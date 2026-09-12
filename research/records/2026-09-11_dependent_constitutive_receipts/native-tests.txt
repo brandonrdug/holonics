@@ -1,0 +1,15 @@
+warning: holonic-engine@0.1.0: exact CUDA laws built for compute_89
+   Compiling relational-geometry v0.1.0 (/home/b/Workspaces/holonics/crates/relational-geometry)
+   Compiling holonic-engine v0.1.0 (/home/b/Workspaces/holonics/crates/holonic-engine)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 02s
+     Running unittests src/lib.rs (target/debug/deps/holonic_engine-6ae3d245ea632305)
+
+running 2 tests
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::comparison::constitutive::tests::dependent_constitutive_return_preserves_source_condition_correlation ... dependent theta_index=0 condition=[Ratio { numer: 3, denom: 2 }, Ratio { numer: 1, denom: 2 }] residual=[Ratio { numer: 1, denom: 2 }, Ratio { numer: 1, denom: 2 }] formation=ConstitutiveFibreReturn { occurrence: 23, predecessor_reading: Plural { particular: [Ratio { numer: 1, denom: 1 }, Ratio { numer: 2, denom: 1 }], directions: [[Ratio { numer: 1, denom: 1 }, Ratio { numer: 0, denom: 1 }]] }, formed_pivot: None, successor_rank: 15 }
+dependent theta_index=1 condition=[Ratio { numer: 6, denom: 5 }, Ratio { numer: 2, denom: 5 }] residual=[Ratio { numer: 1, denom: 5 }, Ratio { numer: 2, denom: 5 }] formation=ConstitutiveFibreReturn { occurrence: 23, predecessor_reading: Plural { particular: [Ratio { numer: 2, denom: 1 }, Ratio { numer: 2, denom: 1 }], directions: [[Ratio { numer: 1, denom: 1 }, Ratio { numer: 0, denom: 1 }]] }, formed_pivot: None, successor_rank: 15 }
+ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::comparison::constitutive::tests::dependent_constitutive_return_retains_condition_obstruction_and_material_extension ... dependent outside_relation=ConditionContactReading { contact: 1, relation_cut: 21, metric: UnitAdmittanceRealification, status: OutsideRepresentedRelation, predecessor: [Ratio { numer: 1, denom: 1 }, Ratio { numer: 0, denom: 1 }], successor: [Ratio { numer: 1, denom: 1 }, Ratio { numer: 0, denom: 1 }], incoming_normal: [Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }], returned_normal: [Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }], difference: [Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }] } formation=ConstitutiveFibreReturn { occurrence: 22, predecessor_reading: Unique { current: [Ratio { numer: -2, denom: 1 }, Ratio { numer: -1, denom: 1 }] }, formed_pivot: Some(14), successor_rank: 15 }
+ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 2412 filtered out; finished in 202.99s
+

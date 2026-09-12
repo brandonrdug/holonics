@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** September 11, 2026. **Current work:** real pending comparisons compile natively; active goal continues through constitutive incorporation.
+**Currency:** September 11, 2026. **Current work:** dependent constitutive returns execute natively; active goal continues through publication of the complete family successor.
 **Athena objective:** standing; useful Athena-alpha has not been attained. **Broad native cultivation:** paused while the consuming family/source binding is repaired;
 authorized native implementation continues within the shared programme. The active phases now have names;
 AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -36,11 +36,20 @@ remount and foreign/released handles. Seven packet and two prior comparison regr
 This is read-only compilation/evaluation; pending returns remain unconsumed and no new material
 or successor is published by it.
 
-[open] The active goal remains the complete native Eros return cycle. Derive the existing
-condition-contact and formation law over this compiled bounded source family, preserving shared
-parameters; relation row witnesses are not material weights. Bind that constitutive consequence
-into one contemporary successor, consume the pending cut once, persist it and inspect subsequent
-conduct. The compiler return is progress toward that objective, not completion of a smaller goal.
+[established-bounded; implemented-exact; formal-checked] The
+[dependent constitutive return](research/records/2026-09-11_CONSTITUTIVE_RETURNS_REMAIN_DEPENDENT_ON_THEIR_SOURCE.md)
+now evaluates the existing condition preimage/contact and staged formation at a shared original
+source parameter. Two native checks return distinct exact conditions `(3/2,1/2)` and `(6/5,2/5)`,
+preserve the vertical output fibre, match the point operation and stage an incompatible-return
+extension without mutating standing. Lean checks the contact law and its non-affine dependence.
+All six neighborhood and 24 coupled-wave checks passed serially, and Framework.Computation built.
+
+[open] The active goal remains the complete native Eros return cycle. The dependent family of
+condition/material consequences must become one contemporary successor; one evaluated alternative
+cannot be installed as that family. Retain its joint with contemporary current and pending sources,
+consume the pending cut once, persist it and inspect subsequent conduct. Source inspection also
+locates a discarded image joint; verify the required delayed correlation with a native separator
+before changing its representation. The evaluator is progress, not completion of a smaller goal.
 
 [proved-derived; formal-checked] The latest
 [relative code-cost return](research/records/2026-09-11_RELATIVE_CODE_COST_HAS_AN_ADDRESSED_BOUNDARY_LAW.md)

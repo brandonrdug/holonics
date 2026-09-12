@@ -1,0 +1,32 @@
+warning: holonic-engine@0.1.0: exact CUDA laws built for compute_89
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s
+     Running unittests src/lib.rs (target/debug/deps/holonic_engine-6ae3d245ea632305)
+
+running 24 tests
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::comparison::constitutive::tests::dependent_constitutive_return_preserves_source_condition_correlation ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::comparison::constitutive::tests::dependent_constitutive_return_retains_condition_obstruction_and_material_extension ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::comparison::joint::tests::compiled_joint_keeps_rational_condition_and_observation_denominators ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::comparison::joint::tests::compiled_joint_retains_free_current_directions_inside_one_anchor ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::comparison::joint::tests::delayed_joint_compilation_uses_current_material_and_the_original_producing_condition ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::comparison::joint::tests::pending_comparison_compiles_joint_equations_without_freeing_its_anchor ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::comparison::tests::coupled_producing_comparison_survives_intervening_condition_and_material ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::comparison::tests::coupled_producing_comparison_unit_lift_is_exact ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::rest::pending_tests::pending_comparison_rest_rejects_equal_endpoint_source_substitution ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::tests::coupled_basis_face_does_not_turn_a_projected_tie_into_a_bounded_score ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::tests::coupled_basis_face_keeps_its_source_and_transports_the_receiver_order ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::tests::coupled_condition_return_separates_dependent_and_independent_receivers ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::tests::coupled_domain_and_source_plane_refusals_preserve_complete_rest ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::tests::coupled_generation_owns_its_family_and_expires_source_admissions ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::tests::coupled_late_refusal_preserves_both_predecessors ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::tests::coupled_observed_next_joins_the_family_and_preserves_its_anchor ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::tests::coupled_plural_source_contact_preserves_its_fibre_and_source_union ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::tests::coupled_reception_forms_material_before_admitting_the_new_current ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::tests::coupled_rest_crosses_process_exit_with_pending_normal_and_conditional_returns ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::tests::coupled_rest_retains_contacts_and_the_next_whole_successor ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::tests::coupled_source_actuation_retains_family_and_uses_the_learned_arrival ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::tests::coupled_source_field_has_one_public_successor_and_exact_internal_composition ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::tests::coupled_source_return_changes_condition_and_joint_atomically ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::tests::coupled_unit_real_sum_lifts_source_offsets_and_retains_chart ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 2390 filtered out; finished in 6.15s
+

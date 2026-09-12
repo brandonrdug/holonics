@@ -2,7 +2,7 @@ use super::*;
 pub(super) mod rest;
 mod comparison;
 use comparison::CoupledProducingCut;
-pub use comparison::{CompiledCoupledJoint, CoupledJointEvaluation, CoupledJointReading,NormalCoupledProducingHandle,NormalCoupledPrediction,NormalCoupledComparison,NormalFamilyComparisonRow};
+pub use comparison::{CoupledConstitutiveFamily, CoupledConstitutiveAlternative, CompiledCoupledJoint, CoupledJointEvaluation, CoupledJointReading,NormalCoupledProducingHandle,NormalCoupledPrediction,NormalCoupledComparison,NormalFamilyComparisonRow};
 use crate::native_ecology::constitutive_fibre::{
     GeneratorNeighborhoodStep, ResidentGeneratorNeighborhood, ResidentSourcePairs,
     ResidentWaveRelation, WaveSourceReceiver,

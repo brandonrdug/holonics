@@ -182,6 +182,13 @@ This [compiler return](../research/records/2026-09-11_ACTUAL_PENDING_COMPARISONS
 is read-only; the active Eros goal still includes its consuming contact/formation law, one
 published successor and exactly-once pending consumption.
 
+[established-bounded; implemented-exact; formal-checked] The
+[dependent constitutive return](../research/records/2026-09-11_CONSTITUTIVE_RETURNS_REMAIN_DEPENDENT_ON_THEIR_SOURCE.md)
+now reuses the actual condition-contact and staged formation law over shared source assignments.
+Its native alternatives retain complete condition/material consequences; a checked elementary
+case is non-affine in the source. Whole-family successor publication and subsequent conduct
+remain open. Inspecting a conditional alternative does not consume or develop the live wave.
+
 ## Native-first construction
 
 [definition] [Hephaestus Automata](HEPHAESTUS_AUTOMATA.md) are operator-scoped mathematical

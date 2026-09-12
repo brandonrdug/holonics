@@ -1652,6 +1652,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 #include "normal_wave_family.cuh"
 #include "normal_family_receiver.cuh"
 #include "coupled_joint_compile.cuh"
+#include "coupled_constitutive_family.cuh"
 #include "normal_coupled.cuh"
 #include "normal_wave_receive.cuh"
 #include "normal_wave_basis_face.cuh"

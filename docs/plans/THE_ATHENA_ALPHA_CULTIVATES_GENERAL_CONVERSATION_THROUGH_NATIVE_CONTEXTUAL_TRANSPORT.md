@@ -218,6 +218,15 @@ in that relation's row span, not learned material weights. The [native return](.
 checks both receiver charts, genuine free current directions, non-dyadic inputs and delayed/restored
 cuts without intermediate readout. It is read-only; the consuming work below remains open.
 
+[established-bounded; implemented-exact; formal-checked] `read_coupled_constitutive_family` now
+lifts the existing neighborhood preimage/contact/formation at a shared source parameter, after
+native anchor admission. The [dependent return](../../research/records/2026-09-11_CONSTITUTIVE_RETURNS_REMAIN_DEPENDENT_ON_THEIR_SOURCE.md)
+checks point specialization, source-dependent conditions, preserved vertical directions and
+staged extension outside the old relation. Even its elementary one-row condition graph is
+non-affine. The next representation must therefore retain `θ ↦ (hθ,Rθ)` and the actual
+source/current continuation; neither one selected alternative nor the span of all alternatives
+can be published as this family. This evaluator does not consume pending returns.
+
 [definition] The family lift must distinguish recorded h_s from a proposed successor condition.
 Use the actual constitutive contact/formation relation over the bounded source parameters;
 retain its joint variation or prove a lawful condensation of its complete return. Never insert

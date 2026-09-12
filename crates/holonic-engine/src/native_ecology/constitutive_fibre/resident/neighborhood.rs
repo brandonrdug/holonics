@@ -42,16 +42,34 @@ pub struct GeneratorNeighborhoodStep<'input, 'c> {
 /// Complete neighborhood successor held before publication.  The wave coordinator can retain
 /// this object while preparing its own successor; dropping it leaves both live predecessors.
 pub(crate) struct PreparedNeighborhoodAdvance<'input, 'c> {
+    source: ResidentConstitutiveCurrent<'input, 'c>,
+    observed: Option<ResidentConstitutiveCurrent<'input, 'c>>,
+    consequence: PreparedNeighborhoodConsequence<'c>,
+}
+
+/// Source-independent storage for the consequence of a specified pair of operands. A dependent
+/// family evaluator owns its operand sections separately and retains their common parameter;
+/// it must not publish one evaluated alternative as the actual neighborhood successor.
+pub(crate) struct PreparedNeighborhoodConsequence<'c> {
     owner: Rc<()>,
     member: usize,
     predecessor_epoch: u64,
     successor_epoch: u64,
     prediction: ResidentConstitutiveReturn<'c>,
     prior_condition: ResidentConditionStanding<'c>,
-    source: ResidentConstitutiveCurrent<'input, 'c>,
-    observed: Option<ResidentConstitutiveCurrent<'input, 'c>>,
     condition: Option<PreparedConditionContact<'c>>,
     formation: Option<PreparedConstitutiveFormation<'c>>,
+}
+impl<'c> PreparedNeighborhoodConsequence<'c> {
+    pub(crate) fn prediction(&self) -> &ResidentConstitutiveReturn<'c> {
+        &self.prediction
+    }
+    pub(crate) fn condition(&self) -> Option<&PreparedConditionContact<'c>> {
+        self.condition.as_ref()
+    }
+    pub(crate) fn formation(&self) -> Option<&ResidentConstitutiveReturn<'c>> {
+        self.formation.as_ref().map(|f| &f.returned)
+    }
 }
 impl<'input, 'c> GeneratorNeighborhoodStep<'input, 'c> {
     pub fn source(&self) -> ResidentConstitutiveCurrent<'_, 'c> {
@@ -139,8 +157,22 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
         receiver: WaveSourceReceiver,
         proposed: Option<&PreparedNeighborhoodAdvance<'_, 'c>>,
     ) -> Result<ResidentWaveRelation<'c>, ConstitutiveFibreError> {
+        self.read_consequence_wave_relation(
+            member,
+            roots,
+            receiver,
+            proposed.map(|p| &p.consequence),
+        )
+    }
+    pub(crate) fn read_consequence_wave_relation(
+        &self,
+        member: usize,
+        roots: usize,
+        receiver: WaveSourceReceiver,
+        proposed: Option<&PreparedNeighborhoodConsequence<'c>>,
+    ) -> Result<ResidentWaveRelation<'c>, ConstitutiveFibreError> {
         if let Some(p) = proposed {
-            if !self.can_commit_advance(p) {
+            if !self.can_commit_consequence(p) {
                 return Err(ConstitutiveFibreError::ForeignOccurrence);
             }
             let condition = p
@@ -197,6 +229,23 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
         source: ResidentConstitutiveCurrent<'i, 'c>,
         observed: Option<ResidentConstitutiveCurrent<'i, 'c>>,
     ) -> Result<PreparedNeighborhoodAdvance<'i, 'c>, ConstitutiveFibreError> {
+        let consequence = self.prepare_consequence(member, source, observed)?;
+        Ok(PreparedNeighborhoodAdvance {
+            source,
+            observed,
+            consequence,
+        })
+    }
+
+    /// The same condition-contact and formation law used by ordinary point occurrences.
+    /// A caller lifting this operation over a source family retains the dependent alternatives;
+    /// this method itself neither publishes nor decides which alternative is actual.
+    pub(crate) fn prepare_consequence(
+        &mut self,
+        member: usize,
+        source: ResidentConstitutiveCurrent<'_, 'c>,
+        observed: Option<ResidentConstitutiveCurrent<'_, 'c>>,
+    ) -> Result<PreparedNeighborhoodConsequence<'c>, ConstitutiveFibreError> {
         if !self.usable {
             return Err(ConstitutiveFibreError::Uncertain);
         }
@@ -234,15 +283,13 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
         } else {
             (None, None)
         };
-        Ok(PreparedNeighborhoodAdvance {
+        Ok(PreparedNeighborhoodConsequence {
             owner: Rc::clone(&self.owner),
             member,
             predecessor_epoch: self.epoch,
             successor_epoch: next,
             prediction,
             prior_condition,
-            source,
-            observed,
             condition,
             formation,
         })
@@ -251,6 +298,12 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
     pub(crate) fn can_commit_advance(
         &self,
         prepared: &PreparedNeighborhoodAdvance<'_, 'c>,
+    ) -> bool {
+        self.can_commit_consequence(&prepared.consequence)
+    }
+    pub(crate) fn can_commit_consequence(
+        &self,
+        prepared: &PreparedNeighborhoodConsequence<'c>,
     ) -> bool {
         self.usable
             && Rc::ptr_eq(&self.owner, &prepared.owner)
@@ -270,6 +323,11 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
         prepared: PreparedNeighborhoodAdvance<'i, 'c>,
     ) -> GeneratorNeighborhoodStep<'i, 'c> {
         debug_assert!(self.can_commit_advance(&prepared));
+        let PreparedNeighborhoodAdvance {
+            source,
+            observed,
+            consequence: prepared,
+        } = prepared;
         let contact = prepared
             .condition
             .map(|c| self.condition.publish_prepared(c));
@@ -296,8 +354,8 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
             prior_condition: prepared.prior_condition,
             contact,
             formation,
-            source: prepared.source,
-            observed: prepared.observed,
+            source,
+            observed,
         }
     }
 }

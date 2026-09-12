@@ -1,0 +1,6 @@
+Terminal excerpt of: bash tools/lean_check.sh ElementaryHolonics.Framework.Computation
+Observed process exit code: 0. Existing dependency/linter replay omitted.
+Full local output retained at /tmp/athena-dependent-lean.txt.
+
+✔ [8893/8894] Built ElementaryHolonics.Mathematics.DependentConstitutiveReturn (3.3s)
+Build completed successfully (8894 jobs).

@@ -1,5 +1,6 @@
 import ElementaryHolonics.Framework.Core
 import ElementaryHolonics.Mathematics.GeneratorFactorization
+import ElementaryHolonics.Mathematics.DependentConstitutiveReturn
 import ElementaryHolonics.Computation.CslibExecutionReceiver
 import ElementaryHolonics.Computation.HolonicMachineLearning
 import ElementaryHolonics.Computation.HolonicArchitectureCharts

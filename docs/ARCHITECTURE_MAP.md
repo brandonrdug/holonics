@@ -135,6 +135,15 @@ connects it to the existing addressed causal-length, physical and complexity own
 
 ## Foundation and transport
 
+[definition] `wave/coupled/comparison/constitutive.rs` owns the dependent constitutive family
+and its conditional alternatives. `coupled_constitutive_family.cuh` substitutes the same resident
+source parameter into both operands after the original anchor check. The existing neighborhood
+transaction now factors `PreparedNeighborhoodConsequence` from borrowed operands, reusing
+condition preimage/contact and staged material formation. `Mathematics/DependentConstitutiveReturn.lean`
+checks shared-parameter composition and a non-affine contact specialization. The
+[dependent return](../research/records/2026-09-11_CONSTITUTIVE_RETURNS_REMAIN_DEPENDENT_ON_THEIR_SOURCE.md)
+states the remaining whole-family publication and source/current continuation boundary.
+
 [definition] `wave/coupled/comparison/joint.rs` owns `CompiledCoupledJoint` and its actual
 parameter/anchor evaluation. `surface_coupled_joint.rs` binds `coupled_joint_compile.cuh` to the
 resident coefficient compiler and original anchor receiver. The same `ResidentBilinearMap`

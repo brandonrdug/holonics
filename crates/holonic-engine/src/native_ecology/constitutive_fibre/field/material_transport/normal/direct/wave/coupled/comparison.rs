@@ -2,6 +2,8 @@
 //! This carrier is not a point source or a span of independently observed alternative rows.
 use super::*;
 mod joint;
+mod constitutive;
+pub use constitutive::{CoupledConstitutiveFamily, CoupledConstitutiveAlternative};
 pub use joint::{CompiledCoupledJoint, CoupledJointEvaluation, CoupledJointReading};
 
 pub(super) struct CoupledProducingCut<'c> {

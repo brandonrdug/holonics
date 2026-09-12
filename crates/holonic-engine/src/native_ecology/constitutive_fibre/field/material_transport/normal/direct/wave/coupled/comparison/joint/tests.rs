@@ -24,39 +24,8 @@ fn parameters_at(
     anchor: &[i64],
     joint: &[i64],
 ) -> Vec<Rat> {
-    let family = comparison.source().affine_relation();
+    let theta = source_parameters_at(comparison, anchor, joint);
     let s = comparison.source().origin().fibre().surface;
-    let raw = s.read_out(family.report()).unwrap();
-    assert!(raw.iter().all(|(a, b)| a == b));
-    let raw = raw.iter().map(|v| v.0).collect::<Vec<_>>();
-    let ps = family.source_width();
-    let t = family.target_width();
-    let pk = ps + t;
-    let origin = raw[ps..pk]
-        .iter()
-        .map(|v| Rat::new((*v).into(), raw[pk].into()))
-        .collect::<Vec<_>>();
-    let dirs = ExactRatMatrix::new(
-        raw[pk + 4..]
-            .chunks_exact(t)
-            .map(|v| v.iter().map(|n| r(*n)).collect())
-            .collect(),
-    )
-    .unwrap();
-    let mut desired = vec![r(1), r(0)];
-    desired.extend(anchor.iter().map(|v| r(*v)));
-    desired.extend(joint.iter().map(|v| r(*v)));
-    let rhs = desired
-        .iter()
-        .zip(origin)
-        .map(|(a, b)| a - b)
-        .collect::<Vec<_>>();
-    let (theta, _) = dirs
-        .transpose()
-        .unwrap()
-        .preimage_fibre(&rhs)
-        .unwrap()
-        .unwrap();
     let mut paired = comparison.inspect_row(0).unwrap();
     paired.features.extend(paired.observed_difference);
     let mut g = paired.features;
@@ -103,6 +72,44 @@ fn parameters_at(
     );
     result.extend(witnesses);
     result
+}
+pub(in super::super::super) fn source_parameters_at(
+    comparison: &NormalCoupledComparison<'_>, anchor: &[i64], joint: &[i64],
+) -> Vec<Rat> {
+    let family = comparison.source().affine_relation();
+    let s = comparison.source().origin().fibre().surface;
+    let raw = s.read_out(family.report()).unwrap();
+    assert!(raw.iter().all(|(a, b)| a == b));
+    let raw = raw.iter().map(|v| v.0).collect::<Vec<_>>();
+    let ps = family.source_width();
+    let t = family.target_width();
+    let pk = ps + t;
+    let origin = raw[ps..pk]
+        .iter()
+        .map(|v| Rat::new((*v).into(), raw[pk].into()))
+        .collect::<Vec<_>>();
+    let dirs = ExactRatMatrix::new(
+        raw[pk + 4..]
+            .chunks_exact(t)
+            .map(|v| v.iter().map(|n| r(*n)).collect())
+            .collect(),
+    )
+    .unwrap();
+    let mut desired = vec![r(1), r(0)];
+    desired.extend(anchor.iter().map(|v| r(*v)));
+    desired.extend(joint.iter().map(|v| r(*v)));
+    let rhs = desired
+        .iter()
+        .zip(origin)
+        .map(|(a, b)| a - b)
+        .collect::<Vec<_>>();
+    let (theta, _) = dirs
+        .transpose()
+        .unwrap()
+        .preimage_fibre(&rhs)
+        .unwrap()
+        .unwrap();
+    theta
 }
 fn wave<'c>(s: &'c ResidentSurface<'c>) -> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
     let h = point(s, &[1, 0]);

@@ -78,8 +78,11 @@ resident evaluation with changed-receiver product reuse. Continue these owners t
 recurrence/block applications and actual source/material incorporation. The subsequent [joint-fibre return](../../research/records/2026-09-11_JOINT_SOURCE_CONDITION_AND_MATERIAL_KEEP_THEIR_PRODUCT_CONSTRAINTS.md)
 now represents shared source/condition/material constraints and evaluates them natively. The [actual pending compiler](../../research/records/2026-09-11_ACTUAL_PENDING_COMPARISONS_COMPILE_WITH_THEIR_ANCHORS.md)
 now constructs those equations directly from resident source and material data with its original
-anchor and producing condition. Continue by deriving the family-valued constitutive contact/
-formation and connecting its complete consequence to the existing atomic transaction.
+anchor and producing condition. The [dependent constitutive return](../../research/records/2026-09-11_CONSTITUTIVE_RETURNS_REMAIN_DEPENDENT_ON_THEIR_SOURCE.md)
+now executes the existing contact/formation law under a shared source assignment and demonstrates
+its non-affine condition dependence. Continue by representing its complete family consequence
+with the actual source/current continuation and connecting it to the existing atomic transaction.
+Publishing one evaluated alternative or the span of all alternatives is not that construction.
 The exterior affine material solve does not itself perform that native incorporation.
 
 [definition] The present work joins two responsibilities in phases 1–2. Use the returned reusable

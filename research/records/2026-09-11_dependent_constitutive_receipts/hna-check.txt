@@ -1,0 +1,28 @@
+   Compiling holonic-engine v0.1.0 (/home/b/Workspaces/holonics/crates/holonic-engine)
+warning: holonic-engine@0.1.0: exact CUDA laws built for compute_89
+warning: method `record_joined_operative_return_bounds` is never used
+ --> crates/holonic-engine/src/resident_section/surface_operative_map_source.rs:4:19
+  |
+3 | impl<'c> ResidentSurface<'c> {
+  | ---------------------------- method in this implementation
+4 |     pub(crate) fn record_joined_operative_return_bounds(
+  |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: struct `SectionContactMaterial` is never constructed
+   --> crates/holonic-engine/src/native_ecology/../holonic_intelligence/operative_return.rs:239:19
+    |
+239 | pub(super) struct SectionContactMaterial<'a, 'chart> {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `enact_section_contact` is never used
+   --> crates/holonic-engine/src/native_ecology/../holonic_intelligence/operative_return.rs:335:15
+    |
+335 | pub(super) fn enact_section_contact<'chart>(
+    |               ^^^^^^^^^^^^^^^^^^^^^
+
+warning: `holonic-engine` (lib) generated 3 warnings
+    Checking life v0.0.0 (/home/b/Workspaces/holonics/crates/holonic-life)
+    Checking holonics-hna v0.1.0 (/home/b/Workspaces/holonics/crates/holonics-hna)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 58s
