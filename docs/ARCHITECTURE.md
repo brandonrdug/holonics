@@ -96,6 +96,16 @@ snapshot/commit API as the full neural runtime.
 
 ## What the mathematics buys the implementation
 
+[project-postulate] The [sustained programme](plans/THE_ROADMAP.md#sustained-objective-and-construction-rhythm)
+makes mathematics, native construction and applications one continuing effort. Recovering
+applicable generators, comparing receiver-preserving realizations, incorporating returned
+constraints and reusing their compressed continuation are the common problems expressed in
+Athena, Eros and Hephaestus. Mathematical/physical sources provide exact constraints and
+separating examples; the engine implements the resulting computational relations and returns
+new observations. The [blueprint's binding table](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-shared-mathematical-to-native-construction)
+identifies current consumers and remaining work. The difference in evidence scope between a
+formal theorem and an executable body is an implementation responsibility within this programme.
+
 [project-postulate] “Learning” is not a capability grade inferred from a changed state. Describe
 the actual conditional association, applicable transformation, receiver reconstruction or
 predictive/product result. The [named Athena phases](plans/THE_ROADMAP.md#athena-construction-order)
@@ -131,7 +141,8 @@ whole causal object.
 makes computational use explicit: preserve joint constraints, let actual contact/condition change
 later response, return labeled emission and the complete successor, and reuse generators only
 through their admitted future receivers. The [Athena blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
-specifies the next bounded source/target, native emission and atomic coupled-ownership work. A
+specifies the continuing source/family incorporation, constituent formation, encoding and
+product work; native emission and coupled ownership are existing dependencies. A
 rendered manifold is a receiver of these constructions; the runtime need not render its state.
 
 ## Consumer hardware and the 20W ideology

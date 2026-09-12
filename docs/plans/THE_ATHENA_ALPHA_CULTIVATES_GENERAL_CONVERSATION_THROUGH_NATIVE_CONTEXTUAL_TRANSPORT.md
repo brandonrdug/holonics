@@ -3,15 +3,17 @@
 [definition] This is the active native implementation specification. [The roadmap](THE_ROADMAP.md)
 alone orders construction; [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) alone records the
 position. September 11 consolidates the old AC responsibility labels into named work phases.
-The file path, source names and existing wire identifiers remain stable. The native pause is
-unchanged by this planning review.
+The file path, source names and existing wire identifiers remain stable.
 
-[project-postulate] Brandon's subsequent direction prioritizes elementary mathematical
-applications as **Hephaestus Automata**, described in the [application design](../HEPHAESTUS_AUTOMATA.md).
-The roadmap now orders that application line. These native phases supply its HNN integration
-requirements; general conversation remains a standing product objective rather than an entrance
-condition for every mathematical device. Eros's composition acts inside nested automata and
-their wider ecology, not only in a separate top-level training phase.
+[project-postulate] Brandon's latest September 11 ruling makes the shared programme explicit.
+Hephaestus mathematical construction and Athena are productive uses of the same engine and
+formative laws. The [roadmap's sustained programme](THE_ROADMAP.md#sustained-objective-and-construction-rhythm)
+orders their common milestones. The mathematical investigations supply generating relations,
+receiver/phase transport, bounds and counterexamples that this blueprint binds into native
+operation. Native failures refine those constructions in return. Eros acts within nested
+constituents and their containing ecology; its incorporation is not deferred until an independent
+mathematical product is finished. Broad cultivation remains paused while its immediate consuming
+family/source attachment is repaired; this is not a pause on authorized native implementation.
 
 ## Product and evidence
 
@@ -25,6 +27,61 @@ its applicability, its composed consequences and the output that demonstrates th
 `occurrence -> local current -> reaction -> emission + successor ecology -> next occurrence`.
 That describes causal operation. It does not by itself establish recognition or comprehension.
 Use the outcome definitions in the roadmap and the full compared faces in the return.
+
+## The shared mathematical-to-native construction
+
+[definition] The target is one continuing ecology of applicable generators. A mathematical
+operator request, a text occurrence, an acoustic event and a kinetic observation enter through
+their source/receiver charts. Athena carries the available organization; Eros changes that
+organization through actual returned constraints; Hephaestus confines its use to a requested
+mathematical operation or construction. Their distinct names do not introduce separate
+inference, compression or formative laws.
+
+| Shared formal construction | Existing executable owner | Required Athena/Eros consequence |
+|---|---|---|
+| Addressed holon, joint future receiver and Preimage Fibre | Coupled current families, source arrivals, pending producing comparison | Retain actual joins and correlated conditions behind an emitted face; later observations constrain the producing relation at its saved cut. |
+| Exact generator factorization and ordered recurrence words | `exact_linear`, `derived_factor_cover`, mathematical factorization example | Expose reusable factors/actions and receiver maps; execute a new admitted composition. Bind the relevant pure action to resident owners before extending it to developing material. |
+| Receiver-history compression and generator equivariance | `receiver_history_compression`, observable-form closure, existing native relation and rest owners | Preserve the complete required future under encoding, including changed conditions, emission and the current material; retain or reopen a separating source fibre. |
+| Swing, clock–ruler and phase-lift transport | Exact receiver atlas, coupled/analytic phase and internal-mode owners | Keep source clock, winding, orientation and within-cycle residue across changed receiving conditions. Source and receiver must travel together. |
+| Situated information and addressed code-cost bounds | `surprisal`, `exact_work`, native comparison/inspection | Measure surprise/code length, full residual, work and residency at the same declared cut. Carry endpoint/normalization terms; use cost to compare admissible realizations, not to replace causal relevance. |
+| Adjoint, finite differences, mixed energy and constitutive reaction | Producing material return, local relation/contact, field and wave owners | A returned difference acts through its actual producing morphology and changes the appropriate law/contact/material in one successor. |
+| Sequence/fold, catalytic current, fluid memory and world-tube sections | Existing physical/kinetic and Schur/internal-mode realizations | Retain joint occupancy/contact and hidden continuation when equal present faces have different futures. Reuse those mechanics wherever the native source domains match. |
+| Encoding-anchored causal length and target correspondence | Public native session, exact primitive/device and interoperability owners | Relate claimed savings to executed work and actual decoded outputs; eventually emit useful executable algorithms with their domain, numeric and state correspondence. |
+
+[definition] This table states the intended consumers; it does not claim all those bindings are
+already complete. Formal definitions and theorem names remain exterior. Native implementations
+realize the relations in their admitted exact representations, with kernel/consumer verification.
+No runtime Lean invocation is part of Eros or Athena.
+
+[definition] The reusable mathematical representation retains domain, input/output action,
+conditions, source occurrence, receiver/decoder, ordered clock, compatible coefficient family,
+residual and available work account. Extend those fields in their existing cohesive owners as
+needed; this is not a new universal wrapper or a source-name registry. A public operator request
+must return executable structured material, not require later consumers to recover it from a
+printed example. Serial composition checks the actual joining/domain relation; changing a
+receiver requires a factorization or an explicit separating obstruction.
+
+[definition] Native incorporation consumes the actual producing comparison and restricts/forms
+the joint source/condition/material relation it establishes. Compatible alternatives remain
+alternatives; no chosen centre or invented measure is substituted. When an affine family cannot
+carry a needed mixed product, represent that product through existing richer section/factor
+owners or return the exact missing relation and construct it. This mathematical derivation and
+its native transaction proceed together. Phase 2 below gives the atomic publication boundary.
+
+[definition] Emergent organization is inspected through actual constituent domains, active
+contacts, retained factors and changed future conduct. These may appear as hierarchical layers
+or overlapping regions; layer counts do not define them. The observation surface shows which
+objects participated, their received current/phase, output and subsequent return. Prediction
+branches share immutable standing and own their differences rather than cloning the ecology.
+Probability/cross-entropy applies only to the declared normalized receiver; retain unresolved
+source alternatives and oriented defects before that scalar reading.
+
+[definition] Each sustained implementation milestone follows the complete application loop:
+request/source → native conduct and emitted face → actual compared return → Eros incorporation
+→ successor → a new request using that successor. Show an admitted transfer or improved
+construction and its separating case, along with decoded output and cost. Persistence checks
+apply to every newly claimed durable relation. Tests and formal certificates explain why a
+construction is lawful; the actual output explains what it now accomplishes.
 
 ## Exact source map
 
@@ -190,6 +247,14 @@ without duplicated current; changed contact and unchanged independent contact; c
 and receiver correspondence after the affected shape/domain changes.
 
 ## 4. Holonic Encoding and compressed continuation
+
+[definition] This phase is the engine use of the current generator/entropy/geometry research.
+The source family supplies candidate constructions; the receiver/history law determines which
+retain the required distinctions; measured code/work/clock costs compare those admitted
+realizations. Preserve different resource tradeoffs instead of assuming shortest code means
+fastest execution. A condensation can reduce repeated conduct while its decoder, source
+remainder and pending producing cuts remain available. The same mechanism is the intended
+internal encoding for text, mathematics, vision and acoustics.
 
 [definition] The [Holonic Solver return](../../research/records/2026-09-11_HOLONIC_SOLVER_NAVIGATES_EXACT_GENERATOR_FACTORIZATIONS.md)
 now provides an executed exterior method for this phase: specify the local action tensor or

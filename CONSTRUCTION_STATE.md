@@ -1,11 +1,21 @@
 # Construction state
 
-**Currency:** September 11, 2026. **Current work:** receiver-relative code cost and operator reuse.
-**Athena objective:** standing; useful Athena-alpha has not been attained. **Native runs:** paused
-during the requested mathematical/encoding applications. The active phases now have names;
+**Currency:** September 11, 2026. **Current work:** unified programme articulated; reusable operator and Eros family integration next.
+**Athena objective:** standing; useful Athena-alpha has not been attained. **Broad native cultivation:** paused while the consuming family/source binding is repaired;
+authorized native implementation continues within the shared programme. The active phases now have names;
 AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/plans/THE_ROADMAP.md)
 is the sole order and [the blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 names actual code changes and outcomes.
+
+[definition] Brandon's latest ruling joins the mathematical work and Athena into one sustained
+construction programme. The [roadmap](docs/plans/THE_ROADMAP.md#sustained-objective-and-construction-rhythm)
+and [native binding table](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-shared-mathematical-to-native-construction)
+now connect reusable generators, Eros incorporation, applicable constituent formation, Holonic
+Encoding, useful durable applications and shared physical/modality work. Next implement reusable
+operator/factor requests alongside the correlated family-incorporation law and native transaction;
+carry their returns into complete observed successor cycles. A new example alone does not finish
+an authorized consuming implementation. This pass reconciled the plans and product guides;
+no native run, source-code change or new product capability is claimed.
 
 [proved-derived; formal-checked] The latest
 [relative code-cost return](research/records/2026-09-11_RELATIVE_CODE_COST_HAS_AN_ADDRESSED_BOUNDARY_LAW.md)
@@ -21,13 +31,6 @@ readings retain the nonzero endpoint term. The prior
 retains the five analytic receivers, phase lifts and 152-bit packet; the
 [information return](research/records/2026-09-11_ZETA_PHASE_SWING_AND_INFORMATION_RATES_ARE_MEASURED.md)
 retains Swing and measured information rates. No native model or GPU operation changed.
-
-[definition] Next compose reusable operator requests and returned factors/words with these
-admissibility, cost, clock and remainder relations. Description length, executed work and
-physical quantities retain separate units. The [application design](docs/HEPHAESTUS_AUTOMATA.md)
-now states the optimality/physical and RH/complexity bridges precisely; their missing source
-bounds do not create new endpoint prerequisites. The roadmap keeps the actual native
-incorporation and subsequent executable lowering in order.
 
 ## Immediate native boundary
 
@@ -46,8 +49,8 @@ observations. Pending comparison inspection, emission and rest are not missing m
 
 [definition] The next phases are situated reception/visible cycles, conditional relations and
 complete return, applicable constituent organization, Holonic Encoding/reuse, useful conversation,
-and shared modality applications. This is a specification handoff, not a new native run or a
-claimed qualitative result. A changed current/standing alone establishes none of the stronger
+and shared modality applications. These are the native responsibilities within the shared programme, with formal and
+mathematical returns integrated into their actual consumers. A changed current/standing alone establishes none of the stronger
 recognition, association or usefulness outcomes named in those phases.
 
 ## Actual output and verification standing

@@ -7,6 +7,24 @@ developmental phase that forms and refines its reusable material within HNN recu
 and their actual maps. The current public Rust entry point is `holonics::hna`;
 the application implementations are in [holonics-hna](../crates/holonics-hna/README.md).
 
+## One sustained construction programme
+
+[project-postulate] The [live programme](plans/THE_ROADMAP.md#sustained-objective-and-construction-rhythm)
+joins formal mathematics, engine realization and useful Athena conduct. Generator/receiver
+construction, Eros incorporation, constituent formation, Holonic Encoding and application use
+are the shared milestones. Hephaestus mathematical requests are direct uses of that ecology;
+conversation, code and other modalities use the same mechanisms through their own source and
+receiver conditions. The framework's physical and mathematical research feeds those owners
+while developing its wider applications.
+
+[definition] The [native blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-shared-mathematical-to-native-construction)
+names the formal-to-native bindings. Current factor/word construction and information/cost laws
+must become reusable executable material, with the actual decoder, clock and remainder retained.
+The immediate native family-incorporation work gives Eros a complete consuming return; subsequent
+requests must use its changed successor. This is how the mathematical workshop becomes Athena's
+available conduct. Source signatures, a printed result or a smaller artifact alone do not
+establish that incorporation.
+
 ## Athena-alpha and the finite construction programme
 
 [established-bounded; source-inspected; computational-witness] The [representation audit](../research/records/2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md)
@@ -29,13 +47,12 @@ retains its distinct 1,930-occurrence scope and receiver limitation. Current con
 belongs in [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md).
 
 [definition] The [Athena-alpha blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
-is authorized through completion. Brandon's latest September 10 direction closes the illustration
-review and finalizes the next implementation handoff. Its order is producing comparison, resident
-emission, coupled conditional organization, lawful formation/reuse and continuing product evaluation.
-The [computational review](../research/records/2026-09-10_TENSION_DYNAMICS_BECOME_ATHENAS_COMPUTATIONAL_CONSTRUCTION.md)
-connects the exact tension, finite-change, kinetic and future-receiver laws to those owner changes.
-Source exposure, interface and persistence accompany each usable return; current execution status
-belongs in CONSTRUCTION_STATE.
+is authorized through completion. The latest September 11 articulation uses the existing
+producing comparison, emission and coupled organization as dependencies; the immediate new
+work is correlated family incorporation and reusable mathematical material, with complete
+source-visible cycles. Applicable formation, encoding and useful durable applications continue
+from that same body. Source exposure, interface and persistence accompany each usable return;
+current execution status belongs in CONSTRUCTION_STATE.
 
 [definition] The [coupled source-field return](../research/records/2026-09-11_COUPLED_SOURCE_FIELDS_REACT_WITH_COMPLETE_ARRIVALS.md)
 uses the complete learned arrival as incoming evidence for an actual source reaction. Its passive
@@ -43,14 +60,16 @@ union transports the full held family, and a complete source field publishes one
 Missing learned arrival remains explicit while the actual offered current is preserved. Source
 actuation, observed development and conditional generation keep their distinct meanings under
 the same wave owner. The coupled session below exposes source actuation and conditional emission;
-producing-family observation remains the next comparison binding.
+the read-only producing-family comparison already exists. Its consuming condition/material
+incorporation remains the next native binding.
 
 [definition] Sequence-to-fold and biochemical kinetics are foundational HNN questions. Their
 [exact source construction](../research/records/2026-09-10_SEQUENCE_FOLD_AND_REACTION_CURRENT_MAKE_THE_CAUSAL_THOUGHT_CHAIN_CONCRETE.md)
 shows why organization, occupancy and joint correlation must survive into later conduct. The
-first planned composite keeps one wave move owner, transfers in the existing learned local
-neighborhood, and stages its member/condition changes with the complete wave successor. The
-current point/exact and bounded-family ports still require the explicit conversions in the plan.
+existing coupled composite keeps one wave move owner and the attached local neighborhood.
+The remaining consuming return must stage its member/condition changes with the complete wave
+successor. Its point/exact and bounded-family ports require the explicit joint relations in
+the plan.
 Its text receiver is a declared native projection with the full source fibre retained, not a
 claim that a selected word identifies the source or proves useful language.
 
@@ -67,7 +86,8 @@ now exposes GPU basis selection, exterior decoding and ordinary emitted-source r
 `NativeWaveSession` and the shared stream. Pending selection/re-entry and delivery survive rest;
 a fresh-process continuation returns identical events and final artifact. The observed eight-symbol
 output is `tht44444`; this establishes the interface/continuation scope, not useful conversation.
-Coupled conditional organization and formation/reuse remain required construction.
+The subsequent coupled conditional organization is described below; consuming family formation
+and its reusable encoding remain construction responsibilities.
 
 [definition] The [coupled session return](../research/records/2026-09-11_COUPLED_FAMILY_EMISSION_CONTINUES_THROUGH_ONE_SESSION.md) exposes the coupled family's declared projected receiver through `NativeCoupledWaveSession`,
 conditional generation and actual emitted-symbol re-entry. `project-symbol` is a pure reading;

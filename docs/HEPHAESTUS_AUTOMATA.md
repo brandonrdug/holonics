@@ -30,6 +30,30 @@ is exterior mathematical apparatus. It searches exact bilinear realizations, sol
 reference for this direction; it does not yet supply a general operator-facing application or
 demonstrate a native HNN solving those tasks.
 
+## Direct contribution to Athena and Eros
+
+[project-postulate] Hephaestus is the mathematical application of the
+[shared sustained programme](plans/THE_ROADMAP.md#sustained-objective-and-construction-rhythm).
+The requested algorithm is executable material for the same ecology that handles other
+occurrences. Eros incorporates the actual returned source/condition constraints and forms
+applicable constituents; Athena retains and applies their conduct; Holonic Encoding preserves
+required futures at measured cost. These are mutually dependent construction responsibilities,
+not a host solver project that must finish before HNN implementation resumes.
+
+[definition] The [native binding table](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-shared-mathematical-to-native-construction)
+connects factor/word, phase, code-cost and future-receiver laws to actual engine owners. The
+immediate reusable-operator work and the producing-family incorporation proceed together where
+their domains permit. A pure local operator can be bound before the complete developing-segment
+law; claiming a changed compressed successor includes that law. Native outputs then inform which
+source families, mixed terms or constitutive relations the framework must express more fully.
+
+[definition] Long-term application outcomes include an ecology that builds an algorithm for a
+request, reuses constituent actions in a later request, refines their applicability from an
+actual difference, and emits useful mathematical/code/text results through their receiver charts.
+The same source/continuation questions appear in kinetics, fluids, spectral certification and
+multimodal perception. Their specific physical laws and endpoint inequalities remain explicit
+while their reusable constructions are integrated into the engine.
+
 ## The operator's request and return
 
 [definition] A request specifies a mathematical operation or constraint, its domain, supplied

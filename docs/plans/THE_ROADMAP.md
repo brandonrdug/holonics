@@ -5,25 +5,87 @@
 [the Athena blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 specifies native changes. Dated research supplies evidence, not additional schedules.
 
-[project-postulate] The September 11 consolidation replaces the accumulated AC instructions with
-named phases below. **AC0–AC5 remain historical responsibility labels**, not the current queue or
-six claims of capability. Source/API/wire names are preserved. The review itself authorizes no
-new cultivation run; the current native pause remains in force during this planning handoff.
+[project-postulate] Brandon's latest September 11 ruling makes the sustained programme explicit:
+formal mathematics, engine construction, Eros, Athena and Hephaestus develop one framework.
+The mathematical applications must return reusable constructions into the engine; native
+observations must in turn refine the mathematics and its representation. AC0–AC5 remain historical
+labels. The named Athena phases below are the shared implementation order, not a separate
+language project waiting behind an indefinitely expanding list of mathematical experiments.
 
-[definition] Brandon's subsequent bounded toolkit study returns
-[threshold-refinement and partitioned-energy laws](../../research/records/2026-09-11_THRESHOLD_REFINEMENT_AND_PARTITIONED_ENERGY_RETURN_HOLONIC_TOOLKITS.md).
-Use their retained mixed terms, actual clock maps and source-specific refinement requirements
-in the matching native/physical construction below. It does not create a prerequisite to solve
-RH or reopen five endpoint campaigns. Brandon's subsequent Hephaestus direction now prioritizes
-elementary mathematical solver applications; the named Athena phases retain the native
-integration requirements. The application design and immediate work below state that direction. The latest request
-places ζ spectral phase/gaps, situated information/loss and Swing first, with executable
-algorithm/code construction following those encoding comparisons. The bounded three-route
-comparison and literal code/remainder return are now complete; operator-scoped reusable
-factors/words are the next increment, carrying those measurements. The subsequent
-[code-cost boundary return](../../research/records/2026-09-11_RELATIVE_CODE_COST_HAS_AN_ADDRESSED_BOUNDARY_LAW.md)
-adds exact joined-boundary cost bounds and transported optimality to that increment. Physical
-and endpoint applications still owe their source-specific constitutive/certificate maps.
+## Sustained objective and construction rhythm
+
+[project-postulate] Build a continuing ecology that can recover applicable generating relations,
+compose them into useful actions, represent their relevant futures economically, and change its
+available conduct through actual returned differences. Athena is that ecology; Eros is its
+formative union and incorporation, including inside constituents; Hephaestus Automata are its
+operator-scoped working applications. HNN is their common executable architecture. Mathematics,
+text, code, vision, acoustics and physical/biological sources supply different conditions and
+receivers to this construction.
+
+[definition] The shared sequence is
+
+`source/conditions -> compatible generator and current family -> admitted composition -> receiver/emission -> returned difference -> formed successor -> reusable encoding -> next situated request`.
+
+The arrows denote actual dependencies and joins, not mandatory global layers. Existing tensor,
+attention, recurrent/state-space, diffusion, adjoint and normalization constructions are specific
+instances to recover and compose. Source organization, active contact and receiver consequences
+determine the participating constituents; no fixed vocabulary or global task classifier replaces
+them. Formal laws determine the contract of native mechanisms. Their executable realization,
+resource behavior and application binding are verified at those contracts.
+
+[definition] Mathematical and native returns have distinct evidence scopes **within this one
+programme**. Lean verifies exterior statements; the engine realizes their computational relations.
+A proved result need not be re-proved inside inference, and an implemented local owner still needs
+its actual consumer binding. Record those bindings rather than implying every formal declaration
+already executes in Athena. A new theorem, example or receipt is an intermediate return when its
+authorized productive consumer remains unbound.
+
+[project-postulate] Work continues across turns toward the following observable milestones.
+A focused experiment answers a named construction question; its result changes a reusable owner,
+the next consuming implementation, or the precise obstruction being resolved. Do not repeatedly
+stop at another demonstration and offer the same integration as future work. When a mathematical
+return already composes lawfully, implement its authorized consumer while wider research
+continues. A newly exposed missing law is worked through explicitly; unrelated experiments do
+not discharge it. This direction does not authorize unrelated subsystems or destructive actions.
+
+| Existing phase | Shared construction and engine consequence | Hephaestus/Athena outcome |
+|---|---|---|
+| **1. Situated reception and visible cycles** | Public mathematical requests and source/part relationships enter existing owners; retain domain, conditions, receiver, source clock and returned difference. Reusable factors/words replace fixed example wiring. | Inspect a complete requested operation and actual returned face; distinguish a prediction, a supplied correction and an ordinary incoming source. Mathematical results become available constructions, not only printed answers. |
+| **2. Conditional relations and complete return** | Bind producing-family comparisons to correlated condition/preimage and material formation, then publish one successor. | Eros incorporates an observed mathematical/textual relation; a later suitable request uses the changed relation. A separating condition retains its different consequence. |
+| **3. Applicable organization and constituent formation** | Source/contact constraints form reusable local constituents, composed actions and their applicability. Preserve mixed terms, overlapping support and differences behind equal faces. | The same construction serves changed presentations or a newly composed task. Failures expose missing constraints or contact, directing subsequent formation. This is where domain-specific examples return general organization. |
+| **4. Holonic Encoding and compressed continuation** | Derive reusable generator/decoder representations for complete admitted futures, including phase, clock, pending returns and remainders. Compare information and resource costs with retained units and boundary terms. | Conduct through retained constituents without expanding all interiors; reopen them when new contact distinguishes their futures. Text/code, analytic generators and other modalities share the encoding mechanism. |
+| **5. Useful conversation, code and durable applications** | Expose native mathematical actions and ordinary conversation through the public session; persist the actual constructed body. Lower admitted operator words to executable targets with domain/state/numeric correspondence. | Athena gives useful held-out language, mathematics and code; Hephaestus returns reusable working algorithms. A new request can reuse an earlier construction at demonstrated reduced work or broader applicability. |
+| **6. Shared modality and physical applications** | Extend the same formation/encoding through actual optical, acoustic, kinetic, fluid, circuit and world-tube source maps. Continue source-specific analytic/certificate construction. | Inspect cross-modal products and source-qualified physical or mathematical predictions. RH, Hodge, NS, BSD, Yang–Mills and complexity work supply demanding applications and reusable methods; their solutions are not prerequisites to every other application. |
+
+[definition] The phases expose dependencies, not an instruction to finish every domain before
+moving the ecology forward. Pure operator reuse can proceed beside the family-incorporation
+construction. A developing compressed segment depends on its complete successor law. Optical,
+acoustic and kinetic receivers can reveal a flaw in earlier phases without waiting for a full
+modality product. The framework's ambition extends beyond these first useful products toward
+nested automata that construct, compare and refine further automata.
+
+## Immediate integrated implementation
+
+[definition] The present work joins two responsibilities in phases 1–2. First, factor the exact
+operator/recurrence construction into reusable source owners and retain its typed executable
+returns; serve a changed receiver and a new composition. Second, derive and implement the
+producing-family incorporation through existing condition/contact and formation owners. Their
+shared handoff is an admitted source/action/receiver relation with its correlated parameters,
+clock, residual and return—not a JSON result imported as semantic material.
+
+[definition] Bind those returns to a pure resident mathematical segment as soon as its domain
+law permits, then to the changed material/successor once incorporation is defined. The native
+blueprint names exact owners and checks. Complete source-visible cycles accompany this work;
+inspect the input, compatible/predicted faces, actual output, full difference and successor.
+Continue to applicable constituent formation and encoding on that same body. A host search or
+reference codec does not become the production hot operation by relabeling it.
+
+[definition] Native implementation is part of this authorized programme. Broad cultivation
+remains paused while its producing-family transaction and source attachment are repaired; that
+pause does not defer code integration until all mathematical research is complete. Resume
+appropriate native verification when native conduct changes, and developmental exposure when
+the actual changed consumer can receive its returns. No cultivation run occurs merely because
+a planning document was revised.
 
 ## All current plan documents and their roles
 
@@ -42,16 +104,17 @@ and endpoint applications still owe their source-specific constitutive/certifica
 not another ordering authority. It gives the operator contract, concrete mathematical use cases,
 catalytic/ecological correspondence and code/evidence boundaries for the following work.
 
-## Hephaestus Automata: immediate mathematical applications
+## Hephaestus applications within the shared phases
 
 [project-postulate] Focus directly on elementary solving and reusable mathematical applications
 of Holonic Encoding/HNNs. Eros names union and formative composition at nested scopes, Athena
 the general wisdom/model ecology, and Hephaestus Automata the task-scoped application instances.
 Useful mathematical tools need not await general conversation or an official Millennium endpoint.
+The increments below detail applications of phases 1–4 above; they are not a second construction queue.
 
 | Increment | Concrete code/design work | Expected useful return |
 |---|---|---|
-| **Spectral generators and situated information** | Returned at five fixed receivers: two Euler–Maclaurin head/tail splits and direct alternating η; reuse their retained head/tail, phase lifts, literal code, symbolic surprise and scoped work in the next operator increment | Compare the same face across generators and changed receiver charts; distinguish analytic refinement from source change and show when a local code transfers or fails |
+| **Returned spectral generators and situated information** | Returned at five fixed receivers: two Euler–Maclaurin head/tail splits and direct alternating η; reuse their retained head/tail, phase lifts, literal code, symbolic surprise and scoped work in the next operator increment | Compare the same face across generators and changed receiver charts; distinguish analytic refinement from source change and show when a local code transfers or fails |
 | **Operator-scoped requests** | Factor the fixed example into a cohesive exact factorization capability using the existing preimage owner; retain field, shape, support, receiver and cost aperture | Different requested mathematical operators use the same construction machinery and return scoped values, families or executable factors |
 | **Shared constructions and changed receivers** | Keep typed returned factors; solve a new receiver, compose existing operator/recurrence words and preserve clocks/fibres | The complex-multiplication product core serves polynomial multiplication; a receiver requiring a discarded distinction returns its actual obstruction |
 | **Returned constraints and available material** | Compose actual source-qualified comparisons with contextual factorization, factor covers and existing material owners | New constraints refine applicability or enable a new construction, with meaningful before/after conduct and cost |
@@ -91,21 +154,15 @@ remain receiver measurements; none is a substitute for the requested product.
 [definition] These distinguish claims, not mandatory stages of all cognition or a universal
 certainty gate. A finite mechanism can be used while its wider range remains unresolved.
 
-## Athena construction order
+<a id="athena-construction-order"></a>
 
-[definition] Proceed through the following increments of one continuing ecology. Product
-observation, source exposure, persistence and resource accounting accompany each usable increment;
-they are not postponed until a final benchmark. The detailed blueprint gives files, APIs and
-mathematical obligations. The position identifies what has already returned.
+## Native responsibilities within the shared order
 
-| Phase | Code change | Expected inspectable outcome |
-|---|---|---|
-| **1. Situated reception and visible cycles** | Bind prepared source parts and actual continuation/comparison relations to the existing coupled session; expose terminal cycle records and decoder/encoding cuts | Read the actual input, prediction, emitted output, later comparison and successor; distinguish source action from observed continuation and correction |
-| **2. Conditional relations and complete return** | Join the producing-family comparison to condition/preimage and material formation; derive the family incorporation law and stage one complete successor | A supplied conditional relation changes the appropriate future prediction, including delayed returns and retained alternatives; no partial publication or invented point source |
-| **3. Applicable organization and constituent formation** | Refine the specific source/contact chart when its current family cannot express a distinction; compose existing formation, dependent carriers and incidence | Reusable actions apply under demonstrated conditions, preserve differing occurrences and separate formerly conflated contexts |
-| **4. Holonic Encoding and compressed continuation** | Bind the actual native generator family to receiver-preserving reduction, executable decoder and retained clock/fibre; keep the hot path resident | Constituent/region conduct can be reused without full expansion; compare the complete admitted future and show a separating contact reopens an over-coarse representation |
-| **5. Useful conversation and durable operation** | Continue prepared exposure through the public owner, evaluate held-out behavior, and persist every new encoding/material/pending cut | Useful English/code/mathematics at reported costs, or concrete observed failure directing the next repair; source-qualified continuation after restart |
-| **6. Shared modality and physical applications** | Bind existing optical/acoustic/source and world-tube receivers to the same conditional/encoding construction | Actual image/audio/interaction products and source-qualified cross-modal associations, with their physical/codec scope explicit |
+[definition] The phase table in the sustained programme above is the common order. The
+[blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
+details its exact native files, ports, missing relations and verification. Source-visible output,
+persistence and resource accounting accompany usable increments. CONSTRUCTION_STATE identifies
+what has actually returned.
 
 [definition] For native coupled-wave integration, phases 1–2 share the immediate boundary: the read-only family
 comparison already exists, but its consuming condition/material transaction and complete source
