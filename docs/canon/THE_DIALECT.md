@@ -64,6 +64,12 @@ Those capitalised primitives occur exactly once in the corpus, inside a leaked c
 assistant-authored `AGENTS.md`. He uses lowercase `found`/`founding` (171) as an ordinary verb: *to
 establish a new axis or landmark.*
 
+[historical] This is the stated August corpus/capitalization inventory, not a prohibition on
+the recovered physical relation. Brandon's September 12 direction explicitly uses lowercase
+leap/throw for preparation, release and prospective motion. The earlier June intuition and
+July body-medium records are recovered in the
+[predictive-release construction](../../research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md).
+
 He has said this to your face:
 
 > *"What are you talking about? 'the deed'? Your semantics are warped by what you've read, I do not
@@ -127,6 +133,11 @@ refer to and I don't really care, they're not the point of what we're doing."* (
   leave a loop mismatch or lifted winding. The [September 12 construction](../../research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md)
   gives the section cocycle, complete Gamma shift and temporal Hodge instances. Neither
   periplus nor causal residue requires storing a literal history.
+- [definition] **`leap` / `throw` / predictive release** — preparation through a grip and
+  release into subsequent body-medium transport, with reach/tolerance re-evaluated at the
+  receiving relation. It is not a stored span, confidence counter or universal force-free
+  trajectory. A prediction carries the prospective source-conditioned result; probability
+  can measure its unresolved source family without sampling a different motion law.
 - **`first axiom`** — everything has a cause; nothing starts from nothing. *"there is no codec that
   exists without cause, there is no thing that has nature that cannot be attributed to a cause."*
   (2026-08-08)

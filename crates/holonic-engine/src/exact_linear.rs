@@ -51,8 +51,10 @@ use thiserror::Error;
 mod bilinear;
 mod joint_bilinear;
 mod kernel_modes;
+mod released_motion;
 pub use joint_bilinear::{JointBilinearFibre, JointBilinearSystem, JointPreimageReduction};
 pub use kernel_modes::{KernelModeAction, KernelModeError, KernelModeReduction, KernelModeSummary};
+pub use released_motion::{ConstantAccelerationRelease, ReleasedMotionError};
 mod contextual;
 pub use bilinear::{
     BilinearOperator, BilinearProductCore, BilinearRealization, BilinearSupportReturn,

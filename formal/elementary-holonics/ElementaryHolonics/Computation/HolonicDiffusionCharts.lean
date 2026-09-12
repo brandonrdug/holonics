@@ -152,6 +152,15 @@ def dirac [DecidableEq Target] (transport : Source → Target) : MarkovKernel So
     (dirac transport).transition source target =
       if target = transport source then 1 else 0 := rfl
 
+/-- Deterministic motion transports an unresolved source measure without sampling a motion. -/
+theorem expectation_dirac [DecidableEq Target]
+    (transport : Source → Target) (probability : FiniteProbabilitySection Source)
+    (receiver : Target → ℝ) :
+    expectation ((dirac transport).pushforward probability) receiver =
+      expectation probability (receiver ∘ transport) := by
+  rw [expectation_pushforward]
+  simp [dirac, expectation, Function.comp_def]
+
 end MarkovKernel
 
 /-! ## A forward kernel alone does not define reverse generation -/

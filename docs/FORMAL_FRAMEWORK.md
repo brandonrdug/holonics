@@ -57,6 +57,20 @@ as it composes realization, continuation and navigation.
 
 ## Begin with a situated interaction
 
+[proved-derived; formal-checked] The [predictive-release construction](../research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md)
+adds exact impulse/work, kinetic–potential and released-motion/tolerance laws. Its observer
+current derives from the actual product derivative of stress and observer, retaining the
+symmetric observer-gradient term; matching internal boundary terms cancel under composition.
+Changing capacitive storage retains its material derivative, and deterministic motion pushes
+a declared source measure through the same future receiver. Prediction is prospective
+transport of a compatible family, not a sampler or a requirement to retain every prior state.
+
+[definition] The same record derives the action-to-Einstein-to-worldtube coupling, local
+contact/torque and higher-jet equations, and physical preparation/release interpretation.
+The Leap and body-medium sources already exist in the imported laboratory records. Their
+return needs the actual constitutive medium and observer; neither a torus picture nor a
+dimensionless information loss by itself supplies a physical force or energy scale.
+
 [proved-derived; formal-checked] The [periplus/rebase construction](../research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md)
 keeps `x=s(qx)+r_s(x)` and the compensating section change `r_s'=r_s-(s'-s)(qx)`.
 The Gaussian source law rebases amplitude and argument together; its opposite shift cancels

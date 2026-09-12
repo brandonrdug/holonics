@@ -233,6 +233,14 @@ invariants required in an ecology in order to successfully "re-construct", which
 You cannot literally reverse time, you cannot literally know the interior of another construction,
 you can only causally justify its existence to the extent of a limit."*
 
+[definition] The September 12 [predictive-release construction](../../research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md)
+uses that same distinction prospectively. Preparation configures an admitted transport;
+release is outward current relative to a moving boundary; subsequent contact supplies its
+actual received consequence. Prediction transports compatible sources through that law.
+Its deterministic measure pushforward, impulse/work, changing capacitance and observer-volume
+identities are derived explicitly. A probability or tolerance is a declared receiver of the
+family, not a universal activation threshold or a demand for exact historical reconstruction.
+
 ### 5.1 The kernel, exactly
 
 For a linear receiver `A`: `Ax = Ay ⟺ x − y ∈ ker A`. **The kernel is literally the

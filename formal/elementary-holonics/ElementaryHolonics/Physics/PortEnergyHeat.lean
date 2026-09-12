@@ -142,4 +142,43 @@ theorem hasDerivAt_totalEnergy_of_ohmicLaw
   simp only [externalPortPower, ohmicHeat, portEffort]
   ring
 
+/-! ## Changing capacitive storage
+
+The inverse-capacity coefficient is supplied by the caller and may vary with time.  The mixed
+term below is a chart identity; no electrical energy balance or neural interpretation is inferred
+without the corresponding constitutive and unit data.
+-/
+
+def changingCapacitiveEnergy (k q : ℝ → ℝ) (time : ℝ) : ℝ :=
+  (1 / 2 : ℝ) * k time * (q time) ^ 2
+
+def capacitiveVoltage (k q : ℝ → ℝ) (time : ℝ) : ℝ := k time * q time
+
+theorem hasDerivAt_changingCapacitiveEnergy
+    (k q : ℝ → ℝ) (time k' q' : ℝ)
+    (hk : HasDerivAt k k' time) (hq : HasDerivAt q q' time) :
+    HasDerivAt (fun t ↦ changingCapacitiveEnergy k q t)
+      ((capacitiveVoltage k q time) * q' + (1 / 2 : ℝ) * k' * (q time) ^ 2) time := by
+  have hpow : HasDerivAt (fun t ↦ (q t) ^ 2) (2 * q time * q') time := by
+    convert (hasDerivAt_pow 2 (q time)).comp time hq using 1 <;>
+      try { rfl } <;> ring
+  have hprod := hk.mul hpow
+  have henergy := hprod.const_mul (1 / 2 : ℝ)
+  have hfun : (fun t ↦ changingCapacitiveEnergy k q t) =
+      (fun y ↦ (1 / 2 : ℝ) * (k * fun t ↦ (q t) ^ 2) y) := by
+    funext t
+    simp only [changingCapacitiveEnergy, Pi.mul_apply]
+    ring
+  rw [hfun]
+  apply henergy.congr_deriv
+  simp only [changingCapacitiveEnergy, capacitiveVoltage]
+  ring
+
+theorem changingCapacitiveEnergy_deriv_eq_voltage_current
+    (k q : ℝ → ℝ) (time k' q' : ℝ)
+    (hk : HasDerivAt k k' time) (hq : HasDerivAt q q' time) :
+    HasDerivAt (fun t ↦ changingCapacitiveEnergy k q t)
+      ((capacitiveVoltage k q time) * q' + (1 / 2 : ℝ) * k' * (q time) ^ 2) time :=
+  hasDerivAt_changingCapacitiveEnergy k q time k' q' hk hq
+
 end Soma.Holonics.Millennium.HolonicComplexParametron

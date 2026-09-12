@@ -1,0 +1,46 @@
+Command: bash tools/lean_check.sh ElementaryHolonics.Framework.Physics ElementaryHolonics.Framework.Computation
+Toolchain: leanprover/lean4:v4.33.0
+Exit: 0
+Scope: selected new-owner and completion output; full terminal remains in .local/scratch/2026-09-12-predictive-release-final-lean.log. The command builds the changed HolonicDiffusionCharts expectation_dirac dependency as well as both framework entry points.
+
+⚠ [9094/9107] Built ElementaryHolonics.Physics.PortEnergyHeat (5.4s)
+warning: ElementaryHolonics/Physics/PortEnergyHeat.lean:174:13: This simp argument is unused:
+  changingCapacitiveEnergy
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [capacitiveVoltage]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: ElementaryHolonics/Physics/PortEnergyHeat.lean:164:18: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+⚠ [9095/9107] Built ElementaryHolonics.Physics.ReleasedMotion (5.3s)
+warning: ElementaryHolonics/Physics/ReleasedMotion.lean:55:53: This simp argument is unused:
+  real_inner_smul_left
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [inner_add_right, real_inner_smul_right, real_inner_self_eq_norm_sq, real_inner_comm g v₀,
+    norm_smul, Real.norm_eq_abs, mul_pow, sq_abs]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: ElementaryHolonics/Physics/ReleasedMotion.lean:96:0: 'Soma.Holonics.Physics.ReleasedMotion.flow_position' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ElementaryHolonics/Physics/ReleasedMotion.lean:97:0: 'Soma.Holonics.Physics.ReleasedMotion.flow_velocity' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ElementaryHolonics/Physics/ReleasedMotion.lean:98:0: 'Soma.Holonics.Physics.ReleasedMotion.constant_acceleration_total_energy' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/ReleasedMotion.lean:99:0: 'Soma.Holonics.Physics.ReleasedMotion.releasedVelocity_momentum_increment' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/ReleasedMotion.lean:100:0: 'Soma.Holonics.Physics.ReleasedMotion.releasedVelocity_kinetic_work_increment' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/ReleasedMotion.lean:101:0: 'Soma.Holonics.Physics.ReleasedMotion.position_endpoint_defect' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/ReleasedMotion.lean:102:0: 'Soma.Holonics.Physics.ReleasedMotion.endpoint_defect_norm_le' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+✔ [9096/9107] Built ElementaryHolonics.Physics.ObserverBoundaryCurrent (5.2s)
+✔ [9106/9107] Built ElementaryHolonics.Framework.Physics (13s)
+✔ [9107/9107] Built ElementaryHolonics.Framework.Computation (15s)
+Build completed successfully (9107 jobs).

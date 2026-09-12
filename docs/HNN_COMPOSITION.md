@@ -210,6 +210,14 @@ does not define every medium's geometry or all language context.
 
 ## Producing comparison and architecture laws
 
+[definition] The [predictive-release return](../research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md)
+connects prepared internal modes, release into the medium, subsequent transport and receiving
+contact. A current can be output-null now but potent under a later admitted action; reduction
+therefore uses the declared future family. Prediction is that family's prospective image.
+Probability measures unresolved source conditions through the deterministic pushforward.
+The release/landing solver, observer boundary current and changing-capacitance work are
+actual returned consumers; no neural activation counter or trajectory archive is introduced.
+
 [definition] The [periplus/time-complement return](../research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md)
 joins passive modal rebasing, complementary residues and actual return transport. A backward
 adjoint transports a comparison covector; it is not the physical inverse of the forward

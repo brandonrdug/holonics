@@ -222,6 +222,13 @@ symbol basis does not define the common interior or its clock.
 
 ## Shared mathematics and its productive use
 
+[definition] The [predictive-release return](../../research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md)
+adds a usable release/landing operator to the shared solver, with impulse/work, full
+kinetic–potential exchange, source uncertainty and receiver tolerance. Observer-current and
+changing-capacitance laws supply its physical preparation/boundary comparison. Continue
+through the existing operator/encoding phases; this recovers the Leap/body-medium line
+without installing a reach counter, trajectory archive or separate motor engine.
+
 [definition] The [periplus/time-complement return](../../research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md)
 adds section-residual and Gaussian rebasing laws, temporal Hodge complements, passive modal
 rebase execution and finite ζ information comparisons to the existing operator/encoding

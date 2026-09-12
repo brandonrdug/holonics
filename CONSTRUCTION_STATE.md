@@ -7,6 +7,20 @@ AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/p
 is the sole order and [the blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 names actual code changes and outcomes.
 
+[proved-derived; formal-checked] The [predictive-release return](research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md)
+recovers the existing Leap/body-medium line and adds exact released-motion composition,
+impulse/work and kinetic–potential identities, endpoint-tolerance transport, observer-current
+product/strain and interface laws, changing-capacitance work and deterministic measure
+expectation. Physics and Computation build. The record derives their GR/worldtube coupling
+and higher-jet interpretation at explicit constitutive scopes.
+
+[established-bounded; implemented-exact] `exact_linear::ConstantAccelerationRelease` builds
+reusable release/flow/receiver operators. The application infers impulse `(8,10)` for its
+two-dimensional target, retains the exact 61 J total through flight, and transports an
+unresolved source population without sampling. Its mean hits the target while only mass 1/2
+meets the declared tolerance. All 37 focused tests pass; no native GPU recurrence or physical
+brain/GR simulator is claimed.
+
 [proved-derived; formal-checked] The [periplus/time-complement return](research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md)
 proves section/residual rebasing, Gaussian amplitude-and-argument cocycles bound to the existing
 flowed Gamma source, and temporal harmonic/exact-complement laws with a constructed Euler

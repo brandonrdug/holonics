@@ -32,6 +32,15 @@ test result never upgrades a correspondence.
 
 ## Formal framework entry points
 
+[definition] `Physics/ReleasedMotion.lean` and `Physics/ObserverBoundaryCurrent.lean` are
+imported by `Framework.Physics`: exact constant-acceleration/impulse/energy and tolerance
+laws; symmetric observer-stress contraction, actual product-jet divergence and joined
+interface cancellation. `Physics/PortEnergyHeat.lean` now differentiates changing inverse
+capacitance; `HolonicDiffusionCharts.MarkovKernel.expectation_dirac` transports finite
+uncertainty through a deterministic map. The [predictive-release return](../research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md)
+states the Einstein/worldtube and biomechanical correspondence without upgrading these
+finite charts into a complete GR or neural simulator.
+
 [definition] `Foundation/SectionResidual.lean` and `Transport/GaussianRebase.lean` are imported
 by `Framework.Information`. They own section/kernel compensation and the Gaussian
 shift/amplitude cocycle; `RH/FlowedGamma.integral_flowedTerm_eq_rebase` binds the latter to
@@ -256,6 +265,13 @@ builder/reference boundary, with no new CUDA owner or native inference binding i
 current, encoder and decoder together, returning the new receiver owner. It retains the old
 frame on failure; its work count excludes inverse setup. The code-cost application's finite
 Dirichlet distribution uses `SymbolicSurprisal` for exact ζ-partition/entropy/KL comparisons.
+
+[definition] `exact_linear/released_motion.rs` owns the immutable
+`ConstantAccelerationRelease` operator builder and `ReleasedMotionError`. It constructs
+release, nilpotent constant-acceleration flow, position and impulse receiver matrices and
+composes the existing preimage/factor owners. `examples/predictive_release.rs` consumes it
+for an inferred launch, kinetic/potential cuts and deterministic source-measure transport.
+This is an exact mathematical application boundary, not a new mutable/native motion engine.
 
 [definition] `Mathematics/GeneratorFactorization.lean` owns the arbitrary finite commutative-ring
 bilinear coefficient certificate, selected three-product identity, ratio-block matrix bridge,

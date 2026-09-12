@@ -1,0 +1,121 @@
+{
+  "chart": {
+    "acceleration": [
+      "0",
+      "-10"
+    ],
+    "length": "metre",
+    "mass": "kilogram",
+    "mass_value": "2",
+    "scope": "uniform weak-field acceleration; no air drag, spin, articulated preparation or GR field solve",
+    "time": "second"
+  },
+  "cuts": [
+    {
+      "kinetic_joules": "41",
+      "potential_joules": "20",
+      "state": [
+        "0",
+        "1",
+        "4",
+        "5",
+        "0",
+        "-10"
+      ],
+      "time_seconds": "0"
+    },
+    {
+      "kinetic_joules": "16",
+      "potential_joules": "45",
+      "state": [
+        "2",
+        "9/4",
+        "4",
+        "0",
+        "0",
+        "-10"
+      ],
+      "time_seconds": "1/2"
+    },
+    {
+      "kinetic_joules": "41",
+      "potential_joules": "20",
+      "state": [
+        "4",
+        "1",
+        "4",
+        "-5",
+        "0",
+        "-10"
+      ],
+      "time_seconds": "1"
+    }
+  ],
+  "expected_launch_energy_joules": "8201/200",
+  "mean_endpoint_x": "4",
+  "native_ecology_changed": false,
+  "release_impulse": [
+    "8",
+    "10"
+  ],
+  "release_kinetic_work_joules": "41",
+  "released_state": [
+    "0",
+    "1",
+    "4",
+    "5",
+    "0",
+    "-10"
+  ],
+  "requested_endpoint": [
+    "4",
+    "1"
+  ],
+  "schema": "holonics.predictive-release.v1",
+  "source_entropy_bits": "3/2*log2(2)",
+  "source_fibre_separator": {
+    "future_difference": [
+      "1",
+      "0"
+    ],
+    "source_null": [
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "0"
+    ]
+  },
+  "source_sampling": false,
+  "success_mass_at_tolerance_1_over_20": "1/2",
+  "uncertain_sources": [
+    {
+      "endpoint": [
+        "39/10",
+        "1"
+      ],
+      "impulse_deviation": "-1/5",
+      "mass": "1/4",
+      "within_declared_tolerance": false
+    },
+    {
+      "endpoint": [
+        "4",
+        "1"
+      ],
+      "impulse_deviation": "0",
+      "mass": "1/2",
+      "within_declared_tolerance": true
+    },
+    {
+      "endpoint": [
+        "41/10",
+        "1"
+      ],
+      "impulse_deviation": "1/5",
+      "mass": "1/4",
+      "within_declared_tolerance": false
+    }
+  ]
+}
