@@ -93,6 +93,107 @@ or another state-mutation assay is not an additional prerequisite to a completed
 Persistence checks apply to newly claimed durable relations; source and formal checks establish
 their particular mathematical and executable contracts.
 
+## Next implementation packets
+
+[project-postulate] The September 12 product-integration ruling makes the
+[roadmap's immediate packets](THE_ROADMAP.md#immediate-mathematical-application-and-implementation)
+the implementation order. This specification supplies their exact binding decisions. It
+does not wait for another intuition, a universal intelligence theorem, or an RH endpoint.
+Correctness of a local relation is used in a product rather than repeatedly re-demonstrated.
+
+### Callable mathematical workshop: the first delivered increment
+
+[definition] Extend the existing public HNN application/session boundary with a mathematical
+request payload. The payload has four operations: construct an admitted operator, apply a
+retained construction, read a new receiver of a retained product, and incorporate an actual
+observation into its producing relation. Request fields carry the target coefficient/action
+chart, supplied candidate forms or constraints, input ports, receiver, declared work/search
+aperture and relevant clock. Return fields carry the usable construction/family, source/target
+maps, residue or obstruction, decoder and measured costs. Names are application/wire addresses,
+not semantic identities. Preserve the existing stream schema and its compatibility discipline.
+
+[definition] Put the application binding beside the native coupled/normal session code in
+`crates/holonics-hna/src/native/` and expose it through the existing facade/stream. It borrows
+or moves the standing native owner and stores immutable construction material and actual
+product occurrences; it does not create another learning engine. Extend `stream.rs`,
+`applications/holonics-workbench/src/session_stream.rs` and `adapters/hna.rs` for delivery.
+The product's primary route is the HNN application interface, not another diagnostic example.
+
+[definition] Recover the already-executed `hephaestus_operator_cycle.rs` into this binding:
+`BilinearOperator`, `BilinearSupportSearch`, `BilinearProductCore`, `factor_receiver`,
+`left_family_preimage`, `ResidentSurface` and `ResidentBilinearMap`. The first class is
+caller-supplied linear/bilinear actions, with supplied finite construction grammars. A selected
+support is reported as first-found/best-found/optimal-in-exhausted-class according to the
+actual search and cost comparison. A finite search obstruction is not global impossibility.
+
+[definition] The returned factor family must also have a task-local native source/condition
+binding. Use the existing coupled relation/normal/native compiler owners for that admitted
+chart, and make an actual observation refine the corresponding mathematical relation. A
+particular coefficient representative is not automatically a uniquely inferred law. Retain
+the family and its actual evaluation/formation map. A pure operator application does not owe
+an invented observation merely to show a changed state.
+
+[definition] Source, condition and output widths are explicit port maps. The present
+neighborhood constructor admits homogeneous source charts; it is not a universal heterogeneous
+application interface. A changed terminal receiver can already have another width through
+the retained product core. Re-entry or composition with a differently shaped source requires
+the actual rectangular map/domain; use the existing resident section and factorization owners.
+Do not pad to the alphabet width, silently identify coordinates or begin a global graph rewrite
+before the first task-local binding works.
+
+[definition] Complete the packet with these caller-controlled operations in one session:
+
+1. Construct a linear/bilinear action from supplied data and return its executable factors or
+   compatible family. Inputs are not the example's hard-coded numbers.
+2. Apply it to new source values on resident carriers and return the requested mathematical
+   output. Show the exact/enclosed result and its cost.
+3. Request another receiver or an admitted composition using the retained interior; return
+   its result or the separating source direction. Recomputing the original product is compared
+   explicitly with reuse.
+4. For a request that supplies a genuine observation, refine its native source/condition/law
+   relation through the existing consuming return. A later new request uses that mathematical
+   consequence. Existing Base/Programme pending-return correctness is reused, not reimplemented.
+
+[definition] The first product case includes a partly constrained mathematical relation,
+not only a fully specified target tensor: return its compatible coefficient/parameter family,
+accept an additional supplied observation, and answer a new input using the refined relation.
+Use native relation/formation ports for that return. An exact equation witness is not copied
+into a material-weight slot. The pure factorization and changed-receiver case remain useful
+operations of the same public instance.
+
+[definition] Checks use the public request path, relevant exact-linear tests, resident bilinear
+controls and coupled-session tests for changed bindings. A direct mathematical reference
+checks new inputs, a new receiver, a nonunique family and an incompatible target. Inspect the
+returned factor/action as the product. Check only the changed rest fields when a new durable
+claim is made. Do not begin wide exposure, a UI redesign or standard-model export in this packet.
+
+### How the research enters these packets
+
+[definition] The returned mathematics has concrete implementation roles:
+
+| Recovered construction | Binding decision |
+|---|---|
+| Addressed differences and joint Preimage Fibre | Source, condition and target share actual parameters and producing cuts; ambiguity is represented before a scalar choice. |
+| Contextual factorization and source-null contrast | Derive the condition distinctions needed by observed returns; an exhibited unsupported contrast identifies the source/port refinement needed next. |
+| Gibbs/KL, code cost and normal/adjoint laws | Separate admissibility from empirical prediction, learn the declared predictive receiver through its actual loss/adjoint, and compare executable representations with decoder/work costs. |
+| Mode exclusion, Hodge complement and section rebase | Eliminate redundant coordinates while carrying amplitudes, phase, complementary residues and the required future receiver. |
+| Fractal generators, ordered words and Gamma/π/e blocks | Compile reusable recursive/analytic actions with clocks and tails; do not store an occurrence sequence as their required representation. |
+| Mass–energy, Maxwell and boundary-current laws | Preserve complete current/energy forms, constitutive response and source/receiver orientation in physical models; use the corresponding algebraic stability and flux structure in admitted native charts. |
+| Predictive release and deterministic measure transport | Produce prospective outcomes from the conditioned generator; probability measures unresolved source conditions when a measure is supplied. |
+| Lorentzian coefficient bounds and affine quotients | When the source family is Lorentzian, use balanced coefficient ratios and their boundedness/sharp-constant certificates for mathematical constraint inference and representation comparison; retain the coefficient convention and actual family. |
+
+[definition] The last row refers to the
+[September 8 v2 bounded-ratio paper](../../research/records/2026-09-12_BOUNDED_LORENTZIAN_RATIOS_JOIN_COEFFICIENT_GAUGES_AND_HODGE_BOUNDS.md).
+It supplies a concrete mathematical application source, not a required new HNN architecture
+or a universal constraint on signed/complex currents. Its bounded-ratio cone comparison is
+not an assertion that every Lorentzian polynomial factors into linear forms.
+
+[definition] The physical and information correspondences supply computational structure,
+not a requirement to simulate a whole organism or solve the full Einstein field before using
+the local laws. Their scientific scope is stated affirmatively by their actual equations.
+RH, Hodge and NS sources remain available for specific closure, realization or stability
+questions; a new endpoint campaign is not the critical path to HNN outputs.
+
 ## Exact source map
 
 [definition] In the paths below, **C** is
@@ -193,6 +294,10 @@ an unavailable point conversion is not a universal certainty gate.
 
 ## 1. Situated reception and visible cycles
 
+[definition] Source delivery, emission/re-entry and Base/Programme pending returns are
+returned dependencies. Extend them only for the actual mathematical-request or contextual
+source binding below. This section is not a new prerequisite campaign before those products.
+
 [definition] Extend the public coupled session and exposure attachment, using actual visible
 source parts and their many-to-many associations. Retain source occurrence, part/view, chart,
 producing handle and observation relation. Preserve the distinction between serial delivery,
@@ -218,187 +323,243 @@ these bindings change. Preserve evaluation material outside developmental select
 
 ## 2. Conditional relations and complete return
 
-[established-bounded; implemented-exact] `ResidentNormalWave::compile_coupled_joint` now compiles
-an actual pending comparison directly on the device. It retains original source/condition and
-anchor, and names the current relation-material cut. Its equation witnesses are coefficients
-in that relation's row span, not learned material weights. The [native return](../../research/records/2026-09-11_ACTUAL_PENDING_COMPARISONS_COMPILE_WITH_THEIR_ANCHORS.md)
-checks both receiver charts, genuine free current directions, non-dyadic inputs and delayed/restored
-cuts without intermediate readout. It remains read-only; the distinct consuming generator and
-session path described below now supplies the complete native return.
+[established-bounded; implemented-exact; formal-checked] The generic native consuming return
+is implemented. Its [complete return record](../../research/records/2026-09-12_OLD_AND_NEW_PENDING_SOURCES_RETURN_THROUGH_ONE_GENERATOR.md)
+joins the pending source, original bound/frame, current continuation, condition/material
+formation, one staged successor and exactly-once consumption. Base and Programme sources,
+repeated/out-of-order observations, source-section receivers and rest compatibility are
+returned dependencies, not new implementation packets.
 
-[established-bounded; implemented-exact; formal-checked] `read_coupled_constitutive_family` now
-lifts the existing neighborhood preimage/contact/formation at a shared source parameter, after
-native anchor admission. The [dependent return](../../research/records/2026-09-11_CONSTITUTIVE_RETURNS_REMAIN_DEPENDENT_ON_THEIR_SOURCE.md)
-checks point specialization, source-dependent conditions, preserved vertical directions and
-staged extension outside the old relation. Even its elementary one-row condition graph is
-non-affine. The owned generator below therefore retains `θ ↦ (hθ,Rθ)` and the actual
-source/current continuation; neither one selected alternative nor the span of all alternatives
-can be published as this family. The evaluator itself remains read-only; its separate owner consumes returns.
+[definition] The exact owners remain `W/coupled/comparison.rs`,
+`comparison/constitutive.rs`, `W/coupled/dependent.rs`,
+`dependent/continuation.rs`, `C/resident/neighborhood.rs`, condition preimage/contact,
+and `A/coupled_wave/body.rs`. The public `NativeCoupledBody::incorporate` already calls
+`ResidentCoupledConstitutive::incorporate_prediction` after entering the dependent form.
+Inspection remains read-only; a consuming observation uses that existing return path.
 
-[established-bounded; implemented-exact] `NormalCoupledContinuation` now retains the actual
-ordered maps from a pending producing source through contemporary current, including all internal
-source-field factors. The [native separator and repair](../../research/records/2026-09-11_PENDING_RETURNS_KEEP_THEIR_ACTUAL_CONTINUATION.md)
-show that separate source/produced/current marginals had lost a real orientation distinction.
-The dependent evaluator exposes this word; rest v9 preserves its joins. Use it in complete-family
-incorporation rather than infer the missing correlation from matching endpoints.
+[definition] Preserve the producing source parameters and the actual joining relation to
+contemporary current. Recorded h_s and proposed successor condition are different operands.
+The dependent family is a function of its shared source parameters; neither a selected centre
+nor the span of alternatives is silently its whole-family replacement. A compatibility
+witness is not a material weight or an additional observed sample.
 
-[established-bounded; implemented-exact; formal-checked] The
-[owned return](../../research/records/2026-09-11_AN_OWNED_CONSTITUTIVE_GENERATOR_CONTINUES_THROUGH_ITS_NEW_MATERIAL.md)
-now joins the original source assignment through that word, applies new material to contemporary
-current, and owns the resulting generator in `ResidentCoupledConstitutive`. A checked source
-section admits publication while the full function remains available at other assignments.
-The next actual source uses its new material/current, and rest/remount preserves the programme.
-The [HNN stream binding](../../research/records/2026-09-11_THE_HNN_STREAM_USES_ITS_RETURNED_GENERATOR.md)
-now supplies the native receiver-coordinate decoder and `NativeCoupledBody` session owner.
-One return, subsequent generation/observation/source fields, pending predictions and the existing
-selection/re-entry cursor persist across processes. The
-[repeated-return construction](../../research/records/2026-09-12_REPEATED_RETURNS_PRESERVE_ORIGINAL_SOURCE_FRAMES.md)
-now adds successive material-return passages with original source-face parameters, conditional
-member material, exactly-once consumption and v3 rest. Native and HNN controls include repeated,
-out-of-order and distinct-source-section returns.
+[definition] The current source-section receiver has its own contract and is not silently
+identified with the earlier projected-family receiver. Source actuation, actual next-current
+observation and an addressed correction also retain their existing meanings. An application
+chooses its intended mathematical relation explicitly.
 
-[established-bounded; implemented-exact; formal-checked; computational-witness] The
-[complete return](../../research/records/2026-09-12_OLD_AND_NEW_PENDING_SOURCES_RETURN_THROUGH_ONE_GENERATOR.md)
-now also incorporates original affine-base pending cuts. The original root and every added source
-constraint remain at their actual times; an erased intermediate distinction is not inferred from
-final endpoints. V4 rest tags Base/Programme frames and migrates v3. Native and streamed controls
-include old-base returns after restart, repeated/out-of-order returns and executable hidden
-source fibres. The return-cycle binding is returned; use it in the Hephaestus mathematical
-requests ordered by the roadmap, extending phase 3's equations/applicability and phase 4's
-generator representation where those applications require them.
+[definition] The new work in this phase is the **consumer binding**: a caller-controlled
+mathematical instance and the contextual assembly provide their actual source, condition,
+receiver and observation to this return. They must then use the corresponding inferred law
+or prediction on a new request. Do not invent a state-change assay for a pure exact synthesis
+request that has no observational update.
 
-[definition] Preserve the declared source-section receiver until its relation to another
-receiver is constructed. Do not relabel it as the former whole-family projection or interpret
-the controlled operator result as useful general conversation.
+[definition] Stage the changed local material/condition, current and pending disposition
+before publication; share immutable standing and preserve the one move owner. Extend tests
+only when the new source/encoding payload changes a contract: a pending cut crossing rebase,
+a new port domain, another affected material section or a new decoder family. The existing
+Base/Programme and restart checks are regression dependencies, not a campaign to rerun
+unchanged before useful work.
 
-[definition] The family lift must distinguish recorded h_s from a proposed successor condition.
-Use the actual constitutive contact/formation relation over the bounded source parameters;
-retain its joint variation or prove a lawful condensation of its complete return. Never insert
-each formal source coefficient row as a separately observed sample or use a relation witness
-as a material coefficient. A compatibility calculation alone does not define the update law.
-
-[definition] Reuse the distinct consuming preparation/publication path over
-`NormalCoupledComparison`; preserve inspection as read-only. That path
-uses the producing family and observed receiver, constructs the admitted source/condition
-constraint, prepares condition contact and affected member material, and stages their effect on
-the continuing wave. It composes into contemporary material; it does not restore an old body.
-
-[definition] Implementation touches `W/coupled/comparison.rs`, `C/resident/neighborhood.rs`,
-`preimage`/`condition_contact`, affected family-image/kernel owners, `W/coupled.rs` and
-`A/coupled_wave.rs`. Reuse `PreparedConditionContact` and `PreparedConstitutiveFormation` with
-actual owner/epoch/chart checks. A newly required family type belongs to these owners and keeps
-the missing mixed relation explicit; it is not another general engine.
-
-[definition] Stage only changed law sections/deltas and the required successor current, condition,
-evidence and pending disposition. Validate all dependencies before one publication. A late
-refusal preserves the committed predecessor; unknown device completion uses the existing poisoned
-owner/recovery contract. Consume a pending comparison once after successful publication. Extend
-existing versioned rest for new fields, including still-pending producing encoding cuts.
-
-[definition] **Expected outcome:** an actual supplied association predicts the corresponding
-conditional return at its declared scope; a changed relevant condition separates that prediction.
-Test the predicted consequence against the reference relation, not merely whether coefficients
-or a future output changed. Keep a matched independent receiver where independence is established.
-These controls establish a scoped association, not general comprehension.
-
-[definition] **Checks:** point specialization; correlated-family vs equal-marginal separator;
-old producing cut after intervening formation; no double deposit; unchanged complete rest on
-late refusal; successful consumption once; interrupted/remounted continuation; no numerical
-host replay in the hot passage. The family hypothesis is proved/checked before claiming its
-broad interpretation; a correct kernel cannot repair the wrong incorporation law.
+[historical] The actual pending compiler, dependent evaluator, first consuming owner,
+stream binding, repeated return and original-base completion remain documented in the
+dated September 11–12 records linked by the complete return. Their former detailed progress
+narrative is preserved in Git at c4dff43c.
 
 ## 3. Applicable organization and constituent formation
 
-[definition] The fixed-condition assay's existing relation contains every zero-mass return
-direction on 73 symbols. Adding rows cannot shrink that vertical subspace, and the same source
-constraints keep its old condition fixed. Preserve this counterexample. The remedy concerns
-actual situated source distinctions, constraint refinement and conditional applicability.
-It is not a new tie-breaker, a larger token vocabulary or more repetitions of the same chart.
+[established-bounded; source-inspected] The current calibration in
+`crates/holonics-hna/examples/conversation_coupled.rs` creates one bilinear law with
+source width 3n, condition width one and target width n. It mounts h=(1,0), supplies that
+same condition for every local observation, then places the law in a one-member neighborhood.
+The exact recorded span contains the entire zero-sum target subspace. Its nonempty prediction
+fibre is consequently the full target mass hyperplane, whose minimum-norm projection is
+uniform. The observed tie is an algebraic consequence of this source/law, not a missing codec.
 
-[definition] Use the existing field/local relation, `ResidentGeneratorNeighborhood`, dependent
-carrier, contextual-section, restriction/rebase and material-formation owners. Identify the
-specific source/contact relation that cannot express an observed distinction. Extend that
-relation with actual incidence or retained conditions; preserve its coarse receiver and source
-fibre. A scene ID, language switch, authored phrase rule or externally ranked semantic class
-must not determine the native route.
+[definition] Preserve that construction as a counterexample/reference, not as the production
+founding recipe. The replacement is a contextual predictive assembly:
 
-[definition] Reusable class identity and particular occurrence identity remain distinct.
-Several overlapping paths or regions may support different decompositions. A compound retains
-its exposed ports, joined occurrences and applicable transformations. Composition follows real
-contact; it does not give all co-present items an edge. A new application domain must be supplied
-by actual source/receiver transport, not guessed from a matching descriptor.
+`(resident preparation state, actual source incidence) -> source/condition current -> local generator -> predictive receiver -> observed return -> formed condition/material`.
 
-[definition] **Expected outcome:** a relation is used across demonstrated changed presentations
-or compositions and distinguishes an actual changed condition. Measure whether the predicted
-consequence matches the supplied association and its separating cases. Exact coordinate
-permutation alone establishes chart covariance, not recognition of meaning.
+The preparation state is the continuing native current and its admitted local context, not
+a raw token window, source ID, authored topic label or copied history. A static alphabet can
+remain the final codec; the present generator already advances before it is decoded.
 
-[definition] **Checks:** new independent constraint vs repetition; same source face/different
-future condition; transported occurrence vs merely equal wording; overlapping constituents
-without duplicated current; changed contact and unchanged independent contact; complete rest
-and receiver correspondence after the affected shape/domain changes.
+### The source and condition construction
+
+[definition] Build the actual pre-return context exposure in the coupled/section-input
+attachment and the native local source owners. Reuse `ResidentGeneratorNeighborhood`,
+`ResidentContextualSection`, condition preimage/contact, normal material and current/field
+transport. `NativeCoupledBody::incorporate` already uses the returned dependent body; another
+package carrying the same handle does not add this source distinction.
+
+[definition] For each admitted developmental comparison, preserve S (coarse source), C
+(available resident contextual state) and Y (the actual returned difference) at the same
+producing cut. The existing contextual factorization asks whether Y on ker S factors through
+C. Use the source-null contrast, not equal spelling, to identify missing conditions. If
+ker S intersect ker C contains a direction exposed by Y, return that actual contrast and
+refine the source/condition representation through admitted incidence or additional native
+state. Increasing a scalar condition dimension without such a relation is not the repair.
+
+[definition] Scope the reused contextual owners correctly. The field-contrast constructor
+currently realizes one observed real ray with retained context expressions; it is not a
+general learned context space merely because it records an ambient width. The bilinear
+contextual-section owner can expose the declared condition chart. Compose independent
+contrasts and the required native restriction/formation map at that owner, and retire borrowed
+developmental source sections when their sufficient relation is formed. An exterior contextual
+inspection must not become a host semantic update or a per-observation context archive.
+
+[definition] Observations used to form the context map belong to development. Evaluation
+targets may not choose the source representation, contact graph, candidate material or
+decoder. During a source section's passage, context is computed from the available prefix/
+source state before its corresponding next-current target is supplied. The exterior driver
+mounts actual source parts and their relations; it does not implement a private learner.
+Intra-section sequencing is a declared transport, not a new native clock or parameter per
+character. Reply-to/part links constrain association but do not make two messages pointwise
+semantic pairs.
+
+### Compatibility, prediction and formation are different operands
+
+[definition] A linear span of compatible observations describes possible relations; it is
+not automatically an empirical conditional predictor. Keep three roles explicit:
+the source/law fibre, a predictive vector or normalized measure for the requested task, and
+the final emitted receiver. In particular the full signed mass hyperplane is not a learned
+probability distribution. Repetition can alter statistical weight without creating a new
+independent constraint; a new conflicting observation need not assert that every linear
+combination is an equally supported target.
+
+[definition] Compose existing normal sufficient statistics for a vector prediction and
+the native normalized-exponential/adjoint receiver where the task asks for a predictive
+distribution. The next-symbol task has an actual observed codec target, so its normalized
+prediction and cross-entropy comparison can be differentiated through the producing native
+material. Retain phase/oriented current and source ambiguity before that statistical reading.
+The normalized output score does not supply contact incidence or replace contextual transport.
+Use the already-derived Gibbs/KL, source-fibre aggregation and production-frame adjoint laws;
+do not introduce a host score, handwritten language rule or second loss-driven update engine.
+
+[definition] An immutable fixed-condition relation remains valid for its producing cut.
+Construct subsequent contact from contemporary condition/material with the matching source
+map; do not mutate an old cut or reuse h=1 as a universal contextual law. Merely switching the
+session to its dependent variant is insufficient if the underlying source constraints still
+force that same condition.
+
+### Local constituents and shape
+
+[definition] The current neighborhood requires homogeneous member source charts and the
+session selects a member. Use actual source/condition restriction and receiver maps to give
+local generators their appropriate domains. First bind a task-local family; generalize the
+existing member/port attachment when a required composition has different widths. Preserve
+the shared continuing ecology and immutable constituent material. The older heterogeneous
+digest/nominal-boundary apparatus is not substituted for this mathematical port relation.
+
+[definition] Form or refine a constituent when an actual residual/condition contrast requires
+an independent generating direction; reuse it when the declared future factors through its
+existing modes. Existing leader, restriction/rebase, field/local-relation and mode owners
+supply the elementary constructions. Overlapping constituents retain their actual shared
+currents and joins. Neither a scalar loss threshold nor an authored semantic class determines
+universal morphology.
+
+[definition] **Delivered outcome:** a source-conditioned mathematical relation is inferred
+from actual supplied examples/constraints and used on new values and a new admitted composition.
+The same repaired source/condition path produces a short held-out contextual text continuation
+that can be inspected as text. These are the first product checks, not a claim that one finite
+case establishes general conversation.
+
+[definition] **Checks and disposition:** use the recorded fixed-condition collapse as the
+control; compare same visible input under distinct actual preparations, changed source
+presentations, new admitted inputs and unavailable conditions. Inspect full source/condition
+and predictive receiver, not only entropy, rank or state change. If new context is present but
+the target family still collapses, inspect the relation/objective assembly; if native predicted
+currents are useful but decoded text is wrong, inspect the existing receiver/codec mapping.
+Repair the identified owner before lengthening the exposure. Native context-section,
+neighborhood, normal/normalized and coupled-session tests cover only their changed claims.
 
 ## 4. Holonic Encoding and compressed continuation
 
-[definition] This phase is the engine use of the current generator/entropy/geometry research.
-The source family supplies candidate constructions; the receiver/history law determines which
-retain the required distinctions; measured code/work/clock costs compare those admitted
-realizations. Preserve different resource tradeoffs instead of assuming shortest code means
-fastest execution. A condensation can reduce repeated conduct while its decoder, source
-remainder and pending producing cuts remain available. The same mechanism is the intended
-internal encoding for text, mathematics, vision and acoustics.
+[definition] This packet begins on the first repeated admitted workshop/conditional action
+and accompanies the formation repair; it is not deferred until large-scale conversation.
+Its task is to execute a compact generative representation, not just to memoize replay.
 
-[definition] The [Holonic Solver return](../../research/records/2026-09-11_HOLONIC_SOLVER_NAVIGATES_EXACT_GENERATOR_FACTORIZATIONS.md)
-now provides an executed exterior method for this phase: specify the local action tensor or
-complete recurrence block, solve compatible factorizations through the existing exact preimage
-owner, verify the full coefficient/clock relation, and retain decoder and cost alternatives.
-The pure admitted bilinear segment now has the resident binding described above. Extend its
-productive construction or reuse through those owners; keep host search and Lean exterior to inference.
-Before applying it to a developing segment, include its complete material/successor action in
-the target. Use phase 2's complete dependent return law when constructing a reduction of developing material.
+[established-bounded; source-inspected] `ResidentCoupledConstitutive::append_operation`
+currently evaluates the whole candidate operations vector before publication.
+`evaluate_programme` starts from the base/comparison and walks that vector; pending and
+returned source cuts refer to its prefixes. Repeated Base/Programme incorporation is already
+implemented. The representation is correct for its checked source-section contract, but it
+makes continued work depend on a growing programme. Readout/observation can trigger the
+same reevaluation again.
 
-[definition] Holonic Encoding forms and reuses representations of transformations and receiver
-faces across modalities. BPE/path folding is a serial codec instance. Autoencoding supplies
-receiver reconstruction; π/e supplies exact generator/window examples; the Complex Parametron
-supplies phase-sensitive coupled conduct, and clocked tori supply retained cuts and interiors.
-The [encoding review](../../research/records/2026-09-11_HOLONIC_ENCODING_RETAINS_TRANSFORMATION_GRAIN_ACROSS_MODALITIES.md)
-records their actual sources and limits.
+### Compile current conduct and retain only required source dependencies
 
-[definition] Bind an actual continuing generator family and its receiver to the existing
-reduction/decoder law. For encoding E, source transport T, encoded transport U and receiver ρ,
-exact reuse serves `E′T=UE` and `DE=ρ`. Include condition, chronology, pending comparisons and
-emission in the claimed successor scope. Partial reduction keeps the full structured defect.
-Changing a future contact can expose a previously blind direction; preserve that source fibre
-and its representation without requiring an archive of every occurrence.
+[definition] Partition the actual programme by mathematical composition, not arbitrary
+clock-sized chunks. Exact linear/affine actions compose through matrices; bilinear actions
+retain their factor cores; indexed recurrences retain their block law and clock. Construct
+the corresponding resident action from the existing packet/section compiler. The first
+compiled segment must be a complete source-to-current or source-to-receiver action already
+used by the application.
 
-[established-bounded; source-inspected] At `6f6627ca`, the dependent owner stores a base and an
-operation vector; `append_operation` evaluates the combined vector before publication, and
-`CoupledConstitutiveRest` retains its source/return packets. This is the current exact executable
-history representation, not demonstrated compression of that history. A replacement may carry
-the required source dependence through a factored word, joint equations, closed recurrence or
-memory/residual law. Compare the actual requested futures and pending-cut semantics when deriving
-that replacement; literal reproduction of the old execution sequence is not a universal target.
+[definition] Formation is a different case from fixed-material execution. Normal-statistic
+increments can close in sufficient statistics; a dependent condition/material return can
+be nonlinear in its retained source parameters. Include those actual functions/constraints
+in the compiled representation. Do not flatten a nonlinear return into an affine hull, choose
+a source centre, or assume that an arbitrary sequence has a finite exact normal form.
+A factored recurrence, constraint family, retained flux/memory state or declared bounded
+residual is an available representation according to the actual law.
 
-[definition] `ObservableMomentReceiverHistoryCompression::found` is an executable exact host
-reference for its finite linear/quadratic chart: close receiver forms under `T*HT` and derive
-encoded action. Existing CUDA mounting is apparatus for admitted quotient forms, not an already
-bound Athena reduction. Productive composition needs a resident local construction/execution
-path and actual native decoder. Use `field/internal_mode.rs`, leader/scale, Schur/diffusion and
-clocked-torus owners where the domains match. Retain internal forcing and memory when eliminating
-state; a static boundary map alone cannot describe all future fluid or neural conduct.
+[definition] Live pending predictions keep the source maps/frames and immutable material
+needed for their admitted return. Retire a prefix only when its effect has a constructed
+replacement and all required pending/source receivers factor through that replacement.
+Disposed handles do not by themselves prove that the earlier constraints are irrelevant.
+Conversely no requirement to reproduce every past occurrence is imposed. Keep the source
+fibre by its equations/generators, not by retaining the old vector just in case.
 
-[definition] Bind the changing encoded carrier to the existing appropriate native receiver;
-`SymbolCurrentChart` may remain the final text codec. Different shape/grain is not resolved by
-padding or equating widths. Persist generator, receiver/decoder, conditions, clock and fibre,
-including the old encoding cut required by a pending return. Account for work/residency/transfer
-of the full representation, not only its serialized face.
+[definition] Use mode/receiver factorization to derive the retained coordinates. Bind
+`E_next T=U E` and `D E=rho` for the actual source, condition, emitted face and successor.
+`KernelModeReduction` provides an exact reference for mass/current-preserving kernels;
+the observable-form closure and field/internal-mode owners supply other existing domains.
+Construct the matching resident primitive where a consuming map is absent, rather than
+calling the host reduction in the hot recurrence. Rebase current, decoder and measuring
+form together.
 
-[definition] **Expected outcome:** conduct a requested boundary without expanding every smaller
-constituent, reproduce the claimed future receiver (or its retained bounded difference), and
-show exactly which new contact reopens an overly coarse representation. Inspect the decoder's
-actual output. A smaller file, unchanged face or zero scalar loss alone proves none of this.
+[definition] The inherited full-operator `operative_reuse::DependencyIndex` has different
+operation/carrier types from the dependent constitutive programme. It is not a drop-in
+compiler or proof of generative compression. Reuse its mathematics only after an actual
+type/semantic map is constructed; do not begin an inherited-model cache campaign to avoid
+compiling the current native action.
+
+### Product and cost check
+
+[definition] **Delivered outcome:** new calls and emitted continuations use the compiled
+current/factor representation. Compare the complete mathematical output and appropriate
+source-return semantics with the standing programme reference, while measuring actual
+resident contractions, intermediate readouts, latency and retained material.
+
+[definition] Test repeated fixed-material use, independent new formation, a changed receiver,
+a source that exposes an omitted direction, and a live pending return crossing the encoding
+change. Repeated use with no new independent structure should not add one model coordinate
+or source packet per use. Required counters/numerical precision and genuinely new modes have
+their own reported cost; “constant bytes forever” is not silently assumed.
+
+[definition] The output/cost comparison distinguishes source archive, executable operation
+history, memoized history, factored generator and current state. Only the last two fulfill the
+new continuation target where their sufficient law is established. Preserve the former
+implementation/evidence recoverably while replacing its productive representation.
 
 ## 5. Useful conversation and durable operation
+
+[definition] This packet starts with the first repaired contextual generator, while the
+workshop remains available. Use a small declared development source and independently held-out
+tasks: contextual continuation with the same wording under changed preparations, application
+of a supplied mathematical relation to new values, a code request checked by execution, and
+an ordinary explanatory reply. These are product questions, not a hand-authored answer grammar
+or a universal intelligence checklist. The driver's output may not be an exterior model's
+answer attributed to HNN.
+
+[definition] Inspect actual replies and mathematical returns after the first representative
+case. A contextual condition that moves while replies remain repetitions is a failure of
+this product packet, not successful qualitative learning. Use source/condition, objective,
+generator and decoder comparisons to locate the error; change that owner before expanding
+corpus exposure. The exact scalar/phase family and loss receivers support this diagnosis,
+but do not replace the requested output.
 
 [definition] Use actual prepared English, code and mathematics material through the public
 session as soon as phases 1–2 permit useful returns. Keep development/evaluation separation and

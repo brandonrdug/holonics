@@ -37,10 +37,18 @@ now has shared engine owners for bilinear construction, receiver factorization a
 preimages. A pure resident consumer executes the returned exact rational factors and applies a
 changed receiver to the same GPU product without intermediate host readout. The earlier fixed
 factorization example now calls those reusable owners. This is productive mathematical/native
-application; the coupled developing-family material transaction remains a separate unbound
-consumer, rather than an implied completed Athena faculty.
+application. Generic dependent Base/Programme material incorporation is also implemented;
+the new boundary is its specific binding to a caller-controlled mathematical instance and
+the returned factor/condition family. It is not another missing generic return-cycle mechanism.
 
 ## Direct contribution to Athena and Eros
+
+[definition] The [current integration packets](plans/THE_ROADMAP.md#immediate-mathematical-application-and-implementation)
+start with a callable workshop over the existing HNN session: construct, apply, change receiver
+and refine an actual mathematical relation. The [implementation contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-implementation-packets)
+names the request payload, native binding, source/condition repair and compact continuation.
+A standalone command wrapping fixed examples would not complete that contract. No visual
+interface redesign is required to make the typed application callable.
 
 [project-postulate] Hephaestus is the mathematical application of the
 [shared sustained programme](plans/THE_ROADMAP.md#sustained-objective-and-construction-rhythm).

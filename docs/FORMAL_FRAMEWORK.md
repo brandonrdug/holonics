@@ -29,6 +29,14 @@ GR-derived models are identified by their actual equations and approximation dom
 
 ## Construction programme and first formal use
 
+[definition] The [HNN integration plan](plans/THE_ROADMAP.md#immediate-mathematical-application-and-implementation)
+now orders use of the returned mathematics through callable construction, contextual
+formation, compiled continuation and actual Athena tasks. The
+[Lorentzian bounded-ratio review](../research/records/2026-09-12_BOUNDED_LORENTZIAN_RATIOS_JOIN_COEFFICIENT_GAUGES_AND_HODGE_BOUNDS.md)
+connects coefficient log gauges, M-convex affine quotients and Hodge-type Hessian signatures
+to a specific admissible coefficient-bound consumer. This source is reviewed mathematics;
+its optimization is not silently described as an already implemented native operation.
+
 [project-postulate] [The Reality of Difference in construction](plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md)
 now carries the philosophical account into one ordered programme: compatible potential and
 joint receivers; Swing/tube/scale transport; constitutive continuation; mathematical source

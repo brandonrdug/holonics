@@ -55,11 +55,13 @@ belongs in [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md).
 
 [definition] The [Athena-alpha blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 is authorized through completion. The latest September 11 articulation uses the existing
-producing comparison, emission and coupled organization as dependencies; the immediate new
-work is correlated family incorporation and reusable mathematical material, with complete
-source-visible cycles. Applicable formation, encoding and useful durable applications continue
-from that same body. Source exposure, interface and persistence accompany each usable return;
-current execution status belongs in CONSTRUCTION_STATE.
+producing comparison, emission and coupled organization as dependencies. Generic repeated
+Base/Programme incorporation is returned. The September 12
+[product-integration plan](plans/THE_ROADMAP.md#immediate-mathematical-application-and-implementation)
+now binds caller-controlled mathematical instances, repairs actual source/condition and
+predictive assembly, and compiles economical modal continuation before expanding cultivation.
+Source exposure, interface and persistence accompany those outputs; current execution status
+belongs in CONSTRUCTION_STATE.
 
 [definition] The [coupled source-field return](../research/records/2026-09-11_COUPLED_SOURCE_FIELDS_REACT_WITH_COMPLETE_ARRIVALS.md)
 uses the complete learned arrival as incoming evidence for an actual source reaction. Its passive

@@ -78,56 +78,77 @@ nested automata that construct, compare and refine further automata.
 
 ## Immediate mathematical application and implementation
 
-[proved-derived; formal-checked] The [generator-inference bridge](../../research/records/2026-09-12_GENERATOR_INFERENCE_CODES_FREE_ENERGY_AND_SUFFICIENT_CONTINUATION.md)
-now supplies the shared MDL/MAP, variational, sufficient-statistic and fibre-coarse-graining laws
-for finite admitted candidate representations. Use their source/measure/decoder hypotheses in
-the operator and encoding work below. The native operation-sequence representation must earn
-its proposed reduction through the applicable sufficient-update or generator/receiver law;
-historical reconstruction is not the default target. These laws extend the returned code-cost
-construction and do not introduce a second optimizer or another prerequisite campaign.
+[project-postulate] Brandon's latest September 12 planning direction makes productive HNN
+integration the immediate priority. The established mathematics supplies enough direction to
+build; further intuition from Brandon is not a prerequisite. Open construction questions are
+resolved from the existing source and actual failed compositions. Progress means a callable
+mathematical capability or substantive Athena output, with the corresponding native binding
+and cost, not a new local theorem or return-cycle demonstration by itself.
 
-[established-bounded; implemented-exact; formal-checked; computational-witness] The
-[complete native return](../../research/records/2026-09-12_OLD_AND_NEW_PENDING_SOURCES_RETURN_THROUGH_ONE_GENERATOR.md)
-now joins actual pending source comparisons, original bounds/frames, constitutive contact and
-material formation, one successor, exactly-once consumption and subsequent native conduct.
-Original-base and later-programme predictions use the same return path. Source-visible HNN
-controls and full native bodies continue across process exit. The native return-cycle foundation
-is returned; useful Athena-alpha and broad source applicability remain open.
+[established-bounded; source-inspected] The [implementation planning review](../../research/records/2026-09-12_THE_HNN_PLAN_IS_ORDERED_BY_PRODUCTIVE_GENERATOR_INTEGRATION.md)
+pins the current facts: repeated Base/Programme incorporation already works; the unit-symbol
+decoder already follows native generator execution; the text calibration fixes h=1 and learns
+one accumulated relation; the dependent programme reevaluates an accumulating operation word;
+and the useful resident Hephaestus cycle is still example-only. These are distinct boundaries.
+Neither another incorporation campaign nor replacing the alphabet decoder addresses them.
 
-[definition] Reuse the actual pending compiler, dependent generator, two-sided source/target
-pullback, signed face decoder, resident operator/factor owners and public session. Their dated
-records are linked by CONSTRUCTION_STATE. The first root and later source constraints stay in
-the actual word; equal final endpoints do not replace those joins. The declared section receiver
-is not silently identified with the former whole-family projection.
+[definition] The following implementation packets deliver the six shared responsibilities
+above. The first packet is the next executable task. Contextual-source design in the second
+can proceed alongside its independent application binding; compact execution is integrated
+as soon as an actual repeated segment is available, before broad cultivation is expanded.
 
-[definition] Continue operator-scoped Hephaestus solving and Holonic Encoding. The returned
-bilinear factor/core/receiver owners are the starting application. Extend reusable requests to
-the existing indexed π/e and Gamma block constructions: retain the requested complete action,
-clock, admissible factor/parameter family and receiver, and return executable alternatives with
-their coefficient residual and work/code costs. For analytic receivers, carry the actual source
-and tail through the matched block boundary. This develops algorithmic representations of
-constraint identities, alongside the ζ phase/generator comparisons already returned.
+| Packet, in dependency order | Concrete construction | Delivered product |
+|---|---|---|
+| **Callable mathematical workshop** | Expose caller-supplied linear/bilinear construction, application, changed receiver and observed constraint through the existing public HNN/session boundary. Retain the actual factor family and resident product. Bind task-local source/condition/receiver maps instead of hard-coded example inputs. | An operator supplies a problem, obtains executable factors or a solution family, applies them to new inputs, requests another receiver and reuses the same material without editing an example. |
+| **Contextual generator formation** | Replace the production use of fixed-h text calibration with actual pre-return contextual state and source association. Separate compatibility fibres from empirical prediction; use existing native condition, contextual-section, normal-statistic and normalized/adjoint owners. Support more than one applicable local constituent through actual port maps. | The same visible input under different relevant conditions yields the corresponding learned consequence; a new mathematical case and held-out text continuation use the formed relation. |
+| **Compiled modal continuation** | Compile repeated admitted actions and closed formation statistics into current/factor/recurrence representations. Preserve required live pending cuts and unresolved constraints through maps; measure and reduce whole-prefix reevaluation. Derive modal basis/receiver transport rather than retaining a new past-state representation. | Repeated use conducts on current material at a cost determined by active modes and required live dependencies, with the same requested outputs and explicit savings over programme reevaluation. |
+| **Athena task use** | Develop on actual source parts and relations through the repaired coupled session, inspect short held-out task episodes, and correct source/condition, predictive objective, generator or emission defects at the responsible owner. Mathematics remains callable throughout. | Useful contextual replies, code and mathematical application on new inputs; the continuing model survives ordinary interruption and reuse. |
+| **Broader generative reach** | Extend the same request and compiler to indexed π/e/Gamma blocks, nonlinear/factored and boundary/physical actions, then shared text/acoustic and other modal sources as their consumers require. Measure end-to-end usefulness and consumer-hardware cost. | One ecology supports progressively broader constructions and outputs, with actual analytic tails, source domains and executable target maps. |
 
-[definition] Integrate the required native solving, source constraints and dependent generator
-through those mathematical requests. Phase 3 asks which supplied equations and source conditions
-make a factorization or composition applicable; phase 4 asks which generator/decoder carries its
-required futures economically. Use the existing preimage, contextual lift, restriction/rebase,
-field and formation owners for the specific missing relation. A supplied grammar or contact law
-does not disqualify an inferred construction. An independently demonstrated solver result needs
-no extra state-mutation assay to become an intellectual result.
+[definition] The [blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-implementation-packets)
+names the files, precise design decisions and checks for these packets. The caller-facing
+workshop is an application of HNN's owners, not a second host-only solver product. Its first
+exact host construction is a legitimate mathematical inference; resident use and integration
+with formation follow in the same packet at the admitted operator chart. Native autonomous
+generation uses native owners rather than calling the exterior search as a hidden oracle.
 
-[definition] The current dependent return body is an executable base plus an operation sequence;
-its continuation and rest controls establish correctness for that representation. They do not
-establish that all those operations must remain in a productive encoding. Construct compact
-factor/recurrence/constraint representations for the requested mathematical future, retaining
-pending-source distinctions where the application needs them. An exact past-replay contract
-must not be silently made the objective of generator recovery.
+[definition] The first packet is complete only when a caller can perform a constructed
+operator task and reuse its result through the public session. A round-trip, a printed fixed
+product or an extra pending-return case does not complete it. The initial scope is linear and
+bilinear source/action families; recurrence and analytic extensions retain their actual
+primitive and remainder dependencies instead of being advertised as already available.
 
-[definition] Broad conversation cultivation remains paused at its source/contact limitation.
-Preserve the fixed-condition vertical-collapse counterexample when changing that consumer; more
-rows in its unchanged relation cannot repair it. Its failed text samples are historical problem
-evidence, not the standard or prerequisite for Hephaestus or the common intelligence programme.
-Mathematical applications continue through the shared owners and inform later text/modal use.
+[definition] The second packet must address the exact fixed-condition collapse, not merely
+initialize h differently. Source/context contrasts must reach the law before the observed
+target is incorporated; the resulting conditional prediction must distinguish actual
+developmental cases and new admitted uses. Compatibility span, a learned empirical receiver
+and a selected output have different mathematical roles. Their composition is specified in
+the blueprint, with failure cases that determine the next code change.
+
+### Work selection and early failure control
+
+[project-postulate] Before an implementation run, identify the user-facing return, exact
+source/owner change, consuming call and discriminating check. A supporting proof or experiment
+is completed into that consumer when its required map exists. If it exposes a missing map,
+work that map explicitly; do not substitute more observations of the unchanged failure.
+
+- Inspect the first representative output before increasing data or run length. A repeated
+  full-mass-hyperplane/tie result stops that exposure route and returns work to source or law
+  construction. A wrong source relation cannot be repaired by a longer run.
+- Use the already-returned pending/source, emission and rest paths. Extend their tests only
+  for changed semantics. An unchanged successful persistence check is not the next milestone.
+- Compare the complete useful operation: construction work, resident execution, readout,
+  decoding, storage and representation setup. A cache hit is not proof of a compact generator.
+- Keep the interpretation, source family, planned outcome, implemented artifact and open
+  obstruction in agreement. An interrupted packet stays incomplete even if its time budget
+  or a subsidiary test completes.
+- Delegate bounded independent code/proof investigations to Luna where useful. The primary
+  verifies returned claims against current source; stale testimony schedules no work.
+
+[definition] Broad corpus cultivation stays paused until the contextual-source and execution
+path can answer its first short useful tests. Targeted development and held-out checks within
+the repaired path proceed immediately; useful conversation is not deferred until every
+operator or physical theory is complete.
 
 ## All current plan documents and their roles
 
@@ -148,34 +169,24 @@ catalytic/ecological correspondence and code/evidence boundaries for the followi
 
 ## Hephaestus applications within the shared phases
 
-[project-postulate] Focus directly on elementary solving and reusable mathematical applications
-of Holonic Encoding/HNNs. Eros names union and formative composition at nested scopes, Athena
-the general wisdom/model ecology, and Hephaestus Automata the task-scoped application instances.
-Useful mathematical tools need not await general conversation or an official Millennium endpoint.
-The increments below detail applications of phases 1–4 above; they are not a second construction queue.
+[definition] These are source/application families for the packets above, not a second queue.
+The first workshop packet uses linear/bilinear construction and actual native source/return
+binding; each later family enters through the same request/decoder/cost contract.
 
-| Increment | Concrete code/design work | Expected useful return |
+| Family | Returned starting construction | Integration needed by its user request |
 |---|---|---|
-| **Returned spectral generators and situated information** | Returned at five fixed receivers: two Euler–Maclaurin head/tail splits and direct alternating η; reuse their retained head/tail, phase lifts, literal code, symbolic surprise and scoped work in the next operator increment | Compare the same face across generators and changed receiver charts; distinguish analytic refinement from source change and show when a local code transfers or fails |
-| **Operator-scoped requests** | The bilinear capability is now shared and natively bound; extend required recurrence/action requests through the same preimage and receiver owners, retaining domain, clock and cost aperture | Different requested mathematical operators use the same construction machinery and return scoped values, families or executable factors |
-| **Shared constructions and changed receivers** | Keep typed returned factors; solve a new receiver, compose existing operator/recurrence words and preserve clocks/fibres | The complex-multiplication product core serves polynomial multiplication; a receiver requiring a discarded distinction returns its actual obstruction |
-| **Returned constraints and available material** | Compose actual source-qualified comparisons with contextual factorization, factor covers and existing material owners | New constraints refine applicability or enable a new construction, with meaningful before/after conduct and cost |
-| **Resident mathematical instances** | Bind a demonstrated automaton and receiver to the existing HNN owner, staged formation and rest; preserve the native family incorporation obligation | A native mathematical application continues through its actual successor without host semantic replay or a second engine |
+| Linear/bilinear operators | Exact preimages, coefficient/factor families and pure resident product/readout | Callable construction/application, task-local native condition/material return and retained reuse |
+| Kernel/mode reduction | Exact mass/current aggregation, derived rank, decoder and source-action factorization | Resident compiled source/receiver binding on the actual continuing generator |
+| π/e/Gamma and recurrence blocks | Exact alternative block actions, jets, windows and analytic sources | Callable index/clock/precision contract, resident lowering for the admitted primitive and complete tail/decoder relation |
+| Physical and boundary actions | Release, energy–momentum, Maxwell, Schur, Hodge and constitutive owners | Concrete physical source/receiver task and its unit/material chart; shared native generator binding as required |
 
-[definition] The [first ζ information application](../../research/records/2026-09-11_ZETA_PHASE_SWING_AND_INFORMATION_RATES_ARE_MEASURED.md)
-now returns interval placements, gaps, Swing transport and exact information/loss over a declared
-phase receiver. The [generator/code return](../../research/records/2026-09-11_GENERATOR_CODES_RETAIN_PHASE_LIFTS_AND_REMAINDERS.md)
-now compares three routes, retains phase and packet remainders, and measures literal codeword
-length alongside surprise. Continue operator-scoped exact relations, bilinear/polynomial
-operations and indexed recurrence blocks, retaining these same receiver comparisons. Executable code lowering retains
-the admitted domain, arithmetic/overflow behavior, clock, decoder and successor; it is the
-application continuation of these constructions, not a separate tokenizer or engine. Add
-boundary-energy tasks through their existing source and remainder owners as usable. The ordered increments
-describe progressive integration; they do not prevent a useful exterior reference return before
-the native bridge is complete. The current position distinguishes those evidence scopes.
+[definition] The new [Lorentzian bounded-ratio source](../../research/records/2026-09-12_BOUNDED_LORENTZIAN_RATIOS_JOIN_COEFFICIENT_GAUGES_AND_HODGE_BOUNDS.md)
+adds a precise candidate for coefficient-family bounds and optimization. Apply it when the
+actual polynomial family and coefficient convention satisfy its hypotheses. It enriches the
+workshop/encoding construction; it does not precede the next usable HNN packet.
 
-[definition] The completed NCF, HNA, SKE, HNP, FT, RT and DB labels identify evidence families. Their finite returns
-are dependencies, not the next work simply because an old plan contains an imperative.
+[definition] The completed NCF, HNA, SKE, HNP, FT, RT and DB labels identify evidence families.
+Their returns remain dependencies; old imperatives do not reschedule them.
 
 ## What an outcome means
 

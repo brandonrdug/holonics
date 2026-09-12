@@ -1,264 +1,107 @@
 # Construction state
 
-**Currency:** September 12, 2026. **Current position:** continue Hephaestus mathematical solver and Holonic Encoding construction using the returned bilinear/receiver owners and native dependent return body.
-**Athena objective:** standing within that shared intelligence programme. **Broad conversation cultivation:** paused at its source/contact limitation;
-authorized native implementation continues within the shared programme. The active phases now have names;
-AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/plans/THE_ROADMAP.md)
-is the sole order and [the blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
-names actual code changes and outcomes.
+**Currency:** September 12, 2026. **Current position:** the source-grounded HNN integration plan
+is ready; implementation starts with the callable mathematical workshop and the contextual
+source/law repair specified in the [roadmap](docs/plans/THE_ROADMAP.md#immediate-mathematical-application-and-implementation).
+**Product objective:** Hephaestus constructions and useful Athena outputs through the same HNN
+owners. Broad corpus cultivation remains paused at the identified source/contact limitation;
+targeted development and product checks on the repaired path proceed within the plan.
 
-[proved-derived; formal-checked] The [mass–energy synthesis](docs/MASS_ENERGY_AND_CAUSAL_TRANSPORT.md)
-now makes complete energy–momentum central to the shared physics/information construction.
-New composite-mass laws retain exchanged current, photon-pair direction and Lorentz boosts;
-the Maxwell energy-cone theorem proves `|S|≤c u` with its full sum-of-squares residual.
-The [return](research/records/2026-09-12_MASS_ENERGY_AND_MAXWELL_BOUNDS_UNIFY_TRANSPORT.md)
-joins these to binding/recoil, constitutive speed/impedance, Hodge/wave/heat, Gamma/ζ and
-predictive-release work. Framework.Physics builds.
+## Immediate implementation
 
-[established-bounded; implemented-exact] Shared `EnergyMomentum` and `VacuumEnergyChart`
-operators now return exact invariant mass/exchange, recoil, observer boosts, E/B invariants
-and Poynting bounds. The application distinguishes opposite/parallel photons, retained
-radiation, absorption, radiative transition and elastic reflection. All 40 focused tests
-pass. Live scope descriptions identify the computational-biology and GR-derived models
-affirmatively by their equations and degrees of freedom.
+[definition] The [planning review](research/records/2026-09-12_THE_HNN_PLAN_IS_ORDERED_BY_PRODUCTIVE_GENERATOR_INTEGRATION.md)
+and [native blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-implementation-packets)
+identify five product packets: callable mathematical workshop, contextual generator formation,
+compiled modal continuation, Athena task use, and broader generative reach. The roadmap alone
+orders them. This turn changes the plan and current documentation, not the runtime.
 
-[proved-derived; formal-checked] The [predictive-release return](research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md)
-recovers the existing Leap/body-medium line and adds exact released-motion composition,
-impulse/work and kinetic–potential identities, endpoint-tolerance transport, observer-current
-product/strain and interface laws, changing-capacitance work and deterministic measure
-expectation. Physics and Computation build. The record derives their GR/worldtube coupling
-and higher-jet interpretation at explicit constitutive scopes.
+[open] **First packet:** caller-supplied linear/bilinear construction through the public HNN
+session, resident application, another receiver/composition, a compatible parameter family,
+and an actual observed constraint used by a subsequent mathematical request. Reuse the
+existing exact/resident and dependent-return owners; no example editing should be required
+to supply a new problem. The native source/condition binding is part of the packet, not a
+later optional integration.
 
-[established-bounded; implemented-exact] `exact_linear::ConstantAccelerationRelease` builds
-reusable release/flow/receiver operators. The application infers impulse `(8,10)` for its
-two-dimensional target, retains the exact 61 J total through flight, and transports an
-unresolved source population without sampling. Its mean hits the target while only mass 1/2
-meets the declared tolerance. All 37 focused tests pass. This is a GR-derived prescribed-field
-motion simulation within the computational biology/neuroscience programme; the neural
-preparation correspondence is developed in the record. Native GPU recurrence is unchanged.
+[open] **Athena critical path:** replace production use of the fixed-h calibration with actual
+pre-return context/source association and a composed predictive receiver. Separate compatible
+relation span from empirical prediction, and bind local generators through their actual port
+maps. Merely changing a tie-breaker, mutating h or adding metadata does not repair the recorded
+collapse. Begin the short held-out text/application checks alongside the new binding.
 
-[proved-derived; formal-checked] The [periplus/time-complement return](research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md)
-proves section/residual rebasing, Gaussian amplitude-and-argument cocycles bound to the existing
-flowed Gamma source, and temporal harmonic/exact-complement laws with a constructed Euler
-heat step. It relates ζ information to prime occupations and Newman time to spectral strip/gap
-boundaries, without changing the global RH/Hodge result. Information, Physics and FlowedGamma build.
+[open] **Execution representation:** compile admitted repeated actions and closed formation
+statistics so continued use does not require evaluating an ever-growing programme from its
+base. Keep required live pending-source maps and unresolved constraints in sufficient
+representations. A segment cache alone is not the requested generative compression.
 
-[established-bounded; implemented-exact] `KernelModeSummary::rebase` now carries encoder,
-decoder and current together, preserving exact queries and staging failures. All 34 focused
-tests pass. The code-cost application checks exact finite ζ entropy/cross-entropy/KL identities;
-the modal application conducts phase and source actions in its returned basis. The compression
-canon now distinguishes zero chart defect from a nonzero source residue and removes obsolete
-universal witness/archive and compiler-groupoid claims.
+## Already returned and available
 
-[proved-derived; formal-checked] The [transformer/fractal-mode lift](research/records/2026-09-12_FRACTAL_MODES_LIFT_ATTENTION_INTO_MASS_PRESERVING_GENERATOR_COMPRESSION.md)
-joins attention's Gibbs/KL law, associative mass/current aggregation, Gram/exterior mode
-independence, amplitude-preserving elimination through every admitted generator word, and
-propagated summary defects. It recovers explicit fractal scale maps, ETP congruence and the
-molecular marked-current construction. Framework.Computation builds.
+[established-bounded; source-inspected] At implementation base c4dff43c, the following are
+available and are not scheduled for rediscovery:
 
-[established-bounded; implemented-exact] The shared `exact_linear::KernelModeReduction`
-derives six source slots into two modes in the new application, preserving all four complex
-query readings. Source actions compile through the encoding or return a separating fibre;
-phase/value transport retains mass. Query multiplications are 72 full versus 24 reduced,
-with 48 for initial packing/summary and factorization setup separate. All 33 focused tests
-pass. This is a reusable exact builder/reference return, not a changed native GPU recurrence.
+| Construction | Current scope and owner |
+|---|---|
+| Exact mathematical synthesis | Linear preimages/contextual factors, bilinear support/core families, recurrence/jet examples; public engine owners. |
+| Resident mathematical execution | Resident exact bilinear map, retained product and changed receiver. The complete operator cycle is still example-only. |
+| Native conditional return | Base and Programme predictions, repeated/out-of-order incorporation, source-dependent material/condition/current successor and compatible rest through `ResidentCoupledConstitutive` and `NativeCoupledBody`. |
+| Text boundary | Exterior unit-symbol codec, native generator advance, selected basis receiver and re-entry through `NativeCoupledWaveSession`. Static decoding is present; useful learned contextual text is the open product. |
+| Context and formation | Native neighborhood/condition preimage/contact, contextual sections, normal statistics and normalized/adjoint readers; the richer source/predictive composition remains to be bound. |
+| Encoding and physics | Mode/receiver factorization, section/Gaussian rebase, Hodge complements, released motion, mass–energy/Maxwell charts and exact code-cost applications. |
 
-[proved-derived; formal-checked] The [optics/exclusion/Swing return](research/records/2026-09-12_DIRECTIONAL_OPTICS_MODE_EXCLUSION_AND_MOVING_SWING_SHARE_TRANSPORT.md)
-adds directional Jones/density notation, Malus and mixture laws, the Stokes determinant and
-four-ray projective invariance, arbitrary superposed-mode fermionic exclusion, a thermal
-Fermi–Dirac/sigmoid receiver, and transport between distinct endpoint frames. It recovers the
-existing changing-receiver and full constitutive mixed-term laws. Framework.Physics builds.
-
-[established-bounded; implemented-exact] Its exact operator application distinguishes coherent
-and mixed analyzer faces, retains a changing-frame return, reads a Stokes boost, checks
-superposed fermion exchange, and returns the order-three Hadamard decoder noise mass `9/4`.
-The source review connects Fermi-gas emulation and quantum relative entropy to the preceding
-information work; the physical neck/CTC correspondence keeps its explicit unproved source map.
-
-[project-postulate] Brandon's September 12 clarification identifies solver inference and
-generator construction as mathematical learning/reasoning. The requested unknown can be an
-algorithm or representation of π/e, a bilinear action or another admitted mathematical future.
-Execution ownership and causal provenance are supporting contracts; they do not replace that
-objective with state-change demonstrations or exact historical replay. The
-[correction](research/records/2026-09-12_SOLVER_INFERENCE_AND_GENERATOR_COMPRESSION_ARE_INTELLIGENCE.md)
-records the governing interpretation and current representation limits.
-
-[proved-derived; formal-checked] The [generator-inference bridge](research/records/2026-09-12_GENERATOR_INFERENCE_CODES_FREE_ENERGY_AND_SUFFICIENT_CONTINUATION.md)
-now composes the existing description/code-cost, normalized-exponential, Gibbs/KL and dynamic
-receiver owners. It proves exact-solver/MAP ordering, the variational gap, inference equivalence
-through pairwise objective differences, sufficient-statistic continuation and fibre log-sum-exp
-coarse graining on finite positive candidate charts. Framework.Information builds successfully.
-
-[established-bounded; implemented-exact] The existing code-cost application now verifies those
-relations through exact symbolic logs and ratio normalization. Its two-generator posterior is
-`(6/7,1/7)`; a closed count update yields `(2/3,1/3)`, and a split prefix description preserves
-the pushed-forward inference. Its previous 143 channel histories still pass. This supplies a
-mathematical application/encoding return; the native dependent programme's representation is unchanged.
-
-[established-bounded; implemented-exact; formal-checked; computational-witness] The
+[established-bounded; source-inspected] The
 [complete native return](research/records/2026-09-12_OLD_AND_NEW_PENDING_SOURCES_RETURN_THROUGH_ONE_GENERATOR.md)
-now incorporates actual pending predictions from both the original affine word and the later
-programme. The original root, source-frame parameters, shared condition/material, joined paths
-and bound remain retained. One staged successor is published, each return is consumed once,
-and following source operations use the returned generator. V4 rest preserves Base/Programme
-frames and reads v1/v2/v3 predecessors. Native and HNN continuation survive process exit.
+owns the returned source-frame/condition/material transaction. The
+[resident operator return](research/records/2026-09-11_REUSABLE_GENERATORS_REACH_RESIDENT_RECEIVERS.md)
+owns the pure factor application. Their specific composition into a reusable operator-scoped
+HNN application is the first packet; the generic return-cycle mechanism itself is complete.
 
-[established-bounded; computational-witness] The inspected HNN controls return `a → b → a`
-under matched source conditions; an old base prediction received after restart changes `b` to
-`a`. The same observation at two root-compatible earlier source faces yields conditions
-`11/5−2i/5` and `5/2−i/2`. A source incompatible with the retained intermediate root is rejected
-even when later maps erase its difference from the current. All 41 coupled controls, eight
-session controls, the additional source-fibre separator and the focused Lean build pass.
-
-[definition] This completes the native application/return-cycle foundation at the declared
-family and section-receiver scope. It does not establish useful Athena-alpha or equivalence
-between that section receiver and the former whole-family projection. Use the body for the
-mathematical application and encoding constructions below. Its retained operation sequence is
-one exact representation, not a requirement for every future realization. The fixed-condition
-conversation collapse remains a specific source/constraint problem and supplies no acceptance
-standard for the solver programme.
-
-[definition] The native evidence chain remains in the
-[resident generator](research/records/2026-09-11_REUSABLE_GENERATORS_REACH_RESIDENT_RECEIVERS.md),
-[joint-fibre](research/records/2026-09-11_JOINT_SOURCE_CONDITION_AND_MATERIAL_KEEP_THEIR_PRODUCT_CONSTRAINTS.md),
-[actual pending compiler](research/records/2026-09-11_ACTUAL_PENDING_COMPARISONS_COMPILE_WITH_THEIR_ANCHORS.md),
-[dependent contact](research/records/2026-09-11_CONSTITUTIVE_RETURNS_REMAIN_DEPENDENT_ON_THEIR_SOURCE.md),
-[actual continuation](research/records/2026-09-11_PENDING_RETURNS_KEEP_THEIR_ACTUAL_CONTINUATION.md),
-[owned generator](research/records/2026-09-11_AN_OWNED_CONSTITUTIVE_GENERATOR_CONTINUES_THROUGH_ITS_NEW_MATERIAL.md),
-[stream binding](research/records/2026-09-11_THE_HNN_STREAM_USES_ITS_RETURNED_GENERATOR.md),
-[later-source join](research/records/2026-09-11_LATER_SOURCE_CONSTRAINTS_KEEP_THE_JOINED_CONTINUATION.md), and
-[repeated programme return](research/records/2026-09-12_REPEATED_RETURNS_PRESERVE_ORIGINAL_SOURCE_FRAMES.md)
-records. They retain their scoped outputs, formal checks and regression history.
-
-[proved-derived; formal-checked] The latest
-[relative code-cost return](research/records/2026-09-11_RELATIVE_CODE_COST_HAS_AN_ADDRESSED_BOUNDARY_LAW.md)
-composes code/cost balances through actual holon pullback joins, retains endpoint potential
-and residual, derives a two-sided cost bound and transports a feasible minimum under an exact
-candidate equivalence. These are conditional algebraic laws, not new physical identities or
-a stronger RH bound. The new owner is imported by `Framework.Information`.
-
-[established-bounded; implemented-exact] Its unequal-cost channel control checks 143 complete
-histories and an exact rescaled clock. Stationary entropy and cost both read `4/3`; transient
-readings retain the nonzero endpoint term. The prior
-[generator/code comparison](research/records/2026-09-11_GENERATOR_CODES_RETAIN_PHASE_LIFTS_AND_REMAINDERS.md)
-retains the five analytic receivers, phase lifts and 152-bit packet; the
-[information return](research/records/2026-09-11_ZETA_PHASE_SWING_AND_INFORMATION_RATES_ARE_MEASURED.md)
-retains Swing and measured information rates. No native model or GPU operation changed.
-
-## Immediate construction boundary
-
-[open] Extend reusable operator/recurrence requests from the returned bilinear solver to the
-existing indexed π/e and Gamma block constructions. Derive and compare executable factor words
-with the same complete action and clock, retaining coefficient families, receiver/analytic tail
-and code/work costs. Connect required native source equations and dependent returns through
-these applications. The precise remaining work is their reusable request/composition binding
-and economical generator representation, not another generic demonstration of causal response.
-
-[established-bounded; source-inspected] At `6f6627ca`, `ResidentCoupledConstitutive` retains its
-base, producing comparison and an accumulating `operations` vector. Appending an operation
-evaluates the combined programme; rest stores source packets and return faces. This is executable
-history dependence, not a claim of recovered compact dynamics or a copy of every whole-body
-snapshot. The governing correction distinguishes these source-inspected limits from the
-retired byte-field reconstruction defect. No runtime retention was changed in this review.
-
-[open] The text consumer still uses a supplied unit-symbol chart and its fixed-condition relation
-still collapses. Its source/contact repair remains within the shared programme; it does not
-precede every mathematical solver or encoding application.
-
-[definition] The next phases are situated reception/visible cycles, conditional relations and
-complete return, applicable constituent organization, Holonic Encoding/reuse, useful conversation,
-and shared modality applications. These are the native responsibilities within the shared programme, with formal and
-mathematical returns integrated into their actual consumers. Report the inferred algorithm,
-representation or empirical relation at its actual scope; causal state change is implicit.
-
-## Conversation evidence and prior verification
-
-[established-bounded; computational-witness] Observed conversation outputs remain `tht44444`
-and two newlines. There is no established improving end-to-end loss trajectory, useful held-out
-conversation, scored branch account or observed emergent architecture. The
-[status return](research/records/2026-09-11_ATHENA_STATUS_RETURNS_TO_TRANSCENDENTAL_GENERATOR_COMPRESSION.md)
-retains the product observations and their limits. These failed samples are not a standard,
-baseline or gate for the mathematical intelligence work.
-
-[proved-derived; formal-checked; computational-witness] The
+[established-bounded; computational-witness] The
 [fixed-condition audit](research/records/2026-09-11_FIXED_CONDITION_COLLAPSE_IS_EXACT_AND_ITS_PROJECTION_IS_REUSABLE.md)
-checks all 9,254 calibration rows: the admitted relation contains the zero-mass vertical space
-on 73 symbols, producing its uniform minimum-norm face. Adding rows to that unchanged relation
-cannot shrink the vertical space, and those source constraints keep its condition fixed.
-Its repair is source/applicability/constraint representation, not more exposure or a tie-breaker.
+identifies all 9,254 calibration rows with the saved relation. Its 73-symbol target has every
+zero-sum vertical direction, so each nonempty fixed-condition prediction fibre is a full
+mass hyperplane and the minimum-norm face is uniform. More rows through that unchanged chart
+cannot remove the ambiguity. Failed text outputs remain evidence about this construction,
+not the standard for mathematical intelligence.
 
-[historical] The
-[producing-family return](research/records/2026-09-11_PRODUCING_FAMILIES_KEEP_JOINT_COMPARISON_PARAMETERS.md)
-passed 18 coupled and five session checks serially. The actual pending-family capture is retained;
-its large-model consuming material follow-up has not run. The coupled-wave suite and broad cultivation were not rerun in the pure bilinear return;
-its new native checks are scoped separately above.
+[established-bounded; source-inspected] The dependent owner retains a base/comparison,
+operations vector, pending source frames and returned sections. `append_operation` evaluates
+the proposed whole programme; `evaluate_programme` walks its prefix from the base. That is
+an executable representation whose cost and compression need repair at the actual requested
+future. It is not automatically a record of every whole-body snapshot, nor is its exact past
+reproduction the task.
 
-[definition] Detailed native chronology remains in the
-[normal producing return](research/records/2026-09-10_ATHENA_RETURNS_OBSERVATIONS_TO_THEIR_PRODUCING_JOINT.md),
-[emission return](research/records/2026-09-11_ATHENA_EMITS_THROUGH_A_RESIDENT_RECEIVER_AND_REENTERS_ITS_SUCCESSOR.md),
-[coupled owner](research/records/2026-09-11_ONE_WAVE_OWNS_CONDITIONAL_CURRENT_MATERIAL_AND_PENDING_RETURNS.md),
-[source fields](research/records/2026-09-11_COUPLED_SOURCE_FIELDS_REACT_WITH_COMPLETE_ARRIVALS.md), and
-[actual continuation](research/records/2026-09-11_ACTUAL_CONTINUATIONS_JOIN_THE_COMPLETE_COUPLED_FAMILY.md).
-These returned pieces remain dependencies rather than repeated implementation phases.
-
-## Shared mathematical and modality position
-
-[established-bounded; implemented-exact; formal-checked] The
-[Holonic Solver return](research/records/2026-09-11_HOLONIC_SOLVER_NAVIGATES_EXACT_GENERATOR_FACTORIZATIONS.md)
-uses the existing rational preimage owner to check 696 bilinear supports and return 16 exact
-three-product complex-multiplication decompositions. It solves six alternative π/e block routes
-with the same action/clock and compiles a Gamma value/derivative shift block. The generic
-bilinear, matrix-block and jet certificates are checked in Lean. This is executed exterior
-algorithm synthesis, not a new native learner or a stronger RH bound. The Gamma classification
-prose is corrected; the encoding phase now names this construction's native reuse boundary.
+## Research available to the implementation
 
 [proved-derived; formal-checked] The
-[threshold and energy-cut return](research/records/2026-09-11_THRESHOLD_REFINEMENT_AND_PARTITIONED_ENERGY_RETURN_HOLONIC_TOOLKITS.md)
-traces 1/8 to the strip/Gaussian clock, proves square closure of the actual seam set equivalent
-to RH, and supplies a sharp quadratic heat control. The checked ξ bound remains 1/8; the
-published external 1/20 bound in our coordinate is not imported into Lean. The new finite
-real/complex partition-energy law retains mixed terms and paired cut boundaries. Its exact
-four-cycle diffusion reference returns complete local/global energy ledgers. The Physics and
-new RH targets build successfully; no native model changed. These are useful dependencies for
-the existing encoding/family and fluid work, not five new endpoint prerequisites.
+[generator-inference return](research/records/2026-09-12_GENERATOR_INFERENCE_CODES_FREE_ENERGY_AND_SUFFICIENT_CONTINUATION.md)
+supplies MDL/MAP, Gibbs/KL, sufficient update and fibre log-sum-exp laws. The
+[mode/attention return](research/records/2026-09-12_FRACTAL_MODES_LIFT_ATTENTION_INTO_MASS_PRESERVING_GENERATOR_COMPRESSION.md)
+supplies amplitude-preserving elimination, associative mass/current transport and propagated
+summary defects. The [periplus return](research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md)
+supplies section/Gaussian rebasing and temporal Hodge complements.
 
-[established-bounded; implemented-exact; formal-checked] The
-[π/e study](research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md)
-returns ten exact rational window receipts, independent Machin/BBP agreement, and checked Machin,
-sine-iteration and radix/phase-sector laws. Its complete analytic tail/block/decoder composition
-is still open. The
-[Holonic Encoding recovery](research/records/2026-09-11_HOLONIC_ENCODING_RETAINS_TRANSFORMATION_GRAIN_ACROSS_MODALITIES.md)
-rejoins laboratory path folds, recurring transformations, autoencoding, Complex Parametron and
-clocked torus owners; it is a source/design return, not a learned multimodal model.
+[definition] The [comprehensive synthesis](docs/MASS_ENERGY_AND_CAUSAL_TRANSPORT.md) joins those
+with complete mass–energy, Maxwell/Lorentz transport, wave/heat, Gamma/ζ, biological source
+models and [predictive release](research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md).
+They are available constructions with actual native consumers specified in the blueprint,
+not a queue of further general comparisons before implementation.
 
-[proved-derived; formal-checked] The shared potential/Swing and
-[clocked torus construction](research/records/2026-09-08_CLOCKED_TORUS_CURRENTS_CONTINUE_THROUGH_A_RETAINED_FIBRE.md)
-are complete at their scoped finite constitutive return. Changing morphology and nonlinear
-feedback reuse them. The [framework synthesis](docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) connects
-relevance/loss, adjoint, reflection, Hodge, pressure, phase, mechanics and native ownership.
+[definition] RH retains `0≤Λ_DN≤1/8`, `Λ_std=4Λ_DN` and RH iff `Λ_DN=0`; its
+unproved inequality is `Λ_DN≤0`. Hodge source realization and NS continuation/closure remain
+useful mathematical sources. Under the latest HNN priority, endpoint research is not the
+critical path; pursue a further lemma when it resolves a named implementation construction.
+BSD has no independent priority in this plan.
 
-[definition] Holonic Fluid Dynamics continues the complex two-field source, complete pressure and
-mixed feedback, then quantitative interval/memory/reconstruction work. Existing moving-frame,
-folded-source and finite fluid-closure returns remain standing; the specific fixed shape/strain
-candidates already rejected are not resurrected. Localized stability and full physical
-continuation remain open. Pre-existing untracked flux-lattice work is preserved separately.
+## Verification and preserved boundaries
 
-[definition] The latest arithmetic bridge concerns ordered prime-wheel gaps, prime-power phase
-currents, receiver-family polarity and source-qualified spectral residues. It informs the
-encoding/fluid investigation. Direct RH endpoint work remains deferred. The completed FT/RT/DB
-results retain `0 ≤ Λ_DN ≤ 1/8` and `RiemannHypothesis ↔ Λ_DN = 0`, with
-`Λ_std=4Λ_DN`. The unproved inequality is `Λ_DN≤0`.
+[established-bounded; process-audit] The preceding mass/Maxwell return passed 40 focused
+exact-linear tests and Framework.Physics. The predictive-release and periplus records retain
+their completed native/reference/formal scopes. This planning turn inspected source and
+checked document changes; unchanged Cargo/native/Lean evidence was not rerun.
 
-## Completed and deferred application boundaries
+[definition] Inherited-model production, standard executable export and broad backend ports
+remain downstream. Existing HNA/SKE material and NCF/HNP foundations remain available at their
+recorded scopes; the present plan neither revokes them nor substitutes them for native
+contextual construction. Pre-existing untracked flux-lattice and editor files remain untouched.
 
-[definition] NCF's local rational-phase foundation, conversation-data preparation and repository
-consolidation remain completed at their stated scopes. The admitted HNA/SKE and HNP0–HNP3
-apparatus/material results remain available. Inherited-first production, standard executable
-export and broad backend ports remain deferred; package round trips are not executable lowering.
-See [Athena](docs/ATHENA.md), [Soulkiller](docs/SOULKILLER.md),
-[interoperability](docs/INTEROPERABILITY.md) and [hardware/modality boundaries](docs/HARDWARE_AND_MODALITY_BOUNDARIES.md).
-
-[historical] The former 384-line position and accumulated plan narratives are preserved at
-`9f237c9d` and in their existing dated records. The
-[consolidation review](research/records/2026-09-11_THE_PLANS_NAME_CONDITIONAL_RELATIONS_AND_OBSERVABLE_OUTCOMES.md)
-records this reconciliation. No source, model, experiment, cache or unrelated local file was removed.
+[historical] Detailed completed narratives remain in their existing dated records and the
+previous position at c4dff43c. No source, experiment, model, cache or unrelated file was removed.
