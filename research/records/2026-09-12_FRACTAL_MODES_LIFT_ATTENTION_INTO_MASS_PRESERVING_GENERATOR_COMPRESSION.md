@@ -96,6 +96,50 @@ too early loses an operand: `((0+0)/2+4)/2=2`, but `(0+(0+4)/2)/2=1`.
 
 ## 3. Exclusion, minimal linear modes and the future quotient
 
+### Complex logarithmic information and coherent aggregation
+
+[definition] To specify the requested complex cross-entropy rather than merely attaching the
+word phase to a scalar loss, take a positive normalized reference q and an actual angular lift
+θ, with probability amplitude `z_i=√q_i exp(iθ_i)`. Its lifted logarithm is
+`log̃ z_i=(ln q_i)/2+iθ_i`. Define the probability-calibrated complex information receiver
+
+`ℐ(q_i,θ_i) = -2 log̃ z_i / ln 2 = -log₂ q_i - (2i/ln 2) θ_i`,
+
+`ℭ(p;q,θ) = Σ_i p_i ℐ(q_i,θ_i)`.
+
+The factor two is required because q is intensity/probability, not amplitude. The angular lift
+is an operand, not a principal-argument choice that discards winding. This is an explicitly
+defined complex receiver extending ordinary cross-entropy, not a claim that Shannon's real
+entropy is already a complex physical quantity.
+
+[proved-derived] Finite linearity gives
+
+`Re ℭ(p;q,θ)=H₂(p,q)`,   `Im ℭ(p;q,θ)=-(2/ln 2) Σ_i p_i θ_i`.
+
+For a source phase lift φ, subtracting the source self-reading and using the existing
+cross-entropy/KL identity gives
+
+`ℭ(p;q,θ)-ℭ(p;p,φ) = D_KL,₂(p||q) - (2i/ln 2) Σ_i p_i(θ_i-φ_i)`.
+
+Thus real excess code length and oriented mean phase defect are two readings of one defined
+comparison. A winding change θ_i→θ_i+2πk_i changes its imaginary reading by
+`-(4π/ln 2)Σ_i p_i k_i`; a source/receiver common phase rechart cancels from the difference.
+These displayed identities follow by expanding the finite sum. Their real KL component is
+already formal-checked in `Physics/InformationDifference`; this combined complex definition
+and derivation are recorded here, not claimed as an additional new Lean theorem.
+
+[definition] The preceding class log-sum-exp acts on probability/code mass. A coherent
+amplitude receiver instead first forms `z_c=Σ_i a_i z_i`, so its intensity contains all
+`a_i conjugate(a_j) z_i conjugate(z_j)` cross terms before logarithmic projection. Cancellation
+can give zero, outside the finite positive logarithmic chart. Neither summing individual
+surprises nor keeping only mean phase reproduces that receiver in general. The new reducer
+preserves the linear complex current before this nonlinear read; its phase/value transport
+and future separator determine when a condensed family suffices. This joins the existing
+phase/winding and optics owners to the information construction without discarding coherent
+transport or pretending that a single complex loss determines every semantic future.
+
+### Independent modes and coding
+
 [definition] For source generators T and the declared family of future receivers R, the existing
 agreement relation is `x~y iff ∀r,w, r(T_w x)=r(T_w y)`. This is a congruence under admitted
 continuation, not an archive of the words actually experienced. In a linear chart its quotient
