@@ -32,6 +32,14 @@ test result never upgrades a correspondence.
 
 ## Formal framework entry points
 
+[definition] `Foundation/SectionResidual.lean` and `Transport/GaussianRebase.lean` are imported
+by `Framework.Information`. They own section/kernel compensation and the Gaussian
+shift/amplitude cocycle; `RH/FlowedGamma.integral_flowedTerm_eq_rebase` binds the latter to
+its actual integer source. `Physics/TemporalHodgeResidue.lean`, imported by `Framework.Physics`,
+constructs `Id-aΔ` and proves harmonic and exact-complement continuation. The
+[periplus return](../research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md)
+gives the analytic domains, Newman clock map and checked consumers.
+
 [definition] `Computation/AttentionModeCompression.lean`,
 `Computation/NormalizationProjectionScope.lean`, `Foundation/GeneratorModeQuotient.lean`
 and `Transport/AccumulatedReceiverDefect.lean` are imported by `Framework.Computation`.
@@ -243,6 +251,11 @@ the summary retains E[mass,weighted currents], including paired phase components
 separator; `transport_values` retains mass under a linear current rechart.
 `examples/kernel_mode_compression.rs` is the exact mathematical application. This is the
 builder/reference boundary, with no new CUDA owner or native inference binding in this return.
+
+[definition] `KernelModeSummary::rebase` stages an invertible rational basis change of its
+current, encoder and decoder together, returning the new receiver owner. It retains the old
+frame on failure; its work count excludes inverse setup. The code-cost application's finite
+Dirichlet distribution uses `SymbolicSurprisal` for exact ζ-partition/entropy/KL comparisons.
 
 [definition] `Mathematics/GeneratorFactorization.lean` owns the arbitrary finite commutative-ring
 bilinear coefficient certificate, selected three-product identity, ratio-block matrix bridge,

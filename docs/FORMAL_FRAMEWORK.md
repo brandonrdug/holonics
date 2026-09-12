@@ -57,6 +57,20 @@ as it composes realization, continuation and navigation.
 
 ## Begin with a situated interaction
 
+[proved-derived; formal-checked] The [periplus/rebase construction](../research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md)
+keeps `x=s(qx)+r_s(x)` and the compensating section change `r_s'=r_s-(s'-s)(qx)`.
+The Gaussian source law rebases amplitude and argument together; its opposite shift cancels
+only at the returned argument. The new temporal Hodge owner constructs `Id-aΔ`, fixing the
+harmonic class while evolving its exact residue. These compose the existing Gamma, critical
+chart, Hodge/Green and changing-receiver owners, with the residue carried as a mathematical
+coordinate or family rather than an occurrence archive.
+
+[proved-derived] The same record derives the explicit ζ exponential-family entropy and KL
+laws, the prime-occupation interpretation, and the positive xi-kernel's temporal information
+geometry. Spectral strip clearance and Hodge gap relaxation have time complements. Their
+source-specific global zero placement and algebraic cycle realization remain distinct
+obligations; mode independence alone supplies neither endpoint theorem.
+
 [proved-derived; formal-checked] The [fractal-mode/attention construction](../research/records/2026-09-12_FRACTAL_MODES_LIFT_ATTENTION_INTO_MASS_PRESERVING_GENERATOR_COMPRESSION.md)
 joins entropic contact weights, mass/current-preserving aggregation, and the future quotient.
 `GeneratorModeQuotient` identifies receiver Gram degeneracy with linear dependence and proves

@@ -32,6 +32,8 @@ fn main() -> Result<()> {
     let reduction = KernelModeReduction::new(&kernel)?;
     assert_eq!(reduction.modes(), 2);
     assert_eq!(reduction.decoder().multiply(reduction.encoder())?, kernel);
+    let original_encoder = reduction.encoder().to_rows();
+    let original_decoder = reduction.decoder().to_rows();
     let (mut summary, preparation) = reduction.summarize(&weights, &values)?;
     let retained = summary.moments().to_rows();
     let packed = ExactRatMatrix::new(
@@ -64,6 +66,11 @@ fn main() -> Result<()> {
         outputs.push(strings(&face));
     }
     assert_eq!(outputs[0], vec!["30/19", "37/19"]);
+    // A passive change of mode basis carries the decoder and current together.
+    let (reduction, rebase_work) = summary.rebase(&m(&[&[1, 1], &[0, 1]])?)?;
+    let rebased_current = summary.moments().to_rows();
+    assert_eq!(reduction.read(&summary, 0)?.0, vec![q(30, 19), q(37, 19)]);
+    assert_eq!(reduction.decoder().multiply(reduction.encoder())?, kernel);
     // Signed value/phase transport acts in the retained modal carrier.
     summary.transport_values(&m(&[&[0, -1], &[1, 0]])?)?;
     assert_eq!(reduction.read(&summary, 0)?.0, vec![q(-37, 19), q(30, 19)]);
@@ -109,9 +116,13 @@ fn main() -> Result<()> {
         "scope":"complete supplied finite nonnegative query kernel; real and imaginary currents as paired columns",
         "kernel":kernel.to_rows().iter().map(|r|strings(r)).collect::<Vec<_>>(),
         "derived_modes":reduction.modes(),"source_ports":kernel.columns(),
-        "encoder":reduction.encoder().to_rows().iter().map(|r|strings(r)).collect::<Vec<_>>(),
-        "decoder":reduction.decoder().to_rows().iter().map(|r|strings(r)).collect::<Vec<_>>(),
+        "encoder":original_encoder.iter().map(|r|strings(r)).collect::<Vec<_>>(),
+        "decoder":original_decoder.iter().map(|r|strings(r)).collect::<Vec<_>>(),
+        "rebased_encoder":reduction.encoder().to_rows().iter().map(|r|strings(r)).collect::<Vec<_>>(),
+        "rebased_decoder":reduction.decoder().to_rows().iter().map(|r|strings(r)).collect::<Vec<_>>(),
         "retained_mass_current":retained.iter().map(|r|strings(r)).collect::<Vec<_>>(),
+        "rebased_mass_current":rebased_current.iter().map(|r|strings(r)).collect::<Vec<_>>(),
+        "rebase_contraction_work_excluding_inverse":rebase_work,
         "decoded_queries":outputs,"phase_rotated_first_query":["-37/19","30/19"],
         "full_query_work_including_divisions":full_work,"reduced_query_work_including_divisions":reduced_work,
         "source_packing_and_summary_work":preparation,

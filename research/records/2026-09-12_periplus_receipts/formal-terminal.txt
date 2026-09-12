@@ -1,0 +1,57 @@
+Command: bash tools/lean_check.sh ElementaryHolonics.Framework.Information ElementaryHolonics.Framework.Physics ElementaryHolonics.RH.FlowedGamma
+Toolchain: leanprover/lean4:v4.33.0
+Scope: selected new-owner/completion output from .local/scratch/2026-09-12-periplus-final-lean.log; final two lines are the earlier section/information build in .local/scratch/2026-09-12-periplus-framework-lean.log. Both commands completed with exit 0.
+
+ℹ [8851/8900] Replayed ElementaryHolonics.Transport.GaussianRebase
+info: ElementaryHolonics/Transport/GaussianRebase.lean:65:0: 'Soma.Holonics.Transport.GaussianRebase.amplitude_cocycle' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ElementaryHolonics/Transport/GaussianRebase.lean:66:0: 'Soma.Holonics.Transport.GaussianRebase.returned_inverse' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ElementaryHolonics/Transport/GaussianRebase.lean:67:0: 'Soma.Holonics.Transport.GaussianRebase.unrebased_return' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [9149/9151] Replayed ElementaryHolonics.RH.FlowedGamma
+info: ElementaryHolonics/RH/FlowedGamma.lean:103:2: Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+info: ElementaryHolonics/RH/FlowedGamma.lean:138:2: Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+info: ElementaryHolonics/RH/FlowedGamma.lean:174:6: Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+⚠ [9150/9151] Built ElementaryHolonics.Physics.TemporalHodgeResidue (1.5s)
+warning: ElementaryHolonics/Physics/TemporalHodgeResidue.lean:64:23: Variable name `h` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _h
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: ElementaryHolonics/Physics/TemporalHodgeResidue.lean:65:26: Variable name `r` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _r
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: ElementaryHolonics/Physics/TemporalHodgeResidue.lean:76:32: This simp argument is unused:
+  smul_eq_mul
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [map_sub, map_smul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: ElementaryHolonics/Physics/TemporalHodgeResidue.lean:79:27: Variable name `hr` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hr
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+✔ [9151/9151] Built ElementaryHolonics.Framework.Physics (9.4s)
+Build completed successfully (9151 jobs).
+✔ [9101/9102] Built ElementaryHolonics.Foundation.SectionResidual (8.8s)
+✔ [9102/9102] Built ElementaryHolonics.Framework.Information (3.5s)

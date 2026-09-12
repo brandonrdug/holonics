@@ -222,6 +222,12 @@ symbol basis does not define the common interior or its clock.
 
 ## Shared mathematics and its productive use
 
+[definition] The [periplus/time-complement return](../../research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md)
+adds section-residual and Gaussian rebasing laws, temporal Hodge complements, passive modal
+rebase execution and finite ζ information comparisons to the existing operator/encoding
+work. Gamma shifts and Newman time keep their actual source/clock domains. Use these returned
+owners without restarting a direct RH endpoint campaign or introducing past-state storage.
+
 [definition] The [transformer/fractal-mode return](../../research/records/2026-09-12_FRACTAL_MODES_LIFT_ATTENTION_INTO_MASS_PRESERVING_GENERATOR_COMPRESSION.md)
 adds usable entropic attention, amplitude-preserving modal elimination, explicit summary-error
 propagation and a shared exact kernel reducer to phases 3–4's operator/encoding work. Reuse

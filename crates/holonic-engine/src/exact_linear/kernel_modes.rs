@@ -186,6 +186,31 @@ impl KernelModeSummary {
     pub fn moments(&self) -> &ExactRatMatrix {
         &self.moments
     }
+    /// Change the complete modal chart, not the underlying source current.
+    /// With B invertible, E'=B E, D'=D B^-1 and M'=B M retain D'M'=DM.
+    /// The new frame and current are staged together; a failed inverse leaves both unchanged.
+    /// Work counts the three matrix contractions; basis inversion is separate setup work.
+    /// Returned reduction owns the receiver in the new frame. Previously compiled actions
+    /// belong to the old frame and must be transported/compiled for the returned reduction.
+    pub fn rebase(
+        &mut self,
+        basis: &ExactRatMatrix,
+    ) -> Result<(KernelModeReduction, ExactWork), KernelModeError> {
+        if basis.rows() != self.core.encoder.rows() || basis.columns() != self.core.encoder.rows() {
+            return Err(ExactLinearError::ShapeMismatch.into());
+        }
+        let inverse = basis.inverse()?;
+        let (encoder, encode_work) = basis.multiply_with_work(&self.core.encoder)?;
+        let (decoder, decode_work) = self.core.decoder.multiply_with_work(&inverse)?;
+        let (moments, current_work) = basis.multiply_with_work(&self.moments)?;
+        let core = Arc::new(KernelModeCore { encoder, decoder });
+        self.core = Arc::clone(&core);
+        self.moments = moments;
+        Ok((
+            KernelModeReduction { core },
+            encode_work.then(&decode_work).then(&current_work),
+        ))
+    }
     /// Transport signed value components while retaining the source mass column. This is
     /// the other linear leg of the same summary, including changes of feature/phase frame.
     pub fn transport_values(
@@ -336,5 +361,34 @@ mod tests {
             Err(KernelModeError::ForeignFrame)
         ));
         assert_eq!(summary.moments().to_rows(), before);
+    }
+
+    #[test]
+    fn passive_rebase_carries_current_decoder_and_failure_together() {
+        let kernel = m(&[&[1, 1, 2], &[2, 2, 1]]);
+        let reduction = KernelModeReduction::new(&kernel).unwrap();
+        let (mut summary, _) = reduction
+            .summarize(&[q(1), q(3), q(2)], &m(&[&[1, -1], &[3, 1], &[2, -2]]))
+            .unwrap();
+        let before = summary.moments().to_rows();
+        let face = reduction.read(&summary, 0).unwrap().0;
+        assert!(summary.rebase(&m(&[&[1, 1], &[2, 2]])).is_err());
+        assert_eq!(summary.moments().to_rows(), before);
+        assert_eq!(reduction.read(&summary, 0).unwrap().0, face);
+        let basis = m(&[&[1, 1], &[0, 1]]);
+        let (rebased, _) = summary.rebase(&basis).unwrap();
+        assert_ne!(summary.moments().to_rows(), before);
+        assert_eq!(rebased.read(&summary, 0).unwrap().0, face);
+        assert_eq!(
+            rebased.decoder().multiply(rebased.encoder()).unwrap(),
+            kernel
+        );
+        assert!(matches!(
+            reduction.read(&summary, 0),
+            Err(KernelModeError::ForeignFrame)
+        ));
+        let (returned, _) = summary.rebase(&basis.inverse().unwrap()).unwrap();
+        assert_eq!(summary.moments().to_rows(), before);
+        assert_eq!(returned.read(&summary, 0).unwrap().0, face);
     }
 }

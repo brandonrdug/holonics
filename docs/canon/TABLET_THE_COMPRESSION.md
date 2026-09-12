@@ -53,10 +53,21 @@ rebase is execution conjugacy" (`algorithms.typ:202`).]
 | **condensation** — far population → compact realizer | **certified** |
 | **compression** — quotient by a declared family (`H.0016`) | the **collapsed population**, family-relative |
 
-**The remainder is a witness, never a number.** `receiver_exact_compression.rs` returns each
-collapsed pair carrying the **shortest input word that separates it** and the receiver that saw the
-difference. Requiring the remainder to be *exhibited* rather than *bounded* is this framework's
-standing demand and is strictly stronger than reporting a distortion scalar.
+[project-postulate] **September 12 correction:** `receiver_exact_compression.rs` returns
+explicit separating words for its finite comparison. That example's witness is
+one witness presentation, not a universal storage or enumeration requirement. Retain the
+required difference/fibre through a generator, joint constraint, section residue or other
+sufficient representation; a scalar bound measures its declared receiver and does not replace
+the relation. Positive-tolerance constructions remain admitted. Literal history storage is
+not the meaning of remainder, lineage or periplus.
+
+[definition] A rebase's zero remainder in the table means **zero reconstruction defect of the
+chart change**, not absence of a residual coordinate in the source. For receiver q and section s,
+`x=s(qx)+r_s(x)` with `q r_s(x)=0`. A new section `s'=s+h` has kernel-valued h and
+`r_s'=r_s-h(qx)`. Thus what appears as representative and what appears as residue changes
+together. A coefficient is not intrinsically a discarded tail. The
+[periplus/time-complement construction](../../research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md)
+connects these checked section laws to modal rebasing, Gaussian shifts and temporal modes.
 
 ## 3. A byte count is an absolute volume, and the invariance is ADDITIVE
 
@@ -80,9 +91,11 @@ Three consequences that are checkable:
 
 - **Declaring a null is not enough; the machine must be declared.** For any `x` there is a universal
   `U` with `K_U(x) ≤ 1`. The theory has content only asymptotically in `|x|`.
-- **The universal machines are not a group.** They are a **groupoid with an additive cocycle** —
-  transitions are compilers, composition adds lengths. No connection, no curvature, no holonomy.
-  *"No absolute frame"* transfers; the symmetry type does not.
+- [definition] **Compiler translation and invertible rebase are different maps.** Generic
+  compilers are not an invertible groupoid; composing chosen translations gives an overhead
+  bound, not an exact additive law for shortest descriptions. Actual invertible chart maps
+  can form a groupoid. A supplied connection/path transport may carry holonomy, but compiler
+  length alone neither constructs it nor rules it out.
 - **A compression ratio quoted without its decoder is convicted.** The Hutter Prize enforces this by
   rule; a 2024 ICLR result reporting a language model beating PNG and FLAC is routinely quoted in
   violation of it.
@@ -127,15 +140,22 @@ This is the same species of move as importing the uncertainty relation by resemb
 two-resource trade, which this project already refuses. The honest object is *a machine-invariant
 functional up to an additive constant*, never a conserved quantity.
 
-**What the tree owes here is one declaration, not an organ.** It prices the remainder exactly and
-prices work exactly and has never priced both on one object. `surprisal::cross_entropy` is the bit
+[historical] **The August 15 implementation comparison:** it priced the remainder and
+work separately. `surprisal::cross_entropy` was the bit
 axis, `cuda_aperture::CarrierWork` the work axis, `ExactOrdering::Open` the correct refusal when the
 two do not order, and `DeclaredCarrierMetric::cost_of` already the right shape for a declared
 exchange — with `cuda_aperture.rs:1113-1114` stating the obstruction verbatim.
 
-**Re-measured 2026-08-15, and it HOLDS.**
+[historical] **Measured 2026-08-15.**
 `comm -12 <(grep -rl "cross_entropy" --include='*.rs' crates soma | sort) <(grep -rl "CarrierWork" --include='*.rs' crates soma | sort)`
 returns empty. The bit axis lives in six files, the work axis in two, and no file holds both.
+
+[established-bounded; implemented-exact] The September 11–12 `receiver_code_cost` and
+generator-code applications now retain information, explicit costs, decoder/framing, endpoint
+potentials and residuals in the same declared comparison. `ReceiverCodeCost` proves its
+addressed composition and transported-optimum laws. The August source census is not current
+evidence of a missing joint cost receiver; the [returned construction](../../research/records/2026-09-11_RELATIVE_CODE_COST_HAS_AN_ADDRESSED_BOUNDARY_LAW.md)
+owns its exact scope.
 
 ## 6. Where the identity holds and where it stops
 
@@ -154,14 +174,16 @@ provides the source-coding construction. The
 [September 11 generator/code return](../../research/records/2026-09-11_GENERATOR_CODES_RETAIN_PHASE_LIFTS_AND_REMAINDERS.md)
 keeps ideal surprise and literal packet lengths together without replacing either.
 
-**Stops, and the stopping point is precise.** *Compression is prediction* is a theorem —
-Solomonoff's dominance bound gives total KL `≤ K(μ)·ln 2`. *Compression is intelligence* is a
-**thesis**, and Leike–Hutter (COLT 2015) is the exact reason: the invariance theorems hold for `K`
-and for Solomonoff induction, and **no invariance theorem is known for AIXI** — adversarial choice of
-universal machine makes it misbehave, and the associated optimality notions are subjective.
+[proved-standard] Solomonoff dominance connects sequential prediction loss with the
+description cost of a computable source under its specified universal machine. Representation
+dependence in universal-agent optimality, including the Leike–Hutter AIXI comparison, does not
+turn this into a theorem characterizing all intelligence or require machine-independent
+behavior from every useful inference method.
 
-> **The step from prediction to intelligence is exactly the step at which machine-independence — the
-> property that makes the whole subject well-posed — is known not to extend.**
+[project-postulate] Brandon's September 12 ruling governs the application: constructive
+solving, generator inference and Holonic Encoding are mathematical intelligence. State their
+source, receiver, inferred construction and useful consequences. An absent universal theorem
+equating compression with every form of intelligence does not revoke those scoped results.
 
 ## 7. What this tablet refuses
 

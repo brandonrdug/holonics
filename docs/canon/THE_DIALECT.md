@@ -121,6 +121,12 @@ refer to and I don't really care, they're not the point of what we're doing."* (
 - **`the arc`** — `Θ = C/r`. The path walked against the frame's own reach. Held as the **pair**
   `(C; r)`, never divided. *"This is related to C/r of course, and the periplus, the lightning
   strike. Probably time parity too."*
+- [definition] **`periplus`** — the oriented outward/return comparison with its contemporary
+  frames and residual. The return need not invert the outward passage. A passive section
+  change compensates representative and residue; actual connection transport may instead
+  leave a loop mismatch or lifted winding. The [September 12 construction](../../research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md)
+  gives the section cocycle, complete Gamma shift and temporal Hodge instances. Neither
+  periplus nor causal residue requires storing a literal history.
 - **`first axiom`** — everything has a cause; nothing starts from nothing. *"there is no codec that
   exists without cause, there is no thing that has nature that cannot be attributed to a cause."*
   (2026-08-08)

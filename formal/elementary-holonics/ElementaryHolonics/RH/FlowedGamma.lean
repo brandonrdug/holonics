@@ -1,6 +1,7 @@
 import Mathlib
 import ElementaryHolonics.RH.DescentComb
 import ElementaryHolonics.RH.GammaStirling
+import ElementaryHolonics.Transport.GaussianRebase
 
 /-!
 # RT3 (i): the flowed Gamma factor, and every event is its shift
@@ -88,6 +89,18 @@ theorem integral_flowedTerm_eq_shift (t : ℝ) (z : ℂ) {n : ℤ} (hn : n ≠ 0
   ring
 
 /-! ## The Gamma factor and the vertical-line representation -/
+
+/-- The existing source shift is an application of the complete Gaussian rebase action.
+Analytic integration still has the source's admitted integrability domain. -/
+theorem integral_flowedTerm_eq_rebase (t : ℝ) (z : ℂ) {n : ℤ} (hn : n ≠ 0) :
+    ∫ u : ℝ, flowedTerm t z n u =
+      Soma.Holonics.Transport.GaussianRebase.act (t : ℂ)
+        (Real.log |(n : ℝ)| : ℂ) (Γt t) z := by
+  rw [integral_flowedTerm_eq_shift t z hn]
+  simp only [Soma.Holonics.Transport.GaussianRebase.act,
+    Soma.Holonics.Transport.GaussianRebase.amplitude,
+    Soma.Holonics.Transport.GaussianRebase.shift, sub_eq_add_neg, Complex.exp_add]
+  ring
 
 /-- The Gamma factor `γ(s) = ¼ s(s − 1) π^{−s/2} Γ(s/2)`, the transform of the single event. -/
 def γ (s : ℂ) : ℂ := (1 / 4 : ℂ) * (s * (s - 1)) * ((π : ℂ) ^ (-s / 2) * Complex.Gamma (s / 2))

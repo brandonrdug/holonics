@@ -157,6 +157,13 @@ prerequisite to every mathematical tool.
 
 ## Spectral application and information units
 
+[established-bounded; implemented-exact] The [periplus/rebase application](../research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md)
+adds passive basis transport to the continuing modal summary, with its encoder/decoder and
+source actions kept in the returned frame. The existing code-cost example now checks finite
+Dirichlet entropy and reference-code excess using public symbolic-log owners. Gamma value/jet
+blocks, the newly bound Gaussian rebase law and the Newman critical chart remain reusable
+operator/source constructions, not an asserted proof of global spectral placement.
+
 [established-bounded; implemented-exact] The [modal compression application](../research/records/2026-09-12_FRACTAL_MODES_LIFT_ATTENTION_INTO_MASS_PRESERVING_GENERATOR_COMPRESSION.md)
 derives a rank-two encoding from six source slots, preserves four exact complex-current
 queries, and carries linear phase maps and closed source actions on the summary. It excludes

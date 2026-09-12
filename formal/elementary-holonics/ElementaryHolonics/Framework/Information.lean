@@ -6,6 +6,8 @@ import ElementaryHolonics.Foundation.InformationReceiver
 import ElementaryHolonics.Foundation.SituatedInformationRate
 import ElementaryHolonics.Foundation.ReceiverCodeCost
 import ElementaryHolonics.Foundation.GeneratorInference
+import ElementaryHolonics.Foundation.SectionResidual
+import ElementaryHolonics.Transport.GaussianRebase
 import ElementaryHolonics.Computation.HolonicAdjointNormalization
 import ElementaryHolonics.Millennium.ReceiverHistory
 import ElementaryHolonics.Millennium.PhysicalRealization

@@ -7,6 +7,19 @@ AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/p
 is the sole order and [the blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 names actual code changes and outcomes.
 
+[proved-derived; formal-checked] The [periplus/time-complement return](research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md)
+proves section/residual rebasing, Gaussian amplitude-and-argument cocycles bound to the existing
+flowed Gamma source, and temporal harmonic/exact-complement laws with a constructed Euler
+heat step. It relates ζ information to prime occupations and Newman time to spectral strip/gap
+boundaries, without changing the global RH/Hodge result. Information, Physics and FlowedGamma build.
+
+[established-bounded; implemented-exact] `KernelModeSummary::rebase` now carries encoder,
+decoder and current together, preserving exact queries and staging failures. All 34 focused
+tests pass. The code-cost application checks exact finite ζ entropy/cross-entropy/KL identities;
+the modal application conducts phase and source actions in its returned basis. The compression
+canon now distinguishes zero chart defect from a nonzero source residue and removes obsolete
+universal witness/archive and compiler-groupoid claims.
+
 [proved-derived; formal-checked] The [transformer/fractal-mode lift](research/records/2026-09-12_FRACTAL_MODES_LIFT_ATTENTION_INTO_MASS_PRESERVING_GENERATOR_COMPRESSION.md)
 joins attention's Gibbs/KL law, associative mass/current aggregation, Gram/exterior mode
 independence, amplitude-preserving elimination through every admitted generator word, and

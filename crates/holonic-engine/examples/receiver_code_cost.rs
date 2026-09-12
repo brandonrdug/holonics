@@ -9,6 +9,48 @@ type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 fn q(n: i64, d: i64) -> Rat {
     Rat::new(n.into(), d.into())
 }
+
+// The finite Dirichlet population uses the same public information receivers as generator
+// inference. Its cutoff is declared; it is not a probability measure on the critical strip.
+fn zeta_information_control() -> Result<Value> {
+    let weights = |sigma: u32| -> Vec<Rat> { (1_i64..=4).map(|n| q(1, n.pow(sigma))).collect() };
+    let w2 = weights(2);
+    let w3 = weights(3);
+    let z2: Rat = w2.iter().cloned().sum();
+    let z3: Rat = w3.iter().cloned().sum();
+    assert_eq!(z2, q(205, 144));
+    assert_eq!(z3, q(2035, 1728));
+    let p: Vec<_> = w2.iter().map(|w| w / &z2).collect();
+    let reference: Vec<_> = w3.iter().map(|w| w / &z3).collect();
+    let mut mean_log = SymbolicSurprisal::zero();
+    let mut entropy = SymbolicSurprisal::zero();
+    let mut cross_entropy = SymbolicSurprisal::zero();
+    let mut kl = SymbolicSurprisal::zero();
+    for (index, mass) in p.iter().enumerate() {
+        let log_n = SymbolicSurprisal::of_probability(&q(1, index as i64 + 1))?;
+        let own_code = SymbolicSurprisal::of_probability(mass)?;
+        let other_code = SymbolicSurprisal::of_probability(&reference[index])?;
+        mean_log = mean_log.plus(&log_n.scaled(mass));
+        entropy = entropy.plus(&own_code.scaled(mass));
+        cross_entropy = cross_entropy.plus(&other_code.scaled(mass));
+        kl = kl.plus(&other_code.minus(&own_code).scaled(mass));
+    }
+    let log_z2 = SymbolicSurprisal::of_probability(&(Rat::one() / &z2))?;
+    let log_z3 = SymbolicSurprisal::of_probability(&(Rat::one() / &z3))?;
+    assert_eq!(entropy, log_z2.plus(&mean_log.scaled(&q(2, 1))));
+    assert_eq!(cross_entropy, log_z3.plus(&mean_log.scaled(&q(3, 1))));
+    assert_eq!(cross_entropy.minus(&entropy), kl);
+    assert_eq!(kl, log_z3.minus(&log_z2).plus(&mean_log));
+    Ok(
+        json!({"source":"finite Dirichlet population n=1..4, exponent 2; reference exponent 3",
+        "partition_2":z2.to_string(),"partition_3":z3.to_string(),
+        "probability_2":p.iter().map(ToString::to_string).collect::<Vec<_>>(),
+        "probability_3":reference.iter().map(ToString::to_string).collect::<Vec<_>>(),
+        "mean_log2_n":mean_log.named(),"entropy_bits":entropy.named(),
+        "cross_entropy_bits":cross_entropy.named(),"kl_bits":kl.named(),
+        "scope":"exact finite positive chart; no infinite tail or critical-strip probability claim"}),
+    )
+}
 #[derive(Clone)]
 struct Edge {
     name: &'static str,
@@ -289,7 +331,8 @@ fn main() -> Result<()> {
       "transfer_eigenvalues":["1","1/4"],"positive_eigenvector":["1","2"],
   "stationary_mass":stationary.map(|x|x.to_string()),"stationary_entropy_bits_per_step":entropy.to_string(),
   "stationary_cost_per_step":cost.to_string(),"transported_chart":{"cost_scale":"3/2","capacity":"2/3"},
-  "checked_histories":checked,"histories":histories,"generator_inference":generator_inference_control()?,"native_model_changed":false});
+  "checked_histories":checked,"histories":histories,"generator_inference":generator_inference_control()?,
+  "zeta_information":zeta_information_control()?,"native_model_changed":false});
     let text = serde_json::to_string_pretty(&result)?;
     if let Some(path) = std::env::args().nth(1) {
         std::fs::write(path, format!("{text}\n"))?;

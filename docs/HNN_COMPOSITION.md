@@ -210,6 +210,13 @@ does not define every medium's geometry or all language context.
 
 ## Producing comparison and architecture laws
 
+[definition] The [periplus/time-complement return](../research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md)
+joins passive modal rebasing, complementary residues and actual return transport. A backward
+adjoint transports a comparison covector; it is not the physical inverse of the forward
+process. Forensic reconstruction means a compatible generating class or newly prepared
+realization, not an exact historical snapshot. The Gamma cocycle, ζ code receiver and temporal
+Hodge construction supply actual equations and consuming owners for this connection.
+
 [proved-derived; formal-checked] The [transformer/fractal-mode lift](../research/records/2026-09-12_FRACTAL_MODES_LIFT_ATTENTION_INTO_MASS_PRESERVING_GENERATOR_COMPRESSION.md)
 composes normalized contact kernels with Gibbs/KL inference and associative `(mass,current)`
 summaries. Gram/exterior dependence excludes a redundant independent direction while its
