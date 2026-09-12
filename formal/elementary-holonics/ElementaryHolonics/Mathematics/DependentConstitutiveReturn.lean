@@ -113,6 +113,44 @@ theorem dependentFormation_point_specialization (x : I → V) (y : I → W)
 
 end PairedMaterial
 
+section ReceiverCoordinates
+
+universe uΘ uV uY
+
+variable {Θ₀ : Type uΘ} {V₀ : Type uV} {Y₀ : Type uY}
+variable [AddCommGroup Θ₀] [Module ℚ Θ₀]
+variable [AddCommGroup V₀] [Module ℚ V₀]
+
+/- A receiver coordinate packet decodes through one affine map.  Its kernel
+   records coordinate aliases; it is not a unique cause decoder. -/
+def decodedFace (origin : V₀) (D : Θ₀ →ₗ[ℚ] V₀) (θ : Θ₀) : V₀ :=
+  origin + D θ
+
+theorem decodedFace_eq_iff_kernel_difference
+    (origin : V₀) (D : Θ₀ →ₗ[ℚ] V₀) (θ₁ θ₂ : Θ₀) :
+    decodedFace origin D θ₁ = decodedFace origin D θ₂ ↔
+      θ₁ - θ₂ ∈ LinearMap.ker D := by
+  constructor
+  · intro h
+    apply LinearMap.mem_ker.mpr
+    rw [map_sub]
+    exact sub_eq_zero.mpr (add_left_cancel h)
+  · intro h
+    have hzero : D θ₁ - D θ₂ = 0 := by
+      rw [← map_sub]
+      exact LinearMap.mem_ker.mp h
+    have hd : D θ₁ = D θ₂ := sub_eq_zero.mp hzero
+    simp [decodedFace, hd]
+
+theorem decodedFace_aliases_agree
+    (origin : V₀) (D : Θ₀ →ₗ[ℚ] V₀) (θ₁ θ₂ : Θ₀)
+    (hθ : θ₁ - θ₂ ∈ LinearMap.ker D) (next : V₀ → Y₀) :
+    next (decodedFace origin D θ₁) = next (decodedFace origin D θ₂) := by
+  congr 1
+  exact (decodedFace_eq_iff_kernel_difference origin D θ₁ θ₂).mpr hθ
+
+end ReceiverCoordinates
+
 /-- The scalar law `x*h = 2` is not affine in the paired `(x,h)` coordinates. -/
 theorem scalar_law_midpoint_obstruction :
     ((1 : ℝ) * 2 = 2) ∧ (2 : ℝ) * 1 = 2 ∧

@@ -89,10 +89,12 @@ states for different source/current joints. Compose the dependent return with th
 do not reconstruct its joining relation from the separate marginals.
 The [owned generator return](../../research/records/2026-09-11_AN_OWNED_CONSTITUTIVE_GENERATOR_CONTINUES_THROUGH_ITS_NEW_MATERIAL.md)
 now publishes that function and continues through changed material under a declared source-section
-receiver. Its complete native representation persists across process exit. Next bind it into the
-continuing HNN session and compose later material returns, retaining each source parameter and
-the emission/re-entry protocol. Keep its explicit receiver chart distinct from the prior global
-family projection; the isolated native application is not the finished integrated goal.
+receiver. Its complete native representation persists across process exit. The
+[HNN stream binding](../../research/records/2026-09-11_THE_HNN_STREAM_USES_ITS_RETURNED_GENERATOR.md)
+now preserves emission/re-entry, later prediction cuts and fresh-process continuation. Continue
+by composing subsequent material returns over their dependent producing sources, retaining each
+parameter and original frame through the actual history. Keep the declared receiver chart distinct
+from the prior whole-family projection. One incorporated return does not finish this integration.
 The exterior affine material solve does not itself perform that native incorporation.
 
 [definition] The present work joins two responsibilities in phases 1–2. Use the returned reusable
@@ -194,8 +196,8 @@ persistence and resource accounting accompany usable increments. CONSTRUCTION_ST
 what has actually returned.
 
 [definition] For native coupled-wave integration, phases 1–2 share the immediate boundary: the read-only family
-comparison already exists, but its consuming condition/material transaction and complete source
-association do not. Do not restart implemented emission, normal producing comparison, coupled
+comparison and first consuming condition/material transaction now exist; subsequent
+material returns must compose their dependent sources and original frames on the same body. Do not restart implemented emission, normal producing comparison, coupled
 ownership or rest. Phase 3 must address the fixed-condition relation's collapse rather than
 append more rows to that unchanged chart. Phase 4 builds on that actual conduct.
 

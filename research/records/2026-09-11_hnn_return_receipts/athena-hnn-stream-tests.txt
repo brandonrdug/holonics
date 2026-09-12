@@ -1,0 +1,45 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+warning: holonic-engine@0.1.0: exact CUDA laws built for compute_89
+   Compiling holonic-engine v0.1.0 (/home/b/Workspaces/holonics/crates/holonic-engine)
+warning: method `record_joined_operative_return_bounds` is never used
+ --> crates/holonic-engine/src/resident_section/surface_operative_map_source.rs:4:19
+  |
+3 | impl<'c> ResidentSurface<'c> {
+  | ---------------------------- method in this implementation
+4 |     pub(crate) fn record_joined_operative_return_bounds(
+  |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: struct `SectionContactMaterial` is never constructed
+   --> crates/holonic-engine/src/native_ecology/../holonic_intelligence/operative_return.rs:239:19
+    |
+239 | pub(super) struct SectionContactMaterial<'a, 'chart> {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `enact_section_contact` is never used
+   --> crates/holonic-engine/src/native_ecology/../holonic_intelligence/operative_return.rs:335:15
+    |
+335 | pub(super) fn enact_section_contact<'chart>(
+    |               ^^^^^^^^^^^^^^^^^^^^^
+
+   Compiling life v0.0.0 (/home/b/Workspaces/holonics/crates/holonic-life)
+warning: `holonic-engine` (lib) generated 3 warnings
+   Compiling holonics-circulation-abi v0.1.0 (/home/b/Workspaces/holonics/crates/holonic-circulation-abi)
+   Compiling holonics-hna v0.1.0 (/home/b/Workspaces/holonics/crates/holonics-hna)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 40.50s
+     Running unittests src/lib.rs (target/debug/deps/holonics_hna-5dc87c8819cf4508)
+
+running 7 tests
+test stream::tests::checkpoint_retains_its_pending_reply_and_close_is_a_transport_boundary ... ok
+test stream::tests::flush_failure_and_new_connection_replay_do_not_repeat_the_effect ... ok
+test stream::tests::fragmented_input_retains_one_occurrence_until_its_whole_frame_arrives ... ok
+test stream::tests::incomplete_and_malformed_frames_remain_owned_without_effects ... ok
+test stream::tests::native_domain_is_an_explicit_stream_request_and_event ... ok
+test stream::tests::output_backpressure_prevents_reading_or_executing_the_next_request ... ok
+test stream::tests::supplied_material_is_receipted_without_manufacturing_a_native_occurrence ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 66 filtered out; finished in 0.00s
+

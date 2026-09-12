@@ -4,6 +4,7 @@ mod receiver;
 pub use basis::{FamilyBasisReading, FamilyBasisSelection, NormalFamilyBasisFace};
 mod rest;
 mod section;
+pub use section::NormalReceiverCoordinates;
 use crate::native_ecology::constitutive_fibre::{ResidentConstitutiveReturn, ResidentWaveRelation};
 pub use receiver::{NormalFamilyReceiverReading, NormalFamilySupport, NormalWaveFamilyReceiver};
 pub use rest::NormalWaveFamilyRest;

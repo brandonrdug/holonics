@@ -13,7 +13,7 @@ use thiserror::Error;
 pub mod section_input;
 mod normal_wave;
 mod coupled_wave;
-pub use coupled_wave::{NativeCoupledWaveSession,NativeCoupledWaveSavedSession,NativeCoupledWaveAttachRefusal};
+pub use coupled_wave::{NativeCoupledBody,NativeCoupledWaveSession,NativeCoupledWaveSavedSession,NativeCoupledWaveAttachRefusal};
 pub use normal_wave::{NativeWaveSession,NativeWaveSavedSession,NativeWaveAttachRefusal};
 
 mod wire;

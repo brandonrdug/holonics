@@ -64,3 +64,46 @@ extern "C" __global__ void section_coupled_family_section(
  for(uint32_t j=0;j<t;++j)out[1u+j]=out_hi[1u+j]=(int64_t)value[j];
  out[ow]=out_hi[ow]=(int64_t)den;out[ow+2u]=out_hi[ow+2u]=-1;
 }
+
+// Invert the affine coordinate map at the existing declared source receiver. The graph
+// (D^T theta,theta) retains the coordinate kernel. Its particular is an encoding of the
+// measured source face, never an assertion that the complete source family is a point.
+extern "C" __global__ void section_coupled_receiver_coordinates(
+ const int64_t *family,const int64_t *family_hi,uint32_t ps,uint32_t t,
+ const int64_t *receiver,const int64_t *receiver_hi,
+ int64_t *graph,int64_t *graph_hi,int64_t *coordinates,int64_t *coordinates_hi,
+ int64_t *report,int64_t *report_hi,int64_t *workspace,
+ uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+ if(blockIdx.x||threadIdx.x)return;if(upstream_refused(census,lineage,lineage_count,slot))return;
+ if(t<10u||(t-2u)%8u){atomicOr(slot,REFUSED_MALFORMED);return;}
+ uint32_t a=(t-2u)/2u,w=2u*t;size_t pk=(size_t)ps+t;
+ for(size_t i=0;i<pk+4u+(size_t)t*t;++i)if(family[i]!=family_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+ for(uint32_t i=0;i<8u+8u*a;++i)if(receiver[i]!=receiver_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+ const wide *r=(const wide*)receiver;wide fd=family[pk],ad=r[1],jd=r[2u+a];
+ if(fd<=0||ad<=0||jd<=0||r[0]!=0||family[pk+1u]==1){atomicOr(slot,REFUSED_CARRIER);return;}
+ const int64_t *dirs=family+pk+4u;wide *row=(wide*)workspace,*query=row+w;
+ for(size_t i=0;i<(size_t)w*w;++i)graph[i]=graph_hi[i]=0;
+ for(uint32_t p=0;p<t;++p){
+  for(uint32_t j=0;j<t;++j){row[j]=dirs[(size_t)p*t+j];row[t+j]=p==j?1:0;}
+  condition_stage_row(graph,graph_hi,w,row,slot);if(*slot)return;
+ }
+ wide den=fibre_lcm(fibre_lcm(fd,ad,slot),jd,slot);if(*slot)return;
+ for(uint32_t j=0;j<t;++j){
+  wide value=j<2u?(j?0:den):(j<2u+a?product_checked(r[2u+j-2u],den/ad,slot):product_checked(r[3u+a+j-2u-a],den/jd,slot));
+  query[j]=sub_checked(value,product_checked(family[ps+j],den/fd,slot),slot);query[t+j]=0;
+ }
+ if(*slot)return;uint32_t disposition=0,rank=0;
+ fibre_query(graph,t,w,query,&den,nullptr,-1,&disposition,&rank,slot);if(*slot)return;
+ if(disposition==1u){atomicOr(slot,REFUSED_MALFORMED);return;}
+ for(uint32_t j=t;j<w;++j)query[j]=sub_checked(0,query[j],slot);
+ for(uint32_t j=0;j<w;++j)to_word(query[j],slot);to_word(den,slot);if(*slot)return;
+ for(uint32_t j=0;j<w;++j)report[j]=report_hi[j]=(int64_t)query[j];
+ report[w]=report_hi[w]=(int64_t)den;report[w+1u]=report_hi[w+1u]=disposition;
+ report[w+2u]=report_hi[w+2u]=-1;report[w+3u]=report_hi[w+3u]=rank;
+ for(uint32_t i=0;i<t;++i)for(uint32_t j=0;j<t;++j){
+  int64_t v=graph[(size_t)(t+i)*w+t+i]?graph[(size_t)(t+i)*w+t+j]:0;
+  report[(size_t)w+4u+(size_t)i*t+j]=report_hi[(size_t)w+4u+(size_t)i*t+j]=v;
+ }
+ for(uint32_t j=0;j<t;++j)coordinates[j]=coordinates_hi[j]=(int64_t)query[t+j];
+ coordinates[t]=coordinates_hi[t]=(int64_t)den;
+}

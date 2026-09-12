@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** September 11, 2026. **Current work:** an owned dependent generator publishes and continues under a declared source-section receiver; continuing HNN-session integration remains active.
+**Currency:** September 11, 2026. **Current work:** the HNN stream publishes and uses its returned generator; repeated dependent material incorporation remains active.
 **Athena objective:** standing; useful Athena-alpha has not been attained. **Broad native cultivation:** paused while the consuming family/source binding is repaired;
 authorized native implementation continues within the shared programme. The active phases now have names;
 AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -60,13 +60,22 @@ source-section receiver, a delayed return reaches `24−4i`; the next actual sou
 sections remain executable after remount. All 31 coupled controls, six neighborhood controls and
 the additional pending-cut retention control passed; the formal and HNN library builds passed.
 
-[open] The full integrated goal remains active. The current HNN session still owns the affine
-coupled wave and `compare_symbol` remains read-only. Bind the owned generator into the continuing
-session, retaining its emission/re-entry protocol and explicit receiver chart; then compose
-further material returns with their own source parameters and shared chronology. The native
-one-return generator currently takes a caller-declared source-section receiver, not the old
-whole-family receiver. Neither an equivalence between those receivers nor useful Athena-alpha
-is claimed. This executable native piece does not replace the remaining requested integration.
+[established-bounded; implemented-exact; computational-witness] The
+[HNN stream return](research/records/2026-09-11_THE_HNN_STREAM_USES_ITS_RETURNED_GENERATOR.md)
+binds the generator into the continuing session. `observe-symbol` incorporates one actual
+return; subsequent emission, re-entry, source input and prediction use that body. The native
+receiver-coordinate decoder retains its kernel and full source. In an exact two-symbol operator
+control with matched complete source, the changed session emits `b` while unchanged material
+emits `a`. Fresh-process continuation agrees, and legacy affine sessions still load. The 33
+coupled checks, strengthened coordinate control, seven session and seven stream controls pass;
+the coordinate-kernel formal build passes.
+
+[open] The integrated goal remains active. Additional material returns after entering the
+dependent representation are explicitly unsupported. Extend the existing programme with the
+later producing source's parameters and joining history; retain original frames and contemporary
+material. Later predictions already persist and can be inspected. The declared source-section
+receiver is not asserted equivalent to the former whole-family projection. This controlled
+operator result does not establish useful Athena-alpha.
 
 [proved-derived; formal-checked] The latest
 [relative code-cost return](research/records/2026-09-11_RELATIVE_CODE_COST_HAS_AN_ADDRESSED_BOUNDARY_LAW.md)
@@ -85,16 +94,16 @@ retains Swing and measured information rates. No native model or GPU operation c
 
 ## Immediate native boundary
 
-[established-bounded; source-inspected] At `9f237c9d`, the coupled wave already owns conditional
+[historical] At `9f237c9d`, the coupled wave already owns conditional
 current families, source-field actuation, actual-next-current reception, prediction, resident
 symbol selection, ordinary re-entry and versioned rest. Its producing-family comparison retains
 joint coefficient sections and the observed target, but `NativeCoupledWaveSession::compare_symbol`
-explicitly returns `material_deposited: false`. The current text boundary is a supplied unit-symbol
+explicitly returns `material_deposited: false`. Inspection remains read-only; the distinct
+`incorporate_symbol` path now consumes the first return. The current text boundary is a supplied unit-symbol
 chart, not a trained autoencoder or general Holonic Encoding faculty.
 
-[open] Bind actual source/part/continuation relations to complete observable cycles, then derive
-and implement the producing-family incorporation into condition/preimage and member formation,
-with one atomic successor. The existing neighborhood transaction consumes point sources; the
+[open] Extend the returned source/part/continuation cycle to repeated dependent
+condition/preimage and member formation, with one atomic successor per admitted return. The existing neighborhood transaction consumes point sources; the
 family bridge must retain correlations and distinguish compatible alternatives from actual
 observations. Pending comparison inspection, emission and rest are not missing mechanisms.
 

@@ -1,26 +1,31 @@
 //! Exterior session over one move-owned coupled normal wave.
-use super::section_input::SymbolCurrentChart;
 use super::NativeSessionError;
-use crate::{publish_new, HnaStream, HnaStreamState, PublicationReceipt};
+use super::section_input::SymbolCurrentChart;
+use crate::{HnaStream, HnaStreamState, PublicationReceipt, publish_new};
 use holonic_engine::{
     codec_recovery::{Symbol, SymbolAlphabet},
     embedding_fiber::ResidentReadout,
     native_ecology::constitutive_fibre::{
-        NormalWaveBasisChart, NormalWaveCoupled, NormalWaveRest, ResidentConstitutiveSection,
-        ResidentNormalWave, WaveSourceReceiver,
+        NormalWaveBasisChart, NormalWaveCoupled, NormalWaveRest, ResidentNormalWave,
+        WaveSourceReceiver,
     },
     resident_section::ResidentSurface,
 };
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::{
     fs::File,
     io::{self, Read, Write},
     path::Path,
 };
 
+mod body;
+pub use body::NativeCoupledBody;
+use body::SavedCoupledBody;
+
 const MAGIC: &[u8] = b"HNA-COUPLED-WAVE-SESSION\x01";
 const MAGIC_V2: &[u8] = b"HNA-COUPLED-WAVE-SESSION\x02";
+const MAGIC_V3: &[u8] = b"HNA-COUPLED-WAVE-SESSION\x03";
 fn invalid(message: impl ToString) -> NativeSessionError {
     NativeSessionError::Application(message.to_string())
 }
@@ -75,7 +80,7 @@ impl std::fmt::Debug for AttachRefusal<'_> {
 
 pub struct NativeCoupledWaveSession<'c> {
     surface: &'c ResidentSurface<'c>,
-    wave: ResidentNormalWave<'c, NormalWaveCoupled<'c>>,
+    wave: NativeCoupledBody<'c>,
     chart: SymbolCurrentChart,
     basis: NormalWaveBasisChart<'c>,
     member: usize,
@@ -110,7 +115,7 @@ impl<'c> NativeCoupledWaveSession<'c> {
         }
         Ok(Self {
             surface,
-            wave,
+            wave: NativeCoupledBody::from_wave(wave),
             chart,
             basis,
             member,
@@ -120,7 +125,7 @@ impl<'c> NativeCoupledWaveSession<'c> {
             last: None,
         })
     }
-    pub fn wave(&self) -> &ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
+    pub fn wave(&self) -> &NativeCoupledBody<'c> {
         &self.wave
     }
     fn ready(&self) -> Result<(), NativeSessionError> {
@@ -146,44 +151,35 @@ impl<'c> NativeCoupledWaveSession<'c> {
         }
         Ok(g)
     }
-    fn contact(
-        &mut self,
-    ) -> Result<
-        holonic_engine::native_ecology::constitutive_fibre::NormalCoupledContact<'c>,
-        NativeSessionError,
-    > {
-        let existing = self.wave.contact_ids().find(|id| {
-            self.wave.contact(*id).is_ok_and(|h| {
-                h.member() == self.member && h.relation().source_receiver() == self.receiver
-            })
-        });
-        Ok(if let Some(id) = existing {
-            self.wave.contact(id)?
-        } else {
-            self.wave
-                .admit_contact_in_chart(self.member, self.receiver)?
+    fn from_body(
+        surface: &'c ResidentSurface<'c>,
+        mut wave: NativeCoupledBody<'c>,
+        chart: SymbolCurrentChart,
+        member: usize,
+        receiver: WaveSourceReceiver,
+    ) -> Result<Self, NativeSessionError> {
+        let basis = chart.receiver(surface)?;
+        if wave.roots() != chart.alphabet().len() || member >= wave.members() {
+            return Err(invalid("coupled session body chart"));
+        }
+        wave.read_basis_face(&basis)?;
+        Ok(Self {
+            surface,
+            wave,
+            chart,
+            basis,
+            member,
+            receiver,
+            cursor: Cursor::Ready,
+            emission_ordinal: 0,
+            last: None,
         })
     }
-    /// Cold observation of an already admitted contact; this never publishes the candidate.
-    pub fn inspect_relation(&self) -> Result<Value, NativeSessionError> {
-        let id = self
-            .wave
-            .contact_ids()
-            .find(|id| {
-                self.wave.contact(*id).is_ok_and(|h| {
-                    h.member() == self.member && h.relation().source_receiver() == self.receiver
-                })
-            })
-            .ok_or_else(|| invalid("no live contact for this session member and receiver"))?;
-        let contact = self.wave.contact(id)?;
-        let candidate = self.wave.read_contact(&contact)?;
-        let reading = candidate.read_receiver()?.inspect()?;
-        Ok(
-            json!({"scope":"unpublished-conditional-family","epoch":self.wave.epoch(),
-            "contact":id,"member":self.member,"receiver":self.receiver,"reading":reading}),
-        )
+    /// Inspect an unpublished native passage in this body's declared receiver chart.
+    pub fn inspect_relation(&mut self) -> Result<Value, NativeSessionError> {
+        self.wave.inspect_relation(self.member, self.receiver)
     }
-    pub fn project_current(&self, full: bool) -> Result<Value, NativeSessionError> {
+    pub fn project_current(&mut self, full: bool) -> Result<Value, NativeSessionError> {
         let face = self.wave.read_basis_face(&self.basis)?;
         let emitted = self.chart.emit_family(face)?;
         let detail = if full {
@@ -192,7 +188,7 @@ impl<'c> NativeCoupledWaveSession<'c> {
             None
         };
         Ok(
-            json!({"scope":"projected-family-joint","epoch":self.wave.epoch(),"selection":emitted.selection(),
+            json!({"scope":self.wave.scope(),"epoch":self.wave.epoch(),"selection":emitted.selection(),
             "symbol":emitted.symbol(),"octets":emitted.octets(),"text":std::str::from_utf8(emitted.octets()).ok(),"detail":detail}),
         )
     }
@@ -208,13 +204,7 @@ impl<'c> NativeCoupledWaveSession<'c> {
             .checked_add(1)
             .ok_or_else(|| invalid("emission ordinal overflow"))?;
         if matches!(self.cursor, Cursor::Ready) {
-            let contact = self.contact()?;
-            let prediction = if retain {
-                Some(self.wave.predict_contact(&contact)?.handle.id())
-            } else {
-                self.wave.advance_contact(&contact)?;
-                None
-            };
+            let prediction = self.wave.advance(self.member, self.receiver, retain)?;
             self.cursor = Cursor::AwaitSelection {
                 generation: self.wave.epoch(),
                 prediction,
@@ -256,13 +246,11 @@ impl<'c> NativeCoupledWaveSession<'c> {
             let source = self
                 .chart
                 .mount(self.surface, &[previous.symbol, action.symbol])?;
-            let contact = self.contact()?;
-            let returned = self.wave.actuate_contact_section(
-                &contact,
-                ResidentConstitutiveSection::integers(&source)?,
-            )?;
+            let before = self.wave.epoch();
+            self.wave
+                .actuate_field(self.member, self.receiver, source, false)?;
             Some(
-                json!({"first":previous,"second":action,"before_epoch":returned.predecessor_epoch,"after_epoch":returned.successor_epoch,"relation":"ordered actual emissions in one output part"}),
+                json!({"first":previous,"second":action,"before_epoch":before,"after_epoch":self.wave.epoch(),"relation":"ordered actual emissions in one output part"}),
             )
         } else {
             None
@@ -271,11 +259,11 @@ impl<'c> NativeCoupledWaveSession<'c> {
         self.emission_ordinal = ordinal;
         self.cursor = Cursor::Ready;
         Ok(
-            json!({"receiver_scope":"projected-family-joint","action":action,"octets":octets,"text":std::str::from_utf8(&octets).ok(),"selection":emitted.selection(),"detail":detail,"reentry":reentry,"successor_epoch":self.wave.epoch()}),
+            json!({"receiver_scope":self.wave.scope(),"action":action,"octets":octets,"text":std::str::from_utf8(&octets).ok(),"selection":emitted.selection(),"detail":detail,"reentry":reentry,"successor_epoch":self.wave.epoch()}),
         )
     }
     pub fn compare_symbol(
-        &self,
+        &mut self,
         source: u64,
         text: &str,
         coefficient_row: Option<usize>,
@@ -287,18 +275,26 @@ impl<'c> NativeCoupledWaveSession<'c> {
             ));
         }
         let observed = self.chart.mount(self.surface, &symbols)?;
-        let handle = self.wave.pending_coupled_prediction(source)?;
-        let paired=self.wave.compare_coupled_prediction(&handle,
-            holonic_engine::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent::integers(&observed)?)?;
-        let row = coefficient_row.map(|i| paired.inspect_row(i)).transpose()?;
-        Ok(
-            json!({"scope":"joint-producing-family-comparison","prediction":source,"member":paired.member(),
-            "receiver":paired.relation().source_receiver(),"producing_material_cut":paired.relation().relation_cut(),
-            "source_epoch":source-1,"produced_epoch":source,"contemporary_epoch":self.wave.epoch(),
-            "parameter_rows":paired.parameter_rows(),"feature_components":paired.feature_components(),
-            "material_deposited":false,"pending_retained":true,"coefficient_row":row}),
-        )
+        self.wave.compare(source,holonic_engine::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent::integers(&observed)?,coefficient_row)
     }
+    /// Consume a real producing comparison and retain the complete returned native generator.
+    /// The producing family's own receiver supplies coordinates; no host-selected source is used.
+    pub fn incorporate_symbol(
+        &mut self,
+        source: u64,
+        text: &str,
+    ) -> Result<Value, NativeSessionError> {
+        self.ready()?;
+        let symbols = self.chart.decode_text(text)?;
+        if symbols.len() != 1 {
+            return Err(invalid("incorporation requires one actual symbol"));
+        }
+        let observed = self.chart.mount(self.surface, &symbols)?;
+        let returned=self.wave.incorporate(source,holonic_engine::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent::integers(&observed)?)?;
+        self.last = None;
+        Ok(returned)
+    }
+
     pub fn release_symbol_comparison(&mut self, source: u64) -> Result<Value, NativeSessionError> {
         let pending = match &self.cursor {
             Cursor::AwaitSelection { prediction, .. } => *prediction,
@@ -310,8 +306,7 @@ impl<'c> NativeCoupledWaveSession<'c> {
                 "finish the pending emission before releasing its producing comparison",
             ));
         }
-        let handle = self.wave.pending_coupled_prediction(source)?;
-        self.wave.release_coupled_prediction(&handle)?;
+        self.wave.release(source)?;
         Ok(json!({"released":source,"epoch":self.wave.epoch()}))
     }
     /// An explicitly observed next current, not an unpaired message or an evaluation target.
@@ -324,14 +319,15 @@ impl<'c> NativeCoupledWaveSession<'c> {
             ));
         }
         let source = self.chart.mount(self.surface, &symbols)?;
-        let contact = self.contact()?;
-        let returned = self.wave.receive_contact_next(&contact,
-            holonic_engine::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent::integers(&source)?)?;
+        let before = self.wave.epoch();
+        self.wave
+            .receive_next(self.member, self.receiver, source, false)?;
         self.last = None;
-        Ok(json!({"scope":"actual-next-current","symbol":symbols[0],
-            "before_epoch":returned.predecessor_epoch,"after_epoch":returned.successor_epoch,
-            "material_deposited":false}))
+        Ok(
+            json!({"scope":"actual-next-current","symbol":symbols[0],"before_epoch":before,"after_epoch":self.wave.epoch(),"material_deposited":false}),
+        )
     }
+
     pub fn actuate_text(&mut self, text: &str) -> Result<Value, NativeSessionError> {
         self.ready()?;
         let symbols = self.chart.decode_text(text)?;
@@ -341,25 +337,26 @@ impl<'c> NativeCoupledWaveSession<'c> {
             ));
         }
         let source = self.chart.mount(self.surface, &symbols)?;
-        let contact = self.contact()?;
-        let returned = self
-            .wave
-            .actuate_contact_section(&contact, ResidentConstitutiveSection::integers(&source)?)?;
+        let before = self.wave.epoch();
+        self.wave
+            .actuate_field(self.member, self.receiver, source, false)?;
         self.last = None;
-        Ok(
-            json!({"rows":symbols.len(),"before_epoch":returned.predecessor_epoch,"after_epoch":returned.successor_epoch}),
-        )
+        Ok(json!({"rows":symbols.len(),"before_epoch":before,"after_epoch":self.wave.epoch()}))
     }
     pub fn inspect(&self) -> Value {
-        json!({"model_kind":"coupled-normal-wave","member":self.member,"receiver":self.receiver,"epoch":self.wave.epoch(),"passages":self.wave.current().passages(),"observations":self.wave.normal_material().observations(),"cursor":self.cursor,"emission_ordinal":self.emission_ordinal,"last_source":self.last,"pending_comparisons":self.wave.pending_coupled_prediction_ids().collect::<Vec<_>>()})
+        json!({"model_kind":if self.wave.scope()=="projected-family-joint" {"coupled-normal-wave"}else{"coupled-constitutive-generator"},
+            "member":self.member,"receiver":self.receiver,"receiver_scope":self.wave.scope(),"epoch":self.wave.epoch(),
+            "passages":self.wave.passages(),"observations":self.wave.normal_observations(),"cursor":self.cursor,
+            "emission_ordinal":self.emission_ordinal,"last_source":self.last,"pending_comparisons":self.wave.pending_ids().expect("initialized body")})
     }
+
     pub fn checkpoint_stream(
         &self,
         path: impl AsRef<Path>,
         transport: &HnaStreamState,
     ) -> Result<PublicationReceipt<()>, NativeSessionError> {
         transport.validate().map_err(invalid)?;
-        let rest = self.wave.rest()?;
+        let rest = self.wave.save()?;
         let header = Header {
             alphabet: self.chart.alphabet().clone(),
             coordinates: self.chart.coordinates().to_vec(),
@@ -372,7 +369,7 @@ impl<'c> NativeCoupledWaveSession<'c> {
         };
         let bytes = serde_json::to_vec(&header)?;
         Ok(publish_new(path, |file| {
-            file.write_all(MAGIC_V2)?;
+            file.write_all(MAGIC_V3)?;
             file.write_all(&(bytes.len() as u64).to_le_bytes())?;
             file.write_all(&bytes)?;
             rest.write(file).map_err(io::Error::other)
@@ -382,15 +379,12 @@ impl<'c> NativeCoupledWaveSession<'c> {
 
 pub struct NativeCoupledWaveSavedSession {
     header: Header,
-    rest: NormalWaveRest,
+    rest: SavedCoupledBody,
 }
 impl NativeCoupledWaveSavedSession {
-    fn validate(h: &Header, r: &NormalWaveRest) -> Result<(), NativeSessionError> {
+    fn validate(h: &Header, r: &SavedCoupledBody) -> Result<(), NativeSessionError> {
         h.transport.validate().map_err(invalid)?;
-        if !r.is_coupled()
-            || r.material().roots() != h.alphabet.len()
-            || r.coupled_members().is_none_or(|n| h.member >= n)
-        {
+        if r.roots() != h.alphabet.len() || h.member >= r.members() {
             return Err(invalid("saved session requires complete coupled rest"));
         }
         let entries = h
@@ -444,7 +438,7 @@ impl NativeCoupledWaveSavedSession {
             {
                 return Err(invalid(
                     "pending emission does not follow its preceding source",
-                ))
+                ));
             }
             Cursor::Ready => {}
             Cursor::AwaitSelection { generation, .. } => {
@@ -471,7 +465,7 @@ impl NativeCoupledWaveSavedSession {
             Cursor::AwaitReentry { action, .. } => action.prediction,
             Cursor::Ready => None,
         };
-        if pending.is_some_and(|id| id != r.epoch() || !r.has_coupled_prediction(id)) {
+        if pending.is_some_and(|id| id != r.epoch() || !r.has_prediction(id)) {
             return Err(invalid("pending emission loses its coupled producing cut"));
         }
         Ok(())
@@ -485,7 +479,7 @@ impl NativeCoupledWaveSavedSession {
         }
         let mut m = vec![0; MAGIC.len()];
         f.read_exact(&mut m)?;
-        if m != MAGIC && m != MAGIC_V2 {
+        if m != MAGIC && m != MAGIC_V2 && m != MAGIC_V3 {
             return Err(invalid("coupled session magic"));
         }
         let mut n = [0; 8];
@@ -498,7 +492,11 @@ impl NativeCoupledWaveSavedSession {
         let mut b = vec![0; usize::try_from(count).map_err(invalid)?];
         f.read_exact(&mut b)?;
         let h: Header = serde_json::from_slice(&b)?;
-        let r = NormalWaveRest::read(&mut f, rem)?;
+        let r = if m == MAGIC_V3 {
+            SavedCoupledBody::read(&mut f, rem)?
+        } else {
+            SavedCoupledBody::Affine(NormalWaveRest::read(&mut f, rem)?)
+        };
         Self::validate(&h, &r)?;
         Ok(Self { header: h, rest: r })
     }
@@ -510,12 +508,12 @@ impl NativeCoupledWaveSavedSession {
         let p = path.as_ref();
         let mut f = File::open(p.join("model.wave"))?;
         let size = f.metadata()?.len();
-        let r = NormalWaveRest::read(&mut f, size)?;
+        let r = SavedCoupledBody::Affine(NormalWaveRest::read(&mut f, size)?);
         let a: SymbolAlphabet =
             serde_json::from_reader(File::open(p.join("exterior-chart.json"))?)?;
         let h = Header {
             alphabet: a,
-            coordinates: (0..r.material().roots()).collect(),
+            coordinates: (0..r.roots()).collect(),
             member,
             receiver,
             cursor: Cursor::Ready,
@@ -535,11 +533,15 @@ impl NativeCoupledWaveSavedSession {
     ) -> Result<R, NativeSessionError> {
         let ro = ResidentReadout::new().map_err(invalid)?;
         let s = ResidentSurface::on(&ro).map_err(invalid)?;
-        let w = self.rest.remount_coupled(&s, |_| {})?;
+        let w = self.rest.remount(&s)?;
         let c = SymbolCurrentChart::recharted(self.header.alphabet, self.header.coordinates)?;
-        let mut session =
-            NativeCoupledWaveSession::from_wave(&s, w, c, self.header.member, self.header.receiver)
-                .map_err(|r| r.reason)?;
+        let mut session = NativeCoupledWaveSession::from_body(
+            &s,
+            w,
+            c,
+            self.header.member,
+            self.header.receiver,
+        )?;
         session.cursor = self.header.cursor;
         session.emission_ordinal = self.header.emission_ordinal;
         session.last = self.header.last;

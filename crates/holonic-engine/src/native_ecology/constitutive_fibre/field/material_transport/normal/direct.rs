@@ -13,7 +13,7 @@ pub use enclosure::{ResidentNormalEnclosure, ResidentNormalEnclosureView, Reside
 mod section;
 pub use section::ResidentNormalSectionReturn;
 mod wave;
-pub use wave::{ResidentNormalWave, NormalWaveWord, NormalWaveCoupled, NormalCoupledAttachRefusal, NormalCoupledContact, NormalCoupledStep, NormalCoupledReception, NormalCoupledSourceActuation, NormalCoupledProducingHandle, NormalCoupledPrediction, NormalCoupledComparison, ResidentCoupledConstitutive, CoupledConstitutiveRefusal, ConstitutiveSourceRefusal, CoupledConstitutiveRest, NormalCoupledContinuation, CoupledConstitutiveFamily, CoupledConstitutiveAlternative, CompiledCoupledJoint, CoupledJointEvaluation, CoupledJointReading, NormalFamilyComparisonRow, NormalWaveCurrent, NormalWaveFibre, NormalWaveStep, NormalWaveReading, NormalWaveRest, NormalWaveSeedRefusal, NormalWaveSeedKind, NormalWaveReception, NormalWaveReceptionReading, NormalWaveDevelopment, NormalSourceActuation, NormalProducingHandle, NormalWavePrediction, NormalWaveComparison, NormalWaveComparisonReading, NormalWaveTransport, NormalWaveTransportChange, NormalWaveReference, NormalWaveReferenceReading, NormalWaveBasisChart, NormalWaveBasisFace, NormalWaveBasisReading, NormalBasisSelection, NormalBasisScore, NormalWaveSource, NormalWaveJointSource, NormalWaveFamily, NormalWaveFamilyRest, NormalFamilyBasisFace, FamilyBasisSelection, FamilyBasisReading, NormalFamilySupport, NormalFamilyReceiverReading, NormalWaveFamilyReceiver};
+pub use wave::{ResidentNormalWave, NormalWaveWord, NormalWaveCoupled, NormalCoupledAttachRefusal, NormalCoupledContact, NormalCoupledStep, NormalCoupledReception, NormalCoupledSourceActuation, NormalCoupledProducingHandle, NormalCoupledPrediction, NormalCoupledComparison, ConstitutiveComparisonSection, ResidentCoupledConstitutive, CoupledConstitutiveRefusal, ConstitutiveSourceRefusal, CoupledConstitutiveRest, NormalCoupledContinuation, CoupledConstitutiveFamily, CoupledConstitutiveAlternative, CompiledCoupledJoint, CoupledJointEvaluation, CoupledJointReading, NormalFamilyComparisonRow, NormalWaveCurrent, NormalWaveFibre, NormalWaveStep, NormalWaveReading, NormalWaveRest, NormalWaveSeedRefusal, NormalWaveSeedKind, NormalWaveReception, NormalWaveReceptionReading, NormalWaveDevelopment, NormalSourceActuation, NormalProducingHandle, NormalWavePrediction, NormalWaveComparison, NormalWaveComparisonReading, NormalWaveTransport, NormalWaveTransportChange, NormalWaveReference, NormalWaveReferenceReading, NormalWaveBasisChart, NormalWaveBasisFace, NormalWaveBasisReading, NormalBasisSelection, NormalBasisScore, NormalWaveSource, NormalWaveJointSource, NormalReceiverCoordinates, NormalWaveFamily, NormalWaveFamilyRest, NormalFamilyBasisFace, FamilyBasisSelection, FamilyBasisReading, NormalFamilySupport, NormalFamilyReceiverReading, NormalWaveFamilyReceiver};
 
 pub struct ResidentNormalMaterial<'c> {
     surface: &'c ResidentSurface<'c>,
@@ -91,6 +91,7 @@ impl<'c> ResidentNormalMaterial<'c> {
     pub fn observations(&self) -> u64 {
         self.observations
     }
+    pub fn roots(&self)->usize {self.roots}
     pub fn inspect(&self) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
         decode_state(
             &self.surface.detach_section(&self.state, i64::BITS)?,

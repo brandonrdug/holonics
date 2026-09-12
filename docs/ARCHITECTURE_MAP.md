@@ -143,7 +143,12 @@ receiver and following source programme. `dependent/rest.rs` encodes this genera
 coupled/point-section frames. Staged material moves through `into_alternative` and
 `ResidentNeighborhoodAlternative`; no conditional matrix replaces the complete function. The
 [owned return](../research/records/2026-09-11_AN_OWNED_CONSTITUTIVE_GENERATOR_CONTINUES_THROUGH_ITS_NEW_MATERIAL.md)
-records checked conduct and the remaining HNN session/iterated-return boundary.
+records the initial checked conduct. `wave/family/section.rs::receiver_coordinates` and
+`section_coupled_receiver_coordinates` now retain the declared face's coordinate preimage.
+`holonics-hna/src/native/coupled_wave/body.rs::NativeCoupledBody` owns the affine/dependent
+session alternatives; session frame v3 tags their existing rests. The
+[stream binding](../research/records/2026-09-11_THE_HNN_STREAM_USES_ITS_RETURNED_GENERATOR.md)
+records checked continuation and the remaining repeated dependent material-return boundary.
 
 [definition] `wave/coupled/continuation.rs` owns `NormalCoupledContinuation`, the actual ordered
 relation word joining a still-pending source to contemporary current. `NormalWaveCoupled` shares

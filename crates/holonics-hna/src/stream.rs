@@ -386,10 +386,10 @@ impl Default for HnaStream {
 /// Only an exterior effect seam for I/O tests. Native current and learning are never callbacks
 /// supplied through the public stream protocol; actual adapters use HnaSession or NativeSession.
 trait StreamTarget {
-    fn compare_symbol(&self,_:u64,_:&str,_:Option<usize>)->Result<Value,String>{Err("joint producing-family comparison unsupported by this model".into())}
+    fn compare_symbol(&mut self,_:u64,_:&str,_:Option<usize>)->Result<Value,String>{Err("joint producing-family comparison unsupported by this model".into())}
     fn release_symbol_comparison(&mut self,_:u64)->Result<Value,String>{Err("coupled comparison release unsupported by this model".into())}
     fn receive_next_symbol(&mut self,_:&str)->Result<Value,String>{Err("actual next-symbol receiver unsupported by this model".into())}
-    fn project_symbol(&self,_:bool)->Result<Value,String>{Err("projected family receiver unsupported by this model".into())}
+    fn project_symbol(&mut self,_:bool)->Result<Value,String>{Err("projected family receiver unsupported by this model".into())}
     fn actuate_text(&mut self,_:&str)->Result<Value,String>{Err("text source chart unsupported by this model".into())}
     fn emit_symbol(&mut self,_:bool,_:bool)->Result<Value,String>{Err("symbol receiver unsupported by this model".into())}
     fn observe_symbol(&mut self,_:u64,_:&str)->Result<Value,String>{Err("symbol observation chart unsupported by this model".into())}
@@ -410,7 +410,7 @@ trait StreamTarget {
     ) -> Result<Value, String> {
         Err("phase incidence replacement is not supported by this model kind".into())
     }
-    fn inspect_relation(&self) -> Result<Value, String> {
+    fn inspect_relation(&mut self) -> Result<Value, String> {
         Err("local relation inspection is not supported by this model kind".into())
     }
     fn advance(&mut self, occurrence: &HnaOccurrence, full: bool) -> Result<Value, String>;
@@ -444,7 +444,7 @@ impl StreamTarget for crate::native::NativeSession<'_> {
             .map(|_| json!(self.inspect()))
             .map_err(|e| e.to_string())
     }
-    fn inspect_relation(&self) -> Result<Value, String> {
+    fn inspect_relation(&mut self) -> Result<Value, String> {
         self.relation_snapshot()
             .map(|v| json!(v))
             .map_err(|e| e.to_string())
@@ -814,16 +814,16 @@ impl StreamTarget for crate::native::NativeWaveSession<'_> {
 }
 
 impl StreamTarget for crate::native::NativeCoupledWaveSession<'_>{
-    fn compare_symbol(&self,id:u64,text:&str,row:Option<usize>)->Result<Value,String>{self.compare_symbol(id,text,row).map_err(|e|e.to_string())}
+    fn compare_symbol(&mut self,id:u64,text:&str,row:Option<usize>)->Result<Value,String>{self.compare_symbol(id,text,row).map_err(|e|e.to_string())}
     fn release_symbol_comparison(&mut self,id:u64)->Result<Value,String>{self.release_symbol_comparison(id).map_err(|e|e.to_string())}
     fn receive_next_symbol(&mut self,text:&str)->Result<Value,String>{self.receive_next_symbol(text).map_err(|e|e.to_string())}
-    fn inspect_relation(&self)->Result<Value,String>{self.inspect_relation().map_err(|e|e.to_string())}
-    fn project_symbol(&self,full:bool)->Result<Value,String>{self.project_current(full).map_err(|e|e.to_string())}
+    fn inspect_relation(&mut self)->Result<Value,String>{self.inspect_relation().map_err(|e|e.to_string())}
+    fn project_symbol(&mut self,full:bool)->Result<Value,String>{self.project_current(full).map_err(|e|e.to_string())}
     fn actuate_text(&mut self,text:&str)->Result<Value,String>{self.actuate_text(text).map_err(|e|e.to_string())}
     fn emit_symbol(&mut self,full:bool,retain:bool)->Result<Value,String>{
         if retain{self.predict_symbol(full)}else{self.next_symbol(full)}.map_err(|e|e.to_string())
     }
-    fn observe_symbol(&mut self,_:u64,_:&str)->Result<Value,String>{Err("joint comparison is available through compare-symbol; its material-development return is not yet bound".into())}
+    fn observe_symbol(&mut self,id:u64,text:&str)->Result<Value,String>{self.incorporate_symbol(id,text).map_err(|e|e.to_string())}
     fn advance(&mut self,_:&HnaOccurrence,_:bool)->Result<Value,String>{Err("use the coupled wave's declared source/receiver commands".into())}
     fn advance_native(&mut self,_:&HnaOccurrence,_:bool)->Result<Value,String>{Err("use the coupled wave's declared source/receiver commands".into())}
     fn inspect(&self)->Value{crate::native::NativeCoupledWaveSession::inspect(self)}

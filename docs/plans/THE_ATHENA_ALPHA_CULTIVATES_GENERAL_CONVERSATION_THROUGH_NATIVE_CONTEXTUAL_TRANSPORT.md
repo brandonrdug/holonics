@@ -240,12 +240,13 @@ now joins the original source assignment through that word, applies new material
 current, and owns the resulting generator in `ResidentCoupledConstitutive`. A checked source
 section admits publication while the full function remains available at other assignments.
 The next actual source uses its new material/current, and rest/remount preserves the programme.
-This currently supports one incorporated return and following source operations. It does not
-yet replace the current HNN session body or supply its automatic receiver/code decoder.
+The [HNN stream binding](../../research/records/2026-09-11_THE_HNN_STREAM_USES_ITS_RETURNED_GENERATOR.md)
+now supplies the native receiver-coordinate decoder and `NativeCoupledBody` session owner.
+One return, subsequent generation/observation/source fields, pending predictions and the existing
+selection/re-entry cursor persist across processes. Further material incorporation remains open.
 
-[definition] Continue by binding this generator state to the HNN coordinator and its existing
-selection/re-entry cursor, adding the subsequent generating and material-return operations over
-the same owned programme. Further producing cuts must retain their own dependent source parameters
+[definition] Continue by composing subsequent material-return operations over that same owned
+programme; do not repeat the completed coordinator binding. Further producing cuts must retain their own dependent source parameters
 and joining histories. Preserve the declared source-section receiver as such until its relation
 to the existing whole-family receiver is constructed; do not silently relabel one as the other.
 

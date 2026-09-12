@@ -5,6 +5,73 @@ use crate::native_ecology::constitutive_fibre::{
 
 impl<'c> ResidentSurface<'c> {
     #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_coupled_receiver_coordinates(
+        &self,
+        lane: &Lane<'_, 'c>,
+        family: &ResidentSection<'c>,
+        ps: usize,
+        t: usize,
+        receiver: &ResidentSection<'c>,
+        graph: &ResidentSection<'c>,
+        coordinates: &ResidentSection<'c>,
+        report: &ResidentSection<'c>,
+        workspace: &ResidentSection<'c>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || Self::operative_error();
+        let w = t.checked_mul(2).ok_or_else(fail)?;
+        let square = t.checked_mul(t).ok_or_else(fail)?;
+        let fw = square
+            .checked_add(ps)
+            .and_then(|v| v.checked_add(t)?.checked_add(4))
+            .ok_or_else(fail)?;
+        let rw = square
+            .checked_add(w)
+            .and_then(|v| v.checked_add(4))
+            .ok_or_else(fail)?;
+        let ww = t.checked_mul(8).ok_or_else(fail)?;
+        if t < 10
+            || (t - 2) % 8 != 0
+            || [ps, t, w, fw, rw, ww]
+                .iter()
+                .any(|v| *v >= u32::MAX as usize)
+            || !self.operative_shape(family, 1, fw)
+            || !self.operative_shape(receiver, 1, 4 * t)
+            || !self.operative_shape(graph, w, w)
+            || !self.operative_shape(coordinates, 1, t + 1)
+            || !self.operative_shape(report, 1, rw)
+            || !self.operative_shape(workspace, 1, ww)
+        {
+            return Err(fail());
+        }
+        let mut p = Params::new();
+        p.ptr(family.lo.device_ptr())
+            .ptr(family.hi.device_ptr())
+            .u32(ps as u32)
+            .u32(t as u32)
+            .ptr(receiver.lo.device_ptr())
+            .ptr(receiver.hi.device_ptr())
+            .ptr(graph.lo.device_ptr())
+            .ptr(graph.hi.device_ptr())
+            .ptr(coordinates.lo.device_ptr())
+            .ptr(coordinates.hi.device_ptr())
+            .ptr(report.lo.device_ptr())
+            .ptr(report.hi.device_ptr())
+            .ptr(workspace.lo.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_coupled_receiver_coordinates",
+            1,
+            self.launch.block_x,
+            0,
+            &mut p,
+            "coupled-receiver-coordinates",
+        )
+    }
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn record_coupled_family_section(
         &self,
         lane: &Lane<'_, 'c>,

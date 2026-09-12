@@ -1,0 +1,15 @@
+Terminal excerpt; complete build log retained at /tmp/athena-receiver-coordinate-formal.txt
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+info: ElementaryHolonics/Mathematics/GeneratorFactorization.lean:135:2: Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+warning: ElementaryHolonics/Mathematics/GeneratorFactorization.lean:159:4: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+✔ [8893/8894] Built ElementaryHolonics.Mathematics.DependentConstitutiveReturn (4.7s)
+✔ [8894/8894] Built ElementaryHolonics.Framework.Computation (3.0s)
+Build completed successfully (8894 jobs).

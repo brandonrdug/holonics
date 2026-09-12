@@ -178,6 +178,18 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
     pub fn successor_section(&self) -> &NormalWaveFamily<'c> {
         &self.successor
     }
+    pub(in super::super) fn retained_successor(&self)->Rc<NormalWaveFamily<'c>>{Rc::clone(&self.successor)}
+    pub(in super::super) fn retained_current(&self)->Rc<NormalWaveFamily<'c>>{Rc::clone(&self.current)}
+    pub(in super::super) fn member_relation(&self,member:usize,
+        other:Option<&ResidentConstitutiveFibre<'c>>,chart:WaveSourceReceiver,
+    )->Result<ResidentWaveRelation<'c>,ConstitutiveFibreError>{
+        let law=if member==self.comparison.member(){&self.consequence.material}else{other.ok_or(ConstitutiveFibreError::Shape)?};
+        law.read_wave_relation_in_chart(self.condition().successor(),self.comparison.relation().roots(),chart)
+    }
+    pub(in super::super) fn apply_map(&mut self,map:Rc<ResidentWaveRelation<'c>>,passage:u64)->Result<(),ConstitutiveFibreError>{
+        let next=Rc::new(self.successor.read_through_at(Rc::clone(&map),passage)?);
+        self.current=Rc::clone(&self.successor);self.successor=next;self.relation=map;Ok(())
+    }
     pub fn read_formed_source(
         &self,
         source: ResidentConstitutiveCurrent<'_, 'c>,
@@ -193,6 +205,13 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
         chart: WaveSourceReceiver,
         source: ResidentConstitutiveCurrent<'_, 'c>,
     ) -> Result<(), ConstitutiveFibreError> {
+        let passage=self.successor.passages().checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
+        self.actuate_source_at(member,other,chart,source,passage)
+    }
+    pub(in super::super) fn actuate_source_at(&mut self,member:usize,
+        other:Option<&ResidentConstitutiveFibre<'c>>,chart:WaveSourceReceiver,
+        source:ResidentConstitutiveCurrent<'_, 'c>,passage:u64,
+    )->Result<(),ConstitutiveFibreError>{
         let law = if member == self.comparison.member() {
             &self.consequence.material
         } else {
@@ -204,11 +223,7 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
             chart,
         )?;
         let map = Rc::new(relation.read_source_contact(law, source)?);
-        let next = Rc::new(self.successor.read_through(Rc::clone(&map))?);
-        self.current = Rc::clone(&self.successor);
-        self.successor = next;
-        self.relation = map;
-        Ok(())
+        self.apply_map(map,passage)
     }
     pub fn inspect_condition(&self) -> Result<ConditionContactReading, ConstitutiveFibreError> {
         self.condition().inspect()

@@ -1,0 +1,10 @@
+warning: holonic-engine@0.1.0: exact CUDA laws built for compute_89
+   Compiling holonic-engine v0.1.0 (/home/b/Workspaces/holonics/crates/holonic-engine)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 33.21s
+     Running unittests src/lib.rs (target/debug/deps/holonic_engine-6ae3d245ea632305)
+
+running 1 test
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::dependent::tests::declared_receiver_coordinates_retain_the_coordinate_kernel ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2422 filtered out; finished in 0.33s
+

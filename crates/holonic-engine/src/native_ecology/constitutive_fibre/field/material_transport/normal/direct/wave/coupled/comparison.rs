@@ -169,6 +169,12 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         observed: ResidentConstitutiveCurrent<'_, 'c>,
     ) -> Result<NormalCoupledComparison<'c>, ConstitutiveFibreError> {
         let cut = Rc::clone(self.coupled_producing_cut(h)?);
+        NormalCoupledComparison::from_cut(h.id,cut,observed)
+    }
+}
+impl<'c> NormalCoupledComparison<'c> {
+    pub(super) fn from_cut(id:u64,cut:Rc<CoupledProducingCut<'c>>,observed:ResidentConstitutiveCurrent<'_, 'c>)
+        ->Result<Self,ConstitutiveFibreError>{
         let relation = cut
             .produced
             .last_relation()
@@ -218,7 +224,7 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
             )));
         }
         Ok(NormalCoupledComparison {
-            id: h.id,
+            id,
             cut,
             features,
             coefficients,

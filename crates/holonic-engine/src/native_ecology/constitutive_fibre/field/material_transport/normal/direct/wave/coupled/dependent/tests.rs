@@ -43,6 +43,63 @@ fn face(model: &mut ResidentCoupledConstitutive<'_>) -> Vec<Rat> {
         .projected_joint
         .unwrap()
 }
+
+#[test]
+#[ignore="requires CUDA; receiver-coordinate inversion retains its aliases and reproduces the original source face"]
+fn declared_receiver_coordinates_retain_the_coordinate_kernel(){
+    use crate::native_ecology::constitutive_fibre::ConstitutiveReading;
+    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
+    let mut wave=world(&s,true);let contact=wave.admit_contact(0).unwrap();wave.advance_contact(&contact).unwrap();
+    let contact=wave.admit_contact(0).unwrap();let pending=wave.predict_contact(&contact).unwrap().handle;
+    let observation=point(&s,&[7,4]);let comparison=wave.compare_coupled_prediction(&pending,current(&observation)).unwrap();
+    let expected=comparison.source().read_receiver().unwrap().inspect().unwrap();
+    let reads=s.census().section_read_outs;
+    let coordinates=comparison.source().receiver_coordinates().unwrap();
+    assert_eq!(s.census().section_read_outs,reads);
+    let ConstitutiveReading::Plural {particular,directions}=coordinates.coordinate_fibre().inspect().unwrap().predecessor_reading else {panic!("coordinate aliases were discarded")};
+    assert!(!directions.is_empty());
+    let mut family=wave.read_coupled_constitutive_family(&comparison).unwrap();
+    let one=family.evaluate(coordinates.coordinates()).unwrap();
+    assert_eq!(one.inspect_condition().unwrap().successor,vec![r(6,5),r(-2,5)]);
+    // Its source decoder must agree with the original min-norm source receiver, even though
+    // coefficient-space aliases remain. A kernel displacement cannot change future conduct.
+    let original=one.successor_section().rest().unwrap();
+    for direction in directions {
+        let alternate=particular.iter().zip(direction).map(|(a,b)|a+b).collect::<Vec<_>>();
+        let packet=s.mount_exact_rational_packet(&alternate).unwrap();
+        let other=family.evaluate(&packet).unwrap();
+        assert_eq!(other.successor_section().rest().unwrap(),original);
+    }
+    assert_eq!(expected.projected_joint,Some(vec![r(2,1),r(1,1),r(0,1),r(2,1)]));
+}
+
+#[test]
+#[ignore="requires CUDA; a field retains every internal source factor under one public clock in a dependent generator"]
+fn dependent_field_is_one_clock_and_all_ordered_factors(){
+    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
+    let build=||{
+        let mut wave=world(&s,true);let contact=wave.admit_contact(0).unwrap();wave.advance_contact(&contact).unwrap();
+        let contact=wave.admit_contact(0).unwrap();let h=wave.predict_contact(&contact).unwrap().handle;
+        let observed=point(&s,&[7,4]);let comparison=wave.compare_coupled_prediction(&h,current(&observed)).unwrap();
+        let coordinates=comparison.source().receiver_coordinates().unwrap().into_coordinates();
+        wave.into_constitutive_continuation(comparison,coordinates).unwrap()
+    };
+    let mut field=build();let mut singles=build();
+    let raw=s.mount_section_rest(&ResidentSectionRest::found(3,2,ResidentGrain(0),64,
+        [1,0,2,0,1,0].into_iter().map(|v|(v,v)).collect()).unwrap()).unwrap();
+    let before=field.epoch();let reads=s.census().section_read_outs;
+    field.actuate_field(0,WaveSourceReceiver::Direct,raw,false).unwrap();
+    assert_eq!(s.census().section_read_outs,reads);
+    for values in [[1,0,2,0,1,0],[-1,0,1,0,2,0]] {
+        let packet=s.mount_exact_rational_packet(&values.map(|v|r(v,1))).unwrap();
+        singles.actuate_source(0,WaveSourceReceiver::Direct,packet).unwrap();
+    }
+    assert_eq!(field.epoch(),before+1);assert_eq!(singles.epoch(),before+2);
+    assert_eq!(face(&mut field),face(&mut singles));
+    let saved=field.rest().unwrap();let mut bytes=Vec::new();saved.write(&mut bytes).unwrap();
+    let mut restored=CoupledConstitutiveRest::read(&mut bytes.as_slice(),bytes.len() as u64).unwrap().remount(&s).unwrap();
+    assert_eq!(restored.rest().unwrap(),saved);assert_eq!(face(&mut restored),face(&mut field));
+}
 #[test]
 #[ignore = "requires CUDA; owned dependent return persists and the next source uses its actual changed material/current"]
 fn owned_constitutive_cycle_publishes_consumes_and_continues() {

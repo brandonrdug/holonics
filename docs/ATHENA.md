@@ -200,9 +200,11 @@ retains the word and validates its joins. This is a dependency of complete-famil
 publishes a source-dependent return by ownership transfer, preserves the complete generator
 beyond its declared receiver section, and uses changed material for following source operations
 across process exit. Its consumed cut becomes a private causal witness, not an active pending
-return. This owner is not yet bound into `NativeCoupledWaveSession`; the session's existing
-comparison remains read-only. Iterated material return and receiver/session integration remain
-active work, and the new section receiver is not asserted equivalent to the old whole-family one.
+return. The [stream binding](../research/records/2026-09-11_THE_HNN_STREAM_USES_ITS_RETURNED_GENERATOR.md)
+now connects it through `NativeCoupledBody` to `NativeCoupledWaveSession`. `compare_symbol`
+remains read-only; `incorporate_symbol` consumes the first return. Following generation and
+pending predictions persist across processes. Repeated dependent material returns remain active
+work; the section receiver is not asserted equivalent to the old whole-family one.
 
 ## Native-first construction
 
