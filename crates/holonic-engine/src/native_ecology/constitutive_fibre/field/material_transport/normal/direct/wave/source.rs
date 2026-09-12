@@ -6,6 +6,7 @@ pub struct NormalWaveJointSource<'c> {
     current: NormalWaveCurrent<'c>,
     fibre: NormalWaveFibre<'c>,
     joint: Rc<ResidentSection<'c>>,
+    metadata: Rc<ResidentSection<'c>>,
 }
 /// The source φ(p,c)=(c−p,c,p) observed through its outward ball. The retained joint
 /// precedes this receiver; failure of this bound need not stop another family operation.
@@ -14,6 +15,40 @@ pub struct NormalWaveSource<'c> {
     source: ResidentSection<'c>,
 }
 impl<'c> NormalWaveJointSource<'c> {
+    /// Share this immutable producing source; the continuing generator is not cloned.
+    pub fn snapshot(&self) -> Self {
+        Self {
+            previous: self.previous.snapshot(),
+            current: self.current.snapshot(),
+            fibre: self.fibre.snapshot(),
+            joint: Rc::clone(&self.joint),
+            metadata: Rc::clone(&self.metadata),
+        }
+    }
+    pub fn inspect(&self) -> Result<NormalWaveReading, ConstitutiveFibreError> {
+        let surface = self.current.surface;
+        let meta = wides(&surface.read_out(&self.metadata)?)?;
+        if meta.len() != 3 {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let scale = BigInt::one() << self.current.grain.0;
+        let joint = ResidentNormalEnclosureView {
+            surface,
+            section: &self.joint,
+            offset: 0,
+            width: 2 * self.current.width,
+            grain: self.current.grain,
+        }
+        .inspect()?;
+        Ok(NormalWaveReading {
+            transport: self.fibre.transport,
+            steps: self.fibre.steps,
+            maximum_computed_power_norm: Rat::from_integer(meta[0].into()),
+            uniform_power_equation_defect: Rat::new(meta[1].into(), scale.clone()),
+            operator_word_error: Rat::new(meta[2].into(), scale),
+            joint_current: joint,
+        })
+    }
     pub fn previous(&self) -> &NormalWaveCurrent<'c> {
         &self.previous
     }
@@ -55,12 +90,7 @@ impl<'c> NormalWaveJointSource<'c> {
             )));
         }
         Ok(NormalWaveSource {
-            origin: Self {
-                previous: self.previous.snapshot(),
-                current: self.current.snapshot(),
-                fibre: self.fibre.snapshot(),
-                joint: Rc::clone(&self.joint),
-            },
+            origin: self.snapshot(),
             source,
         })
     }
@@ -95,6 +125,7 @@ impl<'c> ResidentNormalWave<'c> {
             current: self.current.snapshot(),
             fibre: self.fibre(),
             joint: Rc::clone(&self.joint),
+            metadata: Rc::clone(&self.metadata),
         }
     }
     pub fn read_source(&self) -> Result<NormalWaveSource<'c>, ConstitutiveFibreError> {

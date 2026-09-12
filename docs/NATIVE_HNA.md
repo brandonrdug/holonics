@@ -33,6 +33,16 @@ can be explicitly released. This new application session has no rest/resume bind
 checkpoint requests refuse without claiming a durable artifact. One condition-observation cut
 may be retained per relation; read-only predictions remain available, including plural ones.
 
+[definition] `apply-inputs` uses the same `MathematicalInputWire` as conditional prediction:
+`values`, `product-output`, or `product-receiver` (an operator receiver and retained product).
+An intermediate with `emit_output:false` must be retained for its subsequent consumer.
+`compose` compiles a following retained operator at a supplied fixed right port into the first
+operator's product-core receiver. A following linear operator uses its declared unit port.
+The resulting construction accepts new inputs and can also read the original retained interior;
+it shares the resident input factors. The [updated example](../applications/holonics-workbench/examples/native/mathematical-requests.jsonl)
+uses that compiled construction. The complete [scope and checks](../research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md#resident-composition-and-fixed-section-compilation)
+distinguish fixed-section compilation from general variable-condition continuation.
+
 [definition] `ResidentConstitutiveFibre` retains a rational relation between declared source and
 receiver currents. `found_bilinear_contact` includes actual source, condition and mixed complex
 products in that relation. `advance_resident` / `advance_bilinear_contact` accept resident current

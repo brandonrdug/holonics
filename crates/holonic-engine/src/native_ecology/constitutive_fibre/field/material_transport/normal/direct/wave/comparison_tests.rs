@@ -93,7 +93,7 @@ fn addressed_return_uses_producing_cut_witness() {
     let prediction = body.predict().unwrap();
     assert_eq!(surface.census().section_read_outs, reads_before_predict);
     contains(
-        &prediction.step.current.view().inspect().unwrap(),
+        &prediction.step.current().view().inspect().unwrap(),
         &[wave(2, 0, 1)],
     );
     let held = body.current().snapshot();
@@ -123,7 +123,7 @@ fn addressed_return_uses_producing_cut_witness() {
     assert!(reading.comparison.source_current.is_some());
     assert_eq!(body.pending_predictions(), 0);
     contains(
-        &body.advance().unwrap().current.view().inspect().unwrap(),
+        &body.advance().unwrap().current().view().inspect().unwrap(),
         &[wave(41, 0, 10)],
     );
     let mut next_current = witness(&surface);
@@ -133,7 +133,7 @@ fn addressed_return_uses_producing_cut_witness() {
         &next_current
             .advance()
             .unwrap()
-            .current
+            .current()
             .view()
             .inspect()
             .unwrap(),
@@ -307,7 +307,7 @@ fn producing_comparison_transports_a_unit_phase() {
     body.receive_prediction(&prediction.handle, current(&observed))
         .unwrap();
     contains(
-        &body.advance().unwrap().current.view().inspect().unwrap(),
+        &body.advance().unwrap().current().view().inspect().unwrap(),
         &[wave(0, 41, 10)],
     );
 }

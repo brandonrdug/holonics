@@ -395,15 +395,15 @@ fn learned_decay_keeps_the_join_and_complete_joint_current() {
     for at in 1..=32 {
         let joining = generator.current().snapshot();
         let returned = generator.advance().unwrap();
-        assert!(returned.previous.same_occurrence(&joining));
+        assert!(returned.previous().same_occurrence(&joining));
         assert!(generator.previous().same_occurrence(&joining));
-        assert!(!returned.current.same_occurrence(&joining));
-        assert_eq!(returned.current.at(), Some(at));
+        assert!(!returned.current().same_occurrence(&joining));
+        assert_eq!(returned.current().at(), Some(at));
         assert_eq!(s.census().section_read_outs, reads + (at - 1) * 3);
         denominator *= 2;
         let reading = returned.inspect().unwrap();
         contains(
-            &returned.current.view().inspect().unwrap(),
+            &returned.current().view().inspect().unwrap(),
             &[wave(3, 4, denominator)],
         );
         assert_eq!(reading.steps, at);
@@ -434,19 +434,19 @@ fn rotation_and_equal_faces_are_not_source_identity() {
     let expected = [wave(1, 1, 2), wave(0, 1, 2), wave(-1, 1, 4), wave(-1, 0, 4)];
     for value in expected {
         let returned = generator.advance().unwrap();
-        contains(&returned.current.view().inspect().unwrap(), &[value]);
+        contains(&returned.current().view().inspect().unwrap(), &[value]);
     }
     let body = ResidentNormalMaterial::found(&s, 1, 1, ResidentGrain(u32::BITS)).unwrap();
     let mut zero = body.into_difference_wave(current(&p), current(&p)).unwrap();
     let previous = zero.current().snapshot();
     let returned = zero.advance().unwrap();
-    assert!(!previous.same_occurrence(&returned.current));
+    assert!(!previous.same_occurrence(&returned.current()));
     assert_eq!(
-        returned.current.view().inspect().unwrap().radius,
+        returned.current().view().inspect().unwrap().radius,
         Rat::zero()
     );
     contains(
-        &returned.current.view().inspect().unwrap(),
+        &returned.current().view().inspect().unwrap(),
         &[wave(0, 0, 1)],
     );
 }
@@ -504,7 +504,7 @@ fn generator_rest_decodes_the_word_and_rejoins_the_next_return() {
     let mut bytes = Vec::new();
     saved.write(&mut bytes).unwrap();
     let expected = original.advance().unwrap();
-    let old_current = expected.current.snapshot();
+    let old_current = expected.current().snapshot();
     let expected = serde_json::to_value(expected.inspect().unwrap()).unwrap();
     drop(original);
     let loaded = NormalWaveRest::read(&mut bytes.as_slice(), bytes.len() as u64).unwrap();
@@ -517,7 +517,7 @@ fn generator_rest_decodes_the_word_and_rejoins_the_next_return() {
         serde_json::to_value(returned.inspect().unwrap()).unwrap(),
         expected
     );
-    assert!(!returned.current.same_occurrence(&old_current));
+    assert!(!returned.current().same_occurrence(&old_current));
 }
 
 #[test]
@@ -538,13 +538,13 @@ fn reception_changes_the_next_generator_without_archiving_its_past() {
     assert_eq!(s.census().section_read_outs, before.section_read_outs);
     assert_eq!(s.census().ingress_octets, before.ingress_octets);
     assert!(body.previous().same_occurrence(&joining));
-    assert!(received.previous.same_occurrence(&joining));
+    assert!(received.previous().same_occurrence(&joining));
     assert_eq!(body.steps(), 0);
     assert_eq!(body.epoch(), 2);
-    assert_eq!(received.current.at(), Some(2));
-    assert_eq!(received.predecessor_fibre.material_observations, 3);
-    assert_eq!(received.successor_fibre.material_observations, 4);
-    assert!(received.successor_fibre.initial().is_none());
+    assert_eq!(received.current().at(), Some(2));
+    assert_eq!(received.predecessor_fibre().material_observations, 3);
+    assert_eq!(received.successor_fibre().material_observations, 4);
+    assert!(received.successor_fibre().initial().is_none());
     let reading = received.inspect().unwrap();
     contains(&reading.source_joint, &[wave(1, 0, 1), wave(1, 0, 2)]);
     contains(
@@ -553,15 +553,15 @@ fn reception_changes_the_next_generator_without_archiving_its_past() {
     );
     contains(&reading.comparison.observed, &[wave(3, 0, 2)]);
     assert!(reading.comparison.observed.radius > Rat::zero());
-    let old = received.predecessor_fibre.inspect_material().unwrap();
-    let new = received.successor_fibre.inspect_material().unwrap();
+    let old = received.predecessor_fibre().inspect_material().unwrap();
+    let new = received.successor_fibre().inspect_material().unwrap();
     assert_ne!(old.cross_source, new.cross_source);
     // H=2I+xx*, B=(0,-1,0)+(3/2)x*: its exact response has coefficients
     // (-1/4,-1/4,1/2), so the next current is 2-5/8=11/8.
     let next = body.advance().unwrap();
-    assert!(next.previous.same_occurrence(&received.current));
-    contains(&next.current.view().inspect().unwrap(), &[wave(11, 0, 8)]);
-    assert_eq!(next.current.at(), Some(3));
+    assert!(next.previous().same_occurrence(&received.current()));
+    contains(&next.current().view().inspect().unwrap(), &[wave(11, 0, 8)]);
+    assert_eq!(next.current().at(), Some(3));
     // Saved evidence refers to immutable producing material, even after further development.
     let evidence = serde_json::to_value(received.inspect().unwrap()).unwrap();
     body.receive(current(&c)).unwrap();
@@ -698,10 +698,10 @@ fn a_measured_section_develops_the_continuing_generator() {
     saved.write(&mut bytes).unwrap();
     assert_eq!(bytes[b"HOLONIC-NORMAL-WAVE".len()], 3);
     let next = body.advance().unwrap();
-    assert!(next.previous.same_occurrence(&joining));
+    assert!(next.previous().same_occurrence(&joining));
     // The source (1,2,1), target 2 changes (0,-1/2,0) into (3/8,1/4,3/8).
     // On the actual source (-1/2,1/2,1), the change is 5/16 and current is 13/16.
-    contains(&next.current.view().inspect().unwrap(), &[wave(13, 0, 16)]);
+    contains(&next.current().view().inspect().unwrap(), &[wave(13, 0, 16)]);
     let expected = serde_json::to_value(next.inspect().unwrap()).unwrap();
     drop(next);
     drop(developed);

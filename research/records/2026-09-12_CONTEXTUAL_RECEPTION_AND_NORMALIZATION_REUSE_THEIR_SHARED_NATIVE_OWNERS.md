@@ -128,3 +128,29 @@ covectors through the appropriate native source/material adjoints, broader const
 and the general dependent-programme compression remain active. Existing source/receiver wrapper
 overlap must continue to be reconciled with those consumers. This return neither declares the
 whole codebase consolidated nor schedules maintenance outside the implementation goal.
+
+## Canonical source consolidation in the following increment
+
+[definition] Starting from `2dbe4844`, `NormalWaveStep` and `NormalWaveJointSource` were found
+to carry the same immutable current pair, generating family and joint current; the former
+additionally held the source's actual numerical metadata. They now use one concrete
+`NormalWaveJointSource` implementation including that metadata. The old step name is only a
+compatibility type alias, not another wrapper. `advance`, `joint_source`, source lifting and
+the basis receiver use the same source owner and read-only accessors.
+
+[definition] `NormalWaveReception` now retains that canonical producing source instead of
+independently packaging its predecessor family, joint section and previous-current alias.
+Its `previous()` is the actual producing source's current; its new `current()` and successor
+family remain separate. The normalized receiver reads the canonical source's actual joint
+section. Source and successor access is read-only, preventing callers from independently
+rewriting the native receipt's current or source metadata. Decoded report fields and serialized
+rest formats are unchanged; Rust consumers of the former public fields use the accessors.
+
+[established-bounded; implemented-exact; computational-witness] The canonical-source test
+checks shared current occurrence identity, the same joint and metadata allocations, the same
+material, identical readings, and retained source validity after a later advance. Eighty-eight
+recurrence/source/family/return tests passed (22.33 s), including existing base/programme
+incorporation and compiled-family controls. The HNN native suite's 40 tests passed (14.92 s),
+including contextual and normalized reception through the public adapter. Workspace example
+compilation passed after the accessor changes; this is consolidation of the existing consumers,
+not a facade around the former duplicate source implementation.

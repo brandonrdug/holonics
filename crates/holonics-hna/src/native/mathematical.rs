@@ -47,6 +47,11 @@ pub enum MathematicalInputWire {
     ProductOutput {
         product: u64,
     },
+    /// Read an admitted receiver from the retained interior, then consume it on device.
+    ProductReceiver {
+        product: u64,
+        operator: u64,
+    },
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -140,6 +145,17 @@ pub enum MathematicalRequest {
         #[serde(default)]
         retain_product: bool,
     },
+    ApplyInputs {
+        operator: u64,
+        left: MathematicalInputWire,
+        #[serde(default)]
+        right: Option<MathematicalInputWire>,
+        #[serde(default)]
+        retain_product: bool,
+        /// A retained intermediate need not cross the host boundary before further use.
+        #[serde(default = "emit_by_default")]
+        emit_output: bool,
+    },
     BindReceiver {
         operator: u64,
         coefficients: RationalMatrixWire,
@@ -147,6 +163,13 @@ pub enum MathematicalRequest {
     ComposeReceiver {
         operator: u64,
         matrix: RationalMatrixWire,
+    },
+    /// Compile a following retained operator with its right port fixed for this construction.
+    Compose {
+        operator: u64,
+        following: u64,
+        #[serde(default)]
+        right: Option<Vec<RationalWire>>,
     },
     ReadProduct {
         operator: u64,
@@ -167,6 +190,47 @@ struct Operator<'c> {
     realization: BilinearRealization,
     native: ResidentBilinearMap<'c>,
     linear: bool,
+}
+
+fn emit_by_default() -> bool {
+    true
+}
+
+impl MathematicalInputWire {
+    /// One codec/borrowing path shared by operator application and conditional prediction.
+    /// The callback cannot retain a borrow of a transient mount or introduce a host readout.
+    fn with_section<'c, R>(
+        &self,
+        surface: &'c ResidentSurface<'c>,
+        operators: &BTreeMap<u64, Operator<'c>>,
+        products: &BTreeMap<u64, ResidentBilinearReturn<'c>>,
+        consume: impl FnOnce(&ResidentSection<'c>) -> Result<R, NativeSessionError>,
+    ) -> Result<R, NativeSessionError> {
+        match self {
+            Self::Values { values } => {
+                let section = surface
+                    .mount_exact_rational_packet(&vector(values)?)
+                    .map_err(invalid)?;
+                consume(&section)
+            }
+            Self::ProductOutput { product } => consume(
+                products
+                    .get(product)
+                    .ok_or_else(|| invalid("unknown or released product"))?
+                    .output(),
+            ),
+            Self::ProductReceiver { product, operator } => {
+                let source = products
+                    .get(product)
+                    .ok_or_else(|| invalid("unknown or released product"))?;
+                let receiver = operators
+                    .get(operator)
+                    .ok_or_else(|| invalid("unknown receiver operator"))?;
+                let section = receiver.native.read_product(source).map_err(invalid)?;
+                consume(&section)
+            }
+        }
+    }
 }
 struct Search {
     iterator: BilinearSupportSearch,
@@ -309,11 +373,34 @@ impl<'c> NativeMathematicalSession<'c> {
         realization: BilinearRealization,
         linear: bool,
     ) -> Result<Value, NativeSessionError> {
+        let native = ResidentBilinearMap::mount(self.surface, &realization).map_err(invalid)?;
+        self.publish_ready(realization, native, linear)
+    }
+    fn publish_rebinding(
+        &mut self,
+        source: u64,
+        realization: BilinearRealization,
+    ) -> Result<Value, NativeSessionError> {
+        let owner = self
+            .operators
+            .get(&source)
+            .ok_or_else(|| invalid("unknown source operator"))?;
+        let native = owner
+            .native
+            .rebind_receiver(&realization)
+            .map_err(invalid)?;
+        self.publish_ready(realization, native, owner.linear)
+    }
+    fn publish_ready(
+        &mut self,
+        realization: BilinearRealization,
+        native: ResidentBilinearMap<'c>,
+        linear: bool,
+    ) -> Result<Value, NativeSessionError> {
         let next = self
             .next_operator
             .checked_add(1)
             .ok_or_else(|| invalid("operator addresses exhausted"))?;
-        let native = ResidentBilinearMap::mount(self.surface, &realization).map_err(invalid)?;
         let id = self.next_operator;
         let result = json!({"status": "constructed", "operator": id, "linear_unit_right_port": linear,
             "factors": factor_description(&realization), "execution": "resident exact rational packet"});
@@ -421,21 +508,6 @@ impl<'c> NativeMathematicalSession<'c> {
                 source,
                 retain_prediction,
             } => {
-                let mounted;
-                let section = match source {
-                    MathematicalInputWire::Values { values } => {
-                        mounted = self
-                            .surface
-                            .mount_exact_rational_packet(&vector(values)?)
-                            .map_err(invalid)?;
-                        &mounted
-                    }
-                    MathematicalInputWire::ProductOutput { product } => self
-                        .products
-                        .get(product)
-                        .ok_or_else(|| invalid("unknown or released product"))?
-                        .output(),
-                };
                 let owner = self
                     .relations
                     .get_mut(relation)
@@ -443,9 +515,16 @@ impl<'c> NativeMathematicalSession<'c> {
                 if *retain_prediction && owner.pending_id().is_some() {
                     return Err(invalid("this relation already retains an observation cut; observe or explicitly release it first (read-only predictions remain available)"));
                 }
-                let (prediction, reading) = owner.predict(
-                    ResidentConstitutiveCurrent::rational(section)?,
-                    *retain_prediction,
+                let (prediction, reading) = source.with_section(
+                    self.surface,
+                    &self.operators,
+                    &self.products,
+                    |section| {
+                        Ok(owner.predict(
+                            ResidentConstitutiveCurrent::rational(section)?,
+                            *retain_prediction,
+                        )?)
+                    },
                 )?;
                 Ok(
                     json!({"status":"relation-predicted", "relation":relation, "prediction":prediction, "reading":image_wire(reading),
@@ -594,51 +673,27 @@ impl<'c> NativeMathematicalSession<'c> {
                 right,
                 retain_product,
             } => {
-                let next = self
-                    .next_product
-                    .checked_add(1)
-                    .ok_or_else(|| invalid("product addresses exhausted"))?;
-                let op = self
-                    .operators
-                    .get(operator)
-                    .ok_or_else(|| invalid("unknown operator"))?;
-                let x = self
-                    .surface
-                    .mount_exact_rational_packet(&vector(left)?)
-                    .map_err(invalid)?;
-                let y = if op.linear {
-                    if right.is_some() {
-                        return Err(invalid("linear application supplies only left; right is the declared unit port"));
-                    }
-                    vec![BigRational::one()]
-                } else {
-                    vector(
-                        right
-                            .as_ref()
-                            .ok_or_else(|| invalid("bilinear application requires right input"))?,
-                    )?
+                let left = MathematicalInputWire::Values {
+                    values: left.clone(),
                 };
-                let y = self
-                    .surface
-                    .mount_exact_rational_packet(&y)
-                    .map_err(invalid)?;
-                let reads = self.surface.census().section_read_outs;
-                let result = op.native.apply(&x, &y).map_err(invalid)?;
-                let intermediate_reads = self.surface.census().section_read_outs - reads;
-                let output = self.read(result.output())?;
-                let product = if *retain_product {
-                    let id = self.next_product;
-                    self.products.insert(id, result);
-                    self.next_product = next;
-                    Some(id)
-                } else {
-                    None
-                };
-                Ok(
-                    json!({"status":"applied", "operator":operator, "output":output, "product":product,
-                    "intermediate_section_readouts":intermediate_reads, "source_products_recomputed":true}),
-                )
+                let right = right.as_ref().map(|values| MathematicalInputWire::Values {
+                    values: values.clone(),
+                });
+                self.apply_inputs(*operator, &left, right.as_ref(), *retain_product, true)
             }
+            MathematicalRequest::ApplyInputs {
+                operator,
+                left,
+                right,
+                retain_product,
+                emit_output,
+            } => self.apply_inputs(
+                *operator,
+                left,
+                right.as_ref(),
+                *retain_product,
+                *emit_output,
+            ),
             MathematicalRequest::BindReceiver {
                 operator,
                 coefficients,
@@ -654,7 +709,7 @@ impl<'c> NativeMathematicalSession<'c> {
                 )
                 .map_err(invalid)?;
                 match op.realization.core().bind(&target).map_err(invalid)? {
-                    Ok(realization) => self.publish(realization, op.linear),
+                    Ok(realization) => self.publish_rebinding(*operator, realization),
                     Err(obstruction) => Ok(separator(obstruction)),
                 }
             }
@@ -670,7 +725,41 @@ impl<'c> NativeMathematicalSession<'c> {
                     .realization
                     .then_receiver(&matrix(next)?)
                     .map_err(invalid)?;
-                self.publish(realization, op.linear)
+                self.publish_rebinding(*operator, realization)
+            }
+            MathematicalRequest::Compose {
+                operator,
+                following,
+                right,
+            } => {
+                let first = self
+                    .operators
+                    .get(operator)
+                    .ok_or_else(|| invalid("unknown first operator"))?;
+                let next = self
+                    .operators
+                    .get(following)
+                    .ok_or_else(|| invalid("unknown following operator"))?;
+                let fixed = if next.linear {
+                    if right.is_some() {
+                        return Err(invalid(
+                            "following linear action already has its declared unit right port",
+                        ));
+                    }
+                    vec![BigRational::one()]
+                } else {
+                    vector(right.as_ref().ok_or_else(|| {
+                        invalid("composition requires the following right port to be fixed")
+                    })?)?
+                };
+                let realization = first
+                    .realization
+                    .then_fixed_right(&next.realization, &fixed)
+                    .map_err(invalid)?;
+                let mut result = self.publish_rebinding(*operator, realization)?;
+                result["composition"] = json!({"first":operator,"following":following,
+                    "following_right":row_wire(&fixed),"scope":"the following fixed-right section is compiled into the first core receiver"});
+                Ok(result)
             }
             MathematicalRequest::ReadProduct { operator, product } => {
                 let op = self
@@ -709,6 +798,67 @@ impl<'c> NativeMathematicalSession<'c> {
             }
         }
     }
+    fn apply_inputs(
+        &mut self,
+        operator: u64,
+        left: &MathematicalInputWire,
+        right: Option<&MathematicalInputWire>,
+        retain_product: bool,
+        emit_output: bool,
+    ) -> Result<Value, NativeSessionError> {
+        if !emit_output && !retain_product {
+            return Err(invalid(
+                "an unread intermediate must be retained for its next consumer",
+            ));
+        }
+        let next = self
+            .next_product
+            .checked_add(u64::from(retain_product))
+            .ok_or_else(|| invalid("product addresses exhausted"))?;
+        let op = self
+            .operators
+            .get(&operator)
+            .ok_or_else(|| invalid("unknown operator"))?;
+        let unit = MathematicalInputWire::Values {
+            values: vec![RationalWire::integer(1)],
+        };
+        let right = if op.linear {
+            if right.is_some() {
+                return Err(invalid(
+                    "linear application supplies only left; right is the declared unit port",
+                ));
+            }
+            &unit
+        } else {
+            right.ok_or_else(|| invalid("bilinear application requires right input"))?
+        };
+        let reads = self.surface.census().section_read_outs;
+        let result = left.with_section(self.surface, &self.operators, &self.products, |x| {
+            right.with_section(self.surface, &self.operators, &self.products, |y| {
+                op.native.apply(x, y).map_err(invalid)
+            })
+        })?;
+        let intermediate_reads = self.surface.census().section_read_outs - reads;
+        let output = if emit_output {
+            Some(self.read(result.output())?)
+        } else {
+            None
+        };
+        let product = if retain_product {
+            let id = self.next_product;
+            self.products.insert(id, result);
+            self.next_product = next;
+            Some(id)
+        } else {
+            None
+        };
+        Ok(
+            json!({"status":"applied","operator":operator,"output":output,"product":product,
+            "intermediate_section_readouts":intermediate_reads,"source_products_recomputed":true,
+            "output_emitted":emit_output}),
+        )
+    }
+
     fn resume(&mut self, id: u64, max_candidates: usize) -> Result<Value, NativeSessionError> {
         if max_candidates == 0 {
             return Err(invalid("candidate allowance must be positive"));

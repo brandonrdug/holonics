@@ -11,6 +11,16 @@ targeted development and product checks on the repaired path proceed within the 
 ## Immediate implementation
 
 [established-bounded; implemented-exact; computational-witness] The
+[resident composition return](research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md#resident-composition-and-fixed-section-compilation)
+adds one input path for retained outputs and changed receivers, and compiles a following
+fixed-right section into the first product core. The verified complex composition uses three
+products instead of six and halves the complete launch count; rebinding shares resident A/B
+factors. The [canonical source consolidation](research/records/2026-09-12_CONTEXTUAL_RECEPTION_AND_NORMALIZATION_REUSE_THEIR_SHARED_NATIVE_OWNERS.md#canonical-source-consolidation-in-the-following-increment)
+unifies step/joint-source storage and reception's producing source. Seven exact-owner tests,
+88 recurrence/source/return controls, 40 native HNN tests, workspace examples and the targeted
+Lean identity passed. General dependent-programme compression and broader useful tasks remain open.
+
+[established-bounded; implemented-exact; computational-witness] The
 [source/predictive increment](research/records/2026-09-12_CONTEXTUAL_RECEPTION_AND_NORMALIZATION_REUSE_THEIR_SHARED_NATIVE_OWNERS.md)
 binds fresh applied-wave seeding and direct next-symbol reception (`aax -> a`, `bbx -> b`
 after declared development). Its producing-state probability receiver now reuses the existing

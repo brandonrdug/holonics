@@ -237,6 +237,22 @@ impl BilinearRealization {
             .bind(&target)?
             .map_err(|_| ExactLinearError::RankFactorizationCertificateFailure)
     }
+    /// Compile next(self(x,z), fixed_right) into this product core's receiver. Fixing the
+    /// following right port makes that action linear: D_next diag(B_next c) A_next.
+    /// The full resulting decoder family is re-derived by the existing receiver factorizer.
+    pub fn then_fixed_right(
+        &self,
+        next: &Self,
+        fixed_right: &[Rat],
+    ) -> Result<Self, ExactLinearError> {
+        let amplitudes = next.core.right_forms.apply(fixed_right)?;
+        let section = next
+            .receiver
+            .particular
+            .multiply(&ExactRatMatrix::from_diagonal(amplitudes)?)?
+            .multiply(&next.core.left_forms)?;
+        self.then_receiver(&section)
+    }
     pub fn tensor_residual(
         &self,
         target: &BilinearOperator,
@@ -414,6 +430,44 @@ mod tests {
                 .iter()
                 .all(Zero::is_zero)
         );
+    }
+
+    #[test]
+    fn fixed_right_sequence_compiles_into_the_same_product_core() {
+        let first = core().bind(&complex()).unwrap().unwrap();
+        let fixed = vec![q(2), q(-1)];
+        let compiled = first.then_fixed_right(&first, &fixed).unwrap();
+        assert!(Arc::ptr_eq(compiled.core(), first.core()));
+        let target = BilinearOperator::new(
+            2,
+            2,
+            complex()
+                .left_section(&fixed)
+                .unwrap()
+                .multiply(complex().coefficients())
+                .unwrap(),
+        )
+        .unwrap();
+        assert!(
+            compiled
+                .tensor_residual(&target)
+                .unwrap()
+                .entries()
+                .iter()
+                .all(Zero::is_zero)
+        );
+        for (x, y) in [
+            (vec![q(2), q(3)], vec![q(4), q(5)]),
+            (vec![q(1) / q(3), q(2)], vec![q(-1), q(2) / q(5)]),
+        ] {
+            assert_eq!(
+                compiled.apply(&x, &y).unwrap(),
+                first.apply(&first.apply(&x, &y).unwrap(), &fixed).unwrap()
+            );
+        }
+        let wide = first.core().bind(&polynomial()).unwrap().unwrap();
+        assert!(wide.then_fixed_right(&first, &fixed).is_err());
+        assert!(first.then_fixed_right(&first, &[q(1)]).is_err());
     }
 }
 

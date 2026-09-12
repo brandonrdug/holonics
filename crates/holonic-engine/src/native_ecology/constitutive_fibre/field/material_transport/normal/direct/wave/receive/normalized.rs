@@ -15,7 +15,7 @@ impl<'c> NormalWaveReception<'c> {
         NativeNormalizedMaterialReturn<'c, u64, NormalWaveTransport, &Self>,
         ConstitutiveFibreError,
     > {
-        let fibre = &self.predecessor_fibre;
+        let fibre = self.predecessor_fibre();
         let n = fibre.roots;
         if group_width == 0 || n % group_width != 0 || terms.0 == 0 || terms.0 == u32::MAX {
             return Err(ConstitutiveFibreError::Shape);
@@ -39,7 +39,7 @@ impl<'c> NormalWaveReception<'c> {
             let lane = passage.open(0, &[])?;
             s.record_normalized_sum_receiver(
                 &lane,
-                &self.source_joint,
+                self.source_joint().section,
                 2 * n,
                 &self.report,
                 layout.ball_at(ReportBall::ContemporarySource),

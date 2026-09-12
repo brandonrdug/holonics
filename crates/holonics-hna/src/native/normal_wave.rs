@@ -362,7 +362,7 @@ impl<'c> NativeWaveSession<'c> {
             Err(error)=>json!({"status":"receiver-refused", "error":error.to_string()}),
         });
         Ok(json!({"source_epoch":before, "epoch":self.wave.epoch(),
-            "observations":result.successor_fibre.material_observations,
+            "observations":result.successor_fibre().material_observations,
             "source_scope":"pre-return held joint current", "receiver":"actual next symbol",
             "observation_committed":true, "distribution":distribution}))
     }

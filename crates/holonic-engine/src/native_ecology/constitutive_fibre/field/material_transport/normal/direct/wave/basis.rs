@@ -201,7 +201,7 @@ impl<'c> NormalWaveStep<'c> {
         &self,
         chart: &NormalWaveBasisChart<'c>,
     ) -> Result<NormalWaveBasisFace<'c>, ConstitutiveFibreError> {
-        read_basis_face(self.current.snapshot(), self.fibre.snapshot(), chart)
+        read_basis_face(self.current().snapshot(), self.fibre().snapshot(), chart)
     }
 }
 impl<'c> ResidentNormalWave<'c> {

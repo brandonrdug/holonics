@@ -275,6 +275,18 @@ separator; `transport_values` retains mass under a linear current rechart.
 `examples/kernel_mode_compression.rs` is the exact mathematical application. This is the
 builder/reference boundary, with no new CUDA owner or native inference binding in this return.
 
+[definition] `BilinearRealization::then_fixed_right` now composes a fixed right-port section
+into the existing decoder, using `GeneratorFactorization.fixedRight_receiver_section`.
+`ResidentBilinearMap::rebind_receiver` shares its resident A/B coefficients for that receiver
+family. The mathematical session uses one input resolver for supplied packets, retained outputs
+and retained-product receivers; its `compose` request returns the reusable compiled action.
+
+[definition] `NormalWaveJointSource` in `normal/direct/wave/source.rs` is also the concrete
+step-source implementation; `NormalWaveStep` is a compatibility alias. Its current pair, fibre,
+joint section and actual metadata are shared immutably. `NormalWaveReception` retains that
+canonical source and exposes read-only source/current/fibre accessors. Source lifting, basis
+reading and normalized reception consume that same owner; rest serialization is unchanged.
+
 [definition] `KernelModeSummary::rebase` stages an invertible rational basis change of its
 current, encoder and decoder together, returning the new receiver owner. It retains the old
 frame on failure; its work count excludes inverse setup. The code-cost application's finite

@@ -304,6 +304,238 @@ fn mathematical_wire_keeps_exact_coefficients_and_refuses_extra_fields() {
 }
 
 #[test]
+#[ignore = "requires CUDA; composed operators consume retained interiors without intermediate host readout"]
+fn public_composition_uses_shared_resident_input_ports() {
+    with_mathematical_session(|session| {
+        let mut stream = HnaStream::new();
+        let built = send(session, &mut stream, construct());
+        assert_eq!(built["value"]["operator"], 0);
+        let reads = session.surface.census().section_read_outs;
+        let first = send(
+            session,
+            &mut stream,
+            MathematicalRequest::ApplyInputs {
+                operator: 0,
+                left: MathematicalInputWire::Values {
+                    values: row(&[2, 3]),
+                },
+                right: Some(MathematicalInputWire::Values {
+                    values: row(&[4, 5]),
+                }),
+                retain_product: true,
+                emit_output: false,
+            },
+        );
+        assert_eq!(first["event"], "mathematical-return", "{first}");
+        assert_eq!(first["value"]["product"], 0);
+        assert_eq!(first["value"]["output"], Value::Null);
+        assert_eq!(session.surface.census().section_read_outs, reads);
+        let composed = send(
+            session,
+            &mut stream,
+            MathematicalRequest::ApplyInputs {
+                operator: 0,
+                left: MathematicalInputWire::ProductOutput { product: 0 },
+                right: Some(MathematicalInputWire::Values {
+                    values: row(&[2, -1]),
+                }),
+                retain_product: false,
+                emit_output: true,
+            },
+        );
+        assert_eq!(composed["event"], "mathematical-return", "{composed}");
+        assert_eq!(output(&composed), vector(&row(&[8, 51]))?);
+        assert_eq!(session.surface.census().section_read_outs, reads + 1);
+        let changed = send(
+            session,
+            &mut stream,
+            MathematicalRequest::BindReceiver {
+                operator: 0,
+                coefficients: rows(&[&[1, 0, 0, 0], &[0, 1, 1, 0], &[0, 0, 0, 1]]),
+            },
+        );
+        assert_eq!(changed["value"]["operator"], 1);
+        let sum = send(
+            session,
+            &mut stream,
+            MathematicalRequest::ConstructLinear {
+                coefficients: rows(&[&[1, 1, 1]]),
+            },
+        );
+        assert_eq!(sum["value"]["operator"], 2);
+        let reprojected = send(
+            session,
+            &mut stream,
+            MathematicalRequest::ApplyInputs {
+                operator: 2,
+                left: MathematicalInputWire::ProductReceiver {
+                    product: 0,
+                    operator: 1,
+                },
+                right: None,
+                retain_product: false,
+                emit_output: true,
+            },
+        );
+        assert_eq!(reprojected["event"], "mathematical-return", "{reprojected}");
+        assert_eq!(output(&reprojected), vector(&row(&[45]))?);
+        assert_eq!(session.surface.census().section_read_outs, reads + 2);
+        assert_eq!(reprojected["value"]["intermediate_section_readouts"], 0);
+        let wrong_shape = send(
+            session,
+            &mut stream,
+            MathematicalRequest::ApplyInputs {
+                operator: 2,
+                left: MathematicalInputWire::ProductOutput { product: 0 },
+                right: None,
+                retain_product: true,
+                emit_output: false,
+            },
+        );
+        assert_eq!(wrong_shape["event"], "refused");
+        assert_eq!(session.products.len(), 1);
+        let wrong_core = send(
+            session,
+            &mut stream,
+            MathematicalRequest::ApplyInputs {
+                operator: 2,
+                left: MathematicalInputWire::ProductReceiver {
+                    product: 0,
+                    operator: 2,
+                },
+                right: None,
+                retain_product: true,
+                emit_output: false,
+            },
+        );
+        assert_eq!(wrong_core["event"], "refused");
+        assert_eq!(session.products.len(), 1);
+        send(
+            session,
+            &mut stream,
+            MathematicalRequest::ReleaseProduct { product: 0 },
+        );
+        assert!(session.products.is_empty());
+        Ok(())
+    })
+    .unwrap();
+}
+
+#[test]
+#[ignore = "requires CUDA; a repeated fixed section compiles into reusable factors and shares native coefficients"]
+fn public_fixed_section_compilation_reuses_the_resident_core() {
+    with_mathematical_session(|session| {
+        let mut stream = HnaStream::new();
+        send(session, &mut stream, construct());
+        let first = send(
+            session,
+            &mut stream,
+            MathematicalRequest::ApplyInputs {
+                operator: 0,
+                left: MathematicalInputWire::Values {
+                    values: row(&[2, 3]),
+                },
+                right: Some(MathematicalInputWire::Values {
+                    values: row(&[4, 5]),
+                }),
+                retain_product: true,
+                emit_output: false,
+            },
+        );
+        assert_eq!(first["value"]["product"], 0);
+        let serial = send(
+            session,
+            &mut stream,
+            MathematicalRequest::ApplyInputs {
+                operator: 0,
+                left: MathematicalInputWire::ProductOutput { product: 0 },
+                right: Some(MathematicalInputWire::Values {
+                    values: row(&[2, -1]),
+                }),
+                retain_product: false,
+                emit_output: true,
+            },
+        );
+        assert_eq!(output(&serial), vector(&row(&[8, 51]))?);
+        let difference = |value: &Value, key: &str| {
+            value["value"]["cost"]["census_after"][key]
+                .as_u64()
+                .unwrap()
+                - value["value"]["cost"]["census_before"][key]
+                    .as_u64()
+                    .unwrap()
+        };
+        let serial_launches =
+            difference(&first, "captured_launches") + difference(&serial, "captured_launches");
+        let serial_deeds =
+            difference(&first, "deed_launches") + difference(&serial, "deed_launches");
+        let before = session.surface.census();
+        let compiled = send(
+            session,
+            &mut stream,
+            MathematicalRequest::Compose {
+                operator: 0,
+                following: 0,
+                right: Some(row(&[2, -1])),
+            },
+        );
+        assert_eq!(compiled["event"], "mathematical-return", "{compiled}");
+        assert_eq!(compiled["value"]["operator"], 1);
+        assert_eq!(compiled["value"]["factors"]["products"], 3);
+        // Only the new 2x3 receiver and its denominator are uploaded. A/B packets are shared.
+        assert_eq!(
+            session.surface.census().ingress_octets - before.ingress_octets,
+            (2 * 3 + 1) * 2 * std::mem::size_of::<i64>() as u64
+        );
+        let read = send(
+            session,
+            &mut stream,
+            MathematicalRequest::ReadProduct {
+                operator: 1,
+                product: 0,
+            },
+        );
+        assert_eq!(output(&read), vector(&row(&[8, 51]))?);
+        assert_eq!(read["value"]["source_products_recomputed"], false);
+        let before = session.surface.census();
+        let fresh = send(
+            session,
+            &mut stream,
+            MathematicalRequest::Apply {
+                operator: 1,
+                left: row(&[2, 3]),
+                right: Some(row(&[4, 5])),
+                retain_product: false,
+            },
+        );
+        assert_eq!(output(&fresh), output(&serial));
+        assert_eq!(
+            2 * (session.surface.census().deed_launches - before.deed_launches),
+            serial_deeds
+        );
+        // Count the complete recorded passage, including its closure kernels, not only four
+        // numerical contractions/products. Compilation halves both complete counts here.
+        assert_eq!(
+            2 * (session.surface.census().captured_launches - before.captured_launches),
+            serial_launches
+        );
+        let new_input = send(
+            session,
+            &mut stream,
+            MathematicalRequest::Apply {
+                operator: 1,
+                left: row(&[3, 1]),
+                right: Some(row(&[1, 2])),
+                retain_product: false,
+            },
+        );
+        assert_eq!(output(&new_input), vector(&row(&[9, 13]))?);
+        Ok(())
+    })
+    .unwrap();
+}
+
+#[test]
 #[ignore = "requires CUDA; caller-controlled construction/application through public JSONL"]
 fn public_requests_construct_apply_change_receiver_and_reuse() {
     with_mathematical_session(|session| {

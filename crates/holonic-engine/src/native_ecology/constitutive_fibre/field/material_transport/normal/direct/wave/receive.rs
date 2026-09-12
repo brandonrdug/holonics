@@ -4,11 +4,9 @@ mod normalized;
 /// Both x=(c-p,c,p) and y=v-c come from the retained joint pair and actual received point.
 /// The numerical moment envelopes overapproximate that shared family, not independent causes.
 pub struct NormalWaveReception<'c> {
-    pub previous: NormalWaveCurrent<'c>,
-    pub current: NormalWaveCurrent<'c>,
-    pub predecessor_fibre: NormalWaveFibre<'c>,
-    pub successor_fibre: NormalWaveFibre<'c>,
-    source_joint: Rc<ResidentSection<'c>>,
+    source: NormalWaveJointSource<'c>,
+    current: NormalWaveCurrent<'c>,
+    successor_fibre: NormalWaveFibre<'c>,
     report: ResidentSection<'c>,
 }
 #[derive(Debug, Serialize)]
@@ -19,14 +17,23 @@ pub struct NormalWaveReceptionReading {
     pub comparison: NativeNormalMaterialReading,
 }
 impl<'c> NormalWaveReception<'c> {
+    pub fn source(&self) -> &NormalWaveJointSource<'c> {
+        &self.source
+    }
+    pub fn previous(&self) -> &NormalWaveCurrent<'c> {
+        self.source.current()
+    }
+    pub fn current(&self) -> &NormalWaveCurrent<'c> {
+        &self.current
+    }
+    pub fn predecessor_fibre(&self) -> &NormalWaveFibre<'c> {
+        self.source.fibre()
+    }
+    pub fn successor_fibre(&self) -> &NormalWaveFibre<'c> {
+        &self.successor_fibre
+    }
     pub fn source_joint(&self) -> ResidentNormalEnclosureView<'_, 'c> {
-        ResidentNormalEnclosureView {
-            surface: self.current.surface,
-            section: &self.source_joint,
-            offset: 0,
-            width: 2 * self.current.width,
-            grain: self.current.grain,
-        }
+        self.source.joint()
     }
     pub fn inspect(&self) -> Result<NormalWaveReceptionReading, ConstitutiveFibreError> {
         let fibre = &self.successor_fibre;
@@ -97,8 +104,7 @@ impl<'c> ResidentNormalWave<'c> {
                 returned.obstruction
             )));
         }
-        let predecessor_fibre = self.fibre();
-        let source_joint = Rc::clone(&self.joint);
+        let source = self.joint_source();
         let StagedWaveSeed {
             seed,
             seed_bound,
@@ -124,11 +130,9 @@ impl<'c> ResidentNormalWave<'c> {
         self.seed_kind = NormalWaveSeedKind::ReceivedCurrent;
         self.seed_epochs = [self.previous.at(), self.current.at()];
         Ok(NormalWaveReception {
-            previous: self.previous.snapshot(),
+            source,
             current: self.current.snapshot(),
-            predecessor_fibre,
             successor_fibre: self.fibre(),
-            source_joint,
             report,
         })
     }

@@ -146,3 +146,61 @@ compression. The current parameter-family result does not claim those wider prod
 helper; explicit session ownership/drop repaired it before the successful checks. Delegated
 host-preimage and normal-prior shortcuts were not integrated. Existing engine dead-code warnings
 remain unrelated. No raw conversation log, user file, source, evidence or cache was removed.
+
+## Resident composition and fixed-section compilation
+
+[definition] The subsequent increment starts at `2dbe4844`. The same `MathematicalInputWire`
+now supplies values, an original retained output, or an admitted receiver of a retained
+interior. One private `with_section` path serves both conditional prediction and operator
+application. `apply-inputs` can retain an intermediate without emitting it; `apply` retains
+its original wire behavior. No new input-owner or per-operation return class is introduced.
+
+[established-bounded; implemented-exact; computational-witness] The public path now conducts
+`(2+3i)(4+5i)(2-i)=8+51i` with no intermediate section readout. Reading the polynomial receiver
+of the first retained product and feeding it to a supplied sum operator returns `45`, again
+without an intermediate host read. Shape and foreign-core refusals preserve the retained input.
+These are callable compositions of supplied operators, not calculations implemented in the driver.
+
+[definition] The `compose` request retains a first operator and a following operator with a
+declared fixed right port `c`. For `F1(x,z)=D1((A1 x).*(B1 z))` and
+`F2(u,c)=D2((A2 u).*(B2 c))`, it forms
+`L_c=D2 diag(B2 c) A2` and composes `L_c D1` through the existing receiver factorizer.
+The resulting operator shares the first product core and retains its complete decoder family.
+The right port remains fixed in that constructed instance; an arbitrary varying third input
+has not been silently replaced by its previous value.
+
+[proved-derived; formal-checked] `GeneratorFactorization.fixedRight_receiver_section` proves
+the fixed-port section identity over arbitrary finite commutative-ring charts. Together with
+the existing bilinear factorization certificate and receiver composition, this yields
+`F2(F1(x,z),c)=(L_c D1)((A1 x).*(B1 z))` for the admitted source family. The executable owner is
+`BilinearRealization::then_fixed_right`; it invokes `then_receiver` so the complete coefficient
+family and tensor equality are re-derived, rather than installing an unchecked decoder.
+
+[established-bounded; implemented-exact; computational-witness] The complex-multiplication
+composition compiles two three-product operations into one three-product operation. Its new
+receiver reads the original retained product as `8+51i`, and a fresh input `(3+i)(1+2i)` returns
+`9+13i` after the same fixed following factor `2-i`. The compiled and uncompiled paths return
+the same result; graph launches reduce from two to one and the complete captured-launch count
+from sixteen to eight. Closure kernels are included in that count. This is not a global
+minimal tensor-rank claim or a compiler for the general dependent constitutive programme.
+
+[definition] `ResidentBilinearMap::rebind_receiver` shares the actual immutable resident A/B
+packets and mounts only the new receiver. `bind-receiver`, `compose-receiver` and `compose`
+use that same path. The checked 2x3 decoder adds only seven rational packet words across each
+of the two i64 lanes (112 ingress bytes); the source factors are not uploaded again. A host
+decoder for an unrelated core, including an unrelated resident-compiled core, returns its
+specific obstruction. The existing compiled-family map still uses its own admitted constructor.
+
+[established-bounded; process-audit] Verification returned:
+
+- Seven exact bilinear-owner tests passed, including the full tensor residual for the compiled
+  section, non-dyadic inputs and wrong-domain refusals.
+- The seven mathematical controls passed within the 40-test HNN native run (14.92 s).
+- The updated public JSONL example ran through the built workbench and returned `8+51i` from
+  retained material and `9+13i` on new input.
+- `cargo check --workspace --examples` passed after the public source-accessor consolidation.
+- `bash tools/lean_check.sh ElementaryHolonics.Mathematics.GeneratorFactorization` passed.
+
+[historical] The first launch-count assertion counted four numerical operations but omitted
+their four closure kernels. The control was corrected to compare both complete passages;
+the runtime compiler itself did not change to satisfy that accounting correction.

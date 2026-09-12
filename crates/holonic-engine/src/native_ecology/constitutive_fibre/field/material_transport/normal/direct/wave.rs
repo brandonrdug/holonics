@@ -171,36 +171,8 @@ pub struct NormalWaveReading {
     pub operator_word_error: Rat,
     pub joint_current: NativeFieldCurrentBall,
 }
-pub struct NormalWaveStep<'c> {
-    pub previous: NormalWaveCurrent<'c>,
-    pub current: NormalWaveCurrent<'c>,
-    pub fibre: NormalWaveFibre<'c>,
-    joint: Rc<ResidentSection<'c>>,
-    metadata: Rc<ResidentSection<'c>>,
-}
-impl NormalWaveStep<'_> {
-    pub fn inspect(&self) -> Result<NormalWaveReading, ConstitutiveFibreError> {
-        let surface = self.current.surface;
-        let meta = wides(&surface.read_out(&self.metadata)?)?;
-        let scale = BigInt::one() << self.current.grain.0;
-        let joint = ResidentNormalEnclosureView {
-            surface,
-            section: &self.joint,
-            offset: 0,
-            width: 2 * self.current.width,
-            grain: self.current.grain,
-        }
-        .inspect()?;
-        Ok(NormalWaveReading {
-            transport: self.fibre.transport,
-            steps: self.fibre.steps,
-            maximum_computed_power_norm: Rat::from_integer(meta[0].into()),
-            uniform_power_equation_defect: Rat::new(meta[1].into(), scale.clone()),
-            operator_word_error: Rat::new(meta[2].into(), scale),
-            joint_current: joint,
-        })
-    }
-}
+/// Compatibility name for the single immutable source receipt.
+pub type NormalWaveStep<'c> = NormalWaveJointSource<'c>;
 
 pub struct NormalWaveSeedRefusal<'c> {
     pub material: ResidentNormalMaterial<'c>,
@@ -494,13 +466,7 @@ impl<'c> ResidentNormalWave<'c> {
         self.steps = steps;
         self.epoch = epoch;
         self.joint = Rc::new(joint);
-        Ok(NormalWaveStep {
-            previous: self.previous.snapshot(),
-            current: self.current.snapshot(),
-            fibre: self.fibre(),
-            joint: Rc::clone(&self.joint),
-            metadata: Rc::clone(&self.metadata),
-        })
+        Ok(self.joint_source())
     }
 }
 

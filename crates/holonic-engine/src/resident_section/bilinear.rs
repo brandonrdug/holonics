@@ -72,14 +72,20 @@ impl<'c> MatrixPacket<'c> {
         columns: usize,
     ) -> Result<Self, ResidentRefusal> {
         if rows == 0 || columns == 0 {
-            return Err(refusal("resident coefficient packet requires nonempty dimensions"));
+            return Err(refusal(
+                "resident coefficient packet requires nonempty dimensions",
+            ));
         }
         let entries = rows
             .checked_mul(columns)
             .ok_or_else(|| refusal("resident coefficient dimensions overflow"))?;
         // A coefficient packet is one row of exact words followed by its common denominator.
         surface.validate_packet(&section, entries)?;
-        Ok(Self { section, rows, columns })
+        Ok(Self {
+            section,
+            rows,
+            columns,
+        })
     }
 }
 
@@ -102,8 +108,8 @@ impl CoreIdentity {
 pub struct ResidentBilinearMap<'c> {
     core: CoreIdentity,
     surface: &'c ResidentSurface<'c>,
-    left: MatrixPacket<'c>,
-    right: MatrixPacket<'c>,
+    left: Rc<MatrixPacket<'c>>,
+    right: Rc<MatrixPacket<'c>>,
     receiver: MatrixPacket<'c>,
 }
 pub struct ResidentBilinearReturn<'c> {
@@ -135,9 +141,41 @@ impl<'c> ResidentBilinearMap<'c> {
         Ok(Self {
             core: CoreIdentity::Host(std::sync::Arc::clone(realization.core())),
             surface,
-            left: MatrixPacket::mount(surface, realization.core().left_forms())?,
-            right: MatrixPacket::mount(surface, realization.core().right_forms())?,
+            left: Rc::new(MatrixPacket::mount(
+                surface,
+                realization.core().left_forms(),
+            )?),
+            right: Rc::new(MatrixPacket::mount(
+                surface,
+                realization.core().right_forms(),
+            )?),
             receiver: MatrixPacket::mount(surface, &realization.receiver().particular)?,
+        })
+    }
+
+    /// Rebind the receiver on this same admitted core, sharing its immutable resident A/B
+    /// coefficients. A matching shape or equal output does not supply this core relation.
+    pub fn rebind_receiver(
+        &self,
+        realization: &BilinearRealization,
+    ) -> Result<Self, ResidentRefusal> {
+        let CoreIdentity::Host(core) = &self.core else {
+            return Err(refusal(
+                "a host decoder cannot rebind an unrelated resident-compiled core",
+            ));
+        };
+        if !std::sync::Arc::ptr_eq(core, realization.core()) {
+            return Err(refusal(
+                "receiver realization does not retain this product core",
+            ));
+        }
+        let receiver = MatrixPacket::mount(self.surface, &realization.receiver().particular)?;
+        Ok(Self {
+            core: self.core.clone(),
+            surface: self.surface,
+            left: Rc::clone(&self.left),
+            right: Rc::clone(&self.right),
+            receiver,
         })
     }
 
@@ -158,15 +196,16 @@ impl<'c> ResidentBilinearMap<'c> {
     ) -> Result<Self, ResidentRefusal> {
         let left = MatrixPacket::from_resident(surface, left, left_rows, left_columns)?;
         let right = MatrixPacket::from_resident(surface, right, right_rows, right_columns)?;
-        let receiver = MatrixPacket::from_resident(surface, receiver, receiver_rows, receiver_columns)?;
+        let receiver =
+            MatrixPacket::from_resident(surface, receiver, receiver_rows, receiver_columns)?;
         if left.rows != right.rows || receiver.columns != left.rows {
             return Err(refusal("resident A/B/D coefficient charts do not meet"));
         }
         Ok(Self {
             core: CoreIdentity::Compiled(Rc::new(())),
             surface,
-            left,
-            right,
+            left: Rc::new(left),
+            right: Rc::new(right),
             receiver,
         })
     }

@@ -55,6 +55,30 @@ theorem bilinear_factorization
     _ = ∑ i, ∑ j, T o i j * x i * y j := by
           simp [hT, Finset.sum_mul]
 
+/-- Fixing a right port folds its amplitudes into a linear receiver section. This is
+the coefficient identity used when compiling a following bilinear action into an
+already-retained product core; it does not require replay of that following product. -/
+theorem fixedRight_receiver_section
+    (U : ρ → ι → R) (V : ρ → κ → R) (W : ω → ρ → R)
+    (c : κ → R) (x : ι → R) (o : ω) :
+    (∑ r, W o r * (∑ i, U r i * x i) * (∑ j, V r j * c j)) =
+      ∑ i, (∑ r, W o r * (∑ j, V r j * c j) * U r i) * x i := by
+  classical
+  calc
+    _ = ∑ r, ∑ i, (W o r * (∑ j, V r j * c j) * U r i) * x i := by
+      apply Finset.sum_congr rfl
+      intro r hr
+      calc
+        _ = (W o r * (∑ j, V r j * c j)) * (∑ i, U r i * x i) := by ring
+        _ = _ := by
+          rw [Finset.mul_sum]
+          apply Finset.sum_congr rfl
+          intro i hi
+          ring
+    _ = ∑ i, ∑ r, (W o r * (∑ j, V r j * c j) * U r i) * x i := by
+      rw [Finset.sum_comm]
+    _ = _ := by simp only [Finset.sum_mul]
+
 /-! ## Shared-parameter affine pullback
 
 The quadratic block below is a representation of one shared parameter `θ`.  In particular,
