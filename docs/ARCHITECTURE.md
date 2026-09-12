@@ -33,7 +33,7 @@ the broader doctrine; the remainder of this guide describes the current executab
 |---|---|---|
 | **Holonics** | The mathematical framework and ontology, with executable applications | [Holon](../formal/elementary-holonics/ElementaryHolonics/Foundation/Holon.lean), [mathematics](canon/THE_MATHEMATICS_TABLET.md), [public Rust entry point](../crates/holonics/src/lib.rs) |
 | **HNN** | The Holonic Neural Network architecture and recurrent runtime | [native phase session](../crates/holonics-hna/src/native.rs), [constitutive ecology](../crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs); earlier [full operator](../crates/holonic-engine/src/holonic_intelligence/full_operation.rs) |
-| **Athena** | The general wisdom/model ecology, its available constructions, changing morphology and admitted capability domain | [Athena lifecycle](ATHENA.md) |
+| **Athena** | Product/use label for general wisdom/model outputs of the shared native ecology; no internal machinery boundary | [Athena lifecycle](ATHENA.md) |
 | **Eros** | Union, composition and formative activity throughout the holonic organization, including nested constituents | [native relation formation](../crates/holonic-engine/src/native_ecology/constitutive_fibre.rs) and [circulation](../crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs); earlier [adjoint return](../crates/holonic-engine/src/holonic_intelligence/operative_return.rs) |
 | **Hephaestus Automata** | Operator-scoped mathematical applications and returned working constructions of Holonic Encoding/HNNs | [application design](HEPHAESTUS_AUTOMATA.md); existing [exact synthesis reference](../crates/holonic-engine/examples/generator_factorization.rs) |
 | **Soulkiller** | Independent model-intake, excitation and dismantling apparatus | [Soulkiller](SOULKILLER.md), [consumed-input boundary](../crates/holonic-engine/src/soulkiller/boundary.rs) |
@@ -68,8 +68,10 @@ flowchart LR
     P --> T[Declared external runtime]
 ```
 
-[definition] Eros names union and development within this recurrence; Athena carries the formed
-structure and current. The [expanded architecture diagrams](HNN_COMPOSITION.md#the-architecture-as-explicit-passages)
+[definition] Eros names union and development within this recurrence; the native ecology carries
+the formed structure and current. Athena and Hephaestus label its products and uses, not internal
+engines or encapsulation boundaries. The diagram's Athena nodes use that product shorthand.
+The [expanded architecture diagrams](HNN_COMPOSITION.md#the-architecture-as-explicit-passages)
 show the local passage, developmental return, classical block arithmetic and Soulkiller's
 commuting realization/restriction maps. Their full assembly is a construction account, with the
 implemented bindings and remaining contextual attachments stated separately.

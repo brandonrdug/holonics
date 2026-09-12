@@ -90,6 +90,22 @@ fn run(arguments: Vec<OsString>) -> i32 {
         };
     }
     if let holonics_workbench::WorkbenchCommand::Hna(
+        stream @ holonics_workbench::HnaCommand::MathematicalSession { .. },
+    ) = command
+    {
+        return match holonics_workbench::run_mathematical_session_stream(stream) {
+            Ok(receipt) => {
+                let failed = receipt.stream_error.is_some();
+                eprintln!("{}", serde_json::to_string(&receipt).expect("structured mathematical process receipt"));
+                i32::from(failed)
+            }
+            Err(error) => {
+                eprintln!("holonics hna mathematical-session: {error}");
+                1
+            }
+        };
+    }
+    if let holonics_workbench::WorkbenchCommand::Hna(
         stream @ holonics_workbench::HnaCommand::WaveSession { .. },
     ) = command
     {

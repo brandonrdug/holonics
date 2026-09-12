@@ -4,7 +4,7 @@ use crate::HnaCommand;
 use holonics::hna::{
     native::{
         with_native_session, NativeModelSpec, NativeSavedSession, NativeSessionAnatomy,
-        NativeSessionError, NativeWaveSavedSession, NativeCoupledWaveSavedSession,
+        with_mathematical_session, NativeSessionError, NativeWaveSavedSession, NativeCoupledWaveSavedSession,
     },
     HnaCultivationAperture, HnaModel, HnaSessionAnatomy, HnaSessionError, HnaStream,
     HnaStreamDisposition,
@@ -38,6 +38,56 @@ pub struct NativeHnaStreamProcessReceipt {
     pub checkpoint_octets: Option<u64>,
     pub checkpoint_error: Option<String>,
     pub persistent: bool,
+}
+
+#[derive(Debug, Serialize)]
+pub struct MathematicalHnaStreamProcessReceipt {
+    pub schema: &'static str,
+    pub disposition: Option<HnaStreamDisposition>,
+    pub stream_error: Option<String>,
+    pub transport_sequence: u64,
+    pub inspect: serde_json::Value,
+    /// Input opening, native setup, JSONL processing/egress and native teardown. Excludes the
+    /// CLI parser and writing this final receipt. Per-request timings are nested within this.
+    pub elapsed_microseconds: u128,
+}
+
+pub fn run_mathematical_session_stream(
+    command: HnaCommand,
+) -> Result<MathematicalHnaStreamProcessReceipt, NativeSessionError> {
+    let HnaCommand::MathematicalSession { input } = command else {
+        return Err(NativeSessionError::Application(
+            "expected a mathematical streaming session command".into(),
+        ));
+    };
+    let start = std::time::Instant::now();
+    let mut input: Box<dyn BufRead> = if input.as_os_str() == "-" {
+        Box::new(io::stdin().lock())
+    } else {
+        Box::new(BufReader::new(File::open(&input).map_err(|error| {
+            NativeSessionError::Application(format!("cannot read mathematical input {:?}: {error}", input))
+        })?))
+    };
+    let mut output = io::stdout().lock();
+    let mut receipt = with_mathematical_session(|session| {
+        let mut stream = HnaStream::new();
+        stream.open_new_connection();
+        let pump = stream.pump_mathematical(session, &mut input, &mut output);
+        let (disposition, stream_error) = match pump {
+            Ok(disposition) => (Some(disposition), None),
+            Err(error) => (None, Some(error.to_string())),
+        };
+        Ok(MathematicalHnaStreamProcessReceipt {
+            schema: "org.holonics.hna.mathematical-stream-process.v1",
+            disposition,
+            stream_error,
+            transport_sequence: stream.state().sequence,
+            inspect: session.inspect(),
+            elapsed_microseconds: 0,
+        })
+    })?;
+    receipt.elapsed_microseconds = start.elapsed().as_micros();
+    Ok(receipt)
 }
 
 #[derive(Debug, Serialize)]

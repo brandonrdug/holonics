@@ -1,8 +1,9 @@
 # Construction state
 
-**Currency:** September 12, 2026. **Current position:** the source-grounded HNN integration plan
-is ready; implementation starts with the callable mathematical workshop and the contextual
-source/law repair specified in the [roadmap](docs/plans/THE_ROADMAP.md#immediate-mathematical-application-and-implementation).
+**Currency:** September 12, 2026. **Current position:** the sustained product goal is active;
+the caller-controlled native mathematical workshop has returned at its finite operator and
+condition-family scope. Next is contextual predictive formation and economical continuation
+specified in the [roadmap](docs/plans/THE_ROADMAP.md#immediate-mathematical-application-and-implementation).
 **Product objective:** Hephaestus constructions and useful Athena outputs through the same HNN
 owners. Broad corpus cultivation remains paused at the identified source/contact limitation;
 targeted development and product checks on the repaired path proceed within the plan.
@@ -13,14 +14,20 @@ targeted development and product checks on the repaired path proceed within the 
 and [native blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-implementation-packets)
 identify five product packets: callable mathematical workshop, contextual generator formation,
 compiled modal continuation, Athena task use, and broader generative reach. The roadmap alone
-orders them. This turn changes the plan and current documentation, not the runtime.
+orders them. Athena and Hephaestus are output/use labels, not internal machinery boundaries.
+The [first implementation return](research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md)
+exposes supplied exact constructions through the existing HNN JSONL stream and binds native
+parameter-family refinement. The overall goal remains incomplete; this milestone does not
+substitute for useful contextual language/code or the other shared construction obligations.
 
-[open] **First packet:** caller-supplied linear/bilinear construction through the public HNN
-session, resident application, another receiver/composition, a compatible parameter family,
-and an actual observed constraint used by a subsequent mathematical request. Reuse the
-existing exact/resident and dependent-return owners; no example editing should be required
-to supply a new problem. The native source/condition binding is part of the packet, not a
-later optional integration.
+[established-bounded; implemented-exact; computational-witness] **First packet:** the public
+mathematical session constructs supplied linear/bilinear actions, applies new inputs, reuses
+resident products under changed receivers, and refines a calibrated native condition family.
+The source `F(x,h)=x0*h0+x1*h1` inferred `(h0,h1)=(2+3i,5-i)` and returned `5+11i` at new input
+`(2,i)`. A retained rectangular operator output enters that same relation without source
+remounting. Five focused tests, the actual CLI process test and seven transport regressions
+passed. Mathematical session rest/resume and multiple simultaneous condition-observation cuts
+remain explicit interface extensions; no durable product claim is made for this new session.
 
 [open] **Athena critical path:** replace production use of the fixed-h calibration with actual
 pre-return context/source association and a composed predictive receiver. Separate compatible
@@ -41,7 +48,7 @@ available and are not scheduled for rediscovery:
 | Construction | Current scope and owner |
 |---|---|
 | Exact mathematical synthesis | Linear preimages/contextual factors, bilinear support/core families, recurrence/jet examples; public engine owners. |
-| Resident mathematical execution | Resident exact bilinear map, retained product and changed receiver. The complete operator cycle is still example-only. |
+| Resident mathematical execution | Resident exact bilinear map, retained product and changed receiver; now callable through the public mathematical session. |
 | Native conditional return | Base and Programme predictions, repeated/out-of-order incorporation, source-dependent material/condition/current successor and compatible rest through `ResidentCoupledConstitutive` and `NativeCoupledBody`. |
 | Text boundary | Exterior unit-symbol codec, native generator advance, selected basis receiver and re-entry through `NativeCoupledWaveSession`. Static decoding is present; useful learned contextual text is the open product. |
 | Context and formation | Native neighborhood/condition preimage/contact, contextual sections, normal statistics and normalized/adjoint readers; the richer source/predictive composition remains to be bound. |
@@ -51,8 +58,9 @@ available and are not scheduled for rediscovery:
 [complete native return](research/records/2026-09-12_OLD_AND_NEW_PENDING_SOURCES_RETURN_THROUGH_ONE_GENERATOR.md)
 owns the returned source-frame/condition/material transaction. The
 [resident operator return](research/records/2026-09-11_REUSABLE_GENERATORS_REACH_RESIDENT_RECEIVERS.md)
-owns the pure factor application. Their specific composition into a reusable operator-scoped
-HNN application is the first packet; the generic return-cycle mechanism itself is complete.
+owns the pure factor application. The first workshop composes that application with native
+condition-family inference through the existing joint-image owner. Generic dependent source
+returns remain available; they were not reimplemented to obtain this product.
 
 [established-bounded; computational-witness] The
 [fixed-condition audit](research/records/2026-09-11_FIXED_CONDITION_COLLAPSE_IS_EXACT_AND_ITS_PROJECTION_IS_REUSABLE.md)
@@ -93,10 +101,11 @@ BSD has no independent priority in this plan.
 
 ## Verification and preserved boundaries
 
-[established-bounded; process-audit] The preceding mass/Maxwell return passed 40 focused
-exact-linear tests and Framework.Physics. The predictive-release and periplus records retain
-their completed native/reference/formal scopes. This planning turn inspected source and
-checked document changes; unchanged Cargo/native/Lean evidence was not rerun.
+[established-bounded; process-audit] The workshop passed five focused HNN tests (including four
+CUDA controls), seven stream regressions, one actual workbench subprocess test and one parser
+test. Its committed JSONL example returned exact operator/receiver results. Existing formal
+factorization and joined-preimage laws were inspected and reused; proof sources were unchanged.
+The preceding mass/Maxwell, predictive-release and periplus records retain their checked scopes.
 
 [definition] Inherited-model production, standard executable export and broad backend ports
 remain downstream. Existing HNA/SKE material and NCF/HNP foundations remain available at their

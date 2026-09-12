@@ -47,6 +47,9 @@ pub enum HnaCommand {
         input: PathBuf,
         checkpoint: PathBuf,
     },
+    MathematicalSession {
+        input: PathBuf,
+    },
     WaveSession {
         source: PathBuf,
         resume: bool,

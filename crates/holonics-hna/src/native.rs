@@ -11,6 +11,8 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 pub mod section_input;
+pub mod mathematical;
+pub use mathematical::{with_mathematical_session, MathematicalRequest, NativeMathematicalSession};
 mod normal_wave;
 mod coupled_wave;
 pub use coupled_wave::{NativeCoupledBody,NativeCoupledWaveSession,NativeCoupledWaveSavedSession,NativeCoupledWaveAttachRefusal};

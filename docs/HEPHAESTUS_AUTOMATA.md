@@ -6,6 +6,10 @@ mathematics and solver applications the immediate product focus. An operator con
 device to a requested use; that confinement does not define a separate underlying intelligence.
 “Holonic Solver” remains the descriptive umbrella for this constructive activity.
 
+[project-postulate] Brandon's latest September 12 clarification makes Athena and Hephaestus
+product/output labels. Neither name encapsulates machinery. Source/receiver relations and
+actual native owners organize their shared construction, not a split between named products.
+
 [project-postulate] Hephaestus solving is mathematical learning and reasoning: infer a
 coefficient family, factorization, recurrence or generator/encoding from the supplied constraints.
 The constructed object can itself compute an entire family of consequences. A supplied search
@@ -21,7 +25,7 @@ compression/intelligence/navigation programme.
 | Holonics | The framework of situated differences, composition, transport and physical realization |
 | HNN | The executable architecture conducting and forming those relations |
 | Eros | Union, composition and formative activity throughout the organization, including nested constituents |
-| Athena | The general wisdom/model ecology: available constructions, contextual applicability and continuing conduct |
+| Athena | General wisdom/model product and use label over shared native constructions and contextual conduct |
 | Hephaestus Automata | Operator-scoped applications and returned working constructions for particular mathematical tasks |
 | Soulkiller | Independent intake and dismantling of inherited realizations into usable material and witnesses |
 
@@ -37,9 +41,11 @@ now has shared engine owners for bilinear construction, receiver factorization a
 preimages. A pure resident consumer executes the returned exact rational factors and applies a
 changed receiver to the same GPU product without intermediate host readout. The earlier fixed
 factorization example now calls those reusable owners. This is productive mathematical/native
-application. Generic dependent Base/Programme material incorporation is also implemented;
-the new boundary is its specific binding to a caller-controlled mathematical instance and
-the returned factor/condition family. It is not another missing generic return-cycle mechanism.
+application. Generic dependent Base/Programme material incorporation is also implemented.
+The [caller-controlled workshop](../research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md)
+now exposes exact constructions, resident application/receiver reuse and calibrated native
+condition-family refinement through the public HNN stream. Its live session has explicit
+source/receiver maps; broader contextual empirical prediction and session rest remain open.
 
 ## Direct contribution to Athena and Eros
 

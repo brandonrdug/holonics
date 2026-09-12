@@ -259,7 +259,13 @@ an admitted realization and retains its exact rational product/current sections;
 receiver reads that product directly. `kernels/exact_packet_linear.cuh` supplies the two checked
 packet primitives, included by `exact_resident_section.cu`. The
 [application return](../research/records/2026-09-11_REUSABLE_GENERATORS_REACH_RESIDENT_RECEIVERS.md)
-records native scope and the still-open varying-family Eros incorporation relation.
+records its original native scope. The subsequent
+[caller-controlled workshop](../research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md)
+binds those owners in `holonics-hna/src/native/mathematical.rs` and the existing `stream.rs`.
+Its `mathematical/relation.rs` uses native condition preimage/image/reception for an actual
+parameter family; retained operator outputs enter that relation without a host source remount.
+`holonics-workbench/src/session_stream.rs` supplies the process interface. It adds no new engine
+or CUDA law; the local calibrated-family scope and open general contextual binding remain explicit.
 
 [definition] `exact_linear/kernel_modes.rs` owns `KernelModeReduction`, `KernelModeSummary`,
 `KernelModeAction` and `KernelModeError`. Existing rank factorization derives K=DE;

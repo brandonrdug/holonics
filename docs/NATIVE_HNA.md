@@ -7,6 +7,32 @@ remain exterior charts; the retired byte-cultivation driver is not the native le
 
 ## Learned local law
 
+[established-bounded; implemented-exact] The [caller-controlled mathematical session](../research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md)
+now exposes the shared exact/resident owners through `holonics::hna::native::mathematical`
+and the existing JSONL stream. Run a supplied request file with:
+
+```sh
+holonics hna mathematical-session --input applications/holonics-workbench/examples/native/mathematical-requests.jsonl
+```
+
+[definition] Use `org.holonics.hna.stream-request.v1` with command action
+`mathematical-request`; the `request.operation` selects `construct-linear`,
+`construct-bilinear`, `resume-construction`, `apply`, `bind-receiver`, `compose-receiver`,
+`read-product`, `construct-relation`, `predict-relation`, `observe-relation`,
+`inspect-condition` or the explicit release operations. The public Rust enum
+`MathematicalRequest` owns the exact payload. Rational fields use the existing
+`{"numerator":"1","denominator":"3"}` codec, never JSON floating-point coefficients.
+Construction returns factors and their receiver family, or a scoped search/receiver obstruction.
+Native condition inference returns joint families and coverage, not a chosen coefficient centre.
+`PredictRelation` can consume a retained product output directly through its actual port width.
+
+[definition] `--input -` accepts an ongoing caller stream. Operators and explicitly retained
+products remain reusable during that session; no example source editing is needed for a new
+problem. Search allowances preserve their frontier. Products are transient unless retained and
+can be explicitly released. This new application session has no rest/resume binding yet;
+checkpoint requests refuse without claiming a durable artifact. One condition-observation cut
+may be retained per relation; read-only predictions remain available, including plural ones.
+
 [definition] `ResidentConstitutiveFibre` retains a rational relation between declared source and
 receiver currents. `found_bilinear_contact` includes actual source, condition and mixed complex
 products in that relation. `advance_resident` / `advance_bilinear_contact` accept resident current

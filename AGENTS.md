@@ -15,10 +15,13 @@ catalogue of minor decisions or ask him to repeat a settled ruling.
 framework for situated objects, causal composition, information transport and physical realization.
 Its mathematical research develops reusable methods of construction and explanation across mathematical, physical,
 biological and computational systems. HNN is its Holonic Neural Network architecture; Athena
-is the general wisdom/model ecology; Eros names union, composition and formative activity at
+labels its general wisdom/model products and uses; Eros names union, composition and formative activity at
 every nested holonic scope; Soulkiller independently dismantles inherited realizations.
 Hephaestus Automata are operator-scoped mathematical application instances/products of HNNs
 and Holonic Encoding; “Holonic Solver” describes that constructive activity, not another engine.
+Athena and Hephaestus are product/output labels, not internal machinery boundaries. Actual
+relations, source/receiver maps and ownership determine composition; neither name encapsulates
+an engine, fixes native topology or separates solving from other intelligence.
 See [the application design](docs/HEPHAESTUS_AUTOMATA.md). HNN's product goal is frontier-level
 usefulness on consumer hardware. The “20W ideology” directs efficient local formation and reuse,
 not a literal current-machine power claim. Read

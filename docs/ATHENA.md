@@ -1,7 +1,9 @@
 # Athena and the HNN training/inference interface
 
-[definition] Athena is one continuing native ecology: its constitutive morphology, current,
-incidence, chronology, lineage and admitted receiver domain. Eros is the union/composition and
+[definition] Athena labels general wisdom/model products and uses of HNN. It does not encapsulate
+native machinery or establish an internal boundary from Hephaestus mathematical products. A
+continuing native ecology owns its constitutive morphology, current, incidence, chronology,
+lineage and admitted receiver domain. Eros is the union/composition and
 developmental phase that forms and refines its reusable material within HNN recurrence. The
 [expanded architecture](HNN_COMPOSITION.md#the-architecture-as-explicit-passages) shows these roles
 and their actual maps. The current public Rust entry point is `holonics::hna`;

@@ -24,6 +24,7 @@ pub struct HnaStreamRequest {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "action", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum HnaStreamCommand {
+    MathematicalRequest { request: crate::native::MathematicalRequest },
     ActuateText { text:String },
     ProjectSymbol { #[serde(default)] full_emission:bool },
     EmitSymbol { #[serde(default)] full_emission:bool, #[serde(default)] retain_comparison:bool },
@@ -173,6 +174,11 @@ impl HnaStream {
 
     pub fn pump_coupled_wave(&mut self,session:&mut crate::native::NativeCoupledWaveSession<'_>,input:&mut impl BufRead,output:&mut impl Write)->Result<HnaStreamDisposition,HnaStreamError>{self.pump_target(session,input,output)}
 
+    pub fn pump_mathematical(&mut self, session: &mut crate::native::NativeMathematicalSession<'_>,
+        input: &mut impl BufRead, output: &mut impl Write) -> Result<HnaStreamDisposition, HnaStreamError> {
+        self.pump_target(session, input, output)
+    }
+
     fn emit(&mut self, event: &str, value: Value) -> Result<(), HnaStreamError> {
         let mut bytes = serde_json::to_vec(&json!({"schema":HNA_STREAM_EVENT_SCHEMA,
             "sequence":self.state.sequence,"event":event,"value":value}))?;
@@ -268,6 +274,10 @@ impl HnaStream {
             self.state.input.clear();
             self.state.input_complete = false;
             match request.command {
+                HnaStreamCommand::MathematicalRequest { request } => match target.mathematical_request(&request) {
+                    Ok(value) => self.emit("mathematical-return", value)?,
+                    Err(error) => self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?,
+                },
                 HnaStreamCommand::CompareSymbol{source,text,coefficient_row}=>match target.compare_symbol(source,&text,coefficient_row){
                     Ok(value)=>self.emit("symbol-comparison",value)?,
                     Err(error)=>self.emit("refused",json!({"error":error,"anatomy":target.inspect()}))?,
@@ -386,6 +396,9 @@ impl Default for HnaStream {
 /// Only an exterior effect seam for I/O tests. Native current and learning are never callbacks
 /// supplied through the public stream protocol; actual adapters use HnaSession or NativeSession.
 trait StreamTarget {
+    fn mathematical_request(&mut self, _: &crate::native::MathematicalRequest) -> Result<Value, String> {
+        Err("mathematical construction is not attached to this session".into())
+    }
     fn compare_symbol(&mut self,_:u64,_:&str,_:Option<usize>)->Result<Value,String>{Err("joint producing-family comparison unsupported by this model".into())}
     fn release_symbol_comparison(&mut self,_:u64)->Result<Value,String>{Err("coupled comparison release unsupported by this model".into())}
     fn receive_next_symbol(&mut self,_:&str)->Result<Value,String>{Err("actual next-symbol receiver unsupported by this model".into())}
@@ -811,6 +824,25 @@ impl StreamTarget for crate::native::NativeWaveSession<'_> {
     fn inspect(&self)->Value{crate::native::NativeWaveSession::inspect(self)}
     fn checkpoint(&self,path:&Path,transport:&HnaStreamState)->Result<(),String>{self.checkpoint_stream(path,transport).map(|_|()).map_err(|e|e.to_string())}
     fn supply_input_material(&mut self,_:&Path)->Result<(),String>{Err("a file path is not a native wave source conversion".into())}
+}
+
+impl StreamTarget for crate::native::NativeMathematicalSession<'_> {
+    fn mathematical_request(&mut self, request: &crate::native::MathematicalRequest) -> Result<Value, String> {
+        self.request(request).map_err(|error| error.to_string())
+    }
+    fn advance(&mut self, _: &HnaOccurrence, _: bool) -> Result<Value, String> {
+        Err("use the mathematical request's declared input ports".into())
+    }
+    fn advance_native(&mut self, _: &HnaOccurrence, _: bool) -> Result<Value, String> {
+        Err("use the mathematical request's declared input ports".into())
+    }
+    fn inspect(&self) -> Value { crate::native::NativeMathematicalSession::inspect(self) }
+    fn checkpoint(&self, _: &Path, _: &HnaStreamState) -> Result<(), String> {
+        Err("mathematical session serialization is not attached; the live session remains owned".into())
+    }
+    fn supply_input_material(&mut self, _: &Path) -> Result<(), String> {
+        Err("supply an explicit mathematical construction or input chart".into())
+    }
 }
 
 impl StreamTarget for crate::native::NativeCoupledWaveSession<'_>{

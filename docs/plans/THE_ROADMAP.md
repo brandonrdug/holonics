@@ -28,9 +28,10 @@ continuation as their actual dependencies permit. Work may move among all four i
 
 [project-postulate] Build a continuing ecology that can recover applicable generating relations,
 compose them into useful actions, represent their relevant futures economically, and change its
-available conduct through actual returned differences. Athena is that ecology; Eros is its
-formative union and incorporation, including inside constituents; Hephaestus Automata are its
-operator-scoped working applications. HNN is their common executable architecture. Mathematics,
+available conduct through actual returned differences. Athena labels the general wisdom/model
+products of that ecology; Eros names formative union and incorporation, including inside
+constituents; Hephaestus Automata label operator-scoped working applications. These output/use
+labels do not encapsulate machinery. HNN is their common executable architecture. Mathematics,
 text, code, vision, acoustics and physical/biological sources supply different conditions and
 receivers to this construction.
 
@@ -93,8 +94,9 @@ and the useful resident Hephaestus cycle is still example-only. These are distin
 Neither another incorporation campaign nor replacing the alphabet decoder addresses them.
 
 [definition] The following implementation packets deliver the six shared responsibilities
-above. The first packet is the next executable task. Contextual-source design in the second
-can proceed alongside its independent application binding; compact execution is integrated
+above. The [first packet has returned](../../research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md)
+for caller-controlled exact operators and native calibrated condition families. The next
+executable task is contextual predictive formation; compact execution is integrated
 as soon as an actual repeated segment is available, before broad cultivation is expanded.
 
 | Packet, in dependency order | Concrete construction | Delivered product |
@@ -104,6 +106,14 @@ as soon as an actual repeated segment is available, before broad cultivation is 
 | **Compiled modal continuation** | Compile repeated admitted actions and closed formation statistics into current/factor/recurrence representations. Preserve required live pending cuts and unresolved constraints through maps; measure and reduce whole-prefix reevaluation. Derive modal basis/receiver transport rather than retaining a new past-state representation. | Repeated use conducts on current material at a cost determined by active modes and required live dependencies, with the same requested outputs and explicit savings over programme reevaluation. |
 | **Athena task use** | Develop on actual source parts and relations through the repaired coupled session, inspect short held-out task episodes, and correct source/condition, predictive objective, generator or emission defects at the responsible owner. Mathematics remains callable throughout. | Useful contextual replies, code and mathematical application on new inputs; the continuing model survives ordinary interruption and reuse. |
 | **Broader generative reach** | Extend the same request and compiler to indexed π/e/Gamma blocks, nonlinear/factored and boundary/physical actions, then shared text/acoustic and other modal sources as their consumers require. Measure end-to-end usefulness and consumer-hardware cost. | One ecology supports progressively broader constructions and outputs, with actual analytic tails, source domains and executable target maps. |
+
+[established-bounded; implemented-exact] The first packet's public `MathematicalRequest` now
+binds construction, GPU application/receiver reuse and native condition preimage/image/reception.
+Its live-session scope, explicit release operations, search frontier and exact family outputs
+are available dependencies. Add rest/resume or multi-pending joins when their concrete consumer
+requires them; do not repeat this first product as another verification campaign. The calibrated
+parameter result does not establish empirical contextual text prediction or compact the general
+coupled-wave operation word.
 
 [definition] The [blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-implementation-packets)
 names the files, precise design decisions and checks for these packets. The caller-facing

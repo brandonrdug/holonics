@@ -105,6 +105,12 @@ pub enum HnaCli {
         #[arg(long)]
         checkpoint: PathBuf,
     },
+    /// Stream mathematical requests through a caller-constructed native HNN session.
+    MathematicalSession {
+        /// JSONL input path, or `-` for standard input.
+        #[arg(long, default_value = "-")]
+        input: PathBuf,
+    },
     /// Stream JSONL wave emissions through a completed packet-1 model or saved wave session.
     WaveSession {
         /// Completed packet-1 directory, or a saved wave session when resuming.
@@ -193,6 +199,7 @@ impl From<HnaCli> for HnaCommand {
                 input,
                 checkpoint,
             },
+            HnaCli::MathematicalSession { input } => Self::MathematicalSession { input },
             HnaCli::WaveSession {
                 source,
                 resume,
@@ -892,6 +899,13 @@ mod tests {
                 && checkpoint == &Some(PathBuf::from("next.hna"))
         ));
         assert!(parse_cli(["holonics", "hna", "wave-control", "saved.hna", "--resume"]).is_err());
+    }
+
+    #[test]
+    fn mathematical_session_parses_jsonl_input_without_checkpointing() {
+        let invocation = parse_cli(["holonics", "hna", "mathematical-session", "--input", "requests.jsonl"]).unwrap();
+        assert!(matches!(invocation.command, Some(WorkbenchCommand::Hna(HnaCommand::MathematicalSession { ref input })) if input == &PathBuf::from("requests.jsonl")));
+        assert!(parse_cli(["holonics", "hna", "mathematical-session", "--checkpoint", "saved"]).is_err());
     }
 
     #[test]

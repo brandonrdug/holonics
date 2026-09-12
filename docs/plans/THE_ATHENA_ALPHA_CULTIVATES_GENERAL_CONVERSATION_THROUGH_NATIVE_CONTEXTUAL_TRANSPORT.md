@@ -103,6 +103,16 @@ Correctness of a local relation is used in a product rather than repeatedly re-d
 
 ### Callable mathematical workshop: the first delivered increment
 
+[established-bounded; implemented-exact; computational-witness] The
+[caller-controlled return](../../research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md)
+implements this packet through `native/mathematical.rs`, its native condition-family adapter,
+the HNN stream and workbench process. Supplied exact operators, retained GPU products, changed
+receivers and partly constrained native parameters are callable. Existing condition-image
+reception supplies the actual consuming refinement; generic coupled-wave returns remain their
+separate available dependency. The following paragraphs retain the contract of that returned
+scope. Contextual empirical prediction and general continuation compression are next; new
+session rest/resume and multi-pending condition joins retain their explicit open interface scope.
+
 [definition] Extend the existing public HNN application/session boundary with a mathematical
 request payload. The payload has four operations: construct an admitted operator, apply a
 retained construction, read a new receiver of a retained product, and incorporate an actual
