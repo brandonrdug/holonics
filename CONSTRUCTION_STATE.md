@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** September 11, 2026. **Current work:** the HNN stream publishes and uses its returned generator; repeated dependent material incorporation remains active.
+**Currency:** September 12, 2026. **Current work:** repeated programme returns now form and persist their source-dependent generator; composition of pending pre-programme source frames remains active.
 **Athena objective:** standing; useful Athena-alpha has not been attained. **Broad native cultivation:** paused while the consuming family/source binding is repaired;
 authorized native implementation continues within the shared programme. The active phases now have names;
 AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -70,10 +70,21 @@ emits `a`. Fresh-process continuation agrees, and legacy affine sessions still l
 coupled checks, strengthened coordinate control, seven session and seven stream controls pass;
 the coordinate-kernel formal build passes.
 
-[open] The integrated goal remains active. Additional material returns after entering the
-dependent representation are explicitly unsupported. Extend the existing programme with the
-later producing source's parameters and joining history; retain original frames and contemporary
-material. Later predictions already persist and can be inspected.
+[established-bounded; implemented-exact; computational-witness] The
+[repeated-return construction](research/records/2026-09-12_REPEATED_RETURNS_PRESERVE_ORIGINAL_SOURCE_FRAMES.md)
+now consumes later programme predictions, including out-of-order returns, through their original
+anchored source faces. Later source parameters remain executable: the same observation yields
+conditions `3/2+4i` and `3/2+2i` under two admitted source sections. The two-return HNN stream
+changes `a` to `b`, then back to `a` under matched sources and survives a fresh process. All 36
+coupled and seven session controls pass, together with the signed-face and distinct-section
+controls. The v1/v2 dependent-frame checks also pass.
+
+[open] The integrated goal remains active. Pending predictions already present in the affine
+substrate when the first generator was published still need their base-word source frames joined
+into the repeated programme. They remain inspectable and persistent, and the session now reports
+that precise boundary. The verified repeated-return construction and its evidence are retained
+in the linked record; continue the original-base source-frame composition. The declared section receiver is not asserted equal to the former
+whole-family projection; useful Athena-alpha remains unestablished.
 
 [established-bounded; implemented-exact; formal-checked] The
 [later-source join](research/records/2026-09-11_LATER_SOURCE_CONSTRAINTS_KEEP_THE_JOINED_CONTINUATION.md)

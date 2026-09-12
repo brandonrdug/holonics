@@ -89,6 +89,28 @@ impl<'chart> PreparedConditionContact<'chart> {
     pub fn successor(&self) -> ResidentConstitutiveCurrent<'_, 'chart> {
         self.returned.successor()
     }
+    /// Continue a conditional contact along its actual returned current. This stages another
+    /// contact; it neither publishes the first one nor constructs another ecology owner.
+    pub(crate) fn prepare_following(
+        &self, family: &ResidentConditionPreimage<'chart>,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        let old=&self.returned;
+        let f=&family.inner.returned;
+        if family.source_chart()!=old.family.source_chart() || f.target_width!=old.width
+            || !std::ptr::eq(f.surface,old.family.inner.returned.surface) {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let contact=old.contact.checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
+        let section=Rc::new(affine_contact_section(f.surface,self.successor(),f)?);
+        Ok(Self {
+            predecessor:Rc::clone(&old.section),
+            returned:ResidentConditionContact {
+                section,family:ResidentConditionPreimage {inner:Rc::clone(&family.inner)},
+                metric:old.metric,contact,width:old.width,
+            },
+        })
+    }
+
     pub fn family(&self) -> &ResidentConditionPreimage<'chart> {
         self.returned.family()
     }

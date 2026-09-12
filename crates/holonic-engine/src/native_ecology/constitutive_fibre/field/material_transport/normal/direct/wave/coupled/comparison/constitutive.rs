@@ -23,9 +23,20 @@ pub struct CoupledConstitutiveAlternative<'p, 'j, 'c> {
     difference: ResidentSection<'c>,
     anchor: ResidentSection<'c>,
     consequence: ResidentNeighborhoodAlternative<'c>,
+    material_member: usize,
+    earlier_material: BTreeMap<usize,ResidentConstitutiveFibre<'c>>,
+    path: Vec<(u64,usize,Rc<ResidentWaveRelation<'c>>,Rc<NormalWaveFamily<'c>>)>,
+    returns: Vec<ConstitutiveReturnOperands<'c>>,
     relation: Rc<ResidentWaveRelation<'c>>,
     current: Rc<NormalWaveFamily<'c>>,
     successor: Rc<NormalWaveFamily<'c>>,
+}
+
+pub(in super::super) struct ConstitutiveReturnOperands<'c> {
+    comparison: NormalCoupledComparison<'c>,
+    source: ResidentSection<'c>,
+    difference: ResidentSection<'c>,
+    anchor: ResidentSection<'c>,
 }
 
 impl<'w, 'j, 'c> CoupledConstitutiveFamily<'w, 'j, 'c> {
@@ -54,45 +65,9 @@ impl<'w, 'j, 'c> CoupledConstitutiveFamily<'w, 'j, 'c> {
         &mut self,
         parameters: &'p ResidentSection<'c>,
     ) -> Result<CoupledConstitutiveAlternative<'p, 'j, 'c>, ConstitutiveFibreError> {
-        let c = self.comparison;
-        let s = c.source().origin().fibre().surface;
-        let n = c.relation().roots();
-        let k = c.relation().condition_complex();
-        let anchor = s.fresh_section(1, 2 * (4 * n + 2), ResidentGrain(0))?;
-        let source = s.fresh_section(1, 6 * n + 1, ResidentGrain(0))?;
-        let difference = s.fresh_section(1, 2 * n + 1, ResidentGrain(0))?;
-        let mut passage = s.begin_passage(&[vec![]])?;
-        {
-            let lane = passage.open(0, &[])?;
-            s.record_coupled_joint_anchor(
-                &lane,
-                c.source().affine_relation().report(),
-                c.source().affine_relation().source_width(),
-                c.source().anchor(),
-                n,
-                self.source_parameters(),
-                parameters,
-                &anchor,
-            )?;
-            s.record_coupled_family_operands(
-                &lane,
-                c.coefficients(),
-                n,
-                k,
-                parameters,
-                &anchor,
-                &source,
-                &difference,
-            )?;
-        }
-        passage.close(0, &difference, 64)?;
-        let result = passage.finish()?.launch()?;
-        if !result.obstruction.is_empty() {
-            return Err(ConstitutiveFibreError::Arithmetic(format!(
-                "dependent source substitution: {:?}",
-                result.obstruction
-            )));
-        }
+        let c=self.comparison;
+        let n=c.relation().roots();
+        let (source,difference,anchor)=read_return_operands(c,parameters)?;
         // Condition the actual historic word on this same source assignment. Every later
         // free output direction is still an affine fibre; no intermediate receiver is read.
         let mut image = c.source().parameter_section(parameters, &anchor)?;
@@ -135,6 +110,8 @@ impl<'w, 'j, 'c> CoupledConstitutiveFamily<'w, 'j, 'c> {
             difference,
             anchor,
             consequence: consequence.into_alternative()?,
+            material_member:c.member(),earlier_material:BTreeMap::new(),
+            path:Vec::new(),returns:Vec::new(),
             relation,
             current,
             successor,
@@ -143,6 +120,15 @@ impl<'w, 'j, 'c> CoupledConstitutiveFamily<'w, 'j, 'c> {
 }
 
 impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
+    /// Evaluated later source-qualified comparisons remain inspectable beside the root.
+    pub fn returned_comparisons(&self)->impl Iterator<Item=&NormalCoupledComparison<'c>> {
+        self.returns.iter().map(|r|&r.comparison)
+    }
+    pub fn returned_operands(&self,index:usize)->Option<(ResidentConstitutiveCurrent<'_, 'c>,ResidentConstitutiveCurrent<'_, 'c>,&ResidentSection<'c>)>{
+        self.returns.get(index).map(|r|(
+            ResidentConstitutiveCurrent::rational(&r.source).expect("constructed return source"),
+            ResidentConstitutiveCurrent::rational(&r.difference).expect("constructed return difference"),&r.anchor))
+    }
     pub fn comparison(&self) -> &NormalCoupledComparison<'c> {
         self.comparison
     }
@@ -179,16 +165,51 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
         &self.successor
     }
     pub(in super::super) fn retained_successor(&self)->Rc<NormalWaveFamily<'c>>{Rc::clone(&self.successor)}
-    pub(in super::super) fn retained_current(&self)->Rc<NormalWaveFamily<'c>>{Rc::clone(&self.current)}
     pub(in super::super) fn member_relation(&self,member:usize,
         other:Option<&ResidentConstitutiveFibre<'c>>,chart:WaveSourceReceiver,
     )->Result<ResidentWaveRelation<'c>,ConstitutiveFibreError>{
-        let law=if member==self.comparison.member(){&self.consequence.material}else{other.ok_or(ConstitutiveFibreError::Shape)?};
+        let law=self.material_for(member,other)?;
         law.read_wave_relation_in_chart(self.condition().successor(),self.comparison.relation().roots(),chart)
     }
     pub(in super::super) fn apply_map(&mut self,map:Rc<ResidentWaveRelation<'c>>,passage:u64)->Result<(),ConstitutiveFibreError>{
         let next=Rc::new(self.successor.read_through_at(Rc::clone(&map),passage)?);
+        let epoch=self.successor.origin().fibre().epoch.checked_add(passage).ok_or(ConstitutiveFibreError::Shape)?;
+        let factor=self.path.last().filter(|p|p.0==epoch).map_or(0,|p|p.1+1);
+        self.path.push((epoch,factor,Rc::clone(&map),Rc::clone(&self.successor)));
         self.current=Rc::clone(&self.successor);self.successor=next;self.relation=map;Ok(())
+    }
+    fn material_for<'a>(&'a self,member:usize,other:Option<&'a ResidentConstitutiveFibre<'c>>)->Result<&'a ResidentConstitutiveFibre<'c>,ConstitutiveFibreError>{
+        if member==self.material_member {Ok(&self.consequence.material)}
+        else {self.earlier_material.get(&member).or(other).ok_or(ConstitutiveFibreError::Shape)}
+    }
+    pub(in super::super) fn bind_successor(&mut self,section:ResidentConstitutiveReturn<'c>)->Result<(),ConstitutiveFibreError>{
+        self.successor=Rc::new(self.successor.with_constraint_relation(section)?);Ok(())
+    }
+    pub(in super::super) fn path_len(&self)->usize{self.path.len()}
+    pub(in super::super) fn path_from(&self,at:usize)->Vec<(u64,usize,Rc<ResidentWaveRelation<'c>>,Rc<NormalWaveFamily<'c>>)> {
+        self.path[at..].iter().map(|(e,f,r,s)|(*e,*f,Rc::clone(r),Rc::clone(s))).collect()
+    }
+    pub(in super::super) fn apply_return(
+        &mut self,operands:ConstitutiveReturnOperands<'c>,
+        other:Option<&mut ResidentConstitutiveFibre<'c>>,
+    )->Result<(),ConstitutiveFibreError>{
+        let member=operands.comparison.member();
+        let source=ResidentConstitutiveCurrent::rational(&operands.source)?;
+        let observed=ResidentConstitutiveCurrent::rational(&operands.difference)?;
+        let law=if member==self.material_member {&mut self.consequence.material}
+            else {self.earlier_material.get_mut(&member).or(other).ok_or(ConstitutiveFibreError::Shape)?};
+        let next=ResidentNeighborhoodAlternative::prepare_following(law,&self.consequence.condition,source,observed)?;
+        let map=Rc::new(next.material.read_wave_relation_in_chart(next.condition.successor(),
+            self.comparison.relation().roots(),operands.comparison.relation().source_receiver())?);
+        let passage=self.successor.passages().checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
+        // Stage the complete current before replacing any evaluated material view.
+        self.apply_map(map,passage)?;
+        let old=std::mem::replace(&mut self.consequence,next);
+        if member!=self.material_member {self.earlier_material.insert(self.material_member,old.material);}
+        self.earlier_material.remove(&member);
+        self.material_member=member;
+        self.returns.push(operands);
+        Ok(())
     }
     pub fn read_formed_source(
         &self,
@@ -212,11 +233,7 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
         other:Option<&ResidentConstitutiveFibre<'c>>,chart:WaveSourceReceiver,
         source:ResidentConstitutiveCurrent<'_, 'c>,passage:u64,
     )->Result<(),ConstitutiveFibreError>{
-        let law = if member == self.comparison.member() {
-            &self.consequence.material
-        } else {
-            other.ok_or(ConstitutiveFibreError::Shape)?
-        };
+        let law = self.material_for(member,other)?;
         let relation = law.read_wave_relation_in_chart(
             self.condition().successor(),
             self.comparison.relation().roots(),
@@ -267,3 +284,54 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
 
 #[cfg(test)]
 mod tests;
+
+fn read_return_operands<'c>(comparison:&NormalCoupledComparison<'c>,parameters:&ResidentSection<'c>)
+    ->Result<(ResidentSection<'c>,ResidentSection<'c>,ResidentSection<'c>),ConstitutiveFibreError>{
+        let c = comparison;
+        let s = c.source().origin().fibre().surface;
+        let n = c.relation().roots();
+        let k = c.relation().condition_complex();
+        let anchor = s.fresh_section(1, 2 * (4 * n + 2), ResidentGrain(0))?;
+        let source = s.fresh_section(1, 6 * n + 1, ResidentGrain(0))?;
+        let difference = s.fresh_section(1, 2 * n + 1, ResidentGrain(0))?;
+        let mut passage = s.begin_passage(&[vec![]])?;
+        {
+            let lane = passage.open(0, &[])?;
+            s.record_coupled_joint_anchor(
+                &lane,
+                c.source().affine_relation().report(),
+                c.source().affine_relation().source_width(),
+                c.source().anchor(),
+                n,
+                c.parameter_rows()-1,
+                parameters,
+                &anchor,
+            )?;
+            s.record_coupled_family_operands(
+                &lane,
+                c.coefficients(),
+                n,
+                k,
+                parameters,
+                &anchor,
+                &source,
+                &difference,
+            )?;
+        }
+        passage.close(0, &difference, 64)?;
+        let result = passage.finish()?.launch()?;
+        if !result.obstruction.is_empty() {
+            return Err(ConstitutiveFibreError::Arithmetic(format!(
+                "dependent source substitution: {:?}",
+                result.obstruction
+            )));
+        }
+    Ok((source,difference,anchor))
+}
+impl<'c> ConstitutiveReturnOperands<'c> {
+    pub(in super::super) fn from_comparison(comparison:NormalCoupledComparison<'c>,parameters:&ResidentSection<'c>)
+        ->Result<Self,ConstitutiveFibreError>{
+        let (source,difference,anchor)=read_return_operands(&comparison,parameters)?;
+        Ok(Self {comparison,source,difference,anchor})
+    }
+}

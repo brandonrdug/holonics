@@ -148,7 +148,13 @@ records the initial checked conduct. `wave/family/section.rs::receiver_coordinat
 `holonics-hna/src/native/coupled_wave/body.rs::NativeCoupledBody` owns the affine/dependent
 session alternatives; session frame v3 tags their existing rests. The
 [stream binding](../research/records/2026-09-11_THE_HNN_STREAM_USES_ITS_RETURNED_GENERATOR.md)
-records checked continuation and the remaining repeated dependent material-return boundary.
+records the initial continuation. The
+[repeated-return construction](../research/records/2026-09-12_REPEATED_RETURNS_PRESERVE_ORIGINAL_SOURCE_FRAMES.md)
+adds `Return` passages and v3 dependent rest in those same owners. `PreparedConditionContact`
+and `ResidentNeighborhoodAlternative` stage following contacts/formations; the programme retains
+original source-face parameters and the affected members' conditional material. Family section
+and coupled-joint kernel owners pack/decode signed anchored faces and check their original bounds.
+The remaining boundary concerns pending cuts of the original affine substrate.
 
 [definition] `resident/wave_relation/pullback.rs::ResidentWavePullback` and
 `section_wave_family_pullback` retain both affine source/target constraints through the actual

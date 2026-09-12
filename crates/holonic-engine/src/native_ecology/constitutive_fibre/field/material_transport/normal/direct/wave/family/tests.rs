@@ -244,3 +244,21 @@ fn later_source_pullback_keeps_original_bound_and_frame() {
     let foreign=body.read_family().unwrap().read_through(cancel_map).unwrap();
     assert!(source.read_pullback(&transport,&foreign).is_err());
 }
+
+#[test]
+#[ignore = "requires CUDA; exact source-face decoding preserves signed wide coordinates and the original bound"]
+fn source_face_codec_preserves_negative_phase_and_its_anchor() {
+    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
+    let body=body(&s);let law=law(&s,false);let h=point(&s,&[-2,0]);
+    let source=body.read_family().unwrap().read_through(Rc::new(law.read_wave_relation(current(&h),1).unwrap())).unwrap();
+    let reads=s.census().section_read_outs;
+    let face=source.receiver_face().unwrap();
+    let coordinates=source.coordinates_of_face(&face).unwrap();
+    let section=coordinates.into_section().unwrap();
+    assert_eq!(s.census().section_read_outs,reads);
+    let ConstitutiveReading::Unique {current}=section.inspect().unwrap().predecessor_reading else {panic!("decoded face")};
+    assert_eq!(current,[1,0,1,0,2,1,2,1,0,-1].map(|v|Rat::from_integer(v.into())));
+    let packet=face.into_resident();
+    let raw=source.coordinates_of_resident_face(&packet).unwrap().into_section().unwrap();
+    assert_eq!(raw.inspect().unwrap().predecessor_reading,ConstitutiveReading::Unique {current});
+}

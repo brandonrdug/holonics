@@ -66,6 +66,24 @@ pub(crate) struct ResidentNeighborhoodAlternative<'c> {
     pub(crate) formation:ResidentConstitutiveReturn<'c>,
     pub(crate) material:ResidentConstitutiveFibre<'c>,
 }
+impl<'c> ResidentNeighborhoodAlternative<'c> {
+    /// The next source-conditional return uses the material and condition produced by the
+    /// previous one. The supplied law is the actual affected conditional member, not a row
+    /// witness or an independently sampled alternative.
+    pub(crate) fn prepare_following(
+        law:&mut ResidentConstitutiveFibre<'c>,
+        prior:&PreparedConditionContact<'c>,
+        source:ResidentConstitutiveCurrent<'_, 'c>,
+        observed:ResidentConstitutiveCurrent<'_, 'c>,
+    )->Result<Self,ConstitutiveFibreError>{
+        let prediction=law.read_bilinear(source,prior.successor())?;
+        let family=law.read_condition_preimage(source,observed)?;
+        let condition=prior.prepare_following(&family)?;
+        let staged=law.prepare_bilinear_contact(source,condition.successor(),Some(observed))?;
+        let (material,formation)=staged.into_alternative();
+        Ok(Self {prediction,condition,formation,material})
+    }
+}
 impl<'c> PreparedNeighborhoodConsequence<'c> {
     pub(crate) fn into_alternative(self)->Result<ResidentNeighborhoodAlternative<'c>,ConstitutiveFibreError>{
         let condition=self.condition.ok_or(ConstitutiveFibreError::Shape)?;
@@ -132,6 +150,12 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
     }
     pub fn condition(&self) -> ResidentConstitutiveCurrent<'_, 'c> {
         self.condition.current()
+    }
+    pub(crate) fn generator_for_staging(
+        &mut self, member:usize,
+    )->Result<&mut ResidentConstitutiveFibre<'c>,ConstitutiveFibreError>{
+        self.require_usable()?;
+        self.laws.get_mut(member).ok_or(ConstitutiveFibreError::Shape)
     }
     pub fn generator(
         &self,

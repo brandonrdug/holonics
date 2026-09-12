@@ -145,6 +145,29 @@ fn coupled_session_incorporates_observed_symbol_and_continues() {
     assert_eq!(session.wave.pending_coupled_predictions(), 1);
     let comparison = session.compare_symbol(new_id, "b", Some(0)).unwrap();
     assert_eq!(comparison["scope"], "dependent-producing-family-section");
+    // A second actual return reacts through the material formed by the first. The original
+    // h=1 control and the twice-returned session now agree under matched complete sources.
+    let command=json!({"schema":crate::HNA_STREAM_REQUEST_SCHEMA,"command":{"action":"observe-symbol","source":new_id,"text":"a"}}).to_string()+"\n";
+    let reads=s.census().section_read_outs;
+    let mut output=Vec::new();
+    stream.pump_coupled_wave(&mut session,&mut std::io::Cursor::new(command),&mut output).unwrap();
+    assert_eq!(s.census().section_read_outs,reads);
+    let event:Value=serde_json::from_slice(&output).unwrap();
+    assert_eq!(event["value"]["return_published"],true,"{event}");
+    assert_eq!(event["value"]["material_returns"],2);
+    assert_eq!(session.wave.pending_coupled_predictions(),0);
+    let after_second=session.wave.rest().unwrap();
+    assert!(session.incorporate_symbol(new_id,"a").is_err());
+    assert_eq!(session.wave.rest().unwrap(),after_second);
+    for text in ["a","b"] {
+        session.receive_next_symbol(text).unwrap();
+        control.receive_next_symbol(text).unwrap();
+    }
+    assert_eq!(session.next_symbol(true).unwrap()["text"],"a");
+    assert_eq!(control.next_symbol(true).unwrap()["text"],"a");
+    let third=session.predict_symbol(false).unwrap();
+    let new_id=third["action"]["prediction"].as_u64().unwrap();
+    assert_eq!(session.wave.pending_coupled_predictions(),1);
     let directory = path("constitutive-return");
     std::fs::create_dir(&directory).unwrap();
     let saved = directory.join("before.session");

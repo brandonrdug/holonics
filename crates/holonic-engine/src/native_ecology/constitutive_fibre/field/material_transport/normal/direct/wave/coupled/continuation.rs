@@ -157,6 +157,16 @@ impl<'a, 'c> NormalCoupledContinuation<'a, 'c> {
         if frames.is_empty() || target.passages() != at.passages() {
             return Err(ConstitutiveFibreError::ForeignOccurrence);
         }
+        read_retained_word_pullback(self.source(),target,frames)
+
+    }
+}
+
+pub(super) fn read_retained_word_pullback<'a,'c>(
+    original:&'a NormalWaveFamily<'c>,target:&'a NormalWaveFamily<'c>,
+    frames:Vec<(u64,usize,Rc<ResidentWaveRelation<'c>>,Rc<NormalWaveFamily<'c>>)>,
+)->Result<NormalContinuationPullback<'a,'c>,ConstitutiveFibreError>{
+    if frames.is_empty(){return Err(ConstitutiveFibreError::ForeignOccurrence);}
         let mut joins: Vec<NormalContinuationJoin<'c>> = Vec::with_capacity(frames.len());
         for (epoch, factor, transport, source) in frames.into_iter().rev() {
             let next = joins.last().map_or(target, |j| &j.supported_source);
@@ -175,9 +185,8 @@ impl<'a, 'c> NormalCoupledContinuation<'a, 'c> {
         }
         joins.reverse();
         Ok(NormalContinuationPullback {
-            source: self.source(),
+            source: original,
             target,
             joins,
         })
-    }
 }

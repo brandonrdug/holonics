@@ -303,9 +303,15 @@ impl<'c> NativeCoupledBody<'c> {
                 if !b.has_prediction(id) {
                     return Err(invalid("no available producing comparison"));
                 }
-                return Err(invalid(
-                    "additional dependent material returns require the iterated source-family composition",
-                ));
+                if b.pending_prediction(id).is_ok() {
+                    return Err(invalid("the pending source predates this dependent programme; its original base-word frame still requires composition"));
+                }
+                let before=b.epoch();
+                b.incorporate_prediction(id,observed)?;
+                return Ok(json!({"return_published":true,"prediction_consumed":id,
+                    "before_epoch":before,"after_epoch":b.epoch(),"material_returns":b.material_returns(),
+                    "receiver_scope":"declared-source-section","receiver_origin":"joined-producing-source",
+                    "representation":"source-dependent-generator"}));
             }
         };
         let before = self.epoch();

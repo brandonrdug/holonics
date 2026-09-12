@@ -3,6 +3,7 @@
 use super::*;
 pub(super) mod joint;
 mod constitutive;
+pub(super) use constitutive::ConstitutiveReturnOperands;
 pub use constitutive::{CoupledConstitutiveFamily, CoupledConstitutiveAlternative};
 pub use joint::{CompiledCoupledJoint, CoupledJointEvaluation, CoupledJointReading};
 
@@ -39,6 +40,7 @@ pub struct NormalCoupledComparison<'c> {
     observed: ResidentSection<'c>,
 }
 impl<'c> NormalCoupledComparison<'c> {
+    pub(super) fn into_observation(self)->ResidentSection<'c>{self.observed}
     pub fn prediction_id(&self) -> u64 {
         self.id
     }

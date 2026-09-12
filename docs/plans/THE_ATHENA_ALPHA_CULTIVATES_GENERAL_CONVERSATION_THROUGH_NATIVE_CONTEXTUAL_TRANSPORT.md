@@ -244,11 +244,17 @@ The next actual source uses its new material/current, and rest/remount preserves
 The [HNN stream binding](../../research/records/2026-09-11_THE_HNN_STREAM_USES_ITS_RETURNED_GENERATOR.md)
 now supplies the native receiver-coordinate decoder and `NativeCoupledBody` session owner.
 One return, subsequent generation/observation/source fields, pending predictions and the existing
-selection/re-entry cursor persist across processes. Further material incorporation remains open.
+selection/re-entry cursor persist across processes. The
+[repeated-return construction](../../research/records/2026-09-12_REPEATED_RETURNS_PRESERVE_ORIGINAL_SOURCE_FRAMES.md)
+now adds successive material-return passages with original source-face parameters, conditional
+member material, exactly-once consumption and v3 rest. Native and HNN controls include repeated,
+out-of-order and distinct-source-section returns.
 
-[definition] Continue by composing subsequent material-return operations over that same owned
-programme; do not repeat the completed coordinator binding. Further producing cuts must retain their own dependent source parameters
-and joining histories. Preserve the declared source-section receiver as such until its relation
+[definition] Continue by composing pending source cuts inherited from the original affine
+substrate into that same owned programme. Retain the first root assignment, the earlier/later
+base-cut source assignments and their actual intervening maps; do not restart the returned
+coordinator or programme incorporation. The new source/target pullback is the existing port for
+this constraint transport. Preserve the declared source-section receiver as such until its relation
 to the existing whole-family receiver is constructed; do not silently relabel one as the other.
 
 [definition] The family lift must distinguish recorded h_s from a proposed successor condition.

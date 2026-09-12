@@ -14,7 +14,7 @@ pub use receive::{NormalWaveReception, NormalWaveReceptionReading};
 mod rest;
 pub use rest::NormalWaveRest;
 mod family;
-pub use family::{NormalReceiverCoordinates, NormalFamilyPullback, NormalWaveFamily,NormalWaveFamilyRest, NormalFamilyBasisFace, FamilyBasisSelection, FamilyBasisReading,NormalFamilySupport,NormalFamilyReceiverReading,NormalWaveFamilyReceiver};
+pub use family::{NormalReceiverCoordinates,NormalWaveFacePacket, NormalFamilyPullback, NormalWaveFamily,NormalWaveFamilyRest, NormalFamilyBasisFace, FamilyBasisSelection, FamilyBasisReading,NormalFamilySupport,NormalFamilyReceiverReading,NormalWaveFamilyReceiver};
 mod source;
 pub use source::{NormalWaveSource,NormalWaveJointSource};
 mod basis;

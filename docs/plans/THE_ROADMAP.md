@@ -91,10 +91,12 @@ The [owned generator return](../../research/records/2026-09-11_AN_OWNED_CONSTITU
 now publishes that function and continues through changed material under a declared source-section
 receiver. Its complete native representation persists across process exit. The
 [HNN stream binding](../../research/records/2026-09-11_THE_HNN_STREAM_USES_ITS_RETURNED_GENERATOR.md)
-now preserves emission/re-entry, later prediction cuts and fresh-process continuation. Continue
-by composing subsequent material returns over their dependent producing sources, retaining each
-parameter and original frame through the actual history. Keep the declared receiver chart distinct
-from the prior whole-family projection. One incorporated return does not finish this integration.
+now preserves emission/re-entry, later prediction cuts and fresh-process continuation. The
+[repeated programme return](../../research/records/2026-09-12_REPEATED_RETURNS_PRESERVE_ORIGINAL_SOURCE_FRAMES.md)
+now consumes those predictions using their original source-face parameters, including out-of-order
+returns, and continues through previously formed material. Next compose still-pending cuts of
+the original affine substrate, retaining their base-word frames alongside the first root assignment. Keep the declared receiver chart distinct
+from the prior whole-family projection. The original-base pending boundary remains part of this integration.
 The [later-source join](../../research/records/2026-09-11_LATER_SOURCE_CONSTRAINTS_KEEP_THE_JOINED_CONTINUATION.md)
 supplies the checked two-sided affine pullback and its actual-word consumer. Use that retained
 pair/word in the dependent return's source-frame composition.
@@ -200,8 +202,8 @@ persistence and resource accounting accompany usable increments. CONSTRUCTION_ST
 what has actually returned.
 
 [definition] For native coupled-wave integration, phases 1–2 share the immediate boundary: the read-only family
-comparison and first consuming condition/material transaction now exist; subsequent
-material returns must compose their dependent sources and original frames on the same body. Do not restart implemented emission, normal producing comparison, coupled
+comparison and repeated programme condition/material transactions now exist; pending cuts
+of the original affine body must retain their base-word sources through that same composition. Do not restart implemented emission, normal producing comparison, coupled
 ownership or rest. Phase 3 must address the fixed-condition relation's collapse rather than
 append more rows to that unchanged chart. Phase 4 builds on that actual conduct.
 

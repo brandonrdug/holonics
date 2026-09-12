@@ -4,6 +4,42 @@ use crate::native_ecology::constitutive_fibre::{
 };
 
 impl<'c> ResidentSurface<'c> {
+    pub(crate) fn record_coupled_face_packet_receiver(
+        &self, lane: &Lane<'_, 'c>, packet: &ResidentSection<'c>, n: usize,
+        receiver: &ResidentSection<'c>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || Self::operative_error();
+        let a = n.checked_mul(4).ok_or_else(fail)?;
+        let t = a.checked_mul(2).and_then(|v| v.checked_add(2)).ok_or_else(fail)?;
+        if n == 0 || t.checked_mul(4).is_none_or(|w|w>=u32::MAX as usize) || !self.operative_shape(packet, 1, t + 1)
+            || !self.operative_shape(receiver, 1, 8 + 8 * a) { return Err(fail()); }
+        let mut p = Params::new();
+        p.ptr(packet.lo.device_ptr()).ptr(packet.hi.device_ptr()).u32(n as u32)
+            .ptr(receiver.lo.device_ptr()).ptr(receiver.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane, "section_coupled_face_packet_receiver", 1,
+            self.launch.block_x, 0, &mut p, "coupled-face-packet-receiver")
+    }
+
+    pub(crate) fn record_coupled_receiver_face_packet(
+        &self, lane: &Lane<'_, 'c>, receiver: &ResidentSection<'c>, n: usize,
+        packet: &ResidentSection<'c>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || Self::operative_error();
+        let a = n.checked_mul(4).ok_or_else(fail)?;
+        let t = a.checked_mul(2).and_then(|v| v.checked_add(2)).ok_or_else(fail)?;
+        if n == 0 || t.checked_mul(4).is_none_or(|w|w>=u32::MAX as usize) || !self.operative_shape(receiver, 1, 8 + 8 * a)
+            || !self.operative_shape(packet, 1, t + 1) {
+            return Err(fail());
+        }
+        let mut p = Params::new();
+        p.ptr(receiver.lo.device_ptr()).ptr(receiver.hi.device_ptr()).u32(n as u32)
+            .ptr(packet.lo.device_ptr()).ptr(packet.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane, "section_coupled_receiver_face_packet", 1,
+            self.launch.block_x, 0, &mut p, "coupled-receiver-face-packet")
+    }
+
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn record_coupled_receiver_coordinates(
         &self,

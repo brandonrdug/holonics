@@ -108,6 +108,40 @@ extern "C" __global__ void section_coupled_receiver_coordinates(
  coordinates[t]=coordinates_hi[t]=(int64_t)den;
 }
 
+// Pack the supported declared receiver face as (lambda, anchor, p, c; denominator).
+// All arithmetic stays resident and exact; a non-supported receiver is refused.
+extern "C" __global__ void section_coupled_receiver_face_packet(
+ const int64_t *receiver,const int64_t *receiver_hi,uint32_t n,
+ int64_t *packet,int64_t *packet_hi,uint32_t *slot,const uint32_t *census,
+ const uint32_t *lineage,uint32_t lineage_count){
+ if(blockIdx.x||threadIdx.x)return;if(upstream_refused(census,lineage,lineage_count,slot))return;
+ if(!n||32ull*n+8ull>UINT32_MAX){atomicOr(slot,REFUSED_MALFORMED);return;}uint32_t a=4u*n,t=2u*a+2u;
+ for(uint32_t i=0;i<8u+8u*a;++i)if(receiver[i]!=receiver_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+ const wide *r=(const wide*)receiver; if(r[0]!=0||r[1]<=0||r[2u+a]<=0){atomicOr(slot,REFUSED_CARRIER);return;}
+ wide den=fibre_lcm(r[1],r[2u+a],slot);if(*slot)return;
+ packet[0]=packet_hi[0]=to_word(den,slot); packet[1]=packet_hi[1]=0;
+ for(uint32_t j=0;j<a;++j){packet[2u+j]=packet_hi[2u+j]=to_word(product_checked(r[2u+j],den/r[1],slot),slot);}
+ for(uint32_t j=0;j<a;++j){packet[2u+a+j]=packet_hi[2u+a+j]=to_word(product_checked(r[3u+a+j],den/r[2u+a],slot),slot);}
+ packet[t]=packet_hi[t]=to_word(den,slot);
+}
+
+// Expand a resident face packet back to the receiver wire consumed by the coordinate solver.
+extern "C" __global__ void section_coupled_face_packet_receiver(
+ const int64_t *packet,const int64_t *packet_hi,uint32_t n,
+ int64_t *receiver,int64_t *receiver_hi,uint32_t *slot,const uint32_t *census,
+ const uint32_t *lineage,uint32_t lineage_count){
+ if(blockIdx.x||threadIdx.x)return;if(upstream_refused(census,lineage,lineage_count,slot))return;
+ if(!n||32ull*n+8ull>UINT32_MAX){atomicOr(slot,REFUSED_MALFORMED);return;}uint32_t a=4u*n,t=2u*a+2u;
+ for(uint32_t i=0;i<=t;++i)if(packet[i]!=packet_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+ const int64_t *p=packet;wide den=p[t];if(den<=0||p[0]!=den||p[1]!=0){atomicOr(slot,REFUSED_MALFORMED);return;}
+ for(uint32_t i=0;i<8u+8u*a;++i)receiver[i]=receiver_hi[i]=0;
+ wide *r=(wide*)receiver,*rh=(wide*)receiver_hi;
+ r[1]=rh[1]=den;
+ for(uint32_t j=0;j<a;++j)r[2u+j]=rh[2u+j]=(wide)p[2u+j];
+ r[2u+a]=rh[2u+a]=den;
+ for(uint32_t j=0;j<a;++j)r[3u+a+j]=rh[3u+a+j]=(wide)p[2u+a+j];
+}
+
 // Exact joint F(x) AND R(x,y) AND G(y). Solve in the product's direction coordinates,
 // retaining the pair (x,y), rather than mapping its supported source through R again.
 extern "C" __global__ void section_wave_family_pullback(

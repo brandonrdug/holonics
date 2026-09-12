@@ -61,7 +61,8 @@ Missing learned arrival remains explicit while the actual offered current is pre
 actuation, observed development and conditional generation keep their distinct meanings under
 the same wave owner. The coupled session below exposes source actuation and conditional emission;
 the read-only producing-family comparison and a distinct first consuming return now exist.
-Repeated returns over the dependent source programme remain the next native binding.
+Repeated programme returns now compose and persist; pending source frames inherited from
+the original affine body remain the next native binding.
 
 [definition] Sequence-to-fold and biochemical kinetics are foundational HNN questions. Their
 [exact source construction](../research/records/2026-09-10_SEQUENCE_FOLD_AND_REACTION_CURRENT_MAKE_THE_CAUSAL_THOUGHT_CHAIN_CONCRETE.md)
@@ -180,7 +181,8 @@ recorded condition, source family and anchor while referencing the contemporary 
 They survive reconstruction from a restored pending cut and retain free current directions.
 This [compiler return](../research/records/2026-09-11_ACTUAL_PENDING_COMPARISONS_COMPILE_WITH_THEIR_ANCHORS.md)
 is read-only. The distinct owned-generator/session return below supplies the first consuming
-contact/formation, publication and pending consumption; repeated dependent incorporation remains open.
+contact/formation, publication and pending consumption. Later programme returns now compose
+through that same owner; original affine-base pending frames remain open.
 
 [established-bounded; implemented-exact; formal-checked] The
 [dependent constitutive return](../research/records/2026-09-11_CONSTITUTIVE_RETURNS_REMAIN_DEPENDENT_ON_THEIR_SOURCE.md)
@@ -203,8 +205,12 @@ across process exit. Its consumed cut becomes a private causal witness, not an a
 return. The [stream binding](../research/records/2026-09-11_THE_HNN_STREAM_USES_ITS_RETURNED_GENERATOR.md)
 now connects it through `NativeCoupledBody` to `NativeCoupledWaveSession`. `compare_symbol`
 remains read-only; `incorporate_symbol` consumes the first return. Following generation and
-pending predictions persist across processes. Repeated dependent material returns remain active
-work; the section receiver is not asserted equivalent to the old whole-family one.
+pending predictions persist across processes. The
+[repeated-return construction](../research/records/2026-09-12_REPEATED_RETURNS_PRESERVE_ORIGINAL_SOURCE_FRAMES.md)
+now incorporates programme predictions repeatedly and out of order, retaining their original
+source faces and using previously returned material. Its two-return stream survives process
+exit. Incorporation of still-pending original affine-base cuts remains active work; the section
+receiver is not asserted equivalent to the old whole-family one.
 
 ## Native-first construction
 

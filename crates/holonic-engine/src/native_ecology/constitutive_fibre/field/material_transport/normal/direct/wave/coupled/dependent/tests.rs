@@ -362,3 +362,125 @@ fn owned_constitutive_cycle_retains_other_source_sections() {
     );
     assert_eq!(restored.rest().unwrap(), model.rest().unwrap());
 }
+
+#[test]
+#[ignore = "requires CUDA; repeated returns use the prior formed material and persist their source frames"]
+fn repeated_constitutive_returns_form_and_continue_the_same_generator() {
+    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
+    let mut wave=world(&s,false);let contact=wave.admit_contact(0).unwrap();
+    let pending=wave.predict_contact(&contact).unwrap().handle;
+    let observed=point(&s,&[4,3]);let comparison=wave.compare_coupled_prediction(&pending,current(&observed)).unwrap();
+    let parameters=comparison.source().receiver_coordinates().unwrap().into_coordinates();
+    let mut model=wave.into_constitutive_continuation(comparison,parameters).unwrap();
+    assert_eq!(face(&mut model),vec![r(3,1),r(2,1),r(5,1),r(4,1)]);
+    let second=model.predict_member(0,WaveSourceReceiver::Direct).unwrap();
+    let observation=point(&s,&[7,6]);let before=model.epoch();let reads=s.census().section_read_outs;
+    model.incorporate_prediction(second,current(&observation)).unwrap();
+    assert_eq!(s.census().section_read_outs,reads);
+    assert_eq!(model.epoch(),before+1);assert_eq!(model.material_returns(),2);
+    assert!(!model.has_prediction(second));
+    assert_eq!(model.read_receiver().unwrap().inspect_condition().unwrap().successor,vec![r(1,1),r(0,1)]);
+    assert_eq!(face(&mut model),vec![r(9,1),r(8,1),r(13,1),r(12,1)]);
+    let saved=model.rest().unwrap();
+    assert!(model.incorporate_prediction(second,current(&observation)).is_err());
+    assert_eq!(model.rest().unwrap(),saved);
+    let mut bytes=Vec::new();saved.write(&mut bytes).unwrap();
+    let mut resumed=CoupledConstitutiveRest::read(&mut bytes.as_slice(),bytes.len() as u64).unwrap().remount(&s).unwrap();
+    assert_eq!(resumed.rest().unwrap(),saved);
+    for value in [&mut model,&mut resumed] {
+        value.advance_member(0,WaveSourceReceiver::Direct).unwrap();
+        assert_eq!(face(value),vec![r(13,1),r(12,1),r(17,1),r(16,1)]);
+    }
+    assert_eq!(resumed.rest().unwrap(),model.rest().unwrap());
+    eprintln!("repeated return: h=2 -> h=1; next pair=(13+12i,17+16i)");
+}
+
+#[test]
+#[ignore = "requires CUDA; out-of-order programme returns keep historical maps and each original source"]
+fn repeated_returns_keep_their_original_sources_when_received_out_of_order() {
+    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
+    let mut wave=world(&s,false);let contact=wave.admit_contact(0).unwrap();
+    let pending=wave.predict_contact(&contact).unwrap().handle;
+    let observation=point(&s,&[4,3]);let comparison=wave.compare_coupled_prediction(&pending,current(&observation)).unwrap();
+    let parameters=comparison.source().receiver_coordinates().unwrap().into_coordinates();
+    let mut model=wave.into_constitutive_continuation(comparison,parameters).unwrap();
+    let earlier=model.predict_member(0,WaveSourceReceiver::Direct).unwrap();
+    let later=model.predict_member(0,WaveSourceReceiver::Direct).unwrap();
+    model.incorporate_prediction(later,current(&point(&s,&[13,12]))).unwrap();
+    assert!(model.has_prediction(earlier));assert!(!model.has_prediction(later));
+    assert_eq!(face(&mut model),vec![r(17,1),r(16,1),r(25,1),r(24,1)]);
+    model.incorporate_prediction(earlier,current(&point(&s,&[11,10]))).unwrap();
+    assert_eq!(model.material_returns(),3);
+    assert!(!model.has_prediction(earlier));
+    assert_eq!(model.read_receiver().unwrap().inspect_condition().unwrap().successor,vec![r(3,1),r(0,1)]);
+    assert_eq!(face(&mut model),vec![r(25,1),r(24,1),r(49,1),r(48,1)]);
+    let saved=model.rest().unwrap();let mut bytes=Vec::new();saved.write(&mut bytes).unwrap();
+    let mut resumed=CoupledConstitutiveRest::read(&mut bytes.as_slice(),bytes.len() as u64).unwrap().remount(&s).unwrap();
+    assert_eq!(resumed.rest().unwrap(),saved);
+    resumed.advance_member(0,WaveSourceReceiver::Direct).unwrap();
+    assert_eq!(face(&mut resumed),vec![r(49,1),r(48,1),r(121,1),r(120,1)]);
+}
+
+#[test]
+#[ignore = "requires CUDA; later source parameters remain executable and change the conditional return"]
+fn repeated_return_retains_distinct_source_face_sections() {
+    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
+    let mut wave=world(&s,true);let contact=wave.admit_contact(0).unwrap();
+    let pending=wave.predict_contact(&contact).unwrap().handle;
+    let observation=point(&s,&[4,3]);let comparison=wave.compare_coupled_prediction(&pending,current(&observation)).unwrap();
+    let parameters=comparison.source().receiver_coordinates().unwrap().into_coordinates();
+    let mut model=wave.into_constitutive_continuation(comparison,parameters).unwrap();
+    let later=model.predict_member(0,WaveSourceReceiver::Direct).unwrap();
+    model.incorporate_prediction(later,current(&point(&s,&[7,6]))).unwrap();
+    let root=s.copy_section_device(model.receiver()).unwrap();
+    let default=s.copy_section_device(model.return_source_receivers().next().unwrap().2).unwrap();
+    let raw=s.detach_section(&default,64).unwrap();
+    let mut alternative=raw.intervals.clone();
+    // One admitted real-current direction in this declared specimen. The original anchor and
+    // source frame stay fixed; the native decoder itself checks that the assignment belongs.
+    let denominator=alternative.last().unwrap().0;
+    alternative[8].0+=denominator;alternative[8].1+=denominator;
+    let changed=s.mount_section_rest(&ResidentSectionRest::found(1,raw.width,raw.grain,64,alternative).unwrap()).unwrap();
+    let saved=model.rest().unwrap();
+    let first=model.evaluate_with_return_faces(&root,&[&default]).unwrap().inspect_condition().unwrap();
+    let second=model.evaluate_with_return_faces(&root,&[&changed]).unwrap().inspect_condition().unwrap();
+    assert_eq!(first.successor,vec![r(3,2),r(4,1)]);
+    assert_eq!(second.successor,vec![r(3,2),r(2,1)]);
+    assert_eq!(model.rest().unwrap(),saved);
+    eprintln!("same returned observation, distinct source sections: h=3/2+4i and h=3/2+2i");
+}
+
+#[test]
+#[ignore = "requires CUDA; legacy dependent frames retain source-only programmes under the v3 reader"]
+fn repeated_return_reader_keeps_v1_and_v2_source_programmes() {
+    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
+    let mut wave=world(&s,false);let contact=wave.admit_contact(0).unwrap();
+    let pending=wave.predict_contact(&contact).unwrap().handle;
+    let observation=point(&s,&[4,3]);let comparison=wave.compare_coupled_prediction(&pending,current(&observation)).unwrap();
+    let parameters=comparison.source().receiver_coordinates().unwrap().into_coordinates();
+    let mut model=wave.into_constitutive_continuation(comparison,parameters).unwrap();
+    let offered=s.mount_exact_rational_packet(&[1,0,2,0,1,0].map(|v|r(v,1))).unwrap();
+    model.actuate_source(0,WaveSourceReceiver::Direct,offered).unwrap();
+    let saved=model.rest().unwrap();let mut bytes=Vec::new();saved.write(&mut bytes).unwrap();
+    let prefix=b"HOLONIC-COUPLED-CONSTITUTIVE\x03".len();
+    let length=u64::from_le_bytes(bytes[prefix..prefix+8].try_into().unwrap()) as usize;
+    for version in [1u8,2] {
+        let mut header:serde_json::Value=serde_json::from_slice(&bytes[prefix+8..prefix+8+length]).unwrap();
+        for operation in header["operations"].as_array_mut().unwrap() {
+            operation.as_object_mut().unwrap().remove("returned");
+            if version==1 {operation.as_object_mut().unwrap().remove("kind");}
+        }
+        if version==1 {
+            let object=header.as_object_mut().unwrap();
+            let operations=object.remove("operations").unwrap();object.insert("sources".into(),operations);
+            object.remove("pending");object.remove("released");
+        }
+        let header=serde_json::to_vec(&header).unwrap();
+        let mut legacy=bytes[..prefix].to_vec();legacy[prefix-1]=version;
+        legacy.extend_from_slice(&(header.len() as u64).to_le_bytes());legacy.extend_from_slice(&header);
+        legacy.extend_from_slice(&bytes[prefix+8+length..]);
+        let mut resumed=CoupledConstitutiveRest::read(&mut legacy.as_slice(),legacy.len() as u64).unwrap().remount(&s).unwrap();
+        assert_eq!(resumed.rest().unwrap(),saved);
+        assert_eq!(face(&mut resumed),face(&mut model));
+    }
+}

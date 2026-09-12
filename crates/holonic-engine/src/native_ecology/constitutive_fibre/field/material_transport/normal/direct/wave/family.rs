@@ -6,7 +6,7 @@ mod rest;
 mod section;
 mod pullback;
 pub use pullback::NormalFamilyPullback;
-pub use section::NormalReceiverCoordinates;
+pub use section::{NormalReceiverCoordinates,NormalWaveFacePacket};
 use crate::native_ecology::constitutive_fibre::{ResidentConstitutiveReturn, ResidentWaveRelation};
 pub use receiver::{NormalFamilyReceiverReading, NormalFamilySupport, NormalWaveFamilyReceiver};
 pub use rest::NormalWaveFamilyRest;
@@ -40,6 +40,15 @@ impl<'c> NormalWaveFamily<'c> {
         Ok(())
     }
 
+    /// A derived restriction keeps the producing anchor and physical clock. Its enclosing
+    /// generator owns the constraint; the old physical image's coverage is not reused.
+    pub(crate) fn with_constraint_relation(&self, relation:ResidentConstitutiveReturn<'c>)->Result<Self,ConstitutiveFibreError>{
+        if relation.target_width()!=self.relation.target_width() {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        Ok(Self {origin:Rc::clone(&self.origin),relation,
+            last_relation:self.last_relation.as_ref().map(Rc::clone),affine_coverage:None,passages:self.passages})
+    }
     pub fn origin(&self) -> &NormalWaveJointSource<'c> {
         &self.origin
     }

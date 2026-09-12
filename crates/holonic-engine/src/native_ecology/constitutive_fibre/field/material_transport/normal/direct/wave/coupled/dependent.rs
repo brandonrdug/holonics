@@ -19,6 +19,17 @@ struct ConstitutiveSourcePassage<'c> {
     chart: WaveSourceReceiver,
     kind: ConstitutivePassageKind,
     source: Option<ResidentSection<'c>>,
+    returned: Option<ConstitutiveReturnedSource<'c>>,
+}
+struct ConstitutiveReturnedSource<'c> {
+    prediction:u64,
+    cut:ConstitutiveProducingCut,
+    receiver:ResidentSection<'c>,
+}
+struct EvaluatedProducingCut<'c> {
+    source:Rc<NormalWaveFamily<'c>>,
+    produced:Rc<NormalWaveFamily<'c>>,
+    path:usize,
 }
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -30,6 +41,7 @@ enum ConstitutivePassageKind {
     ObserveInteger,
     ObserveRational,
     Advance,
+    Return,
 }
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
 struct ConstitutiveProducingCut {
@@ -132,23 +144,10 @@ impl<'c> ResidentCoupledConstitutive<'c> {
             return Err(ConstitutiveFibreError::ForeignOccurrence);
         }
         if let Some(cut) = self.pending.get(&id) {
-            let mut value = Self::evaluate_parts(
-                &mut self.base,
-                &self.comparison,
-                &self.operations[..cut.prefix],
-                &self.receiver,
-            )?;
-            let operation = &self.operations[cut.prefix];
-            let other = if cut.member == self.comparison.member() {
-                None
-            } else {
-                Some(self.base.neighborhood().generator(cut.member)?)
-            };
-            Self::apply_operation(&mut value, operation, other)?;
-            let conditional = Rc::new(CoupledProducingCut {
-                member: cut.member,
-                source: value.retained_current(),
-                produced: value.retained_successor(),
+            let (_,cuts)=Self::evaluate_programme(&mut self.base,&self.comparison,&self.operations.iter().collect::<Vec<_>>(),&self.receiver,None)?;
+            let frame=cuts.get(&cut.prefix).ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
+            let conditional=Rc::new(CoupledProducingCut {
+                member:cut.member,source:Rc::clone(&frame.source),produced:Rc::clone(&frame.produced),
             });
             let comparison = NormalCoupledComparison::from_cut(id, conditional, observed)?;
             Ok(ConstitutiveComparisonSection {
@@ -166,6 +165,34 @@ impl<'c> ResidentCoupledConstitutive<'c> {
             })
         }
     }
+    /// Incorporate a prediction captured by this programme. Pending cuts of its original
+    /// affine substrate remain inspectable through pending_prediction(), but are not this port.
+    /// Prepare at the current parameter receiver, retain the full added source parameter,
+    /// and publish the complete programme only after the following current is admitted.
+    pub fn incorporate_prediction(&mut self,id:u64,observed:ResidentConstitutiveCurrent<'_, 'c>)
+        ->Result<(),ConstitutiveFibreError>{
+        let cut=self.pending.get(&id).ok_or(ConstitutiveFibreError::ForeignOccurrence)?.clone();
+        let (receiver,observation)={
+            let (value,cuts)=Self::evaluate_programme(&mut self.base,&self.comparison,&self.operations.iter().collect::<Vec<_>>(),&self.receiver,None)?;
+            let frame=cuts.get(&cut.prefix).ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
+            let joined=super::continuation::read_retained_word_pullback(&frame.source,value.successor_section(),value.path_from(frame.path))?;
+            let receiver=joined.supported_source().receiver_face()?.into_resident();
+            let comparison=NormalCoupledComparison::from_cut(id,Rc::new(CoupledProducingCut {
+                member:cut.member,source:Rc::clone(&frame.source),produced:Rc::clone(&frame.produced),
+            }),observed)?;
+            (receiver,comparison.into_observation())
+        };
+        self.append_operation(ConstitutiveSourcePassage {
+            member:cut.member,chart:cut.chart,kind:ConstitutivePassageKind::Return,source:Some(observation),
+            returned:Some(ConstitutiveReturnedSource {prediction:id,cut,receiver}),
+        },false).map_err(|(_,e)|e)
+    }
+    /// Declared receiver packets of successive returned source frames, in parameter order.
+    /// The same anchored packet remains in its original programme cut after later changes.
+    pub fn return_source_receivers(&self)->impl Iterator<Item=(u64,usize,&ResidentSection<'c>)>{
+        self.operations.iter().filter_map(|p|p.returned.as_ref().map(|r|(r.prediction,r.cut.prefix,&r.receiver)))
+    }
+    pub fn material_returns(&self)->usize{1+self.operations.iter().filter(|p|p.kind==ConstitutivePassageKind::Return).count()}
     pub fn epoch(&self) -> u64 {
         self.epoch
     }
@@ -212,23 +239,62 @@ impl<'c> ResidentCoupledConstitutive<'c> {
         self.base.pending_coupled_prediction(id)
     }
     fn evaluate_parts<'p, 'j>(
-        base: &mut ResidentNormalWave<'c, NormalWaveCoupled<'c>>,
-        comparison: &'j NormalCoupledComparison<'c>,
-        sources: &[ConstitutiveSourcePassage<'c>],
-        parameters: &'p ResidentSection<'c>,
-    ) -> Result<CoupledConstitutiveAlternative<'p, 'j, 'c>, ConstitutiveFibreError> {
-        let mut value = base
-            .read_coupled_constitutive_family(comparison)?
-            .evaluate(parameters)?;
-        for passage in sources {
-            let other = if passage.member == comparison.member() {
-                None
+        base:&mut ResidentNormalWave<'c,NormalWaveCoupled<'c>>,
+        comparison:&'j NormalCoupledComparison<'c>,operations:&[ConstitutiveSourcePassage<'c>],
+        parameters:&'p ResidentSection<'c>,
+    )->Result<CoupledConstitutiveAlternative<'p,'j,'c>,ConstitutiveFibreError>{
+        Ok(Self::evaluate_programme(base,comparison,&operations.iter().collect::<Vec<_>>(),parameters,None)?.0)
+    }
+    fn evaluate_programme<'p,'j>(
+        base:&mut ResidentNormalWave<'c,NormalWaveCoupled<'c>>,
+        comparison:&'j NormalCoupledComparison<'c>,operations:&[&ConstitutiveSourcePassage<'c>],
+        parameters:&'p ResidentSection<'c>,faces:Option<&[&ResidentSection<'c>]>,
+    )->Result<(CoupledConstitutiveAlternative<'p,'j,'c>,BTreeMap<usize,EvaluatedProducingCut<'c>>),ConstitutiveFibreError>{
+        let clauses=operations.iter().enumerate().filter_map(|(i,p)|p.returned.as_ref().map(|r|(i,r))).collect::<Vec<_>>();
+        if faces.is_some_and(|f|f.len()!=clauses.len()){return Err(ConstitutiveFibreError::Shape);}
+        let selected=clauses.iter().enumerate().map(|(i,(at,r))|(*at,*r,faces.map_or(&r.receiver,|f|f[i]))).collect::<Vec<_>>();
+        let mut value=base.read_coupled_constitutive_family(comparison)?.evaluate(parameters)?;
+        let mut cuts=BTreeMap::new();
+        for (index,operation) in operations.iter().enumerate(){
+            let source=value.retained_successor();
+            for (_,returned,face) in selected.iter().filter(|(_,r,_)|r.cut.prefix==index){
+                let named=operations.get(returned.cut.prefix).ok_or(ConstitutiveFibreError::Shape)?;
+                if named.kind!=ConstitutivePassageKind::Advance || named.member!=returned.cut.member || named.chart!=returned.cut.chart {
+                    return Err(ConstitutiveFibreError::ForeignOccurrence);
+                }
+                let coordinates=value.successor_section().coordinates_of_resident_face(face)?;
+                let section=coordinates.into_section()?;
+                value.bind_successor(section)?;
+            }
+            let path=value.path_len();
+            if operation.kind==ConstitutivePassageKind::Return {
+                let returned=operation.returned.as_ref().ok_or(ConstitutiveFibreError::Shape)?;
+                let cut:&EvaluatedProducingCut<'c>=cuts.get(&returned.cut.prefix).ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
+                let observed=ResidentConstitutiveCurrent::rational(operation.source.as_ref().ok_or(ConstitutiveFibreError::Shape)?)?;
+                let c=NormalCoupledComparison::from_cut(returned.prediction,Rc::new(CoupledProducingCut {
+                    member:returned.cut.member,source:Rc::clone(&cut.source),produced:Rc::clone(&cut.produced),
+                }),observed)?;
+                let face=selected.iter().find(|(at,_,_)|*at==index).ok_or(ConstitutiveFibreError::Shape)?.2;
+                let coordinates=c.source().coordinates_of_resident_face(face)?.into_coordinates();
+                let operands=super::comparison::ConstitutiveReturnOperands::from_comparison(c,&coordinates)?;
+                let law=base.continuation.neighborhood.generator_for_staging(operation.member)?;
+                value.apply_return(operands,Some(law))?;
             } else {
-                Some(base.neighborhood().generator(passage.member)?)
-            };
-            Self::apply_operation(&mut value, passage, other)?;
+                let other=if operation.member==comparison.member(){None}else{Some(base.neighborhood().generator(operation.member)?)};
+                Self::apply_operation(&mut value,operation,other)?;
+            }
+            if operation.kind==ConstitutivePassageKind::Advance {
+                cuts.insert(index,EvaluatedProducingCut {source,produced:value.retained_successor(),path});
+            }
         }
-        Ok(value)
+        Ok((value,cuts))
+    }
+    /// Evaluate the complete repeated-return generator. Later parameters are anchored source
+    /// faces in their original frames, ordered by return events, not rebased coefficient rows.
+    pub fn evaluate_with_return_faces<'p,'j>(
+        &'j mut self,parameters:&'p ResidentSection<'c>,faces:&[&ResidentSection<'c>],
+    )->Result<CoupledConstitutiveAlternative<'p,'j,'c>,ConstitutiveFibreError>{
+        Ok(Self::evaluate_programme(&mut self.base,&self.comparison,&self.operations.iter().collect::<Vec<_>>(),parameters,Some(faces))?.0)
     }
     pub fn evaluate<'p, 'j>(
         &'j mut self,
@@ -293,6 +359,7 @@ impl<'c> ResidentCoupledConstitutive<'c> {
             .checked_add(1)
             .ok_or(ConstitutiveFibreError::Shape)?;
         match passage.kind {
+            ConstitutivePassageKind::Return=>Err(ConstitutiveFibreError::Shape),
             ConstitutivePassageKind::Source => value.actuate_source(
                 passage.member,
                 other,
@@ -354,6 +421,13 @@ impl<'c> ResidentCoupledConstitutive<'c> {
         retain: bool,
     ) -> Result<(), (ConstitutiveSourcePassage<'c>, ConstitutiveFibreError)> {
         let prepared = (|| {
+            match (operation.kind,operation.returned.as_ref()) {
+                (ConstitutivePassageKind::Return,Some(r)) if !retain && operation.member==r.cut.member
+                    && operation.chart==r.cut.chart && self.pending.get(&r.prediction)==Some(&r.cut)=>{},
+                (ConstitutivePassageKind::Return,_)=>return Err(ConstitutiveFibreError::ForeignOccurrence),
+                (_,None) if !retain || operation.kind==ConstitutivePassageKind::Advance=>{},
+                _=>return Err(ConstitutiveFibreError::Shape),
+            }
             let next = self
                 .epoch
                 .checked_add(1)
@@ -361,18 +435,8 @@ impl<'c> ResidentCoupledConstitutive<'c> {
             self.operations
                 .try_reserve(1)
                 .map_err(|_| ConstitutiveFibreError::Shape)?;
-            let mut value = Self::evaluate_parts(
-                &mut self.base,
-                &self.comparison,
-                &self.operations,
-                &self.receiver,
-            )?;
-            let other = if operation.member == self.comparison.member() {
-                None
-            } else {
-                Some(self.base.neighborhood().generator(operation.member)?)
-            };
-            Self::apply_operation(&mut value, &operation, other)?;
+            let operations=self.operations.iter().chain(std::iter::once(&operation)).collect::<Vec<_>>();
+            let (value,_)=Self::evaluate_programme(&mut self.base,&self.comparison,&operations,&self.receiver,None)?;
             value
                 .successor_section()
                 .read_receiver()?
@@ -390,6 +454,9 @@ impl<'c> ResidentCoupledConstitutive<'c> {
                             chart: operation.chart,
                         },
                     );
+                }
+                if let Some(returned)=&operation.returned {
+                    self.pending.remove(&returned.prediction);
                 }
                 self.operations.push(operation);
                 self.epoch = next;
@@ -409,6 +476,7 @@ impl<'c> ResidentCoupledConstitutive<'c> {
                 chart,
                 kind: ConstitutivePassageKind::Advance,
                 source: None,
+                returned:None,
             },
             false,
         )
@@ -425,6 +493,7 @@ impl<'c> ResidentCoupledConstitutive<'c> {
                 chart,
                 kind: ConstitutivePassageKind::Advance,
                 source: None,
+                returned:None,
             },
             true,
         )
@@ -454,6 +523,7 @@ impl<'c> ResidentCoupledConstitutive<'c> {
                 chart,
                 kind: ConstitutivePassageKind::Advance,
                 source: None,
+                returned:None,
             },
             other,
         )?;
@@ -472,6 +542,7 @@ impl<'c> ResidentCoupledConstitutive<'c> {
                 chart,
                 kind,
                 source: Some(source),
+                returned:None,
             },
             false,
         )
