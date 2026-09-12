@@ -118,6 +118,9 @@ pub enum HnaCli {
         /// Resume the positional source as a saved wave session artifact.
         #[arg(long)]
         resume: bool,
+        /// Treat the source as an applied-wave seed specification.
+        #[arg(long, conflicts_with = "resume")]
+        seed: bool,
         /// JSONL input path, or `-` for standard input.
         #[arg(long, default_value = "-")]
         input: PathBuf,
@@ -203,11 +206,13 @@ impl From<HnaCli> for HnaCommand {
             HnaCli::WaveSession {
                 source,
                 resume,
+                seed,
                 input,
                 checkpoint,
             } => Self::WaveSession {
                 source,
                 resume,
+                seed,
                 input,
                 checkpoint,
             },
@@ -924,7 +929,7 @@ mod tests {
         assert!(matches!(
             fresh.command,
             Some(WorkbenchCommand::Hna(HnaCommand::WaveSession {
-                ref source, resume: false, ref input, ref checkpoint
+                ref source, resume: false, seed: false, ref input, ref checkpoint
             })) if source == &PathBuf::from("packet-one")
                 && input == &PathBuf::from("events.jsonl")
                 && checkpoint == &PathBuf::from("saved.wave")
@@ -942,11 +947,18 @@ mod tests {
         assert!(matches!(
             resumed.command,
             Some(WorkbenchCommand::Hna(HnaCommand::WaveSession {
-                ref source, resume: true, ref input, ref checkpoint
+                ref source, resume: true, seed: false, ref input, ref checkpoint
             })) if source == &PathBuf::from("saved.wave")
                 && input == &PathBuf::from("-")
                 && checkpoint == &PathBuf::from("next.wave")
         ));
+        let seeded = parse_cli([
+            "holonics", "hna", "wave-session", "seed.json", "--seed", "--checkpoint", "saved.wave",
+        ]).expect("seeded wave session parse");
+        assert!(matches!(seeded.command, Some(WorkbenchCommand::Hna(HnaCommand::WaveSession { seed: true, resume: false, .. }))));
+        assert!(parse_cli([
+            "holonics", "hna", "wave-session", "seed.json", "--seed", "--resume", "--checkpoint", "saved.wave",
+        ]).is_err());
     }
     #[test]
     fn coupled_wave_session_preserves_configuration_and_resume_authority(){

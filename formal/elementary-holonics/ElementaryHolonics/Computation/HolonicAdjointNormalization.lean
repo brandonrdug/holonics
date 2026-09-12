@@ -158,6 +158,21 @@ theorem face_eq_iff_pairwise_differences (left right : Index → ℝ) :
     rw [shifted]
     exact face_add_common right _
 
+/-- A predicted increment has the full next-current probability face only when the omitted
+anchor is a common potential. This is the exact source-map condition used by the shared
+normalized sum receiver; a nonconstant current cannot be discarded as a gauge. -/
+theorem face_add_eq_iff_anchor_constant (anchor increment : Index → ℝ) :
+    (face (fun i => anchor i + increment i)).mass = (face increment).mass ↔
+      ∀ i j, anchor i = anchor j := by
+  rw [face_eq_iff_pairwise_differences]
+  constructor
+  · intro equal i j
+    have h := equal i j
+    linarith
+  · intro constant i j
+    rw [constant i j]
+    ring
+
 /-- The expected receiver reading of one finite section. -/
 def expectation (probability : PositiveProbabilitySection Index) (values : Index → ℝ) : ℝ :=
   ∑ index, probability.mass index * values index

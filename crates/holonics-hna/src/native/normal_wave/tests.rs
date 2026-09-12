@@ -33,6 +33,110 @@ fn emit_request(retain: bool) -> Vec<u8> {
 }
 
 #[test]
+fn source_seed_checks_actual_symbols_and_schema_before_mounting() {
+    let spec = NativeWaveSeedSpec {
+        schema: NATIVE_WAVE_SEED_SCHEMA.into(),
+        symbols: vec!['a', 'b'],
+        seed: "az".into(),
+        grain: 64,
+    };
+    assert!(with_seeded_wave_session(&spec, |_| Ok(())).is_err());
+    let mut spec = spec;
+    spec.seed = "a".into();
+    assert!(with_seeded_wave_session(&spec, |_| Ok(())).is_err());
+}
+
+#[test]
+#[ignore = "requires CUDA; categorical receiver uses c+delta at producing cut and preserves native covectors"]
+fn normalized_next_current_uses_pre_update_prediction_and_actual_symbol_mass() {
+    use num_rational::BigRational as Rat;
+    let q = |n: i64, d: i64| Rat::new(n.into(), d.into());
+    let spec = NativeWaveSeedSpec {
+        schema: NATIVE_WAVE_SEED_SCHEMA.into(),
+        symbols: vec!['a', 'b'],
+        seed: "ab".into(),
+        grain: 64,
+    };
+    with_seeded_wave_session(&spec, |session| {
+        let input=session.chart.mount(session.surface,&session.chart.decode_text("a")?)?;
+        let reads=session.surface.census().section_read_outs;
+        let received=session.wave.receive(ResidentConstitutiveSection::integers(&input)?.row(0)?)?;
+        let normalized=received.normalized_return(2,SeriesAperture(20))?;
+        assert_eq!(session.surface.census().section_read_outs,reads,"all comparison operands remain resident");
+        let reading=normalized.inspect()?;
+        // Initial delta=0 but c=e_b: uniform probabilities would omit the current anchor.
+        assert!(reading.prediction[0].lower>q(1,4));
+        assert!(reading.prediction[0].upper<q(1,3));
+        assert!(reading.prediction[1].lower>q(2,3));
+        assert!(reading.prediction[1].upper<q(3,4));
+        for p in &reading.prediction { assert!(&p.upper-&p.lower<q(1,1024)); }
+        assert_eq!(reading.observation[0].lower,q(1,1));
+        assert_eq!(reading.observation[0].upper,q(1,1));
+        assert_eq!(reading.observation[1].lower,q(0,1));
+        assert_eq!(reading.observation[1].upper,q(0,1));
+        assert!(reading.returned_difference[0].lower>q(0,1));
+        assert!(reading.returned_difference[1].upper<q(0,1));
+        assert!(reading.potential_pullback[0].lower>q(0,1));
+        assert!(reading.potential_pullback[1].upper<q(0,1));
+        assert_eq!(reading.source,0);
+        assert_eq!(reading.receiving,1);
+        assert!(std::ptr::eq(*normalized.origin(),&received));
+        let before=session.wave.fibre().material_observations;
+        assert!(session.receive_next_symbol_distribution("b",0).is_err());
+        assert_eq!(session.wave.fibre().material_observations,before);
+        let mut stream=HnaStream::new();
+        let request=format!("{{\"schema\":\"{}\",\"command\":{{\"action\":\"receive-next-symbol-distribution\",\"text\":\"b\",\"series_terms\":20}}}}\n",crate::HNA_STREAM_REQUEST_SCHEMA);
+        let mut response=Vec::new();
+        stream.pump_wave(session,&mut Input::new(request),&mut response).map_err(invalid)?;
+        let response:Value=serde_json::from_slice(&response)?;
+        assert_eq!(response["event"],"next-symbol-received","{response}");
+        assert_eq!(response["value"]["observation_committed"],true);
+        assert_eq!(response["value"]["distribution"]["status"],"returned","{response}");
+        assert_eq!(response["value"]["distribution"]["reading"]["source"],1);
+        assert_eq!(response["value"]["distribution"]["reading"]["receiving"],2);
+        assert_eq!(session.wave.fibre().material_observations,before+1);
+        assert_eq!(normalized.inspect()?.prediction,reading.prediction,
+            "the earlier source-qualified receiver survives another observation without cloning the ecology");
+        Ok(())
+    }).unwrap();
+}
+
+#[test]
+#[ignore = "requires CUDA; next-symbol development reads the actual resident preparation"]
+fn actual_next_symbol_uses_prepared_context_without_guessed_emission() {
+    let spec = NativeWaveSeedSpec {
+        schema: NATIVE_WAVE_SEED_SCHEMA.into(),
+        symbols: vec!['a', 'b', 'x'],
+        seed: "ax".into(),
+        grain: 64,
+    };
+    with_seeded_wave_session(&spec, |session| {
+        let mut stream=HnaStream::new();
+        for _ in 0..8 {
+            for (prefix,observed) in [("ax","a"),("bx","b")] {
+                session.actuate_text(prefix)?;
+                let request=format!("{{\"schema\":\"{}\",\"command\":{{\"action\":\"receive-next-symbol\",\"text\":\"{observed}\"}}}}\n",crate::HNA_STREAM_REQUEST_SCHEMA);
+                let mut response=Vec::new();
+                stream.pump_wave(session,&mut Input::new(request),&mut response).map_err(invalid)?;
+                let result:Value=serde_json::from_slice(&response)?;
+                assert_eq!(result["event"],"next-symbol-received","{result}");
+            }
+        }
+        assert_eq!(session.wave.fibre().material_observations,16);
+        assert_eq!(session.emission_ordinal,0,"development did not emit a guessed source");
+        let mut results=Vec::new();
+        for (prefix,expected) in [("aax","a"),("bbx","b")] {
+            session.actuate_text(prefix)?;
+            let prediction=session.next_symbol(true)?;
+            eprintln!("contextual prediction {prefix:?} -> {prediction}");
+            results.push((prediction["text"].as_str().unwrap_or("").to_owned(),expected));
+        }
+        assert_eq!(results,vec![("a".to_owned(),"a"),("b".to_owned(),"b")]);
+        Ok(())
+    }).unwrap();
+}
+
+#[test]
 #[ignore = "requires CUDA; native emission re-enters as actual source without a self-target deposit"]
 fn emission_reentry_has_actual_effect_and_no_deposit() {
     let readout = ResidentReadout::new().unwrap();
@@ -162,11 +266,9 @@ fn broken_delivery_and_checkpoint_keep_next_conduct() {
         bytes: vec![],
         remaining: 7,
     };
-    assert!(
-        stream
-            .pump_wave(&mut session, &mut input, &mut broken)
-            .is_err()
-    );
+    assert!(stream
+        .pump_wave(&mut session, &mut input, &mut broken)
+        .is_err());
     assert_eq!(session.wave.epoch(), 1);
     assert_eq!(session.emission_ordinal, 1);
     let pending = stream.state().output.clone().unwrap();

@@ -8,29 +8,41 @@ use num_traits::{One, Zero};
 
 /// Resident p, q, q-p, and J_p(q-p) for disjoint, caller-declared coordinate groups. This is
 /// the receiver's returned covector, not an automatically committed developmental displacement.
-pub struct NativeNormalizedMaterialReturn<'chart> {
-    owner: Rc<()>,
+pub struct NativeNormalizedMaterialReturn<
+    'chart,
+    Provenance = NativeFieldLineage,
+    Chart = NativeMaterialTarget,
+    Origin = (
+        Rc<()>,
+        Rc<ResidentSection<'chart>>,
+        Rc<ResidentSection<'chart>>,
+    ),
+> {
     surface: &'chart ResidentSurface<'chart>,
     pub(in super::super) output: Rc<ResidentSection<'chart>>,
-    _prediction: Rc<ResidentSection<'chart>>,
-    _observation: Rc<ResidentSection<'chart>>,
-    source: NativeFieldLineage,
-    receiving: NativeFieldLineage,
+    // Source ownership is retained, not type-erased: the field owns its immutable carriers;
+    // another operation may borrow its complete already-owned comparison.
+    origin: Origin,
+    source: Provenance,
+    receiving: Provenance,
     group_width: usize,
     grain: u32,
     series_terms: u32,
     nodes: usize,
-    target_chart: NativeMaterialTarget,
+    target_chart: Chart,
 }
 
 #[derive(Clone, Debug, Serialize)]
-pub struct NativeNormalizedMaterialReading {
-    pub source: NativeFieldLineage,
-    pub receiving: NativeFieldLineage,
+pub struct NativeNormalizedMaterialReading<
+    Provenance = NativeFieldLineage,
+    Chart = NativeMaterialTarget,
+> {
+    pub source: Provenance,
+    pub receiving: Provenance,
     pub group_width: usize,
     pub grain: u32,
     pub series_terms: u32,
-    pub target_chart: NativeMaterialTarget,
+    pub target_chart: Chart,
     pub prediction: Vec<ExactInterval>,
     pub observation: Vec<ExactInterval>,
     /// q-p. In this unit potential chart this is also the negative potential derivative of
@@ -43,9 +55,45 @@ pub struct NativeNormalizedMaterialReading {
     pub centered_difference: Vec<ExactInterval>,
 }
 
-impl NativeNormalizedMaterialReturn<'_> {
+impl<'chart, Provenance: Clone, Chart: Clone, Origin>
+    NativeNormalizedMaterialReturn<'chart, Provenance, Chart, Origin>
+{
+    pub fn origin(&self) -> &Origin {
+        &self.origin
+    }
+
+    /// Bind the shared receiver/decoder to an actual source owner and its declared chart.
+    /// Only typed native producers call this; external callers cannot forge report provenance.
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn from_resident(
+        surface: &'chart ResidentSurface<'chart>,
+        output: Rc<ResidentSection<'chart>>,
+        origin: Origin,
+        source: Provenance,
+        receiving: Provenance,
+        group_width: usize,
+        grain: u32,
+        series_terms: u32,
+        nodes: usize,
+        target_chart: Chart,
+    ) -> Self {
+        Self {
+            surface,
+            output,
+            origin,
+            source,
+            receiving,
+            group_width,
+            grain,
+            series_terms,
+            nodes,
+            target_chart,
+        }
+    }
     /// Explicit cold inspection. Constructing the resident return reads only its launch receipt.
-    pub fn inspect(&self) -> Result<NativeNormalizedMaterialReading, ConstitutiveFibreError> {
+    pub fn inspect(
+        &self,
+    ) -> Result<NativeNormalizedMaterialReading<Provenance, Chart>, ConstitutiveFibreError> {
         let rest = self.surface.detach_section(&self.output, 64)?;
         let raw = material_transport::wides(&rest.intervals)?;
         if raw.len() != 10 * self.nodes {
@@ -86,7 +134,7 @@ impl NativeNormalizedMaterialReturn<'_> {
             group_width: self.group_width,
             grain: self.grain,
             series_terms: self.series_terms,
-            target_chart: self.target_chart,
+            target_chart: self.target_chart.clone(),
             prediction,
             observation,
             returned_difference: read(4)?,
@@ -109,8 +157,10 @@ impl<'chart> NativeConstitutiveField<'chart> {
         group_width: usize,
         terms: SeriesAperture,
     ) -> Result<Option<NativeNormalizedMaterialReturn<'chart>>, ConstitutiveFibreError> {
-        let target_chart=self.material_target().unwrap_or_default();
-        let nodes = target_chart.dimension(self.nodes()).ok_or(ConstitutiveFibreError::Shape)?;
+        let target_chart = self.material_target().unwrap_or_default();
+        let nodes = target_chart
+            .dimension(self.nodes())
+            .ok_or(ConstitutiveFibreError::Shape)?;
         if group_width == 0 || nodes % group_width != 0 || terms.0 == 0 || terms.0 == u32::MAX {
             return Err(ConstitutiveFibreError::Shape);
         }
@@ -133,7 +183,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         };
         let report_words = self
             .material_transport_source()
-            .and_then(|source| source.report_words_for(self.nodes(),target_chart))
+            .and_then(|source| source.report_words_for(self.nodes(), target_chart))
             .ok_or(ConstitutiveFibreError::Shape)?;
         if prediction.width() != report_words || observation.width() != report_words {
             return Err(ConstitutiveFibreError::Shape);
@@ -165,11 +215,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
             )));
         }
         Ok(Some(NativeNormalizedMaterialReturn {
-            owner: self.owner.clone(),
             surface,
             output,
-            _prediction: prediction,
-            _observation: observation,
+            origin: (self.owner.clone(), prediction, observation),
             source: producer.lineage.clone(),
             receiving: event.lineage.clone(),
             group_width,
@@ -182,7 +230,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
 }
 
 mod pullback;
-pub use pullback::{NativeMaterialPullbackMetric, NativeMaterialSourcePullback, NativeMaterialSourcePullbackReading};
+pub use pullback::{
+    NativeMaterialPullbackMetric, NativeMaterialSourcePullback, NativeMaterialSourcePullbackReading,
+};
 
 #[cfg(test)]
 mod tests;

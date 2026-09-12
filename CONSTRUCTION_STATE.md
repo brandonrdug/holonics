@@ -10,6 +10,20 @@ targeted development and product checks on the repaired path proceed within the 
 
 ## Immediate implementation
 
+[established-bounded; implemented-exact; computational-witness] The
+[source/predictive increment](research/records/2026-09-12_CONTEXTUAL_RECEPTION_AND_NORMALIZATION_REUSE_THEIR_SHARED_NATIVE_OWNERS.md)
+binds fresh applied-wave seeding and direct next-symbol reception (`aax -> a`, `bbx -> b`
+after declared development). Its producing-state probability receiver now reuses the existing
+normalized return, decoder and CUDA arithmetic; the redundant new Wave-specific return/reading
+types and export chain are removed. Eight HNN controls, six existing normalized/source-pullback
+controls and the targeted Lean source-map lemma passed. The post-consolidation seeded process/
+restart test also passed, returning the two held-out contextual outputs in 0.65 s.
+
+[project-postulate] Consolidation and maintenance accompany every implementation packet. The
+changed source, receiver and public consumers are reconciled in the same increment; source
+inspection identifying existing overlap is not a completed repair. No separate cleanup campaign
+or type-count gate substitutes for keeping the implementation coherent.
+
 [definition] The [planning review](research/records/2026-09-12_THE_HNN_PLAN_IS_ORDERED_BY_PRODUCTIVE_GENERATOR_INTEGRATION.md)
 and [native blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-implementation-packets)
 identify five product packets: callable mathematical workshop, contextual generator formation,

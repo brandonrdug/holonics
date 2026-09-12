@@ -53,6 +53,8 @@ pub enum HnaCommand {
     WaveSession {
         source: PathBuf,
         resume: bool,
+        #[serde(default)]
+        seed: bool,
         input: PathBuf,
         checkpoint: PathBuf,
     },

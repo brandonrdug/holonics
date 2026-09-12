@@ -204,6 +204,7 @@ pub fn run_wave_session_stream(
     let HnaCommand::WaveSession {
         source,
         resume,
+        seed,
         input,
         checkpoint,
     } = command
@@ -212,6 +213,11 @@ pub fn run_wave_session_stream(
             "expected a wave streaming session command".into(),
         ));
     };
+    if seed && resume {
+        return Err(NativeSessionError::Application(
+            "seeded wave sessions cannot resume an existing checkpoint".into(),
+        ));
+    }
     if checkpoint.exists() {
         return Err(NativeSessionError::Application(format!(
             "wave checkpoint already exists: {:?}",
@@ -264,6 +270,20 @@ pub fn run_wave_session_stream(
             epochs: WaveEpochReceipt { before, after },
             inspect,
         }
+    }
+
+    if seed {
+        let bytes = fs::read(&source).map_err(|error| {
+            NativeSessionError::Application(format!("cannot read wave seed {:?}: {error}", source))
+        })?;
+        let spec: holonics::hna::native::NativeWaveSeedSpec = serde_json::from_slice(&bytes)?;
+        return holonics::hna::native::with_seeded_wave_session(&spec, |session| {
+            let mut stream = HnaStream::new();
+            stream.open_new_connection();
+            let before = session.wave().epoch();
+            let pump = stream.pump_wave(session, &mut input, &mut output);
+            Ok(finish_wave_stream(session, &stream, pump, &checkpoint, before))
+        });
     }
 
     let saved = if resume {

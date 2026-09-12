@@ -32,6 +32,7 @@ pub enum HnaStreamCommand {
     CompareSymbol {source:u64,text:String,#[serde(default)] coefficient_row:Option<usize>},
     ReleaseSymbolComparison {source:u64},
     ReceiveNextSymbol { text:String },
+    ReceiveNextSymbolDistribution { text:String, series_terms:u32 },
     ReceiveCurrent {
         current: crate::native::CurrentWire,
         #[serde(default)]
@@ -274,6 +275,10 @@ impl HnaStream {
             self.state.input.clear();
             self.state.input_complete = false;
             match request.command {
+                HnaStreamCommand::ReceiveNextSymbolDistribution {text,series_terms}=>match target.receive_next_symbol_distribution(&text,series_terms){
+                    Ok(value)=>self.emit("next-symbol-received",value)?,
+                    Err(error)=>self.emit("refused",json!({"error":error,"anatomy":target.inspect()}))?,
+                },
                 HnaStreamCommand::MathematicalRequest { request } => match target.mathematical_request(&request) {
                     Ok(value) => self.emit("mathematical-return", value)?,
                     Err(error) => self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?,
@@ -396,6 +401,7 @@ impl Default for HnaStream {
 /// Only an exterior effect seam for I/O tests. Native current and learning are never callbacks
 /// supplied through the public stream protocol; actual adapters use HnaSession or NativeSession.
 trait StreamTarget {
+    fn receive_next_symbol_distribution(&mut self,_:&str,_:u32)->Result<Value,String>{Err("normalized next-current receiver unsupported by this session".into())}
     fn mathematical_request(&mut self, _: &crate::native::MathematicalRequest) -> Result<Value, String> {
         Err("mathematical construction is not attached to this session".into())
     }
@@ -814,6 +820,8 @@ mod tests {
 }
 
 impl StreamTarget for crate::native::NativeWaveSession<'_> {
+    fn receive_next_symbol_distribution(&mut self,text:&str,terms:u32)->Result<Value,String>{self.receive_next_symbol_distribution(text,terms).map_err(|e|e.to_string())}
+    fn receive_next_symbol(&mut self,text:&str)->Result<Value,String>{self.receive_next_symbol(text).map_err(|e|e.to_string())}
     fn actuate_text(&mut self,text:&str)->Result<Value,String>{self.actuate_text(text).map_err(|e|e.to_string())}
     fn emit_symbol(&mut self,full:bool,retain:bool)->Result<Value,String>{
         (if retain {self.predict_symbol(full)} else {self.next_symbol(full)}).map_err(|e|e.to_string())

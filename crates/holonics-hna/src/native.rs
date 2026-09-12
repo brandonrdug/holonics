@@ -16,7 +16,8 @@ pub use mathematical::{with_mathematical_session, MathematicalRequest, NativeMat
 mod normal_wave;
 mod coupled_wave;
 pub use coupled_wave::{NativeCoupledBody,NativeCoupledWaveSession,NativeCoupledWaveSavedSession,NativeCoupledWaveAttachRefusal};
-pub use normal_wave::{NativeWaveSession,NativeWaveSavedSession,NativeWaveAttachRefusal};
+pub use normal_wave::{NativeWaveSession,NativeWaveSavedSession,NativeWaveAttachRefusal,
+    NativeWaveSeedSpec, NATIVE_WAVE_SEED_SCHEMA, with_seeded_wave_session};
 
 mod wire;
 pub use wire::*;

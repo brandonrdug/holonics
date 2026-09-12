@@ -304,6 +304,15 @@ owners; it is not a native HNN synthesizer. The
 [solver return](../research/records/2026-09-11_HOLONIC_SOLVER_NAVIGATES_EXACT_GENERATOR_FACTORIZATIONS.md)
 retains its grammar, exact factors, coefficient fibres and work scope.
 
+[definition] The [contextual reception/receiver consolidation](../research/records/2026-09-12_CONTEXTUAL_RECEPTION_AND_NORMALIZATION_REUSE_THEIR_SHARED_NATIVE_OWNERS.md)
+uses `normal/direct/wave/receive/normalized.rs` only as a source adapter for the existing
+`field/receiver/normalized.rs` return/decoder. The latter parameterizes the actual origin and
+receiver provenance/chart; its field source-pullback consumer remains in `normalized/pullback.rs`.
+`surface_passage.rs` binds `section_normalized_sum_receiver`, and `field_normalized_receiver.cuh`
+shares `normalized_compare_faces` between that affine-sum receiver and the existing field entry.
+`HolonicAdjointNormalization.lean::face_add_eq_iff_anchor_constant` supplies the exact condition
+under which an omitted current anchor would be a normalized-receiver gauge.
+
 [definition] `RH/ThresholdRefinement.lean` derives square-closure equivalence on the actual
 seam-time set and the conditional halving limit. Its quadratic control is the existing polynomial
 heat operator, with explicit off-real roots below its sharp time. It proves no improved ξ bound.

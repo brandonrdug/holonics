@@ -1,24 +1,72 @@
 //! Exterior source, emission and delivery state over one move-owned applied normal wave.
 //! Native current/learning/selection stay in their engine owners; the shared HnaStream owns I/O.
-use super::{NativeSessionError, section_input::SymbolCurrentChart};
-use crate::{HnaStream, HnaStreamState, PublicationReceipt, publish_new};
+use super::{section_input::SymbolCurrentChart, NativeSessionError};
+use crate::{publish_new, HnaStream, HnaStreamState, PublicationReceipt};
 use holonic_engine::{
     codec_recovery::{Symbol, SymbolAlphabet},
     embedding_fiber::ResidentReadout,
     native_ecology::constitutive_fibre::{
         NormalBasisSelection, NormalWaveBasisChart, NormalWaveRest, NormalWaveTransport,
-        ResidentConstitutiveSection, ResidentNormalWave,
+        ResidentConstitutiveSection, ResidentNormalMaterial, ResidentNormalWave,
     },
-    resident_section::ResidentSurface,
+    resident_section::{ResidentGrain, ResidentSurface, SeriesAperture},
 };
 use serde::{Deserialize, Serialize};
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::{
     fs::File,
     io::{self, Read, Write},
     path::Path,
 };
 const MAGIC: &[u8] = b"HNA-APPLIED-WAVE-SESSION\x01";
+
+pub const NATIVE_WAVE_SEED_SCHEMA: &str = "org.holonics.hna.applied-wave-seed.v1";
+
+/// Exterior symbol/current chart and two supplied initial currents, not authored predictions.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct NativeWaveSeedSpec {
+    pub schema: String,
+    pub symbols: Vec<char>,
+    pub seed: String,
+    pub grain: u32,
+}
+
+pub fn with_seeded_wave_session<R>(
+    spec: &NativeWaveSeedSpec,
+    operation: impl FnOnce(&mut NativeWaveSession<'_>) -> Result<R, NativeSessionError>,
+) -> Result<R, NativeSessionError> {
+    if spec.schema != NATIVE_WAVE_SEED_SCHEMA || !(1..=120).contains(&spec.grain) {
+        return Err(invalid("wave seed schema or numerical grain"));
+    }
+    let alphabet = SymbolAlphabet::from_chars(&spec.symbols)
+        .map_err(|e| invalid(format!("alphabet: {e:?}")))?;
+    let chart = SymbolCurrentChart::declared(alphabet);
+    let symbols = chart.decode_text(&spec.seed)?;
+    if symbols.len() != 2 {
+        return Err(invalid(
+            "wave seed requires exactly two supplied source symbols",
+        ));
+    }
+    let readout = ResidentReadout::new().map_err(invalid)?;
+    let surface = ResidentSurface::on(&readout).map_err(invalid)?;
+    let packet = chart.mount(&surface, &symbols)?;
+    let input = ResidentConstitutiveSection::integers(&packet)?;
+    let material = ResidentNormalMaterial::found(
+        &surface,
+        chart.alphabet().len(),
+        chart.alphabet().len(),
+        ResidentGrain(spec.grain),
+    )?;
+    let wave = material
+        .into_applied_difference_wave(input.row(0)?, input.row(1)?)
+        .map_err(|refusal| invalid(refusal.reason))?;
+    let mut session =
+        NativeWaveSession::from_wave(&surface, wave, chart).map_err(|refusal| refusal.reason)?;
+    let result = operation(&mut session);
+    drop(session);
+    result
+}
 fn invalid(message: impl ToString) -> NativeSessionError {
     NativeSessionError::Application(message.to_string())
 }
@@ -266,6 +314,57 @@ impl<'c> NativeWaveSession<'c> {
         )?;
         Ok(json!({"prediction":prediction,"epoch":self.wave.epoch(),
             "observations":result.successor_fibre.material_observations}))
+    }
+
+    /// An actual next-current observation at the current preparation cut. No selected symbol
+    /// is inserted first and no prediction handle is manufactured. Native receive forms
+    /// x=(c-p,c,p), y=observed-c from the same resident pre-return joint current.
+    pub fn receive_next_symbol(&mut self, text: &str) -> Result<Value, NativeSessionError> {
+        self.receive_next(text, None)
+    }
+
+    pub fn receive_next_symbol_distribution(
+        &mut self,
+        text: &str,
+        series_terms: u32,
+    ) -> Result<Value, NativeSessionError> {
+        if series_terms == 0 || series_terms == u32::MAX {
+            return Err(invalid(
+                "normalized receiver requires a positive finite series aperture",
+            ));
+        }
+        self.receive_next(text, Some(SeriesAperture(series_terms)))
+    }
+
+    fn receive_next(
+        &mut self,
+        text: &str,
+        normalized: Option<SeriesAperture>,
+    ) -> Result<Value, NativeSessionError> {
+        self.ready()?;
+        let symbols = self.chart.decode_text(text)?;
+        if symbols.len() != 1 {
+            return Err(invalid(
+                "next-current observation requires one actual symbol",
+            ));
+        }
+        let source = self.chart.mount(self.surface, &symbols)?;
+        let before = self.wave.epoch();
+        let result = self
+            .wave
+            .receive(ResidentConstitutiveSection::integers(&source)?.row(0)?)?;
+        self.last = None; // the next emission is not adjacent to the previous generated part
+                          // This is an optional receiver of the completed native observation. A receiver refusal
+                          // reports that the observation committed; it must not invite repetition of the update.
+        let distribution=normalized.map(|terms| match result.normalized_return(self.chart.alphabet().len(),terms).and_then(|r|r.inspect()) {
+            Ok(reading)=>json!({"status":"returned", "reading":reading,
+                "potential_scope":"pre-update predicted next current c+delta", "observed_scope":"unit-symbol squared-modulus mass"}),
+            Err(error)=>json!({"status":"receiver-refused", "error":error.to_string()}),
+        });
+        Ok(json!({"source_epoch":before, "epoch":self.wave.epoch(),
+            "observations":result.successor_fibre.material_observations,
+            "source_scope":"pre-return held joint current", "receiver":"actual next symbol",
+            "observation_committed":true, "distribution":distribution}))
     }
     pub fn inspect(&self) -> Value {
         json!({"model_kind":"applied-normal-wave","transport":self.wave.transport(),

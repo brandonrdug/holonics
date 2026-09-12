@@ -93,7 +93,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         returned: &NativeNormalizedMaterialReturn<'chart>,
         metric: NativeMaterialPullbackMetric,
     ) -> Result<NativeMaterialSourcePullback<'chart>, ConstitutiveFibreError> {
-        if !Rc::ptr_eq(&self.owner, &returned.owner) {
+        if !Rc::ptr_eq(&self.owner, &returned.origin.0) {
             return Err(ConstitutiveFibreError::ForeignOccurrence);
         }
         if metric == NativeMaterialPullbackMetric::SquaredCurrent {
@@ -103,7 +103,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         }
         self.material_query_pullback(
             returned.output.clone(),
-            returned._observation.clone(),
+            returned.origin.2.clone(),
             returned.source.clone(),
             returned.receiving.clone(),
             metric,

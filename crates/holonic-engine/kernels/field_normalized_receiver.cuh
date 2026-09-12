@@ -112,21 +112,8 @@ __device__ void normalized_packet_face(const wide *input,uint32_t nodes,uint32_t
     }
 }
 
-extern "C" __global__ __launch_bounds__(512) void section_field_normalized_receiver(
-    const int64_t *prediction,const int64_t *observation,uint32_t nodes,uint32_t group_width,
-    uint32_t grain,uint32_t terms,uint32_t packet_observation,int64_t *out_lo,int64_t *out_hi,
-    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
-) {
-    if(threadIdx.x)return;
-    if(upstream_refused(census,lineage,lineage_count,slot))return;
-    if(!nodes||!group_width||nodes%group_width||grain<1||grain>120||!terms||terms==UINT32_MAX||packet_observation>1u){
-        atomicOr(slot,REFUSED_MALFORMED);return;
-    }
-    uint32_t first=blockIdx.x*group_width;if(first>=nodes)return;
-    const wide *p=(const wide *)prediction;
-    // Every material-report family retains its actual observed current in target block two.
-    const wide *q=(const wide *)observation+2u*(2u*nodes+1u);
-    wide *out=(wide *)out_lo;
+__device__ void normalized_compare_faces(const wide *p,const wide *q,uint32_t nodes,uint32_t first,
+    uint32_t group_width,uint32_t grain,uint32_t terms,uint32_t packet_observation,wide *out,uint32_t *slot) {
     normalized_current_face(p,nodes,first,group_width,grain,terms,out,0,slot);
     if(packet_observation)normalized_packet_face(q,nodes,first,group_width,grain,out,slot);
     else normalized_current_face(q,nodes,first,group_width,grain,terms,out,2,slot);
@@ -157,5 +144,52 @@ extern "C" __global__ __launch_bounds__(512) void section_field_normalized_recei
         normalized_interval_product(o[0],o[1],o[8],o[9],grain,o+6,o+7,slot);
     }
     if(*slot)return;
+}
+
+extern "C" __global__ __launch_bounds__(512) void section_field_normalized_receiver(
+    const int64_t *prediction,const int64_t *observation,uint32_t nodes,uint32_t group_width,
+    uint32_t grain,uint32_t terms,uint32_t packet_observation,int64_t *out_lo,int64_t *out_hi,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
+) {
+    if(threadIdx.x)return;
+    if(upstream_refused(census,lineage,lineage_count,slot))return;
+    if(!nodes||!group_width||nodes%group_width||grain<1||grain>120||!terms||terms==UINT32_MAX||packet_observation>1u){
+        atomicOr(slot,REFUSED_MALFORMED);return;
+    }
+    uint32_t first=blockIdx.x*group_width;if(first>=nodes)return;
+    const wide *p=(const wide *)prediction;
+    const wide *q=(const wide *)observation+2u*(2u*nodes+1u);
+    normalized_compare_faces(p,q,nodes,first,group_width,grain,terms,packet_observation,(wide *)out_lo,slot);
+    if(*slot)return;
     for(uint32_t j=first*20u;j<(first+group_width)*20u;++j)out_hi[j]=out_lo[j];
+}
+
+// One normalized comparison over the sum of two declared current balls. Offsets are in wide
+// components. Typed producers supply the actual anchor/increment maps and retain their joint
+// source; the sum's outer radius does not identify that joint source with an independent box.
+extern "C" __global__ __launch_bounds__(512) void section_normalized_sum_receiver(
+    const int64_t *anchor,uint32_t anchor_at,const int64_t *increment,uint32_t increment_at,
+    const int64_t *observed_ball,
+    uint32_t n,uint32_t group_width,uint32_t grain,uint32_t terms,
+    int64_t *scratch,int64_t *out_lo,int64_t *out_hi,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
+) {
+    if(blockIdx.x||threadIdx.x)return;
+    if(upstream_refused(census,lineage,lineage_count,slot))return;
+    if(!n||!group_width||n%group_width||grain<1||grain>120||!terms||terms==UINT32_MAX){
+        atomicOr(slot,REFUSED_MALFORMED);return;
+    }
+    const uint32_t r=2u*n;
+    const wide *a=(const wide *)anchor+anchor_at;
+    const wide *delta=(const wide *)increment+increment_at;
+    wide *pred=(wide *)scratch;
+    if(a[r]<0||delta[r]<0){atomicOr(slot,REFUSED_MALFORMED);return;}
+    for(uint32_t k=0;k<r;++k)pred[k]=add_checked(a[k],delta[k],slot);
+    pred[r]=add_checked(a[r],delta[r],slot);
+    if(*slot)return;
+    for(uint32_t first=0;first<n;first+=group_width){
+        normalized_compare_faces(pred,(const wide *)observed_ball,n,first,group_width,grain,terms,1u,(wide *)out_lo,slot);
+        if(*slot)return;
+    }
+    for(uint32_t k=0;k<n*20u;++k)out_hi[k]=out_lo[k];
 }

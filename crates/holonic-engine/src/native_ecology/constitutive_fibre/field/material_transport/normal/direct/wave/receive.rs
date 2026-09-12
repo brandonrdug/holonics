@@ -1,4 +1,5 @@
 use super::*;
+mod normalized;
 
 /// Both x=(c-p,c,p) and y=v-c come from the retained joint pair and actual received point.
 /// The numerical moment envelopes overapproximate that shared family, not independent causes.

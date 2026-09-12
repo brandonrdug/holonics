@@ -137,6 +137,14 @@ the blueprint, with failure cases that determine the next code change.
 
 ### Work selection and early failure control
 
+[project-postulate] Brandon's latest September 12 maintenance correction applies throughout
+every packet: consolidate the changed relations and their existing consumers during implementation.
+Type/representation proliferation and repeated public forwarding are architectural work in the
+same goal. Preserve real source, fibre and ownership distinctions; reconcile duplicated carrier,
+receiver and decoder machinery instead of leaving a parallel family behind each new operation.
+This is part of delivering each usable product, not a later cleanup phase or a new completion
+standard based on type counts.
+
 [project-postulate] Before an implementation run, identify the user-facing return, exact
 source/owner change, consuming call and discriminating check. A supporting proof or experiment
 is completed into that consumer when its required map exists. If it exposes a missing map,

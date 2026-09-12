@@ -273,6 +273,14 @@ engine.
 
 ## Repository and verification discipline
 
+[project-postulate] Consolidation and maintenance are continuous implementation responsibilities
+within the authorized goal, not a separate optional cleanup campaign. Reconcile duplicated
+representations, source owners, operation wrappers and public exports as their consumers change.
+Retain mathematical and ownership distinctions, but do not encode each implementation task as
+another permanent public type family. Recover the common construction and update its consumers
+together. A working addition that leaves agent-created architectural drift unresolved is not a
+completed implementation increment. Scope discipline does not excuse accumulating that drift.
+
 Use [the repository guide](docs/REPOSITORY.md) and [development guide](docs/DEVELOPMENT.md).
 Keep libraries, applications, device targets, formal work, current design and history in their
 declared roots. Age locates forgotten material; actual dependencies and subject relevance decide

@@ -108,6 +108,45 @@ impl<'chart> ResidentSurface<'chart> {
             self.declaration.warp_size.max(1),0,&mut params,"field-normalized-receiver")
     }
 
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_normalized_sum_receiver(
+        &self, lane: &Lane<'_, 'chart>, anchor: &ResidentSection<'chart>, anchor_at: usize,
+        increment: &ResidentSection<'chart>, increment_at: usize, observed: &ResidentSection<'chart>, n: usize,
+        group_width: usize, grain: u32, terms: SeriesAperture,
+        scratch: &ResidentSection<'chart>, output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || ResidentRefusal::Declaration {
+            operation: "normalized-sum-receiver",
+            what: "incompatible normalized current-sum receiver chart".into(),
+        };
+        let r = n.checked_mul(2).ok_or_else(fail)?;
+        let anchor_words = anchor_at.checked_add(r).and_then(|v| v.checked_add(1)).and_then(|v| v.checked_mul(2)).ok_or_else(fail)?;
+        let increment_words = increment_at.checked_add(r).and_then(|v| v.checked_add(1)).and_then(|v| v.checked_mul(2)).ok_or_else(fail)?;
+        let output_words = n.checked_mul(20).ok_or_else(fail)?;
+        let scratch_width = r.checked_add(1).and_then(|v| v.checked_mul(2)).ok_or_else(fail)?;
+        if n == 0 || n > u32::MAX as usize / 20 || group_width == 0 || n % group_width != 0
+            || !(1..=120).contains(&grain) || terms.0 == 0 || terms.0 == u32::MAX
+            || anchor_at > u32::MAX as usize || increment_at > u32::MAX as usize
+            || anchor.rows != 1 || anchor.width < anchor_words
+            || increment.rows != 1 || increment.width < increment_words
+            || observed.rows != 1 || observed.width != scratch_width
+            || scratch.rows != 1 || scratch.width != scratch_width
+            || output.rows != 1 || output.width != output_words
+            || [anchor, increment, observed, scratch, output].iter().any(|s| s.grain.0 != 0 || !std::ptr::eq(s.surface, self)) {
+            return Err(fail());
+        }
+        let mut params = Params::new();
+        params.ptr(anchor.lo.device_ptr()).u32(anchor_at as u32)
+            .ptr(increment.lo.device_ptr()).u32(increment_at as u32)
+            .ptr(observed.lo.device_ptr()).u32(n as u32).u32(group_width as u32)
+            .u32(grain).u32(terms.0).ptr(scratch.lo.device_ptr())
+            .ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane, "section_normalized_sum_receiver", 1,
+            self.declaration.warp_size.max(1), 0, &mut params,
+            "normalized-sum-receiver")
+    }
+
     pub(crate) fn record_complete_material_source_reading(
         &self,
         lane: &Lane<'_, 'chart>,

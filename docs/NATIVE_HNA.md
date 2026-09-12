@@ -98,6 +98,21 @@ of the whole body. The source-qualified conversation attachment remains a separa
 
 ## Direct accumulated normal response
 
+[established-bounded; implemented-exact] The [source/predictive binding](../research/records/2026-09-12_CONTEXTUAL_RECEPTION_AND_NORMALIZATION_REUSE_THEIR_SHARED_NATIVE_OWNERS.md)
+adds fresh applied-wave sessions from `NativeWaveSeedSpec` through `with_seeded_wave_session`
+or `holonics hna wave-session seed.json --seed --input requests.jsonl --checkpoint next.wave`.
+The seed schema is `org.holonics.hna.applied-wave-seed.v1`, with `symbols` (characters), `seed`
+(exactly two supplied symbols) and numerical `grain`. Existing model-directory and checkpoint
+resume routes are unchanged.
+
+[definition] `receive-next-symbol` supplies an actual next-current observation at the held
+preparation cut; it does not first emit a guessed symbol. `receive-next-symbol-distribution`
+adds a positive `series_terms` aperture and returns the shared normalized comparison of the
+pre-fit full next-current prediction against the observed symbol mass. It reports the normal
+observation's commitment separately from any optional receiver refusal. The source-aware
+normalized return and decoder are the same owners used by the field interface, with typed
+source ownership and chart parameters instead of another operation-specific type family.
+
 [definition] `ResidentNormalMaterial` exposes the existing unit-prior accumulated normal law
 through resident source/observed currents. Its three complex source port blocks and output width
 are declared at founding. `read` preserves material; `receive` stages the existing native normal
