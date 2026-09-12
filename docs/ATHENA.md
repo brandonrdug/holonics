@@ -189,6 +189,12 @@ Its native alternatives retain complete condition/material consequences; a check
 case is non-affine in the source. Whole-family successor publication and subsequent conduct
 remain open. Inspecting a conditional alternative does not consume or develop the live wave.
 
+[established-bounded; implemented-exact] Pending returns now retain their actual source/current
+continuation as an ordered word of resident maps. The
+[native repair](../research/records/2026-09-11_PENDING_RETURNS_KEEP_THEIR_ACTUAL_CONTINUATION.md)
+preserves an orientation distinction that the prior saved marginals lost; coupled rest v9
+retains the word and validates its joins. This is a dependency of complete-family incorporation.
+
 ## Native-first construction
 
 [definition] [Hephaestus Automata](HEPHAESTUS_AUTOMATA.md) are operator-scoped mathematical

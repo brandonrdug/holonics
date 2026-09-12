@@ -1,0 +1,11 @@
+warning: holonic-engine@0.1.0: exact CUDA laws built for compute_89
+   Compiling holonic-engine v0.1.0 (/home/b/Workspaces/holonics/crates/holonic-engine)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 48s
+     Running unittests src/lib.rs (target/debug/deps/holonic_engine-6ae3d245ea632305)
+
+running 2 tests
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::continuation_tests::delayed_joint_separates_same_marginals_after_member_paths_diverge ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::continuation_tests::pending_continuation_retains_internal_factors_and_prunes_only_released_prefix ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 2414 filtered out; finished in 0.57s
+

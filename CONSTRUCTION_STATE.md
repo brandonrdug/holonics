@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** September 11, 2026. **Current work:** dependent constitutive returns execute natively; active goal continues through publication of the complete family successor.
+**Currency:** September 11, 2026. **Current work:** dependent constitutive returns and source/current continuation are verified; next is their owned complete-family successor composition and publication.
 **Athena objective:** standing; useful Athena-alpha has not been attained. **Broad native cultivation:** paused while the consuming family/source binding is repaired;
 authorized native implementation continues within the shared programme. The active phases now have names;
 AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -44,12 +44,19 @@ preserve the vertical output fibre, match the point operation and stage an incom
 extension without mutating standing. Lean checks the contact law and its non-affine dependence.
 All six neighborhood and 24 coupled-wave checks passed serially, and Framework.Computation built.
 
+[established-bounded; implemented-exact; computational-witness] A native delayed-return
+[separator](research/records/2026-09-11_PENDING_RETURNS_KEEP_THEIR_ACTUAL_CONTINUATION.md) exposed
+equal entire saved states after different source/current transport. The repair retains one
+shared word of actual maps for still-pending cuts, including source-field internal factors.
+The two new continuation controls, all 27 coupled-wave checks and five HNN session checks pass,
+including legacy migration and process resume.
+
 [open] The active goal remains the complete native Eros return cycle. The dependent family of
 condition/material consequences must become one contemporary successor; one evaluated alternative
 cannot be installed as that family. Retain its joint with contemporary current and pending sources,
-consume the pending cut once, persist it and inspect subsequent conduct. Source inspection also
-locates a discarded image joint; verify the required delayed correlation with a native separator
-before changing its representation. The evaluator is progress, not completion of a smaller goal.
+consume the pending cut once, persist it and inspect subsequent conduct. The source/current
+continuation now supplies an implicit joint instead of relying on separately saved marginals.
+The evaluator and retained word are progress, not completion of a smaller goal.
 
 [proved-derived; formal-checked] The latest
 [relative code-cost return](research/records/2026-09-11_RELATIVE_CODE_COST_HAS_AN_ADDRESSED_BOUNDARY_LAW.md)

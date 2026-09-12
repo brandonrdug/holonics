@@ -135,6 +135,13 @@ connects it to the existing addressed causal-length, physical and complexity own
 
 ## Foundation and transport
 
+[definition] `wave/coupled/continuation.rs` owns `NormalCoupledContinuation`, the actual ordered
+relation word joining a still-pending source to contemporary current. `NormalWaveCoupled` shares
+one resident-map word across pending cuts, retaining every source-field factor under its public
+epoch. Coupled rest v9 persists and verifies this composition. The
+[continuation repair](../research/records/2026-09-11_PENDING_RETURNS_KEEP_THEIR_ACTUAL_CONTINUATION.md)
+records the native equal-marginal separator and the precise legacy recovery boundary.
+
 [definition] `wave/coupled/comparison/constitutive.rs` owns the dependent constitutive family
 and its conditional alternatives. `coupled_constitutive_family.cuh` substitutes the same resident
 source parameter into both operands after the original anchor check. The existing neighborhood

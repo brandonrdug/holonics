@@ -1,0 +1,25 @@
+Failure before continuation retention. The two long equal state dumps are omitted from this excerpt; full output is in before-fix.txt.gz.
+
+warning: holonic-engine@0.1.0: exact CUDA laws built for compute_89
+   Compiling holonic-engine v0.1.0 (/home/b/Workspaces/holonics/crates/holonic-engine)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 48.37s
+     Running unittests src/lib.rs (target/debug/deps/holonic_engine-6ae3d245ea632305)
+
+running 1 test
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::continuation_tests::delayed_joint_separates_same_marginals_after_member_paths_diverge ... FAILED
+
+failures:
+
+---- native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::continuation_tests::delayed_joint_separates_same_marginals_after_member_paths_diverge stdout ----
+
+thread 'native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::continuation_tests::delayed_joint_separates_same_marginals_after_member_paths_diverge' (1623587) panicked at crates/holonic-engine/src/native_ecology/constitutive_fibre/field/material_transport/normal/direct/wave/coupled/continuation_tests.rs:106:5:
+assertion `left != right` failed: pending source/current orientation was lost
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::coupled::continuation_tests::delayed_joint_separates_same_marginals_after_member_paths_diverge
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 2414 filtered out; finished in 0.35s
+
+error: test failed, to rerun pass `-p holonic-engine --lib`

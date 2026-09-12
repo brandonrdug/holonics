@@ -33,6 +33,13 @@ impl<'w, 'j, 'c> CoupledConstitutiveFamily<'w, 'j, 'c> {
     pub fn source_parameters(&self) -> usize {
         self.comparison.parameter_rows() - 1
     }
+    /// The actual source-to-current word to which a complete dependent return must be joined.
+    /// This keeps intervening incidence available; equal source/current marginals are not used
+    /// to infer a missing coupling.
+    pub fn continuation(&self) -> Result<NormalCoupledContinuation<'_, 'c>, ConstitutiveFibreError> {
+        let handle = self.wave.pending_coupled_prediction(self.comparison.prediction_id())?;
+        self.wave.pending_coupled_continuation(&handle)
+    }
 
     /// Substitute a bound source coordinate. Neither producing-condition equality nor an old
     /// relation-membership witness is required: the condition is allowed to REACT to a return

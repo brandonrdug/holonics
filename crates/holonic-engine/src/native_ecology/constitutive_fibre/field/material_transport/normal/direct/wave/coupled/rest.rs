@@ -18,6 +18,12 @@ struct PendingHeader {
 }
 #[derive(Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
+struct PassageHeader {
+    epoch: u64,
+    factors: usize,
+}
+#[derive(Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 struct Header {
     epoch: u64,
     neighborhood_base: u64,
@@ -26,6 +32,8 @@ struct Header {
     contacts: Vec<ContactHeader>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pending: Vec<PendingHeader>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    passages: Vec<PassageHeader>,
 }
 #[derive(Debug, PartialEq, Eq)]
 struct PendingRest {
@@ -40,6 +48,7 @@ pub(in super::super) struct CoupledRestData {
     family: NormalWaveFamilyRest,
     relations: BTreeMap<u64, NormalWaveRelationRest>,
     pending: BTreeMap<u64, PendingRest>,
+    transport: BTreeMap<u64, Vec<NormalWaveRelationRest>>,
 }
 impl CoupledRestData {
     pub(in super::super) fn members(&self) -> usize {
@@ -163,6 +172,36 @@ impl CoupledRestData {
                 return Err(ConstitutiveFibreError::Shape);
             }
         }
+        let expected = match self.pending.keys().next().copied() {
+            Some(first) => self.header.epoch.checked_sub(first).and_then(|v| v.checked_add(1))
+                .ok_or(ConstitutiveFibreError::Shape)?,
+            None => 0,
+        };
+        if self.header.passages.len() as u64 != expected || self.transport.len() as u64 != expected {
+            return Err(invalid("pending source/current continuation is incomplete"));
+        }
+        let first = self.pending.keys().next().copied().unwrap_or(0);
+        for (offset, passage) in self.header.passages.iter().enumerate() {
+            if first.checked_add(offset as u64) != Some(passage.epoch) || passage.factors == 0 {
+                return Err(invalid("unordered pending continuation"));
+            }
+            let maps = self.transport.get(&passage.epoch).ok_or(ConstitutiveFibreError::Shape)?;
+            if maps.len() != passage.factors { return Err(ConstitutiveFibreError::Shape); }
+            for map in maps {
+                map.validate()?;
+                if map.roots() != n { return Err(ConstitutiveFibreError::Shape); }
+            }
+            if let Some(cut) = self.pending.get(&passage.epoch) {
+                if maps.len() != 1 || maps.last() != cut.produced.last_relation() {
+                    return Err(invalid("continuation does not retain the pending producing map"));
+                }
+            }
+        }
+        if let Some((_, maps)) = self.transport.last_key_value() {
+            if maps.last() != self.family.last_relation() {
+                return Err(invalid("continuation omits the contemporary final map"));
+            }
+        }
         Ok(())
     }
     pub(in super::super) fn write(
@@ -193,12 +232,21 @@ impl CoupledRestData {
             cut.produced.write(&mut bytes)?;
             blob(out, &bytes)?;
         }
+        for passage in &self.header.passages {
+            for map in &self.transport[&passage.epoch] {
+                bytes.clear(); map.write(&mut bytes)?; blob(out, &bytes)?;
+            }
+        }
         Ok(())
     }
     pub(in super::super) fn read(
         input: &mut Take<impl Read>,
+        version: u8,
     ) -> Result<Self, ConstitutiveFibreError> {
-        let header: Header = serde_json::from_slice(&read_blob(input)?).map_err(invalid)?;
+        let mut header: Header = serde_json::from_slice(&read_blob(input)?).map_err(invalid)?;
+        if version < 9 && !header.passages.is_empty() {
+            return Err(invalid("pending continuation requires wave rest v9"));
+        }
         let bytes = read_blob(input)?;
         let neighborhood =
             GeneratorNeighborhoodRest::read(&mut bytes.as_slice(), bytes.len() as u64)?;
@@ -237,12 +285,40 @@ impl CoupledRestData {
                 return Err(invalid("duplicate pending producing cut"));
             }
         }
+        let mut transport = BTreeMap::new();
+        for passage in &header.passages {
+            if passage.factors == 0 || passage.factors as u64 > input.limit()/8 {
+                return Err(ConstitutiveFibreError::Shape);
+            }
+            let mut maps = Vec::new();
+            for _ in 0..passage.factors {
+                let bytes = read_blob(input)?;
+                maps.push(NormalWaveRelationRest::read(&mut bytes.as_slice(),bytes.len() as u64)?);
+            }
+            if transport.insert(passage.epoch,maps).is_some() { return Err(invalid("duplicate continuation epoch")); }
+        }
+        if version == 8 && !pending.is_empty() {
+            let first = *pending.keys().next().unwrap();
+            // A legacy cut carries its complete single producing map. Recover a word only
+            // when every intervening passage is itself still present as such a pending cut.
+            if header.epoch.checked_sub(first).and_then(|v| v.checked_add(1)) != Some(pending.len() as u64) {
+                return Err(invalid("legacy pending state omits intervening source/current transport"));
+            }
+            for (epoch,cut) in &pending {
+                let map = cut.produced.last_relation().ok_or(ConstitutiveFibreError::Shape)?;
+                let mut bytes = Vec::new(); map.write(&mut bytes)?;
+                let map = NormalWaveRelationRest::read(&mut bytes.as_slice(),bytes.len() as u64)?;
+                transport.insert(*epoch,vec![map]);
+                header.passages.push(PassageHeader { epoch:*epoch,factors:1 });
+            }
+        }
         Ok(Self {
             header,
             neighborhood,
             family,
             relations,
             pending,
+            transport,
         })
     }
 }
@@ -282,11 +358,15 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
                 active_member: mode.active_member,
                 contacts,
                 pending: pending_meta,
+                passages: mode.transport.iter().map(|(epoch,maps)| PassageHeader { epoch:*epoch,factors:maps.len() }).collect(),
             },
             neighborhood: mode.neighborhood.rest()?,
             family: mode.current.rest()?,
             relations,
             pending,
+            transport: mode.transport.iter().map(|(epoch,maps)| {
+                Ok((*epoch,maps.iter().map(|m| m.rest()).collect::<Result<Vec<_>,ConstitutiveFibreError>>()?))
+            }).collect::<Result<_,ConstitutiveFibreError>>()?,
         };
         let mut rest = self.rest_normal_bank()?;
         data.validate(&rest)?;
@@ -375,6 +455,33 @@ impl NormalWaveRest {
                 }),
             );
         }
+        let transport = data.transport.into_iter().map(|(epoch,maps)| {
+            Ok((epoch,maps.into_iter().map(|m| m.remount(s).map(Rc::new)).collect::<Result<Vec<_>,ConstitutiveFibreError>>()?))
+        }).collect::<Result<BTreeMap<_,_>,ConstitutiveFibreError>>()?;
+        // Verify the stored operator word at its actual source, including every pending join.
+        // This is cold decoder validation using native images, not hot host semantic replay.
+        if let Some((_, first)) = pending.first_key_value() {
+            let mut carried = Rc::clone(&first.source);
+            for (epoch,maps) in &transport {
+                if let Some(cut) = pending.get(epoch) {
+                    if carried.rest()? != cut.source.rest()? {
+                        return Err(invalid("pending source does not join the retained continuation"));
+                    }
+                }
+                let passage = epoch.checked_sub(base.epoch).ok_or(ConstitutiveFibreError::Shape)?;
+                for map in maps {
+                    carried = Rc::new(carried.read_through_at(Rc::clone(map),passage)?);
+                }
+                if let Some(cut) = pending.get(epoch) {
+                    if carried.rest()? != cut.produced.rest()? {
+                        return Err(invalid("pending production disagrees with retained continuation"));
+                    }
+                }
+            }
+            if carried.rest()? != current.rest()? {
+                return Err(invalid("retained continuation does not reach the contemporary family"));
+            }
+        }
         Ok(base.with_continuation(NormalWaveCoupled {
             neighborhood,
             current,
@@ -384,6 +491,7 @@ impl NormalWaveRest {
             active_member: data.header.active_member,
             bindings,
             pending,
+            transport,
         }))
     }
 }
@@ -399,6 +507,37 @@ mod pending_tests {
         let local=ResidentGeneratorNeighborhood::with_shared_condition(vec![law(s,true)],current(&h),ConditionContactMetric::UnitAdmittanceRealification).unwrap();
         ResidentNormalMaterial::found(s,1,1,ResidentGrain(32)).unwrap().into_applied_difference_wave(current(&a),current(&c)).unwrap().with_neighborhood(local).unwrap()
     }
+    // The old payload ended after pending source/produced pairs. No historical transport
+    // records are manufactured here: migration must either derive the complete word from
+    // those actual producing maps or report the missing intervening passage.
+    fn legacy_payload(data: &CoupledRestData) -> Vec<u8> {
+        let mut out=Vec::new();
+        let mut header=serde_json::to_value(&data.header).unwrap();
+        header.as_object_mut().unwrap().remove("passages");
+        blob(&mut out,&serde_json::to_vec(&header).unwrap()).unwrap();
+        let mut bytes=Vec::new(); data.neighborhood.write(&mut bytes).unwrap(); blob(&mut out,&bytes).unwrap();
+        bytes.clear(); data.family.write(&mut bytes).unwrap(); blob(&mut out,&bytes).unwrap();
+        for c in &data.header.contacts { bytes.clear(); data.relations[&c.id].write(&mut bytes).unwrap(); blob(&mut out,&bytes).unwrap(); }
+        for p in &data.header.pending {
+            bytes.clear(); data.pending[&p.id].source.write(&mut bytes).unwrap(); blob(&mut out,&bytes).unwrap();
+            bytes.clear(); data.pending[&p.id].produced.write(&mut bytes).unwrap(); blob(&mut out,&bytes).unwrap();
+        }
+        out
+    }
+    #[test]
+    #[ignore="requires CUDA; legacy pending words migrate only when their complete transport remains recoverable"]
+    fn pending_continuation_legacy_recovery_reports_missing_intervening_maps() {
+        let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();let mut wave=body(&s,1);
+        for _ in 0..2 { let contact=wave.admit_contact(0).unwrap();wave.predict_contact(&contact).unwrap(); }
+        let saved=wave.rest().unwrap();let bytes=legacy_payload(saved.coupled.as_ref().unwrap());
+        let restored=CoupledRestData::read(&mut bytes.as_slice().take(bytes.len() as u64),8).unwrap();
+        restored.validate(&saved).unwrap();
+        assert_eq!(&restored,saved.coupled.as_ref().unwrap().as_ref());
+        let contact=wave.admit_contact(0).unwrap(); wave.advance_contact(&contact).unwrap();
+        let saved=wave.rest().unwrap();let bytes=legacy_payload(saved.coupled.as_ref().unwrap());
+        let error=CoupledRestData::read(&mut bytes.as_slice().take(bytes.len() as u64),8).unwrap_err();
+        assert!(error.to_string().contains("omits intervening source/current transport"),"{error}");
+    }
     #[test]
     #[ignore="requires CUDA; equal projected endpoints do not validate a substituted producing source"]
     fn pending_comparison_rest_rejects_equal_endpoint_source_substitution(){
@@ -409,7 +548,7 @@ mod pending_tests {
         let mut rest=wave.rest().unwrap();let mut valid=Vec::new();rest.write(&mut valid).unwrap();
         let magic=b"HOLONIC-NORMAL-WAVE";
         // The normal-wave prefix is checked by the actual reader; change only its version octet.
-        assert!(valid.starts_with(magic));let prefix=magic.len();assert_eq!(valid[prefix],8);
+        assert!(valid.starts_with(magic));let prefix=magic.len();assert_eq!(valid[prefix],9);
         let mut legacy=valid.clone();legacy[prefix]=7;
         assert!(NormalWaveRest::read(&mut legacy.as_slice(),legacy.len() as u64).is_err());
         rest.coupled.as_mut().unwrap().pending.get_mut(&pred.handle.id()).unwrap().source=source;

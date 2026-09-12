@@ -107,6 +107,11 @@ different intermediate transport. An ordered retained operator composition or a 
 can preserve this relation without archiving every raw ecology state. Equal endpoint/rest faces
 alone do not establish that the relation survived.
 
+[definition] The subsequent
+[continuation repair](2026-09-11_PENDING_RETURNS_KEEP_THEIR_ACTUAL_CONTINUATION.md) executes that
+separator, verifies the loss, and retains the actual ordered maps through rest/remount. Its
+final construction clause states the shared-parameter join required for the contemporary update.
+
 [definition] Complete publication still owes one atomic condition/material/current successor,
 exact pending consumption, rest/remount and a subsequent source-visible cycle. The active goal
 has not been replaced by completion of this evaluator.

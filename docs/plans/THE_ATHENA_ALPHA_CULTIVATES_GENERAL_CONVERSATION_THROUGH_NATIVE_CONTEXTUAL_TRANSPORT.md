@@ -227,6 +227,13 @@ non-affine. The next representation must therefore retain `θ ↦ (hθ,Rθ)` and
 source/current continuation; neither one selected alternative nor the span of all alternatives
 can be published as this family. This evaluator does not consume pending returns.
 
+[established-bounded; implemented-exact] `NormalCoupledContinuation` now retains the actual
+ordered maps from a pending producing source through contemporary current, including all internal
+source-field factors. The [native separator and repair](../../research/records/2026-09-11_PENDING_RETURNS_KEEP_THEIR_ACTUAL_CONTINUATION.md)
+show that separate source/produced/current marginals had lost a real orientation distinction.
+The dependent evaluator exposes this word; rest v9 preserves its joins. Use it in complete-family
+incorporation rather than infer the missing correlation from matching endpoints.
+
 [definition] The family lift must distinguish recorded h_s from a proposed successor condition.
 Use the actual constitutive contact/formation relation over the bounded source parameters;
 retain its joint variation or prove a lawful condensation of its complete return. Never insert

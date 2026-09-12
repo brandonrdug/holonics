@@ -90,7 +90,7 @@ impl NormalWaveRest {
         if let Some(data) = &self.coupled {
             data.validate(self)?;
             out.write_all(MAGIC).map_err(invalid)?;
-            out.write_all(&[if data.has_pending() { 8 } else { 7 }])
+            out.write_all(&[if data.has_pending() { 9 } else { 7 }])
                 .map_err(invalid)?;
             let mut bank = Vec::new();
             self.write_normal(&mut bank)?;
@@ -195,13 +195,13 @@ impl NormalWaveRest {
         expect(&mut input, MAGIC)?;
         let mut version = [0];
         input.read_exact(&mut version).map_err(invalid)?;
-        if version[0] == 7 || version[0] == 8 {
+        if (7..=9).contains(&version[0]) {
             if !allow_coupled {
                 return Err(invalid("coupled state is not a normal source bank"));
             }
             let bytes = read_blob(&mut input)?;
             let mut bank = Self::read_normal(&mut bytes.as_slice(), bytes.len() as u64)?;
-            let data = super::coupled::rest::CoupledRestData::read(&mut input)?;
+            let data = super::coupled::rest::CoupledRestData::read(&mut input, version[0])?;
             if input.limit() != 0 {
                 return Err(invalid("trailing coupled wave state"));
             }

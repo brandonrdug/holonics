@@ -1,6 +1,8 @@
 use super::*;
 pub(super) mod rest;
 mod comparison;
+mod continuation;
+pub use continuation::NormalCoupledContinuation;
 use comparison::CoupledProducingCut;
 pub use comparison::{CoupledConstitutiveFamily, CoupledConstitutiveAlternative, CompiledCoupledJoint, CoupledJointEvaluation, CoupledJointReading,NormalCoupledProducingHandle,NormalCoupledPrediction,NormalCoupledComparison,NormalFamilyComparisonRow};
 use crate::native_ecology::constitutive_fibre::{
@@ -19,6 +21,8 @@ pub struct NormalWaveCoupled<'c> {
     active_member: Option<usize>,
     bindings: BTreeMap<u64, Rc<CoupledBinding<'c>>>,
     pending: BTreeMap<u64,Rc<CoupledProducingCut<'c>>>,
+    // One shared ordered word, rooted at the oldest still-pending producing source.
+    transport: BTreeMap<u64, Vec<Rc<ResidentWaveRelation<'c>>>>,
 }
 struct CoupledBinding<'c> {
     member: usize,
@@ -152,6 +156,7 @@ impl<'c> ResidentNormalWave<'c> {
                     active_member: None,
                     bindings: BTreeMap::new(),
                     pending: BTreeMap::new(),
+                    transport: BTreeMap::new(),
                 };
                 Ok(self.with_continuation(mode))
             }
@@ -358,8 +363,10 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
             .ok_or(ConstitutiveFibreError::Shape)?;
         let mut successor = Rc::clone(&contact.binding.source);
         let mut predictions = Vec::new();
+        let mut factors = Vec::new();
+        let retain_factors = !self.continuation.pending.is_empty();
         for row in 0..pairs.source().rows() {
-            let (next, prediction) = (|| {
+            let (next, prediction, map) = (|| {
                 let map = contact
                     .binding
                     .relation
@@ -372,9 +379,11 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
                     .source_contact()
                     .expect("source map")
                     .retained_prediction();
+                let map = Rc::new(map);
                 Ok::<_, ConstitutiveFibreError>((
-                    successor.read_through_at(Rc::new(map), passage)?,
+                    successor.read_through_at(Rc::clone(&map), passage)?,
                     prediction,
+                    map,
                 ))
             })()
             .map_err(|source| ConstitutiveFibreError::SourcePassage {
@@ -383,12 +392,13 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
             })?;
             successor = Rc::new(next);
             predictions.push(prediction);
+            if retain_factors { factors.push(map); }
             progress(row + 1);
         }
         self.continuation
             .neighborhood
             .publish_wave_read(contact.binding.neighborhood_epoch);
-        let step = self.publish_coupled(contact, next, Rc::clone(&successor));
+        let step = self.publish_coupled_factors(contact, next, Rc::clone(&successor), factors);
         Ok(NormalCoupledSourceActuation {
             predecessor_epoch: step.predecessor_epoch,
             successor_epoch: step.successor_epoch,
@@ -502,7 +512,20 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         next: u64,
         successor: Rc<NormalWaveFamily<'c>>,
     ) -> NormalCoupledStep<'c> {
+        let factors = vec![successor.last_relation_shared().expect("completed coupled passage")];
+        self.publish_coupled_factors(contact, next, successor, factors)
+    }
+    fn publish_coupled_factors(
+        &mut self,
+        contact: &NormalCoupledContact<'c>,
+        next: u64,
+        successor: Rc<NormalWaveFamily<'c>>,
+        factors: Vec<Rc<ResidentWaveRelation<'c>>>,
+    ) -> NormalCoupledStep<'c> {
         let predecessor_epoch = self.continuation.epoch;
+        if !self.continuation.pending.is_empty() {
+            self.continuation.transport.insert(next, factors);
+        }
         self.continuation.epoch = next;
         self.continuation.active_member = Some(contact.member());
         self.continuation.current = Rc::clone(&successor);
@@ -523,3 +546,6 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
 }
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod continuation_tests;

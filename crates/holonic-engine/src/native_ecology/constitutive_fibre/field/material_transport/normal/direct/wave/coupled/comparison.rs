@@ -112,7 +112,7 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
             id,
         })
     }
-    fn coupled_producing_cut(
+    pub(super) fn coupled_producing_cut(
         &self,
         h: &NormalCoupledProducingHandle,
     ) -> Result<&Rc<CoupledProducingCut<'c>>, ConstitutiveFibreError> {
@@ -130,6 +130,7 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
     ) -> Result<(), ConstitutiveFibreError> {
         self.coupled_producing_cut(h)?;
         self.continuation.pending.remove(&h.id);
+        self.prune_coupled_transport();
         Ok(())
     }
     pub fn predict_contact(
@@ -138,6 +139,11 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
     ) -> Result<NormalCoupledPrediction<'c>, ConstitutiveFibreError> {
         let step = self.advance_contact(contact)?;
         let id = step.successor_epoch;
+        // publish_coupled already appended this map when another return was pending. A first
+        // prediction starts the retained word here, at its actual producing source.
+        self.continuation.transport.entry(id).or_insert_with(|| {
+            vec![step.successor.last_relation_shared().expect("producing map")]
+        });
         self.continuation.pending.insert(
             id,
             Rc::new(CoupledProducingCut {

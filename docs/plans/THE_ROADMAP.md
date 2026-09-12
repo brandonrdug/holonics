@@ -83,6 +83,10 @@ now executes the existing contact/formation law under a shared source assignment
 its non-affine condition dependence. Continue by representing its complete family consequence
 with the actual source/current continuation and connecting it to the existing atomic transaction.
 Publishing one evaluated alternative or the span of all alternatives is not that construction.
+The [continuation repair](../../research/records/2026-09-11_PENDING_RETURNS_KEEP_THEIR_ACTUAL_CONTINUATION.md)
+now retains the actual intervening maps, after a native separator exposed identical old saved
+states for different source/current joints. Compose the dependent return with that retained word;
+do not reconstruct its joining relation from the separate marginals.
 The exterior affine material solve does not itself perform that native incorporation.
 
 [definition] The present work joins two responsibilities in phases 1–2. Use the returned reusable
