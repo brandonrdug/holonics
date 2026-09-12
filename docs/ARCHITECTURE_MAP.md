@@ -167,7 +167,7 @@ map, including the complete pair and residual. `wave/family/pullback.rs::NormalF
 keeps their original common bound/frame and passage clocks. The continuation owner lifts the
 same operation over its retained factors as `NormalContinuationPullback`, keeping every joined
 pair and source-field factor address. The [later-source return](../research/records/2026-09-11_LATER_SOURCE_CONSTRAINTS_KEEP_THE_JOINED_CONTINUATION.md)
-records its verification and remaining consuming boundary.
+records its verification and the then-open consuming boundary, completed by the return above.
 
 [definition] `wave/coupled/continuation.rs` owns `NormalCoupledContinuation`, the actual ordered
 relation word joining a still-pending source to contemporary current. `NormalWaveCoupled` shares
@@ -183,14 +183,16 @@ transaction now factors `PreparedNeighborhoodConsequence` from borrowed operands
 condition preimage/contact and staged material formation. `Mathematics/DependentConstitutiveReturn.lean`
 checks shared-parameter composition and a non-affine contact specialization. The
 [dependent return](../research/records/2026-09-11_CONSTITUTIVE_RETURNS_REMAIN_DEPENDENT_ON_THEIR_SOURCE.md)
-states the remaining whole-family publication and source/current continuation boundary.
+states its initial publication and source/current continuation boundary. The owned generator
+and complete return above subsequently bind it at the declared section-receiver scope.
 
 [definition] `wave/coupled/comparison/joint.rs` owns `CompiledCoupledJoint` and its actual
 parameter/anchor evaluation. `surface_coupled_joint.rs` binds `coupled_joint_compile.cuh` to the
 resident coefficient compiler and original anchor receiver. The same `ResidentBilinearMap`
 now accepts owned resident A/B/D packets and distinguishes host/compiled core identity without
 numerical readout. The [pending compiler return](../research/records/2026-09-11_ACTUAL_PENDING_COMPARISONS_COMPILE_WITH_THEIR_ANCHORS.md)
-records source/condition/material-cut preservation and the unbound constitutive transaction.
+records source/condition/material-cut preservation before the constitutive transaction was
+bound by the dependent generator and public session above.
 
 [definition] `exact_linear/joint_bilinear.rs` owns `JointBilinearFibre` and its conjunctive
 `JointBilinearSystem`: affine source/condition/return maps share one parameter chart, and genuine
@@ -200,7 +202,8 @@ using one shared resident parameter packet and the packet contraction's homogene
 mode. Its evaluation retains the actual borrowed parameter occurrence and complete model.
 `GeneratorFactorization.lean` supplies shared-parameter expansion and independent-lift
 separation laws. The [joint return](../research/records/2026-09-11_JOINT_SOURCE_CONDITION_AND_MATERIAL_KEEP_THEIR_PRODUCT_CONSTRAINTS.md)
-retains actual checks and the unbound producing-comparison/native material transaction.
+retains its actual checks and initial consuming boundary; the actual pending compiler,
+dependent generator and complete return above supply the subsequent native binding.
 
 [definition] `exact_linear/bilinear.rs` owns reusable bilinear operators, immutable product cores,
 streaming support search, receiver families and fixed-port affine-source preimages.

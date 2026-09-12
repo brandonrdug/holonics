@@ -12,8 +12,8 @@ orders their common milestones. The mathematical investigations supply generatin
 receiver/phase transport, bounds and counterexamples that this blueprint binds into native
 operation. Native failures refine those constructions in return. Eros acts within nested
 constituents and their containing ecology; its incorporation is not deferred until an independent
-mathematical product is finished. Broad cultivation remains paused while its immediate consuming
-family/source attachment is repaired; this is not a pause on authorized native implementation.
+mathematical product is finished. Broad cultivation remains paused while broad source/contact
+applicability is repaired on the completed consuming body; authorized native implementation continues.
 
 ## Product and evidence
 
@@ -97,27 +97,30 @@ construction is lawful; the actual output explains what it now accomplishes.
 `C/field/material_transport/normal/direct/wave/`. **A** is
 `crates/holonics-hna/src/native/`. These abbreviations are navigation only.
 
-[established-bounded; source-inspected] Review base `9f237c9d` has the following owners:
+[established-bounded; source-inspected] The owner map is reconciled through implementation base
+`8ac667fa`; the [pickup review](../../research/records/2026-09-12_THE_RETURN_CYCLE_STANDS_AND_THE_PICKUP_FOLLOWS_SOURCE_APPLICABILITY.md)
+records the inspected consuming path and correction of earlier open-binding prose:
 
 | Existing owner | Actual return | Remaining work |
 |---|---|---|
 | `alpha::exposure::{ExposureReader,ExposureCursor}` and prepared source records | Source/part relationships, partitions and resumable delivery | Bind actual mounted material and its comparison relation to the producing native occurrence |
 | `A/section_input.rs::SymbolCurrentChart` | Supplied symbol basis, exact mount, device-selected symbol decoding | Keep as exterior codec; bind a changing internal encoded carrier through an actual receiver map |
 | `W/receive.rs` and normal producing-return owners | Actual next-current and normal addressed material return | Preserve these distinct meanings when composing the family operation |
-| `W/coupled/comparison.rs::{predict_contact,compare_coupled_prediction}` | Retained producing cut and joint source/observed-difference coefficient sections | Add the consuming family/condition/material transaction; inspection currently mutates nothing |
-| `C/resident/neighborhood.rs::{prepare_advance,publish_advance}` | Point-source condition preimage, contact, staged member formation and publication | Generalize the precise family incorporation relation without casting a family centre to a point |
-| `C/resident/{preimage,condition_contact}.rs` | Compatible conditions and actual contact with that family | Retain common source/condition parameters when the source is itself a family |
-| `C/resident/wave_relation/{source,observation}.rs` | Complete source arrivals, affine source action and actual-next observation | Compose with the producing-family return rather than treat source actuation as material formation |
-| `W/coupled.rs` and `W/family/` | One coupled wave, conditional current families, actual source-field actuation, joined continuation | Publish changed material/condition/current and comparison disposition as one complete successor |
-| `A/coupled_wave.rs::NativeCoupledWaveSession` | Prediction, emission, ordinary re-entry, read-only `compare_symbol`, release and rest | Consuming return API, actual source-part association, full-cycle product observation |
-| `W/rest.rs`, `W/coupled/rest.rs`, `C/resident/neighborhood/rest.rs` | Versioned normal/coupled and pending comparison persistence | Extend only for new committed payloads and encoding cuts; retain version compatibility |
+| `W/coupled/comparison.rs::{predict_contact,compare_coupled_prediction}` and `comparison/constitutive.rs` | Retained producing cut, joint source/observed-difference sections and dependent contact/formation evaluator | Bind broader source applicability through the consuming generator; preserve read-only comparison |
+| `C/resident/neighborhood.rs` and `W/coupled/dependent.rs` | Pointwise condition preimage/contact and staged member formation within the complete dependent generator | Extend actual source/contact constraints without casting a family centre to a point |
+| `C/resident/{preimage,condition_contact}.rs` | Compatible conditions and actual contact over shared source parameters | Preserve their source dependence when extending applicability |
+| `C/resident/wave_relation/{source,observation}.rs` | Complete source arrivals, affine source action and actual-next observation on the continuing body | Preserve source actuation, next-current observation and producing correction as distinct operations |
+| `W/coupled.rs`, `W/family/` and `W/coupled/dependent.rs` | One owner, joined source/current continuation and complete returned condition/material/current successor | Reuse this body for source/contact applicability and economical encoding |
+| `A/coupled_wave.rs::NativeCoupledWaveSession` and `coupled_wave/body.rs` | Prediction, emission/re-entry, read-only comparison, consuming `incorporate_symbol`, release and rest | Actual source-part association and full-cycle product observation |
+| `W/rest.rs`, `W/coupled/rest.rs`, `W/coupled/dependent/rest.rs`, `C/resident/neighborhood/rest.rs` | Versioned normal/coupled persistence; dependent v4 retains Base/Programme frames and reads predecessors | Extend only for newly committed source/encoding payloads; preserve pending cuts and compatibility |
 | `receiver_history_compression/{observable,compression}.rs` | Exact quotient, receiver decoder, fibres and ordered-word conduct | Bind the actual continuing coupled-wave generators, conditions and emission; general ownership is not that binding |
 | `field/internal_mode.rs`, leader/scale and diffusion owners | Existing local mode, restriction and reduced-boundary constructions | Compose where domains match, retaining source/memory and actual complete successor |
 
 [established-bounded; source-inspected] `compare_symbol` explicitly reports
 `material_deposited: false`. Its output is a comparison, not a completed material return.
-Emission and pending rest already exist. The old blueprint's instructions to first invent those
-owners are superseded; their implementation evidence remains standing.
+The distinct `incorporate_symbol`/`observe-symbol` path consumes the comparison and publishes
+the returned body at its declared section receiver. Emission and pending rest already exist;
+these owners and their scoped implementation evidence remain standing.
 
 ## Mathematical contract at the immediate boundary
 
@@ -126,9 +129,9 @@ owners are superseded; their implementation evidence remains standing.
 now provides public bilinear target/core/receiver/search owners and a pure resident rational
 binding. `ResidentBilinearMap::read_product` consumes the same retained product under a new
 receiver. `BilinearOperator::left_family_preimage` supplies the fixed-port affine-family
-reference. The native wave's developing transaction below is still unbound; when both source
-and condition vary it must retain their mixed-product consistency. The pure binding is usable
-without asserting that stronger material return.
+reference. The dependent generator and consuming session in phase 2 now bind the developing
+return at its declared source-family and section-receiver scope. Preserve mixed-product
+consistency when both source and condition vary; the pure bilinear binding remains separately usable.
 
 [definition] With complex current pair z=(p,c), retained condition h and actual contact j,
 
@@ -175,9 +178,9 @@ now supplies `JointBilinearFibre` and `JointBilinearSystem`. They retain true pa
 and affine joining coordinates: `z=x*h` and `m*z=v` can be stored and evaluated together.
 Their native evaluator reads the same parameter packet through all participating ports.
 A parameter restriction is handed to the affine solver only after every quadratic term cancels.
-The actual wave compiler must retain the existing normal anchor bound and source/condition/
-material cuts alongside these equations. The generic equality fibre does not supply those
-attachments or select a material-update law by itself.
+The actual pending compiler in phase 2 retains the normal anchor bound and source/condition/
+material cuts alongside these equations. Its dependent contact/formation consumer supplies the
+update law; the generic equality fibre alone does not select that law.
 
 [definition] In the affine specialization, use existing coefficient-image and preimage owners
 with their shared parameters. If both source and condition vary and the required product is
@@ -225,9 +228,9 @@ lifts the existing neighborhood preimage/contact/formation at a shared source pa
 native anchor admission. The [dependent return](../../research/records/2026-09-11_CONSTITUTIVE_RETURNS_REMAIN_DEPENDENT_ON_THEIR_SOURCE.md)
 checks point specialization, source-dependent conditions, preserved vertical directions and
 staged extension outside the old relation. Even its elementary one-row condition graph is
-non-affine. The next representation must therefore retain `θ ↦ (hθ,Rθ)` and the actual
+non-affine. The owned generator below therefore retains `θ ↦ (hθ,Rθ)` and the actual
 source/current continuation; neither one selected alternative nor the span of all alternatives
-can be published as this family. This evaluator does not consume pending returns.
+can be published as this family. The evaluator itself remains read-only; its separate owner consumes returns.
 
 [established-bounded; implemented-exact] `NormalCoupledContinuation` now retains the actual
 ordered maps from a pending producing source through contemporary current, including all internal
@@ -345,10 +348,10 @@ internal encoding for text, mathematics, vision and acoustics.
 now provides an executed exterior method for this phase: specify the local action tensor or
 complete recurrence block, solve compatible factorizations through the existing exact preimage
 owner, verify the full coefficient/clock relation, and retain decoder and cost alternatives.
-The first native target is a pure admitted local segment. Port its productive construction or
-reuse through resident owners; do not insert the host search or Lean checker into inference.
+The pure admitted bilinear segment now has the resident binding described above. Extend its
+productive construction or reuse through those owners; keep host search and Lean exterior to inference.
 Before applying it to a developing segment, include its complete material/successor action in
-the target. This method does not choose the unresolved family incorporation semantics of phase 2.
+the target. Use phase 2's complete dependent return law when constructing a reduction of developing material.
 
 [definition] Holonic Encoding forms and reuses representations of transformations and receiver
 faces across modalities. BPE/path folding is a serial codec instance. Autoencoding supplies

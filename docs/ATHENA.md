@@ -20,9 +20,10 @@ while developing its wider applications.
 [definition] The [native blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-shared-mathematical-to-native-construction)
 names the formal-to-native bindings. Current factor/word construction and information/cost laws
 must become reusable executable material, with the actual decoder, clock and remainder retained.
-The immediate native family-incorporation work gives Eros a complete consuming return; subsequent
-requests must use its changed successor. This is how the mathematical workshop becomes Athena's
-available conduct. Source signatures, a printed result or a smaller artifact alone do not
+The native family-incorporation binding supplies Eros's consuming return at its declared
+source-family and section-receiver scope; subsequent requests use its changed successor.
+Source/contact applicability and productive encoding extend that body. This is how the mathematical
+workshop becomes Athena's available conduct. Source signatures, a printed result or a smaller artifact alone do not
 establish that incorporation.
 
 ## Athena-alpha and the finite construction programme
@@ -68,9 +69,8 @@ source/contact applicability is the next native binding.
 [exact source construction](../research/records/2026-09-10_SEQUENCE_FOLD_AND_REACTION_CURRENT_MAKE_THE_CAUSAL_THOUGHT_CHAIN_CONCRETE.md)
 shows why organization, occupancy and joint correlation must survive into later conduct. The
 existing coupled composite keeps one wave move owner and the attached local neighborhood.
-The remaining consuming return must stage its member/condition changes with the complete wave
-successor. Its point/exact and bounded-family ports require the explicit joint relations in
-the plan.
+The consuming return stages its member/condition changes with the complete wave successor.
+Its point/exact and bounded-family ports retain the explicit joint relations in the plan.
 Its text receiver is a declared native projection with the full source fibre retained, not a
 claim that a selected word identifies the source or proves useful language.
 
@@ -87,8 +87,8 @@ now exposes GPU basis selection, exterior decoding and ordinary emitted-source r
 `NativeWaveSession` and the shared stream. Pending selection/re-entry and delivery survive rest;
 a fresh-process continuation returns identical events and final artifact. The observed eight-symbol
 output is `tht44444`; this establishes the interface/continuation scope, not useful conversation.
-The subsequent coupled conditional organization is described below; consuming family formation
-and its reusable encoding remain construction responsibilities.
+The subsequent coupled conditional organization and consuming family formation are described
+below; broad source applicability and productive encoding remain construction responsibilities.
 
 [definition] The [coupled session return](../research/records/2026-09-11_COUPLED_FAMILY_EMISSION_CONTINUES_THROUGH_ONE_SESSION.md) exposes the coupled family's declared projected receiver through `NativeCoupledWaveSession`,
 conditional generation and actual emitted-symbol re-entry. `project-symbol` is a pure reading;
@@ -98,7 +98,9 @@ the family. The first symbol is held as an output-part prefix; subsequent actual
 use the existing source actuation. No padding or self-target deposition is supplied. Session rest
 retains pending selection/re-entry and the shared delivery cursor. `retain_comparison` now captures a producing family. The [joint comparison return](../research/records/2026-09-11_PRODUCING_FAMILIES_KEEP_JOINT_COMPARISON_PARAMETERS.md)
 exposes `compare-symbol` and `release-symbol-comparison`; comparison preserves the shared source
-parameters without material deposition. `observe-symbol` still refuses the unbound material update.
+parameters without material deposition. `observe-symbol` now calls `incorporate_symbol` through
+the complete consuming body, including original-base and later-programme predictions. Its
+declared source-section receiver and exactly-once publication are described below.
 
 [definition] The [actual-continuation return](../research/records/2026-09-11_ACTUAL_CONTINUATIONS_JOIN_THE_COMPLETE_COUPLED_FAMILY.md)
 adds `receive-next-symbol` for an explicitly observed next current in this symbol chart. It joins
