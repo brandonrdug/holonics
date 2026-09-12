@@ -1,0 +1,21 @@
+Command: bash tools/lean_check.sh ElementaryHolonics.Framework.Physics
+Toolchain: leanprover/lean4:v4.33.0
+Exit: 0
+Scope: final new-owner and completion excerpt; full output is .local/scratch/2026-09-12-mass-energy-final-lean.log.
+
+✔ [9094/9096] Built ElementaryHolonics.Physics.CompositeMassEnergy (6.4s)
+⚠ [9095/9096] Built ElementaryHolonics.Physics.MaxwellEnergyCone (10s)
+warning: ElementaryHolonics/Physics/MaxwellEnergyCone.lean:47:55: Variable name `hc` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hc
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: ElementaryHolonics/Physics/MaxwellEnergyCone.lean:65:60: Variable name `hc` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hc
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+✔ [9096/9096] Built ElementaryHolonics.Framework.Physics (3.4s)
+Build completed successfully (9096 jobs).

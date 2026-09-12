@@ -210,6 +210,14 @@ does not define every medium's geometry or all language context.
 
 ## Producing comparison and architecture laws
 
+[definition] The [mass–energy synthesis](MASS_ENERGY_AND_CAUSAL_TRANSPORT.md) places the
+recent architecture, source, mode and prediction work within one physical account. Invariant
+mass reads complete rest energy; momentum, radiation and field energy read its transported
+configuration. Wave/heat and constitutive response connect the actual generators; sufficient
+mode reduction preserves the complete admitted future and its energy/phase/current receiver.
+The resulting models are computational-biology/neuroscience and physical modelling work at
+their declared scopes, not a separate non-intelligent mathematical activity.
+
 [definition] The [predictive-release return](../research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md)
 connects prepared internal modes, release into the medium, subsequent transport and receiving
 contact. A current can be output-null now but potent under a later admitted action; reduction

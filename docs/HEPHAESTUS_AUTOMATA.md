@@ -146,6 +146,7 @@ product tuple or an equivalent family representation makes the requested receive
 | Algorithm construction | Factor a specified bilinear operator; return executable factors, certificate and cost alternatives | Factorization example and `GeneratorFactorization` |
 | Modal kernel compression | Derive independent kernel modes; preserve normalized mass/current queries and compile source transport or its separating fibre | `exact_linear::KernelModeReduction`; `kernel_mode_compression.rs` |
 | Predictive release | Infer an impulse for a requested receiver, propagate the complete release state and compare energy/tolerance | `exact_linear::ConstantAccelerationRelease`; `predictive_release.rs` |
+| Relativistic energy transport | Compose radiative/body momenta, infer invariant mass and recoil, rebase observer and read field energy flux | `exact_linear::{EnergyMomentum,VacuumEnergyChart}`; `mass_energy_transport.rs` |
 | Recurrence automata | Compose or replace an indexed word; return its full block action, clock and future comparison | `RatioSeriesTransport`, matrix/jet and ordered-word owners |
 | Transcendental receivers | Request a π/e window or Gamma value/jet; return an enclosure/window and reusable generator | Exact window/factorization examples and analytic source/tail owners |
 | Boundary and energy solving | Condense an interior; return boundary action plus source, memory, null family and mixed-energy ledger | Schur/diffusion, `PartitionedHodgeEnergy`, clocked constitutive owners |
@@ -158,12 +159,20 @@ prerequisite to every mathematical tool.
 
 ## Spectral application and information units
 
+[established-bounded; implemented-exact] The [mass–energy application](../research/records/2026-09-12_MASS_ENERGY_AND_MAXWELL_BOUNDS_UNIFY_TRANSPORT.md)
+uses full energy/cp coordinates for composite mass, absorption, emission, reflection and
+observer boosts. Its electromagnetic receiver retains both E/B invariants and the Poynting
+cone residual under field boosts. The [synthesis](MASS_ENERGY_AND_CAUSAL_TRANSPORT.md) connects
+these operators to physical prediction, source-qualified bounds and Holonic Encoding.
+
 [established-bounded; implemented-exact] The [predictive-release application](../research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md)
 uses shared exact preimage solving to infer a launch impulse, then the complete matrix flow
 to return landing, kinetic/potential exchange and unresolved-source outcomes. Its probability
 calculation is deterministic transport of declared source weights. This is a weak-field
-constant-acceleration operator chart with explicit mass/time/receiver conditions; it is not
-an articulated-body, general relativistic or native motor-control product.
+constant-acceleration simulation derived in the GR weak-field chart, with explicit
+mass/time/receiver conditions. Articulation, spin and metric backreaction are held outside
+this particular model's degrees of freedom; its neural preparation correspondence remains
+part of the shared computational-biology construction.
 
 [established-bounded; implemented-exact] The [periplus/rebase application](../research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md)
 adds passive basis transport to the continuing modal summary, with its encoder/decoder and

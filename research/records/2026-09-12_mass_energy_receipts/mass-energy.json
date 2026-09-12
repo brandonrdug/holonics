@@ -1,0 +1,165 @@
+{
+  "41_joule_retained_heat_mass_kg": "41/89875517873681764",
+  "body_with_balanced_retained_radiation": {
+    "c_momentum": [
+      "0",
+      "0",
+      "0"
+    ],
+    "energy": "5",
+    "future_causal": true,
+    "mass_squared_c_fourth": "25"
+  },
+  "boost_beta": "4/5",
+  "boost_gamma": "5/3",
+  "boosted_null_field": {
+    "E_dot_B": "0",
+    "E_squared_minus_c_squared_B_squared": "0",
+    "cone_residual": "0",
+    "energy_density": "25/9",
+    "poynting": [
+      "-20/9",
+      "0",
+      "5/3"
+    ]
+  },
+  "boosted_pair": {
+    "c_momentum": [
+      "-8/3",
+      "0",
+      "0"
+    ],
+    "energy": "10/3",
+    "future_causal": true,
+    "mass_squared_c_fourth": "4"
+  },
+  "chart": "c=1, epsilon=mu=1 unless the separate constitutive chart or SI heat conversion is stated; momentum stored as c*p",
+  "heat_scope": "41 J retained as internal rest-frame energy; a 41 J translational kinetic increment is a different receiver",
+  "native_operation_changed": false,
+  "null_field": {
+    "E_dot_B": "0",
+    "E_squared_minus_c_squared_B_squared": "0",
+    "cone_residual": "0",
+    "energy_density": "1",
+    "poynting": [
+      "0",
+      "0",
+      "1"
+    ]
+  },
+  "opposite_photons": {
+    "c_momentum": [
+      "0",
+      "0",
+      "0"
+    ],
+    "energy": "2",
+    "future_causal": true,
+    "mass_squared_c_fourth": "4"
+  },
+  "other_constitutive_chart": {
+    "epsilon": "2",
+    "field": {
+      "E_dot_B": "0",
+      "E_squared_minus_c_squared_B_squared": "0",
+      "cone_residual": "0",
+      "energy_density": "2",
+      "poynting": [
+        "0",
+        "0",
+        "1"
+      ]
+    },
+    "impedance_squared": "1",
+    "mu": "2",
+    "speed": "1/2"
+  },
+  "parallel_photons": {
+    "c_momentum": [
+      "2",
+      "0",
+      "0"
+    ],
+    "energy": "2",
+    "future_causal": true,
+    "mass_squared_c_fourth": "0"
+  },
+  "photon_absorption": {
+    "c_momentum": [
+      "1",
+      "0",
+      "0"
+    ],
+    "energy": "4",
+    "future_causal": true,
+    "mass_squared_c_fourth": "15"
+  },
+  "radiative_transition": {
+    "daughter": {
+      "c_momentum": [
+        "-8/5",
+        "0",
+        "0"
+      ],
+      "energy": "17/5",
+      "future_causal": true,
+      "mass_squared_c_fourth": "9"
+    },
+    "emission": {
+      "c_momentum": [
+        "8/5",
+        "0",
+        "0"
+      ],
+      "energy": "8/5",
+      "future_causal": true,
+      "mass_squared_c_fourth": "0"
+    },
+    "parent": {
+      "c_momentum": [
+        "0",
+        "0",
+        "0"
+      ],
+      "energy": "5",
+      "future_causal": true,
+      "mass_squared_c_fourth": "25"
+    },
+    "recoil_kinetic": "2/5",
+    "rest_energy_difference": "2"
+  },
+  "reflection": {
+    "recoiled_body": {
+      "c_momentum": [
+        "8/5",
+        "0",
+        "0"
+      ],
+      "energy": "17/5",
+      "future_causal": true,
+      "mass_squared_c_fourth": "9"
+    },
+    "reflected": {
+      "c_momentum": [
+        "-3/5",
+        "0",
+        "0"
+      ],
+      "energy": "3/5",
+      "future_causal": true,
+      "mass_squared_c_fourth": "0"
+    }
+  },
+  "schema": "holonics.mass-energy-transport.v1",
+  "standing_field": {
+    "E_dot_B": "1",
+    "E_squared_minus_c_squared_B_squared": "0",
+    "cone_residual": "1",
+    "energy_density": "1",
+    "poynting": [
+      "0",
+      "0",
+      "0"
+    ]
+  }
+}

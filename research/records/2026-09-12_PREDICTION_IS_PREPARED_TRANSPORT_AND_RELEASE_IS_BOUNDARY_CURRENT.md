@@ -378,7 +378,9 @@ m=2 kg, g=(0,-10) m/s², starting position (0,1) m, zero initial velocity and a 
 after 1 s. The shared solver infers J=(8,10) kg·m/s and launch velocity (4,5) m/s. Launch
 work is 41 J. At times 0,1/2,1, the kinetic/potential pairs are (41,20), (16,45), (41,20) J;
 total energy is exactly 61 J. Flow compositions agree without stepping through a stored path.
-This is a declared uniform-gravity chart, not an Earth calibration or a brain/GR simulator.
+This is a GR-derived weak-field motion simulation with prescribed uniform gravity. The
+acceleration is a declared model parameter; the corresponding neural preparation and
+biomechanical source relations are developed above.
 
 [established-bounded; computational-witness] Three unresolved horizontal impulse deviations
 (-1/5,0,1/5) kg·m/s, with masses (1/4,1/2,1/4), deterministically land at x=(39/10,4,41/10) m.

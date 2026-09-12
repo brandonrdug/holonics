@@ -32,14 +32,22 @@ test result never upgrades a correspondence.
 
 ## Formal framework entry points
 
+[definition] `Physics/CompositeMassEnergy.lean` and `Physics/MaxwellEnergyCone.lean` are
+imported by `Framework.Physics`. The first reuses `HolonicMassShellFace` for exchange,
+two-massless-mode composite mass and exact boosts; the second proves the Poynting
+sum-of-squares residual and `|S|≤c u` in its normalized three-component field chart.
+The [mass–energy synthesis](MASS_ENERGY_AND_CAUSAL_TRANSPORT.md) connects their Maxwell,
+stress/observer, wave/heat, Hodge and generator/information consumers.
+
 [definition] `Physics/ReleasedMotion.lean` and `Physics/ObserverBoundaryCurrent.lean` are
 imported by `Framework.Physics`: exact constant-acceleration/impulse/energy and tolerance
 laws; symmetric observer-stress contraction, actual product-jet divergence and joined
 interface cancellation. `Physics/PortEnergyHeat.lean` now differentiates changing inverse
 capacitance; `HolonicDiffusionCharts.MarkovKernel.expectation_dirac` transports finite
 uncertainty through a deterministic map. The [predictive-release return](../research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md)
-states the Einstein/worldtube and biomechanical correspondence without upgrading these
-finite charts into a complete GR or neural simulator.
+states the Einstein/worldtube and biomechanical correspondence. These are finite stress/field
+models and a GR-derived prescribed-field motion simulation, used in the computational
+biology/neuroscience programme with their actual degrees of freedom stated.
 
 [definition] `Foundation/SectionResidual.lean` and `Transport/GaussianRebase.lean` are imported
 by `Framework.Information`. They own section/kernel compensation and the Gaussian
@@ -272,6 +280,14 @@ release, nilpotent constant-acceleration flow, position and impulse receiver mat
 composes the existing preimage/factor owners. `examples/predictive_release.rs` consumes it
 for an inferred launch, kinetic/potential cuts and deterministic source-measure transport.
 This is an exact mathematical application boundary, not a new mutable/native motion engine.
+
+[definition] `exact_linear/energy_momentum.rs` owns `EnergyMomentum`, `VacuumEnergyChart`,
+`MaxwellEnergyFace` and `EnergyMomentumError`. Energy-scaled momenta compose and boost through
+the shared exact matrix owner; vacuum constitutive coefficients satisfy their exact product
+constraint. E/B fields transform before the energy-flux receiver is read. The application
+`examples/mass_energy_transport.rs` supplies exact mass/recoil/boost/field comparisons and
+retained-internal-energy conversion. These operators model the stated relativistic and
+electromagnetic charts; native recurrence is unchanged.
 
 [definition] `Mathematics/GeneratorFactorization.lean` owns the arbitrary finite commutative-ring
 bilinear coefficient certificate, selected three-product identity, ratio-block matrix bridge,

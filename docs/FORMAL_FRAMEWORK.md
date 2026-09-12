@@ -20,6 +20,13 @@ The [Lean guide](../formal/elementary-holonics/README.md) gives focused imports 
 The [mathematics/native synthesis](MATHEMATICS_AND_NATIVE_CONDUCT.md) connects these laws to
 current executable owners.
 
+[definition] [Mass–energy and causal transport](MASS_ENERGY_AND_CAUSAL_TRANSPORT.md) is the
+comprehensive synthesis of the recent source, optics, mode exclusion, periplus, Gamma/ζ,
+Hodge and predictive-release work. It starts from full energy–momentum and derives the
+interior/exterior exchange, Maxwell speed/impedance and energy-flux bound, Lorentz dilation,
+and the wave/heat transform. Computational biology/neuroscience, electromagnetic and
+GR-derived models are identified by their actual equations and approximation domains.
+
 ## Construction programme and first formal use
 
 [project-postulate] [The Reality of Difference in construction](plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md)

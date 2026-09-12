@@ -49,9 +49,13 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 mod bilinear;
+mod energy_momentum;
 mod joint_bilinear;
 mod kernel_modes;
 mod released_motion;
+pub use energy_momentum::{
+    EnergyMomentum, EnergyMomentumError, MaxwellEnergyFace, VacuumEnergyChart,
+};
 pub use joint_bilinear::{JointBilinearFibre, JointBilinearSystem, JointPreimageReduction};
 pub use kernel_modes::{KernelModeAction, KernelModeError, KernelModeReduction, KernelModeSummary};
 pub use released_motion::{ConstantAccelerationRelease, ReleasedMotionError};

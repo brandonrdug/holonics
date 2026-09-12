@@ -4,8 +4,8 @@ import Mathlib.Tactic
 /-!
 # Released motion in a constant-acceleration chart
 
-This is the exact weak-field, constant-acceleration passage.  It is a reusable mathematical
-chart, not a claim about a relativistic field or a replacement for a constitutive source.
+This is the exact weak-field, constant-acceleration passage, used for GR-derived motion
+simulation and biomechanical prediction. Its acceleration field is prescribed in a local chart.
 -/
 
 namespace Soma.Holonics.Physics.ReleasedMotion

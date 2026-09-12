@@ -6,6 +6,15 @@ research. It records reusable relations and their actual implementation scopes. 
 breadth review inspected source at `ab5251a6`; the earlier fluid/RH sections retain their cited
 formal receipts and the preceding inspection at `6f547c4a`.
 
+[definition] The [mass–energy synthesis](MASS_ENERGY_AND_CAUSAL_TRANSPORT.md) now joins the
+recent construction around complete energy–momentum, rather than separating massive storage
+from propagated energy. It derives photon-pair mass, recoil and Lorentz/Poynting cone laws;
+connects Hodge heat to a Gaussian average of wave transport; and carries the source/decoder
+maps into mode compression, Gamma/ζ information and predictive release. Its
+[formal/executable return](../research/records/2026-09-12_MASS_ENERGY_AND_MAXWELL_BOUNDS_UNIFY_TRANSPORT.md)
+names the actual shared operators and verification. Source-specific bounds travel through
+their full generator/receiver maps rather than by analogy between numerical constants.
+
 [definition] The [formal framework synthesis](FORMAL_FRAMEWORK.md) now supplies a subject-based
 Lean entry point and connects molecular conformation, twisting/phase, active world-tubes and
 cosmological receivers to the same elementary holon. Its checked finite `Bᵀ M B x` change keeps

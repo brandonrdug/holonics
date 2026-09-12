@@ -222,6 +222,13 @@ symbol basis does not define the common interior or its clock.
 
 ## Shared mathematics and its productive use
 
+[definition] The [mass–energy synthesis](../MASS_ENERGY_AND_CAUSAL_TRANSPORT.md) now supplies
+the complete rest-energy/transport account for the recent shared work. Use the returned
+composite-momentum and Maxwell-energy operators with their mode, rebase and prediction
+consumers. The wave/heat transform connects Hodge and Gamma generators explicitly; an RH
+threshold transfer retains its actual xi source and zero receiver. This is integration in
+the existing operator/encoding order, not a new competing research phase.
+
 [definition] The [predictive-release return](../../research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md)
 adds a usable release/landing operator to the shared solver, with impulse/work, full
 kinetic–potential exchange, source uncertainty and receiver tolerance. Observer-current and

@@ -83,6 +83,13 @@ and 2026-06-20:
 > *"**Light does not slow in a medium, it's like a traffic system**, the light is still moving at c
 > relativistically."*
 
+[definition] The [current mass–energy construction](../MASS_ENERGY_AND_CAUSAL_TRANSPORT.md)
+reads this through the full physical current: complete system mass, internal energy,
+outgoing radiation, momentum and recoil. Vacuum propagation obeys `c²μ₀ε₀=1`; impedance
+uses the constitutive ratio. Material delay includes coherent field/material response as
+well as scattering, so the traffic figure does not prescribe a literal stop/restart history
+for each photon. The source, constitutive map and receiver determine the applicable transport.
+
 **The mechanism, stated as neural conduct** — 2026-06-03:
 
 > *"The electrical activity through the brain's nervous system is not live everywhere, **the current

@@ -7,6 +7,21 @@ AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/p
 is the sole order and [the blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 names actual code changes and outcomes.
 
+[proved-derived; formal-checked] The [mass–energy synthesis](docs/MASS_ENERGY_AND_CAUSAL_TRANSPORT.md)
+now makes complete energy–momentum central to the shared physics/information construction.
+New composite-mass laws retain exchanged current, photon-pair direction and Lorentz boosts;
+the Maxwell energy-cone theorem proves `|S|≤c u` with its full sum-of-squares residual.
+The [return](research/records/2026-09-12_MASS_ENERGY_AND_MAXWELL_BOUNDS_UNIFY_TRANSPORT.md)
+joins these to binding/recoil, constitutive speed/impedance, Hodge/wave/heat, Gamma/ζ and
+predictive-release work. Framework.Physics builds.
+
+[established-bounded; implemented-exact] Shared `EnergyMomentum` and `VacuumEnergyChart`
+operators now return exact invariant mass/exchange, recoil, observer boosts, E/B invariants
+and Poynting bounds. The application distinguishes opposite/parallel photons, retained
+radiation, absorption, radiative transition and elastic reflection. All 40 focused tests
+pass. Live scope descriptions identify the computational-biology and GR-derived models
+affirmatively by their equations and degrees of freedom.
+
 [proved-derived; formal-checked] The [predictive-release return](research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md)
 recovers the existing Leap/body-medium line and adds exact released-motion composition,
 impulse/work and kinetic–potential identities, endpoint-tolerance transport, observer-current
@@ -18,8 +33,9 @@ and higher-jet interpretation at explicit constitutive scopes.
 reusable release/flow/receiver operators. The application infers impulse `(8,10)` for its
 two-dimensional target, retains the exact 61 J total through flight, and transports an
 unresolved source population without sampling. Its mean hits the target while only mass 1/2
-meets the declared tolerance. All 37 focused tests pass; no native GPU recurrence or physical
-brain/GR simulator is claimed.
+meets the declared tolerance. All 37 focused tests pass. This is a GR-derived prescribed-field
+motion simulation within the computational biology/neuroscience programme; the neural
+preparation correspondence is developed in the record. Native GPU recurrence is unchanged.
 
 [proved-derived; formal-checked] The [periplus/time-complement return](research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md)
 proves section/residual rebasing, Gaussian amplitude-and-argument cocycles bound to the existing

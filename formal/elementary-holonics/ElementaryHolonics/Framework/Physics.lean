@@ -8,6 +8,8 @@ import ElementaryHolonics.Physics.PartitionedHodgeEnergy
 import ElementaryHolonics.Physics.TemporalHodgeResidue
 import ElementaryHolonics.Physics.ReleasedMotion
 import ElementaryHolonics.Physics.ObserverBoundaryCurrent
+import ElementaryHolonics.Physics.CompositeMassEnergy
+import ElementaryHolonics.Physics.MaxwellEnergyCone
 import ElementaryHolonics.Physics.ScatteringWaveHeat
 import ElementaryHolonics.Physics.PhaseContactPassage
 import ElementaryHolonics.Physics.ReactionCurrent

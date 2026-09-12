@@ -97,7 +97,7 @@ fn main() -> Result<()> {
     assert_eq!(entropy, SymbolicSurprisal::term(2, q(3, 2))?);
     let report = json!({"schema":"holonics.predictive-release.v1",
         "chart":{"length":"metre","time":"second","mass":"kilogram","mass_value":"2",
-            "acceleration":["0","-10"],"scope":"uniform weak-field acceleration; no air drag, spin, articulated preparation or GR field solve"},
+            "acceleration":["0","-10"],"scope":"GR-derived weak-field motion simulation; prescribed uniform acceleration and point-body release"},
         "requested_endpoint":strings(&target),"release_impulse":strings(&impulse),"released_state":strings(&released),
         "release_kinetic_work_joules":"41","cuts":cuts,
         "source_fibre_separator":{"source_null":strings(&source_null),"future_difference":strings(&returned)},

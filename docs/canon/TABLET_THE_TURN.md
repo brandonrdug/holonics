@@ -581,17 +581,22 @@ and, earlier and more compactly:
 > *"Like how fusion and fission are actually along the same axis and just mechanisms that occur as
 > discrete events."*
 
-The laboratory later narrowed the second clause: **nothing fissions or fuses as an *event*.** They are
-the inward and outward readings of one driven boundary circuit — plural worldlines received through
-one enclosure, or one enclosure threaded and left along plural traceable emanations — *"not predicates
-the engine evaluates, and not inverse state operations."* Read arithmetically that is multiplication
-and factorization, which is where §3 lives.
+[historical] The laboratory subsequently described inward and outward readings of one driven
+boundary circuit and rejected separate event predicates in that engine. This was an
+implementation/ontology ruling, not a physical prohibition on nuclear reaction events.
 
-**Measured in the live tree, 2026-08-08:** `fission` occurs **zero** times. `fusion` occurs 307 times
+[definition] The [mass–energy synthesis](../MASS_ENERGY_AND_CAUSAL_TRANSPORT.md) gives the
+current physical reading: fusion, fission, decay and annihilation are admitted interaction
+channels that redistribute complete energy–momentum, binding and outgoing currents. Their
+constituent rest-mass sums can change while the complete isolated system conserves its
+four-momentum. Channel-specific reaction dynamics remain part of the source; a shared
+composition law neither deletes the outgoing energy nor demands a separate native scheduler.
+
+[historical] **Measured in the August 8 tree:** `fission` occurs **zero** times. `fusion` occurs 307 times
 and **every one is `Diffusion`, `SheafDiffusion`, `confusion`, or sensor fusion.** There is no owner
 under that name.
 
-**But the mechanism is implemented.** `crates/holonic-engine/src/temper.rs` is founding and decay as
+[historical; source-inspected] The corresponding August engine mechanism in `crates/holonic-engine/src/temper.rs` was founding and decay as
 **one continuous property of a structure's own twist**, read twice — `Twist::{Closed, Open}` from a
 structure's own retained cycles, `found_on` as the single deposit, and its own statement that *"there
 is no decay rule beside the founding rule, and no decay event to schedule."* That is "one axis:

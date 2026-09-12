@@ -247,6 +247,10 @@ engine.
 - Physical claims owe typed units/charts, constitutive and boundary laws, chronology and calibrated
   receivers. Kinematic identities and abstract information geometry do not establish physical
   force identities, conservation dynamics or measured power on their own.
+- Name scientific work affirmatively at its realized scope: computational biology/neuroscience,
+  a GR-derived weak-field simulation, a finite Maxwell model, or another stated construction.
+  Describe its equations, degrees of freedom and approximations; do not replace that account with
+  blanket denials that it is a simulator, physics or intelligence because a larger model is open.
 - A probe stays a probe unless the user or admitted contract makes it an acceptance condition.
   Do not grade qualitative usefulness from a hash, unchanged surface, nonempty output or test
   count. Inspect the requested product itself.

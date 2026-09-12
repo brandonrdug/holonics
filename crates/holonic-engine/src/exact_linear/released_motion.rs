@@ -2,7 +2,7 @@
 //!
 //! The caller supplies a common unit/frame chart and positive inertial mass. The carrier is
 //! [position, velocity, acceleration]; release additionally receives an impulse. These are
-//! reusable mathematical operator builders, not a gait controller or a GR field solver.
+//! reusable operators for a GR-derived weak-field motion simulation with prescribed acceleration.
 use super::{ExactLinearError, ExactRatMatrix};
 use num_traits::{One, Signed};
 use relational_geometry::Rat;
