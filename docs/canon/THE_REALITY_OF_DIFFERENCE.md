@@ -178,6 +178,13 @@ new charts, and let subsequent interaction refine the terrain. A compact generat
 conduct its admitted consequences. A Preimage Fibre retains compatible causes and future
 conditions, possibly implicitly; it need not reproduce an entire microscopic past.
 
+[project-postulate] Solving for a generator is itself an instance of this intelligence: the
+mathematical unknown can be the program, its constituent factors, parameters or encoding.
+Learning, inference and constructive solving investigate these relations through different
+supplied conditions and receivers. Their causal operation is implicit, not another accomplishment
+to demonstrate. The retained form carries what its future conduct needs; the events that formed
+it need not survive as individually replayable records.
+
 [definition] The existing [compression tablet](TABLET_THE_COMPRESSION.md) retains decoder,
 remainder, work and receiver scope. Its source-coding and predictive theorems have their own
 statements. The philosophical identification gives the research its orientation; those scoped

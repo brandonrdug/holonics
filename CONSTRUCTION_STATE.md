@@ -1,11 +1,19 @@
 # Construction state
 
-**Currency:** September 12, 2026. **Current position:** the complete native return-cycle foundation is implemented and verified; source/contact applicability and productive encoding are the next native work.
-**Athena objective:** standing; useful Athena-alpha has not been attained. **Broad native cultivation:** paused while broad source/contact applicability is repaired;
+**Currency:** September 12, 2026. **Current position:** continue Hephaestus mathematical solver and Holonic Encoding construction using the returned bilinear/receiver owners and native dependent return body.
+**Athena objective:** standing within that shared intelligence programme. **Broad conversation cultivation:** paused at its source/contact limitation;
 authorized native implementation continues within the shared programme. The active phases now have names;
 AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/plans/THE_ROADMAP.md)
 is the sole order and [the blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 names actual code changes and outcomes.
+
+[project-postulate] Brandon's September 12 clarification identifies solver inference and
+generator construction as mathematical learning/reasoning. The requested unknown can be an
+algorithm or representation of π/e, a bilinear action or another admitted mathematical future.
+Execution ownership and causal provenance are supporting contracts; they do not replace that
+objective with state-change demonstrations or exact historical replay. The
+[correction](research/records/2026-09-12_SOLVER_INFERENCE_AND_GENERATOR_COMPRESSION_ARE_INTELLIGENCE.md)
+records the governing interpretation and current representation limits.
 
 [established-bounded; implemented-exact; formal-checked; computational-witness] The
 [complete native return](research/records/2026-09-12_OLD_AND_NEW_PENDING_SOURCES_RETURN_THROUGH_ONE_GENERATOR.md)
@@ -24,11 +32,11 @@ session controls, the additional source-fibre separator and the focused Lean bui
 
 [definition] This completes the native application/return-cycle foundation at the declared
 family and section-receiver scope. It does not establish useful Athena-alpha or equivalence
-between that section receiver and the former whole-family projection. Continue actual
-source/contact applicability and generator/encoding use on this body, with inspected comparisons,
-loss/residual and resource measurements. The fixed-condition conversation collapse remains an
-active source/constraint problem; do not reopen the completed return binding or merely add rows
-to its unchanged relation.
+between that section receiver and the former whole-family projection. Use the body for the
+mathematical application and encoding constructions below. Its retained operation sequence is
+one exact representation, not a requirement for every future realization. The fixed-condition
+conversation collapse remains a specific source/constraint problem and supplies no acceptance
+standard for the solver programme.
 
 [definition] The native evidence chain remains in the
 [resident generator](research/records/2026-09-11_REUSABLE_GENERATORS_REACH_RESIDENT_RECEIVERS.md),
@@ -57,27 +65,40 @@ retains the five analytic receivers, phase lifts and 152-bit packet; the
 [information return](research/records/2026-09-11_ZETA_PHASE_SWING_AND_INFORMATION_RATES_ARE_MEASURED.md)
 retains Swing and measured information rates. No native model or GPU operation changed.
 
-## Immediate native boundary
+## Immediate construction boundary
 
-[open] Bind broad source/part/continuation relationships to the now-consuming public session
-and address the existing relation's fixed-condition/vertical collapse through actual contextual
-constraints and applicability. Use the standing generator/encoding owners and complete returned
-body; a field/file occurrence is not a semantic identity. The current text boundary remains a
-supplied unit-symbol chart, not an established general Holonic Encoding faculty.
+[open] Extend reusable operator/recurrence requests from the returned bilinear solver to the
+existing indexed π/e and Gamma block constructions. Derive and compare executable factor words
+with the same complete action and clock, retaining coefficient families, receiver/analytic tail
+and code/work costs. Connect required native source equations and dependent returns through
+these applications. The precise remaining work is their reusable request/composition binding
+and economical generator representation, not another generic demonstration of causal response.
+
+[established-bounded; source-inspected] At `6f6627ca`, `ResidentCoupledConstitutive` retains its
+base, producing comparison and an accumulating `operations` vector. Appending an operation
+evaluates the combined programme; rest stores source packets and return faces. This is executable
+history dependence, not a claim of recovered compact dynamics or a copy of every whole-body
+snapshot. The governing correction distinguishes these source-inspected limits from the
+retired byte-field reconstruction defect. No runtime retention was changed in this review.
+
+[open] The text consumer still uses a supplied unit-symbol chart and its fixed-condition relation
+still collapses. Its source/contact repair remains within the shared programme; it does not
+precede every mathematical solver or encoding application.
 
 [definition] The next phases are situated reception/visible cycles, conditional relations and
 complete return, applicable constituent organization, Holonic Encoding/reuse, useful conversation,
 and shared modality applications. These are the native responsibilities within the shared programme, with formal and
-mathematical returns integrated into their actual consumers. A changed current/standing alone establishes none of the stronger
-recognition, association or usefulness outcomes named in those phases.
+mathematical returns integrated into their actual consumers. Report the inferred algorithm,
+representation or empirical relation at its actual scope; causal state change is implicit.
 
-## Actual output and verification standing
+## Conversation evidence and prior verification
 
 [established-bounded; computational-witness] Observed conversation outputs remain `tht44444`
 and two newlines. There is no established improving end-to-end loss trajectory, useful held-out
 conversation, scored branch account or observed emergent architecture. The
 [status return](research/records/2026-09-11_ATHENA_STATUS_RETURNS_TO_TRANSCENDENTAL_GENERATOR_COMPRESSION.md)
-retains the product observations and their limits.
+retains the product observations and their limits. These failed samples are not a standard,
+baseline or gate for the mathematical intelligence work.
 
 [proved-derived; formal-checked; computational-witness] The
 [fixed-condition audit](research/records/2026-09-11_FIXED_CONDITION_COLLAPSE_IS_EXACT_AND_ITS_PROJECTION_IS_REUSABLE.md)

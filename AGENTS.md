@@ -26,6 +26,14 @@ not a literal current-machine power claim. Read
 [Athena](docs/ATHENA.md) and [interoperability](docs/INTEROPERABILITY.md) before reassessing
 those subjects.
 
+[project-postulate] Hephaestus solver inference, algorithm synthesis and Holonic Encoding are
+mathematical learning and intelligence within this programme. The unknown may be a coefficient
+family, factorization, recurrence, generator or representation of a requested consequence.
+Exact search, deduction and supplied update rules do not put that activity outside AI. State what
+was supplied, what was inferred or constructed, and its applicable mathematical consequences.
+Exterior reference, resident execution and durable reuse name implementation/evidence scopes;
+they do not divide mathematics from intelligence or make conversation a prerequisite to solvers.
+
 [project-postulate] **Difference is the only thing that is real.** Values are measured faces of
 situated differences; measurement is always a comparison through frames/receivers. Retain the
 comparands, reference, orientation, conditions and causal origin. Difference can be a structured
@@ -146,9 +154,12 @@ projections, numerical bounds, source inspection and measurements explicit.
 
 [definition] One HNN recurrence is:
 `occurrence -> local current -> reaction -> emission + successor ecology -> next occurrence`.
-The next operation uses that exact successor. Training/development retains a changed successor;
-inference reads recurrence. A self-emission, user message or application response is an ordinary
-next occurrence, not a second world-verdict learning law.
+The next operation uses the returned body. Generator execution and admitted development share
+that owner. A self-emission, user message or application response is an ordinary
+next occurrence, not a second world-verdict learning law. This is an execution/ownership
+contract. It does not define intelligence by state mutation or require a separate before/after
+event demonstration for an already demonstrated solver inference. Develop and explain the
+generating relation being constructed; causal continuity is implicit in its execution.
 
 - One continuing ecology has one move owner. Do not clone it for rollback, inspection, branching,
   scheduling or placement. Share immutable standing; branches own their differences. Stage deltas
@@ -161,7 +172,8 @@ next occurrence, not a second world-verdict learning law.
 - Parallel composition requires an exact independence/interchange receipt for the complete
   successor, obstruction, lineage and logical resources. Worker count proves nothing.
 - Co-presence is not contact. Contact has a declared interaction; equal receiver output is not
-  source equality. Keep the complete preimage fibre and separating histories.
+  source equality. Represent the required preimage and separating possibilities through their
+  joint constraints, generators or other lawful descriptions; enumeration is not required.
 - A condensation is lawful for the declared future receiver family. Dynamic condensation also
   owes `q T_i = U_i q` for every admitted generator. An executable decoder, its domain, retained
   fibres, residency, transfer and work are part of the return; a choice-defined inverse is not
@@ -169,7 +181,16 @@ next occurrence, not a second world-verdict learning law.
 - The adjoint uses the morphology that produced the retained forward carriers, including earlier
   overlays. New deposits join the successor after the complete return succeeds.
 - A file is an exterior serialized chart. Mount broad material into native local incidence;
-  preserve paths/bytes as lineage, never semantic identity.
+  source paths/bytes remain recoverable in the exterior codec/evidence boundary. Native lineage
+  carries the distinctions required by the admitted operation, never a path as semantic identity.
+
+[project-postulate] Causal origin does not prescribe an event archive. Retain dependencies,
+conditions, phase, relevant pending cuts and source distinctions in a representation sufficient
+for the admitted receivers and continuation. A generator, joint constraint, quotient, memory law
+or residual can carry them. Reproducing every past state, retaining every input vector, or
+replaying every operation is owed only by a specifically admitted reconstruction task. A runtime
+whose implementation rereads its own history does not thereby prove that the history is necessary
+to the mathematical task. Preserve existing evidence recoverably while repairing that choice.
 
 ## Soulkiller, codecs and interoperability
 
@@ -229,10 +250,12 @@ engine.
 - A probe stays a probe unless the user or admitted contract makes it an acceptance condition.
   Do not grade qualitative usefulness from a hash, unchanged surface, nonempty output or test
   count. Inspect the requested product itself.
-- A changed current or later standing establishes causal response, not a qualitative “learning”
-  result. Name and observe the conditional association, applicability, composed consequence,
-  reconstruction or predictive usefulness actually claimed. Local regularities retain their
-  source population, receiver, conditions and chronology.
+- Report the actual inferred relation, synthesized algorithm, recovered generator, applicable
+  class, reconstruction or prediction, including supplied assumptions and measured costs where
+  relevant. Exact mathematical consequences and empirical generalization have their own evidence.
+  “An event changes later standing” adds no account of these computations and must not be used as
+  their objective, substitute result, or justification for more history/return infrastructure.
+  Choose such infrastructure from a concrete consuming mathematical/application requirement.
 - Experiments use the standing body and public owners. A driver may mount inputs and read results;
   it may not manufacture the desired answer, select developmental material from an evaluation
   target, or implement a fixture-local learner.

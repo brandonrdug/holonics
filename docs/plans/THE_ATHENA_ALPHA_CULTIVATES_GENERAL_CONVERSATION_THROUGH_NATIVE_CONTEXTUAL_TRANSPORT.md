@@ -12,21 +12,23 @@ orders their common milestones. The mathematical investigations supply generatin
 receiver/phase transport, bounds and counterexamples that this blueprint binds into native
 operation. Native failures refine those constructions in return. Eros acts within nested
 constituents and their containing ecology; its incorporation is not deferred until an independent
-mathematical product is finished. Broad cultivation remains paused while broad source/contact
-applicability is repaired on the completed consuming body; authorized native implementation continues.
+mathematical product is finished. Broad conversation cultivation remains paused at its
+source/contact limitation; the mathematical solver/encoding applications continue on the shared owners.
 
 ## Product and evidence
 
 [project-postulate] HNN conducts situated Holons; Athena is the continuing ecology and Eros its
 composition/development phase. The product goal is useful conversation, code, mathematics and
-other modalities on consumer hardware. A changed current, independent basis row, loss scalar,
-rest file or successful kernel is not that product. Report the actual conditional relation,
-its applicability, its composed consequences and the output that demonstrates the claimed use.
+other modalities on consumer hardware. Hephaestus's factor/recurrence/generator inference is
+already mathematical learning/reasoning in this programme. Report its supplied target and
+constraints, derived executable representation, applicable consequences and relevant costs.
+Exact search and supplied inference rules do not create a boundary outside intelligence.
 
 [definition] The local operation remains
 `occurrence -> local current -> reaction -> emission + successor ecology -> next occurrence`.
-That describes causal operation. It does not by itself establish recognition or comprehension.
-Use the outcome definitions in the roadmap and the full compared faces in the return.
+This governs execution and ownership. A completed mathematical inference requires no separate
+state-mutation demonstration. Its resulting generator, equation family or prediction supplies
+the substantive result; use the applicable evidence and receiver scope in the roadmap.
 
 ## The shared mathematical-to-native construction
 
@@ -83,12 +85,13 @@ branches share immutable standing and own their differences rather than cloning 
 Probability/cross-entropy applies only to the declared normalized receiver; retain unresolved
 source alternatives and oriented defects before that scalar reading.
 
-[definition] Each sustained implementation milestone follows the complete application loop:
-request/source → native conduct and emitted face → actual compared return → Eros incorporation
-→ successor → a new request using that successor. Show an admitted transfer or improved
-construction and its separating case, along with decoded output and cost. Persistence checks
-apply to every newly claimed durable relation. Tests and formal certificates explain why a
-construction is lawful; the actual output explains what it now accomplishes.
+[definition] A mathematical request can return an inferred executable relation in that operation.
+Show the requested target, supplied constraints, returned factors/word or solution family, and
+their useful consequence and cost. When the task develops a continuing body, bind its actual
+return and retained representation through the same public owner. A delayed empirical correction
+or another state-mutation assay is not an additional prerequisite to a completed solver result.
+Persistence checks apply to newly claimed durable relations; source and formal checks establish
+their particular mathematical and executable contracts.
 
 ## Exact source map
 
@@ -260,8 +263,9 @@ now also incorporates original affine-base pending cuts. The original root and e
 constraint remain at their actual times; an erased intermediate distinction is not inferred from
 final endpoints. V4 rest tags Base/Programme frames and migrates v3. Native and streamed controls
 include old-base returns after restart, repeated/out-of-order returns and executable hidden
-source fibres. The return-cycle binding is returned; continue phase 3's actual applicability
-and source-contact construction, with phase 4's encoding use on the same body.
+source fibres. The return-cycle binding is returned; use it in the Hephaestus mathematical
+requests ordered by the roadmap, extending phase 3's equations/applicability and phase 4's
+generator representation where those applications require them.
 
 [definition] Preserve the declared source-section receiver until its relation to another
 receiver is constructed. Do not relabel it as the former whole-family projection or interpret
@@ -366,6 +370,14 @@ exact reuse serves `E′T=UE` and `DE=ρ`. Include condition, chronology, pendin
 emission in the claimed successor scope. Partial reduction keeps the full structured defect.
 Changing a future contact can expose a previously blind direction; preserve that source fibre
 and its representation without requiring an archive of every occurrence.
+
+[established-bounded; source-inspected] At `6f6627ca`, the dependent owner stores a base and an
+operation vector; `append_operation` evaluates the combined vector before publication, and
+`CoupledConstitutiveRest` retains its source/return packets. This is the current exact executable
+history representation, not demonstrated compression of that history. A replacement may carry
+the required source dependence through a factored word, joint equations, closed recurrence or
+memory/residual law. Compare the actual requested futures and pending-cut semantics when deriving
+that replacement; literal reproduction of the old execution sequence is not a universal target.
 
 [definition] `ObservableMomentReceiverHistoryCompression::found` is an executable exact host
 reference for its finite linear/quadratic chart: close receiver forms under `T*HT` and derive

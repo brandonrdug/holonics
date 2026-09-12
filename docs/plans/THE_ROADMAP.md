@@ -12,6 +12,13 @@ observations must in turn refine the mathematics and its representation. AC0–A
 labels. The named Athena responsibilities below express shared dependencies, not a separate
 language project waiting behind an indefinitely expanding list of mathematical experiments.
 
+[project-postulate] Brandon's September 12 clarification keeps solver inference and generator
+construction within the learning/intelligence programme itself. The unknown can be an algorithm
+or encoding of a mathematical face and its admitted futures. Exact solving, empirical inference
+and resident execution retain their evidence scopes without becoming separate kinds of intelligence.
+Continue the Hephaestus mathematical applications; source/return machinery serves their concrete
+equations and representations. Causal state change is not an independent construction objective.
+
 ## Sustained objective and construction rhythm
 
 [project-postulate] Brandon's subsequent ruling makes items 1–4 coupled responsibilities of a
@@ -69,7 +76,7 @@ acoustic and kinetic receivers can reveal a flaw in earlier phases without waiti
 modality product. The framework's ambition extends beyond these first useful products toward
 nested automata that construct, compare and refine further automata.
 
-## Immediate integrated implementation
+## Immediate mathematical application and implementation
 
 [established-bounded; implemented-exact; formal-checked; computational-witness] The
 [complete native return](../../research/records/2026-09-12_OLD_AND_NEW_PENDING_SOURCES_RETURN_THROUGH_ONE_GENERATOR.md)
@@ -85,25 +92,34 @@ records are linked by CONSTRUCTION_STATE. The first root and later source constr
 the actual word; equal final endpoints do not replace those joins. The declared section receiver
 is not silently identified with the former whole-family projection.
 
-[definition] The next native construction joins situated source/part/return binding with phase
-3's applicability work. Identify the actual source/contact relation that cannot express a
-measured distinction, using the existing field, contextual-section, restriction/rebase and
-member-formation owners. Preserve the fixed-condition vertical-collapse counterexample; more
-rows in that unchanged relation cannot repair it. Do not supply a scene classifier, phrase rule
-or externally ranked semantic route. Use the consuming session to inspect complete input,
-prediction, actual return, full residual and changed consequence.
+[definition] Continue operator-scoped Hephaestus solving and Holonic Encoding. The returned
+bilinear factor/core/receiver owners are the starting application. Extend reusable requests to
+the existing indexed π/e and Gamma block constructions: retain the requested complete action,
+clock, admissible factor/parameter family and receiver, and return executable alternatives with
+their coefficient residual and work/code costs. For analytic receivers, carry the actual source
+and tail through the matched block boundary. This develops algorithmic representations of
+constraint identities, alongside the ζ phase/generator comparisons already returned.
 
-[definition] Continue phase 4 alongside that work: reuse retained generators and construct lawful
-condensations for their declared future receivers, carrying source fibres, phase, clock, pending
-returns and decoder/work accounts. Mathematical requests and changed modality receivers should
-use those same owners where their domains match. A new theorem, codec or example is useful when
-it changes this construction or exposes its precise missing relation; it is not another engine.
+[definition] Integrate the required native solving, source constraints and dependent generator
+through those mathematical requests. Phase 3 asks which supplied equations and source conditions
+make a factorization or composition applicable; phase 4 asks which generator/decoder carries its
+required futures economically. Use the existing preimage, contextual lift, restriction/rebase,
+field and formation owners for the specific missing relation. A supplied grammar or contact law
+does not disqualify an inferred construction. An independently demonstrated solver result needs
+no extra state-mutation assay to become an intellectual result.
 
-[definition] Broad cultivation remains paused while broad source/contact applicability is
-repaired. The pause is no longer due to a missing family-incorporation transaction. Resume
-appropriate native exposure through the actual changed consumer and inspect its product;
-mathematical breadth continues within the shared programme. No universal intelligence theorem,
-complete modality product or Millennium solution is a prerequisite to an admitted useful increment.
+[definition] The current dependent return body is an executable base plus an operation sequence;
+its continuation and rest controls establish correctness for that representation. They do not
+establish that all those operations must remain in a productive encoding. Construct compact
+factor/recurrence/constraint representations for the requested mathematical future, retaining
+pending-source distinctions where the application needs them. An exact past-replay contract
+must not be silently made the objective of generator recovery.
+
+[definition] Broad conversation cultivation remains paused at its source/contact limitation.
+Preserve the fixed-condition vertical-collapse counterexample when changing that consumer; more
+rows in its unchanged relation cannot repair it. Its failed text samples are historical problem
+evidence, not the standard or prerequisite for Hephaestus or the common intelligence programme.
+Mathematical applications continue through the shared owners and inform later text/modal use.
 
 ## All current plan documents and their roles
 
@@ -155,14 +171,16 @@ are dependencies, not the next work simply because an old plan contains an imper
 
 ## What an outcome means
 
-[project-postulate] A changed current or later standing establishes a causal response. It does
-not alone establish useful recognition, conditional association, comprehension or prediction.
-The word “learning” supplies no acceptance criterion. Name the relation, the conditions under
-which it recurs, the compared outputs and the demonstrated use. Counts, coefficients and hashes
-remain receiver measurements; none is a substitute for the requested product.
+[project-postulate] Report the mathematical or empirical content of the work: the problem and
+supplied information, inferred relation or executable representation, applicable consequences,
+and the costs relevant to the requested use. Causality is common to solver inference, execution
+and model formation; state mutation supplies no separate research objective. Exact algorithm
+construction is a result at its proved domain, and empirical predictions retain their measured
+domain. Neither needs a natural-language demonstration to count as intelligence work.
 
 | Claimed return | Required observation |
 |---|---|
+| Algorithm/generator synthesis | A specified target action or receiver is realized by derived factors, a recurrence or another executable representation; retain its solution family, residual and relevant costs |
 | Conditional association | An actual returned relation couples two classes of difference; a changed condition changes the predicted consequence in the way the supplied comparison tests |
 | Recognition/applicability | A retained relation is used under its admitted changed presentation/conditions, with a separating case outside that scope |
 | Reusable composition | New admitted compositions conduct through retained constituent actions; the relevant decoded future agrees with the declared reference or retains its measured defect |
@@ -183,10 +201,11 @@ persistence and resource accounting accompany usable increments. CONSTRUCTION_ST
 what has actually returned.
 
 [definition] The native application/return-cycle binding in phases 1–2 is implemented and
-verified for its declared families and receivers. Do not restart emission, comparison, original-base
-or programme incorporation, ownership or rest. Phase 3 now addresses source/contact applicability
-and the fixed-condition relation's collapse; phase 4 develops economical generator continuation
-on that actual conduct. Complete outputs and receiver-qualified differences remain part of each increment.
+verified for its declared families and receivers. Reuse emission, comparison, original-base
+and programme incorporation, ownership and rest. Phases 3–4 now develop the mathematical
+applicability and economical generator representations required by the Hephaestus applications
+above. The fixed-condition conversation relation remains a specific consumer to repair through
+those constructions; it does not define their scope or schedule another persistence campaign.
 
 [definition] Phase 6's source/receiver comparisons can inform earlier phases whenever their
 owners compose. A complete vision/audio product, π tail formalization, general fluid solution

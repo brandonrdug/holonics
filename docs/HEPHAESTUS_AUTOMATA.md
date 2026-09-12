@@ -6,6 +6,14 @@ mathematics and solver applications the immediate product focus. An operator con
 device to a requested use; that confinement does not define a separate underlying intelligence.
 “Holonic Solver” remains the descriptive umbrella for this constructive activity.
 
+[project-postulate] Hephaestus solving is mathematical learning and reasoning: infer a
+coefficient family, factorization, recurrence or generator/encoding from the supplied constraints.
+The constructed object can itself compute an entire family of consequences. A supplied search
+grammar, exact arithmetic or fixed inference rule does not disqualify that construction as AI.
+Distinguish its demonstrated domain and execution placement without imposing another state-change
+test or a conversation milestone. This is the September 12 clarification of the existing
+compression/intelligence/navigation programme.
+
 ## One framework, distinct responsibilities
 
 | Name | Meaning in this design |
@@ -204,17 +212,20 @@ Fixing a consistent source cut can yield an exact affine material family; the in
 returns m=4 and a subsequent native output 60 at input 15. An inconsistent cut returns a separator.
 
 [definition] This is reusable exact equation inference and native execution. The affine solve
-remains exterior apparatus. Eros still needs the pending comparison compiled from its actual
-resident source/relation, including anchor constraints, and its constitutive consequence staged
-into one successor. Multiple observations retain separate occurrence coordinates with explicitly
-shared material coordinates; equal dimensions do not establish that association.
+remains exterior apparatus; the subsequent pending compiler and dependent return bind the native
+condition/material operation at its declared source-family and section-receiver scope. Multiple
+observations retain their distinct source conditions and actual shared material relation. Those
+dependencies may be represented implicitly; they do not prescribe one stored vector per event.
 
 [established-bounded; implemented-exact] The [actual pending comparison compiler](../research/records/2026-09-11_ACTUAL_PENDING_COMPARISONS_COMPILE_WITH_THEIR_ANCHORS.md)
 now binds this machinery to real native source/condition/material cuts, preserving the original
 anchor bound. The current native material is a relation and can have free output directions;
 its existential row witnesses are not the scalar material coefficients used by the preceding
-reference application. Constitutive family incorporation and atomic publication remain active
-goal work, beyond this read-only compatibility compiler.
+reference application. The [complete native return](../research/records/2026-09-12_OLD_AND_NEW_PENDING_SOURCES_RETURN_THROUGH_ONE_GENERATOR.md)
+subsequently supplies constitutive incorporation and publication through a dependent generator.
+Its supplied contact/formation law and the solver's inferred factor/parameter families have
+specific mathematical domains; connect them through the actual operator request, not by naming
+either one a prerequisite for intelligence.
 
 ## Relative optimality and boundary cost
 
@@ -255,12 +266,14 @@ and no generic code-cost theorem establishes either endpoint by itself.
 3. **Return constraints to available material.** Refine compatible coefficients/applicability
    or expose a local factor through an actual comparison/source relation. `ExactContextualLift`,
    `SupportedDefectSection`, `DerivedFactorCover` and material-factorization owners provide
-   reference constructions. A solver identity alone is not an observed native event. Keep the
-   joint family and the producing cut in the handoff.
+   reference constructions. A constructed identity is mathematical information with its declared
+   domain; bind it through the appropriate operator/factor port. An empirical observation has
+   its own source/receiver association. Keep the relevant joint family in either handoff.
 4. **Continue the resident passage.** The pure rational factor/receiver binding now exists.
-   Bind its relevant source/return to existing formation owners when the joint law is supplied. Reuse immutable standing, stage changed
-   sections and publish one complete successor. The native family incorporation gap remains
-   explicit. Do not put exterior search, CPU semantic replay or Lean inside inference.
+   The dependent return body also exists. Use the source/return operations that match the
+   mathematical task and derive any missing map explicitly. Preserve one owner while composing
+   or reducing its representation; an accumulating history is not a required model of the task.
+   Native execution retains GPU ownership, with reference search and Lean in their exterior roles.
 
 [definition] A public interface belongs in the existing `holonics`/HNN application surfaces.
 Hephaestus naming does not require a new crate, scheduler, registry, checkpoint family or model
@@ -327,9 +340,10 @@ immutable construction is compatible with distinct application occurrences and h
 | Efficient local continuation | Changed work follows actual dependence; required hidden/mixed contributions remain available |
 | Durable use | Generator, receiver, clock, fibre and pending return survive restart at the claimed scope |
 
-[definition] Static synthesis, useful mathematical application and native HNN formation remain
-separate evidence claims. Seek useful finite returns and broaden their application. A smaller
-file, a basis count or an unchanged displayed answer is not a comprehension measurement.
+[definition] Synthesis, mathematical application and native formation state different evidence
+claims within the same intelligence construction. Report the inferred algorithm or representation
+and its useful consequences, with the reference/native and resource scopes made explicit. The
+method can infer useful structure while its wider applicability or native binding remains open.
 
 [interpretation] The longer ambition is an automated mathematical workshop whose constructions
 become material for further constructions: compound arithmetic operators, indexed recurrence

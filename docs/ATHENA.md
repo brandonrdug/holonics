@@ -17,6 +17,12 @@ conversation, code and other modalities use the same mechanisms through their ow
 receiver conditions. The framework's physical and mathematical research feeds those owners
 while developing its wider applications.
 
+[project-postulate] Hephaestus's exact inference and algorithm construction are already
+mathematical learning/reasoning in this shared programme. CPU reference, GPU execution and
+persistent native formation specify where a construction runs and what it retains. They do not
+decide whether solving counts as intelligence. The source/receiver task determines needed
+memory; the recurrence contract supplies no universal obligation to preserve an event history.
+
 [definition] The [native blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-shared-mathematical-to-native-construction)
 names the formal-to-native bindings. Current factor/word construction and information/cost laws
 must become reusable executable material, with the actual decoder, clock and remainder retained.

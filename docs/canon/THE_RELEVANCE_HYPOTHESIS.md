@@ -111,12 +111,14 @@ family; they do not refute the causal relevance of any generator that the system
 
 ## Loss is a measurement of difference
 
-[project-postulate] Brandon's September 11 clarification rejects “learning” as a qualitative
-grade supplied merely by a changed current or later standing. That establishes causal response.
-A stronger claim names the actual coupled classes of difference, conditions of applicability,
-retained transformation and tested future consequence. Recognition, conditional association,
-reconstruction, predictive usefulness and comprehension are not interchangeable measurements.
-The active plans state what must be observed for each claimed return.
+[project-postulate] Brandon's September 11–12 clarification asks for the content of learning:
+the inferred relation, recovered class, synthesized generator, reconstruction or prediction and
+the conditions under which it applies. A solver constructing a factorization or a recurrence
+from constraints is mathematical learning/reasoning in this programme. Its exact consequences
+and an empirical association have distinct evidence scopes within the same intelligence work.
+Causality already governs both; describing a state change neither explains the inference nor
+creates a separate capability stage. The current request determines the useful consequence to
+inspect, without a universal requirement for an additional before/after-event assay.
 
 [definition] A locally consistent face belongs to its source ecology and receiver scope. For
 a finite or measured population X with finite positive total measure μ(X), a classification receiver R

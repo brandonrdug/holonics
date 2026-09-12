@@ -54,7 +54,9 @@ test and joined-middle Lean statement were inspected. This review reuses those r
 it does not claim a new runtime execution or broader capability verification. Verification
 for this documentation repair is direct diff/source review and `git diff --check`.
 
-[definition] Continue source/contact applicability and productive generator/encoding use on
-the returned body, as the roadmap directs. The fixed-condition collapse, supplied unit-symbol
-chart and observed unusable conversation remain their actual open product boundaries. The
-section-receiver result does not establish whole-family receiver equivalence or useful Athena.
+[historical] This pickup's emphasis on the conversation/source-contact limitation was corrected
+by Brandon's subsequent September 12 messages. The
+[solver/intelligence correction](2026-09-12_SOLVER_INFERENCE_AND_GENERATOR_COMPRESSION_ARE_INTELLIGENCE.md)
+restores Hephaestus mathematical inference and generator construction as the active shared work.
+The API repairs and source/verification observations above stand. The section-receiver result
+retains its scope; the failed conversation sample supplies no solver acceptance standard.

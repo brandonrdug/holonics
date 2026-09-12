@@ -158,8 +158,11 @@ The [complete return](../research/records/2026-09-12_OLD_AND_NEW_PENDING_SOURCES
 adds `ConstitutiveSourceFrame::{Base,Programme}` and dependent rest v4, with v3 migration.
 `evaluate_with_base_faces` retains the root and each base source at its actual producing time;
 all pending origins now use the same staged return. The same family-image owner replaces the
-removed private `parameter_image` helper. Following native work concerns source/contact
-applicability and economical generator continuation.
+removed private `parameter_image` helper. The roadmap now applies these owners through
+Hephaestus mathematical solving and economical generator continuation. `ResidentCoupledConstitutive`
+currently retains its base and growing operation vector; `append_operation` evaluates that
+sequence and dependent rest retains its source/return packets. This describes its exact present
+realization, not a requirement for all encodings to replay their formation history.
 
 [definition] `resident/wave_relation/pullback.rs::ResidentWavePullback` and
 `section_wave_family_pullback` retain both affine source/target constraints through the actual

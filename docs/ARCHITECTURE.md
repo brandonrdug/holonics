@@ -106,10 +106,11 @@ new observations. The [blueprint's binding table](plans/THE_ATHENA_ALPHA_CULTIVA
 identifies current consumers and remaining work. The difference in evidence scope between a
 formal theorem and an executable body is an implementation responsibility within this programme.
 
-[project-postulate] “Learning” is not a capability grade inferred from a changed state. Describe
-the actual conditional association, applicable transformation, receiver reconstruction or
-predictive/product result. The [named Athena phases](plans/THE_ROADMAP.md#athena-construction-order)
-separate those outcomes and their code changes. Attention-like interaction, covector pullback,
+[project-postulate] Solver inference, generator synthesis, compression and empirical model
+formation develop the same intelligence. Describe the supplied problem, inferred relation or
+executable construction, its applicable consequences and costs. The
+[named Athena phases](plans/THE_ROADMAP.md#athena-construction-order) connect those outcomes to
+their code changes. Attention-like interaction, covector pullback,
 diffusion, phase resonance and physical gravity retain their actual operators and realization
 maps; shared mathematical structure is developed through those maps rather than synonym labels.
 
