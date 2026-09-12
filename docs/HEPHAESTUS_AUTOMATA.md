@@ -209,6 +209,13 @@ resident source/relation, including anchor constraints, and its constitutive con
 into one successor. Multiple observations retain separate occurrence coordinates with explicitly
 shared material coordinates; equal dimensions do not establish that association.
 
+[established-bounded; implemented-exact] The [actual pending comparison compiler](../research/records/2026-09-11_ACTUAL_PENDING_COMPARISONS_COMPILE_WITH_THEIR_ANCHORS.md)
+now binds this machinery to real native source/condition/material cuts, preserving the original
+anchor bound. The current native material is a relation and can have free output directions;
+its existential row witnesses are not the scalar material coefficients used by the preceding
+reference application. Constitutive family incorporation and atomic publication remain active
+goal work, beyond this read-only compatibility compiler.
+
 ## Relative optimality and boundary cost
 
 [definition] A locally optimal representation admits no improving variation within its declared

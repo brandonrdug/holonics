@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** September 11, 2026. **Current work:** joint constraint representation returned; native producing-comparison compilation and incorporation continue.
+**Currency:** September 11, 2026. **Current work:** real pending comparisons compile natively; active goal continues through constitutive incorporation.
 **Athena objective:** standing; useful Athena-alpha has not been attained. **Broad native cultivation:** paused while the consuming family/source binding is repaired;
 authorized native implementation continues within the shared programme. The active phases now have names;
 AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -27,11 +27,20 @@ input 15. Four exact reference tests, seven serial packet/joint tests, the appli
 Framework.Computation Lean build passed. Its affine solve remains exterior; no coupled Athena
 material deposit or broad cultivation is claimed.
 
-[open] Compile the actual pending comparison's resident relation/coefficients into this joint
-chart, retaining the producing source, condition/material association and normal anchor bound.
-Then bind its constitutive consequence to condition/contact/formation and one persisted
-contemporary successor. The missing product-consistency representation now exists; native
-compilation and the consuming update law remain the next work within responsibilities 1–4.
+[established-bounded; implemented-exact] The
+[actual pending-compiler return](research/records/2026-09-11_ACTUAL_PENDING_COMPARISONS_COMPILE_WITH_THEIR_ANCHORS.md)
+now builds shared source/condition/relation-witness equations directly on the GPU. It keeps the
+original anchor bound and producing condition while recording the contemporary material cut.
+Four native checks cover both charts, non-dyadic data, free current directions, delayed returns,
+remount and foreign/released handles. Seven packet and two prior comparison regressions passed.
+This is read-only compilation/evaluation; pending returns remain unconsumed and no new material
+or successor is published by it.
+
+[open] The active goal remains the complete native Eros return cycle. Derive the existing
+condition-contact and formation law over this compiled bounded source family, preserving shared
+parameters; relation row witnesses are not material weights. Bind that constitutive consequence
+into one contemporary successor, consume the pending cut once, persist it and inspect subsequent
+conduct. The compiler return is progress toward that objective, not completion of a smaller goal.
 
 [proved-derived; formal-checked] The latest
 [relative code-cost return](research/records/2026-09-11_RELATIVE_CODE_COST_HAS_AN_ADDRESSED_BOUNDARY_LAW.md)

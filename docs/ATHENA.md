@@ -174,6 +174,14 @@ transport and tolerance-based consequences with plural sources. These laws infor
 producing-return and receiver-reuse work; they do not install a support-only emitter, an extra certainty
 gate, or a new runtime model.
 
+[established-bounded; implemented-exact] The native wave now exposes
+`compile_coupled_joint` for its actual pending comparisons. The compiled equations preserve the
+recorded condition, source family and anchor while referencing the contemporary member relation.
+They survive reconstruction from a restored pending cut and retain free current directions.
+This [compiler return](../research/records/2026-09-11_ACTUAL_PENDING_COMPARISONS_COMPILE_WITH_THEIR_ANCHORS.md)
+is read-only; the active Eros goal still includes its consuming contact/formation law, one
+published successor and exactly-once pending consumption.
+
 ## Native-first construction
 
 [definition] [Hephaestus Automata](HEPHAESTUS_AUTOMATA.md) are operator-scoped mathematical

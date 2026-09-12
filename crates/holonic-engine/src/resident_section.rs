@@ -81,6 +81,9 @@ use mount::{
     MemoryInfo, Module, Stream,
 };
 
+#[path = "resident_section/surface_coupled_joint.rs"]
+mod surface_coupled_joint;
+
 #[path = "resident_section/bilinear.rs"]
 mod bilinear;
 pub use bilinear::{ResidentBilinearMap, ResidentBilinearReturn, ResidentJointBilinearEvaluation, ResidentJointBilinearFibre};

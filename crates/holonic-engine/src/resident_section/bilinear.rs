@@ -2,6 +2,7 @@
 use super::*;
 use crate::exact_linear::{BilinearProductCore, BilinearRealization, ExactRatMatrix};
 use num_traits::{One, ToPrimitive};
+use std::rc::Rc;
 
 fn refusal(what: impl Into<String>) -> ResidentRefusal {
     ResidentRefusal::Declaration {
@@ -38,7 +39,12 @@ fn packet(values: &[Rat]) -> Result<Vec<i64>, ResidentRefusal> {
     );
     Ok(words)
 }
-struct MatrixPacket<'c> {
+/// A sealed exact coefficient matrix already resident on the device.
+///
+/// The dimensions are carried separately because a packet is a flat rational word
+/// population.  Keeping them here prevents a compiler from accidentally changing the
+/// tensor chart while reusing the native packet kernels.
+pub(crate) struct MatrixPacket<'c> {
     section: ResidentSection<'c>,
     rows: usize,
     columns: usize,
@@ -58,16 +64,50 @@ impl<'c> MatrixPacket<'c> {
             columns: matrix.columns(),
         })
     }
+
+    pub(crate) fn from_resident(
+        surface: &'c ResidentSurface<'c>,
+        section: ResidentSection<'c>,
+        rows: usize,
+        columns: usize,
+    ) -> Result<Self, ResidentRefusal> {
+        if rows == 0 || columns == 0 {
+            return Err(refusal("resident coefficient packet requires nonempty dimensions"));
+        }
+        let entries = rows
+            .checked_mul(columns)
+            .ok_or_else(|| refusal("resident coefficient dimensions overflow"))?;
+        // A coefficient packet is one row of exact words followed by its common denominator.
+        surface.validate_packet(&section, entries)?;
+        Ok(Self { section, rows, columns })
+    }
 }
+
+#[derive(Clone)]
+enum CoreIdentity {
+    Host(std::sync::Arc<BilinearProductCore>),
+    Compiled(Rc<()>),
+}
+
+impl CoreIdentity {
+    fn same(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Host(a), Self::Host(b)) => std::sync::Arc::ptr_eq(a, b),
+            (Self::Compiled(a), Self::Compiled(b)) => Rc::ptr_eq(a, b),
+            _ => false,
+        }
+    }
+}
+
 pub struct ResidentBilinearMap<'c> {
-    core: std::sync::Arc<BilinearProductCore>,
+    core: CoreIdentity,
     surface: &'c ResidentSurface<'c>,
     left: MatrixPacket<'c>,
     right: MatrixPacket<'c>,
     receiver: MatrixPacket<'c>,
 }
 pub struct ResidentBilinearReturn<'c> {
-    core: std::sync::Arc<BilinearProductCore>,
+    core: CoreIdentity,
     left: ResidentSection<'c>,
     right: ResidentSection<'c>,
     product: ResidentSection<'c>,
@@ -93,11 +133,41 @@ impl<'c> ResidentBilinearMap<'c> {
         realization: &BilinearRealization,
     ) -> Result<Self, ResidentRefusal> {
         Ok(Self {
-            core: std::sync::Arc::clone(realization.core()),
+            core: CoreIdentity::Host(std::sync::Arc::clone(realization.core())),
             surface,
             left: MatrixPacket::mount(surface, realization.core().left_forms())?,
             right: MatrixPacket::mount(surface, realization.core().right_forms())?,
             receiver: MatrixPacket::mount(surface, &realization.receiver().particular)?,
+        })
+    }
+
+    /// Mount three exact A/B/D coefficient packets produced by a resident compiler.
+    /// `left_rows/columns`, `right_rows/columns`, and `receiver_rows/columns` are the
+    /// declared matrix charts; the packets themselves remain owned by this map.
+    pub(crate) fn from_resident_packets(
+        surface: &'c ResidentSurface<'c>,
+        left: ResidentSection<'c>,
+        left_rows: usize,
+        left_columns: usize,
+        right: ResidentSection<'c>,
+        right_rows: usize,
+        right_columns: usize,
+        receiver: ResidentSection<'c>,
+        receiver_rows: usize,
+        receiver_columns: usize,
+    ) -> Result<Self, ResidentRefusal> {
+        let left = MatrixPacket::from_resident(surface, left, left_rows, left_columns)?;
+        let right = MatrixPacket::from_resident(surface, right, right_rows, right_columns)?;
+        let receiver = MatrixPacket::from_resident(surface, receiver, receiver_rows, receiver_columns)?;
+        if left.rows != right.rows || receiver.columns != left.rows {
+            return Err(refusal("resident A/B/D coefficient charts do not meet"));
+        }
+        Ok(Self {
+            core: CoreIdentity::Compiled(Rc::new(())),
+            surface,
+            left,
+            right,
+            receiver,
         })
     }
     /// Apply this receiver to the retained product occurrence from the same immutable core.
@@ -106,7 +176,7 @@ impl<'c> ResidentBilinearMap<'c> {
         &self,
         source: &ResidentBilinearReturn<'c>,
     ) -> Result<ResidentSection<'c>, ResidentRefusal> {
-        if !std::sync::Arc::ptr_eq(&self.core, &source.core) {
+        if !self.core.same(&source.core) {
             return Err(refusal(
                 "receiver and product do not share this core occurrence",
             ));
@@ -137,6 +207,14 @@ impl<'c> ResidentBilinearMap<'c> {
         z: &ResidentSection<'c>,
     ) -> Result<ResidentBilinearReturn<'c>, ResidentRefusal> {
         self.apply_ports(x, z, false)
+    }
+
+    /// Apply a resident compiled family to one shared affine parameter packet.
+    pub(crate) fn apply_affine_shared(
+        &self,
+        parameters: &ResidentSection<'c>,
+    ) -> Result<ResidentBilinearReturn<'c>, ResidentRefusal> {
+        self.apply_ports(parameters, parameters, true)
     }
     fn apply_ports(
         &self,
@@ -181,7 +259,7 @@ impl<'c> ResidentBilinearMap<'c> {
             )));
         }
         Ok(ResidentBilinearReturn {
-            core: std::sync::Arc::clone(&self.core),
+            core: self.core.clone(),
             left: a,
             right: b,
             product,

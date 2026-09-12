@@ -1,6 +1,8 @@
 //! An observed difference remains jointly parameterized with its actual producing family.
 //! This carrier is not a point source or a span of independently observed alternative rows.
 use super::*;
+mod joint;
+pub use joint::{CompiledCoupledJoint, CoupledJointEvaluation, CoupledJointReading};
 
 pub(super) struct CoupledProducingCut<'c> {
     pub(super) member: usize,

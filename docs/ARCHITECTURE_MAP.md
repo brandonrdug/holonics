@@ -135,6 +135,13 @@ connects it to the existing addressed causal-length, physical and complexity own
 
 ## Foundation and transport
 
+[definition] `wave/coupled/comparison/joint.rs` owns `CompiledCoupledJoint` and its actual
+parameter/anchor evaluation. `surface_coupled_joint.rs` binds `coupled_joint_compile.cuh` to the
+resident coefficient compiler and original anchor receiver. The same `ResidentBilinearMap`
+now accepts owned resident A/B/D packets and distinguishes host/compiled core identity without
+numerical readout. The [pending compiler return](../research/records/2026-09-11_ACTUAL_PENDING_COMPARISONS_COMPILE_WITH_THEIR_ANCHORS.md)
+records source/condition/material-cut preservation and the unbound constitutive transaction.
+
 [definition] `exact_linear/joint_bilinear.rs` owns `JointBilinearFibre` and its conjunctive
 `JointBilinearSystem`: affine source/condition/return maps share one parameter chart, and genuine
 quadratic products remain constrained. Affine restrictions reuse the existing preimage solver.

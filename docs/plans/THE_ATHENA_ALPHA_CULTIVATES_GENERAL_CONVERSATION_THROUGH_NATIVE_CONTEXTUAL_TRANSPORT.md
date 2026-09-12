@@ -211,6 +211,19 @@ these bindings change. Preserve evaluation material outside developmental select
 
 ## 2. Conditional relations and complete return
 
+[established-bounded; implemented-exact] `ResidentNormalWave::compile_coupled_joint` now compiles
+an actual pending comparison directly on the device. It retains original source/condition and
+anchor, and names the current relation-material cut. Its equation witnesses are coefficients
+in that relation's row span, not learned material weights. The [native return](../../research/records/2026-09-11_ACTUAL_PENDING_COMPARISONS_COMPILE_WITH_THEIR_ANCHORS.md)
+checks both receiver charts, genuine free current directions, non-dyadic inputs and delayed/restored
+cuts without intermediate readout. It is read-only; the consuming work below remains open.
+
+[definition] The family lift must distinguish recorded h_s from a proposed successor condition.
+Use the actual constitutive contact/formation relation over the bounded source parameters;
+retain its joint variation or prove a lawful condensation of its complete return. Never insert
+each formal source coefficient row as a separately observed sample or use a relation witness
+as a material coefficient. A compatibility calculation alone does not define the update law.
+
 [definition] Reuse the existing read-only comparison. Add a distinct consuming preparation and
 publication path over `NormalCoupledComparison`; preserve inspection as read-only. The new path
 uses the producing family and observed receiver, constructs the admitted source/condition
