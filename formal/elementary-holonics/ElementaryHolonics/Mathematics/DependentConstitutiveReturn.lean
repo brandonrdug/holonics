@@ -264,4 +264,71 @@ theorem one_receiver_does_not_determine_generator :
     have at_two := congrFun equal 2
     norm_num [sourceDependentContact, unitContact, dot] at at_two
 
+/-! ## Joined relational returns
+
+The source support of a returned relation is computed from the complete joined
+pairs.  Reapplying the relation to that support alone forgets the target-side
+constraint, so it can admit a target that the joined return excluded.
+-/
+
+section JoinedRelations
+
+variable {X Y Z : Type*}
+
+def relationalPreimage (R : X → Y → Prop) (G : Set Y) : Set X :=
+  {x | ∃ y, R x y ∧ y ∈ G}
+
+def joinedRelation (F : Set X) (R : X → Y → Prop) (G : Set Y) : X → Y → Prop :=
+  fun x y => x ∈ F ∧ R x y ∧ y ∈ G
+
+def supportedSource (F : Set X) (R : X → Y → Prop) (G : Set Y) : Set X :=
+  {x | x ∈ F ∧ ∃ y, R x y ∧ y ∈ G}
+
+theorem supportedSource_eq_inter_relationalPreimage
+    (F : Set X) (R : X → Y → Prop) (G : Set Y) :
+    supportedSource F R G = F ∩ relationalPreimage R G := by
+  ext x
+  rfl
+
+theorem joinedRelation_mem_iff
+    (F : Set X) (R : X → Y → Prop) (G : Set Y) (x : X) (y : Y) :
+    joinedRelation F R G x y ↔ x ∈ F ∧ R x y ∧ y ∈ G := by
+  rfl
+
+theorem joinedRelation_source_supported
+    (F : Set X) (R : X → Y → Prop) (G : Set Y)
+    {x : X} {y : Y} (hxy : joinedRelation F R G x y) :
+    x ∈ supportedSource F R G := by
+  exact ⟨hxy.1, y, hxy.2.1, hxy.2.2⟩
+
+def serialRelation (R : X → Y → Prop) (S : Y → Z → Prop) : X → Z → Prop :=
+  fun x z => ∃ y, R x y ∧ S y z
+
+theorem relationalPreimage_serial
+    (R : X → Y → Prop) (S : Y → Z → Prop) (H : Set Z) :
+    relationalPreimage (serialRelation R S) H =
+      relationalPreimage R (relationalPreimage S H) := by
+  ext x
+  constructor
+  · rintro ⟨z, ⟨y, hR, hS⟩, hz⟩
+    exact ⟨y, hR, z, hS, hz⟩
+  · rintro ⟨y, hR, z, hS, hz⟩
+    exact ⟨z, ⟨y, hR, hS⟩, hz⟩
+
+/- The converse of a relation can be used as a relational constraint; this
+   serial law keeps the direction of time in `R` then `S`. -/
+
+def broadReturnRelation (x _y : Bool) : Prop := x = true
+
+def allowedTrue : Set Bool := {true}
+
+theorem supportedSource_reapplication_can_reintroduce_disallowed_target :
+    ∃ x y : Bool,
+      x ∈ supportedSource allowedTrue broadReturnRelation allowedTrue ∧
+      broadReturnRelation x y ∧ y ∉ allowedTrue := by
+  refine ⟨true, false, ?_⟩
+  simp [supportedSource, broadReturnRelation, allowedTrue]
+
+end JoinedRelations
+
 end Soma.Holonics.Mathematics.DependentConstitutiveReturn

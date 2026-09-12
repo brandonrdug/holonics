@@ -507,5 +507,5 @@ pub use context_section::{ContextualSectionOrigin, ResidentContextualSection};
 
 mod wave_relation;
 pub use wave_relation::{
-    NormalWaveRelationRest, ResidentWaveRelation, ResidentWaveSourceContact, WaveSourceReceiver,
+    NormalWaveRelationRest, ResidentWavePullback, ResidentWaveRelation, ResidentWaveSourceContact, WaveSourceReceiver,
 };

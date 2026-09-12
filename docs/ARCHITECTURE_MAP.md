@@ -150,6 +150,14 @@ session alternatives; session frame v3 tags their existing rests. The
 [stream binding](../research/records/2026-09-11_THE_HNN_STREAM_USES_ITS_RETURNED_GENERATOR.md)
 records checked continuation and the remaining repeated dependent material-return boundary.
 
+[definition] `resident/wave_relation/pullback.rs::ResidentWavePullback` and
+`section_wave_family_pullback` retain both affine source/target constraints through the actual
+map, including the complete pair and residual. `wave/family/pullback.rs::NormalFamilyPullback`
+keeps their original common bound/frame and passage clocks. The continuation owner lifts the
+same operation over its retained factors as `NormalContinuationPullback`, keeping every joined
+pair and source-field factor address. The [later-source return](../research/records/2026-09-11_LATER_SOURCE_CONSTRAINTS_KEEP_THE_JOINED_CONTINUATION.md)
+records its verification and remaining consuming boundary.
+
 [definition] `wave/coupled/continuation.rs` owns `NormalCoupledContinuation`, the actual ordered
 relation word joining a still-pending source to contemporary current. `NormalWaveCoupled` shares
 one resident-map word across pending cuts, retaining every source-field factor under its public

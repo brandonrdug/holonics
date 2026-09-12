@@ -161,12 +161,13 @@ material also changes the source action when applicable:
 The local moment increment is not a claim to have computed that complete dependency return.
 An adjoint uses the actual producing morphology, including retained overlays.
 
-[open] The family incorporation law must state what an observation constrains. For a source
+[definition] The family incorporation law states what an observation constrains. For a source
 family x(θ), observation v and condition h, retain the joint relation among θ, h and the local
 law yielding v−c(θ). Existential compatibility, imposing a law on every family member, and
 averaging over a supplied measure are different operations. Do not deposit every compatible
-source as if each were actually observed, or invent a probability measure to pick one. Derive
-which family/constraint the existing incorporation owns before implementing its kernel.
+source as if each were actually observed, or invent a probability measure to pick one. The
+first dependent generator applies the existing contact pointwise over the retained source
+domain. Further returns must preserve their joined source parameters under that same law.
 
 [established-bounded; implemented-exact; formal-checked] The
 [joint parameter return](../../research/records/2026-09-11_JOINT_SOURCE_CONDITION_AND_MATERIAL_KEEP_THEIR_PRODUCT_CONSTRAINTS.md)
@@ -256,8 +257,8 @@ retain its joint variation or prove a lawful condensation of its complete return
 each formal source coefficient row as a separately observed sample or use a relation witness
 as a material coefficient. A compatibility calculation alone does not define the update law.
 
-[definition] Reuse the existing read-only comparison. Add a distinct consuming preparation and
-publication path over `NormalCoupledComparison`; preserve inspection as read-only. The new path
+[definition] Extend the distinct consuming preparation/publication path over
+`NormalCoupledComparison`; preserve inspection as read-only. That path
 uses the producing family and observed receiver, constructs the admitted source/condition
 constraint, prepares condition contact and affected member material, and stages their effect on
 the continuing wave. It composes into contemporary material; it does not restore an old body.

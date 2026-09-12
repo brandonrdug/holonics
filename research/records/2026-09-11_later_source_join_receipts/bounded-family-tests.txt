@@ -1,0 +1,12 @@
+   Compiling holonic-engine v0.1.0 (/home/b/Workspaces/holonics/crates/holonic-engine)
+warning: holonic-engine@0.1.0: exact CUDA laws built for compute_89
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 16s
+     Running unittests src/lib.rs (target/debug/deps/holonic_engine-6ae3d245ea632305)
+
+running 3 tests
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::family::tests::later_source_pullback_keeps_original_bound_and_frame ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::family::tests::later_source_pullback_keeps_pairs_instead_of_reexpanding_their_marginal ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::wave::family::tests::later_source_pullback_retains_an_incompatible_relation ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 2423 filtered out; finished in 203.88s
+

@@ -73,7 +73,14 @@ the coordinate-kernel formal build passes.
 [open] The integrated goal remains active. Additional material returns after entering the
 dependent representation are explicitly unsupported. Extend the existing programme with the
 later producing source's parameters and joining history; retain original frames and contemporary
-material. Later predictions already persist and can be inspected. The declared source-section
+material. Later predictions already persist and can be inspected.
+
+[established-bounded; implemented-exact; formal-checked] The
+[later-source join](research/records/2026-09-11_LATER_SOURCE_CONSTRAINTS_KEEP_THE_JOINED_CONTINUATION.md)
+now carries both source/target constraints through actual retained factors, preserving the full
+pair, original bounded frames and clocks. Three native family controls and the actual-word
+control pass, as do the HNN check and formal build. This supplies constraint transport for the
+repeated-return composition; it does not yet publish another material return. The declared source-section
 receiver is not asserted equivalent to the former whole-family projection. This controlled
 operator result does not establish useful Athena-alpha.
 

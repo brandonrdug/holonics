@@ -60,8 +60,8 @@ union transports the full held family, and a complete source field publishes one
 Missing learned arrival remains explicit while the actual offered current is preserved. Source
 actuation, observed development and conditional generation keep their distinct meanings under
 the same wave owner. The coupled session below exposes source actuation and conditional emission;
-the read-only producing-family comparison already exists. Its consuming condition/material
-incorporation remains the next native binding.
+the read-only producing-family comparison and a distinct first consuming return now exist.
+Repeated returns over the dependent source programme remain the next native binding.
 
 [definition] Sequence-to-fold and biochemical kinetics are foundational HNN questions. Their
 [exact source construction](../research/records/2026-09-10_SEQUENCE_FOLD_AND_REACTION_CURRENT_MAKE_THE_CAUSAL_THOUGHT_CHAIN_CONCRETE.md)
@@ -179,15 +179,15 @@ gate, or a new runtime model.
 recorded condition, source family and anchor while referencing the contemporary member relation.
 They survive reconstruction from a restored pending cut and retain free current directions.
 This [compiler return](../research/records/2026-09-11_ACTUAL_PENDING_COMPARISONS_COMPILE_WITH_THEIR_ANCHORS.md)
-is read-only; the active Eros goal still includes its consuming contact/formation law, one
-published successor and exactly-once pending consumption.
+is read-only. The distinct owned-generator/session return below supplies the first consuming
+contact/formation, publication and pending consumption; repeated dependent incorporation remains open.
 
 [established-bounded; implemented-exact; formal-checked] The
 [dependent constitutive return](../research/records/2026-09-11_CONSTITUTIVE_RETURNS_REMAIN_DEPENDENT_ON_THEIR_SOURCE.md)
 now reuses the actual condition-contact and staged formation law over shared source assignments.
 Its native alternatives retain complete condition/material consequences; a checked elementary
-case is non-affine in the source. Whole-family successor publication and subsequent conduct
-remain open. Inspecting a conditional alternative does not consume or develop the live wave.
+case is non-affine in the source. The later owned-generator return below publishes the full
+function and conducts through it. Inspecting an alternative alone does not develop the live wave.
 
 [established-bounded; implemented-exact] Pending returns now retain their actual source/current
 continuation as an ordered word of resident maps. The

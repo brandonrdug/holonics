@@ -95,6 +95,10 @@ now preserves emission/re-entry, later prediction cuts and fresh-process continu
 by composing subsequent material returns over their dependent producing sources, retaining each
 parameter and original frame through the actual history. Keep the declared receiver chart distinct
 from the prior whole-family projection. One incorporated return does not finish this integration.
+The [later-source join](../../research/records/2026-09-11_LATER_SOURCE_CONSTRAINTS_KEEP_THE_JOINED_CONTINUATION.md)
+supplies the checked two-sided affine pullback and its actual-word consumer. Use that retained
+pair/word in the dependent return's source-frame composition.
+Do not reapply a relation to only a supported source projection and discard its target constraint.
 The exterior affine material solve does not itself perform that native incorporation.
 
 [definition] The present work joins two responsibilities in phases 1–2. Use the returned reusable

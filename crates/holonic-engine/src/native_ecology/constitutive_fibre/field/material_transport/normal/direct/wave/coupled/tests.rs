@@ -940,3 +940,46 @@ fn coupled_observed_next_joins_the_family_and_preserves_its_anchor() {
     let a=wave.admit_contact(0).unwrap();let b=restored.admit_contact(0).unwrap();
     wave.advance_contact(&a).unwrap();restored.advance_contact(&b).unwrap();assert_eq!(wire(&restored),wire(&wave));
 }
+
+#[test]
+#[ignore = "requires CUDA; later source constraints traverse every factor of the actual pending word"]
+fn pending_word_pullback_retains_internal_factors_and_joined_boundaries() {
+    let ro=ResidentReadout::new().unwrap();
+    let s=ResidentSurface::on(&ro).unwrap();
+    let mut wave=coupled(&s);
+    let contact=wave.admit_contact(0).unwrap();
+    let pending=wave.predict_contact(&contact).unwrap().handle;
+    let contact=wave.admit_contact(0).unwrap();
+    let packet=s.mount_section_rest(&ResidentSectionRest::found(3,2,ResidentGrain(0),64,
+        [1,0,2,0,1,0].into_iter().map(|v|(v,v)).collect()).unwrap()).unwrap();
+    wave.actuate_contact_section(&contact,ResidentConstitutiveSection::integers(&packet).unwrap()).unwrap();
+    let at=Rc::clone(&wave.continuation.current);
+    let contact=wave.admit_contact(0).unwrap();
+    wave.advance_contact(&contact).unwrap();
+    // A declared later source constraint, not a material return. It has the same original
+    // anchor and final clock. The whole relation word must restrict its original source.
+    let target=at.read_through(Rc::new(contact.relation().read_observed_next(current(&point(&s,&[0,0]))).unwrap())).unwrap();
+    let before=wave.rest().unwrap();
+    let continuation=wave.pending_coupled_continuation(&pending).unwrap();
+    let reads=s.census().section_read_outs;
+    let joined=continuation.read_pullback(&target).unwrap();
+    assert_eq!(s.census().section_read_outs,reads);
+    let declared=continuation.factors().collect::<Vec<_>>();
+    assert_eq!(joined.joins().len(),declared.len());
+    assert_eq!(joined.joins().len(),4);
+    for (join,(epoch,map)) in joined.joins().iter().zip(declared) {
+        assert_eq!(join.epoch(),epoch);
+        assert!(std::ptr::eq(join.transport(),map));
+    }
+    assert_eq!(joined.joins()[1].epoch(),joined.joins()[2].epoch());
+    assert_eq!(joined.joins()[1].factor(),0);
+    assert_eq!(joined.joins()[2].factor(),1);
+    for pair in joined.joins().windows(2) {
+        let left=affine_signature(pair[0].supported_target().affine_relation().inspect().unwrap().predecessor_reading);
+        let right=affine_signature(pair[1].supported_source().affine_relation().inspect().unwrap().predecessor_reading);
+        assert_eq!(left,right);
+    }
+    assert_eq!(joined.supported_source().passages(),continuation.source().passages());
+    assert!(joined.supported_source().read_receiver().unwrap().require_supported().is_err());
+    assert_eq!(wave.rest().unwrap(),before);
+}

@@ -107,3 +107,51 @@ extern "C" __global__ void section_coupled_receiver_coordinates(
  for(uint32_t j=0;j<t;++j)coordinates[j]=coordinates_hi[j]=(int64_t)query[t+j];
  coordinates[t]=coordinates_hi[t]=(int64_t)den;
 }
+
+// Exact joint F(x) AND R(x,y) AND G(y). Solve in the product's direction coordinates,
+// retaining the pair (x,y), rather than mapping its supported source through R again.
+extern "C" __global__ void section_wave_family_pullback(
+ const int64_t *basis,const int64_t *basis_hi,
+ const int64_t *left,const int64_t *left_hi,uint32_t ls,
+ const int64_t *right,const int64_t *right_hi,uint32_t rs,uint32_t t,
+ int64_t *graph,int64_t *graph_hi,int64_t *joint,int64_t *joint_hi,
+ int64_t *lb,int64_t *lb_hi,int64_t *rb,int64_t *rb_hi,
+ int64_t *lo,int64_t *lo_hi,int64_t *ro,int64_t *ro_hi,int64_t *workspace,
+ uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+ if(blockIdx.x||threadIdx.x)return;if(upstream_refused(census,lineage,lineage_count,slot))return;
+ uint64_t w64=2ull*t,k64=2ull*w64,lk64=(uint64_t)ls+t,rk64=(uint64_t)rs+t;
+ if(!t||k64>UINT32_MAX-4u||lk64>UINT32_MAX-4u||rk64>UINT32_MAX-4u){atomicOr(slot,REFUSED_MALFORMED);return;}
+ uint32_t w=(uint32_t)w64,k=(uint32_t)k64,lk=(uint32_t)lk64,rk=(uint32_t)rk64;
+ for(size_t i=0;i<(size_t)w*w;++i)if(basis[i]!=basis_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+ for(size_t i=0;i<(size_t)lk+4u+(size_t)t*t;++i)if(left[i]!=left_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+ for(size_t i=0;i<(size_t)rk+4u+(size_t)t*t;++i)if(right[i]!=right_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+ if(left[lk]<=0||right[rk]<=0||left[lk+1]<0||left[lk+1]>2||right[rk+1]<0||right[rk+1]>2){atomicOr(slot,REFUSED_MALFORMED);return;}
+ condition_empty_report(joint,joint_hi,w,w);condition_empty_report(lo,lo_hi,w,t);condition_empty_report(ro,ro_hi,w,t);
+ for(size_t i=0;i<(size_t)k*k;++i)graph[i]=graph_hi[i]=0;
+ if(left[lk+1]==1||right[rk+1]==1)return;
+ wide *r=(wide*)workspace,*row=r+w,*q=row+k;
+ uint32_t ignored=0,rank=0;
+ for(uint32_t column=0;column<w;++column){
+  for(uint32_t j=0;j<w;++j)r[j]=column<t?(j<t?left[(size_t)lk+4u+(size_t)column*t+j]:0):(j>=t?right[(size_t)rk+4u+(size_t)(column-t)*t+j-t]:0);
+  // Retain the original direction before reduction by the actual relation R.
+  for(uint32_t j=0;j<w;++j)row[w+j]=r[j];
+  wide den=1;fibre_query(basis,w,w,r,&den,nullptr,-1,&ignored,&rank,slot);if(*slot)return;
+  for(uint32_t j=0;j<w;++j){row[j]=r[j];row[w+j]=product_checked(row[w+j],den,slot);}
+  if(*slot)return;condition_stage_row(graph,graph_hi,k,row,slot);if(*slot)return;
+ }
+ wide ld=left[lk],rd=right[rk],cd=fibre_lcm(ld,rd,slot),den=cd;
+ for(uint32_t j=0;j<w;++j)r[j]=j<t?product_checked(left[ls+j],cd/ld,slot):product_checked(right[rs+j-t],cd/rd,slot);
+ if(*slot)return;fibre_query(basis,w,w,r,&den,nullptr,-1,&ignored,&rank,slot);if(*slot)return;
+ for(uint32_t j=0;j<k;++j)q[j]=j<w?sub_checked(0,r[j],slot):0;
+ uint32_t status=0;fibre_query(graph,w,k,q,&den,nullptr,-1,&status,&rank,slot);if(*slot)return;
+ for(uint32_t j=w;j<k;++j)q[j]=sub_checked(0,q[j],slot);
+ if(status!=1u){
+  wide common=fibre_lcm(den,cd,slot);
+  for(uint32_t j=0;j<k;++j)q[j]=product_checked(q[j],common/den,slot);
+  for(uint32_t j=0;j<w;++j){wide origin=j<t?product_checked(left[ls+j],common/ld,slot):product_checked(right[rs+j-t],common/rd,slot);q[w+j]=add_checked(q[w+j],origin,slot);}
+  den=common;fibre_normalize(q,k,&den,slot);
+ }
+ if(*slot)return;condition_store_report(graph,w,k,q,den,status,rank,joint,joint_hi,slot);if(*slot)return;
+ condition_project(joint,w,w,0,t,lb,lb_hi,lo,lo_hi,row,slot);
+ if(*slot)return;condition_project(joint,w,w,t,t,rb,rb_hi,ro,ro_hi,row,slot);
+}

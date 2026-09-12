@@ -68,3 +68,116 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         }
     }
 }
+
+/// A later constraint joined through the retained actual word. Every pair remains available;
+/// source projections alone cannot stand in for this object during a following return.
+pub struct NormalContinuationPullback<'a, 'c> {
+    source: &'a NormalWaveFamily<'c>,
+    target: &'a NormalWaveFamily<'c>,
+    joins: Vec<NormalContinuationJoin<'c>>,
+}
+pub struct NormalContinuationJoin<'c> {
+    epoch: u64,
+    factor: usize,
+    transport: Rc<ResidentWaveRelation<'c>>,
+    source: Rc<NormalWaveFamily<'c>>,
+    supported_source: NormalWaveFamily<'c>,
+    supported_target: NormalWaveFamily<'c>,
+    joint: ResidentConstitutiveReturn<'c>,
+    constraints: ResidentSection<'c>,
+}
+impl<'c> NormalContinuationJoin<'c> {
+    pub fn epoch(&self) -> u64 {
+        self.epoch
+    }
+    pub fn factor(&self) -> usize {
+        self.factor
+    }
+    pub fn transport(&self) -> &ResidentWaveRelation<'c> {
+        &self.transport
+    }
+    pub fn source(&self) -> &NormalWaveFamily<'c> {
+        &self.source
+    }
+    pub fn supported_source(&self) -> &NormalWaveFamily<'c> {
+        &self.supported_source
+    }
+    pub fn supported_target(&self) -> &NormalWaveFamily<'c> {
+        &self.supported_target
+    }
+    pub fn joint(&self) -> &ResidentConstitutiveReturn<'c> {
+        &self.joint
+    }
+    pub fn constraints(&self) -> &ResidentSection<'c> {
+        &self.constraints
+    }
+}
+impl<'a, 'c> NormalContinuationPullback<'a, 'c> {
+    pub fn source(&self) -> &NormalWaveFamily<'c> {
+        self.source
+    }
+    pub fn target(&self) -> &NormalWaveFamily<'c> {
+        self.target
+    }
+    /// Joins in original causal order. Equal boundaries name a shared state variable.
+    pub fn joins(&self) -> &[NormalContinuationJoin<'c>] {
+        &self.joins
+    }
+    pub fn supported_source(&self) -> &NormalWaveFamily<'c> {
+        &self.joins[0].supported_source
+    }
+    pub fn supported_target(&self) -> &NormalWaveFamily<'c> {
+        &self
+            .joins
+            .last()
+            .expect("nonempty retained word")
+            .supported_target
+    }
+}
+impl<'a, 'c> NormalCoupledContinuation<'a, 'c> {
+    pub fn read_pullback<'r>(
+        &'r self,
+        target: &'r NormalWaveFamily<'c>,
+    ) -> Result<NormalContinuationPullback<'r, 'c>, ConstitutiveFibreError> {
+        // Reconstruct the admitted affine sections through the actual immutable word. These
+        // are derived carriers, not copies of a continuing ecology or a numerical host replay.
+        let mut at = Rc::clone(&self.cut.source);
+        let mut frames = Vec::new();
+        for (epoch, maps) in self.word.range(self.from..=self.through) {
+            let passage = at
+                .passages()
+                .checked_add(1)
+                .ok_or(ConstitutiveFibreError::Shape)?;
+            for (factor, map) in maps.iter().enumerate() {
+                let next = Rc::new(at.read_through_at(Rc::clone(map), passage)?);
+                frames.push((*epoch, factor, Rc::clone(map), at));
+                at = next;
+            }
+        }
+        if frames.is_empty() || target.passages() != at.passages() {
+            return Err(ConstitutiveFibreError::ForeignOccurrence);
+        }
+        let mut joins: Vec<NormalContinuationJoin<'c>> = Vec::with_capacity(frames.len());
+        for (epoch, factor, transport, source) in frames.into_iter().rev() {
+            let next = joins.last().map_or(target, |j| &j.supported_source);
+            let (joint, supported_source, supported_target, constraints) =
+                source.read_pullback(&transport, next)?.into_sections();
+            joins.push(NormalContinuationJoin {
+                epoch,
+                factor,
+                transport,
+                source,
+                supported_source,
+                supported_target,
+                joint,
+                constraints,
+            });
+        }
+        joins.reverse();
+        Ok(NormalContinuationPullback {
+            source: self.source(),
+            target,
+            joins,
+        })
+    }
+}

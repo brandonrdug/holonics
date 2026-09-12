@@ -83,6 +83,7 @@ use mount::{
 
 #[path = "resident_section/surface_coupled_joint.rs"]
 mod surface_coupled_joint;
+mod surface_wave_pullback;
 
 #[path = "resident_section/bilinear.rs"]
 mod bilinear;

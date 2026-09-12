@@ -2,6 +2,8 @@ use super::*;
 mod rest;
 mod source;
 mod observation;
+mod pullback;
+pub use pullback::ResidentWavePullback;
 pub use rest::NormalWaveRelationRest;
 pub use source::ResidentWaveSourceContact;
 

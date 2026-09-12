@@ -41,7 +41,7 @@ pub use resident::{
     ResidentConstitutiveCurrent, ResidentConstitutiveImage, ResidentConstitutiveRefinement,
     ResidentConstitutiveReturn, ResidentConstitutiveSection, ResidentContextualSection,
     ResidentDifferenceSection, ResidentGeneratorNeighborhood, ResidentSourcePairs,
-    ResidentWaveRelation, ResidentWaveSourceContact, WaveSourceReceiver,
+    ResidentWavePullback, ResidentWaveRelation, ResidentWaveSourceContact, WaveSourceReceiver,
 };
 
 /// Declared local source law, bound at founding rather than inferred from an array's width.
