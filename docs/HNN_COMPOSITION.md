@@ -210,6 +210,20 @@ does not define every medium's geometry or all language context.
 
 ## Producing comparison and architecture laws
 
+[proved-derived; formal-checked] The [transformer/fractal-mode lift](../research/records/2026-09-12_FRACTAL_MODES_LIFT_ATTENTION_INTO_MASS_PRESERVING_GENERATOR_COMPRESSION.md)
+composes normalized contact kernels with Gibbs/KL inference and associative `(mass,current)`
+summaries. Gram/exterior dependence excludes a redundant independent direction while its
+amplitude joins the retained coefficients; generator descent preserves this elimination
+through every admitted word. Explicit fractal restriction/scale laws and propagated summary
+defects connect recursive representations to the code receiver. The molecular application
+must preserve marked catalytic currents as well as body occupancy.
+
+[established-bounded; implemented-exact] `exact_linear::KernelModeReduction` derives a modal
+encoding/decoder from an actual kernel, preserves mass and signed phase currents, and compiles
+a source action or returns its separating fibre. The exact six-source/two-mode application
+uses the shared owner; it supplies no new native runtime law. The source review also repairs
+the Transformer paper's outward-normal sign and constant-input normalization domain.
+
 [definition] The [equational/world-tube review](../research/records/2026-09-10_EQUATIONAL_LAWS_AND_WORLD_TUBES_MAKE_ATHENAS_NEXT_PASSAGE_EXPLICIT.md)
 connects ETP's congruence/implication/countermodel method with the existing future-stable receiver
 relation. MLP, convolution, graph, attention, SSM and diffusion charts share elementary passages,

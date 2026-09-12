@@ -222,6 +222,13 @@ symbol basis does not define the common interior or its clock.
 
 ## Shared mathematics and its productive use
 
+[definition] The [transformer/fractal-mode return](../../research/records/2026-09-12_FRACTAL_MODES_LIFT_ATTENTION_INTO_MASS_PRESERVING_GENERATOR_COMPRESSION.md)
+adds usable entropic attention, amplitude-preserving modal elimination, explicit summary-error
+propagation and a shared exact kernel reducer to phases 3–4's operator/encoding work. Reuse
+its derived encoder/decoder and source-action compiler where the actual task factors; retain
+the separator when it does not. Fractal scale maps, molecular marked currents and addressed
+code costs remain part of this same construction, not another phase or prerequisite gate.
+
 [project-postulate] Brandon's September 12 optical/Swing clarification makes the frame family
 and constitutive boundary dynamic in the shared construction. Use the
 [returned directional, mode-exchange and endpoint-frame laws](../../research/records/2026-09-12_DIRECTIONAL_OPTICS_MODE_EXCLUSION_AND_MOVING_SWING_SHARE_TRANSPORT.md)

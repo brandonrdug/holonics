@@ -1,0 +1,210 @@
+{
+  "decoded_queries": [
+    [
+      "30/19",
+      "37/19"
+    ],
+    [
+      "33/20",
+      "19/10"
+    ],
+    [
+      "21/13",
+      "25/13"
+    ],
+    [
+      "93/58",
+      "56/29"
+    ]
+  ],
+  "decoder": [
+    [
+      "1",
+      "2"
+    ],
+    [
+      "2",
+      "1"
+    ],
+    [
+      "3",
+      "3"
+    ],
+    [
+      "4",
+      "5"
+    ]
+  ],
+  "derived_modes": 2,
+  "encoder": [
+    [
+      "1",
+      "1",
+      "0",
+      "0",
+      "1",
+      "1"
+    ],
+    [
+      "0",
+      "0",
+      "1",
+      "1",
+      "1",
+      "1"
+    ]
+  ],
+  "full_query_work_including_divisions": {
+    "additions": [
+      72
+    ],
+    "cumulative_bits": [
+      167
+    ],
+    "dependency_span": [
+      1
+    ],
+    "divisions": [
+      8
+    ],
+    "entries_written": [
+      20
+    ],
+    "multiplications": [
+      72
+    ],
+    "peak_bits": [
+      13
+    ],
+    "resident_entries": [
+      12
+    ]
+  },
+  "kernel": [
+    [
+      "1",
+      "1",
+      "2",
+      "2",
+      "3",
+      "3"
+    ],
+    [
+      "2",
+      "2",
+      "1",
+      "1",
+      "3",
+      "3"
+    ],
+    [
+      "3",
+      "3",
+      "3",
+      "3",
+      "6",
+      "6"
+    ],
+    [
+      "4",
+      "4",
+      "5",
+      "5",
+      "9",
+      "9"
+    ]
+  ],
+  "native_ecology_changed": false,
+  "phase_rotated_first_query": [
+    "-37/19",
+    "30/19"
+  ],
+  "reduced_query_work_including_divisions": {
+    "additions": [
+      24
+    ],
+    "cumulative_bits": [
+      167
+    ],
+    "dependency_span": [
+      4
+    ],
+    "divisions": [
+      8
+    ],
+    "entries_written": [
+      20
+    ],
+    "multiplications": [
+      24
+    ],
+    "peak_bits": [
+      13
+    ],
+    "resident_entries": [
+      3
+    ]
+  },
+  "retained_mass_current": [
+    [
+      "7",
+      "12",
+      "13"
+    ],
+    [
+      "6",
+      "9",
+      "12"
+    ]
+  ],
+  "schema": "holonics.kernel-mode-compression.v1",
+  "scope": "complete supplied finite nonnegative query kernel; real and imaginary currents as paired columns",
+  "separating_new_receiver": {
+    "returned": [
+      "-1"
+    ],
+    "source_null": [
+      "-1",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0"
+    ]
+  },
+  "source_packing_and_summary_work": {
+    "additions": [
+      36
+    ],
+    "cumulative_bits": [
+      62
+    ],
+    "dependency_span": [
+      1
+    ],
+    "divisions": [],
+    "entries_written": [
+      18
+    ],
+    "multiplications": [
+      48
+    ],
+    "peak_bits": [
+      5
+    ],
+    "resident_entries": [
+      6
+    ]
+  },
+  "source_ports": 6,
+  "three_stage_defect": {
+    "gain": "2",
+    "per_stage": "1/8",
+    "returned": "7/8"
+  },
+  "unweighted_mean_bracketing": [
+    "2",
+    "1"
+  ],
+  "work_scope": "counted exact matrix arithmetic; rank-factorization setup, allocation time and physical/device cost are separate"
+}

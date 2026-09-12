@@ -1,0 +1,42 @@
+warning: holonic-engine@0.1.0: exact CUDA laws built for compute_89
+   Compiling holonic-engine v0.1.0 (/home/b/Workspaces/holonics/crates/holonic-engine)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 47.36s
+     Running unittests src/lib.rs (target/debug/deps/holonic_engine-5318ec7c60cd39ca)
+
+running 33 tests
+test exact_linear::bilinear::tests::redundant_products_keep_the_full_decoder_family ... ok
+test exact_linear::bilinear::tests::reorientation_retains_inverse_fibres ... ok
+test exact_linear::contextual::tests::context_separates_the_actual_source_null_current ... ok
+test exact_linear::contextual::tests::empty_observations_leave_the_entire_context_and_map_family_open ... ok
+test exact_linear::bilinear::tests::a_fixed_port_observation_retains_correlated_source_parameters ... ok
+test exact_linear::contextual::tests::insufficient_context_returns_a_lineage_combination ... ok
+test exact_linear::bilinear::tests::collapsed_face_returns_a_separating_direction ... ok
+test exact_linear::contextual::tests::present_silence_does_not_license_future_collapse ... ok
+test exact_linear::contextual::tests::a_phase_rechart_transports_the_quotient_instead_of_changing_consequence ... ok
+test exact_linear::joint_bilinear::tests::shared_square_does_not_accept_a_free_negative_square_coordinate ... ok
+test exact_linear::tests::a_singular_operator_refuses_and_the_refusal_is_named ... ok
+test exact_linear::kernel_modes::tests::zero_mass_and_foreign_frames_are_explicit ... ok
+test exact_linear::tests::the_dense_row_presentation_round_trips_at_every_shape_the_laws_reach ... ok
+test exact_linear::tests::a_rebase_returns_both_identity_compositions ... ok
+test exact_linear::bilinear::tests::one_retained_core_serves_distinct_receivers_and_composition ... ok
+test exact_linear::tests::exact_inverse_returns_identity_without_tolerance ... ok
+test exact_linear::tests::a_rectangular_map_returns_an_affine_fibre_or_an_exhibited_obstruction ... ok
+test exact_owner_testimony::tests::an_exact_linear_nonzero_residual_does_not_issue_a_license ... ok
+test exact_linear::tests::a_singular_map_returns_a_factorization_rather_than_an_inverse ... ok
+test exact_linear::tests::the_reduction_returns_its_rank_and_what_it_cost ... ok
+test exact_linear::joint_bilinear::tests::pinning_a_condition_returns_the_complete_affine_source_fibre ... ok
+test exact_owner_testimony::tests::population::exact_linear_population_refuses_missing_reordered_and_one_bad_row ... ok
+test exact_owner_testimony::tests::population::exact_linear_transport_cannot_erase_free_indices_or_claim_an_untyped_contraction ... ok
+test exact_linear::tests::a_bare_transpose_fails_the_adjoint_test_under_a_declared_metric ... ok
+test exact_owner_testimony::tests::population::exact_linear_transport_coordinate_words_must_cover_the_matrix_domain_and_codomain ... ok
+test exact_owner_testimony::tests::contraction_typing_pairs_across_boundaries_but_exact_linear_keeps_it_open ... ok
+test exact_linear::kernel_modes::tests::repeated_modes_retain_mass_and_signed_current ... ok
+test exact_owner_testimony::tests::population::exact_linear_population_identity_matches_all_three_resident_rows ... ok
+test exact_linear::kernel_modes::tests::source_transport_descends_or_exhibits_the_separating_fibre ... ok
+test exact_linear::tests::pivot_columns_derive_zero_one_and_higher_rank_factor_populations ... ok
+test exact_linear::joint_bilinear::tests::quadratic_cross_terms_agree_with_the_actual_composed_action ... ok
+test exact_linear::joint_bilinear::tests::source_condition_and_material_keep_their_joining_coordinate ... ok
+test exact_linear::bilinear::tests::support_search_resumes_the_actual_remaining_population ... ok
+
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 2405 filtered out; finished in 0.19s
+

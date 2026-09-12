@@ -50,7 +50,9 @@ use thiserror::Error;
 
 mod bilinear;
 mod joint_bilinear;
+mod kernel_modes;
 pub use joint_bilinear::{JointBilinearFibre, JointBilinearSystem, JointPreimageReduction};
+pub use kernel_modes::{KernelModeAction, KernelModeError, KernelModeReduction, KernelModeSummary};
 mod contextual;
 pub use bilinear::{
     BilinearOperator, BilinearProductCore, BilinearRealization, BilinearSupportReturn,

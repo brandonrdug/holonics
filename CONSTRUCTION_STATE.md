@@ -7,6 +7,19 @@ AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/p
 is the sole order and [the blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 names actual code changes and outcomes.
 
+[proved-derived; formal-checked] The [transformer/fractal-mode lift](research/records/2026-09-12_FRACTAL_MODES_LIFT_ATTENTION_INTO_MASS_PRESERVING_GENERATOR_COMPRESSION.md)
+joins attention's Gibbs/KL law, associative mass/current aggregation, Gram/exterior mode
+independence, amplitude-preserving elimination through every admitted generator word, and
+propagated summary defects. It recovers explicit fractal scale maps, ETP congruence and the
+molecular marked-current construction. Framework.Computation builds.
+
+[established-bounded; implemented-exact] The shared `exact_linear::KernelModeReduction`
+derives six source slots into two modes in the new application, preserving all four complex
+query readings. Source actions compile through the encoding or return a separating fibre;
+phase/value transport retains mass. Query multiplications are 72 full versus 24 reduced,
+with 48 for initial packing/summary and factorization setup separate. All 33 focused tests
+pass. This is a reusable exact builder/reference return, not a changed native GPU recurrence.
+
 [proved-derived; formal-checked] The [optics/exclusion/Swing return](research/records/2026-09-12_DIRECTIONAL_OPTICS_MODE_EXCLUSION_AND_MOVING_SWING_SHARE_TRANSPORT.md)
 adds directional Jones/density notation, Malus and mixture laws, the Stokes determinant and
 four-ray projective invariance, arbitrary superposed-mode fermionic exclusion, a thermal

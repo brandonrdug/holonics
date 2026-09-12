@@ -57,6 +57,16 @@ as it composes realization, continuation and navigation.
 
 ## Begin with a situated interaction
 
+[proved-derived; formal-checked] The [fractal-mode/attention construction](../research/records/2026-09-12_FRACTAL_MODES_LIFT_ATTENTION_INTO_MASS_PRESERVING_GENERATOR_COMPRESSION.md)
+joins entropic contact weights, mass/current-preserving aggregation, and the future quotient.
+`GeneratorModeQuotient` identifies receiver Gram degeneracy with linear dependence and proves
+that eliminating a redundant direction by incorporating its amplitude remains exact through
+every admitted generator word. `AttentionModeCompression` preserves partition mass before
+normalization; `AccumulatedReceiverDefect` bounds composed approximate summaries by the
+actual step defects and later Lipschitz products. Explicit fractal scale maps, marked molecular
+currents and receiver-relative code costs are the corresponding existing consumers, not new
+subject divisions. The shared exact kernel reducer realizes the finite rational chart.
+
 [proved-derived; formal-checked] The [directional optics and moving-frame construction](../research/records/2026-09-12_DIRECTIONAL_OPTICS_MODE_EXCLUSION_AND_MOVING_SWING_SHARE_TRANSPORT.md)
 uses the existing Jones sections to give local notation `|↔⟩_F`, `|↕⟩_F`,
 `|↗⟩_F=(|↔⟩_F+|↕⟩_F)/√2` and `|↖⟩_F=(-|↔⟩_F+|↕⟩_F)/√2`.

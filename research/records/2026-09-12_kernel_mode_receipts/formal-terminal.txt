@@ -1,0 +1,68 @@
+Command: bash tools/lean_check.sh ElementaryHolonics.Framework.Computation
+Toolchain: leanprover/lean4:v4.33.0
+Scope: selected new-owner and completion excerpts; full terminal remains in .local/scratch/2026-09-12-transformer-mode-framework.log.
+
+⚠ [8883/8904] Replayed ElementaryHolonics.Foundation.GeneratorModeQuotient
+warning: ElementaryHolonics/Foundation/GeneratorModeQuotient.lean:33:0: automatically included section variable(s) unused in theorem `Soma.Holonics.Foundation.GeneratorModeQuotient.dependent_modes_excluded`:
+  [Fintype Mode]
+  [DecidableEq Mode]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Fintype Mode] [DecidableEq Mode] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: ElementaryHolonics/Foundation/GeneratorModeQuotient.lean:40:0: automatically included section variable(s) unused in theorem `Soma.Holonics.Foundation.GeneratorModeQuotient.independent_mode_count_le`:
+  [DecidableEq Mode]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq Mode] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+info: ElementaryHolonics/Foundation/GeneratorModeQuotient.lean:81:0: 'Soma.Holonics.Foundation.GeneratorModeQuotient.receiver_gram_zero_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Foundation/GeneratorModeQuotient.lean:82:0: 'Soma.Holonics.Foundation.GeneratorModeQuotient.dependent_modes_excluded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Foundation/GeneratorModeQuotient.lean:83:0: 'Soma.Holonics.Foundation.GeneratorModeQuotient.independent_mode_count_le' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Foundation/GeneratorModeQuotient.lean:84:0: 'Soma.Holonics.Foundation.GeneratorModeQuotient.eliminated_mode_every_future' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [8884/8904] Replayed ElementaryHolonics.Transport.ChangingReceiver
+⚠ [8885/8904] Replayed ElementaryHolonics.Transport.AccumulatedReceiverDefect
+warning: ElementaryHolonics/Transport/AccumulatedReceiverDefect.lean:59:31: Variable name `ε_nonneg` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _ε_nonneg
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+info: ElementaryHolonics/Transport/AccumulatedReceiverDefect.lean:79:0: 'Soma.Holonics.Transport.AccumulatedReceiverDefect.distance_step_le' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Transport/AccumulatedReceiverDefect.lean:80:0: 'Soma.Holonics.Transport.AccumulatedReceiverDefect.distance_le_budget' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [8886/8904] Replayed ElementaryHolonics.Computation.HolonicNeuralMorphologyContinuation
+⚠ [8902/8904] Replayed ElementaryHolonics.Computation.AttentionModeCompression
+warning: ElementaryHolonics/Computation/AttentionModeCompression.lean:71:25: Variable name `hden` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hden
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+warning: ElementaryHolonics/Computation/AttentionModeCompression.lean:81:0: automatically included section variable(s) unused in theorem `Soma.Holonics.Computation.AttentionModeCompression.weighted_summary_associative`:
+  [Module ℝ V]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Module ℝ V] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: ElementaryHolonics/Computation/AttentionModeCompression.lean:107:0: automatically included section variable(s) unused in theorem `Soma.Holonics.Computation.AttentionModeCompression.linear_summary_transport`:
+  [Fintype C]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Fintype C] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+✔ [8903/8904] Built ElementaryHolonics.Computation.NormalizationProjectionScope (5.4s)
+✔ [8904/8904] Built ElementaryHolonics.Framework.Computation (8.6s)
+Build completed successfully (8904 jobs).
+

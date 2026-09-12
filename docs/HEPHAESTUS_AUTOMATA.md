@@ -144,6 +144,7 @@ product tuple or an equivalent family representation makes the requested receive
 |---|---|---|
 | Exact relation solving | Solve linear/affine constraints; return the whole preimage family or an annihilator obstruction | `exact_linear::{preimage_fibre,contextual_factorization}` |
 | Algorithm construction | Factor a specified bilinear operator; return executable factors, certificate and cost alternatives | Factorization example and `GeneratorFactorization` |
+| Modal kernel compression | Derive independent kernel modes; preserve normalized mass/current queries and compile source transport or its separating fibre | `exact_linear::KernelModeReduction`; `kernel_mode_compression.rs` |
 | Recurrence automata | Compose or replace an indexed word; return its full block action, clock and future comparison | `RatioSeriesTransport`, matrix/jet and ordered-word owners |
 | Transcendental receivers | Request a π/e window or Gamma value/jet; return an enclosure/window and reusable generator | Exact window/factorization examples and analytic source/tail owners |
 | Boundary and energy solving | Condense an interior; return boundary action plus source, memory, null family and mixed-energy ledger | Schur/diffusion, `PartitionedHodgeEnergy`, clocked constitutive owners |
@@ -155,6 +156,15 @@ Athena application chart. The language product remains standing rather than beco
 prerequisite to every mathematical tool.
 
 ## Spectral application and information units
+
+[established-bounded; implemented-exact] The [modal compression application](../research/records/2026-09-12_FRACTAL_MODES_LIFT_ATTENTION_INTO_MASS_PRESERVING_GENERATOR_COMPRESSION.md)
+derives a rank-two encoding from six source slots, preserves four exact complex-current
+queries, and carries linear phase maps and closed source actions on the summary. It excludes
+redundant coordinates by moving their amplitudes into retained modes, not by deleting repeated
+occurrences. Current-only queries do not authorize an arbitrary future: the compiler returns
+the actual null direction exposed by an incompatible action. Query work and summary/setup
+costs remain separate. This is a reusable mathematical builder/reference API alongside the
+existing native operator boundary.
 
 [proved-derived; formal-checked] The [optical application return](../research/records/2026-09-12_DIRECTIONAL_OPTICS_MODE_EXCLUSION_AND_MOVING_SWING_SHARE_TRANSPORT.md)
 provides directional analyzer, phase/coherence, mode-exclusion and changing-frame tasks for the

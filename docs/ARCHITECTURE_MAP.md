@@ -32,6 +32,14 @@ test result never upgrades a correspondence.
 
 ## Formal framework entry points
 
+[definition] `Computation/AttentionModeCompression.lean`,
+`Computation/NormalizationProjectionScope.lean`, `Foundation/GeneratorModeQuotient.lean`
+and `Transport/AccumulatedReceiverDefect.lean` are imported by `Framework.Computation`.
+They own entropic attention/mass-current aggregation, projection domain/sign controls,
+Gram/alternating independence with future-exact amplitude elimination, and finite propagated
+receiver defects. Their [source lift and checks](../research/records/2026-09-12_FRACTAL_MODES_LIFT_ATTENTION_INTO_MASS_PRESERVING_GENERATOR_COMPRESSION.md)
+connect the existing fractal, code-cost, equational and molecular constructions.
+
 [definition] `Foundation/GeneratorInference.lean` composes `ReceiverCodeCost`,
 `HolonicAdjointNormalization`, `InformationDifference` and `ReceiverHistoryCompression` in
 `Framework.Information`. It owns the finite description/data posterior, exact feasible-solver
@@ -227,6 +235,14 @@ receiver reads that product directly. `kernels/exact_packet_linear.cuh` supplies
 packet primitives, included by `exact_resident_section.cu`. The
 [application return](../research/records/2026-09-11_REUSABLE_GENERATORS_REACH_RESIDENT_RECEIVERS.md)
 records native scope and the still-open varying-family Eros incorporation relation.
+
+[definition] `exact_linear/kernel_modes.rs` owns `KernelModeReduction`, `KernelModeSummary`,
+`KernelModeAction` and `KernelModeError`. Existing rank factorization derives K=DE;
+the summary retains E[mass,weighted currents], including paired phase components.
+`compile_source_action` reuses `factor_receiver` to construct UE=ET or its source-null
+separator; `transport_values` retains mass under a linear current rechart.
+`examples/kernel_mode_compression.rs` is the exact mathematical application. This is the
+builder/reference boundary, with no new CUDA owner or native inference binding in this return.
 
 [definition] `Mathematics/GeneratorFactorization.lean` owns the arbitrary finite commutative-ring
 bilinear coefficient certificate, selected three-product identity, ratio-block matrix bridge,
