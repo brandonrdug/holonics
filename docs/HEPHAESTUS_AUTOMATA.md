@@ -11,6 +11,15 @@ general device to a requested use; that confinement does not define a separate u
 product/output labels. Neither name encapsulates machinery. Source/receiver relations and
 actual native owners organize their shared construction, not a split between named products.
 
+[definition] **Generator** names the mathematical operation that produces a conditioned face:
+`y=rho_F(G_Theta(s,c))`. Theta can be realized by retained coefficients, morphology, incidence
+and composed local functions. Emergent recursive/fractal functions and their reusable constituents
+are central to this construction. A parameter checkpoint represents retained mathematical
+material; its architecture and execution conventions determine the operation that uses it.
+Hephaestus includes models whose requested outputs are code, while the same generating mechanism
+serves other tool, text, mathematical and physical receivers. Serializing an already-built
+operator as source code is a separate exterior presentation of that operation.
+
 [project-postulate] Hephaestus solving is mathematical learning and reasoning: infer a
 coefficient family, factorization, recurrence or generator/encoding from the supplied constraints.
 The constructed object can itself compute an entire family of consequences. A supplied search
@@ -174,7 +183,8 @@ coefficients and port maps. A syntax printer may encode that graph; it may not s
 algorithm independently. Use the [outward compiler contract](INTEROPERABILITY.md#the-outward-compiler-contract)
 for the target correspondence. This scoped function release does not require a whole-model export.
 The [blueprint deliverable](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#deliverables-and-discriminating-checks)
-retains the wider parameter-family, target and continuing-use contracts.
+concerns the formed utility generator and its use. This printer is an available target adapter;
+its tests establish that adapter's correspondence, not formation of a code-generating model.
 
 [definition] Contextual code generation and editing subsequently use the same source/condition
 formation and joint release as text. An execution check measures whether the generated program

@@ -131,6 +131,14 @@ The [September 7 synthesis](research/records/2026-09-07_GENERATOR_RECOVERY_AND_P
 retains that chronology and the committed shared generator/Metal port boundary for separate Mac
 research. The latest product and construction status belongs in CONSTRUCTION_STATE, not this contract.
 
+[definition] A generator here is a situated mathematical transformation, including emergent
+recursive/fractal functions and their constituent compositions. Retained parameters, morphology
+and incidence realize its conduct; a model's outputs are faces of that operation. A model that
+generates source code is one application, and printing an existing operator as Rust is an
+exterior representation. Neither defines generator formation. Preserve this distinction when
+turning user language into deliverables; a chosen example or export target does not acquire
+authority from being repeated in an agent plan or goal handoff.
+
 [project-postulate] Brandon's September 5 contextual-transport correction makes **native HNN
 foundations** the present priority, before further Soulkiller/Gemma-led production. Changed
 coefficients or transport do not establish contextual transport; context is the relevant situated

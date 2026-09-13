@@ -107,15 +107,24 @@ name the consuming files, equations, products and discriminating checks.
 [definition] Reuse the [resident feature/predictor and code return](../../research/records/2026-09-13_RESIDENT_CONTEXT_FEATURES_RETURN_PREDICTIONS_AND_FACTORS_RELEASE_EXECUTABLE_CODE.md).
 Its public preparation maps and normal law give a bounded contextual mathematical consumer;
 the next attachment carries that fitted source/condition action through the existing coupled
-wave/joint body. Its executable-function return starts the code row below. CONSTRUCTION_STATE
+wave/joint body. Its Rust printer is an available exterior adapter. CONSTRUCTION_STATE
 retains the measured scope and remaining products; neither return schedules another demo loop.
+
+[project-postulate] Brandon's subsequent generator correction governs these deliverables.
+Generators are the mathematical functions and constituent compositions formed and used by HNN;
+fractal generation and a model's parameterized execution express this shared question. Hephaestus
+includes code-generating models as a use, without making source-code emission the meaning of
+generator formation. The earlier Rust-first interpretation and subsequent code-repair priority
+were agent choices; neither orders the campaign. The
+[direct-message/source audit](../../research/records/2026-09-13_GENERATOR_MEANING_AND_CAMPAIGN_DRIFT_AUDIT.md)
+records the correction and the still-unbound native context consumer.
 
 | Packet / deliverable | Concrete return | Dependency and completion evidence |
 |---|---|---|
 | **Contextual generator formation** | A whole corrected or continued section from source/condition distinctions present before its target arrives; infer `W[S;C]=Y` or the declared normal/conditional law. | Use the source-null contrast and fixed-h collapse as references. Show actual generated chunks for new inputs and the same visible source under distinct preparations, plus the unsupported-condition separator. No additional unchanged broad exposure. |
 | **Joint prediction release** | The prepared joint output and one published successor for the transport-only word, with optional cuts for later joint observations. | Compare with the existing forecast at the same source/section; preserve component correlation, endpoint, delayed return and recoverable refusal. It can bind before general contextual language succeeds. |
 | **Compiled modal continuation** | Reusable factor/recurrence or closed formation statistics, with `E_next T=U E` and `D E=rho` on the admitted operation. | Begin with the first repeated segment. Compare complete requested outputs and live pending returns; repeated use without new independent structure ceases appending executable history. Measure work, representation and precision growth. |
-| **Hephaestus code/function output** | A Rust function over exact rationals lowered from retained operator factors, compositions or powers; return a parameterized family when the inferred relation is plural. | Can use the callable workshop immediately. Execute generated source outside HNN on new inputs and a changed receiver and compare with resident results. Preserve the inferred graph, target domain and unsupported-operation boundary. |
+| **Hephaestus utility generator and output** | A formed mathematical function/composition retained and executed through the shared HNN owners for the requested tool use. Code is an available output domain; an operator can also request an exterior representation of the function. | Inspect the inferred generating relation, its source/condition dependence and returned consequences on new inputs or compositions. Reuse its retained native material. When source-code output or export is requested, check target execution against the specified behavior or retained operator; printer correspondence alone establishes only that adapter. |
 | **Athena task use** | Contextual correction/continuation, a substantive reply, and code or mathematical work using the same formed constructions. | Starts with the repaired contextual section. Inspect held-out requested products and costs; expand development only after diagnosing the first representative failure at its responsible owner. |
 | **Durable application reuse** | Rest/remount for the new section/encoding payload and the public mathematical session's retained constructions, products and pending/frontier state. | Follows the payloads it serializes. A fresh process reuses them on new inputs and consumes a pre-rest comparison once; live output does not wait for this durability claim. |
 | **Broader generative reach** | Indexed analytic generators, nonlinear and physical actions, then shared acoustic/visual and other requested receivers. | Use the same request/encoding/release contract, with actual clock, tail, source units and target execution. Source-specific research below continues alongside native products. |

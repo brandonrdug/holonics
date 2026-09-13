@@ -29,6 +29,13 @@ or the existing position record. It is not a new public type, manifest or genera
 Links replace completed narratives, while the objective and causal reason for the next action
 remain explicit. Read unchanged authority once and recover only what a new question requires.
 
+[project-postulate] Preserve the mathematical referent through that handoff. Generator formation
+concerns the functions and compositions that produce conditioned faces; an output codec or a
+model's application label does not replace that unknown. Keep agent-chosen examples and target
+languages identified as implementation choices. When an example fails to advance the requested
+construction, inspect what was supplied, what was inferred and which consumer is still unbound;
+do not promote a different application into a new requirement merely because its test is familiar.
+
 [project-postulate] Progress is the returned mathematical or product consequence. A proof can
 unlock a cheaper algorithm; an exact solver can return a coefficient family; a native application
 can expose a previously hidden phase; an unsuccessful language reply can identify a wrong source

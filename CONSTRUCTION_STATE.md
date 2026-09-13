@@ -16,6 +16,25 @@ mathematical and physical programme. The [roadmap](docs/plans/THE_ROADMAP.md) al
 
 ## Current consolidation
 
+[project-postulate] Brandon's latest correction restores **generators as mathematical functions
+and constituent compositions**, including emergent recursive/fractal conduct. HNN forms and
+uses these operations; Athena and Hephaestus name their products. The agent-authored Rust-first
+interpretation and subsequent code-repair priority are withdrawn. The two-symbol fitted-wave
+assay is not justification for extending the campaign. The
+[direct-message/source audit](research/records/2026-09-13_GENERATOR_MEANING_AND_CAMPAIGN_DRIFT_AUDIT.md)
+records the original instructions, the substitution and the affected owners. The full shared
+formation, prediction-release, compact-continuation and product objective stands.
+
+[established-bounded; source-inspected] The uncommitted fitted-wave adapter consumes stored
+normal coefficients and publishes a joint section, but its source/condition maps are still
+caller-selected. It adds private wave state under `NativeConditionalPredictor`; the existing
+`NativeCoupledWaveSession` has not acquired the native preparation/condition attachment through
+that adapter. Preserve this experimental source and its measurements pending integration review;
+do not count it as the completed coupled application or extend its two-symbol demonstration.
+The next implementation must resolve that native attachment and reuse formed constituent
+functions through the existing consumer, without replacing the model task with a source-code
+printer or authoring its answer in a driver. The equations and owners below retain their scopes.
+
 [established-bounded; implemented-exact; measured] The public mathematical session now reads
 two resident restrictions of one pre-target preparation, joins their source/condition products,
 and fits the shared unit-prior normal law. Four observations produce new conditional sections,

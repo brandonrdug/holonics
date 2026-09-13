@@ -1,5 +1,11 @@
 # Prediction release has one generating relation and concrete products
 
+[historical] The later
+[generator/campaign audit](2026-09-13_GENERATOR_MEANING_AND_CAMPAIGN_DRIFT_AUDIT.md)
+corrects this record's promotion of Rust-function emission into the Hephaestus generator
+deliverable. The generated-face, joint-source and comparison equations remain standing;
+the Rust receiver remains a scoped exterior adapter. The repaired live plans govern.
+
 [definition] September 13, 2026. This record consolidates Brandon's request to complete the
 HNN prediction-release picture for Athena and Hephaestus, refine the plans into specific
 deliverables, and judge what further Hodge/RH/Navier–Stokes/Yang–Mills work would help before

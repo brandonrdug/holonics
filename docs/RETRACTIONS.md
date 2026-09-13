@@ -6,6 +6,16 @@ root construction state records current implementation scope. Paths in code span
 
 ## Capability and retraction record
 
+[historical; source-inspected; process-audit] September 13: the interpretation that Hephaestus
+generator construction is a Rust-function emission deliverable, and the subsequent repository
+code-repair priority, are withdrawn. Direct messages had already defined the generators as
+mathematical functions and constituent compositions, including fractal generation and model
+execution. The [generator/campaign audit](../research/records/2026-09-13_GENERATOR_MEANING_AND_CAMPAIGN_DRIFT_AUDIT.md)
+traces the substitution into plans and the unbound native source/condition consumer. The exact
+operator algebra, resident fixed-feature prediction and Rust printer retain their recorded
+bounded scopes. Printer correspondence and the uncommitted two-symbol assay do not establish
+the requested contextual model construction. Runtime source is preserved by this audit.
+
 [historical; process-audit] September 9, following explicit removal authorization: the
 byte-field material/text/session/checkpoint adapters, their generic field/model wrapper and
 eight alpha examples were moved out of the live SDK/build into the
