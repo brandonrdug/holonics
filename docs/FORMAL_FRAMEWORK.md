@@ -29,6 +29,14 @@ GR-derived models are identified by their actual equations and approximation dom
 
 ## Construction programme and first formal use
 
+[definition] The [atomic/String/M recovery](../research/records/2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md)
+rejoins laboratory supergravity/compactification sources with the existing connection,
+curvature, Yang–Mills, Maxwell, gravity and matter chain. The
+[physical guide](MASS_ENERGY_AND_CAUSAL_TRANSPORT.md#12-compactification-gauge-charge-and-matter)
+now carries compact momentum/winding spectra, mover parity and fixed-momentum gauge coupling,
+with complex links entering the existing Fock Hamiltonian. These are source-qualified physical
+constructions and continuing derivations, not an atomic question deferred by a hypothesis label.
+
 [proved-derived; formal-checked] The [September 13 game/biological synthesis](../research/records/2026-09-13_GAME_WORLDS_SCOPED_RATES_AND_MOLECULAR_MECHANICS_SHARE_DECLARED_LAWS.md)
 adds elapsed-clock and information-rate laws to `Foundation/SituatedInformationRate.lean`.
 `Physics/ConstitutiveModulation.lean` specializes the existing coupled response to a symmetric

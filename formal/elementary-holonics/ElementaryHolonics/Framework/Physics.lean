@@ -1,5 +1,6 @@
 import ElementaryHolonics.Framework.Dynamics
 import ElementaryHolonics.Physics.PhaseCarrier
+import ElementaryHolonics.Physics.CompactifiedModeTransport
 import ElementaryHolonics.Physics.DirectionalPolarization
 import ElementaryHolonics.Physics.FermionicModeReceiver
 import ElementaryHolonics.Physics.CoupledIncidence

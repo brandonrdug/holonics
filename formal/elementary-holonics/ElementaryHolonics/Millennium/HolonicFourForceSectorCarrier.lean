@@ -21,10 +21,12 @@ curvature is the ordered holonomy around the same addressed square face.  Conseq
 directions and faces are shared while electromagnetic, weak, strong, and frame/gravity states are
 not coerced into one untyped tensor.
 
-**[open]** Physical `U(1)`, `SU(2)ₗ × U(1)ᵧ` with Higgs, `SU(3)`, and frame/Spin
-realizations still owe their respective representation, action, constitutive/Hodge, source,
-continuum, and calibration passages.  This file supplies the common incidence/holonomy type on
-which those distinct instances can now be built.
+**[definition]** This carrier leaves each internal fibre and edge transport as parameters; it
+does not bind the four labels to a complete joint physical action. Companion connection/gauge,
+Yang--Mills variation, Maxwell, frame/gravity and finite Fock/Hamiltonian owners already return
+physical mathematics. Compose their actual representation, action and current maps here when
+developing a sector realization. Missing binding in this type is not absence of those laws from
+Holonics; the current physical guide records their source domains and continuing construction.
 -/
 
 noncomputable section

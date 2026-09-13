@@ -1,8 +1,10 @@
 # Construction state
 
 **Currency:** September 13, 2026. **Latest implementation return:** the
+[compact-fibre, matter and research-workflow return](research/records/2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md)
+and its formal/skill checks are complete, building on the
 [game/rate/molecular consolidation](research/records/2026-09-13_GAME_WORLDS_SCOPED_RATES_AND_MOLECULAR_MECHANICS_SHARE_DECLARED_LAWS.md)
-and its scoped formal/benchmark checks are complete, building on the
+and the
 [frontier review](research/records/2026-09-12_THE_FRONTIER_REVIEW_CONSOLIDATES_CONSTRUCTIVE_CONTINUITY.md).
 **Standing product objective:** useful Athena language/code and
 Hephaestus mathematical applications through the same HNN owners, within the wider Holonics
@@ -15,6 +17,20 @@ equation, chunk transformation and coefficient/statistic update laws below. This
 account is clarified before returning to implementation. No new runtime behavior is claimed.
 
 ## Current consolidation
+
+[proved-derived; formal-checked] The atomic/String/M recovery now supplies compact
+momentum/winding mass transport, left/right mover parity and fixed-momentum Routh reduction
+with explicit gauge coupling. Complex link coefficients enter the existing finite matter
+Hamiltonian, preserving Hermiticity and particle number. Equal-magnitude parallel bonds
+return hopping amplitudes 2 or 0 according to relative phase. The owner and Physics consumer
+passed together; these are source-qualified physical returns, not a language-quality claim.
+
+[definition] The [research skill](.agents/skills/holonics-research/SKILL.md) now routes
+resumed derivations through relevant physics, mathematics and computation sources. Its
+behavioral trials cover prior-physics recovery, observer measurement and avoiding broad work
+for a typo-only edit. The [recovery record](research/records/2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md)
+retains the earlier omission, actual equations, review corrections and continuation. Existing
+field/action physics remains part of the standing construction; it is not deferred by a label.
 
 [definition] Brandon's latest September 13 request extends the consolidation to game/world
 streaming, consumer-hardware performance, molecular geometry and substantive Lean/Millennium

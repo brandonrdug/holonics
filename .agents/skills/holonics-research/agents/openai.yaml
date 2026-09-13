@@ -1,0 +1,4 @@
+interface:
+  display_name: "Holonics research and construction"
+  short_description: "Recover and develop Holonics relations across domains"
+  default_prompt: "Use $holonics-research to recover the relevant constructions and develop the requested mathematical or physical consequence."

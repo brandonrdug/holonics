@@ -63,6 +63,38 @@ the inspected aperture and validation performed. It is not a claim that every th
 experiment, backend or external model was rerun. A fresh source census or universal validation
 gate supplies no substitute for the requested construction.
 
+## Research recovery and derivation
+
+[project-postulate] The [Holonics research skill](../.agents/skills/holonics-research/SKILL.md)
+is the discoverable entry point for resumed derivations, cross-domain synthesis and
+missing-mechanism reviews. It routes to physics, mathematics or computation guidance without
+loading the whole archive. AGENTS, the current position and roadmap retain their authority;
+the skill creates no new scheduler or universal review requirement.
+
+[definition] The September 13 physics omission was a recovery and follow-through failure:
+the narrow knot/biology inspection did not recover the existing String/M, supergravity,
+gauge/action and matter-Hamiltonian chain before describing the atomic map as hypothetical.
+The [recovery and derivation record](../research/records/2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md)
+shows the omitted source and the resulting exact extensions. The existing
+[explorative-failure doctrine](canon/THE_EXPLORATIVE_FAILURE.md) and
+[epistemic grades](canon/EPISTEMIC_GRADES.md#interpretation-is-a-theorem-development-state)
+already prohibited substituting a new noun or a repeated boundary statement for this work.
+
+| Observed failure | Corrective action at the decision point |
+|---|---|
+| Inferring a missing construction from one named file | Search the relation and follow its actual source/consumer chain; use invoked historical material to find the relevant descendants |
+| Ending with "needs a map" or "hypothesis" | Write and attempt the first connecting equation; derive a consequence or expose the exact failure and work that relation |
+| Returning broad physics to familiar HNN work | Keep the requested physical/math output in the continuing brief and deliver it through its own source law |
+| Replacing an explicit equation with a qualitative learning criterion | Name the supplied data, unknown, generation/update equation and requested receiver; use the resulting output |
+| Treating exactness as a ban on observer statistics | Keep the native semantic path exact and measure its external performance in declared clocks/units |
+| Reporting an agent's summary before inspecting its return | Read the changed owner and consuming output; compare the exact statement and measurement population before promotion |
+
+[project-postulate] A research brief carries the requested consequence, its broader purpose,
+current equation, recovered owners, relevant failed composition and next discriminating
+return. Preserve it before a handoff; retain completed evidence by links. Resume the next
+operation rather than restating the whole ambition, rereading unchanged archives or
+re-demonstrating the same bounded result. Ordinary small edits retain ordinary small checks.
+
 ## Rust and CUDA
 
 The current native engine/HNN build is Linux/CUDA-bound, including generated PTX and CUDA

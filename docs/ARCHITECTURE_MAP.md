@@ -102,6 +102,15 @@ Declaration namespaces remain stable. These source extractions preserve old impo
 retaining duplicate definitions. Endpoint commutation does not identify carrying histories.
 The finite modulation return supplies no automatic native response law or molecular calibration.
 
+[definition] `Physics/CompactifiedModeTransport.lean`, imported by `Framework.Physics`, maps
+the existing integral torus lift to a declared compact circle's momentum/winding spectral
+receiver. It proves radius/charge duality, mover parity, a finite-phase mass separator and
+fixed-momentum Routh reduction with connection coupling and retained compact energy.
+`Computation/HolonicFermiHubbard.lean` carries complex link-weighted hopping/current into the
+existing kinetic/full Hamiltonian; the unit-link specialization preserves its old interface.
+The [physical recovery](../research/records/2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md)
+connects these to the existing gauge, force, action and quantum evolution owners.
+
 [definition] The continuing unification adds `Transport/ChangingReceiver.lean` for addressed
 finite and moving differential receiver defects; `Physics/ConformationResponse.lean` and
 `Physics/MechanicalReceiver.lean` instantiate prestress and changing-grain mechanical response;

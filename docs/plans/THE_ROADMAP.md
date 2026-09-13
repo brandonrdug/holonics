@@ -79,6 +79,14 @@ nested automata that construct, compare and refine further automata.
 
 ## Immediate mathematical application and implementation
 
+[project-postulate] Brandon's subsequent September 13 atomic correction makes recovery and
+development of the existing String/M, supergravity and fundamental-force constructions the
+current physical task. Follow compactification through its retained modes, charge/current,
+action and matter observable. The [returned source chain](../MASS_ENERGY_AND_CAUSAL_TRANSPORT.md#12-compactification-gauge-charge-and-matter)
+rejoins this work to existing gauge, Maxwell, gravity and quantum owners. Do not finish a
+requested physical extension by labelling it hypothetical after a narrow file inspection.
+Use the research skill's relevant route and continue the exposed equation at its own domain.
+
 [project-postulate] Brandon's September 13 game/biology/measurement ruling gives the current
 consolidation its concrete returns: receiver-scoped performance conventions and benchmarks,
 consumer-hardware awareness, demand-driven world/continuation maps, and biological constitutive

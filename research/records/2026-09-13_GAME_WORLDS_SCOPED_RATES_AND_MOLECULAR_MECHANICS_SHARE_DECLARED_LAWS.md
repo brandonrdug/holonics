@@ -258,12 +258,14 @@ receiver from the complete dynamics. `HolonicTorusKnots.lean` already proves int
 winding constructions and finite-probe ambiguity. It does not turn a topological knot
 into an electronic state or a complete atom.
 
-[interpretation] The atoms-as-knots and string-theory ideas require a more specific source
-map: state space, interaction/action, charges and measured spectrum/current. The current
-finite quantum owners provide occupation/CAR, Hamiltonians and coherent transport;
-they do not provide this molecular-to-string correspondence. Entanglement is represented
-by joint quantum states/observables, not replaced by a single flux number. Evolving joint
-currents are a useful question precisely when the Hamiltonian and receivers are retained.
+[definition] Brandon's subsequent September 13 correction supersedes this review's broad
+missing-map framing. The narrow knot/biology inspection omitted the laboratory's String/M
+and supergravity work and the current force, gauge/action and finite matter chain. The
+[recovery and derivation](2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md)
+now carries compactified modes into a spectral receiver and fixed-momentum reduction into
+a gauge-coupled action, while connection coefficients enter the matter Hamiltonian. The
+topological, constitutive and quantum steps have explicit owners and consequences; they are
+not an abandoned hypothesis. The complete atomic extension continues through these maps.
 
 ## Formal and Millennium work keeps its own mathematical return
 

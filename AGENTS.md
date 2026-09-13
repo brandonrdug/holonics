@@ -170,6 +170,14 @@ maps and scopes. Their provenance warrants confident application and further der
 it neither requires a new permission cycle nor promotes an unfinished endpoint or product to
 completion. Learn from the relation exposed in dialogue and continue its consequences autonomously.
 
+[project-postulate] For resumed derivations and cross-domain construction, use the repository
+[Holonics research skill](.agents/skills/holonics-research/SKILL.md) and only its relevant route.
+Before declaring a physical/mathematical map absent, follow the current source chain and any
+invoked predecessor research. An `interpretation` is work to develop, not a terminal disclaimer.
+The [research recovery method](docs/DEVELOPMENT.md#research-recovery-and-derivation) activates
+these existing duties before planning. A physical question returns a physical/mathematical
+consequence; its relevance is not decided by immediate Athena implementation.
+
 [definition] `docs/canon/` is doctrine; `docs/plans/THE_ROADMAP.md` is the sole construction
 order; `CONSTRUCTION_STATE.md` is the sole current position. `research/`, formal source and
 papers provide evidence at their declared scopes. `archive/`, old commits, imported records and

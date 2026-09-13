@@ -1,5 +1,13 @@
 # The explorative failure
 
+[definition] The current enactment is the repository
+[research skill](../../.agents/skills/holonics-research/SKILL.md) and
+[recovery method](../DEVELOPMENT.md#research-recovery-and-derivation). The instances below
+retain their historical source coordinates; old CLAUDE sections, owner censuses and line-count
+comparisons do not reinstate retired process gates. Current AGENTS governs. The live corrective
+operation is to recover the relation's existing owner and work the actual failed composition
+before declaring missing theory or founding another mechanism.
+
 **Genre:** canon (`docs/canon/THE_DOCUMENT_LAW.md` §1.2). It states the condition that identifies one
 recurring assistant failure, the trigger that precedes it, its measured instances, the ontology in
 this project's own words that refutes it, and what is done instead.

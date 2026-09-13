@@ -518,7 +518,48 @@ Compact dynamics can support efficient prediction and synthesis, while a global 
 claim still refers to a fixed encoding and uniform computational bound. The same source and
 cost accounting applies to solvers, neural formation and physical computation.[^13]
 
-## 12. Unified construction map
+## 12. Compactification, gauge charge and matter
+
+[definition] The [September 13 recovery](../research/records/2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md)
+rejoins the laboratory's String/M and supergravity work to the current force/quantum source.
+The common chain is addressed transport, loop holonomy, curvature, sector action or
+constitutive current, matter Hamiltonian and physical receiver. `HolonicFourForceSectorCarrier`
+supplies the shared six-face base with dependent internal sectors; continuum connection,
+Bianchi, gauge covariance and Yang–Mills variation owners already supply field dynamics.
+
+[proved-standard] The Type-IIA/eleven-dimensional circle description contains
+`ds11^2=exp(-2phi/3) ds10,string^2 + exp(4phi/3)(dy+C1)^2`, with `R11=g_s*l_s`.
+The mixed metric component is a connection in the reduced description. The laboratory's
+`mathematical-physics.typ` entries H.0467–H.0468 recover this and the worldsheet/supergravity
+sources. See [Witten](https://arxiv.org/abs/hep-th/9503124) and
+[Samtleben](https://arxiv.org/abs/2303.12682).
+The ten-dimensional metric in this expression is in string frame. Samtleben's equation 23
+uses Einstein frame, whose prefactor is `exp(-phi/6)`; the frames satisfy
+`g_string=exp(phi/2)g_Einstein`. The vertical connection block agrees.
+
+[proved-derived; formal-checked] `Physics/CompactifiedModeTransport.lean` makes the compact
+charge/current step explicit. For `L=L_base+B(v+C)^2/2`, fixed conjugate momentum
+`q=B(v+C)` gives `v=q/B-C`. The exact Routh reduction is
+`L-qv=L_base+qC-q^2/(2B)`, for nonzero B. Thus the reduced action retains both connection
+coupling and compact energy. Interpreting C as `C_i dx^i/dt`, with a cyclic vertical coordinate,
+identifies q as the conserved charge coordinate. A physical charge unit is fixed by the
+connection normalization. Spatially changing B retains a force-producing potential term.
+
+[proved-derived; formal-checked] The same source sends the existing integral two-torus lift
+to the circle's momentum/winding charge pair `(n,w)`. With supplied radius R, alpha-prime and
+oscillator offset, `M^2=(n/R)^2+(wR/alpha')^2+offset`. The transformation
+`R -> alpha'/R`, `(n,w)->(w,n)` preserves this mass square and the level-matching product,
+fixes the left mover and reverses the right mover. The finite modulo-four face loses the
+mass distinction between `(0,0)` and `(0,4)` at unit radius/alpha-prime. This gives the
+physical spectral consequence missing from an isolated winding count.
+
+[definition] The connection also enters finite quantum matter through the existing Fock/CAR
+and Fermi–Hubbard owners. A directed hop A carries the complex link coefficient z, with its
+reverse carrying the conjugate: `H_e=z A+conj(z) A†`. The paired current is
+`J_e=i(z A-conj(z) A†)`. These are the finite matter ports for connection phase; their exact
+Hermiticity, occupation and consuming-Hamiltonian results are recorded in the recovery.
+
+## 13. Unified construction map
 
 [definition] The following map identifies the operative relation shared by the recent subjects.
 The formal and executable owners supply their stated mathematical domains.[^2]
