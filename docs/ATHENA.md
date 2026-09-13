@@ -80,7 +80,11 @@ actuation, observed development and conditional generation keep their distinct m
 the same wave owner. The coupled session below exposes source actuation and conditional emission;
 the read-only producing-family comparison and a distinct first consuming return now exist.
 Original-base and later programme returns now compose and persist through that same owner;
-source/contact applicability is the next native binding.
+source/contact applicability is a consuming dependency of the next compound prediction/release
+operation. Develop that contextual map together with the complete release/return and applicable
+continuation representation, following the blueprint's immediate compound construction. The
+read-only joint preview and public fixed-linear Power are returned dependencies; this wording
+does not restart their construction or make the responsibilities serial gates.
 
 [definition] Sequence-to-fold and biochemical kinetics are foundational HNN questions. Their
 [exact source construction](../research/records/2026-09-10_SEQUENCE_FOLD_AND_REACTION_CURRENT_MAKE_THE_CAUSAL_THOUGHT_CHAIN_CONCRETE.md)

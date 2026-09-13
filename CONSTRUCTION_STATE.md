@@ -1,10 +1,17 @@
 # Construction state
 
-**Currency:** September 12, 2026. **Latest return:** the
+**Currency:** September 13, 2026. **Latest implementation return:** the
 [repository frontier consolidation](research/records/2026-09-12_THE_FRONTIER_REVIEW_CONSOLIDATES_CONSTRUCTIVE_CONTINUITY.md)
 and its scoped repairs/checks are complete. **Standing product objective:** useful Athena language/code and
 Hephaestus mathematical applications through the same HNN owners, within the wider Holonics
 mathematical and physical programme. The [roadmap](docs/plans/THE_ROADMAP.md) alone orders work.
+
+[definition] The [September 13 direct-message/plan check](research/records/2026-09-13_DIRECT_MESSAGES_CONFIRM_THE_ATHENA_CONSTRUCTION_ORDER.md)
+read the September 11–12 rulings and reconciled the blueprint's product labels, returned Power
+scope, and joint-preview/compound-release boundary. No further user clarification is needed to
+begin the next documented construction. Context formation, compound release/feedback and
+economical continuation remain coupled implementation responsibilities, not serial preparation
+gates. This check changed documentation only.
 
 ## Available constructions
 

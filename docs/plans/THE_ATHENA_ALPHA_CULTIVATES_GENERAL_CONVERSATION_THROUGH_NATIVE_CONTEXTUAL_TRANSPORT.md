@@ -17,8 +17,9 @@ source/contact limitation; the mathematical solver/encoding applications continu
 
 ## Product and evidence
 
-[project-postulate] HNN conducts situated Holons; Athena is the continuing ecology and Eros its
-composition/development phase. The product goal is useful conversation, code, mathematics and
+[project-postulate] HNN conducts situated Holons through a continuing ecology. Athena and
+Hephaestus label its products/uses; Eros names composition and formation at every nested scope.
+Those names introduce no internal machinery boundary. The product goal is useful conversation, code, mathematics and
 other modalities on consumer hardware. Hephaestus's factor/recurrence/generator inference is
 already mathematical learning/reasoning in this programme. Report its supplied target and
 constraints, derived executable representation, applicable consequences and relevant costs.
@@ -41,15 +42,15 @@ of this complete application/return cycle, with no imposed serial completion ord
 
 [definition] The target is one continuing ecology of applicable generators. A mathematical
 operator request, a text occurrence, an acoustic event and a kinetic observation enter through
-their source/receiver charts. Athena carries the available organization; Eros changes that
-organization through actual returned constraints; Hephaestus confines its use to a requested
-mathematical operation or construction. Their distinct names do not introduce separate
+their source/receiver charts. The HNN ecology carries the available organization; Eros names
+its composition and formation through actual returned constraints. Hephaestus labels an
+operator-scoped mathematical use, while Athena labels general wisdom/model uses. Their names do not introduce separate
 inference, compression or formative laws.
 
 | Shared formal construction | Existing executable owner | Required Athena/Eros consequence |
 |---|---|---|
 | Addressed holon, joint future receiver and Preimage Fibre | Coupled current families, source arrivals, pending producing comparison | Retain actual joins and correlated conditions behind an emitted face; later observations constrain the producing relation at its saved cut. |
-| Exact generator factorization and ordered recurrence words | `exact_linear`, `derived_factor_cover`, mathematical factorization example | Expose reusable factors/actions and receiver maps; execute a new admitted composition. Bind the relevant pure action to resident owners before extending it to developing material. |
+| Exact generator factorization and ordered recurrence words | `exact_linear` polynomial/preimage/factor owners, `derived_factor_cover`, public `native/mathematical.rs` | Reuse callable factors, changed receivers and fixed-operator powers. Extend their actual source/action maps to developing material; the public workshop is already returned. |
 | Receiver-history compression and generator equivariance | `receiver_history_compression`, observable-form closure, existing native relation and rest owners | Preserve the complete required future under encoding, including changed conditions, emission and the current material; retain or reopen a separating source fibre. |
 | Swing, clock–ruler and phase-lift transport | Exact receiver atlas, coupled/analytic phase and internal-mode owners | Keep source clock, winding, orientation and within-cycle residue across changed receiving conditions. Source and receiver must travel together. |
 | Situated information and addressed code-cost bounds | `surprisal`, `exact_work`, native comparison/inspection | Measure surprise/code length, full residual, work and residency at the same declared cut. Carry endpoint/normalization terms; use cost to compare admissible realizations, not to replace causal relevance. |
@@ -101,6 +102,35 @@ the implementation order. This specification supplies their exact binding decisi
 does not wait for another intuition, a universal intelligence theorem, or an RH endpoint.
 Correctness of a local relation is used in a product rather than repeatedly re-demonstrated.
 
+### The immediate compound construction
+
+[definition] The [September 13 direct-message pickup](../../research/records/2026-09-13_DIRECT_MESSAGES_CONFIRM_THE_ATHENA_CONSTRUCTION_ORDER.md)
+reconciles the September 11–12 rulings with the current source. The next product operation is
+**source-conditioned joint prediction and compound release with its actual return**. Context
+formation supplies the relevant pre-return condition; the compound operation consumes it;
+economical continuation is integrated wherever its actual repeated action closes. These are
+coupled responsibilities of one increment, not three serial completion gates. An already
+admitted mathematical source can exercise compound release while broader contextual formation
+is developed through the same owners.
+
+[established-bounded; source-inspected] `NativeCoupledWaveSession::predict_continuation` now
+reads and decodes a specified learned-member word as one anchored joint, without emission,
+source re-entry or successor publication. `next_symbol` supplies single-symbol emission/re-entry.
+Their existence does not yet compose the requested compound release and feedback. Bind that
+operation in the existing session/body and producing-return owners, retaining the shared source,
+intermediate conditions and actual successor; a longer character loop or a serialized preview
+does not by itself supply the missing composition.
+
+[definition] The implementation's context question is the actual source-null contrast described
+in phase 3: a difference hidden by the coarse source but visible in the returned target must
+reach the native condition/formation map before the target is assimilated. An exterior
+contextual inspection, a changed label or another fixed-h observation is not that binding.
+Use the existing contextual section, condition contact, normal/normalized return and joined
+family owners. Inspect the resulting mathematical action or complete text/code output together
+with its prediction and actual comparison. Resolve remaining coefficient, representation and
+receiver choices from these laws during implementation; no further user intuition is required
+to begin, and this plan pickup starts no new engine implementation by itself.
+
 ### Callable mathematical workshop: the first delivered increment
 
 [established-bounded; implemented-exact; computational-witness] The
@@ -112,6 +142,13 @@ reception supplies the actual consuming refinement; generic coupled-wave returns
 separate available dependency. The following paragraphs retain the contract of that returned
 scope. Contextual empirical prediction and general continuation compression are next; new
 session rest/resume and multi-pending condition joins retain their explicit open interface scope.
+
+[established-bounded; implemented-exact] The frontier consolidation additionally returned
+`MathematicalRequest::Power`: retained square linear operator plus exponent, shared minimal-
+polynomial inference/lowering, and resident application. Characteristic polynomials, minimal
+polynomials and preimage work share their actual exact-linear owner. This fixed-operator
+construction is available now; an analytic tail or changing constitutive programme requires
+its own corresponding map. It is not scheduled as a new first-packet prerequisite.
 
 [definition] Extend the existing public HNN application/session boundary with a mathematical
 request payload. The payload has four operations: construct an admitted operator, apply a
@@ -236,13 +273,14 @@ questions; a new endpoint campaign is not the critical path to HNN outputs.
 `C/field/material_transport/normal/direct/wave/`. **A** is
 `crates/holonics-hna/src/native/`. These abbreviations are navigation only.
 
-[established-bounded; source-inspected] The owner map is reconciled through implementation base
-`8ac667fa`; the [pickup review](../../research/records/2026-09-12_THE_RETURN_CYCLE_STANDS_AND_THE_PICKUP_FOLLOWS_SOURCE_APPLICABILITY.md)
-records the inspected consuming path and correction of earlier open-binding prose:
+[established-bounded; source-inspected] The September 13 pickup checks this source map against
+`eee6ab9d`. The earlier [pickup review](../../research/records/2026-09-12_THE_RETURN_CYCLE_STANDS_AND_THE_PICKUP_FOLLOWS_SOURCE_APPLICABILITY.md)
+retains its original consuming-path audit. The joint preview, public fixed-operator Power and
+exterior acknowledgement repair are now available dependencies at their recorded scopes:
 
 | Existing owner | Actual return | Remaining work |
 |---|---|---|
-| `alpha::exposure::{ExposureReader,ExposureCursor}` and prepared source records | Source/part relationships, partitions and resumable delivery | Bind actual mounted material and its comparison relation to the producing native occurrence |
+| `alpha::exposure::{ExposureReader,ExposureCursor}` and prepared source records | Source/part relationships, partitions and resumable delivery; the contextual driver acknowledges selected occurrences after complete native use | Bind relevant source/part relationships to the producing native relation; exterior cursor correctness and report metadata alone do not supply contextual incidence |
 | `A/section_input.rs::SymbolCurrentChart` | Supplied symbol basis, exact mount, device-selected symbol decoding | Keep as exterior codec; bind a changing internal encoded carrier through an actual receiver map |
 | `W/receive.rs` and normal producing-return owners | Actual next-current and normal addressed material return | Preserve these distinct meanings when composing the family operation |
 | `W/coupled/comparison.rs::{predict_contact,compare_coupled_prediction}` and `comparison/constitutive.rs` | Retained producing cut, joint source/observed-difference sections and dependent contact/formation evaluator | Bind broader source applicability through the consuming generator; preserve read-only comparison |
@@ -514,6 +552,11 @@ neighborhood, normal/normalized and coupled-session tests cover only their chang
 [definition] This packet begins on the first repeated admitted workshop/conditional action
 and accompanies the formation repair; it is not deferred until large-scale conversation.
 Its task is to execute a compact generative representation, not just to memoize replay.
+
+[definition] Public fixed-linear `Power` is already a consuming example of exact recurrence
+construction. It does not replace the changing `ConstitutiveSourcePassage` programme below.
+Transfer its representation only after the actual condition/material action and required
+pending/source receivers satisfy the corresponding closure law.
 
 [established-bounded; source-inspected] `ResidentCoupledConstitutive::append_operation`
 currently evaluates the whole candidate operations vector before publication.

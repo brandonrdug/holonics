@@ -109,6 +109,14 @@ returned. The remaining source/condition and accumulating-programme limitations 
 construction questions. CONSTRUCTION_STATE records their current evidence; the old example-only
 workshop description is not a remaining task.
 
+[definition] The [September 13 message/plan check](../../research/records/2026-09-13_DIRECT_MESSAGES_CONFIRM_THE_ATHENA_CONSTRUCTION_ORDER.md)
+confirms the immediate operation: source-conditioned joint prediction and compound release,
+including actual self-re-entry/feedback. Context formation and economical continuation enter
+that same increment as their dependencies permit. The blueprint names the current preview and
+the missing consuming map; it does not impose completion of all context or compression research
+before using an already admitted source. Further elementary direction from Brandon is not a
+prerequisite to proceeding.
+
 [definition] The following implementation packets deliver the six shared responsibilities
 above. The [first packet has returned](../../research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md)
 for caller-controlled exact operators and native calibrated condition families. The next
@@ -140,9 +148,10 @@ generation uses native owners rather than calling the exterior search as a hidde
 
 [definition] The first packet is complete only when a caller can perform a constructed
 operator task and reuse its result through the public session. A round-trip, a printed fixed
-product or an extra pending-return case does not complete it. The initial scope is linear and
-bilinear source/action families; recurrence and analytic extensions retain their actual
-primitive and remainder dependencies instead of being advertised as already available.
+product or an extra pending-return case does not complete it. Linear/bilinear source/action
+families and fixed-linear recurrence/power construction are now callable. General analytic
+actions and changing-programme compression retain their actual primitive, clock and remainder
+dependencies; the completed fixed-operator scope does not settle those different constructions.
 
 [definition] The second packet must address the exact fixed-condition collapse, not merely
 initialize h differently. Source/context contrasts must reach the law before the observed
