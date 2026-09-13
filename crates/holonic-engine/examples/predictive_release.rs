@@ -1,6 +1,8 @@
 //! Exact release synthesis and deterministic transport of unresolved source conditions.
 //! Units: m, s, kg; a declared constant downward acceleration 10 m/s^2, not an Earth calibration.
-use holonic_engine::exact_linear::{ConstantAccelerationRelease, ReceiverFactorization};
+use holonic_engine::exact_linear::{
+    ConstantAccelerationRelease, ExactRatMatrix, ReceiverFactorization,
+};
 use holonic_engine::surprisal::SymbolicSurprisal;
 use num_traits::{Signed, Zero};
 use relational_geometry::Rat;
@@ -13,6 +15,9 @@ fn strings(v: &[Rat]) -> Vec<String> {
     v.iter().map(ToString::to_string).collect()
 }
 fn main() -> Result<()> {
+    if std::env::args().nth(1).as_deref() == Some("--native-requests") {
+        return native_requests();
+    }
     let motion = ConstantAccelerationRelease::new(2, q(2, 1))?;
     let t = q(1, 1);
     let initial = vec![q(0, 1), q(1, 1), q(0, 1), q(0, 1), q(0, 1), q(-10, 1)];
@@ -109,5 +114,114 @@ fn main() -> Result<()> {
         std::fs::write(path, format!("{text}\n"))?;
     }
     println!("{text}");
+    Ok(())
+}
+
+// Compile this same physical chart into caller-controlled public HNN requests. This
+// branch supplies laws and a landing constraint; it does not solve the impulse on the
+// host or supply expected intermediate predictions to the native session.
+fn native_requests() -> Result<()> {
+    let args: Vec<_> = std::env::args().skip(2).collect();
+    if ![0, 2].contains(&args.len()) {
+        return Err("usage: predictive_release --native-requests [target-x target-y]".into());
+    }
+    let target = if args.is_empty() {
+        vec![q(4, 1), q(1, 1)]
+    } else {
+        args.iter()
+            .map(|s| s.parse::<Rat>())
+            .collect::<std::result::Result<Vec<_>, _>>()?
+    };
+    let wire = |v: &[Rat]| {
+        v.iter()
+            .map(|r| {
+                json!({"numerator":r.numer().to_string(),
+        "denominator":r.denom().to_string()})
+            })
+            .collect::<Vec<_>>()
+    };
+    let matrix = |m: &ExactRatMatrix| m.to_rows().iter().map(|row| wire(row)).collect::<Vec<_>>();
+    let emit = |request: serde_json::Value| -> Result<()> {
+        println!(
+            "{}",
+            json!({"schema":"org.holonics.hna.stream-request.v1",
+            "command":{"action":"mathematical-request","request":request}})
+        );
+        Ok(())
+    };
+    // The exact complex dot-product chart reads components of h=(x,v,g,J).
+    // Its calibration is supplied action material; h is inferred by native images.
+    let mut calibration = Vec::new();
+    for axis in 0..8 {
+        let mut basis = vec![q(0, 1); 8];
+        basis[axis] = q(1, 1);
+        calibration.push(json!({"source":wire(&vec![q(0,1);8]),"condition":wire(&basis),"observed":wire(&[q(0,1),q(0,1)])}));
+        calibration.push(json!({"source":wire(&basis),"condition":wire(&vec![q(0,1);8]),"observed":wire(&[q(0,1),q(0,1)])}));
+    }
+    for i in 0..4 {
+        for j in 0..4 {
+            for phase in 0..2 {
+                let mut source = vec![q(0, 1); 8];
+                source[2 * i + phase] = q(1, 1);
+                let mut condition = vec![q(0, 1); 8];
+                condition[2 * j] = q(1, 1);
+                let mut observed = vec![q(0, 1); 2];
+                if i == j {
+                    observed[phase] = q(1, 1);
+                }
+                calibration.push(json!({"source":wire(&source),"condition":wire(&condition),"observed":wire(&observed)}));
+            }
+        }
+    }
+    emit(
+        json!({"operation":"construct-relation","source_complex":4,"condition_complex":4,"target_complex":1,
+        "calibration":calibration,"initial_source":wire(&[q(1,1),q(0,1),q(0,1),q(0,1),q(0,1),q(0,1),q(0,1),q(0,1)]),
+        "initial_observed":wire(&[q(0,1),q(1,1)])}),
+    )?;
+    for (prediction, axis, value) in [(0, 1, [0, 0]), (1, 2, [0, -10])] {
+        let mut source = vec![q(0, 1); 8];
+        source[2 * axis] = q(1, 1);
+        emit(
+            json!({"operation":"predict-relation","relation":0,"source":{"kind":"values","values":wire(&source)},"retain_prediction":true}),
+        )?;
+        emit(
+            json!({"operation":"observe-relation","relation":0,"prediction":prediction,"observed":wire(&value.map(|v|q(v,1)))}),
+        )?;
+    }
+    let motion = ConstantAccelerationRelease::new(2, q(2, 1))?;
+    emit(json!({"operation":"construct-linear","coefficients":matrix(&motion.release()?)}))?; // operator 0
+    for (time, flow) in [(q(1, 2), 1), (q(1, 1), 3)] {
+        emit(json!({"operation":"construct-linear","coefficients":matrix(&motion.flow(&time)?)}))?;
+        emit(json!({"operation":"compose","operator":0,"following":flow}))?; // 2, 4
+    }
+    emit(json!({"operation":"join-receivers","operators":[2,4]}))?; // 5
+    emit(json!({"operation":"predict-condition","relation":0,"operator":5}))?;
+    let mut comparison = vec![vec![q(0, 1); 12]; 2];
+    for i in 0..2 {
+        comparison[i][i] = q(-2, 1);
+        comparison[i][6 + i] = q(1, 1);
+    }
+    emit(
+        json!({"operation":"compose-receiver","operator":5,"matrix":matrix(&ExactRatMatrix::new(comparison)?)}),
+    )?; // 6
+    emit(json!({"operation":"predict-condition","relation":0,"operator":6}))?;
+    let mut landing = vec![vec![q(0, 1); 12]; 2];
+    for i in 0..2 {
+        landing[i][6 + i] = q(1, 1);
+    }
+    emit(
+        json!({"operation":"compose-receiver","operator":5,"matrix":matrix(&ExactRatMatrix::new(landing)?)}),
+    )?; // 7
+    emit(
+        json!({"operation":"predict-condition","relation":0,"operator":7,"retain_prediction":true}),
+    )?;
+    emit(
+        json!({"operation":"observe-relation","relation":0,"prediction":2,"observed":wire(&target)}),
+    )?;
+    emit(json!({"operation":"predict-condition","relation":0,"operator":5}))?;
+    println!(
+        "{}",
+        json!({"schema":"org.holonics.hna.stream-request.v1","command":{"action":"close"}})
+    );
     Ok(())
 }

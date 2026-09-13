@@ -281,6 +281,13 @@ into the existing decoder, using `GeneratorFactorization.fixedRight_receiver_sec
 family. The mathematical session uses one input resolver for supplied packets, retained outputs
 and retained-product receivers; its `compose` request returns the reusable compiled action.
 
+[definition] `BilinearRealization::join_receivers` stacks decoded branches sharing one actual
+core. The session's `predict-condition` compiles a graph chart of the supplied linear action
+for the existing native family-image calculus, then retains the resulting joint condition/
+output image for refinement. `examples/predictive_release.rs --native-requests` supplies
+the existing release/flow matrices through that same public stream; no host source-family
+representative or separate prediction engine is introduced.
+
 [definition] `NormalWaveJointSource` in `normal/direct/wave/source.rs` is also the concrete
 step-source implementation; `NormalWaveStep` is a compatibility alias. Its current pair, fibre,
 joint section and actual metadata are shared immutably. `NormalWaveReception` retains that
@@ -363,6 +370,9 @@ this scoped generator construction.
 source refinements. `constitutive_relation_image.cuh` composes the existing fibre/affine row
 calculus; `surface_fibre_image.rs` validates and records its resident passage. Condition-image
 coverage parsing and homogenized reception are shared with the original condition owner.
+Their common resident carriers, decoding and refinement now live in the internal
+`AffineImageData` in `resident/condition_image.rs`; `ResidentConditionPreimage::read_image`
+retains its original preimage while consuming the existing linear image's carriers.
 `ResidentConditionPreimage::refined_by` checks the actual source before returning constraints
 to the existing `ResidentConditionCurrent::contact`; it adds no new metric or learner.
 

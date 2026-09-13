@@ -30,6 +30,131 @@ pub struct ConditionImageReading {
     pub joint: ConstitutiveReading,
 }
 
+/// Shared native carriers for conditional and general affine images.
+pub(super) struct AffineImageData<'chart> {
+    pub(super) joint: ResidentConstitutiveReturn<'chart>,
+    pub(super) domain: ResidentConstitutiveReturn<'chart>,
+    pub(super) output: ResidentConstitutiveReturn<'chart>,
+    pub(super) constraint: ResidentSection<'chart>,
+    pub(super) rhs: ResidentSection<'chart>,
+    pub(super) coverage: ResidentSection<'chart>,
+    pub(super) safe_current: ResidentSection<'chart>,
+}
+
+impl<'chart> AffineImageData<'chart> {
+    pub(super) fn current(&self) -> ResidentConstitutiveCurrent<'_, 'chart> {
+        let width = self.output.target_width;
+        ResidentConstitutiveCurrent {
+            section: &self.safe_current,
+            offset: 0,
+            width,
+            denominator: Some(width),
+            disposition: Some(width + 1),
+        }
+    }
+    pub(super) fn inspect_constraints(
+        &self,
+    ) -> Result<(ResidentSectionRest, ResidentSectionRest), ConstitutiveFibreError> {
+        Ok((
+            self.joint.surface.detach_section(&self.constraint, 64)?,
+            self.joint.surface.detach_section(&self.rhs, 64)?,
+        ))
+    }
+    pub(super) fn condition_reading(
+        &self,
+    ) -> Result<ConditionImageReading, ConstitutiveFibreError> {
+        let c = self.domain.target_width;
+        let w = self.joint.source_width;
+        Ok(ConditionImageReading {
+            condition_width: c,
+            output_width: self.output.target_width,
+            coverage: read_coverage(self.joint.surface, &self.coverage, c, w)?,
+            supported_conditions: self.domain.inspect()?.predecessor_reading,
+            supported_outputs: self.output.inspect()?.predecessor_reading,
+            joint: self.joint.inspect()?.predecessor_reading,
+        })
+    }
+    pub(super) fn generic_reading(
+        &self,
+        source: &ResidentConstitutiveReturn<'chart>,
+    ) -> Result<super::image::ConstitutiveImageReading, ConstitutiveFibreError> {
+        let reading = self.condition_reading()?;
+        Ok(super::image::ConstitutiveImageReading {
+            source_return_cut: source.occurrence,
+            receiver_cut: self.joint.occurrence,
+            coverage: reading.coverage,
+            supported_source: reading.supported_conditions,
+            output: reading.supported_outputs,
+            joint: reading.joint,
+        })
+    }
+
+    pub(super) fn refine(
+        &self,
+        observed: ResidentConstitutiveCurrent<'_, 'chart>,
+    ) -> Result<
+        (
+            ResidentConstitutiveReturn<'chart>,
+            ResidentSection<'chart>,
+            ResidentSection<'chart>,
+        ),
+        ConstitutiveFibreError,
+    > {
+        let s = self.joint.surface;
+        let c = self.domain.target_width;
+        let y = self.output.target_width;
+        if observed.width != y {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let width = c
+            .checked_add(y)
+            .and_then(|n| n.checked_add(1))
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let scratch = width.checked_mul(32).ok_or(ConstitutiveFibreError::Shape)?;
+        let available = s.declaration().max_sectiond_bytes;
+        if scratch > available as usize {
+            return Err(ConstitutiveFibreError::ScratchAperture {
+                required: scratch,
+                available,
+            });
+        }
+        let constraint = s.fresh_section(width, width, ResidentGrain(0))?;
+        let rhs = s.fresh_section(1, y + 2, ResidentGrain(0))?;
+        let returned = ResidentConstitutiveReturn::allocate(
+            s,
+            y + 1,
+            c,
+            self.joint.occurrence,
+            self.joint.source_chart,
+        )?;
+        let mut passage = s.begin_passage(&[vec![]])?;
+        {
+            let lane = passage.open(0, &[])?;
+            s.record_condition_image_receive(
+                &lane,
+                self.joint.report(),
+                self.joint.source_width,
+                c,
+                y,
+                &self.coverage,
+                observed,
+                &constraint,
+                &rhs,
+                returned.report(),
+            )?;
+        }
+        passage.close(0, returned.report(), 64)?;
+        let receipt = passage.finish()?.launch()?;
+        if !receipt.obstruction.is_empty() {
+            return Err(ConstitutiveFibreError::Arithmetic(format!(
+                "condition image reception: {:?}",
+                receipt.obstruction
+            )));
+        }
+        Ok((returned, constraint, rhs))
+    }
+}
+
 pub(super) fn read_coverage<'c>(
     surface: &ResidentSurface<'c>,
     section: &ResidentSection<'c>,
@@ -73,13 +198,7 @@ pub(super) fn read_coverage<'c>(
 
 pub struct ResidentConditionImage<'chart> {
     condition: ResidentConditionPreimage<'chart>,
-    joint: ResidentConstitutiveReturn<'chart>,
-    domain: ResidentConstitutiveReturn<'chart>,
-    output: ResidentConstitutiveReturn<'chart>,
-    constraint: ResidentSection<'chart>,
-    rhs: ResidentSection<'chart>,
-    coverage: ResidentSection<'chart>,
-    safe_current: ResidentSection<'chart>,
+    pub(super) data: AffineImageData<'chart>,
 }
 
 impl<'chart> ResidentConditionImage<'chart> {
@@ -87,48 +206,31 @@ impl<'chart> ResidentConditionImage<'chart> {
         &self.condition
     }
     pub fn relation_cut(&self) -> u64 {
-        self.joint.occurrence
+        self.data.joint.occurrence
     }
     /// This point port requires both complete condition coverage and one output. Its guard is
     /// native; a constant output on a strict subset cannot masquerade as a whole-family result.
     pub fn current(&self) -> ResidentConstitutiveCurrent<'_, 'chart> {
-        let width = self.output.target_width;
-        ResidentConstitutiveCurrent {
-            section: &self.safe_current,
-            offset: 0,
-            width,
-            denominator: Some(width),
-            disposition: Some(width + 1),
-        }
+        self.data.current()
     }
     pub fn read_differential_pairs(
         &self,
         first_complex: usize,
         pairs: usize,
     ) -> Result<ConstitutiveDifferentialReading, ConstitutiveFibreError> {
-        self.output
-            .read_differential_pairs_guarded(first_complex, pairs, Some(&self.coverage))
+        self.data.output.read_differential_pairs_guarded(
+            first_complex,
+            pairs,
+            Some(&self.data.coverage),
+        )
     }
     pub fn inspect(&self) -> Result<ConditionImageReading, ConstitutiveFibreError> {
-        let c = self.domain.target_width;
-        let w = self.joint.source_width;
-        let coverage = read_coverage(self.joint.surface, &self.coverage, c, w)?;
-        Ok(ConditionImageReading {
-            condition_width: c,
-            output_width: self.output.target_width,
-            coverage,
-            supported_conditions: self.domain.inspect()?.predecessor_reading,
-            supported_outputs: self.output.inspect()?.predecessor_reading,
-            joint: self.joint.inspect()?.predecessor_reading,
-        })
+        self.data.condition_reading()
     }
     pub fn inspect_constraints(
         &self,
     ) -> Result<(ResidentSectionRest, ResidentSectionRest), ConstitutiveFibreError> {
-        Ok((
-            self.joint.surface.detach_section(&self.constraint, 64)?,
-            self.joint.surface.detach_section(&self.rhs, 64)?,
-        ))
+        self.data.inspect_constraints()
     }
 
     /// A later observation restricts the same joint family. Full condition-domain coverage is
@@ -138,63 +240,33 @@ impl<'chart> ResidentConditionImage<'chart> {
         &self,
         observed: ResidentConstitutiveCurrent<'_, 'chart>,
     ) -> Result<ResidentConditionPreimage<'chart>, ConstitutiveFibreError> {
-        let s = self.joint.surface;
-        let c = self.domain.target_width;
-        let y = self.output.target_width;
-        if observed.width != y {
-            return Err(ConstitutiveFibreError::Shape);
-        }
-        let width = y
-            .checked_add(1)
-            .and_then(|n| n.checked_add(c))
-            .ok_or(ConstitutiveFibreError::Shape)?;
-        let scratch = width.checked_mul(32).ok_or(ConstitutiveFibreError::Shape)?;
-        if scratch > s.declaration().max_sectiond_bytes as usize {
-            return Err(ConstitutiveFibreError::ScratchAperture {
-                required: scratch,
-                available: s.declaration().max_sectiond_bytes,
-            });
-        }
-        let constraint = s.fresh_section(width, width, ResidentGrain(0))?;
-        let rhs = s.fresh_section(1, y + 2, ResidentGrain(0))?;
-        let returned = ResidentConstitutiveReturn::allocate(
-            s,
-            y + 1,
-            c,
-            self.joint.occurrence,
-            self.joint.source_chart,
-        )?;
-        let mut passage = s.begin_passage(&[vec![]])?;
-        {
-            let lane = passage.open(0, &[])?;
-            s.record_condition_image_receive(
-                &lane,
-                self.joint.report(),
-                self.joint.source_width,
-                c,
-                y,
-                &self.coverage,
-                observed,
-                &constraint,
-                &rhs,
-                returned.report(),
-            )?;
-        }
-        passage.close(0, returned.report(), 64)?;
-        let receipt = passage.finish()?.launch()?;
-        if !receipt.obstruction.is_empty() {
-            return Err(ConstitutiveFibreError::Arithmetic(format!(
-                "condition image reception: {:?}",
-                receipt.obstruction
-            )));
-        }
+        let (mut returned, constraint, rhs) = self.data.refine(observed)?;
+        returned.source_chart = self.condition.source_chart();
+        returned.occurrence = self.condition.relation_cut();
         Ok(ResidentConditionPreimage {
             inner: Rc::new(ConditionPreimageData {
                 returned,
                 constraint,
                 rhs,
-                action_target_width: y,
+                action_target_width: self.condition.inner.action_target_width,
             }),
+        })
+    }
+}
+
+impl<'chart> ResidentConditionPreimage<'chart> {
+    /// Compile the existing linear receiver over this complete condition family. The derived
+    /// image retains the original preimage data and all joint carriers; no point current is read.
+    pub fn read_image(
+        &self,
+        receiver: &ResidentConstitutiveFibre<'chart>,
+    ) -> Result<ResidentConditionImage<'chart>, ConstitutiveFibreError> {
+        let image = receiver.read_image(self.family())?;
+        Ok(ResidentConditionImage {
+            condition: ResidentConditionPreimage {
+                inner: Rc::clone(&self.inner),
+            },
+            data: image.data,
         })
     }
 }
@@ -228,7 +300,6 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
             || condition.source_chart() != self.source_chart
             || condition.inner.action_target_width != y
             || condition.inner.returned.target_width != c
-            || condition.inner.returned.source_width > w
         {
             return Err(ConstitutiveFibreError::Shape);
         }
@@ -294,13 +365,15 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
             condition: ResidentConditionPreimage {
                 inner: Rc::clone(&condition.inner),
             },
-            joint,
-            domain,
-            output,
-            constraint,
-            rhs,
-            coverage,
-            safe_current,
+            data: AffineImageData {
+                joint,
+                domain,
+                output,
+                constraint,
+                rhs,
+                coverage,
+                safe_current,
+            },
         })
     }
 }

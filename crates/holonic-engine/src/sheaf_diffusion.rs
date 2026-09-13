@@ -967,7 +967,8 @@ impl From<ExactLinearError> for SheafDiffusionError {
             | ExactLinearError::NonsquareMatrix
             | ExactLinearError::AddressOutside
             | ExactLinearError::ExtentOverflow
-            | ExactLinearError::ShapeMismatch => SheafDiffusionError::NonsquareOperator,
+            | ExactLinearError::ShapeMismatch
+            | ExactLinearError::DifferentProductCores => SheafDiffusionError::NonsquareOperator,
         }
     }
 }

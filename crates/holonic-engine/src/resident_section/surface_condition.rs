@@ -386,7 +386,8 @@ impl<'chart> ResidentSurface<'chart> {
             || k > u32::MAX as usize - 4
             || source.width != 2 * source_complex
             || condition_source_width == 0
-            || condition_source_width > w
+            || condition_source_width.checked_add(c).and_then(|n| n.checked_add(4))
+                .is_none_or(|n| n > u32::MAX as usize)
             || !shape(basis, w, Some(w))
             || !shape(condition, 1, report(condition_source_width, c))
             || !shape(graph, k, Some(k))

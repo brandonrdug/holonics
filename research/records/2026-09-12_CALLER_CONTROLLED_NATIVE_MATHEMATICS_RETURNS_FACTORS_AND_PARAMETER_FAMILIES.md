@@ -204,3 +204,115 @@ specific obstruction. The existing compiled-family map still uses its own admitt
 [historical] The first launch-count assertion counted four numerical operations but omitted
 their four closure kernels. The control was corrected to compare both complete passages;
 the runtime compiler itself did not change to satisfy that accounting correction.
+
+## Joint prospective release through the existing family owners
+
+[project-postulate] Parent `11dcb395`. Brandon's next-holon correction requires a prospective
+compound configuration or released section before its exterior token/coordinate decoder.
+This increment binds a complete source family to a shared multi-receiver action through the
+public mathematical session. It does not declare the prior character loop the HNN architecture.
+
+[definition] `BilinearRealization::join_receivers` takes ordered receivers with the **same
+actual retained product core**, stacks their decoders and re-derives the complete decoder
+family through the existing factorizer. It preserves block order and multiplicity. Equal
+dimensions or numerically equal independently constructed cores do not establish this join.
+The new `join-receivers` request returns the operator and ordered output extents; A/B resident
+factors are shared by the existing rebinding owner. The eight exact bilinear controls include
+complex, polynomial and repeated output blocks, and refusal of an unrelated core.
+
+[definition] `predict-condition` applies a retained linear action to the whole current native
+condition/source family. On first family use the session compiles a graph chart of the supplied
+immutable action with the existing native row calculus; subsequent uses reuse that graph.
+This is representation construction from an already supplied mathematical operator, not host
+inference of a source, a private learner or a conversion of an affine origin to a point.
+Failure of graph compilation leaves the existing point-packet operator available. Both setup
+and terminal decoding remain inside the request's reported cost.
+
+[definition] `ResidentConditionPreimage::read_image` now consumes the existing linear image's
+derived carriers while sharing the original immutable preimage data. It returns the existing
+`ResidentConditionImage`, which can be retained as the pending observation cut without a
+self-referential borrow. `observe-relation` restricts its joint family and publishes the
+returned original condition. The prototype still allows one pending cut per relation;
+unretained plural predictions remain available while it is pending.
+
+[definition] The two existing public image wrappers now use one internal `AffineImageData`
+owner for their resident joint/domain/output/coverage carriers, decoding, point guard and
+native refinement. Their source-provenance wrappers remain distinct. A downstream image
+restores its original condition's source chart, relation cut and action-target width on
+return. It does not inherit the derived linear receiver's chart as though that were the
+original bilinear source. This is consolidation in the implementation packet, not a new
+image hierarchy or a separately named prediction engine.
+
+[established-bounded; computational-witness] A 20-coordinate prospective observation can
+refine the original four-coordinate condition and then re-enter its original bilinear law.
+That exposed an obsolete residual-width assumption: the downstream observation's prefix can
+be wider than the original law's residual chart. The host and CUDA bounds now validate the
+actual prefix extent rather than imposing that unrelated width. For an empty condition, the
+image returns empty coverage while the original condition retains its complete obstruction;
+it no longer copies an oversized upstream residual into a smaller image prefix. The control
+also supplies an inconsistent downstream observation and verifies the retained obstruction.
+
+[proved-derived; formal-checked] `GeneratorFactorization.joined_receiver_factorization`
+binds the stacked-receiver matrix identity to the existing core factorization. The new
+`ReceiverPotential.image_receiver_restriction` proves
+
+`J(F ∩ (R∘J)⁻¹(A)) = J(F) ∩ R⁻¹(A)`.
+
+No injectivity, selected source or singleton future is assumed; F or the target region A may
+be empty. Thus restricting a supplied landing/receiver constraint and reading the joint future
+agree at the full-family level. Existing `outcomes_map`, `JointReceiverDescent`, released-motion
+composition and fixed-right compilation supply the adjacent source/transport laws. The
+runtime bridge is presently their affine linear-image realization, not an affine replacement
+for arbitrary nonlinear joint images.
+
+[established-bounded; implemented-exact; computational-witness] The public-stream application
+uses the existing `ConstantAccelerationRelease` with a declared planar SI chart, mass 2 and
+uniform acceleration `(0,-10)`. Its source is `(position, velocity, acceleration, impulse)`;
+position `(0,1)`, velocity `(0,0)` and acceleration are supplied, while impulse is unresolved.
+Release and the two flows at times `1/2` and `1` compile through the same core into a twelve-
+coordinate prospective state family. Its two independent directions couple both future states.
+Their RREF affine origin is not selected as a physical prediction.
+
+[established-bounded; computational-witness] Before determining the impulse, the joint
+receiver already returns the exact position relation
+`position(1) - 2 position(1/2) = (0,-7/2)`.
+Supplying the landing constraint `(4,1)` then infers impulse `(8,10)`, with future states
+`(2,9/4,4,0,0,-10)` and `(4,1,4,-5,0,-10)`, ordered as `(x,y,vx,vy,ax,ay)`.
+The inferred impulse also re-enters the original bilinear relation. These are native
+family predictions and source synthesis, not an exact source selected before prediction,
+independent coordinate guesses, or a stored trajectory replay.
+
+[established-bounded; process-audit] The existing `predictive_release` application now offers
+`--native-requests [target-x target-y]`. This branch emits the supplied law, receiver graph
+and landing constraint as ordinary HNN JSONL requests; it does not run the host impulse solver.
+Piping it through the built `holonics hna mathematical-session --input -` completed all 19
+stream commands for the default target and for the independently supplied target `(6,1)`.
+The latter returned impulse `(12,10)` and future states
+`(3,9/4,6,0,0,-10)` and `(6,1,6,-5,0,-10)` without source edits. The process receivers
+reported 0.467 s and 0.428 s respectively on these warm runs; those are scoped process
+measurements, not general inference benchmarks. No native operation is implemented in the
+example emitter or the terminal JSON filter.
+
+[established-bounded; process-audit] Completed verification:
+
+- Nine mathematical-stream tests passed, including the new joint release, wider observation,
+  existing parameter inference and resident composition/refusal cases. The 224.50 s run
+  included CPU-active first-use initialization; the earlier focused release check took 0.38 s.
+- Fifty-four resident family/image/preimage/contact/neighborhood controls passed in 13.79 s.
+- Eight exact bilinear tests passed in 0.20 s. The final common-reader factoring also passed
+  five generic image controls (1.82 s) and eight conditional-image controls (2.57 s). An
+  accidentally overlapping attempt failed one allocation calibration before its mathematical
+  operation; that attempt is not counted as a pass, and the isolated rerun completed.
+- Both changed Lean sources passed their focused checks. `image_receiver_restriction` uses
+  only the standing `propext`, `Classical.choice`, `Quot.sound` axioms; the matrix join invokes
+  Mathlib's `Matrix.fromRows_mul`. Existing tactic suggestions in the factorization file do
+  not change the successful exit status.
+- `cargo check --workspace --lib --bins` passed, including consumers of the new explicit
+  different-core error. The release example and workbench binary built; both actual CLI
+  application outputs above were inspected.
+
+[open] The next consumer is a learned contextual/anchored generator family, with its original
+source bounds and phase retained through the prospective receiver and multi-part decoder.
+This returned affine mathematical application does not finish general nonlinear/conditional
+programme compilation, contextual-language/code usefulness, or the full HNN product goal.
+No additional character-only exposure or endpoint research campaign replaces that binding.

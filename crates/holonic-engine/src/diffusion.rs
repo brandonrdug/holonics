@@ -627,6 +627,7 @@ impl From<ExactLinearError> for DiffusionError {
             | ExactLinearError::AddressOutside
             | ExactLinearError::ExtentOverflow
             | ExactLinearError::ShapeMismatch
+            | ExactLinearError::DifferentProductCores
             | ExactLinearError::NonsquareMatrix => DiffusionError::MalformedOperator,
         }
     }

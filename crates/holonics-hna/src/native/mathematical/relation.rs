@@ -93,6 +93,32 @@ impl<'c> NativeConditionRelation<'c> {
             .as_ref()
             .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
         let image = self.law.read_condition_image(source, condition)?;
+        self.retain_image(image, retain)
+    }
+
+    /// Transport the whole live source/condition family through a compiled prospective action.
+    /// Its output may have any declared width; one shared family supplies every component.
+    pub fn predict_through(
+        &mut self,
+        operator: &ResidentConstitutiveFibre<'c>,
+        retain: bool,
+    ) -> Result<(Option<u64>, ConditionImageReading), ConstitutiveFibreError> {
+        if retain && self.pending.is_some() {
+            return Err(ConstitutiveFibreError::ForeignOccurrence);
+        }
+        let condition = self
+            .condition
+            .as_ref()
+            .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
+        let image = condition.read_image(operator)?;
+        self.retain_image(image, retain)
+    }
+
+    fn retain_image(
+        &mut self,
+        image: ResidentConditionImage<'c>,
+        retain: bool,
+    ) -> Result<(Option<u64>, ConditionImageReading), ConstitutiveFibreError> {
         let reading = image.inspect()?;
         let id = if retain {
             let id = self.next_prediction;

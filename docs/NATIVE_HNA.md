@@ -18,7 +18,8 @@ holonics hna mathematical-session --input applications/holonics-workbench/exampl
 [definition] Use `org.holonics.hna.stream-request.v1` with command action
 `mathematical-request`; the `request.operation` selects `construct-linear`,
 `construct-bilinear`, `resume-construction`, `apply`, `bind-receiver`, `compose-receiver`,
-`read-product`, `construct-relation`, `predict-relation`, `observe-relation`,
+`read-product`, `compose`, `join-receivers`, `construct-relation`, `predict-relation`,
+`predict-condition`, `observe-relation`,
 `inspect-condition` or the explicit release operations. The public Rust enum
 `MathematicalRequest` owns the exact payload. Rational fields use the existing
 `{"numerator":"1","denominator":"3"}` codec, never JSON floating-point coefficients.
@@ -43,6 +44,29 @@ it shares the resident input factors. The [updated example](../applications/holo
 uses that compiled construction. The complete [scope and checks](../research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md#resident-composition-and-fixed-section-compilation)
 distinguish fixed-section compilation from general variable-condition continuation.
 
+[definition] `join-receivers` takes ordered operator IDs which share the same retained core.
+It stacks their receivers and reports output-block extents; repeated receivers preserve their
+multiplicity. `predict-condition` takes `relation`, `operator` and optional `retain_prediction`.
+For a declared linear operator it returns the whole condition/source family's joint image,
+including correlations among output blocks. `observe-relation` can refine this image using a
+supplied output constraint, preserving the original condition port for subsequent uses.
+The first family use compiles an immutable graph chart of the supplied operator using native
+row intake; subsequent family uses reuse it. The reported request cost includes that setup.
+
+[definition] The existing release application can emit a complete request stream instead of
+solving its impulse on the host. After building that example and the workbench, run:
+
+```sh
+target/debug/examples/predictive_release --native-requests | target/debug/holonics hna mathematical-session --input -
+```
+
+It prepares position, velocity and gravity while leaving impulse unresolved; joins two future
+state receivers; reads their joint cross-time relation; supplies a landing constraint; and
+reads the refined joint future. Optional target coordinates follow `--native-requests`, for
+example `--native-requests 6 1`. This uses the declared two-dimensional weak-field constant-
+acceleration chart, SI units, mass 2 and receiving times 1/2 and 1. The compiled graph and
+family prediction are callable through the ordinary session, not an example-local learner.
+
 [definition] `ResidentConstitutiveFibre` retains a rational relation between declared source and
 receiver currents. `found_bilinear_contact` includes actual source, condition and mixed complex
 products in that relation. `advance_resident` / `advance_bilinear_contact` accept resident current
@@ -62,6 +86,13 @@ the actual borrowed source/receiver, joint input/output fibre and source-domain 
 `ResidentConditionPreimage::refined_by` returns the new constraints to the original condition
 port only when the actual source object matches. The existing condition-current contact then
 changes actual standing and later conduct, preserving its unmeasured component.
+
+[definition] `ResidentConditionPreimage::read_image` owns the corresponding derived image
+without borrowing a movable session field. Conditional and general image wrappers share
+one internal `AffineImageData` owner for resident carriers, decoding, point guards and native
+refinement. A differently shaped downstream observation retains the original source chart,
+relation cut and action-target width; its residual-prefix width need not equal that original
+law's width. An empty image keeps the complete original obstruction in its retained source.
 
 [definition] An image's `output` is its supported marginal; its unqualified point port also
 requires full source coverage. The original source, joint fibre and partial-domain witness

@@ -851,6 +851,8 @@ pub enum RebaseReceipt {
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
 pub enum ExactLinearError {
+    #[error("joint receivers do not share the same retained product core")]
+    DifferentProductCores,
     #[error("an exact matrix cannot have ragged rows")]
     RaggedMatrix,
     #[error("an exact matrix address lies outside its shape")]

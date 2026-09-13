@@ -1327,7 +1327,8 @@ impl From<ExactLinearError> for InverseTransportError {
             | ExactLinearError::NonsquareMatrix
             | ExactLinearError::AddressOutside
             | ExactLinearError::ExtentOverflow
-            | ExactLinearError::ShapeMismatch => InverseTransportError::MalformedMatrix,
+            | ExactLinearError::ShapeMismatch
+            | ExactLinearError::DifferentProductCores => InverseTransportError::MalformedMatrix,
         }
     }
 }

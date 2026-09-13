@@ -1,6 +1,6 @@
 //! Serial affine current-family transport through existing local relations. The retained joint
 //! input/output carrier records the joining fibre; no particular member is selected to compose.
-use super::condition_image::{ConditionCoverage, read_coverage};
+use super::condition_image::{AffineImageData, ConditionCoverage};
 use super::*;
 
 /// Actual borrowed producing relation, not equality inferred from endpoint values or cuts.
@@ -27,13 +27,7 @@ pub struct ConstitutiveImageReading {
 pub struct ResidentConstitutiveImage<'a, 'c> {
     source: &'a ResidentConstitutiveReturn<'c>,
     receiver: ConstitutiveImageReceiver<'a, 'c>,
-    joint: ResidentConstitutiveReturn<'c>,
-    domain: ResidentConstitutiveReturn<'c>,
-    output: ResidentConstitutiveReturn<'c>,
-    constraint: ResidentSection<'c>,
-    rhs: ResidentSection<'c>,
-    coverage: ResidentSection<'c>,
-    safe: ResidentSection<'c>,
+    pub(super) data: AffineImageData<'c>,
 }
 impl<'a, 'c> ResidentConstitutiveImage<'a, 'c> {
     pub fn source(&self) -> &ResidentConstitutiveReturn<'c> {
@@ -43,59 +37,39 @@ impl<'a, 'c> ResidentConstitutiveImage<'a, 'c> {
         &self.receiver
     }
     pub fn joint(&self) -> &ResidentConstitutiveReturn<'c> {
-        &self.joint
+        &self.data.joint
     }
     /// Supported output marginal. Check coverage before claiming it represents every supplied
     /// source; the joint carrier and original source remain available on this image.
     pub fn output(&self) -> &ResidentConstitutiveReturn<'c> {
-        &self.output
+        &self.data.output
     }
     /// Consume this derived image into its output relation and affine-domain receipt. Callers
     /// that carry additional constraints must retain those alongside the returned family.
     pub(crate) fn into_output(self) -> (ResidentConstitutiveReturn<'c>, ResidentSection<'c>) {
-        (self.output, self.coverage)
+        (self.data.output, self.data.coverage)
     }
 
     /// The point port requires full source coverage and a unique output, not a unique input.
     pub fn current(&self) -> ResidentConstitutiveCurrent<'_, 'c> {
-        ResidentConstitutiveCurrent {
-            section: &self.safe,
-            offset: 0,
-            width: self.output.target_width,
-            denominator: Some(self.output.target_width),
-            disposition: Some(self.output.target_width + 1),
-        }
+        self.data.current()
     }
     pub fn read_differential_pairs(
         &self,
         first: usize,
         pairs: usize,
     ) -> Result<ConstitutiveDifferentialReading, ConstitutiveFibreError> {
-        self.output
-            .read_differential_pairs_guarded(first, pairs, Some(&self.coverage))
+        self.data
+            .output
+            .read_differential_pairs_guarded(first, pairs, Some(&self.data.coverage))
     }
     pub fn inspect(&self) -> Result<ConstitutiveImageReading, ConstitutiveFibreError> {
-        Ok(ConstitutiveImageReading {
-            source_return_cut: self.source.occurrence,
-            receiver_cut: self.joint.occurrence,
-            coverage: read_coverage(
-                self.joint.surface,
-                &self.coverage,
-                self.domain.target_width,
-                self.joint.source_width,
-            )?,
-            supported_source: self.domain.inspect()?.predecessor_reading,
-            output: self.output.inspect()?.predecessor_reading,
-            joint: self.joint.inspect()?.predecessor_reading,
-        })
+        self.data.generic_reading(self.source)
     }
     pub fn inspect_constraints(
         &self,
     ) -> Result<(ResidentSectionRest, ResidentSectionRest), ConstitutiveFibreError> {
-        Ok((
-            self.joint.surface.detach_section(&self.constraint, 64)?,
-            self.joint.surface.detach_section(&self.rhs, 64)?,
-        ))
+        self.data.inspect_constraints()
     }
     /// Restrict the original joint fibre by an actual downstream observation. This does not
     /// choose an earlier source or add a row to either learned law. Full-domain coverage is
@@ -104,59 +78,9 @@ impl<'a, 'c> ResidentConstitutiveImage<'a, 'c> {
         &'r self,
         observed: ResidentConstitutiveCurrent<'r, 'c>,
     ) -> Result<ResidentConstitutiveRefinement<'r, 'c>, ConstitutiveFibreError> {
-        let surface = self.joint.surface;
-        let c = self.domain.target_width;
-        let y = self.output.target_width;
-        if observed.width != y {
-            return Err(ConstitutiveFibreError::Shape);
-        }
-        let width = c
-            .checked_add(y)
-            .and_then(|n| n.checked_add(1))
-            .ok_or(ConstitutiveFibreError::Shape)?;
-        let scratch = width.checked_mul(32).ok_or(ConstitutiveFibreError::Shape)?;
-        let available = surface.declaration().max_sectiond_bytes;
-        if scratch > available as usize {
-            return Err(ConstitutiveFibreError::ScratchAperture {
-                required: scratch,
-                available,
-            });
-        }
-        let constraint = surface.fresh_section(width, width, ResidentGrain(0))?;
-        let rhs = surface.fresh_section(1, y + 2, ResidentGrain(0))?;
-        let returned = ResidentConstitutiveReturn::allocate(
-            surface,
-            y + 1,
-            c,
-            self.joint.occurrence,
-            ConstitutiveSourceChart::Linear,
-        )?;
-        let mut passage = surface.begin_passage(&[vec![]])?;
-        {
-            let lane = passage.open(0, &[])?;
-            surface.record_condition_image_receive(
-                &lane,
-                self.joint.report(),
-                self.joint.source_width,
-                c,
-                y,
-                &self.coverage,
-                observed,
-                &constraint,
-                &rhs,
-                returned.report(),
-            )?;
-        }
-        passage.close(0, returned.report(), 64)?;
-        let receipt = passage.finish()?.launch()?;
-        if !receipt.obstruction.is_empty() {
-            return Err(ConstitutiveFibreError::Arithmetic(format!(
-                "joint source refinement: {:?}",
-                receipt.obstruction
-            )));
-        }
+        let (returned, constraint, rhs) = self.data.refine(observed)?;
         Ok(ResidentConstitutiveRefinement {
-            joint: &self.joint,
+            joint: &self.data.joint,
             source: self.source,
             observed,
             returned,
@@ -297,13 +221,15 @@ pub(super) fn image<'a, 'c>(
     Ok(ResidentConstitutiveImage {
         source,
         receiver,
-        joint,
-        domain,
-        output,
-        constraint,
-        rhs,
-        coverage,
-        safe,
+        data: AffineImageData {
+            joint,
+            domain,
+            output,
+            constraint,
+            rhs,
+            coverage,
+            safe_current: safe,
+        },
     })
 }
 impl<'c> ResidentConstitutiveFibre<'c> {

@@ -1357,7 +1357,8 @@ impl From<ExactLinearError> for GenerativeTransportError {
             ExactLinearError::RaggedMatrix
             | ExactLinearError::NonsquareMatrix
             | ExactLinearError::AddressOutside
-            | ExactLinearError::ShapeMismatch => GenerativeTransportError::MalformedMatrix,
+            | ExactLinearError::ShapeMismatch
+            | ExactLinearError::DifferentProductCores => GenerativeTransportError::MalformedMatrix,
         }
     }
 }

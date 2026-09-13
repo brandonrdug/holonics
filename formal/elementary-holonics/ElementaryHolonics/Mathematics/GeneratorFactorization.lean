@@ -87,6 +87,15 @@ evaluated on the same `θ i * θ j` coordinates.  The statement is an algebraic 
 it does not describe a material update or a successor transaction.
 -/
 
+omit [Fintype ι] in
+/-- Stacking receiver blocks preserves their single source encoding. This is the
+matrix identity used by `BilinearRealization::join_receivers`; no new core is formed. -/
+theorem joined_receiver_factorization {ω₁ ω₂ : Type*}
+    (first : Matrix ω₁ ρ R) (second : Matrix ω₂ ρ R) (encoding : Matrix ρ ι R) :
+    Matrix.fromRows first second * encoding =
+      Matrix.fromRows (first * encoding) (second * encoding) := by
+  exact Matrix.fromRows_mul first second encoding
+
 theorem sharedAffineBilinearExpansion
     (F : R → R → R)
     (hleft : ∀ x y z, F (x + y) z = F x z + F y z)

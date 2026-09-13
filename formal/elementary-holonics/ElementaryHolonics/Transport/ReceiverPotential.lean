@@ -93,6 +93,16 @@ theorem additional_observation_refines {Source Observation Additional Result : T
   rintro result ⟨source, hresult⟩
   exact ⟨⟨source.1, congrArg Prod.fst source.2⟩, hresult⟩
 
+/- A prospective receiver can impose a target region as well as an actual observation.
+   The complete joint image refines exactly; neither source injectivity nor singleton
+   futures are required. Empty source/target fibres remain empty in the same identity. -/
+theorem image_receiver_restriction {Source Result Reading : Type*}
+    (family : Set Source) (future : Source → Result) (receiver : Result → Reading)
+    (target : Set Reading) :
+    future '' (family ∩ (receiver ∘ future) ⁻¹' target) =
+      future '' family ∩ receiver ⁻¹' target := by
+  exact Set.image_inter_preimage future family (receiver ⁻¹' target)
+
 /-- The same observed value in a source chart transported by an explicit equivalence. -/
 def rebaseObservation {Source Target Observation : Type*}
     (rebase : Source ≃ Target) (entering : Source → Observation)
@@ -223,6 +233,7 @@ section Audit
 open Soma.Holonics.Transport.ReceiverPotential
 #print axioms mem_outcomes_iff
 #print axioms outcomes_nonempty
+#print axioms image_receiver_restriction
 #print axioms outcomes_map
 #print axioms outcomes_singleton_of_factor
 #print axioms additional_observation_refines

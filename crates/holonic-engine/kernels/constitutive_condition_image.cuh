@@ -59,7 +59,7 @@ extern "C" __global__ void section_constitutive_condition_image(
 ){
     if(blockIdx.x || threadIdx.x)return;if(upstream_refused(census,lineage,lineage_count,slot))return;
     uint64_t sw64=2u*((uint64_t)ns+nc+(uint64_t)ns*nc),w64=sw64+y,k64=w64+2u*nc+y;
-    if(!ns || !nc || !y || y%2 || k64>UINT32_MAX-4u || !ps || ps>w64){atomicOr(slot,REFUSED_MALFORMED);return;}
+    if(!ns || !nc || !y || y%2 || k64>UINT32_MAX-4u || !ps || (uint64_t)ps+2u*nc>UINT32_MAX-4u){atomicOr(slot,REFUSED_MALFORMED);return;}
     uint32_t sw=(uint32_t)sw64,w=(uint32_t)w64,c=2u*nc,joint_target=c+y,k=(uint32_t)k64,pk=ps+c;
     size_t pf_words=(size_t)pk+4+(size_t)c*c;
     for(size_t i=0;i<pf_words;++i)if(pf[i]!=pf_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
@@ -76,9 +76,9 @@ extern "C" __global__ void section_constitutive_condition_image(
     for(uint32_t i=0;i<y+2;++i)safe[i]=safe_hi[i]=0;safe[y]=safe_hi[y]=1;safe[y+1]=safe_hi[y+1]=1;
     if(pf[pk+1]==1){
         coverage[0]=coverage_hi[0]=3;
-        for(uint32_t i=0;i<ps;++i)joint[i]=joint_hi[i]=domain[i]=domain_hi[i]=out[i]=out_hi[i]=rhs[i]=rhs_hi[i]=pf[i];
-        rhs[w]=rhs_hi[w]=pf[pk];
-        joint[k]=joint_hi[k]=domain[w+c]=domain_hi[w+c]=out[w+y]=out_hi[w+y]=pf[pk];
+        // The original condition owns its complete upstream remainder. A downstream
+        // observation can have a wider residual chart than this law; do not copy that
+        // unrelated prefix into the image's smaller source chart. The image is empty.
         return;
     }
     // Build graph rows (P_R(variation), condition variation, output variation).

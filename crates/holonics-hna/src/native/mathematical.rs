@@ -11,14 +11,14 @@ use holonic_engine::{
     },
     native_ecology::constitutive_fibre::{
         ConditionCoverage, ConditionImageReading, ConditionPreimageReading,
-        ResidentConstitutiveCurrent,
+        ResidentConstitutiveCurrent, ResidentConstitutiveFibre,
     },
     resident_section::{
         ResidentBilinearMap, ResidentBilinearReturn, ResidentSection, ResidentSurface,
     },
 };
 use num_rational::BigRational;
-use num_traits::One;
+use num_traits::{One, Zero};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::{collections::BTreeMap, sync::Arc, time::Instant};
@@ -109,6 +109,13 @@ pub enum MathematicalRequest {
         #[serde(default)]
         retain_prediction: bool,
     },
+    /// Apply a retained linear action to the whole current condition/source family.
+    PredictCondition {
+        relation: u64,
+        operator: u64,
+        #[serde(default)]
+        retain_prediction: bool,
+    },
     ObserveRelation {
         relation: u64,
         prediction: u64,
@@ -171,6 +178,10 @@ pub enum MathematicalRequest {
         #[serde(default)]
         right: Option<Vec<RationalWire>>,
     },
+    /// Ordered output blocks sharing one retained core, without recomputing each branch.
+    JoinReceivers {
+        operators: Vec<u64>,
+    },
     ReadProduct {
         operator: u64,
         product: u64,
@@ -190,6 +201,53 @@ struct Operator<'c> {
     realization: BilinearRealization,
     native: ResidentBilinearMap<'c>,
     linear: bool,
+    // A lazily compiled graph chart of the same supplied action, for full-family images.
+    // Failure to compile this receiver does not revoke the existing point-packet operator.
+    family: Option<ResidentConstitutiveFibre<'c>>,
+}
+
+impl<'c> Operator<'c> {
+    fn family(
+        &mut self,
+        surface: &'c ResidentSurface<'c>,
+    ) -> Result<&ResidentConstitutiveFibre<'c>, NativeSessionError> {
+        if !self.linear {
+            return Err(invalid("a family action requires the declared unit-right linear chart; fix the other bilinear port before this use"));
+        }
+        if self.family.is_none() {
+            // Exterior compilation of the already supplied immutable action, not a host
+            // prediction or a learner. Existing native row calculus builds its graph from
+            // the declared columns; every later family image/refinement remains resident.
+            let matrix = self
+                .realization
+                .receiver()
+                .particular
+                .multiply(self.realization.core().tensor_image())
+                .map_err(invalid)?;
+            let mut graph =
+                ResidentConstitutiveFibre::found(surface, matrix.columns(), matrix.rows())?;
+            for column in 0..matrix.columns() {
+                let mut unit = vec![BigRational::zero(); matrix.columns()];
+                unit[column] = BigRational::one();
+                let source = surface
+                    .mount_exact_rational_packet(&unit)
+                    .map_err(invalid)?;
+                let values = (0..matrix.rows())
+                    .map(|row| matrix.get(row, column).cloned())
+                    .collect::<Result<Vec<_>, _>>()
+                    .map_err(invalid)?;
+                let target = surface
+                    .mount_exact_rational_packet(&values)
+                    .map_err(invalid)?;
+                graph.advance_resident(
+                    ResidentConstitutiveCurrent::rational(&source)?,
+                    Some(ResidentConstitutiveCurrent::rational(&target)?),
+                )?;
+            }
+            self.family = Some(graph);
+        }
+        Ok(self.family.as_ref().expect("completed graph compilation"))
+    }
 }
 
 fn emit_by_default() -> bool {
@@ -410,6 +468,7 @@ impl<'c> NativeMathematicalSession<'c> {
                 realization,
                 native,
                 linear,
+                family: None,
             },
         );
         self.next_operator = next;
@@ -529,6 +588,32 @@ impl<'c> NativeMathematicalSession<'c> {
                 Ok(
                     json!({"status":"relation-predicted", "relation":relation, "prediction":prediction, "reading":image_wire(reading),
                     "source":source, "scope":"full joint condition/output image; no selected condition representative"}),
+                )
+            }
+            MathematicalRequest::PredictCondition {
+                relation,
+                operator,
+                retain_prediction,
+            } => {
+                let owner = self
+                    .relations
+                    .get_mut(relation)
+                    .ok_or_else(|| invalid("unknown relation"))?;
+                if *retain_prediction && owner.pending_id().is_some() {
+                    return Err(invalid("this relation already retains an observation cut; observe or explicitly release it first"));
+                }
+                let op = self
+                    .operators
+                    .get_mut(operator)
+                    .ok_or_else(|| invalid("unknown operator"))?;
+                let compiled_now = op.family.is_none();
+                let (prediction, reading) =
+                    owner.predict_through(op.family(self.surface)?, *retain_prediction)?;
+                Ok(
+                    json!({"status":"family-predicted", "relation":relation, "operator":operator,
+                    "prediction":prediction, "reading":image_wire(reading),
+                    "family_graph_compiled":compiled_now,
+                    "scope":"joint prospective output of one complete source/condition family; no source representative selected"}),
                 )
             }
             MathematicalRequest::ObserveRelation {
@@ -759,6 +844,33 @@ impl<'c> NativeMathematicalSession<'c> {
                 let mut result = self.publish_rebinding(*operator, realization)?;
                 result["composition"] = json!({"first":operator,"following":following,
                     "following_right":row_wire(&fixed),"scope":"the following fixed-right section is compiled into the first core receiver"});
+                Ok(result)
+            }
+            MathematicalRequest::JoinReceivers { operators } => {
+                let (&first_id, rest) = operators.split_first().ok_or_else(|| {
+                    invalid("joint receiver requires at least one retained operator")
+                })?;
+                let first = self
+                    .operators
+                    .get(&first_id)
+                    .ok_or_else(|| invalid("unknown first receiver"))?;
+                let others = rest
+                    .iter()
+                    .map(|id| {
+                        self.operators
+                            .get(id)
+                            .map(|op| &op.realization)
+                            .ok_or_else(|| invalid("unknown receiver"))
+                    })
+                    .collect::<Result<Vec<_>, _>>()?;
+                let extents = std::iter::once(&first.realization)
+                    .chain(others.iter().copied())
+                    .map(|op| op.receiver().particular.rows())
+                    .collect::<Vec<_>>();
+                let realization = first.realization.join_receivers(&others).map_err(invalid)?;
+                let mut result = self.publish_rebinding(first_id, realization)?;
+                result["joint_receiver"] = json!({"operators":operators, "output_extents":extents,
+                    "scope":"ordered receiver blocks of the same retained product core"});
                 Ok(result)
             }
             MathematicalRequest::ReadProduct { operator, product } => {

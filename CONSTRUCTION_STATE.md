@@ -10,6 +10,21 @@ targeted development and product checks on the repaired path proceed within the 
 
 ## Immediate implementation
 
+[established-bounded; implemented-exact; computational-witness] The
+[joint prospective application](research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md#joint-prospective-release-through-the-existing-family-owners)
+now returns through the public stream: `join-receivers` shares an actual core and
+`predict-condition` transports the complete source family. Unresolved impulse yields correlated
+future states and a fixed cross-time relation; landing constraints `(4,1)` and `(6,1)` infer
+impulses `(8,10)` and `(12,10)` through the CLI. General and conditional image storage, decoding
+and refinement are consolidated. Nine stream, 54 resident and eight exact bilinear controls,
+two formal sources and the workspace host check passed at their recorded scopes.
+
+[open] Bind this prospective return to the learned contextual/anchored generator families
+and their multi-part output decoder, preserving original bounds and phase rather than taking
+an affine hull or point representative. The supplied affine release application has returned;
+general nonlinear/conditional compilation and useful contextual-language/code products remain
+active. More character-only exposure is not the next implementation step.
+
 [established-bounded; computational-witness] The
 [first real-source trials](research/records/2026-09-12_CONTEXTUAL_RECEPTION_AND_NORMALIZATION_REUSE_THEIR_SHARED_NATIVE_OWNERS.md#real-source-development-and-transport-bound-repair)
 now include actual output: the next-current route completed 166 observations and emitted

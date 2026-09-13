@@ -48,29 +48,33 @@ fn output(value: &Value) -> Vec<BigRational> {
 }
 
 fn calibrated_sum_products() -> MathematicalRequest {
+    calibrated_dot(2, &[2, 3])
+}
+fn calibrated_dot(complex: usize, initial: &[i64]) -> MathematicalRequest {
     // Caller-supplied chart F(x,h)=x0*h0+x1*h1. These rows specify the action;
     // h remains unknown. Inference of h is performed by the native joint-image owner.
     let mut calibration = Vec::new();
-    for axis in 0..4 {
-        let mut basis = [0; 4];
+    let width = 2 * complex;
+    for axis in 0..width {
+        let mut basis = vec![0; width];
         basis[axis] = 1;
         calibration.push(RelationCalibrationWire {
-            source: row(&[0; 4]),
+            source: row(&vec![0; width]),
             condition: row(&basis),
             observed: row(&[0, 0]),
         });
         calibration.push(RelationCalibrationWire {
             source: row(&basis),
-            condition: row(&[0; 4]),
+            condition: row(&vec![0; width]),
             observed: row(&[0, 0]),
         });
     }
-    for i in 0..2 {
-        for j in 0..2 {
+    for i in 0..complex {
+        for j in 0..complex {
             for phase in 0..2 {
-                let mut source = [0; 4];
+                let mut source = vec![0; width];
                 source[2 * i + phase] = 1;
-                let mut condition = [0; 4];
+                let mut condition = vec![0; width];
                 condition[2 * j] = 1;
                 let mut observed = [0; 2];
                 if i == j {
@@ -84,14 +88,317 @@ fn calibrated_sum_products() -> MathematicalRequest {
             }
         }
     }
+    let mut initial_source = vec![0; width];
+    initial_source[0] = 1;
     MathematicalRequest::ConstructRelation {
-        source_complex: 2,
-        condition_complex: 2,
+        source_complex: complex,
+        condition_complex: complex,
         target_complex: 1,
         calibration,
-        initial_source: row(&[1, 0, 0, 0]),
-        initial_observed: row(&[2, 3]),
+        initial_source: row(&initial_source),
+        initial_observed: row(initial),
     }
+}
+
+#[test]
+#[ignore = "requires CUDA; one uncertain release source produces a joint future and is refined by a landing"]
+fn public_joint_release_predicts_correlated_futures_before_selecting_a_source() {
+    use holonic_engine::exact_linear::ConstantAccelerationRelease;
+    with_mathematical_session(|session| {
+        let mut stream = HnaStream::new();
+        // One SI chart: h=(position, velocity, acceleration, impulse), each a planar
+        // complex pair. Initial position is (0,1); velocity and gravity are supplied
+        // by observations of the same calibration law, while impulse remains unknown.
+        let declared = send(session, &mut stream, calibrated_dot(4, &[0, 1]));
+        assert_eq!(declared["event"], "mathematical-return", "{declared}");
+        for (axis, value) in [(1, [0, 0]), (2, [0, -10])] {
+            let mut source = vec![0; 8];
+            source[2 * axis] = 1;
+            let p = send(
+                session,
+                &mut stream,
+                MathematicalRequest::PredictRelation {
+                    relation: 0,
+                    source: MathematicalInputWire::Values {
+                        values: row(&source),
+                    },
+                    retain_prediction: true,
+                },
+            );
+            let observed = send(
+                session,
+                &mut stream,
+                MathematicalRequest::ObserveRelation {
+                    relation: 0,
+                    prediction: p["value"]["prediction"].as_u64().unwrap(),
+                    observed: row(&value),
+                },
+            );
+            assert_eq!(observed["event"], "mathematical-return", "{observed}");
+        }
+        let motion =
+            ConstantAccelerationRelease::new(2, BigRational::from_integer(2.into())).unwrap();
+        let release = send(
+            session,
+            &mut stream,
+            MathematicalRequest::ConstructLinear {
+                coefficients: matrix_wire(&motion.release().unwrap()),
+            },
+        )["value"]["operator"]
+            .as_u64()
+            .unwrap();
+        let mut futures = Vec::new();
+        for t in [BigRational::new(1.into(), 2.into()), BigRational::one()] {
+            let flow = send(
+                session,
+                &mut stream,
+                MathematicalRequest::ConstructLinear {
+                    coefficients: matrix_wire(&motion.flow(&t).unwrap()),
+                },
+            )["value"]["operator"]
+                .as_u64()
+                .unwrap();
+            let composed = send(
+                session,
+                &mut stream,
+                MathematicalRequest::Compose {
+                    operator: release,
+                    following: flow,
+                    right: None,
+                },
+            );
+            assert_eq!(composed["event"], "mathematical-return", "{composed}");
+            futures.push(composed["value"]["operator"].as_u64().unwrap());
+        }
+        let joined = send(
+            session,
+            &mut stream,
+            MathematicalRequest::JoinReceivers {
+                operators: futures.clone(),
+            },
+        );
+        assert_eq!(joined["event"], "mathematical-return", "{joined}");
+        assert_eq!(
+            joined["value"]["joint_receiver"]["output_extents"],
+            json!([6, 6])
+        );
+        let operator = joined["value"]["operator"].as_u64().unwrap();
+        let predict = |session: &mut NativeMathematicalSession<'_>,
+                       stream: &mut HnaStream,
+                       operator,
+                       retain_prediction| {
+            send(
+                session,
+                stream,
+                MathematicalRequest::PredictCondition {
+                    relation: 0,
+                    operator,
+                    retain_prediction,
+                },
+            )
+        };
+        let before = predict(session, &mut stream, operator, false);
+        assert_eq!(before["event"], "mathematical-return", "{before}");
+        assert_eq!(before["value"]["reading"]["coverage"]["kind"], "complete");
+        let family = &before["value"]["reading"]["supported_outputs"];
+        assert_eq!(family["kind"], "plural", "{family}");
+        assert_eq!(family["directions"].as_array().unwrap().len(), 2);
+        assert_eq!(before["value"]["reading"]["output_width"], 12);
+        let condition_before = session.relations[&0].condition().unwrap().inspect()?;
+        // The same two unknown impulse components produce both futures. Their joint
+        // predicts this exact cross-time relation even though both positions are plural.
+        let mut relation_rows = vec![vec![BigRational::zero(); 12]; 2];
+        for i in 0..2 {
+            relation_rows[i][i] = BigRational::from_integer((-2).into());
+            relation_rows[i][6 + i] = BigRational::one();
+        }
+        let difference = send(
+            session,
+            &mut stream,
+            MathematicalRequest::ComposeReceiver {
+                operator,
+                matrix: matrix_wire(&ExactRatMatrix::new(relation_rows).unwrap()),
+            },
+        )["value"]["operator"]
+            .as_u64()
+            .unwrap();
+        let difference = predict(session, &mut stream, difference, false);
+        let difference: Vec<RationalWire> = serde_json::from_value(
+            difference["value"]["reading"]["supported_outputs"]["current"].clone(),
+        )?;
+        assert_eq!(
+            vector(&difference)?,
+            vec![BigRational::zero(), BigRational::new((-7).into(), 2.into())]
+        );
+        assert_eq!(
+            session.relations[&0].condition().unwrap().inspect()?,
+            condition_before
+        );
+
+        let mut landing_rows = vec![vec![BigRational::zero(); 12]; 2];
+        for i in 0..2 {
+            landing_rows[i][6 + i] = BigRational::one();
+        }
+        let landing_operator = send(
+            session,
+            &mut stream,
+            MathematicalRequest::ComposeReceiver {
+                operator,
+                matrix: matrix_wire(&ExactRatMatrix::new(landing_rows).unwrap()),
+            },
+        )["value"]["operator"]
+            .as_u64()
+            .unwrap();
+        let landing = predict(session, &mut stream, landing_operator, true);
+        let id = landing["value"]["prediction"].as_u64().unwrap();
+        let refined = send(
+            session,
+            &mut stream,
+            MathematicalRequest::ObserveRelation {
+                relation: 0,
+                prediction: id,
+                observed: row(&[4, 1]),
+            },
+        );
+        assert_eq!(refined["event"], "mathematical-return", "{refined}");
+        let h: Vec<RationalWire> =
+            serde_json::from_value(refined["value"]["condition_family"]["particular"].clone())?;
+        assert_eq!(vector(&h)?, vector(&row(&[0, 1, 0, 0, 0, -10, 8, 10]))?);
+        let result = predict(session, &mut stream, operator, false);
+        assert_eq!(result["event"], "mathematical-return", "{result}");
+        assert_eq!(result["value"]["family_graph_compiled"], false);
+        let actual: Vec<RationalWire> = serde_json::from_value(
+            result["value"]["reading"]["supported_outputs"]["current"].clone(),
+        )?;
+        let mut expected = row(&[2, 0, 4, 0, 0, -10, 4, 1, 4, -5, 0, -10]);
+        expected[1] = RationalWire::from_rational(&BigRational::new(9.into(), 4.into()));
+        assert_eq!(vector(&actual)?, vector(&expected)?);
+        // A derived linear receiver must not relabel the condition's original bilinear
+        // chart. Its inferred impulse still enters that original public relation.
+        let original = send(
+            session,
+            &mut stream,
+            MathematicalRequest::PredictRelation {
+                relation: 0,
+                source: MathematicalInputWire::Values {
+                    values: row(&[0, 0, 0, 0, 0, 0, 1, 0]),
+                },
+                retain_prediction: false,
+            },
+        );
+        assert_eq!(original["event"], "mathematical-return", "{original}");
+        let impulse: Vec<RationalWire> = serde_json::from_value(
+            original["value"]["reading"]["supported_outputs"]["current"].clone(),
+        )?;
+        assert_eq!(vector(&impulse)?, vector(&row(&[8, 10]))?);
+        Ok(())
+    })
+    .unwrap();
+}
+
+#[test]
+#[ignore = "requires CUDA; a wide downstream return retains the original condition chart and empty-source obstruction"]
+fn wide_prospective_observation_rejoins_the_original_relation() {
+    with_mathematical_session(|session| {
+        let mut stream = HnaStream::new();
+        send(session, &mut stream, calibrated_sum_products());
+        let mut coefficients = vec![vec![BigRational::zero(); 4]; 20];
+        for (i, row) in coefficients.iter_mut().enumerate() {
+            row[i % 4] = BigRational::one();
+        }
+        let operator = send(
+            session,
+            &mut stream,
+            MathematicalRequest::ConstructLinear {
+                coefficients: matrix_wire(&ExactRatMatrix::new(coefficients).unwrap()),
+            },
+        )["value"]["operator"]
+            .as_u64()
+            .unwrap();
+        let forecast = send(
+            session,
+            &mut stream,
+            MathematicalRequest::PredictCondition {
+                relation: 0,
+                operator,
+                retain_prediction: true,
+            },
+        );
+        let values = [2, 3, 5, -1].repeat(5);
+        let received = send(
+            session,
+            &mut stream,
+            MathematicalRequest::ObserveRelation {
+                relation: 0,
+                prediction: forecast["value"]["prediction"].as_u64().unwrap(),
+                observed: row(&values),
+            },
+        );
+        assert_eq!(received["event"], "mathematical-return", "{received}");
+        let original = send(
+            session,
+            &mut stream,
+            MathematicalRequest::PredictRelation {
+                relation: 0,
+                source: MathematicalInputWire::Values {
+                    values: row(&[0, 0, 1, 0]),
+                },
+                retain_prediction: false,
+            },
+        );
+        assert_eq!(original["event"], "mathematical-return", "{original}");
+        let actual: Vec<RationalWire> = serde_json::from_value(
+            original["value"]["reading"]["supported_outputs"]["current"].clone(),
+        )?;
+        assert_eq!(vector(&actual)?, vector(&row(&[5, -1]))?);
+        let forecast = send(
+            session,
+            &mut stream,
+            MathematicalRequest::PredictCondition {
+                relation: 0,
+                operator,
+                retain_prediction: true,
+            },
+        );
+        let mut impossible = values;
+        impossible[19] = 0;
+        let outside = send(
+            session,
+            &mut stream,
+            MathematicalRequest::ObserveRelation {
+                relation: 0,
+                prediction: forecast["value"]["prediction"].as_u64().unwrap(),
+                observed: row(&impossible),
+            },
+        );
+        assert_eq!(
+            outside["value"]["condition_family"]["kind"], "outside-represented-relation",
+            "{outside}"
+        );
+        let retained = session.relations[&0].condition().unwrap().inspect()?;
+        let empty = send(
+            session,
+            &mut stream,
+            MathematicalRequest::PredictRelation {
+                relation: 0,
+                source: MathematicalInputWire::Values {
+                    values: row(&[0, 0, 1, 0]),
+                },
+                retain_prediction: false,
+            },
+        );
+        assert_eq!(empty["event"], "mathematical-return", "{empty}");
+        assert_eq!(
+            empty["value"]["reading"]["coverage"]["kind"],
+            "empty-condition-fibre"
+        );
+        assert_eq!(
+            session.relations[&0].condition().unwrap().inspect()?,
+            retained
+        );
+        Ok(())
+    })
+    .unwrap();
 }
 
 #[test]
