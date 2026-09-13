@@ -280,3 +280,97 @@ limited driver must not become a character-prediction architecture. The roadmap 
 now make the joint prospective continuation/release and its eventual exterior decoding the
 next consumer binding. The already-returned generator, mode-compression, preimage/family,
 physical release and code-cost laws remain its sources, not subjects to rediscover.
+
+## Learned words reach a bounded joint preview and one shared decoder
+
+[definition] Parent `122da135`. The preceding mathematical application accepts an affine
+condition family and caller-supplied compiled operators. This increment binds the prospective
+operation to the actual learned coupled members and to the dependent successor after native
+condition/material return. `predict-continuation` previews a caller-declared member word,
+not another round of character-only development or an archived sequence of past states.
+
+[definition] For source family F and word `L₁,...,L_N`, the compiled carrier is
+`{(z₀,...,z_N) | z₀∈F and (z_(i-1),z_i)∈L_i for every i}`. The first ordinary native image
+already owns `(z₀,z₁)`. Each later lifted relation copies the retained prefix and shares its
+last variable with the next map. Every relation row, including output-vertical rows, is staged
+through the existing exact elimination. Homogenization of the complete affine family then
+allows the existing image owner to compute coverage against the **original** source, not
+merely the last intermediate marginal. The retained anchor ball is never replaced by that hull.
+
+[proved-derived; formal-checked] `DependentConstitutiveReturn.append_step_range` proves the
+linear lifted step's exact shared-variable relation. `homogeneous_unit_slice` proves
+`x∈span{p}+N and λ(x)=1 iff x-p∈N`, given `λ(p)=1` and `N⊆ker λ`. Thus the unit homogeneous
+slice recovers the original affine family without selecting a source inverse. Both focused
+proof checks passed with only the standing `propext`, `Classical.choice` and `Quot.sound` axioms.
+The existing pointwise dependent-word and joined-relation laws supply their surrounding scope.
+
+[definition] `NormalWaveFamilyReceiver` now accepts independently sized anchor and joint-output
+spaces. Its established two-stage unit-metric receiver still projects the anchor centre onto
+the admitted anchor domain, checks the exact original radius, and projects zero onto the joint
+fibre there. It returns one joint witness plus the complete original operands, not an energy
+law or an assertion that the family is a point. `state_width`, `state_count` and `projected_state`
+locate each state's p,c coordinates in that same witness; no independent marginal optimization
+is performed. The old single-state report layout and its consumers remain unchanged in scope.
+
+[definition] `ResidentNormalWave<NormalWaveCoupled>::read_prospective_word` reads current member
+material/condition. Repeated member/chart pairs share their actual immutable map in the word.
+`ResidentCoupledConstitutive::with_prospective` instead evaluates the actual dependent generator,
+using its standing receiver or an explicitly supplied admitted parameter section. It does not
+forecast from the frozen normal bank, publish a common material over all theta, or clone the
+continuing ecology. The affine and declared-source-section scopes remain explicit in the reply.
+
+[definition] The existing `NormalFamilyBasisFace` and `FamilySymbolEmission` now have typed
+ownership parameters: the original route owns family/report material; a prospective face borrows
+the full joint receiver. Both use one score-selection kernel and one symbol decoder. Frame offsets
+select native current components from the **same** joint projection, with free-direction flags
+retained. No host code ranks scores or chooses a source representative. The public stream returns
+projected states, support/coverage, optional full affine joint, text and decoder scope. A decoder
+failure leaves the source/family result available and publishes no partial native action.
+
+[established-bounded; computational-witness] The three new engine controls establish:
+
+- The learned law `c_next=2c-p` with initial `(p,c)=(1,2+i)` gives successive currents
+  `3+2i`, `4+3i`, `5+4i` in one joint preview, retaining its original source and unchanged body.
+- A first map with genuine free output followed by cancellation preserves that free direction
+  in the earlier future and later previous-current slot. The two slots are the same variable;
+  the last current is zero. Dropping vertical rows or multiplying marginals would fail this case.
+- An affine source outside its original anchor ball remains unsupported, while an empty affine
+  source remains separately empty. No centre or affine hull repairs either obstruction.
+
+[established-bounded; computational-witness] The public coupled-stream control returns `aba`
+for a three-transport preview. After an actual observed-symbol incorporation, its dependent
+generator returns `bbb`; a control with matched p,c currents still returns `aba`. The native
+condition/material differs, and the dependent path uses that changed generator. The actual
+streamed text and four joint state blocks were printed and inspected. Preview leaves the complete
+native rest, emission cursor, epochs and pending state unchanged. This is a declared two-symbol
+conditional-prediction result, not a general conversation-quality result.
+
+[definition] The word is transport-only: no intervening external reception or self-re-entry is
+silently predicted. Text is a codec reading of the prepared compound trajectory, not a claim
+that repeating the old `emit-symbol`/re-entry loop yields that same trajectory. The preview
+does not yet publish a compound action or accept its complete feedback. Those are active
+consumer obligations, alongside contextual mode preparation and economical modal compilation.
+The current exact joint construction is dense; its explicit scratch refusal is a representation
+obstruction, not a learned capacity, context window, physical reach or reason to raise a constant.
+
+[established-bounded; process-audit] Completed checks:
+
+- Three new native prospective controls passed; the first-use run took 192.78 s with active
+  CPU initialization. The complete 93-test wave/source/family/return suite passed in 24.09 s.
+- Nine coupled-session controls passed in 6.27 s, including the new affine/dependent preview,
+  old pending delivery, source return and process-resume consumers. The decoded preview's
+  first-use focused run took 194.18 s; the final printed/inspected focused run took 0.60 s.
+- Seven stream transport tests passed; the workspace library/bin check passed.
+- Workspace example compilation passed after the generic face/emission ownership change;
+  existing example consumers still compile with their default source-ownership types.
+- The focused `DependentConstitutiveReturn.lean` check passed both new compiler lemmas.
+- Three unused-in-production helpers were verified to have only test consumers and marked
+  `cfg(test)` without removing their source. Their two joined-section and one source-map controls
+  passed, and the host workspace check no longer emits those dead-code warnings.
+
+[historical; source-inspected] A delegated initial compiler stopped at a singleton and returned
+an obstruction for longer words. It was not treated as completion. Primary review also found an
+uninitialized lifted basis, omitted output-vertical rows and undersized wide scratch. The primary
+implementation replaced that lift, completed the multi-map composition and strengthened the
+empty/paired/extent validation before the passing tests above. Agent testimony did not establish
+the returned capability.

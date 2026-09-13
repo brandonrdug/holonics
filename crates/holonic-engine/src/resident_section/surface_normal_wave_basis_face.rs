@@ -84,12 +84,15 @@ impl<'c> ResidentSurface<'c> {
         family: &ResidentSection<'c>,
         permutation: &ResidentSection<'c>,
         n: usize,
+        outputs: usize,
+        current_at: usize,
         scores: &ResidentSection<'c>,
         selection: &ResidentSection<'c>,
     ) -> Result<(), ResidentRefusal> {
         let fail = || Self::operative_error();
         let fw = n
-            .checked_mul(32)
+            .checked_mul(16)
+            .and_then(|v| v.checked_add(outputs.checked_mul(4)?))
             .and_then(|v| v.checked_add(8))
             .ok_or_else(fail)?;
         let sw = n
@@ -98,6 +101,7 @@ impl<'c> ResidentSurface<'c> {
             .ok_or_else(fail)?;
         if n == 0
             || fw > u32::MAX as usize
+            || current_at.checked_add(n.checked_mul(2).ok_or_else(fail)?).is_none_or(|v| v>outputs)
             || !self.operative_shape(family, 1, fw)
             || !self.operative_shape(permutation, 1, n)
             || !self.operative_shape(scores, 1, sw)
@@ -111,6 +115,8 @@ impl<'c> ResidentSurface<'c> {
             .ptr(permutation.lo.device_ptr())
             .ptr(permutation.hi.device_ptr())
             .u32(n as u32)
+            .u32(outputs as u32)
+            .u32(current_at as u32)
             .ptr(scores.lo.device_ptr())
             .ptr(scores.hi.device_ptr())
             .ptr(selection.lo.device_ptr())

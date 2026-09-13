@@ -70,6 +70,124 @@ fn hyperplane<'c>(s: &'c ResidentSurface<'c>, x: i64, grain: u32) -> NormalWaveF
     }
     specimen(s, [0, 0, 0, 0], 1, grain, origin, dirs, false)
 }
+
+#[test]
+#[ignore = "requires CUDA; a learned word shares the same bounded source across all future frames"]
+fn prospective_word_keeps_learned_phase_and_does_not_advance_the_body() {
+    use super::super::super::comparison_tests::{current, point};
+    use super::super::tests::{body, law};
+    let ro = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&ro).unwrap();
+    let body = body(&s);
+    let member = law(&s, false);
+    let h = point(&s, &[1, 0]);
+    let map = Rc::new(member.read_wave_relation(current(&h), 1).unwrap());
+    let source = body.read_family().unwrap();
+    let before = body.rest().unwrap();
+    let reads = s.census().section_read_outs;
+    let predicted = source
+        .read_prospective(vec![Rc::clone(&map), Rc::clone(&map), map])
+        .unwrap();
+    assert_eq!(s.census().section_read_outs, reads);
+    let reading = predicted.inspect().unwrap();
+    assert_eq!(reading.support, NormalFamilySupport::Supported);
+    assert_eq!((reading.state_width, reading.state_count), (10, 4));
+    for (index, values) in [[1, 0, 2, 1], [2, 1, 3, 2], [3, 2, 4, 3], [4, 3, 5, 4]]
+        .iter()
+        .enumerate()
+    {
+        assert_eq!(
+            reading.projected_state(index).unwrap(),
+            values.map(|n| rat(n, 1))
+        );
+    }
+    assert!(reading.projected_state(4).is_none());
+    assert_eq!(
+        predicted.image().unwrap().inspect().unwrap().coverage,
+        crate::native_ecology::constitutive_fibre::ConditionCoverage::Complete
+    );
+    assert_eq!(body.rest().unwrap(), before);
+    assert_eq!(
+        predicted.source().anchor().inspect().unwrap(),
+        source.anchor().inspect().unwrap()
+    );
+}
+
+#[test]
+#[ignore = "requires CUDA; genuine vertical freedom is retained but intermediate future variables are shared"]
+fn prospective_word_keeps_vertical_modes_without_independent_future_marginals() {
+    use super::super::super::comparison_tests::{current, point};
+    use super::super::tests::{body, law};
+    let ro = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&ro).unwrap();
+    let body = body(&s);
+    let mut free = law(&s, false);
+    free.advance_bilinear_contact(
+        current(&point(&s, &[0; 6])),
+        current(&point(&s, &[0; 2])),
+        Some(current(&point(&s, &[1, 0]))),
+    )
+    .unwrap();
+    let cancel = law(&s, true);
+    let h = point(&s, &[1, 0]);
+    let first = Rc::new(free.read_wave_relation(current(&h), 1).unwrap());
+    let second = Rc::new(cancel.read_wave_relation(current(&h), 1).unwrap());
+    let source = body.read_family().unwrap();
+    let predicted = source.read_prospective(vec![first, second]).unwrap();
+    let affine = predicted
+        .affine_relation()
+        .inspect()
+        .unwrap()
+        .predecessor_reading;
+    let ConstitutiveReading::Plural {
+        particular,
+        directions,
+    } = affine
+    else {
+        panic!("full affine joint must retain its source and vertical modes")
+    };
+    // Frame1.c and frame2.p are the SAME variable. Frame2.c is zero after cancellation.
+    for v in std::iter::once(&particular).chain(directions.iter()) {
+        assert_eq!(&v[18..20], &v[26..28]);
+        assert!(v[28..30].iter().all(|x| *x == Rat::zero()));
+    }
+    assert!(directions
+        .iter()
+        .any(|v| v[..10].iter().all(|x| *x == Rat::zero()) && v[18] != Rat::zero()));
+    let reading = predicted.inspect().unwrap();
+    assert_eq!(reading.support, NormalFamilySupport::Supported);
+    assert_eq!(
+        &reading.projected_state(1).unwrap()[2..],
+        &reading.projected_state(2).unwrap()[..2]
+    );
+}
+
+#[test]
+#[ignore = "requires CUDA; the prospective affine graph never replaces the original anchor-ball constraint"]
+fn prospective_word_keeps_anchor_miss_and_empty_family_distinct() {
+    use super::super::super::comparison_tests::{current, point};
+    use super::super::tests::law;
+    let ro = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&ro).unwrap();
+    let member = law(&s, false);
+    let h = point(&s, &[1, 0]);
+    let map = Rc::new(member.read_wave_relation(current(&h), 1).unwrap());
+    let miss = hyperplane(&s, 2, 32);
+    let result = miss
+        .read_prospective(vec![Rc::clone(&map), Rc::clone(&map)])
+        .unwrap();
+    let reading = result.inspect().unwrap();
+    assert_eq!(reading.support, NormalFamilySupport::OutsideAnchorBall);
+    assert!(reading.projected_joint.is_none());
+    let empty = specimen(&s, [0; 4], 1, 32, [0; 10], vec![], true);
+    let reading = empty
+        .read_prospective(vec![Rc::clone(&map), map])
+        .unwrap()
+        .inspect()
+        .unwrap();
+    assert_eq!(reading.support, NormalFamilySupport::EmptyAffineRelation);
+    assert!(reading.nearest_anchor.is_none());
+}
 #[test]
 #[ignore = "requires CUDA; exact ball tangency is supported while an affine miss returns its oriented witness"]
 fn bounded_receiver_distinguishes_tangent_miss_and_empty_affine() {
@@ -106,16 +224,14 @@ fn bounded_receiver_distinguishes_tangent_miss_and_empty_affine() {
     assert_eq!(view.support, NormalFamilySupport::EmptyAffineRelation);
     assert!(view.nearest_anchor.is_none());
     assert!(view.projected_joint.is_none());
-    assert!(
-        empty
-            .read_receiver()
-            .unwrap()
-            .inspect_vertical_directions()
-            .unwrap()
-            .intervals
-            .iter()
-            .all(|(lo, hi)| *lo == 0 && *hi == 0)
-    );
+    assert!(empty
+        .read_receiver()
+        .unwrap()
+        .inspect_vertical_directions()
+        .unwrap()
+        .intervals
+        .iter()
+        .all(|(lo, hi)| *lo == 0 && *hi == 0));
 }
 #[test]
 #[ignore = "requires CUDA; nonorthogonal anchor and vertical joint projections use exact rational geometry"]

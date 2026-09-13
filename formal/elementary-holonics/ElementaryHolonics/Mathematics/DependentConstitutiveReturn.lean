@@ -151,6 +151,70 @@ theorem decodedFace_aliases_agree
 
 end ReceiverCoordinates
 
+section ProspectiveCompilation
+
+variable {V P X₀ Y₀ : Type*}
+variable [AddCommGroup V] [Module ℚ V]
+variable [AddCommGroup P] [Module ℚ P]
+variable [AddCommGroup X₀] [Module ℚ X₀]
+variable [AddCommGroup Y₀] [Module ℚ Y₀]
+
+/-- The unit homogeneous slice of the particular row and its zero-coordinate directions
+is exactly the original affine family. This includes coordinate aliases and requires no
+selected inverse of the source. The native word compiler uses this after retaining its joins. -/
+theorem homogeneous_unit_slice (coordinate : V →ₗ[ℚ] ℚ) (origin : V)
+    (directions : Submodule ℚ V) (unit : coordinate origin = 1)
+    (zero_directions : directions ≤ LinearMap.ker coordinate) (value : V) :
+    (value ∈ Submodule.span ℚ {origin} ⊔ directions ∧ coordinate value = 1) ↔
+      value - origin ∈ directions := by
+  constructor
+  · rintro ⟨member, value_unit⟩
+    obtain ⟨x, hx, z, hz, sum⟩ := Submodule.mem_sup.mp member
+    obtain ⟨a, rfl⟩ := Submodule.mem_span_singleton.mp hx
+    have zero : coordinate z = 0 := zero_directions hz
+    have one : a = 1 := by
+      have h := congrArg coordinate sum
+      simpa [map_add, map_smul, unit, zero, value_unit] using h
+    subst a
+    have difference : value - origin = z := by rw [← sum]; simp
+    rwa [difference]
+  · intro difference
+    constructor
+    · exact Submodule.mem_sup.mpr ⟨origin, Submodule.mem_span_singleton_self origin,
+        value-origin, difference, by abel⟩
+    · have zero : coordinate (value-origin) = 0 := zero_directions difference
+      have h : coordinate value - 1 = 0 := by simpa [map_sub, unit] using zero
+      exact sub_eq_zero.mp h
+
+/-- A step carries the entire already-requested prefix unchanged and shares the current
+variable on both sides of the next relation. It is a linear lift of prefix and relation rows. -/
+def appendStepMap : (P × (X₀ × Y₀)) →ₗ[ℚ] ((P × X₀) × ((P × X₀) × Y₀)) where
+  toFun v := ((v.1,v.2.1),((v.1,v.2.1),v.2.2))
+  map_add' _ _ := rfl
+  map_smul' _ _ := rfl
+
+theorem append_step_range (relation : Submodule ℚ (X₀ × Y₀))
+    (before : P × X₀) (after : (P × X₀) × Y₀) :
+    (before,after) ∈ (Submodule.prod (⊤ : Submodule ℚ P) relation).map appendStepMap ↔
+      before = after.1 ∧ (before.2,after.2) ∈ relation := by
+  constructor
+  · rintro ⟨v, member, image⟩
+    have left := congrArg Prod.fst image
+    have right := congrArg Prod.snd image
+    change (v.1,v.2.1) = before at left
+    change ((v.1,v.2.1),v.2.2) = after at right
+    rw [← left, ← right]
+    exact ⟨rfl,member.2⟩
+  · rintro ⟨same, member⟩
+    refine Submodule.mem_map.mpr ⟨(before.1,(before.2,after.2)), ⟨Submodule.mem_top,member⟩, ?_⟩
+    change (before,(before,after.2)) = (before,after)
+    rw [same]
+
+end ProspectiveCompilation
+
+#print axioms homogeneous_unit_slice
+#print axioms append_step_range
+
 /-- The scalar law `x*h = 2` is not affine in the paired `(x,h)` coordinates. -/
 theorem scalar_law_midpoint_obstruction :
     ((1 : ℝ) * 2 = 2) ∧ (2 : ℝ) * 1 = 2 ∧

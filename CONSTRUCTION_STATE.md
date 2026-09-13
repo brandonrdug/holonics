@@ -1,14 +1,29 @@
 # Construction state
 
 **Currency:** September 12, 2026. **Current position:** the sustained product goal is active;
-the caller-controlled native mathematical workshop has returned at its finite operator and
-condition-family scope. Next is contextual predictive formation and economical continuation
+the mathematical workshop and joint learned-word preview have returned at their recorded
+scopes. Next is compound release/feedback, contextual mode formation and economical continuation
 specified in the [roadmap](docs/plans/THE_ROADMAP.md#immediate-mathematical-application-and-implementation).
 **Product objective:** Hephaestus constructions and useful Athena outputs through the same HNN
 owners. Broad corpus cultivation remains paused at the identified source/contact limitation;
 targeted development and product checks on the repaired path proceed within the plan.
 
 ## Immediate implementation
+
+[established-bounded; implemented-exact; computational-witness] The
+[learned-word preview](research/records/2026-09-12_CONTEXTUAL_RECEPTION_AND_NORMALIZATION_REUSE_THEIR_SHARED_NATIVE_OWNERS.md#learned-words-reach-a-bounded-joint-preview-and-one-shared-decoder)
+now composes actual coupled members, retaining shared intermediate variables, vertical modes
+and the original anchor. `predict-continuation` reads one joint projection through the existing
+native decoder: a three-transport `aba` preview becomes `bbb` after a native return, while matched
+current coordinates in the control still give `aba`. The dependent successor is used, not its
+frozen base. Ninety-three engine, nine coupled-session and seven stream controls, two compiler
+lemmas and the workspace host check passed at their recorded scopes.
+
+[open] The new operation previews a specified transport word; it does not publish a compound
+action, model intervening self-re-entry, or assimilate the complete compound feedback. Bind
+that release/return and native contextual mode preparation, and replace dense future tuples with
+appropriate modal/factor representations before increasing reach. The small conditional text
+preview is not general useful conversation or completion of the HNN product goal.
 
 [established-bounded; implemented-exact; computational-witness] The
 [joint prospective application](research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md#joint-prospective-release-through-the-existing-family-owners)
@@ -18,12 +33,6 @@ future states and a fixed cross-time relation; landing constraints `(4,1)` and `
 impulses `(8,10)` and `(12,10)` through the CLI. General and conditional image storage, decoding
 and refinement are consolidated. Nine stream, 54 resident and eight exact bilinear controls,
 two formal sources and the workspace host check passed at their recorded scopes.
-
-[open] Bind this prospective return to the learned contextual/anchored generator families
-and their multi-part output decoder, preserving original bounds and phase rather than taking
-an affine hull or point representative. The supplied affine release application has returned;
-general nonlinear/conditional compilation and useful contextual-language/code products remain
-active. More character-only exposure is not the next implementation step.
 
 [established-bounded; computational-witness] The
 [first real-source trials](research/records/2026-09-12_CONTEXTUAL_RECEPTION_AND_NORMALIZATION_REUSE_THEIR_SHARED_NATIVE_OWNERS.md#real-source-development-and-transport-bound-repair)
@@ -39,14 +48,12 @@ canonical-source metadata guard is repaired. Four finite norm lemmas are Lean-ch
 108 normal-material/recurrence/return controls passed. These representation and maintenance
 repairs are integrated goal work, not a completed language product.
 
-[open] Brandon's latest next-holon correction makes the next work **joint prospective
+[project-postulate] Brandon's next-holon correction governs **joint prospective
 continuation/release before exterior decoding**, as specified in the
 [blueprint's research binding](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#how-the-research-enters-these-packets).
-The text driver fitted a fixed-size normal-response family and selected character coordinates;
-it did not integrate the existing modal, joint-family and predictive-release constructions.
-Compose those owners into the requested multi-part/graph-like predictive return while repairing
-directional source/error transport across rebase. Further character-only exposure is not the
-next implementation step. The numerical repairs stand; they do not replace this integration.
+The older character trial is not that architecture. The returned joint preview above now binds
+the learned family and decoder; it does not complete compound release, source-driven mode
+preparation or generative compression. Further character-only exposure is not the next step.
 
 [established-bounded; implemented-exact; computational-witness] The
 [resident composition return](research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md#resident-composition-and-fixed-section-compilation)

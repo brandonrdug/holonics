@@ -77,3 +77,62 @@ extern "C" __global__ void section_constitutive_relation_image(
     for(uint32_t i=0;i<y;++i)safe[i]=safe_hi[i]=out[w+i];
     safe[y]=safe_hi[y]=out[w+y];safe[y+1u]=safe_hi[y+1u]=partial?1:out[w+y+1u];
 }
+
+// Lift L : z_k -> z_{k+1} to X=(z_0,...,z_k) -> (X,z_{k+1}).  The prefix is copied
+// identically, retaining intermediate variables for the final joint trajectory image.
+extern "C" __global__ void section_constitutive_wave_word_lift(
+    const int64_t *basis,const int64_t *basis_hi,uint32_t t,uint32_t prefix,
+    int64_t *lifted,int64_t *lifted_hi,int64_t *workspace,uint32_t *slot,
+    const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+    if(blockIdx.x||threadIdx.x)return;
+    if(upstream_refused(census,lineage,lineage_count,slot))return;
+    uint64_t old64=2u*(uint64_t)t,src64=(uint64_t)prefix+t,total64=src64+src64+t;
+    if(!t||old64>UINT32_MAX-4u||total64>UINT32_MAX-4u){atomicOr(slot,REFUSED_MALFORMED);return;}
+    uint32_t old=(uint32_t)old64,src=(uint32_t)src64,total=(uint32_t)total64;
+    for(size_t i=0;i<(size_t)old*old;++i)if(basis[i]!=basis_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+    wide *row=(wide*)workspace;
+    for(size_t i=0;i<(size_t)total*total;++i)lifted[i]=lifted_hi[i]=0;
+    for(uint32_t p=0;p<prefix;++p){
+        for(uint32_t i=0;i<total;++i)row[i]=0;
+        row[p]=row[src+p]=1;
+        condition_stage_row(lifted,lifted_hi,total,row,slot);if(*slot)return;
+    }
+    // Include ALL rows of L, especially its output-vertical rows. They are actual
+    // allowed directions, not duplicate prefix coordinates or selected outputs.
+    for(uint32_t r=0;r<old;++r){
+        for(uint32_t i=0;i<total;++i)row[i]=0;
+        for(uint32_t i=0;i<t;++i){
+            row[prefix+i]=row[src+prefix+i]=basis[(size_t)r*old+i];
+            row[2u*src+i]=basis[(size_t)r*old+t+i];
+        }
+        condition_stage_row(lifted,lifted_hi,total,row,slot);if(*slot)return;
+    }
+}
+
+// Turn an anchored affine target family into its homogeneous span.  The particular numerator
+// and every retained direction are staged through the existing exact row owner.
+extern "C" __global__ void section_constitutive_wave_family_span(
+    const int64_t *family,const int64_t *family_hi,uint32_t source_width,uint32_t target_width,
+    int64_t *basis,int64_t *basis_hi,int64_t *workspace,uint32_t *slot,
+    const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+    if(blockIdx.x||threadIdx.x)return;
+    if(upstream_refused(census,lineage,lineage_count,slot))return;
+    uint64_t at64=(uint64_t)source_width+target_width,words64=at64+4u+(uint64_t)target_width*target_width;
+    if(target_width<2u||words64>UINT32_MAX-4u){atomicOr(slot,REFUSED_MALFORMED);return;}
+    uint32_t at=(uint32_t)at64,t=target_width;
+    for(size_t i=0;i<(size_t)words64;++i)if(family[i]!=family_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+    for(size_t i=0;i<(size_t)t*t;++i)basis[i]=basis_hi[i]=0;
+    if(family[at]<=0||family[at+1u]<0||family[at+1u]>2){atomicOr(slot,REFUSED_MALFORMED);return;}
+    // status 1 is the canonical empty/outside family; retain an empty span.
+    if(family[at+1u]==1)return;
+    wide den=family[at];
+    if(den<=0 || family[source_width]!=den || family[source_width+1u]!=0){atomicOr(slot,REFUSED_MALFORMED);return;}
+    wide *row=(wide*)workspace;
+    for(uint32_t j=0;j<t;++j)row[j]=family[source_width+j];
+    if(row[0]!=den||row[1]!=0){atomicOr(slot,REFUSED_MALFORMED);return;}
+    condition_stage_row(basis,basis_hi,t,row,slot);if(*slot)return;
+    uint32_t dirs=at+4u;
+    for(uint32_t p=0;p<t;++p){for(uint32_t j=0;j<t;++j)row[j]=family[(size_t)dirs+p*t+j];
+        if(row[0]||row[1]){atomicOr(slot,REFUSED_MALFORMED);return;}
+        condition_stage_row(basis,basis_hi,t,row,slot);if(*slot)return;}
+}

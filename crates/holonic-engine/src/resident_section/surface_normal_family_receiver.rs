@@ -9,6 +9,7 @@ impl<'c> ResidentSurface<'c> {
         source_width: usize,
         anchor: ResidentNormalEnclosureView<'_, 'c>,
         roots: usize,
+        outputs: usize,
         joint: &ResidentSection<'c>,
         anchor_basis: &ResidentSection<'c>,
         vertical: &ResidentSection<'c>,
@@ -17,14 +18,15 @@ impl<'c> ResidentSurface<'c> {
     ) -> Result<(), ResidentRefusal> {
         let fail = || Self::operative_error();
         let a = roots.checked_mul(4).ok_or_else(fail)?;
-        let w = a.checked_mul(2).ok_or_else(fail)?;
+        let w = a.checked_add(outputs).ok_or_else(fail)?;
+        let projection = a.max(outputs).checked_mul(2).ok_or_else(fail)?;
         let t = w.checked_add(2).ok_or_else(fail)?;
         let fw = t
             .checked_mul(t)
             .and_then(|v| v.checked_add(t)?.checked_add(source_width)?.checked_add(4))
             .ok_or_else(fail)?;
-        let rw = a
-            .checked_mul(8)
+        let rw = w
+            .checked_mul(4)
             .and_then(|v| v.checked_add(8))
             .ok_or_else(fail)?;
         let aw = a
@@ -38,6 +40,8 @@ impl<'c> ResidentSurface<'c> {
             .ok_or_else(fail)?;
         let end = anchor.offset.checked_add(aw).ok_or_else(fail)?;
         if roots == 0
+            || outputs == 0
+            || outputs > u32::MAX as usize
             || source_width == 0
             || fw > u32::MAX as usize
             || rw > u32::MAX as usize
@@ -51,14 +55,16 @@ impl<'c> ResidentSurface<'c> {
             || !self.operative_shape(family, 1, fw)
             || !self.operative_shape(joint, w, w)
             || !self.operative_shape(anchor_basis, a, a)
-            || !self.operative_shape(vertical, a, a)
-            || !self.operative_shape(graph, w, w)
+            || !self.operative_shape(vertical, outputs, outputs)
+            || !self.operative_shape(graph, projection, projection)
             || !self.operative_shape(report, 1, rw)
         {
             return Err(fail());
         }
         let shared = a
-            .checked_mul(9)
+            .max(outputs)
+            .checked_mul(5)
+            .and_then(|v| v.checked_add(a.checked_mul(3)?)?.checked_add(outputs))
             .and_then(|v| v.checked_mul(16))
             .and_then(|v| u32::try_from(v).ok())
             .filter(|v| *v <= self.declaration().max_sectiond_bytes)
@@ -71,6 +77,7 @@ impl<'c> ResidentSurface<'c> {
             .ptr(anchor.section.hi.device_ptr())
             .u32(anchor.offset as u32)
             .u32(roots as u32)
+            .u32(outputs as u32)
             .u32(anchor.grain.0);
         for s in [joint, anchor_basis, vertical, graph, report] {
             p.ptr(s.lo.device_ptr()).ptr(s.hi.device_ptr());

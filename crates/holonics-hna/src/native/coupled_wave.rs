@@ -179,6 +179,39 @@ impl<'c> NativeCoupledWaveSession<'c> {
     pub fn inspect_relation(&mut self) -> Result<Value, NativeSessionError> {
         self.wave.inspect_relation(self.member, self.receiver)
     }
+    /// A caller-declared word of learned members, read as one joint prospective object.
+    /// This does not emit/re-enter symbols or publish a successor ecology.
+    pub fn predict_continuation(&mut self, word: &[usize], full_family: bool) -> Result<Value, NativeSessionError> {
+        let word = word.iter().map(|&member| (member, self.receiver)).collect::<Vec<_>>();
+        let epoch = self.wave.epoch();
+        let scope = self.wave.scope();
+        let chart = &self.chart;
+        let basis = &self.basis;
+        self.wave.with_prospective(&word, |future| {
+            let mut value = NativeCoupledBody::describe_prospective(future, epoch, scope, &word, full_family)?;
+            let mut text = String::new();
+            let mut selections = Vec::new();
+            for state in 1..=word.len() {
+                let decoded = future.read_basis(basis, state, epoch).map_err(NativeSessionError::from)
+                    .and_then(|face| chart.emit_family(face));
+                match decoded {
+                    Ok(emission) => {
+                        text.push_str(std::str::from_utf8(emission.octets()).map_err(invalid)?);
+                        selections.push(json!({"state":state,"selection":emission.selection(),"symbol":emission.symbol()}));
+                    }
+                    Err(error) => {
+                        value["text"] = Value::Null;
+                        value["decoding_error"] = json!(error.to_string());
+                        return Ok(value);
+                    }
+                }
+            }
+            value["text"] = json!(text);
+            value["decoded_states"] = json!(selections);
+            value["decoder_scope"] = json!("all symbols read one bounded joint projection; no native source re-entry or action publication");
+            Ok(value)
+        })
+    }
     pub fn project_current(&mut self, full: bool) -> Result<Value, NativeSessionError> {
         let face = self.wave.read_basis_face(&self.basis)?;
         let emitted = self.chart.emit_family(face)?;

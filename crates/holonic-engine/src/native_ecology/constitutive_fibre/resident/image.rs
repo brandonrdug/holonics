@@ -1,6 +1,6 @@
 //! Serial affine current-family transport through existing local relations. The retained joint
 //! input/output carrier records the joining fibre; no particular member is selected to compose.
-use super::condition_image::{AffineImageData, ConditionCoverage};
+use super::condition_image::{AffineImageData, ConditionCoverage, read_coverage};
 use super::*;
 
 /// Actual borrowed producing relation, not equality inferred from endpoint values or cuts.
@@ -10,6 +10,9 @@ pub enum ConstitutiveImageReceiver<'a, 'c> {
     WaveConditional(&'a ResidentWaveRelation<'c>),
     WaveSourceContact(&'a ResidentWaveRelation<'c>),
     WaveObservation(&'a ResidentWaveRelation<'c>),
+    /// The immutable factors of a joint wave word.  Keeping the actual relations here makes
+    /// the receiver a producing receipt rather than an inferred list of equal-shaped maps.
+    WaveWord(Vec<Rc<ResidentWaveRelation<'c>>>),
 }
 
 #[derive(Debug, PartialEq, Eq, Serialize)]
@@ -65,6 +68,10 @@ impl<'a, 'c> ResidentConstitutiveImage<'a, 'c> {
     }
     pub fn inspect(&self) -> Result<ConstitutiveImageReading, ConstitutiveFibreError> {
         self.data.generic_reading(self.source)
+    }
+    pub fn inspect_coverage(&self) -> Result<ConditionCoverage, ConstitutiveFibreError> {
+        read_coverage(self.data.joint.surface, &self.data.coverage,
+            self.data.domain.target_width, self.data.joint.source_width)
     }
     pub fn inspect_constraints(
         &self,
@@ -297,5 +304,70 @@ impl<'c> ResidentWaveRelation<'c> {
                 ConstitutiveImageReceiver::WaveConditional(self)
             },
         )
+    }
+}
+
+impl<'c> ResidentConstitutiveReturn<'c> {
+    /// Compile the joint future (z1,...,zN) of one nonempty word, retaining the original
+    /// source z0 and every intermediate joining variable. The public anchored-family
+    /// owner supplies the wave's validated unit homogeneous source chart.
+    pub(crate) fn read_wave_word(
+        &self,
+        word: Vec<Rc<ResidentWaveRelation<'c>>>,
+    ) -> Result<ResidentConstitutiveImage<'_, 'c>, ConstitutiveFibreError> {
+        let first = word.first().ok_or(ConstitutiveFibreError::Shape)?;
+        let t = first.width();
+        if t == 0 || self.target_width != t {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        if word.iter().any(|map| {
+            map.width() != t || !std::ptr::eq(map.surface, self.surface)
+        }) {
+            return Err(ConstitutiveFibreError::ForeignOccurrence);
+        }
+        let targets = t.checked_mul(word.len()).ok_or(ConstitutiveFibreError::Shape)?;
+        let total = t.checked_add(targets).ok_or(ConstitutiveFibreError::Shape)?;
+        if total > u32::MAX as usize / 2 - 4 {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let map = Rc::clone(first);
+        if word.len() == 1 {
+            return image(self.surface, &map.basis, t, t, map.relation_cut, self,
+                ConstitutiveImageReceiver::WaveWord(word));
+        }
+        let s = self.surface;
+        // The first ordinary image already owns exactly (z0,z1); consume that joint,
+        // not its output marginal. Later steps append to this same variable population.
+        let mut joint = map.read_image(self)?.data.joint;
+        for map in word.iter().skip(1) {
+            let width = joint.target_width;
+            let next_width = width.checked_add(t).ok_or(ConstitutiveFibreError::Shape)?;
+            let relation_width = width.checked_add(next_width).ok_or(ConstitutiveFibreError::Shape)?;
+            let lifted = s.fresh_section(relation_width, relation_width, ResidentGrain(0))?;
+            let workspace = s.fresh_section(1, 2*relation_width, ResidentGrain(0))?;
+            let mut passage = s.begin_passage(&[vec![]])?;
+            { let lane = passage.open(0, &[])?;
+              s.record_wave_word_lift(&lane, &map.basis, t, width-t, &lifted, &workspace)?; }
+            passage.close(0, &lifted, 64)?;
+            let result = passage.finish()?.launch()?;
+            if !result.obstruction.is_empty() { return Err(ConstitutiveFibreError::Arithmetic(
+                format!("joint word lift: {:?}", result.obstruction))); }
+            let next = image(s, &lifted, width, next_width, map.relation_cut, &joint,
+                ConstitutiveImageReceiver::WaveConditional(map))?.into_output().0;
+            joint = next;
+        }
+        // Homogenize with the original lambda=1 coordinate. This yields the exact
+        // composite relation; the final ordinary image computes ORIGINAL-source coverage.
+        let basis = s.fresh_section(total, total, ResidentGrain(0))?;
+        let workspace = s.fresh_section(1, 2*total, ResidentGrain(0))?;
+        let mut passage = s.begin_passage(&[vec![]])?;
+        { let lane = passage.open(0, &[])?;
+          s.record_wave_family_span(&lane, joint.report(), joint.source_width, total, &basis, &workspace)?; }
+        passage.close(0, &basis, 64)?;
+        let result = passage.finish()?.launch()?;
+        if !result.obstruction.is_empty() { return Err(ConstitutiveFibreError::Arithmetic(
+            format!("joint word span: {:?}", result.obstruction))); }
+        let cut = word.last().expect("nonempty word").relation_cut;
+        image(s, &basis, t, targets, cut, self, ConstitutiveImageReceiver::WaveWord(word))
     }
 }

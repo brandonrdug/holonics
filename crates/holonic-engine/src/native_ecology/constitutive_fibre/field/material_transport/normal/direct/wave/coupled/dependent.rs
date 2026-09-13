@@ -760,6 +760,30 @@ impl<'c> ResidentCoupledConstitutive<'c> {
         )?;
         Ok(value)
     }
+    /// Read a prospective learned word at a declared source section of this complete
+    /// dependent generator. None uses its standing receiver; explicit parameters evaluate
+    /// another admitted section. The root generator remains owned and unchanged, never
+    /// replaced by an affine union of its parameter-dependent material alternatives.
+    pub fn with_prospective<R>(
+        &mut self,
+        word: &[(usize, WaveSourceReceiver)],
+        parameters: Option<&ResidentSection<'c>>,
+        read: impl FnOnce(&NormalWaveFamilyReceiver<'_, 'c>) -> Result<R, ConstitutiveFibreError>,
+    ) -> Result<R, ConstitutiveFibreError> {
+        // Structural aperture only: this uses the common chart width, not a forecast
+        // from the frozen base. Validate before evaluating the dependent source section.
+        self.base.current().check_prospective_extent(word.len())?;
+        if word.iter().any(|(member,_)| *member >= self.members()) { return Err(ConstitutiveFibreError::Shape); }
+        let value = Self::evaluate_parts(&mut self.base, &self.comparison, &self.operations,
+            parameters.unwrap_or(&self.receiver))?;
+        let maps = super::continuation::prospective_maps(word, |member, chart| {
+            let other = if member == self.comparison.member() { None }
+                else { Some(self.base.neighborhood().generator(member)?) };
+            value.member_relation(member, other, chart)
+        })?;
+        let future = value.successor_section().read_prospective(maps)?;
+        read(&future)
+    }
     fn append_packet(
         &mut self,
         member: usize,

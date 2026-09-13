@@ -76,6 +76,96 @@ fn session_law<'c>(s: &'c ResidentSurface<'c>, conditional: bool) -> NativeCoupl
 }
 
 #[test]
+#[ignore = "requires CUDA; one prospective word uses the actual learned affine/dependent body and leaves it unpublished"]
+fn prospective_word_uses_returned_generator_with_one_shared_source() {
+    let ro = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&ro).unwrap();
+    let mut developed = session_law(&s, true);
+    let mut control = session_law(&s, true);
+    let read = |value: &Value, state: usize| -> Vec<num_rational::BigRational> {
+        let wire: Vec<super::super::RationalWire> =
+            serde_json::from_value(value["states"][state]["projection"]["current"].clone())
+                .unwrap();
+        wire.iter().map(|x| x.rational().unwrap()).collect()
+    };
+    let expected = |values: &[i64]| {
+        values
+            .iter()
+            .map(|v| num_rational::BigRational::from_integer((*v).into()))
+            .collect::<Vec<_>>()
+    };
+    let saved = developed.wave.rest().unwrap();
+    let cursor = developed.inspect();
+    let mut stream = HnaStream::new();
+    let request=json!({"schema":crate::HNA_STREAM_REQUEST_SCHEMA,"command":{"action":"predict-continuation","word":[0,0,0],"full_family":true}}).to_string()+"\n";
+    let mut output = Vec::new();
+    stream
+        .pump_coupled_wave(
+            &mut developed,
+            &mut std::io::Cursor::new(request),
+            &mut output,
+        )
+        .unwrap();
+    let event: Value = serde_json::from_slice(&output).unwrap();
+    assert_eq!(event["event"], "prospective", "{event}");
+    let forecast = &event["value"];
+    assert_eq!(forecast["action_committed"], false);
+    assert_eq!(forecast["source_scope"], "projected-family-joint");
+    assert_eq!(forecast["reading"]["state_count"], 4);
+    assert_eq!(forecast["text"], "aba", "{forecast}");
+    for (index, values) in [[0, 0, 1, 0], [1, 0, 0, 0], [0, 0, 1, 0], [1, 0, 0, 0]]
+        .iter()
+        .enumerate()
+    {
+        assert_eq!(read(forecast, index), expected(values));
+    }
+    assert_eq!(developed.wave.rest().unwrap(), saved);
+    assert_eq!(developed.inspect(), cursor);
+    assert!(developed.predict_continuation(&[], false).is_err());
+    assert!(developed
+        .predict_continuation(&[usize::MAX], false)
+        .is_err());
+    assert_eq!(developed.wave.rest().unwrap(), saved);
+
+    let predicted = developed.predict_symbol(false).unwrap();
+    control.predict_symbol(false).unwrap();
+    developed
+        .incorporate_symbol(predicted["action"]["prediction"].as_u64().unwrap(), "b")
+        .unwrap();
+    // Match the prepared (p,c) of both bodies. Only the actual returned condition/material
+    // differs; the dependent body must not fall back to its frozen normal/affine substrate.
+    control.receive_next_symbol("a").unwrap();
+    developed.receive_next_symbol("b").unwrap();
+    control.receive_next_symbol("b").unwrap();
+    let saved = developed.wave.rest().unwrap();
+    let forecast = developed.predict_continuation(&[0, 0, 0], true).unwrap();
+    let old = control.predict_continuation(&[0, 0, 0], false).unwrap();
+    assert_eq!(forecast["source_scope"], "declared-source-section");
+    assert_eq!(forecast["text"], "bbb", "{forecast}");
+    assert_eq!(old["text"], "aba", "{old}");
+    assert_eq!(forecast["action_committed"], false);
+    assert_eq!(read(&forecast, 0), read(&old, 0));
+    assert_eq!(
+        forecast["states"][0]["projection"]["previous"],
+        old["states"][0]["projection"]["previous"]
+    );
+    for index in 1..=3 {
+        assert_eq!(read(&forecast, index), expected(&[0, 0, 1, 0]));
+    }
+    assert_eq!(read(&old, 1), expected(&[1, 0, 0, 0]));
+    assert_eq!(read(&old, 2), expected(&[0, 0, 1, 0]));
+    assert_eq!(read(&old, 3), expected(&[1, 0, 0, 0]));
+    assert_eq!(developed.wave.rest().unwrap(), saved);
+    println!(
+        "{}",
+        json!({"scope":"shared-source prospective word control",
+        "initial_preview":event["value"]["text"],"matched_control_preview":old["text"],
+        "after_native_return":forecast["text"],"source_scope":forecast["source_scope"],
+        "joint_states":forecast["states"],"action_committed":forecast["action_committed"]})
+    );
+}
+
+#[test]
 #[ignore = "requires CUDA; streamed return publishes the full generator and following text uses its changed condition"]
 fn coupled_session_incorporates_observed_symbol_and_continues() {
     const CHILD: &str = "HOLONICS_HNN_CONSTITUTIVE_SESSION_RESUME";
@@ -148,26 +238,32 @@ fn coupled_session_incorporates_observed_symbol_and_continues() {
     // A second actual return reacts through the material formed by the first. The original
     // h=1 control and the twice-returned session now agree under matched complete sources.
     let command=json!({"schema":crate::HNA_STREAM_REQUEST_SCHEMA,"command":{"action":"observe-symbol","source":new_id,"text":"a"}}).to_string()+"\n";
-    let reads=s.census().section_read_outs;
-    let mut output=Vec::new();
-    stream.pump_coupled_wave(&mut session,&mut std::io::Cursor::new(command),&mut output).unwrap();
-    assert_eq!(s.census().section_read_outs,reads);
-    let event:Value=serde_json::from_slice(&output).unwrap();
-    assert_eq!(event["value"]["return_published"],true,"{event}");
-    assert_eq!(event["value"]["material_returns"],2);
-    assert_eq!(session.wave.pending_coupled_predictions(),0);
-    let after_second=session.wave.rest().unwrap();
-    assert!(session.incorporate_symbol(new_id,"a").is_err());
-    assert_eq!(session.wave.rest().unwrap(),after_second);
-    for text in ["a","b"] {
+    let reads = s.census().section_read_outs;
+    let mut output = Vec::new();
+    stream
+        .pump_coupled_wave(
+            &mut session,
+            &mut std::io::Cursor::new(command),
+            &mut output,
+        )
+        .unwrap();
+    assert_eq!(s.census().section_read_outs, reads);
+    let event: Value = serde_json::from_slice(&output).unwrap();
+    assert_eq!(event["value"]["return_published"], true, "{event}");
+    assert_eq!(event["value"]["material_returns"], 2);
+    assert_eq!(session.wave.pending_coupled_predictions(), 0);
+    let after_second = session.wave.rest().unwrap();
+    assert!(session.incorporate_symbol(new_id, "a").is_err());
+    assert_eq!(session.wave.rest().unwrap(), after_second);
+    for text in ["a", "b"] {
         session.receive_next_symbol(text).unwrap();
         control.receive_next_symbol(text).unwrap();
     }
-    assert_eq!(session.next_symbol(true).unwrap()["text"],"a");
-    assert_eq!(control.next_symbol(true).unwrap()["text"],"a");
-    let third=session.predict_symbol(false).unwrap();
-    let new_id=third["action"]["prediction"].as_u64().unwrap();
-    assert_eq!(session.wave.pending_coupled_predictions(),1);
+    assert_eq!(session.next_symbol(true).unwrap()["text"], "a");
+    assert_eq!(control.next_symbol(true).unwrap()["text"], "a");
+    let third = session.predict_symbol(false).unwrap();
+    let new_id = third["action"]["prediction"].as_u64().unwrap();
+    assert_eq!(session.wave.pending_coupled_predictions(), 1);
     let directory = path("constitutive-return");
     std::fs::create_dir(&directory).unwrap();
     let saved = directory.join("before.session");
@@ -384,15 +480,13 @@ fn coupled_session_process_resume_drains_the_pending_emission_once() {
     let mut session = session(&s);
     let mut stream = HnaStream::new();
     let request=b"{\"schema\":\"org.holonics.hna.stream-request.v1\",\"command\":{\"action\":\"emit-symbol\"}}\n";
-    assert!(
-        stream
-            .pump_coupled_wave(
-                &mut session,
-                &mut std::io::Cursor::new(request),
-                &mut Broken
-            )
-            .is_err()
-    );
+    assert!(stream
+        .pump_coupled_wave(
+            &mut session,
+            &mut std::io::Cursor::new(request),
+            &mut Broken
+        )
+        .is_err());
     assert_eq!(session.wave.epoch(), 1);
     let native = session.wave.rest().unwrap();
     let frame = stream.state().output.clone().unwrap();
@@ -550,50 +644,92 @@ fn coupled_session_reads_legacy_affine_frames() {
 #[test]
 #[ignore = "requires CUDA; a base prediction returns through the stream after publication and process exit"]
 fn coupled_session_returns_original_base_prediction_after_restart() {
-    const CHILD:&str="HOLONICS_HNN_BASE_RETURN_RESUME";
-    fn receive_base(session:&mut NativeCoupledWaveSession<'_>,stream:&mut HnaStream,id:u64)->Value {
+    const CHILD: &str = "HOLONICS_HNN_BASE_RETURN_RESUME";
+    fn receive_base(
+        session: &mut NativeCoupledWaveSession<'_>,
+        stream: &mut HnaStream,
+        id: u64,
+    ) -> Value {
         let command=json!({"schema":crate::HNA_STREAM_REQUEST_SCHEMA,"command":{"action":"observe-symbol","source":id,"text":"b"}}).to_string()+"\n";
-        let reads=session.surface.census().section_read_outs;
-        let mut output=Vec::new();
-        stream.pump_coupled_wave(session,&mut std::io::Cursor::new(command),&mut output).unwrap();
-        assert_eq!(session.surface.census().section_read_outs,reads);
-        let event:Value=serde_json::from_slice(&output).unwrap();
-        assert_eq!(event["value"]["return_published"],true,"{event}");
-        assert_eq!(session.wave.pending_coupled_predictions(),0);
-        assert!(session.incorporate_symbol(id,"b").is_err());
-        for text in ["a","b"] {session.receive_next_symbol(text).unwrap();}
-        let emitted=session.next_symbol(true).unwrap();
-        assert_eq!(emitted["text"],"a");
+        let reads = session.surface.census().section_read_outs;
+        let mut output = Vec::new();
+        stream
+            .pump_coupled_wave(session, &mut std::io::Cursor::new(command), &mut output)
+            .unwrap();
+        assert_eq!(session.surface.census().section_read_outs, reads);
+        let event: Value = serde_json::from_slice(&output).unwrap();
+        assert_eq!(event["value"]["return_published"], true, "{event}");
+        assert_eq!(session.wave.pending_coupled_predictions(), 0);
+        assert!(session.incorporate_symbol(id, "b").is_err());
+        for text in ["a", "b"] {
+            session.receive_next_symbol(text).unwrap();
+        }
+        let emitted = session.next_symbol(true).unwrap();
+        assert_eq!(emitted["text"], "a");
         json!({"received":event,"emitted":emitted})
     }
-    if let Some(directory)=std::env::var_os(CHILD) {
-        let directory=std::path::PathBuf::from(directory);
-        NativeCoupledWaveSavedSession::read(directory.join("before.session")).unwrap().with_session(|loaded,stream|{
-            let id=loaded.wave.pending_ids()?.into_iter().next().unwrap();
-            assert_eq!(loaded.compare_symbol(id,"b",Some(0))?["scope"],"dependent-producing-family-section");
-            let result=receive_base(loaded,stream,id);
-            std::fs::write(directory.join("result.json"),serde_json::to_vec(&result)?)?;
-            loaded.checkpoint_stream(directory.join("after.session"),stream.state())?;
-            Ok(())
-        }).unwrap();return;
+    if let Some(directory) = std::env::var_os(CHILD) {
+        let directory = std::path::PathBuf::from(directory);
+        NativeCoupledWaveSavedSession::read(directory.join("before.session"))
+            .unwrap()
+            .with_session(|loaded, stream| {
+                let id = loaded.wave.pending_ids()?.into_iter().next().unwrap();
+                assert_eq!(
+                    loaded.compare_symbol(id, "b", Some(0))?["scope"],
+                    "dependent-producing-family-section"
+                );
+                let result = receive_base(loaded, stream, id);
+                std::fs::write(directory.join("result.json"), serde_json::to_vec(&result)?)?;
+                loaded.checkpoint_stream(directory.join("after.session"), stream.state())?;
+                Ok(())
+            })
+            .unwrap();
+        return;
     }
-    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
-    let mut session=session_law(&s,true);let first=session.predict_symbol(false).unwrap();
-    let second=session.predict_symbol(false).unwrap();
-    assert_eq!(first["text"],"a");assert_eq!(second["text"],"b");
-    let root=first["action"]["prediction"].as_u64().unwrap();
-    let remaining=second["action"]["prediction"].as_u64().unwrap();
-    session.incorporate_symbol(root,"b").unwrap();
-    for text in ["a","b"] {session.receive_next_symbol(text).unwrap();}
-    let before=session.next_symbol(true).unwrap();assert_eq!(before["text"],"b");
-    let directory=path("base-return");std::fs::create_dir(&directory).unwrap();
-    let mut stream=HnaStream::new();session.checkpoint_stream(directory.join("before.session"),stream.state()).unwrap();
+    let ro = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&ro).unwrap();
+    let mut session = session_law(&s, true);
+    let first = session.predict_symbol(false).unwrap();
+    let second = session.predict_symbol(false).unwrap();
+    assert_eq!(first["text"], "a");
+    assert_eq!(second["text"], "b");
+    let root = first["action"]["prediction"].as_u64().unwrap();
+    let remaining = second["action"]["prediction"].as_u64().unwrap();
+    session.incorporate_symbol(root, "b").unwrap();
+    for text in ["a", "b"] {
+        session.receive_next_symbol(text).unwrap();
+    }
+    let before = session.next_symbol(true).unwrap();
+    assert_eq!(before["text"], "b");
+    let directory = path("base-return");
+    std::fs::create_dir(&directory).unwrap();
+    let mut stream = HnaStream::new();
+    session
+        .checkpoint_stream(directory.join("before.session"), stream.state())
+        .unwrap();
     let child=std::process::Command::new(std::env::current_exe().unwrap())
         .args(["--exact","native::coupled_wave::tests::coupled_session_returns_original_base_prediction_after_restart","--ignored","--test-threads=1"])
         .env(CHILD,&directory).output().unwrap();
-    assert!(child.status.success(),"{}\n{}",String::from_utf8_lossy(&child.stdout),String::from_utf8_lossy(&child.stderr));
-    let result=receive_base(&mut session,&mut stream,remaining);
-    assert_eq!(serde_json::from_slice::<Value>(&std::fs::read(directory.join("result.json")).unwrap()).unwrap(),result);
-    assert_eq!(NativeCoupledWaveSavedSession::read(directory.join("after.session")).unwrap().rest,session.wave.rest().unwrap());
-    eprintln!("old base prediction returned after first publication: before={} after={}",before["text"],result["emitted"]["text"]);
+    assert!(
+        child.status.success(),
+        "{}\n{}",
+        String::from_utf8_lossy(&child.stdout),
+        String::from_utf8_lossy(&child.stderr)
+    );
+    let result = receive_base(&mut session, &mut stream, remaining);
+    assert_eq!(
+        serde_json::from_slice::<Value>(&std::fs::read(directory.join("result.json")).unwrap())
+            .unwrap(),
+        result
+    );
+    assert_eq!(
+        NativeCoupledWaveSavedSession::read(directory.join("after.session"))
+            .unwrap()
+            .rest,
+        session.wave.rest().unwrap()
+    );
+    eprintln!(
+        "old base prediction returned after first publication: before={} after={}",
+        before["text"], result["emitted"]["text"]
+    );
 }

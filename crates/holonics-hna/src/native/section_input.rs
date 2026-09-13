@@ -5,7 +5,7 @@ use holonic_engine::{
     codec_recovery::{Symbol, SymbolAlphabet},
     native_ecology::constitutive_fibre::{
         FamilyBasisSelection, NormalBasisSelection, NormalFamilyBasisFace, NormalWaveBasisChart,
-        NormalWaveBasisFace,
+        NormalWaveBasisFace, NormalWaveFamily,
     },
     resident_section::{ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface},
 };
@@ -151,10 +151,10 @@ impl SymbolCurrentChart {
     }
     /// Decode an already-selected projected family action. Its producing family remains owned
     /// by the emission; this is not a bounded-score or unique-current assertion.
-    pub fn emit_family<'c>(
+    pub fn emit_family<'c, Origin>(
         &self,
-        source: NormalFamilyBasisFace<'c>,
-    ) -> Result<FamilySymbolEmission<'c>, NativeSessionError> {
+        source: NormalFamilyBasisFace<'c, Origin>,
+    ) -> Result<FamilySymbolEmission<'c, Origin>, NativeSessionError> {
         if source.basis_coordinates() != self.coordinates {
             return Err(NativeSessionError::Application(
                 "emission and symbol source charts differ".into(),
@@ -257,13 +257,13 @@ impl<'c> SymbolEmission<'c> {
 }
 
 /// A known codec action from a declared family projection, with its complete source retained.
-pub struct FamilySymbolEmission<'c> {
+pub struct FamilySymbolEmission<'c, Origin = (std::rc::Rc<NormalWaveFamily<'c>>, ResidentSection<'c>)> {
     symbol: Symbol,
     octets: Vec<u8>,
     selection: FamilyBasisSelection,
-    source: NormalFamilyBasisFace<'c>,
+    source: NormalFamilyBasisFace<'c, Origin>,
 }
-impl<'c> FamilySymbolEmission<'c> {
+impl<'c, Origin> FamilySymbolEmission<'c, Origin> {
     pub fn symbol(&self) -> Symbol {
         self.symbol
     }
@@ -273,7 +273,7 @@ impl<'c> FamilySymbolEmission<'c> {
     pub fn selection(&self) -> &FamilyBasisSelection {
         &self.selection
     }
-    pub fn source(&self) -> &NormalFamilyBasisFace<'c> {
+    pub fn source(&self) -> &NormalFamilyBasisFace<'c, Origin> {
         &self.source
     }
 }

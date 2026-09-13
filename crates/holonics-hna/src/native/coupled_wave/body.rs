@@ -12,7 +12,7 @@ use holonic_engine::{
     },
     resident_section::{ResidentSection, ResidentSurface},
 };
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::io::{Read, Write};
 
 fn invalid(message: impl ToString) -> NativeSessionError {
@@ -31,8 +31,11 @@ pub struct NativeCoupledBody<'c> {
 impl<'c> NativeCoupledBody<'c> {
     /// An affine body is available only while it is the actual continuing representation.
     /// The frozen substrate of a dependent generator is deliberately not exposed here.
-    pub fn affine_wave(&self)->Option<&ResidentNormalWave<'c,NormalWaveCoupled<'c>>>{
-        match self.state.as_ref()? {BodyState::Affine(w)=>Some(w),BodyState::Constitutive(_)=>None}
+    pub fn affine_wave(&self) -> Option<&ResidentNormalWave<'c, NormalWaveCoupled<'c>>> {
+        match self.state.as_ref()? {
+            BodyState::Affine(w) => Some(w),
+            BodyState::Constitutive(_) => None,
+        }
     }
     pub(crate) fn from_wave(wave: ResidentNormalWave<'c, NormalWaveCoupled<'c>>) -> Self {
         Self {
@@ -256,6 +259,73 @@ impl<'c> NativeCoupledBody<'c> {
             }
         }
     }
+    /// One prospective word, not repeated current projections or committed source events.
+    pub fn inspect_prospective(
+        &mut self,
+        word: &[(usize, WaveSourceReceiver)],
+        full_family: bool,
+    ) -> Result<Value, NativeSessionError> {
+        let epoch = self.epoch();
+        let scope = self.scope();
+        self.with_prospective(word, |future| {
+            Self::describe_prospective(future, epoch, scope, word, full_family)
+        })
+    }
+    pub(super) fn describe_prospective(
+        future: &holonic_engine::native_ecology::constitutive_fibre::NormalWaveFamilyReceiver<
+            '_,
+            'c,
+        >,
+        epoch: u64,
+        scope: &str,
+        word: &[(usize, WaveSourceReceiver)],
+        full_family: bool,
+    ) -> Result<Value, NativeSessionError> {
+        let reading = future.inspect()?;
+        let states = (0..reading.state_count)
+            .map(|state| {
+                let part = reading.projected_state(state).map(|v| {
+                    let wire = |v: &[num_rational::BigRational]| {
+                        v.iter()
+                            .map(super::super::RationalWire::from_rational)
+                            .collect::<Vec<_>>()
+                    };
+                    json!({"previous":wire(&v[..v.len()/2]),"current":wire(&v[v.len()/2..])})
+                });
+                json!({"state":state,"projection":part})
+            })
+            .collect::<Vec<_>>();
+        let affine = if full_family {
+            Some(future.affine_relation().inspect()?.predecessor_reading)
+        } else {
+            None
+        };
+        let coverage = future
+            .image()
+            .map(|image| image.inspect_coverage())
+            .transpose()?;
+        Ok(
+            json!({"source_scope":scope,"source_epoch":epoch,"word":word,
+                "action_committed":false,"reading":reading,"states":states,
+                "anchor":future.source().anchor().inspect()?,"affine_joint":affine,"affine_coverage":coverage,
+                "receiver_scope":"one joint minimum-norm output over the nearest supported anchor; not independent marginal selections",
+                "source_preservation":"the original anchor and affine source/future joint remain the prediction operands"}),
+        )
+    }
+    pub(super) fn with_prospective<R>(
+        &mut self,
+        word: &[(usize, WaveSourceReceiver)],
+        read: impl FnOnce(
+            &holonic_engine::native_ecology::constitutive_fibre::NormalWaveFamilyReceiver<'_, 'c>,
+        ) -> Result<R, NativeSessionError>,
+    ) -> Result<R, NativeSessionError> {
+        match self.state_mut()? {
+            BodyState::Affine(wave) => read(&wave.read_prospective_word(word)?),
+            BodyState::Constitutive(body) => {
+                body.with_prospective(word, None, |future| Ok(read(future)))?
+            }
+        }
+    }
     pub fn compare(
         &mut self,
         id: u64,
@@ -303,8 +373,8 @@ impl<'c> NativeCoupledBody<'c> {
                 if !b.has_prediction(id) {
                     return Err(invalid("no available producing comparison"));
                 }
-                let before=b.epoch();
-                b.incorporate_prediction(id,observed)?;
+                let before = b.epoch();
+                b.incorporate_prediction(id, observed)?;
                 return Ok(json!({"return_published":true,"prediction_consumed":id,
                     "before_epoch":before,"after_epoch":b.epoch(),"material_returns":b.material_returns(),
                     "receiver_scope":"declared-source-section","receiver_origin":"joined-producing-source",

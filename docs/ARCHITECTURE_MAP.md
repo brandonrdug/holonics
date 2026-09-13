@@ -450,6 +450,14 @@ receiver. `wave/family/rest.rs` and `resident/wave_relation/rest.rs` retain the 
 anchor, affine relation and last map through process exit. These are exact family interfaces;
 the continuing owner below now retains them; its public session is described below.
 
+[definition] `resident/image.rs::read_wave_word` lifts successive learned relations while
+retaining every earlier state, then compiles their homogeneous joint and checks coverage
+against the original source. Its lift/span kernels are in `constitutive_relation_image.cuh`.
+`NormalWaveFamily::read_prospective` retains that image beside the original anchor, using the
+same bounded receiver with independent anchor/output dimensions. The source and future variables
+are not replaced by independent marginal families. `DependentConstitutiveReturn` proves the
+shared-step range and unit homogeneous slice used by that compilation.
+
 [definition] `wave/coupled.rs` transfers the neighborhood into a typed continuation of
 `ResidentNormalWave`, owns its current family and admitted source/member bindings, and publishes
 prepared local material/condition with the complete next family. `normal_coupled.cuh` checks
@@ -504,6 +512,14 @@ Wave rest v9 retains the pending cuts and actual intervening word. Coupled sessi
 native body, whose dependent v4 rest retains original Base/Programme source frames.
 `compare-symbol` inspects the comparison; `observe-symbol` consumes it through the existing
 condition/contact/material owners and publishes the full returned generator.
+
+[definition] `coupled/continuation.rs::read_prospective_word` reads actual learned member maps
+once per member/chart cut. `coupled/dependent.rs::with_prospective` evaluates those maps through
+the current dependent generator's declared source-section, with optional explicit parameters.
+`NativeCoupledBody` retains that scope in its callback and `predict-continuation` stream return.
+`NormalFamilyBasisFace`/`FamilySymbolEmission` reuse their existing arithmetic and decoder with
+owned or borrowed provenance, reading each future frame from one joint projection. Preview is
+read-only; compound publication/feedback and dense-to-modal future compression remain open.
 
 [definition] `normal/direct/wave/actuate.rs` owns fixed-material source action. The
 `normal_source_actuation.cuh` source word reuses the learned normal response and the enclosed

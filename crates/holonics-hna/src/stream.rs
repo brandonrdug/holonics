@@ -46,6 +46,7 @@ pub enum HnaStreamCommand {
         transport: crate::native::CurrentWire,
     },
     InspectRelation,
+    PredictContinuation { word: Vec<usize>, #[serde(default)] full_family: bool },
     Advance {
         occurrence: HnaOccurrence,
         #[serde(default)]
@@ -333,6 +334,10 @@ impl HnaStream {
                         }
                     }
                 }
+                HnaStreamCommand::PredictContinuation { word, full_family } => match target.predict_continuation(&word, full_family) {
+                    Ok(value) => self.emit("prospective", value)?,
+                    Err(error) => self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?,
+                },
                 HnaStreamCommand::InspectRelation => match target.inspect_relation() {
                     Ok(value) => self.emit("relation", value)?,
                     Err(error) => {
@@ -431,6 +436,9 @@ trait StreamTarget {
     }
     fn inspect_relation(&mut self) -> Result<Value, String> {
         Err("local relation inspection is not supported by this model kind".into())
+    }
+    fn predict_continuation(&mut self, _: &[usize], _: bool) -> Result<Value, String> {
+        Err("joint prospective continuation is not attached to this model kind".into())
     }
     fn advance(&mut self, occurrence: &HnaOccurrence, full: bool) -> Result<Value, String>;
     fn advance_native(&mut self, occurrence: &HnaOccurrence, full: bool) -> Result<Value, String>;
@@ -854,6 +862,7 @@ impl StreamTarget for crate::native::NativeMathematicalSession<'_> {
 }
 
 impl StreamTarget for crate::native::NativeCoupledWaveSession<'_>{
+    fn predict_continuation(&mut self,word:&[usize],full:bool)->Result<Value,String>{self.predict_continuation(word,full).map_err(|e|e.to_string())}
     fn compare_symbol(&mut self,id:u64,text:&str,row:Option<usize>)->Result<Value,String>{self.compare_symbol(id,text,row).map_err(|e|e.to_string())}
     fn release_symbol_comparison(&mut self,id:u64)->Result<Value,String>{self.release_symbol_comparison(id).map_err(|e|e.to_string())}
     fn receive_next_symbol(&mut self,text:&str)->Result<Value,String>{self.receive_next_symbol(text).map_err(|e|e.to_string())}

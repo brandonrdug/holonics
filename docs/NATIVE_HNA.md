@@ -242,8 +242,9 @@ publication now serves `ResidentNormalWave<NormalWaveCoupled>`. `with_neighborho
 local laws and condition into that same move owner. `admit_contact` / `advance_contact` operate
 on its full current family; `receive_contact_source` develops actual point-source testimony and
 stages the next family with the changed neighborhood. Rest v7 and `remount_coupled` preserve the
-whole owner and its live contact/normal-comparison handles. The public text session remains the
-packet-2 normal-word adapter while coupled source/emission integration continues. See the
+whole owner and its live contact/normal-comparison handles. The coupled session binds source,
+emitted and observed currents to this owner and its dependent continuation; the separate
+normal-word session retains its own declared source chart. See the
 [coupled-owner return](../research/records/2026-09-11_ONE_WAVE_OWNS_CONDITIONAL_CURRENT_MATERIAL_AND_PENDING_RETURNS.md) for that distinction.
 
 ## Resident symbol receiver and continuing wave session
@@ -284,6 +285,43 @@ existing inspect/checkpoint stream commands. MODEL_DIRECTORY is an admitted Appl
 See [the emission return](../research/records/2026-09-11_ATHENA_EMITS_THROUGH_A_RESIDENT_RECEIVER_AND_REENTERS_ITS_SUCCESSOR.md) for exact checked source and quality scope.
 
 ## Conversation source
+
+### Coupled session and joint prospective words
+
+[definition] `NativeCoupledWaveSession` owns the affine or dependent coupled body through
+`NativeCoupledBody`. Its existing CLI is `holonics hna coupled-wave-session MODEL_DIRECTORY`
+or `holonics hna coupled-wave-session SAVED.session --resume`, with `--input` and `--checkpoint`
+as on the normal-word session. `observe-symbol` publishes the dependent source/condition/
+material return; it does not resume the frozen normal bank as another continuing body.
+
+[definition] A joint preview uses the same stream schema:
+
+```json
+{"schema":"org.holonics.hna.stream-request.v1","command":{"action":"predict-continuation","word":[0,0,0],"full_family":true}}
+```
+
+The word names actual member indices in this session's source chart. It composes those learned
+transports with no intervening reception or self-re-entry. One shared source and every
+intermediate equality remain in the compiled joint; the original anchor bound remains separate
+from its affine hull. The response includes support, affine coverage, one declared joint
+projection, its state blocks, and text decoded on device from that **same** joint projection.
+`full_family` additionally exposes the complete affine joint. No source, current, condition,
+material, epoch, cursor or pending comparison is published by this preview.
+
+[definition] An affine body previews its whole anchored family. A dependent body uses its
+standing declared source-section, retaining the full dependent generator; the engine's
+`with_prospective` also accepts another admitted parameter section. Neither section is claimed
+to be the union of all parameter-dependent alternatives. The unit-metric projected receiver is
+not a probability distribution or minimum-energy dynamics. This transport-only preview is
+not a claim to predict the different `emit-symbol` loop with intervening source re-entry.
+Compound action publication and its returned observation/feedback remain an integration task.
+
+[definition] Native ownership remains in the existing family/image/receiver types.
+`NormalFamilyBasisFace` and `FamilySymbolEmission` now parameterize their source ownership:
+the old path owns its family/report, and a prospective frame borrows the complete joint receiver.
+Both use the same score kernel and decoder. A receiver/decoder obstruction is reported without
+turning a projection into a point source or deleting the original family. Representation cost
+depends on the requested joint dimensions; a scratch refusal is not a physical prediction horizon.
 
 [definition] `ResidentNormalWave::actuate_section` supplies an incoming source field to the
 held joint current with material fixed. Each measured pair has a learned joined arrival;

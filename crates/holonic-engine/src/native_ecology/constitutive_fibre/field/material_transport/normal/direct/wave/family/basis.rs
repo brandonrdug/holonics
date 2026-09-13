@@ -19,19 +19,26 @@ pub struct FamilyBasisReading {
     /// constancy over the anchor ball, or a robust winning symbol for the whole family.
     pub anchor_independent_free: Vec<bool>,
 }
-pub struct NormalFamilyBasisFace<'c> {
-    family: Rc<NormalWaveFamily<'c>>,
+pub struct NormalFamilyBasisFace<'c, Origin = (Rc<NormalWaveFamily<'c>>, ResidentSection<'c>)> {
+    origin: Origin,
+    surface: &'c ResidentSurface<'c>,
     epoch: u64,
     coordinates: Vec<usize>,
     _basis: Rc<ResidentSection<'c>>,
-    _receiver: ResidentSection<'c>,
     scores: ResidentSection<'c>,
     selection: ResidentSection<'c>,
 }
 impl<'c> NormalFamilyBasisFace<'c> {
     pub fn source(&self) -> &NormalWaveFamily<'c> {
-        &self.family
+        &self.origin.0
     }
+}
+impl<'a, 'r, 'c> NormalFamilyBasisFace<'c, &'a NormalWaveFamilyReceiver<'r, 'c>> {
+    pub fn source(&self) -> &NormalWaveFamilyReceiver<'r, 'c> {
+        self.origin
+    }
+}
+impl<'c, Origin> NormalFamilyBasisFace<'c, Origin> {
     pub fn epoch(&self) -> u64 {
         self.epoch
     }
@@ -39,7 +46,7 @@ impl<'c> NormalFamilyBasisFace<'c> {
         &self.coordinates
     }
     pub fn selection(&self) -> Result<FamilyBasisSelection, ConstitutiveFibreError> {
-        let s = self.family.origin().fibre().surface;
+        let s = self.surface;
         let v = wides(&s.read_out(&self.selection)?)?;
         if v.len() != 4
             || v[0] < 0
@@ -60,14 +67,7 @@ impl<'c> NormalFamilyBasisFace<'c> {
     }
     pub fn inspect(&self) -> Result<FamilyBasisReading, ConstitutiveFibreError> {
         let selection = self.selection()?;
-        let v = wides(
-            &self
-                .family
-                .origin()
-                .fibre()
-                .surface
-                .read_out(&self.scores)?,
-        )?;
+        let v = wides(&self.surface.read_out(&self.scores)?)?;
         let n = self.coordinates.len();
         if v.len() != 2 * n + 1 || v[n] <= 0 || v[n + 1..].iter().any(|v| !matches!(*v, 0 | 1)) {
             return Err(ConstitutiveFibreError::Shape);
@@ -97,6 +97,25 @@ impl<'c> NormalWaveBasisChart<'c> {
             return Err(ConstitutiveFibreError::Shape);
         }
         let receiver = family.read_receiver()?.into_report();
+        let (scores, selection) = self.project_family(&receiver, 4 * n, 2 * n)?;
+        Ok(NormalFamilyBasisFace {
+            origin: (family, receiver),
+            surface: s,
+            epoch,
+            coordinates: self.coordinates.clone(),
+            _basis: Rc::clone(&self.permutation),
+            scores,
+            selection,
+        })
+    }
+    fn project_family(
+        &self,
+        receiver: &ResidentSection<'c>,
+        outputs: usize,
+        current_at: usize,
+    ) -> Result<(ResidentSection<'c>, ResidentSection<'c>), ConstitutiveFibreError> {
+        let s = self.surface;
+        let n = self.coordinates.len();
         let scores = s.fresh_section(1, 2 * (2 * n + 1), ResidentGrain(0))?;
         let selection = s.fresh_section(1, 8, ResidentGrain(0))?;
         let mut p = s.begin_passage(&[vec![]])?;
@@ -104,9 +123,11 @@ impl<'c> NormalWaveBasisChart<'c> {
             let lane = p.open(0, &[])?;
             s.record_family_basis_face(
                 &lane,
-                &receiver,
+                receiver,
                 &self.permutation,
                 n,
+                outputs,
+                current_at,
                 &scores,
                 &selection,
             )?;
@@ -119,12 +140,42 @@ impl<'c> NormalWaveBasisChart<'c> {
                 receipt.obstruction
             )));
         }
+        Ok((scores, selection))
+    }
+}
+
+impl<'r, 'c> NormalWaveFamilyReceiver<'r, 'c> {
+    /// Every requested frame reads the SAME joint projection. This preserves its source
+    /// across decoding; it does not select a new marginal/source independently per symbol.
+    pub fn read_basis<'a>(
+        &'a self,
+        chart: &NormalWaveBasisChart<'c>,
+        state: usize,
+        epoch: u64,
+    ) -> Result<NormalFamilyBasisFace<'c, &'a Self>, ConstitutiveFibreError> {
+        let n = chart.coordinates.len();
+        if !std::ptr::eq(chart.surface, self.source().origin().fibre().surface)
+            || n != self.source().origin().fibre().roots
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let t = 2 + 8 * n;
+        let width = self.affine_relation().target_width();
+        if width % t != 0 || state >= width / t {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let current_at = state
+            .checked_mul(t)
+            .and_then(|v| v.checked_add(2 * n))
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let (scores, selection) =
+            chart.project_family(self.report(), width - 2 - 4 * n, current_at)?;
         Ok(NormalFamilyBasisFace {
-            family,
+            origin: self,
+            surface: chart.surface,
             epoch,
-            coordinates: self.coordinates.clone(),
-            _basis: Rc::clone(&self.permutation),
-            _receiver: receiver,
+            coordinates: chart.coordinates.clone(),
+            _basis: Rc::clone(&chart.permutation),
             scores,
             selection,
         })

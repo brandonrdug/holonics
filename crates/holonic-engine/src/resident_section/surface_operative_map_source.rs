@@ -1,6 +1,7 @@
 use super::*;
 
 impl<'c> ResidentSurface<'c> {
+    #[cfg(test)]
     pub(crate) fn record_joined_operative_return_bounds(
         &self,
         lane: &Lane<'_, 'c>,

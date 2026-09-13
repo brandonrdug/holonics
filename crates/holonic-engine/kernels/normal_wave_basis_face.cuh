@@ -48,12 +48,12 @@ extern "C" __global__ __launch_bounds__(512) void section_normal_wave_basis_face
 // action. The full family remains in the face owner; these scores are not interval bounds.
 extern "C" __global__ void section_family_basis_face(
  const int64_t *family,const int64_t *family_hi,const int64_t *permutation,const int64_t *permutation_hi,
- uint32_t n,int64_t *scores,int64_t *scores_hi,int64_t *selection,int64_t *selection_hi,
+ uint32_t n,uint32_t outputs,uint32_t current_at,int64_t *scores,int64_t *scores_hi,int64_t *selection,int64_t *selection_hi,
  uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
  if(blockIdx.x||threadIdx.x)return;if(upstream_refused(census,lineage,lineage_count,slot))return;
- if(!n||n>(UINT32_MAX-8u)/32u){atomicOr(slot,REFUSED_MALFORMED);return;}
+ if(!n||8u+16u*(uint64_t)n+4u*outputs>UINT32_MAX||(uint64_t)current_at+2u*n>outputs){atomicOr(slot,REFUSED_MALFORMED);return;}
  uint32_t a=4u*n;
- for(uint32_t i=0;i<8u+8u*a;++i)if(family[i]!=family_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+ for(uint32_t i=0;i<8u+4u*a+4u*outputs;++i)if(family[i]!=family_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
  const wide *f=(const wide*)family;
  if(f[0]!=0){atomicOr(slot,REFUSED_BOUND);return;}
  if(f[2u+a]<=0){atomicOr(slot,REFUSED_MALFORMED);return;}
@@ -63,7 +63,7 @@ extern "C" __global__ void section_family_basis_face(
  }
  wide *v=(wide*)scores;uint32_t selected=0,ties=1;
  for(uint32_t i=0;i<n;++i){uint32_t j=(uint32_t)permutation[i];
-  v[i]=f[3u+a+2u*n+2u*j];v[n+1u+i]=f[4u+3u*a+2u*n+2u*j];
+  v[i]=f[3u+a+current_at+2u*j];v[n+1u+i]=f[4u+2u*a+outputs+current_at+2u*j];
   if(v[n+1u+i]<0||v[n+1u+i]>1){atomicOr(slot,REFUSED_MALFORMED);return;}
   if(i){if(v[i]>v[selected]){selected=i;ties=1;}else if(v[i]==v[selected])++ties;}
  }

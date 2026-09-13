@@ -3,6 +3,37 @@
 //! and forgetting its map does not preserve the pending source/current joint.
 use super::*;
 
+/// Read each actual member/receiver cut once for this prospective word. Repeated use shares
+/// immutable derived maps; it does not clone a continuing ecology or store observed events.
+pub(super) fn prospective_maps<'c>(
+    word: &[(usize, WaveSourceReceiver)],
+    mut read: impl FnMut(usize, WaveSourceReceiver) -> Result<ResidentWaveRelation<'c>, ConstitutiveFibreError>,
+) -> Result<Vec<Rc<ResidentWaveRelation<'c>>>, ConstitutiveFibreError> {
+    if word.is_empty() { return Err(ConstitutiveFibreError::Shape); }
+    let mut retained: BTreeMap<(usize, bool), Rc<ResidentWaveRelation<'c>>> = BTreeMap::new();
+    word.iter().map(|&(member, chart)| {
+        let key = (member, match chart { WaveSourceReceiver::Direct => false, WaveSourceReceiver::UnitRealSum => true });
+        if let Some(map) = retained.get(&key) { return Ok(Rc::clone(map)); }
+        let map = Rc::new(read(member, chart)?);
+        retained.insert(key, Rc::clone(&map));
+        Ok(map)
+    }).collect()
+}
+
+impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
+    /// Prospective compound conduct through the current learned members and condition.
+    /// No actual contact, epoch, current, pending handle or material is published here.
+    pub fn read_prospective_word(
+        &self,
+        word: &[(usize, WaveSourceReceiver)],
+    ) -> Result<NormalWaveFamilyReceiver<'_, 'c>, ConstitutiveFibreError> {
+        self.current().check_prospective_extent(word.len())?;
+        let maps = prospective_maps(word, |member, chart| self.neighborhood()
+            .read_wave_relation_in_chart(member, self.normal_material().roots(), chart, None))?;
+        self.current().read_prospective(maps)
+    }
+}
+
 /// An implicit joint relation. For consecutive factors L_i its members satisfy
 /// z_0 in source(), (z_i,z_{i+1}) in L_i, and z_last in current(), with the same joining
 /// z_i at both adjacent ports. Factors are actual immutable maps used by this wave.

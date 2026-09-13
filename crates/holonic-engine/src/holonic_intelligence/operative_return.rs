@@ -236,6 +236,7 @@ pub(super) struct DepositMaterial<'a, 'chart> {
 /// source/target lineage and must establish its joining before calling this numerical passage.
 /// Shape equality alone never establishes that relation. Admittance and source duality are
 /// native constitutive chart data, not caller-provided scores or a fabricated semantic current.
+#[cfg(test)]
 pub(super) struct SectionContactMaterial<'a, 'chart> {
     pub presented: &'a ResidentSection<'chart>,
     pub presented_octaves: u32,
@@ -332,6 +333,7 @@ pub(super) fn native_section_difference<'chart>(
 /// The existing deposit seals u = -2^-learning_shift * d^T and v. Thus its effective formal
 /// admittance includes that explicitly declared dyadic readout. Interval sealing retains the
 /// existing deposit's numerical boundary; this function does not claim a new exact real model.
+#[cfg(test)]
 pub(super) fn enact_section_contact<'chart>(
     surface: &'chart ResidentSurface<'chart>,
     material: SectionContactMaterial<'_, 'chart>,
