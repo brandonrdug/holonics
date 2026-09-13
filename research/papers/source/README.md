@@ -5,10 +5,12 @@ reading and writing surface, not a second claim index, engine owner, research sc
 replacement for the source record. The mathematics is independent of any one Eros or
 machine-learning application.
 
-For the current pure-holonics/RH scope, begin with the dependency-ordered
-[*Synopsis of Elementary Causality in Pure Holonic Mathematics*](synopsis/README.md) and its
-importable [holonics registry](holonics/registry.typ). The older composed papers and object library
-below remain source material until an entry is independently imported and regraded there.
+[definition] Current mathematics is navigated through the
+[formal framework](../../../docs/FORMAL_FRAMEWORK.md), source owners and dated evidence.
+The [publication positioning review](../../records/2026-09-13_PUBLICATION_POSITIONING_DISTINGUISHES_SOURCE_CONSTRUCTION_AND_PRIORITY.md)
+identifies the strongest theorem/artifact packages and their closest prior art. The synopsis,
+its importable notation registry and the composed manuscripts below are presentation/research
+sources; they do not regrade all current mathematics or replace the live construction order.
 
 Use the pinned [`MATHEMATICAL_HOLONICS.md`](../../../archive/reference/holobrochos-a07ff376/src/soma/MATHEMATICAL_HOLONICS.md)
 for historical mathematical orientation, the pinned
@@ -106,17 +108,17 @@ PDF set:
 
 ```sh
 typst --version  # must report 0.15.1
-mkdir -p papers/rendered
-typst compile --root papers/source papers/source/journal.typ papers/rendered/soma-holonics-foundations.pdf
-typst compile --root papers/source papers/source/papers/categorical-holonics/main.typ papers/rendered/categorical-holonics.pdf
-typst compile --root papers/source papers/source/papers/elements-of-holonics/main.typ papers/rendered/elements-of-holonics.pdf
-typst compile --root papers/source papers/source/papers/causal-formulation-ecologies/main.typ papers/rendered/causal-formulation-ecologies.pdf
-typst compile --root papers/source papers/source/papers/riemann-receiver-geometry/main.typ papers/rendered/riemann-receiver-geometry.pdf
-typst compile --root papers/source papers/source/papers/prime-archimedean-formulation-atlas/main.typ papers/rendered/prime-archimedean-formulation-atlas.pdf
-typst compile --root papers/source papers/source/papers/knot-causal-topology/main.typ papers/rendered/knot-causal-topology.pdf
-typst compile --root papers/source papers/source/papers/receiver-relative-arithmetic-calculus/main.typ papers/rendered/receiver-relative-arithmetic-calculus.pdf
-typst compile --root papers/source papers/source/papers/prime-number-observatory/main.typ papers/rendered/prime-number-observatory.pdf
-typst compile --root papers/source papers/source/synopsis/main.typ papers/rendered/synopsis-elementary-causality.pdf
+mkdir -p research/papers/rendered
+typst compile --root research/papers/source research/papers/source/journal.typ research/papers/rendered/soma-holonics-foundations.pdf
+typst compile --root research/papers/source research/papers/source/papers/categorical-holonics/main.typ research/papers/rendered/categorical-holonics.pdf
+typst compile --root research/papers/source research/papers/source/papers/elements-of-holonics/main.typ research/papers/rendered/elements-of-holonics.pdf
+typst compile --root research/papers/source research/papers/source/papers/causal-formulation-ecologies/main.typ research/papers/rendered/causal-formulation-ecologies.pdf
+typst compile --root research/papers/source research/papers/source/papers/riemann-receiver-geometry/main.typ research/papers/rendered/riemann-receiver-geometry.pdf
+typst compile --root research/papers/source research/papers/source/papers/prime-archimedean-formulation-atlas/main.typ research/papers/rendered/prime-archimedean-formulation-atlas.pdf
+typst compile --root research/papers/source research/papers/source/papers/knot-causal-topology/main.typ research/papers/rendered/knot-causal-topology.pdf
+typst compile --root research/papers/source research/papers/source/papers/receiver-relative-arithmetic-calculus/main.typ research/papers/rendered/receiver-relative-arithmetic-calculus.pdf
+typst compile --root research/papers/source research/papers/source/papers/prime-number-observatory/main.typ research/papers/rendered/prime-number-observatory.pdf
+typst compile --root research/papers/source research/papers/source/synopsis/main.typ research/papers/rendered/synopsis-elementary-causality.pdf
 ```
 
 ## Long-term shape
@@ -141,9 +143,9 @@ remain explicit. Ordinary Typst `//` comments remain private and do not render.
 
 ## Boundary
 
-This volume does not supersede the live mathematical orientation, external research network,
-`FORMULA.md`, historical research deposits, or measured results. It reconstructs selected
-relations into dependency-ordered mathematical manuscripts. Every claim remains restricted by
+[definition] Current AGENTS, source, canon, roadmap and position govern construction. Historical
+`FORMULA.md` and imported research locate provenance. This volume reconstructs selected
+relations into mathematical manuscripts. Every claim remains restricted by
 its named source, hypotheses, receiver, parameter region, evidence grade, and open boundary.
 
 ## Receiver and engraving packages

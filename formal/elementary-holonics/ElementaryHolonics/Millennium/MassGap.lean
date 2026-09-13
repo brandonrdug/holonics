@@ -1,26 +1,30 @@
 import ElementaryHolonics.Millennium.Pivots
 
 /-!
-# The Yang–Mills row: the gap is a number, the vacuum is invisible, and non-compactness is attainable
+# The Yang–Mills row: a receiver gap, vacuum reduction, and a perturbation passage
 
-`MillenniumCoupling` proved the dichotomy — a gap is free in finite dimensions and refused by a
-compact form.  Three things were left, and each is one theorem.
+`MillenniumCoupling` proves coercivity for positive-definite finite-dimensional receiver forms
+and excludes coercivity for compact forms on infinite-dimensional carriers. The results below
+quantify the bound, retain the vacuum complement and transport the bound through a controlled
+quadratic difference.
 
 **The gap is a number.**  `theGapIsThePositivityOfTheSphereInfimum`: a form is coercive exactly
-when its readings on the unit sphere stay above some positive `Δ`.  Homogeneity does the rest, so
-"the form has a gap" and "the sphere readings are bounded away from zero" are one statement.  **The
-mass is that bound** — not an existential about the form but a number read off the unit sphere.
+when its quadratic readings on the unit sphere stay above some positive `Δ`.  Homogeneity does the
+rest, so "the form has a gap" and "the sphere readings are bounded away from zero" are one
+statement.  This is a quadratic/spectral receiver bound; identifying it with a physical energy or
+mass scale requires a declared physical operator, units, and receiver map.
 
-**The vacuum is invisible, and it forces the reduction.**  `theVacuumIsInvisible`: if `e` returns
-nothing under a positive form, adding any amount of it changes no reading whatever — the vacuum
-lies in the radical and the reading factors through the quotient by it.  `theVacuumRefusesAGlobalGap`
+**The vacuum is invisible to the form, and it forces the reduction.**  `theVacuumIsInvisible`: if
+`e` returns nothing under a positive form, adding any amount of it changes no diagonal reading of
+that form — the vacuum lies in the radical and the reading factors through the quotient by it.
+`theVacuumRefusesAGlobalGap`
 then shows any form with a nonzero vacuum is non-coercive.  So stating the mass gap *above the
 vacuum* is not a convention: on the whole space no gap can exist, and the only place one can live
 is the quotient.  The frame makes that reduction automatic rather than stipulated.
 
 **And the dichotomy is not vacuous.**  `theAnchorIsNonCompactInInfiniteDimensions`: the identity has
-gap one, so on an infinite-dimensional space it cannot be compact.  A gap **is** possible in
-infinite dimensions, and exactly the non-compact forms can carry one.
+gap one, while its unit-ball image is not totally bounded on an infinite-dimensional space.  A gap
+can therefore occur in infinite dimensions; this witness does not classify all non-compact forms.
 
 Every `theorem` is discharged and none depends on `sorryAx`.
 -/
@@ -34,10 +38,9 @@ open Soma.Holonics.Millennium.Pivots Metric Set
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V]
 
-/-- **THE ANCHOR WITNESSES THAT NON-COMPACTNESS IS ATTAINABLE.**  The identity has gap one, so by
-`theGapRefusesACompactForm` it cannot carry the unit ball to a totally bounded set unless the space
-is finite-dimensional.  The dichotomy is therefore not vacuous on either side: **a gap is possible
-in infinite dimensions, and exactly the non-compact forms can carry one.** -/
+/-- **THE ANCHOR WITNESSES THAT A GAP CAN OCCUR IN INFINITE DIMENSIONS.**  The identity has gap one,
+so by `theGapRefusesACompactForm` its unit-ball image is not totally bounded unless the space is
+finite-dimensional.  This witness does not classify all non-compact forms. -/
 theorem theAnchorIsNonCompactInInfiniteDimensions [CompleteSpace V]
     (hinf : ¬ FiniteDimensional ℝ V) :
     ¬ TotallyBounded ((euclidean V).T '' Metric.closedBall (0 : V) 1) := by
@@ -60,8 +63,9 @@ theorem theGapBoundsTheSphere {F : ReceiverForm V} (h : F.IsCoercive) :
   rwa [hn, one_pow, mul_one] at this
 
 /-- **AND A POSITIVE LOWER BOUND ON THE SPHERE READINGS IS A GAP.**  Homogeneity does the rest, so
-"the form is coercive" and "the sphere readings stay above zero" are one statement.  The **mass** is
-that lower bound: not an existential about the form but a number read off the unit sphere. -/
+"the form is coercive" and "the sphere readings stay above zero" are one statement.  The bound is a
+quadratic/spectral receiver value; a physical mass or energy interpretation requires its declared
+operator, units, and receiver map. -/
 theorem theSphereBoundIsAGap {F : ReceiverForm V} {Δ : ℝ} (hΔ : 0 < Δ)
     (h : ∀ r ∈ sphereReadings F, Δ ≤ r) : F.IsCoercive := by
   refine ⟨Δ, hΔ, fun v => ?_⟩
@@ -83,11 +87,45 @@ theorem theGapIsThePositivityOfTheSphereInfimum (F : ReceiverForm V) :
     F.IsCoercive ↔ ∃ Δ : ℝ, 0 < Δ ∧ ∀ r ∈ sphereReadings F, Δ ≤ r :=
   ⟨theGapBoundsTheSphere, fun ⟨_, hΔ, h⟩ => theSphereBoundIsAGap hΔ h⟩
 
+/-- **A RETAINED FORM SURVIVES A SMALL QUADRATIC DIFFERENCE.**  If `F` has quadratic lower bound
+`Δ` and the diagonal difference `G.B v v - F.B v v` is bounded in absolute value by
+`ε ‖v‖²`, then `G` has the explicit lower bound `(Δ - ε) ‖v‖²`.  This is a receiver-form
+stability law; it does not make a scale-dependent bound uniform across a family. -/
+theorem theGapSurvivesReceiverDifference (F G : ReceiverForm V) {Δ ε : ℝ}
+    (_hΔ : 0 < Δ) (hF : ∀ v : V, Δ * ‖v‖ ^ 2 ≤ F.B v v)
+    (hDifference : ∀ v : V, |G.B v v - F.B v v| ≤ ε * ‖v‖ ^ 2)
+    (hε : ε < Δ) : G.IsCoercive := by
+  refine ⟨Δ - ε, sub_pos.mpr hε, fun v => ?_⟩
+  have hLower : -(ε * ‖v‖ ^ 2) ≤ G.B v v - F.B v v :=
+    neg_le_of_abs_le (hDifference v)
+  nlinarith [hF v]
+
+/-- The quantitative inequality itself is exposed for physical scaling/remainder consumers. -/
+theorem receiverDifference_lower_bound (F G : ReceiverForm V) {Δ ε : ℝ}
+    (hF : ∀ v : V, Δ * ‖v‖ ^ 2 ≤ F.B v v)
+    (hDifference : ∀ v : V, |G.B v v - F.B v v| ≤ ε * ‖v‖ ^ 2) (v : V) :
+    (Δ - ε) * ‖v‖ ^ 2 ≤ G.B v v := by
+  have hLower := neg_le_of_abs_le (hDifference v)
+  nlinarith [hF v]
+
+/-- The same perturbation bound can be reused at every index of a family on one carrier. -/
+theorem familyGapSurvivesReceiverDifference {Index : Type*}
+    (F G : Index → ReceiverForm V) {Δ ε : ℝ}
+    (_hΔ : 0 < Δ) (hF : ∀ (index : Index) (v : V), Δ * ‖v‖ ^ 2 ≤ (F index).B v v)
+    (hDifference : ∀ (index : Index) (v : V),
+      |(G index).B v v - (F index).B v v| ≤ ε * ‖v‖ ^ 2)
+    (hε : ε < Δ) :
+    0 < Δ - ε ∧ ∀ (index : Index) (v : V), (Δ - ε) * ‖v‖ ^ 2 ≤ (G index).B v v := by
+  refine ⟨sub_pos.mpr hε, ?_⟩
+  intro index v
+  exact receiverDifference_lower_bound (F index) (G index) (hF index) (hDifference index) v
+
 /-! ## The vacuum, and why the gap is measured above it -/
 
 /-- **A VACUUM IS INVISIBLE TO A POSITIVE FORM.**  If `e` returns nothing, adding any amount of it
-changes no reading whatever — the vacuum lies in the radical, so the reading factors through the
-quotient by it.
+changes no diagonal reading of that form — the vacuum lies in the radical, so this unnormalized
+quadratic reading factors through the quotient by it.  This statement does not cover arbitrary
+observables or normalized expectation values.
 
 This is why a mass gap is stated *above the vacuum* rather than on the whole space: on the whole
 space the form is never definite once a vacuum exists, and the question is not about the vacuum at

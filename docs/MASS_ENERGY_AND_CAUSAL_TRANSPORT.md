@@ -29,6 +29,12 @@ systems as well as individual particles.[^1]
 
 ## 1. Mass belongs to the complete energy–momentum configuration
 
+[definition] The [mass/flux/gap synthesis](../research/records/2026-09-13_MASS_FLUX_GAPS_AND_OPTIMAL_NAVIGATION_RETURN_THEIR_SOURCE_MAPS.md)
+connects this physical receiver to the traffic source, vacuum-complement coercivity and
+Yang–Mills scale problem. A pair's positive invariant mass and a uniform positive excitation
+threshold are different quantifiers: the new freely scalable opposite-photon family has
+positive total mass below every supplied positive energy threshold.
+
 [definition] Use energy-scaled coordinates \(P=(E,c\mathbf p)\) with pairing
 \(\langle P,Q\rangle_L=E_PE_Q-c^2\mathbf p_P\cdot\mathbf p_Q\). The rest-energy square is
 \(\langle P,P\rangle_L\). The sum of constituent rest masses is generally not the invariant
@@ -559,7 +565,30 @@ reverse carrying the conjugate: `H_e=z A+conj(z) A†`. The paired current is
 `J_e=i(z A-conj(z) A†)`. These are the finite matter ports for connection phase; their exact
 Hermiticity, occupation and consuming-Hamiltonian results are recorded in the recovery.
 
-## 13. Unified construction map
+## 13. Mass gaps, retained modes and navigation
+
+[proved-derived; formal-checked] `Millennium/MassGap.lean` transports a known quadratic lower
+bound through a controlled difference. If `F(v,v)>=Delta||v||^2` and
+`|G(v,v)-F(v,v)|<=epsilon||v||^2`, then `G(v,v)>=(Delta-epsilon)||v||^2`.
+The indexed version uses the same constants at every index. Apply it on the vacuum complement,
+with physical operator/units supplied. Bounding only the visible quotient can miss low-energy
+remainder modes; the complete bound is the useful source obligation for a gap-preserving reduction.
+
+[definition] A unified model can contain a gapped confined sector and a massless radiation
+sector. The former's excitation scale is not a positive gap of the entire combined theory.
+Hodge positive modes, Hamiltonian energy and arithmetic zero placement have their actual
+source maps and units. Heat/Gamma/spectral-zeta transforms connect appropriate operators;
+an equal scalar or an arbitrary finite spectrum does not identify their whole sources.
+
+[definition] The same concern appears in optimal navigation. A quotient distance is a lower
+bound until a full-state target-reaching lift matches it. `Foundation/TransportWord.lean`
+now proves a unit-cost distance/policy certificate and compiles its descending word.
+The exact group-navigation application uses actual cube face geometry to compare projected
+corner goals with complete sticker-state goals. Nonnegative path counting and coherent
+amplitude propagation are distinct receivers: cancellation can erase amplitude while paths
+remain. The synthesis gives their resolvent and soft-minimum connections explicitly.
+
+## 14. Unified construction map
 
 [definition] The following map identifies the operative relation shared by the recent subjects.
 The formal and executable owners supply their stated mathematical domains.[^2]

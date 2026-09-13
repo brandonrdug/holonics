@@ -1,4 +1,5 @@
 import Mathlib.Data.List.Perm.Basic
+import Lean.Elab.Tactic.Omega
 
 /-!
 # Ordered transport words and endpoint order blindness
@@ -44,6 +45,75 @@ theorem generatorEquivarianceExtendsToEveryTransportWord
   | nil => rfl
   | cons i w ih =>
       rw [transportWord_cons, h, ih, transportWord_cons]
+
+/-! ## A local distance certificate compiles an optimal navigation word
+
+A nonnegative integer potential is checked against every admitted unit-cost move. If a policy
+decreases it by exactly one until a zero/goal face, its returned word attains the lower bound.
+The theorem is an optimality certificate, not an assumption that computing the potential is cheap.
+Move order is the existing right-to-left transport convention.
+-/
+
+theorem transportWord_append (T : ι → X → X) (left right : List ι) (x : X) :
+    transportWord T (left ++ right) x = transportWord T left (transportWord T right x) := by
+  induction left with
+  | nil => rfl
+  | cons i left ih => simp [ih]
+
+theorem word_length_lower_bound (T : ι → X → X) (potential : X → ℕ)
+    (edgeBound : ∀ i x, potential x ≤ 1 + potential (T i x))
+    (word : List ι) (x : X) :
+    potential x ≤ word.length + potential (transportWord T word x) := by
+  induction word with
+  | nil => simp
+  | cons i word ih =>
+      have h := edgeBound i (transportWord T word x)
+      simp only [List.length_cons, transportWord_cons]
+      omega
+
+def descendingWord (T : ι → X → X) (choose : X → ι) : ℕ → X → List ι
+  | 0, _ => []
+  | n + 1, x => descendingWord T choose n (T (choose x) x) ++ [choose x]
+
+theorem descendingWord_length (T : ι → X → X) (choose : X → ι) (n : ℕ) (x : X) :
+    (descendingWord T choose n x).length = n := by
+  induction n generalizing x with
+  | zero => rfl
+  | succ n ih => simp [descendingWord, ih]
+
+theorem descendingWord_zero_face (T : ι → X → X) (choose : X → ι) (potential : X → ℕ)
+    (descends : ∀ x, 0 < potential x → potential (T (choose x) x) + 1 = potential x)
+    (n : ℕ) (x : X) (atDepth : potential x = n) :
+    potential (transportWord T (descendingWord T choose n x) x) = 0 := by
+  induction n generalizing x with
+  | zero => simpa [descendingWord] using atDepth
+  | succ n ih =>
+      have hp : 0 < potential x := by omega
+      have hn : potential (T (choose x) x) = n := by
+        have h := descends x hp
+        omega
+      simpa [descendingWord, transportWord_append] using ih (T (choose x) x) hn
+
+/-- The policy reaches an actual declared goal and is no longer than any competing goal word.
+The zero-face implication concerns the full state, so an abstract goal with an unresolved fibre
+cannot silently be substituted here. -/
+theorem descendingWord_is_optimal (T : ι → X → X) (choose : X → ι)
+    (potential : X → ℕ) (goal : X → Prop)
+    (goalZero : ∀ x, goal x ↔ potential x = 0)
+    (edgeBound : ∀ i x, potential x ≤ 1 + potential (T i x))
+    (descends : ∀ x, 0 < potential x → potential (T (choose x) x) + 1 = potential x)
+    (x : X) :
+    goal (transportWord T (descendingWord T choose (potential x) x) x) ∧
+      ∀ word, goal (transportWord T word x) →
+        (descendingWord T choose (potential x) x).length ≤ word.length := by
+  constructor
+  · apply (goalZero _).2
+    exact descendingWord_zero_face T choose potential descends (potential x) x rfl
+  · intro word reaches
+    have bound := word_length_lower_bound T potential edgeBound word x
+    have zero := (goalZero _).1 reaches
+    rw [descendingWord_length]
+    omega
 
 /-! ## Endpoint order blindness -/
 

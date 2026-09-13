@@ -1,5 +1,12 @@
 # The Millennium frame: six receiver questions, and which organ each one lands on
 
+[definition] The current [mass/flux/gap and navigation return](../../research/records/2026-09-13_MASS_FLUX_GAPS_AND_OPTIMAL_NAVIGATION_RETURN_THEIR_SOURCE_MAPS.md)
+reconciles the physical mass receiver, vacuum-complement coercivity, uniform spectral
+remainder and actual optimal traversal. The dated wording below locates the earlier
+programme. A finite spectral interval is a valid observation of its operator; a physical
+Yang–Mills mass gap concerns the reconstructed quantum source above the vacuum and its
+uniform scale behavior. An arbitrary forbidden band is not that complete statement.
+
 **Deposited 2026-08-10.** **Truth status:** `interpretation` throughout. **Nothing here is a claim on
 any Millennium problem**, and no deed may be graded by resemblance to one.
 

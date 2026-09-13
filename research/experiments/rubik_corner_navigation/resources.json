@@ -1,0 +1,65 @@
+{
+  "host": {
+    "declared": {
+      "cpu": "AMD Ryzen 9 7900X",
+      "ram": "32 GB",
+      "gpu": "NVIDIA RTX 4080 SUPER 16 GB",
+      "ssd_read": "7300 MB/s",
+      "ssd_write": "6300 MB/s"
+    },
+    "observed": {
+      "platform": "Linux-7.0.5-2-cachyos-x86_64-with-glibc2.43",
+      "cpu_model": "AMD Ryzen 9 7900X 12-Core Processor",
+      "memory_kib": 31978668,
+      "gpu": "NVIDIA GeForce RTX 4080 SUPER, 16376 MiB"
+    },
+    "binary": {
+      "path": "/home/b/Workspaces/holonics/target/debug/examples/rubik_corner_quotient_navigation",
+      "sha256": "94c3d3a575339d853bd2d276f1e6bd8712fdf6827f4eef639f217cd09f6e4f64"
+    },
+    "source_revision": "4e138f8b5ff46528b8c48d8b0403f82240f6e98c"
+  },
+  "clock": {
+    "name": "clock_gettime(CLOCK_MONOTONIC)",
+    "monotonic": true,
+    "adjustable": false,
+    "resolution_ns": {
+      "numerator": "1",
+      "denominator": "1"
+    }
+  },
+  "outer_process_wall_ns": 4063326177,
+  "process_resources": {
+    "child_wall_ns": 4042246869,
+    "user_seconds": 4.00315,
+    "system_seconds": 0.004018,
+    "max_rss_kib": 18500,
+    "major_page_faults": 0,
+    "minor_page_faults": 4190,
+    "voluntary_context_switches": 1,
+    "involuntary_context_switches": 743
+  },
+  "workstation": {
+    "before": {
+      "load_average": [
+        "2.69",
+        "4.13",
+        "4.68"
+      ],
+      "gpu_temperature_celsius": [
+        49
+      ]
+    },
+    "after": {
+      "load_average": [
+        "2.64",
+        "4.09",
+        "4.67"
+      ],
+      "gpu_temperature_celsius": [
+        49
+      ]
+    }
+  },
+  "scope": "one debug-build exterior exact group construction and full-state certificate; timings include all source/optimality checks; no GPU or energy measurement"
+}

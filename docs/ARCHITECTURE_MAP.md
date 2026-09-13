@@ -34,10 +34,19 @@ test result never upgrades a correspondence.
 
 [definition] `Physics/CompositeMassEnergy.lean` and `Physics/MaxwellEnergyCone.lean` are
 imported by `Framework.Physics`. The first reuses `HolonicMassShellFace` for exchange,
-two-massless-mode composite mass and exact boosts; the second proves the Poynting
+two-massless-mode composite mass, arbitrarily light positive-mass photon pairs and exact boosts; the second proves the Poynting
 sum-of-squares residual and `|S|≤c u` in its normalized three-component field chart.
 The [mass–energy synthesis](MASS_ENERGY_AND_CAUSAL_TRANSPORT.md) connects their Maxwell,
 stress/observer, wave/heat, Hodge and generator/information consumers.
+
+[definition] `Millennium/MassGap.lean` now exposes the quantitative lower bound after a
+quadratic receiver difference, including one common bound across an indexed family.
+`Foundation/TransportWord.lean` owns the descending-policy construction and unit-cost
+optimality certificate. `holonic_engine::group_navigation` constructs exact weighted group
+distances, minimizing move fibres and shortest-word counts using `structure_group`; its
+Rubik application derives corner and facelet actions from the same geometry. The
+[mass/navigation return](../research/records/2026-09-13_MASS_FLUX_GAPS_AND_OPTIMAL_NAVIGATION_RETURN_THEIR_SOURCE_MAPS.md)
+records the physical and algorithmic source boundaries and the actual checks.
 
 [definition] `Physics/ReleasedMotion.lean` and `Physics/ObserverBoundaryCurrent.lean` are
 imported by `Framework.Physics`: exact constant-acceleration/impulse/energy and tolerance

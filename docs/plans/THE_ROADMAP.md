@@ -79,6 +79,15 @@ nested automata that construct, compare and refine further automata.
 
 ## Immediate mathematical application and implementation
 
+[project-postulate] Brandon's latest September 13 mass/navigation direction joins the
+traffic/radiation source to physical invariant mass, the vacuum-complement gap and its
+scale/remainder transport. It also authorizes an actual optimal-traversal construction:
+derive the goal distance or a lawful lower-bound quotient, compile a minimizing word, and
+verify its full-state lift where that claim is made. The
+[current synthesis](../../research/records/2026-09-13_MASS_FLUX_GAPS_AND_OPTIMAL_NAVIGATION_RETURN_THEIR_SOURCE_MAPS.md)
+records its formal and executable returns. Publication positioning compares source-level
+contributions with close prior art alongside construction; it adds no indefinite research gate.
+
 [project-postulate] Brandon's subsequent September 13 atomic correction makes recovery and
 development of the existing String/M, supergravity and fundamental-force constructions the
 current physical task. Follow compactification through its retained modes, charge/current,

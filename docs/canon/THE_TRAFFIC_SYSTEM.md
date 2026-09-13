@@ -1,5 +1,10 @@
 # The traffic system
 
+[definition] The current [mass/flux and navigation synthesis](../../research/records/2026-09-13_MASS_FLUX_GAPS_AND_OPTIMAL_NAVIGATION_RETURN_THEIR_SOURCE_MAPS.md)
+develops this traffic intuition through stored energy, boundary current, physical front
+velocity and declared optimal-path cost. The historical implementations below retain their
+source dates; current AGENTS and the measurement/optimization laws govern their use.
+
 **Genre:** canon (`docs/canon/THE_DOCUMENT_LAW.md` §1.1). It carries one of Brandon's longest-running
 analogies, which had **no canon presence at all** until 2026-08-09 — `grep -i 'traffic\|automobile'
 docs/canon/` returned zero — while the law it describes was already implemented.
@@ -158,9 +163,12 @@ retained and never read, which is the same shape as `H.0466`'s unconnected leade
 `crates/holonic-engine/src/derivation_capacitance.rs` reads it at three sites. What is true, and is
 the sharper statement the stale one was reaching for, is that **it is read and never routed on**:
 `approach_front`'s own header says *"it reports; it never routes. If it ever reaches a `min`, `sort`
-or `argmax` that discards a member it has become a governor."* Whether a predicted crossing may
-determine a transport without becoming a governor is an open question and is Brandon's, not the
-assistant's.
+or `argmax` that discards a member it has become a governor."*
+
+[project-postulate] Later direct rulings settle the general policy: a declared objective,
+source/receiver law or predicted consequence may determine an optimal action. `approach_front`
+is an observer owner; its local reporting contract is not a universal ban on routing or `min`.
+The requested optimal traversal keeps its cost, admitted moves and retained state explicit.
 
 ### Vision is physical, and it is the arrival set
 
@@ -194,9 +202,10 @@ places is now "at" one site.
 > other drivers that want to speed to also speed… the local ecology modulates behaviors for
 > independent units deterministically."*
 
-One field, opposite responses, decided by the receiving unit's own standing. **A deposit that moves
-every receiver the same way is a governor** — the ban on a privileged scalar chooser arriving from
-this side, and stronger, because it says why: a signed weight is a field with the receiver deleted.
+[definition] Response depends on the receiving unit and the actual constitutive relation.
+Equal or opposite responses can both be lawful. A signed coefficient retains a meaningful role
+when its source, receiver and operation are supplied; neither a common response nor a scalar
+coefficient by itself establishes an illicit universal governor.
 
 And *"the 'deposits' in traffic systems are the differences between how the traffic flows in any local
 regions"* — the modulating structure is the **local flow difference**, which is a gradient, not a
@@ -247,12 +256,13 @@ propagation is the pivot, and the traffic law is the declared decoder that says 
 
 ## 4. Bounds
 
-- **The analogy motivates; it does not grade.** `research/papers/source/synopsis/AUDIT.md` governs: physics
-  and complexity claims require their own typed hypotheses. Nothing here licenses a claim about
-  actual road networks, actual optics, or actual neurology.
-- **"Light does not slow in a medium" is his position and is also standard physics** — the phase
-  velocity of the wave in the medium differs from `c` while the photon's own propagation does not.
-  It is quoted as his framing, not deposited as a new physical claim.
+- **The source law determines the application.** Current AGENTS and epistemic grades govern.
+  Traffic, optics and neural models have actual equations and receiver domains; the analogy
+  guides their comparison, while those equations establish their respective consequences.
+- **Vacuum light speed and material response retain different charts.** The quoted traffic
+  intuition is read through the field/material constitutive law. Phase, group, energy and
+  signal-front velocities are distinct; the analogy does not require a stop/restart microscopic
+  photon trajectory for every refractive process. The physical guide supplies the current account.
 - **The photosynthesis research he points at carries a recorded falsification**,
   `docs/canon/THE_QUOTE_NETWORK.md:1117`, corrected 2026-08-07. Anything drawn from that line must carry
   the correction with it.

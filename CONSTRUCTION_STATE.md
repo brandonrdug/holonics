@@ -1,8 +1,9 @@
 # Construction state
 
 **Currency:** September 13, 2026. **Latest implementation return:** the
-[compact-fibre, matter and research-workflow return](research/records/2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md)
-and its formal/skill checks are complete, building on the
+[mass/flux/gap and optimal-navigation return](research/records/2026-09-13_MASS_FLUX_GAPS_AND_OPTIMAL_NAVIGATION_RETURN_THEIR_SOURCE_MAPS.md)
+and its formal/executable checks are complete, building on the
+[compact-fibre and matter return](research/records/2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md),
 [game/rate/molecular consolidation](research/records/2026-09-13_GAME_WORLDS_SCOPED_RATES_AND_MOLECULAR_MECHANICS_SHARE_DECLARED_LAWS.md)
 and the
 [frontier review](research/records/2026-09-12_THE_FRONTIER_REVIEW_CONSOLIDATES_CONSTRUCTIVE_CONTINUITY.md).
@@ -17,6 +18,24 @@ equation, chunk transformation and coefficient/statistic update laws below. This
 account is clarified before returning to implementation. No new runtime behavior is claimed.
 
 ## Current consolidation
+
+[proved-derived; formal-checked] The mass/navigation return distinguishes invariant composite
+mass from a uniform excitation gap, proves an explicit gap bound after quadratic receiver
+error and compiles optimal words from local distance/policy certificates. The changed owners
+and Framework consumer passed together.
+
+[established-bounded; implemented-exact; measured] Actual cube face geometry yields the
+40,320-state corner-permutation projection, diameter 8 in quarter-turn metric, with every
+projected edge checked and full 54-sticker optimality certificates at costs 2 and 8 for
+their specified full-state lifts. Construction and all checks took 4.02 seconds in the debug
+build, with 18,500 KiB peak process RSS. This is exterior exact mathematical construction;
+arbitrary full-cube orientations/edges remain in their source fibre.
+
+[definition] The [publication positioning record](research/records/2026-09-13_PUBLICATION_POSITIONING_DISTINGUISHES_SOURCE_CONSTRUCTION_AND_PRIORITY.md)
+identifies actual contributions, closest prior art and candidate theorem/artifact packages.
+The [synthesis](research/records/2026-09-13_MASS_FLUX_GAPS_AND_OPTIMAL_NAVIGATION_RETURN_THEIR_SOURCE_MAPS.md)
+rejoins traffic, physical mass, spectral/analytic transport and optimal navigation. None of
+these comparisons is an additional qualitative gate on the standing HNN constructions.
 
 [proved-derived; formal-checked] The atomic/String/M recovery now supplies compact
 momentum/winding mass transport, left/right mover parity and fixed-momentum Routh reduction

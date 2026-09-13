@@ -2,11 +2,46 @@
 
 These sources inform the research but do not govern the internal ontology. Each bridge into
 holonics must state its typed translation and evidence grade. Initial atlas accessed 2026-08-03;
-current through the biological and continuous-transport additions accessed 2026-09-02.
+with later subject additions recorded below and in the dated research returns.
 
-The complete authored bibliographies remain scoped in `research/papers/source/**/references.bib` (seven
-files, roughly 180 entries, 121 URL-field occurrences, and 120 normalized distinct URLs).
+The authored bibliographies remain scoped in `research/papers/source/**/references.bib`.
 Duplicate keys are intentionally not merged without namespacing.
+
+## Predictive reduction, open systems and optimal navigation
+
+[definition] The [September 13 positioning review](../../research/records/2026-09-13_PUBLICATION_POSITIONING_DISTINGUISHES_SOURCE_CONSTRUCTION_AND_PRIORITY.md)
+compares the actual constructions with these primary sources. They support targeted research,
+not a mandatory literature gate before every implementation.
+
+- Kalman, *Mathematical Description of Linear Dynamical Systems* — observable/controllable
+  realization and minimal state: <https://epubs.siam.org/doi/10.1137/0301010>.
+- Rutten, *Universal coalgebra: a theory of systems* — behavioral equivalence and system
+  quotients: <https://ir.cwi.nl/pub/48/>.
+- Shalizi–Crutchfield, *Computational Mechanics: Pattern and Prediction, Structure and
+  Simplicity* — causal states and predictive sufficiency:
+  <https://csc.ucdavis.edu/~cmg/compmech/pubs/cmppss.html>.
+- Baez–Fong–Pollard, *A Compositional Framework for Markov Processes* — open composition
+  and boundary behavior: <https://arxiv.org/abs/1508.06448>.
+- van der Schaft–Maschke, *Port-Hamiltonian systems on graphs* — incidence, interconnection,
+  storage and dissipation: <https://arxiv.org/abs/1107.2006>.
+- Korf, *Finding Optimal Solutions to Rubik's Cube Using Pattern Databases* — exact
+  abstract distances as search heuristics:
+  <https://cdn.aaai.org/AAAI/1997/AAAI97-109.pdf>.
+- Demaine et al., *Algorithms for Solving Rubik's Cubes* — generalized family diameters,
+  algorithms and specifically scoped hardness: <https://arxiv.org/abs/1106.5736>.
+
+## Radiation, knots and mass-gap source models
+
+- Wheeler, *Geons* — gravitational/electromagnetic confinement:
+  <https://journals.aps.org/pr/abstract/10.1103/PhysRev.97.511>.
+- Kedia et al., *Tying knots in light fields* — null Maxwell fields with knotted field
+  lines: <https://arxiv.org/abs/1302.0342>.
+- Kedia–Peralta-Salas–Irvine, *When do knots in light stay knotted?* — the analytic
+  pressureless-Euler/shear-free source map: <https://arxiv.org/abs/1706.06175>.
+- Jaffe–Witten, *Quantum Yang–Mills Theory* — the actual continuum existence/gap problem:
+  <https://www.claymath.org/wp-content/uploads/2022/06/yangmills.pdf>.
+- Tong, *Gauge Theory*, Yang–Mills chapter — physical scales, quantum running and
+  confinement: <https://www.damtp.cam.ac.uk/user/tong/gaugetheory/2ym.pdf>.
 
 ## Algebraic topology, categories, and geometry
 

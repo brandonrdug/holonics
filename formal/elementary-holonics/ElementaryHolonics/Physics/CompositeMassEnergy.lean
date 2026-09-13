@@ -47,6 +47,34 @@ theorem parallel_photons_zero_system_norm :
       (unitChartVector 1 ![1, 0, 0] + unitChartVector 1 ![1, 0, 0]) = 0 := by
   norm_num [unitChartVector, lorentzPairing, momentumSquare, Fin.sum_univ_succ]
 
+/-- An equal-energy opposite photon pair in the existing c=1 four-momentum chart. -/
+def oppositePhotonPair (energy : ℝ) : FourMomentum :=
+  unitChartVector energy ![energy, 0, 0] + unitChartVector energy ![-energy, 0, 0]
+
+theorem oppositePhotonPair_energy (energy : ℝ) :
+    (oppositePhotonPair energy).energy = 2 * energy := by
+  change energy + energy = 2 * energy
+  ring
+
+theorem oppositePhotonPair_norm (energy : ℝ) :
+    lorentzPairing 1 (oppositePhotonPair energy) (oppositePhotonPair energy) =
+      4 * energy^2 := by
+  simp [oppositePhotonPair, unitChartVector, lorentzPairing, Fin.sum_univ_succ]
+  ring
+
+/-- Positive composite invariant mass does not imply a common positive excitation threshold.
+The freely scalable photon-pair source admits a positive timelike total below any positive
+energy bound. This is a radiation-source statement, not a proposed Yang--Mills spectrum. -/
+theorem arbitrarilyLightMassivePhotonPair (threshold : ℝ) (positive : 0 < threshold) :
+    ∃ energy : ℝ, 0 < energy ∧
+      (oppositePhotonPair energy).energy < threshold ∧
+      0 < lorentzPairing 1 (oppositePhotonPair energy) (oppositePhotonPair energy) := by
+  refine ⟨threshold / 4, by positivity, ?_, ?_⟩
+  · rw [oppositePhotonPair_energy]
+    linarith
+  · rw [oppositePhotonPair_norm]
+    positivity
+
 def unitBoost (beta gamma : ℝ) (P : FourMomentum) : FourMomentum :=
   ⟨gamma * (P.energy - beta * P.momentum 0),
     ![gamma * (P.momentum 0 - beta * P.energy), P.momentum 1, P.momentum 2]⟩
