@@ -1,19 +1,16 @@
-# Athena: conditional relations, Holonic Encoding and useful conduct
+# HNN construction: mathematical network, encoding and prediction release
 
 [definition] This is the active native implementation specification. [The roadmap](THE_ROADMAP.md)
 alone orders construction; [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) alone records the
 position. September 11 consolidates the old AC responsibility labels into named work phases.
 The file path, source names and existing wire identifiers remain stable.
 
-[project-postulate] Brandon's latest September 11 ruling makes the shared programme explicit.
-Hephaestus tool/code/mathematical construction and Athena are productive uses of the same engine and
-formative laws. The [roadmap's sustained programme](THE_ROADMAP.md#sustained-objective-and-construction-rhythm)
-orders their common milestones. The mathematical investigations supply generating relations,
-receiver/phase transport, bounds and counterexamples that this blueprint binds into native
-operation. Native failures refine those constructions in return. Eros acts within nested
-constituents and their containing ecology; its incorporation is not deferred until an independent
-mathematical product is finished. Broad conversation cultivation remains paused at its
-source/contact limitation; the mathematical solver/encoding applications continue on the shared owners.
+[project-postulate] HNN names the machinery; Athena is its first intended product. Automata
+label HNN-based solvers and traversal constructions. Product labels introduce no mechanisms or
+separate implementation tracks. The [roadmap](THE_ROADMAP.md#sustained-objective-and-construction-rhythm)
+orders the shared construction. Mathematics supplies generating relations, receiver/phase
+transport and bounds; native failures refine their realization. This blueprint owns the network
+and implementation contracts. Available results and the current step belong in CONSTRUCTION_STATE.
 
 ## Product and evidence
 
@@ -31,6 +28,95 @@ Exact search and supplied inference rules do not create a boundary outside intel
 This governs execution and ownership. A completed mathematical inference requires no separate
 state-mutation demonstration. Its resulting generator, equation family or prediction supplies
 the substantive result; use the applicable evidence and receiver scope in the roadmap.
+
+## The HNN network and its mathematical contract
+
+[definition] The model is the retained network of generating functions, current and their
+source-conditioned composition. At a contemporary cut let q denote its situated current,
+Theta its constitutive/generating material, and I its admitted oriented incidence. These are
+mathematical operands already represented by the field, relation and coupled owners, not a new
+universal state wrapper. An occurrence enters through its actual boundary map. Relevant local
+restrictions expose `s_e=S_e(q,o)` and `h_e=C_e(q,o)` at a contact e before its target is observed.
+The domain and source of S_e and C_e must be stated; attaching manually prepared vectors does
+not implement their formation from native incidence.
+
+[definition] In an attachment change, name the body carriers actually read and how the
+restriction refers to their incidence and current chart. Applying supplied A and C computes
+their output sections; it does not infer A and C. Existing resident condition formation can
+supply h without relearning that mechanism. If h or the source is a joint family, preserve its
+shared parameters through the consuming law; a point-current API requires its stated point
+domain. Merely adding a method that transfers a predictor handle does not settle these operands.
+
+[definition] In the finite homogeneous additive chart of
+[FiniteLocalCurrentEcology](../../formal/elementary-holonics/ElementaryHolonics/Computation/HolonicNeuralEcology.lean),
+with the occurrence interpreted in its declared generator chart, a complete local step is
+
+`j_v = sum_u J_Theta(q,o,v,u)`,
+`q_next(v) = R_Theta(o,v,q(v),j_v)`,
+`y = rho_F(q_next)`.
+
+The local current J carries the actual incidence and source/condition dependence; co-presence
+does not imply contact. R receives both prior local standing and arriving current. The graph,
+attention and recurrent charts in
+[HolonicArchitectureCharts](../../formal/elementary-holonics/ElementaryHolonics/Computation/HolonicArchitectureCharts.lean)
+and [HolonicRecurrentEcology](../../formal/elementary-holonics/ElementaryHolonics/Computation/HolonicRecurrentEcology.lean)
+instantiate parts of this account. Heterogeneous ports use their
+actual transport/join maps rather than a universal scalar sum. These signatures specify
+operands and composition; they do not construct J, R or their learned organization merely by
+declaring functions with those types.
+
+[definition] In the present coupled-wave realization, the source action instead uses the
+explicit chart `a=(c-p,c,p)`, `eta in L_j(a,h)`, `v=c+eta`, with successor `(c,v)`.
+The normal specialization fits a declared feature action with `WH=B`; the bilinear relation
+and contextual-section owners retain compatible source/condition products and their fibres.
+These are available local laws, not a definition that every HNN generator is a fixed bilinear
+regression over the last two symbols. The network construction must carry their participating
+source restrictions, condition formation, composition and requested receiver through the same
+continuing owner. A new adapter that supplies those choices externally leaves that work undone.
+
+```mermaid
+flowchart LR
+    O[Situated source and boundary] --> P[Participating current and condition sections]
+    B[Retained generators and incidence] --> P
+    P --> T[Local current, reaction and joined transport]
+    B --> T
+    T --> Y[Requested joint face]
+    T --> Q[Continuing current]
+    Q --> P
+    Y --> R[Optional comparison at its producing cut]
+    V[Observed return] --> R
+    R --> F[Existing constitutive or inference law]
+    F --> B
+    B --- E[Generator encoding and receiver-preserving reuse]
+    E --- T
+```
+
+[definition] Formation determines reusable functions, parameters or incidence through the
+admitted inference/update law and actual returned differences. For an empirical comparison,
+[SituatedMachineLearning](../../formal/elementary-holonics/ElementaryHolonics/Computation/SituatedMachineLearning.lean)
+retains its producer and comparison; the native
+condition-contact, normal and adjoint owners realize their stated laws. For an exact solver,
+preimage/factor construction can infer its requested function directly. Neither mode needs an
+extra event whose only purpose is to demonstrate causality. A new independent contrast can
+require a new constituent direction; repeated occurrence alone does not define one.
+
+[conditional] Compression and navigation share the resulting generator when an executable
+encoding E and retained action U satisfy `E_next T=U E`, and the requested receiver factors as
+`D E=rho`. Ordered application then produces the same requested faces through the encoded
+state. [JointReceiverDescent](../../formal/elementary-holonics/ElementaryHolonics/Foundation/JointReceiverDescent.lean)
+supplies the additive invariant-kernel criterion;
+[receiver_history_compression](../../crates/holonic-engine/src/receiver_history_compression)
+supplies executable reference constructions at its own domain.
+Changing material, incidence or pending-return receivers belongs in T and the family to which
+these equations apply. A set-theoretic quotient alone supplies no executable decoder or cost
+claim. Approximation retains the actual defect and its bound at the declared receiver.
+
+[definition] The assembled HNN requirement is to make these operations consume each other's
+returned mathematical objects. The [source map](#exact-source-map) names the current owners;
+sections 1–4 specify their attachment, formation and representation obligations. Model requests
+use that assembly through the public session. A component experiment is evidence for its
+particular equation; the product claim additionally needs the consuming call and its returned
+consequence. Preview, commit and observation each retain the operation contract below.
 
 ## The shared mathematical-to-native construction
 
@@ -247,7 +333,7 @@ Each row specifies a bounded application consequence; no finite row certifies ge
 | **Context-conditioned generated section** | Replace the production h=1 calibration at the section-input/coupled attachment with resident source/condition restrictions at the producing cut. Join normal/conditional formation in `C/resident/neighborhood.rs`, contextual-section and normal owners; expose the result through the existing coupled stream. Infer `W[S;C]=Y` or the declared feature law `WH=B`; keep non-affine products in their joint owner. | Developmental observations contain a source-null contrast separated by carried conditions. Generate the corresponding whole chunk on new admitted inputs, including the same visible input under those distinct preparations. Report S/C/Y, actual output and the separator for an unsupported contrast. Evaluation targets cannot choose C, contact or decoder. |
 | **Committed joint release** | Extend `W/coupled/dependent.rs`, the existing prospective/family owners, `A/coupled_wave/body.rs`, `A/coupled_wave.rs` and `stream.rs` with the transport-only contract above. Stage the word and receiver cuts, return the prepared joint face and publish one successor; preserve the existing forecast command. | Compare forecast and commit from equivalent initial rests at the same section, including every requested joint component and endpoint. With shared parameter theta, a `(theta,theta)` output must retain the equality, not admit independently selected coordinates. A later component observation constrains that same source. Exercise a delayed return and a rejected final join without partial publication or a whole-body clone. |
 | **Compiled continuing action** | Replace the repeated portion of `ConstitutiveSourcePassage` execution with an existing factor/recurrence or closed-statistic representation. Bind `E_next T=U E` and `D E=rho` to current, conditions, material and required pending cuts. The public fixed-linear `Power` is an available specialization, not a compiler for arbitrary changing material. | Exact/enclosed joint outputs, endpoint and delayed return agree with the standing programme on the declared family. Include a receiver exposing an omitted direction and a new formation step. Repeated calls with no new independent structure cease appending one executable-history item per call; report contractions, stored representation and integer bit growth. |
-| **Hephaestus utility generator and output** | Use the contextual formation and retained operator/constituent owners to construct and execute the mathematical function for the requested utility consequence. Bind its source, conditions, composed action and receiver through the shared session. The existing `emit-rust` receiver remains available when an exterior source representation is requested. | Inspect what relation was inferred, its retained realization and its returned faces under new inputs or admitted compositions. State supplied charts and constraints separately from formed material. Code-model output is checked at its requested behavior; an exported operator is checked against native execution. A plural inferred law retains its family. A printed supplied graph alone does not establish contextual generator formation. |
+| **HNN solver and tool output** | Use the contextual formation and retained operator/constituent owners to construct and execute the mathematical function for the requested utility consequence. Bind its source, conditions, composed action and receiver through the shared session. The existing `emit-rust` receiver remains available when an exterior source representation is requested. | Inspect what relation was inferred, its retained realization and its returned faces under new inputs or admitted compositions. State supplied charts and constraints separately from formed material. Code-model output is checked at its requested behavior; an exported operator is checked against native execution. A plural inferred law retains its family. A printed supplied graph alone does not establish contextual generator formation. |
 | **Athena task episode** | Use the repaired section/formation/release path through the public session for contextual correction/continuation and a short explanatory reply; use the same constructions for a code edit or function request. Source parts and genuine returned observations enter the standing owners. | Publish the development/evaluation split, exact requested outputs and representative successes/failures. A correction preserves the requested unaffected region; a continuation answers its context; code executes the requested behavior. Inspect these products before enlarging exposure. A state change, nonempty response or loss decrease cannot substitute for them. |
 | **Durable reusable products** | Extend existing coupled rest only for the new section/encoding cuts. Attach mathematical-session checkpointing to its retained relations, operators, products, pending predictions and resumable construction frontiers, plus stream state. Reuse existing codecs/rest owners; wire IDs remain stable. | In a new process, apply a retained operator to a new input, change its receiver, continue a declared release and consume a pre-rest pending comparison exactly once. Compare returned faces and successor with uninterrupted execution. A construction interrupted inside its admitted search resumes its frontier and work account. |
 
@@ -272,86 +358,20 @@ measurements; it is not an unconditional runtime promise or a mathematical cutof
 
 ### Callable mathematical workshop: the first delivered increment
 
-[established-bounded; implemented-exact; computational-witness] The
-[caller-controlled return](../../research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md)
-implements this packet through `native/mathematical.rs`, its native condition-family adapter,
-the HNN stream and workbench process. Supplied exact operators, retained GPU products, changed
-receivers and partly constrained native parameters are callable. Existing condition-image
-reception supplies the actual consuming refinement; generic coupled-wave returns remain their
-separate available dependency. The following paragraphs retain the contract of that returned
-scope. Contextual empirical prediction and general continuation compression are next; new
-session rest/resume and multi-pending condition joins retain their explicit open interface scope.
+[established-bounded; source-inspected] `A/mathematical.rs::NativeMathematicalSession` already
+exposes exact linear/bilinear construction, resident application, changed receivers, composition,
+fixed-linear powers and condition-family inference. The
+[returned workshop](../../research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md)
+and [current public interface](../NATIVE_HNA.md) own its request details and measured evidence.
+This is an available consumer of mathematical constructions, not a packet to implement again.
 
-[established-bounded; implemented-exact] The frontier consolidation additionally returned
-`MathematicalRequest::Power`: retained square linear operator plus exponent, shared minimal-
-polynomial inference/lowering, and resident application. Characteristic polynomials, minimal
-polynomials and preimage work share their actual exact-linear owner. This fixed-operator
-construction is available now; an analytic tail or changing constitutive programme requires
-its own corresponding map. It is not scheduled as a new first-packet prerequisite.
-
-[definition] Extend the existing public HNN application/session boundary with a mathematical
-request payload. The payload has four operations: construct an admitted operator, apply a
-retained construction, read a new receiver of a retained product, and incorporate an actual
-observation into its producing relation. Request fields carry the target coefficient/action
-chart, supplied candidate forms or constraints, input ports, receiver, declared work/search
-aperture and relevant clock. Return fields carry the usable construction/family, source/target
-maps, residue or obstruction, decoder and measured costs. Names are application/wire addresses,
-not semantic identities. Preserve the existing stream schema and its compatibility discipline.
-
-[definition] Put the application binding beside the native coupled/normal session code in
-`crates/holonics-hna/src/native/` and expose it through the existing facade/stream. It borrows
-or moves the standing native owner and stores immutable construction material and actual
-product occurrences; it does not create another learning engine. Extend `stream.rs`,
-`applications/holonics-workbench/src/session_stream.rs` and `adapters/hna.rs` for delivery.
-The product's primary route is the HNN application interface, not another diagnostic example.
-
-[definition] Recover the already-executed `hephaestus_operator_cycle.rs` into this binding:
-`BilinearOperator`, `BilinearSupportSearch`, `BilinearProductCore`, `factor_receiver`,
-`left_family_preimage`, `ResidentSurface` and `ResidentBilinearMap`. The first class is
-caller-supplied linear/bilinear actions, with supplied finite construction grammars. A selected
-support is reported as first-found/best-found/optimal-in-exhausted-class according to the
-actual search and cost comparison. A finite search obstruction is not global impossibility.
-
-[definition] The returned factor family must also have a task-local native source/condition
-binding. Use the existing coupled relation/normal/native compiler owners for that admitted
-chart, and make an actual observation refine the corresponding mathematical relation. A
-particular coefficient representative is not automatically a uniquely inferred law. Retain
-the family and its actual evaluation/formation map. A pure operator application does not owe
-an invented observation merely to show a changed state.
-
-[definition] Source, condition and output widths are explicit port maps. The present
-neighborhood constructor admits homogeneous source charts; it is not a universal heterogeneous
-application interface. A changed terminal receiver can already have another width through
-the retained product core. Re-entry or composition with a differently shaped source requires
-the actual rectangular map/domain; use the existing resident section and factorization owners.
-Do not pad to the alphabet width, silently identify coordinates or begin a global graph rewrite
-before the first task-local binding works.
-
-[definition] Complete the packet with these caller-controlled operations in one session:
-
-1. Construct a linear/bilinear action from supplied data and return its executable factors or
-   compatible family. Inputs are not the example's hard-coded numbers.
-2. Apply it to new source values on resident carriers and return the requested mathematical
-   output. Show the exact/enclosed result and its cost.
-3. Request another receiver or an admitted composition using the retained interior; return
-   its result or the separating source direction. Recomputing the original product is compared
-   explicitly with reuse.
-4. For a request that supplies a genuine observation, refine its native source/condition/law
-   relation through the existing consuming return. A later new request uses that mathematical
-   consequence. Existing Base/Programme pending-return correctness is reused, not reimplemented.
-
-[definition] The first product case includes a partly constrained mathematical relation,
-not only a fully specified target tensor: return its compatible coefficient/parameter family,
-accept an additional supplied observation, and answer a new input using the refined relation.
-Use native relation/formation ports for that return. An exact equation witness is not copied
-into a material-weight slot. The pure factorization and changed-receiver case remain useful
-operations of the same public instance.
-
-[definition] Checks use the public request path, relevant exact-linear tests, resident bilinear
-controls and coupled-session tests for changed bindings. A direct mathematical reference
-checks new inputs, a new receiver, a nonunique family and an incompatible target. Inspect the
-returned factor/action as the product. Check only the changed rest fields when a new durable
-claim is made. Do not begin wide exposure, a UI redesign or standard-model export in this packet.
+[definition] Keep its actual port/domain and factor/preimage contracts when composing it with
+native formation. Partly constrained laws retain their parameter families; a chosen coefficient
+representative is not automatically unique. Different receiver widths use the rectangular map
+through the retained product. A real returned observation uses the existing producing comparison;
+a pure exact application needs no fabricated observation. The shared source/condition attachment
+and developing-action encoding are specified in sections 3–4; session durability follows the
+payload it actually retains. The Rust printer remains an exterior representation adapter.
 
 ### How the research enters these packets
 
@@ -515,14 +535,15 @@ producing handle and observation relation. Preserve the distinction between seri
 source chronology and the local native clock. An alphabet row never creates a new native clock
 or permanent constituent merely because it occupies a position in a file.
 
-[definition] Add terminal inspection of complete cycles: source face and relation; producing
-current/condition and encoding cut; applicable passage; predicted/emitted face; actual return;
-full comparison/fibre; changed successor. Compose existing readers and receipts. Keep intermediate
-sections resident and expose only the requested terminal observer projection. This is output
-inspection, not a new trace archive or a reason to clone the ecology.
+[definition] Inspect the requested operation through existing terminal readers: source relation,
+producing current/condition and encoding cut, applied function and returned face. A preview
+reports its unchanged continuing owner; a committed passage reports its successor; an actual
+observation reports its producing comparison and update. Include only the operands and effects
+of that operation. Keep intermediate sections resident. This creates neither a trace archive
+nor a mandatory observation/commit test for every prediction.
 
-[definition] **Expected outcome:** a reader can see exactly what was predicted and what arrived,
-which source relation was used and why the next operation differs. Inspect actual text alongside
+[definition] **Expected outcome:** a reader can see the generating relation and its returned
+face, and any actual observation or successor change admitted by that request. Inspect actual text alongside
 its receiver. Report projected choice, exact ties and optional robust-choice evidence separately.
 The existing smeared/tied output is a failure observation, not a baseline to repeatedly rerun
 without a new diagnostic question.
@@ -738,9 +759,10 @@ same reevaluation again.
 [definition] Partition the actual programme by mathematical composition, not arbitrary
 clock-sized chunks. Exact linear/affine actions compose through matrices; bilinear actions
 retain their factor cores; indexed recurrences retain their block law and clock. Construct
-the corresponding resident action from the existing packet/section compiler. The first
-compiled segment must be a complete source-to-current or source-to-receiver action already
-used by the application.
+the corresponding resident action using the existing factor/section owners. There is no
+already-general compiler implied by that phrase: identify the actual reduction and executable
+binding for the selected segment in `ConstitutiveSourcePassage`/`evaluate_programme`. The
+segment must be a source-to-current or source-to-receiver action consumed by the application.
 
 [definition] Formation is a different case from fixed-material execution. Normal-statistic
 increments can close in sufficient statistics; a dependent condition/material return can

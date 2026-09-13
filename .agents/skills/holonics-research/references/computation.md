@@ -1,9 +1,22 @@
 # Implement the generating relation and measure its use
 
-Recover `docs/DEVELOPMENT.md` and the current interface/owner for the requested operation.
-Prediction release is the generated output. A later comparison, retained handle or successor
-publication has its own contract; none is an extra faculty that turns a face into output.
-Use source/condition equations, generator composition and retained statistics to specify work.
+Use `docs/DEVELOPMENT.md#mathematical-implementation-and-continuation` and the HNN blueprint's
+network contract. HNN names the machinery, Athena its first product, and automata its solver
+applications. A generator is the mathematical function/composition being formed and executed;
+source-code output and operator export are particular receiver uses. Work at the typed operation
+and its consuming source owner, keeping the original objective visible across goal turns.
+
+Inspect what the caller supplied before claiming what HNN formed. `ConstructPredictor` accepting
+source/condition operator handles computes within those supplied maps; it does not establish
+their native formation. Connecting such a result to the existing coupled consumer is a different
+implementation obligation from testing the fitter. Likewise an exact quotient theorem may use
+a non-executable lift: read its assumptions and construct the actual decoder before claiming
+resident reuse. These are examples of the contract distinction, not required architecture choices.
+
+Prediction release already returns output. Match verification to the requested operation:
+preview, committed continuation and observation-driven formation have different effects. Do not
+invent a commit or observation as an intelligence test, or use their absence to revoke a preview
+or exact solver result. Conversely a preview does not establish a claimed successor publication.
 
 Before adding machinery to a slow campaign, inspect one actual operation and its causal work:
 whole-prefix reevaluation, dense expansion, repeated allocation/transfer, growing replay,
@@ -32,6 +45,12 @@ not a substitute for that law. A magnitude or extremum face must not replace the
 sign/phase, relevant momentum, admissible alternatives or residual. In games, retain the
 opponent/control quantifiers and state-dependent guards; in motion, retain momentum, contact,
 boundary and clock. An application classification is not a native topology.
+
+For a campaign audit, inspect the original user instruction and the subsequent assistant/tool
+decision against the plan at that revision. A search hit in copied context or a later summary
+does not prove the original event. Do not diagnose hidden motives or prompting causes from those
+records. Trace the actual scope substitution and repair its live consumers. Reading a plan is
+not evidence that the chosen work followed it; the consuming operation and delivered result are.
 
 When the user asks for a simple bounded edit, make it and run its relevant check. This route
 does not require archive archaeology, a benchmark campaign or a new research record for an

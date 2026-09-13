@@ -1,136 +1,70 @@
 # Construction state
 
-**Currency:** September 13, 2026. **Latest implementation return:**
-[resident contextual features and executable function release](research/records/2026-09-13_RESIDENT_CONTEXT_FEATURES_RETURN_PREDICTIONS_AND_FACTORS_RELEASE_EXECUTABLE_CODE.md).
-The generic normal/source ports, public predictor and code receiver have returned their focused
-native checks and public execution trial. The
-[oriented-configuration](research/records/2026-09-13_ORIENTED_CONFIGURATION_NAVIGATION_RETAINS_ITS_SOURCE_AND_THE_BEACON_STAYS_OPEN.md),
-[mass/flux](research/records/2026-09-13_MASS_FLUX_GAPS_AND_OPTIMAL_NAVIGATION_RETURN_THEIR_SOURCE_MAPS.md),
-[compact-fibre/matter](research/records/2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md)
-and [game/rate](research/records/2026-09-13_GAME_WORLDS_SCOPED_RATES_AND_MOLECULAR_MECHANICS_SHARE_DECLARED_LAWS.md)
-returns remain available dependencies.
-**Standing product objective:** useful Athena language/code and
-Hephaestus tools/utility models, including code generators and mathematical solvers, through
-the same HNN owners within the wider Holonics
-mathematical and physical programme. The [roadmap](docs/plans/THE_ROADMAP.md) alone orders work.
+**Currency:** September 13, 2026. **Latest consolidation:** the direct-message, mathematical-method and
+HNN blueprint consolidation. The [audit](research/records/2026-09-13_GENERATOR_MEANING_AND_CAMPAIGN_DRIFT_AUDIT.md)
+records original decisions, source boundaries and the repaired procedures.
+**Product objective:** construct HNN's contextual generating network, with Athena as the first
+product. Automata label HNN-based solvers and traversal constructions. The
+[roadmap](docs/plans/THE_ROADMAP.md) alone orders work; the
+[network contract](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-hnn-network-and-its-mathematical-contract)
+specifies the assembly and formal obligations.
 
-## Current consolidation
+## Current implementation boundary
 
-[project-postulate] Brandon's latest correction restores **generators as mathematical functions
-and constituent compositions**, including emergent recursive/fractal conduct. HNN forms and
-uses these operations; Athena and Hephaestus name their products. The agent-authored Rust-first
-interpretation and subsequent code-repair priority are withdrawn. The two-symbol fitted-wave
-assay is not justification for extending the campaign. The
-[direct-message/source audit](research/records/2026-09-13_GENERATOR_MEANING_AND_CAMPAIGN_DRIFT_AUDIT.md)
-records the original instructions, the substitution and the affected owners. The full shared
-formation, prediction-release, compact-continuation and product objective stands.
+[project-postulate] Generators are mathematical functions and constituent compositions,
+including emergent recursive/fractal conduct. The agent-authored Rust-first and code-repair
+priorities are withdrawn. The two-symbol assay is not a campaign destination. Follow the
+mathematical contract into its consuming HNN owner; product names, proof/test counts and
+exported syntax supply no replacement objective.
 
-[established-bounded; source-inspected] The uncommitted fitted-wave adapter consumes stored
-normal coefficients and publishes a joint section, but its source/condition maps are still
-caller-selected. It adds private wave state under `NativeConditionalPredictor`; the existing
-`NativeCoupledWaveSession` has not acquired the native preparation/condition attachment through
-that adapter. Preserve this experimental source and its measurements pending integration review;
-do not count it as the completed coupled application or extend its two-symbol demonstration.
-The next implementation must resolve that native attachment and reuse formed constituent
-functions through the existing consumer, without replacing the model task with a source-code
-printer or authoring its answer in a driver. The equations and owners below retain their scopes.
+[established-bounded; source-inspected] `NativeCoupledWaveSession` and `NativeCoupledBody`
+already own continuing source families, standing conditions, joint forecasts, emitted-source
+re-entry and consuming comparison. `ResidentGeneratorNeighborhood` predicts from prior
+condition and subsequently forms its returned condition/material through actual observations.
+These mechanisms exist. Their new source/condition attachment is unfinished implementation,
+not evidence of a missing elementary definition or a need to invent another engine.
 
-[established-bounded; implemented-exact; measured] The public mathematical session now reads
-two resident restrictions of one pre-target preparation, joins their source/condition products,
-and fits the shared unit-prior normal law. Four observations produce new conditional sections,
-including exchange, zero difference-mode and complex quarter-turn cases. The
-[trial](research/experiments/contextual_prediction_release/README.md) checks 34 outputs and
-compiles/executes three generated Rust functions against their resident operator counterparts.
-The final native process took about 0.49 s with a populated CUDA driver cache; the 32-query
-receiver population has median request-body time 486.5 microseconds. These are bounded section
-and exact-function returns, not general conversation or code-editing evidence.
+[established-bounded; source-inspected] At implementation commit `62bf99b9`,
+`ConstructPredictor` accepts supplied source/condition operator handles; `PredictSection`
+applies them to one preparation, constructs resident `[s,h,h tensor s]` and uses normal material.
+Applying A and C computes sections, not A or C. The uncommitted `NativeConditionalPredictor`
+wave adapter also accepts a prepared pair and condition, maintains private wave state and
+returns a joint section. It has not supplied that attachment to the existing coupled session.
+Its source and measurements remain preserved and uncommitted; another two-symbol or h-switch
+trial would not resolve the missing consumer.
 
-[definition] The source restrictions are supplied application maps. The next coupled binding
-uses the fitted law `eta=M_s a+M_h h+M_mix(h tensor a)`, `a=(c-p,c,p)`, `v=c+eta`, through the
-existing wave/joint owners and actual carried conditions. Attach the relevant preparation from
-native source/field incidence; retain the complete material/receiver cut and numerical family.
-The legacy three-port wave seed intentionally refuses arbitrary feature material rather than
-silently reinterpreting its width. This consuming map, then its committed joint section and
-compiled continuation, is the next construction; another unchanged h=1 exposure is not.
+[definition] The next native construction identifies the participating current/condition
+carriers in that continuing body, their source restrictions and the law consuming them before
+an observed target arrives. Use existing resident condition formation where applicable; preserve
+shared parameters when the preparation or condition is a family. Carry the resulting generating
+operation through the existing joint receiver and the state contract requested by the call.
+The fixed-feature normal law and `a=(c-p,c,p)` wave chart are available specializations, not the
+universal HNN representation. Consolidate the adapter and consumers according to that actual
+composition instead of maintaining parallel model paths or merely adding a handle-transfer API.
 
-[definition] `emit-rust` returns exact functions of retained linear/bilinear factor graphs and
-powers. Still-plural output laws, broader contextual code/text products, whole mathematical-session
-rest and changing-programme compilation remain in the active goal. The local feature-material
-rest is implemented; it does not imply that the entire application session can checkpoint.
-The [blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#deliverables-and-discriminating-checks)
-continues to specify those products. The [beacon](docs/BEACON.md) keeps their source available.
+[definition] Encoding accompanies the repeated action actually used. The current dependent
+`ConstitutiveSourcePassage` programme reevaluates its accumulated operations. Replace a closed
+segment through the matching factor/recurrence/statistic owner with `E_next T=U E` and `D E=rho`,
+including its admitted formation and pending receivers. A fixed-linear power or a source-code
+printer alone does not establish that changing-programme closure.
 
-## Available constructions
+## Available returns and unfinished products
 
-[established-bounded; implemented-exact; computational-witness] The public mathematical session
-constructs exact linear/bilinear actions, applies fresh inputs, reuses resident products under
-changed receivers and refines correlated condition families. Its
-[first workshop return](research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md)
-inferred coefficients `(2+3i,5-i)` and returned `5+11i` at a new input. Joint prospective
-constraints also infer release parameters through that public owner.
+[established-bounded; source-inspected] The linked records supply these bounded returns and
+their original checks. This consolidation does not rerun or broaden their measured scope.
 
-[established-bounded; implemented-exact; computational-witness] The
-[learned-word preview](research/records/2026-09-12_CONTEXTUAL_RECEPTION_AND_NORMALIZATION_REUSE_THEIR_SHARED_NATIVE_OWNERS.md#learned-words-reach-a-bounded-joint-preview-and-one-shared-decoder)
-uses one anchored joint relation across actual coupled members, preserving shared intermediate
-variables and vertical modes. A three-transport `aba` preview becomes `bbb` after a native
-return while its matched control remains `aba`. This call returns generated forecast text to
-its caller. It does not advance the continuing body or re-enter that output as a new source;
-those state contracts do not make the returned face less an output.
+| Scope | Evidence and disposition |
+|---|---|
+| Resident features and exact operator export | [September 13 return](research/records/2026-09-13_RESIDENT_CONTEXT_FEATURES_RETURN_PREDICTIONS_AND_FACTORS_RELEASE_EXECUTABLE_CODE.md): bounded conditional section inference, 34 checked outputs and three executed Rust functions. Supplied maps and target-adapter correspondence remain explicit. |
+| Callable exact mathematics and parameter families | [Workshop](research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md): returned factors, changed receivers, powers and native condition-family inference. Reuse these public owners; do not rebuild their request machinery. |
+| Joint forecast and real-source failure | [Reception/normalization return](research/records/2026-09-12_CONTEXTUAL_RECEPTION_AND_NORMALIZATION_REUSE_THEIR_SHARED_NATIVE_OWNERS.md): joint forecast output exists; the real-source trial emitted `race  tr ana t t`. Broad exposure remains paused at that failed source/law construction. |
+| Existing return and persistence | [Base/Programme return](research/records/2026-09-12_OLD_AND_NEW_PENDING_SOURCES_RETURN_THROUGH_ONE_GENERATOR.md): original producing cuts, delayed returns and coupled rest are available dependencies at their declared scopes. |
 
-[established-bounded; implemented-exact; computational-witness] The common algebra now owns
-characteristic/minimal polynomials, reduced powers and one augmented preimage reduction with
-its coefficient family. The public mathematical `power` request constructs an action from a
-retained linear operator and exponent. C5 and C5xC5 recurrences and phase separation have actual
-[resident application evidence](research/experiments/pentagonal_torus_transport/README.md).
-Exterior mathematical construction and resident application retain their distinct cost scopes.
-
-[established-bounded; source-inspected] Native Base/Programme incorporation, pending-source
-comparison, condition/material/current successor, compatible rest and the shared text boundary
-already exist. The complete family remains available before its display or probability receiver.
-Those owners are not scheduled for rediscovery. Current interfaces are in
-[NATIVE_HNA](docs/NATIVE_HNA.md) and [HNN composition](docs/HNN_COMPOSITION.md).
-
-## The coupled generation relation to implement
-
-[definition] `y=rho_F(G_Theta(s,c))`, followed by its codec presentation, is the predicted/output
-face. Chunk reordering, autocorrection and continuation are uses of this relation with different
-known and requested coordinates. The blueprint gives the transposition `Y=P X` as a concrete
-case. A later comparison or a body update is required by the corresponding use, not as a new
-faculty that makes y output.
-
-[definition] For a finite linear comparison, infer W from `W[S;C]=Y`. The existing contextual
-owner returns W's family or a vector in `ker S intersect ker C` exposed by Y. That equation
-specifies which source/condition distinction is missing. In a fixed-feature normal chart,
-`H=sum u u*`, `B=sum v u*` and `W H=B` specify the predictor and its closed update. The
-[fixed-condition audit](research/records/2026-09-11_FIXED_CONDITION_COLLAPSE_IS_EXACT_AND_ITS_PROJECTION_IS_REUSABLE.md)
-remains the concrete reference for the failed constant-condition construction.
-
-[definition] Retain the representation required by the selected equation and receiver:
-normal statistics for the stated fit, the composite permutation for a chunk-reordering endpoint,
-or minimal-polynomial coefficients for powers of a fixed linear action. A changing feature or
-generator uses its specified transport/update relation. The old programme's growing replay is
-an implementation choice to replace at that relation, not an abstract "sufficient continuation"
-standard or a reason to keep every source event.
-
-[project-postulate] Inspect substantive short mathematical/text outputs alongside these changes.
-Broad corpus cultivation remains paused at the identified source/contact limitation. Targeted
-development continues within the actual changed construction; additional exposure through an
-unchanged failed relation is not the next step.
-
-## Product evidence and boundaries
-
-[established-bounded; computational-witness] The preserved
-[real-source trial](research/records/2026-09-12_CONTEXTUAL_RECEPTION_AND_NORMALIZATION_REUSE_THEIR_SHARED_NATIVE_OWNERS.md#real-source-development-and-transport-bound-repair)
-completed 166 next-current observations and emitted `race  tr ana t t`; this is not useful
-language. The addressed route stopped at 95 observations with its pending source retained.
-These are failures of those particular source/receiver constructions, not a grade on exact
-mathematical inference or on the framework's broader scientific work.
-
-[open] A useful general Athena product, durable rest for the new mathematical session,
-standard executable model export and broad hardware parity are not complete. Supported
-Soulkiller/SKE and older HNP material remain available at their recorded scopes; inherited-model
-production stays downstream of the current native foundations. Logical epochs do not supply
-a physical clock or phase law without the source map.
+[open] Useful general contextual replies and code/tool outputs from the formed HNN network,
+compiled changing-programme execution, whole mathematical-session rest, standard executable
+model export and broader hardware parity remain unfinished. The new feature-material rest
+serializes that local object; it is not a whole-session checkpoint. Existing Soulkiller/SKE
+and HNP evidence remains available at its recorded scope; inherited production stays downstream.
 
 ## Research and methodology available now
 

@@ -96,8 +96,8 @@ human origins and to everyday reasoning within the project.
 | **Holonic Engine** | Exact carriers, causal relations, transport, reactions and device execution |
 | **HNN — Holonic Neural Network** | The neural architecture explored within Holonics |
 | **Eros** | Union, composition and formative activity at every nested holonic scope |
-| **Athena** | General wisdom/model products and uses of HNN's available constructions |
-| **Hephaestus / Hephaestus Automata** | Tools and utility models, including code generators, mathematical solvers and reusable working constructions |
+| **Athena** | First intended product of HNN |
+| **Hephaestus / automata** | Utility product label / HNN-based solver applications using its traversal constructions |
 | **Soulkiller** | Analysis and dismantling of supported inherited models into reusable native material |
 
 [open] **The intended useful, general Athena assistant remains unfinished.** The mathematical

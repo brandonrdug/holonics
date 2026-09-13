@@ -1,11 +1,10 @@
 # Hephaestus Automata
 
-[project-postulate] **Hephaestus** labels tools and utility models, including code generators.
-**Hephaestus Automata** are task-scoped application instances of Holonic Encoding and HNN
-construction. Brandon's September 13 clarification includes code construction, transformation
-and other utilities alongside the mathematical solver applications. An operator confines a
-general device to a requested use; that confinement does not define a separate underlying intelligence.
-“Holonic Solver” remains the descriptive umbrella for this constructive activity.
+[project-postulate] **HNN** names the shared machinery; **Athena** is its first intended product.
+**Automata** label solvers based on HNN's traversal constructions. Hephaestus is a tool/utility
+product label, including code-related uses. This guide specifies solver applications and their
+mathematics. These labels do not introduce separate mechanisms or order implementation work.
+“Holonic Solver” describes the activity of constructing and navigating the requested consequence.
 
 [project-postulate] Brandon's latest September 12 clarification makes Athena and Hephaestus
 product/output labels. Neither name encapsulates machinery. Source/receiver relations and
@@ -35,8 +34,8 @@ compression/intelligence/navigation programme.
 | Holonics | The framework of situated differences, composition, transport and physical realization |
 | HNN | The executable architecture conducting and forming those relations |
 | Eros | Union, composition and formative activity throughout the organization, including nested constituents |
-| Athena | General wisdom/model product and use label over shared native constructions and contextual conduct |
-| Hephaestus / Hephaestus Automata | Tools and utility models, including code generators; operator-scoped applications and returned working constructions |
+| Athena | First intended HNN product |
+| Hephaestus / automata | Utility product label / HNN-based solver applications and traversal constructions |
 | Soulkiller | Independent intake and dismantling of inherited realizations into usable material and witnesses |
 
 [definition] Eros is not confined to a separate top-level training job. Composition can occur
@@ -457,6 +456,6 @@ method can infer useful structure while its wider applicability or native bindin
 [interpretation] The longer ambition is an automated workshop for tools, code and mathematics
 whose constructions become material for further constructions: compound arithmetic operators, indexed recurrence
 machines, adaptive analytic charts, local boundary solvers and coupled physical-model sections.
-Operator use supplies new constraints and receivers; Eros composes/refines the available body;
-Athena carries and applies the resulting general wisdom; Hephaestus Automata are particular
-working instances. The code and evidence boundaries above make that ambition concrete.
+Operator use supplies new constraints and receivers; HNN composes, refines and applies the
+retained generating functions. Athena is the first intended product, and automata are solver
+uses of those traversal constructions. The code and evidence boundaries above state their scope.

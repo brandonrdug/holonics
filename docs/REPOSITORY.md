@@ -4,6 +4,24 @@
 and frozen history. A file's age helps locate neglected work; it does not decide whether a
 mathematical subject or a source dependency is obsolete.
 
+## Maintained reading surfaces
+
+| Question | Owner |
+|---|---|
+| What does the framework mean? | `docs/canon/`, with `FORMAL_FRAMEWORK.md` connecting formal subject owners |
+| What machinery is being built? | `ARCHITECTURE.md`, `HNN_COMPOSITION.md`, and the HNN network contract in the linked blueprint |
+| What must a changed operation preserve? | Its formal/native owner and the blueprint's mathematical implementation contract |
+| In what dependency order do we work? | `docs/plans/THE_ROADMAP.md` only |
+| What has returned and what is unfinished now? | `CONSTRUCTION_STATE.md` only; completed evidence is linked to dated records |
+| How do agents construct, measure and audit? | `AGENTS.md`, `DEVELOPMENT.md`, `AGENT_PROTOCOL.md` and the focused research skill |
+| How does a caller use an existing interface? | The relevant interface guide, such as `NATIVE_HNA.md`; API/wire labels remain stable |
+
+[project-postulate] Consolidation updates the owner of a statement and its current consumers.
+Do not append a contradictory correction in another guide or copy current progress into every
+architecture page. Preserve completed recipes and measurements in their existing records and
+Git. Historical product names do not define current mechanisms; HNN is the machinery and Athena
+its first product. This map supplies navigation, not another status index or scheduler.
+
 ## Directory map
 
 | Root | Contents |

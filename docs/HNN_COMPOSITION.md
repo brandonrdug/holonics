@@ -1,10 +1,16 @@
 # HNN composition: section, operation, return and chart
 
-[definition] HNN is a developing ecology of situated sections and interactions. Athena is a
-particular model/ecology; Eros composes and develops it. This guide describes the shared
+[definition] HNN is a developing network of situated sections and interactions. Athena names
+its first intended product. Eros names composition and formation within the network; automata
+label HNN-based solvers using its traversal constructions. This guide describes the shared
 mathematical assembly and its actual owners. It is not a new runtime or a proposed generic
 `Holon` wrapper around unrelated implementations. The [deep review](../research/records/2026-09-09_ARCHITECTURE_CHARTS_REQUIRE_COMPOSED_MECHANISMS_AND_FINITE_CONSTRUCTION_RETURNS.md)
 retains direct-message provenance, architecture comparisons and the repaired formal reaction.
+
+[definition] The [HNN network contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-hnn-network-and-its-mathematical-contract)
+joins these mathematical owners into the intended product construction. This guide explains
+their mechanics; the blueprint owns their implementation contracts, the roadmap owns order,
+and CONSTRUCTION_STATE alone owns the current position.
 
 [interpretation] The [DeepSeek V4.1 comparison](../research/records/2026-09-10_DEEPSEEK_V41_SEPARATES_SHARED_STANDING_CONTACT_AND_CONTEXTUAL_TRANSFORMATION.md)
 separates reusable material, current interaction and fresh response, and maps them to these

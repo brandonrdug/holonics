@@ -24,7 +24,10 @@ during an authoritative repository review. Follow AGENTS.md's responsibility bou
 in-scope repairs and verification; return outcomes and material unresolved decisions, not a
 checklist for Brandon to adjudicate. An explicitly explanation-only request remains explanation.
 
-Name the existing owner and its missing relation before creating another owner. Preserve exact
+Use HNN for machinery and Athena for the first product; automata label HNN-based solvers.
+Follow the mathematical construction contract in DEVELOPMENT and the HNN blueprint. Distinguish
+an unconnected caller, an unsupported representation and an unproved claim before creating an
+owner or describing mathematics as missing. Preserve exact
 bounded results while correcting claims outside their tested scope. Consult source and the latest
 relevant direct messages before declaring capability absent or revoking a construction.
 

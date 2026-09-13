@@ -6,63 +6,71 @@ apparatus; they are not dependencies that schedule native inference.
 
 ## Mathematical implementation and continuation
 
-[project-postulate] Begin each increment from the requested consequence and the mathematical
-unknown it exposes. Holonics' breadth supplies candidate constructions: exact preimages and
-factorization, group/phase transport, recurrence and modal closure, adjoint/normalization,
-boundary/current laws, analytic generators and source-specific physical models. Recover and
-compose the relevant existing relations before introducing another runtime cabinet.
+[project-postulate] HNN is the architecture being constructed; Athena is the first product.
+Use the [network contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-hnn-network-and-its-mathematical-contract)
+to locate the operation a change serves. Generator formation, compression and navigation use
+the same retained mathematical organization. Product labels, test cases and export languages
+do not divide that organization into independent engines or replacement objectives.
 
-[definition] The working chain is
+[definition] A semantic implementation change has a mathematical contract in its owner or
+the blueprint: the typed source and target, known data and inferred unknown, hypotheses and
+constitutive/inference law, receiver, and the equation its execution must preserve. State the
+actual function or family being computed. For example, `WH=B` requires its source features and
+moment convention, including whether H contains a prior; a statement that a return changes
+standing supplies none of these. Reuse the existing formal theorem and construct its consuming
+instance. Extend the formal owner when the mathematical statement changes. No additional proof
+assistant invocation belongs inside native inference or in an ordinary interface-only edit.
 
-`requested consequence -> situated source and unknown -> reusable construction -> consuming operation -> returned comparison -> next inference or repair`.
+[definition] Distinguish supplied, evaluated and inferred objects in that account. Applying
+supplied restrictions `A x` and `C x` evaluates their sections; it does not infer A or C.
+Inference may instead concern coefficients or a compatible function family in that declared
+chart. State the unknown of this increment without denying the computation's mathematical value
+or claiming an unconstructed broader organization.
 
-This is a dependency account, not a sequence of universal approval stages. Exact construction,
-empirical formation, native execution and application inspection may proceed together. The
-source, coefficient ring, phase/clock, receiver, admitted future and cost chart state what a
-particular construction means. Only the information required by its actual consumers is retained.
+| Change in the construction | Mathematical obligation at its consumer |
+|---|---|
+| Source or condition attachment | Identify the participating pre-target carriers and restrictions. A caller-supplied map is a supplied map; a formation claim identifies the native operation that constructs it. Target-derived successor conditions are unavailable to their own earlier prediction. |
+| Serial or parallel composition | Preserve domains, joining equalities and shared parameters. For `z=xh`, `mz=v`, retain z's constraint in both uses. Parallel execution additionally preserves the complete successor and resources under the admitted interchange law. |
+| Kernel or representation change | State a realization equation, such as `decode_Y(native_T(encode_X(x)))=T(x)` on the admitted domain. An enclosure retains the source family and its signed/oriented defect with a bound; a numerical centre is not an exact source. |
+| Observation-driven formation | Use the original producing operands and the selected existing update law. Distinguish changing a parameter from changing its source chart; include mixed terms when both change. An observed coefficient fit and inferred incidence are different claims. |
+| Compression and continued use | Construct E, U and D with `E_next T=U E` and `D E=rho` for the requested future family, including admitted material changes and pending returns. A separator identifies the coordinate or condition to retain. A shorter file or replay cache does not establish these equations. |
+| Physical or information measurement | Retain comparands, orientation, receiver and units. A physical consequence additionally uses its constitutive/boundary law and clock. Loss, cross-entropy and runtime statistics measure their declared populations. |
 
-[project-postulate] The agent's continuing brief keeps six things visible: the human objective;
-the latest corrections; the mathematical relation currently being constructed; the owners and
-usable returns already available; the exact consuming map or obstruction; and the next check
-whose outcome changes the construction. Carry this brief into a compaction or handoff in prose
-or the existing position record. It is not a new public type, manifest or generated registry.
-Links replace completed narratives, while the objective and causal reason for the next action
-remain explicit. Read unchanged authority once and recover only what a new question requires.
+[project-postulate] These obligations are local to the changed relation. They are not a new
+universal intelligence theorem or a requirement to rebuild every proof before producing output.
+A preview already returns its generated face. A commit publishes the specified successor;
+a later observation invokes its comparison/update contract when present. Do not require all
+three in every operation or invent an observation for an exact solver result.
 
-[project-postulate] Preserve the mathematical referent through that handoff. Generator formation
-concerns the functions and compositions that produce conditioned faces; an output codec or a
-model's application label does not replace that unknown. Keep agent-chosen examples and target
-languages identified as implementation choices. When an example fails to advance the requested
-construction, inspect what was supplied, what was inferred and which consumer is still unbound;
-do not promote a different application into a new requirement merely because its test is familiar.
+[definition] Diagnose the obstruction precisely before changing scope:
 
-[project-postulate] Progress is the returned mathematical or product consequence. A proof can
-unlock a cheaper algorithm; an exact solver can return a coefficient family; a native application
-can expose a previously hidden phase; an unsuccessful language reply can identify a wrong source
-relation. State that content directly. A changed state, successful round-trip, test count or
-larger exposure does not by itself explain the learned relation or establish usefulness.
+- **Unconnected caller:** both operations exist; name their types, producing operands and the
+  call that must consume the return. Complete that connection and its public consumer.
+- **Representation mismatch:** show the term or source family that the current carrier cannot
+  express, such as a parameter product outside an affine family. Change the representation
+  through existing factor/section owners and account for its decoder and cost.
+- **Unproved mathematical claim:** state the proposition, hypotheses and attempted derivation
+  or counterexample. Develop the relevant formal owner. Source absence alone is not a proof
+  that the mathematical construction is absent from the framework.
 
-[project-postulate] Prediction release is output of a generated face. Describe its source,
-generator, receiver and requested transformation before discussing lifecycle plumbing. A
-read-only forecast can already return output; a comparison handle, body update or later
-observation has its own contract. Replace "actual context", "complete release", "sufficient
-continuation" or a generic learning/intelligence criterion with the coefficient equation,
-operator composition, retained statistic or receiver identity that the task needs. The
-[blueprint's concrete cases](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#generated-faces-reconfiguration-correction-and-continuation)
-state chunk reconfiguration, correction and continuation in this form.
+[project-postulate] A bounded example answers a named question in that contract. Its driver may
+supply admitted inputs and inspect outputs; it cannot supply the disputed organization or answer
+and then count that as formation. Once the example answers its question, use the result in the
+named consumer. Do not expand it for another isolated success. Small exact results and physical
+models remain valuable at their stated domains; their size is not the criterion.
 
-[definition] Diagnose prolonged work at its actual consumer. Whole-prefix reevaluation calls
-for an economical sufficient continuation. Dense future tuples call for a factor/modal form
-when the requested receiver permits it. Early source acknowledgement calls for repairing the
-source-to-successor transaction. A wrong conditional law calls for changed source/condition
-construction. More state machinery, a generic cache or another theorem count does not resolve
-all four. A returned failure should change the hypothesis, representation, owner or next check.
+[project-postulate] Follow the roadmap's dependency order while maintaining the affected owners.
+A completed local test does not cancel its consuming obligation. Consolidate duplicated
+representations, wrappers and exports as those consumers change. Preserve mathematical,
+ownership and wire distinctions; do not give each implementation task a permanent public family.
 
-[project-postulate] Consolidate the construction into its mathematical owner and update its
-consumers in the same increment. Generic matrix or polynomial inference belongs with the
-existing algebra, not inside a fixed example. A public application invokes that owner and
-declares its source, output and costs. Preserve compatibility only where there is an actual
-consumer, and keep differences in source/ownership or wire semantics when they are material.
+[project-postulate] A handoff retains the original requested outcome and the current mathematical
+contract, its source/native owners, the result returned and the next unresolved consumer. Record
+agent-chosen assumptions as choices, with the reason for their scope. The goal enables continuous
+work; its text and compaction summaries do not supersede the roadmap or turn a subsidiary task
+into the objective. Keep current position only in CONSTRUCTION_STATE, order only in the roadmap,
+contracts in the blueprint and owners, and completed evidence in dated records. Correct a stale
+clause in place; appending a contrary instruction elsewhere is not consolidation.
 
 [definition] Repository-wide review means following the live roots, subject boundaries and
 critical source-to-application maps, then repairing the in-scope contradictions found. Record

@@ -14,15 +14,14 @@ catalogue of minor decisions or ask him to repeat a settled ruling.
 [project-postulate] Holonics is a theory of everything: a mathematical, physical and philosophical
 framework for situated objects, causal composition, information transport and physical realization.
 Its mathematical research develops reusable methods of construction and explanation across mathematical, physical,
-biological and computational systems. HNN is its Holonic Neural Network architecture; Athena
-labels its general wisdom/model products and uses; Eros names union, composition and formative activity at
-every nested holonic scope; Soulkiller independently dismantles inherited realizations.
-Hephaestus labels tools and utility models, including code generators; Hephaestus Automata are
-operator-scoped application instances/products of HNNs and Holonic Encoding. Mathematical solvers
-are one application family; “Holonic Solver” describes that constructive activity, not another engine.
-Athena and Hephaestus are product/output labels, not internal machinery boundaries. Actual
-relations, source/receiver maps and ownership determine composition; neither name encapsulates
-an engine, fixes native topology or separates solving from other intelligence.
+biological and computational systems. **HNN — Holonic Neural Network** names the architecture
+and machinery. **Athena is the first intended product.** Automata label solvers based on HNN's
+traversal constructions; Hephaestus is a tool/utility product label. Use HNN when explaining
+mechanisms, with the actual mathematical operation and source owner. Eros names union,
+composition and formative activity at every nested scope; Soulkiller independently dismantles
+inherited realizations. These names do not choose a topology, divide the network into engines
+or supply an implementation requirement. Source/receiver relations and ownership determine
+composition. Preserve existing API/wire names and historical source references.
 See [the application design](docs/HEPHAESTUS_AUTOMATA.md). HNN's product goal is frontier-level
 usefulness on consumer hardware. The “20W ideology” directs efficient local formation and reuse,
 not a literal current-machine power claim. Read
@@ -30,7 +29,7 @@ not a literal current-machine power claim. Read
 [Athena](docs/ATHENA.md) and [interoperability](docs/INTEROPERABILITY.md) before reassessing
 those subjects.
 
-[project-postulate] Hephaestus solver inference, algorithm synthesis and Holonic Encoding are
+[project-postulate] HNN solver inference, algorithm synthesis and Holonic Encoding are
 mathematical learning and intelligence within this programme. The unknown may be a coefficient
 family, factorization, recurrence, generator or representation of a requested consequence.
 Exact search, deduction and supplied update rules do not put that activity outside AI. State what
@@ -138,6 +137,14 @@ generates source code is one application, and printing an existing operator as R
 exterior representation. Neither defines generator formation. Preserve this distinction when
 turning user language into deliverables; a chosen example or export target does not acquire
 authority from being repeated in an agent plan or goal handoff.
+
+[project-postulate] Implement semantic changes from their mathematical contracts: typed
+operands, constitutive/inference law, source/receiver scope and the realization or residual
+equation the consumer requires. Recover the existing formal statement and native owner;
+distinguish an unconnected caller, an unsupported representation and an unproved mathematical
+claim. Use [the construction method](docs/DEVELOPMENT.md#mathematical-implementation-and-continuation)
+and [the HNN network contract](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-hnn-network-and-its-mathematical-contract).
+Lifecycle correctness, exported syntax and example success do not discharge those equations.
 
 [project-postulate] Brandon's September 5 contextual-transport correction makes **native HNN
 foundations** the present priority, before further Soulkiller/Gemma-led production. Changed

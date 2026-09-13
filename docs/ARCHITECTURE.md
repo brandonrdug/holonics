@@ -33,9 +33,9 @@ the broader doctrine; the remainder of this guide describes the current executab
 |---|---|---|
 | **Holonics** | The mathematical framework and ontology, with executable applications | [Holon](../formal/elementary-holonics/ElementaryHolonics/Foundation/Holon.lean), [mathematics](canon/THE_MATHEMATICS_TABLET.md), [public Rust entry point](../crates/holonics/src/lib.rs) |
 | **HNN** | The Holonic Neural Network architecture and recurrent runtime | [native phase session](../crates/holonics-hna/src/native.rs), [constitutive ecology](../crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs); earlier [full operator](../crates/holonic-engine/src/holonic_intelligence/full_operation.rs) |
-| **Athena** | Product/use label for general wisdom/model outputs of the shared native ecology; no internal machinery boundary | [Athena lifecycle](ATHENA.md) |
+| **Athena** | First intended HNN product; its name introduces no internal machinery boundary | [Athena interface](ATHENA.md) |
 | **Eros** | Union, composition and formative activity throughout the holonic organization, including nested constituents | [native relation formation](../crates/holonic-engine/src/native_ecology/constitutive_fibre.rs) and [circulation](../crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs); earlier [adjoint return](../crates/holonic-engine/src/holonic_intelligence/operative_return.rs) |
-| **Hephaestus / Hephaestus Automata** | Tools and utility models, including code generators, mathematical solvers and operator-scoped working constructions of Holonic Encoding/HNNs | [application design](HEPHAESTUS_AUTOMATA.md); existing [exact synthesis reference](../crates/holonic-engine/examples/generator_factorization.rs) |
+| **Hephaestus / automata** | Utility product label / HNN-based solver applications using its traversal constructions | [application design](HEPHAESTUS_AUTOMATA.md); existing [exact synthesis reference](../crates/holonic-engine/examples/generator_factorization.rs) |
 | **Soulkiller** | Independent model-intake, excitation and dismantling apparatus | [Soulkiller](SOULKILLER.md), [consumed-input boundary](../crates/holonic-engine/src/soulkiller/boundary.rs) |
 | **Applications/codecs** | Text, image, audio, files, user protocols and target runtimes | [CLI](../applications/holonics-workbench/src/cli.rs), [interoperability](INTEROPERABILITY.md) |
 
@@ -53,7 +53,7 @@ architecture. The diagram describes roles and composition, not completed capabil
 
 ```mermaid
 flowchart LR
-    C[Caused interactions and native constitutive owners] --> A[Athena]
+    C[Caused interactions and native constitutive owners] --> A[HNN state and formed generators]
     F[Pretrained assets and execution chart] -. Later inheritance .-> S[Soulkiller apparatus]
     X[Declared exposures and interventions] --> S
     S --> N[Native class ecologies]
@@ -61,7 +61,7 @@ flowchart LR
     N -.-> A
     O[Ordinary occurrence] --> E[HNN operation: conduct and admitted development]
     A --> E
-    E --> A2[Successor Athena]
+    E --> A2[Successor HNN state and generators]
     E --> R[Emission and receiver result]
     A2 --> E
     A2 --> P[Native persistence or target export]
@@ -70,16 +70,15 @@ flowchart LR
 
 [definition] Eros names union and development within this recurrence; the native ecology carries
 the formed structure and current. Athena and Hephaestus label its products and uses, not internal
-engines or encapsulation boundaries. The diagram's Athena nodes use that product shorthand.
+engines or encapsulation boundaries. Athena is the first intended product of this construction.
 The [expanded architecture diagrams](HNN_COMPOSITION.md#the-architecture-as-explicit-passages)
 show the local passage, developmental return, classical block arithmetic and Soulkiller's
 commuting realization/restriction maps. Their full assembly is a construction account, with the
 implemented bindings and remaining contextual attachments stated separately.
 
 [definition] Eros operates at nested scopes as well as the whole ecology; it is not restricted
-to a separate training program. Hephaestus Automata are application instances obtained by
-confining the general construction capability to a requested tool, code or mathematical task
-and receiver. Hephaestus also labels models serving these utility uses.
+to a separate training program. Automata are solver applications of HNN's traversal
+constructions under a requested task and receiver. Hephaestus labels utility products.
 “Holonic Solver” describes that activity. Exact algebraic construction retains its exterior
 execution scope; the [public mathematical session](NATIVE_HNA.md) already binds returned
 operators to resident application and changed receivers. The product name adds no capability

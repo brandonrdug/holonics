@@ -6,7 +6,7 @@
 specifies native changes. Dated research supplies evidence, not additional schedules.
 
 [project-postulate] Brandon's latest September 11 ruling makes the sustained programme explicit:
-formal mathematics, engine construction, Eros, Athena and Hephaestus develop one framework.
+formal mathematics and HNN engine construction develop one framework, with Athena as the first product.
 The mathematical applications must return reusable constructions into the engine; native
 observations must in turn refine the mathematics and its representation. AC0–AC5 remain historical
 labels. The named Athena responsibilities below express shared dependencies, not a separate
@@ -28,13 +28,10 @@ continuation as their actual dependencies permit. Work may move among all four i
 
 [project-postulate] Build a continuing ecology that can recover applicable generating relations,
 compose them into useful actions, represent their relevant futures economically, and change its
-available conduct through actual returned differences. Athena labels the general wisdom/model
-products of that ecology; Eros names formative union and incorporation, including inside
-constituents; Hephaestus labels tools and utility models, including code generators; Hephaestus Automata
-label operator-scoped working applications. These output/use
-labels do not encapsulate machinery. HNN is their common executable architecture. Mathematics,
-text, code, vision, acoustics and physical/biological sources supply different conditions and
-receivers to this construction.
+available conduct through actual returned differences. HNN names the machinery and Athena its
+first intended product. Automata label HNN-based solvers and their traversal constructions;
+Hephaestus is a utility product label. Mathematics, text, code, vision, acoustics and
+physical/biological sources supply different conditions and receivers to the same network.
 
 [definition] The shared sequence is
 
@@ -65,7 +62,7 @@ return already composes lawfully, implement its authorized consumer while wider 
 continues. A newly exposed missing law is worked through explicitly; unrelated experiments do
 not discharge it. This direction does not authorize unrelated subsystems or destructive actions.
 
-| Coupled responsibility | Shared construction and engine consequence | Hephaestus/Athena outcome |
+| Coupled responsibility | Shared construction and engine consequence | HNN consequence and product use |
 |---|---|---|
 | **1. Situated reception and visible cycles** | Public mathematical requests and source/part relationships enter existing owners; retain domain, conditions, receiver, source clock and returned difference. Reusable factors/words replace fixed example wiring. | Inspect a complete requested operation and actual returned face; distinguish a prediction, a supplied correction and an ordinary incoming source. Mathematical results become available constructions, not only printed answers. |
 | **2. Conditional relations and complete return** | Bind producing-family comparisons to correlated condition/preimage and material formation, then publish one successor. | Eros incorporates an observed mathematical/textual relation; a later suitable request uses the changed relation. A separating condition retains its different consequence. |
@@ -83,48 +80,31 @@ nested automata that construct, compare and refine further automata.
 
 ## Immediate mathematical application and implementation
 
-[project-postulate] Brandon's September 13 release/planning clarification governs this
-increment. Prediction release is output of a source-conditioned generated face. A forecast,
-a continuing release and a later comparison have explicit operation contracts; they are not
-separate faculties. Hephaestus labels tools and utility models, including code generators and
-mathematical solvers. Athena and Hephaestus continue through the same HNN owners.
+[project-postulate] Develop the HNN network specified by the
+[mathematical assembly contract](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-hnn-network-and-its-mathematical-contract).
+The present implementation priority is the source/condition attachment to its existing native
+formation and generated-section consumer, accompanied by economical representation of the action
+actually used. CONSTRUCTION_STATE names the current implementation and unfinished call. A new
+example, wrapper, rest format or output codec cannot replace that attachment.
 
-[definition] The [release specification](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#release-continuation-and-comparison-contracts)
-fixes the first compound contract: compose the existing transport-only joint word, return its
-requested section and publish the endpoint once, with optional producing cuts. Intervening
-self-reception is a different composition and must appear in its forecast. Existing joint
-forecasts already return output. Resource-disposal commands named `release-prediction` are
-not generation commands.
+[definition] Prediction release is the generated face crossing its receiver boundary. Preview,
+committed continuation and later comparison have the blueprint's distinct state contracts.
+A model generating code is one use of this mathematical network; an exterior Rust printer
+represents an already-retained operator. No code-repair or Rust-first priority follows from
+the word generator. The
+[message and methodology audit](../../research/records/2026-09-13_GENERATOR_MEANING_AND_CAMPAIGN_DRIFT_AUDIT.md)
+retains the corrections and their original evidence.
 
-[definition] The callable mathematical workshop is an available dependency: exact linear/
-bilinear construction, condition families, changed receivers, composition and fixed-linear
-powers already return through public owners. Reuse those returns. The next implementation
-increment binds resident context to the generated section; joint publication and compiled
-execution accompany it through their actual dependencies. The
-[blueprint deliverables](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#deliverables-and-discriminating-checks)
-name the consuming files, equations, products and discriminating checks.
-
-[definition] Reuse the [resident feature/predictor and code return](../../research/records/2026-09-13_RESIDENT_CONTEXT_FEATURES_RETURN_PREDICTIONS_AND_FACTORS_RELEASE_EXECUTABLE_CODE.md).
-Its public preparation maps and normal law give a bounded contextual mathematical consumer;
-the next attachment carries that fitted source/condition action through the existing coupled
-wave/joint body. Its Rust printer is an available exterior adapter. CONSTRUCTION_STATE
-retains the measured scope and remaining products; neither return schedules another demo loop.
-
-[project-postulate] Brandon's subsequent generator correction governs these deliverables.
-Generators are the mathematical functions and constituent compositions formed and used by HNN;
-fractal generation and a model's parameterized execution express this shared question. Hephaestus
-includes code-generating models as a use, without making source-code emission the meaning of
-generator formation. The earlier Rust-first interpretation and subsequent code-repair priority
-were agent choices; neither orders the campaign. The
-[direct-message/source audit](../../research/records/2026-09-13_GENERATOR_MEANING_AND_CAMPAIGN_DRIFT_AUDIT.md)
-records the correction and the still-unbound native context consumer.
+[definition] The following deliverables specify consequences within the coupled responsibilities
+above. The blueprint owns their mathematical contracts and consuming files; current completion
+and measurements belong only in CONSTRUCTION_STATE and its linked records.
 
 | Packet / deliverable | Concrete return | Dependency and completion evidence |
 |---|---|---|
 | **Contextual generator formation** | A whole corrected or continued section from source/condition distinctions present before its target arrives; infer `W[S;C]=Y` or the declared normal/conditional law. | Use the source-null contrast and fixed-h collapse as references. Show actual generated chunks for new inputs and the same visible source under distinct preparations, plus the unsupported-condition separator. No additional unchanged broad exposure. |
 | **Joint prediction release** | The prepared joint output and one published successor for the transport-only word, with optional cuts for later joint observations. | Compare with the existing forecast at the same source/section; preserve component correlation, endpoint, delayed return and recoverable refusal. It can bind before general contextual language succeeds. |
 | **Compiled modal continuation** | Reusable factor/recurrence or closed formation statistics, with `E_next T=U E` and `D E=rho` on the admitted operation. | Begin with the first repeated segment. Compare complete requested outputs and live pending returns; repeated use without new independent structure ceases appending executable history. Measure work, representation and precision growth. |
-| **Hephaestus utility generator and output** | A formed mathematical function/composition retained and executed through the shared HNN owners for the requested tool use. Code is an available output domain; an operator can also request an exterior representation of the function. | Inspect the inferred generating relation, its source/condition dependence and returned consequences on new inputs or compositions. Reuse its retained native material. When source-code output or export is requested, check target execution against the specified behavior or retained operator; printer correspondence alone establishes only that adapter. |
+| **HNN solver and tool output** | A formed mathematical function/composition retained and executed through the shared HNN owners for the requested tool use. Code is an available output domain; an operator can also request an exterior representation of the function. | Inspect the inferred generating relation, its source/condition dependence and returned consequences on new inputs or compositions. Reuse its retained native material. When source-code output or export is requested, check target execution against the specified behavior or retained operator; printer correspondence alone establishes only that adapter. |
 | **Athena task use** | Contextual correction/continuation, a substantive reply, and code or mathematical work using the same formed constructions. | Starts with the repaired contextual section. Inspect held-out requested products and costs; expand development only after diagnosing the first representative failure at its responsible owner. |
 | **Durable application reuse** | Rest/remount for the new section/encoding payload and the public mathematical session's retained constructions, products and pending/frontier state. | Follows the payloads it serializes. A fresh process reuses them on new inputs and consumes a pre-rest comparison once; live output does not wait for this durability claim. |
 | **Broader generative reach** | Indexed analytic generators, nonlinear and physical actions, then shared acoustic/visual and other requested receivers. | Use the same request/encoding/release contract, with actual clock, tail, source units and target execution. Source-specific research below continues alongside native products. |
@@ -150,45 +130,17 @@ cube search remains exterior reference. Model/checker formation costs remain exp
 
 ### Work selection and early failure control
 
-[project-postulate] Brandon's latest September 12 maintenance correction applies throughout
-every packet: consolidate the changed relations and their existing consumers during implementation.
-Type/representation proliferation and repeated public forwarding are architectural work in the
-same goal. Preserve real source, fibre and ownership distinctions; reconcile duplicated carrier,
-receiver and decoder machinery instead of leaving a parallel family behind each new operation.
-This is part of delivering each usable product, not a later cleanup phase or a new completion
-standard based on type counts.
+[project-postulate] Apply the [mathematical construction method](../DEVELOPMENT.md#mathematical-implementation-and-continuation)
+at the changed owner and consuming call. Preserve the complete objective across goal turns;
+a completed subsidiary proof or test does not close an unimplemented consumer. Consolidate the
+affected representations, wrappers and exports within implementation, preserving actual
+mathematical and ownership distinctions. A packet name does not justify another public type.
 
-[project-postulate] Brandon's subsequent September 12 next-holon correction governs the
-predictive product: compose a prepared generator into its joint prospective continuation or
-released section, retaining actual graph incidence, shared source conditions and future
-receivers. Multi-character text is one exterior decoding of that construction. A repeated
-one-coordinate selection loop is a bounded codec probe, not the architecture or the definition
-of prediction. Bind the existing predictive-release, modal/family and continuation work into
-the application while maintaining its owners; do not schedule further character-only exposure
-as a substitute for that integration.
-
-[project-postulate] Before an implementation run, identify the user-facing return, exact
-source/owner change, consuming call and discriminating check. A supporting proof or experiment
-is completed into that consumer when its required map exists. If it exposes a missing map,
-work that map explicitly; do not substitute more observations of the unchanged failure.
-
-- Inspect the first representative output before increasing data or run length. A repeated
-  full-mass-hyperplane/tie result stops that exposure route and returns work to source or law
-  construction. A wrong source relation cannot be repaired by a longer run.
-- Use the already-returned pending/source, emission and rest paths. Extend their tests only
-  for changed semantics. An unchanged successful persistence check is not the next milestone.
-- Compare the complete useful operation: construction work, resident execution, readout,
-  decoding, storage and representation setup. A cache hit is not proof of a compact generator.
-- Keep the interpretation, source family, planned outcome, implemented artifact and open
-  obstruction in agreement. An interrupted packet stays incomplete even if its time budget
-  or a subsidiary test completes.
-- Delegate bounded independent code/proof investigations to Luna where useful. The primary
-  verifies returned claims against current source; stale testimony schedules no work.
-
-[definition] Broad corpus cultivation stays paused until the contextual-source and execution
-path can answer its first short useful tests. Targeted development and held-out checks within
-the repaired path proceed immediately; useful conversation is not deferred until every
-operator or physical theory is complete.
+[definition] Inspect the first representative returned product before increasing exposure.
+An unchanged source-null collision, full-mass-hyperplane tie or nonsensical continuation directs
+work to its source/law/receiver mismatch. Broad corpus cultivation stays paused at this concrete
+limitation; targeted development and held-out checks of a changed construction proceed. An exact
+solver or physical-model result remains useful at its own scope and requires no language demo.
 
 ## All current plan documents and their roles
 

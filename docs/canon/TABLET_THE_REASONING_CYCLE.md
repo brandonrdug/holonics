@@ -33,8 +33,8 @@ and
 local transports. The admitted source-neutral resident operation can preserve its mathematical
 structure, as Brandon's September 4 ruling establishes. Excitation and the declared receiver
 family found the restricted productive return, separate cold witness and explicit insufficiency.
-Eros names composition and formation at every participating scope; Athena labels a product/use
-of the resulting HNN ecology. Neither name establishes an internal machinery boundary.
+Eros names composition and formation at every participating scope; Athena labels the first
+intended HNN product. Neither name establishes an internal machinery boundary.
 
 The productive reasoning machine is the recurrent ecology in which one occurrence operates on
 the contemporary morphology and returns its emission, trace and successor:
@@ -69,7 +69,7 @@ emission privately copied back into an input buffer is not a world return.
 `definition`: Soulkiller owns no inference mechanism or retained-state convention. A foreign
 realization's internal factorization remains opaque apparatus conduct unless a declared exterior
 reconstruction receiver asks about it. Soulkiller neither requires nor reproduces that
-factorization. An Athena front is an addressed factorization of native incidence, current,
+factorization. An HNN application front is an addressed factorization of native incidence, current,
 constitutive response, chronology, receiver consequence, and Preimage Fibre.
 
 ## 2. The bra-ket anatomy of local transport

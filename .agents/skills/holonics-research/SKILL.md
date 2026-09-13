@@ -1,6 +1,6 @@
 ---
 name: holonics-research
-description: "Recover and develop Holonics research across its mathematical, physical and computational owners. Use for resumed derivations, cross-domain synthesis, missing-mechanism reviews and research-to-source implementation in the Holonics or predecessor laboratory workspace. Ordinary isolated edits do not require this research workflow."
+description: "Recover and develop Holonics mathematical, physical and computational constructions. Use for resumed derivations, cross-domain synthesis, HNN architecture or methodology audits, and research-to-source implementation in Holonics or its predecessor laboratory. Ordinary isolated edits do not require this workflow."
 ---
 
 # Holonics research and construction
@@ -29,15 +29,17 @@ Load only the route needed:
 - [Physics](references/physics.md): forces, atoms, fields, strings, geometry or physical realization.
 - [Mathematics](references/mathematics.md): theorem development, source comparisons, topology,
   number theory, spectral/complexity questions and formalization.
-- [Computation](references/computation.md): native implementation, generated outputs,
-  representation, performance and repeated-execution failures.
+- [Computation](references/computation.md): HNN assembly, native implementation, representation,
+  performance and autonomous-campaign failures.
 
 ## Turn recovery into a consequence
 
-Write the actual chain needed by this request, with available owners on its arrows. Attempt
-the composition. If it fails, expose the first incompatible type, missing relation or
-counterexample and work that relation. “Needs a map”, “sufficient”, “intelligent”, “physical”
-or “not established” alone does not specify a task or complete a requested investigation.
+Use the mathematical construction contract in `docs/DEVELOPMENT.md`: typed source/target,
+known data and inferred unknown, hypotheses, operation and realization/defect equation.
+For HNN, locate the change in the blueprint's network contract before choosing an example.
+Recover the formal/native owners and attempt their composition. Distinguish an unconnected
+caller, a representation that cannot express a required term, and an unproved mathematical
+claim. Name the actual call, term or proposition; none is specified by “missing relation”.
 
 Keep the status of each claim accurate while advancing it. A conditional law is useful when
 its hypotheses are supplied. An interpretation should return a derived subclaim, a tested
@@ -56,9 +58,12 @@ important failed attempt and next discriminating result in the existing position
 Do this before context handoff; do not restart the whole archive or silently drop a requested
 branch after handoff. If another branch is deferred, name its concrete unfinished operation.
 
-Verify the changed relation at its actual consumer. Inspect returned source/output and measured
-units rather than relying on an agent summary, test count or graph shape. Reconcile the live
-clause and consumers when correcting prior prose. Follow `docs/DEVELOPMENT.md` for checks and
-the evidence protocol for records; this skill adds no blanket gate, ledger or approval process.
+Verify the changed relation at its actual consumer. A component example does not discharge an
+unconnected application. Inspect the returned function/output and measured units. Follow
+`docs/DEVELOPMENT.md` for checks and the evidence protocol for records; this skill adds no
+blanket gate, ledger or approval process. In a conduct audit, recover the direct instruction,
+the subsequent assistant decision/tool action and the then-governing plan. Mark an unrecovered
+link explicitly; a later agent confession or plausible failure pattern is not original evidence.
+Correct the live clause and its consumers in place, preserving source and historical evidence.
 When work is delegated, keep file ownership explicit and run final integration after the
 changing owner returns; a build of an intermediate edit is not the completed artifact's check.

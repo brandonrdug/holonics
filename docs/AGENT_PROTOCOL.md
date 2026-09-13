@@ -48,6 +48,13 @@ Paths in code spans are repository-relative.
 
 ## Repository-local evidence and handoff
 
+[definition] A conduct audit distinguishes four sources: the direct instruction, the assistant's
+subsequent decision/tool action, the plan at that revision, and the resulting source or output.
+Retain their coordinates and chronology. A later confession, copied parent message or current
+summary is not evidence of the original decision. If a link cannot be recovered, report that
+boundary instead of filling it with an inferred story. Logs can establish scope substitution
+and procedural conduct; they do not expose a unique hidden psychological or prompting cause.
+
 [project-postulate] A context handoff carries the current construction's reason as well as its
 mechanics: the human objective and breadth, governing corrections, active unknown, available
 relations, actual source/receiver, consuming implementation, failed alternatives that matter,
@@ -55,6 +62,11 @@ and the next discriminating result. Use the existing position and dated record f
 do not create another scheduler or raw-history requirement. The
 [development method](DEVELOPMENT.md#mathematical-implementation-and-continuation) gives the
 working form. An agent report is testimony until the primary inspects its source and checks.
+
+[definition] The plan's presence in a tool read proves it was accessed, not followed. Check the
+chosen edit and its consumer against the governing mathematical contract. An implementation
+assumption copied into a goal or current-position note remains an agent choice until its scope
+is established by the direct instruction and source. Preserve that distinction in summaries.
 
 [project-postulate] Brandon's September 6 consolidation retires the external memory database and
 connector from Holonics operation. Do not query or deposit into it, start cursors, send graph

@@ -1,11 +1,9 @@
 # Athena and the HNN training/inference interface
 
-[definition] Athena labels general wisdom/model products and uses of HNN. It does not encapsulate
-native machinery or establish an internal boundary from Hephaestus tools and utility models,
-including code generators and mathematical solvers. A
-continuing native ecology owns its constitutive morphology, current, incidence, chronology,
-lineage and admitted receiver domain. Eros is the union/composition and
-developmental phase that forms and refines its reusable material within HNN recurrence. The
+[definition] Athena is the first intended HNN product. HNN names the machinery and owns its
+constitutive morphology, current, incidence, chronology, lineage and admitted receiver domain.
+Automata label HNN-based solvers and their traversal constructions; Hephaestus is a utility
+product label. Eros names union, composition and formation throughout HNN recurrence. The
 [expanded architecture](HNN_COMPOSITION.md#the-architecture-as-explicit-passages) shows these roles
 and their actual maps. The current public Rust entry point is `holonics::hna`;
 the application implementations are in [holonics-hna](../crates/holonics-hna/README.md).
@@ -254,8 +252,8 @@ The section receiver is not asserted equivalent to the old whole-family one.
 [definition] [Hephaestus Automata](HEPHAESTUS_AUTOMATA.md) are operator-scoped tool, code and mathematical
 application instances of the general HNN/Holonic Encoding construction. Mathematical operators
 are an available application family; the roadmap binds contextual sections and code/tool outputs
-through the same owners. Athena remains the general wisdom/model
-ecology; this specialization neither replaces that objective nor requires general conversation
+through the same owners. Athena is the first general model product built from this HNN
+construction; this specialization neither replaces that objective nor requires general conversation
 before a mathematical tool can be useful. Current exact solver examples are exterior references,
 with their native source/family/material handoff still explicit.
 
