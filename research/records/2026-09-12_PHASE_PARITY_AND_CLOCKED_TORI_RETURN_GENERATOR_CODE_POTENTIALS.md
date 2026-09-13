@@ -161,6 +161,17 @@ source entropy; it does not imply zero bit length, zero execution work or zero p
 For general bidirectional stationary flux F_ij=pi_i P_ij, `KL_2(F||F^T)` measures the declared
 one-step reversal asymmetry and vanishes exactly at detailed balance on the common support.
 
+[proved-derived] The same two-state transition has eigenvalues 1 and `-phi^-2`: it is similar
+to B/phi. With column probability evolution `p_(n+1)=P^T p_n`, its zero-sum difference from
+the stationary law is exactly `p_n-pi=(-phi^-2)^n(p_0-pi)`. Thus an ordinary admissible
+probability relaxation can alternate its oriented difference without reversing chronology.
+For `p_0-pi=(d,-d)`, the stationary-reference cross-entropy obeys
+`H2(p_n,pi)-H2(pi)=-2d(-phi^-2)^n log2(phi)`. This signed baseline comparison alternates;
+the nonnegative KL excess instead subtracts the changing source entropy H2(p_n). Confusing
+those two baselines hides the parity question. The deterministic edge 1->0 has conditional
+code length zero while changing the source state; its endpoint-potential drop cancels the
+bulk code term, not the actual traversal.
+
 ## Tori, golden clocks and nonorientable returns
 
 [proved-derived] The scalar equal-coupling C5 model has Laplacian eigenvalues 0 and two double
