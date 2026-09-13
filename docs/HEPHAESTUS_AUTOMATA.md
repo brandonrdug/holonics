@@ -1,9 +1,10 @@
 # Hephaestus Automata
 
-[project-postulate] **Hephaestus Automata** are task-scoped mathematical application instances
-of Holonic Encoding and HNN construction. Brandon's September 11 direction makes elementary
-mathematics and solver applications the immediate product focus. An operator confines a general
-device to a requested use; that confinement does not define a separate underlying intelligence.
+[project-postulate] **Hephaestus** labels tools and utility models, including code generators.
+**Hephaestus Automata** are task-scoped application instances of Holonic Encoding and HNN
+construction. Brandon's September 13 clarification includes code construction, transformation
+and other utilities alongside the mathematical solver applications. An operator confines a
+general device to a requested use; that confinement does not define a separate underlying intelligence.
 “Holonic Solver” remains the descriptive umbrella for this constructive activity.
 
 [project-postulate] Brandon's latest September 12 clarification makes Athena and Hephaestus
@@ -26,7 +27,7 @@ compression/intelligence/navigation programme.
 | HNN | The executable architecture conducting and forming those relations |
 | Eros | Union, composition and formative activity throughout the organization, including nested constituents |
 | Athena | General wisdom/model product and use label over shared native constructions and contextual conduct |
-| Hephaestus Automata | Operator-scoped applications and returned working constructions for particular mathematical tasks |
+| Hephaestus / Hephaestus Automata | Tools and utility models, including code generators; operator-scoped applications and returned working constructions |
 | Soulkiller | Independent intake and dismantling of inherited realizations into usable material and witnesses |
 
 [definition] Eros is not confined to a separate top-level training job. Composition can occur
@@ -56,7 +57,7 @@ names the request payload, native binding, source/condition repair and compact c
 A standalone command wrapping fixed examples would not complete that contract. No visual
 interface redesign is required to make the typed application callable.
 
-[project-postulate] Hephaestus is the mathematical application of the
+[project-postulate] Hephaestus labels tool and utility applications of the
 [shared sustained programme](plans/THE_ROADMAP.md#sustained-objective-and-construction-rhythm).
 The requested algorithm is executable material for the same ecology that handles other
 occurrences. Eros incorporates the actual returned source/condition constraints and forms
@@ -80,8 +81,9 @@ while their reusable constructions are integrated into the engine.
 
 ## The operator's request and return
 
-[definition] A request specifies a mathematical operation or constraint, its domain, supplied
-source material, available ports and desired receiver. Where needed it also specifies a
+[definition] A request specifies a tool action, code construction/transformation or mathematical
+operation/constraint, its domain, supplied source material, available ports and desired receiver.
+Where needed it also specifies a
 time/index interval, precision and resource aperture. These are legitimate task conditions,
 like selecting an operation on a calculator. A task name is not an interior semantic identity
 or a substitute for the actual constraints.
@@ -103,9 +105,13 @@ plumbing do not belong in the operator's flow. No new UI or command interface is
 
 [definition] The elementary cycle is:
 
-`request/source -> applicable constructions -> composed candidate -> returned comparison -> usable automaton + changed available construction`.
+`request/source -> applicable constructions -> generated face/automaton + successor -> next occurrence`.
 
-The candidate can be an operator word, factored circuit, recurrence block, constrained state
+Prediction release is the returned face: code, a revised chunk, an executable operator or another
+requested consequence. A later observation may constrain its producing relation. That comparison
+is an ordinary subsequent use, not a prerequisite to releasing the construction.
+
+The construction can be an operator word, factored circuit, recurrence block, constrained state
 family or boundary-response realization. Existing occurrence, section, material, factorization,
 receiver and persistence owners supply these objects. This names no second engine.
 
@@ -149,6 +155,31 @@ tests whether the workshop retained the right interior for its next task.
 face `(1,0)`. Their polynomial coefficient faces are respectively `(1,0,0)` and `(0,0,−1)`.
 The lost distinction cannot be recovered from that complex output alone. Keeping the relevant
 product tuple or an equivalent family representation makes the requested receiver possible.
+
+## Code and utility releases
+
+[definition] Code can be a requested generated face or an executable presentation of a recovered
+generator. For a program request, preserve the input/output domain, admitted effects and state,
+source conditions, target language/runtime and the requested behavior. A correction can return
+a patch or replacement region; a construction can return a function or composed program. The
+target's syntax is an exterior chart. Code generation does not found another HNN engine or
+reduce Hephaestus to a mathematics-only model.
+
+[definition] The first executable-code deliverable lowers retained exact linear/bilinear factors,
+composition and fixed-operator powers to a straight-line function over the declared rational
+arithmetic chart. The function must be derived from the returned operator graph, including its
+coefficients and port maps. A syntax printer may encode that graph; it may not supply the requested
+algorithm independently. Use the [outward compiler contract](INTEROPERABILITY.md#the-outward-compiler-contract)
+for the target correspondence. This scoped function release does not require a whole-model export.
+The [blueprint deliverable](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#deliverables-and-discriminating-checks)
+specifies new-input, changed-receiver and incompatible-target checks.
+
+[definition] Contextual code generation and editing subsequently use the same source/condition
+formation and joint release as text. An execution check measures whether the generated program
+serves its request. When the operator asks for a continuing repair cycle, the actual diagnostic
+can return through the producing comparison. Compilers and tests are exterior consumers; they
+neither author native morphology nor become an obligatory verdict before every output. Preserve
+the supplied specification, inferred construction and construction/checking costs separately.
 
 ## Elementary mathematical applications
 
@@ -411,9 +442,9 @@ claims within the same intelligence construction. Report the inferred algorithm 
 and its useful consequences, with the reference/native and resource scopes made explicit. The
 method can infer useful structure while its wider applicability or native binding remains open.
 
-[interpretation] The longer ambition is an automated mathematical workshop whose constructions
-become material for further constructions: compound arithmetic operators, indexed recurrence
+[interpretation] The longer ambition is an automated workshop for tools, code and mathematics
+whose constructions become material for further constructions: compound arithmetic operators, indexed recurrence
 machines, adaptive analytic charts, local boundary solvers and coupled physical-model sections.
 Operator use supplies new constraints and receivers; Eros composes/refines the available body;
-Athena carries and applies the resulting general wisdom; Hephaestus Automata are its particular
+Athena carries and applies the resulting general wisdom; Hephaestus Automata are particular
 working instances. The code and evidence boundaries above make that ambition concrete.

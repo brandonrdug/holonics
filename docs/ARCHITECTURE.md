@@ -35,7 +35,7 @@ the broader doctrine; the remainder of this guide describes the current executab
 | **HNN** | The Holonic Neural Network architecture and recurrent runtime | [native phase session](../crates/holonics-hna/src/native.rs), [constitutive ecology](../crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs); earlier [full operator](../crates/holonic-engine/src/holonic_intelligence/full_operation.rs) |
 | **Athena** | Product/use label for general wisdom/model outputs of the shared native ecology; no internal machinery boundary | [Athena lifecycle](ATHENA.md) |
 | **Eros** | Union, composition and formative activity throughout the holonic organization, including nested constituents | [native relation formation](../crates/holonic-engine/src/native_ecology/constitutive_fibre.rs) and [circulation](../crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs); earlier [adjoint return](../crates/holonic-engine/src/holonic_intelligence/operative_return.rs) |
-| **Hephaestus Automata** | Operator-scoped mathematical applications and returned working constructions of Holonic Encoding/HNNs | [application design](HEPHAESTUS_AUTOMATA.md); existing [exact synthesis reference](../crates/holonic-engine/examples/generator_factorization.rs) |
+| **Hephaestus / Hephaestus Automata** | Tools and utility models, including code generators, mathematical solvers and operator-scoped working constructions of Holonic Encoding/HNNs | [application design](HEPHAESTUS_AUTOMATA.md); existing [exact synthesis reference](../crates/holonic-engine/examples/generator_factorization.rs) |
 | **Soulkiller** | Independent model-intake, excitation and dismantling apparatus | [Soulkiller](SOULKILLER.md), [consumed-input boundary](../crates/holonic-engine/src/soulkiller/boundary.rs) |
 | **Applications/codecs** | Text, image, audio, files, user protocols and target runtimes | [CLI](../applications/holonics-workbench/src/cli.rs), [interoperability](INTEROPERABILITY.md) |
 
@@ -78,9 +78,12 @@ implemented bindings and remaining contextual attachments stated separately.
 
 [definition] Eros operates at nested scopes as well as the whole ecology; it is not restricted
 to a separate training program. Hephaestus Automata are application instances obtained by
-confining the general construction capability to a requested mathematical domain and receiver.
-“Holonic Solver” describes that activity. The current exact synthesis reference remains exterior
-apparatus; the product naming does not promote it to an already complete native HNN application.
+confining the general construction capability to a requested tool, code or mathematical task
+and receiver. Hephaestus also labels models serving these utility uses.
+“Holonic Solver” describes that activity. Exact algebraic construction retains its exterior
+execution scope; the [public mathematical session](NATIVE_HNA.md) already binds returned
+operators to resident application and changed receivers. The product name adds no capability
+beyond those inspected bindings.
 
 [definition] One operation consumes an occurrence and the contemporary ecology and returns
 an emission, trace and successor. The next operation uses that successor. Inference is a

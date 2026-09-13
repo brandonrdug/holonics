@@ -97,7 +97,7 @@ human origins and to everyday reasoning within the project.
 | **HNN — Holonic Neural Network** | The neural architecture explored within Holonics |
 | **Eros** | Union, composition and formative activity at every nested holonic scope |
 | **Athena** | General wisdom/model products and uses of HNN's available constructions |
-| **Hephaestus Automata** | Mathematical applications for constructing, applying and reusing operators and constrained families |
+| **Hephaestus / Hephaestus Automata** | Tools and utility models, including code generators, mathematical solvers and reusable working constructions |
 | **Soulkiller** | Analysis and dismantling of supported inherited models into reusable native material |
 
 [open] **The intended useful, general Athena assistant remains unfinished.** The mathematical
@@ -120,7 +120,7 @@ inference pipelines.
 
 - [Rust framework](docs/RUST_FRAMEWORK.md) — public mathematical carriers and implementation boundaries
 - [HNN composition](docs/HNN_COMPOSITION.md) — model assembly, local standing, interaction and commuting architecture charts
-- [Hephaestus Automata](docs/HEPHAESTUS_AUTOMATA.md) — mathematical requests, reusable constructions and operator-scoped application design
+- [Hephaestus Automata](docs/HEPHAESTUS_AUTOMATA.md) — tools, code generation, mathematical requests and reusable constructions
 - [The reality of difference](docs/canon/THE_REALITY_OF_DIFFERENCE.md) — ontology, philosophy, relevance and constructive reasoning
 - [The construction programme](docs/plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md) — formalization and use across mathematical and physical realizations
 - [Holonics in Lean](docs/FORMAL_FRAMEWORK.md) — situated objects, molecular conformation, tubes, physics and computation

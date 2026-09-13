@@ -58,8 +58,9 @@ transfer blocks. For HNN use, a factorization of a pure local operation does not
 preserve an entire mutable ecology: source, clock, emission, material and successor must cross
 the actual implementation map. Lean remains exterior to native conduct.
 
-[definition] **Hephaestus Automata** names the task-scoped application instances of this
-construction. The [design](HEPHAESTUS_AUTOMATA.md) connects reusable mathematical requests,
+[definition] **Hephaestus** labels tools and utility models, including code generators;
+**Hephaestus Automata** names task-scoped application instances of this construction.
+The [design](HEPHAESTUS_AUTOMATA.md) connects code/tool and mathematical requests,
 shared constituent actions, changed receivers, catalytic morphology and resident handoff.
 An operator's application constraint does not create another learning law or an independent
 engine. Eros composes at each nested scope; Athena retains the wider available construction.

@@ -6,7 +6,7 @@ position. September 11 consolidates the old AC responsibility labels into named 
 The file path, source names and existing wire identifiers remain stable.
 
 [project-postulate] Brandon's latest September 11 ruling makes the shared programme explicit.
-Hephaestus mathematical construction and Athena are productive uses of the same engine and
+Hephaestus tool/code/mathematical construction and Athena are productive uses of the same engine and
 formative laws. The [roadmap's sustained programme](THE_ROADMAP.md#sustained-objective-and-construction-rhythm)
 orders their common milestones. The mathematical investigations supply generating relations,
 receiver/phase transport, bounds and counterexamples that this blueprint binds into native
@@ -20,7 +20,8 @@ source/contact limitation; the mathematical solver/encoding applications continu
 [project-postulate] HNN conducts situated Holons through a continuing ecology. Athena and
 Hephaestus label its products/uses; Eros names composition and formation at every nested scope.
 Those names introduce no internal machinery boundary. The product goal is useful conversation, code, mathematics and
-other modalities on consumer hardware. Hephaestus's factor/recurrence/generator inference is
+other modalities on consumer hardware. Hephaestus labels tools and utility models, including
+code generators and mathematical solvers. Its factor/recurrence/generator inference is
 already mathematical learning/reasoning in this programme. Report its supplied target and
 constraints, derived executable representation, applicable consequences and relevant costs.
 Exact search and supplied inference rules do not create a boundary outside intelligence.
@@ -44,7 +45,7 @@ of this complete application/return cycle, with no imposed serial completion ord
 operator request, a text occurrence, an acoustic event and a kinetic observation enter through
 their source/receiver charts. The HNN ecology carries the available organization; Eros names
 its composition and formation through actual returned constraints. Hephaestus labels an
-operator-scoped mathematical use, while Athena labels general wisdom/model uses. Their names do not introduce separate
+operator-scoped tool, code or mathematical use, while Athena labels general wisdom/model uses. Their names do not introduce separate
 inference, compression or formative laws.
 
 | Shared formal construction | Existing executable owner | Required Athena/Eros consequence |
@@ -170,6 +171,89 @@ separate autocorrect product stage or a mandatory transposition probe. Returning
 normal, contextual, factor and receiver owners. Update the body through its established operation
 when the use includes subsequent interaction. Report the transformation and its text/mathematical
 result; a separate "complete feedback", "learning" or "intelligence" test is not a prerequisite.
+
+### Release, continuation and comparison contracts
+
+[definition] Let X contain the participating current, condition, material and live source cuts.
+For an admitted passage T and receiver rho, a release returns `y=rho(T(x))` and its presentation.
+A continuing operation also installs `x_next=T(x)`. A forecast evaluates that same relation
+without replacing the continuing owner. Neither operation requires a later target. A comparison
+uses an observed o and the retained producing cut to form the oriented difference `(o,y)` and its
+declared residual; incorporation applies the existing return law to the contemporary body.
+This notation describes existing owners, not a proposed universal X wrapper.
+
+[definition] A compound output retains one joint source:
+
+`x_i=T_i(x_(i-1))`, `J_F={(rho_1(x_1),...,rho_k(x_k)) : x_0 in F}`.
+
+All components use the same source parameters and joining equalities. The output can present a
+chosen declared receiver of J_F or J_F itself; independent coordinate choices do not in general
+belong to J_F. Length, requested region, endpoint or termination are receiver/boundary conditions.
+A caller's finite aperture is reported as such. It is not a discovered intrinsic extent or a
+universal token clock. Execution may stream a section while retaining its joint dependencies.
+
+[definition] Self-emission changes the composed law when it is admitted between passages.
+If I re-enters the generated face, the step is `H(x)=I(T(x),rho(T(x)))`; a k-step continuation
+then composes H, rather than T. I must include the appropriate source/codec map and returned
+body. In particular, `rho(T^k(x))` does not generally predict `rho(H^k(x))`. Intermediate
+re-entry and a single reception at the section boundary are different admitted compositions.
+Neither is silently substituted for the other.
+
+[established-bounded; source-inspected] At `ec410c7b`, the public bindings implement:
+
+| Operation | Returned output and body contract |
+|---|---|
+| `coupled_wave.rs::predict_continuation` | Decoded joint forecast for a caller-declared member word, with no intervening reception or successor publication. The dependent body evaluates its standing parameter section. |
+| `next_symbol` / `predict_symbol` | Both call `emit_symbol`, advance the body and decode a face; the second retains a producing comparison. Adjacent emitted symbols also enter the existing source-actuation path. |
+| `compare_symbol` / `incorporate_symbol` | Read an actual producing comparison / consume its observation through the existing Base/Programme return. These do not turn the earlier face into output. |
+| Mathematical `PredictRelation` / `PredictCondition` | Return a joined condition/output family, with optional retained comparison. Operator application and changed receivers also return generated mathematical faces. |
+| `ReleasePrediction` / `release_symbol_comparison` | Dispose of a comparison handle. Here the API verb means resource disposal, not prediction output; existing wire names remain stable. |
+
+[definition] The first committed compound binding executes the preview's **transport-only word**
+and publishes its endpoint once. It returns the joint output from that same prepared source,
+with optional retained receiver cuts for later observations. It adds no intervening self-re-entry.
+A later source occurrence consumes the published endpoint. If an application requests boundary
+self-reception or interleaved self-emission, compose that source action explicitly; its forecast
+must include it. This fixes one concrete consuming contract without requiring a new release engine.
+
+[definition] Shared family/section and decoder owners retain one producing cut per required
+comparison, rather than manufacturing independent observations from each projected coordinate.
+One observed component restricts the joint relation; a delayed return uses its original source
+maps even after later passages. Disposing of an unneeded comparison requires no fabricated target.
+Read-only forecasts remain available without this continuing-use binding.
+
+### Deliverables and discriminating checks
+
+[definition] These are artifacts and checks for the roadmap's existing packets. Their names
+do not create another phase scheme. The source abbreviations are defined in the source map below.
+Each row specifies a bounded application consequence; no finite row certifies general Athena.
+
+| Deliverable | Implementation artifact and consuming owner | Check that determines the result |
+|---|---|---|
+| **Context-conditioned generated section** | Replace the production h=1 calibration at the section-input/coupled attachment with resident source/condition restrictions at the producing cut. Join normal/conditional formation in `C/resident/neighborhood.rs`, contextual-section and normal owners; expose the result through the existing coupled stream. Infer `W[S;C]=Y` or the declared feature law `WH=B`; keep non-affine products in their joint owner. | Developmental observations contain a source-null contrast separated by carried conditions. Generate the corresponding whole chunk on new admitted inputs, including the same visible input under those distinct preparations. Report S/C/Y, actual output and the separator for an unsupported contrast. Evaluation targets cannot choose C, contact or decoder. |
+| **Committed joint release** | Extend `W/coupled/dependent.rs`, the existing prospective/family owners, `A/coupled_wave/body.rs`, `A/coupled_wave.rs` and `stream.rs` with the transport-only contract above. Stage the word and receiver cuts, return the prepared joint face and publish one successor; preserve the existing forecast command. | Compare forecast and commit from equivalent initial rests at the same section, including every requested joint component and endpoint. With shared parameter theta, a `(theta,theta)` output must retain the equality, not admit independently selected coordinates. A later component observation constrains that same source. Exercise a delayed return and a rejected final join without partial publication or a whole-body clone. |
+| **Compiled continuing action** | Replace the repeated portion of `ConstitutiveSourcePassage` execution with an existing factor/recurrence or closed-statistic representation. Bind `E_next T=U E` and `D E=rho` to current, conditions, material and required pending cuts. The public fixed-linear `Power` is an available specialization, not a compiler for arbitrary changing material. | Exact/enclosed joint outputs, endpoint and delayed return agree with the standing programme on the declared family. Include a receiver exposing an omitted direction and a new formation step. Repeated calls with no new independent structure cease appending one executable-history item per call; report contractions, stored representation and integer bit growth. |
+| **Hephaestus executable function** | Add a code receiver for retained linear/bilinear factors, compositions and powers beside the public mathematical binding, delivered through its stream. First target: Rust straight-line functions using the repository's arbitrary-precision rational arithmetic chart. Lower the returned operator graph and port maps; source syntax is an exterior codec. | Inspect the emitted function, compile it outside HNN and compare its exact outputs with resident application on new inputs and a changed receiver. Use a partly constrained inferred relation as well as a fully supplied operator. A still-plural law returns its parameterized function/family; unsupported effects/state or target primitives return the named obstruction. No task-specific answer body is supplied by the printer. |
+| **Athena task episode** | Use the repaired section/formation/release path through the public session for contextual correction/continuation and a short explanatory reply; use the same constructions for a code edit or function request. Source parts and genuine returned observations enter the standing owners. | Publish the development/evaluation split, exact requested outputs and representative successes/failures. A correction preserves the requested unaffected region; a continuation answers its context; code executes the requested behavior. Inspect these products before enlarging exposure. A state change, nonempty response or loss decrease cannot substitute for them. |
+| **Durable reusable products** | Extend existing coupled rest only for the new section/encoding cuts. Attach mathematical-session checkpointing to its retained relations, operators, products, pending predictions and resumable construction frontiers, plus stream state. Reuse existing codecs/rest owners; wire IDs remain stable. | In a new process, apply a retained operator to a new input, change its receiver, continue a declared release and consume a pre-rest pending comparison exactly once. Compare returned faces and successor with uninterrupted execution. A construction interrupted inside its admitted search resumes its frontier and work account. |
+
+[definition] Formation, joint release and compilation can be developed together through their
+shared source contract. The function receiver can use returned operators without waiting for
+general language formation. Durable serialization follows the payload it must retain; it does
+not hold up live-session output. The next increment is the contextual source/condition binding
+and its generated section, while reusing the already callable workshop.
+
+[definition] Measure each artifact with the [standing performance conventions](../DEVELOPMENT.md#performance-and-information-measurements):
+construction/setup, resident passage, decoding/delivery, target compilation/execution and
+checkpoint costs have separate intervals. A frame is a completed delivery at a named section
+receiver; a tick is an admitted passage at a named owner/clock. Report both populations and
+elapsed intervals, chunk extent, latency distribution, device/host memory and transfers on the
+Ryzen 9 7900X / 32 GB / RTX 4080 Super 16 GB apparatus. A forecast delivery counts as a frame
+without falsely incrementing committed-body ticks. Longer sections do not become faster by
+changing the frame definition. Bits per face require a declared code/probability receiver;
+cross-entropy additionally requires an actual target distribution or observation. Keep signed
+residuals and phase before scalar readings. The sub-five-minute working scale motivates these
+measurements; it is not an unconditional runtime promise or a mathematical cutoff.
 
 ### Callable mathematical workshop: the first delivered increment
 
@@ -520,6 +604,27 @@ contextual-section owner can expose the declared condition chart. Compose indepe
 contrasts and the required native restriction/formation map at that owner, and retire borrowed
 developmental source sections when their sufficient relation is formed. An exterior contextual
 inspection must not become a host semantic update or a per-observation context archive.
+
+[established-bounded; source-inspected] The existing restriction is concrete:
+`ResidentConstitutiveFibre::contextual_section(s)` constructs
+`D_s={(dc,dy) : (0,dc,s tensor dc,dy) in R}` in the source/condition/mixed/target relation.
+It retains vertical directions and the fixed source. Its `retain_condition_current` accepts
+an explicit current in that context chart. `ResidentGeneratorNeighborhood::prepare_consequence`
+already predicts using `prior_condition.current()` before receiving an observed target;
+only afterward does condition preimage/contact prepare the successor. In
+`read_wave_relation_in_chart(..., None)`, None reads the standing resident condition; it does
+not mean an unconditioned generator or a missing forecast argument.
+
+[definition] The first attachment must supply resident maps `s=A x_pre`, `c=C x_pre`, with
+x_pre the participating source/preparation state before the target arrives. A and C are the
+declared source/context restrictions constructed from admitted incidence and developmental
+contrasts. Their rows, reference offsets and widths enter the existing current/section ports.
+At fixed s, contextual differences pass through D_s; a chosen lawful section may give
+`dy=L_s dc`, while the full fibre remains available. The needed binding is from those resident
+preparation carriers to the existing condition chart, not from the unknown target to c. An
+observation-derived `PreparedConditionContact::successor()` belongs to the returned body and
+later predictions. Passing it into that observation's own prior forecast would leak the target.
+Check the condition/current at the producing cut explicitly, including its chart reference.
 
 [definition] Observations used to form the context map belong to development. Evaluation
 targets may not choose the source representation, contact graph, candidate material or

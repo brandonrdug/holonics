@@ -1,7 +1,8 @@
 # Athena and the HNN training/inference interface
 
 [definition] Athena labels general wisdom/model products and uses of HNN. It does not encapsulate
-native machinery or establish an internal boundary from Hephaestus mathematical products. A
+native machinery or establish an internal boundary from Hephaestus tools and utility models,
+including code generators and mathematical solvers. A
 continuing native ecology owns its constitutive morphology, current, incidence, chronology,
 lineage and admitted receiver domain. Eros is the union/composition and
 developmental phase that forms and refines its reusable material within HNN recurrence. The
@@ -21,7 +22,7 @@ mathematical unknown, available constructions and actual product consumer togeth
 [project-postulate] The [live programme](plans/THE_ROADMAP.md#sustained-objective-and-construction-rhythm)
 joins formal mathematics, engine realization and useful Athena conduct. Generator/receiver
 construction, Eros incorporation, constituent formation, Holonic Encoding and application use
-are the shared milestones. Hephaestus mathematical requests are direct uses of that ecology;
+are the shared milestones. Hephaestus tool/code/mathematical requests are direct uses of that ecology;
 conversation, code and other modalities use the same mechanisms through their own source and
 receiver conditions. The framework's physical and mathematical research feeds those owners
 while developing its wider applications.
@@ -86,6 +87,15 @@ blueprint's generated-face construction states this with chunk reconfiguration, 
 coefficient inference and explicit statistic/operator updates. Read-only forecast text is
 already output; retaining a comparison handle or advancing the continuing body is a separate
 operation contract. Those contracts must not become undefined additional faculties.
+
+[definition] The [release contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#release-continuation-and-comparison-contracts)
+specifies the whole generated section and its optional continuing use. The present joint preview
+composes transports without intervening self-reception; repeated symbol emission includes source
+re-entry and therefore has a different composed law. The planned committed section uses the
+preview's transport-only law and publishes its endpoint once. The
+[deliverables](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#deliverables-and-discriminating-checks)
+bind contextual formation, this section return, compact execution, code/function outputs and
+durable reuse to their existing owners. Forecast output is already available.
 
 [definition] Sequence-to-fold and biochemical kinetics are foundational HNN questions. Their
 [exact source construction](../research/records/2026-09-10_SEQUENCE_FOLD_AND_REACTION_CURRENT_MAKE_THE_CAUSAL_THOUGHT_CHAIN_CONCRETE.md)
@@ -241,9 +251,10 @@ The section receiver is not asserted equivalent to the old whole-family one.
 
 ## Native-first construction
 
-[definition] [Hephaestus Automata](HEPHAESTUS_AUTOMATA.md) are operator-scoped mathematical
-application instances of the general HNN/Holonic Encoding construction. Elementary solver
-products are now the immediate application focus. Athena remains the general wisdom/model
+[definition] [Hephaestus Automata](HEPHAESTUS_AUTOMATA.md) are operator-scoped tool, code and mathematical
+application instances of the general HNN/Holonic Encoding construction. Mathematical operators
+are an available application family; the roadmap binds contextual sections and code/tool outputs
+through the same owners. Athena remains the general wisdom/model
 ecology; this specialization neither replaces that objective nor requires general conversation
 before a mathematical tool can be useful. Current exact solver examples are exterior references,
 with their native source/family/material handoff still explicit.

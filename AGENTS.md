@@ -17,8 +17,9 @@ Its mathematical research develops reusable methods of construction and explanat
 biological and computational systems. HNN is its Holonic Neural Network architecture; Athena
 labels its general wisdom/model products and uses; Eros names union, composition and formative activity at
 every nested holonic scope; Soulkiller independently dismantles inherited realizations.
-Hephaestus Automata are operator-scoped mathematical application instances/products of HNNs
-and Holonic Encoding; “Holonic Solver” describes that constructive activity, not another engine.
+Hephaestus labels tools and utility models, including code generators; Hephaestus Automata are
+operator-scoped application instances/products of HNNs and Holonic Encoding. Mathematical solvers
+are one application family; “Holonic Solver” describes that constructive activity, not another engine.
 Athena and Hephaestus are product/output labels, not internal machinery boundaries. Actual
 relations, source/receiver maps and ownership determine composition; neither name encapsulates
 an engine, fixes native topology or separates solving from other intelligence.

@@ -9,43 +9,39 @@ and its formal/native/reference checks are complete, building on the
 and the
 [frontier review](research/records/2026-09-12_THE_FRONTIER_REVIEW_CONSOLIDATES_CONSTRUCTIVE_CONTINUITY.md).
 **Standing product objective:** useful Athena language/code and
-Hephaestus mathematical applications through the same HNN owners, within the wider Holonics
+Hephaestus tools/utility models, including code generators and mathematical solvers, through
+the same HNN owners within the wider Holonics
 mathematical and physical programme. The [roadmap](docs/plans/THE_ROADMAP.md) alone orders work.
-
-[definition] Brandon's [subsequent September 13 correction](research/records/2026-09-13_DIRECT_MESSAGES_CONFIRM_THE_ATHENA_CONSTRUCTION_ORDER.md#prediction-and-output-correction)
-identifies prediction release with output of the generated face. The initial plan pickup left
-three underdefined requirements; the blueprint now replaces them with the source/receiver
-equation, chunk transformation and coefficient/statistic update laws below. This mathematical
-account is clarified before returning to implementation. No new runtime behavior is claimed.
 
 ## Current consolidation
 
-[definition] The latest correction starts from an inherited continuing mode and a new
-placement relative to its causal origin, clock and conditions. Infinite compatible histories
-and futures are represented by their relation/fibre; a present face does not identify that
-whole source. General navigation uses changing joints, admissible passages and oriented
-variation. Model/checker formation is part of the causal cost account. The
-[beacon](docs/BEACON.md) makes useful ideas available without a manuscript-packaging campaign.
+[definition] The [prediction-release/product plan](research/records/2026-09-13_PREDICTION_RELEASE_HAS_ONE_GENERATING_RELATION_AND_CONCRETE_PRODUCTS.md)
+now specifies generated output, forecast versus committed continuation, comparison disposal,
+context formation, executable code and durable reuse. The
+[blueprint deliverables](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#deliverables-and-discriminating-checks)
+name the source owners, equations, artifacts and output checks. This is a completed planning/source
+review; no new runtime capability or performance result is claimed by it.
 
-[proved-derived; formal-checked] The existing Swing split now has an invertible projective
-passage with signed step, source-order preservation, undivided quadratic return and exact
-work decrease. Its root chart has a strict contraction factor. Arbitrary-ring block
-transport retains ordered noncommuting matrix composition and the undivided pair before
-an affine chart. Gap transfer now uses the lower signed return directly, with an independent
-upper-polarity theorem. The changed owners and Framework consumer passed.
+[established-bounded; source-inspected] The current joint preview composes transport without
+intervening self-reception; repeated `emit-symbol` includes adjacent-source re-entry. They have
+different composed laws.
 
-[established-bounded; computational-witness] The public mathematical session constructs and
-applies the split matrix powers at 1, 4 and 16 to two origins. Six exact returns preserve both
-homogeneous coordinates and signed residuals, decrease the declared work and recover each
-origin by inversion. This realizes that conditional source relation through existing owners;
-it does not claim acquisition of an unknown world law or a completed chess/city controller.
-The [record](research/records/2026-09-13_ORIENTED_CONFIGURATION_NAVIGATION_RETAINS_ITS_SOURCE_AND_THE_BEACON_STAYS_OPEN.md)
-retains the chess context, mathematical scope and checks.
+[definition] The next compound binding has a specified transport-only contract:
+return that joint section, publish its endpoint once and optionally retain producing receiver
+cuts. Existing forecast output and single-symbol continuing emission remain available.
 
-[definition] The finite Dijkstra comparison is preserved in example support and removed from
-the public engine API. Its six tests and the workbench build passed. Earlier cube certificates,
-consumer-hardware measurements, physical source returns and prior-art comparisons remain
-valid at their linked scopes; they do not define the general native navigation law.
+[definition] The next implementation increment is the resident source/condition binding and
+its generated section. Joint publication and compact execution accompany that relation; a
+Hephaestus exact-rational Rust function receiver can independently use existing mathematical
+operators. Mathematical-session rest remains unbound. Hodge closure and fluid mixed-term
+checks guide the compilation; the roadmap retains specific RH and Yang–Mills source returns
+without making their endpoints gates for these products.
+
+[definition] The prior oriented Swing, block-transport and one-sided gap proofs, six exact
+native split returns, finite cube reference and their verification are preserved in the
+[oriented-navigation record](research/records/2026-09-13_ORIENTED_CONFIGURATION_NAVIGATION_RETAINS_ITS_SOURCE_AND_THE_BEACON_STAYS_OPEN.md).
+They retain causal origin, phase, source fibre and changing joint/mode incidence. Model/checker
+formation costs remain explicit. The [beacon](docs/BEACON.md) keeps this source available.
 
 ## Available constructions
 

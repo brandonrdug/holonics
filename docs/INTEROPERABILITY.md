@@ -66,6 +66,14 @@ unsupported operation/state/receiver boundary rather than a mislabeled package.
 
 ## Native persistence and remaining executable lowering
 
+[definition] A Hephaestus code request can use this contract at the scope of one generated
+function. The [planned function receiver](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#deliverables-and-discriminating-checks)
+lowers retained linear/bilinear factors, compositions and powers to Rust over arbitrary-precision
+rationals, then compares target execution with resident application. This is a concrete code
+generation product, distinct from exporting the whole continuing HNN. A later stateful program
+adds its actual state/effect correspondence. The code printer encodes a constructed graph; it
+does not manufacture an answer from a task label.
+
 [established-bounded; measured] Native cultivated persistence has returned in two distinct
 families: the earlier dependency-bearing full-operator checkpoint (HNP3) and the dependency-free
 native phase checkpoint, including optional world/stream continuation (NCF4). The

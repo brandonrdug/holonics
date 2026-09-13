@@ -336,7 +336,16 @@ standing declared source-section, retaining the full dependent generator; the en
 to be the union of all parameter-dependent alternatives. The unit-metric projected receiver is
 not a probability distribution or minimum-energy dynamics. This transport-only preview is
 not a claim to predict the different `emit-symbol` loop with intervening source re-entry.
-Compound action publication and its returned observation/feedback remain an integration task.
+The [committed-section deliverable](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#release-continuation-and-comparison-contracts)
+extends this transport-only word with one endpoint publication and optional retained joint
+receiver cuts. An observation can then constrain its producing relation; feedback is not required
+for the earlier forecast or committed section to be output. Interleaved or boundary self-reception
+has its own composed law and is included only when requested by that operation.
+
+[definition] In existing commands, `release-symbol-comparison` and mathematical
+`release-prediction` mean disposal of a retained comparison handle. They do not generate a face.
+This API resource verb is separate from **prediction release**, which means returning the
+generated face to its receiver. Existing wire identifiers retain their meanings and compatibility.
 
 [definition] Native ownership remains in the existing family/image/receiver types.
 `NormalFamilyBasisFace` and `FamilySymbolEmission` now parameterize their source ownership:

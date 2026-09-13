@@ -30,16 +30,20 @@ continuation as their actual dependencies permit. Work may move among all four i
 compose them into useful actions, represent their relevant futures economically, and change its
 available conduct through actual returned differences. Athena labels the general wisdom/model
 products of that ecology; Eros names formative union and incorporation, including inside
-constituents; Hephaestus Automata label operator-scoped working applications. These output/use
+constituents; Hephaestus labels tools and utility models, including code generators; Hephaestus Automata
+label operator-scoped working applications. These output/use
 labels do not encapsulate machinery. HNN is their common executable architecture. Mathematics,
 text, code, vision, acoustics and physical/biological sources supply different conditions and
 receivers to this construction.
 
 [definition] The shared sequence is
 
-`source/conditions -> compatible generator and current family -> admitted composition -> receiver/emission -> returned difference -> formed successor -> reusable encoding -> next situated request`.
+`source/conditions -> compatible generator and current family -> admitted composition -> generated face + successor -> next situated occurrence`.
 
-The arrows denote actual dependencies and joins, not mandatory global layers. Existing tensor,
+An actual returned observation constrains its producing relation through the existing formation
+law; economical encoding carries the admitted continuation. Neither an observation nor a new
+encoding step is required after every output. The arrows denote actual dependencies and joins,
+not mandatory global layers. Existing tensor,
 attention, recurrent/state-space, diffusion, adjoint and normalization constructions are specific
 instances to recover and compose. Source organization, active contact and receiver consequences
 determine the participating constituents; no fixed vocabulary or global task classifier replaces
@@ -79,131 +83,55 @@ nested automata that construct, compare and refine further automata.
 
 ## Immediate mathematical application and implementation
 
-[project-postulate] Brandon's latest September 13 correction generalizes configuration
-navigation through joint/mode incidence, partial admissible passages, retained orientation
-and source-conditioned variation. The finite cube search remains exterior reference evidence;
-it does not define the native law. Recover the chess active-population correction and the
-existing Swing/constitutive/trajectory owners. The
-[oriented return](../../research/records/2026-09-13_ORIENTED_CONFIGURATION_NAVIGATION_RETAINS_ITS_SOURCE_AND_THE_BEACON_STAYS_OPEN.md)
-develops their exact split passage and polarity before any magnitude/extremum display.
-Model/checker formation and candidate construction have explicit causal costs. The
-[beacon](../BEACON.md) makes useful source available; manuscript packaging is not the task.
+[project-postulate] Brandon's September 13 release/planning clarification governs this
+increment. Prediction release is output of a source-conditioned generated face. A forecast,
+a continuing release and a later comparison have explicit operation contracts; they are not
+separate faculties. Hephaestus labels tools and utility models, including code generators and
+mathematical solvers. Athena and Hephaestus continue through the same HNN owners.
 
-[project-postulate] Brandon's latest September 13 mass/navigation direction joins the
-traffic/radiation source to physical invariant mass, the vacuum-complement gap and its
-scale/remainder transport. It also authorizes an actual optimal-traversal construction:
-derive the goal distance or a lawful lower-bound quotient, compile a minimizing word, and
-verify its full-state lift where that claim is made. The
-[current synthesis](../../research/records/2026-09-13_MASS_FLUX_GAPS_AND_OPTIMAL_NAVIGATION_RETURN_THEIR_SOURCE_MAPS.md)
-records its formal and executable returns. Publication positioning compares source-level
-contributions with close prior art alongside construction; it adds no indefinite research gate.
+[definition] The [release specification](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#release-continuation-and-comparison-contracts)
+fixes the first compound contract: compose the existing transport-only joint word, return its
+requested section and publish the endpoint once, with optional producing cuts. Intervening
+self-reception is a different composition and must appear in its forecast. Existing joint
+forecasts already return output. Resource-disposal commands named `release-prediction` are
+not generation commands.
 
-[project-postulate] Brandon's subsequent September 13 atomic correction makes recovery and
-development of the existing String/M, supergravity and fundamental-force constructions the
-current physical task. Follow compactification through its retained modes, charge/current,
-action and matter observable. The [returned source chain](../MASS_ENERGY_AND_CAUSAL_TRANSPORT.md#12-compactification-gauge-charge-and-matter)
-rejoins this work to existing gauge, Maxwell, gravity and quantum owners. Do not finish a
-requested physical extension by labelling it hypothetical after a narrow file inspection.
-Use the research skill's relevant route and continue the exposed equation at its own domain.
+[definition] The callable mathematical workshop is an available dependency: exact linear/
+bilinear construction, condition families, changed receivers, composition and fixed-linear
+powers already return through public owners. Reuse those returns. The next implementation
+increment binds resident context to the generated section; joint publication and compiled
+execution accompany it through their actual dependencies. The
+[blueprint deliverables](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#deliverables-and-discriminating-checks)
+name the consuming files, equations, products and discriminating checks.
 
-[project-postulate] Brandon's September 13 game/biology/measurement ruling gives the current
-consolidation its concrete returns: receiver-scoped performance conventions and benchmarks,
-consumer-hardware awareness, demand-driven world/continuation maps, and biological constitutive
-specializations in Lean. General "intelligence" or "learning" definitions add no preliminary
-gate. Use the generated-face equations already specified. The
-[synthesis](../../research/records/2026-09-13_GAME_WORLDS_SCOPED_RATES_AND_MOLECULAR_MECHANICS_SHARE_DECLARED_LAWS.md)
-connects these returns to their existing source owners and their precise evidence.
-
-[project-postulate] Formal mathematics and Millennium applications receive substantive work
-alongside HNN/Athena. Do not automatically convert a geometry, fluid, arithmetic or physical
-question into another language-exposure task. Work the named source law and its mathematical
-consequence, then integrate an available computational consumer. This does not restart every
-deferred endpoint campaign at once: RH source/sign control, Hodge realization, Navier–Stokes
-source/remainder, BSD arithmetic transport and Yang–Mills field/spectrum keep their own problems.
-For complexity, count uniform construction, storage and bit growth along with query work;
-finite reachability, graph diameter and precomputed answers do not by themselves close P vs NP.
-
-[project-postulate] Brandon's latest September 12 frontier review makes constructive continuity
-and consolidation explicit throughout this order. Preserve the wider framework, active
-mathematical unknown, available generating relations and actual consuming application across
-long runs and context handoffs. Use the
-[implementation method](../DEVELOPMENT.md#mathematical-implementation-and-continuation);
-do not let a historical status page or a support-mechanism loop become the objective.
-
-[definition] The [frontier consolidation](../../research/records/2026-09-12_THE_FRONTIER_REVIEW_CONSOLIDATES_CONSTRUCTIVE_CONTINUITY.md)
-and the [phase/clock return](../../research/records/2026-09-12_PHASE_PARITY_AND_CLOCKED_TORI_RETURN_GENERATOR_CODE_POTENTIALS.md)
-feed the existing contextual/modal packets: apply an admitted analyzer to the retained joint,
-construct powers through the shared polynomial owner, compile applicable learned continuations
-without unnecessary dense expansion, and retain the source clock and actual cost boundary
-when the task requires them. The
-[Gamma/zeta and gap source](../../research/records/2026-09-12_GOLDEN_RECIPROCAL_JOINS_GAMMA_ZETA_AND_SPOKE_GAPS.md)
-adds analytic applications and remainders, not another engine or a new endpoint prerequisite.
-
-[project-postulate] Brandon's latest September 12 planning direction makes productive HNN
-integration the immediate priority. The established mathematics supplies enough direction to
-build; further intuition from Brandon is not a prerequisite. Open construction questions are
-resolved from the existing source and actual failed compositions. Progress means a callable
-mathematical capability or substantive Athena output, with the corresponding native binding
-and cost, not a new local theorem or return-cycle demonstration by itself.
-
-[definition] The [implementation planning review](../../research/records/2026-09-12_THE_HNN_PLAN_IS_ORDERED_BY_PRODUCTIVE_GENERATOR_INTEGRATION.md)
-retains its source snapshot and the reason for the packets below. Base/Programme return and the
-symbol decoder are available owners; callable mathematics and joint learned preview have since
-returned. The remaining source/condition and accumulating-programme limitations are distinct
-construction questions. CONSTRUCTION_STATE records their current evidence; the old example-only
-workshop description is not a remaining task.
-
-[project-postulate] Brandon's subsequent September 13 correction replaces the vague
-"context/condition map, compound release, sufficient continuation" framing. Prediction release
-is the output of a generated face, not an additional capability awaiting complete feedback.
-The blueprint now specifies chunk reconfiguration/correction/continuation through
-`y=rho_F(G_Theta(s,c))`, its conditional coefficient equation, and explicit normal-statistic or
-operator update identities. Resolve this mathematical account before returning to implementation.
-An API's comparison handle or body-publication flag describes an operation contract; it does
-not decide whether its returned text or other face is output.
-
-[definition] The following implementation packets deliver the six shared responsibilities
-above. The [first packet has returned](../../research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md)
-for caller-controlled exact operators and native calibrated condition families. The next
-executable task is contextual predictive formation; compact execution is integrated
-as soon as an actual repeated segment is available, before broad cultivation is expanded.
-
-| Packet, in dependency order | Concrete construction | Delivered product |
+| Packet / deliverable | Concrete return | Dependency and completion evidence |
 |---|---|---|
-| **Callable mathematical workshop** | Expose caller-supplied linear/bilinear construction, application, changed receiver and observed constraint through the existing public HNN/session boundary. Retain the actual factor family and resident product. Bind task-local source/condition/receiver maps instead of hard-coded example inputs. | An operator supplies a problem, obtains executable factors or a solution family, applies them to new inputs, requests another receiver and reuses the same material without editing an example. |
-| **Contextual generator formation** | Replace the production use of fixed-h text calibration with actual pre-return contextual state and source association. Separate compatibility fibres from empirical prediction; use existing native condition, contextual-section, normal-statistic and normalized/adjoint owners. Support more than one applicable local constituent through actual port maps. | The same visible input under different relevant conditions yields the corresponding learned consequence; a new mathematical case and held-out text continuation use the formed relation. |
-| **Compiled modal continuation** | Compile repeated admitted actions and closed formation statistics into current/factor/recurrence representations. Preserve required live pending cuts and unresolved constraints through maps; measure and reduce whole-prefix reevaluation. Derive modal basis/receiver transport rather than retaining a new past-state representation. | Repeated use conducts on current material at a cost determined by active modes and required live dependencies, with the same requested outputs and explicit savings over programme reevaluation. |
-| **Athena task use** | Develop on actual source parts and relations through the repaired coupled session, inspect short held-out task episodes, and correct source/condition, predictive objective, generator or emission defects at the responsible owner. Mathematics remains callable throughout. | Useful contextual replies, code and mathematical application on new inputs; the continuing model survives ordinary interruption and reuse. |
-| **Broader generative reach** | Extend the same request and compiler to indexed π/e/Gamma blocks, nonlinear/factored and boundary/physical actions, then shared text/acoustic and other modal sources as their consumers require. Measure end-to-end usefulness and consumer-hardware cost. | One ecology supports progressively broader constructions and outputs, with actual analytic tails, source domains and executable target maps. |
+| **Contextual generator formation** | A whole corrected or continued section from source/condition distinctions present before its target arrives; infer `W[S;C]=Y` or the declared normal/conditional law. | Use the source-null contrast and fixed-h collapse as references. Show actual generated chunks for new inputs and the same visible source under distinct preparations, plus the unsupported-condition separator. No additional unchanged broad exposure. |
+| **Joint prediction release** | The prepared joint output and one published successor for the transport-only word, with optional cuts for later joint observations. | Compare with the existing forecast at the same source/section; preserve component correlation, endpoint, delayed return and recoverable refusal. It can bind before general contextual language succeeds. |
+| **Compiled modal continuation** | Reusable factor/recurrence or closed formation statistics, with `E_next T=U E` and `D E=rho` on the admitted operation. | Begin with the first repeated segment. Compare complete requested outputs and live pending returns; repeated use without new independent structure ceases appending executable history. Measure work, representation and precision growth. |
+| **Hephaestus code/function output** | A Rust function over exact rationals lowered from retained operator factors, compositions or powers; return a parameterized family when the inferred relation is plural. | Can use the callable workshop immediately. Execute generated source outside HNN on new inputs and a changed receiver and compare with resident results. Preserve the inferred graph, target domain and unsupported-operation boundary. |
+| **Athena task use** | Contextual correction/continuation, a substantive reply, and code or mathematical work using the same formed constructions. | Starts with the repaired contextual section. Inspect held-out requested products and costs; expand development only after diagnosing the first representative failure at its responsible owner. |
+| **Durable application reuse** | Rest/remount for the new section/encoding payload and the public mathematical session's retained constructions, products and pending/frontier state. | Follows the payloads it serializes. A fresh process reuses them on new inputs and consumes a pre-rest comparison once; live output does not wait for this durability claim. |
+| **Broader generative reach** | Indexed analytic generators, nonlinear and physical actions, then shared acoustic/visual and other requested receivers. | Use the same request/encoding/release contract, with actual clock, tail, source units and target execution. Source-specific research below continues alongside native products. |
 
-[established-bounded; implemented-exact] The first packet's public `MathematicalRequest` now
-binds construction, GPU application/receiver reuse and native condition preimage/image/reception.
-Its live-session scope, explicit release operations, search frontier and exact family outputs
-are available dependencies. Add rest/resume or multi-pending joins when their concrete consumer
-requires them; do not repeat this first product as another verification campaign. The calibrated
-parameter result does not establish empirical contextual text prediction or compact the general
-coupled-wave operation word.
+[project-postulate] These packets implement the six shared responsibilities, not a new engine
+or independent campaign per row. Formation, release and representation can change in one
+coherent increment. Context is carried native state and incidence, not a label/window chosen
+from the target. The exact returned relation and its decoded output determine the repair;
+“complete”, “sufficient”, “intelligent” or a changed coefficient alone specify no deliverable.
 
-[definition] The [blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-implementation-packets)
-names the files, precise design decisions and checks for these packets. The caller-facing
-workshop is an application of HNN's owners, not a second host-only solver product. Its first
-exact host construction is a legitimate mathematical inference; resident use and integration
-with formation follow in the same packet at the admitted operator chart. Native autonomous
-generation uses native owners rather than calling the exterior search as a hidden oracle.
-
-[definition] The first packet is complete only when a caller can perform a constructed
-operator task and reuse its result through the public session. A round-trip, a printed fixed
-product or an extra pending-return case does not complete it. Linear/bilinear source/action
-families and fixed-linear recurrence/power construction are now callable. General analytic
-actions and changing-programme compression retain their actual primitive, clock and remainder
-dependencies; the completed fixed-operator scope does not settle those different constructions.
-
-[definition] The second packet must address the exact fixed-condition collapse, not merely
-initialize h differently. Source/context contrasts must reach the law before the observed
-target is incorporated; the resulting conditional prediction must distinguish actual
-developmental cases and new admitted uses. Compatibility span, a learned empirical receiver
-and a selected output have different mathematical roles. Their composition is specified in
-the blueprint, with failure cases that determine the next code change.
+[definition] The [September 13 planning record](../../research/records/2026-09-13_PREDICTION_RELEASE_HAS_ONE_GENERATING_RELATION_AND_CONCRETE_PRODUCTS.md)
+retains the source audit and scope of this consolidation. Earlier returns remain available:
+[generated-face equations](../../research/records/2026-09-13_DIRECT_MESSAGES_CONFIRM_THE_ATHENA_CONSTRUCTION_ORDER.md#prediction-and-output-correction),
+[game/rate/molecular measurements](../../research/records/2026-09-13_GAME_WORLDS_SCOPED_RATES_AND_MOLECULAR_MECHANICS_SHARE_DECLARED_LAWS.md),
+[compactification and matter](../../research/records/2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md),
+[mass/flux/gap transport](../../research/records/2026-09-13_MASS_FLUX_GAPS_AND_OPTIMAL_NAVIGATION_RETURN_THEIR_SOURCE_MAPS.md),
+[oriented configuration navigation](../../research/records/2026-09-13_ORIENTED_CONFIGURATION_NAVIGATION_RETAINS_ITS_SOURCE_AND_THE_BEACON_STAYS_OPEN.md),
+and the [frontier synthesis](../../research/records/2026-09-12_THE_FRONTIER_REVIEW_CONSOLIDATES_CONSTRUCTIVE_CONTINUITY.md).
+They supply constructions and chronology, not competing current tasks. General navigation
+retains changing joint/mode incidence, orientation and source-conditioned variation; finite
+cube search remains exterior reference. Model/checker formation costs remain explicit. The
+[beacon](../BEACON.md) makes the source available without a manuscript-packaging campaign.
 
 ### Work selection and early failure control
 
@@ -300,7 +228,8 @@ domain. Neither needs a natural-language demonstration to count as intelligence 
 | Conditional association | An actual returned relation couples two classes of difference; a changed condition changes the predicted consequence in the way the supplied comparison tests |
 | Recognition/applicability | A retained relation is used under its admitted changed presentation/conditions, with a separating case outside that scope |
 | Reusable composition | New admitted compositions conduct through retained constituent actions; the relevant decoded future agrees with the declared reference or retains its measured defect |
-| Prediction | A produced face is compared with an actual later observation at the producing cut; report the full difference and the chosen loss/distribution receiver |
+| Prediction release | Return the generated face with its source/conditions, receiver and applicable family; forecast and continuing-use contracts are stated explicitly |
+| Compared prediction | Compare an actual later observation at the producing cut; retain the oriented difference and the declared loss/distribution receiver |
 | Useful conversation | Inspect actual held-out replies, code and mathematical work, with substantive successes/failures and complete execution costs |
 
 [definition] These distinguish claims, not mandatory stages of all cognition or a universal
@@ -329,6 +258,29 @@ or intelligence theorem is not a prerequisite for a useful text increment. Conve
 symbol basis does not define the common interior or its clock.
 
 ## Shared mathematics and its productive use
+
+[project-postulate] The release specification is ready for implementation. Additional elementary
+definitions of intelligence or a Millennium endpoint are not prerequisites. Hodge and fluid
+closure are immediate tools for the compiled-continuation deliverable; RH and Yang–Mills retain
+concrete analytic and physical returns as well as their wider source problems. The framework's
+research is not exhausted by what Athena consumes.
+
+[definition] Use the following bounded questions when the corresponding source is engaged.
+They refine the existing research lines below, rather than starting four prerequisite campaigns.
+
+| Subject and existing source | Next discriminating return | Relation to the product work |
+|---|---|---|
+| **Hodge / retained complements** — `Physics/TemporalHodgeResidue.lean`, `Foundation/JointReceiverDescent.lean`, `receiver_history_compression` | For the actual selected encoder E and admitted T, compute `E_next T-U E` and the requested decoder defect. If a discarded r satisfies `E r=0` but a future receiver reads `rho T r!=0`, retain its mode or return that separator. Carry the harmonic part and exact/coexact residue through the changed chart together. | This directly decides which release/return coordinates the compiler can condense. Existing theorems provide the criterion; the native consuming map is the next work. Algebraic supported-cycle realization remains its own Hodge source task. |
+| **Navier–Stokes / mixed feedback** — `NavierStokesLambCurrentEvolution`, `NavierStokesLambCurrentCell`, weighted Duhamel and current finite-source experiments | On the declared periodic source, reconstruct the pressure-projected full/reduced current including `B(u,r)+B(r,u)+B(r,r)`, generated modes and boundary flux. Return a finite-interval signed residual and a quantitative remainder bound, or the explicit term preventing that bound. A finite-mode equality alone does not supply the omitted tail. | The same mixed-term check applies to a changing bilinear/native programme. A state or memory law may replace replay only when it closes that feedback. The fluid calculation also returns a physical source/interval result in its own right. |
+| **Yang–Mills / energy and gap** — `HolonicYangMillsHessian`, gauge-covariance/energy owners, `MassGap.lean`, `YangMillsOfficialReceiver` | Bind a reduction/rebase to the actual gauge energy and Hessian, retaining the commutator and mixed blocks. For a claimed spectral gap, construct the energy form of the stated Hamiltonian on its vacuum complement and bound the lower signed return by `-epsilon ‖v‖²`; the existing law then returns `Delta-epsilon`. Track operator, vacuum, units and scale together. | Gauge/phase transport and one-sided stability inform material/receiver changes and the physical operator applications. A classical Hessian bound is not the quantum Hamiltonian gap. A continuum claim additionally requires one positive bound uniform over its complete source family and refinement; low-energy complement modes cannot be omitted. |
+| **RH / analytic continuation** — `RH/FlowedGamma.lean`, `RH/ThresholdReturn.lean`, existing Gamma/xi block and tail owners | Return an indexed Gamma/xi generator request with its argument, clock conversion, cutoff and retained tail on the requested domain; compare the reconstructed analytic receiver. An RH endpoint claim must carry the actual xi zero receiver and establish the remaining `Lambda_DN<=0`, not substitute a finite gap statistic. | This is a demanding analytic Hephaestus release/encoding application. It proceeds when those analytic primitives are being bound; it does not delay the existing rational/text/code consumers. The direct endpoint campaign remains deferred under its standing scope. |
+
+[conditional] The common compiler argument is short and usable now. If `E_next T=U E`
+and `D E=rho` for every admitted passage/receiver, induction gives the same decoded joint
+release through every admitted word. If a retained source difference later crosses a receiver,
+that word falsifies the proposed condensation. This applies to the specified family; changing
+incidence, material or receiver adds its own map to that family. It requires neither a universal
+loss scalar nor a record of every earlier state.
 
 [definition] The [mass–energy synthesis](../MASS_ENERGY_AND_CAUSAL_TRANSPORT.md) now supplies
 the complete rest-energy/transport account for the recent shared work. Use the returned
