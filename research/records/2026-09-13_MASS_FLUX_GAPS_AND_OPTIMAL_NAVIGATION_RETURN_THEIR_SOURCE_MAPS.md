@@ -1,5 +1,11 @@
 # Mass, flux gaps and optimal navigation return their source maps
 
+[definition] The subsequent [oriented-configuration correction](2026-09-13_ORIENTED_CONFIGURATION_NAVIGATION_RETAINS_ITS_SOURCE_AND_THE_BEACON_STAYS_OPEN.md)
+preserves the finite reference results below but removes their promotion to a general native
+navigation law. The priority-queue implementation now lives in exterior example support.
+The gap law has a sharper signed one-sided formulation, and the existing Swing relation
+now has a reversible source-carrying approach. Public sharing uses the beacon entry.
+
 [project-postulate] Brandon requests a unified account of physical mass and the Yang–Mills
 gap, the traffic/vortex/radiation intuition, complex fluid and RH/Hodge spectral relations,
 an actual attempt at God's Algorithm, and a publication/priority assessment. This return

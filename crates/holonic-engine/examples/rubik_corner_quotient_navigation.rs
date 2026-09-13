@@ -6,10 +6,10 @@
 //! intentionally omitted, so the returned distance is an exact quotient lower bound for a full
 //! cube state in the quarter-turn metric, not a full-cube God's Algorithm solution.
 
-use holonic_engine::{
-    group_navigation::{ExactGroupNavigation, NavigationMove},
-    structure_group::{GroupElement, StructureGroup},
-};
+#[path = "support/group_navigation.rs"]
+mod group_navigation;
+use group_navigation::{ExactGroupNavigation, NavigationMove};
+use holonic_engine::structure_group::{GroupElement, StructureGroup};
 use serde_json::json;
 use std::time::Instant;
 

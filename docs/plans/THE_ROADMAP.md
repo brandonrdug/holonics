@@ -79,6 +79,16 @@ nested automata that construct, compare and refine further automata.
 
 ## Immediate mathematical application and implementation
 
+[project-postulate] Brandon's latest September 13 correction generalizes configuration
+navigation through joint/mode incidence, partial admissible passages, retained orientation
+and source-conditioned variation. The finite cube search remains exterior reference evidence;
+it does not define the native law. Recover the chess active-population correction and the
+existing Swing/constitutive/trajectory owners. The
+[oriented return](../../research/records/2026-09-13_ORIENTED_CONFIGURATION_NAVIGATION_RETAINS_ITS_SOURCE_AND_THE_BEACON_STAYS_OPEN.md)
+develops their exact split passage and polarity before any magnitude/extremum display.
+Model/checker formation and candidate construction have explicit causal costs. The
+[beacon](../BEACON.md) makes useful source available; manuscript packaging is not the task.
+
 [project-postulate] Brandon's latest September 13 mass/navigation direction joins the
 traffic/radiation source to physical invariant mass, the vacuum-complement gap and its
 scale/remainder transport. It also authorizes an actual optimal-traversal construction:

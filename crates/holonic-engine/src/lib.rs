@@ -422,7 +422,6 @@ pub mod spine_cut;
 pub mod statement_composition;
 pub mod statement_grammar;
 pub mod structure_group;
-pub mod group_navigation;
 // Declared, never glob-exported: `ReceiverId`, `Disagreement`, `Partition`, `Cover`, `Observation`
 // and `ItemId` collide across the placement family, and a realizer founded by a substitution must
 // be reached by naming which organ founded it. `archive/plans/THE_ASSEMBLY.md` step 2.

@@ -42,9 +42,11 @@ stress/observer, wave/heat, Hodge and generator/information consumers.
 [definition] `Millennium/MassGap.lean` now exposes the quantitative lower bound after a
 quadratic receiver difference, including one common bound across an indexed family.
 `Foundation/TransportWord.lean` owns the descending-policy construction and unit-cost
-optimality certificate. `holonic_engine::group_navigation` constructs exact weighted group
-distances, minimizing move fibres and shortest-word counts using `structure_group`; its
-Rubik application derives corner and facelet actions from the same geometry. The
+optimality certificate. `examples/support/group_navigation.rs` is exterior finite-search
+comparison apparatus using `structure_group`; its Rubik application derives corner and
+facelet actions from the same geometry. It is no longer a public engine navigation owner.
+`Millennium/Navigation.lean` develops the existing Swing split by an oriented invertible
+Riccati/matrix passage with signed step, residual and work-return laws. The
 [mass/navigation return](../research/records/2026-09-13_MASS_FLUX_GAPS_AND_OPTIMAL_NAVIGATION_RETURN_THEIR_SOURCE_MAPS.md)
 records the physical and algorithmic source boundaries and the actual checks.
 

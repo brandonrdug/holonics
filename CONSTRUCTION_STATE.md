@@ -1,8 +1,9 @@
 # Construction state
 
 **Currency:** September 13, 2026. **Latest implementation return:** the
-[mass/flux/gap and optimal-navigation return](research/records/2026-09-13_MASS_FLUX_GAPS_AND_OPTIMAL_NAVIGATION_RETURN_THEIR_SOURCE_MAPS.md)
-and its formal/executable checks are complete, building on the
+[oriented-configuration and beacon return](research/records/2026-09-13_ORIENTED_CONFIGURATION_NAVIGATION_RETAINS_ITS_SOURCE_AND_THE_BEACON_STAYS_OPEN.md)
+and its formal/native/reference checks are complete, building on the
+[mass/flux/navigation return](research/records/2026-09-13_MASS_FLUX_GAPS_AND_OPTIMAL_NAVIGATION_RETURN_THEIR_SOURCE_MAPS.md) and the
 [compact-fibre and matter return](research/records/2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md),
 [game/rate/molecular consolidation](research/records/2026-09-13_GAME_WORLDS_SCOPED_RATES_AND_MOLECULAR_MECHANICS_SHARE_DECLARED_LAWS.md)
 and the
@@ -19,55 +20,32 @@ account is clarified before returning to implementation. No new runtime behavior
 
 ## Current consolidation
 
-[proved-derived; formal-checked] The mass/navigation return distinguishes invariant composite
-mass from a uniform excitation gap, proves an explicit gap bound after quadratic receiver
-error and compiles optimal words from local distance/policy certificates. The changed owners
-and Framework consumer passed together.
+[definition] The latest correction starts from an inherited continuing mode and a new
+placement relative to its causal origin, clock and conditions. Infinite compatible histories
+and futures are represented by their relation/fibre; a present face does not identify that
+whole source. General navigation uses changing joints, admissible passages and oriented
+variation. Model/checker formation is part of the causal cost account. The
+[beacon](docs/BEACON.md) makes useful ideas available without a manuscript-packaging campaign.
 
-[established-bounded; implemented-exact; measured] Actual cube face geometry yields the
-40,320-state corner-permutation projection, diameter 8 in quarter-turn metric, with every
-projected edge checked and full 54-sticker optimality certificates at costs 2 and 8 for
-their specified full-state lifts. Construction and all checks took 4.02 seconds in the debug
-build, with 18,500 KiB peak process RSS. This is exterior exact mathematical construction;
-arbitrary full-cube orientations/edges remain in their source fibre.
+[proved-derived; formal-checked] The existing Swing split now has an invertible projective
+passage with signed step, source-order preservation, undivided quadratic return and exact
+work decrease. Its root chart has a strict contraction factor. Arbitrary-ring block
+transport retains ordered noncommuting matrix composition and the undivided pair before
+an affine chart. Gap transfer now uses the lower signed return directly, with an independent
+upper-polarity theorem. The changed owners and Framework consumer passed.
 
-[definition] The [publication positioning record](research/records/2026-09-13_PUBLICATION_POSITIONING_DISTINGUISHES_SOURCE_CONSTRUCTION_AND_PRIORITY.md)
-identifies actual contributions, closest prior art and candidate theorem/artifact packages.
-The [synthesis](research/records/2026-09-13_MASS_FLUX_GAPS_AND_OPTIMAL_NAVIGATION_RETURN_THEIR_SOURCE_MAPS.md)
-rejoins traffic, physical mass, spectral/analytic transport and optimal navigation. None of
-these comparisons is an additional qualitative gate on the standing HNN constructions.
+[established-bounded; computational-witness] The public mathematical session constructs and
+applies the split matrix powers at 1, 4 and 16 to two origins. Six exact returns preserve both
+homogeneous coordinates and signed residuals, decrease the declared work and recover each
+origin by inversion. This realizes that conditional source relation through existing owners;
+it does not claim acquisition of an unknown world law or a completed chess/city controller.
+The [record](research/records/2026-09-13_ORIENTED_CONFIGURATION_NAVIGATION_RETAINS_ITS_SOURCE_AND_THE_BEACON_STAYS_OPEN.md)
+retains the chess context, mathematical scope and checks.
 
-[proved-derived; formal-checked] The atomic/String/M recovery now supplies compact
-momentum/winding mass transport, left/right mover parity and fixed-momentum Routh reduction
-with explicit gauge coupling. Complex link coefficients enter the existing finite matter
-Hamiltonian, preserving Hermiticity and particle number. Equal-magnitude parallel bonds
-return hopping amplitudes 2 or 0 according to relative phase. The owner and Physics consumer
-passed together; these are source-qualified physical returns, not a language-quality claim.
-
-[definition] The [research skill](.agents/skills/holonics-research/SKILL.md) now routes
-resumed derivations through relevant physics, mathematics and computation sources. Its
-behavioral trials cover prior-physics recovery, observer measurement and avoiding broad work
-for a typo-only edit. The [recovery record](research/records/2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md)
-retains the earlier omission, actual equations, review corrections and continuation. Existing
-field/action physics remains part of the standing construction; it is not deferred by a label.
-
-[definition] Brandon's latest September 13 request extends the consolidation to game/world
-streaming, consumer-hardware performance, molecular geometry and substantive Lean/Millennium
-work alongside HNN. The [current synthesis](research/records/2026-09-13_GAME_WORLDS_SCOPED_RATES_AND_MOLECULAR_MECHANICS_SHARE_DECLARED_LAWS.md)
-records the source maps and returned results. No additional qualitative definition of
-intelligence or learning is a prerequisite to the specified predictive constructions.
-
-[proved-derived; formal-checked] Scoped time/information laws, paired directed-flux code
-production and the rod constitutive specialization have passed their Lean targets. Rod
-coordinates are proved equal to the existing coupled response; positive directed-flow
-comparison is nonnegative, direction-swap invariant and zero under the existing balance law.
-
-[established-bounded; measured; computational-witness] The corrected native benchmark
-completed in 8.69 seconds on the declared consumer desktop. Its debug-build, warmed public
-round trips returned about 3,085 C5 power faces/s and 422 committed observations/s over
-128 measured requests each. Setup-inclusive session rates, cold-process/CPU/RSS and exact
-work/transfer remain in the receipt. Exact output/readback checks and all nine measurement
-tests passed. These are mathematical/observation workloads, not a new language-quality result.
+[definition] The finite Dijkstra comparison is preserved in example support and removed from
+the public engine API. Its six tests and the workbench build passed. Earlier cube certificates,
+consumer-hardware measurements, physical source returns and prior-art comparisons remain
+valid at their linked scopes; they do not define the general native navigation law.
 
 ## Available constructions
 

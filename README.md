@@ -128,7 +128,7 @@ inference pipelines.
 - [Mathematics and native conduct](docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) — synthesis across research and implementation
 - [Architecture](docs/ARCHITECTURE.md) — framework, implementations and responsibilities
 - [Formal mathematics](formal/README.md) and [research](research/README.md) — proofs, derivations, experiments and papers
-- [Publication positioning](research/records/2026-09-13_PUBLICATION_POSITIONING_DISTINGUISHES_SOURCE_CONSTRUCTION_AND_PRIORITY.md) — contributions, closest prior art and candidate theorem/artifact papers
+- [Holonics beacon](docs/BEACON.md) — useful ideas, source constructions and their relation to other work
 - [Owner map](docs/ARCHITECTURE_MAP.md) — navigation between mathematical and executable sources
 - [Construction state](CONSTRUCTION_STATE.md) and [roadmap](docs/plans/THE_ROADMAP.md) — present position and ordered work
 - [Epistemic grades](docs/canon/EPISTEMIC_GRADES.md) — how to read the scope of a claim

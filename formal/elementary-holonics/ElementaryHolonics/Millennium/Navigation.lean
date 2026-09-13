@@ -5,10 +5,12 @@ import ElementaryHolonics.Millennium.Chronology
 /-!
 # Navigation — when a chart change turns a long computation into two swings
 
-The claim this file discharges: a computation that is expensive in one chart can become cheap in
-another, and **the place to cut is the fixed point of the involution that relates the two charts.**
+The source families here are affine Swing words, reciprocal splitting and cost-exponent pairs.
+For the declared positive reciprocal split, the involution's fixed point gives the cheapest
+split. The oriented Riccati passage approaches that face through a reversible matrix relation.
+These statements do not make every fixed point an optimum of an arbitrary objective.
 
-Three sections.
+Four sections.
 
 **The grading.**  An odd word of swings *is a swing*; an even word is a translation.  So the group
 the swings generate carries a `ℤ/2` grading, and the grading is the orientation class — a circuit
@@ -28,6 +30,10 @@ saving factor is the same half as the seam.*
 pair of exponents: a **frequency swing** (an involution) and a **difference contraction** (which
 fixes the trivial pair).  They do not commute, so by `orderBlind_iff_commute` a word in them is a
 genuine chronology and its order is irreducible information.
+
+**The passage.** The matrix return retains signed separation, the undivided quadratic, source
+reconstruction and the exact work difference. Its root chart has an explicit contraction factor;
+the generating operation does not evaluate a square root or scan a set of candidate values.
 
 Every `theorem` here is discharged.
 -/
@@ -92,6 +98,150 @@ noncomputable def splitSwing (T x : ℝ) : ℝ := T / x
 /-- The **work** a split costs: both pieces are paid for. -/
 noncomputable def splitWork (T x : ℝ) : ℝ := x + T / x
 
+/-! ## 3. An oriented Riccati passage through the same split target -/
+
+/-- The projective passage represented by `[[1, h*T], [h, 1]]`. -/
+noncomputable def riccatiPassage (T x h : ℝ) : ℝ := (x + h * T) / (1 + h * x)
+
+/-- The homogeneous two-coordinate matrix behind `riccatiPassage`. -/
+noncomputable def riccatiMatrix (T h : ℝ) : Matrix (Fin 2) (Fin 2) ℝ := !![1, h * T; h, 1]
+
+/-- The undivided quadratic residual carried by the projective pair. -/
+theorem riccatiPair_residual (T h u v : ℝ) :
+    (u + h * T * v) ^ 2 - T * (h * u + v) ^ 2 =
+      (1 - h ^ 2 * T) * (u ^ 2 - T * v ^ 2) := by
+  ring
+
+theorem riccatiMatrix_det (T h : ℝ) :
+    (riccatiMatrix T h).det = 1 - h ^ 2 * T := by
+  simp [riccatiMatrix, Matrix.det_fin_two]
+  ring
+
+theorem riccatiPassage_denominator_pos {x h : ℝ} (hx : 0 < x) (hh : 0 ≤ h) :
+    0 < 1 + h * x := by
+  positivity
+
+theorem riccatiPassage_pos {T x h : ℝ} (hT : 0 < T) (hx : 0 < x) (hh : 0 ≤ h) :
+    0 < riccatiPassage T x h := by
+  unfold riccatiPassage
+  positivity
+
+/-- The signed passage step is proportional to the split residual `T - x²`. -/
+theorem riccatiPassage_step {T x h : ℝ} (hx : 0 < x) (hh : 0 ≤ h) :
+    riccatiPassage T x h - x = h * (T - x ^ 2) / (1 + h * x) := by
+  unfold riccatiPassage
+  field_simp [ne_of_gt (riccatiPassage_denominator_pos hx hh)]
+  ring
+
+/-- The signed square residual transforms by the positive projective determinant factor. -/
+theorem riccatiPassage_residual {T x h : ℝ} (hx : 0 < x) (hh : 0 ≤ h) :
+    riccatiPassage T x h ^ 2 - T =
+      (1 - h ^ 2 * T) * (x ^ 2 - T) / (1 + h * x) ^ 2 := by
+  unfold riccatiPassage
+  field_simp [ne_of_gt (riccatiPassage_denominator_pos hx hh)]
+  ring
+
+/-- Two source values retain their signed separation under the same projective passage. -/
+theorem riccatiPassage_difference {T x y h : ℝ}
+    (hx : 0 < x) (hy : 0 < y) (hh : 0 ≤ h) :
+    riccatiPassage T x h - riccatiPassage T y h =
+      (1 - h ^ 2 * T) * (x - y) /
+        ((1 + h * x) * (1 + h * y)) := by
+  have hxden : 1 + h * x ≠ 0 :=
+    ne_of_gt (riccatiPassage_denominator_pos hx hh)
+  have hyden : 1 + h * y ≠ 0 :=
+    ne_of_gt (riccatiPassage_denominator_pos hy hh)
+  unfold riccatiPassage
+  field_simp [hxden, hyden]
+  ring
+
+/-- The projective passage preserves orientation when `h²T < 1`. -/
+theorem riccatiPassage_orientation_preserving {T x h : ℝ}
+    (_hT : 0 < T) (_hx : 0 < x) (_hh : 0 ≤ h) (hdet : h ^ 2 * T < 1) :
+    0 < 1 - h ^ 2 * T := by
+  linarith
+
+/-- In the positive-determinant regime, the passage preserves strict source order. -/
+theorem riccatiPassage_strictMono {T h x y : ℝ}
+    (hT : 0 < T) (hh : 0 ≤ h) (hdet : h ^ 2 * T < 1)
+    (hx : 0 < x) (hy : 0 < y) (hxy : x < y) :
+    riccatiPassage T x h < riccatiPassage T y h := by
+  have hdetpos : 0 < 1 - h ^ 2 * T := riccatiPassage_orientation_preserving hT hx hh hdet
+  have hdiff := riccatiPassage_difference (T := T) (x := y) (y := x) hy hx hh
+  have hden : 0 < (1 + h * y) * (1 + h * x) := by positivity
+  have hsep : 0 < (1 - h ^ 2 * T) * (y - x) /
+      ((1 + h * y) * (1 + h * x)) := by
+    exact div_pos (mul_pos hdetpos (sub_pos.mpr hxy)) hden
+  have hgap : 0 < riccatiPassage T y h - riccatiPassage T x h := by
+    rw [hdiff]
+    exact hsep
+  linarith
+
+/-- The split work decreases by the exact squared residual of the passage. -/
+theorem riccatiPassage_work {T x h : ℝ}
+    (hT : 0 < T) (hx : 0 < x) (hh : 0 ≤ h) :
+    splitWork T (riccatiPassage T x h) - splitWork T x =
+      -h * (x ^ 2 - T) ^ 2 / (x * (x + h * T) * (1 + h * x)) := by
+  have hden : 1 + h * x ≠ 0 :=
+    ne_of_gt (riccatiPassage_denominator_pos hx hh)
+  have hnum : 0 < x + h * T := by positivity
+  have hpass : riccatiPassage T x h ≠ 0 :=
+    ne_of_gt (riccatiPassage_pos hT hx hh)
+  unfold splitWork riccatiPassage
+  field_simp [hden, hpass, hx.ne', hnum.ne']
+  ring
+
+theorem riccatiPassage_work_nonincreasing {T x h : ℝ}
+    (hT : 0 < T) (hx : 0 < x) (hh : 0 ≤ h) :
+    splitWork T (riccatiPassage T x h) ≤ splitWork T x := by
+  apply sub_nonpos.mp
+  rw [riccatiPassage_work hT hx hh]
+  have hden : 0 < x * (x + h * T) * (1 + h * x) := by
+    positivity
+  have hnum : -h * (x ^ 2 - T) ^ 2 ≤ 0 := by
+    nlinarith [sq_nonneg (x ^ 2 - T)]
+  have hquot : -h * (x ^ 2 - T) ^ 2 /
+      (x * (x + h * T) * (1 + h * x)) ≤ 0 :=
+    div_nonpos_of_nonpos_of_nonneg hnum hden.le
+  linarith
+
+/-- The inverse passage uses the opposite oriented parameter. -/
+theorem riccatiPassage_inverse {T x h : ℝ}
+    (hT : 0 < T) (hx : 0 < x) (hh : 0 ≤ h) (hdet : h ^ 2 * T < 1) :
+    riccatiPassage T (riccatiPassage T x h) (-h) = x := by
+  have hden : 1 + h * x ≠ 0 :=
+    ne_of_gt (riccatiPassage_denominator_pos hx hh)
+  have hdetpos : 0 < 1 - h ^ 2 * T := riccatiPassage_orientation_preserving hT hx hh hdet
+  have hxp : 0 < riccatiPassage T x h := riccatiPassage_pos hT hx hh
+  have hinvden : 1 - h * riccatiPassage T x h ≠ 0 := by
+    rw [show 1 - h * riccatiPassage T x h =
+        (1 - h ^ 2 * T) / (1 + h * x) by
+      unfold riccatiPassage
+      field_simp [hden]
+      ring]
+    exact div_ne_zero hdetpos.ne' hden
+  simp only [riccatiPassage]
+  have hnum : (x + h * T) / (1 + h * x) + -h * T =
+      x * (1 - h ^ 2 * T) / (1 + h * x) := by
+    field_simp [hden]
+    ring
+  have hden' : 1 + -h * ((x + h * T) / (1 + h * x)) =
+      (1 - h ^ 2 * T) / (1 + h * x) := by
+    field_simp [hden]
+    ring
+  rw [hnum, hden']
+  field_simp [hden, hdetpos.ne']
+
+/-- Cross-multiplication reconstructs the source without invoking a root choice. -/
+theorem riccatiPassage_source_reconstruction {T x h : ℝ}
+    (hx : 0 < x) (hh : 0 ≤ h) :
+    (1 - h * riccatiPassage T x h) * x = riccatiPassage T x h - h * T := by
+  have hden : 1 + h * x ≠ 0 :=
+    ne_of_gt (riccatiPassage_denominator_pos hx hh)
+  unfold riccatiPassage
+  field_simp [hden]
+  ring
+
 theorem theSplitSwingIsAnInvolution {T x : ℝ} (hT : T ≠ 0) (hx : x ≠ 0) :
     splitSwing T (splitSwing T x) = x := by
   simp only [splitSwing]
@@ -106,6 +256,68 @@ theorem theFixedPointOfTheSplitSwingIsTheRoot {T x : ℝ} (hT : 0 < T) (hx : 0 <
     rw [h, Real.sqrt_mul_self hx.le]
   · intro h
     rw [h, Real.mul_self_sqrt hT.le]
+
+/-- For a nonzero step size, the Riccati passage has exactly the same fixed-point face as the
+split Swing. -/
+theorem riccatiPassage_fixed_iff_splitSwing_fixed {T x h : ℝ}
+    (hx : 0 < x) (hh : 0 ≤ h) (hpositive : 0 < h) :
+    riccatiPassage T x h = x ↔ splitSwing T x = x := by
+  have hden : 0 < 1 + h * x := riccatiPassage_denominator_pos hx hh
+  constructor
+  · intro hfix
+    have hstep := riccatiPassage_step (T := T) hx hh
+    rw [hfix, sub_self] at hstep
+    have hmul : h * (T - x ^ 2) = 0 := by
+      simpa using ((eq_div_iff hden.ne').mp hstep).symm
+    have hres : T - x ^ 2 = 0 :=
+      (mul_eq_zero.mp hmul).resolve_left hpositive.ne'
+    unfold splitSwing
+    field_simp [hx.ne']
+    linarith
+  · intro hfix
+    have hres : T - x ^ 2 = 0 := by
+      unfold splitSwing at hfix
+      field_simp [hx.ne'] at hfix
+      linarith
+    have hstep := riccatiPassage_step (T := T) hx hh
+    rw [hres] at hstep
+    have hstep' : riccatiPassage T x h - x = 0 := by simpa using hstep
+    exact sub_eq_zero.mp hstep'
+
+/-- The common fixed point is the already-derived positive root of the split target. -/
+theorem riccatiPassage_fixed_iff_root {T x h : ℝ}
+    (hT : 0 < T) (hx : 0 < x) (hh : 0 ≤ h) (hpositive : 0 < h) :
+    riccatiPassage T x h = x ↔ x = Real.sqrt T := by
+  exact (riccatiPassage_fixed_iff_splitSwing_fixed hx hh hpositive).trans
+    (theFixedPointOfTheSplitSwingIsTheRoot hT hx)
+
+/-- In the root chart `z = (x - a) / (x + a)`, the passage acts by one signed projective
+factor when `T = a²`. -/
+theorem riccatiPassage_root_chart {T x a h : ℝ}
+    (hT : 0 < T) (hx : 0 < x) (ha : 0 < a) (hh : 0 ≤ h) (hroot : T = a ^ 2) :
+    (riccatiPassage T x h - a) / (riccatiPassage T x h + a) =
+      ((1 - h * a) / (1 + h * a)) * ((x - a) / (x + a)) := by
+  have hden : 0 < 1 + h * x := riccatiPassage_denominator_pos hx hh
+  have hpass : 0 < riccatiPassage T x h := riccatiPassage_pos hT hx hh
+  have hxa : 0 < x + a := by positivity
+  have hpa : 0 < riccatiPassage T x h + a := by positivity
+  have hha : 0 < 1 + h * a := by positivity
+  unfold riccatiPassage
+  field_simp [hden.ne', hxa.ne', hpa.ne', hha.ne']
+  rw [hroot]
+  ring
+
+/-- A positive step smaller than the root scale gives a strict contraction factor in the root
+chart. -/
+theorem riccatiPassage_root_chart_factor_between_zero_one {a h : ℝ}
+    (ha : 0 < a) (hh : 0 < h) (hha : h * a < 1) :
+    0 < (1 - h * a) / (1 + h * a) ∧ (1 - h * a) / (1 + h * a) < 1 := by
+  have hden : 0 < 1 + h * a := by positivity
+  have hprod : 0 < h * a := mul_pos hh ha
+  constructor
+  · exact div_pos (by linarith) hden
+  · apply (div_lt_one hden).2
+    linarith
 
 /-- **The work at the fixed point is twice the root.** -/
 theorem theWorkAtTheFixedPoint {T : ℝ} (hT : 0 < T) :
@@ -165,7 +377,7 @@ theorem theCheapestSplitIsTheFixedPointOfTheSwing {T x : ℝ} (hT : 0 < T) (hx :
     have hlin : x - Real.sqrt T = 0 := pow_eq_zero_iff (n := 2) (by norm_num) |>.mp h0
     linarith
 
-/-! ## 3. The cost alphabet: two moves, one an involution, and they do not commute
+/-! ## 4. The cost alphabet: two moves, one an involution, and they do not commute
 
 Bounding a sum of the kind the split produces is done by moving a pair of exponents through two
 operations.  One is a chart transition between the additive and the frequency presentations; the
@@ -192,8 +404,8 @@ theorem theFrequencySwingIsAnInvolution : Function.Involutive frequencySwing := 
   intro p
   simp [frequencySwing]
 
-/-- **The difference contraction fixes the trivial cost.**  It is the anchor of the alphabet: a
-contraction with a fixed point, which is what makes iterating it converge rather than run away. -/
+/-- The difference contraction fixes the trivial cost. This records a fixed point; a quantitative
+convergence assertion additionally needs its own contraction/domain law. -/
 theorem theContractionFixesTheTrivialCost : differenceContraction trivialCost = trivialCost := by
   norm_num [differenceContraction, trivialCost]
 

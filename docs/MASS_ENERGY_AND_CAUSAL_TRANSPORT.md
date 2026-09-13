@@ -568,8 +568,10 @@ Hermiticity, occupation and consuming-Hamiltonian results are recorded in the re
 ## 13. Mass gaps, retained modes and navigation
 
 [proved-derived; formal-checked] `Millennium/MassGap.lean` transports a known quadratic lower
-bound through a controlled difference. If `F(v,v)>=Delta||v||^2` and
-`|G(v,v)-F(v,v)|<=epsilon||v||^2`, then `G(v,v)>=(Delta-epsilon)||v||^2`.
+bound through an oriented return. If `F(v,v)>=Delta||v||^2` and
+`G(v,v)-F(v,v)>=-epsilon||v||^2`, then `G(v,v)>=(Delta-epsilon)||v||^2`.
+The upper-return theorem independently uses the other polarity. The signed difference and
+both source forms remain present; a magnitude is not substituted for their state.
 The indexed version uses the same constants at every index. Apply it on the vacuum complement,
 with physical operator/units supplied. Bounding only the visible quotient can miss low-energy
 remainder modes; the complete bound is the useful source obligation for a gap-preserving reduction.
@@ -583,7 +585,7 @@ an equal scalar or an arbitrary finite spectrum does not identify their whole so
 [definition] The same concern appears in optimal navigation. A quotient distance is a lower
 bound until a full-state target-reaching lift matches it. `Foundation/TransportWord.lean`
 now proves a unit-cost distance/policy certificate and compiles its descending word.
-The exact group-navigation application uses actual cube face geometry to compare projected
+The exterior group-navigation reference uses actual cube face geometry to compare projected
 corner goals with complete sticker-state goals. Nonnegative path counting and coherent
 amplitude propagation are distinct receivers: cancellation can erase amplitude while paths
 remain. The synthesis gives their resolvent and soft-minimum connections explicitly.

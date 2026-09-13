@@ -1,5 +1,10 @@
 # Publication positioning distinguishes source, construction and priority
 
+[definition] Brandon subsequently clarified publication as a **beacon**: make the useful
+ideas available to others. The [beacon entry](../../docs/BEACON.md) now serves that purpose.
+The source comparisons and candidate subjects below remain useful, while manuscript packaging
+and submission priorities are not the requested programme or a condition of sharing.
+
 [definition] Brandon asks which work is ours, what is mathematically distinctive, what to
 publish and which external resources would improve the next campaign. This is a source and
 publication-positioning review at `4e138f8b` plus the current mass/navigation return. It

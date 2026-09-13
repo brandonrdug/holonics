@@ -1,12 +1,13 @@
-//! Exact shortest-word navigation on a declared finite group.
+//! Exterior reference: exact shortest-word navigation on a declared finite group.
 //!
-//! This owner supplies the finite Cayley/Schreier traversal primitive used by bounded
+//! This example support supplies the finite Cayley traversal comparison used by bounded
 //! configuration applications. The group and move costs are caller declarations; closure is
 //! performed by [`StructureGroup`], while this module derives distances, an optimal policy and the
 //! retained family of minimizing continuations. It does not infer a full puzzle model from a name
-//! or claim that a quotient lift is optimal for an omitted coordinate.
+//! or claim that a quotient lift is optimal for an omitted coordinate. Its priority queue
+//! is reference search apparatus, not the general native Holonics navigation/formation law.
 
-use crate::structure_group::{GroupElement, StructureGroup};
+use holonic_engine::structure_group::{GroupElement, StructureGroup};
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
 use std::cmp::Reverse;

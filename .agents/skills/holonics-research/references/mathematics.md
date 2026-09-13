@@ -14,6 +14,13 @@ invariant can reveal a quotient without classifying its whole source. Try a sepa
 when a receiver seems to determine more than it retains; use the failed pair to refine the
 construction, not to dismiss the surrounding subject.
 
+Separate an extremum certificate from the mechanism that approaches it. Recover existing
+Swing, action/first-variation and constitutive constructions before proposing enumeration.
+Keep an oriented difference before taking a magnitude; one-sided bounds often suffice.
+An identity such as `abs(x)=sqrt(x^2)` specifies a mathematical receiver, not a unique
+algorithm, physical motion or clock. A retained source/phase lift determines which path
+information remains available. Local stationarity alone is not global optimality.
+
 For Millennium/complexity questions, identify the actual endpoint statement and current local
 return. Continue a named sign, remainder, realization, representation or source problem.
 Do not demand an endpoint solution before using a local theorem, or substitute another HNN

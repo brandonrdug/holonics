@@ -7,8 +7,9 @@ machine-learning application.
 
 [definition] Current mathematics is navigated through the
 [formal framework](../../../docs/FORMAL_FRAMEWORK.md), source owners and dated evidence.
-The [publication positioning review](../../records/2026-09-13_PUBLICATION_POSITIONING_DISTINGUISHES_SOURCE_CONSTRUCTION_AND_PRIORITY.md)
-identifies the strongest theorem/artifact packages and their closest prior art. The synopsis,
+The [beacon](../../../docs/BEACON.md) makes the ideas and source readily available, and the
+[contribution review](../../records/2026-09-13_PUBLICATION_POSITIONING_DISTINGUISHES_SOURCE_CONSTRUCTION_AND_PRIORITY.md)
+locates their closest prior art. Manuscript packaging is not a condition of that sharing. The synopsis,
 its importable notation registry and the composed manuscripts below are presentation/research
 sources; they do not regrade all current mathematics or replace the live construction order.
 

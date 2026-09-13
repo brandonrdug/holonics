@@ -178,6 +178,17 @@ The [research recovery method](docs/DEVELOPMENT.md#research-recovery-and-derivat
 these existing duties before planning. A physical question returns a physical/mathematical
 consequence; its relevance is not decided by immediate Athena implementation.
 
+[project-postulate] Brandon's latest September 13 navigation correction starts from changing
+joint/mode incidence, admissible transport and oriented potential/current. Cube-piece and
+game-piece names are application charts, not native machinery boundaries. Derive a native
+continuation through its source-conditioned variation or constitutive relation; a scalar
+priority queue or scan over candidates is not the general Holonics navigation law. Preserve
+the source and relevant sign/phase, branch, momentum and preimage information before any
+magnitude or extremum receiver. Express polarized bounds directly where they suffice.
+Exterior finite-search comparisons retain their declared scope and do not schedule the
+native construction. “Publication” in this consolidation means a public beacon of useful
+ideas and source, not a manuscript-packaging campaign.
+
 [definition] `docs/canon/` is doctrine; `docs/plans/THE_ROADMAP.md` is the sole construction
 order; `CONSTRUCTION_STATE.md` is the sole current position. `research/`, formal source and
 papers provide evidence at their declared scopes. `archive/`, old commits, imported records and

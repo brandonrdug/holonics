@@ -31,6 +31,9 @@ Paths in code spans are repository-relative.
   [conversation-data guide](CONVERSATION_DATA.md) and `applications/conversation-data/providers.py`
   carry the detailed exterior codec and separate comparison/trace relations. Private logs and
   prepared datasets are optional local evidence; they are not included in a Git checkout.
+  For focused inspection, select the message occurrence first and print only its text blocks;
+  do not serialize base64 attachments or whole mixed-content records into tool output. Inspect
+  a required image through the image-reading tools instead of expanding its encoded bytes.
 - Apparatus, measured 2026-09-02: one NVIDIA GeForce RTX 4080 SUPER with 16 GiB, a Ryzen 9 7900X,
   30 GiB of system memory. The foreign realization is `/home/b/models/gemma-4-E4B-it` (15 GiB
   BF16, 2,130 tensors). Python apparatus for world and observer use only:

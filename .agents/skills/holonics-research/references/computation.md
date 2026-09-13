@@ -26,6 +26,13 @@ legitimate at their declared scope; native exactness does not ban them. A timeou
 unfinished run, not mathematical infeasibility. A useful inferred generator or mathematical
 output is reported for its own consequence and costs, without a vague intelligence qualifier.
 
+For native navigation, recover changing joint/mode incidence and derive the continuation
+from its oriented source relation. A finite priority-queue search is an exterior comparison,
+not a substitute for that law. A magnitude or extremum face must not replace the source,
+sign/phase, relevant momentum, admissible alternatives or residual. In games, retain the
+opponent/control quantifiers and state-dependent guards; in motion, retain momentum, contact,
+boundary and clock. An application classification is not a native topology.
+
 When the user asks for a simple bounded edit, make it and run its relevant check. This route
 does not require archive archaeology, a benchmark campaign or a new research record for an
 ordinary low-impact change. Use broader recovery when the requested relation or failure needs it.

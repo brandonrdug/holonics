@@ -1,0 +1,1552 @@
+{
+  "source": {
+    "constraint": "x*y=T",
+    "T": {
+      "numerator": "2",
+      "denominator": "1"
+    },
+    "step": {
+      "numerator": "1",
+      "denominator": "4"
+    },
+    "matrix": [
+      [
+        {
+          "numerator": "1",
+          "denominator": "1"
+        },
+        {
+          "numerator": "1",
+          "denominator": "2"
+        }
+      ],
+      [
+        {
+          "numerator": "1",
+          "denominator": "4"
+        },
+        {
+          "numerator": "1",
+          "denominator": "1"
+        }
+      ]
+    ]
+  },
+  "observations": [
+    {
+      "steps": 1,
+      "origin": {
+        "numerator": "1",
+        "denominator": "1"
+      },
+      "homogeneous_return": [
+        {
+          "numerator": "3",
+          "denominator": "2"
+        },
+        {
+          "numerator": "5",
+          "denominator": "4"
+        }
+      ],
+      "coordinate_face": {
+        "numerator": "6",
+        "denominator": "5"
+      },
+      "oriented_step": {
+        "numerator": "1",
+        "denominator": "5"
+      },
+      "signed_residual_before": {
+        "numerator": "-1",
+        "denominator": "1"
+      },
+      "signed_residual_after": {
+        "numerator": "-14",
+        "denominator": "25"
+      },
+      "work_before": {
+        "numerator": "3",
+        "denominator": "1"
+      },
+      "work_after": {
+        "numerator": "43",
+        "denominator": "15"
+      },
+      "matrix_determinant": {
+        "numerator": "7",
+        "denominator": "8"
+      },
+      "undivided_signed_residual": {
+        "numerator": "-7",
+        "denominator": "8"
+      },
+      "recovered_source": {
+        "numerator": "1",
+        "denominator": "1"
+      }
+    },
+    {
+      "steps": 1,
+      "origin": {
+        "numerator": "3",
+        "denominator": "1"
+      },
+      "homogeneous_return": [
+        {
+          "numerator": "7",
+          "denominator": "2"
+        },
+        {
+          "numerator": "7",
+          "denominator": "4"
+        }
+      ],
+      "coordinate_face": {
+        "numerator": "2",
+        "denominator": "1"
+      },
+      "oriented_step": {
+        "numerator": "-1",
+        "denominator": "1"
+      },
+      "signed_residual_before": {
+        "numerator": "7",
+        "denominator": "1"
+      },
+      "signed_residual_after": {
+        "numerator": "2",
+        "denominator": "1"
+      },
+      "work_before": {
+        "numerator": "11",
+        "denominator": "3"
+      },
+      "work_after": {
+        "numerator": "3",
+        "denominator": "1"
+      },
+      "matrix_determinant": {
+        "numerator": "7",
+        "denominator": "8"
+      },
+      "undivided_signed_residual": {
+        "numerator": "49",
+        "denominator": "8"
+      },
+      "recovered_source": {
+        "numerator": "3",
+        "denominator": "1"
+      }
+    },
+    {
+      "steps": 4,
+      "origin": {
+        "numerator": "1",
+        "denominator": "1"
+      },
+      "homogeneous_return": [
+        {
+          "numerator": "257",
+          "denominator": "64"
+        },
+        {
+          "numerator": "185",
+          "denominator": "64"
+        }
+      ],
+      "coordinate_face": {
+        "numerator": "257",
+        "denominator": "185"
+      },
+      "oriented_step": {
+        "numerator": "72",
+        "denominator": "185"
+      },
+      "signed_residual_before": {
+        "numerator": "-1",
+        "denominator": "1"
+      },
+      "signed_residual_after": {
+        "numerator": "-2401",
+        "denominator": "34225"
+      },
+      "work_before": {
+        "numerator": "3",
+        "denominator": "1"
+      },
+      "work_after": {
+        "numerator": "134499",
+        "denominator": "47545"
+      },
+      "matrix_determinant": {
+        "numerator": "2401",
+        "denominator": "4096"
+      },
+      "undivided_signed_residual": {
+        "numerator": "-2401",
+        "denominator": "4096"
+      },
+      "recovered_source": {
+        "numerator": "1",
+        "denominator": "1"
+      }
+    },
+    {
+      "steps": 4,
+      "origin": {
+        "numerator": "3",
+        "denominator": "1"
+      },
+      "homogeneous_return": [
+        {
+          "numerator": "483",
+          "denominator": "64"
+        },
+        {
+          "numerator": "329",
+          "denominator": "64"
+        }
+      ],
+      "coordinate_face": {
+        "numerator": "69",
+        "denominator": "47"
+      },
+      "oriented_step": {
+        "numerator": "-72",
+        "denominator": "47"
+      },
+      "signed_residual_before": {
+        "numerator": "7",
+        "denominator": "1"
+      },
+      "signed_residual_after": {
+        "numerator": "343",
+        "denominator": "2209"
+      },
+      "work_before": {
+        "numerator": "11",
+        "denominator": "3"
+      },
+      "work_after": {
+        "numerator": "9179",
+        "denominator": "3243"
+      },
+      "matrix_determinant": {
+        "numerator": "2401",
+        "denominator": "4096"
+      },
+      "undivided_signed_residual": {
+        "numerator": "16807",
+        "denominator": "4096"
+      },
+      "recovered_source": {
+        "numerator": "3",
+        "denominator": "1"
+      }
+    },
+    {
+      "steps": 16,
+      "origin": {
+        "numerator": "1",
+        "denominator": "1"
+      },
+      "homogeneous_return": [
+        {
+          "numerator": "2570817793",
+          "denominator": "16777216"
+        },
+        {
+          "numerator": "1817847265",
+          "denominator": "16777216"
+        }
+      ],
+      "coordinate_face": {
+        "numerator": "2570817793",
+        "denominator": "1817847265"
+      },
+      "oriented_step": {
+        "numerator": "752970528",
+        "denominator": "1817847265"
+      },
+      "signed_residual_before": {
+        "numerator": "-1",
+        "denominator": "1"
+      },
+      "signed_residual_after": {
+        "numerator": "-33232930569601",
+        "denominator": "3304568678867980225"
+      },
+      "work_before": {
+        "numerator": "3",
+        "denominator": "1"
+      },
+      "work_after": {
+        "numerator": "13218241482541351299",
+        "denominator": "4673354093818386145"
+      },
+      "matrix_determinant": {
+        "numerator": "33232930569601",
+        "denominator": "281474976710656"
+      },
+      "undivided_signed_residual": {
+        "numerator": "-33232930569601",
+        "denominator": "281474976710656"
+      },
+      "recovered_source": {
+        "numerator": "1",
+        "denominator": "1"
+      }
+    },
+    {
+      "steps": 16,
+      "origin": {
+        "numerator": "3",
+        "denominator": "1"
+      },
+      "homogeneous_return": [
+        {
+          "numerator": "4700571267",
+          "denominator": "16777216"
+        },
+        {
+          "numerator": "3323788321",
+          "denominator": "16777216"
+        }
+      ],
+      "coordinate_face": {
+        "numerator": "671510181",
+        "denominator": "474826903"
+      },
+      "oriented_step": {
+        "numerator": "-752970528",
+        "denominator": "474826903"
+      },
+      "signed_residual_before": {
+        "numerator": "7",
+        "denominator": "1"
+      },
+      "signed_residual_after": {
+        "numerator": "4747561509943",
+        "denominator": "225460587812571409"
+      },
+      "work_before": {
+        "numerator": "11",
+        "denominator": "3"
+      },
+      "work_after": {
+        "numerator": "901847098811795579",
+        "denominator": "318851099577199443"
+      },
+      "matrix_determinant": {
+        "numerator": "33232930569601",
+        "denominator": "281474976710656"
+      },
+      "undivided_signed_residual": {
+        "numerator": "232630513987207",
+        "denominator": "281474976710656"
+      },
+      "recovered_source": {
+        "numerator": "3",
+        "denominator": "1"
+      }
+    }
+  ],
+  "native_returns": [
+    {
+      "event": "mathematical-return",
+      "schema": "org.holonics.hna.stream-event.v1",
+      "sequence": 1,
+      "value": {
+        "construction_work": {
+          "additions": [
+            12
+          ],
+          "cumulative_bits": [
+            17
+          ],
+          "dependency_span": [
+            3
+          ],
+          "divisions": [
+            4
+          ],
+          "entries_written": [
+            8
+          ],
+          "multiplications": [
+            12
+          ],
+          "peak_bits": [
+            4
+          ],
+          "resident_entries": [
+            4
+          ]
+        },
+        "cost": {
+          "census_after": {
+            "allocations": 6,
+            "captured_launches": 0,
+            "control_launches": 0,
+            "deed_launches": 0,
+            "device_to_device_octets": 0,
+            "egress_receipt_octets": 0,
+            "egress_section_octets": 0,
+            "ingress_octets": 208,
+            "resident_octets_now": 208,
+            "resident_octets_peak": 208,
+            "section_read_outs": 0,
+            "synchronizations": 0
+          },
+          "census_before": {
+            "allocations": 0,
+            "captured_launches": 0,
+            "control_launches": 0,
+            "deed_launches": 0,
+            "device_to_device_octets": 0,
+            "egress_receipt_octets": 0,
+            "egress_section_octets": 0,
+            "ingress_octets": 0,
+            "resident_octets_now": 0,
+            "resident_octets_peak": 0,
+            "section_read_outs": 0,
+            "synchronizations": 0
+          },
+          "elapsed_microseconds": 691,
+          "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+        },
+        "derived_rank": 2,
+        "execution": "resident exact rational packet",
+        "factors": {
+          "left_extent": 2,
+          "left_forms": [
+            [
+              {
+                "denominator": "1",
+                "numerator": "1"
+              },
+              {
+                "denominator": "1",
+                "numerator": "0"
+              }
+            ],
+            [
+              {
+                "denominator": "1",
+                "numerator": "0"
+              },
+              {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            ]
+          ],
+          "output_extent": 2,
+          "products": 2,
+          "receiver_family": {
+            "free_row_directions": [],
+            "particular": [
+              [
+                {
+                  "denominator": "1",
+                  "numerator": "1"
+                },
+                {
+                  "denominator": "2",
+                  "numerator": "1"
+                }
+              ],
+              [
+                {
+                  "denominator": "4",
+                  "numerator": "1"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "1"
+                }
+              ]
+            ],
+            "scope": "every free row direction annihilates the complete retained product core"
+          },
+          "right_extent": 1,
+          "right_forms": [
+            [
+              {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            ],
+            [
+              {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            ]
+          ],
+          "tensor_chart": "column i*right_extent+j",
+          "tensor_image": [
+            [
+              {
+                "denominator": "1",
+                "numerator": "1"
+              },
+              {
+                "denominator": "1",
+                "numerator": "0"
+              }
+            ],
+            [
+              {
+                "denominator": "1",
+                "numerator": "0"
+              },
+              {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            ]
+          ]
+        },
+        "linear_unit_right_port": true,
+        "operator": 0,
+        "status": "constructed",
+        "unit_port_lowering": "right=[1]; carrier lanes are not a bilinear-rank optimality claim"
+      }
+    },
+    {
+      "event": "mathematical-return",
+      "schema": "org.holonics.hna.stream-event.v1",
+      "sequence": 2,
+      "value": {
+        "construction_work": {
+          "additions": [
+            12
+          ],
+          "cumulative_bits": [
+            17
+          ],
+          "dependency_span": [
+            3
+          ],
+          "divisions": [
+            4
+          ],
+          "entries_written": [
+            8
+          ],
+          "multiplications": [
+            12
+          ],
+          "peak_bits": [
+            4
+          ],
+          "resident_entries": [
+            4
+          ]
+        },
+        "cost": {
+          "census_after": {
+            "allocations": 12,
+            "captured_launches": 0,
+            "control_launches": 0,
+            "deed_launches": 0,
+            "device_to_device_octets": 0,
+            "egress_receipt_octets": 0,
+            "egress_section_octets": 0,
+            "ingress_octets": 416,
+            "resident_octets_now": 416,
+            "resident_octets_peak": 416,
+            "section_read_outs": 0,
+            "synchronizations": 0
+          },
+          "census_before": {
+            "allocations": 6,
+            "captured_launches": 0,
+            "control_launches": 0,
+            "deed_launches": 0,
+            "device_to_device_octets": 0,
+            "egress_receipt_octets": 0,
+            "egress_section_octets": 0,
+            "ingress_octets": 208,
+            "resident_octets_now": 208,
+            "resident_octets_peak": 208,
+            "section_read_outs": 0,
+            "synchronizations": 0
+          },
+          "elapsed_microseconds": 564,
+          "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+        },
+        "derived_rank": 2,
+        "execution": "resident exact rational packet",
+        "exponent": 1,
+        "factors": {
+          "left_extent": 2,
+          "left_forms": [
+            [
+              {
+                "denominator": "1",
+                "numerator": "1"
+              },
+              {
+                "denominator": "1",
+                "numerator": "0"
+              }
+            ],
+            [
+              {
+                "denominator": "1",
+                "numerator": "0"
+              },
+              {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            ]
+          ],
+          "output_extent": 2,
+          "products": 2,
+          "receiver_family": {
+            "free_row_directions": [],
+            "particular": [
+              [
+                {
+                  "denominator": "1",
+                  "numerator": "1"
+                },
+                {
+                  "denominator": "2",
+                  "numerator": "1"
+                }
+              ],
+              [
+                {
+                  "denominator": "4",
+                  "numerator": "1"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "1"
+                }
+              ]
+            ],
+            "scope": "every free row direction annihilates the complete retained product core"
+          },
+          "right_extent": 1,
+          "right_forms": [
+            [
+              {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            ],
+            [
+              {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            ]
+          ],
+          "tensor_chart": "column i*right_extent+j",
+          "tensor_image": [
+            [
+              {
+                "denominator": "1",
+                "numerator": "1"
+              },
+              {
+                "denominator": "1",
+                "numerator": "0"
+              }
+            ],
+            [
+              {
+                "denominator": "1",
+                "numerator": "0"
+              },
+              {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            ]
+          ]
+        },
+        "linear_unit_right_port": true,
+        "operator": 1,
+        "power_construction_work": {
+          "additions": [
+            49
+          ],
+          "cumulative_bits": [
+            167
+          ],
+          "dependency_span": [
+            6
+          ],
+          "divisions": [
+            10
+          ],
+          "entries_written": [
+            58
+          ],
+          "multiplications": [
+            53
+          ],
+          "peak_bits": [
+            8
+          ],
+          "resident_entries": [
+            12
+          ]
+        },
+        "power_of": 0,
+        "power_scope": {
+          "execution": "exterior exact construction; resident application",
+          "reduction": "exact minimal-polynomial exponentiation by squaring",
+          "source": "declared retained linear operator matrix reconstructed from its exact receiver/core",
+          "source_shape": [
+            2,
+            2
+          ]
+        },
+        "source_reconstruction_work": {
+          "additions": [
+            8
+          ],
+          "cumulative_bits": [
+            11
+          ],
+          "dependency_span": [
+            1
+          ],
+          "divisions": [],
+          "entries_written": [
+            4
+          ],
+          "multiplications": [
+            8
+          ],
+          "peak_bits": [
+            4
+          ],
+          "resident_entries": [
+            4
+          ]
+        },
+        "status": "constructed",
+        "unit_port_lowering": "right=[1]; carrier lanes are not a bilinear-rank optimality claim"
+      }
+    },
+    {
+      "event": "mathematical-return",
+      "schema": "org.holonics.hna.stream-event.v1",
+      "sequence": 3,
+      "value": {
+        "cost": {
+          "census_after": {
+            "allocations": 26,
+            "captured_launches": 8,
+            "control_launches": 0,
+            "deed_launches": 1,
+            "device_to_device_octets": 0,
+            "egress_receipt_octets": 256,
+            "egress_section_octets": 48,
+            "ingress_octets": 508,
+            "resident_octets_now": 416,
+            "resident_octets_peak": 956,
+            "section_read_outs": 1,
+            "synchronizations": 1
+          },
+          "census_before": {
+            "allocations": 12,
+            "captured_launches": 0,
+            "control_launches": 0,
+            "deed_launches": 0,
+            "device_to_device_octets": 0,
+            "egress_receipt_octets": 0,
+            "egress_section_octets": 0,
+            "ingress_octets": 416,
+            "resident_octets_now": 416,
+            "resident_octets_peak": 416,
+            "section_read_outs": 0,
+            "synchronizations": 0
+          },
+          "elapsed_microseconds": 465,
+          "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+        },
+        "intermediate_section_readouts": 0,
+        "operator": 1,
+        "output": [
+          {
+            "denominator": "2",
+            "numerator": "3"
+          },
+          {
+            "denominator": "4",
+            "numerator": "5"
+          }
+        ],
+        "output_emitted": true,
+        "product": null,
+        "source_products_recomputed": true,
+        "status": "applied"
+      }
+    },
+    {
+      "event": "mathematical-return",
+      "schema": "org.holonics.hna.stream-event.v1",
+      "sequence": 4,
+      "value": {
+        "cost": {
+          "census_after": {
+            "allocations": 40,
+            "captured_launches": 16,
+            "control_launches": 0,
+            "deed_launches": 2,
+            "device_to_device_octets": 0,
+            "egress_receipt_octets": 512,
+            "egress_section_octets": 96,
+            "ingress_octets": 600,
+            "resident_octets_now": 416,
+            "resident_octets_peak": 956,
+            "section_read_outs": 2,
+            "synchronizations": 2
+          },
+          "census_before": {
+            "allocations": 26,
+            "captured_launches": 8,
+            "control_launches": 0,
+            "deed_launches": 1,
+            "device_to_device_octets": 0,
+            "egress_receipt_octets": 256,
+            "egress_section_octets": 48,
+            "ingress_octets": 508,
+            "resident_octets_now": 416,
+            "resident_octets_peak": 956,
+            "section_read_outs": 1,
+            "synchronizations": 1
+          },
+          "elapsed_microseconds": 220,
+          "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+        },
+        "intermediate_section_readouts": 0,
+        "operator": 1,
+        "output": [
+          {
+            "denominator": "2",
+            "numerator": "7"
+          },
+          {
+            "denominator": "4",
+            "numerator": "7"
+          }
+        ],
+        "output_emitted": true,
+        "product": null,
+        "source_products_recomputed": true,
+        "status": "applied"
+      }
+    },
+    {
+      "event": "mathematical-return",
+      "schema": "org.holonics.hna.stream-event.v1",
+      "sequence": 5,
+      "value": {
+        "construction_work": {
+          "additions": [
+            12
+          ],
+          "cumulative_bits": [
+            49
+          ],
+          "dependency_span": [
+            3
+          ],
+          "divisions": [
+            4
+          ],
+          "entries_written": [
+            8
+          ],
+          "multiplications": [
+            12
+          ],
+          "peak_bits": [
+            14
+          ],
+          "resident_entries": [
+            4
+          ]
+        },
+        "cost": {
+          "census_after": {
+            "allocations": 46,
+            "captured_launches": 16,
+            "control_launches": 0,
+            "deed_launches": 2,
+            "device_to_device_octets": 0,
+            "egress_receipt_octets": 512,
+            "egress_section_octets": 96,
+            "ingress_octets": 808,
+            "resident_octets_now": 624,
+            "resident_octets_peak": 956,
+            "section_read_outs": 2,
+            "synchronizations": 2
+          },
+          "census_before": {
+            "allocations": 40,
+            "captured_launches": 16,
+            "control_launches": 0,
+            "deed_launches": 2,
+            "device_to_device_octets": 0,
+            "egress_receipt_octets": 512,
+            "egress_section_octets": 96,
+            "ingress_octets": 600,
+            "resident_octets_now": 416,
+            "resident_octets_peak": 956,
+            "section_read_outs": 2,
+            "synchronizations": 2
+          },
+          "elapsed_microseconds": 650,
+          "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+        },
+        "derived_rank": 2,
+        "execution": "resident exact rational packet",
+        "exponent": 4,
+        "factors": {
+          "left_extent": 2,
+          "left_forms": [
+            [
+              {
+                "denominator": "1",
+                "numerator": "1"
+              },
+              {
+                "denominator": "1",
+                "numerator": "0"
+              }
+            ],
+            [
+              {
+                "denominator": "1",
+                "numerator": "0"
+              },
+              {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            ]
+          ],
+          "output_extent": 2,
+          "products": 2,
+          "receiver_family": {
+            "free_row_directions": [],
+            "particular": [
+              [
+                {
+                  "denominator": "64",
+                  "numerator": "113"
+                },
+                {
+                  "denominator": "4",
+                  "numerator": "9"
+                }
+              ],
+              [
+                {
+                  "denominator": "8",
+                  "numerator": "9"
+                },
+                {
+                  "denominator": "64",
+                  "numerator": "113"
+                }
+              ]
+            ],
+            "scope": "every free row direction annihilates the complete retained product core"
+          },
+          "right_extent": 1,
+          "right_forms": [
+            [
+              {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            ],
+            [
+              {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            ]
+          ],
+          "tensor_chart": "column i*right_extent+j",
+          "tensor_image": [
+            [
+              {
+                "denominator": "1",
+                "numerator": "1"
+              },
+              {
+                "denominator": "1",
+                "numerator": "0"
+              }
+            ],
+            [
+              {
+                "denominator": "1",
+                "numerator": "0"
+              },
+              {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            ]
+          ]
+        },
+        "linear_unit_right_port": true,
+        "operator": 2,
+        "power_construction_work": {
+          "additions": [
+            61
+          ],
+          "cumulative_bits": [
+            287
+          ],
+          "dependency_span": [
+            6
+          ],
+          "divisions": [
+            12
+          ],
+          "entries_written": [
+            72
+          ],
+          "multiplications": [
+            65
+          ],
+          "peak_bits": [
+            15
+          ],
+          "resident_entries": [
+            12
+          ]
+        },
+        "power_of": 0,
+        "power_scope": {
+          "execution": "exterior exact construction; resident application",
+          "reduction": "exact minimal-polynomial exponentiation by squaring",
+          "source": "declared retained linear operator matrix reconstructed from its exact receiver/core",
+          "source_shape": [
+            2,
+            2
+          ]
+        },
+        "source_reconstruction_work": {
+          "additions": [
+            8
+          ],
+          "cumulative_bits": [
+            11
+          ],
+          "dependency_span": [
+            1
+          ],
+          "divisions": [],
+          "entries_written": [
+            4
+          ],
+          "multiplications": [
+            8
+          ],
+          "peak_bits": [
+            4
+          ],
+          "resident_entries": [
+            4
+          ]
+        },
+        "status": "constructed",
+        "unit_port_lowering": "right=[1]; carrier lanes are not a bilinear-rank optimality claim"
+      }
+    },
+    {
+      "event": "mathematical-return",
+      "schema": "org.holonics.hna.stream-event.v1",
+      "sequence": 6,
+      "value": {
+        "cost": {
+          "census_after": {
+            "allocations": 60,
+            "captured_launches": 24,
+            "control_launches": 0,
+            "deed_launches": 3,
+            "device_to_device_octets": 0,
+            "egress_receipt_octets": 768,
+            "egress_section_octets": 144,
+            "ingress_octets": 900,
+            "resident_octets_now": 624,
+            "resident_octets_peak": 1164,
+            "section_read_outs": 3,
+            "synchronizations": 3
+          },
+          "census_before": {
+            "allocations": 46,
+            "captured_launches": 16,
+            "control_launches": 0,
+            "deed_launches": 2,
+            "device_to_device_octets": 0,
+            "egress_receipt_octets": 512,
+            "egress_section_octets": 96,
+            "ingress_octets": 808,
+            "resident_octets_now": 624,
+            "resident_octets_peak": 956,
+            "section_read_outs": 2,
+            "synchronizations": 2
+          },
+          "elapsed_microseconds": 203,
+          "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+        },
+        "intermediate_section_readouts": 0,
+        "operator": 2,
+        "output": [
+          {
+            "denominator": "64",
+            "numerator": "257"
+          },
+          {
+            "denominator": "64",
+            "numerator": "185"
+          }
+        ],
+        "output_emitted": true,
+        "product": null,
+        "source_products_recomputed": true,
+        "status": "applied"
+      }
+    },
+    {
+      "event": "mathematical-return",
+      "schema": "org.holonics.hna.stream-event.v1",
+      "sequence": 7,
+      "value": {
+        "cost": {
+          "census_after": {
+            "allocations": 74,
+            "captured_launches": 32,
+            "control_launches": 0,
+            "deed_launches": 4,
+            "device_to_device_octets": 0,
+            "egress_receipt_octets": 1024,
+            "egress_section_octets": 192,
+            "ingress_octets": 992,
+            "resident_octets_now": 624,
+            "resident_octets_peak": 1164,
+            "section_read_outs": 4,
+            "synchronizations": 4
+          },
+          "census_before": {
+            "allocations": 60,
+            "captured_launches": 24,
+            "control_launches": 0,
+            "deed_launches": 3,
+            "device_to_device_octets": 0,
+            "egress_receipt_octets": 768,
+            "egress_section_octets": 144,
+            "ingress_octets": 900,
+            "resident_octets_now": 624,
+            "resident_octets_peak": 1164,
+            "section_read_outs": 3,
+            "synchronizations": 3
+          },
+          "elapsed_microseconds": 219,
+          "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+        },
+        "intermediate_section_readouts": 0,
+        "operator": 2,
+        "output": [
+          {
+            "denominator": "64",
+            "numerator": "483"
+          },
+          {
+            "denominator": "64",
+            "numerator": "329"
+          }
+        ],
+        "output_emitted": true,
+        "product": null,
+        "source_products_recomputed": true,
+        "status": "applied"
+      }
+    },
+    {
+      "event": "mathematical-return",
+      "schema": "org.holonics.hna.stream-event.v1",
+      "sequence": 8,
+      "value": {
+        "construction_work": {
+          "additions": [
+            12
+          ],
+          "cumulative_bits": [
+            205
+          ],
+          "dependency_span": [
+            3
+          ],
+          "divisions": [
+            4
+          ],
+          "entries_written": [
+            8
+          ],
+          "multiplications": [
+            12
+          ],
+          "peak_bits": [
+            55
+          ],
+          "resident_entries": [
+            4
+          ]
+        },
+        "cost": {
+          "census_after": {
+            "allocations": 80,
+            "captured_launches": 32,
+            "control_launches": 0,
+            "deed_launches": 4,
+            "device_to_device_octets": 0,
+            "egress_receipt_octets": 1024,
+            "egress_section_octets": 192,
+            "ingress_octets": 1200,
+            "resident_octets_now": 832,
+            "resident_octets_peak": 1164,
+            "section_read_outs": 4,
+            "synchronizations": 4
+          },
+          "census_before": {
+            "allocations": 74,
+            "captured_launches": 32,
+            "control_launches": 0,
+            "deed_launches": 4,
+            "device_to_device_octets": 0,
+            "egress_receipt_octets": 1024,
+            "egress_section_octets": 192,
+            "ingress_octets": 992,
+            "resident_octets_now": 624,
+            "resident_octets_peak": 1164,
+            "section_read_outs": 4,
+            "synchronizations": 4
+          },
+          "elapsed_microseconds": 1226,
+          "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+        },
+        "derived_rank": 2,
+        "execution": "resident exact rational packet",
+        "exponent": 16,
+        "factors": {
+          "left_extent": 2,
+          "left_forms": [
+            [
+              {
+                "denominator": "1",
+                "numerator": "1"
+              },
+              {
+                "denominator": "1",
+                "numerator": "0"
+              }
+            ],
+            [
+              {
+                "denominator": "1",
+                "numerator": "0"
+              },
+              {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            ]
+          ],
+          "output_extent": 2,
+          "products": 2,
+          "receiver_family": {
+            "free_row_directions": [],
+            "particular": [
+              [
+                {
+                  "denominator": "16777216",
+                  "numerator": "1064876737"
+                },
+                {
+                  "denominator": "262144",
+                  "numerator": "23530329"
+                }
+              ],
+              [
+                {
+                  "denominator": "524288",
+                  "numerator": "23530329"
+                },
+                {
+                  "denominator": "16777216",
+                  "numerator": "1064876737"
+                }
+              ]
+            ],
+            "scope": "every free row direction annihilates the complete retained product core"
+          },
+          "right_extent": 1,
+          "right_forms": [
+            [
+              {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            ],
+            [
+              {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            ]
+          ],
+          "tensor_chart": "column i*right_extent+j",
+          "tensor_image": [
+            [
+              {
+                "denominator": "1",
+                "numerator": "1"
+              },
+              {
+                "denominator": "1",
+                "numerator": "0"
+              }
+            ],
+            [
+              {
+                "denominator": "1",
+                "numerator": "0"
+              },
+              {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            ]
+          ]
+        },
+        "linear_unit_right_port": true,
+        "operator": 3,
+        "power_construction_work": {
+          "additions": [
+            75
+          ],
+          "cumulative_bits": [
+            964
+          ],
+          "dependency_span": [
+            6
+          ],
+          "divisions": [
+            14
+          ],
+          "entries_written": [
+            88
+          ],
+          "multiplications": [
+            79
+          ],
+          "peak_bits": [
+            56
+          ],
+          "resident_entries": [
+            12
+          ]
+        },
+        "power_of": 0,
+        "power_scope": {
+          "execution": "exterior exact construction; resident application",
+          "reduction": "exact minimal-polynomial exponentiation by squaring",
+          "source": "declared retained linear operator matrix reconstructed from its exact receiver/core",
+          "source_shape": [
+            2,
+            2
+          ]
+        },
+        "source_reconstruction_work": {
+          "additions": [
+            8
+          ],
+          "cumulative_bits": [
+            11
+          ],
+          "dependency_span": [
+            1
+          ],
+          "divisions": [],
+          "entries_written": [
+            4
+          ],
+          "multiplications": [
+            8
+          ],
+          "peak_bits": [
+            4
+          ],
+          "resident_entries": [
+            4
+          ]
+        },
+        "status": "constructed",
+        "unit_port_lowering": "right=[1]; carrier lanes are not a bilinear-rank optimality claim"
+      }
+    },
+    {
+      "event": "mathematical-return",
+      "schema": "org.holonics.hna.stream-event.v1",
+      "sequence": 9,
+      "value": {
+        "cost": {
+          "census_after": {
+            "allocations": 94,
+            "captured_launches": 40,
+            "control_launches": 0,
+            "deed_launches": 5,
+            "device_to_device_octets": 0,
+            "egress_receipt_octets": 1280,
+            "egress_section_octets": 240,
+            "ingress_octets": 1292,
+            "resident_octets_now": 832,
+            "resident_octets_peak": 1372,
+            "section_read_outs": 5,
+            "synchronizations": 5
+          },
+          "census_before": {
+            "allocations": 80,
+            "captured_launches": 32,
+            "control_launches": 0,
+            "deed_launches": 4,
+            "device_to_device_octets": 0,
+            "egress_receipt_octets": 1024,
+            "egress_section_octets": 192,
+            "ingress_octets": 1200,
+            "resident_octets_now": 832,
+            "resident_octets_peak": 1164,
+            "section_read_outs": 4,
+            "synchronizations": 4
+          },
+          "elapsed_microseconds": 213,
+          "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+        },
+        "intermediate_section_readouts": 0,
+        "operator": 3,
+        "output": [
+          {
+            "denominator": "16777216",
+            "numerator": "2570817793"
+          },
+          {
+            "denominator": "16777216",
+            "numerator": "1817847265"
+          }
+        ],
+        "output_emitted": true,
+        "product": null,
+        "source_products_recomputed": true,
+        "status": "applied"
+      }
+    },
+    {
+      "event": "mathematical-return",
+      "schema": "org.holonics.hna.stream-event.v1",
+      "sequence": 10,
+      "value": {
+        "cost": {
+          "census_after": {
+            "allocations": 108,
+            "captured_launches": 48,
+            "control_launches": 0,
+            "deed_launches": 6,
+            "device_to_device_octets": 0,
+            "egress_receipt_octets": 1536,
+            "egress_section_octets": 288,
+            "ingress_octets": 1384,
+            "resident_octets_now": 832,
+            "resident_octets_peak": 1372,
+            "section_read_outs": 6,
+            "synchronizations": 6
+          },
+          "census_before": {
+            "allocations": 94,
+            "captured_launches": 40,
+            "control_launches": 0,
+            "deed_launches": 5,
+            "device_to_device_octets": 0,
+            "egress_receipt_octets": 1280,
+            "egress_section_octets": 240,
+            "ingress_octets": 1292,
+            "resident_octets_now": 832,
+            "resident_octets_peak": 1372,
+            "section_read_outs": 5,
+            "synchronizations": 5
+          },
+          "elapsed_microseconds": 213,
+          "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+        },
+        "intermediate_section_readouts": 0,
+        "operator": 3,
+        "output": [
+          {
+            "denominator": "16777216",
+            "numerator": "4700571267"
+          },
+          {
+            "denominator": "16777216",
+            "numerator": "3323788321"
+          }
+        ],
+        "output_emitted": true,
+        "product": null,
+        "source_products_recomputed": true,
+        "status": "applied"
+      }
+    }
+  ],
+  "process_receipt": {
+    "schema": "org.holonics.hna.mathematical-stream-process.v1",
+    "disposition": "input-exhausted",
+    "stream_error": null,
+    "transport_sequence": 10,
+    "inspect": {
+      "census": {
+        "allocations": 108,
+        "captured_launches": 48,
+        "control_launches": 0,
+        "deed_launches": 6,
+        "device_to_device_octets": 0,
+        "egress_receipt_octets": 1536,
+        "egress_section_octets": 288,
+        "ingress_octets": 1384,
+        "resident_octets_now": 832,
+        "resident_octets_peak": 1372,
+        "section_read_outs": 6,
+        "synchronizations": 6
+      },
+      "operators": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "pending_constructions": [],
+      "relations": [],
+      "retained_products": [],
+      "scope": "native-mathematical-application-session"
+    },
+    "elapsed_microseconds": 265117
+  },
+  "scope": "declared split relation; existing fixed-linear power construction and resident application; source signs and undivided pair retained; exterior exact ratio decoder/reference checks; no city/chess solver or rule-acquisition claim"
+}

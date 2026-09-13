@@ -87,33 +87,35 @@ theorem theGapIsThePositivityOfTheSphereInfimum (F : ReceiverForm V) :
     F.IsCoercive ↔ ∃ Δ : ℝ, 0 < Δ ∧ ∀ r ∈ sphereReadings F, Δ ≤ r :=
   ⟨theGapBoundsTheSphere, fun ⟨_, hΔ, h⟩ => theSphereBoundIsAGap hΔ h⟩
 
-/-- **A RETAINED FORM SURVIVES A SMALL QUADRATIC DIFFERENCE.**  If `F` has quadratic lower bound
-`Δ` and the diagonal difference `G.B v v - F.B v v` is bounded in absolute value by
-`ε ‖v‖²`, then `G` has the explicit lower bound `(Δ - ε) ‖v‖²`.  This is a receiver-form
-stability law; it does not make a scale-dependent bound uniform across a family. -/
+/-- The signed lower return, rather than an absolute-value projection, is enough to transport
+the lower gap. The complete forms and oriented difference remain in the statement. -/
 theorem theGapSurvivesReceiverDifference (F G : ReceiverForm V) {Δ ε : ℝ}
     (_hΔ : 0 < Δ) (hF : ∀ v : V, Δ * ‖v‖ ^ 2 ≤ F.B v v)
-    (hDifference : ∀ v : V, |G.B v v - F.B v v| ≤ ε * ‖v‖ ^ 2)
+    (hDifference : ∀ v : V, -(ε * ‖v‖ ^ 2) ≤ G.B v v - F.B v v)
     (hε : ε < Δ) : G.IsCoercive := by
   refine ⟨Δ - ε, sub_pos.mpr hε, fun v => ?_⟩
-  have hLower : -(ε * ‖v‖ ^ 2) ≤ G.B v v - F.B v v :=
-    neg_le_of_abs_le (hDifference v)
-  nlinarith [hF v]
+  nlinarith [hF v, hDifference v]
 
 /-- The quantitative inequality itself is exposed for physical scaling/remainder consumers. -/
 theorem receiverDifference_lower_bound (F G : ReceiverForm V) {Δ ε : ℝ}
     (hF : ∀ v : V, Δ * ‖v‖ ^ 2 ≤ F.B v v)
-    (hDifference : ∀ v : V, |G.B v v - F.B v v| ≤ ε * ‖v‖ ^ 2) (v : V) :
+    (hDifference : ∀ v : V, -(ε * ‖v‖ ^ 2) ≤ G.B v v - F.B v v) (v : V) :
     (Δ - ε) * ‖v‖ ^ 2 ≤ G.B v v := by
-  have hLower := neg_le_of_abs_le (hDifference v)
-  nlinarith [hF v]
+  nlinarith [hF v, hDifference v]
+
+/-- The upper return has its own polarity and allowance; it need not mirror the lower one. -/
+theorem receiverDifference_upper_bound (F G : ReceiverForm V) {ceiling ε : ℝ}
+    (hF : ∀ v : V, F.B v v ≤ ceiling * ‖v‖ ^ 2)
+    (hDifference : ∀ v : V, G.B v v - F.B v v ≤ ε * ‖v‖ ^ 2) (v : V) :
+    G.B v v ≤ (ceiling + ε) * ‖v‖ ^ 2 := by
+  nlinarith [hF v, hDifference v]
 
 /-- The same perturbation bound can be reused at every index of a family on one carrier. -/
 theorem familyGapSurvivesReceiverDifference {Index : Type*}
     (F G : Index → ReceiverForm V) {Δ ε : ℝ}
     (_hΔ : 0 < Δ) (hF : ∀ (index : Index) (v : V), Δ * ‖v‖ ^ 2 ≤ (F index).B v v)
     (hDifference : ∀ (index : Index) (v : V),
-      |(G index).B v v - (F index).B v v| ≤ ε * ‖v‖ ^ 2)
+      -(ε * ‖v‖ ^ 2) ≤ (G index).B v v - (F index).B v v)
     (hε : ε < Δ) :
     0 < Δ - ε ∧ ∀ (index : Index) (v : V), (Δ - ε) * ‖v‖ ^ 2 ≤ (G index).B v v := by
   refine ⟨sub_pos.mpr hε, ?_⟩
