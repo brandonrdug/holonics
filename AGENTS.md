@@ -185,6 +185,14 @@ contract. It does not define intelligence by state mutation or require a separat
 event demonstration for an already demonstrated solver inference. Develop and explain the
 generating relation being constructed; causal continuity is implicit in its execution.
 
+[definition] Brandon's September 13 correction identifies **prediction release with output of
+the generated face**. State the source/conditions, generator, receiver and emitted presentation;
+text reconfiguration, correction and continuation are concrete uses of that relation. Retaining
+a comparison handle, advancing the body or incorporating a later response are operation contracts,
+not separate faculties or prerequisites for counting that face as output. Before implementation,
+replace phrases such as "actual context", "complete release" and "sufficient continuation"
+with the coefficient/constraint equation, receiver map or update identity they are meant to name.
+
 - One continuing ecology has one move owner. Do not clone it for rollback, inspection, branching,
   scheduling or placement. Share immutable standing; branches own their differences. Stage deltas
   or transfer ownership recoverably before atomic change.

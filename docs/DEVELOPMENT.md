@@ -35,6 +35,15 @@ can expose a previously hidden phase; an unsuccessful language reply can identif
 relation. State that content directly. A changed state, successful round-trip, test count or
 larger exposure does not by itself explain the learned relation or establish usefulness.
 
+[project-postulate] Prediction release is output of a generated face. Describe its source,
+generator, receiver and requested transformation before discussing lifecycle plumbing. A
+read-only forecast can already return output; a comparison handle, body update or later
+observation has its own contract. Replace "actual context", "complete release", "sufficient
+continuation" or a generic learning/intelligence criterion with the coefficient equation,
+operator composition, retained statistic or receiver identity that the task needs. The
+[blueprint's concrete cases](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#generated-faces-reconfiguration-correction-and-continuation)
+state chunk reconfiguration, correction and continuation in this form.
+
 [definition] Diagnose prolonged work at its actual consumer. Whole-prefix reevaluation calls
 for an economical sufficient continuation. Dense future tuples call for a factor/modal form
 when the requested receiver permits it. Early source acknowledgement calls for repairing the

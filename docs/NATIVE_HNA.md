@@ -128,9 +128,12 @@ relates the current joint preview to actual complex analyzers, clocked source ch
 generator code costs. Its C5 and C5xC5 application infers monic recurrence coefficients with the
 existing exact matrix preimage owner, lowers requested powers and consumes them through the
 public resident mathematical session. Its conjugate-phase inputs have equal separate
-intensities and different later analyzer powers. This is a verified mathematical application;
-the current learned joint-preview decoder still needs its actual analyzer/clock/feedback and
-economical continuation binding. Logical epochs are chronology, not a physical time unit.
+intensities and different later analyzer powers. This is a verified mathematical application.
+The current joint-preview API already returns generated forecast output. Further analyzer,
+clock, body-update or observation maps are specified by the requested use; they are not another
+generative faculty that must be completed before that face counts as output. The blueprint's
+chunk/conditional-equation examples state the source and receiver construction. Logical epochs
+retain their chronology meaning; a physical clock additionally has its declared unit and law.
 
 [definition] `ResidentGeneratorNeighborhood::with_shared_condition` moves existing learned
 relations into one owner with an explicitly shared condition chart. Each law's actual dependence

@@ -237,6 +237,11 @@ you can only causally justify its existence to the extent of a limit."*
 uses that same distinction prospectively. Preparation configures an admitted transport;
 release is outward current relative to a moving boundary; subsequent contact supplies its
 actual received consequence. Prediction transports compatible sources through that law.
+Brandon's September 13 clarification identifies a generated prediction face with the output
+released at its receiving boundary. A scalar answer, corrected text chunk or prospective section
+does not await another generative faculty to become output. Whether the application also
+advances its body, retains a comparison or receives a later observation is a separate operation
+contract, not a prerequisite to that face's release.
 Its deterministic measure pushforward, impulse/work, changing capacitance and observer-volume
 identities are derived explicitly. A probability or tolerance is a declared receiver of the
 family, not a universal activation threshold or a demand for exact historical reconstruction.

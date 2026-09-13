@@ -109,13 +109,14 @@ returned. The remaining source/condition and accumulating-programme limitations 
 construction questions. CONSTRUCTION_STATE records their current evidence; the old example-only
 workshop description is not a remaining task.
 
-[definition] The [September 13 message/plan check](../../research/records/2026-09-13_DIRECT_MESSAGES_CONFIRM_THE_ATHENA_CONSTRUCTION_ORDER.md)
-confirms the immediate operation: source-conditioned joint prediction and compound release,
-including actual self-re-entry/feedback. Context formation and economical continuation enter
-that same increment as their dependencies permit. The blueprint names the current preview and
-the missing consuming map; it does not impose completion of all context or compression research
-before using an already admitted source. Further elementary direction from Brandon is not a
-prerequisite to proceeding.
+[project-postulate] Brandon's subsequent September 13 correction replaces the vague
+"context/condition map, compound release, sufficient continuation" framing. Prediction release
+is the output of a generated face, not an additional capability awaiting complete feedback.
+The blueprint now specifies chunk reconfiguration/correction/continuation through
+`y=rho_F(G_Theta(s,c))`, its conditional coefficient equation, and explicit normal-statistic or
+operator update identities. Resolve this mathematical account before returning to implementation.
+An API's comparison handle or body-publication flag describes an operation contract; it does
+not decide whether its returned text or other face is output.
 
 [definition] The following implementation packets deliver the six shared responsibilities
 above. The [first packet has returned](../../research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md)

@@ -102,34 +102,74 @@ the implementation order. This specification supplies their exact binding decisi
 does not wait for another intuition, a universal intelligence theorem, or an RH endpoint.
 Correctness of a local relation is used in a product rather than repeatedly re-demonstrated.
 
-### The immediate compound construction
+### Generated faces: reconfiguration, correction and continuation
 
-[definition] The [September 13 direct-message pickup](../../research/records/2026-09-13_DIRECT_MESSAGES_CONFIRM_THE_ATHENA_CONSTRUCTION_ORDER.md)
-reconciles the September 11–12 rulings with the current source. The next product operation is
-**source-conditioned joint prediction and compound release with its actual return**. Context
-formation supplies the relevant pre-return condition; the compound operation consumes it;
-economical continuation is integrated wherever its actual repeated action closes. These are
-coupled responsibilities of one increment, not three serial completion gates. An already
-admitted mathematical source can exercise compound release while broader contextual formation
-is developed through the same owners.
+[project-postulate] Brandon's subsequent September 13 correction resolves the ambiguity in the
+earlier plan pickup: prediction, release and output are not separate intelligent faculties or
+completion gates. Specify the generating relation and its concrete use before implementation.
+The [message/plan review](../../research/records/2026-09-13_DIRECT_MESSAGES_CONFIRM_THE_ATHENA_CONSTRUCTION_ORDER.md#prediction-and-output-correction)
+retains the correction.
 
-[established-bounded; source-inspected] `NativeCoupledWaveSession::predict_continuation` now
-reads and decodes a specified learned-member word as one anchored joint, without emission,
-source re-entry or successor publication. `next_symbol` supplies single-symbol emission/re-entry.
-Their existence does not yet compose the requested compound release and feedback. Bind that
-operation in the existing session/body and producing-return owners, retaining the shared source,
-intermediate conditions and actual successor; a longer character loop or a serialized preview
-does not by itself supply the missing composition.
+[definition] For source s, carried conditions c, generator G_Theta, requested receiver rho_F
+and codec D_F, the operation returns
 
-[definition] The implementation's context question is the actual source-null contrast described
-in phase 3: a difference hidden by the coarse source but visible in the returned target must
-reach the native condition/formation map before the target is assimilated. An exterior
-contextual inspection, a changed label or another fixed-h observation is not that binding.
-Use the existing contextual section, condition contact, normal/normalized return and joined
-family owners. Inspect the resulting mathematical action or complete text/code output together
-with its prediction and actual comparison. Resolve remaining coefficient, representation and
-receiver choices from these laws during implementation; no further user intuition is required
-to begin, and this plan pickup starts no new engine implementation by itself.
+`y = rho_F(G_Theta(s,c))`,   `output = D_F(y)`.
+
+Prediction describes the generated consequence y under the source conditions. Release/output
+is that same face presented across the receiving boundary. The codec changes its presentation,
+not whether it is a prediction. A face may be a number, text chunk, graph/section, action or
+requested family. An emitted reading does not require its source fibre to become a singleton.
+A later observation can be compared and incorporated; it is not required to make the preceding
+output a prediction.
+
+[established-bounded; source-inspected] `next_symbol` and `predict_symbol` already call the same
+`emit_symbol`; the latter retains a comparison handle. `predict_continuation` constructs and
+returns generated text from a joint receiver. Its read-only status means the continuing native
+body is not advanced by that forecast call; it does not mean the call produces no output.
+Emission counters, source re-entry, pending comparisons and rest are operation/state contracts,
+not additional definitions of generation or criteria for intelligence.
+
+[definition] **Text reconfiguration:** represent three chunk embeddings as the rows of X.
+`P=[[1,0,0],[0,0,1],[0,1,0]]` gives `Y=P X`, preserving the chunks and changing their order.
+For the characters `teh` it returns `the`. P states the local transformation; source and
+correction examples determine its applicability. This is a worked transposition case, not a
+claim of a trained general autocorrect model or a rule to transpose every word.
+
+[definition] **Correction and continuation:** correction examples pair a received chunk with
+its corrected presentation; continuation examples pair the available source with its further
+face. Reordering, filling missing coordinates and replacing conflicting coordinates change
+the known/unknown parts of the conditional relation. The same generator/receiver returns the
+revised chunk or the further chunk, without a new kind of generating machinery.
+
+[proved-derived] In the finite linear comparison owned by `exact_linear/contextual.rs`, columns
+S,C,Y encode source, carried conditions and returned targets from the same occurrences. Solve
+`W [S;C]=Y`. A solution exists exactly when `ker S intersect ker C` is contained in `ker Y`;
+preimage reduction returns all W or a separating vector d. If `S d=0` but `Y d!=0`, S alone
+cannot reproduce those targets. C supplies a distinction when the stacked source removes that
+obstruction. This specifies the context question by an equation and witness. The existing
+bilinear contact includes its declared source/condition products when their interaction is read.
+
+[proved-derived] For fixed encoded features u_i and target increments v_i, the normal
+construction retains `H=sum u_i u_i*`, `B=sum v_i u_i*`; its least-squares equation is `W H=B`.
+A new pair updates `H+=u u*`, `B+=v u*`. The sum identities show why these statistics preserve
+this solve without rereading earlier pairs. For an invertible feature rebase A, `H'=A H A*`,
+`B'=B A*` and `W'=W A^-1` preserve the predicted face. A different change needs its corresponding
+transport. This is a sufficient
+representation for a specified feature/target law, not an undefined requirement on all conduct.
+
+[proved-derived] For fixed linear conduct, `G^d=sum_(j<d) a_j G^j` lets reduced coefficients
+represent later powers, as the existing minimal-polynomial owner implements. For a sequence of
+chunk permutations, their composite permutation represents its endpoint action. Requested
+intermediate sections require their corresponding reconstruction maps. These named identities
+replace the phrase "sufficient continuation" with the representation and receiver being checked.
+
+[definition] Specify a requested chunk/section source, its correction or continuation target,
+the coefficient/conditional relation inferred from their comparisons, and the receiver returning
+the generated face. The examples above make the mathematics explicit; they do not prescribe a
+separate autocorrect product stage or a mandatory transposition probe. Returning that face is output. Use the existing
+normal, contextual, factor and receiver owners. Update the body through its established operation
+when the use includes subsequent interaction. Report the transformation and its text/mathematical
+result; a separate "complete feedback", "learning" or "intelligence" test is not a prerequisite.
 
 ### Callable mathematical workshop: the first delivered increment
 
@@ -226,20 +266,19 @@ this whole binding and must not silently become the construction programme.
 joint future receiver reads `{(R₁Φ₁(z), …, RₖΦₖ(z)) : z∈F}`. The same z and shared conditions
 occur in every component; replacing this with the Cartesian product of marginal readings
 loses their relation. Graph incidence and joined intermediate conditions specify legal
-composition. The prospective generator/family and sufficient continuation describe that
+composition. The prospective generator/family and its declared composition/update rule describe that
 relation without recording a realized trajectory. A scalar request remains a legitimate
 receiver; the interface must not impose scalar or character-by-character prediction on all
 products.
 
-[definition] The next binding composes the standing joint source/family and generator
-continuation with its **prospective emission receiver**, followed by the appropriate codec.
-`CompiledCoupledJoint` currently evaluates source/condition constraints at a shared parameter
-occurrence; that is available apparatus, not by itself the completed generative receiver.
-Use the existing block/factor and release operators to construct the complete requested action,
-and the existing normal/adjoint owners for its actual developmental return. Mode exclusion,
-section/periplus rebase and sufficient updates preserve the required joint future; code/loss
-receivers measure that construction rather than defining its incidence. Do not add a separately
-named next-holon engine or treat larger token batches as this missing composition.
+[definition] The generated-face equation composes the joint source/family and generator with
+its receiver and codec. `CompiledCoupledJoint` evaluates source/condition constraints at a shared
+parameter occurrence; the existing joint-preview path already returns a decoded forecast for a
+specified learned word. Use the block/factor and receiver owners to express the requested face,
+and the normal/adjoint owners when a new observation is supplied. Mode exclusion and rebase
+preserve the stated joint receiver through their explicit identities. Code/loss measures compare
+the resulting faces. There is no separately named next-holon engine or additional release faculty
+to construct; a changed request or subsequent-use contract specifies which existing maps to join.
 
 [definition] The returned mathematics has concrete implementation roles:
 

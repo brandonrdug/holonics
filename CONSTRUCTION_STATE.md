@@ -6,12 +6,11 @@ and its scoped repairs/checks are complete. **Standing product objective:** usef
 Hephaestus mathematical applications through the same HNN owners, within the wider Holonics
 mathematical and physical programme. The [roadmap](docs/plans/THE_ROADMAP.md) alone orders work.
 
-[definition] The [September 13 direct-message/plan check](research/records/2026-09-13_DIRECT_MESSAGES_CONFIRM_THE_ATHENA_CONSTRUCTION_ORDER.md)
-read the September 11–12 rulings and reconciled the blueprint's product labels, returned Power
-scope, and joint-preview/compound-release boundary. No further user clarification is needed to
-begin the next documented construction. Context formation, compound release/feedback and
-economical continuation remain coupled implementation responsibilities, not serial preparation
-gates. This check changed documentation only.
+[definition] Brandon's [subsequent September 13 correction](research/records/2026-09-13_DIRECT_MESSAGES_CONFIRM_THE_ATHENA_CONSTRUCTION_ORDER.md#prediction-and-output-correction)
+identifies prediction release with output of the generated face. The initial plan pickup left
+three underdefined requirements; the blueprint now replaces them with the source/receiver
+equation, chunk transformation and coefficient/statistic update laws below. This mathematical
+account is clarified before returning to implementation. No new runtime behavior is claimed.
 
 ## Available constructions
 
@@ -26,8 +25,9 @@ constraints also infer release parameters through that public owner.
 [learned-word preview](research/records/2026-09-12_CONTEXTUAL_RECEPTION_AND_NORMALIZATION_REUSE_THEIR_SHARED_NATIVE_OWNERS.md#learned-words-reach-a-bounded-joint-preview-and-one-shared-decoder)
 uses one anchored joint relation across actual coupled members, preserving shared intermediate
 variables and vertical modes. A three-transport `aba` preview becomes `bbb` after a native
-return while its matched control remains `aba`. This is an unpublished preview of a specified
-transport word; it does not complete compound action release or general conversation.
+return while its matched control remains `aba`. This call returns generated forecast text to
+its caller. It does not advance the continuing body or re-enter that output as a new source;
+those state contracts do not make the returned face less an output.
 
 [established-bounded; implemented-exact; computational-witness] The common algebra now owns
 characteristic/minimal polynomials, reduced powers and one augmented preimage reduction with
@@ -42,22 +42,27 @@ already exist. The complete family remains available before its display or proba
 Those owners are not scheduled for rediscovery. Current interfaces are in
 [NATIVE_HNA](docs/NATIVE_HNA.md) and [HNN composition](docs/HNN_COMPOSITION.md).
 
-## The actual next HNN construction
+## The generation relation to implement
 
-[open] Bind **compound prospective release, self-re-entry and complete feedback** through the
-existing joint continuation. The next operation must use its actual successor and original
-source association. Repeated scalar/character selection alone does not supply that construction.
+[definition] `y=rho_F(G_Theta(s,c))`, followed by its codec presentation, is the predicted/output
+face. Chunk reordering, autocorrection and continuation are uses of this relation with different
+known and requested coordinates. The blueprint gives the transposition `Y=P X` as a concrete
+case. A later comparison or a body update is required by the corresponding use, not as a new
+faculty that makes y output.
 
-[open] Form applicable context/source relations and empirical prediction through the existing
-local generator, condition, normal-statistic and receiver owners. The
+[definition] For a finite linear comparison, infer W from `W[S;C]=Y`. The existing contextual
+owner returns W's family or a vector in `ker S intersect ker C` exposed by Y. That equation
+specifies which source/condition distinction is missing. In a fixed-feature normal chart,
+`H=sum u u*`, `B=sum v u*` and `W H=B` specify the predictor and its closed update. The
 [fixed-condition audit](research/records/2026-09-11_FIXED_CONDITION_COLLAPSE_IS_EXACT_AND_ITS_PROJECTION_IS_REUSABLE.md)
-shows why one unchanged calibration law cannot resolve the text family. The new source/reception
-and joint-preview returns improve the binding, but useful contextual text remains open.
+remains the concrete reference for the failed constant-condition construction.
 
-[open] Replace whole-prefix reevaluation and unnecessary dense future expansion with sufficient
-operator/modal/recurrence representations. A power of one fixed linear operator now has a public
-construction; arbitrary changing learned words still owe their joint closure, pending-source
-maps and receiver guarantees. A segment cache alone is not the requested generative compression.
+[definition] Retain the representation required by the selected equation and receiver:
+normal statistics for the stated fit, the composite permutation for a chunk-reordering endpoint,
+or minimal-polynomial coefficients for powers of a fixed linear action. A changing feature or
+generator uses its specified transport/update relation. The old programme's growing replay is
+an implementation choice to replace at that relation, not an abstract "sufficient continuation"
+standard or a reason to keep every source event.
 
 [project-postulate] Inspect substantive short mathematical/text outputs alongside these changes.
 Broad corpus cultivation remains paused at the identified source/contact limitation. Targeted

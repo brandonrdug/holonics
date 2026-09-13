@@ -6,6 +6,11 @@ before proceeding. With the current date September 13 in America/Los_Angeles, th
 window is September 11–12 Pacific: `[2026-09-11T07:00:00Z,2026-09-13T07:00:00Z)`.
 This is a log/plan review, not a new implementation or research campaign.
 
+[historical] The initial pickup assessment below left its three named implementation conditions
+underdefined. Brandon's later correction, recorded in
+[Prediction and output correction](#prediction-and-output-correction), supersedes that framing.
+The retrieved messages and their provenance remain standing.
+
 ## Retrieved authority
 
 [established-bounded; source-audit] The scan covered the local Codex session tree, including
@@ -94,3 +99,40 @@ serial ordering of context formation, release and compression.
 so no Cargo, CUDA or Lean execution is required. The existing verified implementation remains the
 base. Private raw logs, unrelated local work and the paused implementation body remain untouched.
 The roadmap is still the sole order and CONSTRUCTION_STATE the sole current position.
+
+## Prediction and output correction
+
+[project-postulate] Brandon's subsequent September 13 message asks to resolve the supposedly
+open items mathematically before returning to implementation. The qualifiers "actual context",
+"completing compound release" and "sufficient continuation" did not name equations or operations.
+Prediction release is output of the generated causally situated face. Chunk reconfiguration and
+autocorrection already exhibit generation; extending the requested unknown face is the same
+construction. Generic learning/intelligence standards must not be inserted between these uses.
+
+[established-bounded; source-inspected] The source at `feb5e91d` makes the prior interpretive error
+visible. `next_symbol` and `predict_symbol` both call `emit_symbol`; the difference is retention
+of a comparison handle. `predict_continuation` returns generated decoded text. Its absence of a
+continuing-body advance or source re-entry is an API state contract, not absence of output.
+The earlier plan had promoted that implementation distinction into a separate capability gap.
+
+[definition] The repaired blueprint states `y=rho_F(G_Theta(s,c))` and its codec presentation as
+one generated/output face. It gives a chunk transposition `Y=P X`, with `teh -> the` as a
+mathematical example of the supplied transformation. Correction/continuation change the known
+and requested coordinates of a conditional relation. The example asserts no trained general
+autocorrector or universal word-transposition rule.
+
+[proved-derived] The source/condition question is the existing coefficient problem
+`W[S;C]=Y`, with existence criterion `ker S intersect ker C <= ker Y` and an explicit separating
+vector on failure. For fixed source features and target increments, `H=sum u_i u_i*` and
+`B=sum v_i u_i*` give normal equation `WH=B`; appending a pair adds `u u*` and `v u*` respectively.
+An invertible rebase A carries `H'=AHA*`, `B'=BA*`, `W'=WA^-1`. Expanding the sums and products
+proves these update/prediction identities. Composite permutations and minimal-polynomial powers
+give further concrete endpoint representations. These are the technical meanings required in
+place of the three unqualified labels.
+
+[definition] The live operating clause, blueprint, roadmap, product guide, operation doctrine,
+development method and position now carry this correction. The source comment on
+`predict_continuation` identifies its returned forecast text as output while retaining the
+separate state semantics. Runtime behavior is unchanged. The equations and examples clarify the
+construction before implementation; a later observed target or another state-change assay is
+not a prerequisite to recognizing the generated face as output.

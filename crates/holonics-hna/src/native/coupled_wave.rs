@@ -179,8 +179,9 @@ impl<'c> NativeCoupledWaveSession<'c> {
     pub fn inspect_relation(&mut self) -> Result<Value, NativeSessionError> {
         self.wave.inspect_relation(self.member, self.receiver)
     }
-    /// A caller-declared word of learned members, read as one joint prospective object.
-    /// This does not emit/re-enter symbols or publish a successor ecology.
+    /// Return generated forecast text for a declared word of learned members from one joint.
+    /// This is output to the caller; it does not advance the continuing body or re-enter that
+    /// output as a new source. Those state contracts are separate from constructing the face.
     pub fn predict_continuation(&mut self, word: &[usize], full_family: bool) -> Result<Value, NativeSessionError> {
         let word = word.iter().map(|&member| (member, self.receiver)).collect::<Vec<_>>();
         let epoch = self.wave.epoch();
