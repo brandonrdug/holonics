@@ -148,6 +148,17 @@ reproduction the task.
 
 ## Research available to the implementation
 
+[established-bounded; implemented-exact; formal-checked; computational-witness] The
+[phase/clock/code return](research/records/2026-09-12_PHASE_PARITY_AND_CLOCKED_TORI_RETURN_GENERATOR_CODE_POTENTIALS.md)
+now supplies lifted information parity, direct/reflected modulation, Fibonacci clock residue
+and an explicit positive-generator code/boundary law. The exact preimage owner inferred C5
+and C5xC5 operator recurrences; the public resident mathematical session consumed their lowered
+powers and exposed a phase separator behind equal intensities. Smith returns retain finite
+clock kernels, cyclic factors and code width. Five focused formal targets, the final Rust
+example and the inference-fed native process passed. Brandon's parallel HNN session remains
+paused for this requested review; the next consuming maps are the retained joint analyzer,
+source clock when needed, resident recurrence lowering and the existing compound release/feedback.
+
 [proved-derived; formal-checked] The
 [generator-inference return](research/records/2026-09-12_GENERATOR_INFERENCE_CODES_FREE_ENERGY_AND_SUFFICIENT_CONTINUATION.md)
 supplies MDL/MAP, Gibbs/KL, sufficient update and fibre log-sum-exp laws. The

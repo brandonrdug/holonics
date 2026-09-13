@@ -1,5 +1,6 @@
 import ElementaryHolonics.Foundation.InformationReceiver
 import ElementaryHolonics.Millennium.HolonicMembraneActionTransport
+import Mathlib.Data.Complex.Basic
 
 /-!
 # Receiver-relative information differences
@@ -39,6 +40,72 @@ theorem crossEntropy_excess_eq_kl
       klDivergence reference emitted := by
   rw [crossEntropy_eq_entropy_add_kl]
   ring
+
+/-! ## Lifted phase information and its parity
+
+The phase is a supplied real lift, including winding. Conjugating that lift is a declared
+comparison involution; it neither exchanges the source/reference distributions nor reverses
+physical chronology. These definitions formalize the existing complex-information construction
+recorded on September 12, before any scalar phase mean is used as a future state.
+-/
+
+def phaseMean (p : PositiveProbabilitySection Index) (phase : Index → ℝ) : ℝ :=
+  ∑ index, p.mass index * phase index
+
+theorem phaseMean_add (p : PositiveProbabilitySection Index) (a b : Index → ℝ) :
+    phaseMean p (fun i => a i + b i) = phaseMean p a + phaseMean p b := by
+  simp [phaseMean, mul_add, Finset.sum_add_distrib]
+
+theorem phaseMean_sub (p : PositiveProbabilitySection Index) (a b : Index → ℝ) :
+    phaseMean p (fun i => a i - b i) = phaseMean p a - phaseMean p b := by
+  simp [phaseMean, mul_sub, Finset.sum_sub_distrib]
+
+theorem phaseMean_neg (p : PositiveProbabilitySection Index) (a : Index → ℝ) :
+    phaseMean p (fun i => -a i) = -phaseMean p a := by
+  simp [phaseMean, Finset.sum_neg_distrib]
+
+/-- Probability-calibrated information in bits, paired with the retained angular-lift reading.
+The factor two converts the logarithm of an amplitude to the logarithm of its intensity. -/
+def liftedCrossEntropy (p q : PositiveProbabilitySection Index) (phase : Index → ℝ) : ℂ :=
+  ⟨crossEntropy p q / Real.log 2, -(2 / Real.log 2) * phaseMean p phase⟩
+
+theorem liftedCrossEntropy_real (p q : PositiveProbabilitySection Index)
+    (phase : Index → ℝ) :
+    (liftedCrossEntropy p q phase).re = crossEntropy p q / Real.log 2 := rfl
+
+theorem liftedCrossEntropy_excess (p q : PositiveProbabilitySection Index)
+    (sourcePhase receiverPhase : Index → ℝ) :
+    liftedCrossEntropy p q receiverPhase - liftedCrossEntropy p p sourcePhase =
+      (⟨klDivergence p q / Real.log 2,
+        -(2 / Real.log 2) * phaseMean p (fun i => receiverPhase i - sourcePhase i)⟩ : ℂ) := by
+  apply Complex.ext
+  · change crossEntropy p q / Real.log 2 - crossEntropy p p / Real.log 2 = _
+    rw [← sub_div, crossEntropy_self_eq_entropy, crossEntropy_excess_eq_kl]
+  · change -(2 / Real.log 2) * phaseMean p receiverPhase -
+        -(2 / Real.log 2) * phaseMean p sourcePhase = _
+    rw [phaseMean_sub]
+    ring
+
+/-- The code-length face is even and the phase face odd under simultaneous lift conjugation. -/
+theorem liftedCrossEntropy_conjugate (p q : PositiveProbabilitySection Index)
+    (phase : Index → ℝ) :
+    liftedCrossEntropy p q (fun i => -phase i) = star (liftedCrossEntropy p q phase) := by
+  apply Complex.ext <;> simp [liftedCrossEntropy, phaseMean_neg]
+
+/-- A common channel-wise rechart of the compared phase lifts cancels from their difference. -/
+theorem liftedCrossEntropy_commonPhase (p q : PositiveProbabilitySection Index)
+    (sourcePhase receiverPhase shift : Index → ℝ) :
+    liftedCrossEntropy p q (fun i => receiverPhase i + shift i) -
+        liftedCrossEntropy p p (fun i => sourcePhase i + shift i) =
+      liftedCrossEntropy p q receiverPhase - liftedCrossEntropy p p sourcePhase := by
+  apply Complex.ext
+  · rfl
+  · change -(2 / Real.log 2) * phaseMean p (fun i => receiverPhase i + shift i) -
+        -(2 / Real.log 2) * phaseMean p (fun i => sourcePhase i + shift i) = _
+    rw [phaseMean_add, phaseMean_add]
+    change _ = -(2 / Real.log 2) * phaseMean p receiverPhase -
+      -(2 / Real.log 2) * phaseMean p sourcePhase
+    ring
 
 theorem thermal_crossEntropy_identity
     (thermalScale : ℝ) (energy : Index → ℝ) (logZ : ℝ)
@@ -141,6 +208,10 @@ section Audit
 #print axioms membrane_tail_scalar_does_not_determine_action
 #print axioms thermal_crossEntropy_identity
 #print axioms freeEnergy_difference_eq_thermalScale_mul_kl
+#print axioms liftedCrossEntropy_real
+#print axioms liftedCrossEntropy_excess
+#print axioms liftedCrossEntropy_conjugate
+#print axioms liftedCrossEntropy_commonPhase
 
 end Audit
 

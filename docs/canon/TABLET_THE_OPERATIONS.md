@@ -266,19 +266,35 @@ rebase is execution conjugacy" (`algorithms.typ:202`).]
 face** — one through which every future distinction factors (`docs/canon/THE_HOLOBROCHOS_SPINE.md` §3).
 Reconstruction to the extent of a limit is the receiver-indexed limit, `H.0262`.
 
-### 5.3 Parity, chronology, reversibility: three objects, never one
+### 5.3 Parity, chronology and reversibility retain their actual maps
 
-> **Parity is a property of the boundary operator (`∂∂ = 0`). Chronology is a property of the
-> lineage. Reversibility is a property of one specific transport, decided by its collapsed
-> population.**
+[definition] Parity is read relative to a declared involution or grading. A receiver can be even,
+`r(Θx)=r(x)`, or odd, `r(Θx)=-r(x)`, with `Θ²=id`. The chain-complex law `∂²=0` expresses
+boundary closure; it is not by itself a definition of time parity. In a degree-graded chain
+complex, the sign grading Γ satisfies `Γ∂=-∂Γ`, which is its separate parity relation.
+Chronology retains the actual ordered passages. Invertibility concerns a particular transport
+and its source/target domains. None of these statements permits literal reversal of an occurrence.
 
-His star-atoms trajectory states the third in matter, and its standard name is the backward heat
-problem: forward diffusion is a **semigroup** — `exp(−tL)` for `t ≥ 0` only — deterministic
-forward, ill-posed backward. What forward transport collapsed can be attributed afterward only as
-a declared quotient: his *"distributions of attributing where kinds of atoms were roughly most
-likely to have come from"* is `Q` against `Π` exactly (`CLAUDE.md` §13 rule 2) — the lived
-trajectory happened one way; the reconstruction distribution is the receiver's quotient over
-interiors no longer reachable.
+[definition] In a linear autonomous dynamical chart, a proposed time-reflection involution Θ
+preserves the equation under `x(t) -> Θx(-t)` precisely when `AΘ=-ΘA`. An ordinary spatial
+symmetry instead commutes with A. Moving conditions, drive protocols and receiver frames must
+also be transported. The existing Swing theorem has a narrower exact scope: n repeats about
+one anchor multiply the oriented-span receiver by `(-1)^n`; it does not identify arbitrary
+word length with every orientation or infer invertibility of other generators.
+
+[proved-derived; formal-checked] `Physics/InformationDifference` now formalizes the previously
+derived lifted complex information comparison. With the probability sections fixed, negating
+the angular lifts conjugates its complex face: real cross-entropy is even and the weighted
+phase face is odd. A common phase rechart cancels from the compared difference. This is a
+receiver parity theorem, not a physical time-reflection theorem or a complete coherent receiver.
+
+[proved-standard] A finite exact heat map `exp(-tL)` is invertible as a matrix, although its
+inverse amplifies decayed modes and is not the same admissible passive heat evolution. Standard
+heat evolution can likewise be injective while backward reconstruction is ill-posed. A
+nontrivial collapsed population instead comes from a specified quotient, truncation, uncertain
+observation or other actual noninjective map. Thus determinism, algebraic invertibility,
+stable reconstruction and physical admissibility remain distinct. The compatible-source
+fibre records the reconstruction question at the declared receiver; it is not an event archive.
 
 ### 5.4 PreimageFibre: the preimage of a stable receiver quotient
 

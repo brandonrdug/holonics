@@ -87,7 +87,7 @@ phase, geometry, physical boundaries and computation at their declared scopes.
 | Ordered generator action and endpoint order blindness | `Foundation/TransportWord.lean` | `Millennium.Chronology` retains its applied material and imports this owner |
 | Future-exact receiver compression | `Foundation/ReceiverHistoryCompression.lean` | `Millennium.LineageCompression` forwards the import |
 | Clocked addressed spans and returned world-tubes | `Transport/WorldTube.lean` | `Millennium.HolonicSensoryWorldTube` forwards the import |
-| Complex phase carrier, locked sheets and winding fibres | `Physics/PhaseCarrier.lean` | `Millennium.HolonicParametron` forwards the import |
+| Complex phase carrier, direct/reflected modulation, locked sheets and winding fibres | `Physics/PhaseCarrier.lean` | `Millennium.HolonicParametron` forwards the import; real-linear composition, mirror involution and determinant, plus a future-visible quadrature separator |
 | Oriented incidence, coupled response and phase-bearing holons | `Physics/CoupledIncidence.lean` | `Millennium.HolonicComplexParametron` forwards the import |
 | Quadratic port dynamics and retained heat | `Physics/PortEnergyHeat.lean` | Chain-rule storage/source/dissipation balance; nonnegative conductance and explicit heat law |
 | Partitioned Hodge/complex energy and paired cut boundaries | `Physics/PartitionedHodgeEnergy.lean` | Arbitrary finite section mixed-energy law; exact four-cycle harmonic/exact and diffusion reference; imported by `Framework.Physics` |
@@ -152,7 +152,8 @@ adds `Foundation/CausalRelevance.lean` (greatest stable future relation and addi
 `Foundation/ComparisonLoss.lean` (situated comparison gauges), and
 `Foundation/InformationReceiver.lean` (the moved generic information implementation; old names
 and `Computation.HolonicInformationTheory` import preserved). `Physics/InformationDifference.lean`
-proves the baseline/KL and finite Gibbs free-energy relation; `Physics/TwoCellEntropyTransport.lean`
+proves the baseline/KL and finite Gibbs free-energy relation, and the lifted complex code/phase
+comparison with conjugation parity and common-phase cancellation; `Physics/TwoCellEntropyTransport.lean`
 proves mass and logarithmic entropy returns for actual constitutive trajectories. These formal
 owners add no native learner or physical identity outside their stated hypotheses.
 
@@ -171,10 +172,20 @@ and remainder observations feed operator reuse without installing a native token
 
 [definition] `Foundation/ReceiverCodeCost.lean`, imported by `Framework.Information`, composes
 code/cost balances through `Holon.Interaction`, bounds cost from endpoint/residual bounds, and
-transports a feasible optimum under a cost-preserving candidate equivalence. The exterior
+transports a feasible optimum under a cost-preserving candidate equivalence. Its positive-eigenvector
+transition construction now gives an explicit code/boundary-potential law and symmetric-weight
+detailed balance. The exterior
 `holonic-engine/examples/receiver_code_cost.rs` instantiates unequal-cost channel paths and
 transported clock readings. The [boundary return](../research/records/2026-09-11_RELATIVE_CODE_COST_HAS_AN_ADDRESSED_BOUNDARY_LAW.md)
 connects it to the existing addressed causal-length, physical and complexity owners.
+
+[definition] The [phase/clock return](../research/records/2026-09-12_PHASE_PARITY_AND_CLOCKED_TORI_RETURN_GENERATOR_CODE_POTENTIALS.md)
+uses `Millennium/Turn.lean` for the Fibonacci clock's signed golden residue;
+`holonic-engine/examples/phase_clock_smith.rs` for finite-clock Smith kernels and inferred
+monic operator recurrences through `rebase_invariants` and `ExactRatMatrix::preimage_fibre`;
+and `research/experiments/pentagonal_torus_transport/` for their public resident HNN application.
+The native consumer currently takes lowered matrices. The recurrent coefficient action and
+general learned-family compilation remain their own binding question.
 
 ## Foundation and transport
 

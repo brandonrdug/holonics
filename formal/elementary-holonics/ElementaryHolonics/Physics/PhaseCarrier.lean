@@ -17,6 +17,51 @@ open scoped BigOperators
 
 namespace Soma.Holonics.Millennium.HolonicParametron
 
+/-! ## Direct and reflected modulation of a complex carrier
+
+A real-linear scalar complex passage has a direct and a conjugate coefficient. This retains
+the reflected direction before any intensity/probability receiver; a mirror is real-linear
+but conjugate-linear over the complex chart. These are local maps, not a new native engine.
+-/
+
+def modulatedCarrier (direct reflected carrier : ℂ) : ℂ :=
+  direct * carrier + reflected * star carrier
+
+theorem modulatedCarrier_compose (a b c d z : ℂ) :
+    modulatedCarrier a b (modulatedCarrier c d z) =
+      modulatedCarrier (a * c + b * star d) (a * d + b * star c) z := by
+  simp only [modulatedCarrier, star_add, star_mul, star_star]
+  ring
+
+theorem modulatedCarrier_direct (a z : ℂ) : modulatedCarrier a 0 z = a * z := by
+  simp [modulatedCarrier]
+
+theorem modulatedCarrier_reflected (b z : ℂ) :
+    modulatedCarrier 0 b z = b * star z := by
+  simp [modulatedCarrier]
+
+theorem modulatedCarrier_mirror_twice (b z : ℂ) (hb : b * star b = 1) :
+    modulatedCarrier 0 b (modulatedCarrier 0 b z) = z := by
+  simp only [modulatedCarrier, zero_mul, zero_add, star_mul, star_star]
+  calc
+    b * (z * star b) = (b * star b) * z := by ring
+    _ = z := by rw [hb, one_mul]
+
+/-- The determinant of the corresponding real two-coordinate matrix is the direct-minus-
+reflected squared magnitude. Its zero stratum is singular, not an identity/no-change test. -/
+theorem modulatedCarrier_real_determinant (a b : ℂ) :
+    (a.re + b.re) * (a.re - b.re) - (-a.im + b.im) * (a.im + b.im) =
+      Complex.normSq a - Complex.normSq b := by
+  simp only [Complex.normSq_apply]
+  ring
+
+/-- A presently invisible quadrature becomes visible after the same phase rotation. -/
+theorem realReceiver_null_reopens :
+    Complex.I.re = (0 : ℂ).re ∧
+      (modulatedCarrier Complex.I 0 Complex.I).re ≠
+        (modulatedCarrier Complex.I 0 0).re := by
+  norm_num [modulatedCarrier, Complex.I_mul_I]
+
 /-! ## The pump creates a two-sheet phase population -/
 
 /-- The phase carrier presented in the complex receiver. -/
@@ -262,6 +307,10 @@ theorem phaseNetworkEnergy_binaryPhase
 end Soma.Holonics.Millennium.HolonicParametron
 
 #print axioms Soma.Holonics.Millennium.HolonicParametron.pumpStorage_halfTurnSheet
+#print axioms Soma.Holonics.Millennium.HolonicParametron.modulatedCarrier_compose
+#print axioms Soma.Holonics.Millennium.HolonicParametron.modulatedCarrier_mirror_twice
+#print axioms Soma.Holonics.Millennium.HolonicParametron.modulatedCarrier_real_determinant
+#print axioms Soma.Holonics.Millennium.HolonicParametron.realReceiver_null_reopens
 #print axioms Soma.Holonics.Millennium.HolonicParametron.phaseCarrier_halfTurnSheet
 #print axioms Soma.Holonics.Millennium.HolonicParametron.phaseNetworkEnergy_binaryPhase
 #print axioms Soma.Holonics.Millennium.HolonicParametron.exp_windingLogI

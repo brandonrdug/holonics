@@ -113,6 +113,15 @@ language or every context is globally linear. The [composition guide](HNN_COMPOS
 
 ## Continuing local-generator neighborhood
 
+[definition] The [phase/time-parity review](../research/records/2026-09-12_PHASE_PARITY_AND_CLOCKED_TORI_RETURN_GENERATOR_CODE_POTENTIALS.md)
+relates the current joint preview to actual complex analyzers, clocked source charts and
+generator code costs. Its C5 and C5xC5 application infers monic recurrence coefficients with the
+existing exact matrix preimage owner, lowers requested powers and consumes them through the
+public resident mathematical session. Its conjugate-phase inputs have equal separate
+intensities and different later analyzer powers. This is a verified mathematical application;
+the current learned joint-preview decoder still needs its actual analyzer/clock/feedback and
+economical continuation binding. Logical epochs are chronology, not a physical time unit.
+
 [definition] `ResidentGeneratorNeighborhood::with_shared_condition` moves existing learned
 relations into one owner with an explicitly shared condition chart. Each law's actual dependence
 determines which directions of that current can affect its receiver. Common membership alone

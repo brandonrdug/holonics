@@ -2,6 +2,7 @@ import Mathlib.Analysis.SpecialFunctions.Complex.Log
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Analysis.Real.Pi.Bounds
 import Mathlib.Data.Fintype.BigOperators
+import Mathlib.NumberTheory.Real.GoldenRatio
 
 /-!
 # The turn — what the exponential deletes, and what each chart can still store
@@ -260,7 +261,50 @@ theorem thePeriodTwoValuesDifferByOne :
   rw [theGoldenRatioIsTwiceACosineOfTheFifthTurn, theDoubledFifthTurnIsTheOtherRoot]
   ring
 
+/-! ## 6. The golden two-phase clock returns with an oriented residue
+
+On a torus measured in cycles with rate (1, phi), the integer time F_n closes the first phase.
+The second phase retains its integer winding F_(n+1) and this signed discrepancy. Mathlib's
+Fibonacci identity supplies the arithmetic; no exact common nonzero period or physical clock
+calibration is assumed by this chart.
+-/
+
+noncomputable def goldenClockResidue (n : ℕ) : ℝ :=
+  (Nat.fib n : ℝ) * Real.goldenRatio - (Nat.fib (n + 1) : ℝ)
+
+theorem goldenClock_reconstruction (n : ℕ) :
+    (Nat.fib n : ℝ) * Real.goldenRatio =
+      (Nat.fib (n + 1) : ℝ) + goldenClockResidue n := by
+  unfold goldenClockResidue
+  ring
+
+theorem goldenClock_oriented_residue (n : ℕ) :
+    goldenClockResidue n =
+      (-1 : ℝ) ^ (n + 1) * (Real.goldenRatio⁻¹) ^ n := by
+  have h := Real.fib_succ_sub_goldenRatio_mul_fib n
+  have hc : Real.goldenConj = (-1 : ℝ) * Real.goldenRatio⁻¹ := by
+    rw [Real.inv_goldenRatio]
+    ring
+  calc
+    goldenClockResidue n = -(Real.goldenConj ^ n) := by
+      unfold goldenClockResidue
+      nlinarith [h]
+    _ = (-1 : ℝ) ^ (n + 1) * (Real.goldenRatio⁻¹) ^ n := by
+      rw [hc, mul_pow, pow_succ]
+      ring
+
+theorem goldenClock_residue_step (n : ℕ) :
+    goldenClockResidue (n + 1) =
+      -Real.goldenRatio⁻¹ * goldenClockResidue n := by
+  rw [goldenClock_oriented_residue, goldenClock_oriented_residue,
+    pow_succ, pow_succ]
+  ring
+
 /-! ## Audit -/
+
+#print axioms goldenClock_reconstruction
+#print axioms goldenClock_oriented_residue
+#print axioms goldenClock_residue_step
 
 #print axioms ArcPartition.integratedLength_nonneg
 #print axioms TurnCalibration.fullTurn_eq_two_mul_halfTurn

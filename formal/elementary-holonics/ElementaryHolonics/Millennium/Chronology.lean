@@ -16,8 +16,8 @@ proves that a family of transports has the same endpoint action for every permut
 and only if the generators commute pairwise.  This endpoint property does not erase the word,
 occurrence lineage, or a receiver that records it; it only identifies the resulting endpoint action.
 
-The remaining sections connect this action to parity, affine charts, squeeze bounds and closure: the hand of a configuration is
-the parity of the word that produced it, the mean value theorem is the flat statement read out of
+The remaining sections connect this action to parity, affine charts, squeeze bounds and closure:
+a repeated fixed-anchor swing acts on the oriented span by word-length parity, the mean value theorem is the flat statement read out of
 the chart the two constraints declare, the squeeze is a pair of constraints closing on a body,
 and a closed triple of transports has its third member forced.
 
@@ -41,11 +41,13 @@ theorem theSwingFamilyIsNotOrderBlind : ¬ OrderBlind (swing : Site → Site →
   simp only [swing, Prod.mk_add_mk, Prod.mk_sub_mk, Prod.mk.injEq] at this
   omega
 
-/-! ## 1. The hand of a configuration is the parity of the word that produced it
+/-! ## 1. Fixed-anchor Swing parity in the oriented-span receiver
 
-A single crossing negates the oriented span; the span is only restored after an even number of
-them.  So the "cross product" a configuration exhibits is not a property of the endpoint — it is a
-function of the chronology's length, and no unsigned reading of the endpoint recovers it. -/
+A swing about the declared anchor negates this oriented span. Repeating that same swing n times
+multiplies it by (-1)^n. The receiver is a function of the returned endpoint and its reference
+sites; an unsigned reading omits its sign. When the span is zero, it cannot distinguish odd and
+even words. This statement does not identify parity with general chronology or boundary closure.
+-/
 
 /-- **After a word of `n` swings about one anchor, the hand is `(−1)^n`.**
 
@@ -59,8 +61,8 @@ theorem theHandIsTheParityOfTheWord (a b c : Site) (n : ℕ) :
     rw [Function.iterate_succ_apply', theSwingNegatesTheOrientedSpan, ih, pow_succ]
     ring
 
-/-- **An even word restores the hand; an odd word reverses it.**  Even words are therefore the
-ones that preserve the oriented form, and odd words are the ones that reverse it. -/
+/-- An even repeated fixed-anchor word restores the span; an odd one negates it.
+A zero span is unchanged in both cases and does not distinguish their parity. -/
 theorem theEvenWordRestoresTheHand (a b c : Site) {n : ℕ} (hn : Even n) :
     orientedSpan ((swing b)^[n] a) b c = orientedSpan a b c := by
   rw [theHandIsTheParityOfTheWord, hn.neg_one_pow, one_mul]

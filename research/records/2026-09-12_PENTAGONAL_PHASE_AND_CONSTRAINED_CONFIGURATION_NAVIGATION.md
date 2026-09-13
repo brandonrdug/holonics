@@ -8,6 +8,12 @@ The photograph is user-supplied evidence, not evidence of its author's diagnosis
 
 ## What the photograph supports
 
+[historical] Brandon's subsequent September 12 clarification locates the eight spokes in the
+drawing's construction/layer ruler, without asserting eightfold symmetry. The
+[phase/clock continuation](2026-09-12_PHASE_PARITY_AND_CLOCKED_TORI_RETURN_GENERATOR_CODE_POTENTIALS.md)
+uses that corrected reading. The symmetric pursuit model below remains one mathematical
+illustration, not a symmetry claim attributed to Brandon or a recovered authorial algorithm.
+
 [interpretation] The upper spiral is a winding mesh with repeated transverse intersections and
 outward spokes. An eightfold polygon-pursuit construction is a candidate for the structure
 Brandon notices, not a recovered generating algorithm. An exact eightfold model predicts

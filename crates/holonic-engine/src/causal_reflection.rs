@@ -38,8 +38,8 @@
 //!
 //! The second half is **Niven's theorem** (Niven, *Irrational Numbers*, Carus Mathematical
 //! Monographs 11, MAA 1956, Corollary 3.12): for `θ` a rational multiple of `π`, the
-//! only rational values of `cos θ` are `0, ±1/2, ±1` and the only rational values of `sin θ` and
-//! `tan θ` are `0, ±1`. On the `N`-point circular lattice both spectral faces of a response are
+//! only rational values of `cos θ` and `sin θ` are `0, ±1/2, ±1`, while the only rational values
+//! of `tan θ` (where defined) are `0, ±1`. On the `N`-point circular lattice both spectral faces of a response are
 //! rational for every rational response exactly when every `sin(2πk/N)` and `cos(2πk/N)` is
 //! rational, that is exactly when `N ∈ {1, 2, 4}`; and the circular Hilbert kernel
 //! `(2/N)·cot(πm/N)` is rational at exactly those same `N`. So "given one spectral face, return the

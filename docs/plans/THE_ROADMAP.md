@@ -79,6 +79,20 @@ nested automata that construct, compare and refine further automata.
 
 ## Immediate mathematical application and implementation
 
+[project-postulate] Brandon's subsequent September 12 request pauses the parallel HNN session
+to derive the time-parity/cross-entropy, torus/clock, friction/code-cost and Smith/fractal
+connections against the current continuation owners. This is the present requested research
+increment. Carry its concrete returned generators, receiver laws and executable comparisons
+back into the existing contextual/modal packets; it does not found another engine or require
+a general P-versus-NP solution before useful construction.
+
+[definition] That [research increment has returned](../../research/records/2026-09-12_PHASE_PARITY_AND_CLOCKED_TORI_RETURN_GENERATOR_CODE_POTENTIALS.md):
+inferred operator recurrences now feed the public resident mathematical application, while
+the phase/clock and code-potential laws have focused formal checks. Its remaining native
+consumer is the same contextual/modal construction below: apply a declared analyzer to the
+retained joint before scalar decoding, lower admitted repeated actions without dense expansion,
+and retain the source clock and actual cost boundary when the task requires them.
+
 [project-postulate] Brandon's latest September 12 planning direction makes productive HNN
 integration the immediate priority. The established mathematics supplies enough direction to
 build; further intuition from Brandon is not a prerequisite. Open construction questions are

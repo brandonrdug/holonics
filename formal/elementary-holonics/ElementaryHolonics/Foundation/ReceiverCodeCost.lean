@@ -15,6 +15,52 @@ feasibility hypotheses. They define no physical constitutive identification or g
 namespace Soma.Holonics.Foundation.ReceiverCodeCost
 
 open Soma.Holonics
+open scoped BigOperators
+
+/-! ## A positive generator supplies an explicit code/boundary law
+
+Given a positive eigenvector v of a nonnegative finite weighted adjacency A, the normalized
+transition is A_ij v_j / (lambda v_i). The actual eigenvector equation, support and positive
+scale are hypotheses. This constructs a code comparison, not a generic efficient eigensolver
+or a physical dissipation identification.
+-/
+
+noncomputable def perronTransition (weight sourceMode targetMode eigenvalue : ℝ) : ℝ :=
+  weight * targetMode / (eigenvalue * sourceMode)
+
+theorem perronTransition_nonnegative {weight sourceMode targetMode eigenvalue : ℝ}
+    (hw : 0 ≤ weight) (hs : 0 < sourceMode) (ht : 0 < targetMode)
+    (hl : 0 < eigenvalue) :
+    0 ≤ perronTransition weight sourceMode targetMode eigenvalue := by
+  exact div_nonneg (mul_nonneg hw ht.le) (mul_pos hl hs).le
+
+theorem perronTransition_normalized {Index : Type*} [Fintype Index]
+    (weight : Index → Index → ℝ) (mode : Index → ℝ) (eigenvalue : ℝ) (source : Index)
+    (hs : mode source ≠ 0) (hl : eigenvalue ≠ 0)
+    (row : ∑ target, weight source target * mode target = eigenvalue * mode source) :
+    ∑ target, perronTransition (weight source target) (mode source) (mode target) eigenvalue = 1 := by
+  unfold perronTransition
+  rw [← Finset.sum_div, row, div_self (mul_ne_zero hl hs)]
+
+theorem perron_edge_code_balance {weight sourceMode targetMode eigenvalue : ℝ}
+    (hw : 0 < weight) (hs : 0 < sourceMode) (ht : 0 < targetMode)
+    (hl : 0 < eigenvalue) :
+    -Real.log (perronTransition weight sourceMode targetMode eigenvalue) / Real.log 2 =
+      (Real.log eigenvalue - Real.log weight) / Real.log 2 +
+        Real.log sourceMode / Real.log 2 - Real.log targetMode / Real.log 2 := by
+  unfold perronTransition
+  rw [Real.log_div (mul_pos hw ht).ne' (mul_pos hl hs).ne',
+    Real.log_mul hw.ne' ht.ne', Real.log_mul hl.ne' hs.ne']
+  ring
+
+/-- Symmetric edge weights make squared eigenvector weights balance the two directed currents.
+Normalizing these squared weights supplies the stationary law when the rows normalize. -/
+theorem perron_detailed_balance {weight sourceMode targetMode eigenvalue : ℝ}
+    (hs : sourceMode ≠ 0) (ht : targetMode ≠ 0) (hl : eigenvalue ≠ 0) :
+    sourceMode ^ 2 * perronTransition weight sourceMode targetMode eigenvalue =
+      targetMode ^ 2 * perronTransition weight targetMode sourceMode eigenvalue := by
+  unfold perronTransition
+  field_simp [hs, ht, hl]
 
 /-! ## Serial boundary balance -/
 
@@ -92,5 +138,10 @@ theorem feasible_cost_le_transported
         ((feasible_transport (equiv.symm z)).2 (by simpa using hz))
       _ = cost' z := by
         convert (cost_transport (equiv.symm z)).symm using 1 <;> simp
+
+#print axioms perronTransition_nonnegative
+#print axioms perronTransition_normalized
+#print axioms perron_edge_code_balance
+#print axioms perron_detailed_balance
 
 end Soma.Holonics.Foundation.ReceiverCodeCost
