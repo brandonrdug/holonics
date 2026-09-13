@@ -107,7 +107,9 @@ finite and moving differential receiver defects; `Physics/ConformationResponse.l
 `Physics/MechanicalReceiver.lean` instantiate prestress and changing-grain mechanical response;
 `Physics/FluidReceiverClosure.lean` instantiates the same defect with the existing finite
 Galerkin Navier–Stokes source. `Physics/ConstitutiveModulation.lean` additionally composes the
-moving receiver with stress/strain pullback. These are formal owners; they add no native engine.
+moving receiver with stress/strain pullback, and specializes the shared coupled response to a
+symmetric bend/twist/stretch rod chart with reciprocal cross response and a torque separator.
+These are formal owners; they add no native engine.
 Their statements and limits are in the
 [continuation](../research/records/2026-09-08_CHANGING_CONSTITUTION_AND_RECEIVERS_SHARE_ONE_DEFECT_CALCULUS.md).
 
@@ -159,7 +161,10 @@ owners add no native learner or physical identity outside their stated hypothese
 
 [definition] `Foundation/SituatedInformationRate.lean`, imported by `Framework.Information`,
 owns finite measured-occurrence information rates, transported-measure invariance, conserved
-subdivision and nats/bits conversion. The existing `holonic_engine::surprisal` owner retains
+subdivision and nats/bits conversion. It also owns elapsed-throughput clock transport,
+duration-weighted aggregation, information-rate factorization and the conditional resource
+ceiling; see [measurement conventions](DEVELOPMENT.md#performance-and-information-measurements).
+The existing `holonic_engine::surprisal` owner retains
 exact prime-log forms and code-missing fibres. `eta_atlas::derive_ordinate_relations` reads
 interval marks directly; `holonic-engine/examples/zeta_information.rs` composes atlas phase,
 gap, Swing and information receivers as exterior Hephaestus apparatus. The
@@ -174,7 +179,8 @@ and remainder observations feed operator reuse without installing a native token
 code/cost balances through `Holon.Interaction`, bounds cost from endpoint/residual bounds, and
 transports a feasible optimum under a cost-preserving candidate equivalence. Its positive-eigenvector
 transition construction now gives an explicit code/boundary-potential law and symmetric-weight
-detailed balance. The exterior
+detailed balance. Its paired directed-flux code production is nonnegative for positive flows,
+unchanged by swapping directions and zero under that detailed balance. The exterior
 `holonic-engine/examples/receiver_code_cost.rs` instantiates unequal-cost channel paths and
 transported clock readings. The [boundary return](../research/records/2026-09-11_RELATIVE_CODE_COST_HAS_AN_ADDRESSED_BOUNDARY_LAW.md)
 connects it to the existing addressed causal-length, physical and complexity owners.

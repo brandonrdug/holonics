@@ -37,6 +37,14 @@ was supplied, what was inferred or constructed, and its applicable mathematical 
 Exterior reference, resident execution and durable reuse name implementation/evidence scopes;
 they do not divide mathematics from intelligence or make conversation a prerequisite to solvers.
 
+[project-postulate] "Intelligence" and "learning" name the programme and its applications;
+they add no qualitative admission test to an already specified construction. Explain the
+generated face, inferred relation, update law, applicability and cost. A saved game world,
+tensor checkpoint and native rest are serialized charts of their respective continuing
+systems; executable laws and future receivers determine what must be materialized or retained.
+Demand-driven generation and streaming follow actual dependencies and boundary summaries,
+including relevant offscreen effects, rather than requiring a whole world in memory.
+
 [project-postulate] **Difference is the only thing that is real.** Values are measured faces of
 situated differences; measurement is always a comparison through frames/receivers. Retain the
 comparands, reference, orientation, conditions and causal origin. Difference can be a structured
@@ -254,6 +262,24 @@ Soulkiller return. Impedance-matched termination remains an interpretation requi
 native admittances, not a face-count governor.
 
 ## Construction, experiments and physical scope
+
+[project-postulate] The research workstation is consumer hardware: Ryzen 9 7900X, 32 GB RAM,
+RTX 4080 SUPER with 16 GB VRAM, and M.2 SSD rated by Brandon at 7300 MB/s sequential read and
+6300 MB/s sequential write. Keep this resource context visible when assessing completed
+constructions and minute-scale algorithms. Installed capacities and supplied storage ratings
+are not measured available memory, sustained bandwidth or power. The
+[hardware profile](docs/HARDWARE_AND_MODALITY_BOUNDARIES.md#consumer-workstation-and-measurement-scope)
+and [measurement conventions](docs/DEVELOPMENT.md#performance-and-information-measurements)
+retain the measured apparatus and costs. Under-five-minute returns are evidence about those
+workloads, not a universal runtime limit or another hang guard.
+
+[project-postulate] Measure performance routinely at the requested operation and receiver:
+delivered faces, completed owner updates, latency distributions, exact work/bit growth,
+memory, transfer and scoped information rates. Name each clock and distinguish setup,
+resident execution, readout and end-to-end delivery. Scalars, floating-point observer
+statistics and explicit resource objectives are legitimate measurements; the native exactness
+rule does not ban them. A clock reading or scalar loss becomes a decision through a declared
+law, never by silently becoming semantic identity or a mathematical impossibility verdict.
 
 Compose existing owners before founding another. A missing familiar software noun is not proof of
 a missing mechanism. Search by the relation, attempt the composition, and name the concrete absent

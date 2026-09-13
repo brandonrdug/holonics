@@ -29,6 +29,15 @@ GR-derived models are identified by their actual equations and approximation dom
 
 ## Construction programme and first formal use
 
+[proved-derived; formal-checked] The [September 13 game/biological synthesis](../research/records/2026-09-13_GAME_WORLDS_SCOPED_RATES_AND_MOLECULAR_MECHANICS_SHARE_DECLARED_LAWS.md)
+adds elapsed-clock and information-rate laws to `Foundation/SituatedInformationRate.lean`.
+`Physics/ConstitutiveModulation.lean` specializes the existing coupled response to a symmetric
+bend/twist/stretch matrix: finite energy changes retain quadratic remainders, and nonzero
+twist–stretch coupling separates torque at equal twist but different extension. Its coordinate
+map is proved equal to the existing `coupledResponse` through identity incidence. The
+dimensionless rod chart is reusable mathematics; a DNA/material application supplies reference
+strain, stiffness, units, medium and boundary conditions.
+
 [definition] The [HNN integration plan](plans/THE_ROADMAP.md#immediate-mathematical-application-and-implementation)
 now orders use of the returned mathematics through callable construction, contextual
 formation, compiled continuation and actual Athena tasks. The

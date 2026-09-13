@@ -117,6 +117,74 @@ remain ignored and retained.
 Authored Typst work is under `research/papers/source/`; compile it when editing or using those
 papers. It is not a required check for unrelated Rust work.
 
+## Performance and information measurements
+
+[definition] A **face delivery** completes a requested receiver output: a rendered image,
+decoded text section, solved coefficient family or another declared face. An **owner update**
+completes one admitted successor at its continuing owner. Report the selected operation and
+receiver address; these are scoped analogues of frames and ticks. A GPU launch, a symbol,
+a source observation and a successor are not interchangeable counts. A forecast can deliver
+an output without advancing its body. Equal repeated output still counts as deliveries,
+while its information cost depends on the declared conditional code.
+
+[definition] Over an elapsed interval `dt > 0` in a named clock, rates are `N_face/dt` and
+`N_update/dt`. Aggregate disjoint serial windows as `sum N / sum dt`; do not average reciprocal
+latencies without duration weighting. Concurrent branches require an actual common observation
+interval and identified deliveries to avoid double counting. Simulation time per wall time,
+device event time, CPU time and end-to-end latency have different units/scopes. Under an affine
+clock map `t' = a t + b`, `a > 0`, the same rate becomes `r/a`. A signed clock reversal changes
+the sign of an oriented quotient; it does not reverse dissipative dynamics or prove detailed
+balance. Nonlinear clocks use their actual finite interval, or `r/f'(t)` locally when defined.
+
+[definition] For the same measured occurrence family, information throughput factors as
+`bits/second = occurrences/second * bits/occurrence`. A code reading uses conditional lengths
+`sum -log2 q(y_k | conditions_k) / dt`; an expected finite positive-distribution reading is
+`r H2(p,q) = r H2(p) + r KL2(p||q)`. An event rate alone is not cross-entropy. Keep alphabet,
+conditioning, probability receiver and log base; zero code probability for an observed event
+has infinite cost or an explicit missing-code return, not a silently finite replacement.
+Exact prime-log code forms remain in `holonic_engine::surprisal`; decimal display is an observer
+projection. Code lengths, phase differences, physical joules and coordinate time are separate
+quantities until their constitutive map is supplied.
+
+[proved-derived; formal-checked] `Foundation/SituatedInformationRate.lean` proves affine
+clock transport, duration-weighted serial composition, measured-information factorization,
+expected entropy/KL rate decomposition and the conditional resource ceiling:
+`N*w_min <= W <= B*dt` implies `N/dt <= B/w_min`, for positive `dt,w_min`.
+Each resource uses its own work/capacity units; jointly applicable ceilings can be intersected.
+This is a hardware/workload bound, not a universal computational speed of light.
+
+[project-postulate] Benchmark the useful operation with its substantive output or mathematical
+reference. Record source revision, workload/extent, exact precision/bit growth, hardware and
+co-load, cold-start conditions, warm-up, repetition count and clock resolution. Retain raw
+durations and report total throughput, median and appropriate tail quantiles/maxima; a p99
+from only a few observations is an order statistic with little tail evidence. Define a stall
+against an explicit application deadline, not an invented universal cutoff.
+
+[project-postulate] Keep compilation, process/context creation, material setup, exterior
+construction, resident execution, synchronization/readout and complete delivery boundaries
+visible. Do not subtract overlapping durations as if they were serial work. Use existing
+receipts and asynchronous device events; do not introduce per-hot-operation host semantic
+readback merely to measure. Report payload bytes, allocator/device/process high-water readings,
+transfer direction and exact resource work separately. Missing counters are unknown, not zero.
+Joules/operation or bits/joule require an energy receiver with sampling interval and baseline;
+an SSD label or GPU power limit does not measure either quantity.
+
+[definition] `ExactWork` is the exact arithmetic/resource vector, with its existing product
+order and `WorkBudget`; it deliberately carries no elapsed clock. This local type contract
+does not prohibit timing statistics, loss objectives or external deadline/resource policies.
+Floating-point timing/quantile displays are observer calculations, not device semantic
+coefficients. A timeout records an unfinished run at its deadline, not mathematical
+infeasibility. Historical "no scalar"/"clock may never select" wording must be read at the
+actual erroneous substitution, never as a ban on measuring or optimizing performance.
+
+[established-bounded; measured; computational-witness] The
+[native performance benchmark](../research/experiments/native_performance_benchmark/README.md)
+applies these conventions to public C5 power/application, committed wave observations and
+exact code-cost calculation. It checks actual rational outputs and committed requests, keeps
+raw samples and reports process CPU/RSS, payload residency and transfer at their available
+scopes. Its explicit workload labels and setup boundaries are the measurement pattern for
+further applications; the file is an experiment, not a universal gate or native mechanism.
+
 ## Verification cadence
 
 [definition] CUDA controls that measure allocation granularity require an isolated allocation

@@ -62,6 +62,39 @@ theorem perron_detailed_balance {weight sourceMode targetMode eigenvalue : ℝ}
   unfold perronTransition
   field_simp [hs, ht, hl]
 
+/-! ## Directed flux comparison -/
+
+/-- A paired directed-flux code comparison. If the two positive inputs are occurrence rates
+in the same clock/units, this is a bit rate. It becomes physical entropy production only
+through an admitted stochastic/constitutive source and its boundary assumptions. -/
+noncomputable def edgeCodeProduction (forward backward : ℝ) : ℝ :=
+  (forward - backward) * (Real.log forward - Real.log backward) / Real.log 2
+
+/-- The oriented flux difference and code ratio both reverse sign under exchanging directions;
+their paired production is unchanged. This is distinct from reversing elapsed coordinates. -/
+theorem edgeCodeProduction_swap (forward backward : ℝ) :
+    edgeCodeProduction backward forward = edgeCodeProduction forward backward := by
+  unfold edgeCodeProduction
+  ring
+
+theorem edgeCodeProduction_nonnegative {forward backward : ℝ}
+    (hf : 0 < forward) (hb : 0 < backward) :
+    0 ≤ edgeCodeProduction forward backward := by
+  apply div_nonneg _ (le_of_lt (Real.log_pos (by norm_num : (1 : ℝ) < 2)))
+  rcases le_total backward forward with h | h
+  · exact mul_nonneg (sub_nonneg.mpr h) (sub_nonneg.mpr (Real.log_le_log hb h))
+  · exact mul_nonneg_of_nonpos_of_nonpos (sub_nonpos.mpr h)
+      (sub_nonpos.mpr (Real.log_le_log hf h))
+
+/-- The actual symmetric-generator balance annihilates this paired code production. -/
+theorem perron_edgeCodeProduction_zero {weight sourceMode targetMode eigenvalue : ℝ}
+    (hs : sourceMode ≠ 0) (ht : targetMode ≠ 0) (hl : eigenvalue ≠ 0) :
+    edgeCodeProduction
+      (sourceMode ^ 2 * perronTransition weight sourceMode targetMode eigenvalue)
+      (targetMode ^ 2 * perronTransition weight targetMode sourceMode eigenvalue) = 0 := by
+  rw [perron_detailed_balance hs ht hl]
+  simp [edgeCodeProduction]
+
 /-! ## Serial boundary balance -/
 
 theorem serial_boundary_balance

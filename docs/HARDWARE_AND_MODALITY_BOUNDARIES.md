@@ -1,5 +1,29 @@
 # Hardware and modality boundaries
 
+## Consumer workstation and measurement scope
+
+[established-bounded; source-inspected] Brandon's September 13 workstation declaration is
+Ryzen 9 7900X, 32 GB RAM, RTX 4080 SUPER with 16 GB VRAM, and M.2 SSD rated at 7300 MB/s
+sequential read / 6300 MB/s sequential write. A local apparatus read on September 13 confirms
+the AMD Ryzen 9 7900X 12-core/24-thread CPU, Linux `MemTotal: 31978668 kB` (about 30.5 GiB
+visible), and NVIDIA GeForce RTX 4080 SUPER `16376 MiB` under driver `595.71.05`.
+The storage speeds are supplied ratings; this review did not measure sustained SSD bandwidth.
+
+[definition] Installed RAM/VRAM, free capacity during a run, allocated resident payload,
+allocator reservation and whole-device memory use are different receivers. Decimal MB/s and
+binary MiB/GiB retain their units. A successful minute-scale exact/native operation on this
+machine is a useful consumer-hardware result at that workload, precision and output. Record it
+with setup and execution costs rather than replacing it with a generic capability adjective.
+The 20W ideology remains an efficiency direction; neither these capacities nor elapsed time
+establish measured energy or power.
+
+[definition] [Development's measurement conventions](DEVELOPMENT.md#performance-and-information-measurements)
+define receiver-scoped face/update rates, information units and latency/memory accounting.
+The [September 13 synthesis](../research/records/2026-09-13_GAME_WORLDS_SCOPED_RATES_AND_MOLECULAR_MECHANICS_SHARE_DECLARED_LAWS.md)
+records the benchmark return and source-qualified game/biological connections.
+
+## Apple and modality source boundaries
+
 [established-bounded; source-inspected] **September 8 branch update:**
 `origin/codex/apple-silicon` was fetched to `9b7b4b63` (September 7, 21:23 PDT), with common
 ancestor `e577d9b3`. It retains temporal observed-support adjoints, producing/current-cut

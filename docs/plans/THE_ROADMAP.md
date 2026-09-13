@@ -79,6 +79,23 @@ nested automata that construct, compare and refine further automata.
 
 ## Immediate mathematical application and implementation
 
+[project-postulate] Brandon's September 13 game/biology/measurement ruling gives the current
+consolidation its concrete returns: receiver-scoped performance conventions and benchmarks,
+consumer-hardware awareness, demand-driven world/continuation maps, and biological constitutive
+specializations in Lean. General "intelligence" or "learning" definitions add no preliminary
+gate. Use the generated-face equations already specified. The
+[synthesis](../../research/records/2026-09-13_GAME_WORLDS_SCOPED_RATES_AND_MOLECULAR_MECHANICS_SHARE_DECLARED_LAWS.md)
+connects these returns to their existing source owners and their precise evidence.
+
+[project-postulate] Formal mathematics and Millennium applications receive substantive work
+alongside HNN/Athena. Do not automatically convert a geometry, fluid, arithmetic or physical
+question into another language-exposure task. Work the named source law and its mathematical
+consequence, then integrate an available computational consumer. This does not restart every
+deferred endpoint campaign at once: RH source/sign control, Hodge realization, Navier–Stokes
+source/remainder, BSD arithmetic transport and Yang–Mills field/spectrum keep their own problems.
+For complexity, count uniform construction, storage and bit growth along with query work;
+finite reachability, graph diameter and precomputed answers do not by themselves close P vs NP.
+
 [project-postulate] Brandon's latest September 12 frontier review makes constructive continuity
 and consolidation explicit throughout this order. Preserve the wider framework, active
 mathematical unknown, available generating relations and actual consuming application across

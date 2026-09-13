@@ -1,8 +1,10 @@
 # Construction state
 
 **Currency:** September 13, 2026. **Latest implementation return:** the
-[repository frontier consolidation](research/records/2026-09-12_THE_FRONTIER_REVIEW_CONSOLIDATES_CONSTRUCTIVE_CONTINUITY.md)
-and its scoped repairs/checks are complete. **Standing product objective:** useful Athena language/code and
+[game/rate/molecular consolidation](research/records/2026-09-13_GAME_WORLDS_SCOPED_RATES_AND_MOLECULAR_MECHANICS_SHARE_DECLARED_LAWS.md)
+and its scoped formal/benchmark checks are complete, building on the
+[frontier review](research/records/2026-09-12_THE_FRONTIER_REVIEW_CONSOLIDATES_CONSTRUCTIVE_CONTINUITY.md).
+**Standing product objective:** useful Athena language/code and
 Hephaestus mathematical applications through the same HNN owners, within the wider Holonics
 mathematical and physical programme. The [roadmap](docs/plans/THE_ROADMAP.md) alone orders work.
 
@@ -11,6 +13,26 @@ identifies prediction release with output of the generated face. The initial pla
 three underdefined requirements; the blueprint now replaces them with the source/receiver
 equation, chunk transformation and coefficient/statistic update laws below. This mathematical
 account is clarified before returning to implementation. No new runtime behavior is claimed.
+
+## Current consolidation
+
+[definition] Brandon's latest September 13 request extends the consolidation to game/world
+streaming, consumer-hardware performance, molecular geometry and substantive Lean/Millennium
+work alongside HNN. The [current synthesis](research/records/2026-09-13_GAME_WORLDS_SCOPED_RATES_AND_MOLECULAR_MECHANICS_SHARE_DECLARED_LAWS.md)
+records the source maps and returned results. No additional qualitative definition of
+intelligence or learning is a prerequisite to the specified predictive constructions.
+
+[proved-derived; formal-checked] Scoped time/information laws, paired directed-flux code
+production and the rod constitutive specialization have passed their Lean targets. Rod
+coordinates are proved equal to the existing coupled response; positive directed-flow
+comparison is nonnegative, direction-swap invariant and zero under the existing balance law.
+
+[established-bounded; measured; computational-witness] The corrected native benchmark
+completed in 8.69 seconds on the declared consumer desktop. Its debug-build, warmed public
+round trips returned about 3,085 C5 power faces/s and 422 committed observations/s over
+128 measured requests each. Setup-inclusive session rates, cold-process/CPU/RSS and exact
+work/transfer remain in the receipt. Exact output/readback checks and all nine measurement
+tests passed. These are mathematical/observation workloads, not a new language-quality result.
 
 ## Available constructions
 

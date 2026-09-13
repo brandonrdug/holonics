@@ -2,13 +2,9 @@
 //!
 //! ## Why this exists, and what it discharges
 //!
-//! `docs/canon/TABLET_THE_CHART.md` §3.7 carries a standing owed item, and it is the one that makes every
-//! cost question in this repository unanswerable:
-//!
-//! > *"the machine currently has no organ that returns **'is this solvable, and at what cost'** as a
-//! > typed answer… `PivotSchedule` returns the pivot count and it is provably **not** the dominating
-//! > quantity; the dominating quantity is **intermediate entry bit-length** and nothing counts it.
-//! > Until a work vector exists, no cost question in this repository has a lawful answer."*
+//! `docs/canon/TABLET_THE_CHART.md` §3.7 records the August 17 gap this owner repaired:
+//! exact elimination counted pivots without intermediate rational widths. The present owner
+//! retains both work and width. That historical absence did not make elapsed measurements invalid.
 //!
 //! Measured 2026-08-17 by
 //! `grep -rn "\.bits()" --include='*.rs' crates/holonic-engine/src/inertia.rs
@@ -26,8 +22,9 @@
 //!
 //! and observed that averaging adjacent logarithmic slopes over **doubling** extents telescopes to
 //! `(log₂ t₆₄ − log₂ t₈)/3`, so the two interior measurements did not affect the fitted exponent at
-//! all. `CLAUDE.md`'s rule is that **a cost is measured in work; a clock may measure but may never
-//! select.** This module is the work.
+//! all. The error was promoting a small-aperture fit into an exact infeasibility claim. Elapsed
+//! clocks can measure and guide a declared resource policy; they cannot supply the missing exact
+//! work law. This owner counts work, while exterior benchmark receivers retain timing separately.
 //!
 //! ## The law it is a lift of
 //!
@@ -60,10 +57,13 @@
 //!
 //! ## What is refused
 //!
-//! No elapsed time, anywhere in this module. A caller that wants a clock keeps one beside the vector
-//! and it may not enter [`WorkBudget::admits`]. And no scalar: the ordering is the product order, and
-//! where it returns `Open` a **declared receiver metric** decides — which is a caller's declaration
-//! exhibited in the return, never a governor inside the organ.
+//! Exact admission in this module uses the complete work vector, never elapsed time or a scalar
+//! surrogate. A caller may keep elapsed-time statistics, a declared wall-time budget, or an
+//! optimization objective beside that vector; those external measurements do not establish exact
+//! infeasibility, and a timeout must not become a mathematical infeasibility refusal or an
+//! exact projected work law.
+//! Where the exact ordering returns `Open`, a **declared receiver metric** decides — a caller's
+//! comparison exhibited in its return, never a hidden governor inside this owner.
 
 use num_bigint::BigUint;
 use num_traits::Zero;

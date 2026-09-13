@@ -325,28 +325,32 @@ His intuitions, verbatim:
 > *"Dark matter is purely like the wormhole, explicitly a curved path. Is the fractal dimension like
 > pi's C/d? This has something to do with FLT still."*
 
-Two standard facts make the curvature intuition exact:
+The geometric and arithmetic receivers retain different consequences:
 
 - The Fermat curve `xⁿ + yⁿ = zⁿ` is a smooth plane curve of degree `n` and therefore has **genus
-  `(n−1)(n−2)/2`**. For `n = 3` the genus is 1 — an elliptic curve, flat. For `n ≥ 4` the genus is
-  `≥ 3`, so `χ = 2 − 2g < 0`: **hyperbolic**.
+  `(n−1)(n−2)/2`** over characteristic zero. For `n = 3` the genus is 1; its complex
+  uniformization admits a flat metric. For `n ≥ 4` the genus is at least 3 and its complex
+  uniformization is hyperbolic. Neither statement chooses the metric of every embedding.
 - **Faltings (1983, the Mordell conjecture)**: a curve of genus > 1 over a number field has only
   **finitely many** rational points.
 
-So *"a curved path"* is not loose talk: the difficulty of FLT switches on exactly when the curve's
-Euler characteristic goes negative, and the first general theorem about it is a theorem about that
-curvature. Faltings gives finiteness, not emptiness; Wiles closes the gap by a different route
-entirely — modularity of semistable elliptic curves, via Frey's curve and Ribet's theorem.
+[definition] Genus distinguishes these geometric cases; it does not locate the onset of FLT,
+which already includes exponent 3. Faltings gives finiteness, not the absence of nontrivial
+points. Wiles's modularity result and the Frey–Ribet route give the arithmetic conclusion;
+see [Wiles, 1995](https://annals.math.princeton.edu/1995/141-3/p01).
 
 **And the deeper alignment, which this project should carry:**
 
-`xⁿ + yⁿ = zⁿ` has abundant **real** solutions and abundant **rational** ones on the projective
-curve's complex points. What fails is the **integral** section. FLT is not "no solutions" — it is
-*the solutions exist over the larger ring and not over `ℤ`*.
+[proved-derived] A nonzero rational solution of the homogeneous equation `xⁿ+yⁿ=zⁿ`
+would give a nonzero integral solution by multiplying all three coordinates by a common
+denominator. Thus the nontrivial rational and integral existence questions agree here.
+Real/complex solutions exist; calling complex points "rational" erases the arithmetic condition.
+This corrects the earlier agent prose, recoverable in Git before the September 13 synthesis.
 
-That is the **same species** as the failure of the *integral* Hodge conjecture, which `CLAUDE.md` §3
-records: a class supported over `ℚ` and unsupported over `ℤ`, with the obstruction living in the
-**cokernel of the cycle class map**. And this repository already models that species by name:
+[interpretation] Integral Hodge obstructions instead concern an integral class whose suitable
+multiple is realized; its obstruction can live in the cokernel of the cycle-class map.
+The shared question is realization under a specified coefficient change, with a different
+source map in each case. The repository models a multiple-realization obstruction by name:
 `ObstructionSpecies::ReachableOnlyInMultiple { factor }`, `supported_realizers.rs:108` — and the
 grown circuit produced an instance of it, `factor: 2`, with the generator exhibited.
 
@@ -362,24 +366,30 @@ more.
 
 > *"uses "is this solvable, and at what cost" in order to infer about the *combinatorics*."*
 
-The precise reading in the machine's own vocabulary, and it is already half-written in `CLAUDE.md` §2:
+[definition] The useful operational reading is preprocessing and reuse: a constructed
+representation can make a later query cheap. Its complete cost is construction plus storage,
+query/decoding and maintenance under admitted changes. A finite search can still be exponential
+in input bit length. Neither finite exhaustion nor an already-stored answer proves equality
+between finding and verification costs. Trial division up to `sqrt(n)` is finite but not
+polynomial in `log2(n)`; factorization is not silently identified with an NP-complete problem.
 
-P vs NP is the gap between **verifying** and **finding**. RIDE is verification against standing;
-FOUND is search that pays curvature. `CLAUDE.md` §2, assistant prose: *"FOUND pays curvature; RIDE is
-cheap because the terrain already paid."* **Localized P=NP is the statement that on standing terrain,
-finding costs what verifying costs — because the terrain already did the finding.**
+[proved-standard] P versus NP concerns polynomial-time decision over an unbounded encoded
+input family. A local reusable algorithm must state its family, input size, uniform construction,
+representation size and exact bit costs before it bears on that question. See
+[Cook's official problem description](https://www.claymath.org/wp-content/uploads/2022/06/pvsnp.pdf).
+The historical phrase "Localized P=NP" is an intuition about reusable standing, not a proof
+of the complexity-class identity or a license to omit preprocessing.
 
-Prime founding is the worked instance the contract already names: verifying a factorization is one
-multiplication; finding it is the hard direction. But *below the square-root frontier the transport
-population is finite and exhaustible*, so locally the two costs meet, and exhaustion — not a
-certificate — is what FOUNDs a new axis.
+[established-bounded; source-inspected] `crates/holonic-engine/src/exact_work.rs` now records
+arithmetic operations, written entries, cumulative/peak rational bit width, residency and
+dependency span. The shared polynomial/matrix owners expose counted construction and reduced
+power work. These repair the August gap; they do not provide a universal solver cost oracle.
 
-**Owed:** the machine currently has no organ that returns *"is this solvable, and at what cost"* as a
-typed answer. §8's cost discipline and today's Smith-reduction finding are the same demand arriving
-from the other side: a cost that is measured in **work** and not in elapsed time. `PivotSchedule`
-returns the pivot count and it is provably **not** the dominating quantity; the dominating quantity
-is intermediate entry bit-length and nothing counts it. Until a work vector exists, no cost question
-in this repository has a lawful answer.
+[project-postulate] Count exact work and measure elapsed performance. Declared scalar objectives,
+timing statistics and wall-time budgets are lawful receivers/policies with their units and
+conditions. A fitted time curve or timeout does not prove mathematical infeasibility.
+Use [the measurement conventions](../DEVELOPMENT.md#performance-and-information-measurements)
+and preserve both the resource vector and the requested scalar display.
 
 ---
 
