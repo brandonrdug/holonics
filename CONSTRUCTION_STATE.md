@@ -10,6 +10,29 @@ targeted development and product checks on the repaired path proceed within the 
 
 ## Immediate implementation
 
+[established-bounded; computational-witness] The
+[first real-source trials](research/records/2026-09-12_CONTEXTUAL_RECEPTION_AND_NORMALIZATION_REUSE_THEIR_SHARED_NATIVE_OWNERS.md#real-source-development-and-transport-bound-repair)
+now include actual output: the next-current route completed 166 observations and emitted
+`race  tr ana t t`. This is not a useful language response. The addressed route still refuses
+at 95 observations, with its pending source preserved; it formerly stopped at 42. No exposure
+was lengthened. Both observation charts and their actual outcomes are recorded separately.
+
+[established-bounded; implemented-exact; formal-checked; computational-witness] The same
+native owners now retain dyadic Schur/Gram transport bounds, charge only actual first-step
+rounding and keep wide exact error moments independent of narrower report fields. The
+canonical-source metadata guard is repaired. Four finite norm lemmas are Lean-checked;
+108 normal-material/recurrence/return controls passed. These representation and maintenance
+repairs are integrated goal work, not a completed language product.
+
+[open] Brandon's latest next-holon correction makes the next work **joint prospective
+continuation/release before exterior decoding**, as specified in the
+[blueprint's research binding](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#how-the-research-enters-these-packets).
+The text driver fitted a fixed-size normal-response family and selected character coordinates;
+it did not integrate the existing modal, joint-family and predictive-release constructions.
+Compose those owners into the requested multi-part/graph-like predictive return while repairing
+directional source/error transport across rebase. Further character-only exposure is not the
+next implementation step. The numerical repairs stand; they do not replace this integration.
+
 [established-bounded; implemented-exact; computational-witness] The
 [resident composition return](research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md#resident-composition-and-fixed-section-compilation)
 adds one input path for retained outputs and changed receivers, and compiles a following

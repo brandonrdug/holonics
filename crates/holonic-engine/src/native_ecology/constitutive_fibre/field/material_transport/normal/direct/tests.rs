@@ -38,6 +38,56 @@ fn contains(ball: &NativeFieldCurrentBall, expected: &[ExactComplexWaveCurrent])
 }
 
 #[test]
+#[ignore = "requires CUDA; exact source moments must not be refused by a narrow diagnostic"]
+fn large_exact_source_error_keeps_the_zero_fit_and_complete_moments() {
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let grain = ResidentGrain(64);
+    let mut body = ResidentNormalMaterial::found(&s, 1, 1, grain).unwrap();
+    // Entire ball of radius 2^40 with zero centre, not a point. Every source maps
+    // to zero under the zero operator, independently of this large source aperture.
+    let mut values = vec![0i128; 7];
+    values[6] = 1i128 << 104;
+    let words = values.into_iter().flat_map(|value| {
+        let bytes = value.to_le_bytes();
+        [i64::from_le_bytes(bytes[..8].try_into().unwrap()),
+            i64::from_le_bytes(bytes[8..].try_into().unwrap())]
+    }).map(|v| (v, v)).collect();
+    let source = s.mount_section_rest(&ResidentSectionRest::found(1, 14, ResidentGrain(0), 64, words)
+        .unwrap()).unwrap();
+    let ball = ResidentNormalEnclosureView { surface: &s, section: &source, offset: 0, width: 6, grain };
+    let y = point(&s, &[0, 0]);
+    let reads = s.census().section_read_outs;
+    let returned = body.receive(ball, current(&y)).unwrap();
+    assert_eq!(s.census().section_read_outs, reads);
+    let after = returned.inspect_after().unwrap().unwrap();
+    let expected = Rat::from_integer(BigInt::one() << 80usize);
+    assert_eq!(after.source_normal_error_upper, expected);
+    assert_eq!(after.increments[0], expected);
+    assert_eq!(after.forward.radius, Rat::zero());
+    assert_eq!(after.coefficient_error, Rat::zero());
+    assert_eq!(after.source_current.unwrap().radius,
+        Rat::from_integer(BigInt::one() << 40usize));
+    drop(returned);
+    let state = body.inspect().unwrap();
+    assert_eq!(state.source_normal_error, expected);
+    assert_eq!(state.material.radius, Rat::zero());
+    let saved = body.rest().unwrap();
+    saved.validate().unwrap();
+    let mut restored = saved.remount(&s).unwrap();
+    let next = restored.read(ball).unwrap().inspect_before().unwrap();
+    assert_eq!(next.source_normal_error_upper, expected);
+    assert_eq!(next.forward.radius, Rat::zero());
+    // A non-power total takes an outward power bound while its exact moment stays 3*EH.
+    for _ in 0..2 { restored.receive(ball, current(&y)).unwrap(); }
+    let total = restored.read(ball).unwrap().inspect_before().unwrap();
+    assert_eq!(total.source_normal_error_upper, &expected * Rat::from_integer(4.into()));
+    assert_eq!(restored.inspect().unwrap().source_normal_error,
+        &expected * Rat::from_integer(3.into()));
+    restored.rest().unwrap().validate().unwrap();
+}
+
+#[test]
 #[ignore = "requires CUDA; actual differing observations retain fit discrepancy without growing source history"]
 fn differing_returns_accumulate_geometry_and_keep_fit_distinct_from_solve_error() {
     let readout = ResidentReadout::new().unwrap();

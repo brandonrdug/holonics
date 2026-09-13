@@ -7,6 +7,16 @@ fn phase(r: i64, i: i64, d: i64) -> NativePhaseCurrent {
 }
 
 #[test]
+fn diagnostic_chart_keeps_legacy_values_and_rejects_invalid_power_codes() {
+    assert_eq!(diagnostic_numerator(17).unwrap(), BigInt::from(17));
+    assert_eq!(diagnostic_numerator(-127).unwrap(), BigInt::one() << 127usize);
+    assert_eq!(diagnostic_numerator(-144).unwrap(), BigInt::one() << 144usize);
+    for invalid in [-1, -126, -545, i128::MIN] {
+        assert!(diagnostic_numerator(invalid).is_err());
+    }
+}
+
+#[test]
 fn normal_objective_separates_fit_prior_solve_and_source_family() {
     let q = |n: i64, d: i64| Rat::new(n.into(), d.into());
     let wave = |r, i, d| ExactComplexWaveCurrent::new(q(r, d), q(i, d));

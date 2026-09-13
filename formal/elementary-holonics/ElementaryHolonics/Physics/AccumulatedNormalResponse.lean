@@ -1,5 +1,7 @@
 import Mathlib.LinearAlgebra.Matrix.ConjTranspose
 import Mathlib.Analysis.InnerProductSpace.EuclideanDist
+import Mathlib.Analysis.CStarAlgebra.Matrix
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Tactic
 
 /-!
@@ -76,6 +78,132 @@ def normalObjective (samples : List (Sample Source Target)) (M : Matrix Target S
 theorem frobeniusSq_nonneg (M : Matrix Target Source ℂ) :
     0 ≤ frobeniusSq M := by
   exact sq_nonneg _
+
+theorem weighted_cauchy_schwarz {I : Type*} [Fintype I]
+    (a x : I → ℝ) (ha : ∀ i, 0 ≤ a i) :
+    (∑ i, a i * x i) ^ 2 ≤ (∑ i, a i) * ∑ i, a i * (x i) ^ 2 := by
+  have h := Finset.sum_mul_sq_le_sq_mul_sq (Finset.univ : Finset I)
+    (fun i => Real.sqrt (a i)) (fun i => Real.sqrt (a i) * x i)
+  have hs (i : I) : (Real.sqrt (a i)) ^ 2 = a i := Real.sq_sqrt (ha i)
+  have hleft : (∑ i, Real.sqrt (a i) * (Real.sqrt (a i) * x i)) =
+      ∑ i, a i * x i := by
+    apply Finset.sum_congr rfl
+    intro i hi
+    rw [show Real.sqrt (a i) * (Real.sqrt (a i) * x i) =
+      (Real.sqrt (a i)) ^ 2 * x i by ring, hs]
+  have hweight : (∑ i, (Real.sqrt (a i)) ^ 2) = ∑ i, a i := by
+    apply Finset.sum_congr rfl
+    intro i hi
+    exact hs i
+  have hright : (∑ i, (Real.sqrt (a i) * x i) ^ 2) =
+      ∑ i, a i * (x i) ^ 2 := by
+    apply Finset.sum_congr rfl
+    intro i hi
+    rw [show (Real.sqrt (a i) * x i) ^ 2 =
+      (Real.sqrt (a i)) ^ 2 * (x i) ^ 2 by ring, hs]
+  rw [hleft, hweight, hright] at h
+  exact h
+
+theorem complex_schur_action_sq
+    (A : Matrix Target Source ℂ) (a : Target → Source → ℝ)
+    (x : Source → ℂ) (R C : ℝ)
+    (ha : ∀ i j, 0 ≤ a i j)
+    (hnorm : ∀ i j, ‖A i j‖ ≤ a i j)
+    (hrows : ∀ i, (∑ j, a i j) ≤ R)
+    (hcols : ∀ j, (∑ i, a i j) ≤ C)
+    (hR : 0 ≤ R) (_hC : 0 ≤ C) :
+    (∑ i, ‖∑ j, A i j * x j‖ ^ 2) ≤
+      R * C * ∑ j, ‖x j‖ ^ 2 := by
+  have hrow (i : Target) :
+      ‖∑ j, A i j * x j‖ ^ 2 ≤
+        R * ∑ j, a i j * ‖x j‖ ^ 2 := by
+    have htriangle : ‖∑ j, A i j * x j‖ ≤ ∑ j, a i j * ‖x j‖ := by
+      calc
+        ‖∑ j, A i j * x j‖ ≤ ∑ j, ‖A i j * x j‖ := norm_sum_le _ _
+        _ ≤ ∑ j, a i j * ‖x j‖ := by
+          apply Finset.sum_le_sum
+          intro j hj
+          exact (norm_mul_le _ _).trans
+            (mul_le_mul_of_nonneg_right (hnorm i j) (norm_nonneg _))
+    have hcs := weighted_cauchy_schwarz (fun j => a i j) (fun j => ‖x j‖) (ha i)
+    have hsum_nonneg : 0 ≤ ∑ j, a i j * ‖x j‖ ^ 2 := by
+      exact Finset.sum_nonneg fun j hj => mul_nonneg (ha i j) (sq_nonneg _)
+    have hsum_norm_nonneg : 0 ≤ ∑ j, a i j * ‖x j‖ := by
+      exact Finset.sum_nonneg fun j hj => mul_nonneg (ha i j) (norm_nonneg _)
+    have hweighted :
+        (∑ j, a i j * ‖x j‖) ^ 2 ≤
+          R * ∑ j, a i j * ‖x j‖ ^ 2 :=
+      (hcs.trans (mul_le_mul_of_nonneg_right (hrows i) hsum_nonneg))
+    exact ((sq_le_sq₀ (norm_nonneg _) hsum_norm_nonneg).2 htriangle).trans hweighted
+  calc
+    (∑ i, ‖∑ j, A i j * x j‖ ^ 2) ≤
+        ∑ i, R * ∑ j, a i j * ‖x j‖ ^ 2 :=
+      Finset.sum_le_sum fun i hi => hrow i
+    _ = R * ∑ i, ∑ j, a i j * ‖x j‖ ^ 2 := by rw [Finset.mul_sum]
+    _ = R * ∑ j, (∑ i, a i j) * ‖x j‖ ^ 2 := by
+      congr 1
+      rw [Finset.sum_comm]
+      apply Finset.sum_congr rfl
+      intro j hj
+      rw [Finset.sum_mul]
+    _ ≤ R * (C * ∑ j, ‖x j‖ ^ 2) := by
+      apply mul_le_mul_of_nonneg_left
+      · calc
+          (∑ j, (∑ i, a i j) * ‖x j‖ ^ 2) ≤
+              ∑ j, C * ‖x j‖ ^ 2 := by
+            apply Finset.sum_le_sum
+            intro j hj
+            exact mul_le_mul_of_nonneg_right (hcols j) (sq_nonneg _)
+          _ = C * ∑ j, ‖x j‖ ^ 2 := by rw [Finset.mul_sum]
+      · exact hR
+    _ = R * C * ∑ j, ‖x j‖ ^ 2 := by ring
+
+open scoped Matrix.Norms.L2Operator in
+theorem square_schur_operator_bound [DecidableEq Source]
+    (A : Matrix Source Source ℂ) (a : Source → Source → ℝ) (R C : ℝ)
+    (ha : ∀ i j, 0 ≤ a i j) (hnorm : ∀ i j, ‖A i j‖ ≤ a i j)
+    (hrows : ∀ i, (∑ j, a i j) ≤ R) (hcols : ∀ j, (∑ i, a i j) ≤ C)
+    (hR : 0 ≤ R) (hC : 0 ≤ C) : ‖A‖ ≤ Real.sqrt (R * C) := by
+  rw [← Matrix.l2_opNorm_toEuclideanCLM]
+  apply ContinuousLinearMap.opNorm_le_bound _ (Real.sqrt_nonneg _)
+  intro x
+  apply (sq_le_sq₀ (norm_nonneg _) (mul_nonneg (Real.sqrt_nonneg _) (norm_nonneg _))).mp
+  rw [mul_pow, Real.sq_sqrt (mul_nonneg hR hC)]
+  simp only [EuclideanSpace.norm_sq_eq, Matrix.ofLp_toEuclideanCLM]
+  simpa only [Matrix.mulVec, dotProduct] using
+    complex_schur_action_sq A a (WithLp.ofLp x) R C ha hnorm hrows hcols hR hC
+
+open scoped Matrix.Norms.L2Operator in
+/-- Taking the complex Gram product before its entrywise bound keeps cancellation
+between modes. This is a bound on the current operator, not its previous power envelope. -/
+theorem gram_operator_bound [DecidableEq Source]
+    (A : Matrix Source Source ℂ) (G : ℝ) (hG : 0 ≤ G)
+    (hrows : ∀ i, (∑ j, (|((A.conjTranspose * A) i j).re| +
+      |((A.conjTranspose * A) i j).im|)) ≤ G) :
+    ‖A‖ ≤ Real.sqrt G := by
+  let K := A.conjTranspose * A
+  let a := fun i j => |(K i j).re| + |(K i j).im|
+  have hhermitian : K.conjTranspose = K := by simp [K]
+  have hsymm (i j : Source) : a i j = a j i := by
+    have h := congrArg (fun M : Matrix Source Source ℂ => M i j) hhermitian
+    change star (K j i) = K i j at h
+    dsimp [a]
+    rw [← h]
+    simp
+  have hcols (j : Source) : (∑ i, a i j) ≤ G := by
+    calc
+      (∑ i, a i j) = ∑ i, a j i := Finset.sum_congr rfl (fun i _ => hsymm i j)
+      _ ≤ G := hrows j
+  have hbound := square_schur_operator_bound K a G G
+    (fun i j => add_nonneg (abs_nonneg _) (abs_nonneg _))
+    (fun i j => Complex.norm_le_abs_re_add_abs_im (K i j)) hrows hcols hG hG
+  rw [Real.sqrt_mul_self hG] at hbound
+  change ‖A.conjTranspose * A‖ ≤ G at hbound
+  rw [Matrix.l2_opNorm_conjTranspose_mul_self] at hbound
+  have hsqrt := Real.sq_sqrt hG
+  have hn := norm_nonneg A
+  have hr := Real.sqrt_nonneg G
+  nlinarith
 
 theorem normalObjective_zero (samples : List (Sample Source Target)) :
     normalObjective samples 0 =
@@ -268,6 +396,10 @@ section Audit
 #print axioms normal_minimizer_frobenius_norm_le_sqrt_target
 #print axioms applied_reference_frobenius_bound_of_normal_minimizer
 #print axioms minimum_of_two_valid_bounds
+#print axioms weighted_cauchy_schwarz
+#print axioms complex_schur_action_sq
+#print axioms square_schur_operator_bound
+#print axioms gram_operator_bound
 
 end Audit
 

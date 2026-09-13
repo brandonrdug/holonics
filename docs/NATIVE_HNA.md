@@ -123,6 +123,15 @@ observation's commitment separately from any optional receiver refusal. The sour
 normalized return and decoder are the same owners used by the field interface, with typed
 source ownership and chart parameters instead of another operation-specific type family.
 
+[definition] The [`contextual_text_use` example](../crates/holonics-hna/examples/contextual_text_use.rs)
+feeds bounded development parts from the validated exposure reader through those existing
+public owners. It records the exact source aperture, observations, actual output, errors and
+private checkpoint. Its optional `addressed`/`next-current` argument declares two distinct
+observation contracts, not alternative hidden learning engines. `--inspect CHECKPOINT` reads
+the retained numerical geometry without changing it. The
+[first real-source trials](../research/records/2026-09-12_CONTEXTUAL_RECEPTION_AND_NORMALIZATION_REUSE_THEIR_SHARED_NATIVE_OWNERS.md#real-source-development-and-transport-bound-repair)
+record both failures and the incomplete language output; this driver is not a finished product UI.
+
 [definition] `ResidentNormalMaterial` exposes the existing unit-prior accumulated normal law
 through resident source/observed currents. Its three complex source port blocks and output width
 are declared at founding. `read` preserves material; `receive` stages the existing native normal

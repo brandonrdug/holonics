@@ -69,8 +69,8 @@ __device__ void direct_normal_predict_mode(const int64_t *old,const wide *curren
         size_t at=normal_metadata_at(roots,targets);
         out[at]=M[(size_t)R*normal_sources(roots)];out[at+1u]=M[(size_t)R*normal_sources(roots)+1u];out[at+2u]=norm;
         const int64_t *errors=old+normal_state_words(roots,targets)-NORMAL_STATISTIC_COUNT*MOMENT_WIRE_WORDS;
-        out[at+3u]=normal_grid(normal_read(errors,slot),grain,true,slot);
-        out[at+4u]=normal_grid(normal_read(errors+MOMENT_WIRE_WORDS,slot),grain,true,slot);
+        out[at+3u]=normal_diagnostic_upper(normal_read(errors,slot),grain,slot);
+        out[at+4u]=normal_diagnostic_upper(normal_read(errors+MOMENT_WIRE_WORDS,slot),grain,slot);
         }
     }
     __syncthreads();if(*slot)return;

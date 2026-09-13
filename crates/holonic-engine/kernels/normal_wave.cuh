@@ -117,6 +117,14 @@ extern "C" __global__ void section_normal_wave_power(const int64_t *material,con
 __device__ wide normal_wave_multiply_upper(wide a,wide b,uint32_t grain,uint32_t *slot){
     return normal_grid(normal_wide(a)*normal_wide(b),grain,true,slot);
 }
+// Both operands already have valid nonnegative bounds. Compare in the full moment
+// carrier before narrowing: an irrelevant larger candidate does not obstruct the cap.
+__device__ wide normal_wave_root_capped(const MomentInteger &square,wide cap,uint32_t *slot){
+    if(square.overflow||square.negative||normal_wide(cap)*normal_wide(cap)<=square)return cap;
+    HistoryInteger value;
+    for(uint32_t j=0;j<HistoryInteger::LIMBS;++j)value.limb[j]=square.limb[j];
+    return history_norm_ceiling(value,slot);
+}
 __device__ void section_normal_wave_evaluate_impl(const int64_t *material,const int64_t *power,
     const int64_t *seed_bound,const int64_t *old_meta,uint32_t n,uint32_t grain,uint64_t steps,
     int64_t *meta,int64_t *meta_hi,int64_t *joint,int64_t *joint_hi,int64_t *current,int64_t *current_hi,
@@ -136,12 +144,40 @@ __device__ void section_normal_wave_evaluate_impl(const int64_t *material,const 
         scratch[2u*row]=row_norm;scratch[2u*row+1u]=col_norm;
     }
     __syncthreads();if(*slot)return;
+    __shared__ wide current_cap;
     if(!threadIdx.x){
-        wide B=((const wide *)old_meta)[0];
-        for(uint32_t j=0;j<2u*d;++j){wide v=scratch[j]/S+(scratch[j]%S!=0);if(v>B)B=v;}
+        wide rows=0,cols=0;
+        for(uint32_t j=0;j<d;++j){if(scratch[2u*j]>rows)rows=scratch[2u*j];if(scratch[2u*j+1u]>cols)cols=scratch[2u*j+1u];}
+        // Schur: ||Q||_2 <= sqrt(max-row-l1 * max-column-l1). Keep the
+        // dyadic root, rather than rounding the transport to an integer each rebase.
+        current_cap=normal_wave_root_capped(normal_wide(rows)*normal_wide(cols),rows>cols?rows:cols,slot);
+    }
+    __syncthreads();if(*slot)return;
+    for(uint32_t row=threadIdx.x;row<d;row+=blockDim.x){
+        MomentInteger row_sum;
+        for(uint32_t col=0;col<d;++col){
+            MomentInteger re,im;
+            for(uint32_t k=0;k<d;++k){size_t a=2u*((size_t)k*d+col),b=2u*((size_t)k*d+row);
+                if((Q[a]||Q[a+1u])&&(Q[b]||Q[b+1u]))
+                    normal_product(re,im,normal_wide(Q[a]),normal_wide(Q[a+1u]),normal_wide(Q[b]),normal_wide(Q[b+1u]),true);}
+            row_sum=row_sum+normal_abs(re)+normal_abs(im);
+        }
+        // ||Q||_2^2 = ||Q* Q||_2. Preserve phase cancellations inside each
+        // exact Gram entry before bounding its row; Hermitian column sums agree.
+        scratch[2u*row]=normal_wave_root_capped(row_sum,current_cap,slot);
+    }
+    __syncthreads();if(*slot)return;
+    if(!threadIdx.x){
+        wide current_bound=0;
+        for(uint32_t j=0;j<d;++j)if(scratch[2u*j]>current_bound)current_bound=scratch[2u*j];
+        wide B=((const wide *)old_meta)[0],integer_bound=current_bound/S+(current_bound%S!=0);
+        if(integer_bound>B)B=integer_bound;
         wide coefficient_error=reference?((const wide *)material)[6u*(size_t)n*n]:0;
         if(coefficient_error<0||B<1){atomicOr(slot,REFUSED_MALFORMED);}
-        wide defect=add_checked(product_checked(product_checked(2,coefficient_error,slot),B,slot),(wide)2u*d,slot);
+        // At the first step Q=G*I has no dyadic matrix-product rounding. This
+        // does not discard Q*z rounding, source radius or reference coefficient error.
+        wide product_error=steps==1u?0:(wide)2u*d;
+        wide defect=add_checked(product_checked(product_checked(2,coefficient_error,slot),B,slot),product_error,slot);
         wide base=add_checked(S,defect,slot),growth=S;uint64_t exponent=steps;
         while(exponent&&! *slot){if(exponent&1u)growth=normal_wave_multiply_upper(growth,base,grain,slot);
             exponent>>=1u;if(exponent)base=normal_wave_multiply_upper(base,base,grain,slot);}
@@ -149,7 +185,7 @@ __device__ void section_normal_wave_evaluate_impl(const int64_t *material,const 
         for(uint32_t j=0;j<d;++j)rounds=add_checked(rounds,scratch[2u*d+j],slot);
         for(uint32_t j=0;j<2u*d;++j)norm=add_checked(norm,ft_abs(z[j],slot),slot);
         wide radius=add_checked(normal_wave_multiply_upper(error,add_checked(norm,z[2u*d],slot),grain,slot),
-            add_checked(product_checked(B,z[2u*d],slot),rounds,slot),slot);
+            add_checked(normal_wave_multiply_upper(current_bound,z[2u*d],grain,slot),rounds,slot),slot);
         out[2u*d]=radius;wide *m=(wide *)meta;m[0]=B;m[1]=defect;m[2]=error;m[3]=radius;
     }
     __syncthreads();if(*slot)return;

@@ -3,6 +3,113 @@ use super::*;
 use crate::embedding_fiber::ResidentReadout;
 
 #[test]
+#[ignore = "requires CUDA; exact first power and dyadic operator transport retain source error"]
+fn first_power_pays_actual_rounding_and_dyadic_source_transport() {
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let seed = s
+        .mount_section_rest(
+            &ResidentSectionRest::found(1, 3, ResidentGrain(0), 64, vec![(1, 1), (0, 0), (3, 3)])
+                .unwrap(),
+        )
+        .unwrap();
+    let rational = ResidentConstitutiveCurrent::rational(&seed).unwrap();
+    let mut body = ResidentNormalMaterial::found(&s, 1, 1, ResidentGrain(32))
+        .unwrap()
+        .into_difference_wave(rational, rational)
+        .unwrap();
+    body.set_transport(NormalWaveTransport::Applied).unwrap();
+    let scale = BigInt::one() << 32usize;
+    assert_eq!(
+        body.joint_source().joint().inspect().unwrap().radius,
+        Rat::new(2.into(), scale.clone())
+    );
+    let reads = s.census().section_read_outs;
+    let result = body.advance().unwrap();
+    assert_eq!(s.census().section_read_outs, reads);
+    let reading = result.inspect().unwrap();
+    assert_eq!(reading.uniform_power_equation_defect, Rat::zero());
+    assert_eq!(reading.operator_word_error, Rat::zero());
+    // Q=[0,1;0,1] has norm sqrt(2), not its integer ceiling 2.
+    assert_eq!(reading.joint_current.radius, Rat::new(3.into(), scale));
+    super::comparison_tests::contains(
+        &reading.joint_current,
+        &[
+            super::comparison_tests::wave(1, 0, 3),
+            super::comparison_tests::wave(1, 0, 3),
+        ],
+    );
+}
+
+#[test]
+#[ignore = "requires CUDA; complex Gram contraction precedes absolute row bounds"]
+fn gram_transport_keeps_cancellation_before_its_bound() {
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let material = ResidentNormalMaterial::found(&s, 2, 2, ResidentGrain(32)).unwrap();
+    let mut state = material.state_wire().unwrap();
+    let layout = NormalLayout::new(2, 2).unwrap();
+    let mut values = wides(&state.intervals[..layout.matrix_words]).unwrap();
+    let scale = 1i128 << 32;
+    // A declared applied operator, not training data or a fixture-local learner:
+    // G=[0,I;A,0], A=3/4*[1,i;1,-i]. Its Gram is diagonal, norm²=9/8.
+    values[2 * 2] = -scale;
+    values[2 * 4] = 3 * scale / 4;
+    values[2 * 5 + 1] = 3 * scale / 4;
+    values[2 * (6 + 3)] = -scale;
+    values[2 * (6 + 4)] = 3 * scale / 4;
+    values[2 * (6 + 5) + 1] = -3 * scale / 4;
+    // The zero-statistic minimizer is zero: these exact L1 M/residual bounds
+    // enclose this declared dyadic realization without claiming it was fitted.
+    for v in &mut values[layout.cross_values..layout.cross_values + 3] {
+        *v = 5 * scale;
+    }
+    for (i, value) in values.into_iter().enumerate() {
+        let bytes = value.to_le_bytes();
+        let lo = i64::from_le_bytes(bytes[..8].try_into().unwrap());
+        let hi = i64::from_le_bytes(bytes[8..].try_into().unwrap());
+        state.intervals[2 * i] = (lo, lo);
+        state.intervals[2 * i + 1] = (hi, hi);
+    }
+    let material = NormalMaterialRest::from_state_data(2, 2, ResidentGrain(32), 0, state)
+        .unwrap()
+        .remount(&s)
+        .unwrap();
+    let seed = s
+        .mount_section_rest(
+            &ResidentSectionRest::found(
+                1,
+                5,
+                ResidentGrain(0),
+                64,
+                vec![(1, 1), (0, 0), (1, 1), (0, 0), (3, 3)],
+            )
+            .unwrap(),
+        )
+        .unwrap();
+    let rational = ResidentConstitutiveCurrent::rational(&seed).unwrap();
+    let mut body = material.into_difference_wave(rational, rational).unwrap();
+    body.set_transport(NormalWaveTransport::Applied).unwrap();
+    let reading = body.advance().unwrap().inspect().unwrap();
+    // Four seed rounding units, transported by sqrt(9/8), round up to five;
+    // all four real/imaginary bottom components incur one actual rounding unit.
+    assert_eq!(
+        reading.joint_current.radius,
+        Rat::new(9.into(), BigInt::from(scale))
+    );
+    assert_eq!(reading.operator_word_error, Rat::zero());
+    super::comparison_tests::contains(
+        &reading.joint_current,
+        &[
+            super::comparison_tests::wave(1, 0, 3),
+            super::comparison_tests::wave(1, 0, 3),
+            super::comparison_tests::wave(1, 1, 4),
+            super::comparison_tests::wave(1, -1, 4),
+        ],
+    );
+}
+
+#[test]
 #[ignore = "requires CUDA; normal-reference comparison is a separate pure receiver"]
 fn applied_transport_retains_reference_without_reinjecting_it() {
     let readout = ResidentReadout::new().unwrap();

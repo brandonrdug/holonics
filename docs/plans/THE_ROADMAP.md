@@ -145,6 +145,15 @@ receiver and decoder machinery instead of leaving a parallel family behind each 
 This is part of delivering each usable product, not a later cleanup phase or a new completion
 standard based on type counts.
 
+[project-postulate] Brandon's subsequent September 12 next-holon correction governs the
+predictive product: compose a prepared generator into its joint prospective continuation or
+released section, retaining actual graph incidence, shared source conditions and future
+receivers. Multi-character text is one exterior decoding of that construction. A repeated
+one-coordinate selection loop is a bounded codec probe, not the architecture or the definition
+of prediction. Bind the existing predictive-release, modal/family and continuation work into
+the application while maintaining its owners; do not schedule further character-only exposure
+as a substitute for that integration.
+
 [project-postulate] Before an implementation run, identify the user-facing return, exact
 source/owner change, consuming call and discriminating check. A supporting proof or experiment
 is completed into that consumer when its required map exists. If it exposes a missing map,

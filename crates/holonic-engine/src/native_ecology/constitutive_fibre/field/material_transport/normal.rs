@@ -67,6 +67,18 @@ fn ceil_norm(values: &[i128]) -> BigInt {
         s
     }
 }
+// The two observer-only accumulated-error fields keep legacy nonnegative grained
+// numerators, or -e for the outward numerator 2^e. This is not a native current codec.
+fn diagnostic_numerator(code: i128) -> Result<BigInt, ConstitutiveFibreError> {
+    if code >= 0 {
+        return Ok(code.into());
+    }
+    let exponent = code.checked_neg().ok_or_else(|| invalid("diagnostic exponent"))?;
+    if !(127..=(MomentWire::LIMBS * MomentWire::LIMB_BITS) as i128).contains(&exponent) {
+        return Err(invalid("diagnostic exponent"));
+    }
+    Ok(BigInt::one() << exponent as usize)
+}
 fn increments(raw: &[i128], layout: &NormalLayout) -> [BigInt; STATISTIC_SCALARS] {
     let x = &raw[layout.source_at..layout.source_at + layout.source_components];
     let observed = layout.ball_at(ReportBall::Observed);
@@ -101,10 +113,12 @@ pub(in super::super) fn validate_report(
         .iter()
         .any(|&ball| v[layout.ball_radius_at(ball)] < 0)
         || v[layout.source_at + layout.source_components] < 0
-        || v[extra..].iter().any(|v| *v < 0)
+        || v[extra..extra + 3].iter().any(|v| *v < 0)
     {
         return Err(invalid("report bound"));
     }
+    diagnostic_numerator(v[extra + 3])?;
+    diagnostic_numerator(v[extra + 4])?;
     let expected = if linked {
         increments(&v, &layout)
     } else {
@@ -557,8 +571,8 @@ fn decode_report(
         coefficient_error: q(v[extra]),
         normal_residual_upper: q(v[extra + 1]),
         coefficient_norm_upper: q(v[extra + 2]),
-        source_normal_error_upper: q(v[extra + 3]),
-        cross_source_error_upper: q(v[extra + 4]),
+        source_normal_error_upper: Rat::new(diagnostic_numerator(v[extra + 3])?, scale.clone()),
+        cross_source_error_upper: Rat::new(diagnostic_numerator(v[extra + 4])?, scale),
         increments: raw.try_into().map_err(|_| ConstitutiveFibreError::Shape)?,
     })
 }

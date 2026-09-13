@@ -154,3 +154,129 @@ incorporation and compiled-family controls. The HNN native suite's 40 tests pass
 including contextual and normalized reception through the public adapter. Workspace example
 compilation passed after the accessor changes; this is consolidation of the existing consumers,
 not a facade around the former duplicate source implementation.
+
+## Real-source development and transport-bound repair
+
+[counterexample; computational-witness] At parent `4c01bac5`, the new application driver
+`crates/holonics-hna/examples/contextual_text_use.rs` selected the first two eligible development
+parts through the existing validated `ExposureReader`. The declared aperture was two parts,
+at most 96 characters each, one cycle, probe `I read ` and 16 requested emissions. The parts
+contained 74 and 96 characters; their union supplied the 36-symbol alphabet. No evaluation
+target selected development material. Development used the existing addressed prediction,
+actual-symbol observation and actual adjacent-pair source feedback; generation uses that same
+source-feedback route. The driver does not implement a learner or an answer emitter.
+
+[established-bounded; process-audit] The first run stopped at source index 44 of the first part,
+after 42 committed observations, in 16.03 s. No probe output was produced. The private source,
+report and native checkpoint are reproducible at `.local/runs/contextual-text-YfcxvX/first/`
+using `.local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl`. The failed update
+left its prediction pending; the native checkpoint retained the prior committed material and
+current. Reports preserve source family, sequence and part pointers as exterior experiment
+provenance, not as semantic identity or a raw source archive inside the model.
+
+[established-bounded; source-inspected] `section_normal_wave_evaluate_impl` rounded every
+current operator bound to a whole integer and reused its maximum over earlier powers to
+transport the seed radius. It also paid the generic matrix-product rounding allowance for
+the first multiplication by identity, although that dyadic multiplication is exact. Repeated
+source/material rebases therefore magnified enclosure inflation unnecessarily.
+
+[proved-derived; formal-checked] The existing `AccumulatedNormalResponse` Lean owner now
+proves `weighted_cauchy_schwarz`, `complex_schur_action_sq`, `square_schur_operator_bound` and
+`gram_operator_bound`. For the actual complex matrix `Q`, nonnegative entry majorants with
+row and column sums bounded by `R,C` give `||Q||₂ ≤ sqrt(R C)`. Bounding the absolute real
+and imaginary row sums of `Q* Q` by `G` gives `||Q||₂ ≤ sqrt(G)`. The Gram calculation
+precedes absolute values, retaining phase cancellation within each entry. These are finite
+operator theorems, not an assertion of global stability of the developmental recurrence.
+
+[definition] The same CUDA owner now computes both bounds with existing exact moment and
+integer-square-root arithmetic, retaining the smaller outward dyadic bound for the actual
+current power. The historical integer maximum remains the separate uniform word-error bound.
+At step one the identity multiplication contributes no matrix-product rounding; source radius,
+actual current-product rounding and reference-coefficient uncertainty still contribute. No
+coefficient, source sample, numerical grain, state-carrier limit or public Wave type is added
+or changed by this repair.
+
+[established-bounded; computational-witness] The identical replay with this operator-bound
+repair reaches 78 committed observations before the normal-fit refusal, at index 8 of the
+second part, in 31.14 s. It still produces no output; its private artifacts are in
+`.local/runs/contextual-text-YfcxvX/operator-bound-repair/`. Its current centre has L1 norm
+about 6.15, while the outward radius is about `5.46e9`. Thus sharper operator bounds do not
+by themselves fix repeated spherical-enclosure inflation. The checked complex cancellation
+control uses `Q=[0,I;A,0]`, `A=3/4 [1,i;1,-i]`, and preserves the complete rational seed
+inside its tighter outward radius.
+
+[established-bounded; source-inspected] The same investigation found that normal-fit reports
+try to narrow the accumulated `EH,EB` moments into two signed-wide diagnostic fields. The
+actual moments already use the wider exact moment carrier, and the fit can be well-defined
+when that redundant display cannot represent its bound. This display is not an input to the
+normal law. Its two producers and shared decoder now use one diagnostic-only outward chart:
+nonnegative values retain the legacy grained numerator; a negative code `-e`, `127≤e≤544`,
+denotes numerator `2^e`. Larger non-power moments round upward only in this display. The
+exact moments and all physical/current bounds remain unchanged. Older nonnegative reports
+still decode identically; older binaries reject the extended negative diagnostic codes.
+No wire extent or model-state version changed, and native arithmetic never consumes this
+display codec.
+
+[established-bounded; computational-witness] A complete source ball of radius `2^40` and
+zero observed target now returns the exact zero operator with zero coefficient defect.
+Its exact source-error moment is `2^80`, retained through native development and validated
+rest/remount. Three such observations retain exact moment `3·2^80`; its diagnostic returns
+the outward `4·2^80` bound. This exercises both power and non-power encodings. The previous
+diagnostic narrowing would refuse even the first valid fit.
+
+[established-bounded; process-audit] With both repairs, the original addressed trial reaches
+95 observations in 41.19 s, then refuses at the **producing response** rather than the
+normal fit. Its artifacts remain in `.local/runs/contextual-text-YfcxvX/diagnostic-repair/`.
+No output is present. The exact source/current error still outgrows the response carrier;
+changing a display chart does not solve that underlying propagation problem.
+
+[established-bounded; computational-witness] The separately declared `next-current` trial
+uses the same development parts, alphabet, numerical grain, cycle count, source feedback,
+probe and emission aperture, but observes the actual current through the existing full-state
+receiver instead of the material-only addressed return. It completed all 166 observations
+and 16 emissions in 67.21 s, returning exactly `race  tr ana t t`. Its artifacts are in
+`.local/runs/contextual-text-YfcxvX/next-current/`. This is a different observation contract,
+not a successful replay of the failing addressed route. The actual generated fragment does
+not supply a useful language response; neither trial completes the product goal.
+
+[established-bounded; process-audit] A guard added after the preceding 88-test run incorrectly
+required three wide metadata fields in `NormalWaveJointSource::inspect`, although the native
+packet has four (the fourth is the joint radius). The earlier record's suite was run before
+that final guard edit, so it did not validate that committed guard. It is corrected here and
+the canonical-source test passed against the correction. This is an agent-created defect,
+not a change to the source packet contract.
+
+[established-bounded; process-audit] Verification of the final engine changes:
+
+- The 108 tests under `native_ecology::constitutive_fibre::field::material_transport::normal::`
+  passed with `--include-ignored --test-threads=1` in 26.95 s, including the two new transport
+  controls, wide-diagnostic current/fit/rest controls, existing field/adjoint, pending-source,
+  family, compiled-receiver and recurrence tests.
+- The focused Lean source check passed, including axiom inspection of the four new lemmas:
+  only `propext`, `Classical.choice` and `Quot.sound` occur.
+- The example compiled and the four private application runs above returned their reported
+  outcomes. Failed trials were not counted as successful checks.
+- All eight public HNN `native::normal_wave::tests` controls passed in 2.71 s after the
+  shared engine changes, including contextual reception, normalized comparison, codec,
+  delivery/refusal and rest consumers.
+- An earlier 90-test attempt overlapped a separate CUDA trial and failed one allocation
+  calibration before entering its numerical test. Its new Gram fixture also initially had
+  an invalid exact coefficient-norm receipt. That receipt was corrected from a loose value
+  to its required exact L1 value; the five focused controls passed in isolation (1.19 s),
+  followed by the complete final 108-test run above.
+- Cold first-use runs took 238.58 s (three concurrent contexts) and 204.17 s (one context)
+  while CPU computation continued; both finished. They are not steady-state timings or
+  timeout passes. The completed warm checks are reported separately.
+
+[open] The addressed route needs directional source/error propagation across rebase, not
+another enlarged scalar radius or a retained sequence of raw sources. The real-source
+next-current route still needs useful conditional generator formation and composition at
+its actual output receiver. These are the active product work; extra exposure and repeated
+unchanged comparisons are not scheduled as substitutes.
+
+[project-postulate] Brandon's following next-holon correction explicitly reconnects this
+work to leap/throw, multi-part or graph-like prediction and the full research synthesis. The
+limited driver must not become a character-prediction architecture. The roadmap and blueprint
+now make the joint prospective continuation/release and its eventual exterior decoding the
+next consumer binding. The already-returned generator, mode-compression, preimage/family,
+physical release and code-cost laws remain its sources, not subjects to rediscover.

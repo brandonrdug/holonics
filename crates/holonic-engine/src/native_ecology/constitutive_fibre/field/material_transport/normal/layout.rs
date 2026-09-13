@@ -22,8 +22,8 @@ const REPORT_METADATA: usize = [
     "coefficient radius",
     "normal residual",
     "coefficient norm",
-    "source normal error",
-    "cross source error",
+    "source normal error (dyadic numerator or outward power code)",
+    "cross source error (dyadic numerator or outward power code)",
 ]
 .len();
 pub(super) const STATISTIC_SCALARS: usize = [

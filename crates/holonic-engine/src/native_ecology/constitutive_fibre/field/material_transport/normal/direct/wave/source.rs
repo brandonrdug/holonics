@@ -28,7 +28,10 @@ impl<'c> NormalWaveJointSource<'c> {
     pub fn inspect(&self) -> Result<NormalWaveReading, ConstitutiveFibreError> {
         let surface = self.current.surface;
         let meta = wides(&surface.read_out(&self.metadata)?)?;
-        if meta.len() != 3 {
+        // The native metadata packet has four wide fields; this reading exposes its first
+        // three numerical bounds. The fourth is the joint-current radius, also retained
+        // in the joint enclosure decoded below.
+        if meta.len() != 4 {
             return Err(ConstitutiveFibreError::Shape);
         }
         let scale = BigInt::one() << self.current.grain.0;

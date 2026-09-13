@@ -37,6 +37,23 @@ __device__ wide normal_grid(MomentInteger x,uint32_t shift,bool ceiling,uint32_t
     if(ceiling && x.negative){atomicOr(slot,REFUSED_MALFORMED);return 0;}
     return ceiling?add_checked(value,omitted,slot):value;
 }
+// Diagnostic-only chart, never an operand of the normal law. Preserve the legacy
+// nonnegative dyadic numerator when it fits. A negative code -e denotes 2^e/S;
+// e>=127 distinguishes this outward bound from every valid signed-wide numerator.
+// Exact EH/EB remain in the moment state; a narrow display must not refuse that state.
+__device__ wide normal_diagnostic_upper(const MomentInteger &x,uint32_t grain,uint32_t *slot){
+    if(x.negative||x.overflow){atomicOr(slot,REFUSED_CARRIER);return 0;}
+    const wide maximum=(wide)(((uwide)1<<127)-1u);
+    MomentInteger limit=normal_wide(maximum)*normal_wide((wide)1<<grain);
+    if(x<=limit)return normal_grid(x,grain,true,slot);
+    uint32_t bits=0,nonzero_limbs=0;bool single_bit=false;
+    for(uint32_t j=0;j<MomentInteger::LIMBS;++j)if(x.limb[j]){
+        bits=32u*j+32u-__clz(x.limb[j]);++nonzero_limbs;
+        single_bit=(x.limb[j]&(x.limb[j]-1u))==0;
+    }
+    uint32_t exponent=bits-grain-(nonzero_limbs==1u&&single_bit?1u:0u);
+    return -(wide)exponent;
+}
 __device__ void normal_product(MomentInteger &re,MomentInteger &im,
     const MomentInteger &ar,const MomentInteger &ai,const MomentInteger &br,const MomentInteger &bi,bool conjugate){
     if(conjugate){re=re+ar*br+ai*bi;im=im+ai*br-ar*bi;}
@@ -110,7 +127,7 @@ __device__ void normal_fit(int64_t *state,uint32_t n,uint32_t targets,uint32_t g
         M[2u*coefficients]=normal_grid(bound,2u*grain,true,slot);
         M[2u*coefficients+1u]=normal_grid(residual,2u*grain,true,slot);M[2u*coefficients+2u]=norm;
         if(diagnostic){diagnostic[0]=M[2u*coefficients];diagnostic[1]=normal_grid(residual,2u*grain,true,slot);diagnostic[2]=norm;
-            diagnostic[3]=normal_grid(eh,grain,true,slot);diagnostic[4]=normal_grid(eb,grain,true,slot);}
+            diagnostic[3]=normal_diagnostic_upper(eh,grain,slot);diagnostic[4]=normal_diagnostic_upper(eb,grain,slot);}
     }
     __syncthreads();
 }

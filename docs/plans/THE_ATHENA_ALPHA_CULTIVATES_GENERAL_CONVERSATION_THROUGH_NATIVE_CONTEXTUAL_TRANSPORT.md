@@ -179,6 +179,31 @@ claim is made. Do not begin wide exposure, a UI redesign or standard-model expor
 
 ### How the research enters these packets
 
+[project-postulate] Brandon's later September 12 clarification makes **next-holon prediction**
+the product object: a source-conditioned prospective configuration, coupled graph/section or
+released action, with its continuing consequences. The character adapter is an exterior
+receiver of that object. The bounded next-current and addressed text trials do not implement
+this whole binding and must not silently become the construction programme.
+
+[definition] For one compatible source family F and admitted prepared transport Φ, a finite
+joint future receiver reads `{(R₁Φ₁(z), …, RₖΦₖ(z)) : z∈F}`. The same z and shared conditions
+occur in every component; replacing this with the Cartesian product of marginal readings
+loses their relation. Graph incidence and joined intermediate conditions specify legal
+composition. The prospective generator/family and sufficient continuation describe that
+relation without recording a realized trajectory. A scalar request remains a legitimate
+receiver; the interface must not impose scalar or character-by-character prediction on all
+products.
+
+[definition] The next binding composes the standing joint source/family and generator
+continuation with its **prospective emission receiver**, followed by the appropriate codec.
+`CompiledCoupledJoint` currently evaluates source/condition constraints at a shared parameter
+occurrence; that is available apparatus, not by itself the completed generative receiver.
+Use the existing block/factor and release operators to construct the complete requested action,
+and the existing normal/adjoint owners for its actual developmental return. Mode exclusion,
+section/periplus rebase and sufficient updates preserve the required joint future; code/loss
+receivers measure that construction rather than defining its incidence. Do not add a separately
+named next-holon engine or treat larger token batches as this missing composition.
+
 [definition] The returned mathematics has concrete implementation roles:
 
 | Recovered construction | Binding decision |
