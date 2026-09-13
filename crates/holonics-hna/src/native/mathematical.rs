@@ -11,10 +11,11 @@ use holonic_engine::{
     },
     native_ecology::constitutive_fibre::{
         ConditionCoverage, ConditionImageReading, ConditionPreimageReading,
-        ResidentConstitutiveCurrent, ResidentConstitutiveFibre,
+        ResidentConstitutiveCurrent, ResidentConstitutiveFibre, ResidentConstitutiveSection,
+        ResidentNormalMaterial,
     },
     resident_section::{
-        ResidentBilinearMap, ResidentBilinearReturn, ResidentSection, ResidentSurface,
+        ResidentBilinearMap, ResidentBilinearReturn, ResidentGrain, ResidentSection, ResidentSurface,
     },
 };
 use num_rational::BigRational;
@@ -24,7 +25,8 @@ use serde_json::{json, Value};
 use std::{collections::BTreeMap, sync::Arc, time::Instant};
 
 mod relation;
-use relation::NativeConditionRelation;
+mod code;
+use relation::{NativeConditionRelation, NativeConditionalPredictor};
 
 pub type RationalMatrixWire = Vec<Vec<RationalWire>>;
 
@@ -95,6 +97,28 @@ pub enum BilinearConstructionWire {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "operation", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum MathematicalRequest {
+    /// Release an executable exact-rational function from a retained factor graph.
+    EmitRust { operator: u64 },
+    /// Both resident restrictions read the same preparation BEFORE its target is observed.
+    ConstructPredictor {
+        source_operator: u64,
+        condition_operator: u64,
+        target_complex: usize,
+        fractional_bits: u32,
+    },
+    PredictSection {
+        predictor: u64,
+        preparation: MathematicalInputWire,
+        #[serde(default)]
+        retain_prediction: bool,
+    },
+    ObserveSection {
+        predictor: u64,
+        prediction: u64,
+        observed: Vec<RationalWire>,
+    },
+    ReleaseSectionPrediction { predictor: u64, prediction: u64 },
+    ReleasePredictor { predictor: u64 },
     ConstructRelation {
         source_complex: usize,
         condition_complex: usize,
@@ -308,10 +332,12 @@ pub struct NativeMathematicalSession<'c> {
     products: BTreeMap<u64, ResidentBilinearReturn<'c>>,
     searches: BTreeMap<u64, Search>,
     relations: BTreeMap<u64, NativeConditionRelation<'c>>,
+    predictors: BTreeMap<u64, NativeConditionalPredictor<'c>>,
     next_operator: u64,
     next_product: u64,
     next_search: u64,
     next_relation: u64,
+    next_predictor: u64,
 }
 
 pub fn with_mathematical_session<R>(
@@ -417,10 +443,12 @@ impl<'c> NativeMathematicalSession<'c> {
             products: BTreeMap::new(),
             searches: BTreeMap::new(),
             relations: BTreeMap::new(),
+            predictors: BTreeMap::new(),
             next_operator: 0,
             next_product: 0,
             next_search: 0,
             next_relation: 0,
+            next_predictor: 0,
         }
     }
     pub fn inspect(&self) -> Value {
@@ -429,6 +457,10 @@ impl<'c> NativeMathematicalSession<'c> {
             "pending_constructions": self.searches.keys().collect::<Vec<_>>(),
             "relations": self.relations.iter().map(|(id, r)| json!({"relation":id,
                 "calibration_rows":r.occurrences(), "pending_prediction":r.pending_id()})).collect::<Vec<_>>(),
+            "predictors": self.predictors.iter().map(|(id,p)| json!({"predictor":id,
+                "source_operator":p.source_operator,"condition_operator":p.condition_operator,
+                "observations":p.material.observations(),"source_chart":p.material.source_chart(),
+                "pending_prediction":p.pending_id()})).collect::<Vec<_>>(),
             "census": self.surface.census()})
     }
     fn publish(
@@ -555,6 +587,70 @@ impl<'c> NativeMathematicalSession<'c> {
     }
     fn execute(&mut self, request: &MathematicalRequest) -> Result<Value, NativeSessionError> {
         match request {
+            MathematicalRequest::EmitRust {operator} => {
+                let owner=self.operators.get(operator).ok_or_else(||invalid("unknown operator"))?;
+                let source=code::rust_function(&owner.realization,owner.linear)?;
+                Ok(json!({"status":"code-emitted","operator":operator,"language":"rust",
+                    "function":"holonic_apply","source":source,"linear":owner.linear,
+                    "graph":factor_description(&owner.realization),
+                    "numeric_chart":"num_rational::BigRational; arbitrary-precision exact integer coefficients",
+                    "scope":"function of the retained operator; target compilation/execution is exterior"}))
+            }
+            MathematicalRequest::ConstructPredictor {source_operator,condition_operator,target_complex,fractional_bits} => {
+                let a=self.operators.get(source_operator).ok_or_else(||invalid("unknown source restriction"))?;
+                let c=self.operators.get(condition_operator).ok_or_else(||invalid("unknown condition restriction"))?;
+                let ns=a.realization.receiver().particular.rows();
+                let nc=c.realization.receiver().particular.rows();
+                if !a.linear || !c.linear || ns==0 || nc==0 || ns%2!=0 || nc%2!=0 ||
+                    a.realization.core().left_forms().columns()!=c.realization.core().left_forms().columns() {
+                    return Err(invalid("source and condition restrictions must be linear complex charts on one preparation domain"));
+                }
+                let ns=ns/2;let nc=nc/2;
+                let features=ns.checked_mul(nc).and_then(|v|v.checked_add(ns)).and_then(|v|v.checked_add(nc))
+                    .ok_or_else(||invalid("feature extent overflow"))?;
+                let material=ResidentNormalMaterial::found_features(self.surface,features,*target_complex,ResidentGrain(*fractional_bits))?;
+                let id=self.next_predictor;
+                let next=id.checked_add(1).ok_or_else(||invalid("predictor addresses exhausted"))?;
+                self.predictors.insert(id,NativeConditionalPredictor::new(*source_operator,*condition_operator,material));
+                self.next_predictor=next;
+                Ok(json!({"status":"predictor-constructed","predictor":id,"source_complex":ns,"condition_complex":nc,
+                    "feature_complex":features,"target_complex":target_complex,"source_operator":source_operator,"condition_operator":condition_operator,
+                    "law":"H=I+sum uu*, B=sum vu*, WH=B; u=(s,c,c tensor s)","observations":0}))
+            }
+            MathematicalRequest::PredictSection {predictor,preparation,retain_prediction} => {
+                let owner=self.predictors.get_mut(predictor).ok_or_else(||invalid("unknown predictor"))?;
+                let a=self.operators.get(&owner.source_operator).ok_or_else(||invalid("missing source restriction"))?;
+                let c=self.operators.get(&owner.condition_operator).ok_or_else(||invalid("missing condition restriction"))?;
+                let reads=self.surface.census().section_read_outs;
+                let unit=self.surface.mount_exact_rational_packet(&[BigRational::one()]).map_err(invalid)?;
+                let features=preparation.with_section(self.surface,&self.operators,&self.products,|x| {
+                    let source=a.native.apply(x,&unit).map_err(invalid)?;
+                    let condition=c.native.apply(x,&unit).map_err(invalid)?;
+                    Ok(ResidentConstitutiveSection::rationals(source.output())?
+                        .bilinear_features(self.surface,ResidentConstitutiveSection::rationals(condition.output())?)?.into_features())
+                })?;
+                let intermediate=self.surface.census().section_read_outs-reads;
+                let mut result=owner.predict(features,*retain_prediction)?;
+                result["predictor"]=json!(predictor);
+                result["preparation"]=json!(preparation);
+                result["intermediate_section_readouts"]=json!(intermediate);
+                Ok(result)
+            }
+            MathematicalRequest::ObserveSection {predictor,prediction,observed} => {
+                let observation=self.surface.mount_exact_rational_packet(&vector(observed)?).map_err(invalid)?;
+                self.predictors.get_mut(predictor).ok_or_else(||invalid("unknown predictor"))?
+                    .observe(*prediction,ResidentConstitutiveCurrent::rational(&observation)?)
+            }
+            MathematicalRequest::ReleaseSectionPrediction {predictor,prediction} => {
+                self.predictors.get_mut(predictor).ok_or_else(||invalid("unknown predictor"))?.release(*prediction)?;
+                Ok(json!({"status":"released","predictor":predictor,"prediction":prediction}))
+            }
+            MathematicalRequest::ReleasePredictor {predictor} => {
+                let owner=self.predictors.get(predictor).ok_or_else(||invalid("unknown predictor"))?;
+                if owner.pending_id().is_some(){return Err(invalid("observe or dispose of the pending section prediction before releasing its predictor"));}
+                self.predictors.remove(predictor);
+                Ok(json!({"status":"released","predictor":predictor}))
+            }
             MathematicalRequest::ConstructRelation {
                 source_complex,
                 condition_complex,
@@ -946,6 +1042,9 @@ impl<'c> NativeMathematicalSession<'c> {
                 Ok(json!({"status":"released", "product":product}))
             }
             MathematicalRequest::ReleaseOperator { operator } => {
+                if self.predictors.values().any(|p|p.source_operator==*operator || p.condition_operator==*operator) {
+                    return Err(invalid("operator is a live predictor restriction; release that predictor first"));
+                }
                 self.operators
                     .remove(operator)
                     .ok_or_else(|| invalid("unknown or released operator"))?;

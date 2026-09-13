@@ -4,7 +4,7 @@ pub struct NormalRealizationRefinement<'c> {
     surface: &'c ResidentSurface<'c>,
     before: Rc<ResidentSection<'c>>,
     after: Rc<ResidentSection<'c>>,
-    roots: usize,
+    source_chart: NormalSourceChart,
     targets: usize,
     pub before_grain: ResidentGrain,
     pub after_grain: ResidentGrain,
@@ -12,17 +12,17 @@ pub struct NormalRealizationRefinement<'c> {
 }
 impl NormalRealizationRefinement<'_> {
     pub fn inspect_before(&self) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
-        decode_state(
+        decode_state_layout(
             &self.surface.detach_section(&self.before, 64)?,
-            self.roots,
+            self.source_chart.layout(self.targets)?,
             self.targets,
             self.before_grain.0,
         )
     }
     pub fn inspect_after(&self) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
-        decode_state(
+        decode_state_layout(
             &self.surface.detach_section(&self.after, 64)?,
-            self.roots,
+            self.source_chart.layout(self.targets)?,
             self.targets,
             self.after_grain.0,
         )
@@ -36,8 +36,7 @@ impl<'c> ResidentNormalMaterial<'c> {
         if grain.0 <= self.grain.0 || grain.0 > 120 {
             return Err(ConstitutiveFibreError::Shape);
         }
-        let layout =
-            NormalLayout::new(self.roots, self.targets).ok_or(ConstitutiveFibreError::Shape)?;
+        let layout = self.source_chart.layout(self.targets)?;
         let next = self
             .surface
             .fresh_section(1, layout.state_words, ResidentGrain(0))?;
@@ -50,7 +49,7 @@ impl<'c> ResidentNormalMaterial<'c> {
             self.surface.record_normal_refine(
                 &lane,
                 &self.state,
-                self.roots,
+                self.source_complex(),
                 self.targets,
                 self.grain.0,
                 grain.0,
@@ -73,7 +72,7 @@ impl<'c> ResidentNormalMaterial<'c> {
             surface: self.surface,
             before,
             after: next,
-            roots: self.roots,
+            source_chart: self.source_chart,
             targets: self.targets,
             before_grain,
             after_grain: grain,

@@ -1,0 +1,4058 @@
+{
+  "scope": "declared preparation restrictions; native unit-prior bilinear-feature prediction; exact factor-code release",
+  "native_process": {
+    "wall_ns": 370711386,
+    "resources": {
+      "child_wall_ns": 349633922,
+      "user_seconds": 0.146413,
+      "system_seconds": 0.18989499999999998,
+      "max_rss_kib": 283624,
+      "major_page_faults": 11,
+      "minor_page_faults": 8906,
+      "voluntary_context_switches": 135,
+      "involuntary_context_switches": 35
+    },
+    "stderr": "{\"schema\":\"org.holonics.hna.mathematical-stream-process.v1\",\"disposition\":\"input-exhausted\",\"stream_error\":null,\"transport_sequence\":54,\"inspect\":{\"census\":{\"allocations\":1454,\"captured_launches\":766,\"control_launches\":0,\"deed_launches\":155,\"device_to_device_octets\":0,\"egress_receipt_octets\":24512,\"egress_section_octets\":118224,\"ingress_octets\":30736,\"resident_octets_now\":24240,\"resident_octets_peak\":58980,\"section_read_outs\":48,\"synchronizations\":155},\"operators\":[0,1,2,3,4,5],\"pending_constructions\":[],\"predictors\":[{\"condition_operator\":1,\"observations\":4,\"pending_prediction\":null,\"predictor\":0,\"source_chart\":{\"kind\":\"features\",\"source_complex\":5},\"source_operator\":0}],\"relations\":[],\"retained_products\":[0],\"scope\":\"native-mathematical-application-session\"},\"elapsed_microseconds\":338140}\n"
+  },
+  "development_observations": 4,
+  "queries": [
+    {
+      "index": 1,
+      "expected_real": [
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        },
+        {
+          "numerator": "4",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 286,
+          "captured_launches": 128,
+          "control_launches": 0,
+          "deed_launches": 28,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 4096,
+          "egress_section_octets": 36736,
+          "ingress_octets": 24464,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 14,
+          "synchronizations": 28
+        },
+        "census_before": {
+          "allocations": 250,
+          "captured_launches": 108,
+          "control_launches": 0,
+          "deed_launches": 24,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 3456,
+          "egress_section_octets": 34112,
+          "ingress_octets": 24296,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 13,
+          "synchronizations": 24
+        },
+        "elapsed_microseconds": 526,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        },
+        {
+          "numerator": "2",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 2,
+      "expected_real": [
+        {
+          "numerator": "4",
+          "denominator": "3"
+        },
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 322,
+          "captured_launches": 148,
+          "control_launches": 0,
+          "deed_launches": 32,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 4736,
+          "egress_section_octets": 39360,
+          "ingress_octets": 24632,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 15,
+          "synchronizations": 32
+        },
+        "census_before": {
+          "allocations": 286,
+          "captured_launches": 128,
+          "control_launches": 0,
+          "deed_launches": 28,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 4096,
+          "egress_section_octets": 36736,
+          "ingress_octets": 24464,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 14,
+          "synchronizations": 28
+        },
+        "elapsed_microseconds": 523,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "2",
+          "denominator": "1"
+        },
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 3,
+      "expected_real": [
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        },
+        {
+          "numerator": "4",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 358,
+          "captured_launches": 168,
+          "control_launches": 0,
+          "deed_launches": 36,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 5376,
+          "egress_section_octets": 41984,
+          "ingress_octets": 24800,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 16,
+          "synchronizations": 36
+        },
+        "census_before": {
+          "allocations": 322,
+          "captured_launches": 148,
+          "control_launches": 0,
+          "deed_launches": 32,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 4736,
+          "egress_section_octets": 39360,
+          "ingress_octets": 24632,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 15,
+          "synchronizations": 32
+        },
+        "elapsed_microseconds": 538,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        },
+        {
+          "numerator": "2",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 4,
+      "expected_real": [
+        {
+          "numerator": "4",
+          "denominator": "3"
+        },
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 394,
+          "captured_launches": 188,
+          "control_launches": 0,
+          "deed_launches": 40,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 6016,
+          "egress_section_octets": 44608,
+          "ingress_octets": 24968,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 17,
+          "synchronizations": 40
+        },
+        "census_before": {
+          "allocations": 358,
+          "captured_launches": 168,
+          "control_launches": 0,
+          "deed_launches": 36,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 5376,
+          "egress_section_octets": 41984,
+          "ingress_octets": 24800,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 16,
+          "synchronizations": 36
+        },
+        "elapsed_microseconds": 511,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "2",
+          "denominator": "1"
+        },
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 5,
+      "expected_real": [
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        },
+        {
+          "numerator": "4",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 430,
+          "captured_launches": 208,
+          "control_launches": 0,
+          "deed_launches": 44,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 6656,
+          "egress_section_octets": 47232,
+          "ingress_octets": 25136,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 18,
+          "synchronizations": 44
+        },
+        "census_before": {
+          "allocations": 394,
+          "captured_launches": 188,
+          "control_launches": 0,
+          "deed_launches": 40,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 6016,
+          "egress_section_octets": 44608,
+          "ingress_octets": 24968,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 17,
+          "synchronizations": 40
+        },
+        "elapsed_microseconds": 554,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        },
+        {
+          "numerator": "2",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 6,
+      "expected_real": [
+        {
+          "numerator": "4",
+          "denominator": "3"
+        },
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 466,
+          "captured_launches": 228,
+          "control_launches": 0,
+          "deed_launches": 48,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 7296,
+          "egress_section_octets": 49856,
+          "ingress_octets": 25304,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 19,
+          "synchronizations": 48
+        },
+        "census_before": {
+          "allocations": 430,
+          "captured_launches": 208,
+          "control_launches": 0,
+          "deed_launches": 44,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 6656,
+          "egress_section_octets": 47232,
+          "ingress_octets": 25136,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 18,
+          "synchronizations": 44
+        },
+        "elapsed_microseconds": 528,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "2",
+          "denominator": "1"
+        },
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 7,
+      "expected_real": [
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        },
+        {
+          "numerator": "4",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 502,
+          "captured_launches": 248,
+          "control_launches": 0,
+          "deed_launches": 52,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 7936,
+          "egress_section_octets": 52480,
+          "ingress_octets": 25472,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 20,
+          "synchronizations": 52
+        },
+        "census_before": {
+          "allocations": 466,
+          "captured_launches": 228,
+          "control_launches": 0,
+          "deed_launches": 48,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 7296,
+          "egress_section_octets": 49856,
+          "ingress_octets": 25304,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 19,
+          "synchronizations": 48
+        },
+        "elapsed_microseconds": 514,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        },
+        {
+          "numerator": "2",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 8,
+      "expected_real": [
+        {
+          "numerator": "4",
+          "denominator": "3"
+        },
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 538,
+          "captured_launches": 268,
+          "control_launches": 0,
+          "deed_launches": 56,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 8576,
+          "egress_section_octets": 55104,
+          "ingress_octets": 25640,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 21,
+          "synchronizations": 56
+        },
+        "census_before": {
+          "allocations": 502,
+          "captured_launches": 248,
+          "control_launches": 0,
+          "deed_launches": 52,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 7936,
+          "egress_section_octets": 52480,
+          "ingress_octets": 25472,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 20,
+          "synchronizations": 52
+        },
+        "elapsed_microseconds": 522,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "2",
+          "denominator": "1"
+        },
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 9,
+      "expected_real": [
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        },
+        {
+          "numerator": "4",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 574,
+          "captured_launches": 288,
+          "control_launches": 0,
+          "deed_launches": 60,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 9216,
+          "egress_section_octets": 57728,
+          "ingress_octets": 25808,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 22,
+          "synchronizations": 60
+        },
+        "census_before": {
+          "allocations": 538,
+          "captured_launches": 268,
+          "control_launches": 0,
+          "deed_launches": 56,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 8576,
+          "egress_section_octets": 55104,
+          "ingress_octets": 25640,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 21,
+          "synchronizations": 56
+        },
+        "elapsed_microseconds": 522,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        },
+        {
+          "numerator": "2",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 10,
+      "expected_real": [
+        {
+          "numerator": "4",
+          "denominator": "3"
+        },
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 610,
+          "captured_launches": 308,
+          "control_launches": 0,
+          "deed_launches": 64,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 9856,
+          "egress_section_octets": 60352,
+          "ingress_octets": 25976,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 23,
+          "synchronizations": 64
+        },
+        "census_before": {
+          "allocations": 574,
+          "captured_launches": 288,
+          "control_launches": 0,
+          "deed_launches": 60,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 9216,
+          "egress_section_octets": 57728,
+          "ingress_octets": 25808,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 22,
+          "synchronizations": 60
+        },
+        "elapsed_microseconds": 508,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "2",
+          "denominator": "1"
+        },
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 11,
+      "expected_real": [
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        },
+        {
+          "numerator": "4",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 646,
+          "captured_launches": 328,
+          "control_launches": 0,
+          "deed_launches": 68,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 10496,
+          "egress_section_octets": 62976,
+          "ingress_octets": 26144,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 24,
+          "synchronizations": 68
+        },
+        "census_before": {
+          "allocations": 610,
+          "captured_launches": 308,
+          "control_launches": 0,
+          "deed_launches": 64,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 9856,
+          "egress_section_octets": 60352,
+          "ingress_octets": 25976,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 23,
+          "synchronizations": 64
+        },
+        "elapsed_microseconds": 536,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        },
+        {
+          "numerator": "2",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 12,
+      "expected_real": [
+        {
+          "numerator": "4",
+          "denominator": "3"
+        },
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 682,
+          "captured_launches": 348,
+          "control_launches": 0,
+          "deed_launches": 72,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 11136,
+          "egress_section_octets": 65600,
+          "ingress_octets": 26312,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 25,
+          "synchronizations": 72
+        },
+        "census_before": {
+          "allocations": 646,
+          "captured_launches": 328,
+          "control_launches": 0,
+          "deed_launches": 68,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 10496,
+          "egress_section_octets": 62976,
+          "ingress_octets": 26144,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 24,
+          "synchronizations": 68
+        },
+        "elapsed_microseconds": 552,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "2",
+          "denominator": "1"
+        },
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 13,
+      "expected_real": [
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        },
+        {
+          "numerator": "4",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 718,
+          "captured_launches": 368,
+          "control_launches": 0,
+          "deed_launches": 76,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 11776,
+          "egress_section_octets": 68224,
+          "ingress_octets": 26480,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 26,
+          "synchronizations": 76
+        },
+        "census_before": {
+          "allocations": 682,
+          "captured_launches": 348,
+          "control_launches": 0,
+          "deed_launches": 72,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 11136,
+          "egress_section_octets": 65600,
+          "ingress_octets": 26312,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 25,
+          "synchronizations": 72
+        },
+        "elapsed_microseconds": 508,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        },
+        {
+          "numerator": "2",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 14,
+      "expected_real": [
+        {
+          "numerator": "4",
+          "denominator": "3"
+        },
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 754,
+          "captured_launches": 388,
+          "control_launches": 0,
+          "deed_launches": 80,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 12416,
+          "egress_section_octets": 70848,
+          "ingress_octets": 26648,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 27,
+          "synchronizations": 80
+        },
+        "census_before": {
+          "allocations": 718,
+          "captured_launches": 368,
+          "control_launches": 0,
+          "deed_launches": 76,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 11776,
+          "egress_section_octets": 68224,
+          "ingress_octets": 26480,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 26,
+          "synchronizations": 76
+        },
+        "elapsed_microseconds": 533,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "2",
+          "denominator": "1"
+        },
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 15,
+      "expected_real": [
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        },
+        {
+          "numerator": "4",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 790,
+          "captured_launches": 408,
+          "control_launches": 0,
+          "deed_launches": 84,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 13056,
+          "egress_section_octets": 73472,
+          "ingress_octets": 26816,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 28,
+          "synchronizations": 84
+        },
+        "census_before": {
+          "allocations": 754,
+          "captured_launches": 388,
+          "control_launches": 0,
+          "deed_launches": 80,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 12416,
+          "egress_section_octets": 70848,
+          "ingress_octets": 26648,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 27,
+          "synchronizations": 80
+        },
+        "elapsed_microseconds": 506,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        },
+        {
+          "numerator": "2",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 16,
+      "expected_real": [
+        {
+          "numerator": "4",
+          "denominator": "3"
+        },
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 826,
+          "captured_launches": 428,
+          "control_launches": 0,
+          "deed_launches": 88,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 13696,
+          "egress_section_octets": 76096,
+          "ingress_octets": 26984,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 29,
+          "synchronizations": 88
+        },
+        "census_before": {
+          "allocations": 790,
+          "captured_launches": 408,
+          "control_launches": 0,
+          "deed_launches": 84,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 13056,
+          "egress_section_octets": 73472,
+          "ingress_octets": 26816,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 28,
+          "synchronizations": 84
+        },
+        "elapsed_microseconds": 533,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "2",
+          "denominator": "1"
+        },
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 17,
+      "expected_real": [
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        },
+        {
+          "numerator": "4",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 862,
+          "captured_launches": 448,
+          "control_launches": 0,
+          "deed_launches": 92,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 14336,
+          "egress_section_octets": 78720,
+          "ingress_octets": 27152,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 30,
+          "synchronizations": 92
+        },
+        "census_before": {
+          "allocations": 826,
+          "captured_launches": 428,
+          "control_launches": 0,
+          "deed_launches": 88,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 13696,
+          "egress_section_octets": 76096,
+          "ingress_octets": 26984,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 29,
+          "synchronizations": 88
+        },
+        "elapsed_microseconds": 514,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        },
+        {
+          "numerator": "2",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 18,
+      "expected_real": [
+        {
+          "numerator": "4",
+          "denominator": "3"
+        },
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 898,
+          "captured_launches": 468,
+          "control_launches": 0,
+          "deed_launches": 96,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 14976,
+          "egress_section_octets": 81344,
+          "ingress_octets": 27320,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 31,
+          "synchronizations": 96
+        },
+        "census_before": {
+          "allocations": 862,
+          "captured_launches": 448,
+          "control_launches": 0,
+          "deed_launches": 92,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 14336,
+          "egress_section_octets": 78720,
+          "ingress_octets": 27152,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 30,
+          "synchronizations": 92
+        },
+        "elapsed_microseconds": 521,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "2",
+          "denominator": "1"
+        },
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 19,
+      "expected_real": [
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        },
+        {
+          "numerator": "4",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 934,
+          "captured_launches": 488,
+          "control_launches": 0,
+          "deed_launches": 100,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 15616,
+          "egress_section_octets": 83968,
+          "ingress_octets": 27488,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 32,
+          "synchronizations": 100
+        },
+        "census_before": {
+          "allocations": 898,
+          "captured_launches": 468,
+          "control_launches": 0,
+          "deed_launches": 96,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 14976,
+          "egress_section_octets": 81344,
+          "ingress_octets": 27320,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 31,
+          "synchronizations": 96
+        },
+        "elapsed_microseconds": 510,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        },
+        {
+          "numerator": "2",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 20,
+      "expected_real": [
+        {
+          "numerator": "4",
+          "denominator": "3"
+        },
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 970,
+          "captured_launches": 508,
+          "control_launches": 0,
+          "deed_launches": 104,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 16256,
+          "egress_section_octets": 86592,
+          "ingress_octets": 27656,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 33,
+          "synchronizations": 104
+        },
+        "census_before": {
+          "allocations": 934,
+          "captured_launches": 488,
+          "control_launches": 0,
+          "deed_launches": 100,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 15616,
+          "egress_section_octets": 83968,
+          "ingress_octets": 27488,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 32,
+          "synchronizations": 100
+        },
+        "elapsed_microseconds": 531,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "2",
+          "denominator": "1"
+        },
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 21,
+      "expected_real": [
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        },
+        {
+          "numerator": "4",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 1006,
+          "captured_launches": 528,
+          "control_launches": 0,
+          "deed_launches": 108,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 16896,
+          "egress_section_octets": 89216,
+          "ingress_octets": 27824,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 34,
+          "synchronizations": 108
+        },
+        "census_before": {
+          "allocations": 970,
+          "captured_launches": 508,
+          "control_launches": 0,
+          "deed_launches": 104,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 16256,
+          "egress_section_octets": 86592,
+          "ingress_octets": 27656,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 33,
+          "synchronizations": 104
+        },
+        "elapsed_microseconds": 511,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        },
+        {
+          "numerator": "2",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 22,
+      "expected_real": [
+        {
+          "numerator": "4",
+          "denominator": "3"
+        },
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 1042,
+          "captured_launches": 548,
+          "control_launches": 0,
+          "deed_launches": 112,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 17536,
+          "egress_section_octets": 91840,
+          "ingress_octets": 27992,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 35,
+          "synchronizations": 112
+        },
+        "census_before": {
+          "allocations": 1006,
+          "captured_launches": 528,
+          "control_launches": 0,
+          "deed_launches": 108,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 16896,
+          "egress_section_octets": 89216,
+          "ingress_octets": 27824,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 34,
+          "synchronizations": 108
+        },
+        "elapsed_microseconds": 518,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "2",
+          "denominator": "1"
+        },
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 23,
+      "expected_real": [
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        },
+        {
+          "numerator": "4",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 1078,
+          "captured_launches": 568,
+          "control_launches": 0,
+          "deed_launches": 116,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 18176,
+          "egress_section_octets": 94464,
+          "ingress_octets": 28160,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 36,
+          "synchronizations": 116
+        },
+        "census_before": {
+          "allocations": 1042,
+          "captured_launches": 548,
+          "control_launches": 0,
+          "deed_launches": 112,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 17536,
+          "egress_section_octets": 91840,
+          "ingress_octets": 27992,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 35,
+          "synchronizations": 112
+        },
+        "elapsed_microseconds": 507,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        },
+        {
+          "numerator": "2",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 24,
+      "expected_real": [
+        {
+          "numerator": "4",
+          "denominator": "3"
+        },
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 1114,
+          "captured_launches": 588,
+          "control_launches": 0,
+          "deed_launches": 120,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 18816,
+          "egress_section_octets": 97088,
+          "ingress_octets": 28328,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 37,
+          "synchronizations": 120
+        },
+        "census_before": {
+          "allocations": 1078,
+          "captured_launches": 568,
+          "control_launches": 0,
+          "deed_launches": 116,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 18176,
+          "egress_section_octets": 94464,
+          "ingress_octets": 28160,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 36,
+          "synchronizations": 116
+        },
+        "elapsed_microseconds": 511,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "2",
+          "denominator": "1"
+        },
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 25,
+      "expected_real": [
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        },
+        {
+          "numerator": "4",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 1150,
+          "captured_launches": 608,
+          "control_launches": 0,
+          "deed_launches": 124,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 19456,
+          "egress_section_octets": 99712,
+          "ingress_octets": 28496,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 38,
+          "synchronizations": 124
+        },
+        "census_before": {
+          "allocations": 1114,
+          "captured_launches": 588,
+          "control_launches": 0,
+          "deed_launches": 120,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 18816,
+          "egress_section_octets": 97088,
+          "ingress_octets": 28328,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 37,
+          "synchronizations": 120
+        },
+        "elapsed_microseconds": 552,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        },
+        {
+          "numerator": "2",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 26,
+      "expected_real": [
+        {
+          "numerator": "4",
+          "denominator": "3"
+        },
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 1186,
+          "captured_launches": 628,
+          "control_launches": 0,
+          "deed_launches": 128,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 20096,
+          "egress_section_octets": 102336,
+          "ingress_octets": 28664,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 39,
+          "synchronizations": 128
+        },
+        "census_before": {
+          "allocations": 1150,
+          "captured_launches": 608,
+          "control_launches": 0,
+          "deed_launches": 124,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 19456,
+          "egress_section_octets": 99712,
+          "ingress_octets": 28496,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 38,
+          "synchronizations": 124
+        },
+        "elapsed_microseconds": 508,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "2",
+          "denominator": "1"
+        },
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 27,
+      "expected_real": [
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        },
+        {
+          "numerator": "4",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 1222,
+          "captured_launches": 648,
+          "control_launches": 0,
+          "deed_launches": 132,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 20736,
+          "egress_section_octets": 104960,
+          "ingress_octets": 28832,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 40,
+          "synchronizations": 132
+        },
+        "census_before": {
+          "allocations": 1186,
+          "captured_launches": 628,
+          "control_launches": 0,
+          "deed_launches": 128,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 20096,
+          "egress_section_octets": 102336,
+          "ingress_octets": 28664,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 39,
+          "synchronizations": 128
+        },
+        "elapsed_microseconds": 527,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        },
+        {
+          "numerator": "2",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 28,
+      "expected_real": [
+        {
+          "numerator": "4",
+          "denominator": "3"
+        },
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 1258,
+          "captured_launches": 668,
+          "control_launches": 0,
+          "deed_launches": 136,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 21376,
+          "egress_section_octets": 107584,
+          "ingress_octets": 29000,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 41,
+          "synchronizations": 136
+        },
+        "census_before": {
+          "allocations": 1222,
+          "captured_launches": 648,
+          "control_launches": 0,
+          "deed_launches": 132,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 20736,
+          "egress_section_octets": 104960,
+          "ingress_octets": 28832,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 40,
+          "synchronizations": 132
+        },
+        "elapsed_microseconds": 522,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "2",
+          "denominator": "1"
+        },
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 29,
+      "expected_real": [
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        },
+        {
+          "numerator": "4",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 1294,
+          "captured_launches": 688,
+          "control_launches": 0,
+          "deed_launches": 140,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 22016,
+          "egress_section_octets": 110208,
+          "ingress_octets": 29168,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 42,
+          "synchronizations": 140
+        },
+        "census_before": {
+          "allocations": 1258,
+          "captured_launches": 668,
+          "control_launches": 0,
+          "deed_launches": 136,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 21376,
+          "egress_section_octets": 107584,
+          "ingress_octets": 29000,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 41,
+          "synchronizations": 136
+        },
+        "elapsed_microseconds": 507,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        },
+        {
+          "numerator": "2",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 30,
+      "expected_real": [
+        {
+          "numerator": "4",
+          "denominator": "3"
+        },
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 1330,
+          "captured_launches": 708,
+          "control_launches": 0,
+          "deed_launches": 144,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 22656,
+          "egress_section_octets": 112832,
+          "ingress_octets": 29336,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 43,
+          "synchronizations": 144
+        },
+        "census_before": {
+          "allocations": 1294,
+          "captured_launches": 688,
+          "control_launches": 0,
+          "deed_launches": 140,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 22016,
+          "egress_section_octets": 110208,
+          "ingress_octets": 29168,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 42,
+          "synchronizations": 140
+        },
+        "elapsed_microseconds": 512,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "2",
+          "denominator": "1"
+        },
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 31,
+      "expected_real": [
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        },
+        {
+          "numerator": "4",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 1366,
+          "captured_launches": 728,
+          "control_launches": 0,
+          "deed_launches": 148,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 23296,
+          "egress_section_octets": 115456,
+          "ingress_octets": 29504,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 44,
+          "synchronizations": 148
+        },
+        "census_before": {
+          "allocations": 1330,
+          "captured_launches": 708,
+          "control_launches": 0,
+          "deed_launches": 144,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 22656,
+          "egress_section_octets": 112832,
+          "ingress_octets": 29336,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 43,
+          "synchronizations": 144
+        },
+        "elapsed_microseconds": 523,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        },
+        {
+          "numerator": "2",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    },
+    {
+      "index": 32,
+      "expected_real": [
+        {
+          "numerator": "4",
+          "denominator": "3"
+        },
+        {
+          "numerator": "-2",
+          "denominator": "3"
+        }
+      ],
+      "output": {
+        "center": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "268435456",
+              "numerator": "357913941"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "536870912",
+              "numerator": "-357913941"
+            }
+          }
+        ],
+        "radius": {
+          "denominator": "2147483648",
+          "numerator": "119"
+        },
+        "scope": "one joint Euclidean enclosure"
+      },
+      "cost": {
+        "census_after": {
+          "allocations": 1402,
+          "captured_launches": 748,
+          "control_launches": 0,
+          "deed_launches": 152,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 23936,
+          "egress_section_octets": 118080,
+          "ingress_octets": 29672,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 45,
+          "synchronizations": 152
+        },
+        "census_before": {
+          "allocations": 1366,
+          "captured_launches": 728,
+          "control_launches": 0,
+          "deed_launches": 148,
+          "device_to_device_octets": 0,
+          "egress_receipt_octets": 23296,
+          "egress_section_octets": 115456,
+          "ingress_octets": 29504,
+          "resident_octets_now": 23136,
+          "resident_octets_peak": 58980,
+          "section_read_outs": 44,
+          "synchronizations": 148
+        },
+        "elapsed_microseconds": 518,
+        "scope": "application request body: construction/input mounting, resident execution and terminal decoding; excludes JSON transport and session startup"
+      },
+      "exchange_target_real": [
+        {
+          "numerator": "2",
+          "denominator": "1"
+        },
+        {
+          "numerator": "-1",
+          "denominator": "1"
+        }
+      ],
+      "prediction_minus_exchange_target": [
+        {
+          "real": {
+            "numerator": "-178956971",
+            "denominator": "268435456"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        },
+        {
+          "real": {
+            "numerator": "178956971",
+            "denominator": "536870912"
+          },
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "exchange_discrepancy_square": {
+        "numerator": "160127987347474205",
+        "denominator": "288230376151711744"
+      },
+      "normal_enclosure_contains_exchange_target": false
+    }
+  ],
+  "query_measurement": {
+    "receiver": "one two-complex-component normal-reference enclosure",
+    "count": 32,
+    "clock": "public request body, microseconds; first query excluded",
+    "median_us": 521.5,
+    "sum_us": 16706,
+    "rate_numerator": 32000000,
+    "rate_denominator": 16706,
+    "rate_unit": "delivered sections per request-body second"
+  },
+  "target_build": {
+    "wall_ns": 1256040056,
+    "resources": {
+      "child_wall_ns": 1237238636,
+      "user_seconds": 1.292096,
+      "system_seconds": 0.318641,
+      "max_rss_kib": 274640,
+      "major_page_faults": 29,
+      "minor_page_faults": 95766,
+      "voluntary_context_switches": 2632,
+      "involuntary_context_switches": 212
+    },
+    "stderr": "     Locking 5 packages to latest compatible versions\n   Compiling autocfg v1.5.1\n   Compiling num-traits v0.2.19\n   Compiling num-integer v0.1.47\n   Compiling num-bigint v0.4.8\n   Compiling num-rational v0.4.2\n   Compiling hephaestus-function-check v0.0.0 (/home/b/Workspaces/holonics/research/experiments/contextual_prediction_release/target_program)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.19s\n"
+  },
+  "target_execution": {
+    "wall_ns": 19859212,
+    "resources": {
+      "child_wall_ns": 836497,
+      "user_seconds": 0.000762,
+      "system_seconds": 0.0,
+      "max_rss_kib": 12504,
+      "major_page_faults": 0,
+      "minor_page_faults": 105,
+      "voluntary_context_switches": 1,
+      "involuntary_context_switches": 0
+    },
+    "stdout": "base:337/120,-3/4\nchanged:247/120,427/120\nlinear:-11/12,-5/12\n"
+  },
+  "target_expected": {
+    "base": [
+      {
+        "numerator": "337",
+        "denominator": "120"
+      },
+      {
+        "numerator": "-3",
+        "denominator": "4"
+      }
+    ],
+    "changed": [
+      {
+        "numerator": "247",
+        "denominator": "120"
+      },
+      {
+        "numerator": "427",
+        "denominator": "120"
+      }
+    ],
+    "linear": [
+      {
+        "numerator": "-11",
+        "denominator": "12"
+      },
+      {
+        "numerator": "-5",
+        "denominator": "12"
+      }
+    ]
+  },
+  "artifacts": {
+    "base": {
+      "left_extent": 2,
+      "left_forms": [
+        [
+          {
+            "denominator": "1",
+            "numerator": "1"
+          },
+          {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        ],
+        [
+          {
+            "denominator": "1",
+            "numerator": "0"
+          },
+          {
+            "denominator": "1",
+            "numerator": "1"
+          }
+        ],
+        [
+          {
+            "denominator": "1",
+            "numerator": "1"
+          },
+          {
+            "denominator": "1",
+            "numerator": "1"
+          }
+        ]
+      ],
+      "output_extent": 2,
+      "products": 3,
+      "receiver_family": {
+        "free_row_directions": [],
+        "particular": [
+          [
+            {
+              "denominator": "1",
+              "numerator": "1"
+            },
+            {
+              "denominator": "1",
+              "numerator": "-1"
+            },
+            {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          ],
+          [
+            {
+              "denominator": "1",
+              "numerator": "-1"
+            },
+            {
+              "denominator": "1",
+              "numerator": "-1"
+            },
+            {
+              "denominator": "1",
+              "numerator": "1"
+            }
+          ]
+        ],
+        "scope": "every free row direction annihilates the complete retained product core"
+      },
+      "right_extent": 2,
+      "right_forms": [
+        [
+          {
+            "denominator": "1",
+            "numerator": "1"
+          },
+          {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        ],
+        [
+          {
+            "denominator": "1",
+            "numerator": "0"
+          },
+          {
+            "denominator": "1",
+            "numerator": "1"
+          }
+        ],
+        [
+          {
+            "denominator": "1",
+            "numerator": "1"
+          },
+          {
+            "denominator": "1",
+            "numerator": "1"
+          }
+        ]
+      ],
+      "tensor_chart": "column i*right_extent+j",
+      "tensor_image": [
+        [
+          {
+            "denominator": "1",
+            "numerator": "1"
+          },
+          {
+            "denominator": "1",
+            "numerator": "0"
+          },
+          {
+            "denominator": "1",
+            "numerator": "0"
+          },
+          {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        ],
+        [
+          {
+            "denominator": "1",
+            "numerator": "0"
+          },
+          {
+            "denominator": "1",
+            "numerator": "0"
+          },
+          {
+            "denominator": "1",
+            "numerator": "0"
+          },
+          {
+            "denominator": "1",
+            "numerator": "1"
+          }
+        ],
+        [
+          {
+            "denominator": "1",
+            "numerator": "1"
+          },
+          {
+            "denominator": "1",
+            "numerator": "1"
+          },
+          {
+            "denominator": "1",
+            "numerator": "1"
+          },
+          {
+            "denominator": "1",
+            "numerator": "1"
+          }
+        ]
+      ]
+    },
+    "changed": {
+      "left_extent": 2,
+      "left_forms": [
+        [
+          {
+            "denominator": "1",
+            "numerator": "1"
+          },
+          {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        ],
+        [
+          {
+            "denominator": "1",
+            "numerator": "0"
+          },
+          {
+            "denominator": "1",
+            "numerator": "1"
+          }
+        ],
+        [
+          {
+            "denominator": "1",
+            "numerator": "1"
+          },
+          {
+            "denominator": "1",
+            "numerator": "1"
+          }
+        ]
+      ],
+      "output_extent": 2,
+      "products": 3,
+      "receiver_family": {
+        "free_row_directions": [],
+        "particular": [
+          [
+            {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            {
+              "denominator": "1",
+              "numerator": "-2"
+            },
+            {
+              "denominator": "1",
+              "numerator": "1"
+            }
+          ],
+          [
+            {
+              "denominator": "1",
+              "numerator": "2"
+            },
+            {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            {
+              "denominator": "1",
+              "numerator": "-1"
+            }
+          ]
+        ],
+        "scope": "every free row direction annihilates the complete retained product core"
+      },
+      "right_extent": 2,
+      "right_forms": [
+        [
+          {
+            "denominator": "1",
+            "numerator": "1"
+          },
+          {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        ],
+        [
+          {
+            "denominator": "1",
+            "numerator": "0"
+          },
+          {
+            "denominator": "1",
+            "numerator": "1"
+          }
+        ],
+        [
+          {
+            "denominator": "1",
+            "numerator": "1"
+          },
+          {
+            "denominator": "1",
+            "numerator": "1"
+          }
+        ]
+      ],
+      "tensor_chart": "column i*right_extent+j",
+      "tensor_image": [
+        [
+          {
+            "denominator": "1",
+            "numerator": "1"
+          },
+          {
+            "denominator": "1",
+            "numerator": "0"
+          },
+          {
+            "denominator": "1",
+            "numerator": "0"
+          },
+          {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        ],
+        [
+          {
+            "denominator": "1",
+            "numerator": "0"
+          },
+          {
+            "denominator": "1",
+            "numerator": "0"
+          },
+          {
+            "denominator": "1",
+            "numerator": "0"
+          },
+          {
+            "denominator": "1",
+            "numerator": "1"
+          }
+        ],
+        [
+          {
+            "denominator": "1",
+            "numerator": "1"
+          },
+          {
+            "denominator": "1",
+            "numerator": "1"
+          },
+          {
+            "denominator": "1",
+            "numerator": "1"
+          },
+          {
+            "denominator": "1",
+            "numerator": "1"
+          }
+        ]
+      ]
+    },
+    "linear": {
+      "left_extent": 2,
+      "left_forms": [
+        [
+          {
+            "denominator": "1",
+            "numerator": "1"
+          },
+          {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        ],
+        [
+          {
+            "denominator": "1",
+            "numerator": "0"
+          },
+          {
+            "denominator": "1",
+            "numerator": "1"
+          }
+        ]
+      ],
+      "output_extent": 2,
+      "products": 2,
+      "receiver_family": {
+        "free_row_directions": [],
+        "particular": [
+          [
+            {
+              "denominator": "1",
+              "numerator": "8"
+            },
+            {
+              "denominator": "1",
+              "numerator": "5"
+            }
+          ],
+          [
+            {
+              "denominator": "1",
+              "numerator": "5"
+            },
+            {
+              "denominator": "1",
+              "numerator": "3"
+            }
+          ]
+        ],
+        "scope": "every free row direction annihilates the complete retained product core"
+      },
+      "right_extent": 1,
+      "right_forms": [
+        [
+          {
+            "denominator": "1",
+            "numerator": "1"
+          }
+        ],
+        [
+          {
+            "denominator": "1",
+            "numerator": "1"
+          }
+        ]
+      ],
+      "tensor_chart": "column i*right_extent+j",
+      "tensor_image": [
+        [
+          {
+            "denominator": "1",
+            "numerator": "1"
+          },
+          {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        ],
+        [
+          {
+            "denominator": "1",
+            "numerator": "0"
+          },
+          {
+            "denominator": "1",
+            "numerator": "1"
+          }
+        ]
+      ]
+    }
+  },
+  "exchange_target_observer": "Added from the retained outputs; distinct from the normal-reference numerical enclosure. No native rerun or timing change."
+}

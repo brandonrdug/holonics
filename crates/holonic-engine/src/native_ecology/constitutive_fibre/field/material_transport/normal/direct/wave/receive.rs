@@ -72,7 +72,7 @@ impl<'c> ResidentNormalWave<'c> {
             .material
             .prepare_wave_seed(self.current.view().into(), observed)?;
         let s = self.material.surface;
-        let n = self.material.roots;
+        let n = self.material.roots();
         let layout = NormalLayout::new(n, n).ok_or(ConstitutiveFibreError::Shape)?;
         let fresh = |w| s.fresh_section(1, w, ResidentGrain(0));
         let next = fresh(layout.state_words)?;

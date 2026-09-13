@@ -104,6 +104,12 @@ execution accompany it through their actual dependencies. The
 [blueprint deliverables](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#deliverables-and-discriminating-checks)
 name the consuming files, equations, products and discriminating checks.
 
+[definition] Reuse the [resident feature/predictor and code return](../../research/records/2026-09-13_RESIDENT_CONTEXT_FEATURES_RETURN_PREDICTIONS_AND_FACTORS_RELEASE_EXECUTABLE_CODE.md).
+Its public preparation maps and normal law give a bounded contextual mathematical consumer;
+the next attachment carries that fitted source/condition action through the existing coupled
+wave/joint body. Its executable-function return starts the code row below. CONSTRUCTION_STATE
+retains the measured scope and remaining products; neither return schedules another demo loop.
+
 | Packet / deliverable | Concrete return | Dependency and completion evidence |
 |---|---|---|
 | **Contextual generator formation** | A whole corrected or continued section from source/condition distinctions present before its target arrives; infer `W[S;C]=Y` or the declared normal/conditional law. | Use the source-null contrast and fixed-h collapse as references. Show actual generated chunks for new inputs and the same visible source under distinct preparations, plus the unsupported-condition separator. No additional unchanged broad exposure. |

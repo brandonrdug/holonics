@@ -1,14 +1,14 @@
 // Direct current attachment to the existing unit-prior normal law. Source coordinates are the
 // three declared complex port blocks; no field source handle or history table is an operand.
 // The packed source ball and rational observed current are transient passage carriers.
-__device__ void direct_normal_pack(
+__device__ void direct_normal_pack_sources(
     const int64_t *xlo,const int64_t *xhi,uint32_t xa,uint32_t xd,uint32_t xs,uint32_t xkind,
     const int64_t *ylo,const int64_t *yhi,uint32_t ya,uint32_t yd,uint32_t ys,
-    uint32_t roots,uint32_t targets,uint32_t grain,uint32_t observed,int64_t *input,uint32_t *slot){
-    const uint32_t d=normal_source_components(roots);
+    uint32_t m,uint32_t targets,uint32_t grain,uint32_t observed,int64_t *input,uint32_t *slot){
+    const uint32_t d=NORMAL_QUADRATURES*m;
     wide *current=(wide *)input;
     int64_t *incoming=input+NORMAL_WIDE_WORDS*2u*(d+1u);
-        if(!roots||!targets||grain<1||grain>120||observed>1||xkind>1){atomicOr(slot,REFUSED_MALFORMED);}
+        if(!m||!targets||grain<1||grain>120||observed>1||xkind>1){atomicOr(slot,REFUSED_MALFORMED);}
         if(!*slot&&xkind==1){
             for(size_t j=0;j<NORMAL_WIDE_WORDS*(d+1u);++j)
                 if(xlo[xa+j]!=xhi[xa+j])atomicOr(slot,REFUSED_MALFORMED);
@@ -40,11 +40,19 @@ __device__ void direct_normal_pack(
         }
 }
 
+__device__ void direct_normal_pack(
+    const int64_t *xlo,const int64_t *xhi,uint32_t xa,uint32_t xd,uint32_t xs,uint32_t xkind,
+    const int64_t *ylo,const int64_t *yhi,uint32_t ya,uint32_t yd,uint32_t ys,
+    uint32_t roots,uint32_t targets,uint32_t grain,uint32_t observed,int64_t *input,uint32_t *slot){
+    direct_normal_pack_sources(xlo,xhi,xa,xd,xs,xkind,ylo,yhi,ya,yd,ys,
+        normal_sources(roots),targets,grain,observed,input,slot);
+}
+
 // Parallel target rows, followed by their complete joint-radius bound.
-__device__ void direct_normal_predict_mode(const int64_t *old,const wide *current,
-    uint32_t roots,uint32_t targets,uint32_t grain,wide *out,int64_t *work,bool full_report,
+__device__ void direct_normal_predict_mode_sources(const int64_t *old,const wide *current,
+    uint32_t m,uint32_t targets,uint32_t grain,wide *out,int64_t *work,bool full_report,
     bool reference,uint32_t *slot){
-    const uint32_t d=normal_source_components(roots),R=2u*targets;
+    const uint32_t d=NORMAL_QUADRATURES*m,R=2u*targets;
     // Read the old operator using the same contraction and certified family bound as the field.
     const wide *M=(const wide *)old;
     for(uint32_t row=threadIdx.x;row<targets;row+=blockDim.x){
@@ -52,7 +60,7 @@ __device__ void direct_normal_predict_mode(const int64_t *old,const wide *curren
         for(uint32_t j=0;j<d;++j)norm=add_checked(norm,ft_abs(M[(size_t)row*d+j],slot),slot);
         ((wide *)work)[2u*row]=norm;
         ((wide *)work)[2u*row+1u]=linear_material_row(M,nullptr,current+d+1u,row,
-            normal_sources(roots),grain,out,slot);
+            m,grain,out,slot);
     }
     __syncthreads();if(*slot)return;
     if(!threadIdx.x){
@@ -63,12 +71,12 @@ __device__ void direct_normal_predict_mode(const int64_t *old,const wide *curren
         }
         // Reference transport pays the retained coefficient defect. Applied transport uses
         // the stored operator as the law, while retaining source enclosure and rounding.
-        wide error=reference?M[(size_t)R*normal_sources(roots)]:0;
+        wide error=reference?M[(size_t)R*m]:0;
         out[R]=ft_prediction_error(error,norm,current+d+1u,d,current[2u*(d+1u)-1u],remainder,grain,slot);
         if(full_report){
-        size_t at=normal_metadata_at(roots,targets);
-        out[at]=M[(size_t)R*normal_sources(roots)];out[at+1u]=M[(size_t)R*normal_sources(roots)+1u];out[at+2u]=norm;
-        const int64_t *errors=old+normal_state_words(roots,targets)-NORMAL_STATISTIC_COUNT*MOMENT_WIRE_WORDS;
+        size_t at=normal_metadata_at_sources(m,targets);
+        out[at]=M[(size_t)R*m];out[at+1u]=M[(size_t)R*m+1u];out[at+2u]=norm;
+        const int64_t *errors=old+normal_state_words_sources(m,targets)-NORMAL_STATISTIC_COUNT*MOMENT_WIRE_WORDS;
         out[at+3u]=normal_diagnostic_upper(normal_read(errors,slot),grain,slot);
         out[at+4u]=normal_diagnostic_upper(normal_read(errors+MOMENT_WIRE_WORDS,slot),grain,slot);
         }
@@ -76,9 +84,48 @@ __device__ void direct_normal_predict_mode(const int64_t *old,const wide *curren
     __syncthreads();if(*slot)return;
 }
 
+__device__ void direct_normal_predict_mode(const int64_t *old,const wide *current,
+    uint32_t roots,uint32_t targets,uint32_t grain,wide *out,int64_t *work,bool full_report,
+    bool reference,uint32_t *slot){
+    direct_normal_predict_mode_sources(old,current,normal_sources(roots),targets,grain,out,work,full_report,reference,slot);
+}
+
+__device__ void direct_normal_predict_sources(const int64_t *old,const wide *current,
+    uint32_t m,uint32_t targets,uint32_t grain,wide *out,int64_t *work,bool full_report,uint32_t *slot){
+    direct_normal_predict_mode_sources(old,current,m,targets,grain,out,work,full_report,true,slot);
+}
+
 __device__ void direct_normal_predict(const int64_t *old,const wide *current,
     uint32_t roots,uint32_t targets,uint32_t grain,wide *out,int64_t *work,bool full_report,uint32_t *slot){
     direct_normal_predict_mode(old,current,roots,targets,grain,out,work,full_report,true,slot);
+}
+
+__device__ void direct_normal_material_execute(
+    const int64_t *old,const int64_t *xlo,const int64_t *xhi,uint32_t xa,uint32_t xd,uint32_t xs,uint32_t xkind,
+    const int64_t *ylo,const int64_t *yhi,uint32_t ya,uint32_t yd,uint32_t ys,
+    uint32_t source_complex,uint32_t targets,uint32_t grain,uint32_t observed,
+    int64_t *next,int64_t *next_hi,int64_t *before,int64_t *before_hi,
+    int64_t *after,int64_t *after_hi,int64_t *work,int64_t *input,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count) {
+    if(blockIdx.x||upstream_refused(census,lineage,lineage_count,slot))return;
+    const uint32_t d=NORMAL_QUADRATURES*source_complex;
+    const size_t report_words=normal_report_words_sources(source_complex,targets);
+    wide *current=(wide *)input; int64_t *incoming=input+NORMAL_WIDE_WORDS*2u*(d+1u);
+    wide *out=(wide *)before;
+    for(size_t j=threadIdx.x;j<report_words;j+=blockDim.x)before[j]=before_hi[j]=0;
+    for(size_t j=threadIdx.x;j<2u*(d+1u);j+=blockDim.x)current[j]=0;
+    __syncthreads();
+    if(!threadIdx.x)direct_normal_pack_sources(xlo,xhi,xa,xd,xs,xkind,ylo,yhi,ya,yd,ys,
+        source_complex,targets,grain,observed,input,slot);
+    __syncthreads();if(*slot)return;
+    direct_normal_predict_mode_sources(old,current,source_complex,targets,grain,out,work,true,true,slot);
+    if(*slot)return;
+    for(size_t j=threadIdx.x;j<report_words;j+=blockDim.x)before_hi[j]=before[j];
+    __syncthreads();
+    if(observed){
+        field_normal_material_prepare_sources(old,current,(const wide *)before,current,incoming,
+            source_complex,1,grain,next,next_hi,after,after_hi,work,targets,0,0,slot);
+    }
 }
 
 extern "C" __global__ __launch_bounds__(512) void section_direct_normal_material(
@@ -89,25 +136,15 @@ extern "C" __global__ __launch_bounds__(512) void section_direct_normal_material
     int64_t *next,int64_t *next_hi,int64_t *before,int64_t *before_hi,
     int64_t *after,int64_t *after_hi,int64_t *work,int64_t *input,
     uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count) {
-    if(blockIdx.x)return;
-    if(upstream_refused(census,lineage,lineage_count,slot))return;
-    const uint32_t d=normal_source_components(roots),R=2u*targets;
-    const size_t report_words=normal_report_words(roots,targets);
-    wide *current=(wide *)input;
-    int64_t *incoming=input+NORMAL_WIDE_WORDS*2u*(d+1u);
-    wide *out=(wide *)before;
-    for(size_t j=threadIdx.x;j<report_words;j+=blockDim.x)before[j]=before_hi[j]=0;
-    for(size_t j=threadIdx.x;j<2u*(d+1u);j+=blockDim.x)current[j]=0;
-    __syncthreads();
-    if(!threadIdx.x){
-        direct_normal_pack(xlo,xhi,xa,xd,xs,xkind,ylo,yhi,ya,yd,ys,
-            roots,targets,grain,observed,input,slot);
-    }
-    __syncthreads();if(*slot)return;
-    direct_normal_predict_mode(old,current,roots,targets,grain,out,work,true,true,slot);
-    if(*slot)return;
-    for(size_t j=threadIdx.x;j<report_words;j+=blockDim.x)before_hi[j]=before[j];
-    __syncthreads();
-    if(observed)field_normal_material_prepare(old,current,(const wide *)before,current,incoming,
-        roots,1,grain,next,next_hi,after,after_hi,work,targets,0,slot);
+    direct_normal_material_execute(old,xlo,xhi,xa,xd,xs,xkind,ylo,yhi,ya,yd,ys,normal_sources(roots),targets,grain,observed,next,next_hi,before,before_hi,after,after_hi,work,input,slot,census,lineage,lineage_count);
+}
+
+extern "C" __global__ __launch_bounds__(512) void section_direct_normal_material_sources(
+    const int64_t *old,const int64_t *xlo,const int64_t *xhi,uint32_t xa,uint32_t xd,uint32_t xs,uint32_t xkind,
+    const int64_t *ylo,const int64_t *yhi,uint32_t ya,uint32_t yd,uint32_t ys,
+    uint32_t source_complex,uint32_t targets,uint32_t grain,uint32_t observed,
+    int64_t *next,int64_t *next_hi,int64_t *before,int64_t *before_hi,
+    int64_t *after,int64_t *after_hi,int64_t *work,int64_t *input,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count) {
+    direct_normal_material_execute(old,xlo,xhi,xa,xd,xs,xkind,ylo,yhi,ya,yd,ys,source_complex,targets,grain,observed,next,next_hi,before,before_hi,after,after_hi,work,input,slot,census,lineage,lineage_count);
 }

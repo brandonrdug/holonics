@@ -45,7 +45,7 @@ impl<'c> ResidentNormalWave<'c> {
         &mut self,
         source: ResidentConstitutiveSection<'a, 'c>,
     ) -> Result<NormalSourceActuation<'a, 'c>, ConstitutiveFibreError> {
-        let n = self.material.roots;
+        let n = self.material.roots();
         if source.rows() < 2 || source.components() != 2 * n {
             return Err(ConstitutiveFibreError::Shape);
         }

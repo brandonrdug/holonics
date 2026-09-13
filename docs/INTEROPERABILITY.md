@@ -67,9 +67,9 @@ unsupported operation/state/receiver boundary rather than a mislabeled package.
 ## Native persistence and remaining executable lowering
 
 [definition] A Hephaestus code request can use this contract at the scope of one generated
-function. The [planned function receiver](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#deliverables-and-discriminating-checks)
+function. The [returned function receiver](../research/experiments/contextual_prediction_release/README.md)
 lowers retained linear/bilinear factors, compositions and powers to Rust over arbitrary-precision
-rationals, then compares target execution with resident application. This is a concrete code
+rationals, with target execution compared to resident application. This is a concrete code
 generation product, distinct from exporting the whole continuing HNN. A later stateful program
 adds its actual state/effect correspondence. The code printer encodes a constructed graph; it
 does not manufacture an answer from a task label.
@@ -80,7 +80,7 @@ native phase checkpoint, including optional world/stream continuation (NCF4). Th
 [Athena guide](ATHENA.md#model-artifacts-and-persistence) and [native guide](NATIVE_HNA.md)
 name their actual owners. Neither is an export produced by the older package-conversion owner.
 
-[open] Standard executable lowering still requires the actual target-operation/state map,
+[open] Whole-model standard executable lowering still requires the actual target-operation/state map,
 coefficients/configuration, numeric projection, decoder boundary and matched target execution.
 The inherited-first [production campaign](plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md)
 remains paused; its old outward branch is not automatic construction order. A frozen target

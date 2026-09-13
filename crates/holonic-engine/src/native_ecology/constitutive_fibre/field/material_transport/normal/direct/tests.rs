@@ -332,3 +332,65 @@ fn target_energy_caps_a_large_source_family_and_keeps_legacy_rest() {
     legacy_state.intervals[at+1]=((old_error >> 64) as i64,(old_error >> 64) as i64);
     NormalMaterialRest::from_state_data(1,1,grain,1,legacy_state).unwrap();
 }
+
+#[test]
+#[ignore = "requires CUDA; generic feature chart uses the explicit source width"]
+fn generic_features_rectangular_receive_accumulates_full_normal_report() {
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let mut body = ResidentNormalMaterial::found_features(&s, 2, 3, ResidentGrain(32)).unwrap();
+    assert_eq!(body.source_complex(), 2);
+    assert_eq!(body.targets(), 3);
+    let x = point(&s, &[1, 0, 0, 1]);
+    let y = point(&s, &[1, 0, 0, 1, -1, 0]);
+    let first = body.receive(current(&x), current(&y)).unwrap();
+    let before = first.inspect_before().unwrap();
+    let after = first.inspect_after().unwrap().unwrap();
+    assert!(after.returned_difference.is_some());
+    assert!(after.chronological_current.is_some());
+    assert!(after.contemporary_difference.is_some());
+    assert_eq!(after.forward.center.len(), 3);
+    drop(first);
+    body.receive(current(&x), current(&y)).unwrap();
+    let state = body.inspect().unwrap();
+    assert_eq!(body.observations(), 2);
+    assert_eq!(state.source_normal.len(), 2);
+    assert_eq!(state.source_normal[0].len(), 2);
+    assert_eq!(state.cross_source[0].len(), 2);
+    assert_eq!(state.target_energy, Rat::from_integer(6.into()));
+    assert_eq!(state.source_normal,vec![vec![wave(3,0,1),wave(0,-2,1)],vec![wave(0,2,1),wave(3,0,1)]]);
+    assert_eq!(state.cross_source[0],vec![wave(2,0,1),wave(0,-2,1)]);
+    // Two observations give P=(2/5)y[1,-i]. Test a fresh source, not merely a state shape.
+    let z=point(&s,&[2,0,0,0]);
+    let predicted=body.read(current(&z)).unwrap().into_forward().inspect().unwrap();
+    contains(&predicted,&[wave(4,0,5),wave(0,4,5),wave(-4,0,5)]);
+    assert!(predicted.radius<q(1,1000));
+    assert!(before.forward.center.iter().all(|v|v.real.is_zero()&&v.imaginary.is_zero()));
+    assert_eq!(before.forward.center.len(), 3);
+}
+
+#[test]
+#[ignore = "requires CUDA; generic feature rest and refinement retain exact geometry"]
+fn generic_features_rest_roundtrip_and_refinement_preserve_geometry() {
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let mut body = ResidentNormalMaterial::found_features(&s, 5, 2, ResidentGrain(16)).unwrap();
+    let x = point(&s, &[1, 0, 0, 1, -1, 0, 0, 1, 1, 0]);
+    let y = point(&s, &[1, 0, 0, 1]);
+    body.receive(current(&x), current(&y)).unwrap();
+    let state = body.inspect().unwrap();
+    let rest = body.rest().unwrap();
+    rest.validate().unwrap();
+    let mut bytes=Vec::new(); rest.write(&mut bytes).unwrap();
+    assert_eq!(bytes[b"HOLONIC-NORMAL-MATERIAL".len()],2);
+    let rest=NormalMaterialRest::read(&mut bytes.as_slice(),bytes.len() as u64).unwrap();
+    let mut restored = rest.remount(&s).unwrap();
+    assert_eq!(restored.source_chart(), body.source_chart());
+    assert_eq!(restored.inspect().unwrap().source_normal, state.source_normal);
+    let refinement = restored.refine_realization(ResidentGrain(24)).unwrap();
+    assert_eq!(refinement.inspect_before().unwrap().source_normal, state.source_normal);
+    assert_eq!(refinement.inspect_after().unwrap().source_normal, state.source_normal);
+    drop(refinement);
+    let initial=point(&s,&[1,0,0,0]);
+    assert!(restored.into_difference_wave(current(&initial),current(&initial)).is_err());
+}

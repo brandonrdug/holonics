@@ -136,7 +136,7 @@ impl<'c> ResidentNormalWave<'c> {
     /// Lift this actual joint into an anchored affine carrier without selecting the centre.
     pub fn read_family(&self) -> Result<NormalWaveFamily<'c>, ConstitutiveFibreError> {
         let origin = self.joint_source();
-        let n = self.material.roots;
+        let n = self.material.roots();
         let t = n
             .checked_mul(8)
             .and_then(|v| v.checked_add(2))

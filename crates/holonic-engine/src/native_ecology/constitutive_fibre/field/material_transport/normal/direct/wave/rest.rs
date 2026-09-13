@@ -410,7 +410,7 @@ impl NormalWaveRest {
                         surface,
                         section: &initial,
                         offset: 0,
-                        width: 2 * material.roots,
+                        width: 2 * material.roots(),
                         grain: material.grain,
                     }),
                     view.row(2)?,

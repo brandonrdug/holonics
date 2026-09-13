@@ -165,14 +165,16 @@ a patch or replacement region; a construction can return a function or composed 
 target's syntax is an exterior chart. Code generation does not found another HNN engine or
 reduce Hephaestus to a mathematics-only model.
 
-[definition] The first executable-code deliverable lowers retained exact linear/bilinear factors,
-composition and fixed-operator powers to a straight-line function over the declared rational
-arithmetic chart. The function must be derived from the returned operator graph, including its
+[established-bounded; implemented-exact] The [first executable-code return](../research/experiments/contextual_prediction_release/README.md)
+lowers retained exact linear/bilinear factors, composition and fixed-operator powers to Rust
+functions over arbitrary-precision rationals. Three generated functions compile and agree with
+resident application on new inputs, including a changed receiver of a retained product.
+The function is derived from the returned operator graph, including its
 coefficients and port maps. A syntax printer may encode that graph; it may not supply the requested
 algorithm independently. Use the [outward compiler contract](INTEROPERABILITY.md#the-outward-compiler-contract)
 for the target correspondence. This scoped function release does not require a whole-model export.
 The [blueprint deliverable](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#deliverables-and-discriminating-checks)
-specifies new-input, changed-receiver and incompatible-target checks.
+retains the wider parameter-family, target and continuing-use contracts.
 
 [definition] Contextual code generation and editing subsequently use the same source/condition
 formation and joint release as text. An execution check measures whether the generated program

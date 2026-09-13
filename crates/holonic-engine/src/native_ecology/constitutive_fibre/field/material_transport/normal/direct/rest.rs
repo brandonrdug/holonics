@@ -1,30 +1,40 @@
-//! Complete local normal material at rest. Read-time validation uses the existing exact
-//! inertia/source-energy owner; it does not replay observations or refit coefficients.
+//! Complete local normal material at rest. The legacy wave codec retains its meaning;
+//! arbitrary feature charts carry their actual extent. Validation does not replay observations.
 use super::*;
 use crate::native_ecology::constitutive_fibre::circulation::rest::{
     blob, expect, point_bytes, read_blob, read_point,
 };
 use std::io::{Read, Write};
-
-const MAGIC: &[u8] = b"HOLONIC-NORMAL-MATERIAL\x01";
+const MAGIC: &[u8] = b"HOLONIC-NORMAL-MATERIAL";
 #[derive(Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 struct Header {
+    source_chart: NormalSourceChart,
+    targets: usize,
+    grain: u32,
+    observations: u64,
+}
+// Version-one wire chart only; the live/rest owner stores one source declaration.
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct WaveHeader {
     roots: usize,
     targets: usize,
     grain: u32,
     observations: u64,
 }
-/// Its private fields have passed the mathematical-domain and numerical-witness checks.
 #[derive(Debug, PartialEq, Eq)]
 pub struct NormalMaterialRest {
     header: Header,
     state: ResidentSectionRest,
 }
-
 impl NormalMaterialRest {
+    /// Wave roots are absent (zero) for a general feature chart.
     pub fn roots(&self) -> usize {
-        self.header.roots
+        self.header.source_chart.wave_roots().unwrap_or(0)
+    }
+    pub fn source_chart(&self) -> NormalSourceChart {
+        self.header.source_chart
     }
     pub fn targets(&self) -> usize {
         self.header.targets
@@ -38,8 +48,7 @@ impl NormalMaterialRest {
     pub fn state(&self) -> &ResidentSectionRest {
         &self.state
     }
-    /// Import a declared normal chart. This checks its compatible moment domain and actual
-    /// stored operator residual; it cannot authenticate the exterior origin of observations.
+    /// Legacy three-port ingress; the mathematical checks do not authenticate observation origin.
     pub fn from_state_data(
         roots: usize,
         targets: usize,
@@ -47,24 +56,38 @@ impl NormalMaterialRest {
         observations: u64,
         state: ResidentSectionRest,
     ) -> Result<Self, ConstitutiveFibreError> {
-        if roots == 0 || targets == 0 || !(1..=120).contains(&grain.0) {
+        Self::from_chart_state_data(
+            NormalSourceChart::Wave { roots },
+            targets,
+            grain,
+            observations,
+            state,
+        )
+    }
+    pub fn from_chart_state_data(
+        source_chart: NormalSourceChart,
+        targets: usize,
+        grain: ResidentGrain,
+        observations: u64,
+        state: ResidentSectionRest,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        source_chart.layout(targets)?;
+        if !(1..=120).contains(&grain.0) {
             return Err(ConstitutiveFibreError::Shape);
         }
-        let result = Self {
+        let value = Self {
             header: Header {
-                roots,
+                source_chart,
                 targets,
                 grain: grain.0,
                 observations,
             },
             state,
         };
-        result.validate()?;
-        Ok(result)
+        value.validate()?;
+        Ok(value)
     }
-    /// Snapshot an already admitted native material cut. Cold wire ingress still uses
-    /// `from_state_data` and validates its mathematical domain; a retained producing cut need
-    /// not solve that domain again merely to be written at rest.
+    /// Snapshot an admitted wave cut without solving its mathematical domain again.
     pub(super) fn from_native_state(
         roots: usize,
         targets: usize,
@@ -72,50 +95,94 @@ impl NormalMaterialRest {
         observations: u64,
         state: ResidentSectionRest,
     ) -> Result<Self, ConstitutiveFibreError> {
-        point_section(&state, 1, state_words(roots, targets).ok_or(ConstitutiveFibreError::Shape)?)?;
+        Self::from_native_chart(
+            NormalSourceChart::Wave { roots },
+            targets,
+            grain,
+            observations,
+            state,
+        )
+    }
+    fn from_native_chart(
+        source_chart: NormalSourceChart,
+        targets: usize,
+        grain: ResidentGrain,
+        observations: u64,
+        state: ResidentSectionRest,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        point_section(&state, 1, source_chart.layout(targets)?.state_words)?;
         Ok(Self {
-            header: Header { roots, targets, grain: grain.0, observations },
+            header: Header {
+                source_chart,
+                targets,
+                grain: grain.0,
+                observations,
+            },
             state,
         })
     }
     pub fn validate(&self) -> Result<(), ConstitutiveFibreError> {
         let h = &self.header;
-        let value = decode_state(&self.state, h.roots, h.targets, h.grain)?;
+        let value = decode_state_layout(
+            &self.state,
+            h.source_chart.layout(h.targets)?,
+            h.targets,
+            h.grain,
+        )?;
         validate_geometry(&value, h.observations)?;
-        let layout = NormalLayout::new(h.roots, h.targets).ok_or(ConstitutiveFibreError::Shape)?;
+        let layout = h.source_chart.layout(h.targets)?;
         let numeric = wides(&self.state.intervals[..layout.matrix_words])?;
-        let values = layout.gram_values + layout.cross_values + STATISTIC_SCALARS;
-        let moments = (0..values)
+        let error = numeric[layout.cross_values];
+        let moments = (0..layout.gram_values + layout.cross_values + STATISTIC_SCALARS)
             .map(|i| {
                 let start = layout.matrix_words + MomentWire::WORDS * i;
                 integer(&self.state.intervals[start..start + MomentWire::WORDS])
             })
             .collect::<Result<Vec<_>, _>>()?;
-        validate_numerical_witness(
-            &self.state,
-            h.roots,
-            h.targets,
-            h.grain,
-            numeric[layout.cross_values],
-            &moments,
-        )
+        validate_numerical_witness_layout(&self.state, layout, h.targets, h.grain, error, &moments)
     }
-
     pub fn write(&self, out: &mut impl Write) -> Result<(), ConstitutiveFibreError> {
         out.write_all(MAGIC).map_err(invalid)?;
-        blob(out, &serde_json::to_vec(&self.header).map_err(invalid)?)?;
+        if let NormalSourceChart::Wave { roots } = self.header.source_chart {
+            out.write_all(&[1]).map_err(invalid)?;
+            let h = WaveHeader {
+                roots,
+                targets: self.targets(),
+                grain: self.header.grain,
+                observations: self.observations(),
+            };
+            blob(out, &serde_json::to_vec(&h).map_err(invalid)?)?;
+        } else {
+            out.write_all(&[2]).map_err(invalid)?;
+            blob(out, &serde_json::to_vec(&self.header).map_err(invalid)?)?;
+        }
         blob(out, &point_bytes(&self.state)?)
     }
     pub fn read(input: &mut impl Read, octets: u64) -> Result<Self, ConstitutiveFibreError> {
         let mut input = input.take(octets);
         expect(&mut input, MAGIC)?;
-        let header: Header = serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
+        let mut version = [0u8];
+        input.read_exact(&mut version).map_err(invalid)?;
+        let header = match version[0] {
+            1 => {
+                let h: WaveHeader =
+                    serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
+                Header {
+                    source_chart: NormalSourceChart::Wave { roots: h.roots },
+                    targets: h.targets,
+                    grain: h.grain,
+                    observations: h.observations,
+                }
+            }
+            2 => serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?,
+            _ => return Err(invalid("unsupported normal source chart version")),
+        };
         let state = read_point(&read_blob(&mut input)?)?;
         if input.limit() != 0 {
             return Err(invalid("trailing normal material bytes"));
         }
-        Self::from_state_data(
-            header.roots,
+        Self::from_chart_state_data(
+            header.source_chart,
             header.targets,
             ResidentGrain(header.grain),
             header.observations,
@@ -130,7 +197,7 @@ impl NormalMaterialRest {
         Ok(ResidentNormalMaterial {
             surface,
             state: Rc::new(state),
-            roots: self.header.roots,
+            source_chart: self.header.source_chart,
             targets: self.header.targets,
             grain: ResidentGrain(self.header.grain),
             observations: self.header.observations,
@@ -139,24 +206,13 @@ impl NormalMaterialRest {
 }
 impl ResidentNormalMaterial<'_> {
     pub fn rest(&self) -> Result<NormalMaterialRest, ConstitutiveFibreError> {
-        // Native construction and validated remount are the only ways to obtain this owner.
-        // Cold ingress validates the mathematical domain; ordinary persistence need not solve
-        // that same domain again. Its private rest cannot be mutated after construction.
-        let state = self.state_wire()?;
-        point_section(
-            &state,
-            1,
-            state_words(self.roots, self.targets).ok_or(ConstitutiveFibreError::Shape)?,
-        )?;
-        Ok(NormalMaterialRest {
-            header: Header {
-                roots: self.roots,
-                targets: self.targets,
-                grain: self.grain.0,
-                observations: self.observations,
-            },
-            state,
-        })
+        NormalMaterialRest::from_native_chart(
+            self.source_chart,
+            self.targets,
+            self.grain,
+            self.observations,
+            self.state_wire()?,
+        )
     }
 }
 
@@ -166,7 +222,7 @@ fn validate_geometry(
     value: &NativeNormalMaterialState,
     observations: u64,
 ) -> Result<(), ConstitutiveFibreError> {
-    use crate::inertia::{SymmetricForm, positive_source_energy};
+    use crate::inertia::{positive_source_energy, SymmetricForm};
     let m = value.source_normal.len();
     if [
         &value.source_normal_error,

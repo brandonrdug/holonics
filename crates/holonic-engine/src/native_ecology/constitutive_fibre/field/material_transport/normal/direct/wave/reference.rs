@@ -48,7 +48,7 @@ impl<'c> ResidentNormalWave<'c> {
     /// separate receiver pays the M/P comparison, without turning it into the next applied input.
     pub fn reference_next(&self) -> Result<NormalWaveReference<'c>, ConstitutiveFibreError> {
         let s = self.material.surface;
-        let n = self.material.roots;
+        let n = self.material.roots();
         let d = 2 * n;
         let seed = self.material.prepare_joint_seed(&self.joint, self.epoch)?;
         let fresh = |w| s.fresh_section(1, w, ResidentGrain(0));

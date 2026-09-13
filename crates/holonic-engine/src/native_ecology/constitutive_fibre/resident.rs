@@ -6,7 +6,7 @@
 
 use super::*;
 mod section;
-pub use section::{ResidentConstitutiveSection, ResidentDifferenceSection, ResidentSourcePairs};
+pub use section::{ResidentBilinearFeatures, ResidentConstitutiveSection, ResidentDifferenceSection, ResidentSourcePairs};
 mod return_rest;
 pub use return_rest::ConstitutiveReturnRest;
 

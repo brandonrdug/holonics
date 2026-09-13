@@ -16,12 +16,26 @@ pub(crate) fn report_words(n: usize, t: usize) -> Option<usize> {
 pub(crate) fn workspace_words(n: usize, t: usize) -> Option<usize> {
     Some(NormalLayout::new(n, t)?.workspace_words)
 }
+pub(crate) fn feature_state_words(sources: usize, targets: usize) -> Option<usize> { Some(NormalLayout::for_sources(sources, targets)?.state_words) }
+pub(crate) fn feature_report_words(sources: usize, targets: usize) -> Option<usize> { Some(NormalLayout::for_sources(sources, targets)?.report_words) }
+pub(crate) fn feature_workspace_words(sources: usize, targets: usize) -> Option<usize> { Some(NormalLayout::for_sources(sources, targets)?.workspace_words) }
 pub(super) fn initial_words(
     n: usize,
     t: usize,
     grain: u32,
 ) -> Result<Vec<(i64, i64)>, ConstitutiveFibreError> {
-    let layout = NormalLayout::new(n, t).ok_or(ConstitutiveFibreError::Shape)?;
+    initial_words_for_sources(
+        n.checked_mul(3).ok_or(ConstitutiveFibreError::Shape)?,
+        t,
+        grain,
+    )
+}
+fn initial_words_for_sources(
+    sources: usize,
+    t: usize,
+    grain: u32,
+) -> Result<Vec<(i64, i64)>, ConstitutiveFibreError> {
+    let layout = NormalLayout::for_sources(sources, t).ok_or(ConstitutiveFibreError::Shape)?;
     let mut out = vec![(0, 0); layout.state_words];
     let square_scale_bit = 2 * grain as usize;
     for i in 0..layout.sources {
@@ -61,11 +75,7 @@ pub(super) fn integer(words: &[(i64, i64)]) -> Result<BigInt, ConstitutiveFibreE
 fn ceil_norm(values: &[i128]) -> BigInt {
     let q: BigInt = values.iter().map(|v| BigInt::from(*v).pow(2)).sum();
     let s = q.sqrt();
-    if &s * &s < q {
-        s + 1
-    } else {
-        s
-    }
+    if &s * &s < q { s + 1 } else { s }
 }
 // The two observer-only accumulated-error fields keep legacy nonnegative grained
 // numerators, or -e for the outward numerator 2^e. This is not a native current codec.
@@ -73,7 +83,9 @@ fn diagnostic_numerator(code: i128) -> Result<BigInt, ConstitutiveFibreError> {
     if code >= 0 {
         return Ok(code.into());
     }
-    let exponent = code.checked_neg().ok_or_else(|| invalid("diagnostic exponent"))?;
+    let exponent = code
+        .checked_neg()
+        .ok_or_else(|| invalid("diagnostic exponent"))?;
     if !(127..=(MomentWire::LIMBS * MomentWire::LIMB_BITS) as i128).contains(&exponent) {
         return Err(invalid("diagnostic exponent"));
     }
@@ -100,12 +112,18 @@ pub(in super::super) fn validate_report(
     t: usize,
     linked: bool,
 ) -> Result<i128, ConstitutiveFibreError> {
-    point_section(
+    validate_report_layout(
         s,
-        1,
-        report_words(n, t).ok_or(ConstitutiveFibreError::Shape)?,
-    )?;
-    let layout = NormalLayout::new(n, t).ok_or(ConstitutiveFibreError::Shape)?;
+        &NormalLayout::new(n, t).ok_or(ConstitutiveFibreError::Shape)?,
+        linked,
+    )
+}
+fn validate_report_layout(
+    s: &ResidentSectionRest,
+    layout: &NormalLayout,
+    linked: bool,
+) -> Result<i128, ConstitutiveFibreError> {
+    point_section(s, 1, layout.report_words)?;
     let base = layout.report_moments_at;
     let v = wides(&s.intervals[..base])?;
     let extra = layout.metadata_at;
@@ -220,16 +238,36 @@ pub(in super::super) fn validate_state<'a>(
 // Shared exact wire-scale comparison. This avoids reducing millions of intermediate
 // rational products when a cold material already supplies one common dyadic chart.
 fn validate_numerical_witness(
-    s: &ResidentSectionRest, n: usize, t: usize, grain: u32,
-    error: i128, expected: &[BigInt],
+    s: &ResidentSectionRest,
+    n: usize,
+    t: usize,
+    grain: u32,
+    error: i128,
+    expected: &[BigInt],
 ) -> Result<(), ConstitutiveFibreError> {
-    let layout=NormalLayout::new(n,t).ok_or(ConstitutiveFibreError::Shape)?;
-    let m=layout.sources;
-    let h=layout.matrix_words;
-    let hh=layout.gram_values;
-    let bb=layout.cross_values;
-    let scale=BigInt::one()<<grain;
-    let square=&scale*&scale;
+    validate_numerical_witness_layout(
+        s,
+        NormalLayout::new(n, t).ok_or(ConstitutiveFibreError::Shape)?,
+        t,
+        grain,
+        error,
+        expected,
+    )
+}
+fn validate_numerical_witness_layout(
+    s: &ResidentSectionRest,
+    layout: NormalLayout,
+    t: usize,
+    grain: u32,
+    error: i128,
+    expected: &[BigInt],
+) -> Result<(), ConstitutiveFibreError> {
+    let m = layout.sources;
+    let h = layout.matrix_words;
+    let hh = layout.gram_values;
+    let bb = layout.cross_values;
+    let scale = BigInt::one() << grain;
+    let square = &scale * &scale;
     let matrix = wides(&s.intervals[..h])?;
     if matrix[bb] != error || matrix[bb..].iter().any(|v| *v < 0) {
         return Err(invalid("coefficient/error standing"));
@@ -273,12 +311,18 @@ fn validate_numerical_witness(
             q + 1
         }
     };
-    let residual_bound = ceil(&(&residual + &norm * &expected[hh + bb]
-        + &scale * &expected[hh + bb + 1]));
+    let residual_bound =
+        ceil(&(&residual + &norm * &expected[hh + bb] + &scale * &expected[hh + bb + 1]));
     let energy = &expected[hh + bb + 2] + &expected[hh + bb + 3];
-    if energy.is_negative() { return Err(invalid("negative target energy family")); }
+    if energy.is_negative() {
+        return Err(invalid("negative target energy family"));
+    }
     let root = energy.sqrt();
-    let root_upper = if &root * &root == energy { root } else { root + 1 };
+    let root_upper = if &root * &root == energy {
+        root
+    } else {
+        root + 1
+    };
     let energy_bound = &norm + root_upper;
     let tightened_bound = residual_bound.clone().min(energy_bound);
     // Retain legacy residual-only rests as well as the new independently certified minimum.
@@ -514,8 +558,20 @@ fn decode_report(
     g: u32,
     linked: bool,
 ) -> Result<NativeNormalMaterialReading, ConstitutiveFibreError> {
-    validate_report(s, n, t, linked)?;
-    let layout = NormalLayout::new(n, t).ok_or(ConstitutiveFibreError::Shape)?;
+    decode_report_layout(
+        s,
+        NormalLayout::new(n, t).ok_or(ConstitutiveFibreError::Shape)?,
+        g,
+        linked,
+    )
+}
+fn decode_report_layout(
+    s: &ResidentSectionRest,
+    layout: NormalLayout,
+    g: u32,
+    linked: bool,
+) -> Result<NativeNormalMaterialReading, ConstitutiveFibreError> {
+    validate_report_layout(s, &layout, linked)?;
     let base = layout.report_moments_at;
     let v = wides(&s.intervals[..base])?;
     let extra = layout.metadata_at;
@@ -583,7 +639,19 @@ fn decode_state(
     t: usize,
     g: u32,
 ) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
-    let layout = NormalLayout::new(n, t).ok_or(ConstitutiveFibreError::Shape)?;
+    decode_state_layout(
+        state,
+        NormalLayout::new(n, t).ok_or(ConstitutiveFibreError::Shape)?,
+        t,
+        g,
+    )
+}
+fn decode_state_layout(
+    state: &ResidentSectionRest,
+    layout: NormalLayout,
+    t: usize,
+    g: u32,
+) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
     point_section(state, 1, layout.state_words)?;
     let numeric = wides(&state.intervals[..layout.matrix_words])?;
     let unit = BigInt::one() << g;
@@ -645,4 +713,25 @@ fn decode_state(
 }
 
 mod direct;
-pub use direct::{ResidentNormalMaterial, NormalMaterialRest, NormalRealizationRefinement, ResidentNormalReturn, ResidentNormalWave, NormalWaveWord, NormalWaveCoupled, NormalCoupledAttachRefusal, NormalCoupledContact, NormalCoupledStep, NormalCoupledReception, NormalCoupledSourceActuation, NormalCoupledProducingHandle, NormalCoupledPrediction, NormalCoupledComparison, ConstitutiveComparisonSection, ConstitutiveSourceFrame, ResidentCoupledConstitutive, CoupledConstitutiveRefusal, ConstitutiveSourceRefusal, CoupledConstitutiveRest, NormalCoupledContinuation, NormalContinuationPullback, NormalContinuationJoin, CoupledConstitutiveFamily, CoupledConstitutiveAlternative, CompiledCoupledJoint, CoupledJointEvaluation, CoupledJointReading, NormalFamilyComparisonRow, NormalWaveCurrent, NormalWaveFibre, NormalWaveStep, NormalWaveReading, NormalWaveRest, NormalWaveSeedRefusal, NormalWaveSeedKind, NormalWaveReception, NormalWaveReceptionReading, NormalWaveDevelopment, NormalSourceActuation, NormalProducingHandle, NormalWavePrediction, NormalWaveComparison, NormalWaveComparisonReading, NormalWaveTransport, NormalWaveTransportChange, NormalWaveReference, NormalWaveReferenceReading, NormalWaveBasisChart, NormalWaveBasisFace, NormalWaveBasisReading, NormalBasisSelection, NormalBasisScore, NormalWaveSource, NormalWaveJointSource, NormalReceiverCoordinates,NormalWaveFacePacket, NormalFamilyPullback, NormalWaveFamily, NormalWaveFamilyRest, NormalFamilyBasisFace, FamilyBasisSelection, FamilyBasisReading, NormalFamilySupport, NormalFamilyReceiverReading, NormalWaveFamilyReceiver, ResidentNormalSectionReturn, ResidentNormalInput, ResidentNormalEnclosure, ResidentNormalEnclosureView};
+pub use direct::{
+    CompiledCoupledJoint, ConstitutiveComparisonSection, ConstitutiveSourceFrame,
+    ConstitutiveSourceRefusal, CoupledConstitutiveAlternative, CoupledConstitutiveFamily,
+    CoupledConstitutiveRefusal, CoupledConstitutiveRest, CoupledJointEvaluation,
+    CoupledJointReading, FamilyBasisReading, FamilyBasisSelection, NormalBasisScore,
+    NormalBasisSelection, NormalContinuationJoin, NormalContinuationPullback,
+    NormalCoupledAttachRefusal, NormalCoupledComparison, NormalCoupledContact,
+    NormalCoupledContinuation, NormalCoupledPrediction, NormalCoupledProducingHandle,
+    NormalCoupledReception, NormalCoupledSourceActuation, NormalCoupledStep, NormalFamilyBasisFace,
+    NormalFamilyComparisonRow, NormalFamilyPullback, NormalFamilyReceiverReading,
+    NormalFamilySupport, NormalMaterialRest, NormalProducingHandle, NormalRealizationRefinement,
+    NormalReceiverCoordinates, NormalSourceActuation, NormalSourceChart, NormalWaveBasisChart,
+    NormalWaveBasisFace, NormalWaveBasisReading, NormalWaveComparison, NormalWaveComparisonReading,
+    NormalWaveCoupled, NormalWaveCurrent, NormalWaveDevelopment, NormalWaveFacePacket,
+    NormalWaveFamily, NormalWaveFamilyReceiver, NormalWaveFamilyRest, NormalWaveFibre,
+    NormalWaveJointSource, NormalWavePrediction, NormalWaveReading, NormalWaveReception,
+    NormalWaveReceptionReading, NormalWaveReference, NormalWaveReferenceReading, NormalWaveRest,
+    NormalWaveSeedKind, NormalWaveSeedRefusal, NormalWaveSource, NormalWaveStep,
+    NormalWaveTransport, NormalWaveTransportChange, NormalWaveWord, ResidentCoupledConstitutive,
+    ResidentNormalEnclosure, ResidentNormalEnclosureView, ResidentNormalInput,
+    ResidentNormalMaterial, ResidentNormalReturn, ResidentNormalSectionReturn, ResidentNormalWave,
+};

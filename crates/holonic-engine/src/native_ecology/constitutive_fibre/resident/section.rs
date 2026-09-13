@@ -1,6 +1,8 @@
 use super::*;
 mod difference;
 pub use difference::{ResidentDifferenceSection, ResidentSourcePairs};
+mod bilinear_features;
+pub use bilinear_features::ResidentBilinearFeatures;
 
 /// A borrowed measured section. Rows are addresses in this exterior/current chart, not
 /// intrinsic Holon identities or model clock ticks. The device still validates pointness.

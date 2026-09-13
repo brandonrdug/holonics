@@ -19,13 +19,39 @@ holonics hna mathematical-session --input applications/holonics-workbench/exampl
 `mathematical-request`; the `request.operation` selects `construct-linear`,
 `construct-bilinear`, `power`, `resume-construction`, `apply`, `bind-receiver`, `compose-receiver`,
 `read-product`, `compose`, `join-receivers`, `construct-relation`, `predict-relation`,
-`predict-condition`, `observe-relation`,
+`predict-condition`, `observe-relation`, `construct-predictor`, `predict-section`,
+`observe-section`, `emit-rust`,
 `inspect-condition` or the explicit release operations. The public Rust enum
 `MathematicalRequest` owns the exact payload. Rational fields use the existing
 `{"numerator":"1","denominator":"3"}` codec, never JSON floating-point coefficients.
 Construction returns factors and their receiver family, or a scoped search/receiver obstruction.
 Native condition inference returns joint families and coverage, not a chosen coefficient centre.
 `PredictRelation` can consume a retained product output directly through its actual port width.
+
+[definition] `construct-predictor` takes linear `source_operator` and `condition_operator`
+restrictions of the same preparation domain, `target_complex` and `fractional_bits`. Their
+complex output widths derive the source/condition/mixed feature extent. `predict-section`
+takes its `predictor`, a `preparation` in the common `MathematicalInputWire` and optional
+`retain_prediction`. It applies both restrictions to that same resident preparation, builds
+the joined features, and returns one normal-reference enclosure. The carried conditions
+therefore exist before the target; they are not selected from an evaluation answer.
+
+[definition] `observe-section` takes `predictor`, `prediction` and an actual `observed` current
+in interleaved complex coordinates. It updates the existing normal statistics at that saved
+feature cut. One comparison may be retained per predictor; additional read-only forecasts
+remain available. `release-section-prediction` disposes of that comparison; `release-predictor`
+disposes of the material after its pending comparison is resolved. Source restriction operators
+remain live while their predictor uses them. The unit-prior law is `H=I+sum uu*`, `B=sum vu*`,
+`WH=B`; it is distinct from the calibrated relation's compatibility span.
+
+[definition] `emit-rust` takes a retained `operator` and returns the actual factor graph and a
+`holonic_apply` function over arbitrary-precision rationals. A linear operator has one input;
+a bilinear one keeps both ports. The code preserves the retained product circuit and receiver.
+It is source output; target compilation/execution is exterior to HNN. The
+[public trial](../research/experiments/contextual_prediction_release/README.md) records new-input
+conditional sections and executed generated functions. The current predictor uses declared
+preparation restrictions; automatic contextual attachment to the continuing coupled session,
+general text/code task behavior and mathematical-session persistence retain their plan scopes.
 
 [definition] `--input -` accepts an ongoing caller stream. Operators and explicitly retained
 products remain reusable during that session; no example source editing is needed for a new
@@ -186,8 +212,9 @@ the retained numerical geometry without changing it. The
 record both failures and the incomplete language output; this driver is not a finished product UI.
 
 [definition] `ResidentNormalMaterial` exposes the existing unit-prior accumulated normal law
-through resident source/observed currents. Its three complex source port blocks and output width
-are declared at founding. `read` preserves material; `receive` stages the existing native normal
+through resident source/observed currents. `found` declares the legacy three complex source
+port blocks; `found_features` declares an arbitrary complex feature width. Both declare their
+output width and use the same law. `read` preserves material; `receive` stages the existing native normal
 increment and finite fit before publishing its successor. The object retains moments and the
 numerical witness, without field history handles or an observation archive.
 
@@ -208,6 +235,8 @@ method returns `ResidentDifferenceSection`, with the original field and the exac
 difference/comparand and observed-difference sections. `receive_section` integrates the supplied
 observations and fits once, returning the two response fields and actual immutable operator cuts.
 These row coordinates are not native identity or a clock, and the source fields are not model history.
+`bilinear_features` joins equal-row source/condition sections through the existing native contact
+kernel, retaining both direct ports and their complex products before normal reception.
 
 ## Difference generators, received currents and rest
 

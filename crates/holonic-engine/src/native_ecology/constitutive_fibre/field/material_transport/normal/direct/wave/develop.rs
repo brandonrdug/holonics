@@ -22,7 +22,7 @@ impl<'c> ResidentNormalMaterial<'c> {
         epoch: u64,
     ) -> Result<JointSeed<'c>, ConstitutiveFibreError> {
         let s = self.surface;
-        let r = 2 * self.roots;
+        let r = 2 * self.roots();
         let fresh = |w| s.fresh_section(1, w, ResidentGrain(0));
         let previous = fresh(2 * (r + 1))?;
         let current = fresh(2 * (r + 1))?;
@@ -34,7 +34,7 @@ impl<'c> ResidentNormalMaterial<'c> {
             s.record_normal_wave_joint_seed(
                 &lane,
                 joint,
-                self.roots,
+                self.roots(),
                 self.grain.0,
                 &previous,
                 &current,

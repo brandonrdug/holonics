@@ -47,6 +47,60 @@ fn output(value: &Value) -> Vec<BigRational> {
         .unwrap()
 }
 
+#[test]
+#[ignore = "requires CUDA; one preparation feeds source/condition restrictions and the native normal law emits a whole contextual section"]
+fn contextual_section_uses_pre_target_restrictions_and_returns_new_input_faces() {
+    let readout=ResidentReadout::new().unwrap();
+    let surface=ResidentSurface::on(&readout).unwrap();
+    let mut session=NativeMathematicalSession::on(&surface);
+    let mut stream=HnaStream::new();
+    let a=send(&mut session,&mut stream,MathematicalRequest::ConstructLinear {coefficients:rows(&[
+        &[1,0,0,0,0,0],&[0,1,0,0,0,0],&[0,0,1,0,0,0],&[0,0,0,1,0,0]])});
+    let c=send(&mut session,&mut stream,MathematicalRequest::ConstructLinear {coefficients:rows(&[
+        &[0,0,0,0,1,0],&[0,0,0,0,0,1]])});
+    let a=a["value"]["operator"].as_u64().unwrap();
+    let c=c["value"]["operator"].as_u64().unwrap();
+    let built=send(&mut session,&mut stream,MathematicalRequest::ConstructPredictor {
+        source_operator:a,condition_operator:c,target_complex:2,fractional_bits:32});
+    let id=built["value"]["predictor"].as_u64().unwrap();
+    assert_eq!(built["value"]["feature_complex"],5); // not a three-port padding
+    let read_ball=|value:&Value| {
+        let q=|v:&Value|serde_json::from_value::<RationalWire>(v.clone()).unwrap().rational().unwrap();
+        (value["center"].as_array().unwrap().iter().map(|v|(q(&v["real"]),q(&v["imaginary"]))).collect::<Vec<_>>(),q(&value["radius"]))
+    };
+    // Given examples specify a conditional exchange. Source and condition are read before
+    // the corresponding target; the driver supplies no coefficients or fitted answer.
+    for (i,(left,right,condition,y0,y1)) in [
+        (1,0,1,1,0),(1,0,-1,0,1),(0,1,1,0,1),(0,1,-1,1,0)
+    ].into_iter().enumerate() {
+        let prediction=send(&mut session,&mut stream,MathematicalRequest::PredictSection {
+            predictor:id,preparation:MathematicalInputWire::Values {values:row(&[left,0,right,0,condition,0])},retain_prediction:true});
+        assert_eq!(prediction["value"]["observations"],i);
+        assert_eq!(prediction["value"]["intermediate_section_readouts"],0);
+        if i==0 { let (v,r)=read_ball(&prediction["value"]["output"]); assert!(r.is_zero());assert!(v.iter().all(|(r,i)|r.is_zero()&&i.is_zero())); }
+        let pending=prediction["value"]["prediction"].as_u64().unwrap();
+        let received=send(&mut session,&mut stream,MathematicalRequest::ObserveSection {predictor:id,prediction:pending,observed:row(&[y0,0,y1,0])});
+        assert_eq!(received["value"]["observations"],i+1);
+        assert!(session.request(&MathematicalRequest::ObserveSection {predictor:id,prediction:pending,observed:row(&[y0,0,y1,0])}).is_err());
+    }
+    // Independent consequence of H=I+sum uu*, B=sum vu*: the two nonzero rows
+    // are (1,1,0,1,-1)/3 and (1,1,0,-1,1)/3. No solve/readback feeds the model.
+    for (condition,want) in [(1,[4,-2]),(-1,[-2,4])] {
+        let prediction=send(&mut session,&mut stream,MathematicalRequest::PredictSection {
+            predictor:id,preparation:MathematicalInputWire::Values {values:row(&[2,0,-1,0,condition,0])},retain_prediction:false});
+        let (v,r)=read_ball(&prediction["value"]["output"]);
+        let error:BigRational=v.iter().zip(want).map(|((re,im),w)| {
+            let d=re-BigRational::new(w.into(),3.into());&d*&d+im*im
+        }).sum();
+        assert!(error<=&r*&r,"contextual section missed the normal-system consequence: {prediction}");
+        assert!(r<BigRational::new(1.into(),1000.into()));
+        assert_eq!(prediction["value"]["intermediate_section_readouts"],0);
+    }
+    assert!(session.request(&MathematicalRequest::ReleaseOperator {operator:a}).is_err());
+    send(&mut session,&mut stream,MathematicalRequest::ReleasePredictor {predictor:id});
+    send(&mut session,&mut stream,MathematicalRequest::ReleaseOperator {operator:a});
+}
+
 fn calibrated_sum_products() -> MathematicalRequest {
     calibrated_dot(2, &[2, 3])
 }

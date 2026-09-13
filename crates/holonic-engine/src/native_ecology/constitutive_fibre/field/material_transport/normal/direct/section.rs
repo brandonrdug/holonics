@@ -11,7 +11,7 @@ pub struct ResidentNormalSectionReturn<'a, 'c> {
     observed: ResidentConstitutiveSection<'a, 'c>,
     before: ResidentSection<'c>,
     after: ResidentSection<'c>,
-    roots: usize,
+    source_chart: NormalSourceChart,
     targets: usize,
     grain: ResidentGrain,
     pub predecessor_observations: u64,
@@ -58,9 +58,9 @@ impl<'a, 'c> ResidentNormalSectionReturn<'a, 'c> {
     pub fn inspect_before_operator(
         &self,
     ) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
-        decode_state(
+        decode_state_layout(
             &self.surface.detach_section(&self.prior, i64::BITS)?,
-            self.roots,
+            self.source_chart.layout(self.targets)?,
             self.targets,
             self.grain.0,
         )
@@ -68,9 +68,9 @@ impl<'a, 'c> ResidentNormalSectionReturn<'a, 'c> {
     pub fn inspect_after_operator(
         &self,
     ) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
-        decode_state(
+        decode_state_layout(
             &self.surface.detach_section(&self.successor, i64::BITS)?,
-            self.roots,
+            self.source_chart.layout(self.targets)?,
             self.targets,
             self.grain.0,
         )
@@ -125,8 +125,7 @@ impl<'c> ResidentNormalMaterial<'c> {
         source: ResidentConstitutiveSection<'a, 'c>,
         observed: ResidentConstitutiveSection<'a, 'c>,
     ) -> Result<ResidentNormalSectionReturn<'a, 'c>, ConstitutiveFibreError> {
-        let layout =
-            NormalLayout::new(self.roots, self.targets).ok_or(ConstitutiveFibreError::Shape)?;
+        let layout = self.source_chart.layout(self.targets)?;
         if source.rows() != observed.rows()
             || source.components() != layout.source_components
             || observed.components() != layout.target_components
@@ -158,7 +157,7 @@ impl<'c> ResidentNormalMaterial<'c> {
                 &self.state,
                 source,
                 observed,
-                self.roots,
+                self.source_complex(),
                 self.targets,
                 self.grain.0,
                 &next,
@@ -188,7 +187,7 @@ impl<'c> ResidentNormalMaterial<'c> {
             observed,
             before,
             after,
-            roots: self.roots,
+            source_chart: self.source_chart,
             targets: self.targets,
             grain: self.grain,
             predecessor_observations,

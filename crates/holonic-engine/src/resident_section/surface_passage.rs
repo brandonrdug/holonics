@@ -784,37 +784,96 @@ impl<'chart> ResidentSurface<'chart> {
         &self,
         lane: &Lane<'_, 'chart>,
         source: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
-        condition: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
+        condition: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<
+            '_,
+            'chart,
+        >,
         output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        if output.rows != 1 {
+            return Err(ResidentRefusal::Declaration {
+                operation: "constitutive-bilinear-source",
+                what: "point bilinear contact requires a one-row output".into(),
+            });
+        }
+        self.record_constitutive_bilinear_source_row(lane, source, condition, output, 0)
+    }
+
+    pub(crate) fn record_constitutive_bilinear_source_row(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        source: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
+        condition: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<
+            '_,
+            'chart,
+        >,
+        output: &ResidentSection<'chart>,
+        row: usize,
     ) -> Result<(), ResidentRefusal> {
         self.validate_constitutive_current_view(source)?;
         self.validate_constitutive_current_view(condition)?;
-        let fail = || ResidentRefusal::Declaration { operation: "constitutive-bilinear-source",
-            what: "incompatible source/condition complex contact chart or scratch aperture".into() };
-        let source_complex=source.width/2;
-        let condition_complex=condition.width/2;
-        let width=source_complex.checked_mul(condition_complex)
+        let fail = || ResidentRefusal::Declaration {
+            operation: "constitutive-bilinear-source",
+            what: "incompatible source/condition complex contact chart or scratch aperture".into(),
+        };
+        let source_complex = source.width / 2;
+        let condition_complex = condition.width / 2;
+        let width = source_complex
+            .checked_mul(condition_complex)
             .and_then(|n| n.checked_add(source_complex))
             .and_then(|n| n.checked_add(condition_complex))
-            .and_then(|n| n.checked_mul(2)).ok_or_else(fail)?;
-        if source.width == 0 || condition.width == 0 || source.width%2 != 0 || condition.width%2 != 0
-            || width >= u32::MAX as usize || output.rows != 1 || output.width != width+1
-            || output.grain.0 != 0 || !std::ptr::eq(output.surface,self)
-        { return Err(fail()); }
-        let shared=width.checked_mul(16).and_then(|n| u32::try_from(n).ok())
-            .filter(|n| *n <= self.declaration.max_sectiond_bytes).ok_or_else(fail)?;
-        let mut params=Params::new();
-        for current in [source,condition] {
-            params.ptr(current.section.lo.device_ptr()).ptr(current.section.hi.device_ptr())
-                .u32(current.offset as u32)
-                .u32(current.denominator.map_or(u32::MAX,|n| n as u32))
-                .u32(current.disposition.map_or(u32::MAX,|n| n as u32));
+            .and_then(|n| n.checked_mul(2))
+            .ok_or_else(fail)?;
+        let output_at = row.checked_mul(output.width).ok_or_else(fail)?;
+        let output_octet_at = output_at
+            .checked_mul(std::mem::size_of::<i64>())
+            .ok_or_else(fail)?;
+        let output_end = output_at.checked_add(width + 1).ok_or_else(fail)?;
+        if source.width == 0
+            || condition.width == 0
+            || source.width % 2 != 0
+            || condition.width % 2 != 0
+            || width >= u32::MAX as usize
+            || row >= output.rows
+            || output.width != width + 1
+            || output_end > output.rows.checked_mul(output.width).ok_or_else(fail)?
+            || output.grain.0 != 0
+            || !std::ptr::eq(output.surface, self)
+        {
+            return Err(fail());
         }
-        params.u32(source_complex as u32).u32(condition_complex as u32)
-            .ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr()).ptr(lane.slot)
-            .ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
-        self.record_blocks(lane,"section_constitutive_bilinear_source",1,self.declaration.warp_size.max(1),
-            shared,&mut params,"constitutive-bilinear-source")
+        let shared = width
+            .checked_mul(16)
+            .and_then(|n| u32::try_from(n).ok())
+            .filter(|n| *n <= self.declaration.max_sectiond_bytes)
+            .ok_or_else(fail)?;
+        let mut params = Params::new();
+        for current in [source, condition] {
+            params
+                .ptr(current.section.lo.device_ptr())
+                .ptr(current.section.hi.device_ptr())
+                .u32(current.offset as u32)
+                .u32(current.denominator.map_or(u32::MAX, |n| n as u32))
+                .u32(current.disposition.map_or(u32::MAX, |n| n as u32));
+        }
+        params
+            .u32(source_complex as u32)
+            .u32(condition_complex as u32)
+            .ptr(output.lo.device_ptr() + output_octet_at as u64)
+            .ptr(output.hi.device_ptr() + output_octet_at as u64)
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_constitutive_bilinear_source",
+            1,
+            self.declaration.warp_size.max(1),
+            shared,
+            &mut params,
+            "constitutive-bilinear-source",
+        )
     }
 
     pub(crate) fn record_condition_preimage(

@@ -1,6 +1,6 @@
 use super::*;
 use crate::native_ecology::constitutive_fibre::{
-    normal_material_report_words, normal_material_state_words, normal_material_workspace_words,
+    normal_feature_report_words, normal_feature_state_words, normal_feature_workspace_words,
     ResidentConstitutiveSection,
 };
 impl<'c> ResidentSurface<'c> {
@@ -69,7 +69,7 @@ impl<'c> ResidentSurface<'c> {
         state: &ResidentSection<'c>,
         source: ResidentConstitutiveSection<'_, 'c>,
         observed: ResidentConstitutiveSection<'_, 'c>,
-        roots: usize,
+        sources: usize,
         targets: usize,
         grain: u32,
         next: &ResidentSection<'c>,
@@ -83,11 +83,11 @@ impl<'c> ResidentSurface<'c> {
             operation: "normal-material-section",
             what: "incompatible source/return section and normal chart".into(),
         };
-        let d = roots.checked_mul(6).ok_or_else(fail)?;
+        let d = sources.checked_mul(2).ok_or_else(fail)?;
         let r = targets.checked_mul(2).ok_or_else(fail)?;
-        let sw = normal_material_state_words(roots, targets).ok_or_else(fail)?;
-        let rw = normal_material_report_words(roots, targets).ok_or_else(fail)?;
-        let ww = normal_material_workspace_words(roots, targets).ok_or_else(fail)?;
+        let sw = normal_feature_state_words(sources, targets).ok_or_else(fail)?;
+        let rw = normal_feature_report_words(sources, targets).ok_or_else(fail)?;
+        let ww = normal_feature_workspace_words(sources, targets).ok_or_else(fail)?;
         let iw = d
             .checked_add(1)
             .and_then(|n| n.checked_mul(4))
@@ -98,7 +98,7 @@ impl<'c> ResidentSurface<'c> {
             .checked_add(1)
             .and_then(|n| n.checked_mul(2))
             .ok_or_else(fail)?;
-        if roots == 0
+        if sources == 0
             || targets == 0
             || rows == 0
             || rows != observed.rows()
@@ -133,7 +133,7 @@ impl<'c> ResidentSurface<'c> {
                 .u32(u32::from(v.rational));
         }
         p.u32(rows as u32)
-            .u32(roots as u32)
+            .u32(sources as u32)
             .u32(targets as u32)
             .u32(grain);
         for s in [next, before, after] {
@@ -148,7 +148,7 @@ impl<'c> ResidentSurface<'c> {
             .u32(lane.lineage_count);
         self.record_blocks(
             lane,
-            "section_normal_material_section",
+            "section_normal_material_section_sources",
             1,
             self.launch.block_x,
             0,

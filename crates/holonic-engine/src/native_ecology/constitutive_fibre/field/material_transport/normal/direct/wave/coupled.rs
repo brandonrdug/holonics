@@ -134,8 +134,8 @@ impl<'c> ResidentNormalWave<'c> {
             for j in 0..neighborhood.members() {
                 let law = neighborhood.generator(j)?;
                 if !std::ptr::eq(law.surface, self.material.surface)
-                    || law.target_width != 2 * self.material.roots
-                    || !matches!(law.source_chart,ConstitutiveSourceChart::BilinearContact{source_complex,..} if source_complex==3*self.material.roots)
+                    || law.target_width != 2 * self.material.roots()
+                    || !matches!(law.source_chart,ConstitutiveSourceChart::BilinearContact{source_complex,..} if source_complex==3*self.material.roots())
                 {
                     return Err(ConstitutiveFibreError::Shape);
                 }
@@ -213,7 +213,7 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         let next = id.checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
         let relation = mode.neighborhood.read_wave_relation_in_chart(
             member,
-            self.material.roots,
+            self.material.roots(),
             receiver,
             None,
         )?;
@@ -343,7 +343,7 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         mut progress: impl FnMut(usize),
     ) -> Result<NormalCoupledSourceActuation<'a, 'c>, ConstitutiveFibreError> {
         self.check_contact(contact)?;
-        if source.components() != 2 * self.material.roots {
+        if source.components() != 2 * self.material.roots() {
             return Err(ConstitutiveFibreError::Shape);
         }
         let next = self
@@ -475,7 +475,7 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
             s.record_normal_source_plane(
                 &lane,
                 source,
-                self.material.roots,
+                self.material.roots(),
                 contact.binding.relation.source_receiver(),
                 &out,
             )?;
@@ -495,7 +495,7 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         )?;
         let relation = self.neighborhood().read_wave_relation_in_chart(
             contact.member(),
-            self.material.roots,
+            self.material.roots(),
             contact.binding.relation.source_receiver(),
             Some(&prepared),
         )?;

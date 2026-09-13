@@ -12,13 +12,63 @@ mod enclosure;
 pub use enclosure::{ResidentNormalEnclosure, ResidentNormalEnclosureView, ResidentNormalInput};
 mod section;
 pub use section::ResidentNormalSectionReturn;
+
+/// Declared domain of the same normal-statistic operator. A feature chart is not silently
+/// padded or identified with the wave's three equally sized physical/current ports.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(tag = "kind", rename_all = "kebab-case")]
+pub enum NormalSourceChart {
+    Wave { roots: usize },
+    Features { source_complex: usize },
+}
+impl NormalSourceChart {
+    pub fn wave_roots(self) -> Option<usize> {
+        match self {
+            Self::Wave { roots } => Some(roots),
+            Self::Features { .. } => None,
+        }
+    }
+    pub fn complex_sources(self) -> Option<usize> {
+        match self {
+            Self::Wave { roots } => roots.checked_mul(3),
+            Self::Features { source_complex } => Some(source_complex),
+        }
+    }
+    pub(super) fn layout(self, targets: usize) -> Result<NormalLayout, ConstitutiveFibreError> {
+        NormalLayout::for_sources(
+            self.complex_sources()
+                .ok_or(ConstitutiveFibreError::Shape)?,
+            targets,
+        )
+        .ok_or(ConstitutiveFibreError::Shape)
+    }
+}
 mod wave;
-pub use wave::{ResidentNormalWave, NormalWaveWord, NormalWaveCoupled, NormalCoupledAttachRefusal, NormalCoupledContact, NormalCoupledStep, NormalCoupledReception, NormalCoupledSourceActuation, NormalCoupledProducingHandle, NormalCoupledPrediction, NormalCoupledComparison, ConstitutiveComparisonSection, ConstitutiveSourceFrame, ResidentCoupledConstitutive, CoupledConstitutiveRefusal, ConstitutiveSourceRefusal, CoupledConstitutiveRest, NormalCoupledContinuation, NormalContinuationPullback, NormalContinuationJoin, CoupledConstitutiveFamily, CoupledConstitutiveAlternative, CompiledCoupledJoint, CoupledJointEvaluation, CoupledJointReading, NormalFamilyComparisonRow, NormalWaveCurrent, NormalWaveFibre, NormalWaveStep, NormalWaveReading, NormalWaveRest, NormalWaveSeedRefusal, NormalWaveSeedKind, NormalWaveReception, NormalWaveReceptionReading, NormalWaveDevelopment, NormalSourceActuation, NormalProducingHandle, NormalWavePrediction, NormalWaveComparison, NormalWaveComparisonReading, NormalWaveTransport, NormalWaveTransportChange, NormalWaveReference, NormalWaveReferenceReading, NormalWaveBasisChart, NormalWaveBasisFace, NormalWaveBasisReading, NormalBasisSelection, NormalBasisScore, NormalWaveSource, NormalWaveJointSource, NormalReceiverCoordinates,NormalWaveFacePacket, NormalFamilyPullback, NormalWaveFamily, NormalWaveFamilyRest, NormalFamilyBasisFace, FamilyBasisSelection, FamilyBasisReading, NormalFamilySupport, NormalFamilyReceiverReading, NormalWaveFamilyReceiver};
+pub use wave::{
+    CompiledCoupledJoint, ConstitutiveComparisonSection, ConstitutiveSourceFrame,
+    ConstitutiveSourceRefusal, CoupledConstitutiveAlternative, CoupledConstitutiveFamily,
+    CoupledConstitutiveRefusal, CoupledConstitutiveRest, CoupledJointEvaluation,
+    CoupledJointReading, FamilyBasisReading, FamilyBasisSelection, NormalBasisScore,
+    NormalBasisSelection, NormalContinuationJoin, NormalContinuationPullback,
+    NormalCoupledAttachRefusal, NormalCoupledComparison, NormalCoupledContact,
+    NormalCoupledContinuation, NormalCoupledPrediction, NormalCoupledProducingHandle,
+    NormalCoupledReception, NormalCoupledSourceActuation, NormalCoupledStep, NormalFamilyBasisFace,
+    NormalFamilyComparisonRow, NormalFamilyPullback, NormalFamilyReceiverReading,
+    NormalFamilySupport, NormalProducingHandle, NormalReceiverCoordinates, NormalSourceActuation,
+    NormalWaveBasisChart, NormalWaveBasisFace, NormalWaveBasisReading, NormalWaveComparison,
+    NormalWaveComparisonReading, NormalWaveCoupled, NormalWaveCurrent, NormalWaveDevelopment,
+    NormalWaveFacePacket, NormalWaveFamily, NormalWaveFamilyReceiver, NormalWaveFamilyRest,
+    NormalWaveFibre, NormalWaveJointSource, NormalWavePrediction, NormalWaveReading,
+    NormalWaveReception, NormalWaveReceptionReading, NormalWaveReference,
+    NormalWaveReferenceReading, NormalWaveRest, NormalWaveSeedKind, NormalWaveSeedRefusal,
+    NormalWaveSource, NormalWaveStep, NormalWaveTransport, NormalWaveTransportChange,
+    NormalWaveWord, ResidentCoupledConstitutive, ResidentNormalWave,
+};
 
 pub struct ResidentNormalMaterial<'c> {
     surface: &'c ResidentSurface<'c>,
     state: Rc<ResidentSection<'c>>,
-    roots: usize,
+    source_chart: NormalSourceChart,
     targets: usize,
     grain: ResidentGrain,
     observations: u64,
@@ -32,7 +82,7 @@ pub struct ResidentNormalReturn<'a, 'c> {
     after: Option<ResidentSection<'c>>,
     source: ResidentNormalInput<'a, 'c>,
     observed: Option<ResidentConstitutiveCurrent<'a, 'c>>,
-    roots: usize,
+    source_chart: NormalSourceChart,
     targets: usize,
     grain: ResidentGrain,
     pub predecessor_observations: u64,
@@ -47,7 +97,12 @@ impl<'a, 'c> ResidentNormalReturn<'a, 'c> {
     }
     pub fn inspect_before(&self) -> Result<NativeNormalMaterialReading, ConstitutiveFibreError> {
         let rest = self.surface.detach_section(&self.before, i64::BITS)?;
-        decode_report(&rest, self.roots, self.targets, self.grain.0, false)
+        decode_report_layout(
+            &rest,
+            self.source_chart.layout(self.targets)?,
+            self.grain.0,
+            false,
+        )
     }
     pub fn inspect_after(
         &self,
@@ -56,7 +111,12 @@ impl<'a, 'c> ResidentNormalReturn<'a, 'c> {
             .as_ref()
             .map(|section| {
                 let rest = self.surface.detach_section(section, i64::BITS)?;
-                decode_report(&rest, self.roots, self.targets, self.grain.0, true)
+                decode_report_layout(
+                    &rest,
+                    self.source_chart.layout(self.targets)?,
+                    self.grain.0,
+                    true,
+                )
             })
             .transpose()
     }
@@ -71,10 +131,34 @@ impl<'c> ResidentNormalMaterial<'c> {
         targets: usize,
         grain: ResidentGrain,
     ) -> Result<Self, ConstitutiveFibreError> {
-        if roots == 0 || targets == 0 || !(1..=120).contains(&grain.0) {
+        Self::found_in_chart(surface, NormalSourceChart::Wave { roots }, targets, grain)
+    }
+    /// Fit arbitrary declared complex features through the same resident unit-prior normal
+    /// geometry. Features can be native restrictions or joined bilinear products.
+    pub fn found_features(
+        surface: &'c ResidentSurface<'c>,
+        source_complex: usize,
+        targets: usize,
+        grain: ResidentGrain,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        Self::found_in_chart(
+            surface,
+            NormalSourceChart::Features { source_complex },
+            targets,
+            grain,
+        )
+    }
+    fn found_in_chart(
+        surface: &'c ResidentSurface<'c>,
+        source_chart: NormalSourceChart,
+        targets: usize,
+        grain: ResidentGrain,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        if !(1..=120).contains(&grain.0) {
             return Err(ConstitutiveFibreError::Shape);
         }
-        let values = initial_words(roots, targets, grain.0)?;
+        let layout = source_chart.layout(targets)?;
+        let values = initial_words_for_sources(layout.sources, targets, grain.0)?;
         let state = surface.mount_section_rest(
             &ResidentSectionRest::found(1, values.len(), ResidentGrain(0), i64::BITS, values)
                 .map_err(invalid)?,
@@ -82,7 +166,7 @@ impl<'c> ResidentNormalMaterial<'c> {
         Ok(Self {
             surface,
             state: Rc::new(state),
-            roots,
+            source_chart,
             targets,
             grain,
             observations: 0,
@@ -91,11 +175,26 @@ impl<'c> ResidentNormalMaterial<'c> {
     pub fn observations(&self) -> u64 {
         self.observations
     }
-    pub fn roots(&self)->usize {self.roots}
+    /// Number of wave roots; a Features chart has no wave roots. Use `source_chart` for
+    /// the domain and `source_complex` for its feature width.
+    pub fn roots(&self) -> usize {
+        self.source_chart.wave_roots().unwrap_or(0)
+    }
+    pub fn source_chart(&self) -> NormalSourceChart {
+        self.source_chart
+    }
+    pub fn source_complex(&self) -> usize {
+        self.source_chart
+            .complex_sources()
+            .expect("admitted normal chart")
+    }
+    pub fn targets(&self) -> usize {
+        self.targets
+    }
     pub fn inspect(&self) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
-        decode_state(
+        decode_state_layout(
             &self.surface.detach_section(&self.state, i64::BITS)?,
-            self.roots,
+            self.source_chart.layout(self.targets)?,
             self.targets,
             self.grain.0,
         )
@@ -127,8 +226,7 @@ impl<'c> ResidentNormalMaterial<'c> {
         observed: Option<ResidentConstitutiveCurrent<'a, 'c>>,
     ) -> Result<(ResidentNormalReturn<'a, 'c>, Option<ResidentSection<'c>>), ConstitutiveFibreError>
     {
-        let layout =
-            NormalLayout::new(self.roots, self.targets).ok_or(ConstitutiveFibreError::Shape)?;
+        let layout = self.source_chart.layout(self.targets)?;
         if source.width() != layout.source_components
             || observed.is_some_and(|y| y.width != layout.target_components)
         {
@@ -159,7 +257,7 @@ impl<'c> ResidentNormalMaterial<'c> {
                 &self.state,
                 source,
                 observed,
-                self.roots,
+                self.source_complex(),
                 self.targets,
                 self.grain.0,
                 next.as_ref(),
@@ -184,7 +282,7 @@ impl<'c> ResidentNormalMaterial<'c> {
                 after,
                 source,
                 observed,
-                roots: self.roots,
+                source_chart: self.source_chart,
                 targets: self.targets,
                 grain: self.grain,
                 predecessor_observations: self.observations,

@@ -391,7 +391,7 @@ impl NormalWaveRest {
                 .ok_or(ConstitutiveFibreError::Shape)?
                 .source_receiver();
             let mut relation =
-                neighborhood.read_wave_relation_in_chart(j, base.material.roots, receiver, None)?;
+                neighborhood.read_wave_relation_in_chart(j, base.material.roots(), receiver, None)?;
             if let Some(observed) = family.last_relation().and_then(|v| v.observed_next()) {
                 relation = relation.read_observed_next(observed)?;
             } else if let Some(contact) = family.last_relation().and_then(|v| v.source_contact()) {
@@ -409,7 +409,7 @@ impl NormalWaveRest {
         for c in data.header.contacts {
             let relation = neighborhood.read_wave_relation_in_chart(
                 c.member,
-                base.material.roots,
+                base.material.roots(),
                 data.relations[&c.id].source_receiver(),
                 None,
             )?;

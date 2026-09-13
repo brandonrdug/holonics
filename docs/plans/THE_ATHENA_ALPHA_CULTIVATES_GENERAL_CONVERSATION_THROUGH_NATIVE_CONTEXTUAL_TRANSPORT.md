@@ -224,6 +224,14 @@ Read-only forecasts remain available without this continuing-use binding.
 
 ### Deliverables and discriminating checks
 
+[established-bounded; implemented-exact; measured] The
+[first active-goal return](../../research/records/2026-09-13_RESIDENT_CONTEXT_FEATURES_RETURN_PREDICTIONS_AND_FACTORS_RELEASE_EXECUTABLE_CODE.md)
+binds arbitrary-width resident source/condition features to the shared normal material and
+public mathematical predictor. It also returns executed Rust functions from retained factor
+graphs. The preparation restrictions in that trial are supplied maps; the next coupled
+source/field attachment remains in section 3 below. Exact-function code does not discharge
+the broader parameter-family, contextual editing or whole-session persistence rows.
+
 [definition] These are artifacts and checks for the roadmap's existing packets. Their names
 do not create another phase scheme. The source abbreviations are defined in the source map below.
 Each row specifies a bounded application consequence; no finite row certifies general Athena.
@@ -582,6 +590,14 @@ a raw token window, source ID, authored topic label or copied history. A static 
 remain the final codec; the present generator already advances before it is decoded.
 
 ### The source and condition construction
+
+[definition] Consume the returned fitted material through
+`eta=M_s a+M_h h+M_mix(h tensor a)`, with `a=(c-p,c,p)` and `v=c+eta`.
+At fixed h this is an affine source action with its retained numerical/material family.
+Its actual wave/joint attachment must carry the condition and preparation section from native
+source incidence. `found_features` now supplies the material width; the old wave seed correctly
+refuses that different chart. Construct the consuming relation at the existing wave/section
+owner rather than dropping the h terms or padding the features into three equal ports.
 
 [definition] Build the actual pre-return context exposure in the coupled/section-input
 attachment and the native local source owners. Reuse `ResidentGeneratorNeighborhood`,

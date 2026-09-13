@@ -291,15 +291,15 @@ impl<'c> ResidentNormalMaterial<'c> {
             ResidentNormalInput::Point(_) => NormalWaveSeedKind::ExactPair,
             ResidentNormalInput::Enclosed(_) => NormalWaveSeedKind::ReceivedCurrent,
         };
-        if self.roots != self.targets
-            || previous.width() != 2 * self.roots
+        if self.roots() != self.targets
+            || previous.width() != 2 * self.roots()
             || current.width != previous.width()
         {
             return Err(ConstitutiveFibreError::Shape);
         }
         let s = self.surface;
         let r = previous.width();
-        let d = 2 * self.roots;
+        let d = 2 * self.roots();
         let fresh = |width| s.fresh_section(1, width, ResidentGrain(0));
         let rows = if seed_kind == NormalWaveSeedKind::ExactPair {
             2
@@ -319,7 +319,7 @@ impl<'c> ResidentNormalMaterial<'c> {
                 &lane,
                 previous,
                 current,
-                self.roots,
+                self.roots(),
                 self.grain.0,
                 &seed,
                 &seed_bound,
@@ -402,7 +402,7 @@ impl<'c> ResidentNormalWave<'c> {
             .checked_add(1)
             .ok_or(ConstitutiveFibreError::Shape)?;
         let s = self.material.surface;
-        let n = self.material.roots;
+        let n = self.material.roots();
         let d = 2 * n;
         let r = 2 * n;
         let fresh = |width| s.fresh_section(1, width, ResidentGrain(0));
@@ -489,7 +489,7 @@ impl<'c,C> ResidentNormalWave<'c,C> {
             material: Rc::clone(&self.material.state),
             seed: Rc::clone(&self.seed),
             surface: self.material.surface,
-            roots: self.material.roots,
+            roots: self.material.roots(),
             grain: self.material.grain,
             material_observations: self.material.observations,
             epoch: self.epoch,

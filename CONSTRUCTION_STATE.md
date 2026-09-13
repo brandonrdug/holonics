@@ -1,13 +1,14 @@
 # Construction state
 
-**Currency:** September 13, 2026. **Latest implementation return:** the
-[oriented-configuration and beacon return](research/records/2026-09-13_ORIENTED_CONFIGURATION_NAVIGATION_RETAINS_ITS_SOURCE_AND_THE_BEACON_STAYS_OPEN.md)
-and its formal/native/reference checks are complete, building on the
-[mass/flux/navigation return](research/records/2026-09-13_MASS_FLUX_GAPS_AND_OPTIMAL_NAVIGATION_RETURN_THEIR_SOURCE_MAPS.md) and the
-[compact-fibre and matter return](research/records/2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md),
-[game/rate/molecular consolidation](research/records/2026-09-13_GAME_WORLDS_SCOPED_RATES_AND_MOLECULAR_MECHANICS_SHARE_DECLARED_LAWS.md)
-and the
-[frontier review](research/records/2026-09-12_THE_FRONTIER_REVIEW_CONSOLIDATES_CONSTRUCTIVE_CONTINUITY.md).
+**Currency:** September 13, 2026. **Latest implementation return:**
+[resident contextual features and executable function release](research/records/2026-09-13_RESIDENT_CONTEXT_FEATURES_RETURN_PREDICTIONS_AND_FACTORS_RELEASE_EXECUTABLE_CODE.md).
+The generic normal/source ports, public predictor and code receiver have returned their focused
+native checks and public execution trial. The
+[oriented-configuration](research/records/2026-09-13_ORIENTED_CONFIGURATION_NAVIGATION_RETAINS_ITS_SOURCE_AND_THE_BEACON_STAYS_OPEN.md),
+[mass/flux](research/records/2026-09-13_MASS_FLUX_GAPS_AND_OPTIMAL_NAVIGATION_RETURN_THEIR_SOURCE_MAPS.md),
+[compact-fibre/matter](research/records/2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md)
+and [game/rate](research/records/2026-09-13_GAME_WORLDS_SCOPED_RATES_AND_MOLECULAR_MECHANICS_SHARE_DECLARED_LAWS.md)
+returns remain available dependencies.
 **Standing product objective:** useful Athena language/code and
 Hephaestus tools/utility models, including code generators and mathematical solvers, through
 the same HNN owners within the wider Holonics
@@ -15,33 +16,30 @@ mathematical and physical programme. The [roadmap](docs/plans/THE_ROADMAP.md) al
 
 ## Current consolidation
 
-[definition] The [prediction-release/product plan](research/records/2026-09-13_PREDICTION_RELEASE_HAS_ONE_GENERATING_RELATION_AND_CONCRETE_PRODUCTS.md)
-now specifies generated output, forecast versus committed continuation, comparison disposal,
-context formation, executable code and durable reuse. The
-[blueprint deliverables](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#deliverables-and-discriminating-checks)
-name the source owners, equations, artifacts and output checks. This is a completed planning/source
-review; no new runtime capability or performance result is claimed by it.
+[established-bounded; implemented-exact; measured] The public mathematical session now reads
+two resident restrictions of one pre-target preparation, joins their source/condition products,
+and fits the shared unit-prior normal law. Four observations produce new conditional sections,
+including exchange, zero difference-mode and complex quarter-turn cases. The
+[trial](research/experiments/contextual_prediction_release/README.md) checks 34 outputs and
+compiles/executes three generated Rust functions against their resident operator counterparts.
+The final native process took about 0.49 s with a populated CUDA driver cache; the 32-query
+receiver population has median request-body time 486.5 microseconds. These are bounded section
+and exact-function returns, not general conversation or code-editing evidence.
 
-[established-bounded; source-inspected] The current joint preview composes transport without
-intervening self-reception; repeated `emit-symbol` includes adjacent-source re-entry. They have
-different composed laws.
+[definition] The source restrictions are supplied application maps. The next coupled binding
+uses the fitted law `eta=M_s a+M_h h+M_mix(h tensor a)`, `a=(c-p,c,p)`, `v=c+eta`, through the
+existing wave/joint owners and actual carried conditions. Attach the relevant preparation from
+native source/field incidence; retain the complete material/receiver cut and numerical family.
+The legacy three-port wave seed intentionally refuses arbitrary feature material rather than
+silently reinterpreting its width. This consuming map, then its committed joint section and
+compiled continuation, is the next construction; another unchanged h=1 exposure is not.
 
-[definition] The next compound binding has a specified transport-only contract:
-return that joint section, publish its endpoint once and optionally retain producing receiver
-cuts. Existing forecast output and single-symbol continuing emission remain available.
-
-[definition] The next implementation increment is the resident source/condition binding and
-its generated section. Joint publication and compact execution accompany that relation; a
-Hephaestus exact-rational Rust function receiver can independently use existing mathematical
-operators. Mathematical-session rest remains unbound. Hodge closure and fluid mixed-term
-checks guide the compilation; the roadmap retains specific RH and Yang–Mills source returns
-without making their endpoints gates for these products.
-
-[definition] The prior oriented Swing, block-transport and one-sided gap proofs, six exact
-native split returns, finite cube reference and their verification are preserved in the
-[oriented-navigation record](research/records/2026-09-13_ORIENTED_CONFIGURATION_NAVIGATION_RETAINS_ITS_SOURCE_AND_THE_BEACON_STAYS_OPEN.md).
-They retain causal origin, phase, source fibre and changing joint/mode incidence. Model/checker
-formation costs remain explicit. The [beacon](docs/BEACON.md) keeps this source available.
+[definition] `emit-rust` returns exact functions of retained linear/bilinear factor graphs and
+powers. Still-plural output laws, broader contextual code/text products, whole mathematical-session
+rest and changing-programme compilation remain in the active goal. The local feature-material
+rest is implemented; it does not imply that the entire application session can checkpoint.
+The [blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#deliverables-and-discriminating-checks)
+continues to specify those products. The [beacon](docs/BEACON.md) keeps their source available.
 
 ## Available constructions
 
@@ -73,7 +71,7 @@ already exist. The complete family remains available before its display or proba
 Those owners are not scheduled for rediscovery. Current interfaces are in
 [NATIVE_HNA](docs/NATIVE_HNA.md) and [HNN composition](docs/HNN_COMPOSITION.md).
 
-## The generation relation to implement
+## The coupled generation relation to implement
 
 [definition] `y=rho_F(G_Theta(s,c))`, followed by its codec presentation, is the predicted/output
 face. Chunk reordering, autocorrection and continuation are uses of this relation with different

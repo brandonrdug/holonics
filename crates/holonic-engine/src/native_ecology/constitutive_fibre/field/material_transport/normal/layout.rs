@@ -72,6 +72,12 @@ pub(super) struct NormalLayout {
 impl NormalLayout {
     pub fn new(roots: usize, targets: usize) -> Option<Self> {
         let sources = roots.checked_mul(SOURCE_PORTS)?;
+        Self::for_sources(sources, targets)
+    }
+    pub fn for_sources(sources: usize, targets: usize) -> Option<Self> {
+        if sources == 0 || targets == 0 {
+            return None;
+        }
         let source_components = sources.checked_mul(QUADRATURES)?;
         let target_components = targets.checked_mul(QUADRATURES)?;
         let gram_values = sources.checked_mul(source_components)?;

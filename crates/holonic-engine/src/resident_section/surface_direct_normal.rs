@@ -1,6 +1,6 @@
 use super::*;
 use crate::native_ecology::constitutive_fibre::{
-    normal_material_report_words, normal_material_state_words, normal_material_workspace_words,
+    normal_feature_report_words, normal_feature_state_words, normal_feature_workspace_words,
     ResidentConstitutiveCurrent, ResidentNormalInput,
 };
 impl<'c> ResidentSurface<'c> {
@@ -9,7 +9,7 @@ impl<'c> ResidentSurface<'c> {
         &self,
         lane: &Lane<'_, 'c>,
         old: &ResidentSection<'c>,
-        roots: usize,
+        sources: usize,
         targets: usize,
         old_grain: u32,
         grain: u32,
@@ -17,13 +17,13 @@ impl<'c> ResidentSurface<'c> {
         work: &ResidentSection<'c>,
     ) -> Result<(), ResidentRefusal> {
         let fail = || Self::operative_error();
-        let sw = normal_material_state_words(roots, targets).ok_or_else(fail)?;
-        let ww = normal_material_workspace_words(roots, targets).ok_or_else(fail)?;
-        if roots == 0
+        let sw = normal_feature_state_words(sources, targets).ok_or_else(fail)?;
+        let ww = normal_feature_workspace_words(sources, targets).ok_or_else(fail)?;
+        if sources == 0
             || targets == 0
             || grain <= old_grain
             || grain > 120
-            || roots > u32::MAX as usize / 6
+            || sources > u32::MAX as usize / 2
             || targets > u32::MAX as usize / 2
             || !self.operative_shape(old, 1, sw)
             || !self.operative_shape(next, 1, sw)
@@ -33,7 +33,7 @@ impl<'c> ResidentSurface<'c> {
         }
         let mut p = Params::new();
         p.ptr(old.lo.device_ptr())
-            .u32(roots as u32)
+            .u32(sources as u32)
             .u32(targets as u32)
             .u32(old_grain)
             .u32(grain)
@@ -46,7 +46,7 @@ impl<'c> ResidentSurface<'c> {
             .u32(lane.lineage_count);
         self.record_blocks(
             lane,
-            "section_normal_refine",
+            "section_normal_refine_sources",
             1,
             self.launch.block_x,
             0,
@@ -61,7 +61,7 @@ impl<'c> ResidentSurface<'c> {
         state: &ResidentSection<'c>,
         source: ResidentNormalInput<'_, 'c>,
         observed: Option<ResidentConstitutiveCurrent<'_, 'c>>,
-        roots: usize,
+        sources: usize,
         targets: usize,
         grain: u32,
         next: Option<&ResidentSection<'c>>,
@@ -72,19 +72,19 @@ impl<'c> ResidentSurface<'c> {
     ) -> Result<(), ResidentRefusal> {
         let fail = || ResidentRefusal::Declaration {
             operation: "direct-normal-material",
-            what: "incompatible three-port current, output or normal-state chart".into(),
+            what: "incompatible feature current, output or normal-state chart".into(),
         };
-        let d = roots.checked_mul(6).ok_or_else(fail)?;
+        let d = sources.checked_mul(2).ok_or_else(fail)?;
         let r = targets.checked_mul(2).ok_or_else(fail)?;
-        let state_words = normal_material_state_words(roots, targets).ok_or_else(fail)?;
-        let report_words = normal_material_report_words(roots, targets).ok_or_else(fail)?;
-        let work_words = normal_material_workspace_words(roots, targets).ok_or_else(fail)?;
+        let state_words = normal_feature_state_words(sources, targets).ok_or_else(fail)?;
+        let report_words = normal_feature_report_words(sources, targets).ok_or_else(fail)?;
+        let work_words = normal_feature_workspace_words(sources, targets).ok_or_else(fail)?;
         let input_words = d
             .checked_add(1)
             .and_then(|v| v.checked_mul(4))
             .and_then(|v| targets.checked_mul(3).and_then(|t| v.checked_add(t)))
             .ok_or_else(fail)?;
-        if roots == 0
+        if sources == 0
             || targets == 0
             || d > u32::MAX as usize
             || r > u32::MAX as usize
@@ -153,7 +153,7 @@ impl<'c> ResidentSurface<'c> {
                 .u32(u32::MAX)
                 .u32(u32::MAX);
         }
-        p.u32(roots as u32)
+        p.u32(sources as u32)
             .u32(targets as u32)
             .u32(grain)
             .u32(u32::from(observed.is_some()));
@@ -169,7 +169,7 @@ impl<'c> ResidentSurface<'c> {
             .u32(lane.lineage_count);
         self.record_blocks(
             lane,
-            "section_direct_normal_material",
+            "section_direct_normal_material_sources",
             1,
             self.launch.block_x,
             0,

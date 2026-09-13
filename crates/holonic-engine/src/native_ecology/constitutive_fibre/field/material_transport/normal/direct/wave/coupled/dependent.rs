@@ -534,7 +534,7 @@ impl<'c> ResidentCoupledConstitutive<'c> {
         )
     }
     pub fn roots(&self) -> usize {
-        self.base.normal_material().roots
+        self.base.normal_material().roots()
     }
     pub fn passages(&self) -> u64 {
         self.base.current().passages() + 1 + self.operations.len() as u64

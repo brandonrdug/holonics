@@ -26,7 +26,7 @@ mod internal_current;
 mod internal_mode;
 mod junction;
 mod material_transport;
-pub(crate) use material_transport::normal::{state_words as normal_material_state_words, report_words as normal_material_report_words, workspace_words as normal_material_workspace_words};
+pub(crate) use material_transport::normal::{feature_state_words as normal_feature_state_words, feature_report_words as normal_feature_report_words, feature_workspace_words as normal_feature_workspace_words, state_words as normal_material_state_words, report_words as normal_material_report_words, workspace_words as normal_material_workspace_words};
 mod receiver;
 mod rechart;
 mod relation_current;
@@ -60,7 +60,7 @@ pub use junction::{NativeOperativeCurrentFactorCondensation,NativeOperativeRetur
 };
 use junction::{PairedJunction, PendingJunction};
 use material_transport::{MaterialTransport, PendingMaterialTransport};
-pub use material_transport::{
+pub use material_transport::{NormalSourceChart,
     NativeMaterialReportPacking, NativeMaterialReportPackingRest,
     NativeCompleteMaterialTransportReading, NativeCompleteMaterialTransportState,
     NativeFieldExactMaterialTransport, NativeFieldMaterialTransportReading,

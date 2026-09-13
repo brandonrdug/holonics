@@ -306,6 +306,9 @@ records its original native scope. The subsequent
 binds those owners in `holonics-hna/src/native/mathematical.rs` and the existing `stream.rs`.
 Its `mathematical/relation.rs` uses native condition preimage/image/reception for an actual
 parameter family; retained operator outputs enter that relation without a host source remount.
+It also binds the shared normal material to source/condition restrictions of one preparation
+packet, joined resident features and a delayed observed section. `mathematical/code.rs` releases
+exact Rust functions from retained factor graphs; compilation/execution is an exterior consumer.
 `holonics-workbench/src/session_stream.rs` supplies the process interface. It adds no new engine
 or CUDA law; the local calibrated-family scope and open general contextual binding remain explicit.
 
@@ -428,6 +431,10 @@ CUDA learning rule, token lookup or historical predictor enters this composition
 
 [definition] `field/material_transport/normal/direct.rs` exposes `ResidentNormalMaterial` and
 `ResidentNormalReturn`, the existing accumulated normal law with supplied resident currents.
+`NormalSourceChart` distinguishes the legacy three-port wave domain from an arbitrary declared
+feature width. Both share one normal increment/fit/response implementation; feature material
+does not masquerade as a wave seed. Its version-two rest retains that chart while wave rest
+keeps the version-one codec.
 `surface_direct_normal.rs` validates the passage; `direct_normal_material.cuh` adapts its operands
 to the existing normal increment/fit and bounded linear response. `normal.rs` now shares the
 report/state decoders with the old field owner. No historical-source adapter is needed by this
@@ -439,6 +446,9 @@ input; `normal/direct/section.rs` integrates supplied sections and retains actua
 
 [definition] `constitutive_fibre/resident/section.rs` owns addressed point-current section views;
 `section/difference.rs` retains their original path and local comparison fields. The source
+and condition join in `section/bilinear_features.rs` keeps both same-row operands and uses the
+existing bilinear-source kernel to form their direct and mixed complex coordinates on device.
+No Cartesian product or source-centre selection is inserted. The source
 attachment in `holonics-hna::native::section_input` uses the existing exterior `SymbolAlphabet`.
 The public `conversation_difference_field` example calls these native owners directly. Its
 published source run is a local normal-response construction, not a completed generative ecology.
