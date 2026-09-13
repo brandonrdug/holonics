@@ -1,9 +1,9 @@
 //! Bounded contextual-text experiment over the admitted exposure reader and native wave owner.
 //! This is an application driver: it supplies source apertures and records native returns.
 use holonics_hna::{
-    alpha::exposure::{ExposureFamily, ExposurePartition, ExposureReader},
+    alpha::exposure::{ExposureCursor, ExposureFamily, ExposurePartition, ExposureReader},
     native::{
-        with_seeded_wave_session, NativeWaveSavedSession, NativeWaveSeedSpec,
+        with_seeded_wave_session, NativeSessionError, NativeWaveSavedSession, NativeWaveSeedSpec,
         NATIVE_WAVE_SEED_SCHEMA,
     },
     publish_new, HnaStreamState,
@@ -44,6 +44,8 @@ struct Report {
     families: Vec<Family>,
     observations: Option<u64>,
     cursor: Option<Value>,
+    exposure_cursor: Option<ExposureCursor>,
+    pending_exposure_sequence: Option<u64>,
     progress: Value,
     elapsed_micros: u128,
     errors: Vec<String>,
@@ -124,11 +126,15 @@ fn main() -> Result<()> {
     }
 
     let started = Instant::now();
-    let mut reader = ExposureReader::open(&exposure)?;
+    // This pass plans the bounded source aperture and discovers its codec alphabet. Its cursor is
+    // disposable planning state. The fresh delivery reader below owns actual acknowledgements.
+    let mut planning_reader = ExposureReader::open(&exposure)?;
     let mut selected = Vec::<(ExposureFamily, u64, u64, String, String)>::new();
     let mut alphabet = BTreeSet::new();
     while selected.len() < aperture.development_parts {
-        let Some(frame) = reader.peek()? else { break };
+        let Some(frame) = planning_reader.peek()? else {
+            break;
+        };
         let sequence = frame.sequence;
         let source_family = frame.family.clone();
         let parts = if frame.partition == ExposurePartition::Development {
@@ -136,7 +142,7 @@ fn main() -> Result<()> {
         } else {
             Vec::new()
         };
-        reader.acknowledge(sequence)?;
+        planning_reader.acknowledge(sequence)?;
         for part in parts {
             let Some(text) = part.text else { continue };
             let chars: String = text.chars().take(aperture.max_chars_per_part).collect();
@@ -175,22 +181,39 @@ fn main() -> Result<()> {
         seed: first.iter().collect(),
         grain: 64,
     };
+    let planned_by_sequence = selected.iter().enumerate().fold(
+        std::collections::BTreeMap::<u64, Vec<(usize, u64, String, String)>>::new(),
+        |mut by_sequence, (family, (_, sequence, part, pointer, text))| {
+            by_sequence.entry(*sequence).or_default().push((
+                family,
+                *part,
+                pointer.clone(),
+                text.clone(),
+            ));
+            by_sequence
+        },
+    );
+    // This reader is the actual cold-delivery cursor. A selected occurrence remains pending until
+    // every selected part has completed all declared native cycles.
+    let mut delivery_reader = ExposureReader::open(&exposure)?;
+    let mut exposure_cursor = Some(delivery_reader.cursor());
+    let mut pending_exposure_sequence = None;
     let mut errors = Vec::new();
     let mut result_output = String::new();
     let mut checkpoint = None;
     let mut progress = serde_json::json!({"stage":"mount"});
     let native = with_seeded_wave_session(&spec, |session| {
-        'development: for cycle in 0..aperture.cycles {
-            for (family, (_, _, _, _, text)) in selected.iter().enumerate() {
+        let mut process_parts = |cycle: usize, source_parts: &[(usize, String)]| -> bool {
+            for (family, text) in source_parts {
                 let chars: Vec<char> = text.chars().collect();
                 progress = serde_json::json!({"stage":"part-source","cycle":cycle,"part":family});
                 // The first pair already supplied the exact initial state. Later parts/cycles
                 // offer their actual initial pair to the continuing state, without a reset.
-                if cycle != 0 || family != 0 {
+                if cycle != 0 || *family != 0 {
                     if let Err(error) = session.actuate_text(&chars[..2].iter().collect::<String>())
                     {
                         errors.push(format!("cycle {cycle} family {family} actuation: {error}"));
-                        break 'development;
+                        return false;
                     }
                 }
                 for index in 2..chars.len() {
@@ -200,9 +223,6 @@ fn main() -> Result<()> {
                             chars.len()
                         );
                     }
-                    // These are distinct declared observation charts. Addressed return
-                    // changes material while retaining the flowing current. Next-current
-                    // supplies the actual unit symbol to the existing full-state receiver.
                     let returned = if aperture.observation == "next-current" {
                         progress = serde_json::json!({"stage":"observation","cycle":cycle,"part":family,"symbol":index});
                         session.receive_next_symbol(&chars[index].to_string())
@@ -214,12 +234,12 @@ fn main() -> Result<()> {
                                 errors.push(format!(
                                     "cycle {cycle} family {family} prediction {index}: {error}"
                                 ));
-                                break 'development;
+                                return false;
                             }
                         };
                         let Some(id) = prediction["action"]["prediction"].as_u64() else {
                             errors.push(format!("cycle {cycle} family {family} prediction {index}: missing native handle"));
-                            break 'development;
+                            return false;
                         };
                         progress = serde_json::json!({"stage":"observation","cycle":cycle,"part":family,"symbol":index,"prediction":id});
                         session.receive_symbol(id, &chars[index].to_string())
@@ -228,7 +248,7 @@ fn main() -> Result<()> {
                         errors.push(format!(
                             "cycle {cycle} family {family} observation {index}: {error}"
                         ));
-                        break 'development;
+                        return false;
                     }
                     progress = serde_json::json!({"stage":"source-feedback","cycle":cycle,"part":family,"symbol":index});
                     if let Err(error) =
@@ -237,6 +257,76 @@ fn main() -> Result<()> {
                         errors.push(format!(
                             "cycle {cycle} family {family} source {index}: {error}"
                         ));
+                        return false;
+                    }
+                }
+            }
+            true
+        };
+        let mut delivered_parts = Vec::<Vec<(usize, String)>>::new();
+        'development: for cycle in 0..aperture.cycles {
+            if cycle == 0 {
+                while delivered_parts.len() < planned_by_sequence.len() {
+                    let Some(frame) = delivery_reader
+                        .peek()
+                        .map_err(|error| NativeSessionError::Application(error.to_string()))?
+                    else {
+                        errors.push(
+                            "source ended before all planned occurrences were natively used".into(),
+                        );
+                        break 'development;
+                    };
+                    let sequence = frame.sequence;
+                    let Some(planned_parts) = planned_by_sequence.get(&sequence) else {
+                        // Non-selected cold occurrences may advance. A selected occurrence stays
+                        // pending until every selected part has completed its native use.
+                        delivery_reader
+                            .acknowledge(sequence)
+                            .map_err(|error| NativeSessionError::Application(error.to_string()))?;
+                        exposure_cursor = Some(delivery_reader.cursor());
+                        continue;
+                    };
+                    pending_exposure_sequence = Some(sequence);
+                    let actual_parts = frame
+                        .development_parts()
+                        .map_err(|error| NativeSessionError::Application(error.to_string()))?
+                        .to_vec();
+                    let source_parts: Option<Vec<(usize, String)>> = planned_parts
+                        .iter()
+                        .map(|(family, ordinal, pointer, expected)| {
+                            actual_parts
+                                .iter()
+                                .find(|part| {
+                                    part.ordinal == *ordinal
+                                        && part.pointer == *pointer
+                                        && part.text.as_ref().is_some_and(|text| {
+                                            text.chars()
+                                                .take(aperture.max_chars_per_part)
+                                                .collect::<String>()
+                                                == *expected
+                                        })
+                                })
+                                .and_then(|part| part.text.as_ref())
+                                .map(|_| (*family, expected.clone()))
+                        })
+                        .collect::<Option<Vec<_>>>();
+                    let Some(source_parts) = source_parts else {
+                        errors.push(format!("planned source occurrence {sequence} no longer matches its actual visible parts"));
+                        break 'development;
+                    };
+                    if !process_parts(cycle, &source_parts) {
+                        break 'development;
+                    }
+                    delivery_reader
+                        .acknowledge(sequence)
+                        .map_err(|error| NativeSessionError::Application(error.to_string()))?;
+                    exposure_cursor = Some(delivery_reader.cursor());
+                    pending_exposure_sequence = None;
+                    delivered_parts.push(source_parts);
+                }
+            } else {
+                for source_parts in &delivered_parts {
+                    if !process_parts(cycle, source_parts) {
                         break 'development;
                     }
                 }
@@ -317,6 +407,8 @@ fn main() -> Result<()> {
         observations,
         elapsed_micros: started.elapsed().as_micros(),
         cursor,
+        exposure_cursor,
+        pending_exposure_sequence,
         progress,
         errors,
         checkpoint,

@@ -1,3 +1,4 @@
+use num_traits::Zero;
 use relational_geometry::{integer, rat};
 
 use super::*;
@@ -16,6 +17,23 @@ fn exact_division_refuses_rather_than_truncating() {
     );
     let square = divisor.times(&divisor);
     assert_eq!(square.divided_exactly_by(&divisor).unwrap(), divisor);
+}
+
+#[test]
+fn polynomial_work_counts_exact_products_and_remainders() {
+    let left = polynomial(&[1, 2]);
+    let right = polynomial(&[3, 4]);
+    let (product, product_work) = left.times_with_work(&right);
+    assert_eq!(product, polynomial(&[3, 10, 8]));
+    assert!(!product_work.multiplications.is_zero());
+    assert!(!product_work.additions.is_zero());
+    assert!(!product_work.cumulative_bits.is_zero());
+
+    let (quotient, remainder, division_work) = product.divided_by_with_work(&left).unwrap();
+    assert_eq!(quotient, right);
+    assert!(remainder.is_zero());
+    assert!(!division_work.divisions.is_zero());
+    assert!(!division_work.cumulative_bits.is_zero());
 }
 
 #[test]

@@ -17,7 +17,7 @@ holonics hna mathematical-session --input applications/holonics-workbench/exampl
 
 [definition] Use `org.holonics.hna.stream-request.v1` with command action
 `mathematical-request`; the `request.operation` selects `construct-linear`,
-`construct-bilinear`, `resume-construction`, `apply`, `bind-receiver`, `compose-receiver`,
+`construct-bilinear`, `power`, `resume-construction`, `apply`, `bind-receiver`, `compose-receiver`,
 `read-product`, `compose`, `join-receivers`, `construct-relation`, `predict-relation`,
 `predict-condition`, `observe-relation`,
 `inspect-condition` or the explicit release operations. The public Rust enum
@@ -43,6 +43,16 @@ The resulting construction accepts new inputs and can also read the original ret
 it shares the resident input factors. The [updated example](../applications/holonics-workbench/examples/native/mathematical-requests.jsonl)
 uses that compiled construction. The complete [scope and checks](../research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md#resident-composition-and-fixed-section-compilation)
 distinguish fixed-section compilation from general variable-condition continuation.
+
+[definition] `power` takes a retained linear `operator` and nonnegative integer `exponent`.
+It recovers that operator's exact declared matrix, infers its minimal polynomial through the
+shared matrix/preimage owner, reduces the exponent and uses the existing resident linear
+constructor. Exponent zero returns the identity on the same square source chart. A nonsquare
+or non-linear source refuses at its actual shape/type boundary. The response separates source
+matrix reconstruction, power construction and rank-factorization work. It constructs a new
+resident action; it does not compact an arbitrary changing learned word or infer a physical clock.
+The [frontier return](../research/records/2026-09-12_THE_FRONTIER_REVIEW_CONSOLIDATES_CONSTRUCTIVE_CONTINUITY.md)
+records its actual public application and validation.
 
 [definition] `join-receivers` takes ordered operator IDs which share the same retained core.
 It stacks their receivers and reports output-block extents; repeated receivers preserve their

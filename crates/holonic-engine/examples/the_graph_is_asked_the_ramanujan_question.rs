@@ -44,47 +44,27 @@
 //! cargo run --release -p holonic-engine --example the_graph_is_asked_the_ramanujan_question
 //! ```
 
+use holonic_engine::exact_linear::ExactRatMatrix;
 use holonic_engine::rational_polynomial::{RationalPolynomial, rational_root_census};
-use num_traits::{One, Zero};
+use num_traits::Zero;
 use relational_geometry::Rat;
 
 fn integer(value: i64) -> Rat {
     Rat::from_integer(value.into())
 }
 
-/// The adjacency characteristic polynomial of a graph given by its adjacency matrix, exactly, by
-/// Faddeev–LeVerrier over `Rat`. Small and self-contained: the graphs below are tiny by design.
+/// The adjacency characteristic polynomial through the shared exact matrix owner.
 fn characteristic(adjacency: &[Vec<i64>]) -> RationalPolynomial {
-    let extent = adjacency.len();
-    let mut coefficients = vec![Rat::zero(); extent + 1];
-    coefficients[extent] = Rat::one();
-    let mut current: Vec<Vec<Rat>> = vec![vec![Rat::zero(); extent]; extent];
-    for (row, line) in current.iter_mut().enumerate() {
-        line[row] = Rat::one();
-    }
-    for step in 1..=extent {
-        // current <- A * current
-        let mut product = vec![vec![Rat::zero(); extent]; extent];
-        for row in 0..extent {
-            for column in 0..extent {
-                let mut sum = Rat::zero();
-                for inner in 0..extent {
-                    if adjacency[row][inner] != 0 {
-                        sum += integer(adjacency[row][inner]) * &current[inner][column];
-                    }
-                }
-                product[row][column] = sum;
-            }
-        }
-        let trace: Rat = (0..extent).map(|at| product[at][at].clone()).sum();
-        let coefficient = -trace / integer(step as i64);
-        coefficients[extent - step] = coefficient.clone();
-        for (row, line) in product.iter_mut().enumerate() {
-            line[row] += &coefficient;
-        }
-        current = product;
-    }
-    RationalPolynomial::new(coefficients)
+    let matrix = ExactRatMatrix::new(
+        adjacency
+            .iter()
+            .map(|row| row.iter().map(|value| integer(*value)).collect())
+            .collect(),
+    )
+    .expect("the graph adjacency is rectangular");
+    matrix
+        .characteristic_polynomial()
+        .expect("the graph adjacency is square")
 }
 
 /// `chi(x) * chi(-x)` is even; return the `q` with `q(x^2)` equal to it, whose roots are the

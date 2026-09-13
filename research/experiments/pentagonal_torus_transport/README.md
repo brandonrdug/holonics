@@ -2,9 +2,12 @@
 
 `run_public_session.py` supplies exact integer matrices to the public
 `holonics hna mathematical-session` JSONL boundary and checks the returned native actions.
-The `phase_clock_smith` example infers the monic annihilator coefficients through the existing
-`ExactRatMatrix::preimage_fibre` owner; the native session constructs and applies the resulting
-exact rank-factorized operators.
+The `phase_clock_smith` example independently infers the monic annihilator coefficients through
+the shared `ExactRatMatrix::minimal_polynomial` owner and its exact preimage reduction.
+The public exact `power` request takes only
+a retained operator and exponent; the native session infers the minimal polynomial itself and
+uses the existing rank-factorized linear construction path.  The matching receipt is a separate
+verification witness.
 The default receipt is `.local/artifacts/2026-09-12-geometry/phase_clock_smith.json`; a missing
 receipt returns explicit producer guidance and never falls back to canonical coefficients.
 
@@ -30,12 +33,11 @@ L5³ - 5 L5² + 5 L5 = 0
 K25⁶ - 20 K25⁵ + 150 K25⁴ - 525 K25³ + 850 K25² - 500 K25 = 0.
 ```
 
-It forms `L5²` and `L5³` through the public resident `compose` request, then consumes a
-recurrence-reduced `L5¹⁶` matrix.  The 25-dimensional torus powers `K25²` through `K25⁶`
-and the recurrence-reduced `K25¹²` are supplied as complete exact matrices because the
-current public `compose` request composes retained product cores and does not combine
-arbitrary polynomial coefficients.  All are still rank-factorized, resident-constructed,
-and applied through the public session.
+It forms `L5²` and `L5³` through the public resident `compose` request, then consumes `L5¹⁶`
+through the native exact `power` request.  The 25-dimensional torus powers `K25²` through
+`K25⁶` remain supplied as complete exact matrices for the independent annihilator check;
+`K25¹²` is constructed through the same native `power` request.  All are rank-factorized,
+resident-constructed, and applied through the public session.
 
 The phase control supplies the real analyzer
 

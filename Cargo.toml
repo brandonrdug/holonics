@@ -6,9 +6,10 @@
 #
 # `body` is pure law: no_std, zero dependencies. `crates/holonic-structure` is the
 # substrate — ordinal and relation atlases, local populations, branch lineage,
-# typed atomic membrane. `crates/relational-geometry` and `crates/holonic-engine`
-# are the exact receiver-relative geometry, float-free over BigRational with
-# Sturm-certified algebraic roots. `crates/holonic-language` is the reflective
+# typed atomic membrane. `crates/relational-geometry` and the native mathematical owners in
+# `crates/holonic-engine` keep receiver-relative conduct exact over BigRational with
+# Sturm-certified algebraic roots; exterior float codewords and measurements keep their
+# declared codec/apparatus roles. `crates/holonic-language` is the reflective
 # runtime. `crates/holonic-life` is the membrane where the ecologies live.
 #
 # Excluded on purpose: the rust-gpu kernel and the nvptx mount kernel each pin

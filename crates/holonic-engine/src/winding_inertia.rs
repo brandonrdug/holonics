@@ -1506,20 +1506,7 @@ fn characteristic_polynomial(symbol: &[BigInt]) -> Result<Vec<Rat>, WindingError
             })
             .collect(),
     )?;
-    let mut coefficients = vec![Rat::zero(); extent + 1];
-    coefficients[extent] = Rat::one();
-    let mut carried = ExactRatMatrix::identity(extent)?;
-    for step in 1..=extent {
-        let product = matrix.multiply(&carried)?;
-        let mut trace = Rat::zero();
-        for index in 0..extent {
-            trace += product.get(index, index)?;
-        }
-        let coefficient = -trace / Rat::from_integer(BigInt::from(step));
-        coefficients[extent - step] = coefficient.clone();
-        carried = product.add(&ExactRatMatrix::identity(extent)?.scaled(&coefficient))?;
-    }
-    Ok(coefficients)
+    Ok(matrix.characteristic_polynomial()?.coefficients().to_vec())
 }
 
 // ===============================================================================================

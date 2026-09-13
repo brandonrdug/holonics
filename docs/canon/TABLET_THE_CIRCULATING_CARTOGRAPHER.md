@@ -1,8 +1,8 @@
 # Tablet of the circulating cartographer
 
-The map is the changing terrain; intelligence is navigation through it; and the present
-construction frontier is circulation through the machine's existing organs rather than another
-cabinet of semantic subsystems.
+The map is the changing terrain; intelligence is navigation through it. Construction recovers,
+composes and reuses its generating relations across the framework's mathematical, physical and
+learning applications.
 
 **Date:** 2026-08-12.
 **Truth status:** `project-postulate` for the adopted ontology and construction discipline;
@@ -14,8 +14,12 @@ circulation.
 **Governing documents:** `docs/canon/01_CAUSAL_CALCULUS.md`, `docs/canon/TABLET_THE_OPERATIONS.md`,
 `docs/canon/TABLET_THE_REASONING_CYCLE.md`, `docs/canon/TABLET_THE_CAUSAL_PROFILE.md`, and
 `docs/canon/TABLET_THE_UNIVERSALITY_MACHINE.md`.
-**Construction status:** doctrine only. The live blueprint schedules construction and
+**Construction status:** doctrine only. The live roadmap schedules construction and
 `CONSTRUCTION_STATE.md` records its admitted position.
+
+[historical] The dated capability and open-status statements below describe their cited
+construction returns. They are not the current position. Source-qualified reuse of those
+returns is governed by the current [development method](../DEVELOPMENT.md#mathematical-implementation-and-continuation).
 
 ---
 

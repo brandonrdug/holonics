@@ -809,6 +809,7 @@
   },
   "inferred_or_checked": {
     "inference_receipt": ".local/artifacts/2026-09-12-geometry/phase_clock_smith.json",
+    "inference_receipt_scope": "independent matching witness; coefficients are not passed to native Power",
     "inference_summary": {
       "C5-Laplacian": {
         "first_consistent_degree": 3,
@@ -819,30 +820,7 @@
           "1"
         ],
         "coefficient_kernel": [],
-        "power_construction_work": {
-          "additions": [
-            375
-          ],
-          "multiplications": [
-            375
-          ],
-          "divisions": [],
-          "entries_written": [
-            75
-          ],
-          "cumulative_bits": [
-            245
-          ],
-          "peak_bits": [
-            6
-          ],
-          "resident_entries": [
-            25
-          ],
-          "dependency_span": [
-            3
-          ]
-        }
+        "power_construction_work": null
       },
       "C5xC5-Kronecker-sum-Laplacian": {
         "first_consistent_degree": 6,
@@ -856,30 +834,7 @@
           "1"
         ],
         "coefficient_kernel": [],
-        "power_construction_work": {
-          "additions": [
-            93750
-          ],
-          "multiplications": [
-            93750
-          ],
-          "divisions": [],
-          "entries_written": [
-            3750
-          ],
-          "cumulative_bits": [
-            25175
-          ],
-          "peak_bits": [
-            16
-          ],
-          "resident_entries": [
-            625
-          ],
-          "dependency_span": [
-            6
-          ]
-        }
+        "power_construction_work": null
       }
     },
     "inferred_L5_recurrence_coefficients_ascending": [
@@ -899,6 +854,18 @@
     ],
     "native_L3_equals_5L2_minus_5L": true,
     "native_K6_annihilated_by_supplied_polynomial": true,
+    "native_power_requests": {
+      "L16": {
+        "operator": 0,
+        "exponent": 16,
+        "source": "native Power request"
+      },
+      "K12": {
+        "operator": 4,
+        "exponent": 12,
+        "source": "native Power request"
+      }
+    },
     "reduced_powers": {
       "L16": {
         "dimension": 5,
@@ -945,7 +912,7 @@
       1,
       2
     ],
-    "L16_reduced": 3,
+    "L16_power": 3,
     "K": [
       4,
       5,
@@ -954,9 +921,9 @@
       8,
       9
     ],
-    "K12_reduced": 10,
+    "K12_power": 10,
     "phase_analyzer": 11
   },
-  "composition_scope": "L3 was formed through public Compose; K2..K6 and reduced K12 were supplied as exact matrices because this session's Compose contract is a retained-core composition path, not a polynomial combiner",
+  "composition_scope": "L3 was formed through public Compose; Power internally infers the exact minimal-polynomial recurrence and uses the existing linear resident constructor; K2..K6 remain supplied exact matrices because this session's Compose contract is a retained-core composition path, not a polynomial combiner",
   "cost_scope": "per-request cost objects are retained in stdout; process startup/JSON transport are excluded by the native request cost field"
 }

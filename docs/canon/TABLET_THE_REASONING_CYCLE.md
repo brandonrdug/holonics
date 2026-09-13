@@ -29,11 +29,12 @@ and
 
 ## 1. The organ and the ecology
 
-`definition`: within Soulkiller, a pretrained transformer is a foreign realization of inherited
-morphology implementing a population of local transports. It is scrapyard material, not an organ
-which remains foreign inside Athena. Soulkiller returns a source-neutral native spool bundle, a
-separate cold exterior witness, and explicit receiver insufficiency. Eros alone composes admitted
-spools and returned consequences into Athena; foreign model identity and execution have ended.
+[definition] Within Soulkiller, a pretrained transformer supplies an inherited realization of
+local transports. The admitted source-neutral resident operation can preserve its mathematical
+structure, as Brandon's September 4 ruling establishes. Excitation and the declared receiver
+family found the restricted productive return, separate cold witness and explicit insufficiency.
+Eros names composition and formation at every participating scope; Athena labels a product/use
+of the resulting HNN ecology. Neither name establishes an internal machinery boundary.
 
 The productive reasoning machine is the recurrent ecology in which one occurrence operates on
 the contemporary morphology and returns its emission, trace and successor:

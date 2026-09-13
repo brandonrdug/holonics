@@ -996,6 +996,100 @@ fn linear_and_zero_actions_have_explicit_unit_port_and_derived_rank() {
 }
 
 #[test]
+#[ignore = "requires CUDA; exact reduced power and resident linear construction"]
+fn power_reuses_exact_recurrence_and_linear_resident_constructor() {
+    with_mathematical_session(|session| {
+        let l5 = rows(&[
+            &[2, -1, 0, 0, -1],
+            &[-1, 2, -1, 0, 0],
+            &[0, -1, 2, -1, 0],
+            &[0, 0, -1, 2, -1],
+            &[-1, 0, 0, -1, 2],
+        ]);
+        let linear = session.request(&MathematicalRequest::ConstructLinear { coefficients: l5 })?;
+        assert_eq!(linear["operator"], 0);
+        assert_eq!(linear["derived_rank"], 4);
+
+        let power = session.request(&MathematicalRequest::Power {
+            operator: 0,
+            exponent: 16,
+        })?;
+        assert_eq!(power["power_of"], 0);
+        assert_eq!(power["exponent"], 16);
+        assert_eq!(power["power_scope"]["source_shape"], json!([5, 5]));
+        assert!(power["power_construction_work"].is_object());
+        assert!(power["source_reconstruction_work"].is_object());
+        assert_eq!(power["operator"], 1);
+        assert_eq!(power["derived_rank"], 4);
+
+        let applied = session.request(&MathematicalRequest::Apply {
+            operator: 1,
+            left: row(&[2, -1, 3, 5, -4]),
+            right: None,
+            retain_product: false,
+        })?;
+        assert_eq!(
+            vector(&serde_json::from_value::<Vec<RationalWire>>(
+                applied["output"].clone()
+            )?)
+            .unwrap(),
+            vector(&row(&[
+                2_937_109_375,
+                -1_633_203_125,
+                -294_531_250,
+                2_109_765_625,
+                -3_119_140_625,
+            ]))
+            .unwrap()
+        );
+
+        let identity = session.request(&MathematicalRequest::Power {
+            operator: 0,
+            exponent: 0,
+        })?;
+        assert_eq!(identity["operator"], 2);
+        assert_eq!(identity["exponent"], 0);
+        let applied_identity = session.request(&MathematicalRequest::Apply {
+            operator: 2,
+            left: row(&[2, -1, 3, 5, -4]),
+            right: None,
+            retain_product: false,
+        })?;
+        assert_eq!(
+            vector(&serde_json::from_value::<Vec<RationalWire>>(
+                applied_identity["output"].clone()
+            )?)
+            .unwrap(),
+            vector(&row(&[2, -1, 3, 5, -4])).unwrap()
+        );
+
+        let bilinear = session.request(&MathematicalRequest::ConstructBilinear {
+            target: BilinearTargetWire {
+                left_extent: 1,
+                right_extent: 1,
+                coefficients: rows(&[&[1]]),
+            },
+            construction: BilinearConstructionWire::Core {
+                left_forms: rows(&[&[1]]),
+                right_forms: rows(&[&[1]]),
+            },
+        })?;
+        assert_eq!(bilinear["operator"], 3);
+        let refused = session.request(&MathematicalRequest::Power {
+            operator: 3,
+            exponent: 2,
+        });
+        assert!(refused.is_err());
+        assert!(refused
+            .unwrap_err()
+            .to_string()
+            .contains("retained linear operator"));
+        Ok(())
+    })
+    .unwrap();
+}
+
+#[test]
 #[ignore = "requires CUDA; finite search continuation and receiver separators"]
 fn search_continuation_is_not_exhaustion_and_failed_receiver_does_not_change_material() {
     with_mathematical_session(|session| {

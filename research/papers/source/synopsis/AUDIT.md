@@ -27,10 +27,10 @@ files. Old entries remain source material until imported and regraded one by one
 
 ## Formal corpus
 
-The current formal foundation is `src/soma/formal/elementary-holonics/`: pinned Lean/Mathlib, no
+The current formal foundation is `formal/elementary-holonics/`: pinned Lean/Mathlib, no
 `sorry`, exact receiver factorization, situated transition paths, conjugate rebase, telescoping,
 the exact numerator--denominator Swing carrier, and Mathlib's actual `RiemannHypothesis`
-proposition. `src/soma/formal/rh-source-transport/` remains a separate exact finite conditional
+proposition. `formal/rh-source-transport/` remains a separate exact finite conditional
 result whose proportional candidate is rejected at the claimed analytic scope; it is not an RH
 proof.
 

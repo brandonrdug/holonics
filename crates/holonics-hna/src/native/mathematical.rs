@@ -139,6 +139,11 @@ pub enum MathematicalRequest {
     ConstructLinear {
         coefficients: RationalMatrixWire,
     },
+    /// Construct a reduced exact power of a retained square linear action.
+    Power {
+        operator: u64,
+        exponent: u64,
+    },
     ResumeConstruction {
         search: u64,
         max_candidates: usize,
@@ -474,6 +479,54 @@ impl<'c> NativeMathematicalSession<'c> {
         self.next_operator = next;
         Ok(result)
     }
+    fn construct_linear_matrix(
+        &mut self,
+        target_matrix: ExactRatMatrix,
+    ) -> Result<Value, NativeSessionError> {
+        let factor = target_matrix.rank_factorization().map_err(invalid)?;
+        // Rank-zero maps still need a resident zero carrier in this packet primitive.
+        // Report that representational lane separately from the derived mathematical rank.
+        let left = if factor.derived_rank == 0 {
+            ExactRatMatrix::zero(1, target_matrix.columns()).map_err(invalid)?
+        } else {
+            factor.right
+        };
+        let right = ExactRatMatrix::new(vec![vec![BigRational::one()]; left.rows()])
+            .map_err(invalid)?;
+        let core = Arc::new(BilinearProductCore::new(left, right).map_err(invalid)?);
+        let target = BilinearOperator::new(target_matrix.columns(), 1, target_matrix)
+            .map_err(invalid)?;
+        let realization = core
+            .bind(&target)
+            .map_err(invalid)?
+            .map_err(|_| invalid("rank factorization failed to bind"))?;
+        let mut value = self.publish(realization, true)?;
+        value["derived_rank"] = json!(factor.derived_rank);
+        value["construction_work"] = json!(factor.work);
+        value["unit_port_lowering"] =
+            json!("right=[1]; carrier lanes are not a bilinear-rank optimality claim");
+        Ok(value)
+    }
+    fn declared_linear_matrix(
+        &self,
+        operator: u64,
+    ) -> Result<(ExactRatMatrix, holonic_engine::exact_work::ExactWork), NativeSessionError> {
+        let op = self
+            .operators
+            .get(&operator)
+            .ok_or_else(|| invalid("unknown operator"))?;
+        if !op.linear {
+            return Err(invalid("power requires a retained linear operator"));
+        }
+        if op.realization.core().right_forms().columns() != 1 {
+            return Err(invalid("power requires the declared unit right port"));
+        }
+        op.realization
+            .receiver()
+            .particular
+            .multiply_with_work(op.realization.core().tensor_image())
+            .map_err(invalid)
+    }
     fn read(&self, section: &ResidentSection<'c>) -> Result<Vec<RationalWire>, NativeSessionError> {
         let packet = self.surface.read_out(section).map_err(invalid)?;
         if packet.len() < 2
@@ -723,29 +776,25 @@ impl<'c> NativeMathematicalSession<'c> {
                 }
             }
             MathematicalRequest::ConstructLinear { coefficients } => {
-                let target_matrix = matrix(coefficients)?;
-                let factor = target_matrix.rank_factorization().map_err(invalid)?;
-                // Rank-zero maps still need a resident zero carrier in this packet primitive.
-                // Report that representational lane separately from the derived mathematical rank.
-                let left = if factor.derived_rank == 0 {
-                    ExactRatMatrix::zero(1, target_matrix.columns()).map_err(invalid)?
-                } else {
-                    factor.right
-                };
-                let right = ExactRatMatrix::new(vec![vec![BigRational::one()]; left.rows()])
+                self.construct_linear_matrix(matrix(coefficients)?)
+            }
+            MathematicalRequest::Power { operator, exponent } => {
+                let (source, source_reconstruction_work) = self.declared_linear_matrix(*operator)?;
+                let rows = source.rows();
+                let (powered, power_work) = source
+                    .power_reduced_with_work(*exponent)
                     .map_err(invalid)?;
-                let core = Arc::new(BilinearProductCore::new(left, right).map_err(invalid)?);
-                let target = BilinearOperator::new(target_matrix.columns(), 1, target_matrix)
-                    .map_err(invalid)?;
-                let realization = core
-                    .bind(&target)
-                    .map_err(invalid)?
-                    .map_err(|_| invalid("rank factorization failed to bind"))?;
-                let mut value = self.publish(realization, true)?;
-                value["derived_rank"] = json!(factor.derived_rank);
-                value["construction_work"] = json!(factor.work);
-                value["unit_port_lowering"] =
-                    json!("right=[1]; carrier lanes are not a bilinear-rank optimality claim");
+                let mut value = self.construct_linear_matrix(powered)?;
+                value["power_of"] = json!(*operator);
+                value["exponent"] = json!(*exponent);
+                value["source_reconstruction_work"] = json!(source_reconstruction_work);
+                value["power_construction_work"] = json!(power_work);
+                value["power_scope"] = json!({
+                    "source_shape": [rows, rows],
+                    "source": "declared retained linear operator matrix reconstructed from its exact receiver/core",
+                    "reduction": "exact minimal-polynomial exponentiation by squaring",
+                    "execution": "exterior exact construction; resident application"
+                });
                 Ok(value)
             }
             MathematicalRequest::ResumeConstruction {

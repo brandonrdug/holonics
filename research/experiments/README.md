@@ -1,9 +1,9 @@
 # EXTERIOR INSTRUMENTS — nothing here is part of the body
 
-> **BANNER. This directory is not the machine.** `analysis/` holds readers written *outside* the
-> engine, in Python and numpy, against material the engine also reads. Nothing here is an organ,
-> nothing here is a driver, and **no figure produced here is a machine return.** `CLAUDE.md`'s
-> workspace table names `crates/` and `soma/`; this directory is deliberately not in it.
+> **BANNER. This directory is not the machine.** The experiment readers are exterior instruments,
+> often Python or numpy, against material the engine also reads. Nothing here is an organ, nothing
+> here is a driver, and **no figure produced here is a machine return.** The live layout and source
+> ownership are governed by [`AGENTS.md`](../../AGENTS.md) and [`docs/REPOSITORY.md`](../../docs/REPOSITORY.md).
 
 ## Why the banner exists
 

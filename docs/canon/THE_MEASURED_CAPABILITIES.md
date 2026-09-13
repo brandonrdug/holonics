@@ -1,8 +1,14 @@
 # THE MEASURED CAPABILITIES — what the machine has actually done
 
-**Genre:** canon (`docs/canon/THE_DOCUMENT_LAW.md` §1.1). It is the **evidence index**, not a plan and
-not doctrine. `docs/plans/THE_ROADMAP.md` says what is open; `CONSTRUCTION_STATE.md` says what is
-admitted; **this says what was measured, by whom, and whether it still stands.**
+[historical] This is the August evidence index at the revisions and dates given below. Its
+measurements retain their original scope and value; its counts and capability summaries are
+not a second current position. Consult later direct rulings and [retractions](../RETRACTIONS.md)
+when recovering a construction, then follow the actual current source and consumer through
+[the owner map](../ARCHITECTURE_MAP.md). No archived benchmark or census is a mandatory pickup run.
+
+**Genre:** historical evidence navigation (`docs/canon/THE_DOCUMENT_LAW.md` §1.1).
+`docs/plans/THE_ROADMAP.md` orders construction; `CONSTRUCTION_STATE.md` records the current
+position; this preserves what was measured and by whom at its cited dates.
 
 **Truth status:** `established-bounded`. **Evidence:** `measured` — 96 binaries **executed** at
 `101882f` on 2026-08-08, not read; all 324 research records indexed and deduplicated; the

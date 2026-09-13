@@ -1,17 +1,20 @@
-# Soma receiver observatory
+# Historical Soma receiver observatory
 
-This is a read-only instrument for inspecting one declared receiver-relative section of an exact
-world artifact. It does not first draw a whole body in an absolute room. The world supplies the
-root, coordinates, metric or pairing, and lawful restriction/rebase map; the canvas is a disposable
-face of that declaration.
+This retained read-only instrument is historical apparatus for inspecting one declared
+receiver-relative section of an exact world artifact. It does not first draw a whole body in an
+absolute room. The world supplies the root, coordinates, metric or pairing, and lawful
+restriction/rebase map; the canvas is a disposable face of that declaration. It is not a current
+repository runtime: its default observations belonged to the frozen predecessor tree and are not
+present in this checkout.
 
-Serve the repository root, then open the instrument:
+Serve the frozen predecessor checkout that contains `src/soma/tools/observatory/` and its
+`observations/` tree, then open the instrument:
 
 ```sh
 python3 -m http.server 8017
 ```
 
-`http://localhost:8017/src/soma/tools/observatory/`
+`http://localhost:8017/src/soma/tools/observatory/` (predecessor checkout only)
 
 ## Default instruments
 
@@ -83,6 +86,9 @@ The 17 MB carrier report is lazy: it is not fetched or parsed unless **Carrier**
 ```sh
 node --test src/soma/tools/observatory/observatory-core.test.js
 ```
+
+This historical check requires the predecessor observation files; it is not a current-root
+validation command.
 
 The tests check the receiver laws, refuse the former absolute whole-body cellular plot, reject
 fractional JavaScript numbers anywhere in analytical scenes, and reject direct transcendental

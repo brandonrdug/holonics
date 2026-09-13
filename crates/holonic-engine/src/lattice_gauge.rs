@@ -946,34 +946,10 @@ impl ExactSpectrum {
 pub fn characteristic_polynomial(
     operator: &ExactRatMatrix,
 ) -> Result<RationalPolynomial, LatticeGaugeRefusal> {
-    if !operator.is_square() {
-        return Err(LatticeGaugeRefusal::Linear(
-            ExactLinearError::NonsquareMatrix,
-        ));
-    }
-    let extent = operator.rows();
-    if extent == 0 {
+    if operator.rows() == 0 {
         return Err(LatticeGaugeRefusal::NothingToDiagonalize);
     }
-    let identity = ExactRatMatrix::identity(extent)?;
-    let mut coefficients = vec![Rat::one()];
-    let mut standing = ExactRatMatrix::zero(extent, extent)?;
-    for step in 1..=extent {
-        let last = coefficients
-            .last()
-            .cloned()
-            .ok_or(LatticeGaugeRefusal::NothingToDiagonalize)?;
-        standing = operator.multiply(&standing)?.add(&identity.scaled(&last))?;
-        let product = operator.multiply(&standing)?;
-        let mut trace = Rat::zero();
-        for index in 0..extent {
-            trace += product.get(index, index)?;
-        }
-        coefficients.push(-trace / Rat::from_integer(BigInt::from(step as i64)));
-    }
-    // `coefficients[k]` multiplies `x^(extent-k)`; `RationalPolynomial` is ascending.
-    coefficients.reverse();
-    Ok(RationalPolynomial::new(coefficients))
+    Ok(operator.characteristic_polynomial()?)
 }
 
 /// **The exact spectrum of a rational matrix**: the complete rational eigenvalue population with

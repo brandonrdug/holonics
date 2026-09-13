@@ -96,14 +96,20 @@ human origins and to everyday reasoning within the project.
 | **Holonic Engine** | Exact carriers, causal relations, transport, reactions and device execution |
 | **HNN — Holonic Neural Network** | The neural architecture explored within Holonics |
 | **Eros** | Union, composition and formative activity at every nested holonic scope |
-| **Athena** | The general wisdom/model ecology carrying available constructions and their applicability |
-| **Hephaestus Automata** | Task-scoped mathematical applications; exact solver references and a native integration design |
+| **Athena** | General wisdom/model products and uses of HNN's available constructions |
+| **Hephaestus Automata** | Mathematical applications for constructing, applying and reusing operators and constrained families |
 | **Soulkiller** | Analysis and dismantling of supported inherited models into reusable native material |
 
-[open] **Eros and Athena are experimental and have not attained the intended useful, general
-learning product. Athena-alpha remains unfinished.** Bounded native execution, persistence,
-normalization and model-dismantling results retain their own evidence scopes. They do not make
-the prototypes a production-ready assistant.
+[open] **The intended useful, general Athena assistant remains unfinished.** The mathematical
+workshop already returns exact inferred relations and reusable native operator applications;
+the broader contextual language/code product remains under construction. Native execution,
+formation, persistence and model-dismantling results retain their stated evidence scopes.
+
+[project-postulate] This breadth is part of the working method. A result in arithmetic can
+supply a recurrence, a geometric receiver can expose a hidden mode, and a physical balance can
+clarify an information-cost boundary. Their concrete source maps make them reusable construction
+material. The [implementation method](docs/DEVELOPMENT.md#mathematical-implementation-and-continuation)
+keeps those relationships and the human objective present across sustained work and context handoffs.
 
 [definition] Current prose uses **HNN**. Existing source identifiers and historical campaign
 labels may still contain `hna` or `HNA`; these remain references to those implementations and

@@ -234,7 +234,8 @@ impl BilinearRealization {
             self.core.right_forms.columns(),
             ExactRatMatrix::new(rows)?.multiply(&self.core.tensor_image)?,
         )?;
-        self.core.bind(&target)?
+        self.core
+            .bind(&target)?
             .map_err(|_| ExactLinearError::RankFactorizationCertificateFailure)
     }
     pub fn apply(&self, left: &[Rat], right: &[Rat]) -> Result<Vec<Rat>, ExactLinearError> {
@@ -337,10 +338,15 @@ mod tests {
         let joint = a.join_receivers(&[&b, &a]).unwrap();
         assert!(Arc::ptr_eq(joint.core(), &shared));
         assert_eq!(joint.core().products(), 3);
-        assert_eq!(joint.apply(&[q(2), q(3)], &[q(4), q(5)]).unwrap(),
-            vec![q(-7), q(22), q(8), q(22), q(15), q(-7), q(22)]);
+        assert_eq!(
+            joint.apply(&[q(2), q(3)], &[q(4), q(5)]).unwrap(),
+            vec![q(-7), q(22), q(8), q(22), q(15), q(-7), q(22)]
+        );
         let other = core().bind(&complex()).unwrap().unwrap();
-        assert_eq!(a.join_receivers(&[&other]).unwrap_err(), ExactLinearError::DifferentProductCores);
+        assert_eq!(
+            a.join_receivers(&[&other]).unwrap_err(),
+            ExactLinearError::DifferentProductCores
+        );
     }
     #[test]
     fn collapsed_face_returns_a_separating_direction() {

@@ -100,6 +100,20 @@ realizations. Each returned construction is usable at its actual scope as this p
 
 ## Relevance makes relativity constitutive
 
+[definition] A conserved face and an unchanged source are different constructions. An invariant
+states `C(Tx)=C(x)` for its declared family; the source may move within its fibre. A rebase carries
+the entire diagram, while an active modulator can change the actual source or constitutive law.
+Its effect may be linear, reflected, nonlinear or presently invisible relative to the receiving
+chart. Future-stable invisibility is a stronger relation than one zero reading. Clock parity,
+orientation and winding therefore remain operands, rather than synonyms for a past-state archive.
+
+[definition] A mathematical constant is understood through the relation that selects it: a
+ratio or fixed point, a spectral value, a period, a normalization, or an extremal threshold.
+Coincident numerical readings become a useful cross-domain connection only through their actual
+source maps. Such a connection can return a new algorithm or representation before it settles
+a broader physical or mathematical endpoint. The elementary constructions are reusable methods
+of intelligence within this programme, with exact and empirical consequences at their scopes.
+
 [project-postulate] **Everything is oriented and relevant.** Every occurrence participates in
 conditioned causal relations; its existence and possibilities of consequence are situated.
 The relevance hypothesis concerns that participation itself. Comparison of coordinate frames
@@ -126,6 +140,12 @@ self-description. Mathematical notation, a scientific instrument and an engineer
 can expose different faces of the same constrained relation.
 
 ## Counting, geometry and construction share their origin
+
+[definition] Scalar measurements can enter a declared constitutive law or optimization. A
+coefficient, energy, loss or code length is not disqualified by being scalar. Its comparands,
+units, causal source and lawful role determine what it can decide. The failure is promoting a
+gauge-dependent or authored reading into intrinsic semantic identity or admission without that
+map. This distinction preserves both situated differences and productive mathematical inference.
 
 [project-postulate] Mathematical relations and their constructive possibilities precede their
 human notation, textbook divisions and historical discovery. Brandon's Archimedes/calculus

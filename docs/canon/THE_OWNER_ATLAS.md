@@ -35,8 +35,8 @@ naming *which file owns the thing* — that answer survives edits; the address d
 **This atlas covers the subjects swept on 2026-08-13 and no others.** Those subjects are: the intake
 mouth, Fourier/spectral/scale, spin, charge, mass and gravitas, Einstein and curvature, circuitry
 (junction, admittance, reflection, delay, capacitance), and lightning. Every other subject is
-**absent from this atlas, not from the tree**, and adding one means running its sweep and depositing
-the result here.
+**absent from this historical atlas, not from the tree**. Current navigation belongs in
+`docs/ARCHITECTURE_MAP.md` and the subject guides; this snapshot is not extended into a new census.
 
 **Two standing rules, because both were broken tonight.**
 
@@ -207,7 +207,9 @@ the cut side exists as `im B*`.
 1. **It asserts nothing.** Every row is graded at its owner. Citing a row as evidence is citing the
    wrong thing.
 2. **A row is not a licence.** That an owner exists says nothing about whether it is wired, driven,
-   or reachable. `docs/canon/THE_INFORMATION_ENGINE.md` §2 carries the wiring; read it before claiming
-   the body conducts through anything here.
-3. **Absences decay.** Every absence above is dated 2026-08-13 and carries its command. Re-run it.
+   or reachable. The August wiring is preserved in
+   `archive/operations/2026-09-12_INFORMATION_ENGINE_BEFORE_FRONTIER_CONSOLIDATION.md` §2.
+   Inspect the current source and actual consuming call before claiming present conduct.
+3. **Absences are dated.** Every absence above is an August 13 observation. A current claim
+   needs a scoped source investigation; it does not require rerunning a blanket census.
 4. **The aperture is declared in §0 and is small.** A subject not listed is not absent from the tree.

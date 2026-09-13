@@ -7,8 +7,9 @@
 //!
 //! The default `native` feature preserves the existing `hna`, `soulkiller` and `interop`
 //! interfaces and exposes their `engine` owner. The HNN API contains several explicitly scoped
-//! realizations. In particular, `hna::alpha` is experimental byte-field apparatus, not an
-//! attained general-language model. Package containers are distinct from standard executable
+//! realizations. `hna::alpha` retains the source-qualified exterior exposure reader; the
+//! byte-field cultivation adapters are archived. Current HNN construction uses `hna::native`.
+//! Package containers are distinct from standard executable
 //! model graphs; see docs/INTEROPERABILITY.md.
 
 pub use holonic_structure as structure;

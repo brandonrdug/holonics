@@ -45,6 +45,14 @@ Paths in code spans are repository-relative.
 
 ## Repository-local evidence and handoff
 
+[project-postulate] A context handoff carries the current construction's reason as well as its
+mechanics: the human objective and breadth, governing corrections, active unknown, available
+relations, actual source/receiver, consuming implementation, failed alternatives that matter,
+and the next discriminating result. Use the existing position and dated record for continuity;
+do not create another scheduler or raw-history requirement. The
+[development method](DEVELOPMENT.md#mathematical-implementation-and-continuation) gives the
+working form. An agent report is testimony until the primary inspects its source and checks.
+
 [project-postulate] Brandon's September 6 consolidation retires the external memory database and
 connector from Holonics operation. Do not query or deposit into it, start cursors, send graph
 messages, require schema consensus, or make a Mac checkout depend on its installation. The

@@ -73,6 +73,16 @@ currents, with no Lean or exterior evaluator in the learning path.
 
 ## One framework, several realizations
 
+[definition] The [September 12 frontier consolidation](../research/records/2026-09-12_THE_FRONTIER_REVIEW_CONSOLIDATES_CONSTRUCTIVE_CONTINUITY.md)
+recovers the live workspace and formal/scientific breadth, consolidates shared polynomial
+inference and its public HNN consumer, and repairs the source acknowledgement boundary.
+[Development](DEVELOPMENT.md#mathematical-implementation-and-continuation) owns the continuing
+implementation method; the [Information Engine](canon/THE_INFORMATION_ENGINE.md) now carries
+current doctrine with its historical census preserved separately. The
+[golden-ratio/Gamma/zeta return](../research/records/2026-09-12_GOLDEN_RECIPROCAL_JOINS_GAMMA_ZETA_AND_SPOKE_GAPS.md)
+demonstrates that method through explicit functional arguments, characters, gap profiles and
+Mellin transforms. Those relationships remain available to further construction across subjects.
+
 [proved-derived; formal-checked] The
 [relevance and loss foundation](../research/records/2026-09-09_RELEVANCE_LOSS_AND_REALIZED_CLASSES.md)
 now derives the greatest stable future receiver agreement, with an additive invariant-kernel

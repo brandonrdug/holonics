@@ -86,8 +86,9 @@ struct RecurrenceReading {
     monic_coefficients: Vec<String>,
     coefficient_family: &'static str,
     coefficient_kernel: Vec<Vec<String>>,
-    verified_full_matrix_residual: Vec<Vec<String>>,
-    power_construction_work: ExactWork,
+    minimal_polynomial_is_unique: bool,
+    verified_full_matrix_residual_zero: bool,
+    minimal_polynomial_work: ExactWork,
 }
 
 fn matrix_chart(name: &'static str, rows: &'static [&'static [i64]]) -> MatrixChart {
@@ -296,91 +297,37 @@ fn kronecker_sum(
     Ok(ExactRatMatrix::shaped(size, size, rows)?)
 }
 
-fn recurrence_residual(
-    powers: &[ExactRatMatrix],
-    coefficients: &[relational_geometry::Rat],
-    degree: usize,
-) -> Result<ExactRatMatrix, Box<dyn std::error::Error>> {
-    let mut residual = vec![vec![q(0, 1); powers[0].columns()]; powers[0].rows()];
-    for (power, coefficient) in coefficients.iter().enumerate() {
-        for (row, values) in residual.iter_mut().enumerate() {
-            for (column, value) in values.iter_mut().enumerate() {
-                *value += coefficient * powers[power].get(row, column)?;
-            }
-        }
-    }
-    for (row, values) in residual.iter_mut().enumerate() {
-        for (column, value) in values.iter_mut().enumerate() {
-            *value += powers[degree].get(row, column)?;
-        }
-    }
-    Ok(ExactRatMatrix::new(residual)?)
-}
-
 fn infer_monic_annihilator(
     name: &str,
     operator: ExactRatMatrix,
 ) -> Result<RecurrenceReading, Box<dyn std::error::Error>> {
     let dimension = operator.rows();
-    let mut powers = vec![ExactRatMatrix::identity(dimension)?];
-    let mut power_work = ExactWork::nothing();
-    for degree in 1..=dimension {
-        let (next, work) = powers
-            .last()
-            .expect("the identity power exists")
-            .multiply_with_work(&operator)?;
-        power_work = power_work.then(&work);
-        powers.push(next);
-
-        let mut relation_rows = Vec::with_capacity(operator.rows() * operator.columns());
-        for row in 0..operator.rows() {
-            for column in 0..operator.columns() {
-                let mut coefficients = Vec::with_capacity(degree);
-                for power in 0..degree {
-                    coefficients.push(powers[power].get(row, column)?.clone());
-                }
-                relation_rows.push(coefficients);
-            }
-        }
-        let target: Vec<_> = powers[degree]
-            .entries()
+    let (polynomial, work) = operator.minimal_polynomial_with_work()?;
+    let degree = polynomial
+        .degree()
+        .ok_or("the exact matrix returned no minimal polynomial")?;
+    Ok(RecurrenceReading {
+        name: name.to_owned(),
+        owner: "exact_linear::ExactRatMatrix::minimal_polynomial_with_work",
+        matrix_dimension: dimension,
+        operator: operator
+            .to_rows()
             .iter()
-            .map(|entry| -entry.clone())
-            .collect();
-        let relation = ExactRatMatrix::new(relation_rows)?;
-        let Some((coefficients, kernel)) = relation.preimage_fibre(&target)? else {
-            continue;
-        };
-        let residual = recurrence_residual(&powers, &coefficients, degree)?;
-        assert!(residual.entries().iter().all(Zero::is_zero));
-        let mut monic_coefficients = coefficients.clone();
-        monic_coefficients.push(relational_geometry::Rat::one());
-        return Ok(RecurrenceReading {
-            name: name.to_owned(),
-            owner: "exact_linear::ExactRatMatrix::preimage_fibre",
-            matrix_dimension: dimension,
-            operator: operator
-                .to_rows()
-                .iter()
-                .map(|row| row.iter().map(ToString::to_string).collect())
-                .collect(),
-            first_consistent_degree: degree,
-            degrees_attempted: (1..=degree).collect(),
-            monic_coefficients: monic_coefficients.iter().map(ToString::to_string).collect(),
-            coefficient_family: "returned particular + span(returned kernel)",
-            coefficient_kernel: kernel
-                .iter()
-                .map(|row| row.iter().map(ToString::to_string).collect())
-                .collect(),
-            verified_full_matrix_residual: residual
-                .to_rows()
-                .iter()
-                .map(|row| row.iter().map(ToString::to_string).collect())
-                .collect(),
-            power_construction_work: power_work,
-        });
-    }
-    Err(format!("no monic annihilator found through degree {dimension}").into())
+            .map(|row| row.iter().map(ToString::to_string).collect())
+            .collect(),
+        first_consistent_degree: degree,
+        degrees_attempted: (1..=degree).collect(),
+        monic_coefficients: polynomial
+            .coefficients()
+            .iter()
+            .map(ToString::to_string)
+            .collect(),
+        coefficient_family: "unique monic minimum-degree relation; preimage kernel validated empty",
+        coefficient_kernel: Vec::new(),
+        minimal_polynomial_is_unique: true,
+        verified_full_matrix_residual_zero: true,
+        minimal_polynomial_work: work,
+    })
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

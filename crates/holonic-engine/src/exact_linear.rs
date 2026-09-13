@@ -48,6 +48,8 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::rational_polynomial::RationalPolynomial;
+
 mod bilinear;
 mod energy_momentum;
 mod joint_bilinear;
@@ -206,19 +208,81 @@ impl ExactRatMatrix {
     }
 
     pub fn scaled(&self, coefficient: &Rat) -> Self {
+        self.scaled_impl(coefficient, None)
+    }
+
+    pub fn scaled_with_work(&self, coefficient: &Rat) -> (Self, crate::exact_work::ExactWork) {
+        let mut work = crate::exact_work::ExactWork::nothing();
+        let result = self.scaled_impl(coefficient, Some(&mut work));
+        (result, work)
+    }
+
+    fn scaled_impl(
+        &self,
+        coefficient: &Rat,
+        mut work: Option<&mut crate::exact_work::ExactWork>,
+    ) -> Self {
+        let entries = self
+            .entries
+            .iter()
+            .map(|entry| {
+                let value = coefficient * entry;
+                if let Some(work) = work.as_deref_mut() {
+                    work.multiplied(1);
+                    work.wrote(&value);
+                }
+                value
+            })
+            .collect();
         Self {
             rows: self.rows,
             columns: self.columns,
-            entries: self
-                .entries
-                .iter()
-                .map(|entry| coefficient * entry)
-                .collect(),
+            entries,
         }
     }
 
     pub fn add(&self, other: &Self) -> Result<Self, ExactLinearError> {
-        self.zip(other, |left, right| left + right)
+        self.add_impl(other, None)
+    }
+
+    pub fn add_with_work(
+        &self,
+        other: &Self,
+    ) -> Result<(Self, crate::exact_work::ExactWork), ExactLinearError> {
+        if self.rows != other.rows || self.columns != other.columns {
+            return Err(ExactLinearError::ShapeMismatch);
+        }
+        let mut work = crate::exact_work::ExactWork::nothing();
+        let result = self.add_impl(other, Some(&mut work))?;
+        Ok((result, work))
+    }
+
+    fn add_impl(
+        &self,
+        other: &Self,
+        mut work: Option<&mut crate::exact_work::ExactWork>,
+    ) -> Result<Self, ExactLinearError> {
+        if self.rows != other.rows || self.columns != other.columns {
+            return Err(ExactLinearError::ShapeMismatch);
+        }
+        let entries = self
+            .entries
+            .iter()
+            .zip(&other.entries)
+            .map(|(left, right)| {
+                let value = left + right;
+                if let Some(work) = work.as_deref_mut() {
+                    work.added(1);
+                    work.wrote(&value);
+                }
+                value
+            })
+            .collect();
+        Ok(Self {
+            rows: self.rows,
+            columns: self.columns,
+            entries,
+        })
     }
 
     pub fn subtract(&self, other: &Self) -> Result<Self, ExactLinearError> {
@@ -263,6 +327,199 @@ impl ExactRatMatrix {
             }
         }
         Ok((result, work))
+    }
+
+    /// The monic characteristic polynomial, computed by exact Faddeev--LeVerrier recurrence.
+    ///
+    /// This is the generic matrix operation. Domain-specific spectrum owners may wrap it in their
+    /// own refusal type, but the exact matrix and polynomial arithmetic remain shared here.
+    pub fn characteristic_polynomial(&self) -> Result<RationalPolynomial, ExactLinearError> {
+        if !self.is_square() {
+            return Err(ExactLinearError::NonsquareMatrix);
+        }
+        let extent = self.rows;
+        let identity = Self::identity(extent)?;
+        let mut coefficients = vec![Rat::one()];
+        let mut standing = Self::zero(extent, extent)?;
+        for step in 1..=extent {
+            let last = coefficients
+                .last()
+                .cloned()
+                .expect("the characteristic recurrence has a leading coefficient");
+            standing = self.multiply(&standing)?.add(&identity.scaled(&last))?;
+            let product = self.multiply(&standing)?;
+            let trace: Rat = (0..extent)
+                .map(|index| product.get(index, index).cloned())
+                .collect::<Result<Vec<_>, _>>()?
+                .into_iter()
+                .sum();
+            coefficients.push(-trace / Rat::from_integer(BigInt::from(step as i64)));
+        }
+        coefficients.reverse();
+        Ok(RationalPolynomial::new(coefficients))
+    }
+
+    /// The first monic polynomial relation among the powers of this square exact matrix.
+    ///
+    /// The search is over the matrix's own dimension, which is the Cayley--Hamilton bound. Each
+    /// candidate solves the flattened operator relation through [`Self::preimage_fibre`]; the first
+    /// reachable degree is the unique monic minimal polynomial over `Q`.
+    pub fn minimal_polynomial(&self) -> Result<RationalPolynomial, ExactLinearError> {
+        Ok(self.minimal_polynomial_with_work()?.0)
+    }
+
+    /// The minimal polynomial together with the exact work of power construction and relation
+    /// searches. The coefficient preimage kernel is checked to be empty at the first degree because
+    /// a monic minimum-degree relation is unique; callers needing a family at a fixed larger degree
+    /// should use [`Self::preimage_fibre`] directly.
+    pub fn minimal_polynomial_with_work(
+        &self,
+    ) -> Result<(RationalPolynomial, crate::exact_work::ExactWork), ExactLinearError> {
+        let (polynomial, work, _) = self.minimal_polynomial_with_work_and_powers()?;
+        Ok((polynomial, work))
+    }
+
+    fn minimal_polynomial_with_work_and_powers(
+        &self,
+    ) -> Result<(RationalPolynomial, crate::exact_work::ExactWork, Vec<Self>), ExactLinearError>
+    {
+        if !self.is_square() {
+            return Err(ExactLinearError::NonsquareMatrix);
+        }
+        if self.rows == 0 {
+            return Ok((
+                RationalPolynomial::one(),
+                crate::exact_work::ExactWork::nothing(),
+                vec![Self::identity(0)?],
+            ));
+        }
+
+        let mut powers = vec![Self::identity(self.rows)?];
+        let mut work = crate::exact_work::ExactWork::nothing();
+        for degree in 1..=self.rows {
+            let (next, power_work) = powers
+                .last()
+                .expect("the identity power exists")
+                .multiply_with_work(self)?;
+            work = work.then(&power_work);
+            powers.push(next);
+
+            let mut relation_rows = Vec::with_capacity(self.rows * self.columns);
+            for row in 0..self.rows {
+                for column in 0..self.columns {
+                    let mut coefficients = Vec::with_capacity(degree);
+                    for power in 0..degree {
+                        coefficients.push(powers[power].get(row, column)?.clone());
+                    }
+                    relation_rows.push(coefficients);
+                }
+            }
+            let target: Vec<Rat> = powers[degree]
+                .entries
+                .iter()
+                .map(|entry| -entry.clone())
+                .collect();
+            let relation = Self::new(relation_rows)?;
+            let (solution, relation_work) = relation.preimage_fibre_with_work(&target)?;
+            work = work.then(&relation_work);
+            let Some((mut coefficients, kernel)) = solution else {
+                continue;
+            };
+            if !kernel.is_empty() {
+                return Err(ExactLinearError::RankFactorizationCertificateFailure);
+            }
+            coefficients.push(Rat::one());
+            let polynomial = RationalPolynomial::new(coefficients.clone());
+            let mut residual = Self::zero(self.rows, self.columns)?;
+            for (power, coefficient) in coefficients.iter().enumerate() {
+                let scaled = powers[power].scaled_with_work(coefficient);
+                work = work.then(&scaled.1);
+                let added = residual.add_with_work(&scaled.0)?;
+                work = work.then(&added.1);
+                residual = added.0;
+            }
+            if residual.entries.iter().any(|entry| !entry.is_zero()) {
+                return Err(ExactLinearError::RankFactorizationCertificateFailure);
+            }
+            return Ok((polynomial, work, powers));
+        }
+        Err(ExactLinearError::RankFactorizationCertificateFailure)
+    }
+
+    /// Evaluate a large operator power after reducing its exponent modulo the exact minimal
+    /// polynomial. The returned matrix is the same operator power, with the polynomial reduction
+    /// and the exact matrix multiplication/evaluation work retained.
+    pub fn power_reduced(&self, exponent: u64) -> Result<Self, ExactLinearError> {
+        Ok(self.power_reduced_with_work(exponent)?.0)
+    }
+
+    /// The reduced operator power together with the work of discovering its minimal polynomial,
+    /// constructing the needed powers, and evaluating the reduced polynomial in the matrix.
+    /// Polynomial coefficient arithmetic itself is exact and uses the existing
+    /// `RationalPolynomial` owner.
+    pub fn power_reduced_with_work(
+        &self,
+        exponent: u64,
+    ) -> Result<(Self, crate::exact_work::ExactWork), ExactLinearError> {
+        if !self.is_square() {
+            return Err(ExactLinearError::NonsquareMatrix);
+        }
+        if exponent == 0 {
+            return Ok((
+                Self::identity(self.rows)?,
+                crate::exact_work::ExactWork::nothing(),
+            ));
+        }
+        let (minimal, mut work, powers) = self.minimal_polynomial_with_work_and_powers()?;
+        if minimal.degree().is_none() {
+            return Err(ExactLinearError::RankFactorizationCertificateFailure);
+        }
+        let mut reduced_result = RationalPolynomial::one();
+        let mut reduced_base = RationalPolynomial::variable();
+        let mut remaining = exponent;
+        while remaining > 0 {
+            if remaining % 2 == 1 {
+                let (product, product_work) = reduced_result.times_with_work(&reduced_base);
+                work = work.then(&product_work);
+                let (_, remainder, division_work) = product
+                    .divided_by_with_work(&minimal)
+                    .map_err(|_| ExactLinearError::RankFactorizationCertificateFailure)?;
+                work = work.then(&division_work);
+                reduced_result = remainder;
+            }
+            remaining /= 2;
+            if remaining > 0 {
+                let (product, product_work) = reduced_base.times_with_work(&reduced_base);
+                work = work.then(&product_work);
+                let (_, remainder, division_work) = product
+                    .divided_by_with_work(&minimal)
+                    .map_err(|_| ExactLinearError::RankFactorizationCertificateFailure)?;
+                work = work.then(&division_work);
+                reduced_base = remainder;
+            }
+        }
+
+        let mut rows = vec![vec![Rat::zero(); self.columns]; self.rows];
+        for (power, coefficient) in reduced_result.coefficients().iter().enumerate() {
+            for row in 0..self.rows {
+                for column in 0..self.columns {
+                    let term = coefficient * powers[power].get(row, column)?;
+                    work.multiplied(1);
+                    if power == 0 {
+                        rows[row][column] = term;
+                    } else {
+                        rows[row][column] += term;
+                        work.added(1);
+                    }
+                }
+            }
+        }
+        for row in &rows {
+            for value in row {
+                work.wrote(value);
+            }
+        }
+        Ok((Self::new(rows)?, work))
     }
 
     pub fn apply(&self, vector: &[Rat]) -> Result<Vec<Rat>, ExactLinearError> {
@@ -512,6 +769,14 @@ impl ExactRatMatrix {
     /// zero: the map collapses nothing.
     pub fn kernel_basis(&self) -> Result<Vec<Vec<Rat>>, ExactLinearError> {
         let (reduced, pivots, _) = self.reduced_row_echelon()?;
+        self.kernel_basis_from_reduced(&reduced, &pivots)
+    }
+
+    fn kernel_basis_from_reduced(
+        &self,
+        reduced: &Self,
+        pivots: &[usize],
+    ) -> Result<Vec<Vec<Rat>>, ExactLinearError> {
         let free: Vec<usize> = (0..self.columns)
             .filter(|column| !pivots.contains(column))
             .collect();
@@ -559,6 +824,24 @@ impl ExactRatMatrix {
         &self,
         target: &[Rat],
     ) -> Result<Option<(Vec<Rat>, Vec<Vec<Rat>>)>, ExactLinearError> {
+        Ok(self.preimage_fibre_with_work(target)?.0)
+    }
+
+    /// The complete affine preimage together with the exact work of its one augmented RREF.
+    ///
+    /// The particular and kernel are both derived from the same reduced augmented matrix. This
+    /// keeps the returned work truthful and avoids rerunning the source reduction just to recover
+    /// its kernel basis.
+    pub fn preimage_fibre_with_work(
+        &self,
+        target: &[Rat],
+    ) -> Result<
+        (
+            Option<(Vec<Rat>, Vec<Vec<Rat>>)>,
+            crate::exact_work::ExactWork,
+        ),
+        ExactLinearError,
+    > {
         if target.len() != self.rows {
             return Err(ExactLinearError::ShapeMismatch);
         }
@@ -567,16 +850,17 @@ impl ExactRatMatrix {
             row.push(value.clone());
         }
         let augmented = Self::new(augmented)?;
-        let (reduced, pivots, _) = augmented.reduced_row_echelon()?;
+        let (reduced, pivots, work) = augmented.reduced_row_echelon()?;
         if pivots.last() == Some(&self.columns) {
             // A pivot in the augmented column: the target is outside the image.
-            return Ok(None);
+            return Ok((None, work));
         }
         let mut particular = vec![Rat::zero(); self.columns];
         for (row, pivot) in pivots.iter().enumerate() {
             particular[*pivot] = reduced.get(row, self.columns)?.clone();
         }
-        Ok(Some((particular, self.kernel_basis()?)))
+        let kernel = self.kernel_basis_from_reduced(&reduced, &pivots)?;
+        Ok((Some((particular, kernel)), work))
     }
 
     /// The covector witnessing that a target lies outside the image, or `None` when it does not.
@@ -1159,5 +1443,70 @@ mod tests {
                 .inverse(),
             Err(ExactLinearError::NonsquareMatrix)
         );
+    }
+
+    #[test]
+    fn characteristic_and_minimal_polynomials_share_the_exact_matrix_owner() {
+        let repeated = ExactRatMatrix::from_diagonal(vec![
+            Rat::one(),
+            Rat::from_integer(2.into()),
+            Rat::from_integer(2.into()),
+        ])
+        .unwrap();
+        assert_eq!(
+            repeated.characteristic_polynomial().unwrap(),
+            RationalPolynomial::new(vec![
+                Rat::from_integer(BigInt::from(-4)),
+                Rat::from_integer(8.into()),
+                Rat::from_integer(BigInt::from(-5)),
+                Rat::one(),
+            ])
+        );
+        assert_eq!(
+            repeated.minimal_polynomial().unwrap(),
+            RationalPolynomial::new(vec![
+                Rat::from_integer(2.into()),
+                Rat::from_integer(BigInt::from(-3)),
+                Rat::one(),
+            ])
+        );
+    }
+
+    #[test]
+    fn the_minimal_polynomial_of_a_nilpotent_jordan_block_is_x_squared() {
+        let nilpotent = matrix(&[&[0, 1], &[0, 0]]);
+        assert_eq!(
+            nilpotent.minimal_polynomial().unwrap(),
+            RationalPolynomial::new(vec![Rat::zero(), Rat::zero(), Rat::one()])
+        );
+        assert_eq!(
+            nilpotent.power_reduced(7).unwrap(),
+            ExactRatMatrix::zero(2, 2).unwrap()
+        );
+    }
+
+    #[test]
+    fn preimage_work_and_kernel_come_from_one_augmented_reduction() {
+        let map = matrix(&[&[1, 1], &[0, 0]]);
+        let target = vec![Rat::one(), Rat::zero()];
+        let (fibre, work) = map.preimage_fibre_with_work(&target).unwrap();
+        let (particular, kernel) = fibre.unwrap();
+        assert_eq!(map.apply(&particular).unwrap(), target);
+        assert_eq!(kernel.len(), 1);
+        assert!(map.apply(&kernel[0]).unwrap().iter().all(Zero::is_zero));
+        assert!(!work.entries_written.is_zero());
+    }
+
+    #[test]
+    fn reduced_powers_use_the_minimal_relation_and_return_work() {
+        let diagonal =
+            ExactRatMatrix::from_diagonal(vec![Rat::one(), Rat::from_integer(2.into())]).unwrap();
+        let (power, work) = diagonal.power_reduced_with_work(7).unwrap();
+        assert_eq!(
+            power,
+            ExactRatMatrix::from_diagonal(vec![Rat::one(), Rat::from_integer(128.into())]).unwrap()
+        );
+        assert!(!work.entries_written.is_zero());
+        assert!(!work.cumulative_bits.is_zero());
     }
 }

@@ -79,19 +79,21 @@ nested automata that construct, compare and refine further automata.
 
 ## Immediate mathematical application and implementation
 
-[project-postulate] Brandon's subsequent September 12 request pauses the parallel HNN session
-to derive the time-parity/cross-entropy, torus/clock, friction/code-cost and Smith/fractal
-connections against the current continuation owners. This is the present requested research
-increment. Carry its concrete returned generators, receiver laws and executable comparisons
-back into the existing contextual/modal packets; it does not found another engine or require
-a general P-versus-NP solution before useful construction.
+[project-postulate] Brandon's latest September 12 frontier review makes constructive continuity
+and consolidation explicit throughout this order. Preserve the wider framework, active
+mathematical unknown, available generating relations and actual consuming application across
+long runs and context handoffs. Use the
+[implementation method](../DEVELOPMENT.md#mathematical-implementation-and-continuation);
+do not let a historical status page or a support-mechanism loop become the objective.
 
-[definition] That [research increment has returned](../../research/records/2026-09-12_PHASE_PARITY_AND_CLOCKED_TORI_RETURN_GENERATOR_CODE_POTENTIALS.md):
-inferred operator recurrences now feed the public resident mathematical application, while
-the phase/clock and code-potential laws have focused formal checks. Its remaining native
-consumer is the same contextual/modal construction below: apply a declared analyzer to the
-retained joint before scalar decoding, lower admitted repeated actions without dense expansion,
-and retain the source clock and actual cost boundary when the task requires them.
+[definition] The [frontier consolidation](../../research/records/2026-09-12_THE_FRONTIER_REVIEW_CONSOLIDATES_CONSTRUCTIVE_CONTINUITY.md)
+and the [phase/clock return](../../research/records/2026-09-12_PHASE_PARITY_AND_CLOCKED_TORI_RETURN_GENERATOR_CODE_POTENTIALS.md)
+feed the existing contextual/modal packets: apply an admitted analyzer to the retained joint,
+construct powers through the shared polynomial owner, compile applicable learned continuations
+without unnecessary dense expansion, and retain the source clock and actual cost boundary
+when the task requires them. The
+[Gamma/zeta and gap source](../../research/records/2026-09-12_GOLDEN_RECIPROCAL_JOINS_GAMMA_ZETA_AND_SPOKE_GAPS.md)
+adds analytic applications and remainders, not another engine or a new endpoint prerequisite.
 
 [project-postulate] Brandon's latest September 12 planning direction makes productive HNN
 integration the immediate priority. The established mathematics supplies enough direction to
@@ -100,12 +102,12 @@ resolved from the existing source and actual failed compositions. Progress means
 mathematical capability or substantive Athena output, with the corresponding native binding
 and cost, not a new local theorem or return-cycle demonstration by itself.
 
-[established-bounded; source-inspected] The [implementation planning review](../../research/records/2026-09-12_THE_HNN_PLAN_IS_ORDERED_BY_PRODUCTIVE_GENERATOR_INTEGRATION.md)
-pins the current facts: repeated Base/Programme incorporation already works; the unit-symbol
-decoder already follows native generator execution; the text calibration fixes h=1 and learns
-one accumulated relation; the dependent programme reevaluates an accumulating operation word;
-and the useful resident Hephaestus cycle is still example-only. These are distinct boundaries.
-Neither another incorporation campaign nor replacing the alphabet decoder addresses them.
+[definition] The [implementation planning review](../../research/records/2026-09-12_THE_HNN_PLAN_IS_ORDERED_BY_PRODUCTIVE_GENERATOR_INTEGRATION.md)
+retains its source snapshot and the reason for the packets below. Base/Programme return and the
+symbol decoder are available owners; callable mathematics and joint learned preview have since
+returned. The remaining source/condition and accumulating-programme limitations are distinct
+construction questions. CONSTRUCTION_STATE records their current evidence; the old example-only
+workshop description is not a remaining task.
 
 [definition] The following implementation packets deliver the six shared responsibilities
 above. The [first packet has returned](../../research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md)

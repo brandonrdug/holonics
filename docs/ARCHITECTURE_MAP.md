@@ -182,10 +182,15 @@ connects it to the existing addressed causal-length, physical and complexity own
 [definition] The [phase/clock return](../research/records/2026-09-12_PHASE_PARITY_AND_CLOCKED_TORI_RETURN_GENERATOR_CODE_POTENTIALS.md)
 uses `Millennium/Turn.lean` for the Fibonacci clock's signed golden residue;
 `holonic-engine/examples/phase_clock_smith.rs` for finite-clock Smith kernels and inferred
-monic operator recurrences through `rebase_invariants` and `ExactRatMatrix::preimage_fibre`;
+monic operator recurrences through `rebase_invariants` and `ExactRatMatrix::minimal_polynomial`;
 and `research/experiments/pentagonal_torus_transport/` for their public resident HNN application.
-The native consumer currently takes lowered matrices. The recurrent coefficient action and
-general learned-family compilation remain their own binding question.
+The [frontier consolidation](../research/records/2026-09-12_THE_FRONTIER_REVIEW_CONSOLIDATES_CONSTRUCTIVE_CONTINUITY.md)
+moves characteristic/minimal polynomials and reduced powers into `ExactRatMatrix`, with the
+existing `RationalPolynomial` arithmetic and one augmented preimage reduction. Lattice-gauge,
+winding and graph consumers share the characteristic owner. Public `MathematicalRequest::Power`
+constructs powers from a retained linear action through this owner and the existing resident
+linear constructor. Resident coefficient-recurrence execution and arbitrary changing learned
+word compilation remain their own binding questions.
 
 ## Foundation and transport
 

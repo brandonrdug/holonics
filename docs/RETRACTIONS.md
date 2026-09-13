@@ -178,5 +178,6 @@ prose-generation records, source-bearing shortcuts were later found and removed.
 HNA/SKE native recurrence and declared-family emissions retain their own bounded scopes; the
 earlier failures do not establish their absence. The historical attachment question is recorded
 in `2026-08-10_THE_MACHINE_RETURNS_EVERY_BRANCH_BECAUSE_NOTHING_ATTACHES.md`,
-`docs/canon/TABLET_THE_RESONANCE.md` §6, and `docs/canon/THE_INFORMATION_ENGINE.md` §5; current scope is in
+`docs/canon/TABLET_THE_RESONANCE.md` §6, and
+`archive/operations/2026-09-12_INFORMATION_ENGINE_BEFORE_FRONTIER_CONSOLIDATION.md` §5; current scope is in
 `CONSTRUCTION_STATE.md`.

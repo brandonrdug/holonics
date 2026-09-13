@@ -84,6 +84,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::exact_value::{AlgebraicRoot, ExactInterval, IntegerPolynomial};
+use crate::exact_work::ExactWork;
 
 mod root_separation;
 pub use root_separation::{RootSeparation, RootSeparationBound};
@@ -178,10 +179,25 @@ impl RationalPolynomial {
     }
 
     pub fn plus(&self, other: &Self) -> Self {
+        self.plus_impl(other, None)
+    }
+
+    pub fn plus_with_work(&self, other: &Self) -> (Self, ExactWork) {
+        let mut work = ExactWork::nothing();
+        let result = self.plus_impl(other, Some(&mut work));
+        (result, work)
+    }
+
+    fn plus_impl(&self, other: &Self, mut work: Option<&mut ExactWork>) -> Self {
         let extent = self.coefficients.len().max(other.coefficients.len());
         let mut coefficients = Vec::with_capacity(extent);
         for degree in 0..extent {
-            coefficients.push(self.coefficient(degree) + other.coefficient(degree));
+            let value = self.coefficient(degree) + other.coefficient(degree);
+            if let Some(work) = work.as_deref_mut() {
+                work.added(1);
+                work.wrote(&value);
+            }
+            coefficients.push(value);
         }
         Self::new(coefficients)
     }
@@ -197,15 +213,42 @@ impl RationalPolynomial {
     }
 
     pub fn scaled(&self, factor: &Rat) -> Self {
-        Self::new(
-            self.coefficients
-                .iter()
-                .map(|coefficient| coefficient * factor)
-                .collect(),
-        )
+        self.scaled_impl(factor, None)
+    }
+
+    pub fn scaled_with_work(&self, factor: &Rat) -> (Self, ExactWork) {
+        let mut work = ExactWork::nothing();
+        let result = self.scaled_impl(factor, Some(&mut work));
+        (result, work)
+    }
+
+    fn scaled_impl(&self, factor: &Rat, mut work: Option<&mut ExactWork>) -> Self {
+        let coefficients = self
+            .coefficients
+            .iter()
+            .map(|coefficient| {
+                let value = coefficient * factor;
+                if let Some(work) = work.as_deref_mut() {
+                    work.multiplied(1);
+                    work.wrote(&value);
+                }
+                value
+            })
+            .collect();
+        Self::new(coefficients)
     }
 
     pub fn times(&self, other: &Self) -> Self {
+        self.times_impl(other, None)
+    }
+
+    pub fn times_with_work(&self, other: &Self) -> (Self, ExactWork) {
+        let mut work = ExactWork::nothing();
+        let result = self.times_impl(other, Some(&mut work));
+        (result, work)
+    }
+
+    fn times_impl(&self, other: &Self, mut work: Option<&mut ExactWork>) -> Self {
         if self.is_zero() || other.is_zero() {
             return Self::zero();
         }
@@ -216,7 +259,14 @@ impl RationalPolynomial {
                 continue;
             }
             for (right_degree, right) in other.coefficients.iter().enumerate() {
-                coefficients[left_degree + right_degree] += left * right;
+                let product = left * right;
+                let coefficient = &mut coefficients[left_degree + right_degree];
+                *coefficient += &product;
+                if let Some(work) = work.as_deref_mut() {
+                    work.multiplied(1);
+                    work.added(1);
+                    work.wrote(coefficient);
+                }
             }
         }
         Self::new(coefficients)
@@ -247,6 +297,24 @@ impl RationalPolynomial {
 
     /// Euclidean division over the field `Q`.
     pub fn divided_by(&self, divisor: &Self) -> Result<(Self, Self), ExactPolynomialError> {
+        self.divided_by_impl(divisor, None)
+            .map(|(quotient, remainder)| (quotient, remainder))
+    }
+
+    pub fn divided_by_with_work(
+        &self,
+        divisor: &Self,
+    ) -> Result<(Self, Self, ExactWork), ExactPolynomialError> {
+        let mut work = ExactWork::nothing();
+        let (quotient, remainder) = self.divided_by_impl(divisor, Some(&mut work))?;
+        Ok((quotient, remainder, work))
+    }
+
+    fn divided_by_impl(
+        &self,
+        divisor: &Self,
+        mut work: Option<&mut ExactWork>,
+    ) -> Result<(Self, Self), ExactPolynomialError> {
         if divisor.is_zero() {
             return Err(ExactPolynomialError::DivisionByZeroPolynomial);
         }
@@ -258,10 +326,19 @@ impl RationalPolynomial {
         while remainder.len() > divisor_degree {
             let shift = remainder.len() - 1 - divisor_degree;
             let factor = remainder[remainder.len() - 1].clone() / &divisor_leading;
+            if let Some(work) = work.as_deref_mut() {
+                work.divided(1);
+                work.wrote(&factor);
+            }
             if !factor.is_zero() {
                 quotient[shift] = factor.clone();
                 for (degree, coefficient) in divisor.coefficients.iter().enumerate() {
                     remainder[shift + degree] -= &factor * coefficient;
+                    if let Some(work) = work.as_deref_mut() {
+                        work.multiplied(1);
+                        work.added(1);
+                        work.wrote(&remainder[shift + degree]);
+                    }
                 }
             }
             remainder.pop();

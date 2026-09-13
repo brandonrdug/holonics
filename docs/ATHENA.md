@@ -11,6 +11,13 @@ the application implementations are in [holonics-hna](../crates/holonics-hna/REA
 
 ## One sustained construction programme
 
+[definition] This guide owns Athena's product and interface contracts. Current native use
+enters through [NATIVE_HNA](NATIVE_HNA.md); the HNP sections below document the separately
+maintained inherited-operator interface and its dated evidence. They do not restart that deferred
+campaign or supply a competing current position. The
+[implementation method](DEVELOPMENT.md#mathematical-implementation-and-continuation) keeps the
+mathematical unknown, available constructions and actual product consumer together across long runs.
+
 [project-postulate] The [live programme](plans/THE_ROADMAP.md#sustained-objective-and-construction-rhythm)
 joins formal mathematics, engine realization and useful Athena conduct. Generator/receiver
 construction, Eros incorporation, constituent formation, Holonic Encoding and application use

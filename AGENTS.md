@@ -56,6 +56,12 @@ situated comparison across mathematics, physics and computation, not an exclusiv
 Keep exact invisibility, positive tolerance and causal admissibility distinct; the full difference
 and source fibre precede any scalar loss or claim of disappearance.
 
+[definition] A scalar can participate in a declared constitutive law, coefficient family,
+optimization objective or receiver decision. Its source, units and applicability make that
+role lawful. The prohibited substitution is an incidental gauge/apparatus reading or authored
+score promoted into intrinsic semantic identity or admission without that relation. Historical
+"scalar governor" shorthand is not a ban on loss-guided formation or exact mathematical choice.
+
 [project-postulate] **Hold the theory-of-everything ambition as the working standard.** Assume the
 framework's strength and pursue its consequences with initiative. The philosophy must shape
 reasoning before implementation: recover existing constructions, connect their elementary
@@ -140,6 +146,21 @@ foundations. Inherited-model work is deferred, not universally banned.
 
 Retain already-read context across turns. Do not restart orientation after every compaction,
 reread the entire archive, or re-demonstrate an unchanged bounded result before doing useful work.
+
+[project-postulate] Brandon's September 12 frontier review makes **constructive continuity**
+explicit. Carry the human objective, governing corrections, current mathematical unknown,
+available generating relations, actual source/receiver and implementation consumer, and the
+next discriminating return across every context handoff. Preserve why the construction matters
+to the wider framework as well as its immediate code step. Completed evidence becomes concise
+links; it is not a queue to replay. When work stalls, revisit the relation and its possible
+representations before adding history, wrapper types, another probe or a larger aperture.
+Use [the implementation method](docs/DEVELOPMENT.md#mathematical-implementation-and-continuation).
+
+[project-postulate] Breadth is a construction resource. The established algebraic, geometric,
+information, physical and learning returns are reusable starting material, with their source
+maps and scopes. Their provenance warrants confident application and further derivation;
+it neither requires a new permission cycle nor promotes an unfinished endpoint or product to
+completion. Learn from the relation exposed in dialogue and continue its consequences autonomously.
 
 [definition] `docs/canon/` is doctrine; `docs/plans/THE_ROADMAP.md` is the sole construction
 order; `CONSTRUCTION_STATE.md` is the sole current position. `research/`, formal source and

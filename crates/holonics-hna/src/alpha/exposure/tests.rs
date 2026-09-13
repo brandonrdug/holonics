@@ -96,6 +96,25 @@ fn actual_response_is_a_later_frame_and_pending_delivery_survives_reopen() {
 }
 
 #[test]
+fn consumer_failure_after_source_part_begins_keeps_occurrence_pending() {
+    let root = tempfile::tempdir().unwrap();
+    let path = write_stream(root.path(), &[occurrence(0, "request", "human", "native source")]);
+    let mut reader = ExposureReader::open(path).unwrap();
+    let before = reader.cursor();
+    let sequence = reader.peek().unwrap().unwrap().sequence;
+    let native_consumer = || -> Result<(), &'static str> {
+        Err("controlled native refusal after the source part began")
+    };
+    assert!(native_consumer().is_err());
+    // A consumer failure cannot be treated as delivery. The selected frame remains the pending
+    // source and its saved cursor remains at the same byte position until a later success.
+    assert_eq!(reader.cursor(), before);
+    assert_eq!(reader.peek().unwrap().unwrap().sequence, sequence);
+    reader.acknowledge(sequence).unwrap();
+    assert!(reader.peek().unwrap().is_none());
+}
+
+#[test]
 fn future_and_unknown_times_cannot_be_declared_development() {
     for time in [
         Some("2026-09-04T00:00:00.000000+00:00"),

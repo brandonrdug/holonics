@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Run exact C5 and C5xC5 actions through the public HNN math session.
 
-The matrices are supplied mathematical data and the monic recurrence coefficients are
-consumed from the existing exact inference receipt.  The script independently constructs
-powers, recurrence reductions, and input products so the native JSONL return is checked
-against exact mathematics.
+The matrices are supplied mathematical data.  The exact inference receipt independently
+supplies a matching recurrence witness; native Power requests infer their own minimal
+polynomials from retained operators.  The script independently constructs powers, recurrence
+reductions, and input products so the native JSONL return is checked against exact mathematics.
 """
 
 from __future__ import annotations
@@ -181,8 +181,8 @@ def main() -> None:
     l5 = matrix_add(
         matrix_scale(identity(5), 2), matrix_add(p, transpose(p)), scale=-1
     )
-    # The canonical polynomial is retained for an independent check; the recurrence source used
-    # below comes from the existing exact inference receipt loaded above.
+    # The canonical polynomial and external inference receipt are retained for independent checks;
+    # native Power infers its recurrence from the retained operator itself.
     canonical_l_poly = [0, 5, -5, 1]
     assert l_poly == canonical_l_poly
     l16 = reduced_power(l5, 16, l_poly)
@@ -191,8 +191,8 @@ def main() -> None:
     x5 = [2, -1, 3, 5, -4]
 
     k = matrix_add(kron(l5, identity(5)), kron(identity(5), l5))
-    # The canonical factored polynomial is retained for an independent check; inferred coefficients
-    # are the recurrence source used below.
+    # The canonical factored polynomial and inferred coefficients are independent matrix checks;
+    # native Power again infers its recurrence from retained K.
     canonical_k_poly = [0, -500, 850, -525, 150, -20, 1]
     assert k_poly == canonical_k_poly
     # Coefficients are ascending; expand the canonical factors independently as a check.
@@ -217,8 +217,9 @@ def main() -> None:
     requests.append(request("compose", operator=1, following=0))
     requests.append(apply_request(2, x5, retain=True))
     requests.append(request("read-product", operator=2, product=0))
-    # A recurrence-reduced L^16 action is supplied as a new exact operator and consumed natively.
-    requests.append(request("construct-linear", coefficients=matrix_wire(l16)))
+    # The native Power request consumes the retained L operator and constructs its exact reduced
+    # power through the shared minimal-polynomial owner and the existing linear resident path.
+    requests.append(request("power", operator=0, exponent=16))
     requests.append(apply_request(3, x5))
 
     # Construct the full K powers as supplied exact matrices. The public Compose path is intended
@@ -230,7 +231,8 @@ def main() -> None:
     for operator in range(4, 10):
         requests.append(apply_request(operator, x25, retain=(operator == 9)))
     requests.append(request("read-product", operator=9, product=1))
-    requests.append(request("construct-linear", coefficients=matrix_wire(k12)))
+    # K^12 follows the same public Power path; l16/k12 above remain independent exact checks.
+    requests.append(request("power", operator=4, exponent=12))
     requests.append(apply_request(10, x25))
     # A later complex analyzer separates two inputs with the same separate intensity face.
     analyzer = [[1, 0, 0, -1], [0, 1, 1, 0], [1, 0, 0, 1], [0, 1, -1, 0]]
@@ -264,13 +266,24 @@ def main() -> None:
     returns = [event for event in events if event.get("event") == "mathematical-return"]
     applied = [event for event in returns if event["value"].get("status") == "applied"]
     reads = [event for event in returns if event["value"].get("status") == "read"]
-    # Applied order: L^3, reduced L^16, K, K^2, ..., K^6, reduced K^12.
+    power_l16 = next(
+        event for event in returns if event["value"].get("power_of") == 0
+    )
+    power_k12 = next(
+        event for event in returns if event["value"].get("power_of") == 4
+    )
+    # Applied order: L^3, native Power(L,16), K, K^2, ..., K^6, native Power(K,12).
     l1x = vector_apply(l5, x5)
     l2x = vector_apply(power(l5, 2), x5)
     assert output_values(applied[0]) == vector_apply(power(l5, 3), x5)
     assert output_values(applied[0]) == [5 * l2x[i] - 5 * l1x[i] for i in range(5)]
     assert output_values(reads[0]) == vector_apply(power(l5, 3), x5)
     assert output_values(applied[1]) == vector_apply(l16, x5)
+    assert power_l16["value"]["power_of"] == 0
+    assert power_l16["value"]["exponent"] == 16
+    assert power_l16["value"]["power_scope"]["source_shape"] == [5, 5]
+    assert "source_reconstruction_work" in power_l16["value"]
+    assert "power_construction_work" in power_l16["value"]
     k6 = power(k, 6)
     # Evaluate the supplied polynomial on the vector from the six native powers.
     native_k_powers = [output_values(applied[index]) for index in range(2, 8)]
@@ -285,6 +298,11 @@ def main() -> None:
     assert annihilated == [0] * 25, annihilated
     assert output_values(reads[1]) == vector_apply(k6, x25)
     assert output_values(applied[8]) == vector_apply(k12, x25)
+    assert power_k12["value"]["power_of"] == 4
+    assert power_k12["value"]["exponent"] == 12
+    assert power_k12["value"]["power_scope"]["source_shape"] == [25, 25]
+    assert "source_reconstruction_work" in power_k12["value"]
+    assert "power_construction_work" in power_k12["value"]
     assert output_values(applied[9]) == vector_apply(analyzer, phase_plus) == [1, 0, 3, 0]
     assert output_values(applied[10]) == vector_apply(analyzer, phase_minus) == [3, 0, 1, 0]
     plus_power = [value * value for value in output_values(applied[9])]
@@ -303,6 +321,7 @@ def main() -> None:
         },
         "inferred_or_checked": {
             "inference_receipt": str(args.inference_receipt),
+            "inference_receipt_scope": "independent matching witness; coefficients are not passed to native Power",
             "inference_summary": {
                 "C5-Laplacian": {
                     "first_consistent_degree": l_inference["first_consistent_degree"],
@@ -321,6 +340,10 @@ def main() -> None:
             "inferred_K25_recurrence_coefficients_ascending": k_poly,
             "native_L3_equals_5L2_minus_5L": True,
             "native_K6_annihilated_by_supplied_polynomial": True,
+            "native_power_requests": {
+                "L16": {"operator": 0, "exponent": 16, "source": "native Power request"},
+                "K12": {"operator": 4, "exponent": 12, "source": "native Power request"},
+            },
             "reduced_powers": {
                 "L16": {"dimension": 5, "same_as_direct_power": True, "max_abs_entry": max(abs(v) for row in l16 for v in row)},
                 "K12": {"dimension": 25, "same_as_direct_power": True, "max_abs_entry": max(abs(v) for row in k12 for v in row)},
@@ -333,8 +356,8 @@ def main() -> None:
         "requests": len(requests),
         "events": len(events),
         "return_count": len(returns),
-        "native_operator_chain": {"L": [0, 1, 2], "L16_reduced": 3, "K": [4, 5, 6, 7, 8, 9], "K12_reduced": 10, "phase_analyzer": 11},
-        "composition_scope": "L3 was formed through public Compose; K2..K6 and reduced K12 were supplied as exact matrices because this session's Compose contract is a retained-core composition path, not a polynomial combiner",
+        "native_operator_chain": {"L": [0, 1, 2], "L16_power": 3, "K": [4, 5, 6, 7, 8, 9], "K12_power": 10, "phase_analyzer": 11},
+        "composition_scope": "L3 was formed through public Compose; Power internally infers the exact minimal-polynomial recurrence and uses the existing linear resident constructor; K2..K6 remain supplied exact matrices because this session's Compose contract is a retained-core composition path, not a polynomial combiner",
         "cost_scope": "per-request cost objects are retained in stdout; process startup/JSON transport are excluded by the native request cost field",
     }
     (directory / "result.json").write_text(json.dumps(metadata, indent=2) + "\n")

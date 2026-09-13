@@ -252,6 +252,12 @@ hypotheses. Neither statement follows from a lone permutation count.
 
 ## What returns to HNN
 
+[historical] The subsequent [frontier consolidation](2026-09-12_THE_FRONTIER_REVIEW_CONSOLIDATES_CONSTRUCTIVE_CONTINUITY.md)
+moves generic recurrence inference into `ExactRatMatrix` and adds public `power` construction
+from a retained linear operator. That later request performs its own shared-owner inference;
+the experiment's exterior recurrence receipt is then an independent comparison. The original
+lowered-matrix handoff and measurements below retain their earlier scope.
+
 [established-bounded; implemented-exact; computational-witness] The same phase/Smith example
 now infers a monic annihilator through `ExactRatMatrix::preimage_fibre`. At each degree d it
 solves `sum_(j<d) c_j vec(A^j)=-vec(A^d)`, retaining the returned coefficient family, and uses

@@ -4,6 +4,56 @@
 `accelerators/` keep their declared toolchains. Lean and Typst are verification/exposition
 apparatus; they are not dependencies that schedule native inference.
 
+## Mathematical implementation and continuation
+
+[project-postulate] Begin each increment from the requested consequence and the mathematical
+unknown it exposes. Holonics' breadth supplies candidate constructions: exact preimages and
+factorization, group/phase transport, recurrence and modal closure, adjoint/normalization,
+boundary/current laws, analytic generators and source-specific physical models. Recover and
+compose the relevant existing relations before introducing another runtime cabinet.
+
+[definition] The working chain is
+
+`requested consequence -> situated source and unknown -> reusable construction -> consuming operation -> returned comparison -> next inference or repair`.
+
+This is a dependency account, not a sequence of universal approval stages. Exact construction,
+empirical formation, native execution and application inspection may proceed together. The
+source, coefficient ring, phase/clock, receiver, admitted future and cost chart state what a
+particular construction means. Only the information required by its actual consumers is retained.
+
+[project-postulate] The agent's continuing brief keeps six things visible: the human objective;
+the latest corrections; the mathematical relation currently being constructed; the owners and
+usable returns already available; the exact consuming map or obstruction; and the next check
+whose outcome changes the construction. Carry this brief into a compaction or handoff in prose
+or the existing position record. It is not a new public type, manifest or generated registry.
+Links replace completed narratives, while the objective and causal reason for the next action
+remain explicit. Read unchanged authority once and recover only what a new question requires.
+
+[project-postulate] Progress is the returned mathematical or product consequence. A proof can
+unlock a cheaper algorithm; an exact solver can return a coefficient family; a native application
+can expose a previously hidden phase; an unsuccessful language reply can identify a wrong source
+relation. State that content directly. A changed state, successful round-trip, test count or
+larger exposure does not by itself explain the learned relation or establish usefulness.
+
+[definition] Diagnose prolonged work at its actual consumer. Whole-prefix reevaluation calls
+for an economical sufficient continuation. Dense future tuples call for a factor/modal form
+when the requested receiver permits it. Early source acknowledgement calls for repairing the
+source-to-successor transaction. A wrong conditional law calls for changed source/condition
+construction. More state machinery, a generic cache or another theorem count does not resolve
+all four. A returned failure should change the hypothesis, representation, owner or next check.
+
+[project-postulate] Consolidate the construction into its mathematical owner and update its
+consumers in the same increment. Generic matrix or polynomial inference belongs with the
+existing algebra, not inside a fixed example. A public application invokes that owner and
+declares its source, output and costs. Preserve compatibility only where there is an actual
+consumer, and keep differences in source/ownership or wire semantics when they are material.
+
+[definition] Repository-wide review means following the live roots, subject boundaries and
+critical source-to-application maps, then repairing the in-scope contradictions found. Record
+the inspected aperture and validation performed. It is not a claim that every theorem, archived
+experiment, backend or external model was rerun. A fresh source census or universal validation
+gate supplies no substitute for the requested construction.
+
 ## Rust and CUDA
 
 The current native engine/HNN build is Linux/CUDA-bound, including generated PTX and CUDA
