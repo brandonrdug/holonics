@@ -13,6 +13,12 @@ use thiserror::Error;
 use crate::{EventId, EventSuccessor, ExactEventLaw};
 use relational_geometry::ReceiverId;
 
+mod affine_orbit;
+pub use affine_orbit::{
+    AffineOrbitCertificate, AffineOrbitContinuation, AffineOrbitError, AffineOrbitSearch,
+    CoprimeModulusDerivation, derive_coprime_modulus, search_affine_orbit,
+};
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PrimeValuation {
     pub prime: u64,

@@ -69,6 +69,15 @@ That graph alone is not an empirical-admission law for arbitrary later field dat
 enclosed comparison and retained discrepancy explicitly while preserving pending producing
 cuts; do not obtain a fitting source by selecting its unknown coordinates from the target.
 
+[open] The consuming empirical return is in progress: for original wave source
+`a=(c-p,c,p)` and produced state v, observed state y supplies target increment `eta=y-c`
+and discrepancy `delta=y-v`. It must update contemporary material using the original source
+family and producing condition. The first finite-enclosure draft failed review and is preserved
+at `.local/recovery/2026-09-13-family-enclosure-draft/`; live native owners remain at the
+verified boundary/interior return. The next construction must derive whole-family moment
+bounds, preserve the historical producing map through material-only rest, and express the same
+formation over dependent condition families without selecting their displayed point.
+
 ## Available returns and unfinished products
 
 [established-bounded; source-inspected] The linked records supply these bounded returns and
@@ -88,6 +97,16 @@ serializes that local object; it is not a whole-session checkpoint. Existing Sou
 and HNP evidence remains available at its recorded scope; inherited production stays downstream.
 
 ## Research and methodology available now
+
+[proved-derived; formal-checked] The [affine-orbit return](research/records/2026-09-13_AFFINE_ORBITS_RETURN_COMPOSITE_CERTIFICATES_THROUGH_FINITE_CLOCKS.md)
+develops Brandon's arXiv:2508.18305 reference into a factorization-free composite-term bound,
+finite-state return and general divisor certificate. `Framework.Dynamics` builds with the
+new leaf. The record connects golden/affine matrix clocks, Smith constraints and changing-action
+conditions; it does not replace the native dependency above.
+
+[established-bounded; measured] The affine-orbit CPU application passed seven tests, including
+composite moduli and binary verification of a 201-bit clock. Its source, parameters, timings
+and exact comparison scopes are retained in the linked record.
 
 [proved-derived; formal-checked] Dynamic reflection now retains the interior residual,
 moving-chart derivative and forcing mismatch; a passive counterexample separates static Schur

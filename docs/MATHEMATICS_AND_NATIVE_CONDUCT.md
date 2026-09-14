@@ -15,6 +15,16 @@ maps into mode compression, Gamma/ζ information and predictive release. Its
 names the actual shared operators and verification. Source-specific bounds travel through
 their full generator/receiver maps rather than by analogy between numerical constants.
 
+[proved-derived; formal-checked] The [affine-orbit return](../research/records/2026-09-13_AFFINE_ORBITS_RETURN_COMPOSITE_CERTIFICATES_THROUGH_FINITE_CLOCKS.md)
+uses finite permutation clocks to prove a composite-term bound without factoring the root.
+Its quotient `q_d f=U_d q_d` preserves residue futures; strict growth supplies the additional
+proper-divisor conclusion.
+
+[established-bounded; implemented-exact] The accompanying CPU arithmetic application retains
+the source, backward numerator, divisor and clock, with binary certificate verification.
+The linked record also derives the affine/golden matrix and Smith clock connections and
+exhibits why arbitrary changing maps require their actual conditions in the state.
+
 [definition] The [formal framework synthesis](FORMAL_FRAMEWORK.md) now supplies a subject-based
 Lean entry point and connects molecular conformation, twisting/phase, active world-tubes and
 cosmological receivers to the same elementary holon. Its checked finite `Bᵀ M B x` change keeps

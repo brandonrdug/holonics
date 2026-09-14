@@ -220,6 +220,14 @@ constructs powers from a retained linear action through this owner and the exist
 linear constructor. Resident coefficient-recurrence execution and arbitrary changing learned
 word compilation remain their own binding questions.
 
+[definition] `Mathematics/AffineOrbitDivisor.lean`, imported by `Framework.Dynamics`, supplies
+finite injective return, affine reduction/iteration and proper-divisor certificates. The exact
+CPU application `arithmetic_phase/affine_orbit.rs` retains a source, modulus and return clock,
+constructs coprime moduli from backward numerators, and verifies clocks by binary affine
+composition. The [affine-orbit return](../research/records/2026-09-13_AFFINE_ORBITS_RETURN_COMPOSITE_CERTIFICATES_THROUGH_FINITE_CLOCKS.md)
+connects its matrices to the existing affine-group and Smith clock owners; it is exterior
+arithmetic apparatus, separate from native HNN formation.
+
 ## Foundation and transport
 
 [definition] `resident/neighborhood.rs` retains each compatibility law with optional normal
