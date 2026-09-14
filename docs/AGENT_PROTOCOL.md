@@ -55,6 +55,15 @@ summary is not evidence of the original decision. If a link cannot be recovered,
 boundary instead of filling it with an inferred story. Logs can establish scope substitution
 and procedural conduct; they do not expose a unique hidden psychological or prompting cause.
 
+[project-postulate] After compaction, distinguish a newly delivered human occurrence from a
+retained view of an earlier request. Carry that request's disposition and the unresolved
+consuming operation through the handoff. A completed paper, audit or experiment remains completed
+when its initiating message is still visible. Check the recorded occurrence and completed return
+when this is ambiguous; do not restart the subject from its URL or wording. A paused continuation
+control does not become active because old user text survives compaction. The
+[September 14 audit](../research/records/2026-09-14_DIRECT_MESSAGES_AND_THE_PAUSED_HNN_RUN.md)
+records the concrete failure and its original coordinates.
+
 [project-postulate] A context handoff carries the current construction's reason as well as its
 mechanics: the human objective and breadth, governing corrections, active unknown, available
 relations, actual source/receiver, consuming implementation, failed alternatives that matter,

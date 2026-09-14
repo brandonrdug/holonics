@@ -1,6 +1,10 @@
 # Construction state
 
-**Currency:** September 13, 2026. **Latest returned unit:** empirical observations form
+**Currency:** September 14, 2026. **Control:** the construction goal was paused at
+00:15:41 America/Los_Angeles; the current request is a direct-message and campaign review.
+The [paused-run review](research/records/2026-09-14_DIRECT_MESSAGES_AND_THE_PAUSED_HNN_RUN.md)
+recovers the original requests, completed returns and unfinished draft. **Latest verified
+implementation unit:** empirical observations form
 predictive material at retained producing cuts through the coupled HNN. The
 [empirical return](research/records/2026-09-13_EMPIRICAL_RETURNS_KEEP_SOURCE_FIBRES_AND_FORM_THE_NEXT_PREDICTION.md)
 records its source, equations, measured output and checks. The broader
@@ -13,6 +17,14 @@ product. Automata label HNN-based solvers and traversal constructions. The
 specifies the assembly and formal obligations.
 
 ## Current implementation boundary
+
+[established-bounded; source-inspected] The uncommitted operative-condition draft adds bounded
+material exposure, known condition input, batched moments, consecutive-condition reduction and
+a reusable reflection operator. Its latest four source tests passed after the pause; the revised
+material-changing HNN consumer has no successful recorded run. Earlier tests returned an
+allocation-probe failure and a stale field-cut refusal. The draft's two-material probe fit is a
+local experiment, not completion of changing-incidence assembly or compiled changing-programme
+execution. Preserve it for reviewed integration; the linked review specifies the actual gaps.
 
 [established-bounded; measured] The five-coordinate boundary/interior source now completes
 its ninth field observation through `NativeCoupledBody::observe`. Original-source moments,
