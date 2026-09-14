@@ -160,7 +160,7 @@ impl<'r, 'c> NormalWaveFamilyReceiver<'r, 'c> {
             return Err(ConstitutiveFibreError::Shape);
         }
         let t = 2 + 8 * n;
-        let width = self.affine_relation().target_width();
+        let width = self.target_width();
         if width % t != 0 || state >= width / t {
             return Err(ConstitutiveFibreError::Shape);
         }

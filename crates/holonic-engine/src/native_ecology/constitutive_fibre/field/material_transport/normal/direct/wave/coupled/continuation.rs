@@ -27,7 +27,7 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         &self,
         word: &[(usize, WaveSourceReceiver)],
     ) -> Result<NormalWaveFamilyReceiver<'_, 'c>, ConstitutiveFibreError> {
-        self.current().check_prospective_extent(word.len())?;
+        self.current().check_prospective_shape(word.len())?;
         let maps = prospective_maps(word, |member, chart| self.neighborhood()
             .read_wave_relation_in_chart(member, self.normal_material().roots(), chart, None))?;
         self.current().read_prospective(maps)

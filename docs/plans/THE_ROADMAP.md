@@ -82,10 +82,10 @@ nested automata that construct, compare and refine further automata.
 
 [project-postulate] Develop the HNN network specified by the
 [mathematical assembly contract](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-hnn-network-and-its-mathematical-contract).
-The present implementation priority is the source/condition attachment to its existing native
-formation and generated-section consumer, accompanied by economical representation of the action
-actually used. CONSTRUCTION_STATE names the current implementation and unfinished call. A new
-example, wrapper, rest format or output codec cannot replace that attachment.
+Use the joined source/condition/material owners to form preparation restrictions from actual
+mounted incidence and developmental contrasts, accompanied by economical representation of the
+action actually used. CONSTRUCTION_STATE names the returned consumer and next source/encoding
+dependency. A new example, wrapper, rest format or output codec cannot replace that construction.
 
 [definition] Prediction release is the generated face crossing its receiver boundary. Preview,
 committed continuation and later comparison have the blueprint's distinct state contracts.
@@ -225,6 +225,13 @@ or intelligence theorem is not a prerequisite for a useful text increment. Conve
 symbol basis does not define the common interior or its clock.
 
 ## Shared mathematics and its productive use
+
+[definition] The [fluid reflection and concentrated-interior construction](../FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md)
+supplies the dynamic residual behind static Schur elimination, finite Galerkin MHD interactions,
+conducting-front/channel laws and scale-dependent interior receivers. Use the residual and
+forcing terms when deriving a closed native continuation; preserve harmonic, reactive and
+later-coupled modes. Stellar collisions, lightning and torus friction also remain physical
+applications of these source-qualified laws within the shared programme.
 
 [project-postulate] The release specification is ready for implementation. Additional elementary
 definitions of intelligence or a Millennium endpoint are not prerequisites. Hodge and fluid

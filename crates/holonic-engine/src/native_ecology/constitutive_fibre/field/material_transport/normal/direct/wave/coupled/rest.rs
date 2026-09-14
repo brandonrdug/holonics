@@ -106,12 +106,7 @@ impl CoupledRestData {
         ) {
             (None, None, 0) => {}
             (Some(j), Some(last), d) if d > 0 => {
-                let law = self
-                    .neighborhood
-                    .laws()
-                    .get(j)
-                    .ok_or(ConstitutiveFibreError::Shape)?;
-                if last.roots() != n || last.relation_cut() != law.occurrences() {
+                if last.roots() != n || last.relation_cut() != self.neighborhood.action_cut(j)? {
                     return Err(ConstitutiveFibreError::Shape);
                 }
             }
@@ -119,11 +114,6 @@ impl CoupledRestData {
         }
         let mut ids = std::collections::BTreeSet::new();
         for c in &self.header.contacts {
-            let law = self
-                .neighborhood
-                .laws()
-                .get(c.member)
-                .ok_or(ConstitutiveFibreError::Shape)?;
             let relation = self
                 .relations
                 .get(&c.id)
@@ -133,7 +123,7 @@ impl CoupledRestData {
                 || c.id >= self.header.next_contact
                 || !ids.insert(c.id)
                 || relation.roots() != n
-                || relation.relation_cut() != law.occurrences()
+                || relation.relation_cut() != self.neighborhood.action_cut(c.member)?
             {
                 return Err(ConstitutiveFibreError::Shape);
             }
@@ -152,6 +142,7 @@ impl CoupledRestData {
                 .laws()
                 .get(p.member)
                 .ok_or(ConstitutiveFibreError::Shape)?;
+            let action_cut = self.neighborhood.action_cut(p.member)?;
             cut.source.validate()?;
             cut.produced.validate()?;
             if p.id == 0
@@ -167,7 +158,7 @@ impl CoupledRestData {
                 || cut.source.current_epoch()? != p.id - 1
                 || cut.produced.current_epoch()? != p.id
                 || p.id <= bank.normal_bank_epoch()
-                || cut.produced.last_relation().is_none_or(|r| !r.is_conditional() || r.relation_cut()>law.occurrences() || matches!(law.source_chart(),ConstitutiveSourceChart::BilinearContact{condition_complex,..} if r.condition_components()!=2*condition_complex))
+                || cut.produced.last_relation().is_none_or(|r| !r.is_conditional() || r.relation_cut()>action_cut || matches!(law.source_chart(),ConstitutiveSourceChart::BilinearContact{condition_complex,..} if r.condition_components()!=2*condition_complex))
             {
                 return Err(ConstitutiveFibreError::Shape);
             }
@@ -396,7 +387,7 @@ impl NormalWaveRest {
                 relation = relation.read_observed_next(observed)?;
             } else if let Some(contact) = family.last_relation().and_then(|v| v.source_contact()) {
                 relation =
-                    relation.read_source_contact(neighborhood.generator(j)?, contact.source())?;
+                    relation.read_source_contact(neighborhood.action(j)?, contact.source())?;
                 if let Some(row) = contact.source_row() {
                     relation = relation.with_source_row(row);
                 }

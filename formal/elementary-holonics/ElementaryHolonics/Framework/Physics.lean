@@ -17,6 +17,8 @@ import ElementaryHolonics.Physics.ReactionCurrent
 import ElementaryHolonics.Physics.ReceiverStressEnergy
 import ElementaryHolonics.Physics.MechanicalReceiver
 import ElementaryHolonics.Physics.FluidReceiverClosure
+import ElementaryHolonics.Physics.ReflectedBoundaryMemory
+import ElementaryHolonics.Physics.ConductiveFluidReflection
 import ElementaryHolonics.Physics.ConstitutiveWorldTube
 import ElementaryHolonics.Physics.FourTorusParametronCurrent
 import ElementaryHolonics.Physics.AccumulatedNormalResponse

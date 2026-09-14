@@ -2,6 +2,7 @@
 //! original domain and historical joins are the state; a receiver assignment is only its chart.
 use super::comparison::EvaluatedProducingCut;
 use super::*;
+use crate::native_ecology::constitutive_fibre::resident::GeneratorMaterial;
 
 /// One owner of the complete family-valued successor. The prior wave is moved into immutable
 /// generator substrate; it is not exposed as a competing continuing ecology. Evaluation stages
@@ -471,13 +472,13 @@ impl<'c> ResidentCoupledConstitutive<'c> {
                 let law = base
                     .continuation
                     .neighborhood
-                    .generator_for_staging(operation.member)?;
+                    .material_for_staging(operation.member)?;
                 value.apply_return(operands, Some(law))?;
             } else {
                 let other = if operation.member == comparison.member() {
                     None
                 } else {
-                    Some(base.neighborhood().generator(operation.member)?)
+                    Some(base.neighborhood().material(operation.member)?)
                 };
                 Self::apply_operation(&mut value, operation, other)?;
             }
@@ -542,6 +543,14 @@ impl<'c> ResidentCoupledConstitutive<'c> {
     pub fn members(&self) -> usize {
         self.base.neighborhood().members()
     }
+    /// Observer of the fitted material at the same declared source section used by conduct.
+    /// Other source assignments remain in the retained generator; this is not a global matrix.
+    pub fn inspect_predictive_material(&mut self, member: usize)
+        -> Result<Option<(u64, NativeNormalMaterialState)>, ConstitutiveFibreError> {
+        let value = Self::evaluate_parts(&mut self.base, &self.comparison, &self.operations, &self.receiver)?;
+        let material = value.material_for(member, Some(self.base.neighborhood().material(member)?))?;
+        material.predictive.as_ref().map(|v| Ok((v.material.observations(), v.material.inspect()?))).transpose()
+    }
     pub fn has_prediction(&self, id: u64) -> bool {
         self.pending_prediction_ids().any(|p| p == id)
     }
@@ -565,7 +574,7 @@ impl<'c> ResidentCoupledConstitutive<'c> {
     fn apply_operation(
         value: &mut CoupledConstitutiveAlternative<'_, '_, 'c>,
         passage: &ConstitutiveSourcePassage<'c>,
-        other: Option<&ResidentConstitutiveFibre<'c>>,
+        other: Option<&GeneratorMaterial<'c>>,
     ) -> Result<(), ConstitutiveFibreError> {
         let next = value
             .successor_section()
@@ -745,7 +754,7 @@ impl<'c> ResidentCoupledConstitutive<'c> {
         let other = if member == self.comparison.member() {
             None
         } else {
-            Some(self.base.neighborhood().generator(member)?)
+            Some(self.base.neighborhood().material(member)?)
         };
         Self::apply_operation(
             &mut value,
@@ -772,13 +781,13 @@ impl<'c> ResidentCoupledConstitutive<'c> {
     ) -> Result<R, ConstitutiveFibreError> {
         // Structural aperture only: this uses the common chart width, not a forecast
         // from the frozen base. Validate before evaluating the dependent source section.
-        self.base.current().check_prospective_extent(word.len())?;
+        self.base.current().check_prospective_shape(word.len())?;
         if word.iter().any(|(member,_)| *member >= self.members()) { return Err(ConstitutiveFibreError::Shape); }
         let value = Self::evaluate_parts(&mut self.base, &self.comparison, &self.operations,
             parameters.unwrap_or(&self.receiver))?;
         let maps = super::continuation::prospective_maps(word, |member, chart| {
             let other = if member == self.comparison.member() { None }
-                else { Some(self.base.neighborhood().generator(member)?) };
+                else { Some(self.base.neighborhood().material(member)?) };
             value.member_relation(member, other, chart)
         })?;
         let future = value.successor_section().read_prospective(maps)?;

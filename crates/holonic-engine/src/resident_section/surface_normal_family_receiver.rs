@@ -1,6 +1,48 @@
 use super::*;
 use crate::native_ecology::constitutive_fibre::ResidentNormalEnclosureView;
 impl<'c> ResidentSurface<'c> {
+    fn point_word_shape(roots: usize, steps: usize) -> Option<(usize,usize,usize)> {
+        let a=roots.checked_mul(4)?;
+        let w=a.checked_mul(2)?.checked_add(2)?;
+        let t=steps.checked_add(1)?.checked_mul(w)?;
+        let y=t.checked_sub(2+a)?;
+        let report=4usize.checked_add(2*a)?.checked_add(y.checked_mul(2)?)?.checked_mul(2)?;
+        if roots==0 || steps==0 || report>u32::MAX as usize || w.checked_mul(w)?.checked_mul(4)?>u32::MAX as usize {return None;}
+        Some((a,w,report))
+    }
+    pub(crate) fn record_normal_point_word_seed(&self,lane:&Lane<'_, 'c>,family:&ResidentSection<'c>,
+        source_width:usize, roots:usize, steps:usize, initial:&ResidentSection<'c>,
+        state:&ResidentSection<'c>, report:&ResidentSection<'c>) -> Result<(),ResidentRefusal> {
+        let fail=||Self::operative_error();
+        let (a,w,rw)=Self::point_word_shape(roots,steps).ok_or_else(fail)?;
+        let fw=source_width.checked_add(w).and_then(|v|v.checked_add(4)?.checked_add(w.checked_mul(w)?)).ok_or_else(fail)?;
+        if source_width==0 || fw>u32::MAX as usize || !self.operative_shape(family,1,fw) ||
+            !self.operative_shape(initial,1,2*(4+4*a)) || !self.operative_shape(state,1,2*(w+1)) ||
+            !self.operative_shape(report,1,rw) {return Err(fail());}
+        let mut p=Params::new();
+        p.ptr(family.lo.device_ptr()).ptr(family.hi.device_ptr()).u32(source_width as u32)
+            .u32(roots as u32).u32(steps as u32)
+            .ptr(initial.lo.device_ptr()).ptr(initial.hi.device_ptr())
+            .ptr(state.lo.device_ptr()).ptr(state.hi.device_ptr())
+            .ptr(report.lo.device_ptr()).ptr(report.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_normal_point_word_seed",1,self.launch.block_x,0,&mut p,"normal-point-word-source")
+    }
+    pub(crate) fn record_normal_point_word_step(&self,lane:&Lane<'_, 'c>,map:&ResidentSection<'c>,
+        roots:usize,steps:usize,at:usize,state:&ResidentSection<'c>,report:&ResidentSection<'c>,workspace:&ResidentSection<'c>)
+        ->Result<(),ResidentRefusal>{
+        let fail=||Self::operative_error();
+        let (_,w,rw)=Self::point_word_shape(roots,steps).ok_or_else(fail)?;
+        if at==0 || at>steps || !self.operative_shape(map,2*w,2*w) ||
+            !self.operative_shape(state,1,2*(w+1)) || !self.operative_shape(report,1,rw) ||
+            !self.operative_shape(workspace,1,4*w) {return Err(fail());}
+        let mut p=Params::new();
+        p.ptr(map.lo.device_ptr()).ptr(map.hi.device_ptr()).u32(roots as u32).u32(steps as u32).u32(at as u32)
+            .ptr(state.lo.device_ptr()).ptr(state.hi.device_ptr())
+            .ptr(report.lo.device_ptr()).ptr(report.hi.device_ptr()).ptr(workspace.lo.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_normal_point_word_step",1,self.launch.block_x,0,&mut p,"normal-point-word-step")
+    }
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn record_normal_family_receiver(
         &self,

@@ -42,6 +42,63 @@ fn value(result: &ResidentConstitutiveReturn<'_>) -> Vec<Rat> {
 }
 
 #[test]
+#[ignore = "requires CUDA; fitted prediction consumes the native prior condition and survives neighborhood rest"]
+fn normal_prediction_forms_from_native_condition_and_preserves_its_moments() {
+    use crate::native_ecology::constitutive_fibre::ResidentNormalMaterial;
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let initial = points(&s, &[0, 1, 3, 0]);
+    let mut body = ResidentGeneratorNeighborhood::with_shared_condition(
+        learned_pair(&s), current(&initial), ConditionContactMetric::UnitAdmittanceRealification,
+    ).unwrap();
+    let normal = ResidentNormalMaterial::found_features(&s, 5, 1, ResidentGrain(16)).unwrap();
+    body.attach_normal_prediction(0, normal).unwrap_or_else(|(_, e)| panic!("{e:?}"));
+    let source = points(&s, &[1, 0]);
+    let fresh = points(&s, &[2, 3]);
+    let observed = points(&s, &[3, 4]);
+    let q = |n:i64| Rat::from_integer(n.into());
+    let independent = value(&body.read(1, current(&fresh)).unwrap());
+    assert_eq!(value(&body.read(0, current(&fresh)).unwrap()), vec![q(0),q(0)]);
+    let reads = s.census().section_read_outs;
+    let step = body.advance(0, current(&source), Some(current(&observed))).unwrap();
+    assert_eq!(s.census().section_read_outs, reads);
+    assert_eq!(step.contact.as_ref().unwrap().inspect().unwrap().successor,
+        vec![q(3),q(4),q(3),q(0)]);
+    assert_eq!(value(&body.read(1, current(&fresh)).unwrap()), independent);
+
+    let normal = body.predictive_material(0).unwrap().unwrap();
+    assert_eq!(normal.observations(),1);
+    let state = normal.inspect().unwrap();
+    // h at the producing cut was (i,3), NOT the target-conditioned successor (3+4i,3).
+    let u = [(1,0),(0,1),(3,0),(0,1),(3,0)];
+    for (i,&(ar,ai)) in u.iter().enumerate() {
+        assert_eq!(state.cross_source[0][i].real, q(3*ar+4*ai));
+        assert_eq!(state.cross_source[0][i].imaginary, q(4*ar-3*ai));
+        for (j,&(br,bi)) in u.iter().enumerate() {
+            assert_eq!(state.source_normal[i][j].real,q(ar*br+ai*bi+i64::from(i==j)));
+            assert_eq!(state.source_normal[i][j].imaginary,q(ai*br-ar*bi));
+        }
+    }
+    // Fresh evaluation uses the NEW carried h. Independently contract the stored M with
+    // (x,h,h*x); this checks the applied graph/consumer, not the ideal normal minimizer.
+    let next_u = [(2,3),(3,4),(3,0),(-6,17),(6,9)];
+    let mut expected = [q(0),q(0)];
+    for (coefficient,(re,im)) in state.material.coefficients[0].iter().zip(next_u) {
+        expected[0] += &coefficient.real*q(re)-&coefficient.imaginary*q(im);
+        expected[1] += &coefficient.real*q(im)+&coefficient.imaginary*q(re);
+    }
+    let output = value(&body.read(0,current(&fresh)).unwrap());
+    assert_eq!(output,expected);
+    let saved = body.rest().unwrap();
+    let mut bytes = Vec::new(); saved.write(&mut bytes).unwrap();
+    assert!(bytes.starts_with(b"HOLONIC-GENERATOR-NEIGHBORHOOD\x02"));
+    drop(body);
+    let restored = GeneratorNeighborhoodRest::read(&mut bytes.as_slice(),bytes.len() as u64).unwrap().remount(&s).unwrap();
+    assert_eq!(restored.rest().unwrap(),saved);
+    assert_eq!(value(&restored.read(0,current(&fresh)).unwrap()),output);
+}
+
+#[test]
 #[ignore = "requires CUDA; generator dependence selects the changed directions of a shared condition field and the whole neighborhood resumes"]
 fn shared_condition_changes_only_receivers_that_depend_on_the_return() {
     let readout = ResidentReadout::new().unwrap();

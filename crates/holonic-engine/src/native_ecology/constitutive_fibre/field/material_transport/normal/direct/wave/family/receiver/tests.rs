@@ -135,10 +135,8 @@ fn prospective_word_keeps_vertical_modes_without_independent_future_marginals() 
     let source = body.read_family().unwrap();
     let predicted = source.read_prospective(vec![first, second]).unwrap();
     let affine = predicted
-        .affine_relation()
-        .inspect()
-        .unwrap()
-        .predecessor_reading;
+        .inspect_affine_relation()
+        .unwrap();
     let ConstitutiveReading::Plural {
         particular,
         directions,
@@ -160,6 +158,40 @@ fn prospective_word_keeps_vertical_modes_without_independent_future_marginals() 
         &reading.projected_state(1).unwrap()[2..],
         &reading.projected_state(2).unwrap()[..2]
     );
+}
+
+#[test]
+#[ignore = "requires CUDA; a point word can outgrow generic projection scratch without selecting a source representative"]
+fn point_word_retains_a_long_joint_beyond_projection_scratch() {
+    use super::super::super::comparison_tests::{current, point};
+    use super::super::tests::law;
+    let ro = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&ro).unwrap();
+    let member = law(&s, false);
+    let h = point(&s, &[1, 0]);
+    let map = Rc::new(member.read_wave_relation(current(&h), 1).unwrap());
+    let origin = [1, 0, 1, 0, 2, 1, 1, 0, 2, 1];
+    let source = specimen(&s, [1, 0, 2, 1], 0, 8, origin, vec![], false);
+    let before = source.affine_relation().inspect().unwrap();
+    let steps = s.declaration().max_sectiond_bytes as usize / 960 + 1;
+    assert!(source.check_prospective_extent(steps).is_err());
+    let reads = s.census().section_read_outs;
+    let future = source.read_prospective(vec![Rc::clone(&map); steps]).unwrap();
+    assert_eq!(s.census().section_read_outs, reads);
+    assert_eq!(future.point_word().unwrap().len(), steps);
+    assert!(future.affine_relation().is_none());
+    let reading = future.inspect().unwrap();
+    assert_eq!(reading.state_count, steps + 1);
+    for k in 0..=steps {
+        let k = k as i64;
+        assert_eq!(reading.projected_state(k as usize).unwrap(),
+            [rat(1+k,1),rat(k,1),rat(2+k,1),rat(1+k,1)]);
+    }
+    assert_eq!(source.affine_relation().inspect().unwrap(), before);
+
+    // The same resource change does not authorize evaluating an unresolved source at its centre.
+    let plural = hyperplane(&s, 0, 8);
+    assert!(plural.read_prospective(vec![map; steps]).is_err());
 }
 
 #[test]

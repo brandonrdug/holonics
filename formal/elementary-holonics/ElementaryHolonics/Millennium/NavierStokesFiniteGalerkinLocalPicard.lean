@@ -73,6 +73,85 @@ def finiteGalerkinNavierStokesVectorField
     -((nu * torusStokesEigenvalue output.1 : ℝ) : ℂ) • state output -
       finiteGalerkinProjectedInteraction carrier aperture state state output
 
+/-! ## Slot linearity of the actual finite projected interaction -/
+
+section InteractionLinearity
+variable {carrier : Finset SpatialFrequency} (aperture : Finset SpatialFrequency)
+
+theorem finiteGalerkinZeroExtension_add (u v : FiniteGalerkinState carrier) :
+    finiteGalerkinZeroExtension (u + v) =
+      fun p ↦ finiteGalerkinZeroExtension u p + finiteGalerkinZeroExtension v p := by
+  funext p
+  by_cases hp : p ∈ carrier <;> simp [finiteGalerkinZeroExtension, hp]
+
+theorem finiteGalerkinZeroExtension_neg (u : FiniteGalerkinState carrier) :
+    finiteGalerkinZeroExtension (-u) = fun p ↦ -finiteGalerkinZeroExtension u p := by
+  funext p
+  by_cases hp : p ∈ carrier <;> simp [finiteGalerkinZeroExtension, hp]
+
+theorem finiteGalerkinProjectedInteraction_add_left (u v w : FiniteGalerkinState carrier) : finiteGalerkinProjectedInteraction carrier aperture (u + v) w =
+    finiteGalerkinProjectedInteraction carrier aperture u w + finiteGalerkinProjectedInteraction carrier aperture v w := by
+  have h (output : SpatialFrequency) := finiteAdvectiveCoefficient_add_add aperture
+    (finiteGalerkinZeroExtension u) (finiteGalerkinZeroExtension v)
+    (finiteGalerkinZeroExtension w) (fun _ ↦ 0) output
+  have hadd (output : SpatialFrequency) :
+      finiteAdvectiveCoefficient aperture
+        (fun p ↦ finiteGalerkinZeroExtension u p + finiteGalerkinZeroExtension v p)
+        (finiteGalerkinZeroExtension w) output =
+      finiteAdvectiveCoefficient aperture (finiteGalerkinZeroExtension u) (finiteGalerkinZeroExtension w) output +
+      finiteAdvectiveCoefficient aperture (finiteGalerkinZeroExtension v) (finiteGalerkinZeroExtension w) output := by
+    simpa [finiteAdvectiveCoefficient, complexAdvectiveInteraction, complexDot] using h output
+  funext output
+  simp only [finiteGalerkinProjectedInteraction, finiteProjectedAdvectiveCoefficient,
+    finiteGalerkinZeroExtension_add, Pi.add_apply]
+  rw [hadd, lerayProjectMode_add]
+
+theorem finiteGalerkinProjectedInteraction_add_right (u v w : FiniteGalerkinState carrier) : finiteGalerkinProjectedInteraction carrier aperture u (v + w) =
+    finiteGalerkinProjectedInteraction carrier aperture u v + finiteGalerkinProjectedInteraction carrier aperture u w := by
+  have h (output : SpatialFrequency) := finiteAdvectiveCoefficient_add_add aperture
+    (finiteGalerkinZeroExtension u) (fun _ ↦ 0)
+    (finiteGalerkinZeroExtension v) (finiteGalerkinZeroExtension w) output
+  have hadd (output : SpatialFrequency) :
+      finiteAdvectiveCoefficient aperture (finiteGalerkinZeroExtension u)
+        (fun p ↦ finiteGalerkinZeroExtension v p + finiteGalerkinZeroExtension w p) output =
+      finiteAdvectiveCoefficient aperture (finiteGalerkinZeroExtension u) (finiteGalerkinZeroExtension v) output +
+      finiteAdvectiveCoefficient aperture (finiteGalerkinZeroExtension u) (finiteGalerkinZeroExtension w) output := by
+    simpa [finiteAdvectiveCoefficient, complexAdvectiveInteraction, complexDot] using h output
+  funext output
+  simp only [finiteGalerkinProjectedInteraction, finiteProjectedAdvectiveCoefficient,
+    finiteGalerkinZeroExtension_add, Pi.add_apply]
+  rw [hadd, lerayProjectMode_add]
+
+@[simp] theorem finiteGalerkinProjectedInteraction_zero_left (u : FiniteGalerkinState carrier) : finiteGalerkinProjectedInteraction carrier aperture 0 u = 0 := by
+  funext output
+  simp [finiteGalerkinProjectedInteraction, finiteProjectedAdvectiveCoefficient,
+    finiteGalerkinZeroExtension, finiteAdvectiveCoefficient, complexAdvectiveInteraction,
+    lerayProjectMode, complexDot]
+
+@[simp] theorem finiteGalerkinProjectedInteraction_zero_right (u : FiniteGalerkinState carrier) : finiteGalerkinProjectedInteraction carrier aperture u 0 = 0 := by
+  funext output
+  simp [finiteGalerkinProjectedInteraction, finiteProjectedAdvectiveCoefficient,
+    finiteGalerkinZeroExtension, finiteAdvectiveCoefficient, complexAdvectiveInteraction,
+    lerayProjectMode, complexDot]
+
+theorem finiteGalerkinProjectedInteraction_neg_left (u v : FiniteGalerkinState carrier) : finiteGalerkinProjectedInteraction carrier aperture (-u) v = -finiteGalerkinProjectedInteraction carrier aperture u v := by
+  apply eq_neg_iff_add_eq_zero.mpr
+  rw [← finiteGalerkinProjectedInteraction_add_left, neg_add_cancel, finiteGalerkinProjectedInteraction_zero_left]
+
+theorem finiteGalerkinProjectedInteraction_neg_right (u v : FiniteGalerkinState carrier) : finiteGalerkinProjectedInteraction carrier aperture u (-v) = -finiteGalerkinProjectedInteraction carrier aperture u v := by
+  apply eq_neg_iff_add_eq_zero.mpr
+  rw [← finiteGalerkinProjectedInteraction_add_right, neg_add_cancel, finiteGalerkinProjectedInteraction_zero_right]
+
+theorem finiteGalerkinProjectedInteraction_sub_left (u v w : FiniteGalerkinState carrier) : finiteGalerkinProjectedInteraction carrier aperture (u-v) w =
+    finiteGalerkinProjectedInteraction carrier aperture u w - finiteGalerkinProjectedInteraction carrier aperture v w := by
+  simp only [sub_eq_add_neg, finiteGalerkinProjectedInteraction_add_left, finiteGalerkinProjectedInteraction_neg_left]
+
+theorem finiteGalerkinProjectedInteraction_sub_right (u v w : FiniteGalerkinState carrier) : finiteGalerkinProjectedInteraction carrier aperture u (v-w) =
+    finiteGalerkinProjectedInteraction carrier aperture u v - finiteGalerkinProjectedInteraction carrier aperture u w := by
+  simp only [sub_eq_add_neg, finiteGalerkinProjectedInteraction_add_right, finiteGalerkinProjectedInteraction_neg_right]
+
+end InteractionLinearity
+
 /-! ## Exact quadratic difference -/
 
 @[simp]

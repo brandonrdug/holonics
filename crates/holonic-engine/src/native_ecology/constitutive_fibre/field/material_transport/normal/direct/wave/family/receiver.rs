@@ -40,8 +40,9 @@ impl NormalFamilyReceiverReading {
 pub struct NormalWaveFamilyReceiver<'a, 'c> {
     source: &'a NormalWaveFamily<'c>,
     image: Option<ResidentConstitutiveImage<'a, 'c>>,
+    point_word: Option<Vec<Rc<ResidentWaveRelation<'c>>>>,
     report: ResidentSection<'c>,
-    vertical: ResidentSection<'c>,
+    vertical: Option<ResidentSection<'c>>,
 }
 impl<'a, 'c> NormalWaveFamilyReceiver<'a, 'c> {
     pub(super) fn report(&self) -> &ResidentSection<'c> { &self.report }
@@ -72,26 +73,52 @@ impl<'a, 'c> NormalWaveFamilyReceiver<'a, 'c> {
     pub fn image(&self) -> Option<&ResidentConstitutiveImage<'a, 'c>> {
         self.image.as_ref()
     }
-    /// Full source/future joint before applying the retained original anchor bound.
-    pub fn affine_relation(&self) -> &ResidentConstitutiveReturn<'c> {
-        self.image
+    /// Expanded i64 affine carrier when this receiver uses that representation. A generated
+    /// point word retains its source and maps instead; inspect_affine_relation reads its exact
+    /// wide joint without forcing it back into the narrower affine wire.
+    pub fn affine_relation(&self) -> Option<&ResidentConstitutiveReturn<'c>> {
+        if self.point_word.is_some() {return None;}
+        Some(self.image
             .as_ref()
-            .map_or(self.source.affine_relation(), |image| image.joint())
+            .map_or(self.source.affine_relation(), |image| image.joint()))
+    }
+    pub fn point_word(&self) -> Option<&[Rc<ResidentWaveRelation<'c>>]> {
+        self.point_word.as_deref()
+    }
+    pub fn target_width(&self) -> usize {
+        self.point_word.as_ref().map_or_else(
+            ||self.affine_relation().expect("expanded receiver").target_width(),
+            |word|(word.len()+1)*self.source.affine_relation().target_width())
+    }
+    pub fn inspect_affine_relation(&self) -> Result<ConstitutiveReading,ConstitutiveFibreError> {
+        if let Some(affine)=self.affine_relation() {return Ok(affine.inspect()?.predecessor_reading);}
+        let reading=self.inspect()?;
+        let mut current=vec![Rat::one(),Rat::zero()];
+        current.extend(reading.nearest_anchor.ok_or(ConstitutiveFibreError::Shape)?);
+        current.extend(reading.projected_joint.ok_or(ConstitutiveFibreError::Shape)?);
+        Ok(ConstitutiveReading::Unique {current})
     }
     pub fn inspect_vertical_directions(
         &self,
     ) -> Result<ResidentSectionRest, ConstitutiveFibreError> {
-        Ok(self
+        if let Some(vertical)=&self.vertical {return Ok(self
             .source
             .origin
             .fibre()
             .surface
-            .detach_section(&self.vertical, 64)?)
+            .detach_section(vertical, 64)?);}
+        let a=4*self.source.origin.fibre().roots;
+        let y=self.target_width()-2-a;
+        let mut values=Vec::new();
+        let count=y.checked_mul(y).ok_or(ConstitutiveFibreError::Shape)?;
+        values.try_reserve_exact(count).map_err(invalid)?;
+        values.resize(count,(0,0));
+        ResidentSectionRest::found(y,y,ResidentGrain(0),64,values).map_err(invalid)
     }
     pub fn inspect(&self) -> Result<NormalFamilyReceiverReading, ConstitutiveFibreError> {
         let a = self.source.origin.fibre().roots * 4;
         let state_width = 2 + 2 * a;
-        let t = self.affine_relation().target_width();
+        let t = self.target_width();
         let y = t.checked_sub(2 + a).ok_or(ConstitutiveFibreError::Shape)?;
         if t % state_width != 0 {
             return Err(ConstitutiveFibreError::Shape);
@@ -145,17 +172,56 @@ impl<'c> NormalWaveFamily<'c> {
         &self,
         word: Vec<Rc<ResidentWaveRelation<'c>>>,
     ) -> Result<NormalWaveFamilyReceiver<'_, 'c>, ConstitutiveFibreError> {
-        self.check_prospective_extent(word.len())?;
-        let image = self.relation.read_wave_word(word)?;
-        self.receiver_with_image(Some(image))
+        self.check_prospective_shape(word.len())?;
+        let expanded=self.check_prospective_extent(word.len())
+            .and_then(|_|self.relation.read_wave_word(word.clone()))
+            .and_then(|image|self.receiver_with_image(Some(image)));
+        match expanded {
+            Ok(receiver)=>Ok(receiver),
+            Err(original)=>self.read_point_word(word).map_err(|point_error|ConstitutiveFibreError::Arithmetic(
+                format!("expanded word: {original}; exact point-word receiver: {point_error}"))),
+        }
     }
-    pub(in super::super) fn check_prospective_extent(
+    fn read_point_word(&self, word:Vec<Rc<ResidentWaveRelation<'c>>>)
+        ->Result<NormalWaveFamilyReceiver<'_, 'c>,ConstitutiveFibreError>{
+        let s=self.origin.fibre().surface;
+        let n=self.origin.fibre().roots;let a=4*n;let w=2+2*a;
+        if self.relation.target_width()!=w || word.iter().any(|m|m.roots()!=n) {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let y=(word.len()+1).checked_mul(w).and_then(|v|v.checked_sub(2+a)).ok_or(ConstitutiveFibreError::Shape)?;
+        let rw=(4usize+2*a).checked_add(2*y).and_then(|v|v.checked_mul(2)).ok_or(ConstitutiveFibreError::Shape)?;
+        let initial=self.read_receiver()?;
+        let report=s.fresh_section(1,rw,ResidentGrain(0))?;
+        let state=s.fresh_section(1,2*(w+1),ResidentGrain(0))?;
+        let work=s.fresh_section(1,4*w,ResidentGrain(0))?;
+        let mut p=s.begin_passage(&[vec![]])?;
+        {
+            let lane=p.open(0,&[])?;
+            s.record_normal_point_word_seed(&lane,self.relation.report(),self.relation.source_width(),n,word.len(),
+                initial.report(),&state,&report)?;
+            for (i,map) in word.iter().enumerate() {
+                s.record_normal_point_word_step(&lane,&map.basis,n,word.len(),i+1,&state,&report,&work)?;
+            }
+        }
+        p.close(0,&report,64)?;
+        let returned=p.finish()?.launch()?;
+        if !returned.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("point-word: {:?}",returned.obstruction)));}
+        Ok(NormalWaveFamilyReceiver {source:self,image:None,point_word:Some(word),report,vertical:None})
+    }
+    pub(in super::super) fn check_prospective_shape(&self, steps:usize) -> Result<(),ConstitutiveFibreError> {
+        let a=self.origin.fibre().roots.checked_mul(4).ok_or(ConstitutiveFibreError::Shape)?;
+        let t=steps.checked_add(1).and_then(|v|v.checked_mul(self.relation.target_width())).ok_or(ConstitutiveFibreError::Shape)?;
+        let y=t.checked_sub(2+a).ok_or(ConstitutiveFibreError::Shape)?;
+        let words=a.checked_add(y).and_then(|v|v.checked_mul(4)?.checked_add(8)).ok_or(ConstitutiveFibreError::Shape)?;
+        if steps==0 || words>u32::MAX as usize {return Err(ConstitutiveFibreError::Shape);}
+        Ok(())
+    }
+    fn check_prospective_extent(
         &self,
         steps: usize,
     ) -> Result<(), ConstitutiveFibreError> {
-        if steps == 0 {
-            return Err(ConstitutiveFibreError::Shape);
-        }
+        self.check_prospective_shape(steps)?;
         let a = self
             .origin
             .fibre()
@@ -242,8 +308,9 @@ impl<'c> NormalWaveFamily<'c> {
         Ok(NormalWaveFamilyReceiver {
             source: self,
             image,
+            point_word: None,
             report,
-            vertical,
+            vertical: Some(vertical),
         })
     }
 }

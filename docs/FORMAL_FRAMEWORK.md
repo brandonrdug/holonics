@@ -596,6 +596,15 @@ replace them by a picture of a fractal or an assumed fixed semantic dimension.
 
 ## Physics across grains and boundaries
 
+[proved-derived; formal-checked] The [fluid/reflection construction](FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md)
+adds a dynamic interior-return/Riccati defect with a differentiable changing receiver,
+and finite Galerkin MHD/Elsasser identities using the existing projected advective operator.
+It preserves the stretching term that distinguishes magnetic induction from complex-bilinear
+Euler/NS. The same source guide carries concentrated density and rotational interiors through
+scale change and physical momentum balance, with lightning and stellar-collision literature.
+HNN's field/body simulation account uses these constitutive and closure requirements; a point,
+particle or output label does not supply the interior dynamics by itself.
+
 [definition] The following sources connect the same elementary calculus to distinct physical
 questions. Each retains its own constitutive and analytic hypotheses.
 

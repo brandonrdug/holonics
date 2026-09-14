@@ -622,10 +622,13 @@ remain the final codec; the present generator already advances before it is deco
 [definition] Consume the returned fitted material through
 `eta=M_s a+M_h h+M_mix(h tensor a)`, with `a=(c-p,c,p)` and `v=c+eta`.
 At fixed h this is an affine source action with its retained numerical/material family.
-Its actual wave/joint attachment must carry the condition and preparation section from native
-source incidence. `found_features` now supplies the material width; the old wave seed correctly
-refuses that different chart. Construct the consuming relation at the existing wave/section
-owner rather than dropping the h terms or padding the features into three equal ports.
+The existing neighborhood owns the compatibility relation, normal material and its applied-M
+graph together. Its wave/joint action reads the standing resident h and actual source restriction;
+normal observation formation uses h from the producing cut, including delayed returns, while
+condition contact changes contemporary standing. `found_features` supplies the feature width;
+the applied graph consumes those features through the existing bilinear/wave relation owner.
+The stored dyadic action and its normal-reference enclosure remain different readings.
+Current validation belongs in CONSTRUCTION_STATE and its linked cycle record.
 
 [definition] Build the actual pre-return context exposure in the coupled/section-input
 attachment and the native local source owners. Reuse `ResidentGeneratorNeighborhood`,

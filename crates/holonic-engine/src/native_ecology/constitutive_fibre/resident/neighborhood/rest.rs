@@ -3,12 +3,21 @@ use crate::native_ecology::constitutive_fibre::circulation::rest::{blob, expect,
 use std::io::{Read, Write};
 
 const MAGIC: &[u8] = b"HOLONIC-GENERATOR-NEIGHBORHOOD\x01";
+const MAGIC_V2: &[u8] = b"HOLONIC-GENERATOR-NEIGHBORHOOD\x02";
 const END: &[u8] = b"HOLONIC-GENERATOR-NEIGHBORHOOD-END\x01";
 #[derive(Serialize, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 struct Header {
     members: usize,
     epoch: u64,
+    evidence: Option<EvidenceHeader>,
+}
+#[derive(Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct HeaderV2 {
+    members: usize,
+    epoch: u64,
+    predictive: Vec<bool>,
     evidence: Option<EvidenceHeader>,
 }
 #[derive(Serialize, serde::Deserialize)]
@@ -21,6 +30,7 @@ struct EvidenceHeader {
 #[derive(Debug, PartialEq, Eq)]
 pub struct GeneratorNeighborhoodRest {
     laws: Vec<ConstitutiveFibreRest>,
+    predictive: Vec<Option<NormalMaterialRest>>,
     condition: ConditionCurrentRest,
     epoch: u64,
     evidence: Option<NeighborhoodEvidenceRest>,
@@ -41,6 +51,28 @@ impl GeneratorNeighborhoodRest {
     pub fn laws(&self) -> &[ConstitutiveFibreRest] {
         &self.laws
     }
+    /// Metadata of the action actually used for transport. A normal action is constructed
+    /// from its real source-axis rows; that count is distinct from empirical observations
+    /// and from formation occurrences in the compatibility relation.
+    pub(crate) fn action_cut(&self, member: usize) -> Result<u64, ConstitutiveFibreError> {
+        match self.predictive_material(member)? {
+            Some(material) => match material.source_chart() {
+                NormalSourceChart::Features {source_complex} => source_complex.checked_mul(2)
+                    .and_then(|v|u64::try_from(v).ok()).ok_or(ConstitutiveFibreError::Shape),
+                _ => Err(ConstitutiveFibreError::Shape),
+            },
+            None => self.laws.get(member).map(|v|v.occurrences()).ok_or(ConstitutiveFibreError::Shape),
+        }
+    }
+    pub fn predictive_material(
+        &self,
+        member: usize,
+    ) -> Result<Option<&NormalMaterialRest>, ConstitutiveFibreError> {
+        self.predictive
+            .get(member)
+            .map(Option::as_ref)
+            .ok_or(ConstitutiveFibreError::Shape)
+    }
     pub fn condition(&self) -> &ConditionCurrentRest {
         &self.condition
     }
@@ -59,6 +91,34 @@ impl GeneratorNeighborhoodRest {
         for law in &self.laws {
             law.validate()?;
             if law.source_chart() != chart {
+                return Err(ConstitutiveFibreError::Shape);
+            }
+        }
+        if self.predictive.len() != self.laws.len() {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        for (law, predictive) in self.laws.iter().zip(&self.predictive) {
+            let Some(material) = predictive else { continue };
+            material.validate()?;
+            let ConstitutiveSourceChart::BilinearContact {
+                source_complex: ns,
+                condition_complex: nc,
+            } = chart
+            else {
+                return Err(ConstitutiveFibreError::Shape);
+            };
+            let features = ns
+                .checked_mul(nc)
+                .and_then(|n| n.checked_add(ns))
+                .and_then(|n| n.checked_add(nc))
+                .ok_or(ConstitutiveFibreError::Shape)?;
+            if material.source_chart()
+                != (NormalSourceChart::Features {
+                    source_complex: features,
+                })
+                || law.target_width() % 2 != 0
+                || material.targets() != law.target_width() / 2
+            {
                 return Err(ConstitutiveFibreError::Shape);
             }
         }
@@ -87,19 +147,29 @@ impl GeneratorNeighborhoodRest {
     }
     pub fn write(&self, out: &mut impl Write) -> Result<(), ConstitutiveFibreError> {
         self.validate()?;
-        out.write_all(MAGIC).map_err(error)?;
-        blob(
-            out,
-            &serde_json::to_vec(&Header {
+        let has_predictive = self.predictive.iter().any(Option::is_some);
+        if !has_predictive {
+            out.write_all(MAGIC).map_err(error)?;
+            blob(out, &serde_json::to_vec(&Header {
                 members: self.laws.len(),
                 epoch: self.epoch,
                 evidence: self.evidence.as_ref().map(|e| EvidenceHeader {
                     member: e.member,
                     epoch: e.epoch,
                 }),
-            })
-            .map_err(error)?,
-        )?;
+            }).map_err(error)?)?;
+        } else {
+            out.write_all(MAGIC_V2).map_err(error)?;
+            blob(out, &serde_json::to_vec(&HeaderV2 {
+                members: self.laws.len(),
+                epoch: self.epoch,
+                predictive: self.predictive.iter().map(Option::is_some).collect(),
+                evidence: self.evidence.as_ref().map(|e| EvidenceHeader {
+                    member: e.member,
+                    epoch: e.epoch,
+                }),
+            }).map_err(error)?)?;
+        }
         let mut bytes = Vec::new();
         self.condition.write(&mut bytes)?;
         blob(out, &bytes)?;
@@ -107,6 +177,15 @@ impl GeneratorNeighborhoodRest {
             bytes.clear();
             law.write(&mut bytes)?;
             blob(out, &bytes)?;
+        }
+        if has_predictive {
+            for material in &self.predictive {
+                if let Some(material) = material {
+                    bytes.clear();
+                    material.write(&mut bytes)?;
+                    blob(out, &bytes)?;
+                }
+            }
         }
         if let Some(e) = &self.evidence {
             bytes.clear();
@@ -116,23 +195,57 @@ impl GeneratorNeighborhoodRest {
         out.write_all(END).map_err(error)
     }
     pub fn read(input: &mut impl Read, octets: u64) -> Result<Self, ConstitutiveFibreError> {
-        let mut input = input.take(octets);
-        expect(&mut input, MAGIC)?;
-        let header: Header = serde_json::from_slice(&read_blob(&mut input)?).map_err(error)?;
+        let mut wire = Vec::new();
+        input.take(octets).read_to_end(&mut wire).map_err(error)?;
+        if wire.len() < MAGIC.len() {
+            return Err(error("native rest magic or end marker"));
+        }
+        let v2 = wire.starts_with(MAGIC_V2);
+        if v2 && wire.len() < MAGIC_V2.len() {
+            return Err(error("native rest magic or end marker"));
+        }
+        let magic_len = if v2 { MAGIC_V2.len() } else { MAGIC.len() };
+        if !v2 && !wire.starts_with(MAGIC) {
+            return Err(error("native rest magic or end marker"));
+        }
+        let cursor = std::io::Cursor::new(&wire[magic_len..]);
+        let mut input = cursor.take((wire.len() - magic_len) as u64);
+        let (members, epoch, predictive_flags, evidence_header) = if v2 {
+            let h: HeaderV2 = serde_json::from_slice(&read_blob(&mut input)?).map_err(error)?;
+            if h.predictive.len() != h.members {
+                return Err(ConstitutiveFibreError::Shape);
+            }
+            (h.members, h.epoch, h.predictive, h.evidence)
+        } else {
+            let h: Header = serde_json::from_slice(&read_blob(&mut input)?).map_err(error)?;
+            if h.members == 0 || h.members as u64 > input.limit() / 8 {
+                return Err(ConstitutiveFibreError::Shape);
+            }
+            (h.members, h.epoch, vec![false; h.members], h.evidence)
+        };
         let condition = ConditionCurrentRest::read(&mut read_blob(&mut input)?.as_slice())?;
-        if header.members == 0 || header.members as u64 > input.limit() / 8 {
+        if members == 0 || members as u64 > input.limit() / 8 {
             return Err(ConstitutiveFibreError::Shape);
         }
         let mut laws = Vec::new();
-        laws.try_reserve(header.members).map_err(error)?;
-        for _ in 0..header.members {
+        laws.try_reserve(members).map_err(error)?;
+        for _ in 0..members {
             let bytes = read_blob(&mut input)?;
             laws.push(ConstitutiveFibreRest::read(
                 &mut bytes.as_slice(),
                 bytes.len() as u64,
             )?);
         }
-        let evidence = match header.evidence {
+        let mut predictive = Vec::with_capacity(members);
+        for flag in predictive_flags {
+            predictive.push(if flag {
+                let bytes = read_blob(&mut input)?;
+                Some(NormalMaterialRest::read(&mut bytes.as_slice(), bytes.len() as u64)?)
+            } else {
+                None
+            });
+        }
+        let evidence = match evidence_header {
             Some(e) => {
                 let bytes = read_blob(&mut input)?;
                 Some(NeighborhoodEvidenceRest {
@@ -149,8 +262,9 @@ impl GeneratorNeighborhoodRest {
         }
         let result = Self {
             laws,
+            predictive,
             condition,
-            epoch: header.epoch,
+            epoch,
             evidence,
         };
         result.validate()?;
@@ -161,11 +275,17 @@ impl GeneratorNeighborhoodRest {
         surface: &'c ResidentSurface<'c>,
     ) -> Result<ResidentGeneratorNeighborhood<'c>, ConstitutiveFibreError> {
         self.validate()?;
-        let laws = self
-            .laws
-            .into_iter()
-            .map(|law| law.remount(surface))
-            .collect::<Result<Vec<_>, _>>()?;
+        let mut laws = Vec::with_capacity(self.laws.len());
+        for (law, predictive) in self.laws.into_iter().zip(self.predictive) {
+            let law = law.remount(surface)?;
+            let predictive = predictive
+                .map(|material| {
+                    let material = material.remount(surface)?;
+                    PredictiveMaterial::new(material, &law)
+                })
+                .transpose()?;
+            laws.push(GeneratorMaterial { law, predictive });
+        }
         let condition = self.condition.remount(surface)?;
         let evidence = self
             .evidence
@@ -199,7 +319,18 @@ impl ResidentGeneratorNeighborhood<'_> {
             laws: self
                 .laws
                 .iter()
-                .map(ResidentConstitutiveFibre::rest)
+                .map(|material| material.law.rest())
+                .collect::<Result<_, _>>()?,
+            predictive: self
+                .laws
+                .iter()
+                .map(|material| {
+                    material
+                        .predictive
+                        .as_ref()
+                        .map(|p| p.material.rest())
+                        .transpose()
+                })
                 .collect::<Result<_, _>>()?,
             condition: self.condition.rest()?,
             epoch: self.epoch,

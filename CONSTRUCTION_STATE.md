@@ -1,8 +1,11 @@
 # Construction state
 
-**Currency:** September 13, 2026. **Latest consolidation:** the direct-message, mathematical-method and
-HNN blueprint consolidation. The [audit](research/records/2026-09-13_GENERATOR_MEANING_AND_CAMPAIGN_DRIFT_AUDIT.md)
-records original decisions, source boundaries and the repaired procedures.
+**Currency:** September 13, 2026. **Active cycle:** conditional prediction in the continuing
+HNN body, with dynamic reflection and conductive-fluid returns. The
+[cycle record](research/records/2026-09-13_CONDITIONED_PREDICTION_AND_DYNAMIC_INTERIOR_RETURN.md)
+records equations, owners and verification. The
+[methodology audit](research/records/2026-09-13_GENERATOR_MEANING_AND_CAMPAIGN_DRIFT_AUDIT.md)
+retains the original decisions and repaired procedures.
 **Product objective:** construct HNN's contextual generating network, with Athena as the first
 product. Automata label HNN-based solvers and traversal constructions. The
 [roadmap](docs/plans/THE_ROADMAP.md) alone orders work; the
@@ -17,30 +20,29 @@ priorities are withdrawn. The two-symbol assay is not a campaign destination. Fo
 mathematical contract into its consuming HNN owner; product names, proof/test counts and
 exported syntax supply no replacement objective.
 
-[established-bounded; source-inspected] `NativeCoupledWaveSession` and `NativeCoupledBody`
-already own continuing source families, standing conditions, joint forecasts, emitted-source
-re-entry and consuming comparison. `ResidentGeneratorNeighborhood` predicts from prior
-condition and subsequently forms its returned condition/material through actual observations.
-These mechanisms exist. Their new source/condition attachment is unfinished implementation,
-not evidence of a missing elementary definition or a need to invent another engine.
+[established-bounded; source-inspected] `ResidentGeneratorNeighborhood` now retains normal
+predictive material alongside its compatibility relation. Its action is the exact graph of the
+stored dyadic M on `[a,h,h tensor a]`. The existing `NativeCoupledBody` consumes that action;
+observations form condition and material through the existing affine/dependent return owners.
+Delayed returns update the normal moments using their original producing h. Contemporary
+contact forms the condition used by later predictions. The former private fitted-wave adapter
+has been removed from live source and preserved in
+[the implementation archive](archive/implementations/2026-09-13-fitted-wave-adapter/README.md).
 
-[established-bounded; source-inspected] At implementation commit `62bf99b9`,
-`ConstructPredictor` accepts supplied source/condition operator handles; `PredictSection`
-applies them to one preparation, constructs resident `[s,h,h tensor s]` and uses normal material.
-Applying A and C computes sections, not A or C. The uncommitted `NativeConditionalPredictor`
-wave adapter also accepts a prepared pair and condition, maintains private wave state and
-returns a joint section. It has not supplied that attachment to the existing coupled session.
-Its source and measurements remain preserved and uncommitted; another two-symbol or h-switch
-trial would not resolve the missing consumer.
+[established-bounded; measured] The numerical body test has returned two delayed observations,
+an inferred conditional recurrence, a joint two-step forecast and the same result after complete
+body rest/remount. The retained point word uses the existing wide receiver arithmetic when its
+joint image exceeds the narrower expanded affine carrier. Final verification passed: 59 related
+engine regressions (20.35 s), 10 HNN regressions (8.27 s), and the HNN public-example Cargo check.
+The long-word check also exceeds generic projection scratch while retaining the unique source;
+an unresolved source is refused instead of reduced to a representative.
 
-[definition] The next native construction identifies the participating current/condition
-carriers in that continuing body, their source restrictions and the law consuming them before
-an observed target arrives. Use existing resident condition formation where applicable; preserve
-shared parameters when the preparation or condition is a family. Carry the resulting generating
-operation through the existing joint receiver and the state contract requested by the call.
-The fixed-feature normal law and `a=(c-p,c,p)` wave chart are available specializations, not the
-universal HNN representation. Consolidate the adapter and consumers according to that actual
-composition instead of maintaining parallel model paths or merely adding a handle-transfer API.
+[definition] The next source construction forms the preparation restrictions from mounted
+incidence and developmental source-null contrasts: for source S, condition C and returned Y,
+identify the directions in `ker S` exposed by Y, carry their existing native contextual section,
+and form C so those admitted differences can reach the predictor. The numerical return supplies
+this predictor/condition consumer; it does not derive arbitrary A/C restrictions from raw material.
+The fixed-feature normal law and `a=(c-p,c,p)` wave chart remain explicit specializations.
 
 [definition] Encoding accompanies the repeated action actually used. The current dependent
 `ConstitutiveSourcePassage` programme reevaluates its accumulated operations. Replace a closed
@@ -67,6 +69,15 @@ serializes that local object; it is not a whole-session checkpoint. Existing Sou
 and HNP evidence remains available at its recorded scope; inherited production stays downstream.
 
 ## Research and methodology available now
+
+[proved-derived; formal-checked] Dynamic reflection now retains the interior residual,
+moving-chart derivative and forcing mismatch; a passive counterexample separates static Schur
+agreement from dynamic closure. Finite Galerkin MHD/Elsasser identities and the complex-NS
+stretching difference are imported by `Framework.Physics`, whose build passes. The
+[physical source guide](docs/FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md) derives leader/front,
+conducting-channel, friction, impulse and concentrated-interior equations and connects primary
+stellar-collision research. These return a closure law and physical source family to the common
+programme; they are not another prerequisite sequence.
 
 [proved-derived; formal-checked] The
 [phase/clock/code return](research/records/2026-09-12_PHASE_PARITY_AND_CLOCKED_TORI_RETURN_GENERATOR_CODE_POTENTIALS.md)

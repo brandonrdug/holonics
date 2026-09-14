@@ -298,7 +298,7 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         let map = contact
             .binding
             .relation
-            .read_source_contact(self.neighborhood().generator(contact.member())?, source)?;
+            .read_source_contact(self.neighborhood().action(contact.member())?, source)?;
         contact.binding.source.read_through(Rc::new(map))
     }
     pub fn actuate_contact_source(
@@ -373,7 +373,7 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
                     .binding
                     .relation
                     .read_source_contact(
-                        self.neighborhood().generator(contact.member())?,
+                        self.neighborhood().action(contact.member())?,
                         pairs.source().row(row)?,
                     )?
                     .with_source_row(row);

@@ -277,7 +277,7 @@ theorem finiteHeatSeededPicardGeneration_eq_markedHighFiber_of_outside
 
 /-! ### The marked source has a high parent in every term -/
 
-private theorem lerayProjectMode_add
+theorem lerayProjectMode_add
     (frequency : SpatialFrequency) (left right : ComplexVector) :
     lerayProjectMode frequency (left + right) =
       lerayProjectMode frequency left + lerayProjectMode frequency right := by
@@ -292,7 +292,7 @@ private theorem lerayProjectMode_add
       complexDot, dotProduct_add]
     ring
 
-private theorem finiteAdvectiveCoefficient_add_add
+theorem finiteAdvectiveCoefficient_add_add
     (aperture : Finset SpatialFrequency)
     (leftAdvecting highAdvecting leftTransported highTransported :
       ComplexFourierModePopulation)

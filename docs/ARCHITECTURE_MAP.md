@@ -103,6 +103,8 @@ phase, geometry, physical boundaries and computation at their declared scopes.
 | Quadratic port dynamics and retained heat | `Physics/PortEnergyHeat.lean` | Chain-rule storage/source/dissipation balance; nonnegative conductance and explicit heat law |
 | Partitioned Hodge/complex energy and paired cut boundaries | `Physics/PartitionedHodgeEnergy.lean` | Arbitrary finite section mixed-energy law; exact four-cycle harmonic/exact and diffusion reference; imported by `Framework.Physics` |
 | Complex scattering power and attenuation return | `Physics/ScatteringWaveHeat.lean` | Two-port norm preservation and complementary heat; finite constitutive channel |
+| Dynamic reflection and retained interior return | `Physics/ReflectedBoundaryMemory.lean` | Linear-map residual/Riccati defect, actual changing-chart derivative and discrete counterpart; passive static-elimination counterexample; imported by `Framework.Physics` |
+| Conductive-fluid counterpropagating fields | `Physics/ConductiveFluidReflection.lean` | Actual finite Galerkin advection/Stokes operators, Elsasser identities and complex-Euler/MHD stretching difference; interaction slot linearity owned by `NavierStokesFiniteGalerkinLocalPicard` using `NavierStokesFinitePicardChronology`; imported by `Framework.Physics` |
 | Phase-connected contact, reorientation and intensity defect | `Physics/PhaseContactPassage.lean` | Passive seam/heat and transported sum, gauge covariance, signed-cycle section and amplitude/intensity interpolation difference |
 | Biochemical reaction current and joint fold/occupancy receiver | `Physics/ReactionCurrent.lean` | Stoichiometric enzyme/substrate conservation, positive mass-action rates, equal-marginal binding separator and distinct labeled emissions from the same body return |
 | Observer stress, angular derivative jets and positive rest energy | `Physics/ReceiverStressEnergy.lean` | Both Lorentz indices, perfect-fluid and boosted dust/vacuum readings; mass-shell owner reused |
@@ -219,6 +221,19 @@ linear constructor. Resident coefficient-recurrence execution and arbitrary chan
 word compilation remain their own binding questions.
 
 ## Foundation and transport
+
+[definition] `resident/neighborhood.rs` retains each compatibility law with optional normal
+predictive material and its exact applied-M graph. `normal/direct/applied_relation.rs` and
+`normal_applied_relation.cuh` construct that graph and stage observations through the existing
+normal preparation. `wave/coupled/comparison/constitutive.rs` retains producing conditions for
+normal moments while contemporary condition contact forms the successor. Neighborhood rest
+preserves v1 for compatibility-only bodies and carries normal material in v2; coupled rest
+validates action construction cuts separately from empirical observation counts.
+`wave/family/receiver.rs` retains an ordered generating word for a proven unique source when
+the expanded affine joint exceeds its narrow carrier or projection scratch. The point-word
+kernels use the existing wide report and preserve the original source; unresolved families keep
+their full relation or return an obstruction. `NativeCoupledBody` exposes these same owners to
+numerical applications, with explicit material/current receiver inspections.
 
 [definition] `wave/family/section.rs` and `section_coupled_family_section` evaluate a conditional
 source section for the dependent generator. `wave/coupled/comparison/constitutive.rs` now joins

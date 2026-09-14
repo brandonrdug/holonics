@@ -11,6 +11,7 @@ pub use refine::NormalRealizationRefinement;
 mod enclosure;
 pub use enclosure::{ResidentNormalEnclosure, ResidentNormalEnclosureView, ResidentNormalInput};
 mod section;
+mod applied_relation;
 pub use section::ResidentNormalSectionReturn;
 
 /// Declared domain of the same normal-statistic operator. A feature chart is not silently
@@ -191,6 +192,7 @@ impl<'c> ResidentNormalMaterial<'c> {
     pub fn targets(&self) -> usize {
         self.targets
     }
+    pub fn grain(&self) -> ResidentGrain { self.grain }
     pub fn inspect(&self) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
         decode_state_layout(
             &self.surface.detach_section(&self.state, i64::BITS)?,

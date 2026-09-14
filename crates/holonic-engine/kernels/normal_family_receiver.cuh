@@ -9,9 +9,17 @@ __device__ FamilyReceiverInteger family_receiver_integer(wide x){
 
 // Graph (V v_i, v_i) gives orthogonal projection onto row span V through the existing
 // relation elimination, including zero-padded and nonorthogonal rows.
+// Both callers supply an echelon basis indexed by its leading coordinate. Full rank
+// means the receiver subspace is the whole space; rank zero means the zero subspace.
+// Those exact projections need no Gram graph and avoid irrelevant determinant growth.
+__device__ uint32_t family_projection_rank(const int64_t *v,uint32_t d){
+    uint32_t rank=0;for(uint32_t i=0;i<d;++i)if(v[(size_t)i*d+i])++rank;
+    return rank;
+}
 __device__ void family_projection_graph(const int64_t *v,uint32_t d,int64_t *g,int64_t *gh,wide *row,uint32_t *slot){
     uint32_t k=2u*d;
     for(size_t i=0;i<(size_t)k*k;++i)g[i]=gh[i]=0;
+    uint32_t rank=family_projection_rank(v,d);if(rank==0||rank==d)return;
     for(uint32_t i=0;i<d;++i){
         for(uint32_t j=0;j<d;++j){
             row[j]=0;
@@ -23,6 +31,12 @@ __device__ void family_projection_graph(const int64_t *v,uint32_t d,int64_t *g,i
 }
 __device__ void family_project(const int64_t *v,const int64_t *graph,uint32_t d,
     const wide *input,wide *den,wide *output,wide *query,uint32_t *slot){
+    uint32_t span_rank=family_projection_rank(v,d);
+    if(span_rank==0||span_rank==d){
+        for(uint32_t i=0;i<d;++i)output[i]=span_rank?input[i]:0;
+        if(!span_rank)*den=1;
+        return;
+    }
     for(uint32_t i=0;i<d;++i){
         query[i]=query[d+i]=0;
         for(uint32_t j=0;j<d;++j)query[i]=add_checked(query[i],product_checked(v[(size_t)i*d+j],input[j],slot),slot);
@@ -118,5 +132,65 @@ extern "C" __global__ void section_normal_family_receiver(
         if(*slot)return;fibre_normalize(z,y,&final_den,slot);if(*slot)return;
         out[2u+a]=final_den;for(uint32_t i=0;i<y;++i)out[3u+a+i]=z[i];
     }
+    for(uint32_t i=0;i<2u*count;++i)report_hi[i]=report[i];
+}
+
+// A unique affine source has no unresolved output directions. Keep the ordered maps
+// as the source of its future and calculate directly in the existing wide receiver
+// carrier; materializing an i64 affine point after every factor is unnecessary.
+extern "C" __global__ void section_normal_point_word_seed(
+    const int64_t *pf,const int64_t *pf_hi,uint32_t ps,uint32_t n,uint32_t steps,
+    const int64_t *initial,const int64_t *initial_hi,
+    int64_t *state,int64_t *state_hi,int64_t *report,int64_t *report_hi,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+    if(blockIdx.x||threadIdx.x)return;
+    if(upstream_refused(census,lineage,lineage_count,slot))return;
+    uint32_t a=4u*n,w=2u+2u*a,pk=ps+w,y=(steps+1u)*w-2u-a,count=4u+2u*a+2u*y;
+    if(!n||!steps||pf[pk]<=0||pf[pk+1u]!=0||pf[pk+3u]!=0){atomicOr(slot,REFUSED_MALFORMED);return;}
+    for(size_t i=0;i<(size_t)pk+4u+(size_t)w*w;++i)if(pf[i]!=pf_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+    for(uint32_t i=0;i<2u*(4u+4u*a);++i)if(initial[i]!=initial_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+    const wide *prior=(const wide *)initial;
+    if(prior[0]!=0||pf[ps]!=pf[pk]||pf[ps+1u]!=0){atomicOr(slot,REFUSED_MALFORMED);return;}
+    wide *s=(wide *)state,*out=(wide *)report;
+    s[0]=pf[pk];for(uint32_t i=0;i<w;++i)s[1u+i]=pf[ps+i];
+    for(uint32_t i=0;i<count;++i)out[i]=0;
+    out[0]=0;out[1]=prior[1];out[2u+a]=s[0];out[3u+a+y]=prior[3u+2u*a];
+    for(uint32_t i=0;i<a;++i){
+        out[2u+i]=prior[2u+i];
+        out[3u+a+i]=s[1u+2u+a+i];
+        out[4u+a+y+i]=prior[4u+2u*a+i];
+    }
+    for(uint32_t i=0;i<2u*(w+1u);++i)state_hi[i]=state[i];
+    for(uint32_t i=0;i<2u*count;++i)report_hi[i]=report[i];
+}
+
+extern "C" __global__ void section_normal_point_word_step(
+    const int64_t *map,const int64_t *map_hi,uint32_t n,uint32_t steps,uint32_t at,
+    int64_t *state,int64_t *state_hi,int64_t *report,int64_t *report_hi,int64_t *workspace,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+    if(blockIdx.x||threadIdx.x)return;
+    if(*slot||upstream_refused(census,lineage,lineage_count,slot))return;
+    uint32_t a=4u*n,w=2u+2u*a,y=(steps+1u)*w-2u-a,count=4u+2u*a+2u*y;
+    if(!at||at>steps){atomicOr(slot,REFUSED_MALFORMED);return;}
+    for(size_t i=0;i<(size_t)4u*w*w;++i)if(map[i]!=map_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+    wide *s=(wide *)state,*out=(wide *)report,*q=(wide *)workspace;
+    wide den=s[0];
+    for(uint32_t i=0;i<w;++i){q[i]=s[1u+i];q[w+i]=0;}
+    uint32_t disposition=0,rank=0;
+    fibre_query(map,w,2u*w,q,&den,nullptr,-1,&disposition,&rank,slot);
+    if(*slot)return;
+    if(disposition!=0){atomicOr(slot,REFUSED_MALFORMED);return;}
+    for(uint32_t i=0;i<w;++i)q[w+i]=sub_checked(0,q[w+i],slot);
+    fibre_normalize(q+w,w,&den,slot);if(*slot)return;
+    if(q[w]!=den||q[w+1u]!=0){atomicOr(slot,REFUSED_MALFORMED);return;}
+    wide old_den=out[2u+a],common=fibre_lcm(old_den,den,slot);
+    uint32_t used=a+(at-1u)*w;
+    for(uint32_t i=0;i<used;++i)out[3u+a+i]=product_checked(out[3u+a+i],common/old_den,slot);
+    for(uint32_t i=0;i<w;++i)out[3u+a+used+i]=product_checked(q[w+i],common/den,slot);
+    if(*slot)return;
+    fibre_normalize(out+3u+a,used+w,&common,slot);if(*slot)return;
+    out[2u+a]=common;s[0]=den;
+    for(uint32_t i=0;i<w;++i)s[1u+i]=q[w+i];
+    for(uint32_t i=0;i<2u*(w+1u);++i)state_hi[i]=state[i];
     for(uint32_t i=0;i<2u*count;++i)report_hi[i]=report[i];
 }

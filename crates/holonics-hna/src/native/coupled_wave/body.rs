@@ -37,7 +37,9 @@ impl<'c> NativeCoupledBody<'c> {
             BodyState::Constitutive(_) => None,
         }
     }
-    pub(crate) fn from_wave(wave: ResidentNormalWave<'c, NormalWaveCoupled<'c>>) -> Self {
+    /// The same coupled HNN owner can serve numerical sections directly, without requiring
+    /// an application to first choose a symbol codec. The text session uses this constructor.
+    pub fn from_wave(wave: ResidentNormalWave<'c, NormalWaveCoupled<'c>>) -> Self {
         Self {
             state: Some(BodyState::Affine(wave)),
         }
@@ -105,6 +107,32 @@ impl<'c> NativeCoupledBody<'c> {
             BodyState::Affine(w) => Some(w.normal_material().observations()),
             BodyState::Constitutive(_) => None,
         }
+    }
+
+    /// Inspect the actual predictive material, including its reference error, at this body's
+    /// current receiver scope. This explicit observer is not part of native hot execution.
+    pub fn inspect_predictive_material(&mut self, member: usize) -> Result<Value, NativeSessionError> {
+        let scope = self.scope();
+        let state = match self.state_mut()? {
+            BodyState::Affine(wave) => wave.neighborhood().predictive_material(member)?
+                .map(|m| m.inspect().map(|state| (m.observations(), state))).transpose()?,
+            BodyState::Constitutive(body) => body.inspect_predictive_material(member)?,
+        };
+        Ok(json!({"source_scope":scope,"member":member,"predictive_material":state.map(|(observations,state)|
+            json!({"observations":observations,"state":state})),"coefficient_scope":"applied stored action; normal-reference bounds retained"}))
+    }
+
+    /// Current numerical receiver of the same body used by subsequent transport.
+    pub fn inspect_current(&mut self) -> Result<Value, NativeSessionError> {
+        let scope=self.scope();let epoch=self.epoch();
+        let (reading,relation)=match self.state_mut()? {
+            BodyState::Affine(wave)=>(wave.current().read_receiver()?.inspect()?,wave.current().affine_relation().inspect()?),
+            BodyState::Constitutive(body)=>{
+                let value=body.read_receiver()?;
+                (value.successor_section().read_receiver()?.inspect()?,value.successor_section().affine_relation().inspect()?)
+            },
+        };
+        Ok(json!({"source_scope":scope,"epoch":epoch,"reading":reading,"relation":relation}))
     }
 
     pub fn read_basis_face(
@@ -296,7 +324,7 @@ impl<'c> NativeCoupledBody<'c> {
             })
             .collect::<Vec<_>>();
         let affine = if full_family {
-            Some(future.affine_relation().inspect()?.predecessor_reading)
+            Some(future.inspect_affine_relation()?)
         } else {
             None
         };
@@ -306,10 +334,11 @@ impl<'c> NativeCoupledBody<'c> {
             .transpose()?;
         Ok(
             json!({"source_scope":scope,"source_epoch":epoch,"word":word,
+                "receiver_representation":if future.point_word().is_some(){"generated-point-word"}else{"expanded-affine-family"},
                 "action_committed":false,"reading":reading,"states":states,
                 "anchor":future.source().anchor().inspect()?,"affine_joint":affine,"affine_coverage":coverage,
                 "receiver_scope":"one joint minimum-norm output over the nearest supported anchor; not independent marginal selections",
-                "source_preservation":"the original anchor and affine source/future joint remain the prediction operands"}),
+                "source_preservation":"the original anchor and joint source remain; futures use the expanded relation or its retained ordered generating word"}),
         )
     }
     pub(super) fn with_prospective<R>(

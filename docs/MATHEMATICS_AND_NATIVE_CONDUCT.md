@@ -263,6 +263,15 @@ retains typed local restriction maps. The same solve gives a discrete state-spac
 `phi_next=M^-1*C*phi_previous+M^-1*input`. The current paired-junction graph reflection is
 another declared local law; it is not the entirety of integration by reflection.
 
+[proved-derived; formal-checked] The [dynamic reflection return](FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md#integration-by-reflection-the-dynamic-return-is-essential)
+now retains `r_dot=(D-KB)r+(C+DK-KA-KBK-K_dot)x+g-Kf`, its actual trajectory derivative,
+and the discrete changing-chart analogue. Static elimination can fail even in a passive
+oscillator whose total energy decreases. The same source guide derives conductive-fluid
+counterpropagating fields from the existing Galerkin interaction, with their stretching signs
+and hidden feedback. It connects lightning channels, stellar collisions and concentrated
+interiors through their physical source equations, rather than treating a current boundary
+agreement as closure of all future conduct.
+
 [established-bounded; source-inspected] In
 [`leader_quadrature.rs`](../crates/holonic-engine/src/leader_quadrature.rs), local material founds
 an extension and later conduct rides its retained germ. `LocalJet::rebase`, `LeaderLaw`,

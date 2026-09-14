@@ -38,6 +38,43 @@ fn contains(ball: &NativeFieldCurrentBall, expected: &[ExactComplexWaveCurrent])
 }
 
 #[test]
+#[ignore = "requires CUDA; conditioned staging is compared with the established section update"]
+fn staged_conditioned_update_matches_section_update_and_preserves_original() {
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let source = point(&s, &[1, 2, -1, 1]);
+    let condition = point(&s, &[2, -1]);
+    let observed = point(&s, &[3, 1]);
+    let source_current = current(&source);
+    let condition_current = current(&condition);
+    let observed_current = current(&observed);
+
+    let joined = ResidentConstitutiveSection::integers(&source)
+        .unwrap()
+        .bilinear_features(&s, ResidentConstitutiveSection::integers(&condition).unwrap())
+        .unwrap();
+    let feature_section = joined.into_features();
+    let mut expected = ResidentNormalMaterial::found_features(&s, 5, 1, ResidentGrain(32)).unwrap();
+    expected
+        .receive_section(
+            ResidentConstitutiveSection::rationals(&feature_section).unwrap(),
+            ResidentConstitutiveSection::integers(&observed).unwrap(),
+        )
+        .unwrap();
+
+    let original = ResidentNormalMaterial::found_features(&s, 5, 1, ResidentGrain(32)).unwrap();
+    let original_wire = original.state_wire().unwrap();
+    let staged = original
+        .stage_bilinear_observation(source_current, condition_current, observed_current)
+        .unwrap();
+
+    assert_eq!(staged.observations(), 1);
+    assert_eq!(staged.state_wire().unwrap(), expected.state_wire().unwrap());
+    assert_eq!(original.state_wire().unwrap(), original_wire);
+    assert_eq!(original.observations(), 0);
+}
+
+#[test]
 #[ignore = "requires CUDA; exact source moments must not be refused by a narrow diagnostic"]
 fn large_exact_source_error_keeps_the_zero_fit_and_complete_moments() {
     let readout = ResidentReadout::new().unwrap();

@@ -164,6 +164,12 @@ It need not be energy depleted from the object's deeper interior. Absorption, re
 thermal emission and inelastic scattering are distinguished by their source/current balances,
 not by treating outgoing light as one universal origin story.
 
+[definition] [Fluid reflection and concentrated interiors](FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md)
+develops this balance for lightning leader/return channels, impulse and collision currents,
+stellar fluid collisions and a rotating rescaled interior. Its changing L/C channel energy
+equation retains geometry work as well as Joule heat. The source's mass, circulation, internal
+stress and observer resolution remain separate operands in the resulting exterior face.
+
 [proved-derived] For a density a and flux j satisfying \(\partial_ta+\nabla\cdot j=s\), a
 boundary moving with velocity w obeys
 

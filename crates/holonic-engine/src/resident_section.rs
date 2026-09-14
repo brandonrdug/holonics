@@ -97,6 +97,7 @@ mod surface_mount;
 mod surface_passage;
 mod surface_linear_material;
 mod surface_direct_normal;
+mod surface_normal_relation;
 mod surface_normal_section;
 mod surface_normal_wave;
 mod surface_normal_wave_basis_face;

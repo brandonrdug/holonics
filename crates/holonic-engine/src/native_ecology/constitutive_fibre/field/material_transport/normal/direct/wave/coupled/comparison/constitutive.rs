@@ -2,7 +2,7 @@
 //! substitution retains the SAME theta in x(theta), eta(theta), condition and material return.
 //! The family is a generator of alternatives, never the span/union of their material rows.
 use super::*;
-use crate::native_ecology::constitutive_fibre::resident::ResidentNeighborhoodAlternative;
+use crate::native_ecology::constitutive_fibre::resident::{GeneratorMaterial, ResidentNeighborhoodAlternative};
 use crate::native_ecology::constitutive_fibre::{
     ConditionContactReading, ConstitutiveFibreReturn, PreparedConditionContact,
 };
@@ -24,7 +24,7 @@ pub struct CoupledConstitutiveAlternative<'p, 'j, 'c> {
     anchor: ResidentSection<'c>,
     consequence: ResidentNeighborhoodAlternative<'c>,
     material_member: usize,
-    earlier_material: BTreeMap<usize, ResidentConstitutiveFibre<'c>>,
+    earlier_material: BTreeMap<usize, GeneratorMaterial<'c>>,
     path: Vec<(
         u64,
         usize,
@@ -151,10 +151,11 @@ impl<'w, 'j, 'c> CoupledConstitutiveFamily<'w, 'j, 'c> {
         {
             return Err(ConstitutiveFibreError::ForeignOccurrence);
         }
-        let consequence = self.wave.continuation.neighborhood.prepare_consequence(
+        let consequence = self.wave.continuation.neighborhood.prepare_consequence_at(
             c.member(),
             ResidentConstitutiveCurrent::rational(&source)?,
             Some(ResidentConstitutiveCurrent::rational(&difference)?),
+            Some(c.relation().fixed_condition()),
         )?;
         let relation = Rc::new(self.wave.neighborhood().read_consequence_wave_relation(
             c.member(),
@@ -252,10 +253,10 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
     pub(in super::super) fn member_relation(
         &self,
         member: usize,
-        other: Option<&ResidentConstitutiveFibre<'c>>,
+        other: Option<&GeneratorMaterial<'c>>,
         chart: WaveSourceReceiver,
     ) -> Result<ResidentWaveRelation<'c>, ConstitutiveFibreError> {
-        let law = self.material_for(member, other)?;
+        let law = self.material_for(member, other)?.action();
         law.read_wave_relation_in_chart(
             self.condition().successor(),
             self.comparison.relation().roots(),
@@ -287,11 +288,11 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
         self.relation = map;
         Ok(())
     }
-    fn material_for<'a>(
+    pub(in super::super) fn material_for<'a>(
         &'a self,
         member: usize,
-        other: Option<&'a ResidentConstitutiveFibre<'c>>,
-    ) -> Result<&'a ResidentConstitutiveFibre<'c>, ConstitutiveFibreError> {
+        other: Option<&'a GeneratorMaterial<'c>>,
+    ) -> Result<&'a GeneratorMaterial<'c>, ConstitutiveFibreError> {
         if member == self.material_member {
             Ok(&self.consequence.material)
         } else {
@@ -336,7 +337,7 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
     pub(in super::super) fn apply_return(
         &mut self,
         operands: ConstitutiveReturnOperands<'c>,
-        other: Option<&mut ResidentConstitutiveFibre<'c>>,
+        other: Option<&mut GeneratorMaterial<'c>>,
     ) -> Result<(), ConstitutiveFibreError> {
         let member = operands.comparison.member();
         let source = ResidentConstitutiveCurrent::rational(&operands.source)?;
@@ -354,8 +355,9 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
             &self.consequence.condition,
             source,
             observed,
+            operands.comparison.relation().fixed_condition(),
         )?;
-        let map = Rc::new(next.material.read_wave_relation_in_chart(
+        let map = Rc::new(next.material.action().read_wave_relation_in_chart(
             next.condition.successor(),
             self.comparison.relation().roots(),
             operands.comparison.relation().source_receiver(),
@@ -383,12 +385,13 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
     ) -> Result<ResidentConstitutiveReturn<'c>, ConstitutiveFibreError> {
         self.consequence
             .material
+            .action()
             .read_bilinear(source, self.consequence.condition.successor())
     }
     pub(in super::super) fn actuate_source(
         &mut self,
         member: usize,
-        other: Option<&ResidentConstitutiveFibre<'c>>,
+        other: Option<&GeneratorMaterial<'c>>,
         chart: WaveSourceReceiver,
         source: ResidentConstitutiveCurrent<'_, 'c>,
     ) -> Result<(), ConstitutiveFibreError> {
@@ -402,12 +405,12 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
     pub(in super::super) fn actuate_source_at(
         &mut self,
         member: usize,
-        other: Option<&ResidentConstitutiveFibre<'c>>,
+        other: Option<&GeneratorMaterial<'c>>,
         chart: WaveSourceReceiver,
         source: ResidentConstitutiveCurrent<'_, 'c>,
         passage: u64,
     ) -> Result<(), ConstitutiveFibreError> {
-        let law = self.material_for(member, other)?;
+        let law = self.material_for(member, other)?.action();
         let relation = law.read_wave_relation_in_chart(
             self.condition().successor(),
             self.comparison.relation().roots(),

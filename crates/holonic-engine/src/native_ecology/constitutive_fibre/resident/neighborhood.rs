@@ -3,17 +3,60 @@
 //! No source codec, input history, token lookup or alternative learning law lives here.
 use super::*;
 use std::rc::Rc;
+use crate::native_ecology::constitutive_fibre::ResidentNormalMaterial;
 
 mod rest;
 pub use rest::{GeneratorNeighborhoodRest, NeighborhoodEvidenceRest};
 
 pub struct ResidentGeneratorNeighborhood<'c> {
-    laws: Vec<ResidentConstitutiveFibre<'c>>,
+    laws: Vec<GeneratorMaterial<'c>>,
     condition: ResidentConditionCurrent<'c>,
     epoch: u64,
     evidence: Option<NeighborhoodEvidence<'c>>,
     owner: Rc<()>,
     usable: bool,
+}
+
+/// Compatibility and empirical prediction are two readings of one local material owner.
+/// The normal action is derived from the retained moments, never supplied as a target router.
+pub(crate) struct GeneratorMaterial<'c> {
+    pub(crate) law: ResidentConstitutiveFibre<'c>,
+    pub(crate) predictive: Option<PredictiveMaterial<'c>>,
+}
+pub(crate) struct PredictiveMaterial<'c> {
+    pub(crate) material: ResidentNormalMaterial<'c>,
+    pub(crate) action: ResidentConstitutiveFibre<'c>,
+}
+impl<'c> PredictiveMaterial<'c> {
+    fn action_for(material: &ResidentNormalMaterial<'c>, law: &ResidentConstitutiveFibre<'c>)
+        -> Result<ResidentConstitutiveFibre<'c>, ConstitutiveFibreError> {
+        let ConstitutiveSourceChart::BilinearContact {source_complex, condition_complex} = law.source_chart
+            else { return Err(ConstitutiveFibreError::Shape); };
+        if 2 * material.targets() != law.target_width { return Err(ConstitutiveFibreError::Shape); }
+        let action = material.read_applied_bilinear_relation(source_complex, condition_complex)?;
+        if !std::ptr::eq(action.surface, law.surface) { return Err(ConstitutiveFibreError::Shape); }
+        Ok(action)
+    }
+    pub(crate) fn new(material: ResidentNormalMaterial<'c>, law: &ResidentConstitutiveFibre<'c>)
+        -> Result<Self, ConstitutiveFibreError> {
+        let action = Self::action_for(&material, law)?;
+        Ok(Self {material, action})
+    }
+    fn stage(&self, source: ResidentConstitutiveCurrent<'_, 'c>,
+        prior_condition: ResidentConstitutiveCurrent<'_, 'c>, observed: ResidentConstitutiveCurrent<'_, 'c>)
+        -> Result<Self, ConstitutiveFibreError> {
+        Self::new(self.material.stage_bilinear_observation(source, prior_condition, observed)?, &self.action)
+    }
+}
+impl<'c> GeneratorMaterial<'c> {
+    pub(crate) fn action(&self) -> &ResidentConstitutiveFibre<'c> {
+        self.predictive.as_ref().map_or(&self.law, |v| &v.action)
+    }
+    fn stage_prediction(&self, source: ResidentConstitutiveCurrent<'_, 'c>,
+        prior_condition: ResidentConstitutiveCurrent<'_, 'c>, observed: ResidentConstitutiveCurrent<'_, 'c>)
+        -> Result<Option<PredictiveMaterial<'c>>, ConstitutiveFibreError> {
+        self.predictive.as_ref().map(|v| v.stage(source, prior_condition, observed)).transpose()
+    }
 }
 
 /// The latest received fibre at its producing local-law cut. It is not a cumulative
@@ -59,35 +102,40 @@ pub(crate) struct PreparedNeighborhoodConsequence<'c> {
     prior_condition: ResidentConditionStanding<'c>,
     condition: Option<PreparedConditionContact<'c>>,
     formation: Option<PreparedConstitutiveFormation<'c>>,
+    predictive: Option<PredictiveMaterial<'c>>,
 }
 pub(crate) struct ResidentNeighborhoodAlternative<'c> {
     pub(crate) prediction:ResidentConstitutiveReturn<'c>,
     pub(crate) condition:PreparedConditionContact<'c>,
     pub(crate) formation:ResidentConstitutiveReturn<'c>,
-    pub(crate) material:ResidentConstitutiveFibre<'c>,
+    pub(crate) material:GeneratorMaterial<'c>,
 }
 impl<'c> ResidentNeighborhoodAlternative<'c> {
     /// The next source-conditional return uses the material and condition produced by the
     /// previous one. The supplied law is the actual affected conditional member, not a row
     /// witness or an independently sampled alternative.
     pub(crate) fn prepare_following(
-        law:&mut ResidentConstitutiveFibre<'c>,
+        material:&mut GeneratorMaterial<'c>,
         prior:&PreparedConditionContact<'c>,
         source:ResidentConstitutiveCurrent<'_, 'c>,
         observed:ResidentConstitutiveCurrent<'_, 'c>,
+        producing_condition:ResidentConstitutiveCurrent<'_, 'c>,
     )->Result<Self,ConstitutiveFibreError>{
-        let prediction=law.read_bilinear(source,prior.successor())?;
-        let family=law.read_condition_preimage(source,observed)?;
+        let prediction=material.action().read_bilinear(source,prior.successor())?;
+        let predictive=material.stage_prediction(source,producing_condition,observed)?;
+        let family=material.law.read_condition_preimage(source,observed)?;
         let condition=prior.prepare_following(&family)?;
-        let staged=law.prepare_bilinear_contact(source,condition.successor(),Some(observed))?;
-        let (material,formation)=staged.into_alternative();
+        let staged=material.law.prepare_bilinear_contact(source,condition.successor(),Some(observed))?;
+        let (law,formation)=staged.into_alternative();
+        let material=GeneratorMaterial {law,predictive};
         Ok(Self {prediction,condition,formation,material})
     }
 }
 impl<'c> PreparedNeighborhoodConsequence<'c> {
     pub(crate) fn into_alternative(self)->Result<ResidentNeighborhoodAlternative<'c>,ConstitutiveFibreError>{
         let condition=self.condition.ok_or(ConstitutiveFibreError::Shape)?;
-        let (material,formation)=self.formation.ok_or(ConstitutiveFibreError::Shape)?.into_alternative();
+        let (law,formation)=self.formation.ok_or(ConstitutiveFibreError::Shape)?.into_alternative();
+        let material=GeneratorMaterial {law,predictive:self.predictive};
         Ok(ResidentNeighborhoodAlternative {prediction:self.prediction,condition,formation,material})
     }
 }
@@ -124,7 +172,7 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
         }
         let condition = first.retain_condition_current(initial, metric)?;
         Ok(Self {
-            laws,
+            laws: laws.into_iter().map(|law| GeneratorMaterial {law,predictive:None}).collect(),
             condition,
             epoch: 0,
             evidence: None,
@@ -151,12 +199,14 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
     pub fn condition(&self) -> ResidentConstitutiveCurrent<'_, 'c> {
         self.condition.current()
     }
-    pub(crate) fn generator_for_staging(
+    pub(crate) fn material_for_staging(
         &mut self, member:usize,
-    )->Result<&mut ResidentConstitutiveFibre<'c>,ConstitutiveFibreError>{
+    )->Result<&mut GeneratorMaterial<'c>,ConstitutiveFibreError>{
         self.require_usable()?;
         self.laws.get_mut(member).ok_or(ConstitutiveFibreError::Shape)
     }
+    /// Compatibility law used for condition contact and relation formation. Predictions use
+    /// the attached normal action when present; `predictive_material` exposes that material.
     pub fn generator(
         &self,
         member: usize,
@@ -164,7 +214,37 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
         if !self.usable {
             return Err(ConstitutiveFibreError::Uncertain);
         }
+        Ok(&self.material(member)?.law)
+    }
+    pub(crate) fn material(&self, member: usize) -> Result<&GeneratorMaterial<'c>, ConstitutiveFibreError> {
+        self.require_usable()?;
         self.laws.get(member).ok_or(ConstitutiveFibreError::Shape)
+    }
+    pub(crate) fn action(&self, member: usize) -> Result<&ResidentConstitutiveFibre<'c>, ConstitutiveFibreError> {
+        Ok(self.material(member)?.action())
+    }
+    /// Attach already-formed normal material to this existing local generator and condition.
+    /// Subsequent observations derive their features from the actual prior condition here.
+    /// Refusal returns the supplied material and leaves this neighborhood unchanged.
+    pub fn attach_normal_prediction(&mut self, member: usize, material: ResidentNormalMaterial<'c>)
+        -> Result<(), (ResidentNormalMaterial<'c>, ConstitutiveFibreError)> {
+        let prepared = (|| {
+            let local = self.material(member)?;
+            if local.predictive.is_some() { return Err(ConstitutiveFibreError::Shape); }
+            let next = self.epoch.checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
+            Ok((PredictiveMaterial::action_for(&material, &local.law)?, next))
+        })();
+        match prepared {
+            Ok((action, next)) => {
+                self.laws[member].predictive = Some(PredictiveMaterial {material,action});
+                self.epoch = next;
+                Ok(())
+            }
+            Err(error) => Err((material,error)),
+        }
+    }
+    pub fn predictive_material(&self, member: usize) -> Result<Option<&ResidentNormalMaterial<'c>>, ConstitutiveFibreError> {
+        Ok(self.material(member)?.predictive.as_ref().map(|v| &v.material))
     }
 
     #[cfg(test)]
@@ -206,14 +286,17 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
                 .as_ref()
                 .map_or_else(|| self.condition.current(), |v| v.successor());
             if p.member == member {
+                if let Some(predictive) = &p.predictive {
+                    return predictive.action.read_wave_relation_in_chart(condition, roots, receiver);
+                }
                 if let Some(formation) = &p.formation {
                     return formation.read_wave_relation(condition, roots, receiver);
                 }
             }
-            self.generator(member)?
+            self.action(member)?
                 .read_wave_relation_in_chart(condition, roots, receiver)
         } else {
-            self.generator(member)?.read_wave_relation_in_chart(
+            self.action(member)?.read_wave_relation_in_chart(
                 self.condition.current(),
                 roots,
                 receiver,
@@ -232,7 +315,7 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
         member: usize,
         source: ResidentConstitutiveCurrent<'_, 'c>,
     ) -> Result<ResidentConstitutiveReturn<'c>, ConstitutiveFibreError> {
-        self.generator(member)?
+        self.action(member)?
             .read_bilinear(source, self.condition.current())
     }
     /// Ordinary occurrence. A received current first meets the old compatible condition
@@ -272,6 +355,17 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
         source: ResidentConstitutiveCurrent<'_, 'c>,
         observed: Option<ResidentConstitutiveCurrent<'_, 'c>>,
     ) -> Result<PreparedNeighborhoodConsequence<'c>, ConstitutiveFibreError> {
+        self.prepare_consequence_at(member, source, observed, None)
+    }
+    /// A delayed empirical observation uses its producing condition for the normal moments;
+    /// condition contact itself still reacts through the contemporary standing field.
+    pub(crate) fn prepare_consequence_at(
+        &mut self,
+        member: usize,
+        source: ResidentConstitutiveCurrent<'_, 'c>,
+        observed: Option<ResidentConstitutiveCurrent<'_, 'c>>,
+        producing_condition: Option<ResidentConstitutiveCurrent<'_, 'c>>,
+    ) -> Result<PreparedNeighborhoodConsequence<'c>, ConstitutiveFibreError> {
         if !self.usable {
             return Err(ConstitutiveFibreError::Uncertain);
         }
@@ -279,12 +373,15 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
             .epoch
             .checked_add(1)
             .ok_or(ConstitutiveFibreError::Shape)?;
-        let law = self
+        let material = self
             .laws
             .get_mut(member)
             .ok_or(ConstitutiveFibreError::Shape)?;
         let prior_condition = self.condition.standing();
-        let prediction = law.read_bilinear(source, prior_condition.current())?;
+        let prediction = material.action().read_bilinear(source, prior_condition.current())?;
+        let predictive = observed.map(|value| material.stage_prediction(source, producing_condition.unwrap_or(prior_condition.current()), value))
+            .transpose()?.flatten();
+        let law = &mut material.law;
         let (condition, formation) = if let Some(observed) = observed {
             let family = law.read_condition_preimage(source, observed)?;
             let proposed = self.condition.prepare_contact(&family)?;
@@ -318,6 +415,7 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
             prior_condition,
             condition,
             formation,
+            predictive,
         })
     }
 
@@ -341,7 +439,7 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
             && prepared
                 .formation
                 .as_ref()
-                .map_or(true, |f| self.laws[prepared.member].can_commit_formation(f))
+                .map_or(true, |f| self.laws[prepared.member].law.can_commit_formation(f))
     }
 
     pub(crate) fn publish_advance<'i>(
@@ -359,7 +457,10 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
             .map(|c| self.condition.publish_prepared(c));
         let formation = prepared
             .formation
-            .map(|f| self.laws[prepared.member].publish_formation(f));
+            .map(|f| self.laws[prepared.member].law.publish_formation(f));
+        if let Some(predictive) = prepared.predictive {
+            self.laws[prepared.member].predictive = Some(predictive);
+        }
         self.usable = true;
         if let Some(contact) = &contact {
             self.evidence = Some(NeighborhoodEvidence {

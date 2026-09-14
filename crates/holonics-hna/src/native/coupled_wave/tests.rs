@@ -26,6 +26,93 @@ fn current<'a, 'c>(v: &'a ResidentSection<'c>) -> ResidentConstitutiveCurrent<'a
 fn session<'c>(s: &'c ResidentSurface<'c>) -> NativeCoupledWaveSession<'c> {
     session_law(s, false)
 }
+
+// Measured complex source/condition specimens for the generic numerical HNN owner.
+// All compatibility formation and normal fitting use public native owners.
+fn numerical_predictive_body<'c>(s: &'c ResidentSurface<'c>) -> NativeCoupledBody<'c> {
+    let mut law = ResidentConstitutiveFibre::found_bilinear_contact(s,3,1,1).unwrap();
+    let mut normal = ResidentNormalMaterial::found_features(s,7,1,ResidentGrain(8)).unwrap();
+    let mut inputs = vec![[0;6]];
+    for coordinate in 0..6 {let mut source=[0;6];source[coordinate]=1;inputs.push(source);}
+    for a in inputs {
+        for h in [[0,0],[1,0],[0,1]] {
+            let measured=[a[0]*h[0]-a[1]*h[1],a[0]*h[1]+a[1]*h[0]];
+            let a=point(s,&a);let h=point(s,&h);let y=point(s,&measured);
+            law.advance_bilinear_contact(current(&a),current(&h),Some(current(&y))).unwrap();
+            normal=normal.stage_bilinear_observation(current(&a),current(&h),current(&y)).unwrap();
+        }
+    }
+    let h=point(s,&[1,0]);
+    let mut neighborhood=ResidentGeneratorNeighborhood::with_shared_condition(vec![law],current(&h),
+        ConditionContactMetric::UnitAdmittanceRealification).unwrap();
+    neighborhood.attach_normal_prediction(0,normal).unwrap_or_else(|(_,e)|panic!("{e:?}"));
+    let p=point(s,&[1,0]);let c=point(s,&[2,1]);
+    let wave=ResidentNormalMaterial::found(s,1,1,ResidentGrain(8)).unwrap()
+        .into_applied_difference_wave(current(&p),current(&c)).unwrap()
+        .with_neighborhood(neighborhood).unwrap();
+    NativeCoupledBody::from_wave(wave)
+}
+
+#[test]
+#[ignore = "requires CUDA; actual numerical coupled consumer keeps fitted material and producing conditions through out-of-order returns"]
+fn fitted_material_reaches_the_numerical_hnn_and_delayed_return() {
+    type Q=num_rational::BigRational;
+    let q=|n:i64|Q::from_integer(n.into());
+    let read_q=|v:&Value|serde_json::from_value::<Q>(v.clone()).unwrap();
+    let read_current=|v:&Value,state:usize| {
+        v["states"][state]["projection"]["current"].as_array().unwrap().iter()
+            .map(|v|Q::new(v["numerator"].as_str().unwrap().parse().unwrap(),v["denominator"].as_str().unwrap().parse().unwrap()))
+            .collect::<Vec<_>>()
+    };
+    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
+    let mut body=numerical_predictive_body(&s);
+    let initial=body.inspect_predictive_material(0).unwrap();
+    let initial_hh=read_q(&initial["predictive_material"]["state"]["source_normal"][3][3]["real"]);
+    let first=body.advance(0,WaveSourceReceiver::Direct,true).unwrap().unwrap();
+    let second=body.advance(0,WaveSourceReceiver::Direct,true).unwrap().unwrap();
+    let returned=point(&s,&[7,4]);
+    body.incorporate(second,current(&returned)).unwrap();
+    let old_return=point(&s,&[5,-2]);
+    body.incorporate(first,current(&old_return)).unwrap();
+    assert!(body.incorporate(first,current(&old_return)).is_err());
+    let material=body.inspect_predictive_material(0).unwrap();
+    assert_eq!(material["predictive_material"]["observations"],23);
+    // Both pending predictions were made under h=1. The current condition changed after the
+    // second return, but must not be substituted into the older first return's normal moments.
+    let hh=read_q(&material["predictive_material"]["state"]["source_normal"][3][3]["real"]);
+    assert_eq!(hh,initial_hh+q(2));
+
+    // The final observed return has original (p,c)=(1,2+i), eta=3-3i. The compatibility
+    // condition therefore becomes h=(3-3i)/(1+i)=-3i. It is formed inside the HNN body.
+    // Independently contract the returned stored M with every step's full (a,h,h*a).
+    let coefficients=material["predictive_material"]["state"]["material"]["coefficients"][0]
+        .as_array().unwrap().iter().map(|z|[read_q(&z["real"]),read_q(&z["imaginary"])])
+        .collect::<Vec<_>>();
+    let word=[(0,WaveSourceReceiver::Direct);2];
+    let epoch=body.epoch();
+    let forecast=body.inspect_prospective(&word,true).unwrap();
+    assert_eq!(body.epoch(),epoch);
+    assert_eq!(forecast["receiver_representation"],"generated-point-word");
+    for state in 0..2 {
+        let previous=forecast["states"][state]["projection"]["previous"].as_array().unwrap().iter()
+            .map(|v|Q::new(v["numerator"].as_str().unwrap().parse().unwrap(),v["denominator"].as_str().unwrap().parse().unwrap())).collect::<Vec<_>>();
+        let c=read_current(&forecast,state);
+        let a=[[&c[0]-&previous[0],&c[1]-&previous[1]],[c[0].clone(),c[1].clone()],[previous[0].clone(),previous[1].clone()]];
+        let mut u=a.to_vec();u.push([q(0),q(-3)]);
+        for x in &a {u.push([q(3)*&x[1],q(-3)*&x[0]]);}
+        let mut expected=c;
+        for (m,x) in coefficients.iter().zip(u) {
+            expected[0]+=&m[0]*&x[0]-&m[1]*&x[1];
+            expected[1]+=&m[0]*&x[1]+&m[1]*&x[0];
+        }
+        assert_eq!(read_current(&forecast,state+1),expected);
+    }
+    // Existing complete body persistence carries the new local material through its owner.
+    let rest=body.rest().unwrap();let mut bytes=Vec::new();rest.write(&mut bytes).unwrap();
+    let mut restored=SavedCoupledBody::read(&mut bytes.as_slice(),bytes.len() as u64).unwrap().remount(&s).unwrap();
+    assert_eq!(restored.inspect_predictive_material(0).unwrap(),material);
+    assert_eq!(restored.inspect_prospective(&word,true).unwrap(),forecast);
+}
 fn session_law<'c>(s: &'c ResidentSurface<'c>, conditional: bool) -> NativeCoupledWaveSession<'c> {
     let mut law = ResidentConstitutiveFibre::found_bilinear_contact(s, 6, 1, 2).unwrap();
     let mut sources = vec![vec![0; 12]];
