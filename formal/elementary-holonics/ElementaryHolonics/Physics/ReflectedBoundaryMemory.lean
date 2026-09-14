@@ -69,6 +69,56 @@ theorem reflectedResidual_step
 
 end Discrete
 
+section BoundaryReduction
+
+variable {Q : Type*} [AddCommGroup Q] [Module 𝕜 Q]
+
+/-- A changing boundary encoding eliminates an arbitrary interior exactly when the boundary
+action descends and the interior coupling is invisible in the next encoding. This is an operator
+criterion, not an assertion that unmeasured circulation is absent or that its history is stored. -/
+theorem boundary_reduction_iff
+    (A : X →ₗ[𝕜] X) (B : Z →ₗ[𝕜] X)
+    (E Enext : X →ₗ[𝕜] Q) (U : Q →ₗ[𝕜] Q) :
+    (∀ x z, Enext (A x + B z) = U (E x)) ↔
+      Enext.comp A = U.comp E ∧ Enext.comp B = 0 := by
+  constructor
+  · intro h
+    constructor
+    · ext x
+      simpa using h x 0
+    · ext z
+      simpa using h 0 z
+  · rintro ⟨hA, hB⟩ x z
+    have hx := LinearMap.congr_fun hA x
+    have hz := LinearMap.congr_fun hB z
+    simp only [LinearMap.comp_apply, LinearMap.zero_apply] at hx hz
+    rw [map_add, hx, hz, add_zero]
+
+/-- Boundary forcing is transported by the same next encoding. With these hypotheses at each
+step, the reduced recurrence follows by induction, without expanding the interior trajectory. -/
+theorem boundary_reduction_with_forcing
+    (A : X →ₗ[𝕜] X) (B : Z →ₗ[𝕜] X)
+    (E Enext : X →ₗ[𝕜] Q) (U : Q →ₗ[𝕜] Q)
+    (hA : Enext.comp A = U.comp E) (hB : Enext.comp B = 0)
+    (x : X) (z : Z) (f : X) :
+    Enext (A x + B z + f) = U (E x) + Enext f := by
+  rw [map_add, (boundary_reduction_iff A B E Enext U).mpr ⟨hA, hB⟩]
+
+/-- In a moving continuous chart the encoder derivative participates in the dynamics. -/
+theorem moving_boundary_rate
+    (A : X →ₗ[𝕜] X) (B : Z →ₗ[𝕜] X)
+    (E Edot : X →ₗ[𝕜] Q) (U : Q →ₗ[𝕜] Q)
+    (hA : Edot + E.comp A = U.comp E) (hB : E.comp B = 0)
+    (x : X) (z : Z) (f : X) :
+    Edot x + E (A x + B z + f) = U (E x) + E f := by
+  have hx := LinearMap.congr_fun hA x
+  have hz := LinearMap.congr_fun hB z
+  simp only [LinearMap.add_apply, LinearMap.comp_apply, LinearMap.zero_apply] at hx hz
+  simp only [map_add]
+  rw [hz, add_zero, ← add_assoc, hx]
+
+end BoundaryReduction
+
 section Trajectory
 
 variable {U V : Type*} [NormedAddCommGroup U] [NormedSpace ℝ U]

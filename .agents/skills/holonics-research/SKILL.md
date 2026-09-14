@@ -37,6 +37,12 @@ Load only the route needed:
 Use the mathematical construction contract in `docs/DEVELOPMENT.md`: typed source/target,
 known data and inferred unknown, hypotheses, operation and realization/defect equation.
 For HNN, locate the change in the blueprint's network contract before choosing an example.
+For sustained construction, execute the
+[construction loop](../../../docs/DEVELOPMENT.md#orchestrated-construction-cycles) from the active
+brief in CONSTRUCTION_STATE and the [model formula](../../../docs/HNN_FORMULA.md). The brief
+selects the consuming operation; source-local failures do not select a replacement objective.
+Root checks the proposed action against the actual model equation and consuming call;
+an independent review is optional support for a concrete unresolved question.
 Recover the formal/native owners and attempt their composition. Distinguish an unconnected
 caller, a representation that cannot express a required term, and an unproved mathematical
 claim. Name the actual call, term or proposition; none is specified by “missing relation”.

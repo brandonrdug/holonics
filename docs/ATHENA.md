@@ -10,6 +10,13 @@ the application implementations are in [holonics-hna](../crates/holonics-hna/REA
 
 ## One sustained construction programme
 
+[project-postulate] Athena uses the [HNN model formula](HNN_FORMULA.md) through one assembled
+public model. Its active currents and constituted operators implement the field/circuit
+dynamics, learned transformations and encoded continuation described there. A matrix fitted
+to an independent field's outputs is a valid surrogate application, not an automatic substitute
+for assembling this model. The [library guide](RUST_FRAMEWORK.md#mathematical-operators-and-model-assembly)
+records the current separate session implementations and the concrete connection to make.
+
 [definition] This guide owns Athena's product and interface contracts. Current native use
 enters through [NATIVE_HNA](NATIVE_HNA.md); the HNP sections below document the separately
 maintained inherited-operator interface and its dated evidence. They do not restart that deferred

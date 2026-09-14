@@ -1,7 +1,12 @@
 # Construction state
 
 **Currency:** September 14, 2026. **Control:** the construction goal was paused at
-00:15:41 America/Los_Angeles; the current request is a direct-message and campaign review.
+00:15:41 America/Los_Angeles. The current request is to recover the mathematical design,
+audit its Rust library composition and establish the model formula. It does not resume the
+paused construction goal. The [formula and library reconciliation](research/records/2026-09-14_THE_HNN_FORMULA_JOINS_THE_LIBRARY_TO_THE_MODEL.md)
+are complete. The [model formula](docs/HNN_FORMULA.md) governs the next integration; its
+boundary-reduction extension and `Framework.Physics` passed Lean. Native implementation
+remains at the verified/draft boundary below.
 The [paused-run review](research/records/2026-09-14_DIRECT_MESSAGES_AND_THE_PAUSED_HNN_RUN.md)
 recovers the original requests, completed returns and unfinished draft. **Latest verified
 implementation unit:** empirical observations form
@@ -15,6 +20,23 @@ product. Automata label HNN-based solvers and traversal constructions. The
 [roadmap](docs/plans/THE_ROADMAP.md) alone orders work; the
 [network contract](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-hnn-network-and-its-mathematical-contract)
 specifies the assembly and formal obligations.
+
+## Active construction brief
+
+[project-postulate] This brief applies the existing
+[assembly contract](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#boundary-and-interior-assembly-contract)
+under the [construction loop](docs/DEVELOPMENT.md#orchestrated-construction-cycles). Its endpoint
+does not change when a supporting test passes.
+
+| Control | Current content |
+|---|---|
+| Authorized deliverable | Assemble the HNN model in `docs/HNN_FORMULA.md`: constituted boundary/interior dynamics, learned transformations and modal execution through one public body. Produce the requested Athena output from that model. A separate predictor fitted to field samples is an application, not the architecture by default. |
+| Consuming owners | `NativeConstitutiveField` supplies caused current/material sections; `ResidentGeneratorNeighborhood` and `NativeCoupledBody` consume generating relations; dependent continuation retains the admitted parameter family and pending returns. Their actual source/action joins, not a fixed assay, determine the integration. |
+| Returned / unclosed | `b27588d2` verifies enclosed prediction and empirical formation at original producing cuts. Transport through changing current/material source charts and encoded execution of the consumed changing programme remain unclosed parts of this deliverable. |
+| Selected action on resumption | Compose the existing operative scattering/transport and local learned reaction in `NativeCoupledBody` using the same resident material and internal current. Make its output differential reach that material; factor its actual repeated action through existing mode/recurrence owners, carrying changing contact charts. Use the existing public request/readout for the resulting model. |
+| Completion evidence | Show the actual model invocation and generated product, the material transformation it used, and repeated execution/representation costs. Check the same operator's forecast, committed action and required differential/observation path. A component pass or two-material sensitivity test does not replace this model operation. |
+| Current draft disposition | Preserved, uncommitted support code. Known-condition reception, batch moments and cached reflection are candidates for that composition. Passing their probes cannot mark the assembly complete. The revised HNN test is not yet verified. |
+| Handoff disposition | The original paper occurrence `msg_01a09e2a-a7a0-7683-9b8e-e0e9446d959c` was fulfilled by `ce288e14`. It is retained context. The construction goal is paused. The September 14 request is model design and library synthesis; do not restart the surrogate draft or the old audit on pickup. |
 
 ## Current implementation boundary
 

@@ -1,4 +1,11 @@
-# HNN composition: section, operation, return and chart
+# HNN composition: transport, reaction, variation and encoding
+
+[project-postulate] The [model formula](HNN_FORMULA.md) specifies the whole computational
+object: oriented contacts, constitutive operators and active currents, their scattering/field
+dynamics, material variation and changing modal representation. This guide expands those
+equations. Lifecycle nouns alone do not specify a model. The
+[Rust composition boundary](RUST_FRAMEWORK.md#mathematical-operators-and-model-assembly)
+identifies where the existing library operations do and do not reach that model.
 
 [definition] HNN is a developing network of situated sections and interactions. Athena names
 its first intended product. Eros names composition and formation within the network; automata

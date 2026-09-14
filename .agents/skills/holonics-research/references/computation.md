@@ -6,6 +6,14 @@ applications. A generator is the mathematical function/composition being formed 
 source-code output and operator export are particular receiver uses. Work at the typed operation
 and its consuming source owner, keeping the original objective visible across goal turns.
 
+During sustained construction use the model formula, active brief and construction loop in the
+development guide. Root checks the actual operator composition and requested output before
+changing scope. A Luna review may answer a bounded independent source question; it is not a
+mandatory step or evidence that an autonomous campaign will remain aligned.
+When reviewing a probe proposal, locate what invokes its resulting object in the agreed network;
+before/after inequality, fixture success or a new export alone cannot close an assembly claim.
+Keep component verification available while retaining the original consuming deliverable.
+
 Inspect what the caller supplied before claiming what HNN formed. `ConstructPredictor` accepting
 source/condition operator handles computes within those supplied maps; it does not establish
 their native formation. Connecting such a result to the existing coupled consumer is a different

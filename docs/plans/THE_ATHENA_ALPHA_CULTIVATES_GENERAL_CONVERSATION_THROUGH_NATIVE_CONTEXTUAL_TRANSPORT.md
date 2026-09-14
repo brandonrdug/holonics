@@ -31,6 +31,13 @@ the substantive result; use the applicable evidence and receiver scope in the ro
 
 ## The HNN network and its mathematical contract
 
+[project-postulate] The [HNN model formula](../HNN_FORMULA.md) governs this assembly. It gives
+the constituted circuit/field equations, native scattering action, tangent/adjoint, classical
+learning instances and dynamic mode reduction. The relationships below specialize that formula;
+they must not be read as an architecture consisting only of lifecycle obligations. The
+[library composition table](../RUST_FRAMEWORK.md#mathematical-operators-and-model-assembly)
+distinguishes implemented mathematical operators from their present model consumers.
+
 [definition] The model is the retained network of generating functions, current and their
 situated composition. Its context is the [causal boundary over intersecting event histories](../HNN_COMPOSITION.md#context-names-a-situated-causal-boundary),
 including stored interior response, actual flux, constitutive material and local clocks.
@@ -124,6 +131,36 @@ consequence. Preview, commit and observation each retain the operation contract 
 ## The shared mathematical-to-native construction
 
 ### Boundary and interior assembly contract
+
+[project-postulate] The next assembly executes the actual constitutive operators as the HNN
+model. In the existing scattering chart, `A=I+DD*`, `A v=2(u+D b)`, `w=v-u`,
+`b_next=D*v-b`. Compose the incident boundary transport, these internal dynamics and the local
+learned reaction through `NativeCoupledBody` and the operative field's resident material.
+The forecast and committed step must evaluate this same composition. Normal fitting is used
+where its coefficients are the inferred model; an independent field fitted as a target source
+does not stand in for this assembly. That distinction supersedes the draft's surrogate-first
+interpretation, while retaining its valid normal/enclosure and delayed-observation code.
+
+[definition] The consuming implementation has three joined obligations:
+
+1. **Evaluate and learn the composed model.** Transfer resident currents through the actual
+   contact charts; use the existing scattering/reaction operators for joint output. Pull the
+   requested differential through their tangent/adjoint into those same coefficients, including
+   the current/material interaction terms. Reuse condition/preimage and normal laws where they
+   occur in this model; do not require a synthetic observation after every output.
+2. **Execute its modal representation.** Factor the repeated full boundary/interior action,
+   with its initial internal modes and pending comparisons. For changing geometry use
+   `E_next T=U E`; where it fails, retain the exposed mode or its dynamic memory. The exact
+   reducer is an algorithmic starting point to lower to resident execution, not a new host loop.
+3. **Expose the same model to Athena requests.** Keep input encoding and requested output
+   projection on the existing public session. Inspect the actual correction, continuation or
+   mathematical product from the composed body, including its error and work. Derive the next
+   repair from that operation rather than introducing a different example to obtain a pass.
+
+[project-postulate] This is one integration assignment. Supporting numerical and ownership
+repairs stay part of it. Existing wrappers and separate prepared predictors are implementation
+choices to reconcile, not mathematical boundaries to perpetuate. The current draft is not
+discarded and no unrelated physical environment or solver API is removed.
 
 [definition] The consuming operation binds actual participating boundary and retained interior
 currents to local generating material, then returns the requested joint face and the successor

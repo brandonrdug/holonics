@@ -80,6 +80,23 @@ nested automata that construct, compare and refine further automata.
 
 ## Immediate mathematical application and implementation
 
+[project-postulate] Brandon's September 14 design ruling makes the
+[model formula](../HNN_FORMULA.md) the construction object. The next assignment is the
+[composed field/model operation](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#boundary-and-interior-assembly-contract):
+execute the existing native scattering/transport and learned reactions through one public HNN
+body; make its differential act on that same material; execute its applicable modal/recurrence
+representation; inspect the actual Athena request and output. These are joined responsibilities,
+not a queue of separate predictor, persistence and compiler demonstrations. A field-as-target
+surrogate remains an available application, but no longer selects the model architecture.
+
+[project-postulate] The shared Rust libraries already contain exact operator/factorization,
+normal learning, adjoint, field and mode constructions. Their
+[inspected consumers](../RUST_FRAMEWORK.md#mathematical-operators-and-model-assembly) determine
+the integration, including native lowering of the host exact modal reducer where applicable.
+Formalization returns executable laws into these owners. Another paper or elementary
+definition is not scheduled before the model; physical derivations continue as its design
+and as independent framework work at their actual equations.
+
 [project-postulate] Develop the HNN network specified by the
 [mathematical assembly contract](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-hnn-network-and-its-mathematical-contract).
 Compose the evolving event boundary, stored current, material and actual incident transport

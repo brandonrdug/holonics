@@ -3,6 +3,20 @@
 Brandon's latest direct request governs. This is the shared contract for Codex and Claude;
 CLAUDE.md points here. The repository belongs to one human operator, not an approval committee.
 
+## Sustained construction control
+
+[project-postulate] Before selecting work in a sustained construction run, use the active brief
+at the top of [CONSTRUCTION_STATE.md](CONSTRUCTION_STATE.md). It retains the user-authorized
+deliverable, unresolved consuming operation, next action and completion evidence. The
+[HNN model formula](docs/HNN_FORMULA.md) supplies the transport, constitutive, variation and
+encoding equations; the brief does not replace that model with lifecycle nouns. A helper,
+probe or corrected defect may advance that operation; it does not replace the deliverable.
+Follow the [construction loop](docs/DEVELOPMENT.md#orchestrated-construction-cycles) at scope
+transitions and after compaction. Root checks the actual consuming call against the request
+and owns integration; a reviewer is optional support, not a mandatory workflow gate.
+When asked to repair this practice,
+make the operational change and report its result instead of repeating an assent or diagnosis.
+
 ## Responsibility and product orientation
 
 [project-postulate] Agents own investigation, repair, integration and verification of agent-created

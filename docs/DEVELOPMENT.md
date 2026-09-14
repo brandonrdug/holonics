@@ -82,23 +82,48 @@ clause in place; appending a contrary instruction elsewhere is not consolidation
 [project-postulate] Brandon's authorized workflow keeps the primary agent responsible for
 mathematical decisions, consuming implementation, integration and verification. Luna workers
 handle bounded independent source, proof, kernel or regression tasks with explicit ownership.
-Their result is integrated into the shared construction before another worker campaign grows
-around it. A worker's proposed map is checked against the actual source and consumer.
+Their returns feed the same consuming implementation. The following control applies to sustained
+construction; ordinary repairs and user-requested bounded tasks do not acquire another process.
 
-[definition] One cycle follows the live blueprint's consuming contract through a returned
-function, joint output or physical/mathematical consequence. The primary agent identifies the
-source/current/material/receiver equation, implements its dependent call, reconciles affected
-owners and verifies the requested output and cost. Supporting derivations are used in that
-consumer as their domains permit. A source example or lemma is an intermediate result when
-the consuming call remains unbound.
+[definition] Keep one short active brief in CONSTRUCTION_STATE, linked to the roadmap and exact
+blueprint contract: **authorized deliverable; consuming operation and existing owners; verified
+return and unclosed obligations; selected next action and why it advances that operation; evidence
+that would complete it.** Keep proposed scope changes visibly distinct from user rulings. Do not
+create a second plan, enumerate every edit, or rewrite the brief at each tool call.
 
-[project-postulate] After each substantive return, rejoin the current direct ruling, native
-implementation and relevant wider mathematics. Record what the return changes in the programme
-and proceed to its next dependency. This is a continuation decision, not another archive audit
-or recurring documentation exercise. During compaction preserve that decision, the active
-equation, changed files and running checks. Completion of a cycle does not complete the broader
-HNN objective. A goal control, when enabled, supplies continuous turns; the live blueprint and
-latest direct messages continue to govern what those turns do.
+[project-postulate] Execute this loop at a substantive return, a proposed change of source/domain
+or completion criterion, or compaction that leaves the next action ambiguous:
+
+1. **Select from the brief.** Name the change to the consuming operation. If the proposed work
+   ends at another example, helper or measurement, state its already-required consumer and carry
+   that integration in the same work assignment. A failed fixture does not choose the next goal.
+2. **Check the model equation at the consumer.** Root compares the proposed edit with the
+   [model formula](HNN_FORMULA.md), direct request and actual invoked operator. Identify which
+   current, constitutive map, differential or representation changes and what requested output
+   it affects. A worker is optional for a specific independent source question, not a required
+   reviewer of each scope change. A workflow rehearsal does not verify autonomous reliability.
+3. **Construct and integrate.** Root owns the mathematical choice and joined implementation.
+   Delegate bounded parts when useful. Tests answer the selected operation's uncertainty;
+   they do not become independent campaign destinations. Repair exposed defects without
+   replacing the deliverable with their apparatus.
+4. **Close against the requested result.** Report the returned function/product and executed
+   consumer, applicable source family, remaining defect and relevant work/representation costs.
+   A component pass is an intermediate return. Keep the same deliverable active while its
+   consuming call or promised encoding remains unclosed; do not announce completion and merely
+   rename that obligation as the next cycle.
+
+[project-postulate] A scope objection returns work to the existing consuming operation, not
+to another audit or policy-writing loop. One resolved comparison covers routine dependent edits;
+do not review every patch or rerun an unchanged check. A new mathematical obstruction can change
+the implementation route, with its failed equation and revised route recorded. It does not
+silently shrink the user's deliverable or require a new user permission for authorized work.
+
+[project-postulate] Compaction retains this brief's unresolved operation, selected action,
+changed owners, running checks, the actual model invocation/output and the disposition of the
+last human occurrence. Resume that action when it is clear; completed links are not new
+requests. A paused goal stays paused.
+An explicit new user request can steer the work without replacing the full programme. The
+loop is an execution practice, not a theorem of model behavior or a runtime intelligence gate.
 
 [definition] Repository-wide review means following the live roots, subject boundaries and
 critical source-to-application maps, then repairing the in-scope contradictions found. Record

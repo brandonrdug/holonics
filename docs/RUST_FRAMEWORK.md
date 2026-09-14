@@ -6,7 +6,7 @@ used as a path dependency (`publish = false`). HNN application and wire names re
 compatibility.
 
 [definition] The [HNN composition guide](HNN_COMPOSITION.md) describes the model's semantic
-assembly and its actual remaining attachment. The dependency split below improves library
+assembly, with its [governing model formula](HNN_FORMULA.md). The dependency split below improves library
 access; it does not make distinct field/full-operator states interchangeable or complete the
 general model architecture.
 
@@ -63,3 +63,52 @@ identity or native adjacency. The [owner map](ARCHITECTURE_MAP.md) connects furt
 physical and computational subjects to their formal and executable owners. Lean stays separate
 verification apparatus. The [native](NATIVE_HNA.md), [Athena](ATHENA.md) and
 [interoperability](INTEROPERABILITY.md) guides retain the different runtime and artifact scopes.
+
+## Mathematical operators and model assembly
+
+[established-bounded; source-inspected] Holonics already has reusable Rust mathematical and
+learning libraries. The September 14 source inspection distinguishes their algorithms from
+the model that currently consumes them. Re-exporting an owner supplies library access; it
+does not join the model's data and execution. This is the concrete translation boundary for
+the [formula](HNN_FORMULA.md), not a proposal for another `holonics-ml` wrapper crate.
+
+| Mathematical contract | Existing library implementation | Actual model connection |
+|---|---|---|
+| Exact linear maps, preimages and factorization | `holonics::engine::exact_linear`, including `ExactRatMatrix::factor_receiver` | `NativeMathematicalSession` constructs resident linear/bilinear operators and parameter families. Its operator/product/predictor maps are application storage, not one assembled field model. |
+| Normalized attention, weighted mode summaries and descended actions | `exact_linear::KernelModeReduction` and `KernelModeSummary`; formal `AttentionModeCompression`, `GeneratorModeQuotient` | The reducer's callers are its example and unit tests. It uses `ExactRatMatrix`/`Rat` on the host. Native consumption requires lowering the derived operators and current columns through existing resident owners; do not run a host semantic replay loop. |
+| Incidence, field current and boundary/interior scattering | `native_ecology::constitutive_fibre::NativeConstitutiveField`, operative field kernels | The field owns actual material and internal current. The recent coupled boundary test uses field observations to fit normal prediction; this establishes that surrogate binding, not execution of the same field law by every public session. |
+| Material differential and adjoint | `field/junction/operative/response.rs`, `propagation.rs` and their resident kernels | `material_contact_response`/`apply_material_contact_response` already compute and apply a declared contact response. Bind the requested output differential through these operators in the same model invocation. |
+| Normal equations and condition/preimage inference | `ResidentNormalMaterial`, `ResidentConditionCurrent`, `ResidentGeneratorNeighborhood` | Normal material is attached to the neighborhood and consumed by coupled generation. Keep that actual learning law available; its fixed features do not prescribe every HNN operator. |
+| Joint generation and dependent parameter families | `holonics::hna::native::NativeCoupledBody` over `ResidentNormalWave` or `ResidentCoupledConstitutive` | This is the selected application owner to extend for the composed model. The field's transport/material and modal execution must participate through one owned operation; adding a further competing session does not close that connection. |
+| Spatial/temporal modal closure and boundary memory | `receiver_history_compression`, `exact_linear`, operative current factors; formal `ReflectedBoundaryMemory` | Reuse factor/recurrence algorithms for the actual model action. The dependent coupled implementation still evaluates its retained programme. A fixed-linear compiler is available but does not itself compile changing material. |
+
+[project-postulate] Library design follows these mathematical operations. A reusable owner
+provides its operands, application/composition and required differential or factorization;
+the corresponding CUDA implementation realizes those operations in the declared exact/enclosed
+representation. The public HNN session consumes them. Keep mathematical reference code
+available independently where the dependency graph permits; a full workspace move is not
+required before composing the current native model.
+
+[definition] Translation from Lean is translation of a specified construction. A formal
+existence statement or `noncomputable` quotient does not choose an executable decoder. For
+finite linear boundary reduction, the decoder/action is already constructive: factor
+`E_next[A B]` through `[E 0]` using `ExactRatMatrix::factor_receiver`; consume the resulting
+map or its actual separating vector. That is a library operation with a mathematical
+contract. A new collection of theorem-named wrapper types would not improve it.
+
+[established-bounded; source-inspected] Retention also crosses this boundary. The field's
+`history: Vec<HeldField>` currently supplies occurrence counts, delayed material/current
+references and rest reconstruction; operative current-factor condensation already reduces
+some retained current data. The coupled dependent body evaluates its operation prefix.
+These consumers explain the current representation, not a mathematical requirement to store
+every event. Reconcile them around live internal modes, closed statistics and outstanding
+comparison operands; keep chronology as chronology rather than making a vector of old fields
+its necessary implementation. Existing evidence and rests must remain recoverable during
+that migration.
+
+[project-postulate] The next integration changes the composed model, not the public spelling
+of these APIs: execute the operative scattering law and its learned/local transformations
+through `NativeCoupledBody`, make the output differential reach the same material, and compile
+the repeated action with its internal modes. The blueprint and roadmap own this work. Retain
+the useful mathematical-session API and historical `hna` identifiers as applications and
+compatibility surfaces.

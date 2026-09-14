@@ -47,6 +47,11 @@ native topology or proves a particular executable adapter exists.
 
 ## The lifecycle
 
+[project-postulate] Begin construction with the [HNN model formula](HNN_FORMULA.md), whose
+transport, constitutive response, adjoint variation and modal encoding determine the model.
+The lifecycle below describes ownership and interfaces around those operations; it is not
+the mathematical architecture and cannot choose which computation to implement next.
+
 [project-postulate] Native founding and contextual development are now the primary construction
 path. Inherited material is a later composition path, not the source of the missing contextual
 architecture. The diagram describes roles and composition, not completed capabilities.
