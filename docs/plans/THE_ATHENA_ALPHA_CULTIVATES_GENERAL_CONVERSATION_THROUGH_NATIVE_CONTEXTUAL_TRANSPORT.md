@@ -32,13 +32,16 @@ the substantive result; use the applicable evidence and receiver scope in the ro
 ## The HNN network and its mathematical contract
 
 [definition] The model is the retained network of generating functions, current and their
-source-conditioned composition. At a contemporary cut let q denote its situated current,
-Theta its constitutive/generating material, and I its admitted oriented incidence. These are
+situated composition. Its context is the [causal boundary over intersecting event histories](../HNN_COMPOSITION.md#context-names-a-situated-causal-boundary),
+including stored interior response, actual flux, constitutive material and local clocks.
+At a contemporary cut let q denote its situated current, Theta its constitutive/generating
+material, and I its admitted oriented incidence. These are
 mathematical operands already represented by the field, relation and coupled owners, not a new
 universal state wrapper. An occurrence enters through its actual boundary map. Relevant local
 restrictions expose `s_e=S_e(q,o)` and `h_e=C_e(q,o)` at a contact e before its target is observed.
-The domain and source of S_e and C_e must be stated; attaching manually prepared vectors does
-not implement their formation from native incidence.
+The domain and source of S_e and C_e must be stated. They are restrictions at this boundary;
+the local port h does not stand for its entire context. Their formation and use belong to
+the evolving current/material/incidence assembly, with no universal context-extraction stage.
 
 [definition] In an attachment change, name the body carriers actually read and how the
 restriction refers to their incidence and current chart. Applying supplied A and C computes
@@ -618,6 +621,13 @@ a raw token window, source ID, authored topic label or copied history. A static 
 remain the final codec; the present generator already advances before it is decoded.
 
 ### The source and condition construction
+
+[project-postulate] This section implements local restrictions of the whole causal situation
+specified above. Source-null contrasts diagnose a declared receiver's lost distinctions; they
+do not define context as a classification of text preparations. Compose available current,
+capacitance/storage, topology and interior-return owners before adding a new extraction or
+fitting stage. A whole-field diffusion product, an SSM trajectory and a joint future section
+are applicable output constructions through the same source/receiver contract.
 
 [definition] Consume the returned fitted material through
 `eta=M_s a+M_h h+M_mix(h tensor a)`, with `a=(c-p,c,p)` and `v=c+eta`.

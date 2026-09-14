@@ -82,10 +82,13 @@ nested automata that construct, compare and refine further automata.
 
 [project-postulate] Develop the HNN network specified by the
 [mathematical assembly contract](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-hnn-network-and-its-mathematical-contract).
-Use the joined source/condition/material owners to form preparation restrictions from actual
-mounted incidence and developmental contrasts, accompanied by economical representation of the
-action actually used. CONSTRUCTION_STATE names the returned consumer and next source/encoding
-dependency. A new example, wrapper, rest format or output codec cannot replace that construction.
+Compose the evolving event boundary, stored current, material and actual incident transport
+through the joined native owners. Source/condition restrictions and developmental contrasts
+are local constructions within that dynamics; the [composition guide](../HNN_COMPOSITION.md#context-names-a-situated-causal-boundary)
+specifies their scope and the SSM/convolution/diffusion/joint-output connections. Economical
+representation accompanies the action actually used. CONSTRUCTION_STATE names the returned
+consumer and next source/encoding dependency. A new example, wrapper, rest format or output
+codec cannot replace that construction.
 
 [definition] Prediction release is the generated face crossing its receiver boundary. Preview,
 committed continuation and later comparison have the blueprint's distinct state contracts.
@@ -101,7 +104,7 @@ and measurements belong only in CONSTRUCTION_STATE and its linked records.
 
 | Packet / deliverable | Concrete return | Dependency and completion evidence |
 |---|---|---|
-| **Contextual generator formation** | A whole corrected or continued section from source/condition distinctions present before its target arrives; infer `W[S;C]=Y` or the declared normal/conditional law. | Use the source-null contrast and fixed-h collapse as references. Show actual generated chunks for new inputs and the same visible source under distinct preparations, plus the unsupported-condition separator. No additional unchanged broad exposure. |
+| **Generator formation through situated incidence and material** | A generated section from the evolving event boundary and its retained interior response. `W[S;C]=Y` and the normal/conditional law are local source specializations; recurrence, field evolution and mixed interaction retain their own equations. | Inspect the participating incidence/current/storage and joint output before the target arrives. For the existing text/source specialization, use source-null contrasts and fixed-h collapse as references, with changed preparations and an unsupported-condition separator. No additional unchanged broad exposure. |
 | **Joint prediction release** | The prepared joint output and one published successor for the transport-only word, with optional cuts for later joint observations. | Compare with the existing forecast at the same source/section; preserve component correlation, endpoint, delayed return and recoverable refusal. It can bind before general contextual language succeeds. |
 | **Compiled modal continuation** | Reusable factor/recurrence or closed formation statistics, with `E_next T=U E` and `D E=rho` on the admitted operation. | Begin with the first repeated segment. Compare complete requested outputs and live pending returns; repeated use without new independent structure ceases appending executable history. Measure work, representation and precision growth. |
 | **HNN solver and tool output** | A formed mathematical function/composition retained and executed through the shared HNN owners for the requested tool use. Code is an available output domain; an operator can also request an exterior representation of the function. | Inspect the inferred generating relation, its source/condition dependence and returned consequences on new inputs or compositions. Reuse its retained native material. When source-code output or export is requested, check target execution against the specified behavior or retained operator; printer correspondence alone establishes only that adapter. |
@@ -111,8 +114,9 @@ and measurements belong only in CONSTRUCTION_STATE and its linked records.
 
 [project-postulate] These packets implement the six shared responsibilities, not a new engine
 or independent campaign per row. Formation, release and representation can change in one
-coherent increment. Context is carried native state and incidence, not a label/window chosen
-from the target. The exact returned relation and its decoded output determine the repair;
+coherent increment. Context denotes the situated event boundary with current, incidence,
+storage and interior return; a local condition coordinate is one restriction of it.
+The exact returned relation and its decoded output determine the repair;
 “complete”, “sufficient”, “intelligent” or a changed coefficient alone specify no deliverable.
 
 [definition] The [September 13 planning record](../../research/records/2026-09-13_PREDICTION_RELEASE_HAS_ONE_GENERATING_RELATION_AND_CONCRETE_PRODUCTS.md)

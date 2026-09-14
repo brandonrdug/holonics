@@ -221,6 +221,14 @@ translation-relative transport, graph networks as incident message transport, an
 models as retained recurrence with an observation map. Those mathematical constructions do not
 require the neural ecology to adopt an entire Transformer or any other fixed architecture.
 
+[definition] The [situated-boundary refinement](HNN_COMPOSITION.md#context-names-a-situated-causal-boundary)
+connects these owners through retained storage and the actual event cut. It derives the SSM's
+causal convolution including its initial-state return, places generative diffusion's initial
+field and formed evolution in their declared probability chart, and identifies multi-face
+prediction as a joint future receiver. Context denotes that causal situation; a condition port
+or text prefix exposes one restriction. Dynamic reflection and changing capacitance participate
+in the generating law and its encoding, rather than entering only as later analogies.
+
 [established-bounded; source-inspected] These ideas also have executable owners.
 [`exponentiated_ratio.rs`](../crates/holonic-engine/src/exponentiated_ratio.rs) carries a ratio
 cocycle and exact rational normalization in its symbolic-log domain. General certified

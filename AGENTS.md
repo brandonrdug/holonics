@@ -58,6 +58,14 @@ relativity. A relevance score, semantic label or universal all-to-all contact is
 The causal ontology treats apparent randomness through unresolved conditions and receiver scope;
 probability and statistics remain lawful declared charts under the existing jurisdiction rules.
 
+[definition] **Context names the situated causal boundary over intersecting event histories.**
+It includes actual incidence, current, constitutive storage, local clocks and the interior return
+needed for admitted continuation. A local condition port is one restriction of that situation.
+Name those operands instead of using “context-driven” as an explanation. State-space recurrence,
+convolution, diffusion and joint prediction are mathematical realizations to compose through
+their laws; text is one receiver application. Read the
+[composition definition](docs/HNN_COMPOSITION.md#context-names-a-situated-causal-boundary).
+
 [project-postulate] The [relevance hypothesis](docs/canon/THE_RELEVANCE_HYPOTHESIS.md) supplies the
 derived future-receiver principle and its cross-domain source maps. Loss is a measurement of a
 situated comparison across mathematics, physics and computation, not an exclusively ML technique.

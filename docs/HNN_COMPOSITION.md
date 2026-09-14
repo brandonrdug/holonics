@@ -19,6 +19,177 @@ source chart; its finite attention difference separates changes to transported v
 to their participation. This informs the existing contextual attachment work without changing AC
 order or installing a DeepSeek architecture.
 
+## Context names a situated causal boundary
+
+[project-postulate] Brandon's September 13 clarification makes the scope explicit: context is
+the situated boundary over intersecting trees of events, with the material and flux that make
+their continuation possible. Lead HNN construction with that evolving incidence and interior–
+exterior transport. A text prefix, a local condition vector h and an instantaneous array each
+present a particular face of it. None independently defines the complete causal situation.
+
+[definition] On an admitted event-order chart, take a causal past P closed under predecessors.
+Its cut exposes the incoming/outgoing incidences crossing P and the retained interfaces to its
+interiors. Intersecting event branches join through their actual shared occurrence/port maps;
+their joint constraints, phase and local clock comparisons travel with the join. At receiver F,
+the relevant restriction is the part that can participate through the admitted transport and
+future receiver family. This is a definition over the existing occurrence diagram, not a demand
+for a global synchronized lattice or for storing every ancestor. A spatial incidence graph may
+contain circulation even when its successive events are ordered causally.
+
+[definition] The restricted boundary carries its medium's current, storage, constitutive
+response, changing incidence, and the retained interior response needed for subsequent conduct.
+An exterior face can therefore be small while its realization has nested dynamics. The local
+ports `s=S_e(q,o)` and `h=C_e(q,o)` in the blueprint are restrictions of that situation. The
+condition port h is an operand of one law; it is not a replacement definition of context.
+In current prose name the actual operand: event cut, incident current, held charge, material,
+source restriction, interior return, or receiver. Use the shorthand only with that scope stated.
+
+[established-bounded; source-inspected] `Foundation/AddressedBoundary.lean::boundary_join`
+cancels the matched middle face using its pullback joining equality.
+`Transport/WorldTube.lean::ClockedSpan.comp` retains both occurrence clocks, receiver faces
+and obstructions. Native `current_world.rs::NativePathChart` realizes an ordered path incidence
+chart; `causal_traversal.rs::ExactReactiveTraversalInteraction` separates arriving current,
+retained storage, material and feedback into the next morphology. These are existing owners
+and specializations, not evidence that a one-dimensional path implements every event complex.
+
+### Material, capacitance and changing incidence
+
+[definition] In a fixed finite capacitive chart, let phi be real potential, C positive symmetric
+capacity, d the oriented incidence, and W nonnegative branch conductance. Stored charge is
+`q=C phi`; the dissipative response is `L phi=d* W d phi`. Conservation with injection b gives
+
+```text
+partial_t(C phi) = -L phi + b.
+```
+
+This equation states what the material stores and how flux crosses its actual connections.
+The electrical realization uses its voltage, capacitance, conductance and time units. Other
+media supply their corresponding constitutive storage and flux law. Capacitance here is a
+material relation, not a synonym for an allocated context length or a scalar model capacity.
+
+[proved-derived] For differentiable C on that fixed carrier,
+
+```text
+E = phi* C phi / 2,
+E_dot = phi* b - phi* L phi - phi* C_dot phi / 2.
+```
+
+The material-rate term follows from differentiating charge and energy together. For constant
+C, backward Euler gives `(C+dt L) phi_next=C phi+dt b_next`; thus the existing implicit diffusion
+solve is also a state-space step. With changing C the charge-conserving step uses C_next on
+the left and C_previous on the right. A changed node/port population additionally needs the
+actual transfer of stored charge between carriers and its boundary work. Coordinate relabeling,
+physical coupling change and birth/removal of a port are different transformations.
+
+[established-bounded; source-inspected] `Physics/CoupledIncidence.lean` carries branch drops,
+quadratic storage and the generalized `K v=omega² C v` mode relation.
+`Physics/PortEnergyHeat.lean` carries driven capacitive/inductive response, heat and changing
+storage. `Physics/ConstitutiveModulation.lean` carries incidence/material/state changes.
+A Hamiltonian chart supplies the energy and its symplectic or quantum evolution; dissipative
+and driven terms retain their additional laws. The instantaneous graph specifies admissible
+couplings, while the material specifies their action. The Hamiltonian operator and a Hamiltonian
+path through a graph denote different constructions; neither is implicit merely in having nodes.
+
+### State-space, convolution and diffusion are connected realizations
+
+[proved-derived] For the linear recurrence and receiver
+`x_(k+1)=A x_k+B u_k`, `y_k=R x_k+D u_k`, induction gives
+
+```text
+y_k = R A^k x_0 + sum_(j=0)^(k-1) R A^(k-1-j) B u_j + D u_k.
+```
+
+This is a retained interior realization and its causal convolutional boundary response,
+including the initial-state return. For varying maps, `A^k` becomes the ordered transition
+product and the kernel depends on both event positions. Input-dependent material can make
+that entire map input-dependent. Its composition remains useful even where translation
+symmetry no longer provides one shared convolution kernel. The spatial analogue
+`y(v)=sum_delta K(delta)x(v-delta)` shares transport by relative displacement on its declared
+translation chart; irregular/changing incidence uses the corresponding addressed operators.
+
+[established-bounded; source-inspected] `Computation/HolonicArchitectureCharts.lean` owns
+state-space fold composition, the linear recurrence, convolution equivariance and graph-current
+specializations. S4 develops a structured SSM with efficient convolutional evaluation;
+Mamba's input-dependent SSM parameters use selective recurrent computation. These external
+constructions help identify realizable state/transport laws; they prescribe no HNN architecture.
+[S4](https://arxiv.org/abs/2111.00396), [Mamba](https://arxiv.org/abs/2312.00752).
+
+[proved-derived] The same fixed-operator convolution has the generating function
+`sum_(j>=0) R A^j B z^j = R(I-zA)^(-1)B`, as a formal power series or on its analytic
+convergence domain. A recurrence, convolution kernel and rational resolvent can therefore
+encode the same boundary response. Initial standing still contributes its separate transported
+term. This gives the existing factor/recurrence work a direct SSM application without imposing
+token-by-token execution or claiming that every changing nonlinear system has a fixed resolvent.
+S4's construction explicitly evaluates this generating function through structured Cauchy
+operations. [S4, sections 2.4 and C.3](https://arxiv.org/pdf/2111.00396).
+
+[proved-derived; formal-checked] Integration by reflection retains the same interior return.
+For `x_dot=A x+B z+f`, `z_dot=C x+D z+g` and `z=Kx+r`, the new
+`Physics/ReflectedBoundaryMemory.lean` gives
+
+`r_dot=(D-KB)r+(C+DK-KA-KBK-K_dot)x+g-Kf`.
+
+The [fluid construction](FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md) supplies the matching
+memory kernel and MHD mixed interactions. A local SSM can realize such a returning interior;
+a static boundary matrix omits it unless the required residual/forcing terms close. This is
+why changing geometry and stored current belong in the generating operation itself.
+
+[proved-derived] With constant coefficients, Laplace-domain elimination exhibits the connection
+directly: the boundary operator is `sI-A-B(sI-D)^(-1)C`, and its source is
+`x(0)+f_hat+B(sI-D)^(-1)(z(0)+g_hat)` wherever the transform and inverse are defined.
+Thus dynamic Schur response, the interior semigroup memory and the SSM resolvent are three
+representations of this same coupled equation. The initial interior source survives each one.
+
+[definition] Deterministic diffusion conducts a field through its constituted evolution.
+Probabilistic diffusion conducts a declared source measure through transition kernels.
+Generative denoising supplies an evolution formed from data/constraints that carries an initial
+field toward product receivers. Its denoising index, event time, physical time and wall time
+are separately named clocks. An unconditional generator still has initial state, material,
+domain, schedule and receiver conditions; it needs no text prompt to have a situated source.
+
+[established-bounded; source-inspected] DDPM defines a forward Gaussian corruption process and
+a formed reverse Markov chain starting from a Gaussian source. Its progressive sample production
+is a concrete example of generation through successive whole-field transformations.
+[Ho, Jain and Abbeel](https://arxiv.org/pdf/2006.11239). The existing
+`Computation/HolonicDiffusionCharts.lean` proves finite Markov composition and expectation
+transport and supplies a collapse example separating a forward kernel from an inverse.
+The formed reverse law and its source distribution provide the generative information.
+
+[definition] Include the initial field and any later sampling innovations in a complete source
+xi. Conditional on xi, a realized generating trajectory is `Gamma_(Theta,b)(xi)`; its output
+measure is the pushforward of the declared xi measure through the product receiver. This gives
+noise, deterministic execution, retained preimages and probability their respective places.
+It does not assert that an arbitrary forward diffusion has an inverse or that denoising is
+physical reversal of the source events. Nonlinear drift and interactions may form new structure;
+the operation is more than choosing among a fixed list of stored responses.
+
+### Joint prediction is a boundary section of the future
+
+[definition] For source family F and admitted complete transitions T_j, the prospective joint
+receiver is
+
+`Gamma_m(F)={(rho_1 T_1 x, rho_2 T_2 T_1 x, ..., rho_m T_m ... T_1 x) : x in F}`.
+
+Each T_j carries the current, material, incidence and clock changes of its actual passage.
+This is one family with shared producing variables. A requested output can be a spatial field,
+multiple future faces, a section of a trajectory or a text block. A one-token receiver and a
+multi-token receiver choose different faces of this construction; they do not define its interior.
+
+[established-bounded; source-inspected] The cited multi-token-prediction work uses several
+future-token heads over shared producing material. Its particular independent-head objective
+does not by itself specify every correlation of a joint future distribution.
+[Gloeckle et al.](https://arxiv.org/abs/2404.19737). The native `read_wave_word`, family receiver
+and coupled producing-cut owners explicitly retain shared future coordinates at their declared
+scope. Releasing those coordinates through a receiver is output, whether or not their medium
+has a token codec. Scheduling several outputs together requires their actual dependency map.
+
+[project-postulate] The next construction therefore composes the evolving event boundary,
+stored interior current, constitutive interaction and requested joint release. Native source/
+condition restrictions and source-null contrasts are local tools within that assembly. They
+are not an independent context-extraction stage or a prerequisite to every kind of inference.
+Inspect the actual lattice/field conduct and output; use the dynamic reflection defect when
+encoding it. The roadmap and blueprint retain the concrete implementation order and bindings.
+
 ## Holonic Encoding
 
 [definition] **Holonic Encoding** names the situated formation and reuse of causal

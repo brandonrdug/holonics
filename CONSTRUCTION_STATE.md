@@ -37,12 +37,16 @@ engine regressions (20.35 s), 10 HNN regressions (8.27 s), and the HNN public-ex
 The long-word check also exceeds generic projection scratch while retaining the unique source;
 an unresolved source is refused instead of reduced to a representative.
 
-[definition] The next source construction forms the preparation restrictions from mounted
-incidence and developmental source-null contrasts: for source S, condition C and returned Y,
-identify the directions in `ker S` exposed by Y, carry their existing native contextual section,
-and form C so those admitted differences can reach the predictor. The numerical return supplies
-this predictor/condition consumer; it does not derive arbitrary A/C restrictions from raw material.
-The fixed-feature normal law and `a=(c-p,c,p)` wave chart remain explicit specializations.
+[project-postulate] Brandon's latest clarification governs the next assembly: context is the
+situated boundary over intersecting event histories, including actual incidence, current,
+constitutive storage, clocks and interior return. The
+[composition definition](docs/HNN_COMPOSITION.md#context-names-a-situated-causal-boundary)
+connects those owners to state-space, convolution, diffusion and joint prediction. The next
+consuming change binds the participating native boundary/interior currents into the local
+generator's source/condition ports and its joint release. S/C restrictions and source-null
+contrasts serve their local source/receiver equations within it; they are not
+a separate context-extraction stage. The fixed-feature normal law and `a=(c-p,c,p)` wave chart
+remain explicit specializations, with their recorded numerical consumer already returned.
 
 [definition] Encoding accompanies the repeated action actually used. The current dependent
 `ConstitutiveSourcePassage` programme reevaluates its accumulated operations. Replace a closed

@@ -29,6 +29,16 @@ Four clauses, each doing work:
    is `Π`, the lived construction, which `CLAUDE.md` §13 rule 2 rules lawful and not the assistant's
    to gate.
 
+[definition] Brandon's September 13, 2026 clarification makes “the state of the medium at the
+site” explicit: context is a situated boundary over intersecting trees of events, retaining
+their actual incidence, flux, constitutive storage/capacitance, local chronology and interior–
+exterior response. Its instantaneous lattice is a chart of ongoing conduct. A condition vector,
+text prefix or present boundary measurement is a restriction of that situation. The
+[composition guide](../HNN_COMPOSITION.md#context-names-a-situated-causal-boundary) develops the
+event-cut, state-space, convolution, diffusion and joint-prediction equations and current owners.
+The historical owner table below retains its original deposit scope; current implementation
+status belongs to CONSTRUCTION_STATE and current source.
+
 ## 2. What it is not
 
 **Not a stored alternative.** 2026-08-09, on how he decomposes:
