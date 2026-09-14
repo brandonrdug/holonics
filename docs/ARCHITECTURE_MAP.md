@@ -1113,6 +1113,14 @@ The draft applies its maps globally at that port; it does not supply the missing
 
 ## Classical learning, reflection and recursive compression
 
+[definition] Start a heads/layers/learning/generation question from the
+[connected tensor computation](HNN_FORMULA.md#one-connected-tensor-computation), then
+follow the owner below for the operation being changed. The
+[reference field and its figures](../research/experiments/connected_holonic_field/README.md)
+join normalized current, gradient, contact and integration in one reproducible calculation.
+This source map distinguishes a missing caller from a missing operator; a row's scope limit
+is not a prohibition on composing its already-defined mathematics.
+
 [historical] The [AC1/AC2 field-wrapper return](../research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)
 retains complete-successor and local-return comparisons. Its SDK assembly/archive wrapper is
 now retired. `field/junction/operative/response/observation.rs` remains a generic observed-response
@@ -1133,7 +1141,7 @@ They are not all composed into AC1's general conversation path.
 
 | Relation | Formal owner | Executable owner | Scope |
 |---|---|---|---|
-| Normalized exponential, sigmoid and adjoint geometry | `Computation/HolonicAdjointNormalization.lean` | `exponentiated_ratio.rs`; `surprisal.rs`; `kernels/exact_resident_section.cu`; `kernels/exact_resident_adjoint.cuh` | Exact symbolic ratio domain and certified resident exponential/contact/return; earlier source-specific targets and grains retain their declared boundaries. |
+| Normalized exponential, sigmoid and adjoint geometry | `Computation/HolonicAdjointNormalization.lean` | `exponentiated_ratio.rs` and `exponentiated_ratio/transport.rs`; `surprisal.rs`; `kernels/exact_resident_section.cu`; `kernels/exact_resident_adjoint.cuh` | Exact symbolic ratios, normalized vector-current JVP/pullback/material step, binary sigmoid derivative; resident exponential/contact/return keep their own numerical scope. |
 | Source-qualified material normalization and metric returns | Same normalized-exponential and adjoint laws | `native_ecology/constitutive_fibre/field/receiver/normalized.rs`; `kernels/field_normalized_receiver.cuh` | Resident complete grouped p/q, q-p and `J_p(q-p)` with original complex reports and lineages retained. Three native controls and three actual-model returns; no committed morphology change from this receiver alone. |
 | Material prediction to its two query arguments | Real derivative of `M[Q(s) tensor Q(c)]` | `native_ecology/constitutive_fibre/field/receiver/normalized/pullback.rs`; `kernels/field_material_pullback.cuh` | Producing operator factors, complex pairings, visible source and complete outgoing/internal current. Outward intervals include retained operator/source error; this partial adjoint does not itself commit a successor. See the [return record](../research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_REACHES_BOTH_QUERY_ARGUMENTS.md). |
 | Material return through paired contacts and finite response | Existing paired-producer adjoint; contractive block `[I,-D;D*,I]` | `native_ecology/constitutive_fibre/field/junction/operative/response.rs`; `kernels/field_operative_adjoint.cuh`; existing operative staging | Journal-qualified producing map, complete local adjoint and constrained unit-Frobenius response with finite mixed moments. The earlier `EnclosedFlow` corpus attempts refuse; the separately declared deposit realization is below. [Scope and failure](../research/records/2026-09-08_AC1_THE_PAIRED_RETURN_CHANGES_CONTACTS_AND_THE_NEXT_CURRENT.md). |

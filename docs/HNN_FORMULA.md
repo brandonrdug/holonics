@@ -223,6 +223,64 @@ flowchart LR
 
 ## 2. Transformer, convolution, SSM and diffusion operators
 
+### One connected tensor computation
+
+[definition] In a finite chart write the computational Holon as `|H_l>_F`, with current
+`X_l ∈ C^(sites × channels)` and situated incidence `E_l`. A head is one pair of query/key
+charts and a transported value chart on that same object. A layer composes those maps:
+
+```text
+Q_h=X_l W_Qh,  K_h=X_l W_Kh,  V_h=X_l W_Vh,
+s_hij=β Re <Q_hi,K_hj> + b_hij,                  j ∈ E_l(i),
+a_hij=μ_j exp(s_hij)/Σ_(k∈E_l(i)) μ_k exp(s_hik),
+Y_hi=Σ_(j∈E_l(i)) a_hij U_hij V_hj,
+Z_l=X_l + Concat_h(Y_h) W_O,
+g_l=σ(G_l Z_l+c_l),
+X_(l+1)=N_l[Z_l+g_l ⊙ R_l(Z_l;Θ_l)].
+```
+
+[definition] `U_hij` transports values between the participating frames; its unit/phase
+or general constitutive law is declared. `N_l` is the specified normalization, `R_l` the
+local reaction and `g_l` a binary participation chart. These are typed tensor operations,
+not seven new engines. Head indices label parallel charts; layer indices label composition.
+Neither index determines a physical level or a text-generation clock. The general HNN
+incidence and current/material equations in §1 decide which maps and subdivisions apply.
+The earlier native `operative_atlas` actually composes Q/K/V, RoPE, masked multihead contact,
+output contraction, residuals and gated reaction through `NativeFullOperatorSession`.
+The active constitutive field's normalized receiver and contact adjoints are separate owners;
+the presence of the earlier graph does not connect that graph to this field automatically.
+
+[definition] Attention is the dependence of transported current on these situated
+comparisons, including its sensitivity to changing input, phase and material. A normalized
+coefficient is one chart of participation. For one row,
+
+```text
+da_j=a_j(ds_j-Σ_k a_k ds_k),
+dY=Σ_j a_j U_j dV_j + Σ_j a_j dU_j V_j
+    + Σ_j a_j(ds_j-E_a ds) U_j V_j.
+```
+
+[proved-derived] The last term curves participation through
+`J=diag(a)-a aᵀ`, a positive semidefinite covariance/Laplacian with constant-shift null
+direction. A head can suppress a large but common perturbation while responding strongly
+to a smaller difference that changes its participating current. Softmax is not an all-to-all
+incidence rule: its denominator ranges over the admitted contacts. Sigmoid is the two-channel
+restriction `σ(s)=exp(s)/(exp(s)+1)` with derivative `σ(s)(1-σ(s))`. Changing a previously absent
+edge requires the separate incidence law; the derivative on a fixed support does not open it.
+
+[established-bounded; implemented-exact] The
+[connected reference computation](../research/experiments/connected_holonic_field/README.md)
+uses fifteen complex toroidal channels, two normalized heads, two composed layers, a sigmoid
+gate, a phase-sensitive dissipative contact, an observed material step and a whole-field
+resolvent. Its exact rational `K=exp(s)` specialization lives in
+[`exponentiated_ratio::NormalizedKernel`](../crates/holonic-engine/src/exponentiated_ratio/transport.rs).
+It accepts supplied positive rational K, hence `s=log K`; it does not silently approximate a
+general exponential of arbitrary query/key products. Its generated field drives the new
+synopsis figures through the existing geometric decoder. This is executable reference
+composition on the CPU; the native model assembly still belongs to the active field/body.
+
+### Existing classical and modal restrictions
+
 [definition] A Transformer chart evaluates `Q=XW_Q`, `K=XW_K`, `V=XW_V`, then
 
 ```text
@@ -271,12 +329,28 @@ is the precise relationship to forward evaluation and backpropagation. The imple
 must include the induced change of contact transport as well as local coefficient changes.
 The existing operative material-response and causal-propagation owners contain those terms.
 
-[definition] A specified scalar objective supplies one output covector, such as
-`dℓ=(q-p)·ds` for cross-entropy at softmax logits. Scalar loss is a lawful comparison in this
+[definition] A specified scalar objective supplies one output covector. With predicted
+probability p and observed probability q, cross-entropy has `dℓ=(p-q)·ds` at softmax logits;
+`q-p` is its negative gradient. For half squared probability error the gradient is
+`J_p(p-q)`, and the descent return is `J_p(q-p)`. Scalar loss is a lawful comparison in this
 chart. The cotangent and its operator pullback contain the directional update information.
 A chosen constitutive metric maps that covector to a material displacement; numerical step
 size and constrained realization belong to that update law. An adjoint is not a physical
 reversal of time, and a unit metric is not a theorem of universal learning dynamics.
+
+[definition] In the normalized-current chart `Y=aV`, a receiver covector `G=∂ℓ/∂Y`
+pulls back to `∂ℓ/∂s_ij=a_ij <G_i,V_j-Y_i>` and `∂ℓ/∂V=aᵀG` when the frame transport is
+identity. The general chart also pulls back through `U`, Q/K and the metric. The reference
+owner exposes both operands and their exact pairing identity. Its declared Euclidean
+material step uses `∂ℓ/∂K=(∂ℓ/∂s)/K`, updates positive K and refuses a step crossing the
+present positive support. This local objective and supplied step are explicit, not a
+universal gradient or an assertion that every physical relaxation minimizes that loss.
+
+[proved-derived] Integration also has a differential. For the fixed-field restriction
+`x_(k+1)=λ B_Θ x_k+(1-λ)h`, `x*=(I-λ B_Θ)^(-1)(1-λ)h`. Its material sensitivity solves
+`(I-λ B_Θ) dx*=λ(dB_Θ)x*+(1-λ)dh` at fixed λ. For two shared layers `B=L²`,
+`dB=(dL)L+L(dL)`. Thus learning, internal refinement and the decoded output are linked
+by one chain rule; differentiating only a final readout would omit this induced change.
 
 [established-bounded; source-inspected] Existing normal material supplies another concrete
 learning law: for features f and targets t, accumulate `H=H_0+Σ ff*`, `B=B_0+Σ tf*`, then solve
@@ -336,6 +410,35 @@ effects continue in its environment; an HNN need represent only the effects requ
 interactions. No reconstruction of every cause is implied.
 
 ## 5. The circuit, fluid, membrane and magnetic design connection
+
+### Friction, leader formation and return propagation
+
+[definition] The finite phase contact `δ=y-u x`, `|u|=1`,
+`x'=x+α conjugate(u)δ`, `y'=y-αδ` has the exact balance
+`|x|²+|y|²-|x'|²-|y'|²=2α(1-α)|δ|²` for `0≤α≤1`.
+It acts on signed/complex relative slip and deposits a nonnegative energy difference.
+In the connected reference this is an actual operator between attention and the next layer;
+the figures use its computed input, output and deposited quantity. A physical unit calibration
+is additional data; softmax weights themselves are not electrical conductances.
+
+[definition] The existing conducting-fluid construction explains the higher-level lightning
+analogy through coupled equations, not through a branching shape:
+`Γ_e=n_e u-μ_e n_e E-D_e∇n_e`,
+`∂_t n_e+div Γ_e=S_ion+S_photo-S_attach-S_recomb`,
+`div(εE)=ρ`. A leader changes conductivity, channel geometry and capacitance; the return
+current then propagates in that changed material. Along a resolved channel,
+`∂_s V=-∂_t(LI)-RI+e` and `∂_s I=-∂_t(CV)-GV+i` retain induction, storage,
+leakage and forcing. The [fluid/leader guide](FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md)
+contains the source chain and energy/material derivatives.
+
+[interpretation] For HNN this suggests deriving a new contact from oriented potential and
+the local constitutive/material differential, then integrating current on the changed
+operator. The leader corresponds to changing admissible transport; the return corresponds
+to its realized current. A finite fixed-support attention derivative models the second
+operation's sensitivity, not the first operation's birth of a channel. A physical leader's
+computed trajectory requires the ionization and boundary data in those equations. The
+synopsis displays this extension as a coupled-law diagram and does not present its finite
+normalized field example as a plasma simulation.
 
 [definition] Membrane transport uses the same arrangement of stored quantities, interfaces
 and flux laws, with species-specific operands. For example, local near-equilibrium transport

@@ -1,5 +1,8 @@
 import ElementaryHolonics.Computation.HolonicInformationTheory
 import ElementaryHolonics.Millennium.SituatedReturnedDifference
+import Mathlib.Analysis.Calculus.Deriv.Mul
+import Mathlib.Analysis.Calculus.Deriv.Inv
+import Mathlib.Analysis.SpecialFunctions.ExpDeriv
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
 /-!
@@ -12,9 +15,10 @@ This file keeps four objects separate:
 * the gradient obtained only after a declared tangent--cotangent chart;
 * normalized exponential, RMS, and centered variance faces read from a complete finite section.
 
-Softmax is not installed as native routing.  Its algebraic return is the weighted complete-graph
-Laplacian on the admitted finite contact population.  Its constant null direction is therefore a
-gauge fibre, not missing native state.
+This file formalizes normalization and its differential on an admitted finite contact population.
+Incidence is supplied by the contact law; native normalized/contact owners realize particular
+charts.  Its algebraic return is the weighted complete-graph Laplacian, whose constant null
+direction is a gauge fibre rather than missing native state.
 -/
 
 noncomputable section
@@ -274,6 +278,67 @@ theorem sigmoid_is_binary_normalized_exponential (potential : ℝ) :
   simp [NormalizedExponential.face, NormalizedExponential.partition, sigmoidFace,
     Fintype.sum_bool]
 
+/-- The sigmoid receiver's directional derivative is its returned binary covariance face. -/
+theorem hasDerivAt_sigmoidFace (potential : ℝ) :
+    HasDerivAt sigmoidFace (sigmoidFace potential * (1 - sigmoidFace potential)) potential := by
+  let e : ℝ := Real.exp potential
+  have he : HasDerivAt (fun x : ℝ => Real.exp x) e potential := by
+    simpa [e] using (Real.hasDerivAt_exp potential)
+  have hden : e + 1 ≠ 0 := by
+    dsimp [e]
+    positivity
+  have hquot := he.div (he.add_const 1) hden
+  have hfun : sigmoidFace = (fun x : ℝ => Real.exp x / (Real.exp x + 1)) := by
+    funext x
+    rfl
+  rw [hfun]
+  apply hquot.congr_deriv
+  dsimp [e, sigmoidFace]
+  field_simp [hden]
+
+namespace NormalizedExponential
+
+variable {Index : Type uI} [Fintype Index] [Nonempty Index]
+
+/-- The normalized exponential's directional derivative is its weighted Laplacian return. -/
+theorem hasDerivAt_face_mass_sectionLine
+    (potential direction : Index → ℝ) (index : Index) :
+    HasDerivAt
+      (fun t => (face (fun j => potential j + t * direction j)).mass index)
+      (laplacianReturn 1 (face potential) direction index) 0 := by
+  have harg : ∀ j : Index,
+      HasDerivAt (fun t : ℝ => potential j + t * direction j) (direction j) 0 := by
+    intro j
+    simpa using ((hasDerivAt_id (0 : ℝ)).mul_const (direction j)).const_add (potential j)
+  have hexp : ∀ j : Index,
+      HasDerivAt (fun t : ℝ => Real.exp (potential j + t * direction j))
+        (Real.exp (potential j) * direction j) 0 := by
+    intro j
+    simpa using (harg j).exp
+  have hsum := HasDerivAt.fun_sum (u := (Finset.univ : Finset Index))
+    (fun j _hj => hexp j)
+  have hden : (∑ j, Real.exp (potential j + 0 * direction j)) ≠ 0 := by
+    simpa [partition] using (partition_ne_zero potential)
+  have hquot := (hexp index).div hsum hden
+  have hfun :
+      (fun t => (face (fun j => potential j + t * direction j)).mass index) =
+        (fun t => Real.exp (potential index + t * direction index) /
+          (∑ j, Real.exp (potential j + t * direction j))) := by
+    funext t
+    rfl
+  rw [hfun]
+  apply hquot.congr_deriv
+  simp only [laplacianReturn, face, expectation, partition]
+  simp only [mul_zero, add_zero, zero_mul]
+  have hP : (∑ x, Real.exp (potential x)) ≠ 0 := by
+    simpa [partition] using (partition_ne_zero potential)
+  simp_rw [div_mul_eq_mul_div]
+  rw [← Finset.sum_div]
+  field_simp [hP]
+  <;> ring
+
+end NormalizedExponential
+
 /-! ## RMS and centered normalization are receiver charts, not native depth -/
 
 namespace FiniteNormalization
@@ -361,6 +426,8 @@ section Audit
 #print axioms NormalizedExponential.sum_laplacianReturn_zero
 #print axioms NormalizedExponential.quadratic_laplacianReturn
 #print axioms sigmoid_is_binary_normalized_exponential
+#print axioms hasDerivAt_sigmoidFace
+#print axioms NormalizedExponential.hasDerivAt_face_mass_sectionLine
 #print axioms FiniteNormalization.population_mul_meanSquare
 #print axioms FiniteNormalization.centered_add_common
 #print axioms entropy_doesNot_govern_complete_morphology

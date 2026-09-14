@@ -90,6 +90,8 @@ the [formula](HNN_FORMULA.md), not a proposal for another `holonics-ml` wrapper 
 |---|---|---|
 | Exact linear maps, preimages and factorization | `holonics::engine::exact_linear`, including `ExactRatMatrix::factor_receiver` | `NativeMathematicalSession` constructs resident linear/bilinear operators and parameter families. Its operator/product/predictor maps are application storage, not one assembled field model. |
 | Normalized attention, weighted mode summaries and descended actions | `exact_linear::KernelModeReduction` and `KernelModeSummary`; formal `AttentionModeCompression`, `GeneratorModeQuotient` | The reducer's callers are its example and unit tests. It uses `ExactRatMatrix`/`Rat` on the host. Native consumption requires lowering the derived operators and current columns through existing resident owners; do not run a host semantic replay loop. |
+| Normalized vector-current transport and learning differential | `exponentiated_ratio::NormalizedKernel::{apply,differential,pullback,fit_step}` | Exact log-rational kernel chart; binary sigmoid and complete value/potential returns. `connected_holonic_field` composes it into the reference field that drives the synopsis. It is exterior CPU execution. |
+| Native multihead block and normalized field return | Earlier `operative_atlas` / `NativeFullOperatorSession`; active `NativeConstitutiveField::normalized_material_return` | The earlier graph has Q/K/V, phase, multihead contact, residual/gated reaction and adjoints. The active field has grouped exponential and material/current pullbacks; width two is a binary normalization. These are actual mechanisms with different consumers, not absent theory. |
 | Incidence, field current and boundary/interior scattering | `native_ecology::constitutive_fibre::NativeConstitutiveField`, operative field kernels | The field owns actual material and internal current. The recent coupled boundary test uses field observations to fit normal prediction; this establishes that surrogate binding, not execution of the same field law by every public session. |
 | Material differential and adjoint | `field/junction/operative/response.rs`, `propagation.rs` and their resident kernels | `material_contact_response`/`apply_material_contact_response` already compute and apply a declared contact response. Bind the requested output differential through these operators in the same model invocation. |
 | Normal equations and condition/preimage inference | `ResidentNormalMaterial`, `ResidentConditionCurrent`, `ResidentGeneratorNeighborhood` | Normal material is attached to the neighborhood and consumed by coupled generation. Keep that actual learning law available; its fixed features do not prescribe every HNN operator. |
@@ -102,6 +104,14 @@ the corresponding CUDA implementation realizes those operations in the declared 
 representation. The public HNN session consumes them. Keep mathematical reference code
 available independently where the dependency graph permits; a full workspace move is not
 required before composing the current native model.
+
+[established-bounded; source-inspected] The September 14 connected-mechanics audit found
+navigation and composition failures: the formal architecture chart, normalization calculus,
+old full-operator graph, active field adjoints and physical leader guide were reachable in
+separate subject lists but the synopsis did not follow a current through them. The
+[formula](HNN_FORMULA.md#one-connected-tensor-computation) now supplies that operation-level
+route; its reference computation feeds the actual figures. This repairs discoverability
+without claiming that reference code installs the composed native model.
 
 [definition] Translation from Lean is translation of a specified construction. A formal
 existence statement or `noncomputable` quotient does not choose an executable decoder. For

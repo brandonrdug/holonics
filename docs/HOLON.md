@@ -52,6 +52,7 @@ operations on Holons, with familiar vector/tensor realizations where applicable.
 | Receive then emit | (\|B⟩⟨r\|)\|A⟩=⟨r\|A⟩\|B⟩; a rank-one operator, with an explicitly declared bra | Factorized linear maps and native material-response factors |
 | Compose transports | Ĝ₂Ĝ₁\|H⟩; the output port of the first joins the input of the second | `then_receiver`, `then_fixed_right`, resident relation images |
 | Reflect/interfere | A constituted multiport operator acts on incoming and stored-current kets together | Operative field scattering, phase transport and internal modes |
+| Attend / normalize participation | `Y_i=Σ_j a_ij U_ij V_j`, `a_ij=exp(s_ij)/Σ_k exp(s_ik)` on admitted contacts; a sigmoid is its binary restriction | Resident normalized/contact operators; exact `NormalizedKernel` forward, differential and pullback |
 | Differentiate/pull back | δ\|H'⟩=D𝓘_H δ\|H⟩; a covector acts through (D𝓘_H)* on the same material | Operative tangent/adjoint and normal/preimage laws |
 | Generate | \|X(τ)⟩=𝓤_(Θ,K)^(τ←τ₀)(\|Ξ⟩;h), then ⟨r\|b_H(X(τ))⟩; the whole field evolves | Joint native wave/family operations; the general field consumer is the active assembly |
 | Recur / change scale | F^∘n(\|H⟩), or a recursive family H=union_i F_i(H); retain its scale maps and branch constraints | Fractal restriction/packing, generator words and recurrence owners |
@@ -71,6 +72,14 @@ compose suitable tensor/contraction operators or the model's nonlinear constitut
 The native code already exposes `advance_bilinear_contact` and `bilinear_features`;
 mathematical operator realizations expose receiver composition and factor reuse. A helper
 around the fitter would not establish a more general Holon algebra by itself.
+
+[definition] The [connected tensor computation](HNN_FORMULA.md#one-connected-tensor-computation)
+composes these interactions into heads, layers, current integration and geometric decoding.
+It names the softmax covariance differential, sigmoid derivative, value/phase returns and
+the implicit derivative of generation. A vector of amplitudes becomes a geometric output
+through `A(x)=Σ_i ψ_i φ_i(x)` and a declared receiver such as an intensity level set. The
+basis, contact material and reconstruction operator are part of this computational Holon;
+the coefficient vector alone neither specifies them nor replaces them.
 
 [definition] In an interaction diagram, an oriented line carries a ket or port index, a
 propagator carries its transport, and a vertex carries the actual interaction tensor/map.

@@ -106,6 +106,9 @@ use thiserror::Error;
 
 use crate::surprisal::SymbolicSurprisal;
 
+mod transport;
+pub use transport::{NormalizedKernel, NormalizedKernelError};
+
 /// `2^form`, exactly, when the form's coefficients are integers.
 ///
 /// `2^{Σ q_k log₂ p_k} = Π p_k^{q_k}`, so an integral coefficient vector
