@@ -1,7 +1,9 @@
 # Construction state
 
-**Currency:** September 13, 2026. **Active cycle:** conditional prediction in the continuing
-HNN body, with dynamic reflection and conductive-fluid returns. The
+**Currency:** September 13, 2026. **Next construction unit:** the
+[boundary/interior assembly](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#boundary-and-interior-assembly-contract)
+feeding joint release, with encoding of its repeated conduct. Conditional prediction,
+dynamic reflection and conductive-fluid equations are returned starting material. The
 [cycle record](research/records/2026-09-13_CONDITIONED_PREDICTION_AND_DYNAMIC_INTERIOR_RETURN.md)
 records equations, owners and verification. The
 [methodology audit](research/records/2026-09-13_GENERATOR_MEANING_AND_CAMPAIGN_DRIFT_AUDIT.md)

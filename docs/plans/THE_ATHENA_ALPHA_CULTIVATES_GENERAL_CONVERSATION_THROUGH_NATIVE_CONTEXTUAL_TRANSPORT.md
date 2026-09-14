@@ -123,6 +123,30 @@ consequence. Preview, commit and observation each retain the operation contract 
 
 ## The shared mathematical-to-native construction
 
+### Boundary and interior assembly contract
+
+[definition] The consuming operation binds actual participating boundary and retained interior
+currents to local generating material, then returns the requested joint face and the successor
+specified by the call. Its pre-return source is the admitted event-boundary section, including
+incidence, storage, clocks and the represented source fibre. A local restriction S/C is one
+map within that operation. The existing field/junction current and condition owners supply
+source constructions; `ResidentGeneratorNeighborhood` and `NativeCoupledBody` supply the
+returned conditional-generation and joint-release consumer. Their source types, shared
+parameters and ownership transfer must agree at the consuming call.
+
+| Deliverable | Equation or concrete completion evidence |
+|---|---|
+| Resident boundary/interior binding | Name the native carriers and restrictions used before the observed target; execute the local interaction on their joined source family. The consumer retains the actual interior response, rather than reading a cold inspection as a production operand. |
+| Generated joint product | Inspect the requested multi-face section from the shared producing family and reuse the returned body for its next admitted call. Include the observed-return contract only when requested by the application. Text, numerical fields and mathematical actions use their respective receiver charts. |
+| Encoded repeated conduct | For the repeated segment actually encountered, construct E/U/D with `E_next T=U E` and `D E=rho`, or retain the explicit dynamic residual and its receiver bound. Include material/incidence changes and pending producing cuts. A full expanded word does not establish reduced execution work. |
+| Integrated verification and maintenance | Compare the actual outputs, shared-source constraints and needed delayed returns. Measure setup, repeated execution, delivery and retained representation separately; consolidate affected owners and run the relevant native/formal checks. |
+
+[project-postulate] These deliverables apply the existing assembly, formation and encoding
+responsibilities together. The [orchestrated cycle](../DEVELOPMENT.md#orchestrated-construction-cycles)
+keeps one primary integration owner and bounded Luna support. Source-domain mismatches are
+resolved at their equation and port; they do not launch another independent model adapter.
+The roadmap supplies order and CONSTRUCTION_STATE records the current returned dependency.
+
 [interpretation] A reusable machine can support a family of admitted orientations before a
 contemporary application selects source ports, held conditions and receiver. The non-orientable
 surface picture motivates retaining transition maps and route differences; it is not a claim

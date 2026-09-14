@@ -72,6 +72,29 @@ into the objective. Keep current position only in CONSTRUCTION_STATE, order only
 contracts in the blueprint and owners, and completed evidence in dated records. Correct a stale
 clause in place; appending a contrary instruction elsewhere is not consolidation.
 
+### Orchestrated construction cycles
+
+[project-postulate] Brandon's authorized workflow keeps the primary agent responsible for
+mathematical decisions, consuming implementation, integration and verification. Luna workers
+handle bounded independent source, proof, kernel or regression tasks with explicit ownership.
+Their result is integrated into the shared construction before another worker campaign grows
+around it. A worker's proposed map is checked against the actual source and consumer.
+
+[definition] One cycle follows the live blueprint's consuming contract through a returned
+function, joint output or physical/mathematical consequence. The primary agent identifies the
+source/current/material/receiver equation, implements its dependent call, reconciles affected
+owners and verifies the requested output and cost. Supporting derivations are used in that
+consumer as their domains permit. A source example or lemma is an intermediate result when
+the consuming call remains unbound.
+
+[project-postulate] After each substantive return, rejoin the current direct ruling, native
+implementation and relevant wider mathematics. Record what the return changes in the programme
+and proceed to its next dependency. This is a continuation decision, not another archive audit
+or recurring documentation exercise. During compaction preserve that decision, the active
+equation, changed files and running checks. Completion of a cycle does not complete the broader
+HNN objective. A goal control, when enabled, supplies continuous turns; the live blueprint and
+latest direct messages continue to govern what those turns do.
+
 [definition] Repository-wide review means following the live roots, subject boundaries and
 critical source-to-application maps, then repairing the in-scope contradictions found. Record
 the inspected aperture and validation performed. It is not a claim that every theorem, archived
