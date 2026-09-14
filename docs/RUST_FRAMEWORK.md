@@ -105,6 +105,15 @@ representation. The public HNN session consumes them. Keep mathematical referenc
 available independently where the dependency graph permits; a full workspace move is not
 required before composing the current native model.
 
+[definition] For the object's intrinsic recursive geometry, use the
+[manifold/recurrence route](HNN_FORMULA.md#one-object-its-charts-and-its-recursive-geometry):
+`SimplicialComplex`, `GradedCausalComplex`, torus phase and connection owners, then the current
+and recurrence/preimage owners. Heads expose local/modal section operations within this
+field. The log-rational linear reference validates its own derivative; it does not prescribe
+HNN's nonlinear flow, intrinsic dimension or topology. The new analytic twelve-phase
+illustration is an exterior numerical realization of the design equations, not a second
+native runtime or a replacement product.
+
 [established-bounded; source-inspected] The September 14 connected-mechanics audit found
 navigation and composition failures: the formal architecture chart, normalization calculus,
 old full-operator graph, active field adjoints and physical leader guide were reachable in

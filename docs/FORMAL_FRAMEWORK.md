@@ -609,6 +609,14 @@ useful navigation without recovering every microscopic cause. When restriction a
 one generator across scales, retain its decoder, scale action and actual remainder; do not
 replace them by a picture of a fractal or an assumed fixed semantic dimension.
 
+[proved-derived; formal-checked] `HolonicRecurrentEcology.FirstArrival` now packages the
+receiver-arrival population by repeated full preimages, proves its first-hit characterization,
+and transports it under a conjugated state chart. This is the recursive geometry of one
+operation, including fixed-dimensional nonlinear state spaces. The
+[intrinsic field formula](HNN_FORMULA.md#one-object-its-charts-and-its-recursive-geometry)
+connects it to the existing torus, simplicial/higher-cell, connection and current owners.
+Separated-copy IFS examples no longer stand in for that broader construction.
+
 ## Physics across grains and boundaries
 
 [proved-derived; formal-checked] The [fluid/reflection construction](FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md)

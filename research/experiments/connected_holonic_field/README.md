@@ -1,11 +1,12 @@
 # Connected attention, learning and geometric generation
 
-[established-bounded; implemented-exact] This is the reference computation consumed by
-`research/papers/source/papers/elementary-holon-generation/main.typ`. Fifteen complex field
-channels pass through two normalized heads, two shared layers, a phase-sensitive contact,
-one observed material update and a whole-field implicit solve. Its computed coefficients
-feed the existing toroidal-basis decoder. The new figures are generated from this result;
-no previously rendered Information Chemistry scene is imported.
+[established-bounded; implemented-exact] This is the retained fifteen-channel linear
+reference from the earlier September 14 synopsis. Its normalized-current differential,
+material update and implicit solve remain bounded mathematical controls. It no longer
+supplies the main geometry or the general model architecture. The current synopsis is built
+from [the intrinsic nonlinear field](../intrinsic_holonic_flow/README.md); its toroidal,
+shared-cell and first-arrival views replace this reference's skin, layer columns and tiled IFS.
+The historical figures and source remain recoverable.
 
 ## Operands and exact operation
 
@@ -94,9 +95,6 @@ cargo run -p holonic-engine --no-default-features --example connected_holonic_fi
 python3 research/experiments/connected_holonic_field/render.py geometry
 python3 research/experiments/connected_holonic_field/render.py
 python3 research/experiments/connected_holonic_field/schematics.py
-typst compile --root . \
-  research/papers/source/papers/elementary-holon-generation/main.typ \
-  research/papers/rendered/elementary-holon-generation.pdf
 ```
 
 [definition] The plot environment needs NumPy and Matplotlib. Geometry uses the repository's

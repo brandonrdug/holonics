@@ -53,6 +53,17 @@ three in every operation or invent an observation for an exact solver result.
   or counterexample. Develop the relevant formal owner. Source absence alone is not a proof
   that the mathematical construction is absent from the framework.
 
+[project-postulate] For generative/physical geometry, identify the complete object and its
+actual nonlinear operation before selecting a figure or computational simplification. State
+which restriction, projection or section the picture reads and which couplings it retains.
+A named example must retain the mechanism being explained: global affine contraction cannot
+stand in for saddle-mediated recursion, and separated IFS copies cannot stand in for an
+intersecting field's intrinsic return geometry. These are construction choices to correct,
+not reasons to add another acceptance gate. Recover recurrence/preimage, manifold/higher-cell,
+connection and constitutive owners together; the filename `FractalPacking` does not bound the
+framework's meaning of fractals. The [intrinsic field formula](HNN_FORMULA.md#one-object-its-charts-and-its-recursive-geometry)
+provides the current source route.
+
 [project-postulate] A bounded example answers a named question in that contract. Its driver may
 supply admitted inputs and inspect outputs; it cannot supply the disputed organization or answer
 and then count that as formation. Once the example answers its question, use the result in the

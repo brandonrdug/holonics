@@ -246,7 +246,7 @@ phase receivers to the active construction, including the latent-reasoning paper
 ```text
 lattice   = founded incidence, local axes, relations, higher cells;
 crystal   = lattice + recurring phase/group transport + locked relations/bands;
-fractal   = law recurrence after restriction and rebase while the population grows;
+fractal   = recursive scale/branch geometry of a generated, invariant or preimage family;
 lightning = current front founding its path while travelling;
 freezing front = open growth locking into reusable transport.
 ```
@@ -256,11 +256,24 @@ not by that fact fractal. The additional lattice action, phase, periodic/quasipe
 self-similarity, scale action, and receiver testimony remain explicit.
 
 Where relations lock, emit the crystal: its lattice, phase transport, spectrum, bands, and boundary
-response. Where the body remains self-similar and growing, emit the generator, scale action, and
-lineage rather than a finite stack sampling the population.
+response. Where recursive restriction exposes new structure, retain the generator, scale action,
+compatible phase and branch family. Material population growth is one possible realization;
+it is not a requirement for fractal dynamics. A finite-dimensional nonlinear state can have
+fractal invariant, survivor or arrival-boundary geometry. An IFS of separated copies is one
+specialization, not the default meaning of a fractal Holon.
 
-A layer stack may realize one chronology over this body. It never supplies the internal dimension.
-The lattice's incidence, local rank, cycles, reconvergences, and higher cells do.
+A layer stack may display one operator composition on this body. A head is a local or modal
+current/comparison chart of that same object; charts can overlap and interact through common
+incidence, geometry and constitutive material. Head and layer indices do not imply separate
+bodies, parallel physical planes or disconnected copies. The lattice's incidence, local rank,
+cycles, reconvergences and higher cells supply its internal geometry.
+
+[project-postulate] Brandon's September 14 correction makes this reading operative in diagrams
+and implementation. Follow the [intrinsic field construction](../HNN_FORMULA.md#one-object-its-charts-and-its-recursive-geometry)
+through its carrier, current and nonlinear recurrence before choosing a picture. A printed
+2D basin is a receiver section of that recurrence; an exterior level set is another receiver.
+Neither is the whole Holon. A smooth, globally contractive affine example cannot supply the
+saddle-mediated geometry invoked by the latent-reasoning paper.
 
 ## 10. Semantic capacity is founded and apparatus capacity is declared
 

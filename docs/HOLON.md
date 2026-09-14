@@ -37,6 +37,13 @@ continuation. A scalar, vector, matrix or higher tensor can be a face or a const
 Holon, depending on the declared operation. A nonlinear holonic map acts on these objects
 without acquiring linear superposition merely from ket notation.
 
+[definition] The [intrinsic field construction](HNN_FORMULA.md#one-object-its-charts-and-its-recursive-geometry)
+keeps heads, local sections, circulating toroidal modes and generated/recursive geometry in
+one object. Smooth charts and finite tensor coordinates can describe local restrictions of
+that object while its invariant or preimage families have fractal structure. A tile of copied
+outputs, a column of layer nodes or a closed exterior skin is not its defining geometry.
+The actual restriction, gluing, current and constitutive evolution specify what the chart shows.
+
 ## High-level Holonic Interactions
 
 [definition] These are the operations used to formulate the model. They are abstracted

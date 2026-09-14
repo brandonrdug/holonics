@@ -160,6 +160,15 @@ exterior representation. Neither defines generator formation. Preserve this dist
 turning user language into deliverables; a chosen example or export target does not acquire
 authority from being repeated in an agent plan or goal handoff.
 
+[project-postulate] Brandon's September 14 intrinsic-fractal correction keeps heads, local
+charts, interlinked toroidal modes and recursive geometry in one evolving Holon. Fractal
+structure can belong to a fixed-dimensional nonlinear recurrence's invariant or preimage
+families; it does not require tiled copies or a growing number of material units. Recover
+the manifold/connection/current and recurrence/preimage owners together before choosing a
+representation. A layer-column diagram or exterior isosurface is one receiver, not the model's
+ontology. Use the [intrinsic field formula](docs/HNN_FORMULA.md#one-object-its-charts-and-its-recursive-geometry)
+and [hexis correction](docs/canon/TABLET_THE_HEXIS.md#9-lattice-crystal-fractal-and-lightning-are-distinct-morphology-regimes).
+
 [project-postulate] Implement semantic changes from their mathematical contracts: typed
 operands, constitutive/inference law, source/receiver scope and the realization or residual
 equation the consumer requires. Recover the existing formal statement and native owner;

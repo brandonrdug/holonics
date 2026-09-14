@@ -1111,6 +1111,26 @@ The draft applies its maps globally at that port; it does not supply the missing
 | Safetensors and ONNX export lenses | `NativeMorphologyVariant.lean::{ExactExportLens,ProjectedExportWitness,ExportDisposition}` | `native_intelligence/morphology_export/` over `NativeMorphologyArtifact`; lossless `ForeignOnnxChart` import | no native apparatus identity; custom ONNX domain is exterior | **exact-bounded:** valid Safetensors artifact/anatomy tensors and ONNX IR 14 `org.holonics` opset 1 round-trip complete artifacts; anatomy-only projections retain both artifacts and a configuration separator; unsupported receiver/cultivation/world requests refuse |
 | Configuration-indexed multimodal evaluation | `NativeMorphologyVariant.lean::{InferenceConfigurationClaim,CrossCodecResonance}` | historical MVF6 receipt; obsolete operator-authored evaluation owner and driver | resident word/current apparatus remains one configuration coordinate | **historical exact-bounded control:** matched text/image/audio/temporal-video/mixed apertures preserved supplied chronology, but their cultivation current was manually constructed; no HNN or qualitative multimodal grade follows |
 
+## Intrinsic manifold and recursive field geometry
+
+[definition] Begin with the [one-object construction](HNN_FORMULA.md#one-object-its-charts-and-its-recursive-geometry),
+not with the shape of a familiar network diagram. The actual related owners are:
+
+| Relation | Source owner | Role in the same field |
+|---|---|---|
+| Oriented manifold stars, links and hinge changes | `simplicial.rs` | Two-dimensional surface incidence and its local changes |
+| Higher shared cells and boundary compatibility | `algebraic.rs::GradedCausalComplex` | Arbitrary chain degree, `∂²=0` and chain maps |
+| Toroidal phase charts and current around closed paths | `analytic_field.rs`; `implicit.rs`; `lattice_gauge.rs`; `structure_group.rs` | Carrier equations, phase, winding and ordered holonomy |
+| Nonlinear recursive operation and first-arrival geometry | `HolonicRecurrentEcology.FirstArrival`; `basin.rs` for bounded outcome regions | Full preimages, first-reception populations and chart covariance |
+| Current, material and changing geometry | Active constitutive field/junction; `discrete_curvature.rs` at its declared hinge-response scope | Coupled operation on the existing current and incidence |
+| Restriction and receiver-compatible compression | Tube/clocked span, mode quotient, `FractalPacking` | Recursive rebase, retained phase/fibre and specialized separated restriction |
+
+[established-bounded; source-inspected] The September 14 correction found that repeatedly
+starting at `FractalPacking` bypassed the existing nonlinear/preimage and manifold routes.
+The new [phase-field construction](../research/experiments/intrinsic_holonic_flow/README.md)
+illustrates their composition and its scope. An IFS or fixed-dimensional tensor face is one
+chart, not a replacement ontology for the complete model.
+
 ## Classical learning, reflection and recursive compression
 
 [definition] Start a heads/layers/learning/generation question from the

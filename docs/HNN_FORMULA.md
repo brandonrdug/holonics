@@ -114,6 +114,102 @@ Holon type. Its encoding theorem equates full and reduced generation when their 
 commute; its composition equivalence carries one latent population through two refinements.
 Neither binding requires a trajectory archive or independent output marginals.
 
+### One object, its charts and its recursive geometry
+
+[definition] A computational Holon is the same situated field across its local, modal and
+receiver charts. Let `K` be its oriented cell incidence, `Γ(K)` the compatible current/field
+sections and `Φ_Θ` the actual nonlinear operation on current, material and geometry. A chart
+restriction `r_α` gives `|H⟩_α=r_α|H⟩`; compatible restrictions on an overlap are related by
+its declared transition. A head reads/transports such currents. Composing heads, reactions
+and time steps acts on the same Holon; a layer diagram is an execution chart, not a set of
+physically separated planes. If local restrictions do not close dynamically, retain the
+coupling, interior modes and residual rather than treating each chart as an autonomous object.
+
+[definition] The carrier can have toroidal cycles, curved transport tubes and overlapping
+field domains, with higher cells recording their joints. `simplicial::SimplicialComplex`
+provides oriented surface stars/links and hinge changes; `algebraic::GradedCausalComplex`
+provides arbitrary-grade incidence with `∂²=0`; `analytic_field` supplies torus phase charts;
+connection/holonomy owners transport current around actual paths. A torus is not a generic
+hypersphere, and an aggregate intensity isosurface does not expose all of its constituent
+cycles. An embedding into a displayed 3D scene is a receiver of these relations. Interlinked
+cores, intersecting support domains and actual constitutive contact are separately specified.
+
+[definition] Fractal geometry can arise within the operation's invariant, survivor or
+receiver-arrival populations while the number of state axes remains fixed. For a fixed
+recurrence `Φ` and receiving region A, the **first-arrival** populations are
+
+```text
+A_0=A,
+A_(n+1)=Φ^(-1)(A_n) \ A,
+x∈A_n  iff  Φ^[n](x)∈A and Φ^[k](x)∉A for every k<n.
+```
+
+[proved-derived; formal-checked] `HolonicRecurrentEcology.FirstArrival` proves that
+characterization and its covariance under a state-chart equivalence with the transported
+recurrence and receiver. Preimage here means all compatible initial conditions, not reverse
+time or a chosen inverse. Repeated stretching, folding, passage near saddle regions and
+restriction can produce fine interleaving. A small sampled dimension or a finite picture
+alone neither proves infinite-scale fractality nor replaces this generator.
+
+[definition] A basin figure uses a declared family `z(a,b)=z₀+a u+b v` or a valid manifold
+section. Its coordinates label initial conditions for **one** full recurrence. Color may
+read first arrival, decoded settling or another specified consequence. Its nonlinear
+trajectories live in the full state space; the two plotted axes and 3D embeddings need not
+be dynamically invariant. A zoom recomputes that restricted family. It does not place more
+copies of the complete model in a grid. Nonlinear dynamics also need not be globally
+contractive; do not choose a uniform contraction merely to make the demonstration settle.
+
+[definition] Intrinsic metric/measure and the admitted family determine dimension. For a
+compact receiver family, box dimension uses `lim_(ε→0) log N(ε)/log(1/ε)` when that limit
+exists. An uncertainty fraction `f(ε)~ε^α` gives section-boundary dimension `d-α` only under
+its sampling and scaling hypotheses. Carrier/stratum dimension, phase-space dimension,
+fractal dimension and effective receiver rank are separate quantities. A chart of twelve
+phase coordinates does not force its invariant or survivor geometry to have dimension twelve;
+a two-dimensional basin plot does not reduce the complete field to two dimensions.
+
+[established-bounded; computational-witness] The
+[intrinsic phase-field reference](../research/experiments/intrinsic_holonic_flow/README.md)
+constructs six interlinked toroidal domains, a conforming volume subcomplex with shared
+contact cells, and a twelve-phase nonlinear map. Two normalized phase-comparison potentials
+and a sigmoid local reaction act on this one state. The linked geometry, changing head
+weights, paired flow histories and successively resolved arrival sections are its different
+receivers. This is a supplied analytic constitutive example, numerically evaluated outside
+the native runtime. It is not a reproduced trained-model experiment. The older fifteen-channel
+linear reference remains evidence for its differential and material step; it does not provide
+the main generative or fractal geometry of the model.
+
+[proved-derived] The linked carrier and its common cell complex also admit a concrete
+incompressible material motion. At unit nondimensional density, put
+`u=(0,-χxz,χxy)`, `p_hyd=χ²x²(y²+z²)/2`, and `f=(χ²x(y²+z²),0,0)`.
+Then `div u=0`, `Δu=0`, and `(u·∇)u=-∇p_hyd+f`, giving a local forced Euler/Navier–Stokes
+field for any constant viscosity. Its exact flow is
+`F_t(x,y,z)=(x,y cos(χxt)-z sin(χxt),y sin(χxt)+z cos(χxt))`, with determinant one and
+inverse `F_(-t)`. Advect the torus domains and every shared cell by the same map; linking,
+incidence and containment are preserved. The reference uses `χ=1/8`, `0≤t≤1`.
+A circulating point/current has velocity `u(F_t X)+DF_t·X_dot`; omitting either term would
+separate internal motion from the material carrying it. The graphical edges sample these
+curved images, not an assumption that the underlying cells stay affine in space.
+
+[definition] In that reference `q,p∈T^6`, `s^h_ij=β_h cos(2π(q_i-q_j-φ_ij))` on the
+geometrically admitted incidence, `a^h=softmax(s^h)`, and `g_i=σ(-cos(2πq_i))`. The potential
+and its complete gradient are
+
+```text
+V(q)=κ/(2π) Σ_i softplus(-cos(2πq_i))
+     -κγ/(2π H) Σ_h β_h^(-1) Σ_i log Σ_(j∈E_i) exp(s^h_ij),
+∂V/∂q_i=κ[g_i sin(2πq_i)
+          +γ/H Σ_(h,j)(a^h_ij+a^h_ji) sin(2π(q_i-q_j-φ_ij))].
+q'=q+κ sin(2πp),                 p'=p-∇V(q')      (mod 1).
+```
+
+[proved-derived] The two substeps are exact flows of complementary periodic Hamiltonians,
+so their composition preserves the canonical form `Σ_i dq_i∧dp_i` and phase volume. It need
+not preserve one unsplit energy or converge to a fixed point. The full derivative includes
+inbound and outbound attention and the sigmoid/softmax differentials; omitting one changes
+the Hamiltonian field. A detector's first reception is an output without requiring global
+settling. Dissipative material and incidence changes can be composed through their own laws;
+the conservative instance does not declare them absent from HNN.
+
 ### Recursive generators, scale and transcendental operations
 
 [definition] Repeated latent generation is `x_(n+1)=F_Theta(x_n,h)`. Its tangent evolves by
@@ -122,11 +218,12 @@ an entire field. Fractal basins of that recurrence describe sensitivity of its r
 settling times; their finite-resolution measurements are not tensor rank or a proof that
 all algorithms must traverse the same difficult routes.
 
-[definition] Geometric recursion can instead use `S(H)=union_i F_i(H)` and an attractor
+[definition] A separated IFS specialization can use `S(H)=union_i F_i(H)` and an attractor
 `H=S(H)`. With contracting similarities and the stated separation condition, dimension D
 obeys `sum_i r_i^D=1`. The maps, their scale and relevant branch constraints are the compact
 construction. A lattice is one resolved realization, not the only way to compute it.
-Existing `FractalPacking` and scale/phase owners provide starting constructions.
+The existing `FractalPacking` owner proves that specialization's restriction laws. The
+recurrence, preimage, tube, connection and scale owners supply the broader construction.
 
 [definition] Functional calculus supplies generators: `exp(tA)` evolves a linear field;
 `exp(i theta)` carries torus phase with period 2π; logarithms read relative scale; Gamma

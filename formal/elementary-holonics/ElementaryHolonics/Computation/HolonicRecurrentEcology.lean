@@ -376,6 +376,67 @@ theorem changingStep_changes_morphology_and_advances :
 
 end Control
 
+/-! ## First-arrival receiver populations -/
+
+namespace FirstArrival
+
+variable {X Y : Type*}
+
+/-- States whose autonomous recurrence reaches a receiver for the first time at `n`.
+
+The recurrence state contains any fixed forcing or clock required by the operation.  No history
+archive is introduced: the population is formed by repeated pullback and removal of the receiver
+already reached at the current stage.
+-/
+def population (T : X → X) (A : Set X) : ℕ → Set X
+  | 0 => A
+  | n + 1 => T ⁻¹' population T A n \ A
+
+theorem mem_population_iff (T : X → X) (A : Set X) (x : X) (n : ℕ) :
+    x ∈ population T A n ↔
+      T^[n] x ∈ A ∧ ∀ k < n, T^[k] x ∉ A := by
+  induction n generalizing x with
+  | zero => simp [population]
+  | succ n ih =>
+      simp only [population, Set.mem_sdiff, Set.mem_preimage, ih]
+      constructor
+      · rintro ⟨⟨hit, prior⟩, present⟩
+        refine ⟨?_, ?_⟩
+        · rw [Function.iterate_succ_apply]
+          exact hit
+        intro k hk
+        rcases Nat.eq_zero_or_pos k with rfl | hkpos
+        · exact present
+        · obtain ⟨j, rfl⟩ := Nat.exists_eq_succ_of_ne_zero (Nat.ne_of_gt hkpos)
+          exact prior j (Nat.lt_of_succ_lt_succ hk)
+      · rintro ⟨hit, prior⟩
+        refine ⟨⟨?_, ?_⟩, ?_⟩
+        · rw [Function.iterate_succ_apply] at hit
+          exact hit
+        · intro k hk
+          exact prior (k + 1) (Nat.succ_lt_succ hk)
+        · exact prior 0 (Nat.zero_lt_succ n)
+
+/-- Conjugate an autonomous recurrence along an equivalence of state charts. -/
+def conjugate (e : X ≃ Y) (T : X → X) : Y → Y := e ∘ T ∘ e.symm
+
+theorem iterate_conjugate (e : X ≃ Y) (T : X → X) (y : Y) (n : ℕ) :
+    (conjugate e T)^[n] y = e (T^[n] (e.symm y)) := by
+  induction n generalizing y with
+  | zero => simp [conjugate]
+  | succ n ih =>
+      rw [Function.iterate_succ_apply, ih]
+      simp [conjugate]
+
+theorem chart_covariant (e : X ≃ Y) (T : X → X) (A : Set X) (y : Y) (n : ℕ) :
+    y ∈ population (conjugate e T) (e '' A) n ↔
+      e.symm y ∈ population T A n := by
+  rw [mem_population_iff, mem_population_iff]
+  simp only [Set.mem_image_equiv]
+  simp only [iterate_conjugate, Equiv.symm_apply_apply]
+
+end FirstArrival
+
 section Audit
 
 #print axioms OperationStep.operate_successor
@@ -390,6 +451,9 @@ section Audit
 #print axioms Control.fixed_and_changing_share_one_operation_owner
 #print axioms Control.fixedStep_advances_without_changing_morphology
 #print axioms Control.changingStep_changes_morphology_and_advances
+#print axioms FirstArrival.mem_population_iff
+#print axioms FirstArrival.iterate_conjugate
+#print axioms FirstArrival.chart_covariant
 
 end Audit
 

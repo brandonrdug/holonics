@@ -4,15 +4,19 @@
 00:15:41 America/Los_Angeles. The current request develops generation as whole-field
 refinement and boundary radiation, audits the computational Holon and its elementary
 operators, and produces a reusable illustrated synopsis of the formal/software design.
-The latest [connected-mechanics correction](research/records/2026-09-14_ATTENTION_LEARNING_AND_GENERATION_SHARE_A_COMPUTATIONAL_HOLON.md)
-is complete: the ten-page synopsis follows computed attention heads/layers, sigmoid/softmax
-variation, learned material, phase friction and whole-field geometric decoding. It joins the
-leader/return and recursive-scale constructions through explicit equations. New sigmoid and
-normalized-exponential derivative theorems and the consuming architecture chart passed Lean;
-17 ratio-module tests passed, and the reference's field, sensitivity and energy residuals
-were checked exactly. All final PDF pages were rendered and inspected. The source route is
-linked from the Holon, model formula, Rust framework and architecture map. This is a
-mathematical/library/reference return, not completion of the paused native model assembly.
+The [intrinsic-fractal correction](research/records/2026-09-14_FRACTAL_GEOMETRY_BELONGS_TO_THE_INTERACTING_FIELD.md)
+now supplies the current synopsis and source route: interlinked toroidal domains, advected
+shared volume cells, one nonlinear phase field with normalized heads/sigmoid reaction, and
+recomputed first-arrival sections. The first-hit characterization and chart covariance passed
+Lean; the numerical phase/advection and geometric checks returned, and the ten final pages
+were rendered and inspected. Hexis, the model formula, Holon/formal/Rust guides, architecture
+map, development method, blueprint and operating contract carry the same correction.
+Fractal structure does not require tiled copies or a growing number of native state axes.
+The earlier [connected-mechanics return](research/records/2026-09-14_ATTENTION_LEARNING_AND_GENERATION_SHARE_A_COMPUTATIONAL_HOLON.md)
+retains its valid normalization/gradient and affine-reference results as bounded controls.
+Its fixed contraction and presentation do not define HNN's nonlinear geometry. This is a
+mathematical/documentation return; the supplied phase reference does not replace the paused
+native model assembly below.
 The [generation/Holon return](research/records/2026-09-14_GENERATION_REFINES_FIELDS_AND_THE_HOLON_HAS_COMPUTATIONAL_FACES.md)
 supplies earlier dependencies: Holon generation/tensor bindings and Core passed Lean; the Rust audit corrected
 a false reversibility convention; the computational specification uses Holonic/Dirac tensor
@@ -50,7 +54,7 @@ does not change when a supporting test passes.
 | Selected action on resumption | Compose the existing operative scattering/transport and local learned reaction in `NativeCoupledBody` using the same resident material and internal current. Make its output differential reach that material; factor its actual repeated action through existing mode/recurrence owners, carrying changing contact charts. Use the existing public request/readout for the resulting model. |
 | Completion evidence | Show the actual model invocation and generated product, the material transformation it used, and repeated execution/representation costs. Check the same operator's forecast, committed action and required differential/observation path. A component pass or two-material sensitivity test does not replace this model operation. |
 | Current draft disposition | Preserved, uncommitted support code. Known-condition reception, batch moments and cached reflection are candidates for that composition. Passing their probes cannot mark the assembly complete. The revised HNN test is not yet verified. |
-| Handoff disposition | The old affine-orbit paper was fulfilled by `ce288e14`. The model formula, connected attention/learning/generation synopsis and four supplied Transformer/fractal paper analyses are completed returns. The new reference and derivative owners are linked from the formula; the slower inverse trial was withdrawn. The construction goal stays paused. On a new continuation request use the whole-field, tensor-interaction and recursive/analytic operator contracts; do not repeat completed reviews or restart the surrogate draft by default. |
+| Handoff disposition | The old affine-orbit paper was fulfilled by `ce288e14`. The intrinsic-field synopsis, first-arrival formalization and four-paper analysis are completed returns. Follow the nonlinear manifold/current/preimage route in the formula. Earlier linear/IFS references are bounded controls, not default model topologies; the slower inverse trial was withdrawn. The construction goal stays paused. On a new continuation request use the whole-field, tensor-interaction and recursive/analytic operator contracts; do not repeat completed reviews or restart the surrogate draft by default. |
 
 ## Current implementation boundary
 

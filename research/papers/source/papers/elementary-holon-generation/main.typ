@@ -1,140 +1,140 @@
 #import "../../holonics/computational-holon.typ": *
 #show: chemistry-style
-#set document(title:"Elementary Holonics: Connected Attention, Learning and Generation",author:"Brandon Duggan / Holonics",description:"Computational Holons through normalized heads, gradients, contact, whole-field integration and geometric decoding.")
+#set document(title:"Elementary Holonics: Intrinsic Fields and Recursive Geometry",author:"Brandon Duggan / Holonics",description:"One interacting Holon: linked tori, shared cells, phase attention, current, nonlinear recurrence and arrival geometry.")
 #let title=chemistry-title
 #let note=chemistry-note
 #let eq(m)=block(width:100%,above:2mm,below:2mm,align(center,math.equation(m.body,block:true)))
-#let fig(name,width:100%)=image("figures/"+name+".svg",width:width)
+#let fig(name,width:100%,height:auto)=image("figures/"+name+".svg",width:width,height:height,fit:"contain")
 #let two(a,b)=grid(columns:(1fr,1fr),gutter:13mm,a,b)
 #let three(a,b,c)=grid(columns:(1fr,1fr,1fr),gutter:8mm,a,b,c)
 #let status(body)=block(width:100%,above:4mm,below:0pt,note(body))
 
-#title("01","A Holon through an entire generating computation","The figures follow one fifteen-channel complex field through two heads, two layers and an integrated release.")
-#three(
- [*Incident field* #v(2mm)#fig("input-geometry")],
- [*After the two-layer interaction* #v(2mm)#fig("layer_two-geometry")],
- [*Integrated field, geometrically decoded* #v(2mm)#fig("integrated-geometry")],
-)
-#eq[$#hk($H$)_F=sum_i psi_i #ket($phi_i$)_F, quad #hk($H_2$)_F=hat(L)_Theta^2 #hk($H_0$)_F$]
-#eq[$x^*=(I-lambda L_Theta^2)^(-1)(1-lambda)h, quad A(x)=sum_i psi_i phi_i (x), quad Sigma_R={x:I_h (x)=1/3}$]
+#title("01","One Holon: linked geometry and circulating fields","Heads and local charts are operations within the same evolving object; its visible geometry is one receiver of that object.")
+#align(center,fig("intrinsic-torus-chain",width:282mm,height:86mm))
+#eq[$#hk($H$) in Gamma(K), quad #hk($H$)_alpha=r_alpha #hk($H$), quad z=(q,p) in TT^12$]
+#eq[$#hk($H'$)=Phi_Theta (#hk($H$)), quad #hk($H$)_(n+1)=Phi_Theta (#hk($H$)_n)$]
 #two(
- [*The picture is downstream of the computation.* #v(2mm)#note([The field amplitudes are produced by the Rust operator chain. The existing toroidal basis then constructs a coherent complex amplitude; an intensity receiver produces the polyhedral surface. None of these panels imports an old rendered scene. The same decoder and threshold are used throughout.])],
- [*The supplied and inferred parts are visible.* #v(2mm)#note([The geometric incidence and two positive kernel charts are supplied. A recorded physical field observation changes head A through the declared gradient step. The new material changes both layers and their integrated field. This is an exact finite CPU reference construction; it does not claim a completed native Athena model.])],
+ [*Cycles, joins and field currents belong together.* #v(2mm)#note([Six toroidal domains form a branched chain. Neighboring cores have a linking number of magnitude one, verified by their spanning-disk crossings. Their thicker field domains overlap at the gold contact witnesses. The linked carrier is advected by an explicit incompressible twist. Red and blue curves follow two nearby phase states through that moving material; the shown carrier is its final-time cut.])],
+ [*The complete state exceeds the picture.* #v(2mm)#note([Each torus has two circulating phase coordinates. The combined reference has twelve phase axes; the 3D embedding displays its constituent cycles and actual field contacts. It is not a twelve-dimensional object flattened into twelve physical planes. Amplitude, constitutive storage and geometry may also vary in the general field specification.])],
 )
-#v(3mm)#status([Established-bounded · implemented-exact. Source: `connected_holonic_field/result.json`; the geometric receiver rounds complex coordinates to 24 fractional bits before its exact level-set construction. It retains the rounding bound and original coefficients; no topological equivalence to the unrounded surface is asserted.])
+#status([Definition for the supplied analytic phase configuration; established-bounded · computational-witness for the depicted trajectories and geometry. This refines the mathematical design; it is not a reproduced trained-model basin experiment. `HNN_FORMULA.md` retains the general current/material/incidence law.])
 
 #pagebreak()
-#title("02","Heads are parallel charts; layers compose their actions","A current keeps its channel, frame and phase through the whole chain. The displayed edges come from the computed layer matrix.")
-#align(center,fig("interaction-chain",width:245mm))
-#eq[$Q_h=X W_(Q h), quad K_h=X W_(K h), quad V_h=X W_(V h), quad s_(h i j)=beta op("Re") ⟨ Q_(h i),K_(h j) ⟩+b_(h i j)$]
-#eq[$Y_(h i)=sum_(j in E(i)) a_(h i j) U_(h i j) V_(h j), quad Z=X+op("Concat")_h (Y_h)W_O$]
-#eq[$X'=N[Z+sigma(G Z+c) ⊙ R_Theta (Z)]$]
+#title("02","Intersecting fields have shared cells and interior directions","A head is a current/comparison chart of this body. The chart boundary is not a wall between independent models.")
+#align(center,fig("intrinsic-contact-complex",width:276mm,height:89mm))
+#eq[$partial^2=0, quad r_(alpha beta) #hk($H$)_alpha=g_(alpha beta)r_(beta alpha) #hk($H$)_beta$]
+#eq[$F_t (x,y,z)=(x,y cos(chi x t)-z sin(chi x t),y sin(chi x t)+z cos(chi x t)), quad det D F_t=1, quad chi=1/8$]
 #two(
- [*General computational interface.* #v(2mm)#note([Q/K are comparison charts, V carries current, U transports its frame, and E restricts actual participation. Output contraction, residual addition, a gated local reaction and normalization compose a full block. A head is not a new engine; a layer is not a biological scale. Joining these operators is tensor contraction and function composition.])],
- [*The plotted specialization.* #v(2mm)#note([Each of the two layers uses the same two normalized spatial heads, identity value charts, an averaging output map and a sigmoid residual gate. The phase-sensitive contact C follows that mix. Circle area measures current magnitude; color distinguishes phase; line width follows the real two-axis block norm. Sharing the layers is a declared restriction, not a claim that every network must tie its weights.])],
+ [*An interior, not only an exterior skin.* #v(2mm)#note([The cutaway shows the field-support domains around a branch. The magnified view transports one quarter-unit volume complex through that fluid map: 31,440 conforming tetrahedra, including 240 with multiple domain owners. Gold cells carry shared support. Curved edges are advected source edges; common vertices and faces join the complex; the higher cells retain interior variation and their oriented boundary.])],
+ [*Gluing and physical transport have different roles.* #v(2mm)#note([Chart transitions make restrictions compatible. A connection transports current along actual paths and can return nontrivial loop holonomy. Interlinked cores do not alone create contact; the overlap witnesses and the specified constitutive interaction do. The 3D display is an embedded finite realization of these relationships, with its sampling and containment bound retained.])],
 )
-#status([Definition for the general block; established-bounded · implemented-exact for the displayed specialization. The full Transformer comparison comes from the supplied field-operator paper, arXiv:2510.03989. The native earlier operator atlas already contains Q/K/V, RoPE, multihead contact, residuals and a gated reaction.])
+#status([Established-bounded · computational-witness: `intrinsic_holonic_flow/mesh.json`. The inscribed cubes lie within their recorded torus owners by a distance bound; they are subdivided with common incidence. Source owners: `simplicial`, `GradedCausalComplex`, `analytic_field` and connection/holonomy.])
 
 #pagebreak()
-#title("03","Softmax and sigmoid have explicit geometry","Normalization redistributes a whole admitted population; a binary gate is the same operation on two channels.")
-#align(center,fig("sigmoid-and-participation",width:250mm))
-#eq[$a_j=frac(exp(s_j),sum_k exp(s_k)), quad J=op("diag")(a)-a a^T, quad delta a_j=a_j (delta s_j-sum_k a_k delta s_k)$]
-#eq[$sigma(s)=frac(exp(s),exp(s)+1), quad sigma'(s)=sigma(s)(1-sigma(s)), quad J bold(1)=0$]
+#title("03","Softmax and sigmoid respond inside the phase field","Both heads compare currents on the same admitted contacts; the local sigmoid supplies a smooth reaction coefficient.")
+#align(center,fig("intrinsic-response",width:263mm))
+#eq[$s_(i j)^h=beta_h cos(2pi(q_i-q_j-phi_(i j))), quad a_(i j)^h=frac(exp(s_(i j)^h),sum_(k in E_i) exp(s_(i k)^h))$]
+#eq[$g_i=sigma(-cos(2pi q_i)), quad sigma'(s)=sigma(s)(1-sigma(s))$]
+#eq[$delta a_j=a_j (delta s_j-sum_k a_k delta s_k), quad J=op("diag")(a)-a a^T$]
 #two(
- [*Attention is a changing transport relation.* #v(2mm)#note([The right plot varies one log-potential on an actual contact of head A. Increasing it changes every normalized weight in that receiver row. The resulting current also depends on values, relative phase and receiver sensitivity. A common score shift is invisible to this chart; it is not the same as losing all information in the participating Holon.])],
- [*Finite softness is not a hard selector.* #v(2mm)#note([The smooth differential is a covariance/Laplacian. Low-temperature score cells give the tropical comparison under the paper's fixed-key and margin hypotheses. Finite-temperature attention still blends values and carries a nonzero differential. The contact support is supplied separately; a derivative on that support cannot create a missing channel.])],
+ [*A head is a field-sensitive operation.* #v(2mm)#note([The plotted phase is q₀ in the same twelve-axis state. The two heads use β=1 and β=4 on the same contact incidence and oriented phase connection. Their different responses affect the same current; they do not occupy separate parallel bodies. The sigmoid is evaluated on a local phase potential, with its derivative retained.])],
+ [*Normalization retains curvature and participation.* #v(2mm)#note([Its differential is J=diag(a)−aaᵀ, a covariance/Laplacian with constant-shift null direction. The complete transport differential also includes changed values and frame transport. A current can curve, exchange phase and change participation while remaining a section of the same field. Adding contact requires the incidence law as well.])],
 )
 #eq[$delta Y=sum_j a_j U_j delta V_j+sum_j a_j delta U_j V_j+sum_j a_j (delta s_j-op("E")_a delta s)U_j V_j$]
-#status([Proved-derived · formal-checked: `HolonicAdjointNormalization`; exact rational specialization: `NormalizedKernel`. Here K is positive rational and s=log K, so no general exponential is rounded into a rational identity. Analytic curves are exterior floating-point plots.])
+#status([Proved-derived · formal-checked: normalized exponential and sigmoid directional derivatives in `HolonicAdjointNormalization`. The plots evaluate the analytic reference numerically; they show its phase-dependent coefficients, not separate head topologies.])
 
 #pagebreak()
-#title("04","Learning changes the operator that transports the field","Both the value current and the comparison material receive the derivative; the source matrices below are actual computed returns.")
-#align(center,fig("heads-and-gradient",width:280mm))
-#eq[$Y=a V, quad G=frac(partial ell,partial Y), quad frac(partial ell,partial s_(i j))=a_(i j) ⟨ G_i,V_j-Y_i ⟩, quad frac(partial ell,partial V)=a^T G$]
-#eq[$ell=frac(1,2) norm(Y-Y_("obs"))^2, quad K'=K-eta frac(partial ell,partial K), quad frac(partial ell,partial K_(i j))=frac(1,K_(i j)) frac(partial ell,partial s_(i j))$]
+#title("04","State and material variation share one differential","Changing a current changes participation. Learning changes the operator material through the generated result's derivative.")
 #two(
- [*One measured material change.* #v(2mm)#note([The observed next complex field comes from the retained toroidal-contact experiment. The library takes a declared Euclidean step on positive K at rate 1/64; it refuses a step crossing the present positive support. The example checks that this receiver loss falls and that the changed kernel changes the integrated output. It does not claim that the observation is exactly representable by one convex attention head.])],
- [*The sign convention matters.* #v(2mm)#note([With p predicted and q observed, cross-entropy has logit gradient p−q; q−p is the descent direction. For half squared probability discrepancy the descent return is Jₚ(q−p). Those are distinct objectives. A scalar loss supplies a covector through its differential; it does not replace the full directional return.])],
+ [#align(center,fig("intrinsic-heads",width:132mm))],
+ [*The same two heads at two flow times.* #v(2mm)#note([These matrices are numerical receiver faces of the linked object. Their entries change because q changes under the nonlinear operation. The map's coefficients remain fixed in this comparison. Treating this state effect as a learned material update would conflate two derivatives.])
+ #eq[$delta x'=D_x Phi_Theta delta x+D_Theta Phi_Theta delta Theta$]
+ #eq[$D_Theta (Phi_Theta compose Phi_Theta)=D_x Phi_Theta D_Theta Phi_Theta+D_Theta Phi_Theta$]
+ #note([In the second equation the outer derivatives are evaluated at the intermediate state. Learning pulls a supplied output covector through this whole composition and uses a declared material metric/update law. The same parameter appearing in several local operations contributes through every use.])
+ #v(4mm)*The normalized current has an explicit pullback.*
+ #eq[$Y=a V, quad G=frac(partial ell,partial Y)$]
+ #eq[$frac(partial ell,partial s_(i j))=a_(i j)⟨G_i,V_j-Y_i⟩, quad frac(partial ell,partial V)=a^T G$]
+ ],
 )
-#status([Established-bounded · implemented-exact. `NormalizedKernel::pullback` returns both operands; its test checks exact tangent–cotangent duality, the gauge null and absent-contact behavior. The new record retains numerical loss and material/output differences.])
+#status([Definition for the complete operator variation; proved-derived for the chain rule. The existing Rust `NormalizedKernel` checks the full tangent/pullback pairing and an observed material update in its separate exact log-rational diagnostic. That bounded control does not replace the nonlinear model equation or its geometric carrier.])
 
 #pagebreak()
-#title("05","Curved gradients and friction act on the same complex current","The left panel is a two-potential slice of the measured objective; the right is the actual phase contact inside the layer.")
-#two(fig("gradient-flow"),fig("friction-current"))
+#title("05","Relative phase determines a contact's dissipative return","The currents below come from the same toroidal branch, expressed in the common frame of its 2↔5 contact.")
+#align(center,fig("intrinsic-friction",width:270mm))
 #eq[$delta=y-u x, quad abs(u)=1, quad x'=x+alpha overline(u)delta, quad y'=y-alpha delta$]
 #eq[$abs(x)^2+abs(y)^2-abs(x')^2-abs(y')^2=2alpha(1-alpha)abs(delta)^2$]
 #two(
- [*The gradient is not a scalar instruction.* #v(2mm)#note([Contours show half squared complex-current discrepancy for receiver 5 while two log-potentials vary. Arrows are the analytic negative gradient in this declared Euclidean chart. A constitutive metric changes the corresponding gradient vector. The full return also includes transported values and frame/material derivatives; these are not implied by drawing one arrow on a loss surface.])],
- [*The contact uses relative phase.* #v(2mm)#note([For the selected witnessed contact 5↔10, u=−i and α=1/4. The arrows compare both currents in the same phase frame. The library matrix contracts their relative slip, and the example verifies the complete quadratic balance exactly. The deposited amount is the computational energy difference; electrical or mechanical units require their specified constitutive calibration.])],
+ [*Friction responds to a situated difference.* #v(2mm)#note([The connection transports x into y's frame before comparison. At α=1/4 their relative slip contracts and the complete quadratic energy difference is deposited. Neither the individual intensity nor a scalar attention coefficient determines this phase-sensitive exchange on its own. The plotted coefficient family uses the same incident currents.])],
+ [*A physical field keeps the receiving modes.* #v(2mm)#note([Dissipation changes radial amplitude and deposits energy into internal/thermal modes. Those modes augment the conservative unit-phase chart used for the basin calculation; they are not erased by its phase-only view. HNN's constitutive field and reflected interior already supply the corresponding current, material and storage roles.])],
 )
-#eq[$L=C[(1-g)I+frac(g,2)(A+B)⊗I_2], quad g=sigma(log(1/3))=1/4$]
-#status([Established-bounded · implemented-exact for the contact and observed chart; definition for the chosen unit metric and kernel charts. Softmax participation and physical conductance are related through a declared constitutive map, not identified by their being positive numbers.])
+#status([Proved-derived for the displayed balance; established-bounded · computational-witness for the local contact evaluated on the selected phase state. The conservative arrival map and this dissipative contact are explicitly different constitutive restrictions of the general field, not an assertion that phase motion alone models all friction.])
 
 #pagebreak()
-#title("06","Generation integrates a whole field, then decodes it","The refinement clock is separate from every output coordinate. The final implicit solve and the iterated field obey the same equation.")
-#align(center,fig("convergence-and-learning",width:280mm))
-#eq[$x_(k+1)=lambda L^2 x_k+(1-lambda)h, quad lambda=1/2, quad (I-lambda L^2)x^*=(1-lambda)h$]
-#eq[$(I-lambda L^2)delta x^*=lambda[(delta L)L+L(delta L)]x^*+(1-lambda)delta h$]
+#title("06","Generation follows curved routes through the whole state","Nearby initial sections can have different arrival times while every head acts within the same continuing field.")
+#align(center,fig("intrinsic-route-separation",width:270mm))
+#eq[$q'=q+kappa sin(2pi p), quad p'=p-nabla V(q') quad (mod 1)$]
+#eq[$tau_A (z)=min{n:Phi^n (z) in A}, quad A={q_0 in [0.20,0.34),p_0 in [0.08,0.20)}$]
 #two(
- [*The release converges under stated conditions.* #v(2mm)#note([Each normalized head is a convex current combination; the unit-phase contact and residual mix are nonexpansive in the maximum complex-channel norm. The forced map therefore contracts by at most 1/2. Its fixed point is unique. The plot reports Euclidean receiver norms; these are measurements, not the proof's norm. The exact implicit residual and its material-sensitivity residual are zero.])],
- [*A surface is a decoded product.* #v(2mm)#note([The integrated coefficients excite the toroidal basis, its coherent field creates nodal intensity, and a declared level set produces a new surface. A waveform uses an acoustic reconstruction basis; an image uses spatial channels; text requires its own structured output codec. Decoding these faces does not turn the shared generating law into next-token prediction.])],
+ [*The complete generator is nonlinear.* #v(2mm)#note([V combines the two normalized phase-comparison potentials and sigmoid reaction. Each split subflow is Hamiltonian; their composition preserves phase volume without requiring global contraction. The paired states shown on the linked tori first reach this detector after 9 and 96 iterations. Their separation uses all twelve phase coordinates.])],
+ [*An output does not require the whole body to settle.* #v(2mm)#note([A receiver reads the generated activity that reaches it. The plotted height is first arrival, not a physical surface height or proof of a fixed point. Image, acoustic and text decoders read their own structured fields and boundaries; the refinement clock is not universally an output-token position. The full state continues beyond an observation when its application requires it.])],
 )
-#status([Proved-derived for the finite contraction under the displayed hypotheses; established-bounded · implemented-exact for the calculated solution and differential. The material step is local supervised learning; the later contraction is inference/integration. Their distinct roles are connected through the same changed L.])
+#status([Established-bounded · computational-witness for the finite numerical trajectories. The detector, sample section and 96-step observation window are declared. Gray cells have not arrived within that window. They are retained outcomes, not silently classified as impossible or divergent.])
 
 #pagebreak()
-#title("07","Leader formation changes what the return can traverse","The physics connection joins material evolution, admissible incidence, flux and dissipation. This plate is a coupled-law diagram.")
-#align(center,fig("leader-and-return",width:286mm))
+#title("07","Leader formation changes the available geometric pathways","Material, incidence, current and dissipation are coupled parts of the same field construction.")
+#align(center,fig("leader-and-return",width:280mm))
 #eq[$Gamma_e=n_e u-mu_e n_e E-D_e nabla n_e, quad partial_t n_e+op("div") Gamma_e=S_("ion")+S_("photo")-S_("attach")-S_("recomb")$]
 #eq[$op("div")(epsilon E)=rho, quad partial_s V=-partial_t (L I)-R I+e, quad partial_s I=-partial_t (C V)-G V+i$]
 #two(
- [*A new channel is a material event.* #v(2mm)#note([Electron transport, ionization, the electric field and boundary conditions determine leader growth. It changes the channel's conductivity, storage and geometric incidence. The return stroke then propagates current in that altered material; variable L and C contribute their own energy terms. A branching line alone illustrates none of those laws.])],
- [*The computational consequence is specific.* #v(2mm)#note([A fixed-support attention gradient changes present participation; it cannot express birth of a new edge. HNN's corresponding construction must pull its oriented potential/current variation into its existing incidence and material-change owners, then integrate on that changed operator. The fifteen-channel example supplies the fixed-incidence subcase. The active native field supplies constituted scattering and material returns.])],
+ [*The changing medium determines continuation.* #v(2mm)#note([Electron transport, ionization, electric field and boundary conditions determine leader growth. It changes conductivity, storage and channel incidence; the return then propagates in that changed material. The schematic connects the existing conducting-fluid and channel laws. Its branches are annotated relationships, not measured plasma trajectories.])],
+ [*A fixed-contact phase configuration is one restriction.* #v(2mm)#note([The preceding phase calculation holds an already constituted contact complex. The full HNN operation can also change the complex and material through the existing source-conditioned current/variation owners. A local derivative on a fixed support does not perform that transition. The retained interior and higher-cell incidence carry the terms needed to compose it.])],
 )
-#status([Definition for the displayed conducting-fluid/channel equations; interpretation for the HNN map from leader growth to incidence formation. Source: `FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md`. This is not a simulated plasma trajectory or a claim that electrical conductance equals an attention weight.])
+#status([Definition for the physical equations; interpretation for the explicit HNN map between oriented variation, changing incidence and current. Source: `FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md`. This is an extension of the same object, not a topology assigned by a head or layer name.])
 
 #pagebreak()
-#title("08","Recursive scale acts on the computational object","A scale map can place the same generated local field at nested sites; its mass and current must transform together.")
-#align(center,fig("recursive-field",width:276mm))
-#eq[$F_(a b)(x)=frac(x+(2a,2b),3), quad a,b in {0,1}, quad cal(H)=union_(a,b) F_(a b)(cal(H)), quad d=frac(log 4,log 3)$]
-#eq[$m_C=sum_(j in C)mu_j, quad p_C=sum_(j in C)mu_j V_j, quad Y_i=frac(sum_C k_(i C)p_C,sum_C k_(i C)m_C)$]
+#title("08","Fractal geometry belongs to the nonlinear operation","These are freshly evolved sections and zooms of one twelve-phase map, not copies placed at smaller spatial scales.")
+#align(center,fig("intrinsic-arrival-basins",width:280mm))
+#eq[$A_0=A, quad A_(n+1)=Phi^(-1) (A_n) without A, quad z in A_n ⇔ Phi^n (z) in A and forall k<n,Phi^k (z) ∉ A$]
 #two(
- [*Dimension comes from a generating relation.* #v(2mm)#note([The displayed hierarchy uses four separated similarities of ratio 1/3. The local field is the newly computed integrated field; the outer arrangement is a declared recursive construction. The support's similarity dimension solves 4·3⁻ᵈ=1. This is a derived chart property, not a dimension inferred from the number of colored pixels or from every HNN's topology.])],
- [*Compression follows the requested action.* #v(2mm)#note([When copies are kernel-equivalent for a receiving head, carry their summed mass and signed/complex current. The exact normalized output then follows the class formula above. Keeping only a mean loses the denominator's role. If a later head or frame separates the copies, refine the class or retain the missing difference; do not assert equivalence from identical appearance.])],
+ [*Repeated preimages expose the fine geometry.* #v(2mm)#note([Color records first arrival at the same detector. Stretching, folding and repeated restriction produce the interleaved route populations. Each 192×192 panel starts new trajectories on the indicated smaller initial-condition section; it is not an enlarged bitmap or a grid of duplicated models. The other ten initial phase coordinates are held fixed.])],
+ [*The number of material units need not grow.* #v(2mm)#note([A fixed-dimensional nonlinear state can have fractal invariant, survivor or arrival-boundary families. Their geometry belongs to the generating operation and its compatible conditions. The old “while the population grows” convention was too narrow. The finite panels here expose multiscale return structure; an infinite-scale dimension theorem requires its own hypotheses and proof.])],
 )
-#status([Definition for the four-map construction; proved-standard for its similarity dimension under separation; proved-derived · formal-checked for the mass/current attention quotient. This plate connects `FractalPacking`, `AttentionModeCompression` and the same decoded field without claiming learned fractal morphology.])
+#status([Proved-derived · formal-checked: `HolonicRecurrentEcology.FirstArrival` proves the first-hit characterization and chart covariance. Established-bounded · computational-witness for the sampled phase map. The supplied paper's panels similarly read latent initial-condition sections, but use trained models and decoded settling; this reference uses its own explicit analytic law and first-arrival receiver.])
 
 #pagebreak()
-#title("09","Exponentials and modes generate the field","The transcendental operations already appear in phase, participation, scale and integrated motion.")
+#title("09","Scale, phase and decoding are operations on the field","A smooth local chart, a fractal family and an emitted image can describe different aspects of the same generative object.")
 #three(
- [*Phase and participation* #eq[$u=exp(i theta), quad a=op("softmax")(s), quad s=log K$] #note([Phase changes interference before an intensity measurement. The normalized exponential changes participation. Its logarithmic chart makes multiplicative material ratios additive without deleting the signed/complex transported values.])],
- [*Continuous integration* #eq[$dot(x)=(lambda L^2-I)x+(1-lambda)h$] #eq[$x(t)=x^*+exp(t(lambda L^2-I))(x(0)-x^*)$] #note([For this frozen linear field the exponential propagates every mode together. The implicit fixed point on plate 6 is shared by the discrete and continuous relaxations. Varying operators require their ordered evolution; one matrix exponential would no longer suffice.])],
- [*Recursive scale* #eq[$4 r^d=1, quad d=-frac(log 4,log r)$] #note([At r=1/3 this recovers plate 8. Scale changes the measure used by transport and compression. Fractal dimension and effective rank answer different questions; neither is an arbitrary network width or a count of saved states.])],
+ [*Circulation and analytic phase* #eq[$psi_i=exp(2pi upright(i)q_i), quad U_gamma=product_(e in gamma) U_e$] #note([The two torus cycles, their relative phase and path-ordered transport remain in the source behind an exterior picture. The constitutive currents can excite many modes. A monochrome or intensity receiver discards some of their phase distinctions; it does not define the entire Holon.])],
+ [*Recursive restriction and rebase* #eq[$r_("out") compose Phi_("fine")=Phi_("coarse") compose r_("in")$] #note([A reusable coarse law must commute with the admitted action, or retain its actual defect and relevant unresolved modes. Branching preimages and recursive restrictions need not be a disjoint IFS. Fractal dimension, tensor rank, spatial dimension and the number of displayed axes answer different questions.])],
+ [*Geometric and modal decoding* #eq[$A(x)=sum_i psi_i phi_i (x), quad y_R=rho_(R) (A)$] #note([A source-resolved reconstruction produces a wave, image or geometric field. Its interior, surface, phase and intensity views have distinct receiver maps. A single outer isosurface can conceal linked cycles and shared interiors; use the view that exposes the interaction under discussion.])],
 )
-#v(8mm)
+#v(4mm)
+#eq[$d_("box")=lim_(epsilon arrow.r 0) frac(log N(epsilon),log(1/epsilon)), quad f(epsilon) asymp epsilon^alpha, quad d_("section boundary")=2-alpha$]
+#note([The boundary relation on the right requires its sampling and scaling hypotheses. In this construction the torus surface has dimension 2, the shared volume cells dimension 3, the phase chart dimension 12, and the plotted initial-condition section dimension 2. None of those integers is an estimate of a limiting fractal dimension. The receipt retains finite early/late disagreement across five separations without promoting a finite fit to that limit.])
+#v(4mm)
 #eq[$x_t=sqrt(overline(alpha)_t)x_0+sqrt(1-overline(alpha)_t)epsilon$]
 #eq[$d x=[f(x,t)-g(t)^2 nabla_x log p_t (x)]d t+g(t)d overline(W)_t$]
 #two(
- [*Classical generative diffusion supplies a learned field.* #v(2mm)#note([DDPM learns a denoising/noise relation. Score-based models learn a score and integrate the corresponding reverse-time process; the displayed SDE uses decreasing time. DiffWave's bidirectional convolution refines an entire acoustic waveform. The fifteen-channel calculation is a deterministic forced-field reference, not a trained score model. Its integration/decoder interface is the common structural connection.])],
- [*The output can remain internal.* #v(2mm)#note([A reconstructed image or acoustic mode can be received by another interior Holon before any external artifact is emitted. A gaze or motion can also perturb an external observer without a deliberate communication action. In both cases the relevant operation is generated activity crossing an actual coupling boundary; intent and token positions are not universal operands.])],
+ [*Diffusion generation refines a joint field.* #v(2mm)#note([Classical denoising and score models learn a field and integrate it; DiffWave refines a complete acoustic waveform with bidirectional convolution. The reverse-time SDE above uses decreasing time. HNN's local, modal and geometric refinements compose through their own laws on the whole field. A linear resolvent is a useful special case, not its universal dynamics.])],
+ [*An internal image is also a generated receiver face.* #v(2mm)#note([A reconstructed field may perturb another interior Holon before any exterior product is emitted. Gaze, motion and acoustic radiation likewise expose activity through available coupling. The framework concerns these generated and received differences at every grain; deliberate communication and next-token prediction are application restrictions.])],
 )
-#status([Definition for the frozen linear chart; proved-standard for its exponential solution. External comparisons: DDPM, arXiv:2006.11239; DiffWave, arXiv:2009.09761; score SDEs, arXiv:2011.13456. The supplied Transformer and fractal papers are analyzed in the September 14 research record.])
+#status([Definition for the operator/receiver relationships. Primary comparisons: DDPM, arXiv:2006.11239; DiffWave, arXiv:2009.09761; score SDEs, arXiv:2011.13456. The September 8 generator/tube synthesis and the supplied September 14 papers remain part of this source route.])
 
 #pagebreak()
-#title("10","The formula must point to the operations that consume it","This synopsis is a view of the mathematical/library contract. Its diagrams do not substitute for that construction.")
-#table(columns:(1.0fr,1.55fr,1.55fr),inset:5pt,stroke:0.35pt+rgb("aaaaaa"),
- [*Operation*],[*Mathematical / executable owner*],[*Concrete role*],
- [Holon and tensor interaction],[`HOLON.md`; `HolonTensorLens`; bilinear and resident section operators],[Typed current, tensor/contraction ports, frame, incidence and executable material.],
- [Heads, blocks and covariance],[`HolonicArchitectureCharts`; `HolonicAdjointNormalization`; `AttentionModeCompression`],[Admitted attention, normalized differential, sigmoid derivative, complete mass/current quotient.],
- [Exact reference transport],[`exponentiated_ratio::NormalizedKernel`],[Vector forward action, log-potential/value tangent, adjoint and positive material step.],
- [Native normalized current],[`field/receiver/normalized.rs` and its material pullback],[Grouped exponential, binary restriction, complete discrepancy and returns to both producing arguments.],
- [Native layer graph],[Earlier `operative_atlas`, `NativeFullOperatorSession`],[Q/K/V, phase, multihead contact, residual/gated reaction and their retained carriers.],
- [Contact and integration],[Active operative field/current/material owners; coupled body],[Current and material dynamics on actual incidence; the public model must consume their composed action.],
- [Geometric decoding],[`connected_holonic_field`; existing toroidal basis and exact receiver compiler],[Generated coefficients → coherent amplitude → declared intensity receiver → displayed topology.],
- [Changing incidence and scale],[Physical leader/material guide; `FractalPacking`; mode and recurrence owners],[Derive the contact transition and its transported current; choose a quotient from its future action.],
+#title("10","The construction is networked by its mathematical relations","The formula and library map now recover the manifold, nonlinear recurrence and preimage geometry together.")
+#table(columns:(1.05fr,1.6fr,1.5fr),inset:5pt,stroke:0.35pt+rgb("aaaaaa"),
+ [*Operation*],[*Existing source owner*],[*Role in the same object*],
+ [Holon / tensor current],[`HOLON.md`; `HolonTensorLens`; field and bilinear operators],[Typed sections, contraction, frame, current and material.],
+ [Surface and higher incidence],[`SimplicialComplex`; `GradedCausalComplex`],[Stars, links, hinges, common higher cells and ∂²=0.],
+ [Torus, phase and holonomy],[`analytic_field`; `implicit`; `lattice_gauge`; `StructureConnection`],[Actual carrier equations, cycles, local phases and ordered current transport.],
+ [Attention and derivatives],[`HolonicAdjointNormalization`; `HolonicArchitectureCharts`; normalized native receiver],[State-dependent participation, sigmoid/softmax calculus and complete value/material returns.],
+ [Recursive arrival geometry],[`HolonicRecurrentEcology.FirstArrival`; bounded `basin` owner],[Full preimages, first-hit characterization and covariance under a changed chart.],
+ [Constitutive body and geometry],[Active field/junction/coupled body; `discrete_curvature` at its own scope],[Current, internal storage, material variation and changed incidence.],
+ [Scale and compression],[Tube/clocked span, mode quotient, `FractalPacking`],[Restriction/rebase and future-compatible compression; separated IFS is one specialization.],
+ [Illustrated analytic instance],[`intrinsic_holonic_flow`],[One twelve-phase map, linked domains, shared volume cells and recomputed arrival sections.],
 )
-#v(5mm)
-#two(
- [*The source-navigation failure was real.* #v(2mm)#note([The formal normalization calculus, architecture block, native old graph, active field adjoints and physical leader construction were documented separately. The previous synopsis imported geometry without making any of those operations consume it. `HNN_FORMULA.md` now supplies a connected operation-level path, and the same path is linked from `HOLON.md`, `RUST_FRAMEWORK.md` and the architecture map.])],
- [*The native assembly has a precise consuming equation.* #v(2mm)#note([The active body must execute its field's current/material action and its output differential on the same changing incidence, then encode the repeated action it actually uses. Existing helpers and the CPU reference do not establish that call. Conversely, this absent consumer does not make softmax, sigmoid, gradients, fractal restriction or learning absent mathematics.])],
+#v(5mm)#two(
+ [*The conceptual substitution is corrected.* #v(2mm)#note([The prior document replaced intrinsic recursive geometry with tiling, and replaced the shared manifold with an execution-column picture. It also made a globally contractive affine reference central, removing the route geometry being discussed. Those examples remain historical bounded controls; they no longer define the model or its main illustrations.])],
+ [*The correction belongs in the workflow.* #v(2mm)#note([The hexis convention now permits fractal geometry in a fixed-dimensional state. The model formula, Holon guide, formal framework, architecture map, development method and operating contract direct recovery through current/connection/incidence and recurrence/preimage together. A picture must identify its receiver and preserve the mechanism it is meant to explain.])],
 )
-#v(4mm)#status([Established-bounded · source-inspected for the owner audit. Reproduction and exact numerical returns: `research/experiments/connected_holonic_field/README.md`. Formal and library edits, checks and source continuity: the September 14 connected attention/learning/generation record.])
+#status([Established-bounded · source-inspected for the owner recovery and document correction. The nonlinear numerical reference is a mathematical/physical construction at its stated scope. Native Athena assembly continues through the existing field/body consumer; this presentation does not substitute the reference for that product.])

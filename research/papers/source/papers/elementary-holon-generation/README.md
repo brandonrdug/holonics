@@ -1,28 +1,26 @@
-# Elementary Holonics: connected attention, learning and generation
+# Elementary Holonics: intrinsic fields and recursive geometry
 
-The ten plates present the maintained computational object and model formula from
-`docs/HOLON.md` and `docs/HNN_FORMULA.md`. They now follow one reference field through
-normalized heads, sigmoid participation, complete gradients, phase-sensitive friction,
-composed layers, convergent whole-field integration and geometric decoding.
+This ten-plate synopsis reflects `docs/HOLON.md` and `docs/HNN_FORMULA.md`. The September 14
+intrinsic-fractal correction replaces the tiled-copy and separated-layer pictures with one
+coupled nonlinear field: interlinked toroidal domains, shared higher cells, phase-dependent
+attention, constitutive current and recursively generated arrival geometry.
 
-`research/experiments/connected_holonic_field/README.md` specifies the exact calculation,
-supplied observations, learned material, scopes and reproduction commands. Its computed
-coefficients generate the new geometry through the existing toroidal-basis decoder;
-previously rendered Information Chemistry figures are not imported. White landscape pages,
-black Libertinus text, Holonic marks, Dirac notation and original phase rendering retain
-the Information Chemistry conventions.
+The computation, geometry, detector, finite-resolution scope and reproduction commands are in
+`research/experiments/intrinsic_holonic_flow/README.md`. Its two attention potentials and
+sigmoid reaction operate on the same twelve-phase state. The 3D toroidal and shared-cell views,
+phase-current traces, local contact and freshly computed arrival zooms are distinct receivers
+of that construction. The separate conservative and dissipative restrictions are identified.
+The numerical reference is not a reproduced trained model or a new native HNN runtime.
 
-The leader/return diagram connects the existing conducting-fluid and channel equations to
-changing incidence. The recursive plate places the new field through a declared four-map
-construction and connects mass/current aggregation to attention compression. These two
-schematics retain their declared status rather than being presented as inferred morphology
-or simulated plasma. The exponential/phase/scale/diffusion plate connects the analytic
-operations and the supplied research papers to the same generation interface.
+The earlier fifteen-channel exact linear reference and its gradient tests remain available
+as bounded mathematical controls. Its exterior skin, fixed layer columns and four-copy IFS
+no longer organize this document. Existing artifacts are preserved; they are not silently
+reclassified as a nonlinear or fractal result.
 
-The reusable `holonics/computational-holon.typ` module supplies the existing style and
-Holonic/Dirac conventions. The source equations are maintained in the model formula;
-Lean and Rust own the formal and executable operations. This presentation creates no
-second construction order. Its last plate identifies exact owners and consuming equations.
+White 320×210 mm pages, black Libertinus type and the Holonic/Dirac conventions remain in
+`holonics/computational-holon.typ`. The equations and source routes live in the maintained
+model and framework documents; the new first-arrival and chart-covariance laws are formalized
+inside `HolonicRecurrentEcology`. The presentation does not set a separate construction order.
 
 Build from the repository root:
 

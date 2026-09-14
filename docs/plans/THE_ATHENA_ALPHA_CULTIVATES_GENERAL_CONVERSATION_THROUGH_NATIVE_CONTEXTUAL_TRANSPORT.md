@@ -273,6 +273,14 @@ and codec D_F, the operation returns
 
 `y = rho_F(G_Theta(s,c))`,   `output = D_F(y)`.
 
+[project-postulate] The September 14 intrinsic-fractal correction governs the representation
+of this generator: heads and local charts operate inside the same interacting field; layer
+indices are a composition chart. Its toroidal cycles, simplicial/higher-cell joins, connection,
+nonlinear recurrence and full preimages must be recovered together. A separated-copy IFS,
+a fixed affine contraction or an exterior skin cannot define the general HNN topology or
+its recursive dynamics. The [intrinsic field formula](../HNN_FORMULA.md#one-object-its-charts-and-its-recursive-geometry)
+provides the operational source route and the precise first-arrival/rebase relation.
+
 [definition] G_Theta is the mathematical generating operation. Its constituent functions,
 parameters, morphology and source-conditioned composition are the objects being formed and
 reused, including recursive/fractal realizations. A code-generating model specializes the
