@@ -6,13 +6,22 @@ object. The earlier tiled IFS and separated layer-column picture do not supply t
 This is a supplied analytic constitutive example used to explain the design. It is evaluated
 numerically outside native HNN and does not reproduce a trained model from the cited paper.
 
+[project-postulate] The subsequent exact-mode/receiver correction governs this directory.
+`model_constraints.json` retains exact rational parameters, units, integer chart addresses
+and the normalized exponential/rotation constraints. `exact/` executes the actual map with
+rational enclosures: the first selected state's arrival is certified at 9; the second excludes
+arrival through 32 and retains an undecided receiver family at 33. Earlier NumPy output below
+is historical exploratory evidence, not an exact Holonic mode or native arrival verdict.
+`flow.py` now requires an explicit exploratory-survey flag for that legacy calculation;
+its imported numeric functions serve only the exterior display/diagnostic boundary.
+
 ## Carrier and common cells
 
 [definition] Six radius-2 toroidal cores form a branched chain, with centers and axes in
 `receipt.json`. Five neighboring pairs are linked once: the adjacent perpendicular core
 crosses the other's spanning disk at exactly one interior point; its other plane crossing
 lies outside the disk. `mesh.json` retains those points and squared-radius comparisons.
-The core's displayed tube radius is 0.26. The field domain has minor radius 1 and is defined
+The core's displayed tube radius is 13/50. The field domain has minor radius 1 and is defined
 by the torus quartic, not by a decorative outline.
 
 [established-bounded; computational-witness] Integer, denominator-cleared quartics on a
@@ -62,7 +71,7 @@ V(q) = κ/(2π) Σ_i softplus(-cos(2πq_i))
 q' = q+κ sin(2πp),                     p' = p-∇V(q')       (mod 1).
 ```
 
-[definition] `κ=0.27`, `γ=0.35`; self-comparison is included. The two shear stages are
+[definition] `κ=27/100`, `γ=7/20`; self-comparison is included. The two shear stages are
 complementary current operations on the **same** state. Heads are normalized comparisons
 inside the potential. The inbound and outbound terms both contribute to its gradient.
 The trajectory renderer follows the exact analytic subflow formulas between sampled steps,
@@ -78,7 +87,7 @@ unit-phase restriction; the full HNN constitutive field has those additional rol
 
 ## Recursive geometry and numerical scope
 
-[definition] The detector is `q₀∈[0.20,0.34), p₀∈[0.08,0.20)`. A 192×192 family varies
+[definition] The detector is `q₀∈[1/5,17/50), p₀∈[2/25,1/5)`. A 192×192 family varies
 these two **initial** phases while fixing the other ten as recorded in `flow.py`. Each initial
 condition follows the complete twelve-phase recurrence. Colors record first reception through
 iteration 96; gray retains non-arrival within that window. The two zooms independently evolve
@@ -91,14 +100,14 @@ objects placed in tiles. `arrival.npz` retains every sampled arrival time.
 state equivalence with conjugated recurrence and transported receiver. The preimages are
 full compatible populations; their definition does not require an event archive.
 
-[established-bounded; computational-witness] The selected neighboring grid cells first
+[historical; computational-witness] The earlier floating survey reports that the selected neighboring grid cells first
 arrive at steps 9 and 96. Selection is made **after** evolution among adjacent cells whose
 first arrivals are both later than 8 and within the window; this avoids presenting the
 initial detector edge or a censored outcome as a long-route contrast. The coarse, first-zoom
 and second-zoom arrival fractions are respectively 0.6196831597, 0.8907877604 and 0.9420030382.
 The changing participation matrices and all plotted flow traces use this same selected state.
 
-[established-bounded; computational-witness] The numerical checks compare the analytic
+[historical; computational-witness] The exploratory numerical checks compare the analytic
 potential gradient with central finite differences, the full twelve-axis Jacobian with the
 canonical symplectic form, and the composed map with its inverse. Maximum errors were
 `3.84e-11`, `1.59e-10`, and `2.22e-16`; the Jacobian determinant was `1.0000000000653`.
@@ -116,7 +125,7 @@ linear control cannot supply the saddle-mediated dynamics under discussion.
 ## Reproduce and reuse
 
 ```bash
-python3 research/experiments/intrinsic_holonic_flow/flow.py
+cargo run --manifest-path research/experiments/intrinsic_holonic_flow/exact/Cargo.toml --quiet
 python3 research/experiments/intrinsic_holonic_flow/render.py
 typst compile --root . \
   research/papers/source/papers/elementary-holon-generation/main.typ \

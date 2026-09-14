@@ -1,0 +1,65 @@
+{
+  "schema": "holonics.intrinsic-phase-constraint.v1",
+  "carrier": "six torus charts with twelve phase coordinates; integers record axes and cell degrees, not semantic capacities",
+  "exponential_mode": {
+    "normalization": "E(0)=1; E prime=E",
+    "composition": "E(z+w)=E(z)E(w)",
+    "phase_kernel": "2*pi*i*Z with winding retained"
+  },
+  "phase_mode": {
+    "rotation": "R prime=J R; R(0)=I; J^2=-I",
+    "pi_constraint": "16 atan(1/5)-4 atan(1/239); lifted Gaussian/Machin branch"
+  },
+  "rational_parameters": {
+    "kappa": "27/100",
+    "gamma": "7/20",
+    "betas": [
+      1,
+      4
+    ],
+    "connection_turn": "1/8",
+    "core_radius_in_L0": "13/50",
+    "major_radius_in_L0": 2,
+    "field_radius_in_L0": 1
+  },
+  "units": {
+    "phase": "turn",
+    "material_position": "L0",
+    "material_time": "T0",
+    "advection_rate": "1/(8 L0 T0)"
+  },
+  "section_charts": {
+    "N": 192,
+    "base_center": [
+      "1/2",
+      "1/2"
+    ],
+    "zoom_center": [
+      "15/16",
+      "73/384"
+    ],
+    "widths": [
+      "1",
+      "4/25",
+      "4/125"
+    ],
+    "dilations": [
+      "1",
+      "25/4",
+      "125/4"
+    ],
+    "address": "c_l+w_l*((2*i+1-N)/(2*N),(2*j+1-N)/(2*N))"
+  },
+  "detector": {
+    "q": [
+      "1/5",
+      "17/50"
+    ],
+    "p": [
+      "2/25",
+      "1/5"
+    ],
+    "upper_endpoints": "open"
+  },
+  "realization": "exact/ executes the analytic mode using existing rational series and outward enclosures; old NumPy survey is an exterior exploratory face and is not an exact arrival verdict"
+}

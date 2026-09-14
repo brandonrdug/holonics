@@ -1111,6 +1111,24 @@ The draft applies its maps globally at that port; it does not supply the missing
 | Safetensors and ONNX export lenses | `NativeMorphologyVariant.lean::{ExactExportLens,ProjectedExportWitness,ExportDisposition}` | `native_intelligence/morphology_export/` over `NativeMorphologyArtifact`; lossless `ForeignOnnxChart` import | no native apparatus identity; custom ONNX domain is exterior | **exact-bounded:** valid Safetensors artifact/anatomy tensors and ONNX IR 14 `org.holonics` opset 1 round-trip complete artifacts; anatomy-only projections retain both artifacts and a configuration separator; unsupported receiver/cultivation/world requests refuse |
 | Configuration-indexed multimodal evaluation | `NativeMorphologyVariant.lean::{InferenceConfigurationClaim,CrossCodecResonance}` | historical MVF6 receipt; obsolete operator-authored evaluation owner and driver | resident word/current apparatus remains one configuration coordinate | **historical exact-bounded control:** matched text/image/audio/temporal-video/mixed apertures preserved supplied chronology, but their cultivation current was manually constructed; no HNN or qualitative multimodal grade follows |
 
+## Constraint modes and active receiver faces
+
+[definition] The [constraint-mode/face contract](CONSTRAINT_MODES_AND_RECEIVER_FACES.md)
+joins normalized exponential and phase/period sources, exact series/reopening, Golden/Gamma/
+zeta relations, separately named Copson and Newman boundaries, typed scale/Lorentz transport,
+gyro composition and observer stress/current. Its chronology comes from the existing August
+and September deposits, not a new numerical-constant catalogue.
+
+[established-bounded; implemented-exact] The September 14 audit repaired `CertifiedSeries`:
+exp/cos/sin expressions now retain their generating species, and odd circular truncations
+carry the correct signed omitted term. The same owner is consumed by the
+[exact phase receiver](../research/experiments/intrinsic_holonic_flow/exact/README.md).
+[Exact contact surfaces and observer faces](../research/experiments/contact_receiver_faces/README.md)
+compose rational torus patches, Lorentz/gyro transformations, traction and stress contractions.
+`ReceiverStressEnergy`, `Gyrogroup`, `NavierStokesCurvedTransport` and the connection/Bianchi
+owners retain their respective formal contracts. No global Einstein solution is inferred
+from a local tetrad example.
+
 ## Intrinsic manifold and recursive field geometry
 
 [definition] Begin with the [one-object construction](HNN_FORMULA.md#one-object-its-charts-and-its-recursive-geometry),

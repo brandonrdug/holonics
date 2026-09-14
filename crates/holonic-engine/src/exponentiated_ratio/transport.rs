@@ -3,6 +3,9 @@
 //! K_ij = exp(s_ij), a_ij = K_ij / sum_j K_ij, Y = a V. Rational positive K is
 //! the exact log-rational specialization of softmax. Zero entries declare absent contacts.
 //! The derivative includes both changing participation and changing transported current.
+//! K is supplied positive material. The real log-potential is defined implicitly by the
+//! normalized mode E'=E, E(0)=1, E(s)=K; this calculation does not evaluate/store a logarithm
+//! or claim that a learner generated K. Its constraint source is retained by this chart.
 //! These are reusable exact reference operators; they do not insert a host loop into HNN.
 
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix};

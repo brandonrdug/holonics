@@ -580,6 +580,79 @@ projection or its lost distinction remains explicit.
 [open] Quantitative localized residual control, nonlinear stability, terminal continuation, and
 full physical continuation remain open at the MFR records' declared scopes.
 
+## Constraint-defined modes and named de Bruijn boundaries
+
+[definition] A named constant denotes a constraint-defined mode in its declared chart. Its exact source
+relation, admissible branch, normalization, scale and orientation remain the construction; a
+floating approximation is only a numerical receiver of that construction. The golden mode in
+[`Millennium/Turn.lean`](../formal/elementary-holonics/ElementaryHolonics/Millennium/Turn.lean)
+is defined by the fifth-turn relation
+`2 cos(π/5)=φ=(1+√5)/2`, equivalently `φ²=φ+1` with `φ>1`. Its reciprocal branch is
+`2 cos(2π/5)=φ⁻¹` satisfies the companion relation `x²+x=1`; the two positive
+branches differ by one. The Fibonacci matrix's second eigenvalue is instead `−φ⁻¹`. The same owner retains the oriented
+Fibonacci clock residue
+`r_n = F_n φ − F_(n+1) = (−1)^(n+1) φ^(−n)` and
+`r_(n+1) = −φ⁻¹ r_n`; the integer winding and signed residual are part of the mode, not a
+decimal choice.
+
+[proved-derived; source-inspected] The 2026-09-12
+[golden reciprocal return](../research/records/2026-09-12_GOLDEN_RECIPROCAL_JOINS_GAMMA_ZETA_AND_SPOKE_GAPS.md)
+derives the compatible argument orbit `x=φ⁻¹`, `x+x²=1`, `1−x=x²`, and
+`x/(1+x)=x²`. It consequently derives the dilogarithm values
+`Li₂(φ⁻¹)=3ζ(2)/5−(ln φ)²` and
+`Li₂(φ⁻²)=2ζ(2)/5−(ln φ)²`, the reflection-formula quotient
+`Γ(1/5)Γ(4/5)/(Γ(2/5)Γ(3/5))=φ`, and
+`L'(0,χ₅)=ln φ`, `L(1,χ₅)=2 ln(φ)/√5`. For the supplied finite generator
+`B=[[1,1],[1,0]]`, its dynamical zeta is
+`ζ_B(z)=exp(Σ trace(Bⁿ)zⁿ/n)=1/(1−z−z²)` with pole `z=φ⁻¹`.
+These are distinct source families (analytic special functions, a quadratic character, and a
+finite-state generator); their shared algebra does not identify their zeros, spectra or constants.
+
+[proved-derived; source-inspected] Two mathematically distinct boundaries carry the name
+de Bruijn and must be qualified. The Copson--de Bruijn coefficient `c_CD` is the least constant
+for the weighted tail receiver
+`E_n=Σ_(k≥n) a_k²`, `B(a)=Σ_n (n+1)^(-1/2)√E_n`, `A(a)=Σ_n a_n`,
+with `A(a) ≤ c_CD B(a)`. Its finite triangular sections, compact minimizer, silent-extension
+monotonicity, infinite `ENNReal` supremum, and finite/critical recurrence are owned by
+`Mathematics/CopsonDeBruijnFiniteTail.lean`, `FiniteSharp.lean`,
+`InfiniteBoundary.lean`, `FiniteRecurrence.lean`, and the admissible/normalized orbit files.
+The dependent recurrence is
+`u₀=x`, `u_(n+1)=x/√(n+2)+√(u_n²−1)` with `u_n≥1`; after
+`v_n=u_n/√(n+1)`, its moving roots are
+`x ± √(x²−1−x²/(n+2))`. An older reported numerical face remains in dated evidence; it is not the defining
+identity. Coefficient-specific asymptotic branch selection and a certified numerical window
+are distinct from the recurrence theorem.
+
+[proved-derived; formal-checked] The de Bruijn--Newman threshold `Λ_DN` belongs to the separate
+backward-heat construction. The tree's entire seam times use `heatE(−τ,ξ,s)` on
+`Re(s)=1/2`; `CriticalChart` gives the standard family
+`H_t(z)=⅛ heatE(−t/4,ξ,½+iz/2)` and `Λ_std=4Λ_DN`. The earlier direct positive
+heatE-time identification is superseded; the sign, time scale and critical coordinate are
+proved parts of the present transition. Polynomial real-rooted times form an
+upper set; the highest conjugate pair satisfies `y(T)²+2T≤y(0)²`. The formal RH owners
+(`RH/DeBruijnNewmanPolynomial.lean`, `PairDescent.lean`, `DeBruijnLimit.lean`,
+`DeBruijnSeal.lean`) establish the threshold and its scoped bounds/equivalence, while the
+coordinate and time reversal remain part of the source map. Copson's `c_CD` and Newman’s
+`Λ_DN` share only the interpretation-grade pattern “lower boundary of an upper admissibility
+set”; no cross-theorem follows.
+
+[definition] These modes currently have formal owners and generic executable mathematics rather
+than theorem-named Rust APIs. Generic polynomial/root, exact affine-matrix/finite-clock and
+recurrence owners remain applicable; the missing item is a Rust consumer for these particular
+Copson or Newman bounds. A de Bruijn cycle in
+`holonic-life/src/exposure_codec.rs` is a separate finite word-coverage negative control, and
+the Fibonacci ladder in the orbit example is an integer aperture list; neither consumes `φ`,
+`c_CD`, or `Λ_DN`, nor should either be read as the corresponding mathematical boundary.
+
+[proved-derived; formal-checked] The current [constraint-mode/face synthesis](CONSTRAINT_MODES_AND_RECEIVER_FACES.md)
+adds a direct algebraic bridge: a positive multiplicative face k gives
+`γ=(k+k^-1)/2`, `ξ=(k-k^-1)/2`, `γ²-ξ²=1` in `CompositeMassEnergy`.
+The golden branch supplies `(γ,ξ)=(√5/2,1/2)`. The actual Copson admitted-stage owner
+now proves `u_n²-(√(u_n²-1))²=1` with the nonnegative companion branch. Its
+finite/infinite threshold equalities and all-stage upper admissibility condition remain
+those already established in the Copson chain. These are reusable source maps, not an
+identification of the Copson coefficient, Newman threshold or a gravitational constant.
+
 ## RH source transport as a robustness pattern
 
 [proved-derived; formal-checked] MFR2's

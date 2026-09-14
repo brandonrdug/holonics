@@ -1,19 +1,23 @@
 """A coupled analytic phase field on a branched chain of interlinked tori.
 
-Exterior numerical realization for the synopsis. Two normalized phase-comparison
+Preserved exterior numerical survey/display evaluator.
+The authoritative source is model_constraints.json and exact/; this evaluator
+must not supply exact Holonic state or receiver verdicts. Two normalized phase-comparison
 potentials act on ONE T^(2N), with incidence computed from exact solid-torus overlap
 witnesses. The chosen symplectic split, parameters and detector are explicit.
 This is not a new native HNN runtime or a reproduced trained reasoning model.
 """
 from pathlib import Path
+from fractions import Fraction as Q
+import sys
 import json,time
 import numpy as np
 
 HERE=Path(__file__).parent
-N=6; R=2.; FIELD_RADIUS=1.; CORE_RADIUS=.26
+N=6; R=2; FIELD_RADIUS=1; CORE_RADIUS=float(Q(13,50))
 CENTERS=np.array([[-6,0,0],[-3,0,0],[0,0,0],[3,0,0],[6,0,0],[0,3,0]],dtype=float)
 AXES=np.array([2,1,2,1,2,0])
-KAPPA=.27; GAMMA=.35; BETAS=(1.,4.); CAP=96
+KAPPA=float(Q(27,100)); GAMMA=float(Q(7,20)); BETAS=(1,4); CAP=96
 # Clock and canonical phase have dimensionless reference units.
 
 def torus_polynomial(points,i,minor=FIELD_RADIUS):
@@ -176,4 +180,7 @@ def main():
         paths=[dict(q=q.tolist(),p=p.tolist()) for q,p in paths],elapsed_seconds=time.perf_counter()-start)
     (HERE/'receipt.json').write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps({k:result[k] for k in ['phase_dimension','arrival_pair','observation_windows','checks','elapsed_seconds']},indent=2))
-if __name__=='__main__':main()
+if __name__=='__main__':
+    if '--exploratory-survey' not in sys.argv:
+        raise SystemExit('For exact/enclosed execution use exact/Cargo.toml. The preserved numerical survey requires --exploratory-survey and supplies no exact Holonic verdict.')
+    main()

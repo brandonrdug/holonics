@@ -89,3 +89,9 @@
 #let tangent-equation = $(I+D D^*)delta v=2 delta u+2 delta D b+2 D delta b-(delta D D^*+D delta D^*)v$
 #let diffusion-equation = $x_t=sqrt(overline(alpha)_t)x_0+sqrt(1-overline(alpha)_t)epsilon$
 #let memory-equation = $dot(r)=(D-K B)r+(C+D K-K A-K B K-dot(K))x+g-K f$
+
+// Normalized constraint modes and active faces. Maintained source contracts:
+// docs/CONSTRAINT_MODES_AND_RECEIVER_FACES.md and docs/HNN_FORMULA.md.
+#let constraint-mode-equation=$cal(E)'=cal(E), quad cal(E)(0)=1, quad cal(E)(z+w)=cal(E)(z)cal(E)(w), quad e=cal(E)(1)$
+#let multiplicative-lorentz-equation=$gamma_k=(k+k^(-1))/2, quad xi_k=(k-k^(-1))/2, quad gamma_k^2-xi_k^2=1, quad cal(E)(r)=k$
+#let observer-stress-face-equation=$e_U=T_(mu nu)U^mu U^nu, quad j_U^mu=-T^(mu nu)U_nu, quad cal(F)_U=c j_U^mu n_mu$

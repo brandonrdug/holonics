@@ -169,6 +169,15 @@ representation. A layer-column diagram or exterior isosurface is one receiver, n
 ontology. Use the [intrinsic field formula](docs/HNN_FORMULA.md#one-object-its-charts-and-its-recursive-geometry)
 and [hexis correction](docs/canon/TABLET_THE_HEXIS.md#9-lattice-crystal-fractal-and-lightning-are-distinct-morphology-regimes).
 
+[project-postulate] Brandon's September 14 exact-mode/face correction keeps a constant's
+normalized constraint, branch/period and generating operation distinct from a float or radix
+face. Use typed dilations/Lorentz changes, integer grades/counts/levels and explicit units.
+Physical reception is a participating current/material/observer relation; recover stress,
+contact-surface and Einstein/Bianchi/gyro constructions even when the application is ML.
+The [constraint-mode and active-face contract](docs/CONSTRAINT_MODES_AND_RECEIVER_FACES.md)
+connects their chronology and consumers. Function names alone neither provide the missing
+source relation nor prove a missing mechanism; inspect the actual operation and its remainder.
+
 [project-postulate] Implement semantic changes from their mathematical contracts: typed
 operands, constitutive/inference law, source/receiver scope and the realization or residual
 equation the consumer requires. Recover the existing formal statement and native owner;

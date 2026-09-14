@@ -244,8 +244,9 @@ theorem theFifthTurnValueSolvesThePeriodTwoRelation :
   field_simp
   nlinarith [h5]
 
-/-- **And the reciprocal turn is the other root.**  `2 cos(2π/5) = 1/φ`, the second value the
-period-two word reaches, differing from the first by exactly one. -/
+/-- **The reciprocal turn is the companion positive branch.** `2 cos(2π/5) = 1/φ`
+satisfies `x² + x = 1`; it is not the negative conjugate root of `x² - x - 1`. The two
+positive values reached by the period-two word differ by exactly one. -/
 theorem theDoubledFifthTurnIsTheOtherRoot :
     2 * Real.cos (2 * Real.pi / 5) = (Real.sqrt 5 - 1) / 2 := by
   have h : (2 : ℝ) * Real.pi / 5 = 2 * (Real.pi / 5) := by ring

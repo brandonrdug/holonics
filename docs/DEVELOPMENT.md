@@ -53,6 +53,16 @@ three in every operation or invent an observation for an exact solver result.
   or counterexample. Develop the relevant formal owner. Source absence alone is not a proof
   that the mathematical construction is absent from the framework.
 
+[project-postulate] When a construction uses a named constant or transcendental operation,
+recover its normalized constraint, branch/period and source family before interpreting its
+numeric face. Exact evaluation retains the generating expression and oriented remainder;
+changing decimal notation alone does not make a float-based state/branch decision exact.
+Use the [constraint-mode/active-face contract](CONSTRAINT_MODES_AND_RECEIVER_FACES.md) for the
+chronological exp/phase, Gamma/zeta, golden/de Bruijn and Lorentz/gyro/stress connections.
+A physical receiver participates through the field/material interaction; an exterior renderer
+is a typed projection and supplies no hidden native controller. These duties repair the
+consuming relation rather than introduce another universal approval or proof gate.
+
 [project-postulate] For generative/physical geometry, identify the complete object and its
 actual nonlinear operation before selecting a figure or computational simplification. State
 which restriction, projection or section the picture reads and which couplings it retains.

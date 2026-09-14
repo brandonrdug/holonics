@@ -44,6 +44,15 @@ that object while its invariant or preimage families have fractal structure. A t
 outputs, a column of layer nodes or a closed exterior skin is not its defining geometry.
 The actual restriction, gluing, current and constitutive evolution specify what the chart shows.
 
+[definition] A physical receiver is another participating Holon. A local interaction can
+return `(H_A',H_R',Face_R)` from `(H_A,H_R)` through the shared current/material law. Its
+frame, velocity, tangent/normal faces and stress/current belong to the operands. A rendered
+readout is a further projection of that interaction. The
+[active-face contract](CONSTRAINT_MODES_AND_RECEIVER_FACES.md#the-overlap-has-stress-bearing-faces)
+connects this to traction, Lorentz/gyro transport and Einstein/Bianchi balance. The abstract
+field description and its physical realization retain their declared units and constitutive
+maps; an ML label does not remove these relations.
+
 ## High-level Holonic Interactions
 
 [definition] These are the operations used to formulate the model. They are abstracted

@@ -132,6 +132,54 @@ geometry. Spectral strip clearance and Hodge gap relaxation have time complement
 source-specific global zero placement and algebraic cycle realization remain distinct
 obligations; mode independence alone supplies neither endpoint theorem.
 
+[definition; source-inspected] The September 11 [π/e constraint deposit](../research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md)
+fixes the normalization before any numerical face is read: the exponential flow is
+`E' = E`, `E(0) = 1`, and `e = E(1)`. Over the complex chart,
+
+`E(z+w)=E(z)E(w)` and `ker E=2πiℤ`, with `E:ℂ→ℂ*`.
+
+Thus `2πi` is the primitive positive imaginary period; `π` is the constrained normalized half-turn mode. A
+phase receiver sees only the quotient face and must retain its winding fibre. The formal
+`Physics/PhaseCarrier` owner proves `exp(i(θ + 2π)) = exp(iθ)` and the half-turn sign,
+and `Mathematics/MachinPhaseConstraint` proves the exact Gaussian/Machin relations
+`(5+i)^4 = (239+i)(2+2i)` and `π = 16 atan(1/5) − 4 atan(1/239)`. The native
+`reopening::arctan_unit_fraction` carries the rational partial sum and alternating remainder;
+it is an exact generator face at a declared term aperture, not a stored π literal.
+
+[definition] A logarithm is the inverse-scale face of a declared positive multiplicative
+transport. `atmospheric_inverse::exact_positive_log_ratio` realizes `log(n/d)` by the exact
+series `2 Σ z^(2k+1)/(2k+1)`, `z=(n−d)/(n+d)`, with its positive geometric tail. The
+normalized kernel owner accepts supplied positive rational `K` and defines its implicit real
+log-potential by the normalized relation `E(s)=K`. This relation needs no stored/evaluated
+logarithm and does not claim that a learner generated the supplied K. `exp(tA)` and
+Gaussian amplitude/argument shifts are instead generic operator constructions: the formal
+`Transport/GaussianRebase` owner proves the cocycle
+`a(t,L,z) a(t,M,z+2tL) = a(t,L+M,z)`, while `Mathematics/GeneratorFactorization`
+provides the reusable block composition for Gamma-like coefficient shifts. This preserves
+the shift law without identifying every `Gamma` name with one function.
+
+[definition] Two Gamma constructions remain distinct. `kelvin::MaterialLoop` owns
+circulation `Γ(t)=∮_{C(t)} v·dl` and transports the material loop with the field; it is not
+Euler's Gamma function. Euler-Gamma/ratio work is represented through the generic exact
+factorization and shifted-block owners when a concrete source seed and recurrence are supplied.
+No bare Gamma symbol is a native law by itself.
+
+[established-bounded; source-inspected] The arithmetic owner retains formal prime-log
+coefficients. For the Chebyshev source, `a_p` counts the positive powers `p^k≤x`, and
+`ψ(x)=Σ_p a_p log p` has exact multiplicative face `exp(ψ(x))=lcm(1,…,x)` in
+`PrimePowerCurrent`. Arbitrary prime-log coefficients are not asserted to have that lcm face.
+The owner does not evaluate a floating logarithm in standing. Its `zeta_receiver_measure` is a finite selected-prime chart with
+`q_p=p^(−σ)`, `m₀,p=1−q_p`, and return mass `∏_{p∈P}(1−p^(−σ))^(−1)` for `σ>1`.
+The formal/RH zeta owners and the September 11 spectral atlas supply analytic continuation,
+η/ξ zero enclosures and winding receivers at their declared rectangles. A finite zeta
+place measure, a completed-zeta analytic function, and a serialized information rate are
+different faces and must not be substituted for one another.
+
+[definition] Transcendental use therefore follows one route: constraint identity → retained
+mode/generator state and branch or period → typed receiver face with remainder. A decimal,
+float, radix window, phase sign, circulation `Γ`, or finite ζ product is a receiver reading;
+it does not become the generating relation merely because it is printed or serialized.
+
 [proved-derived; formal-checked] The [fractal-mode/attention construction](../research/records/2026-09-12_FRACTAL_MODES_LIFT_ATTENTION_INTO_MASS_PRESERVING_GENERATOR_COMPRESSION.md)
 joins entropic contact weights, mass/current-preserving aggregation, and the future quotient.
 `GeneratorModeQuotient` identifies receiver Gram degeneracy with linear dependence and proves

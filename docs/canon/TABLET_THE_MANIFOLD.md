@@ -72,7 +72,7 @@ defined.
 | an implicit coercion | a **transition map** |
 | a coercion diamond must commute | the **cocycle condition** |
 | a coercion whose result depends on the path taken | **holonomy** |
-| a lossy cast (`i32 → f64 → i32`) | a transition map that is **not invertible** |
+| a lossy cast (`i64 → f64 → i64`, for source integers beyond the exact binary precision) | a transition map that is **not invertible** |
 
 **The cocycle is enforced here as a typed refusal.** A comparison between two charts is refused when
 the relation graph admits more than one route and the caller supplied no `route_overrides`
@@ -81,12 +81,17 @@ the relation graph admits more than one route and the caller supplied no `route_
 > *"A chart with no declared relation to another chart is not wrong; it is **incomparable**, and the
 > type says so."*
 
-A machine that silently picks one of two routes has assumed the cocycle without checking it. This one
-refuses instead, which is the strongest available form of the discipline.
+A machine that silently picks one of two coordinate routes has not thereby established their
+agreement. The cited implementation refuses an undeclared route choice; this policy alone is
+not a proof of the cocycle. An actual transition equality, or a path-qualified physical
+connection with its holonomy, supplies the corresponding mathematical relation.
 
-**The last row is where the float law and the atlas law turn out to be one law.** A float is a chart
-on `ℝ` whose transition back is not injective, so by `H.0420` the receiver square does not commute
-and the loss is a **collapsed pair with a separating word**, not a magnitude. The declared mouth is
+**The last row joins the float-face and chart distinction.** Encoding a richer real/integer
+source into a finite float code can be noninjective. Decoding that codeword into its exact dyadic
+rational is injective on finite canonical code values, apart from separately represented signed
+zero. The discarded source fibre belongs to the encoding, not to an invented uncertainty in
+the decoded dyadic. A pair such as 2^53 and 2^53+1 separates the two roles; all i32 values are
+exactly representable in f64, so the earlier i32 example did not demonstrate loss. The declared mouth is
 `crates/holonic-engine/src/reopening.rs:492` `ExactFace::from_binary_float`; `collapsed` truncates;
 the reopening **adjoins the channel** the truncation deleted.
 
@@ -827,3 +832,9 @@ otherwise.
    owed.
 3. **No cost claim borrowed from an organ that refuses a presentation.** The reading and the
    exhibition are different objects; say which one a figure measures.
+
+[project-postulate] The September 14 [constraint-mode and active-face correction](../CONSTRAINT_MODES_AND_RECEIVER_FACES.md)
+keeps dilation, Lorentz transport, unit conversion and lossy projection as typed operations.
+The generating mode is retained through its normalized identities; a numeric face is not
+silently promoted into that mode. Physical receiver holonomy carries path/connection data;
+ordinary chart-transition coherence does not manufacture curvature by itself.

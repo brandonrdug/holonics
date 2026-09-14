@@ -3,6 +3,7 @@ from pathlib import Path
 from itertools import permutations,combinations,product
 from collections import Counter
 import json
+from fractions import Fraction as Q
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -18,9 +19,44 @@ ROOT=Path(__file__).resolve().parents[3]
 HERE=Path(__file__).parent
 OUT=ROOT/'research/papers/source/papers/elementary-holon-generation/figures'
 d=json.loads((HERE/'receipt.json').read_text())
+# The live trajectory view is a projection of retained exact interval states.
+# No interval midpoint is fed into the generating operation or receiver decision.
+exact_path=HERE/'exact/trajectory.json'
+if exact_path.exists():
+    exact=json.loads(exact_path.read_text());cut=min(len(v['steps']) for v in exact['results'])-1
+    display_paths=[]
+    for result in exact['results']:
+        records=result['steps'][:cut+1]
+        def center(entry):return (Q(entry['lower'])+Q(entry['upper']))/2
+        q=[[center(v) for v in st['q']] for st in records];p=[[center(v) for v in st['p']] for st in records]
+        qq=[q[0]];pp=[p[0]]
+        for k in range(cut):
+            for j in range(1,12):
+                a=Q(j,11);qq.append([(1-a)*x+a*y for x,y in zip(q[k],q[k+1])]);pp.append(p[k])
+            for j in range(1,12):
+                a=Q(j,11);qq.append(q[k+1]);pp.append([(1-a)*x+a*y for x,y in zip(p[k],p[k+1])])
+        display_paths.append({'q':[[float(v) for v in row] for row in qq],'p':[[float(v) for v in row] for row in pp]})
+    d['paths']=display_paths;d['display_cut']=cut
 plt.rcParams.update({'font.family':'DejaVu Serif','font.size':10,'svg.fonttype':'path','axes.spines.top':False,'axes.spines.right':False,'savefig.facecolor':'white'})
 
+def ratio_ticks(ax,axis,values):
+    values=[Q(v) for v in values]
+    labels=[str(v.numerator) if v.denominator==1 else r'$\frac{'+str(v.numerator)+'}{'+str(v.denominator)+'}$' for v in values]
+    getattr(ax,'set_'+axis+'ticks')([float(v) for v in values],labels)
+
 def save(fig,name):
+    # Tick positions are exact declared chart landmarks. Float conversion paints only.
+    if name=='intrinsic-response':
+        for ax in fig.axes:ratio_ticks(ax,'x',['0','1/4','1/2','3/4','1'])
+        ratio_ticks(fig.axes[0],'y',['1/4','1/2','3/4']);ratio_ticks(fig.axes[1],'y',['0','1/4','1/2'])
+    elif name=='intrinsic-heads':ratio_ticks(fig.axes[-1],'y',['0','1/4','1/2','3/4','1'])
+    elif name=='intrinsic-friction':
+        ratio_ticks(fig.axes[0],'x',['-1','-1/2','0','1/2','1']);ratio_ticks(fig.axes[0],'y',['-1','-1/2','0','1/2','1'])
+        ratio_ticks(fig.axes[1],'x',['0','1/4','1/2','3/4','1']);ratio_ticks(fig.axes[1],'y',['0','1/2','1','3/2','2'])
+    elif name=='intrinsic-route-separation':
+        ratio_ticks(fig.axes[0],'x',['7/8','15/16','1']);ratio_ticks(fig.axes[0],'y',['1/8','3/16','1/4'])
+        ratio_ticks(fig.axes[0],'z',[0,24,48,72,96]);ratio_ticks(fig.axes[1],'x',[0,2,4,6,8,9])
+        ratio_ticks(fig.axes[1],'y',['1/256','1/64','1/16','1/4'])
     fig.savefig(OUT/f'{name}.svg',bbox_inches='tight',pad_inches=.08);plt.close(fig)
 
 def surface(i,radius=f.CORE_RADIUS,rows=18,cols=64):
@@ -45,7 +81,7 @@ def setup(ax,local=False):
         ax.set(xlim=(-8.5,8.5),ylim=(-3,6),zlim=(-3,3));ax.set_box_aspect((17,9,6),zoom=1.05)
     ax.set_axis_off()
 
-def draw_body(ax,indices=range(f.N),alpha=.10,substeps=14,paths=True):
+def draw_body(ax,indices=range(f.N),alpha=.10,substeps=9,paths=True):
     cmap=plt.get_cmap('twilight_shifted')
     for i in indices:
         pts,faces=surface(i)
@@ -123,7 +159,7 @@ def geometry():
     vertices,tets,owners,stats=volume_complex()
     edge=next(w for w in f.WITNESSES if w['edge']==[2,5]);site=np.array(edge['point'])
     fig=plt.figure(figsize=(11.6,4.1));ax=fig.add_subplot(121,projection='3d',computed_zorder=False)
-    draw_body(ax,indices=[1,2,3,5],alpha=.13,substeps=14);setup(ax)
+    draw_body(ax,indices=[1,2,3,5],alpha=.13,substeps=9);setup(ax)
     ax.set(xlim=(-5.5,5.5),ylim=(-3,6),zlim=(-3,3));ax.set_box_aspect((11,9,6),zoom=1.25);ax.set_title('Overlapping field domains around a real join',fontsize=12)
     # Thick field boundaries restricted to a cutaway; complete definitions retained.
     for i in [2,5]:
@@ -175,12 +211,15 @@ def basins():
     fig,axes=plt.subplots(1,3,figsize=(12,3.45),layout='constrained')
     for i,(ax,name,bounds) in enumerate(zip(axes,names,d['bounds'])):
         image=np.ma.masked_greater(fields[name],f.CAP)
-        im=ax.imshow(image,origin='lower',extent=bounds,cmap=cmap,vmin=0,vmax=f.CAP,interpolation='nearest',aspect='equal')
+        im=ax.imshow(image,origin='lower',extent=list(map(float,[-Q(1,2),Q(383,2),-Q(1,2),Q(383,2)])),cmap=cmap,vmin=0,vmax=f.CAP,interpolation='nearest',aspect='equal')
         if i<2:
-            b=d['bounds'][i+1];ax.add_patch(Rectangle((b[0],b[2]),b[1]-b[0],b[3]-b[2],fill=False,edgecolor='white',lw=1))
-        ax.set(xlabel='initial longitude q₀',ylabel='initial meridian p₀',title=['Full initial-condition section','Freshly evolved 6.25× zoom','Freshly evolved 31.25× zoom'][i])
+            centers=[(Q(1,2),Q(1,2)),(Q(15,16),Q(73,384)),(Q(15,16),Q(73,384))];widths=[Q(1),Q(4,25),Q(4,125)]
+            lo=[centers[i][k]-widths[i]/2 for k in range(2)];nextlo=[centers[i+1][k]-widths[i+1]/2 for k in range(2)]
+            corner=[(nextlo[k]-lo[k])*192/widths[i]-Q(1,2) for k in range(2)];side=widths[i+1]*192/widths[i]
+            ax.add_patch(Rectangle(tuple(map(float,corner)),float(side),float(side),fill=False,edgecolor='white',lw=1))
+        ax.set(xlabel=f'cell address i · chart C{i}',ylabel=f'cell address j · chart C{i}',title=['C₀ · base chart','C₁ · dilation 25/4','C₂ · dilation 125/4'][i],xticks=[0,48,96,144,191],yticks=[0,48,96,144,191])
         ax.tick_params(labelsize=8)
-    cb=fig.colorbar(im,ax=axes,shrink=.75,pad=.02);cb.set_label('first receiver arrival · iteration')
+    cb=fig.colorbar(im,ax=axes,shrink=.75,pad=.02);cb.set_ticks([0,24,48,72,96]);cb.set_label('exploratory arrival face · integer iteration')
     save(fig,'intrinsic-arrival-basins')
     fig=plt.figure(figsize=(11.5,3.8));ax=fig.add_subplot(121,projection='3d',computed_zorder=False)
     times=fields['zoom'];xx=np.linspace(d['bounds'][1][0],d['bounds'][1][1],192);yy=np.linspace(d['bounds'][1][2],d['bounds'][1][3],192)
@@ -192,7 +231,7 @@ def basins():
     # Phase distance retains all twelve axes, not only their 3D display positions.
     dist=np.sqrt(np.sum(((np.c_[qa,pa]-np.c_[qb,pb]+.5)%1-.5)**2,axis=1))
     ax2.semilogy(np.arange(len(dist))/22,dist,color='black')
-    ax2.set(xlabel='split-flow iteration',ylabel='distance in the 12-phase chart',title=f"Neighboring starts · arrival {d['arrival_pair'][0]} versus {d['arrival_pair'][1]}")
+    ax2.set(xlabel='integer phase step n',ylabel='display face of retained phase-interval separation',title='Exact source tubes · common cut n=9')
     fig.subplots_adjust(left=.02,right=.98,bottom=.18,top=.9,wspace=.3)
     save(fig,'intrinsic-route-separation')
 

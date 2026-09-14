@@ -101,4 +101,34 @@ theorem rational_boost_parameters :
     ((5 / 3 : ℝ) ^ 2) * (1 - (4 / 5 : ℝ) ^ 2) = 1 := by
   norm_num
 
+/-! ## Multiplicative scale as a Lorentz face -/
+
+/-- A positive multiplicative scale supplies the normalized Lorentz hyperbola without evaluating
+the logarithm/rapidity: `k` is the exponential scale face, while `γ` and `ξ` are its symmetric and
+antisymmetric combinations. -/
+theorem multiplicativeScale_lorentz_identity (k : ℝ) (hk : 0 < k) :
+    ((k + k⁻¹) / 2) ^ 2 - ((k - k⁻¹) / 2) ^ 2 = 1 := by
+  field_simp [ne_of_gt hk]
+  ring
+
+/-- The same positive scale gives the normalized boost parameters directly. -/
+theorem multiplicativeScale_unitBoost_relation (k : ℝ) (hk : 0 < k) :
+    let gamma := (k + k⁻¹) / 2
+    let beta := (k - k⁻¹) / (k + k⁻¹)
+    gamma ^ 2 * (1 - beta ^ 2) = 1 := by
+  dsimp
+  have hsum : k + k⁻¹ ≠ 0 := by positivity
+  field_simp [ne_of_gt hk, hsum]
+  ring
+
+/-- `unitBoost` consumes the scale-derived parameters and preserves the existing Lorentz norm. -/
+theorem multiplicativeScale_unitBoost_preserves_lorentzNorm
+    (k : ℝ) (hk : 0 < k) (P : FourMomentum) :
+    lorentzPairing 1
+        (unitBoost ((k - k⁻¹) / (k + k⁻¹)) ((k + k⁻¹) / 2) P)
+        (unitBoost ((k - k⁻¹) / (k + k⁻¹)) ((k + k⁻¹) / 2) P) =
+      lorentzPairing 1 P P := by
+  apply unitBoost_preserves_lorentzNorm
+  exact multiplicativeScale_unitBoost_relation k hk
+
 end Soma.Holonics.Physics.CompositeMassEnergy

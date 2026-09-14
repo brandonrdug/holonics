@@ -64,6 +64,13 @@ physical and computational subjects to their formal and executable owners. Lean 
 verification apparatus. The [native](NATIVE_HNA.md), [Athena](ATHENA.md) and
 [interoperability](INTEROPERABILITY.md) guides retain the different runtime and artifact scopes.
 
+[definition] Exact transcendental use preserves the [constraint mode](CONSTRAINT_MODES_AND_RECEIVER_FACES.md)
+and its receiver remainder. `CertifiedSeries` retains the exp/cos/sin expression species and
+oriented tail; `AlgebraicRoot` retains polynomial/branch isolation; rational kernel transport
+uses its implicit normalized-log relation. A display evaluator does not establish a native
+state or branch. The exact phase reference composes these existing owners into actual interval
+currents and receiver decisions; no live Lean invocation or floating midpoint enters the map.
+
 ## Mathematical operators and model assembly
 
 [definition] The [computational Holon contract](HOLON.md) identifies the object represented

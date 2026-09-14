@@ -14,6 +14,13 @@ representations of such operators. It does not add a further faculty between com
 intelligence. Safetensors, an ONNX graph and a world save serialize different portions of an
 executable system. The model specification must say which laws interpret that data.
 
+[project-postulate] The [constraint-mode and active-face contract](CONSTRAINT_MODES_AND_RECEIVER_FACES.md)
+governs the notation below. `exp`, phase/π, log, Gamma and named constants refer to their
+normalized generating constraints, branches and periods; a floating value is only a receiver
+face. Exact rational scales, units and integer grades/counts remain typed. The observing Holon
+participates through its current/material/frame coupling; the GR, stress, gyro and conservation
+relations are part of this construction, not excluded by its software realization.
+
 ## 1. The model, its dynamics and its output
 
 [definition] Use the [encapsulated Holon operations](HOLON.md#high-level-holonic-interactions)
@@ -225,9 +232,12 @@ construction. A lattice is one resolved realization, not the only way to compute
 The existing `FractalPacking` owner proves that specialization's restriction laws. The
 recurrence, preimage, tube, connection and scale owners supply the broader construction.
 
-[definition] Functional calculus supplies generators: `exp(tA)` evolves a linear field;
-`exp(i theta)` carries torus phase with period 2π; logarithms read relative scale; Gamma
-recurrences carry analytic blocks. Domains, branches and remainders belong to the operation.
+[definition] Functional calculus supplies constrained generator modes: `exp(tA)` denotes the normalized
+flow `U'=AU`, `U(0)=I`, not an unconstrained numeric primitive;
+`exp(i theta)` is its phase restriction with the primitive period/winding kernel retained;
+logarithms invert the declared positive flow. Euler-Gamma shifts use their recurrence, seed
+constraint and block action; Kelvin circulation Γ has a different source. The named exact
+function and the native operation consuming its source are stated separately. Domains, branches and remainders belong to the operation.
 A periodic bounded field generally has no limit at one added point at infinity; retain its
 phase chart instead. These laws are not merely floating-point constants or ornamental
 references to fractals.
@@ -369,9 +379,11 @@ edge requires the separate incidence law; the derivative on a fixed support does
 [connected reference computation](../research/experiments/connected_holonic_field/README.md)
 uses fifteen complex toroidal channels, two normalized heads, two composed layers, a sigmoid
 gate, a phase-sensitive dissipative contact, an observed material step and a whole-field
-resolvent. Its exact rational `K=exp(s)` specialization lives in
+resolvent. Its exact rational positive-kernel/log-potential specialization lives in
 [`exponentiated_ratio::NormalizedKernel`](../crates/holonic-engine/src/exponentiated_ratio/transport.rs).
-It accepts supplied positive rational K, hence `s=log K`; it does not silently approximate a
+It accepts supplied positive rational K. Its implicit real log chart is defined by the
+normalized flow relation `E(s)=K`; no separately evaluated or stored logarithm is needed.
+This supplied material is not an inferred exponential generator. It does not approximate a
 general exponential of arbitrary query/key products. Its generated field drives the new
 synopsis figures through the existing geometric decoder. This is executable reference
 composition on the CPU; the native model assembly still belongs to the active field/body.

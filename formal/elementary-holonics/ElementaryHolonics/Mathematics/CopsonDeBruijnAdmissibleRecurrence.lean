@@ -62,6 +62,20 @@ theorem principalSqrt_nonnegative {x : ℝ} (recurrence : AdmissibleRealRecurren
     0 ≤ Real.sqrt ((recurrence.iterate n).1 ^ 2 - 1) :=
   Real.sqrt_nonneg _
 
+/-- Each admitted stage and its principal companion form a unit Lorentz-normalized pair.
+
+The relation is an exact algebraic face of the recurrence; it does not identify the coefficient
+or the recurrence with a physical spacetime quantity. -/
+theorem admissibleStage_lorentzPair {x : ℝ}
+    (recurrence : AdmissibleRealRecurrence x) (n : ℕ) :
+    (recurrence.iterate n).1 ^ 2 -
+          (Real.sqrt ((recurrence.iterate n).1 ^ 2 - 1)) ^ 2 = 1 ∧
+      0 ≤ Real.sqrt ((recurrence.iterate n).1 ^ 2 - 1) := by
+  constructor
+  · rw [Real.sq_sqrt (recurrence.radicand_nonnegative n)]
+    ring
+  · exact recurrence.principalSqrt_nonnegative n
+
 /-- Every dependent admitted recurrence agrees with the deterministic raw recurrence. -/
 theorem iterate_eq_realRecurrenceValue {x : ℝ}
     (recurrence : AdmissibleRealRecurrence x) (n : ℕ) :
@@ -500,6 +514,7 @@ end Soma.Holonics.Mathematics.CopsonDeBruijnFiniteTail
 section Audit
 open Soma.Holonics.Mathematics.CopsonDeBruijnFiniteTail
 #print axioms AdmissibleRealRecurrence.radicand_nonnegative
+#print axioms AdmissibleRealRecurrence.admissibleStage_lorentzPair
 #print axioms AdmissibleRealRecurrence.iterate_eq_realRecurrenceValue
 #print axioms nonempty_admissibleRealRecurrence_iff_all_finite
 #print axioms not_finiteRecurrenceAdmissible_iff_exists_obstruction_le

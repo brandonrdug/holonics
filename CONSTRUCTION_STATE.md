@@ -1,45 +1,44 @@
 # Construction state
 
-**Currency:** September 14, 2026. **Control:** the construction goal was paused at
-00:15:41 America/Los_Angeles. The current request develops generation as whole-field
-refinement and boundary radiation, audits the computational Holon and its elementary
-operators, and produces a reusable illustrated synopsis of the formal/software design.
-The [intrinsic-fractal correction](research/records/2026-09-14_FRACTAL_GEOMETRY_BELONGS_TO_THE_INTERACTING_FIELD.md)
-now supplies the current synopsis and source route: interlinked toroidal domains, advected
-shared volume cells, one nonlinear phase field with normalized heads/sigmoid reaction, and
-recomputed first-arrival sections. The first-hit characterization and chart covariance passed
-Lean; the numerical phase/advection and geometric checks returned, and the ten final pages
-were rendered and inspected. Hexis, the model formula, Holon/formal/Rust guides, architecture
-map, development method, blueprint and operating contract carry the same correction.
-Fractal structure does not require tiled copies or a growing number of native state axes.
-The earlier [connected-mechanics return](research/records/2026-09-14_ATTENTION_LEARNING_AND_GENERATION_SHARE_A_COMPUTATIONAL_HOLON.md)
-retains its valid normalization/gradient and affine-reference results as bounded controls.
-Its fixed contraction and presentation do not define HNN's nonlinear geometry. This is a
-mathematical/documentation return; the supplied phase reference does not replace the paused
-native model assembly below.
-The [generation/Holon return](research/records/2026-09-14_GENERATION_REFINES_FIELDS_AND_THE_HOLON_HAS_COMPUTATIONAL_FACES.md)
-supplies earlier dependencies: Holon generation/tensor bindings and Core passed Lean; the Rust audit corrected
-a false reversibility convention; the computational specification uses Holonic/Dirac tensor
-operations and interaction vertices. The earlier reused-geometry synopsis is superseded
-by the connected calculation above, with the Information Chemistry style retained. The [four-paper analysis](research/records/2026-09-14_TRANSFORMER_FIELDS_TROPICAL_CELLS_AND_FRACTAL_GENERATORS.md)
-is integrated into the operator/formula specification. This does not resume the
-paused construction goal. The earlier [formula and library reconciliation](research/records/2026-09-14_THE_HNN_FORMULA_JOINS_THE_LIBRARY_TO_THE_MODEL.md)
-remain completed dependencies; native implementation remains at the verified/draft boundary below.
-The [paused-run review](research/records/2026-09-14_DIRECT_MESSAGES_AND_THE_PAUSED_HNN_RUN.md)
-recovers the original requests, completed returns and unfinished draft. **Latest verified
-implementation unit:** empirical observations form
-predictive material at retained producing cuts through the coupled HNN. The
-[empirical return](research/records/2026-09-13_EMPIRICAL_RETURNS_KEEP_SOURCE_FIBRES_AND_FORM_THE_NEXT_PREDICTION.md)
-records its source, equations, measured output and checks. The broader
-[assembly contract](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#boundary-and-interior-assembly-contract)
-continues through encoded transport and changing material/incidence.
-**Product objective:** construct HNN's contextual generating network, with Athena as the first
-product. Automata label HNN-based solvers and traversal constructions. The
-[roadmap](docs/plans/THE_ROADMAP.md) alone orders work; the
-[network contract](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-hnn-network-and-its-mathematical-contract)
-specifies the assembly and formal obligations.
+**Currency:** September 14, 2026. The construction goal remains paused. Brandon's latest
+request asks for a genuine synthesis of Swing, the computational Holon, stress/momentum,
+interior/exterior and microscopic/macroscopic dynamics into complex Euler/Navier–Stokes,
+with the corresponding Hodge, RH and BSD relations recovered and developed.
 
-## Active construction brief
+## Current research brief
+
+[project-postulate] Derive the connected fluid construction from the existing primitives and
+constitutive laws. Recover the actual Galerkin/Elsasser, receiver-closure, Hodge and boundary-memory
+owners; bind Swing to the native scattering equation and the nonlinear fluid operation.
+The deliverable is the derivation with reusable formal joins and exact source links, including
+what a retained interior contributes to stress and diffusion. It does not resume or replace
+the paused Athena assembly. Root is constructing that derivation; bounded Luna tasks prove the
+scattering/Swing and finite-Galerkin Swing identities and review internal-mode energy coupling.
+
+[established-bounded; source-inspected] The completed
+[constraint-mode and active-face return](research/records/2026-09-14_CONSTRAINT_MODES_AND_ACTIVE_EINSTEIN_FACES_REJOIN_THE_LIBRARY.md)
+repairs exact chart/mode notation and native circular-series bounds, and joins toroidal collision
+surfaces to Lorentz/gyro/Einstein receiver balance. Thirteen source tests and the two changed
+formal owners passed. The actual rational-enclosure phase run certifies arrival 9 for one state;
+the other remains outside through 32 and returns an undecided family at 33. The thirteen-page
+synopsis is rendered and inspected. Pixel/exploratory faces select no native result.
+
+[historical] Completed dependencies retain their evidence without being replayed as work:
+[intrinsic fractal geometry](research/records/2026-09-14_FRACTAL_GEOMETRY_BELONGS_TO_THE_INTERACTING_FIELD.md),
+[attention/learning/generation](research/records/2026-09-14_ATTENTION_LEARNING_AND_GENERATION_SHARE_A_COMPUTATIONAL_HOLON.md),
+[computational Holon](research/records/2026-09-14_GENERATION_REFINES_FIELDS_AND_THE_HOLON_HAS_COMPUTATIONAL_FACES.md),
+[four-paper analysis](research/records/2026-09-14_TRANSFORMER_FIELDS_TROPICAL_CELLS_AND_FRACTAL_GENERATORS.md),
+[model formula](research/records/2026-09-14_THE_HNN_FORMULA_JOINS_THE_LIBRARY_TO_THE_MODEL.md),
+and [paused-run review](research/records/2026-09-14_DIRECT_MESSAGES_AND_THE_PAUSED_HNN_RUN.md).
+Their nonlinear manifold/current/preimage construction supersedes the disconnected tiling and
+fixed-contraction illustrations. Native assembly retains its verified/draft boundary below.
+
+**Product objective:** construct HNN's contextual generating network, with Athena as the first
+product. The [roadmap](docs/plans/THE_ROADMAP.md) alone orders that construction; the
+[network contract](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-hnn-network-and-its-mathematical-contract)
+specifies its assembly and mathematical obligations.
+
+## Paused Athena construction brief
 
 [project-postulate] This brief applies the existing
 [assembly contract](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#boundary-and-interior-assembly-contract)

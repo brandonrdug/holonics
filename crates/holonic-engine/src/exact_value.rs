@@ -528,17 +528,17 @@ impl AlgebraicRoot {
     }
 }
 
-/// Past this reach a decaying exponential is below `2^-REACH`, which no grain this workspace
-/// carries can separate from zero. Read off the carrier: `bfloat16` holds eight significand
-/// octaves and `binary64` fifty-two, so sixty-four leaves every declared receiver behind.
+/// This bounded helper returns [0, 2^-REACH] beyond the stated negative reach.
+/// The interval retains a positive possible value; this is not equality with zero or a
+/// universal bound on the precision of other receiver charts.
 const DECAY_REACH: u32 = 64;
-/// Past this reach a growing exponential leaves any carrier a declared receiver reads, and the
-/// owner **refuses** rather than forming it.
+/// Resource/domain aperture of this enclosure helper. A refusal is local to this
+/// implementation, not a claim that a larger exponential has no exact representation.
 const GROWTH_REACH: u32 = 64;
 /// Past this reach `tanh` is within `2^(-2 REACH)` of its limit.
 const TANGENT_REACH: u32 = 32;
 /// The dyadic places a composed exponential is held at, so its denominators cannot grow with the
-/// exponent. Sixty-four leaves every declared receiver in this workspace behind.
+/// exponent. This is the helper's declared dyadic grain, not the source mode's precision.
 const EXPONENTIAL_OCTAVES: u32 = 64;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -592,8 +592,8 @@ impl CertifiedSeries {
         let negative = x.is_negative();
         let magnitude = if negative { -x.clone() } else { x.clone() };
         // **THE APERTURE, and it is a bound rather than a shortcut.** For `x <= -REACH` the value
-        // is below `2^-REACH` because `e > 2`, so `[0, 2^-REACH]` contains it exactly — and no
-        // declared receiver at any grain this workspace carries can separate a finer statement.
+        // is below `2^-REACH` because `e > 2`, so `[0, 2^-REACH]` is a valid enclosure.
+        // A finer receiver can distinguish values inside it; this helper retains that family.
         // Forming `e^REACH` to divide it back out is the same answer at hundreds of times the cost.
         if negative && magnitude >= Rat::from_integer(BigInt::from(DECAY_REACH)) {
             return ExactInterval::new(
@@ -625,11 +625,13 @@ impl CertifiedSeries {
         }
     }
 
-    /// **`exp(x)` as a certified series for `|x| <= 1`**, with the geometric tail this owner
+    /// **The normalized exponential mode as a certified series**, for the argument/term
+    /// domain `|x|/(terms+1) < 1`, with the geometric tail this owner
     /// already validates.
     ///
     /// After `n` terms every omitted term is at most the first times `(|x|/(n+1))^j`, which is
-    /// exactly [`SeriesTailCertificate::AbsoluteGeometric`]. The owner refuses the certificate
+    /// exactly [`SeriesTailCertificate::AbsoluteGeometric`]. Its source is E'=E, E(0)=1;
+    /// `exp` names that constrained mode. The owner refuses the certificate
     /// where the ratio bound does not close the tail, so a caller cannot silently take too few
     /// terms for its argument. [`Self::exponential_enclosure`] is the reduction that keeps every
     /// caller inside this domain.
@@ -655,7 +657,8 @@ impl CertifiedSeries {
             return Err(ExactValueError::TailDoesNotClose);
         }
         Self::new(
-            ExactExpr::Rational(x.clone()),
+            // Retain the normalized exponential relation, not merely its rational argument face.
+            ExactExpr::function("exp", vec![ExactExpr::rational(x.clone())]),
             sum,
             BigUint::from(terms as u64),
             SeriesTailCertificate::AbsoluteGeometric {
@@ -698,11 +701,16 @@ impl CertifiedSeries {
             cosine_term = &cosine_term * &square / (a * b);
         }
         let cosine = Self::new(
-            ExactExpr::Rational(x.clone()),
+            // The phase series is a face of the cosine generator in its declared rotation chart.
+            ExactExpr::function("cos", vec![ExactExpr::rational(x.clone())]),
             cosine_sum,
             BigUint::from(terms as u64),
             SeriesTailCertificate::AlternatingMonotone {
-                first_omitted_term: cosine_term,
+                first_omitted_term: if terms.is_multiple_of(2) {
+                    cosine_term
+                } else {
+                    -cosine_term
+                },
             },
         )?;
 
@@ -719,11 +727,16 @@ impl CertifiedSeries {
             sine_term = &sine_term * &square / (a * b);
         }
         let sine = Self::new(
-            ExactExpr::Rational(x.clone()),
+            // Preserve sine as the oriented quadrature generator, including a negative input phase.
+            ExactExpr::function("sin", vec![ExactExpr::rational(x.clone())]),
             sine_sum,
             BigUint::from(terms as u64),
             SeriesTailCertificate::AlternatingMonotone {
-                first_omitted_term: sine_term,
+                first_omitted_term: if terms.is_multiple_of(2) {
+                    sine_term
+                } else {
+                    -sine_term
+                },
             },
         )?;
         Ok((cosine, sine))
@@ -1983,6 +1996,48 @@ mod tests {
         let below = Rat::new(BigInt::from(46211715), BigInt::from(100000000));
         let above = Rat::new(BigInt::from(46211716), BigInt::from(100000000));
         assert!(value.lower >= below && value.upper <= above, "{value:?}");
+    }
+
+    #[test]
+    fn circular_series_retains_species_and_orients_alternating_tails() {
+        let half = Rat::new(BigInt::from(1), BigInt::from(2));
+        let (cosine_one, sine_one) = CertifiedSeries::circular_series(&half, 1).unwrap();
+        assert_eq!(
+            cosine_one.enclosure(),
+            ExactInterval::new(rat(7, 8), rat(1, 1)).unwrap()
+        );
+        assert_eq!(
+            sine_one.enclosure(),
+            ExactInterval::new(rat(23, 48), rat(1, 2)).unwrap()
+        );
+        assert!(matches!(
+            cosine_one.expression,
+            ExactExpr::Function { ref name, .. } if name == "cos"
+        ));
+        assert!(matches!(
+            sine_one.expression,
+            ExactExpr::Function { ref name, .. } if name == "sin"
+        ));
+
+        let exponential = CertifiedSeries::exponential_series(&half, 8).unwrap();
+        assert_eq!(
+            exponential.expression,
+            ExactExpr::function("exp", vec![ExactExpr::rational(half.clone())])
+        );
+        let (cosine_two, sine_two) = CertifiedSeries::circular_series(&half, 2).unwrap();
+        assert!(cosine_two.enclosure().lower >= cosine_one.enclosure().lower);
+        assert!(cosine_two.enclosure().upper <= cosine_one.enclosure().upper);
+        assert!(sine_two.enclosure().lower >= sine_one.enclosure().lower);
+        assert!(sine_two.enclosure().upper <= sine_one.enclosure().upper);
+
+        let negative = Rat::new(BigInt::from(-1), BigInt::from(2));
+        let (cosine_negative, sine_negative) =
+            CertifiedSeries::circular_series(&negative, 1).unwrap();
+        assert_eq!(cosine_negative.enclosure(), cosine_one.enclosure());
+        assert_eq!(
+            sine_negative.enclosure(),
+            ExactInterval::new(rat(-1, 2), rat(-23, 48)).unwrap()
+        );
     }
 
     use relational_geometry::{integer, rat};
