@@ -85,7 +85,8 @@ together and preserves their contractions. Moving or rotating the physical recei
 holding the source fixed generally changes its face. A rotated plotting camera is a third
 operation, downstream of both. The September 12 directional-optics construction already
 separates common state/analyzer transport from moving the analyzer relative to the state.
-The new diagram now makes the distinction visible instead of using the display camera as R.
+The moving-aperture control illustrates this distinction at a fixed source. It does not
+represent the changing source field and was incorrectly presented as completing that synthesis.
 
 ## Induction includes the moving receiving surface
 
@@ -243,3 +244,13 @@ the HNN's toroidal network is still an architectural schematic. It does not clai
 ray solution, calibrated photodetector response or completed native field/body assembly.
 The full receiver material response, moving EM surface coupling and corresponding native
 encoding consumers remain the actual integration work named by their equations above.
+
+## Continuing-field correction
+
+[project-postulate] The fixed-ray example above is a local optical control. Brandon rejected
+its use as the HNN field illustration because the field itself must continue relative to R.
+The [replacement construction](../research/experiments/hnn_field_architecture/CONTINUING_FIELD.md)
+evolves the complex currents, thermal modes and their common nonuniform material transport,
+then reconstructs the full receiver volume. The geometric carriers and field are generated
+from that same state. This corrects the omitted source-evolution contribution without claiming
+that one supplied constitutive example completes the general HNN/physics synthesis.

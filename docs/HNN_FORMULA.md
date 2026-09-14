@@ -23,20 +23,26 @@ relations are part of this construction, not excluded by its software realizatio
 
 ## Reading the field architecture diagram
 
-![HNN field architecture: a toroidal source and a moving receiving Holon with traced ray currents](../research/experiments/hnn_field_architecture/architecture.svg)
+![One received cut of the continuing coupled field](../research/experiments/hnn_field_architecture/continuing-field.png)
 
-[definition] The [receiver-holarchy construction](RECEIVER_HOLARCHY.md) places the observing
-Holon in the diagram. It has its own world-tube, frame, aperture and internal current; the
-viewing camera is a separate display projection. The moving-receiver version preserves the
-source network while exact null-ray/receiver calculations determine contacts and local faces.
-Its conditional entropy panel reads the received-current partition, not intrinsic entropy
-production. Receiver motion, phase/fractal evolution and lawful compression share the actual
-parameterized receiving family.
+[definition] The current [continuing-field construction](../research/experiments/hnn_field_architecture/CONTINUING_FIELD.md)
+evolves `(ψ,H,Φ)` before reception: complex-current contact and heat return, thermal exchange,
+and current-dependent nonuniform spatial transport. The same Φ carries the toroidal supports,
+phase plates and field reconstruction. The receiver image integrates that changing volume.
+The previous fixed-field/three-ray aperture illustration answered only a local optical question;
+it did not depict the continuing field requested here. Its data and source remain recoverable.
 
-[definition] The diagram is the HNN counterpart of an embedding/attention/reaction/decoding
-schematic. It shows one continuing field with local and modal sections, shared contact faces,
-internal circulation, constituted material and outward reconstruction. It is a spatial
-projection of the object, with chart addresses rather than layer numbers. The drawn tori are
+[definition] The [receiver-holarchy construction](RECEIVER_HOLARCHY.md) specifies the observing
+Holon and its world-tube, frame, aperture and internal current. The current volume image is
+a face received through its supplied fixed frame. The prior moving-aperture control preserves a fixed source and calculates local ray faces.
+That specialization is insufficient for the whole-field picture. In the current volume view,
+source evolution supplies the missing `ρ_R ẋ` contribution while R is held fixed. Receiver
+motion can then compose with it through the existing chart-rate law; it cannot substitute for it.
+
+[definition] The architecture comparison below concerns the operations of this continuing
+field. The earlier [annotated overview](../research/experiments/hnn_field_architecture/architecture.svg)
+locates their interfaces; the current motion view reconstructs changing field states. Local
+sections, shared contact, internal circulation and material belong to the same object. The drawn tori are
 an explicit geometric realization of circulation and overlap; they do not assert that every
 Holon has genus one or that tensor rank equals the visible spatial dimension.
 

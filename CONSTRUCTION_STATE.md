@@ -1,75 +1,32 @@
 # Construction state
 
-**Currency:** September 14, 2026. Brandon's latest correction makes the receiver an active
-Holon with perspective, motion, flux/induction and retained internal state. The requested
-unification joins that object to fractal/parametric evolution, entropy, compression and storage,
-using recent direct messages and actual source constructions. The timed goal remains paused.
+**Currency:** September 14, 2026. Brandon rejected the frozen source/three-ray receiver
+illustration: the continuing Holonic field itself must evolve relative to the receiver as a
+coupled cloud/vortex with circulation, diffusion and recursively unfolding geometry. The
+previous moving-aperture example is a local optical control and does not discharge that request.
+The timed goal remains paused.
 
-## Current receiver construction return
+## Continuing-field correction returned
 
-[established-bounded; source-inspected] The [receiver-holarchy synthesis](docs/RECEIVER_HOLARCHY.md)
-now joins the participating perspective object, moving frame/stress/induction, complete
-fractal preimages, received entropy and future-receiver compression. The architecture diagram
-contains a moving receiving Holon with exact null-ray intersections, proper-time faces and
-conditional entropy, while the viewing camera stays fixed. New geometric projection-rate
-interfaces are consumed by the existing optical example; the clock-extended first-arrival
-join reuses the original formal owner. The [record](research/records/2026-09-14_THE_RECEIVER_IS_A_PARTICIPATING_HOLON_WITH_MOVING_FACES.md)
-retains recovered direct-message coordinates, exact optical results, 12 passing projection
-tests, the completed formal build and browser/motion checks. The requested synthesis and
-scoped library/visual return are complete. Full native receiver-material/field-body coupling
-and moving-EM surface realization remain their explicit implementation joins; the timed goal
-and earlier assembly draft remain paused/preserved.
+[established-bounded; source-inspected] The [continuing-field construction](research/experiments/hnn_field_architecture/CONTINUING_FIELD.md)
+now evolves exact complex mode currents and thermal modes through witnessed contact, and uses
+the returned currents to generate noncommuting, volume-preserving material transport. The
+receiver image is recomputed from the changing coherent volume; transported toroidal carriers
+share the same source map. The returned 25 frames replace the frozen-emitter illustration.
+Source energy/heat and transport checks passed; desktop/narrow playback and scrubbing were
+inspected. This returns a concrete correction to the source-evolution omission. It does not
+mark the broader HNN or physical synthesis complete. The fixed-ray receiver example remains
+a valid local control, with its earlier visual-completion claim withdrawn.
 
-## Current architecture and library return
+## Reusable prior returns
 
-[established-bounded; source-inspected] The
-[field architecture diagram](docs/HNN_FORMULA.md#reading-the-field-architecture-diagram)
-now shows situated encoding, overlapping toroidal sections, contact attention, internal
-circulation/material and joint-field decoding in one object. Its inspectable source and
-reusable SVG are in `research/experiments/hnn_field_architecture`. The public facade,
-frame/tensor operators, normalization, diffusion/Hodge and native field/coupled interfaces
-were audited. Exact bilinear input differentials, covector pullbacks and port precomposition
-now compose through the retained factor core and rederive receiver families under rank change.
-Scalar and graded diffusion expose source work, constitutive dissipation and implicit-step
-defect separately; the native circulation consumer uses the complete balance. The bilinear,
-diffusion/Hodge and native adapter tests passed; browser checks covered all operation selections
-and desktop/narrow layouts. The [record](research/records/2026-09-14_HNN_FIELD_ARCHITECTURE_REFINES_THE_COMPUTATIONAL_INTERFACES.md)
-retains exact results and scope. This requested diagram/interface increment is complete.
-The richer field/body assembly and native continuum Q-field consumer retain their existing
-unclosed implementation equations; neither is claimed complete by this library return.
+[established-bounded; source-inspected] Completed components retain their stated scopes:
 
-## Current research return
-
-[established-bounded; source-inspected] The
-[fluid construction](docs/HOLONIC_FLUID_CONSTRUCTION.md) now derives Swing/scattering,
-material-action Euler, Newtonian and relativistic stress projections, Hodge pressure,
-microscopic feedback, boundary memory and an energy-balanced internal-field stress/diffusion
-class. It retains the complex-Euler/MHD sign distinction, fractal spectral-scale relation,
-RH critical heat chart and BSD local transfer. The
-[return and checks](research/records/2026-09-14_SWING_STRESS_AND_INTERIOR_FEEDBACK_FORM_THE_FLUID_CONSTRUCTION.md)
-record three changed formal owners, their successful targeted build and the new checked
-scattering/Swing, Galerkin feedback and local-transfer metric joins. The model formula,
-Holon guide and source maps consume the same derivation. Continuum derivations with supplied
-material laws are distinct from an implemented native fluid consumer. The requested synthesis
-is returned at that stated scope; the goal and native Athena assembly below remain paused.
-
-[established-bounded; source-inspected] The completed
-[constraint-mode and active-face return](research/records/2026-09-14_CONSTRAINT_MODES_AND_ACTIVE_EINSTEIN_FACES_REJOIN_THE_LIBRARY.md)
-repairs exact chart/mode notation and native circular-series bounds, and joins toroidal collision
-surfaces to Lorentz/gyro/Einstein receiver balance. Thirteen source tests and the two changed
-formal owners passed. The actual rational-enclosure phase run certifies arrival 9 for one state;
-the other remains outside through 32 and returns an undecided family at 33. The thirteen-page
-synopsis is rendered and inspected. Pixel/exploratory faces select no native result.
-
-[historical] Completed dependencies retain their evidence without being replayed as work:
-[intrinsic fractal geometry](research/records/2026-09-14_FRACTAL_GEOMETRY_BELONGS_TO_THE_INTERACTING_FIELD.md),
-[attention/learning/generation](research/records/2026-09-14_ATTENTION_LEARNING_AND_GENERATION_SHARE_A_COMPUTATIONAL_HOLON.md),
-[computational Holon](research/records/2026-09-14_GENERATION_REFINES_FIELDS_AND_THE_HOLON_HAS_COMPUTATIONAL_FACES.md),
-[four-paper analysis](research/records/2026-09-14_TRANSFORMER_FIELDS_TROPICAL_CELLS_AND_FRACTAL_GENERATORS.md),
-[model formula](research/records/2026-09-14_THE_HNN_FORMULA_JOINS_THE_LIBRARY_TO_THE_MODEL.md),
-and [paused-run review](research/records/2026-09-14_DIRECT_MESSAGES_AND_THE_PAUSED_HNN_RUN.md).
-Their nonlinear manifold/current/preimage construction supersedes the disconnected tiling and
-fixed-contraction illustrations. Native assembly retains its verified/draft boundary below.
+- [Receiver motion and moving arrival sets](research/records/2026-09-14_THE_RECEIVER_IS_A_PARTICIPATING_HOLON_WITH_MOVING_FACES.md): exact projection rates, local optical world-tube and clock-extended first-arrival. The fixed-source visual was insufficient and is superseded above.
+- [Tensor and diffusion interfaces](research/records/2026-09-14_HNN_FIELD_ARCHITECTURE_REFINES_THE_COMPUTATIONAL_INTERFACES.md): factorized differentials, covector pullbacks, port precomposition and complete scalar/graded diffusion energy accounting.
+- [Swing/fluid synthesis](research/records/2026-09-14_SWING_STRESS_AND_INTERIOR_FEEDBACK_FORM_THE_FLUID_CONSTRUCTION.md): checked scattering/Swing, Galerkin feedback and local-transfer metric joins, plus written continuum constitutive derivations.
+- [Exact modes and active faces](research/records/2026-09-14_CONSTRAINT_MODES_AND_ACTIVE_EINSTEIN_FACES_REJOIN_THE_LIBRARY.md): repaired series bounds, exact optical/stress faces and the thirteen-page synopsis.
+- [Computational Holon](research/records/2026-09-14_GENERATION_REFINES_FIELDS_AND_THE_HOLON_HAS_COMPUTATIONAL_FACES.md), [paper analysis](research/records/2026-09-14_TRANSFORMER_FIELDS_TROPICAL_CELLS_AND_FRACTAL_GENERATORS.md), [model formula](research/records/2026-09-14_THE_HNN_FORMULA_JOINS_THE_LIBRARY_TO_THE_MODEL.md), and [paused-run review](research/records/2026-09-14_DIRECT_MESSAGES_AND_THE_PAUSED_HNN_RUN.md) retain their evidence and the native draft boundary.
 
 **Product objective:** construct HNN's contextual generating network, with Athena as the first
 product. The [roadmap](docs/plans/THE_ROADMAP.md) alone orders that construction; the
