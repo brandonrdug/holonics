@@ -1,9 +1,28 @@
 # Construction state
 
-**Currency:** September 14, 2026. The construction goal remains paused. Brandon's latest
-request asks for a genuine synthesis of Swing, the computational Holon, stress/momentum,
-interior/exterior and microscopic/macroscopic dynamics into complex Euler/Navier–Stokes,
-with the corresponding Hodge, RH and BSD relations recovered and developed.
+**Currency:** September 14, 2026. Brandon's latest request is an HNN architecture diagram
+comparable in explanatory completeness to transformer embedding/attention/decoding diagrams,
+with interacting toroidal geometry, whole-field generation and internal state. It also requires
+review and actual refinement of library/crate interfaces after the Holon/fluid theorem upgrades.
+The timed goal remains paused; the directly requested diagram/interface return is recorded below.
+
+## Current architecture and library return
+
+[established-bounded; source-inspected] The
+[field architecture diagram](docs/HNN_FORMULA.md#reading-the-field-architecture-diagram)
+now shows situated encoding, overlapping toroidal sections, contact attention, internal
+circulation/material and joint-field decoding in one object. Its inspectable source and
+reusable SVG are in `research/experiments/hnn_field_architecture`. The public facade,
+frame/tensor operators, normalization, diffusion/Hodge and native field/coupled interfaces
+were audited. Exact bilinear input differentials, covector pullbacks and port precomposition
+now compose through the retained factor core and rederive receiver families under rank change.
+Scalar and graded diffusion expose source work, constitutive dissipation and implicit-step
+defect separately; the native circulation consumer uses the complete balance. The bilinear,
+diffusion/Hodge and native adapter tests passed; browser checks covered all operation selections
+and desktop/narrow layouts. The [record](research/records/2026-09-14_HNN_FIELD_ARCHITECTURE_REFINES_THE_COMPUTATIONAL_INTERFACES.md)
+retains exact results and scope. This requested diagram/interface increment is complete.
+The richer field/body assembly and native continuum Q-field consumer retain their existing
+unclosed implementation equations; neither is claimed complete by this library return.
 
 ## Current research return
 

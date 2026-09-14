@@ -185,10 +185,69 @@ pub struct DiffusionReceipt {
     pub conservation_residual: Rat,
     pub stored_energy_before: Rat,
     pub stored_energy_after: Rat,
-    /// Exact change in stored quadratic energy. It is nonnegative for the
-    /// closed source-free law declared here.
+    /// Exact decrease in stored quadratic energy, not constitutive heat alone.
+    /// `energy_balance` separates source work, conduction and the implicit-step defect.
+    /// This difference is nonnegative for the closed source-free law declared here.
     pub energy_departed: Rat,
     pub transfer: DiffusionBoundaryTransferReceipt,
+}
+
+/// Complete energy pairing of this implicit event; no physical thermal receiver is selected.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DiffusionEnergyBalance {
+    /// Endpoint potential paired with the signed integrated source.
+    pub source_work: Rat,
+    /// Integrated constitutive branch power: sum(transferred * endpoint potential difference).
+    pub conductive_dissipation: Rat,
+    /// One half of the capacity norm squared of the potential increment.
+    /// This is the backward-Euler time-discretization defect, not extra material friction.
+    pub implicit_step_defect: Rat,
+    /// E_after - E_before - source_work + conduction + step_defect.
+    pub exact_residual: Rat,
+}
+
+impl DiffusionReceipt {
+    /// Recover the complete finite-step balance from the existing oriented receipt.
+    ///
+    /// Pairing C(phi_after-phi_before)=source-tau L phi_after with phi_after yields
+    /// E_after-E_before = source_work-conductive_dissipation-implicit_step_defect.
+    /// Capacities are fixed during this event. A changing-capacity law additionally owes
+    /// its material-work term. Existing serialized receipts retain this entire calculation.
+    pub fn energy_balance(&self) -> Result<DiffusionEnergyBalance, DiffusionError> {
+        let after = |node: &CurrentNodeId| {
+            self.potential_after
+                .get(node)
+                .ok_or(DiffusionError::MissingNode(*node))
+        };
+        let mut source_work = Rat::zero();
+        let mut implicit_step_defect = Rat::zero();
+        let two = Rat::from_integer(2.into());
+        for balance in &self.balances {
+            let phi_after = after(&balance.node)?;
+            let phi_before = self
+                .potential_before
+                .get(&balance.node)
+                .ok_or(DiffusionError::MissingNode(balance.node))?;
+            source_work += phi_after * &balance.source;
+            implicit_step_defect += (phi_after - phi_before)
+                * (&balance.content_after - &balance.content_before)
+                / &two;
+        }
+        let mut conductive_dissipation = Rat::zero();
+        for current in &self.currents {
+            conductive_dissipation +=
+                &current.transferred * (after(&current.source)? - after(&current.target)?);
+        }
+        let exact_residual = &self.stored_energy_after - &self.stored_energy_before - &source_work
+            + &conductive_dissipation
+            + &implicit_step_defect;
+        Ok(DiffusionEnergyBalance {
+            source_work,
+            conductive_dissipation,
+            implicit_step_defect,
+            exact_residual,
+        })
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -418,30 +477,34 @@ impl ExactDiffusionLaw {
             return Err(DiffusionError::EnergyIncreased);
         }
 
+        let receipt = DiffusionReceipt {
+            schema: "holonic-engine.diffusion-receipt.v1".to_owned(),
+            interval: event.interval.clone(),
+            potential_before,
+            potential_after,
+            currents,
+            balances,
+            total_before,
+            total_source,
+            total_after,
+            conservation_residual,
+            stored_energy_before,
+            stored_energy_after,
+            energy_departed,
+            transfer: DiffusionBoundaryTransferReceipt {
+                reused_factorization,
+                certificate: transfer.certificate,
+            },
+        };
+        if !receipt.energy_balance()?.exact_residual.is_zero() {
+            return Err(DiffusionError::EnergyBalanceFailure);
+        }
         Ok((
             DiffusionStanding {
                 schema: standing.schema.clone(),
                 content: content_after,
             },
-            DiffusionReceipt {
-                schema: "holonic-engine.diffusion-receipt.v1".to_owned(),
-                interval: event.interval.clone(),
-                potential_before,
-                potential_after,
-                currents,
-                balances,
-                total_before,
-                total_source,
-                total_after,
-                conservation_residual,
-                stored_energy_before,
-                stored_energy_after,
-                energy_departed,
-                transfer: DiffusionBoundaryTransferReceipt {
-                    reused_factorization,
-                    certificate: transfer.certificate,
-                },
-            },
+            receipt,
         ))
     }
 }
@@ -801,6 +864,8 @@ pub enum DiffusionError {
     BalanceFailure(CurrentNodeId),
     #[error("the closed diffusion complex failed exact total conservation")]
     ConservationFailure,
+    #[error("the implicit diffusion event failed its complete energy balance")]
+    EnergyBalanceFailure,
     #[error("a closed source-free diffusion event increased stored energy")]
     EnergyIncreased,
 }
@@ -852,16 +917,39 @@ mod tests {
         assert_eq!(after.content[&right], integer(1) / integer(3));
         assert_eq!(receipt.currents[0].current, integer(1) / integer(3));
         assert_eq!(receipt.currents[0].transferred, integer(1) / integer(3));
-        assert!(
-            receipt
-                .balances
-                .iter()
-                .all(|balance| balance.exact_residual.is_zero())
-        );
+        assert!(receipt
+            .balances
+            .iter()
+            .all(|balance| balance.exact_residual.is_zero()));
         assert!(receipt.conservation_residual.is_zero());
         assert_eq!(receipt.stored_energy_before, integer(1) / integer(2));
         assert_eq!(receipt.stored_energy_after, integer(5) / integer(18));
         assert_eq!(receipt.energy_departed, integer(2) / integer(9));
+        let energy = receipt.energy_balance().unwrap();
+        assert_eq!(energy.source_work, integer(0));
+        assert_eq!(energy.conductive_dissipation, integer(1) / integer(9));
+        assert_eq!(energy.implicit_step_defect, integer(1) / integer(9));
+        assert!(energy.exact_residual.is_zero());
+
+        // A supplied integrated source can increase storage while conduction remains positive.
+        let (_, supplied) = law
+            .enact(
+                &standing,
+                &DiffusionEvent {
+                    interval: integer(1),
+                    source: BTreeMap::from([(left, integer(1))]),
+                },
+            )
+            .unwrap();
+        let energy = supplied.energy_balance().unwrap();
+        assert_eq!(supplied.energy_departed, -integer(11) / integer(18));
+        assert_eq!(energy.source_work, integer(4) / integer(3));
+        assert_eq!(energy.conductive_dissipation, integer(4) / integer(9));
+        assert_eq!(energy.implicit_step_defect, integer(5) / integer(18));
+        assert!(energy.exact_residual.is_zero());
+        let reopened: DiffusionReceipt =
+            serde_json::from_str(&serde_json::to_string(&supplied).unwrap()).unwrap();
+        assert_eq!(reopened.energy_balance().unwrap(), energy);
     }
 
     #[test]
@@ -902,6 +990,10 @@ mod tests {
             .unwrap();
 
         assert_eq!(receipt.currents[0].current, -integer(1) / integer(3));
+        let energy = receipt.energy_balance().unwrap();
+        assert_eq!(energy.conductive_dissipation, integer(1) / integer(9));
+        assert_eq!(energy.implicit_step_defect, integer(1) / integer(9));
+        assert!(energy.exact_residual.is_zero());
         assert_eq!(receipt.balances[0].content_after, integer(2) / integer(3));
     }
 
@@ -958,24 +1050,20 @@ mod tests {
         assert_eq!(law.transfer_cache_entries(), 1);
         assert_eq!(first.transfer.certificate.boundary, vec![left, right]);
         assert_eq!(first.transfer.certificate.interior, vec![middle]);
-        assert!(
-            first
-                .transfer
-                .certificate
-                .interior_inverse_residual
-                .iter()
-                .flatten()
-                .all(Zero::is_zero)
-        );
-        assert!(
-            first
-                .transfer
-                .certificate
-                .boundary_inverse_residual
-                .iter()
-                .flatten()
-                .all(Zero::is_zero)
-        );
+        assert!(first
+            .transfer
+            .certificate
+            .interior_inverse_residual
+            .iter()
+            .flatten()
+            .all(Zero::is_zero));
+        assert!(first
+            .transfer
+            .certificate
+            .boundary_inverse_residual
+            .iter()
+            .flatten()
+            .all(Zero::is_zero));
 
         let right_hand = first
             .transfer

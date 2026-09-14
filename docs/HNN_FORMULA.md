@@ -21,6 +21,67 @@ face. Exact rational scales, units and integer grades/counts remain typed. The o
 participates through its current/material/frame coupling; the GR, stress, gyro and conservation
 relations are part of this construction, not excluded by its software realization.
 
+## Reading the field architecture diagram
+
+![HNN field architecture: situated encoding, overlapping toroidal sections, internal circulation and joint-field decoding](../research/experiments/hnn_field_architecture/architecture.svg)
+
+[definition] The diagram is the HNN counterpart of an embedding/attention/reaction/decoding
+schematic. It shows one continuing field with local and modal sections, shared contact faces,
+internal circulation, constituted material and outward reconstruction. It is a spatial
+projection of the object, with chart addresses rather than layer numbers. The drawn tori are
+an explicit geometric realization of circulation and overlap; they do not assert that every
+Holon has genus one or that tensor rank equals the visible spatial dimension.
+
+| Familiar diagram component | HNN operation in this same field |
+|---|---|
+| Embedding / encoder | Map an occurrence into situated current/field sections with declared axes, basis and source conditions. Text, images and acoustics have different exterior maps into these ports. |
+| Query/key comparison | A source-conditioned comparison on admitted contacts. Its comparands, pairing, phase and geometry specify the potential; co-presence alone does not establish contact. |
+| Values / attention | `T_F[Ψ]=Σ_G a_FG[Ψ] U_(F←G)[Ψ] Ψ_G`. Normalized participation and transported current are both differentiated. |
+| Heads and layers | Families of local/modal operators and their composition on the same object. Overlap, recurrent paths, changing material and nested scales replace a mandatory global stack. |
+| SSM state | Constitutive interior and retained generator modes. A fixed linear interior yields its evolution operator and boundary memory kernel; a changing interior retains its actual dynamics. |
+| Diffusion / refinement | Evolve a joint field against its conditions and constitutive operators. The integration coordinate is distinct from an output-token index. Classical stochastic corruption is one exterior comparison chart, not a mandatory native noise source. |
+| Decoder / output | Reconstruct a jointly supported field and read its receiving boundary: text section, image, acoustic interval or another internal Holon. Streaming exposes available portions under their dependencies. |
+
+[definition] A local current section has the type `Ψ_F∈Γ(U_F,E_F)`, where the fibre E_F
+can be complex, vector-valued or tensor-valued; a transition acts on that fibre over the
+actual overlap. The plotted surface, the section's tensor axes and the generator's phase
+coordinates are distinct dimensions. Fractal return/preimage geometry belongs to the evolving
+object and its scale family, not to tiles copied beside it. The
+[four-paper synthesis](../research/records/2026-09-14_TRANSFORMER_FIELDS_TROPICAL_CELLS_AND_FRACTAL_GENERATORS.md)
+connects the field/reaction view of transformers, finite-temperature attention geometry,
+operator splitting and recursive basin structure to these same operations.
+
+[definition] These correspondences overlap within a single Holonic Interaction. They are not
+three separate transformer/diffusion/SSM engines added together. The complete model remains
+`M=(K,Θ,x)` below. In a fixed local carrier, an admitted constitutive chart can express
+`ẋ=F_(K,Θ)(x,h)` and `Θ̇=G_(K,Θ)(x,h,returned_difference)`; combinatorial changes of K
+use their actual incidence/transport maps, rather than pretending a cell label has an ordinary
+time derivative. Whole-field generation follows the dependencies of the requested release;
+it does not require every offscreen degree of freedom to be expanded or globally settled.
+
+[proved-derived] A fixed-linear interior `ż=Az+Bx` gives the received memory term
+`C E((t−s)A) B` after elimination. That is a precise SSM/convolution face of the continuing
+interior. The [fluid construction](HOLONIC_FLUID_CONSTRUCTION.md) retains its changing-chart
+residual, nonlinear microscopic feedback and additional stress. Replacing it by a stateless
+layer diagram would remove an actual term, not merely change the illustration.
+
+[definition] The normalized contact return is
+`δT_F=Σ_G a_FG δ(U_FG Ψ_G)+Σ_G δa_FG U_FG Ψ_G`.
+A nonlinear reaction, including a sigmoid chart where admitted, acts locally on the same
+current/material. Bilinear contractions are elementary vertices in this composition;
+propagators carry the actual chart/phase maps. A drawn crossing has no interaction vertex
+unless the source supplies contact. The shared source/receiving geometry remains when the
+same interaction is drawn as a tensor contraction instead of a torus.
+
+[established-bounded; source-inspected] The accompanying
+[diagram source and interface audit](../research/experiments/hnn_field_architecture/README.md)
+binds these labels to `NormalizedKernel`, exact bilinear/core/receiver operators,
+`ExactSheafDiffusionLaw`, `NativeConstitutiveField`, and `NativeCoupledBody`.
+The richer field and coupled application still require their recorded assembly join;
+the diagram does not claim that the narrowed historical session already implements every
+operation shown. Delayed observation is an ordinary dependency: a comparison cannot consume
+an observation before it arrives, and every output does not require a new learning event.
+
 ## 1. The model, its dynamics and its output
 
 [definition] Use the [encapsulated Holon operations](HOLON.md#high-level-holonic-interactions)

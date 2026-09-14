@@ -281,6 +281,16 @@ impl NativeCirculationSession {
                 "exact diffusion returned a nonzero balance residual".to_owned(),
             ));
         }
+        let energy = receipt
+            .energy_balance()
+            .map_err(|error| NativeSessionError::Conduct(error.to_string()))?;
+        if !energy.exact_residual.is_zero() {
+            return Err(NativeSessionError::Conduct(
+                "diffusion failed its source/conduction/time-step energy balance".to_owned(),
+            ));
+        }
+        // The emitted receipt carries all three terms. A thermal continuation must select
+        // the constitutive dissipation through its material law, not `energy_departed`.
         let after = NativeDiffusionStanding {
             content: law.native_content(&standing_after),
         };
@@ -440,6 +450,13 @@ mod tests {
             panic!("diffusive event species");
         };
         assert!(first.receipt.conservation_residual.is_zero());
+        let energy = first.receipt.energy_balance().expect("energy pairing");
+        assert!(energy.exact_residual.is_zero());
+        assert_eq!(energy.source_work, Rat::zero());
+        assert_eq!(
+            first.receipt.energy_departed,
+            &energy.conductive_dissipation + &energy.implicit_step_defect
+        );
         assert!(first
             .receipt
             .balances

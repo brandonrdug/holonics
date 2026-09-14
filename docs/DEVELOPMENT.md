@@ -69,7 +69,9 @@ which restriction, projection or section the picture reads and which couplings i
 A named example must retain the mechanism being explained: global affine contraction cannot
 stand in for saddle-mediated recursion, and separated IFS copies cannot stand in for an
 intersecting field's intrinsic return geometry. These are construction choices to correct,
-not reasons to add another acceptance gate. Recover recurrence/preimage, manifold/higher-cell,
+not reasons to add another acceptance gate. A mathematical correction also reaches its
+actual library/consumer interfaces in the same return: update the affected operations and
+verify their equation, rather than leaving an upgraded theorem beside an unaware implementation. Recover recurrence/preimage, manifold/higher-cell,
 connection and constitutive owners together; the filename `FractalPacking` does not bound the
 framework's meaning of fractals. The [intrinsic field formula](HNN_FORMULA.md#one-object-its-charts-and-its-recursive-geometry)
 provides the current source route.

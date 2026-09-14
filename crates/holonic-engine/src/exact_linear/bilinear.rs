@@ -17,7 +17,6 @@
 //! an occurrence ledger or expand the full tensor for each use. The resident
 //! realization belongs to the existing native operator owners.
 use super::{ExactLinearError, ExactRatMatrix, LinearMapFamily, ReceiverFactorization};
-#[cfg(test)]
 use num_traits::Zero;
 use relational_geometry::Rat;
 use std::sync::Arc;
@@ -66,6 +65,60 @@ impl BilinearOperator {
                 .iter()
                 .flat_map(|a| right.iter().map(move |b| a * b))
                 .collect::<Vec<_>>(),
+        )
+    }
+
+    /// The exact differential of the bilinear action.  The two input variations remain separate
+    /// ports; the mixed product is the second-order remainder of a finite change.
+    pub fn differential(
+        &self,
+        left: &[Rat],
+        right: &[Rat],
+        left_delta: &[Rat],
+        right_delta: &[Rat],
+    ) -> Result<Vec<Rat>, ExactLinearError> {
+        if left.len() != self.left_extent
+            || right.len() != self.right_extent
+            || left_delta.len() != self.left_extent
+            || right_delta.len() != self.right_extent
+        {
+            return Err(ExactLinearError::ShapeMismatch);
+        }
+        let mut result = vec![Rat::zero(); self.coefficients.rows()];
+        for output in 0..self.coefficients.rows() {
+            for i in 0..self.left_extent {
+                for j in 0..self.right_extent {
+                    let coefficient = self.coefficients.get(output, i * self.right_extent + j)?;
+                    result[output] += coefficient
+                        * (left_delta[i].clone() * &right[j] + &left[i] * &right_delta[j]);
+                }
+            }
+        }
+        Ok(result)
+    }
+
+    /// Pull back an output covector through this bilinear action to the two input ports.
+    /// The returned covectors are kept in their declared input coordinates; no metric or Riesz
+    /// identification is silently applied.
+    pub fn pullback(
+        &self,
+        left: &[Rat],
+        right: &[Rat],
+        output_covector: &[Rat],
+    ) -> Result<(Vec<Rat>, Vec<Rat>), ExactLinearError> {
+        if left.len() != self.left_extent
+            || right.len() != self.right_extent
+            || output_covector.len() != self.coefficients.rows()
+        {
+            return Err(ExactLinearError::ShapeMismatch);
+        }
+        let product_covector = self.coefficients.transpose()?.apply(output_covector)?;
+        product_pullback(
+            left,
+            right,
+            &product_covector,
+            self.left_extent,
+            self.right_extent,
         )
     }
     /// Fix the right port. The resulting map returns the whole compatible left-source fibre
@@ -192,6 +245,53 @@ impl BilinearProductCore {
         let b = self.right_forms.apply(right)?;
         Ok(a.iter().zip(b).map(|(x, y)| x * y).collect())
     }
+    /// First differential of the factorized product map. Callers comparing a finite change can
+    /// obtain the separate mixed remainder by applying the same core to both input deltas.
+    pub fn differential(
+        &self,
+        left: &[Rat],
+        right: &[Rat],
+        left_delta: &[Rat],
+        right_delta: &[Rat],
+    ) -> Result<Vec<Rat>, ExactLinearError> {
+        let a = self.left_forms.apply(left)?;
+        let b = self.right_forms.apply(right)?;
+        let da = self.left_forms.apply(left_delta)?;
+        let db = self.right_forms.apply(right_delta)?;
+        Ok(a.iter()
+            .zip(b)
+            .zip(da.iter().zip(db))
+            .map(|((a, b), (da, db))| da * b + a * db)
+            .collect())
+    }
+    /// Pull back a covector on the factorized product to the original left and right ports.
+    pub fn pullback(
+        &self,
+        left: &[Rat],
+        right: &[Rat],
+        product_covector: &[Rat],
+    ) -> Result<(Vec<Rat>, Vec<Rat>), ExactLinearError> {
+        let a = self.left_forms.apply(left)?;
+        let b = self.right_forms.apply(right)?;
+        if product_covector.len() != a.len() {
+            return Err(ExactLinearError::ShapeMismatch);
+        }
+        let left_factor = a
+            .iter()
+            .zip(&b)
+            .zip(product_covector)
+            .map(|((_, b), weight)| weight * b)
+            .collect::<Vec<_>>();
+        let right_factor = a
+            .iter()
+            .zip(product_covector)
+            .map(|(a, weight)| weight * a)
+            .collect::<Vec<_>>();
+        Ok((
+            self.left_forms.transpose()?.apply(&left_factor)?,
+            self.right_forms.transpose()?.apply(&right_factor)?,
+        ))
+    }
     pub fn factor_receiver(
         &self,
         target: &BilinearOperator,
@@ -220,6 +320,34 @@ impl BilinearProductCore {
     pub fn swap_ports(&self) -> Result<Self, ExactLinearError> {
         Self::new(self.right_forms.clone(), self.left_forms.clone())
     }
+}
+
+fn product_pullback(
+    left: &[Rat],
+    right: &[Rat],
+    product_covector: &[Rat],
+    left_extent: usize,
+    right_extent: usize,
+) -> Result<(Vec<Rat>, Vec<Rat>), ExactLinearError> {
+    if left.len() != left_extent
+        || right.len() != right_extent
+        || product_covector.len()
+            != left_extent
+                .checked_mul(right_extent)
+                .ok_or(ExactLinearError::ExtentOverflow)?
+    {
+        return Err(ExactLinearError::ShapeMismatch);
+    }
+    let mut left_covector = vec![Rat::zero(); left_extent];
+    let mut right_covector = vec![Rat::zero(); right_extent];
+    for i in 0..left_extent {
+        for j in 0..right_extent {
+            let weight = &product_covector[i * right_extent + j];
+            left_covector[i] += weight * &right[j];
+            right_covector[j] += weight * &left[i];
+        }
+    }
+    Ok((left_covector, right_covector))
 }
 
 #[derive(Clone, Debug)]
@@ -257,6 +385,63 @@ impl BilinearRealization {
         self.receiver
             .particular
             .apply(&self.core.apply(left, right)?)
+    }
+    /// Differential of the realized bilinear output. The receiver is applied after the shared
+    /// factorized product differential, so no full interaction tensor is materialized.
+    pub fn differential(
+        &self,
+        left: &[Rat],
+        right: &[Rat],
+        left_delta: &[Rat],
+        right_delta: &[Rat],
+    ) -> Result<Vec<Rat>, ExactLinearError> {
+        self.receiver.particular.apply(&self.core.differential(
+            left,
+            right,
+            left_delta,
+            right_delta,
+        )?)
+    }
+    /// Pull back an output covector through the receiver and shared product core. The result is
+    /// a pair of input covectors, before any declared metric identification.
+    pub fn pullback(
+        &self,
+        left: &[Rat],
+        right: &[Rat],
+        output_covector: &[Rat],
+    ) -> Result<(Vec<Rat>, Vec<Rat>), ExactLinearError> {
+        let product_covector = self
+            .receiver
+            .particular
+            .transpose()?
+            .apply(output_covector)?;
+        self.core.pullback(left, right, &product_covector)
+    }
+    /// Precompose both input ports and rederive the receiver family on the resulting shared core.
+    /// The maps may be noninvertible: this is an input restriction/transport, not a rechart, and a
+    /// rank drop is allowed to expose additional receiver freedom.
+    pub fn precompose_ports(
+        &self,
+        left_new_to_old: &ExactRatMatrix,
+        right_new_to_old: &ExactRatMatrix,
+    ) -> Result<Self, ExactLinearError> {
+        if left_new_to_old.rows() != self.core.left_forms.columns()
+            || right_new_to_old.rows() != self.core.right_forms.columns()
+        {
+            return Err(ExactLinearError::ShapeMismatch);
+        }
+        let new_core = Arc::new(BilinearProductCore::new(
+            self.core.left_forms.multiply(left_new_to_old)?,
+            self.core.right_forms.multiply(right_new_to_old)?,
+        )?);
+        let target = BilinearOperator::new(
+            left_new_to_old.columns(),
+            right_new_to_old.columns(),
+            self.receiver.particular.multiply(&new_core.tensor_image)?,
+        )?;
+        new_core
+            .bind(&target)?
+            .map_err(|_| ExactLinearError::RankFactorizationCertificateFailure)
     }
     /// Compose a new returned-face map while preserving the complete product core. Re-derive
     /// the entire receiver family, including any newly invisible directions.
@@ -344,6 +529,124 @@ mod tests {
         let middle = polynomial.then_receiver(&m(&[&[0, 1, 0]])).unwrap();
         assert_eq!(middle.apply(&a, &b).unwrap(), vec![q(22)]);
         assert!(Arc::ptr_eq(&core, middle.core()));
+    }
+
+    #[test]
+    fn factorized_differential_matches_finite_change_with_mixed_correction() {
+        let core = BilinearProductCore::new(
+            m(&[&[2, 1], &[1, 1], &[1, 2]]),
+            m(&[&[1, 2], &[0, 1], &[2, 1]]),
+        )
+        .unwrap();
+        let x = vec![q(2), q(3)];
+        let y = vec![q(4), q(5)];
+        let dx = vec![q(1), q(-1)];
+        let dy = vec![q(2), q(1)];
+        let before = core.apply(&x, &y).unwrap();
+        let after = core
+            .apply(
+                &x.iter().zip(&dx).map(|(a, b)| a + b).collect::<Vec<_>>(),
+                &y.iter().zip(&dy).map(|(a, b)| a + b).collect::<Vec<_>>(),
+            )
+            .unwrap();
+        let differential = core.differential(&x, &y, &dx, &dy).unwrap();
+        let mixed = core.apply(&dx, &dy).unwrap();
+        for ((after, before), (differential, mixed)) in after
+            .iter()
+            .zip(&before)
+            .zip(differential.iter().zip(&mixed))
+        {
+            assert_eq!(after - before, differential + mixed);
+        }
+    }
+
+    #[test]
+    fn realized_pullback_satisfies_exact_adjoint_duality() {
+        let realization = core().bind(&complex()).unwrap().unwrap();
+        let x = vec![q(2), q(3)];
+        let y = vec![q(4), q(5)];
+        let dx = vec![q(1), q(-1)];
+        let dy = vec![q(2), q(1)];
+        let lambda = vec![q(7), q(-2)];
+        let differential = realization.differential(&x, &y, &dx, &dy).unwrap();
+        let (left_covector, right_covector) = realization.pullback(&x, &y, &lambda).unwrap();
+        let lhs: Rat = lambda.iter().zip(&differential).map(|(a, b)| a * b).sum();
+        let rhs: Rat = left_covector
+            .iter()
+            .zip(&dx)
+            .map(|(a, b)| a * b)
+            .sum::<Rat>()
+            + right_covector
+                .iter()
+                .zip(&dy)
+                .map(|(a, b)| a * b)
+                .sum::<Rat>();
+        assert_eq!(lhs, rhs);
+        assert!(realization.pullback(&x, &y, &[q(1)]).is_err());
+        assert!(realization.differential(&x, &y, &[q(1)], &dy).is_err());
+    }
+
+    #[test]
+    fn precomposed_ports_transport_values_and_covectors_in_nonorthogonal_charts() {
+        let realization = core().bind(&complex()).unwrap().unwrap();
+        let left_map = m(&[&[1], &[2]]);
+        let right_map = m(&[&[2, 1], &[1, 1]]);
+        let precomposed = realization.precompose_ports(&left_map, &right_map).unwrap();
+        let left = vec![q(3)];
+        let right = vec![q(4), q(5)];
+        let old_left = left_map.apply(&left).unwrap();
+        let old_right = right_map.apply(&right).unwrap();
+        assert_eq!(
+            precomposed.apply(&left, &right).unwrap(),
+            realization.apply(&old_left, &old_right).unwrap()
+        );
+        let lambda = vec![q(7), q(-2)];
+        let (old_left_covector, old_right_covector) = realization
+            .pullback(&old_left, &old_right, &lambda)
+            .unwrap();
+        let (left_covector, right_covector) = precomposed.pullback(&left, &right, &lambda).unwrap();
+        assert_eq!(
+            left_covector,
+            left_map
+                .transpose()
+                .unwrap()
+                .apply(&old_left_covector)
+                .unwrap()
+        );
+        assert_eq!(
+            right_covector,
+            right_map
+                .transpose()
+                .unwrap()
+                .apply(&old_right_covector)
+                .unwrap()
+        );
+    }
+
+    #[test]
+    fn precomposition_rederives_receiver_freedom_after_rank_drop() {
+        let realization = core().bind(&complex()).unwrap().unwrap();
+        let left_map = m(&[&[1], &[0]]);
+        let right_map = m(&[&[1], &[0]]);
+        let precomposed = realization.precompose_ports(&left_map, &right_map).unwrap();
+        assert!(!precomposed.receiver.free_row_directions.is_empty());
+        assert!(precomposed
+            .precompose_ports(&m(&[&[1, 0]]), &right_map)
+            .is_err());
+    }
+
+    #[test]
+    fn operator_differential_and_pullback_reject_wrong_port_extents() {
+        let operator = complex();
+        let x = vec![q(2), q(3)];
+        let y = vec![q(4), q(5)];
+        assert!(operator.differential(&x, &y, &[q(1)], &y).is_err());
+        assert!(operator.pullback(&x, &y, &[q(1)]).is_err());
+        let differential = operator.differential(&x, &y, &x, &y).unwrap();
+        assert_eq!(differential, vec![q(-14), q(44)]);
+        let (left, right) = operator.pullback(&x, &y, &[q(7), q(-2)]).unwrap();
+        assert_eq!(left, vec![q(18), q(-43)]);
+        assert_eq!(right, vec![q(8), q(-25)]);
     }
     #[test]
     fn joint_receivers_keep_order_multiplicity_and_actual_core_identity() {

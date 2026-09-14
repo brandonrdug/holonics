@@ -1,0 +1,116 @@
+<div id="hnn-field-architecture">
+  <h2>One field, many interacting faces</h2>
+  <div class="viz-controls" aria-label="Inspect a Holonic operation">
+    <button type="button" class="btn" data-focus="whole" aria-pressed="true">Whole object</button>
+    <button type="button" class="btn" data-focus="reception" aria-pressed="false">Reception</button>
+    <button type="button" class="btn" data-focus="contact" aria-pressed="false">Attention &amp; contact</button>
+    <button type="button" class="btn" data-focus="interior" aria-pressed="false">Internal circulation</button>
+    <button type="button" class="btn" data-focus="generation" aria-pressed="false">Generation</button>
+  </div>
+  <svg class="field-diagram" role="img" aria-label="A folded chain of interlinked toroidal field regions. Input enters situated sections. Contact surfaces couple currents; internal loops carry memory and material. Joint fields radiate toward text, image, acoustic and internal receivers."></svg>
+  <div class="text-small" aria-live="polite" data-detail></div>
+  <div class="text-small text-muted" data-scope>Architecture schematic · a spatial projection of field and phase structure · region count and visible dimension do not prescribe the model.</div>
+</div>
+<style>
+#hnn-field-architecture .field-diagram {display:block;width:100%;overflow:visible;}
+#hnn-field-architecture .field-diagram text {fill:var(--foreground);font-family:inherit;font-size:12px;font-weight:400;}
+#hnn-field-architecture .field-diagram .label-main {font-weight:500;}
+#hnn-field-architecture [data-detail] {min-height:2.8em;margin-block:8px;}
+#hnn-field-architecture [data-scope] {margin-block-start:6px;}
+</style>
+<script>
+(() => {
+ const root=document.getElementById('hnn-field-architecture');
+ const svg=root.querySelector('.field-diagram');
+ const data=@@GEOMETRY@@;
+ const NS='http://www.w3.org/2000/svg';
+ const colors={reception:'var(--viz-series-1)',contact:'var(--viz-series-2)',interior:'var(--viz-series-3)',generation:'var(--viz-series-4)'};
+ const details={
+  whole:'A computational Holon carries the current field, constituted material, contact geometry and joint interior. The visible paths are spatial/phase projections of its operations.',
+  reception:'Reception maps a text, image, acoustic or internal occurrence into situated field sections. Coordinate encoding supplies ports; it does not choose native adjacency.',
+  contact:'Attention normalizes participation over admitted contacts. Frame/phase transport acts on values; the return differentiates both participation and the transported current.',
+  interior:'Scattering couples incident and held currents. Internal modes, unresolved feedback and boundary memory remain in the same continuing object.',
+  generation:'The joint field is refined and reconstructed at its receivers. A text chunk, image field, acoustic interval or another internal Holon can be a generated face.'
+ };
+ let focus='whole';
+ function el(tag,attrs={},parent=svg){const n=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,v);parent.append(n);return n;}
+ function path(d,color,width=1,opacity=1,extra={}){return el('path',{d,stroke:color,'stroke-width':width,opacity,fill:'none',...extra});}
+ function text(x,y,str,anchor='start',cls=''){const n=el('text',{x,y,'text-anchor':anchor,class:cls});n.textContent=str;return n;}
+ function lines(x,y,arr,anchor='start',cls=''){arr.forEach((s,i)=>text(x,y+17*i,s,anchor,cls));}
+ function active(key){return focus==='whole'||focus===key;}
+ function opac(key,on=1){return active(key)?on:0.13;}
+ function draw(){
+  const w=Math.max(280,root.clientWidth);const small=w<540;const h=small?630:600;
+  svg.replaceChildren();svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.style.height=h+'px';
+  const defs=el('defs');
+  for(const key of Object.keys(colors)){
+   const marker=el('marker',{id:`hfa-${key}`,viewBox:'0 0 8 8',refX:7,refY:4,markerWidth:5,markerHeight:5,orient:'auto'},defs);
+   el('path',{d:'M0 0 L8 4 L0 8 Z',fill:colors[key]},marker);
+  }
+  const margin=small?20:55;
+  const bounds=small?[data.bounds[1],[-data.bounds[0][1],-data.bounds[0][0]]]:data.bounds;
+  const xmin=bounds[0][0],xmax=bounds[0][1],ymin=bounds[1][0],ymax=bounds[1][1];
+  const scale=Math.min((w-2*margin)/(xmax-xmin),(small?270:320)/(ymax-ymin));
+  const cx=w/2,cy=small?310:300;
+  const P=p=>{const q=small?[p[1],-p[0]]:p;return [cx+(q[0]-(xmin+xmax)/2)*scale,cy+(q[1]-(ymin+ymax)/2)*scale];};
+  const poly=line=>line.map((p,i)=>{const q=P(p);return `${i?'L':'M'}${q[0].toFixed(2)},${q[1].toFixed(2)}`;}).join(' ');
+  // Mesh is a common deformed geometry. Gray lines are structural; colored strands are operations.
+  const meshes=data.regions.flatMap((r,i)=>r.mesh.map(line=>({line,i,z:line.reduce((s,p)=>s+p[2],0)/line.length})));
+  meshes.sort((a,b)=>a.z-b.z);
+  for(const item of meshes)path(poly(item.line),'var(--foreground)',0.7,focus==='whole'?0.16:0.09);
+  for(const patch of data.patches){el('path',{d:poly(patch.points)+'Z',fill:colors.contact,opacity:opac('contact',0.30),stroke:colors.contact,'stroke-width':0.35});}
+  for(let i=0;i<data.regions.length;i++){
+   const region=data.regions[i];
+   region.strands.forEach((line,k)=>path(poly(line),colors.interior,k===0?1.8:0.7,opac('interior',k===0?0.82:0.35)));
+   path(poly(region.strands[0].slice(18,24)),colors.interior,1.8,opac('interior',0.9),{'marker-end':'url(#hfa-interior)'});
+  }
+  // Modal participation spans overlap; these curves are declared architecture connections, not scores.
+  const c=data.regions.map(r=>P(r.center));
+  [[0,1],[1,2],[2,3],[3,4],[2,5],[1,5],[3,5]].forEach(([a,b],i)=>{
+   const A=c[a],B=c[b],lift=(i%2?1:-1)*(small?22:35);
+   path(`M${A[0]},${A[1]} Q${(A[0]+B[0])/2},${(A[1]+B[1])/2+lift} ${B[0]},${B[1]}`,colors.contact,2,opac('contact',0.8),{'marker-end':'url(#hfa-contact)'});
+  });
+  const inY=small?76:70;
+  text(w/2,inY,'Encoding into situated sections','middle','label-main');
+  text(w/2,inY+20,small?'Text · image · acoustics · internal':'Text / image / acoustic fields / internal occurrences','middle');
+  const sourceXs=small?[w*.24,w*.5,w*.76]:[w*.25,w*.5,w*.75];
+  sourceXs.forEach((x,i)=>{
+   const target=c[[0,5,4][i]];
+   const d=`M${x},${inY+31} C${x},${inY+65} ${target[0]},${target[1]-65} ${target[0]},${target[1]}`;
+   path(d,colors.reception,small?3:5,opac('reception',0.65),{'marker-end':'url(#hfa-reception)'});
+  });
+  const outY=small?526:520;
+  const receivers=[c[1],c[2],c[3]];
+  receivers.forEach((a,i)=>{
+   const x=sourceXs[i];
+   path(`M${a[0]},${a[1]} C${a[0]},${a[1]+70} ${x},${outY-65} ${x},${outY-16}`,colors.generation,small?4:6,opac('generation',0.65),{'marker-end':'url(#hfa-generation)'});
+  });
+  text(w/2,outY+8,'Decoding the jointly refined field','middle','label-main');
+  text(w/2,outY+28,small?'Text chunk · image · acoustic interval':'Text chunk / image field / acoustic interval / internal Holon','middle');
+  // Recurrent material/adjoint path returns within the body; it does not follow every output by fiat.
+  if(!small){
+   const A=c[4],B=c[0];
+   path(`M${A[0]},${A[1]+16} C${w-18},470 18,470 ${B[0]},${B[1]+16}`,colors.interior,1.2,opac('interior',0.75),{'marker-end':'url(#hfa-interior)'});
+   text(w/2,461,'Tangent and adjoint act on the same current and material','middle');
+  }
+  if(small){
+   text(w/2,142,focus==='whole'?'Shared geometry · circulating interior':({reception:'Encoding into situated sections',contact:'Coupled contact faces',interior:'Internal modes and memory',generation:'Whole-field refinement'})[focus],'middle','label-main');
+   text(w/2,483,'Material and current change together','middle');
+  } else {
+   lines(22,125,['Ψ: local / modal sections','Transport + local reaction']);
+   lines(w-22,125,['Attention on contact faces','a[F,G] · U[F←G] · Ψ[G]'],'end');
+   path(`M135,151 Q170,170 ${c[1][0]},${c[1][1]-20}`,'var(--foreground)',0.7,0.4);
+   path(`M${w-140},151 Q${w-170},172 ${c[5][0]},${c[5][1]}`,'var(--foreground)',0.7,0.4);
+  }
+  // Integer chart addresses do not imply a layer order.
+  c.forEach((q,i)=>{el('circle',{cx:q[0],cy:q[1],r:10,fill:'var(--background)',opacity:0.9});text(q[0],q[1]+4,String(i),'middle');});
+  if(small)lines(w/2,h-29,['Chart addresses 0–5','locate regions, not layers.'],'middle');
+  else text(w/2,h-8,'Chart addresses 0–5 locate this drawn instance; they are not layer numbers.','middle');
+  root.querySelector('[data-detail]').textContent=details[focus];
+ }
+ root.querySelectorAll('[data-focus]').forEach(button=>button.addEventListener('click',()=>{
+  focus=button.dataset.focus;root.querySelectorAll('[data-focus]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));draw();
+ }));
+ new ResizeObserver(draw).observe(root);draw();
+})();
+</script>

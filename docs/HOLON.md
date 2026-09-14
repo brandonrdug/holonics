@@ -83,6 +83,15 @@ operations on Holons, with familiar vector/tensor realizations where applicable.
 | Apply an analytic generator | exp(tA), phase exp(iθ), logarithmic scale and Gamma recurrence with their actual domains and remainders | Existing exact expressions, phase/clock and analytic block generators |
 | Encode/reopen | \|ξ⟩=Ê\|H⟩; a decoder and residual reconstruct the requested field/face, with Ê_next T=U Ê | Kernel-mode factorization, receiver descent and boundary memory |
 
+[established-bounded; implemented-exact] The factorized bilinear library now exposes
+`differential`, `pullback` and `precompose_ports`. It differentiates both input Holons through
+the same retained factor core; the reverse returns input covectors before any metric/Riesz
+identification. A finite change retains its separate mixed product. Port precomposition carries
+explicit new-to-old maps and rederives the receiver family when their ranks change. These are
+operations on the existing tensor realization, not a new catch-all object wrapper.
+The [architecture diagram](HNN_FORMULA.md#reading-the-field-architecture-diagram) places them
+inside the whole field with contact normalization, constituted circulation and joint decoding.
+
 [definition] The existing mixed-feature interaction is explicit:
 
 ```text

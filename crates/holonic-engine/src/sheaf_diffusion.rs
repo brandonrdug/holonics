@@ -40,6 +40,7 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::diffusion::DiffusionEnergyBalance;
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::{
     CausalAlgebraicError, CausalCellId, EventSuccessor, ExactEventLaw, GradedCausalComplex,
@@ -741,25 +742,88 @@ impl ExactSheafDiffusionLaw {
             schema: standing.schema.clone(),
             content: content_after,
         };
-        Ok((
-            standing_after,
-            SheafDiffusionReceipt {
-                schema: "holonic-engine.sheaf-diffusion-receipt.v1".to_owned(),
-                interval: event.interval.clone(),
-                potential_before,
-                potential_after: potential_after_cochain,
-                compatibility_before,
-                compatibility_after,
-                balance_residual,
-                stored_energy_before,
-                stored_energy_after,
-                energy_departed,
-                compatibility_energy_before,
-                compatibility_energy_after,
-                reused_factorization,
-                certificate,
-            },
-        ))
+        let receipt = SheafDiffusionReceipt {
+            schema: "holonic-engine.sheaf-diffusion-receipt.v1".to_owned(),
+            interval: event.interval.clone(),
+            potential_before,
+            potential_after: potential_after_cochain,
+            compatibility_before,
+            compatibility_after,
+            balance_residual,
+            stored_energy_before,
+            stored_energy_after,
+            energy_departed,
+            compatibility_energy_before,
+            compatibility_energy_after,
+            reused_factorization,
+            certificate,
+        };
+        let energy = self.energy_balance(&receipt, event)?;
+        if !energy.exact_residual.is_zero() {
+            return Err(SheafDiffusionError::SolveResidualNonzero);
+        }
+        Ok((standing_after, receipt))
+    }
+
+    /// Recover the complete finite-step energy pairing for one exact sheaf event.
+    ///
+    /// The Hodge term uses the full cellular Laplacian, hence both the lower and upper
+    /// coboundary contributions.  The returned `energy_departed` field remains only a stored
+    /// endpoint difference; this method separates signed source work, conductive dissipation,
+    /// and the backward-Euler step defect without choosing a thermal receiver.
+    pub fn energy_balance(
+        &self,
+        receipt: &SheafDiffusionReceipt,
+        event: &SheafDiffusionEvent,
+    ) -> Result<DiffusionEnergyBalance, SheafDiffusionError> {
+        if !event.interval.is_positive() || !receipt.interval.is_positive() {
+            return Err(SheafDiffusionError::NonpositiveInterval);
+        }
+        if event.interval != receipt.interval {
+            return Err(SheafDiffusionError::SolveResidualNonzero);
+        }
+        for potential in [&receipt.potential_before, &receipt.potential_after] {
+            if potential.grade != self.grade {
+                return Err(SheafDiffusionError::LawGradeMismatch {
+                    expected: self.grade,
+                    supplied: potential.grade,
+                });
+            }
+        }
+        // Equal dimensions do not identify a sheaf's restriction maps or Hodge action.
+        // Reuse this law's cached certificate to bind the receiving calculation to its source.
+        let (expected, _) = self.certificate(&event.interval)?;
+        if receipt.certificate != expected {
+            return Err(SheafDiffusionError::TransferCertificateFailure);
+        }
+        let source = self.validate_and_flatten_source(&event.source)?;
+        let before = receipt.potential_before.flattened(&self.sheaf)?;
+        let after = receipt.potential_after.flattened(&self.sheaf)?;
+        let hodge = receipt.certificate.hodge_laplacian.apply(&after)?;
+        let mut source_work = Rat::zero();
+        let mut conductive_dissipation = Rat::zero();
+        let mut implicit_step_defect = Rat::zero();
+        let two = Rat::from_integer(2.into());
+        for (((after, before), source), (capacity, hodge)) in after
+            .iter()
+            .zip(&before)
+            .zip(&source)
+            .zip(receipt.certificate.capacities.iter().zip(&hodge))
+        {
+            source_work += after * source;
+            conductive_dissipation += event.interval.clone() * after * hodge;
+            implicit_step_defect += capacity * (after - before) * (after - before) / &two;
+        }
+        let exact_residual =
+            &receipt.stored_energy_after - &receipt.stored_energy_before - &source_work
+                + &conductive_dissipation
+                + &implicit_step_defect;
+        Ok(DiffusionEnergyBalance {
+            source_work,
+            conductive_dissipation,
+            implicit_step_defect,
+            exact_residual,
+        })
     }
 
     fn flattened_capacities(&self) -> Vec<Rat> {
@@ -1243,14 +1307,25 @@ mod tests {
         assert_eq!(after.content.values[&right], vec![integer(1) / integer(3)]);
         assert_eq!(receipt.compatibility_after.values.len(), 1);
         assert_eq!(receipt.certificate.harmonic_dimension, 1);
-        assert!(
-            receipt
-                .balance_residual
-                .values
-                .values()
-                .flatten()
-                .all(Zero::is_zero)
-        );
+        assert!(receipt
+            .balance_residual
+            .values
+            .values()
+            .flatten()
+            .all(Zero::is_zero));
+        let energy = law
+            .energy_balance(
+                &receipt,
+                &SheafDiffusionEvent {
+                    interval: integer(1),
+                    source: BTreeMap::new(),
+                },
+            )
+            .unwrap();
+        assert_eq!(energy.source_work, integer(0));
+        assert_eq!(energy.conductive_dissipation, integer(1) / integer(9));
+        assert_eq!(energy.implicit_step_defect, integer(1) / integer(9));
+        assert_eq!(energy.exact_residual, integer(0));
         assert!(!receipt.reused_factorization);
         let (_, second) = law
             .enact(
@@ -1280,6 +1355,103 @@ mod tests {
             .apply(&section.flattened(&sheaf).unwrap())
             .unwrap();
         assert!(residual.iter().all(Zero::is_zero));
+
+        let law = ExactSheafDiffusionLaw::new(
+            sheaf.clone(),
+            0,
+            BTreeMap::from([(left, vec![integer(1)]), (right, vec![integer(1)])]),
+        )
+        .unwrap();
+        let standing = law.initial_standing(section.clone()).unwrap();
+        let (after, receipt) = law
+            .enact(
+                &standing,
+                &SheafDiffusionEvent {
+                    interval: integer(1),
+                    source: BTreeMap::new(),
+                },
+            )
+            .unwrap();
+        assert_eq!(after.content, standing.content);
+        let energy = law
+            .energy_balance(
+                &receipt,
+                &SheafDiffusionEvent {
+                    interval: integer(1),
+                    source: BTreeMap::new(),
+                },
+            )
+            .unwrap();
+        assert_eq!(energy.conductive_dissipation, integer(0));
+        assert_eq!(energy.implicit_step_defect, integer(0));
+        assert_eq!(energy.exact_residual, integer(0));
+    }
+
+    #[test]
+    fn source_work_can_overcome_diffusion_and_step_defect() {
+        let (sheaf, left, right, _) = constant_interval_sheaf();
+        let law = ExactSheafDiffusionLaw::new(
+            sheaf.clone(),
+            0,
+            BTreeMap::from([(left, vec![integer(1)]), (right, vec![integer(1)])]),
+        )
+        .unwrap();
+        let standing = law
+            .initial_standing(
+                ExactSheafCochain::new(
+                    &sheaf,
+                    0,
+                    BTreeMap::from([(left, vec![integer(1)]), (right, vec![integer(0)])]),
+                )
+                .unwrap(),
+            )
+            .unwrap();
+        let event = SheafDiffusionEvent {
+            interval: integer(1),
+            source: BTreeMap::from([(left, vec![integer(1)])]),
+        };
+        let (after, receipt) = law.enact(&standing, &event).unwrap();
+        assert_eq!(after.content.values[&left], vec![integer(4) / integer(3)]);
+        assert_eq!(after.content.values[&right], vec![integer(2) / integer(3)]);
+        let energy = law.energy_balance(&receipt, &event).unwrap();
+        assert_eq!(energy.source_work, integer(4) / integer(3));
+        assert_eq!(energy.conductive_dissipation, integer(4) / integer(9));
+        assert_eq!(energy.implicit_step_defect, integer(5) / integer(18));
+        assert_eq!(energy.exact_residual, integer(0));
+        assert_eq!(receipt.energy_departed, -(integer(11) / integer(18)));
+    }
+
+    #[test]
+    fn grade_one_energy_retains_lower_coboundary_and_the_actual_source_law() {
+        let (sheaf, _, _, edge) = constant_interval_sheaf();
+        let law = ExactSheafDiffusionLaw::new(
+            sheaf.clone(),
+            1,
+            BTreeMap::from([(edge, vec![integer(1)])]),
+        )
+        .unwrap();
+        let standing = law
+            .initial_standing(
+                ExactSheafCochain::new(&sheaf, 1, BTreeMap::from([(edge, vec![integer(1)])]))
+                    .unwrap(),
+            )
+            .unwrap();
+        let event = SheafDiffusionEvent {
+            interval: integer(1),
+            source: BTreeMap::new(),
+        };
+        let (_, receipt) = law.enact(&standing, &event).unwrap();
+        let energy = law.energy_balance(&receipt, &event).unwrap();
+        assert!(receipt.compatibility_energy_after.is_zero());
+        assert_eq!(energy.conductive_dissipation, integer(2) / integer(9));
+        assert_eq!(energy.implicit_step_defect, integer(2) / integer(9));
+        assert!(energy.exact_residual.is_zero());
+        let mut other_operator = receipt.clone();
+        other_operator.certificate.hodge_laplacian.entries[0][0] = integer(0);
+        assert_eq!(
+            law.energy_balance(&other_operator, &event),
+            Err(SheafDiffusionError::TransferCertificateFailure)
+        );
     }
 
     #[test]
@@ -1311,15 +1483,13 @@ mod tests {
             ]),
         )
         .unwrap();
-        assert!(
-            sheaf
-                .coboundary(0)
-                .unwrap()
-                .apply(&compatible.flattened(&sheaf).unwrap())
-                .unwrap()
-                .iter()
-                .all(Zero::is_zero)
-        );
+        assert!(sheaf
+            .coboundary(0)
+            .unwrap()
+            .apply(&compatible.flattened(&sheaf).unwrap())
+            .unwrap()
+            .iter()
+            .all(Zero::is_zero));
         let law = ExactSheafDiffusionLaw::new(
             sheaf.clone(),
             0,

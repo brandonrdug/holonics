@@ -87,6 +87,24 @@ and `read_image` execute their declared resident interactions. Their documentati
 the high-level tensor action and contractions. The foundation's four-map tuple proves the
 object relationships; callers should not reconstruct that tuple for every supported operation.
 
+[established-bounded; implemented-exact] `BilinearOperator`, `BilinearProductCore` and
+`BilinearRealization` now provide complete input `differential` and covector `pullback`.
+The factorized realization performs them through its factors and receiver without expanding
+its output interaction tensor. `precompose_ports` carries actual new-to-old linear maps and
+rederives the receiver family, including new freedom under a rank drop. The name does not
+assert invertibility. Callers still supply the correct physical/semantic chart relation;
+matching dimensions alone never established that relation.
+
+[established-bounded; implemented-exact] Scalar `DiffusionReceipt::energy_balance` and
+`ExactSheafDiffusionLaw::energy_balance(receipt,event)` expose one shared
+`DiffusionEnergyBalance`: signed source work, constitutive dissipation, implicit-step defect
+and exact residual. Both laws consume the identity on enactment; the existing native
+circulation adapter consumes and carries it at its public boundary. The sheaf method checks
+its actual graded source certificate and uses both Hodge coboundaries. Existing receipt wire
+fields remain; `energy_departed` keeps its meaning as an endpoint storage difference and is
+not promoted to thermal energy. These are exact CPU mathematical/adapter operations, not a
+new GPU fluid solver or a completed native Q-field implementation.
+
 [established-bounded; source-inspected] Holonics already has reusable Rust mathematical and
 learning libraries. The September 14 source inspection distinguishes their algorithms from
 the model that currently consumes them. Re-exporting an owner supplies library access; it

@@ -30,6 +30,18 @@ Each row connects one mathematical relation to its live formal and executable pr
 Paths are stable owner addresses, not line citations. A hash, filename, count, output artifact, or
 test result never upgrades a correspondence.
 
+## Field architecture and elementary operator interfaces
+
+[definition] The [HNN field diagram](HNN_FORMULA.md#reading-the-field-architecture-diagram)
+locates reception, normalized contact, material/internal evolution and joint decoding in one
+object. `exact_linear::bilinear` now owns factor-preserving input differential, covector
+pullback and port precomposition. `diffusion` owns the shared `DiffusionEnergyBalance`;
+`sheaf_diffusion` computes it with the complete graded Hodge operator and actual source
+certificate. The existing `holonic-life::native_intelligence::circulation_diffusion` adapter
+consumes the complete balance. These extend the existing mathematical/library scopes and do
+not introduce another model owner. The [source audit](../research/experiments/hnn_field_architecture/README.md)
+retains the public/native assembly boundary.
+
 ## Swing, fluid and transfer composition
 
 [definition] The [fluid derivation](HOLONIC_FLUID_CONSTRUCTION.md) connects the actual owners:

@@ -488,6 +488,26 @@ are distinct mathematical endpoints. The usable synthesis is already stronger th
 of analogies: it gives contact reflection, exact nonlinear unresolved stress, boundary
 memory, coupled material dissipation, and source-specific spectral/transfer identities.
 
+## Exact library return after the architecture audit
+
+[proved-derived] A finite implicit diffusion step has an additional term beyond the
+continuous balance. From `C(φ₁−φ₀)=s−τLφ₁`, pairing with φ₁ gives
+`E₁−E₀=〈φ₁,s〉−τ〈φ₁,Lφ₁〉−||φ₁−φ₀||²_C/2`.
+The final square follows by expanding the quadratic energy; it is a time-step defect,
+not a further physical friction coefficient. Source work may make the endpoint energy grow.
+For the graded law, L contains both lower and upper Hodge terms; upper compatibility alone
+is insufficient to account for the dissipative return.
+
+[established-bounded; implemented-exact] The scalar and graded Rust diffusion owners now
+expose and consume this complete `DiffusionEnergyBalance`; the native circulation boundary
+uses it too. Exact regression includes source work, a harmonic section, a grade-one lower
+coboundary contribution and a mismatched source operator. The bilinear library now supplies
+the complete input differential and covector return of a factorized interaction, including
+explicit port precomposition. Applied to the advection vertex from §7, this is the elementary
+return required for its state and material operands; physical adjunction additionally uses
+the declared energy pairing. The [diagram/interface source](../research/experiments/hnn_field_architecture/README.md)
+records the actual library and native-consumer scopes.
+
 ## Implementation consequence
 
 [project-postulate] HNN's Holon operations must carry this composition through their existing
