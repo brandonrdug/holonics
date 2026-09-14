@@ -592,6 +592,94 @@ pub fn project_receiver_point(
     }
 }
 
+/// Exact first derivative of the receiver projection at a point. The source point and its
+/// receiver-frame rate are supplied separately; the same singularity conditions as projection
+/// apply, so a pole/focal-plane crossing is refused rather than differentiated through.
+pub fn project_receiver_point_rate(
+    point: &RatVec3,
+    relative_rate: &RatVec3,
+    projection: &ProjectionLaw,
+) -> Result<ExactVec2, ProjectionError> {
+    match projection {
+        ProjectionLaw::Orthographic => Ok(ExactVec2::new(
+            ExactExpr::from(relative_rate.x.clone()),
+            ExactExpr::from(relative_rate.y.clone()),
+        )),
+        ProjectionLaw::PerspectiveRay { focal_distance } => {
+            let denominator = focal_distance + &point.z;
+            if denominator.is_zero() {
+                return Err(ProjectionError::Singular(
+                    "the point lies on the receiver's focal plane".to_owned(),
+                ));
+            }
+            let denominator_squared = &denominator * &denominator;
+            let x_rate = focal_distance
+                * (&relative_rate.x * &denominator - &point.x * &relative_rate.z)
+                / &denominator_squared;
+            let y_rate = focal_distance
+                * (&relative_rate.y * &denominator - &point.y * &relative_rate.z)
+                / &denominator_squared;
+            Ok(ExactVec2::new(
+                ExactExpr::from(x_rate),
+                ExactExpr::from(y_rate),
+            ))
+        }
+        ProjectionLaw::StereographicNorth => {
+            let denominator = Rat::one() - &point.z;
+            if denominator.is_zero() {
+                return Err(ProjectionError::Singular(
+                    "the point is the stereographic receiver pole".to_owned(),
+                ));
+            }
+            let denominator_squared = &denominator * &denominator;
+            let x_rate = (&relative_rate.x * &denominator + &point.x * &relative_rate.z)
+                / &denominator_squared;
+            let y_rate = (&relative_rate.y * &denominator + &point.y * &relative_rate.z)
+                / &denominator_squared;
+            Ok(ExactVec2::new(
+                ExactExpr::from(x_rate),
+                ExactExpr::from(y_rate),
+            ))
+        }
+        ProjectionLaw::Isometric => {
+            let root_two = ExactExpr::sqrt_int(2);
+            let root_six = ExactExpr::sqrt_int(6);
+            let x = ExactExpr::from(&relative_rate.x - &relative_rate.z).divide(root_two);
+            let y = ExactExpr::from(
+                &relative_rate.x + &relative_rate.z - integer(2) * &relative_rate.y,
+            )
+            .divide(root_six);
+            Ok(ExactVec2::new(x, y))
+        }
+    }
+}
+
+/// Project a moving source point and return its exact projected point and projected rate. The
+/// `frame_linear_rate` and `frame_translation_rate` arguments are the derivatives of the already
+/// combined oriented source-to-receiver chart `L p + b`; callers supply those kinematic operands.
+pub fn project_point_with_motion(
+    construction: &Construction,
+    source_frame: FrameId,
+    point: &RatVec3,
+    point_rate: &RatVec3,
+    receiver: &Receiver,
+    frame_linear_rate: &RatMat3,
+    frame_translation_rate: &RatVec3,
+) -> Result<(ProjectedPoint, ExactVec2), ProjectionError> {
+    let transport = receiver_transport(construction, source_frame, receiver)?;
+    let linear = receiver.orientation.matrix().multiply(&transport.linear);
+    let translation = receiver.orientation.matrix().apply(&transport.translation);
+    let receiver_point = linear.apply(point).add(&translation);
+    let relative_rate = linear
+        .apply(point_rate)
+        .add(&frame_linear_rate.apply(point))
+        .add(frame_translation_rate);
+    let projected = project_receiver_point(&receiver_point, &receiver.projection)?;
+    let projected_rate =
+        project_receiver_point_rate(&receiver_point, &relative_rate, &receiver.projection)?;
+    Ok((projected, projected_rate))
+}
+
 pub fn project_entity(
     construction: &Construction,
     entity: EntityId,
@@ -1342,6 +1430,76 @@ mod tests {
     use super::*;
     use crate::exact::{RatVec3, rat};
     use crate::model::{Construction, Geometry};
+
+    #[test]
+    fn exact_receiver_projection_rate_uses_the_same_quotient_domain() {
+        let point = RatVec3::from_i64(2, 1, 1);
+        let rate = RatVec3::from_i64(1, 2, 3);
+        let perspective = project_receiver_point_rate(
+            &point,
+            &rate,
+            &ProjectionLaw::PerspectiveRay {
+                focal_distance: rat(3, 1),
+            },
+        )
+        .unwrap();
+        assert_eq!(perspective.x, ExactExpr::from(rat(-3, 8)));
+        assert_eq!(perspective.y, ExactExpr::from(rat(15, 16)));
+
+        let stereo_point = RatVec3::from_i64(2, 1, 0);
+        let stereographic =
+            project_receiver_point_rate(&stereo_point, &rate, &ProjectionLaw::StereographicNorth)
+                .unwrap();
+        assert_eq!(stereographic.x, ExactExpr::from(rat(7, 1)));
+        assert_eq!(stereographic.y, ExactExpr::from(rat(5, 1)));
+
+        assert!(project_receiver_point_rate(
+            &RatVec3::from_i64(0, 0, 1),
+            &rate,
+            &ProjectionLaw::StereographicNorth
+        )
+        .is_err());
+    }
+
+    #[test]
+    fn moving_projection_retains_receiver_motion_and_comoving_cancellation() {
+        let (construction, frame) = Construction::new("moving receiver");
+        let receiver = Receiver::new(
+            ReceiverId(1),
+            "orthographic",
+            frame,
+            ProjectionLaw::Orthographic,
+        );
+        let point = RatVec3::from_i64(2, 3, 4);
+        let stationary = RatVec3::zero();
+        let (projected, moving_rate) = project_point_with_motion(
+            &construction,
+            frame,
+            &point,
+            &stationary,
+            &receiver,
+            &RatMat3::from_i64([[0, 0, 0], [0, 0, 0], [0, 0, 0]]),
+            &RatVec3::from_i64(1, -2, 0),
+        )
+        .unwrap();
+        assert_eq!(projected.rational, Some(RatVec2::new(rat(2, 1), rat(3, 1))));
+        assert_eq!(moving_rate.x, ExactExpr::from(rat(1, 1)));
+        assert_eq!(moving_rate.y, ExactExpr::from(rat(-2, 1)));
+
+        let (comoving, zero_rate) = project_point_with_motion(
+            &construction,
+            frame,
+            &point,
+            &RatVec3::from_i64(-1, 2, 0),
+            &receiver,
+            &RatMat3::from_i64([[0, 0, 0], [0, 0, 0], [0, 0, 0]]),
+            &RatVec3::from_i64(1, -2, 0),
+        )
+        .unwrap();
+        assert_eq!(comoving.exact, projected.exact);
+        assert_eq!(zero_rate.x, ExactExpr::from(rat(0, 1)));
+        assert_eq!(zero_rate.y, ExactExpr::from(rat(0, 1)));
+    }
 
     #[test]
     fn exact_spin_composes_projective_cayley_ratios_in_causal_order() {

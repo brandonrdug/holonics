@@ -30,6 +30,20 @@ Each row connects one mathematical relation to its live formal and executable pr
 Paths are stable owner addresses, not line citations. A hash, filename, count, output artifact, or
 test result never upgrades a correspondence.
 
+## Participating receiver, motion and first-arrival families
+
+[definition] [Receiver holarchy](RECEIVER_HOLARCHY.md) joins the existing receiving Holon,
+frame, stress/induction, entropy and future-receiver compression owners. New geometric
+`project_receiver_point_rate` and `project_point_with_motion` in
+`relational-geometry/src/projection.rs` feed the existing
+`holonic-engine/examples/optical_receiver_frames.rs` consumer. The example's moving aperture,
+null momenta and proper-time face rates supply the architecture animation.
+`Computation/HolonicRecurrentEcology.ClockedFirstArrival` derives moving-region/nonautonomous
+arrival sets through the existing autonomous owner on clock-extended state; endogenous
+receiver state can belong to the same coupled carrier. This is not a new global clock or
+model owner. Static mathematical receiver maps and their containing active Holons retain
+their different scopes.
+
 ## Field architecture and elementary operator interfaces
 
 [definition] The [HNN field diagram](HNN_FORMULA.md#reading-the-field-architecture-diagram)

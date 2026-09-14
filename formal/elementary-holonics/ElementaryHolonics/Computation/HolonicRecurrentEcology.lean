@@ -437,6 +437,72 @@ theorem chart_covariant (e : X ≃ Y) (T : X → X) (A : Set X) (y : Y) (n : ℕ
 
 end FirstArrival
 
+/-! ## Moving receivers as clock-extended first-arrival populations -/
+
+namespace ClockedFirstArrival
+
+variable {X : Type*}
+
+def step (transport : ℕ → X → X) : X × ℕ → X × ℕ
+  | (state, clock) => (transport clock state, clock + 1)
+
+def receiving (regions : ℕ → Set X) : Set (X × ℕ) :=
+  {point | point.1 ∈ regions point.2}
+
+def evolution (transport : ℕ → X → X) (startClock : ℕ) : ℕ → X → X
+  | 0, state => state
+  | n + 1, state => transport (startClock + n)
+      (evolution transport startClock n state)
+
+theorem step_iterate (transport : ℕ → X → X) (n : ℕ) (state : X) (clock : ℕ) :
+    (step transport)^[n] (state, clock) =
+      (evolution transport clock n state, clock + n) := by
+  induction n generalizing state clock with
+  | zero => rfl
+  | succ n ih =>
+      rw [Function.iterate_succ_apply, ih]
+      change (evolution transport (clock + 1) n (transport clock state), clock + 1 + n) = _
+      have shift : ∀ m,
+          evolution transport (clock + 1) m (transport clock state) =
+            transport (clock + m) (evolution transport clock m state) := by
+        intro m
+        induction m with
+        | zero => rfl
+        | succ m hm =>
+            simp only [evolution]
+            rw [hm]
+            congr 1
+            omega
+      rw [shift]
+      congr 1
+      omega
+
+/-- Moving receiver first-arrival populations are the existing autonomous populations on the
+clock-extended state. -/
+theorem mem_population_iff
+    (transport : ℕ → X → X) (regions : ℕ → Set X)
+    (state : X) (startClock n : ℕ) :
+    (state, startClock) ∈
+        FirstArrival.population (step transport) (receiving regions) n ↔
+      evolution transport startClock n state ∈ regions (startClock + n) ∧
+        ∀ k < n, evolution transport startClock k state ∉ regions (startClock + k) := by
+  rw [FirstArrival.mem_population_iff, step_iterate]
+  constructor
+  · intro h
+    refine ⟨h.1, ?_⟩
+    intro k hk hhit
+    apply h.2 k hk
+    rw [step_iterate]
+    exact hhit
+  · rintro ⟨hit, prior⟩
+    refine ⟨hit, ?_⟩
+    intro k hk hhit
+    apply prior k hk
+    rw [step_iterate] at hhit
+    exact hhit
+
+end ClockedFirstArrival
+
 section Audit
 
 #print axioms OperationStep.operate_successor
@@ -454,6 +520,8 @@ section Audit
 #print axioms FirstArrival.mem_population_iff
 #print axioms FirstArrival.iterate_conjugate
 #print axioms FirstArrival.chart_covariant
+#print axioms ClockedFirstArrival.step_iterate
+#print axioms ClockedFirstArrival.mem_population_iff
 
 end Audit
 

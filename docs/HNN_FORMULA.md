@@ -23,7 +23,15 @@ relations are part of this construction, not excluded by its software realizatio
 
 ## Reading the field architecture diagram
 
-![HNN field architecture: situated encoding, overlapping toroidal sections, internal circulation and joint-field decoding](../research/experiments/hnn_field_architecture/architecture.svg)
+![HNN field architecture: a toroidal source and a moving receiving Holon with traced ray currents](../research/experiments/hnn_field_architecture/architecture.svg)
+
+[definition] The [receiver-holarchy construction](RECEIVER_HOLARCHY.md) places the observing
+Holon in the diagram. It has its own world-tube, frame, aperture and internal current; the
+viewing camera is a separate display projection. The moving-receiver version preserves the
+source network while exact null-ray/receiver calculations determine contacts and local faces.
+Its conditional entropy panel reads the received-current partition, not intrinsic entropy
+production. Receiver motion, phase/fractal evolution and lawful compression share the actual
+parameterized receiving family.
 
 [definition] The diagram is the HNN counterpart of an embedding/attention/reaction/decoding
 schematic. It shows one continuing field with local and modal sections, shared contact faces,
@@ -102,6 +110,11 @@ Their numerical representations may be sparse sections, tensors, factors, recurr
 correlated parameter families. K is not a semantic classifier. The components need not share
 one shape, one spatial grain or a universal clock. At a specified interaction, the joined
 ports determine which restrictions of these objects participate.
+
+[definition] The parameters of `ρ_F` can belong to another participating H_R. Its state
+is either an explicit nested component of the joint model or part of the actual coupled
+environment h. Receiver motion and material response then contribute to the receiving
+differential. A fixed readout matrix is the specialization where those operands are fixed.
 
 [definition] b_H is the outwardly available field/current at the selected holonic boundary.
 It can be an identity/readout port in a computational chart. Another internal region or an

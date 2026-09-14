@@ -183,3 +183,9 @@ and its preserved balance, then implement the consuming operation. A familiar sc
 PDF label or numerical probe cannot take the place of that relation. Existing completed
 constructions are starting material across domains; their source laws and scopes carry their
 usefulness without a new permission or intelligence test.
+
+[definition] The [receiver-holarchy synthesis](RECEIVER_HOLARCHY.md) now connects these active
+stress faces to the perspective object, moving optical projection, induction pullback,
+parameterized fractal arrival sets and entropy/encoding. A coordinate rebase transports both
+source and receiver; changing the physical receiver need not preserve the old reading.
+The constitutive mode and its continuation exceed the particular measured samples.

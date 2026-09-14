@@ -1,0 +1,3020 @@
+{
+  "beams": [
+    {
+      "direction": [
+        "3/5",
+        "0",
+        "4/5"
+      ],
+      "flight": "85/12",
+      "hit": [
+        "5/4",
+        "3/4",
+        "8"
+      ],
+      "inward_current_magnitude": "16/25",
+      "outward_current": "-16/25",
+      "received_energy": "4/5",
+      "source": [
+        "-3",
+        "3/4",
+        "7/3"
+      ]
+    },
+    {
+      "direction": [
+        "-5/13",
+        "0",
+        "12/13"
+      ],
+      "flight": "26/3",
+      "hit": [
+        "-1",
+        "49/108",
+        "8"
+      ],
+      "inward_current_magnitude": "240/169",
+      "outward_current": "-240/169",
+      "received_energy": "20/13",
+      "source": [
+        "7/3",
+        "49/108",
+        "0"
+      ]
+    },
+    {
+      "direction": [
+        "-3/5",
+        "0",
+        "4/5"
+      ],
+      "flight": "85/12",
+      "hit": [
+        "-5/4",
+        "3/4",
+        "8"
+      ],
+      "inward_current_magnitude": "34/25",
+      "outward_current": "-34/25",
+      "received_energy": "17/10",
+      "source": [
+        "3",
+        "3/4",
+        "7/3"
+      ]
+    }
+  ],
+  "beta": "3/5",
+  "complete_chart_rate": true,
+  "cross_entropy": "-sum p_R log p_reference",
+  "entropy": "-sum p_R log p_R",
+  "entropy_scope": "conditional received-current partition, not intrinsic entropy production",
+  "exact_null_momenta": true,
+  "frames": [
+    {
+      "accepted": [
+        false,
+        true,
+        true
+      ],
+      "center_lab_time": "-5/2",
+      "center_x": "-3/2",
+      "current_sum": "11746/4225",
+      "emission_lab_times": [
+        "-119/15",
+        "-163/15",
+        "-283/30"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "-17/20",
+        "-11/5",
+        "-47/20"
+      ],
+      "index": 0,
+      "local_faces": [
+        [
+          "11/5",
+          "3/4"
+        ],
+        [
+          "2/5",
+          "49/108"
+        ],
+        [
+          "1/5",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "0",
+        "3000/5873",
+        "2873/5873"
+      ],
+      "proper_time": "-2"
+    },
+    {
+      "accepted": [
+        false,
+        true,
+        true
+      ],
+      "center_lab_time": "-155/64",
+      "center_x": "-93/64",
+      "current_sum": "11746/4225",
+      "emission_lab_times": [
+        "-473/60",
+        "-649/60",
+        "-563/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "-4/5",
+        "-43/20",
+        "-23/10"
+      ],
+      "index": 1,
+      "local_faces": [
+        [
+          "173/80",
+          "3/4"
+        ],
+        [
+          "29/80",
+          "49/108"
+        ],
+        [
+          "13/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "0",
+        "3000/5873",
+        "2873/5873"
+      ],
+      "proper_time": "-31/16"
+    },
+    {
+      "accepted": [
+        false,
+        true,
+        true
+      ],
+      "center_lab_time": "-75/32",
+      "center_x": "-45/32",
+      "current_sum": "11746/4225",
+      "emission_lab_times": [
+        "-47/6",
+        "-323/30",
+        "-28/3"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "-3/4",
+        "-21/10",
+        "-9/4"
+      ],
+      "index": 2,
+      "local_faces": [
+        [
+          "17/8",
+          "3/4"
+        ],
+        [
+          "13/40",
+          "49/108"
+        ],
+        [
+          "1/8",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "0",
+        "3000/5873",
+        "2873/5873"
+      ],
+      "proper_time": "-15/8"
+    },
+    {
+      "accepted": [
+        false,
+        true,
+        true
+      ],
+      "center_lab_time": "-145/64",
+      "center_x": "-87/64",
+      "current_sum": "11746/4225",
+      "emission_lab_times": [
+        "-467/60",
+        "-643/60",
+        "-557/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "-7/10",
+        "-41/20",
+        "-11/5"
+      ],
+      "index": 3,
+      "local_faces": [
+        [
+          "167/80",
+          "3/4"
+        ],
+        [
+          "23/80",
+          "49/108"
+        ],
+        [
+          "7/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "0",
+        "3000/5873",
+        "2873/5873"
+      ],
+      "proper_time": "-29/16"
+    },
+    {
+      "accepted": [
+        false,
+        true,
+        true
+      ],
+      "center_lab_time": "-35/16",
+      "center_x": "-21/16",
+      "current_sum": "11746/4225",
+      "emission_lab_times": [
+        "-116/15",
+        "-32/3",
+        "-277/30"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "-13/20",
+        "-2",
+        "-43/20"
+      ],
+      "index": 4,
+      "local_faces": [
+        [
+          "41/20",
+          "3/4"
+        ],
+        [
+          "1/4",
+          "49/108"
+        ],
+        [
+          "1/20",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "0",
+        "3000/5873",
+        "2873/5873"
+      ],
+      "proper_time": "-7/4"
+    },
+    {
+      "accepted": [
+        false,
+        true,
+        true
+      ],
+      "center_lab_time": "-135/64",
+      "center_x": "-81/64",
+      "current_sum": "11746/4225",
+      "emission_lab_times": [
+        "-461/60",
+        "-637/60",
+        "-551/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "-3/5",
+        "-39/20",
+        "-21/10"
+      ],
+      "index": 5,
+      "local_faces": [
+        [
+          "161/80",
+          "3/4"
+        ],
+        [
+          "17/80",
+          "49/108"
+        ],
+        [
+          "1/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "0",
+        "3000/5873",
+        "2873/5873"
+      ],
+      "proper_time": "-27/16"
+    },
+    {
+      "accepted": [
+        false,
+        true,
+        true
+      ],
+      "center_lab_time": "-65/32",
+      "center_x": "-39/32",
+      "current_sum": "11746/4225",
+      "emission_lab_times": [
+        "-229/30",
+        "-317/30",
+        "-137/15"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "-11/20",
+        "-19/10",
+        "-41/20"
+      ],
+      "index": 6,
+      "local_faces": [
+        [
+          "79/40",
+          "3/4"
+        ],
+        [
+          "7/40",
+          "49/108"
+        ],
+        [
+          "-1/40",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "0",
+        "3000/5873",
+        "2873/5873"
+      ],
+      "proper_time": "-13/8"
+    },
+    {
+      "accepted": [
+        false,
+        true,
+        true
+      ],
+      "center_lab_time": "-125/64",
+      "center_x": "-75/64",
+      "current_sum": "11746/4225",
+      "emission_lab_times": [
+        "-91/12",
+        "-631/60",
+        "-109/12"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "-1/2",
+        "-37/20",
+        "-2"
+      ],
+      "index": 7,
+      "local_faces": [
+        [
+          "31/16",
+          "3/4"
+        ],
+        [
+          "11/80",
+          "49/108"
+        ],
+        [
+          "-1/16",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "0",
+        "3000/5873",
+        "2873/5873"
+      ],
+      "proper_time": "-25/16"
+    },
+    {
+      "accepted": [
+        false,
+        true,
+        true
+      ],
+      "center_lab_time": "-15/8",
+      "center_x": "-9/8",
+      "current_sum": "11746/4225",
+      "emission_lab_times": [
+        "-113/15",
+        "-157/15",
+        "-271/30"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "-9/20",
+        "-9/5",
+        "-39/20"
+      ],
+      "index": 8,
+      "local_faces": [
+        [
+          "19/10",
+          "3/4"
+        ],
+        [
+          "1/10",
+          "49/108"
+        ],
+        [
+          "-1/10",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "0",
+        "3000/5873",
+        "2873/5873"
+      ],
+      "proper_time": "-3/2"
+    },
+    {
+      "accepted": [
+        false,
+        true,
+        true
+      ],
+      "center_lab_time": "-115/64",
+      "center_x": "-69/64",
+      "current_sum": "11746/4225",
+      "emission_lab_times": [
+        "-449/60",
+        "-125/12",
+        "-539/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "-2/5",
+        "-7/4",
+        "-19/10"
+      ],
+      "index": 9,
+      "local_faces": [
+        [
+          "149/80",
+          "3/4"
+        ],
+        [
+          "1/16",
+          "49/108"
+        ],
+        [
+          "-11/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "0",
+        "3000/5873",
+        "2873/5873"
+      ],
+      "proper_time": "-23/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-55/32",
+      "center_x": "-33/32",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-223/30",
+        "-311/30",
+        "-134/15"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "-7/20",
+        "-17/10",
+        "-37/20"
+      ],
+      "index": 10,
+      "local_faces": [
+        [
+          "73/40",
+          "3/4"
+        ],
+        [
+          "1/40",
+          "49/108"
+        ],
+        [
+          "-7/40",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-11/8"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-105/64",
+      "center_x": "-63/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-443/60",
+        "-619/60",
+        "-533/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "-3/10",
+        "-33/20",
+        "-9/5"
+      ],
+      "index": 11,
+      "local_faces": [
+        [
+          "143/80",
+          "3/4"
+        ],
+        [
+          "-1/80",
+          "49/108"
+        ],
+        [
+          "-17/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-21/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-25/16",
+      "center_x": "-15/16",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-22/3",
+        "-154/15",
+        "-53/6"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "-1/4",
+        "-8/5",
+        "-7/4"
+      ],
+      "index": 12,
+      "local_faces": [
+        [
+          "7/4",
+          "3/4"
+        ],
+        [
+          "-1/20",
+          "49/108"
+        ],
+        [
+          "-1/4",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-5/4"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-95/64",
+      "center_x": "-57/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-437/60",
+        "-613/60",
+        "-527/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "-1/5",
+        "-31/20",
+        "-17/10"
+      ],
+      "index": 13,
+      "local_faces": [
+        [
+          "137/80",
+          "3/4"
+        ],
+        [
+          "-7/80",
+          "49/108"
+        ],
+        [
+          "-23/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-19/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-45/32",
+      "center_x": "-27/32",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-217/30",
+        "-61/6",
+        "-131/15"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "-3/20",
+        "-3/2",
+        "-33/20"
+      ],
+      "index": 14,
+      "local_faces": [
+        [
+          "67/40",
+          "3/4"
+        ],
+        [
+          "-1/8",
+          "49/108"
+        ],
+        [
+          "-13/40",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-9/8"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-85/64",
+      "center_x": "-51/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-431/60",
+        "-607/60",
+        "-521/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "-1/10",
+        "-29/20",
+        "-8/5"
+      ],
+      "index": 15,
+      "local_faces": [
+        [
+          "131/80",
+          "3/4"
+        ],
+        [
+          "-13/80",
+          "49/108"
+        ],
+        [
+          "-29/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-17/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-5/4",
+      "center_x": "-3/4",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-107/15",
+        "-151/15",
+        "-259/30"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "-1/20",
+        "-7/5",
+        "-31/20"
+      ],
+      "index": 16,
+      "local_faces": [
+        [
+          "8/5",
+          "3/4"
+        ],
+        [
+          "-1/5",
+          "49/108"
+        ],
+        [
+          "-2/5",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-1"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-75/64",
+      "center_x": "-45/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-85/12",
+        "-601/60",
+        "-103/12"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "0",
+        "-27/20",
+        "-3/2"
+      ],
+      "index": 17,
+      "local_faces": [
+        [
+          "25/16",
+          "3/4"
+        ],
+        [
+          "-19/80",
+          "49/108"
+        ],
+        [
+          "-7/16",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-15/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-35/32",
+      "center_x": "-21/32",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-211/30",
+        "-299/30",
+        "-128/15"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "1/20",
+        "-13/10",
+        "-29/20"
+      ],
+      "index": 18,
+      "local_faces": [
+        [
+          "61/40",
+          "3/4"
+        ],
+        [
+          "-11/40",
+          "49/108"
+        ],
+        [
+          "-19/40",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-7/8"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-65/64",
+      "center_x": "-39/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-419/60",
+        "-119/12",
+        "-509/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "1/10",
+        "-5/4",
+        "-7/5"
+      ],
+      "index": 19,
+      "local_faces": [
+        [
+          "119/80",
+          "3/4"
+        ],
+        [
+          "-5/16",
+          "49/108"
+        ],
+        [
+          "-41/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-13/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-15/16",
+      "center_x": "-9/16",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-104/15",
+        "-148/15",
+        "-253/30"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "3/20",
+        "-6/5",
+        "-27/20"
+      ],
+      "index": 20,
+      "local_faces": [
+        [
+          "29/20",
+          "3/4"
+        ],
+        [
+          "-7/20",
+          "49/108"
+        ],
+        [
+          "-11/20",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-3/4"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-55/64",
+      "center_x": "-33/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-413/60",
+        "-589/60",
+        "-503/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "1/5",
+        "-23/20",
+        "-13/10"
+      ],
+      "index": 21,
+      "local_faces": [
+        [
+          "113/80",
+          "3/4"
+        ],
+        [
+          "-31/80",
+          "49/108"
+        ],
+        [
+          "-47/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-11/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-25/32",
+      "center_x": "-15/32",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-41/6",
+        "-293/30",
+        "-25/3"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "1/4",
+        "-11/10",
+        "-5/4"
+      ],
+      "index": 22,
+      "local_faces": [
+        [
+          "11/8",
+          "3/4"
+        ],
+        [
+          "-17/40",
+          "49/108"
+        ],
+        [
+          "-5/8",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-5/8"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-45/64",
+      "center_x": "-27/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-407/60",
+        "-583/60",
+        "-497/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "3/10",
+        "-21/20",
+        "-6/5"
+      ],
+      "index": 23,
+      "local_faces": [
+        [
+          "107/80",
+          "3/4"
+        ],
+        [
+          "-37/80",
+          "49/108"
+        ],
+        [
+          "-53/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-9/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-5/8",
+      "center_x": "-3/8",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-101/15",
+        "-29/3",
+        "-247/30"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "7/20",
+        "-1",
+        "-23/20"
+      ],
+      "index": 24,
+      "local_faces": [
+        [
+          "13/10",
+          "3/4"
+        ],
+        [
+          "-1/2",
+          "49/108"
+        ],
+        [
+          "-7/10",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-1/2"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-35/64",
+      "center_x": "-21/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-401/60",
+        "-577/60",
+        "-491/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "2/5",
+        "-19/20",
+        "-11/10"
+      ],
+      "index": 25,
+      "local_faces": [
+        [
+          "101/80",
+          "3/4"
+        ],
+        [
+          "-43/80",
+          "49/108"
+        ],
+        [
+          "-59/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-7/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-15/32",
+      "center_x": "-9/32",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-199/30",
+        "-287/30",
+        "-122/15"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "9/20",
+        "-9/10",
+        "-21/20"
+      ],
+      "index": 26,
+      "local_faces": [
+        [
+          "49/40",
+          "3/4"
+        ],
+        [
+          "-23/40",
+          "49/108"
+        ],
+        [
+          "-31/40",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-3/8"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-25/64",
+      "center_x": "-15/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-79/12",
+        "-571/60",
+        "-97/12"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "1/2",
+        "-17/20",
+        "-1"
+      ],
+      "index": 27,
+      "local_faces": [
+        [
+          "19/16",
+          "3/4"
+        ],
+        [
+          "-49/80",
+          "49/108"
+        ],
+        [
+          "-13/16",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-5/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-5/16",
+      "center_x": "-3/16",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-98/15",
+        "-142/15",
+        "-241/30"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "11/20",
+        "-4/5",
+        "-19/20"
+      ],
+      "index": 28,
+      "local_faces": [
+        [
+          "23/20",
+          "3/4"
+        ],
+        [
+          "-13/20",
+          "49/108"
+        ],
+        [
+          "-17/20",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-1/4"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-15/64",
+      "center_x": "-9/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-389/60",
+        "-113/12",
+        "-479/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "3/5",
+        "-3/4",
+        "-9/10"
+      ],
+      "index": 29,
+      "local_faces": [
+        [
+          "89/80",
+          "3/4"
+        ],
+        [
+          "-11/16",
+          "49/108"
+        ],
+        [
+          "-71/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-3/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-5/32",
+      "center_x": "-3/32",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-193/30",
+        "-281/30",
+        "-119/15"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "13/20",
+        "-7/10",
+        "-17/20"
+      ],
+      "index": 30,
+      "local_faces": [
+        [
+          "43/40",
+          "3/4"
+        ],
+        [
+          "-29/40",
+          "49/108"
+        ],
+        [
+          "-37/40",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-1/8"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "-5/64",
+      "center_x": "-3/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-383/60",
+        "-559/60",
+        "-473/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "7/10",
+        "-13/20",
+        "-4/5"
+      ],
+      "index": 31,
+      "local_faces": [
+        [
+          "83/80",
+          "3/4"
+        ],
+        [
+          "-61/80",
+          "49/108"
+        ],
+        [
+          "-77/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "-1/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "0",
+      "center_x": "0",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-19/3",
+        "-139/15",
+        "-47/6"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "3/4",
+        "-3/5",
+        "-3/4"
+      ],
+      "index": 32,
+      "local_faces": [
+        [
+          "1",
+          "3/4"
+        ],
+        [
+          "-4/5",
+          "49/108"
+        ],
+        [
+          "-1",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "0"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "5/64",
+      "center_x": "3/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-377/60",
+        "-553/60",
+        "-467/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "4/5",
+        "-11/20",
+        "-7/10"
+      ],
+      "index": 33,
+      "local_faces": [
+        [
+          "77/80",
+          "3/4"
+        ],
+        [
+          "-67/80",
+          "49/108"
+        ],
+        [
+          "-83/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "1/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "5/32",
+      "center_x": "3/32",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-187/30",
+        "-55/6",
+        "-116/15"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "17/20",
+        "-1/2",
+        "-13/20"
+      ],
+      "index": 34,
+      "local_faces": [
+        [
+          "37/40",
+          "3/4"
+        ],
+        [
+          "-7/8",
+          "49/108"
+        ],
+        [
+          "-43/40",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "1/8"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "15/64",
+      "center_x": "9/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-371/60",
+        "-547/60",
+        "-461/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "9/10",
+        "-9/20",
+        "-3/5"
+      ],
+      "index": 35,
+      "local_faces": [
+        [
+          "71/80",
+          "3/4"
+        ],
+        [
+          "-73/80",
+          "49/108"
+        ],
+        [
+          "-89/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "3/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "5/16",
+      "center_x": "3/16",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-92/15",
+        "-136/15",
+        "-229/30"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "19/20",
+        "-2/5",
+        "-11/20"
+      ],
+      "index": 36,
+      "local_faces": [
+        [
+          "17/20",
+          "3/4"
+        ],
+        [
+          "-19/20",
+          "49/108"
+        ],
+        [
+          "-23/20",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "1/4"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "25/64",
+      "center_x": "15/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-73/12",
+        "-541/60",
+        "-91/12"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "1",
+        "-7/20",
+        "-1/2"
+      ],
+      "index": 37,
+      "local_faces": [
+        [
+          "13/16",
+          "3/4"
+        ],
+        [
+          "-79/80",
+          "49/108"
+        ],
+        [
+          "-19/16",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "5/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "15/32",
+      "center_x": "9/32",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-181/30",
+        "-269/30",
+        "-113/15"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "21/20",
+        "-3/10",
+        "-9/20"
+      ],
+      "index": 38,
+      "local_faces": [
+        [
+          "31/40",
+          "3/4"
+        ],
+        [
+          "-41/40",
+          "49/108"
+        ],
+        [
+          "-49/40",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "3/8"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "35/64",
+      "center_x": "21/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-359/60",
+        "-107/12",
+        "-449/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "11/10",
+        "-1/4",
+        "-2/5"
+      ],
+      "index": 39,
+      "local_faces": [
+        [
+          "59/80",
+          "3/4"
+        ],
+        [
+          "-17/16",
+          "49/108"
+        ],
+        [
+          "-101/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "7/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "5/8",
+      "center_x": "3/8",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-89/15",
+        "-133/15",
+        "-223/30"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "23/20",
+        "-1/5",
+        "-7/20"
+      ],
+      "index": 40,
+      "local_faces": [
+        [
+          "7/10",
+          "3/4"
+        ],
+        [
+          "-11/10",
+          "49/108"
+        ],
+        [
+          "-13/10",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "1/2"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "45/64",
+      "center_x": "27/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-353/60",
+        "-529/60",
+        "-443/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "6/5",
+        "-3/20",
+        "-3/10"
+      ],
+      "index": 41,
+      "local_faces": [
+        [
+          "53/80",
+          "3/4"
+        ],
+        [
+          "-91/80",
+          "49/108"
+        ],
+        [
+          "-107/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "9/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "25/32",
+      "center_x": "15/32",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-35/6",
+        "-263/30",
+        "-22/3"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "5/4",
+        "-1/10",
+        "-1/4"
+      ],
+      "index": 42,
+      "local_faces": [
+        [
+          "5/8",
+          "3/4"
+        ],
+        [
+          "-47/40",
+          "49/108"
+        ],
+        [
+          "-11/8",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "5/8"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "55/64",
+      "center_x": "33/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-347/60",
+        "-523/60",
+        "-437/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "13/10",
+        "-1/20",
+        "-1/5"
+      ],
+      "index": 43,
+      "local_faces": [
+        [
+          "47/80",
+          "3/4"
+        ],
+        [
+          "-97/80",
+          "49/108"
+        ],
+        [
+          "-113/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "11/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "15/16",
+      "center_x": "9/16",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-86/15",
+        "-26/3",
+        "-217/30"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "27/20",
+        "0",
+        "-3/20"
+      ],
+      "index": 44,
+      "local_faces": [
+        [
+          "11/20",
+          "3/4"
+        ],
+        [
+          "-5/4",
+          "49/108"
+        ],
+        [
+          "-29/20",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "3/4"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "65/64",
+      "center_x": "39/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-341/60",
+        "-517/60",
+        "-431/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "7/5",
+        "1/20",
+        "-1/10"
+      ],
+      "index": 45,
+      "local_faces": [
+        [
+          "41/80",
+          "3/4"
+        ],
+        [
+          "-103/80",
+          "49/108"
+        ],
+        [
+          "-119/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "13/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "35/32",
+      "center_x": "21/32",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-169/30",
+        "-257/30",
+        "-107/15"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "29/20",
+        "1/10",
+        "-1/20"
+      ],
+      "index": 46,
+      "local_faces": [
+        [
+          "19/40",
+          "3/4"
+        ],
+        [
+          "-53/40",
+          "49/108"
+        ],
+        [
+          "-61/40",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "7/8"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "75/64",
+      "center_x": "45/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-67/12",
+        "-511/60",
+        "-85/12"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "3/2",
+        "3/20",
+        "0"
+      ],
+      "index": 47,
+      "local_faces": [
+        [
+          "7/16",
+          "3/4"
+        ],
+        [
+          "-109/80",
+          "49/108"
+        ],
+        [
+          "-25/16",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "15/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "5/4",
+      "center_x": "3/4",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-83/15",
+        "-127/15",
+        "-211/30"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "31/20",
+        "1/5",
+        "1/20"
+      ],
+      "index": 48,
+      "local_faces": [
+        [
+          "2/5",
+          "3/4"
+        ],
+        [
+          "-7/5",
+          "49/108"
+        ],
+        [
+          "-8/5",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "1"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "85/64",
+      "center_x": "51/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-329/60",
+        "-101/12",
+        "-419/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "8/5",
+        "1/4",
+        "1/10"
+      ],
+      "index": 49,
+      "local_faces": [
+        [
+          "29/80",
+          "3/4"
+        ],
+        [
+          "-23/16",
+          "49/108"
+        ],
+        [
+          "-131/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "17/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "45/32",
+      "center_x": "27/32",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-163/30",
+        "-251/30",
+        "-104/15"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "33/20",
+        "3/10",
+        "3/20"
+      ],
+      "index": 50,
+      "local_faces": [
+        [
+          "13/40",
+          "3/4"
+        ],
+        [
+          "-59/40",
+          "49/108"
+        ],
+        [
+          "-67/40",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "9/8"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "95/64",
+      "center_x": "57/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-323/60",
+        "-499/60",
+        "-413/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "17/10",
+        "7/20",
+        "1/5"
+      ],
+      "index": 51,
+      "local_faces": [
+        [
+          "23/80",
+          "3/4"
+        ],
+        [
+          "-121/80",
+          "49/108"
+        ],
+        [
+          "-137/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "19/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "25/16",
+      "center_x": "15/16",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-16/3",
+        "-124/15",
+        "-41/6"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "7/4",
+        "2/5",
+        "1/4"
+      ],
+      "index": 52,
+      "local_faces": [
+        [
+          "1/4",
+          "3/4"
+        ],
+        [
+          "-31/20",
+          "49/108"
+        ],
+        [
+          "-7/4",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "5/4"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "105/64",
+      "center_x": "63/64",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-317/60",
+        "-493/60",
+        "-407/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "9/5",
+        "9/20",
+        "3/10"
+      ],
+      "index": 53,
+      "local_faces": [
+        [
+          "17/80",
+          "3/4"
+        ],
+        [
+          "-127/80",
+          "49/108"
+        ],
+        [
+          "-143/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "21/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        true
+      ],
+      "center_lab_time": "55/32",
+      "center_x": "33/32",
+      "current_sum": "578/169",
+      "emission_lab_times": [
+        "-157/30",
+        "-49/6",
+        "-101/15"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "37/20",
+        "1/2",
+        "7/20"
+      ],
+      "index": 54,
+      "local_faces": [
+        [
+          "7/40",
+          "3/4"
+        ],
+        [
+          "-13/8",
+          "49/108"
+        ],
+        [
+          "-73/40",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1352/7225",
+        "120/289",
+        "169/425"
+      ],
+      "proper_time": "11/8"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        false
+      ],
+      "center_lab_time": "115/64",
+      "center_x": "69/64",
+      "current_sum": "8704/4225",
+      "emission_lab_times": [
+        "-311/60",
+        "-487/60",
+        "-401/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "19/10",
+        "11/20",
+        "2/5"
+      ],
+      "index": 55,
+      "local_faces": [
+        [
+          "11/80",
+          "3/4"
+        ],
+        [
+          "-133/80",
+          "49/108"
+        ],
+        [
+          "-149/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "169/544",
+        "375/544",
+        "0"
+      ],
+      "proper_time": "23/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        false
+      ],
+      "center_lab_time": "15/8",
+      "center_x": "9/8",
+      "current_sum": "8704/4225",
+      "emission_lab_times": [
+        "-77/15",
+        "-121/15",
+        "-199/30"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "39/20",
+        "3/5",
+        "9/20"
+      ],
+      "index": 56,
+      "local_faces": [
+        [
+          "1/10",
+          "3/4"
+        ],
+        [
+          "-17/10",
+          "49/108"
+        ],
+        [
+          "-19/10",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "169/544",
+        "375/544",
+        "0"
+      ],
+      "proper_time": "3/2"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        false
+      ],
+      "center_lab_time": "125/64",
+      "center_x": "75/64",
+      "current_sum": "8704/4225",
+      "emission_lab_times": [
+        "-61/12",
+        "-481/60",
+        "-79/12"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "2",
+        "13/20",
+        "1/2"
+      ],
+      "index": 57,
+      "local_faces": [
+        [
+          "1/16",
+          "3/4"
+        ],
+        [
+          "-139/80",
+          "49/108"
+        ],
+        [
+          "-31/16",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "169/544",
+        "375/544",
+        "0"
+      ],
+      "proper_time": "25/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        false
+      ],
+      "center_lab_time": "65/32",
+      "center_x": "39/32",
+      "current_sum": "8704/4225",
+      "emission_lab_times": [
+        "-151/30",
+        "-239/30",
+        "-98/15"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "41/20",
+        "7/10",
+        "11/20"
+      ],
+      "index": 58,
+      "local_faces": [
+        [
+          "1/40",
+          "3/4"
+        ],
+        [
+          "-71/40",
+          "49/108"
+        ],
+        [
+          "-79/40",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "169/544",
+        "375/544",
+        "0"
+      ],
+      "proper_time": "13/8"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        false
+      ],
+      "center_lab_time": "135/64",
+      "center_x": "81/64",
+      "current_sum": "8704/4225",
+      "emission_lab_times": [
+        "-299/60",
+        "-95/12",
+        "-389/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "21/10",
+        "3/4",
+        "3/5"
+      ],
+      "index": 59,
+      "local_faces": [
+        [
+          "-1/80",
+          "3/4"
+        ],
+        [
+          "-29/16",
+          "49/108"
+        ],
+        [
+          "-161/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "169/544",
+        "375/544",
+        "0"
+      ],
+      "proper_time": "27/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        false
+      ],
+      "center_lab_time": "35/16",
+      "center_x": "21/16",
+      "current_sum": "8704/4225",
+      "emission_lab_times": [
+        "-74/15",
+        "-118/15",
+        "-193/30"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "43/20",
+        "4/5",
+        "13/20"
+      ],
+      "index": 60,
+      "local_faces": [
+        [
+          "-1/20",
+          "3/4"
+        ],
+        [
+          "-37/20",
+          "49/108"
+        ],
+        [
+          "-41/20",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "169/544",
+        "375/544",
+        "0"
+      ],
+      "proper_time": "7/4"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        false
+      ],
+      "center_lab_time": "145/64",
+      "center_x": "87/64",
+      "current_sum": "8704/4225",
+      "emission_lab_times": [
+        "-293/60",
+        "-469/60",
+        "-383/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "11/5",
+        "17/20",
+        "7/10"
+      ],
+      "index": 61,
+      "local_faces": [
+        [
+          "-7/80",
+          "3/4"
+        ],
+        [
+          "-151/80",
+          "49/108"
+        ],
+        [
+          "-167/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "169/544",
+        "375/544",
+        "0"
+      ],
+      "proper_time": "29/16"
+    },
+    {
+      "accepted": [
+        true,
+        true,
+        false
+      ],
+      "center_lab_time": "75/32",
+      "center_x": "45/32",
+      "current_sum": "8704/4225",
+      "emission_lab_times": [
+        "-29/6",
+        "-233/30",
+        "-19/3"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "9/4",
+        "9/10",
+        "3/4"
+      ],
+      "index": 62,
+      "local_faces": [
+        [
+          "-1/8",
+          "3/4"
+        ],
+        [
+          "-77/40",
+          "49/108"
+        ],
+        [
+          "-17/8",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "169/544",
+        "375/544",
+        "0"
+      ],
+      "proper_time": "15/8"
+    },
+    {
+      "accepted": [
+        true,
+        false,
+        false
+      ],
+      "center_lab_time": "155/64",
+      "center_x": "93/64",
+      "current_sum": "16/25",
+      "emission_lab_times": [
+        "-287/60",
+        "-463/60",
+        "-377/60"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "23/10",
+        "19/20",
+        "4/5"
+      ],
+      "index": 63,
+      "local_faces": [
+        [
+          "-13/80",
+          "3/4"
+        ],
+        [
+          "-157/80",
+          "49/108"
+        ],
+        [
+          "-173/80",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1",
+        "0",
+        "0"
+      ],
+      "proper_time": "31/16"
+    },
+    {
+      "accepted": [
+        true,
+        false,
+        false
+      ],
+      "center_lab_time": "5/2",
+      "center_x": "3/2",
+      "current_sum": "16/25",
+      "emission_lab_times": [
+        "-71/15",
+        "-23/3",
+        "-187/30"
+      ],
+      "face_rate": [
+        "-3/5",
+        "0"
+      ],
+      "hit_lab_times": [
+        "47/20",
+        "1",
+        "17/20"
+      ],
+      "index": 64,
+      "local_faces": [
+        [
+          "-1/5",
+          "3/4"
+        ],
+        [
+          "-2",
+          "49/108"
+        ],
+        [
+          "-11/5",
+          "3/4"
+        ]
+      ],
+      "probabilities": [
+        "1",
+        "0",
+        "0"
+      ],
+      "proper_time": "2"
+    }
+  ],
+  "gamma": "5/4",
+  "normal": "(0,0,0,-1)",
+  "radius": "2",
+  "reference_probabilities": [
+    "1352/7225",
+    "120/289",
+    "169/425"
+  ],
+  "schema": "holonics.moving-optical-receiver.v1",
+  "scope": "local Minkowski receiving worldtube with supplied inertial motion and three stationary incoherent null-ray current channels; no curved-ray or material-response calibration",
+  "units": {
+    "c": "L0/T0=1",
+    "current": "declared unit null-stress density times c",
+    "energy": "E0",
+    "length": "L0",
+    "proper_time": "T0"
+  },
+  "velocity": "(5/4,3/4,0,0)",
+  "worldtube": "(gamma*tau+gamma*beta*u,gamma*beta*tau+gamma*u,v,8)",
+  "z": "8"
+}

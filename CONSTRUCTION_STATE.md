@@ -1,10 +1,24 @@
 # Construction state
 
-**Currency:** September 14, 2026. Brandon's latest request is an HNN architecture diagram
-comparable in explanatory completeness to transformer embedding/attention/decoding diagrams,
-with interacting toroidal geometry, whole-field generation and internal state. It also requires
-review and actual refinement of library/crate interfaces after the Holon/fluid theorem upgrades.
-The timed goal remains paused; the directly requested diagram/interface return is recorded below.
+**Currency:** September 14, 2026. Brandon's latest correction makes the receiver an active
+Holon with perspective, motion, flux/induction and retained internal state. The requested
+unification joins that object to fractal/parametric evolution, entropy, compression and storage,
+using recent direct messages and actual source constructions. The timed goal remains paused.
+
+## Current receiver construction return
+
+[established-bounded; source-inspected] The [receiver-holarchy synthesis](docs/RECEIVER_HOLARCHY.md)
+now joins the participating perspective object, moving frame/stress/induction, complete
+fractal preimages, received entropy and future-receiver compression. The architecture diagram
+contains a moving receiving Holon with exact null-ray intersections, proper-time faces and
+conditional entropy, while the viewing camera stays fixed. New geometric projection-rate
+interfaces are consumed by the existing optical example; the clock-extended first-arrival
+join reuses the original formal owner. The [record](research/records/2026-09-14_THE_RECEIVER_IS_A_PARTICIPATING_HOLON_WITH_MOVING_FACES.md)
+retains recovered direct-message coordinates, exact optical results, 12 passing projection
+tests, the completed formal build and browser/motion checks. The requested synthesis and
+scoped library/visual return are complete. Full native receiver-material/field-body coupling
+and moving-EM surface realization remain their explicit implementation joins; the timed goal
+and earlier assembly draft remain paused/preserved.
 
 ## Current architecture and library return
 

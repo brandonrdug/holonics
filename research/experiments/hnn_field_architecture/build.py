@@ -38,12 +38,18 @@ def bend(p):
     x,y,z=p
     return (x,y+x*x/12,z+x*y/12)
 
-def project(p):
-    x,y,z=bend(p)
+def camera(p):
+    x,y,z=p
     # Rational viewing chart; every number below is a display coordinate.
     return (Q(4,5)*x+Q(3,10)*y-Q(1,5)*z,
             -Q(1,10)*x-Q(1,2)*y+Q(4,5)*z,
             Q(1,5)*x-Q(4,5)*y-Q(1,2)*z)
+
+def project(p):
+    return camera(bend(p))
+
+def world_ink(p):
+    return [round(c*10000) for c in camera(p)]
 
 def ink(p):
     # Integer ink stations: denominators remain in source; no float affects incidence.
@@ -72,6 +78,30 @@ data=dict(schema='holonics.hnn-architecture-display.v1',regions=regions,patches=
           source='Existing six-domain field and certified 2/5 collision facets. One invertible det=1 polynomial material map preserves their incidence. Integer ink stations only.',
           source_map='F(x,y,z)=(x,y+x²/12,z+xy/12); F inverse (X,Y,Z)=(X,Y-X²/12,Z-X(Y-X²/12)/12)',
           role='Operator-placement schematic. Six drawn regions do not prescribe HNN extent, rank or topology; paths illustrate admitted circulation, not a measured trajectory.')
+# The receiver and the beams are already in the deformed world chart. They are not bent again.
+receiver=json.loads((HERE/'receiver-motion.json').read_text())
+gamma=Q(receiver['gamma']);z=Q(receiver['z']);radius=Q(receiver['radius'])
+base=world_ink((Q(0),Q(0),z))
+def receptor(theta,phi,minor=Q(1,6)):
+    r=radius+minor*phi[0]
+    return world_ink((gamma*r*theta[0],r*theta[1],z+minor*phi[1]))
+receiver['rim']=[[receptor(t,p) for t in circle(12)+circle(12)[:1]] for p in circle(2)]
+receiver['aperture']=[world_ink((gamma*radius*t[0],radius*t[1],z)) for t in circle(20)+circle(20)[:1]]
+receiver['interior']=[[world_ink((gamma*Q(k,5)*t[0],Q(k,5)*t[1],z)) for t in circle(12)+circle(12)[:1]] for k in [2,4,6]]
+receiver['axes']=[base,world_ink((gamma,Q(0),z)),world_ink((Q(0),Q(1),z)),world_ink((Q(0),Q(0),z-1))]
+receiver['base_center']=base
+for beam in receiver['beams']:
+    beam['source_display']=world_ink(tuple(Q(x) for x in beam['source']))
+    beam['hit_display']=world_ink(tuple(Q(x) for x in beam['hit']))
+for f in receiver['frames']:
+    center=world_ink((Q(f['center_x']),Q(0),z))
+    f['display_shift']=[center[k]-base[k] for k in range(3)]
+allpoints=pts[:]
+for f in receiver['frames']:
+    for line in receiver['rim']:
+        allpoints.extend([[p[k]+f['display_shift'][k] for k in range(3)] for p in line])
+data['bounds']=[[min(p[k] for p in allpoints),max(p[k] for p in allpoints)] for k in range(3)]
+data['receiver']=receiver
 (HERE/'geometry.json').write_text(json.dumps(data,separators=(',',':'))+'\n')
 fragment=(HERE/'explorer.template.html').read_text().replace('@@GEOMETRY@@',json.dumps(data,separators=(',',':')))
 OUTPUT.parent.mkdir(parents=True,exist_ok=True)

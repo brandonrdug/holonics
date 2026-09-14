@@ -61,6 +61,15 @@ positive mobility produce diffusion and heat. Native graph scattering is precise
 about its constituted projection; the object therefore connects to the primitive operation
 without replacing the field by its displayed coefficient vector.
 
+[definition] The [receiving Holon](RECEIVER_HOLARCHY.md) completes this distinction:
+`ρ_R` is its receiving operation, while H_R carries the frame, material, current and internal
+state that determine that operation. A continuous section is not intrinsically a discrete
+sample; samples and coefficients present restrictions of its generating relation. Source and
+receiver can both change, so their joint differential includes the receiver's motion/material
+return. The first-arrival/fractal sets, entropy partitions and compression family are defined
+through those actual receiving operations. A physical drive or monitor instantiates the same
+interaction/encoding pattern with its own material laws.
+
 ## High-level Holonic Interactions
 
 [definition] These are the operations used to formulate the model. They are abstracted

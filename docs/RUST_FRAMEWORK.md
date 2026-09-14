@@ -71,6 +71,15 @@ uses its implicit normalized-log relation. A display evaluator does not establis
 state or branch. The exact phase reference composes these existing owners into actual interval
 currents and receiver decisions; no live Lean invocation or floating midpoint enters the map.
 
+[established-bounded; implemented-exact] `holonics::geometry::project_point_with_motion`
+now composes the declared frame route and orientation with source velocity and the combined
+chart rates `L̇,ḃ`; it returns the existing projected face plus its exact derivative.
+`project_receiver_point_rate` covers the four existing projection laws with their singularity
+domains. The caller supplies the actual trajectory rates, not a difference inferred from two
+samples. The existing optical receiver example consumes this API with a proper-time receiving
+world-tube and exact photon boosts. [Receiver holarchy](RECEIVER_HOLARCHY.md) connects that
+spatial chart to the containing Holon's material/current state and compression family.
+
 ## Mathematical operators and model assembly
 
 [definition] The [computational Holon contract](HOLON.md) identifies the object represented
