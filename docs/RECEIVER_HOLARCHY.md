@@ -152,16 +152,23 @@ retains harmonic modes and the source-specific spectral scaling relation.
 ## The calculus of entropy also contains receiver motion
 
 [proved-derived] In a smooth flat chart, suppose a density obeys `∂_tρ+div J=s`, and a
-receiving cell A_i(t) moves with boundary velocity v_i. Reynolds transport gives
+receiving cell A_i(t) moves with boundary velocity v_i. For received mass
+`m_i=∫_(A_i)ρ`, Reynolds transport gives
 
 ```text
-ṗ_i = −∫_(∂A_i) (J−ρv_i)·n + ∫_(A_i) s.
+ṁ_i = −∫_(∂A_i) (J−ρv_i)·n + ∫_(A_i) s.
 ```
 
 This follows by adding the boundary-motion term to the density derivative and applying
 the divergence theorem. The flux relative to the receiving boundary, rather than J alone,
 determines the change in that cell's reading. On moving/curved geometry use the transported
 density form, retaining the volume and connection contributions.
+
+[proved-derived] An aperture may receive only part of the source. Its conditional
+probabilities have `Z=Σm_i>0` and `p_i=m_i/Z`, so the quotient rule adds
+`ṗ_i=(ṁ_i−p_i Ż)/Z`. The moving normalization cannot be omitted when the admitted
+current changes. For a complete probability partition, Z=1 is the corresponding
+specialization. The optical example normalizes the exact admitted current at every cut.
 
 [proved-derived] On a fixed positive-support stratum with normalized p,
 
