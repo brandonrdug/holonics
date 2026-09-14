@@ -7,7 +7,8 @@ use std::io::{Read, Write};
 const MAGIC_V1: &[u8] = b"HOLONIC-COUPLED-CONSTITUTIVE\x01";
 const MAGIC_V2: &[u8] = b"HOLONIC-COUPLED-CONSTITUTIVE\x02";
 const MAGIC_V3: &[u8] = b"HOLONIC-COUPLED-CONSTITUTIVE\x03";
-const MAGIC: &[u8] = b"HOLONIC-COUPLED-CONSTITUTIVE\x04";
+const MAGIC_V4: &[u8] = b"HOLONIC-COUPLED-CONSTITUTIVE\x04";
+const MAGIC: &[u8] = b"HOLONIC-COUPLED-CONSTITUTIVE\x05";
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 struct ReturnedHeader {
@@ -52,6 +53,16 @@ struct SourceHeader {
     #[serde(default)]
     returned: Option<ReturnedHeader>,
 }
+impl SourceHeader {
+    fn returned_cut(&self)->Option<(u64,ConstitutiveSourceFrame)>{
+        self.kind.empirical_cut().or_else(||self.returned.as_ref().map(|r|(r.prediction,r.cut)))
+    }
+}
+fn operation_epoch(base:u64,operations:&[SourceHeader],index:usize)->Result<u64,ConstitutiveFibreError>{
+    let prefix=operations.get(..=index).ok_or(ConstitutiveFibreError::Shape)?;
+    base.checked_add(1).and_then(|v|v.checked_add(prefix.iter().filter(|p|p.kind.moves_wave()).count() as u64))
+        .ok_or(ConstitutiveFibreError::Shape)
+}
 #[derive(Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 struct Header {
@@ -91,7 +102,7 @@ impl CoupledConstitutiveRest {
             .header
             .operations
             .iter()
-            .any(|op| op.returned.as_ref().is_some_and(|r| r.prediction == id));
+            .any(|op| op.returned_cut().is_some_and(|r| r.0 == id));
         self.header.pending.contains_key(&id)
             || (!returned
                 && id != self.header.prediction
@@ -107,7 +118,7 @@ impl CoupledConstitutiveRest {
         {
             return Err(ConstitutiveFibreError::Shape);
         }
-        out.write_all(MAGIC).map_err(invalid)?;
+        out.write_all(if self.header.operations.iter().any(|p|p.kind.empirical_cut().is_some()) {MAGIC}else{MAGIC_V4}).map_err(invalid)?;
         blob(out, &serde_json::to_vec(&self.header).map_err(invalid)?)?;
         let mut base = Vec::new();
         self.base.write(&mut base)?;
@@ -130,11 +141,11 @@ impl CoupledConstitutiveRest {
         let mut input = input.take(octets);
         let mut magic = vec![0; MAGIC.len()];
         input.read_exact(&mut magic).map_err(invalid)?;
-        if magic != MAGIC && magic != MAGIC_V3 && magic != MAGIC_V2 && magic != MAGIC_V1 {
+        if magic != MAGIC && magic != MAGIC_V4 && magic != MAGIC_V3 && magic != MAGIC_V2 && magic != MAGIC_V1 {
             return Err(invalid("dependent continuation magic"));
         }
         let header_bytes = read_blob(&mut input)?;
-        let header: Header = if magic == MAGIC {
+        let header: Header = if magic == MAGIC || magic==MAGIC_V4 {
             serde_json::from_slice(&header_bytes).map_err(invalid)?
         } else {
             let old: LegacyHeader = serde_json::from_slice(&header_bytes).map_err(invalid)?;
@@ -173,7 +184,7 @@ impl CoupledConstitutiveRest {
             || base
                 .epoch()
                 .checked_add(1)
-                .and_then(|v| v.checked_add(header.operations.len() as u64))
+                .and_then(|v| v.checked_add(header.operations.iter().filter(|p|p.kind.moves_wave()).count() as u64))
                 != Some(header.epoch)
         {
             return Err(invalid(
@@ -186,6 +197,8 @@ impl CoupledConstitutiveRest {
         let mut return_faces = Vec::new();
         let mut returned_predictions = std::collections::BTreeSet::new();
         for (operation_index, op) in header.operations.iter().enumerate() {
+            if magic!=MAGIC&&op.kind.empirical_cut().is_some(){return Err(invalid(
+                "empirical material return requires dependent frame v5"));}
             if op.kind != ConstitutivePassageKind::Return && op.returned.is_some() {
                 return Err(invalid("return metadata on non-return operation"));
             }
@@ -202,8 +215,9 @@ impl CoupledConstitutiveRest {
             } else {
                 Some(read_point(&read_blob(&mut input)?)?)
             });
-            if op.kind == ConstitutivePassageKind::Return {
-                let returned = op.returned.as_ref().ok_or(ConstitutiveFibreError::Shape)?;
+            if op.kind == ConstitutivePassageKind::Return||op.kind.empirical_cut().is_some() {
+                let (prediction,cut)=op.returned_cut().ok_or(ConstitutiveFibreError::Shape)?;
+                let returned=ReturnedHeader{prediction,cut};
                 if !returned_predictions.insert(returned.prediction)
                     || returned.prediction == header.prediction
                 {
@@ -215,11 +229,7 @@ impl CoupledConstitutiveRest {
                 if let Some(prefix) = returned.cut.prefix() {
                     if prefix >= operation_index
                         || returned.prediction
-                            != base
-                                .epoch()
-                                .checked_add(2)
-                                .and_then(|v| v.checked_add(prefix as u64))
-                                .ok_or(ConstitutiveFibreError::Shape)?
+                            != operation_epoch(base.epoch(),&header.operations,prefix)?
                     {
                         return Err(invalid("dependent return predecessor cut"));
                     }
@@ -238,7 +248,9 @@ impl CoupledConstitutiveRest {
                 } else if !base.has_coupled_prediction(returned.prediction) {
                     return Err(invalid("dependent base return predecessor"));
                 }
-                return_faces.push(Some(read_point(&read_blob(&mut input)?)?));
+                return_faces.push(if op.kind==ConstitutivePassageKind::Return {
+                    Some(read_point(&read_blob(&mut input)?)?)
+                }else{None});
             } else {
                 return_faces.push(None);
             }
@@ -254,11 +266,7 @@ impl CoupledConstitutiveRest {
             if op.kind != ConstitutivePassageKind::Advance
                 || op.member != cut.member
                 || op.chart != cut.chart
-                || base
-                    .epoch()
-                    .checked_add(2)
-                    .and_then(|v| v.checked_add(cut.prefix as u64))
-                    != Some(*id)
+                || operation_epoch(base.epoch(),&header.operations,cut.prefix)?!=*id
             {
                 return Err(invalid(
                     "dependent producing cut does not name its actual operation",
@@ -317,14 +325,11 @@ impl CoupledConstitutiveRest {
             .zip(return_faces)
             .enumerate()
         {
-            let operation_id = base_epoch
-                .checked_add(2)
-                .and_then(|v| v.checked_add(index as u64))
-                .ok_or(ConstitutiveFibreError::Shape)?;
-            let retain = header.pending.contains_key(&operation_id)
+            let operation_id=operation_epoch(base_epoch,&operation_metadata,index)?;
+            let retain = meta.kind==ConstitutivePassageKind::Advance&&(header.pending.contains_key(&operation_id)
                 || operation_metadata.iter().skip(index + 1).any(|later| {
-                    later.returned.as_ref().and_then(|r| r.cut.prefix()) == Some(index)
-                });
+                    later.returned_cut().and_then(|(_,cut)|cut.prefix()) == Some(index)
+                }));
             let source = source
                 .map(|v| {
                     s.mount_section_rest(&v)

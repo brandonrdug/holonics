@@ -1,8 +1,8 @@
 # Construction state
 
-**Currency:** September 13, 2026. **Latest returned unit:** resident boundary and internal
-currents through normal formation and joint HNN prediction. The
-[boundary/interior return](research/records/2026-09-13_BOUNDARY_AND_INTERNAL_CURRENTS_FEED_JOINT_HNN_PREDICTION.md)
+**Currency:** September 13, 2026. **Latest returned unit:** empirical observations form
+predictive material at retained producing cuts through the coupled HNN. The
+[empirical return](research/records/2026-09-13_EMPIRICAL_RETURNS_KEEP_SOURCE_FIBRES_AND_FORM_THE_NEXT_PREDICTION.md)
 records its source, equations, measured output and checks. The broader
 [assembly contract](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#boundary-and-interior-assembly-contract)
 continues through encoded transport and changing material/incidence.
@@ -14,14 +14,14 @@ specifies the assembly and formal obligations.
 
 ## Current implementation boundary
 
-[established-bounded; measured] `read_current_source` now carries outgoing current and every
-operative internal b coordinate, retaining its producing cut and source witnesses. Enclosed
-source and target operands feed the common normal moment law; a five-coordinate field source
-with fixed material/contact population formed its transition from eight returns and produced
-two joined future states through `NativeCoupledBody`. Independent coefficient contraction,
-sequential conduct and rest/remount agree. Final checks passed: 169 engine regressions, 21
-HNN/workshop regressions and the HNN public-example Cargo check. One warm joint delivery took
-141217 microseconds; the linked record retains the signed later-field comparison and bounds.
+[established-bounded; measured] The five-coordinate boundary/interior source now completes
+its ninth field observation through `NativeCoupledBody::observe`. Original-source moments,
+signed discrepancy, parameter-dependent material, held-current provenance and the next forecast
+survive delayed return and rest/remount. One warm empirical return took 33417 microseconds on
+the Ryzen 9 7900X / RTX 4080 SUPER; the field cut, wave epoch and material observation count
+remain distinct. The relevant normal suite passed 127 tests, coupled HNN passed 11, and the
+HNN public-example Cargo check passed. The linked record retains the inferred relations,
+source radii, exact comparison scopes and individual timing observations.
 
 [project-postulate] Generators are mathematical functions and constituent compositions,
 including emergent recursive/fractal conduct. The agent-authored Rust-first and code-repair
@@ -50,8 +50,9 @@ situated boundary over intersecting event histories, including actual incidence,
 constitutive storage, clocks and interior return. The
 [composition definition](docs/HNN_COMPOSITION.md#context-names-a-situated-causal-boundary)
 connects those owners to state-space, convolution, diffusion and joint prediction. The returned field specialization binds boundary/interior currents into the generator and
-joint release. Changing the operative material or incidence must now enter its source/action
-map with the corresponding mixed return; the fixed interval is not that extension. S/C
+joint release and observed return. The next source/action map must include the retained
+`OperativeSections.map`, its bounds and caused incidence, with the corresponding mixed
+current/material return; the fixed interval is not that extension. S/C
 restrictions and source-null contrasts are local tools within this dynamics. The fixed-feature normal law and `a=(c-p,c,p)` wave chart
 remain explicit specializations, with their recorded numerical consumer already returned.
 
@@ -61,22 +62,12 @@ segment through the matching factor/recurrence/statistic owner with `E_next T=U 
 including its admitted formation and pending receivers. A fixed-linear power or a source-code
 printer alone does not establish that changing-programme closure.
 
-[definition] The next observed-field binding must carry the prediction discrepancy
-`delta=y-M a`, its original source and enclosure, into the existing normal formation owner.
-The current coupled `incorporate` port accepts a point observation and uses a compatibility
-relation; the field regression uses its fitted point graph for a fixed forecast interval.
-That graph alone is not an empirical-admission law for arbitrary later field data. Bind the
-enclosed comparison and retained discrepancy explicitly while preserving pending producing
-cuts; do not obtain a fitting source by selecting its unknown coordinates from the target.
-
-[open] The consuming empirical return is in progress: for original wave source
-`a=(c-p,c,p)` and produced state v, observed state y supplies target increment `eta=y-c`
-and discrepancy `delta=y-v`. It must update contemporary material using the original source
-family and producing condition. The first finite-enclosure draft failed review and is preserved
-at `.local/recovery/2026-09-13-family-enclosure-draft/`; live native owners remain at the
-verified boundary/interior return. The next construction must derive whole-family moment
-bounds, preserve the historical producing map through material-only rest, and express the same
-formation over dependent condition families without selecting their displayed point.
+[definition] Empirical observation uses `eta=y-c_s` and `delta=y-v_s` at the producing cut.
+It forms current normal material without advancing wave time. Dependent returns pull later
+parameter constraints through the retained word to the jointly supported earlier source and
+prediction; they retain the joins and remain functions of the same parameter family.
+The existing constitutive-incorporation and observed-next ports retain their declared
+condition/material/current-transport contracts.
 
 ## Available returns and unfinished products
 

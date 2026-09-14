@@ -28,6 +28,18 @@ pub(crate) struct PredictiveMaterial<'c> {
     pub(crate) action: ResidentConstitutiveFibre<'c>,
 }
 impl<'c> PredictiveMaterial<'c> {
+    pub(crate) fn stage_enclosed(&self,source:ResidentNormalEnclosureView<'_, 'c>,
+        producing_condition:ResidentConstitutiveCurrent<'_, 'c>,observed:ResidentNormalEnclosureView<'_, 'c>)
+        ->Result<Self,ConstitutiveFibreError>{
+        let next=match self.material.source_chart(){
+            NormalSourceChart::Wave{..}=>self.material.stage_source_observation(source,observed)?,
+            NormalSourceChart::Features{..}=>{
+                let features=source.bilinear_features(producing_condition)?;
+                self.material.stage_source_observation(features.view(),observed)?
+            },
+        };
+        Self::new(next,&self.action)
+    }
     fn action_for(material: &ResidentNormalMaterial<'c>, law: &ResidentConstitutiveFibre<'c>)
         -> Result<ResidentConstitutiveFibre<'c>, ConstitutiveFibreError> {
         let ConstitutiveSourceChart::BilinearContact {source_complex, condition_complex} = law.source_chart
@@ -124,9 +136,12 @@ impl<'c> ResidentNeighborhoodAlternative<'c> {
         source:ResidentConstitutiveCurrent<'_, 'c>,
         observed:ResidentConstitutiveCurrent<'_, 'c>,
         producing_condition:ResidentConstitutiveCurrent<'_, 'c>,
+        predictive_override:Option<&PredictiveMaterial<'c>>,
     )->Result<Self,ConstitutiveFibreError>{
-        let prediction=material.action().read_bilinear(source,prior.successor())?;
-        let predictive=material.stage_prediction(source,producing_condition,observed)?;
+        let predictive_source=predictive_override.or(material.predictive.as_ref());
+        let action=predictive_source.map_or(&material.law,|p|&p.action);
+        let prediction=action.read_bilinear(source,prior.successor())?;
+        let predictive=predictive_source.map(|p|p.stage(source,producing_condition,observed)).transpose()?;
         let family=material.law.read_condition_preimage(source,observed)?;
         let condition=prior.prepare_following(&family)?;
         let staged=material.law.prepare_bilinear_contact(source,condition.successor(),Some(observed))?;
@@ -249,6 +264,11 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
     }
     pub fn predictive_material(&self, member: usize) -> Result<Option<&ResidentNormalMaterial<'c>>, ConstitutiveFibreError> {
         Ok(self.material(member)?.predictive.as_ref().map(|v| &v.material))
+    }
+    pub(crate) fn publish_predictive(&mut self,member:usize,epoch:u64,next:PredictiveMaterial<'c>){
+        debug_assert!(self.usable&&self.epoch==epoch&&self.laws[member].predictive.is_some());
+        self.laws[member].predictive=Some(next);
+        self.epoch=epoch.checked_add(1).expect("staged material epoch");
     }
 
     #[cfg(test)]

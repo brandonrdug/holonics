@@ -1,6 +1,60 @@
 use super::*;
 use crate::native_ecology::constitutive_fibre::ResidentNormalEnclosureView;
 impl<'c> ResidentSurface<'c> {
+    fn normal_family_enclosure_shape(a:usize,y:usize,grain:ResidentGrain)
+        ->Option<(usize,usize,usize,usize,usize)> {
+        let w=a.checked_add(y)?;
+        let report=w.checked_mul(4)?.checked_add(8)?;
+        let output=y.checked_add(1)?.checked_mul(2)?;
+        let graph=a.checked_mul(2)?;
+        let work=a.checked_mul(6)?.checked_add(y.checked_mul(3)?)?.checked_mul(2)?;
+        if a==0 || y==0 || a%2!=0 || y%2!=0 || !(1..=120).contains(&grain.0)
+            || report>u32::MAX as usize || work>u32::MAX as usize {return None;}
+        w.checked_mul(w)?;graph.checked_mul(graph)?;
+        Some((w,report,output,graph,work))
+    }
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_normal_family_enclosure(
+        &self,lane:&Lane<'_, 'c>,report:&ResidentSection<'c>,joint:&ResidentSection<'c>,
+        ab:&ResidentSection<'c>,vertical:&ResidentSection<'c>,anchor:ResidentNormalEnclosureView<'_, 'c>,
+        a:usize,y:usize,grain:ResidentGrain,graph:&ResidentSection<'c>,work:&ResidentSection<'c>,
+        output:&ResidentSection<'c>) ->Result<(),ResidentRefusal>{
+        let fail=||Self::operative_error();
+        let (w,rw,ow,gw,ww)=Self::normal_family_enclosure_shape(a,y,grain).ok_or_else(fail)?;
+        let aw=a.checked_add(1).and_then(|v|v.checked_mul(2)).ok_or_else(fail)?;
+        let end=anchor.offset.checked_add(aw).ok_or_else(fail)?;
+        let capacity=anchor.section.rows.checked_mul(anchor.section.width).ok_or_else(fail)?;
+        if anchor.width!=a || anchor.offset%2!=0 || end>capacity || end>u32::MAX as usize
+            || !(1..=120).contains(&anchor.grain.0) || anchor.section.grain.0!=0
+            || !std::ptr::eq(anchor.surface,self) || !std::ptr::eq(anchor.section.surface,self)
+            || !self.operative_shape(report,1,rw) || !self.operative_shape(joint,w,w)
+            || !self.operative_shape(ab,a,a) || !self.operative_shape(vertical,y,y)
+            || !self.operative_shape(graph,gw,gw) || !self.operative_shape(work,1,ww)
+            || !self.operative_shape(output,1,ow) {return Err(fail());}
+        let mut p=Params::new();
+        for s in [report,joint,ab,vertical,anchor.section] {p.ptr(s.lo.device_ptr()).ptr(s.hi.device_ptr());}
+        p.u32(anchor.offset as u32).u32(anchor.grain.0).u32(a as u32).u32(y as u32).u32(grain.0)
+            .ptr(graph.lo.device_ptr()).ptr(graph.hi.device_ptr()).ptr(work.lo.device_ptr())
+            .ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_normal_family_enclosure",1,self.launch.block_x,0,
+            &mut p,"normal-family-enclosure")
+    }
+    pub(crate) fn record_normal_family_enclosure_point(
+        &self,lane:&Lane<'_, 'c>,report:&ResidentSection<'c>,a:usize,y:usize,
+        grain:ResidentGrain,output:&ResidentSection<'c>) ->Result<(),ResidentRefusal>{
+        let fail=||Self::operative_error();
+        let (_,rw,ow,_,_)=Self::normal_family_enclosure_shape(a,y,grain).ok_or_else(fail)?;
+        if !self.operative_shape(report,1,rw)||!self.operative_shape(output,1,ow){return Err(fail());}
+        let mut p=Params::new();
+        p.ptr(report.lo.device_ptr()).ptr(report.hi.device_ptr())
+            .u32(a as u32).u32(y as u32).u32(grain.0)
+            .ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_normal_family_enclosure_point",1,self.launch.block_x,0,
+            &mut p,"normal-family-enclosure-point")
+    }
+
     fn point_word_shape(roots: usize, steps: usize) -> Option<(usize,usize,usize)> {
         let a=roots.checked_mul(4)?;
         let w=a.checked_mul(2)?.checked_add(2)?;

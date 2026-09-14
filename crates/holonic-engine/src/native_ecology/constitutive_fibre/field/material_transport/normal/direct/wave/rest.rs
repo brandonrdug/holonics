@@ -90,7 +90,7 @@ impl NormalWaveRest {
         if let Some(data) = &self.coupled {
             data.validate(self)?;
             out.write_all(MAGIC).map_err(invalid)?;
-            out.write_all(&[if data.has_pending() { 9 } else { 7 }])
+            out.write_all(&[if data.has_historical_current() { 10 } else if data.has_pending() { 9 } else { 7 }])
                 .map_err(invalid)?;
             let mut bank = Vec::new();
             self.write_normal(&mut bank)?;
@@ -195,7 +195,7 @@ impl NormalWaveRest {
         expect(&mut input, MAGIC)?;
         let mut version = [0];
         input.read_exact(&mut version).map_err(invalid)?;
-        if (7..=9).contains(&version[0]) {
+        if (7..=10).contains(&version[0]) {
             if !allow_coupled {
                 return Err(invalid("coupled state is not a normal source bank"));
             }

@@ -3,6 +3,8 @@ pub(super) mod rest;
 mod comparison;
 mod continuation;
 mod dependent;
+mod observation;
+pub use observation::NormalCoupledObservation;
 pub use dependent::{ConstitutiveComparisonSection, ConstitutiveSourceFrame,ResidentCoupledConstitutive,CoupledConstitutiveRefusal,ConstitutiveSourceRefusal,CoupledConstitutiveRest};
 pub use continuation::{NormalCoupledContinuation, NormalContinuationPullback, NormalContinuationJoin};
 use comparison::CoupledProducingCut;
@@ -19,6 +21,9 @@ pub struct NormalWaveCoupled<'c> {
     current: Rc<NormalWaveFamily<'c>>,
     epoch: u64,
     neighborhood_base: u64,
+    // Neighborhood cut whose action produced the held current. Formation alone
+    // advances neighborhood standing while this source cut stays unchanged.
+    current_neighborhood_epoch: u64,
     next_contact: u64,
     active_member: Option<usize>,
     bindings: BTreeMap<u64, Rc<CoupledBinding<'c>>>,
@@ -152,6 +157,7 @@ impl<'c> ResidentNormalWave<'c> {
                 let mode = NormalWaveCoupled {
                     epoch: self.epoch,
                     neighborhood_base: neighborhood.epoch(),
+                    current_neighborhood_epoch: neighborhood.epoch(),
                     neighborhood,
                     current: Rc::new(current),
                     next_contact: 1,
@@ -531,6 +537,7 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         self.continuation.epoch = next;
         self.continuation.active_member = Some(contact.member());
         self.continuation.current = Rc::clone(&successor);
+        self.continuation.current_neighborhood_epoch=self.continuation.neighborhood.epoch();
         // Admissions name one source occurrence. External receipts retain their old source,
         // but no admission can silently act again at a different continuation.
         self.continuation.bindings.clear();

@@ -4,7 +4,29 @@ use crate::native_ecology::constitutive_fibre::{
     normal_feature_workspace_words,
 };
 impl<'c> ResidentSurface<'c> {
-    fn validate_normal_input(
+    pub(crate) fn record_normal_enclose_input(&self,lane:&Lane<'_, 'c>,
+        input:ResidentNormalInput<'_, 'c>,grain:ResidentGrain,out:&ResidentSection<'c>)
+        ->Result<(),ResidentRefusal>{
+        let fail=||Self::operative_error();
+        let d=input.width();
+        let words=d.checked_add(1).and_then(|v|v.checked_mul(2)).ok_or_else(fail)?;
+        if d==0||d%2!=0||words>u32::MAX as usize||!(1..=120).contains(&grain.0)
+            ||!self.operative_shape(out,1,words){return Err(fail());}
+        self.validate_normal_input(input,grain.0)?;
+        let mut p=Params::new();
+        match input {
+            ResidentNormalInput::Point(v)=>{p.ptr(v.section.lo.device_ptr()).ptr(v.section.hi.device_ptr())
+                .u32(v.offset as u32).u32(v.denominator.map_or(u32::MAX,|n|n as u32))
+                .u32(v.disposition.map_or(u32::MAX,|n|n as u32)).u32(0);},
+            ResidentNormalInput::Enclosed(v)=>{p.ptr(v.section.lo.device_ptr()).ptr(v.section.hi.device_ptr())
+                .u32(v.offset as u32).u32(u32::MAX).u32(u32::MAX).u32(1);},
+        }
+        p.u32(d as u32).u32(grain.0).ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_normal_enclose_input",1,self.launch.block_x,0,
+            &mut p,"normal-input-enclosure")
+    }
+    pub(super) fn validate_normal_input(
         &self,
         input: ResidentNormalInput<'_, 'c>,
         grain: u32,

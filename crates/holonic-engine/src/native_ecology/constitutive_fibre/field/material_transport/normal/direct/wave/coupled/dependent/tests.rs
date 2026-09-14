@@ -606,3 +606,71 @@ fn base_return_retains_root_invisible_source_parameters() {
     assert_eq!(model.rest().unwrap(),saved);
     eprintln!("root-compatible hidden base fibre: h=11/5-2i/5 versus 5/2-i/2");
 }
+
+#[test]
+#[ignore="requires CUDA; empirical returns remain functions of theta across original and programme producing cuts"]
+fn dependent_observation_keeps_parameter_material_and_separate_wave_clocks() {
+    use super::super::comparison::joint::tests::source_parameters_at;
+    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
+    let grain=ResidentGrain(8);
+    let h=point(&s,&[1,0]);let mut compatible=law(&s,false);
+    compatible.advance_bilinear_contact(current(&point(&s,&[0;6])),current(&h),Some(current(&point(&s,&[1,0])))).unwrap();
+    let mut second=law(&s,false);
+    second.advance_bilinear_contact(current(&point(&s,&[0;6])),current(&h),Some(current(&point(&s,&[1,0])))).unwrap();
+    let mut local=ResidentGeneratorNeighborhood::with_shared_condition(vec![compatible,second],current(&h),ConditionContactMetric::UnitAdmittanceRealification).unwrap();
+    for member in 0..2 {local.attach_normal_prediction(member,ResidentNormalMaterial::found_features(&s,7,1,grain).unwrap()).unwrap_or_else(|(_,e)|panic!("{e}"));}
+    let values=[1i128,0,2,0,1].into_iter().flat_map(|x|{let v=x<<grain.0;[v as i64,(v>>64) as i64]}).map(|v|(v,v)).collect::<Vec<_>>();
+    let ball=s.mount_section_rest(&ResidentSectionRest::found(1,values.len(),ResidentGrain(0),64,values).unwrap()).unwrap();
+    let seed=ResidentNormalEnclosureView{surface:&s,section:&ball,offset:0,width:4,grain};
+    let mut wave=ResidentNormalMaterial::found(&s,1,1,grain).unwrap().into_joint_difference_wave(seed).unwrap().with_neighborhood(local).unwrap();
+    let c=wave.admit_contact(1).unwrap();let original=wave.predict_contact(&c).unwrap().handle;
+    let c=wave.admit_contact(0).unwrap();let root=wave.predict_contact(&c).unwrap().handle;
+    let y=point(&s,&[3,0]);let comparison=wave.compare_coupled_prediction(&root,current(&y)).unwrap();
+    let coordinates=[2,1].map(|c|source_parameters_at(&comparison,&[1,0,c,0],&[c,0,c,0]));
+    let parameters=coordinates.iter().map(|p|s.mount_exact_rational_packet(p).unwrap()).collect::<Vec<_>>();
+    let receiver=s.mount_exact_rational_packet(&coordinates[0]).unwrap();
+    let mut model=wave.into_constitutive_continuation(comparison,receiver).unwrap();
+    for (index,y) in [[4,0],[5,0]].into_iter().enumerate(){
+        let id=if index==0 {original.id()}else{model.predict_member(1,WaveSourceReceiver::Direct).unwrap()};
+        let before=parameters.iter().map(|p|{
+            let value=ResidentCoupledConstitutive::evaluate_programme(&mut model.base,&model.comparison,
+                &model.operations.iter().collect::<Vec<_>>(),p,None).unwrap().0;
+            let m=value.predictive_for(1,Some(model.base.neighborhood().material(1).unwrap())).unwrap().unwrap();
+            (m.material.observations(),m.material.inspect().unwrap().cross_source,value.successor_section().rest().unwrap())
+        }).collect::<Vec<_>>();
+        let epoch=model.epoch();let passages=model.passages();let input=point(&s,&y);let reads=s.census().section_read_outs;
+        model.observe_prediction(id,current(&input)).unwrap();
+        assert_eq!(s.census().section_read_outs,reads);
+        assert_eq!(model.epoch(),epoch);assert_eq!(model.passages(),passages);assert!(!model.has_prediction(id));
+        let after=parameters.iter().zip(&before).map(|(p,(observations,old,current))|{
+            let mut value=ResidentCoupledConstitutive::evaluate_programme(&mut model.base,&model.comparison,
+                &model.operations.iter().collect::<Vec<_>>(),p,None).unwrap().0;
+            assert_eq!(value.successor_section().rest().unwrap(),*current);
+            let m=value.predictive_for(1,Some(model.base.neighborhood().material(1).unwrap())).unwrap().unwrap();
+            assert_eq!(m.material.observations(),observations+1);
+            let after=m.material.inspect().unwrap().cross_source;
+            let receipt=value.take_observation().unwrap();
+            assert!(!receipt.continuation().is_empty());
+            let condition=receipt.produced_family().last_relation().unwrap().fixed_condition();
+            let f=receipt.source().bilinear_features(condition).unwrap().inspect().unwrap();
+            let eta=receipt.target_increment().inspect().unwrap();
+            for j in 0..7 {assert_eq!(after[0][j],old[0][j].add(&eta.center[0].multiply(&f.center[j].conjugate())));}
+            after
+        }).collect::<Vec<_>>();
+        assert_ne!(after[0],after[1],"the parameter generator was collapsed to its displayed material");
+    }
+    let epoch=model.epoch();let next=model.predict_member(0,WaveSourceReceiver::Direct).unwrap();
+    assert_eq!(next,epoch+1);assert_eq!(model.material_returns(),3);
+    let saved=model.rest().unwrap();let mut bytes=Vec::new();saved.write(&mut bytes).unwrap();
+    let mut resumed=CoupledConstitutiveRest::read(&mut bytes.as_slice(),bytes.len() as u64).unwrap().remount(&s).unwrap();
+    assert_eq!(resumed.rest().unwrap(),saved);assert!(resumed.has_prediction(next));
+    for p in &parameters {
+        let a=ResidentCoupledConstitutive::evaluate_programme(&mut model.base,&model.comparison,
+            &model.operations.iter().collect::<Vec<_>>(),p,None).unwrap().0;
+        let b=ResidentCoupledConstitutive::evaluate_programme(&mut resumed.base,&resumed.comparison,
+            &resumed.operations.iter().collect::<Vec<_>>(),p,None).unwrap().0;
+        assert_eq!(a.successor_section().rest().unwrap(),b.successor_section().rest().unwrap());
+        assert_eq!(a.predictive_for(1,Some(model.base.neighborhood().material(1).unwrap())).unwrap().unwrap().material.inspect().unwrap().cross_source,
+            b.predictive_for(1,Some(resumed.base.neighborhood().material(1).unwrap())).unwrap().unwrap().material.inspect().unwrap().cross_source);
+    }
+}

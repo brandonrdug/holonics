@@ -144,7 +144,7 @@ fn field_interiors_form_and_feed_the_coupled_prediction() {
     }
     let epoch = body.epoch();
     let reads = s.census().section_read_outs;
-    body.advance(0, WaveSourceReceiver::Direct, false).unwrap();
+    let pending=body.advance(0, WaveSourceReceiver::Direct, true).unwrap().unwrap();
     assert_eq!(s.census().section_read_outs, reads);
     assert_eq!(body.epoch(), epoch + 1);
     let state = body.inspect_current().unwrap();
@@ -160,7 +160,8 @@ fn field_interiors_form_and_feed_the_coupled_prediction() {
         .remount(&s)
         .unwrap();
     assert_eq!(resumed.inspect_current().unwrap(), state);
-    let actual = step(&mut field).enclosure().inspect().unwrap();
+    let actual_source=step(&mut field);
+    let actual = actual_source.enclosure().inspect().unwrap();
     let prediction = waves(&forecast["states"][1]["projection"]["current"]);
     let residual = prediction
         .iter()
@@ -168,4 +169,42 @@ fn field_interiors_form_and_feed_the_coupled_prediction() {
         .map(|(p, a)| p.subtract(a))
         .collect::<Vec<_>>();
     eprintln!("boundary transport: {n} complex state coordinates, 8 measured returns, 2 future states, delivery_us={delivery_us}; source_radius={}, actual_radius={}, prediction_minus_actual_center={}",pair.inspect().unwrap().radius,actual.radius,serde_json::to_string(&residual).unwrap());
+
+    let before_epoch=body.epoch();let reads=s.census().section_read_outs;
+    let started=std::time::Instant::now();
+    let returned=body.observe(pending,actual_source.enclosure()).unwrap();
+    let observation_us=started.elapsed().as_micros();
+    assert_eq!(s.census().section_read_outs,reads);
+    assert_eq!((returned.predecessor_observations,returned.successor_observations),(8,9));
+    assert_eq!(body.epoch(),before_epoch);assert_eq!(body.pending_coupled_predictions(),0);
+    assert_eq!(body.inspect_current().unwrap(),state);
+    let source=returned.source().inspect().unwrap();
+    let target=returned.target_increment().inspect().unwrap();
+    let discrepancy=returned.discrepancy().inspect().unwrap();
+    let squared_error=residual.iter().zip(&discrepancy.center).map(|(prediction_minus_actual,c)|{
+        let delta=prediction_minus_actual.scaled(&num_rational::BigRational::from_integer((-1).into())).subtract(c);
+        &delta.real*&delta.real+&delta.imaginary*&delta.imaginary
+    }).sum::<num_rational::BigRational>();
+    assert!(squared_error<=&discrepancy.radius*&discrepancy.radius);
+    let after=body.affine_wave().unwrap().neighborhood().predictive_material(0).unwrap().unwrap().inspect().unwrap();
+    for row in 0..n {for col in 0..3*n {
+        assert_eq!(after.cross_source[row][col],fitted.cross_source[row][col]
+            .add(&target.center[row].multiply(&source.center[col].conjugate())));
+    }}
+    // Rest directly after formation must retain the old held map alongside new M.
+    let saved=body.rest().unwrap();let mut wire=Vec::new();saved.write(&mut wire).unwrap();
+    resumed=SavedCoupledBody::read(&mut wire.as_slice(),wire.len() as u64).unwrap().remount(&s).unwrap();
+    assert_eq!(resumed.inspect_current().unwrap(),state);
+    let expected=body.inspect_prospective(&[(0,WaveSourceReceiver::Direct)],true).unwrap();
+    assert_eq!(resumed.inspect_prospective(&[(0,WaveSourceReceiver::Direct)],true).unwrap(),expected);
+    let held=body.affine_wave().unwrap().current().read_receiver().unwrap().inspect().unwrap()
+        .projected_joint.unwrap().chunks_exact(2)
+        .map(|v|ExactComplexWaveCurrent::new(v[0].clone(),v[1].clone())).collect::<Vec<_>>();
+    let (p,c)=held.split_at(n);
+    let a=c.iter().zip(p).map(|(c,p)|c.subtract(p)).chain(c.iter().cloned()).chain(p.iter().cloned()).collect::<Vec<_>>();
+    let expected_current=after.material.coefficients.iter().zip(c).map(|(row,c)|{
+        row.iter().zip(&a).fold(c.clone(),|v,(m,a)|v.add(&m.multiply(a)))
+    }).collect::<Vec<_>>();
+    assert_eq!(waves(&expected["states"][1]["projection"]["current"]),expected_current);
+    eprintln!("boundary empirical return: field_cut={}, wave_epoch={}, material_observations=9, observation_us={observation_us}, source_radius={}, target_radius={}, discrepancy_radius={}",actual_source.field_cut(),body.epoch(),source.radius,target.radius,discrepancy.radius);
 }

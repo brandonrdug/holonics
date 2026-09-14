@@ -5,10 +5,10 @@
 use super::super::NativeSessionError;
 use holonic_engine::{
     native_ecology::constitutive_fibre::{
-        ConstitutiveSourceRefusal, CoupledConstitutiveRest, NormalCoupledContact,
+        ConstitutiveSourceRefusal, CoupledConstitutiveRest, NormalCoupledContact, NormalCoupledObservation,
         NormalFamilyBasisFace, NormalWaveBasisChart, NormalWaveCoupled, NormalWaveRest,
         ResidentConstitutiveCurrent, ResidentConstitutiveSection, ResidentCoupledConstitutive,
-        ResidentNormalWave, WaveSourceReceiver,
+        ResidentNormalWave, ResidentNormalInput, WaveSourceReceiver,
     },
     resident_section::{ResidentSection, ResidentSurface},
 };
@@ -427,6 +427,20 @@ impl<'c> NativeCoupledBody<'c> {
                 self.state = Some(BodyState::Affine(refusal.wave));
                 Err(refusal.reason.into())
             }
+        }
+    }
+    /// Empirical normal formation at the original producing source. The return
+    /// carries y-v and y-c as resident families. This does not advance wave time;
+    /// a dependent body retains the same operation over its parameter generator.
+    pub fn observe<'a>(&mut self,id:u64,observed:impl Into<ResidentNormalInput<'a,'c>>)
+        ->Result<NormalCoupledObservation<'c>,NativeSessionError> where 'c:'a {
+        let observed=observed.into();
+        match self.state_mut()? {
+            BodyState::Affine(wave)=>{
+                let handle=wave.pending_coupled_prediction(id)?;
+                Ok(wave.observe_coupled_prediction(&handle,observed)?)
+            },
+            BodyState::Constitutive(body)=>Ok(body.observe_prediction(id,observed)?),
         }
     }
     pub fn release(&mut self, id: u64) -> Result<(), NativeSessionError> {

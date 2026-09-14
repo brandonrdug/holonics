@@ -1,5 +1,6 @@
 use super::*;
 use crate::native_ecology::constitutive_fibre::ResidentConstitutiveImage;
+mod enclosure;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 pub enum NormalFamilySupport {
@@ -43,6 +44,8 @@ pub struct NormalWaveFamilyReceiver<'a, 'c> {
     point_word: Option<Vec<Rc<ResidentWaveRelation<'c>>>>,
     report: ResidentSection<'c>,
     vertical: Option<ResidentSection<'c>>,
+    joint: Option<ResidentSection<'c>>,
+    anchor_basis: Option<ResidentSection<'c>>,
 }
 impl<'a, 'c> NormalWaveFamilyReceiver<'a, 'c> {
     pub(super) fn report(&self) -> &ResidentSection<'c> { &self.report }
@@ -207,7 +210,8 @@ impl<'c> NormalWaveFamily<'c> {
         p.close(0,&report,64)?;
         let returned=p.finish()?.launch()?;
         if !returned.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("point-word: {:?}",returned.obstruction)));}
-        Ok(NormalWaveFamilyReceiver {source:self,image:None,point_word:Some(word),report,vertical:None})
+        Ok(NormalWaveFamilyReceiver {source:self,image:None,point_word:Some(word),report,vertical:None,
+            joint:None,anchor_basis:None})
     }
     pub(in super::super) fn check_prospective_shape(&self, steps:usize) -> Result<(),ConstitutiveFibreError> {
         let a=self.origin.fibre().roots.checked_mul(4).ok_or(ConstitutiveFibreError::Shape)?;
@@ -311,6 +315,8 @@ impl<'c> NormalWaveFamily<'c> {
             point_word: None,
             report,
             vertical: Some(vertical),
+            joint: Some(joint),
+            anchor_basis: Some(ab),
         })
     }
 }

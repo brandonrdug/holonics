@@ -112,12 +112,14 @@ pub struct NormalContinuationJoin<'c> {
     factor: usize,
     transport: Rc<ResidentWaveRelation<'c>>,
     source: Rc<NormalWaveFamily<'c>>,
-    supported_source: NormalWaveFamily<'c>,
-    supported_target: NormalWaveFamily<'c>,
+    supported_source: Rc<NormalWaveFamily<'c>>,
+    supported_target: Rc<NormalWaveFamily<'c>>,
     joint: ResidentConstitutiveReturn<'c>,
     constraints: ResidentSection<'c>,
 }
 impl<'c> NormalContinuationJoin<'c> {
+    pub(super) fn supported_source_shared(&self)->Rc<NormalWaveFamily<'c>>{Rc::clone(&self.supported_source)}
+    pub(super) fn supported_target_shared(&self)->Rc<NormalWaveFamily<'c>>{Rc::clone(&self.supported_target)}
     pub fn epoch(&self) -> u64 {
         self.epoch
     }
@@ -144,6 +146,7 @@ impl<'c> NormalContinuationJoin<'c> {
     }
 }
 impl<'a, 'c> NormalContinuationPullback<'a, 'c> {
+    pub(super) fn into_joins(self)->Vec<NormalContinuationJoin<'c>>{self.joins}
     pub fn source(&self) -> &NormalWaveFamily<'c> {
         self.source
     }
@@ -208,8 +211,8 @@ pub(super) fn read_retained_word_pullback<'a,'c>(
                 factor,
                 transport,
                 source,
-                supported_source,
-                supported_target,
+                supported_source:Rc::new(supported_source),
+                supported_target:Rc::new(supported_target),
                 joint,
                 constraints,
             });

@@ -395,6 +395,16 @@ The native source retains all internal coordinates, including a nonzero pair hid
 present aggregate. This is a consuming source specialization within the full event-boundary
 assembly; changing incidence/material still requires its own action and mixed-return map.
 
+[established-bounded; implemented-exact] The [empirical return](../research/records/2026-09-13_EMPIRICAL_RETURNS_KEEP_SOURCE_FIBRES_AND_FORM_THE_NEXT_PREDICTION.md)
+now binds a later observed state through `NativeCoupledBody::observe`. It forms the existing
+normal moments from the producing source and condition, with `eta=y-c_s` and `delta=y-v_s`
+retained as different receivers. Affine and dependent bodies use this same operation. A later
+parameter constraint reaches an earlier prediction through the existing joined-word pullback;
+the earlier source marginal alone does not establish that correlation. Local normal formation
+and wave transport keep separate clocks, and remount retains the historical producing map.
+The nine-observation field consumer, two-member parameter family and their next forecasts
+are verified at the scopes recorded there.
+
 ## Producing comparison and architecture laws
 
 [definition] The [mass–energy synthesis](MASS_ENERGY_AND_CAUSAL_TRANSPORT.md) places the

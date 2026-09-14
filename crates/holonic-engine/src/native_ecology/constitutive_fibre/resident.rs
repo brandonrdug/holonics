@@ -478,7 +478,7 @@ mod contact_tests;
 mod law_rest_tests;
 
 mod neighborhood;
-pub(crate) use neighborhood::{GeneratorMaterial, ResidentNeighborhoodAlternative};
+pub(crate) use neighborhood::{GeneratorMaterial, PredictiveMaterial, ResidentNeighborhoodAlternative};
 mod read;
 pub use neighborhood::{
     GeneratorNeighborhoodRest, GeneratorNeighborhoodStep, NeighborhoodEvidence,

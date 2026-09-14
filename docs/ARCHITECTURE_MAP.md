@@ -243,6 +243,17 @@ kernels use the existing wide report and preserve the original source; unresolve
 their full relation or return an obstruction. `NativeCoupledBody` exposes these same owners to
 numerical applications, with explicit material/current receiver inspections.
 
+[definition] `wave/coupled/observation.rs` owns `NormalCoupledObservation` and affine
+empirical publication. `wave/coupled/dependent.rs` retains the same operation over its original
+Base/Programme frame; `continuation.rs` supplies the backward joins and shares their immutable
+supported families. `wave/family/receiver/enclosure.rs` and `normal_family_enclosure.cuh`
+derive whole-family output bounds. Direct normal input conversion, restriction, wave-source
+and bilinear feature receivers share the existing moment owner. `NativeCoupledBody::observe`
+is the common consuming port. Wave rest v10 retains a held map older than its current material;
+dependent rest v5 records empirical operations without adding wave ticks. The
+[empirical return](../research/records/2026-09-13_EMPIRICAL_RETURNS_KEEP_SOURCE_FIBRES_AND_FORM_THE_NEXT_PREDICTION.md)
+records the field consumer, parameter-family correction and checks.
+
 [definition] `wave/family/section.rs` and `section_coupled_family_section` evaluate a conditional
 source section for the dependent generator. `wave/coupled/comparison/constitutive.rs` now joins
 that section through the actual historical word before applying new material at contemporary

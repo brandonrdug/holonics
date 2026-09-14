@@ -34,7 +34,8 @@ fn specimen<'c>(
     let w = t + 1;
     let mut words = vec![0i64; w + 4 + t * t];
     words[1..w].copy_from_slice(&origin);
-    words[w] = 1;
+    // The homogeneous lambda numerator carries the common affine denominator.
+    words[w] = if origin[0] > 0 { origin[0] } else { 1 };
     words[w + 1] = if empty {
         1
     } else if directions.is_empty() {
@@ -420,4 +421,121 @@ fn source_bound_refusal_does_not_block_the_anchored_family() {
         restored.anchor().inspect().unwrap(),
         family.anchor().inspect().unwrap()
     );
+}
+
+#[test]
+#[ignore = "requires CUDA; bounded projected family enclosure returns an outer resident ball"]
+fn enclosure_identity_retains_unit_anchor_radius_without_host_readout() {
+    let ro = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&ro).unwrap();
+    let mut origin = [0; 10]; origin[0] = 1;
+    let directions = (0..4).map(|i| { let mut d=[0;10]; d[2+i]=1; d[6+i]=1; d }).collect();
+    let family = specimen(&s, [0;4], 1, 72, origin, directions, false);
+    let receiver = family.read_receiver().unwrap();
+    let before = s.census().section_read_outs;
+    let enclosure = receiver.enclosure(ResidentGrain(72)).unwrap();
+    assert_eq!(s.census().section_read_outs, before);
+    let reading = enclosure.inspect().unwrap();
+    assert_eq!(reading.center, vec![ExactComplexWaveCurrent::zero(); 2]);
+    assert_eq!(reading.radius, rat(1, 1));
+}
+
+#[test]
+#[ignore = "requires CUDA; projected rank-one family carries an exact fractional radius"]
+fn enclosure_scaled_rank_one_rounds_out_the_negative_fractional_image() {
+    let ro = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&ro).unwrap();
+    let mut d=[0;10]; d[2]=3; d[6]=-1;
+    let mut origin=[0;10]; origin[0]=1;
+    let family=specimen(&s,[0;4],1,72,origin,vec![d],false);
+    let receiver=family.read_receiver().unwrap();
+    let enclosure=receiver.enclosure(ResidentGrain(8)).unwrap();
+    let radius=enclosure.inspect().unwrap().radius;
+    assert!(radius >= rat(1,3));
+    assert!(radius <= rat(1,3)+rat(1,256));
+}
+
+#[test]
+#[ignore = "requires CUDA; unresolved vertical output directions refuse outer enclosure formation"]
+fn enclosure_refuses_vertical_output_while_receiver_remains_supported() {
+    let ro=ResidentReadout::new().unwrap(); let s=ResidentSurface::on(&ro).unwrap();
+    let mut origin=[0;10]; origin[0]=1;
+    let mut vertical=[0;10]; vertical[6]=1;
+    let family=specimen(&s,[0;4],1,72,origin,vec![vertical],false);
+    let receiver=family.read_receiver().unwrap();
+    assert_eq!(receiver.inspect().unwrap().support, NormalFamilySupport::Supported);
+    assert!(receiver.enclosure(ResidentGrain(72)).is_err());
+}
+
+#[test]
+#[ignore = "requires CUDA; a source outside the retained anchor ball has no bounded enclosure"]
+fn enclosure_refuses_an_affine_family_outside_its_anchor_ball() {
+    let ro=ResidentReadout::new().unwrap(); let s=ResidentSurface::on(&ro).unwrap();
+    let mut origin=[0;10]; origin[0]=1; origin[2]=2;
+    let family=specimen(&s,[0;4],1,72,origin,vec![],false);
+    let receiver=family.read_receiver().unwrap();
+    assert_eq!(receiver.inspect().unwrap().support, NormalFamilySupport::OutsideAnchorBall);
+    assert!(receiver.enclosure(ResidentGrain(72)).is_err());
+}
+
+#[test]
+#[ignore = "requires CUDA; partial anchor projection retains the joint projected centre and bound"]
+fn enclosure_partial_anchor_matches_projected_joint_centre() {
+    let ro=ResidentReadout::new().unwrap(); let s=ResidentSurface::on(&ro).unwrap();
+    let mut origin=[0;10]; origin[0]=1; origin[6]=1; origin[8]=3;
+    let mut anchor=[0;10]; anchor[2]=1; anchor[3]=1; anchor[8]=2;
+    let family=specimen(&s,[1,0,0,0],1,72,origin,vec![anchor],false);
+    let receiver=family.read_receiver().unwrap();
+    let expected=receiver.inspect().unwrap().projected_joint.unwrap();
+    let enclosure=receiver.enclosure(ResidentGrain(72)).unwrap();
+    let reading=enclosure.inspect().unwrap();
+    let actual=reading.center.iter().flat_map(|z| [z.real.clone(),z.imaginary.clone()]).collect::<Vec<_>>();
+    assert_eq!(actual,expected);
+    assert_eq!(actual,vec![rat(1,1),rat(0,1),rat(4,1),rat(0,1)]);
+    // AP_U maps (x,y,0,0) to (0,0,x+y,0): max row/column norm is 2.
+    assert_eq!(reading.radius,rat(2,1));
+}
+
+#[test]
+#[ignore = "requires CUDA; a non-dyadic projected centre remains covered after high-grain rounding"]
+fn enclosure_non_dyadic_centre_keeps_positive_rounding_radius() {
+    let ro=ResidentReadout::new().unwrap(); let s=ResidentSurface::on(&ro).unwrap();
+    let mut origin=[0;10]; origin[0]=3; origin[6]=1;
+    let family=specimen(&s,[0;4],0,72,origin,vec![],false);
+    let receiver=family.read_receiver().unwrap();
+    assert_eq!(receiver.inspect().unwrap().projected_joint.unwrap()[0],rat(1,3));
+    for grain in [8,72] {
+        let before=s.census().section_read_outs;
+        let enclosure=receiver.enclosure(ResidentGrain(grain)).unwrap();
+        assert_eq!(s.census().section_read_outs,before);
+        let reading=enclosure.inspect().unwrap();
+        let unit=Rat::new(1.into(),num_bigint::BigInt::from(1)<<grain);
+        assert_eq!(reading.radius,unit);
+        assert!(reading.center[0].real<=rat(1,3));
+        assert!(reading.center[0].real.clone()+reading.radius>=rat(1,3));
+    }
+}
+
+#[test]
+#[ignore = "requires CUDA; generated point words retain the rounding error of their whole joint output"]
+fn enclosure_point_word_keeps_non_dyadic_rounding() {
+    use super::super::super::comparison_tests::{current,point};
+    use super::super::tests::law;
+    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
+    let member=law(&s,false);let h=point(&s,&[1,0]);
+    let map=Rc::new(member.read_wave_relation(current(&h),1).unwrap());
+    let mut origin=[0;10];origin[0]=3;origin[6]=1;
+    let family=specimen(&s,[0;4],0,72,origin,vec![],false);
+    let receiver=family.read_point_word(vec![map]).unwrap();
+    let exact=receiver.inspect().unwrap().projected_joint.unwrap();
+    let before=s.census().section_read_outs;
+    let enclosure=receiver.enclosure(ResidentGrain(8)).unwrap();
+    assert_eq!(s.census().section_read_outs,before);
+    let reading=enclosure.inspect().unwrap();
+    assert!(reading.radius>Rat::zero());
+    let mut error=Rat::zero();
+    for (a,b) in reading.center.iter().flat_map(|z|[&z.real,&z.imaginary]).zip(exact) {
+        let e=a-b;error+=if e<Rat::zero(){-e}else{e};
+    }
+    assert!(error<=reading.radius);
 }

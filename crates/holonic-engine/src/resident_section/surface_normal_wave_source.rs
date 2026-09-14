@@ -7,6 +7,12 @@ impl<'c> ResidentSurface<'c> {
         roots: usize,
         source: &ResidentSection<'c>,
     ) -> Result<(), ResidentRefusal> {
+        self.record_normal_wave_source_in_chart(lane,joint,roots,ResidentGrain(1),0,source)
+    }
+    pub(crate) fn record_normal_wave_source_in_chart(
+        &self,lane:&Lane<'_, 'c>,joint:&ResidentSection<'c>,roots:usize,grain:ResidentGrain,
+        receiver:u32,source:&ResidentSection<'c>,
+    )->Result<(),ResidentRefusal>{
         let fail = || Self::operative_error();
         let joint_width = roots
             .checked_mul(8)
@@ -16,7 +22,7 @@ impl<'c> ResidentSurface<'c> {
             .checked_mul(12)
             .and_then(|n| n.checked_add(2))
             .ok_or_else(fail)?;
-        if roots == 0
+        if roots == 0 || receiver>1 || !(1..=120).contains(&grain.0)
             || source_width > u32::MAX as usize
             || !self.operative_shape(joint, 1, joint_width)
             || !self.operative_shape(source, 1, source_width)
@@ -27,6 +33,7 @@ impl<'c> ResidentSurface<'c> {
         p.ptr(joint.lo.device_ptr())
             .ptr(joint.hi.device_ptr())
             .u32(roots as u32)
+            .u32(grain.0).u32(receiver)
             .ptr(source.lo.device_ptr())
             .ptr(source.hi.device_ptr())
             .ptr(lane.slot)

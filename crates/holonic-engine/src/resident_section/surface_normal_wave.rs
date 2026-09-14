@@ -4,6 +4,42 @@ use crate::native_ecology::constitutive_fibre::{
     normal_material_state_words, normal_material_workspace_words,
 };
 impl<'c> ResidentSurface<'c> {
+    pub(crate) fn record_normal_enclosure_features(&self,lane:&Lane<'_, 'c>,
+        source:ResidentNormalEnclosureView<'_, 'c>,condition:ResidentConstitutiveCurrent<'_, 'c>,
+        out:&ResidentSection<'c>)->Result<(),ResidentRefusal>{
+        let fail=||Self::operative_error();let d=source.width;let k=condition.width;
+        self.validate_normal_input(ResidentNormalInput::Enclosed(source),source.grain.0)?;
+        self.validate_constitutive_current_view(condition)?;
+        let f=d.checked_mul(k/2).and_then(|v|v.checked_add(d)?.checked_add(k)).ok_or_else(fail)?;
+        let words=f.checked_add(1).and_then(|v|v.checked_mul(2)).ok_or_else(fail)?;
+        if d==0||k==0||d%2!=0||k%2!=0||words>u32::MAX as usize
+            ||!self.operative_shape(out,1,words){return Err(fail());}
+        let mut p=Params::new();
+        p.ptr(source.section.lo.device_ptr()).ptr(source.section.hi.device_ptr()).u32(source.offset as u32).u32(d as u32)
+            .ptr(condition.section.lo.device_ptr()).ptr(condition.section.hi.device_ptr()).u32(condition.offset as u32)
+            .u32(condition.denominator.map_or(u32::MAX,|n|n as u32)).u32(condition.disposition.map_or(u32::MAX,|n|n as u32))
+            .u32(k as u32).u32(source.grain.0).ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_normal_enclosure_features",1,self.launch.block_x,0,
+            &mut p,"normal-enclosure-features")
+    }
+    pub(crate) fn record_normal_enclosure_restrict(&self,lane:&Lane<'_, 'c>,
+        source:ResidentNormalEnclosureView<'_, 'c>,start:usize,count:usize,out:&ResidentSection<'c>)
+        ->Result<(),ResidentRefusal>{
+        let fail=||Self::operative_error();
+        self.validate_normal_input(ResidentNormalInput::Enclosed(source),source.grain.0)?;
+        let words=count.checked_add(1).and_then(|v|v.checked_mul(2)).ok_or_else(fail)?;
+        if count==0||count%2!=0||start%2!=0||source.width>u32::MAX as usize
+            ||start.checked_add(count).is_none_or(|v|v>source.width)
+            ||!self.operative_shape(out,1,words){return Err(fail());}
+        let mut p=Params::new();
+        p.ptr(source.section.lo.device_ptr()).ptr(source.section.hi.device_ptr())
+            .u32(source.offset as u32).u32(source.width as u32).u32(start as u32).u32(count as u32)
+            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_normal_enclosure_restrict",1,self.launch.block_x,0,
+            &mut p,"normal-enclosure-restriction")
+    }
     pub(crate) fn record_normal_enclosure_pair(&self,lane:&Lane<'_, 'c>,
         left:ResidentNormalEnclosureView<'_, 'c>,right:ResidentNormalEnclosureView<'_, 'c>,
         kind:u32,out:&ResidentSection<'c>)->Result<(),ResidentRefusal>{

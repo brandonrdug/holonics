@@ -27,6 +27,8 @@ struct PassageHeader {
 struct Header {
     epoch: u64,
     neighborhood_base: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    current_neighborhood_epoch: Option<u64>,
     next_contact: u64,
     active_member: Option<usize>,
     contacts: Vec<ContactHeader>,
@@ -51,6 +53,9 @@ pub(in super::super) struct CoupledRestData {
     transport: BTreeMap<u64, Vec<NormalWaveRelationRest>>,
 }
 impl CoupledRestData {
+    pub(in super::super) fn has_historical_current(&self)->bool{
+        self.header.current_neighborhood_epoch.is_some()
+    }
     pub(in super::super) fn members(&self) -> usize {
         self.neighborhood.members()
     }
@@ -88,6 +93,7 @@ impl CoupledRestData {
             || self.family.passages() != delta
             || self.family.current_epoch()? != self.header.epoch
             || self.header.neighborhood_base.checked_add(delta) != Some(self.neighborhood.epoch())
+            || self.header.current_neighborhood_epoch.is_some_and(|e|e>=self.neighborhood.epoch())
             || self.header.contacts.len() != self.relations.len()
         {
             return Err(ConstitutiveFibreError::Shape);
@@ -106,7 +112,9 @@ impl CoupledRestData {
         ) {
             (None, None, 0) => {}
             (Some(j), Some(last), d) if d > 0 => {
-                if last.roots() != n || last.relation_cut() != self.neighborhood.action_cut(j)? {
+                let cut=self.neighborhood.action_cut(j)?;
+                if last.roots() != n || last.relation_cut()>cut
+                    || (!self.has_historical_current()&&last.relation_cut()!=cut) {
                     return Err(ConstitutiveFibreError::Shape);
                 }
             }
@@ -235,6 +243,8 @@ impl CoupledRestData {
         version: u8,
     ) -> Result<Self, ConstitutiveFibreError> {
         let mut header: Header = serde_json::from_slice(&read_blob(input)?).map_err(invalid)?;
+        if version<10&&header.current_neighborhood_epoch.is_some(){return Err(invalid(
+            "material-only current provenance requires wave rest v10"));}
         if version < 9 && !header.passages.is_empty() {
             return Err(invalid("pending continuation requires wave rest v9"));
         }
@@ -345,6 +355,8 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
             header: Header {
                 epoch: mode.epoch,
                 neighborhood_base: mode.neighborhood_base,
+                current_neighborhood_epoch:(mode.current_neighborhood_epoch!=mode.neighborhood.epoch())
+                    .then_some(mode.current_neighborhood_epoch),
                 next_contact: mode.next_contact,
                 active_member: mode.active_member,
                 contacts,
@@ -375,8 +387,11 @@ impl NormalWaveRest {
         data.validate(&self)?;
         let base = self.remount(s, progress)?;
         let neighborhood = data.neighborhood.remount(s)?;
+        let current_neighborhood_epoch=data.header.current_neighborhood_epoch.unwrap_or(neighborhood.epoch());
         let mut family = data.family.remount(s)?;
-        if let Some(j) = data.header.active_member {
+        // A material-only return leaves the historical producing map on the family.
+        // Current contact admissions still derive from contemporary standing below.
+        if let Some(j) = data.header.active_member.filter(|_|data.header.current_neighborhood_epoch.is_none()) {
             let receiver = family
                 .last_relation()
                 .ok_or(ConstitutiveFibreError::Shape)?
@@ -474,6 +489,7 @@ impl NormalWaveRest {
             }
         }
         Ok(base.with_continuation(NormalWaveCoupled {
+            current_neighborhood_epoch,
             neighborhood,
             current,
             epoch: data.header.epoch,

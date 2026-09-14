@@ -526,6 +526,23 @@ material also changes the source action when applicable:
 The local moment increment is not a claim to have computed that complete dependency return.
 An adjoint uses the actual producing morphology, including retained overlays.
 
+[definition] `NativeCoupledBody::observe` now exposes empirical normal formation at a retained
+prediction. Its input is a point or enclosed observed state y; its source is the producing
+family, with target increment `eta=y-c_s` and comparison `delta=y-v_s`. Whole-family bounds
+enter the common moment law, and the full source/produced relation remains retained. Formation
+increments the local material observation count while the held current keeps its original map
+and wave clock. A later action uses the returned material. Constitutive `incorporate` remains
+the operation that additionally develops the source/condition/law relation and transports its
+specified successor.
+
+[definition] In a dependent return, an earlier source must be joined to the current parameter
+section through the saved word before moment formation. Reuse the complete pullback and retain
+its supported source, original predicted target and joining constraints; the new y does not
+select an unknown source coordinate. A normal-only change to another member is a difference
+over its immutable base material, evaluated at each parameter assignment. The
+[empirical construction](../../research/records/2026-09-13_EMPIRICAL_RETURNS_KEEP_SOURCE_FIBRES_AND_FORM_THE_NEXT_PREDICTION.md)
+supplies the source-qualified field return and the two-member separating case for this law.
+
 [definition] The family incorporation law states what an observation constrains. For a source
 family x(θ), observation v and condition h, retain the joint relation among θ, h and the local
 law yielding v−c(θ). Existential compatibility, imposing a law on every family member, and

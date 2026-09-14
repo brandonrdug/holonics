@@ -72,6 +72,23 @@ impl ResidentNormalInput<'_, '_> {
         }
     }
 }
+impl<'a,'c> ResidentNormalInput<'a,'c> {
+    /// Use the common normal-input conversion, retaining its full radius and any
+    /// rational-to-dyadic rounding. An existing enclosure must have the requested grain.
+    pub fn enclosure(self,surface:&'c ResidentSurface<'c>,grain:ResidentGrain)
+        ->Result<ResidentNormalEnclosure<'c>,ConstitutiveFibreError>{
+        let width=self.width();
+        let words=width.checked_add(1).and_then(|v|v.checked_mul(2)).ok_or(ConstitutiveFibreError::Shape)?;
+        let section=surface.fresh_section(1,words,ResidentGrain(0))?;
+        let mut p=surface.begin_passage(&[vec![]])?;
+        {let lane=p.open(0,&[])?;surface.record_normal_enclose_input(&lane,self,grain,&section)?;}
+        p.close(0,&section,64)?;
+        let r=p.finish()?.launch()?;
+        if !r.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!(
+            "normal input enclosure: {:?}",r.obstruction)));}
+        Ok(ResidentNormalEnclosure{surface,section,width,grain})
+    }
+}
 impl<'a, 'c> From<ResidentConstitutiveCurrent<'a, 'c>> for ResidentNormalInput<'a, 'c> {
     fn from(v: ResidentConstitutiveCurrent<'a, 'c>) -> Self {
         Self::Point(v)

@@ -719,7 +719,7 @@ pub use direct::{
     CoupledConstitutiveRefusal, CoupledConstitutiveRest, CoupledJointEvaluation,
     CoupledJointReading, FamilyBasisReading, FamilyBasisSelection, NormalBasisScore,
     NormalBasisSelection, NormalContinuationJoin, NormalContinuationPullback,
-    NormalCoupledAttachRefusal, NormalCoupledComparison, NormalCoupledContact,
+    NormalCoupledAttachRefusal, NormalCoupledComparison, NormalCoupledObservation, NormalCoupledContact,
     NormalCoupledContinuation, NormalCoupledPrediction, NormalCoupledProducingHandle,
     NormalCoupledReception, NormalCoupledSourceActuation, NormalCoupledStep, NormalFamilyBasisFace,
     NormalFamilyComparisonRow, NormalFamilyPullback, NormalFamilyReceiverReading,

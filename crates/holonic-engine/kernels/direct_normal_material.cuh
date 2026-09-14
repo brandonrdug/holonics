@@ -1,6 +1,39 @@
 // Direct current attachment to the existing unit-prior normal law. Source coordinates are the
 // three declared complex port blocks; no field source handle or history table is an operand.
 // The packed source ball and rational observed current are transient passage carriers.
+__device__ void direct_normal_source_ball(
+    const int64_t *lo,const int64_t *hi,uint32_t at,uint32_t den_at,uint32_t status_at,
+    uint32_t kind,uint32_t d,uint32_t grain,wide *out,uint32_t *slot){
+    if(!d||(d&1u)||grain<1||grain>120||kind>1){atomicOr(slot,REFUSED_MALFORMED);return;}
+    if(kind){
+        for(size_t j=0;j<2u*((size_t)d+1u);++j)if(lo[at+j]!=hi[at+j]){
+            atomicOr(slot,REFUSED_MALFORMED);return;
+        }
+        const wide *ball=(const wide *)(lo+at);
+        if(ball[d]<0){atomicOr(slot,REFUSED_MALFORMED);return;}
+        for(uint32_t j=0;j<=d;++j)out[j]=ball[j];
+    }else{
+        wide den=fibre_current_denominator(lo,hi,den_at,status_at,slot),S=(wide)1<<grain;
+        wide radius=0;
+        for(uint32_t j=0;j<d&&! *slot;++j){
+            if(lo[at+j]!=hi[at+j]){atomicOr(slot,REFUSED_MALFORMED);return;}
+            wide lower=signed_product_divide_2(lo[at+j],S/2,den,0,slot);
+            wide upper=signed_product_divide_2(lo[at+j],S/2,den,1,slot);
+            out[j]=lo[at+j]<0?upper:lower;
+            if(lower!=upper)radius=add_checked(radius,1,slot);
+        }
+        out[d]=radius;
+    }
+}
+extern "C" __global__ void section_normal_enclose_input(
+    const int64_t *lo,const int64_t *hi,uint32_t at,uint32_t den_at,uint32_t status_at,
+    uint32_t kind,uint32_t d,uint32_t grain,int64_t *out,int64_t *out_hi,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+    if(blockIdx.x||threadIdx.x||upstream_refused(census,lineage,lineage_count,slot))return;
+    direct_normal_source_ball(lo,hi,at,den_at,status_at,kind,d,grain,(wide *)out,slot);
+    if(*slot)return;
+    for(size_t j=0;j<2u*((size_t)d+1u);++j)out_hi[j]=out[j];
+}
 __device__ void direct_normal_pack_sources_with_target_kind(
     const int64_t *xlo,const int64_t *xhi,uint32_t xa,uint32_t xd,uint32_t xs,uint32_t xkind,
     const int64_t *ylo,const int64_t *yhi,uint32_t ya,uint32_t yd,uint32_t ys,uint32_t ykind,
@@ -9,25 +42,7 @@ __device__ void direct_normal_pack_sources_with_target_kind(
     wide *current=(wide *)input;
     int64_t *incoming=input+NORMAL_WIDE_WORDS*2u*(d+1u);
         if(!m||!targets||grain<1||grain>120||observed>1||xkind>1||ykind>1){atomicOr(slot,REFUSED_MALFORMED);}
-        if(!*slot&&xkind==1){
-            for(size_t j=0;j<NORMAL_WIDE_WORDS*(d+1u);++j)
-                if(xlo[xa+j]!=xhi[xa+j])atomicOr(slot,REFUSED_MALFORMED);
-            const wide *ball=(const wide *)(xlo+xa);
-            if(ball[d]<0)atomicOr(slot,REFUSED_MALFORMED);
-            if(!*slot)for(uint32_t j=0;j<=d;++j)current[d+1u+j]=ball[j];
-        }
-        if(!*slot&&xkind==0){
-            wide den=fibre_current_denominator(xlo,xhi,xd,xs,slot),S=(wide)1<<grain;
-            wide radius=0;
-            for(uint32_t j=0;j<d&&! *slot;++j){
-                if(xlo[xa+j]!=xhi[xa+j]){atomicOr(slot,REFUSED_MALFORMED);break;}
-                wide lo=signed_product_divide_2(xlo[xa+j],S/2,den,0,slot);
-                wide hi=signed_product_divide_2(xlo[xa+j],S/2,den,1,slot);
-                current[d+1u+j]=xlo[xa+j]<0?hi:lo;
-                if(lo!=hi)radius=add_checked(radius,1,slot);
-            }
-            current[2u*(d+1u)-1u]=radius;
-        }
+        if(!*slot)direct_normal_source_ball(xlo,xhi,xa,xd,xs,xkind,d,grain,current+d+1u,slot);
         if(!*slot&&ykind==1){
             for(uint32_t j=0;j<2u*(2u*targets+1u);++j)
                 if(ylo[ya+j]!=yhi[ya+j])atomicOr(slot,REFUSED_MALFORMED);

@@ -2,7 +2,7 @@
 //! substitution retains the SAME theta in x(theta), eta(theta), condition and material return.
 //! The family is a generator of alternatives, never the span/union of their material rows.
 use super::*;
-use crate::native_ecology::constitutive_fibre::resident::{GeneratorMaterial, ResidentNeighborhoodAlternative};
+use crate::native_ecology::constitutive_fibre::resident::{GeneratorMaterial, PredictiveMaterial, ResidentNeighborhoodAlternative};
 use crate::native_ecology::constitutive_fibre::{
     ConditionContactReading, ConstitutiveFibreReturn, PreparedConditionContact,
 };
@@ -25,6 +25,10 @@ pub struct CoupledConstitutiveAlternative<'p, 'j, 'c> {
     consequence: ResidentNeighborhoodAlternative<'c>,
     material_member: usize,
     earlier_material: BTreeMap<usize, GeneratorMaterial<'c>>,
+    // Only normal components changed on otherwise immutable base members.
+    // Full locally formed members retain their predictive component in-place.
+    predictive_updates: BTreeMap<usize, PredictiveMaterial<'c>>,
+    last_observation: Option<NormalCoupledObservation<'c>>,
     path: Vec<(
         u64,
         usize,
@@ -179,6 +183,8 @@ impl<'w, 'j, 'c> CoupledConstitutiveFamily<'w, 'j, 'c> {
             consequence: consequence.into_alternative()?,
             material_member: c.member(),
             earlier_material: BTreeMap::new(),
+            predictive_updates: BTreeMap::new(),
+            last_observation: None,
             path,
             base_cuts,
             returns: Vec::new(),
@@ -256,7 +262,7 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
         other: Option<&GeneratorMaterial<'c>>,
         chart: WaveSourceReceiver,
     ) -> Result<ResidentWaveRelation<'c>, ConstitutiveFibreError> {
-        let law = self.material_for(member, other)?.action();
+        let law = self.action_for(member, other)?;
         law.read_wave_relation_in_chart(
             self.condition().successor(),
             self.comparison.relation().roots(),
@@ -301,6 +307,31 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
                 .or(other)
                 .ok_or(ConstitutiveFibreError::Shape)
         }
+    }
+    pub(in super::super) fn predictive_for<'a>(&'a self,member:usize,other:Option<&'a GeneratorMaterial<'c>>)
+        ->Result<Option<&'a PredictiveMaterial<'c>>,ConstitutiveFibreError>{
+        Ok(self.predictive_updates.get(&member).or(self.material_for(member,other)?.predictive.as_ref()))
+    }
+    fn action_for<'a>(&'a self,member:usize,other:Option<&'a GeneratorMaterial<'c>>)
+        ->Result<&'a ResidentConstitutiveFibre<'c>,ConstitutiveFibreError>{
+        let material=self.material_for(member,other)?;
+        Ok(self.predictive_updates.get(&member).map_or_else(||material.action(),|v|&v.action))
+    }
+    pub(in super::super) fn observe_material(&mut self,id:u64,cut:Rc<CoupledProducingCut<'c>>,
+        observed:ResidentNormalInput<'_, 'c>,other:Option<&GeneratorMaterial<'c>>,
+        joins:Vec<NormalContinuationJoin<'c>>)
+        ->Result<(),ConstitutiveFibreError>{
+        let member=cut.member;
+        let material=self.predictive_for(member,other)?.ok_or(ConstitutiveFibreError::Shape)?;
+        let (receipt,next)=NormalCoupledObservation::prepare(id,cut,observed,material)?;
+        if member==self.material_member {self.consequence.material.predictive=Some(next);}
+        else if let Some(material)=self.earlier_material.get_mut(&member) {material.predictive=Some(next);}
+        else {self.predictive_updates.insert(member,next);}
+        self.last_observation=Some(receipt.with_continuation(joins));
+        Ok(())
+    }
+    pub(in super::super) fn take_observation(&mut self)->Option<NormalCoupledObservation<'c>>{
+        self.last_observation.take()
     }
     pub(in super::super) fn bind_successor(
         &mut self,
@@ -356,6 +387,7 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
             source,
             observed,
             operands.comparison.relation().fixed_condition(),
+            self.predictive_updates.get(&member),
         )?;
         let map = Rc::new(next.material.action().read_wave_relation_in_chart(
             next.condition.successor(),
@@ -375,6 +407,7 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
                 .insert(self.material_member, old.material);
         }
         self.earlier_material.remove(&member);
+        self.predictive_updates.remove(&member);
         self.material_member = member;
         self.returns.push(operands);
         Ok(())
@@ -410,7 +443,7 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
         source: ResidentConstitutiveCurrent<'_, 'c>,
         passage: u64,
     ) -> Result<(), ConstitutiveFibreError> {
-        let law = self.material_for(member, other)?.action();
+        let law = self.action_for(member, other)?;
         let relation = law.read_wave_relation_in_chart(
             self.condition().successor(),
             self.comparison.relation().roots(),
