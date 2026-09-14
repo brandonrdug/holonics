@@ -28,6 +28,53 @@ extern "C" __global__ void section_constitutive_relation_image(
     // source remainder stays in the borrowed source object, not in an unrelated residual chart.
     if(pf[pk+1u]==1){coverage[0]=coverage_hi[0]=3;return;}
     uint32_t ignored=0,rank=0;
+    // A single-valued relation which carries the entire supplied affine family can be
+    // applied to its origin and generators directly. This retains every joined variable;
+    // it avoids a second nullspace solve with large, mutually cancelling coefficients.
+    bool functional=true;
+    for(uint32_t p=c;p<w;++p)if(basis[(size_t)p*w+p])functional=false;
+    if(functional)for(uint32_t p=0;p<=c;++p){
+        for(uint32_t i=0;i<w;++i)r[i]=i<c?(p==c?pf[ps+i]:pf[(size_t)pk+4u+(size_t)p*c+i]):0;
+        wide den=p==c?pf[pk]:1;
+        fibre_query(basis,c,w,r,&den,nullptr,-1,&ignored,&rank,slot);if(*slot)return;
+        if(ignored!=0){functional=false;break;}
+    }
+    if(functional){
+        // An equivalent residual graph consists of free output residual rows together
+        // with kernel rows (d,A d), for every retained source direction d.
+        for(uint32_t j=0;j<y;++j){
+            for(uint32_t i=0;i<k;++i)row[i]=0;
+            row[c+j]=row[w+c+j]=1;
+            condition_stage_row(graph,graph_hi,k,row,slot);if(*slot)return;
+        }
+        for(uint32_t p=0;p<c;++p){
+            const int64_t *v=pf+(size_t)pk+4u+(size_t)p*c;
+            for(uint32_t i=0;i<w;++i)r[i]=i<c?v[i]:0;
+            wide den=1;fibre_query(basis,c,w,r,&den,nullptr,-1,&ignored,&rank,slot);if(*slot)return;
+            for(uint32_t i=0;i<k;++i)row[i]=0;
+            for(uint32_t i=0;i<c;++i)row[w+i]=product_checked(v[i],den,slot);
+            for(uint32_t j=0;j<y;++j)row[w+c+j]=sub_checked(0,r[c+j],slot);
+            if(*slot)return;condition_stage_row(graph,graph_hi,k,row,slot);if(*slot)return;
+        }
+        wide cd=pf[pk],den=cd;
+        for(uint32_t i=0;i<w;++i)r[i]=i<c?pf[ps+i]:0;
+        fibre_query(basis,c,w,r,&den,nullptr,-1,&ignored,&rank,slot);if(*slot)return;
+        wide common=fibre_lcm(cd,den,slot);
+        for(uint32_t i=0;i<k;++i)q[i]=0;
+        for(uint32_t i=0;i<c;++i)q[w+i]=product_checked(pf[ps+i],common/cd,slot);
+        for(uint32_t j=0;j<y;++j)q[w+c+j]=sub_checked(0,product_checked(r[c+j],common/den,slot),slot);
+        if(*slot)return;fibre_normalize(q,k,&common,slot);if(*slot)return;
+        for(uint32_t i=0;i<w;++i){wide value=i<c?0:q[w+i];to_word(value,slot);rhs[i]=rhs_hi[i]=(int64_t)value;}
+        to_word(common,slot);if(*slot)return;rhs[w]=rhs_hi[w]=(int64_t)common;
+        uint32_t directions=0;rank=0;
+        for(uint32_t p=0;p<k;++p)if(graph[(size_t)p*k+p]){++rank;if(p>=w)++directions;}
+        condition_store_report(graph,w,k,q,common,directions?2:0,rank,joint,joint_hi,slot);if(*slot)return;
+        condition_project(joint,w,w,0,c,domain_basis,domain_basis_hi,domain,domain_hi,row,slot);
+        condition_project(joint,w,w,c,y,out_basis,out_basis_hi,out,out_hi,row,slot);if(*slot)return;
+        for(uint32_t j=0;j<y;++j)safe[j]=safe_hi[j]=out[w+j];
+        safe[y]=safe_hi[y]=out[w+y];safe[y+1u]=safe_hi[y+1u]=out[w+y+1u];
+        return;
+    }
     for(uint32_t column=0;column<w;++column){
         for(uint32_t i=0;i<w;++i)r[i]=0;
         if(column<c)for(uint32_t i=0;i<c;++i)r[i]=pf[(size_t)pk+4u+(size_t)column*c+i];

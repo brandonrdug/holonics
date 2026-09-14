@@ -1626,6 +1626,8 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 #include "enclosed_field_junction.cuh"
 #include "field_material_transport.cuh"
 #include "field_current_history_source.cuh"
+#include "field_current_source.cuh"
+#include "normal_wave_source_join.cuh"
 #include "field_complete_material_transport.cuh"
 #include "field_moment_material.cuh"
 #include "field_contextual_material.cuh"

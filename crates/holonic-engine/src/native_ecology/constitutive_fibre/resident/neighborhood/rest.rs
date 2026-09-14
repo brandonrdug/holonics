@@ -56,11 +56,7 @@ impl GeneratorNeighborhoodRest {
     /// and from formation occurrences in the compatibility relation.
     pub(crate) fn action_cut(&self, member: usize) -> Result<u64, ConstitutiveFibreError> {
         match self.predictive_material(member)? {
-            Some(material) => match material.source_chart() {
-                NormalSourceChart::Features {source_complex} => source_complex.checked_mul(2)
-                    .and_then(|v|u64::try_from(v).ok()).ok_or(ConstitutiveFibreError::Shape),
-                _ => Err(ConstitutiveFibreError::Shape),
-            },
+            Some(_) => self.laws.get(member).and_then(|law|u64::try_from(law.source_width()).ok()).ok_or(ConstitutiveFibreError::Shape),
             None => self.laws.get(member).map(|v|v.occurrences()).ok_or(ConstitutiveFibreError::Shape),
         }
     }
@@ -112,10 +108,11 @@ impl GeneratorNeighborhoodRest {
                 .and_then(|n| n.checked_add(ns))
                 .and_then(|n| n.checked_add(nc))
                 .ok_or(ConstitutiveFibreError::Shape)?;
-            if material.source_chart()
-                != (NormalSourceChart::Features {
-                    source_complex: features,
-                })
+            let admitted=match material.source_chart() {
+                NormalSourceChart::Features{source_complex}=>source_complex==features,
+                NormalSourceChart::Wave{roots}=>roots.checked_mul(3)==Some(ns),
+            };
+            if !admitted
                 || law.target_width() % 2 != 0
                 || material.targets() != law.target_width() / 2
             {

@@ -1,4 +1,5 @@
 use super::*;
+mod boundary;
 use holonic_engine::{
     native_ecology::constitutive_fibre::{
         ConditionContactMetric, ResidentConstitutiveCurrent, ResidentConstitutiveFibre,

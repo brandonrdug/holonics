@@ -73,6 +73,8 @@ fn main() {
     println!("cargo:rerun-if-changed=kernels/exact_conic_support.cu");
     println!("cargo:rerun-if-changed=kernels/exact_integer.cuh");
     println!("cargo:rerun-if-changed=kernels/field_current_history_source.cuh");
+    println!("cargo:rerun-if-changed=kernels/field_current_source.cuh");
+    println!("cargo:rerun-if-changed=kernels/normal_wave_source_join.cuh");
     println!("cargo:rerun-if-changed=kernels/field_complete_material_transport.cuh");
     println!("cargo:rerun-if-changed=kernels/field_moment_material.cuh");
     println!("cargo:rerun-if-changed=kernels/field_contextual_material.cuh");

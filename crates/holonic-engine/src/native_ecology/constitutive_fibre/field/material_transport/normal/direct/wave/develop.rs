@@ -16,6 +16,16 @@ pub(super) struct JointSeed<'c> {
     pub(super) current: NormalWaveCurrent<'c>,
 }
 impl<'c> ResidentNormalMaterial<'c> {
+    /// Found the existing wave from a declared joint (p,c) outer source. The original source
+    /// stays borrowed during construction; no centre is used as an exact initial pair.
+    pub fn into_joint_difference_wave(self, joint:ResidentNormalEnclosureView<'_, 'c>)
+        ->Result<ResidentNormalWave<'c>,NormalWaveSeedRefusal<'c>> {
+        let valid=matches!(self.source_chart,NormalSourceChart::Wave{roots} if roots==self.targets && joint.components()==4*roots)
+            &&joint.grain()==self.grain&&std::ptr::eq(self.surface,joint.surface);
+        if !valid {return Err(NormalWaveSeedRefusal{material:self,reason:ConstitutiveFibreError::Shape});}
+        let owned=match joint.to_owned(){Ok(v)=>v,Err(reason)=>return Err(NormalWaveSeedRefusal{material:self,reason})};
+        self.into_joint_wave(Rc::new(owned.section),0)
+    }
     pub(super) fn prepare_joint_seed(
         &self,
         joint: &ResidentSection<'c>,

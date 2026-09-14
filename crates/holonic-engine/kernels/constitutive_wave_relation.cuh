@@ -15,6 +15,11 @@ extern "C" __global__ void section_constitutive_wave_relation(
     uint32_t f=(uint32_t)f64,l=(uint32_t)l64,q=(uint32_t)q64,u=(uint32_t)u64,g=(uint32_t)g64;
     uint32_t a=4u*n,r=2u*n,source_width=6u*n,hwidth=2u*kc,z_at=2u+a,eta_at=z_at+2u*r;
     for(size_t i=0;i<(size_t)l*l;++i)if(basis[i]!=basis_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+    // For a total single-valued law, the pullback is the graph of its direct application.
+    // Building a second residual/nullspace graph only introduces avoidable determinant growth.
+    // Partial domains and vertical fibres still use the complete kernel construction below.
+    bool total=true;
+    for(uint32_t p=0;p<l;++p)if((basis[(size_t)p*l+p]!=0)!=(p<f))total=false;
     if(receiver)for(uint32_t p=0;p<l;++p){
         wide sum=0;for(uint32_t i=0;i<n;++i)sum=add_checked(sum,basis[(size_t)p*l+f+2u*i],slot);
         if(*slot)return;if(sum){atomicOr(slot,REFUSED_MALFORMED);return;}
@@ -25,7 +30,7 @@ extern "C" __global__ void section_constitutive_wave_relation(
     for(size_t i=0;i<(size_t)g*g;++i)graph[i]=graph_hi[i]=0;
     for(size_t i=0;i<(size_t)(2u*q)*(2u*q);++i)derived[i]=derived_hi[i]=0;
     wide scale=product_checked(hd,receiver?n:1u,slot);if(*slot)return;
-    for(uint32_t col=0;col<u;++col){
+    for(uint32_t col=0;col<(total?q:u);++col){
         for(uint32_t i=0;i<l;++i)residual[i]=0;
         if(col<2u){
             // The constant feature h becomes h*lambda; mixed features remain a*h.
@@ -56,13 +61,26 @@ extern "C" __global__ void section_constitutive_wave_relation(
         }
         if(*slot)return;
         wide den=scale;uint32_t ignored=0,rank=0;
-        fibre_query(basis,l,l,residual,&den,nullptr,-1,&ignored,&rank,slot);if(*slot)return;
+        fibre_query(basis,total?f:l,l,residual,&den,nullptr,-1,&ignored,&rank,slot);if(*slot)return;
+        if(total){
+            if(ignored!=0){atomicOr(slot,REFUSED_MALFORMED);return;}
+            for(uint32_t i=0;i<2u*q;++i)row[i]=0;
+            row[col]=den;
+            if(col<z_at)row[q+col]=den;
+            if(col>=z_at+r)row[q+z_at+col-z_at-r]=den;
+            for(uint32_t j=0;j<r;++j){
+                row[q+z_at+r+j]=sub_checked(col==z_at+r+j?den:0,residual[f+j],slot);
+            }
+            if(*slot)return;
+            condition_stage_row(derived,derived_hi,2u*q,row,slot);if(*slot)return;
+            continue;
+        }
         for(uint32_t i=0;i<g;++i)row[i]=i<l?residual[i]:(i-l==col?den:0);
         condition_stage_row(graph,graph_hi,g,row,slot);if(*slot)return;
     }
     // Residual-prefix-zero graph rows are exactly the kernel. Map them into the complete
     // input/output graph and eliminate dependent mapped rows with the existing relation owner.
-    for(uint32_t pivot=0;pivot<u;++pivot){
+    for(uint32_t pivot=0;!total&&pivot<u;++pivot){
         const int64_t *v=graph+(size_t)(l+pivot)*g+l;
         if(!v[pivot])continue;
         for(uint32_t i=0;i<2u*q;++i)row[i]=0;

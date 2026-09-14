@@ -230,6 +230,9 @@ pub const KERNELS: [&str; 50] = [
     "section_contract_join",
 ];
 
+#[path = "resident_section/surface_field_current_source.rs"]
+mod surface_field_current_source;
+
 /// `CUdevice_attribute` selectors from `cuda.h`, fixed by the foreign interface.
 const ATTRIBUTE_MAX_THREADS_PER_BLOCK: i32 = 1;
 const ATTRIBUTE_MAX_GRID_DIM_X: i32 = 5;

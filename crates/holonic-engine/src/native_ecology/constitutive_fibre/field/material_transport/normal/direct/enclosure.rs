@@ -4,7 +4,7 @@ use super::*;
 /// there is no point-current conversion. The producing return keeps its finer operand relation.
 #[derive(Clone, Copy)]
 pub struct ResidentNormalEnclosureView<'a, 'c> {
-    pub(super) surface: &'c ResidentSurface<'c>,
+    pub(crate) surface: &'c ResidentSurface<'c>,
     pub(crate) section: &'a ResidentSection<'c>,
     pub(crate) offset: usize,
     pub(crate) width: usize,
@@ -12,9 +12,9 @@ pub struct ResidentNormalEnclosureView<'a, 'c> {
 }
 pub struct ResidentNormalEnclosure<'c> {
     pub(super) surface: &'c ResidentSurface<'c>,
-    section: ResidentSection<'c>,
-    width: usize,
-    grain: ResidentGrain,
+    pub(super) section: ResidentSection<'c>,
+    pub(super) width: usize,
+    pub(super) grain: ResidentGrain,
 }
 impl<'c> ResidentNormalEnclosure<'c> {
     pub fn view(&self) -> ResidentNormalEnclosureView<'_, 'c> {

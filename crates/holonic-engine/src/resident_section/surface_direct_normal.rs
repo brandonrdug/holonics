@@ -1,9 +1,36 @@
 use super::*;
 use crate::native_ecology::constitutive_fibre::{
-    normal_feature_report_words, normal_feature_state_words, normal_feature_workspace_words,
-    ResidentConstitutiveCurrent, ResidentNormalInput,
+    ResidentNormalInput, normal_feature_report_words, normal_feature_state_words,
+    normal_feature_workspace_words,
 };
 impl<'c> ResidentSurface<'c> {
+    fn validate_normal_input(
+        &self,
+        input: ResidentNormalInput<'_, 'c>,
+        grain: u32,
+    ) -> Result<(), ResidentRefusal> {
+        match input {
+            ResidentNormalInput::Point(v) => self.validate_constitutive_current_view(v),
+            ResidentNormalInput::Enclosed(v) => {
+                let end = v
+                    .width
+                    .checked_add(1)
+                    .and_then(|n| n.checked_mul(2))
+                    .and_then(|n| v.offset.checked_add(n));
+                if v.grain.0 != grain
+                    || v.section.grain.0 != 0
+                    || !std::ptr::eq(v.surface, self)
+                    || !std::ptr::eq(v.section.surface, self)
+                    || v.offset % 2 != 0
+                    || v.offset > u32::MAX as usize
+                    || end.is_none_or(|end| end > v.section.rows * v.section.width)
+                {
+                    return Err(Self::operative_error());
+                }
+                Ok(())
+            }
+        }
+    }
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn record_normal_refine(
         &self,
@@ -60,7 +87,7 @@ impl<'c> ResidentSurface<'c> {
         lane: &Lane<'_, 'c>,
         state: &ResidentSection<'c>,
         source: ResidentNormalInput<'_, 'c>,
-        observed: Option<ResidentConstitutiveCurrent<'_, 'c>>,
+        observed: Option<ResidentNormalInput<'_, 'c>>,
         sources: usize,
         targets: usize,
         grain: u32,
@@ -90,7 +117,7 @@ impl<'c> ResidentSurface<'c> {
             || r > u32::MAX as usize
             || !(1..=120).contains(&grain)
             || source.width() != d
-            || observed.is_some_and(|v| v.width != r)
+            || observed.is_some_and(|v| v.width() != r)
             || observed.is_some() != next.is_some()
             || observed.is_some() != after.is_some()
             || !self.operative_shape(state, 1, state_words)
@@ -102,23 +129,9 @@ impl<'c> ResidentSurface<'c> {
         {
             return Err(fail());
         }
-        match source {
-            ResidentNormalInput::Point(v) => self.validate_constitutive_current_view(v)?,
-            ResidentNormalInput::Enclosed(v) => {
-                if v.grain.0 != grain
-                    || v.section.grain.0 != 0
-                    || !std::ptr::eq(v.section.surface, self)
-                    || v.offset % 2 != 0
-                    || v.offset
-                        .checked_add(2 * (d + 1))
-                        .is_none_or(|end| end > v.section.rows * v.section.width)
-                {
-                    return Err(fail());
-                }
-            }
-        }
-        if let Some(v) = observed {
-            self.validate_constitutive_current_view(v)?;
+        self.validate_normal_input(source, grain)?;
+        if let Some(value) = observed {
+            self.validate_normal_input(value, grain)?;
         }
         let mut p = Params::new();
         p.ptr(state.lo.device_ptr());
@@ -141,17 +154,29 @@ impl<'c> ResidentSurface<'c> {
             }
         }
         if let Some(v) = observed {
-            p.ptr(v.section.lo.device_ptr())
-                .ptr(v.section.hi.device_ptr())
-                .u32(v.offset as u32)
-                .u32(v.denominator.map_or(u32::MAX, |n| n as u32))
-                .u32(v.disposition.map_or(u32::MAX, |n| n as u32));
+            match v {
+                ResidentNormalInput::Point(v) => p
+                    .ptr(v.section.lo.device_ptr())
+                    .ptr(v.section.hi.device_ptr())
+                    .u32(v.offset as u32)
+                    .u32(v.denominator.map_or(u32::MAX, |n| n as u32))
+                    .u32(v.disposition.map_or(u32::MAX, |n| n as u32))
+                    .u32(0),
+                ResidentNormalInput::Enclosed(v) => p
+                    .ptr(v.section.lo.device_ptr())
+                    .ptr(v.section.hi.device_ptr())
+                    .u32(v.offset as u32)
+                    .u32(u32::MAX)
+                    .u32(u32::MAX)
+                    .u32(1),
+            };
         } else {
             p.ptr(before.lo.device_ptr())
                 .ptr(before.hi.device_ptr())
                 .u32(0)
                 .u32(u32::MAX)
-                .u32(u32::MAX);
+                .u32(u32::MAX)
+                .u32(0);
         }
         p.u32(sources as u32)
             .u32(targets as u32)

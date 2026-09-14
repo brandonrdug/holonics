@@ -73,7 +73,7 @@ fn assert_fresh_moments(field: &NativeConstitutiveField<'_>) {
             surface.detach_section(full, 64).unwrap());
     }
 }
-fn seed() -> Vec<NativeJunctionSeed> {
+pub(super) fn seed() -> Vec<NativeJunctionSeed> {
     vec![NativeJunctionSeed {
         incoming_admittance: 1,
         held_admittance: 1,
@@ -81,7 +81,7 @@ fn seed() -> Vec<NativeJunctionSeed> {
         initial_held: NativePhaseCurrent::zero(),
     }]
 }
-fn populate(field: &mut NativeConstitutiveField<'_>) {
+pub(super) fn populate(field: &mut NativeConstitutiveField<'_>) {
     let mut latest = None;
     let mut anchor = None;
     for at in 0..4 {

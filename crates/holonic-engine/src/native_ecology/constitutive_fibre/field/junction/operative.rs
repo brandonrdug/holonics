@@ -31,10 +31,12 @@ pub(in super::super) mod rest;
 mod current_factor;
 mod propagation;
 mod map_source;
+mod source;
 use map_source::{OperativeMapProgram,OperativeSourceOverlap};
 use propagation::CausalPropagationSections;
 pub use propagation::{NativeCausalContactPropagation,NativeCausalContactPropagationReading,NativeCausalContactJoinReading};
 pub use current_factor::NativeOperativeCurrentFactorCondensation;
+pub use source::NativeFieldCurrentSource;
 
 pub(in super::super) struct OperativeSections<'c> {
     pub(in super::super) map: Rc<ResidentSection<'c>>,

@@ -1,14 +1,14 @@
 // Direct current attachment to the existing unit-prior normal law. Source coordinates are the
 // three declared complex port blocks; no field source handle or history table is an operand.
 // The packed source ball and rational observed current are transient passage carriers.
-__device__ void direct_normal_pack_sources(
+__device__ void direct_normal_pack_sources_with_target_kind(
     const int64_t *xlo,const int64_t *xhi,uint32_t xa,uint32_t xd,uint32_t xs,uint32_t xkind,
-    const int64_t *ylo,const int64_t *yhi,uint32_t ya,uint32_t yd,uint32_t ys,
+    const int64_t *ylo,const int64_t *yhi,uint32_t ya,uint32_t yd,uint32_t ys,uint32_t ykind,
     uint32_t m,uint32_t targets,uint32_t grain,uint32_t observed,int64_t *input,uint32_t *slot){
     const uint32_t d=NORMAL_QUADRATURES*m;
     wide *current=(wide *)input;
     int64_t *incoming=input+NORMAL_WIDE_WORDS*2u*(d+1u);
-        if(!m||!targets||grain<1||grain>120||observed>1||xkind>1){atomicOr(slot,REFUSED_MALFORMED);}
+        if(!m||!targets||grain<1||grain>120||observed>1||xkind>1||ykind>1){atomicOr(slot,REFUSED_MALFORMED);}
         if(!*slot&&xkind==1){
             for(size_t j=0;j<NORMAL_WIDE_WORDS*(d+1u);++j)
                 if(xlo[xa+j]!=xhi[xa+j])atomicOr(slot,REFUSED_MALFORMED);
@@ -28,7 +28,14 @@ __device__ void direct_normal_pack_sources(
             }
             current[2u*(d+1u)-1u]=radius;
         }
-        if(!*slot){
+        if(!*slot&&ykind==1){
+            for(uint32_t j=0;j<2u*(2u*targets+1u);++j)
+                if(ylo[ya+j]!=yhi[ya+j])atomicOr(slot,REFUSED_MALFORMED);
+            const wide *ball=(const wide *)(ylo+ya);
+            if(ball[2u*targets]<0)atomicOr(slot,REFUSED_MALFORMED);
+            // The existing observation/normal owner consumes this original wide ball.
+            // It is not narrowed into the transient rational-point packet.
+        } else if(!*slot){
             wide yden=observed?fibre_current_denominator(ylo,yhi,yd,ys,slot):1;
             for(uint32_t j=0;j<targets&&! *slot;++j){
                 for(uint32_t q=0;q<2u;++q){
@@ -40,11 +47,18 @@ __device__ void direct_normal_pack_sources(
         }
 }
 
-__device__ void direct_normal_pack(
+__device__ void direct_normal_pack_sources(
     const int64_t *xlo,const int64_t *xhi,uint32_t xa,uint32_t xd,uint32_t xs,uint32_t xkind,
     const int64_t *ylo,const int64_t *yhi,uint32_t ya,uint32_t yd,uint32_t ys,
+    uint32_t m,uint32_t targets,uint32_t grain,uint32_t observed,int64_t *input,uint32_t *slot){
+    direct_normal_pack_sources_with_target_kind(xlo,xhi,xa,xd,xs,xkind,ylo,yhi,ya,yd,ys,0,m,targets,grain,observed,input,slot);
+}
+
+__device__ void direct_normal_pack(
+    const int64_t *xlo,const int64_t *xhi,uint32_t xa,uint32_t xd,uint32_t xs,uint32_t xkind,
+    const int64_t *ylo,const int64_t *yhi,uint32_t ya,uint32_t yd,uint32_t ys,uint32_t ykind,
     uint32_t roots,uint32_t targets,uint32_t grain,uint32_t observed,int64_t *input,uint32_t *slot){
-    direct_normal_pack_sources(xlo,xhi,xa,xd,xs,xkind,ylo,yhi,ya,yd,ys,
+    direct_normal_pack_sources_with_target_kind(xlo,xhi,xa,xd,xs,xkind,ylo,yhi,ya,yd,ys,ykind,
         normal_sources(roots),targets,grain,observed,input,slot);
 }
 
@@ -102,7 +116,7 @@ __device__ void direct_normal_predict(const int64_t *old,const wide *current,
 
 __device__ void direct_normal_material_execute(
     const int64_t *old,const int64_t *xlo,const int64_t *xhi,uint32_t xa,uint32_t xd,uint32_t xs,uint32_t xkind,
-    const int64_t *ylo,const int64_t *yhi,uint32_t ya,uint32_t yd,uint32_t ys,
+    const int64_t *ylo,const int64_t *yhi,uint32_t ya,uint32_t yd,uint32_t ys,uint32_t ykind,
     uint32_t source_complex,uint32_t targets,uint32_t grain,uint32_t observed,
     int64_t *next,int64_t *next_hi,int64_t *before,int64_t *before_hi,
     int64_t *after,int64_t *after_hi,int64_t *work,int64_t *input,
@@ -115,7 +129,7 @@ __device__ void direct_normal_material_execute(
     for(size_t j=threadIdx.x;j<report_words;j+=blockDim.x)before[j]=before_hi[j]=0;
     for(size_t j=threadIdx.x;j<2u*(d+1u);j+=blockDim.x)current[j]=0;
     __syncthreads();
-    if(!threadIdx.x)direct_normal_pack_sources(xlo,xhi,xa,xd,xs,xkind,ylo,yhi,ya,yd,ys,
+    if(!threadIdx.x)direct_normal_pack_sources_with_target_kind(xlo,xhi,xa,xd,xs,xkind,ylo,yhi,ya,yd,ys,ykind,
         source_complex,targets,grain,observed,input,slot);
     __syncthreads();if(*slot)return;
     direct_normal_predict_mode_sources(old,current,source_complex,targets,grain,out,work,true,true,slot);
@@ -123,28 +137,29 @@ __device__ void direct_normal_material_execute(
     for(size_t j=threadIdx.x;j<report_words;j+=blockDim.x)before_hi[j]=before[j];
     __syncthreads();
     if(observed){
-        field_normal_material_prepare_sources(old,current,(const wide *)before,current,incoming,
-            source_complex,1,grain,next,next_hi,after,after_hi,work,targets,0,0,slot);
+        field_normal_material_prepare_sources_with_ball(old,current,(const wide *)before,current,incoming,
+            source_complex,1,grain,next,next_hi,after,after_hi,work,targets,0,0,
+            ykind?(const wide *)(ylo+ya):nullptr,slot);
     }
 }
 
 extern "C" __global__ __launch_bounds__(512) void section_direct_normal_material(
     const int64_t *old,
     const int64_t *xlo,const int64_t *xhi,uint32_t xa,uint32_t xd,uint32_t xs,uint32_t xkind,
-    const int64_t *ylo,const int64_t *yhi,uint32_t ya,uint32_t yd,uint32_t ys,
+    const int64_t *ylo,const int64_t *yhi,uint32_t ya,uint32_t yd,uint32_t ys,uint32_t ykind,
     uint32_t roots,uint32_t targets,uint32_t grain,uint32_t observed,
     int64_t *next,int64_t *next_hi,int64_t *before,int64_t *before_hi,
     int64_t *after,int64_t *after_hi,int64_t *work,int64_t *input,
     uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count) {
-    direct_normal_material_execute(old,xlo,xhi,xa,xd,xs,xkind,ylo,yhi,ya,yd,ys,normal_sources(roots),targets,grain,observed,next,next_hi,before,before_hi,after,after_hi,work,input,slot,census,lineage,lineage_count);
+    direct_normal_material_execute(old,xlo,xhi,xa,xd,xs,xkind,ylo,yhi,ya,yd,ys,ykind,normal_sources(roots),targets,grain,observed,next,next_hi,before,before_hi,after,after_hi,work,input,slot,census,lineage,lineage_count);
 }
 
 extern "C" __global__ __launch_bounds__(512) void section_direct_normal_material_sources(
     const int64_t *old,const int64_t *xlo,const int64_t *xhi,uint32_t xa,uint32_t xd,uint32_t xs,uint32_t xkind,
-    const int64_t *ylo,const int64_t *yhi,uint32_t ya,uint32_t yd,uint32_t ys,
+    const int64_t *ylo,const int64_t *yhi,uint32_t ya,uint32_t yd,uint32_t ys,uint32_t ykind,
     uint32_t source_complex,uint32_t targets,uint32_t grain,uint32_t observed,
     int64_t *next,int64_t *next_hi,int64_t *before,int64_t *before_hi,
     int64_t *after,int64_t *after_hi,int64_t *work,int64_t *input,
     uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count) {
-    direct_normal_material_execute(old,xlo,xhi,xa,xd,xs,xkind,ylo,yhi,ya,yd,ys,source_complex,targets,grain,observed,next,next_hi,before,before_hi,after,after_hi,work,input,slot,census,lineage,lineage_count);
+    direct_normal_material_execute(old,xlo,xhi,xa,xd,xs,xkind,ylo,yhi,ya,yd,ys,ykind,source_complex,targets,grain,observed,next,next_hi,before,before_hi,after,after_hi,work,input,slot,census,lineage,lineage_count);
 }

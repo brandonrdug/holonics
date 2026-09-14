@@ -1,9 +1,28 @@
 use super::*;
 use crate::native_ecology::constitutive_fibre::{
-    ResidentConstitutiveCurrent, ResidentNormalInput, normal_material_report_words,
+    ResidentConstitutiveCurrent, ResidentNormalInput, ResidentNormalEnclosureView, normal_material_report_words,
     normal_material_state_words, normal_material_workspace_words,
 };
 impl<'c> ResidentSurface<'c> {
+    pub(crate) fn record_normal_enclosure_pair(&self,lane:&Lane<'_, 'c>,
+        left:ResidentNormalEnclosureView<'_, 'c>,right:ResidentNormalEnclosureView<'_, 'c>,
+        kind:u32,out:&ResidentSection<'c>)->Result<(),ResidentRefusal>{
+        let fail=||Self::operative_error();
+        let valid=|v:ResidentNormalEnclosureView<'_, 'c>| {
+            v.components()>0&&v.components()%2==0&&v.offset%2==0
+                &&v.offset<=u32::MAX as usize&&v.components()<u32::MAX as usize/4
+                &&std::ptr::eq(v.surface,self)&&v.section.grain().0==0
+                &&v.offset.checked_add(2*(v.components()+1)).is_some_and(|end|end<=v.section.rows()*v.section.width())
+        };
+        let width=if kind==1 {left.components().checked_add(right.components()).ok_or_else(fail)?}else{left.components()};
+        if kind>2||!valid(left)||!valid(right)||left.grain()!=right.grain()
+            ||(kind==2&&left.components()!=right.components())||!self.operative_shape(out,1,2*(width+1)){return Err(fail());}
+        let mut p=Params::new();
+        p.ptr(left.section.lo.device_ptr()).ptr(left.section.hi.device_ptr()).u32(left.offset as u32).u32(left.components() as u32)
+            .ptr(right.section.lo.device_ptr()).ptr(right.section.hi.device_ptr()).u32(right.offset as u32).u32(right.components() as u32).u32(kind)
+            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_normal_enclosure_pair",1,self.launch.block_x,0,&mut p,"normal-enclosure-receiver")
+    }
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn record_normal_source_actuation(
         &self,

@@ -386,6 +386,15 @@ fields retain actual operator cuts. Bounded outputs can enter the normal current
 The exterior Unicode/symbol-basis attachment is one declared source chart; its local stencil
 does not define every medium's geometry or all language context.
 
+[established-bounded; measured] The [boundary/interior return](../research/records/2026-09-13_BOUNDARY_AND_INTERNAL_CURRENTS_FEED_JOINT_HNN_PREDICTION.md)
+now binds actual outgoing and operative internal-current enclosures into normal formation
+and the coupled HNN's joint forecast. Enclosed targets preserve their moment-error terms.
+The source task fixes material and contact population after preparation; it infers a local
+five-coordinate field transition from eight returns and measures a later field comparison.
+The native source retains all internal coordinates, including a nonzero pair hidden by its
+present aggregate. This is a consuming source specialization within the full event-boundary
+assembly; changing incidence/material still requires its own action and mixed-return map.
+
 ## Producing comparison and architecture laws
 
 [definition] The [mass–energy synthesis](MASS_ENERGY_AND_CAUSAL_TRANSPORT.md) places the

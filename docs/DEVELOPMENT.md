@@ -64,6 +64,11 @@ A completed local test does not cancel its consuming obligation. Consolidate dup
 representations, wrappers and exports as those consumers change. Preserve mathematical,
 ownership and wire distinctions; do not give each implementation task a permanent public family.
 
+[project-postulate] Format only the changed owners. A workspace `cargo fmt` rewrites unrelated
+applications and research sources in this checkout; isolated work uses
+`rustfmt --config skip_children=true` on its explicit Rust files. Inspect the resulting diff.
+This applies to delegated tasks as well as primary-agent edits.
+
 [project-postulate] A handoff retains the original requested outcome and the current mathematical
 contract, its source/native owners, the result returned and the next unresolved consumer. Record
 agent-chosen assumptions as choices, with the reason for their scope. The goal enables continuous

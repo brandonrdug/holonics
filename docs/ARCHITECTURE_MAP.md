@@ -454,10 +454,30 @@ keeps the version-one codec.
 to the existing normal increment/fit and bounded linear response. `normal.rs` now shares the
 report/state decoders with the old field owner. No historical-source adapter is needed by this
 direct local response. `normal/direct/enclosure.rs` now carries bounded output into later native
-input; `normal/direct/section.rs` integrates supplied sections and retains actual operator cuts.
+input and observed-target ports; the common normal moment law retains both error families.
+`normal/direct/joined_source.rs` supplies joined, oriented-difference and wave-source receivers
+of those outer balls, with exact cancellation for the same immutable operand.
+`normal/direct/section.rs` integrates supplied sections and retains actual operator cuts.
 `surface_normal_section.rs` records those passages and the generic current difference receiver.
 `normal_material_section.cuh` shares the existing observation increment, fit and response helpers;
 `current_difference_section.cuh` constructs local differences with their comparands.
+
+[definition] `field/junction/operative/source.rs::NativeFieldCurrentSource` exposes the actual
+outgoing current and every operative internal b coordinate as one resident outer source,
+retaining the cut, births and original producing carriers. `field_current_source.cuh` packages
+that receiver; it does not substitute the aggregate D b for the internal population.
+`normal/direct/wave/develop.rs::into_joint_difference_wave` consumes a paired enclosure through
+the existing JointEnclosure seed. Applied normal graphs admit both full bilinear features and
+the declared condition-independent Wave source. The existing coupled HNN body consumes the
+field-derived material and source, as recorded in the
+[boundary/interior return](../research/records/2026-09-13_BOUNDARY_AND_INTERNAL_CURRENTS_FEED_JOINT_HNN_PREDICTION.md).
+
+[definition] `constitutive_wave_relation.cuh` applies a total single-valued law directly to
+construct its wave graph. `constitutive_relation_image.cuh` directly maps the origin and all
+directions of an affine source when the relation is single-valued and carries that entire
+family. The original general algorithms remain for vertical fibres or partial coverage.
+Both retain the complete joint; they avoid redundant nullspace elimination without changing
+the supplied function or replacing an unresolved source with a point.
 
 [definition] `constitutive_fibre/resident/section.rs` owns addressed point-current section views;
 `section/difference.rs` retains their original path and local comparison fields. The source

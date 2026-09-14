@@ -230,14 +230,18 @@ __device__ void normal_observation_moments(const wide *x,const wide *y,uint32_t 
 
 // One observation's bounded source/target geometry, shared by field and direct section intake.
 // Called by one thread; the enclosing passage supplies synchronization and publication.
-__device__ void normal_observation_frame_sources(const wide *origin_current,const int64_t *incoming,
+__device__ void normal_observation_frame_sources_with_ball(const wide *origin_current,const int64_t *incoming,
     uint32_t m,uint32_t targets,uint32_t linked,uint32_t grain,uint32_t factor_width,uint32_t target_roots,
-    int64_t *report,uint32_t *slot){
+    int64_t *report,uint32_t *slot,const wide *target_ball){
     uint32_t d=NORMAL_QUADRATURES*m,R=NORMAL_QUADRATURES*targets;
     size_t stride=normal_ball_stride(targets),gain=normal_source_at(targets);
     wide *out=(wide *)report;wide S=(wide)1<<grain;
         wide *y=out+NORMAL_OBSERVED*stride,ey=0;
         if(!*slot && factor_width){ if(!target_roots)atomicOr(slot,REFUSED_MALFORMED); else contextual_tensor_target(incoming,target_roots,factor_width,targets,grain,y,&ey,slot); }
+        else if(!*slot&&target_ball){
+            for(uint32_t j=0;j<R;++j)y[j]=target_ball[j];
+            ey=target_ball[R];if(ey<0)atomicOr(slot,REFUSED_MALFORMED);
+        }
         else if(!*slot)for(uint32_t j=0;j<R;++j){const int64_t *v=incoming+3u*(j/2u);if(v[2]<=0){atomicOr(slot,REFUSED_MALFORMED);break;}
             wide lo=signed_product_divide_2(v[j%2u],S/2,v[2],0,slot),hi=signed_product_divide_2(v[j%2u],S/2,v[2],1,slot);y[j]=v[j%2u]<0?hi:lo;if(lo!=hi)ey=add_checked(ey,1,slot);}
         y[R]=ey;
@@ -250,13 +254,13 @@ __device__ void normal_observation_frame_sources(const wide *origin_current,cons
 __device__ void normal_observation_frame(const wide *origin_current,const int64_t *incoming,
     uint32_t roots,uint32_t targets,uint32_t linked,uint32_t grain,uint32_t factor_width,
     int64_t *report,uint32_t *slot){
-    normal_observation_frame_sources(origin_current,incoming,normal_sources(roots),targets,linked,grain,factor_width,roots,report,slot);
+    normal_observation_frame_sources_with_ball(origin_current,incoming,normal_sources(roots),targets,linked,grain,factor_width,roots,report,slot,0);
 }
 
-__device__ void field_normal_material_prepare_sources(const int64_t *old,const wide *origin_current,const wide *origin_forward,
+__device__ void field_normal_material_prepare_sources_with_ball(const int64_t *old,const wide *origin_current,const wide *origin_forward,
     const wide *current,const int64_t *incoming,uint32_t m,uint32_t linked,uint32_t grain,
     int64_t *next,int64_t *next_hi,int64_t *report,int64_t *report_hi,int64_t *workspace,
-    uint32_t targets,uint32_t factor_width,uint32_t target_roots,uint32_t *slot){
+    uint32_t targets,uint32_t factor_width,uint32_t target_roots,const wide *target_ball,uint32_t *slot){
     uint32_t d=NORMAL_QUADRATURES*m,R=NORMAL_QUADRATURES*targets;size_t stride=normal_ball_stride(targets),gain=normal_source_at(targets),extra=normal_metadata_at_sources(m,targets);
     size_t state_words=normal_state_words_sources(m,targets),report_words=normal_report_words_sources(m,targets);
     wide *out=(wide *)report;const wide *M=(const wide *)old;wide S=(wide)1<<grain;
@@ -265,7 +269,7 @@ __device__ void field_normal_material_prepare_sources(const int64_t *old,const w
     __syncthreads();
     if(!threadIdx.x){
         if(!m||!targets||!workspace||grain<1||grain>120||linked>1||(linked&&(!origin_current||!origin_forward)))atomicOr(slot,REFUSED_MALFORMED);
-        normal_observation_frame_sources(origin_current,incoming,m,targets,linked,grain,factor_width,target_roots,report,slot);
+        normal_observation_frame_sources_with_ball(origin_current,incoming,m,targets,linked,grain,factor_width,target_roots,report,slot,target_ball);
     }
     __syncthreads();if(*slot)return;
     if(linked){normal_increment_sources(next+normal_matrix_words_sources(m,targets),out+gain,out+NORMAL_OBSERVED*stride,report+normal_report_base_sources(m,targets),m,targets,false,slot);
@@ -301,8 +305,22 @@ __device__ void field_normal_material_prepare(const int64_t *old,const wide *ori
     const wide *current,const int64_t *incoming,uint32_t roots,uint32_t linked,uint32_t grain,
     int64_t *next,int64_t *next_hi,int64_t *report,int64_t *report_hi,int64_t *workspace,
     uint32_t targets,uint32_t factor_width,uint32_t *slot){
-    field_normal_material_prepare_sources(old,origin_current,origin_forward,current,incoming,
-        normal_sources(roots),linked,grain,next,next_hi,report,report_hi,workspace,targets,factor_width,roots,slot);
+    field_normal_material_prepare_sources_with_ball(old,origin_current,origin_forward,current,incoming,
+        normal_sources(roots),linked,grain,next,next_hi,report,report_hi,workspace,targets,factor_width,roots,0,slot);
+}
+
+__device__ void normal_observation_frame_sources(const wide *origin_current,const int64_t *incoming,
+    uint32_t m,uint32_t targets,uint32_t linked,uint32_t grain,uint32_t factor_width,uint32_t target_roots,
+    int64_t *report,uint32_t *slot){
+    normal_observation_frame_sources_with_ball(origin_current,incoming,m,targets,linked,grain,factor_width,target_roots,report,slot,0);
+}
+
+__device__ void field_normal_material_prepare_sources(const int64_t *old,const wide *origin_current,const wide *origin_forward,
+    const wide *current,const int64_t *incoming,uint32_t m,uint32_t linked,uint32_t grain,
+    int64_t *next,int64_t *next_hi,int64_t *report,int64_t *report_hi,int64_t *workspace,
+    uint32_t targets,uint32_t factor_width,uint32_t target_roots,uint32_t *slot){
+    field_normal_material_prepare_sources_with_ball(old,origin_current,origin_forward,current,incoming,m,linked,grain,
+        next,next_hi,report,report_hi,workspace,targets,factor_width,target_roots,0,slot);
 }
 
 // Decode an older normal operator by subtracting exactly the later observed increments.

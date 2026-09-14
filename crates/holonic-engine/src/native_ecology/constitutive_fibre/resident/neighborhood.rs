@@ -45,7 +45,11 @@ impl<'c> PredictiveMaterial<'c> {
     fn stage(&self, source: ResidentConstitutiveCurrent<'_, 'c>,
         prior_condition: ResidentConstitutiveCurrent<'_, 'c>, observed: ResidentConstitutiveCurrent<'_, 'c>)
         -> Result<Self, ConstitutiveFibreError> {
-        Self::new(self.material.stage_bilinear_observation(source, prior_condition, observed)?, &self.action)
+        let next=match self.material.source_chart() {
+            NormalSourceChart::Features {..}=>self.material.stage_bilinear_observation(source, prior_condition, observed)?,
+            NormalSourceChart::Wave {..}=>self.material.stage_source_observation(source,observed)?,
+        };
+        Self::new(next, &self.action)
     }
 }
 impl<'c> GeneratorMaterial<'c> {

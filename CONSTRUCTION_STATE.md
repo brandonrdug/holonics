@@ -1,13 +1,11 @@
 # Construction state
 
-**Currency:** September 13, 2026. **Next construction unit:** the
-[boundary/interior assembly](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#boundary-and-interior-assembly-contract)
-feeding joint release, with encoding of its repeated conduct. Conditional prediction,
-dynamic reflection and conductive-fluid equations are returned starting material. The
-[cycle record](research/records/2026-09-13_CONDITIONED_PREDICTION_AND_DYNAMIC_INTERIOR_RETURN.md)
-records equations, owners and verification. The
-[methodology audit](research/records/2026-09-13_GENERATOR_MEANING_AND_CAMPAIGN_DRIFT_AUDIT.md)
-retains the original decisions and repaired procedures.
+**Currency:** September 13, 2026. **Latest returned unit:** resident boundary and internal
+currents through normal formation and joint HNN prediction. The
+[boundary/interior return](research/records/2026-09-13_BOUNDARY_AND_INTERNAL_CURRENTS_FEED_JOINT_HNN_PREDICTION.md)
+records its source, equations, measured output and checks. The broader
+[assembly contract](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#boundary-and-interior-assembly-contract)
+continues through encoded transport and changing material/incidence.
 **Product objective:** construct HNN's contextual generating network, with Athena as the first
 product. Automata label HNN-based solvers and traversal constructions. The
 [roadmap](docs/plans/THE_ROADMAP.md) alone orders work; the
@@ -15,6 +13,15 @@ product. Automata label HNN-based solvers and traversal constructions. The
 specifies the assembly and formal obligations.
 
 ## Current implementation boundary
+
+[established-bounded; measured] `read_current_source` now carries outgoing current and every
+operative internal b coordinate, retaining its producing cut and source witnesses. Enclosed
+source and target operands feed the common normal moment law; a five-coordinate field source
+with fixed material/contact population formed its transition from eight returns and produced
+two joined future states through `NativeCoupledBody`. Independent coefficient contraction,
+sequential conduct and rest/remount agree. Final checks passed: 169 engine regressions, 21
+HNN/workshop regressions and the HNN public-example Cargo check. One warm joint delivery took
+141217 microseconds; the linked record retains the signed later-field comparison and bounds.
 
 [project-postulate] Generators are mathematical functions and constituent compositions,
 including emergent recursive/fractal conduct. The agent-authored Rust-first and code-repair
@@ -31,23 +38,21 @@ contact forms the condition used by later predictions. The former private fitted
 has been removed from live source and preserved in
 [the implementation archive](archive/implementations/2026-09-13-fitted-wave-adapter/README.md).
 
-[established-bounded; measured] The numerical body test has returned two delayed observations,
-an inferred conditional recurrence, a joint two-step forecast and the same result after complete
-body rest/remount. The retained point word uses the existing wide receiver arithmetic when its
-joint image exceeds the narrower expanded affine carrier. Final verification passed: 59 related
-engine regressions (20.35 s), 10 HNN regressions (8.27 s), and the HNN public-example Cargo check.
-The long-word check also exceeds generic projection scratch while retaining the unique source;
-an unresolved source is refused instead of reduced to a representative.
+[established-bounded; measured] The preceding
+[conditioned-prediction return](research/records/2026-09-13_CONDITIONED_PREDICTION_AND_DYNAMIC_INTERIOR_RETURN.md)
+retains two delayed observations, their original producing conditions and the inferred
+conditional recurrence. Its point-word receiver remains available when a point forecast's
+expanded affine carrier is too narrow. The new field source also remains plural through
+its joint prediction; it is not converted to a point to obtain output.
 
 [project-postulate] Brandon's latest clarification governs the next assembly: context is the
 situated boundary over intersecting event histories, including actual incidence, current,
 constitutive storage, clocks and interior return. The
 [composition definition](docs/HNN_COMPOSITION.md#context-names-a-situated-causal-boundary)
-connects those owners to state-space, convolution, diffusion and joint prediction. The next
-consuming change binds the participating native boundary/interior currents into the local
-generator's source/condition ports and its joint release. S/C restrictions and source-null
-contrasts serve their local source/receiver equations within it; they are not
-a separate context-extraction stage. The fixed-feature normal law and `a=(c-p,c,p)` wave chart
+connects those owners to state-space, convolution, diffusion and joint prediction. The returned field specialization binds boundary/interior currents into the generator and
+joint release. Changing the operative material or incidence must now enter its source/action
+map with the corresponding mixed return; the fixed interval is not that extension. S/C
+restrictions and source-null contrasts are local tools within this dynamics. The fixed-feature normal law and `a=(c-p,c,p)` wave chart
 remain explicit specializations, with their recorded numerical consumer already returned.
 
 [definition] Encoding accompanies the repeated action actually used. The current dependent
@@ -55,6 +60,14 @@ remain explicit specializations, with their recorded numerical consumer already 
 segment through the matching factor/recurrence/statistic owner with `E_next T=U E` and `D E=rho`,
 including its admitted formation and pending receivers. A fixed-linear power or a source-code
 printer alone does not establish that changing-programme closure.
+
+[definition] The next observed-field binding must carry the prediction discrepancy
+`delta=y-M a`, its original source and enclosure, into the existing normal formation owner.
+The current coupled `incorporate` port accepts a point observation and uses a compatibility
+relation; the field regression uses its fitted point graph for a fixed forecast interval.
+That graph alone is not an empirical-admission law for arbitrary later field data. Bind the
+enclosed comparison and retained discrepancy explicitly while preserving pending producing
+cuts; do not obtain a fitting source by selecting its unknown coordinates from the target.
 
 ## Available returns and unfinished products
 

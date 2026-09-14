@@ -10,6 +10,7 @@ pub use refine::NormalRealizationRefinement;
 
 mod enclosure;
 pub use enclosure::{ResidentNormalEnclosure, ResidentNormalEnclosureView, ResidentNormalInput};
+mod joined_source;
 mod section;
 mod applied_relation;
 pub use section::ResidentNormalSectionReturn;
@@ -82,7 +83,7 @@ pub struct ResidentNormalReturn<'a, 'c> {
     before: ResidentSection<'c>,
     after: Option<ResidentSection<'c>>,
     source: ResidentNormalInput<'a, 'c>,
-    observed: Option<ResidentConstitutiveCurrent<'a, 'c>>,
+    observed: Option<ResidentNormalInput<'a, 'c>>,
     source_chart: NormalSourceChart,
     targets: usize,
     grain: ResidentGrain,
@@ -93,7 +94,7 @@ impl<'a, 'c> ResidentNormalReturn<'a, 'c> {
     pub fn source(&self) -> ResidentNormalInput<'_, 'c> {
         self.source
     }
-    pub fn observed(&self) -> Option<ResidentConstitutiveCurrent<'_, 'c>> {
+    pub fn observed(&self) -> Option<ResidentNormalInput<'_, 'c>> {
         self.observed
     }
     pub fn inspect_before(&self) -> Result<NativeNormalMaterialReading, ConstitutiveFibreError> {
@@ -215,9 +216,9 @@ impl<'c> ResidentNormalMaterial<'c> {
     pub fn receive<'a>(
         &mut self,
         source: impl Into<ResidentNormalInput<'a, 'c>>,
-        observed: ResidentConstitutiveCurrent<'a, 'c>,
+        observed: impl Into<ResidentNormalInput<'a, 'c>>,
     ) -> Result<ResidentNormalReturn<'a, 'c>, ConstitutiveFibreError> {
-        let (returned, next) = self.prepare(source.into(), Some(observed))?;
+        let (returned, next) = self.prepare(source.into(), Some(observed.into()))?;
         self.state = Rc::new(next.ok_or(ConstitutiveFibreError::Shape)?);
         self.observations = returned.successor_observations;
         Ok(returned)
@@ -225,12 +226,12 @@ impl<'c> ResidentNormalMaterial<'c> {
     fn prepare<'a>(
         &self,
         source: ResidentNormalInput<'a, 'c>,
-        observed: Option<ResidentConstitutiveCurrent<'a, 'c>>,
+        observed: Option<ResidentNormalInput<'a, 'c>>,
     ) -> Result<(ResidentNormalReturn<'a, 'c>, Option<ResidentSection<'c>>), ConstitutiveFibreError>
     {
         let layout = self.source_chart.layout(self.targets)?;
         if source.width() != layout.source_components
-            || observed.is_some_and(|y| y.width != layout.target_components)
+            || observed.is_some_and(|y| y.width() != layout.target_components)
         {
             return Err(ConstitutiveFibreError::Shape);
         }
@@ -297,3 +298,5 @@ impl<'c> ResidentNormalMaterial<'c> {
 
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod enclosed_target_tests;
