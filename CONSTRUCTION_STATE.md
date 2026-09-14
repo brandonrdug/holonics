@@ -1,12 +1,18 @@
 # Construction state
 
 **Currency:** September 14, 2026. **Control:** the construction goal was paused at
-00:15:41 America/Los_Angeles. The current request is to recover the mathematical design,
-audit its Rust library composition and establish the model formula. It does not resume the
-paused construction goal. The [formula and library reconciliation](research/records/2026-09-14_THE_HNN_FORMULA_JOINS_THE_LIBRARY_TO_THE_MODEL.md)
-are complete. The [model formula](docs/HNN_FORMULA.md) governs the next integration; its
-boundary-reduction extension and `Framework.Physics` passed Lean. Native implementation
-remains at the verified/draft boundary below.
+00:15:41 America/Los_Angeles. The current request develops generation as whole-field
+refinement and boundary radiation, audits the computational Holon and its elementary
+operators, and produces a reusable illustrated synopsis of the formal/software design.
+The [generation/Holon return](research/records/2026-09-14_GENERATION_REFINES_FIELDS_AND_THE_HOLON_HAS_COMPUTATIONAL_FACES.md)
+is complete: Holon generation/tensor bindings and Core passed Lean; the Rust audit corrected
+a false reversibility convention; the computational specification uses Holonic/Dirac tensor
+operations and interaction vertices. The ten-page synopsis restores Information Chemistry
+geometry/styling and includes recursive fractals and analytic generators; all final pages
+were rendered and inspected. The [four-paper analysis](research/records/2026-09-14_TRANSFORMER_FIELDS_TROPICAL_CELLS_AND_FRACTAL_GENERATORS.md)
+is integrated into the operator/formula specification. This does not resume the
+paused construction goal. The earlier [formula and library reconciliation](research/records/2026-09-14_THE_HNN_FORMULA_JOINS_THE_LIBRARY_TO_THE_MODEL.md)
+remain completed dependencies; native implementation remains at the verified/draft boundary below.
 The [paused-run review](research/records/2026-09-14_DIRECT_MESSAGES_AND_THE_PAUSED_HNN_RUN.md)
 recovers the original requests, completed returns and unfinished draft. **Latest verified
 implementation unit:** empirical observations form
@@ -36,7 +42,7 @@ does not change when a supporting test passes.
 | Selected action on resumption | Compose the existing operative scattering/transport and local learned reaction in `NativeCoupledBody` using the same resident material and internal current. Make its output differential reach that material; factor its actual repeated action through existing mode/recurrence owners, carrying changing contact charts. Use the existing public request/readout for the resulting model. |
 | Completion evidence | Show the actual model invocation and generated product, the material transformation it used, and repeated execution/representation costs. Check the same operator's forecast, committed action and required differential/observation path. A component pass or two-material sensitivity test does not replace this model operation. |
 | Current draft disposition | Preserved, uncommitted support code. Known-condition reception, batch moments and cached reflection are candidates for that composition. Passing their probes cannot mark the assembly complete. The revised HNN test is not yet verified. |
-| Handoff disposition | The original paper occurrence `msg_01a09e2a-a7a0-7683-9b8e-e0e9446d959c` was fulfilled by `ce288e14`. It is retained context. The construction goal is paused. The September 14 request is model design and library synthesis; do not restart the surrogate draft or the old audit on pickup. |
+| Handoff disposition | The old affine-orbit paper was fulfilled by `ce288e14`. The model formula, corrected geometric/Dirac synopsis and the four supplied Transformer/fractal paper analyses are completed returns. The construction goal stays paused. On a new continuation request use the whole-field, tensor-interaction and recursive/analytic operator contracts; do not repeat completed reviews or restart the surrogate draft by default. |
 
 ## Current implementation boundary
 

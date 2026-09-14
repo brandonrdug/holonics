@@ -80,6 +80,14 @@ nested automata that construct, compare and refine further automata.
 
 ## Immediate mathematical application and implementation
 
+[project-postulate] The September 14 generation clarification is part of this same model
+assembly: evolve a whole resident latent/partial field through constituted refinement and
+expose its generated boundary to internal or external receivers. Image, acoustic and symbolic
+sections use the same [generative relation](../HNN_FORMULA.md#generation-as-field-refinement-and-boundary-radiation).
+The refinement/integration coordinate is not an output-token clock. Use the
+[computational Holon](../HOLON.md) as the object contract across its numerical realizations;
+do not start a second generator engine, token loop or prerequisite modality campaign.
+
 [project-postulate] Brandon's September 14 design ruling makes the
 [model formula](../HNN_FORMULA.md) the construction object. The next assignment is the
 [composed field/model operation](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#boundary-and-interior-assembly-contract):

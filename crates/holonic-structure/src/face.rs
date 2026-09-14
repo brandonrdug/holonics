@@ -1,23 +1,17 @@
-//! An index is a scalar face of a relation, and the relation stays askable.
+//! A scalar presentation paired with the relation needed by its consumer.
 //!
 //! Brandon, 2026-08-15: *"mathematics objects like tensors have scalar faces, and scalar faces have
 //! tensor faces (relative to a perspective). So any kind of collection is a geometrically
 //! traversible mathematical object."*
 //!
-//! That sentence is the addressing law, and it decides what an index is allowed to be. Today
-//! [`crate::RelationSpan`] is `{ start: u64, len: u64 }` and a branch node carries `extent: usize`
-//! — **scalar faces with the tensor face deleted.** Each is the float argument one level down: keep
-//! the magnitude, discard the turn. It is why every invariant computed on an undirected complex
-//! held at 16/16 and 39/39 under a boundary-sign flip while twenty-four tests failed, every one of
-//! them in a reader that traverses.
+//! [`Face`] keeps both supplied values. `descend` reads the scalar; `reopen` reads the retained
+//! relation. The constructor does not prove that the scalar is a particular projection of that
+//! relation, and the relation need not be an original datum or an event archive. Its mathematical
+//! adequacy belongs to the operation that constructs and consumes the pair.
 //!
-//! [`Face`] keeps both. `descend` takes the scalar; `reopen` returns the relation it was taken from.
-//! The ascent has a standing owner — `holonic_engine::reopening` reopens a numeric face collapsed to
-//! a declared grain, with a typed refusal when the face is coarser than the grain asked of it — and
-//! this carrier is the shape that hands it something to reopen.
-//!
-//! **This does not make addressing exact.** A `Face` whose relation is itself a magnitude has kept
-//! two magnitudes. What it makes *possible* is the question, which is the half that was missing.
+//! This is one storage building block for a computational holon, not its entire definition.
+//! The complete object also has its actual ports, permitted operations and receiver maps. Bare
+//! offsets remain useful storage coordinates when their owning object supplies that structure.
 
 use serde::{Deserialize, Serialize};
 
@@ -52,8 +46,9 @@ impl<S, R> Face<S, R> {
         (&self.scalar, &self.relation)
     }
 
-    /// Carry the scalar face into another chart, leaving the relation untouched. A chart transition
-    /// on the face alone; the relation is what makes it reversible.
+    /// Transform the scalar presentation while leaving the relation untouched. This need not be
+    /// injective or reversible: a caller may map every scalar to the same value. Reconstructing a
+    /// prior face requires an actual decoder from the retained relation or other admitted data.
     pub fn map_scalar<T, F: FnOnce(S) -> T>(self, transition: F) -> Face<T, R> {
         Face {
             scalar: transition(self.scalar),

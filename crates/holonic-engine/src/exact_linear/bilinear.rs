@@ -1,6 +1,21 @@
 //! Receiver-oriented bilinear actions using the shared exact matrix/preimage owners.
 //! Product cores are immutable reusable material. Application fixes input ports and receiver;
 //! reverse use is a preimage family, not an assertion that the operation is invertible.
+//!
+//! # Holonic tensor interaction
+//!
+//! In the declared port bases this owner evaluates `|C> = I (|A> tensor |B>)`,
+//! or `C[o] = sum(i,j) I[o,i,j] A[i] B[j]`. `BilinearOperator` is the interaction
+//! tensor; `BilinearProductCore` retains its factorized input contractions; and
+//! `BilinearRealization` binds a receiver to that shared core. The caller supplies
+//! the actual frame/contact interpretation of these coordinate ports.
+//!
+//! `apply` executes the interaction, `then_receiver` contracts its output with a
+//! further linear map, `join_receivers` returns multiple faces of the same product,
+//! and `then_fixed_right` composes another interaction at a fixed right-hand holon.
+//! These are high-level operator compositions, not instructions to reconstruct
+//! an occurrence ledger or expand the full tensor for each use. The resident
+//! realization belongs to the existing native operator owners.
 use super::{ExactLinearError, ExactRatMatrix, LinearMapFamily, ReceiverFactorization};
 #[cfg(test)]
 use num_traits::Zero;

@@ -1,5 +1,10 @@
 # Papers
 
+- [Elementary Holonics: objects, generation and coupled fields](rendered/elementary-holon-generation.pdf)
+  is the current ten-page computational synopsis. It renders the maintained Holon/model
+  specification using [reusable equations and diagrams](source/holonics/computational-holon.typ).
+  [Editable source](source/papers/elementary-holon-generation/main.typ).
+
 - `source/` is the complete authored Typst paper and dependency-ordered mathematics corpus copied
   from the laboratory.
 - `rendered/` contains ten PDFs regenerated from the extracted source after validation, including

@@ -66,6 +66,20 @@ verification apparatus. The [native](NATIVE_HNA.md), [Athena](ATHENA.md) and
 
 ## Mathematical operators and model assembly
 
+[definition] The [computational Holon contract](HOLON.md) identifies the object represented
+by the library's tensor/section charts. `ResidentSection` and current views are numerical
+representations; their field/relation owners supply incidence, frames, laws and joint
+families. A scalar presentation plus arbitrary retained data proves no reconstruction law.
+The `Face::map_scalar` documentation now states that its map can be noninvertible.
+
+[definition] The public mathematical operation vocabulary is the
+[Holonic tensor/Dirac interface](HOLON.md#high-level-holonic-interactions). It already has
+concrete operator counterparts: `BilinearOperator::apply`, `BilinearRealization::then_receiver`,
+`join_receivers` and `then_fixed_right`; native `bilinear_features`, `advance_bilinear_contact`
+and `read_image` execute their declared resident interactions. Their documentation names
+the high-level tensor action and contractions. The foundation's four-map tuple proves the
+object relationships; callers should not reconstruct that tuple for every supported operation.
+
 [established-bounded; source-inspected] Holonics already has reusable Rust mathematical and
 learning libraries. The September 14 source inspection distinguishes their algorithms from
 the model that currently consumes them. Re-exporting an owner supplies library access; it

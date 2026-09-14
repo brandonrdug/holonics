@@ -40,14 +40,12 @@ variable [Fintype Axis] {Slot : Axis → Type uSlot}
 variable [CommSemiring R] [∀ axis, AddCommMonoid (Slot axis)]
 variable [∀ axis, Module R (Slot axis)]
 
-/-- Apply a heterogeneous tensor lens only at the receiver boundary. -/
+/-- Read a heterogeneous tensor face through the common Holon receiver operation. This boundary
+can be internal to a larger holon; tensor coordinates are not restricted to exterior file codecs. -/
 def applyToHolon {Source : Type uSource} {Target : Type uTarget}
     (lens : TensorLens Carrier R Axis Slot) (holon : Holon Source Target Carrier) :
-    Holon Source Target (TensorFace R Slot) where
-  Occurrence := holon.Occurrence
-  source := holon.source
-  target := holon.target
-  receive occurrence := lens.project (holon.receive occurrence)
+    Holon Source Target (TensorFace R Slot) :=
+  holon.mapReceiver lens.project
 
 /-- The literal preimage population behind one heterogeneous tensor face. -/
 def PreimageFibre {Source : Type uSource} {Target : Type uTarget}

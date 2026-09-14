@@ -27,6 +27,21 @@ interior/exterior exchange, Maxwell speed/impedance and energy-flux bound, Loren
 and the wave/heat transform. Computational biology/neuroscience, electromagnetic and
 GR-derived models are identified by their actual equations and approximation domains.
 
+## Computational objects and generation
+
+[definition] The [Holon specification](HOLON.md) is the current elementary operational
+synopsis: situated interfaces and faces, composition, frame transport, constitutive response,
+variation, inference, generation and modal representation. `Foundation/Holon.lean` owns the
+minimal carrier and now directly constructs generated sections with `ofEvolution`.
+The [HNN generation formula](HNN_FORMULA.md#generation-as-field-refinement-and-boundary-radiation)
+uses this object for whole image, acoustic and symbolic fields at nested boundaries.
+
+[proved-derived; formal-checked] The new encoded-generation square preserves the generated
+face under actual evolution/decoder maps. The serial-generation occurrence equivalence
+retains one latent population through two deterministic refinements without storing a
+trajectory. These reuse the existing Holon and addressed-composition owners, not another
+formal object taxonomy. The associated Rust audit is in the specification.
+
 ## Construction programme and first formal use
 
 [definition] The [atomic/String/M recovery](../research/records/2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md)

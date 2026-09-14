@@ -50,6 +50,40 @@ def toPassage (holon : Holon Source Target LeftFace) : AddressedPassage Source T
   source := holon.source
   target := holon.target
 
+/-- A generated field section is an ordinary holon. The occurrence is the prepared latent/input
+parameter, not a list of past states or a next-token position. Evolution and readout are supplied
+mathematical operators; their implementation, learning and physical laws retain their own scope. -/
+def ofEvolution {Seed : Type*}
+    (prepare : Seed → Source) (evolve : Source → Target) (read : Target → LeftFace) :
+    Holon Source Target LeftFace where
+  Occurrence := Seed
+  source := prepare
+  target := evolve ∘ prepare
+  receive := read ∘ evolve ∘ prepare
+
+/-- Read another face of the same holon without replacing its ports or occurrence population.
+The map may be noninjective; it is not automatically a rebase or a reversible encoding. -/
+def mapReceiver {Face' : Type*} (holon : Holon Source Target LeftFace)
+    (read : LeftFace → Face') : Holon Source Target Face' where
+  Occurrence := holon.Occurrence
+  source := holon.source
+  target := holon.target
+  receive := read ∘ holon.receive
+
+/-- Generating in a reduced representation gives the same face when the actual evolution and
+receiver squares commute. The latent population may remain plural, and no inverse is selected. -/
+theorem ofEvolution_receive_eq_encoded
+    {Seed EncodedSource EncodedTarget : Type*}
+    (prepare : Seed → Source) (evolve : Source → Target) (read : Target → LeftFace)
+    (encode : Source → EncodedSource) (encodeNext : Target → EncodedTarget)
+    (encodedEvolve : EncodedSource → EncodedTarget) (decode : EncodedTarget → LeftFace)
+    (hstep : ∀ x, encodeNext (evolve x) = encodedEvolve (encode x))
+    (hread : ∀ x, decode (encodeNext x) = read x) (seed : Seed) :
+    (ofEvolution prepare evolve read).receive seed =
+      (ofEvolution (encode ∘ prepare) encodedEvolve decode).receive seed := by
+  change read (evolve (prepare seed)) = decode (encodedEvolve (encode (prepare seed)))
+  rw [← hread, hstep]
+
 /-- Every occurrence retained behind one returned receiver face. -/
 def PreimageFibre (holon : Holon Source Target LeftFace) (face : LeftFace) : Type _ :=
   { occurrence : holon.Occurrence // holon.receive occurrence = face }
@@ -110,6 +144,23 @@ def comp (right : Holon Middle Target RightFace)
   source joined := left.source joined.left
   target joined := right.target joined.right
   receive joined := (left.receive joined.left, right.receive joined.right)
+
+/-- Composing two deterministic field refinements retains one seed. The joined intermediate
+state is determined by the first evolution, so a stored trajectory is not the occurrence type. -/
+def ofEvolutionCompOccurrenceEquiv
+    {Seed : Type*} (prepare : Seed → Source)
+    (first : Source → Middle) (second : Middle → Target)
+    (readFirst : Middle → LeftFace) (readSecond : Target → RightFace) :
+    (comp (ofEvolution id second readSecond)
+      (ofEvolution prepare first readFirst)).Occurrence ≃ Seed where
+  toFun joined := joined.left
+  invFun seed := ⟨seed, first (prepare seed), rfl⟩
+  left_inv joined := by
+    rcases joined with ⟨seed, middle, hjoin⟩
+    change first (prepare seed) = middle at hjoin
+    cases hjoin
+    rfl
+  right_inv _ := rfl
 
 /--
 The Cartesian interaction body of two holons.  This constructs the complete pair population and
@@ -323,6 +374,8 @@ end Soma.Holonics
 section Audit
 open Soma.Holonics
 #print axioms Holon.compPreimageFibreEquiv
+#print axioms Holon.ofEvolution_receive_eq_encoded
+#print axioms Holon.ofEvolutionCompOccurrenceEquiv
 #print axioms Holon.cartesianPreimageFibreEquiv
 #print axioms Holon.Rebase.preimageFibreEquiv
 #print axioms Holon.interaction_middle_boundary

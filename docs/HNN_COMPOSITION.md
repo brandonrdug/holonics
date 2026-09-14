@@ -7,6 +7,12 @@ equations. Lifecycle nouns alone do not specify a model. The
 [Rust composition boundary](RUST_FRAMEWORK.md#mathematical-operators-and-model-assembly)
 identifies where the existing library operations do and do not reach that model.
 
+[definition] The [computational Holon specification](HOLON.md) defines the elementary object,
+its tensor realizations and operator algebra. [Generation](HNN_FORMULA.md#generation-as-field-refinement-and-boundary-radiation)
+refines whole fields and exposes their boundary activity, including internal and involuntary
+communication. Its integration coordinate is not a token position. The illustrated synopsis
+renders these same contracts and their source owners.
+
 [definition] HNN is a developing network of situated sections and interactions. Athena names
 its first intended product. Eros names composition and formation within the network; automata
 label HNN-based solvers using its traversal constructions. This guide describes the shared

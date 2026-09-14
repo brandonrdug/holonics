@@ -16,10 +16,16 @@ executable system. The model specification must say which laws interpret that da
 
 ## 1. The model, its dynamics and its output
 
+[definition] Use the [encapsulated Holon operations](HOLON.md#high-level-holonic-interactions)
+to formulate this model: chart-presented tensor kets |H⟩_F, receiver bras ⟨r|, operator
+application, tensor interaction, contraction and adjoint variation. The tuple below is the
+model's state specification, not its public computational notation. Interaction diagrams
+carry these objects on oriented lines and their actual maps at vertices.
+
 [definition] Write the situated model as
 
 ```text
-M = (K, Θ, x),                 y = ρ_F(x).
+M = (K, Θ, x),                 y_F = ρ_F(b_H(x)).
 ```
 
 K is the oriented contact complex, including its boundary ports and chart transitions; Θ is
@@ -28,6 +34,11 @@ Their numerical representations may be sparse sections, tensors, factors, recurr
 correlated parameter families. K is not a semantic classifier. The components need not share
 one shape, one spatial grain or a universal clock. At a specified interaction, the joined
 ports determine which restrictions of these objects participate.
+
+[definition] b_H is the outwardly available field/current at the selected holonic boundary.
+It can be an identity/readout port in a computational chart. Another internal region or an
+exterior system can receive it; it need not be a deliberately requested message. The
+[computational Holon](HOLON.md) supplies the elementary object and operator contract.
 
 [definition] The executable model is a composition of those actual operators:
 
@@ -45,7 +56,92 @@ compositions through its specified variation. A public input selects a task and 
 not a different learning engine. A speculative output and a committed step evaluate the same
 generating law with their respective ownership effects.
 
+### Generation as field refinement and boundary radiation
+
+[project-postulate] Generation develops a joint field or configuration through the model's
+constituted dynamics. Its integration/refinement coordinate is not an output-token index.
+Image, acoustic, geometric and symbolic outputs are receiver charts of that construction.
+Streaming may expose available parts, but must not replace joint generation with independent
+per-coordinate predictions. A text codec cannot schedule the model's evolution.
+
+[definition] Let ξ parameterize a prepared latent/partial field and h the actual restricted
+environment, internal material and boundary data. A generative chart is
+
+```text
+x(τ₀)=I_h(ξ),
+∂_τ x = F_(Θ,K)(x,h,τ),
+y_F(τ)=ρ_F b_H(x(τ)),
+u_B=C_(B←H) b_H(x).
+```
+
+F is composed from transport, constitutive reaction, inference/score and integration
+operators; its signature alone does not implement it. C is an actual coupling to another
+region, possibly within the same larger model. Local evolution can use stored currents
+and internal clocks without a fresh user message. Voluntary communication can shape the
+boundary activity but does not define whether it can affect another region.
+
+[definition] Classical denoising diffusion uses the corruption chart
+`x_t=√ᾱ_t x_0+√(1-ᾱ_t) ε`. A learned noise/score field drives generative refinement of the
+whole latent field. The usual variance step is
+`x_t=√(1-β_t)x_(t-1)+√β_t ε`. Convolutional networks can parameterize that field with shared
+kernels and multiscale connections. DiffWave refines whole acoustic waveforms without
+autoregressive sample generation. [Image diffusion](https://arxiv.org/html/2006.11239v2),
+[acoustic diffusion](https://arxiv.org/html/2009.09761v3).
+
+[conditional] For forward SDE `dx=f dt+g(t) dW`, an exact score and the density/regularity
+hypotheses give probability-flow ODE `dx=[f-(g²/2)∇log p_t]dt`. Integrating from the prior end
+gives the same one-time marginals as the corresponding SDE, not the same stochastic paths
+or a unique historical input. This is a deterministic generative realization, not a
+requirement to add a sampler to every native operation.
+[Score-based construction](https://arxiv.org/html/2011.13456v2).
+
+[definition] The initial latent may be a supplied noise realization, structured modes or an
+unresolved joint family. Zero current, an unseen region, uncertainty and stochastic noise
+are different operands. Stable heat smoothing alone does not synthesize a learned
+distribution; the learned/refined constitutive field supplies its structure. Known
+observations constrain appropriate coordinates while generation can continue elsewhere
+without a singleton causal preimage or complete historical reconstruction.
+
+[project-postulate] The native consumer takes a whole resident section/family, its refinement
+law and boundary constraints, and emits the joint generated section through the existing
+body. Image/acoustic arrays and symbolic sections enter through their shape/transport maps.
+The two-current wave chart and character readout are local specializations, not the general
+generation algorithm. Inspect joint generation and composition before introducing a token
+loop or another fixed assay.
+
+[proved-derived; formal-checked] `Holon.ofEvolution` realizes generation in the elementary
+Holon type. Its encoding theorem equates full and reduced generation when their maps
+commute; its composition equivalence carries one latent population through two refinements.
+Neither binding requires a trajectory archive or independent output marginals.
+
+### Recursive generators, scale and transcendental operations
+
+[definition] Repeated latent generation is `x_(n+1)=F_Theta(x_n,h)`. Its tangent evolves by
+`J_(n+1)=DF_Theta(x_n,h) J_n`; both are executable recurrences. A single iteration may refine
+an entire field. Fractal basins of that recurrence describe sensitivity of its routes or
+settling times; their finite-resolution measurements are not tensor rank or a proof that
+all algorithms must traverse the same difficult routes.
+
+[definition] Geometric recursion can instead use `S(H)=union_i F_i(H)` and an attractor
+`H=S(H)`. With contracting similarities and the stated separation condition, dimension D
+obeys `sum_i r_i^D=1`. The maps, their scale and relevant branch constraints are the compact
+construction. A lattice is one resolved realization, not the only way to compute it.
+Existing `FractalPacking` and scale/phase owners provide starting constructions.
+
+[definition] Functional calculus supplies generators: `exp(tA)` evolves a linear field;
+`exp(i theta)` carries torus phase with period 2π; logarithms read relative scale; Gamma
+recurrences carry analytic blocks. Domains, branches and remainders belong to the operation.
+A periodic bounded field generally has no limit at one added point at infinity; retain its
+phase chart instead. These laws are not merely floating-point constants or ornamental
+references to fractals.
+
 ### Capacitive, inductive and dissipative realization
+
+[definition] The [paper synthesis](../research/records/2026-09-14_TRANSFORMER_FIELDS_TROPICAL_CELLS_AND_FRACTAL_GENERATORS.md)
+places field transport, reaction, recursive generation and the following physical
+realizations in one operator algebra. Published Transformer charts supply useful instances;
+their fixed token base, frozen-key limits and empirical basin measurements do not choose
+HNN's topology or impose a universal limit on generation.
 
 [definition] On a finite real electrical chart, let d map node potentials to oriented edge
 drops. Let C and L be positive symmetric storage maps and R nonnegative resistance. The

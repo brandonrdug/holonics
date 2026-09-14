@@ -141,6 +141,13 @@ where its coefficients are the inferred model; an independent field fitted as a 
 does not stand in for this assembly. That distinction supersedes the draft's surrogate-first
 interpretation, while retaining its valid normal/enclosure and delayed-observation code.
 
+[project-postulate] The consuming implementation uses the [Holon object](../HOLON.md) and the
+[whole-field generation law](../HNN_FORMULA.md#generation-as-field-refinement-and-boundary-radiation).
+Its operator acts on a resident section or joint family; successive refinements change that
+field, while image pixels, waveform samples and text symbols are output coordinates.
+Boundary activity can stimulate another internal region without a deliberate message.
+The public codec observes this operation and does not reduce it to next-token steps.
+
 [definition] The consuming implementation has three joined obligations:
 
 1. **Evaluate and learn the composed model.** Transfer resident currents through the actual
