@@ -613,6 +613,13 @@ opposite configurations under the stated positive parameters. Separately, h=k=a=
 exactly commuting fine/coarse step while energy increases from 2 to 50. Exact descent of a
 receiver chart does not establish energy descent of the finite step.
 
+[definition] The [primitive-to-fluid construction](HOLONIC_FLUID_CONSTRUCTION.md) now uses
+Swing at the native graph projection and at an evolving Galerkin mean. The checked identities
+retain `B(r,r)` in the even part and both mixed interactions in the odd part. It develops
+material-action Euler, constituted stress/diffusion, active Einstein faces and an explicit
+internal-field energy exchange, and joins the Hodge/heat/arithmetic sources without identifying
+their different receivers or claiming their unsolved endpoints.
+
 [proved-derived; formal-checked] [`FluidReceiverClosure`](../formal/elementary-holonics/ElementaryHolonics/Physics/FluidReceiverClosure.lean)
 uses a receiver Q and lift J. For resolved state r=JQx and retained z=x−r, its complete rate defect is
 

@@ -93,4 +93,28 @@ theorem theFactorSplitsThroughTheWeilRoot (a q : ℤ) (h : (a : ℝ) ^ 2 ≤ 4 *
       = 1 - (α + (starRingEnd ℂ) α) * T + (α * (starRingEnd ℂ) α) * T ^ 2 := by ring
   rw [expand, hsum, hprod]
 
+/-- The quadratic energy pairing carried by the existing arithmetic transfer.
+It is positive definite on the strict elliptic domain `a² < 4q`. -/
+noncomputable def companionMetric (a q : ℝ) : Matrix (Fin 2) (Fin 2) ℝ :=
+  !![1, -a / 2; -a / 2, q]
+
+/-- The local transfer scales its own pairing by q, before any normalized phase face. -/
+theorem companion_preserves_scaled_metric (a q : ℝ) :
+    (companion a q).transpose * companionMetric a q * companion a q =
+      q • companionMetric a q := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [companion, companionMetric, Matrix.mul_apply, Fin.sum_univ_two] <;> ring
+
+/-- Exact completion of the square identifies the positive-metric domain. -/
+theorem companion_metric_complete_square (a q x y : ℝ) :
+    x ^ 2 - a * x * y + q * y ^ 2 =
+      (x - a * y / 2) ^ 2 + (q - a ^ 2 / 4) * y ^ 2 := by ring
+
 end Soma.Holonics.Millennium.LocalFactor
+
+section MetricAudit
+open Soma.Holonics.Millennium.LocalFactor
+#print axioms companion_preserves_scaled_metric
+#print axioms companion_metric_complete_square
+end MetricAudit

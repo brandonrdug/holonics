@@ -30,6 +30,18 @@ Each row connects one mathematical relation to its live formal and executable pr
 Paths are stable owner addresses, not line citations. A hash, filename, count, output artifact, or
 test result never upgrades a correspondence.
 
+## Swing, fluid and transfer composition
+
+[definition] The [fluid derivation](HOLONIC_FLUID_CONSTRUCTION.md) connects the actual owners:
+`Computation/HolonicConstitutiveCirculation` proves the graph-projection/native-scattering
+Swing and involution under the exact normal-solve hypothesis; `Physics/FluidReceiverClosure`
+proves the actual Galerkin even/odd Swing split and moving-anchor quadratic defect;
+`Millennium/LocalFactor` binds its existing arithmetic companion to the scaled quadratic
+metric. Existing operative field kernels realize the scattering formula. The added
+continuum material-field stress and energy derivation is a documented constitutive extension,
+not an already implemented native field solver. Source links and preserved equations belong
+to the derivation; this map remains descriptive.
+
 ## Formal framework entry points
 
 [definition] `Physics/CompositeMassEnergy.lean` and `Physics/MaxwellEnergyCone.lean` are

@@ -6,6 +6,12 @@ interiors, predictive release and HNN. The requested singularity is a receiver-v
 concentration whose interior has dynamics at another scale. The physical source and its
 interior remain part of the construction. The roadmap retains construction order.
 
+[definition] The [Swing-to-fluid derivation](HOLONIC_FLUID_CONSTRUCTION.md) now joins these
+sources into one construction: native graph reflection, material-action Euler, stress and
+relativistic projections, Hodge pressure elimination, microscopic feedback and boundary
+memory, then an energy-balanced internal-field stress/diffusion extension. It retains the
+complex-Euler/MHD sign distinction and the source-qualified Hodge/RH/BSD connections.
+
 ## Physical source and receiver
 
 [definition] A useful common state contains mass density rho, velocity u, internal energy,

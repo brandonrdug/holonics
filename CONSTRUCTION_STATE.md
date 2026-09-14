@@ -5,15 +5,20 @@ request asks for a genuine synthesis of Swing, the computational Holon, stress/m
 interior/exterior and microscopic/macroscopic dynamics into complex Euler/Navier–Stokes,
 with the corresponding Hodge, RH and BSD relations recovered and developed.
 
-## Current research brief
+## Current research return
 
-[project-postulate] Derive the connected fluid construction from the existing primitives and
-constitutive laws. Recover the actual Galerkin/Elsasser, receiver-closure, Hodge and boundary-memory
-owners; bind Swing to the native scattering equation and the nonlinear fluid operation.
-The deliverable is the derivation with reusable formal joins and exact source links, including
-what a retained interior contributes to stress and diffusion. It does not resume or replace
-the paused Athena assembly. Root is constructing that derivation; bounded Luna tasks prove the
-scattering/Swing and finite-Galerkin Swing identities and review internal-mode energy coupling.
+[established-bounded; source-inspected] The
+[fluid construction](docs/HOLONIC_FLUID_CONSTRUCTION.md) now derives Swing/scattering,
+material-action Euler, Newtonian and relativistic stress projections, Hodge pressure,
+microscopic feedback, boundary memory and an energy-balanced internal-field stress/diffusion
+class. It retains the complex-Euler/MHD sign distinction, fractal spectral-scale relation,
+RH critical heat chart and BSD local transfer. The
+[return and checks](research/records/2026-09-14_SWING_STRESS_AND_INTERIOR_FEEDBACK_FORM_THE_FLUID_CONSTRUCTION.md)
+record three changed formal owners, their successful targeted build and the new checked
+scattering/Swing, Galerkin feedback and local-transfer metric joins. The model formula,
+Holon guide and source maps consume the same derivation. Continuum derivations with supplied
+material laws are distinct from an implemented native fluid consumer. The requested synthesis
+is returned at that stated scope; the goal and native Athena assembly below remain paused.
 
 [established-bounded; source-inspected] The completed
 [constraint-mode and active-face return](research/records/2026-09-14_CONSTRAINT_MODES_AND_ACTIVE_EINSTEIN_FACES_REJOIN_THE_LIBRARY.md)

@@ -307,6 +307,17 @@ The next application uses w and b_next through its physical/contact transport. A
 from this operation directly computes those currents; fitting a second matrix to its outputs
 is a distinct surrogate-model task and is justified only when that task is intended.
 
+[proved-derived; formal-checked] This same native scattering is
+`R_G x=2P_G x−x=Swing_(P_G x)(x)`, where
+`P_G(u,b)=(A⁻¹(u+Db),D* A⁻¹(u+Db))` projects onto the constituted contact graph.
+`HolonicConstitutiveCirculation` proves the projection and involution from the actual solve
+identity and binds the result to the existing Swing definition. With the energy adjoint,
+its orthogonality gives the conserved norm. The
+[fluid construction](HOLONIC_FLUID_CONSTRUCTION.md) carries this relation through material
+advection, stress, Hodge projection, exact unresolved-mode feedback and interior memory.
+Its internal-field extension pairs advection with the actual adjoint stress; this is a
+constitutive specialization to implement through these owners, not a second model definition.
+
 [project-postulate] Extend the existing `NativeCoupledBody` application owner to execute the
 field's constituted transport and the required local generator/reaction maps from their shared
 resident material. The field and coupled representation must not become independently trained

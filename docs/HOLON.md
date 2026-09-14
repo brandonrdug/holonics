@@ -53,6 +53,14 @@ connects this to traction, Lorentz/gyro transport and Einstein/Bianchi balance. 
 field description and its physical realization retain their declared units and constitutive
 maps; an ML label does not remove these relations.
 
+[definition] The [fluid realization](HOLONIC_FLUID_CONSTRUCTION.md) now applies this object
+through material motion, oriented stress faces, Hodge decomposition, interior memory and
+micro/macro restriction. The high-level interaction has a concrete energy form: advection of
+an internal field and its adjoint force exchange energy, while the material gradient and
+positive mobility produce diffusion and heat. Native graph scattering is precisely Swing
+about its constituted projection; the object therefore connects to the primitive operation
+without replacing the field by its displayed coefficient vector.
+
 ## High-level Holonic Interactions
 
 [definition] These are the operations used to formulate the model. They are abstracted

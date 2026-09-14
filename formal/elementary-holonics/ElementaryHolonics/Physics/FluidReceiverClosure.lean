@@ -161,6 +161,60 @@ theorem finiteGalerkin_rateDefect_eq_hidden_feedback_of_section
   exact ⟨q_hiddenState_eq_zero q lift hsection state,
     finiteGalerkin_rateDefect_eq_hidden_feedback nu aperture q lift state⟩
 
+/-! ## Swing decomposition of the finite Galerkin vector field -/
+
+/-- The even part of the finite quadratic fluid field keeps the marked--marked interaction face. -/
+theorem finiteGalerkinNavierStokesVectorField_swing_even
+    (nu : ℝ) (carrier aperture : Finset SpatialFrequency)
+    (b r : FiniteGalerkinState carrier) :
+    finiteGalerkinNavierStokesVectorField nu carrier aperture (b + r) +
+        finiteGalerkinNavierStokesVectorField nu carrier aperture (b - r) =
+      2 • (finiteGalerkinNavierStokesVectorField nu carrier aperture b -
+        finiteGalerkinProjectedInteraction carrier aperture r r) := by
+  funext output
+  simp only [finiteGalerkinNavierStokesVectorField, Pi.add_apply, Pi.sub_apply,
+    Pi.smul_apply, finiteGalerkinProjectedInteraction_add_left,
+    finiteGalerkinProjectedInteraction_add_right,
+    finiteGalerkinProjectedInteraction_sub_left,
+    finiteGalerkinProjectedInteraction_sub_right]
+  module
+
+/-- The odd part is the transported linear Stokes difference plus both cross interactions. -/
+theorem finiteGalerkinNavierStokesVectorField_swing_odd
+    (nu : ℝ) (carrier aperture : Finset SpatialFrequency)
+    (b r : FiniteGalerkinState carrier) :
+    finiteGalerkinNavierStokesVectorField nu carrier aperture (b + r) -
+        finiteGalerkinNavierStokesVectorField nu carrier aperture (b - r) =
+      2 • (finiteGalerkinStokesPart nu r -
+        finiteGalerkinProjectedInteraction carrier aperture b r -
+        finiteGalerkinProjectedInteraction carrier aperture r b) := by
+  funext output
+  simp only [finiteGalerkinNavierStokesVectorField, finiteGalerkinStokesPart, Pi.add_apply, Pi.sub_apply,
+    Pi.smul_apply, finiteGalerkinProjectedInteraction_add_left,
+    finiteGalerkinProjectedInteraction_add_right,
+    finiteGalerkinProjectedInteraction_sub_left,
+    finiteGalerkinProjectedInteraction_sub_right]
+  module
+
+/-- A moving affine Swing contributes the rate `-N(u) + 2 ḃ`; its quadratic remainder is the
+marked--marked interaction around the anchor. -/
+theorem moving_swing_galerkin_rate_defect
+    (nu : ℝ) (carrier aperture : Finset SpatialFrequency)
+    (b bdot u : FiniteGalerkinState carrier) :
+    finiteGalerkinNavierStokesVectorField nu carrier aperture
+        (2 • b - u) +
+        finiteGalerkinNavierStokesVectorField nu carrier aperture u - 2 • bdot =
+      2 • (finiteGalerkinNavierStokesVectorField nu carrier aperture b - bdot -
+        finiteGalerkinProjectedInteraction carrier aperture (u - b) (u - b)) := by
+  have heven := finiteGalerkinNavierStokesVectorField_swing_even
+    nu carrier aperture b (u - b)
+  have hplus : b + (u - b) = u := by module
+  have hminus : b - (u - b) = 2 • b - u := by module
+  rw [hplus, hminus] at heven
+  rw [add_comm] at heven
+  rw [heven]
+  module
+
 /-- The actual Galerkin trajectory, received through a moving chart, obeys the complete coarse
 equation with the exhibited unresolved-mode feedback. The derivative hypotheses bind the maps
 to the trajectory; the algebra alone does not assert a continuum solution. -/
@@ -244,6 +298,9 @@ open Soma.Holonics.Physics.FluidReceiverClosure
 #print axioms finiteGalerkin_rateDefect_eq_hidden_feedback
 #print axioms finiteGalerkin_rateDefect_eq_hidden_feedback_of_section
 #print axioms finiteGalerkin_rateDefect_eq_chartRate_hidden_feedback
+#print axioms finiteGalerkinNavierStokesVectorField_swing_even
+#print axioms finiteGalerkinNavierStokesVectorField_swing_odd
+#print axioms moving_swing_galerkin_rate_defect
 #print axioms moving_galerkin_receiver_equation
 #print axioms full_receiver_retains_chart_motion
 #print axioms norm_fluid_rateDefect_le

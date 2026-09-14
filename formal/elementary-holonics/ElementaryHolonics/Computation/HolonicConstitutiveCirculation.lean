@@ -1,4 +1,5 @@
 import ElementaryHolonics.Computation.HolonicConstitutiveFibre
+import ElementaryHolonics.Millennium.Swing
 import Mathlib.Tactic
 
 /-!
@@ -370,10 +371,90 @@ theorem circulate_unlinked_relation_unchanged
     (circulate state incoming none).1.relation = state.relation := by
   rfl
 
+/-! ## Graph projection and the associated Swing scattering
+
+This is the existing native normal equation, with its exact inverse supplied as a linear map.
+`Dt` becomes the energy adjoint in an orthogonal realization; idempotence and involution need
+only the displayed solve identity. Arbitrary `D, Dt` do not imply norm conservation.
+-/
+
+section GraphScattering
+variable {V W : Type*} [AddCommGroup V] [Module ℝ V]
+    [AddCommGroup W] [Module ℝ W]
+
+/-- Projection onto the contact graph through the actual normal solve. -/
+def graphProjection (D : W →ₗ[ℝ] V) (Dt : V →ₗ[ℝ] W) (Kinv : V →ₗ[ℝ] V) :
+    (V × W) →ₗ[ℝ] (V × W) where
+  toFun x := (Kinv (x.1 + D x.2), Dt (Kinv (x.1 + D x.2)))
+  map_add' x y := by simp [map_add, add_assoc, add_left_comm, add_comm]
+  map_smul' c x := by simp
+
+/-- Emitted and held currents of the existing two-sided scattering equation. -/
+def graphScattering (D : W →ₗ[ℝ] V) (Dt : V →ₗ[ℝ] W) (Kinv : V →ₗ[ℝ] V)
+    (x : V × W) : V × W :=
+  (2 : ℝ) • graphProjection D Dt Kinv x - x
+
+theorem graphProjection_idempotent
+    (D : W →ₗ[ℝ] V) (Dt : V →ₗ[ℝ] W) (Kinv : V →ₗ[ℝ] V)
+    (hleft : Kinv.comp (LinearMap.id + D.comp Dt) = LinearMap.id) (x : V × W) :
+    graphProjection D Dt Kinv (graphProjection D Dt Kinv x) =
+      graphProjection D Dt Kinv x := by
+  have h := LinearMap.congr_fun hleft (Kinv (x.1 + D x.2))
+  change Kinv (Kinv (x.1 + D x.2) + D (Dt (Kinv (x.1 + D x.2)))) =
+    Kinv (x.1 + D x.2) at h
+  dsimp [graphProjection]
+  rw [h]
+
+theorem graphScattering_involutive
+    (D : W →ₗ[ℝ] V) (Dt : V →ₗ[ℝ] W) (Kinv : V →ₗ[ℝ] V)
+    (hleft : Kinv.comp (LinearMap.id + D.comp Dt) = LinearMap.id) (x : V × W) :
+    graphScattering D Dt Kinv (graphScattering D Dt Kinv x) = x := by
+  simp only [graphScattering, map_sub, map_smul,
+    graphProjection_idempotent D Dt Kinv hleft]
+  module
+
+theorem graphScattering_eq_swing
+    (D : W →ₗ[ℝ] V) (Dt : V →ₗ[ℝ] W) (Kinv : V →ₗ[ℝ] V) (x : V × W) :
+    graphScattering D Dt Kinv x =
+      Soma.Holonics.Millennium.Swing.swing (graphProjection D Dt Kinv x) x := by
+  simp [graphScattering, Soma.Holonics.Millennium.Swing.swing, two_smul]
+
+/-- An inverse paired coupling scatters by exchanging its transported components.
+In an isometric realization Dt is the energy adjoint and `(1/2) I` is the normal inverse. -/
+theorem graphScattering_inversePair
+    (D : W →ₗ[ℝ] V) (Dt : V →ₗ[ℝ] W)
+    (hinv : Dt.comp D = LinearMap.id) (x : V × W) :
+    graphScattering D Dt ((1 / 2 : ℝ) • LinearMap.id) x = (D x.2, Dt x.1) := by
+  have h := LinearMap.congr_fun hinv x.2
+  change Dt (D x.2) = x.2 at h
+  apply Prod.ext
+  · change (2 : ℝ) • ((1 / 2 : ℝ) • (x.1 + D x.2)) - x.1 = D x.2
+    module
+  · change (2 : ℝ) • Dt ((1 / 2 : ℝ) • (x.1 + D x.2)) - x.2 = Dt x.1
+    rw [map_smul, map_add, h]
+    module
+
+/-- Composing with the identity-graph Swing transports the two carriers in opposite directions. -/
+theorem paired_graphSwings_transport
+    (D Dt : V →ₗ[ℝ] V) (hinv : Dt.comp D = LinearMap.id) (x : V × V) :
+    graphScattering D Dt ((1 / 2 : ℝ) • LinearMap.id)
+      (graphScattering LinearMap.id LinearMap.id ((1 / 2 : ℝ) • LinearMap.id) x) =
+      (D x.1, Dt x.2) := by
+  rw [graphScattering_inversePair LinearMap.id LinearMap.id (by ext; rfl),
+    graphScattering_inversePair D Dt hinv]
+  rfl
+
+end GraphScattering
+
 end Soma.Holonics.Computation.HolonicConstitutiveCirculation
 
 section Audit
 open Soma.Holonics.Computation.HolonicConstitutiveCirculation
+#print axioms graphScattering_inversePair
+#print axioms paired_graphSwings_transport
+#print axioms graphProjection_idempotent
+#print axioms graphScattering_involutive
+#print axioms graphScattering_eq_swing
 #print axioms weighted_square_energy
 #print axioms phase_weighted_square_energy
 #print axioms emitted_smul

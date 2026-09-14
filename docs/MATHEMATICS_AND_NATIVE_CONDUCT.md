@@ -81,6 +81,14 @@ retention while its actual text remains unusable.
 This is a concrete classical-learning/constitutive correction grounded in actual retained
 currents, with no Lean or exterior evaluator in the learning path.
 
+[definition] The [September 14 fluid construction](HOLONIC_FLUID_CONSTRUCTION.md) derives
+material-action Euler and stress-based NS through the same Holon, and proves new joins from
+native scattering to Swing, from Swing to the actual Galerkin quadratic feedback, and from
+the local arithmetic companion to its phase metric. Microscopic restriction and boundary
+elimination retain their displayed feedback/memory equations. The documented internal-mode
+extension supplies an adjoint force, directional stress and energy-balanced diffusion; its
+continuum/native implementation is distinguished from the existing executable scattering.
+
 ## One framework, several realizations
 
 [definition] The [September 12 frontier consolidation](../research/records/2026-09-12_THE_FRONTIER_REVIEW_CONSOLIDATES_CONSTRUCTIVE_CONTINUITY.md)
