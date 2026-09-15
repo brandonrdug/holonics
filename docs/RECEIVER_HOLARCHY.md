@@ -339,3 +339,66 @@ evolves the complex currents, thermal modes and their common nonuniform material
 then reconstructs the full receiver volume. The geometric carriers and field are generated
 from that same state. This corrects the omitted source-evolution contribution without claiming
 that one supplied constitutive example completes the general HNN/physics synthesis.
+
+## Landmarks constrain one continuing interior
+
+[project-postulate] Brandon's September 15 horizon example poses an engineering construction:
+use before, intermediate and contemporary observations to infer the dynamics of an incompletely
+observed interior. Phase transitions are informative landmarks. The same question appears in
+perception, recollection, inverse physical problems and HNN formation. It belongs to the shared
+receiver/field objects, without prescribing a stored trace of every intermediate state.
+
+[definition] Let Ω be an admitted family of possible evolutions, retaining the constitutive
+laws, participating receivers, clocks, conservation constraints and phase-transition maps.
+At landmark i, `p_i:Ω→X_i` reads its situated state and `ρ_i:X_i→Y_i` its observing face.
+For available observation regions `O_i⊆Y_i`, the compatible family and a requested future face are
+
+```text
+F_I = ⋂_(i∈I) (ρ_i ∘ p_i)^(-1)(O_i)  ⊆ Ω,
+Y_* = (ρ_* ∘ p_*)(F_I).
+```
+
+[definition] This is a joint pullback on one family. Correlations between landmarks travel
+through Ω; independently matching three marginal observations does not construct their common
+evolution. A deterministic realization can instead use transported states `p_i=Φ_i`, including
+its parameters and receiver state in the common source. Relations and changing state spaces
+remain available when a phase change is not expressed by one fixed global coordinate map.
+The triad is a useful selected set of cuts, not a required three-step engine or global clock.
+
+[proved-derived; source-inspected] Adding an intermediate constraint gives
+`F_{0,1,2}⊆F_{0,2}`, hence `Y_*^{0,1,2}⊆Y_*^{0,2}`. This is the existing
+[`ReceiverPotential.additional_observation_refines`](../formal/elementary-holonics/ElementaryHolonics/Transport/ReceiverPotential.lean)
+construction on a product receiver; `image_receiver_restriction` covers source/target regions.
+`outcomes_singleton_of_factor` supplies the useful stronger case: a future face can be uniquely
+determined by the observations while the compatible source interior remains plural. The
+existing shrinking-receiver theorem gives the corresponding convergence under its bounds.
+
+[definition] “Inevitable” refers to a consequence forced throughout the applicable family.
+Useful generation can also return a compatible face or a bounded family under its requested
+conditions. Neither form requires claiming that all hidden microscopic history is recoverable.
+An observation used at the contemporary cut need not have been available to a historical
+prediction; the occurrence/receiver chronology retains that distinction.
+
+[proved-derived; source-inspected] The existing
+[`ReflectedBoundaryMemory.boundary_reduction_iff`](../formal/elementary-holonics/ElementaryHolonics/Physics/ReflectedBoundaryMemory.lean)
+makes interior omission precise in a linear chart. For arbitrary boundary x and interior z,
+
+```text
+E_next(Ax+Bz)=U(Ex)  for all x,z
+    iff  E_next A=U E  and  E_next B=0.
+```
+
+[definition] If the interior coupling contributes to an admitted future face, retain its modes,
+joint constraints, memory law or bounded residual in the representation. A richer encoding can
+carry that contribution economically. This specialization joins the general dynamic quotient
+`q_next T=U q`; it does not impose boundary-only state on a nonlinear coupled field.
+`ClockedSpan.comp`, `WorldTube` and `JointReceiverHistory.quotient` supply existing source,
+clock, obstruction, interior/radiation and receiver-family owners for the same composition.
+
+[definition] Conservation across these faces retains their orientations and actual material/
+exchange laws. Shared boundary contributions join through the declared incidence and transport;
+changing coarse charts carry their boundary-square defect when nonzero.
+[`ExteriorBoundary.pullback_coboundary_defect`](../formal/elementary-holonics/ElementaryHolonics/Geometry/ExteriorBoundary.lean)
+and the [active stress-face law](CONSTRAINT_MODES_AND_RECEIVER_FACES.md#the-overlap-has-stress-bearing-faces)
+make those obligations explicit. An active plate stores and changes current, material and frame;
+its receiving face is one projection of that continuing physical/mathematical construction.

@@ -33,14 +33,15 @@ compression/intelligence/navigation programme.
 |---|---|
 | Holonics | The framework of situated differences, composition, transport and physical realization |
 | HNN | The executable architecture conducting and forming those relations |
-| Eros | Union, composition and formative activity throughout the organization, including nested constituents |
-| Athena | First intended HNN product |
+| Eros | Collective formative machine and the union/composition occurring at every nested scope |
+| Athena | First intended HNN product within Eros; its interactions also enact Eros |
 | Hephaestus / automata | Utility product label / HNN-based solver applications and traversal constructions |
 | Soulkiller | Independent intake and dismantling of inherited realizations into usable material and witnesses |
 
 [definition] Eros is not confined to a separate top-level training job. Composition can occur
 inside a constituent, between constituents, and in the larger ecology containing them. Those
-are scopes of the same formative activity. Athena's generality and a Hephaestus application's
+are scopes of the same formative machine. Athena is one formation in this ecology, and its
+interactions continue that formative activity. Athena's generality and a Hephaestus application's
 specificity are compatible: a calculator request fixes a domain and receiver over a general
 construction capability. Existing API/wire names retain their compatibility.
 

@@ -20,8 +20,10 @@ population; a rebase carries the complete diagram. The
 transports that construction through parameter changes.
 
 [project-postulate] HNN is an executable architecture within this framework. Its product
-objective is frontier-level usefulness on consumer hardware. Mathematical research and HNN
-construction have their own explicit returns and can inform each other. The current
+objective is frontier-level usefulness on consumer hardware. Eros names the collective
+formative machine and the composition enacted throughout it. Mathematical and physical
+research develops the very objects, interactions and representations the HNN must execute;
+implementation and observation then refine those same constructions. The current
 [moving-frame strategy](plans/THE_MOVING_FRAME_RETURNS_THE_NULL_FIBRE_AND_THE_PHYSICAL_CONTINUATION.md)
 joins null fibres, physical continuation and the RH source without making the neural product
 the limit of the mathematics. The [mathematics tablet](canon/THE_MATHEMATICS_TABLET.md) supplies
@@ -33,8 +35,8 @@ the broader doctrine; the remainder of this guide describes the current executab
 |---|---|---|
 | **Holonics** | The mathematical framework and ontology, with executable applications | [Holon](../formal/elementary-holonics/ElementaryHolonics/Foundation/Holon.lean), [mathematics](canon/THE_MATHEMATICS_TABLET.md), [public Rust entry point](../crates/holonics/src/lib.rs) |
 | **HNN** | The Holonic Neural Network architecture and recurrent runtime | [native phase session](../crates/holonics-hna/src/native.rs), [constitutive ecology](../crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs); earlier [full operator](../crates/holonic-engine/src/holonic_intelligence/full_operation.rs) |
-| **Athena** | First intended HNN product; its name introduces no internal machinery boundary | [Athena interface](ATHENA.md) |
-| **Eros** | Union, composition and formative activity throughout the holonic organization, including nested constituents | [native relation formation](../crates/holonic-engine/src/native_ecology/constitutive_fibre.rs) and [circulation](../crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs); earlier [adjoint return](../crates/holonic-engine/src/holonic_intelligence/operative_return.rs) |
+| **Athena** | First intended HNN product within Eros; its constituent interactions also enact Eros | [Athena interface](ATHENA.md) |
+| **Eros** | Collective formative machine/ecology and the union/composition occurring throughout its nested constituents | [native relation formation](../crates/holonic-engine/src/native_ecology/constitutive_fibre.rs) and [circulation](../crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs); earlier [adjoint return](../crates/holonic-engine/src/holonic_intelligence/operative_return.rs) |
 | **Hephaestus / automata** | Utility product label / HNN-based solver applications using its traversal constructions | [application design](HEPHAESTUS_AUTOMATA.md); existing [exact synthesis reference](../crates/holonic-engine/examples/generator_factorization.rs) |
 | **Soulkiller** | Independent model-intake, excitation and dismantling apparatus | [Soulkiller](SOULKILLER.md), [consumed-input boundary](../crates/holonic-engine/src/soulkiller/boundary.rs) |
 | **Applications/codecs** | Text, image, audio, files, user protocols and target runtimes | [CLI](../applications/holonics-workbench/src/cli.rs), [interoperability](INTEROPERABILITY.md) |
@@ -73,9 +75,11 @@ flowchart LR
     P --> T[Declared external runtime]
 ```
 
-[definition] Eros names union and development within this recurrence; the native ecology carries
-the formed structure and current. Athena and Hephaestus label its products and uses, not internal
-engines or encapsulation boundaries. Athena is the first intended product of this construction.
+[definition] Eros names this collective formative organization and its union/development at
+every nested scope. Athena is a formation within it, while Athena's own interactions enact
+that same formative activity. The native ecology carries the shared structure, current and
+constitutive relations. Athena and Hephaestus name products/uses of the organization; their
+names introduce no separate engines or permanent training/inference partition.
 The [expanded architecture diagrams](HNN_COMPOSITION.md#the-architecture-as-explicit-passages)
 show the local passage, developmental return, classical block arithmetic and Soulkiller's
 commuting realization/restriction maps. Their full assembly is a construction account, with the

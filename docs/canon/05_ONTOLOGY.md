@@ -33,33 +33,66 @@ physical realization” of the whole ecology.
 
 ## Eros
 
-`Eros` is an `interpretation`: the project name for the operational pattern in which differences
-meet, constrain one another, found new local relations, return consequences, and retain changed
-conduct for later contact. Eros is not a persona module, language model, objective scalar, or
-metaphysical substance inserted into code.
+[definition] Eros names the collective formative machine/ecology and the operational pattern
+throughout it: differences meet, constrain one another, compose new relations and generate
+consequences through which the organization continues. Athena is a formation within Eros;
+Athena's constituent interactions and its participation in the wider ecology also enact Eros.
+The same relationship recurs at finer and coarser grains. HNN names the executable architecture
+through which that composition is realized.
 
-Prior passages can change the pathways by which later passages conduct. Capability increases only
-relative to a declared receiver and demonstrated improvement; morphology change alone can also
-degrade, specialize, or obstruct conduct. The machine's “self” is interpreted through the
-recurrent topology and lineage of that continuing ecology, not a frozen state image or a narrative
-synopsis.
+[project-postulate] Assess an operation with its actual receiver and keep its contribution to
+the accumulated whole in view. A local measurement can expose improvement, specialization or a
+failure without resetting the machine's other capabilities. The machine's self-relation is a
+construction through its changing body, shared source/receiver geometry and continuing modes.
+Develop the laws that let it perceive and act through that relation.
 
-## Certainty without mystification
+## Theogony as a reasoning lens
 
-Every implemented mechanism must answer:
+[interpretation] Brandon's September 15 Theogony reading is an explicitly nonliteral ontology
+for remembering a recurrent physical construction. These are his working roles, not a claim
+that a historical genealogy proves a physical theory or specifies software modules.
 
-1. What occurrence caused it?
-2. What local structure did it read and change?
-3. What constitutive law admitted that change?
-4. What returned consequence or obstruction resulted?
-5. Which later receiver can distinguish the change?
-6. What apparatus realized it, and what resource testimony returned?
+| Name in this lens | Relation to develop |
+|---|---|
+| Gaea | The exposed/supporting surface through which a body participates |
+| Tartarus | The interior or under relative to that surface and receiving frame |
+| Chaos | The intervening flux, available pathways and unresolved field organization |
+| Eros | Coupling and formative union binding those roles into an interacting whole |
+| Ouranos | An emergent enclosing or opposed boundary, itself produced by the organization |
+| Chronos; Zeus, Poseidon and Hades | Temporal/phase differentiation and the light, perturbation and decay relations Brandon associates with it |
 
-When these are unknown, retain an open fiber. Do not fill the gap with imported terminology,
-semantic confidence, an unexplained learned weight, or a framework convention.
+[interpretation] At a different receiver or grain, the whole construction can occupy one role
+inside another such construction. The roof's exterior and a room's interior, a membrane and
+its surrounding media, or a field boundary and its retained modes expose different instances.
+Orientation, winding and moving frames determine which side is seen. The [active-face law](../CONSTRAINT_MODES_AND_RECEIVER_FACES.md#the-overlap-has-stress-bearing-faces)
+retains the stress/current and observer terms needed to make that picture computational.
 
-Exact causal understanding does not require a single equation governing all ecologies. It requires
-that each local conduct be derivable, inspectable, and composable under the shared event calculus.
+[project-postulate] Use this lens, Platonic-element imagery and prism/refraction comparisons
+to recover relationships and propose equations. Express their implementation through the
+existing Holon, incidence, field, constitutive and receiver operators. Their explanatory power
+lies in helping the same construction remain recognizable across scales and representations.
+
+## Constructive certainty
+
+[project-postulate] Begin from the relation the physical or experiential picture exposes.
+Name its actual participants and observable faces, recover the governing maps and determine
+what can be constructed from the conditions. Retain alternative interiors where the receiver
+does not separate them; use their common consequences and derive a further separating or
+refining operation when needed. Precision should make the construction more powerful and
+composable, rather than become another qualitative gate on intelligence.
+
+[definition] Each realized claim retains its typed participants, source/constitutive relation,
+receiving consequence, applicable conditions and implementation or measurement evidence.
+The [mathematical implementation contract](../DEVELOPMENT.md#mathematical-implementation-and-continuation)
+owns that account and its relevant costs. It applies to the actual operation being constructed;
+no extra later-state mutation is required to recognize a solver or generated face.
+
+[definition] Before, intermediate and contemporary observations can constrain one common
+family of possible evolutions. Their [joint pullback](../RECEIVER_HOLARCHY.md#landmarks-constrain-one-continuing-interior)
+keeps chronology, phase-transition landmarks and constitutive conditions together. It supports
+interior inference without demanding a reversible record of every microscopic state. A claim
+of certainty concerns the declared consequence across that family; a claim of exact physical
+reproduction concerns the corresponding realization laws and their evidence.
 
 ## Knowledge and perspective
 

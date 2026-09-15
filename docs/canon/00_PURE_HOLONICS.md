@@ -25,8 +25,10 @@ connects this philosophical starting point to counting, geometry, construction a
 4. **Local exact transport.** A current follows locally admissible incidence and preserves every
    distinction owed to its declared future receivers. Approximation is lawful only as a named
    receiver quotient with an error/remainder certificate.
-5. **Return changes standing.** An event is complete only when its consequence, residual, or
-   obstruction returns to the continuing body. That returned difference may change later conduct.
+5. **Consequences compose.** Carry the generated face, inferred relation, residual or obstruction
+   with the source/material needed by its admitted consumers. Continuing operations use their
+   returned body. Inference, output and development contribute through their actual equations;
+   an extra before/after-state demonstration does not define their mathematical significance.
 6. **Holonic relativity.** Whole/part, interior/boundary, current/form, local/global, and
    source/receiver are roles at a declared grain and cut, not permanent substances.
 7. **No privileged chart.** Algebra, geometry, prose, code, pixels, waves, voltages, proof terms,

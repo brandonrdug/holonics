@@ -20,6 +20,14 @@ measurement does not reset the whole-machine appraisal. Preserve a component's i
 couplings across handoffs, and implement them through one continuing HNN rather than collecting
 isolated successful applications. The evaluation kit measures this work; it does not replace it.
 
+[project-postulate] The same September 15 direction names **Eros** as the collective formative
+machine: Athena is contained within it, and Athena's interactions enact that union at nested
+scales. First-person perception/cognition, faces and conservation, active plates/media and
+coarse graining guide the shared computational objects. “Continue Athena” authorizes refining
+those mathematical objects and their native consumers as one ambitious construction. The
+[construction ethos](../canon/THE_REALITY_OF_DIFFERENCE.md#construct-cognition-through-the-shared-objects)
+retains this direction across subjects and handoffs.
+
 ## Sustained objective and construction rhythm
 
 [definition] The model is one continuing `(K,Θ,|H⟩)` with admitted incidence/transport K,
@@ -190,10 +198,12 @@ not a measured power claim. Do not invent universal time, rank, precision or tok
 
 ## Shared mathematics and its productive use
 
-[project-postulate] Holonics remains a mathematical, physical and philosophical framework.
-Athena is its first product, not its entire purpose. Research and engine development inform
-one another, but no newly noticed subject automatically takes over the active model increment.
-Use the existing [research recovery method](../DEVELOPMENT.md#research-recovery-and-derivation)
+[project-postulate] Holonics develops the shared mathematical, physical and philosophical
+construction; Eros names its formative machine and Athena its first intended HNN product.
+Spectral/RH, Hodge, complex-fluid, force/GR and time research develops the objects that the
+engine must execute. Pursue the required generalization and tight composition through the
+active consuming operation, while a specifically requested physical/mathematical result retains
+its own deliverable. Conjecture endpoints do not define these objects' relevance. Use the existing [research recovery method](../DEVELOPMENT.md#research-recovery-and-derivation)
 and [formal framework](../FORMAL_FRAMEWORK.md).
 
 | Source construction | Concrete reusable contribution | Its separate open question |
@@ -205,8 +215,10 @@ and [formal framework](../FORMAL_FRAMEWORK.md).
 | Algebraic/arithmetic, quantum and geometric constructions | Callable exact algorithms, coefficient/constraint inference and typed physical application laws | Their individual source/endpoint claims; none is a universal admission requirement for HNN |
 
 [definition] The latest [RH current work](../RH_CENTERED_CURRENT_UPPER_BOUND.md) is explicitly
-authorized. It continues as a mathematical application alongside the engine. A request about
-it returns that mathematics; “Continue Athena” selects the engine brief. The threshold chart
+authorized. Its analytic/spectral objects contribute to the shared construction, while its
+global endpoint remains a particular mathematical objective. A request about that endpoint
+returns that mathematics; “Continue Athena” composes the applicable objects through the engine
+brief without waiting for the endpoint. The threshold chart
 remains `Λ_std=4Λ_DN`; a new physical or receiver analogy does not change its source theorem.
 
 ## All current plan documents and their roles

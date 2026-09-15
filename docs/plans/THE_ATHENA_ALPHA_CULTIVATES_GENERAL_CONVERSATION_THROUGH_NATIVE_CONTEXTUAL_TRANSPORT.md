@@ -273,6 +273,14 @@ the admitted session requires them, through the existing rest owner. The [traini
 [context](#context-morphology-and-active-interfaces), [durability](#encoding-memory-and-durability)
 and [application](#application-and-release-contract) contracts below govern this one construction.
 
+[project-postulate] Brandon's September 15 continuation standard is the unified Eros/HNN
+construction: conscious-experience motivation, face/conservation laws, active plates/media,
+coarse graining and spectral/cycle/fluid objects govern the elementary operations. The
+[landmark receiver construction](../RECEIVER_HOLARCHY.md#landmarks-constrain-one-continuing-interior)
+shows how available observations constrain one common evolving interior. Recover and implement
+the corresponding operators at this consumer; preserve their phase, source correlations,
+applicability and producing variations. The benchmark apparatus measures those consequences.
+
 ### Training data and generalization
 
 [project-postulate] The [shared evaluation contract](../ATHENA_EVALUATION.md) fixes the questions

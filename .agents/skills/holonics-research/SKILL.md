@@ -6,9 +6,15 @@ description: "Recover and develop Holonics mathematical, physical and computatio
 # Holonics research and construction
 
 Develop the consequence the user requested from the programme's existing constructions.
-An intuition is a starting relation to work, not a subject to classify and set aside.
-Physics, mathematics and computation have their own productive returns; do not redirect
-one into another because a familiar implementation is easier to finish.
+An intuition is a starting relation to work. Carry the accumulated framework's strength into
+its construction: first-person perception, faces/conservation, coarse graining, plate/medium
+coupling and interior inference guide the shared objects. Eros names their collective formation
+and nested composition; “Continue Athena” means realizing that unification through the actual
+application. The [construction ethos](../../../docs/canon/THE_REALITY_OF_DIFFERENCE.md#construct-cognition-through-the-shared-objects)
+retains the reasoning. Subject routes below locate dependencies; they do not separate the
+machine into faculties or make mathematical objects optional because a conjecture is unfinished.
+Physics, mathematics and computation retain their requested consequences and compose through
+their actual laws, rather than being redirected to a familiar small demonstration.
 
 ## Recover the relevant construction
 

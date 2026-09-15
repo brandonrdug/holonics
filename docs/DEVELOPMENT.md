@@ -6,7 +6,12 @@ apparatus; they are not dependencies that schedule native inference.
 
 ## Mathematical implementation and continuation
 
-[project-postulate] HNN is the architecture being constructed; Athena is the first product.
+[project-postulate] HNN is the architecture being constructed; Eros names the collective
+formative machine and its nested interactions; Athena is its first intended product. “Continue
+Athena” carries the accumulated physical/mathematical constructions into their shared executable
+objects. The [construction ethos](canon/THE_REALITY_OF_DIFFERENCE.md#construct-cognition-through-the-shared-objects)
+keeps conscious-experience motivation, faces, active media, coarse graining and interior inference
+present in this work. A new source domain is an opportunity to generalize and join those objects.
 Use the [network contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-hnn-network-and-its-mathematical-contract)
 to locate the operation a change serves. Generator formation, compression and navigation use
 the same retained mathematical organization. Product labels, test cases and export languages
@@ -117,9 +122,11 @@ create a second plan, enumerate every edit, or rewrite the brief at each tool ca
 [project-postulate] Execute this loop at a substantive return, a proposed change of source/domain
 or completion criterion, or compaction that leaves the next action ambiguous:
 
-1. **Select from the brief.** Name the change to the consuming operation. If the proposed work
-   ends at another example, helper or measurement, state its already-required consumer and carry
-   that integration in the same work assignment. A failed fixture does not choose the next goal.
+1. **Select from the brief and the accumulated construction.** Name the shared object or
+   interaction being strengthened, the mathematical/physical relations already available, and
+   the consuming operation. Carry a keystone's role in the whole even when its local output is
+   small. If the work returns a theorem, helper or measurement, carry its required native or
+   mathematical consumption in the same assignment. A failed fixture does not choose the goal.
 2. **Check the model equation at the consumer.** Root compares the proposed edit with the
    [model formula](HNN_FORMULA.md), direct request and actual invoked operator. Identify which
    current, constitutive map, differential or representation changes and what requested output
@@ -141,9 +148,10 @@ do not review every patch or rerun an unchanged check. A new mathematical obstru
 the implementation route, with its failed equation and revised route recorded. It does not
 silently shrink the user's deliverable or require a new user permission for authorized work.
 
-[project-postulate] Compaction retains this brief's unresolved operation, selected action,
-changed owners, running checks, the actual model invocation/output and the disposition of the
-last human occurrence. Resume that action when it is clear; completed links are not new
+[project-postulate] Compaction retains the unified machine objective, accumulated usable
+relations and why the current keystone matters, together with this brief's unresolved operation,
+selected action, changed owners, running checks, actual model invocation/output and disposition
+of the last human occurrence. Resume that action when it is clear; completed links are not new
 requests. A paused goal stays paused.
 An explicit new user request can steer the work without replacing the full programme. The
 loop is an execution practice, not a theorem of model behavior or a runtime intelligence gate.

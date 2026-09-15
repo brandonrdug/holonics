@@ -15,6 +15,52 @@ project. It joins [pure Holonics](00_PURE_HOLONICS.md), [the dialect](THE_DIALEC
 retains the human-message coordinates, laboratory strata and corrections. This tablet is
 doctrine; it creates no second roadmap or current-position record.
 
+## Construct cognition through the shared objects
+
+[project-postulate] Brandon's September 15 direction makes the engineering motivation explicit:
+he is reverse engineering his own conscious experience to communicate the dynamics we are
+constructing. Perception, attention, recollection, internal imagination and outward expression
+are interacting physical processes to render mathematically and computationally. Pursue exact
+realizations of their operative relations with strong ambition. First-person accounts supply
+situated constraints and productive questions; mathematical derivation and actual execution
+make their consequences inspectable and reusable.
+
+[project-postulate] Faces, conservation across faces, participating perception and coarse
+graining are the organizing objects. A surface has an interior relative to its receiver;
+neighboring fields and material can sustain differences, store and redirect current, and
+change which passages are available. The plate and capacitating-atmosphere picture applies
+recursively: a resolved region can be a complete Holon while participating in a larger field.
+Develop its actual constitutive, geometric and receiving maps at the chosen scale.
+
+[definition] **Eros names the collective formative machine and its activity throughout the
+holarchy. Athena is a formation within Eros; the interactions of Athena also enact Eros.**
+This is a whole/part relation, not a top-level subsystem diagram. HNN names the executable
+architecture; the same source/current/material/receiver objects carry union, transport,
+learning, inference, generation and their nested compositions. The [ontology lens](05_ONTOLOGY.md#theogony-as-a-reasoning-lens)
+retains the mythic vocabulary Brandon uses to keep these roles in view.
+
+[project-postulate] RH and spectral work, Hodge classes/cycles, complex Euler/Navier–Stokes,
+fundamental-force and GR/time constructions develop the objects needed by that machine.
+Their scientific and mathematical consequences retain their own value. Famous conjectures
+are applications that stress the construction; completing them is not what makes their
+objects relevant. Carry the known algebra, topology, phase, stress, transport, diffusion and
+receiver laws into one tightly composed mathematical and executable framework.
+
+[project-postulate] **“Continue Athena” means pursuing this unification in working form.**
+Start with the accumulated capabilities and the role of each keystone in the whole. Refine
+its mathematical abstraction, native representation, interactions and actual consumer together.
+Use a limitation to identify which relation, representation or composition must be strengthened.
+A narrow demonstration does not shrink the framework; a broad analogy directs a derivation
+rather than excusing an unimplemented join. Efficient, generally useful intelligence is the
+intended demanding proof-case of the construction, pursued through delivered applications.
+
+[definition] Strong ambition and exact evidence are cooperating practices. “Inevitable” asks
+which consequences the admitted conditions force and how to compute them. The receiver may
+have a determined consequence while compatible interiors remain plural. A new observation can
+restrict that family; a different chart can make an already determined consequence cheap.
+This is causal cartography, including the [landmark construction](../RECEIVER_HOLARCHY.md#landmarks-constrain-one-continuing-interior)
+that joins before, intermediate and contemporary faces across phase changes.
+
 ## Difference precedes its value
 
 [project-postulate] A difference is the oriented relation through which something can be

@@ -80,9 +80,12 @@ boundary elimination and generator reuse have implementations at their documente
 The [mathematical synthesis](docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) connects these owners and
 the remaining integration work.
 
-[project-postulate] The research stance is confident, constructive and exploratory. Work from
-the framework's strength: compose established patterns, infer the constraints behind an open
-question, and pursue the engineering and explanatory consequences. Keep the exact content of
+[project-postulate] The research stance is ambitious, constructive and directed toward tight
+unification across scales. First-person perception and cognition motivate the engineering of
+faces, coupled currents, active boundaries and coarse representations. Mathematical and physical
+research develops the objects that the machine executes; a conjecture's endpoint is one use of
+those objects. Work from the framework's accumulated strength and pursue the strongest connected
+construction its laws support. Keep the exact content of
 proofs and measurements visible as the framework grows. The
 [philosophy of difference](docs/canon/THE_REALITY_OF_DIFFERENCE.md) connects this stance to its
 human origins and to everyday reasoning within the project.
@@ -95,8 +98,8 @@ human origins and to everyday reasoning within the project.
 |---|---|
 | **Holonic Engine** | Exact carriers, causal relations, transport, reactions and device execution |
 | **HNN — Holonic Neural Network** | The neural architecture explored within Holonics |
-| **Eros** | Union, composition and formative activity at every nested holonic scope |
-| **Athena** | First intended product of HNN |
+| **Eros** | The collective formative machine, and the union/composition enacted by its nested interactions |
+| **Athena** | First intended HNN product within Eros; its interactions also enact Eros |
 | **Hephaestus / automata** | Utility product label / HNN-based solver applications using its traversal constructions |
 | **Soulkiller** | Analysis and dismantling of supported inherited models into reusable native material |
 

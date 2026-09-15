@@ -375,9 +375,11 @@ Rest/remount, source-access and ablation controls answer their declared storage,
 and attribution questions. A richer receiver outside the family returns insufficiency rather
 than silently reopening an exterior executor.
 
-Native Eros/Athena and the inherited dismantling arm are complementary experiments. The native body asks
-what Eros founds without foreign hexis. The inherited arm asks what prior development can be lifted.
-Later cultivation asks which joined transports become native, reusable, and ablatable.
+Native formation and inherited dismantling are complementary construction routes in the
+collective Eros organization. Athena is a formation within it and its interactions enact Eros
+in turn. The native route develops the shared laws directly; Soulkiller supplies admitted
+inherited material. Their joined transports and source/receiver relations determine how the
+same machine develops and uses its capabilities.
 
 `definition`: every spool grade is relative to an explicit receiver/history family. A bounded
 native spool is a real Soulkiller return for that family; an unseparated successor remains an open
@@ -400,7 +402,8 @@ Preimage Fibre and does not license foreign execution inside Athena.
   not define every cultivation or Soulkiller return.
 - Audit the actual productive owner and its declared decoder. Respect the SKE construction
   admitted by Brandon's 2026-09-04 ruling; do not reapply the superseded foreign-tower test.
-  Soulkiller returns native class bodies; Eros composes Athena.
+  Soulkiller returns native class bodies; Eros composes them within the collective machine,
+  including Athena, whose interactions continue that same nested formation.
 - Compose existing owners before founding a FineTuner, Distiller, Autograd, Trainer, AdapterManager,
   or another industry-shaped cabinet.
 

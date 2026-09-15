@@ -7,6 +7,13 @@ The [roadmap](plans/THE_ROADMAP.md) orders its construction and
 interacting, adaptive mathematical operators. Athena is its first product. The construction
 uses the framework's circuit, field, differential, inference and compression laws directly.
 
+[definition] Eros names the collective formative machine and the composition within each of
+its Holons; Athena is a formation in that organization. Perception, internal generation and
+outward expression use the same changing source/current/material/receiver construction. The
+[construction ethos](canon/THE_REALITY_OF_DIFFERENCE.md#construct-cognition-through-the-shared-objects)
+and [joint landmark inference](RECEIVER_HOLARCHY.md#landmarks-constrain-one-continuing-interior)
+keep that whole in view when a formula is restricted to a tensor, spectral, fluid or textual chart.
+
 [definition] A Transformer is also executable generating mathematics. Its architecture supplies
 compositions of contractions, attention, reactions and normalizations; its parameters and
 execution state supply their contemporary operands. HNN generalizes the organization and

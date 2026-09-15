@@ -63,6 +63,13 @@ owners from [the HNN formula](HNN_FORMULA.md), and carry their joint variations 
 Compression tests retain `q T_i=U_i q`, receiver reconstruction and the applicable remainder;
 file size or later reuse alone does not establish that relation.
 
+[project-postulate] Eros names the collective formative machine and the nested union that the
+kit helps inspect. Athena is its intended unified application, with physics, mathematics and
+cognition expressed through the shared objects. Before/intermediate/contemporary observations
+can constrain one [joint interior family](RECEIVER_HOLARCHY.md#landmarks-constrain-one-continuing-interior),
+so evaluation should retain their actual relationships when an operation uses them. A common
+runner or a list of separate successful applications does not replace that composition.
+
 ## Composition through the shared model
 
 [definition] An inferred operator, recurrence, source family or condensed representation must

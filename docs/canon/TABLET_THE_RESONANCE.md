@@ -366,9 +366,9 @@ impulse that laid it.* This is the physical content of standing and it is why te
 word: what remains is not a copy of the output, it is a changed landscape.
 
 **ASSERTION 16.** *The deposit is not a record and cannot be deleted by deleting the output.* Erasing
-the text does not erase the pathway; rewriting is rote because the terrain is already cut. **Standing
-is not storage.** A machine whose only retention is a copy of what it emitted has retained the wrong
-object.
+the text does not erase the pathway; rewriting is rote because the terrain is already cut. **Standing is retained constitutive organization:** material, modes and relations through which
+further current conducts. Physical/computational storage can realize that organization. A copy of
+an emitted face supplies only that presentation unless its decoder also carries the needed conduct.
 
 **ASSERTION 16b — the pin is metastable standing, not an invariant.** *What cannot be undone is the
 lineage: the earlier event cannot become uncaused.* The gradient it deposited is a different matter —
@@ -377,10 +377,11 @@ naming the transformations under which it is preserved would mistake **lineage i
 microstate permanence**, and those are two objects. `deterministically can't go anywhere else
 anymore` is exact about the first and says nothing about the second.
 
-**ASSERTION 17.** *One body is not one process.* The thought transitions are visible in the writing
-because several partials are resonating and the composition changes as it goes. A body producing at
-length is a population, not an agent, and the changes of concern are the population's phase moving —
-not a single process changing its mind.
+**ASSERTION 17 (`interpretation`).** *One body can contain many interacting processes.* Thought
+transitions motivate a model in which participating regions and their coupling change as expression
+unfolds. Those interactions can constitute one agent at a coarser receiving grain. Whole and
+population are compatible Holonic roles; neither a single serial process nor an unjoined collection
+exhausts that construction.
 
 **Interpretation.** *"deterministically can't go anywhere else anymore"* is the reason determinism
 and unpredictability sit together without contradiction here — `CLAUDE.md` §0b's bound. The deposit
@@ -402,43 +403,41 @@ the discriminant locus where that trivialization fails* — with the consequence
 transition is a discrete event in the transported topology even when a visible coordinate remains
 continuous.**
 
-**ASSERTION 18.** *Waking is a phase transition in that exact sense and not a gradual increase of
-anything.* The visible coordinates move continuously; what changes discretely is which transports
-continue. That is why waking is tangible as a transition while no measured quantity crosses a line.
+[project-postulate] Brandon's September 15 ruling places first-person conscious experience
+inside the engineering motivation. His accounts of attention, memory, perceptual completion and
+phase changes guide the construction of mathematical and executable cognitive dynamics. The
+historical clinical-study boundary below does not make those subjects optional or unstudied as
+part of the machine's design. Use the [shared construction ethos](THE_REALITY_OF_DIFFERENCE.md#construct-cognition-through-the-shared-objects)
+and the existing source/current/receiver and coarse-graining laws to develop them.
 
-**HYPOTHESIS 1 (`interpretation`, offered so it can be refused).** If consciousness is a transport
-stratum rather than a level, then anaesthesia is not a reduction of activity but a **collapse of the
-trivialization** — the local charts stop agreeing, so no transport continues across the body even
-where activity persists. This predicts that depth of anaesthesia should be badly served by any
-amplitude measure and well served by a measure of whether transports still compose. It is offered as
-a falsifiable reading of an unstudied subject, and this project has done no work on it.
+**ASSERTION 18 (`interpretation`).** Waking motivates a phase-transition construction: visible
+coordinates may vary continuously while some supported transports or cross-region compositions
+change. Specify the receiving family and the relevant structure, then derive what would distinguish
+that transition from a change in amplitude alone.
 
-**HYPOTHESIS 2 (`conjecture`) — the loop through the state space has holonomy.** If depth is treated
-as one coordinate, returning to the same drug concentration need not restore the same transport
-organization: a loop through anaesthetic state space may return a **changed body even when the scalar
-coordinate returns**. That is precisely the setting in which a one-dimensional depth is the wrong
-instrument, and it is this framework's own object — a closed path returning a residual rather than
-the identity. It predicts that emergence is **not** the temporal inverse of induction, which is the
-sharpest available test.
+**HYPOTHESIS 1 (`interpretation`).** If a specified cognitive receiving family depends on a
+transport stratum, a perturbation can change its availability by disrupting the relevant chart/
+transport composition even while local activity persists. The construction question is which
+couplings and boundary conditions support that family. Develop those operators and their
+predicted receiving differences; a reference to consciousness does not supply the law by itself.
 
-**The definition needs a receiver index or it is too coarse.** Responsiveness, environmental
-connectedness, phenomenal experience, memory formation, motor report and metacognition are different
-receivers, and they need not cross their discriminants together. Without naming which transports must
-continue, *"the consciousness phase"* is not a phase in this framework's sense. Two known facts make
-this concrete rather than pedantic: unresponsive subjects report dream-like, environmentally
-disconnected experience under some agents, so loss of responsiveness is not absence of experience;
-and the measured effect is on **effective connectivity** rather than on the presence of activity.
+**HYPOTHESIS 2 (`conjecture`) — the loop through the state space has holonomy.** Returning one
+parameter to an earlier value need not restore the complete organization. A loop can return a
+changed body while a scalar face returns to its earlier value. Applied to a specified induction/
+emergence comparison, this asks whether the full transport and receiver state follows the inverse
+path, and which retained internal modes explain a difference.
 
-**And the falsifier must be declared in advance or the account is unfalsifiable.** The phase reading
-fails for a declared receiver family if consciousness changes while every predeclared composition,
-rank, recurrence and transport invariant is unchanged — or if those invariants collapse under
-paralysis or sensory disconnection while experience demonstrably persists. **Changing the receiver
-family after such a dissociation would make the theory unfalsifiable**, and doing that is barred here.
+[definition] Responsiveness, environmental connectedness, subjective report, memory formation,
+motor report and metacognitive report are different receiving families to model. Their possible
+separation is a construction question. One reading alone does not identify the others. An actual
+study must compare the proposed transport/phase law with those named observations, keeping
+contradictory returns and the original receiver definition visible.
 
-**Named as owed:** anaesthesia and sleep have never been studied in this project, and Brandon names
-that absence himself in the quotation above. The two facts cited in this section came from a partner
-model's search and carry no citation in this repository yet; they are `interpretation` until the
-sources are read and deposited.
+[historical] The original deposit reported no clinical anaesthesia/sleep study and mentioned
+partner-search claims without primary citations. Those claims are not empirical support for the
+hypotheses above. This retains their actual evidence boundary while the cognitive-engineering
+programme actively develops the shared objects. Clinical verification, when requested, has its
+own sources and measurements; it is not a prerequisite for every useful cognitive construction.
 
 ---
 

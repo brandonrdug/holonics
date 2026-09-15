@@ -10,7 +10,11 @@ review's exact source coordinates are retained in the
 [project-postulate] The [reality of difference](canon/THE_REALITY_OF_DIFFERENCE.md) supplies the
 philosophical starting point: Holonics is a theory of everything, difference is primary, every
 value comes from a situated comparison, and relevance concerns causal participation. These
-commitments guide how the formalized instances below are composed and developed.
+commitments guide how the formalized instances below are composed and developed. Brandon's
+September 15 ruling makes their construction role explicit: RH/spectral, Hodge, complex fluid,
+force/GR and time investigations develop shared objects required by the machine. Conjecture
+endpoints are applications of those objects. Formal/library work refines the common structure
+and its consumers together, with the accumulated framework's strength as the starting point.
 
 [definition] The Lean entry point is
 [`ElementaryHolonics.Framework`](../formal/elementary-holonics/ElementaryHolonics/Framework.lean).

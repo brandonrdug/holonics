@@ -1,7 +1,9 @@
 # Athena and the HNN training/inference interface
 
-[definition] Athena is the first intended HNN product. HNN names the machinery and owns its
-constitutive morphology, current, incidence, chronology, lineage and admitted receiver domain.
+[definition] Athena is the first intended HNN product within Eros, the collective formative
+machine. Athena's internal and outward interactions also enact Eros at their respective grains.
+HNN names the architecture and owns its constitutive morphology, current, incidence, chronology,
+lineage and admitted receiver domain.
 Automata label HNN-based solvers and their traversal constructions; Hephaestus is a utility
 product label. Eros names union, composition and formation throughout HNN recurrence. The
 [expanded architecture](HNN_COMPOSITION.md#the-architecture-as-explicit-passages) shows these roles

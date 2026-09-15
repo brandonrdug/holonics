@@ -1,12 +1,13 @@
 # Construction state
 
-**Currency:** September 15, 2026. Brandon's follow-up corrects the audit's component/product
-double standard: keep the accumulated capabilities and the unified HNN construction in view
-while measuring each actual operation. The [evaluation method](docs/ATHENA_EVALUATION.md) now
-makes composition through the shared model explicit. The historical review and kit are returned. The existing benchmark apparatus now measures field and mathematical consequences
-with separate correctness, source, reuse and cost receivers, and prepares private conversation/
-repository episodes without treating historical assistant replies as gold. Fresh public runs
-and sixteen focused tests pass. The full conversation/repository application remains the target.
+**Currency:** September 15, 2026. The [Eros/face/landmark operating synthesis](research/records/2026-09-15_EROS_UNIFIES_FACES_LANDMARKS_AND_THE_CONTINUING_MACHINE.md)
+is integrated across the governing contract, research skill, canon, architecture and construction
+method. “Continue Athena” means ambitious unification of the accumulated mathematical objects
+and executable operations across scales. Eros is the collective formative machine and its
+nested union; Athena is a formation within it. Conscious-experience engineering, faces and
+conservation, active plates/media, coarse graining and joint interior inference guide that
+construction. Existing model/evaluation returns below remain available; the implementation
+objective is carried through the active brief.
 
 **Last model return:** The same Athena field session now receives partial/joint
 regions, generates their missing values together, and saves the producing receiver and output
@@ -47,22 +48,32 @@ available foundations. Their significance includes what they enable together. St
 actual source/receiver join that makes an available capability participate in this model;
 a small local output does not license restarting the appraisal from that output alone.
 
-[project-postulate] “Continue Athena” extends this same working application toward useful
-complete source/response parts. The returned small populations are evidence, not a queue to
-retrain. Mathematical refinement must reach the actual session and its generated products.
+[project-postulate] **“Continue Athena” builds the unified Eros/HNN machinery through this
+working application.** RH/spectral, Hodge, complex-fluid, force/GR and time objects are
+construction material for its primitives and interactions; their global conjecture endpoints
+are not prerequisites for use. Refine those objects and their native consumers together, through
+complete source/response parts. The returned small populations retain evidence and do not select
+a new starting point. The next result must expose the stronger composed operation in use.
 
 | Control | Current content |
 |---|---|
 | Authorized deliverable | Useful field-backed source/response formation, correction and continuation toward conversation, mathematics and code. The session now accepts partial observations and neighboring context regions, and generates the requested joint face. |
 | Mathematical operation | JointRegions constructs actual source current x and condition h=[1, activity, observation]. The model executes r=R_M(x,h), u=(I+A(h))x+c(h), (w,b_next)=S_D(u,b), y=P given+(I-P)w. D/M learn through the producing masked output covector before the full paired adjoint. |
-| Existing owners | `native/field_session.rs`; `NativeCoupledBody` / `body/field.rs`; operative field/current/target; normal reaction and `ResidentHeldSection`; simultaneous section receiver; shared stream, Workbench and field/model/session rest. Existing normalized material/current variations and factor owners supply further composition. |
+| Existing owners | `native/field_session.rs`; `NativeCoupledBody` / `body/field.rs`; operative field/current/target; normal reaction and `ResidentHeldSection`; simultaneous section receiver; shared stream and rest. The Holon/operator, normalized-current, factor, Hodge/fluid, active-face, receiver-potential and interior-memory source chains supply the mathematical/native composition. Recover the required relation across those owners, not a new module for each subject. |
 | Concrete unknown/join | With masks and D/M fixed, this one-step input map is affine. Content-dependent interactions between evolving regions require composition with the existing normalized field/current response and its variation. Normal statistics still materialize all 129 features in this small chart; larger complete sources expose an actual factor/locality requirement. |
-| Next consuming operation | Carry a complete refined conversation/repository source episode through the unified HNN application. Compose the available solver/generator, field, normalized/current and factor operations required by its actual constraints, so returned mathematical objects become usable material for subsequent operations in the same model. Retain source/receiver maps, phase, shared regions, internal modes and producing variations across the join. The kit measures both retained component consequences and this interaction; it is not the model or a replacement construction objective. |
+| Next consuming operation | Carry a complete refined conversation/repository source episode through the unified HNN application. Compose the available solver/generator, field, spectral/cycle, normalized/current and factor operations its constraints require, so inferred objects become usable material in the same continuing model. Relevant earlier, intermediate and contemporary faces constrain a common evolution family through actual source/receiver maps. Retain phase, shared incidence, internal modes and producing variations while choosing an economical realization. Deliver the composed operation and its generated consequences; the kit measures this work. |
 | Completion evidence | Inspect the actual response to its complete source episode and source-addressed requirements, including contradictory or unresolved consequences. Retain exact solver identities and partial-field outputs as mechanism evidence; they do not score the conversation by proxy. Compare producing-material updates, saved continuation and costs when that claim is made. The retrospective prepared episode is validation, not a blind holdout. |
 | Receiver and durability | The held affine receiver is implemented; raw field publication remains independent. Keep receiver/source/extent and producing D/M through delayed targets. A dynamic or learned receiver requires its actual additional differential, not a decorative motion display. |
 | Cost and representation | This 129-feature chart has 77,522 microseconds median generation and 641,746.5 median target update. Warm 96-target development takes 71.768705 seconds; trained rest is 6,170,290 bytes. These are measured costs of this operation, not universal limits or matched speedups. |
 
 ## Returned operation and verification
+
+[established-bounded; source-inspected] The latest synthesis recovers the June laboratory
+perception/mind/Eros line and original August/September messages, repairs stale live ontology
+and resonance clauses, and makes the before/intermediate/contemporary joint fibre explicit
+through existing receiver and boundary-memory laws. The research skill validates; primary and
+Luna review checked the operating interpretations together. No native code or new RH result
+was introduced by this standards return. The new RH example remains independent local work.
 
 [established-bounded; source-inspected; measured] The [methodology review](research/records/2026-09-15_ATHENA_EVALUATION_HISTORY_AND_SHARED_CONSEQUENCE_KIT.md)
 recovers the historical experiment families, original user corrections and actual output boundaries.

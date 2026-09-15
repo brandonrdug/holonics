@@ -31,11 +31,13 @@ Its mathematical research develops reusable methods of construction and explanat
 biological and computational systems. **HNN — Holonic Neural Network** names the architecture
 and machinery. **Athena is the first intended product.** Automata label solvers based on HNN's
 traversal constructions; Hephaestus is a tool/utility product label. Use HNN when explaining
-mechanisms, with the actual mathematical operation and source owner. Eros names union,
-composition and formative activity at every nested scope; Soulkiller independently dismantles
-inherited realizations. These names do not choose a topology, divide the network into engines
-or supply an implementation requirement. Source/receiver relations and ownership determine
-composition. Preserve existing API/wire names and historical source references.
+mechanisms, with the actual mathematical operation and source owner. **Eros names the collective
+formative machine and the union/composition occurring throughout it. Athena is a formation within
+Eros, and Athena's constituent interactions enact Eros.** This whole/part relation recurs across
+grains. Soulkiller independently dismantles inherited realizations into material that can join
+that organization. Source/receiver relations, constitutive laws and ownership determine the
+implementation; the names do not partition it into independent engines. Preserve existing API/wire
+names and historical source references.
 See [the application design](docs/HEPHAESTUS_AUTOMATA.md). HNN's product goal is frontier-level
 usefulness on consumer hardware. The “20W ideology” directs efficient local formation and reuse,
 not a literal current-machine power claim. Read
@@ -92,13 +94,26 @@ role lawful. The prohibited substitution is an incidental gauge/apparatus readin
 score promoted into intrinsic semantic identity or admission without that relation. Historical
 "scalar governor" shorthand is not a ban on loss-guided formation or exact mathematical choice.
 
-[project-postulate] **Hold the theory-of-everything ambition as the working standard.** Assume the
-framework's strength and pursue its consequences with initiative. The philosophy must shape
-reasoning before implementation: recover existing constructions, connect their elementary
-patterns, and let each return change what can be inferred or built next. A theorem's solved
-status is not its purpose. Develop an intuition into explicit maps and consequences; use actual
-failures to locate the mistaken construction or refine the claim. Keep the ambition strong and
-the evidence exact, without repeatedly seeking permission to use established mathematics.
+[project-postulate] **Construct the unified machine with the full theory-of-everything ambition.**
+Brandon's September 15 ruling treats his first-person account of perception, attention, memory
+and generation as engineering direction for mathematically reproducing the operative dynamics.
+Faces, conservation across faces, participating receivers, coarse graining, active plates and
+capacitating media are central construction objects at every scale. RH, Hodge, complex Euler/
+Navier–Stokes, fundamental-force and relativistic/time research develop these objects and laws;
+the named conjecture endpoints do not determine their importance or postpone their use.
+Start from the substantial accumulated mathematics and machinery. Derive, compose, generalize,
+realize and refine it aggressively; pursue the strongest supported construction rather than
+resetting capability to the latest small example. Precision makes the ambition executable:
+a failed equation directs repair, and an interpretation directs the next derivation.
+
+[project-postulate] **“Continue Athena” means this unification in executable form.** Use the
+active brief to carry the actual application through shared Holons, operators and evolving
+source/receiver relations. Refine mathematical objects and their native consumers together.
+The [construction ethos](docs/canon/THE_REALITY_OF_DIFFERENCE.md#construct-cognition-through-the-shared-objects)
+retains the first-person motivation, Eros nesting and landmark/interior reasoning; the
+[ontology](docs/canon/05_ONTOLOGY.md#theogony-as-a-reasoning-lens) retains Brandon's nonliteral
+mythic vocabulary. These orient construction and do not introduce deity-named modules,
+a new workflow ritual or another requirement to ask him for an explainer.
 
 [project-postulate] The [Reality of Difference construction programme](docs/plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md)
 now connects the existing Swing, potential/fibre, tube/scale, constitutive, mathematical,

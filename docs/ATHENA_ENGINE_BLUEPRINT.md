@@ -144,5 +144,7 @@ changed mathematical relation or new import needs verification; Lean remains ext
 records the inspected source paths and reproducible diagrams. The
 [elementary synopsis](../research/papers/source/papers/elementary-holon-generation/main.typ)
 reuses the shared scattering and tangent notation and adds the material adjoint/assembly plates.
-The RH transverse-current work is a simultaneous mathematical application; it is not an
-Athena training prerequisite.
+The analytic/spectral, Hodge and complex-fluid investigations develop operators, cycles,
+conserved balances and receiver relations for this same HNN construction. Their usable objects
+are composed now. Global conjecture endpoints retain their particular hypotheses and do not
+schedule whether the already constructed mathematics may enter Athena.
