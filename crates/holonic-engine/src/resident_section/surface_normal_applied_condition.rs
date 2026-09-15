@@ -12,9 +12,11 @@ impl<'c> ResidentSurface<'c> {
         condition: ResidentConstitutiveCurrent<'_, 'c>,
         targets: usize,
         joint: Option<(usize, ResidentNormalEnclosureView<'_, 'c>)>,
+        identity: bool,
         out: &ResidentSection<'c>,
     ) -> Result<(), ResidentRefusal> {
         let fail = Self::operative_error;
+        if identity && (joint.is_some() || source.width != 2*targets) { return Err(fail()); }
         self.validate_normal_input(source.into(), source.grain.0)?;
         self.validate_normal_input(ResidentNormalInput::Point(condition), source.grain.0)?;
         let d = joint.map_or(source.width, |(d, _)| d);
@@ -62,7 +64,7 @@ impl<'c> ResidentSurface<'c> {
             .ptr(external.section.lo.device_ptr())
             .ptr(external.section.hi.device_ptr())
             .u32(external.offset as u32)
-            .u32(u32::from(joint.is_some()))
+            .u32(if identity { 2 } else { u32::from(joint.is_some()) })
             .ptr(condition.section.lo.device_ptr())
             .ptr(condition.section.hi.device_ptr())
             .u32(condition.offset as u32)

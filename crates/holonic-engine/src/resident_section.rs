@@ -103,6 +103,7 @@ mod surface_normal_enclosure_ports;
 mod surface_normal_applied_condition;
 mod surface_normal_wave;
 mod surface_normal_wave_basis_face;
+mod surface_normal_section_basis;
 mod surface_normal_wave_source;
 mod surface_normal_wave_family;
 mod surface_normal_family_receiver;
@@ -165,7 +166,7 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 50] = [
+pub const KERNELS: [&str; 51] = [
     "section_constitutive_rechart",
     "section_constitutive_circulation",
     "section_constitutive_fibre",
@@ -218,6 +219,7 @@ pub const KERNELS: [&str; 50] = [
     "section_contact_adjoint_keys",
     "section_contact_adjoint_values",
     "section_arithmetic_control",
+    "section_normal_wave_basis_sections",
     // The tiled contraction's emitted family. Every wrapper is named here so the module-wide block
     // derivation inspects every instantiation rather than one; each carries `__launch_bounds__(512)`
     // so no instantiation drops `block_x` for the other kernels in the module.

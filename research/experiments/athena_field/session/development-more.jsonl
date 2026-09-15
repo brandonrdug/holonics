@@ -1,0 +1,757 @@
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 55, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 56, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 57, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 58, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 59, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 60, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 61, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 62, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 63, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 64, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 65, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 66, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 67, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 68, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 69, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 70, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 71, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 72, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 73, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 74, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 75, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 76, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 77, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 78, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 79, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 80, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 81, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 82, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 83, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 84, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 85, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 86, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 87, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 88, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 89, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 90, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 91, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 92, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 93, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 94, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 95, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 96, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 97, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 98, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 99, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 100, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 101, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 102, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 103, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 104, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 105, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 106, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 107, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 108, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 109, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 110, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 111, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 112, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 113, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 114, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 115, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 116, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 117, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 118, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 119, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 120, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 121, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 122, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 123, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 124, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 125, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 126, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 127, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 128, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 129, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 130, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 131, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 132, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 133, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 134, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 135, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 136, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 137, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 138, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 139, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 140, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 141, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 142, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 143, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 144, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 145, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 146, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 147, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 148, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 149, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 150, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 151, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 152, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 153, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 154, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 155, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 156, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 157, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 158, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 159, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 160, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 161, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 162, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 163, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 164, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 165, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 166, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 167, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 168, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 169, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 170, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 171, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 172, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 173, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 174, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 175, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 176, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 177, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 178, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 179, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 180, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 181, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 182, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 183, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 184, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 185, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 186, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 187, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 188, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 189, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 190, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 191, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 192, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 193, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 194, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 195, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 196, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 197, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 198, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 199, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 200, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 201, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 202, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 203, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 204, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 205, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 206, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 207, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 208, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 209, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 210, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 211, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 212, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 213, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 214, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 215, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 216, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 217, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 218, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 219, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 220, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 221, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 222, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 223, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 224, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 225, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 226, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 227, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 228, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 229, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 230, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 231, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 232, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 233, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 234, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 235, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 236, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 237, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 238, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 239, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 240, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 241, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 242, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 243, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 244, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 245, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 246, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 247, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 248, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 249, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 250, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 251, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 252, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 253, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 254, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 255, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 256, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 257, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 258, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 259, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 260, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 261, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 262, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 263, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 264, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 265, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 266, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 267, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 268, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 269, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 270, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 271, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 272, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 273, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 274, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 275, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 276, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 277, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 278, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 279, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 280, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 281, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 282, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 283, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 284, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 285, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 286, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 287, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 288, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 289, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 290, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 291, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 292, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 293, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 294, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 295, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 296, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 297, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 298, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 299, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 300, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 301, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 302, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 303, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 304, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 305, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 306, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 307, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 308, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 309, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 310, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 311, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 312, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 313, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 314, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 315, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 316, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 317, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 318, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 319, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 320, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 321, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 322, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 323, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 324, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 325, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 326, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 327, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 328, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 329, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 330, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 331, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 332, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 333, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 334, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 335, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 336, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 337, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 338, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 339, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 340, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 341, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 342, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 343, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 344, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 345, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 346, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 347, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 348, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 349, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 350, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 351, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 352, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 353, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 354, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 355, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 356, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 357, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 358, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 359, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 360, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 361, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 362, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 363, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 364, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 365, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 366, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 367, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 368, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 369, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 370, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 371, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 372, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 373, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 374, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 375, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 376, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 377, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 378, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 379, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 380, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 381, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 382, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 383, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 384, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 385, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 386, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 387, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 388, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 389, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 390, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 391, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 392, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 393, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 394, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 395, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 396, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 397, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 398, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 399, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 400, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 401, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 402, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 403, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 404, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 405, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 406, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 407, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 408, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 409, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 410, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 411, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 412, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 413, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["blue", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 414, "text": "green green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 415, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 416, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 417, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 418, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 419, "text": "red red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "red"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 420, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 421, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 422, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 423, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 424, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 425, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "blue"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 426, "text": "blue blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 427, "text": "red blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red green", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 428, "text": "red green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue red", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 429, "text": "blue red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "blue green", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 430, "text": "blue green", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green red", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 431, "text": "green red", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "green blue", "context": ["green", "green"], "commit": true, "retain_comparison": true}}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "observe-field", "source": 432, "text": "green blue", "step_bits": 1}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "field-request", "request": {"text": "red blue", "context": ["red", "green"], "commit": true, "retain_comparison": true}}}

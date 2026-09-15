@@ -33,6 +33,13 @@ operative field and its learned local reaction. `preview_field`, `generate_field
 [`athena_field` example](examples/athena_field.rs) learns a joint complex transformation from
 actual targets, generates on held-out inputs and reads back its trained `SavedCoupledBody`.
 [Actual outputs, command, costs and completed 48-target continuation](../../research/experiments/athena_field/README.md).
+
+The [field-session application](../../research/experiments/athena_field/session/README.md)
+connects whole text requests and native ordered context to this same body through the
+Workbench/JSONL stream. It returns learned contextual edits, saved pending comparisons and
+failed-output recovery at its declared section/codec scope. `NativeFieldSession` and
+`HnaStream::pump_field` are the corresponding library entry points.
+
 This is the first finite model operation; useful Athena conversation and broader receiving
 applications remain in the live construction order.
 

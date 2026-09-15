@@ -59,8 +59,9 @@ boundary constraints, admissible source/latent family and requested receiver/ext
 the generated joint section or its requested presentation and the applicable source/defect
 information. A continuing call publishes the corresponding endpoint once. A forecast evaluates
 the same declared operation without installing that endpoint. The numerical field API now
-exposes `preview_field` and `generate_field`; `observe_field` consumes the retained comparison. The complete partial/context/receiver request
-and existing application stream still require their consuming attachment.
+exposes `preview_field` and `generate_field`; `observe_field` consumes the retained comparison. The field-session stream now consumes these APIs with a declared symbol section, ordered
+context tensor and joint basis receiver. Broader partial/context/support families extend this
+existing consumer.
 
 [definition] The refinement coordinate advances the whole participating state. Image/acoustic
 coordinates and textual symbols label output faces, not mandatory evolution ticks. Extent can
@@ -90,10 +91,10 @@ loss. No new universal optimizer or qualitative definition of intelligence is re
 producing D/M target response, public Rust invocation and local trained rest have returned in
 [the model experiment](../../research/experiments/athena_field/README.md). The 48-target repair
 continues that same core. This section retains its mathematical contract and responsibility
-map, with the actual invoked owners and still-unconnected application consumers.
-Its shared request/stream exposure is still unconnected, and its initially supplied condition
-has not become the full contextual source construction. Continue through the application join
-below rather than repeating the numerical first increment.
+map, with the actual invoked owners and the application responsibilities they now serve.
+Its shared field-session request/stream exposure now returns the bounded contextual text
+application below. The initially supplied condition has an ordered native tensor realization
+there; broader contextual representation and source populations continue through that consumer.
 
 [project-postulate] Deliver one public **train → generate → observed update → generate again**
 operation on joint sections, using the actual operative field and local learned reaction.
@@ -168,7 +169,7 @@ Those preconditions are not retroactively imposed on the direct producing-target
 | Retain the joint section | `NativeFieldCurrentSource`, `NativeFieldGeneratedSection`, resident enclosures | Keep the common current and producing relation through text/other section receivers; never substitute independent marginal selections or a point seal. |
 | Train the same D/M | `FieldModel::observe`; paired `compare_target`/`apply_reflection_target`; neighborhood staged reaction target | Carry an actual application target back through its producing receiver and model material. |
 | Consume the producing handle | `FieldModel::pending`, `observe_field`, comparison release | Bind session responses to the model handle; preserve its scope and single incorporation across the admitted session lifecycle. |
-| Expose and retain the result | Public Rust field API; field/body rest and `SavedCoupledBody` | Connect the existing request stream and whole-section presentation; extend the corresponding session/pending payload as needed. |
+| Expose and retain the result | Public Rust field API; field/body rest, `NativeFieldSession` and `HnaStream::pump_field` | The joint text receiver and pending/delivery payload now serve the bounded application; extend its complete source/support representation through these same owners. |
 
 [definition] In this table C is `crates/holonic-engine/src/native_ecology/constitutive_fibre`
 and A is `crates/holonics-hna/src/native`. The field's ordinary occurrence capabilities,
@@ -201,15 +202,21 @@ same session's trained state. Inspect held-out episodes/combinations and preserv
 The first scoped application does not claim general conversation or code competence merely
 because the adapter runs.
 
-[established-bounded; source-inspected] `A/coupled_wave/body/field.rs` already exposes the
-field constructor, preview/generation and target update. `crates/holonics-hna/src/stream.rs`
-and `applications/holonics-workbench/src/session_stream.rs` provide the public request boundary,
-but their existing coupled text target uses wave-specific source/receiver calls.
-`A/section_input.rs::SymbolCurrentChart` supplies the declared alphabet/current conversion;
-its current emission methods require wave basis faces. `alpha::exposure::ExposureReader` and
-`applications/conversation-data` provide prepared source/part relationships. Connect those
-actual boundaries to the field's joint return and source/context maps; their names do not
-establish an existing end-to-end field application.
+[established-bounded; source-inspected; measured] The
+[September 15 field session](../../research/experiments/athena_field/session/README.md) connects
+`A/field_session.rs`, `HnaStream::pump_field` and Workbench `hna field-session` to the existing
+field APIs. `SymbolCurrentChart` supplies the exterior unit-basis source; native ordered tensor
+products form context; `read_basis_sections` receives all output positions together. The source
+port is declared as incoming or continuing boundary and persists with the model. Outstanding
+producing D/M and stream output also persist and resume. The bounded three-word/two-position
+control returns actual contextual edits. This is the reusable application path to extend.
+
+[definition] `FieldSectionRequest::from_exposures` reads complete shared visible parts and
+checks the supplied recorded prior-parent chain. `ExposureReader` supplies validated source
+families. The current session's fixed section and explicitly materialized tensor are exact at
+their declared finite source chart; their growth makes a factored/local representation and
+appropriate response support concrete requirements of broader complete inputs. Resolve those
+at this same application call using existing section, factor, condition and receiver owners.
 
 [definition] Keep the complete section and relevant preceding parts as source operands.
 `P_s/P_h/E_B` restrict or transport that situated input into the existing reaction/scattering

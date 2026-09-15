@@ -66,6 +66,15 @@ restriction A(h)s+c(h) and its common-current extension `(s,b) -> (x+A(h)s+c(h),
 Field rest v5/v6 additionally retains that image; versions 1–4 remain readable. Public
 `SavedCoupledBody` tag 2 carries the local trained field/reaction. See the [measured return](../research/experiments/athena_field/README.md).
 
+[established-bounded; source-inspected] `native/field_session.rs`, `HnaStream::pump_field` and
+Workbench `hna field-session` now consume that model. `NativeFieldReactionPort` distinguishes
+incoming and continuing boundary operands; the incoming conditional kernel contracts I+A(h)
+before bounding. `direct/section_basis.rs` receives all symbol sections from one joint source.
+`source/rest.rs` and `field_reaction/rest.rs` retain pending producing sections; field-body and
+session payloads carry those witnesses and the existing stream cursor. The
+[field-session return](../research/experiments/athena_field/session/README.md) maps measured text,
+context, update, restart and cost scopes to those owners.
+
 ## Swing, fluid and transfer composition
 
 [definition] The [fluid derivation](HOLONIC_FLUID_CONSTRUCTION.md) connects the actual owners:

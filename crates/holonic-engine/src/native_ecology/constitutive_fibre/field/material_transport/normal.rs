@@ -734,5 +734,5 @@ pub use direct::{
     NormalWaveTransport, NormalWaveTransportChange, NormalWaveWord, ResidentCoupledConstitutive,
     ResidentNormalEnclosure, ResidentNormalEnclosureView, ResidentNormalInput,
     ResidentNormalMaterial, ResidentNormalMaterialView, ResidentNormalReturn,
-    ResidentNormalSectionReturn, ResidentNormalWave,
+    NormalSectionBasisFace, ResidentNormalSectionReturn, ResidentNormalWave,
 };

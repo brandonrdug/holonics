@@ -25,6 +25,9 @@ pub struct HnaStreamRequest {
 #[serde(tag = "action", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum HnaStreamCommand {
     MathematicalRequest { request: crate::native::MathematicalRequest },
+    FieldRequest { request: crate::native::FieldSectionRequest },
+    ObserveField { source: u64, text: String, step_bits: u32 },
+    ReleaseFieldComparison { source: u64 },
     ActuateText { text:String },
     ProjectSymbol { #[serde(default)] full_emission:bool },
     EmitSymbol { #[serde(default)] full_emission:bool, #[serde(default)] retain_comparison:bool },
@@ -181,6 +184,15 @@ impl HnaStream {
         self.pump_target(session, input, output)
     }
 
+    pub fn pump_field(
+        &mut self,
+        session: &mut crate::native::NativeFieldSession<'_>,
+        input: &mut impl BufRead,
+        output: &mut impl Write,
+    ) -> Result<HnaStreamDisposition, HnaStreamError> {
+        self.pump_target(session, input, output)
+    }
+
     fn emit(&mut self, event: &str, value: Value) -> Result<(), HnaStreamError> {
         let mut bytes = serde_json::to_vec(&json!({"schema":HNA_STREAM_EVENT_SCHEMA,
             "sequence":self.state.sequence,"event":event,"value":value}))?;
@@ -282,6 +294,18 @@ impl HnaStream {
                 },
                 HnaStreamCommand::MathematicalRequest { request } => match target.mathematical_request(&request) {
                     Ok(value) => self.emit("mathematical-return", value)?,
+                    Err(error) => self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?,
+                },
+                HnaStreamCommand::FieldRequest { request } => match target.field_request(&request) {
+                    Ok(value) => self.emit("field-request", value)?,
+                    Err(error) => self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?,
+                },
+                HnaStreamCommand::ObserveField { source, text, step_bits } => match target.observe_field(source, &text, step_bits) {
+                    Ok(value) => self.emit("field-observation", value)?,
+                    Err(error) => self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?,
+                },
+                HnaStreamCommand::ReleaseFieldComparison { source } => match target.release_field_comparison(source) {
+                    Ok(value) => self.emit("field-comparison-released", value)?,
                     Err(error) => self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?,
                 },
                 HnaStreamCommand::CompareSymbol{source,text,coefficient_row}=>match target.compare_symbol(source,&text,coefficient_row){
@@ -406,6 +430,9 @@ impl Default for HnaStream {
 /// Only an exterior effect seam for I/O tests. Native current and learning are never callbacks
 /// supplied through the public stream protocol; actual adapters use HnaSession or NativeSession.
 trait StreamTarget {
+    fn field_request(&mut self, _: &crate::native::FieldSectionRequest) -> Result<Value, String> { Err("field session is not attached".into()) }
+    fn observe_field(&mut self, _: u64, _: &str, _: u32) -> Result<Value, String> { Err("field observation is not attached".into()) }
+    fn release_field_comparison(&mut self, _: u64) -> Result<Value, String> { Err("field comparison release is not attached".into()) }
     fn receive_next_symbol_distribution(&mut self,_:&str,_:u32)->Result<Value,String>{Err("normalized next-current receiver unsupported by this session".into())}
     fn mathematical_request(&mut self, _: &crate::native::MathematicalRequest) -> Result<Value, String> {
         Err("mathematical construction is not attached to this session".into())
@@ -878,4 +905,29 @@ impl StreamTarget for crate::native::NativeCoupledWaveSession<'_>{
     fn inspect(&self)->Value{crate::native::NativeCoupledWaveSession::inspect(self)}
     fn checkpoint(&self,path:&Path,transport:&HnaStreamState)->Result<(),String>{self.checkpoint_stream(path,transport).map(|_|()).map_err(|e|e.to_string())}
     fn supply_input_material(&mut self,_:&Path)->Result<(),String>{Err("a file path is not a coupled wave source conversion".into())}
+}
+
+impl StreamTarget for crate::native::NativeFieldSession<'_> {
+    fn field_request(&mut self, request: &crate::native::FieldSectionRequest) -> Result<Value, String> {
+        self.request(request).map_err(|e| e.to_string())
+    }
+    fn observe_field(&mut self, source: u64, text: &str, step_bits: u32) -> Result<Value, String> {
+        self.observe(source, text, step_bits).map_err(|e| e.to_string())
+    }
+    fn release_field_comparison(&mut self, source: u64) -> Result<Value, String> {
+        self.release(source).map_err(|e| e.to_string())
+    }
+    fn inspect(&self) -> Value { self.inspect() }
+    fn advance(&mut self, _: &HnaOccurrence, _: bool) -> Result<Value, String> {
+        Err("use field-request with its declared source/context section".into())
+    }
+    fn advance_native(&mut self, _: &HnaOccurrence, _: bool) -> Result<Value, String> {
+        Err("use field-request with its declared source/context section".into())
+    }
+    fn checkpoint(&self, path: &Path, transport: &HnaStreamState) -> Result<(), String> {
+        self.checkpoint(path, transport).map(|_| ()).map_err(|e| e.to_string())
+    }
+    fn supply_input_material(&mut self, _: &Path) -> Result<(), String> {
+        Err("field sessions use their declared FieldSessionSpec".into())
+    }
 }

@@ -217,6 +217,18 @@ impl SymbolCurrentChart {
             .mount_section_rest(&rest)
             .map_err(|e| NativeSessionError::Application(e.to_string()))
     }
+    /// Block inclusion of a complete symbol section in a declared complex boundary.
+    /// Positions are simultaneous codec coordinates; optional trailing channels receive zero.
+    pub fn mount_joint<'c>(&self, surface:&'c ResidentSurface<'c>, symbols:&[Symbol], components:usize)
+        ->Result<ResidentSection<'c>,NativeSessionError> {
+        let used=symbols.len().checked_mul(self.components()).ok_or_else(||NativeSessionError::Application("joint symbol extent".into()))?;
+        if symbols.is_empty() || components<used || components%2!=0 || symbols.iter().any(|s|s.0 as usize>=self.alphabet.len()) {
+            return Err(NativeSessionError::Application("joint symbol boundary shape".into()));
+        }
+        let mut values=Vec::new();values.try_reserve_exact(components).map_err(|e|NativeSessionError::Application(e.to_string()))?;values.resize(components,(0,0));
+        for (position,symbol) in symbols.iter().enumerate(){values[position*self.components()+2*self.coordinates[symbol.0 as usize]]=(1,1);}
+        Ok(surface.mount_section_rest(&ResidentSectionRest::found(1,components,ResidentGrain(0),64,values).map_err(NativeSessionError::Application)?).map_err(|e|NativeSessionError::Application(e.to_string()))?)
+    }
     /// Unicode decoding is explicitly exterior. Multi-octet spellings are not multiple native
     /// impulses; a different codec may supply opaque symbols through `mount` directly.
     pub fn decode_text(&self, text: &str) -> Result<Vec<Symbol>, NativeSessionError> {

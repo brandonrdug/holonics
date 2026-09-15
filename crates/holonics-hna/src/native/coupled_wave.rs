@@ -20,7 +20,7 @@ use std::{
 };
 
 mod body;
-pub use body::{NativeCoupledBody,NativeFieldAttachRefusal,NativeFieldGeneratedSection,NativeFieldModelRest};
+pub use body::{NativeFieldReactionPort,NativeCoupledBody,NativeFieldAttachRefusal,NativeFieldGeneratedSection,NativeFieldModelRest};
 pub use body::SavedCoupledBody;
 
 const MAGIC: &[u8] = b"HNA-COUPLED-WAVE-SESSION\x01";

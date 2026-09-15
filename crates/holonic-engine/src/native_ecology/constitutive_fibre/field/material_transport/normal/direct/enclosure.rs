@@ -17,6 +17,17 @@ pub struct ResidentNormalEnclosure<'c> {
     pub(super) grain: ResidentGrain,
 }
 impl<'c> ResidentNormalEnclosure<'c> {
+    /// Restore the declared complete ball from an exterior point-word chart.
+    pub fn remount(surface:&'c ResidentSurface<'c>, rest:ResidentSectionRest, grain:ResidentGrain)
+        ->Result<Self,ConstitutiveFibreError> {
+        if rest.rows!=1 || rest.width<6 || rest.width%2!=0 || !(1..=120).contains(&grain.0) {return Err(ConstitutiveFibreError::Shape);}
+        let width=rest.width/2-1;
+        if width%2!=0{return Err(ConstitutiveFibreError::Shape);}
+        crate::native_ecology::constitutive_fibre::circulation::rest::point_section(&rest,1,2*(width+1))?;
+        if wides(&rest.intervals)?[width]<0{return Err(ConstitutiveFibreError::Uncertain);}
+        Ok(Self{surface,section:surface.mount_section_rest(&rest)?,width,grain})
+    }
+    pub fn rest(&self)->Result<ResidentSectionRest,ConstitutiveFibreError>{Ok(self.surface.detach_section(&self.section,64)?)}
     pub fn view(&self) -> ResidentNormalEnclosureView<'_, 'c> {
         ResidentNormalEnclosureView {
             surface: self.surface,

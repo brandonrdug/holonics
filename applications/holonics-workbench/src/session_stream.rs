@@ -5,6 +5,7 @@ use holonics::hna::{
     native::{
         with_native_session, NativeModelSpec, NativeSavedSession, NativeSessionAnatomy,
         with_mathematical_session, NativeSessionError, NativeWaveSavedSession, NativeCoupledWaveSavedSession,
+        with_field_session, FieldSessionSpec, NativeFieldSavedSession, NativeFieldSession,
     },
     HnaCultivationAperture, HnaModel, HnaSessionAnatomy, HnaSessionError, HnaStream,
     HnaStreamDisposition,
@@ -50,6 +51,40 @@ pub struct MathematicalHnaStreamProcessReceipt {
     /// Input opening, native setup, JSONL processing/egress and native teardown. Excludes the
     /// CLI parser and writing this final receipt. Per-request timings are nested within this.
     pub elapsed_microseconds: u128,
+}
+
+#[derive(Debug, Serialize)]
+pub struct FieldHnaStreamProcessReceipt {
+    pub schema: &'static str,
+    pub disposition: Option<HnaStreamDisposition>,
+    pub stream_error: Option<String>,
+    pub checkpoint: PathBuf,
+    pub checkpoint_octets: Option<u64>,
+    pub checkpoint_error: Option<String>,
+    pub transport_sequence: u64,
+    pub inspect: serde_json::Value,
+}
+
+pub fn run_field_session_stream(command: HnaCommand) -> Result<FieldHnaStreamProcessReceipt, NativeSessionError> {
+    let HnaCommand::FieldSession { source, resume, input, checkpoint } = command else {
+        return Err(NativeSessionError::Application("expected a field streaming session command".into()));
+    };
+    if checkpoint.exists() { return Err(NativeSessionError::Application(format!("field checkpoint already exists: {:?}", checkpoint))); }
+    if let Some(parent) = checkpoint.parent().filter(|p| !p.as_os_str().is_empty()) { fs::create_dir_all(parent).map_err(|e| NativeSessionError::Application(format!("cannot create field checkpoint directory {:?}: {e}", parent)))?; }
+    let mut input: Box<dyn BufRead> = if input.as_os_str() == "-" { Box::new(io::stdin().lock()) } else { Box::new(BufReader::new(File::open(&input).map_err(|e| NativeSessionError::Application(format!("cannot read field input {:?}: {e}", input)))?)) };
+    let mut output = io::stdout().lock();
+    fn finish(session: &NativeFieldSession<'_>, stream: &HnaStream, pump: Result<HnaStreamDisposition, holonics::hna::HnaStreamError>, checkpoint: &PathBuf) -> FieldHnaStreamProcessReceipt {
+        let (disposition, stream_error) = match pump { Ok(v) => (Some(v), None), Err(e) => (None, Some(e.to_string())) };
+        let saved = session.checkpoint(checkpoint, stream.state());
+        let (checkpoint_octets, checkpoint_error) = match saved { Ok(r) => (Some(r.bytes), None), Err(e) => (None, Some(e.to_string())) };
+        FieldHnaStreamProcessReceipt { schema: "org.holonics.hna.field-stream-process.v1", disposition, stream_error, checkpoint: checkpoint.clone(), checkpoint_octets, checkpoint_error, transport_sequence: stream.state().sequence, inspect: session.inspect() }
+    }
+    if resume {
+        return NativeFieldSavedSession::open(&source)?.with_session(|session, stream| { stream.open_new_connection(); let pump = stream.pump_field(session, &mut input, &mut output); Ok(finish(session, stream, pump, &checkpoint)) });
+    }
+    let bytes = fs::read(&source).map_err(|e| NativeSessionError::Application(format!("cannot read field source {:?}: {e}", source)))?;
+    let spec: FieldSessionSpec = serde_json::from_slice(&bytes)?;
+    with_field_session(&spec, |session| { let mut stream = HnaStream::new(); stream.open_new_connection(); let pump = stream.pump_field(session, &mut input, &mut output); Ok(finish(session, &stream, pump, &checkpoint)) })
 }
 
 pub fn run_mathematical_session_stream(

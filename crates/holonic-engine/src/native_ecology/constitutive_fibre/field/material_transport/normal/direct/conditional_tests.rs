@@ -148,3 +148,19 @@ fn conditional_joint_map_preserves_shared_radius_and_affine_tail() {
         .read_applied_bilinear_joint(source, 1, condition, external)
         .is_err());
 }
+
+#[test]
+#[ignore="requires CUDA; identity and reaction share one uncertain incoming source"]
+fn incoming_reaction_cancels_the_same_source_before_bounding(){
+    let ro=ResidentReadout::new().unwrap();let surface=ResidentSurface::on(&ro).unwrap();let grain=ResidentGrain(16);let scale=1i128<<16;
+    let normal=ResidentNormalMaterial::found_features(&surface,3,1,grain).unwrap();let rest=normal.rest().unwrap();
+    let mut words=wides(&rest.state().intervals).unwrap();words[..6].copy_from_slice(&[-scale,0,2*scale,0,0,0]);
+    let material=ResidentNormalMaterialView{surface:&surface,state:Rc::new(mount(&surface,&words)),source_chart:NormalSourceChart::Features{source_complex:3},targets:1,grain,observations:0};
+    let input=mount(&surface,&[scale,2*scale,scale]);
+    let input=ResidentNormalEnclosureView{surface:&surface,section:&input,offset:0,width:2,grain};
+    let h=surface.mount_section_rest(&ResidentSectionRest::found(1,2,ResidentGrain(0),64,vec![(1,1),(0,0)]).unwrap()).unwrap();
+    let reads=surface.census().section_read_outs;
+    let out=material.read_applied_bilinear_identity(input,ResidentConstitutiveCurrent::integers(&h).unwrap()).unwrap();
+    assert_eq!(surface.census().section_read_outs,reads);
+    let out=out.inspect().unwrap();assert_eq!(out.radius,Rat::zero());assert_eq!(out.center[0].real,Rat::from_integer(2.into()));assert_eq!(out.center[0].imaginary,Rat::zero());
+}

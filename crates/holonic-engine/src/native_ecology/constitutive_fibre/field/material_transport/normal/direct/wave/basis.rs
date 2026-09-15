@@ -9,6 +9,8 @@ pub struct NormalWaveBasisChart<'c> {
     pub(super) coordinates: Vec<usize>,
 }
 impl<'c> NormalWaveBasisChart<'c> {
+    pub(crate) fn receiver_surface(&self) -> &'c ResidentSurface<'c> { self.surface }
+    pub(crate) fn permutation_section(&self) -> &Rc<ResidentSection<'c>> { &self.permutation }
     pub fn identity(
         surface: &'c ResidentSurface<'c>,
         count: usize,

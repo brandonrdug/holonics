@@ -46,7 +46,7 @@ pub use internal_mode::{
     NativeSharedDriveModeReturn,
 };
 pub use junction::{NativeOperativeCurrentFactorCondensation,NativeOperativeReturnStorage,
-    NativeFieldCurrentBall, NativeFieldCurrentSource, NativeFieldReflectionTarget, NativeFieldReflection, NativeFieldEnclosedJunctionReading, NativeFieldExactJunctionReading,
+    NativeFieldCurrentBall, NativeFieldCurrentSource, NativeFieldCurrentSourceRest, NativeFieldReflectionTarget, NativeFieldReflection, NativeFieldEnclosedJunctionReading, NativeFieldExactJunctionReading,
     NativeFieldInternalCurrent, NativeFieldInternalCurrentBall, NativeFieldJunctionReading,
     NativeFieldJunctionRepresentation, NativeFieldJunctionSolver,
     PairedContactCotangent, PairedJunctionCotangent, PairedJunctionLinearization, PairedJunctionTangent,
@@ -67,7 +67,7 @@ pub use material_transport::{NormalSourceChart,
     NativeFieldMaterialTransportResidual, NativeFieldMaterialTransportState,
     NativeMaterialModeComponent, NativeMaterialModeDifferential, NativeMaterialModeReading,
     NativeMaterialModeReturn, NativeMaterialModeUnfolding, NativeMaterialTransportSource,
-    NativeMaterialTarget,
+    NativeMaterialTarget, NormalSectionBasisFace,
     NativeNormalMaterialObjective, NativeNormalMaterialReading, NativeNormalMaterialState, ResidentNormalMaterial, ResidentNormalMaterialView, NormalMaterialRest, NormalRealizationRefinement, ResidentNormalReturn, ResidentNormalWave, NormalWaveWord, NormalWaveCoupled, NormalCoupledAttachRefusal, NormalCoupledContact, NormalCoupledStep, NormalCoupledReception, NormalCoupledSourceActuation, NormalCoupledProducingHandle, NormalCoupledPrediction, NormalCoupledComparison, NormalCoupledObservation, ConstitutiveComparisonSection, ConstitutiveSourceFrame, ResidentCoupledConstitutive, CoupledConstitutiveRefusal, ConstitutiveSourceRefusal, CoupledConstitutiveRest, NormalCoupledContinuation, NormalContinuationPullback, NormalContinuationJoin, CoupledConstitutiveFamily, CoupledConstitutiveAlternative, CompiledCoupledJoint, CoupledJointEvaluation, CoupledJointReading, NormalFamilyComparisonRow, NormalWaveCurrent, NormalWaveFibre, NormalWaveStep, NormalWaveReading, NormalWaveRest, NormalWaveSeedRefusal, NormalWaveSeedKind, NormalWaveReception, NormalWaveReceptionReading, NormalWaveDevelopment, NormalSourceActuation, NormalProducingHandle, NormalWavePrediction, NormalWaveComparison, NormalWaveComparisonReading, NormalWaveTransport, NormalWaveTransportChange, NormalWaveReference, NormalWaveReferenceReading, NormalWaveBasisChart, NormalWaveBasisFace, NormalWaveBasisReading, NormalBasisSelection, NormalBasisScore, NormalWaveSource, NormalWaveJointSource, NormalReceiverCoordinates,NormalWaveFacePacket, NormalFamilyPullback, NormalWaveFamily, NormalWaveFamilyRest, NormalFamilyBasisFace, FamilyBasisSelection, FamilyBasisReading, NormalFamilySupport, NormalFamilyReceiverReading, NormalWaveFamilyReceiver, ResidentNormalSectionReturn, ResidentNormalInput, ResidentNormalEnclosure, ResidentNormalEnclosureView, NativeMomentMaterialReading, NativeContextualMaterialReading, NativeOperativeContextReading, NativeVisibleSourceReading,
 };
 pub use receiver::{NativeFieldDifferentialReading, NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn,

@@ -1,0 +1,881 @@
+{
+  "task": "joint contextual word correction",
+  "alphabet": [
+    "red",
+    "blue",
+    "green"
+  ],
+  "section_symbols": 2,
+  "context_symbols": 2,
+  "development": "54 distinct off-diagonal requests over nine ordered correction contexts, eight passes and two resumed development comparisons; 434 actual targets total",
+  "evaluation_scope": "27 diagonal requests excluded from model updates; used as recombination validation during iteration, not an untouched final benchmark",
+  "runs": {
+    "initial": {
+      "correct": 21,
+      "cases": 27,
+      "edits_correct": 0,
+      "edit_cases": 6,
+      "maximum_output_radius": "1003/140737488355328",
+      "maximum_output_radius_decimal": 7.126743639673805e-12,
+      "generation": {
+        "count": 55,
+        "p50_us": 23071,
+        "p95_us": 24334,
+        "max_us": 24810
+      },
+      "target_update": {
+        "count": 54,
+        "p50_us": 187620.0,
+        "p95_us": 194798,
+        "max_us": 197432
+      },
+      "process": {
+        "command": [
+          "target/debug/holonics",
+          "--format",
+          "jsonl",
+          "hna",
+          "field-session",
+          "--source",
+          "/home/b/Workspaces/holonics/research/experiments/athena_field/session/spec.json",
+          "--input",
+          "/home/b/Workspaces/holonics/research/experiments/athena_field/session/development.jsonl",
+          "--checkpoint",
+          "/home/b/Workspaces/holonics/research/experiments/athena_field/session/initial/pending.session"
+        ],
+        "exit_code": 0,
+        "wall_seconds": 204.71936276699125,
+        "max_rss_kib": 4756844,
+        "scope": "debug process including first-load CUDA setup, complete requests, training, egress and checkpoint"
+      },
+      "evaluation_process": {
+        "command": [
+          "target/debug/holonics",
+          "--format",
+          "jsonl",
+          "hna",
+          "field-session",
+          "--resume",
+          "/home/b/Workspaces/holonics/research/experiments/athena_field/session/initial/pending.session",
+          "--input",
+          "/home/b/Workspaces/holonics/research/experiments/athena_field/session/evaluation.jsonl",
+          "--checkpoint",
+          "/home/b/Workspaces/holonics/research/experiments/athena_field/session/initial/trained.session"
+        ],
+        "exit_code": 0,
+        "wall_seconds": 3.6580252690037014,
+        "max_rss_kib": 324384,
+        "scope": "warm debug process; remount, pending actual target, held-out previews and checkpoint"
+      },
+      "outputs": [
+        {
+          "request": "red red",
+          "context": [
+            "red",
+            "red"
+          ],
+          "target": "red red",
+          "generated": "red red",
+          "correct": true,
+          "required_edit": false,
+          "radius": "997/140737488355328",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "blue blue",
+          "context": [
+            "red",
+            "red"
+          ],
+          "target": "blue blue",
+          "generated": "blue blue",
+          "correct": true,
+          "required_edit": false,
+          "radius": "1999/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "green green",
+          "context": [
+            "red",
+            "red"
+          ],
+          "target": "green green",
+          "generated": "green green",
+          "correct": true,
+          "required_edit": false,
+          "radius": "1991/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "red red",
+          "context": [
+            "red",
+            "blue"
+          ],
+          "target": "blue blue",
+          "generated": "red red",
+          "correct": false,
+          "required_edit": true,
+          "radius": "1993/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "blue blue",
+          "context": [
+            "red",
+            "blue"
+          ],
+          "target": "blue blue",
+          "generated": "blue blue",
+          "correct": true,
+          "required_edit": false,
+          "radius": "1003/140737488355328",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "green green",
+          "context": [
+            "red",
+            "blue"
+          ],
+          "target": "green green",
+          "generated": "green green",
+          "correct": true,
+          "required_edit": false,
+          "radius": "1989/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "red red",
+          "context": [
+            "red",
+            "green"
+          ],
+          "target": "green green",
+          "generated": "red red",
+          "correct": false,
+          "required_edit": true,
+          "radius": "1985/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "blue blue",
+          "context": [
+            "red",
+            "green"
+          ],
+          "target": "blue blue",
+          "generated": "blue blue",
+          "correct": true,
+          "required_edit": false,
+          "radius": "1991/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "green green",
+          "context": [
+            "red",
+            "green"
+          ],
+          "target": "green green",
+          "generated": "green green",
+          "correct": true,
+          "required_edit": false,
+          "radius": "1991/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "red red",
+          "context": [
+            "blue",
+            "red"
+          ],
+          "target": "red red",
+          "generated": "red red",
+          "correct": true,
+          "required_edit": false,
+          "radius": "1991/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "blue blue",
+          "context": [
+            "blue",
+            "red"
+          ],
+          "target": "red red",
+          "generated": "blue blue",
+          "correct": false,
+          "required_edit": true,
+          "radius": "997/140737488355328",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "green green",
+          "context": [
+            "blue",
+            "red"
+          ],
+          "target": "green green",
+          "generated": "green green",
+          "correct": true,
+          "required_edit": false,
+          "radius": "249/35184372088832",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "red red",
+          "context": [
+            "blue",
+            "blue"
+          ],
+          "target": "red red",
+          "generated": "red red",
+          "correct": true,
+          "required_edit": false,
+          "radius": "1989/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "blue blue",
+          "context": [
+            "blue",
+            "blue"
+          ],
+          "target": "blue blue",
+          "generated": "blue blue",
+          "correct": true,
+          "required_edit": false,
+          "radius": "499/70368744177664",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "green green",
+          "context": [
+            "blue",
+            "blue"
+          ],
+          "target": "green green",
+          "generated": "green green",
+          "correct": true,
+          "required_edit": false,
+          "radius": "1993/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "red red",
+          "context": [
+            "blue",
+            "green"
+          ],
+          "target": "red red",
+          "generated": "red red",
+          "correct": true,
+          "required_edit": false,
+          "radius": "997/140737488355328",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "blue blue",
+          "context": [
+            "blue",
+            "green"
+          ],
+          "target": "green green",
+          "generated": "blue blue",
+          "correct": false,
+          "required_edit": true,
+          "radius": "1991/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "green green",
+          "context": [
+            "blue",
+            "green"
+          ],
+          "target": "green green",
+          "generated": "green green",
+          "correct": true,
+          "required_edit": false,
+          "radius": "1989/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "red red",
+          "context": [
+            "green",
+            "red"
+          ],
+          "target": "red red",
+          "generated": "red red",
+          "correct": true,
+          "required_edit": false,
+          "radius": "993/140737488355328",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "blue blue",
+          "context": [
+            "green",
+            "red"
+          ],
+          "target": "blue blue",
+          "generated": "blue blue",
+          "correct": true,
+          "required_edit": false,
+          "radius": "125/17592186044416",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "green green",
+          "context": [
+            "green",
+            "red"
+          ],
+          "target": "red red",
+          "generated": "green green",
+          "correct": false,
+          "required_edit": true,
+          "radius": "1983/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "red red",
+          "context": [
+            "green",
+            "blue"
+          ],
+          "target": "red red",
+          "generated": "red red",
+          "correct": true,
+          "required_edit": false,
+          "radius": "1993/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "blue blue",
+          "context": [
+            "green",
+            "blue"
+          ],
+          "target": "blue blue",
+          "generated": "blue blue",
+          "correct": true,
+          "required_edit": false,
+          "radius": "1999/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "green green",
+          "context": [
+            "green",
+            "blue"
+          ],
+          "target": "blue blue",
+          "generated": "green green",
+          "correct": false,
+          "required_edit": true,
+          "radius": "1985/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "red red",
+          "context": [
+            "green",
+            "green"
+          ],
+          "target": "red red",
+          "generated": "red red",
+          "correct": true,
+          "required_edit": false,
+          "radius": "995/140737488355328",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "blue blue",
+          "context": [
+            "green",
+            "green"
+          ],
+          "target": "blue blue",
+          "generated": "blue blue",
+          "correct": true,
+          "required_edit": false,
+          "radius": "1995/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "green green",
+          "context": [
+            "green",
+            "green"
+          ],
+          "target": "green green",
+          "generated": "green green",
+          "correct": true,
+          "required_edit": false,
+          "radius": "995/140737488355328",
+          "all_symbol_margins_robust": true
+        }
+      ]
+    },
+    "continued": {
+      "correct": 27,
+      "cases": 27,
+      "edits_correct": 6,
+      "edit_cases": 6,
+      "maximum_output_radius": "19767/281474976710656",
+      "maximum_output_radius_decimal": 7.02264912888495e-11,
+      "generation": {
+        "count": 379,
+        "p50_us": 23174,
+        "p95_us": 24918,
+        "max_us": 27664
+      },
+      "target_update": {
+        "count": 378,
+        "p50_us": 188562.5,
+        "p95_us": 202384,
+        "max_us": 212187
+      },
+      "process": {
+        "command": [
+          "target/debug/holonics",
+          "--format",
+          "jsonl",
+          "hna",
+          "field-session",
+          "--resume",
+          "/home/b/Workspaces/holonics/research/experiments/athena_field/session/initial/trained.session",
+          "--input",
+          "/home/b/Workspaces/holonics/research/experiments/athena_field/session/development-more.jsonl",
+          "--checkpoint",
+          "/home/b/Workspaces/holonics/research/experiments/athena_field/session/continued/pending.session"
+        ],
+        "exit_code": 0,
+        "wall_seconds": 85.69196353400184,
+        "max_rss_kib": 319676,
+        "scope": "warm debug process, existing trained field, 378 further targets, retained pending comparison"
+      },
+      "evaluation_process": {
+        "command": [
+          "target/debug/holonics",
+          "--format",
+          "jsonl",
+          "hna",
+          "field-session",
+          "--resume",
+          "/home/b/Workspaces/holonics/research/experiments/athena_field/session/continued/pending.session",
+          "--input",
+          "/home/b/Workspaces/holonics/research/experiments/athena_field/session/evaluation-more.jsonl",
+          "--checkpoint",
+          "/home/b/Workspaces/holonics/research/experiments/athena_field/session/continued/trained.session"
+        ],
+        "exit_code": 0,
+        "wall_seconds": 6.992626559003838,
+        "max_rss_kib": 326032,
+        "scope": "warm debug process; remount, actual pending target and held-out recombination validation"
+      },
+      "outputs": [
+        {
+          "request": "red red",
+          "context": [
+            "red",
+            "red"
+          ],
+          "target": "red red",
+          "generated": "red red",
+          "correct": true,
+          "required_edit": false,
+          "radius": "19739/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "blue blue",
+          "context": [
+            "red",
+            "red"
+          ],
+          "target": "blue blue",
+          "generated": "blue blue",
+          "correct": true,
+          "required_edit": false,
+          "radius": "4939/70368744177664",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "green green",
+          "context": [
+            "red",
+            "red"
+          ],
+          "target": "green green",
+          "generated": "green green",
+          "correct": true,
+          "required_edit": false,
+          "radius": "9877/140737488355328",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "red red",
+          "context": [
+            "red",
+            "blue"
+          ],
+          "target": "blue blue",
+          "generated": "blue blue",
+          "correct": true,
+          "required_edit": true,
+          "radius": "9869/140737488355328",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "blue blue",
+          "context": [
+            "red",
+            "blue"
+          ],
+          "target": "blue blue",
+          "generated": "blue blue",
+          "correct": true,
+          "required_edit": false,
+          "radius": "9881/140737488355328",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "green green",
+          "context": [
+            "red",
+            "blue"
+          ],
+          "target": "green green",
+          "generated": "green green",
+          "correct": true,
+          "required_edit": false,
+          "radius": "19741/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "red red",
+          "context": [
+            "red",
+            "green"
+          ],
+          "target": "green green",
+          "generated": "green green",
+          "correct": true,
+          "required_edit": true,
+          "radius": "19743/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "blue blue",
+          "context": [
+            "red",
+            "green"
+          ],
+          "target": "blue blue",
+          "generated": "blue blue",
+          "correct": true,
+          "required_edit": false,
+          "radius": "19747/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "green green",
+          "context": [
+            "red",
+            "green"
+          ],
+          "target": "green green",
+          "generated": "green green",
+          "correct": true,
+          "required_edit": false,
+          "radius": "617/8796093022208",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "red red",
+          "context": [
+            "blue",
+            "red"
+          ],
+          "target": "red red",
+          "generated": "red red",
+          "correct": true,
+          "required_edit": false,
+          "radius": "19739/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "blue blue",
+          "context": [
+            "blue",
+            "red"
+          ],
+          "target": "red red",
+          "generated": "red red",
+          "correct": true,
+          "required_edit": true,
+          "radius": "617/8796093022208",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "green green",
+          "context": [
+            "blue",
+            "red"
+          ],
+          "target": "green green",
+          "generated": "green green",
+          "correct": true,
+          "required_edit": false,
+          "radius": "4937/70368744177664",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "red red",
+          "context": [
+            "blue",
+            "blue"
+          ],
+          "target": "red red",
+          "generated": "red red",
+          "correct": true,
+          "required_edit": false,
+          "radius": "19737/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "blue blue",
+          "context": [
+            "blue",
+            "blue"
+          ],
+          "target": "blue blue",
+          "generated": "blue blue",
+          "correct": true,
+          "required_edit": false,
+          "radius": "19759/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "green green",
+          "context": [
+            "blue",
+            "blue"
+          ],
+          "target": "green green",
+          "generated": "green green",
+          "correct": true,
+          "required_edit": false,
+          "radius": "19755/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "red red",
+          "context": [
+            "blue",
+            "green"
+          ],
+          "target": "red red",
+          "generated": "red red",
+          "correct": true,
+          "required_edit": false,
+          "radius": "19737/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "blue blue",
+          "context": [
+            "blue",
+            "green"
+          ],
+          "target": "green green",
+          "generated": "green green",
+          "correct": true,
+          "required_edit": true,
+          "radius": "2467/35184372088832",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "green green",
+          "context": [
+            "blue",
+            "green"
+          ],
+          "target": "green green",
+          "generated": "green green",
+          "correct": true,
+          "required_edit": false,
+          "radius": "2469/35184372088832",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "red red",
+          "context": [
+            "green",
+            "red"
+          ],
+          "target": "red red",
+          "generated": "red red",
+          "correct": true,
+          "required_edit": false,
+          "radius": "19745/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "blue blue",
+          "context": [
+            "green",
+            "red"
+          ],
+          "target": "blue blue",
+          "generated": "blue blue",
+          "correct": true,
+          "required_edit": false,
+          "radius": "2469/35184372088832",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "green green",
+          "context": [
+            "green",
+            "red"
+          ],
+          "target": "red red",
+          "generated": "red red",
+          "correct": true,
+          "required_edit": true,
+          "radius": "2467/35184372088832",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "red red",
+          "context": [
+            "green",
+            "blue"
+          ],
+          "target": "red red",
+          "generated": "red red",
+          "correct": true,
+          "required_edit": false,
+          "radius": "19741/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "blue blue",
+          "context": [
+            "green",
+            "blue"
+          ],
+          "target": "blue blue",
+          "generated": "blue blue",
+          "correct": true,
+          "required_edit": false,
+          "radius": "19767/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "green green",
+          "context": [
+            "green",
+            "blue"
+          ],
+          "target": "blue blue",
+          "generated": "blue blue",
+          "correct": true,
+          "required_edit": true,
+          "radius": "19747/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "red red",
+          "context": [
+            "green",
+            "green"
+          ],
+          "target": "red red",
+          "generated": "red red",
+          "correct": true,
+          "required_edit": false,
+          "radius": "19749/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "blue blue",
+          "context": [
+            "green",
+            "green"
+          ],
+          "target": "blue blue",
+          "generated": "blue blue",
+          "correct": true,
+          "required_edit": false,
+          "radius": "19767/281474976710656",
+          "all_symbol_margins_robust": true
+        },
+        {
+          "request": "green green",
+          "context": [
+            "green",
+            "green"
+          ],
+          "target": "green green",
+          "generated": "green green",
+          "correct": true,
+          "required_edit": false,
+          "radius": "9871/140737488355328",
+          "all_symbol_margins_robust": true
+        }
+      ]
+    }
+  },
+  "continuing_evaluation": {
+    "correct": 27,
+    "cases": 27,
+    "material_targets": 0,
+    "exact_endpoint_reopen": true,
+    "endpoint_text": "blue blue",
+    "process": {
+      "command": [
+        "target/debug/holonics",
+        "--format",
+        "jsonl",
+        "hna",
+        "field-session",
+        "--resume",
+        "/home/b/Workspaces/holonics/research/experiments/athena_field/session/continued/trained.session",
+        "--input",
+        "/home/b/Workspaces/holonics/research/experiments/athena_field/session/committed-evaluation.jsonl",
+        "--checkpoint",
+        "/home/b/Workspaces/holonics/research/experiments/athena_field/session/continued/continuing.session"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 5.826645405002637,
+      "max_rss_kib": 318380,
+      "scope": "warm debug process; 27 committed validation sections, one endpoint preview, checkpoint; no material targets"
+    },
+    "reopen_process": {
+      "command": [
+        "target/debug/holonics",
+        "--format",
+        "jsonl",
+        "hna",
+        "field-session",
+        "--resume",
+        "/home/b/Workspaces/holonics/research/experiments/athena_field/session/continued/continuing.session",
+        "--input",
+        "/home/b/Workspaces/holonics/research/experiments/athena_field/session/reopen-probe.jsonl",
+        "--checkpoint",
+        "/home/b/Workspaces/holonics/research/experiments/athena_field/session/continued/reopened.session"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 5.1624150540010305,
+      "max_rss_kib": 318292,
+      "scope": "warm debug process; exact endpoint preview comparison after reopening"
+    }
+  }
+}

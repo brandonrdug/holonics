@@ -36,7 +36,7 @@ use map_source::{OperativeMapProgram,OperativeSourceOverlap};
 use propagation::CausalPropagationSections;
 pub use propagation::{NativeCausalContactPropagation,NativeCausalContactPropagationReading,NativeCausalContactJoinReading};
 pub use current_factor::NativeOperativeCurrentFactorCondensation;
-pub use source::{NativeFieldCurrentSource,NativeFieldReflection,NativeFieldReflectionTarget};
+pub use source::{NativeFieldCurrentSource, NativeFieldCurrentSourceRest,NativeFieldReflection,NativeFieldReflectionTarget};
 
 pub(in super::super) struct OperativeSections<'c> {
     pub(in super::super) map: Rc<ResidentSection<'c>>,

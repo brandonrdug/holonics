@@ -96,8 +96,9 @@ integers; generated columns show complex centres):
 [established-bounded; measured] Preview and commit agree for each generated training section;
 one target handle cannot be applied twice. [athena-field.rest](one-pass/athena-field.rest)
 contains 39712 bytes. The example drops the live model, reads these serialized bytes,
-remounts and returns exactly the same four held-out balls. It checkpoints resolved comparisons;
-pending target persistence is not yet part of this field-body codec.
+remounts and returns exactly the same four held-out balls. That version checkpoints resolved comparisons. The later
+[field-session application](session/README.md) adds outstanding producing-comparison and
+delivery persistence to the same field body.
 
 ## Cost and representation
 
@@ -131,8 +132,9 @@ packet aperture is a separate representation boundary; raising precision was not
 complete this 48-target task.
 
 [project-postulate] The return establishes the first trainable model operation at this declared
-scope. Receiver-relative contextual tasks, economical repeated execution, pending continuation
-and Athena text/code applications continue under the roadmap. No additional definition-of-
+scope. The [field session](session/README.md) now returns bounded contextual text and pending
+continuation; broader receiver/context representation and Athena text/code applications
+continue under the roadmap. No additional definition-of-
 intelligence or global-convergence test is introduced.
 
 

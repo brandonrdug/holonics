@@ -2,6 +2,8 @@ use super::*;
 mod reflection;
 mod reflection_commit;
 mod reflection_target;
+mod rest;
+pub use rest::NativeFieldCurrentSourceRest;
 pub use reflection_target::NativeFieldReflectionTarget;
 pub use reflection::NativeFieldReflection;
 

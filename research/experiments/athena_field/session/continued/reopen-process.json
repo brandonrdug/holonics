@@ -1,0 +1,19 @@
+{
+  "command": [
+    "target/debug/holonics",
+    "--format",
+    "jsonl",
+    "hna",
+    "field-session",
+    "--resume",
+    "/home/b/Workspaces/holonics/research/experiments/athena_field/session/continued/continuing.session",
+    "--input",
+    "/home/b/Workspaces/holonics/research/experiments/athena_field/session/reopen-probe.jsonl",
+    "--checkpoint",
+    "/home/b/Workspaces/holonics/research/experiments/athena_field/session/continued/reopened.session"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 5.1624150540010305,
+  "max_rss_kib": 318292,
+  "scope": "warm debug process; exact endpoint preview comparison after reopening"
+}

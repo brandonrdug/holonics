@@ -60,6 +60,11 @@ pub struct ResidentConstitutiveCurrent<'a, 'chart> {
 impl<'a, 'chart> ResidentConstitutiveCurrent<'a, 'chart> {
     /// Number of real coordinate components in the declared current chart.
     pub fn components(&self) -> usize { self.width }
+    /// Restrict complex coordinate pairs while retaining the same source and denominator.
+    pub fn restrict_components(self, range:std::ops::Range<usize>) -> Result<Self,ConstitutiveFibreError> {
+        if range.start>=range.end || range.end>self.width || range.start%2!=0 || range.end%2!=0 {return Err(ConstitutiveFibreError::Shape);}
+        Ok(Self{offset:self.offset.checked_add(range.start).ok_or(ConstitutiveFibreError::Shape)?,width:range.end-range.start,..self})
+    }
     /// Retain this exact point-current operand in a rational packet on its supplied surface.
     pub fn to_owned(self,surface:&'chart ResidentSurface<'chart>)->Result<ResidentSection<'chart>,ConstitutiveFibreError>{
         let width=self.width.checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
@@ -497,7 +502,7 @@ pub use neighborhood::{
     NeighborhoodEvidenceRest, ResidentGeneratorNeighborhood,
 };
 #[allow(unused_imports)]
-pub use neighborhood::field_reaction::{FieldReactionEnclosure,PreparedFieldReaction};
+pub use neighborhood::field_reaction::{FieldReactionEnclosure,FieldReactionEnclosureRest,PreparedFieldReaction};
 
 mod preimage;
 pub use preimage::{ConditionPreimageReading, ConditionPreimageRest, ResidentConditionPreimage};

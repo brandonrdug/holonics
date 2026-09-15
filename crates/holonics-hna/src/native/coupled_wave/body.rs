@@ -21,7 +21,7 @@ fn invalid(message: impl ToString) -> NativeSessionError {
 
 mod field;
 use field::FieldModel;
-pub use field::{NativeFieldAttachRefusal, NativeFieldGeneratedSection, NativeFieldModelRest};
+pub use field::{NativeFieldReactionPort,NativeFieldAttachRefusal, NativeFieldGeneratedSection, NativeFieldModelRest};
 
 enum BodyState<'c> {
     Field(FieldModel<'c>),
@@ -629,7 +629,7 @@ impl SavedCoupledBody {
     }
     pub fn has_prediction(&self, id: u64) -> bool {
         match self {
-            Self::Field(_) => false,
+            Self::Field(rest) => rest.has_prediction(id),
             Self::Affine(rest) => rest.has_coupled_prediction(id),
             Self::Constitutive(rest) => rest.has_prediction(id),
         }

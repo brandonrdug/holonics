@@ -30,7 +30,7 @@ mod law_rest;
 mod resident;
 pub use law_rest::ConstitutiveFibreRest;
 pub use resident::{
-    FieldReactionEnclosure, PreparedFieldReaction,
+    FieldReactionEnclosure, FieldReactionEnclosureRest, PreparedFieldReaction,
     AffineContactReading, ConditionContactMetric, ConditionContactReading, ConditionContactStatus,
     ConditionCoverage, ConditionCurrentRest, ConditionImageReading, ConditionPreimageReading,
     ConditionPreimageRest, ConstitutiveDifferentialReading, ConstitutiveImageReading,

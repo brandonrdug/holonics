@@ -24,8 +24,10 @@ source bindings. The [first field-backed model return](../research/records/2026-
 owner attachment, joint generation, D/M target response and local trained rest. Its held-out
 outputs and repaired 48-target continuation are recorded at their actual scopes.
 [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md#roadmap-position) locates these returns in the
-roadmap: the public Rust model core is delivered, while the prepared request/context, shared
-stream and whole-section text receiver still need their field consumer. The
+roadmap: the public Rust model core and its first contextual text session are delivered.
+The [field-session return](../research/experiments/athena_field/session/README.md) binds prepared
+sections, native context, joint text reception and pending/delivery restart. Broader complete
+conversation/code parts still require a suitable source/support representation. The
 [next application contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-consuming-application)
 continues that join alongside its required context/receiver and durability work.
 

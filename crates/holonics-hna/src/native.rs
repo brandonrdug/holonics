@@ -13,9 +13,11 @@ use thiserror::Error;
 pub mod section_input;
 pub mod mathematical;
 pub use mathematical::{with_mathematical_session, MathematicalRequest, NativeMathematicalSession};
+mod field_session;
+pub use field_session::{FieldTextCodec,FieldSessionSpec,FieldSectionRequest,NativeFieldSession,NativeFieldSavedSession,with_field_session};
 mod normal_wave;
 mod coupled_wave;
-pub use coupled_wave::{SavedCoupledBody,NativeFieldAttachRefusal,NativeFieldGeneratedSection,NativeFieldModelRest,NativeCoupledBody,NativeCoupledWaveSession,NativeCoupledWaveSavedSession,NativeCoupledWaveAttachRefusal};
+pub use coupled_wave::{NativeFieldReactionPort,SavedCoupledBody,NativeFieldAttachRefusal,NativeFieldGeneratedSection,NativeFieldModelRest,NativeCoupledBody,NativeCoupledWaveSession,NativeCoupledWaveSavedSession,NativeCoupledWaveAttachRefusal};
 pub use normal_wave::{NativeWaveSession,NativeWaveSavedSession,NativeWaveAttachRefusal,
     NativeWaveSeedSpec, NATIVE_WAVE_SEED_SCHEMA, with_seeded_wave_session};
 

@@ -40,7 +40,10 @@ normal/conditional learning, receiving maps, prospective joint families and seve
 formats. The first [field-backed model return](../../research/experiments/athena_field/README.md)
 now binds these owners under the public coupled body. Its eight-target task and trained rest
 are delivered; the common-current repair also returns the same 48-target continuation and
-trained reopen. Changing source/receiver conduct and economical durability continue below. Fitting another predictor to that field is a separate application.
+trained reopen. The [field-session application](../../research/experiments/athena_field/session/README.md)
+now adds actual contextual text, producing-comparison and delivery restart. Broader source/receiver
+conduct and economical representation continue through that consumer. Fitting another predictor
+to the field is a separate application.
 
 ## Athena construction order
 
@@ -81,7 +84,8 @@ binds its prepared source/context, shared session and joint response receiver.
 
 [project-postulate] Milestones 2–3 supply the contextual organization and durability needed by
 milestone 4's applications as those applications are constructed. The shared request/session
-attachment from milestone 1 remains an implementation obligation where it is still unconnected.
+attachment from milestone 1 is now the concrete field-session consumer. Its broader source
+and response/support representations continue as application implementation.
 Receiver motion, contact formation and encoding are model operations to implement at their
 actual consuming source/receiver. Their separate numerical demonstrations do not become
 additional phases before conversation/code work. The native specification keeps the wider

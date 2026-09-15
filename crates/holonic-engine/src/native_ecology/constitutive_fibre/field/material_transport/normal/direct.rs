@@ -17,6 +17,8 @@ mod applied_relation;
 mod joined_source;
 mod section;
 pub use section::ResidentNormalSectionReturn;
+mod section_basis;
+pub use section_basis::NormalSectionBasisFace;
 
 /// Declared domain of the same normal-statistic operator. A feature chart is not silently
 /// padded or identified with the wave's three equally sized physical/current ports.
@@ -92,6 +94,9 @@ pub struct ResidentNormalMaterialView<'c> {
 }
 
 impl<'c> ResidentNormalMaterialView<'c> {
+    pub fn rest(&self)->Result<NormalMaterialRest,ConstitutiveFibreError>{
+        ResidentNormalMaterial{surface:self.surface,state:Rc::clone(&self.state),source_chart:self.source_chart,targets:self.targets,grain:self.grain,observations:self.observations}.rest()
+    }
     /// Evaluate the retained immutable coefficient state at this producing cut. No mutable
     /// learner is exposed by this view, and no numerical state is detached to the host.
     pub fn read<'a>(&self, source:impl Into<ResidentNormalInput<'a,'c>>)
@@ -118,10 +123,24 @@ impl<'c> ResidentNormalMaterialView<'c> {
         let width=self.targets.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?;
         let section=self.surface.fresh_section(1,2*(width+1),ResidentGrain(0))?;
         let mut pass=self.surface.begin_passage(&[vec![]])?;
-        {let lane=pass.open(0,&[])?;self.surface.record_normal_applied_condition(&lane,&self.state,source,condition,self.targets,None,&section)?;}
+        {let lane=pass.open(0,&[])?;self.surface.record_normal_applied_condition(&lane,&self.state,source,condition,self.targets,None,false,&section)?;}
         pass.close(0,&section,64)?;let result=pass.finish()?.launch()?;
         if !result.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("applied conditional reaction: {:?}",result.obstruction)));}
         Ok(ResidentNormalEnclosure{surface:self.surface,section,width,grain:self.grain})
+    }
+    /// Execute x+M[x,h,h⊗x] as one affine action of the incoming source. The
+    /// identity path and reaction share x; its uncertainty is transported by I+A(h).
+    pub fn read_applied_bilinear_identity(&self, source:ResidentNormalEnclosureView<'_, 'c>, condition:ResidentConstitutiveCurrent<'_, 'c>)
+        -> Result<ResidentNormalEnclosure<'c>,ConstitutiveFibreError> {
+        let d=source.components();let k=condition.components();
+        let features=d.checked_mul(k/2).and_then(|v|v.checked_add(d)?.checked_add(k)).ok_or(ConstitutiveFibreError::Shape)?;
+        if self.source_chart != (NormalSourceChart::Features{source_complex:features/2}) || source.grain()!=self.grain || d!=2*self.targets {return Err(ConstitutiveFibreError::Shape);}
+        let section=self.surface.fresh_section(1,2*(d+1),ResidentGrain(0))?;
+        let mut pass=self.surface.begin_passage(&[vec![]])?;
+        {let lane=pass.open(0,&[])?;self.surface.record_normal_applied_condition(&lane,&self.state,source,condition,self.targets,None,true,&section)?;}
+        pass.close(0,&section,64)?;let result=pass.finish()?.launch()?;
+        if !result.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("incoming conditional reaction: {:?}",result.obstruction)));}
+        Ok(ResidentNormalEnclosure{surface:self.surface,section,width:d,grain:self.grain})
     }
     /// At fixed h apply (s,b) -> (x+A(h)s+c(h),b) to one joint ball. The
     /// unchanged tail is part of that same source, not an independently joined enclosure.
@@ -138,7 +157,7 @@ impl<'c> ResidentNormalMaterialView<'c> {
         let words=width.checked_add(1).and_then(|v|v.checked_mul(2)).ok_or(ConstitutiveFibreError::Shape)?;
         let section=self.surface.fresh_section(1,words,ResidentGrain(0))?;
         let mut pass=self.surface.begin_passage(&[vec![]])?;
-        {let lane=pass.open(0,&[])?; self.surface.record_normal_applied_condition(&lane,&self.state,source,condition,self.targets,Some((d,external)),&section)?;}
+        {let lane=pass.open(0,&[])?; self.surface.record_normal_applied_condition(&lane,&self.state,source,condition,self.targets,Some((d,external)),false,&section)?;}
         pass.close(0,&section,64)?; let result=pass.finish()?.launch()?;
         if !result.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("applied conditional joint current: {:?}",result.obstruction)));}
         Ok(ResidentNormalEnclosure{surface:self.surface,section,width,grain:self.grain})

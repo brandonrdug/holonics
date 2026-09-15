@@ -63,6 +63,12 @@ pub enum HnaCommand {
         #[serde(default)] member:Option<usize>,
         #[serde(default)] receiver:Option<String>,
     },
+    FieldSession {
+        source: PathBuf,
+        resume: bool,
+        input: PathBuf,
+        checkpoint: PathBuf,
+    },
     WaveControl {
         #[serde(alias = "spec")]
         source: PathBuf,

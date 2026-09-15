@@ -6,6 +6,8 @@
 //! the public model counts actual output targets separately.
 
 use super::*;
+mod rest;
+pub use rest::FieldReactionEnclosureRest;
 
 /// Owned source-qualified result of an enclosed family read. Source, producing condition, output
 /// and material snapshot remain separate; the output is never treated as an observation.
@@ -47,6 +49,11 @@ impl<'c> FieldReactionEnclosure<'c> {
     ) -> Result<ResidentNormalEnclosure<'c>, ConstitutiveFibreError> {
         self.material.read_applied_bilinear_joint(source, self.source.view().components(),
             self.producing_condition()?, external)
+    }
+
+    /// The identity and local reaction act on the same retained incoming current.
+    pub fn incoming_with_reaction(&self) -> Result<ResidentNormalEnclosure<'c>, ConstitutiveFibreError> {
+        self.material.read_applied_bilinear_identity(self.source.view(), self.producing_condition()?)
     }
 
     pub fn material_observations(&self) -> u64 {

@@ -137,6 +137,21 @@ pub enum HnaCli {
         #[arg(long,conflicts_with="resume")] member:Option<usize>,
         #[arg(long,value_parser=["direct","unit-real-sum"],conflicts_with="resume")] receiver:Option<String>,
     },
+    /// Stream field sections through an operative native field session.
+    FieldSession {
+        /// FieldSessionSpec JSON, or a saved field checkpoint when resuming.
+        #[arg(long = "source", required_unless_present = "resume", conflicts_with = "resume")]
+        source: Option<PathBuf>,
+        /// Resume an existing field checkpoint.
+        #[arg(long, required_unless_present = "source", conflicts_with = "source")]
+        resume: Option<PathBuf>,
+        /// JSONL field request input, or `-` for standard input.
+        #[arg(long, default_value = "-")]
+        input: PathBuf,
+        /// Destination field checkpoint path.
+        #[arg(long)]
+        checkpoint: PathBuf,
+    },
     /// Run the declared native wave-control adapter from a JSON specification.
     WaveControl {
         /// Wave-control specification JSON, or a native wave checkpoint when resuming.
@@ -217,6 +232,12 @@ impl From<HnaCli> for HnaCommand {
                 checkpoint,
             },
             HnaCli::CoupledWaveSession{source,resume,input,checkpoint,member,receiver}=>Self::CoupledWaveSession{source,resume,input,checkpoint,member,receiver},
+            HnaCli::FieldSession { source, resume, input, checkpoint } => Self::FieldSession {
+                source: source.or(resume.clone()).expect("clap requires source or resume"),
+                resume: resume.is_some(),
+                input,
+                checkpoint,
+            },
             HnaCli::WaveControl {
                 source,
                 resume,
@@ -678,6 +699,16 @@ impl From<EngineCli> for EngineCommand {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn field_session_selects_one_source_and_keeps_its_checkpoint() {
+        let invocation=parse_cli(["holonics","hna","field-session","--source","field.json","--checkpoint","next.session"]).unwrap();
+        assert!(matches!(invocation.command,Some(WorkbenchCommand::Hna(HnaCommand::FieldSession{resume:false,..}))));
+        let invocation=parse_cli(["holonics","hna","field-session","--resume","old.session","--checkpoint","next.session"]).unwrap();
+        assert!(matches!(invocation.command,Some(WorkbenchCommand::Hna(HnaCommand::FieldSession{resume:true,..}))));
+        assert!(parse_cli(["holonics","hna","field-session","--checkpoint","next.session"]).is_err());
+        assert!(parse_cli(["holonics","hna","field-session","--source","field.json","--resume","old.session","--checkpoint","next.session"]).is_err());
+    }
 
     #[test]
     fn high_level_workspace_and_nested_diagnostic_commands_parse() {

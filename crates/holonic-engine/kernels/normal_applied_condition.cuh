@@ -17,10 +17,10 @@ extern "C" __global__ void section_normal_applied_condition(
  wide den=fibre_current_denominator(h,h_hi,hd,hs,slot),S=(wide)1<<grain;
  const wide *M=(const wide*)state,*x=(const wide*)(source+sa);wide *y=(wide*)out;
  if(*slot||den<=0||x[whole]<0){atomicOr(slot,REFUSED_MALFORMED);return;}
- if(joint)for(size_t j=0;j<2u*(2u*(size_t)targets+1u);++j)
+ if(joint==1u)for(size_t j=0;j<2u*(2u*(size_t)targets+1u);++j)
   if(external[ea+j]!=external_hi[ea+j])atomicOr(slot,REFUSED_MALFORMED);
  const wide *e=(const wide*)(external+ea);
- if(joint&&e[2u*targets]<0){atomicOr(slot,REFUSED_MALFORMED);return;}
+ if(joint==1u&&e[2u*targets]<0){atomicOr(slot,REFUSED_MALFORMED);return;}
  MomentInteger denominator=normal_wide(S)*normal_wide(den),gain,square;
  wide rounding=0;
  for(uint32_t row=0;row<targets;++row){
@@ -35,6 +35,9 @@ extern "C" __global__ void section_normal_applied_condition(
     size_t at=d+k+(size_t)j*d+i;
     normal_product(ar,ai,normal_wide(a[at]),normal_wide(a[at+1u]),normal_wide(h[ha+2u*j]),normal_wide(h[ha+2u*j+1u]),false);
    }
+   // A declared incoming-boundary reaction receives the same x as the identity path.
+   // Contract (I+A), rather than independently summing two enclosures of x.
+   if(joint==2u && i==2u*row)ar=ar+denominator;
    gain=gain+normal_abs(ar)+normal_abs(ai);
    square=square+ar*ar+ai*ai;
    normal_product(yr,yi,ar,ai,normal_wide(x[i]),normal_wide(x[i+1u]),false);
@@ -42,7 +45,7 @@ extern "C" __global__ void section_normal_applied_condition(
   bool rr=false,ri=false;
   y[2u*row]=normal_grid(exact_divide_positive(yr,denominator,&rr),0,false,slot);
   y[2u*row+1u]=normal_grid(exact_divide_positive(yi,denominator,&ri),0,false,slot);
-  if(joint){y[2u*row]=add_checked(y[2u*row],e[2u*row],slot);y[2u*row+1u]=add_checked(y[2u*row+1u],e[2u*row+1u],slot);}
+  if(joint==1u){y[2u*row]=add_checked(y[2u*row],e[2u*row],slot);y[2u*row+1u]=add_checked(y[2u*row+1u],e[2u*row+1u],slot);}
   rounding=add_checked(rounding,(wide)rr+(wide)ri,slot);
  }
  // Frobenius bound of the exactly contracted A(h). Work at dyadic gain scale S;
@@ -55,11 +58,11 @@ extern "C" __global__ void section_normal_applied_condition(
  wide norm=normal_wave_root_capped(square_value,cap,slot);
  // diag(A,I) acts on the ONE joint Euclidean family. Tail coordinates retain their
  // original dependence on s; restriction and independent rejoining would add rho twice.
- uint32_t tail=joint?whole-d:0u, width=2u*targets+tail;
+ uint32_t tail=joint==1u?whole-d:0u, width=2u*targets+tail;
  if(tail&&norm<S)norm=S;
  bool rem=false;MomentInteger bound=exact_divide_positive(normal_wide(norm)*normal_wide(x[whole]),normal_wide(S),&rem);
  y[width]=add_checked(add_checked(normal_grid(bound,0,false,slot),(wide)rem,slot),rounding,slot);
- if(joint)y[width]=add_checked(y[width],e[2u*targets],slot);
+ if(joint==1u)y[width]=add_checked(y[width],e[2u*targets],slot);
  for(uint32_t j=0;j<tail;++j)y[2u*targets+j]=x[d+j];
  if(*slot)return;for(size_t j=0;j<2u*((size_t)width+1u);++j)out_hi[j]=out[j];
 }
