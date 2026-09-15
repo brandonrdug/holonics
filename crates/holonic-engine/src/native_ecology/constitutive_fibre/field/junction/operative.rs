@@ -36,7 +36,7 @@ use map_source::{OperativeMapProgram,OperativeSourceOverlap};
 use propagation::CausalPropagationSections;
 pub use propagation::{NativeCausalContactPropagation,NativeCausalContactPropagationReading,NativeCausalContactJoinReading};
 pub use current_factor::NativeOperativeCurrentFactorCondensation;
-pub use source::NativeFieldCurrentSource;
+pub use source::{NativeFieldCurrentSource,NativeFieldReflection,NativeFieldReflectionTarget};
 
 pub(in super::super) struct OperativeSections<'c> {
     pub(in super::super) map: Rc<ResidentSection<'c>>,
@@ -500,6 +500,10 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
     }
     pub(super) fn stage_return_using(&self, returned: Rc<OperativeReturn<'c>>,
         currents: &Rc<ResidentSection<'c>>) -> Result<Self, Error> {
+        self.stage_return_using_image(returned,currents,None)
+    }
+    pub(super) fn stage_return_using_image(&self, returned:Rc<OperativeReturn<'c>>, currents:&Rc<ResidentSection<'c>>, image:Option<ResidentNormalEnclosureView<'_, 'c>>) -> Result<Self,Error> {
+        if image.is_some() && (returned.factor_count!=0 || returned.b.is_none() || returned.source_overlap.is_some()){return Err(Error::Shape);}
         if returned.source_overlap.is_some(){return self.stage_source_return(returned,currents);}
         if !Rc::ptr_eq(&self.origin, &returned.origin) || returned.at_cut!=self.field_cut() || returned.contact_count!=self.births.len() {
             return Err(Error::ForeignOccurrence);
@@ -531,6 +535,9 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
                 staged.current(),
                 &update_rounds,
             )?;
+            if let Some(image)=image {
+                surface.record_field_reflection_current_bound(&lane,image,k,&staged.bounds)?;
+            }
         }
         passage.close(0, &staged.bounds, 64)?;
         {
@@ -666,31 +673,8 @@ pub(in super::super) fn decode_reflection(
         return Err(invalid("reflection radius or norm"));
     }
     let scale = num_bigint::BigInt::from(1) << grain;
-    let cube = num_bigint::BigInt::from(1) << (3 * grain);
     let q = |x: i128| Rat::new(x.into(), scale.clone());
-    let integer = |row: usize| -> Result<num_bigint::BigInt, Error> {
-        let w = &trace.intervals[18 * row..18 * (row + 1)];
-        if ![0, 1].contains(&w[17].0) || w[..17].iter().any(|(a, _)| *a < 0 || *a > u32::MAX as i64)
-        {
-            return Err(invalid("reflection residual codeword"));
-        }
-        let mut v = num_bigint::BigInt::from(0);
-        for (i, (word, _)) in w[..17].iter().enumerate() {
-            v += num_bigint::BigInt::from(*word) << (32 * i);
-        }
-        if w[17].0 == 1 {
-            v = -v;
-        }
-        Ok(v)
-    };
-    let numerical_residual = (0..d / 2)
-        .map(|j| {
-            Ok(ExactComplexWaveCurrent::new(
-                Rat::new(integer(2 * j)?, cube.clone()),
-                Rat::new(integer(2 * j + 1)?, cube.clone()),
-            ))
-        })
-        .collect::<Result<Vec<_>, Error>>()?;
+    let numerical_residual=decode_reflection_residual(&trace.intervals[..18*d],d,grain)?;
     Ok(NativeOperativeReflectionReading {
         potential: base.potential,
         outgoing: base.outgoing,
@@ -749,4 +733,33 @@ impl NativeConstitutiveField<'_> {
                     .transpose()
             })
     }
+}
+
+pub(in super::super) fn decode_reflection_residual(words:&[(i64,i64)],d:usize,grain:u32)
+    ->Result<Vec<ExactComplexWaveCurrent>,Error>{
+    if words.len()!=18*d||words.iter().any(|(a,b)|a!=b){return Err(invalid("reflection residual shape"));}
+    let cube = num_bigint::BigInt::from(1) << (3 * grain);
+    let integer = |row: usize| -> Result<num_bigint::BigInt, Error> {
+        let w = &words[18 * row..18 * (row + 1)];
+        if ![0, 1].contains(&w[17].0) || w[..17].iter().any(|(a, _)| *a < 0 || *a > u32::MAX as i64)
+        {
+            return Err(invalid("reflection residual codeword"));
+        }
+        let mut v = num_bigint::BigInt::from(0);
+        for (i, (word, _)) in w[..17].iter().enumerate() {
+            v += num_bigint::BigInt::from(*word) << (32 * i);
+        }
+        if w[17].0 == 1 {
+            v = -v;
+        }
+        Ok(v)
+    };
+    (0..d / 2)
+        .map(|j| {
+            Ok(ExactComplexWaveCurrent::new(
+                Rat::new(integer(2 * j)?, cube.clone()),
+                Rat::new(integer(2 * j + 1)?, cube.clone()),
+            ))
+        })
+        .collect::<Result<Vec<_>, Error>>()
 }

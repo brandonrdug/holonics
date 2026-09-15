@@ -17,6 +17,22 @@ __device__ void operative_write_moment(const MomentInteger &a,int64_t *lo,int64_
     lo[MomentInteger::LIMBS]=hi[MomentInteger::LIMBS]=a.negative && !a.is_zero()?1:0;
 }
 
+// Exact residual shared by a committed reflection and an immutable material query.
+__device__ void operative_reflection_residual(
+    const wide *map,const wide *u,const wide *v,const wide *old_b,const int64_t *qraw,
+    uint32_t d,uint32_t count,uint32_t old_count,uint32_t port,uint32_t grain,
+    MomentInteger &re,MomentInteger &im,uint32_t *slot){
+    wide S=(wide)1<<grain;
+    re=moment_lift(complete_power(2u*grain,slot))*moment_lift(history_integer(sub_checked(v[2u*port],product_checked(2,u[2u*port],slot),slot)));
+    im=moment_lift(complete_power(2u*grain,slot))*moment_lift(history_integer(sub_checked(v[2u*port+1u],product_checked(2,u[2u*port+1u],slot),slot)));
+        for(uint32_t row=0;row<count;++row){
+            HistoryInteger qr=history_read_integer(qraw+10u*(size_t)row,slot),qi=history_read_integer(qraw+10u*(size_t)row+5u,slot);
+            if(row<old_count){qr=qr-HistoryInteger(2)*history_integer(S)*history_integer(old_b[2u*row]);qi=qi-HistoryInteger(2)*history_integer(S)*history_integer(old_b[2u*row+1u]);}
+            MomentInteger dr=moment_lift(history_integer(map[(size_t)row*d+2u*port])),di=moment_lift(history_integer(map[(size_t)row*d+2u*port+1u]));
+            re=re+dr*moment_lift(qr)-di*moment_lift(qi);im=im+dr*moment_lift(qi)+di*moment_lift(qr);
+        }
+}
+
 __device__ void field_operative_reflection_prepare(
     const int64_t *table,const int64_t *query,const int64_t *origin,const int64_t *incoming,
     const int64_t *frame,const int64_t *old_frame,const int64_t *raw_cov,const wide *before,
@@ -96,14 +112,8 @@ __device__ void field_operative_reflection_prepare(
     __syncthreads();if(*slot)return;
     // Exact numerator of (I+Dhat Dhat*)vhat-2(uhat+Dhat bhat), at scale S^3.
     for(uint32_t port=threadIdx.x;port<m;port+=blockDim.x){
-        MomentInteger re=moment_lift(complete_power(2u*grain,slot))*moment_lift(history_integer(sub_checked(v[2u*port],product_checked(2,u[2u*port],slot),slot)));
-        MomentInteger im=moment_lift(complete_power(2u*grain,slot))*moment_lift(history_integer(sub_checked(v[2u*port+1u],product_checked(2,u[2u*port+1u],slot),slot)));
-        for(uint32_t row=0;row<count;++row){
-            HistoryInteger qr=history_read_integer(qraw+10u*(size_t)row,slot),qi=history_read_integer(qraw+10u*(size_t)row+5u,slot);
-            if(row<old_count){qr=qr-HistoryInteger(2)*history_integer(S)*history_integer(old_b[2u*row]);qi=qi-HistoryInteger(2)*history_integer(S)*history_integer(old_b[2u*row+1u]);}
-            MomentInteger dr=moment_lift(history_integer(map[(size_t)row*d+2u*port])),di=moment_lift(history_integer(map[(size_t)row*d+2u*port+1u]));
-            re=re+dr*moment_lift(qr)-di*moment_lift(qi);im=im+dr*moment_lift(qi)+di*moment_lift(qr);
-        }
+        MomentInteger re,im;
+        operative_reflection_residual(map,u,v,old_b,qraw,d,count,old_count,port,grain,re,im,slot);
         operative_write_moment(re,trace+36u*port,trace_hi+36u*port,slot);operative_write_moment(im,trace+36u*port+18u,trace_hi+36u*port+18u,slot);
         wide omitted=0;residual[2u*port]=operative_moment_grid(re,2u*grain,&omitted,slot);
         residual[2u*port+1u]=operative_moment_grid(im,2u*grain,&omitted,slot);rhs[port]=omitted;

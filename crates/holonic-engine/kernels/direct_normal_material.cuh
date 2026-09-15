@@ -132,7 +132,7 @@ __device__ void direct_normal_predict(const int64_t *old,const wide *current,
 __device__ void direct_normal_material_execute(
     const int64_t *old,const int64_t *xlo,const int64_t *xhi,uint32_t xa,uint32_t xd,uint32_t xs,uint32_t xkind,
     const int64_t *ylo,const int64_t *yhi,uint32_t ya,uint32_t yd,uint32_t ys,uint32_t ykind,
-    uint32_t source_complex,uint32_t targets,uint32_t grain,uint32_t observed,
+    uint32_t source_complex,uint32_t targets,uint32_t grain,uint32_t observed,uint32_t reference,
     int64_t *next,int64_t *next_hi,int64_t *before,int64_t *before_hi,
     int64_t *after,int64_t *after_hi,int64_t *work,int64_t *input,
     uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count) {
@@ -147,7 +147,7 @@ __device__ void direct_normal_material_execute(
     if(!threadIdx.x)direct_normal_pack_sources_with_target_kind(xlo,xhi,xa,xd,xs,xkind,ylo,yhi,ya,yd,ys,ykind,
         source_complex,targets,grain,observed,input,slot);
     __syncthreads();if(*slot)return;
-    direct_normal_predict_mode_sources(old,current,source_complex,targets,grain,out,work,true,true,slot);
+    direct_normal_predict_mode_sources(old,current,source_complex,targets,grain,out,work,true,reference!=0,slot);
     if(*slot)return;
     for(size_t j=threadIdx.x;j<report_words;j+=blockDim.x)before_hi[j]=before[j];
     __syncthreads();
@@ -166,15 +166,15 @@ extern "C" __global__ __launch_bounds__(512) void section_direct_normal_material
     int64_t *next,int64_t *next_hi,int64_t *before,int64_t *before_hi,
     int64_t *after,int64_t *after_hi,int64_t *work,int64_t *input,
     uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count) {
-    direct_normal_material_execute(old,xlo,xhi,xa,xd,xs,xkind,ylo,yhi,ya,yd,ys,ykind,normal_sources(roots),targets,grain,observed,next,next_hi,before,before_hi,after,after_hi,work,input,slot,census,lineage,lineage_count);
+    direct_normal_material_execute(old,xlo,xhi,xa,xd,xs,xkind,ylo,yhi,ya,yd,ys,ykind,normal_sources(roots),targets,grain,observed,1,next,next_hi,before,before_hi,after,after_hi,work,input,slot,census,lineage,lineage_count);
 }
 
 extern "C" __global__ __launch_bounds__(512) void section_direct_normal_material_sources(
     const int64_t *old,const int64_t *xlo,const int64_t *xhi,uint32_t xa,uint32_t xd,uint32_t xs,uint32_t xkind,
     const int64_t *ylo,const int64_t *yhi,uint32_t ya,uint32_t yd,uint32_t ys,uint32_t ykind,
-    uint32_t source_complex,uint32_t targets,uint32_t grain,uint32_t observed,
+    uint32_t source_complex,uint32_t targets,uint32_t grain,uint32_t observed,uint32_t reference,
     int64_t *next,int64_t *next_hi,int64_t *before,int64_t *before_hi,
     int64_t *after,int64_t *after_hi,int64_t *work,int64_t *input,
     uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count) {
-    direct_normal_material_execute(old,xlo,xhi,xa,xd,xs,xkind,ylo,yhi,ya,yd,ys,ykind,source_complex,targets,grain,observed,next,next_hi,before,before_hi,after,after_hi,work,input,slot,census,lineage,lineage_count);
+    direct_normal_material_execute(old,xlo,xhi,xa,xd,xs,xkind,ylo,yhi,ya,yd,ys,ykind,source_complex,targets,grain,observed,reference,next,next_hi,before,before_hi,after,after_hi,work,input,slot,census,lineage,lineage_count);
 }

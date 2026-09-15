@@ -9,10 +9,11 @@ mod refine;
 pub use refine::NormalRealizationRefinement;
 
 mod enclosure;
+mod enclosure_ports;
 pub use enclosure::{ResidentNormalEnclosure, ResidentNormalEnclosureView, ResidentNormalInput};
+mod applied_relation;
 mod joined_source;
 mod section;
-mod applied_relation;
 pub use section::ResidentNormalSectionReturn;
 
 /// Declared domain of the same normal-statistic operator. A feature chart is not silently
@@ -52,19 +53,19 @@ pub use wave::{
     CoupledConstitutiveRefusal, CoupledConstitutiveRest, CoupledJointEvaluation,
     CoupledJointReading, FamilyBasisReading, FamilyBasisSelection, NormalBasisScore,
     NormalBasisSelection, NormalContinuationJoin, NormalContinuationPullback,
-    NormalCoupledAttachRefusal, NormalCoupledComparison, NormalCoupledObservation, NormalCoupledContact,
-    NormalCoupledContinuation, NormalCoupledPrediction, NormalCoupledProducingHandle,
-    NormalCoupledReception, NormalCoupledSourceActuation, NormalCoupledStep, NormalFamilyBasisFace,
-    NormalFamilyComparisonRow, NormalFamilyPullback, NormalFamilyReceiverReading,
-    NormalFamilySupport, NormalProducingHandle, NormalReceiverCoordinates, NormalSourceActuation,
-    NormalWaveBasisChart, NormalWaveBasisFace, NormalWaveBasisReading, NormalWaveComparison,
-    NormalWaveComparisonReading, NormalWaveCoupled, NormalWaveCurrent, NormalWaveDevelopment,
-    NormalWaveFacePacket, NormalWaveFamily, NormalWaveFamilyReceiver, NormalWaveFamilyRest,
-    NormalWaveFibre, NormalWaveJointSource, NormalWavePrediction, NormalWaveReading,
-    NormalWaveReception, NormalWaveReceptionReading, NormalWaveReference,
-    NormalWaveReferenceReading, NormalWaveRest, NormalWaveSeedKind, NormalWaveSeedRefusal,
-    NormalWaveSource, NormalWaveStep, NormalWaveTransport, NormalWaveTransportChange,
-    NormalWaveWord, ResidentCoupledConstitutive, ResidentNormalWave,
+    NormalCoupledAttachRefusal, NormalCoupledComparison, NormalCoupledContact,
+    NormalCoupledContinuation, NormalCoupledObservation, NormalCoupledPrediction,
+    NormalCoupledProducingHandle, NormalCoupledReception, NormalCoupledSourceActuation,
+    NormalCoupledStep, NormalFamilyBasisFace, NormalFamilyComparisonRow, NormalFamilyPullback,
+    NormalFamilyReceiverReading, NormalFamilySupport, NormalProducingHandle,
+    NormalReceiverCoordinates, NormalSourceActuation, NormalWaveBasisChart, NormalWaveBasisFace,
+    NormalWaveBasisReading, NormalWaveComparison, NormalWaveComparisonReading, NormalWaveCoupled,
+    NormalWaveCurrent, NormalWaveDevelopment, NormalWaveFacePacket, NormalWaveFamily,
+    NormalWaveFamilyReceiver, NormalWaveFamilyRest, NormalWaveFibre, NormalWaveJointSource,
+    NormalWavePrediction, NormalWaveReading, NormalWaveReception, NormalWaveReceptionReading,
+    NormalWaveReference, NormalWaveReferenceReading, NormalWaveRest, NormalWaveSeedKind,
+    NormalWaveSeedRefusal, NormalWaveSource, NormalWaveStep, NormalWaveTransport,
+    NormalWaveTransportChange, NormalWaveWord, ResidentCoupledConstitutive, ResidentNormalWave,
 };
 
 pub struct ResidentNormalMaterial<'c> {
@@ -74,6 +75,56 @@ pub struct ResidentNormalMaterial<'c> {
     targets: usize,
     grain: ResidentGrain,
     observations: u64,
+}
+
+/// Immutable resident state retained by a source-qualified forecast.  This deliberately keeps
+/// the mounted section and its declared chart metadata; numerical detachment belongs to an
+/// explicit observer and is never part of the native forecast path.
+pub struct ResidentNormalMaterialView<'c> {
+    pub(crate) surface: &'c ResidentSurface<'c>,
+    pub(crate) state: Rc<ResidentSection<'c>>,
+    pub(crate) source_chart: NormalSourceChart,
+    pub(crate) targets: usize,
+    pub(crate) grain: ResidentGrain,
+    pub(crate) observations: u64,
+}
+
+impl<'c> ResidentNormalMaterialView<'c> {
+    /// Evaluate the retained immutable coefficient state at this producing cut. No mutable
+    /// learner is exposed by this view, and no numerical state is detached to the host.
+    pub fn read<'a>(&self, source:impl Into<ResidentNormalInput<'a,'c>>)
+        ->Result<ResidentNormalReturn<'a,'c>,ConstitutiveFibreError>{
+        let retained=ResidentNormalMaterial{surface:self.surface,state:Rc::clone(&self.state),
+            source_chart:self.source_chart,targets:self.targets,grain:self.grain,observations:self.observations};
+        retained.read(source)
+    }
+    /// The stored coefficient map is the executed law; its normal-reference defect remains
+    /// available through this immutable material witness.
+    pub fn read_applied<'a>(&self, source: impl Into<ResidentNormalInput<'a, 'c>>)
+        -> Result<ResidentNormalReturn<'a, 'c>, ConstitutiveFibreError> {
+        let retained=ResidentNormalMaterial{surface:self.surface,state:Rc::clone(&self.state),
+            source_chart:self.source_chart,targets:self.targets,grain:self.grain,observations:self.observations};
+        retained.read_applied(source)
+    }
+    /// Execute M[s,h,h⊗s] at fixed exact h, retaining the actual affine source restriction.
+    /// Only A(h), not the independent condition coefficients, transports source uncertainty.
+    pub fn read_applied_bilinear(&self, source:ResidentNormalEnclosureView<'_, 'c>, condition:ResidentConstitutiveCurrent<'_, 'c>)
+        -> Result<ResidentNormalEnclosure<'c>,ConstitutiveFibreError> {
+        let d=source.components();let k=condition.components();
+        let features=d.checked_mul(k/2).and_then(|v|v.checked_add(d)?.checked_add(k)).ok_or(ConstitutiveFibreError::Shape)?;
+        if self.source_chart != (NormalSourceChart::Features{source_complex:features/2}) || source.grain()!=self.grain {return Err(ConstitutiveFibreError::Shape);}
+        let width=self.targets.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?;
+        let section=self.surface.fresh_section(1,2*(width+1),ResidentGrain(0))?;
+        let mut pass=self.surface.begin_passage(&[vec![]])?;
+        {let lane=pass.open(0,&[])?;self.surface.record_normal_applied_condition(&lane,&self.state,source,condition,self.targets,&section)?;}
+        pass.close(0,&section,64)?;let result=pass.finish()?.launch()?;
+        if !result.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("applied conditional reaction: {:?}",result.obstruction)));}
+        Ok(ResidentNormalEnclosure{surface:self.surface,section,width,grain:self.grain})
+    }
+    pub fn inspect(&self)->Result<NativeNormalMaterialState,ConstitutiveFibreError>{
+        decode_state_layout(&self.surface.detach_section(&self.state,i64::BITS)?,
+            self.source_chart.layout(self.targets)?,self.targets,self.grain.0)
+    }
 }
 
 /// A receiver result with its actual borrowed operands. Forward/return currents are complete
@@ -124,6 +175,16 @@ impl<'a, 'c> ResidentNormalReturn<'a, 'c> {
     }
 }
 impl<'c> ResidentNormalMaterial<'c> {
+    pub(crate) fn retained_view(&self) -> ResidentNormalMaterialView<'c> {
+        ResidentNormalMaterialView {
+            surface: self.surface,
+            state: Rc::clone(&self.state),
+            source_chart: self.source_chart,
+            targets: self.targets,
+            grain: self.grain,
+            observations: self.observations,
+        }
+    }
     /// Found the existing unit-prior normal law. `roots` declares three equal complex port
     /// blocks (outgoing, held, target/reference), and targets declares the output chart.
     /// Grain is the caller's numerical realization; it is not a semantic capacity.
@@ -193,7 +254,9 @@ impl<'c> ResidentNormalMaterial<'c> {
     pub fn targets(&self) -> usize {
         self.targets
     }
-    pub fn grain(&self) -> ResidentGrain { self.grain }
+    pub fn grain(&self) -> ResidentGrain {
+        self.grain
+    }
     pub fn inspect(&self) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
         decode_state_layout(
             &self.surface.detach_section(&self.state, i64::BITS)?,
@@ -213,6 +276,13 @@ impl<'c> ResidentNormalMaterial<'c> {
     ) -> Result<ResidentNormalReturn<'a, 'c>, ConstitutiveFibreError> {
         Ok(self.prepare(source.into(), None)?.0)
     }
+    /// Apply the stored dyadic coefficient map. Input-family and arithmetic errors remain in
+    /// the output; the separate normal-equation comparison remains in the returned metadata
+    /// and material. This is the same applied/reference distinction used by native wave transport.
+    pub fn read_applied<'a>(&self, source: impl Into<ResidentNormalInput<'a, 'c>>)
+        -> Result<ResidentNormalReturn<'a, 'c>, ConstitutiveFibreError> {
+        Ok(self.prepare_mode(source.into(), None, false)?.0)
+    }
     pub fn receive<'a>(
         &mut self,
         source: impl Into<ResidentNormalInput<'a, 'c>>,
@@ -229,6 +299,14 @@ impl<'c> ResidentNormalMaterial<'c> {
         observed: Option<ResidentNormalInput<'a, 'c>>,
     ) -> Result<(ResidentNormalReturn<'a, 'c>, Option<ResidentSection<'c>>), ConstitutiveFibreError>
     {
+        self.prepare_mode(source, observed, true)
+    }
+    fn prepare_mode<'a>(
+        &self,
+        source: ResidentNormalInput<'a, 'c>,
+        observed: Option<ResidentNormalInput<'a, 'c>>,
+        reference: bool,
+    ) -> Result<(ResidentNormalReturn<'a, 'c>, Option<ResidentSection<'c>>), ConstitutiveFibreError> {
         let layout = self.source_chart.layout(self.targets)?;
         if source.width() != layout.source_components
             || observed.is_some_and(|y| y.width() != layout.target_components)
@@ -263,6 +341,7 @@ impl<'c> ResidentNormalMaterial<'c> {
                 self.source_complex(),
                 self.targets,
                 self.grain.0,
+                reference,
                 next.as_ref(),
                 &before,
                 after.as_ref(),
@@ -297,6 +376,6 @@ impl<'c> ResidentNormalMaterial<'c> {
 }
 
 #[cfg(test)]
-mod tests;
-#[cfg(test)]
 mod enclosed_target_tests;
+#[cfg(test)]
+mod tests;

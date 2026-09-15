@@ -25,6 +25,17 @@ The `native_generator` example now exercises the engine's learned local law and
 `ConstitutiveFibreRest` through resident current composition, with no text codec or observation
 archive in its learned material. Its declared phase-source example does not establish a general model.
 
+## Constituted-field model
+
+[established-bounded; measured] `native::NativeCoupledBody::from_field` now directly owns the
+operative field and its learned local reaction. `preview_field`, `generate_field` and
+`observe_field` share the same generating law and producing-material return. The
+[`athena_field` example](examples/athena_field.rs) learns a joint complex transformation from
+actual targets, generates on held-out inputs and reads back its trained `SavedCoupledBody`.
+[Actual outputs, command, costs and longer-run failure](../../research/experiments/athena_field/README.md).
+This is the first finite model operation; useful Athena conversation and broader receiving
+applications remain in the live construction order.
+
 ## Earlier inherited-operator interface
 
 [established-bounded; source-inspected] These interfaces retain their existing bounded scope:

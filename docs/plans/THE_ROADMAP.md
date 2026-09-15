@@ -37,10 +37,10 @@ codecs, durable I/O and scoped reference checks.
 
 [definition] Existing source already provides scattering, paired tangents/adjoints, local
 normal/conditional learning, receiving maps, prospective joint families and several rest
-formats. The immediate architectural defect is an unbound application composition: the public
-coupled body does not directly own and execute the operative field and its same-material
-learning path. Fitting another predictor to that field is a separate application, not the
-construction below.
+formats. The first [field-backed model return](../../research/experiments/athena_field/README.md)
+now binds these owners under the public coupled body. Its eight-target task and trained rest
+are delivered; the recorded longer-run joint-enclosure obstruction remains concrete continuation
+work. Fitting another predictor to that field is a separate application.
 
 ## Athena construction order
 

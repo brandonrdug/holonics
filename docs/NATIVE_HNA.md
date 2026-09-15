@@ -5,6 +5,23 @@
 now composes productive generator material through those owners. Text/audio/visual measurements
 remain exterior charts; the retired byte-cultivation driver is not the native learning API.
 
+## Constituted field model
+
+[established-bounded; measured] `holonics::hna::native::NativeCoupledBody::from_field` now
+moves a constituted field and its local reaction into one model. `preview_field` reads a whole
+section; `generate_field` commits that same evaluated field and optionally retains its producing
+comparison. `observe_field` returns an actual target through the paired adjoint into D and the
+local normal reaction. `train_field_reaction` supplies local constituent examples. Existing
+`rest` / `SavedCoupledBody::read` / `remount` persist the trained local model after its pending
+target comparisons are resolved. [Example, actual outputs and costs](../research/experiments/athena_field/README.md).
+
+[definition] The first field path fixes incidence and uses an explicit point-condition port.
+Its kernel executes stored D/M while retaining source uncertainty and reference/realization
+comparisons. The [construction record](../research/records/2026-09-14_THE_CONSTITUTED_FIELD_TRAINS_AND_REOPENS_AS_ONE_HNN_MODEL.md)
+and [receiver/music synthesis](../research/records/2026-09-14_HEAR_THE_MUSIC_SITUATED_RELEASE_AND_SELF_MOTION.md)
+name the actual next joint/current and moving-receiver terms. Other owners below keep their
+own source and codec scopes.
+
 ## Learned local law
 
 [established-bounded; implemented-exact] The [caller-controlled mathematical session](../research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md)

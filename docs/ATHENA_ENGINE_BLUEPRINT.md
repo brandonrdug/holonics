@@ -71,7 +71,7 @@ into an admissible coefficient change; the finite recomputation retains the mixe
 | Learned contact response | `normalized_material_return`, `pull_back_material_current/source`, `material_contact_response`, `apply_material_contact_realization` | Develop the material that produced the generated field. |
 | Existing complete observed field update | `NativeConstitutiveField::respond_to_material_observation` | Already joins the actual receiving cut, current/probability metric, paired response and atomic material update. Reuse it where that observation contract applies. |
 | Conditional local generator | `ResidentGeneratorNeighborhood`; normal and bilinear relation owners | Use its learned action as a constituent reaction with actual source/condition sections. It must not become an independently fitted stand-in for the whole field. |
-| Public model ownership | `NativeCoupledBody`; currently `ResidentNormalWave` or `ResidentCoupledConstitutive` | Add an operative-field-backed path under this existing public owner. Its current enum does not own the field's scattering/material path. |
+| Public model ownership | `NativeCoupledBody::from_field`, alongside the existing wave representations | The field-backed state owns `NativeConstitutiveField` and `ResidentGeneratorNeighborhood`; it executes the field/reaction, retains its producing section and applies actual D/M target responses. |
 | Joint receiver and continuation | Existing prospective/current section and receiving projection owners | Provide joint generation over the constituted field, with read-only or committed ownership as requested. Streaming reads this section under its dependencies. |
 | Economical repeated action | Existing exact mode/observable reducers and resident factor/current owners | Bind a decoder and reduced action to the operator actually executed, including retained interior and pending producing comparisons. |
 
@@ -87,9 +87,11 @@ used to implement the requested whole-field refinement merely because that API a
 The new body path must use one explicit generating operator for its requested joint section;
 preview and commit differ in ownership effects, not in an unannounced change of that operator.
 
+[established-bounded; measured] The [first model return](../research/records/2026-09-14_THE_CONSTITUTED_FIELD_TRAINS_AND_REOPENS_AS_ONE_HNN_MODEL.md) implements this attachment and returns held-out joint sections after actual D/M training, plus trained rest/remount. Its longer-run enclosure obstruction is retained; current continuation belongs in CONSTRUCTION_STATE.
+
 ## Concrete engine-development increment
 
-[project-postulate] The next increment is an operative-field-backed body operation. It consumes
+[project-postulate] The first increment is the operative-field-backed body operation. It consumes
 the existing resident input/partial field, actual boundary constraints and requested receiving
 chart; executes constituted transport and its local learned reactions; and returns a joint
 field through that receiver. The same body handles an actual observed difference at its

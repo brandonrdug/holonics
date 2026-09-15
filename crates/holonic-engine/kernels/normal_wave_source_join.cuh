@@ -1,5 +1,23 @@
 // Linear receivers of already-declared joint balls. The result is an outer enclosure;
 // no centre is installed as the source and no independence of its components is asserted.
+// A point port is admitted only after proving that the declared ball has zero
+// radius. Normalize in the wide carrier before checking the rational word wire.
+extern "C" __global__ void section_normal_exact_point(
+    const int64_t *source,const int64_t *source_hi,uint32_t at,uint32_t width,uint32_t grain,
+    int64_t *workspace,int64_t *out,int64_t *out_hi,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+    if(blockIdx.x||threadIdx.x||upstream_refused(census,lineage,lineage_count,slot))return;
+    if(!width||(width&1u)||(at&1u)||grain<1||grain>120){atomicOr(slot,REFUSED_MALFORMED);return;}
+    for(size_t j=0;j<2u*((size_t)width+1u);++j)if(source[at+j]!=source_hi[at+j]){atomicOr(slot,REFUSED_MALFORMED);return;}
+    const wide *x=(const wide *)(source+at);wide *v=(wide *)workspace;
+    if(x[width]!=0){atomicOr(slot,REFUSED_BOUND);return;}
+    wide den=(wide)1<<grain;
+    for(uint32_t j=0;j<width;++j)v[j]=x[j];
+    fibre_normalize(v,width,&den,slot);
+    for(uint32_t j=0;j<width;++j)to_word(v[j],slot);to_word(den,slot);if(*slot)return;
+    for(uint32_t j=0;j<width;++j)out[j]=out_hi[j]=(int64_t)v[j];
+    out[width]=out_hi[width]=(int64_t)den;
+}
 // At fixed h, F(a)=(a,h,h tensor a) is affine, with Lipschitz constant
 // sqrt(1+||h||_2^2) <= 1+sum |h_j| over the real coordinates. Exact h is retained;
 // only the returned numerical chart is rounded, with its error added to the ball.

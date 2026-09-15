@@ -58,6 +58,20 @@ impl ResidentNormalEnclosureView<'_, '_> {
         })
     }
 }
+impl<'a,'c> ResidentNormalEnclosureView<'a,'c>{
+    /// Read the exact point only when the entire declared ball has radius zero.
+    /// A nonzero radius or an unrepresentable reduced rational returns an obstruction.
+    pub fn read_exact_point(self)->Result<ResidentSection<'c>,ConstitutiveFibreError>{
+        let width=self.width.checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
+        let out=self.surface.fresh_section(1,width,ResidentGrain(0))?;
+        let work=self.surface.fresh_section(1,self.width.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?,ResidentGrain(0))?;
+        let mut p=self.surface.begin_passage(&[vec![]])?;
+        {let lane=p.open(0,&[])?;self.surface.record_normal_exact_point(&lane,self,&work,&out)?;}
+        p.close(0,&out,64)?;let r=p.finish()?.launch()?;
+        if !r.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("exact point of declared ball: {:?}",r.obstruction)));}
+        Ok(out)
+    }
+}
 
 #[derive(Clone, Copy)]
 pub enum ResidentNormalInput<'a, 'c> {

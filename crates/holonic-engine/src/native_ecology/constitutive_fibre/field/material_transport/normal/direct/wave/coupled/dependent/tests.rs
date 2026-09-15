@@ -674,3 +674,31 @@ fn dependent_observation_keeps_parameter_material_and_separate_wave_clocks() {
             b.predictive_for(1,Some(resumed.base.neighborhood().material(1).unwrap())).unwrap().unwrap().material.inspect().unwrap().cross_source);
     }
 }
+
+#[test]
+#[ignore="requires CUDA; a received condition persists across a later insensitive contact and programme rest"]
+fn known_condition_input_is_the_following_standing_without_a_wave_tick(){
+    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();let h=point(&s,&[1,0]);
+    let neighborhood=ResidentGeneratorNeighborhood::with_shared_condition(vec![law(&s,true)],current(&h),ConditionContactMetric::UnitAdmittanceRealification).unwrap();
+    let mut wave=body(&s).with_neighborhood(neighborhood).unwrap();
+    let c=wave.admit_contact(0).unwrap();let pending=wave.predict_contact(&c).unwrap().handle;
+    let y=point(&s,&[0,0]);let comparison=wave.compare_coupled_prediction(&pending,current(&y)).unwrap();
+    let receiver=comparison.source().receiver_coordinates().unwrap().into_coordinates();
+    let mut model=wave.into_constitutive_continuation(comparison,receiver).unwrap();
+    let epoch=model.epoch();let before=face(&mut model);
+    let contacts=model.read_receiver().unwrap().condition_standing().contacts();
+    for index in 0..16 {let input=point(&s,&[index+3,1]);model.receive_condition(current(&input)).unwrap();}
+    assert_eq!(model.operations.len(),1);assert_eq!(model.operations[0].kind.condition_inputs(),Some(16));
+    assert_eq!(model.read_receiver().unwrap().condition_standing().contacts(),contacts+16);
+    assert_eq!(model.epoch(),epoch);assert_eq!(face(&mut model),before);
+    let seen=model.read_receiver().unwrap().condition_current().to_owned(&s).unwrap();
+    assert_eq!(s.read_out(&seen).unwrap(),vec![(18,18),(1,1),(1,1)]);
+    let id=model.predict_member(0,WaveSourceReceiver::Direct).unwrap();assert_eq!(id,epoch+1);
+    model.incorporate_prediction(id,current(&y)).unwrap();
+    let seen=model.read_receiver().unwrap().condition_current().to_owned(&s).unwrap();
+    assert_eq!(s.read_out(&seen).unwrap(),vec![(18,18),(1,1),(1,1)]);
+    let saved=model.rest().unwrap();let mut wire=Vec::new();saved.write(&mut wire).unwrap();
+    let mut restored=CoupledConstitutiveRest::read(&mut wire.as_slice(),wire.len() as u64).unwrap().remount(&s).unwrap();
+    assert_eq!(restored.rest().unwrap(),saved);
+    assert_eq!(face(&mut restored),face(&mut model));
+}

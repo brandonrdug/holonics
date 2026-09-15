@@ -258,6 +258,17 @@ impl<'chart> ResidentSurface<'chart> {
         )
     }
 
+    pub(crate) fn record_constitutive_current_snapshot(&self,lane:&Lane<'_, 'chart>,
+        current:ResidentConstitutiveCurrent<'_, 'chart>,out:&ResidentSection<'chart>)->Result<(),ResidentRefusal>{
+        self.validate_constitutive_current_view(current)?;
+        if current.width==0||current.width>=u32::MAX as usize||!self.operative_shape(out,1,current.width+1){return Err(Self::operative_error());}
+        let mut p=Params::new();p.ptr(current.section.lo.device_ptr()).ptr(current.section.hi.device_ptr())
+            .u32(current.offset as u32).u32(current.denominator.map_or(u32::MAX,|v|v as u32))
+            .u32(current.disposition.map_or(u32::MAX,|v|v as u32)).u32(current.width as u32)
+            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census)
+            .ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_constitutive_current_snapshot",1,self.launch.block_x,0,&mut p,"constitutive-current-snapshot")
+    }
     /// Stage a retained condition current, or its unit-admittance affine contact. Neither
     /// kernel mutates the supplied current or family. The caller owns successor publication.
     pub(crate) fn record_condition_contact(

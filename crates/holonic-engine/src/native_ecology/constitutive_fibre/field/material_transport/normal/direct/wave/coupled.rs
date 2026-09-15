@@ -172,6 +172,14 @@ impl<'c> ResidentNormalWave<'c> {
     }
 }
 impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
+    /// Receive an actual condition without advancing the held wave. Its original
+    /// map remains retained, and later contact reads the new condition.
+    pub fn receive_condition(&mut self,incoming:ResidentConstitutiveCurrent<'_, 'c>)
+        ->Result<(),ConstitutiveFibreError>{
+        let next=self.continuation.neighborhood_base.checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
+        self.continuation.neighborhood.receive_condition(incoming)?;
+        self.continuation.neighborhood_base=next;self.continuation.bindings.clear();Ok(())
+    }
     pub fn epoch(&self) -> u64 {
         self.continuation.epoch
     }

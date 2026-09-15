@@ -5,6 +5,7 @@ use super::*;
 use std::rc::Rc;
 use crate::native_ecology::constitutive_fibre::ResidentNormalMaterial;
 
+pub mod field_reaction;
 mod rest;
 pub use rest::{GeneratorNeighborhoodRest, NeighborhoodEvidenceRest};
 
@@ -132,7 +133,7 @@ impl<'c> ResidentNeighborhoodAlternative<'c> {
     /// witness or an independently sampled alternative.
     pub(crate) fn prepare_following(
         material:&mut GeneratorMaterial<'c>,
-        prior:&PreparedConditionContact<'c>,
+        prior:&ResidentConditionStanding<'c>,
         source:ResidentConstitutiveCurrent<'_, 'c>,
         observed:ResidentConstitutiveCurrent<'_, 'c>,
         producing_condition:ResidentConstitutiveCurrent<'_, 'c>,
@@ -140,10 +141,10 @@ impl<'c> ResidentNeighborhoodAlternative<'c> {
     )->Result<Self,ConstitutiveFibreError>{
         let predictive_source=predictive_override.or(material.predictive.as_ref());
         let action=predictive_source.map_or(&material.law,|p|&p.action);
-        let prediction=action.read_bilinear(source,prior.successor())?;
+        let prediction=action.read_bilinear(source,prior.current())?;
         let predictive=predictive_source.map(|p|p.stage(source,producing_condition,observed)).transpose()?;
         let family=material.law.read_condition_preimage(source,observed)?;
-        let condition=prior.prepare_following(&family)?;
+        let condition=prior.prepare_contact(&family)?;
         let staged=material.law.prepare_bilinear_contact(source,condition.successor(),Some(observed))?;
         let (law,formation)=staged.into_alternative();
         let material=GeneratorMaterial {law,predictive};
@@ -217,6 +218,14 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
     }
     pub fn condition(&self) -> ResidentConstitutiveCurrent<'_, 'c> {
         self.condition.current()
+    }
+    /// An actual supplied condition in this neighborhood's declared chart.
+    /// Pending producers retain their former condition; only later reads use this input.
+    pub fn receive_condition(&mut self,incoming:ResidentConstitutiveCurrent<'_, 'c>)
+        ->Result<ResidentConditionStanding<'c>,ConstitutiveFibreError>{
+        self.require_usable()?;
+        let next=self.epoch.checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
+        let prior=self.condition.receive_current(incoming)?;self.epoch=next;Ok(prior)
     }
     pub(crate) fn material_for_staging(
         &mut self, member:usize,

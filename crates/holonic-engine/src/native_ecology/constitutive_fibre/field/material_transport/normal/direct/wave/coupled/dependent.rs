@@ -82,9 +82,11 @@ enum ConstitutivePassageKind {
     Advance,
     Return,
     Empirical { prediction:u64, cut:ConstitutiveSourceFrame },
+    Condition { inputs:u64 },
 }
 impl ConstitutivePassageKind {
-    fn moves_wave(self)->bool{!matches!(self,Self::Empirical{..})}
+    fn moves_wave(self)->bool{!matches!(self,Self::Empirical{..}|Self::Condition{..})}
+    fn condition_inputs(self)->Option<u64>{match self{Self::Condition{inputs}=>Some(inputs),_=>None}}
     fn empirical_cut(self)->Option<(u64,ConstitutiveSourceFrame)>{
         match self {Self::Empirical{prediction,cut}=>Some((prediction,cut)),_=>None}
     }
@@ -181,6 +183,19 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
 }
 
 impl<'c> ResidentCoupledConstitutive<'c> {
+    /// Receive a known current in the root's shared condition chart. The input
+    /// remains in the programme, and each parameter alternative uses it next.
+    pub fn receive_condition(&mut self,incoming:ResidentConstitutiveCurrent<'_, 'c>)
+        ->Result<(),ConstitutiveFibreError>{
+        if incoming.width!=self.base.neighborhood().condition().width{return Err(ConstitutiveFibreError::Shape);}
+        let source=incoming.to_owned(self.base.material.surface)?;
+        let previous=self.operations.last().and_then(|p|p.kind.condition_inputs());
+        let inputs=previous.unwrap_or(0).checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
+        self.append_operation_replacing(ConstitutiveSourcePassage{
+            member:self.comparison.member(),chart:self.comparison.relation().source_receiver(),
+            kind:ConstitutivePassageKind::Condition{inputs},source:Some(source),returned:None,
+        },false,previous.is_some()).map(|_|()).map_err(|(_,e)|e)
+    }
     pub fn compare_prediction(
         &mut self,
         id: u64,
@@ -617,12 +632,17 @@ impl<'c> ResidentCoupledConstitutive<'c> {
         passage: &ConstitutiveSourcePassage<'c>,
         other: Option<&GeneratorMaterial<'c>>,
     ) -> Result<(), ConstitutiveFibreError> {
+        if let Some(inputs)=passage.kind.condition_inputs() {
+            return value.receive_condition(ResidentConstitutiveCurrent::rational(
+                passage.source.as_ref().ok_or(ConstitutiveFibreError::Shape)?)?,inputs);
+        }
         let next = value
             .successor_section()
             .passages()
             .checked_add(1)
             .ok_or(ConstitutiveFibreError::Shape)?;
         match passage.kind {
+            ConstitutivePassageKind::Condition{..}=>unreachable!("condition input handled before wave-time arithmetic"),
             ConstitutivePassageKind::Return|ConstitutivePassageKind::Empirical{..} => Err(ConstitutiveFibreError::Shape),
             ConstitutivePassageKind::Source => value.actuate_source(
                 passage.member,
@@ -684,8 +704,20 @@ impl<'c> ResidentCoupledConstitutive<'c> {
         operation: ConstitutiveSourcePassage<'c>,
         retain: bool,
     ) -> Result<Option<NormalCoupledObservation<'c>>, (ConstitutiveSourcePassage<'c>, ConstitutiveFibreError)> {
+        self.append_operation_replacing(operation,retain,false)
+    }
+    fn append_operation_replacing(&mut self,operation:ConstitutiveSourcePassage<'c>,retain:bool,replace_last:bool)
+        ->Result<Option<NormalCoupledObservation<'c>>,(ConstitutiveSourcePassage<'c>,ConstitutiveFibreError)>{
         let prepared = (|| {
+            if replace_last && (retain||self.operations.last().and_then(|p|p.kind.condition_inputs())
+                .and_then(|n|n.checked_add(1))!=operation.kind.condition_inputs()){
+                return Err(ConstitutiveFibreError::ForeignOccurrence);
+            }
             match (operation.kind, operation.returned.as_ref()) {
+                (ConstitutivePassageKind::Condition{inputs},None) if inputs>0&&!retain
+                    &&operation.member==self.comparison.member()
+                    &&operation.chart==self.comparison.relation().source_receiver()=>{},
+                (ConstitutivePassageKind::Condition{..},_)=>return Err(ConstitutiveFibreError::ForeignOccurrence),
                 (ConstitutivePassageKind::Empirical{prediction,cut},None)
                     if !retain&&operation.member==cut.member()&&operation.chart==cut.chart()
                         &&self.source_frame(prediction).ok()==Some(cut)=>{},
@@ -711,6 +743,7 @@ impl<'c> ResidentCoupledConstitutive<'c> {
             let operations = self
                 .operations
                 .iter()
+                .take(self.operations.len()-usize::from(replace_last))
                 .chain(std::iter::once(&operation))
                 .collect::<Vec<_>>();
             let (mut value, _) = Self::evaluate_programme(
@@ -744,6 +777,7 @@ impl<'c> ResidentCoupledConstitutive<'c> {
                     }
                 }
                 if let Some((id,_))=operation.kind.empirical_cut(){self.pending.remove(&id);}
+                if replace_last {self.operations.pop();}
                 self.operations.push(operation);
                 self.epoch = next;
                 Ok(receipt)

@@ -1,9 +1,41 @@
 use super::*;
 use crate::native_ecology::constitutive_fibre::{
     normal_feature_report_words, normal_feature_state_words, normal_feature_workspace_words,
-    ResidentConstitutiveSection,
+    ResidentConstitutiveSection, ResidentNormalEnclosureView, ResidentNormalInput,
 };
 impl<'c> ResidentSurface<'c> {
+    pub(crate) fn normal_enclosed_batch_table(&'c self,pairs:&[(ResidentNormalEnclosureView<'_, 'c>,ResidentNormalEnclosureView<'_, 'c>)],
+        sources:usize,targets:usize,grain:ResidentGrain)->Result<ResidentSection<'c>,ResidentRefusal>{
+        let fail=||Self::operative_error();
+        if pairs.is_empty()||pairs.len()>u32::MAX as usize||sources==0||targets==0{return Err(fail());}
+        let mut values=Vec::with_capacity(pairs.len().checked_mul(6).ok_or_else(fail)?);
+        for &(x,y) in pairs{
+            if x.width!=2*sources||y.width!=2*targets{return Err(fail());}
+            for v in [x,y]{self.validate_normal_input(ResidentNormalInput::Enclosed(v),grain.0)?;
+                for raw in [v.section.lo.device_ptr(),v.section.hi.device_ptr(),v.offset as u64]{values.push((raw as i64,raw as i64));}
+            }
+        }
+        self.mount_section_rest(&ResidentSectionRest::found(pairs.len(),6,ResidentGrain(0),64,values).map_err(|_|fail())?)
+    }
+    pub(crate) fn record_normal_enclosed_batch(&self,lane:&Lane<'_, 'c>,state:&ResidentSection<'c>,table:&ResidentSection<'c>,
+        sources:usize,targets:usize,grain:ResidentGrain,next:&ResidentSection<'c>,work:&ResidentSection<'c>,
+        input:&ResidentSection<'c>,report:&ResidentSection<'c>)->Result<(),ResidentRefusal>{
+        let fail=||Self::operative_error();
+        let sw=normal_feature_state_words(sources,targets).ok_or_else(fail)?;
+        let rw=normal_feature_report_words(sources,targets).ok_or_else(fail)?;
+        let ww=normal_feature_workspace_words(sources,targets).ok_or_else(fail)?;
+        let iw=sources.checked_mul(2).and_then(|d|d.checked_add(1)?.checked_mul(4)?.checked_add(3*targets)).ok_or_else(fail)?;
+        if sources==0||targets==0||sources>u32::MAX as usize/2||targets>u32::MAX as usize/2
+            ||table.rows==0||table.rows>u32::MAX as usize||!(1..=120).contains(&grain.0)
+            ||!self.operative_shape(table,table.rows,6)||!self.operative_shape(state,1,sw)
+            ||!self.operative_shape(next,1,sw)||!self.operative_shape(work,1,ww)
+            ||!self.operative_shape(input,1,iw)||!self.operative_shape(report,1,rw){return Err(fail());}
+        let mut p=Params::new();p.ptr(state.lo.device_ptr()).ptr(table.lo.device_ptr()).u32(table.rows as u32)
+            .u32(sources as u32).u32(targets as u32).u32(grain.0).ptr(next.lo.device_ptr()).ptr(next.hi.device_ptr())
+            .ptr(work.lo.device_ptr()).ptr(input.lo.device_ptr()).ptr(report.lo.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_normal_material_enclosed_batch",1,self.launch.block_x,0,&mut p,"normal-enclosed-batch")
+    }
     pub(crate) fn record_current_difference_section(
         &self,
         lane: &Lane<'_, 'c>,

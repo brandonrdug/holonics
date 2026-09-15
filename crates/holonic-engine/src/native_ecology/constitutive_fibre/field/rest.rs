@@ -11,6 +11,9 @@ use std::io::{Read, Write};
 
 const MAGIC: &[u8] = b"HNA-NATIVE-FIELD-REST\x01";
 const PACKED_MAGIC: &[u8] = b"HNA-NATIVE-FIELD-REST\x02";
+// Versions 3/4 retain a current report refined after the latest ordinary occurrence.
+const CURRENT_MAGIC: &[u8] = b"HNA-NATIVE-FIELD-REST\x03";
+const CURRENT_PACKED_MAGIC: &[u8] = b"HNA-NATIVE-FIELD-REST\x04";
 const END: &[u8] = b"HNA-NATIVE-FIELD-END\x01";
 type Error = ConstitutiveFibreError;
 fn invalid(detail: impl std::fmt::Display) -> Error {
@@ -95,6 +98,7 @@ pub struct NativeFieldRest {
     basis: ResidentSectionRest,
     covariance: Option<ResidentSectionRest>,
     initial_junction: Option<ResidentSectionRest>,
+    current_junction: Option<ResidentSectionRest>,
     transport: Option<ResidentSectionRest>,
     history: Vec<HeldRest>,
 }
@@ -211,6 +215,7 @@ impl NativeFieldRest {
             || (!h.transport && (!h.transport_source.is_outgoing() || !h.transport_target.is_direct()))
             || h.transport_source.report_words_for(n,h.transport_target).is_none()
             || self.initial_junction.is_some() != (h.junction.is_some() && h.history.is_empty())
+            || (self.current_junction.is_some() && (h.junction.is_none() || h.history.is_empty()))
         {
             return Err(invalid("field populations"));
         }
@@ -548,6 +553,9 @@ impl NativeFieldRest {
         if preceding_rank != rank || h.history.iter().zip(received).any(|(e, r)| e.returned != r) {
             return Err(invalid("field rank or consumed-source flags"));
         }
+        if let (Some(wire), Some(section)) = (&h.junction, &self.current_junction) {
+            junction_section(section, dimension, wire.representation)?;
+        }
         if let (Some(wire), Some(section)) = (&h.junction, &self.initial_junction) {
             junction_section(section, dimension, wire.representation)?;
             match wire.representation {
@@ -675,11 +683,15 @@ impl NativeFieldRest {
         self.validate()?;
         let packing=self.header.transport_source.is_operative() && self.header.transport_source.is_projector()
             && !self.header.transport_target.is_direct();
-        out.write_all(if packing{PACKED_MAGIC}else{MAGIC}).map_err(invalid)?;
+        let magic = match (packing, self.current_junction.is_some()) {
+            (false, false) => MAGIC, (true, false) => PACKED_MAGIC,
+            (false, true) => CURRENT_MAGIC, (true, true) => CURRENT_PACKED_MAGIC,
+        };
+        out.write_all(magic).map_err(invalid)?;
         blob(out, &serde_json::to_vec(&self.header).map_err(invalid)?)?;
         fn section(out:&mut impl Write,s:&ResidentSectionRest)->Result<(),Error>{blob(out,&point_bytes(s)?)}
         section(out,&self.seed)?;section(out,&self.memory)?;section(out,&self.basis)?;
-        for s in [&self.covariance,&self.initial_junction,&self.transport].into_iter().flatten(){section(out,s)?;}
+        for s in [&self.covariance,&self.initial_junction,&self.transport,&self.current_junction].into_iter().flatten(){section(out,s)?;}
         if let Some(op)=&self.operative {op.write(&mut |s|section(out,s))?;}
         for (at,h) in self.history.iter().enumerate() {
             section(out,&h.source)?;
@@ -700,8 +712,9 @@ impl NativeFieldRest {
     }
     pub fn read(input: &mut impl Read, octets: u64) -> Result<Self, Error> {
         let mut input=input.take(octets);let mut magic=vec![0;MAGIC.len()];input.read_exact(&mut magic).map_err(invalid)?;
-        let packing=magic==PACKED_MAGIC;
-        if !packing && magic!=MAGIC{return Err(invalid("unsupported field rest version"));}
+        let packing=magic==PACKED_MAGIC || magic==CURRENT_PACKED_MAGIC;
+        let contemporary=magic==CURRENT_MAGIC || magic==CURRENT_PACKED_MAGIC;
+        if !packing && !contemporary && magic!=MAGIC{return Err(invalid("unsupported field rest version"));}
         let header: Header=serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
         if packing && (!header.transport_source.is_operative() || !header.transport_source.is_projector() || header.transport_target.is_direct()){
             return Err(invalid("packed field target chart"));
@@ -711,6 +724,7 @@ impl NativeFieldRest {
         let covariance=header.junction.as_ref().map(|_|section(&mut input)).transpose()?;
         let initial_junction=(header.junction.is_some() && header.history.is_empty()).then(||section(&mut input)).transpose()?;
         let transport=header.transport.then(||section(&mut input)).transpose()?;
+        let current_junction=contemporary.then(||section(&mut input)).transpose()?;
         let operative=header.operative.as_ref().map(|w|OperativeRest::read(w,&mut ||section(&mut input))).transpose()?;
         let mut history=Vec::new();
         for (at,event) in header.history.iter().enumerate(){
@@ -738,7 +752,7 @@ impl NativeFieldRest {
         }
         expect(&mut input,END)?;
         if input.limit()!=0{return Err(invalid("trailing field rest bytes"));}
-        let rest=Self{operative,header,seed,memory,basis,covariance,initial_junction,transport,history};rest.validate()?;Ok(rest)
+        let rest=Self{operative,header,seed,memory,basis,covariance,initial_junction,current_junction,transport,history};rest.validate()?;Ok(rest)
     }
 }
 
@@ -855,6 +869,16 @@ impl<'chart> NativeConstitutiveField<'chart> {
             } else {
                 None
             },
+            // Keep the actual contemporary report independently of ordinary observation
+            // history. Pointer identity avoids copying the usual unchanged last report.
+            current_junction: match (&self.junction, self.history.last()) {
+                (Some(j), Some(last)) => {
+                    let same = last.resident.as_ref().and_then(|h| h.junction.as_ref())
+                        .is_some_and(|previous| Rc::ptr_eq(previous, &j.current));
+                    if same { None } else { Some(section(&j.current)?) }
+                },
+                _ => None,
+            },
             transport: self
                 .transport
                 .as_ref()
@@ -934,6 +958,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             basis,
             covariance,
             initial_junction,
+            current_junction,
             transport,
             history,
         } = rest;
@@ -1008,7 +1033,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
             archive.note_archived_prefix(history.len().saturating_sub(1));
         }
         let junction = if let Some(j) = h.junction {
-            let current = if let Some(last) = history.last() {
+            let current = if let Some(current) = current_junction {
+                Rc::new(surface.mount_section_rest(&current)?)
+            } else if let Some(last) = history.last() {
                 Rc::clone(
                     last.resident()?
                         .junction

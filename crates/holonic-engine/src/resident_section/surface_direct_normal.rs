@@ -113,6 +113,7 @@ impl<'c> ResidentSurface<'c> {
         sources: usize,
         targets: usize,
         grain: u32,
+        reference: bool,
         next: Option<&ResidentSection<'c>>,
         before: &ResidentSection<'c>,
         after: Option<&ResidentSection<'c>>,
@@ -203,7 +204,8 @@ impl<'c> ResidentSurface<'c> {
         p.u32(sources as u32)
             .u32(targets as u32)
             .u32(grain)
-            .u32(u32::from(observed.is_some()));
+            .u32(u32::from(observed.is_some()))
+            .u32(u32::from(reference));
         // These aliases are unused by the read-only branch; it never writes state or after.
         for section in [next.unwrap_or(before), before, after.unwrap_or(before)] {
             p.ptr(section.lo.device_ptr()).ptr(section.hi.device_ptr());

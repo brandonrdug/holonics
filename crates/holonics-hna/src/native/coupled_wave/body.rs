@@ -5,10 +5,10 @@
 use super::super::NativeSessionError;
 use holonic_engine::{
     native_ecology::constitutive_fibre::{
-        ConstitutiveSourceRefusal, CoupledConstitutiveRest, NormalCoupledContact, NormalCoupledObservation,
-        NormalFamilyBasisFace, NormalWaveBasisChart, NormalWaveCoupled, NormalWaveRest,
-        ResidentConstitutiveCurrent, ResidentConstitutiveSection, ResidentCoupledConstitutive,
-        ResidentNormalWave, ResidentNormalInput, WaveSourceReceiver,
+        ConstitutiveSourceRefusal, CoupledConstitutiveRest, NormalCoupledContact,
+        NormalCoupledObservation, NormalFamilyBasisFace, NormalWaveBasisChart, NormalWaveCoupled,
+        NormalWaveRest, ResidentConstitutiveCurrent, ResidentConstitutiveSection,
+        ResidentCoupledConstitutive, ResidentNormalInput, ResidentNormalWave, WaveSourceReceiver,
     },
     resident_section::{ResidentSection, ResidentSurface},
 };
@@ -19,7 +19,12 @@ fn invalid(message: impl ToString) -> NativeSessionError {
     NativeSessionError::Application(message.to_string())
 }
 
+mod field;
+use field::FieldModel;
+pub use field::{NativeFieldAttachRefusal, NativeFieldGeneratedSection, NativeFieldModelRest};
+
 enum BodyState<'c> {
+    Field(FieldModel<'c>),
     Affine(ResidentNormalWave<'c, NormalWaveCoupled<'c>>),
     Constitutive(ResidentCoupledConstitutive<'c>),
 }
@@ -29,10 +34,29 @@ pub struct NativeCoupledBody<'c> {
 }
 
 impl<'c> NativeCoupledBody<'c> {
+    /// Supply an actual condition through the same continuing owner. It changes
+    /// following generator reads while retained predictions keep their former conditions.
+    pub fn receive_condition(
+        &mut self,
+        incoming: ResidentConstitutiveCurrent<'_, 'c>,
+    ) -> Result<(), NativeSessionError> {
+        match self.state_mut()? {
+            BodyState::Field(_) => {
+                return Err(invalid(
+                    "field generation takes its explicit producing condition",
+                ))
+            }
+
+            BodyState::Affine(w) => Ok(w.receive_condition(incoming)?),
+            BodyState::Constitutive(b) => Ok(b.receive_condition(incoming)?),
+        }
+    }
     /// An affine body is available only while it is the actual continuing representation.
     /// The frozen substrate of a dependent generator is deliberately not exposed here.
     pub fn affine_wave(&self) -> Option<&ResidentNormalWave<'c, NormalWaveCoupled<'c>>> {
         match self.state.as_ref()? {
+            BodyState::Field(_) => None,
+
             BodyState::Affine(w) => Some(w),
             BodyState::Constitutive(_) => None,
         }
@@ -65,6 +89,8 @@ impl<'c> NativeCoupledBody<'c> {
 
     pub fn epoch(&self) -> u64 {
         match self.state.as_ref().expect("initialized coupled body") {
+            BodyState::Field(field) => field.epoch(),
+
             BodyState::Affine(wave) => wave.epoch(),
             BodyState::Constitutive(body) => body.epoch(),
         }
@@ -72,6 +98,8 @@ impl<'c> NativeCoupledBody<'c> {
 
     pub fn pending_coupled_predictions(&self) -> usize {
         match self.state.as_ref().expect("initialized coupled body") {
+            BodyState::Field(field) => field.pending(),
+
             BodyState::Affine(wave) => wave.pending_coupled_predictions(),
             BodyState::Constitutive(body) => body.pending_prediction_ids().count(),
         }
@@ -79,6 +107,8 @@ impl<'c> NativeCoupledBody<'c> {
 
     pub fn scope(&self) -> &'static str {
         match self.state.as_ref().expect("initialized coupled body") {
+            BodyState::Field(_) => "constituted-field-joint",
+
             BodyState::Affine(_) => "projected-family-joint",
             BodyState::Constitutive(_) => "declared-source-section",
         }
@@ -86,24 +116,32 @@ impl<'c> NativeCoupledBody<'c> {
 
     pub fn roots(&self) -> usize {
         match self.state.as_ref().expect("initialized coupled body") {
+            BodyState::Field(field) => field.roots(),
+
             BodyState::Affine(w) => w.normal_material().roots(),
             BodyState::Constitutive(b) => b.roots(),
         }
     }
     pub fn members(&self) -> usize {
         match self.state.as_ref().expect("initialized coupled body") {
+            BodyState::Field(field) => field.members(),
+
             BodyState::Affine(w) => w.neighborhood().members(),
             BodyState::Constitutive(b) => b.members(),
         }
     }
     pub fn passages(&self) -> u64 {
         match self.state.as_ref().expect("initialized coupled body") {
+            BodyState::Field(field) => field.passages(),
+
             BodyState::Affine(w) => w.current().passages(),
             BodyState::Constitutive(b) => b.passages(),
         }
     }
     pub fn normal_observations(&self) -> Option<u64> {
         match self.state.as_ref().expect("initialized coupled body") {
+            BodyState::Field(field) => field.observations(),
+
             BodyState::Affine(w) => Some(w.normal_material().observations()),
             BodyState::Constitutive(_) => None,
         }
@@ -111,26 +149,45 @@ impl<'c> NativeCoupledBody<'c> {
 
     /// Inspect the actual predictive material, including its reference error, at this body's
     /// current receiver scope. This explicit observer is not part of native hot execution.
-    pub fn inspect_predictive_material(&mut self, member: usize) -> Result<Value, NativeSessionError> {
+    pub fn inspect_predictive_material(
+        &mut self,
+        member: usize,
+    ) -> Result<Value, NativeSessionError> {
         let scope = self.scope();
         let state = match self.state_mut()? {
-            BodyState::Affine(wave) => wave.neighborhood().predictive_material(member)?
-                .map(|m| m.inspect().map(|state| (m.observations(), state))).transpose()?,
+            BodyState::Field(field) => return field.inspect_material(),
+
+            BodyState::Affine(wave) => wave
+                .neighborhood()
+                .predictive_material(member)?
+                .map(|m| m.inspect().map(|state| (m.observations(), state)))
+                .transpose()?,
             BodyState::Constitutive(body) => body.inspect_predictive_material(member)?,
         };
-        Ok(json!({"source_scope":scope,"member":member,"predictive_material":state.map(|(observations,state)|
-            json!({"observations":observations,"state":state})),"coefficient_scope":"applied stored action; normal-reference bounds retained"}))
+        Ok(
+            json!({"source_scope":scope,"member":member,"predictive_material":state.map(|(observations,state)|
+            json!({"observations":observations,"state":state})),"coefficient_scope":"applied stored action; normal-reference bounds retained"}),
+        )
     }
 
     /// Current numerical receiver of the same body used by subsequent transport.
     pub fn inspect_current(&mut self) -> Result<Value, NativeSessionError> {
-        let scope=self.scope();let epoch=self.epoch();
-        let (reading,relation)=match self.state_mut()? {
-            BodyState::Affine(wave)=>(wave.current().read_receiver()?.inspect()?,wave.current().affine_relation().inspect()?),
-            BodyState::Constitutive(body)=>{
-                let value=body.read_receiver()?;
-                (value.successor_section().read_receiver()?.inspect()?,value.successor_section().affine_relation().inspect()?)
-            },
+        let scope = self.scope();
+        let epoch = self.epoch();
+        let (reading, relation) = match self.state_mut()? {
+            BodyState::Field(field) => return field.inspect(),
+
+            BodyState::Affine(wave) => (
+                wave.current().read_receiver()?.inspect()?,
+                wave.current().affine_relation().inspect()?,
+            ),
+            BodyState::Constitutive(body) => {
+                let value = body.read_receiver()?;
+                (
+                    value.successor_section().read_receiver()?.inspect()?,
+                    value.successor_section().affine_relation().inspect()?,
+                )
+            }
         };
         Ok(json!({"source_scope":scope,"epoch":epoch,"reading":reading,"relation":relation}))
     }
@@ -140,6 +197,12 @@ impl<'c> NativeCoupledBody<'c> {
         basis: &NormalWaveBasisChart<'c>,
     ) -> Result<NormalFamilyBasisFace<'c>, NativeSessionError> {
         match self.state_mut()? {
+            BodyState::Field(_) => {
+                return Err(invalid(
+                    "this wave operation requires a wave chart; use the field section operation",
+                ))
+            }
+
             BodyState::Affine(wave) => Ok(wave.read_basis_face(basis)?),
             BodyState::Constitutive(body) => Ok(body.read_basis_face(basis)?),
         }
@@ -152,6 +215,12 @@ impl<'c> NativeCoupledBody<'c> {
         retain: bool,
     ) -> Result<Option<u64>, NativeSessionError> {
         match self.state_mut()? {
+            BodyState::Field(_) => {
+                return Err(invalid(
+                    "this wave operation requires a wave chart; use the field section operation",
+                ))
+            }
+
             BodyState::Constitutive(body) => {
                 if retain {
                     Ok(Some(body.predict_member(member, chart)?))
@@ -206,6 +275,12 @@ impl<'c> NativeCoupledBody<'c> {
         rational: bool,
     ) -> Result<(), NativeSessionError> {
         match self.state_mut()? {
+            BodyState::Field(_) => {
+                return Err(invalid(
+                    "this wave operation requires a wave chart; use the field section operation",
+                ))
+            }
+
             BodyState::Constitutive(body) => body
                 .actuate_field(member, chart, source, rational)
                 .map_err(|e: ConstitutiveSourceRefusal<'c>| e.reason.into()),
@@ -231,6 +306,12 @@ impl<'c> NativeCoupledBody<'c> {
         rational: bool,
     ) -> Result<(), NativeSessionError> {
         match self.state_mut()? {
+            BodyState::Field(_) => {
+                return Err(invalid(
+                    "this wave operation requires a wave chart; use the field section operation",
+                ))
+            }
+
             BodyState::Constitutive(body) => body
                 .receive_next_current(member, chart, source, rational)
                 .map_err(|e: ConstitutiveSourceRefusal<'c>| e.reason.into()),
@@ -250,6 +331,8 @@ impl<'c> NativeCoupledBody<'c> {
 
     pub fn pending_ids(&self) -> Result<Vec<u64>, NativeSessionError> {
         Ok(match self.state()? {
+            BodyState::Field(field) => field.pending_ids(),
+
             BodyState::Affine(wave) => wave.pending_coupled_prediction_ids().collect(),
             BodyState::Constitutive(body) => body.pending_prediction_ids().collect(),
         })
@@ -261,6 +344,12 @@ impl<'c> NativeCoupledBody<'c> {
         chart: WaveSourceReceiver,
     ) -> Result<Value, NativeSessionError> {
         match self.state_mut()? {
+            BodyState::Field(_) => {
+                return Err(invalid(
+                    "this wave operation requires a wave chart; use the field section operation",
+                ))
+            }
+
             BodyState::Affine(wave) => {
                 let id = wave
                     .contact_ids()
@@ -349,6 +438,12 @@ impl<'c> NativeCoupledBody<'c> {
         ) -> Result<R, NativeSessionError>,
     ) -> Result<R, NativeSessionError> {
         match self.state_mut()? {
+            BodyState::Field(_) => {
+                return Err(invalid(
+                    "this wave operation requires a wave chart; use the field section operation",
+                ))
+            }
+
             BodyState::Affine(wave) => read(&wave.read_prospective_word(word)?),
             BodyState::Constitutive(body) => {
                 body.with_prospective(word, None, |future| Ok(read(future)))?
@@ -371,6 +466,12 @@ impl<'c> NativeCoupledBody<'c> {
                 "material_deposited":false,"pending_retained":true,"coefficient_row":row}))
         };
         match self.state_mut()? {
+            BodyState::Field(_) => {
+                return Err(invalid(
+                    "this wave operation requires a wave chart; use the field section operation",
+                ))
+            }
+
             BodyState::Affine(wave) => {
                 let handle = wave.pending_coupled_prediction(id)?;
                 let comparison = wave.compare_coupled_prediction(&handle, observed)?;
@@ -389,6 +490,12 @@ impl<'c> NativeCoupledBody<'c> {
     ) -> Result<Value, NativeSessionError> {
         // Finish every fallible comparison/receiver operation before transferring the owner.
         let (comparison, coordinates) = match self.state_mut()? {
+            BodyState::Field(_) => {
+                return Err(invalid(
+                    "this wave operation requires a wave chart; use the field section operation",
+                ))
+            }
+
             BodyState::Affine(wave) => {
                 let handle = wave.pending_coupled_prediction(id)?;
                 let comparison = wave.compare_coupled_prediction(&handle, observed)?;
@@ -432,19 +539,33 @@ impl<'c> NativeCoupledBody<'c> {
     /// Empirical normal formation at the original producing source. The return
     /// carries y-v and y-c as resident families. This does not advance wave time;
     /// a dependent body retains the same operation over its parameter generator.
-    pub fn observe<'a>(&mut self,id:u64,observed:impl Into<ResidentNormalInput<'a,'c>>)
-        ->Result<NormalCoupledObservation<'c>,NativeSessionError> where 'c:'a {
-        let observed=observed.into();
+    pub fn observe<'a>(
+        &mut self,
+        id: u64,
+        observed: impl Into<ResidentNormalInput<'a, 'c>>,
+    ) -> Result<NormalCoupledObservation<'c>, NativeSessionError>
+    where
+        'c: 'a,
+    {
+        let observed = observed.into();
         match self.state_mut()? {
-            BodyState::Affine(wave)=>{
-                let handle=wave.pending_coupled_prediction(id)?;
-                Ok(wave.observe_coupled_prediction(&handle,observed)?)
-            },
-            BodyState::Constitutive(body)=>Ok(body.observe_prediction(id,observed)?),
+            BodyState::Field(_) => {
+                return Err(invalid(
+                    "this wave operation requires a wave chart; use the field section operation",
+                ))
+            }
+
+            BodyState::Affine(wave) => {
+                let handle = wave.pending_coupled_prediction(id)?;
+                Ok(wave.observe_coupled_prediction(&handle, observed)?)
+            }
+            BodyState::Constitutive(body) => Ok(body.observe_prediction(id, observed)?),
         }
     }
     pub fn release(&mut self, id: u64) -> Result<(), NativeSessionError> {
         match self.state_mut()? {
+            BodyState::Field(field) => field.release(id),
+
             BodyState::Affine(wave) => {
                 Ok(wave.release_coupled_prediction(&wave.pending_coupled_prediction(id)?)?)
             }
@@ -469,6 +590,8 @@ impl<'c> NativeCoupledBody<'c> {
     }
     pub fn save(&self) -> Result<SavedCoupledBody, NativeSessionError> {
         Ok(match self.state()? {
+            BodyState::Field(field) => SavedCoupledBody::Field(field.rest()?),
+
             BodyState::Affine(wave) => SavedCoupledBody::Affine(wave.rest()?),
             BodyState::Constitutive(body) => SavedCoupledBody::Constitutive(body.rest()?),
         })
@@ -477,6 +600,7 @@ impl<'c> NativeCoupledBody<'c> {
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum SavedCoupledBody {
+    Field(NativeFieldModelRest),
     Affine(NormalWaveRest),
     Constitutive(CoupledConstitutiveRest),
 }
@@ -484,30 +608,38 @@ pub enum SavedCoupledBody {
 impl SavedCoupledBody {
     pub fn roots(&self) -> usize {
         match self {
+            Self::Field(rest) => rest.roots(),
             Self::Affine(rest) => rest.material().roots(),
             Self::Constitutive(rest) => rest.roots(),
         }
     }
     pub fn members(&self) -> usize {
         match self {
+            Self::Field(rest) => rest.members(),
             Self::Affine(rest) => rest.coupled_members().unwrap_or(0),
             Self::Constitutive(rest) => rest.members(),
         }
     }
     pub fn epoch(&self) -> u64 {
         match self {
+            Self::Field(rest) => rest.epoch(),
             Self::Affine(rest) => rest.epoch(),
             Self::Constitutive(rest) => rest.epoch(),
         }
     }
     pub fn has_prediction(&self, id: u64) -> bool {
         match self {
+            Self::Field(_) => false,
             Self::Affine(rest) => rest.has_coupled_prediction(id),
             Self::Constitutive(rest) => rest.has_prediction(id),
         }
     }
     pub fn write(&self, out: &mut impl Write) -> Result<(), NativeSessionError> {
         match self {
+            Self::Field(rest) => {
+                out.write_all(&[2])?;
+                rest.write(out)?;
+            }
             Self::Affine(rest) => {
                 out.write_all(&[0])?;
                 rest.write(out)?;
@@ -527,6 +659,7 @@ impl SavedCoupledBody {
             .checked_sub(1)
             .ok_or_else(|| invalid("truncated coupled body"))?;
         match tag[0] {
+            2 => Ok(Self::Field(NativeFieldModelRest::read(&mut bytes, count)?)),
             0 => Ok(Self::Affine(NormalWaveRest::read(&mut bytes, count)?)),
             1 => Ok(Self::Constitutive(CoupledConstitutiveRest::read(
                 &mut bytes, count,
@@ -540,6 +673,9 @@ impl SavedCoupledBody {
         surface: &'c ResidentSurface<'c>,
     ) -> Result<NativeCoupledBody<'c>, NativeSessionError> {
         Ok(match self {
+            Self::Field(rest) => NativeCoupledBody {
+                state: Some(BodyState::Field(rest.remount(surface)?)),
+            },
             Self::Affine(rest) => {
                 NativeCoupledBody::from_wave(rest.remount_coupled(surface, |_| {})?)
             }

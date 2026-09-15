@@ -1,5 +1,18 @@
 // Pack the actual outgoing junction current and every retained operative internal b coordinate
 // into one outer enclosure. The source report and operative sections remain separate witnesses.
+extern "C" __global__ void section_field_material_source(
+    const int64_t *map,const int64_t *map_hi,const int64_t *bounds,const int64_t *bounds_hi,
+    uint32_t width,int64_t *out,int64_t *out_hi,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+    if(blockIdx.x||threadIdx.x||upstream_refused(census,lineage,lineage_count,slot))return;
+    if(!width||(width&1u)){atomicOr(slot,REFUSED_MALFORMED);return;}
+    for(size_t i=0;i<2u*(size_t)width;++i)if(map[i]!=map_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+    if(bounds[0]!=bounds_hi[0]||bounds[1]!=bounds_hi[1]){atomicOr(slot,REFUSED_MALFORMED);return;}
+    const wide *m=(const wide *)map,*e=(const wide *)bounds;wide *v=(wide *)out;
+    if(e[0]<0){atomicOr(slot,REFUSED_MALFORMED);return;}
+    for(uint32_t i=0;i<width;++i)v[i]=m[i];v[width]=e[0];
+    for(size_t i=0;i<2u*((size_t)width+1u);++i)out_hi[i]=out[i];
+}
 extern "C" __global__ void section_field_current_source(
     const int64_t *current_lo, const int64_t *current_hi,
     const int64_t *b_lo, const int64_t *b_hi,

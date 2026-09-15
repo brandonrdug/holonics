@@ -15,7 +15,7 @@ pub mod mathematical;
 pub use mathematical::{with_mathematical_session, MathematicalRequest, NativeMathematicalSession};
 mod normal_wave;
 mod coupled_wave;
-pub use coupled_wave::{NativeCoupledBody,NativeCoupledWaveSession,NativeCoupledWaveSavedSession,NativeCoupledWaveAttachRefusal};
+pub use coupled_wave::{SavedCoupledBody,NativeFieldAttachRefusal,NativeFieldGeneratedSection,NativeFieldModelRest,NativeCoupledBody,NativeCoupledWaveSession,NativeCoupledWaveSavedSession,NativeCoupledWaveAttachRefusal};
 pub use normal_wave::{NativeWaveSession,NativeWaveSavedSession,NativeWaveAttachRefusal,
     NativeWaveSeedSpec, NATIVE_WAVE_SEED_SCHEMA, with_seeded_wave_session};
 

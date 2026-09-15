@@ -1,0 +1,202 @@
+use super::super::*;
+use crate::ExactComplexWaveCurrent;
+use crate::embedding_fiber::ResidentReadout;
+use num_bigint::BigInt;
+use num_traits::{One, Signed, Zero};
+use relational_geometry::Rat;
+
+fn section<'c>(s: &'c ResidentSurface<'c>, values: &[i64]) -> ResidentSection<'c> {
+    s.mount_section_rest(
+        &ResidentSectionRest::found(
+            1,
+            values.len(),
+            ResidentGrain(0),
+            i64::BITS,
+            values.iter().map(|v| (*v, *v)).collect(),
+        )
+        .unwrap(),
+    )
+    .unwrap()
+}
+
+fn enclosure_section<'c>(s: &'c ResidentSurface<'c>, values: &[i128]) -> ResidentSection<'c> {
+    let words = values
+        .iter()
+        .flat_map(|value| {
+            let bytes = value.to_le_bytes();
+            [
+                i64::from_le_bytes(bytes[..8].try_into().unwrap()),
+                i64::from_le_bytes(bytes[8..].try_into().unwrap()),
+            ]
+        })
+        .map(|word| (word, word))
+        .collect::<Vec<_>>();
+    s.mount_section_rest(
+        &ResidentSectionRest::found(1, words.len(), ResidentGrain(0), i64::BITS, words).unwrap(),
+    )
+    .unwrap()
+}
+
+#[test]
+#[ignore = "requires CUDA; enclosed forecast and staged material remain resident on the surface"]
+fn enclosed_forecast_uses_retained_material_and_commit_checks_freshness() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let initial = section(&surface, &[0, 1, 3, 0]);
+    let law = ResidentConstitutiveFibre::found_bilinear_contact(&surface, 1, 2, 1).unwrap();
+    let mut body = ResidentGeneratorNeighborhood::with_shared_condition(
+        vec![law],
+        ResidentConstitutiveCurrent::integers(&initial).unwrap(),
+        ConditionContactMetric::UnitAdmittanceRealification,
+    )
+    .unwrap();
+    body.attach_normal_prediction(
+        0,
+        ResidentNormalMaterial::found_features(&surface, 5, 1, ResidentGrain(16)).unwrap(),
+    )
+    .map_err(|(_, error)| error)
+    .unwrap();
+
+    let scale = 1_i128 << 16;
+    let source_section = enclosure_section(&surface, &[scale, 0, scale]);
+    let observed_section = enclosure_section(&surface, &[2 * scale, -scale, scale]);
+    let source = ResidentNormalEnclosureView {
+        surface: &surface,
+        section: &source_section,
+        offset: 0,
+        width: 2,
+        grain: ResidentGrain(16),
+    };
+    let observed = ResidentNormalEnclosureView {
+        surface: &surface,
+        section: &observed_section,
+        offset: 0,
+        width: 2,
+        grain: ResidentGrain(16),
+    };
+    let prepared = body
+        .prepare_enclosed_material(
+            0,
+            source,
+            ResidentConstitutiveCurrent::integers(&initial).unwrap(),
+            observed,
+        )
+        .unwrap();
+    let stale = body
+        .prepare_enclosed_material(
+            0,
+            source,
+            ResidentConstitutiveCurrent::integers(&initial).unwrap(),
+            observed,
+        )
+        .unwrap();
+    assert!(body.can_commit_field_reaction(&prepared));
+    body.commit_field_reaction(prepared).unwrap();
+    assert!(!body.can_commit_field_reaction(&stale));
+    assert!(body.commit_field_reaction(stale).is_err());
+    assert_eq!(
+        body.predictive_material(0).unwrap().unwrap().observations(),
+        1
+    );
+
+    let reads = surface.census().section_read_outs;
+    let receipt = body
+        .forecast_enclosed_reaction(
+            0,
+            source,
+            ResidentConstitutiveCurrent::integers(&initial).unwrap(),
+        )
+        .unwrap();
+    assert_eq!(surface.census().section_read_outs, reads);
+    assert_eq!(receipt.material_observations(), 1);
+    let output = receipt.output_view().inspect().unwrap();
+    assert_eq!(output.center.len(), 1);
+    assert!(output.radius >= Rat::from_integer(BigInt::from(0)));
+    let cold = body
+        .predictive_material(0)
+        .unwrap()
+        .unwrap()
+        .inspect()
+        .unwrap();
+    let coefficients = &cold.material.coefficients[0];
+    assert_eq!(coefficients.len(), 5);
+    let i = ExactComplexWaveCurrent::new(Rat::zero(), Rat::one());
+    let three = Rat::from_integer(BigInt::from(3));
+    let a = coefficients[0]
+        .add(&coefficients[3].multiply(&i))
+        .add(&coefficients[4].scaled(&three));
+    let c = coefficients[1]
+        .multiply(&i)
+        .add(&coefficients[2].scaled(&three));
+    for s in [
+        ExactComplexWaveCurrent::new(Rat::from_integer(BigInt::from(1)), Rat::zero()),
+        ExactComplexWaveCurrent::new(Rat::from_integer(BigInt::from(2)), Rat::zero()),
+        ExactComplexWaveCurrent::new(Rat::zero(), Rat::zero()),
+        ExactComplexWaveCurrent::new(Rat::from_integer(BigInt::from(1)), Rat::one()),
+        ExactComplexWaveCurrent::new(
+            Rat::from_integer(BigInt::from(1)),
+            Rat::from_integer(BigInt::from(-1)),
+        ),
+    ] {
+        let expected = [a.multiply(&s).add(&c)];
+        assert!(
+            output.contains(&expected),
+            "applied enclosure lost exact face for {s:?}"
+        );
+    }
+    let coefficient_norm = a.real.abs() + a.imaginary.abs();
+    let rounding = Rat::new(3.into(), (1_i128 << 16).into());
+    assert!(output.radius <= coefficient_norm + rounding);
+    let applied_read = receipt
+        .material
+        .read_applied_bilinear(
+            receipt.source_view(),
+            receipt.producing_condition().unwrap(),
+        )
+        .unwrap()
+        .inspect()
+        .unwrap();
+    assert_eq!(applied_read, output);
+
+    let later = body
+        .prepare_enclosed_material(
+            0,
+            source,
+            ResidentConstitutiveCurrent::integers(&initial).unwrap(),
+            observed,
+        )
+        .unwrap();
+    body.commit_field_reaction(later).unwrap();
+    assert_eq!(receipt.output_view().inspect().unwrap(), output);
+    assert_eq!(
+        body.predictive_material(0).unwrap().unwrap().observations(),
+        2
+    );
+    // An actual condition input does not invent preimage-family evidence, but it must rest.
+    let changed = section(&surface, &[1, 0, 2, 0]);
+    body.receive_condition(ResidentConstitutiveCurrent::integers(&changed).unwrap())
+        .unwrap();
+    let expected = body
+        .forecast_enclosed_reaction(0, source, body.condition())
+        .unwrap()
+        .output_view()
+        .inspect()
+        .unwrap();
+    let saved = body.rest().unwrap();
+    let mut bytes = Vec::new();
+    saved.write(&mut bytes).unwrap();
+    drop(body);
+    let decoded =
+        GeneratorNeighborhoodRest::read(&mut bytes.as_slice(), bytes.len() as u64).unwrap();
+    assert_eq!(decoded, saved);
+    let resumed = decoded.remount(&surface).unwrap();
+    assert_eq!(
+        resumed
+            .forecast_enclosed_reaction(0, source, resumed.condition())
+            .unwrap()
+            .output_view()
+            .inspect()
+            .unwrap(),
+        expected
+    );
+}

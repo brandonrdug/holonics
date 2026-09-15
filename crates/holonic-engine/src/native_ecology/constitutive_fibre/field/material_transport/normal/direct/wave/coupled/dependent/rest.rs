@@ -8,7 +8,8 @@ const MAGIC_V1: &[u8] = b"HOLONIC-COUPLED-CONSTITUTIVE\x01";
 const MAGIC_V2: &[u8] = b"HOLONIC-COUPLED-CONSTITUTIVE\x02";
 const MAGIC_V3: &[u8] = b"HOLONIC-COUPLED-CONSTITUTIVE\x03";
 const MAGIC_V4: &[u8] = b"HOLONIC-COUPLED-CONSTITUTIVE\x04";
-const MAGIC: &[u8] = b"HOLONIC-COUPLED-CONSTITUTIVE\x05";
+const MAGIC_V5: &[u8] = b"HOLONIC-COUPLED-CONSTITUTIVE\x05";
+const MAGIC: &[u8] = b"HOLONIC-COUPLED-CONSTITUTIVE\x06";
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 struct ReturnedHeader {
@@ -118,7 +119,8 @@ impl CoupledConstitutiveRest {
         {
             return Err(ConstitutiveFibreError::Shape);
         }
-        out.write_all(if self.header.operations.iter().any(|p|p.kind.empirical_cut().is_some()) {MAGIC}else{MAGIC_V4}).map_err(invalid)?;
+        out.write_all(if self.header.operations.iter().any(|p|p.kind.condition_inputs().is_some()){MAGIC}
+            else if self.header.operations.iter().any(|p|p.kind.empirical_cut().is_some()) {MAGIC_V5}else{MAGIC_V4}).map_err(invalid)?;
         blob(out, &serde_json::to_vec(&self.header).map_err(invalid)?)?;
         let mut base = Vec::new();
         self.base.write(&mut base)?;
@@ -141,11 +143,11 @@ impl CoupledConstitutiveRest {
         let mut input = input.take(octets);
         let mut magic = vec![0; MAGIC.len()];
         input.read_exact(&mut magic).map_err(invalid)?;
-        if magic != MAGIC && magic != MAGIC_V4 && magic != MAGIC_V3 && magic != MAGIC_V2 && magic != MAGIC_V1 {
+        if magic != MAGIC && magic!=MAGIC_V5 && magic != MAGIC_V4 && magic != MAGIC_V3 && magic != MAGIC_V2 && magic != MAGIC_V1 {
             return Err(invalid("dependent continuation magic"));
         }
         let header_bytes = read_blob(&mut input)?;
-        let header: Header = if magic == MAGIC || magic==MAGIC_V4 {
+        let header: Header = if magic == MAGIC ||magic==MAGIC_V5|| magic==MAGIC_V4 {
             serde_json::from_slice(&header_bytes).map_err(invalid)?
         } else {
             let old: LegacyHeader = serde_json::from_slice(&header_bytes).map_err(invalid)?;
@@ -197,8 +199,10 @@ impl CoupledConstitutiveRest {
         let mut return_faces = Vec::new();
         let mut returned_predictions = std::collections::BTreeSet::new();
         for (operation_index, op) in header.operations.iter().enumerate() {
-            if magic!=MAGIC&&op.kind.empirical_cut().is_some(){return Err(invalid(
+            if magic!=MAGIC&&magic!=MAGIC_V5&&op.kind.empirical_cut().is_some(){return Err(invalid(
                 "empirical material return requires dependent frame v5"));}
+            if magic!=MAGIC&&op.kind.condition_inputs().is_some(){return Err(invalid(
+                "known condition input requires dependent frame v6"));}
             if op.kind != ConstitutivePassageKind::Return && op.returned.is_some() {
                 return Err(invalid("return metadata on non-return operation"));
             }

@@ -59,7 +59,9 @@ pub struct ResidentConditionContact<'chart> {
 
 /// Immutable actual standing used by a producing passage. Sharing its resident section does
 /// not create another move owner or retain a chain of earlier states.
+#[derive(Clone)]
 pub struct ResidentConditionStanding<'chart> {
+    surface: &'chart ResidentSurface<'chart>,
     section: Rc<ResidentSection<'chart>>,
     width: usize,
     source_chart: ConstitutiveSourceChart,
@@ -67,6 +69,31 @@ pub struct ResidentConditionStanding<'chart> {
     contacts: u64,
 }
 impl<'chart> ResidentConditionStanding<'chart> {
+    /// Receive an explicitly supplied actual condition through the existing
+    /// exact current constructor. This is an input, not an inferred cause.
+    pub(crate) fn with_current(&self,incoming:ResidentConstitutiveCurrent<'_, 'chart>)
+        ->Result<Self,ConstitutiveFibreError>{
+        self.with_current_count(incoming,1)
+    }
+    pub(crate) fn with_current_count(&self,incoming:ResidentConstitutiveCurrent<'_, 'chart>,inputs:u64)
+        ->Result<Self,ConstitutiveFibreError>{
+        if inputs==0{return Err(ConstitutiveFibreError::Shape);}
+        let count=self.contacts.checked_add(inputs).ok_or(ConstitutiveFibreError::Shape)?;
+        let mut next=ResidentConditionCurrent::found(self.surface,self.source_chart,self.width,incoming,self.metric)?;
+        next.contacts=count;Ok(next.standing())
+    }
+    pub(crate) fn prepare_contact(&self,family:&ResidentConditionPreimage<'chart>)
+        ->Result<PreparedConditionContact<'chart>,ConstitutiveFibreError>{
+        let f=&family.inner.returned;
+        if family.source_chart()!=self.source_chart||f.target_width!=self.width||!std::ptr::eq(self.surface,f.surface){
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let next=self.contacts.checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
+        let section=Rc::new(affine_contact_section(self.surface,self.current(),f)?);
+        Ok(PreparedConditionContact{predecessor:Rc::clone(&self.section),returned:ResidentConditionContact{
+            section,family:ResidentConditionPreimage{inner:Rc::clone(&family.inner)},
+            metric:self.metric,contact:next,width:self.width}})
+    }
     pub fn current(&self) -> ResidentConstitutiveCurrent<'_, 'chart> {
         current_view(&self.section, self.width, self.width)
     }
@@ -86,31 +113,14 @@ pub struct PreparedConditionContact<'chart> {
     returned: ResidentConditionContact<'chart>,
 }
 impl<'chart> PreparedConditionContact<'chart> {
+    pub fn standing(&self)->ResidentConditionStanding<'chart>{
+        ResidentConditionStanding{surface:self.returned.family.inner.returned.surface,
+            section:Rc::clone(&self.returned.section),width:self.returned.width,
+            source_chart:self.returned.family.source_chart(),metric:self.returned.metric,contacts:self.returned.contact}
+    }
     pub fn successor(&self) -> ResidentConstitutiveCurrent<'_, 'chart> {
         self.returned.successor()
     }
-    /// Continue a conditional contact along its actual returned current. This stages another
-    /// contact; it neither publishes the first one nor constructs another ecology owner.
-    pub(crate) fn prepare_following(
-        &self, family: &ResidentConditionPreimage<'chart>,
-    ) -> Result<Self, ConstitutiveFibreError> {
-        let old=&self.returned;
-        let f=&family.inner.returned;
-        if family.source_chart()!=old.family.source_chart() || f.target_width!=old.width
-            || !std::ptr::eq(f.surface,old.family.inner.returned.surface) {
-            return Err(ConstitutiveFibreError::Shape);
-        }
-        let contact=old.contact.checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
-        let section=Rc::new(affine_contact_section(f.surface,self.successor(),f)?);
-        Ok(Self {
-            predecessor:Rc::clone(&old.section),
-            returned:ResidentConditionContact {
-                section,family:ResidentConditionPreimage {inner:Rc::clone(&family.inner)},
-                metric:old.metric,contact,width:old.width,
-            },
-        })
-    }
-
     pub fn family(&self) -> &ResidentConditionPreimage<'chart> {
         self.returned.family()
     }
@@ -201,6 +211,7 @@ impl<'chart> ResidentConditionCurrent<'chart> {
 impl<'chart> ResidentConditionCurrent<'chart> {
     pub fn standing(&self) -> ResidentConditionStanding<'chart> {
         ResidentConditionStanding {
+            surface:self.surface,
             section: Rc::clone(&self.section),
             width: self.width,
             source_chart: self.source_chart,
@@ -210,6 +221,11 @@ impl<'chart> ResidentConditionCurrent<'chart> {
     }
     pub fn current(&self) -> ResidentConstitutiveCurrent<'_, 'chart> {
         current_view(&self.section, self.width, self.width)
+    }
+    pub fn receive_current(&mut self,incoming:ResidentConstitutiveCurrent<'_, 'chart>)
+        ->Result<ResidentConditionStanding<'chart>,ConstitutiveFibreError>{
+        let prior=self.standing();let next=prior.with_current(incoming)?;
+        self.section=next.section;self.contacts=next.contacts;Ok(prior)
     }
     pub fn contacts(&self) -> u64 {
         self.contacts
@@ -237,32 +253,7 @@ impl<'chart> ResidentConditionCurrent<'chart> {
         &self,
         family: &ResidentConditionPreimage<'chart>,
     ) -> Result<PreparedConditionContact<'chart>, ConstitutiveFibreError> {
-        let f = &family.inner.returned;
-        if family.source_chart() != self.source_chart
-            || f.target_width != self.width
-            || !std::ptr::eq(self.surface, f.surface)
-        {
-            return Err(ConstitutiveFibreError::Shape);
-        }
-        let next = self
-            .contacts
-            .checked_add(1)
-            .ok_or(ConstitutiveFibreError::Shape)?;
-        let c = self.width;
-        let section = affine_contact_section(self.surface, self.current(), f)?;
-        let section = Rc::new(section);
-        Ok(PreparedConditionContact {
-            predecessor: Rc::clone(&self.section),
-            returned: ResidentConditionContact {
-                section,
-                family: ResidentConditionPreimage {
-                    inner: Rc::clone(&family.inner),
-                },
-                metric: self.metric,
-                contact: next,
-                width: c,
-            },
-        })
+        self.standing().prepare_contact(family)
     }
 
     pub fn commit_contact(

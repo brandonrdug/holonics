@@ -58,6 +58,18 @@ pub struct ResidentConstitutiveCurrent<'a, 'chart> {
 }
 
 impl<'a, 'chart> ResidentConstitutiveCurrent<'a, 'chart> {
+    /// Number of real coordinate components in the declared current chart.
+    pub fn components(&self) -> usize { self.width }
+    /// Retain this exact point-current operand in a rational packet on its supplied surface.
+    pub fn to_owned(self,surface:&'chart ResidentSurface<'chart>)->Result<ResidentSection<'chart>,ConstitutiveFibreError>{
+        let width=self.width.checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
+        let out=surface.fresh_section(1,width,ResidentGrain(0))?;
+        let mut p=surface.begin_passage(&[vec![]])?;
+        {let lane=p.open(0,&[])?;surface.record_constitutive_current_snapshot(&lane,self,&out)?;}
+        p.close(0,&out,64)?;let r=p.finish()?.launch()?;
+        if !r.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("point-current snapshot: {:?}",r.obstruction)));}
+        Ok(out)
+    }
     /// Exact numerator coordinates followed by one common denominator. Pointness and a positive
     /// denominator are checked on device when consumed; no numerical value is read here.
     pub fn rational(section: &'a ResidentSection<'chart>) -> Result<Self, ConstitutiveFibreError> {
@@ -484,6 +496,8 @@ pub use neighborhood::{
     GeneratorNeighborhoodRest, GeneratorNeighborhoodStep, NeighborhoodEvidence,
     NeighborhoodEvidenceRest, ResidentGeneratorNeighborhood,
 };
+#[allow(unused_imports)]
+pub use neighborhood::field_reaction::{FieldReactionEnclosure,PreparedFieldReaction};
 
 mod preimage;
 pub use preimage::{ConditionPreimageReading, ConditionPreimageRest, ResidentConditionPreimage};

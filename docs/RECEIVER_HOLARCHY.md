@@ -9,6 +9,11 @@ viewing camera silently placed outside every mathematical diagram. This guide jo
 [fluid construction](HOLONIC_FLUID_CONSTRUCTION.md). It specifies their common operation,
 not another model owner or construction schedule.
 
+[definition] The [foveation, spatial-audio and music synthesis](../research/records/2026-09-14_HEAR_THE_MUSIC_SITUATED_RELEASE_AND_SELF_MOTION.md)
+connects receiver resolution, morphology-dependent transfer, self-motion and whole-section
+predictive release. It recovers the chord class/performance distinction and gives a concrete
+relative-motion equation and phase-sensitive receiving comparison.
+
 ## The object, the receiving operation and the displayed face
 
 [definition] A receiver is a role of a participating Holon H_R. In a declared contact C,

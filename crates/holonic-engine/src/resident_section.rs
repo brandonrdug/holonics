@@ -99,6 +99,8 @@ mod surface_linear_material;
 mod surface_direct_normal;
 mod surface_normal_relation;
 mod surface_normal_section;
+mod surface_normal_enclosure_ports;
+mod surface_normal_applied_condition;
 mod surface_normal_wave;
 mod surface_normal_wave_basis_face;
 mod surface_normal_wave_source;
@@ -232,6 +234,8 @@ pub const KERNELS: [&str; 50] = [
 
 #[path = "resident_section/surface_field_current_source.rs"]
 mod surface_field_current_source;
+mod surface_field_reflection_commit;
+mod surface_field_reflection_target;
 
 /// `CUdevice_attribute` selectors from `cuda.h`, fixed by the foreign interface.
 const ATTRIBUTE_MAX_THREADS_PER_BLOCK: i32 = 1;

@@ -104,6 +104,26 @@ impl<'a, 'c> ResidentNormalSectionReturn<'a, 'c> {
     }
 }
 impl<'c> ResidentNormalMaterial<'c> {
+    /// Integrate bounded observations into the same sufficient statistics and fit
+    /// once. The endpoint equals admitted sequential receives at this chart/grain;
+    /// this call does not expose intermediate fitted operators or retain input rows.
+    pub fn receive_many(&mut self,pairs:&[(ResidentNormalEnclosureView<'_, 'c>,ResidentNormalEnclosureView<'_, 'c>)])
+        ->Result<(),ConstitutiveFibreError>{
+        if pairs.is_empty(){return Ok(());}
+        let observations=self.observations.checked_add(pairs.len() as u64).ok_or(ConstitutiveFibreError::Shape)?;
+        let layout=self.source_chart.layout(self.targets)?;
+        let table=self.surface.normal_enclosed_batch_table(pairs,self.source_complex(),self.targets,self.grain)?;
+        let next=self.surface.fresh_section(1,layout.state_words,ResidentGrain(0))?;
+        let work=self.surface.fresh_section(1,layout.workspace_words,ResidentGrain(0))?;
+        let input=self.surface.fresh_section(1,4*(layout.source_components+1)+3*self.targets,ResidentGrain(0))?;
+        let report=self.surface.fresh_section(1,layout.report_words,ResidentGrain(0))?;
+        let mut p=self.surface.begin_passage(&[vec![]])?;
+        {let lane=p.open(0,&[])?;self.surface.record_normal_enclosed_batch(&lane,&self.state,&table,self.source_complex(),
+            self.targets,self.grain,&next,&work,&input,&report)?;}
+        p.close(0,&next,64)?;let r=p.finish()?.launch()?;
+        if !r.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("normal enclosed batch: {:?}",r.obstruction)));}
+        self.state=Rc::new(next);self.observations=observations;Ok(())
+    }
     /// Integrate all supplied point observations into the same normal geometry, then fit once.
     /// The row population is a measured section aperture. It is not a native clock or new
     /// coefficient population. Any failure precedes publication of the complete successor.

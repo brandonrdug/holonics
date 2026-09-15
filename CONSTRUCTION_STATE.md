@@ -1,56 +1,74 @@
 # Construction state
 
-**Currency:** September 14, 2026. Brandon requested a complete plan for Athena and HNN
-implementation. The [roadmap](docs/plans/THE_ROADMAP.md) now carries the consolidated delivery
-order; the [native specification](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#complete-implementation-contract)
-contains the actual operation, data and first increment contracts. This return completes plan
-consolidation. The new field-backed model operation has not yet been implemented. The old
-timed goal remains paused and is not required for ordinary construction.
+**Currency:** September 14, 2026. “Continue Athena” has returned the first public
+field-backed trainable model at its declared one-pass scope. The
+[actual outputs, trained model and costs](research/experiments/athena_field/README.md) are available.
+The [construction record](research/records/2026-09-14_THE_CONSTITUTED_FIELD_TRAINS_AND_REOPENS_AS_ONE_HNN_MODEL.md)
+binds its equations and owners. The directly supplied-condition rest rule is also repaired and verified. The older
+uncommitted field-to-predictor assay is preserved as a separate failing remount/word-aperture
+experiment. The old timed goal remains paused.
+
+**Active research request:** Brandon now requests heavy analysis of all Carey Glenn Butler
+works linked from PhilPeople (25 indexed entries, with linked series/components to recover),
+and Koestler’s *The Ghost in the Machine*. The deep-research skill is active; source inventory
+and reading notes are being collected in `.local/artifacts/2026-09-14-butler/`. Produce the
+full work-by-work and mathematical/philosophical comparison artifact, keeping its theories,
+assumptions and evidence distinct and applying concrete consequences to the HNN/receiver model.
+This research augments the delivered engine; it does not reset the next engine operation below.
 
 ## Active Athena construction brief
 
-[project-postulate] **“Continue Athena” executes this operation.** Keep the model/product
-objective, governing corrections and mathematical consumer together across turns and compaction.
-A helper, review, new diagram or successful component test does not replace this deliverable.
+[project-postulate] **“Continue Athena” continues the same model under the roadmap.** Retain
+the product objective, governing corrections and mathematical consumer across compaction.
+A helper, diagram or component pass does not replace the public operation and generated product.
 
 | Control | Current content |
 |---|---|
-| Authorized deliverable | One trainable HNN body that directly executes the constituted field and local learned reaction, generates a joint section, incorporates an actual observed target through its producing material, and generates on held-out inputs. This is milestone 1 of the complete Athena plan. |
-| Mathematical operation | On q joining the actual field source and prepared external boundary/input, `s=P_s q`, `h=P_h q`, `r=R_M(s,h)`, `u=E_B input+r`, `(w,b_next)=S_D(u,b)`, `y=P_R w`. The initial reaction-before-scattering split and fixed-incidence aperture are declared implementation choices. D/M stay fixed within a generation and develop on the actual observed return. |
-| Existing owners | `NativeConstitutiveField`, its resident ingress, operative current/material and paired response; `ResidentGeneratorNeighborhood` for the local conditional action; `NativeFieldCurrentSource` for the retained joint source; `NativeCoupledBody` for public ownership; existing SDK/native stream and field/body rest owners. |
-| Concrete unknown/join | The public body has no operative-field-backed state. Its local reaction needs a compatible staged field source/condition port, the enclosed scattering needs its matching current publication, and the delivered section needs its source/receiver and producing-handle binding. The field-to-normal-predictor test is a different application. |
-| Next edit | Implement the field-backed body path and its first source/condition/scattering/receiver composition under the [first increment contract](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#first-implementation-increment). Reuse `advance_current_resident`; review the preserved `NativeFieldCurrentSource::reflect` draft for staged enclosed application and add its matching publication inside the field owner. Do not start another predictor wrapper or source survey. |
-| Completion evidence | Public command/model invocation, supplied input/target and initial configuration, actual generated complete section, learned material/relation and output on another input. Verify the composed producing adjoint, source/family preservation, single update/publication, local trained rest/reopen, and measured setup/resident/delivery costs. |
-| Pending semantics | Retain the generation's producing source and reaction cut. A target arrives as a new receiving occurrence linked to that producer. `respond_to_material_observation` requires the latest receiving cut and commits internally; do not pass a stale receiving index or apply the response twice. Forecast and commit use the same chosen operator. |
-| Current draft | Preserved uncommitted operative-condition/material-source/reflection support. Its local checks do not verify the planned body assembly. Inspect and integrate relevant pieces while preserving unrelated source and evidence. |
+| Authorized deliverable | Continue the field-backed HNN into receiver-relative contextual operation and economical repeated generation. The first model task, actual D/M target response, held-out outputs and local trained rest have returned. Keep those usable while repairing the wider continuation. |
+| Mathematical operation | `r=A(h)s+c(h)`, `u=x+r`, `(w,b_next)=S_D(u,b)`, `y=w`, with stored D/M fixed within generation and developed on actual targets. The shared-input form is `S_D diag(A(h),I) q + S_D(x+c(h),0)`. Retain the joint source through that composition. |
+| Existing owners | `NativeCoupledBody::from_field`; `NativeConstitutiveField`; `NativeFieldCurrentSource`; `NativeFieldReflection` and its target response; `ResidentGeneratorNeighborhood`; native conditional contraction and existing field/body rest. No second model owner. |
+| Concrete unknown/join | A 48-target continuation completed 39 targets, then the next paired adjoint overflowed after repeated enclosure expansion. The current assembly restricts the common outward/interior family into separate balls and recombines them, losing correlations. Fixed-condition contraction and current-delta cancellation are already corrected. |
+| Next consuming operation | Carry the common q through its conditional affine map and scattering, with the matching source/fibre representation in rest. Test the same longer task without dropping radii or inventing a larger semantic limit; then bind changed receiver orientation/material and self-motion through the existing joint derivative. |
+| Completion evidence | Keep the public one-pass output working; return a longer generated/updated section sequence with controlled source-qualified bounds and trained reopen. Receiver work must distinguish physical receiver motion from common recharting and use held-out comparisons. |
+| Pending semantics | Retained comparisons carry the producing D, reaction source/condition and output. Actual targets are consumed once; preview/commit evaluate the same operator. Current field-body rest requires resolved comparisons; complete pending-return durability remains explicit roadmap work. |
+| Research steering | The eight-paper foveation/spatial-audio analysis, music/chord recovery and shared aperiodic-field picture are in [Hear the music](research/records/2026-09-14_HEAR_THE_MUSIC_SITUATED_RELEASE_AND_SELF_MOTION.md). They refine the receiver/current operation, not a separate rendering prerequisite. |
 
-## Implementation boundary and retained evidence
+## Returned operation and verification
 
-[established-bounded; source-inspected] The direct field already has resident ingress,
-constituted scattering, paired input/material derivatives and `respond_to_material_observation`.
-The current public body dispatches to affine/dependent wave bodies. The latest plan review
-found a resident ingress port already available; do not rebuild it from an assumption that
-all field input is a host vector. `NativeFieldCurrentSource.enclosure()` is an outer receiver;
-the source owner, operative sections, report and births remain the finer witness.
+[established-bounded; measured] `athena_field` uses one field node, one caused contact,
+three complex boundary coordinates and one complex point condition. Twenty-one local examples
+and eight actual model targets lower the four held-out squared centre errors from
+267.358024691 to 26.378035151 (decimal observer presentations of exact rational readings).
+The largest final numerical enclosure radius is below `3/100000000`. The 39,712-byte trained
+rest reopens to exactly the same four held-out balls. This is a finite joint-field task, not
+completed Athena conversation/code behavior.
 
-[established-bounded; measured] Recorded local learning/continuation evidence includes the
-normal suite (127 tests), coupled HNN suite (11 tests), the public-example Cargo check and a
-33417-microsecond warm empirical return at the earlier five-coordinate boundary/interior
-application. These are prior bounded returns, not fresh verification of the uncommitted draft
-or the new model path. The numerical coupled test forms a complex relation from 21 examples,
-incorporates two original-source observations and derives condition `h=−3i`.
+[established-bounded; measured] Five focused native tests pass: current publication/reopen,
+paired exact-reference target pullback, enclosed addition/refusal and fixed-condition reaction
+with retained material. The broader normal/rest/source/condition suite passes 144 tests.
+The existing HNA suite returns 11 passes. Its separate pre-existing material-condition assay
+now forms and saves, but reopened prospective word expansion exceeds its carrier/aperture; it
+remains uncommitted with its closure/precision corrections and failure evidence. This surrogate
+assay does not replace or define acceptance of the directly field-backed model.
 
-[established-bounded; source-inspected] The preserved draft contains known-condition input,
-batched normal moments, material exposure and cached reflection. Its recorded local source
-checks passed; its revised material-changing HNN consumer has no successful recorded run.
-The earlier allocation-probe and stale-field-cut failures belong to that draft. The
-[paused-run review](research/records/2026-09-14_DIRECT_MESSAGES_AND_THE_PAUSED_HNN_RUN.md) retains
-its exact scope. Those probes are not a replacement destination for the first model operation.
+[established-bounded; source-inspected] The public Field path owns both field and reaction.
+Generation consumes applied M; the complete normal-reference state and its residual stay in
+the producing witness. The paired derivative is adapted to the existing native material adjoint.
+Field rest v3/v4 retains the contemporary junction report instead of silently restoring the last
+ordinary occurrence. Source/grain/owner checks and source ball remainders remain active.
+
+[established-bounded; measured] The longer-run failure and its actual target/output/state are
+preserved in [training-obstruction.json](research/experiments/athena_field/longer-run/training-obstruction.json).
+An earlier concurrent CUDA attempt failed the apparatus allocation-grain measurement; the
+isolated rerun establishes the 39-target model return and subsequent carrier obstruction.
+A grain-72 trial also exposed the existing applied compatibility graph's 64-bit packet aperture;
+that is a separate representation constraint, not a reason to seal a family to its centre.
 
 ## Governing synthesis available for this construction
 
 [definition] These completed returns are reusable source context, not a queue to replay:
 
+- [Hear the music](research/records/2026-09-14_HEAR_THE_MUSIC_SITUATED_RELEASE_AND_SELF_MOTION.md): eight primary-paper analyses, receiver morphology/resolution, self-motion, chord-class and coherent phase relations, and the aperiodic-field/finite-conduction synthesis.
 - [Model formula and library join](research/records/2026-09-14_THE_HNN_FORMULA_JOINS_THE_LIBRARY_TO_THE_MODEL.md), [computational Holon](docs/HOLON.md) and [engine blueprint](docs/ATHENA_ENGINE_BLUEPRINT.md): one current/material/incidence object, whole-field generation, actual operator and derivative owners.
 - [Continuing plates and moving current](research/records/2026-09-14_CONTINUING_PLATES_AND_THE_RECEIVER_RIDING_THE_CURRENT.md): receiving interfaces can have storage, material, current and motion inside the joint forward/adjoint. Causal memory does not prescribe an event archive.
 - [Swing/fluid construction](docs/HOLONIC_FLUID_CONSTRUCTION.md) and [dynamic interior memory](docs/FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md): actual constitutive scattering, mixed feedback, Hodge modes and changing-boundary residuals.
@@ -78,4 +96,5 @@ new approval ritual, blanket source census or unrequested permission question is
 at `782d246d` and in their linked records. The
 [complete-plan return](research/records/2026-09-14_THE_COMPLETE_ATHENA_IMPLEMENTATION_PLAN.md)
 records this consolidation. Unrelated `.opencode/`, `.vscode/`, fitted-wave/flux-lattice
-research and the existing uncommitted native draft remain preserved.
+research and the unfinished `coupled_wave/tests/boundary.rs` assay remain preserved. The
+relevant native owners are integrated with the verified field-backed model consumers.

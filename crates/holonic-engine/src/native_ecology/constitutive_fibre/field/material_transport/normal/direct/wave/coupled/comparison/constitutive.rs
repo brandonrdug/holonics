@@ -29,6 +29,7 @@ pub struct CoupledConstitutiveAlternative<'p, 'j, 'c> {
     // Full locally formed members retain their predictive component in-place.
     predictive_updates: BTreeMap<usize, PredictiveMaterial<'c>>,
     last_observation: Option<NormalCoupledObservation<'c>>,
+    received_condition: Option<crate::native_ecology::constitutive_fibre::ResidentConditionStanding<'c>>,
     path: Vec<(
         u64,
         usize,
@@ -185,6 +186,7 @@ impl<'w, 'j, 'c> CoupledConstitutiveFamily<'w, 'j, 'c> {
             earlier_material: BTreeMap::new(),
             predictive_updates: BTreeMap::new(),
             last_observation: None,
+            received_condition: None,
             path,
             base_cuts,
             returns: Vec::new(),
@@ -233,6 +235,18 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
     pub fn condition(&self) -> &PreparedConditionContact<'c> {
         &self.consequence.condition
     }
+    /// Actual following condition, including a known condition received after the
+    /// last constitutive contact. condition() retains that contact's own receipt.
+    pub fn condition_current(&self)->ResidentConstitutiveCurrent<'_, 'c>{
+        self.received_condition.as_ref().map_or_else(||self.consequence.condition.successor(),|v|v.current())
+    }
+    pub fn condition_standing(&self)->crate::native_ecology::constitutive_fibre::ResidentConditionStanding<'c>{
+        self.received_condition.clone().unwrap_or_else(||self.consequence.condition.standing())
+    }
+    pub(in super::super) fn receive_condition(&mut self,incoming:ResidentConstitutiveCurrent<'_, 'c>,inputs:u64)
+        ->Result<(),ConstitutiveFibreError>{
+        let next=self.condition_standing().with_current_count(incoming,inputs)?;self.received_condition=Some(next);Ok(())
+    }
     pub fn prediction(&self) -> &ResidentConstitutiveReturn<'c> {
         &self.consequence.prediction
     }
@@ -264,7 +278,7 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
     ) -> Result<ResidentWaveRelation<'c>, ConstitutiveFibreError> {
         let law = self.action_for(member, other)?;
         law.read_wave_relation_in_chart(
-            self.condition().successor(),
+            self.condition_current(),
             self.comparison.relation().roots(),
             chart,
         )
@@ -373,6 +387,7 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
         let member = operands.comparison.member();
         let source = ResidentConstitutiveCurrent::rational(&operands.source)?;
         let observed = ResidentConstitutiveCurrent::rational(&operands.difference)?;
+        let prior=self.condition_standing();
         let law = if member == self.material_member {
             &mut self.consequence.material
         } else {
@@ -383,7 +398,7 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
         };
         let next = ResidentNeighborhoodAlternative::prepare_following(
             law,
-            &self.consequence.condition,
+            &prior,
             source,
             observed,
             operands.comparison.relation().fixed_condition(),
@@ -402,6 +417,7 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
         // Stage the complete current before replacing any evaluated material view.
         self.apply_map(map, passage)?;
         let old = std::mem::replace(&mut self.consequence, next);
+        self.received_condition=None;
         if member != self.material_member {
             self.earlier_material
                 .insert(self.material_member, old.material);
@@ -419,7 +435,7 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
         self.consequence
             .material
             .action()
-            .read_bilinear(source, self.consequence.condition.successor())
+            .read_bilinear(source, self.condition_current())
     }
     pub(in super::super) fn actuate_source(
         &mut self,
@@ -445,7 +461,7 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
     ) -> Result<(), ConstitutiveFibreError> {
         let law = self.action_for(member, other)?;
         let relation = law.read_wave_relation_in_chart(
-            self.condition().successor(),
+            self.condition_current(),
             self.comparison.relation().roots(),
             chart,
         )?;

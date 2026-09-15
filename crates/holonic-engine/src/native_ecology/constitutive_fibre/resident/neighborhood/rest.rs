@@ -119,8 +119,8 @@ impl GeneratorNeighborhoodRest {
                 return Err(ConstitutiveFibreError::Shape);
             }
         }
+        // Direct condition reception has a contact count but no inferred preimage.
         match &self.evidence {
-            None if self.condition.contacts() != 0 => return Err(ConstitutiveFibreError::Shape),
             Some(e) => {
                 e.family.validate()?;
                 let law = self

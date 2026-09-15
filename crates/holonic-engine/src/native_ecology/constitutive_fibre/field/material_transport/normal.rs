@@ -733,5 +733,6 @@ pub use direct::{
     NormalWaveSeedKind, NormalWaveSeedRefusal, NormalWaveSource, NormalWaveStep,
     NormalWaveTransport, NormalWaveTransportChange, NormalWaveWord, ResidentCoupledConstitutive,
     ResidentNormalEnclosure, ResidentNormalEnclosureView, ResidentNormalInput,
-    ResidentNormalMaterial, ResidentNormalReturn, ResidentNormalSectionReturn, ResidentNormalWave,
+    ResidentNormalMaterial, ResidentNormalMaterialView, ResidentNormalReturn,
+    ResidentNormalSectionReturn, ResidentNormalWave,
 };

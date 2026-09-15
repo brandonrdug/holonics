@@ -56,6 +56,14 @@ consumes the complete balance. These extend the existing mathematical/library sc
 not introduce another model owner. The [source audit](../research/experiments/hnn_field_architecture/README.md)
 retains the public/native assembly boundary.
 
+[established-bounded; source-inspected] `holonics-hna/src/native/coupled_wave/body/field.rs`
+now assembles the actual operative field and neighborhood under `NativeCoupledBody`. Field
+`junction/operative/source/{reflection,reflection_commit,reflection_target}.rs` owns the resident
+solve, single publication and producing paired adjoint. `resident/neighborhood/field_reaction.rs`
+stages local normal responses; `normal_applied_condition.cuh` executes the fixed-condition
+restriction A(h)s+c(h). Field rest v3/v4 retains the contemporary refined report, and public
+`SavedCoupledBody` tag 2 carries the local trained field/reaction. See the [measured return](../research/experiments/athena_field/README.md).
+
 ## Swing, fluid and transfer composition
 
 [definition] The [fluid derivation](HOLONIC_FLUID_CONSTRUCTION.md) connects the actual owners:

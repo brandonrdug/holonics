@@ -1,6 +1,16 @@
 // Unit-admittance contact with an affine condition family F=a+V, in the declared
 // realified phase chart. P projects onto V, Q=I-P. The two-port exchange is
 // (h,Qa) -> (Ph+Qa,Qh). It retains unconstrained current; it does not identify a cause.
+extern "C" __global__ void section_constitutive_current_snapshot(
+    const int64_t *lo,const int64_t *hi,uint32_t at,uint32_t den_at,uint32_t status_at,uint32_t width,
+    int64_t *out,int64_t *out_hi,uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+    if(blockIdx.x||threadIdx.x||upstream_refused(census,lineage,lineage_count,slot))return;
+    wide den=fibre_current_denominator(lo,hi,den_at,status_at,slot);
+    for(uint32_t j=0;j<width;++j)if(lo[at+j]!=hi[at+j]){atomicOr(slot,REFUSED_MALFORMED);return;}
+    to_word(den,slot);if(*slot)return;
+    for(uint32_t j=0;j<width;++j)out[j]=out_hi[j]=lo[at+j];
+    out[width]=out_hi[width]=(int64_t)den;
+}
 extern "C" __global__ void section_constitutive_condition_current_found(
     const int64_t *lo, const int64_t *hi, uint32_t at, uint32_t den_at, uint32_t status_at,
     uint32_t c, int64_t *out, int64_t *out_hi,

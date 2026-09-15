@@ -75,6 +75,11 @@ fn main() {
     println!("cargo:rerun-if-changed=kernels/exact_integer.cuh");
     println!("cargo:rerun-if-changed=kernels/field_current_history_source.cuh");
     println!("cargo:rerun-if-changed=kernels/field_current_source.cuh");
+    println!("cargo:rerun-if-changed=kernels/field_source_reflection.cuh");
+    println!("cargo:rerun-if-changed=kernels/field_reflection_commit.cuh");
+    println!("cargo:rerun-if-changed=kernels/field_reflection_target.cuh");
+    println!("cargo:rerun-if-changed=kernels/normal_enclosure_ports.cuh");
+    println!("cargo:rerun-if-changed=kernels/normal_applied_condition.cuh");
     println!("cargo:rerun-if-changed=kernels/normal_wave_source_join.cuh");
     println!("cargo:rerun-if-changed=kernels/field_complete_material_transport.cuh");
     println!("cargo:rerun-if-changed=kernels/field_moment_material.cuh");

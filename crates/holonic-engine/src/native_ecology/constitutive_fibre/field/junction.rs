@@ -10,7 +10,7 @@ mod enclosure;
 mod producer;
 pub(super) mod operative;
 pub use operative::{NativeOperativeCurrentFactorCondensation,NativeOperativeReturnStorage,NativeOperativeReflectionReading,NativeOperativeContactBirth, NativeOperativeContactReading, NativeOperativeContactStaging,
-    NativeMaterialResponseChart, NativeMaterialContactResponse, NativeMaterialContactResponseReading, NativeRetainedMaterialRelation, NativeMaterialContactStepComparison, NativeFiniteMaterialResponse, NativeContactRealization, NativeContactDepositReading, NativeFieldCurrentSource};
+    NativeMaterialResponseChart, NativeMaterialContactResponse, NativeMaterialContactResponseReading, NativeRetainedMaterialRelation, NativeMaterialContactStepComparison, NativeFiniteMaterialResponse, NativeContactRealization, NativeContactDepositReading, NativeFieldCurrentSource, NativeFieldReflectionTarget, NativeFieldReflection};
 pub use producer::{CausalContactPropagation, CausalContactPropagationCotangent, CausalContactPropagationEnclosure, PairedContactCotangent, PairedJunctionCotangent, PairedJunctionLinearization, PairedJunctionTangent,JointMaterialContactResponse,joint_material_contact};
 pub use operative::{NativeCausalContactPropagation,NativeCausalContactPropagationReading,NativeCausalContactJoinReading};
 #[cfg(test)]

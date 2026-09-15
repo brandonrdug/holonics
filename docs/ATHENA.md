@@ -20,16 +20,16 @@ brief without a goal command or another planning/permission cycle.
 [definition] The [illustrated engine blueprint](ATHENA_ENGINE_BLUEPRINT.md) now traces the
 actual field scattering, material adjoint, local learned reaction and joint receiver into
 the existing public model owner. Plates 14–15 of elementary-holon-generation use these same
-source bindings. This is the construction to implement; fitting another predictor to the
-field is a separate application. The blueprint names the current owner-level attachment
-and the generated-section/training operation that will demonstrate it.
+source bindings. The [first field-backed model return](../research/records/2026-09-14_THE_CONSTITUTED_FIELD_TRAINS_AND_REOPENS_AS_ONE_HNN_MODEL.md) now implements the
+owner attachment, joint generation, D/M target response and local trained rest. Its held-out
+outputs and longer-run bound failure are recorded at their actual scopes.
 
 [project-postulate] Athena uses the [HNN model formula](HNN_FORMULA.md) through one assembled
 public model. Its active currents and constituted operators implement the field/circuit
 dynamics, learned transformations and encoded continuation described there. A matrix fitted
 to an independent field's outputs is a valid surrogate application, not an automatic substitute
 for assembling this model. The [library guide](RUST_FRAMEWORK.md#mathematical-operators-and-model-assembly)
-records the current separate session implementations and the concrete connection to make.
+records the field-backed connection and the scopes of the other session implementations.
 
 [definition] This guide owns Athena's product and interface contracts. Current native use
 enters through [NATIVE_HNA](NATIVE_HNA.md); the HNP sections below document the separately

@@ -4,6 +4,18 @@ use crate::native_ecology::constitutive_fibre::{
     normal_material_state_words, normal_material_workspace_words,
 };
 impl<'c> ResidentSurface<'c> {
+    pub(crate) fn record_normal_exact_point(&self,lane:&Lane<'_, 'c>,source:ResidentNormalEnclosureView<'_, 'c>,
+        workspace:&ResidentSection<'c>,out:&ResidentSection<'c>)->Result<(),ResidentRefusal>{
+        let fail=||Self::operative_error();self.validate_normal_input(ResidentNormalInput::Enclosed(source),source.grain.0)?;
+        let width=source.width;let work=width.checked_mul(2).ok_or_else(fail)?;
+        if width==0||width%2!=0||work>u32::MAX as usize||!self.operative_shape(workspace,1,work)
+            ||!self.operative_shape(out,1,width+1){return Err(fail());}
+        let mut p=Params::new();p.ptr(source.section.lo.device_ptr()).ptr(source.section.hi.device_ptr())
+            .u32(source.offset as u32).u32(width as u32).u32(source.grain.0).ptr(workspace.lo.device_ptr())
+            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr()).ptr(lane.slot).ptr(lane.census)
+            .ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_normal_exact_point",1,self.launch.block_x,0,&mut p,"normal-exact-point")
+    }
     pub(crate) fn record_normal_enclosure_features(&self,lane:&Lane<'_, 'c>,
         source:ResidentNormalEnclosureView<'_, 'c>,condition:ResidentConstitutiveCurrent<'_, 'c>,
         out:&ResidentSection<'c>)->Result<(),ResidentRefusal>{
