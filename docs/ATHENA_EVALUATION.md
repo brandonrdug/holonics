@@ -7,6 +7,14 @@ isolate elementary operations; they do not replace that application. Existing ma
 solver outputs are already inference and predictive release. Text, numerical and optical
 presentations do not define different standards of intelligence.
 
+[project-postulate] Brandon's follow-up makes **composition of accumulated capabilities** the
+purpose of this method. Each local result contributes through its role in the whole HNN;
+limited test scope does not diminish the significance of a keystone or erase other completed
+constructions. Carry that larger capability and its intended couplings across context handoffs.
+His repeated requests to elevate the appraisal recover this whole, rather than authorizing
+inflated measurements. The theory-of-everything ambition directs unification across these
+applications; their separate benchmark profiles are observations of the work, not its ontology.
+
 [definition] The [history review](../research/records/2026-09-15_ATHENA_EVALUATION_HISTORY_AND_SHARED_CONSEQUENCE_KIT.md)
 recovers the repeated experimental families and their failures. The existing
 [native benchmark apparatus](../research/experiments/native_performance_benchmark/README.md)
@@ -54,6 +62,24 @@ or count of toroids is not a measurement of these laws. Use the actual cycle/con
 owners from [the HNN formula](HNN_FORMULA.md), and carry their joint variations into the model.
 Compression tests retain `q T_i=U_i q`, receiver reconstruction and the applicable remainder;
 file size or later reuse alone does not establish that relation.
+
+## Composition through the shared model
+
+[definition] An inferred operator, recurrence, source family or condensed representation must
+retain the operands that let another HNN operation use it: source/receiver maps, applicable
+conditions, phase/orientation, relevant unresolved directions and its variation where learning
+consumes it. A solver can construct material for a continuing field; that field's received
+current can supply a subsequent inference or material comparison. Geometry, algebra, learning
+and generation describe overlapping operations in this composition. Their boundaries are
+mathematical interfaces to implement, rather than separate faculties to admit.
+
+[project-postulate] Assess the composition itself when it is the changed operation: can one
+constructed result be used by the next operation under the same situated source constraints,
+and can its consequences return through the actual producing dependencies? Retain the earlier
+component evidence while measuring this join. No component must independently exhibit the
+whole product, and a successful join does not require replaying unrelated benchmarks. The
+current kit's separate field/mathematical profiles retain baselines; their common runner alone
+is not the runtime unification Brandon is requesting.
 
 ## Stable questions, specialized receivers
 

@@ -1,7 +1,9 @@
 # Construction state
 
-**Currency:** September 15, 2026. The [historical evaluation review and shared kit](docs/ATHENA_EVALUATION.md)
-are returned. The existing benchmark apparatus now measures field and mathematical consequences
+**Currency:** September 15, 2026. Brandon's follow-up corrects the audit's component/product
+double standard: keep the accumulated capabilities and the unified HNN construction in view
+while measuring each actual operation. The [evaluation method](docs/ATHENA_EVALUATION.md) now
+makes composition through the shared model explicit. The historical review and kit are returned. The existing benchmark apparatus now measures field and mathematical consequences
 with separate correctness, source, reuse and cost receivers, and prepares private conversation/
 repository episodes without treating historical assistant replies as gold. Fresh public runs
 and sixteen focused tests pass. The full conversation/repository application remains the target.
@@ -38,6 +40,13 @@ changes into the joint pattern. A semantic task classifier/template emitter is n
 construction. Use the [generation law](docs/HNN_FORMULA.md#generation-as-field-refinement-and-boundary-radiation)
 and [application contract](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-consuming-application).
 
+[project-postulate] Carry the accumulated construction across handoffs: exact algebraic
+operator/factor inference, phase-sensitive generator recovery, source/preimage and receiver
+relations, conditional learning, coupled field evolution and durable producing returns are
+available foundations. Their significance includes what they enable together. State the
+actual source/receiver join that makes an available capability participate in this model;
+a small local output does not license restarting the appraisal from that output alone.
+
 [project-postulate] “Continue Athena” extends this same working application toward useful
 complete source/response parts. The returned small populations are evidence, not a queue to
 retrain. Mathematical refinement must reach the actual session and its generated products.
@@ -48,7 +57,7 @@ retrain. Mathematical refinement must reach the actual session and its generated
 | Mathematical operation | JointRegions constructs actual source current x and condition h=[1, activity, observation]. The model executes r=R_M(x,h), u=(I+A(h))x+c(h), (w,b_next)=S_D(u,b), y=P given+(I-P)w. D/M learn through the producing masked output covector before the full paired adjoint. |
 | Existing owners | `native/field_session.rs`; `NativeCoupledBody` / `body/field.rs`; operative field/current/target; normal reaction and `ResidentHeldSection`; simultaneous section receiver; shared stream, Workbench and field/model/session rest. Existing normalized material/current variations and factor owners supply further composition. |
 | Concrete unknown/join | With masks and D/M fixed, this one-step input map is affine. Content-dependent interactions between evolving regions require composition with the existing normalized field/current response and its variation. Normal statistics still materialize all 129 features in this small chart; larger complete sources expose an actual factor/locality requirement. |
-| Next consuming operation | Carry a complete refined conversation/repository source episode through the field application. Specify its actual unknown and source/receiver constraints before selecting the operator composition; recover applicable solver, generator, normalized/current and factor owners. Bind the needed content-dependent refinement and its producing variation to this consumer, with phase, shared regions and internal modes retained. Use the standard kit to expose the actual unsupported source/operation or failed consequence; do not substitute another color task or a mandatory normalization prerequisite. |
+| Next consuming operation | Carry a complete refined conversation/repository source episode through the unified HNN application. Compose the available solver/generator, field, normalized/current and factor operations required by its actual constraints, so returned mathematical objects become usable material for subsequent operations in the same model. Retain source/receiver maps, phase, shared regions, internal modes and producing variations across the join. The kit measures both retained component consequences and this interaction; it is not the model or a replacement construction objective. |
 | Completion evidence | Inspect the actual response to its complete source episode and source-addressed requirements, including contradictory or unresolved consequences. Retain exact solver identities and partial-field outputs as mechanism evidence; they do not score the conversation by proxy. Compare producing-material updates, saved continuation and costs when that claim is made. The retrospective prepared episode is validation, not a blind holdout. |
 | Receiver and durability | The held affine receiver is implemented; raw field publication remains independent. Keep receiver/source/extent and producing D/M through delayed targets. A dynamic or learned receiver requires its actual additional differential, not a decorative motion display. |
 | Cost and representation | This 129-feature chart has 77,522 microseconds median generation and 641,746.5 median target update. Warm 96-target development takes 71.768705 seconds; trained rest is 6,170,290 bytes. These are measured costs of this operation, not universal limits or matched speedups. |

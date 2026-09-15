@@ -12,7 +12,10 @@ the application implementations are in [holonics-hna](../crates/holonics-hna/REA
 source/unknown/receiver questions across model changes. Mathematical solvers, field completion,
 conversation/code products, causal reuse and performance retain their own evidence scopes.
 Refined conversations and repository material remain the primary application data; a new crate
-or operator does not reset construction to another trivial example.
+or operator does not reset construction to another trivial example. The target is their joint
+use through the HNN's computational objects and interactions. A component's limited measurement
+and its importance to the whole are compatible: describe the actual coupling it contributes
+and carry the accumulated capability into the next implementation step.
 
 ## One sustained construction programme
 

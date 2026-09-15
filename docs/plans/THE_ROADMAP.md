@@ -12,6 +12,14 @@ mathematics, code/tool use and progressively broader modalities. Frontier-level 
 on consumer hardware remains the ambition. A small successful field task is an implementation
 milestone, not completion of that ambition or of general Athena.
 
+[project-postulate] Brandon's September 15 follow-up makes the cumulative construction
+explicit: algebraic inference, geometry/physics, phase-sensitive generators, learning,
+compression and generation are contributing realizations of one framework. Continue from
+that accumulated capability through the actual shared objects and interfaces. A limited local
+measurement does not reset the whole-machine appraisal. Preserve a component's intended
+couplings across handoffs, and implement them through one continuing HNN rather than collecting
+isolated successful applications. The evaluation kit measures this work; it does not replace it.
+
 ## Sustained objective and construction rhythm
 
 [definition] The model is one continuing `(K,Θ,|H⟩)` with admitted incidence/transport K,

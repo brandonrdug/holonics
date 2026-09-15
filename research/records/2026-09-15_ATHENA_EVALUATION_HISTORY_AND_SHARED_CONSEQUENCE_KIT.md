@@ -90,13 +90,27 @@ stronger examples and original application cease to anchor the comparison. The s
 and original September 1/6 exchanges support that procedural diagnosis. They do not identify a
 unique hidden psychological or harness mechanism.
 
-[interpretation; source-inspected] Four concrete substitutions recur: lifecycle/attribution
-success for useful output; a source-independent file for inferred reusable content; source/codec
-or authored-template work for model construction; and a local numerical/linguistic failure for a
-framework-wide verdict. The opposite mistake also occurs: exact solver inference gets demoted
-because it uses explicit mathematics, even though it constructs a generator or consequence that
-the small text experiment only samples. The correction is one source/unknown/receiver contract
-with separate evidence dimensions, not a stricter universal definition of intelligence.
+[interpretation; source-inspected] Brandon's subsequent September 15 correction identifies
+a double standard in this audit's own framing. “Component evidence became a product claim”
+and “stronger inference was left behind” treated limited demonstration and accumulated capability
+as opposing appraisals. His repeated elevation of the machine restores the larger construction
+when agent attention has narrowed to one local result. It is not evidence that he asked for
+unsupported claims. A keystone's significance comes from its role in the unified construction,
+including roles that do not produce an impressive isolated output.
+
+[project-postulate] Carry the accumulated constructive capability into every assessment.
+A local test constrains what that measurement establishes; it does not reset the framework or
+its other realized capabilities. The empirical/template/source-access defects above remain
+specific defects. Explain each through the actual missing or incorrect composition and its
+consequences, rather than another global verdict about whether the machine is intelligent.
+
+[definition] Specialized mathematical and learning applications reveal related constructions:
+source restriction, variation, transport, inference of compatible causes/generators, receiving
+and economical continuation. The product objective is their joint availability and interaction
+through one HNN interface. Counting separate successful applications or placing them behind a
+common command dispatcher does not implement those shared mathematical relationships. The kit
+must expose how their actual returned objects participate in one another's operations as that
+composition is built; its separate profiles retain useful evidence for that construction.
 
 [definition] The common construction and its MVT/squeeze, optical/torus and passive-current
 interpretations are developed in [ATHENA_EVALUATION](../../docs/ATHENA_EVALUATION.md). The current
@@ -146,10 +160,11 @@ A bounded read-only review identified two issues to carry into the later authori
 `census.py` compares serialized fractional minima as strings, and `dJ_R_upper`/`M_hi` upper-round
 an already conservative lower summand rather than bound the true statistic. The ±500 calculation
 is still a finite discrete sum. No complete source-tail epsilon or global RH bound was computed.
-No acquisition source or evidence was edited by this review. The untracked census directory
-was present during inspection and absent at final integration; the findings refer to the
-inspected version, not a verified current replacement. Its later review must recover that
-source/data version before using the reported minima.
+No acquisition source or evidence was edited by this review. Brandon subsequently explained
+that he directed the side agent to change strategy and that removal accompanied cleanup of the
+failed Python attempt. These findings apply to that retired attempt. Later RH review follows
+the replacement strategy and its new results; restoring or rerunning the discarded census is
+not a prerequisite for that review or for Athena.
 
 [counterexample; implemented-exact] The distinction is elementary and directly relevant to
 benchmark receivers: lexicographically `-31/32 < -63/64`, but rationally the inequality reverses.
