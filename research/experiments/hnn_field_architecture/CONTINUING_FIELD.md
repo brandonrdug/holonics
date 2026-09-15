@@ -6,6 +6,39 @@ example in the live visualization while preserving its valid projection/optical 
 separate control. It is an explicit coupled-field specialization, not a declaration that the
 entire HNN/physical synthesis has been completed.
 
+## Evolution, orientation and the actual population
+
+[definition] The displayed τ is the model's declared evolution coordinate, `τ=n T₀/16`.
+It is not a calibrated physical clock or a relativistic proper-time trajectory. The receiver
+position, orientation and exposure are fixed in this example. The source's local orientations
+change through nonrigid transport, but the independent receiver-frame family is not varied.
+A joint study uses `y(τ)=ρ_(R(τ))[Ψ(τ)]`, retaining both source evolution and receiver-frame
+rate. Merely rotating a view supplies no fractal invariant or scale law.
+
+[definition] The population here is six supplied toroidal modes with initial currents
+`(2,i,1,−i,1,1+i)` and their thermal modes. The current-to-twist law is a supplied constitutive
+choice for this example. It was not inferred from Athena material or from an RH/Hodge system.
+The construction checks coupled evolution and reception; it does not yet analyze a particular
+RH or Hodge population.
+
+[definition] A Hodge investigation should instead start from the actual chosen complex,
+restriction maps and metric, hence its `Δ=dδ+δd`, then decompose current into exact, coexact
+and harmonic components. The existing `HodgeFiniteDecomposition`, `TemporalHodgeResidue`,
+`PartitionedHodgeEnergy` and Rust `ExactCellularSheaf`/`ExactSheafDiffusionLaw` supply that
+route. A meaningful question is which circulation survives the stated evolution and which
+receiver/frame changes hide or expose it. Ordinary fixed linear heat flow need not produce
+fractal structure; nonlinear transport or a scale-dependent receiving/iteration family must
+be specified if that is the question.
+
+[definition] An RH investigation has a different concrete population: the zero divisor,
+with multiplicity, of `F_u(s)=heatE(u,ξ,s)`. The existing `ZeroDynamicsEntire` and
+`FosterClassHeatFlow` relate a simple zero's velocity to `F_ss/F_s` and its regularized
+divisor current. `FoldedSource` retains the source/tail receiver needed for finite windows.
+The standard chart is `H_t(z)=⅛ heatE(−t/4,ξ,½+iz/2)`; this analytic deformation parameter
+must not be silently identified with this movie's τ. Zeros of a nonzero entire function are
+locally discrete; fractal basin geometry, when studied, belongs to a specified iteration or
+receiving partition, not automatically to the zero set itself.
+
 ## One state supplies the field, its transport and its receiver image
 
 [definition] The state is `(ψ_n,H_n,Φ_n)`: complex mode currents, nonnegative thermal modes,
