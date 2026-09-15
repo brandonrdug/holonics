@@ -1,0 +1,21 @@
+
+running 12 tests
+test native::coupled_wave::body::field::compatibility_tests::original_one_pass_field_model_remains_readable ... ok
+test native::coupled_wave::tests::boundary::field_interiors_form_and_feed_the_coupled_prediction ... boundary transport: 5 complex state coordinates, 8 measured returns, 2 future states, delivery_us=145292; source_radius=159/32768, actual_radius=87/32768, prediction_minus_actual_center=[{"real":[[1,[319757]],[1,[1073741824]]],"imaginary":[[1,[347559]],[1,[2147483648]]]},{"real":[[-1,[1503077]],[1,[2147483648]]],"imaginary":[[1,[2015925]],[1,[0,1]]]},{"real":[[-1,[1246913]],[1,[0,1]]],"imaginary":[[1,[425987]],[1,[536870912]]]},{"real":[[-1,[2417763]],[1,[0,1]]],"imaginary":[[1,[147919]],[1,[2147483648]]]},{"real":[[-1,[705711]],[1,[2147483648]]],"imaginary":[[1,[13997]],[1,[33554432]]]}]
+boundary empirical return: field_cut=13, wave_epoch=1, material_observations=9, observation_us=26730, source_radius=159/16384, target_radius=123/16384, discrepancy_radius=935/65536
+ok
+test native::coupled_wave::tests::coupled_session_generates_and_reenters_without_self_deposition ... ok
+test native::coupled_wave::tests::coupled_session_incorporates_observed_symbol_and_continues ... HNN old="a" returned="b" receiver=declared-source-section
+ok
+test native::coupled_wave::tests::coupled_session_keeps_and_compares_its_producing_family ... ok
+test native::coupled_wave::tests::coupled_session_observed_next_is_distinct_from_unpaired_source_and_correction ... ok
+test native::coupled_wave::tests::coupled_session_pending_phases_retain_the_producing_cut ... ok
+test native::coupled_wave::tests::coupled_session_process_resume_drains_the_pending_emission_once ... ok
+test native::coupled_wave::tests::coupled_session_reads_legacy_affine_frames ... ok
+test native::coupled_wave::tests::coupled_session_returns_original_base_prediction_after_restart ... old base prediction returned after first publication: before="b" after="a"
+ok
+test native::coupled_wave::tests::fitted_material_reaches_the_numerical_hnn_and_delayed_return ... ok
+test native::coupled_wave::tests::prospective_word_uses_returned_generator_with_one_shared_source ... {"action_committed":false,"after_native_return":"bbb","initial_preview":"aba","joint_states":[{"projection":{"current":[{"denominator":"1","numerator":"0"},{"denominator":"1","numerator":"0"},{"denominator":"1","numerator":"1"},{"denominator":"1","numerator":"0"}],"previous":[{"denominator":"1","numerator":"1"},{"denominator":"1","numerator":"0"},{"denominator":"1","numerator":"0"},{"denominator":"1","numerator":"0"}]},"state":0},{"projection":{"current":[{"denominator":"1","numerator":"0"},{"denominator":"1","numerator":"0"},{"denominator":"1","numerator":"1"},{"denominator":"1","numerator":"0"}],"previous":[{"denominator":"1","numerator":"0"},{"denominator":"1","numerator":"0"},{"denominator":"1","numerator":"1"},{"denominator":"1","numerator":"0"}]},"state":1},{"projection":{"current":[{"denominator":"1","numerator":"0"},{"denominator":"1","numerator":"0"},{"denominator":"1","numerator":"1"},{"denominator":"1","numerator":"0"}],"previous":[{"denominator":"1","numerator":"0"},{"denominator":"1","numerator":"0"},{"denominator":"1","numerator":"1"},{"denominator":"1","numerator":"0"}]},"state":2},{"projection":{"current":[{"denominator":"1","numerator":"0"},{"denominator":"1","numerator":"0"},{"denominator":"1","numerator":"1"},{"denominator":"1","numerator":"0"}],"previous":[{"denominator":"1","numerator":"0"},{"denominator":"1","numerator":"0"},{"denominator":"1","numerator":"1"},{"denominator":"1","numerator":"0"}]},"state":3}],"matched_control_preview":"aba","scope":"shared-source prospective word control","source_scope":"declared-source-section"}
+ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 84 filtered out; finished in 8.26s

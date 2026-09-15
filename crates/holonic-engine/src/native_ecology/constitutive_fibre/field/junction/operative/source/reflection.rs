@@ -5,7 +5,7 @@ use super::*;
 pub struct NativeFieldReflection<'a, 'c> {
     source: &'a NativeFieldCurrentSource<'c>,
     input: ResidentNormalEnclosureView<'a, 'c>,
-    output: ResidentSection<'c>,
+    pub(super) output: Rc<ResidentSection<'c>>,
     residual: ResidentSection<'c>,
 }
 impl<'a, 'c> NativeFieldReflection<'a, 'c> {
@@ -113,7 +113,7 @@ impl<'c> NativeFieldCurrentSource<'c> {
         Ok(NativeFieldReflection {
             source: self,
             input,
-            output,
+            output: Rc::new(output),
             residual,
         })
     }

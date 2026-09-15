@@ -1,0 +1,13 @@
+{
+  "command": [
+    "target/debug/examples/athena_field",
+    "/home/b/Workspaces/holonics/research/experiments/athena_field/joint-one-pass",
+    "8"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 0.590484649001155,
+  "max_rss_kib": 293268,
+  "user_seconds": 0.422228,
+  "system_seconds": 0.183019,
+  "scope": "isolated debug process after native CUDA module warm-up; includes setup, task, observers and durable I/O"
+}

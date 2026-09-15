@@ -17,7 +17,7 @@ pub struct NativeFieldCurrentSource<'c> {
     cut: usize,
     grain: u32,
     width: usize,
-    packed: ResidentSection<'c>,
+    packed: Rc<ResidentSection<'c>>,
     material: std::cell::OnceCell<ResidentSection<'c>>,
     reflection: std::cell::OnceCell<ResidentSection<'c>>,
     report: Rc<ResidentSection<'c>>,
@@ -102,6 +102,15 @@ impl<'c> NativeConstitutiveField<'c> {
         let width = d
             .checked_add(count.checked_mul(2).ok_or(Error::Shape)?)
             .ok_or(Error::Shape)?;
+        if let Some(image) = staging.field.junction.as_ref().and_then(|j| j.valid_joint_current()) {
+            if Rc::ptr_eq(&staging.sections.b, &staging.field.junction.as_ref().unwrap().operative.as_ref().unwrap().sections.b) {
+                return Ok(NativeFieldCurrentSource {
+                    surface, owner, cut, grain: staging.grain, width, packed: Rc::clone(image),
+                    material: std::cell::OnceCell::new(), reflection: std::cell::OnceCell::new(),
+                    report, _producing: Rc::clone(&staging.sections), births: staging.births.clone(),
+                });
+            }
+        }
         let packed = surface.fresh_section(1, 2 * (width + 1), ResidentGrain(0))?;
         let mut passage = surface.begin_passage(&[vec![]])?;
         {
@@ -130,7 +139,7 @@ impl<'c> NativeConstitutiveField<'c> {
             cut,
             grain: staging.grain,
             width,
-            packed,
+            packed: Rc::new(packed),
             material:std::cell::OnceCell::new(),
             reflection:std::cell::OnceCell::new(),
             report,

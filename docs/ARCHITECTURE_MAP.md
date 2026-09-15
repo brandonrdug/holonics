@@ -61,7 +61,9 @@ now assembles the actual operative field and neighborhood under `NativeCoupledBo
 `junction/operative/source/{reflection,reflection_commit,reflection_target}.rs` owns the resident
 solve, single publication and producing paired adjoint. `resident/neighborhood/field_reaction.rs`
 stages local normal responses; `normal_applied_condition.cuh` executes the fixed-condition
-restriction A(h)s+c(h). Field rest v3/v4 retains the contemporary refined report, and public
+restriction A(h)s+c(h) and its common-current extension `(s,b) -> (x+A(h)s+c(h),b)`.
+`PairedJunction::valid_joint_current` qualifies the shared output image by report/internal owners.
+Field rest v5/v6 additionally retains that image; versions 1–4 remain readable. Public
 `SavedCoupledBody` tag 2 carries the local trained field/reaction. See the [measured return](../research/experiments/athena_field/README.md).
 
 ## Swing, fluid and transfer composition

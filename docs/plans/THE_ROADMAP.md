@@ -39,8 +39,8 @@ codecs, durable I/O and scoped reference checks.
 normal/conditional learning, receiving maps, prospective joint families and several rest
 formats. The first [field-backed model return](../../research/experiments/athena_field/README.md)
 now binds these owners under the public coupled body. Its eight-target task and trained rest
-are delivered; the recorded longer-run joint-enclosure obstruction remains concrete continuation
-work. Fitting another predictor to that field is a separate application.
+are delivered; the common-current repair also returns the same 48-target continuation and
+trained reopen. Changing source/receiver conduct and economical durability continue below. Fitting another predictor to that field is a separate application.
 
 ## Athena construction order
 

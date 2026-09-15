@@ -511,7 +511,7 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
         let surface = self.field.relation.surface;
         let d = 6 * self.field.nodes();
         let k = self.births.len();
-        let staged = sections(surface, d, k)?;
+        let mut staged = sections(surface, d, k)?;
         let update_rounds = surface.fresh_section(k.max(1), 2, ResidentGrain(0))?;
         let moments_rounds =
             surface.fresh_section(1, 2 * ((d / 2) * (d / 2) + d / 2), ResidentGrain(0))?;
@@ -556,6 +556,11 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
         let receipt = passage.finish()?.launch()?;
         if !receipt.obstruction.is_empty() {
             return Err(Error::Arithmetic(format!("{:?}", receipt.obstruction)));
+        }
+        // A material-only return changes D, not the current. Keep that immutable owner,
+        // so a common outward/internal image remains valid across material development.
+        if returned.b.is_none() {
+            Rc::get_mut(&mut staged).ok_or(Error::Uncertain)?.b = Rc::clone(&self.sections.b);
         }
         let mut returns = self.returns.clone();
         returns.push(returned);

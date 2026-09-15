@@ -14,6 +14,10 @@ const PACKED_MAGIC: &[u8] = b"HNA-NATIVE-FIELD-REST\x02";
 // Versions 3/4 retain a current report refined after the latest ordinary occurrence.
 const CURRENT_MAGIC: &[u8] = b"HNA-NATIVE-FIELD-REST\x03";
 const CURRENT_PACKED_MAGIC: &[u8] = b"HNA-NATIVE-FIELD-REST\x04";
+// Versions 5/6 retain a joint image and one byte declaring whether a separate
+// contemporary report follows. Empty-history fields use their existing initial report.
+const JOINT_MAGIC: &[u8] = b"HNA-NATIVE-FIELD-REST\x05";
+const JOINT_PACKED_MAGIC: &[u8] = b"HNA-NATIVE-FIELD-REST\x06";
 const END: &[u8] = b"HNA-NATIVE-FIELD-END\x01";
 type Error = ConstitutiveFibreError;
 fn invalid(detail: impl std::fmt::Display) -> Error {
@@ -99,6 +103,7 @@ pub struct NativeFieldRest {
     covariance: Option<ResidentSectionRest>,
     initial_junction: Option<ResidentSectionRest>,
     current_junction: Option<ResidentSectionRest>,
+    joint_current: Option<ResidentSectionRest>,
     transport: Option<ResidentSectionRest>,
     history: Vec<HeldRest>,
 }
@@ -556,9 +561,31 @@ impl NativeFieldRest {
         if let (Some(wire), Some(section)) = (&h.junction, &self.current_junction) {
             junction_section(section, dimension, wire.representation)?;
         }
+        if let Some(image) = &self.joint_current {
+            let wire = h.operative.as_ref().ok_or_else(|| invalid("joint image without operative state"))?;
+            let k = wire.births.len();
+            let d = dimension;
+            let width = d.checked_add(2*k).ok_or(Error::Shape)?;
+            point_section(image, 1, 2*(width+1))?;
+            let values = packed(image)?;
+            let report = self.current_junction.as_ref()
+                .or_else(||self.history.last().and_then(|h|h.junction.as_ref()))
+                .or(self.initial_junction.as_ref()).ok_or_else(||invalid("joint image report"))?;
+            let report_values = packed(report)?;
+            let b_values = packed(&self.operative.as_ref().ok_or(Error::Shape)?.current[1])?;
+            if values[width]<0 || report_values.len()<2*(d+1) || b_values.len()<2*k {
+                return Err(invalid("joint image extent/radius"));
+            }
+            // Publication gives the outward restriction exactly this joint radius; the
+            // potential is a different block and must not be substituted for outgoing w.
+            if values[..d] != report_values[d+1..2*d+1] || values[d..width] != b_values[..2*k]
+                || values[width] != report_values[2*d+1] {
+                return Err(invalid("joint image disagrees with outgoing report/internal current"));
+            }
+        }
         if let (Some(wire), Some(section)) = (&h.junction, &self.initial_junction) {
             junction_section(section, dimension, wire.representation)?;
-            match wire.representation {
+            if self.joint_current.is_none() { match wire.representation {
                 NativeFieldJunctionRepresentation::RationalWords => {
                     for block in section.intervals.chunks_exact(dimension + 1) {
                         if block[..dimension].iter().any(|v| v.0 != 0) || block[dimension].0 != 1 {
@@ -574,6 +601,7 @@ impl NativeFieldRest {
                         return Err(invalid("initial enclosed junction"));
                     }
                 }
+            }
             }
         }
         if let Some(state) = &self.transport {
@@ -683,15 +711,16 @@ impl NativeFieldRest {
         self.validate()?;
         let packing=self.header.transport_source.is_operative() && self.header.transport_source.is_projector()
             && !self.header.transport_target.is_direct();
-        let magic = match (packing, self.current_junction.is_some()) {
+        let magic = if self.joint_current.is_some() { if packing { JOINT_PACKED_MAGIC } else { JOINT_MAGIC } } else { match (packing, self.current_junction.is_some()) {
             (false, false) => MAGIC, (true, false) => PACKED_MAGIC,
             (false, true) => CURRENT_MAGIC, (true, true) => CURRENT_PACKED_MAGIC,
-        };
+        }};
         out.write_all(magic).map_err(invalid)?;
         blob(out, &serde_json::to_vec(&self.header).map_err(invalid)?)?;
+        if self.joint_current.is_some() { out.write_all(&[u8::from(self.current_junction.is_some())]).map_err(invalid)?; }
         fn section(out:&mut impl Write,s:&ResidentSectionRest)->Result<(),Error>{blob(out,&point_bytes(s)?)}
         section(out,&self.seed)?;section(out,&self.memory)?;section(out,&self.basis)?;
-        for s in [&self.covariance,&self.initial_junction,&self.transport,&self.current_junction].into_iter().flatten(){section(out,s)?;}
+        for s in [&self.covariance,&self.initial_junction,&self.transport,&self.current_junction,&self.joint_current].into_iter().flatten(){section(out,s)?;}
         if let Some(op)=&self.operative {op.write(&mut |s|section(out,s))?;}
         for (at,h) in self.history.iter().enumerate() {
             section(out,&h.source)?;
@@ -712,19 +741,25 @@ impl NativeFieldRest {
     }
     pub fn read(input: &mut impl Read, octets: u64) -> Result<Self, Error> {
         let mut input=input.take(octets);let mut magic=vec![0;MAGIC.len()];input.read_exact(&mut magic).map_err(invalid)?;
-        let packing=magic==PACKED_MAGIC || magic==CURRENT_PACKED_MAGIC;
+        let joint=magic==JOINT_MAGIC || magic==JOINT_PACKED_MAGIC;
+        let packing=magic==PACKED_MAGIC || magic==CURRENT_PACKED_MAGIC || magic==JOINT_PACKED_MAGIC;
         let contemporary=magic==CURRENT_MAGIC || magic==CURRENT_PACKED_MAGIC;
-        if !packing && !contemporary && magic!=MAGIC{return Err(invalid("unsupported field rest version"));}
+        if !packing && !contemporary && !joint && magic!=MAGIC{return Err(invalid("unsupported field rest version"));}
         let header: Header=serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
         if packing && (!header.transport_source.is_operative() || !header.transport_source.is_projector() || header.transport_target.is_direct()){
             return Err(invalid("packed field target chart"));
         }
+        let contemporary=if joint {
+            let mut flag=[0]; input.read_exact(&mut flag).map_err(invalid)?;
+            match flag[0] {0=>false,1=>true,_=>return Err(invalid("joint current-report presence"))}
+        } else {contemporary};
         fn section(input:&mut std::io::Take<impl Read>)->Result<ResidentSectionRest,Error>{read_point(&read_blob(input)?)}
         let seed=section(&mut input)?;let memory=section(&mut input)?;let basis=section(&mut input)?;
         let covariance=header.junction.as_ref().map(|_|section(&mut input)).transpose()?;
         let initial_junction=(header.junction.is_some() && header.history.is_empty()).then(||section(&mut input)).transpose()?;
         let transport=header.transport.then(||section(&mut input)).transpose()?;
         let current_junction=contemporary.then(||section(&mut input)).transpose()?;
+        let joint_current=joint.then(||section(&mut input)).transpose()?;
         let operative=header.operative.as_ref().map(|w|OperativeRest::read(w,&mut ||section(&mut input))).transpose()?;
         let mut history=Vec::new();
         for (at,event) in header.history.iter().enumerate(){
@@ -752,7 +787,7 @@ impl NativeFieldRest {
         }
         expect(&mut input,END)?;
         if input.limit()!=0{return Err(invalid("trailing field rest bytes"));}
-        let rest=Self{operative,header,seed,memory,basis,covariance,initial_junction,current_junction,transport,history};rest.validate()?;Ok(rest)
+        let rest=Self{operative,header,seed,memory,basis,covariance,initial_junction,current_junction,joint_current,transport,history};rest.validate()?;Ok(rest)
     }
 }
 
@@ -869,6 +904,8 @@ impl<'chart> NativeConstitutiveField<'chart> {
             } else {
                 None
             },
+            joint_current: self.junction.as_ref().and_then(|j|j.valid_joint_current())
+                .map(|image|section(image)).transpose()?,
             // Keep the actual contemporary report independently of ordinary observation
             // history. Pointer identity avoids copying the usual unchanged last report.
             current_junction: match (&self.junction, self.history.last()) {
@@ -959,6 +996,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             covariance,
             initial_junction,
             current_junction,
+            joint_current,
             transport,
             history,
         } = rest;
@@ -1045,15 +1083,21 @@ impl<'chart> NativeConstitutiveField<'chart> {
             } else {
                 Rc::new(surface.mount_section_rest(&initial_junction.expect("initial junction"))?)
             };
+            let operative = match (h.operative,operative) {
+                (Some(wire),Some(rest))=>Some(OperativeState::remount(surface,wire,rest,match j.representation {NativeFieldJunctionRepresentation::EnclosedDyadic{fractional_bits}=>fractional_bits,_=>return Err(invalid("operative representation"))})?),
+                (None,None)=>None,_=>return Err(invalid("operative state presence")),
+            };
+            let joint_current = joint_current.map(|image| {
+                let op=operative.as_ref().ok_or(Error::Shape)?;
+                Ok::<_,Error>((Rc::clone(&current),Rc::clone(&op.sections.b),Rc::new(surface.mount_section_rest(&image)?)))
+            }).transpose()?;
             Some(PairedJunction {
                 representation: j.representation,
                 solver: j.solver,
                 covariance: surface.mount_section_rest(&covariance.expect("covariance"))?,
                 current,
-                operative: match (h.operative,operative) {
-                    (Some(wire),Some(rest))=>Some(OperativeState::remount(surface,wire,rest,match j.representation {NativeFieldJunctionRepresentation::EnclosedDyadic{fractional_bits}=>fractional_bits,_=>return Err(invalid("operative representation"))})?),
-                    (None,None)=>None,_=>return Err(invalid("operative state presence")),
-                },
+                joint_current,
+                operative,
             })
         } else {
             None

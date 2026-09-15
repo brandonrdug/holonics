@@ -3,20 +3,25 @@
 // before the final grid projection; only A(h) transports the source radius.
 extern "C" __global__ void section_normal_applied_condition(
  const int64_t *state,const int64_t *state_hi,
- const int64_t *source,const int64_t *source_hi,uint32_t sa,uint32_t d,
+ const int64_t *source,const int64_t *source_hi,uint32_t sa,uint32_t d,uint32_t whole,
+ const int64_t *external,const int64_t *external_hi,uint32_t ea,uint32_t joint,
  const int64_t *h,const int64_t *h_hi,uint32_t ha,uint32_t hd,uint32_t hs,uint32_t k,
  uint32_t targets,uint32_t grain,int64_t *out,int64_t *out_hi,
  uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
  if(blockIdx.x||threadIdx.x||upstream_refused(census,lineage,lineage_count,slot))return;
- if(!d||!k||(d&1u)||(k&1u)||(sa&1u)||!targets||grain<1||grain>120){atomicOr(slot,REFUSED_MALFORMED);return;}
+ if(!d||!k||whole<d||(whole&1u)||(d&1u)||(k&1u)||(sa&1u)||!targets||grain<1||grain>120){atomicOr(slot,REFUSED_MALFORMED);return;}
  const size_t f=(size_t)d+k+(size_t)d*(k/2u);
  for(size_t j=0;j<2u*f*targets;++j)if(state[j]!=state_hi[j])atomicOr(slot,REFUSED_MALFORMED);
- for(size_t j=0;j<2u*((size_t)d+1u);++j)if(source[sa+j]!=source_hi[sa+j])atomicOr(slot,REFUSED_MALFORMED);
+ for(size_t j=0;j<2u*((size_t)whole+1u);++j)if(source[sa+j]!=source_hi[sa+j])atomicOr(slot,REFUSED_MALFORMED);
  for(uint32_t j=0;j<k;++j)if(h[ha+j]!=h_hi[ha+j])atomicOr(slot,REFUSED_MALFORMED);
  wide den=fibre_current_denominator(h,h_hi,hd,hs,slot),S=(wide)1<<grain;
  const wide *M=(const wide*)state,*x=(const wide*)(source+sa);wide *y=(wide*)out;
- if(*slot||den<=0||x[d]<0){atomicOr(slot,REFUSED_MALFORMED);return;}
- MomentInteger denominator=normal_wide(S)*normal_wide(den),gain;
+ if(*slot||den<=0||x[whole]<0){atomicOr(slot,REFUSED_MALFORMED);return;}
+ if(joint)for(size_t j=0;j<2u*(2u*(size_t)targets+1u);++j)
+  if(external[ea+j]!=external_hi[ea+j])atomicOr(slot,REFUSED_MALFORMED);
+ const wide *e=(const wide*)(external+ea);
+ if(joint&&e[2u*targets]<0){atomicOr(slot,REFUSED_MALFORMED);return;}
+ MomentInteger denominator=normal_wide(S)*normal_wide(den),gain,square;
  wide rounding=0;
  for(uint32_t row=0;row<targets;++row){
   const wide *a=M+row*f;MomentInteger yr,yi;
@@ -31,14 +36,30 @@ extern "C" __global__ void section_normal_applied_condition(
     normal_product(ar,ai,normal_wide(a[at]),normal_wide(a[at+1u]),normal_wide(h[ha+2u*j]),normal_wide(h[ha+2u*j+1u]),false);
    }
    gain=gain+normal_abs(ar)+normal_abs(ai);
+   square=square+ar*ar+ai*ai;
    normal_product(yr,yi,ar,ai,normal_wide(x[i]),normal_wide(x[i+1u]),false);
   }
   bool rr=false,ri=false;
   y[2u*row]=normal_grid(exact_divide_positive(yr,denominator,&rr),0,false,slot);
   y[2u*row+1u]=normal_grid(exact_divide_positive(yi,denominator,&ri),0,false,slot);
+  if(joint){y[2u*row]=add_checked(y[2u*row],e[2u*row],slot);y[2u*row+1u]=add_checked(y[2u*row+1u],e[2u*row+1u],slot);}
   rounding=add_checked(rounding,(wide)rr+(wide)ri,slot);
  }
- bool rem=false;MomentInteger bound=exact_divide_positive(gain*normal_wide(x[d]),denominator,&rem);
- y[2u*targets]=add_checked(add_checked(normal_grid(bound,0,false,slot),(wide)rem,slot),rounding,slot);
- if(*slot)return;for(size_t j=0;j<2u*(2u*(size_t)targets+1u);++j)out_hi[j]=out[j];
+ // Frobenius bound of the exactly contracted A(h). Work at dyadic gain scale S;
+ // ceil before the integer root is outward and keeps every fractional scale factor.
+ bool cap_rem=false,square_rem=false;
+ MomentInteger cap_value=exact_divide_positive(gain,normal_wide(den),&cap_rem);
+ wide cap=add_checked(normal_grid(cap_value,0,false,slot),(wide)cap_rem,slot);
+ MomentInteger square_value=exact_divide_positive(square,normal_wide(den)*normal_wide(den),&square_rem);
+ if(square_rem)square_value=square_value+MomentInteger(1);
+ wide norm=normal_wave_root_capped(square_value,cap,slot);
+ // diag(A,I) acts on the ONE joint Euclidean family. Tail coordinates retain their
+ // original dependence on s; restriction and independent rejoining would add rho twice.
+ uint32_t tail=joint?whole-d:0u, width=2u*targets+tail;
+ if(tail&&norm<S)norm=S;
+ bool rem=false;MomentInteger bound=exact_divide_positive(normal_wide(norm)*normal_wide(x[whole]),normal_wide(S),&rem);
+ y[width]=add_checked(add_checked(normal_grid(bound,0,false,slot),(wide)rem,slot),rounding,slot);
+ if(joint)y[width]=add_checked(y[width],e[2u*targets],slot);
+ for(uint32_t j=0;j<tail;++j)y[2u*targets+j]=x[d+j];
+ if(*slot)return;for(size_t j=0;j<2u*((size_t)width+1u);++j)out_hi[j]=out[j];
 }

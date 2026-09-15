@@ -98,10 +98,17 @@ pub(super) struct PairedJunction<'chart> {
     pub(super) solver: NativeFieldJunctionSolver,
     pub(super) covariance: ResidentSection<'chart>,
     pub(super) current: Rc<ResidentSection<'chart>>,
+    // Immutable joint image, qualified by the exact report and internal-current owners.
+    pub(super) joint_current: Option<(Rc<ResidentSection<'chart>>, Rc<ResidentSection<'chart>>, Rc<ResidentSection<'chart>>)>,
     pub(super) operative: Option<operative::OperativeState<'chart>>,
 }
 
-impl PairedJunction<'_> {
+impl<'chart> PairedJunction<'chart> {
+    pub(super) fn valid_joint_current(&self) -> Option<&Rc<ResidentSection<'chart>>> {
+        let (report, b, image) = self.joint_current.as_ref()?;
+        let op = self.operative.as_ref()?;
+        (Rc::ptr_eq(report, &self.current) && Rc::ptr_eq(b, &op.sections.b)).then_some(image)
+    }
     pub(super) fn kernel(&self) -> (u32, u32) {
         let (mode, grain) = self.representation.kernel();
         (
@@ -199,6 +206,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             covariance: mount(covariance)?,
             current: Rc::new(mount(report)?),
             operative: None,
+            joint_current: None,
         });
         Ok(body)
     }

@@ -188,17 +188,7 @@ impl<'c> FieldModel<'c> {
             self.reaction
                 .forecast_enclosed_reaction(self.member, boundary.view(), condition)?;
         let external = input.enclosure(self.field.surface(), source.enclosure().grain())?;
-        let entering = external.view().sum_same_shape(reaction.output_view())?;
-        let input = if source.internal_components() == 0 {
-            entering
-        } else {
-            entering.view().join(
-                source
-                    .enclosure()
-                    .restrict(self.width..source.enclosure().components())?
-                    .view(),
-            )?
-        };
+        let input = reaction.apply_joint_current(source.enclosure(), external.view())?;
         let reflected = source.reflect(input.view())?;
         let full_output = reflected.output().to_owned()?;
         let outward = full_output.view().restrict(0..self.width)?;
@@ -489,5 +479,30 @@ impl<'c> NativeCoupledBody<'c> {
         step_bits: u32,
     ) -> Result<Value, NativeSessionError> {
         self.field_model()?.observe(id, target, step_bits)
+    }
+}
+
+#[cfg(test)]
+mod compatibility_tests {
+    use super::*;
+    use holonic_engine::embedding_fiber::ResidentReadout;
+
+    #[test]
+    #[ignore = "requires CUDA; reopens the previously delivered field model wire"]
+    fn original_one_pass_field_model_remains_readable() {
+        let bytes = include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../research/experiments/athena_field/one-pass/athena-field.rest"
+        ));
+        let expected: Value = serde_json::from_str(include_str!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../research/experiments/athena_field/one-pass/return.json"
+        )))
+        .unwrap();
+        let rest = SavedCoupledBody::read(&mut bytes.as_slice(), bytes.len() as u64).unwrap();
+        let readout = ResidentReadout::new().unwrap();
+        let surface = ResidentSurface::on(&readout).unwrap();
+        let mut body = rest.remount(&surface).unwrap();
+        assert_eq!(body.inspect_current().unwrap(), expected["model_state"]);
     }
 }

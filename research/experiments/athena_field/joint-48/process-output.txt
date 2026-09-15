@@ -1,0 +1,7 @@
+trained 8 complete field targets
+trained 16 complete field targets
+trained 24 complete field targets
+trained 32 complete field targets
+trained 40 complete field targets
+trained 48 complete field targets
+{"actual_model_targets":48,"output":"/home/b/Workspaces/holonics/research/experiments/athena_field/joint-48","rest_octets":81449,"rest_receiver_match":true}

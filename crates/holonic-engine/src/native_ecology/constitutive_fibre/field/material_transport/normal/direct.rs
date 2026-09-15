@@ -10,6 +10,8 @@ pub use refine::NormalRealizationRefinement;
 
 mod enclosure;
 mod enclosure_ports;
+#[cfg(test)]
+mod conditional_tests;
 pub use enclosure::{ResidentNormalEnclosure, ResidentNormalEnclosureView, ResidentNormalInput};
 mod applied_relation;
 mod joined_source;
@@ -116,9 +118,29 @@ impl<'c> ResidentNormalMaterialView<'c> {
         let width=self.targets.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?;
         let section=self.surface.fresh_section(1,2*(width+1),ResidentGrain(0))?;
         let mut pass=self.surface.begin_passage(&[vec![]])?;
-        {let lane=pass.open(0,&[])?;self.surface.record_normal_applied_condition(&lane,&self.state,source,condition,self.targets,&section)?;}
+        {let lane=pass.open(0,&[])?;self.surface.record_normal_applied_condition(&lane,&self.state,source,condition,self.targets,None,&section)?;}
         pass.close(0,&section,64)?;let result=pass.finish()?.launch()?;
         if !result.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("applied conditional reaction: {:?}",result.obstruction)));}
+        Ok(ResidentNormalEnclosure{surface:self.surface,section,width,grain:self.grain})
+    }
+    /// At fixed h apply (s,b) -> (x+A(h)s+c(h),b) to one joint ball. The
+    /// unchanged tail is part of that same source, not an independently joined enclosure.
+    pub fn read_applied_bilinear_joint(
+        &self, source: ResidentNormalEnclosureView<'_, 'c>, boundary_components: usize,
+        condition: ResidentConstitutiveCurrent<'_, 'c>, external: ResidentNormalEnclosureView<'_, 'c>,
+    ) -> Result<ResidentNormalEnclosure<'c>, ConstitutiveFibreError> {
+        let d=boundary_components; let k=condition.components();
+        let features=d.checked_mul(k/2).and_then(|v|v.checked_add(d)?.checked_add(k)).ok_or(ConstitutiveFibreError::Shape)?;
+        if self.source_chart != (NormalSourceChart::Features{source_complex:features/2})
+            || source.grain()!=self.grain || external.grain()!=self.grain { return Err(ConstitutiveFibreError::Shape); }
+        let tail=source.components().checked_sub(d).ok_or(ConstitutiveFibreError::Shape)?;
+        let width=self.targets.checked_mul(2).and_then(|v|v.checked_add(tail)).ok_or(ConstitutiveFibreError::Shape)?;
+        let words=width.checked_add(1).and_then(|v|v.checked_mul(2)).ok_or(ConstitutiveFibreError::Shape)?;
+        let section=self.surface.fresh_section(1,words,ResidentGrain(0))?;
+        let mut pass=self.surface.begin_passage(&[vec![]])?;
+        {let lane=pass.open(0,&[])?; self.surface.record_normal_applied_condition(&lane,&self.state,source,condition,self.targets,Some((d,external)),&section)?;}
+        pass.close(0,&section,64)?; let result=pass.finish()?.launch()?;
+        if !result.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("applied conditional joint current: {:?}",result.obstruction)));}
         Ok(ResidentNormalEnclosure{surface:self.surface,section,width,grain:self.grain})
     }
     pub fn inspect(&self)->Result<NativeNormalMaterialState,ConstitutiveFibreError>{

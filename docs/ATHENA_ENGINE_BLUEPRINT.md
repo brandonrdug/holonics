@@ -87,7 +87,7 @@ used to implement the requested whole-field refinement merely because that API a
 The new body path must use one explicit generating operator for its requested joint section;
 preview and commit differ in ownership effects, not in an unannounced change of that operator.
 
-[established-bounded; measured] The [first model return](../research/records/2026-09-14_THE_CONSTITUTED_FIELD_TRAINS_AND_REOPENS_AS_ONE_HNN_MODEL.md) implements this attachment and returns held-out joint sections after actual D/M training, plus trained rest/remount. Its longer-run enclosure obstruction is retained; current continuation belongs in CONSTRUCTION_STATE.
+[established-bounded; measured] The [first model return](../research/records/2026-09-14_THE_CONSTITUTED_FIELD_TRAINS_AND_REOPENS_AS_ONE_HNN_MODEL.md) implements this attachment and returns held-out joint sections after actual D/M training, plus trained rest/remount. The [common-current continuation](../research/records/2026-09-14_THE_JOINT_FIELD_CURRENT_SURVIVES_REPEATED_GENERATION.md) now completes the same 48-target task and trained reopen, with the former obstruction retained as evidence. Current continuation belongs in CONSTRUCTION_STATE.
 
 ## Concrete engine-development increment
 

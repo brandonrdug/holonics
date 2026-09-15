@@ -40,6 +40,15 @@ impl<'c> FieldReactionEnclosure<'c> {
         ResidentConstitutiveCurrent::rational(&self.producing_condition)
     }
 
+    /// Apply the same producing reaction to the boundary of a joint current and leave
+    /// its internal coordinates coupled to that boundary through one source enclosure.
+    pub fn apply_joint_current(
+        &self, source: ResidentNormalEnclosureView<'_, 'c>, external: ResidentNormalEnclosureView<'_, 'c>,
+    ) -> Result<ResidentNormalEnclosure<'c>, ConstitutiveFibreError> {
+        self.material.read_applied_bilinear_joint(source, self.source.view().components(),
+            self.producing_condition()?, external)
+    }
+
     pub fn material_observations(&self) -> u64 {
         self.material.observations
     }

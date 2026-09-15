@@ -183,3 +183,36 @@ fn empty_field_variants_remount_without_an_initial_fake_occurrence() {
         assert!(malformed.validate().is_err());
     }
 }
+
+#[test]
+#[ignore = "requires CUDA; joint current codec validates actual w/b and an empty observation history"]
+fn joint_image_rest_matches_outgoing_and_rejects_corruption_without_history() {
+    let readout=ResidentReadout::new().unwrap();
+    let surface=ResidentSurface::on(&readout).unwrap();
+    let mut field=NativeConstitutiveField::found_with_enclosed_junction(&surface,seed(),ResidentGrain(48)).unwrap();
+    field.enable_operative_contacts().unwrap();
+    let source=field.read_current_source().unwrap();
+    let point=surface.mount_section_rest(&ResidentSectionRest::found(1,6,ResidentGrain(0),64,
+        vec![(1,1),(2,2),(3,3),(4,4),(5,5),(6,6)]).unwrap()).unwrap();
+    let input=ResidentNormalInput::Point(ResidentConstitutiveCurrent::integers(&point).unwrap())
+        .enclosure(&surface,ResidentGrain(48)).unwrap();
+    let reflection=source.reflect(input.view()).unwrap();
+    let expected=reflection.output().inspect().unwrap();
+    field.commit_reflection(&reflection).unwrap();
+    let mut rest=field.rest(&[],&[]).unwrap();
+    assert!(rest.current_junction.is_none());
+    assert!(rest.joint_current.is_some());
+    let mut bytes=Vec::new();rest.write(&mut bytes).unwrap();
+    assert!(bytes.starts_with(JOINT_MAGIC));
+    let saved=NativeFieldRest::read(&mut bytes.as_slice(),bytes.len() as u64).unwrap();
+    let (mut resumed,_,_)=NativeConstitutiveField::remount(&surface,saved).unwrap();
+    assert_eq!(resumed.read_current_source().unwrap().enclosure().inspect().unwrap(),expected);
+    let image=rest.joint_current.as_mut().unwrap();
+    let first=image.intervals[0];image.intervals[0]=(first.0+1,first.1+1);
+    assert!(rest.validate().unwrap_err().to_string().contains("joint image disagrees"));
+    rest.joint_current.as_mut().unwrap().intervals[0]=first;
+    let image=rest.joint_current.as_mut().unwrap();
+    let end=image.intervals.len();
+    image.intervals[end-2]=(-1,-1);image.intervals[end-1]=(-1,-1);
+    assert!(rest.validate().unwrap_err().to_string().contains("joint image extent/radius"));
+}

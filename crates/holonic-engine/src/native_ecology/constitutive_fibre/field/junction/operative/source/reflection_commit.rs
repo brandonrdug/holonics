@@ -109,6 +109,7 @@ impl<'c> NativeConstitutiveField<'c> {
         op.origin = origin;
         op.returns = returns;
         op.program = program;
+        junction.joint_current = Some((Rc::clone(&report), Rc::clone(&op.sections.b), Rc::clone(&reflected.output)));
         junction.current = report;
         Ok(())
     }
@@ -162,11 +163,17 @@ mod tests {
         let current = field.read_current_source().unwrap();
         let actual = current.enclosure().inspect().unwrap();
         assert_eq!(actual.center, expected.center);
-        assert!(actual.radius >= expected.radius);
+        assert_eq!(actual, expected);
         assert!(matches!(
             field.commit_reflection(&reflection),
             Err(Error::ForeignOccurrence)
         ));
+        // Changing D through the producing adjoint leaves q untouched, including its
+        // common radius. This must not silently fall back to adding marginal radii.
+        let target = source.enclosure().restrict(0..source.boundary_components()).unwrap();
+        let update = reflection.compare_target(target.view(), 3).unwrap();
+        field.apply_reflection_target(&update, NativeContactRealization::DyadicDeposit).unwrap();
+        assert_eq!(field.read_current_source().unwrap().enclosure().inspect().unwrap(), actual);
         let rest = field.rest(&[], &[]).unwrap();
         let mut bytes = Vec::new();
         rest.write(&mut bytes).unwrap();
@@ -182,5 +189,8 @@ mod tests {
                 .unwrap(),
             actual
         );
+        resumed.advance_resident(&mut NativeFieldOccurrence::entering(vec![NativePhaseCurrent::new(2,1,1).unwrap()])).unwrap();
+        assert!(resumed.junction.as_ref().unwrap().valid_joint_current().is_none());
+        assert_ne!(resumed.read_current_source().unwrap().enclosure().inspect().unwrap().center,actual.center);
     }
 }

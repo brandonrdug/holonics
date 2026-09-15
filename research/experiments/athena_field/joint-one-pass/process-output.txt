@@ -1,0 +1,2 @@
+trained 8 complete field targets
+{"actual_model_targets":8,"output":"/home/b/Workspaces/holonics/research/experiments/athena_field/joint-one-pass","rest_octets":39889,"rest_receiver_match":true}

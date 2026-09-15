@@ -1,0 +1,9 @@
+
+running 5 tests
+test native_ecology::constitutive_fibre::field::junction::operative::source::reflection_commit::tests::committed_reflection_is_the_next_field_and_reopens ... ok
+test native_ecology::constitutive_fibre::field::junction::operative::source::reflection_target::tests::reflected_target_matches_exact_paired_pullback_and_boundary_target ... ok
+test native_ecology::constitutive_fibre::field::material_transport::normal::direct::conditional_tests::conditional_joint_map_preserves_shared_radius_and_affine_tail ... ok
+test native_ecology::constitutive_fibre::field::rest::tests::joint_image_rest_matches_outgoing_and_rejects_corruption_without_history ... ok
+test native_ecology::constitutive_fibre::resident::neighborhood::field_reaction::tests::enclosed_forecast_uses_retained_material_and_commit_checks_freshness ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 2507 filtered out; finished in 197.40s

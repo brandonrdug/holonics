@@ -898,6 +898,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 solver: self.junction.as_ref().expect("existing junction").solver,
                 covariance: next.covariance,
                 current: next.report,
+                joint_current: None,
                 operative,
             });
         }

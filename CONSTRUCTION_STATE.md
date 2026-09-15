@@ -1,21 +1,12 @@
 # Construction state
 
-**Currency:** September 14, 2026. “Continue Athena” has returned the first public
-field-backed trainable model at its declared one-pass scope. The
-[actual outputs, trained model and costs](research/experiments/athena_field/README.md) are available.
-The [construction record](research/records/2026-09-14_THE_CONSTITUTED_FIELD_TRAINS_AND_REOPENS_AS_ONE_HNN_MODEL.md)
-binds its equations and owners. The directly supplied-condition rest rule is also repaired and verified. The older
-uncommitted field-to-predictor assay is preserved as a separate failing remount/word-aperture
-experiment. The old timed goal remains paused.
-
-**Research return:** The [Butler, Koestler and SpiralOS review](research/records/2026-09-14_BUTLER_KOESTLER_AND_HOLONIC_CONSTRUCTION.md)
-now covers the 25 profile entries, publicly recovered later series/components, repository
-interfaces, dialogue and code archives. It includes independent counterexamples, a consistent
-torsion-bearing connection, corrected projected-step/diffusion relations, a recovered dependent
-octant chart, and a convergent golden-weighted zeta source with explicit remainder. Published
-model affirmations and proposed physics are not promoted to proofs or adopted as agent rules.
-The source-qualified conclusions refine the existing HNN consumers; the next engine operation
-below remains selected by “Continue Athena.”
+**Currency:** September 14, 2026. “Continue Athena” now returns the same public field model
+through **48 actual targets and trained reopen**. The former 39-target enclosure failure is
+repaired by carrying the common outward/internal current through its affine/scattering action
+and field rest. [Actual outputs, trained model and costs](research/experiments/athena_field/README.md#completed-repeated-generation)
+and the [construction record](research/records/2026-09-14_THE_JOINT_FIELD_CURRENT_SURVIVES_REPEATED_GENERATION.md)
+are delivered. The earlier one-pass centres and saved model remain verified. The old timed goal
+remains paused; the Butler/Koestler side research is complete and linked below.
 
 ## Active Athena construction brief
 
@@ -25,45 +16,37 @@ A helper, diagram or component pass does not replace the public operation and ge
 
 | Control | Current content |
 |---|---|
-| Authorized deliverable | Continue the field-backed HNN into receiver-relative contextual operation and economical repeated generation. The first model task, actual D/M target response, held-out outputs and local trained rest have returned. Keep those usable while repairing the wider continuation. |
-| Mathematical operation | `r=A(h)s+c(h)`, `u=x+r`, `(w,b_next)=S_D(u,b)`, `y=w`, with stored D/M fixed within generation and developed on actual targets. The shared-input form is `S_D diag(A(h),I) q + S_D(x+c(h),0)`. Retain the joint source through that composition. |
-| Existing owners | `NativeCoupledBody::from_field`; `NativeConstitutiveField`; `NativeFieldCurrentSource`; `NativeFieldReflection` and its target response; `ResidentGeneratorNeighborhood`; native conditional contraction and existing field/body rest. No second model owner. |
-| Concrete unknown/join | A 48-target continuation completed 39 targets, then the next paired adjoint overflowed after repeated enclosure expansion. The current assembly restricts the common outward/interior family into separate balls and recombines them, losing correlations. Fixed-condition contraction and current-delta cancellation are already corrected. |
-| Next consuming operation | Carry the common q through its conditional affine map and scattering, with the matching source/fibre representation in rest. Test the same longer task without dropping radii or inventing a larger semantic limit; then bind changed receiver orientation/material and self-motion through the existing joint derivative. |
-| Completion evidence | Keep the public one-pass output working; return a longer generated/updated section sequence with controlled source-qualified bounds and trained reopen. Receiver work must distinguish physical receiver motion from common recharting and use held-out comparisons. |
+| Authorized deliverable | Continue the same field-backed HNN into receiver-relative contextual operation and economical repeated generation, then usable Athena applications. The original model and its 48-target continuation now return actual D/M learning, held-out outputs and local trained rest. |
+| Mathematical operation | `r=A(h)s+c(h)`, `u=x+r`, `(w,b_next)=S_D(u,b)`, `y=w`. Generation now applies the common-q form directly. Receiver extension uses `y=E q_next` and `delta_y=(delta_E)q_next+E delta_q_next`, including the actual h/D/current variations. |
+| Existing owners | `NativeCoupledBody::from_field`; `NativeConstitutiveField`; `NativeFieldCurrentSource`; `NativeFieldReflection` and producing paired adjoint; `ResidentGeneratorNeighborhood`; conditional joint action and field/body rest. The existing paired linearization and receiving projections supply the next composition. |
+| Concrete unknown/join | The public operation currently has fixed source/receiver restrictions and a supplied exact h. Connect actual changed receiver orientation/material and source-relative motion to its forward/adjoint, including the local conditional variation. The fixed-h enclosure bound already returned does not account for those moving operands by itself. |
+| Next consuming operation | Extend `FieldModel::prepare`/`observe` through the actual receiving map and source/receiver differential. Preserve the common q and producing D/M; distinguish a common coordinate rechart from physical relative motion. Return a held-out contextual receiver task through this same public model. |
+| Completion evidence | The same presented section under different relevant source/receiver surroundings must produce and learn the corresponding consequences. Compare common-rechart covariance separately from changed physical reception; retain outputs, targets, source-qualified bounds, actual costs and trained reopen. |
 | Pending semantics | Retained comparisons carry the producing D, reaction source/condition and output. Actual targets are consumed once; preview/commit evaluate the same operator. Current field-body rest requires resolved comparisons; complete pending-return durability remains explicit roadmap work. |
 | Research steering | The eight-paper foveation/spatial-audio analysis, music/chord recovery and shared aperiodic-field picture are in [Hear the music](research/records/2026-09-14_HEAR_THE_MUSIC_SITUATED_RELEASE_AND_SELF_MOTION.md). They refine the receiver/current operation, not a separate rendering prerequisite. |
 
 ## Returned operation and verification
 
-[established-bounded; measured] `athena_field` uses one field node, one caused contact,
-three complex boundary coordinates and one complex point condition. Twenty-one local examples
-and eight actual model targets lower the four held-out squared centre errors from
-267.358024691 to 26.378035151 (decimal observer presentations of exact rational readings).
-The largest final numerical enclosure radius is below `3/100000000`. The 39,712-byte trained
-rest reopens to exactly the same four held-out balls. This is a finite joint-field task, not
-completed Athena conversation/code behavior.
+[established-bounded; measured] The unchanged three-complex-coordinate task completes 21 local
+examples and all 48 actual model targets. Held-out squared centre error falls from
+267.358024691 to 3.496044848, a 98.692% reduction. The largest final numerical/source radius is
+`1717/281474976710656`. The 81,449-byte trained rest reproduces the same four balls exactly.
+The warm isolated debug process takes 1.088606 seconds, with 291,096 KiB peak process RSS and
+195,156 bytes peak native section accounting. These are finite task/receiver measurements.
 
-[established-bounded; measured] Five focused native tests pass: current publication/reopen,
-paired exact-reference target pullback, enclosed addition/refusal and fixed-condition reaction
-with retained material. The broader normal/rest/source/condition suite passes 144 tests.
-The existing HNA suite returns 11 passes. Its separate pre-existing material-condition assay
-now forms and saves, but reopened prospective word expansion exceeds its carrier/aperture; it
-remains uncommitted with its closure/precision corrections and failure evidence. This surrogate
-assay does not replace or define acceptance of the directly field-backed model.
+[established-bounded; measured] The original one-pass task's twelve inspected centres and all
+three error sums are unchanged exactly. Five focused tests, 165 native regressions and twelve
+public HNN tests pass; the latter include reopening the original delivered model bytes and
+matching their saved state. [Evidence and commands](research/experiments/athena_field/README.md).
+The separate uncommitted surrogate assay retains its previously recorded remount/word aperture
+failure and does not define the direct field model's acceptance.
 
-[established-bounded; source-inspected] The public Field path owns both field and reaction.
-Generation consumes applied M; the complete normal-reference state and its residual stay in
-the producing witness. The paired derivative is adapted to the existing native material adjoint.
-Field rest v3/v4 retains the contemporary junction report instead of silently restoring the last
-ordinary occurrence. Source/grain/owner checks and source ball remainders remain active.
-
-[established-bounded; measured] The longer-run failure and its actual target/output/state are
-preserved in [training-obstruction.json](research/experiments/athena_field/longer-run/training-obstruction.json).
-An earlier concurrent CUDA attempt failed the apparatus allocation-grain measurement; the
-isolated rerun establishes the 39-target model return and subsequent carrier obstruction.
-A grain-72 trial also exposed the existing applied compatibility graph's 64-bit packet aperture;
-that is a separate representation constraint, not a reason to seal a family to its centre.
+[established-bounded; source-inspected] The field shares one complete joint current image,
+qualified by the report and b owners, through material-only updates and rest v5/v6. Generation
+uses the fixed-condition affine action on that common ball; no centre is sealed or source
+radius dropped. Older field-rest versions remain readable. The current representation is an
+outer ball; the operative journal still grows and pending target persistence remains explicit
+roadmap work. Neither is made a new prerequisite for using the returned model sections.
 
 ## Governing synthesis available for this construction
 
@@ -71,6 +54,7 @@ that is a separate representation constraint, not a reason to seal a family to i
 
 - [Butler, Koestler and SpiralOS](research/records/2026-09-14_BUTLER_KOESTLER_AND_HOLONIC_CONSTRUCTION.md): complete public-work comparison, explicit dependency/typing checks, constructive mathematical repairs and observed LLM workflow patterns. No external covenant is an HNN activation gate.
 - [Hear the music](research/records/2026-09-14_HEAR_THE_MUSIC_SITUATED_RELEASE_AND_SELF_MOTION.md): eight primary-paper analyses, receiver morphology/resolution, self-motion, chord-class and coherent phase relations, and the aperiodic-field/finite-conduction synthesis.
+- [Joint current through repeated generation](research/records/2026-09-14_THE_JOINT_FIELD_CURRENT_SURVIVES_REPEATED_GENERATION.md): common-source affine/scattering bound, producing current ownership, field-rest v5/v6 and the returned 48-target model task.
 - [Model formula and library join](research/records/2026-09-14_THE_HNN_FORMULA_JOINS_THE_LIBRARY_TO_THE_MODEL.md), [computational Holon](docs/HOLON.md) and [engine blueprint](docs/ATHENA_ENGINE_BLUEPRINT.md): one current/material/incidence object, whole-field generation, actual operator and derivative owners.
 - [Continuing plates and moving current](research/records/2026-09-14_CONTINUING_PLATES_AND_THE_RECEIVER_RIDING_THE_CURRENT.md): receiving interfaces can have storage, material, current and motion inside the joint forward/adjoint. Causal memory does not prescribe an event archive.
 - [Swing/fluid construction](docs/HOLONIC_FLUID_CONSTRUCTION.md) and [dynamic interior memory](docs/FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md): actual constitutive scattering, mixed feedback, Hodge modes and changing-boundary residuals.
