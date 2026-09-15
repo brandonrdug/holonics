@@ -256,4 +256,39 @@ theorem zero_curve_velocity_riemannXi {z z' : ℝ → ℂ} (hz : ∀ s, HasDeriv
   zero_curve_velocity differentiable_riemannXi hasGrowth_riemannXi A_nonneg (by norm_num)
     (by norm_num) (by norm_num) hz hz' hzero hs
 
+/-- Local residual decay for the evolving source. This is a chain-rule consequence on an
+admitted curve, not an existence or global convergence theorem for that curve. -/
+theorem hasDerivAt_heatE_comp_residual_guided
+    (hf : Differentiable ℂ f) (hg : HasGrowth f A B ρ) (hA : 0 ≤ A)
+    (hB : 0 ≤ B) (hρ0 : 0 < ρ) (hρ2 : ρ < 2) {z z' : ℝ → ℂ}
+    (hz : ∀ s, HasDerivAt z (z' s) s) (hz' : Continuous z') (t₀ : ℝ)
+    (hs : heatE t₀ (deriv f) (z t₀) ≠ 0)
+    (hmotion : z' t₀ =
+      (-heatE t₀ f (z t₀) + heatE t₀ (deriv (deriv f)) (z t₀)) /
+        heatE t₀ (deriv f) (z t₀)) :
+    HasDerivAt (fun s : ℝ => heatE s f (z s))
+      (-heatE t₀ f (z t₀)) t₀ := by
+  have h := hasDerivAt_heatE_comp hf hg hA hB hρ0 hρ2 hz hz' t₀
+  apply h.congr_deriv
+  rw [hmotion]
+  field_simp [hs]
+  ring
+
+theorem hasDerivAt_heatE_comp_residual_guided_riemannXi
+    {z z' : ℝ → ℂ} (hz : ∀ s, HasDerivAt z (z' s) s)
+    (hz' : Continuous z') (t₀ : ℝ)
+    (hs : heatE t₀ (deriv riemannXi) (z t₀) ≠ 0)
+    (hmotion : z' t₀ =
+      (-heatE t₀ riemannXi (z t₀) +
+        heatE t₀ (deriv (deriv riemannXi)) (z t₀)) /
+        heatE t₀ (deriv riemannXi) (z t₀)) :
+    HasDerivAt (fun s : ℝ => heatE s riemannXi (z s))
+      (-heatE t₀ riemannXi (z t₀)) t₀ :=
+  hasDerivAt_heatE_comp_residual_guided differentiable_riemannXi
+    hasGrowth_riemannXi A_nonneg (by norm_num) (by norm_num) (by norm_num)
+    hz hz' t₀ hs hmotion
+
 end Soma.Holonics.RH.ZeroDynamicsEntire
+
+#print axioms Soma.Holonics.RH.ZeroDynamicsEntire.hasDerivAt_heatE_comp_residual_guided
+#print axioms Soma.Holonics.RH.ZeroDynamicsEntire.hasDerivAt_heatE_comp_residual_guided_riemannXi

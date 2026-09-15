@@ -76,6 +76,51 @@ impl ComplexJet2 {
     fn divide(&self, other: &Self, bits: u32) -> Result<Self, ExactAnalysisError> {
         Ok(self.multiply(&other.reciprocal(bits)?, bits))
     }
+
+    /// The logarithmic current `f'/f`, returned as a complete complex enclosure.
+    pub fn logarithmic_current(&self) -> Result<ComplexInterval, ExactAnalysisError> {
+        self.first.divide(&self.value)
+    }
+
+    /// The residual velocity `-f/f'` used by a Newton-style release.
+    pub fn residual_velocity(&self) -> Result<ComplexInterval, ExactAnalysisError> {
+        self.residual_velocity_with_source_rate(&ComplexInterval::zero())
+    }
+
+    /// Solve `f_s v + source_rate = -f` for a changing analytic source. The supplied rate is
+    /// the partial derivative at fixed spatial coordinate, including its declared clock rate.
+    /// For backward heat, `source_rate = -u_dot * f_ss`. At a simple zero this reduces to the
+    /// heat-driven zero velocity; away from it the same operation releases the residual.
+    pub fn residual_velocity_with_source_rate(
+        &self,
+        source_rate: &ComplexInterval,
+    ) -> Result<ComplexInterval, ExactAnalysisError> {
+        self.value.add(source_rate).neg().divide(&self.first)
+    }
+
+    /// Release image `z - λ f/f'` for the supplied source point `z` and scale `λ`.
+    pub fn relaxed_release(
+        &self,
+        z: &ComplexInterval,
+        lambda: &Rat,
+    ) -> Result<ComplexInterval, ExactAnalysisError> {
+        Ok(z.subtract(&self.value.divide(&self.first)?.scale(lambda)))
+    }
+
+    /// Derivative of the relaxed release, `1 - λ + λ f f''/(f')²`.
+    pub fn relaxed_release_derivative(
+        &self,
+        lambda: &Rat,
+    ) -> Result<ComplexInterval, ExactAnalysisError> {
+        let ratio = self
+            .value
+            .multiply(&self.second)
+            .divide(&self.first.multiply(&self.first))?;
+        Ok(
+            ComplexInterval::point(RatComplex::new(Rat::one() - lambda, Rat::zero()))
+                .add(&ratio.scale(lambda)),
+        )
+    }
 }
 
 pub(super) fn negative_complex_power_jet2(
@@ -616,6 +661,14 @@ pub fn eta_evaluate_jet2_with_head(
     })
 }
 
+/// `eta`, `eta'`, and `eta''` with the Euler--Maclaurin head supplied by this owner.
+pub fn eta_evaluate_jet2(
+    receiver: &ComplexReceiverBox,
+    config: &ExactSeriesConfig,
+) -> Result<Jet2Evaluation, ExactAnalysisError> {
+    eta_evaluate_jet2_with_head(receiver, config, None)
+}
+
 /// A rational upper bound for `|eta''(s)|` throughout one receiver box.
 ///
 /// The finite prefix is bounded termwise.  The alternating tail is bounded by
@@ -665,4 +718,129 @@ pub fn eta_second_derivative_bound(
     let tail =
         &amplitude * (log_square + integer(2) * first_log_integral + s_bound * second_log_integral);
     Ok(dyadic_ceil(&(finite + tail), config.dyadic_bits))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::exact::rat;
+
+    fn point(real: i64, imaginary: i64) -> ComplexInterval {
+        ComplexInterval::point(RatComplex::new(rat(real, 1), rat(imaginary, 1)))
+    }
+
+    #[test]
+    fn polynomial_jet_exposes_log_current_release_and_release_derivative() {
+        // f(z)=z² at z=1: f=1, f'=2, f''=2.
+        let jet = ComplexJet2 {
+            value: point(1, 0),
+            first: point(2, 0),
+            second: point(2, 0),
+        };
+        assert_eq!(jet.logarithmic_current().unwrap(), point(2, 0));
+        assert_eq!(
+            jet.residual_velocity().unwrap(),
+            ComplexInterval::point(RatComplex::new(rat(-1, 2), rat(0, 1)))
+        );
+        assert_eq!(
+            jet.relaxed_release(&point(1, 0), &rat(1, 2)).unwrap(),
+            ComplexInterval::point(RatComplex::new(rat(3, 4), rat(0, 1)))
+        );
+        assert_eq!(
+            jet.relaxed_release_derivative(&rat(1, 2)).unwrap(),
+            ComplexInterval::point(RatComplex::new(rat(3, 4), rat(0, 1)))
+        );
+    }
+
+    #[test]
+    fn changing_heat_source_and_residual_share_the_tangent_equation() {
+        // F(s,u)=s²−2u: F_u=−2, F_s=2s. At (s,u)=(2,1), F=2.
+        let jet = ComplexJet2 {
+            value: point(2, 0),
+            first: point(4, 0),
+            second: point(2, 0),
+        };
+        let source_rate = jet.second.neg();
+        let velocity = jet
+            .residual_velocity_with_source_rate(&source_rate)
+            .unwrap();
+        assert_eq!(velocity, point(0, 0));
+        assert_eq!(
+            jet.first.multiply(&velocity).add(&source_rate),
+            jet.value.neg()
+        );
+        // On its moving simple zero (s,u)=(2,2), the velocity is F_ss/F_s=1/2.
+        let zero_jet = ComplexJet2 {
+            value: point(0, 0),
+            ..jet
+        };
+        let velocity = zero_jet
+            .residual_velocity_with_source_rate(&source_rate)
+            .unwrap();
+        assert_eq!(
+            velocity,
+            ComplexInterval::point(RatComplex::new(rat(1, 2), rat(0, 1)))
+        );
+        assert_eq!(
+            zero_jet.first.multiply(&velocity).add(&source_rate),
+            point(0, 0)
+        );
+    }
+
+    #[test]
+    fn affine_rechart_transports_relaxed_release_covariantly() {
+        // w=3z+2 and f̃(w)=3f((w-2)/3) preserve the Newton correction as an affine map.
+        let jet = ComplexJet2 {
+            value: point(1, 0),
+            first: point(2, 0),
+            second: point(2, 0),
+        };
+        let release = jet.relaxed_release(&point(1, 0), &rat(1, 2)).unwrap();
+        let recharted = ComplexJet2 {
+            value: point(3, 0),
+            first: point(2, 0),
+            second: ComplexInterval::point(RatComplex::new(rat(2, 3), rat(0, 1))),
+        };
+        let release_recharted = recharted.relaxed_release(&point(5, 0), &rat(1, 2)).unwrap();
+        let expected = ComplexInterval::point(RatComplex::new(rat(17, 4), rat(0, 1)));
+        assert_eq!(release_recharted, expected);
+        assert_eq!(
+            release.scale(&rat(3, 1)).add(&point(2, 0)),
+            release_recharted
+        );
+    }
+
+    #[test]
+    fn logarithmic_current_can_fail_at_zero_but_simple_release_remains_valid() {
+        let simple_zero = ComplexJet2 {
+            value: point(0, 0),
+            first: point(1, 0),
+            second: ComplexInterval::zero(),
+        };
+        assert!(matches!(
+            simple_zero.logarithmic_current(),
+            Err(ExactAnalysisError::DivisionByIntervalContainingZero)
+        ));
+        assert_eq!(simple_zero.residual_velocity().unwrap(), point(0, 0));
+        assert_eq!(
+            simple_zero
+                .relaxed_release(&point(0, 0), &rat(1, 1))
+                .unwrap(),
+            point(0, 0)
+        );
+
+        let zero_derivative = ComplexJet2 {
+            value: point(1, 0),
+            first: ComplexInterval::zero(),
+            second: point(2, 0),
+        };
+        assert!(matches!(
+            zero_derivative.residual_velocity(),
+            Err(ExactAnalysisError::DivisionByIntervalContainingZero)
+        ));
+        assert!(matches!(
+            zero_derivative.relaxed_release(&point(1, 0), &rat(1, 1)),
+            Err(ExactAnalysisError::DivisionByIntervalContainingZero)
+        ));
+    }
 }

@@ -71,6 +71,16 @@ uses its implicit normalized-log relation. A display evaluator does not establis
 state or branch. The exact phase reference composes these existing owners into actual interval
 currents and receiver decisions; no live Lean invocation or floating midpoint enters the map.
 
+[established-bounded; implemented-exact] The [analytic construction](ANALYTIC_FLUX_AND_RECEIVING_BASINS.md)
+is exported through `holonics::geometry`: `ComplexJet2` exposes logarithmic current, residual
+velocity, changing-source residual velocity and the relaxed release/differential.
+`certify_capture` and `propagate_to_capture` consume that same enclosed source callback.
+`mean_value_release` retains the whole source region through its centered differential
+inclusion; failed/exhausted propagation returns the complete current region. The actual ζ
+application uses the existing Euler–Maclaurin jets and independent η winding receiver.
+These are CPU exact analytic owners, with source-domain and same-source certificate contracts;
+they do not invoke Lean or substitute for the resident GPU field implementation.
+
 [established-bounded; implemented-exact] `holonics::geometry::project_point_with_motion`
 now composes the declared frame route and orientation with source velocity and the combined
 chart rates `L̇,ḃ`; it returns the existing projected face plus its exact derivative.

@@ -247,6 +247,14 @@ encoding consumers remain the actual integration work named by their equations a
 
 ## Continuing-field correction
 
+[definition] The [analytic flux construction](ANALYTIC_FLUX_AND_RECEIVING_BASINS.md) makes
+the subsequent source/receiver synthesis explicit: `F_s v=-F-u_dot F_u` joins source change
+to residual release, and `T^R_n=e_(n+1) T_n e_n^-1` carries the relative evolving field through
+changing receiver charts. Its first-arrival populations use the actual partial generator and
+moving receiving regions. Potential/phase one-forms, inverse-branch Jacobians and contour
+periods supply analytic measurements; moving a view or measuring entropy alone supplies none
+of those dynamics. The source guide separates coordinate reexpression from physical coupling.
+
 [project-postulate] The fixed-ray example above is a local optical control. Brandon rejected
 its use as the HNN field illustration because the field itself must continue relative to R.
 The [replacement construction](../research/experiments/hnn_field_architecture/CONTINUING_FIELD.md)

@@ -23,12 +23,12 @@ Cauchy's theorem kills it.  So the index is exactly a winding number, and the an
 gauge: it can be deformed freely without moving the count.  That is the phase-object reading of a
 divisor — the whole content lives in the turn.
 
-**The boundary, measured 2026-08-23.**  Extending this to a rectangle — the shape the critical
-strip needs — is *not* available: `grep -rn "argument principle\|argumentPrinciple" Mathlib/Analysis/`
-returns nothing, and `Mathlib/Analysis/Complex/HasPrimitives.lean` carries rectangle integrals only
-as a device for constructing primitives, with no homotopy-invariance or index statement attached.
-So `theZeroCountIsAWinding` over a box owes a contour-deformation argument that mathlib does not
-supply, and this file supplies its local input rather than claiming the whole.
+**Later exact owners.**  The local factorization proved here is now composed by
+`RH.RectangleArgumentPrinciple.rectIntegral_mul_logDeriv`, which returns the multiplicity-weighted
+zero population inside an admissible rectangle.  `RH.WeightedArgumentPrinciple.hasWeightedArgumentPrinciple`
+discharges the corresponding weighted circle receiver for every admissible xi contour, including
+the finite divisor support and the nonvanishing boundary hypothesis.  This file remains the local
+factor and circle-integral owner; those later files own the rectangle and weighted xi compositions.
 -/
 
 namespace Soma.Holonics.RH.Winding

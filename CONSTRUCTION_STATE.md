@@ -1,10 +1,33 @@
 # Construction state
 
-**Currency:** September 14, 2026. Brandon rejected the frozen source/three-ray receiver
-illustration: the continuing Holonic field itself must evolve relative to the receiver as a
-coupled cloud/vortex with circulation, diffusion and recursively unfolding geometry. The
-previous moving-aperture example is a local optical control and does not discharge that request.
-The timed goal remains paused.
+**Currency:** September 14, 2026. Brandon explicitly directs construction of the analytic
+dynamics and receiving/preimage populations previously deferred as additional mathematics.
+The deliverable is the reusable mathematical operation and its real source application;
+visualization is a receiver, not the completion criterion. The timed Athena goal remains paused.
+
+## Analytic construction returned
+
+[project-postulate] Construct source-derived release and recursively pulled-back receiving
+regions, joining the RH analytic populations to potential/phase circulation and Hodge periods.
+Use the existing enclosed analytic jets, Holon/preimage composition, first-arrival populations
+and argument-principle/winding owners. The operation solves `f'(z)v=-f(z)` and transports full
+compatible source regions; an authored point cloud or fixed torus arrangement cannot replace it.
+
+[proved-derived; formal-checked] The [analytic return](research/records/2026-09-14_ANALYTIC_RELEASE_AND_RECURSIVE_RECEIVING_POPULATIONS.md)
+binds the source-derived release to `Holon`, the exact preimage equation and first-arrival
+populations under changing receiver charts. The existing ξ heat-flow chain theorem now also
+derives residual-guided motion of the changing source. `Framework.Dynamics` and the RH
+`FosterClassHeatFlow` consumer build with these joins.
+
+[established-bounded; computational-witness] The shared exact Rust library now consumes complete
+analytic jets for release, centered differential propagation and local contraction capture.
+The actual ζ application returned three certified receiving neighborhoods with independent
+winding one each; nine full source regions were captured in one to three releases. It retains
+pole/domain refusal and horizon-exhausted regions. Twenty analytic tests and the reduced public
+SDK check pass. The [source guide](docs/ANALYTIC_FLUX_AND_RECEIVING_BASINS.md) connects these
+operations to phase/potential circulation and the HNN formula. Finite capture does not establish
+a global fractal dimension; finite-time ξ heat evaluation and native GPU lowering have not been
+implemented by this return. The pre-existing native Athena draft remains paused and preserved.
 
 ## Continuing-field correction returned
 

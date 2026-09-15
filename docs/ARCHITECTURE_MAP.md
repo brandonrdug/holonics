@@ -1178,6 +1178,7 @@ not with the shape of a familiar network diagram. The actual related owners are:
 | Higher shared cells and boundary compatibility | `algebraic.rs::GradedCausalComplex` | Arbitrary chain degree, `∂²=0` and chain maps |
 | Toroidal phase charts and current around closed paths | `analytic_field.rs`; `implicit.rs`; `lattice_gauge.rs`; `structure_group.rs` | Carrier equations, phase, winding and ordered holonomy |
 | Nonlinear recursive operation and first-arrival geometry | `HolonicRecurrentEcology.FirstArrival`; `basin.rs` for bounded outcome regions | Full preimages, first-reception populations and chart covariance |
+| Analytic residual current, changing source and recursive receiving regions | `Mathematics/AnalyticNavigation.lean`, `AnalyticReceiving.lean`; `RH/ZeroDynamicsEntire.lean`; `relational-geometry::exact_analysis::{ComplexJet2,certify_capture,mean_value_release,propagate_to_capture}` | Actual source jet, partial-map Holon, time-varying chart covariance, backward-heat residual law, enclosed ζ traversal and η circulation receiver; [scope and equations](ANALYTIC_FLUX_AND_RECEIVING_BASINS.md) |
 | Current, material and changing geometry | Active constitutive field/junction; `discrete_curvature.rs` at its declared hinge-response scope | Coupled operation on the existing current and incidence |
 | Restriction and receiver-compatible compression | Tube/clocked span, mode quotient, `FractalPacking` | Recursive rebase, retained phase/fibre and specialized separated restriction |
 

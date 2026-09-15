@@ -238,6 +238,16 @@ time or a chosen inverse. Repeated stretching, folding, passage near saddle regi
 restriction can produce fine interleaving. A small sampled dimension or a finite picture
 alone neither proves infinite-scale fractality nor replaces this generator.
 
+[definition] The [analytic flux and receiving-basin construction](ANALYTIC_FLUX_AND_RECEIVING_BASINS.md)
+now binds that recursion to a supplied holomorphic source: `f_s v=-f`, its enclosed release
+and derivative, complete preimage equation and certified receiving neighborhoods. The same
+law for a changing source is `F_s v=-F-u_dot F_u`; backward heat joins it to the existing
+RH zero motion. `AnalyticReceiving` binds the admitted operation to `Holon` and clocked
+first arrivals; `relational-geometry::exact_analysis` supplies its executable enclosure and
+capture operations. These are reusable analytic realizations of field refinement, not a
+requirement to choose Newton dynamics as every HNN's constitutive law. Their logarithmic
+one-form and contour periods connect actual potential/phase circulation to the Hodge owners.
+
 [definition] A basin figure uses a declared family `z(a,b)=z₀+a u+b v` or a valid manifold
 section. Its coordinates label initial conditions for **one** full recurrence. Color may
 read first arrival, decoded settling or another specified consequence. Its nonlinear

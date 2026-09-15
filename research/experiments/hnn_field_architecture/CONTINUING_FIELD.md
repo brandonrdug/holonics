@@ -21,6 +21,13 @@ choice for this example. It was not inferred from Athena material or from an RH/
 The construction checks coupled evolution and reception; it does not yet analyze a particular
 RH or Hodge population.
 
+[definition] Brandon's subsequent instruction promotes the analytic population construction
+to implemented mathematical work. The [analytic flux guide](../../../docs/ANALYTIC_FLUX_AND_RECEIVING_BASINS.md)
+now connects source-driven release, backward-heat source evolution, moving chart recurrence,
+complete preimages and potential/phase circulation. Its exact ζ receiving-basin application
+uses actual analytic jets. The six-mode movie remains the supplied constitutive example above;
+it is not silently relabeled as that analytic population.
+
 [definition] A Hodge investigation should instead start from the actual chosen complex,
 restriction maps and metric, hence its `Δ=dδ+δd`, then decompose current into exact, coexact
 and harmonic components. The existing `HodgeFiniteDecomposition`, `TemporalHodgeResidue`,
