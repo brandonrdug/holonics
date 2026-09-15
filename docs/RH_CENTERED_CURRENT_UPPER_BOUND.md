@@ -60,6 +60,64 @@ J_R(s)=2 Σ_(w≠s,s†) m_w (Re(s)−Re(w))/|s−w|².
 automatically a maximum of the entire source. Its exterior population must be retained through
 the actual current/tail relation, or a proved orientation of that complement.
 
+## Riding the current: the recovered complex Burgers source
+
+[proved-derived] The September 5 [heat/current construction](../research/records/2026-09-05_MFR3_THE_ORIENTED_ENTROPY_CURRENT_RETURNS_ITS_HEAT_SOURCE_AND_COMPLEX_PHASE.md)
+already supplies the logarithmic heat relation. Apply it to the actual seam source
+`G_τ=G_ss` on a zero-free patch. For `L=G_s/G` and `u=−2L`,
+
+```text
+L_τ=L_ss+2 L L_s,
+u_τ+u u_s=u_ss.
+```
+
+This is an exact complex Burgers realization. Near a simple zero s₀(τ), write
+`u=−2/(s−s₀)+u_reg+O(s−s₀)`. The double-pole coefficient in the PDE is
+`2(u_reg−s₀_dot)`, so `s₀_dot=u_reg=−G_ss(s₀)/G_s(s₀)`.
+Thus the preceding zero-current equation is precisely motion of the pole under its
+regularized surrounding field. The displayed real half-centre is not itself a current;
+it is a reference locus of this current's divisor/receiver relation.
+
+[definition] The derivative here is the holomorphic `∂_s` in one complex variable.
+Its square is not the Euclidean Laplacian on the two real coordinates of ℂ. A complex
+Euler/NS system on ℂⁿ additionally specifies its metric, real/complex tangent pairing,
+divergence/pressure condition and constitutive stress. The existence of that equation
+or of a local solution does not settle the singularity population of this particular source.
+
+[proved-derived] In a moving complex chart `q=s−b(τ)`, the received velocity
+`U(τ,q)=u(τ,q+b(τ))−b_dot` satisfies
+`U_τ+U U_q=U_qq−b_double_dot`. Following a pole fixes its displayed q-coordinate, while
+the image of the critical line becomes `{1/2+iη−b(τ):η∈ℝ}`. The relative normal gap is
+unchanged. A dilation r=Ld also transports its metric: `r²/L²=d²`, and the derivative
+retains the `L_dot` term. Choosing an observer can simplify the current/estimate, but
+centring the view does not establish zero separation from the transported critical line.
+
+[established-bounded; computational-witness] The
+[moving-plate/Burgers audit](../research/experiments/mfr_entropy_heat_current/moving_plate_and_burgers.json)
+checks the quotient-jet PDE, its pole coefficient, the accelerating-frame source and
+normalized gap/rate. It also constructs an explicit reflected-quartet polynomial heat
+source and verifies its Burgers law and initial normal/tangential pole velocities. That
+control obeys the same local PDE and symmetries while having off-line initial zeros.
+Consequently a universal existence or covariance theorem for those equations alone cannot
+prove RH; the bound must use the actual ξ kernel/source conditions.
+
+[definition] A relativistic realization needs a declared spacetime metric, causal propagation
+law, material/receiver world-tube and a source-preserving map to this analytic field. The
+complex coordinate s and heat parameter τ do not acquire a physical Lorentz metric from
+their notation. Maxwell/causal-current estimates become relevant to RH through an explicit
+map that preserves the ξ source, pole/zero population, time conversion and required
+inequality. Existing finite-relaxation current laws explain how retained flux gives a
+finite front and how a parabolic heat law can arise as an effective reduction. Replacing
+the actual ξ heat source by a different hyperbolic system would require that comparison.
+
+[proved-derived] A fixed nonsingular smooth frame change with bounded inverse derivative
+on the region is bi-Lipschitz there. Its upper/lower diameter bounds preserve Hausdorff
+dimension; a Lorentz boost alone therefore cannot generate intrinsic fractality.
+Different receiver intersections, projections, apertures and limiting scale families can
+expose different faces or apparent dimensions. Their fibre and metric must be retained.
+An optical/causal horizon is derived from propagation to the receiver, not identified
+with an arbitrary plotted basin boundary.
+
 ## The finite source error already exists
 
 [established-bounded; source-inspected] `FosterClassFlux.comb'_sub_le` already bounds the

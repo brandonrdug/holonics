@@ -45,6 +45,72 @@ For a linear receiving chart this reduces to `ẏ=q̇x+qẋ`, already proved by
 Replacing the receiving Holon by a fixed row vector suppresses a term whenever that row
 actually changes. Conversely, a fixed receiver map remains a valid stated specialization.
 
+## A displayed body is a cut; its plates can be continuing bodies
+
+[definition] A rendered frame is a present spatial/receiving cut of a world-tube and its
+field sections. The chosen window can be bounded without establishing a physically closed
+body or a definite value for every unobserved interior. An exposure may integrate a finite
+interval rather than one instantaneous slice. The complete source retains its evolution,
+incoming boundary conditions and relevant unobserved modes.
+
+[definition] Brandon's subsequent plate-chain clarification makes the interface itself
+active: a membrane/plate Σ(t) can carry surface charge, tangential current, material state,
+deformation and its own internal modes. It participates as a Holon, receives from the
+adjacent fields and conducts/emits into others. A smooth manifold is a local plate chart;
+junctions, branching and singular contacts can require the existing stratified/cellular
+description. Geometry supplies the incidence and metric; capacitance additionally requires
+its constitutive storage–potential relation. A drawn surface alone does not specify C.
+
+[proved-derived] For a moving volume with boundary velocity w, a conserved bulk density ρ
+and laboratory current j obey the relative-flux balance
+
+```text
+d/dt ∫_(Ω(t)) ρ = −∫_(∂Ω(t)) (j−ρw)·n + ∫_(Ω(t)) source.
+```
+
+For a smooth membrane separating minus/plus bulk fields, normal n points from minus to plus.
+Here ρ_± and j_± are charge densities and charge currents. With surface charge σ,
+tangential conduction j_Σ and material derivative D_t^Σ,
+
+```text
+D_t^Σ σ + σ div_Σ w + div_Σ j_Σ
+ = [(j_-−ρ_-w)−(j_+−ρ_+w)]·n.
+```
+
+These continuum identities use the actual moving surface/volume transport theorem. Surface
+sources add their declared term. Under `σ=C_m V`, V the potential jump, the left side includes
+`C_m D_t^Σ V + V D_t^Σ C_m + C_m V div_Σ w`. Its geometry/material and area terms are part of
+the receiver's response. They cannot be removed by holding the rendered plate stationary.
+
+[definition] For several coupled plates, capacitance is generally an operator from relative
+potentials to stored charges, not one coefficient per drawn surface. In an isolated
+electrostatic chart its common-potential direction is a gauge; grounded/reference charts
+restrict that direction explicitly. The shared difference and normalization patterns are
+reusable in attention, but the actual constitutive law decides the participation/current.
+
+[proved-derived] In a lumped two-sided membrane restriction, `q=C V` and
+`I=C V_dot+C_dot V+g V`. Its power identity is
+`V I=d(CV²/2)/dt+gV²+C_dot V²/2`. The last term is exchange with changing geometry/material.
+The existing port-energy and conducting-channel laws supply its inductive/current extension;
+`HolonicMembraneActionTransport` and `ConstitutiveWorldTube` supply addressed membrane and
+constitutive scope. The [exact symbolic join](../research/experiments/mfr_entropy_heat_current/moving_plate_and_burgers.json)
+checks the lumped identity and a separating omission of `C_dot V`. It is not a calibrated
+biological membrane or a proof of the full continuum surface law by finite algebra.
+
+[definition] A context stack is usefully read as live nested causal couplings and continuations:
+active ports, storage, current, phase, constraints and pending interactions. A call stack is
+one restricted ordering; biological and field interactions can be cyclic, branched and
+asynchronous. Their causal memory can reside in material, modes and an evolution kernel.
+It does not prescribe a literal stack trace or archive of every past source. Eliminating an
+interior produces the existing memory term `B U(t,s) C` and its initial-state contribution.
+The retained state must realize those future boundary effects.
+
+[proved-standard] The classical Hodgkin–Huxley membrane is a concrete biological
+restriction: capacitive storage is coupled to ionic conductances whose states respond to
+voltage and time. It illustrates an active receiving boundary rather than a passive viewing
+plane. Its particular constitutive equations are not a universal HNN law.
+[Original membrane-current construction](https://physoc.onlinelibrary.wiley.com/doi/10.1113/jphysiol.1952.sp004764).
+
 ## Perspective is a physical relation before it becomes screen coordinates
 
 [definition] In a relativistic realization, the receiver has a world-tube χ_R and a

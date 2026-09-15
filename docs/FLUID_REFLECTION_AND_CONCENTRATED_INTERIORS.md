@@ -134,6 +134,35 @@ lightning simulation.
 
 ## Integration by reflection: the dynamic return is essential
 
+### Continuing plates couple the matter and electromagnetic fields
+
+[definition] The [continuing membrane](RECEIVER_HOLARCHY.md#a-displayed-body-is-a-cut-its-plates-can-be-continuing-bodies)
+is an active boundary subsystem of the same source: its charge, tangential current, material
+and motion affect the adjacent fields. Maxwell's differential-form equations can be written
+`dF=0`, `dG=J`, where the excitation G is determined by the metric and the actual material
+constitutive relation to F. This formulation carries changing electric/magnetic receiving
+faces without assuming fixed perpendicular plates or a single global I/O direction.
+
+[proved-standard] In a nonrelativistic moving conductor with a declared scalar conductivity,
+the conduction law includes `j_cond=σ(E+u×B)`. Faraday's moving-loop EMF is
+`∮(E+w×B)·dl=−d/dt∫_(Σ(t))B·n`. The momentum equation receives `ρ_e E+j×B`
+and the Maxwell traction; current heating changes thermal state and therefore conductivity.
+The curl of the induction law transports and stretches magnetic flux through the fluid.
+Fluid vorticity and electric current are coupled fields, not interchangeable operands.
+[Induction and Lorentz force](https://www.feynmanlectures.caltech.edu/II_17.html),
+[electrodynamics](https://www.damtp.cam.ac.uk/user/tong/justem.html).
+
+[definition] The common construction includes conduction, displacement/polarization current,
+radiation and material momentum transport with their respective constitutive laws. Vacuum
+electromagnetic propagation does not require a stream of conducting electrons. A biological
+membrane additionally supplies its ionic/electrochemical transport and channel kinetics.
+The leader/channel equations above already couple charge transport, ionization, conductivity,
+heat and changed geometry; the continuum Euler/NS and Maxwell stress account describes their
+fluid response at the declared approximation. This is the reusable feedback the engine's
+context/attention interfaces should retain.
+
+### Elimination retains the boundary's dynamical memory
+
 [proved-derived] The existing diffusion/Schur construction solves the interior row and
 substitutes it at the boundary:
 

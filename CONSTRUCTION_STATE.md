@@ -1,11 +1,20 @@
 # Construction state
 
-**Currency:** September 14, 2026. Brandon requests an actual Athena engine blueprint and
-source synthesis, preparing the next engine development, alongside de Bruijn–Newman
-upper-bound work using the half-centred face and evolving-source current. The timed goal
-remains paused. This request does not reinstate the surrogate-field predictor as the model.
+**Currency:** September 14, 2026. Brandon refines the engine's field/receiver ontology:
+the rendered body is a contemporary cut, and its capacitating plates can themselves be
+continuing fields. The current synthesis joins moving membranes, circuitry/induction and
+the RH current viewed from a moving receiver. The engine blueprint's next direct field
+attachment remains the construction target; the timed goal remains paused.
 
 ## Engine blueprint and upper-bound synthesis
+
+[definition] The [continuing-plate return](research/records/2026-09-14_CONTINUING_PLATES_AND_THE_RECEIVER_RIDING_THE_CURRENT.md)
+places receiver/interface storage, current, material and motion inside the joint forward
+and adjoint operation. The context/continuation graph need not be a literal event archive.
+The recovered heat-to-Burgers map identifies RH zero motion with the regular current at
+its poles; moving with a pole also transports the critical line and introduces the receiver
+acceleration term. Exact symbolic source/plate identities are returned at their stated scope.
+No new global RH bound or completed physical Lorentz realization is inferred from that rebase.
 
 [project-postulate] The [Athena engine blueprint](docs/ATHENA_ENGINE_BLUEPRINT.md) is the
 illustrated reading of the standing assembly contract. The next engine operation puts the

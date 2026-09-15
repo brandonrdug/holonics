@@ -31,6 +31,13 @@ participation and local learned reactions. A pure fixed scattering map is linear
 preserving; its existence alone does not supply learned nonlinear organization. Nonlinear
 material/participation and changing incidence enter through their own existing laws.
 
+[definition] The subsequent [continuing-plate clarification](RECEIVER_HOLARCHY.md#a-displayed-body-is-a-cut-its-plates-can-be-continuing-bodies)
+applies to this same assembly. A receiving interface can have its own field, storage, current,
+material and motion, coupled into the joint HNN state. A pictured boundary is one cut of that
+interaction, not an inert terminal surface. Its state-dependent transport/participation and
+receiving differential are part of the forward/adjoint composition. Context is carried by
+those live couplings and retained interior responses; a literal event stack is not introduced.
+
 [definition] The generative invocation and its training comparison use the same operator.
 For output covectors `g_w,g_b`, define `λ=A^(-1)(g_w+D g_b)` in this unit-admittance chart.
 Its complete local reverse calculation is
