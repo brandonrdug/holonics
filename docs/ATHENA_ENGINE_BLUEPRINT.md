@@ -7,6 +7,14 @@ not another plan or a new model definition. [HNN_FORMULA](HNN_FORMULA.md) owns t
 the roadmap owns construction order, and CONSTRUCTION_STATE records the current position.
 The elementary-holon-generation plates and the interactive blueprint use this same assembly.
 
+[definition] The [complete delivery plan](plans/THE_ROADMAP.md#athena-construction-order)
+now carries seven milestones from a trainable field-backed operation to usable Athena,
+broader receivers, hardening and executable interoperability. The
+[first increment](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#first-implementation-increment)
+fixes the initial reaction/scattering order, resident source/condition ports, section receiver,
+producing-handle sequence and measured output. This illustrated guide remains a reading
+surface for those contracts, not a parallel schedule.
+
 ## The model that generates and learns
 
 [definition] Athena uses one continuing HNN object `M=(K,Θ,|H⟩)`: caused contact incidence and

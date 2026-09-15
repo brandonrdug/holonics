@@ -1,402 +1,239 @@
 # The roadmap
 
-[definition] This is the sole construction order. Brandon's latest direct instruction governs.
-[CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) records the current position;
-[the Athena blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
-specifies native changes. Dated research supplies evidence, not additional schedules.
+[definition] This is the sole construction order for HNN and Athena. Brandon's latest direct
+request governs. [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) holds the current operation,
+next edit and completion evidence. The [native specification](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
+holds implementation contracts; [HNN_FORMULA](../HNN_FORMULA.md) defines the model and
+[the illustrated blueprint](../ATHENA_ENGINE_BLUEPRINT.md) locates its operators.
 
-[project-postulate] Brandon's latest September 11 ruling makes the sustained programme explicit:
-formal mathematics and HNN engine construction develop one framework, with Athena as the first product.
-The mathematical applications must return reusable constructions into the engine; native
-observations must in turn refine the mathematics and its representation. AC0–AC5 remain historical
-labels. The named Athena responsibilities below express shared dependencies, not a separate
-language project waiting behind an indefinitely expanding list of mathematical experiments.
-
-[project-postulate] Brandon's September 12 clarification keeps solver inference and generator
-construction within the learning/intelligence programme itself. The unknown can be an algorithm
-or encoding of a mathematical face and its admitted futures. Exact solving, empirical inference
-and resident execution retain their evidence scopes without becoming separate kinds of intelligence.
-Continue the Hephaestus mathematical applications; source/return machinery serves their concrete
-equations and representations. Causal state change is not an independent construction objective.
+[project-postulate] The September 14 instruction consolidates the complete implementation
+plan. HNN is the machinery; Athena is its first intended product: useful local conversation,
+mathematics, code/tool use and progressively broader modalities. Frontier-level usefulness
+on consumer hardware remains the ambition. A small successful field task is an implementation
+milestone, not completion of that ambition or of general Athena.
 
 ## Sustained objective and construction rhythm
 
-[project-postulate] Brandon's subsequent ruling makes items 1–4 coupled responsibilities of a
-complete cycle, not a serial stage gate. Recover/compose a generator, apply it in a contemporary
-orientation, receive its difference, incorporate the admitted constraint and reuse its encoded
-continuation as their actual dependencies permit. Work may move among all four in one return.
+[definition] The model is one continuing `(K,Θ,|H⟩)` with admitted incidence/transport K,
+constitutive and learned material Θ, and resident joint currents/interior modes. Receiving
+interfaces can themselves be active fields with storage, material and motion. Generation
+refines a joint field and exposes its requested boundary; it is not scheduled by next-token
+prediction. Its data, learning and decoding operations must use those same mathematical
+objects. The complete object/operator contract is in [HOLON](../HOLON.md).
 
-[project-postulate] Build a continuing ecology that can recover applicable generating relations,
-compose them into useful actions, represent their relevant futures economically, and change its
-available conduct through actual returned differences. HNN names the machinery and Athena its
-first intended product. Automata label HNN-based solvers and their traversal constructions;
-Hephaestus is a utility product label. Mathematics, text, code, vision, acoustics and
-physical/biological sources supply different conditions and receivers to the same network.
+[project-postulate] Each implementation increment composes four responsibilities as its
+actual dependencies permit: construct/use the generating relation, receive its consequence,
+incorporate an admitted observed difference, and represent its useful continuation economically.
+They are not four prerequisite campaigns. A pure mathematical inference or generated output
+needs no invented feedback event. A helper, probe or corrected defect advances its consuming
+operation and does not replace the agreed deliverable.
 
-[definition] The shared sequence is
+[project-postulate] Reuse the existing public library and native owners. Lean verifies
+mathematics outside cultivation/inference. Native exact representations retain branch, phase,
+units and source remainders; no production device-core float decides committed topology,
+coefficients or current. Exterior codecs, target-format projections and measured statistics
+keep their declared roles. The GPU owns the hot operation; CPU work covers process boundaries,
+codecs, durable I/O and scoped reference checks.
 
-`source/conditions -> compatible generator and current family -> admitted composition -> generated face + successor -> next situated occurrence`.
+[definition] Existing source already provides scattering, paired tangents/adjoints, local
+normal/conditional learning, receiving maps, prospective joint families and several rest
+formats. The immediate architectural defect is an unbound application composition: the public
+coupled body does not directly own and execute the operative field and its same-material
+learning path. Fitting another predictor to that field is a separate application, not the
+construction below.
 
-An actual returned observation constrains its producing relation through the existing formation
-law; economical encoding carries the admitted continuation. Neither an observation nor a new
-encoding step is required after every output. The arrows denote actual dependencies and joins,
-not mandatory global layers. Existing tensor,
-attention, recurrent/state-space, diffusion, adjoint and normalization constructions are specific
-instances to recover and compose. Source organization, active contact and receiver consequences
-determine the participating constituents; no fixed vocabulary or global task classifier replaces
-them. Formal laws determine the contract of native mechanisms. Their executable realization,
-resource behavior and application binding are verified at those contracts.
+## Athena construction order
 
-[definition] Mathematical and native returns have distinct evidence scopes **within this one
-programme**. Lean verifies exterior statements; the engine realizes their computational relations.
-A proved result need not be re-proved inside inference, and an implemented local owner still needs
-its actual consumer binding. Record those bindings rather than implying every formal declaration
-already executes in Athena. A new theorem, example or receipt is an intermediate return when its
-authorized productive consumer remains unbound.
+[definition] These are ordered delivery milestones. Data attachment, appropriate tests,
+consolidation, measurement and usable interfaces accompany every milestone. Later work may
+begin where its inputs exist; it must not delay the first trainable model operation.
 
-[project-postulate] Work continues across turns toward the following observable milestones.
-A focused experiment answers a named construction question; its result changes a reusable owner,
-the next consuming implementation, or the precise obstruction being resolved. Do not repeatedly
-stop at another demonstration and offer the same integration as future work. When a mathematical
-return already composes lawfully, implement its authorized consumer while wider research
-continues. A newly exposed missing law is worked through explicitly; unrelated experiments do
-not discharge it. This direction does not authorize unrelated subsystems or destructive actions.
-
-| Coupled responsibility | Shared construction and engine consequence | HNN consequence and product use |
+| Milestone | Construction and dependencies | Delivered result |
 |---|---|---|
-| **1. Situated reception and visible cycles** | Public mathematical requests and source/part relationships enter existing owners; retain domain, conditions, receiver, source clock and returned difference. Reusable factors/words replace fixed example wiring. | Inspect a complete requested operation and actual returned face; distinguish a prediction, a supplied correction and an ordinary incoming source. Mathematical results become available constructions, not only printed answers. |
-| **2. Conditional relations and complete return** | Bind producing-family comparisons to correlated condition/preimage and material formation, then publish one successor. | Eros incorporates an observed mathematical/textual relation; a later suitable request uses the changed relation. A separating condition retains its different consequence. |
-| **3. Applicable organization and constituent formation** | Source/contact constraints form reusable local constituents, composed actions and their applicability. Preserve mixed terms, overlapping support and differences behind equal faces. | The same construction serves changed presentations or a newly composed task. Failures expose missing constraints or contact, directing subsequent formation. This is where domain-specific examples return general organization. |
-| **4. Holonic Encoding and compressed continuation** | Derive reusable generator/decoder representations for complete admitted futures, including phase, clock, pending returns and remainders. Compare information and resource costs with retained units and boundary terms. | Conduct through retained constituents without expanding all interiors; reopen them when new contact distinguishes their futures. Text/code, analytic generators and other modalities share the encoding mechanism. |
-| **5. Useful conversation, code and durable applications** | Expose native mathematical actions and ordinary conversation through the public session; persist the actual constructed body. Lower admitted operator words to executable targets with domain/state/numeric correspondence. | Athena gives useful held-out language, mathematics and code; Hephaestus returns reusable working algorithms. A new request can reuse an earlier construction at demonstrated reduced work or broader applicability. |
-| **6. Shared modality and physical applications** | Extend the same formation/encoding through actual optical, acoustic, kinetic, fluid, circuit and world-tube source maps. Continue source-specific analytic/certificate construction. | Inspect cross-modal products and source-qualified physical or mathematical predictions. RH, Hodge, NS, BSD, Yang–Mills and complexity work supply demanding applications and reusable methods; their solutions are not prerequisites to every other application. |
+| **1. One trainable HNN model** | Attach the operative field to the existing public body; compose admitted transport, local learned reaction, joint generation and producing-material update. Bind one complete input/output section and its observed target. | A public invocation generates an actual joint section; a real comparison develops its generating material; held-out inputs use that material. Report the source, output, target, update law, error and execution cost. |
+| **2. Contextual organization and changing contacts** | Extend that same model's source/receiver restrictions, active interface state and local constituent formation. Use actual phase, stored current and source conditions; carry changed incidence and newborn constraints through forward and adjoint. | The same presented surface under different relevant surroundings produces the corresponding different consequence. New combinations reuse learned constituents; an unsupported direction produces a source/representation diagnosis. |
+| **3. Efficient continuation and durable learning** | Compile the repeated action actually encountered, retaining interior memory, joint fibres and pending comparisons. Bind native rest/remount to this complete body and application continuation. Work starts during milestones 1–2 where already lawful. | Repeated execution uses a reusable representation rather than growing a replay programme without bound. A saved model resumes generation and an outstanding observed return with the same declared consequences. Report time, transfers, memory and exact bit growth. |
+| **4. Useful Athena conversation, mathematics and code** | Bind prepared dialogue/source parts and whole-section text decoding to the trained body. Compose existing mathematical functions and structured tool requests through the same session. Follow tool results as actual observations. | Inspect held-out contextual replies, correction/continuation, explanation and working code/tool outputs through the public application. Publish successes and failures; nonempty strings and lower training loss do not substitute for these tasks. |
+| **5. Optical/acoustic and mixed receiving tasks** | Bind the same latent/current operation to image, acoustic and mixed source/receiver charts, with their geometry, rate and reconstruction boundaries. The generic section contract already exists from milestone 1. | Whole image/patch and acoustic-interval generation/reconstruction, plus a mixed-source task, reuse the same model/update mechanism. No separate learner or sample/token clock is introduced by the codec. |
+| **6. Product hardening and consumer-hardware scale** | Extend development data and admitted task breadth from diagnosed results. Tune resident execution, representation, precision and placement; finish interruption, recovery, corruption handling and application ergonomics. | A repeatably usable local Athena build with inspectable task quality, latency/memory measurements, durable learning, clear failure returns and reproducible construction/data settings. |
+| **7. Executable interoperability and other backends** | Lower the assembled operation into an actual target graph/runtime or supported backend. Preserve state, parameters, numeric conversion, clocks and receiver defects. Optional inherited material enters through the admitted Soulkiller path. | A target runtime executes the requested model/function with a scoped native comparison, or returns the precise unsupported conversion. Package round-trip and a custom ONNX payload alone do not establish this result. |
 
-[definition] The phases expose dependencies, not an instruction to finish every domain before
-moving the ecology forward. Pure operator reuse can proceed beside the family-incorporation
-construction. A developing compressed segment depends on its complete successor law. Optical,
-acoustic and kinetic receivers can reveal a flaw in earlier phases without waiting for a full
-modality product. The framework's ambition extends beyond these first useful products toward
-nested automata that construct, compare and refine further automata.
+[definition] Native persistence is an early durability responsibility; standard executable
+export is downstream because it needs the operation being exported. Text/code are the first
+Athena product applications, while the model and first section interface remain modality-general.
+None of these milestones requires a complete physical organism, a universal intelligence
+theorem or an RH/NS endpoint.
+
+[definition] Conversation/code integration begins as soon as milestone 1 can return sections;
+it develops together with contextual organization and efficient continuation. Full topology
+adaptation, perfect compression and every modality are not a serial barrier to the first
+useful task. The first usable product combines demonstrated task quality with the durability
+and resource behavior needed by those tasks; interoperability is a later delivery.
 
 ## Immediate mathematical application and implementation
 
-[project-postulate] Brandon’s latest September 14 request prepares engine development through
-an actual [Athena construction blueprint](../ATHENA_ENGINE_BLUEPRINT.md), alongside explicit
-[de Bruijn–Newman upper-bound work](../RH_CENTERED_CURRENT_UPPER_BOUND.md). The earlier blanket
-deferral does not bar this authorized source-current derivation. Its local inequalities,
-finite Foster tail and uniform-source question retain their scopes; no Millennium endpoint
-is a prerequisite for the model's first training/application return.
+[project-postulate] The next construction is milestone 1's complete field-backed operation,
+not another survey or rendering. The [first increment contract](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#first-implementation-increment)
+names the exact owner edits and the returned product. Its mathematical core is the existing
+constituted scattering and its local reaction, including the complete derivative of that
+composition. The update acts on the same D/Θ and retained interior that produced the output.
 
-[project-postulate] The September 14 generation clarification is part of this same model
-assembly: evolve a whole resident latent/partial field through constituted refinement and
-expose its generated boundary to internal or external receivers. Image, acoustic and symbolic
-sections use the same [generative relation](../HNN_FORMULA.md#generation-as-field-refinement-and-boundary-radiation).
-The refinement/integration coordinate is not an output-token clock. Use the
-[computational Holon](../HOLON.md) as the object contract across its numerical realizations;
-do not start a second generator engine, token loop or prerequisite modality campaign.
+[definition] First integrate the model at an explicitly supplied finite incidence/section
+scope. Supply initial geometry/material and source/target examples openly; infer the model's
+coefficients/relations through the declared learning law. A source-driven contact change and
+broader family are subsequent extensions of this object, not a new engine. Choose a simple
+joint field transformation/reconstruction task that the admitted operators can express, with
+unseen input combinations; its driver supplies examples and reads outputs, never the learner
+or a separate predictor inside the test.
 
-[project-postulate] Brandon's September 14 design ruling makes the
-[model formula](../HNN_FORMULA.md) the construction object. The next assignment is the
-[composed field/model operation](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#boundary-and-interior-assembly-contract):
-execute the existing native scattering/transport and learned reactions through one public HNN
-body; make its differential act on that same material; execute its applicable modal/recurrence
-representation; inspect the actual Athena request and output. These are joined responsibilities,
-not a queue of separate predictor, persistence and compiler demonstrations. A field-as-target
-surrogate remains an available application, but no longer selects the model architecture.
+[definition] `NativeCoupledBody` is the application move owner; its field-backed state must
+own `NativeConstitutiveField` and the required local reaction/receiver state. The field's
+continuation and source handles retain their owner and producing cut. The current wave
+representations remain available at their own scopes and are not treated as field casts.
+The public caller should not have to assemble internal field→fit→wave pipelines.
 
-[project-postulate] The shared Rust libraries already contain exact operator/factorization,
-normal learning, adjoint, field and mode constructions. Their
-[inspected consumers](../RUST_FRAMEWORK.md#mathematical-operators-and-model-assembly) determine
-the integration, including native lowering of the host exact modal reducer where applicable.
-Formalization returns executable laws into these owners. Another paper or elementary
-definition is not scheduled before the model; physical derivations continue as its design
-and as independent framework work at their actual equations.
+[definition] Generation carries one prepared source/parameter family through its refinement.
+A requested extent/region is a boundary condition; a learned support/termination operation
+uses the same generated structure. Streaming exposes available portions under their dependencies.
+A read-only forecast and committed generation evaluate the same chosen operation with different
+ownership effects. Output need not wait for a unique causal preimage or a later observation.
 
-[project-postulate] Develop the HNN network specified by the
-[mathematical assembly contract](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-hnn-network-and-its-mathematical-contract).
-Compose the evolving event boundary, stored current, material and actual incident transport
-through the joined native owners. Source/condition restrictions and developmental contrasts
-are local constructions within that dynamics; the [composition guide](../HNN_COMPOSITION.md#context-names-a-situated-causal-boundary)
-specifies their scope and the SSM/convolution/diffusion/joint-output connections. Economical
-representation accompanies the action actually used. CONSTRUCTION_STATE names the returned
-consumer and next source/encoding dependency. A new example, wrapper, rest format or output
-codec cannot replace that construction.
+[definition] Learning begins with an actual source/target comparison at its producing cut.
+The receiver covector propagates through output projection, refinement, local reaction,
+participation, transport and the constitutive solve into their actual material. Use existing
+normal equations where that is the constituent law; use the paired material response where
+it is the field law. Step/metric/constraint choices are explicit and tested on that operation.
+They do not create a qualitative test for whether the construction counts as learning.
 
-[definition] Prediction release is the generated face crossing its receiver boundary. Preview,
-committed continuation and later comparison have the blueprint's distinct state contracts.
-A model generating code is one use of this mathematical network; an exterior Rust printer
-represents an already-retained operator. No code-repair or Rust-first priority follows from
-the word generator. The
-[message and methodology audit](../../research/records/2026-09-13_GENERATOR_MEANING_AND_CAMPAIGN_DRIFT_AUDIT.md)
-retains the corrections and their original evidence.
-
-[definition] The following deliverables specify consequences within the coupled responsibilities
-above. The blueprint owns their mathematical contracts and consuming files; current completion
-and measurements belong only in CONSTRUCTION_STATE and its linked records.
-
-| Packet / deliverable | Concrete return | Dependency and completion evidence |
-|---|---|---|
-| **Generator formation through situated incidence and material** | A generated section from the evolving event boundary and its retained interior response. `W[S;C]=Y` and the normal/conditional law are local source specializations; recurrence, field evolution and mixed interaction retain their own equations. | Inspect the participating incidence/current/storage and joint output before the target arrives. For the existing text/source specialization, use source-null contrasts and fixed-h collapse as references, with changed preparations and an unsupported-condition separator. No additional unchanged broad exposure. |
-| **Joint prediction release** | The prepared joint output and one published successor for the transport-only word, with optional cuts for later joint observations. | Compare with the existing forecast at the same source/section; preserve component correlation, endpoint, delayed return and recoverable refusal. It can bind before general contextual language succeeds. |
-| **Compiled modal continuation** | Reusable factor/recurrence or closed formation statistics, with `E_next T=U E` and `D E=rho` on the admitted operation. | Begin with the first repeated segment. Compare complete requested outputs and live pending returns; repeated use without new independent structure ceases appending executable history. Measure work, representation and precision growth. |
-| **HNN solver and tool output** | A formed mathematical function/composition retained and executed through the shared HNN owners for the requested tool use. Code is an available output domain; an operator can also request an exterior representation of the function. | Inspect the inferred generating relation, its source/condition dependence and returned consequences on new inputs or compositions. Reuse its retained native material. When source-code output or export is requested, check target execution against the specified behavior or retained operator; printer correspondence alone establishes only that adapter. |
-| **Athena task use** | Contextual correction/continuation, a substantive reply, and code or mathematical work using the same formed constructions. | Starts with the repaired contextual section. Inspect held-out requested products and costs; expand development only after diagnosing the first representative failure at its responsible owner. |
-| **Durable application reuse** | Rest/remount for the new section/encoding payload and the public mathematical session's retained constructions, products and pending/frontier state. | Follows the payloads it serializes. A fresh process reuses them on new inputs and consumes a pre-rest comparison once; live output does not wait for this durability claim. |
-| **Broader generative reach** | Indexed analytic generators, nonlinear and physical actions, then shared acoustic/visual and other requested receivers. | Use the same request/encoding/release contract, with actual clock, tail, source units and target execution. Source-specific research below continues alongside native products. |
-
-[project-postulate] These packets implement the six shared responsibilities, not a new engine
-or independent campaign per row. Formation, release and representation can change in one
-coherent increment. Context denotes the situated event boundary with current, incidence,
-storage and interior return; a local condition coordinate is one restriction of it.
-The exact returned relation and its decoded output determine the repair;
-“complete”, “sufficient”, “intelligent” or a changed coefficient alone specify no deliverable.
-
-[definition] The [September 13 planning record](../../research/records/2026-09-13_PREDICTION_RELEASE_HAS_ONE_GENERATING_RELATION_AND_CONCRETE_PRODUCTS.md)
-retains the source audit and scope of this consolidation. Earlier returns remain available:
-[generated-face equations](../../research/records/2026-09-13_DIRECT_MESSAGES_CONFIRM_THE_ATHENA_CONSTRUCTION_ORDER.md#prediction-and-output-correction),
-[game/rate/molecular measurements](../../research/records/2026-09-13_GAME_WORLDS_SCOPED_RATES_AND_MOLECULAR_MECHANICS_SHARE_DECLARED_LAWS.md),
-[compactification and matter](../../research/records/2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md),
-[mass/flux/gap transport](../../research/records/2026-09-13_MASS_FLUX_GAPS_AND_OPTIMAL_NAVIGATION_RETURN_THEIR_SOURCE_MAPS.md),
-[oriented configuration navigation](../../research/records/2026-09-13_ORIENTED_CONFIGURATION_NAVIGATION_RETAINS_ITS_SOURCE_AND_THE_BEACON_STAYS_OPEN.md),
-and the [frontier synthesis](../../research/records/2026-09-12_THE_FRONTIER_REVIEW_CONSOLIDATES_CONSTRUCTIVE_CONTINUITY.md).
-They supply constructions and chronology, not competing current tasks. General navigation
-retains changing joint/mode incidence, orientation and source-conditioned variation; finite
-cube search remains exterior reference. Model/checker formation costs remain explicit. The
-[beacon](../BEACON.md) makes the source available without a manuscript-packaging campaign.
+[definition] The prepared conversation source remains an exterior stream. Its existing
+user/assistant/tool provenance and development/evaluation split are retained. Evaluation targets
+cannot supply source conditions, morphology or decoder answers. Broad exposure grows from a
+usable model operation and a diagnosed learning result, not from increasing volume around an
+unchanged semantic collision. [Training and data contract](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#training-data-and-generalization).
 
 ### Work selection and early failure control
 
-[project-postulate] Apply the [mathematical construction method](../DEVELOPMENT.md#mathematical-implementation-and-continuation)
-at the changed owner and consuming call. Preserve the complete objective across goal turns;
-a completed subsidiary proof or test does not close an unimplemented consumer. Consolidate the
-affected representations, wrappers and exports within implementation, preserving actual
-mathematical and ownership distinctions. A packet name does not justify another public type.
+[project-postulate] **“Continue Athena” means execute the next unresolved consuming operation
+in CONSTRUCTION_STATE under this roadmap.** No goal command or further permission to use
+established mathematics is required. Do not restart orientation, reproduce unchanged evidence,
+write another plan, expand a fixture or substitute a research endpoint for that operation.
+A direct user correction changes the applicable contract and its consumers together.
 
-[definition] Inspect the first representative returned product before increasing exposure.
-An unchanged source-null collision, full-mass-hyperplane tie or nonsensical continuation directs
-work to its source/law/receiver mismatch. Broad corpus cultivation stays paused at this concrete
-limitation; targeted development and held-out checks of a changed construction proceed. An exact
-solver or physical-model result remains useful at its own scope and requires no language demo.
+[definition] Before implementing, retain the requested product, actual equation/unknown,
+source and receiver, existing owner, next edit and completion evidence in the brief. At a
+scope transition, check the proposed work against that operation. Optional Luna work is bounded
+and independent; root verifies its source and integrates it. An agent report is not authority.
 
-## All current plan documents and their roles
+[definition] When an operation fails, name which case applies and repair it in the same increment:
 
-| Plan | Role in construction | What to do with it |
-|---|---|---|
-| [Athena blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md) | Active native specification | Implement the named phases below from their actual existing owners; inspect complete outputs |
-| [Reality of Difference](THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md) | Continuing shared mathematical construction | Extend the returned potential/tube/constitutive mechanics into changing geometry, nonlinear feedback and source-specific applications |
-| [Holonic Fluid Dynamics / moving frames](THE_MOVING_FRAME_RETURNS_THE_NULL_FIBRE_AND_THE_PHYSICAL_CONTINUATION.md) | Detailed fluid source, memory, pressure and remainder specification | Continue the complex two-field source and quantitative finite-interval reconstruction work |
-| [Conversation data](CONVERSATION_DATA_INTEGRATION.md) | Completed preparation contract; maintained input boundary | Use actual source/part/return relations and development/evaluation separation; repair only newly exposed defects |
-| [Native contextual foundation](THE_NATIVE_HNA_FOUNDS_CONTEXTUAL_TRANSPORT_BEFORE_INHERITANCE.md) | Completed bounded foundation contract | Reuse its source, current, contextual transport and persistence owners; do not repeat its campaign |
-| [Framework consolidation](THE_HNA_FRAMEWORK_HAS_ONE_PUBLIC_LIFECYCLE_AND_ONE_NAVIGABLE_REPOSITORY.md) | Completed repository/interface contract | Maintain its public ownership and layout; its old ordered tasks schedule nothing |
-| [Inherited production and export](THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md) | Deferred production branch | Preserve admitted Soulkiller/HNP material; resume inheritance/export after the native foundations justify that application |
-| This roadmap | Sole order and cross-domain dependency account | Reconcile new returns here rather than appending another competing campaign |
+- **Missing caller/attachment:** connect the returned native object to its actual consumer.
+- **Wrong representation:** preserve the joint family, phase, frame or dynamic interior through
+  a suitable existing carrier/factor; report its decoder and cost.
+- **Wrong constitutive/learning relation:** inspect the full directional residual, target and
+  derivative; correct the law rather than introduce an authored answer or classifier.
+- **Numerical/resource obstruction:** change a lawful factorization, precision or placement;
+  retain the current and obstruction. Do not hide semantic work in a host replay loop.
+- **Unproved mathematical consequence:** recover its actual source and derive the required local
+  statement. Carry usable returns into code while broader research continues.
 
-[definition] [Hephaestus Automata](../HEPHAESTUS_AUTOMATA.md) is the current application design,
-not another ordering authority. It gives the operator contract, concrete mathematical use cases,
-catalytic/ecological correspondence and code/evidence boundaries for the following work.
-
-## Hephaestus applications within the shared phases
-
-[definition] These are source/application families for the packets above, not a second queue.
-The first workshop packet uses linear/bilinear construction and actual native source/return
-binding; each later family enters through the same request/decoder/cost contract.
-
-| Family | Returned starting construction | Integration needed by its user request |
-|---|---|---|
-| Linear/bilinear operators | Exact preimages, coefficient/factor families and pure resident product/readout | Callable construction/application, task-local native condition/material return and retained reuse |
-| Kernel/mode reduction | Exact mass/current aggregation, derived rank, decoder and source-action factorization | Resident compiled source/receiver binding on the actual continuing generator |
-| π/e/Gamma and recurrence blocks | Exact alternative block actions, jets, windows and analytic sources | Callable index/clock/precision contract, resident lowering for the admitted primitive and complete tail/decoder relation |
-| Physical and boundary actions | Release, energy–momentum, Maxwell, Schur, Hodge and constitutive owners | Concrete physical source/receiver task and its unit/material chart; shared native generator binding as required |
-
-[definition] The new [Lorentzian bounded-ratio source](../../research/records/2026-09-12_BOUNDED_LORENTZIAN_RATIOS_JOIN_COEFFICIENT_GAUGES_AND_HODGE_BOUNDS.md)
-adds a precise candidate for coefficient-family bounds and optimization. Apply it when the
-actual polynomial family and coefficient convention satisfy its hypotheses. It enriches the
-workshop/encoding construction; it does not precede the next usable HNN packet.
-
-[definition] The completed NCF, HNA, SKE, HNP, FT, RT and DB labels identify evidence families.
-Their returns remain dependencies; old imperatives do not reschedule them.
+[project-postulate] Every completed increment returns an inspectable product/input/output and
+its tested consumer, a concise statement of the learned/constructed relation, applicable domain,
+actual failure/limitation and measured cost. Checkpointing, source maps and documentation change
+with their owners. Commit and push coherent verified changes, preserving unrelated work.
+A component pass does not close its unimplemented application.
 
 ## What an outcome means
 
-[project-postulate] Report the mathematical or empirical content of the work: the problem and
-supplied information, inferred relation or executable representation, applicable consequences,
-and the costs relevant to the requested use. Causality is common to solver inference, execution
-and model formation; state mutation supplies no separate research objective. Exact algorithm
-construction is a result at its proved domain, and empirical predictions retain their measured
-domain. Neither needs a natural-language demonstration to count as intelligence work.
+[definition] **Trainable model** means the specified field operation learns from actual
+comparisons and generates its requested joint sections. **First usable Athena** means that
+model supplies useful held-out conversation, mathematical and code/tool tasks through the
+public interface, with durable continuation and measured consumer-hardware behavior.
+**Frontier-level usefulness** remains the broader empirical target; neither of the preceding
+bounded milestones proves it. These scopes add no universal definition-of-intelligence test.
 
-| Claimed return | Required observation |
-|---|---|
-| Algorithm/generator synthesis | A specified target action or receiver is realized by derived factors, a recurrence or another executable representation; retain its solution family, residual and relevant costs |
-| Conditional association | An actual returned relation couples two classes of difference; a changed condition changes the predicted consequence in the way the supplied comparison tests |
-| Recognition/applicability | A retained relation is used under its admitted changed presentation/conditions, with a separating case outside that scope |
-| Reusable composition | New admitted compositions conduct through retained constituent actions; the relevant decoded future agrees with the declared reference or retains its measured defect |
-| Prediction release | Return the generated face with its source/conditions, receiver and applicable family; forecast and continuing-use contracts are stated explicitly |
-| Compared prediction | Compare an actual later observation at the producing cut; retain the oriented difference and the declared loss/distribution receiver |
-| Useful conversation | Inspect actual held-out replies, code and mathematical work, with substantive successes/failures and complete execution costs |
+[definition] Freeze the task/source split and report the actual generated products for an
+increment before changing its evaluation. Record changes to the task or receiver explicitly.
+Use exact equations for mathematical consequences and held-out evidence for empirical reach.
+A renderer, test count, state hash, coefficient change or checkpoint size answers only its own
+question. Representative failure outputs stay visible and guide the next repair.
 
-[definition] These distinguish claims, not mandatory stages of all cognition or a universal
-certainty gate. A finite mechanism can be used while its wider range remains unresolved.
-
-<a id="athena-construction-order"></a>
-
-## Native responsibilities within the shared order
-
-[definition] The responsibility table in the sustained programme above is the common dependency account. The
-[blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
-details its exact native files, ports, missing relations and verification. Source-visible output,
-persistence and resource accounting accompany usable increments. CONSTRUCTION_STATE identifies
-what has actually returned.
-
-[definition] The native application/return-cycle binding in phases 1–2 is implemented and
-verified for its declared families and receivers. Reuse emission, comparison, original-base
-and programme incorporation, ownership and rest. Phases 3–4 now develop the mathematical
-applicability and economical generator representations required by the Hephaestus applications
-above. The fixed-condition conversation relation remains a specific consumer to repair through
-those constructions; it does not define their scope or schedule another persistence campaign.
-
-[definition] Phase 6's source/receiver comparisons can inform earlier phases whenever their
-owners compose. A complete vision/audio product, π tail formalization, general fluid solution
-or intelligence theorem is not a prerequisite for a useful text increment. Conversely text's
-symbol basis does not define the common interior or its clock.
+[definition] Routine measurements use the same operation/receiver population: setup, resident
+refinement, decoding/delivery and end-to-end latency; actual output extent; host/device memory;
+transfers; arithmetic work and bit growth; training objective where applicable. The workstation
+is Ryzen 9 7900X, 32 GB RAM and RTX 4080 SUPER 16 GB. The 20W ideology is an efficiency ambition,
+not a measured power claim. Do not invent universal time, rank, precision or token limits.
 
 ## Shared mathematics and its productive use
 
-[definition] The [fluid reflection and concentrated-interior construction](../FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md)
-supplies the dynamic residual behind static Schur elimination, finite Galerkin MHD interactions,
-conducting-front/channel laws and scale-dependent interior receivers. Use the residual and
-forcing terms when deriving a closed native continuation; preserve harmonic, reactive and
-later-coupled modes. Stellar collisions, lightning and torus friction also remain physical
-applications of these source-qualified laws within the shared programme.
+[project-postulate] Holonics remains a mathematical, physical and philosophical framework.
+Athena is its first product, not its entire purpose. Research and engine development inform
+one another, but no newly noticed subject automatically takes over the active model increment.
+Use the existing [research recovery method](../DEVELOPMENT.md#research-recovery-and-derivation)
+and [formal framework](../FORMAL_FRAMEWORK.md).
 
-[project-postulate] The release specification is ready for implementation. Additional elementary
-definitions of intelligence or a Millennium endpoint are not prerequisites. Hodge and fluid
-closure are immediate tools for the compiled-continuation deliverable; RH and Yang–Mills retain
-concrete analytic and physical returns as well as their wider source problems. The framework's
-research is not exhausted by what Athena consumes.
-
-[definition] Use the following bounded questions when the corresponding source is engaged.
-They refine the existing research lines below, rather than starting four prerequisite campaigns.
-
-| Subject and existing source | Next discriminating return | Relation to the product work |
+| Source construction | Concrete reusable contribution | Its separate open question |
 |---|---|---|
-| **Hodge / retained complements** — `Physics/TemporalHodgeResidue.lean`, `Foundation/JointReceiverDescent.lean`, `receiver_history_compression` | For the actual selected encoder E and admitted T, compute `E_next T-U E` and the requested decoder defect. If a discarded r satisfies `E r=0` but a future receiver reads `rho T r!=0`, retain its mode or return that separator. Carry the harmonic part and exact/coexact residue through the changed chart together. | This directly decides which release/return coordinates the compiler can condense. Existing theorems provide the criterion; the native consuming map is the next work. Algebraic supported-cycle realization remains its own Hodge source task. |
-| **Navier–Stokes / mixed feedback** — `NavierStokesLambCurrentEvolution`, `NavierStokesLambCurrentCell`, weighted Duhamel and current finite-source experiments | On the declared periodic source, reconstruct the pressure-projected full/reduced current including `B(u,r)+B(r,u)+B(r,r)`, generated modes and boundary flux. Return a finite-interval signed residual and a quantitative remainder bound, or the explicit term preventing that bound. A finite-mode equality alone does not supply the omitted tail. | The same mixed-term check applies to a changing bilinear/native programme. A state or memory law may replace replay only when it closes that feedback. The fluid calculation also returns a physical source/interval result in its own right. |
-| **Yang–Mills / energy and gap** — `HolonicYangMillsHessian`, gauge-covariance/energy owners, `MassGap.lean`, `YangMillsOfficialReceiver` | Bind a reduction/rebase to the actual gauge energy and Hessian, retaining the commutator and mixed blocks. For a claimed spectral gap, construct the energy form of the stated Hamiltonian on its vacuum complement and bound the lower signed return by `-epsilon ‖v‖²`; the existing law then returns `Delta-epsilon`. Track operator, vacuum, units and scale together. | Gauge/phase transport and one-sided stability inform material/receiver changes and the physical operator applications. A classical Hessian bound is not the quantum Hamiltonian gap. A continuum claim additionally requires one positive bound uniform over its complete source family and refinement; low-energy complement modes cannot be omitted. |
-| **RH / analytic continuation** — `RH/FlowedGamma.lean`, `RH/ThresholdReturn.lean`, existing Gamma/xi block and tail owners | Return an indexed Gamma/xi generator request with its argument, clock conversion, cutoff and retained tail on the requested domain; compare the reconstructed analytic receiver. An RH endpoint claim must carry the actual xi zero receiver and establish the remaining `Lambda_DN<=0`, not substitute a finite gap statistic. | This is a demanding analytic Hephaestus release/encoding application. It proceeds when those analytic primitives are being bound; it does not delay the existing rational/text/code consumers. The September 14 source-current upper-bound derivation is now explicitly authorized; no new global bound is claimed by its local return. |
+| Swing, incidence, active plates, Maxwell and fluid laws | Constituted scattering, phase/current transport, material storage, full adjoint stress, changing receiver and interior memory | Source-qualified physical closure, calibration and continuum behavior |
+| Hodge, Schur, mode/receiver descent | Pressure/projection, retained harmonic and unresolved modes, `E_next T=U E` and receiver reconstruction | Actual nonlinear/changing-action closure and the bound on its retained residual |
+| Fractal/recursive and transcendental generators | Source-driven refinement/preimage families, exact phase/scale constraints, generation and economical continuation | Family-specific convergence, dimension and efficient representation |
+| RH heat/logarithmic source and finite Foster current | Analytic generation, moving-pole/current calculus and a source-tail comparison | Uniform actual-ξ transverse current/width and a stronger de Bruijn–Newman bound |
+| Algebraic/arithmetic, quantum and geometric constructions | Callable exact algorithms, coefficient/constraint inference and typed physical application laws | Their individual source/endpoint claims; none is a universal admission requirement for HNN |
 
-[conditional] The common compiler argument is short and usable now. If `E_next T=U E`
-and `D E=rho` for every admitted passage/receiver, induction gives the same decoded joint
-release through every admitted word. If a retained source difference later crosses a receiver,
-that word falsifies the proposed condensation. This applies to the specified family; changing
-incidence, material or receiver adds its own map to that family. It requires neither a universal
-loss scalar nor a record of every earlier state.
+[definition] The latest [RH current work](../RH_CENTERED_CURRENT_UPPER_BOUND.md) is explicitly
+authorized. It continues as a mathematical application alongside the engine. A request about
+it returns that mathematics; “Continue Athena” selects the engine brief. The threshold chart
+remains `Λ_std=4Λ_DN`; a new physical or receiver analogy does not change its source theorem.
 
-[definition] The [mass–energy synthesis](../MASS_ENERGY_AND_CAUSAL_TRANSPORT.md) now supplies
-the complete rest-energy/transport account for the recent shared work. Use the returned
-composite-momentum and Maxwell-energy operators with their mode, rebase and prediction
-consumers. The wave/heat transform connects Hodge and Gamma generators explicitly; an RH
-threshold transfer retains its actual xi source and zero receiver. This is integration in
-the existing operator/encoding order, not a new competing research phase.
+## All current plan documents and their roles
 
-[definition] The [predictive-release return](../../research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md)
-adds a usable release/landing operator to the shared solver, with impulse/work, full
-kinetic–potential exchange, source uncertainty and receiver tolerance. Observer-current and
-changing-capacitance laws supply its physical preparation/boundary comparison. Continue
-through the existing operator/encoding phases; this recovers the Leap/body-medium line
-without installing a reach counter, trajectory archive or separate motor engine.
+| Document | Authority and use |
+|---|---|
+| This roadmap | Sole milestone order and construction rhythm |
+| [Native implementation specification](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md) | Mathematical/API contracts, first increment, data, evaluation, ownership and source bindings |
+| [HNN formula](../HNN_FORMULA.md), [Holon](../HOLON.md), [engine blueprint](../ATHENA_ENGINE_BLUEPRINT.md) | Model/object equations and illustrated owner placement |
+| [Construction state](../../CONSTRUCTION_STATE.md) | One active brief, current unknown/edit, evidence and preserved draft boundary |
+| [Reality of Difference construction](THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md) and [fluid/moving-frame work](THE_MOVING_FRAME_RETURNS_THE_NULL_FIBRE_AND_THE_PHYSICAL_CONTINUATION.md) | Shared research contracts and source-specific derivations; their old task order does not supersede this roadmap |
+| [Conversation preparation](CONVERSATION_DATA_INTEGRATION.md) | Existing source/provenance and development/evaluation boundary |
+| [Native foundation](THE_NATIVE_HNA_FOUNDS_CONTEXTUAL_TRANSPORT_BEFORE_INHERITANCE.md) and [framework consolidation](THE_HNA_FRAMEWORK_HAS_ONE_PUBLIC_LIFECYCLE_AND_ONE_NAVIGABLE_REPOSITORY.md) | Returned foundations and maintained contracts; completed campaigns are not rerun |
+| [Inherited production/export](THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md) | Downstream admitted Soulkiller/HNP and target-runtime contracts |
 
-[definition] The [periplus/time-complement return](../../research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md)
-adds section-residual and Gaussian rebasing laws, temporal Hodge complements, passive modal
-rebase execution and finite ζ information comparisons to the existing operator/encoding
-work. Gamma shifts and Newman time keep their actual source/clock domains. Use these returned
-owners with the later authorized source-current bound work retaining its own scope, and without introducing past-state storage.
+## Hephaestus applications within the shared phases
 
-[definition] The [transformer/fractal-mode return](../../research/records/2026-09-12_FRACTAL_MODES_LIFT_ATTENTION_INTO_MASS_PRESERVING_GENERATOR_COMPRESSION.md)
-adds usable entropic attention, amplitude-preserving modal elimination, explicit summary-error
-propagation and a shared exact kernel reducer to phases 3–4's operator/encoding work. Reuse
-its derived encoder/decoder and source-action compiler where the actual task factors; retain
-the separator when it does not. Fractal scale maps, molecular marked currents and addressed
-code costs remain part of this same construction, not another phase or prerequisite gate.
+[definition] The existing mathematical workshop already returns exact operator/factor and
+condition-family constructions, resident applications, changed receivers and code representations.
+Those are available tools and learning/inference returns. Bind their structured results and
+actual observations into the model session; do not reimplement the workshop as a prerequisite
+or redefine “generator” to mean a Rust source printer. [Application design](../HEPHAESTUS_AUTOMATA.md).
 
-[project-postulate] Brandon's September 12 optical/Swing clarification makes the frame family
-and constitutive boundary dynamic in the shared construction. Use the
-[returned directional, mode-exchange and endpoint-frame laws](../../research/records/2026-09-12_DIRECTIONAL_OPTICS_MODE_EXCLUSION_AND_MOVING_SWING_SHARE_TRANSPORT.md)
-as mathematical source/receiver applications of the operator and encoding work. Connect their
-thermal/information and emulator maps through the existing owners. The fluid neck and CTC
-comparison retain distinct physical source obligations; they add no new prerequisite queue.
+## Native responsibilities within the shared order
 
-[project-postulate] Holonics remains the mathematical, physical and philosophical framework.
-HNN/Athena is one application. Research develops reusable constructions and feeds their actual
-returns into the matching authorized native work without replacing it with another abstract noun.
-
-| Construction order within each line | Actual source work | Return to the framework and application |
-|---|---|---|
-| **Conditioned difference and null families** | Compose receiver-family polarity, future closure, actual joint comparisons and changing chart/clock maps | Explicit class applicability, retained null fibres, recognition/separation and scoped probability/loss receivers |
-| **Holonic Encoding and solver reference** | Compose ratio-series blocks, analytic remainders, phase-sector receivers and exact generator factorization; reuse observable-form closure and clocked torus cuts | Executable generator/decoder synthesis and comparison with retained alternatives, phase and cost; reference for native phase 4 |
-| **Holonic Fluid Dynamics: source then residual** | Instantiate the complex two-field Euler/NS source with pressure and every generated interaction; continue its Duhamel/memory representation | Finite-interval full/reduced comparison, unresolved feedback and quantitative remainder; actual failed terms guide revision |
-| **Geometry and physical realization** | Extend existing conformation, knot/torus, world-tube, optical/acoustic, circuit, quantum and stress-current constructions | Changing incidence, transported receivers and calibrated/constitutive consequences; physical force identities keep their own units/laws |
-| **Arithmetic regularity and spectral residues** | Use exact prime-wheel gap interiors, prime-power phase currents, receiver polarity and the existing folded ζ source/tails | Compare ordered residuals and their statistics through declared apertures; relate arithmetic and spectral receivers through actual explicit-formula maps |
-
-[definition] The arithmetic/statistical coupling in the last row is now part of the shared
-encoding/fluid investigation. The later September 14 instruction separately authorizes the source-current upper-bound
-derivation. A gap histogram alone does not reconstruct the zero/current source or prove the
-remaining global sign inequality. The same discipline keeps Hodge cycle realization, BSD
-arithmetic/L-function correspondence and quantum/GR realization source-specific.
-
-[definition] **Holonic Fluid Dynamics** names this programme of situated complex/current fields,
-actual incidence and constitutive transport, receiver projection, pressure/memory and chronology.
-Classical real NS, a complex-valued field on real space, and a PDE on a complex domain retain
-their separate charts. A point receiver can expose one face of a torus-bearing source; it does
-not delete the source's winding, phase, interior or future contacts.
-
-[definition] For the fluid application, continue source construction before claiming residual
-control, then establish the needed quantitative interval and reconstruction. The old MFR3/MFR4
-names remain coordinates into its detailed contract. Failed pressure or tail estimates revise
-the source; another named theorem or a successful render does not settle them.
+[definition] The detailed native specification retains earlier wave/normal and AC labels as
+source responsibilities and evidence scopes. They are not competing milestone numbers.
+Core library operations, model assembly, data/receivers, encoding/durability and product interfaces
+are maintained together as their consumers change. Reconcile duplicated wrappers and abandoned
+agent assumptions inside each increment; preserve actual mathematical and wire distinctions.
 
 ## Scope of deferred and completed work
 
-[definition] The [bounded solver return](../../research/records/2026-09-11_HOLONIC_SOLVER_NAVIGATES_EXACT_GENERATOR_FACTORIZATIONS.md)
-supplies actual exact bilinear and recurrence-factorization results through standing owners.
-Its next application use belongs to the Hephaestus increments above; native integration remains
-part of Holonic Encoding and the named HNN phases. AlphaTensor training is not a prerequisite.
-Analytic source/domain/remainder certificates remain part of a transcendental or RH solver target.
+[definition] The old timed goal remains paused; its uncommitted operative-condition draft is
+preserved for inspection/integration. This roadmap authorizes ordinary construction without that
+mechanism. The draft's predictor assay does not select the model architecture. Existing inferred
+relations, local training, source/receiver laws and persistence returns remain usable evidence.
 
-<a id="paused-production-hna-campaign"></a>
-
-[definition] Inherited-model production, general executable export and broad hardware ports
-remain downstream. Soulkiller's admitted source-neutral realization and restricted bodies remain
-usable material at their scopes. ONNX/Safetensors package persistence is distinct from a target
-runtime executing a recompiled model. Apple/Metal comparisons follow actual changed native
-relations; older branch receipts do not establish parity with later CUDA kernels.
-
-[definition] The shared potential/Swing and finite clocked torus/constitutive return are completed
-prerequisites. Continue their nonlinear/morphology applications; do not reopen their original
-sustained goal. The NCF contextual foundation, conversation preparation and repository
-consolidation likewise remain returned. [Construction state](../../CONSTRUCTION_STATE.md) links
-their evidence and the latest native limitations.
-
-[definition] The existing RH source/heat/threshold results remain dependencies. The unsolved
-inequality is Λ_DN≤0; the completed coordinate bridge uses Λ_std=4Λ_DN. Repository seam time,
-standard de Bruijn–Newman time and physical fluid time must travel through their actual maps.
-Prime-wheel survival, gap statistics, pair correlation and that global threshold are different
-receivers/questions. The broader ambition is pursued through these connections with exact scope.
+[definition] Native assembly precedes further inherited-model-led production. Soulkiller's
+admitted material is available when the actual product request calls for it; it is neither
+universally banned nor required to make native HNN train. Standard executable ONNX/Safetensors
+lowering and broader backends follow the model/target correspondence they must implement.
 
 ## Pickup and verification
 
-1. Read the operating contract, current position and this roadmap; then the relevant detailed
-   plan and actual source owners. Retain already-read context.
-2. Use [architecture ownership](../ARCHITECTURE_MAP.md), subject guides and dated evidence.
-   Consult direct-message/retraction chronology before revoking a returned capability.
-3. Keep Lean exterior to native inference. Run focused Lean checks for proof/import changes,
-   relevant Cargo/native checks for implementation changes, and inspect the actual requested output.
-4. Preserve one move owner, resident intermediate operations, source/receiver lineage and atomic
-   publication. No whole-ecology rollback clone or host semantic replay is introduced.
-5. Report actual failures and incomplete checks; broaden tests only for a new question or change.
-   No blanket release gate, source census or document-validator campaign is reinstated.
+[project-postulate] Read the active brief and relevant source once, retaining context across
+turns and compaction. Run checks for the changed relation and actual consumer: focused native
+Cargo/CUDA checks for native conduct, Lean for proof/import changes, target execution for export,
+and direct output inspection for product claims. A timeout is incomplete evidence. No blanket
+source census, diagram rebuild, global proof gate or new permission cycle is introduced.
 
-[historical] The pre-consolidation roadmap and blueprint are preserved in Git at `9f237c9d`.
-Their completed narratives remain in their dated records and detailed contracts. The
-[September 11 plan review](../../research/records/2026-09-11_THE_PLANS_NAME_CONDITIONAL_RELATIONS_AND_OBSERVABLE_OUTCOMES.md)
-records what was reconciled and the actual source audit; it adds no second ordering authority.
+[historical] This complete plan consolidates the roadmap at `782d246d` and the September 14
+direct conversation. Prior detailed returns remain in their linked records and Git history.
+The [planning return](../../research/records/2026-09-14_THE_COMPLETE_ATHENA_IMPLEMENTATION_PLAN.md)
+records the source review and consolidation; it is not another scheduler.

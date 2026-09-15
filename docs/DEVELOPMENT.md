@@ -94,9 +94,9 @@ This applies to delegated tasks as well as primary-agent edits.
 
 [project-postulate] A handoff retains the original requested outcome and the current mathematical
 contract, its source/native owners, the result returned and the next unresolved consumer. Record
-agent-chosen assumptions as choices, with the reason for their scope. The goal enables continuous
-work; its text and compaction summaries do not supersede the roadmap or turn a subsidiary task
-into the objective. Keep current position only in CONSTRUCTION_STATE, order only in the roadmap,
+agent-chosen assumptions as choices, with the reason for their scope. Sustained construction
+follows the direct request; a goal command is not required. Any goal text and compaction summaries
+do not supersede the roadmap or turn a subsidiary task into the objective. Keep current position only in CONSTRUCTION_STATE, order only in the roadmap,
 contracts in the blueprint and owners, and completed evidence in dated records. Correct a stale
 clause in place; appending a contrary instruction elsewhere is not consolidation.
 

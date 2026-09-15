@@ -10,6 +10,13 @@ the application implementations are in [holonics-hna](../crates/holonics-hna/REA
 
 ## One sustained construction programme
 
+[project-postulate] The [complete Athena plan](plans/THE_ROADMAP.md#athena-construction-order)
+now orders the trainable HNN model, contextual organization, efficient/durable continuation,
+conversation/code applications, broader modality receivers, product hardening and executable
+interoperability. The [public model and first increment contracts](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#complete-implementation-contract)
+name the exact operations and source owners. “Continue Athena” executes the active construction
+brief without a goal command or another planning/permission cycle.
+
 [definition] The [illustrated engine blueprint](ATHENA_ENGINE_BLUEPRINT.md) now traces the
 actual field scattering, material adjoint, local learned reaction and joint receiver into
 the existing public model owner. Plates 14–15 of elementary-holon-generation use these same

@@ -29,6 +29,290 @@ This governs execution and ownership. A completed mathematical inference require
 state-mutation demonstration. Its resulting generator, equation family or prediction supplies
 the substantive result; use the applicable evidence and receiver scope in the roadmap.
 
+## Complete implementation contract
+
+[project-postulate] The September 14 complete plan uses the seven delivery milestones in
+[the roadmap](THE_ROADMAP.md#athena-construction-order). This file specifies their consuming
+operations. Its older numbered sections retain mathematical/source responsibilities and
+compatibility evidence, not a second implementation order. A completed small example does
+not replace the public model and actual generated product described here.
+
+### The public model operation
+
+[definition] Use the existing `holonics::{structure,geometry,engine,hna}` library boundaries.
+`NativeCoupledBody` owns the active model; add an operative-field-backed representation under
+that owner rather than a second engine. Reuse the current field, local generator neighborhood,
+resident section/family, constitutive material and receiver types. A Holon operation retains
+the source/target charts, incidence and shared parameters; it is not an untyped buffer wrapper.
+Its initial constructor specifies K, material and receiver configuration explicitly.
+
+[definition] The initial model law is an explicit composition of admitted contact/phase
+transport, normalized participation, constituted boundary/interior scattering and local
+learned reaction. The composition order is part of the model, including its finite integration
+step and residual when a continuum interpretation is claimed. The neighborhood's normal or
+bilinear law may parameterize a local reaction; it does not learn a separate imitation of the
+entire scattering field. Those operators all act on the continuing field or joined source
+family and expose their actual differential to the model's update.
+
+[definition] A public generation request supplies a resident partial/source field, its known
+boundary constraints, admissible source/latent family and requested receiver/extent. It returns
+the generated joint section or its requested presentation and the applicable source/defect
+information. A continuing call publishes the corresponding endpoint once. A forecast evaluates
+the same declared operation without installing that endpoint. These are proposed operation
+contracts to bind to the existing public session; their names alone do not claim an API exists.
+
+[definition] The refinement coordinate advances the whole participating state. Image/acoustic
+coordinates and textual symbols label output faces, not mandatory evolution ticks. Extent can
+be caller-declared initially and later supplied by the model's learned support/boundary action.
+An unfinished global reconstruction or plural source fibre does not prohibit a lawful requested
+face. Conversely independent coordinate selections cannot invent a joint output absent from
+the retained source family.
+
+[definition] A training request supplies an actual observed/target section and the required
+producing handle. It forms the declared receiver residual and returns the covector through
+projection, refinement, reaction, participation, transport and scattering into the material
+that generated the prediction. It also retains source/internal/receiver variations where those
+are operands. Receiver plates can carry their own state, storage and motion inside this joint
+operation. A frozen readout is one explicit restriction, not the general receiver ontology.
+
+[definition] The training law is concrete at each constituent: normal statistics solve `WH=B`
+where that is the parameter inference; the existing contact response solves its stated
+Frobenius/constitutive variation; a normalized receiver uses its actual KL/squared-probability
+or current derivative. Sign, metric, step and admissible coefficient realization are declared.
+A finite update must be checked through the actual nonlinear forward operator and its mixed
+terms. An infinitesimal gradient identity alone does not prove that every full-size step lowers
+loss. No new universal optimizer or qualitative definition of intelligence is required.
+
+### First implementation increment
+
+[project-postulate] Deliver one public **train → generate → observed update → generate again**
+operation on joint sections, using the actual operative field and local learned reaction.
+Inference on held-out inputs is part of this same return. The first aperture has explicit
+finite incidence and a modest complete section; these supplied dimensions do not become
+intrinsic semantic limits. This is the first model increment, not the whole Athena release.
+
+[definition] **Chosen initial composition.** At each refinement cut let q join the field's
+actual boundary/current and operative interior with the prepared external boundary/input.
+Use declared resident port maps `P_s`, `P_h`
+to obtain the reaction source and condition before seeing a target. The initial split is
+
+```text
+s=P_s q,           h=P_h q,
+r=R_M(s,h),        u=E_B input + r,
+(w,b_next)=S_D(u,b),
+y=P_R w.
+```
+
+`R_M` is the existing local conditional/bilinear action; its output codomain is the operative
+boundary-input chart of D. `E_B` is the declared external-boundary injection. D and M are
+model parameters, not fitted copies of one another. Repeated refinements consume the returned
+state. The first aperture holds material fixed within a generation and develops it on the
+actual observed return; later constitutive/material evolution is an explicit extension.
+This reaction-before-scattering split is an implementation choice within the formula, not
+a claim that every physical/HNN interaction has this universal order.
+
+[definition] **Resident ports and publication.** The existing `advance_current_resident` in
+`field/resident_input.rs` already admits a generated point current without a host numerical
+round-trip; preserve its actual input chart. `NativeFieldCurrentSource` joins the outgoing
+report and operative b with owner, producing sections and contact births. Its `enclosure()`
+is an outer receiver of those retained finer operands, not their replacement. The preserved
+draft's `NativeFieldCurrentSource::reflect` already applies the actual D to an enclosed joint
+`(u,b)` without mutation. Review and use it for the staged scattering where its domain matches.
+Add the matching current-publication port inside the field owner, validating the producing
+cut/material and publishing the computed w/b once. A new occurrence must not silently compute
+a different operator or invent an observed target. Ordinary external/observed occurrences
+continue through the existing field ingress and source/anchor contracts.
+
+[definition] **Reaction attachment.** Bind `P_s/P_h` to declared blocks/transport maps of that
+same joined field/input source and to the neighborhood action's domain. Repeated uses of an
+input retain its shared parameters rather than independent copies. Use the existing action and
+prepared-condition machinery to read `R_M(s,h)` without changing condition or material during
+a forecast; expose a narrowly scoped staged read if the needed port is crate-private. The
+first fixed-incidence aperture fixes these port maps explicitly. Born contacts later extend
+their actual domains and adjoints using the birth/source-overlap maps, not padding based only
+on equal widths. The composed pullback returns `P_R*` through `S_D`, then through `R_M` and
+`P_s/P_h`, to the actual pre-generation D/M/current. Holding two owners side by side is not
+this binding.
+
+[definition] **First receiver.** The numerical application initially returns the identity
+receiver on the complete requested outward block, with an optional declared `P_R` projection.
+Use the staged reflection's `output()` or committed `read_current_source().enclosure()` with
+its retained source witness; select the boundary block explicitly and keep b in the body.
+The public section return must retain the owner-qualified generating source and the complete
+joint output, not only a detached report. Host readout occurs at the requested delivery boundary.
+Later text/image/acoustic codecs consume that same receiver contract. A coordinate envelope
+must not be promoted to the Cartesian product of independent possible outputs.
+
+[definition] **Producing-handle order.** Retain the immutable producing source/sections, local
+reaction cut, condition/port maps and receiver when preparing a comparison. Commit its field
+generation once. A target arrives as a new receiving occurrence tied to that producing emission
+or retained anchor. Only after that reception succeeds may the latest-cut material observation
+operation run. Its successful response already applies the contact update. Tie the application's
+opaque handle to this complete retained relation and consume it once; do not maintain an
+independently advancing wave prediction alongside the field's pending occurrence.
+
+| Work in the increment | Existing owner and concrete edit | Evidence returned with the operation |
+|---|---|---|
+| Own the field model | Extend `A/coupled_wave/body.rs` with a representation that owns `NativeConstitutiveField` and its necessary reaction/receiver state. Bind founding from the existing field constructors. | One live move owner, a usable public constructor, and source/continuation handles belonging to it. No field-to-wave cast or cloned ecology. |
+| Execute the actual forward composition | Bind ordinary ingress through `advance_resident`/`advance_current_resident`; compose the declared reaction-first operator above on resident sections, using the actual operative scattering and its matching staged current publication. | Input/known boundary, operator configuration and complete generated output. The driver contains no local learner, surrogate W, semantic scene switch or expected-answer emitter. |
+| Preserve section/family semantics | Reuse `NativeFieldContinuation`, `NativeFieldCurrentSource`, resident enclosures/sections and the declared receiving chart; promote only the specific inaccessible port needed by the public consumer. | Shared parameters and joined coordinates survive the output. A point-only port receives only its admitted domain; no enclosure centre is silently substituted. |
+| Train the same material | Route a genuine receiving occurrence through `respond_to_material_observation` where its contract applies, or compose its existing query/paired-response owners for the required model covector. Compose the local reaction's own update in the same body. | Source/target comparison, signed covector, actual changed coefficients/constraints and generated held-out section after training. Verify the producing-material adjoint and actual finite-step behavior. |
+| Unify producing handles | Bind the application's comparison identifier to the field's producing occurrence/current/material and source frame. A late observation is a new receiving occurrence referring to that producer. | Correct producing cut, recoverable refusal and one incorporation. `respond_to_material_observation` requires the latest receiving cut and already commits internally; do not pass an old receiving index or apply its response twice. |
+| Expose and retain the result | Add the operation to the existing native request/stream boundary and extend the corresponding field/body rest payload sufficiently to reopen this local trained operation. Keep an inspectable result artifact and command. | Reproducible public invocation, saved learned material/current with its decoder/configuration, and output on another input. Whole-session pending/application durability continues in the durability contract below. |
+
+[definition] In this table C is `crates/holonic-engine/src/native_ecology/constitutive_fibre`
+and A is `crates/holonics-hna/src/native`. `advance_resident` mutates its field and returns
+owner-qualified continuation; it is not a stateless function handle. The field's pending
+occurrence and the wave body's prediction identifiers are different existing representations.
+Unify their actual producing relation instead of introducing an unverified ID-only adapter.
+
+[definition] The first data task is a declared joint field transformation/reconstruction
+within the configured operators' applicable family. Examples and target sections are external
+data; the field's D/Θ is trained directly. Include an unseen input combination and a conditional
+case with its condition supplied before the target. Report supplied initial K/material, the
+learned relation, exact/enclosed outputs, target error and cost. The task may use a small
+controlled source to expose the learning equation; it does not become a permanent intelligence
+gate or substitute for the later conversation/code product.
+
+[definition] Start with an ordinary immediate observation to close the direct path, then
+exercise a delayed observation when the producing-handle join is implemented. Reuse existing
+native checks for the unchanged local arithmetic. Add checks for the actual new composed
+forward/adjoint, family output and ownership joins. Do not count a CUDA-ignored test as executed,
+or a public wrapper compilation as a model output. Measure setup, resident work and delivery
+separately on the actual requested section.
+
+### Training data and generalization
+
+[definition] Reuse `applications/conversation-data`, `alpha::exposure::ExposureReader` and
+the prepared source/part/return stream. User, assistant and tool messages retain their actual
+roles and chronological relationships. The native input is a situated section and its relevant
+conditions, not a source path, row number or document ID as semantic identity. Raw files remain
+at the exterior preparation/evidence boundary; retain native distinctions needed by the law
+through material, constraints, phase, modes and pending cuts rather than an input archive.
+
+[definition] Use three distinguishable evidence scopes: development exposures that update
+material; validation comparisons used to diagnose/tune the declared construction; and held-out
+episodes/combinations whose targets do not enter material or source preparation. Separate by
+whole source episode/relationship where necessary, not merely by shuffled adjacent text rows.
+Record which exposure constructs which relation. A source presentation can be masked or partly
+observed under a declared corruption/restriction chart; noise is an available exterior choice,
+not the definition of native uncertainty or a required source of generation.
+
+[definition] Begin contextual product work with complete requests/responses or requested
+sections, including corrections, dependencies and relevant earlier turns. Train joint
+reconstruction/continuation through the same field dynamics. Test changed conditions and
+unseen combinations rather than only replaying a stored span. Text tokenization, if used by
+an exterior codec, does not set the latent topology, default memory architecture or refinement
+clock. Source/target leakage, an authored decoder answer and self-output mislabeled as human
+feedback are incorrect constructions to repair.
+
+[definition] Grow the data aperture when the operation has returned a useful result at its
+current scope and the next exposure answers an actual learning/capacity question. If outputs
+fail, inspect the source distinction, material law, adjoint, representation and receiver before
+increasing volume. The goal is empirical reach from one model, not completion of a data-ingest
+campaign. Existing exact mathematical solver inference remains independently useful.
+
+### Context, morphology and active interfaces
+
+[definition] Extend the first model by giving its actual neighboring/receiving regions their
+state, internal storage, phase, transport and relevant material response. Source/condition ports
+are restrictions of that coupled situation; an appended context label is not that relation.
+The forward and adjoint include changing participation and changing transported values.
+Learned topology uses source-conditioned incidence/constitutive variation and the existing
+contact birth/transport owners. A fixed-shape derivative does not account for a new coordinate.
+
+[definition] A retained residual, preimage or rank/separation result identifies a distinction
+the current local constituent cannot express. Construct or refine the corresponding constituent
+through its actual source map, then update its callers and representation together. Preserve
+newborn zero-input constraints, source overlap, relevant sign/phase and existing pending
+producing material. Do not make a semantic classifier, scalar priority queue or content hash
+the general law of contact/navigation.
+
+[definition] The model may use lattice, mode, sparse factor, tensor, recursive or analytic
+representations of the same operation. Toroidal cycles and fractal/preimage geometry enter
+through actual incidence, transport and recurrence; their illustrated count does not prescribe
+network depth. A physical law supplies its unit/constitutive chart, not a requirement to
+simulate an entire organism before delivering an HNN application.
+
+### Encoding, memory and durability
+
+[definition] Bind `E_next T=U E` and `D_dec E=ρ` to the repeated operator actually executed,
+including its interior and required future receivers. Reuse the existing mode/observable
+reducers, native factors and condensed operative programmes. When an eliminated mode can
+affect a future receiver, retain its dynamics or explicit memory/residual; do not discard it
+because the present scalar reading agrees. Declared approximate encoding retains its bound.
+
+[definition] Distinguish the model's dynamic memory from replay required by a current
+implementation. Remove repeated full-prefix execution where a sufficient generator, local
+statistic or state realization already closes the action. Keep the relevant pending source
+relations; branch states share immutable material and own their differences. Measure resident
+work, allocations, transfers, representation size and exact bit growth before claiming savings.
+
+[definition] Extend the rest belonging to the actual field-backed body and its application.
+Payload includes K/transport, material, current/interior, codec/receiver configuration,
+encoded programme or residual, pending producing comparisons and the continuation/cursor
+needed by the admitted resume. Use existing field/operative rest and `SavedCoupledBody`
+versioning; native ecology and inherited HNP rest are different existing payloads and cannot
+be interchanged by name. A new process must generate a new section and incorporate a retained
+pending observation consistently with uninterrupted execution.
+
+### Application and release contract
+
+[definition] Use the existing Workbench stream boundary and public SDK. Callers should mount
+a prepared source, invoke the model, receive its generated artifact and continue/update/rest
+without manually wiring internal arithmetic. The current native wave/coupled codec ports are
+reusable boundaries; older `text_session.rs` uses `AthenaTokenApplication`/HNP model semantics
+and must not silently restore a next-token engine or inherited model dependency.
+
+[definition] The first usable Athena release covers held-out contextual conversation,
+correction/continuation, mathematical use and code/tool tasks through this same model. Inspect
+the actual outputs, changed-context behavior and execution of generated code/tool arguments.
+Existing exact mathematical operators are callable functions within the product; a code
+printer remains an export/application of a constructed generator, not its definition. Tool
+results enter as actual source observations under the application's explicit tool contract.
+
+[definition] The initial text receiver can reuse `A/section_input.rs::SymbolCurrentChart`
+as a declared symbol/current codec over a complete requested section. Encode known and
+unknown regions and their constraints; let the model refine them jointly. Any symbol-basis,
+embedding or support/end-marker map has a stated supplied/learned role. Decode from the same
+joint realized field or supported family through its actual receiver, not independent choices
+from marginal enclosures. Extending the output region follows the model's support/boundary
+operation and dependencies. It does not revert to feeding one selected next symbol back as
+the definition of generation. Existing wave text readers are codec/reference consumers to
+adapt, not the new field model's hidden scheduler.
+
+[definition] Optical/acoustic support uses the same joint-section/request/update contract.
+Recover `membrane_optical` and `membrane_acoustic` receiver laws at their existing source-neutral
+scopes, then bind the current emitted fields through the actual phase/axis maps. Their historical
+source-neutral morphology types are not automatically the new body's types. Image/PCM encoding
+is exterior; a multimodal receiver does not create a separate learning engine.
+
+[definition] Harden interruption, unsuccessful-operation ownership, malformed input/artifact,
+pending return and remount at the actual process boundaries. Expand throughput and useful
+capacity under measured consumer resources. Native exact arithmetic and GPU residence apply
+to the assembled hot operation. A float-based observer statistic is not forbidden; a host
+semantic replay or float-derived committed coefficient is not a lawful shortcut.
+
+[definition] Executable export follows `INTEROPERABILITY`: actual target graph, parameters,
+state, chronology, numeric conversion and receiver comparison. The existing Safetensors/custom
+ONNX package is a container capability. Broader GPU/CPU/Metal parity and optional Soulkiller
+material require their own operation/source correspondence, not the reinstatement of a
+retired inherited-first campaign.
+
+### Completion and continuation
+
+[project-postulate] Each increment returns the generated product and the actual invoked
+consumer, supplied versus inferred material, relevant checks and measured cost. A local
+training task establishes that task; the first usable Athena release additionally owes its
+conversation/code/application evidence. Frontier-level usefulness remains the empirical
+ambition. None adds a vague state-mutation or universal-intelligence admission test.
+
+[definition] “Continue Athena” resumes the active brief's next unclosed operation under the
+roadmap. Carry the human objective, governing corrections, equation/unknown, source/receiver,
+owner, next edit and completion evidence across compaction. Completed evidence becomes concise
+links. Keep research and code corrections coupled to their consumers, preserve useful unrelated
+work, and finish the authorized increment without returning another plan or permission loop.
+
 ## The HNN network and its mathematical contract
 
 [project-postulate] The [HNN model formula](../HNN_FORMULA.md) governs this assembly. It gives
@@ -258,13 +542,14 @@ or another state-mutation assay is not an additional prerequisite to a completed
 Persistence checks apply to newly claimed durable relations; source and formal checks establish
 their particular mathematical and executable contracts.
 
-## Next implementation packets
+<a id="next-implementation-packets"></a>
 
-[project-postulate] The September 12 product-integration ruling makes the
-[roadmap's immediate packets](THE_ROADMAP.md#immediate-mathematical-application-and-implementation)
-the implementation order. This specification supplies their exact binding decisions. It
-does not wait for another intuition, a universal intelligence theorem, or an RH endpoint.
-Correctness of a local relation is used in a product rather than repeatedly re-demonstrated.
+## Existing generation and implementation responsibilities
+
+[definition] The following source/receiver and wave/normal constructions remain reusable
+mathematical contracts and bounded evidence. The September 14 complete contract above and
+the [roadmap](THE_ROADMAP.md#athena-construction-order) select the direct field-backed model
+assembly. These older local applications do not schedule another predictor-first increment.
 
 ### Generated faces: reconfiguration, correction and continuation
 
@@ -426,8 +711,8 @@ Each row specifies a bounded application consequence; no finite row certifies ge
 shared source contract. Here compilation means constructing an executable representation of
 the retained mathematical action; it need not emit source text. An exterior function receiver
 can use returned operators for a requested export. Durable serialization follows its payload; it does
-not hold up live-session output. The next increment is the contextual source/condition binding
-and its generated section, while reusing the already callable workshop.
+not hold up live-session output. The first field-backed increment above now binds the actual
+source/condition, constituted action and generated section, reusing the callable workshop.
 
 [definition] Measure each artifact with the [standing performance conventions](../DEVELOPMENT.md#performance-and-information-measurements):
 construction/setup, resident passage, decoding/delivery, target compilation/execution and
