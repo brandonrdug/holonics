@@ -1,6 +1,6 @@
 # Elementary Holonics: intrinsic fields and recursive geometry
 
-This thirteen-plate synopsis reflects `docs/HOLON.md` and `docs/HNN_FORMULA.md`. The September 14
+This sixteen-plate synopsis reflects `docs/HOLON.md` and `docs/HNN_FORMULA.md`. The September 14
 intrinsic-fractal correction replaces the tiled-copy and separated-layer pictures with one
 coupled nonlinear field: interlinked toroidal domains, shared higher cells, phase-dependent
 attention, constitutive current and recursively generated arrival geometry.
@@ -37,3 +37,10 @@ retains an undecided receiver family at 33 after exclusion through 32. The older
 is explicitly an exploratory face, not an exact Holonic branch certificate. Plot coordinates
 are an exterior display conversion; scales, counts, units, generators and constraints are
 retained independently. Shared Typst mode/face equations live in `computational-holon.typ`.
+
+The engine synthesis adds plates 14–16: Athena's actual field/body attachment, learning through
+the same producing material, and the half-centred quartet/current inequality for the separate
+RH upper-bound application. `engine-blueprint.typ` reuses the shared scattering/adjoint and
+centred-face equations. The source diagrams and interface audit live in
+`research/experiments/athena_engine_blueprint/`; the plan remains the existing HNN assembly
+contract. The diagram does not assert that its specified public field-backed body already runs.

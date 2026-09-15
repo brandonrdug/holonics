@@ -10,6 +10,13 @@ the application implementations are in [holonics-hna](../crates/holonics-hna/REA
 
 ## One sustained construction programme
 
+[definition] The [illustrated engine blueprint](ATHENA_ENGINE_BLUEPRINT.md) now traces the
+actual field scattering, material adjoint, local learned reaction and joint receiver into
+the existing public model owner. Plates 14–15 of elementary-holon-generation use these same
+source bindings. This is the construction to implement; fitting another predictor to the
+field is a separate application. The blueprint names the current owner-level attachment
+and the generated-section/training operation that will demonstrate it.
+
 [project-postulate] Athena uses the [HNN model formula](HNN_FORMULA.md) through one assembled
 public model. Its active currents and constituted operators implement the field/circuit
 dynamics, learned transformations and encoded continuation described there. A matrix fitted

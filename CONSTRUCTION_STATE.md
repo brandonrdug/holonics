@@ -1,9 +1,33 @@
 # Construction state
 
-**Currency:** September 14, 2026. Brandon explicitly directs construction of the analytic
-dynamics and receiving/preimage populations previously deferred as additional mathematics.
-The deliverable is the reusable mathematical operation and its real source application;
-visualization is a receiver, not the completion criterion. The timed Athena goal remains paused.
+**Currency:** September 14, 2026. Brandon requests an actual Athena engine blueprint and
+source synthesis, preparing the next engine development, alongside de Bruijn–Newman
+upper-bound work using the half-centred face and evolving-source current. The timed goal
+remains paused. This request does not reinstate the surrogate-field predictor as the model.
+
+## Engine blueprint and upper-bound synthesis
+
+[project-postulate] The [Athena engine blueprint](docs/ATHENA_ENGINE_BLUEPRINT.md) is the
+illustrated reading of the standing assembly contract. The next engine operation puts the
+operative field under the existing public body, directly composes scattering and its local
+learned reaction, emits the joint field, and returns an actual observation through that same
+producing material. Existing `respond_to_material_observation` supplies the direct update;
+the current wave body has no operative-field-backed dispatch. No new plan, corpus increase
+or predictor fitted to the field substitutes for this join on an Athena continuation.
+
+[established-bounded; source-inspected] The interface review returned the existing direct
+scattering/tangent/adjoint/material-update path and distinguished it from the successful
+local normal/conditional training. The updated sixteen-plate elementary-holon-generation
+synopsis and interactive blueprint show the same owners and assembly boundary. These are
+construction artifacts, not a claim that the new public field-backed body has been implemented.
+
+[proved-derived; formal-checked] The [centred-current construction](docs/RH_CENTERED_CURRENT_UPPER_BOUND.md)
+now has the arbitrary-complex reflected centre, distinct quartet reciprocal currents,
+multiplicity-aware surplus, integrated squared-width bound and a finite error estimate for
+the actual flowed ξ source. `FosterClassFlux.comb'_sub_le` already supplied the finite tail;
+the new consumer connects it to normal zero velocity. Its uniform all-height surplus/width
+comparison is not yet established, and the proved global Λ_DN bound is unchanged. This
+mathematics runs alongside the engine work and does not delay its first model application.
 
 ## Analytic construction returned
 

@@ -188,3 +188,5 @@
  [*The correction belongs in the workflow.* #v(2mm)#note([The hexis convention now permits fractal geometry in a fixed-dimensional state. The model formula, Holon guide, formal framework, architecture map, development method and operating contract direct recovery through current/connection/incidence and recurrence/preimage together. A picture must identify its receiver and preserve the mechanism it is meant to explain.])],
 )
 #status([Established-bounded · source-inspected for the owner recovery and document correction. The nonlinear numerical reference is a mathematical/physical construction at its stated scope. Native Athena assembly continues through the existing field/body consumer; this presentation does not substitute the reference for that product.])
+
+#include "engine-blueprint.typ"

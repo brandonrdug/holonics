@@ -44,6 +44,11 @@ boundaries, not a claim that all formal Holonics is already available in a porta
 
 ## Productive local generator construction
 
+[definition] The [engine blueprint](ATHENA_ENGINE_BLUEPRINT.md#actual-owners-and-the-exact-assembly-join)
+links the operative field's existing forward, paired adjoint and observed-material update
+to the application body. `respond_to_material_observation` is a direct field update; the
+field-to-normal-predictor test is a different application and does not discharge this join.
+
 [definition] Import `ResidentConstitutiveFibre`, `ResidentConstitutiveCurrent` and
 `ConstitutiveFibreRest` through `holonics::engine::native_ecology::constitutive_fibre`.
 The existing resident relation owns observation-founded formation and later current transport.

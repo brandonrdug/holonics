@@ -80,6 +80,13 @@ nested automata that construct, compare and refine further automata.
 
 ## Immediate mathematical application and implementation
 
+[project-postulate] Brandon’s latest September 14 request prepares engine development through
+an actual [Athena construction blueprint](../ATHENA_ENGINE_BLUEPRINT.md), alongside explicit
+[de Bruijn–Newman upper-bound work](../RH_CENTERED_CURRENT_UPPER_BOUND.md). The earlier blanket
+deferral does not bar this authorized source-current derivation. Its local inequalities,
+finite Foster tail and uniform-source question retain their scopes; no Millennium endpoint
+is a prerequisite for the model's first training/application return.
+
 [project-postulate] The September 14 generation clarification is part of this same model
 assembly: evolve a whole resident latent/partial field through constituted refinement and
 expose its generated boundary to internal or external receivers. Image, acoustic and symbolic
@@ -276,7 +283,7 @@ They refine the existing research lines below, rather than starting four prerequ
 | **Hodge / retained complements** — `Physics/TemporalHodgeResidue.lean`, `Foundation/JointReceiverDescent.lean`, `receiver_history_compression` | For the actual selected encoder E and admitted T, compute `E_next T-U E` and the requested decoder defect. If a discarded r satisfies `E r=0` but a future receiver reads `rho T r!=0`, retain its mode or return that separator. Carry the harmonic part and exact/coexact residue through the changed chart together. | This directly decides which release/return coordinates the compiler can condense. Existing theorems provide the criterion; the native consuming map is the next work. Algebraic supported-cycle realization remains its own Hodge source task. |
 | **Navier–Stokes / mixed feedback** — `NavierStokesLambCurrentEvolution`, `NavierStokesLambCurrentCell`, weighted Duhamel and current finite-source experiments | On the declared periodic source, reconstruct the pressure-projected full/reduced current including `B(u,r)+B(r,u)+B(r,r)`, generated modes and boundary flux. Return a finite-interval signed residual and a quantitative remainder bound, or the explicit term preventing that bound. A finite-mode equality alone does not supply the omitted tail. | The same mixed-term check applies to a changing bilinear/native programme. A state or memory law may replace replay only when it closes that feedback. The fluid calculation also returns a physical source/interval result in its own right. |
 | **Yang–Mills / energy and gap** — `HolonicYangMillsHessian`, gauge-covariance/energy owners, `MassGap.lean`, `YangMillsOfficialReceiver` | Bind a reduction/rebase to the actual gauge energy and Hessian, retaining the commutator and mixed blocks. For a claimed spectral gap, construct the energy form of the stated Hamiltonian on its vacuum complement and bound the lower signed return by `-epsilon ‖v‖²`; the existing law then returns `Delta-epsilon`. Track operator, vacuum, units and scale together. | Gauge/phase transport and one-sided stability inform material/receiver changes and the physical operator applications. A classical Hessian bound is not the quantum Hamiltonian gap. A continuum claim additionally requires one positive bound uniform over its complete source family and refinement; low-energy complement modes cannot be omitted. |
-| **RH / analytic continuation** — `RH/FlowedGamma.lean`, `RH/ThresholdReturn.lean`, existing Gamma/xi block and tail owners | Return an indexed Gamma/xi generator request with its argument, clock conversion, cutoff and retained tail on the requested domain; compare the reconstructed analytic receiver. An RH endpoint claim must carry the actual xi zero receiver and establish the remaining `Lambda_DN<=0`, not substitute a finite gap statistic. | This is a demanding analytic Hephaestus release/encoding application. It proceeds when those analytic primitives are being bound; it does not delay the existing rational/text/code consumers. The direct endpoint campaign remains deferred under its standing scope. |
+| **RH / analytic continuation** — `RH/FlowedGamma.lean`, `RH/ThresholdReturn.lean`, existing Gamma/xi block and tail owners | Return an indexed Gamma/xi generator request with its argument, clock conversion, cutoff and retained tail on the requested domain; compare the reconstructed analytic receiver. An RH endpoint claim must carry the actual xi zero receiver and establish the remaining `Lambda_DN<=0`, not substitute a finite gap statistic. | This is a demanding analytic Hephaestus release/encoding application. It proceeds when those analytic primitives are being bound; it does not delay the existing rational/text/code consumers. The September 14 source-current upper-bound derivation is now explicitly authorized; no new global bound is claimed by its local return. |
 
 [conditional] The common compiler argument is short and usable now. If `E_next T=U E`
 and `D E=rho` for every admitted passage/receiver, induction gives the same decoded joint
@@ -303,7 +310,7 @@ without installing a reach counter, trajectory archive or separate motor engine.
 adds section-residual and Gaussian rebasing laws, temporal Hodge complements, passive modal
 rebase execution and finite ζ information comparisons to the existing operator/encoding
 work. Gamma shifts and Newman time keep their actual source/clock domains. Use these returned
-owners without restarting a direct RH endpoint campaign or introducing past-state storage.
+owners with the later authorized source-current bound work retaining its own scope, and without introducing past-state storage.
 
 [definition] The [transformer/fractal-mode return](../../research/records/2026-09-12_FRACTAL_MODES_LIFT_ATTENTION_INTO_MASS_PRESERVING_GENERATOR_COMPRESSION.md)
 adds usable entropic attention, amplitude-preserving modal elimination, explicit summary-error
@@ -332,8 +339,8 @@ returns into the matching authorized native work without replacing it with anoth
 | **Arithmetic regularity and spectral residues** | Use exact prime-wheel gap interiors, prime-power phase currents, receiver polarity and the existing folded ζ source/tails | Compare ordered residuals and their statistics through declared apertures; relate arithmetic and spectral receivers through actual explicit-formula maps |
 
 [definition] The arithmetic/statistical coupling in the last row is now part of the shared
-encoding/fluid investigation. It does **not** restart the separately deferred direct RH endpoint
-campaign. A gap histogram alone does not reconstruct the zero/current source or prove the
+encoding/fluid investigation. The later September 14 instruction separately authorizes the source-current upper-bound
+derivation. A gap histogram alone does not reconstruct the zero/current source or prove the
 remaining global sign inequality. The same discipline keeps Hodge cycle realization, BSD
 arithmetic/L-function correspondence and quantum/GR realization source-specific.
 

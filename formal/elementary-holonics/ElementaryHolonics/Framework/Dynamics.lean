@@ -5,6 +5,7 @@ import ElementaryHolonics.Transport.ChangingReceiver
 import ElementaryHolonics.Mathematics.AffineOrbitDivisor
 import ElementaryHolonics.Mathematics.AnalyticNavigation
 import ElementaryHolonics.Mathematics.AnalyticReceiving
+import ElementaryHolonics.RH.FiniteZeroCurrent
 import ElementaryHolonics.Millennium.HolonicDifferenceCalculus
 import ElementaryHolonics.Millennium.HolonicDirectedPassage
 import ElementaryHolonics.Millennium.HolonicClockedPantographicSwing

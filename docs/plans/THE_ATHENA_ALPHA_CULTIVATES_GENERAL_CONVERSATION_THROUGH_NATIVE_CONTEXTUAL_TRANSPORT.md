@@ -132,6 +132,12 @@ consequence. Preview, commit and observation each retain the operation contract 
 
 ### Boundary and interior assembly contract
 
+[definition] The September 14 [engine blueprint](../ATHENA_ENGINE_BLUEPRINT.md) is the
+illustrated source-level reading of this contract. The direct path is the existing operative
+field, paired material response and local learned reaction under `NativeCoupledBody`.
+Its diagram distinguishes existing operators from the unbound application join. No field-to-W
+surrogate wrapper is substituted for this same-material forward/training operation.
+
 [project-postulate] The next assembly executes the actual constitutive operators as the HNN
 model. In the existing scattering chart, `A=I+DD*`, `A v=2(u+D b)`, `w=v-u`,
 `b_next=D*v-b`. Compose the incident boundary transport, these internal dynamics and the local

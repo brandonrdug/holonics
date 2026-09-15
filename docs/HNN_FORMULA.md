@@ -98,6 +98,10 @@ an observation before it arrives, and every output does not require a new learni
 
 ## 1. The model, its dynamics and its output
 
+[definition] The [Athena engine blueprint](ATHENA_ENGINE_BLUEPRINT.md) diagrams this operator
+composition with the inspected Rust owners and the exact application attachment. Its paper
+plates reuse the equations below; it does not define another model or construction order.
+
 [definition] Use the [encapsulated Holon operations](HOLON.md#high-level-holonic-interactions)
 to formulate this model: chart-presented tensor kets |H⟩_F, receiver bras ⟨r|, operator
 application, tensor interaction, contraction and adjoint variation. The tuple below is the

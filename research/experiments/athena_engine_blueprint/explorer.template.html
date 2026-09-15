@@ -1,0 +1,97 @@
+<div id="athena-engine-blueprint">
+  <h2>Athena: one constituted HNN model</h2>
+  <div class="viz-controls" aria-label="Inspect the engine construction">
+    <button type="button" class="btn" data-mode="network" aria-pressed="true">Engine</button>
+    <button type="button" class="btn" data-mode="generation" aria-pressed="false">Generate</button>
+    <button type="button" class="btn" data-mode="training" aria-pressed="false">Learn</button>
+    <button type="button" class="btn" data-mode="encoding" aria-pressed="false">Reuse modes</button>
+  </div>
+  <svg class="engine-diagram" role="img" aria-label="One HNN field with input constraints, circulating interior, constitutive material, joint output and a producing-material adjoint. Dashed joins identify the existing field's attachment to the public Athena body."></svg>
+  <div class="text-small" data-detail aria-live="polite"></div>
+  <div class="text-small text-muted">Solid: existing mathematical operators · Dashed: body assembly · Toroidal support is schematic; K determines the participating population.</div>
+</div>
+<style>
+#athena-engine-blueprint .engine-diagram {display:block;width:100%;overflow:visible}
+#athena-engine-blueprint .engine-diagram text {fill:var(--foreground);font-family:inherit;font-size:14px;font-weight:400}
+#athena-engine-blueprint .engine-diagram .secondary {fill:var(--muted-foreground);font-size:12px}
+#athena-engine-blueprint [data-detail] {min-height:3em;margin:8px 0}
+#athena-engine-blueprint .engine-diagram .strong {font-weight:500}
+</style>
+<script>
+(()=>{
+const root=document.getElementById('athena-engine-blueprint');
+const svg=root.querySelector('.engine-diagram'), ns='http://www.w3.org/2000/svg';
+const data=@@DATA@@;
+let mode='network';
+const details={
+ network:'Assembly: NativeCoupledBody must execute the operative field, local learned reaction and joint receiver through the same resident material.',
+ generation:'Generate: advance_resident → constituted scattering/reaction → joint boundary. Refinement advances the whole section; the codec reads its face.',
+ training:'Learn: producing receiver covector → material_contact_response → apply_material_contact_realization. The updated D belongs to the generating field.',
+ encoding:'Reuse: retain the interior and required source fibre; execute a descended operator only with the matching receiver and changing-action relation.'};
+function el(tag,attrs,parent=svg){const e=document.createElementNS(ns,tag);for(const [k,v] of Object.entries(attrs))e.setAttribute(k,v);parent.appendChild(e);return e}
+function text(x,y,lines,anchor='middle',cls='',parent=svg){const e=el('text',{x,y,'text-anchor':anchor,class:cls},parent);lines.forEach((s,i)=>{const t=el('tspan',{x,dy:i?19:0},e);t.textContent=s});return e}
+function path(d,color,opacity=1,dashed=false,width=2,parent=svg){return el('path',{d,fill:'none',stroke:color,'stroke-width':width,opacity,'stroke-dasharray':dashed?'6 5':'none','stroke-linecap':'round','stroke-linejoin':'round'},parent)}
+function draw(){
+ const W=Math.max(320,Math.round(root.getBoundingClientRect().width)), narrow=W<590,H=narrow?810:540;
+ svg.replaceChildren();svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.setAttribute('height',H);
+ const title=el('title',{});title.textContent='HNN engine construction and its generating, learning and encoding paths';
+ const colors={flow:'var(--viz-series-1)',train:'var(--viz-series-2)',mode:'var(--viz-series-3)',neutral:'var(--border)'};
+ const defs=el('defs',{});Object.entries(colors).forEach(([k,c])=>{const m=el('marker',{id:`aeb-${k}`,viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto-start-reverse'},defs);el('path',{d:'M0 0L10 5L0 10Z',fill:c},m)});
+ const on=(m)=>mode==='network'||mode===m;
+ const arrow=(d,k,active=true,dash=false)=>{const p=path(d,colors[k],active?1:.14,dash,active?2.5:1.5);p.setAttribute('marker-end',`url(#aeb-${k})`)};
+ const cx=W/2, cy=narrow?350:263, gw=narrow?W-34:W*.58, gh=narrow?177:183;
+ const points=data.regions.flatMap(r=>r.mesh.flat());
+ const bounds=[0,1].map(k=>[Math.min(...points.map(p=>p[k])),Math.max(...points.map(p=>p[k]))]);
+ const scale=Math.min(gw/(bounds[0][1]-bounds[0][0]),gh/(bounds[1][1]-bounds[1][0]));
+ const pxy=p=>[cx+(p[0]-(bounds[0][0]+bounds[0][1])/2)*scale,cy-(p[1]-(bounds[1][0]+bounds[1][1])/2)*scale];
+ const poly=ps=>ps.map((p,i)=>`${i?'L':'M'}${pxy(p).join(',')}`).join(' ');
+ const field=el('g',{'data-field':'true'});
+ data.regions.forEach((r,j)=>{r.mesh.filter((_,i)=>i%2===0).forEach(line=>path(poly(line),colors.flow,.17,false,1,field));r.strands.filter((_,i)=>i<2).forEach(line=>path(poly(line),colors.flow,mode==='training'?.25:.64,false,1.2,field));});
+ data.patches.filter((_,i)=>i%5===0).forEach(p=>{const line=p.points||p.vertices||p;if(Array.isArray(line)&&Array.isArray(line[0]))path(poly(line)+'Z',colors.train,.3,false,1,field)});
+ text(cx,narrow?30:27,['NativeCoupledBody'], 'middle','strong');
+ text(cx,narrow?51:47,['one model owner · operative field attachment'], 'middle','secondary');
+ arrow(`M${cx},${narrow?69:62} L${cx},${narrow?232:175}`,'flow',mode==='network',true);
+ text(cx,narrow?249:193,['K · Θ · |H⟩'], 'middle','strong');
+ if(narrow){
+  text(15,104,['Boundary constraints','+ partial field |ξ⟩'],'start','strong');
+  text(W-15,162,['Phase / contact transport','normalized participation'],'end','secondary');
+  arrow(`M35,148 C35,217 ${cx-100},213 ${cx-78},280`,'flow',on('generation'));
+  text(cx,460,['Retained interior b ↔ boundary u'],'middle','strong');
+  text(cx,481,['scattering S_D · local learned reaction'],'middle','secondary');
+  arrow(`M${cx+90},404 C${W-18},462 ${W-18},498 ${cx+35},539`,'flow',on('generation'));
+  text(cx,560,['Joint generated boundary','receiving Holon H_R'],'middle','strong');
+  text(cx,601,['text section · image field · acoustic interval'],'middle','secondary');
+  text(16,660,['Producing-material adjoint','δℓ → G_D, G_Θ'],'start','strong');
+  arrow(`M${cx},614 C${cx},634 36,629 36,639`,'train',on('training'));
+  arrow(`M12,695 C6,532 2,382 ${cx-100},361`,'train',on('training'));
+  text(W-16,738,['Encoded current + internal modes','E, U, D_dec'],'end','strong');
+  arrow(`M${W-14},432 C${W-8},502 ${W-8},670 ${W-32},709`,'mode',on('encoding'));
+  path(`M12,783 H${W-12}`,colors.neutral);
+  text(cx,802,['CPU boundary: codecs · rest · measurements'],'middle','secondary');
+ }else{
+  text(12,100,['Boundary constraints','+ partial field |ξ⟩'],'start','strong');
+  text(12,146,['Resident section / joint family'],'start','secondary');
+  arrow(`M110,159 C112,205 ${cx-160},192 ${cx-123},230`,'flow',on('generation'));
+  text(W-12,100,['Joint generated boundary','receiving Holon H_R'],'end','strong');
+  text(W-12,146,['text · image · acoustic section'],'end','secondary');
+  arrow(`M${cx+124},230 C${cx+169},178 ${W-108},199 ${W-106},161`,'flow',on('generation'));
+  text(12,246,['Contact transport','+ participation'],'start','secondary');
+  text(W-12,307,['Local learned','reaction'],'end','secondary');
+  text(cx,372,['Retained interior b ↔ boundary u'],'middle','strong');
+  text(cx,393,['NativeConstitutiveField · S_D'],'middle','secondary');
+  text(W-16,434,['Producing-material adjoint','δℓ → G_D, G_Θ'],'end','strong');
+  arrow(`M${W-55},167 C${W-2},242 ${W-18},356 ${W-72},407`,'train',on('training'));
+  arrow(`M${W-175},441 C${cx+190},487 ${cx+230},345 ${cx+82},300`,'train',on('training'));
+  text(12,434,['Encoded current + internal modes','E, U, D_dec'],'start','strong');
+  arrow(`M${cx-65},321 C${cx-149},350 82,356 82,406`,'mode',on('encoding'));
+  arrow(`M12,480 L5,480 C5,375 5,279 ${cx-151},274`,'mode',on('encoding'),true);
+  path(`M12,499 H${W-12}`,colors.neutral);
+  text(cx,524,['GPU: current · material · refinement      /      CPU boundary: codecs · rest · measurements'],'middle','secondary');
+ }
+ root.querySelector('[data-detail]').textContent=details[mode];
+ root.dataset.mode=mode;
+}
+root.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;root.querySelectorAll('[data-mode]').forEach(c=>c.setAttribute('aria-pressed',String(c===b)));draw()}));
+new ResizeObserver(draw).observe(root);draw();
+})();
+</script>

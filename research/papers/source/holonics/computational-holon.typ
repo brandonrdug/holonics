@@ -87,6 +87,9 @@
 
 #let scattering-equation = $(I+D D^*)v=2(u+D b), quad w=v-u, quad b^+=D^*v-b$
 #let tangent-equation = $(I+D D^*)delta v=2 delta u+2 delta D b+2 D delta b-(delta D D^*+D delta D^*)v$
+#let scattering-adjoint-equation = $lambda=(I+D D^*)^(-1)(g_w+D g_b), quad G_D=lambda(b-b^+)^*+v(g_b-D^*lambda)^*$
+#let centered-face-equation = $s=1/2+d+upright(i)y, quad s^dagger=1-op("conj")(s)=1/2-d+upright(i)y, quad (s+s^dagger)/2=1/2+upright(i)y$
+#let transverse-current-equation = $dot(d) lt.eq -1/d-J_R+epsilon_R, quad d(T)^2+2(1+a)T lt.eq d(0)^2$
 #let diffusion-equation = $x_t=sqrt(overline(alpha)_t)x_0+sqrt(1-overline(alpha)_t)epsilon$
 #let memory-equation = $dot(r)=(D-K B)r+(C+D K-K A-K B K-dot(K))x+g-K f$
 
