@@ -8,22 +8,47 @@ and the [construction record](research/records/2026-09-14_THE_JOINT_FIELD_CURREN
 are delivered. The earlier one-pass centres and saved model remain verified. The old timed goal
 remains paused; the Butler/Koestler side research is complete and linked below.
 
+## Roadmap position
+
+[established-bounded; source-inspected; measured] The core model return belongs to milestone 1.
+The common-current repair advances milestone 3 within that model. Neither the 48-target count
+nor the numerical task is a new roadmap milestone. The public Rust field API and example work;
+the existing Workbench stream and symbol receiver still use their wave/session-specific ports.
+`SymbolCurrentChart` supplies a reusable exterior codec, but its current `emit` methods consume
+wave basis faces. The field API does not yet provide the complete contextual text application.
+
+| Roadmap milestone | Position and retained obligation |
+|---|---|
+| 1. One trainable HNN model | Core delivered: field/reaction generation, producing D/M updates, held-out numerical sections and trained rest. The planned shared request/session exposure still needs its field consumer. |
+| 2. Contextual organization and changing contacts | Active construction: join actual source/context/receiver restrictions to the same model and their updates. Supplied point h and fixed incidence are the present aperture; broader contextual and contact formation are unfinished. |
+| 3. Efficient continuation and durable learning | Partial: common-current propagation and resolved-comparison rest work. Pending-return/session durability and economical repeated representation remain open. |
+| 4. Useful Athena conversation, mathematics and code | Application integration begins now, alongside the needed work in 2–3. Existing workshop functions and codecs are available; useful field-backed contextual text/code behavior has not been delivered. |
+| 5–7. Broader modalities, hardening/scale, executable export | Retained downstream deliveries, with existing mathematics/implementations reused at their documented scopes. |
+
 ## Active Athena construction brief
 
-[project-postulate] **“Continue Athena” continues the same model under the roadmap.** Retain
-the product objective, governing corrections and mathematical consumer across compaction.
-A helper, diagram or component pass does not replace the public operation and generated product.
+[project-postulate] **“Continue Athena” advances the application through this same field model.**
+The next product is a field-backed request/context → jointly generated response → actual
+comparison/update → saved continuation session. Begin with the existing contextual text
+correction/continuation contract. Context, receiver and durability work belong to that consuming
+application; a numerical helper or another diagram does not replace it. This applies the
+roadmap's existing instruction to start application integration once the model returns sections.
 
 | Control | Current content |
 |---|---|
-| Authorized deliverable | Continue the same field-backed HNN into receiver-relative contextual operation and economical repeated generation, then usable Athena applications. The original model and its 48-target continuation now return actual D/M learning, held-out outputs and local trained rest. |
-| Mathematical operation | `r=A(h)s+c(h)`, `u=x+r`, `(w,b_next)=S_D(u,b)`, `y=w`. Generation now applies the common-q form directly. Receiver extension uses `y=E q_next` and `delta_y=(delta_E)q_next+E delta_q_next`, including the actual h/D/current variations. |
-| Existing owners | `NativeCoupledBody::from_field`; `NativeConstitutiveField`; `NativeFieldCurrentSource`; `NativeFieldReflection` and producing paired adjoint; `ResidentGeneratorNeighborhood`; conditional joint action and field/body rest. The existing paired linearization and receiving projections supply the next composition. |
-| Concrete unknown/join | The public operation currently has fixed source/receiver restrictions and a supplied exact h. Connect actual changed receiver orientation/material and source-relative motion to its forward/adjoint, including the local conditional variation. The fixed-h enclosure bound already returned does not account for those moving operands by itself. |
-| Next consuming operation | Extend `FieldModel::prepare`/`observe` through the actual receiving map and source/receiver differential. Preserve the common q and producing D/M; distinguish a common coordinate rechart from physical relative motion. Return a held-out contextual receiver task through this same public model. |
-| Completion evidence | The same presented section under different relevant source/receiver surroundings must produce and learn the corresponding consequences. Compare common-rechart covariance separately from changed physical reception; retain outputs, targets, source-qualified bounds, actual costs and trained reopen. |
-| Pending semantics | Retained comparisons carry the producing D, reaction source/condition and output. Actual targets are consumed once; preview/commit evaluate the same operator. Current field-body rest requires resolved comparisons; complete pending-return durability remains explicit roadmap work. |
-| Research steering | The eight-paper foveation/spatial-audio analysis, music/chord recovery and shared aperiodic-field picture are in [Hear the music](research/records/2026-09-14_HEAR_THE_MUSIC_SITUATED_RELEASE_AND_SELF_MOTION.md). They refine the receiver/current operation, not a separate rendering prerequisite. |
+| Authorized deliverable | A callable Athena field session that consumes a prepared complete request with relevant prior parts, generates and presents a complete response section, incorporates an actual supplied comparison, and reopens its trained state. Return inspected held-out contextual correction/continuation outputs and failures. The broader conversation, mathematics and code product remains the sustained objective. |
+| Mathematical operation | Mount the situated source/context through declared `P_s/P_h/E_B`; execute `r=R_M(s,h)`, `(w,b_next)=S_D(E_B input+r,b)`; receive the joint response through `P_R` and its codec. Train D/M from the actual response comparison. Existing common-q propagation is the starting implementation. |
+| Existing owners | `NativeCoupledBody::{from_field,preview_field,generate_field,observe_field}`; its field/reaction and `SavedCoupledBody`; `crates/holonics-hna/src/stream.rs`; Workbench `session_stream.rs`/`adapters/hna.rs`; `alpha::exposure::ExposureReader`; `native/section_input.rs::SymbolCurrentChart`. Reuse their actual operations and extend incompatible ports without a second engine. |
+| Concrete unknown/join | The field API is callable from Rust but is not connected to the prepared request/context stream and whole-section text receiver. Current symbol emission consumes wave-specific faces; current field h is caller-supplied rather than formed from the relevant situated section. Bind these operands and the producing comparison through the public application. |
+| Next consuming operation | Trace one prepared request/context/target episode through the existing stream adapter, field API and receiver. Implement the shared field-session calls and the required joint section/source/codec maps, then train and inspect contextual correction/continuation on held-out episodes or combinations. A wiring-only return is intermediate to that application result. |
+| Completion evidence | A public request returns actual jointly generated text/sections from the field model, with supplied codec/configuration and inferred material distinguished; an actual comparison updates the producing D/M; changed relevant context and held-out combinations are inspected; trained reopen reproduces the declared result. Report quality failures and costs. Targets never supply source context or decoder answers. |
+| Receiver and context work | Retain active receiving fields, phase, flux, incidence, internal state and relative motion. Implement the corresponding source/receiver maps and full variations where the application uses them: `delta_y=(delta_P_R)w+P_R delta_w`. A common rechart and physical relative motion have different consequences. A separate moving-field demonstration does not replace the application consumer. |
+| Durability | Current rest supports resolved comparisons. Extend the existing field/session payload for an outstanding producing comparison when this session needs it; preserve the old model files. Compile/condense the repeated operator where the application's measured work exposes that need. No complete-compression gate precedes application integration. |
+
+[project-postulate] On continuation, start from this unclosed application join and the
+[native application contract](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-consuming-application).
+Keep the successful numerical task as regression evidence. Carry its actual model forward;
+do not restart the first model, select another research endpoint, or request a new goal command.
 
 ## Returned operation and verification
 

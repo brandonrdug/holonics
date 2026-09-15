@@ -91,17 +91,16 @@ preview and commit differ in ownership effects, not in an unannounced change of 
 
 ## Concrete engine-development increment
 
-[project-postulate] The first increment is the operative-field-backed body operation. It consumes
-the existing resident input/partial field, actual boundary constraints and requested receiving
-chart; executes constituted transport and its local learned reactions; and returns a joint
-field through that receiver. The same body handles an actual observed difference at its
-producing cut and changes the material used by the next model invocation. Use the current
-field and neighborhood types; do not introduce a second public engine or clone the ecology.
+[project-postulate] Continue the delivered operative-field-backed body through the
+[shared request/context and joint response application](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-consuming-application).
+The model's actual transport, local reaction, source/receiver maps and producing D/M update
+supply that application. Receiver/context refinements must identify the requested response they
+change and join its forward/adjoint. The active brief carries the exact implementation position.
 
-[definition] Implement the owner attachment and its forward/adjoint consumer together. Begin
-with fixed admitted incidence so the existing derivative has a precise domain, while retaining
-the existing contact-change ports. This is an implementation aperture, not a claim that K is
-intrinsically fixed. Do not add universal symmetry, certainty, global convergence or
+[definition] The returned model uses fixed admitted incidence, so its existing derivative
+has a precise domain. Extend source/context and receiver consumers together, retaining the
+existing contact-change ports and the actual derivative of each changed domain. This is an
+implementation aperture, not a claim that K is intrinsically fixed. Do not add universal symmetry, certainty, global convergence or
 Millennium-theorem admission conditions to ordinary training.
 
 [definition] The first application measures an actual generated joint section against an

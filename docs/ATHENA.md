@@ -22,7 +22,12 @@ actual field scattering, material adjoint, local learned reaction and joint rece
 the existing public model owner. Plates 14–15 of elementary-holon-generation use these same
 source bindings. The [first field-backed model return](../research/records/2026-09-14_THE_CONSTITUTED_FIELD_TRAINS_AND_REOPENS_AS_ONE_HNN_MODEL.md) now implements the
 owner attachment, joint generation, D/M target response and local trained rest. Its held-out
-outputs and longer-run bound failure are recorded at their actual scopes.
+outputs and repaired 48-target continuation are recorded at their actual scopes.
+[CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md#roadmap-position) locates these returns in the
+roadmap: the public Rust model core is delivered, while the prepared request/context, shared
+stream and whole-section text receiver still need their field consumer. The
+[next application contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-consuming-application)
+continues that join alongside its required context/receiver and durability work.
 
 [project-postulate] Athena uses the [HNN model formula](HNN_FORMULA.md) through one assembled
 public model. Its active currents and constituted operators implement the field/circuit

@@ -40,9 +40,9 @@ not replace the public model and actual generated product described here.
 ### The public model operation
 
 [definition] Use the existing `holonics::{structure,geometry,engine,hna}` library boundaries.
-`NativeCoupledBody` owns the active model; add an operative-field-backed representation under
-that owner rather than a second engine. Reuse the current field, local generator neighborhood,
-resident section/family, constitutive material and receiver types. A Holon operation retains
+`NativeCoupledBody` owns the active model; its operative-field-backed representation owns
+the field and local reaction under that same move owner. Reuse the current field, local
+generator neighborhood, resident section/family, constitutive material and receiver types. A Holon operation retains
 the source/target charts, incidence and shared parameters; it is not an untyped buffer wrapper.
 Its initial constructor specifies K, material and receiver configuration explicitly.
 
@@ -58,8 +58,9 @@ family and expose their actual differential to the model's update.
 boundary constraints, admissible source/latent family and requested receiver/extent. It returns
 the generated joint section or its requested presentation and the applicable source/defect
 information. A continuing call publishes the corresponding endpoint once. A forecast evaluates
-the same declared operation without installing that endpoint. These are proposed operation
-contracts to bind to the existing public session; their names alone do not claim an API exists.
+the same declared operation without installing that endpoint. The numerical field API now
+exposes `preview_field` and `generate_field`; `observe_field` consumes the retained comparison. The complete partial/context/receiver request
+and existing application stream still require their consuming attachment.
 
 [definition] The refinement coordinate advances the whole participating state. Image/acoustic
 coordinates and textual symbols label output faces, not mandatory evolution ticks. Extent can
@@ -84,6 +85,15 @@ terms. An infinitesimal gradient identity alone does not prove that every full-s
 loss. No new universal optimizer or qualitative definition of intelligence is required.
 
 ### First implementation increment
+
+[established-bounded; source-inspected; measured] The field/reaction core, current publication,
+producing D/M target response, public Rust invocation and local trained rest have returned in
+[the model experiment](../../research/experiments/athena_field/README.md). The 48-target repair
+continues that same core. This section retains its mathematical contract and responsibility
+map, with the actual invoked owners and still-unconnected application consumers.
+Its shared request/stream exposure is still unconnected, and its initially supplied condition
+has not become the full contextual source construction. Continue through the application join
+below rather than repeating the numerical first increment.
 
 [project-postulate] Deliver one public **train → generate → observed update → generate again**
 operation on joint sections, using the actual operative field and local learned reaction.
@@ -115,12 +125,11 @@ a claim that every physical/HNN interaction has this universal order.
 `field/resident_input.rs` already admits a generated point current without a host numerical
 round-trip; preserve its actual input chart. `NativeFieldCurrentSource` joins the outgoing
 report and operative b with owner, producing sections and contact births. Its `enclosure()`
-is an outer receiver of those retained finer operands, not their replacement. The preserved
-draft's `NativeFieldCurrentSource::reflect` already applies the actual D to an enclosed joint
-`(u,b)` without mutation. Review and use it for the staged scattering where its domain matches.
-Add the matching current-publication port inside the field owner, validating the producing
-cut/material and publishing the computed w/b once. A new occurrence must not silently compute
-a different operator or invent an observed target. Ordinary external/observed occurrences
+is an outer receiver of those retained finer operands, not their replacement.
+`NativeFieldCurrentSource::reflect` applies the actual D to an enclosed joint `(u,b)` without
+mutation. `NativeConstitutiveField::commit_reflection` validates the producing cut/material
+and publishes the computed w/b once, retaining its qualified common image. A new occurrence
+must not silently compute a different operator or invent an observed target. Ordinary external/observed occurrences
 continue through the existing field ingress and source/anchor contracts.
 
 [definition] **Reaction attachment.** Bind `P_s/P_h` to declared blocks/transport maps of that
@@ -143,28 +152,29 @@ joint output, not only a detached report. Host readout occurs at the requested d
 Later text/image/acoustic codecs consume that same receiver contract. A coordinate envelope
 must not be promoted to the Cartesian product of independent possible outputs.
 
-[definition] **Producing-handle order.** Retain the immutable producing source/sections, local
-reaction cut, condition/port maps and receiver when preparing a comparison. Commit its field
-generation once. A target arrives as a new receiving occurrence tied to that producing emission
-or retained anchor. Only after that reception succeeds may the latest-cut material observation
-operation run. Its successful response already applies the contact update. Tie the application's
-opaque handle to this complete retained relation and consume it once; do not maintain an
-independently advancing wave prediction alongside the field's pending occurrence.
+[definition] **Producing-handle order.** The field body retains its immutable producing
+source, reaction condition/material and joint input/output under the comparison identifier.
+`observe_field` receives an actual target for that handle, stages the paired D and local M
+responses, publishes both after successful preparation, and consumes the handle once. This
+path does not fabricate an ordinary historical observation or route through a second wave
+predictor. `respond_to_material_observation` remains a different available field operation:
+when a caller uses it, its latest-receiving-cut precondition and internal commit apply.
+Those preconditions are not retroactively imposed on the direct producing-target API.
 
-| Work in the increment | Existing owner and concrete edit | Evidence returned with the operation |
+| Responsibility | Mathematical/native owner | Application obligation |
 |---|---|---|
-| Own the field model | Extend `A/coupled_wave/body.rs` with a representation that owns `NativeConstitutiveField` and its necessary reaction/receiver state. Bind founding from the existing field constructors. | One live move owner, a usable public constructor, and source/continuation handles belonging to it. No field-to-wave cast or cloned ecology. |
-| Execute the actual forward composition | Bind ordinary ingress through `advance_resident`/`advance_current_resident`; compose the declared reaction-first operator above on resident sections, using the actual operative scattering and its matching staged current publication. | Input/known boundary, operator configuration and complete generated output. The driver contains no local learner, surrogate W, semantic scene switch or expected-answer emitter. |
-| Preserve section/family semantics | Reuse `NativeFieldContinuation`, `NativeFieldCurrentSource`, resident enclosures/sections and the declared receiving chart; promote only the specific inaccessible port needed by the public consumer. | Shared parameters and joined coordinates survive the output. A point-only port receives only its admitted domain; no enclosure centre is silently substituted. |
-| Train the same material | Route a genuine receiving occurrence through `respond_to_material_observation` where its contract applies, or compose its existing query/paired-response owners for the required model covector. Compose the local reaction's own update in the same body. | Source/target comparison, signed covector, actual changed coefficients/constraints and generated held-out section after training. Verify the producing-material adjoint and actual finite-step behavior. |
-| Unify producing handles | Bind the application's comparison identifier to the field's producing occurrence/current/material and source frame. A late observation is a new receiving occurrence referring to that producer. | Correct producing cut, recoverable refusal and one incorporation. `respond_to_material_observation` requires the latest receiving cut and already commits internally; do not pass an old receiving index or apply its response twice. |
-| Expose and retain the result | Add the operation to the existing native request/stream boundary and extend the corresponding field/body rest payload sufficiently to reopen this local trained operation. Keep an inspectable result artifact and command. | Reproducible public invocation, saved learned material/current with its decoder/configuration, and output on another input. Whole-session pending/application durability continues in the durability contract below. |
+| Own the field model | `A/coupled_wave/body/field.rs::FieldModel`; `NativeCoupledBody::from_field` | Keep one live owner through the shared request/session interface. |
+| Execute the forward composition | `FieldModel::prepare`; reaction `apply_joint_current`; field `reflect`/`commit_reflection` | Bind the application's source/context and receiver maps to this operator; expose actual joint output. |
+| Retain the joint section | `NativeFieldCurrentSource`, `NativeFieldGeneratedSection`, resident enclosures | Keep the common current and producing relation through text/other section receivers; never substitute independent marginal selections or a point seal. |
+| Train the same D/M | `FieldModel::observe`; paired `compare_target`/`apply_reflection_target`; neighborhood staged reaction target | Carry an actual application target back through its producing receiver and model material. |
+| Consume the producing handle | `FieldModel::pending`, `observe_field`, comparison release | Bind session responses to the model handle; preserve its scope and single incorporation across the admitted session lifecycle. |
+| Expose and retain the result | Public Rust field API; field/body rest and `SavedCoupledBody` | Connect the existing request stream and whole-section presentation; extend the corresponding session/pending payload as needed. |
 
 [definition] In this table C is `crates/holonic-engine/src/native_ecology/constitutive_fibre`
-and A is `crates/holonics-hna/src/native`. `advance_resident` mutates its field and returns
-owner-qualified continuation; it is not a stateless function handle. The field's pending
-occurrence and the wave body's prediction identifiers are different existing representations.
-Unify their actual producing relation instead of introducing an unverified ID-only adapter.
+and A is `crates/holonics-hna/src/native`. The field's ordinary occurrence capabilities,
+direct generated-section comparisons and older wave prediction handles have different source
+contracts. Reuse each at its actual consumer; a common application interface does not identify
+them merely because they all have integer identifiers.
 
 [definition] The first data task is a declared joint field transformation/reconstruction
 within the configured operators' applicable family. Examples and target sections are external
@@ -180,6 +190,47 @@ native checks for the unchanged local arithmetic. Add checks for the actual new 
 forward/adjoint, family output and ownership joins. Do not count a CUDA-ignored test as executed,
 or a public wrapper compilation as a model output. Measure setup, resident work and delivery
 separately on the actual requested section.
+
+### Next consuming application
+
+[project-postulate] Build the first field-backed Athena contextual correction/continuation
+session through the existing Workbench/request stream. Consume a complete prepared request and
+its relevant preceding parts, generate the response as a joint section, expose its actual text
+presentation, receive a supplied comparison through the producing model, and save/reopen that
+same session's trained state. Inspect held-out episodes/combinations and preserve failed outputs.
+The first scoped application does not claim general conversation or code competence merely
+because the adapter runs.
+
+[established-bounded; source-inspected] `A/coupled_wave/body/field.rs` already exposes the
+field constructor, preview/generation and target update. `crates/holonics-hna/src/stream.rs`
+and `applications/holonics-workbench/src/session_stream.rs` provide the public request boundary,
+but their existing coupled text target uses wave-specific source/receiver calls.
+`A/section_input.rs::SymbolCurrentChart` supplies the declared alphabet/current conversion;
+its current emission methods require wave basis faces. `alpha::exposure::ExposureReader` and
+`applications/conversation-data` provide prepared source/part relationships. Connect those
+actual boundaries to the field's joint return and source/context maps; their names do not
+establish an existing end-to-end field application.
+
+[definition] Keep the complete section and relevant preceding parts as source operands.
+`P_s/P_h/E_B` restrict or transport that situated input into the existing reaction/scattering
+law; `P_R` and the declared codec receive its jointly generated response. Their domains,
+units/phase, known/unknown regions and producing parameters must be explicit. A source path,
+episode label or target answer cannot substitute for those relations. Reuse the current
+condition/contact, receiver and joint-family owners before adding an interface or representation.
+
+[definition] Contextual and receiver development is part of this application construction.
+Where the receiving chart/material moves, use its actual variation together with the source,
+reaction, scattering and interior variations. Active plates and physical relative motion remain
+in the model construction; a stand-alone geometry experiment is not the application's delivered
+response. Unresolved broader receiver physics does not prevent using an already-admitted
+receiver in an application.
+
+[project-postulate] A callable adapter alone is an intermediate result. Close the increment with
+actual generated response sections/text, an actual D/M comparison/update, held-out contextual
+outputs, trained reopen and measured quality/cost. Keep pending comparisons across restart when
+the admitted session requires them, through the existing rest owner. The [training data](#training-data-and-generalization),
+[context](#context-morphology-and-active-interfaces), [durability](#encoding-memory-and-durability)
+and [application](#application-and-release-contract) contracts below govern this one construction.
 
 ### Training data and generalization
 

@@ -82,10 +82,14 @@ training. Five focused tests, 165 wider native regressions and 12 public HNN tes
 the previously delivered model-file compatibility fixture. The original one-pass
 centres and errors remain exactly unchanged, and its new rest reproduces its four final balls.
 
-[project-postulate] The next consuming operation is the source/receiver-relative field action,
-including the actual receiver map and its variation in the same forward/adjoint. For
-`y=E q_next`, `delta_y=(delta_E)q_next+E delta_q_next`; varying h/D/current requires their
-corresponding terms inside `delta_q_next`. A common coordinate rechart must commute, while
-physical relative motion changes the received face through the actual transport. The present
-fixed-condition bound is not substituted for that complete derivative. This continues the
-same public model; the roadmap retains pending-return durability and Athena application work.
+[historical] The implementation return initially named source/receiver-relative field action
+as the next operation without retaining its application consumer. Brandon's subsequent roadmap
+clarification exposed that drift. The live [position](../../CONSTRUCTION_STATE.md#roadmap-position)
+and [application contract](../../docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-consuming-application)
+now bind the receiver/context work to the same model's request and joint response session.
+
+[definition] For `y=E q_next`, `delta_y=(delta_E)q_next+E delta_q_next`; varying h/D/current
+requires the corresponding terms inside `delta_q_next`. A common coordinate rechart commutes
+at its declared scope; physical relative motion changes the received face through the actual
+transport. The fixed-condition bound is not substituted for that complete derivative. These
+remain construction relations for their consumers, rather than a separate roadmap phase.

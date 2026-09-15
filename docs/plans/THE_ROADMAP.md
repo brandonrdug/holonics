@@ -72,19 +72,25 @@ and resource behavior needed by those tasks; interoperability is a later deliver
 
 ## Immediate mathematical application and implementation
 
-[project-postulate] The next construction is milestone 1's complete field-backed operation,
-not another survey or rendering. The [first increment contract](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#first-implementation-increment)
-names the exact owner edits and the returned product. Its mathematical core is the existing
-constituted scattering and its local reaction, including the complete derivative of that
-composition. The update acts on the same D/Θ and retained interior that produced the output.
+[project-postulate] Continue from the delivered field-backed core into its consuming Athena
+application. [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md#roadmap-position) holds the exact
+milestone position and unclosed join. The [first increment contract](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#first-implementation-increment)
+retains the model equations and completed core responsibilities; it does not schedule repeated
+construction of that core. The [next consuming application](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-consuming-application)
+binds its prepared source/context, shared session and joint response receiver.
 
-[definition] First integrate the model at an explicitly supplied finite incidence/section
-scope. Supply initial geometry/material and source/target examples openly; infer the model's
-coefficients/relations through the declared learning law. A source-driven contact change and
-broader family are subsequent extensions of this object, not a new engine. Choose a simple
-joint field transformation/reconstruction task that the admitted operators can express, with
-unseen input combinations; its driver supplies examples and reads outputs, never the learner
-or a separate predictor inside the test.
+[project-postulate] Milestones 2–3 supply the contextual organization and durability needed by
+milestone 4's applications as those applications are constructed. The shared request/session
+attachment from milestone 1 remains an implementation obligation where it is still unconnected.
+Receiver motion, contact formation and encoding are model operations to implement at their
+actual consuming source/receiver. Their separate numerical demonstrations do not become
+additional phases before conversation/code work. The native specification keeps the wider
+physical and mathematical construction intact.
+
+[definition] Keep the initial finite-incidence joint transformation as regression and cost
+evidence. Reuse the trained model, its normal/contact update laws and current representation.
+Extend the application from diagnosed source/receiver differences; a larger training count or
+another version of that first example does not itself deliver contextual conversation.
 
 [definition] `NativeCoupledBody` is the application move owner; its field-backed state must
 own `NativeConstitutiveField` and the required local reaction/receiver state. The field's

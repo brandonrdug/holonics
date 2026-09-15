@@ -32,7 +32,7 @@ operative field and its learned local reaction. `preview_field`, `generate_field
 `observe_field` share the same generating law and producing-material return. The
 [`athena_field` example](examples/athena_field.rs) learns a joint complex transformation from
 actual targets, generates on held-out inputs and reads back its trained `SavedCoupledBody`.
-[Actual outputs, command, costs and longer-run failure](../../research/experiments/athena_field/README.md).
+[Actual outputs, command, costs and completed 48-target continuation](../../research/experiments/athena_field/README.md).
 This is the first finite model operation; useful Athena conversation and broader receiving
 applications remain in the live construction order.
 
