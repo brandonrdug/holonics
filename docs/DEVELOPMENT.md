@@ -301,7 +301,7 @@ infeasibility. Historical "no scalar"/"clock may never select" wording must be r
 actual erroneous substitution, never as a ban on measuring or optimizing performance.
 
 [established-bounded; measured; computational-witness] The
-[native performance benchmark](../research/experiments/native_performance_benchmark/README.md)
+[shared HNN evaluation kit and native performance benchmark](../research/experiments/native_performance_benchmark/README.md)
 applies these conventions to public C5 power/application, committed wave observations and
 exact code-cost calculation. It checks actual rational outputs and committed requests, keeps
 raw samples and reports process CPU/RSS, payload residency and transfer at their available

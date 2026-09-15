@@ -154,6 +154,13 @@ A component pass does not close its unimplemented application.
 
 ## What an outcome means
 
+[project-postulate] The September 15 [evaluation synthesis](../ATHENA_EVALUATION.md) keeps the
+same source/unknown/receiver questions through implementation changes. Refined conversation
+and repository episodes remain the application target. Existing solver inference, generator
+recovery, field completion and their counterexamples remain available regression evidence;
+another elementary example is not automatically the next construction objective. Reuse the
+existing evaluation apparatus and select the checks that answer the changed operation.
+
 [definition] **Trainable model** means the specified field operation learns from actual
 comparisons and generates its requested joint sections. **First usable Athena** means that
 model supplies useful held-out conversation, mathematical and code/tool tasks through the

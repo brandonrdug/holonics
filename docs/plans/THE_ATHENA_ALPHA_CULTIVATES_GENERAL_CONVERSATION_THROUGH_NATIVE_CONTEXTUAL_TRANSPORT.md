@@ -275,6 +275,14 @@ and [application](#application-and-release-contract) contracts below govern this
 
 ### Training data and generalization
 
+[project-postulate] The [shared evaluation contract](../ATHENA_EVALUATION.md) fixes the questions
+about supplied conditions, inferred relation, complete output, future reuse and cost. Its
+conversation/repository episode adapter reuses the existing refined source package and keeps
+historical assessment outside the model input. Mathematical solver results count at their
+actual domain; field integration is a different consumer obligation, not a higher definition
+of intelligence. Add a source family to answer a concrete application question rather than
+replacing the benchmark each time an owner changes.
+
 [definition] Reuse `applications/conversation-data`, `alpha::exposure::ExposureReader` and
 the prepared source/part/return stream. User, assistant and tool messages retain their actual
 roles and chronological relationships. The native input is a situated section and its relevant

@@ -1,4 +1,33 @@
-# Native workload benchmark
+# HNN evaluation kit and native workload benchmark
+
+[project-postulate] Use this existing apparatus for Athena's continuing evaluation. The
+[shared methodology](../../../docs/ATHENA_EVALUATION.md) connects source constraints, inferred
+relations, generated consequences, held-out application quality, reuse and cost. It incorporates
+[the historical review](../../records/2026-09-15_ATHENA_EVALUATION_HISTORY_AND_SHARED_CONSEQUENCE_KIT.md)
+without restoring retired drivers or making every profile a release gate.
+
+[definition] `quality.py recorded --output NEW_DIRECTORY` reassesses retained mathematical and
+partial-field results. `quality.py run --output NEW_DIRECTORY` calls the same public sessions
+and records fresh responses, exact consequence checks and process costs through `benchmark.py`.
+The field profile evaluates its existing trained artifact; the mathematical profile uses its
+four-observation normal law and exact algebraic constructions. They retain different source
+scopes and produce no aggregate intelligence score. The fixed references belong to those
+specific profiles; a changed training/data recipe needs its corresponding reference relation.
+Protocol errors and quality failures remain in the report; process exit is not a capability grade.
+
+[definition] `episode.py --dataset PATH --request-event ID --repository-ref COMMIT:PATH
+--output NEW_DIRECTORY` uses the existing conversation packager to prepare a private source
+input and separate historical assessment. Explicit prior `--context-event ID` values can be
+included; responses and later material are rejected as context. This is retrospective validation,
+not automatic gold labeling or a reconstructed original prompt. The full conversation/repository
+application remains the target; these mechanism profiles do not measure it by proxy.
+
+[established-bounded; measured] The [September 15 integrated run](consequences/2026-09-15/result.json)
+returns the current mathematical identities and partial-field consequences. Source requests,
+responses and stderr remain beside it. Sixteen focused tests cover the shared timing, exact
+receivers, failure visibility and private episode separation.
+
+## Workload clocks
 
 `benchmark.py` measures the current public HNN workloads on a declared host using existing
 native process receipts, per-request `ExactWork`/cost fields, and resident transfer census values.

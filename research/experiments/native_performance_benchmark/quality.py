@@ -1,0 +1,211 @@
+#!/usr/bin/env python3
+"""Shared exterior consequence receivers over existing public HNN operations.
+
+No learner, training-answer router, aggregate intelligence score, or release gate lives here.
+Recorded evidence and fresh execution are explicitly different modes. Source suites retain
+separate histories and consumers. Add an adapter here when an actual application can consume
+its source, rather than founding another benchmark for each implementation increment.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+from fractions import Fraction as Q
+import json
+from pathlib import Path
+import subprocess
+
+import benchmark
+
+ROOT = Path(__file__).resolve().parents[3]
+FIELD = ROOT / 'research/experiments/athena_field/pattern'
+MATH = ROOT / 'research/experiments/contextual_prediction_release'
+
+
+def load_lines(path):
+    return [json.loads(line) for line in Path(path).read_text().splitlines() if line.strip()]
+
+
+def rat(value):
+    if isinstance(value, dict):
+        return Q(int(value['numerator']), int(value['denominator']))
+    def integer(words):
+        return words[0] * sum(v << (32 * i) for i, v in enumerate(words[1]))
+    return Q(integer(value[0]), integer(value[1]))
+
+
+def check_events(events, count, event):
+    if len(events) != count:
+        raise ValueError(f'expected {count} {event} records, received {len(events)}')
+    sequences = [item['sequence'] for item in events]
+    if any(b != a + 1 for a, b in zip(sequences, sequences[1:])):
+        raise ValueError('stream sequence is not contiguous')
+    if any(item.get('event') != event for item in events):
+        raise ValueError('an operation refused or returned a different event')
+    return [item['value'] for item in events]
+
+
+def field_cases():
+    groups = json.loads((FIELD / 'expected.json').read_text())['evaluation']
+    return [(family, case) for family in ('withheld_equal', 'composition_controls', 'shorter_output_controls') for case in groups[family]]
+
+
+def check_field(events, cases=None):
+    cases = field_cases() if cases is None else cases
+    values = check_events(events, len(cases), 'field-request')
+    report = {'consumer': 'NativeFieldSession / constituted field',
+              'supplied': 'trained D/M, partial symbol regions, context region and receiving mask',
+              'inferred': 'free region currents and their simultaneous symbol faces',
+              'scope': 'declared finite symbol chart; supplied values are not inferred values',
+              'families': {}}
+    for (family, case), value in zip(cases, values):
+        target = case['target'].split()
+        observed = {i: v for i, v in enumerate(case['partial']) if v is not None and i < len(target)}
+        # Output length errors count against every missing coordinate; never truncate with zip.
+        received = value['symbols']
+        missing = [i for i in range(len(target)) if i not in observed]
+        correct = lambda i, wanted: i < len(received) and received[i] == wanted
+        result = {'source': case['partial'], 'context': case['context'],
+                  'expected': target, 'received': received, 'text': value['text'],
+                  'complete_correct': received == target and value['text'] == case['target'],
+                  'presentation_agrees_with_symbols': value['text'] == ' '.join(received),
+                  'inferred_correct': sum(correct(i, target[i]) for i in missing),
+                  'inferred_count': len(missing),
+                  'supplied_preserved': sum(correct(i, v) for i, v in observed.items()),
+                  'supplied_count': len(observed),
+                  'radius': str(rat(value['generated']['received_boundary']['radius'])),
+                  'selections': value['selections']}
+        report['families'].setdefault(family, []).append(result)
+    return report
+
+
+def factor_tensor(factors):
+    """Reconstruct coefficients from returned factors, independently of tensor_image."""
+    left = [[rat(x) for x in row] for row in factors['left_forms']]
+    right = [[rat(x) for x in row] for row in factors['right_forms']]
+    weights = [[rat(x) for x in row] for row in factors['receiver_family']['particular']]
+    rank = factors['products']
+    n, m = factors['left_extent'], factors['right_extent']
+    if len(left) != rank or len(right) != rank or any(len(r) != n for r in left) or any(len(r) != m for r in right) or any(len(r) != rank for r in weights):
+        raise ValueError('factor extent mismatch')
+    return [[sum(row[k] * left[k][i] * right[k][j] for k in range(rank))
+             for i in range(n) for j in range(m)] for row in weights]
+
+
+def enclosure_difference(output, expected):
+    center = output['center']
+    if len(center) != len(expected):
+        raise ValueError('enclosure output extent mismatch')
+    radius = rat(output['radius'])
+    if radius < 0:
+        raise ValueError('negative radius')
+    difference = [(rat(z['real']) - real, rat(z['imaginary']) - imaginary)
+                  for z, (real, imaginary) in zip(center, expected)]
+    squared = sum(a*a + b*b for a, b in difference)
+    return {'contains_reference': squared <= radius*radius,
+            'center_minus_reference': [[str(a), str(b)] for a, b in difference],
+            'squared_difference': str(squared), 'radius': str(radius)}
+
+
+def check_math(events, requests=None):
+    requests = load_lines(MATH / 'requests.jsonl') if requests is None else requests
+    values = check_events(events, len(requests), 'mathematical-return')
+    report = {'consumer': 'NativeMathematicalSession',
+              'supplied': 'source/condition maps, four observations with unit prior, target tensors and permitted factor forms',
+              'inferred': 'normal coefficients; complex-product factorization and recurrence power',
+              'scope': 'explicit supplied maps; exact solver construction is inference, independent of text reception',
+              'normal': [], 'algebra': []}
+    for request, value in zip(requests, values):
+        r = request['command']['request']; op = r['operation']
+        if op == 'predict-section' and not r['retain_prediction']:
+            x = [rat(v) for v in r['preparation']['values']]
+            a, ai, b, bi, h, hi = x
+            # Reference WH=B after the four specified observations, including the unit prior.
+            dr, di = a-b, ai-bi
+            pr, pi = h*dr-hi*di, h*di+hi*dr
+            expected = [((a+b+pr)/3, (ai+bi+pi)/3), ((a+b-pr)/3, (ai+bi-pi)/3)]
+            result = enclosure_difference(value['output'], expected)
+            result.update({'preparation': [str(z) for z in x], 'observations': value['observations'],
+                           'normal_reference': [[str(a), str(b)] for a,b in expected]})
+            if h in (Q(-1), Q(1)) and hi == 0:
+                target = [(a,ai),(b,bi)] if h == 1 else [(b,bi),(a,ai)]
+                result['unregularized_exchange'] = enclosure_difference(value['output'], target)
+            report['normal'].append(result)
+        elif op == 'construct-bilinear':
+            target = [[rat(x) for x in row] for row in r['target']['coefficients']]
+            actual = factor_tensor(value['factors'])
+            report['algebra'].append({'operation': op, 'all_coefficients_equal': actual == target,
+                'products': value['factors']['products'],
+                'scope': 'coefficient identity for every input in the supplied rational bilinear domain',
+                'coefficients': [[str(x) for x in row] for row in actual]})
+        elif op in ('apply', 'read-product'):
+            expected_by_owner = {2: [Q(337,120),Q(-3,4)], 3: [Q(247,120),Q(427,120)], 5: [Q(-11,12),Q(-5,12)]}
+            expected = expected_by_owner[r['operator']]
+            actual = list(map(rat, value['output']))
+            report['algebra'].append({'operation': op, 'operator': r['operator'],
+                'expected': list(map(str,expected)), 'received': list(map(str,actual)),
+                'exact': actual == expected,
+                'source_products_recomputed': value['source_products_recomputed']})
+    report['distinct_normal_preparations'] = len({tuple(r['preparation']) for r in report['normal']})
+    report['normal_query_count'] = len(report['normal'])
+    return report
+
+
+def process_case(name, command, requests, output):
+    payload = ''.join(json.dumps(r)+'\n' for r in requests)
+    (output / f'{name}-requests.jsonl').write_text(payload)
+    result, wall, resources = benchmark.measured_process(command, payload)
+    (output / f'{name}-events.jsonl').write_text(result.stdout)
+    (output / f'{name}-stderr.txt').write_text(result.stderr)
+    record = {'command': command, 'wall_ns': wall, 'process_resources': resources, 'exit_code': result.returncode,
+              'clock_scope': 'fresh process with current CUDA cache; outer wall and child resources separate'}
+    if result.returncode:
+        return None, record
+    return [json.loads(line) for line in result.stdout.splitlines() if line.strip()], record
+
+
+def evaluate(mode, output, binary):
+    output.mkdir(parents=True, exist_ok=False)
+    result = {'schema': 'holonics.consequence-evaluation.v1', 'mode': mode,
+              'aggregate_intelligence_score': None, 'sources': {}, 'workloads': {},
+              'application_target': {'material': 'refined conversation exposure and repository sources at declared revisions',
+                  'contract': 'docs/ATHENA_EVALUATION.md',
+                  'status': 'not measured by these mechanism populations; keep whole episodes and actual constraints',
+                  'automatic_gold_from_assistant': False}}
+    if mode == 'recorded':
+        field = [r for r in load_lines(FIELD/'run/evaluation-events.jsonl') if r['event']=='field-request']
+        math = load_lines(MATH/'responses.jsonl')
+        result['sources'] = {'field': str((FIELD/'run/evaluation-events.jsonl').relative_to(ROOT)),
+                             'math': str((MATH/'responses.jsonl').relative_to(ROOT))}
+    else:
+        result['revision'] = subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
+        result['binary_sha256'] = hashlib.sha256(binary.read_bytes()).hexdigest()
+        field_requests = [r for r in load_lines(FIELD/'evaluation.jsonl') if r['command']['action']=='field-request']
+        if any(r['command']['request']['commit'] or r['command']['request']['retain_comparison'] for r in field_requests):
+            raise ValueError('evaluation-only field profile must not update or retain target comparisons')
+        field, result['sources']['field'] = process_case('field', [str(binary),'--format','jsonl','hna','field-session',
+            '--resume',str(FIELD/'run/trained.session'),'--input','-','--checkpoint',str(output/'field.session')],field_requests,output)
+        math, result['sources']['math'] = process_case('math', [str(binary),'--format','jsonl','hna','mathematical-session','--input','-'],load_lines(MATH/'requests.jsonl'),output)
+    for name, events, receiver in [('field',field,check_field),('math',math,check_math)]:
+        try:
+            if events is None: raise ValueError('native process failed; inspect saved stderr')
+            result['workloads'][name] = receiver(events)
+        except (ValueError,KeyError,TypeError,IndexError) as error:
+            result['workloads'][name] = {'error': str(error)}
+    (output/'result.json').write_text(json.dumps(result,indent=2)+'\n')
+    return result
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('mode',choices=['recorded','run'])
+    parser.add_argument('--output',type=Path,required=True,help='new result directory, never overwritten')
+    parser.add_argument('--binary',type=Path,default=ROOT/'target/debug/holonics')
+    args=parser.parse_args()
+    result=evaluate(args.mode,args.output.resolve(),args.binary.resolve())
+    # Exit means the receiver ran; per-family failures remain visible, never a global AI verdict.
+    print(json.dumps({'output':str(args.output/'result.json'),'mode':args.mode,
+                      'protocol_errors':{k:v['error'] for k,v in result['workloads'].items() if 'error' in v}}))
+
+
+if __name__=='__main__':main()

@@ -6,6 +6,14 @@ root construction state records current implementation scope. Paths in code span
 
 ## Capability and retraction record
 
+[historical; source-inspected] September 15: the R16 two-theorem kernel/dependency result at
+`7fdc7b92` is limited to its artifact, declared dependency and restart checks. Its
+`include/holonics/codec/theorem_production_renderer.hpp` contains literal authored theorem
+bodies and explanations; kernel acceptance does not establish that the model inferred those
+bodies. The [evaluation-history review](../research/records/2026-09-15_ATHENA_EVALUATION_HISTORY_AND_SHARED_CONSEQUENCE_KIT.md)
+retains this source finding while preserving the distinct exact solver/factorization results.
+The frozen C++ source remains historical; no current mathematical solver capability is revoked.
+
 [historical; source-inspected; process-audit] September 13: the interpretation that Hephaestus
 generator construction is a Rust-function emission deliverable, and the subsequent repository
 code-repair priority, are withdrawn. Direct messages had already defined the generators as

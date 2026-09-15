@@ -210,6 +210,16 @@ checked for the visible-role boundary, absent assigned loss/gold status and sepa
 observations. Eight parent references and one tool return remain unresolved, with seven parent
 candidate links retained; no source is selected merely to make the graph appear complete.
 
+## Evaluation through the actual source relationships
+
+[definition] The [shared Athena evaluation method](ATHENA_EVALUATION.md) uses these existing
+source and comparison owners. The native benchmark's `episode.py` prepares a private retrospective
+request/context/repository input separately from recorded candidate replies and later human
+observations. It calls this packager's visible views and private publication; it adds no second
+log parser or native learner. Repository snapshots are explicitly supplied to the new experiment,
+not silently treated as earlier knowledge. A full episode is the application target; passing a
+small symbol completion does not stand in for evaluating that episode.
+
 ## Cultivation and machine transfer
 
 [definition] The subsequent [Athena synthesis](ATHENA.md#athena-alpha-and-the-next-cultivation)

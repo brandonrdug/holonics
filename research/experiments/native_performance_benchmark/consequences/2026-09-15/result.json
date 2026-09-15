@@ -1,0 +1,6855 @@
+{
+  "schema": "holonics.consequence-evaluation.v1",
+  "mode": "run",
+  "aggregate_intelligence_score": null,
+  "sources": {
+    "field": {
+      "command": [
+        "/home/b/Workspaces/holonics/target/debug/holonics",
+        "--format",
+        "jsonl",
+        "hna",
+        "field-session",
+        "--resume",
+        "/home/b/Workspaces/holonics/research/experiments/athena_field/pattern/run/trained.session",
+        "--input",
+        "-",
+        "--checkpoint",
+        "/home/b/Workspaces/holonics/.local/evaluations/athena-methods-live-2026-09-15/field.session"
+      ],
+      "wall_ns": 6005042684,
+      "process_resources": {
+        "child_wall_ns": 5981753133,
+        "user_seconds": 5.755905,
+        "system_seconds": 0.21087899999999998,
+        "max_rss_kib": 327312,
+        "major_page_faults": 0,
+        "minor_page_faults": 21245,
+        "voluntary_context_switches": 2081,
+        "involuntary_context_switches": 452
+      },
+      "exit_code": 0,
+      "clock_scope": "fresh process with current CUDA cache; outer wall and child resources separate"
+    },
+    "math": {
+      "command": [
+        "/home/b/Workspaces/holonics/target/debug/holonics",
+        "--format",
+        "jsonl",
+        "hna",
+        "mathematical-session",
+        "--input",
+        "-"
+      ],
+      "wall_ns": 340931260,
+      "process_resources": {
+        "child_wall_ns": 320955724,
+        "user_seconds": 0.163492,
+        "system_seconds": 0.15637299999999998,
+        "max_rss_kib": 301668,
+        "major_page_faults": 0,
+        "minor_page_faults": 9118,
+        "voluntary_context_switches": 150,
+        "involuntary_context_switches": 17
+      },
+      "exit_code": 0,
+      "clock_scope": "fresh process with current CUDA cache; outer wall and child resources separate"
+    }
+  },
+  "workloads": {
+    "field": {
+      "consumer": "NativeFieldSession / constituted field",
+      "supplied": "trained D/M, partial symbol regions, context region and receiving mask",
+      "inferred": "free region currents and their simultaneous symbol faces",
+      "scope": "declared finite symbol chart; supplied values are not inferred values",
+      "families": {
+        "withheld_equal": [
+          {
+            "source": [
+              "red",
+              null,
+              null
+            ],
+            "context": [
+              "red"
+            ],
+            "expected": [
+              "red",
+              "red",
+              "red"
+            ],
+            "received": [
+              "red",
+              "red",
+              "red"
+            ],
+            "text": "red red red",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 2,
+            "inferred_count": 2,
+            "supplied_preserved": 1,
+            "supplied_count": 1,
+            "radius": "11671/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11671
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1905203131,
+                      20205
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11671
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      2811526193,
+                      3327
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      4096
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11671
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              }
+            ]
+          },
+          {
+            "source": [
+              null,
+              null,
+              "red"
+            ],
+            "context": [
+              "red"
+            ],
+            "expected": [
+              "red",
+              "red",
+              "red"
+            ],
+            "received": [
+              "red",
+              "red",
+              "red"
+            ],
+            "text": "red red red",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 2,
+            "inferred_count": 2,
+            "supplied_preserved": 1,
+            "supplied_count": 1,
+            "radius": "11675/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      3889264583,
+                      50526
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11675
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      4075891987,
+                      10748
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      16384
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11675
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11675
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              }
+            ]
+          },
+          {
+            "source": [
+              "red",
+              "red",
+              null
+            ],
+            "context": [
+              "red"
+            ],
+            "expected": [
+              "red",
+              "red",
+              "red"
+            ],
+            "received": [
+              "red",
+              "red",
+              "red"
+            ],
+            "text": "red red red",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "11655/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11655
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11655
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      2562085251,
+                      27707
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11655
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              }
+            ]
+          },
+          {
+            "source": [
+              null,
+              "red",
+              "red"
+            ],
+            "context": [
+              "red"
+            ],
+            "expected": [
+              "red",
+              "red",
+              "red"
+            ],
+            "received": [
+              "red",
+              "red",
+              "red"
+            ],
+            "text": "red red red",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "365/8796093022208",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      3008173909,
+                      54235
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      365
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      2048
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      365
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      2048
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      365
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      2048
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              }
+            ]
+          },
+          {
+            "source": [
+              "blue",
+              null,
+              null
+            ],
+            "context": [
+              "blue"
+            ],
+            "expected": [
+              "blue",
+              "blue",
+              "blue"
+            ],
+            "received": [
+              "blue",
+              "blue",
+              "blue"
+            ],
+            "text": "blue blue blue",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 2,
+            "inferred_count": 2,
+            "supplied_preserved": 1,
+            "supplied_count": 1,
+            "radius": "11689/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11689
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1991265101,
+                      1621
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      2048
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11689
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      292909011,
+                      23657
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11689
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              }
+            ]
+          },
+          {
+            "source": [
+              null,
+              null,
+              "blue"
+            ],
+            "context": [
+              "blue"
+            ],
+            "expected": [
+              "blue",
+              "blue",
+              "blue"
+            ],
+            "received": [
+              "blue",
+              "blue",
+              "blue"
+            ],
+            "text": "blue blue blue",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 2,
+            "inferred_count": 2,
+            "supplied_preserved": 1,
+            "supplied_count": 1,
+            "radius": "11683/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1838169703,
+                      45605
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11683
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1564724475,
+                      52113
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11683
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11683
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              }
+            ]
+          },
+          {
+            "source": [
+              "blue",
+              "blue",
+              null
+            ],
+            "context": [
+              "blue"
+            ],
+            "expected": [
+              "blue",
+              "blue",
+              "blue"
+            ],
+            "received": [
+              "blue",
+              "blue",
+              "blue"
+            ],
+            "text": "blue blue blue",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "1461/35184372088832",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      1461
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      8192
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      1461
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      8192
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      3135445637,
+                      51420
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      1461
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      8192
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              }
+            ]
+          },
+          {
+            "source": [
+              null,
+              "blue",
+              "blue"
+            ],
+            "context": [
+              "blue"
+            ],
+            "expected": [
+              "blue",
+              "blue",
+              "blue"
+            ],
+            "received": [
+              "blue",
+              "blue",
+              "blue"
+            ],
+            "text": "blue blue blue",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "11695/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      3260876977,
+                      13018
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      16384
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11695
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11695
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11695
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              }
+            ]
+          },
+          {
+            "source": [
+              "green",
+              null,
+              null
+            ],
+            "context": [
+              "green"
+            ],
+            "expected": [
+              "green",
+              "green",
+              "green"
+            ],
+            "received": [
+              "green",
+              "green",
+              "green"
+            ],
+            "text": "green green green",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 2,
+            "inferred_count": 2,
+            "supplied_preserved": 1,
+            "supplied_count": 1,
+            "radius": "11709/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11709
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1449945849,
+                      46007
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11709
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      3031991425,
+                      50214
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11709
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              }
+            ]
+          },
+          {
+            "source": [
+              null,
+              null,
+              "green"
+            ],
+            "context": [
+              "green"
+            ],
+            "expected": [
+              "green",
+              "green",
+              "green"
+            ],
+            "received": [
+              "green",
+              "green",
+              "green"
+            ],
+            "text": "green green green",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 2,
+            "inferred_count": 2,
+            "supplied_preserved": 1,
+            "supplied_count": 1,
+            "radius": "2929/70368744177664",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      2855253421,
+                      25610
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      2929
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      16384
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      647227577,
+                      12858
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      16384
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      2929
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      16384
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      2929
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      16384
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              }
+            ]
+          },
+          {
+            "source": [
+              "green",
+              "green",
+              null
+            ],
+            "context": [
+              "green"
+            ],
+            "expected": [
+              "green",
+              "green",
+              "green"
+            ],
+            "received": [
+              "green",
+              "green",
+              "green"
+            ],
+            "text": "green green green",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "5849/140737488355328",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      5849
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      5849
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      206592853,
+                      53614
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      5849
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              }
+            ]
+          },
+          {
+            "source": [
+              null,
+              "green",
+              "green"
+            ],
+            "context": [
+              "green"
+            ],
+            "expected": [
+              "green",
+              "green",
+              "green"
+            ],
+            "received": [
+              "green",
+              "green",
+              "green"
+            ],
+            "text": "green green green",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "11717/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1233781673,
+                      55705
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11717
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11717
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11717
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              }
+            ]
+          }
+        ],
+        "composition_controls": [
+          {
+            "source": [
+              "red",
+              null,
+              "blue"
+            ],
+            "context": [
+              "red"
+            ],
+            "expected": [
+              "red",
+              "red",
+              "blue"
+            ],
+            "received": [
+              "red",
+              "red",
+              "blue"
+            ],
+            "text": "red red blue",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "11645/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11645
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      3349990243,
+                      46395
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11645
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11645
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              }
+            ]
+          },
+          {
+            "source": [
+              "red",
+              null,
+              "green"
+            ],
+            "context": [
+              "red"
+            ],
+            "expected": [
+              "red",
+              "red",
+              "green"
+            ],
+            "received": [
+              "red",
+              "red",
+              "green"
+            ],
+            "text": "red red green",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "1461/35184372088832",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      1461
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      8192
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      3005197397,
+                      55033
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      1461
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      8192
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      1461
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      8192
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              }
+            ]
+          },
+          {
+            "source": [
+              "red",
+              null,
+              "blue"
+            ],
+            "context": [
+              "blue"
+            ],
+            "expected": [
+              "red",
+              "blue",
+              "blue"
+            ],
+            "received": [
+              "red",
+              "blue",
+              "blue"
+            ],
+            "text": "red blue blue",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "11673/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11673
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      335535071,
+                      56865
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11673
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11673
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              }
+            ]
+          },
+          {
+            "source": [
+              "red",
+              null,
+              "green"
+            ],
+            "context": [
+              "blue"
+            ],
+            "expected": [
+              "red",
+              "blue",
+              "green"
+            ],
+            "received": [
+              "red",
+              "blue",
+              "green"
+            ],
+            "text": "red blue green",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "11731/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11731
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1749980321,
+                      30364
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11731
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11731
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              }
+            ]
+          },
+          {
+            "source": [
+              "red",
+              null,
+              "blue"
+            ],
+            "context": [
+              "green"
+            ],
+            "expected": [
+              "red",
+              "green",
+              "blue"
+            ],
+            "received": [
+              "red",
+              "green",
+              "blue"
+            ],
+            "text": "red green blue",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "5831/140737488355328",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      5831
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      730596679,
+                      3279
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      4096
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      5831
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      5831
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              }
+            ]
+          },
+          {
+            "source": [
+              "red",
+              null,
+              "green"
+            ],
+            "context": [
+              "green"
+            ],
+            "expected": [
+              "red",
+              "green",
+              "green"
+            ],
+            "received": [
+              "red",
+              "green",
+              "green"
+            ],
+            "text": "red green green",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "11693/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11693
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      248330301,
+                      54191
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11693
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11693
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              }
+            ]
+          },
+          {
+            "source": [
+              "blue",
+              null,
+              "red"
+            ],
+            "context": [
+              "red"
+            ],
+            "expected": [
+              "blue",
+              "red",
+              "red"
+            ],
+            "received": [
+              "blue",
+              "red",
+              "red"
+            ],
+            "text": "blue red red",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "91/2199023255552",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      91
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      512
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1748239253,
+                      22469
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      91
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      512
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      91
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      512
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              }
+            ]
+          },
+          {
+            "source": [
+              "blue",
+              null,
+              "green"
+            ],
+            "context": [
+              "red"
+            ],
+            "expected": [
+              "blue",
+              "red",
+              "green"
+            ],
+            "received": [
+              "blue",
+              "red",
+              "green"
+            ],
+            "text": "blue red green",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "733/17592186044416",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      733
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      4096
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      518278199,
+                      54619
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      733
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      4096
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      733
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      4096
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              }
+            ]
+          },
+          {
+            "source": [
+              "blue",
+              null,
+              "red"
+            ],
+            "context": [
+              "blue"
+            ],
+            "expected": [
+              "blue",
+              "blue",
+              "red"
+            ],
+            "received": [
+              "blue",
+              "blue",
+              "red"
+            ],
+            "text": "blue blue red",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "1459/35184372088832",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      1459
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      8192
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1933081229,
+                      59216
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      1459
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      8192
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      1459
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      8192
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              }
+            ]
+          },
+          {
+            "source": [
+              "blue",
+              null,
+              "green"
+            ],
+            "context": [
+              "blue"
+            ],
+            "expected": [
+              "blue",
+              "blue",
+              "green"
+            ],
+            "received": [
+              "blue",
+              "blue",
+              "green"
+            ],
+            "text": "blue blue green",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "11749/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11749
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      571949393,
+                      28443
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11749
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11749
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              }
+            ]
+          },
+          {
+            "source": [
+              "blue",
+              null,
+              "red"
+            ],
+            "context": [
+              "green"
+            ],
+            "expected": [
+              "blue",
+              "green",
+              "red"
+            ],
+            "received": [
+              "blue",
+              "green",
+              "red"
+            ],
+            "text": "blue green red",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "11673/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11673
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1020522045,
+                      55063
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11673
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11673
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              }
+            ]
+          },
+          {
+            "source": [
+              "blue",
+              null,
+              "green"
+            ],
+            "context": [
+              "green"
+            ],
+            "expected": [
+              "blue",
+              "green",
+              "green"
+            ],
+            "received": [
+              "blue",
+              "green",
+              "green"
+            ],
+            "text": "blue green green",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "5861/140737488355328",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      5861
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      3494572361,
+                      28971
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      5861
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      5861
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              }
+            ]
+          },
+          {
+            "source": [
+              "green",
+              null,
+              "red"
+            ],
+            "context": [
+              "red"
+            ],
+            "expected": [
+              "green",
+              "red",
+              "red"
+            ],
+            "received": [
+              "green",
+              "red",
+              "red"
+            ],
+            "text": "green red red",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "1461/35184372088832",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      1461
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      8192
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      703452887,
+                      54136
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      1461
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      8192
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      1461
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      8192
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              }
+            ]
+          },
+          {
+            "source": [
+              "green",
+              null,
+              "blue"
+            ],
+            "context": [
+              "red"
+            ],
+            "expected": [
+              "green",
+              "red",
+              "blue"
+            ],
+            "received": [
+              "green",
+              "red",
+              "blue"
+            ],
+            "text": "green red blue",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "11721/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11721
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      2738736829,
+                      13794
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      16384
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11721
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11721
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              }
+            ]
+          },
+          {
+            "source": [
+              "green",
+              null,
+              "red"
+            ],
+            "context": [
+              "blue"
+            ],
+            "expected": [
+              "green",
+              "blue",
+              "red"
+            ],
+            "received": [
+              "green",
+              "blue",
+              "red"
+            ],
+            "text": "green blue red",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "2933/70368744177664",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      2933
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      16384
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      465922013,
+                      59389
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      2933
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      16384
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      2933
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      16384
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              }
+            ]
+          },
+          {
+            "source": [
+              "green",
+              null,
+              "blue"
+            ],
+            "context": [
+              "blue"
+            ],
+            "expected": [
+              "green",
+              "blue",
+              "blue"
+            ],
+            "received": [
+              "green",
+              "blue",
+              "blue"
+            ],
+            "text": "green blue blue",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "5861/140737488355328",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      5861
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      3423045797,
+                      13298
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      16384
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      5861
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      5861
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              }
+            ]
+          },
+          {
+            "source": [
+              "green",
+              null,
+              "red"
+            ],
+            "context": [
+              "green"
+            ],
+            "expected": [
+              "green",
+              "green",
+              "red"
+            ],
+            "received": [
+              "green",
+              "green",
+              "red"
+            ],
+            "text": "green green red",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "11705/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11705
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1984818231,
+                      27273
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11705
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11705
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              }
+            ]
+          },
+          {
+            "source": [
+              "green",
+              null,
+              "blue"
+            ],
+            "context": [
+              "green"
+            ],
+            "expected": [
+              "green",
+              "green",
+              "blue"
+            ],
+            "received": [
+              "green",
+              "green",
+              "blue"
+            ],
+            "text": "green green blue",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 2,
+            "supplied_count": 2,
+            "radius": "1465/35184372088832",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      1465
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      8192
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      4199606515,
+                      55702
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      1465
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      8192
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      1465
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      8192
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              }
+            ]
+          }
+        ],
+        "shorter_output_controls": [
+          {
+            "source": [
+              "red",
+              null
+            ],
+            "context": [
+              "red"
+            ],
+            "expected": [
+              "red",
+              "red"
+            ],
+            "received": [
+              "red",
+              "red"
+            ],
+            "text": "red red",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 1,
+            "supplied_count": 1,
+            "radius": "11683/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11683
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1321947747,
+                      17190
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11683
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              }
+            ]
+          },
+          {
+            "source": [
+              "red",
+              null
+            ],
+            "context": [
+              "blue"
+            ],
+            "expected": [
+              "red",
+              "blue"
+            ],
+            "received": [
+              "red",
+              "blue"
+            ],
+            "text": "red blue",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 1,
+            "supplied_count": 1,
+            "radius": "11653/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11653
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      2869247421,
+                      49405
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11653
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              }
+            ]
+          },
+          {
+            "source": [
+              "red",
+              null
+            ],
+            "context": [
+              "green"
+            ],
+            "expected": [
+              "red",
+              "green"
+            ],
+            "received": [
+              "red",
+              "green"
+            ],
+            "text": "red green",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 1,
+            "supplied_count": 1,
+            "radius": "2919/70368744177664",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      2919
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      16384
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      3338935111,
+                      1123
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      2048
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      2919
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      16384
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              }
+            ]
+          },
+          {
+            "source": [
+              "blue",
+              null
+            ],
+            "context": [
+              "red"
+            ],
+            "expected": [
+              "blue",
+              "red"
+            ],
+            "received": [
+              "blue",
+              "red"
+            ],
+            "text": "blue red",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 1,
+            "supplied_count": 1,
+            "radius": "11691/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11691
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      3042757005,
+                      33361
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11691
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              }
+            ]
+          },
+          {
+            "source": [
+              "blue",
+              null
+            ],
+            "context": [
+              "blue"
+            ],
+            "expected": [
+              "blue",
+              "blue"
+            ],
+            "received": [
+              "blue",
+              "blue"
+            ],
+            "text": "blue blue",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 1,
+            "supplied_count": 1,
+            "radius": "5845/140737488355328",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      5845
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      3590337225,
+                      11670
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      16384
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      5845
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      32768
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              }
+            ]
+          },
+          {
+            "source": [
+              "blue",
+              null
+            ],
+            "context": [
+              "green"
+            ],
+            "expected": [
+              "blue",
+              "green"
+            ],
+            "received": [
+              "blue",
+              "green"
+            ],
+            "text": "blue green",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 1,
+            "supplied_count": 1,
+            "radius": "11695/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11695
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      572665641,
+                      38465
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11695
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              }
+            ]
+          },
+          {
+            "source": [
+              "green",
+              null
+            ],
+            "context": [
+              "red"
+            ],
+            "expected": [
+              "green",
+              "red"
+            ],
+            "received": [
+              "green",
+              "red"
+            ],
+            "text": "green red",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 1,
+            "supplied_count": 1,
+            "radius": "11713/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11713
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      2687406097,
+                      5224
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      8192
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11713
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 0,
+                "selected_coordinate": 0
+              }
+            ]
+          },
+          {
+            "source": [
+              "green",
+              null
+            ],
+            "context": [
+              "blue"
+            ],
+            "expected": [
+              "green",
+              "blue"
+            ],
+            "received": [
+              "green",
+              "blue"
+            ],
+            "text": "green blue",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 1,
+            "supplied_count": 1,
+            "radius": "11711/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11711
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1842729757,
+                      46208
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11711
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 1,
+                "selected_coordinate": 1
+              }
+            ]
+          },
+          {
+            "source": [
+              "green",
+              null
+            ],
+            "context": [
+              "green"
+            ],
+            "expected": [
+              "green",
+              "green"
+            ],
+            "received": [
+              "green",
+              "green"
+            ],
+            "text": "green green",
+            "complete_correct": true,
+            "presentation_agrees_with_symbols": true,
+            "inferred_correct": 1,
+            "inferred_count": 1,
+            "supplied_preserved": 1,
+            "supplied_count": 1,
+            "radius": "11713/281474976710656",
+            "selections": [
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      1
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11713
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              },
+              {
+                "centre_score": [
+                  [
+                    1,
+                    [
+                      10932151,
+                      9643
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      16384
+                    ]
+                  ]
+                ],
+                "centre_ties": 1,
+                "robust": true,
+                "score_radius": [
+                  [
+                    1,
+                    [
+                      11713
+                    ]
+                  ],
+                  [
+                    1,
+                    [
+                      0,
+                      65536
+                    ]
+                  ]
+                ],
+                "selected": 2,
+                "selected_coordinate": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "math": {
+      "consumer": "NativeMathematicalSession",
+      "supplied": "source/condition maps, four observations with unit prior, target tensors and permitted factor forms",
+      "inferred": "normal coefficients; complex-product factorization and recurrence power",
+      "scope": "explicit supplied maps; exact solver construction is inference, independent of text reception",
+      "normal": [
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "-1/805306368",
+              "0"
+            ],
+            [
+              "1/1610612736",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "4/3",
+              "0"
+            ],
+            [
+              "-2/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "-178956971/268435456",
+                "0"
+              ],
+              [
+                "178956971/536870912",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "1/1610612736",
+              "0"
+            ],
+            [
+              "-1/805306368",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "-1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "-2/3",
+              "0"
+            ],
+            [
+              "4/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "178956971/536870912",
+                "0"
+              ],
+              [
+                "-178956971/268435456",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "-1/805306368",
+              "0"
+            ],
+            [
+              "1/1610612736",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "4/3",
+              "0"
+            ],
+            [
+              "-2/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "-178956971/268435456",
+                "0"
+              ],
+              [
+                "178956971/536870912",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "1/1610612736",
+              "0"
+            ],
+            [
+              "-1/805306368",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "-1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "-2/3",
+              "0"
+            ],
+            [
+              "4/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "178956971/536870912",
+                "0"
+              ],
+              [
+                "-178956971/268435456",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "-1/805306368",
+              "0"
+            ],
+            [
+              "1/1610612736",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "4/3",
+              "0"
+            ],
+            [
+              "-2/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "-178956971/268435456",
+                "0"
+              ],
+              [
+                "178956971/536870912",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "1/1610612736",
+              "0"
+            ],
+            [
+              "-1/805306368",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "-1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "-2/3",
+              "0"
+            ],
+            [
+              "4/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "178956971/536870912",
+                "0"
+              ],
+              [
+                "-178956971/268435456",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "-1/805306368",
+              "0"
+            ],
+            [
+              "1/1610612736",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "4/3",
+              "0"
+            ],
+            [
+              "-2/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "-178956971/268435456",
+                "0"
+              ],
+              [
+                "178956971/536870912",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "1/1610612736",
+              "0"
+            ],
+            [
+              "-1/805306368",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "-1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "-2/3",
+              "0"
+            ],
+            [
+              "4/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "178956971/536870912",
+                "0"
+              ],
+              [
+                "-178956971/268435456",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "-1/805306368",
+              "0"
+            ],
+            [
+              "1/1610612736",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "4/3",
+              "0"
+            ],
+            [
+              "-2/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "-178956971/268435456",
+                "0"
+              ],
+              [
+                "178956971/536870912",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "1/1610612736",
+              "0"
+            ],
+            [
+              "-1/805306368",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "-1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "-2/3",
+              "0"
+            ],
+            [
+              "4/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "178956971/536870912",
+                "0"
+              ],
+              [
+                "-178956971/268435456",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "-1/805306368",
+              "0"
+            ],
+            [
+              "1/1610612736",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "4/3",
+              "0"
+            ],
+            [
+              "-2/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "-178956971/268435456",
+                "0"
+              ],
+              [
+                "178956971/536870912",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "1/1610612736",
+              "0"
+            ],
+            [
+              "-1/805306368",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "-1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "-2/3",
+              "0"
+            ],
+            [
+              "4/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "178956971/536870912",
+                "0"
+              ],
+              [
+                "-178956971/268435456",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "-1/805306368",
+              "0"
+            ],
+            [
+              "1/1610612736",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "4/3",
+              "0"
+            ],
+            [
+              "-2/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "-178956971/268435456",
+                "0"
+              ],
+              [
+                "178956971/536870912",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "1/1610612736",
+              "0"
+            ],
+            [
+              "-1/805306368",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "-1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "-2/3",
+              "0"
+            ],
+            [
+              "4/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "178956971/536870912",
+                "0"
+              ],
+              [
+                "-178956971/268435456",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "-1/805306368",
+              "0"
+            ],
+            [
+              "1/1610612736",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "4/3",
+              "0"
+            ],
+            [
+              "-2/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "-178956971/268435456",
+                "0"
+              ],
+              [
+                "178956971/536870912",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "1/1610612736",
+              "0"
+            ],
+            [
+              "-1/805306368",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "-1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "-2/3",
+              "0"
+            ],
+            [
+              "4/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "178956971/536870912",
+                "0"
+              ],
+              [
+                "-178956971/268435456",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "-1/805306368",
+              "0"
+            ],
+            [
+              "1/1610612736",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "4/3",
+              "0"
+            ],
+            [
+              "-2/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "-178956971/268435456",
+                "0"
+              ],
+              [
+                "178956971/536870912",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "1/1610612736",
+              "0"
+            ],
+            [
+              "-1/805306368",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "-1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "-2/3",
+              "0"
+            ],
+            [
+              "4/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "178956971/536870912",
+                "0"
+              ],
+              [
+                "-178956971/268435456",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "-1/805306368",
+              "0"
+            ],
+            [
+              "1/1610612736",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "4/3",
+              "0"
+            ],
+            [
+              "-2/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "-178956971/268435456",
+                "0"
+              ],
+              [
+                "178956971/536870912",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "1/1610612736",
+              "0"
+            ],
+            [
+              "-1/805306368",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "-1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "-2/3",
+              "0"
+            ],
+            [
+              "4/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "178956971/536870912",
+                "0"
+              ],
+              [
+                "-178956971/268435456",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "-1/805306368",
+              "0"
+            ],
+            [
+              "1/1610612736",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "4/3",
+              "0"
+            ],
+            [
+              "-2/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "-178956971/268435456",
+                "0"
+              ],
+              [
+                "178956971/536870912",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "1/1610612736",
+              "0"
+            ],
+            [
+              "-1/805306368",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "-1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "-2/3",
+              "0"
+            ],
+            [
+              "4/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "178956971/536870912",
+                "0"
+              ],
+              [
+                "-178956971/268435456",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "-1/805306368",
+              "0"
+            ],
+            [
+              "1/1610612736",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "4/3",
+              "0"
+            ],
+            [
+              "-2/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "-178956971/268435456",
+                "0"
+              ],
+              [
+                "178956971/536870912",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "1/1610612736",
+              "0"
+            ],
+            [
+              "-1/805306368",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "-1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "-2/3",
+              "0"
+            ],
+            [
+              "4/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "178956971/536870912",
+                "0"
+              ],
+              [
+                "-178956971/268435456",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "-1/805306368",
+              "0"
+            ],
+            [
+              "1/1610612736",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "4/3",
+              "0"
+            ],
+            [
+              "-2/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "-178956971/268435456",
+                "0"
+              ],
+              [
+                "178956971/536870912",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "1/1610612736",
+              "0"
+            ],
+            [
+              "-1/805306368",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "-1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "-2/3",
+              "0"
+            ],
+            [
+              "4/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "178956971/536870912",
+                "0"
+              ],
+              [
+                "-178956971/268435456",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "-1/805306368",
+              "0"
+            ],
+            [
+              "1/1610612736",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "4/3",
+              "0"
+            ],
+            [
+              "-2/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "-178956971/268435456",
+                "0"
+              ],
+              [
+                "178956971/536870912",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "1/1610612736",
+              "0"
+            ],
+            [
+              "-1/805306368",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "-1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "-2/3",
+              "0"
+            ],
+            [
+              "4/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "178956971/536870912",
+                "0"
+              ],
+              [
+                "-178956971/268435456",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "-1/805306368",
+              "0"
+            ],
+            [
+              "1/1610612736",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "4/3",
+              "0"
+            ],
+            [
+              "-2/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "-178956971/268435456",
+                "0"
+              ],
+              [
+                "178956971/536870912",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "1/1610612736",
+              "0"
+            ],
+            [
+              "-1/805306368",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "-1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "-2/3",
+              "0"
+            ],
+            [
+              "4/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "178956971/536870912",
+                "0"
+              ],
+              [
+                "-178956971/268435456",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "-1/805306368",
+              "0"
+            ],
+            [
+              "1/1610612736",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "4/3",
+              "0"
+            ],
+            [
+              "-2/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "-178956971/268435456",
+                "0"
+              ],
+              [
+                "178956971/536870912",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "1/1610612736",
+              "0"
+            ],
+            [
+              "-1/805306368",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "-1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "-2/3",
+              "0"
+            ],
+            [
+              "4/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "178956971/536870912",
+                "0"
+              ],
+              [
+                "-178956971/268435456",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "-1/805306368",
+              "0"
+            ],
+            [
+              "1/1610612736",
+              "0"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "1",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "4/3",
+              "0"
+            ],
+            [
+              "-2/3",
+              "0"
+            ]
+          ],
+          "unregularized_exchange": {
+            "contains_reference": false,
+            "center_minus_reference": [
+              [
+                "-178956971/268435456",
+                "0"
+              ],
+              [
+                "178956971/536870912",
+                "0"
+              ]
+            ],
+            "squared_difference": "160127987347474205/288230376151711744",
+            "radius": "119/2147483648"
+          }
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "-1/3221225472",
+              "0"
+            ],
+            [
+              "-1/3221225472",
+              "0"
+            ]
+          ],
+          "squared_difference": "1/5188146770730811392",
+          "radius": "51/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "0",
+            "0"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "1/3",
+              "0"
+            ],
+            [
+              "1/3",
+              "0"
+            ]
+          ]
+        },
+        {
+          "contains_reference": true,
+          "center_minus_reference": [
+            [
+              "-1/3221225472",
+              "-1/1073741824"
+            ],
+            [
+              "-1/3221225472",
+              "1/1073741824"
+            ]
+          ],
+          "squared_difference": "5/2594073385365405696",
+          "radius": "119/2147483648",
+          "preparation": [
+            "2",
+            "0",
+            "-1",
+            "0",
+            "0",
+            "1"
+          ],
+          "observations": 4,
+          "normal_reference": [
+            [
+              "1/3",
+              "1"
+            ],
+            [
+              "1/3",
+              "-1"
+            ]
+          ]
+        }
+      ],
+      "algebra": [
+        {
+          "operation": "construct-bilinear",
+          "all_coefficients_equal": true,
+          "products": 3,
+          "scope": "coefficient identity for every input in the supplied rational bilinear domain",
+          "coefficients": [
+            [
+              "1",
+              "0",
+              "0",
+              "-1"
+            ],
+            [
+              "0",
+              "1",
+              "1",
+              "0"
+            ]
+          ]
+        },
+        {
+          "operation": "apply",
+          "operator": 2,
+          "expected": [
+            "337/120",
+            "-3/4"
+          ],
+          "received": [
+            "337/120",
+            "-3/4"
+          ],
+          "exact": true,
+          "source_products_recomputed": true
+        },
+        {
+          "operation": "read-product",
+          "operator": 3,
+          "expected": [
+            "247/120",
+            "427/120"
+          ],
+          "received": [
+            "247/120",
+            "427/120"
+          ],
+          "exact": true,
+          "source_products_recomputed": false
+        },
+        {
+          "operation": "apply",
+          "operator": 5,
+          "expected": [
+            "-11/12",
+            "-5/12"
+          ],
+          "received": [
+            "-11/12",
+            "-5/12"
+          ],
+          "exact": true,
+          "source_products_recomputed": true
+        }
+      ],
+      "distinct_normal_preparations": 4,
+      "normal_query_count": 35
+    }
+  },
+  "application_target": {
+    "material": "refined conversation exposure and repository sources at declared revisions",
+    "contract": "docs/ATHENA_EVALUATION.md",
+    "status": "not measured by these mechanism populations; keep whole episodes and actual constraints",
+    "automatic_gold_from_assistant": false
+  },
+  "revision": "d05882388cd65fa7c70f1e24e9ceee07d48d705a",
+  "binary_sha256": "e358e027c7a65db6767761b4b7712f60e29a9d156d4ab7ae6d44ba182d669661"
+}

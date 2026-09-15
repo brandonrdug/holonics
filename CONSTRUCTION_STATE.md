@@ -1,6 +1,12 @@
 # Construction state
 
-**Currency:** September 15, 2026. The same Athena field session now receives partial/joint
+**Currency:** September 15, 2026. The [historical evaluation review and shared kit](docs/ATHENA_EVALUATION.md)
+are returned. The existing benchmark apparatus now measures field and mathematical consequences
+with separate correctness, source, reuse and cost receivers, and prepares private conversation/
+repository episodes without treating historical assistant replies as gold. Fresh public runs
+and sixteen focused tests pass. The full conversation/repository application remains the target.
+
+**Last model return:** The same Athena field session now receives partial/joint
 regions, generates their missing values together, and saves the producing receiver and output
 extent with delayed comparisons. The [application and trained session](research/experiments/athena_field/pattern/README.md)
 return 45/45 missing values across 39 responses; all 63 supplied values remain fixed at the
@@ -42,12 +48,20 @@ retrain. Mathematical refinement must reach the actual session and its generated
 | Mathematical operation | JointRegions constructs actual source current x and condition h=[1, activity, observation]. The model executes r=R_M(x,h), u=(I+A(h))x+c(h), (w,b_next)=S_D(u,b), y=P given+(I-P)w. D/M learn through the producing masked output covector before the full paired adjoint. |
 | Existing owners | `native/field_session.rs`; `NativeCoupledBody` / `body/field.rs`; operative field/current/target; normal reaction and `ResidentHeldSection`; simultaneous section receiver; shared stream, Workbench and field/model/session rest. Existing normalized material/current variations and factor owners supply further composition. |
 | Concrete unknown/join | With masks and D/M fixed, this one-step input map is affine. Content-dependent interactions between evolving regions require composition with the existing normalized field/current response and its variation. Normal statistics still materialize all 129 features in this small chart; larger complete sources expose an actual factor/locality requirement. |
-| Next consuming operation | Extend the partial-section application through content-dependent coupled refinement, binding the existing normalized current/material operation to its producing forward/adjoint path. Carry an actual multi-region source and its complete response through that composition; preserve held source constraints, phase and internal modes. Use the returned relation to choose its economical representation. |
-| Completion evidence | Generated complete responses to the chosen source population and unseen compositions; actual producing-material target updates; saved continuation; reported failures, costs and source assumptions. Supplied-coordinate copying must remain separate from missing-value generation. |
+| Next consuming operation | Carry a complete refined conversation/repository source episode through the field application. Specify its actual unknown and source/receiver constraints before selecting the operator composition; recover applicable solver, generator, normalized/current and factor owners. Bind the needed content-dependent refinement and its producing variation to this consumer, with phase, shared regions and internal modes retained. Use the standard kit to expose the actual unsupported source/operation or failed consequence; do not substitute another color task or a mandatory normalization prerequisite. |
+| Completion evidence | Inspect the actual response to its complete source episode and source-addressed requirements, including contradictory or unresolved consequences. Retain exact solver identities and partial-field outputs as mechanism evidence; they do not score the conversation by proxy. Compare producing-material updates, saved continuation and costs when that claim is made. The retrospective prepared episode is validation, not a blind holdout. |
 | Receiver and durability | The held affine receiver is implemented; raw field publication remains independent. Keep receiver/source/extent and producing D/M through delayed targets. A dynamic or learned receiver requires its actual additional differential, not a decorative motion display. |
 | Cost and representation | This 129-feature chart has 77,522 microseconds median generation and 641,746.5 median target update. Warm 96-target development takes 71.768705 seconds; trained rest is 6,170,290 bytes. These are measured costs of this operation, not universal limits or matched speedups. |
 
 ## Returned operation and verification
+
+[established-bounded; source-inspected; measured] The [methodology review](research/records/2026-09-15_ATHENA_EVALUATION_HISTORY_AND_SHARED_CONSEQUENCE_KIT.md)
+recovers the historical experiment families, original user corrections and actual output boundaries.
+The kit reuses `native_performance_benchmark` and `conversation-data`; it adds no native engine.
+Fresh field responses retain 45/45 missing values; the mathematical profile reconstructs its
+three-product tensor identity, returns exact new-input outputs and separates normal-reference
+error from task discrepancy. A private complete request with repository snapshots is prepared
+for retrospective application use; no general conversation result is claimed for its preparation.
 
 [established-bounded; measured] The [partial-pattern return](research/records/2026-09-15_PARTIAL_FIELDS_FORM_JOINT_PATTERNS_THROUGH_THEIR_RECEIVERS.md)
 uses 24 distinct authored development examples and 97 targets. All 39 evaluation responses

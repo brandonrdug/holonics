@@ -8,6 +8,12 @@ product label. Eros names union, composition and formation throughout HNN recurr
 and their actual maps. The current public Rust entry point is `holonics::hna`;
 the application implementations are in [holonics-hna](../crates/holonics-hna/README.md).
 
+[project-postulate] The [shared evaluation method](ATHENA_EVALUATION.md) retains stable
+source/unknown/receiver questions across model changes. Mathematical solvers, field completion,
+conversation/code products, causal reuse and performance retain their own evidence scopes.
+Refined conversations and repository material remain the primary application data; a new crate
+or operator does not reset construction to another trivial example.
+
 ## One sustained construction programme
 
 [project-postulate] The [complete Athena plan](plans/THE_ROADMAP.md#athena-construction-order)
