@@ -194,6 +194,33 @@ separately on the actual requested section.
 
 ### Next consuming application
 
+[interpretation] **Diffusion and embroidery govern this construction reading.** Apply Brandon's
+September 15 correction by grounding the application in how an interacting field forms a
+received pattern. An incoming difference participates through the existing medium, incidence,
+material, current, phase and boundary constraints. Refinement can propagate between coupled
+regions and scales; local formation can alter subsequent admissible transport. A request can
+specify constraints and a receiving boundary without first becoming a semantic task class.
+The word-correction experiment measures one consequence of these operators; its template of
+request/context/target does not define HNN's ontology or the organization of general generation.
+
+[definition] The embroidery comparison retains crossings, orientation, tension/material response
+and the dependence of the visible pattern on the receiving face. The
+[July 17 mechanical correspondence](../../research/records/2026-07-17_THE_DUALITY_IS_THE_SITUATED_TRANSITION_THE_NET_HAS_NO_OUTSIDE.md#iv--string-sheet-and-volume-are-orders-of-carried-history)
+and current [joint-field generation law](../HNN_FORMULA.md#generation-as-field-refinement-and-boundary-radiation)
+supply this connection. Historical terminology does not prescribe an event archive or a new
+weave subsystem. Dependencies may be carried by existing incidence, constraints, modes and
+generators sufficient for the admitted operations.
+
+[definition] Compact representation must preserve the interacting construction: shared
+occurrences/crossings, causal transport, phase, relevant internal modes and the ability to
+continue/re-express the pattern through its receivers. Independent component summaries can
+lose those relations. Factoring a separable input is one exact case; factor the actual coupled
+operator and its response where the relation admits it, or retain the separating mode/residual.
+Diffusion does not require independent noise, and a zero value does not stand for unresolved
+structure. Complete output concerns the jointly supported construction; streaming and local
+refinement follow its dependencies. A single compiled generating operation may express such
+an evolution; neither an arbitrary pass count nor a next-symbol clock defines generation.
+
 [project-postulate] Build the first field-backed Athena contextual correction/continuation
 session through the existing Workbench/request stream. Consume a complete prepared request and
 its relevant preceding parts, generate the response as a joint section, expose its actual text

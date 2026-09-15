@@ -27,6 +27,16 @@ recombination validation. They all return the expected text after 434 developmen
 
 ## Active Athena construction brief
 
+[interpretation] Applying Brandon's latest **diffusion and embroidery** correction: organize
+the construction around formation/refinement of an interacting field and its received pattern.
+“Contextual task” may describe an exterior test population; it must not become a native
+classify-instruction → choose-task → emit-template architecture. Context includes the medium,
+existing structure, incidence, phase, current and active receiving constraints that participate
+in that formation. Local changes can propagate through shared crossings and alter the joint
+pattern. Text, image and acoustic presentations remain receiving faces of this same construction.
+Use the [generation law](docs/HNN_FORMULA.md#generation-as-field-refinement-and-boundary-radiation)
+and the [application refinement contract](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-consuming-application).
+
 [project-postulate] **“Continue Athena” extends the same working field application to broader
 complete requests.** Keep its actual request, context, joint response, comparison and restart
 path together. The successful two-word task becomes regression evidence; increasing its training
@@ -38,7 +48,7 @@ count or starting a separate mathematical demonstration does not replace the app
 | Mathematical operation | The application now executes `h=tensor(context parts)`, `r=R_M(x,h)`, `u=(I+A(h))x+c(h)`, `(w,b_next)=S_D(u,b)` and a simultaneous unit-basis section receiver. The continuing-boundary reaction remains an explicit compatible alternative. D/M are learned by the existing producing-target response. |
 | Existing owners | `native/field_session.rs`; `NativeCoupledBody` and `body/field.rs`; normal material/section/family and factor owners; `SymbolCurrentChart` and `read_basis_sections`; `HnaStream::pump_field`; Workbench `hna field-session`; `ExposureReader` and `FieldSectionRequest::from_exposures`; field/model/session rest. No new engine or token scheduler. |
 | Concrete unknown/join | `FieldSessionSpec` fixes section/context extents; `mount_context` materializes an alphabet-size-to-context-length tensor, and the normal owner materializes its feature statistics. Those representations prevent direct use of broad complete exposure parts economically. The exposed limits are concrete dimensions and operators, not a missing definition of generation or learning. |
-| Next consuming operation | Take an actual complete prepared request/context/correction through the exposure bridge and this session. Replace the obstructing dense context/section expansion with a suitable existing factored/local source and operator representation, bind the corresponding receiver/support for its requested complete response, and retain the same D/M update and restart. Select the representation from that source and its equations; do not found another context subsystem or make universal compression a gate. |
+| Next consuming operation | Carry a prepared partial/joint section and its receiving constraints through the same field's admitted refinement/integration or its compiled generating relation. Use an actual complete application source to expose the required joins and output support. Replace obstructing dense expansion while retaining shared crossings, phase, evolving modes and the producing D/M response. Text correction is one receiving use; the native construction is formation of the joint pattern, not selection of a task label. |
 | Completion evidence | Generated whole responses to the broader source/condition population, including actual context-dependent changes and unseen compositions; target comparisons through the producing material; saved continuation; reported source/configuration, inferred relation, quality failures, work and memory. Labels or decoder answers cannot be derived from evaluation targets. |
 | Receiver and context work | Active receiving fields, phase, incidence, internal state and relative motion stay in the construction. Apply their actual source/receiver maps and variations at this application consumer. The current fixed basis is a tested receiver chart; a separate receiver-motion display is not the next application result. |
 | Durability and cost | Pending and delivery rest are now usable. Keep those contracts when factoring the operator. The 69-feature control currently has about 23 ms median generation and 189 ms median target update; source/context growth and remount/journal cost are exposed quantities to improve, not universal time limits. |

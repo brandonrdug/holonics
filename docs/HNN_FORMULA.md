@@ -149,6 +149,15 @@ generating law with their respective ownership effects.
 
 ### Generation as field refinement and boundary radiation
 
+[interpretation] The diffusion/embroidery reading concerns **how the pattern is formed**.
+The receiving medium, existing structure, crossings, phase and material response participate in
+that formation. Local transport and integration can organize a larger pattern and change its
+further admissible motion. A “contextual task” is an exterior application description, not a
+native category that selects an answer mechanism. Text, image and acoustic output are received
+faces of the same construction. The
+[application contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-consuming-application)
+retains this correction alongside the actual software consumer.
+
 [project-postulate] Generation develops a joint field or configuration through the model's
 constituted dynamics. Its integration/refinement coordinate is not an output-token index.
 Image, acoustic, geometric and symbolic outputs are receiver charts of that construction.
