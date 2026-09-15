@@ -275,6 +275,13 @@ identifies the composite's fibre with both component fibres plus that join. Two 
 `4`, or two performances of the same chord class, can share a receiver face while remaining
 different occurrences.
 
+[definition] The [external Holor/Koestler study](../research/records/2026-09-14_BUTLER_KOESTLER_AND_HOLONIC_CONSTRUCTION.md)
+makes this distinction concrete: composition can retain an intermediate occurrence even when
+its underlying tensor map equals a shortcut. Forgetting the occurrence requires the actual
+future-receiver factorization; a natural transformation alone is not an inverse. The study also
+recovers a correlated eight-state chart from a misleading four-independent-factor presentation.
+These are applications of the existing span/fibre constructions, not new model-owner types.
+
 [definition] A larger holon is assembled by this same operation at a declared boundary and grain.
 `BoundaryHolon` additionally supplies a constitutive boundary map. Its `boundary_totalCurrent`
 relates the complete finite current population to outgoing-minus-incoming faces. Its hypothesis

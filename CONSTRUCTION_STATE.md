@@ -8,13 +8,14 @@ binds its equations and owners. The directly supplied-condition rest rule is als
 uncommitted field-to-predictor assay is preserved as a separate failing remount/word-aperture
 experiment. The old timed goal remains paused.
 
-**Active research request:** Brandon now requests heavy analysis of all Carey Glenn Butler
-works linked from PhilPeople (25 indexed entries, with linked series/components to recover),
-and Koestler’s *The Ghost in the Machine*. The deep-research skill is active; source inventory
-and reading notes are being collected in `.local/artifacts/2026-09-14-butler/`. Produce the
-full work-by-work and mathematical/philosophical comparison artifact, keeping its theories,
-assumptions and evidence distinct and applying concrete consequences to the HNN/receiver model.
-This research augments the delivered engine; it does not reset the next engine operation below.
+**Research return:** The [Butler, Koestler and SpiralOS review](research/records/2026-09-14_BUTLER_KOESTLER_AND_HOLONIC_CONSTRUCTION.md)
+now covers the 25 profile entries, publicly recovered later series/components, repository
+interfaces, dialogue and code archives. It includes independent counterexamples, a consistent
+torsion-bearing connection, corrected projected-step/diffusion relations, a recovered dependent
+octant chart, and a convergent golden-weighted zeta source with explicit remainder. Published
+model affirmations and proposed physics are not promoted to proofs or adopted as agent rules.
+The source-qualified conclusions refine the existing HNN consumers; the next engine operation
+below remains selected by “Continue Athena.”
 
 ## Active Athena construction brief
 
@@ -68,12 +69,13 @@ that is a separate representation constraint, not a reason to seal a family to i
 
 [definition] These completed returns are reusable source context, not a queue to replay:
 
+- [Butler, Koestler and SpiralOS](research/records/2026-09-14_BUTLER_KOESTLER_AND_HOLONIC_CONSTRUCTION.md): complete public-work comparison, explicit dependency/typing checks, constructive mathematical repairs and observed LLM workflow patterns. No external covenant is an HNN activation gate.
 - [Hear the music](research/records/2026-09-14_HEAR_THE_MUSIC_SITUATED_RELEASE_AND_SELF_MOTION.md): eight primary-paper analyses, receiver morphology/resolution, self-motion, chord-class and coherent phase relations, and the aperiodic-field/finite-conduction synthesis.
 - [Model formula and library join](research/records/2026-09-14_THE_HNN_FORMULA_JOINS_THE_LIBRARY_TO_THE_MODEL.md), [computational Holon](docs/HOLON.md) and [engine blueprint](docs/ATHENA_ENGINE_BLUEPRINT.md): one current/material/incidence object, whole-field generation, actual operator and derivative owners.
 - [Continuing plates and moving current](research/records/2026-09-14_CONTINUING_PLATES_AND_THE_RECEIVER_RIDING_THE_CURRENT.md): receiving interfaces can have storage, material, current and motion inside the joint forward/adjoint. Causal memory does not prescribe an event archive.
 - [Swing/fluid construction](docs/HOLONIC_FLUID_CONSTRUCTION.md) and [dynamic interior memory](docs/FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md): actual constitutive scattering, mixed feedback, Hodge modes and changing-boundary residuals.
 - [Tensor/diffusion interfaces](research/records/2026-09-14_HNN_FIELD_ARCHITECTURE_REFINES_THE_COMPUTATIONAL_INTERFACES.md), [constraint modes](docs/CONSTRAINT_MODES_AND_RECEIVER_FACES.md) and [paper synthesis](research/records/2026-09-14_TRANSFORMER_FIELDS_TROPICAL_CELLS_AND_FRACTAL_GENERATORS.md): elementary operations, normalized response, exact transcendental/phase source and recursive geometry.
-- [Analytic release and receiving populations](research/records/2026-09-14_ANALYTIC_RELEASE_AND_RECURSIVE_RECEIVING_POPULATIONS.md) and [centred zero current](docs/RH_CENTERED_CURRENT_UPPER_BOUND.md): worked analytic generation and actual ξ current/tail joins; no new global RH bound is claimed.
+- [Analytic release and receiving populations](research/records/2026-09-14_ANALYTIC_RELEASE_AND_RECURSIVE_RECEIVING_POPULATIONS.md) and [centred zero current](docs/RH_CENTERED_CURRENT_UPPER_BOUND.md): worked analytic generation and actual ξ current/tail joins; no new global RH bound is claimed. The [deposited width-induction strategy](research/records/2026-09-14_THE_OFF_LINE_ZERO_IS_AN_ENDPOINT_TACHYON_THE_WIDTH_INDUCTION_CLOSES_ON_THE_TAIL.md) records the endpoint/tachyon reading, the Lenz reduction to the tail, and its falsifiers.
 - [Callable mathematical workshop](research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md), [producing-return construction](research/records/2026-09-13_CONDITIONED_PREDICTION_AND_DYNAMIC_INTERIOR_RETURN.md) and existing rest/export records: source-scoped available algorithms and interfaces, not a whole-model completion claim.
 
 ## Next deliveries and scope

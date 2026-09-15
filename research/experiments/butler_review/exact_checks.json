@@ -1,0 +1,162 @@
+{
+  "scope": "independent exact arithmetic; not execution of the external package",
+  "connection_convention": "nabla_mu v^lambda = partial_mu v^lambda + Gamma^lambda_mu_nu v^nu",
+  "original_connection": {
+    "Gamma_t": [
+      [
+        "0",
+        "0"
+      ],
+      [
+        "0",
+        "1/2"
+      ]
+    ],
+    "Gamma_x": [
+      [
+        "0",
+        "0"
+      ],
+      [
+        "-1/2",
+        "0"
+      ]
+    ],
+    "nabla_t_g": [
+      [
+        "0",
+        "0"
+      ],
+      [
+        "0",
+        "-1"
+      ]
+    ],
+    "R_tx": [
+      [
+        "0",
+        "0"
+      ],
+      [
+        "-1/4",
+        "0"
+      ]
+    ]
+  },
+  "repaired_connection": {
+    "Gamma_t": [
+      [
+        "0",
+        "0"
+      ],
+      [
+        "0",
+        "0"
+      ]
+    ],
+    "Gamma_x": [
+      [
+        "0",
+        "1"
+      ],
+      [
+        "-1",
+        "0"
+      ]
+    ],
+    "torsion_x_tx": "1",
+    "divergence_Phi_1_0": "-1",
+    "HSE": "0"
+  },
+  "projected_descent": {
+    "eta": "1/2",
+    "L": "1",
+    "claimed_c": "3/8",
+    "boundary_counterexample": {
+      "x": "1",
+      "gradient": "-1",
+      "next": "1",
+      "before_loss": "0",
+      "after_loss": "0",
+      "projected_positive_gradient": "-1",
+      "claimed_upper_loss": "-3/8"
+    },
+    "interior_counterexample": {
+      "x": "1/8",
+      "gradient": "1",
+      "next": "0",
+      "before_loss": "1/8",
+      "after_loss": "0",
+      "claimed_upper_loss": "-1/4",
+      "gradient_mapping": "1/4",
+      "correct_upper_loss": "13/128"
+    }
+  },
+  "four_binary_factors_cardinality": 16,
+  "CI_II_correlated_octants": {
+    "count": 8,
+    "phase_equals_perspective": [
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        1
+      ],
+      [
+        0,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        0,
+        0
+      ],
+      [
+        1,
+        1,
+        1,
+        1
+      ]
+    ]
+  },
+  "endpoint_predicate_counterexample": {
+    "0_to_1": true,
+    "1_to_2": true,
+    "0_to_2": false,
+    "repair": "retain the composite path (0,1,2) as a distinct arrow"
+  },
+  "golden_weighted_zeta_tail_upper": {
+    "4": "25000/88929",
+    "8": "15625000/396793809",
+    "16": "6103515625000/6753110622696369",
+    "32": "931322574615478515625000/1901475551096378621440611448689",
+    "64": "21684043449710088680149056017398834228515625000/150650441649272206815765304873728938090450006104301134950129"
+  }
+}

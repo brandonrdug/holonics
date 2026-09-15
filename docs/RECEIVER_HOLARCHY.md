@@ -14,6 +14,12 @@ connects receiver resolution, morphology-dependent transfer, self-motion and who
 predictive release. It recovers the chord class/performance distinction and gives a concrete
 relative-motion equation and phase-sensitive receiving comparison.
 
+[definition] The [Butler/Koestler comparison](../research/records/2026-09-14_BUTLER_KOESTLER_AND_HOLONIC_CONSTRUCTION.md)
+recovers whole/part and receiving-role distinctions, the actual dependence in the CI octant table,
+and typed projection/return requirements. Its independent connection and projected-step checks
+separate a meaningful geometric proposal from its claimed proof. External invocation/covenant
+rules do not replace the physical reception or native HNN contracts.
+
 ## The object, the receiving operation and the displayed face
 
 [definition] A receiver is a role of a participating Holon H_R. In a declared contact C,
