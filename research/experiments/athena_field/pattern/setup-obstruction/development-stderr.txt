@@ -1,0 +1,1 @@
+holonics hna field-session: native application: CUDA allocation_grain_bytes returned -1 (INVALID_DRIVER_VALUE): one-word charge 131072 and restored free extent 15111946240 do not close at 15106048000

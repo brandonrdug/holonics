@@ -75,6 +75,15 @@ session payloads carry those witnesses and the existing stream cursor. The
 [field-session return](../research/experiments/athena_field/session/README.md) maps measured text,
 context, update, restart and cost scopes to those owners.
 
+[established-bounded; source-inspected] `ResidentHeldSection` in `normal/direct/held_section.rs`
+and `normal_held_section.cuh` implement the affine face `P given+(I-P)w`, retaining raw field
+publication separately. `reflection_target` applies the mask to the output covector before the
+complete paired adjoint; partial target prefixes leave unspecified output coordinates at zero.
+`FieldSourceChart::JointRegions` places context in the incoming source and supplies separate
+activity/observation maps. Field pending kind 3 and session v2 retain given/mask/extent with
+producing D/M; older bytes remain readable. The [partial-region return](../research/experiments/athena_field/pattern/README.md)
+records actual generated missing values, constrained observations, restart and dense-statistic costs.
+
 ## Swing, fluid and transfer composition
 
 [definition] The [fluid derivation](HOLONIC_FLUID_CONSTRUCTION.md) connects the actual owners:

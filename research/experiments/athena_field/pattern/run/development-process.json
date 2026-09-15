@@ -1,0 +1,19 @@
+{
+  "command": [
+    "target/debug/holonics",
+    "--format",
+    "jsonl",
+    "hna",
+    "field-session",
+    "--source",
+    "/home/b/Workspaces/holonics/research/experiments/athena_field/pattern/spec.json",
+    "--input",
+    "/home/b/Workspaces/holonics/research/experiments/athena_field/pattern/development.jsonl",
+    "--checkpoint",
+    "/home/b/Workspaces/holonics/research/experiments/athena_field/pattern/run/pending.session"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 71.76870511099696,
+  "max_rss_kib": 303872,
+  "scope": "warm isolated debug application, 96 targets and pending receiver checkpoint"
+}

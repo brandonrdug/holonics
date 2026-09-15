@@ -1654,6 +1654,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 #include "normal_applied_relation.cuh"
 #include "normal_material_section.cuh"
 #include "normal_enclosure_ports.cuh"
+#include "normal_held_section.cuh"
 #include "normal_wave.cuh"
 #include "normal_applied_condition.cuh"
 #include "normal_wave_source.cuh"

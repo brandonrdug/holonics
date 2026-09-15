@@ -1,0 +1,12 @@
+{
+  "symbols": [
+    "red",
+    "blue",
+    "green"
+  ],
+  "section_symbols": 3,
+  "context_symbols": 1,
+  "source_chart": "joint-regions",
+  "codec": "whitespace-words",
+  "fractional_bits": 48
+}

@@ -8,6 +8,7 @@ impl<'c> ResidentSurface<'c> {
         output: ResidentNormalEnclosureView<'_, 'c>,
         target: ResidentNormalEnclosureView<'_, 'c>,
         bounds: &ResidentSection<'c>,
+        mask: Option<&ResidentSection<'c>>,
         n: usize,
         k: usize,
         step_bits: u32,
@@ -23,6 +24,9 @@ impl<'c> ResidentSurface<'c> {
             .and_then(|v| v.checked_add(2 * k))
             .and_then(|v| v.checked_mul(4))
             .ok_or_else(fail)?;
+        let target_extent_ok = target.width == d
+            || target.width == width
+            || (mask.is_some() && target.width > 0 && target.width <= d && target.width % 2 == 0);
         for v in [input, output, target] {
             self.validate_normal_input(ResidentNormalInput::Enclosed(v), input.grain.0)?;
         }
@@ -31,12 +35,13 @@ impl<'c> ResidentSurface<'c> {
             || step_bits > 120
             || input.width != width
             || output.width != width
-            || (target.width != d && target.width != width)
+            || !target_extent_ok
             || !self.operative_shape(bounds, 1, 4)
             || !self.operative_shape(out[0], 1, 12 * (d + 1))
             || !self.operative_shape(out[1], k.max(1), 4)
             || !self.operative_shape(out[2], 1, 4)
             || !self.operative_shape(out[3], 1, query_width)
+            || mask.is_some_and(|m| !self.operative_shape(m, 1, d / 2))
         {
             return Err(fail());
         }
@@ -49,6 +54,9 @@ impl<'c> ResidentSurface<'c> {
         p.u32(target.width as u32)
             .ptr(bounds.lo.device_ptr())
             .ptr(bounds.hi.device_ptr())
+            .ptr(mask.map_or(0, |m| m.lo.device_ptr()))
+            .ptr(mask.map_or(0, |m| m.hi.device_ptr()))
+            .u32(u32::from(mask.is_some()))
             .u32(n as u32)
             .u32(k as u32)
             .u32(input.grain.0)

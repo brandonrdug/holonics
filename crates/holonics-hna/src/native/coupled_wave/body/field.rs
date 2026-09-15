@@ -1,19 +1,24 @@
 //! Direct model composition on the operative field. No wave surrogate or host semantic replay.
 use super::*;
-use serde::{Serialize,Deserialize};
-use holonic_engine::resident_section::{ResidentGrain,ResidentSectionRest};
 use holonic_engine::native_ecology::constitutive_fibre::{
-    ConstitutiveSourceChart, FieldReactionEnclosure, GeneratorNeighborhoodRest,
-    NativeConstitutiveField, NativeFieldCurrentSource, NativeFieldCurrentSourceRest, NativeFieldRest, FieldReactionEnclosureRest,
-    ResidentGeneratorNeighborhood, ResidentNormalEnclosure, ResidentNormalEnclosureView,
+    ConstitutiveSourceChart, FieldReactionEnclosure, FieldReactionEnclosureRest,
+    GeneratorNeighborhoodRest, NativeConstitutiveField, NativeFieldCurrentSource,
+    NativeFieldCurrentSourceRest, NativeFieldRest, ResidentGeneratorNeighborhood,
+    ResidentHeldSection, ResidentHeldSectionRest, ResidentNormalEnclosure,
+    ResidentNormalEnclosureView,
 };
+use holonic_engine::resident_section::{ResidentGrain, ResidentSectionRest};
+use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, rc::Rc};
 
 /// Declared restriction supplying the local reaction. The incoming boundary and the
 /// continuing outgoing boundary are different physical operands of the same field model.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all="kebab-case")]
-pub enum NativeFieldReactionPort { ContinuingBoundary, IncomingBoundary }
+#[serde(rename_all = "kebab-case")]
+pub enum NativeFieldReactionPort {
+    ContinuingBoundary,
+    IncomingBoundary,
+}
 
 struct FieldProducingSection<'c> {
     source: NativeFieldCurrentSource<'c>,
@@ -21,6 +26,8 @@ struct FieldProducingSection<'c> {
     input: ResidentNormalEnclosure<'c>,
     full_output: ResidentNormalEnclosure<'c>,
     outward: ResidentNormalEnclosure<'c>,
+    receiver: Option<ResidentHeldSection<'c>>,
+    received: Option<ResidentNormalEnclosure<'c>>,
     epoch: u64,
 }
 
@@ -34,6 +41,13 @@ impl<'c> NativeFieldGeneratedSection<'c> {
     pub fn output(&self) -> ResidentNormalEnclosureView<'_, 'c> {
         self.producing.outward.view()
     }
+    /// The requested affine receiving face; the raw boundary and joint field stay available.
+    pub fn received_output(&self) -> ResidentNormalEnclosureView<'_, 'c> {
+        self.producing
+            .received
+            .as_ref()
+            .map_or_else(|| self.output(), |s| s.view())
+    }
     pub fn joint_output(&self) -> ResidentNormalEnclosureView<'_, 'c> {
         self.producing.full_output.view()
     }
@@ -44,11 +58,14 @@ impl<'c> NativeFieldGeneratedSection<'c> {
         self.producing.epoch
     }
     pub fn inspect(&self) -> Result<Value, NativeSessionError> {
-        Ok(
-            json!({"scope":"constituted-field-joint","producing_epoch":self.producing.epoch,
+        let mut result = json!({"scope":"constituted-field-joint","producing_epoch":self.producing.epoch,
             "field_source_cut":self.producing.source.field_cut(),"comparison":self.comparison,
-            "boundary":self.output().inspect()?,"joint":self.joint_output().inspect()?}),
-        )
+            "boundary":self.output().inspect()?,"joint":self.joint_output().inspect()?});
+        if let Some(receiver) = &self.producing.receiver {
+            result["received_boundary"] = json!(self.received_output().inspect()?);
+            result["held_coordinates"] = json!(receiver.held());
+        }
+        Ok(result)
     }
 }
 
@@ -188,31 +205,54 @@ impl<'c> FieldModel<'c> {
         input: ResidentNormalInput<'_, 'c>,
         condition: ResidentConstitutiveCurrent<'_, 'c>,
         commit: bool,
+        held: Option<&[bool]>,
     ) -> Result<FieldProducingSection<'c>, NativeSessionError> {
         if input.width() != self.width || condition.components() != self.condition_width {
             return Err(invalid("field generation source/condition shape mismatch"));
         }
         let source = self.field.read_current_source()?;
         let external = input.enclosure(self.field.surface(), source.enclosure().grain())?;
+        let receiver = held
+            .map(|mask| ResidentHeldSection::found(external.view(), mask))
+            .transpose()?;
         let reaction_source = match self.reaction_port {
-            NativeFieldReactionPort::ContinuingBoundary => source.enclosure().restrict(0..self.width)?,
+            NativeFieldReactionPort::ContinuingBoundary => {
+                source.enclosure().restrict(0..self.width)?
+            }
             NativeFieldReactionPort::IncomingBoundary => external.view().to_owned()?,
         };
-        let reaction = self.reaction.forecast_enclosed_reaction(self.member, reaction_source.view(), condition)?;
+        let reaction = self.reaction.forecast_enclosed_reaction(
+            self.member,
+            reaction_source.view(),
+            condition,
+        )?;
         let input = match self.reaction_port {
-            NativeFieldReactionPort::ContinuingBoundary => reaction.apply_joint_current(source.enclosure(), external.view())?,
+            NativeFieldReactionPort::ContinuingBoundary => {
+                reaction.apply_joint_current(source.enclosure(), external.view())?
+            }
             NativeFieldReactionPort::IncomingBoundary => {
-                let entering=reaction.incoming_with_reaction()?;
-                if source.internal_components()==0 { entering } else {
+                let entering = reaction.incoming_with_reaction()?;
+                if source.internal_components() == 0 {
+                    entering
+                } else {
                     // The new external boundary is independent of the continuing interior;
                     // the previously emitted outward current is not re-entered by this port.
-                    entering.view().join(source.enclosure().restrict(self.width..source.enclosure().components())?.view())?
+                    entering.view().join(
+                        source
+                            .enclosure()
+                            .restrict(self.width..source.enclosure().components())?
+                            .view(),
+                    )?
                 }
             }
         };
         let reflected = source.reflect(input.view())?;
         let full_output = reflected.output().to_owned()?;
         let outward = full_output.view().restrict(0..self.width)?;
+        let received = receiver
+            .as_ref()
+            .map(|r| r.receive(outward.view()))
+            .transpose()?;
         if commit {
             self.field.commit_reflection(&reflected)?;
         }
@@ -223,6 +263,8 @@ impl<'c> FieldModel<'c> {
             input,
             full_output,
             outward,
+            receiver,
+            received,
             epoch: self.epoch,
         })
     }
@@ -232,6 +274,7 @@ impl<'c> FieldModel<'c> {
         condition: ResidentConstitutiveCurrent<'_, 'c>,
         commit: bool,
         retain: bool,
+        held: Option<&[bool]>,
     ) -> Result<NativeFieldGeneratedSection<'c>, NativeSessionError> {
         if retain && !commit {
             return Err(invalid(
@@ -254,7 +297,7 @@ impl<'c> FieldModel<'c> {
         } else {
             self.next_comparison
         };
-        let prepared = self.prepare(input, condition, commit)?;
+        let prepared = self.prepare(input, condition, commit, held)?;
         let producing = Rc::new(prepared);
         if let Some(id) = comparison {
             self.pending.insert(id, Rc::clone(&producing));
@@ -316,7 +359,56 @@ impl<'c> FieldModel<'c> {
         let target =
             target.enclosure(self.field.surface(), producing.source.enclosure().grain())?;
         let reflection = producing.source.reflect(producing.input.view())?;
-        let returned = reflection.compare_target(target.view(), step_bits)?;
+        if step_bits > 120 {
+            return Err(invalid("target step leaves the native dyadic carrier"));
+        }
+        if target.view().components() == 0 || target.view().components() % 2 != 0 {
+            return Err(invalid("target must retain complete complex coordinates"));
+        }
+        let predicted = producing.received.as_ref().unwrap_or(&producing.outward);
+        let held_difference = if let Some(receiver) = &producing.receiver {
+            let given = receiver.given().inspect()?;
+            let t = target.inspect()?;
+            let differences = given
+                .center
+                .iter()
+                .zip(&t.center)
+                .zip(receiver.held())
+                .enumerate()
+                .filter_map(|(i, ((a, b), held))| {
+                    held.then(|| json!({"coordinate":i,"difference":b.subtract(a)}))
+                })
+                .collect::<Vec<_>>();
+            let radius = if differences.is_empty() {
+                given.radius.clone() - given.radius
+            } else {
+                given.radius + t.radius
+            };
+            json!({"coordinates":differences,"radius":radius,"scope":"target minus supplied fixed source; only target-covered held coordinates"})
+        } else {
+            Value::Null
+        };
+        // A target observing only fixed source coordinates has no D/M derivative.
+        if producing.receiver.as_ref().is_some_and(|r| {
+            target.view().components() <= self.width
+                && r.held()[..target.view().components() / 2]
+                    .iter()
+                    .all(|v| *v)
+        }) {
+            let evidence = json!({"scope":"constituted-field-target","comparison":id,"producing_epoch":producing.epoch,
+                "before_epoch":self.epoch,"after_epoch":next,"predicted":predicted.inspect()?,"target":target.inspect()?,
+                "held_difference":held_difference,"parameter_update":"zero: target covers fixed receiving coordinates"});
+            self.pending.remove(&id);
+            self.targets = targets;
+            self.epoch = next;
+            return Ok(evidence);
+        }
+        let returned = match &producing.receiver {
+            Some(receiver) => {
+                reflection.compare_received_target(target.view(), step_bits, receiver)?
+            }
+            None => reflection.compare_target(target.view(), step_bits)?,
+        };
         let reaction_covector = returned.input_covector().restrict(0..self.width)?;
         let reaction = self.reaction.prepare_reaction_target(
             self.member,
@@ -328,11 +420,14 @@ impl<'c> FieldModel<'c> {
         }
         // Read requested evidence before publication; this is the application receiver, not a
         // numerical operand in the model's update. All arithmetic above remained resident.
-        let evidence = json!({"scope":"constituted-field-target","comparison":id,
+        let mut evidence = json!({"scope":"constituted-field-target","comparison":id,
             "producing_epoch":producing.epoch,"before_epoch":self.epoch,"after_epoch":next,
-            "predicted":producing.outward.view().inspect()?,"target":target.view().inspect()?,
+            "predicted":predicted.inspect()?,"target":target.view().inspect()?,
             "descending_input_covector":returned.input_covector().inspect()?,
             "step_denominator_power":step_bits,"reaction_update":"source-qualified normal proximal response"});
+        if producing.receiver.is_some() {
+            evidence["held_difference"] = held_difference;
+        }
         self.field.apply_reflection_target(&returned,
             holonic_engine::native_ecology::constitutive_fibre::NativeContactRealization::DyadicDeposit)?;
         // &mut self excludes any intervening neighborhood update after its freshness check.
@@ -343,8 +438,21 @@ impl<'c> FieldModel<'c> {
         Ok(evidence)
     }
     pub(super) fn rest(&self) -> Result<NativeFieldModelRest, NativeSessionError> {
-        let pending=self.pending.iter().map(|(id,p)|Ok(FieldPendingRest{id:*id,epoch:p.epoch,
-            source:p.source.rest()?,reaction:p.reaction.rest()?,input:p.input.rest()?,output:p.full_output.rest()?})).collect::<Result<Vec<_>,NativeSessionError>>()?;
+        let pending = self
+            .pending
+            .iter()
+            .map(|(id, p)| {
+                Ok(FieldPendingRest {
+                    id: *id,
+                    epoch: p.epoch,
+                    source: p.source.rest()?,
+                    reaction: p.reaction.rest()?,
+                    input: p.input.rest()?,
+                    output: p.full_output.rest()?,
+                    receiver: p.receiver.as_ref().map(|r| r.rest()).transpose()?,
+                })
+            })
+            .collect::<Result<Vec<_>, NativeSessionError>>()?;
         Ok(NativeFieldModelRest {
             field: self.field.rest(&[], &[])?,
             reaction: self.reaction.rest()?,
@@ -360,7 +468,15 @@ impl<'c> FieldModel<'c> {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-struct FieldPendingRest { id:u64,epoch:u64,source:NativeFieldCurrentSourceRest,reaction:FieldReactionEnclosureRest,input:ResidentSectionRest,output:ResidentSectionRest }
+struct FieldPendingRest {
+    id: u64,
+    epoch: u64,
+    source: NativeFieldCurrentSourceRest,
+    reaction: FieldReactionEnclosureRest,
+    input: ResidentSectionRest,
+    output: ResidentSectionRest,
+    receiver: Option<ResidentHeldSectionRest>,
+}
 
 /// Native field, reaction and outstanding producing comparisons using their existing cold
 /// owners. Session codecs and transport cursors belong to the exterior field-session rest.
@@ -377,7 +493,9 @@ pub struct NativeFieldModelRest {
     pending: Vec<FieldPendingRest>,
 }
 impl NativeFieldModelRest {
-    pub(super) fn has_prediction(&self,id:u64)->bool{self.pending.iter().any(|p|p.id==id)}
+    pub(super) fn has_prediction(&self, id: u64) -> bool {
+        self.pending.iter().any(|p| p.id == id)
+    }
     pub(super) fn roots(&self) -> usize {
         self.field.nodes()
     }
@@ -407,16 +525,39 @@ impl NativeFieldModelRest {
         }
         // Absent extension retains the original continuing-boundary model bytes.
         if self.pending.is_empty() {
-            if self.reaction_port==NativeFieldReactionPort::IncomingBoundary { out.write_all(&[1])?; }
+            if self.reaction_port == NativeFieldReactionPort::IncomingBoundary {
+                out.write_all(&[1])?;
+            }
         } else {
-            out.write_all(&[2,u8::from(self.reaction_port==NativeFieldReactionPort::IncomingBoundary)])?;
+            let with_receivers = self.pending.iter().any(|p| p.receiver.is_some());
+            out.write_all(&[
+                if with_receivers { 3 } else { 2 },
+                u8::from(self.reaction_port == NativeFieldReactionPort::IncomingBoundary),
+            ])?;
             out.write_all(&(self.pending.len() as u64).to_le_bytes())?;
             for pending in &self.pending {
-                out.write_all(&pending.id.to_le_bytes())?;out.write_all(&pending.epoch.to_le_bytes())?;
-                let mut source=Vec::new();pending.source.write(&mut source)?;
-                let mut reaction=Vec::new();pending.reaction.write(&mut reaction)?;
-                for bytes in [source,reaction,pending.input.canonical_bytes().map_err(invalid)?,pending.output.canonical_bytes().map_err(invalid)?] {
-                    out.write_all(&(bytes.len() as u64).to_le_bytes())?;out.write_all(&bytes)?;
+                out.write_all(&pending.id.to_le_bytes())?;
+                out.write_all(&pending.epoch.to_le_bytes())?;
+                let mut source = Vec::new();
+                pending.source.write(&mut source)?;
+                let mut reaction = Vec::new();
+                pending.reaction.write(&mut reaction)?;
+                for bytes in [
+                    source,
+                    reaction,
+                    pending.input.canonical_bytes().map_err(invalid)?,
+                    pending.output.canonical_bytes().map_err(invalid)?,
+                ] {
+                    out.write_all(&(bytes.len() as u64).to_le_bytes())?;
+                    out.write_all(&bytes)?;
+                }
+                if with_receivers {
+                    let mut bytes = Vec::new();
+                    if let Some(receiver) = &pending.receiver {
+                        receiver.write(&mut bytes)?;
+                    }
+                    out.write_all(&(bytes.len() as u64).to_le_bytes())?;
+                    out.write_all(&bytes)?;
                 }
             }
         }
@@ -444,34 +585,75 @@ impl NativeFieldModelRest {
             return Err(invalid("truncated reaction rest"));
         }
         let reaction = GeneratorNeighborhoodRest::read(&mut input, count)?;
-        let mut pending=Vec::new();
-        let reaction_port=if input.limit()==0 {NativeFieldReactionPort::ContinuingBoundary} else {
-            let mut mode=[0];input.read_exact(&mut mode)?;
+        let mut pending = Vec::new();
+        let reaction_port = if input.limit() == 0 {
+            NativeFieldReactionPort::ContinuingBoundary
+        } else {
+            let mut mode = [0];
+            input.read_exact(&mut mode)?;
             match mode[0] {
-                1 if input.limit()==0=>NativeFieldReactionPort::IncomingBoundary,
-                2=>{
+                1 if input.limit() == 0 => NativeFieldReactionPort::IncomingBoundary,
+                version @ (2 | 3) => {
                     input.read_exact(&mut mode)?;
-                    let port=match mode[0]{0=>NativeFieldReactionPort::ContinuingBoundary,1=>NativeFieldReactionPort::IncomingBoundary,_=>return Err(invalid("field reaction port"))};
-                    let count=number(&mut input)?;
-                    if count>input.limit()/48{return Err(invalid("pending field extent"));}
-                    let mut seen=std::collections::BTreeSet::new();
-                    for _ in 0..count {
-                        let id=number(&mut input)?;let producing_epoch=number(&mut input)?;
-                        if id>=next_comparison || producing_epoch>epoch || !seen.insert(id){return Err(invalid("pending field identity/epoch"));}
-                        let mut parts=Vec::new();for _ in 0..4 {
-                            let count=number(&mut input)?;
-                            if count>input.limit(){return Err(invalid("truncated pending field"));}
-                            let mut bytes=Vec::new();bytes.try_reserve_exact(usize::try_from(count).map_err(invalid)?).map_err(invalid)?;bytes.resize(count as usize,0);input.read_exact(&mut bytes)?;parts.push(bytes);
-                        }
-                        pending.push(FieldPendingRest{id,epoch:producing_epoch,
-                            source:NativeFieldCurrentSourceRest::read(&mut parts[0].as_slice(),parts[0].len() as u64)?,
-                            reaction:FieldReactionEnclosureRest::read(&mut parts[1].as_slice(),parts[1].len() as u64)?,
-                            input:ResidentSectionRest::read(&parts[2]).map_err(invalid)?,output:ResidentSectionRest::read(&parts[3]).map_err(invalid)?});
+                    let port = match mode[0] {
+                        0 => NativeFieldReactionPort::ContinuingBoundary,
+                        1 => NativeFieldReactionPort::IncomingBoundary,
+                        _ => return Err(invalid("field reaction port")),
+                    };
+                    let count = number(&mut input)?;
+                    if count > input.limit() / 48 {
+                        return Err(invalid("pending field extent"));
                     }
-                    if input.limit()!=0{return Err(invalid("trailing pending field bytes"));}
+                    let mut seen = std::collections::BTreeSet::new();
+                    for _ in 0..count {
+                        let id = number(&mut input)?;
+                        let producing_epoch = number(&mut input)?;
+                        if id >= next_comparison || producing_epoch > epoch || !seen.insert(id) {
+                            return Err(invalid("pending field identity/epoch"));
+                        }
+                        let mut parts = Vec::new();
+                        for _ in 0..if version == 3 { 5 } else { 4 } {
+                            let count = number(&mut input)?;
+                            if count > input.limit() {
+                                return Err(invalid("truncated pending field"));
+                            }
+                            let mut bytes = Vec::new();
+                            bytes
+                                .try_reserve_exact(usize::try_from(count).map_err(invalid)?)
+                                .map_err(invalid)?;
+                            bytes.resize(count as usize, 0);
+                            input.read_exact(&mut bytes)?;
+                            parts.push(bytes);
+                        }
+                        pending.push(FieldPendingRest {
+                            id,
+                            epoch: producing_epoch,
+                            source: NativeFieldCurrentSourceRest::read(
+                                &mut parts[0].as_slice(),
+                                parts[0].len() as u64,
+                            )?,
+                            reaction: FieldReactionEnclosureRest::read(
+                                &mut parts[1].as_slice(),
+                                parts[1].len() as u64,
+                            )?,
+                            input: ResidentSectionRest::read(&parts[2]).map_err(invalid)?,
+                            output: ResidentSectionRest::read(&parts[3]).map_err(invalid)?,
+                            receiver: if version == 3 && !parts[4].is_empty() {
+                                Some(ResidentHeldSectionRest::read(
+                                    &mut parts[4].as_slice(),
+                                    parts[4].len() as u64,
+                                )?)
+                            } else {
+                                None
+                            },
+                        });
+                    }
+                    if input.limit() != 0 {
+                        return Err(invalid("trailing pending field bytes"));
+                    }
                     port
-                },
-                _=>return Err(invalid("field model rest extension")),
+                }
+                _ => return Err(invalid("field model rest extension")),
             }
         };
         Ok(Self {
@@ -499,16 +681,40 @@ impl NativeFieldModelRest {
         model.next_comparison = self.next_comparison;
         model.targets = self.targets;
         for p in self.pending {
-            let source=model.field.remount_current_source(p.source)?;
-            let grain=source.enclosure().grain();
-            let reaction=model.reaction.remount_field_reaction(model.member,p.reaction)?;
-            let input=ResidentNormalEnclosure::remount(surface,p.input,grain)?;
-            let full_output=ResidentNormalEnclosure::remount(surface,p.output,grain)?;
-            let reflected=source.reflect(input.view())?;
-            if reflected.output().inspect()?!=full_output.inspect()? {return Err(invalid("pending output differs from producing field"));}
+            let source = model.field.remount_current_source(p.source)?;
+            let grain = source.enclosure().grain();
+            let reaction = model
+                .reaction
+                .remount_field_reaction(model.member, p.reaction)?;
+            let input = ResidentNormalEnclosure::remount(surface, p.input, grain)?;
+            let full_output = ResidentNormalEnclosure::remount(surface, p.output, grain)?;
+            let reflected = source.reflect(input.view())?;
+            if reflected.output().inspect()? != full_output.inspect()? {
+                return Err(invalid("pending output differs from producing field"));
+            }
             drop(reflected);
-            let outward=full_output.view().restrict(0..model.width)?;
-            model.pending.insert(p.id,Rc::new(FieldProducingSection{source,reaction,input,full_output,outward,epoch:p.epoch}));
+            let outward = full_output.view().restrict(0..model.width)?;
+            let receiver = p
+                .receiver
+                .map(|r| ResidentHeldSection::remount(surface, r))
+                .transpose()?;
+            let received = receiver
+                .as_ref()
+                .map(|r| r.receive(outward.view()))
+                .transpose()?;
+            model.pending.insert(
+                p.id,
+                Rc::new(FieldProducingSection {
+                    source,
+                    reaction,
+                    input,
+                    full_output,
+                    outward,
+                    receiver,
+                    received,
+                    epoch: p.epoch,
+                }),
+            );
         }
         Ok(model)
     }
@@ -528,17 +734,33 @@ impl<'c> NativeCoupledBody<'c> {
         })
     }
     /// Found the same field with an explicit incoming or continuing reaction source.
-    pub fn from_field_with_reaction_port(field:NativeConstitutiveField<'c>, reaction:ResidentGeneratorNeighborhood<'c>,
-        member:usize, port:NativeFieldReactionPort) -> Result<Self,NativeFieldAttachRefusal<'c>> {
-        let mut model=FieldModel::new(field,reaction,member)?;
-        model.reaction_port=port;
-        Ok(Self{state:Some(BodyState::Field(model))})
+    pub fn from_field_with_reaction_port(
+        field: NativeConstitutiveField<'c>,
+        reaction: ResidentGeneratorNeighborhood<'c>,
+        member: usize,
+        port: NativeFieldReactionPort,
+    ) -> Result<Self, NativeFieldAttachRefusal<'c>> {
+        let mut model = FieldModel::new(field, reaction, member)?;
+        model.reaction_port = port;
+        Ok(Self {
+            state: Some(BodyState::Field(model)),
+        })
     }
-    pub fn field_dimensions(&self)->Result<(usize,usize,ResidentGrain,NativeFieldReactionPort),NativeSessionError>{
+    pub fn field_dimensions(
+        &self,
+    ) -> Result<(usize, usize, ResidentGrain, NativeFieldReactionPort), NativeSessionError> {
         match self.state()? {
-            BodyState::Field(field)=>Ok((field.width,field.condition_width,
-                field.reaction.predictive_material(field.member)?.ok_or_else(||invalid("absent reaction material"))?.grain(),field.reaction_port)),
-            _=>Err(invalid("operation requires constituted field body")),
+            BodyState::Field(field) => Ok((
+                field.width,
+                field.condition_width,
+                field
+                    .reaction
+                    .predictive_material(field.member)?
+                    .ok_or_else(|| invalid("absent reaction material"))?
+                    .grain(),
+                field.reaction_port,
+            )),
+            _ => Err(invalid("operation requires constituted field body")),
         }
     }
     fn field_model(&mut self) -> Result<&mut FieldModel<'c>, NativeSessionError> {
@@ -553,14 +775,28 @@ impl<'c> NativeCoupledBody<'c> {
         condition: ResidentConstitutiveCurrent<'_, 'c>,
         retain: bool,
     ) -> Result<NativeFieldGeneratedSection<'c>, NativeSessionError> {
-        self.field_model()?.generate(input, condition, true, retain)
+        self.field_model()?
+            .generate(input, condition, true, retain, None)
     }
     pub fn preview_field(
         &mut self,
         input: ResidentNormalInput<'_, 'c>,
         condition: ResidentConstitutiveCurrent<'_, 'c>,
     ) -> Result<NativeFieldGeneratedSection<'c>, NativeSessionError> {
-        self.field_model()?.generate(input, condition, false, false)
+        self.field_model()?
+            .generate(input, condition, false, false, None)
+    }
+    /// Generate the raw field and its declared affine receiver without changing field publication.
+    pub fn generate_received_field(
+        &mut self,
+        input: ResidentNormalInput<'_, 'c>,
+        condition: ResidentConstitutiveCurrent<'_, 'c>,
+        held: &[bool],
+        commit: bool,
+        retain: bool,
+    ) -> Result<NativeFieldGeneratedSection<'c>, NativeSessionError> {
+        self.field_model()?
+            .generate(input, condition, commit, retain, Some(held))
     }
     pub fn train_field_reaction(
         &mut self,

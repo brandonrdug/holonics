@@ -166,7 +166,7 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 51] = [
+pub const KERNELS: [&str; 52] = [
     "section_constitutive_rechart",
     "section_constitutive_circulation",
     "section_constitutive_fibre",
@@ -232,12 +232,14 @@ pub const KERNELS: [&str; 51] = [
     "section_contract_partial_r1_l32",
     "section_contract_partial_r4_l32",
     "section_contract_join",
+    "section_normal_held_section",
 ];
 
 #[path = "resident_section/surface_field_current_source.rs"]
 mod surface_field_current_source;
 mod surface_field_reflection_commit;
 mod surface_field_reflection_target;
+mod surface_normal_held_section;
 
 /// `CUdevice_attribute` selectors from `cuda.h`, fixed by the foreign interface.
 const ATTRIBUTE_MAX_THREADS_PER_BLOCK: i32 = 1;

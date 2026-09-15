@@ -786,6 +786,30 @@ impl Context {
 /// after each. **Measured, never declared** — an apparatus coordinate a deed's admission rounds
 /// every allocation up to.
 fn measure_allocation_grain(memory_info: impl Fn() -> Result<MemoryInfo>) -> Result<usize> {
+    retry_allocation_measurement(|| measure_allocation_grain_once(&memory_info))
+}
+
+// Driver JIT cleanup or another client can change the global free-memory reading between
+// samples. Retry this small calibration, never a native operation, and still require the
+// complete one-word/wider-allocation conservation check. No page size is guessed.
+fn retry_allocation_measurement(mut attempt: impl FnMut() -> Result<usize>) -> Result<usize> {
+    for sample in 0..3 {
+        match attempt() {
+            Ok(grain) => return Ok(grain),
+            Err(error)
+                if sample < 2
+                    && error.context == "allocation_grain_bytes"
+                    && error.name == "INVALID_DRIVER_VALUE" =>
+            {
+                continue
+            }
+            Err(error) => return Err(error),
+        }
+    }
+    unreachable!("the final calibration attempt returns its result")
+}
+
+fn measure_allocation_grain_once(memory_info: &impl Fn() -> Result<MemoryInfo>) -> Result<usize> {
     let before = memory_info()?.free_bytes;
     let one = DeviceBuffer::<u32>::alloc(1)?;
     let after_one = memory_info()?.free_bytes;
@@ -1835,6 +1859,51 @@ impl<T> Drop for DeviceBuffer<T> {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn allocation_calibration_retries_an_unstable_sample_without_guessing() {
+        let mut calls = 0;
+        let grain = super::retry_allocation_measurement(|| {
+            calls += 1;
+            if calls == 1 {
+                Err(super::invalid_driver_value(
+                    "allocation_grain_bytes",
+                    "free extent changed during JIT cleanup".into(),
+                ))
+            } else {
+                Ok(131072)
+            }
+        })
+        .unwrap();
+        assert_eq!(calls, 2);
+        assert_eq!(grain, 131072);
+    }
+    #[test]
+    fn allocation_calibration_keeps_persistent_and_driver_failures() {
+        let mut calls = 0;
+        assert!(super::retry_allocation_measurement(|| {
+            calls += 1;
+            Err(super::invalid_driver_value(
+                "allocation_grain_bytes",
+                "unstable".into(),
+            ))
+        })
+        .is_err());
+        assert_eq!(calls, 3);
+        let mut calls = 0;
+        let failure = super::retry_allocation_measurement(|| {
+            calls += 1;
+            Err(super::CudaError {
+                code: 2,
+                name: "CUDA_ERROR_OUT_OF_MEMORY".into(),
+                message: "allocation failed".into(),
+                context: "cuMemAlloc",
+            })
+        })
+        .unwrap_err();
+        assert_eq!(calls, 1);
+        assert_eq!(failure.code, 2);
+    }
+
     use super::*;
 
     #[test]

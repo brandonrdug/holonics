@@ -10,9 +10,11 @@ pub use refine::NormalRealizationRefinement;
 
 mod enclosure;
 mod enclosure_ports;
+mod held_section;
 #[cfg(test)]
 mod conditional_tests;
 pub use enclosure::{ResidentNormalEnclosure, ResidentNormalEnclosureView, ResidentNormalInput};
+pub use held_section::{ResidentHeldSection, ResidentHeldSectionRest};
 mod applied_relation;
 mod joined_source;
 mod section;

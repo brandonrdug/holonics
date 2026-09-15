@@ -40,6 +40,13 @@ Workbench/JSONL stream. It returns learned contextual edits, saved pending compa
 failed-output recovery at its declared section/codec scope. `NativeFieldSession` and
 `HnaStream::pump_field` are the corresponding library entry points.
 
+[established-bounded; measured] The [partial-region application](../../research/experiments/athena_field/pattern/README.md)
+adds `FieldSourceChart::JointRegions`, `partial` observations and `output_symbols` within the
+saved capacity. Context currents enter actual source regions; the native affine receiver keeps
+supplied coordinates while the field generates the others jointly. `generate_received_field`
+returns both raw and received sections. Its target pullback and pending restart retain the
+receiver mask and original output extent; older text-session checkpoints remain readable.
+
 This is the first finite model operation; useful Athena conversation and broader receiving
 applications remain in the live construction order.
 

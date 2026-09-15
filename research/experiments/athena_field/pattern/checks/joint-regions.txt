@@ -1,0 +1,8 @@
+
+running 4 tests
+test native::field_session::joint_region_tests::fully_held_receiver_does_not_deposit_its_own_output ... ok
+test native::field_session::joint_region_tests::joint_source_distinguishes_unknown_from_inactive_and_context ... ok
+test native::field_session::joint_region_tests::partial_receiver_reopens_after_intervening_material_update ... ok
+test native::field_session::joint_region_tests::region_extents_grow_with_regions_and_retain_legacy_chart ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 100 filtered out; finished in 2.54s

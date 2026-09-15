@@ -221,6 +221,13 @@ structure. Complete output concerns the jointly supported construction; streamin
 refinement follow its dependencies. A single compiled generating operation may express such
 an evolution; neither an arbitrary pass count nor a next-symbol clock defines generation.
 
+[established-bounded; source-inspected] The [partial-region implementation](../../research/records/2026-09-15_PARTIAL_FIELDS_FORM_JOINT_PATTERNS_THROUGH_THEIR_RECEIVERS.md)
+now supplies the concrete affine receiver and its target pullback, actual neighboring context
+currents and variable receiving extent. Its separate activity/observation maps distinguish
+unresolved regions from zero-valued observations. The single fixed-mask reaction/scattering
+step is affine; composition with the existing content-dependent field/current variations is
+further construction through this same application, not a claim already supplied by the mask.
+
 [project-postulate] Build the first field-backed Athena contextual correction/continuation
 session through the existing Workbench/request stream. Consume a complete prepared request and
 its relevant preceding parts, generate the response as a joint section, expose its actual text

@@ -1,0 +1,2943 @@
+{
+  "schema": "org.holonics.hna.field-pattern.v1",
+  "source_chart": "joint-regions",
+  "codec": "whitespace-words",
+  "fractional_bits": 48,
+  "symbols": [
+    "red",
+    "blue",
+    "green"
+  ],
+  "section_capacity": 3,
+  "context_capacity": 1,
+  "target_authority": "exterior-generated-source-data",
+  "partial_observation": {
+    "non_null_entries": "held observations through y = P given + Q raw_field",
+    "null_entries": "unobserved regions",
+    "zero_seed": "chosen seed only; never an observation"
+  },
+  "epochs": 4,
+  "development": {
+    "base_cases": 24,
+    "observed_targets": 96,
+    "pending_comparison": 96,
+    "pending": {
+      "split": "development-pending",
+      "comparison": 96,
+      "a": "red",
+      "b": "blue",
+      "pattern": [
+        "red",
+        "blue",
+        "red"
+      ],
+      "context": [
+        "blue"
+      ],
+      "partial": [
+        "red",
+        null,
+        null
+      ],
+      "target": "red blue red"
+    },
+    "cases": [
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 0,
+        "a": "red",
+        "b": "blue",
+        "pattern": [
+          "red",
+          "blue",
+          "red"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "red",
+          null,
+          null
+        ],
+        "target": "red blue red",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 1,
+        "a": "red",
+        "b": "blue",
+        "pattern": [
+          "red",
+          "blue",
+          "red"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          null,
+          null,
+          "red"
+        ],
+        "target": "red blue red",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 2,
+        "a": "red",
+        "b": "blue",
+        "pattern": [
+          "red",
+          "blue",
+          "red"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "red",
+          "blue",
+          null
+        ],
+        "target": "red blue red",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 3,
+        "a": "red",
+        "b": "blue",
+        "pattern": [
+          "red",
+          "blue",
+          "red"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          null,
+          "blue",
+          "red"
+        ],
+        "target": "red blue red",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 4,
+        "a": "red",
+        "b": "green",
+        "pattern": [
+          "red",
+          "green",
+          "red"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "red",
+          null,
+          null
+        ],
+        "target": "red green red",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 5,
+        "a": "red",
+        "b": "green",
+        "pattern": [
+          "red",
+          "green",
+          "red"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          null,
+          null,
+          "red"
+        ],
+        "target": "red green red",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 6,
+        "a": "red",
+        "b": "green",
+        "pattern": [
+          "red",
+          "green",
+          "red"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "red",
+          "green",
+          null
+        ],
+        "target": "red green red",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 7,
+        "a": "red",
+        "b": "green",
+        "pattern": [
+          "red",
+          "green",
+          "red"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          null,
+          "green",
+          "red"
+        ],
+        "target": "red green red",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 8,
+        "a": "blue",
+        "b": "red",
+        "pattern": [
+          "blue",
+          "red",
+          "blue"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "blue",
+          null,
+          null
+        ],
+        "target": "blue red blue",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 9,
+        "a": "blue",
+        "b": "red",
+        "pattern": [
+          "blue",
+          "red",
+          "blue"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          null,
+          null,
+          "blue"
+        ],
+        "target": "blue red blue",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 10,
+        "a": "blue",
+        "b": "red",
+        "pattern": [
+          "blue",
+          "red",
+          "blue"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "blue",
+          "red",
+          null
+        ],
+        "target": "blue red blue",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 11,
+        "a": "blue",
+        "b": "red",
+        "pattern": [
+          "blue",
+          "red",
+          "blue"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          null,
+          "red",
+          "blue"
+        ],
+        "target": "blue red blue",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 12,
+        "a": "blue",
+        "b": "green",
+        "pattern": [
+          "blue",
+          "green",
+          "blue"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "blue",
+          null,
+          null
+        ],
+        "target": "blue green blue",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 13,
+        "a": "blue",
+        "b": "green",
+        "pattern": [
+          "blue",
+          "green",
+          "blue"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          null,
+          null,
+          "blue"
+        ],
+        "target": "blue green blue",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 14,
+        "a": "blue",
+        "b": "green",
+        "pattern": [
+          "blue",
+          "green",
+          "blue"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "blue",
+          "green",
+          null
+        ],
+        "target": "blue green blue",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 15,
+        "a": "blue",
+        "b": "green",
+        "pattern": [
+          "blue",
+          "green",
+          "blue"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          null,
+          "green",
+          "blue"
+        ],
+        "target": "blue green blue",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 16,
+        "a": "green",
+        "b": "red",
+        "pattern": [
+          "green",
+          "red",
+          "green"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "green",
+          null,
+          null
+        ],
+        "target": "green red green",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 17,
+        "a": "green",
+        "b": "red",
+        "pattern": [
+          "green",
+          "red",
+          "green"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          null,
+          null,
+          "green"
+        ],
+        "target": "green red green",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 18,
+        "a": "green",
+        "b": "red",
+        "pattern": [
+          "green",
+          "red",
+          "green"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "green",
+          "red",
+          null
+        ],
+        "target": "green red green",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 19,
+        "a": "green",
+        "b": "red",
+        "pattern": [
+          "green",
+          "red",
+          "green"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          null,
+          "red",
+          "green"
+        ],
+        "target": "green red green",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 20,
+        "a": "green",
+        "b": "blue",
+        "pattern": [
+          "green",
+          "blue",
+          "green"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "green",
+          null,
+          null
+        ],
+        "target": "green blue green",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 21,
+        "a": "green",
+        "b": "blue",
+        "pattern": [
+          "green",
+          "blue",
+          "green"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          null,
+          null,
+          "green"
+        ],
+        "target": "green blue green",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 22,
+        "a": "green",
+        "b": "blue",
+        "pattern": [
+          "green",
+          "blue",
+          "green"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "green",
+          "blue",
+          null
+        ],
+        "target": "green blue green",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 0,
+        "comparison": 23,
+        "a": "green",
+        "b": "blue",
+        "pattern": [
+          "green",
+          "blue",
+          "green"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          null,
+          "blue",
+          "green"
+        ],
+        "target": "green blue green",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 24,
+        "a": "red",
+        "b": "blue",
+        "pattern": [
+          "red",
+          "blue",
+          "red"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "red",
+          null,
+          null
+        ],
+        "target": "red blue red",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 25,
+        "a": "red",
+        "b": "blue",
+        "pattern": [
+          "red",
+          "blue",
+          "red"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          null,
+          null,
+          "red"
+        ],
+        "target": "red blue red",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 26,
+        "a": "red",
+        "b": "blue",
+        "pattern": [
+          "red",
+          "blue",
+          "red"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "red",
+          "blue",
+          null
+        ],
+        "target": "red blue red",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 27,
+        "a": "red",
+        "b": "blue",
+        "pattern": [
+          "red",
+          "blue",
+          "red"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          null,
+          "blue",
+          "red"
+        ],
+        "target": "red blue red",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 28,
+        "a": "red",
+        "b": "green",
+        "pattern": [
+          "red",
+          "green",
+          "red"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "red",
+          null,
+          null
+        ],
+        "target": "red green red",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 29,
+        "a": "red",
+        "b": "green",
+        "pattern": [
+          "red",
+          "green",
+          "red"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          null,
+          null,
+          "red"
+        ],
+        "target": "red green red",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 30,
+        "a": "red",
+        "b": "green",
+        "pattern": [
+          "red",
+          "green",
+          "red"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "red",
+          "green",
+          null
+        ],
+        "target": "red green red",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 31,
+        "a": "red",
+        "b": "green",
+        "pattern": [
+          "red",
+          "green",
+          "red"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          null,
+          "green",
+          "red"
+        ],
+        "target": "red green red",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 32,
+        "a": "blue",
+        "b": "red",
+        "pattern": [
+          "blue",
+          "red",
+          "blue"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "blue",
+          null,
+          null
+        ],
+        "target": "blue red blue",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 33,
+        "a": "blue",
+        "b": "red",
+        "pattern": [
+          "blue",
+          "red",
+          "blue"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          null,
+          null,
+          "blue"
+        ],
+        "target": "blue red blue",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 34,
+        "a": "blue",
+        "b": "red",
+        "pattern": [
+          "blue",
+          "red",
+          "blue"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "blue",
+          "red",
+          null
+        ],
+        "target": "blue red blue",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 35,
+        "a": "blue",
+        "b": "red",
+        "pattern": [
+          "blue",
+          "red",
+          "blue"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          null,
+          "red",
+          "blue"
+        ],
+        "target": "blue red blue",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 36,
+        "a": "blue",
+        "b": "green",
+        "pattern": [
+          "blue",
+          "green",
+          "blue"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "blue",
+          null,
+          null
+        ],
+        "target": "blue green blue",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 37,
+        "a": "blue",
+        "b": "green",
+        "pattern": [
+          "blue",
+          "green",
+          "blue"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          null,
+          null,
+          "blue"
+        ],
+        "target": "blue green blue",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 38,
+        "a": "blue",
+        "b": "green",
+        "pattern": [
+          "blue",
+          "green",
+          "blue"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "blue",
+          "green",
+          null
+        ],
+        "target": "blue green blue",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 39,
+        "a": "blue",
+        "b": "green",
+        "pattern": [
+          "blue",
+          "green",
+          "blue"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          null,
+          "green",
+          "blue"
+        ],
+        "target": "blue green blue",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 40,
+        "a": "green",
+        "b": "red",
+        "pattern": [
+          "green",
+          "red",
+          "green"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "green",
+          null,
+          null
+        ],
+        "target": "green red green",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 41,
+        "a": "green",
+        "b": "red",
+        "pattern": [
+          "green",
+          "red",
+          "green"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          null,
+          null,
+          "green"
+        ],
+        "target": "green red green",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 42,
+        "a": "green",
+        "b": "red",
+        "pattern": [
+          "green",
+          "red",
+          "green"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "green",
+          "red",
+          null
+        ],
+        "target": "green red green",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 43,
+        "a": "green",
+        "b": "red",
+        "pattern": [
+          "green",
+          "red",
+          "green"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          null,
+          "red",
+          "green"
+        ],
+        "target": "green red green",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 44,
+        "a": "green",
+        "b": "blue",
+        "pattern": [
+          "green",
+          "blue",
+          "green"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "green",
+          null,
+          null
+        ],
+        "target": "green blue green",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 45,
+        "a": "green",
+        "b": "blue",
+        "pattern": [
+          "green",
+          "blue",
+          "green"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          null,
+          null,
+          "green"
+        ],
+        "target": "green blue green",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 46,
+        "a": "green",
+        "b": "blue",
+        "pattern": [
+          "green",
+          "blue",
+          "green"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "green",
+          "blue",
+          null
+        ],
+        "target": "green blue green",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 1,
+        "comparison": 47,
+        "a": "green",
+        "b": "blue",
+        "pattern": [
+          "green",
+          "blue",
+          "green"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          null,
+          "blue",
+          "green"
+        ],
+        "target": "green blue green",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 48,
+        "a": "red",
+        "b": "blue",
+        "pattern": [
+          "red",
+          "blue",
+          "red"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "red",
+          null,
+          null
+        ],
+        "target": "red blue red",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 49,
+        "a": "red",
+        "b": "blue",
+        "pattern": [
+          "red",
+          "blue",
+          "red"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          null,
+          null,
+          "red"
+        ],
+        "target": "red blue red",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 50,
+        "a": "red",
+        "b": "blue",
+        "pattern": [
+          "red",
+          "blue",
+          "red"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "red",
+          "blue",
+          null
+        ],
+        "target": "red blue red",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 51,
+        "a": "red",
+        "b": "blue",
+        "pattern": [
+          "red",
+          "blue",
+          "red"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          null,
+          "blue",
+          "red"
+        ],
+        "target": "red blue red",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 52,
+        "a": "red",
+        "b": "green",
+        "pattern": [
+          "red",
+          "green",
+          "red"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "red",
+          null,
+          null
+        ],
+        "target": "red green red",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 53,
+        "a": "red",
+        "b": "green",
+        "pattern": [
+          "red",
+          "green",
+          "red"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          null,
+          null,
+          "red"
+        ],
+        "target": "red green red",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 54,
+        "a": "red",
+        "b": "green",
+        "pattern": [
+          "red",
+          "green",
+          "red"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "red",
+          "green",
+          null
+        ],
+        "target": "red green red",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 55,
+        "a": "red",
+        "b": "green",
+        "pattern": [
+          "red",
+          "green",
+          "red"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          null,
+          "green",
+          "red"
+        ],
+        "target": "red green red",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 56,
+        "a": "blue",
+        "b": "red",
+        "pattern": [
+          "blue",
+          "red",
+          "blue"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "blue",
+          null,
+          null
+        ],
+        "target": "blue red blue",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 57,
+        "a": "blue",
+        "b": "red",
+        "pattern": [
+          "blue",
+          "red",
+          "blue"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          null,
+          null,
+          "blue"
+        ],
+        "target": "blue red blue",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 58,
+        "a": "blue",
+        "b": "red",
+        "pattern": [
+          "blue",
+          "red",
+          "blue"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "blue",
+          "red",
+          null
+        ],
+        "target": "blue red blue",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 59,
+        "a": "blue",
+        "b": "red",
+        "pattern": [
+          "blue",
+          "red",
+          "blue"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          null,
+          "red",
+          "blue"
+        ],
+        "target": "blue red blue",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 60,
+        "a": "blue",
+        "b": "green",
+        "pattern": [
+          "blue",
+          "green",
+          "blue"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "blue",
+          null,
+          null
+        ],
+        "target": "blue green blue",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 61,
+        "a": "blue",
+        "b": "green",
+        "pattern": [
+          "blue",
+          "green",
+          "blue"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          null,
+          null,
+          "blue"
+        ],
+        "target": "blue green blue",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 62,
+        "a": "blue",
+        "b": "green",
+        "pattern": [
+          "blue",
+          "green",
+          "blue"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "blue",
+          "green",
+          null
+        ],
+        "target": "blue green blue",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 63,
+        "a": "blue",
+        "b": "green",
+        "pattern": [
+          "blue",
+          "green",
+          "blue"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          null,
+          "green",
+          "blue"
+        ],
+        "target": "blue green blue",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 64,
+        "a": "green",
+        "b": "red",
+        "pattern": [
+          "green",
+          "red",
+          "green"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "green",
+          null,
+          null
+        ],
+        "target": "green red green",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 65,
+        "a": "green",
+        "b": "red",
+        "pattern": [
+          "green",
+          "red",
+          "green"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          null,
+          null,
+          "green"
+        ],
+        "target": "green red green",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 66,
+        "a": "green",
+        "b": "red",
+        "pattern": [
+          "green",
+          "red",
+          "green"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "green",
+          "red",
+          null
+        ],
+        "target": "green red green",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 67,
+        "a": "green",
+        "b": "red",
+        "pattern": [
+          "green",
+          "red",
+          "green"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          null,
+          "red",
+          "green"
+        ],
+        "target": "green red green",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 68,
+        "a": "green",
+        "b": "blue",
+        "pattern": [
+          "green",
+          "blue",
+          "green"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "green",
+          null,
+          null
+        ],
+        "target": "green blue green",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 69,
+        "a": "green",
+        "b": "blue",
+        "pattern": [
+          "green",
+          "blue",
+          "green"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          null,
+          null,
+          "green"
+        ],
+        "target": "green blue green",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 70,
+        "a": "green",
+        "b": "blue",
+        "pattern": [
+          "green",
+          "blue",
+          "green"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "green",
+          "blue",
+          null
+        ],
+        "target": "green blue green",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 2,
+        "comparison": 71,
+        "a": "green",
+        "b": "blue",
+        "pattern": [
+          "green",
+          "blue",
+          "green"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          null,
+          "blue",
+          "green"
+        ],
+        "target": "green blue green",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 72,
+        "a": "red",
+        "b": "blue",
+        "pattern": [
+          "red",
+          "blue",
+          "red"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "red",
+          null,
+          null
+        ],
+        "target": "red blue red",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 73,
+        "a": "red",
+        "b": "blue",
+        "pattern": [
+          "red",
+          "blue",
+          "red"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          null,
+          null,
+          "red"
+        ],
+        "target": "red blue red",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 74,
+        "a": "red",
+        "b": "blue",
+        "pattern": [
+          "red",
+          "blue",
+          "red"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "red",
+          "blue",
+          null
+        ],
+        "target": "red blue red",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 75,
+        "a": "red",
+        "b": "blue",
+        "pattern": [
+          "red",
+          "blue",
+          "red"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          null,
+          "blue",
+          "red"
+        ],
+        "target": "red blue red",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 76,
+        "a": "red",
+        "b": "green",
+        "pattern": [
+          "red",
+          "green",
+          "red"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "red",
+          null,
+          null
+        ],
+        "target": "red green red",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 77,
+        "a": "red",
+        "b": "green",
+        "pattern": [
+          "red",
+          "green",
+          "red"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          null,
+          null,
+          "red"
+        ],
+        "target": "red green red",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 78,
+        "a": "red",
+        "b": "green",
+        "pattern": [
+          "red",
+          "green",
+          "red"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "red",
+          "green",
+          null
+        ],
+        "target": "red green red",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 79,
+        "a": "red",
+        "b": "green",
+        "pattern": [
+          "red",
+          "green",
+          "red"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          null,
+          "green",
+          "red"
+        ],
+        "target": "red green red",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 80,
+        "a": "blue",
+        "b": "red",
+        "pattern": [
+          "blue",
+          "red",
+          "blue"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "blue",
+          null,
+          null
+        ],
+        "target": "blue red blue",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 81,
+        "a": "blue",
+        "b": "red",
+        "pattern": [
+          "blue",
+          "red",
+          "blue"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          null,
+          null,
+          "blue"
+        ],
+        "target": "blue red blue",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 82,
+        "a": "blue",
+        "b": "red",
+        "pattern": [
+          "blue",
+          "red",
+          "blue"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "blue",
+          "red",
+          null
+        ],
+        "target": "blue red blue",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 83,
+        "a": "blue",
+        "b": "red",
+        "pattern": [
+          "blue",
+          "red",
+          "blue"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          null,
+          "red",
+          "blue"
+        ],
+        "target": "blue red blue",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 84,
+        "a": "blue",
+        "b": "green",
+        "pattern": [
+          "blue",
+          "green",
+          "blue"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "blue",
+          null,
+          null
+        ],
+        "target": "blue green blue",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 85,
+        "a": "blue",
+        "b": "green",
+        "pattern": [
+          "blue",
+          "green",
+          "blue"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          null,
+          null,
+          "blue"
+        ],
+        "target": "blue green blue",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 86,
+        "a": "blue",
+        "b": "green",
+        "pattern": [
+          "blue",
+          "green",
+          "blue"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "blue",
+          "green",
+          null
+        ],
+        "target": "blue green blue",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 87,
+        "a": "blue",
+        "b": "green",
+        "pattern": [
+          "blue",
+          "green",
+          "blue"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          null,
+          "green",
+          "blue"
+        ],
+        "target": "blue green blue",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 88,
+        "a": "green",
+        "b": "red",
+        "pattern": [
+          "green",
+          "red",
+          "green"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "green",
+          null,
+          null
+        ],
+        "target": "green red green",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 89,
+        "a": "green",
+        "b": "red",
+        "pattern": [
+          "green",
+          "red",
+          "green"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          null,
+          null,
+          "green"
+        ],
+        "target": "green red green",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 90,
+        "a": "green",
+        "b": "red",
+        "pattern": [
+          "green",
+          "red",
+          "green"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "green",
+          "red",
+          null
+        ],
+        "target": "green red green",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 91,
+        "a": "green",
+        "b": "red",
+        "pattern": [
+          "green",
+          "red",
+          "green"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          null,
+          "red",
+          "green"
+        ],
+        "target": "green red green",
+        "view_index": 3
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 92,
+        "a": "green",
+        "b": "blue",
+        "pattern": [
+          "green",
+          "blue",
+          "green"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "green",
+          null,
+          null
+        ],
+        "target": "green blue green",
+        "view_index": 0
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 93,
+        "a": "green",
+        "b": "blue",
+        "pattern": [
+          "green",
+          "blue",
+          "green"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          null,
+          null,
+          "green"
+        ],
+        "target": "green blue green",
+        "view_index": 1
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 94,
+        "a": "green",
+        "b": "blue",
+        "pattern": [
+          "green",
+          "blue",
+          "green"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "green",
+          "blue",
+          null
+        ],
+        "target": "green blue green",
+        "view_index": 2
+      },
+      {
+        "split": "development",
+        "epoch": 3,
+        "comparison": 95,
+        "a": "green",
+        "b": "blue",
+        "pattern": [
+          "green",
+          "blue",
+          "green"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          null,
+          "blue",
+          "green"
+        ],
+        "target": "green blue green",
+        "view_index": 3
+      }
+    ]
+  },
+  "evaluation": {
+    "resume_first_event": "observe-field",
+    "resume_source": 96,
+    "withheld_equal_cases": 12,
+    "withheld_equal": [
+      {
+        "split": "withheld-equal",
+        "a": "red",
+        "b": "red",
+        "pattern": [
+          "red",
+          "red",
+          "red"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "red",
+          null,
+          null
+        ],
+        "target": "red red red",
+        "view_index": 0
+      },
+      {
+        "split": "withheld-equal",
+        "a": "red",
+        "b": "red",
+        "pattern": [
+          "red",
+          "red",
+          "red"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          null,
+          null,
+          "red"
+        ],
+        "target": "red red red",
+        "view_index": 1
+      },
+      {
+        "split": "withheld-equal",
+        "a": "red",
+        "b": "red",
+        "pattern": [
+          "red",
+          "red",
+          "red"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "red",
+          "red",
+          null
+        ],
+        "target": "red red red",
+        "view_index": 2
+      },
+      {
+        "split": "withheld-equal",
+        "a": "red",
+        "b": "red",
+        "pattern": [
+          "red",
+          "red",
+          "red"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          null,
+          "red",
+          "red"
+        ],
+        "target": "red red red",
+        "view_index": 3
+      },
+      {
+        "split": "withheld-equal",
+        "a": "blue",
+        "b": "blue",
+        "pattern": [
+          "blue",
+          "blue",
+          "blue"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "blue",
+          null,
+          null
+        ],
+        "target": "blue blue blue",
+        "view_index": 0
+      },
+      {
+        "split": "withheld-equal",
+        "a": "blue",
+        "b": "blue",
+        "pattern": [
+          "blue",
+          "blue",
+          "blue"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          null,
+          null,
+          "blue"
+        ],
+        "target": "blue blue blue",
+        "view_index": 1
+      },
+      {
+        "split": "withheld-equal",
+        "a": "blue",
+        "b": "blue",
+        "pattern": [
+          "blue",
+          "blue",
+          "blue"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "blue",
+          "blue",
+          null
+        ],
+        "target": "blue blue blue",
+        "view_index": 2
+      },
+      {
+        "split": "withheld-equal",
+        "a": "blue",
+        "b": "blue",
+        "pattern": [
+          "blue",
+          "blue",
+          "blue"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          null,
+          "blue",
+          "blue"
+        ],
+        "target": "blue blue blue",
+        "view_index": 3
+      },
+      {
+        "split": "withheld-equal",
+        "a": "green",
+        "b": "green",
+        "pattern": [
+          "green",
+          "green",
+          "green"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "green",
+          null,
+          null
+        ],
+        "target": "green green green",
+        "view_index": 0
+      },
+      {
+        "split": "withheld-equal",
+        "a": "green",
+        "b": "green",
+        "pattern": [
+          "green",
+          "green",
+          "green"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          null,
+          null,
+          "green"
+        ],
+        "target": "green green green",
+        "view_index": 1
+      },
+      {
+        "split": "withheld-equal",
+        "a": "green",
+        "b": "green",
+        "pattern": [
+          "green",
+          "green",
+          "green"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "green",
+          "green",
+          null
+        ],
+        "target": "green green green",
+        "view_index": 2
+      },
+      {
+        "split": "withheld-equal",
+        "a": "green",
+        "b": "green",
+        "pattern": [
+          "green",
+          "green",
+          "green"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          null,
+          "green",
+          "green"
+        ],
+        "target": "green green green",
+        "view_index": 3
+      }
+    ],
+    "composition_control_cases": 18,
+    "composition_controls": [
+      {
+        "split": "composition-control",
+        "a": "red",
+        "b": "red",
+        "c": "blue",
+        "pattern": [
+          "red",
+          "red",
+          "blue"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "red",
+          null,
+          "blue"
+        ],
+        "target": "red red blue"
+      },
+      {
+        "split": "composition-control",
+        "a": "red",
+        "b": "red",
+        "c": "green",
+        "pattern": [
+          "red",
+          "red",
+          "green"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "red",
+          null,
+          "green"
+        ],
+        "target": "red red green"
+      },
+      {
+        "split": "composition-control",
+        "a": "red",
+        "b": "blue",
+        "c": "blue",
+        "pattern": [
+          "red",
+          "blue",
+          "blue"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "red",
+          null,
+          "blue"
+        ],
+        "target": "red blue blue"
+      },
+      {
+        "split": "composition-control",
+        "a": "red",
+        "b": "blue",
+        "c": "green",
+        "pattern": [
+          "red",
+          "blue",
+          "green"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "red",
+          null,
+          "green"
+        ],
+        "target": "red blue green"
+      },
+      {
+        "split": "composition-control",
+        "a": "red",
+        "b": "green",
+        "c": "blue",
+        "pattern": [
+          "red",
+          "green",
+          "blue"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "red",
+          null,
+          "blue"
+        ],
+        "target": "red green blue"
+      },
+      {
+        "split": "composition-control",
+        "a": "red",
+        "b": "green",
+        "c": "green",
+        "pattern": [
+          "red",
+          "green",
+          "green"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "red",
+          null,
+          "green"
+        ],
+        "target": "red green green"
+      },
+      {
+        "split": "composition-control",
+        "a": "blue",
+        "b": "red",
+        "c": "red",
+        "pattern": [
+          "blue",
+          "red",
+          "red"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "blue",
+          null,
+          "red"
+        ],
+        "target": "blue red red"
+      },
+      {
+        "split": "composition-control",
+        "a": "blue",
+        "b": "red",
+        "c": "green",
+        "pattern": [
+          "blue",
+          "red",
+          "green"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "blue",
+          null,
+          "green"
+        ],
+        "target": "blue red green"
+      },
+      {
+        "split": "composition-control",
+        "a": "blue",
+        "b": "blue",
+        "c": "red",
+        "pattern": [
+          "blue",
+          "blue",
+          "red"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "blue",
+          null,
+          "red"
+        ],
+        "target": "blue blue red"
+      },
+      {
+        "split": "composition-control",
+        "a": "blue",
+        "b": "blue",
+        "c": "green",
+        "pattern": [
+          "blue",
+          "blue",
+          "green"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "blue",
+          null,
+          "green"
+        ],
+        "target": "blue blue green"
+      },
+      {
+        "split": "composition-control",
+        "a": "blue",
+        "b": "green",
+        "c": "red",
+        "pattern": [
+          "blue",
+          "green",
+          "red"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "blue",
+          null,
+          "red"
+        ],
+        "target": "blue green red"
+      },
+      {
+        "split": "composition-control",
+        "a": "blue",
+        "b": "green",
+        "c": "green",
+        "pattern": [
+          "blue",
+          "green",
+          "green"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "blue",
+          null,
+          "green"
+        ],
+        "target": "blue green green"
+      },
+      {
+        "split": "composition-control",
+        "a": "green",
+        "b": "red",
+        "c": "red",
+        "pattern": [
+          "green",
+          "red",
+          "red"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "green",
+          null,
+          "red"
+        ],
+        "target": "green red red"
+      },
+      {
+        "split": "composition-control",
+        "a": "green",
+        "b": "red",
+        "c": "blue",
+        "pattern": [
+          "green",
+          "red",
+          "blue"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "green",
+          null,
+          "blue"
+        ],
+        "target": "green red blue"
+      },
+      {
+        "split": "composition-control",
+        "a": "green",
+        "b": "blue",
+        "c": "red",
+        "pattern": [
+          "green",
+          "blue",
+          "red"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "green",
+          null,
+          "red"
+        ],
+        "target": "green blue red"
+      },
+      {
+        "split": "composition-control",
+        "a": "green",
+        "b": "blue",
+        "c": "blue",
+        "pattern": [
+          "green",
+          "blue",
+          "blue"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "green",
+          null,
+          "blue"
+        ],
+        "target": "green blue blue"
+      },
+      {
+        "split": "composition-control",
+        "a": "green",
+        "b": "green",
+        "c": "red",
+        "pattern": [
+          "green",
+          "green",
+          "red"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "green",
+          null,
+          "red"
+        ],
+        "target": "green green red"
+      },
+      {
+        "split": "composition-control",
+        "a": "green",
+        "b": "green",
+        "c": "blue",
+        "pattern": [
+          "green",
+          "green",
+          "blue"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "green",
+          null,
+          "blue"
+        ],
+        "target": "green green blue"
+      }
+    ],
+    "shorter_output_control_cases": 9,
+    "shorter_output_controls": [
+      {
+        "split": "shorter-output-control",
+        "a": "red",
+        "b": "red",
+        "pattern": [
+          "red",
+          "red",
+          "red"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "red",
+          null
+        ],
+        "output_symbols": 2,
+        "target": "red red"
+      },
+      {
+        "split": "shorter-output-control",
+        "a": "red",
+        "b": "blue",
+        "pattern": [
+          "red",
+          "blue",
+          "red"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "red",
+          null
+        ],
+        "output_symbols": 2,
+        "target": "red blue"
+      },
+      {
+        "split": "shorter-output-control",
+        "a": "red",
+        "b": "green",
+        "pattern": [
+          "red",
+          "green",
+          "red"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "red",
+          null
+        ],
+        "output_symbols": 2,
+        "target": "red green"
+      },
+      {
+        "split": "shorter-output-control",
+        "a": "blue",
+        "b": "red",
+        "pattern": [
+          "blue",
+          "red",
+          "blue"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "blue",
+          null
+        ],
+        "output_symbols": 2,
+        "target": "blue red"
+      },
+      {
+        "split": "shorter-output-control",
+        "a": "blue",
+        "b": "blue",
+        "pattern": [
+          "blue",
+          "blue",
+          "blue"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "blue",
+          null
+        ],
+        "output_symbols": 2,
+        "target": "blue blue"
+      },
+      {
+        "split": "shorter-output-control",
+        "a": "blue",
+        "b": "green",
+        "pattern": [
+          "blue",
+          "green",
+          "blue"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "blue",
+          null
+        ],
+        "output_symbols": 2,
+        "target": "blue green"
+      },
+      {
+        "split": "shorter-output-control",
+        "a": "green",
+        "b": "red",
+        "pattern": [
+          "green",
+          "red",
+          "green"
+        ],
+        "context": [
+          "red"
+        ],
+        "partial": [
+          "green",
+          null
+        ],
+        "output_symbols": 2,
+        "target": "green red"
+      },
+      {
+        "split": "shorter-output-control",
+        "a": "green",
+        "b": "blue",
+        "pattern": [
+          "green",
+          "blue",
+          "green"
+        ],
+        "context": [
+          "blue"
+        ],
+        "partial": [
+          "green",
+          null
+        ],
+        "output_symbols": 2,
+        "target": "green blue"
+      },
+      {
+        "split": "shorter-output-control",
+        "a": "green",
+        "b": "green",
+        "pattern": [
+          "green",
+          "green",
+          "green"
+        ],
+        "context": [
+          "green"
+        ],
+        "partial": [
+          "green",
+          null
+        ],
+        "output_symbols": 2,
+        "target": "green green"
+      }
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "source": "research/experiments/athena_field/session/continued/trained.session",
+  "source_wire_version": 1,
+  "exit_code": 0,
+  "wall_seconds": 5.232684818998678,
+  "received": "blue blue",
+  "expected": "blue blue"
+}

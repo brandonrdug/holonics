@@ -1,5 +1,6 @@
 //! A real output target reaches the same paired source and its material through the existing adjoint.
 use super::*;
+use crate::native_ecology::constitutive_fibre::ResidentHeldSection;
 
 #[cfg(test)]
 mod tests;
@@ -12,6 +13,7 @@ pub struct NativeFieldReflectionTarget<'a, 'b, 'c> {
     delta_bounds: Rc<ResidentSection<'c>>,
     _diagnostics: ResidentSection<'c>,
     incoming: ResidentSection<'c>,
+    receiver: Option<&'a crate::native_ecology::constitutive_fibre::ResidentHeldSection<'c>>,
 }
 impl<'a, 'b, 'c> NativeFieldReflectionTarget<'a, 'b, 'c> {
     pub fn input_covector(&self) -> ResidentNormalEnclosureView<'_, 'c> {
@@ -26,6 +28,9 @@ impl<'a, 'b, 'c> NativeFieldReflectionTarget<'a, 'b, 'c> {
     }
     pub fn target(&self) -> ResidentNormalEnclosureView<'_, 'c> {
         self.target
+    }
+    pub fn receiver(&self) -> Option<&ResidentHeldSection<'c>> {
+        self.receiver
     }
     pub fn material_covector(
         &self,
@@ -65,6 +70,36 @@ impl<'b, 'c> NativeFieldReflection<'b, 'c> {
         target: ResidentNormalEnclosureView<'a, 'c>,
         step_bits: u32,
     ) -> Result<NativeFieldReflectionTarget<'a, 'b, 'c>, Error> {
+        self.compare_target_with_receiver(target, step_bits, None)
+    }
+
+    pub fn compare_received_target<'a>(
+        &'a self,
+        target: ResidentNormalEnclosureView<'a, 'c>,
+        step_bits: u32,
+        receiver: &'a ResidentHeldSection<'c>,
+    ) -> Result<NativeFieldReflectionTarget<'a, 'b, 'c>, Error> {
+        let source = self.source();
+        let d = source.boundary_components();
+        let given = receiver.given();
+        if !std::ptr::eq(given.surface, source.surface)
+            || given.components() != d
+            || target.components() == 0
+            || given.grain() != ResidentGrain(source.grain)
+            || (target.components() > d && target.components() != source.width)
+            || target.components() % 2 != 0
+        {
+            return Err(Error::Shape);
+        }
+        self.compare_target_with_receiver(target, step_bits, Some(receiver))
+    }
+
+    fn compare_target_with_receiver<'a>(
+        &'a self,
+        target: ResidentNormalEnclosureView<'a, 'c>,
+        step_bits: u32,
+        receiver: Option<&'a ResidentHeldSection<'c>>,
+    ) -> Result<NativeFieldReflectionTarget<'a, 'b, 'c>, Error> {
         let source = self.source();
         let surface = source.surface;
         let d = source.boundary_components();
@@ -94,6 +129,7 @@ impl<'b, 'c> NativeFieldReflection<'b, 'c> {
                 self.output(),
                 target,
                 &source._producing.bounds,
+                receiver.map(|r| r.mask()),
                 n,
                 k,
                 step_bits,
@@ -149,6 +185,7 @@ impl<'b, 'c> NativeFieldReflection<'b, 'c> {
             delta_bounds,
             _diagnostics: diagnostics,
             incoming,
+            receiver,
         })
     }
 }

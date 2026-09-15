@@ -17,6 +17,7 @@ use holonic_engine::{
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::{
+    collections::BTreeMap,
     fs::File,
     io::{Read, Write},
     path::Path,
@@ -37,12 +38,27 @@ pub enum FieldTextCodec {
     UnicodeScalars,
     WhitespaceWords,
 }
+/// The legacy chart expands a categorical context tensor. Joint regions place the actual
+/// context currents beside the requested region and use a bounded observation-mask port.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum FieldSourceChart {
+    #[default]
+    TensorCondition,
+    JointRegions,
+}
+fn tensor_condition(chart: &FieldSourceChart) -> bool {
+    *chart == FieldSourceChart::TensorCondition
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct FieldSessionSpec {
     pub symbols: Vec<String>,
     pub section_symbols: usize,
     pub context_symbols: usize,
+    #[serde(default, skip_serializing_if = "tensor_condition")]
+    pub source_chart: FieldSourceChart,
     #[serde(default)]
     pub codec: FieldTextCodec,
     #[serde(default = "grain")]
@@ -51,7 +67,14 @@ pub struct FieldSessionSpec {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct FieldSectionRequest {
+    #[serde(default)]
     pub text: String,
+    /// Explicit unobserved regions. Null selects the declared zero latent seed, not observed zero.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub partial: Option<Vec<Option<String>>>,
+    /// Requested receiving extent; the source can expose fewer positions than this.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output_symbols: Option<usize>,
     #[serde(default)]
     pub context: Vec<String>,
     #[serde(default)]
@@ -96,6 +119,8 @@ impl FieldSectionRequest {
         }
         Ok(Self {
             text: text(request)?,
+            partial: None,
+            output_symbols: None,
             context: context
                 .iter()
                 .map(|event| text(event))
@@ -131,19 +156,31 @@ impl FieldSessionSpec {
         Ok(SymbolCurrentChart::declared(alphabet))
     }
     fn extents(&self) -> Result<(usize, usize, usize)> {
-        let complex = self
-            .section_symbols
+        let regions = match self.source_chart {
+            FieldSourceChart::TensorCondition => self.section_symbols,
+            FieldSourceChart::JointRegions => self
+                .section_symbols
+                .checked_add(self.context_symbols)
+                .ok_or_else(|| invalid("joint region extent"))?,
+        };
+        let complex = regions
             .checked_mul(self.symbols.len())
             .ok_or_else(|| invalid("field section extent"))?;
         let nodes = complex
             .checked_add(2)
             .ok_or_else(|| invalid("field node extent"))?
             / 3;
-        let context = self
-            .symbols
-            .len()
-            .checked_pow(u32::try_from(self.context_symbols).map_err(invalid)?)
-            .ok_or_else(|| invalid("context tensor extent"))?;
+        let context = match self.source_chart {
+            FieldSourceChart::TensorCondition => self
+                .symbols
+                .len()
+                .checked_pow(u32::try_from(self.context_symbols).map_err(invalid)?)
+                .ok_or_else(|| invalid("context tensor extent"))?,
+            FieldSourceChart::JointRegions => regions
+                .checked_mul(2)
+                .and_then(|n| n.checked_add(1))
+                .ok_or_else(|| invalid("observation port extent"))?,
+        };
         let features = nodes
             .checked_mul(3)
             .and_then(|s| s.checked_mul(context)?.checked_add(s)?.checked_add(context))
@@ -170,6 +207,14 @@ pub struct NativeFieldSession<'c> {
     spec: FieldSessionSpec,
     chart: SymbolCurrentChart,
     body: NativeCoupledBody<'c>,
+    pending_extents: BTreeMap<u64, usize>,
+}
+struct PreparedFieldSection<'c> {
+    input: ResidentSection<'c>,
+    condition: ResidentSection<'c>,
+    held: Option<Vec<bool>>,
+    output_symbols: usize,
+    observed: Option<Vec<bool>>,
 }
 impl<'c> NativeFieldSession<'c> {
     fn found(surface: &'c ResidentSurface<'c>, spec: &FieldSessionSpec) -> Result<Self> {
@@ -237,6 +282,7 @@ impl<'c> NativeFieldSession<'c> {
             spec: spec.clone(),
             chart,
             body,
+            pending_extents: BTreeMap::new(),
         })
     }
     fn mount_text(&self, text: &str) -> Result<ResidentSection<'c>> {
@@ -300,6 +346,132 @@ impl<'c> NativeFieldSession<'c> {
         }
         Ok(tensor)
     }
+    fn prepare_request(&self, request: &FieldSectionRequest) -> Result<PreparedFieldSection<'c>> {
+        if self.spec.source_chart == FieldSourceChart::TensorCondition {
+            if request.partial.is_some()
+                || request
+                    .output_symbols
+                    .is_some_and(|n| n != self.spec.section_symbols)
+            {
+                return Err(invalid(
+                    "partial/variable regions require the joint-regions source chart",
+                ));
+            }
+            return Ok(PreparedFieldSection {
+                input: self.mount_text(&request.text)?,
+                condition: self.mount_context(&request.context)?,
+                held: None,
+                output_symbols: self.spec.section_symbols,
+                observed: None,
+            });
+        }
+        if request.partial.is_some() && !request.text.is_empty() {
+            return Err(invalid("supply text or partial regions, not both"));
+        }
+        let partial = match &request.partial {
+            Some(parts) => parts
+                .iter()
+                .map(|p| match p {
+                    None => Ok(None),
+                    Some(text) => {
+                        let symbols = self.spec.symbols_of(&self.chart, text)?;
+                        if symbols.len() != 1 {
+                            return Err(invalid(
+                                "one partial region must name exactly one codec symbol",
+                            ));
+                        }
+                        Ok(Some(symbols[0]))
+                    }
+                })
+                .collect::<Result<Vec<_>>>()?,
+            None => self
+                .spec
+                .symbols_of(&self.chart, &request.text)?
+                .into_iter()
+                .map(Some)
+                .collect(),
+        };
+        let output_symbols = request.output_symbols.unwrap_or(partial.len());
+        if output_symbols == 0
+            || output_symbols > self.spec.section_symbols
+            || partial.len() > self.spec.section_symbols
+        {
+            return Err(invalid(
+                "request or receiving region exceeds the declared field capacity",
+            ));
+        }
+        let context = request
+            .context
+            .iter()
+            .map(|s| self.spec.symbols_of(&self.chart, s))
+            .collect::<Result<Vec<_>>>()?
+            .into_iter()
+            .flatten()
+            .collect::<Vec<_>>();
+        if context.len() > self.spec.context_symbols {
+            return Err(invalid(
+                "context exceeds the declared observed-region capacity",
+            ));
+        }
+        let (nodes, condition_complex, _) = self.spec.extents()?;
+        let width = 6 * nodes;
+        let a = self.spec.symbols.len();
+        let regions = self.spec.section_symbols + self.spec.context_symbols;
+        let mut current = vec![(0i64, 0i64); width];
+        let mut held = vec![true; width / 2];
+        // Presence and observation are separate source maps. An inactive region, an
+        // unobserved active region, and an observed numerical zero are distinct charts.
+        let mut active = vec![false; regions];
+        let mut observed = vec![false; regions];
+        for i in 0..self.spec.section_symbols {
+            let value = partial.get(i).copied().flatten();
+            if let Some(symbol) = value {
+                current[2 * (i * a + self.chart.coordinates()[symbol.0 as usize])] = (1, 1);
+            }
+            active[i] = i < output_symbols || i < partial.len();
+            observed[i] = value.is_some();
+            if i < output_symbols {
+                let fixed = request.partial.is_some() && value.is_some();
+                held[i * a..(i + 1) * a].fill(fixed);
+            }
+        }
+        for (j, symbol) in context.iter().enumerate() {
+            let i = self.spec.section_symbols + j;
+            current[2 * (i * a + self.chart.coordinates()[symbol.0 as usize])] = (1, 1);
+            active[i] = true;
+            observed[i] = true;
+        }
+        let mut condition = vec![(0i64, 0i64); 2 * condition_complex + 1];
+        condition[0] = (1, 1);
+        for i in 0..regions {
+            let a = i64::from(active[i]);
+            let k = i64::from(observed[i]);
+            condition[2 * (i + 1)] = (a, a);
+            condition[2 * (regions + i + 1)] = (k, k);
+        }
+        *condition.last_mut().unwrap() = (1, 1);
+        let input = self
+            .surface
+            .mount_section_rest(
+                &ResidentSectionRest::found(1, width, ResidentGrain(0), 64, current)
+                    .map_err(invalid)?,
+            )
+            .map_err(invalid)?;
+        let condition = self
+            .surface
+            .mount_section_rest(
+                &ResidentSectionRest::found(1, condition.len(), ResidentGrain(0), 64, condition)
+                    .map_err(invalid)?,
+            )
+            .map_err(invalid)?;
+        Ok(PreparedFieldSection {
+            input,
+            condition,
+            held: Some(held),
+            output_symbols,
+            observed: Some(observed),
+        })
+    }
     pub fn request(&mut self, request: &FieldSectionRequest) -> Result<Value> {
         if request.retain_comparison && !request.commit {
             return Err(invalid(
@@ -307,30 +479,36 @@ impl<'c> NativeFieldSession<'c> {
             ));
         }
         let start = Instant::now();
-        let input = self.mount_text(&request.text)?;
-        let condition = self.mount_context(&request.context)?;
+        let prepared = self.prepare_request(request)?;
         let chart = self.chart.receiver(self.surface)?;
         let generation = Instant::now();
-        let produced = if request.commit {
-            self.body.generate_field(
-                ResidentConstitutiveCurrent::integers(&input)?.into(),
-                ResidentConstitutiveCurrent::rational(&condition)?,
+        let input = ResidentConstitutiveCurrent::integers(&prepared.input)?;
+        let condition = ResidentConstitutiveCurrent::rational(&prepared.condition)?;
+        let produced = if let Some(held) = &prepared.held {
+            self.body.generate_received_field(
+                input.into(),
+                condition,
+                held,
+                request.commit,
                 request.retain_comparison,
             )?
+        } else if request.commit {
+            self.body
+                .generate_field(input.into(), condition, request.retain_comparison)?
         } else {
-            self.body.preview_field(
-                ResidentConstitutiveCurrent::integers(&input)?.into(),
-                ResidentConstitutiveCurrent::rational(&condition)?,
-            )?
+            self.body.preview_field(input.into(), condition)?
         };
+        if let Some(id) = produced.comparison_id() {
+            self.pending_extents.insert(id, prepared.output_symbols);
+        }
         let generation_us = generation.elapsed().as_micros();
         let receive = || -> Result<_> {
             let selected = produced
-                .output()
-                .restrict(0..2 * self.spec.section_symbols * self.spec.symbols.len())?;
+                .received_output()
+                .restrict(0..2 * prepared.output_symbols * self.spec.symbols.len())?;
             let face = selected
                 .view()
-                .read_basis_sections(&chart, self.spec.section_symbols)?;
+                .read_basis_sections(&chart, prepared.output_symbols)?;
             Ok(face.selections()?)
         };
         let selections = match receive() {
@@ -360,24 +538,45 @@ impl<'c> NativeFieldSession<'c> {
         Ok(
             json!({"schema":"org.holonics.hna.field-section.v1","text":text,"symbols":pieces,
             "comparison":produced.comparison_id(),"producing_epoch":produced.producing_epoch(),"committed":request.commit,
-            "selections":selections,"generated":produced.inspect()?,"generation_us":generation_us,"elapsed_us":start.elapsed().as_micros(),
+            "selections":selections,"output_symbols":prepared.output_symbols,"observed_regions":prepared.observed,
+            "latent_seed":"zero on explicitly unobserved regions","generated":produced.inspect()?,"generation_us":generation_us,"elapsed_us":start.elapsed().as_micros(),
             "scope":"joint complete section; native incoming reaction and constituted scattering; declared exterior symbol codec"}),
         )
     }
     pub fn observe(&mut self, source: u64, text: &str, step_bits: u32) -> Result<Value> {
         let start = Instant::now();
-        let target = self.mount_text(text)?;
+        let target = if self.spec.source_chart == FieldSourceChart::JointRegions {
+            let expected = *self
+                .pending_extents
+                .get(&source)
+                .ok_or_else(|| invalid("unknown field response extent"))?;
+            let symbols = self.spec.symbols_of(&self.chart, text)?;
+            if symbols.len() != expected {
+                return Err(invalid(
+                    "target does not match its producing response extent",
+                ));
+            }
+            self.chart.mount_joint(
+                self.surface,
+                &symbols,
+                2 * self.spec.symbols.len() * expected,
+            )?
+        } else {
+            self.mount_text(text)?
+        };
         let returned = self.body.observe_field(
             source,
             ResidentConstitutiveCurrent::integers(&target)?.into(),
             step_bits,
         )?;
+        self.pending_extents.remove(&source);
         Ok(
             json!({"source":source,"target":text,"returned":returned,"elapsed_us":start.elapsed().as_micros(),"anatomy":self.inspect()}),
         )
     }
     pub fn release(&mut self, source: u64) -> Result<Value> {
         self.body.release(source)?;
+        self.pending_extents.remove(&source);
         Ok(json!({"released":source,"anatomy":self.inspect()}))
     }
     pub fn inspect(&self) -> Value {
@@ -396,6 +595,7 @@ impl<'c> NativeFieldSession<'c> {
             spec: self.spec.clone(),
             state: state.clone(),
             body: rest,
+            pending_extents: self.pending_extents.clone(),
         };
         let mut bytes = Vec::new();
         saved.write(&mut bytes)?;
@@ -403,17 +603,19 @@ impl<'c> NativeFieldSession<'c> {
     }
 }
 const MAGIC: &[u8] = b"HNA-FIELD-SESSION\x01";
+const REGIONS_MAGIC: &[u8] = b"HNA-FIELD-SESSION\x02";
 pub struct NativeFieldSavedSession {
     spec: FieldSessionSpec,
     state: HnaStreamState,
     body: SavedCoupledBody,
+    pending_extents: BTreeMap<u64, usize>,
 }
 impl NativeFieldSavedSession {
     fn write(&self, out: &mut impl Write) -> Result<()> {
-        let header = serde_json::to_vec(&(self.spec.clone(), self.state.clone()))?;
+        let header = serde_json::to_vec(&(&self.spec, &self.state, &self.pending_extents))?;
         let mut body = Vec::new();
         self.body.write(&mut body)?;
-        out.write_all(MAGIC)?;
+        out.write_all(REGIONS_MAGIC)?;
         for bytes in [&header, &body] {
             out.write_all(&(bytes.len() as u64).to_le_bytes())?;
             out.write_all(bytes)?;
@@ -429,7 +631,8 @@ impl NativeFieldSavedSession {
         let mut input = input.take(octets);
         let mut magic = vec![0; MAGIC.len()];
         input.read_exact(&mut magic)?;
-        if magic != MAGIC {
+        let regions = magic == REGIONS_MAGIC;
+        if magic != MAGIC && !regions {
             return Err(invalid("unsupported field-session rest"));
         }
         fn blob(input: &mut std::io::Take<impl Read>) -> Result<Vec<u8>> {
@@ -447,8 +650,18 @@ impl NativeFieldSavedSession {
             input.read_exact(&mut bytes)?;
             Ok(bytes)
         }
-        let (spec, state): (FieldSessionSpec, HnaStreamState) =
-            serde_json::from_slice(&blob(&mut input)?)?;
+        let header = blob(&mut input)?;
+        let (spec, state, pending_extents): (
+            FieldSessionSpec,
+            HnaStreamState,
+            BTreeMap<u64, usize>,
+        ) = if regions {
+            serde_json::from_slice(&header)?
+        } else {
+            let (spec, state): (FieldSessionSpec, HnaStreamState) =
+                serde_json::from_slice(&header)?;
+            (spec, state, BTreeMap::new())
+        };
         spec.chart()?;
         state.validate().map_err(invalid)?;
         let bytes = blob(&mut input)?;
@@ -459,7 +672,18 @@ impl NativeFieldSavedSession {
         {
             return Err(invalid("field session body/configuration mismatch"));
         }
-        Ok(Self { spec, state, body })
+        if pending_extents
+            .iter()
+            .any(|(id, n)| *n == 0 || *n > spec.section_symbols || !body.has_prediction(*id))
+        {
+            return Err(invalid("field session pending receiver extent"));
+        }
+        Ok(Self {
+            spec,
+            state,
+            body,
+            pending_extents,
+        })
     }
     pub fn with_session<T>(
         self,
@@ -473,6 +697,7 @@ impl NativeFieldSavedSession {
             spec: self.spec,
             chart,
             body: self.body.remount(&surface)?,
+            pending_extents: self.pending_extents,
         };
         let (nodes, context, _) = session.spec.extents()?;
         if session.body.field_dimensions()?
@@ -486,6 +711,16 @@ impl NativeFieldSavedSession {
             return Err(invalid(
                 "saved session model ports/grain do not match its declared codec",
             ));
+        }
+        for id in session.body.pending_ids()? {
+            if !session.pending_extents.contains_key(&id) {
+                if session.spec.source_chart == FieldSourceChart::JointRegions {
+                    return Err(invalid("missing pending field receiving extent"));
+                }
+                session
+                    .pending_extents
+                    .insert(id, session.spec.section_symbols);
+            }
         }
         let mut stream = HnaStream::from_state(self.state).map_err(invalid)?;
         f(&mut session, &mut stream)
@@ -513,11 +748,14 @@ mod tests {
             symbols: vec!["a".into(), "b".into(), "c".into()],
             section_symbols: 1,
             context_symbols: 0,
+            source_chart: FieldSourceChart::TensorCondition,
             codec: FieldTextCodec::UnicodeScalars,
             fractional_bits: 48,
         };
         let make = |text: &str| FieldSectionRequest {
             text: text.into(),
+            partial: None,
+            output_symbols: None,
             context: vec![],
             commit: true,
             retain_comparison: true,
@@ -553,6 +791,7 @@ mod tests {
             symbols: vec!["red".into(), "blue".into(), "green".into()],
             section_symbols: 2,
             context_symbols: 2,
+            source_chart: FieldSourceChart::TensorCondition,
             codec: FieldTextCodec::WhitespaceWords,
             fractional_bits: 48,
         };
@@ -590,6 +829,7 @@ mod delivery_tests {
             symbols: vec!["a".into(), "b".into(), "c".into()],
             section_symbols: 1,
             context_symbols: 0,
+            source_chart: FieldSourceChart::TensorCondition,
             codec: FieldTextCodec::UnicodeScalars,
             fractional_bits: 48,
         };
@@ -598,6 +838,8 @@ mod delivery_tests {
             command: crate::HnaStreamCommand::FieldRequest {
                 request: FieldSectionRequest {
                     text: "a".into(),
+                    partial: None,
+                    output_symbols: None,
                     context: vec![],
                     commit: true,
                     retain_comparison: true,
@@ -663,5 +905,112 @@ mod exposure_tests {
         assert!(FieldSectionRequest::from_exposures(&request, &[&other], false, false).is_err());
         let future = event(2, "before", None, "red");
         assert!(FieldSectionRequest::from_exposures(&request, &[&future], false, false).is_err());
+    }
+}
+
+#[cfg(test)]
+mod joint_region_tests {
+    use super::*;
+    fn spec() -> FieldSessionSpec {
+        FieldSessionSpec {
+            symbols: vec!["a".into(), "b".into(), "c".into()],
+            section_symbols: 2,
+            context_symbols: 1,
+            source_chart: FieldSourceChart::JointRegions,
+            codec: FieldTextCodec::UnicodeScalars,
+            fractional_bits: 48,
+        }
+    }
+    fn request(parts: Vec<Option<&str>>, context: &str) -> FieldSectionRequest {
+        FieldSectionRequest {
+            text: String::new(),
+            partial: Some(parts.into_iter().map(|s| s.map(str::to_owned)).collect()),
+            output_symbols: None,
+            context: vec![context.into()],
+            commit: true,
+            retain_comparison: true,
+        }
+    }
+    #[test]
+    fn region_extents_grow_with_regions_and_retain_legacy_chart() {
+        let mut spec = spec();
+        assert_eq!(spec.extents().unwrap(), (3, 7, 79));
+        spec.context_symbols = 10;
+        assert_eq!(spec.extents().unwrap(), (12, 25, 961));
+    }
+    #[test]
+    #[ignore = "requires CUDA; active, observed and held are distinct region maps"]
+    fn joint_source_distinguishes_unknown_from_inactive_and_context() {
+        with_field_session(&spec(), |s| {
+            let p = s.prepare_request(&request(vec![None], "b"))?;
+            let h = s.surface.read_out(&p.condition).map_err(invalid)?;
+            // bias; active(query0,query1,context0); observed(query0,query1,context0); denominator
+            assert_eq!(
+                h.iter().map(|v| v.0).collect::<Vec<_>>(),
+                [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1]
+            );
+            assert_eq!(
+                p.held.unwrap(),
+                [false, false, false, true, true, true, true, true, true]
+            );
+            let x = s.surface.read_out(&p.input).map_err(invalid)?;
+            assert_eq!(x[14], (1, 1)); // b in the context region, not a context identifier.
+            assert_eq!(p.output_symbols, 1);
+            Ok(())
+        })
+        .unwrap();
+    }
+    #[test]
+    #[ignore = "requires CUDA; receiver mask and variable target extent survive a delayed comparison"]
+    fn partial_receiver_reopens_after_intervening_material_update() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("partial.session");
+        let expected = with_field_session(&spec(), |s| {
+            let a = s.request(&request(vec![Some("a"), None], "b"))?;
+            assert!(a["text"].as_str().unwrap().starts_with('a'));
+            let b = s.request(&request(vec![None], "c"))?;
+            s.observe(a["comparison"].as_u64().unwrap(), "ab", 1)?;
+            s.checkpoint(&path, &HnaStreamState::default())?;
+            assert!(s
+                .observe(b["comparison"].as_u64().unwrap(), "cc", 1)
+                .is_err());
+            let returned = s.observe(b["comparison"].as_u64().unwrap(), "c", 1)?;
+            Ok((returned["returned"].clone(), s.inspect_current()?))
+        })
+        .unwrap();
+        NativeFieldSavedSession::open(&path)
+            .unwrap()
+            .with_session(|s, _| {
+                assert!(s.observe(1, "cc", 1).is_err());
+                let returned = s.observe(1, "c", 1)?;
+                assert_eq!(returned["returned"], expected.0);
+                assert_eq!(s.inspect_current()?, expected.1);
+                assert!(s.observe(1, "c", 1).is_err());
+                Ok(())
+            })
+            .unwrap();
+    }
+    #[test]
+    #[ignore = "requires CUDA; a fully held face has no parameter derivative and exposes contradictory data"]
+    fn fully_held_receiver_does_not_deposit_its_own_output() {
+        with_field_session(&spec(), |s| {
+            let p = s.request(&request(vec![Some("a")], "b"))?;
+            assert_eq!(p["text"], "a");
+            let before = s.inspect_current()?;
+            let comparison = s.observe(p["comparison"].as_u64().unwrap(), "c", 1)?;
+            let after = s.inspect_current()?;
+            assert_eq!(before["material"], after["material"]);
+            assert_eq!(before["reaction"], after["reaction"]);
+            assert!(comparison["returned"]["parameter_update"]
+                .as_str()
+                .unwrap()
+                .starts_with("zero"));
+            assert_ne!(
+                comparison["returned"]["held_difference"]["coordinates"][0]["difference"]["real"],
+                json!([[0, []], [1, [1]]])
+            );
+            Ok(())
+        })
+        .unwrap();
     }
 }

@@ -1,84 +1,76 @@
 # Construction state
 
-**Currency:** September 15, 2026. The first field-backed contextual text session now runs
-through the Workbench, learns complete two-word edits, and reopens outstanding comparisons.
-[Application, generated text, trained sessions and measurements](research/experiments/athena_field/session/README.md)
-are returned; the [source record](research/records/2026-09-15_THE_FIELD_MODEL_GENERATES_CONTEXTUAL_TEXT_THROUGH_THE_PUBLIC_SESSION.md)
-binds the exact operation. The 48-target numerical model and legacy files remain available.
-This is the first bounded text application, not completed general Athena conversation/code.
-The old timed goal remains paused.
+**Currency:** September 15, 2026. The same Athena field session now receives partial/joint
+regions, generates their missing values together, and saves the producing receiver and output
+extent with delayed comparisons. The [application and trained session](research/experiments/athena_field/pattern/README.md)
+return 45/45 missing values across 39 responses; all 63 supplied values remain fixed at the
+receiver. Committed continuation and exact endpoint reopening pass. The old timed goal remains
+paused. No goal command is needed.
 
 ## Roadmap position
 
-[established-bounded; source-inspected; measured] The core model belongs to milestone 1;
-its common-current and pending-comparison returns advance milestone 3. The field-session
-application now consumes that model through `HnaStream::pump_field` and the Workbench.
-Its tested source chart is a three-word alphabet, two-word request/output and two-word context.
-The 27 diagonal request/context combinations are excluded from model updates and used for
-recombination validation. They all return the expected text after 434 development targets.
+[established-bounded; source-inspected; measured] The model core and its shared stream are
+usable. This increment advances milestones 2–4 through actual context regions, partial receiving
+constraints, variable output extent and their producing target/rest path. Its source chart has
+fixed incidence and a single learned reaction/scattering step. The complete Athena application
+objective remains active.
 
 | Roadmap milestone | Position and retained obligation |
 |---|---|
-| 1. One trainable HNN model | Delivered core and shared field-session consumer: generation, actual D/M updates, native reception, public CLI and saved state. |
-| 2. Contextual organization and changing contacts | The application constructs an actual ordered context tensor and conditions the incoming-boundary reaction. General context representation, active receiver changes and learned incidence are still broader work; this return has fixed incidence. |
-| 3. Efficient continuation and durable learning | Common currents, old producing D/M, outstanding comparisons and failed-output delivery now reopen correctly. Dense normal statistics, explicit context tensors and the operative journal remain measured representation costs. |
-| 4. Useful Athena conversation, mathematics and code | First contextual text-edit session delivered at its declared finite chart. Broader complete requests, variable output support and conversation/code usefulness remain the sustained application objective. |
-| 5–7. Broader modalities, hardening/scale, executable export | Retained downstream deliveries, reusing existing mathematics and implementations at their documented scopes. |
+| 1. One trainable HNN model | Delivered core and field-session consumer: generation, actual D/M updates, native reception, CLI and saved state. |
+| 2. Contextual organization and changing contacts | JointRegions puts context currents into the actual incoming field and distinguishes active, observed and held regions. Content-dependent coupled refinement and learned incidence extend these operators. |
+| 3. Efficient continuation and durable learning | Common currents, old producing D/M, receiver masks/extents, pending comparisons and failed-output delivery reopen. JointRegions avoids categorical context enumeration within its explicit chart; dense normal statistics and the operative journal remain measured costs. |
+| 4. Useful Athena conversation, mathematics and code | Complete text edits and partial-pattern responses delivered at their declared finite charts. Variable receiving extent is now usable within capacity. Broader source support and useful conversation/code generation remain the application objective. |
+| 5–7. Broader modalities, hardening/scale, executable export | Retained downstream deliveries using existing mathematical owners. |
 
 ## Active Athena construction brief
 
-[interpretation] Applying Brandon's latest **diffusion and embroidery** correction: organize
-the construction around formation/refinement of an interacting field and its received pattern.
-“Contextual task” may describe an exterior test population; it must not become a native
-classify-instruction → choose-task → emit-template architecture. Context includes the medium,
-existing structure, incidence, phase, current and active receiving constraints that participate
-in that formation. Local changes can propagate through shared crossings and alter the joint
-pattern. Text, image and acoustic presentations remain receiving faces of this same construction.
-Use the [generation law](docs/HNN_FORMULA.md#generation-as-field-refinement-and-boundary-radiation)
-and the [application refinement contract](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-consuming-application).
+[interpretation] Brandon's **diffusion and embroidery** correction governs: formation/refinement
+of an interacting field produces its received pattern. Context includes medium, structure,
+incidence, phase, current and receiving constraints. Shared crossings can transmit local
+changes into the joint pattern. A semantic task classifier/template emitter is not this
+construction. Use the [generation law](docs/HNN_FORMULA.md#generation-as-field-refinement-and-boundary-radiation)
+and [application contract](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-consuming-application).
 
-[project-postulate] **“Continue Athena” extends the same working field application to broader
-complete requests.** Keep its actual request, context, joint response, comparison and restart
-path together. The successful two-word task becomes regression evidence; increasing its training
-count or starting a separate mathematical demonstration does not replace the application.
+[project-postulate] “Continue Athena” extends this same working application toward useful
+complete source/response parts. The returned small populations are evidence, not a queue to
+retrain. Mathematical refinement must reach the actual session and its generated products.
 
 | Control | Current content |
 |---|---|
-| Authorized deliverable | Useful field-backed contextual requests, correction/continuation and eventually conversation, mathematics and code through the same session. The first finite text-edit application and its saved continuation are returned. Extend actual complete source/response parts and show generated products and failures. |
-| Mathematical operation | The application now executes `h=tensor(context parts)`, `r=R_M(x,h)`, `u=(I+A(h))x+c(h)`, `(w,b_next)=S_D(u,b)` and a simultaneous unit-basis section receiver. The continuing-boundary reaction remains an explicit compatible alternative. D/M are learned by the existing producing-target response. |
-| Existing owners | `native/field_session.rs`; `NativeCoupledBody` and `body/field.rs`; normal material/section/family and factor owners; `SymbolCurrentChart` and `read_basis_sections`; `HnaStream::pump_field`; Workbench `hna field-session`; `ExposureReader` and `FieldSectionRequest::from_exposures`; field/model/session rest. No new engine or token scheduler. |
-| Concrete unknown/join | `FieldSessionSpec` fixes section/context extents; `mount_context` materializes an alphabet-size-to-context-length tensor, and the normal owner materializes its feature statistics. Those representations prevent direct use of broad complete exposure parts economically. The exposed limits are concrete dimensions and operators, not a missing definition of generation or learning. |
-| Next consuming operation | Carry a prepared partial/joint section and its receiving constraints through the same field's admitted refinement/integration or its compiled generating relation. Use an actual complete application source to expose the required joins and output support. Replace obstructing dense expansion while retaining shared crossings, phase, evolving modes and the producing D/M response. Text correction is one receiving use; the native construction is formation of the joint pattern, not selection of a task label. |
-| Completion evidence | Generated whole responses to the broader source/condition population, including actual context-dependent changes and unseen compositions; target comparisons through the producing material; saved continuation; reported source/configuration, inferred relation, quality failures, work and memory. Labels or decoder answers cannot be derived from evaluation targets. |
-| Receiver and context work | Active receiving fields, phase, incidence, internal state and relative motion stay in the construction. Apply their actual source/receiver maps and variations at this application consumer. The current fixed basis is a tested receiver chart; a separate receiver-motion display is not the next application result. |
-| Durability and cost | Pending and delivery rest are now usable. Keep those contracts when factoring the operator. The 69-feature control currently has about 23 ms median generation and 189 ms median target update; source/context growth and remount/journal cost are exposed quantities to improve, not universal time limits. |
-
-[project-postulate] The [application contract](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-consuming-application)
-retains this consumer and the broader model objective. No goal command or new approval cycle is
-needed. Lean remains exterior formal verification; the runtime uses its native mathematical owners.
+| Authorized deliverable | Useful field-backed source/response formation, correction and continuation toward conversation, mathematics and code. The session now accepts partial observations and neighboring context regions, and generates the requested joint face. |
+| Mathematical operation | JointRegions constructs actual source current x and condition h=[1, activity, observation]. The model executes r=R_M(x,h), u=(I+A(h))x+c(h), (w,b_next)=S_D(u,b), y=P given+(I-P)w. D/M learn through the producing masked output covector before the full paired adjoint. |
+| Existing owners | `native/field_session.rs`; `NativeCoupledBody` / `body/field.rs`; operative field/current/target; normal reaction and `ResidentHeldSection`; simultaneous section receiver; shared stream, Workbench and field/model/session rest. Existing normalized material/current variations and factor owners supply further composition. |
+| Concrete unknown/join | With masks and D/M fixed, this one-step input map is affine. Content-dependent interactions between evolving regions require composition with the existing normalized field/current response and its variation. Normal statistics still materialize all 129 features in this small chart; larger complete sources expose an actual factor/locality requirement. |
+| Next consuming operation | Extend the partial-section application through content-dependent coupled refinement, binding the existing normalized current/material operation to its producing forward/adjoint path. Carry an actual multi-region source and its complete response through that composition; preserve held source constraints, phase and internal modes. Use the returned relation to choose its economical representation. |
+| Completion evidence | Generated complete responses to the chosen source population and unseen compositions; actual producing-material target updates; saved continuation; reported failures, costs and source assumptions. Supplied-coordinate copying must remain separate from missing-value generation. |
+| Receiver and durability | The held affine receiver is implemented; raw field publication remains independent. Keep receiver/source/extent and producing D/M through delayed targets. A dynamic or learned receiver requires its actual additional differential, not a decorative motion display. |
+| Cost and representation | This 129-feature chart has 77,522 microseconds median generation and 641,746.5 median target update. Warm 96-target development takes 71.768705 seconds; trained rest is 6,170,290 bytes. These are measured costs of this operation, not universal limits or matched speedups. |
 
 ## Returned operation and verification
 
-[established-bounded; measured] The field session returns 27/27 source/context recombinations,
-including all six required edits, after eight passes through 54 distinct development examples
-and two resumed development comparisons. The initial pass's 0/6 edit result is retained.
-A 27-case committed sequence also returns all expected text without target updates; its endpoint
-preview reopens exactly. Final preview radius is at most `19767/281474976710656`. This population was used for validation
-during iteration, not a blind final benchmark. [All outputs and clocks](research/experiments/athena_field/session/results.json).
+[established-bounded; measured] The [partial-pattern return](research/records/2026-09-15_PARTIAL_FIELDS_FORM_JOINT_PATTERNS_THROUGH_THEIR_RECEIVERS.md)
+uses 24 distinct authored development examples and 97 targets. All 39 evaluation responses
+pass, including withheld equal-color patterns, independently supplied outer regions and shorter
+output support. It generates 45/45 missing values and holds 63/63 supplied values. A 39-response
+committed sequence also passes without target updates; raw/received endpoint currents and
+selections reopen exactly. [Results, examples and clocks](research/experiments/athena_field/pattern/results.json).
 
-[established-bounded; measured] The warm 378-target continuation takes 85.691964 seconds,
-with 319,676 KiB peak process RSS and 8,311,812 bytes peak native section accounting. The
-resolved trained session is 2,315,343 bytes. 168 native regressions, 16 public/session tests and
-eight CLI tests pass, including old model bytes, old producing material after another update,
-exposure-chain ordering, and undelivered response recovery. The
-[prior numerical return](research/experiments/athena_field/README.md) remains exact regression
-context rather than a task to replay. The unrelated surrogate assay retains its recorded failure.
+[established-bounded; measured] 171 native regressions, 20 public/session tests and two allocator
+calibration tests pass. They include masked/full-joint adjoints with interior gradients, positive
+receiving radius, delayed D/M after an intervening update, variable target extent and fully held
+contradictory observations without parameter deposition. Actual version-1 session reopening
+retains the earlier expected text edit. The unrelated surrogate assay remains preserved outside
+this field application. A cold allocation-calibration failure and its bounded retry repair are
+recorded separately from warm model execution.
 
-[established-bounded; source-inspected] The session's source/target formulas are external task
-data; generation, ordered context products, conditional action, field scattering, D/M update
-and simultaneous selection execute through native owners. The checkpoint stores only the current
-body and required pending producing witnesses, plus its existing journal and exterior delivery
-state. No raw conversation archive, per-token generator or live Lean dependency is introduced.
+[established-bounded; source-inspected] The new source chart puts context in x and observation
+geometry in h; it is an explicit realization, not an exact compression theorem for every old
+categorical context tensor. The application uses authored exterior pattern data, not private
+conversation targets. Its native generation and D/M response remain on the resident owners.
+The [earlier 27-case text-edit session](research/experiments/athena_field/session/README.md)
+and [numerical model](research/experiments/athena_field/README.md) remain available regression
+evidence. No Lean or Typst change was required for this increment.
 
 ## Governing synthesis available for this construction
 

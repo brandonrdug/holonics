@@ -22,6 +22,14 @@ and [receiver/music synthesis](../research/records/2026-09-14_HEAR_THE_MUSIC_SIT
 name the actual next joint/current and moving-receiver terms. Other owners below keep their
 own source and codec scopes.
 
+[definition] `NativeFieldSession` and Workbench `hna field-session` expose this field as one
+ongoing application. The [partial-region interface](../research/experiments/athena_field/pattern/README.md)
+provides actual JSONL requests, a trained artifact and exact output/restart evidence. Its explicit
+JointRegions chart places observed context beside the receiving regions, uses separate activity/
+observation flags, and supports partial and variable-length receiving sections within capacity.
+The raw field evolves through its existing scattering; `ResidentHeldSection` receives the given
+and generated coordinates. The target covector follows that receiver before the full adjoint.
+
 ## Learned local law
 
 [established-bounded; implemented-exact] The [caller-controlled mathematical session](../research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md)

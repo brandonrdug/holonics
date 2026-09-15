@@ -5,6 +5,7 @@ extern "C" __global__ void section_field_reflection_target(
  const int64_t *output,const int64_t *output_hi,uint32_t oa,
  const int64_t *target,const int64_t *target_hi,uint32_t ta,uint32_t target_width,
  const int64_t *source_bounds,const int64_t *source_bounds_hi,
+ const int64_t *held,const int64_t *held_hi,uint32_t has_held,
  uint32_t n,uint32_t count,uint32_t grain,uint32_t step_bits,
  int64_t *forward,int64_t *forward_hi,int64_t *after_b,int64_t *after_b_hi,
  int64_t *bounds,int64_t *bounds_hi,int64_t *query,int64_t *query_hi,
@@ -12,10 +13,12 @@ extern "C" __global__ void section_field_reflection_target(
  if(blockIdx.x||threadIdx.x||upstream_refused(census,lineage,lineage_count,slot))return;
  const uint32_t d=6u*n;const size_t width=(size_t)d+2u*count,stride=(size_t)d+1u;
  if(!n||grain<1||grain>120||step_bits>120||(ia&1u)||(oa&1u)||(ta&1u)
-    ||(target_width!=d&&target_width!=width)){atomicOr(slot,REFUSED_MALFORMED);return;}
+    ||(target_width!=d&&target_width!=width&&(!has_held||!target_width||target_width>d||(target_width&1u)))){atomicOr(slot,REFUSED_MALFORMED);return;}
  for(size_t i=0;i<2u*(width+1u);++i)if(input[ia+i]!=input_hi[ia+i]||output[oa+i]!=output_hi[oa+i])atomicOr(slot,REFUSED_MALFORMED);
  for(size_t i=0;i<2u*((size_t)target_width+1u);++i)if(target[ta+i]!=target_hi[ta+i])atomicOr(slot,REFUSED_MALFORMED);
  for(size_t i=0;i<4;++i)if(source_bounds[i]!=source_bounds_hi[i])atomicOr(slot,REFUSED_MALFORMED);
+ if(has_held)for(uint32_t i=0;i<d/2u;++i)
+   if(held[i]!=held_hi[i]||(held[i]!=0&&held[i]!=1)){atomicOr(slot,REFUSED_MALFORMED);return;}
  const wide *x=(const wide*)(input+ia),*y=(const wide*)(output+oa),*t=(const wide*)(target+ta),*se=(const wide*)source_bounds;
  if(*slot||x[width]<0||y[width]<0||t[target_width]<0||se[0]<0){atomicOr(slot,REFUSED_MALFORMED);return;}
  wide *v=(wide*)forward,*b=(wide*)after_b,*e=(wide*)bounds,*q=(wide*)query;
@@ -27,8 +30,11 @@ extern "C" __global__ void section_field_reflection_target(
  for(uint32_t j=0;j<2u*count;++j)b[j]=y[d+j];
  e[0]=se[0];e[1]=y[width];
  wide divisor=(wide)((uwide)1u<<step_bits);
- wide radius=div_ceil(add_checked(t[target_width],y[width],slot),divisor,slot);
+ bool active=target_width>d;
+ for(uint32_t j=0;j<target_width&&j<d;++j)if(!has_held||!held[j/2u])active=true;
+ wide radius=active?div_ceil(add_checked(t[target_width],y[width],slot),divisor,slot):0;
  for(uint32_t j=0;j<target_width;++j){
+  if(has_held&&j<d&&held[j/2u]){q[2u*((size_t)4u*n+j)]=0;q[2u*((size_t)4u*n+j)+1u]=0;continue;}
   wide round=0;
   wide g=history_narrow(complete_divide(history_integer(sub_checked(t[j],y[j],slot)),history_integer(divisor),&round,slot),slot);
   wide error=add_checked(radius,round,slot);

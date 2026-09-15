@@ -732,7 +732,7 @@ pub use direct::{
     NormalWaveReceptionReading, NormalWaveReference, NormalWaveReferenceReading, NormalWaveRest,
     NormalWaveSeedKind, NormalWaveSeedRefusal, NormalWaveSource, NormalWaveStep,
     NormalWaveTransport, NormalWaveTransportChange, NormalWaveWord, ResidentCoupledConstitutive,
-    ResidentNormalEnclosure, ResidentNormalEnclosureView, ResidentNormalInput,
+    ResidentHeldSection, ResidentHeldSectionRest, ResidentNormalEnclosure, ResidentNormalEnclosureView, ResidentNormalInput,
     ResidentNormalMaterial, ResidentNormalMaterialView, ResidentNormalReturn,
     NormalSectionBasisFace, ResidentNormalSectionReturn, ResidentNormalWave,
 };
