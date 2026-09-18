@@ -98,3 +98,43 @@ extern "C" __global__ __launch_bounds__(512) void section_normal_material_sectio
     uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
     normal_material_section_execute(old,xlo,xhi,xstride,xrational,ylo,yhi,ystride,yrational,rows,source_complex,targets,grain,next,next_hi,before,before_hi,after,after_hi,work,input,report,slot,census,lineage,lineage_count);
 }
+
+// Apply one retained normal operator to every row of a resident source section.  The source
+// section is a point or rational packet; the output retains one complete enclosure per row.
+// No material state is changed and no row is read back between applications.
+__device__ void normal_applied_material_section_execute(
+    const int64_t *old,const int64_t *xlo,const int64_t *xhi,uint32_t xstride,
+    uint32_t xrational,uint32_t rows,uint32_t source_complex,uint32_t targets,uint32_t grain,
+    int64_t *out,int64_t *out_hi,int64_t *work,int64_t *input,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+    if(blockIdx.x||upstream_refused(census,lineage,lineage_count,slot))return;
+    const uint32_t d=NORMAL_QUADRATURES*source_complex;
+    const size_t stride=normal_ball_stride(targets);
+    const size_t field_words=NORMAL_WIDE_WORDS*stride*rows;
+    for(size_t j=threadIdx.x;j<field_words;j+=blockDim.x)out[j]=0;
+    __syncthreads();
+    for(uint32_t row=0;row<rows;++row){
+        if(!threadIdx.x){
+            const uint32_t xa=row*xstride;
+            direct_normal_pack_sources(
+                xlo,xhi,xa,xrational?xa+d:UINT32_MAX,UINT32_MAX,0,
+                nullptr,nullptr,0,UINT32_MAX,UINT32_MAX,
+                source_complex,targets,grain,0,input,slot);
+        }
+        __syncthreads();if(*slot)return;
+        direct_normal_predict_mode_sources(
+            old,(const wide *)input,source_complex,targets,grain,
+            ((wide *)out)+row*stride,work,false,false,slot);
+        if(*slot)return;
+    }
+    for(size_t j=threadIdx.x;j<field_words;j+=blockDim.x)out_hi[j]=out[j];
+}
+
+extern "C" __global__ __launch_bounds__(512) void section_normal_applied_material_section(
+    const int64_t *old,const int64_t *xlo,const int64_t *xhi,uint32_t xstride,
+    uint32_t xrational,uint32_t rows,uint32_t source_complex,uint32_t targets,uint32_t grain,
+    int64_t *out,int64_t *out_hi,int64_t *work,int64_t *input,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+    normal_applied_material_section_execute(old,xlo,xhi,xstride,xrational,rows,source_complex,targets,grain,
+        out,out_hi,work,input,slot,census,lineage,lineage_count);
+}

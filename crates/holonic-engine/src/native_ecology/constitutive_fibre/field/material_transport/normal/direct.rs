@@ -18,7 +18,7 @@ pub use held_section::{ResidentHeldSection, ResidentHeldSectionRest};
 mod applied_relation;
 mod joined_source;
 mod section;
-pub use section::ResidentNormalSectionReturn;
+pub use section::{ResidentNormalEnclosureSection, ResidentNormalSectionReturn};
 mod section_basis;
 pub use section_basis::NormalSectionBasisFace;
 

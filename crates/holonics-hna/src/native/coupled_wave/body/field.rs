@@ -1,5 +1,6 @@
 //! Direct model composition on the operative field. No wave surrogate or host semantic replay.
 use super::*;
+mod section;
 use holonic_engine::native_ecology::constitutive_fibre::{
     ConstitutiveSourceChart, FieldReactionEnclosure, FieldReactionEnclosureRest,
     GeneratorNeighborhoodRest, NativeConstitutiveField, NativeFieldCurrentSource,

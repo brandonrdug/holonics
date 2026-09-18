@@ -2,6 +2,7 @@
 //! Text segmentation and symbol exhibition are exterior codecs. The native model receives
 //! complete unit-basis sections and an ordered context tensor, and learns its own D/M action.
 use super::section_input::SymbolCurrentChart;
+mod shared;
 use super::{NativeCoupledBody, NativeFieldReactionPort, NativeSessionError, SavedCoupledBody};
 use crate::{publish_new, HnaStream, HnaStreamState, PublicationReceipt};
 use holonic_engine::{
@@ -37,6 +38,7 @@ pub enum FieldTextCodec {
     #[default]
     UnicodeScalars,
     WhitespaceWords,
+    Utf8Nibbles,
 }
 /// The legacy chart expands a categorical context tensor. Joint regions place the actual
 /// context currents beside the requested region and use a bounded observation-mask port.
@@ -46,6 +48,7 @@ pub enum FieldSourceChart {
     #[default]
     TensorCondition,
     JointRegions,
+    SharedRegions,
 }
 fn tensor_condition(chart: &FieldSourceChart) -> bool {
     *chart == FieldSourceChart::TensorCondition
@@ -57,6 +60,8 @@ pub struct FieldSessionSpec {
     pub symbols: Vec<String>,
     pub section_symbols: usize,
     pub context_symbols: usize,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub region_offsets: Vec<isize>,
     #[serde(default, skip_serializing_if = "tensor_condition")]
     pub source_chart: FieldSourceChart,
     #[serde(default)]
@@ -135,9 +140,13 @@ impl FieldSessionSpec {
         if self.section_symbols == 0 || !(1..=120).contains(&self.fractional_bits) {
             return Err(invalid("field section extent/grain"));
         }
+        if self.codec == FieldTextCodec::Utf8Nibbles && (self.symbols.len()!=16 || self.source_chart!=FieldSourceChart::SharedRegions) {return Err(invalid("UTF-8 nibble codec requires sixteen declared symbols and shared-regions"));}
+        if self.source_chart==FieldSourceChart::SharedRegions {self.shared_extents()?;}
+        else if !self.region_offsets.is_empty(){return Err(invalid("region offsets require the shared-regions source chart"));}
         for symbol in &self.symbols {
             let valid = match self.codec {
                 FieldTextCodec::UnicodeScalars => symbol.chars().count() == 1,
+                FieldTextCodec::Utf8Nibbles => !symbol.is_empty(),
                 FieldTextCodec::WhitespaceWords => {
                     !symbol.is_empty() && !symbol.chars().any(char::is_whitespace)
                 }
@@ -156,7 +165,9 @@ impl FieldSessionSpec {
         Ok(SymbolCurrentChart::declared(alphabet))
     }
     fn extents(&self) -> Result<(usize, usize, usize)> {
+        if self.source_chart==FieldSourceChart::SharedRegions{return self.shared_extents();}
         let regions = match self.source_chart {
+            FieldSourceChart::SharedRegions => unreachable!(),
             FieldSourceChart::TensorCondition => self.section_symbols,
             FieldSourceChart::JointRegions => self
                 .section_symbols
@@ -171,6 +182,7 @@ impl FieldSessionSpec {
             .ok_or_else(|| invalid("field node extent"))?
             / 3;
         let context = match self.source_chart {
+            FieldSourceChart::SharedRegions => unreachable!(),
             FieldSourceChart::TensorCondition => self
                 .symbols
                 .len()
@@ -189,6 +201,8 @@ impl FieldSessionSpec {
     }
     fn symbols_of(&self, chart: &SymbolCurrentChart, text: &str) -> Result<Vec<Symbol>> {
         match self.codec {
+            FieldTextCodec::Utf8Nibbles => text.as_bytes().iter().flat_map(|b|[b>>4,b&15]).map(|n|
+                chart.alphabet().symbol_of(&self.symbols[n as usize]).ok_or_else(||invalid("nibble outside codec"))).collect(),
             FieldTextCodec::UnicodeScalars => chart.decode_text(text),
             FieldTextCodec::WhitespaceWords => text
                 .split_whitespace()
@@ -473,6 +487,7 @@ impl<'c> NativeFieldSession<'c> {
         })
     }
     pub fn request(&mut self, request: &FieldSectionRequest) -> Result<Value> {
+        if self.spec.source_chart==FieldSourceChart::SharedRegions{return self.shared_request(request);}
         if request.retain_comparison && !request.commit {
             return Err(invalid(
                 "a retained target requires committed field generation",
@@ -532,6 +547,7 @@ impl<'c> NativeFieldSession<'c> {
             })
             .collect::<Result<Vec<_>>>()?;
         let text = pieces.join(match self.spec.codec {
+            FieldTextCodec::Utf8Nibbles => unreachable!(),
             FieldTextCodec::UnicodeScalars => "",
             FieldTextCodec::WhitespaceWords => " ",
         });
@@ -748,6 +764,7 @@ mod tests {
             symbols: vec!["a".into(), "b".into(), "c".into()],
             section_symbols: 1,
             context_symbols: 0,
+            region_offsets: vec![],
             source_chart: FieldSourceChart::TensorCondition,
             codec: FieldTextCodec::UnicodeScalars,
             fractional_bits: 48,
@@ -791,6 +808,7 @@ mod tests {
             symbols: vec!["red".into(), "blue".into(), "green".into()],
             section_symbols: 2,
             context_symbols: 2,
+            region_offsets: vec![],
             source_chart: FieldSourceChart::TensorCondition,
             codec: FieldTextCodec::WhitespaceWords,
             fractional_bits: 48,
@@ -829,6 +847,7 @@ mod delivery_tests {
             symbols: vec!["a".into(), "b".into(), "c".into()],
             section_symbols: 1,
             context_symbols: 0,
+            region_offsets: vec![],
             source_chart: FieldSourceChart::TensorCondition,
             codec: FieldTextCodec::UnicodeScalars,
             fractional_bits: 48,
@@ -916,6 +935,7 @@ mod joint_region_tests {
             symbols: vec!["a".into(), "b".into(), "c".into()],
             section_symbols: 2,
             context_symbols: 1,
+            region_offsets: vec![],
             source_chart: FieldSourceChart::JointRegions,
             codec: FieldTextCodec::UnicodeScalars,
             fractional_bits: 48,

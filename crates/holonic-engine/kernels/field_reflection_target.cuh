@@ -62,3 +62,45 @@ extern "C" __global__ void section_field_reflection_input_cotangent(
  y[width]=add_checked(p[offset+1u],p[offset+2u],slot);
  if(*slot)return;for(size_t i=0;i<2u*(width+1u);++i)out_hi[i]=out[i];
 }
+
+// Form Q*(target-output) for all rows before the same self-adjoint fixed-D reflection.
+// Both source enclosures and dyadic division remainders remain in the returned bound.
+extern "C" __global__ void section_field_target_residual_section(
+ const int64_t *output,const int64_t *output_hi,uint32_t output_stride,
+ const int64_t *target,const int64_t *target_hi,uint32_t target_stride,
+ const int64_t *mask,const int64_t *mask_hi,uint32_t has_mask,
+ uint32_t d,uint32_t count,uint32_t rows,uint32_t step_bits,
+ int64_t *out,int64_t *out_hi,uint32_t *slot,const uint32_t *census,
+ const uint32_t *lineage,uint32_t lineage_count){
+ if(blockIdx.x||upstream_refused(census,lineage,lineage_count,slot))return;
+ const uint32_t width=d+2u*count;
+ if(!d||(d&1u)||!rows||output_stride!=2u*(width+1u)||target_stride!=2u*(d+1u)||step_bits>120u){if(!threadIdx.x)atomicOr(slot,REFUSED_MALFORMED);return;}
+ const wide divisor=(wide)((uwide)1u<<step_bits);
+ if(!threadIdx.x&&has_mask){
+  if(!mask||!mask_hi)atomicOr(slot,REFUSED_MALFORMED);
+  else for(uint32_t j=0;j<d/2u;++j)if(mask[j]!=mask_hi[j]||(mask[j]!=0&&mask[j]!=1))atomicOr(slot,REFUSED_MALFORMED);
+ }
+ __syncthreads();if(*slot)return;
+ for(uint32_t row=0;row<rows;++row){
+  const int64_t *yw=output+(size_t)row*output_stride,*yh=output_hi+(size_t)row*output_stride;
+  const int64_t *tw=target+(size_t)row*target_stride,*th=target_hi+(size_t)row*target_stride;
+  wide *g=(wide*)out+(size_t)row*(width+1u);
+  if(!threadIdx.x){
+   const wide *y=(const wide*)yw,*t=(const wide*)tw;
+   for(size_t j=0;j<output_stride;++j)if(yw[j]!=yh[j])atomicOr(slot,REFUSED_MALFORMED);
+   for(size_t j=0;j<target_stride;++j)if(tw[j]!=th[j])atomicOr(slot,REFUSED_MALFORMED);
+   if(y[width]<0||t[d]<0)atomicOr(slot,REFUSED_MALFORMED);
+   for(uint32_t j=0;j<width;++j)g[j]=0;
+   wide rounding=0;bool active=false;
+   if(!*slot)for(uint32_t j=0;j<d;++j)if(!has_mask||!mask[j/2u]){
+    active=true;wide error=0;
+    g[j]=history_narrow(complete_divide(history_integer(sub_checked(t[j],y[j],slot)),history_integer(divisor),&error,slot),slot);
+    rounding=add_checked(rounding,error,slot);
+   }
+   g[width]=active?add_checked(div_ceil(add_checked(y[width],t[d],slot),divisor,slot),rounding,slot):0;
+  }
+  __syncthreads();if(*slot)return;
+  for(size_t j=threadIdx.x;j<2u*(size_t)(width+1u);j+=blockDim.x)out_hi[(size_t)row*2u*(width+1u)+j]=out[(size_t)row*2u*(width+1u)+j];
+  __syncthreads();
+ }
+}

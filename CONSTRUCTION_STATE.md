@@ -1,13 +1,44 @@
 # Construction state
 
-**Currency:** September 15, 2026. The [Eros/face/landmark operating synthesis](research/records/2026-09-15_EROS_UNIFIES_FACES_LANDMARKS_AND_THE_CONTINUING_MACHINE.md)
-is integrated across the governing contract, research skill, canon, architecture and construction
-method. “Continue Athena” means ambitious unification of the accumulated mathematical objects
-and executable operations across scales. Eros is the collective formative machine and its
-nested union; Athena is a formation within it. Conscious-experience engineering, faces and
-conservation, active plates/media, coarse graining and joint interior inference guide that
-construction. Existing model/evaluation returns below remain available; the implementation
-objective is carried through the active brief.
+**Currency:** September 18, 2026. Active construction: a shared section realization of the
+existing field reaction and reflection, so whole source regions use one local coefficient law
+instead of a global position-by-condition normal matrix. The native section reader, field
+section reflection/adjoint, same-model material update and complete-source session consumer
+are being joined. In this collective operation D is the fixed producing constitutive field;
+actual section targets adapt its shared reaction M through D's full input adjoint. Existing
+individual D/M updates remain available. The source application is corpus/repository field
+reconstruction under explicit receiving constraints; source text is material, not an assertion
+that a historical assistant answer is correct.
+
+[established-bounded; measured] September 18: the shared-section device tests pass on the card when
+run serially with the GPU otherwise idle — the operative source module 8 of 8, the direct normal
+material module 136 of 136, `resident_section` 53 of 53. Run in parallel, or beside another GPU
+process, they fail in the allocator's `allocation_grain_bytes` calibration, which is apparatus and
+not the section law. One defect was repaired: both new section launches compared the source
+section's stored width with its component count, omitting a rational section's denominator word, so
+every rational source was refused; the kernels already received the true stride and the rational
+flag. `applied_section_matches_rows_and_retains_rational_bound` now receives observations before it
+reads, so the section reader and the per-row reader agree on nonzero enclosures with a positive
+retained bound instead of on a freshly founded zero. A second defect was repaired in the scatter
+recorder, which passed the destination section's width — always one — where the kernel's
+`dest_count` is its row count, so every multi-row scatter was refused as malformed; with it the
+shared session test `shared_source_updates_and_reopens_without_a_position_sized_model` passes.
+`holonics-hna` then reads 106 of 107 serially. **Open:** the new
+`changing_operative_material_conditions_the_same_hnn_source` refuses at its prospective reading —
+the affine family image refuses with flag 1 and the exact point-word fallback with flag 2, in
+`wave/family/receiver.rs::read_prospective` — and is the next discriminating return for this
+construction. No complete-source session result is claimed.
+
+[established-bounded; formal-checked; implemented-exact] September 17–18: the
+[shared carrier](docs/plans/THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md) C1–C8 with the tube
+join, its [receiver atlas](docs/plans/THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md) R1–R7,
+the [biological instance](docs/plans/THE_BIOLOGICAL_ECOLOGY_INSTANTIATES_THE_CARRIER.md) B0–B7
+except its physicochemical receiver, and the
+[exact device law](docs/plans/THE_EXACT_DEVICE_LAW_IS_CONSTRUCTED.md) D1–D3 are returned as paired
+Lean and Rust owners at commit `2c6041ac`; [ARCHITECTURE_MAP](docs/ARCHITECTURE_MAP.md) carries
+their rows. The next construction contract is
+[generalized transport](docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md).
+D3's generated section triple is the device form this shared-section realization adopts next.
 
 **Last model return:** The same Athena field session now receives partial/joint
 regions, generates their missing values together, and saves the producing receiver and output
@@ -67,6 +98,24 @@ a new starting point. The next result must expose the stronger composed operatio
 | Cost and representation | This 129-feature chart has 77,522 microseconds median generation and 641,746.5 median target update. Warm 96-target development takes 71.768705 seconds; trained rest is 6,170,290 bytes. These are measured costs of this operation, not universal limits or matched speedups. |
 
 ## Returned operation and verification
+
+[established-bounded; source-inspected] The [integrating/differentiating role synthesis](research/records/2026-09-15_INTEGRATING_AND_DIFFERENTIATING_ROLES_SHARE_ONE_CURRENT.md)
+is complete and verified against source. Seven construction owners carry the role reading —
+`BilinearRealization`, `StructureGroup`, `LocalJet`, `ConstitutiveModulation`, the diffusion and
+port/entropy balances, the Hodge and inertia separations, and the energy/stress charts — each
+recorded at what it actually proves. Three overstatements in the earlier draft are corrected:
+`diffusion.rs` carries no entropy reading, and entropy production is proved only for two cells;
+`R_D* = R_D` is a declared realization condition rather than a Lean theorem, while `R_D^2 = I` is
+proved; and `c^2 u^2 - |S|^2 >= 0` is instance-checked, not proved. The generator-relative rate
+form `Sigma_G = A*G + GA + G_dot` stays a written derivation with a named Lean home and exact
+hypotheses: its decision content — the signature and its behaviour under a chart change — is
+already exact and executable in `inertia.rs`, and no owner computes `Sigma_G`. The `Sigma_G = 0`
+critical-seam reading is recorded with its missing semisimplicity hypothesis (a defective
+generator can sit on the seam spectrally with no conserving receiver) and with the centering that
+makes the conjugate reflection and the Swing the same `2P - I` shape; neither is formalized,
+because the actual obstruction is the absent spectral realization, not the rate algebra. No
+native code, Lean proof or measured result was introduced by this synthesis, and the in-flight
+shared-section work was read only.
 
 [established-bounded; source-inspected] The latest synthesis recovers the June laboratory
 perception/mind/Eros line and original August/September messages, repairs stale live ontology

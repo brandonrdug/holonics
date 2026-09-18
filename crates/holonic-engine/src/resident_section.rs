@@ -166,7 +166,7 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 52] = [
+pub const KERNELS: [&str; 60] = [
     "section_constitutive_rechart",
     "section_constitutive_circulation",
     "section_constitutive_fibre",
@@ -233,6 +233,14 @@ pub const KERNELS: [&str; 52] = [
     "section_contract_partial_r4_l32",
     "section_contract_join",
     "section_normal_held_section",
+    "section_normal_applied_material_section",
+    "section_field_source_reflection_section",
+    "section_field_target_residual_section",
+    "section_field_source_reflection_joint_section",
+    "section_normal_enclosure_section",
+    "section_normal_enclosure_sum_section",
+    "section_normal_enclosure_scatter_section",
+    "section_normal_enclosure_restrict_section",
 ];
 
 #[path = "resident_section/surface_field_current_source.rs"]
@@ -630,7 +638,7 @@ impl std::fmt::Debug for ResidentSection<'_> {
     }
 }
 
-impl ResidentSection<'_> {
+impl<'chart> ResidentSection<'chart> {
     pub fn rows(&self) -> usize {
         self.rows
     }
@@ -639,6 +647,9 @@ impl ResidentSection<'_> {
     }
     pub fn grain(&self) -> ResidentGrain {
         self.grain
+    }
+    pub(crate) fn surface(&self) -> &'chart ResidentSurface<'chart> {
+        self.surface
     }
     /// The resident address of the lower endpoint population, for a sibling owner in this crate
     /// mounting a sealed section (`lo == hi`) as an aligned readout inside the same context.

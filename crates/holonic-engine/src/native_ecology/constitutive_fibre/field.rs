@@ -46,7 +46,7 @@ pub use internal_mode::{
     NativeSharedDriveModeReturn,
 };
 pub use junction::{NativeOperativeCurrentFactorCondensation,NativeOperativeReturnStorage,
-    NativeFieldCurrentBall, NativeFieldCurrentSource, NativeFieldCurrentSourceRest, NativeFieldReflectionTarget, NativeFieldReflection, NativeFieldEnclosedJunctionReading, NativeFieldExactJunctionReading,
+    NativeFieldCurrentBall, NativeFieldCurrentSource, NativeFieldCurrentSourceRest, NativeFieldReflectionTarget, NativeFieldReflection, NativeFieldReflectionSection, NativeFieldEnclosedJunctionReading, NativeFieldExactJunctionReading,
     NativeFieldInternalCurrent, NativeFieldInternalCurrentBall, NativeFieldJunctionReading,
     NativeFieldJunctionRepresentation, NativeFieldJunctionSolver,
     PairedContactCotangent, PairedJunctionCotangent, PairedJunctionLinearization, PairedJunctionTangent,
@@ -74,6 +74,7 @@ pub use receiver::{NativeFieldDifferentialReading, NativeNormalizedMaterialReadi
     NativeMaterialPacketReading, NativePacketQuadrature, NativeMaterialActuation,
     NativeMaterialPullbackMetric, NativeMaterialSourcePullback, NativeMaterialSourcePullbackReading};
 pub use resident_input::NativeFieldIncoming;
+pub use material_transport::ResidentNormalEnclosureSection;
 pub use rest::NativeFieldRest;
 
 /// One actual emitted source from this live body. It is linear; the caller cannot manufacture

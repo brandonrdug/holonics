@@ -38,6 +38,71 @@ fn contains(ball: &NativeFieldCurrentBall, expected: &[ExactComplexWaveCurrent])
 }
 
 #[test]
+#[ignore = "requires CUDA; section applied reader must match per-row applied material without host readout"]
+fn applied_section_matches_rows_and_retains_rational_bound() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let grain = ResidentGrain(8);
+    let source = surface
+        .mount_section_rest(
+            &ResidentSectionRest::found(
+                2,
+                3,
+                ResidentGrain(0),
+                i64::BITS,
+                [1, 0, 3, 2, 1, 3]
+                    .into_iter()
+                    .map(|v| (v, v))
+                    .collect(),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+    let source_rows = ResidentConstitutiveSection::rationals(&source).unwrap();
+    let mut material = ResidentNormalMaterial::found_features(&surface, 1, 1, grain).unwrap();
+    // A freshly founded material applies to zero with zero radius, where the section and per-row
+    // readers agree trivially. Receive one observation per source row first, so the comparison
+    // below is between two nonzero applied enclosures with a positive retained bound.
+    let observed = surface
+        .mount_section_rest(
+            &ResidentSectionRest::found(
+                2,
+                2,
+                ResidentGrain(0),
+                i64::BITS,
+                [3, 1, 2, -1].into_iter().map(|v| (v, v)).collect(),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+    material
+        .receive_section(
+            source_rows,
+            ResidentConstitutiveSection::integers(&observed).unwrap(),
+        )
+        .unwrap();
+    let applied = material
+        .retained_view()
+        .read_applied_section(source_rows)
+        .unwrap();
+    assert_eq!(applied.rows(), 2);
+    assert_eq!(applied.components(), 2);
+    assert_eq!(applied.grain(), grain);
+    let section = applied.row(0).unwrap();
+    assert!(section.inspect().unwrap().radius > Rat::zero());
+    for row in 0..2 {
+        let expected = material
+            .read_applied(source_rows.row(row).unwrap())
+            .unwrap()
+            .inspect_before()
+            .unwrap()
+            .forward;
+        let actual = applied.row(row).unwrap().inspect().unwrap();
+        assert_eq!(actual, expected);
+    }
+}
+
+#[test]
 #[ignore = "requires CUDA; conditioned staging is compared with the established section update"]
 fn staged_conditioned_update_matches_section_update_and_preserves_original() {
     let readout = ResidentReadout::new().unwrap();

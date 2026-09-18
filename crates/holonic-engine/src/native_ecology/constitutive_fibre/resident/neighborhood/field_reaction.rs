@@ -176,6 +176,23 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
         )
     }
 
+    /// Stage the complete feature/target section on the existing shared normal owner.
+    /// The caller's source feature construction retains its source/condition relation.
+    pub fn prepare_feature_section_material(
+        &self,
+        member: usize,
+        features: &crate::native_ecology::constitutive_fibre::ResidentNormalEnclosureSection<'c>,
+        observed: &crate::native_ecology::constitutive_fibre::ResidentNormalEnclosureSection<'c>,
+    ) -> Result<PreparedFieldReaction<'c>, ConstitutiveFibreError> {
+        self.require_usable()?;
+        let after_epoch = self.epoch.checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
+        let prior = self.material(member)?.predictive.as_ref().ok_or(ConstitutiveFibreError::Shape)?;
+        let next = prior.material.stage_receive_enclosed_section(features, observed)?;
+        let material = PredictiveMaterial::new(next, &prior.action)?;
+        Ok(PreparedFieldReaction { owner: Rc::clone(&self.owner), member,
+            before_epoch: self.epoch, after_epoch, material })
+    }
+
     pub fn can_commit_field_reaction(&self, prepared: &PreparedFieldReaction<'c>) -> bool {
         self.usable
             && Rc::ptr_eq(&self.owner, &prepared.owner)

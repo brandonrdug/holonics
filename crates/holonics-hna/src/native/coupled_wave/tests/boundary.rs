@@ -208,3 +208,74 @@ fn field_interiors_form_and_feed_the_coupled_prediction() {
     assert_eq!(waves(&expected["states"][1]["projection"]["current"]),expected_current);
     eprintln!("boundary empirical return: field_cut={}, wave_epoch={}, material_observations=9, observation_us={observation_us}, source_radius={}, target_radius={}, discrepancy_radius={}",actual_source.field_cut(),body.epoch(),source.radius,target.radius,discrepancy.radius);
 }
+
+#[test]
+#[ignore="requires CUDA; a live material response changes the conditional HNN reflection at the same bounded source"]
+fn changing_operative_material_conditions_the_same_hnn_source(){
+    use holonic_engine::native_ecology::constitutive_fibre::{NativeContactRealization,NativeMaterialTransportSource,ResidentNormalInput,ResidentNormalEnclosure};
+    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();let grain=ResidentGrain(24);
+    let mut field=NativeConstitutiveField::found_with_enclosed_junction(&s,vec![NativeJunctionSeed{
+        incoming_admittance:1,held_admittance:1,incoming_transport:NativePhaseCurrent::unit(),initial_held:NativePhaseCurrent::zero(),
+    }],grain).unwrap();
+    field.enable_material_transport_source(NativeMaterialTransportSource::OperativeNormal).unwrap();
+    let mut predecessor=None;
+    for input in [NativePhaseCurrent::new(4,0,1).unwrap(),NativePhaseCurrent::new(0,4,1).unwrap(),NativePhaseCurrent::new(-4,0,1).unwrap()]{
+        let mut event=match predecessor.take(){Some(old)=>NativeFieldOccurrence::through(old,vec![input]),None=>NativeFieldOccurrence::entering(vec![input])};
+        predecessor=Some(field.advance_resident(&mut event).unwrap().source);
+    }
+    let old=field.read_current_source().unwrap();let cut=field.occurrence_count();
+    let n=old.enclosure().components()/2;let k=old.material().unwrap().unwrap().components()/2;
+    assert_eq!((n,k),(5,6));let features=3*n+k+3*n*k;
+    let mut material=ResidentNormalMaterial::found_features(&s,features,n,grain).unwrap();
+    let zero=ResidentNormalInput::from(current(&point(&s,&vec![0;2*n]))).enclosure(&s,grain).unwrap();
+    let mut xs=Vec::new();let mut ys=Vec::new();
+    fn expose<'c>(source:&NativeFieldCurrentSource<'c>,s:&'c ResidentSurface<'c>,grain:ResidentGrain,n:usize,zero:&ResidentNormalEnclosure<'c>,xs:&mut Vec<ResidentNormalEnclosure<'c>>,ys:&mut Vec<ResidentNormalEnclosure<'c>>) {
+        let h=source.material().unwrap().unwrap().read_exact_point().unwrap();
+        for previous in [false,true] {for coordinate in 0..2*n {for sign in [-1,1] {
+            let mut values=vec![0;2*n];values[coordinate]=sign*8;
+            let pulse=ResidentNormalInput::from(current(&point(&s,&values))).enclosure(&s,grain).unwrap();
+            let (p,c)=if previous {(pulse.view(),zero.view())}else{(zero.view(),pulse.view())};
+            let pair=p.join(c).unwrap();let a=pair.difference_source().unwrap();
+            let x=a.view().bilinear_features(ResidentConstitutiveCurrent::rational(&h).unwrap()).unwrap();
+            let response=source.reflect(c).unwrap();let y=response.output().difference(c).unwrap();
+            xs.push(x);ys.push(y);
+        }}}
+    }
+    let reads=s.census().section_read_outs;expose(&old,&s,grain,n,&zero,&mut xs,&mut ys);
+    // The actual latest observation has an earlier source with one born contact.
+    // Probes above were read-only, so the material response is still at its valid cut.
+    assert_eq!(field.occurrence_count(),cut);
+    let query=field.pull_back_material_current(cut-1).unwrap().unwrap();
+    let response=field.material_contact_response(query).unwrap();
+    field.apply_material_contact_realization(&response,NativeContactRealization::DyadicDeposit).unwrap();
+    let changed=field.read_current_source().unwrap();expose(&changed,&s,grain,n,&zero,&mut xs,&mut ys);
+    assert_eq!(s.census().section_read_outs,reads);assert_eq!(field.occurrence_count(),cut);
+    assert_eq!(old.births(),changed.births());
+    assert_eq!(old.enclosure().inspect().unwrap().center,changed.enclosure().inspect().unwrap().center);
+    assert_ne!(old.material().unwrap().unwrap().inspect().unwrap().center,changed.material().unwrap().unwrap().inspect().unwrap().center);
+    let pairs=xs.iter().zip(&ys).map(|(x,y)|(x.view(),y.view())).collect::<Vec<_>>();
+    let count=pairs.len() as u64;let fit=std::time::Instant::now();material.receive_many(&pairs).unwrap();let fit_us=fit.elapsed().as_micros();
+    let h=old.material().unwrap().unwrap().read_exact_point().unwrap();let law=material.read_applied_bilinear_relation(3*n,k).unwrap();
+    let mut local=ResidentGeneratorNeighborhood::with_shared_condition(vec![law],ResidentConstitutiveCurrent::rational(&h).unwrap(),ConditionContactMetric::UnitAdmittanceRealification).unwrap();
+    local.attach_normal_prediction(0,material).unwrap_or_else(|(_,e)|panic!("{e}"));
+    let input=old.enclosure();let pair=zero.view().join(input).unwrap();
+    let wave=ResidentNormalMaterial::found(&s,n,n,grain).unwrap().into_joint_difference_wave(pair.view()).unwrap().with_neighborhood(local).unwrap();
+    let mut body=NativeCoupledBody::from_wave(wave);let held=body.inspect_current().unwrap();let epoch=body.epoch();
+    let before=body.inspect_prospective(&[(0,WaveSourceReceiver::Direct)],true).unwrap();
+    let h=changed.material().unwrap().unwrap().read_exact_point().unwrap();let reads=s.census().section_read_outs;
+    body.receive_condition(ResidentConstitutiveCurrent::rational(&h).unwrap()).unwrap();
+    assert_eq!(s.census().section_read_outs,reads);assert_eq!(body.epoch(),epoch);assert_eq!(body.inspect_current().unwrap(),held);
+    let after=body.inspect_prospective(&[(0,WaveSourceReceiver::Direct)],true).unwrap();
+    assert_ne!(before["states"][1]["projection"]["current"],after["states"][1]["projection"]["current"]);
+    let actual=changed.reflect(input).unwrap();let former=old.reflect(input).unwrap();
+    assert_ne!(actual.output().inspect().unwrap().center,former.output().inspect().unwrap().center);
+    let id=body.advance(0,WaveSourceReceiver::Direct,true).unwrap().unwrap();let reads=s.census().section_read_outs;
+    let observation=std::time::Instant::now();let returned=body.observe(id,actual.output()).unwrap();let observation_us=observation.elapsed().as_micros();
+    assert_eq!(s.census().section_read_outs,reads);assert_eq!((returned.predecessor_observations,returned.successor_observations),(count,count+1));
+    let residual=returned.discrepancy().inspect().unwrap();
+    let saved=body.rest().unwrap();let mut bytes=Vec::new();saved.write(&mut bytes).unwrap();
+    let mut resumed=SavedCoupledBody::read(&mut bytes.as_slice(),bytes.len() as u64).unwrap().remount(&s).unwrap();
+    assert_eq!(resumed.inspect_current().unwrap(),body.inspect_current().unwrap());
+    assert_eq!(resumed.inspect_prospective(&[(0,WaveSourceReceiver::Direct)],true).unwrap(),body.inspect_prospective(&[(0,WaveSourceReceiver::Direct)],true).unwrap());
+    eprintln!("operative-condition HNN: state_complex={n}, condition_complex={k}, feature_complex={features}, training_returns={count}, material_returns=1, fit_us={fit_us}, observation_us={observation_us}, signed_discrepancy={}, discrepancy_radius={}",serde_json::to_string(&residual.center).unwrap(),residual.radius);
+}

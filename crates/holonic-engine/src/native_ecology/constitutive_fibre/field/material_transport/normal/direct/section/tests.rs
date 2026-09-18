@@ -153,29 +153,79 @@ fn rational_current_path_produces_its_exact_local_difference_field() {
 }
 
 #[test]
-#[ignore="requires CUDA; bounded observation batches preserve every normal statistic and fit the same endpoint once"]
+#[ignore = "requires CUDA; bounded observation batches preserve every normal statistic and fit the same endpoint once"]
 fn enclosed_batch_has_the_sequential_endpoint_without_input_retention() {
-    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();let grain=ResidentGrain(72);
-    let ball=|v:[i64;3],radius:i128|{
-        let scale=1i128<<grain.0;
-        let values=[v[0] as i128*scale/v[2] as i128,v[1] as i128*scale/v[2] as i128,radius]
-            .into_iter().flat_map(|x|[x as i64,(x>>64) as i64]).map(|x|(x,x)).collect::<Vec<_>>();
-        s.mount_section_rest(&ResidentSectionRest::found(1,6,ResidentGrain(0),64,values).unwrap()).unwrap()
+    let ro = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&ro).unwrap();
+    let grain = ResidentGrain(72);
+    let ball = |v: [i64; 3], radius: i128| {
+        let scale = 1i128 << grain.0;
+        let values = [
+            v[0] as i128 * scale / v[2] as i128,
+            v[1] as i128 * scale / v[2] as i128,
+            radius,
+        ]
+        .into_iter()
+        .flat_map(|x| [x as i64, (x >> 64) as i64])
+        .map(|x| (x, x))
+        .collect::<Vec<_>>();
+        s.mount_section_rest(
+            &ResidentSectionRest::found(1, 6, ResidentGrain(0), 64, values).unwrap(),
+        )
+        .unwrap()
     };
-    let xs=[ball([1,1,1],1i128<<68),ball([2,-1,1],1i128<<69),ball([-1,0,1],0)];
-    let ys=[ball([2,1,1],1i128<<68),ball([-1,3,1],0),ball([1,-2,1],1i128<<67)];
-    let pairs=xs.iter().zip(&ys).map(|(x,y)|(
-        ResidentNormalEnclosureView{surface:&s,section:x,offset:0,width:2,grain},
-        ResidentNormalEnclosureView{surface:&s,section:y,offset:0,width:2,grain})).collect::<Vec<_>>();
-    let mut batch=ResidentNormalMaterial::found_features(&s,1,1,grain).unwrap();
-    let mut serial=ResidentNormalMaterial::found_features(&s,1,1,grain).unwrap();
-    let before=s.census().section_read_outs;
+    let xs = [
+        ball([1, 1, 1], 1i128 << 68),
+        ball([2, -1, 1], 1i128 << 69),
+        ball([-1, 0, 1], 0),
+    ];
+    let ys = [
+        ball([2, 1, 1], 1i128 << 68),
+        ball([-1, 3, 1], 0),
+        ball([1, -2, 1], 1i128 << 67),
+    ];
+    let pairs = xs
+        .iter()
+        .zip(&ys)
+        .map(|(x, y)| {
+            (
+                ResidentNormalEnclosureView {
+                    surface: &s,
+                    section: x,
+                    offset: 0,
+                    width: 2,
+                    grain,
+                },
+                ResidentNormalEnclosureView {
+                    surface: &s,
+                    section: y,
+                    offset: 0,
+                    width: 2,
+                    grain,
+                },
+            )
+        })
+        .collect::<Vec<_>>();
+    let mut batch = ResidentNormalMaterial::found_features(&s, 1, 1, grain).unwrap();
+    let mut serial = ResidentNormalMaterial::found_features(&s, 1, 1, grain).unwrap();
+    let before = s.census().section_read_outs;
     batch.receive_many(&pairs).unwrap();
-    assert_eq!(s.census().section_read_outs,before);
-    for &(x,y) in &pairs {serial.receive(x,y).unwrap();}
-    assert_eq!(batch.state_wire().unwrap(),serial.state_wire().unwrap());
-    assert_eq!(batch.observations(),3);
-    let before=batch.rest().unwrap();batch.receive_many(&[]).unwrap();assert_eq!(batch.rest().unwrap(),before);
-    let wrong=[(pairs[0].0,ResidentNormalEnclosureView{grain:ResidentGrain(64),..pairs[0].1})];
-    assert!(batch.receive_many(&wrong).is_err());assert_eq!(batch.rest().unwrap(),before);
+    assert_eq!(s.census().section_read_outs, before);
+    for &(x, y) in &pairs {
+        serial.receive(x, y).unwrap();
+    }
+    assert_eq!(batch.state_wire().unwrap(), serial.state_wire().unwrap());
+    assert_eq!(batch.observations(), 3);
+    let before = batch.rest().unwrap();
+    batch.receive_many(&[]).unwrap();
+    assert_eq!(batch.rest().unwrap(), before);
+    let wrong = [(
+        pairs[0].0,
+        ResidentNormalEnclosureView {
+            grain: ResidentGrain(64),
+            ..pairs[0].1
+        },
+    )];
+    assert!(batch.receive_many(&wrong).is_err());
+    assert_eq!(batch.rest().unwrap(), before);
 }

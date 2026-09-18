@@ -27,6 +27,7 @@ pub enum HnaStreamCommand {
     MathematicalRequest { request: crate::native::MathematicalRequest },
     FieldRequest { request: crate::native::FieldSectionRequest },
     ObserveField { source: u64, text: String, step_bits: u32 },
+    ObserveFieldSource { request: crate::native::FieldSectionRequest, text: String, step_bits: u32 },
     ReleaseFieldComparison { source: u64 },
     ActuateText { text:String },
     ProjectSymbol { #[serde(default)] full_emission:bool },
@@ -300,6 +301,10 @@ impl HnaStream {
                     Ok(value) => self.emit("field-request", value)?,
                     Err(error) => self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?,
                 },
+                HnaStreamCommand::ObserveFieldSource { request, text, step_bits } => match target.observe_field_source(&request, &text, step_bits) {
+                    Ok(value) => self.emit("field-source-observation", value)?,
+                    Err(error) => self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?,
+                },
                 HnaStreamCommand::ObserveField { source, text, step_bits } => match target.observe_field(source, &text, step_bits) {
                     Ok(value) => self.emit("field-observation", value)?,
                     Err(error) => self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?,
@@ -432,6 +437,7 @@ impl Default for HnaStream {
 trait StreamTarget {
     fn field_request(&mut self, _: &crate::native::FieldSectionRequest) -> Result<Value, String> { Err("field session is not attached".into()) }
     fn observe_field(&mut self, _: u64, _: &str, _: u32) -> Result<Value, String> { Err("field observation is not attached".into()) }
+    fn observe_field_source(&mut self, _: &crate::native::FieldSectionRequest, _: &str, _: u32) -> Result<Value, String> { Err("field source observation is not attached".into()) }
     fn release_field_comparison(&mut self, _: u64) -> Result<Value, String> { Err("field comparison release is not attached".into()) }
     fn receive_next_symbol_distribution(&mut self,_:&str,_:u32)->Result<Value,String>{Err("normalized next-current receiver unsupported by this session".into())}
     fn mathematical_request(&mut self, _: &crate::native::MathematicalRequest) -> Result<Value, String> {
@@ -908,6 +914,10 @@ impl StreamTarget for crate::native::NativeCoupledWaveSession<'_>{
 }
 
 impl StreamTarget for crate::native::NativeFieldSession<'_> {
+    fn observe_field_source(&mut self, request: &crate::native::FieldSectionRequest, text: &str, step_bits: u32) -> Result<Value, String> {
+        self.observe_source(request, text, step_bits).map_err(|e|e.to_string())
+    }
+
     fn field_request(&mut self, request: &crate::native::FieldSectionRequest) -> Result<Value, String> {
         self.request(request).map_err(|e| e.to_string())
     }
