@@ -226,7 +226,9 @@ contracts: the [shared carrier](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md) 
 the mathematical applications and the biological ecologies all instantiate; its
 [receiver atlas](THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md); its environment-indexed
 [physical instance](THE_BIOLOGICAL_ECOLOGY_INSTANTIATES_THE_CARRIER.md); and its
-[device realization](THE_EXACT_DEVICE_LAW_IS_CONSTRUCTED.md). They carry formalization and
+[device realization](THE_EXACT_DEVICE_LAW_IS_CONSTRUCTED.md); a fifth,
+[generalized transport](THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md), extends the
+carrier and its atlas from readings to when a tube conducts and why. They carry formalization and
 engineering intentions, not milestones. Each item is discharged inside the increment that consumes
 it, and none of them reorders the milestone table above.
 
@@ -246,6 +248,7 @@ it, and none of them reorders the milestone table above.
 | [Receiver atlas](THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md) | Causal chord, rate reading, reflection algebra, acoustic/colour, rigidity, spectral, topological receivers and release width |
 | [Biological ecology](THE_BIOLOGICAL_ECOLOGY_INSTANTIATES_THE_CARRIER.md) | Environment-indexed physical instance: grain restriction, adapters, passages, selection, evaluation and the RNA/DNA/viral/cancer/neuro extension |
 | [Exact device law](THE_EXACT_DEVICE_LAW_IS_CONSTRUCTED.md) | Kernel construction discipline, launch receipts, exclusive-access typing, partition-generated layout and measurement scope |
+| [Tube, release, necks, folds and junctions](THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md) | Generalized transport: the relation ladder from identity to potential, standing and extinction, release over an edited family, knot friction, the two-axis horizon, neck invariants, fold/cut/junction law and the jet-tower staircase |
 
 ## Hephaestus applications within the shared phases
 
