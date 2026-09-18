@@ -1,0 +1,1042 @@
+{
+  "grade": "established-bounded",
+  "evidence": [
+    "computational-witness"
+  ],
+  "scope": "Pseudo-legal chess without castling, en passant or check; fixed root menus of top-k moves plus two enabled moves per side; each generator used at most once; sides alternate; no captures are ever in a menu. Finite statements only.",
+  "engine": "flux_lattice_core.js (same engine as the Flux Lattice canvas)",
+  "menus": [
+    {
+      "white": 4,
+      "black": 3,
+      "depth": 8,
+      "nodes": 268,
+      "capped": false,
+      "sharedSquares": [
+        "d5"
+      ],
+      "sides": [
+        {
+          "side": "white",
+          "generators": [
+            "P d2→d4",
+            "P e2→e4",
+            "N b1→c3",
+            "N g1→f3",
+            "P d4→d5 [after P d2→d4]",
+            "B c1→e3 [after P d2→d4]"
+          ],
+          "pairs": {
+            "commute": 12,
+            "gated": 3
+          },
+          "cliquePolynomial": "1 − 6z + 12z^2 − 10z^3 + 3z^4",
+          "coefficients": [
+            1,
+            -6,
+            12,
+            -10,
+            3,
+            0,
+            0
+          ],
+          "zeros": [
+            [
+              0.999993,
+              0.000011
+            ],
+            [
+              1.000005,
+              0
+            ],
+            [
+              0.999997,
+              -0.000005
+            ],
+            [
+              0.333333,
+              0
+            ]
+          ],
+          "allZerosReal": true,
+          "dependenceGraphClawFree": true,
+          "claw": null,
+          "backwardHeatThreshold": 0
+        },
+        {
+          "side": "black",
+          "generators": [
+            "P d7→d5",
+            "P e7→e5",
+            "N b8→c6",
+            "B c8→e6 [after P d7→d5]",
+            "N g8→f6"
+          ],
+          "pairs": {
+            "commute": 8,
+            "gated": 2
+          },
+          "cliquePolynomial": "1 − 5z + 8z^2 − 5z^3 + z^4",
+          "coefficients": [
+            1,
+            -5,
+            8,
+            -5,
+            1,
+            0
+          ],
+          "zeros": [
+            [
+              1,
+              0
+            ],
+            [
+              2.618034,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0.381966,
+              0
+            ]
+          ],
+          "allZerosReal": true,
+          "dependenceGraphClawFree": true,
+          "claw": null,
+          "backwardHeatThreshold": 0
+        }
+      ],
+      "plies": [
+        {
+          "ply": 0,
+          "sequences": 1,
+          "pairwiseSequences": 1,
+          "pairwiseBoards": 1,
+          "boards": 1,
+          "contact": 0,
+          "sharedSquareLaw": 0,
+          "uniquePathBoards": 1,
+          "meanLog2Paths": 0
+        },
+        {
+          "ply": 1,
+          "sequences": 4,
+          "pairwiseSequences": 4,
+          "pairwiseBoards": 4,
+          "boards": 4,
+          "contact": 0,
+          "sharedSquareLaw": 0,
+          "uniquePathBoards": 4,
+          "meanLog2Paths": 0
+        },
+        {
+          "ply": 2,
+          "sequences": 16,
+          "pairwiseSequences": 16,
+          "pairwiseBoards": 16,
+          "boards": 16,
+          "contact": 0,
+          "sharedSquareLaw": 0,
+          "uniquePathBoards": 16,
+          "meanLog2Paths": 0
+        },
+        {
+          "ply": 3,
+          "sequences": 55,
+          "pairwiseSequences": 56,
+          "pairwiseBoards": 32,
+          "boards": 31,
+          "contact": 1,
+          "sharedSquareLaw": 1,
+          "uniquePathBoards": 7,
+          "meanLog2Paths": 0.774
+        },
+        {
+          "ply": 4,
+          "sequences": 175,
+          "pairwiseSequences": 182,
+          "pairwiseBoards": 56,
+          "boards": 52,
+          "contact": 4,
+          "sharedSquareLaw": 4,
+          "uniquePathBoards": 1,
+          "meanLog2Paths": 1.673
+        },
+        {
+          "ply": 5,
+          "sequences": 482,
+          "pairwiseSequences": 559,
+          "pairwiseBoards": 77,
+          "boards": 61,
+          "contact": 16,
+          "sharedSquareLaw": 16,
+          "uniquePathBoards": 0,
+          "meanLog2Paths": 2.833
+        },
+        {
+          "ply": 6,
+          "sequences": 1090,
+          "pairwiseSequences": 1376,
+          "pairwiseBoards": 77,
+          "boards": 53,
+          "contact": 24,
+          "sharedSquareLaw": 24,
+          "uniquePathBoards": 0,
+          "meanLog2Paths": 4.136
+        },
+        {
+          "ply": 7,
+          "sequences": 2006,
+          "pairwiseSequences": 3488,
+          "pairwiseBoards": 70,
+          "boards": 34,
+          "contact": 36,
+          "sharedSquareLaw": 36,
+          "uniquePathBoards": 0,
+          "meanLog2Paths": 5.642
+        },
+        {
+          "ply": 8,
+          "sequences": 2704,
+          "pairwiseSequences": 5668,
+          "pairwiseBoards": 40,
+          "boards": 16,
+          "contact": 24,
+          "sharedSquareLaw": 24,
+          "uniquePathBoards": 0,
+          "meanLog2Paths": 7.085
+        }
+      ],
+      "lawExactAtEveryPly": true
+    },
+    {
+      "white": 3,
+      "black": 3,
+      "depth": 8,
+      "nodes": 134,
+      "capped": false,
+      "sharedSquares": [
+        "d5"
+      ],
+      "sides": [
+        {
+          "side": "white",
+          "generators": [
+            "P d2→d4",
+            "P e2→e4",
+            "N b1→c3",
+            "P d4→d5 [after P d2→d4]",
+            "B c1→e3 [after P d2→d4]"
+          ],
+          "pairs": {
+            "commute": 7,
+            "gated": 3
+          },
+          "cliquePolynomial": "1 − 5z + 7z^2 − 3z^3",
+          "coefficients": [
+            1,
+            -5,
+            7,
+            -3,
+            0,
+            0
+          ],
+          "zeros": [
+            [
+              0.333333,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "allZerosReal": true,
+          "dependenceGraphClawFree": true,
+          "claw": null,
+          "backwardHeatThreshold": 0
+        },
+        {
+          "side": "black",
+          "generators": [
+            "P d7→d5",
+            "P e7→e5",
+            "N b8→c6",
+            "B c8→e6 [after P d7→d5]",
+            "N g8→f6"
+          ],
+          "pairs": {
+            "commute": 8,
+            "gated": 2
+          },
+          "cliquePolynomial": "1 − 5z + 8z^2 − 5z^3 + z^4",
+          "coefficients": [
+            1,
+            -5,
+            8,
+            -5,
+            1,
+            0
+          ],
+          "zeros": [
+            [
+              1,
+              0
+            ],
+            [
+              2.618034,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              0.381966,
+              0
+            ]
+          ],
+          "allZerosReal": true,
+          "dependenceGraphClawFree": true,
+          "claw": null,
+          "backwardHeatThreshold": 0
+        }
+      ],
+      "plies": [
+        {
+          "ply": 0,
+          "sequences": 1,
+          "pairwiseSequences": 1,
+          "pairwiseBoards": 1,
+          "boards": 1,
+          "contact": 0,
+          "sharedSquareLaw": 0,
+          "uniquePathBoards": 1,
+          "meanLog2Paths": 0
+        },
+        {
+          "ply": 1,
+          "sequences": 3,
+          "pairwiseSequences": 3,
+          "pairwiseBoards": 3,
+          "boards": 3,
+          "contact": 0,
+          "sharedSquareLaw": 0,
+          "uniquePathBoards": 3,
+          "meanLog2Paths": 0
+        },
+        {
+          "ply": 2,
+          "sequences": 12,
+          "pairwiseSequences": 12,
+          "pairwiseBoards": 12,
+          "boards": 12,
+          "contact": 0,
+          "sharedSquareLaw": 0,
+          "uniquePathBoards": 12,
+          "meanLog2Paths": 0
+        },
+        {
+          "ply": 3,
+          "sequences": 31,
+          "pairwiseSequences": 32,
+          "pairwiseBoards": 20,
+          "boards": 19,
+          "contact": 1,
+          "sharedSquareLaw": 1,
+          "uniquePathBoards": 7,
+          "meanLog2Paths": 0.632
+        },
+        {
+          "ply": 4,
+          "sequences": 97,
+          "pairwiseSequences": 104,
+          "pairwiseBoards": 35,
+          "boards": 31,
+          "contact": 4,
+          "sharedSquareLaw": 4,
+          "uniquePathBoards": 1,
+          "meanLog2Paths": 1.548
+        },
+        {
+          "ply": 5,
+          "sequences": 191,
+          "pairwiseSequences": 247,
+          "pairwiseBoards": 42,
+          "boards": 30,
+          "contact": 12,
+          "sharedSquareLaw": 12,
+          "uniquePathBoards": 0,
+          "meanLog2Paths": 2.523
+        },
+        {
+          "ply": 6,
+          "sequences": 400,
+          "pairwiseSequences": 608,
+          "pairwiseBoards": 42,
+          "boards": 24,
+          "contact": 18,
+          "sharedSquareLaw": 18,
+          "uniquePathBoards": 0,
+          "meanLog2Paths": 3.818
+        },
+        {
+          "ply": 7,
+          "sequences": 406,
+          "pairwiseSequences": 1056,
+          "pairwiseBoards": 28,
+          "boards": 10,
+          "contact": 18,
+          "sharedSquareLaw": 18,
+          "uniquePathBoards": 0,
+          "meanLog2Paths": 5.217
+        },
+        {
+          "ply": 8,
+          "sequences": 416,
+          "pairwiseSequences": 1716,
+          "pairwiseBoards": 16,
+          "boards": 4,
+          "contact": 12,
+          "sharedSquareLaw": 12,
+          "uniquePathBoards": 0,
+          "meanLog2Paths": 6.542
+        }
+      ],
+      "lawExactAtEveryPly": true
+    },
+    {
+      "white": 2,
+      "black": 2,
+      "depth": 8,
+      "nodes": 46,
+      "capped": false,
+      "sharedSquares": [
+        "d5"
+      ],
+      "sides": [
+        {
+          "side": "white",
+          "generators": [
+            "P d2→d4",
+            "P e2→e4",
+            "P d4→d5 [after P d2→d4]",
+            "N b1→c3"
+          ],
+          "pairs": {
+            "commute": 5,
+            "gated": 1
+          },
+          "cliquePolynomial": "1 − 4z + 5z^2 − 2z^3",
+          "coefficients": [
+            1,
+            -4,
+            5,
+            -2,
+            0
+          ],
+          "zeros": [
+            [
+              0.5,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "allZerosReal": true,
+          "dependenceGraphClawFree": true,
+          "claw": null,
+          "backwardHeatThreshold": 0
+        },
+        {
+          "side": "black",
+          "generators": [
+            "P d7→d5",
+            "P e7→e5",
+            "N b8→c6",
+            "B c8→e6 [after P d7→d5]"
+          ],
+          "pairs": {
+            "commute": 4,
+            "gated": 2
+          },
+          "cliquePolynomial": "1 − 4z + 4z^2 − z^3",
+          "coefficients": [
+            1,
+            -4,
+            4,
+            -1,
+            0
+          ],
+          "zeros": [
+            [
+              0.381966,
+              0
+            ],
+            [
+              2.618034,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "allZerosReal": true,
+          "dependenceGraphClawFree": true,
+          "claw": null,
+          "backwardHeatThreshold": 0
+        }
+      ],
+      "plies": [
+        {
+          "ply": 0,
+          "sequences": 1,
+          "pairwiseSequences": 1,
+          "pairwiseBoards": 1,
+          "boards": 1,
+          "contact": 0,
+          "sharedSquareLaw": 0,
+          "uniquePathBoards": 1,
+          "meanLog2Paths": 0
+        },
+        {
+          "ply": 1,
+          "sequences": 3,
+          "pairwiseSequences": 3,
+          "pairwiseBoards": 3,
+          "boards": 3,
+          "contact": 0,
+          "sharedSquareLaw": 0,
+          "uniquePathBoards": 3,
+          "meanLog2Paths": 0
+        },
+        {
+          "ply": 2,
+          "sequences": 9,
+          "pairwiseSequences": 9,
+          "pairwiseBoards": 9,
+          "boards": 9,
+          "contact": 0,
+          "sharedSquareLaw": 0,
+          "uniquePathBoards": 9,
+          "meanLog2Paths": 0
+        },
+        {
+          "ply": 3,
+          "sequences": 20,
+          "pairwiseSequences": 21,
+          "pairwiseBoards": 12,
+          "boards": 11,
+          "contact": 1,
+          "sharedSquareLaw": 1,
+          "uniquePathBoards": 2,
+          "meanLog2Paths": 0.818
+        },
+        {
+          "ply": 4,
+          "sequences": 44,
+          "pairwiseSequences": 49,
+          "pairwiseBoards": 16,
+          "boards": 13,
+          "contact": 3,
+          "sharedSquareLaw": 3,
+          "uniquePathBoards": 0,
+          "meanLog2Paths": 1.692
+        },
+        {
+          "ply": 5,
+          "sequences": 54,
+          "pairwiseSequences": 84,
+          "pairwiseBoards": 12,
+          "boards": 6,
+          "contact": 6,
+          "sharedSquareLaw": 6,
+          "uniquePathBoards": 0,
+          "meanLog2Paths": 3.085
+        },
+        {
+          "ply": 6,
+          "sequences": 66,
+          "pairwiseSequences": 132,
+          "pairwiseBoards": 9,
+          "boards": 3,
+          "contact": 6,
+          "sharedSquareLaw": 6,
+          "uniquePathBoards": 0,
+          "meanLog2Paths": 4.308
+        },
+        {
+          "ply": 7,
+          "sequences": 0,
+          "pairwiseSequences": 132,
+          "pairwiseBoards": 3,
+          "boards": 0,
+          "contact": 3,
+          "sharedSquareLaw": 3,
+          "uniquePathBoards": 0,
+          "meanLog2Paths": 0
+        },
+        {
+          "ply": 8,
+          "sequences": 0,
+          "pairwiseSequences": 96,
+          "pairwiseBoards": 1,
+          "boards": 0,
+          "contact": 1,
+          "sharedSquareLaw": 1,
+          "uniquePathBoards": 0,
+          "meanLog2Paths": 0
+        }
+      ],
+      "lawExactAtEveryPly": true
+    },
+    {
+      "white": 5,
+      "black": 4,
+      "depth": 7,
+      "nodes": 471,
+      "capped": false,
+      "sharedSquares": [
+        "d4",
+        "d5"
+      ],
+      "sides": [
+        {
+          "side": "white",
+          "generators": [
+            "P d2→d4",
+            "P e2→e4",
+            "N b1→c3",
+            "N g1→f3",
+            "P d2→d3",
+            "P d4→d5 [after P d2→d4]",
+            "B c1→e3 [after P d2→d4 or P d2→d3]"
+          ],
+          "pairs": {
+            "commute": 15,
+            "exclusive": 2,
+            "gated": 4
+          },
+          "cliquePolynomial": "1 − 7z + 15z^2 − 13z^3 + 4z^4",
+          "coefficients": [
+            1,
+            -7,
+            15,
+            -13,
+            4,
+            0,
+            0,
+            0
+          ],
+          "zeros": [
+            [
+              1.000012,
+              0.000008
+            ],
+            [
+              0.999995,
+              0.000002
+            ],
+            [
+              0.999995,
+              -0.000007
+            ],
+            [
+              0.25,
+              0
+            ]
+          ],
+          "allZerosReal": true,
+          "dependenceGraphClawFree": true,
+          "claw": null,
+          "backwardHeatThreshold": 0
+        },
+        {
+          "side": "black",
+          "generators": [
+            "P d7→d5",
+            "P e7→e5",
+            "N b8→c6",
+            "N g8→f6",
+            "B c8→e6 [after P d7→d5]",
+            "P d5→d4 [after P d7→d5]"
+          ],
+          "pairs": {
+            "commute": 12,
+            "gated": 3
+          },
+          "cliquePolynomial": "1 − 6z + 12z^2 − 10z^3 + 3z^4",
+          "coefficients": [
+            1,
+            -6,
+            12,
+            -10,
+            3,
+            0,
+            0
+          ],
+          "zeros": [
+            [
+              0.999993,
+              0.000011
+            ],
+            [
+              1.000005,
+              0
+            ],
+            [
+              0.999997,
+              -0.000005
+            ],
+            [
+              0.333333,
+              0
+            ]
+          ],
+          "allZerosReal": true,
+          "dependenceGraphClawFree": true,
+          "claw": null,
+          "backwardHeatThreshold": 0
+        }
+      ],
+      "plies": [
+        {
+          "ply": 0,
+          "sequences": 1,
+          "pairwiseSequences": 1,
+          "pairwiseBoards": 1,
+          "boards": 1,
+          "contact": 0,
+          "sharedSquareLaw": 0,
+          "uniquePathBoards": 1,
+          "meanLog2Paths": 0
+        },
+        {
+          "ply": 1,
+          "sequences": 5,
+          "pairwiseSequences": 5,
+          "pairwiseBoards": 5,
+          "boards": 5,
+          "contact": 0,
+          "sharedSquareLaw": 0,
+          "uniquePathBoards": 5,
+          "meanLog2Paths": 0
+        },
+        {
+          "ply": 2,
+          "sequences": 20,
+          "pairwiseSequences": 20,
+          "pairwiseBoards": 20,
+          "boards": 20,
+          "contact": 0,
+          "sharedSquareLaw": 0,
+          "uniquePathBoards": 20,
+          "meanLog2Paths": 0
+        },
+        {
+          "ply": 3,
+          "sequences": 83,
+          "pairwiseSequences": 84,
+          "pairwiseBoards": 48,
+          "boards": 47,
+          "contact": 1,
+          "sharedSquareLaw": 1,
+          "uniquePathBoards": 11,
+          "meanLog2Paths": 0.766
+        },
+        {
+          "ply": 4,
+          "sequences": 279,
+          "pairwiseSequences": 294,
+          "pairwiseBoards": 96,
+          "boards": 87,
+          "contact": 9,
+          "sharedSquareLaw": 9,
+          "uniquePathBoards": 3,
+          "meanLog2Paths": 1.586
+        },
+        {
+          "ply": 5,
+          "sequences": 852,
+          "pairwiseSequences": 966,
+          "pairwiseBoards": 136,
+          "boards": 110,
+          "contact": 26,
+          "sharedSquareLaw": 26,
+          "uniquePathBoards": 0,
+          "meanLog2Paths": 2.789
+        },
+        {
+          "ply": 6,
+          "sequences": 2274,
+          "pairwiseSequences": 2967,
+          "pairwiseBoards": 187,
+          "boards": 123,
+          "contact": 64,
+          "sharedSquareLaw": 64,
+          "uniquePathBoards": 0,
+          "meanLog2Paths": 3.968
+        },
+        {
+          "ply": 7,
+          "sequences": 4242,
+          "pairwiseSequences": 6923,
+          "pairwiseBoards": 154,
+          "boards": 78,
+          "contact": 76,
+          "sharedSquareLaw": 76,
+          "uniquePathBoards": 0,
+          "meanLog2Paths": 5.497
+        }
+      ],
+      "lawExactAtEveryPly": true
+    },
+    {
+      "white": 6,
+      "black": 5,
+      "depth": 7,
+      "nodes": 1498,
+      "capped": false,
+      "sharedSquares": [
+        "d4",
+        "d5"
+      ],
+      "sides": [
+        {
+          "side": "white",
+          "generators": [
+            "P d2→d4",
+            "P e2→e4",
+            "N b1→c3",
+            "N g1→f3",
+            "P c2→c4",
+            "P f2→f4",
+            "P d4→d5 [after P d2→d4]",
+            "B c1→e3 [after P d2→d4]"
+          ],
+          "pairs": {
+            "commute": 23,
+            "gated": 5
+          },
+          "cliquePolynomial": "1 − 8z + 23z^2 − 28z^3 + 12z^4",
+          "coefficients": [
+            1,
+            -8,
+            23,
+            -28,
+            12,
+            0,
+            0,
+            0,
+            0
+          ],
+          "zeros": [
+            [
+              0.5,
+              0
+            ],
+            [
+              0.333333,
+              0
+            ],
+            [
+              0.5,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "allZerosReal": true,
+          "dependenceGraphClawFree": true,
+          "claw": null,
+          "backwardHeatThreshold": 0
+        },
+        {
+          "side": "black",
+          "generators": [
+            "P d7→d5",
+            "P e7→e5",
+            "N b8→c6",
+            "N g8→f6",
+            "P d7→d6",
+            "B c8→e6 [after P d7→d5 or P d7→d6]",
+            "P d5→d4 [after P d7→d5]"
+          ],
+          "pairs": {
+            "commute": 15,
+            "exclusive": 2,
+            "gated": 4
+          },
+          "cliquePolynomial": "1 − 7z + 15z^2 − 13z^3 + 4z^4",
+          "coefficients": [
+            1,
+            -7,
+            15,
+            -13,
+            4,
+            0,
+            0,
+            0
+          ],
+          "zeros": [
+            [
+              1.000012,
+              0.000008
+            ],
+            [
+              0.999995,
+              0.000002
+            ],
+            [
+              0.999995,
+              -0.000007
+            ],
+            [
+              0.25,
+              0
+            ]
+          ],
+          "allZerosReal": true,
+          "dependenceGraphClawFree": true,
+          "claw": null,
+          "backwardHeatThreshold": 0
+        }
+      ],
+      "plies": [
+        {
+          "ply": 0,
+          "sequences": 1,
+          "pairwiseSequences": 1,
+          "pairwiseBoards": 1,
+          "boards": 1,
+          "contact": 0,
+          "sharedSquareLaw": 0,
+          "uniquePathBoards": 1,
+          "meanLog2Paths": 0
+        },
+        {
+          "ply": 1,
+          "sequences": 6,
+          "pairwiseSequences": 6,
+          "pairwiseBoards": 6,
+          "boards": 6,
+          "contact": 0,
+          "sharedSquareLaw": 0,
+          "uniquePathBoards": 6,
+          "meanLog2Paths": 0
+        },
+        {
+          "ply": 2,
+          "sequences": 30,
+          "pairwiseSequences": 30,
+          "pairwiseBoards": 30,
+          "boards": 30,
+          "contact": 0,
+          "sharedSquareLaw": 0,
+          "uniquePathBoards": 30,
+          "meanLog2Paths": 0
+        },
+        {
+          "ply": 3,
+          "sequences": 149,
+          "pairwiseSequences": 150,
+          "pairwiseBoards": 85,
+          "boards": 84,
+          "contact": 1,
+          "sharedSquareLaw": 1,
+          "uniquePathBoards": 19,
+          "meanLog2Paths": 0.774
+        },
+        {
+          "ply": 4,
+          "sequences": 611,
+          "pairwiseSequences": 630,
+          "pairwiseBoards": 204,
+          "boards": 193,
+          "contact": 11,
+          "sharedSquareLaw": 11,
+          "uniquePathBoards": 9,
+          "meanLog2Paths": 1.56
+        },
+        {
+          "ply": 5,
+          "sequences": 2463,
+          "pairwiseSequences": 2667,
+          "pairwiseBoards": 372,
+          "boards": 327,
+          "contact": 45,
+          "sharedSquareLaw": 45,
+          "uniquePathBoards": 0,
+          "meanLog2Paths": 2.767
+        },
+        {
+          "ply": 6,
+          "sequences": 7386,
+          "pairwiseSequences": 8763,
+          "pairwiseBoards": 527,
+          "boards": 407,
+          "contact": 120,
+          "sharedSquareLaw": 120,
+          "uniquePathBoards": 0,
+          "meanLog2Paths": 3.958
+        },
+        {
+          "ply": 7,
+          "sequences": 23446,
+          "pairwiseSequences": 31671,
+          "pairwiseBoards": 680,
+          "boards": 450,
+          "contact": 230,
+          "sharedSquareLaw": 230,
+          "uniquePathBoards": 0,
+          "meanLog2Paths": 5.466
+        }
+      ],
+      "lawExactAtEveryPly": true
+    }
+  ],
+  "realityTolerance": 0.0001,
+  "summary": {
+    "lawExactEverywhere": true,
+    "allMenusClawFree": true,
+    "allZerosRealEverywhere": true,
+    "thresholds": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ]
+    ]
+  }
+}
