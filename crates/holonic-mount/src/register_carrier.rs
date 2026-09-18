@@ -4,10 +4,11 @@
 //! layout.  The live carrier body never returns to cpu memory: one CUDA worker moves each exact
 //! row into a fresh allocation and the old allocation remains immutable until completion.
 
-use crate::cuda::LaunchCensus;
+use crate::launch_law::LaunchEvidence;
+use crate::launch_law::{Extent, LaunchReceipt};
 use crate::{
     Context, CudaError, DeviceBuffer, RegisterCarrierRebaseArguments, RegisterCarrierRebaseKernel,
-    RegisterSpan, Result,
+    RegisterSpan, RegisterWriteSpan, Result,
 };
 use body::manifold;
 use soma_abi::register;
@@ -25,6 +26,8 @@ pub struct RegisterCarrierRebaseOutput {
     pub lanes: DeviceBuffer<u32>,
     pub lane_words: Vec<u32>,
     pub completion: Vec<u32>,
+    /// The proved launch receipt: shape, extents, stream and the clauses proved.
+    pub receipt: LaunchReceipt,
 }
 
 fn boundary(context: &'static str, message: impl Into<String>) -> CudaError {
@@ -129,7 +132,7 @@ fn planned_lanes(
 pub fn launch_register_carrier_rebase(
     context: &Context,
     kernel: &RegisterCarrierRebaseKernel<'_>,
-    census: LaunchCensus,
+    evidence: LaunchEvidence<'_>,
     rebase: RegisterCarrierRebase<'_>,
 ) -> Result<RegisterCarrierRebaseOutput> {
     if rebase.old_lanes.len() != rebase.old_lane_words.len() {
@@ -148,35 +151,38 @@ pub fn launch_register_carrier_rebase(
     lanes.copy_from_slice(&lane_words)?;
     let requests = DeviceBuffer::alloc(rebase.request_words.len())?;
     requests.copy_from_slice(rebase.request_words)?;
-    let carriers = DeviceBuffer::<u32>::alloc_zeroed(fresh_words)?;
-    let completions = DeviceBuffer::<u32>::alloc(rebase.lane_count)?;
+    // Bound `mut` because the entry declares these two faces `*mut`: the launcher takes an
+    // exclusive `RegisterWriteSpan` of each.
+    let mut carriers = DeviceBuffer::<u32>::alloc_zeroed(fresh_words)?;
+    let mut completions = DeviceBuffer::<u32>::alloc(rebase.lane_count)?;
     completions.copy_from_slice(&vec![register::RECAST_INCOMPLETE; rebase.lane_count])?;
 
-    let launch = kernel.linear_launch(census, rebase.lane_count as u64)?;
-    let params = [
-        u32::try_from(rebase.lane_count).map_err(|_| {
-            boundary(
-                "carrier rebase launch",
-                "lane count exceeds the CUDA parameter wire",
-            )
-        })?,
-        launch.x_stride,
-    ];
-    let params_buffer = DeviceBuffer::alloc(params.len())?;
-    params_buffer.copy_from_slice(&params)?;
-    kernel.launch(
-        launch.grid,
-        launch.block,
+    // Allocate the parameter buffer, prove the cover, fill the buffer with the proof's own
+    // `x_stride`, then enact. The kernel reads the same stride the launch law proved.
+    const PARAM_WORDS: usize = 2;
+    let lane_count = u32::try_from(rebase.lane_count).map_err(|_| {
+        boundary(
+            "carrier rebase launch",
+            "lane count exceeds the CUDA parameter wire",
+        )
+    })?;
+    let params_buffer = DeviceBuffer::<u32>::alloc(PARAM_WORDS)?;
+    let proof = kernel.cover(
+        evidence,
+        rebase.lane_count as u64,
+        Extent::Exactly(PARAM_WORDS),
         RegisterCarrierRebaseArguments {
             old_carriers: RegisterSpan::whole(rebase.old_carriers),
-            fresh_carriers: RegisterSpan::whole(&carriers),
+            fresh_carriers: RegisterWriteSpan::whole(&mut carriers),
             old_lanes: RegisterSpan::whole(rebase.old_lanes),
             new_lanes: RegisterSpan::whole(&lanes),
             requests: RegisterSpan::whole(&requests),
-            completions: RegisterSpan::whole(&completions),
+            completions: RegisterWriteSpan::whole(&mut completions),
             params: RegisterSpan::whole(&params_buffer),
         },
     )?;
+    params_buffer.copy_from_slice(&[lane_count, proof.x_stride()])?;
+    let receipt = kernel.enact(proof)?;
     context.synchronize()?;
 
     let mut completion = vec![register::RECAST_INCOMPLETE; rebase.lane_count];
@@ -195,6 +201,7 @@ pub fn launch_register_carrier_rebase(
         lanes,
         lane_words,
         completion,
+        receipt,
     })
 }
 

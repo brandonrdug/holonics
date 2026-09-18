@@ -9,8 +9,8 @@
 use std::collections::BTreeMap;
 
 use ::mount::{
-    Context, Device, DeviceBuffer, LiveEventArguments, LiveEventSpan, Module,
-    RegionalContactArguments, SOMA_PTX,
+    Context, Device, DeviceBuffer, LaunchEvidence, LiveEventArguments, LiveEventSpan,
+    LiveEventWriteSpan, Module, RegionalContactArguments, SOMA_PTX,
 };
 use body::manifold::{
     node_packed_word, LiveBodyHeader, SparseOwnCell, CARRIER_HEADER_WORDS, ENCLOSURE_WORDS,
@@ -59,10 +59,15 @@ pub struct CudaLiveCurrentExecutor {
     resident_standing: Option<ResidentStanding>,
     resident_lineages: BTreeMap<CurrentLineage, ResidentCarrier>,
     staged: Option<StagedEvent>,
-    /// **The device's own launch census**, taken once at mount: `μ`'s `D` constituent. The
-    /// population mouth hands it to `Function::linear_launch`, which derives grid and block from it
-    /// together with the function's own attribute. No launch geometry is authored anywhere.
+    /// **The device's own launch census**, taken once at mount: `μ`'s `D` constituent, and the
+    /// source of the reported multiprocessor population. It is no longer the *launch evidence* of
+    /// any mouth: a census carries neither the per-dimension block extent nor the per-block shared
+    /// extent nor the warp, so every mouth crossed with it deferred those clauses.
     launch_census: Option<::mount::cuda::LaunchCensus>,
+    /// **The mounted card's own handle**, retained from mount and presented as
+    /// `LaunchEvidence::Device` at every launch this executor issues, so no clause of any of them
+    /// is deferred. The launch *shape* is still derived from the card, never authored.
+    device: Device,
     max_blocks_per_multiprocessor: u32,
     concurrent_kernels: bool,
     pub(crate) context: Context,
@@ -101,7 +106,7 @@ impl CudaLiveCurrentExecutor {
         let stack_limit_bytes = context.ensure_stack_limit_bytes(stack)?;
         Ok(Self {
             module,
-            device_name: device.name,
+            device_name: device.name.clone(),
             stack_limit_bytes,
             stack_growths: 0,
             launches: 0,
@@ -121,6 +126,7 @@ impl CudaLiveCurrentExecutor {
             resident_lineages: BTreeMap::new(),
             staged: None,
             launch_census,
+            device,
             max_blocks_per_multiprocessor,
             concurrent_kernels,
             context,

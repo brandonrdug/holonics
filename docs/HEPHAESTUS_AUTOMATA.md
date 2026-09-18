@@ -57,6 +57,49 @@ now exposes exact constructions, resident application/receiver reuse and calibra
 condition-family refinement through the public HNN stream. Its live session has explicit
 source/receiver maps; broader contextual empirical prediction and session rest remain open.
 
+## Ecological roles as generator-relative characteristics
+
+[interpretation] Brandon's September 15 integrating/differentiating analogy concerns changing
+roles within one ecology. Concentration, retention, separation, transport and release can occur
+simultaneously at different regions or receivers. A Hephaestus automaton can expose alternatives,
+restrict a source family, synthesize usable material and emit a consequence as its situation
+changes. Those are operations of the common Eros/HNN construction, not permanent agent or
+biological-sex classes.
+
+[definition] Describe the role through its source/current/material/receiver law. In a continuous
+linear chart `x_dot=Ax+s`, a differentiable Hermitian receiving metric gives
+`E_dot=Re(x*G s)+x*(A*G+G A+G_dot)x/2`. In a discrete chart use `T*G_next T-G` instead.
+The same operator can have contracting, expanding and neutral directions at that receiver;
+physical heat/entropy claims additionally retain their constitutive balance and boundary flux.
+Group/phase/holonomy and future-receiver laws determine which characteristics travel to another
+situation. The [source synthesis](../research/records/2026-09-15_INTEGRATING_AND_DIFFERENTIATING_ROLES_SHARE_ONE_CURRENT.md)
+connects the actual owners, corrects the thin-lens polarity and gives the reciprocal Swing case.
+
+[definition] The reading has an exact executable owner. `Sigma_G`'s positive, negative and null
+directions are `inertia.rs::inertia`, and their survival under a chart change is
+`inertia.rs::congruence`, which refuses a singular chart by name; a collapsing receiver gets
+`pullback_inertia_bound` instead, returning the inertia bound together with a basis of the
+directions it cannot see. So "this receiver contracts here, expands there and is neutral
+elsewhere" is a computed signature with an exhibited kernel, not an assigned character. The
+continuous rate form itself is a written derivation with a named Lean home and no current
+consumer; the [source synthesis](../research/records/2026-09-15_INTEGRATING_AND_DIFFERENTIATING_ROLES_SHARE_ONE_CURRENT.md)
+records that placement and its exact hypotheses.
+
+[definition] The current fixed-D field is one concrete example: the same self-adjoint reflection
+serves forward current and the input-covector return, while its different ports receive different
+shares. Shared material can then integrate the observed section. Self-adjointness there is a
+**declared realization condition** on the graph projection's adjoint under the unit pairing, not a
+property of every reflection, and the reuse stops being an adjoint without it. Neither the
+forward/adjoint orientation nor one visible amplitude defines an intrinsic “integrator” or
+“differentiator.”
+
+[definition] Naming rule. In mathematics and implementation use `IntegratingLens`,
+`DifferentiatingLens`, `InvariantPart` and `TransverseDefect`, which name the operation, its
+operand and its receiver. The same object can be an `IntegratingLens` for one receiving plane and
+a `DifferentiatingLens` for another, exactly as a converging lens collimates when the source path
+is reversed. Maternal/paternal vocabulary remains philosophical explanation and never becomes a
+type, module, field, kernel or wire name.
+
 ## Direct contribution to Athena and Eros
 
 [definition] The [current integration packets](plans/THE_ROADMAP.md#immediate-mathematical-application-and-implementation)

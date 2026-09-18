@@ -40,7 +40,11 @@
 //! construction. PTX passes raw device pointers, so each `&mut [_]` argument arrives as a
 //! `(ptr, len)` pair reconstructed with `from_raw_parts_mut` before the identical body.
 #![no_std]
-#![feature(abi_ptx, link_llvm_intrinsics, stdarch_nvptx)]
+// `asm_experimental_arch` carries the two lines of inline PTX the D3 section-apply entry needs to
+// reach its `.extern .shared` tile: rustc has no attribute placing a `static` in address space 3,
+// so the tile is declared at module scope and converted to a generic address with `cvta.shared`,
+// which is exactly what CUDA C's `extern __shared__` lowers to.
+#![feature(abi_ptx, asm_experimental_arch, link_llvm_intrinsics, stdarch_nvptx)]
 
 use core::arch::nvptx;
 use core::slice;
@@ -76,6 +80,7 @@ use soma_abi::morphological_condition_cuda as morph_condition_cuda;
 use soma_abi::morphological_conduct_cuda as morph_cuda;
 use soma_abi::recurrent_law_cuda;
 use soma_abi::returned_contact_cuda as returned_cuda;
+use soma_abi::section_layout_cuda as section_cuda;
 use soma_abi::text_restrict_cuda as text_cuda;
 use soma_abi::{contact as contact_abi, register as register_abi};
 
@@ -5999,4 +6004,238 @@ pub unsafe extern "ptx-kernel" fn morphological_conduct_group(
     } else {
         morph_cuda::STATUS_COMPLETE
     };
+}
+
+// --- D3 · THE GENERATED SECTION TRIPLE ----------------------------------------------------------
+// `docs/plans/THE_EXACT_DEVICE_LAW_IS_CONSTRUCTED.md` D3: *partition generates layout*. One
+// declared incidence — for each local slot, the global address it reads and the region it belongs
+// to — generates a gather, a shared-tile local application and a transposed scatter. These four
+// entries are the generic realization; a new section operator is then a declaration
+// (`mount::section_layout::IncidenceDeclaration` plus a `LocalOperator`), not another hand-written
+// kernel. The Lean owner is `Soma.Holonics.Foundation.SectionLayout`.
+//
+// The arithmetic is `soma_abi::section_layout_cuda`'s `Z/(2^61 - 1)` — the SAME code the host
+// reference compiles, so the bit-for-bit device/host agreement is one mouth and not two
+// transcriptions. Addition there is associative and commutative, which is what an accumulating
+// scatter requires; no float appears in any of the four bodies.
+//
+// No atomic appears either, and that is the point of the colouring: `section_scatter_add` is
+// launched once per colour class of the region conflict graph, and within one class no two regions
+// touch a common global address (`SectionLayout.Incidence.colour_fiber_single_region`), so each
+// address has exactly one writing thread and the read-modify-write is not a race. Colour-by-colour
+// accumulation equals the sequential scatter by `SectionLayout.Incidence.colour_schedule`.
+
+// The dynamic shared tile. rustc has no attribute for address space 3, so the symbol is declared
+// here in PTX exactly as `extern __shared__` lowers, and `section_tile_base` converts it to a
+// generic address. Its octet extent is supplied per launch by `cuLaunchKernel`'s `sharedMemBytes`,
+// which `mount`'s launch law derives from the declared tile width and proves against the card's
+// own `MAX_SHARED_MEMORY_PER_BLOCK`.
+core::arch::global_asm!(".extern .shared .align 8 .b8 section_tile[];");
+
+#[inline(always)]
+unsafe fn section_tile_base() -> *mut u64 {
+    let generic: u64;
+    core::arch::asm!(
+        "cvta.shared.u64 {0}, section_tile;",
+        out(reg64) generic,
+        options(nostack)
+    );
+    generic as *mut u64
+}
+
+/// The launch's own linearization, `blockIdx.x * blockDim.x + threadIdx.x` folded with the Y grid
+/// by the `gridDim.x * blockDim.x` stride — the exact map `DeviceLaunchLaw.LaunchShape.linearIndex`
+/// is proved injective over, and the one `LaunchReceipt.x_stride` records.
+#[inline(always)]
+unsafe fn section_linear_index() -> u64 {
+    let block_x = nvptx::_block_idx_x() as u64;
+    let block_y = nvptx::_block_idx_y() as u64;
+    let thread_x = nvptx::_thread_idx_x() as u64;
+    let block_dim_x = nvptx::_block_dim_x() as u64;
+    let grid_dim_x = nvptx::_grid_dim_x() as u64;
+    (block_x * block_dim_x + thread_x) + block_y * (grid_dim_x * block_dim_x)
+}
+
+/// **The gather arm.** One thread per declared slot: `local[s] = source[index[s]]`.
+///
+/// `index` is the generated gather table, which is the incidence's own ordered address list. Every
+/// bound the launch law already proved is re-guarded here, because a kernel that trusts its
+/// parameter block has no defence against a launch that did not cross the law.
+#[no_mangle]
+pub unsafe extern "ptx-kernel" fn section_gather(
+    source: *const u64,
+    source_len: usize,
+    index: *const u32,
+    index_len: usize,
+    local: *mut u64,
+    local_len: usize,
+    slots: u64,
+) {
+    let linear = section_linear_index();
+    if linear >= slots {
+        return;
+    }
+    let slot = linear as usize;
+    if slot >= index_len || slot >= local_len {
+        return;
+    }
+    let address = *index.add(slot) as usize;
+    if address >= source_len {
+        return;
+    }
+    *local.add(slot) = section_cuda::canonical(*source.add(address));
+}
+
+/// **The local-application arm.** One block per declared region.
+///
+/// The block cooperatively stages its region's tile `local[lo..hi)` into the dynamic shared
+/// surface, barriers once, and then each thread computes its own output slots as
+/// `y_j = Σ_k L[j][k] · x_k` in `Z/(2^61 - 1)`, reading `x` from the shared copy. Because every
+/// read is from the shared copy, the results may be written straight back into `local` with no
+/// second barrier: the operator is `L_r` and the tile is `P_r x`, so this is `L_r P_r x`.
+///
+/// `coeff` is the declared local operator, a dense `tile_width × tile_width` table shared by every
+/// region — the "shared local material application" of the hand-written section kernels, expressed
+/// once. Region `r` uses the leading `w_r × w_r` block of it.
+#[no_mangle]
+pub unsafe extern "ptx-kernel" fn section_apply(
+    local: *mut u64,
+    local_len: usize,
+    offsets: *const u32,
+    offsets_len: usize,
+    coeff: *const u64,
+    coeff_len: usize,
+    regions: u64,
+    tile_width: u64,
+) {
+    let block_x = nvptx::_block_idx_x() as u64;
+    let block_y = nvptx::_block_idx_y() as u64;
+    let grid_dim_x = nvptx::_grid_dim_x() as u64;
+    let region = block_x + block_y * grid_dim_x;
+    if region >= regions {
+        return;
+    }
+    let at = region as usize;
+    if at + 1 >= offsets_len {
+        return;
+    }
+    let lo = *offsets.add(at) as usize;
+    let hi = *offsets.add(at + 1) as usize;
+    if hi < lo || hi > local_len {
+        return;
+    }
+    let width = tile_width as usize;
+    let span = hi - lo;
+    if span > width {
+        return;
+    }
+    let tile = section_tile_base();
+    let threads = nvptx::_block_dim_x() as usize;
+    let lane = nvptx::_thread_idx_x() as usize;
+    if threads == 0 {
+        return;
+    }
+
+    let mut j = lane;
+    while j < span {
+        *tile.add(j) = *local.add(lo + j);
+        j += threads;
+    }
+    nvptx::_syncthreads();
+
+    let mut j = lane;
+    while j < span {
+        let row = j * width;
+        let mut acc: u64 = 0;
+        let mut k = 0usize;
+        while k < span {
+            let entry = row + k;
+            if entry < coeff_len {
+                acc = section_cuda::add(acc, section_cuda::mul(*coeff.add(entry), *tile.add(k)));
+            }
+            k += 1;
+        }
+        *local.add(lo + j) = acc;
+        j += threads;
+    }
+}
+
+/// **The scatter arm under an injective incidence.** One thread per slot, plain store.
+///
+/// Admitted only when the generated scatter receipt is `ScatterReceipt::Injective`, i.e. no global
+/// address is named by two slots. The writes are then disjoint and the final state is
+/// order-independent (`DeviceLaunchLaw.DisjointPartition.scatter_perm`).
+#[no_mangle]
+pub unsafe extern "ptx-kernel" fn section_scatter_store(
+    local: *const u64,
+    local_len: usize,
+    index: *const u32,
+    index_len: usize,
+    target: *mut u64,
+    target_len: usize,
+    slots: u64,
+) {
+    let linear = section_linear_index();
+    if linear >= slots {
+        return;
+    }
+    let slot = linear as usize;
+    if slot >= local_len || slot >= index_len {
+        return;
+    }
+    let address = *index.add(slot) as usize;
+    if address >= target_len {
+        return;
+    }
+    *target.add(address) = *local.add(slot);
+}
+
+/// **The scatter arm under a declared exact accumulation, launched one colour class at a time.**
+///
+/// One thread per region *of this colour*: the thread walks its own region's slots in order and
+/// accumulates each into the global field. Within a colour no two distinct regions reach a common
+/// address, so each address has exactly one writing thread and this plain read-modify-write is not
+/// a race; a region that names one address twice folds both of its own slots in program order.
+/// Successive colours are successive stream-ordered launches, and their composition is the
+/// sequential scatter (`SectionLayout.Incidence.colour_schedule`).
+#[no_mangle]
+pub unsafe extern "ptx-kernel" fn section_scatter_add(
+    local: *const u64,
+    local_len: usize,
+    index: *const u32,
+    index_len: usize,
+    offsets: *const u32,
+    offsets_len: usize,
+    colour_regions: *const u32,
+    colour_regions_len: usize,
+    target: *mut u64,
+    target_len: usize,
+    count: u64,
+) {
+    let linear = section_linear_index();
+    if linear >= count {
+        return;
+    }
+    let at = linear as usize;
+    if at >= colour_regions_len {
+        return;
+    }
+    let region = *colour_regions.add(at) as usize;
+    if region + 1 >= offsets_len {
+        return;
+    }
+    let lo = *offsets.add(region) as usize;
+    let hi = *offsets.add(region + 1) as usize;
+    if hi < lo || hi > local_len || hi > index_len {
+        return;
+    }
+    let mut slot = lo;
+    while slot < hi {
+        let address = *index.add(slot) as usize;
+        if address < target_len {
+            *target.add(address) =
+                section_cuda::add(*target.add(address), *local.add(slot));
+        }
+        slot += 1;
+    }
 }

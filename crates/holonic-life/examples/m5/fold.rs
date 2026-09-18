@@ -483,7 +483,7 @@ impl ContactWire {
             .iter()
             .map(|residue| {
                 let index = as_u32(self.lower_xyz.len() / 3)?;
-                let (lower, upper) = residue.ca.wire(places)?;
+                let (lower, upper) = residue.wire(places)?;
                 self.lower_xyz.extend(lower);
                 self.upper_xyz.extend(upper);
                 Ok(index)
@@ -532,9 +532,8 @@ fn designed_contact_face(
             let at = left_at * right.residues.len() + right_at;
             let exact = aperture.classify(
                 &left_residue
-                    .ca
                     .box3_at_places(resident_decimal_places)?
-                    .squared_distance(&right_residue.ca.box3_at_places(resident_decimal_places)?),
+                    .squared_distance(&right_residue.box3_at_places(resident_decimal_places)?),
             );
             if classes[at] != exact {
                 return Err(format!(
@@ -590,7 +589,7 @@ fn derive_resident_places(
             .flat_map(|presentation| &presentation.components)
             .flat_map(|component| &component.residues)
         {
-            let Ok((lower, upper)) = residue.ca.wire(places) else {
+            let Ok((lower, upper)) = residue.wire(places) else {
                 valid = false;
                 break;
             };

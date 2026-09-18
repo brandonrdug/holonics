@@ -1,27 +1,23 @@
-//! Exact NumPy faces for the admitted Protenix PAE occurrence.
+//! The admitted Protenix PAE occurrence, read **through the library intake**.
+//!
+//! [definition] Every `.npy` header, every stored codeword and every directional reading in this
+//! deed is `holonic_engine::physical_intake::numpy`'s. This file used to carry its own copy of
+//! `NpyArray::{elements, binary16, i32_le, unicode}` — including the same unguarded
+//! `shape.iter().product()` the library has since had to repair — and the copy is gone. What
+//! remains is the M5 receipt: which members were extracted, with what digest, and the declared
+//! environment the atlas binds against.
 
 use std::collections::BTreeMap;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
-use holonic_engine::exact_value::ieee754::{decode_binary16_bits, FloatReading};
-use holonic_engine::exact_value::ExactInterval;
 use holonic_engine::physical_constraint_complex::PairUncertainty;
+use holonic_engine::physical_intake::numpy::{NumpySource, UncertaintyWordFormat};
+use holonic_engine::physical_intake::{
+    AddressedUncertainty, ENVIRONMENT_ARRAYS, EnvironmentIndex, UncertaintyArray,
+};
 use serde::Serialize;
 
 use super::input::digest_path;
-
-const REQUIRED: &[&str] = &[
-    "pae.npy",
-    "token_chain_ids.npy",
-    "token_res_ids.npy",
-    "design_uuid.npy",
-    "design_name.npy",
-    "target.npy",
-    "cofolding_model.npy",
-    "stoichiometry.npy",
-    "target_form.npy",
-    "seed.npy",
-];
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct NpyMember {
@@ -52,14 +48,13 @@ pub struct PaeAtlas {
     pub token_population: usize,
     pub uncertainty_law: String,
     #[serde(skip)]
-    words: Vec<u16>,
-    #[serde(skip)]
-    token_chain_ids: Vec<String>,
-    #[serde(skip)]
-    token_res_ids: Vec<i32>,
+    occurrence: AddressedUncertainty,
 }
 
 impl PaeAtlas {
+    /// The directional uncertainty of every pair of one declared cross population, straight from
+    /// `AddressedUncertainty::pair_uncertainty`: the token addressing, the distinct-address check
+    /// and the exact decoding of both directions are the library's.
     pub fn pair_uncertainty(
         &self,
         left_chain: &str,
@@ -67,56 +62,9 @@ impl PaeAtlas {
         right_chain: &str,
         right_residues: &[i32],
     ) -> Result<BTreeMap<(u32, u32), PairUncertainty>, String> {
-        let mut token = BTreeMap::<(String, i32), usize>::new();
-        for (at, (chain, residue)) in self
-            .token_chain_ids
-            .iter()
-            .zip(&self.token_res_ids)
-            .enumerate()
-        {
-            if token.insert((chain.clone(), *residue), at).is_some() {
-                return Err(format!(
-                    "PAE token address {chain}:{residue} occurs more than once"
-                ));
-            }
-        }
-        let width = self.matrix_shape[1];
-        let mut result = BTreeMap::new();
-        for (left_at, left_residue) in left_residues.iter().enumerate() {
-            let left_token = *token
-                .get(&(left_chain.to_owned(), *left_residue))
-                .ok_or_else(|| format!("PAE has no token {left_chain}:{left_residue}"))?;
-            for (right_at, right_residue) in right_residues.iter().enumerate() {
-                let right_token = *token
-                    .get(&(right_chain.to_owned(), *right_residue))
-                    .ok_or_else(|| format!("PAE has no token {right_chain}:{right_residue}"))?;
-                let row_word = self.words[left_token * width + right_token];
-                let column_word = self.words[right_token * width + left_token];
-                let row = decode_binary16_bits(row_word).map_err(|error| error.to_string())?;
-                let column =
-                    decode_binary16_bits(column_word).map_err(|error| error.to_string())?;
-                result.insert(
-                    (left_at as u32 + 1, right_at as u32 + 1),
-                    PairUncertainty {
-                        source_lineage: format!(
-                            "{} / directional PAE {left_chain}:{left_residue}<->{right_chain}:{right_residue}",
-                            self.source_npz_release_path
-                        ),
-                        row_given_column_bits: row_word,
-                        column_given_row_bits: column_word,
-                        row_given_column: ExactInterval::point(
-                            row.enclosure(FloatReading::ExactBitPattern).lower,
-                        ),
-                        column_given_row: ExactInterval::point(
-                            column.enclosure(FloatReading::ExactBitPattern).lower,
-                        ),
-                        row_given_column_ulp: row.unit_in_last_place(),
-                        column_given_row_ulp: column.unit_in_last_place(),
-                    },
-                );
-            }
-        }
-        Ok(result)
+        self.occurrence
+            .pair_uncertainty(left_chain, left_residues, right_chain, right_residues)
+            .map_err(|error| error.to_string())
     }
 }
 
@@ -125,223 +73,61 @@ pub fn read(
     source_npz_release_path: &str,
     source_npz_sha256: &str,
 ) -> Result<PaeAtlas, String> {
-    let mut arrays = BTreeMap::<String, NpyArray>::new();
+    let source = NumpySource::read_directory(directory).map_err(|error| error.to_string())?;
     let mut extracted_members = Vec::new();
-    for name in REQUIRED {
+    for name in ENVIRONMENT_ARRAYS {
+        let member = source.member(name).map_err(|error| error.to_string())?;
         let path = directory.join(name);
-        let array = NpyArray::read(&path)?;
         extracted_members.push(NpyMember {
-            name: (*name).to_owned(),
+            name: name.to_owned(),
             local_path: path.display().to_string(),
             sha256: digest_path(&path)?,
-            descr: array.descr.clone(),
-            shape: array.shape.clone(),
+            descr: member.descr.clone(),
+            shape: member.shape.clone(),
             octets: std::fs::metadata(&path)
                 .map_err(|error| error.to_string())?
                 .len(),
         });
-        arrays.insert((*name).to_owned(), array);
     }
-    let words = arrays["pae.npy"].binary16()?;
-    let shape = &arrays["pae.npy"].shape;
-    if shape.len() != 2 || shape[0] != shape[1] {
-        return Err(format!("PAE shape {shape:?} is not a square matrix"));
-    }
-    let token_chain_ids = arrays["token_chain_ids.npy"].unicode()?;
-    let token_res_ids = arrays["token_res_ids.npy"].i32_le()?;
-    if token_chain_ids.len() != shape[0] || token_res_ids.len() != shape[0] {
+
+    let environment =
+        EnvironmentIndex::from_numpy_source(&source).map_err(|error| error.to_string())?;
+    let array = UncertaintyArray::from_numpy_source(&source).map_err(|error| error.to_string())?;
+    // The M5 release stores `<f2`; the library admits `<f4` and `<f8` as well, so the deed states
+    // the wire it was measured on rather than inheriting whatever the source happens to carry.
+    if array.format != UncertaintyWordFormat::Binary16 {
         return Err(format!(
-            "PAE extent {} disagrees with chain {} / residue {} token faces",
-            shape[0],
-            token_chain_ids.len(),
-            token_res_ids.len()
+            "the admitted M5 PAE wire is <f2; {} carries {}",
+            directory.display(),
+            array.format.descr()
         ));
     }
-    let mut finite_binary16_words = 0usize;
-    let mut refused_nonfinite_words = 0usize;
-    for word in &words {
-        if decode_binary16_bits(*word).is_ok() {
-            finite_binary16_words += 1;
-        } else {
-            refused_nonfinite_words += 1;
-        }
-    }
-    if refused_nonfinite_words != 0 {
-        return Err(format!(
-            "PAE carries {refused_nonfinite_words} non-finite binary16 words"
-        ));
-    }
-    let scalar = |name: &str| -> Result<String, String> {
-        let values = arrays[name].unicode()?;
-        match values.as_slice() {
-            [value] => Ok(value.clone()),
-            _ => Err(format!("{name} is not one scalar string")),
-        }
-    };
-    let matrix_shape = [shape[0], shape[1]];
+    let extent = array.extent;
+    // Every word decoded to a finite exact dyadic, because `UncertaintyArray::found` refuses the
+    // first word that does not and this read succeeded. The refused count is therefore zero by
+    // construction rather than by a second scan.
+    let finite_binary16_words = array.finite_words;
+    let occurrence =
+        AddressedUncertainty::found(environment, array).map_err(|error| error.to_string())?;
+    let ecology = &occurrence.environment().ecology;
+    let lineage = &occurrence.environment().lineage;
     Ok(PaeAtlas {
         schema: "holonics.m5.exact-binary16-pae-atlas.v1".to_owned(),
         source_npz_release_path: source_npz_release_path.to_owned(),
         source_npz_sha256: source_npz_sha256.to_owned(),
         extracted_members,
-        design_uuid: scalar("design_uuid.npy")?,
-        design_name: scalar("design_name.npy")?,
-        target: scalar("target.npy")?,
-        cofolding_model: scalar("cofolding_model.npy")?,
-        stoichiometry: scalar("stoichiometry.npy")?,
-        target_form: scalar("target_form.npy")?,
-        seed: scalar("seed.npy")?,
-        matrix_shape,
+        design_uuid: lineage.design_uuid.clone(),
+        design_name: lineage.design_name.clone(),
+        target: ecology.target.clone(),
+        cofolding_model: ecology.cofolding_model.clone(),
+        stoichiometry: ecology.stoichiometry.clone(),
+        target_form: ecology.target_form.clone(),
+        seed: lineage.seed.clone(),
+        matrix_shape: [extent, extent],
         finite_binary16_words,
-        refused_nonfinite_words,
-        token_population: token_chain_ids.len(),
-        uncertainty_law: "every <f2 word is decoded as its exact IEEE binary16 dyadic; the directional PAE value is retained as a point and its format ulp is carried separately; PAE is predictor testimony, not a coordinate enclosure or physical measurement".to_owned(),
-        words,
-        token_chain_ids,
-        token_res_ids,
+        refused_nonfinite_words: 0,
+        token_population: occurrence.environment().tokens.len(),
+        uncertainty_law: occurrence.array().reading_law.clone(),
+        occurrence,
     })
-}
-
-struct NpyArray {
-    path: PathBuf,
-    descr: String,
-    shape: Vec<usize>,
-    data: Vec<u8>,
-}
-
-impl NpyArray {
-    fn read(path: &Path) -> Result<Self, String> {
-        let bytes = std::fs::read(path).map_err(|error| error.to_string())?;
-        if bytes.len() < 10 || &bytes[..6] != b"\x93NUMPY" {
-            return Err(format!("{} is not an NPY occurrence", path.display()));
-        }
-        let major = bytes[6];
-        let header_octets = match major {
-            1 => u16::from_le_bytes([bytes[8], bytes[9]]) as usize,
-            2 | 3 => {
-                if bytes.len() < 12 {
-                    return Err(format!("{} has a truncated NPY header", path.display()));
-                }
-                u32::from_le_bytes([bytes[8], bytes[9], bytes[10], bytes[11]]) as usize
-            }
-            _ => {
-                return Err(format!(
-                    "{} uses unsupported NPY major {major}",
-                    path.display()
-                ))
-            }
-        };
-        let header_start = if major == 1 { 10 } else { 12 };
-        let data_start = header_start + header_octets;
-        if data_start > bytes.len() {
-            return Err(format!("{} NPY header leaves the file", path.display()));
-        }
-        let header = std::str::from_utf8(&bytes[header_start..data_start])
-            .map_err(|error| error.to_string())?;
-        if !header.contains("'fortran_order': False") {
-            return Err(format!("{} is not row-major NPY material", path.display()));
-        }
-        let descr = between(header, "'descr': '", "'")?.to_owned();
-        let shape_text = between(header, "'shape': (", ")")?;
-        let shape = shape_text
-            .split(',')
-            .map(str::trim)
-            .filter(|field| !field.is_empty())
-            .map(|field| field.parse::<usize>().map_err(|error| error.to_string()))
-            .collect::<Result<Vec<_>, _>>()?;
-        Ok(Self {
-            path: path.to_owned(),
-            descr,
-            shape,
-            data: bytes[data_start..].to_vec(),
-        })
-    }
-
-    fn elements(&self) -> usize {
-        if self.shape.is_empty() {
-            1
-        } else {
-            self.shape.iter().product()
-        }
-    }
-
-    fn binary16(&self) -> Result<Vec<u16>, String> {
-        if self.descr != "<f2" || self.data.len() != self.elements() * 2 {
-            return Err(format!(
-                "{} is {:?}, not a complete <f2 array",
-                self.path.display(),
-                self.descr
-            ));
-        }
-        Ok(self
-            .data
-            .chunks_exact(2)
-            .map(|word| u16::from_le_bytes([word[0], word[1]]))
-            .collect())
-    }
-
-    fn i32_le(&self) -> Result<Vec<i32>, String> {
-        if self.descr != "<i4" || self.data.len() != self.elements() * 4 {
-            return Err(format!(
-                "{} is {:?}, not a complete <i4 array",
-                self.path.display(),
-                self.descr
-            ));
-        }
-        Ok(self
-            .data
-            .chunks_exact(4)
-            .map(|word| i32::from_le_bytes([word[0], word[1], word[2], word[3]]))
-            .collect())
-    }
-
-    fn unicode(&self) -> Result<Vec<String>, String> {
-        let width = self
-            .descr
-            .strip_prefix("<U")
-            .ok_or_else(|| {
-                format!(
-                    "{} is not a little-endian Unicode array",
-                    self.path.display()
-                )
-            })?
-            .parse::<usize>()
-            .map_err(|error| error.to_string())?;
-        let bytes_per = width * 4;
-        if self.data.len() != self.elements() * bytes_per {
-            return Err(format!(
-                "{} has a truncated Unicode payload",
-                self.path.display()
-            ));
-        }
-        self.data
-            .chunks_exact(bytes_per)
-            .map(|item| {
-                item.chunks_exact(4)
-                    .map(|word| u32::from_le_bytes([word[0], word[1], word[2], word[3]]))
-                    .take_while(|code| *code != 0)
-                    .map(|code| {
-                        char::from_u32(code).ok_or_else(|| {
-                            format!(
-                                "{} contains invalid Unicode scalar {code}",
-                                self.path.display()
-                            )
-                        })
-                    })
-                    .collect()
-            })
-            .collect()
-    }
-}
-
-fn between<'a>(text: &'a str, prefix: &str, suffix: &str) -> Result<&'a str, String> {
-    let start = text
-        .find(prefix)
-        .ok_or_else(|| format!("NPY header lacks {prefix}"))?
-        + prefix.len();
-    let end = text[start..]
-        .find(suffix)
-        .ok_or_else(|| format!("NPY header lacks closing {suffix}"))?
-        + start;
-    Ok(&text[start..end])
 }

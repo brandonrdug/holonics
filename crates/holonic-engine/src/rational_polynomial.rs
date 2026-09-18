@@ -83,7 +83,10 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::exact_value::{AlgebraicRoot, ExactInterval, IntegerPolynomial};
+use crate::exact_value::{
+    AlgebraicRoot, ExactInterval, ExactValueError, IntegerPolynomial, SturmChain,
+    check_declared_sturm_work,
+};
 use crate::exact_work::ExactWork;
 
 mod root_separation;
@@ -93,9 +96,37 @@ pub use root_separation::{RootSeparation, RootSeparationBound};
 ///
 /// Coefficients ascend in degree. The empty vector is the zero polynomial; a nonzero polynomial
 /// never carries a zero leading coefficient, so `degree` is unambiguous.
+///
+/// **The wire enforces that normal form.** The derived `Deserialize` skipped
+/// [`RationalPolynomial::new`]'s trim, so a remounted instance carrying a trailing zero reported a
+/// degree one too high — and `degree()` is what every division, gcd, resultant and census reads
+/// first. A wire whose leading coefficient is zero is refused as
+/// [`ExactPolynomialError::UntrimmedPolynomialWire`] rather than silently re-normalized into a
+/// different polynomial than the one it named. `Default` is the zero polynomial, which is the
+/// normal form of zero, so it is not a bypass.
 #[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(try_from = "RationalPolynomialWire")]
 pub struct RationalPolynomial {
     coefficients: Vec<Rat>,
+}
+
+#[derive(Deserialize)]
+struct RationalPolynomialWire {
+    coefficients: Vec<Rat>,
+}
+
+impl TryFrom<RationalPolynomialWire> for RationalPolynomial {
+    type Error = ExactPolynomialError;
+
+    fn try_from(wire: RationalPolynomialWire) -> Result<Self, Self::Error> {
+        if wire.coefficients.last().is_some_and(Zero::is_zero) {
+            return Err(ExactPolynomialError::UntrimmedPolynomialWire {
+                declared: wire.coefficients.len(),
+            });
+        }
+        let polynomial = Self::new(wire.coefficients);
+        Ok(polynomial)
+    }
 }
 
 impl RationalPolynomial {
@@ -298,7 +329,6 @@ impl RationalPolynomial {
     /// Euclidean division over the field `Q`.
     pub fn divided_by(&self, divisor: &Self) -> Result<(Self, Self), ExactPolynomialError> {
         self.divided_by_impl(divisor, None)
-            .map(|(quotient, remainder)| (quotient, remainder))
     }
 
     pub fn divided_by_with_work(
@@ -387,6 +417,16 @@ impl RationalPolynomial {
 
     /// The squarefree part `p / gcd(p, p')`, which has the same distinct roots with multiplicity
     /// one.
+    ///
+    /// [proved-derived; formal-checked] The Lean owner is
+    /// `Foundation/RootCount.lean::theSquarefreePartSharesItsRoots`, and **it is conditional**: it
+    /// takes `p = gcd(p, p') * q` as a hypothesis and proves from it that `q` has exactly the roots
+    /// of `p`. It does not prove that any particular `q` is that quotient. What discharges the
+    /// hypothesis is the line below — [`RationalPolynomial::divided_exactly_by`] returns
+    /// [`ExactPolynomialError::NonExactPolynomialDivision`] unless the remainder is exactly zero —
+    /// so the factorization the theorem assumes is *checked here, at every use*, by the library and
+    /// not only by a test. [`RationalPolynomial::made_monic`] then scales by a nonzero constant,
+    /// which is a unit and moves no root, so the conclusion transfers to what this returns.
     pub fn squarefree_part(&self) -> Result<Self, ExactPolynomialError> {
         if self.is_zero() {
             return Err(ExactPolynomialError::ZeroPolynomial);
@@ -505,6 +545,44 @@ impl RationalPolynomial {
         if integers.last().is_some_and(Signed::is_negative) {
             for value in &mut integers {
                 *value = -value.clone();
+            }
+        }
+        IntegerPolynomial::new(integers).map_err(|_| ExactPolynomialError::ZeroPolynomial)
+    }
+
+    /// The primitive integer form **with the polynomial's own sign kept**.
+    ///
+    /// [definition] [`RationalPolynomial::primitive_integer_form`] normalizes the leading
+    /// coefficient positive, which is gauge for a question about *one* polynomial — a Sturm chain
+    /// of `−f` reads exactly what the chain of `f` reads, by
+    /// `Foundation/RootCount.lean`'s `theReadingIsInvariantUnderCommonNonzeroRescaling`. It is
+    /// **not** gauge for a question about a *pair*: the Cauchy index `I(q/p)` changes sign when one
+    /// of the two is flipped and the other is not. Anything reading a numerator against a
+    /// denominator takes this form instead.
+    pub fn signed_primitive_integer_form(&self) -> Result<IntegerPolynomial, ExactPolynomialError> {
+        if self.is_zero() {
+            return Err(ExactPolynomialError::ZeroPolynomial);
+        }
+        let mut common_denominator = BigInt::one();
+        for coefficient in &self.coefficients {
+            let denominator = coefficient.denom().clone();
+            let divisor = integer_gcd(&common_denominator, &denominator);
+            common_denominator = common_denominator / divisor * denominator;
+        }
+        let mut integers = self
+            .coefficients
+            .iter()
+            .map(|coefficient| coefficient.numer() * (&common_denominator / coefficient.denom()))
+            .collect::<Vec<_>>();
+        let content = integers
+            .iter()
+            .filter(|value| !value.is_zero())
+            .map(|value| value.abs())
+            .reduce(|left, right| integer_gcd(&left, &right))
+            .unwrap_or_else(BigInt::one);
+        if !content.is_zero() {
+            for value in &mut integers {
+                *value /= &content;
             }
         }
         IntegerPolynomial::new(integers).map_err(|_| ExactPolynomialError::ZeroPolynomial)
@@ -714,6 +792,499 @@ pub fn nonzero_root_lower_bound(polynomial: &IntegerPolynomial) -> Option<Rat> {
     Some(Rat::new(anchor.clone(), anchor + largest))
 }
 
+// -------------------------------------------------------------------------------------------------
+// where the roots are: a bound that carries its own certificate
+// -------------------------------------------------------------------------------------------------
+
+/// **The declared ceiling on the doublings a certified root bound may take.**
+///
+/// [definition] The doubling terminates as mathematics: above `max Re(root)` the shifted polynomial
+/// is coefficientwise nonnegative, because a real polynomial all of whose roots have negative real
+/// part factors into linear and quadratic factors with positive coefficients. So this is a
+/// hostile-input guard on a caller-declared coefficient size, not an approximation budget, and a
+/// polynomial that exhausts it returns [`ExactPolynomialError::RootBoundDoublingExhausted`].
+pub const ROOT_BOUND_DOUBLING_CEILING: u32 = 4096;
+
+/// **The declared ceiling on the half-integer descent's recursion depth.**
+///
+/// [definition] The census's first descent halves its interval to unit width, so its depth is
+/// `log2` of the enclosure's width — a number the caller's coefficients decide. It is a *recursive*
+/// descent, so the load it puts on the machine stack is a load no `Result` can carry, and a
+/// polynomial whose enclosure is wider than `2^4096` is refused by name instead. The certified
+/// enclosure makes this ceiling far less reachable than the absolute Cauchy bound did.
+pub const HALF_INTEGER_DESCENT_CEILING: u32 = 4096;
+
+/// `f(x + shift)`, exactly, by repeated synthetic division.
+///
+/// The returned coefficient `i` is `f^(i)(shift) / i!`, ascending as everywhere else here. The cost
+/// is `O(deg^2)` integer additions and multiplications, which is negligible beside one Sturm count.
+pub fn taylor_shifted(coefficients: &[BigInt], shift: &BigInt) -> Vec<BigInt> {
+    let mut shifted = coefficients.to_vec();
+    let length = shifted.len();
+    if length < 2 {
+        return shifted;
+    }
+    for start in 0..length - 1 {
+        for index in (start..length - 1).rev() {
+            let carried = &shifted[index + 1] * shift;
+            shifted[index] += carried;
+        }
+    }
+    shifted
+}
+
+/// **The certificate that `bound` exceeds every real root of `f`.**
+///
+/// If every coefficient of `f(x + bound)` is nonnegative and its constant coefficient `f(bound)` is
+/// strictly positive, then `f(y) >= f(bound) > 0` for every `y >= bound`, so `f` has no real root
+/// at or above `bound`. That is a **proof about this polynomial**, computed in `O(deg^2)` integer
+/// operations, not a bound quoted from a theorem whose constant has to be trusted.
+fn exceeds_every_real_root(coefficients: &[BigInt], bound: &BigInt) -> bool {
+    let shifted = taylor_shifted(coefficients, bound);
+    shifted.first().is_some_and(Signed::is_positive)
+        && shifted.iter().all(|value| !value.is_negative())
+}
+
+/// The least integer `m >= 1` with `m^power * anchor >= magnitude`, by bracketing and bisection.
+fn least_integer_root(magnitude: &BigInt, anchor: &BigInt, power: u32) -> BigInt {
+    let reached = |candidate: &BigInt| -> bool { candidate.pow(power) * anchor >= *magnitude };
+    let mut high = BigInt::one();
+    if reached(&high) {
+        return high;
+    }
+    while !reached(&high) {
+        high *= 2;
+    }
+    let mut low = BigInt::one();
+    while &low + 1 < high {
+        let middle = (&low + &high) / 2;
+        if reached(&middle) {
+            high = middle;
+        } else {
+            low = middle;
+        }
+    }
+    high
+}
+
+/// The starting guess for an upper bound on the positive roots of a polynomial with **positive**
+/// leading coefficient: `2 * max_k (|a_{n-k}| / a_n)^(1/k)` over the `k` at which `a_{n-k} < 0`
+/// (Kioustelidis; the one-sided form of Fujiwara's bound, and the bound the continued-fraction
+/// isolation algorithms use). Only the negative coefficients enter, which is exactly what makes it
+/// **one-sided** and therefore tight for an operator whose spectrum lies on one side of zero.
+///
+/// This is a *guess*: [`certified_upper_bound`] verifies it and doubles until the certificate
+/// holds, so nothing downstream depends on the constant `2` being the sharpest one.
+fn kioustelidis_guess(coefficients: &[BigInt]) -> BigInt {
+    let Some(degree) = coefficients.len().checked_sub(1) else {
+        return BigInt::one();
+    };
+    let leading = coefficients[degree].abs();
+    let mut largest = BigInt::zero();
+    for step in 1..=degree {
+        let coefficient = &coefficients[degree - step];
+        if !coefficient.is_negative() {
+            continue;
+        }
+        let Ok(power) = u32::try_from(step) else {
+            continue;
+        };
+        let candidate = least_integer_root(&coefficient.abs(), &leading, power);
+        if candidate > largest {
+            largest = candidate;
+        }
+    }
+    if largest.is_zero() {
+        // No negative coefficient: `f(y) >= a_0 > 0` already holds past the origin.
+        BigInt::one()
+    } else {
+        BigInt::from(2) * largest
+    }
+}
+
+/// The absolute Cauchy bound `max_{i<n} |a_i| / |a_n| + 1`, rounded up to an integer.
+///
+/// Every root satisfies `|x| < ` this, so it is both the bound the certified enclosure replaces and
+/// the **backstop** it never does worse than: a root's real part is at most its modulus, so the
+/// Taylor-shift certificate is guaranteed to hold here.
+fn absolute_cauchy_bound(coefficients: &[BigInt]) -> BigInt {
+    let Some(degree) = coefficients.len().checked_sub(1) else {
+        return BigInt::one();
+    };
+    let widest = coefficients[..degree]
+        .iter()
+        .map(Signed::abs)
+        .max()
+        .unwrap_or_else(BigInt::zero);
+    let leading = coefficients[degree].abs();
+    if leading.is_zero() {
+        return BigInt::one();
+    }
+    (&widest + &leading - BigInt::one()) / &leading + BigInt::one()
+}
+
+/// An upper bound on the real roots, **verified by [`exceeds_every_real_root`]** and doubled until
+/// it verifies. `coefficients` must have a positive leading coefficient.
+///
+/// The search starts at the smaller of the `k`-th root guess and the absolute Cauchy bound and is
+/// capped at the latter, so the returned bound is **never wider than the bound it replaced** even
+/// where the one-sided guess happens to be the looser of the two.
+fn certified_upper_bound(coefficients: &[BigInt]) -> Result<(BigInt, u32), ExactPolynomialError> {
+    let cauchy = absolute_cauchy_bound(coefficients);
+    let mut bound = kioustelidis_guess(coefficients)
+        .max(BigInt::one())
+        .min(cauchy.clone());
+    let mut doublings = 0_u32;
+    loop {
+        if exceeds_every_real_root(coefficients, &bound) {
+            return Ok((bound, doublings));
+        }
+        if bound >= cauchy || doublings >= ROOT_BOUND_DOUBLING_CEILING {
+            return Err(ExactPolynomialError::RootBoundDoublingExhausted {
+                ceiling: ROOT_BOUND_DOUBLING_CEILING,
+            });
+        }
+        bound = (bound * BigInt::from(2)).min(cauchy.clone());
+        doublings += 1;
+    }
+}
+
+/// `f(-x)` with the leading coefficient normalized positive: the reflection whose positive roots
+/// are the negatives of `f`'s negative roots.
+fn reflected_with_positive_leading(coefficients: &[BigInt]) -> Vec<BigInt> {
+    let mut reflected: Vec<BigInt> = coefficients
+        .iter()
+        .enumerate()
+        .map(|(degree, coefficient)| {
+            if degree % 2 == 0 {
+                coefficient.clone()
+            } else {
+                -coefficient
+            }
+        })
+        .collect();
+    if reflected.last().is_some_and(Signed::is_negative) {
+        for value in &mut reflected {
+            *value = -value.clone();
+        }
+    }
+    reflected
+}
+
+/// **Where the real roots are, with the proof attached and the two sides counted separately.**
+///
+/// [proved-derived; implemented-exact] `rational_root_census` used to descend from the *absolute*
+/// Cauchy bound `max |a_i| / |a_n| + 1` of the monic companion. That bound is a magnitude, and a
+/// magnitude is read off the widest coefficient: a degree-eight companion built from 103-bit matrix
+/// entries has a constant term near `8 x 103` bits by Hadamard, so the Cauchy bound is `2^770` wide
+/// while the eigenvalues themselves cannot pass `2^106`
+/// (`lattice_gauge.rs`, the rebase note). Descending from there is a thousand Sturm counts per root
+/// before the first one is separated, which is why both R1 and R3 routed around this owner.
+///
+/// This enclosure is different in three ways, each of which matters on a physical operator:
+///
+/// 1. **It is a `k`-th root bound, not a magnitude.** The guess is
+///    `2 max_k (|a_{n-k}| / a_n)^(1/k)`, so the same `2^770` constant term contributes
+///    `2 * (2^770)^(1/8) ~ 2^97` rather than `2^770`.
+/// 2. **The two sides are counted separately.** The positive bound reads only the *negative*
+///    coefficients and the negative bound reads the reflection's, so a positive semidefinite
+///    operator — whose companion has no sign change on one side — gets a bound of `1` there instead
+///    of a symmetric copy of the other side.
+/// 3. **It carries its own certificate.** Each side's bound `B` is returned only once
+///    `f(x + B)` has come out coefficientwise nonnegative with `f(B) > 0`, which *proves* there is
+///    no root at or above `B`. The bound is therefore not trusted from a quoted constant; the
+///    constant only decides where the verification starts.
+///
+/// `cauchy_bound` is retained beside them so a reader can see, on their own material, what was
+/// replaced.
+/// A remounted enclosure passes through [`RealRootEnclosure::assembled`]: the wire carries the same
+/// fields, and one whose interval does not agree with its own two bounds — or whose bounds are not
+/// positive, or which claims to be narrower than the Cauchy bound it reports — is refused at the
+/// boundary rather than reconstructed past the constructor. The *certificate* itself is a statement
+/// about a polynomial the enclosure does not carry, so a remounted enclosure is testimony about
+/// that polynomial; what is checkable without it is checked.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(try_from = "RealRootEnclosureWire")]
+pub struct RealRootEnclosure {
+    /// Every real root is strictly below this.
+    pub positive_bound: BigInt,
+    /// Every real root is strictly above `-negative_bound`.
+    pub negative_bound: BigInt,
+    /// `[-(negative_bound + 1/2), positive_bound + 1/2]`. **Half-integer endpoints**, so a monic
+    /// integer polynomial can never have a root on one and every Sturm count taken against it is
+    /// at a legal boundary.
+    pub interval: ExactInterval,
+    /// The absolute Cauchy bound this replaced, retained as the comparison.
+    pub cauchy_bound: BigInt,
+    /// How many doublings the certificate needed past the guess. Zero means the guess certified.
+    pub doublings: u32,
+    /// Set when a caller's declared enclosure was tighter on that side **and certified**.
+    pub declared_positive: bool,
+    pub declared_negative: bool,
+}
+
+#[derive(Deserialize)]
+struct RealRootEnclosureWire {
+    positive_bound: BigInt,
+    negative_bound: BigInt,
+    interval: ExactInterval,
+    cauchy_bound: BigInt,
+    doublings: u32,
+    declared_positive: bool,
+    declared_negative: bool,
+}
+
+impl TryFrom<RealRootEnclosureWire> for RealRootEnclosure {
+    type Error = ExactPolynomialError;
+
+    fn try_from(wire: RealRootEnclosureWire) -> Result<Self, Self::Error> {
+        Self::assembled(
+            wire.positive_bound,
+            wire.negative_bound,
+            wire.interval,
+            wire.cauchy_bound,
+            wire.doublings,
+            wire.declared_positive,
+            wire.declared_negative,
+        )
+    }
+}
+
+impl RealRootEnclosure {
+    /// The one way an enclosure comes into existence, including from a wire.
+    fn assembled(
+        positive_bound: BigInt,
+        negative_bound: BigInt,
+        interval: ExactInterval,
+        cauchy_bound: BigInt,
+        doublings: u32,
+        declared_positive: bool,
+        declared_negative: bool,
+    ) -> Result<Self, ExactPolynomialError> {
+        if !positive_bound.is_positive()
+            || !negative_bound.is_positive()
+            || !cauchy_bound.is_positive()
+        {
+            return Err(ExactPolynomialError::MalformedRootEnclosure);
+        }
+        if positive_bound > cauchy_bound || negative_bound > cauchy_bound {
+            return Err(ExactPolynomialError::MalformedRootEnclosure);
+        }
+        let half = Rat::new(BigInt::one(), BigInt::from(2));
+        if interval.upper != Rat::from_integer(positive_bound.clone()) + &half
+            || interval.lower != -Rat::from_integer(negative_bound.clone()) - &half
+        {
+            return Err(ExactPolynomialError::MalformedRootEnclosure);
+        }
+        Ok(Self {
+            positive_bound,
+            negative_bound,
+            interval,
+            cauchy_bound,
+            doublings,
+            declared_positive,
+            declared_negative,
+        })
+    }
+
+    /// The width of the Cauchy interval this replaced against the width of the certified
+    /// enclosure, as an exact ratio: `(2·cauchy + 1) / (positive + negative + 1)`, both intervals
+    /// being widened to half-integer endpoints. A readout, never a decision.
+    pub fn narrowing(&self) -> Rat {
+        let replaced = BigInt::from(2) * &self.cauchy_bound + BigInt::one();
+        let certified = &self.positive_bound + &self.negative_bound + BigInt::one();
+        Rat::new(replaced, certified)
+    }
+}
+
+/// **The certified real-root enclosure of an integer polynomial.**
+pub fn certified_real_root_enclosure(
+    polynomial: &IntegerPolynomial,
+) -> Result<RealRootEnclosure, ExactPolynomialError> {
+    certified_enclosure_within(polynomial, None)
+}
+
+/// The certified enclosure, optionally narrowed by a caller's declaration.
+///
+/// [definition] A caller's interval is a **declaration**, so it is verified rather than believed:
+/// the narrower of the two endpoints is taken on each side and put through
+/// [`exceeds_every_real_root`], and a declaration that does not certify is discarded in favour of
+/// this owner's own bound. A census can therefore never be made incomplete by a caller who
+/// declared an interval that does not actually enclose the roots.
+fn certified_enclosure_within(
+    polynomial: &IntegerPolynomial,
+    declared: Option<&ExactInterval>,
+) -> Result<RealRootEnclosure, ExactPolynomialError> {
+    polynomial.check_declared_size()?;
+    let degree = polynomial.degree();
+    if degree == 0 {
+        return Err(ExactPolynomialError::ConstantPolynomial);
+    }
+    let mut forward = polynomial.coefficients.clone();
+    if forward.last().is_some_and(Signed::is_negative) {
+        for value in &mut forward {
+            *value = -value.clone();
+        }
+    }
+    let backward = reflected_with_positive_leading(&forward);
+
+    let (mut positive_bound, forward_doublings) = certified_upper_bound(&forward)?;
+    let (mut negative_bound, backward_doublings) = certified_upper_bound(&backward)?;
+    let mut declared_positive = false;
+    let mut declared_negative = false;
+
+    if let Some(interval) = declared {
+        // The caller's upper endpoint, rounded outward to an integer; taken only if it is tighter
+        // and only if it certifies.
+        let candidate = interval.upper.ceil().to_integer().max(BigInt::one());
+        if candidate < positive_bound && exceeds_every_real_root(&forward, &candidate) {
+            positive_bound = candidate;
+            declared_positive = true;
+        }
+        let candidate = (-interval.lower.clone())
+            .ceil()
+            .to_integer()
+            .max(BigInt::one());
+        if candidate < negative_bound && exceeds_every_real_root(&backward, &candidate) {
+            negative_bound = candidate;
+            declared_negative = true;
+        }
+    }
+
+    let cauchy_bound = absolute_cauchy_bound(&polynomial.coefficients);
+
+    let half = Rat::new(BigInt::one(), BigInt::from(2));
+    let interval = ExactInterval::new(
+        -Rat::from_integer(negative_bound.clone()) - &half,
+        Rat::from_integer(positive_bound.clone()) + &half,
+    )
+    .map_err(|_| ExactPolynomialError::MalformedInterval)?;
+
+    RealRootEnclosure::assembled(
+        positive_bound,
+        negative_bound,
+        interval,
+        cauchy_bound,
+        forward_doublings.max(backward_doublings),
+        declared_positive,
+        declared_negative,
+    )
+}
+
+/// **The declared ceiling on an isolation's bisection depth at this owner.**
+///
+/// [definition] `depth_bound` is a caller's declaration and it sizes both the descent and the
+/// worklist, so the owner carries a ceiling of its own — the same discipline
+/// `hodge_receiver::ISOLATION_DEPTH_CEILING` already applies to its own entry point, moved to where
+/// the descent actually is. Each bisection halves an interval, so this narrows any enclosure by
+/// `2^-1024`.
+pub const ISOLATION_DEPTH_CEILING: u32 = 1024;
+
+/// **Isolate every real root of an integer polynomial inside a declared enclosure.**
+///
+/// [proved-derived; implemented-exact] One [`SturmChain`] is built and **every** count below is
+/// taken against it, which is the whole difference between this and a descent that rebuilt the
+/// sequence per count. The split point is the midpoint, moved toward the lower endpoint while the
+/// polynomial vanishes there; a polynomial of degree `d` has at most `d` roots and the candidates
+/// are distinct, so `d + 1` attempts cannot all be roots and the move terminates by pigeonhole
+/// rather than by a budget.
+///
+/// The descent is an **explicit worklist**, not recursion: the depth is a caller's declaration and
+/// a recursive descent would put a caller-sized load on the machine stack, which no `Result` can
+/// carry. The left half of each split is taken first, so the returned intervals are ascending, and
+/// the worklist never holds more than `depth_bound + 1` pending intervals.
+///
+/// Endpoints of the returned intervals are never roots, so each is a lawful Sturm certificate and
+/// can be handed to [`crate::exact_value::AlgebraicRoot::isolate`] unchanged.
+pub fn isolate_real_roots(
+    polynomial: &IntegerPolynomial,
+    enclosure: &ExactInterval,
+    depth_bound: u32,
+) -> Result<Vec<ExactInterval>, ExactPolynomialError> {
+    let chain = polynomial.sturm_chain()?;
+    isolate_against_chain(polynomial, &chain, enclosure, depth_bound).map(|(intervals, _)| intervals)
+}
+
+/// [`isolate_real_roots`] against a chain the caller already built, also returning the depth the
+/// descent actually reached.
+///
+/// **The chain must be the chain of this polynomial, and that is now verified.** Pairing `x² + 1`
+/// with the chain of `x` used to return `Ok` with an interval containing no root at all. A
+/// [`SturmChain`] carries its own source polynomial, so this entry is a thin wrapper over
+/// [`isolate_with_chain`], which takes the chain alone and cannot be mispaired.
+pub fn isolate_against_chain(
+    polynomial: &IntegerPolynomial,
+    chain: &SturmChain,
+    enclosure: &ExactInterval,
+    depth_bound: u32,
+) -> Result<(Vec<ExactInterval>, u32), ExactPolynomialError> {
+    if chain.polynomial() != polynomial || !chain.is_sturm_chain() {
+        return Err(ExactValueError::ChainPolynomialMismatch {
+            chain_degree: chain.polynomial().degree(),
+            declared_degree: polynomial.degree(),
+        }
+        .into());
+    }
+    isolate_with_chain(chain, enclosure, depth_bound)
+}
+
+/// **Isolate every real root of the chain's own polynomial inside a declared enclosure.**
+///
+/// The chain is the only argument that names a polynomial, so there is no pairing to get wrong.
+/// [`isolate_real_roots`] and [`isolate_against_chain`] both reduce to this.
+pub fn isolate_with_chain(
+    chain: &SturmChain,
+    enclosure: &ExactInterval,
+    depth_bound: u32,
+) -> Result<(Vec<ExactInterval>, u32), ExactPolynomialError> {
+    if !chain.is_sturm_chain() {
+        return Err(ExactValueError::ChainIsNotASturmChain.into());
+    }
+    let polynomial = chain.polynomial();
+    if depth_bound > ISOLATION_DEPTH_CEILING {
+        return Err(ExactPolynomialError::IsolationDepthBoundTooLarge {
+            bound: depth_bound,
+            ceiling: ISOLATION_DEPTH_CEILING,
+        });
+    }
+    let degree = polynomial.degree();
+    let two = Rat::from_integer(BigInt::from(2));
+    let mut isolated: Vec<ExactInterval> = Vec::new();
+    let mut reached = 0_u32;
+    // Last in, first out; the left half is pushed last so it is taken first and the isolating
+    // intervals leave in ascending order.
+    let mut pending: Vec<(Rat, Rat, u32)> =
+        vec![(enclosure.lower.clone(), enclosure.upper.clone(), 0)];
+    while let Some((low, high, depth)) = pending.pop() {
+        reached = reached.max(depth);
+        let interval = ExactInterval::new(low.clone(), high.clone())
+            .map_err(|_| ExactPolynomialError::MalformedInterval)?;
+        let count = chain.distinct_root_count(&interval)?;
+        if count == 0 {
+            continue;
+        }
+        if count == 1 {
+            isolated.push(interval);
+            continue;
+        }
+        if depth >= depth_bound {
+            return Err(ExactPolynomialError::IsolationDepthExceeded { bound: depth_bound });
+        }
+        let mut middle = (&low + &high) / &two;
+        let mut attempts = 0_usize;
+        while chain.vanishes_at(&middle) {
+            middle = (&low + &middle) / &two;
+            attempts += 1;
+            if attempts > degree + 1 {
+                return Err(ExactPolynomialError::NoInteriorNonRoot);
+            }
+        }
+        pending.push((middle.clone(), high, depth + 1));
+        pending.push((low, middle, depth + 1));
+    }
+    Ok((isolated, reached))
+}
+
 /// The interior points a bisection may split at, read off the degree.
 ///
 /// A polynomial of degree `d` has at most `d` roots, so `d + 1` distinct interior points contain at
@@ -821,7 +1392,18 @@ pub struct CensusedRealRoot {
 /// `rational_roots` is exhaustive, not a sample: see this module's head for why. The real-root
 /// half is separate on purpose — a real root that is not rational is exactly the obstruction a
 /// chart transition hits, and it is retained here with a certificate rather than discarded.
+///
+/// **A remounted census is re-derived where the data to re-derive it is here.** `source` alone
+/// determines `primitive`, `leading_coefficient` and `monic_companion`, so the wire rebuilds all
+/// three — behind [`MONIC_COMPANION_BIT_CEILING`], because that is precisely the blow-up the
+/// census's own entry gates — and refuses on disagreement. What cannot be rebuilt without
+/// redoing the descent is checked for agreement with itself: every rational root vanishes on
+/// `source`, every isolated root belongs to the companion, the two counts agree, the bounding
+/// interval is the enclosure's own, and the derived splitting depth is inside this owner's
+/// ceiling. Each carried [`CensusedRealRoot`] re-runs its own Sturm isolation through
+/// [`AlgebraicRoot`]'s wire before any of this.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(try_from = "RationalRootCensusWire")]
 pub struct RationalRootCensus {
     pub source: RationalPolynomial,
     pub primitive: IntegerPolynomial,
@@ -829,7 +1411,8 @@ pub struct RationalRootCensus {
     /// roots of `A`.
     pub monic_companion: IntegerPolynomial,
     pub leading_coefficient: BigInt,
-    /// Cauchy bound: every real root of the companion lies strictly inside.
+    /// The certified enclosure the descent ran over: every real root of the companion lies
+    /// strictly inside, and [`RationalRootCensus::enclosure`] carries the proof.
     pub bounding_interval: ExactInterval,
     pub distinct_real_roots: u32,
     pub roots: Vec<CensusedRealRoot>,
@@ -844,7 +1427,133 @@ pub struct RationalRootCensus {
     pub isolation_depth_bound: u64,
     /// The worst fraction either child of a split may retain, read off the split schedule.
     pub split_schedule_retained: Rat,
+    /// **Where the roots were looked for, and the certificate that they are all in there.** See
+    /// [`RealRootEnclosure`]: the bound is a `k`-th root bound, split positive from negative, and
+    /// each side is returned only once the Taylor shift proves there is no root past it.
+    pub enclosure: RealRootEnclosure,
     pub work: CensusWork,
+}
+
+#[derive(Deserialize)]
+struct RationalRootCensusWire {
+    source: RationalPolynomial,
+    primitive: IntegerPolynomial,
+    monic_companion: IntegerPolynomial,
+    leading_coefficient: BigInt,
+    bounding_interval: ExactInterval,
+    distinct_real_roots: u32,
+    roots: Vec<CensusedRealRoot>,
+    rational_roots: Vec<Rat>,
+    separation: RootSeparation,
+    isolation_depth_bound: u64,
+    split_schedule_retained: Rat,
+    enclosure: RealRootEnclosure,
+    work: CensusWork,
+}
+
+fn census_clause(clause: &'static str) -> ExactPolynomialError {
+    ExactPolynomialError::MalformedCensus { clause }
+}
+
+impl TryFrom<RationalRootCensusWire> for RationalRootCensus {
+    type Error = ExactPolynomialError;
+
+    fn try_from(wire: RationalRootCensusWire) -> Result<Self, Self::Error> {
+        // Re-derived, not believed.
+        let primitive = wire.source.primitive_integer_form()?;
+        if primitive != wire.primitive {
+            return Err(census_clause("the primitive integer form is not the source's"));
+        }
+        let leading = primitive
+            .coefficients
+            .last()
+            .cloned()
+            .ok_or(ExactPolynomialError::ZeroPolynomial)?;
+        if leading != wire.leading_coefficient {
+            return Err(census_clause(
+                "the leading coefficient is not the primitive form's",
+            ));
+        }
+        // The companion is the blow-up this owner gates, so the gate is taken before it is rebuilt.
+        check_companion_declared_size(&primitive, &leading)?;
+        if monic_companion_of(&primitive, &leading)? != wire.monic_companion {
+            return Err(census_clause(
+                "the monic companion is not the one the primitive form generates",
+            ));
+        }
+        if wire.bounding_interval != wire.enclosure.interval {
+            return Err(census_clause(
+                "the bounding interval is not the certified enclosure's own",
+            ));
+        }
+        if wire.distinct_real_roots as usize != wire.roots.len() {
+            return Err(census_clause(
+                "the distinct real root count does not match the isolated population",
+            ));
+        }
+        if wire.isolation_depth_bound > SEPARATION_SPLITTING_DEPTH_CEILING {
+            return Err(ExactPolynomialError::SeparationSplittingDepthTooLarge {
+                bound: wire.isolation_depth_bound,
+                ceiling: SEPARATION_SPLITTING_DEPTH_CEILING,
+            });
+        }
+        let leading_rational = Rat::from_integer(leading.clone());
+        let mut previous: Option<&ExactInterval> = None;
+        for root in &wire.roots {
+            if root.isolating.polynomial != wire.monic_companion {
+                return Err(census_clause(
+                    "an isolated root does not belong to the monic companion",
+                ));
+            }
+            if previous.is_some_and(|last| last.upper > root.isolating.isolating_interval.lower) {
+                return Err(census_clause(
+                    "the isolating intervals are not ascending and disjoint",
+                ));
+            }
+            previous = Some(&root.isolating.isolating_interval);
+            if let Some(value) = &root.rational_value {
+                let scaled = value * &leading_rational;
+                if scaled <= root.isolating.isolating_interval.lower
+                    || scaled >= root.isolating.isolating_interval.upper
+                    || !wire.monic_companion.evaluate(&scaled).is_zero()
+                {
+                    return Err(ExactPolynomialError::CensusedRootValueDisagrees {
+                        value: value.to_string(),
+                    });
+                }
+                if !wire.rational_roots.contains(value) {
+                    return Err(census_clause(
+                        "a root declared rational is absent from the rational population",
+                    ));
+                }
+            }
+        }
+        for value in &wire.rational_roots {
+            if !wire.source.evaluate(value).is_zero() {
+                return Err(ExactPolynomialError::CensusRootDoesNotVanish);
+            }
+        }
+        if wire.rational_roots.windows(2).any(|pair| pair[0] >= pair[1]) {
+            return Err(census_clause(
+                "the rational population is not ascending and deduplicated",
+            ));
+        }
+        Ok(RationalRootCensus {
+            source: wire.source,
+            primitive,
+            monic_companion: wire.monic_companion,
+            leading_coefficient: leading,
+            bounding_interval: wire.bounding_interval,
+            distinct_real_roots: wire.distinct_real_roots,
+            roots: wire.roots,
+            rational_roots: wire.rational_roots,
+            separation: wire.separation,
+            isolation_depth_bound: wire.isolation_depth_bound,
+            split_schedule_retained: wire.split_schedule_retained,
+            enclosure: wire.enclosure,
+            work: wire.work,
+        })
+    }
 }
 
 impl RationalRootCensus {
@@ -956,7 +1665,10 @@ pub fn rational_roots_by_lifting(
         let reduced_derivative: Vec<u64> =
             derivative.iter().map(|c| residue_u64(c, prime)).collect();
         let mut residues = Vec::new();
-        for r in 0..prime {
+        // `Z/p` is exhausted, so the receiver's whole population is looked at; `prime` advances
+        // only on the way out of this sweep.
+        let population = prime;
+        for r in 0..population {
             if evaluate_mod_u64(&reduced, r, prime) == 0 {
                 if evaluate_mod_u64(&reduced_derivative, r, prime) == 0 {
                     // a non-simple residue: this prime divides the discriminant; take the next
@@ -1016,7 +1728,7 @@ fn is_small_prime(value: u64) -> bool {
     }
     let mut divisor = 2u64;
     while divisor * divisor <= value {
-        if value % divisor == 0 {
+        if value.is_multiple_of(divisor) {
             return false;
         }
         divisor += 1;
@@ -1107,20 +1819,110 @@ fn rational_reconstruction(
 }
 
 /// Count and isolate the real roots and return every rational root, exactly.
+///
+/// The descent runs over [`certified_real_root_enclosure`] of the monic companion: a `k`-th root
+/// bound, split positive from negative, each side carrying its own Taylor-shift certificate. See
+/// that type for what it replaced and why both R1 and R3 had routed around this owner.
 pub fn rational_root_census(
     polynomial: &RationalPolynomial,
 ) -> Result<RationalRootCensus, ExactPolynomialError> {
-    let primitive = polynomial.primitive_integer_form()?;
+    census_within(polynomial, None)
+}
+
+/// **Census the roots inside a caller-declared enclosing interval.**
+///
+/// [definition] The interval is declared **in the polynomial's own variable** and is a claim that
+/// every real root lies inside it — the claim a positive semidefinite operator's `[0, tr Δ]`
+/// makes. It is *verified*, never believed: it is mapped into the monic companion's variable by the
+/// positive leading coefficient, rounded outward to the half-integer grid the descent needs, and
+/// each side is put through the same Taylor-shift certificate the owner's own bound passes. A side
+/// that does not certify falls back to the owner's bound, so a census can never be made incomplete
+/// by a wrong declaration; [`RationalRootCensus::enclosure`] records which side the caller's
+/// declaration actually supplied.
+pub fn rational_root_census_within(
+    polynomial: &RationalPolynomial,
+    enclosure: &ExactInterval,
+) -> Result<RationalRootCensus, ExactPolynomialError> {
+    census_within(polynomial, Some(enclosure))
+}
+
+/// **The declared ceiling on the monic companion's coefficient width.**
+///
+/// [definition] The census descends over `B(z) = c^(n-1) A(z/c)`, whose coefficients are
+/// `a_i · c^(n-1-i)`: the companion's widest coefficient carries
+///
+/// ```text
+///   bits(B)  ≤  max_i bits(a_i)  +  (degree − 1) · bits(c)
+/// ```
+///
+/// bits. **That product is a caller-declared extent and it is the one that actually decides the
+/// work**: every `leading.pow(exponent)` in the companion, every coefficient of the Sturm chain
+/// built over it, and every exact evaluation in the half-integer descent is sized by it. It used to
+/// be computed and only then handed to [`IntegerPolynomial::check_declared_size`] — a degree-100
+/// polynomial with a sixty-four-bit leading coefficient did not finish in sixty seconds, and an
+/// over-ceiling declaration took hundreds of times longer to *refuse* than the gated path did,
+/// because the refusal happened after the blow-up rather than before it.
+///
+/// Four kilobits is about 1230 decimal digits in a single companion coefficient. Every exact
+/// spectrum this workspace presents is monic or near-monic — a characteristic polynomial has
+/// `c = 1`, so its companion is the polynomial itself and this quantity is `max_i bits(a_i)` — so
+/// the ceiling is generous for the material and refuses only the blow-up. Refused by name with
+/// [`ExactPolynomialError::MonicCompanionTooWide`], before the companion is formed.
+pub const MONIC_COMPANION_BIT_CEILING: u64 = 1 << 12;
+
+/// The predicted width of the monic companion of a primitive integer polynomial, in bits, and the
+/// refusal when it is past [`MONIC_COMPANION_BIT_CEILING`] or past the Sturm owner's own ceilings.
+///
+/// **Taken on declared numbers alone**: no companion is formed, no coefficient is multiplied, and
+/// nothing is allocated. This is the whole of the gate, so a test can reach the refusal and know
+/// that no blow-up preceded it.
+fn check_companion_declared_size(
+    primitive: &IntegerPolynomial,
+    leading: &BigInt,
+) -> Result<u64, ExactPolynomialError> {
+    primitive.check_declared_size()?;
     let degree = primitive.degree();
-    let leading = primitive
+    let widest = primitive
         .coefficients
-        .last()
-        .cloned()
-        .ok_or(ExactPolynomialError::ZeroPolynomial)?;
+        .iter()
+        .map(BigInt::bits)
+        .max()
+        .unwrap_or(0);
+    let leading_bits = leading.bits();
+    let companion_bits = widest.saturating_add(
+        (degree as u64)
+            .saturating_sub(1)
+            .saturating_mul(leading_bits),
+    );
+    if companion_bits > MONIC_COMPANION_BIT_CEILING {
+        return Err(ExactPolynomialError::MonicCompanionTooWide {
+            degree,
+            leading_bits,
+            bits: companion_bits,
+            ceiling: MONIC_COMPANION_BIT_CEILING,
+        });
+    }
+    // The companion is what the Sturm chain is actually built over, so the chain's own combined
+    // work ceiling is taken against the companion's predicted width rather than the source's.
+    check_declared_sturm_work(degree, companion_bits)?;
+    Ok(companion_bits)
+}
+
+/// `B(z) = c^(n-1) A(z/c)`, the monic companion of a primitive integer polynomial.
+///
+/// **Call [`check_companion_declared_size`] first.** The `leading.pow(exponent)` below runs the
+/// exponent up to `degree - 1`, which is the blow-up that gate exists for; this routine forms the
+/// coefficients and nothing else. Factored out so the census and the census's own wire build the
+/// same object rather than two transcriptions of it.
+fn monic_companion_of(
+    primitive: &IntegerPolynomial,
+    leading: &BigInt,
+) -> Result<IntegerPolynomial, ExactPolynomialError> {
+    let degree = primitive.degree();
     if degree == 0 {
         return Err(ExactPolynomialError::ConstantPolynomial);
     }
-    let companion_coefficients = primitive
+    let coefficients = primitive
         .coefficients
         .iter()
         .enumerate()
@@ -1133,30 +1935,51 @@ pub fn rational_root_census(
             }
         })
         .collect::<Vec<_>>();
-    let monic_companion = IntegerPolynomial::new(companion_coefficients)
-        .map_err(|_| ExactPolynomialError::ZeroPolynomial)?;
+    IntegerPolynomial::new(coefficients).map_err(|_| ExactPolynomialError::ZeroPolynomial)
+}
 
-    let bound = monic_companion
+fn census_within(
+    polynomial: &RationalPolynomial,
+    declared: Option<&ExactInterval>,
+) -> Result<RationalRootCensus, ExactPolynomialError> {
+    let primitive = polynomial.primitive_integer_form()?;
+    let degree = primitive.degree();
+    let leading = primitive
         .coefficients
-        .iter()
-        .take(degree)
-        .map(|coefficient| coefficient.abs())
-        .max()
-        .unwrap_or_else(BigInt::one)
-        + BigInt::one();
-    let half = Rat::new(BigInt::one(), BigInt::from(2));
-    let lower = -Rat::from_integer(bound.clone()) - &half;
-    let upper = Rat::from_integer(bound) + &half;
-    let bounding_interval = ExactInterval::new(lower.clone(), upper.clone())
-        .map_err(|_| ExactPolynomialError::MalformedInterval)?;
+        .last()
+        .cloned()
+        .ok_or(ExactPolynomialError::ZeroPolynomial)?;
+    if degree == 0 {
+        return Err(ExactPolynomialError::ConstantPolynomial);
+    }
+    // **Before the companion is formed.** `coefficient * leading.pow(exponent)` below runs the
+    // exponent up to `degree - 1`, so the declared sizes are refused here rather than discovered
+    // inside that product.
+    check_companion_declared_size(&primitive, &leading)?;
+    let monic_companion = monic_companion_of(&primitive, &leading)?;
+
+    // The caller's declaration lives in `A`'s variable; the descent lives in the companion's, and
+    // `z = c·t` with `c > 0` by the primitive normalization, so the map preserves order.
+    let scale = Rat::from_integer(leading.clone());
+    let companion_declaration = declared
+        .map(|interval| {
+            ExactInterval::new(&interval.lower * &scale, &interval.upper * &scale)
+                .map_err(|_| ExactPolynomialError::MalformedInterval)
+        })
+        .transpose()?;
+    let enclosure = certified_enclosure_within(&monic_companion, companion_declaration.as_ref())?;
+    let bounding_interval = enclosure.interval.clone();
+    let lower = bounding_interval.lower.clone();
+    let upper = bounding_interval.upper.clone();
 
     let mut work = CensusWork::default();
-    let distinct_real_roots = sturm_count(&monic_companion, &lower, &upper, &mut work)?;
+    let companion_chain = monic_companion.sturm_chain()?;
+    let distinct_real_roots = sturm_count(&companion_chain, &lower, &upper, &mut work)?;
 
     let mut integer_roots = Vec::new();
     let mut leaves = Vec::new();
     descend_half_integer(
-        &monic_companion,
+        &companion_chain,
         &lower,
         &upper,
         distinct_real_roots,
@@ -1185,17 +2008,24 @@ pub fn rational_root_census(
     } else {
         0
     };
+    // **Before descending.** The depth is read off the caller's own coefficients and nothing
+    // bounded it; it sizes both the descent and its worklist, so a bound past this owner's ceiling
+    // is refused here rather than taken.
+    if isolation_depth_bound > SEPARATION_SPLITTING_DEPTH_CEILING {
+        return Err(ExactPolynomialError::SeparationSplittingDepthTooLarge {
+            bound: isolation_depth_bound,
+            ceiling: SEPARATION_SPLITTING_DEPTH_CEILING,
+        });
+    }
 
+    let squarefree_chain = squarefree.sturm_chain()?;
     let mut isolated = Vec::new();
-    for (leaf_lower, leaf_upper, count) in leaves {
+    for leaf in &leaves {
         isolate_within(
-            &squarefree,
+            &squarefree_chain,
             &separation,
             isolation_depth_bound,
-            &leaf_lower,
-            &leaf_upper,
-            count,
-            0,
+            leaf,
             &mut isolated,
             &mut work,
         )?;
@@ -1249,12 +2079,13 @@ pub fn rational_root_census(
         separation,
         isolation_depth_bound,
         split_schedule_retained,
+        enclosure,
         work,
     })
 }
 
 fn sturm_count(
-    polynomial: &IntegerPolynomial,
+    chain: &SturmChain,
     lower: &Rat,
     upper: &Rat,
     work: &mut CensusWork,
@@ -1262,7 +2093,7 @@ fn sturm_count(
     work.sturm_counts += 1;
     let interval = ExactInterval::new(lower.clone(), upper.clone())
         .map_err(|_| ExactPolynomialError::MalformedInterval)?;
-    polynomial
+    chain
         .distinct_root_count(&interval)
         .map_err(|_| ExactPolynomialError::SturmRefused)
 }
@@ -1273,9 +2104,18 @@ fn sturm_count(
 /// A monic integer polynomial has no non-integer rational root, so a half-integer is never a root
 /// and every Sturm count below is taken at a legal boundary. That is the whole reason this descent
 /// needs no divisor enumeration.
-#[allow(clippy::too_many_arguments)]
+///
+/// **The descent is an explicit worklist, not recursion.** The depth is `log2` of the enclosure's
+/// width and the enclosure's width comes from the caller's own coefficients, so a recursive form
+/// put a caller-sized load on the machine stack: it reached about four thousand frames before its
+/// ceiling fired, and on a small-stack thread that is an abort no `Result` can carry.
+/// [`isolate_against_chain`] in this same file already carried a worklist for exactly this reason.
+/// The ceiling is now checked **before** each descent rather than on the way down, and the
+/// worklist holds at most one pending interval per depth, so the memory is bounded by the ceiling
+/// too. Depth-first with the left half taken first, so the leaves leave in ascending order —
+/// exactly the recursion's order.
 fn descend_half_integer(
-    polynomial: &IntegerPolynomial,
+    chain: &SturmChain,
     lower: &Rat,
     upper: &Rat,
     count: u32,
@@ -1283,116 +2123,135 @@ fn descend_half_integer(
     leaves: &mut Vec<(Rat, Rat, u32)>,
     work: &mut CensusWork,
 ) -> Result<(), ExactPolynomialError> {
-    if count == 0 {
-        return Ok(());
-    }
-    let width = upper - lower;
-    if width <= Rat::one() {
-        let candidate = (lower + upper) / Rat::from_integer(BigInt::from(2));
-        work.exact_evaluations += 1;
-        if candidate.is_integer() && polynomial.evaluate(&candidate).is_zero() {
-            integer_roots.push(candidate.to_integer());
+    // The chain carries the polynomial it belongs to, so there is no second argument to mispair.
+    let polynomial = chain.polynomial();
+    let two = Rat::from_integer(BigInt::from(2));
+    let half = Rat::new(BigInt::one(), BigInt::from(2));
+    // Last in, first out; the right half is pushed first so the left is taken first.
+    let mut pending: Vec<(Rat, Rat, u32, u32)> =
+        vec![(lower.clone(), upper.clone(), count, 0)];
+    while let Some((low, high, count, depth)) = pending.pop() {
+        if count == 0 {
+            continue;
         }
-        leaves.push((lower.clone(), upper.clone(), count));
-        return Ok(());
+        // **The descent depth is a declared size.** Each step halves the interval, so the depth is
+        // `log2` of the enclosure's width, and the enclosure's width comes from the caller's
+        // coefficients. It is refused before the step is taken, not after.
+        if depth > HALF_INTEGER_DESCENT_CEILING {
+            return Err(ExactPolynomialError::HalfIntegerDescentTooDeep {
+                ceiling: HALF_INTEGER_DESCENT_CEILING,
+            });
+        }
+        let width = &high - &low;
+        if width <= Rat::one() {
+            let candidate = (&low + &high) / &two;
+            work.exact_evaluations += 1;
+            if candidate.is_integer() && polynomial.evaluate(&candidate).is_zero() {
+                integer_roots.push(candidate.to_integer());
+            }
+            leaves.push((low, high, count));
+            continue;
+        }
+        work.bisection_steps += 1;
+        let middle = Rat::from_integer(((&low + &high) / &two).floor().to_integer()) + &half;
+        if !(low < middle && middle < high) {
+            return Err(ExactPolynomialError::BisectionStalled);
+        }
+        let left = sturm_count(chain, &low, &middle, work)?;
+        let right = sturm_count(chain, &middle, &high, work)?;
+        if left + right != count {
+            return Err(ExactPolynomialError::SturmCountsDisagree);
+        }
+        pending.push((middle.clone(), high, right, depth + 1));
+        pending.push((low, middle, left, depth + 1));
     }
-    work.bisection_steps += 1;
-    let middle = Rat::from_integer(
-        ((lower + upper) / Rat::from_integer(BigInt::from(2)))
-            .floor()
-            .to_integer(),
-    ) + Rat::new(BigInt::one(), BigInt::from(2));
-    if !(*lower < middle && middle < *upper) {
-        return Err(ExactPolynomialError::BisectionStalled);
-    }
-    let left = sturm_count(polynomial, lower, &middle, work)?;
-    let right = sturm_count(polynomial, &middle, upper, work)?;
-    if left + right != count {
-        return Err(ExactPolynomialError::SturmCountsDisagree);
-    }
-    descend_half_integer(
-        polynomial,
-        lower,
-        &middle,
-        left,
-        integer_roots,
-        leaves,
-        work,
-    )?;
-    descend_half_integer(
-        polynomial,
-        &middle,
-        upper,
-        right,
-        integer_roots,
-        leaves,
-        work,
-    )
+    Ok(())
 }
+
+/// **The declared ceiling on a splitting depth derived from the separation bound.**
+///
+/// [measured] `RootSeparation::splitting_depth` reads its depth off the polynomial's own
+/// discriminant, which makes it *material* rather than a budget — but it is material a **caller**
+/// supplied, it is returned as an unbounded `u64`, and nothing bounded it: a degree-two polynomial
+/// with roots `1/2 ± 2^-(k+1)` derives 7232 at `k = 1000`, and a descent handed that number will
+/// take it. The depth sizes both the descent and its worklist — which holds at most one pending
+/// interval per depth — so this owner carries a ceiling and refuses **before** descending rather
+/// than on the way down.
+///
+/// **Set against measured material, not chosen.** The bound is a worst case and is almost never
+/// approached, so the ceiling is placed above every bound this repository's own material derives
+/// rather than above every depth it reaches (release profile):
+///
+/// ```text
+///   polynomial                        derived bound   depth reached
+///   x^6 − 2(10^12 x − 1)^2                     1483             158
+///   x^6 − 2(10^16 x − 1)^2                     1966             212
+///   x^6 − 2(10^100 x − 1)^2                   12105            1326
+///   x^6 − 2(10^300 x − 1)^2                   36246            3985
+///   x^6 − 2(10^600 x − 1)^2                   72458            7972
+///   x^2 + x − 2^4000                          4820               0
+///   x^6 + x − 2^4000                         51919               0
+/// ```
+///
+/// `1 << 17` is 131072, above every one of those. The excised hard-coded depth of two hundred is
+/// the cautionary case: a *small* ceiling here refuses Mignotte's family, which is genuine
+/// material, and that is why this is a hostile-input guard on an unbounded declaration rather than
+/// a budget. `x^12 + x − 2^4000` derives about 198000 and is refused by name.
+pub const SEPARATION_SPLITTING_DEPTH_CEILING: u64 = 1 << 17;
 
 /// Split a leaf until each surviving interval holds exactly one root of the squarefree part.
 ///
-/// **Both refusals below are defect reports, not budget overruns.** The material — the polynomial's
-/// own discriminant, through [`root_separation`] — states how narrow an interval has to be before
-/// it can hold at most one root, and how many splits at the declared schedule's worst retained
-/// fraction reach that width. Passing either means Sturm and the discriminant disagree about the
-/// same polynomial.
-#[allow(clippy::too_many_arguments)]
+/// **Both separation refusals below are defect reports, not budget overruns.** The material — the
+/// polynomial's own discriminant, through [`root_separation`] — states how narrow an interval has
+/// to be before it can hold at most one root, and how many splits at the declared schedule's worst
+/// retained fraction reach that width. Passing either means Sturm and the discriminant disagree
+/// about the same polynomial. The ceiling on `depth_bound` itself is a different thing and is
+/// checked by the caller, once, before any descent starts.
+///
+/// **The descent is an explicit worklist, not recursion**, for the same reason
+/// [`isolate_against_chain`] carries one: `depth_bound` comes from the caller's own coefficients
+/// and a recursive form puts that number of frames on the machine stack, which no `Result` can
+/// carry. Depth-first, left half first, so the isolating intervals leave in ascending order.
 fn isolate_within(
-    squarefree: &IntegerPolynomial,
+    chain: &SturmChain,
     separation: &RootSeparation,
     depth_bound: u64,
-    lower: &Rat,
-    upper: &Rat,
-    count: u32,
-    depth: u64,
+    leaf: &(Rat, Rat, u32),
     isolated: &mut Vec<(Rat, Rat)>,
     work: &mut CensusWork,
 ) -> Result<(), ExactPolynomialError> {
-    if count == 0 {
-        return Ok(());
+    // The chain carries its own squarefree polynomial; the leaf carries its interval and its count.
+    let squarefree = chain.polynomial();
+    let (lower, upper, count) = leaf;
+    let mut pending: Vec<(Rat, Rat, u32, u64)> = vec![(lower.clone(), upper.clone(), *count, 0)];
+    while let Some((low, high, count, depth)) = pending.pop() {
+        if count == 0 {
+            continue;
+        }
+        work.isolation_depth_reached = work.isolation_depth_reached.max(depth);
+        if count == 1 {
+            isolated.push((low, high));
+            continue;
+        }
+        // The sharp form, independent of any schedule: an interval this narrow cannot hold two
+        // roots.
+        if separation.holds_at_most_one_root(&(&high - &low)) {
+            return Err(ExactPolynomialError::SeparationBoundContradicted { count });
+        }
+        if depth >= depth_bound {
+            return Err(ExactPolynomialError::IsolationPastTheSeparationBound { depth_bound });
+        }
+        let middle = interior_non_root(squarefree, &low, &high, work)?;
+        work.bisection_steps += 1;
+        let left = sturm_count(chain, &low, &middle, work)?;
+        let right = sturm_count(chain, &middle, &high, work)?;
+        if left + right != count {
+            return Err(ExactPolynomialError::SturmCountsDisagree);
+        }
+        pending.push((middle.clone(), high, right, depth + 1));
+        pending.push((low, middle, left, depth + 1));
     }
-    work.isolation_depth_reached = work.isolation_depth_reached.max(depth);
-    if count == 1 {
-        isolated.push((lower.clone(), upper.clone()));
-        return Ok(());
-    }
-    // The sharp form, independent of any schedule: an interval this narrow cannot hold two roots.
-    if separation.holds_at_most_one_root(&(upper - lower)) {
-        return Err(ExactPolynomialError::SeparationBoundContradicted { count });
-    }
-    if depth >= depth_bound {
-        return Err(ExactPolynomialError::IsolationPastTheSeparationBound { depth_bound });
-    }
-    let middle = interior_non_root(squarefree, lower, upper, work)?;
-    work.bisection_steps += 1;
-    let left = sturm_count(squarefree, lower, &middle, work)?;
-    let right = sturm_count(squarefree, &middle, upper, work)?;
-    if left + right != count {
-        return Err(ExactPolynomialError::SturmCountsDisagree);
-    }
-    isolate_within(
-        squarefree,
-        separation,
-        depth_bound,
-        lower,
-        &middle,
-        left,
-        depth + 1,
-        isolated,
-        work,
-    )?;
-    isolate_within(
-        squarefree,
-        separation,
-        depth_bound,
-        &middle,
-        upper,
-        right,
-        depth + 1,
-        isolated,
-        work,
-    )
+    Ok(())
 }
 
 /// A point strictly inside `(lower, upper)` at which the polynomial does not vanish.
@@ -1418,11 +2277,319 @@ fn interior_non_root(
     Err(ExactPolynomialError::NoInteriorNonRoot)
 }
 
+
+// -------------------------------------------------------------------------------------------------
+// counting roots by half-plane: Routh-Hurwitz in its Sturm form
+// -------------------------------------------------------------------------------------------------
+
+/// **How far [`half_plane_count`] may halve its shift before refusing.**
+///
+/// The loop terminates as mathematics — there are finitely many distinct real parts — so this is a
+/// hostile-input guard and not an approximation budget. A polynomial that exhausts it returns
+/// [`ExactPolynomialError::HalfPlaneRefinementExhausted`] naming the reached depth.
+pub const HALF_PLANE_REFINEMENT_CEILING: u32 = 96;
+
+/// The exact population of a real polynomial's roots by half-plane, with multiplicity.
+/// **The three populations partition the roots with multiplicity**, so the wire checks that they
+/// sum to the declared degree. [`HalfPlaneCount::is_hurwitz`] is a stability reading taken straight
+/// off these numbers; a wire that carried three unrelated integers could report a Hurwitz operator
+/// that is not one.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(try_from = "HalfPlaneCountWire")]
+pub struct HalfPlaneCount {
+    pub degree: usize,
+    /// `Re λ < 0`.
+    pub left: usize,
+    /// `Re λ = 0`.
+    pub axis: usize,
+    /// `Re λ > 0`.
+    pub right: usize,
+    /// The rational shift at which the counts closed. `None` for the inertia route, where no shift
+    /// is needed because the spectrum is real.
+    pub shift_witness: Option<Rat>,
+    /// How many halvings the shift needed. Zero on the first try.
+    pub refinements: u32,
+}
+
+#[derive(Deserialize)]
+struct HalfPlaneCountWire {
+    degree: usize,
+    left: usize,
+    axis: usize,
+    right: usize,
+    shift_witness: Option<Rat>,
+    refinements: u32,
+}
+
+impl TryFrom<HalfPlaneCountWire> for HalfPlaneCount {
+    type Error = ExactPolynomialError;
+
+    fn try_from(wire: HalfPlaneCountWire) -> Result<Self, Self::Error> {
+        let total = wire
+            .left
+            .checked_add(wire.axis)
+            .and_then(|partial| partial.checked_add(wire.right));
+        if total != Some(wire.degree) {
+            return Err(ExactPolynomialError::MalformedHalfPlaneCount {
+                degree: wire.degree,
+                left: wire.left,
+                axis: wire.axis,
+                right: wire.right,
+            });
+        }
+        if wire.refinements > HALF_PLANE_REFINEMENT_CEILING {
+            return Err(ExactPolynomialError::HalfPlaneRefinementExhausted {
+                ceiling: HALF_PLANE_REFINEMENT_CEILING,
+            });
+        }
+        Ok(Self {
+            degree: wire.degree,
+            left: wire.left,
+            axis: wire.axis,
+            right: wire.right,
+            shift_witness: wire.shift_witness,
+            refinements: wire.refinements,
+        })
+    }
+}
+
+impl HalfPlaneCount {
+    pub fn total(&self) -> usize {
+        self.left + self.axis + self.right
+    }
+
+    /// Every mode decays: the whole spectrum is in the open left half-plane.
+    pub fn is_hurwitz(&self) -> bool {
+        self.degree > 0 && self.left == self.degree
+    }
+}
+
+/// `p(iω) = P(ω) + i Q(ω)`, as two real polynomials.
+fn imaginary_axis_parts(
+    polynomial: &RationalPolynomial,
+) -> (RationalPolynomial, RationalPolynomial) {
+    let coefficients = polynomial.coefficients();
+    let mut real = vec![Rat::zero(); coefficients.len()];
+    let mut imaginary = vec![Rat::zero(); coefficients.len()];
+    for (power, coefficient) in coefficients.iter().enumerate() {
+        // `i^power` cycles `1, i, −1, −i`.
+        match power % 4 {
+            0 => real[power] = coefficient.clone(),
+            1 => imaginary[power] = coefficient.clone(),
+            2 => real[power] = -coefficient,
+            _ => imaginary[power] = -coefficient,
+        }
+    }
+    (
+        RationalPolynomial::new(real),
+        RationalPolynomial::new(imaginary),
+    )
+}
+
+/// The number of distinct real roots, over the certified enclosure of this owner.
+///
+/// The enclosure's endpoints are half-integers strictly past a certified bound on the roots, so
+/// they can never be roots themselves, which is what
+/// [`crate::exact_value::SturmChain::distinct_root_count`] requires.
+pub fn distinct_real_root_count(
+    polynomial: &RationalPolynomial,
+) -> Result<u32, ExactPolynomialError> {
+    let Some(degree) = polynomial.degree() else {
+        return Err(ExactPolynomialError::ZeroPolynomial);
+    };
+    if degree == 0 {
+        return Ok(0);
+    }
+    let primitive = polynomial.primitive_integer_form()?;
+    let enclosure = certified_real_root_enclosure(&primitive)?;
+    Ok(primitive
+        .sturm_chain()?
+        .distinct_root_count(&enclosure.interval)?)
+}
+
+/// The number of real roots **with multiplicity**.
+pub fn real_root_count_with_multiplicity(
+    polynomial: &RationalPolynomial,
+) -> Result<usize, ExactPolynomialError> {
+    if polynomial.is_zero() {
+        return Err(ExactPolynomialError::ZeroPolynomial);
+    }
+    if polynomial.degree() == Some(0) {
+        return Ok(0);
+    }
+    let mut total = 0usize;
+    for (multiplicity, factor) in polynomial.squarefree_decomposition()? {
+        let distinct = distinct_real_root_count(&factor)? as usize;
+        total = total
+            .checked_add(
+                distinct
+                    .checked_mul(multiplicity as usize)
+                    .ok_or(ExactPolynomialError::DegreeTooLarge)?,
+            )
+            .ok_or(ExactPolynomialError::DegreeTooLarge)?;
+    }
+    Ok(total)
+}
+
+/// The number of roots of `p` on the imaginary axis, with multiplicity.
+///
+/// If `p` has a root `iω₀` of order `m` then `p(iω)` has a zero of order `m` at the real point
+/// `ω₀`, so `(ω−ω₀)^m` divides both `P` and `Q` and at least one of the two order-`m` coefficients
+/// is nonzero — hence **the multiplicity of `iω₀` in `p` is exactly the multiplicity of `ω₀` as a
+/// real root of `gcd(P,Q)`**.
+pub fn axis_root_count(polynomial: &RationalPolynomial) -> Result<usize, ExactPolynomialError> {
+    if polynomial.is_zero() {
+        return Err(ExactPolynomialError::ZeroPolynomial);
+    }
+    let (real, imaginary) = imaginary_axis_parts(polynomial);
+    let common = match (real.is_zero(), imaginary.is_zero()) {
+        (true, true) => return Err(ExactPolynomialError::ZeroPolynomial),
+        (true, false) => imaginary,
+        (false, true) => real,
+        (false, false) => real.monic_gcd(&imaginary)?,
+    };
+    real_root_count_with_multiplicity(&common)
+}
+
+/// **The Cauchy index `I_{−∞}^{+∞}(numerator / denominator)`, exactly.**
+///
+/// `V(−∞) − V(+∞)` over the signed remainder sequence `f_0 = denominator`, `f_1 = numerator`,
+/// `f_{i+1} = −rem(f_{i−1}, f_i)`. The sequence is built over `Z` by
+/// [`crate::exact_value::SturmChain::from_pair`], with the same positive-multiple sign discipline
+/// the Sturm chain uses: a sign at `±∞` is a leading coefficient's sign with a parity flip, and a
+/// positive rescaling cannot move it.
+pub fn cauchy_index(
+    numerator: &RationalPolynomial,
+    denominator: &RationalPolynomial,
+) -> Result<i64, ExactPolynomialError> {
+    if denominator.is_zero() {
+        return Err(ExactPolynomialError::ZeroPolynomial);
+    }
+    if numerator.is_zero() {
+        return Ok(0);
+    }
+    // **The two signs are relative, so neither is normalized.** Flipping the numerator and not the
+    // denominator flips the index; `primitive_integer_form` would do exactly that.
+    let chain = SturmChain::from_pair(
+        &denominator.signed_primitive_integer_form()?,
+        &numerator.signed_primitive_integer_form()?,
+    )?;
+    Ok(chain.cauchy_index())
+}
+
+/// The open-right-half-plane root count of a polynomial **with no roots on the imaginary axis**.
+///
+/// The argument principle on the half-plane contour gives `Δ arg p(iω) = π(n − 2k)` for `k` the
+/// right-half-plane count; writing the continuous argument against `arctan` and counting the jumps
+/// of the ratio at the denominator's zeros gives `k = (n + I(Q/P))/2` for `n` even and
+/// `k = (n − I(P/Q))/2` for `n` odd.
+fn right_half_plane_count_axis_free(
+    polynomial: &RationalPolynomial,
+) -> Result<usize, ExactPolynomialError> {
+    let Some(degree) = polynomial.degree() else {
+        return Err(ExactPolynomialError::ZeroPolynomial);
+    };
+    if degree == 0 {
+        return Ok(0);
+    }
+    let (real, imaginary) = imaginary_axis_parts(polynomial);
+    let index = if degree % 2 == 0 {
+        cauchy_index(&imaginary, &real)?
+    } else {
+        -cauchy_index(&real, &imaginary)?
+    };
+    let doubled = degree as i64 + index;
+    if doubled < 0 || doubled % 2 != 0 {
+        return Err(ExactPolynomialError::HalfPlaneParityFailure { degree, index });
+    }
+    Ok((doubled / 2) as usize)
+}
+
+/// **The exact half-plane population of a real polynomial's roots, with multiplicity.**
+///
+/// [proved-derived; implemented-exact] Three steps, none of them a tolerance:
+///
+/// 1. **Axis roots, with multiplicity**, from [`axis_root_count`].
+/// 2. **Left and right, by the Cauchy index** of the signed remainder sequence — Routh–Hurwitz in
+///    its Sturm form — through [`cauchy_index`].
+/// 3. **The shift, with a self-certifying stop.** `p` itself may have axis roots, so the left and
+///    right counts are read at a rational shift `σ > 0`: `#{Re λ < −σ}` from `p(s−σ)` and
+///    `#{Re λ > σ}` from `p(s+σ)`. The loop halves `σ` until `left + axis + right = n`, which is
+///    exactly the certificate that no non-axis root has `|Re λ| ≤ σ`. It terminates because there
+///    are finitely many distinct real parts, and it carries
+///    [`HALF_PLANE_REFINEMENT_CEILING`] so a hostile polynomial returns a named refusal rather than
+///    running forever.
+///
+/// [definition] **This is the one owner.** `causal_chord::half_plane_count` is a thin re-entry into
+/// it that maps the refusal into that module's own species; there is no second implementation.
+/// When the operator is symmetric the whole question is already answered by Sylvester's signature
+/// and `causal_chord::half_plane_from_symmetric` routes to `crate::inertia::inertia` instead. The
+/// two are held to exact agreement by
+/// `causal_chord::tests::the_half_plane_count_agrees_with_the_inertia_of_a_symmetric_operator`.
+pub fn half_plane_count(
+    polynomial: &RationalPolynomial,
+) -> Result<HalfPlaneCount, ExactPolynomialError> {
+    let Some(degree) = polynomial.degree() else {
+        return Err(ExactPolynomialError::ZeroPolynomial);
+    };
+    if degree == 0 {
+        return Ok(HalfPlaneCount::default());
+    }
+    let axis = axis_root_count(polynomial)?;
+    let mut shift = Rat::one();
+    let two = Rat::from_integer(BigInt::from(2));
+    for refinements in 0..HALF_PLANE_REFINEMENT_CEILING {
+        let towards_left =
+            polynomial.composed_with(&RationalPolynomial::new(vec![-shift.clone(), Rat::one()]));
+        let towards_right =
+            polynomial.composed_with(&RationalPolynomial::new(vec![shift.clone(), Rat::one()]));
+        if axis_root_count(&towards_left)? == 0 && axis_root_count(&towards_right)? == 0 {
+            let right = right_half_plane_count_axis_free(&towards_right)?;
+            let left = degree - right_half_plane_count_axis_free(&towards_left)?;
+            if left + axis + right == degree {
+                return Ok(HalfPlaneCount {
+                    degree,
+                    left,
+                    axis,
+                    right,
+                    shift_witness: Some(shift),
+                    refinements,
+                });
+            }
+        }
+        shift /= &two;
+    }
+    Err(ExactPolynomialError::HalfPlaneRefinementExhausted {
+        ceiling: HALF_PLANE_REFINEMENT_CEILING,
+    })
+}
+
 /// One polynomial in two variables, presented as a polynomial in the variable that will be
 /// eliminated whose coefficients live in `Q[t]`.
+/// The wire enforces the same trimmed normal form [`BivariatePolynomial::new`] produces, for the
+/// same reason [`RationalPolynomial`]'s does: `degree()` is read off the coefficient count.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(try_from = "BivariatePolynomialWire")]
 pub struct BivariatePolynomial {
     coefficients: Vec<RationalPolynomial>,
+}
+
+#[derive(Deserialize)]
+struct BivariatePolynomialWire {
+    coefficients: Vec<RationalPolynomial>,
+}
+
+impl TryFrom<BivariatePolynomialWire> for BivariatePolynomial {
+    type Error = ExactPolynomialError;
+
+    fn try_from(wire: BivariatePolynomialWire) -> Result<Self, Self::Error> {
+        if wire.coefficients.last().is_some_and(RationalPolynomial::is_zero) {
+            return Err(ExactPolynomialError::UntrimmedPolynomialWire {
+                declared: wire.coefficients.len(),
+            });
+        }
+        Ok(Self::new(wire.coefficients))
+    }
 }
 
 impl BivariatePolynomial {
@@ -1885,6 +3052,85 @@ pub enum ExactPolynomialError {
     IsolationRefused,
     #[error("a censused rational root did not vanish on the source polynomial")]
     CensusRootDoesNotVanish,
+    #[error(
+        "a root enclosure whose interval does not agree with its own bounds, or whose bounds are \
+         not positive, is not an enclosure and is refused at the boundary"
+    )]
+    MalformedRootEnclosure,
+    #[error(
+        "the half-integer descent passed its declared depth ceiling of {ceiling}; the enclosure is \
+         wider than a recursive descent may be asked to halve"
+    )]
+    HalfIntegerDescentTooDeep { ceiling: u32 },
+    #[error(
+        "a certified root bound did not close after {ceiling} doublings; the polynomial is refused \
+         rather than enclosed by an unverified bound"
+    )]
+    RootBoundDoublingExhausted { ceiling: u32 },
+    #[error(
+        "a declared isolation depth of {bound} is past this owner's ceiling of {ceiling}: the \
+         depth sizes both the descent and its worklist, so it is refused rather than accepted"
+    )]
+    IsolationDepthBoundTooLarge { bound: u32, ceiling: u32 },
+    #[error("root isolation passed the declared depth bound of {bound}")]
+    IsolationDepthExceeded { bound: u32 },
+    #[error(
+        "the root separation bound derived a splitting depth of {bound}, past this owner's ceiling \
+         of {ceiling}: the depth sizes both the descent and its worklist, so it is refused before \
+         the descent rather than taken"
+    )]
+    SeparationSplittingDepthTooLarge { bound: u64, ceiling: u64 },
+    #[error(
+        "the monic companion of a degree-{degree} polynomial with a {leading_bits}-bit leading \
+         coefficient carries coefficients of up to {bits} bits, past the declared ceiling of \
+         {ceiling}: the companion is refused before it is formed rather than after"
+    )]
+    MonicCompanionTooWide {
+        degree: usize,
+        leading_bits: u64,
+        bits: u64,
+        ceiling: u64,
+    },
+    #[error(
+        "a remounted rational polynomial declares {declared} coefficients whose leading entry is \
+         zero; the constructor trims that away, so the declaration names a degree one higher than \
+         the polynomial has and is refused rather than re-normalized"
+    )]
+    UntrimmedPolynomialWire { declared: usize },
+    #[error(
+        "a remounted root separation does not agree with the bound its own material derives, or \
+         claims there is no pair of roots to separate at a degree that has one"
+    )]
+    MalformedRootSeparation,
+    #[error(
+        "a remounted half-plane count puts {left} + {axis} + {right} roots into a degree-{degree} \
+         polynomial; the three populations partition the roots with multiplicity, so the \
+         declaration is refused"
+    )]
+    MalformedHalfPlaneCount {
+        degree: usize,
+        left: usize,
+        axis: usize,
+        right: usize,
+    },
+    #[error(
+        "a remounted censused root carries the rational value {value}, which is not a root of the \
+         polynomial inside its own isolating interval"
+    )]
+    CensusedRootValueDisagrees { value: String },
+    #[error(
+        "a remounted census does not agree with itself: {clause}"
+    )]
+    MalformedCensus { clause: &'static str },
+    #[error(
+        "the half-plane count did not close after {ceiling} shift refinements; the polynomial is \
+         refused rather than reported from an unclosed count"
+    )]
+    HalfPlaneRefinementExhausted { ceiling: u32 },
+    #[error("the Cauchy index {index} has the wrong parity against degree {degree}")]
+    HalfPlaneParityFailure { degree: usize, index: i64 },
+    #[error(transparent)]
+    Value(#[from] ExactValueError),
 }
 
 #[cfg(test)]

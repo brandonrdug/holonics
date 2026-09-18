@@ -378,14 +378,6 @@ impl PinnedHost {
         unsafe { core::slice::from_raw_parts_mut(self.pointer.cast::<u8>(), self.octets) }
     }
 
-    /// The slot as octets without a unique borrow, for a caller that has proved by construction
-    /// (the stream's own ordering) that no copy is reading it.
-    ///
-    /// # Safety
-    /// No copy engine may be reading this slot while the returned slice is written.
-    pub unsafe fn as_octets_unchecked(&self) -> &mut [u8] {
-        unsafe { core::slice::from_raw_parts_mut(self.pointer.cast::<u8>(), self.octets) }
-    }
 }
 
 impl Drop for PinnedHost {

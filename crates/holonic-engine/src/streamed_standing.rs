@@ -638,9 +638,11 @@ impl<'chart> StreamedCirculation<'chart> {
         }
         let mut offsets = Vec::with_capacity(regions.len());
         let mut at = 0usize;
-        // SAFETY: the copy that last read this slot has completed (the synchronization above), and
-        // no copy has been issued against it since.
-        let octets = unsafe { self.pinned[pinned_slot].as_octets_unchecked() };
+        // The copy that last read this slot has completed (the synchronization above) and no copy
+        // has been issued against it since, so the unique borrow is the truthful one. `pinned` and
+        // `census` are disjoint fields, so the loop below may account while the slot is written.
+        let census = &mut self.census;
+        let octets = self.pinned[pinned_slot].as_mut_octets();
         for region in regions {
             let span = region.octets();
             if region.start + span as u64 > container_octets {
@@ -658,8 +660,8 @@ impl<'chart> StreamedCirculation<'chart> {
                 })?;
             offsets.push(at);
             at += span;
-            self.census.staged_regions += 1;
-            self.census.staged_octets += span as u64;
+            census.staged_regions += 1;
+            census.staged_octets += span as u64;
         }
         Ok(offsets)
     }

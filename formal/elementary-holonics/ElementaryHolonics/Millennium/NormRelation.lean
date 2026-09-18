@@ -252,7 +252,18 @@ and a *relative norm*.  Its mathlib-native form is `IsCyclotomicExtension.autEqu
 `K = Q(ζ_m)`, whose one undischarged input is `Irreducible (cyclotomic l K)` over that base.
 
 It is stated and not used: no theorem in this file assumes it, and nothing below it depends on
-it. -/
+it.
+
+**Discharged 2026-09-18** in `Foundation/IwasawaTower.lean` as
+`Soma.Holonics.Foundation.IwasawaTower.theRelativeOrbitFillsTheCoprimeLevel`, together with the
+irreducibility this docstring names, as
+`theCyclotomicPolynomialIsIrreducibleOverTheCoprimeLevel` (non-vacuous at
+`theCoprimeIrreducibilityIsNotVacuous`).  One correction to the paragraph above: the `Prop` does
+**not** require the relative irreducibility.  `ℚ(ζ_m, ζ_l)` is already a cyclotomic extension of
+level `m l` over `ℚ`, where `cyclotomic.irreducible_rat` applies directly, and the automorphism is
+the unit of `(ℤ/ml)ˣ` that the Chinese remainder theorem builds from `1 mod m` and `a mod l`.  The
+relative irreducibility is proved there anyway, because the Euler system's horizontal composition
+wants the sharper object, but it is not what this `Prop` costs. -/
 def TheRelativeOrbitFillsTheCoprimeLevel : Prop :=
   ∀ (L : Type) [Field L] [Algebra ℚ L] (m l : ℕ) (zm zl : L),
     0 < m → Nat.Prime l → ¬ l ∣ m →

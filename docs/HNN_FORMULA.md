@@ -103,6 +103,15 @@ the diagram does not claim that the narrowed historical session already implemen
 operation shown. Delayed observation is an ordinary dependency: a comparison cannot consume
 an observation before it arrives, and every output does not require a new learning event.
 
+[definition] The [ecological-role construction](HEPHAESTUS_AUTOMATA.md#ecological-roles-as-generator-relative-characteristics)
+reads integration, separation, retention and release from the actual generator, source and
+receiver. They can coexist within this field. The discrete rate form `T*G_next T-G`, or the
+continuous form `A*G+G A+G_dot`, keeps that reading tied to its metric and clock; role names do
+not assign native topology or replace the constitutive heat/current balance. Both forms are
+Hermitian, so their content is a signature under congruence — `inertia.rs::inertia` and
+`inertia.rs::congruence` — and not an eigenvalue or a score. The same generator can contract one
+direction of this field while expanding another, and a chart change carries that reading exactly.
+
 ## 1. The model, its dynamics and its output
 
 [definition] The [Athena engine blueprint](ATHENA_ENGINE_BLUEPRINT.md) diagrams this operator

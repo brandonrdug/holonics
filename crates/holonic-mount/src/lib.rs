@@ -10,19 +10,34 @@
 
 pub mod cuda;
 pub mod ffi;
+// D1/D2 of the exact device law: a launch is a passage that owes a receipt, and exclusive access
+// is a type. Paired with `ElementaryHolonics/Foundation/DeviceLaunchLaw.lean`.
+pub mod launch_law;
 pub mod live_event_launch;
 pub mod register_carrier;
 pub mod register_launch;
 pub mod register_recast;
+// D3 of the exact device law: a declared incidence generates the gather, the residency and the
+// scatter. Paired with `ElementaryHolonics/Foundation/SectionLayout.lean`.
+pub mod section_layout;
 
 pub use cuda::{
     BorrowedContext, Context, CudaError, Device, DeviceAttribute, DeviceBuffer, Dim3, Event,
     Function, Graph, GraphCensus, GraphExec, LinearLaunch, MemoryInfo, Module, PinnedHost, Result,
     Stream, VirtualDeviceBuffer, VirtualDeviceGrowth,
 };
+pub use launch_law::{
+    Access, AliasAudit, ArgumentReceipt, ArgumentRequirement, ArgumentSpan, BlockConstraint,
+    Coverage, DeferredReceipt, DeviceReadSpan, DeviceWriteSpan, DisjointPartition, Extent,
+    FullyProvedReceipt, InFlightWrite, Lawful, LaunchClause, LaunchEvidence, LaunchLimits,
+    LaunchReceipt, LaunchRefusal, LaunchRequirement, LaunchShape, LawfulLaunch, OpenWrite,
+    PartitionClause, PartitionRefusal, PartitionedWrite, Partitioned, ProofScope, Residency,
+    ScalarArgument, ScalarReceipt, ScalarRequirement, ScalarWidth, ScatterLaw, Settles,
+    SharedRequirement, StreamIdentity, StreamRequirement,
+};
 pub use live_event_launch::{
-    LiveEventArguments, LiveEventKernel, LiveEventSpan, RegionalContactArguments,
-    RegionalContactKernel,
+    LiveEventArguments, LiveEventKernel, LiveEventSpan, LiveEventWriteSpan,
+    RegionalContactArguments, RegionalContactKernel,
 };
 pub use register_carrier::{
     launch_register_carrier_rebase, RegisterCarrierRebase, RegisterCarrierRebaseOutput,
@@ -30,7 +45,13 @@ pub use register_carrier::{
 pub use register_launch::{
     RegisterCarrierRebaseArguments, RegisterCarrierRebaseKernel, RegisterRecastArguments,
     RegisterRecastFinishKernel, RegisterRecastKernel, RegisterScopeArguments, RegisterScopeKernel,
-    RegisterScopeSurfaceArguments, RegisterScopeSurfaceKernel, RegisterSpan,
+    RegisterScopeSurfaceArguments, RegisterScopeSurfaceKernel, RegisterSpan, RegisterWriteSpan,
+};
+pub use section_layout::{
+    AccumulationLaw, CheckedIntegers, ExactRing, IncidenceDeclaration, LocalOperator, ModularWords,
+    RegionColouring, ScatterReceipt, ScatterRequest, SectionApparatus, SectionClause,
+    SectionDeviceTables, SectionKernels, SectionLayout, SectionReceipts, SectionRefusal, Sectioned,
+    TileExtents, TransposeTable,
 };
 pub use register_recast::{
     launch_register_own_recast, RegisterOwnRecast, RegisterOwnRecastOutput, REGISTER_LANE_WORDS,
@@ -112,6 +133,12 @@ mod tests {
         "recurrent_law_found",
         "recurrent_law_evaluate",
         "recurrent_law_fold",
+        // D3 — the generated section triple, reached by `section_layout::SectionKernels::resolve`
+        // through `soma_abi::section_layout_cuda::Entry::symbol`.
+        "section_gather",
+        "section_apply",
+        "section_scatter_store",
+        "section_scatter_add",
     ];
 
     /// Entries compiled into the artifact and reachable by NOTHING. Measured 2026-08-15.
@@ -305,6 +332,51 @@ mod tests {
                 !morph_body.contains(float_spelling),
                 "morphological_conduct_group carries forbidden {float_spelling}"
             );
+        }
+    }
+
+    /// D3 — the generated section triple's own PTX face: the declared parameter-word count of each
+    /// entry, and the absence of any floating spelling in any of their bodies. The parameter counts
+    /// come from `soma_abi::section_layout_cuda::Entry`, the same declaration
+    /// `section_layout::SectionLayout` generates its `LaunchRequirement`s against, so a signature
+    /// change on either side of the seam is a failing test rather than a silent parameter-block
+    /// mismatch.
+    #[test]
+    fn the_section_triple_keeps_its_declared_ptx_mouth_and_carries_no_float() {
+        let text = std::str::from_utf8(SOMA_PTX).expect("the soma PTX artifact is text");
+        assert!(
+            text.contains(".extern .shared .align 8 .b8 section_tile[]"),
+            "the section-apply entry declares its dynamic shared tile"
+        );
+        for entry in soma_abi::section_layout_cuda::Entry::ALL {
+            let mouth = format!(".entry {}(", entry.symbol());
+            let after = text
+                .split_once(&mouth)
+                .unwrap_or_else(|| panic!("PTX carries {}", entry.symbol()))
+                .1;
+            let signature = after
+                .split_once(')')
+                .unwrap_or_else(|| panic!("PTX closes {} signature", entry.symbol()))
+                .0;
+            assert_eq!(
+                signature
+                    .lines()
+                    .filter(|line| line.contains(".param "))
+                    .count(),
+                entry.cuda_parameter_words(),
+                "{} PTX parameter count left its declared mouth",
+                entry.symbol()
+            );
+            let body = after
+                .split_once("\n.visible .entry ")
+                .map_or(after, |(body, _)| body);
+            for float_spelling in [".f16", ".f32", ".f64"] {
+                assert!(
+                    !body.contains(float_spelling),
+                    "{} carries forbidden {float_spelling}",
+                    entry.symbol()
+                );
+            }
         }
     }
 

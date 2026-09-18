@@ -26,11 +26,11 @@ use body::manifold::{
 use body::medium::{RegionalForm, FORM_WORDS};
 use body::num::COG_WORDS;
 use body::seam::SliceWordSeam;
-use mount::cuda::LaunchCensus;
 use mount::{
-    launch_register_carrier_rebase, Context, DeviceBuffer, Dim3, Module, RegisterCarrierRebase,
-    RegisterCarrierRebaseKernel, RegisterScopeArguments, RegisterScopeKernel,
-    RegisterScopeSurfaceArguments, RegisterScopeSurfaceKernel, RegisterSpan, Result,
+    launch_register_carrier_rebase, Context, DeviceBuffer, Dim3, LaunchEvidence, Module,
+    RegisterCarrierRebase, RegisterCarrierRebaseKernel, RegisterScopeArguments,
+    RegisterScopeKernel, RegisterScopeSurfaceArguments, RegisterScopeSurfaceKernel, RegisterSpan,
+    RegisterWriteSpan, Result,
 };
 use soma_abi::{contact as contact_abi, register as register_abi};
 
@@ -386,7 +386,7 @@ fn cuda_reference(
     ctx: &Context,
     function: GateScope<'_, '_>,
     carrier_rebase: &RegisterCarrierRebaseKernel<'_>,
-    census: LaunchCensus,
+    device: &mount::Device,
     interior_installment: usize,
     completion_rows: usize,
 ) -> Result<RegisterTrace> {
@@ -412,22 +412,25 @@ fn cuda_reference(
         completion_words as u32,
     ];
 
+    // The `*mut` faces of the entry are bound `mut`: the launcher takes an exclusive
+    // `RegisterWriteSpan` of each, so no second span of a written allocation can exist while the
+    // launch that writes it is being proved.
     let standing_b: DeviceBuffer<u32> = DeviceBuffer::alloc(standing_words)?;
     standing_b.copy_from_slice(&standing)?;
-    let owns_b: DeviceBuffer<u32> = DeviceBuffer::alloc_zeroed(registered_words)?;
+    let mut owns_b: DeviceBuffer<u32> = DeviceBuffer::alloc_zeroed(registered_words)?;
     let mut carriers_b: DeviceBuffer<u32> = DeviceBuffer::alloc_zeroed(carrier_words)?;
     let bytes_b: DeviceBuffer<u32> = DeviceBuffer::alloc(packed.len())?;
     bytes_b.copy_from_slice(&packed)?;
     let mut lanes_b: DeviceBuffer<u32> = DeviceBuffer::alloc(lane.len())?;
     lanes_b.copy_from_slice(&lane)?;
-    let counts_b: DeviceBuffer<u64> = DeviceBuffer::alloc_zeroed(4)?;
+    let mut counts_b: DeviceBuffer<u64> = DeviceBuffer::alloc_zeroed(4)?;
     let params_b: DeviceBuffer<u32> = DeviceBuffer::alloc(params.len())?;
     params_b.copy_from_slice(&params)?;
-    let radiation_b: DeviceBuffer<u32> = DeviceBuffer::alloc_zeroed(radiation_words)?;
-    let completion_b: DeviceBuffer<u32> = DeviceBuffer::alloc_zeroed(completion_words)?;
-    let statuses_b = DeviceBuffer::alloc(REGISTER_STATUS_WORDS)?;
+    let mut radiation_b: DeviceBuffer<u32> = DeviceBuffer::alloc_zeroed(radiation_words)?;
+    let mut completion_b: DeviceBuffer<u32> = DeviceBuffer::alloc_zeroed(completion_words)?;
+    let mut statuses_b = DeviceBuffer::alloc(REGISTER_STATUS_WORDS)?;
     statuses_b.copy_from_slice(&[u32::MAX, 0, 0])?;
-    let contact_b: DeviceBuffer<u32> = DeviceBuffer::alloc_zeroed(CONTACT_SURFACE_WORDS)?;
+    let mut contact_b: DeviceBuffer<u32> = DeviceBuffer::alloc_zeroed(CONTACT_SURFACE_WORDS)?;
 
     let mut carriers = vec![0u32; carrier_words];
     let mut counts = [0u64; 4];
@@ -449,29 +452,45 @@ fn cuda_reference(
         completion_b.zero()?;
         let arguments = RegisterScopeArguments {
             standing: RegisterSpan::whole(&standing_b),
-            owns: RegisterSpan::whole(&owns_b),
-            carriers: RegisterSpan::whole(&carriers_b),
+            owns: RegisterWriteSpan::whole(&mut owns_b),
+            carriers: RegisterWriteSpan::whole(&mut carriers_b),
             bytes: RegisterSpan::whole(&bytes_b),
             lanes: RegisterSpan::whole(&lanes_b),
-            counts: RegisterSpan::whole(&counts_b),
+            counts: RegisterWriteSpan::whole(&mut counts_b),
             params: RegisterSpan::whole(&params_b),
-            radiation: RegisterSpan::whole(&radiation_b),
-            completion: RegisterSpan::whole(&completion_b),
-            statuses: RegisterSpan::whole(&statuses_b),
+            radiation: RegisterWriteSpan::whole(&mut radiation_b),
+            completion: RegisterWriteSpan::whole(&mut completion_b),
+            statuses: RegisterWriteSpan::whole(&mut statuses_b),
         };
         let block = if cooperative { CONTACT_BLOCK } else { BLOCK };
-        match function {
-            GateScope::Inline(function) => {
-                function.launch(Dim3::x(1), Dim3::x(block), arguments)?
-            }
-            GateScope::Surface(function) => function.launch(
+        // One REGISTER lane is the declared element extent of this stroke, and the **mounted card
+        // itself** is the declared device evidence, so every clause is proved here — including the
+        // per-dimension block extent and the per-block shared extent a census cannot carry, which
+        // this gate formerly deferred.
+        let receipt = match function {
+            GateScope::Inline(function) => function.launch(
+                LaunchEvidence::Device(device),
                 Dim3::x(1),
                 Dim3::x(block),
+                1,
+                arguments,
+            )?,
+            GateScope::Surface(function) => function.launch(
+                LaunchEvidence::Device(device),
+                Dim3::x(1),
+                Dim3::x(block),
+                1,
                 RegisterScopeSurfaceArguments {
                     common: arguments,
-                    contact_words: RegisterSpan::whole(&contact_b),
+                    contact_words: RegisterWriteSpan::whole(&mut contact_b),
                 },
             )?,
+        };
+        if !receipt.is_fully_proved() {
+            panic!(
+                "the scope launch deferred {:?} under LaunchEvidence::Device: {receipt}",
+                receipt.deferred()
+            );
         }
         ctx.synchronize()?;
         launches += 1;
@@ -493,7 +512,7 @@ fn cuda_reference(
             let rebased = launch_register_carrier_rebase(
                 ctx,
                 carrier_rebase,
-                census,
+                LaunchEvidence::Device(device),
                 RegisterCarrierRebase {
                     old_carriers: &carriers_b,
                     old_lanes: &lanes_b,
@@ -671,7 +690,6 @@ fn run() -> Result<()> {
     }
     let device = mount::Device::get(0)?;
     println!("device: {}", device.name);
-    let census = device.launch_census()?;
     let ctx = Context::create(&device)?;
     let module = Module::load_ptx(PTX)?;
     let inline_function = module.register_scope()?;
@@ -691,7 +709,7 @@ fn run() -> Result<()> {
         &ctx,
         GateScope::Inline(&inline_function),
         &carrier_rebase,
-        census,
+        &device,
         WHOLE,
         PLURAL_COMPLETION_ROWS,
     )?;
@@ -702,7 +720,7 @@ fn run() -> Result<()> {
         &ctx,
         GateScope::Surface(&surface_function),
         &carrier_rebase,
-        census,
+        &device,
         WHOLE,
         PLURAL_COMPLETION_ROWS,
     )?;
@@ -713,7 +731,7 @@ fn run() -> Result<()> {
         &ctx,
         GateScope::Surface(&surface_function),
         &carrier_rebase,
-        census,
+        &device,
         ONE_MOVE,
         PLURAL_COMPLETION_ROWS,
     )?;
@@ -724,7 +742,7 @@ fn run() -> Result<()> {
         &ctx,
         GateScope::Surface(&surface_function),
         &carrier_rebase,
-        census,
+        &device,
         WHOLE,
         1,
     )?;
@@ -735,7 +753,7 @@ fn run() -> Result<()> {
         &ctx,
         GateScope::Surface(&surface_function),
         &carrier_rebase,
-        census,
+        &device,
         WHOLE,
         PLURAL_COMPLETION_ROWS,
     )?;

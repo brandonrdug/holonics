@@ -102,6 +102,23 @@ and navigation questions compose without assuming the desired realization.
 The returned construction joins **WorldTube resegmentation and BoundaryScalePassage** to the
 potential family from step 1.
 
+[established-bounded; formal-checked; implemented-exact] The tube/tower join those two owners needed
+is returned:
+[`Transport/ContinuingTube.lean`](../../formal/elementary-holonics/ElementaryHolonics/Transport/ContinuingTube.lean)
+and [`continuing_tube.rs`](../../crates/holonic-engine/src/continuing_tube.rs). A tube's transverse
+section at each station is `Foundation/ContinuingTower.lean::Tower`; its longitudinal axis is
+`ClockedSpan`, presented by `Tube.clockedSpan` with `clockedSpan_split_rejoin` and
+`clockedSpan_openGap_has_no_joined_occurrence` citing the resegmentation owners rather than reproving
+them; and the two axes commute by `Tube.square`, which is `Migration.naturality` with the identity
+index map. `boundaryScaleMigration` exhibits a named `BoundaryScalePassage` as the chartwise
+migration between two enclosure towers — the same potential across two tube charts — and
+`projectionScalePassage_no_reverse_passage` exhibits the retained kernel as a genuine obstruction:
+the transported face alone does not return, and the residual must be supplied. Where the square
+fails the failure is returned whole as `SquareVerdict.defect`, with the grain instance as the
+separator this step asks for. See
+[THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-object)
+for the carrier clause.
+
 - Use an actual joined `ClockedSpan` occurrence and the existing split/rejoin equivalence.
   Prove that its future receiver family and declared tolerance are unchanged by that
   resegmentation when the future transport is carried through the same equivalence.

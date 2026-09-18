@@ -221,6 +221,15 @@ returns that mathematics; “Continue Athena” composes the applicable objects 
 brief without waiting for the endpoint. The threshold chart
 remains `Λ_std=4Λ_DN`; a new physical or receiver analogy does not change its source theorem.
 
+[definition] The September 17 consolidation states the shared construction as four subordinate
+contracts: the [shared carrier](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md) that HNN, Athena,
+the mathematical applications and the biological ecologies all instantiate; its
+[receiver atlas](THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md); its environment-indexed
+[physical instance](THE_BIOLOGICAL_ECOLOGY_INSTANTIATES_THE_CARRIER.md); and its
+[device realization](THE_EXACT_DEVICE_LAW_IS_CONSTRUCTED.md). They carry formalization and
+engineering intentions, not milestones. Each item is discharged inside the increment that consumes
+it, and none of them reorders the milestone table above.
+
 ## All current plan documents and their roles
 
 | Document | Authority and use |
@@ -233,6 +242,10 @@ remains `Λ_std=4Λ_DN`; a new physical or receiver analogy does not change its 
 | [Conversation preparation](CONVERSATION_DATA_INTEGRATION.md) | Existing source/provenance and development/evaluation boundary |
 | [Native foundation](THE_NATIVE_HNA_FOUNDS_CONTEXTUAL_TRANSPORT_BEFORE_INHERITANCE.md) and [framework consolidation](THE_HNA_FRAMEWORK_HAS_ONE_PUBLIC_LIFECYCLE_AND_ONE_NAVIGABLE_REPOSITORY.md) | Returned foundations and maintained contracts; completed campaigns are not rerun |
 | [Inherited production/export](THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md) | Downstream admitted Soulkiller/HNP and target-runtime contracts |
+| [Shared carrier](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md) | Tower, fibre, migration, capability, bridge, cost and Iwasawa formalization intentions |
+| [Receiver atlas](THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md) | Causal chord, rate reading, reflection algebra, acoustic/colour, rigidity, spectral, topological receivers and release width |
+| [Biological ecology](THE_BIOLOGICAL_ECOLOGY_INSTANTIATES_THE_CARRIER.md) | Environment-indexed physical instance: grain restriction, adapters, passages, selection, evaluation and the RNA/DNA/viral/cancer/neuro extension |
+| [Exact device law](THE_EXACT_DEVICE_LAW_IS_CONSTRUCTED.md) | Kernel construction discipline, launch receipts, exclusive-access typing, partition-generated layout and measurement scope |
 
 ## Hephaestus applications within the shared phases
 

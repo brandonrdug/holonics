@@ -55,6 +55,9 @@
 //! A display codec or a Vulkan executor may consume these receipts.  Neither
 //! is permitted to redefine their mathematics.
 
+/// Receiver R2: a bank of causal resonators consuming the same co-present mode population the
+/// colour receiver consumes, so colour and timbre factor through one current and one lineage.
+pub mod acoustic_receiver;
 mod addressed_current;
 pub use addressed_current::*;
 pub mod algebraic;
@@ -71,9 +74,17 @@ pub mod atmospheric_inverse;
 // and every emitted float carries the exact rational residual its rounding cost.
 pub mod basin;
 pub mod bit_causal;
+// C7 of `docs/plans/THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md`: `Bridge` and
+// `ProposedBridge` — eight distinct connection statuses with a genuine partial order, one
+// epistemic grade from the canon, and a composition taking the meet of both while composing
+// residuals through `Transition`. Paired with `Foundation/Bridge.lean`.
+pub mod bridge;
 pub mod category;
 pub mod causal;
 pub mod causal_body;
+/// Receiver R1: the exact transfer object `C(sI−A)^{-1}B` of a linearization, its poles, residues,
+/// eigenvector support and Gaussian-rational resolvent probes.
+pub mod causal_chord;
 pub mod causal_reflection;
 pub mod causal_state_grammar;
 pub mod codec_recovery;
@@ -118,6 +129,17 @@ pub mod collocation;
 // `receiver_exact_compression` and collide at the crate root.
 pub mod conditioned_derivation;
 pub mod conic;
+/// The continuing tower carrier: faces over a refinement order, the gluing trichotomy, and the
+/// non-invertible transition that carries its residual. Paired with
+/// `formal/elementary-holonics/ElementaryHolonics/Foundation/ContinuingTower.lean`. Declared, never
+/// glob-exported: `Tower`, `Transition`, `GluingResult` and `MaterializedFace` are deliberately
+/// reached through this module's name so that a caller states which carrier it means.
+pub mod continuing_tower;
+/// The continuing tube: a tower is the transverse section of a tube, longitudinal transport and
+/// transverse restriction commute, and a wormhole is a passage between charts the tube's own order
+/// does not relate. Paired with
+/// `formal/elementary-holonics/ElementaryHolonics/Transport/ContinuingTube.lean`.
+pub mod continuing_tube;
 // The lived construction `Π` of a declared text corpus: every surface form counted, every whole and
 // stratum it reaches named, and the exact symbolic surprisal of its embodied probability. Declared,
 // never glob-exported: it names `Kind`, `Stratum`, `SurfaceId`, `tokenize` and `classify`, none of
@@ -234,11 +256,26 @@ pub mod landauer;
 // `encode_native_bytes` and `decode_native_bytes`, and a glob would put those verbs in the crate
 // root where nothing says which form they are of. `archive/plans/THE_ASSEMBLY.md` step 6.
 pub mod graded_complex_form;
+/// The grain tower `Component ⊑ Residue ⊑ Atom`, its restriction as a non-invertible
+/// transition, and the typed `ApertureRelation` a coarse receiver must declare. Paired with
+/// `formal/elementary-holonics/ElementaryHolonics/Foundation/GrainRestriction.lean`. Declared,
+/// never glob-exported: `Grain`, `GrainFace`, `GrainTower` and `ApertureRelation` are reached
+/// through this module's name so that a caller states which axis of the index it means.
+pub mod grain_tower;
 pub mod graph_receiver;
 // A size-agnostic recursive cell, the schedules that expand it, and the 2-complex it grows.
 // Declared, never glob-exported: it names `grow`, `split`, `cat` and `evaluate`, and a glob would
 // put those verbs in the crate root where nothing says what material they are of.
 pub mod grown_cell;
+/// The Hodge and spectral receiver `Δ_k = d_(k−1) d_(k−1)^* + d_k^* d_k` on the incidence complex
+/// `physical_constraint_grading` returns, under a declared metric and declared boundary
+/// conditions: the exact/coexact/harmonic decomposition, harmonic dimension against Betti from
+/// Smith normal form, the spectrum held exactly with Sturm-isolated roots, the spectral gap as an
+/// exact interval, and mode localization. Paired with
+/// `formal/elementary-holonics/ElementaryHolonics/Foundation/HodgeReceiver.lean`. Declared, never
+/// glob-exported: `MetricLaw`, `BoundaryCondition`, `HodgeOperator` and `hodge_family` are reached
+/// through this module's name so that a caller states whose metric and whose complex it means.
+pub mod hodge_receiver;
 pub mod holonic_complex;
 pub mod image;
 pub mod implicit;
@@ -252,6 +289,11 @@ pub mod inertia;
 pub mod interaction;
 pub mod interchange;
 pub mod inverse_transport;
+// C8: the finite computable shadow of the Iwasawa algebra Λ = Z_p[[T]] — the distinguished
+// polynomials ω_n = (1+T)^(p^n) - 1, their divisibility chain as an instance of `continuing_tower`,
+// and the finite abelian groups M/ω_n M read off an exact Smith normal form. Paired with
+// `formal/elementary-holonics/ElementaryHolonics/Foundation/IwasawaTower.lean`.
+pub mod iwasawa_tower;
 // A human-written formal development read at the grain of its OWN declarations, with the aperture
 // declared so that using the one-artifact reader on many-declaration material is detectable rather
 // than silently absorbed. Reached explicitly: `join`, `DeclaredForm` and `read_development` say
@@ -260,6 +302,11 @@ pub mod inverse_transport;
 // two founding orders. Reached explicitly: `Gyration` and `FoundedReceiver` say nothing at the crate
 // root about which population they grow.
 pub mod founded_receiver;
+// The library-level Lean-citation check: every Lean declaration name a Rust owner cites is looked
+// up in that owner's Lean file, so a stale citation fails `cargo test`. Test-only; it exports
+// nothing.
+#[cfg(test)]
+mod lean_citations;
 pub mod lean_development;
 pub mod live_presentation;
 // The material loop and its circulation -- Kelvin's theorem as a carried loop rather than a fixed
@@ -299,11 +346,30 @@ pub mod physical;
 // `ConstraintEdge`/`ConstraintFace` names are local to this carrier and must not collide with the
 // oriented simplicial or physical-world faces at the crate root.
 pub mod physical_constraint_complex;
+// The adapter from that contact incidence into `algebraic::GradedCausalComplex`, and with it into
+// every exact algebraic receiver. Not glob-exported for the same reason as the complex it adapts:
+// `OpenContact`, `EdgeProvenance` and `OpenResolution` are local to this carrier. The open class is
+// carried as a *family* of complexes rather than resolved, and the module doc states that law.
+pub mod physical_constraint_grading;
+// Library intake for an environment-indexed physical occurrence: all-atom mmCIF, exact `<f2`/
+// `<f4`/`<f8` uncertainty words, and the environment index without which no occurrence is
+// founded. Not glob-exported: `TokenAddress`, `ComponentGrain` and `IntakeRefusal` are local to
+// this exterior boundary and must not collide with the native addressing at the crate root.
+pub mod physical_intake;
+// The typed environment index that sits on top of the intake's presented one, the occurrence
+// situated at exactly one of them, and the six-state contact status. Not glob-exported: its
+// `Coordinate`, `Environment`, `Occurrence` and `ContactStatus` names are local to this carrier
+// and must not collide with the addressing at the crate root. A claim read at one environment is
+// a claim at that environment only, and carrying it elsewhere needs a supplied passage.
+pub mod physical_occurrence;
 pub mod placement;
 pub mod platform;
 #[cfg(all(target_os = "linux", feature = "desktop-x11"))]
 pub mod platform_x11;
 pub mod presentation;
+// C5: cost as a receipt with provenance, and the receiver-relative Pareto frontier of
+// presentations. Paired with `Foundation/PresentationCost.lean`.
+pub mod presentation_cost;
 pub mod quantity;
 // The declared display gauge and the body's one vector codec. Not glob-exported for the same
 // reason as `certified_face`: colour is a gauge and must be named as one at every call site.
@@ -357,10 +423,28 @@ pub mod receiver_history_cultivation;
 // `DeclaredGrain`, and `ExactFace` collides in meaning with `certified_face`'s presentation face
 // while `reopen` says nothing at the crate root about what is being reopened. `CLAUDE.md` §2b and
 // `docs/canon/THE_MATHEMATICS_TABLET.md` §1, "one deletion, three carriers".
+// C6 of `docs/plans/THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md`: `Capability`,
+// `LocalChart` with transition maps on overlaps, and `ReceiverAtlas` — an embedding is an
+// atlas of placements whose content is its transition maps, not one global vector. Paired
+// with `Foundation/ReceiverAtlas.lean`.
+pub mod receiver_atlas;
 pub mod receiver_current;
 pub mod receiver_ecology;
 pub mod receiver_phase_atlas;
+// R6 of `docs/plans/THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md`: the width
+// `w_R(h) = diam { R(Phi_h(x, u)) }` of a receiver reading over a compatible family, exactly —
+// an exact zonotope enclosure under `causal_chord`'s linear dynamics — and the caller-declared
+// release law whose lawful returns are hold, widen, ask, release-coarser and
+// no-continuation-bridges. Paired with `Foundation/ReceiverRelease.lean`.
+pub mod receiver_release;
 pub mod regime_reading;
+// The rigidity receiver **R4**: the constraint Jacobian `J = D F(q)` of a contact complex's
+// one-skeleton, `ker J` as the infinitesimal motions, `ker J^T` as the self-stress, the trivial
+// motions measured rather than assumed, rigid clusters and contact-removal sensitivity. Declared
+// and not glob-exported: `ExactConfiguration`, `DistanceConstraint` and `MaxwellCount` are local
+// to this carrier, and the open class stays a *family* here exactly as it does in
+// `physical_constraint_grading`.
+pub mod rigidity_receiver;
 // The resident section: the continuing semantic standing owned by the card between the entering
 // codewords and the terminal face. Contract:
 // `research/records/2026-08-18_THE_SECTION_MUST_STAY_ON_THE_CARD_THE_CONTRACT_BEFORE_THE_RESIDENT_LAYER.md`.
@@ -437,6 +521,11 @@ pub mod surprisal;
 // never glob-exported: `ItemId`, `ReceiverId`, `Observation`, `Step`, `Verdict` and `window` reach
 // it from `receiver_exact_compression` and collide at the crate root.
 pub mod token_invariance;
+// Receiver R5: persistence over the exact aperture filtration, and linking where an embedding
+// exists. Declared, never glob-exported: `Crossing`, `Coefficients`, `OrderLaw` and
+// `ProjectionDirection` say nothing at the crate root about which carrier they belong to.
+// `docs/plans/THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md` R5.
+pub mod topological_receiver;
 pub mod traversible_chain;
 pub mod tube;
 pub mod wave_propagation;

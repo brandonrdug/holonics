@@ -40,6 +40,9 @@ pub mod recurrent_law_cuda;
 pub mod register;
 /// Exact returned-contact grouping at the CUDA execution seam.
 pub mod returned_contact_cuda;
+/// D3 — the generated section triple (gather, local application, transposed scatter) and its
+/// exact `Z/(2^61 - 1)` arithmetic, compiled for both nvptx and the host reference.
+pub mod section_layout_cuda;
 /// Sparse exact text-section restriction at the CUDA execution seam.
 pub mod text_restrict_cuda;
 

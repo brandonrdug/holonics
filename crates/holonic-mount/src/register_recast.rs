@@ -4,10 +4,11 @@
 //! two-entry ABI: immutable old OWN, a newly zeroed destination, old/new lane layouts, immutable
 //! requests, a separately seeded completion aperture, and launch parameters.
 
-use crate::cuda::LaunchCensus;
+use crate::launch_law::LaunchEvidence;
+use crate::launch_law::{Extent, LaunchReceipt};
 use crate::{
     Context, CudaError, DeviceBuffer, RegisterRecastArguments, RegisterRecastFinishKernel,
-    RegisterRecastKernel, RegisterSpan, Result,
+    RegisterRecastKernel, RegisterSpan, RegisterWriteSpan, Result,
 };
 
 pub use soma_abi::register::{
@@ -30,10 +31,15 @@ pub struct RegisterOwnRecast<'a> {
     pub fresh_own_words: usize,
 }
 
-/// The fresh aggregate OWN allocation after both ordered recast entries have completed.
+/// The fresh aggregate OWN allocation after both ordered recast entries have completed, together
+/// with the launch receipt each ordered entry earned under `crate::launch_law`.
 pub struct RegisterOwnRecastOutput {
     pub owns: DeviceBuffer<u32>,
     pub completion: Vec<u32>,
+    /// The proved cell-move launch: shape, extents, stream and the clauses proved.
+    pub cell_receipt: LaunchReceipt,
+    /// The proved ordered finish launch.
+    pub finish_receipt: LaunchReceipt,
 }
 
 fn boundary(context: &'static str, message: impl Into<String>) -> CudaError {
@@ -114,7 +120,7 @@ pub fn launch_register_own_recast(
     context: &Context,
     cells: &RegisterRecastKernel<'_>,
     finish: &RegisterRecastFinishKernel<'_>,
-    census: LaunchCensus,
+    evidence: LaunchEvidence<'_>,
     recast: RegisterOwnRecast<'_>,
 ) -> Result<RegisterOwnRecastOutput> {
     let (lane_count, max_old_capacity, work) = validate_extents(
@@ -127,46 +133,49 @@ pub fn launch_register_own_recast(
         recast.requests.len(),
     )?;
 
-    let owns = DeviceBuffer::<u32>::alloc_zeroed(recast.fresh_own_words)?;
-    let completion = DeviceBuffer::<u32>::alloc(recast.lane_count)?;
+    // The two written faces are bound `mut` because the entry declares them `*mut`: the launcher
+    // takes an exclusive `RegisterWriteSpan` of each, so no read span of the same allocation can
+    // coexist with the launch that writes it.
+    let mut owns = DeviceBuffer::<u32>::alloc_zeroed(recast.fresh_own_words)?;
+    let mut completion = DeviceBuffer::<u32>::alloc(recast.lane_count)?;
     completion.copy_from_slice(&vec![REGISTER_RECAST_INCOMPLETE; recast.lane_count])?;
 
-    let cell_launch = cells.linear_launch(census, work)?;
-    let cell_params = [lane_count, max_old_capacity, cell_launch.x_stride];
-    let cell_params_buffer = DeviceBuffer::alloc(cell_params.len())?;
-    cell_params_buffer.copy_from_slice(&cell_params)?;
+    // The parameter buffer exists before the shape is proved, because the proof's own `x_stride`
+    // is the third word the kernel reads out of it. The order is: allocate, prove, fill, enact.
+    const PARAM_WORDS: usize = 3;
+    let cell_params_buffer = DeviceBuffer::<u32>::alloc(PARAM_WORDS)?;
+    let cell_arguments = RegisterRecastArguments {
+        old_owns: RegisterSpan::whole(recast.old_owns),
+        fresh_owns: RegisterWriteSpan::whole(&mut owns),
+        old_lanes: RegisterSpan::whole(recast.old_lanes),
+        new_lanes: RegisterSpan::whole(recast.new_lanes),
+        requests: RegisterSpan::whole(recast.requests),
+        completions: RegisterWriteSpan::whole(&mut completion),
+        params: RegisterSpan::whole(&cell_params_buffer),
+    };
+    let cell_proof = cells.cover(evidence, work, Extent::Exactly(PARAM_WORDS), cell_arguments)?;
+    cell_params_buffer.copy_from_slice(&[lane_count, max_old_capacity, cell_proof.x_stride()])?;
+    let cell_receipt = cells.enact(cell_proof)?;
 
-    cells.launch(
-        cell_launch.grid,
-        cell_launch.block,
-        RegisterRecastArguments {
-            old_owns: RegisterSpan::whole(recast.old_owns),
-            fresh_owns: RegisterSpan::whole(&owns),
-            old_lanes: RegisterSpan::whole(recast.old_lanes),
-            new_lanes: RegisterSpan::whole(recast.new_lanes),
-            requests: RegisterSpan::whole(recast.requests),
-            completions: RegisterSpan::whole(&completion),
-            params: RegisterSpan::whole(&cell_params_buffer),
-        },
+    let finish_params_buffer = DeviceBuffer::<u32>::alloc(PARAM_WORDS)?;
+    let finish_arguments = RegisterRecastArguments {
+        old_owns: RegisterSpan::whole(recast.old_owns),
+        fresh_owns: RegisterWriteSpan::whole(&mut owns),
+        old_lanes: RegisterSpan::whole(recast.old_lanes),
+        new_lanes: RegisterSpan::whole(recast.new_lanes),
+        requests: RegisterSpan::whole(recast.requests),
+        completions: RegisterWriteSpan::whole(&mut completion),
+        params: RegisterSpan::whole(&finish_params_buffer),
+    };
+    let finish_proof = finish.cover(
+        evidence,
+        recast.lane_count as u64,
+        Extent::Exactly(PARAM_WORDS),
+        finish_arguments,
     )?;
-
-    let finish_launch = finish.linear_launch(census, recast.lane_count as u64)?;
-    let finish_params = [lane_count, max_old_capacity, finish_launch.x_stride];
-    let finish_params_buffer = DeviceBuffer::alloc(finish_params.len())?;
-    finish_params_buffer.copy_from_slice(&finish_params)?;
-    finish.launch(
-        finish_launch.grid,
-        finish_launch.block,
-        RegisterRecastArguments {
-            old_owns: RegisterSpan::whole(recast.old_owns),
-            fresh_owns: RegisterSpan::whole(&owns),
-            old_lanes: RegisterSpan::whole(recast.old_lanes),
-            new_lanes: RegisterSpan::whole(recast.new_lanes),
-            requests: RegisterSpan::whole(recast.requests),
-            completions: RegisterSpan::whole(&completion),
-            params: RegisterSpan::whole(&finish_params_buffer),
-        },
-    )?;
+    finish_params_buffer
+        .copy_from_slice(&[lane_count, max_old_capacity, finish_proof.x_stride()])?;
+    let finish_receipt = finish.enact(finish_proof)?;
     context.synchronize()?;
 
     let mut returned = vec![REGISTER_RECAST_INCOMPLETE; recast.lane_count];
@@ -184,6 +193,8 @@ pub fn launch_register_own_recast(
     Ok(RegisterOwnRecastOutput {
         owns,
         completion: returned,
+        cell_receipt,
+        finish_receipt,
     })
 }
 

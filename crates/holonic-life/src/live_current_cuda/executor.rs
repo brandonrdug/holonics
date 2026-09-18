@@ -67,21 +67,27 @@ impl CudaLiveCurrentExecutor {
             }
             let directed_device = upload(&directed_cpu)?;
             let contact_extent = checked_mul(pairs.len(), cuda::DIRECTED_CONTACT_WORDS)?;
-            let contact_device =
+            // The two `*mut` faces are bound `mut`: the launcher takes an exclusive
+            // `LiveEventWriteSpan` of each, so the write exclusivity is a compile-time fact.
+            let mut contact_device =
                 DeviceBuffer::<u32>::alloc_zeroed(contact_extent).map_err(substrate)?;
-            let status_device =
+            let mut status_device =
                 DeviceBuffer::<u32>::alloc_zeroed(pairs.len()).map_err(substrate)?;
             self.module
                 .regional_contacts()
                 .map_err(substrate)?
-                .launch(RegionalContactArguments {
-                    standing: LiveEventSpan::prefix(standing, standing_len).map_err(substrate)?,
-                    standing_axis,
-                    receiver: LiveEventSpan::whole(&receiver_device),
-                    directed_events: LiveEventSpan::whole(&directed_device),
-                    directed_contacts: LiveEventSpan::whole(&contact_device),
-                    statuses: LiveEventSpan::whole(&status_device),
-                })
+                .launch(
+                    LaunchEvidence::Device(&self.device),
+                    RegionalContactArguments {
+                        standing: LiveEventSpan::prefix(standing, standing_len)
+                            .map_err(substrate)?,
+                        standing_axis,
+                        receiver: LiveEventSpan::whole(&receiver_device),
+                        directed_events: LiveEventSpan::whole(&directed_device),
+                        directed_contacts: LiveEventWriteSpan::whole(&mut contact_device),
+                        statuses: LiveEventWriteSpan::whole(&mut status_device),
+                    },
+                )
                 .map_err(substrate)?;
             self.context.synchronize().map_err(substrate)?;
             self.launches = self
@@ -339,10 +345,10 @@ impl CudaLiveCurrentExecutor {
                     .copy_from_slice(&row.words());
             }
 
-            let control_device = upload(&control)?;
+            let mut control_device = upload(&control)?;
             let relations_device = upload(&relation_cpu)?;
-            let owns_device = upload(&owns_cpu)?;
-            let (carriers_device, overflow_device, overflow_counts_device) =
+            let mut owns_device = upload(&owns_cpu)?;
+            let (mut carriers_device, mut overflow_device, mut overflow_counts_device) =
                 if let Some(resident) = resident {
                     if resident.depth != prior_depth
                         || resident.max_depth < prior_depth
@@ -415,34 +421,38 @@ impl CudaLiveCurrentExecutor {
                     (carriers_device, overflow_device, overflow_counts_device)
                 };
             let directed_events_device = upload(&directed_event_cpu)?;
-            let directed_contacts_device = upload(&directed_contact_cpu)?;
-            let emissions_device = upload(&emissions_cpu)?;
-            let emanation_device = upload(&emanation_cpu)?;
+            let mut directed_contacts_device = upload(&directed_contact_cpu)?;
+            let mut emissions_device = upload(&emissions_cpu)?;
+            let mut emanation_device = upload(&emanation_cpu)?;
             self.module
                 .lineage_event()
                 .map_err(substrate)?
-                .launch(LiveEventArguments {
-                    standing: LiveEventSpan::prefix(standing, standing_len).map_err(substrate)?,
-                    control: LiveEventSpan::whole(&control_device),
-                    relations: LiveEventSpan::prefix(&relations_device, relation_extent)
+                .launch(
+                    LaunchEvidence::Device(&self.device),
+                    LiveEventArguments {
+                        standing: LiveEventSpan::prefix(standing, standing_len)
+                            .map_err(substrate)?,
+                        control: LiveEventWriteSpan::whole(&mut control_device),
+                        relations: LiveEventSpan::prefix(&relations_device, relation_extent)
+                            .map_err(substrate)?,
+                        owns: LiveEventWriteSpan::whole(&mut owns_device),
+                        carriers: LiveEventWriteSpan::whole(&mut carriers_device),
+                        overflow_nodes: LiveEventWriteSpan::whole(&mut overflow_device),
+                        overflow_counts: LiveEventWriteSpan::whole(&mut overflow_counts_device),
+                        directed_events: LiveEventSpan::prefix(
+                            &directed_events_device,
+                            directed_event_extent,
+                        )
                         .map_err(substrate)?,
-                    owns: LiveEventSpan::whole(&owns_device),
-                    carriers: LiveEventSpan::whole(&carriers_device),
-                    overflow_nodes: LiveEventSpan::whole(&overflow_device),
-                    overflow_counts: LiveEventSpan::whole(&overflow_counts_device),
-                    directed_events: LiveEventSpan::prefix(
-                        &directed_events_device,
-                        directed_event_extent,
-                    )
-                    .map_err(substrate)?,
-                    directed_contacts: LiveEventSpan::prefix(
-                        &directed_contacts_device,
-                        directed_contact_extent,
-                    )
-                    .map_err(substrate)?,
-                    emissions: LiveEventSpan::whole(&emissions_device),
-                    emanation: LiveEventSpan::whole(&emanation_device),
-                })
+                        directed_contacts: LiveEventWriteSpan::prefix(
+                            &mut directed_contacts_device,
+                            directed_contact_extent,
+                        )
+                        .map_err(substrate)?,
+                        emissions: LiveEventWriteSpan::whole(&mut emissions_device),
+                        emanation: LiveEventWriteSpan::whole(&mut emanation_device),
+                    },
+                )
                 .map_err(substrate)?;
             self.context.synchronize().map_err(substrate)?;
             self.launches = self
@@ -1026,19 +1036,21 @@ impl CudaLiveCurrentExecutor {
             let emissions_flat = vec![0u32; checked_mul(count, emission_extent)?];
             let emanation_flat = vec![0u32; checked_mul(count, cuda::EMANATION_WORDS)?];
 
-            let control_device = upload(&control_flat)?;
+            let mut control_device = upload(&control_flat)?;
             let relations_device = upload(&relation_flat)?;
-            let owns_device = upload(&owns_flat)?;
-            let emissions_device = upload(&emissions_flat)?;
-            let emanation_device = upload(&emanation_flat)?;
+            let mut owns_device = upload(&owns_flat)?;
+            let mut emissions_device = upload(&emissions_flat)?;
+            let mut emanation_device = upload(&emanation_flat)?;
             let directed_device = DeviceBuffer::alloc_zeroed(count.max(1)).map_err(substrate)?;
-            let contacts_device = DeviceBuffer::alloc_zeroed(count.max(1)).map_err(substrate)?;
+            let mut contacts_device = DeviceBuffer::alloc_zeroed(count.max(1)).map_err(substrate)?;
 
-            let carriers_device = DeviceBuffer::alloc_zeroed(checked_mul(count, carrier_extent)?)
-                .map_err(substrate)?;
-            let overflow_device = DeviceBuffer::alloc_zeroed(checked_mul(count, overflow_extent)?)
-                .map_err(substrate)?;
-            let counts_device = DeviceBuffer::alloc_zeroed(checked_mul(count, caps.max_depth)?)
+            let mut carriers_device =
+                DeviceBuffer::alloc_zeroed(checked_mul(count, carrier_extent)?)
+                    .map_err(substrate)?;
+            let mut overflow_device =
+                DeviceBuffer::alloc_zeroed(checked_mul(count, overflow_extent)?)
+                    .map_err(substrate)?;
+            let mut counts_device = DeviceBuffer::alloc_zeroed(checked_mul(count, caps.max_depth)?)
                 .map_err(substrate)?;
 
             for (lane, (stage, resident)) in staged.iter().zip(residents).enumerate() {
@@ -1143,29 +1155,28 @@ impl CudaLiveCurrentExecutor {
                 });
             }
 
-            // ONE crossing. The shape comes from `Function::linear_launch`, which reads it off the
-            // function's own attribute and the device census.
-            let census = self.device_census()?;
+            // ONE crossing. The shape is derived from the mounted card itself, which is also the
+            // declared launch evidence, so no clause of this launch is deferred.
             self.module
                 .lineage_event_population()
                 .map_err(substrate)?
                 .launch(
-                    census,
+                    LaunchEvidence::Device(&self.device),
                     LiveEventArguments {
                         standing: LiveEventSpan::prefix(standing, standing_len)
                             .map_err(substrate)?,
-                        control: LiveEventSpan::whole(&control_device),
+                        control: LiveEventWriteSpan::whole(&mut control_device),
                         relations: LiveEventSpan::whole(&relations_device),
-                        owns: LiveEventSpan::whole(&owns_device),
-                        carriers: LiveEventSpan::whole(&carriers_device),
-                        overflow_nodes: LiveEventSpan::whole(&overflow_device),
-                        overflow_counts: LiveEventSpan::whole(&counts_device),
+                        owns: LiveEventWriteSpan::whole(&mut owns_device),
+                        carriers: LiveEventWriteSpan::whole(&mut carriers_device),
+                        overflow_nodes: LiveEventWriteSpan::whole(&mut overflow_device),
+                        overflow_counts: LiveEventWriteSpan::whole(&mut counts_device),
                         directed_events: LiveEventSpan::prefix(&directed_device, 0)
                             .map_err(substrate)?,
-                        directed_contacts: LiveEventSpan::prefix(&contacts_device, 0)
+                        directed_contacts: LiveEventWriteSpan::prefix(&mut contacts_device, 0)
                             .map_err(substrate)?,
-                        emissions: LiveEventSpan::whole(&emissions_device),
-                        emanation: LiveEventSpan::whole(&emanation_device),
+                        emissions: LiveEventWriteSpan::whole(&mut emissions_device),
+                        emanation: LiveEventWriteSpan::whole(&mut emanation_device),
                     },
                     count,
                 )
@@ -1256,12 +1267,6 @@ impl CudaLiveCurrentExecutor {
 }
 
 impl CudaLiveCurrentExecutor {
-    /// The device's own launch census, taken once at mount. `μ`'s `D` constituent.
-    fn device_census(&self) -> Result<::mount::cuda::LaunchCensus, LiveCurrentError> {
-        self.launch_census
-            .ok_or(LiveCurrentError::PhysicalSettlement)
-    }
-
     /// Stage one current's cpu region at the population's uniform capacities.
     ///
     /// This is `enact_one`'s packing, taking its capacities as arguments instead of owning them, so

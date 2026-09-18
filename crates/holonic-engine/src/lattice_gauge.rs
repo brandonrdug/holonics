@@ -78,9 +78,6 @@ use crate::structure_group::{
 // refusals
 // -------------------------------------------------------------------------------------------------
 
-/// Why a lattice, a representation, or a reading was refused. Every variant names the material that
-/// failed rather than reporting a position.
-
 // ---------------------------------------------------------------------------------------------
 // THE CROSSING: a rational current entering a plaquette
 //
@@ -963,21 +960,68 @@ pub fn characteristic_polynomial(
 /// them.
 ///
 /// This is `H.0106`'s rebase and nothing more (id corrected 2026-09-03; `H.0104` is Lambda): an invertible change of chart with **zero remainder**,
-/// the free stroke. Without it, `rational_root_census` bounds its search by the Cauchy bound
-/// `max |coefficient| + 1` and runs Sturm sequences across it. On a real transport read off a
-/// pretrained map that interval was measured at half-width `2^770` — because a degree-8 polynomial
-/// over 103-bit entries has a constant term near `8 × 103` bits by Hadamard — while the eigenvalues
-/// themselves cannot exceed `2^106`. The census was not wrong; it was asked in the chart where the
-/// magnitudes live, and **a magnitude is the one species the horizon law says does not cross a frame**.
+/// the free stroke. Without it, `rational_root_census` used to bound its search by the absolute
+/// Cauchy bound `max |coefficient| + 1` and run Sturm sequences across it. On a real transport read
+/// off a pretrained map that interval was measured at half-width `2^770` — because a degree-8
+/// polynomial over 103-bit entries has a constant term near `8 × 103` bits by Hadamard — while the
+/// eigenvalues themselves cannot exceed `2^106`. The census was not wrong; it was asked in the chart
+/// where the magnitudes live, and **a magnitude is the one species the horizon law says does not
+/// cross a frame**. That bound is now
+/// `rational_polynomial::certified_real_root_enclosure`, a `k`-th root bound with the two sides
+/// counted separately and a Taylor-shift certificate attached, so the same degree-8 case is bounded
+/// near `2^97` rather than `2^770`. The rebase below remains the cheaper first question and is kept.
 ///
 /// The prime population is **read off the material**: every prime up to twice the degree, skipping
 /// any that divides the leading coefficient. A polynomial of degree `d` has at most `d` roots over
 /// `Z/p`, so primes above `d` are where a refutation becomes likely, and the degree is the
 /// polynomial's own.
 ///
+/// **Zero is deflated before the question is asked.** `x = 0` is a root of `f mod p` for *every*
+/// prime as soon as `f` has a zero constant term, so on any singular operator — every Laplacian,
+/// every `−JᵀJ` with an infinitesimal motion — the refutation could never fire and the route was
+/// unusable exactly where it was needed. R1 recorded that on `−JᵀJ`. The `x^k` factor is divided
+/// out here and returned as the multiplicity of the eigenvalue `0`, which is exact and free; the
+/// refutation is then asked of the deflated factor, where it can actually answer.
+///
 /// Returns the refuting prime when one exists. `None` means *not refuted here* — never *a root
 /// exists* — so the full census still runs and the returned roots are unchanged either way.
+/// `exact_spectrum` inlines this pair so it can also keep the multiplicity the deflation reads
+/// off; the composed form is retained for the test that holds the corrected route against the
+/// defect it replaced.
+#[cfg(test)]
 fn refuting_prime(primitive: &crate::exact_value::IntegerPolynomial) -> Option<u64> {
+    let deflated = deflate_zero_root(primitive).1?;
+    refuting_prime_of_deflated(&deflated)
+}
+
+/// **The declared ceiling on the prime population a refutation may try.**
+///
+/// [definition] The population below is read off the coefficient width, which is a caller-declared
+/// size: a matrix whose entries a caller supplies decides how many primes are swept, and the sweep
+/// is quadratic in that number because each prime is checked by trial division and each polynomial
+/// is evaluated at every residue. A hostile operator would therefore buy an arbitrarily long sweep
+/// with one wide entry. The ceiling caps it; passing it simply means the fast path declines and the
+/// census runs, which is the same answer the route already gives when nothing refutes.
+pub const REFUTING_PRIME_CEILING: u64 = 4096;
+
+/// `(multiplicity of the root 0, the polynomial with `x^k` divided out)`. The second is `None` only
+/// for the zero polynomial, which has no deflation.
+fn deflate_zero_root(
+    primitive: &crate::exact_value::IntegerPolynomial,
+) -> (usize, Option<crate::exact_value::IntegerPolynomial>) {
+    let zeros = primitive
+        .coefficients
+        .iter()
+        .take_while(|coefficient| coefficient.is_zero())
+        .count();
+    let remaining = primitive.coefficients[zeros..].to_vec();
+    (
+        zeros,
+        crate::exact_value::IntegerPolynomial::new(remaining).ok(),
+    )
+}
+
+fn refuting_prime_of_deflated(primitive: &crate::exact_value::IntegerPolynomial) -> Option<u64> {
     let degree = primitive.degree();
     if degree == 0 {
         return None;
@@ -987,16 +1031,22 @@ fn refuting_prime(primitive: &crate::exact_value::IntegerPolynomial) -> Option<u
     // `Z/p` has at most `d` roots, so a single prime refutes only sometimes — measured on a real
     // transport, primes up to `2·degree` gave six candidates and none refuted. The count that
     // matters is therefore not the degree but the **width of the search the census would otherwise
-    // run**, which is set by the widest coefficient: the Cauchy bound is `max |coefficient| + 1`, so
-    // that many bits is exactly what a refutation is worth. Each prime costs microseconds against a
-    // census that costs seconds, and the ceiling is the material's own number rather than a choice.
+    // run**, which is set by the widest coefficient, so that many bits is exactly what a refutation
+    // is worth. Each prime costs microseconds against a census that costs seconds, so the ceiling is
+    // read off the material — and then capped by [`REFUTING_PRIME_CEILING`], because the widest
+    // coefficient is a caller-declared size and the sweep is quadratic in it.
     let widest = primitive
         .coefficients
         .iter()
         .map(|coefficient| coefficient.bits())
         .max()
         .unwrap_or(0);
-    let ceiling = widest.max(2 * degree as u64).max(3);
+    let wanted = widest.max(2 * degree as u64).max(3);
+    let ceiling = if wanted > REFUTING_PRIME_CEILING {
+        REFUTING_PRIME_CEILING
+    } else {
+        wanted
+    };
     'candidate: for prime in 2..=ceiling {
         for smaller in 2..prime {
             if prime % smaller == 0 {
@@ -1039,16 +1089,30 @@ fn refuting_prime(primitive: &crate::exact_value::IntegerPolynomial) -> Option<u
 pub fn exact_spectrum(operator: &ExactRatMatrix) -> Result<ExactSpectrum, LatticeGaugeRefusal> {
     let characteristic = characteristic_polynomial(operator)?;
 
-    // The rebase, before the search. If a prime refutes, every rational root is refuted and the
-    // whole characteristic polynomial is the unresolved factor — which is exactly what the census
-    // would have returned after isolating over the Cauchy interval.
+    // The rebase, before the search. Zero is deflated first — it is a root of every reduction, so
+    // leaving it in made the refutation unfirable on exactly the singular operators that needed it
+    // — and the refutation is then asked of the deflated factor. If a prime refutes, every
+    // *nonzero* rational root is refuted, the deflated factor is the unresolved one, and the
+    // eigenvalue `0` is returned with the exact multiplicity the deflation read off.
     if let Ok(primitive) = characteristic.primitive_integer_form() {
-        if refuting_prime(&primitive).is_some() {
+        let (kernel_multiplicity, deflated) = deflate_zero_root(&primitive);
+        if let Some(deflated) = deflated
+            && refuting_prime_of_deflated(&deflated).is_some()
+        {
+            // `characteristic / x^k`, in the characteristic's own monic normalization rather than
+            // the deflated primitive form's.
+            let unresolved =
+                RationalPolynomial::new(characteristic.coefficients()[kernel_multiplicity..].to_vec());
+            let rational_eigenvalues = if kernel_multiplicity > 0 {
+                vec![(Rat::zero(), kernel_multiplicity)]
+            } else {
+                Vec::new()
+            };
             return Ok(ExactSpectrum {
                 extent: operator.rows(),
-                characteristic: characteristic.clone(),
-                rational_eigenvalues: Vec::new(),
-                unresolved: characteristic,
+                characteristic,
+                rational_eigenvalues,
+                unresolved,
                 intervals: Vec::new(),
             });
         }
@@ -1666,6 +1730,119 @@ mod tests {
         assert_eq!(
             GaugeConfiguration::declare(lattice, group, assignment),
             Err(LatticeGaugeRefusal::LinkCarriesNothing { link: 101 })
+        );
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // the refutation on a singular operator
+
+    /// `−JᵀJ` for a declared integer constraint Jacobian: symmetric, negative semidefinite, and
+    /// **singular**, which is the shape every elastic network built from a rigidity Jacobian has.
+    fn negative_gram(rows: &[&[i64]]) -> ExactRatMatrix {
+        let jacobian = ExactRatMatrix::new(
+            rows.iter()
+                .map(|row| row.iter().copied().map(rat).collect())
+                .collect(),
+        )
+        .expect("a rectangular Jacobian");
+        let gram = jacobian
+            .transpose()
+            .expect("the transpose returns")
+            .multiply(&jacobian)
+            .expect("JᵀJ is square");
+        gram.scaled(&-Rat::one())
+    }
+
+    /// **R1's finding, refuted: the refutation now fires on `−JᵀJ`.**
+    ///
+    /// [established-bounded] `A = −JᵀJ` is singular whenever `J` has an infinitesimal motion, so
+    /// `det(xI − A)` has a zero constant term and `x = 0` is a root of its reduction modulo *every*
+    /// prime. The refutation could therefore never fire, and R1 recorded the route as unusable on
+    /// exactly this operator. The `x^k` factor is deflated first now, and the refutation is asked of
+    /// what is left.
+    ///
+    /// `J = [[1,1,0],[0,1,2]]` gives `JᵀJ` with eigenvalues `0` and `(7 ± √13)/2`, so
+    /// `det(xI − A) = x(x² + 7x + 9)`: one rational eigenvalue, `0`, and an irreducible quadratic.
+    /// `13` is a quadratic non-residue modulo `5`, so the prime `5` refutes the deflated factor.
+    #[test]
+    fn the_refutation_fires_on_a_singular_negative_gram_after_the_zero_root_is_deflated() {
+        let operator = negative_gram(&[&[1, 1, 0], &[0, 1, 2]]);
+        let characteristic = characteristic_polynomial(&operator).expect("the recurrence returns");
+        // `x³ + 7x² + 9x`, ascending.
+        assert_eq!(
+            characteristic.coefficients(),
+            &[rat(0), rat(9), rat(7), rat(1)]
+        );
+        let primitive = characteristic
+            .primitive_integer_form()
+            .expect("a nonzero polynomial");
+
+        // The route as it was: asked of the undeflated polynomial, no prime can ever refute,
+        // because `0` is a root of every reduction.
+        assert_eq!(
+            refuting_prime_of_deflated(&primitive),
+            None,
+            "an undeflated singular characteristic polynomial can never be refuted, which is the \
+             defect"
+        );
+        // The route as it is: the deflation exposes a factor the refutation can answer about.
+        assert!(
+            refuting_prime(&primitive).is_some(),
+            "the deflated factor x² + 7x + 9 has no rational root and a prime must refute it"
+        );
+
+        let spectrum = exact_spectrum(&operator).expect("the spectrum returns");
+        assert_eq!(
+            spectrum.rational_eigenvalues,
+            vec![(Rat::zero(), 1)],
+            "the kernel multiplicity is exact and is returned, not discarded by the fast path"
+        );
+        assert_eq!(spectrum.unresolved.degree(), Some(2));
+        assert!(!spectrum.is_completely_rational());
+        assert_eq!(spectrum.accounted(), 1);
+        // The unresolved factor is `characteristic / x`, in the characteristic's own normalization.
+        assert_eq!(
+            spectrum.unresolved.coefficients(),
+            &[rat(9), rat(7), rat(1)]
+        );
+    }
+
+    /// **The same route on a wider `−JᵀJ`, with the census as the fallback it always was.**
+    ///
+    /// A nine-coordinate elastic network whose Jacobian carries three-digit entries: the
+    /// characteristic polynomial's coefficients reach Hadamard size, which is exactly the material
+    /// on which the absolute Cauchy bound was astronomically wide. The spectrum returns with the
+    /// kernel multiplicity exact either way — whether a prime refutes or the census runs — and
+    /// `0` is placed as a rational eigenvalue, which is what R1 needed and could not get.
+    #[test]
+    fn a_wide_singular_negative_gram_returns_its_kernel_multiplicity_exactly() {
+        let operator = negative_gram(&[
+            &[103, -47, 0, 0, 0, 0, 91, 0, 0],
+            &[0, 61, -83, 0, 0, 0, 0, 17, 0],
+            &[0, 0, 29, -71, 0, 0, 0, 0, 53],
+            &[0, 0, 0, 37, -19, 0, 11, 0, 0],
+            &[0, 0, 0, 0, 89, -23, 0, 41, 0],
+            &[7, 0, 0, 0, 0, 13, 0, 0, -67],
+        ]);
+        let spectrum = exact_spectrum(&operator).expect("the spectrum returns");
+        assert_eq!(spectrum.extent, 9);
+        let kernel = operator.kernel_basis().expect("the kernel returns").len();
+        assert_eq!(kernel, 3, "six constraints on nine coordinates leave three motions");
+        let placed_zero = spectrum
+            .rational_eigenvalues
+            .iter()
+            .find(|(value, _)| value.is_zero())
+            .map(|(_, multiplicity)| *multiplicity)
+            .unwrap_or(0);
+        assert_eq!(
+            placed_zero, kernel,
+            "the algebraic multiplicity of the eigenvalue 0 must equal the geometric one for a \
+             symmetric operator"
+        );
+        assert_eq!(
+            spectrum.unresolved.degree(),
+            Some(9 - kernel),
+            "everything but the kernel is left in the unresolved factor, by name"
         );
     }
 }

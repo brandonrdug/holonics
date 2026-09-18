@@ -18,7 +18,8 @@ use mount::cuda::LaunchCensus;
 use mount::{
     launch_register_own_recast, Context, CudaError, Device, DeviceBuffer, Module,
     RegisterOwnRecast, RegisterOwnRecastOutput, RegisterRecastFinishKernel, RegisterRecastKernel,
-    RegisterScopeArguments, RegisterScopeKernel, RegisterSpan, Result,
+    LaunchEvidence, RegisterScopeArguments, RegisterScopeKernel, RegisterSpan, RegisterWriteSpan,
+    Result,
 };
 use soma_abi::register as register_abi;
 
@@ -306,18 +307,23 @@ fn cpu_proof() -> CpuProof {
     }
 }
 
+/// The written faces are taken `&mut` because the entry declares them `*mut`: `RegisterWriteSpan`
+/// is not `Copy`, so the borrow checker refuses any second span of the same allocation for the
+/// life of the launch.
+#[allow(clippy::too_many_arguments)]
 fn launch_scope(
     context: &Context,
     function: &RegisterScopeKernel<'_>,
+    device: &Device,
     census: LaunchCensus,
     standing: &DeviceBuffer<u32>,
-    owns: &DeviceBuffer<u32>,
-    carrier: &DeviceBuffer<u32>,
+    owns: &mut DeviceBuffer<u32>,
+    carrier: &mut DeviceBuffer<u32>,
     packed: &DeviceBuffer<u32>,
     lane: &DeviceBuffer<u32>,
-    counts: &DeviceBuffer<u64>,
-    radiation: &DeviceBuffer<u32>,
-    status: &DeviceBuffer<u32>,
+    counts: &mut DeviceBuffer<u64>,
+    radiation: &mut DeviceBuffer<u32>,
+    status: &mut DeviceBuffer<u32>,
     capacity: usize,
     installment: usize,
 ) -> Result<[u32; STATUS_WORDS]> {
@@ -338,22 +344,36 @@ fn launch_scope(
     let params_b = DeviceBuffer::alloc(params.len())?;
     params_b.copy_from_slice(&params)?;
 
-    let completion = DeviceBuffer::<u32>::alloc_zeroed(1)?;
-    function.launch(
+    let mut completion = DeviceBuffer::<u32>::alloc_zeroed(1)?;
+    // One lane is the declared element extent of this stroke, and the **mounted card itself** is
+    // the declared device evidence, so every clause is proved — including the per-dimension block
+    // extent and the per-block shared extent a census cannot carry, which this gate formerly
+    // deferred.  The census is still what the launch *shape* is derived from.
+    let receipt = function.launch(
+        LaunchEvidence::Device(device),
         launch.grid,
         launch.block,
+        1,
         RegisterScopeArguments {
             standing: RegisterSpan::whole(standing),
-            owns: RegisterSpan::whole(owns),
-            carriers: RegisterSpan::whole(carrier),
+            owns: RegisterWriteSpan::whole(owns),
+            carriers: RegisterWriteSpan::whole(carrier),
             bytes: RegisterSpan::whole(packed),
             lanes: RegisterSpan::whole(lane),
-            counts: RegisterSpan::whole(counts),
+            counts: RegisterWriteSpan::whole(counts),
             params: RegisterSpan::whole(&params_b),
-            radiation: RegisterSpan::whole(radiation),
-            completion: RegisterSpan::whole(&completion),
-            statuses: RegisterSpan::whole(status),
+            radiation: RegisterWriteSpan::whole(radiation),
+            completion: RegisterWriteSpan::whole(&mut completion),
+            statuses: RegisterWriteSpan::whole(status),
         },
+    )?;
+    require(
+        receipt.is_fully_proved(),
+        "launch_scope",
+        format!(
+            "the scope launch deferred {:?} under LaunchEvidence::Device: {receipt}",
+            receipt.deferred()
+        ),
     )?;
     context.synchronize()?;
 
@@ -374,7 +394,7 @@ fn checked_recast(
     context: &Context,
     cells: &RegisterRecastKernel<'_>,
     finish: &RegisterRecastFinishKernel<'_>,
-    census: LaunchCensus,
+    device: &Device,
     old_owns: &DeviceBuffer<u32>,
     fresh_own_words: usize,
     old_lane: &DeviceBuffer<u32>,
@@ -389,7 +409,7 @@ fn checked_recast(
         context,
         cells,
         finish,
-        census,
+        LaunchEvidence::Device(device),
         RegisterOwnRecast {
             old_owns,
             old_lanes: old_lane,
@@ -463,7 +483,7 @@ fn flatten_lanes(rows: &[[u32; register_abi::LANE_WORDS]]) -> Vec<u32> {
     rows.iter().flat_map(|row| row.iter().copied()).collect()
 }
 
-fn card_mixed_recast(device: &Device, census: LaunchCensus, cpu: &CpuProof) -> Result<()> {
+fn card_mixed_recast(device: &Device, cpu: &CpuProof) -> Result<()> {
     let requested_old = &cpu.sub.owns;
     let mut requested_new = vec![0u32; own_words(4)];
     require(
@@ -511,7 +531,7 @@ fn card_mixed_recast(device: &Device, census: LaunchCensus, cpu: &CpuProof) -> R
             &context,
             &recast,
             &finish,
-            census,
+            device,
             &old,
             expected.len(),
             &old_lanes,
@@ -544,7 +564,7 @@ fn card_proof(cpu: &CpuProof) -> Result<Snapshot> {
     mount::cuda::init()?;
     let device = Device::get(0)?;
     let census = device.launch_census()?;
-    card_mixed_recast(&device, census, cpu)?;
+    card_mixed_recast(&device, cpu)?;
 
     let path_snapshot = {
         let context = Context::create(&device)?;
@@ -555,17 +575,17 @@ fn card_proof(cpu: &CpuProof) -> Result<Snapshot> {
             let recast_finish = module.register_recast_finish()?;
             let standing = DeviceBuffer::<u32>::alloc_zeroed(STANDING_CELLS * FORM_WORDS)?;
             let mut owns = DeviceBuffer::<u32>::alloc_zeroed(own_words(1))?;
-            let carrier = DeviceBuffer::<u32>::alloc_zeroed(manifold::carrier_row_words(DEPTH))?;
+            let mut carrier = DeviceBuffer::<u32>::alloc_zeroed(manifold::carrier_row_words(DEPTH))?;
             let packed = upload(&packed_light())?;
             let mut lane = upload(&lane_row(1))?;
-            let counts = DeviceBuffer::<u64>::alloc_zeroed(4)?;
-            let radiation =
+            let mut counts = DeviceBuffer::<u64>::alloc_zeroed(4)?;
+            let mut radiation =
                 DeviceBuffer::<u32>::alloc_zeroed(LIGHT.len() * manifold::RADIATION_WORDS)?;
-            let status = DeviceBuffer::<u32>::alloc(STATUS_WORDS)?;
+            let mut status = DeviceBuffer::<u32>::alloc(STATUS_WORDS)?;
 
             let first_status = launch_scope(
-                &context, &scope, census, &standing, &owns, &carrier, &packed, &lane, &counts,
-                &radiation, &status, 1, 0,
+                &context, &scope, &device, census, &standing, &mut owns, &mut carrier, &packed, &lane,
+                &mut counts, &mut radiation, &mut status, 1, 0,
             )?;
             require(
                 first_status == [STATUS_NEEDS_OWN_RECAST, 1, 2],
@@ -582,7 +602,7 @@ fn card_proof(cpu: &CpuProof) -> Result<Snapshot> {
                 &context,
                 &recast,
                 &recast_finish,
-                census,
+                &device,
                 &owns,
                 own_words(4),
                 &lane,
@@ -603,8 +623,8 @@ fn card_proof(cpu: &CpuProof) -> Result<Snapshot> {
             lane = new_lane;
 
             let second_status = launch_scope(
-                &context, &scope, census, &standing, &owns, &carrier, &packed, &lane, &counts,
-                &radiation, &status, 4, 0,
+                &context, &scope, &device, census, &standing, &mut owns, &mut carrier, &packed, &lane,
+                &mut counts, &mut radiation, &mut status, 4, 0,
             )?;
             require(
                 second_status == [STATUS_NEEDS_OWN_RECAST, 2, 4],
@@ -636,12 +656,12 @@ fn card_proof(cpu: &CpuProof) -> Result<Snapshot> {
         let recast_finish = module.register_recast_finish()?;
         let standing = DeviceBuffer::<u32>::alloc_zeroed(STANDING_CELLS * FORM_WORDS)?;
         let mut owns = upload(&path_snapshot.owns)?;
-        let carrier = upload(&path_snapshot.carrier)?;
+        let mut carrier = upload(&path_snapshot.carrier)?;
         let packed = upload(&path_snapshot.packed)?;
         let mut lane = upload(&path_snapshot.lane)?;
-        let counts = upload(&path_snapshot.counts)?;
-        let radiation = upload(&path_snapshot.radiation)?;
-        let status = upload(&path_snapshot.status)?;
+        let mut counts = upload(&path_snapshot.counts)?;
+        let mut radiation = upload(&path_snapshot.radiation)?;
+        let mut status = upload(&path_snapshot.status)?;
         let uploaded = download_snapshot(
             &owns, &carrier, &counts, &radiation, &packed, &lane, &status,
         )?;
@@ -652,7 +672,7 @@ fn card_proof(cpu: &CpuProof) -> Result<Snapshot> {
             &context,
             &recast,
             &recast_finish,
-            census,
+            &device,
             &owns,
             own_words(16),
             &lane,
@@ -674,8 +694,8 @@ fn card_proof(cpu: &CpuProof) -> Result<Snapshot> {
 
         let before_resume = path_snapshot.counts;
         let resumed_status = launch_scope(
-            &context, &scope, census, &standing, &owns, &carrier, &packed, &lane, &counts,
-            &radiation, &status, 16, 1,
+            &context, &scope, &device, census, &standing, &mut owns, &mut carrier, &packed, &lane,
+            &mut counts, &mut radiation, &mut status, 16, 1,
         )?;
         require(
             resumed_status == [STATUS_CONTINUE, 0, 0],
@@ -703,8 +723,8 @@ fn card_proof(cpu: &CpuProof) -> Result<Snapshot> {
         let mut current = resumed;
         while !settled(&current.carrier) {
             let returned = launch_scope(
-                &context, &scope, census, &standing, &owns, &carrier, &packed, &lane, &counts,
-                &radiation, &status, 16, 1,
+                &context, &scope, &device, census, &standing, &mut owns, &mut carrier, &packed, &lane,
+                &mut counts, &mut radiation, &mut status, 16, 1,
             )?;
             require(
                 (returned[0] == STATUS_CONTINUE || returned[0] == STATUS_COMPLETE)
