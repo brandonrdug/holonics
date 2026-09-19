@@ -74,6 +74,57 @@ longitudinal station and the grain index, which is not the time/entropy pair; [o
 of the time and entropy axes along an oriented chain is to be constructed from T5's longitudinal
 axis and T7's directed entropy condition, not read off either alone.
 
+[project-postulate] Brandon, September 19, on notation: **a passage between neighbouring blocks is
+an arrow, not a pair of integers.** The indices `1, 2` of a cross block carry no magnitude; what
+matters is the direction of the shift. Write the upstream→downstream block `A_↗` (formerly `A₂₁`)
+and the return `A_↘` (formerly `A₁₂`); along one axis use `→ ← ↑ ↓`. The six signed unit shifts of
+three axes are the vertices of the octahedron. And **every `−1` is the half-turn `e^{iπ}`**, with
+`i = e^{iπ/2}` the quarter-turn; signs are phases, which is what lets a relation continue
+analytically.
+
+[proved-derived; formal-checked] In that notation the chain's returned theorems read: the neck is
+`rank A_↗`; the conservative coupling returns with a half-turn, `Ω_↘ = e^{iπ} Ω_↗ᵀ`, and the
+dissipative one with none, `M_↘ = M_↗ᵀ`; reversal exchanges `↗` and `↘`
+(`HolonicChain.lean::adjoint_is_the_reversed_structure`), so everything built from `M` is
+reversal-even and the signed flux is reversal-odd. With `Ω = e^{iπ/2}H`, `H` Hermitian, the
+generator is `A = (e^{iπ/2}H + e^{iπ}M)G`: for `G ≻ 0` the conservative part places spectrum on the
+axis (phase `±π/2`) and the dissipative part on the negative real line (phase `π`). The two parts
+sit a quarter-turn apart, and spectral placement is the question of which phases a generator
+carries under which positivity.
+
+[interpretation] Three consequences to develop, each with its first derivation target.
+**Spectral placement.** A `G`-skew generator (`AᵀG + GA = 0`) has spectrum symmetric under
+`λ ↦ −λ̄` — the finite form of a reflection functional equation `ξ(s) = ξ(1−s)`; `G ≻ 0` collapses
+the symmetric pairs onto the axis, which is `SpectralReading`'s licence and the shape of the
+reflection-positivity item [the Millennium frame](../canon/THE_MILLENNIUM_FRAME.md) names as
+missing. [proved-standard] For indefinite nondegenerate `G` with `κ` negative squares, at most
+`min(κ, n−κ)` eigenvalues lie in the open right half plane (Pontryagin); `G = diag(1, −1)`,
+`A = [[0,1],[1,0]]` attains it. Target: replace `NoLicenceWithoutDefiniteStorage`'s silence by that
+bounded licence, read from the `Inertia` it already computes.
+[source-audit 2026-09-19 5a406e17] prior-art 'pontryagin|krein|negative squares|indefinite inner product' -> 3 files, none in this sense (they concern the Pontryagin dual).
+**Hodge cycles.** `M_contact = Σ_f w_f J_fᵀD_fJ_f` is a weighted Hodge Laplacian `d*⋆d` when the
+slip maps are coboundary rows. Its kernel is the zero-slip motions; the eigenvalues that stay on
+the axis under dissipation are exactly the largest `A`-invariant subspace inside `ker(MG)` — the
+cycle classes dissipation cannot see. Euler is the `Ω`-only generator and Navier–Stokes adds
+`M = ν d*d`; the storage-rate identity is the energy identity `Ė = −2ν‖∇u‖²`; the complex-Euler
+analyticity strip is the neck's analytic width (#32). Target: state the on-axis count as the
+dimension of that invariant subspace and read it with `hodge_receiver` on the same incidence.
+**Gluing.** The receiver atlas lists, per receiver, an unproved gluing law with interface
+coupling: an interconnection receiver (R1), Mayer–Vietoris or an interface-coupled Laplacian (R3),
+composition of sub-framework motion spaces (R4), persistence Mayer–Vietoris (R5), and the
+physicochemical interface (#10). `holonic_chain` returned R1's and, in hinge form, R4's. These are
+one construction — the gluing law across a neck, whose connecting map has rank at most
+`rank A_↗` — and the multi-neck chain and measured contact faces (#27) are its continuation, not
+separate campaigns. The Euler characteristic that gluing must respect is the Poincaré polynomial
+at the half-turn, `χ = Σ_k e^{iπk} b_k`.
+
+[definition] The tower `z = i^{i^{i^{⋰}}}` is the constant defined by the constraint `z = i^z =
+e^{(iπ/2)z}` on the principal branch, `z = (2i/π)·W(−iπ/2)`, an attracting fixed point
+(`|f′(z)| = (π/2)|z| < 1`). It is kept as its constraint and branch under the
+[constraint-mode contract](../CONSTRAINT_MODES_AND_RECEIVER_FACES.md), never as a float. In it
+`arg z = (π/2)·Re z` and `|z| = e^{−(π/2)·Im z}`: the real part of the exponent turns and the
+imaginary part contracts — the same quarter-turn split between circulation and dissipation.
+
 ## What is already owned
 
 [established-bounded; formal-checked; implemented-exact] The two-axis object is
