@@ -1,0 +1,94 @@
+{
+  "schema": "holonics.m5-predictor-runs.v1",
+  "note": "What actually ran, as recorded from the commands and their logs. Wall seconds are `date +%s` differences around the `boltz predict` process; the GPU figure is the whole device's used memory sampled every 0.4 s by `nvidia-smi`, so it includes the ~0.9 GiB the desktop compositor holds.",
+  "workstation": {
+    "gpu": "NVIDIA GeForce RTX 4080 SUPER, 16376 MiB",
+    "driver": "595.71.05",
+    "cuda_runtime_reported_by_driver": "13.2",
+    "torch": "2.14.0+cu130",
+    "torch_cuda": "13.0",
+    "python": "3.12",
+    "virtual_environment": ".local/venv-protein"
+  },
+  "predictors_installed": {
+    "boltz": "2.2.1",
+    "protenix": "absent (importlib.metadata PackageNotFoundError)",
+    "chai_lab": "absent (importlib.metadata PackageNotFoundError)",
+    "esm": "absent (importlib.metadata PackageNotFoundError)",
+    "proteinmpnn": ".local/tools/ProteinMPNN — inverse folding, not a structure predictor; not run"
+  },
+  "sequences": {
+    "note": "Extracted from the authenticated M5 mmCIF files' own `_atom_site` rows, never retyped. Identical in all three reference presentations.",
+    "target_rbx1_108": "MAAAMDVDTPSGTNSGAGKKRFEVKKWNAVALWAWDIVVDNCAICRNHIMDLCIECQANQASATSEECTVAWGVCNHAFHFHCISRWLKTRQVCPLDNREWEFQKYGH",
+    "binder_96": "MSPLEEVIEKGEELIRELGEKYNIPKEVTEKLIELFREYLEKYGVSNEAFRNFLKESLEILLKSGVPKEKAFDFVIELGAELTRWLFWKLRQKGLE"
+  },
+  "runs": [
+    {
+      "name": "boltz2-target-seed0",
+      "command": "boltz predict inputs/target-only.fasta --out_dir out-target-only --use_msa_server --seed 0 --output_format mmcif --write_full_pae --override",
+      "model": "boltz2 (default checkpoint boltz2_conf.ckpt from ~/.boltz)",
+      "version": "boltz 2.2.1",
+      "msa_mode": "colabfold MMseqs2 server (https://api.colabfold.com), unpaired; single chain so no pairing is involved",
+      "msa_depth_rows": { "chain_A_target": 11248 },
+      "seed": 0,
+      "diffusion_samples": 1,
+      "recycling_steps": 3,
+      "sampling_steps": 200,
+      "wall_seconds": 26,
+      "exit": 0
+    },
+    {
+      "name": "boltz2-complex-seed0",
+      "command": "boltz predict inputs/binder-target.fasta --out_dir out-binder-target --use_msa_server --seed 0 --output_format mmcif --write_full_pae --override",
+      "model": "boltz2",
+      "version": "boltz 2.2.1",
+      "msa_mode": "colabfold MMseqs2 server, greedy pairing; the target chain received a real paired+unpaired MSA and the de novo binder a single-sequence MSA, because the server found no homolog of a designed sequence",
+      "msa_depth_rows": { "chain_A_target": 11248, "chain_B_binder": 1 },
+      "seed": 0,
+      "diffusion_samples": 1,
+      "wall_seconds": 60,
+      "exit": 0,
+      "failed_attempts": 2,
+      "failure": "Two attempts before this one died in `boltz/data/msa/mmseqs2.py::run_mmseqs2` with `tarfile.ReadError: not a gzip file`. The file the server returned is JSON: {\"message\":\"Route GET:/compute/v1/msa/result/download/<hash> not found\",\"error\":\"Not Found\",\"statusCode\":404}. The 404 is intermittent and hits the paired or the unpaired download arbitrarily; boltz 2.2.1 does not check the HTTP status before handing the body to `tarfile.open`. Retrying is the whole workaround."
+    },
+    {
+      "name": "boltz2-complex-seed1",
+      "command": "boltz predict inputs/binder-target-seed1.fasta --out_dir out-binder-target-seed1 --seed 1 --output_format mmcif --write_full_pae --override",
+      "model": "boltz2",
+      "version": "boltz 2.2.1",
+      "msa_mode": "the seed-0 run's own emitted MSA csv files, named per chain in the FASTA header; no server call, so the MSA is byte-identical to the seed-0 run and the only difference is the seed",
+      "msa_depth_rows": { "chain_A_target": 11248, "chain_B_binder": 1 },
+      "seed": 1,
+      "diffusion_samples": 1,
+      "wall_seconds": 29,
+      "exit": 0
+    },
+    {
+      "name": "boltz2-target-seed1",
+      "command": "boltz predict inputs/target-only-seed1.fasta --out_dir out-target-only-seed1 --seed 1 --output_format mmcif --write_full_pae --override",
+      "model": "boltz2",
+      "version": "boltz 2.2.1",
+      "msa_mode": "the seed-0 target run's own emitted MSA csv; no server call",
+      "msa_depth_rows": { "chain_A_target": 11248 },
+      "seed": 1,
+      "diffusion_samples": 1,
+      "wall_seconds": 26,
+      "exit": 0
+    },
+    {
+      "name": "gpu-memory-probe",
+      "command": "boltz predict inputs/binder-target-seed1.fasta --out_dir <scratch> --seed 1 --output_format mmcif --write_full_pae --override, with `nvidia-smi --query-gpu=memory.used` sampled every 0.4 s",
+      "purpose": "peak device memory of the 204-token complex; the prediction itself is a repeat of boltz2-complex-seed1",
+      "wall_seconds": 42,
+      "peak_device_memory_mib": 13823,
+      "desktop_baseline_memory_mib": 920,
+      "exit": 0
+    }
+  ],
+  "reference_presentations": {
+    "note": "Not run here. The authenticated M5 release at /home/b/Downloads/holonics-m5-rbx1-rank05 supplies them, and this experiment reads them unchanged.",
+    "designed": "designed-free-rbx1.cif — the design itself, no uncertainty array",
+    "protenix-free": "ptxv2-free-rbx1-seed2.cif with ptxv2-free-rbx1-seed2-pae.npz",
+    "protenix-cul1": "ptxv2-cul1-rbx1-seed0.cif with ptxv2-cul1-rbx1-seed0-pae.npz"
+  }
+}
