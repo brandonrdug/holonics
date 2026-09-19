@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Cross-language prior-art / absence search. Usage:
+#   .agents/bin/prior-art 'lorentz|minkowski|minkowskiMetric|lorentz_metric|spacetime'
+# Give the prose name, the Lean camelCase, the Rust snake_case and one adjacent concept.
+# Paste the printed receipt beside any sentence that says the repository lacks something,
+# and run it before founding a new owner or unit. Record titles are full sentences, so the
+# title search is the cheapest index the repository has.
+set -euo pipefail
+pat="$1"
+cd "$(git rev-parse --show-toplevel)"
+roots=(formal/elementary-holonics/ElementaryHolonics crates docs research/records)
+files=$(rg -il --sort path --glob '!target' -e "$pat" "${roots[@]}" 2>/dev/null || true)
+titles=$(ls research/records | grep -iE -- "$pat" || true)
+count() { if [ -z "$1" ]; then echo 0; else printf '%s\n' "$1" | wc -l; fi; }
+echo "[source-audit $(date -u +%F) $(git rev-parse --short HEAD)] prior-art '$pat' over ${roots[*]} -> $(count "$files") files, $(count "$titles") record titles"
+[ -n "$titles" ] && printf '%s\n' "$titles" | sed 's/^/  title: /' | head -40
+[ -n "$files" ] && printf '%s\n' "$files" | grep -v '^research/records/' | sed 's/^/  file:  /' | head -60
+exit 0

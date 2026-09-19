@@ -14,6 +14,7 @@ retains the reason for this focus and the prior native checkpoint. The
 | Mathematical join | Bind contact kinematics and constitutive current/stress to the field's variation and receiver maps. T4's constraint work/torque, T7's interface balance and the existing active-face/fluid construction supply operands of this composition. |
 | Available owners | `continuing_tower`, `continuing_tube`, `receiver_atlas`, `junction_law`, `edit_rigidity`, `causal_chord`; native constitutive field/source/current and paired adjoints; existing fluid, receiver-stress and exact torus-contact owners. The shared-carrier plan maps the consuming ports. |
 | Current open construction | T6 neck and T8 jet readings have not returned. Build them over the same source/receiver dynamics and retain their transport/reconstruction residuals. The complete moving contact/variation/receiving composition is not supplied by the separate returned examples alone. |
+| Unifying subject | **Holonic Interactions**: a chain of necks and media. A neck is a pinhole where flux converges and then diverges into the next medium; Hamiltonian/lattice pathways propagate through each medium; orientation is parametric and the chain crosses the time and entropy axes. The tube is the general object, a tower one instantaneous frame, a staircase its passage between grains or difference orders. The [tube contract](docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md#the-governing-statements) recovers the typed August four-body unit and `HolonicInteractionExterior.lean`. |
 | Next action | Follow the [general embedding composition](docs/plans/THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-general-embedding-and-its-consuming-composition) and T6/T8's first consuming return: derive the source-linked local neck/jet relation using the existing contact, pole, variation and higher-difference operations; connect its usable return to the applicable scientific/native consumer. |
 | Completion evidence | Inspect the generated relation and receiver consequence at that consumer, with source, material, frame, units, uncertainty and actual cost. The contact balance, differential/adjoint and restriction/transport equations determine the needed checks. |
 | Application feedback | Protein/physical work and Athena expose requirements and counterexamples to the same operators. General improvements return to shared owners and affected consumers; codecs retain application-specific material. |
@@ -28,9 +29,11 @@ retains the reason for this focus and the prior native checkpoint. The
 | Robotics/kinetics | Exploratory idea from the latest message | No active task, simulator selection or deadline. |
 
 [established-bounded; measured] The [completed source review](research/records/2026-09-19_REPOSITORY_REVIEW_AFTER_THE_SHARED_CARRIER_CONSTRUCTION.md)
-verified the intervening implementation and repaired its consuming contracts. Full Lean and
-workspace/all-target builds passed, as did 3,134 default engine tests and the recorded serial
-native/device suites. This planning consolidation changes no executable source.
+verified the intervening implementation and repaired its consuming contracts. Its closing checks
+at `d31b9afa` are the current lines of [the receipt log](docs/VERIFICATION_RECEIPTS.tsv); no
+executable source has changed since. The [workflow audit](research/records/2026-09-19_THE_WAVES_REPEATED_READING_AND_UNCOORDINATED_BUILDS_NOT_DISTRUST.md)
+and [worker brief](docs/WORKER_BRIEF.md) set the next wave's shape: two parallel workers (media and
+contact exchange; necks and the jet staircase), one sequential join worker, one reviewer.
 
 ## Athena application checkpoint
 

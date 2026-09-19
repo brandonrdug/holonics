@@ -1,7 +1,8 @@
 # AGENTS.md — Holonics operating contract
 
-Brandon's latest direct request governs. This is the shared contract for Codex and Claude;
-CLAUDE.md points here. The repository belongs to one human operator, not an approval committee.
+Brandon's latest direct request governs. This is the one shared contract for Codex (Astra) and
+Claude; there is no separate CLAUDE.md. Either primary may refine it, keeping the other's harness
+instructions intact. The repository belongs to one human operator, not an approval committee.
 
 ## Sustained construction control
 
@@ -127,6 +128,25 @@ an exploratory thought, with no active construction target. The roadmap schedule
 dependencies; completing every mathematical or device specialization is not a universal
 prerequisite for a usable scientific or Athena return.
 
+[project-postulate] Brandon's September 19 follow-up names the subject of the open shared work:
+**Holonic Interactions** — a chain of necks and media. A neck is a pinhole, an intermediary
+singularity into which flux converges and from which it diverges into the next medium, as light
+passes the lens of an eye and crosses the aqueous medium to the retina. Hamiltonian structures and
+lattice/crystal pathways propagate the energy through each medium; orientation is parametric and
+the chain crosses the axes of time and entropy. **The tube is the general object; a tower is one
+instantaneous frame of it; a staircase is its passage between grains or difference orders.** The
+unit was typed in August (`|source⟩`, standing `H_int`, dynamic `H_pert`, `⟨perspective|`); the
+[tube contract](docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md#the-governing-statements)
+recovers its records and formal owners. Organize work by this machinery; product and
+plan-document names are names.
+
+[project-postulate] **Execution against reality is the strongest validation.** Whether the program
+runs, predicts real structures accurately and does so at a usable cost exposes broken mathematics
+inevitably; no script outranks it, and process exists to get work there sooner. An agent resolves
+a choice from the mathematics and context, proceeds, and marks it `[agent-inferred]` with what it
+was inferred from; Brandon corrects such choices retroactively. Waiting on a ruling is not a work
+state, and a deferred decision is not a return.
+
 [project-postulate] The [Reality of Difference construction programme](docs/plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md)
 now connects the existing Swing, potential/fibre, tube/scale, constitutive, mathematical,
 quantum/geometric and physical-realization work. Its order belongs to the live roadmap.
@@ -141,10 +161,17 @@ source, canon and later direct rulings govern implementation. Historical agent s
 capability claims are not silently restored with the philosophy. Retain this context across
 turns rather than treating its consequences as repeated revelations.
 
-[project-postulate] Use **Luna only** when delegating. Honor an instruction to work without agents.
-Delegate bounded independent tasks whose value justifies their token cost. Do not duplicate the
-primary agent's broad reading. The primary agent reads governing authority and integrates every
-returned result; an agent report is testimony, not authority.
+[project-postulate] Delegation is per harness. Codex delegates to **Luna only**. Claude delegates
+to at most **three Opus 5 workers** in parallel on disjoint owner paths, followed by **one Sonnet 5
+reviewer that spawns nothing**; use fewer workers when the work does not split naturally, and a
+sequential worker for a join that consumes two returns. Honor an instruction to work without
+agents. Delegate bounded independent tasks whose value justifies their token cost, and carry the
+needed contract in the prompt from the [worker brief](docs/WORKER_BRIEF.md) so workers do not
+repeat the primary's broad reading. The primary reads governing authority and integrates every
+returned result. A worker's **judgement** is testimony, not authority: inspect the changed owner
+and its consuming call. A worker's **measurement** — a test count, build exit or axiom audit
+recorded with its tree — is a [receipt](docs/VERIFICATION_RECEIPTS.tsv); re-running a receipt
+whose tree is unchanged adds no evidence and is not verification.
 
 Finish the authorized work. Ask only for a material choice that cannot be resolved from standing
 directions; complete independent authorized work first. This authority does not invent unrelated
@@ -255,8 +282,11 @@ completion. Learn from the relation exposed in dialogue and continue its consequ
 
 [project-postulate] For resumed derivations and cross-domain construction, use the repository
 [Holonics research skill](.agents/skills/holonics-research/SKILL.md) and only its relevant route.
-Before declaring a physical/mathematical map absent, follow the current source chain and any
-invoked predecessor research. An `interpretation` is work to develop, not a terminal disclaimer.
+Before declaring a physical/mathematical map absent, and before founding a new owner or unit, run
+`.agents/bin/prior-art` with the prose, Lean, Rust and adjacent spellings, read the matching
+record titles, and put its `source-audit` receipt beside the sentence. Zero hits license "the
+repository has no X"; any hit licenses only "this owner has not composed X, whose owner is …".
+An `interpretation` is work to develop, not a terminal disclaimer.
 The [research recovery method](docs/DEVELOPMENT.md#research-recovery-and-derivation) activates
 these existing duties before planning. A physical question returns a physical/mathematical
 consequence; its relevance is not decided by immediate Athena implementation.
@@ -457,6 +487,15 @@ check, not a partial pass. Compile under progress supervision; the 180-second ru
 guard, not a production wall-time or semantic bound. Do not fragment a natural operation merely
 to fit a clock or rerun unchanged expensive evidence without a new question. Keep owners cohesive
 through review, not a line-count approval ritual. Scope every reported check accurately.
+
+[definition] [`docs/VERIFICATION_RECEIPTS.tsv`](docs/VERIFICATION_RECEIPTS.tsv) is how "unchanged"
+is known: whoever runs a check appends its command, tree, result and duration. A receipt is the
+opposite of a gate. It records what a check already answered so the check is not repeated; it
+grades nothing, schedules nothing and blocks nothing, and a missing receipt only means the check
+runs. In a wave, workers run their own module scopes, and the primary runs the one integrated
+broad run and the one serial device run on the combined tree. Position documents cite receipts
+instead of restating counts. `target/` holds build output only; models, rests and evidence live
+under `.local/` or their research directory.
 
 Update the position honestly while work is active; mark completion only after the required
 artifact and checks return. Keep the position concise and move completed narratives into their

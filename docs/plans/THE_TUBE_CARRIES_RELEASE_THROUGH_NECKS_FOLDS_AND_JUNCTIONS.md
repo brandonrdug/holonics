@@ -39,6 +39,41 @@ collapsed to a point at the receiver's grain while remaining plural inside:
 `∀ a a' ∈ F_k, π_B(a) ~ π_B(a')`. That is `receiver_release`'s width-zero condition, and the
 lawful returns other than release are the ones that owner already types.
 
+[project-postulate] Brandon, September 19: **the remaining items here are one subject — Holonic
+Interactions.** A neck is a pinhole: an intermediary singularity into which flux converges and from
+which it diverges into the next medium, as light converges into the lens of an eye and diverges
+through the aqueous medium onto the retina. Hamiltonian structures and lattice/crystal pathways
+propagate the energy through each medium. The generalized structure is a **chain of necks and
+media** with parametric orientation, crossing the axes of time and entropy. The tube is the general
+object; a tower is what one instantaneous frame of it shows, and a staircase is its passage between
+grains or difference orders. Contact faces, necks, jets, folds and junctions are stations and
+readings of that one chain, and are constructed as such.
+
+[definition] This ruling resumes an already typed unit; it founds no new one. The
+[August 14 record](../../research/records/2026-08-14_THE_APERTURE_IS_AN_INTERACTION_HAMILTONIAN_AND_A_PHASE_OBJECT_IS_INVISIBLE_TO_THE_MAGNITUDE_FACE.md#2-the-holonic-interaction-typed)
+types the Holonic Interaction as four bodies — `|source⟩` emanating current, the standing
+intermediary lattice `H_int`, the dynamic modulating field `H_pert`, and `⟨perspective|` with its
+own aperture — and states the problem as the population of Hamiltonian paths through lattices and
+their reflection/refraction junctions: circuitry, not single rays. Its whip is a chain of
+zero-remainder rebases. The [August 20 record](../../research/records/2026-08-20_SHADOWS_OF_HOLONIC_INTERACTIONS.md)
+gives its optical/projective reading through the cross-ratio swing. The
+[August 24 record](../../research/records/2026-08-24_THE_HOLONIC_INTERACTION_IS_A_COVARIANT_STORAGE_FLUX_COMPLEX_AND_THE_CUSP_RAISES_DIFFERENCE_ORDER.md)
+and `Millennium/HolonicInteractionExterior.lean` make it a covariant storage–flux complex, prove
+that a square-zero cusp shear raises to a genuine second-difference law on the induced flux face,
+and type every apparent convergence as shared incidence, a receiver caustic, or a declared
+constitutive coupling. `Millennium/HolonicSnellInteraction.lean` already owns the
+interface between two media as tangential phase conservation with a retained normal remainder
+(`snellCompatible_iff`, `tangentialConservation_retainsNormalRemainder`) and a finite chain of such
+interfaces (`finiteInterfaceChain_eq_exterior`). In this contract: a **neck** is the aperture station where the section
+converges (T6); a **medium** is a standing `H_int` with its constitutive law and the contact faces
+where exchange occurs; `H_pert` is the admitted edit or changing condition; the cusp's raised
+difference order is the first exact instance of the **staircase** T8 reads. T7's junction law is
+the interface condition between consecutive media, and its entropy condition — owned by the
+`(junction, direction)` pair — is the chain's irreversibility. T5's horizon `(h, k)` is the
+longitudinal station and the grain index, which is not the time/entropy pair; [open] the crossing
+of the time and entropy axes along an oriented chain is to be constructed from T5's longitudinal
+axis and T7's directed entropy condition, not read off either alone.
+
 ## What is already owned
 
 [established-bounded; formal-checked; implemented-exact] The two-axis object is
@@ -513,9 +548,11 @@ Helicity transport in particular retains its boundary and dissipative terms. The
 derivation targets connected to the existing fluid and T7 balance owners, not universal laws
 inferred from a shared word or picture.
 
-[project-postulate] **First consuming return with T8:** construct the neck/jet reading from a
-declared generator and its changing source/receiver chart; carry the compatible family and
-conservation/transport residual through the read. Use the
+[project-postulate] **First consuming return with T8: one Holonic Interaction chain.** Construct
+a declared source, at least two media with their constitutive laws, the neck between them and the
+receiver as one tube; read its convergence into and divergence out of the neck, the jet staircase
+at that station and the junction balance at each interface from the same dynamics. Carry the
+compatible family and conservation/transport residual through the read. Use the
 [embedding composition](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-general-embedding-and-its-consuming-composition)
 to join the available contact, constitutive variation, pole and higher-difference operations.
 The existing torus-contact and protein/field constructions supply application material; reuse

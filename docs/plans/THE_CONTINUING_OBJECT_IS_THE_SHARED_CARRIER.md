@@ -57,6 +57,15 @@ count of material units.
 | Embedding/receiving atlas | `receiver_atlas`, `grain_tower`, source/receiver restrictions | A protein presentation, acoustic face and Athena response use their own codecs and receivers over the shared operations |
 | Economical realization | Residual-carrying transitions, factored source relations, shared resident sections, `SectionLayout` | Rebase, factor, lower and reopen the required operation while retaining its receiver equation and cost |
 
+[project-postulate] Brandon's September 19 follow-up names what these rows compose: **Holonic
+Interactions** — a chain of necks and media. The tube is the general object, a tower is one
+instantaneous frame of it, and a staircase is its passage between grains or difference orders.
+The [tube contract](THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md#the-governing-statements)
+recovers the typed four-body unit (`|source⟩`, standing `H_int`, dynamic `H_pert`, `⟨perspective|`)
+and its August formal owners. The contact surface of this table is where a medium exchanges; the
+neck is where the section converges between media; the modal response is the receiver's reading of
+the chain.
+
 [open] **The immediate join is executable contact with its variation and continuing receiver.**
 The table names substantial existing constructions; it does not claim a single native call already
 composes every row. In particular, T4's `W²` and edit torque are exact constrained-edit readings.

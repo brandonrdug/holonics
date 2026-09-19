@@ -121,8 +121,10 @@ clause in place; appending a contrary instruction elsewhere is not consolidation
 ### Orchestrated construction cycles
 
 [project-postulate] Brandon's authorized workflow keeps the primary agent responsible for
-mathematical decisions, consuming implementation, integration and verification. Luna workers
-handle bounded independent source, proof, kernel or regression tasks with explicit ownership.
+mathematical decisions, consuming implementation, integration and verification. Delegated workers
+(Luna under Codex; up to three Opus 5 workers and one Sonnet 5 reviewer under Claude, per the
+[worker brief](WORKER_BRIEF.md)) handle bounded independent source, proof, kernel or regression
+tasks with explicit, disjoint ownership.
 Their returns feed the same consuming implementation. The following control applies to sustained
 construction; ordinary repairs and user-requested bounded tasks do not acquire another process.
 
@@ -365,9 +367,14 @@ ordinary changes use their affected owner tests. Supervise productive compilatio
 an unfinished check before resuming it. Retain successful unaffected checks. The blanket gate,
 document/index tools and source-size ledger are archived; do not recreate them or compile every
 example/paper after each edit. Review source cohesion and verify behavior directly.
+"Retain successful unaffected checks" means a line in
+[`VERIFICATION_RECEIPTS.tsv`](VERIFICATION_RECEIPTS.tsv), not a memory. Parallel workers share
+one tree and one `target/`, so they build only their own module scopes; `--all-targets` compiles
+every example and belongs to a workspace-wide source move. `target/` had grown to 626 GB by
+September 19 and was cleaned; keep models, rests and evidence out of it.
 
 [definition] `CONSTRUCTION_STATE.md` records the current position and
 `docs/plans/THE_ROADMAP.md` orders construction. AGENTS.md is the shared agent operating
-contract; CLAUDE.md is its pointer. The [repository guide](REPOSITORY.md) explains historical
+contract for both Codex and Claude. The [repository guide](REPOSITORY.md) explains historical
 paths and backup recovery. Keep exact raw runtime evidence in dated research receipts, and
 private reproducible working data in `.local/`.

@@ -10,6 +10,7 @@ __pycache__/
 .claude/
 .codex/
 .agents/*
+!.agents/bin/
 !.agents/skills/
 .agents/skills/*
 !.agents/skills/holonics-research/

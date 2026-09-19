@@ -70,7 +70,9 @@ relations, actual source/receiver, consuming implementation, failed alternatives
 and the next discriminating result. Use the existing position and dated record for continuity;
 do not create another scheduler or raw-history requirement. The
 [development method](DEVELOPMENT.md#mathematical-implementation-and-continuation) gives the
-working form. An agent report is testimony until the primary inspects its source and checks.
+working form. An agent's judgement is testimony until the primary inspects the changed source.
+Its recorded checks are [receipts](VERIFICATION_RECEIPTS.tsv): re-run only a scope whose paths
+changed since the receipt's tree, plus the one integrated run a combined tree owes.
 
 [definition] The plan's presence in a tool read proves it was accessed, not followed. Check the
 chosen edit and its consumer against the governing mathematical contract. An implementation

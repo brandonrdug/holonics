@@ -1,0 +1,12 @@
+when	tree	dirty	scope	command	result	secs	who	log
+#toolchain	rustc 1.92.0	lean4 v4.33.0	cuda 13.2
+2026-09-19	d31b9afa	-	lean:ElementaryHolonics	lake build	build:ok (9182 jobs); RelationLadder.equalPotential_of_closedCarrier axioms:clean	-	Astra review	research/records/2026-09-19_REPOSITORY_REVIEW_AFTER_THE_SHARED_CARRIER_CONSTRUCTION.md
+2026-09-19	d31b9afa	-	workspace	cargo check -j 2 --workspace --all-targets	build:ok	-	Astra review	same
+2026-09-19	d31b9afa	-	holonic-engine	cargo test -j 2 -p holonic-engine --lib	pass:3134/0/413	-	Astra review	same
+2026-09-19	d31b9afa	-	device:holonics-hna	public HNN test binary --include-ignored --test-threads=1	pass:107/0/0	-	Astra review	same
+2026-09-19	d31b9afa	-	device:holonic-mount	mount test binary --include-ignored --test-threads=1	pass:118/0/0	-	Astra review	same
+2026-09-19	d31b9afa	-	device:holonic-engine:section_layout_adoption	--include-ignored --test-threads=1	pass:5/0/0	-	Astra review	same
+2026-09-19	d31b9afa	-	device:holonic-engine:direct-normal material	--include-ignored --test-threads=1	pass:138/0/0	-	Astra review	same
+2026-09-19	d31b9afa	-	device:holonic-engine:resident_section	--include-ignored --test-threads=1	pass:53/0/0	-	Astra review	same
+2026-09-19	d31b9afa	-	device:holonic-engine:operative source	--include-ignored --test-threads=1	pass:8/0/0	-	Astra review	same
+2026-09-19	d31b9afa	-	device:holonic-engine:constitutive_fibre base	--include-ignored --test-threads=1	pass:9/0/0	-	Astra review	same

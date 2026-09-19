@@ -15,7 +15,7 @@ does not create another approval layer for the sole human operator.
 
 | Material | Home and responsibility |
 |---|---|
-| Operating contract | Root `AGENTS.md`; `CLAUDE.md` points to it without copying policy. |
+| Operating contract | Root `AGENTS.md`, shared by Codex and Claude; there is no separate `CLAUDE.md`. |
 | Construction order | `docs/plans/THE_ROADMAP.md` and its explicitly admitted current plan. |
 | Current position | Root `CONSTRUCTION_STATE.md`, concise and updated when the work changes. |
 | Architecture and interfaces | `docs/ARCHITECTURE.md`, the Soulkiller/Athena/interoperability guides, and the actual public source owners. |

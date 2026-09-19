@@ -172,7 +172,7 @@ A direct user correction changes the applicable contract and its consumers toget
 
 [definition] Before implementing, retain the requested product, actual equation/unknown,
 source and receiver, existing owner, next edit and completion evidence in the brief. At a
-scope transition, check the proposed work against that operation. Optional Luna work is bounded
+scope transition, check the proposed work against that operation. Optional delegated work is bounded
 and independent; root verifies its source and integrates it. An agent report is not authority.
 
 [definition] When an operation fails, name which case applies and repair it in the same increment:
@@ -273,7 +273,11 @@ documents hold the statements, owners and findings and are not re-narrated here.
 
 [definition] **Construction proceeds by the shared operation's dependencies.**
 
-1. **Next shared increment: contact, neck and jet composition.** T6/T8 remain the next unreturned
+1. **Next shared increment: the Holonic Interaction chain.** Contact, neck and jet are stations
+   and readings of one tube: a source, media with their constitutive laws, the necks where flux
+   converges and diverges between them, and a participating receiver. The
+   [tube contract](THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md#the-governing-statements)
+   recovers the typed August unit and its formal owners. T6/T8 remain the next unreturned
    formal items. Build them from the existing T4/T7, field/flux and analytic owners as described in
    the [embedding composition](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-general-embedding-and-its-consuming-composition).
    Its return is a source-linked interaction and its receiver/variation/continuation, with the
@@ -326,10 +330,20 @@ the framework does not determine goes to Brandon.
 8. **Device evidence is serial.** CUDA tests run one process at a time and single-threaded; the
    allocation calibration reads the whole device's free extent and cannot attribute a concurrent
    allocation.
-9. **A wave is closed before the next opens.** At most four constructing agents and one reviewer
-   that spawns none; the reviewer's confirmed defects are repaired in the same wave; the closing
-   verification is run by the primary agent; the wave is committed and pushed. The construction
-   state is updated in that commit.
+9. **A wave is closed before the next opens.** At most three constructing agents on disjoint owner
+   paths and one reviewer that spawns none; a wave that does not split that way runs with fewer
+   agents, never more. Workers run their own module scopes and return receipt lines. The primary's
+   closing verification is one integrated broad run, one serial device run when native conduct
+   changed and the Lean build when Lean changed, on the combined tree; it does not re-run a scope
+   whose [receipt](../VERIFICATION_RECEIPTS.tsv) names the current tree. The reviewer's confirmed
+   defects are repaired in the same wave; the wave is committed and pushed with the construction
+   state updated. The [worker brief](../WORKER_BRIEF.md) holds the protocol and templates.
+10. **Absence and novelty carry a search receipt.** "The repository has no X" and a newly founded
+   unit each sit beside a `.agents/bin/prior-art` receipt. A nonzero search names the existing
+   owner instead.
+11. **A choice the mathematics determines is made, marked `[agent-inferred]`, and carried on.**
+   Brandon corrects it retroactively. Execution against real targets is the validation every
+   other check serves.
 
 ## All current plan documents and their roles
 
