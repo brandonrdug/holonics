@@ -299,7 +299,17 @@ pub mod grown_cell;
 /// glob-exported: `MetricLaw`, `BoundaryCondition`, `HodgeOperator` and `hodge_family` are reached
 /// through this module's name so that a caller states whose metric and whose complex it means.
 pub mod hodge_receiver;
+// The join: one Holonic Interaction read as a chain `|source⟩ → medium → neck → medium →
+// ⟨perspective|`, whose neck is the rank of the coupling between consecutive media, whose flux is
+// the power current, and whose Markov staircase is the jet at that station. Paired with
+// `formal/elementary-holonics/ElementaryHolonics/Transport/HolonicChain.lean`.
+pub mod holonic_chain;
 pub mod holonic_complex;
+// The Holonic Interaction unit — `|source⟩`, a standing medium `H_int` with its contact faces, the
+// dynamic `H_pert`, `⟨perspective|` — its assembled contact dissipation, clocked edit energy and
+// the port-Hamiltonian linearization it hands to `causal_chord`. Paired with
+// `formal/elementary-holonics/ElementaryHolonics/Transport/HolonicInteraction.lean`.
+pub mod holonic_interaction;
 pub mod image;
 pub mod implicit;
 // Sylvester's law of inertia over exact rationals: the signature of a symmetric form, which is the
@@ -317,6 +327,12 @@ pub mod inverse_transport;
 // and the finite abelian groups M/ω_n M read off an exact Smith normal form. Paired with
 // `formal/elementary-holonics/ElementaryHolonics/Foundation/IwasawaTower.lean`.
 pub mod iwasawa_tower;
+// T8: the jet staircase — the finite jet ladder and its compatible continuations, the exact
+// difference↔jet change of basis at a declared step, sparse-difference encoding with its measured
+// cost, the computed grain/order pair, and the cusp instance in which a square-zero fibre shear
+// raises to a second-difference law on the induced flux face. Paired with
+// `formal/elementary-holonics/ElementaryHolonics/Transport/JetStaircase.lean`.
+pub mod jet_staircase;
 // T7: the junction law — the tangential part continuous, the normal part jumping, the jump being
 // the source on the joint — over `hodge_receiver`'s coboundary and declared metric, with the
 // circuit, refraction, shock, thin-sheet and film instances and the pair of pants against the
@@ -495,6 +511,12 @@ pub mod source_occurrence;
 // The front passage: causal front -> interchange certificate -> cover -> exact work -> admission
 // -> resident enactment -> receipt, with the four obstruction species kept apart. Same contract.
 pub mod front_passage;
+// T6: the neck station — the pinhole into which flux converges and out of which it diverges, as a
+// station of `continuing_tube`'s tube. Three widths kept in three types, the per-station transport
+// residual computed by `junction_law`, and the exact rational ABCD instance in which étendue
+// survives the focus the geometric width does not. Paired with
+// `formal/elementary-holonics/ElementaryHolonics/Transport/Neck.lean`.
+pub mod neck;
 // The native arm: a rest that witnesses its own laws, and the atlas walked and read on the card.
 pub mod native_anatomical_potential;
 pub mod native_anatomy;

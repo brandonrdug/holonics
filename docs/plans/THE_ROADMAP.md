@@ -269,7 +269,7 @@ documents hold the statements, owners and findings and are not re-narrated here.
 | Receiver atlas | R1–R7 | per-eigenvalue refinement on `ExactHodgeSpectrum`; `MarkovTwoNSuffices` |
 | Biological ecology | B0–B10 | held-out agreement counts computed from a declared receiver family rather than supplied; a run of the installed predictors against an M5 design; the gluing law with interface coupling for the physicochemical receiver |
 | Exact device law | D1–D3, one engine instance adopted on the card | a second device ring of signed 128-bit words with the engine's carrier refusal; per-region operator family; base-pointer registry; common context ownership for module/stream/buffer handles; D4 stays an intention |
-| Generalized transport | T1 relation ladder, T2 standing/memory/extinction, T3 release over an edited family, T4 knot friction and edit torque, T5 two-axis horizon, T7 fold, cut and junction law | T6 with T8; a plural family generic in its coordinate address (named by T3, not founded); a faithful Israel-junction instance joining the existing Lorentzian/Einstein-fluid foundations to a four-dimensional hypersurface and its computed extrinsic curvature |
+| Generalized transport and the Holonic Interaction chain | T1 relation ladder, T2 standing/memory/extinction, T3 release over an edited family, T4 knot friction and edit torque, T5 two-axis horizon, T6 neck station, T7 fold, cut and junction law, T8 jet staircase; the Holonic Interaction unit with media and contact exchange; the two-media chain read at the elastic-network consumer on real structure | the multi-neck chain; faces derived from contact geometry; the time/entropy crossing (#5); analytic width above 24 coordinates; a plural family generic in its coordinate address; a faithful Israel-junction instance (#23) |
 
 [definition] The open joins of this table are itemized as
 [GitHub issues](https://github.com/brandonrdug/holonics/issues) under four milestones — Holonic
@@ -279,7 +279,11 @@ section orders it.
 
 [definition] **Construction proceeds by the shared operation's dependencies.**
 
-1. **Next shared increment: the Holonic Interaction chain.** Contact, neck and jet are stations
+1. **Shared increment, first return made September 19: the Holonic Interaction chain.** Issues
+   #1–#4 returned the unit, the staircase, the neck and their join at the elastic-network
+   consumer. It continues as the multi-neck chain, measured contact faces and the predictor
+   comparison that exercises it (milestones *Holonic Interaction chain* and *Predicted structures
+   against references*). Contact, neck and jet are stations
    and readings of one tube: a source, media with their constitutive laws, the necks where flux
    converges and diverges between them, and a participating receiver. The
    [tube contract](THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md#the-governing-statements)

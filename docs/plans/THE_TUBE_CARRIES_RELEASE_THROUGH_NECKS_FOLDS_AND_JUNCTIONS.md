@@ -533,6 +533,18 @@ it as commuting would manufacture flatness; `squares_with_no_declared_face` is i
 bounded route search returns `NoRouteWithinBound` or `MoreRoutesThanDeclared` — never "unreachable",
 and never a truncated enumeration presented as complete.
 
+[established-bounded; formal-checked; implemented-exact] **T6 — returned September 19** as
+[`Transport/Neck.lean`](../../formal/elementary-holonics/ElementaryHolonics/Transport/Neck.lean) and
+[`neck.rs`](../../crates/holonic-engine/src/neck.rs): a station of the existing tube
+(`NeckTube: StationedTower`), three distinct typed widths joined only through a declared
+constitutive link with its residual, flux convergence/divergence under `div J = σ` with the
+station balance taken from `junction_law`, the `Open | Pinhole | Closed` reading, and exact
+ray-transfer optics in which étendue survives the focus the geometric width does not. Its join
+with T8 and the Holonic Interaction unit is
+[`holonic_chain.rs`](../../crates/holonic-engine/src/holonic_chain.rs), where the neck of a chain
+is the rank of the coupling between consecutive media. The pinching strip, p-adic neck, vortex and
+whip below remain `interpretation`.
+
 [definition] **T6 — Neck invariants.** A neck reading specifies its continuing source family,
 station/clock, receiver and the section being narrowed. Geometric cross-sectional area, receiver
 uncertainty width and an analytic domain's width are different quantities. Relate them through
@@ -810,7 +822,17 @@ material changes `hodge_receiver`'s metric and nothing else in this owner moves.
 of the interface term the receiver atlas names as absent for the physicochemical receiver; it is not
 that receiver's term, and the atlas row for it is unchanged.
 
-[definition] **T8 — The jet tower and compression as a staircase.** The finite jet ladder
+[established-bounded; formal-checked; implemented-exact] **T8 — returned September 19** as
+[`Transport/JetStaircase.lean`](../../formal/elementary-holonics/ElementaryHolonics/Transport/JetStaircase.lean)
+and [`jet_staircase.rs`](../../crates/holonic-engine/src/jet_staircase.rs): the finite jet ladder
+with its compatible polynomial and spline families, the exact difference↔jet passage at a
+rational step, encoding by repeated integration with measured cost, grain/order pairs computed per
+instance (one source under two grains gives two answers — no universal drop), the August 24 cusp
+recomputed over `Q`, and the Mahler/Iwasawa comparison with the exact place it stops
+(`ω_n ≠ Δ^{p^n}`). In the chain, the Markov parameters `C Aᵏ B` are the jet and the relative
+degree is its vanishing order.
+
+[definition] **T8 — The jet staircase.** The finite jet ladder
 `J^0 ← J^1 ← …` restricts by forgetting higher derivatives in a declared chart. Begin with the
 existing `HigherDifference*`, local-jet and transported-calculus owners. The first exact
 realization uses declared polynomial/piecewise-polynomial or finite-difference data, its boundary

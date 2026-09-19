@@ -2,7 +2,6 @@ when	tree	dirty	scope	command	result	secs	who	log
 #toolchain	rustc 1.92.0	lean4 v4.33.0	cuda 13.2
 2026-09-19	d31b9afa	-	lean:ElementaryHolonics	lake build	build:ok (9182 jobs); RelationLadder.equalPotential_of_closedCarrier axioms:clean	-	Astra review	research/records/2026-09-19_REPOSITORY_REVIEW_AFTER_THE_SHARED_CARRIER_CONSTRUCTION.md
 2026-09-19	d31b9afa	-	workspace	cargo check -j 2 --workspace --all-targets	build:ok	-	Astra review	same
-2026-09-19	d31b9afa	-	holonic-engine	cargo test -j 2 -p holonic-engine --lib	pass:3134/0/413	-	Astra review	same
 2026-09-19	d31b9afa	-	device:holonics-hna	public HNN test binary --include-ignored --test-threads=1	pass:107/0/0	-	Astra review	same
 2026-09-19	d31b9afa	-	device:holonic-mount	mount test binary --include-ignored --test-threads=1	pass:118/0/0	-	Astra review	same
 2026-09-19	d31b9afa	-	device:holonic-engine:section_layout_adoption	--include-ignored --test-threads=1	pass:5/0/0	-	Astra review	same
@@ -10,3 +9,14 @@ when	tree	dirty	scope	command	result	secs	who	log
 2026-09-19	d31b9afa	-	device:holonic-engine:resident_section	--include-ignored --test-threads=1	pass:53/0/0	-	Astra review	same
 2026-09-19	d31b9afa	-	device:holonic-engine:operative source	--include-ignored --test-threads=1	pass:8/0/0	-	Astra review	same
 2026-09-19	d31b9afa	-	device:holonic-engine:constitutive_fibre base	--include-ignored --test-threads=1	pass:9/0/0	-	Astra review	same
+2026-09-19	335f296e	crates/holonic-engine/src/holonic_interaction.rs,crates/holonic-engine/src/holonic_interaction/tests.rs	holonic-engine:holonic_interaction	cargo test -p holonic-engine --lib holonic_interaction::	pass:23/0/0	1	W8/A	-
+2026-09-19	335f296e	crates/holonic-engine/src/holonic_interaction.rs,crates/holonic-engine/src/lean_citations.rs	holonic-engine:lean_citations	cargo test -p holonic-engine --lib lean_citations::	pass:3/0/0	1	W8/A	-
+2026-09-19	335f296e	formal/elementary-holonics/ElementaryHolonics/Transport/HolonicInteraction.lean	lean:ElementaryHolonics.Transport.HolonicInteraction	lake build ElementaryHolonics.Transport.HolonicInteraction	axioms:clean (25 audited)	3	W8/A	-
+2026-09-19	335f296e	crates/holonic-engine/src/jet_staircase.rs,crates/holonic-engine/src/jet_staircase/tests.rs	holonic-engine:jet_staircase	cargo test -p holonic-engine --lib jet_staircase::	pass:28/0/0	1	W8/B	-
+2026-09-19	335f296e	crates/holonic-engine/src/neck.rs,crates/holonic-engine/src/neck/tests.rs	holonic-engine:neck	cargo test -p holonic-engine --lib neck::	pass:20/0/0	1	W8/B	-
+2026-09-19	335f296e	formal/elementary-holonics/ElementaryHolonics/Transport/{JetStaircase,Neck}.lean	lean:ElementaryHolonics.Transport.{Neck,JetStaircase}	lake build ElementaryHolonics.Transport.Neck ElementaryHolonics.Transport.JetStaircase	axioms:clean (31 audited)	46	W8/B	-
+2026-09-19	335f296e	crates/holonic-engine/src/holonic_chain.rs,crates/holonic-engine/src/holonic_chain/tests.rs	holonic-engine:holonic_chain	cargo test -p holonic-engine --lib holonic_chain::	pass:25/0/2	1	W8/C	-
+2026-09-19	335f296e	crates/holonic-engine/src/holonic_chain.rs,crates/holonic-engine/src/holonic_chain/tests.rs	holonic-engine:holonic_chain measured (M5 RBX1)	cargo test -p holonic-engine --lib holonic_chain::tests::the_measured_hinge -- --ignored --nocapture	pass:2/0/0; 12-residue window hinge cut 8 section 4, transfer rank 4, residuals 0; 40-residue scan 5 interior minima	185	W8/C	-
+2026-09-19	335f296e	formal/elementary-holonics/ElementaryHolonics/Transport/HolonicChain.lean	lean:ElementaryHolonics.Transport.HolonicChain	lake build ElementaryHolonics.Transport.HolonicChain	axioms:clean (29 audited)	18	W8/C	-
+2026-09-19	335f296e	Transport/{HolonicInteraction,Neck,JetStaircase,HolonicChain}.lean, ElementaryHolonics.lean	lean:ElementaryHolonics	lake build	build:ok (9182 jobs; all four new modules imported by the root)	4	primary (W8 closing)	-
+2026-09-19	335f296e	W8 integrated after review repairs: holonic_interaction, neck, jet_staircase, holonic_chain (+tests), inertia.rs, lib.rs, lean_citations.rs	holonic-engine	cargo test -p holonic-engine --lib	pass:3231/0/415	101	primary (W8 closing)	-

@@ -276,6 +276,10 @@ import ElementaryHolonics.Transport.ArtifactRelease
 import ElementaryHolonics.Transport.Fold
 import ElementaryHolonics.Transport.EditRigidity
 import ElementaryHolonics.Transport.JunctionLaw
+import ElementaryHolonics.Transport.JetStaircase
+import ElementaryHolonics.Transport.Neck
+import ElementaryHolonics.Transport.HolonicInteraction
+import ElementaryHolonics.Transport.HolonicChain
 import ElementaryHolonics.Millennium.HolonicRankFourInteractionPlanes
 import ElementaryHolonics.Millennium.HolonicMaxwellPropagation
 import ElementaryHolonics.Millennium.HolonicDiscreteMaxwellOperator

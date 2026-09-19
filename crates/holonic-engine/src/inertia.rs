@@ -103,13 +103,41 @@ pub use source_energy::{positive_source_energy, PositiveSourceEnergy, SourceEner
 
 /// A symmetric bilinear form over the rationals, exact.
 ///
-/// Symmetry is checked at construction and never re-checked, so [`inertia`] is total: a form that
-/// exists is a form whose inertia is defined.
+/// Symmetry is checked at construction — and again at every remount, through the wire's
+/// `TryFrom` — so [`inertia`] is total: a form that exists is a form whose inertia is defined.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(try_from = "SymmetricFormWire")]
 pub struct SymmetricForm {
     extent: usize,
     /// Row-major, `extent * extent`.
     entries: Vec<Rat>,
+}
+
+/// The wire shape. A remounted form re-enters through [`SymmetricForm::from_rows`], so an
+/// asymmetric or ragged wire is refused instead of becoming a form whose inertia is undefined.
+#[derive(Deserialize)]
+struct SymmetricFormWire {
+    extent: usize,
+    entries: Vec<Rat>,
+}
+
+impl TryFrom<SymmetricFormWire> for SymmetricForm {
+    type Error = InertiaError;
+
+    fn try_from(wire: SymmetricFormWire) -> Result<Self, Self::Error> {
+        let SymmetricFormWire { extent, entries } = wire;
+        if extent.checked_mul(extent) != Some(entries.len()) {
+            return Err(InertiaError::RaggedForm {
+                row: 0,
+                found: entries.len(),
+                extent,
+            });
+        }
+        if extent == 0 {
+            return Self::from_rows(Vec::new());
+        }
+        Self::from_rows(entries.chunks(extent).map(<[Rat]>::to_vec).collect())
+    }
 }
 
 impl SymmetricForm {
@@ -928,6 +956,25 @@ mod tests {
     use super::*;
     use crate::exact_value::ExactOrdering;
     use num_bigint::BigUint;
+
+    /// A remounted form re-enters through `from_rows`: a symmetric wire round-trips, and an
+    /// asymmetric or ragged wire is refused instead of becoming a form.
+    #[test]
+    fn a_remounted_form_is_rechecked_for_symmetry() {
+        let form = SymmetricForm::from_integers(&[vec![2, 1], vec![1, 3]]).expect("symmetric");
+        let wire = serde_json::to_value(&form).expect("serializes");
+        let back: SymmetricForm = serde_json::from_value(wire.clone()).expect("round-trips");
+        assert_eq!(back, form);
+
+        let mut asymmetric = wire.clone();
+        let entries = asymmetric["entries"].as_array_mut().expect("entries");
+        entries.swap(0, 1);
+        assert!(serde_json::from_value::<SymmetricForm>(asymmetric).is_err());
+
+        let mut ragged = wire;
+        ragged["entries"].as_array_mut().expect("entries").pop();
+        assert!(serde_json::from_value::<SymmetricForm>(ragged).is_err());
+    }
 
     // -----------------------------------------------------------------------------------------
     // THE WORK VECTOR — 2026-08-17

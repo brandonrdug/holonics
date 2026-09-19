@@ -334,6 +334,22 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             "Transport/JunctionLaw.lean",
         ),
         (include_str!("fold.rs"), "fold.rs", "Transport/Fold.lean"),
+        (
+            include_str!("jet_staircase.rs"),
+            "jet_staircase.rs",
+            "Transport/JetStaircase.lean",
+        ),
+        (include_str!("neck.rs"), "neck.rs", "Transport/Neck.lean"),
+        (
+            include_str!("holonic_interaction.rs"),
+            "holonic_interaction.rs",
+            "Transport/HolonicInteraction.lean",
+        ),
+        (
+            include_str!("holonic_chain.rs"),
+            "holonic_chain.rs",
+            "Transport/HolonicChain.lean",
+        ),
     ]
 }
 
