@@ -221,7 +221,7 @@ pub(super) fn image<'a, 'c>(
     let receipt = passage.finish()?.launch()?;
     if !receipt.obstruction.is_empty() {
         return Err(ConstitutiveFibreError::Arithmetic(format!(
-            "affine family image: {:?}",
+            "affine family image: {}",
             receipt.obstruction
         )));
     }
@@ -351,7 +351,7 @@ impl<'c> ResidentConstitutiveReturn<'c> {
             passage.close(0, &lifted, 64)?;
             let result = passage.finish()?.launch()?;
             if !result.obstruction.is_empty() { return Err(ConstitutiveFibreError::Arithmetic(
-                format!("joint word lift: {:?}", result.obstruction))); }
+                format!("joint word lift: {}", result.obstruction))); }
             let next = image(s, &lifted, width, next_width, map.relation_cut, &joint,
                 ConstitutiveImageReceiver::WaveConditional(map))?.into_output().0;
             joint = next;
@@ -366,7 +366,7 @@ impl<'c> ResidentConstitutiveReturn<'c> {
         passage.close(0, &basis, 64)?;
         let result = passage.finish()?.launch()?;
         if !result.obstruction.is_empty() { return Err(ConstitutiveFibreError::Arithmetic(
-            format!("joint word span: {:?}", result.obstruction))); }
+            format!("joint word span: {}", result.obstruction))); }
         let cut = word.last().expect("nonempty word").relation_cut;
         image(s, &basis, t, targets, cut, self, ConstitutiveImageReceiver::WaveWord(word))
     }

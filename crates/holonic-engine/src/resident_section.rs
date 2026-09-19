@@ -1480,6 +1480,72 @@ impl ObstructionLineage {
     }
 }
 
+/// The kernel flag names a raised word carries, in the header's order. An unnamed bit is reported
+/// as its own value rather than dropped, so a flag added to the kernels and not here is visible.
+pub fn refusal_flag_names(flags: u32) -> Vec<String> {
+    let named: [(u32, &str); 5] = [
+        (REFUSED_CARRIER, "carrier"),
+        (REFUSED_MALFORMED, "malformed"),
+        (REFUSED_INVERTED, "inverted"),
+        (REFUSED_UPSTREAM, "upstream"),
+        (REFUSED_BOUND, "refuted-bound"),
+    ];
+    let mut out: Vec<String> = named
+        .iter()
+        .filter(|(bit, _)| flags & bit != 0)
+        .map(|(_, name)| (*name).to_owned())
+        .collect();
+    let covered = named.iter().fold(0, |acc, (bit, _)| acc | bit);
+    if flags & !covered != 0 {
+        out.push(format!("unnamed:{:#x}", flags & !covered));
+    }
+    if out.is_empty() {
+        out.push("none".to_owned());
+    }
+    out
+}
+
+impl std::fmt::Display for OccurrenceRefusal {
+    /// The named face of one refusal. `Debug` keeps the raw words; this names them, so a recorded
+    /// refusal says `carrier` or `malformed` rather than a bit a reader must decode by hand.
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "occurrence {} {} [{}]",
+            self.index,
+            if self.origin { "originated" } else { "carried" },
+            refusal_flag_names(self.flags).join("|")
+        )?;
+        if !self.origin || self.upstream_count != 0 {
+            write!(
+                f,
+                " from {} predecessor(s)",
+                self.upstream_count
+            )?;
+            if let Some(first) = self.upstream_first {
+                write!(f, " first {first}")?;
+            }
+            write!(f, " [{}]", refusal_flag_names(self.upstream_flags).join("|"))?;
+        }
+        Ok(())
+    }
+}
+
+impl std::fmt::Display for ObstructionLineage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.refusals.is_empty() {
+            return write!(f, "no refusal");
+        }
+        for (at, refusal) in self.refusals.iter().enumerate() {
+            if at != 0 {
+                write!(f, "; ")?;
+            }
+            write!(f, "{refusal}")?;
+        }
+        Ok(())
+    }
+}
+
 /// What one launch of a passage returned: the census of every occurrence, the complete obstruction
 /// lineage read off it, and how the deed crossed. The terminal face is read separately, by the
 /// receiver, from the section it names — and only with this reading in hand.

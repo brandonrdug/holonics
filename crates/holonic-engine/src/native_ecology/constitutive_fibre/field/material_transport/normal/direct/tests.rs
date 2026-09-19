@@ -1,3 +1,11 @@
+//! **These `#[ignore]`d tests mount a CUDA context; run them serially.**
+//! `ResidentSurface::on` calibrates the allocator grain from `cuMemGetInfo_v2`, which reports the
+//! **whole device's** free extent. Another allocation on the card between its samples — a second
+//! test thread, a second cargo test process, any other GPU program — enters the difference and the
+//! calibration refuses with `one-word charge … and restored free extent … do not close`. That is
+//! apparatus, not the law under test. Run `-- --include-ignored --test-threads=1` with the card
+//! otherwise idle; see `docs/DEVELOPMENT.md`'s verification cadence.
+
 use super::*;
 use crate::embedding_fiber::ResidentReadout;
 

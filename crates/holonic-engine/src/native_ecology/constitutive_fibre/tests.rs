@@ -244,3 +244,69 @@ fn physical_scratch_aperture_is_read_before_allocating_a_relation() {
     ));
     assert_eq!(surface.census(), before);
 }
+
+/// ADVERSARIAL: a relation whose source block carries a large common denominator is exactly
+/// the material that compounds under an un-rebased elimination. Each step of the old spelling
+/// multiplied the whole query by the pivot `D` and the following normalization divided it
+/// straight back out; that transient factor — never present in the answer — is what left the
+/// 128-bit carrier. With the content removed before the products (`fibre_rebase_step`), a
+/// 51-octave `D` against a 30-octave source stays at 81 octaves for every deposited row, and
+/// the returned currents are exact. Un-rebased, the second row already forms a 132-octave
+/// product and this whole test refuses.
+#[test]
+#[ignore = "requires CUDA; the elimination re-bases instead of compounding the pivot it will divide out"]
+fn scaled_source_relation_is_queried_without_compounding_its_pivot() {
+    use num_bigint::BigInt;
+    let readout = ResidentReadout::new().expect("CUDA apparatus required");
+    let surface = ResidentSurface::on(&readout).unwrap();
+    // 2^50 < D, and every deposited row carries a unit entry, so the row content is one and
+    // D survives into the basis as the pivot of its source coordinate.
+    const D: i64 = 1_125_899_906_842_679;
+    const X: [i64; 6] = [
+        1_073_741_827,
+        -908_765_431,
+        1_000_000_007,
+        -2_147_483_647 / 2,
+        999_999_937,
+        -1_234_567_891,
+    ];
+    let rows: [[i64; 3]; 6] = [
+        [1, 2, 3],
+        [1, -3, 5],
+        [1, 7, -11],
+        [1, -13, 17],
+        [1, 19, -23],
+        [1, -29, 31],
+    ];
+    let mut body = ResidentConstitutiveFibre::found(&surface, 6, 3).unwrap();
+    assert!(u64::try_from(D).unwrap().leading_zeros() == 13); // 51 octaves.
+    for (deposited, row) in rows.iter().enumerate() {
+        let mut source = [0i64; 6];
+        source[deposited] = D;
+        let staged = body.advance(&source, Some(row)).unwrap();
+        assert_eq!(staged.formed_pivot, Some(deposited));
+        // Query the part of the source the relation now carries. The exact answer is
+        // (sum_i x_i A_i)/D — 38 octaves over 51 — while the un-rebased intermediate is 132.
+        let mut query = [0i64; 6];
+        query[..=deposited].copy_from_slice(&X[..=deposited]);
+        let read = unique(body.advance(&query, None).unwrap());
+        let expected: Vec<Rat> = (0..3)
+            .map(|j| {
+                let numerator: BigInt = (0..=deposited)
+                    .map(|i| BigInt::from(X[i]) * BigInt::from(rows[i][j]))
+                    .sum();
+                Rat::new(numerator, D.into())
+            })
+            .collect();
+        assert_eq!(read, expected, "exact current after {} deposited rows", deposited + 1);
+        // Bounded step over step: the reading never carries the pivots it was eliminated
+        // through, only the answer's own octaves.
+        let octaves = read
+            .iter()
+            .map(|v| v.numer().bits().max(v.denom().bits()))
+            .max()
+            .unwrap();
+        assert!(octaves <= 52, "row {deposited} reading grew to {octaves} octaves");
+    }
+    assert_eq!(body.occurrences(), 12);
+}

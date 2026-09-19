@@ -10,24 +10,94 @@ individual D/M updates remain available. The source application is corpus/reposi
 reconstruction under explicit receiving constraints; source text is material, not an assertion
 that a historical assistant answer is correct.
 
-[established-bounded; measured] September 18: the shared-section device tests pass on the card when
+[established-bounded; measured] September 18: the shared-section device suites pass on the card when
 run serially with the GPU otherwise idle — the operative source module 8 of 8, the direct normal
-material module 136 of 136, `resident_section` 53 of 53. Run in parallel, or beside another GPU
-process, they fail in the allocator's `allocation_grain_bytes` calibration, which is apparatus and
-not the section law. One defect was repaired: both new section launches compared the source
-section's stored width with its component count, omitting a rational section's denominator word, so
-every rational source was refused; the kernels already received the true stride and the rational
-flag. `applied_section_matches_rows_and_retains_rational_bound` now receives observations before it
-reads, so the section reader and the per-row reader agree on nonzero enclosures with a positive
-retained bound instead of on a freshly founded zero. A second defect was repaired in the scatter
-recorder, which passed the destination section's width — always one — where the kernel's
-`dest_count` is its row count, so every multi-row scatter was refused as malformed; with it the
-shared session test `shared_source_updates_and_reopens_without_a_position_sized_model` passes.
-`holonics-hna` then reads 106 of 107 serially. **Open:** the new
-`changing_operative_material_conditions_the_same_hnn_source` refuses at its prospective reading —
-the affine family image refuses with flag 1 and the exact point-word fallback with flag 2, in
-`wave/family/receiver.rs::read_prospective` — and is the next discriminating return for this
-construction. No complete-source session result is claimed.
+material module **138 of 138**, `resident_section` 53 of 53, `native_ecology::constitutive_fibre`
+9 of 9, `holonics-hna` **107 of 107**, and `holonic-engine --lib` **2835 of 2835** by default.
+Three defects were repaired on the way: both new section launches compared the source section's
+stored width with its component count, omitting a rational section's denominator word, so every
+rational source was refused; the scatter recorder
+passed the destination section's width — always one — where the kernel's `dest_count` is its row
+count, so every multi-row scatter was refused as malformed; and
+`applied_section_matches_rows_and_retains_rational_bound` now receives observations before it reads.
+Every `record_*` function added or changed in `24e74c64` has since been audited position by position
+against its kernel's parameter list: the eight new recorders agree argument for argument with their
+eight kernels, and the three that the commit only moved are whitespace-identical. No further
+mismatch of that family exists.
+
+[established-bounded; formal-checked; implemented-exact; measured]
+`changing_operative_material_conditions_the_same_hnn_source` is **closed with a reading, not a
+refusal.** Brandon's ruling governs: the 128-bit carrier is a rebasing matter, and resource
+pressure changes lawful representation rather than raising a magic number. Two things were
+measured before anything was written. First, the presentation the committed step deposits — the
+joint `(z0, z1)`, 84 source coordinates over a rank-20 direction block whose entries are 48
+octaves at grain 24 — is **already reduced**: integer size reduction, an exact LLL over the same
+row lattice and the rational reduced echelon form all return 48 octaves, because that subspace IS
+the graph of the learned 48-octave step map over the anchor block. No rebase of *that* chart
+exists, and the earlier plan to reduce it would have returned nothing. Second, the growth law is
+one map-octave per composition: 48 octaves after one step at grain 24, and the 65 / 71 / 81
+octaves recorded at grains 16 / 18 / 20 track the same law after two. The expanded composite is
+therefore ~96 octaves per entry and enters no `int64` affine report word at any grain this
+material admits; that arm's refusal is a property of the chart, not of the relation.
+
+The rebase that exists is a change of *which* chart carries the relation, and it was made in two
+places. **The elimination step itself** now re-bases: `kernels/exact_resident_section.cu::
+fibre_rebase_step` divides pivot and coefficient by their gcd before the products in `fibre_query`
+and `fibre_stage`. Both spellings name the same rational vector and `fibre_normalize` reduces the
+pair `(row, den)` to the identical primitive afterwards, so **every reported value is unchanged
+bit for bit**; only the intermediates shrink. That matters because a relation whose source block
+carries a common denominator `D` — the ordinary shape of a learned affine map — made the old
+spelling multiply the whole query by `D` and the following normalization divide it straight back
+out. That transient, never present in the answer, is what left the carrier.
+`scaled_source_relation_is_queried_without_compounding_its_pivot` is the adversarial witness: a
+51-octave `D` against a 30-octave source returns exact currents for every deposited row, and
+refuses `REFUSED_CARRIER` at the second row with the re-basing removed (measured both ways).
+**The prospective reading** is now taken in the factored chart when the expanded one leaves the
+carrier: `section_normal_point_word_seed` admits a plural source family whose every retained
+direction moves the anchor, seeding the retained word from that family's own receiver point
+instead of from a particular it does not have. That is exact, not a selection — with no output
+coordinate free at a fixed anchor the fibre over the projected anchor is a single point, so the
+joint minimum-norm receiver of `(z0, L z0)` *is* the image of this family's receiver. A genuine
+vertical fibre is still refused as malformed and the expanded chart remains its only reading
+(`the_word_refuses_a_genuine_vertical_fibre_rather_than_standing_in`). Where both charts are
+readable they agree exactly (`rebase_and_expansion_read_the_same_future`), which is
+`Foundation/RelationPresentation.lean::Rebase.carrier_eq` and `Rebase.faces_eq` at the receiver:
+row-equivalent presentations have equal domain, image and fibres, and the chart change has
+`Rebase.residual_empty`.
+
+The test now demands the reading its original form demanded and more: live and remounted bodies
+return the identical prospective reading after the committed step, with no readout across the
+advance or the observation, the word's first state equal coordinate-for-coordinate to the
+committed current, the changed material conditioning that reading, and the growth asserted rather
+than printed — one factor adds at most its own octave (74 → 121 octaves through a 48-octave
+factor, inside the 127-octave wide carrier). Nothing was widened and no refusal was relaxed.
+
+[established-bounded; source-inspected] The allocator's `allocation_grain_bytes` calibration is
+apparatus and is now said so where it will be read. It differences two `cuMemGetInfo_v2` readings —
+the **whole device's** free extent, not this context's and not this process's — across one word
+allocation, so any other allocation on the card between the samples enters the difference and the
+closure check fails. It is now serialized process-wide, retried a bounded
+`ALLOCATION_CALIBRATION_ATTEMPTS` times with the retry count reported by
+`mount::cuda::allocation_calibration_retries`, and an exhausted calibration returns **every**
+attempt's reading, so an allocator that does not compose (repeating readings) is distinguishable
+from a busy card (differing readings). None of that makes a shared card measurable; the serial
+requirement is now stated in `docs/DEVELOPMENT.md`'s verification cadence and at the head of the
+device test modules. No complete-source session result is claimed.
+
+[established-bounded; implemented-exact; measured] D3's engine-side adoption has its first
+instance. `crates/holonic-engine/src/section_layout_adoption.rs` declares the hand-written
+`section_normal_enclosure_scatter_section` as a `mount::IncidenceDeclaration` with its local block,
+and on the card the generated gather/apply/scatter triple reproduces that kernel's coordinate result
+word for word on the engine's own enclosure material. The declaration forced one correction to the
+plan's migration map — a `(region, slot) → global index` incidence carries one address space, so a
+source→destination map is declared by embedding both in one extent and putting the map in the
+region's `2c × 2c` local block, not by an `L = I` block — and measured three obligations, all
+recorded in D3's open paragraph: the generated ring agrees with the engine's 128-bit `wide` only on
+words in `[0, 2^61 - 1)` and a general adoption owes a second **device** ring rather than a wider
+modulus; the enclosure radius is a second, accumulating address under `AccumulationLaw::IntegerAdd`,
+which has no device arm; and the triple returns an all-zero field when enacted inside the engine's
+adopted readout context although every receipt is fully proved, which is unexplained and is the
+first obstacle a real migration must clear. No engine result is changed by this module.
 
 [established-bounded; formal-checked; implemented-exact] September 17–18: the
 [shared carrier](docs/plans/THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md) C1–C8 with the tube
@@ -38,7 +108,8 @@ except its physicochemical receiver, and the
 Lean and Rust owners at commit `2c6041ac`; [ARCHITECTURE_MAP](docs/ARCHITECTURE_MAP.md) carries
 their rows. The next construction contract is
 [generalized transport](docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md).
-D3's generated section triple is the device form this shared-section realization adopts next.
+D3's generated section triple is the device form this shared-section realization adopts next;
+its first engine-side declaration and device cross-check now exist.
 
 **Last model return:** The same Athena field session now receives partial/joint
 regions, generates their missing values together, and saves the producing receiver and output

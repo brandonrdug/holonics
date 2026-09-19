@@ -61,8 +61,8 @@ agreement (`futureAgreement_is_greatest_stable`), with a separator returned on i
 `Foundation/ReceiverHistoryCompression.lean` owns the quotient through which every admitted future
 observation factors. `Transport/ChangingReceiver.lean` owns a receiver that changes while its source
 does not. `Foundation/Bridge.lean` owns a strength order on eight statuses with counterexamples.
-What is absent is the single typed ladder that places these on one scale with its implications and
-non-implications proved.
+The single typed scale that places these together with its implications and non-implications proved
+is `Foundation/RelationLadder.lean` / `relation_ladder.rs`, returned as T1 below.
 
 [established-bounded; source-inspected] Junctions are owned in several places:
 [the junction is a half-twist](../../research/records/2026-08-16_THE_JUNCTION_IS_A_HALF_TWIST_AND_A_MODULUS_IS_WHAT_A_DECLARED_QUOTIENT_RETAINS.md)
@@ -74,29 +74,127 @@ critical vorticity rate, stretching comb and finite-time files under `Millennium
 
 ## Intentions
 
-[definition] **T1 — The relation ladder.** One typed scale over the owners above, in the manner of
-`Bridge.lean`'s status order: strict occurrence identity `x = y` within one situated type;
-continuation `x ⇝ y` (an addressed passage, with `X_t` and `X_u` distinct types and
-`T_{u←t} : X_t → X_u` the only thing connecting them); structure-preserving isomorphism `x ≅ y`;
-receiver equivalence `x ~_ρ y`; equal potential `x ~_{G,R} y`, where
-`Pot_{G,R}(x) = [(w, ρ) ↦ ρ(T_w x)]` over finite ordered histories; and tolerance
-`x ≈_{ρ,ε} y`. Prove which implications hold and exhibit a counterexample for each that does not —
-equal face without equal potential, equal potential without isomorphism, continuation without any
-equal face — and prove that no relation below identity ascends to it. `Expression` against `eval`
-is the first worked instance; two enactments of one song, as a family of admissible enactments under
-a musical receiver, is the second.
+[established-bounded; formal-checked; implemented-exact] **T1 — The relation ladder. Returned.**
+Owners: [`Foundation/RelationLadder.lean`](../../formal/elementary-holonics/ElementaryHolonics/Foundation/RelationLadder.lean)
+(namespace `Soma.Holonics.Foundation.RelationLadder`) and
+[`relation_ladder.rs`](../../crates/holonic-engine/src/relation_ladder.rs) with
+`relation_ladder/tests.rs`. One typed scale over the owners above, in the manner of `Bridge.lean`'s
+status order: strict occurrence identity `x = y` within one situated type; continuation `x ⇝ y`
+(`AddressedPassage.Fibre`); structure-preserving isomorphism `x ≅ y` (`SituationAuto`, which is
+`Holon.Rebase` with the situation's generator square and receiver triangle as its ports); receiver
+equivalence `x ~_ρ y` (`ReceiverEq`); equal potential `x ~_{G,R} y`, which **is**
+`CausalRelevance.futureAgreement` and is named, not redefined; and tolerance `x ≈_{ρ,ε} y`, which is
+`ReceiverRelease.width` on `{x, y}` inside a declared tolerance (`withinTolerance_of_width_le`).
+`Rung.entails` is proved a genuine partial order and not total, `rungMeet` its total meet, and
+`no_rung_below_identity_entails_identity` with `noRungBelowIdentityAscendsToIdentity` is the
+headline in both its forms — the declared order and five constructed witnesses. Every failing
+implication carries a construction: `receiverEqualityWithoutEqualPotential` (the three-step example,
+cited), `equalPotentialWithoutIsomorphism`, `isomorphismWithoutIdentity`,
+`continuationWithoutAnyEqualFace` (`translationPassage`, cited),
+`lossyContinuationIsNotAnIsomorphism`, `toleranceIsNotTransitive`. `equalPotentialAntitone` proves
+that enlarging `(G, R)` refines the class and `separatorRefutesEqualPotential` that one `(w, ρ)`
+refutes it. Each of the 31 audited declarations depends only on `propext`, `Classical.choice` and
+`Quot.sound` — several on fewer and three on none — and none on `sorryAx`. The Rust owner is the executable equivalent: `Rung`, `rung_meet`,
+`Situation::declare`, `classify`, `Separator`, `PotentialVerdict`, `ContinuationVerdict`, with 42
+tests and exact `BigUint`/`BigRational` throughout. `Expression` against `eval` is the first worked
+instance and two enactments of one song — a family of admissible enactments and transformations
+under a musical receiver, separated by a richer one — is the second.
 
-[definition] **T2 — Standing, memory and extinction.** A remembered face is generated now, not
-retrieved: `m_t = D_t(S_t, c_t)` with `S_t` the standing shaped by prior passages, `c_t` the present
-context and `D_t` the current reconstruction. The original occurrence is not regenerated; a new
-occurrence in a related family is constituted by the morphology the original helped form. With the
-source `M` fixed, `ρ_t(M)` still changes as the receiver acquires distinctions — `ChangingReceiver`
-is the owner. **Effective extinction** of a perturbation `x` against a reference `0` is
-receiver-relative: `∀ ρ ∈ R, ∀ w ∈ G*, d(ρ(T_w x), ρ(T_w 0)) ≤ ε`, which is `receiver_release`'s
-width inside tolerance read on the pair `{x, 0}`. A wave has no universal death: its recoverability
-as the original organized occurrence decays while its differences are redistributed into other
-structures, of which a fossil is a durable boundary inscription. State that as the theorem it is —
-extinct at `(R, ε)` and separated at a richer `(R', ε')` — with an exact instance.
+[established-bounded] Four findings from building it, each changing the item as the paragraph above
+first stated it.
+**(1) The rungs are relative to three different things, so they are not one linear scale.** Rung 1
+is absolute; rungs 3–6 are relative to the declared `(G, R)`; rung 2 is relative to a declared
+*lineage* and is therefore incomparable with rungs 4, 5 and 6 (`entails_is_not_total`,
+`equalPotentialWithoutAGeneratorContinuation`). The order needs a seventh bottom rung,
+`noRelation`, for the meet to be total, and the Rust `Classification` reports the continuation
+beside the identity chain rather than inside it. **(2) "Isomorphism implies equal potential" is only
+true with the equivariance carried inside the isomorphism, and each half is separately necessary**:
+`receiverEquivarianceIsNecessary` drops the receiver triangle and `generatorEquivarianceIsNecessary`
+drops the generator square, each exhibiting a bijection carrying `x` to `y` whose potentials differ.
+**(3) Which rung holds for `4` and `2^2` is a fact about the declared generator family, not about
+the pair**: under a family that only post-composes `eval` they have equal potential
+(`postcomposeFamilyGivesEqualPotential`); one construction generator separates them
+(`bumpExponentSeparatesThem`). **(4) A bounded search can never establish rung 5.**
+`PotentialVerdict::NotSeparatedWithinBound` carries the bound it ran under and is never reported as
+equal potential; the one sound executable route to rung 5 is an equivariance check over a probe the
+caller declares to be the whole carrier, and a probe that is not stays a probe.
+
+[established-bounded; formal-checked; implemented-exact] **T2 — Standing, memory and extinction.
+Returned.** Owners:
+[`Foundation/Standing.lean`](../../formal/elementary-holonics/ElementaryHolonics/Foundation/Standing.lean)
+(namespace `Soma.Holonics.Foundation.Standing`) and
+[`standing.rs`](../../crates/holonic-engine/src/standing.rs) with `standing/tests.rs`.
+
+**Standing is the retained residue of passages, and it may be any quotient sufficient for the
+admitted future.** `standingLaw_exists_iff_future_factors` proves that as an equivalence, which is the clause
+AGENTS.md states — *"causal origin does not prescribe an event archive"* — as a theorem: a retention map
+carries a lawful `StandingLaw` **exactly when** every admitted future observation factors through
+it. `two_histories_leave_one_standing` exhibits two distinct presents reached by different
+histories with one standing, and `one_present_face_two_standings_separated_later` two presents
+agreeing at the present receiver whose standing a future receiver separates — the separator is
+returned. `causalSignature` **is** T1's `RelationLadder.potential`
+(`causalSignature_eq_potential`), and equal standing establishes rung 5
+(`retain_eq_establishes_equalPotential`); nothing here founds a second quotient or a second scale.
+
+**Memory is a generator.** `MemoryLaw.remember` returns a `TimedFace` at the present time, whose
+time is part of the *type*, so `the_remembered_face_is_a_new_occurrence` is a statement the typing
+makes rather than a convention; `receiver_agreement_after_the_passage_is_not_recovery` shows that
+the passage and a receiver are all that relate the two, and that agreement at that receiver leaves
+the carried values different. The same standing under two contexts returns two faces; the same
+original under two later standings returns two reconstructions. The **fidelity law** is
+`faithfulAt_iff_receiver_factors_through_standing`, which is `receiverTransformer_exists_iff` at
+the retention map, cited not rebuilt. Its counterexample,
+`the_unretained_receiver_is_reconstructed_confidently_and_wrongly`, is the honest formal content of
+*"it cannot confabulate without origin, but it can be wrong"*: the retained face is exactly right,
+the unretained one is returned **definitely** and is exactly wrong, and the constructed
+`ReceiverInsufficiency` is why no reconstruction could have done better.
+
+**The receiver keeps changing after the source stops.** The aperture chain has zero
+`ChangingReceiver.defect` at every pair of steps; with `M` fixed its available face changes at
+every step; the compatible fibre is antitone; no finite step makes it a singleton; the
+intersection is `{M}` only because this chain separates, and
+`a_non_separating_chain_never_reaches_a_singleton` shows one unread coordinate keeps it plural
+forever. `apertureInsufficiency` and `no_transformer_from_the_coarser_aperture` are the separator
+owners cited: a later separation is new content, not a reading of the earlier face.
+
+**Effective extinction** is `Extinct`, and `extinct_iff_release_width_inside_tolerance` proves it
+*is* `ReceiverRelease.Releasable` on the two-point family `{T_w x, T_w 0}` — `width_pair` is the
+only new lemma and it is proved from that owner's own `width_le_of_bounds` and `abs_sub_le_width`.
+It is monotone in the tolerance, the receiver family and the generator family, it is T1's rung 6
+after every admitted history, and at `ε = 0` it coincides with rung 5
+(`extinct_at_zero_iff_equalPotential`). `lawful_silence_is_extinction_at_the_outward_receiver`
+reads `WorldTube.IsLawfulSilence` in this vocabulary: a nonzero section extinct at the outward
+receiver is *dead to this receiver, alive inside*. The exact instance is a damped linear wave
+`(a, e, m)` with `a ↦ a/2`, `e ↦ e/4`, `m ↦ m + e/4`: `e_t = a_t²` is proved, at horizon 3 the
+wave chart is extinct at tolerance `1/8`, the medium reads exactly `21/64` at the **same**
+tolerance and `the_fossil_is_durable` shows it never falls below that again while staying strictly
+below `1/3`, and `the_energy_that_left_the_wave_is_accounted_for` closes the ledger exactly in
+medium plus dissipation. In the exact `3-4-5` rational rotation the declared quadratic energy is
+invariant along every word, so `no_horizon_releases_the_energy_receiver` and
+`nothing_nonzero_is_extinct_at_zero_tolerance`: the difference is redistributed between the
+coordinates and never leaves. Each of the 42 audited declarations depends only on `propext`,
+`Classical.choice` and `Quot.sound` — five on none — and none on `sorryAx`. The Rust owner is the
+executable equivalent with 37 tests, exact `BigRational` throughout and no float anywhere.
+
+[established-bounded] Four findings from building it, each changing the item as the paragraph above
+first stated it. **(1) Taken literally over every word, `Extinct` is never satisfied by a decaying
+wave read from its origin**, because the supremum sits at the empty word. The object that carries
+the intended meaning is extinction *of the present occurrence*, `Extinct(T^h x | 0)`: the horizon
+belongs inside the perturbation, not inside the quantifier. Every fossil result is stated that way.
+**(2) A bounded word search can only refute extinction; affirming it needs a certificate.** This is
+T1's finding (4) again at a different rung. `ExtinctionVerdict` therefore has three values, and the
+sound executable route to `Extinct` is a **checked** `ContractionCertificate`: a declared coordinate
+chart proved invariant under every generator, an exact rational factor `λ ≤ 1` bounding every chart
+row, and an exact gain for each reading, which together bound every word at once. A receiver that
+reads outside the certified chart does not get an extinction verdict; the fall-through names it.
+**(3) "Extinct at `(R, ε)` and separated at a richer `(R', ε')`" holds at the *same* `ε`.** The
+plan allowed a wider tolerance and the exact instance does not need one — the enrichment is
+entirely in the receiver family, which is the sharper statement and the one now proved. **(4) The
+declared quadratic energy must be carried as its own coordinate for the system to stay exactly
+linear and the ledger to be a theorem rather than a definition.** `e` quarters linearly because `a`
+halves; `e_t = a_t²` is then proved by induction rather than assumed; and the medium/dissipation
+split closes exactly over the rationals. A linear system plus a quadratic form does not by itself
+give an exact rational energy ledger.
 
 [definition] **T3 — Release over an edited artifact family.** Compose `receiver_release`,
 `continuing_tube` and `physical_occurrence::PluralFibre` into the generation law above. The
@@ -163,12 +261,12 @@ p-adically. Join to `HigherDifference*`; exact over rationals by finite differen
 
 ## Carried from the four returned plans
 
-[definition] Biological: **B8** selection and design equivalence over `PluralFibre` and the Pareto
-frontier, **B9** evaluation discipline, **B10** cost cascade and receipts, and the physicochemical
-receiver of B7. Receivers: a per-eigenvalue refinement owner on `ExactHodgeSpectrum`, and
-`MarkovTwoNSuffices`. Device: engine-side adoption of the generated section triple, a per-region
-operator family and a base-pointer registry; **D4** stays an intention. Carrier: Weierstrass
-division for the power-series form of `Λ/(ω_n)`.
+[definition] Biological: **B8** is returned as `design_selection` on `RelationLadder`'s equal
+potential; **B9** evaluation discipline, **B10** cost cascade and receipts, and the physicochemical
+receiver of B7 remain. Receivers: a per-eigenvalue refinement owner on `ExactHodgeSpectrum`, and
+`MarkovTwoNSuffices`. Device: a second device ring of signed 128-bit words with the engine's carrier
+refusal, a per-region operator family and a base-pointer registry; **D4** stays an intention.
+Carrier: Weierstrass division for the power-series form of `Λ/(ω_n)`.
 
 [established-bounded; measured] The shared-section realization of the field reaction and reflection
 that the [construction state](../../CONSTRUCTION_STATE.md) names as active is the engine-side
@@ -177,9 +275,8 @@ on the card; adopting the generated triple there is the next device increment.
 
 ## Order
 
-[definition] Waves are at most four constructing agents and one reviewer, the reviewer spawning no
-agents of its own. T1 and T2 come first because every later item states its results in that
-vocabulary. T3 with T5 follows, since release over a family needs the two-axis horizon. T4 and T7
-share the rigidity owner and go together. T6 and T8 share the higher-difference and pole owners and
-go together. B8–B10 consume T1's potential equivalence for design equivalence and run beside
-whichever wave has room.
+[definition] The order of what remains here, the wave shape and the rules that settle recurring
+choices are stated once, in [THE_ROADMAP](THE_ROADMAP.md#position-of-the-five-contracts). T1 and T2
+are returned and every later item states its results on `RelationLadder`'s rungs. T3 goes with T5,
+since release over a family needs the two-axis horizon; T4 with T7, which share the rigidity owner;
+T6 with T8, which share the pole and higher-difference owners.

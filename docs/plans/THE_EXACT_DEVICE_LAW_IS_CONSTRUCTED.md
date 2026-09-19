@@ -417,6 +417,25 @@ shared-tile population is a different, larger file set.
   and needs no flag, no serialization and no `REFUSED_MALFORMED` path. The sibling
   `section_normal_enclosure_restrict_section` is the same projection with an injective-by-row
   destination.
+
+  [established-bounded; implemented-exact; measured] **This one is now declared and cross-checked,
+  September 18**, in the engine's own crate against this owner's public declaration:
+  [`crates/holonic-engine/src/section_layout_adoption.rs`](../../crates/holonic-engine/src/section_layout_adoption.rs)
+  with [its tests](../../crates/holonic-engine/src/section_layout_adoption/tests.rs).
+  `enclosure_scatter_incidence` returns the `IncidenceDeclaration` and `window_placement_operator`
+  the local block; on the RTX 4080 SUPER the generated triple's device result equals its own exact
+  reference bit for bit **and** equals, word for word, what
+  `ResidentNormalEnclosureSection::scatter_components` wrote for the same four rows of engine
+  enclosure material. **The correction the declaration forced:** a `(region, slot) → global index`
+  incidence carries **one** address space, because the gather index *is* the address table and the
+  scatter is its transpose. The engine's scatter maps a source section into a *different*
+  destination field, so it is declared by embedding both in one extent — source section flat, then
+  destination field — and putting the map inside the region's local block: region `r` is its source
+  window followed by its destination window, `2·count` slots, and `L[count + j][j] = 1` is the
+  window projection composed with the placement. A source→destination map is therefore not outside
+  D3; it is a `2c × 2c` block on a common field, and the migration map's `L = I` above is the
+  *shape* of the arm, not the block that realizes it. Two things the current generated ring does not
+  carry are stated in the `[open]` paragraph below.
 * **`exact_packet_linear.cuh`** — the cleanest instance of the *shared-tile* form. Incidence: a
   uniform affine row gather (region = row, width = the row length). Local operator: a dense matvec
   accumulated into `scratch[r]`, followed by `fibre_normalize`. Scatter: plain stores, injective by
@@ -459,7 +478,35 @@ enclosures that publish a radius in their last slot, and the generated triple ca
 radius word. **`AccumulationLaw::IntegerAdd` has no device arm**, for the stated reason.
 **The engine side is not migrated**, and cannot be from here: `mount` cannot depend on
 `holonic-engine`, so adopting the triple is a change in the engine's own crate against this owner's
-public declaration, to be made when that session's in-flight kernel work lands.
+public declaration.
+
+[open] **What the first engine-side declaration measured the ring gap to be.** The cross-check
+above holds the coordinate arm exactly and names three obligations, each now a measured fact rather
+than an expectation.
+
+1. **The word, precisely.** The engine's coordinate is a 128-bit signed `wide` held as an `int64`
+   low/high pair with a `REFUSED_CARRIER` overflow refusal; the generated arm is one `u64` in
+   `Z/(2^61 - 1)`. They agree **bit for bit** exactly while a coordinate word is non-negative and
+   below `2^61 - 1`, because a placement block is a permutation and no ring operation but `x·1 + 0`
+   reaches a gathered word. Outside that window the generated arm folds a residue where the engine
+   keeps an exact integer. What a general adoption owes is therefore **not a wider modulus** but a
+   second device ring: signed 128-bit words carried as two device words, with the engine's own
+   carrier refusal raised from the kernel. That is four new nvptx entries and a refusal slot in the
+   generated triple's ABI, not a change to `ExactRing`'s host side, and it is **not** a contained
+   change to `section_layout`.
+2. **The radius is a second, accumulating address.** Every engine enclosure carries one radius word
+   after its coordinates, and the scattered output's radius is the *sum of the participating source
+   radii* — an address every region adds into, under exact integer addition with an overflow
+   refusal. That is `AccumulationLaw::IntegerAdd`, which `SectionKernels::enact` refuses on device.
+   So even the cleanest instance is, in full, an injective coordinate scatter **plus** one
+   accumulating address whose law has no device arm; the declaration carries the coordinates and
+   says so.
+3. **One context, unresolved.** Enacting the generated triple inside the engine's adopted
+   `ResidentReadout` context — same device, same thread, every receipt fully proved — leaves the
+   gather arm's tile and the target field **entirely zero**; the identical call in a context from
+   `mount::Context::create` reproduces the exact reference. The cross-check therefore uses its own
+   context, and the cause is not identified. This is the first obstacle a real migration must
+   clear, because a migrated kernel must share the engine's context with the engine's own.
 
 [definition] **D4 — A generator may compile its own device law.** A generator is a situated
 mathematical transformation, and a model that emits source is one application of that. A Holon that
@@ -489,5 +536,6 @@ so. Installed capacity and a vendor rating are not measured bandwidth or power.
 `R_D` identity carries a measurement rather than an inspection. Then D1 and D2 against the existing
 kernel set, since both are contracts over calls that already exist. D3 is Returned at the scope
 stated above; its remaining work is the engine-side adoption named in its `[open]`, which belongs to
-the crate that owns those kernels. D4 remains an intention until a consuming construction asks for
+the crate that owns those kernels and whose first declaration and device cross-check now exist in
+`holonic-engine::section_layout_adoption`. D4 remains an intention until a consuming construction asks for
 it.

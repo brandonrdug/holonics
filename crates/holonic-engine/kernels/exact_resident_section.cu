@@ -996,9 +996,28 @@ extern "C" __global__ void section_contact(
 // the vertical fibre and are never silently discarded. An occurrence optionally carries a paired
 // receiver current. Its row is reduced and staged BEFORE the sole basis write. No source values,
 // selected answer, scalar loss or host-derived rank enter the formation rule.
+/// Binary (Stein) greatest common divisor over the wide magnitude. Identical result to the
+/// Euclidean spelling; the device has no 128-bit divider, so `%` here is a software routine and
+/// this loop is shifts and subtractions instead. Content removal runs inside every elimination
+/// step, so its cost is the elimination's cost.
+__device__ __forceinline__ uint32_t fibre_trailing(uwide m) {
+    uint64_t lo = (uint64_t)m;
+    if (lo != 0) return (uint32_t)__ffsll((long long)lo) - 1u;
+    return 64u + (uint32_t)__ffsll((long long)(uint64_t)(m >> 64)) - 1u;
+}
+
 __device__ __forceinline__ uwide fibre_gcd(uwide a, uwide b) {
-    while (b != 0) { uwide r = a % b; a = b; b = r; }
-    return a;
+    if (a == 0) return b;
+    if (b == 0) return a;
+    uint32_t sa = fibre_trailing(a), sb = fibre_trailing(b);
+    uint32_t shared = sa < sb ? sa : sb;
+    a >>= sa;
+    b >>= sb;
+    while (a != b) {
+        if (a > b) { a -= b; a >>= fibre_trailing(a); }
+        else { b -= a; b >>= fibre_trailing(b); }
+    }
+    return a << shared;
 }
 
 __device__ __forceinline__ void fibre_normalize(
@@ -1026,6 +1045,30 @@ __device__ __forceinline__ wide fibre_entry(const int64_t *basis, uint32_t width
     return (int64_t)row == staged_pivot ? staged[column] : basis[(size_t)row * width + column];
 }
 
+/// THE ELIMINATION STEP IS RE-BASED, NOT WIDENED.
+///
+/// `(row, den) <- (pivot·row − coefficient·basis_p, den·pivot)` and
+/// `(row, den) <- ((pivot/g)·row − (coefficient/g)·basis_p, den·(pivot/g))` for
+/// `g = gcd(pivot, coefficient)` name the SAME rational vector: the step subtracts
+/// `coefficient/(den·pivot) · basis_p` either way, and `coefficient/g` still annihilates
+/// coordinate `p` against `pivot/g`. The second scales the whole presentation down by `g`
+/// BEFORE the products, and `fibre_normalize` — which reduces the pair `(row, den)` by its
+/// full content — brings both spellings to the identical primitive pair afterwards. Every
+/// reported value is therefore unchanged, bit for bit, and only the intermediates shrink.
+///
+/// That matters because the un-rebased spelling compounds. On a relation whose source block
+/// carries a common denominator `D` — the ordinary shape of a learned affine map — each step
+/// multiplies the whole query by `D` and the following `fibre_normalize` divides it straight
+/// back out. The transient `D · query` is a factor the answer never contains, and on a
+/// 74-octave query against a 48-octave `D` it is what leaves a 128-bit carrier. With the
+/// content removed first, `g = D`, the step costs nothing, and the intermediates stay bounded
+/// by the answer instead of by the history of pivots that produced it. AGENTS.md: resource
+/// pressure changes lawful representation, it does not justify a wider magic number.
+__device__ __forceinline__ void fibre_rebase_step(wide *pivot, wide *coefficient) {
+    uwide g = fibre_gcd(magnitude(*pivot), magnitude(*coefficient));
+    if (g > 1) { *pivot /= (wide)g; *coefficient /= (wide)g; }
+}
+
 __device__ void fibre_query(const int64_t *basis, uint32_t source_width, uint32_t width,
     wide *query, wide *denominator, const wide *staged, int64_t staged_pivot,
     uint32_t *disposition, uint32_t *rank, uint32_t *slot) {
@@ -1036,6 +1079,7 @@ __device__ void fibre_query(const int64_t *basis, uint32_t source_width, uint32_
         if (pivot) { ++*rank; if (p >= source_width) ++vertical; }
         if (p >= source_width || !pivot || !query[p]) continue;
         wide coefficient = query[p];
+        fibre_rebase_step(&pivot, &coefficient);
         for (uint32_t j = 0; j < width; ++j) {
             query[j] = sub_checked(product_checked(pivot, query[j], slot),
                 product_checked(coefficient, fibre_entry(basis, width, p, j, staged, staged_pivot), slot), slot);
@@ -1055,9 +1099,12 @@ __device__ int64_t fibre_stage(const int64_t *basis, uint32_t width, wide *forme
         if (!formed[p]) continue;
         int64_t pivot = basis[(size_t)p * width + p];
         if (!pivot) { inserted = p; break; }
-        wide coefficient = formed[p];
+        wide staged_pivot = pivot, coefficient = formed[p];
+        // Same re-basing as fibre_query: the staged row is content-reduced against the pivot
+        // before the products, and the row that is finally written is the identical primitive.
+        fibre_rebase_step(&staged_pivot, &coefficient);
         for (uint32_t j = 0; j < width; ++j) {
-            formed[j] = sub_checked(product_checked(pivot, formed[j], slot),
+            formed[j] = sub_checked(product_checked(staged_pivot, formed[j], slot),
                 product_checked(coefficient, basis[(size_t)p * width + j], slot), slot);
         }
         if (*slot) return -1;

@@ -191,6 +191,9 @@ fn point_word_retains_a_long_joint_beyond_projection_scratch() {
     assert_eq!(source.affine_relation().inspect().unwrap(), before);
 
     // The same resource change does not authorize evaluating an unresolved source at its centre.
+    // `hyperplane` keeps a direction above the anchor block, so one output coordinate is still
+    // free at a fixed anchor and the factored word refuses it rather than reading a point of it
+    // (`the_word_refuses_a_genuine_vertical_fibre_rather_than_standing_in`).
     let plural = hyperplane(&s, 0, 8);
     assert!(plural.read_prospective(vec![map; steps]).is_err());
 }
@@ -538,4 +541,127 @@ fn enclosure_point_word_keeps_non_dyadic_rounding() {
         let e=a-b;error+=if e<Rat::zero(){-e}else{e};
     }
     assert!(error<=reading.radius);
+}
+
+#[test]
+#[ignore = "requires CUDA; the expanded composite and the retained word are two charts of one relation"]
+fn rebase_and_expansion_read_the_same_future() {
+    use super::super::super::comparison_tests::{current, point};
+    use super::super::tests::law;
+    let ro = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&ro).unwrap();
+    let member = law(&s, false);
+    let h = point(&s, &[1, 0]);
+    let map = Rc::new(member.read_wave_relation(current(&h), 1).unwrap());
+    // A PLURAL family that is a graph over its anchor block: both retained directions carry a
+    // pivot inside the anchor coordinates 2..6, so nothing is free once the anchor is fixed.
+    let mut origin = [0; 10];
+    origin[0] = 1;
+    origin[2] = 1;
+    origin[6] = 2;
+    origin[8] = 1;
+    let family = specimen(
+        &s,
+        [0, 0, 0, 0],
+        4,
+        8,
+        origin,
+        vec![
+            [0, 0, 1, 0, 0, 0, 3, 1, 0, 2],
+            [0, 0, 0, 1, 0, 0, 1, 0, 2, 1],
+        ],
+        false,
+    );
+    match family.affine_relation().inspect().unwrap().predecessor_reading {
+        ConstitutiveReading::Plural { ref directions, .. } => assert_eq!(directions.len(), 2),
+        ref other => panic!("the specimen must be plural: {other:?}"),
+    }
+    let word = vec![Rc::clone(&map), Rc::clone(&map), map];
+    // The expanded chart: one composite relation carried in the i64 affine wire.
+    let expanded = family.read_prospective(word.clone()).unwrap();
+    assert!(expanded.point_word().is_none() && expanded.affine_relation().is_some());
+    // The factored chart: the same relation as its retained ordered word over this family's
+    // own receiver point, transported in the wide carrier with no composite materialized.
+    let factored = family.read_point_word(word).unwrap();
+    assert!(factored.point_word().is_some() && factored.affine_relation().is_none());
+    let (a, b) = (expanded.inspect().unwrap(), factored.inspect().unwrap());
+    assert_eq!(a.support, NormalFamilySupport::Supported);
+    assert!(a.anchor_independent_free.iter().all(|free| !free));
+    // Every reading the receiver returns is identical: the rebase has no residual.
+    assert_eq!(
+        serde_json::to_value(&a).unwrap(),
+        serde_json::to_value(&b).unwrap(),
+        "the factored word and the expanded composite must read the same future"
+    );
+    assert_eq!((b.state_width, b.state_count), (10, 4));
+    // Bounded step over step across a word of three factors: the octaves of a state never
+    // exceed the previous state's plus the factor's own. An elimination that carried the
+    // pivots it was reduced through would grow with the length of the word instead.
+    let factor = match family.affine_relation().inspect().unwrap().predecessor_reading {
+        ConstitutiveReading::Plural { ref directions, .. } => directions
+            .iter()
+            .flatten()
+            .map(|v| v.numer().bits().max(v.denom().bits()))
+            .max()
+            .unwrap_or(0),
+        ref other => panic!("the specimen must be plural: {other:?}"),
+    };
+    let octaves = |state: usize| {
+        b.projected_state(state)
+            .unwrap()
+            .iter()
+            .map(|v| v.numer().bits().max(v.denom().bits()))
+            .max()
+            .unwrap_or(0)
+    };
+    for state in 0..4 {
+        assert_eq!(a.projected_state(state), b.projected_state(state));
+        if state > 0 {
+            assert!(
+                octaves(state) <= octaves(state - 1) + factor,
+                "factor {state} added more than its own octave: {} -> {} through {factor}",
+                octaves(state - 1),
+                octaves(state)
+            );
+        }
+    }
+    // The word's first state is this family's own receiver, not another point of it.
+    let alone = family.read_receiver().unwrap().inspect().unwrap();
+    assert_eq!(alone.nearest_anchor, b.nearest_anchor);
+    assert_eq!(alone.projected_joint.unwrap(), b.projected_state(0).unwrap());
+}
+
+#[test]
+#[ignore = "requires CUDA; a real vertical output fibre is not answered by a point of it"]
+fn the_word_refuses_a_genuine_vertical_fibre_rather_than_standing_in() {
+    use super::super::super::comparison_tests::{current, point};
+    use super::super::tests::law;
+    let ro = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&ro).unwrap();
+    let member = law(&s, false);
+    let h = point(&s, &[1, 0]);
+    let map = Rc::new(member.read_wave_relation(current(&h), 1).unwrap());
+    // hyperplane retains a direction at coordinate 9, above the anchor block: the joint
+    // minimum norm over (z0, L z0) is then NOT the image of this family's own receiver,
+    // so the factored chart refuses and the expanded composite remains the only reading.
+    let vertical = hyperplane(&s, 0, 8);
+    assert!(vertical
+        .read_receiver()
+        .unwrap()
+        .inspect()
+        .unwrap()
+        .anchor_independent_free
+        .iter()
+        .any(|free| *free));
+    assert!(vertical.read_point_word(vec![Rc::clone(&map)]).is_err());
+    // The expanded chart still answers it, so the refusal is the word's scope, not a loss.
+    assert_eq!(
+        vertical
+            .read_prospective(vec![map])
+            .unwrap()
+            .inspect()
+            .unwrap()
+            .support,
+        NormalFamilySupport::Supported
+    );
 }

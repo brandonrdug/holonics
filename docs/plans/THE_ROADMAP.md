@@ -232,6 +232,62 @@ carrier and its atlas from readings to when a tube conducts and why. They carry 
 engineering intentions, not milestones. Each item is discharged inside the increment that consumes
 it, and none of them reorders the milestone table above.
 
+### Position of the five contracts
+
+[established-bounded; formal-checked; implemented-exact] One table is the live status; the contract
+documents hold the statements, owners and findings and are not re-narrated here.
+
+| Contract | Returned | Remaining, in order |
+|---|---|---|
+| Shared carrier | C1–C8 and the tube join | Weierstrass division for the power-series form of `Λ/(ω_n)` |
+| Receiver atlas | R1–R7 | per-eigenvalue refinement on `ExactHodgeSpectrum`; `MarkovTwoNSuffices` |
+| Biological ecology | B0–B8, and B7 except its physicochemical receiver | B9 evaluation discipline; B10 cost cascade; the physicochemical receiver |
+| Exact device law | D1–D3, one engine instance adopted on the card | a second device ring of signed 128-bit words with the engine's carrier refusal; per-region operator family; base-pointer registry; the zero gather inside the adopted readout context; D4 stays an intention |
+| Generalized transport | T1 relation ladder, T2 standing/memory/extinction | T3 with T5; T4 with T7; T6 with T8 |
+
+[definition] **The remaining order is one list.** (1) The rebased prospective reading of the shared
+section work, which is the Athena application's next discriminating return. (2) T3 release over an
+edited family with T5 the two-axis horizon. (3) T4 knot friction with T7 fold, cut and junction,
+which share the rigidity owner. (4) T6 neck invariants with T8 the jet tower, which share the pole
+and higher-difference owners. (5) B9, B10 and the physicochemical receiver, beside whichever wave
+has room. (6) The device ring and the items listed against it. The smaller open items in the table
+are taken inside the increment that next touches their owner, not as increments of their own.
+
+### Rules that settle recurring choices
+
+[project-postulate] These follow from the operating contract and the framework. An agent applies
+them and records the application; it does not return them as a question. Only a material choice
+the framework does not determine goes to Brandon.
+
+1. **Resource pressure is answered by rebasing.** A presentation that outgrows its carrier is
+   brought to a reduced chart, factored, or placed differently — an exact, recorded, invertible
+   change of presentation — or the obstruction is returned. A carrier is never widened and a
+   ceiling is never raised to let a computation through.
+2. **A bounded search refutes and never affirms.** Equal potential, extinction, design equivalence
+   and separation-freedom are affirmed only by an exhibited certificate or isomorphism that the
+   library checks. "Not separated within the bound" is its own return.
+3. **Equality is typed.** Identity belongs to an occurrence, persistence to lineage, sameness to a
+   receiver, potential to a family of futures, memory to standing. A result states its rung on
+   `RelationLadder`, and no rung below identity is promoted to it.
+4. **Open is carried, never rounded.** An undecided comparison, an unread environment and an
+   overlapping interval stay plural through every consumer; none is a best case, a worst case or a
+   tie-break.
+5. **A value enters only through its constructor.** Every wire, every receipt and every
+   certificate is routed through the checks that found it; a remount re-runs what it can and says
+   what it is not testimony for.
+6. **Declared sizes are bounded before the work they size.** Allocation, recursion, enumeration and
+   products from a caller's declaration are preceded by a checked bound and a typed refusal.
+7. **Compose before founding.** Search by the relation, attempt the composition, and found an owner
+   only for the concrete absent object named. Every paired owner is registered with the citation
+   check, so a Lean name cited from Rust that no Lean file declares fails the test suite.
+8. **Device evidence is serial.** CUDA tests run one process at a time and single-threaded; the
+   allocation calibration reads the whole device's free extent and cannot attribute a concurrent
+   allocation.
+9. **A wave is closed before the next opens.** At most four constructing agents and one reviewer
+   that spawns none; the reviewer's confirmed defects are repaired in the same wave; the closing
+   verification is run by the primary agent; the wave is committed and pushed. The construction
+   state is updated in that commit.
+
 ## All current plan documents and their roles
 
 | Document | Authority and use |

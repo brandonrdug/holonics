@@ -24,6 +24,8 @@ import ElementaryHolonics.Foundation.TopologicalReceiver
 import ElementaryHolonics.Foundation.CausalChord
 import ElementaryHolonics.Foundation.RootCount
 import ElementaryHolonics.Foundation.ReceiverRelease
+import ElementaryHolonics.Foundation.RelationLadder
+import ElementaryHolonics.Foundation.RelationPresentation
 import ElementaryHolonics.Foundation.AcousticReceiver
 import ElementaryHolonics.Foundation.CausalNaturalHolon
 import ElementaryHolonics.Foundation.HolonTensorLens
@@ -43,6 +45,8 @@ import ElementaryHolonics.Foundation.CoordinateSubsetReceiver
 import ElementaryHolonics.Foundation.CoordinateHaarReceiver
 import ElementaryHolonics.Foundation.DeviceLaunchLaw
 import ElementaryHolonics.Foundation.SectionLayout
+import ElementaryHolonics.Foundation.Standing
+import ElementaryHolonics.Foundation.DesignSelection
 import ElementaryHolonics.Computation.MachineLearningChart
 import ElementaryHolonics.Computation.MachineLearningStrictLift
 import ElementaryHolonics.Computation.SituatedMachineLearning

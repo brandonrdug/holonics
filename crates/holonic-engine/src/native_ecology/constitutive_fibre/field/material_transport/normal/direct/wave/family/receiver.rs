@@ -64,7 +64,7 @@ impl<'a, 'c> NormalWaveFamilyReceiver<'a, 'c> {
         let result = passage.finish()?.launch()?;
         if !result.obstruction.is_empty() {
             return Err(ConstitutiveFibreError::Arithmetic(format!(
-                "conditional family admission: {:?}",
+                "conditional family admission: {}",
                 result.obstruction
             )));
         }
@@ -85,6 +85,17 @@ impl<'a, 'c> NormalWaveFamilyReceiver<'a, 'c> {
             .as_ref()
             .map_or(self.source.affine_relation(), |image| image.joint()))
     }
+    /// The retained ordered factors, when this reading was taken in the FACTORED chart rather
+    /// than the expanded one. A rebase is a passage with a receipt, not a silent mutation: which
+    /// presentation answered travels with the reading, here and in `affine_relation`.
+    ///
+    /// [definition] The two are charts of ONE relation, not two relations.
+    /// `Foundation/RelationPresentation.lean::Rebase.carrier_eq` is the law — presentations
+    /// spanning the same directions, with origins differing by one of them, carry the identical
+    /// subset — and `Foundation/RelationPresentation.lean::Rebase.faces_eq` is its consequence
+    /// for what a receiver reads: equal domain, equal image, equal fibre over every point.
+    /// `Foundation/RelationPresentation.lean::Rebase.residual_empty` is the zero residual a chart
+    /// change owes, and `Foundation/Holon.lean::Rebase` is the same word one grain up.
     pub fn point_word(&self) -> Option<&[Rc<ResidentWaveRelation<'c>>]> {
         self.point_word.as_deref()
     }
@@ -181,8 +192,22 @@ impl<'c> NormalWaveFamily<'c> {
             .and_then(|image|self.receiver_with_image(Some(image)));
         match expanded {
             Ok(receiver)=>Ok(receiver),
+            // THE SAME RELATION IN ITS FACTORED CHART. The expanded arm carries the whole
+            // composite in one i64 affine wire; the generated point word carries the retained
+            // ordered factors and transports this family's own receiver point through them in
+            // the wide carrier. Passing between the two is an exact invertible change of
+            // presentation with no residual -- a rebase -- and where both are readable they
+            // return the identical reading (`rebase_and_expansion_read_the_same_future`).
+            // The expansion compounds an octave per factor and is the arm that leaves the
+            // carrier first; the word does not, because no composite is ever materialized.
+            // The word is exact only where every retained direction moves the anchor, so the
+            // fibre over the projected anchor is a single point: a real vertical output fibre
+            // makes the joint minimum norm differ from the image of the marginal one, and the
+            // word then refuses it as malformed rather than standing in for the expansion.
             Err(original)=>self.read_point_word(word).map_err(|point_error|ConstitutiveFibreError::Arithmetic(
-                format!("expanded word: {original}; exact point-word receiver: {point_error}"))),
+                format!("expanded word: {original}; factored point-word receiver: {point_error}; \
+                    the expanded i64 affine wire and the retained generating word are the only two \
+                    prospective representations"))),
         }
     }
     fn read_point_word(&self, word:Vec<Rc<ResidentWaveRelation<'c>>>)
@@ -209,7 +234,7 @@ impl<'c> NormalWaveFamily<'c> {
         }
         p.close(0,&report,64)?;
         let returned=p.finish()?.launch()?;
-        if !returned.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("point-word: {:?}",returned.obstruction)));}
+        if !returned.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("point-word: {}",returned.obstruction)));}
         Ok(NormalWaveFamilyReceiver {source:self,image:None,point_word:Some(word),report,vertical:None,
             joint:None,anchor_basis:None})
     }
@@ -305,7 +330,7 @@ impl<'c> NormalWaveFamily<'c> {
         let returned = passage.finish()?.launch()?;
         if !returned.obstruction.is_empty() {
             return Err(ConstitutiveFibreError::Arithmetic(format!(
-                "family receiver: {:?}",
+                "family receiver: {}",
                 returned.obstruction
             )));
         }

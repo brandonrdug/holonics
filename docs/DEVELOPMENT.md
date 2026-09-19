@@ -54,6 +54,19 @@ three in every operation or invent an observation for an exact solver result.
 - **Representation mismatch:** show the term or source family that the current carrier cannot
   express, such as a parameter product outside an affine family. Change the representation
   through existing factor/section owners and account for its decoder and cost.
+  A `REFUSED_CARRIER` is this diagnosis and never a licence to widen a word. Measure first
+  whether the *deposited* presentation is reducible — size reduction, LLL over the same row
+  lattice and the rational reduced echelon form answer that — and say what the reduced size is.
+  Two rebases follow, in this order. **Inside one operation:** content-reduce the elimination
+  step against its pivot before the products, so an intermediate never carries a factor the
+  following normalization divides straight back out
+  (`kernels/exact_resident_section.cu::fibre_rebase_step`); the reported values are unchanged.
+  **Across operations:** carry the relation in its factored chart — the retained ordered word —
+  instead of the expanded composite, when the composite is the only thing that leaves the
+  carrier (`…/wave/family/receiver.rs::read_prospective`). A factored reading owes the exact
+  condition under which it equals the expanded one, a test that both charts agree on material
+  small enough to read both ways, and a typed refusal where that condition fails.
+  `Foundation/RelationPresentation.lean` is the law that the two charts read identically.
 - **Unproved mathematical claim:** state the proposition, hypotheses and attempted derivation
   or counterexample. Develop the relevant formal owner. Source absence alone is not a proof
   that the mathematical construction is absent from the framework.
@@ -322,6 +335,23 @@ further applications; the file is an experiment, not a universal gate or native 
 reading. Run the explicit resident-return controls with `--test-threads=1`; concurrent contexts
 can invalidate that calibration before the numerical test starts. This is an observer/apparatus
 condition, not a production worker limit or a reason to serialize independent native currents.
+
+[established-bounded; source-inspected] **What that calibration measures and why concurrency
+breaks it.** `mount::cuda::measure_allocation_grain_once` reads the free extent, allocates one
+word, reads it again, and takes the difference as the legacy `cuMemAlloc` charge grain; it then
+frees the word, requires the free extent to close exactly at its starting value, and requires a
+probe one word wider than the grain to cost exactly twice. Nothing is declared and no page size is
+guessed. The reading it differences, `cuMemGetInfo_v2`, is the free extent of the **whole device**
+— not of this context and not of this process — so any other allocation on the card between two
+samples enters the difference and the closure check fails with `one-word charge … and restored
+free extent … do not close`. The perturbation carries no attribution and cannot be subtracted.
+The calibration is therefore serialized process-wide (two of our own calibrations never sample
+across each other), a disturbed sample is retried a bounded `ALLOCATION_CALIBRATION_ATTEMPTS`
+times with the retry count reported by `mount::cuda::allocation_calibration_retries`, and an
+exhausted calibration returns **every** attempt's reading, so readings that repeat name an
+allocator that does not compose while readings that differ name a busy card. None of that makes
+a shared card measurable: run `--include-ignored` device suites with `--test-threads=1` and no
+other GPU process, one crate at a time.
 
 ```sh
 cargo test -p holonics-hna --lib hna

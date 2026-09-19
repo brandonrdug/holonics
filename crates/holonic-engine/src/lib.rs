@@ -225,6 +225,11 @@ pub mod derivation_two_cells;
 pub mod cross_chart;
 pub mod derivation_skein;
 pub mod derived_factor_cover;
+// B8: the selection cascade and design equivalence. Hard constraints, the Pareto frontier over
+// the (receiver, environment) reading vector, worst-environment ranking, quality-diversity and
+// structural clusters from the exact separator structure -- with design equivalence being
+// `relation_ladder`'s EqualPotential and never a score.
+pub mod design_selection;
 pub mod dilation;
 pub mod dimensional_receiver;
 pub mod dimensional_wave;
@@ -438,6 +443,10 @@ pub mod receiver_phase_atlas;
 // no-continuation-bridges. Paired with `Foundation/ReceiverRelease.lean`.
 pub mod receiver_release;
 pub mod regime_reading;
+// T1 — the relation ladder: one typed scale between two occurrences (identity, continuation,
+// isomorphism, receiver equality, equal potential, tolerance) with its order, its bounded
+// separator search and the two worked instances. Paired with `Foundation/RelationLadder.lean`.
+pub mod relation_ladder;
 // The rigidity receiver **R4**: the constraint Jacobian `J = D F(q)` of a contact complex's
 // one-skeleton, `ker J` as the infinitesimal motions, `ker J^T` as the self-stress, the trivial
 // motions measured rather than assumed, rigid clusters and contact-removal sensitivity. Declared
@@ -472,6 +481,10 @@ pub mod soulkiller_witness;
 // refill against the deed still reading the slot it replaces. The apparatus half of Deed H4; it
 // carries no semantics and owns no reader.
 pub mod streamed_standing;
+// D3's engine-side adoption: the hand-written enclosure scatter declared as a `mount`
+// `IncidenceDeclaration`, with the generated gather/apply/scatter triple cross-checked against the
+// kernel's own result on the card. Declaration and cross-check only; no production path.
+pub mod section_layout_adoption;
 // The coordinate-region partition of one section, with its completeness and disjointness computed
 // rather than asserted, its cover and independence certificate composed, and its pressure one
 // covector per resource species. `FrontCell` carries an index and an extent and no coordinate;
@@ -503,6 +516,11 @@ mod mordell_weil_realizers;
 pub use mordell_weil_realizers::*;
 pub mod multiquadratic;
 pub mod spine_cut;
+// T2 of the generalized-transport plan: standing as the retained residue of passages, memory
+// as a generator `m_t = D_t(S_t, c_t)`, the receiver that keeps changing after its source
+// stops, and effective extinction read as `receiver_release`'s width inside tolerance on the
+// two-point family. Paired with `Foundation/Standing.lean`.
+pub mod standing;
 pub mod statement_composition;
 pub mod statement_grammar;
 pub mod structure_group;

@@ -135,9 +135,25 @@ extern "C" __global__ void section_normal_family_receiver(
     for(uint32_t i=0;i<2u*count;++i)report_hi[i]=report[i];
 }
 
-// A unique affine source has no unresolved output directions. Keep the ordered maps
-// as the source of its future and calculate directly in the existing wide receiver
-// carrier; materializing an i64 affine point after every factor is unnecessary.
+// THE FACTORED CHART OF THE SAME RELATION.  Keep the ordered maps as the source of the
+// future and calculate directly in the existing wide receiver carrier; materializing an
+// i64 affine point after every factor is unnecessary.  This seeds the word's state.
+//
+// Two source families are admitted, and BOTH seed the same word:
+//
+//   * a unique affine source (status 0, rank 0): its particular IS the whole family.
+//   * a PLURAL source whose every retained direction moves the anchor — the initial
+//     receiver reports no anchor-independent free coordinate.  Such a family
+//     is a graph over the anchor block, so the fibre over ANY anchor is a single point and
+//     the joint minimum-norm receiver of (z_0, L z_0, ...) is exactly the image of this
+//     family's own receiver point under the word.  Seeding from `prior` — the receiver
+//     already read from this same family — is therefore a REBASE of the presentation and
+//     not a selection: the expanded composite and this factored word return the identical
+//     reading, and the source relation stays whole on the returned receiver.
+//
+// One coordinate still free at a fixed anchor is a real plural output fibre: the joint
+// minimum norm then genuinely differs from the image of the marginal one, so it is refused
+// here and the expanded arm remains the only representation that can answer it.
 extern "C" __global__ void section_normal_point_word_seed(
     const int64_t *pf,const int64_t *pf_hi,uint32_t ps,uint32_t n,uint32_t steps,
     const int64_t *initial,const int64_t *initial_hi,
@@ -146,13 +162,33 @@ extern "C" __global__ void section_normal_point_word_seed(
     if(blockIdx.x||threadIdx.x)return;
     if(upstream_refused(census,lineage,lineage_count,slot))return;
     uint32_t a=4u*n,w=2u+2u*a,pk=ps+w,y=(steps+1u)*w-2u-a,count=4u+2u*a+2u*y;
-    if(!n||!steps||pf[pk]<=0||pf[pk+1u]!=0||pf[pk+3u]!=0){atomicOr(slot,REFUSED_MALFORMED);return;}
+    if(!n||!steps||pf[pk]<=0){atomicOr(slot,REFUSED_MALFORMED);return;}
+    int64_t status=pf[pk+1u];
+    if(status!=0&&status!=2){atomicOr(slot,REFUSED_MALFORMED);return;}
+    if(status==0&&pf[pk+3u]!=0){atomicOr(slot,REFUSED_MALFORMED);return;}
     for(size_t i=0;i<(size_t)pk+4u+(size_t)w*w;++i)if(pf[i]!=pf_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
     for(uint32_t i=0;i<2u*(4u+4u*a);++i)if(initial[i]!=initial_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
     const wide *prior=(const wide *)initial;
     if(prior[0]!=0||pf[ps]!=pf[pk]||pf[ps+1u]!=0){atomicOr(slot,REFUSED_MALFORMED);return;}
     wide *s=(wide *)state,*out=(wide *)report;
-    s[0]=pf[pk];for(uint32_t i=0;i<w;++i)s[1u+i]=pf[ps+i];
+    if(status==0){
+        s[0]=pf[pk];for(uint32_t i=0;i<w;++i)s[1u+i]=pf[ps+i];
+    }else{
+        // Every retained direction moves the anchor. `prior` is this same family's own
+        // receiver, and its anchor-independent flags are exactly the staged vertical block:
+        // one set flag is one output coordinate still free at a fixed anchor. All clear means
+        // the fibre over the projected anchor is a single point. The stored direction rows are
+        // a list, not a pivot-indexed basis, so the staged reading is what decides this.
+        for(uint32_t i=0;i<a;++i)if(prior[4u+3u*a+i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+        wide ad=prior[1],jd=prior[2u+a];
+        if(ad<=0||jd<=0){atomicOr(slot,REFUSED_MALFORMED);return;}
+        wide d=fibre_lcm(ad,jd,slot);if(*slot)return;
+        s[1]=d;s[2]=0;
+        for(uint32_t i=0;i<a;++i)s[1u+2u+i]=product_checked(prior[2u+i],d/ad,slot);
+        for(uint32_t i=0;i<a;++i)s[1u+2u+a+i]=product_checked(prior[3u+a+i],d/jd,slot);
+        if(*slot)return;
+        s[0]=d;fibre_normalize(s+1u,w,s,slot);if(*slot)return;
+    }
     for(uint32_t i=0;i<count;++i)out[i]=0;
     out[0]=0;out[1]=prior[1];out[2u+a]=s[0];out[3u+a+y]=prior[3u+2u*a];
     for(uint32_t i=0;i<a;++i){

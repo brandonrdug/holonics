@@ -777,23 +777,80 @@ impl Context {
 /// probe one word wider than that charge must cost exactly twice, and the free extent must close
 /// after each. **Measured, never declared** — an apparatus coordinate a deed's admission rounds
 /// every allocation up to.
+///
+/// **What it measures, and why it needs a quiet allocator.** `cuMemGetInfo_v2` reports the free
+/// extent of the *whole device*, not of this context and not of this process. The grain is read as
+/// the difference between two such readings across one allocation, so **any** other allocation on
+/// the card between the samples — another test thread, another process, the driver's own JIT —
+/// enters the difference and the conservation check `restored == before` fails. That failure is
+/// the probe saying its sample was disturbed; it is not a fault in the allocator and not in the
+/// construction under test. The perturbation cannot be subtracted, because the reading carries no
+/// attribution. Three answers are given here and no fourth is invented: the calibration is
+/// serialized process-wide so two of our own calibrations never sample across each other; a
+/// disturbed sample is retried a bounded, counted number of times; and when every attempt is
+/// disturbed the refusal carries **every** attempt's reading, so a genuinely non-composing
+/// allocator (the same numbers each time) is distinguishable from a perturbed one (different
+/// numbers each time). A card shared with concurrent allocation cannot be calibrated by a global
+/// counter at all, and that requirement is stated rather than worked around.
 fn measure_allocation_grain(memory_info: impl Fn() -> Result<MemoryInfo>) -> Result<usize> {
+    // Poisoning carries no state here: the guard protects a sampling window, not data.
+    let _serial = ALLOCATION_CALIBRATION
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
     retry_allocation_measurement(|| measure_allocation_grain_once(&memory_info))
 }
 
+/// The calibration's sampling window, held process-wide. Two simultaneous calibrations in one
+/// process would each be the other's perturbation; nothing else is serialized by it.
+static ALLOCATION_CALIBRATION: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
+/// Retries of the allocation-grain calibration since this process started — **reported, not
+/// hidden**. A caller that wants to say how quiet the card was during a run reads it.
+static ALLOCATION_CALIBRATION_RETRIES: std::sync::atomic::AtomicU64 =
+    std::sync::atomic::AtomicU64::new(0);
+
+/// How many calibration samples this process has had to discard as disturbed. Zero means every
+/// calibration closed on its first sample.
+pub fn allocation_calibration_retries() -> u64 {
+    ALLOCATION_CALIBRATION_RETRIES.load(std::sync::atomic::Ordering::Relaxed)
+}
+
+/// The bounded attempt count. Bounded because an unbounded retry would turn a genuinely
+/// non-composing allocator into a hang; counted because a silent retry is a hidden measurement.
+pub const ALLOCATION_CALIBRATION_ATTEMPTS: usize = 8;
+
 // Driver JIT cleanup or another client can change the global free-memory reading between
 // samples. Retry this small calibration, never a native operation, and still require the
-// complete one-word/wider-allocation conservation check. No page size is guessed.
+// complete one-word/wider-allocation conservation check. No page size is guessed. Every
+// discarded sample's own reading is retained and returned with the last, so the refusal shows
+// whether the readings varied (a perturbed card) or repeated (an allocator that does not compose).
 fn retry_allocation_measurement(mut attempt: impl FnMut() -> Result<usize>) -> Result<usize> {
-    for sample in 0..3 {
+    let mut disturbed: Vec<String> = Vec::new();
+    for sample in 0..ALLOCATION_CALIBRATION_ATTEMPTS {
         match attempt() {
             Ok(grain) => return Ok(grain),
             Err(error)
-                if sample < 2
-                    && error.context == "allocation_grain_bytes"
+                if error.context == "allocation_grain_bytes"
                     && error.name == "INVALID_DRIVER_VALUE" =>
             {
-                continue
+                disturbed.push(format!("sample {sample}: {}", error.message));
+                if sample + 1 == ALLOCATION_CALIBRATION_ATTEMPTS {
+                    return Err(invalid_driver_value(
+                        "allocation_grain_bytes",
+                        format!(
+                            "{ALLOCATION_CALIBRATION_ATTEMPTS} allocation-grain samples were all \
+                             disturbed; cuMemGetInfo_v2 reports the whole device, so this \
+                             calibration requires the card to be otherwise idle (run device tests \
+                             serially, --test-threads=1, with no other GPU process). Readings that \
+                             repeat name an allocator that does not compose; readings that differ \
+                             name a busy card. [{}]",
+                            disturbed.join("; ")
+                        ),
+                    ));
+                }
+                ALLOCATION_CALIBRATION_RETRIES
+                    .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                continue;
             }
             Err(error) => return Err(error),
         }
@@ -1872,15 +1929,25 @@ mod tests {
     #[test]
     fn allocation_calibration_keeps_persistent_and_driver_failures() {
         let mut calls = 0;
-        assert!(super::retry_allocation_measurement(|| {
+        let exhausted = super::retry_allocation_measurement(|| {
             calls += 1;
             Err(super::invalid_driver_value(
                 "allocation_grain_bytes",
-                "unstable".into(),
+                format!("unstable {calls}"),
             ))
         })
-        .is_err());
-        assert_eq!(calls, 3);
+        .unwrap_err();
+        assert_eq!(calls, super::ALLOCATION_CALIBRATION_ATTEMPTS);
+        // Every discarded sample's own reading is in the refusal, so a perturbed card and an
+        // allocator that does not compose are told apart by whether the readings repeat.
+        for sample in 1..=super::ALLOCATION_CALIBRATION_ATTEMPTS {
+            assert!(
+                exhausted.message.contains(&format!("unstable {sample}")),
+                "sample {sample} missing from {}",
+                exhausted.message
+            );
+        }
+        assert!(exhausted.message.contains("--test-threads=1"));
         let mut calls = 0;
         let failure = super::retry_allocation_measurement(|| {
             calls += 1;

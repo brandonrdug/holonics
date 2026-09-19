@@ -485,15 +485,95 @@ the designed structure's 159, so the designed structure's excess is local to the
 and is not a property of the chain. The CUL1-bound prediction is the sparsest at every separation
 and every scope, and is the one that returns `NoCycle` rather than a zero.
 
-[definition] **B8 — Selection and design equivalence.** Hard constraints first, then Pareto
-filtering, then worst-environment ranking, then quality-diversity, then structural clustering, with
-any scalar retained as one receiver and never as the identity of a candidate. Two designs may be
-merged only when every declared receiver, environment and admitted future transformation agrees;
-one separating future receiver refutes the collapse. The mounted release already exhibits this
-empirically: two binders within two per cent on final dissociation constant differ qualitatively on
-cross-species binding, and two designs with near-identical predicted interface receivers differ by
-roughly six-fold in affinity and qualitatively across species. Present-receiver agreement does not
-imply environment agreement.
+[definition] **B8 — Selection and design equivalence. Returned.** Hard constraints first, then
+Pareto filtering, then worst-environment ranking, then quality-diversity, then structural
+clustering, with any scalar retained as one receiver and never as the identity of a candidate. Two
+designs may be merged only when every declared receiver, environment and admitted future
+transformation agrees; one separating future receiver refutes the collapse. The library owners are
+[`design_selection.rs`](../../crates/holonic-engine/src/design_selection.rs) and
+[`Foundation/DesignSelection.lean`](../../formal/elementary-holonics/ElementaryHolonics/Foundation/DesignSelection.lean),
+stated in the vocabulary of `relation_ladder`/`Foundation/RelationLadder.lean`.
+
+[established-bounded; formal-checked; implemented-exact] **Design equivalence is equal potential,
+never equal score, and it is a new owner rather than a `physical_occurrence` submodule.** The
+selection cascade consumes the receivers that read `physical_occurrence`'s complexes, so it sits
+above that layer; and its population is a **rectangle neither existing family admits** — several
+objects, each read at several environments. `VerticalFamily` refuses a second object,
+`HorizontalFamily` refuses a second environment, and `PluralFibre` refuses a member of different
+kinship by construction. `DesignFamily::declare` founds the rows as vertical families and the
+columns as horizontal ones, so the composition is checked rather than asserted, and two designs
+about the same object are refused by name as one object read twice. Design equivalence **is**
+`RelationLadder.EqualPotential` over `DesignFamily::design_situation`, whose generators are
+admitted `physical_occurrence::Passage`es — vertical environment changes and horizontal mutations,
+each built through that owner's own constructor so a generator exists only where the passage does —
+and whose receivers are the declared receiver family read at the carrier's environment index.
+`merge_verdict` returns `Refuted{separator} | NotSeparatedWithinBound{bound} | EquivalentBy{iso}`,
+only the third reaches `merge`, and `MergedClass`'s fields are private, so a bounded search cannot
+reach a merged class by any path. A separator **overrides** a declared isomorphism, because the
+separator is evidence and the declaration is not. In Lean:
+`only_equivalentBy_licenses_merge`, `notSeparatedWithinBound_does_not_license_merge`,
+`presentAgreementDoesNotImplyEnvironmentAgreement` and
+`declaredEnvironmentAgreementDoesNotImplyUndeclared`, the last being
+`RelationLadder.equalPotentialAntitone` made concrete — and executably, enlarging the declared
+history ceiling from `0` to `1` turns the same pair's `NotSeparatedWithinBound` into `Refuted`.
+
+[established-bounded; implemented-exact] **The cascade is five typed stages and no stage reads a
+scalar.** Hard constraints return one typed `ConstraintViolation` per violated constraint and never
+a penalty term — the stage performs no arithmetic at all, so no weight can make a violation
+survivable. Pareto filtering runs over the **`(receiver, environment)` axes**, collapsing no
+environment before the frontier has seen it, through
+`presentation_cost::frontier_by`: the frontier rule of C5, **minimally generalized at its own
+owner** to a declared three-valued axis comparison because a design's reading can be *undecided*
+where a `BigUint` cost coordinate never is, with `pareto_frontier` re-expressed through it so there
+is one spelling of the rule. An undecided comparison — a plural reading whose exact intervals
+overlap, or an axis a receiver did not read — never licenses a discard. Worst-environment ranking
+takes the extremum in the bad direction over the *declared* environment family: an undeclared
+environment is absent and is neither a best case nor a worst case (`undeclared_environment_is_absent`),
+a design unread at a declared environment is refused for ranking there and never imputed
+(`unread_at_a_declared_environment_refuses`), and a worst that several environments attain returns
+all of them. Quality-diversity returns one representative **set** per structural cluster, and
+structural clusters are the connected components of the indistinguishability graph over
+`physical_occurrence`'s own `DecidedClass` law — never a float embedding. No float decides
+anything, every ranking comparison is exact through `topological_receiver::compare_values`, and
+ties are returned as ties: a tier carries every exactly-equal design sorted by identity, and a pair
+the exact law does not decide is returned in `undecided` rather than ordered.
+
+[proved-derived; formal-checked] **A scalar-first cascade discards a frontier design every stage
+above it keeps.** The constructed instance is `PresentationCost.chordFamily` lifted to designs —
+readings `(0,10)`, `(10,0)`, `(6,6)` on two smaller-is-better receivers. All three pass the
+constraints, all three are frontier points, each is its own structural cluster and quality-diversity
+keeps the balanced one; yet over all 168 declared rational weightings with positive weight on
+either axis, the balanced design is a minimizer of none. That is
+`PresentationCost.unsupported_not_minimizer`, cited rather than rebuilt.
+
+[definition] **A finding that corrects this plan.** The sentence "the mounted release already
+exhibits this empirically" was wrong. The mounted release at
+`/home/b/Downloads/holonics-m5-rbx1-rank05` carries **three presentations of one object** — one
+designed structure and two Protenix predictions of the same binder against RBX1 — and **no
+dissociation constant, no cross-species assay and no second design**. Its `STRUCTURE_MANIFEST`
+names `design_models.csv` and `design_names.csv` by digest, but those files are not mounted. The
+two per cent / six-fold observations are therefore recorded prose with no repository-local
+measurement behind them, and they are modelled here as a **synthetic instance on exact rationals**
+and labelled as such: two binders at `100` and `101` at one assay — inside a declared tolerance of
+`2`, so rung 6 holds — that read `100` and `1200` at another, and two designs whose interface
+receiver reads `41` on both and whose dissociation constant reads `50` against `300`. Rung 6 at a
+receiver does not even give rung 4 at that same receiver at that same environment, which is the
+sharp form of what the plan meant.
+
+[established-bounded; measured] **On the release.** The three RBX1 presentations are one object at
+three environments, so a design family over them is refused by name — that refusal is the
+structural reason the release supplies no horizontal material — and they are used vertically. Over
+the 10,368 addressed alpha-carbon pairs at 8 Å the formed-contact receiver reads **64 / 59 / 45**
+for the designed structure, the free prediction and the CUL1-bound prediction, with **1 / 0 / 0**
+open readings; the worst over the three declared environments at that greater-is-better receiver is
+`45`, attained at the CUL1-bound presentation alone, and replacing one environment's reading with
+an `Unread` returns `UnreadAt` rather than a ranking. The horizontal material is **synthetic**:
+three designs built by exact perturbation of the mounted contact complexes — one renamed monomer of
+the binder sequence, which is what makes each a different object and exactly what
+`Passage::<Horizontal>::mutation` requires, and `0 / 3 / 7` flipped decided contact classes. At
+each of the three real environments they are a horizontal family, each design's three faces are a
+vertical family, the separator between the unperturbed and the seven-flip design is exactly those
+**7** contacts, and the release's single open reading is carried on neither side.
 
 [definition] **B9 — Evaluation discipline.** Leave-one-target-out, leave-one-interface-family-out,
 leave-one-generator-out, assay-specific calibration, predictor-disagreement subsets and

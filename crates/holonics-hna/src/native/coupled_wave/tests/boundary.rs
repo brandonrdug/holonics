@@ -267,15 +267,71 @@ fn changing_operative_material_conditions_the_same_hnn_source(){
     assert_eq!(s.census().section_read_outs,reads);assert_eq!(body.epoch(),epoch);assert_eq!(body.inspect_current().unwrap(),held);
     let after=body.inspect_prospective(&[(0,WaveSourceReceiver::Direct)],true).unwrap();
     assert_ne!(before["states"][1]["projection"]["current"],after["states"][1]["projection"]["current"]);
+    // The changed condition survives rest and remount exactly: the same current AND the same
+    // prospective reading come back from the wire, with no readout and no re-fit.
+    {
+        let saved=body.rest().unwrap();let mut bytes=Vec::new();saved.write(&mut bytes).unwrap();
+        let mut resumed=SavedCoupledBody::read(&mut bytes.as_slice(),bytes.len() as u64).unwrap().remount(&s).unwrap();
+        assert_eq!(resumed.inspect_current().unwrap(),body.inspect_current().unwrap());
+        assert_eq!(resumed.inspect_prospective(&[(0,WaveSourceReceiver::Direct)],true).unwrap(),after);
+    }
     let actual=changed.reflect(input).unwrap();let former=old.reflect(input).unwrap();
     assert_ne!(actual.output().inspect().unwrap().center,former.output().inspect().unwrap().center);
-    let id=body.advance(0,WaveSourceReceiver::Direct,true).unwrap().unwrap();let reads=s.census().section_read_outs;
+    let id=body.advance(0,WaveSourceReceiver::Direct,true).unwrap().unwrap();
+    let reads=s.census().section_read_outs;
     let observation=std::time::Instant::now();let returned=body.observe(id,actual.output()).unwrap();let observation_us=observation.elapsed().as_micros();
     assert_eq!(s.census().section_read_outs,reads);assert_eq!((returned.predecessor_observations,returned.successor_observations),(count,count+1));
     let residual=returned.discrepancy().inspect().unwrap();
     let saved=body.rest().unwrap();let mut bytes=Vec::new();saved.write(&mut bytes).unwrap();
     let mut resumed=SavedCoupledBody::read(&mut bytes.as_slice(),bytes.len() as u64).unwrap().remount(&s).unwrap();
     assert_eq!(resumed.inspect_current().unwrap(),body.inspect_current().unwrap());
-    assert_eq!(resumed.inspect_prospective(&[(0,WaveSourceReceiver::Direct)],true).unwrap(),body.inspect_prospective(&[(0,WaveSourceReceiver::Direct)],true).unwrap());
+    // THE PROSPECTIVE READING AFTER THE COMMITTED STEP, IN THE FACTORED CHART.
+    //
+    // The committed step deposits the joint (z0,z1): 84 source coordinates over a rank-20
+    // direction block whose entries are 48 octaves at this grain. Measured on the card, that
+    // presentation is already reduced -- integer size reduction, LLL and the rational reduced
+    // echelon form all return the same 48 octaves, because the subspace IS the graph of the
+    // learned 48-octave step map over the anchor block. One further EXPANDED composition
+    // therefore needs roughly 96 octaves per entry and cannot enter the int64 affine report
+    // word at all; that arm still refuses, and its refusal is a property of the chart, not of
+    // the relation. The same relation read in its FACTORED chart -- the retained word applied
+    // to this family's own receiver point, in the wide carrier -- returns the reading. The
+    // rebase is exact: every direction of this family moves the anchor, so the fibre over the
+    // projected anchor is a single point and the joint minimum-norm receiver of (z0, L z0) is
+    // exactly the image of this family's receiver point.
+    let live=body.inspect_prospective(&[(0,WaveSourceReceiver::Direct)],true).unwrap();
+    assert_eq!(resumed.inspect_prospective(&[(0,WaveSourceReceiver::Direct)],true).unwrap(),live);
+    assert_eq!(live["receiver_representation"],"generated-point-word");
+    assert_eq!(live["reading"]["state_count"],2);
+    assert_eq!(live["reading"]["support"],"Supported");
+    // Nothing is free at a fixed anchor: that is the exact condition under which the factored
+    // chart reproduces the expanded joint receiver rather than standing in for it.
+    assert!(live["reading"]["anchor_independent_free"].as_array().unwrap().iter().all(|v|v==false));
+    // The word's first state IS the committed current, coordinate for coordinate, so the
+    // factored reading starts from this family's own receiver and not from some other point.
+    let held_now=body.inspect_current().unwrap();
+    let joint=live["reading"]["projected_joint"].as_array().unwrap();
+    assert_eq!(held_now["reading"]["projected_joint"].as_array().unwrap().as_slice(),&joint[..2*n*2]);
+    let (state0,state1)=(waves(&live["states"][0]["projection"]["current"]),waves(&live["states"][1]["projection"]["current"]));
+    assert_eq!(state0.len(),n);assert_ne!(state0,state1);
+    // The changed material conditions THIS reading too: the same word over the same committed
+    // body, read before the condition arrived, is a different future.
+    assert_ne!(live["states"][1]["projection"]["current"],before["states"][1]["projection"]["current"]);
+    // BOUNDED STEP OVER STEP. Each factor of the word adds at most its own octave to the
+    // reading; nothing accumulates the history of pivots that produced it. The measured
+    // committed presentation supplies the bound -- no authored constant stands in for it.
+    let bits=|v:&num_rational::BigRational|v.numer().bits().max(v.denom().bits());
+    let octaves=|w:&[ExactComplexWaveCurrent]|w.iter().map(|c|bits(&c.real).max(bits(&c.imaginary))).max().unwrap_or(0);
+    let factor_octaves=match body.affine_wave().unwrap().current().affine_relation().inspect().unwrap().predecessor_reading{
+        holonic_engine::native_ecology::constitutive_fibre::ConstitutiveReading::Plural{directions,..}=>
+            directions.iter().flatten().map(bits).max().unwrap_or(0),
+        other=>panic!("the committed step deposits a plural family: {other:?}"),
+    };
+    let (zero_octaves,one_octaves)=(octaves(&state0),octaves(&state1));
+    assert!(one_octaves<=zero_octaves+factor_octaves,
+        "one factor added more than its own octave: {zero_octaves} -> {one_octaves} through {factor_octaves}");
+    assert!(one_octaves<127,"the factored reading must stay inside the exact wide carrier: {one_octaves}");
+    eprintln!("operative-condition HNN prospective after the committed step: read in the factored \
+        chart, state0_max_octaves={zero_octaves}, state1_max_octaves={one_octaves}, factor_octaves={factor_octaves}");
     eprintln!("operative-condition HNN: state_complex={n}, condition_complex={k}, feature_complex={features}, training_returns={count}, material_returns=1, fit_us={fit_us}, observation_us={observation_us}, signed_discrepancy={}, discrepancy_radius={}",serde_json::to_string(&residual.center).unwrap(),residual.radius);
 }

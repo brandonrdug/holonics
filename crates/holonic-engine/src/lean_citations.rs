@@ -113,7 +113,35 @@ fn declared_names(source: &str) -> BTreeSet<String> {
             names.insert(leaf(name).to_owned());
         }
     };
+    // Block comments (`/- … -/`, `/-- … -/`, `/-! … -/`) are prose: a doc-comment table row begins
+    // with `|` exactly as an inductive constructor does, so a name that occurs only there must not
+    // count as declared. Nesting is tracked because Lean's block comments nest.
+    let mut comment_depth = 0_usize;
     for line in source.lines() {
+        let started_in_comment = comment_depth > 0;
+        let mut scan = line;
+        while !scan.is_empty() {
+            let open = scan.find("/-");
+            let close = scan.find("-/");
+            match (open, close) {
+                (Some(o), Some(c)) if o < c => {
+                    comment_depth += 1;
+                    scan = &scan[o + 2..];
+                }
+                (_, Some(c)) => {
+                    comment_depth = comment_depth.saturating_sub(1);
+                    scan = &scan[c + 2..];
+                }
+                (Some(o), None) => {
+                    comment_depth += 1;
+                    scan = &scan[o + 2..];
+                }
+                (None, None) => break,
+            }
+        }
+        if started_in_comment || line.trim_start().starts_with("/-") || line.trim_start().starts_with("--") {
+            continue;
+        }
         let indented = line.starts_with(' ');
         let mut rest = line.trim_start();
         while rest.starts_with("@[") {
@@ -238,6 +266,11 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             "Foundation/Bridge.lean",
         ),
         (
+            include_str!("relation_ladder.rs"),
+            "relation_ladder.rs",
+            "Foundation/RelationLadder.lean",
+        ),
+        (
             include_str!("continuing_tower.rs"),
             "continuing_tower.rs",
             "Foundation/ContinuingTower.lean",
@@ -264,6 +297,16 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             include_str!("physical_constraint_complex.rs"),
             "physical_constraint_complex.rs",
             "Foundation/AperturedGradedComplex.lean",
+        ),
+        (
+            include_str!("standing.rs"),
+            "standing.rs",
+            "Foundation/Standing.lean",
+        ),
+        (
+            include_str!("design_selection.rs"),
+            "design_selection.rs",
+            "Foundation/DesignSelection.lean",
         ),
     ]
 }
@@ -366,14 +409,10 @@ fn every_inline_lean_citation_names_a_declared_lean_name() {
     let mut checked = 0usize;
     let mut unresolved: Vec<String> = Vec::new();
     for path in &sources {
-        // These directories belong to another session's in-flight work.
+        // `native_ecology/` and `resident_section/` were excluded here while they belonged to
+        // another session's in-flight work. That session is closed and the whole tree is in
+        // scope, so their citations are now checked like every other engine source.
         let display = path.display().to_string();
-        if display.contains("/native_ecology/")
-            || display.contains("/resident_section/")
-            || display.contains("/cuda_")
-        {
-            continue;
-        }
         let source = std::fs::read_to_string(path).expect("an engine source reads");
         for (file, name) in inline_citations(&source) {
             let declared = cache.entry(file.clone()).or_insert_with(|| {
@@ -448,4 +487,18 @@ fn inline_citations(source: &str) -> Vec<(String, String)> {
         }
     }
     found
+}
+
+/// **A name that occurs only in Lean prose is not declared.** A doc-comment table row begins with
+/// `|` exactly as an inductive constructor does; the scanner reads neither it nor a line comment.
+#[test]
+fn a_name_that_occurs_only_in_a_lean_comment_is_not_declared() {
+    let source = "/-! Header.\n| rung | written | owner |\n| onlyInProse | x | y |\n-/\n\
+                  -- | alsoOnlyInProse : Nope\n\
+                  inductive Rung where\n  | identity : Rung\n  /- nested /- deeper -/ still -/\n  | noRelation : Rung\n";
+    let names = declared_names(source);
+    assert!(names.contains("Rung") && names.contains("identity") && names.contains("noRelation"));
+    assert!(!names.contains("rung"));
+    assert!(!names.contains("onlyInProse"));
+    assert!(!names.contains("alsoOnlyInProse"));
 }

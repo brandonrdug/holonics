@@ -39,7 +39,7 @@
 //! | `StrictlyDominates`, `strictlyDominates_iff` | [`CostReceipt::strictly_dominates`] |
 //! | `CostReceipt.compose`, `compose_vector` | [`CostReceipt::compose`] |
 //! | `serial_receipt_balance` (cites `ReceiverCodeCost.serial_boundary_balance`) | [`CostReceipt::compose`]'s derived provenance names that owner |
-//! | `IsFrontierPoint`, `frontier`, `mem_frontier` | [`pareto_frontier`] |
+//! | `IsFrontierPoint`, `frontier`, `mem_frontier` | [`pareto_frontier`]; [`frontier_by`] generalizes it to a declared three-valued axis comparison, whose `Undecided` case has no Lean counterpart (implemented-exact, tested) |
 //! | `exists_frontier_dominating`, `frontier_nonempty` | [`frontier_dominator`] |
 //! | `Weighting`, `Weighting.objective`, `Weighting.Positive` | [`Weighting`], [`Weighting::objective`], [`Weighting::is_positive`] |
 //! | `minimizer_isFrontierPoint` | [`scalar_minimizers`] and its invariant test |
@@ -68,6 +68,7 @@
 //! presentations of one real object — the `_atom_site` table of an mmCIF deposit — with every byte
 //! count measured from the actual file. See `presentation_cost/tests.rs`.
 
+use std::cmp::Ordering;
 use std::collections::BTreeMap;
 use std::fmt;
 
@@ -461,13 +462,84 @@ impl ParetoPoint {
 /// A family with repeated cost vectors keeps **every** copy: equal vectors do not strictly dominate
 /// each other, and two presentations with equal counts are still two presentations.
 pub fn pareto_frontier(points: &[ParetoPoint]) -> Vec<usize> {
-    (0..points.len())
-        .filter(|at| {
-            !points
-                .iter()
-                .any(|rival| rival.receipt.strictly_dominates(&points[*at].receipt))
+    frontier_by(points.len(), Axis::ALL.len(), &|rival, candidate, axis| {
+        let axis = Axis::ALL[axis];
+        match points[rival].receipt.count(axis).cmp(points[candidate].receipt.count(axis)) {
+            Ordering::Less => AxisComparison::Better,
+            Ordering::Equal => AxisComparison::Equal,
+            Ordering::Greater => AxisComparison::Worse,
+        }
+    })
+}
+
+/// How a rival stands to a candidate at one declared axis of a generalized frontier.
+///
+/// [definition] Lifted out of [`pareto_frontier`] 2026-09-18 when item **B8** of
+/// `docs/plans/THE_BIOLOGICAL_ECOLOGY_INSTANTIATES_THE_CARRIER.md` needed the same rule over a
+/// design's **receiver-reading vector** rather than over the five cost axes. The reading axes
+/// carry an exact comparison that can be *undecided* — a plural reading whose exact intervals
+/// overlap without coinciding, or an axis a receiver did not read — which the five `BigUint` cost
+/// coordinates never are. The rule is the same rule, and a second spelling of a Pareto front is
+/// how a pre-check and a guard drift apart, so [`pareto_frontier`] is expressed **through**
+/// [`frontier_by`] rather than beside it.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum AxisComparison {
+    /// The rival is strictly better here.
+    Better,
+    /// The rival is strictly worse here.
+    Worse,
+    /// The two readings are exactly equal here.
+    Equal,
+    /// The exact comparison does not decide. **This never licenses a discard.**
+    Undecided,
+}
+
+/// The nondominated members of a finite declared family under a finite declared axis family whose
+/// per-axis comparison is exact and three-valued.
+///
+/// `compare(rival, candidate, axis)` says how the rival stands to the candidate at that axis. A
+/// rival strictly dominates the candidate when it is [`AxisComparison::Better`] or
+/// [`AxisComparison::Equal`] at **every** axis and `Better` at at least one — so a single
+/// [`AxisComparison::Undecided`] anywhere leaves the candidate on the frontier. Openness is never
+/// resolved by a default here, exactly as `physical_constraint_grading` never resolves it.
+///
+/// [definition] `members` and `axes` are the family's and the declaration's own counts, and the
+/// comparison closure owns the indexing: this performs `members² · axes` comparisons and bounds
+/// nothing itself. Every caller checks that product with checked arithmetic against its own
+/// declared ceiling before calling — `design_selection::DesignFamily::frontier` does, and
+/// [`pareto_frontier`] derives both counts from the slice it was handed.
+///
+/// Lean counterpart: `Foundation/PresentationCost.lean::IsFrontierPoint`, whose `∀ j ∈ S, ¬ w j < w i`
+/// is this predicate at a decided axis family.
+pub fn frontier_by(
+    members: usize,
+    axes: usize,
+    compare: &dyn Fn(usize, usize, usize) -> AxisComparison,
+) -> Vec<usize> {
+    (0..members)
+        .filter(|candidate| {
+            !(0..members)
+                .any(|rival| rival != *candidate && dominates_by(rival, *candidate, axes, compare))
         })
         .collect()
+}
+
+/// Whether the rival is better or equal at every declared axis and strictly better at one.
+fn dominates_by(
+    rival: usize,
+    candidate: usize,
+    axes: usize,
+    compare: &dyn Fn(usize, usize, usize) -> AxisComparison,
+) -> bool {
+    let mut strict = false;
+    for axis in 0..axes {
+        match compare(rival, candidate, axis) {
+            AxisComparison::Better => strict = true,
+            AxisComparison::Equal => {}
+            AxisComparison::Worse | AxisComparison::Undecided => return false,
+        }
+    }
+    strict
 }
 
 /// A frontier point that dominates the given member of the family, or `None` when the index is out

@@ -2175,8 +2175,11 @@ pub enum StatusRefusal {
 // B5 and B6: the plural fibre and the typed passage, in this owner's own submodules
 // ---------------------------------------------------------------------------------------------
 
+// Reachable from `design_selection`'s tests too: B8's real-data exhibition is the same three
+// M5 presentations, and a second copy of those builders is exactly the drift this module exists to
+// prevent.
 #[cfg(test)]
-mod fixture;
+pub(crate) mod fixture;
 pub mod passage;
 pub mod plural_fibre;
 
