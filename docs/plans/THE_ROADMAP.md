@@ -243,14 +243,13 @@ documents hold the statements, owners and findings and are not re-narrated here.
 | Receiver atlas | R1–R7 | per-eigenvalue refinement on `ExactHodgeSpectrum`; `MarkovTwoNSuffices` |
 | Biological ecology | B0–B10 | held-out agreement counts computed from a declared receiver family rather than supplied; a run of the installed predictors against an M5 design; the gluing law with interface coupling for the physicochemical receiver |
 | Exact device law | D1–D3, one engine instance adopted on the card | a second device ring of signed 128-bit words with the engine's carrier refusal; per-region operator family; base-pointer registry; the zero gather inside the adopted readout context; D4 stays an intention |
-| Generalized transport | T1 relation ladder, T2 standing/memory/extinction, T3 release over an edited family, T5 two-axis horizon | T4 with T7; T6 with T8; a plural family generic in its coordinate address (named by T3, not founded) |
+| Generalized transport | T1 relation ladder, T2 standing/memory/extinction, T3 release over an edited family, T4 knot friction and edit torque, T5 two-axis horizon, T7 fold, cut and junction law | T6 with T8; a plural family generic in its coordinate address (named by T3, not founded); a faithful Israel-junction instance, which owes a Lorentzian metric and extrinsic curvature no owner carries |
 
-[definition] **The remaining order is one list.** (1) T4 knot friction with T7 fold, cut and
-junction, which share the rigidity owner. (2) T6 neck invariants with T8 the jet tower, which share
-the pole and higher-difference owners. (3) The device ring and the items listed against it. (4) The
-Athena application's complete-source session over the rebased shared section work, carried by
-[CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md). The smaller open items in the table are taken
-inside the increment that next touches their owner, not as increments of their own.
+[definition] **The remaining order is one list.** (1) T6 neck invariants with T8 the jet tower,
+which share the pole and higher-difference owners. (2) The device ring and the items listed against
+it. (3) The Athena application's complete-source session over the rebased shared section work,
+carried by [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md). The smaller open items in the table
+are taken inside the increment that next touches their owner, not as increments of their own.
 
 ### Rules that settle recurring choices
 

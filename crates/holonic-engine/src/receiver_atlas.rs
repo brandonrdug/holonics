@@ -75,6 +75,10 @@ use crate::hodge_receiver::{
     BoundaryCondition, HodgeError, HodgeOperator, MetricDeclaration, hodge_decomposition,
     hodge_reading,
 };
+use crate::junction_law::{
+    Interface, JointUnits, JunctionField, JunctionRefusal, JunctionVerdict, ResistiveNetwork, Side,
+    check_junction,
+};
 use crate::physical_constraint_complex::{
     ConstraintComponentId, ConstraintEdge, ConstraintVertexId, ContactClass, CoordinateBox3,
 };
@@ -1746,7 +1750,7 @@ impl ContractEntry {
 /// One row of the contract ledger.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ContractRow {
-    /// Which receiver: `R1`, `R3`, `R4` or `R5`.
+    /// Which receiver: `R1`, `R3`, `R4`, `R5`, `B7phys` or `T7`.
     pub receiver: &'static str,
     /// Which contract.
     pub contract: AtlasContract,
@@ -2447,8 +2451,8 @@ fn verify_b7_physicochemical_energy_balance() -> ContractStatus {
     }
 }
 
-/// **The contract ledger: which of R1, R3, R4 and R5 satisfies which contract, computed where it
-/// can be and named as unproved where it cannot.**
+/// **The contract ledger: which receiver satisfies which contract, computed where it can be and
+/// named as unproved where it cannot.**
 ///
 /// [implemented-exact] The `Satisfied` rows are *recomputed on every call*, and that is enforced
 /// by the types rather than by convention: [`ContractStatus::Satisfied`] carries a [`Recomputed`]
@@ -2475,6 +2479,227 @@ pub fn contract_ledger() -> Vec<ContractRow> {
             status: entry.status(),
         })
         .collect()
+}
+
+/// The two-loop resistive network the T7 witnesses read: four nodes, five branches, unit
+/// conductance, and an injection that sums to zero.
+fn ledger_two_loop_network() -> Result<(ResistiveNetwork, Vec<Rat>), JunctionRefusal> {
+    let branches = [
+        (0usize, 1usize, Rat::one()),
+        (1, 2, Rat::one()),
+        (2, 3, Rat::one()),
+        (3, 0, Rat::one()),
+        (0, 2, Rat::one()),
+    ];
+    let network = ResistiveNetwork::declare("ledger|t7|two-loop", 4, &branches)?;
+    let injection = vec![Rat::one(), Rat::zero(), -Rat::one(), Rat::zero()];
+    Ok((network, injection))
+}
+
+/// **T7 energy balance, computed: Tellegen's theorem at a junction.**
+///
+/// The pairing of the branch drops with the branch flux equals the pairing of the node potentials
+/// with the declared injection, exactly. This is the summation-by-parts identity
+/// `Foundation/HodgeReceiver.lean::codiff₀_adjoint` read at a balanced flux, and it is the
+/// conservation a junction owes: power delivered at the nodes is power dissipated along the
+/// branches, with no tolerance anywhere.
+fn verify_t7_tellegen_energy_balance() -> ContractStatus {
+    let build = || -> Result<(bool, bool, usize), JunctionRefusal> {
+        let (network, injection) = ledger_two_loop_network()?;
+        let solution = network.solve(&injection)?;
+        if !solution.solved() {
+            return Ok((false, false, 0));
+        }
+        let receipt = network.power_ledger(&solution.potentials)?;
+        let dissipation_is_positive = receipt.dissipated.parts().0 > &Rat::zero();
+        Ok((
+            receipt.balances(),
+            dissipation_is_positive,
+            receipt.checked.len(),
+        ))
+    };
+    match build() {
+        Ok((true, true, checked)) => ContractStatus::satisfied(format!(
+            "junction_law::tellegen returns an exactly zero residual on a four-node, five-branch \
+             resistive network read at {checked} nodes: the pairing of the drops with the flux and \
+             the pairing of the potential with the injection are the same exact rational, and the \
+             dissipation is strictly positive so the balance is not the trivial one"
+        )),
+        Ok((balanced, positive, _)) => ContractStatus::Failed {
+            counterexample: format!(
+                "the power ledger did not balance: balances = {balanced}, dissipation positive = \
+                 {positive}"
+            ),
+        },
+        Err(error) => ContractStatus::Unproved {
+            missing: format!("the witness could not be built: {error}"),
+        },
+    }
+}
+
+/// **T7 gluing with interface coupling, computed.**
+///
+/// The reading of the glued object is determined by the two sides' readings **together with the
+/// interface coupling**, and not by the sides alone: the normal jump at the interface is the sum
+/// of the two sides' outward normal fluxes, and changing only the declared coupling on one side —
+/// the permittivity, which is the Hodge metric weight there — moves the glued reading while both
+/// sides' fields stay exactly what they were.
+fn verify_t7_gluing_with_interface_coupling() -> ContractStatus {
+    let build = || -> Result<(Rat, Rat, bool), JunctionRefusal> {
+        let units = JointUnits::electrostatic()?;
+        let field = vec![Rat::one(), Rat::new(BigInt::one(), BigInt::from(3))];
+        let source = vec![
+            -Rat::from_integer(BigInt::from(2)),
+            Rat::one(),
+            Rat::one(),
+        ];
+        let potential = vec![
+            Rat::zero(),
+            Rat::one(),
+            Rat::new(BigInt::from(4), BigInt::from(3)),
+        ];
+        let mut jumps = Vec::new();
+        for right_permittivity in [3i64, 6] {
+            let branches = [
+                (0usize, 1usize, Rat::from_integer(BigInt::from(2))),
+                (1, 2, Rat::from_integer(BigInt::from(right_permittivity))),
+            ];
+            let chain = ResistiveNetwork::declare("ledger|t7|dielectric", 3, &branches)?;
+            let operator = chain.operator();
+            let interface = Interface::declare(
+                "ledger|t7|interface",
+                operator,
+                0,
+                [
+                    (operator.cells(1)[0], Side::Left),
+                    (operator.cells(1)[1], Side::Right),
+                ]
+                .into_iter()
+                .collect(),
+                [operator.cells(0)[1]].into_iter().collect(),
+            )?;
+            let verdict = check_junction(
+                operator,
+                &interface,
+                &JunctionField {
+                    potential: &potential,
+                    field: &field,
+                    source: &source,
+                },
+                &units,
+            )?;
+            let jump = match &verdict {
+                JunctionVerdict::Balanced { law, .. } | JunctionVerdict::Unbalanced { law, .. } => {
+                    law.normal_jump()
+                        .values()
+                        .next()
+                        .cloned()
+                        .unwrap_or_else(Rat::zero)
+                }
+                JunctionVerdict::Open { .. } => Rat::zero(),
+            };
+            jumps.push(jump);
+        }
+        let declared_matches = jumps[0] == Rat::one();
+        Ok((jumps[0].clone(), jumps[1].clone(), declared_matches))
+    };
+    match build() {
+        Ok((first, second, true)) if first != second => ContractStatus::satisfied(format!(
+            "the normal jump of the displacement at a two-material interface is the sum of the two \
+             sides' outward normal fluxes, and it is {first} at permittivity 3 against {second} at \
+             permittivity 6 with both sides' fields unchanged: the glued reading is the parts' \
+             readings together with the declared interface coupling, and the parts alone do not \
+             determine it"
+        )),
+        Ok((first, second, matched)) => ContractStatus::Failed {
+            counterexample: format!(
+                "the coupling did not move the glued reading, or the declared balance was wrong: \
+                 {first} against {second}, declared balance held = {matched}"
+            ),
+        },
+        Err(error) => ContractStatus::Unproved {
+            missing: format!("the witness could not be built: {error}"),
+        },
+    }
+}
+
+/// **T7 source accountability, computed.** Every component of a junction reading is indexed by the
+/// joint cell it was read at, the balanced arm names every cell it evaluated, and the unbalanced
+/// arm returns the residual cochain whole rather than a norm of it.
+fn verify_t7_source_accountability() -> ContractStatus {
+    let build = || -> Result<(usize, usize, bool), JunctionRefusal> {
+        let units = JointUnits::electrostatic()?;
+        let branches = [
+            (0usize, 1usize, Rat::from_integer(BigInt::from(2))),
+            (1, 2, Rat::from_integer(BigInt::from(3))),
+        ];
+        let chain = ResistiveNetwork::declare("ledger|t7|accountability", 3, &branches)?;
+        let operator = chain.operator();
+        let potential = vec![
+            Rat::zero(),
+            Rat::one(),
+            Rat::new(BigInt::from(4), BigInt::from(3)),
+        ];
+        let field = vec![Rat::one(), Rat::new(BigInt::one(), BigInt::from(3))];
+        let wrong = vec![
+            -Rat::from_integer(BigInt::from(2)),
+            Rat::from_integer(BigInt::from(5)),
+            Rat::one(),
+        ];
+        let interface = Interface::declare(
+            "ledger|t7|accountability|interface",
+            operator,
+            0,
+            [
+                (operator.cells(1)[0], Side::Left),
+                (operator.cells(1)[1], Side::Right),
+            ]
+            .into_iter()
+            .collect(),
+            [operator.cells(0)[1]].into_iter().collect(),
+        )?;
+        let verdict = check_junction(
+            operator,
+            &interface,
+            &JunctionField {
+                potential: &potential,
+                field: &field,
+                source: &wrong,
+            },
+            &units,
+        )?;
+        match verdict {
+            JunctionVerdict::Unbalanced {
+                law,
+                residual,
+                offending,
+            } => Ok((
+                residual.len(),
+                offending.len(),
+                residual.keys().all(|cell| law.normal_jump().contains_key(cell))
+                    && law.source().len() == law.normal_jump().len(),
+            )),
+            _ => Ok((0, 0, false)),
+        }
+    };
+    match build() {
+        Ok((residual, offending, true)) if residual > 0 && offending > 0 => {
+            ContractStatus::satisfied(format!(
+                "a junction reading that does not balance returns its residual as a cochain of \
+                 {residual} entry indexed by joint cell, names the {offending} offending cell, and \
+                 carries the jump and the source at exactly the same joint population"
+            ))
+        }
+        Ok((residual, offending, indexed)) => ContractStatus::Failed {
+            counterexample: format!(
+                "the reading was not accountable: residual entries = {residual}, offending = \
+                 {offending}, indexed by the joint = {indexed}"
+            ),
+        },
+        Err(error) => ContractStatus::Unproved {
+            missing: format!("the witness could not be built: {error}"),
+        },
+    }
 }
 
 /// **Every ledger row, as `(receiver, contract, how its status is produced)`.**
@@ -2651,6 +2876,35 @@ pub fn ledger_entries() -> Vec<(&'static str, AtlasContract, ContractEntry)> {
                           change in a deposited coordinate can carry a donor-acceptor pair across \
                           a hydrogen-bond window bound. Both are carried as undecided rather than \
                           rounded, which is honesty about the discontinuity and not a bound on it."
+                    .to_owned(),
+            })),
+        ("T7", AtlasContract::RebaseEquivariance, ContractEntry::Standing(StandingStatus::Unproved {
+                missing: "junction_law reads a GradedCausalComplex, a declared metric and three \
+                          cochains. This repository declares no relabelling action on that complex \
+                          and no induced action on cochains, so there is no rebase for the junction \
+                          reading to be equivariant under. The concrete absent object is a declared \
+                          cell-relabelling functor with its action on the coboundary and the \
+                          metric."
+                    .to_owned(),
+            })),
+        ("T7", AtlasContract::DeclarationIndependence, ContractEntry::Standing(StandingStatus::NotApplicable {
+                reason: "the declared metric IS the constitutive law here — the conductance of a \
+                         branch, the permittivity of a side — so the reading depends on it by \
+                         construction and must. That dependence is what the GluingWithInterfaceCoupling \
+                         row computes. Independence from the supplied metric would be independence \
+                         from the material, and asserting it would be a different receiver."
+                    .to_owned(),
+            })),
+        ("T7", AtlasContract::SourceAccountability, ContractEntry::Recomputed(verify_t7_source_accountability)),
+        ("T7", AtlasContract::EnergyBalance, ContractEntry::Recomputed(verify_t7_tellegen_energy_balance)),
+        ("T7", AtlasContract::GluingWithInterfaceCoupling, ContractEntry::Recomputed(verify_t7_gluing_with_interface_coupling)),
+        ("T7", AtlasContract::StabilityAwayFromBifurcation, ContractEntry::Standing(StandingStatus::Unproved {
+                missing: "no perturbation bound relates two nearby declared metrics' junction \
+                          readings. The nodal solve is exact at one presentation and carries no \
+                          modulus of continuity, and the total-internal-reflection classification \
+                          is a strict sign condition whose grazing case is returned as its own \
+                          value rather than folded into either neighbour — which is honesty about \
+                          the discontinuity, not a bound on it."
                     .to_owned(),
             })),
     ]

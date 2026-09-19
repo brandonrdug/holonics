@@ -109,6 +109,9 @@
 //! [`removal_sensitivity`] reads it off the cokernel basis, and
 //! [`verify_removal_sensitivity`] re-derives a bounded sample by actually deleting the row and
 //! recomputing the exact rank.
+//! The law is formal-checked over this owner's own `selfStresses` and `rigidityMatrix` as
+//! `Transport/EditRigidity.lean::dependent_iff_droppingLosesNothing`, with
+//! `Transport/EditRigidity.lean::entanglement_is_self_stress_support` its edit-side reading.
 //!
 //! # The open family
 //!

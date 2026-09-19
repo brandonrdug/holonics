@@ -273,6 +273,9 @@ import ElementaryHolonics.Millennium.HolonicGeneratedPortMomentPassage
 import ElementaryHolonics.Millennium.HolonicSensoryWorldTube
 import ElementaryHolonics.Transport.ContinuingTube
 import ElementaryHolonics.Transport.ArtifactRelease
+import ElementaryHolonics.Transport.Fold
+import ElementaryHolonics.Transport.EditRigidity
+import ElementaryHolonics.Transport.JunctionLaw
 import ElementaryHolonics.Millennium.HolonicRankFourInteractionPlanes
 import ElementaryHolonics.Millennium.HolonicMaxwellPropagation
 import ElementaryHolonics.Millennium.HolonicDiscreteMaxwellOperator

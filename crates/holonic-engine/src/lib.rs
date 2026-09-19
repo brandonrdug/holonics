@@ -170,6 +170,11 @@ pub mod device;
 pub mod diffusion;
 mod digest;
 pub use digest::is_sha256_digest;
+// T4 of `docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md`: the edit side
+// of `rigidity_receiver`'s one Jacobian — free edits as `ker J_keep`, the compensating family and
+// its obstruction certificate, rethreading work in a declared metric, and the edit torque `J* r`.
+// Paired with `Transport/EditRigidity.lean`.
+pub mod edit_rigidity;
 // Whether an exponential integrand closes in the elementary chart, decided as the consistency of
 // one exact rational linear system. The candidate realizer's degree is forced a priori, so the
 // candidate population is finite and exhaustible and non-elementarity returns as a rank deficiency
@@ -259,6 +264,12 @@ pub mod exact_value;
 pub mod exact_work;
 pub mod executor;
 pub mod field_atlas;
+/// T7's fold and cut: a reflection applied to one side of an exact rational crease, its side-bit
+/// residual, the bounce and the layer contact, rotation as two reflections, the cut that changes
+/// homology where a fold cannot, crease patterns as hinge frameworks, the fold catastrophe and the
+/// protein backbone as rigid origami. Paired with
+/// `formal/elementary-holonics/ElementaryHolonics/Transport/Fold.lean`.
+pub mod fold;
 pub mod foreign_map;
 pub mod generative_transport;
 pub mod gluing;
@@ -306,6 +317,12 @@ pub mod inverse_transport;
 // and the finite abelian groups M/ω_n M read off an exact Smith normal form. Paired with
 // `formal/elementary-holonics/ElementaryHolonics/Foundation/IwasawaTower.lean`.
 pub mod iwasawa_tower;
+// T7: the junction law — the tangential part continuous, the normal part jumping, the jump being
+// the source on the joint — over `hodge_receiver`'s coboundary and declared metric, with the
+// circuit, refraction, shock, thin-sheet and film instances and the pair of pants against the
+// Möbius shorts. Paired with
+// `formal/elementary-holonics/ElementaryHolonics/Transport/JunctionLaw.lean`.
+pub mod junction_law;
 // A human-written formal development read at the grain of its OWN declarations, with the aperture
 // declared so that using the one-artifact reader on many-declaration material is detectable rather
 // than silently absorbed. Reached explicitly: `join`, `DeclaredForm` and `read_development` say

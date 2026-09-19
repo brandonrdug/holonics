@@ -241,6 +241,11 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             "Transport/ArtifactRelease.lean",
         ),
         (
+            include_str!("edit_rigidity.rs"),
+            "edit_rigidity.rs",
+            "Transport/EditRigidity.lean",
+        ),
+        (
             include_str!("iwasawa_tower.rs"),
             "iwasawa_tower.rs",
             "Foundation/IwasawaTower.lean",
@@ -323,6 +328,12 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             "evaluation_discipline.rs",
             "Foundation/EvaluationDiscipline.lean",
         ),
+        (
+            include_str!("junction_law.rs"),
+            "junction_law.rs",
+            "Transport/JunctionLaw.lean",
+        ),
+        (include_str!("fold.rs"), "fold.rs", "Transport/Fold.lean"),
     ]
 }
 

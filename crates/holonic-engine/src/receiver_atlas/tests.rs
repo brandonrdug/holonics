@@ -1294,7 +1294,7 @@ fn the_spectral_and_topological_atlas_cannot_separate_two_non_isomorphic_complex
 fn the_contract_ledger_recomputes_every_satisfied_row() {
     let entries = ledger_entries();
     let ledger = contract_ledger();
-    assert_eq!(ledger.len(), 30);
+    assert_eq!(ledger.len(), 36);
     assert_eq!(entries.len(), ledger.len());
 
     let mut satisfied = 0usize;
@@ -1341,9 +1341,9 @@ fn the_contract_ledger_recomputes_every_satisfied_row() {
         entries.iter().filter(|(_, _, entry)| entry.is_recomputed()).count(),
         "every recomputed row is Satisfied and every Satisfied row is recomputed"
     );
-    assert_eq!(satisfied, 10, "the ten recomputed rows");
+    assert_eq!(satisfied, 13, "the thirteen recomputed rows");
 
-    // The ten rows that are verified by computation, named — and each one is a
+    // The thirteen rows that are verified by computation, named — and each one is a
     // `ContractEntry::Recomputed` in the table, not a literal.
     for (receiver, contract) in [
         ("R1", AtlasContract::RebaseEquivariance),
@@ -1356,6 +1356,9 @@ fn the_contract_ledger_recomputes_every_satisfied_row() {
         ("B7phys", AtlasContract::RebaseEquivariance),
         ("B7phys", AtlasContract::SourceAccountability),
         ("B7phys", AtlasContract::EnergyBalance),
+        ("T7", AtlasContract::SourceAccountability),
+        ("T7", AtlasContract::EnergyBalance),
+        ("T7", AtlasContract::GluingWithInterfaceCoupling),
     ] {
         let row = ledger
             .iter()
@@ -1382,11 +1385,22 @@ fn the_contract_ledger_recomputes_every_satisfied_row() {
         .expect("R5 carries a rebase row");
     assert!(matches!(writhe.status, ContractStatus::Failed { .. }));
 
-    // Nothing claims the gluing law with interface coupling anywhere.
+    // **T7 is the one receiver that claims the gluing law with interface coupling**, and it claims
+    // it by computation: the junction law's normal jump is the two sides' outward normal fluxes
+    // plus the declared interface coupling, and changing only that coupling moves the glued
+    // reading while both sides' fields stand. Every other receiver still names the absent term.
     for row in ledger
         .iter()
         .filter(|row| row.contract == AtlasContract::GluingWithInterfaceCoupling)
     {
+        if row.receiver == "T7" {
+            assert!(
+                matches!(row.status, ContractStatus::Satisfied(_)),
+                "T7 computes the gluing contract, got {:?}",
+                row.status
+            );
+            continue;
+        }
         assert!(
             matches!(row.status, ContractStatus::Unproved { .. }),
             "{} must not claim the gluing contract",

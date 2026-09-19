@@ -104,8 +104,8 @@ transport T1, T2, T3 and T5 and the biological ecology B8–B10 with B7's physic
 returned as paired owners — `relation_ladder`, `standing`, `artifact_release`, the two-axis horizon
 in `receiver_release` and `continuing_tube`, `design_selection` with its costed cascade,
 `evaluation_discipline` and `physicochemical_receiver`. The one position table and the ordered
-remaining list are in [THE_ROADMAP](docs/plans/THE_ROADMAP.md#position-of-the-five-contracts); T4
-with T7 is next.
+remaining list are in [THE_ROADMAP](docs/plans/THE_ROADMAP.md#position-of-the-five-contracts). T4
+and T7 followed as `edit_rigidity`, `fold` and `junction_law`; T6 with T8 is next.
 
 [established-bounded; formal-checked; implemented-exact] September 17–18: the
 [shared carrier](docs/plans/THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md) C1–C8 with the tube

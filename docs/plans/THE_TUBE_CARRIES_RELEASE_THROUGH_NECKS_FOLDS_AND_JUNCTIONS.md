@@ -280,12 +280,120 @@ product order: `the_two_horizon_coordinates_are_not_one_scale` records that `(2,
 incomparable, so "how far into the horizon a release was taken" is a pair — how many edits, and how
 coarse the receiver's region — and never a number.
 
-[definition] **T4 — Knot friction and edit torque.** An artifact's kept receivers define a
-constraint complex. `ker J_keep` is the free edits, an empty compensating family is an obstructed
-edit, self-stress support is entanglement, `J* r` is the edit torque, and the rethreading work
-`W_knot(g | A) = inf ‖δ‖` over compensations preserving the kept faces is a
-`presentation_cost::CostReceipt`. This is `rigidity_receiver` applied to an artifact; it founds no
-second Jacobian.
+[established-bounded; formal-checked; implemented-exact] **T4 — Knot friction and edit torque.
+Returned.** Owners:
+[`Transport/EditRigidity.lean`](../../formal/elementary-holonics/ElementaryHolonics/Transport/EditRigidity.lean)
+(namespace `Soma.Holonics.Transport.EditRigidity`) and
+[`edit_rigidity.rs`](../../crates/holonic-engine/src/edit_rigidity.rs) with
+`edit_rigidity/tests.rs`.
+
+**It founds no second Jacobian.** `KeptReceiverJacobian::from_rigidity` takes
+`rigidity_receiver::RigidityJacobian`'s matrix unchanged, `keptJacobian` is
+`RigidityReceiver.rigidityMatrix` by definition, and
+`the_kept_face_differential_is_the_rigidity_jacobian`, `kept_rank_nullity` and
+`kept_self_stress_dimension` are R4's own `jacobian_is_the_differential`, `rank_nullity` and
+`self_stress_dimension` cited rather than restated. `identify_with_rigidity_reading` refuses **by
+name** if the reading taken here and `rigidity_receiver::rigidity_reading` part company on the
+rank, the free dimension, the self-stress dimension or the face count. A kept face that is an exact
+*linear* form of the chart coordinates is its own differential
+(`linear_face_is_its_own_differential`), so a chart mixing declared separations with declared
+role-agreement forms is one matrix and not two receivers.
+
+**Free, compensable, obstructed.** `ker J_keep` is the free edits (`free_iff_mem_ker`) — the
+first-order directions no kept receiver sees. A proposed edit is compensable over a declared
+allowed subspace exactly when one exact linear system is consistent (`compensating_iff_solves`),
+the compensating family is affine (`compensating_family_is_affine`), and it is empty exactly when a
+left-null covector certifies the inconsistency. That last equivalence is the **Fredholm alternative
+over the rationals**, `mem_range_iff_annihilators_vanish`, proved here; every `Obstructed` return
+carries a certificate that is checked — `wᵀ(J_keep A) = 0` and `⟨w, J_keep g⟩ ≠ 0` — before it is
+constructed, so an obstruction is a return and never a search that gave up. **Entanglement is
+self-stress support**: `entanglement_is_self_stress_support` proves *some self-stress is supported
+at `c`*, *row `c` is a combination of the others* and *dropping `c` loses no first-order
+restriction* mutually equivalent, and `a_face_carrying_no_self_stress_forbids_an_edit_of_its_own`
+exhibits, for a load-bearing face, the edit it alone forbids.
+
+**Rethreading work is a receipt and a declared metric, not a norm.** `W² = inf ‖δ‖²_M` over the
+compensating family is exact rational linear algebra: one `preimage_fibre` decides consistency and
+one normal-equation solve selects the minimizer, whose normal equation is re-checked at every
+allowed direction before it is returned (`normal_equation_gives_the_unique_minimizer`). The
+receiver reports `W²`, never a root and never a float, and every declared Gram matrix carries a
+checked exact `LDLᵀ` certificate — symmetry, strictly positive pivots, an exact reconstruction and
+a full-rank triangular factor (`positive_definite_of_ldl`). `work_zero_iff_free` makes `W² = 0`
+**exactly** the free arm, so the verdict's split is a theorem and not a threshold. Beside every
+verdict sits a `presentation_cost::CostReceipt` whose coordinates are the coordinates the edit
+writes, the coordinates it and its compensation touch together, the coordinates the compensation
+moves, the kept faces that must be re-read to certify it, and one bit per kept face an obstruction
+is supported at.
+
+**Edit torque.** `τ = J_g^† r` is the **metric** adjoint `M⁻¹J_gᵀN` applied to the declared
+residual, checked against its own characterization at every coordinate pair before it is used
+(`metric_adjoint_pairs_the_residual_with_the_generators`), with the bare transpose carried beside
+it so the difference is visible rather than assumed away. `τ = 0` is exactly orthogonality of the
+residual to the image and exactly first-order stationarity of the squared residual
+(`torque_zero_iff_residual_annihilates_image`, `stationary_iff_torque_zero`); a nonzero torque
+always admits the exact rational step `⟨τ,Mτ⟩/⟨J_gτ,N J_gτ⟩` whose decrease is recomputed rather
+than predicted (`the_exact_descent_step`, `torque_nonzero_has_nonzero_image`).
+
+**The knot.** The rigid clusters are `rigidity_receiver::rigid_clusters`, cited; the per-scale
+reading over a declared word/sentence/breath region ladder returns, for each region, the kept faces
+induced entirely inside it, the induced rank, the region's free dimension and **its self-stress
+dimension**. An `Open` kept face makes the verdict plural: `plural_rethreading` returns both bounds
+and resolves neither. What is *defined* is exact and finite — `W²`, `τ`, and a self-stress dimension
+per declared scale; that the three together are a *knot friction moment* in the sense of an
+electromagnetic moment is graded `interpretation`.
+
+**The worked instances.** (a) The six-slot role frame on an **embedding-placement** chart: the
+slots are points of `ℚ²`, the kept faces are three declared separations and one declared linear
+role-agreement form, `dog → cat` moves the noun slot perpendicular to the separation the receiver
+keeps and is **free** with `W² = 0`, moving it along the separation is **compensable** with the
+exact minimizer `(3, 4)` at the determiner slot and `W² = 25`, and `is → why` is **obstructed** with
+its checked certificate. (b) The M5 RBX1 contact framework, `#[ignore]`d and CPU-only: a
+24-residue window at an eight angstrom aperture, kept faces the interface contacts, the edit one
+residue displaced along `x`. its tests run by default, exact `Rat`/`BigUint` throughout and no float
+anywhere; each of the 37 audited Lean declarations depends only on `propext`, `Classical.choice`
+and `Quot.sound`, and none on `sorryAx`.
+
+[established-bounded] Five findings from building it, each changing the item as the paragraph above
+first stated it. **(1) R4's removal-sensitivity law was claimed in its Rust prose and not carried by
+its Lean owner.** `rigidity_receiver.rs` states — and `removal_sensitivity` computes from — "removing
+one constraint changes `dim ker J` exactly when that constraint carries no self-stress", but
+`Foundation/RigidityReceiver.lean` proves `rank_nullity`, `self_stress_dimension`,
+`maxwell_relation` and `motions_antitone` and **not** that equivalence. It is proved here in all
+three of its readings, about R4's own `selfStresses` and `rigidityMatrix`, from the Fredholm
+alternative; R4's `verify_removal_sensitivity` and this owner's `verify_entanglement_by_dropping`
+are now two executions of a formalized theorem rather than of a prose claim.
+**(2) The knot nests upward, not downward — and the ambient reading nests the other way.** The plan
+asked which direction is true. For the framework *induced inside* a region the true direction is
+**ascending**: `impliedBy_mono` proves that what a subregion's induced faces hold, the region's
+induced faces hold too, because the exhibited combination is still a combination. The descending
+direction is **false**, and `induced_implication_does_not_descend` is the counterexample — three
+occurrences on a line with the two consecutive separations kept, whose outer pair is held at the
+whole region and by nothing at all inside the subregion carrying only its two endpoints. Read
+instead at the *ambient* motions, knot-ness is downward closed
+(`ambient_knot_is_downward_closed`). So "knot" must say which of the two readings it means; they
+nest in opposite directions and are not interchangeable.
+**(3) `W²` is one receiver of the edit and orders nothing by itself.** Two edits with **equal**
+`W² = 1` carry Pareto-incomparable `CostReceipt`s — one writes two coordinates and compensates with
+one, the other writes one and compensates with two — and two positive-definite metrics order that
+same pair in opposite directions. A ranking of edits by friction is therefore a **declared
+receiver**; the unit metric is one declaration and this owner supplies no default.
+**(4) Of T3's three relations this linear notion is the third, and neither of the other two.** In a
+linear chart *every* pair of first-order edits commutes, because edit directions add, so commuting
+separates nothing here at all — T3's finding (2) in its sharpest form; and a first-order direction
+has no read/write distinction, so chartwise locality is a property of the discrete `EditAction` and
+not of its differential. T3's six-slot receiver is discrete and has **no** differential of its own,
+so instance (a) is built on an embedding-placement chart and says so: the discrete law is T3's and
+the linear one is its first-order chart.
+**(5) In the real instance the rethreading propagates through the whole window.** Displacing one
+RBX1 residue is **obstructed** when only its first contact shell may move — in all three
+presentations — because moving a neighbour breaks the faces that neighbour shares with residues
+outside the shell. At the second shell it is still obstructed in the two free presentations and
+becomes compensable in the CUL1-bound one, which carries **no self-stress at all**; and when every
+other residue may move the compensation is supported on **69 of the 72 coordinates** — every
+coordinate but the edited residue's. The measured readings are `70/62/10/8` kept faces, rank, free
+dimension and self-stress for `designed-free`, `59/53/19/6` for `protenix-free-seed2` and
+`50/50/22/0` for `protenix-cul1-seed0`; `W²` is an exact rational of about 110 digits over 110 and
+rises under the stiffer declared metric, as a metric weighted up must.
 
 [established-bounded; formal-checked; implemented-exact] **T5 — The two-axis horizon. Returned.**
 Owners, extended in place:
@@ -403,7 +511,247 @@ of the boundary operator, the electromagnetic boundary conditions and Snell refr
 Rankine–Hugoniot, the Israel junction conditions, Plateau's laws, Kawasaki at a vertex. Valence,
 Euler characteristic contribution and an orientation bit complete it: the pair of pants and the
 Möbius shorts both contribute `chi = −1` and differ in orientability. It is composed over the
-existing gluing owners.
+existing gluing owners. **Both halves of this item are returned in the paragraphs below: the fold
+and cut half first, the junction law after it.**
+
+[established-bounded; formal-checked; implemented-exact] **T7 — The fold and the cut. Returned.**
+Owners: [`Transport/Fold.lean`](../../formal/elementary-holonics/ElementaryHolonics/Transport/Fold.lean)
+(namespace `Soma.Holonics.Transport.Fold`) and
+[`fold.rs`](../../crates/holonic-engine/src/fold.rs) with `fold/tests.rs`.
+
+**A fold is a reflection applied to one side of a crease, and it is exact over `Q` with no square
+root anywhere.** `Crease` carries an exact rational normal and offset with `⟨n,n⟩ ≠ 0`, which over
+`Q` is exactly `n ≠ 0`; `reflect x = x − 2 σ(x) n / ⟨n,n⟩` divides only by `⟨n,n⟩` and never forms a
+norm, every distance in the owner is a *squared* distance, and every angle is avoided by an exact
+rational surrogate. `fold` applies it to the negative side only. **A bounce is that fold read in the
+trajectory**: `side_segment` makes the signed side affine along a segment, `crossing_side_eq_zero`
+locates the crossing at an exact rational parameter, and `bounce_direction` is equal angles with no
+angle taken — the tangential component of the direction is fixed and the normal one negated. **A
+collision is the contact law between the layers the fold stacks**: `layer_contact_within` composes
+`physical_constraint_complex`'s own `Inside/Outside/Open` classification on the folded configuration
+under the caller's declared squared-separation tolerance, and the pairs the aperture cannot decide
+come back in their own list, never rounded into `Inside` or `Outside`. **Reversibility is the residual**:
+`foldTransition` is a `ContinuingTower::Transition` whose residual is the side bit and whose
+`reopen_apply` is exact; `fold_fibre` proves the map two-to-one off the crease, so folding in half
+**is** the quotient of the sheet by the reflection onto the closed positive half-space, with the
+side bit as the remainder. `k` folds are `FoldWord`: `k` bits and `2^k` layers, and `dyadic_layer`
+addresses the layer as an element of `Z/2^k` — the level-`k` face of the dyadic tower, cited through
+`ContinuingTube.padicTube_crossSection_branching` at `p = 2` (`k_folds_branch_dyadically`). An
+**elastic** crease is that `Transition`; a **plastic** crease is `PlasticCrease`, a different type
+with no `Transition` implementation at all, whose `reverse_passage` returns `OnlyWithTheResidual`
+with the two merged faces — the instance of
+`ResidualMigration.traversability_is_the_residual`, cited.
+
+**Division, shear and inversion are separated exactly.** `lineReflect_comp_eq_rotBy` writes a plane
+direction as a Gaussian rational and proves the composite of two line reflections is the rotation
+`rot(v ū)`, with no angle and no square root; `rotBy_eq_id_iff` decides identity by one rational
+equation. **Kawasaki's condition is that equation**: `kawasaki_iff` proves the ordered product of a
+degree-`2n` vertex's crease reflections is the identity exactly when the accumulated turn
+`∏ (d_{2k} d̄_{2k−1})` has zero imaginary part, and the coordinate-ray vertex and the vertex with one
+ray moved to `(1, −1)` are the two exact instances. **Maekawa** is `maekawa_iff_mountain_count`:
+`M − V = ±2` is exactly `M = n ± 1`, decided over all sixteen degree-four assignments.
+`flat_foldability` **never affirms**: it returns a named local refutation or
+`NotDecidedWithinBound`, because the global layer ordering is NP-hard (Bern and Hayes 1996), cited.
+**Inversion** satisfies the exact rational law `‖inv x − inv y‖² = r⁴ ‖x − y‖² / (⟨x,x⟩⟨y,y⟩)`, from
+which cross-ratio invariance follows with every factor cancelling; that inversion in a sphere is a
+reflection in the conformal model is cited classical. **A shear is neither**: it changes a squared
+distance in every neighbourhood of every point, so `no_isometry_is_a_shear` — a shear is not a
+composition of reflections and so not a composition of folds, and it is the one of Brandon's three
+that deforms the lattice rather than folding it.
+
+**A fold preserves homology; a cut does not.** `fold_preserves_betti` is rank invariance under a
+relabelling of cells through `Matrix.rank_submatrix`, and `read_cellular_fold` enacts it on a worked
+complex through the existing Smith-normal-form owner, with every edge's exact squared length
+unchanged (`fold_preserves_intrinsic_length`). The cut instances are exact: an annulus cut along a
+radial arc becomes a disc and `b₁` goes `1 ↦ 0`; a disc cut along its diagonal becomes two and `b₀`
+goes `1 ↦ 2`. `read_cut` returns the **gluing data** reversing the cut needs, checks that regluing
+returns the original cell for cell, and compares the residuals: a fold's is one bit and the annulus
+cut's is twelve, so `residual_is_strictly_larger_than_a_folds` is the irreversibility statement,
+with `residual_injective_on_fibre` as its law. `severed_contact_family` projects the cut onto a
+contact family so the broken bonds come back as `physical_occurrence::ConstraintDelta`'s own typed
+delta and no second passage type is founded.
+
+**The crease pattern is a hinge framework and the backbone is rigid origami of a one-dimensional
+linkage.** `hinge_framework` returns `rigidity_receiver`'s own `RigidityJacobian` — the bar-joint
+model with each panel braced as a rigid body — so no second Jacobian exists; folding motions are
+`ker J` modulo the trivial motions and a locked pattern carries a self-stress. `BackboneChain` is
+`N`, `CA`, `C` per residue with fixed bond lengths, fixed bond angles and a declared planar `ω`
+carried as the `CA–CA` bar: `7r − 4` bars against `9r` coordinates, predicting `2(r − 1)` internal
+freedoms, **measured** and not assumed. Adding the within-window contacts removes dihedral motions,
+which is what holds the fold. A dihedral is reported **without an angle**: `ExactDihedral` carries
+the exact rational `cos²θ` with the signs of `cos θ` and `sin θ`, and no float appears anywhere in the
+owner. A `RamachandranChart` is a *declared* partition of that chart with a ground, refusing an
+empty partition and returning `OutsideTheChart` rather than imputing a residue it does not cover. A
+lattice-protein **pivot** is a rotation about a chain axis, which is two reflections: `PivotMove`
+applies them to a declared tail, checks every bond length exactly, and reports whether the tail is
+half-space separated rather than assuming it. **Unfolding at a tolerance** is `FoldCatastrophe`:
+`V_a(x) = x³/3 − a x` has two equilibria above zero, one at it and none below, counted by the Sturm
+owner over exact rational windows whose endpoints are proved not to be roots, with stability the
+exact sign of `V'' = 2x`. `CreaseModel` is the declared constitutive model — a polynomial hinge
+torque against a constant gravity load, with typed units through `quantity.rs` — whose held
+equilibrium disappears at the exact threshold `κ u₀²`. Brandon's lever arm is exact:
+`displacementSq_scales_with_lever` proves the squared offset of a point at distance `ℓ` from the
+crease is `4 ℓ² t² / (1 + t²)` under the rational parametrization `t = tan(θ/2)`, so the offset grows
+**linearly** with distance from the crease, with no small-angle expansion. What a calibrated gravity
+receiver would owe beyond that is stated on `CreaseModel` and graded `interpretation`.
+
+[established-bounded; measured] **The real instance.** On all three M5 RBX1 presentations, at the
+declared twelve-residue window, the free backbone carries `80` bars on `108` coordinates and the
+measured internal freedom is exactly `22` — the prediction `2(r − 1)` realized at the deposited
+coordinates, on the designed release and on both Protenix predictions alike. Adding the
+eight-angstrom within-window contacts at sequence separation three is where the three part company:
+the designed release's first twelve residues carry `90` contact bars and come down to `3` internal
+freedoms with a `71`-dimensional self-stress, while `ptxv2-free-rbx1-seed2` carries `26` and
+`ptxv2-cul1-rbx1-seed0` carries `27`, each coming down to `2` freedoms with a self-stress of `6` and
+`7`. **The designed window is far more compactly held than either prediction's**, and that is a
+measurement of the three presentations and not of the method. Every `ω` in every window has
+`cos²ω > 9/10`, so the model's planarity declaration is met by the deposits. The declared
+`(sign, cos²)` Ramachandran chart of the test covers two of the designed window's ten interior
+residues and none of either prediction's; the rest return `OutsideTheChart` and are not imputed. The
+two measured tests are `#[ignore]`d, CPU only, and took `364 s` in the unoptimized debug build; the
+laws they exercise are all checked without any fixture by the 48 synthetic tests beside them. Each
+of the its audited Lean declarations depends only on `propext`, `Classical.choice` and `Quot.sound`
+— one on `propext` alone — and none on `sorryAx`; the Rust owner carries exact `Rat`, `BigInt` and
+`BigUint` throughout and no float anywhere.
+
+[established-bounded] Six findings from building it, each changing the item as the paragraph above
+first stated it. **(1) The bar-joint model of a *planar* panel is infinitesimally flexible in three
+dimensions.** The plan read "a crease pattern is a hinge framework and is read by
+`rigidity_receiver`" as unconditional. Bracing a coplanar quadrilateral by every pair of its
+vertices gives rank five, not six: every in-plane bar is blind to the out-of-plane velocity
+components, so such a panel contributes exactly one spurious infinitesimal motion **and** one
+self-stress, although the panel is finitely rigid. The bar-joint reading is therefore exact for
+**triangulated** patterns, and `CreasePatternFraming::planar_panels` names the others rather than
+letting the count be read as a folding motion. **(2) A fold is not an isometry, and the exact size
+of its failure is the content.** The plan wrote "a fold preserves intrinsic curvature"; it preserves
+the *intrinsic* metric, because each closed side is rigid, but across the crease it changes every
+squared distance by exactly `4 σ(x) σ(y) / ⟨n,n⟩`, strictly negative between strict sides. That defect
+is what stacks the two layers, and the collision law is read on it. **(3) The homology statement
+that can be proved is the automorphism one; the quotient is a different theorem.**
+`fold_preserves_betti` is about a relabelling of cells, and the two-to-one fold of a sheet onto a
+fundamental domain is `fold_fibre`, whose residual is one bit. Both are stated and neither is
+presented as the other. **(4) Kawasaki needs no angle at all.** Stated through the reflection
+product it is one exact rational equation in the crease directions, which is also exactly the
+statement that a rotation is two reflections — so Brandon's "division, shear, inversion are all
+kinda the same thing" is *proved* for two of the three and *refuted* for the third. **(5) The
+backbone's prediction is `2(r − 1)` and not `2r`.** The two terminal atoms each have a flap about
+the axis of their own two bars, but each such flap differs from the corresponding dihedral by a
+rigid motion of the whole window, so it is not a second freedom. The prediction is measured against
+the deposited coordinates rather than assumed. **(6) On a real backbone a pivot is a rotation
+applied to a chain tail and not a fold of a half-space.** The plan's "lattice-protein pivot moves
+are literal reflections" is right about the transformation and wrong about its domain: `PivotMove`
+applies the same two reflections about the same axis, every bond length survives exactly and the two
+axis atoms are fixed, but on the designed M5 window 21 of the 36 atoms sit on the side of the first
+crease that the tail/head split does not put them on, so a pivot **is** a fold only when the tail
+happens to be half-space separated. `PivotReading::is_a_half_space_fold` measures that on the actual
+configuration rather than assuming it, and names the atoms where the two disagree.
+
+[established-bounded; formal-checked; implemented-exact] **T7 — The junction law. Returned.**
+Owners: [`Transport/JunctionLaw.lean`](../../formal/elementary-holonics/ElementaryHolonics/Transport/JunctionLaw.lean)
+(namespace `Soma.Holonics.Transport.JunctionLaw`) and
+[`junction_law.rs`](../../crates/holonic-engine/src/junction_law.rs) with `junction_law/tests.rs`.
+Nothing is founded that an existing owner carries: the complex, the coboundary, the declared metric
+and the codifferential are `hodge_receiver`'s, the Betti numbers and torsion are
+`rebase_invariants`'s Smith normal form, the orientation reading is
+`contact_gluing::OrientationReading`, the pullback is `Foundation/Lineage.lean::AddressedPassage.Join`
+and the rung is `relation_ladder`'s.
+
+**The joint is one object in three pictures, and each picture is a theorem over an owner that
+already exists.** *Tower:* `join_is_exactly_the_compatible_pairs` proves `AddressedPassage.Join` is
+**exactly** the pullback of compatible pairs — no pair without the joining equality and none with it
+missing — and `noSharedBoundary_isEmpty_join` is the empty case, whose span-level form is
+`Transport/WorldTube.lean::openGap_has_no_joined_occurrence`. Where the two charts admit no common
+refinement (`Foundation/ContinuingTower.lean::twoCharts_no_common_refinement`) the comparison is
+undefined and the connection is a `Transport/ContinuingTube.lean::Wormhole`, which the executable
+`Joint` returns as its own arm rather than as a failed join. *Tube:* a valence-2 station is the
+serial join whose occurrence type **is** that pullback (`ClockedSpan.comp`); a **junction** is a
+station of valence at least three, and `check_junction` computes the valence from the incidence and
+the Euler contribution `2 − valence` from it — `0` for the serial joint, `−1` for the trivalent one.
+*Staircase:* a joint is a spline knot whose order is the lowest derivative that jumps; that object
+is **T8's**, this owner computes no derivative, and `JointOrder` exists only so a T8 consumer has
+the field to fill.
+
+**One law, and both halves are `d` and its metric adjoint at the interface.** The intrinsic half
+`[[ι* u]] = 0` is exactness of the Mayer–Vietoris map: two side fields descend to one field on the
+union **exactly when** their pullbacks to the shared cells agree (`descend_restricts_right` with
+`no_descent_of_nonzero_jump`), so tangential continuity is not a constraint imposed at a junction —
+it is what being one cochain across it means. The extrinsic half is `normalJump_eq_divergence`:
+splitting the flux cells into the two sides splits the divergence into the two sides' outward normal
+fluxes, whose sum is `δ f` and nothing else, so `[[n · flux]] = σ` **is** `δ f = σ`
+(`balanced_iff_divergence`). `discrete_gauss` is the summation-by-parts identity the balance
+integrates by — `Foundation/HodgeReceiver.lean::codiff₀_adjoint` at an indicator — and `tellegen` is
+that same identity at a potential and a balanced flux, which is the junction's exact energy ledger.
+The codimension-2 compatibility is `codiff_comp_zero`: `δ ∘ δ = 0`, so the junction sources around a
+vertex link close, and `no_interface_flux_for_a_nonclosing_source` returns the obstruction whole
+with the annihilating covector rather than repairing it. `chi_glue_along_zero` gives
+`χ(A ∪_{S¹} B) = χ(A) + χ(B)` and `each_junction_costs_one_euler` its consequence: **each junction
+costs one unit of Euler characteristic**, and orientability is the extra `Z/2`, proved as the
+telescoping of a `Z/2` dual-graph holonomy (`walkHolonomy_telescopes`, `closed_walk_holonomy_one`)
+with the reversing loop exhibited (`no_consistent_orientation_on_a_reversing_loop`) and the
+determinant `(−1)^k` of a circuit of `k` reflections (`orientation_reversing_iff_odd`). The
+tube-level form of that obstruction is `flipCircuit_carries_no_invariant_end`, cited. The
+half-twist's identification with `√z` and `Re s = 1/2` keeps the grade the 2026-08-16 record gives
+it — `interpretation` for the correspondence, on `proved-standard` parts — and is not upgraded here.
+
+**The instances, each exact and each naming its scope.** **A finite circuit**: KVL is exactness, KCL
+is the divergence, Ohm's law is the declared conductance **as the Hodge metric**, `Δ₀ v = s` is the
+weighted graph Laplacian, and the circulating currents are the harmonic 1-cochains of dimension
+`b₁` — read through `hodge_receiver`, which cross-checks the harmonic dimension against the integral
+Betti number at every reading. On a four-node five-branch network the solve returns the complete
+affine fibre with the gauge carried, the currents are proved independent of the representative, an
+injection that does not sum to zero returns the annihilating covector, and Tellegen balances at
+exactly `1/2` of the declared power unit on both sides. **A finite Maxwell-type interface**:
+tangential continuity of the wave covector gives `n₁² sin²θ₁ = n₂² sin²θ₂` as an exact rational
+identity in squares (`snell_squared`), total internal reflection is the exact sign condition
+`|kᵗ|² > n₂² κ²` returning a typed deficit and never a `NaN`
+(`no_transmitted_covector_beyond_the_critical_angle`), and on a two-material chain the normal
+displacement jumps by the surface charge with the permittivity as the declared metric weight. The
+law is **grade-parametric**, so the tangential field jumping by a surface current along a crease is
+the *same* `check_junction` one grade up, on a two-triangle complex whose shared edge is the joint. **A
+scalar conservation law with the exact polynomial Burgers flux**: `s = [[f]]/[[u]]` is exactly
+rational, `s [[u]] = [[f]]` holds as a dimensional identity as well as a numerical one, and the Lax
+condition is the exact inequality that admits a compression and refuses an expansion shock. **A
+Newtonian thin sheet**: the potential is continuous and its normal derivative jumps by the declared
+source, in units where the coupling `4πG` **is** the declared unit, so no transcendental constant is
+approximated anywhere; it is not an instance of the Israel conditions and says so.
+`israel_junction_conditions` states those, grades them `proved-standard`, cites Israel 1966 and
+names what a faithful instance would owe — a Lorentzian metric, an embedded hypersurface, its
+extrinsic curvature and the Gauss–Codazzi relations, none of which this repository carries. **A film
+junction**: Plateau's line law is proved as an equivalence and computed on an exact rational
+configuration. 42 tests, 43 audited Lean declarations depending only on `propext`,
+`Classical.choice` and `Quot.sound` — several on fewer and three on none — and none on `sorryAx`. Every
+value is an exact `Rat` or exact integer and a test scans both sources line by line for a float
+name.
+
+[established-bounded] Six findings from building it, each changing the item as the paragraph above
+first stated it. **(1) The pair of pants and the Möbius shorts do not differ only in
+orientability.** They agree at every receiver reading the *surface's own* homology — a compact
+surface with boundary is homotopy equivalent to a wedge of circles whatever its orientability, so
+both are `b = (1, 2, 0)` over `Z` with no torsion and the same over `F₂` — and are separated by
+**two** receivers: the boundary count (three against one) and the orientation bit. The pair
+separated by orientability **alone** is the **one-holed torus** against the Möbius shorts, and that
+instance is built: same `χ = −1`, same Betti numbers over both fields, same torsion, same single
+boundary circle, and `compare_surfaces` returns exactly one separator. **(2) The mod-2 against
+rational Betti difference exhibits non-orientability only for a *closed* surface.** The torus reads
+`(1, 2, 1)` torsion-free and the Klein bottle `(1, 1, 0)` with `Z/2` torsion and `F₂` Betti
+`(1, 2, 1)`; with boundary the two fields agree and exhibit nothing, and the reading that does is
+`contact_gluing::OrientationReading`'s exhibited reversing seam. **(3) Tellegen's theorem is not a
+second law: it is the adjoint identity at a balanced flux**, so the receiver atlas's `EnergyBalance`
+contract has a computed row for this receiver with no new machinery, and `GluingWithInterfaceCoupling`
+has one too — the declared metric **is** the interface term, and changing a permittivity moves the
+glued reading while both sides' fields stay exactly what they were. **(4) Plateau's `120°` law is
+forced by the balance and the tetrahedral law is not.** Three conormals of equal squared tension
+balance **iff** every pairwise product is `−T/2`, both directions proved; for four, the balance
+alone forces only that the six products sum to `−2T`, and `(a, −a, b, −b)` balances at equal tension
+without being tetrahedral. The vertex law is an extra declaration; the line law is a theorem.
+**(5) The entropy condition is the junction's irreversibility and it belongs to the
+`(junction, direction)` pair.** Reversing the traversal reverses the verdict while the
+Rankine–Hugoniot balance itself is symmetric — which is the 2026-08-16 record's own sentence about
+the reflection coefficient arriving from fluids. **(6) The metric is the constitutive law.**
+Conductance, permittivity and the unit sheet weight are one declared object, so changing the
+material changes `hodge_receiver`'s metric and nothing else in this owner moves. That is the shape
+of the interface term the receiver atlas names as absent for the physicochemical receiver; it is not
+that receiver's term, and the atlas row for it is unchanged.
 
 [definition] **T8 — The jet tower and compression as a staircase.** The jet ladder `J^0 ← J^1 ← …`
 is a `Tower` whose restriction forgets the top derivative; every consistent jet sequence has a
