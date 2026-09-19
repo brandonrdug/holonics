@@ -229,6 +229,14 @@ pub struct AtomOccurrence {
     pub y: DecimalToken,
     /// The `z` coordinate token.
     pub z: DecimalToken,
+    /// `_atom_site.occupancy`, when the presentation carries that column and the row a value.
+    /// A `.` or `?` cell is the format's own absent value and is retained as `None`.
+    #[serde(default)]
+    pub occupancy: Option<DecimalToken>,
+    /// `_atom_site.B_iso_or_equiv`, under the same rule. Exterior testimony about the deposit; no
+    /// reading in this module consumes it.
+    #[serde(default)]
+    pub temperature_factor: Option<DecimalToken>,
 }
 
 impl AtomOccurrence {
@@ -384,6 +392,19 @@ impl StructurePresentation {
         let element_column = optional("_atom_site.type_symbol");
         let alternate_column = optional("_atom_site.label_alt_id");
         let entity_column = optional("_atom_site.label_entity_id");
+        let occupancy_column = optional("_atom_site.occupancy");
+        let temperature_column = optional("_atom_site.B_iso_or_equiv");
+        // The format's absent cell, in an optional numeric column, is no value rather than a
+        // malformed one.
+        let optional_decimal = |cell: &str| -> Result<Option<DecimalToken>, IntakeRefusal> {
+            // `tokenize` has already removed a cell's quoting, for every column, so a quoted `'.'`
+            // and the bare absent cell arrive identically and both read as absent here. Keeping
+            // that distinction would be a change to the tokenizer's contract, not to this column.
+            match cell {
+                "." | "?" => Ok(None),
+                present => DecimalToken::parse(present).map(Some),
+            }
+        };
 
         // `label_asym_id -> label_seq_id -> (monomer, atoms in file order)`. Both maps are ordered,
         // so chains are addressed by label and residues ascend by the source's own ordinal.
@@ -405,6 +426,14 @@ impl StructurePresentation {
                 x: DecimalToken::parse(&row[x_column])?,
                 y: DecimalToken::parse(&row[y_column])?,
                 z: DecimalToken::parse(&row[z_column])?,
+                occupancy: match occupancy_column {
+                    Some(at) => optional_decimal(&row[at])?,
+                    None => None,
+                },
+                temperature_factor: match temperature_column {
+                    Some(at) => optional_decimal(&row[at])?,
+                    None => None,
+                },
             };
             maximum_decimal_places = maximum_decimal_places.max(atom.decimal_places());
             let chain_label = unquote(&row[chain_column]).to_owned();

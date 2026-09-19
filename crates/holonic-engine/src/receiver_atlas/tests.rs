@@ -1294,7 +1294,7 @@ fn the_spectral_and_topological_atlas_cannot_separate_two_non_isomorphic_complex
 fn the_contract_ledger_recomputes_every_satisfied_row() {
     let entries = ledger_entries();
     let ledger = contract_ledger();
-    assert_eq!(ledger.len(), 24);
+    assert_eq!(ledger.len(), 30);
     assert_eq!(entries.len(), ledger.len());
 
     let mut satisfied = 0usize;
@@ -1341,9 +1341,9 @@ fn the_contract_ledger_recomputes_every_satisfied_row() {
         entries.iter().filter(|(_, _, entry)| entry.is_recomputed()).count(),
         "every recomputed row is Satisfied and every Satisfied row is recomputed"
     );
-    assert_eq!(satisfied, 7, "the seven recomputed rows");
+    assert_eq!(satisfied, 10, "the ten recomputed rows");
 
-    // The seven rows that are verified by computation, named — and each one is a
+    // The ten rows that are verified by computation, named — and each one is a
     // `ContractEntry::Recomputed` in the table, not a literal.
     for (receiver, contract) in [
         ("R1", AtlasContract::RebaseEquivariance),
@@ -1353,6 +1353,9 @@ fn the_contract_ledger_recomputes_every_satisfied_row() {
         ("R4", AtlasContract::RebaseEquivariance),
         ("R4", AtlasContract::SourceAccountability),
         ("R5", AtlasContract::SourceAccountability),
+        ("B7phys", AtlasContract::RebaseEquivariance),
+        ("B7phys", AtlasContract::SourceAccountability),
+        ("B7phys", AtlasContract::EnergyBalance),
     ] {
         let row = ledger
             .iter()

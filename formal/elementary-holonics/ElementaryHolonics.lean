@@ -18,6 +18,7 @@ import ElementaryHolonics.Foundation.Bridge
 import ElementaryHolonics.Foundation.IwasawaTower
 import ElementaryHolonics.Foundation.ExteriorIntake
 import ElementaryHolonics.Foundation.PhysicalOccurrence
+import ElementaryHolonics.Foundation.PhysicochemicalReceiver
 import ElementaryHolonics.Foundation.RigidityReceiver
 import ElementaryHolonics.Foundation.HodgeReceiver
 import ElementaryHolonics.Foundation.TopologicalReceiver
@@ -47,6 +48,7 @@ import ElementaryHolonics.Foundation.DeviceLaunchLaw
 import ElementaryHolonics.Foundation.SectionLayout
 import ElementaryHolonics.Foundation.Standing
 import ElementaryHolonics.Foundation.DesignSelection
+import ElementaryHolonics.Foundation.EvaluationDiscipline
 import ElementaryHolonics.Computation.MachineLearningChart
 import ElementaryHolonics.Computation.MachineLearningStrictLift
 import ElementaryHolonics.Computation.SituatedMachineLearning
@@ -270,6 +272,7 @@ import ElementaryHolonics.Millennium.HolonicQuadraticMomentCondensation
 import ElementaryHolonics.Millennium.HolonicGeneratedPortMomentPassage
 import ElementaryHolonics.Millennium.HolonicSensoryWorldTube
 import ElementaryHolonics.Transport.ContinuingTube
+import ElementaryHolonics.Transport.ArtifactRelease
 import ElementaryHolonics.Millennium.HolonicRankFourInteractionPlanes
 import ElementaryHolonics.Millennium.HolonicMaxwellPropagation
 import ElementaryHolonics.Millennium.HolonicDiscreteMaxwellOperator

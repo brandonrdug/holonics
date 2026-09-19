@@ -1341,3 +1341,104 @@ fn a_remounted_receiver_width_is_rechecked() {
         "a point witness with a nonzero diameter is refused"
     );
 }
+
+// ---------------------------------------------------------------------------------------------
+// T5 (a) — the horizon has two coordinates, and the width over already-read faces
+// ---------------------------------------------------------------------------------------------
+
+fn declared_horizon(longitudinal: usize, index: usize) -> Horizon {
+    Horizon::declare(longitudinal, index).expect("a horizon inside both ceilings")
+}
+
+/// `Foundation/ReceiverRelease.lean::horizonWithin_is_not_total`: the two coordinates are a product
+/// order and not one scale, so "how far into the horizon" is a pair and never a number.
+#[test]
+fn the_horizon_has_two_coordinates_that_are_not_one_scale() {
+    let along = declared_horizon(2, 0);
+    let across = declared_horizon(0, 2);
+    assert!(!along.contains(&across));
+    assert!(!across.contains(&along));
+    assert!(!along.comparable(&across));
+    assert!(declared_horizon(2, 2).contains(&along));
+    assert!(declared_horizon(2, 2).contains(&across));
+    assert!(along.is_longitudinal_only());
+    assert!(!across.is_longitudinal_only());
+    assert_eq!(
+        Horizon::longitudinal_only(3).expect("inside the ceiling"),
+        declared_horizon(3, 0)
+    );
+}
+
+/// A declared horizon above either ceiling is a typed refusal, and the `Deserialize` route runs the
+/// same checks: a forged horizon cannot be remounted.
+#[test]
+fn a_horizon_above_either_ceiling_is_refused_and_no_wire_bypasses_it() {
+    assert!(matches!(
+        Horizon::declare(usize::MAX, 0),
+        Err(WidthRefusal::HorizonCeiling { .. })
+    ));
+    assert!(matches!(
+        Horizon::declare(0, INDEX_HORIZON_CEILING + 1),
+        Err(WidthRefusal::IndexHorizonCeiling { .. })
+    ));
+    let forged = format!(
+        "{{\"longitudinal\":0,\"index\":{}}}",
+        INDEX_HORIZON_CEILING + 1
+    );
+    let refused: Result<Horizon, _> = serde_json::from_str(&forged);
+    assert!(
+        refused.is_err(),
+        "a wire horizon above the ceiling is refused by the validating TryFrom"
+    );
+    let admitted: Horizon =
+        serde_json::from_str("{\"longitudinal\":2,\"index\":1}").expect("an admissible horizon");
+    assert_eq!(admitted, declared_horizon(2, 1));
+}
+
+/// `width_over_readings` is `width_enumerated`'s diameter on faces that were read elsewhere — the
+/// two-axis horizon of a tube is the first consumer — and the two agree exactly, witness included.
+#[test]
+fn the_width_over_readings_is_the_enumerated_width() {
+    let family = CompatibleFamily::enumerated(
+        "three compatible states",
+        vec![
+            vec![integer(1), integer(0)],
+            vec![integer(4), integer(0)],
+            vec![integer(2), integer(0)],
+        ],
+    )
+    .expect("a family inside the ceiling");
+    let reading = LinearReading {
+        receiver: "the first coordinate".to_owned(),
+        matrix: matrix(&[&[1, 0]]),
+    };
+    let enumerated =
+        width_enumerated(&reading, &family, DiameterNorm::Supremum).expect("an exact width");
+    let faces = vec![
+        ExactFace::Vector(vec![integer(1)]),
+        ExactFace::Vector(vec![integer(4)]),
+        ExactFace::Vector(vec![integer(2)]),
+    ];
+    let over_readings = width_over_readings(
+        "the first coordinate",
+        "three compatible states",
+        &faces,
+        DiameterNorm::Supremum,
+    )
+    .expect("an exact width");
+    assert_eq!(enumerated.diameter(), over_readings.diameter());
+    assert_eq!(enumerated.diameter(), &integer(3));
+    assert_eq!(enumerated.attaining(), over_readings.attaining());
+    assert_eq!(enumerated.read(), over_readings.read());
+    assert!(matches!(
+        width_over_readings("r", "l", &[], DiameterNorm::Supremum),
+        Err(WidthRefusal::EmptyFamily)
+    ));
+    let too_many: Vec<ExactFace> = (0..=(FAMILY_CEILING + 1))
+        .map(|value| ExactFace::Count(BigInt::from(value as i64)))
+        .collect();
+    assert!(matches!(
+        width_over_readings("r", "l", &too_many, DiameterNorm::Supremum),
+        Err(WidthRefusal::FamilyCeiling { .. })
+    ));
+}

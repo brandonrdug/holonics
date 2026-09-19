@@ -2381,3 +2381,320 @@ fn synthetic_designs_by_exact_perturbation_of_the_mounted_contact_complex() {
         AdmittedTransformation::Mutation { site: 1, .. }
     ));
 }
+
+// ---------------------------------------------------------------------------------------------
+// B10 — the cost cascade, read for what it costs
+// ---------------------------------------------------------------------------------------------
+
+/// A per-candidate cost meter that charges a declared number of decode steps.
+fn meter(presentation: &'static str, steps: u64) -> DesignCost {
+    std::sync::Arc::new(move |design: &Design| CostReceipt {
+        presentation: format!("{presentation} at design {:?}", design.id),
+        bytes: Counted::derived(0_u32, "this stage occupies no presentation of its own"),
+        decode_work: Counted::measured(steps, "the declared per-candidate step count of this stage"),
+        update_work: Counted::derived(0_u32, "this stage re-presents nothing"),
+        certificate_work: Counted::derived(steps, "one comparison per step"),
+        residual: Counted::derived(0_u32, "this stage drops nothing"),
+    })
+}
+
+/// The cheap coarse test: admit a design whose worst `interface` reading is at least `40`.
+fn cheap_at_least(bound: i64) -> DesignTest {
+    std::sync::Arc::new(move |design: &Design| {
+        design
+            .reading("interface", "assayA")
+            .and_then(ReceiverReading::value)
+            .is_some_and(|value| value.lower >= rat(bound))
+    })
+}
+
+/// The worked cascade family: three designs whose `interface` readings are 39, 40 and 41.
+fn cascade_family() -> DesignFamily {
+    let environments = two_environments();
+    let (a, b) = (
+        environments[0].environment().clone(),
+        environments[1].environment().clone(),
+    );
+    let classes = [ContactClass::Inside, ContactClass::Outside];
+    let design = |id: u64, monomer: &str, value: i64| {
+        synthetic_design(
+            id,
+            monomer,
+            &[("assayA", &a, &classes), ("assayB", &b, &classes)],
+            &[
+                ("affinity", "assayA", read(10)),
+                ("affinity", "assayB", read(10)),
+                ("interface", "assayA", read(value)),
+                ("interface", "assayB", read(value)),
+            ],
+        )
+    };
+    DesignFamily::declare(
+        vec![
+            design(1, "ALA", 39),
+            design(2, "GLY", 40),
+            design(3, "SER", 41),
+        ],
+        environments,
+        vec![
+            receiver("affinity", Sense::SmallerIsBetter),
+            receiver("interface", Sense::GreaterIsBetter),
+        ],
+    )
+    .expect("three distinct objects found a family")
+}
+
+/// **Lean: `certified_cascade_preserves_the_frontier`.** With every discarding stage certified, the
+/// cascade keeps exactly what the full evaluation keeps.
+#[test]
+fn a_certified_cascade_keeps_exactly_what_the_full_evaluation_keeps() {
+    let family = cascade_family();
+    let all: Vec<DesignId> = family.designs().iter().map(|design| design.id).collect();
+    let probe: Vec<Design> = family.designs().to_vec();
+    // The cheap reading refuses at 40 and the expensive one at 41: the cheap reading therefore
+    // refuses only where the expensive one does, which is the certificate.
+    let stage = CascadeStage::certified_bound(
+        "coarse interface filter",
+        "the synthetic cascade fixture",
+        "the cheap reading's admission threshold is below the expensive receiver's, so a cheap \
+         refusal certifies an expensive refusal",
+        StageReadings {
+            cheap: cheap_at_least(40),
+            expensive: cheap_at_least(41),
+            cheap_cost: meter("cheap coarse filter", 1),
+            expensive_cost: meter("expensive interface receiver", 100),
+        },
+        &probe,
+    )
+    .expect("the certificate holds at every probe candidate");
+    assert!(matches!(stage.law(), DiscardLaw::CertifiedBound(_)));
+    let DiscardLaw::CertifiedBound(certificate) = stage.law() else {
+        unreachable!()
+    };
+    assert_eq!(certificate.probe(), 3, "the certificate names where it was checked");
+
+    let cascade = CostedCascade::declare(vec![stage]).expect("one stage founds a cascade");
+    let cascaded = cascade.run(&family, &all).expect("the cascade runs");
+    let full = cascade
+        .full_evaluation(&family, &all)
+        .expect("the full evaluation runs");
+    assert!(
+        survivors_agree(&cascaded, &full),
+        "a certified cheap filter changes what is computed and never what is kept"
+    );
+    assert_eq!(cascaded.survivors, vec![DesignId(3)]);
+
+    // And it saves: the expensive receiver ran on one candidate instead of three.
+    let saving = cost_saving(&cascaded, &full);
+    let decode = saving
+        .iter()
+        .find(|axis| axis.axis == Axis::DecodeWork)
+        .expect("the decode axis");
+    assert_eq!(
+        decode.direction,
+        CostDirection::Saved,
+        "the cascade cost strictly less decode work: {decode:?}"
+    );
+    assert_eq!(
+        decode.full,
+        num_bigint::BigUint::from(300_u32),
+        "the full evaluation ran the 100-step receiver on all three designs"
+    );
+    assert_eq!(
+        decode.cascade,
+        num_bigint::BigUint::from(203_u32),
+        "the cascade ran the 1-step filter on all three and the 100-step receiver on the two the \
+         filter admitted, where the full evaluation ran the 100-step receiver on all three"
+    );
+}
+
+/// **Lean: `proxyStage_is_not_certified` and `uncertified_proxy_loses_a_frontier_design`.** An
+/// uncertified proxy discards nothing under the cascade's law; admitting its discard loses a design
+/// the full evaluation keeps.
+#[test]
+fn an_uncertified_proxy_discards_nothing_and_loses_a_design_when_it_is_let_to() {
+    let family = cascade_family();
+    let all: Vec<DesignId> = family.designs().iter().map(|design| design.id).collect();
+    // A cheap scalar proxy that refuses below 41 while the expensive receiver admits from 40: the
+    // cheap reading refuses where the expensive one admits, so it is no bound at all.
+    let stage = CascadeStage::uncertified_proxy(
+        "a cheap scalar proxy for the interface receiver",
+        "the synthetic cascade fixture, with no certificate",
+        StageReadings {
+            cheap: cheap_at_least(41),
+            expensive: cheap_at_least(40),
+            cheap_cost: meter("cheap scalar proxy", 1),
+            expensive_cost: meter("expensive interface receiver", 100),
+        },
+    )
+    .expect("a stated proxy");
+    assert!(matches!(stage.law(), DiscardLaw::UncertifiedProxy { .. }));
+    assert!(!stage.law().licenses_a_discard());
+
+    let cascade = CostedCascade::declare(vec![stage]).expect("a cascade");
+    let cascaded = cascade.run(&family, &all).expect("the cascade runs");
+    let full = cascade
+        .full_evaluation(&family, &all)
+        .expect("the full evaluation runs");
+    assert!(
+        survivors_agree(&cascaded, &full),
+        "the law does not let an uncertified proxy discard, so nothing is lost"
+    );
+    assert_eq!(
+        cascaded.stages[0].would_have_discarded,
+        vec![DesignId(1), DesignId(2)],
+        "every discard it would have made is recorded rather than taken"
+    );
+
+    let admitted = cascade
+        .run_admitting_every_proxy_discard(&family, &all)
+        .expect("the exhibition runs");
+    assert!(
+        !survivors_agree(&admitted, &full),
+        "letting the uncertified proxy discard loses a design the full evaluation keeps"
+    );
+    assert_eq!(admitted.survivors, vec![DesignId(3)]);
+    assert_eq!(full.survivors, vec![DesignId(2), DesignId(3)]);
+}
+
+/// A certificate refuted at a probe candidate is never minted: [`Certified`] has no other
+/// constructor, so the stage cannot exist.
+#[test]
+fn a_certificate_refuted_at_a_probe_candidate_is_not_minted() {
+    let family = cascade_family();
+    let probe: Vec<Design> = family.designs().to_vec();
+    let refusal = CascadeStage::certified_bound(
+        "a proxy claiming to be a bound",
+        "the synthetic cascade fixture",
+        "a law the data refutes",
+        StageReadings {
+            cheap: cheap_at_least(41),
+            expensive: cheap_at_least(40),
+            cheap_cost: meter("cheap", 1),
+            expensive_cost: meter("expensive", 100),
+        },
+        &probe,
+    )
+    .expect_err("the cheap reading refuses design 2, which the expensive receiver admits");
+    assert!(matches!(
+        refusal,
+        SelectionRefusal::CertificateRefuted {
+            design: DesignId(2),
+            ..
+        }
+    ));
+}
+
+/// A hard-constraint stage is certified by construction, runs once and is charged once.
+#[test]
+fn a_hard_constraint_stage_is_certified_and_charged_once() {
+    let family = cascade_family();
+    let all: Vec<DesignId> = family.designs().iter().map(|design| design.id).collect();
+    let constraint = HardConstraint::declare(
+        "the interface receiver reads at least 40",
+        "the synthetic cascade fixture",
+        |design: &Design| {
+            design
+                .reading("interface", "assayA")
+                .and_then(ReceiverReading::value)
+                .is_some_and(|value| value.lower >= rat(40))
+        },
+    )
+    .expect("a stated constraint");
+    let stage = CascadeStage::hard_constraint(constraint, meter("hard constraint", 2));
+    assert!(matches!(stage.law(), DiscardLaw::HardConstraint { .. }));
+    assert!(stage.law().licenses_a_discard());
+    assert!(stage.cheap_is_expensive());
+
+    let cascade = CostedCascade::declare(vec![stage]).expect("a cascade");
+    let run = cascade.run(&family, &all).expect("the cascade runs");
+    assert_eq!(run.survivors, vec![DesignId(2), DesignId(3)]);
+    assert_eq!(
+        run.total.count(Axis::DecodeWork),
+        &num_bigint::BigUint::from(6_u32),
+        "two steps for each of the three candidates, charged once and not twice"
+    );
+    assert_eq!(run.stages[0].discarded.len(), 1);
+    assert_eq!(run.stages[0].discarded[0].law, "hard-constraint");
+}
+
+/// A cascade with a repeated stage name is refused: a discard must be able to name the stage that
+/// made it.
+#[test]
+fn a_repeated_cascade_stage_name_is_refused() {
+    let stage = |name: &'static str| {
+        CascadeStage::uncertified_proxy(
+            name,
+            "a ground",
+            StageReadings {
+                cheap: cheap_at_least(0),
+                expensive: cheap_at_least(0),
+                cheap_cost: meter("cheap", 1),
+                expensive_cost: meter("expensive", 1),
+            },
+        )
+        .expect("a stated proxy")
+    };
+    assert!(matches!(
+        CostedCascade::declare(vec![stage("one"), stage("one")]),
+        Err(SelectionRefusal::CascadeStageNameRepeated { .. })
+    ));
+    assert!(matches!(
+        CostedCascade::declare(Vec::new()),
+        Err(SelectionRefusal::EmptyFamily)
+    ));
+}
+
+/// **One cascade, two readings.** The decision reading of `DesignFamily::cascade` and the cost
+/// reading of `CostedCascade::run` agree on who survives the hard-constraint stage.
+#[test]
+fn the_decision_reading_and_the_cost_reading_are_one_cascade() {
+    let family = cascade_family();
+    let all: Vec<DesignId> = family.designs().iter().map(|design| design.id).collect();
+    let admits = |design: &Design| {
+        design
+            .reading("interface", "assayA")
+            .and_then(ReceiverReading::value)
+            .is_some_and(|value| value.lower >= rat(40))
+    };
+    let decision = family.admit(&[HardConstraint::declare(
+        "the interface receiver reads at least 40",
+        "the synthetic cascade fixture",
+        admits,
+    )
+    .expect("a stated constraint")]);
+    let cost = CostedCascade::declare(vec![CascadeStage::hard_constraint(
+        HardConstraint::declare(
+            "the interface receiver reads at least 40",
+            "the synthetic cascade fixture",
+            admits,
+        )
+        .expect("a stated constraint"),
+        meter("hard constraint", 2),
+    )])
+    .expect("a cascade")
+    .run(&family, &all)
+    .expect("the cascade runs");
+    assert_eq!(
+        decision.admitted, cost.survivors,
+        "the same stage decides the same survivors; the second reading only says what it cost"
+    );
+}
+
+/// **A bound checked at no design is not a checked bound.** An empty probe passed the certificate
+/// loop vacuously and minted a certificate for a cheap test that discards everything the expensive
+/// receiver admits. It is now refused by name, and the same readings over a nonempty probe are
+/// refuted by the first design.
+#[test]
+fn a_certified_bound_over_an_empty_probe_is_refused() {
+    let readings = || StageReadings {
+        cheap: std::sync::Arc::new(|_: &Design| false),
+        expensive: std::sync::Arc::new(|_: &Design| true),
+        cheap_cost: std::sync::Arc::new(|_: &Design| empty_receipt("cheap")),
+        expensive_cost: std::sync::Arc::new(|_: &Design| empty_receipt("expensive")),
+    };
+    assert!(matches!(
+        CascadeStage::certified_bound("bogus", "a ground", "a claimed law", readings(), &[]),
+        Err(SelectionRefusal::EmptyCertificateProbe { .. })
+    ));
+}

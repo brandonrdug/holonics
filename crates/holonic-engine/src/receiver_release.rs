@@ -26,6 +26,23 @@
 //! | `future_stable_event_with_unstable_timing` | `an_event_is_future_stable_while_its_timing_is_not` |
 //! | `timingInsufficiency` | `the_coarse_event_reading_does_not_determine_the_timing` |
 //!
+//! Item **T5** of `docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md` adds
+//! the horizon's second coordinate. The same Lean owner carries it, and the tube-side consumer is
+//! `crates/holonic-engine/src/continuing_tube.rs`.
+//!
+//! | Lean | Rust |
+//! |---|---|
+//! | `Horizon`, `Horizon.longitudinalOnly`, `Horizon.Within` | [`Horizon`], [`Horizon::longitudinal_only`], [`Horizon::contains`] |
+//! | `horizonWithin_is_not_total` | `the_horizon_has_two_coordinates_that_are_not_one_scale`; [`Horizon`] derives no `Ord` |
+//! | `ChainDistanceAtMost`, `chainDistance_symm`, `chainDistance_trans` | `continuing_tube::index_distance` and `continuing_tube::IndexReading` |
+//! | `Comparable`, `chainDistance_orderDual` | `continuing_tube::IndexDirection`, which names the direction the same distance is walked in |
+//! | `TwoAxisReach`, `twoAxisWidth` | `continuing_tube::{HorizonReach, two_axis_width}` |
+//! | `twoAxisWidth_mono`, `twoAxisWidth_mono_longitudinal`, `twoAxisWidth_mono_index` | `the_two_axis_width_is_monotone_in_each_coordinate` |
+//! | `twoAxisWidth_at_index_zero_is_the_longitudinal_width`, `longitudinal_case_is_the_existing_width_law` | `the_longitudinal_only_case_is_the_existing_width` |
+//! | `coarseReach`, `coarse_width_eq_zero`, `fineFibre` | `continuing_tube::{IndexDirection, Plurality}` |
+//! | `looking_toward_the_coarse_is_determined_and_toward_the_fine_is_plural` | `the_reach_is_a_face_toward_the_coarse_and_a_fibre_toward_the_fine` |
+//! | `width` over already-read faces | [`width_over_readings`], which [`width_enumerated`] now is |
+//!
 //! # The object
 //!
 //! [definition] For a **compatible family** — the preimage/observation fibre of
@@ -961,26 +978,7 @@ pub fn width_enumerated(
         .iter()
         .map(|member| reading.read(member))
         .collect::<Result<Vec<_>, _>>()?;
-    let mut diameter = Rat::zero();
-    let mut attaining = WidthWitness::Point;
-    for left in 0..faces.len() {
-        for right in (left + 1)..faces.len() {
-            let separation = faces[left].separation(&faces[right], norm)?;
-            if separation > diameter {
-                diameter = separation;
-                attaining = WidthWitness::Pair { left, right };
-            }
-        }
-    }
-    Ok(ReceiverWidth {
-        schema: RECEIVER_WIDTH_SCHEMA.to_owned(),
-        receiver: reading.name().to_owned(),
-        lineage: family.lineage().to_owned(),
-        norm,
-        diameter,
-        attaining,
-        read: faces.len(),
-    })
+    width_over_readings(reading.name(), family.lineage(), &faces, norm)
 }
 
 /// **The width of an exact linear reading over an enclosed compatible family.**
@@ -1033,6 +1031,175 @@ pub fn width(
             receiver: reading.name().to_owned(),
         })
     }
+}
+
+// -------------------------------------------------------------------------------------------
+// T5 (a) — the horizon has two coordinates
+// -------------------------------------------------------------------------------------------
+
+/// The ceiling on the index coordinate of a declared two-axis [`Horizon`].
+///
+/// [definition] The index coordinate counts steps through a tower's charts. Every step toward a
+/// finer chart replaces a face by its **fibre**, so the population a reach carries is multiplied
+/// rather than kept, and the coordinate is therefore work a caller declares. It is checked by
+/// [`Horizon::declare`] before any reach is walked; the tube-side reach adds its own work ceiling
+/// over the product of this coordinate with the chart and face populations.
+pub const INDEX_HORIZON_CEILING: usize = 1024;
+
+/// **A horizon with two coordinates: `h` longitudinal steps and `k` steps in the tower's index.**
+///
+/// [definition] `w_R(h)` — the width this module already owned — measures distance into the
+/// horizon along one axis only. The second coordinate is distance in the **index**, in either
+/// direction: `k` steps toward the finer charts or `k` steps toward the coarser ones. Brandon's
+/// statement, September 18: *zooming from orbit down to an organism is as far into the horizon as
+/// looking out to the stars*, and that is the same notion of distance in both directions.
+///
+/// [proved-derived; formal-checked] Lean counterpart:
+/// `Foundation/ReceiverRelease.lean::Horizon`, with `Horizon.Within` the product order,
+/// `horizonWithin_refl`/`horizonWithin_trans` its two laws and `horizonWithin_is_not_total` the
+/// statement that **the two coordinates are not one scale**: `(2, 0)` and `(0, 2)` are
+/// incomparable horizons, so "how far into the horizon" is a pair and not a number, and no
+/// lexicographic order is imposed on it here. That is why this type derives no `Ord`.
+///
+/// [implemented-exact] Both fields are private and the only constructors are [`Self::declare`] and
+/// [`Self::longitudinal_only`], which check both ceilings. The `Deserialize` route goes through
+/// `#[serde(try_from = ...)]` and re-runs those checks, so a remounted horizon cannot carry a
+/// declaration the library would have refused.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(try_from = "HorizonWire")]
+pub struct Horizon {
+    longitudinal: usize,
+    index: usize,
+}
+
+/// The wire form of a [`Horizon`]. Deserializing one goes through this and the ceiling checks in
+/// `TryFrom`; there is no unchecked route.
+#[derive(Clone, Copy, Debug, Deserialize)]
+struct HorizonWire {
+    longitudinal: usize,
+    index: usize,
+}
+
+impl TryFrom<HorizonWire> for Horizon {
+    type Error = WidthRefusal;
+
+    fn try_from(wire: HorizonWire) -> Result<Self, Self::Error> {
+        Self::declare(wire.longitudinal, wire.index)
+    }
+}
+
+impl Horizon {
+    /// Declare a two-axis horizon, checking both coordinates against their ceilings before
+    /// anything is sized by them.
+    pub fn declare(longitudinal: usize, index: usize) -> Result<Self, WidthRefusal> {
+        if longitudinal > HORIZON_CEILING {
+            return Err(WidthRefusal::HorizonCeiling {
+                requested: longitudinal,
+                ceiling: HORIZON_CEILING,
+            });
+        }
+        if index > INDEX_HORIZON_CEILING {
+            return Err(WidthRefusal::IndexHorizonCeiling {
+                requested: index,
+                ceiling: INDEX_HORIZON_CEILING,
+            });
+        }
+        Ok(Self {
+            longitudinal,
+            index,
+        })
+    }
+
+    /// The horizon this module's existing width reads at: `h` longitudinal steps and `k = 0`.
+    ///
+    /// Lean counterpart: `Horizon.longitudinalOnly` and
+    /// `twoAxisWidth_at_index_zero_is_the_longitudinal_width`, which is why every theorem already
+    /// proved of `width` is the `k = 0` case of the two-axis width and is not restated.
+    pub fn longitudinal_only(longitudinal: usize) -> Result<Self, WidthRefusal> {
+        Self::declare(longitudinal, 0)
+    }
+
+    /// The longitudinal coordinate: steps of `Φ` along the tube.
+    pub const fn longitudinal(&self) -> usize {
+        self.longitudinal
+    }
+
+    /// The index coordinate: steps through the tower's charts, in either direction.
+    pub const fn index(&self) -> usize {
+        self.index
+    }
+
+    /// Whether this is the longitudinal-only horizon the one-axis width reads at.
+    pub const fn is_longitudinal_only(&self) -> bool {
+        self.index == 0
+    }
+
+    /// Whether `inner` lies inside this horizon, in the **product** order: no further along either
+    /// axis. This is the order the monotonicity law is stated in, and it is partial.
+    ///
+    /// Lean counterpart: `Horizon.Within`.
+    pub const fn contains(&self, inner: &Self) -> bool {
+        inner.longitudinal <= self.longitudinal && inner.index <= self.index
+    }
+
+    /// Whether two horizons are comparable at all. `(2, 0)` and `(0, 2)` are not.
+    ///
+    /// Lean counterpart: `horizonWithin_is_not_total`.
+    pub const fn comparable(&self, other: &Self) -> bool {
+        self.contains(other) || other.contains(self)
+    }
+}
+
+/// **The width of an already-read family of exact faces.**
+///
+/// [definition] This is [`width_enumerated`]'s second half on its own: the diameter of a set of
+/// exact faces in a declared norm, with the pair that attains it. It exists because a width is
+/// taken over readings that did not come from a `Vec<Rat>` compatible family — the faces of a
+/// tube's two-axis horizon are the first consumer — and the diameter law must not be written a
+/// second time for them.
+///
+/// Lean counterpart: `Foundation/ReceiverRelease.lean::width`, with `abs_sub_le_width` the pair
+/// that attains it and `width_nonneg` the sign. The declared face count is checked against
+/// [`FAMILY_CEILING`] and its pair count formed with checked arithmetic before any pair is read.
+pub fn width_over_readings(
+    receiver: &str,
+    lineage: &str,
+    faces: &[ExactFace],
+    norm: DiameterNorm,
+) -> Result<ReceiverWidth, WidthRefusal> {
+    if faces.is_empty() {
+        return Err(WidthRefusal::EmptyFamily);
+    }
+    if faces.len() > FAMILY_CEILING {
+        return Err(WidthRefusal::FamilyCeiling {
+            declared: faces.len(),
+            ceiling: FAMILY_CEILING,
+        });
+    }
+    let count = faces.len();
+    count
+        .checked_mul(count.saturating_sub(1))
+        .ok_or(WidthRefusal::PairCountOverflows { members: count })?;
+    let mut diameter = Rat::zero();
+    let mut attaining = WidthWitness::Point;
+    for left in 0..faces.len() {
+        for right in (left + 1)..faces.len() {
+            let separation = faces[left].separation(&faces[right], norm)?;
+            if separation > diameter {
+                diameter = separation;
+                attaining = WidthWitness::Pair { left, right };
+            }
+        }
+    }
+    Ok(ReceiverWidth {
+        schema: RECEIVER_WIDTH_SCHEMA.to_owned(),
+        receiver: receiver.to_owned(),
+        lineage: lineage.to_owned(),
+        norm,
+        diameter,
+        attaining,
+        read: faces.len(),
+    })
 }
 
 // -------------------------------------------------------------------------------------------
@@ -1816,6 +1983,17 @@ pub enum WidthRefusal {
     )]
     HorizonCeiling {
         /// How many steps were asked for.
+        requested: usize,
+        /// The ceiling.
+        ceiling: usize,
+    },
+    /// A declared two-axis horizon reaches further through the index than the ceiling admits.
+    #[error(
+        "an index horizon of {requested} chart steps exceeds the declared ceiling {ceiling}; \
+         no chart was walked and no fibre was opened"
+    )]
+    IndexHorizonCeiling {
+        /// How many index steps were asked for.
         requested: usize,
         /// The ceiling.
         ceiling: usize,

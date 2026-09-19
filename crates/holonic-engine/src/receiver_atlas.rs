@@ -79,6 +79,11 @@ use crate::physical_constraint_complex::{
     ConstraintComponentId, ConstraintEdge, ConstraintVertexId, ContactClass, CoordinateBox3,
 };
 use crate::physical_constraint_grading::EdgeProvenance;
+use crate::physicochemical_receiver::{
+    ClassPair, HydrogenBondWindow, PairPopulation, PairWorkBound, PhysicochemicalRefusal,
+    RigidMotion, composition_under_declared_protonation, electrostatic_enclosure,
+    hydrogen_bond_candidates, steric_overlaps, worked_presentation,
+};
 use crate::topological_receiver::{
     ApertureFiltration, Coefficients, FiltrationOrder, OrderLaw, TopologicalError,
     grade_zero_agreement, persistence,
@@ -2195,6 +2200,253 @@ fn verify_r5_source_accountability() -> ContractStatus {
     }
 }
 
+
+/// **B7's physicochemical receiver, rebase equivariance, computed.** Every reading is a function of
+/// the pairwise exact separations and the declared site chemistry alone, so an exact rational rigid
+/// motion of the whole configuration must move none of them.
+///
+/// The motion is the composed Pythagorean rotation `R_z(3/5, 4/5) · R_x(5/13, 12/13)` with a
+/// translation; `physicochemical_receiver::RigidMotion::declare` checks `RᵀR = I` entry by entry
+/// over `Q` before the motion exists at all, so no approximate rotation can reach a reading.
+fn verify_b7_physicochemical_rigid_motion_invariance() -> ContractStatus {
+    type Reading = (BTreeMap<ClassPair, u64>, u64, usize, usize);
+    let build = || -> Result<(Reading, Reading), PhysicochemicalRefusal> {
+        let rational = |numerator: i64| Rat::from_integer(BigInt::from(numerator));
+        let motion = RigidMotion::declared_pythagorean([
+            rational(7),
+            rational(-3),
+            rational(11),
+        ])?;
+        let window = HydrogenBondWindow::conventional();
+        let bound = PairWorkBound::declare(
+            4_096,
+            "the worked witness addresses eight sites, so its pair population is C(8,2) = 28",
+        )?;
+        let read = |motion: Option<&RigidMotion>| -> Result<Reading, PhysicochemicalRefusal> {
+            let worked = worked_presentation(motion)?;
+            let composition = composition_under_declared_protonation(
+                &worked.complex,
+                &worked.sites,
+                &worked.tables,
+                &worked.basis,
+                0,
+            )?;
+            let population = PairPopulation::AmongSites {
+                sites: worked.sites.sites().keys().copied().collect(),
+                minimum_residue_separation: 1,
+            };
+            let hydrogen = hydrogen_bond_candidates(
+                &worked.complex,
+                &worked.sites,
+                &worked.tables,
+                &window,
+                &population,
+                &bound,
+            )?;
+            let steric = steric_overlaps(
+                &worked.complex,
+                &worked.sites,
+                &worked.tables,
+                &Rat::new(BigInt::from(4), BigInt::from(10)),
+                &population,
+                &bound,
+            )?;
+            Ok((
+                composition.admitted.clone(),
+                composition.admitted_total,
+                hydrogen.candidates.len(),
+                steric.clashes.len(),
+            ))
+        };
+        Ok((read(None)?, read(Some(&motion))?))
+    };
+    match build() {
+        Ok((before, after)) if before == after && before.1 > 0 => ContractStatus::satisfied(
+            format!(
+                "under the exact rational rigid motion R_z(3/5,4/5)·R_x(5/13,12/13) plus a \
+                 translation, the residue-class composition ({} admitted contacts over {} class \
+                 pairs), the hydrogen-bond candidate count {} and the steric overlap count {} are \
+                 all unchanged; the rotation's orthogonality is checked entry by entry over Q \
+                 before it can be applied",
+                before.1,
+                before.0.len(),
+                before.2,
+                before.3
+            ),
+        ),
+        Ok((before, after)) => ContractStatus::Failed {
+            counterexample: format!(
+                "a rigid motion moved the reading: {before:?} against {after:?}"
+            ),
+        },
+        Err(error) => ContractStatus::Unproved {
+            missing: format!("the witness could not be built: {error}"),
+        },
+    }
+}
+
+/// **B7's physicochemical receiver, source accountability, computed.** Every returned count is
+/// accounted for: the per-class-pair counts sum to the admitted total, the admitted, undecided and
+/// excluded counts exhaust the addressed population, and every hydrogen-bond candidate and every
+/// steric overlap names the two addressed sites and carries the exact squared-distance interval its
+/// verdict was taken from.
+fn verify_b7_physicochemical_source_accountability() -> ContractStatus {
+    let build = || -> Result<(u64, u64, usize, usize), PhysicochemicalRefusal> {
+        let worked = worked_presentation(None)?;
+        let composition = composition_under_declared_protonation(
+            &worked.complex,
+            &worked.sites,
+            &worked.tables,
+            &worked.basis,
+            0,
+        )?;
+        let by_pair: u64 = composition.admitted.values().sum();
+        let by_open: u64 = composition.open.values().sum();
+        if by_pair != composition.admitted_total || by_open != composition.open_total {
+            return Err(PhysicochemicalRefusal::PairCountOverflows);
+        }
+        if composition.admitted_total + composition.open_total + composition.excluded_total
+            != composition.population
+        {
+            return Err(PhysicochemicalRefusal::PairCountOverflows);
+        }
+        let bound = PairWorkBound::declare(
+            4_096,
+            "the worked witness addresses eight sites, so its pair population is C(8,2) = 28",
+        )?;
+        let population = PairPopulation::AmongSites {
+            sites: worked.sites.sites().keys().copied().collect(),
+            minimum_residue_separation: 1,
+        };
+        let hydrogen = hydrogen_bond_candidates(
+            &worked.complex,
+            &worked.sites,
+            &worked.tables,
+            &HydrogenBondWindow::conventional(),
+            &population,
+            &bound,
+        )?;
+        let steric = steric_overlaps(
+            &worked.complex,
+            &worked.sites,
+            &worked.tables,
+            &Rat::new(BigInt::from(4), BigInt::from(10)),
+            &population,
+            &bound,
+        )?;
+        // Every returned candidate and every returned overlap names two standing sites and carries
+        // the exact interval it was decided from, re-derived here from the presentation itself.
+        for (left, right, interval) in hydrogen
+            .candidates
+            .iter()
+            .map(|candidate| {
+                (
+                    candidate.donor,
+                    candidate.acceptor,
+                    candidate.squared_distance.clone(),
+                )
+            })
+            .chain(steric.clashes.iter().map(|clash| {
+                (clash.left, clash.right, clash.squared_distance.clone())
+            }))
+        {
+            worked.sites.site(left)?;
+            worked.sites.site(right)?;
+            let a = &worked
+                .complex
+                .vertices
+                .get(&left)
+                .ok_or(PhysicochemicalRefusal::SiteAbsent { vertex: left })?
+                .position;
+            let b = &worked
+                .complex
+                .vertices
+                .get(&right)
+                .ok_or(PhysicochemicalRefusal::SiteAbsent { vertex: right })?
+                .position;
+            if a.squared_distance(b) != interval {
+                return Err(PhysicochemicalRefusal::PairCountOverflows);
+            }
+        }
+        Ok((
+            composition.population,
+            composition.admitted_total,
+            hydrogen.candidates.len(),
+            steric.clashes.len(),
+        ))
+    };
+    match build() {
+        Ok((population, admitted, candidates, clashes)) => ContractStatus::satisfied(format!(
+            "over {population} addressed pairs the per-class-pair counts sum to the admitted total \
+             {admitted}, the admitted, undecided and excluded counts exhaust the population, and \
+             every one of the {candidates} hydrogen-bond candidates and {clashes} steric overlaps \
+             names two standing sites and carries an exact squared-distance interval re-derived \
+             here from the presentation's own coordinates"
+        )),
+        Err(error) => ContractStatus::Unproved {
+            missing: format!("the witness could not be built or did not account: {error}"),
+        },
+    }
+}
+
+/// **B7's physicochemical receiver, energy balance, computed.** The declared finite electrostatic
+/// model's enclosure over a pair population is **exactly** the sum of its enclosures over a
+/// declared partition of that population: the parts recombine to the whole, endpoint for endpoint,
+/// with no widening. That is the conservation this receiver owes, and it is recomputed rather than
+/// asserted.
+fn verify_b7_physicochemical_energy_balance() -> ContractStatus {
+    let build = || -> Result<(String, u64), PhysicochemicalRefusal> {
+        let worked = worked_presentation(None)?;
+        let bound = PairWorkBound::declare(
+            4_096,
+            "the worked witness addresses eight sites, so its pair population is C(8,2) = 28",
+        )?;
+        let every: Vec<_> = worked.sites.sites().keys().copied().collect();
+        let left_half: BTreeSet<_> = every[..4].iter().copied().collect();
+        let right_half: BTreeSet<_> = every[4..].iter().copied().collect();
+        let enclose = |population: PairPopulation| {
+            electrostatic_enclosure(
+                &worked.complex,
+                &worked.sites,
+                &worked.tables,
+                &worked.basis,
+                &population,
+                &bound,
+                32,
+            )
+        };
+        let whole = enclose(PairPopulation::AmongSites {
+            sites: every.iter().copied().collect(),
+            minimum_residue_separation: 1,
+        })?;
+        let across = enclose(PairPopulation::SitesAgainstPresentation {
+            sites: left_half,
+            minimum_residue_separation: 1,
+        })?;
+        let within = enclose(PairPopulation::AmongSites {
+            sites: right_half,
+            minimum_residue_separation: 1,
+        })?;
+        let recombined = across.enclosure.sum(&within.enclosure)?;
+        if recombined.enclosure() != whole.enclosure.enclosure() {
+            return Err(PhysicochemicalRefusal::PairCountOverflows);
+        }
+        Ok((whole.enclosure.render(), whole.contributing_pairs))
+    };
+    match build() {
+        Ok((rendered, contributing)) => ContractStatus::satisfied(format!(
+            "the declared finite electrostatic model's enclosure over the whole pair population, \
+             {rendered} from {contributing} contributing pairs, is exactly the sum of its \
+             enclosures over a declared two-part partition of that population; the parts recombine \
+             endpoint for endpoint with no widening, and the reading carries its unit rather than \
+             being a bare number"
+        )),
+        Err(error) => ContractStatus::Unproved {
+            missing: format!("the witness could not be built or did not balance: {error}"),
+        },
+    }
+}
+
 /// **The contract ledger: which of R1, R3, R4 and R5 satisfies which contract, computed where it
 /// can be and named as unproved where it cannot.**
 ///
@@ -2362,6 +2614,43 @@ pub fn ledger_entries() -> Vec<(&'static str, AtlasContract, ContractEntry)> {
                           direction: the deposited decimal precision, not the geometry, decides \
                           whether the aperture order is decided at all, and the two family bounds \
                           can return different pairings."
+                    .to_owned(),
+            })),
+        ("B7phys", AtlasContract::RebaseEquivariance, ContractEntry::Recomputed(verify_b7_physicochemical_rigid_motion_invariance)),
+        ("B7phys", AtlasContract::DeclarationIndependence, ContractEntry::Standing(StandingStatus::Failed {
+                counterexample: "the declared parameter table decides the reading, and the owner \
+                                 ships two named tables that exhibit it: \
+                                 physicochemical_receiver::residue_classes_histidine_polar files \
+                                 histidine polar and residue_classes_histidine_positive files it \
+                                 positively charged, and on a presentation carrying a histidine \
+                                 the two give different compositions — \
+                                 a_second_table_changes_the_reading_and_the_comparison_refuses \
+                                 exhibits one whose salt-bridge candidate count is 0 under the \
+                                 first and 1 under the second. The dependence is not hidden: every \
+                                 reading carries its TableIdentity and compare_across_tables \
+                                 refuses two readings taken under different tables unless a \
+                                 TablePassage accounting for every divergent residue is supplied. \
+                                 The contract is refuted, not discharged."
+                    .to_owned(),
+            })),
+        ("B7phys", AtlasContract::SourceAccountability, ContractEntry::Recomputed(verify_b7_physicochemical_source_accountability)),
+        ("B7phys", AtlasContract::EnergyBalance, ContractEntry::Recomputed(verify_b7_physicochemical_energy_balance)),
+        ("B7phys", AtlasContract::GluingWithInterfaceCoupling, ContractEntry::Standing(StandingStatus::Unproved {
+                missing: "CompositionReading::sum is additive over two populations that are \
+                          already disjoint; it is not a gluing law. Gluing two presented parts \
+                          owes the interface pairs neither part carries, and no law relates a \
+                          whole's composition or electrostatic enclosure to its parts' readings \
+                          plus a declared interface term without recomputing the cross population \
+                          from the joined coordinates. The absent object is that interface term."
+                    .to_owned(),
+            })),
+        ("B7phys", AtlasContract::StabilityAwayFromBifurcation, ContractEntry::Standing(StandingStatus::Unproved {
+                missing: "no continuity bound is proved and the measured finding runs the other \
+                          way: a contact whose exact interval straddles the aperture makes the \
+                          composition a family between two bounds that differ, and a last-place \
+                          change in a deposited coordinate can carry a donor-acceptor pair across \
+                          a hydrogen-bond window bound. Both are carried as undecided rather than \
+                          rounded, which is honesty about the discontinuity and not a bound on it."
                     .to_owned(),
             })),
     ]

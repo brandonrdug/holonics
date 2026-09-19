@@ -25,7 +25,16 @@
 //! | `unread_at_a_declared_environment_refuses` | [`WorstVerdict::UnreadAt`] |
 //! | `scalarFirstDiscardsAFrontierDesign` | [`ReceiverWeighting`], [`DesignFamily::scalar_minimizers`] and its test |
 //! | `indistinguishabilityIsNotTransitive`, `aComponentCanContainASeparatedPair` | [`StructuralClusters::separated_pairs_inside_a_component`] |
-//! | `selection_contract` | the whole module |
+//! | `selection_contract` | the whole B8 half of the module |
+//! | `CascadeStage`, `Certified` | [`CascadeStage`], [`DiscardLaw`], [`Certified`] |
+//! | `hardConstraintStage`, `hardConstraintStage_is_certified` | [`CascadeStage::hard_constraint`] |
+//! | `cascadeSurvivors`, `fullSurvivors` | [`CostedCascade::run`], [`CostedCascade::full_evaluation`] |
+//! | `all_cheap_and_expensive`, `certified_cascade_preserves_the_frontier` | [`survivors_agree`] and its test |
+//! | `proxyStage`, `proxyStage_is_not_certified` | [`CascadeStage::uncertified_proxy`] |
+//! | `uncertified_proxy_loses_a_frontier_design` | [`CostedCascade::run_admitting_every_proxy_discard`] |
+//! | `certifiedStage`, `certifiedStage_is_certified` | [`CascadeStage::certified_bound`] |
+//! | `expensiveWork`, `expensiveWork_le_population`, `the_certified_filter_saves_expensive_work` | [`StageRun::entered`] and [`cost_saving`] |
+//! | `cost_cascade_contract` | the whole B10 half of the module |
 //!
 //! **Scope of the formal side.** `DesignSelection.lean` states the worst-environment laws for the
 //! smaller-is-better sense over fully decided readings. The greater-is-better sense is the same
@@ -131,12 +140,26 @@
 //! built, and hands its declared history ceiling to [`Situation::declare`], which checks the
 //! implied ordered-history population before anything is enumerated.
 //!
+//! # The cost cascade: the same cascade, read for what it costs
+//!
+//! [definition] Item **B10** of the same plan is not a second pipeline. [`CostedCascade`] is the
+//! same ordered sequence of stages carrying, per candidate, the [`crate::presentation_cost::CostReceipt`]
+//! of the cheap reading it runs and of the expensive receiver it stands in for;
+//! [`CostedCascade::run`] runs a stage only on the survivors of the cheaper stages. The soundness
+//! law is [`DiscardLaw`]: a stage may discard only by a hard constraint — whose cheap test *is* its
+//! expensive test — or by a [`Certified`] bound checked at every candidate of a declared probe. An
+//! uncertified proxy discards nothing; what it would have removed is recorded in
+//! [`StageRun::would_have_discarded`], and [`CostedCascade::run_admitting_every_proxy_discard`]
+//! exists only so the loss it causes can be exhibited against
+//! [`CostedCascade::full_evaluation`].
+//!
 //! [implemented-exact] Every refusal is a typed [`SelectionRefusal`]. The `expect`s in this module
 //! stand on invariants [`DesignFamily::declare`] established — a face at every declared
 //! environment, a reading at every axis — and are unreachable from a declared family; nothing here
 //! panics on caller input. An out-of-range carrier handed to a receiver of
 //! [`DesignFamily::design_situation`] returns a typed [`LadderRefusal`] rather than indexing.
 
+use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Arc;
 
@@ -152,7 +175,7 @@ use crate::physical_occurrence::{
     HorizontalFamily, ObjectKinship, OccurrenceId, Passage, PassageRefusal, SituatedFamily,
     StatusRefusal, Vertical, VerticalFamily,
 };
-use crate::presentation_cost::{AxisComparison, frontier_by};
+use crate::presentation_cost::{Axis, AxisComparison, CostReceipt, Counted, frontier_by};
 use crate::relation_ladder::{
     Classification, Declarations, LadderRefusal, NamedGenerator, NamedReceiver, PotentialVerdict,
     Rung, Separator, Situation,
@@ -385,6 +408,37 @@ pub enum SelectionRefusal {
     /// The passage owner refused, so the transformation is not admitted.
     #[error("the passage refused, so the transformation is not admitted: {0}")]
     Passage(#[from] PassageRefusal),
+    /// A declared certified bound was refuted at a probe candidate: the cheap reading refused
+    /// where the expensive receiver admits, so it is not a bound in the discarding direction.
+    #[error("cascade stage {stage:?} declares a certified bound with an empty probe; a bound checked at no design is not a checked bound")]
+    EmptyCertificateProbe {
+        /// The stage whose certificate was declared over nothing.
+        stage: String,
+    },
+    #[error(
+        "the cheap reading of stage {stage:?} refuses design {design:?}, which its expensive \
+         receiver admits; that is not a certified bound and this owner refuses to mint one"
+    )]
+    CertificateRefuted {
+        /// Which stage.
+        stage: String,
+        /// The design that refutes the certificate.
+        design: DesignId,
+    },
+    /// The declared cascade has more stages than [`CASCADE_STAGE_CEILING`].
+    #[error("the declared cascade has {declared} stages, above the ceiling {ceiling}")]
+    CascadeTooLong {
+        /// How many were declared.
+        declared: usize,
+        /// The ceiling.
+        ceiling: usize,
+    },
+    /// Two cascade stages carry the same name, so a discard cannot name the stage that made it.
+    #[error("the cascade stage name {name:?} is declared twice")]
+    CascadeStageNameRepeated {
+        /// The repeated name.
+        name: String,
+    },
     /// The relation ladder refused.
     #[error("the relation ladder refused: {0}")]
     Ladder(#[from] LadderRefusal),
@@ -2283,6 +2337,679 @@ impl DesignFamily {
             diversity,
         })
     }
+}
+
+// -------------------------------------------------------------------------------------------
+// B10: the cost cascade — one cascade, read for what it costs
+// -------------------------------------------------------------------------------------------
+
+/// The largest admitted cascade-stage family.
+pub const CASCADE_STAGE_CEILING: usize = 64;
+
+mod certification {
+    /// **The token a [`super::DiscardLaw::CertifiedBound`] is made of.**
+    ///
+    /// [definition] Its fields are private to this module and its only constructor is
+    /// [`Certified::by`], which is `pub(super)`. No struct literal of this type can be written
+    /// anywhere — not in another crate, not in another module, and not in `design_selection`
+    /// itself — so a certified bound cannot be *asserted*. The only way to obtain one is to call
+    /// [`super::CascadeStage::certified_bound`], which checks the bound against a declared probe.
+    ///
+    /// This is `receiver_atlas`'s `Recomputed` pattern: only a verifier that computed something
+    /// produces the token that licenses the claim.
+    #[derive(Clone, Debug, PartialEq, Eq)]
+    pub struct Certified {
+        law: String,
+        probe: std::collections::BTreeSet<super::DesignId>,
+    }
+
+    impl Certified {
+        /// Record what the certificate check just computed. Reachable only from
+        /// `design_selection`'s own checking constructor.
+        pub(super) fn by(law: String, probe: std::collections::BTreeSet<super::DesignId>) -> Self {
+            Self { law, probe }
+        }
+
+        /// The mathematical law the bound rests on, written out.
+        pub fn law(&self) -> &str {
+            &self.law
+        }
+
+        /// How many candidates the bound was checked at. Never zero: a bound checked nowhere is
+        /// refused at construction.
+        pub fn probe(&self) -> usize {
+            self.probe.len()
+        }
+
+        /// Whether the bound was actually checked at this design. A discard of a design outside
+        /// the probe rests on the declared law alone, and a run says so per discard.
+        pub fn checked_at(&self, design: super::DesignId) -> bool {
+            self.probe.contains(&design)
+        }
+    }
+}
+
+pub use certification::Certified;
+
+/// **How a cascade stage is permitted to discard a candidate.**
+///
+/// [definition] The soundness law of a cascade: an early cheap stage may discard only by a typed
+/// refusal every later stage would also issue — a [`DiscardLaw::HardConstraint`] — or by a
+/// [`DiscardLaw::CertifiedBound`], a cheap reading that *provably* refuses only where the expensive
+/// receiver refuses. A [`DiscardLaw::UncertifiedProxy`] is a cheap scalar standing in for a later
+/// receiver with no such certificate, and [`CostedCascade::run`] **does not let it discard**: the
+/// candidates it would have removed are recorded in [`StageRun::would_have_discarded`] and carried
+/// forward.
+///
+/// Lean counterpart: `Foundation/DesignSelection.lean::{Certified, hardConstraintStage_is_certified,
+/// proxyStage_is_not_certified}`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum DiscardLaw {
+    /// A typed hard constraint: the cheap test **is** the expensive one, so every later stage
+    /// issues the same refusal.
+    HardConstraint {
+        /// The constraint's declared name.
+        name: String,
+        /// The ground it is declared on.
+        ground: String,
+    },
+    /// A cheap reading that provably bounds the expensive one in the discarding direction, with the
+    /// checked certificate.
+    CertifiedBound(Certified),
+    /// A cheap scalar proxy with no certificate. It discards nothing.
+    UncertifiedProxy {
+        /// Its declared name.
+        name: String,
+        /// The ground it is declared on.
+        ground: String,
+    },
+    /// The stage decides nothing and only costs: a pure measurement stage.
+    NoDiscard,
+}
+
+impl DiscardLaw {
+    /// A short name for receipts.
+    pub const fn label(&self) -> &'static str {
+        match self {
+            Self::HardConstraint { .. } => "hard-constraint",
+            Self::CertifiedBound(_) => "certified-bound",
+            Self::UncertifiedProxy { .. } => "uncertified-proxy",
+            Self::NoDiscard => "no-discard",
+        }
+    }
+
+    /// Whether this law licenses a discard at all. True for a hard constraint and a certified
+    /// bound, false for an uncertified proxy and for a measurement stage.
+    pub const fn licenses_a_discard(&self) -> bool {
+        matches!(self, Self::HardConstraint { .. } | Self::CertifiedBound(_))
+    }
+}
+
+/// A stage's cheap or expensive admission test.
+pub type DesignTest = Arc<dyn Fn(&Design) -> bool + Send + Sync>;
+/// A stage's per-candidate cost meter.
+pub type DesignCost = Arc<dyn Fn(&Design) -> CostReceipt + Send + Sync>;
+
+/// **The four readings one cascade stage carries**, grouped because they must agree: the cheap
+/// admission test and what it costs per candidate, and the expensive receiver it stands in for and
+/// what *that* costs per candidate.
+pub struct StageReadings {
+    /// The cheap reading the stage runs on every candidate that reaches it.
+    pub cheap: DesignTest,
+    /// The expensive receiver it stands in for.
+    pub expensive: DesignTest,
+    /// What the cheap reading costs, per candidate.
+    pub cheap_cost: DesignCost,
+    /// What the expensive receiver costs, per candidate.
+    pub expensive_cost: DesignCost,
+}
+
+impl std::fmt::Debug for StageReadings {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter.debug_struct("StageReadings").finish_non_exhaustive()
+    }
+}
+
+/// **One stage of the cost cascade**: the cheap reading it runs, the expensive receiver it stands
+/// in for, and the [`CostReceipt`] each of those costs **per candidate**.
+///
+/// [definition] The decision reading and the cost reading are two readings of one stage, not two
+/// pipelines: the same `cheap`/`expensive` pair decides who survives and is charged for.
+///
+/// Lean counterpart: `Foundation/DesignSelection.lean::CascadeStage`.
+pub struct CascadeStage {
+    name: String,
+    ground: String,
+    law: DiscardLaw,
+    cheap: DesignTest,
+    expensive: DesignTest,
+    cheap_cost: DesignCost,
+    expensive_cost: DesignCost,
+}
+
+impl std::fmt::Debug for CascadeStage {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter
+            .debug_struct("CascadeStage")
+            .field("name", &self.name)
+            .field("ground", &self.ground)
+            .field("law", &self.law)
+            .finish_non_exhaustive()
+    }
+}
+
+/// A [`CostReceipt`] whose every coordinate is zero, for a stage no candidate entered. Every
+/// coordinate is derived and says so, so it is never mistaken for a measurement.
+fn empty_receipt(presentation: impl Into<String>) -> CostReceipt {
+    let rule = "no candidate entered this stage, so every coordinate is zero by the empty sum";
+    let zero = || Counted::derived(BigUint::from(0_u32), rule);
+    CostReceipt {
+        presentation: presentation.into(),
+        bytes: zero(),
+        decode_work: zero(),
+        update_work: zero(),
+        certificate_work: zero(),
+        residual: zero(),
+    }
+}
+
+impl CascadeStage {
+    /// **A hard-constraint stage.** The cheap test is the constraint and the expensive test is the
+    /// same constraint, so the stage is certified by construction: every later stage issues the
+    /// same typed refusal.
+    ///
+    /// Lean counterpart: `hardConstraintStage`, with `hardConstraintStage_is_certified`.
+    pub fn hard_constraint(constraint: HardConstraint, cost: DesignCost) -> Self {
+        let name = constraint.name().to_owned();
+        let ground = constraint.ground().to_owned();
+        let admits = Arc::new(constraint);
+        let cheap_admits = Arc::clone(&admits);
+        let expensive_admits = Arc::clone(&admits);
+        Self {
+            name: name.clone(),
+            ground: ground.clone(),
+            law: DiscardLaw::HardConstraint { name, ground },
+            cheap: Arc::new(move |design: &Design| cheap_admits.admits(design)),
+            expensive: Arc::new(move |design: &Design| expensive_admits.admits(design)),
+            cheap_cost: Arc::clone(&cost),
+            expensive_cost: cost,
+        }
+    }
+
+    /// **A certified-bound stage.** The certificate is *checked* here, at every candidate of a
+    /// declared probe: the cheap reading must refuse only where the expensive receiver refuses.
+    /// The first violation is [`SelectionRefusal::CertificateRefuted`], naming the design.
+    ///
+    /// The probe is the caller's declaration of where the bound was checked, exactly as
+    /// `relation_ladder::AutomorphismClaim`'s probe is; the `law` string is the mathematical ground
+    /// the bound rests on, which the library cannot verify and does not pretend to. What the
+    /// library does enforce is that a bound never *checked* cannot become a
+    /// [`DiscardLaw::CertifiedBound`], because [`Certified`] has no public constructor.
+    pub fn certified_bound(
+        name: impl Into<String>,
+        ground: impl Into<String>,
+        law: impl Into<String>,
+        readings: StageReadings,
+        probe: &[Design],
+    ) -> Result<Self, SelectionRefusal> {
+        let StageReadings {
+            cheap,
+            expensive,
+            cheap_cost,
+            expensive_cost,
+        } = readings;
+        let name = name.into();
+        let ground = ground.into();
+        let law = law.into();
+        for what in [(&name, "cascade stage name"), (&ground, "cascade stage ground"), (&law, "certified bound law")] {
+            if what.0.trim().is_empty() {
+                return Err(SelectionRefusal::NotStated { what: what.1 });
+            }
+        }
+        // A bound checked at no design is not a checked bound. An empty probe would pass the loop
+        // below vacuously and mint a certificate from nothing.
+        if probe.is_empty() {
+            return Err(SelectionRefusal::EmptyCertificateProbe { stage: name });
+        }
+        for design in probe {
+            if !(cheap)(design) && (expensive)(design) {
+                return Err(SelectionRefusal::CertificateRefuted {
+                    stage: name,
+                    design: design.id,
+                });
+            }
+        }
+        Ok(Self {
+            name,
+            ground,
+            law: DiscardLaw::CertifiedBound(Certified::by(
+                law,
+                probe.iter().map(|design| design.id).collect(),
+            )),
+            cheap,
+            expensive,
+            cheap_cost,
+            expensive_cost,
+        })
+    }
+
+    /// **An uncertified-proxy stage.** It runs and it costs; it discards nothing, because no
+    /// certificate says its refusal is the expensive receiver's refusal.
+    pub fn uncertified_proxy(
+        name: impl Into<String>,
+        ground: impl Into<String>,
+        readings: StageReadings,
+    ) -> Result<Self, SelectionRefusal> {
+        let StageReadings {
+            cheap,
+            expensive,
+            cheap_cost,
+            expensive_cost,
+        } = readings;
+        let name = name.into();
+        let ground = ground.into();
+        if name.trim().is_empty() {
+            return Err(SelectionRefusal::NotStated {
+                what: "cascade stage name",
+            });
+        }
+        if ground.trim().is_empty() {
+            return Err(SelectionRefusal::NotStated {
+                what: "cascade stage ground",
+            });
+        }
+        Ok(Self {
+            name: name.clone(),
+            ground: ground.clone(),
+            law: DiscardLaw::UncertifiedProxy { name, ground },
+            cheap,
+            expensive,
+            cheap_cost,
+            expensive_cost,
+        })
+    }
+
+    /// Its declared name.
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    /// The ground it is declared on.
+    pub fn ground(&self) -> &str {
+        &self.ground
+    }
+
+    /// How it is permitted to discard.
+    pub const fn law(&self) -> &DiscardLaw {
+        &self.law
+    }
+
+    /// The cheap reading at one design.
+    pub fn cheap_admits(&self, design: &Design) -> bool {
+        (self.cheap)(design)
+    }
+
+    /// The expensive receiver at one design.
+    pub fn expensive_admits(&self, design: &Design) -> bool {
+        (self.expensive)(design)
+    }
+
+    /// **Whether the cheap reading and the expensive receiver are the same computation.** True for
+    /// a [`DiscardLaw::HardConstraint`], whose cheap test *is* its expensive test, and where the
+    /// cascade therefore runs it once and is charged once. False everywhere else, where the two are
+    /// two computations and the cascade pays for both on a candidate the cheap reading admits.
+    pub const fn cheap_is_expensive(&self) -> bool {
+        matches!(self.law, DiscardLaw::HardConstraint { .. })
+    }
+}
+
+/// Which reading of the cascade a [`CascadeRun`] is.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub enum CascadeReading {
+    /// The cascade as its laws permit: a stage runs only on the survivors of the cheaper stages,
+    /// and only a hard constraint or a certified bound discards.
+    Cascaded,
+    /// Every expensive receiver run on every candidate. The reference the cascade is compared with.
+    FullEvaluation,
+    /// The cascade with every uncertified proxy's discard **admitted**, which is what a scalar-first
+    /// cascade does. It exists only so that the loss can be exhibited.
+    ProxyDiscardsAdmitted,
+}
+
+/// One candidate a stage removed, with the stage and the law that removed it.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct Discard {
+    /// Which design.
+    pub design: DesignId,
+    /// Which stage removed it.
+    pub stage: String,
+    /// Under which law.
+    pub law: &'static str,
+    /// Whether the discard stands on a check the library made **at this design**: a hard
+    /// constraint's own refusal, or a certified bound whose probe contains the design. `false`
+    /// names a discard that rests on the bound's declared law beyond the designs it was checked
+    /// at — lawful under that law's stated ground, and never silently merged with the checked
+    /// ones.
+    pub checked_at_this_design: bool,
+}
+
+/// What one stage of a run did and what it cost.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct StageRun {
+    /// The stage's declared name.
+    pub stage: String,
+    /// The law it discards under.
+    pub law: &'static str,
+    /// The candidates that reached it, in order.
+    pub entered: Vec<DesignId>,
+    /// The candidates that left it.
+    pub survived: Vec<DesignId>,
+    /// The candidates it removed.
+    pub discarded: Vec<Discard>,
+    /// The candidates an **uncertified proxy** would have removed and did not. Empty for every
+    /// other law.
+    pub would_have_discarded: Vec<DesignId>,
+    /// The cost receipt of this stage **per candidate that entered it**.
+    pub per_candidate: Vec<(DesignId, CostReceipt)>,
+    /// The serial composition of those receipts: what the stage cost in total.
+    pub stage_cost: CostReceipt,
+}
+
+/// What a whole run of the cost cascade did and what it cost.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct CascadeRun {
+    /// The schema this run serializes under.
+    pub schema: String,
+    /// Which reading this is.
+    pub reading: CascadeReading,
+    /// Each stage, in order.
+    pub stages: Vec<StageRun>,
+    /// The candidates that survived every stage.
+    pub survivors: Vec<DesignId>,
+    /// The serial composition of every stage's cost.
+    pub total: CostReceipt,
+}
+
+/// **The cost cascade**: an ordered sequence of stages, each with its own discard law and its own
+/// per-candidate cost meter.
+///
+/// [definition] It is the same cascade [`DesignFamily::cascade`] runs, read for what it costs. The
+/// plan's order — cheap population filters, a moderate structural population, the constraint and
+/// interface receivers, expensive plural prediction, robust diverse release — is the order the
+/// caller declares the stages in, and the rule that a stage runs only on the survivors of the
+/// cheaper stages is [`CostedCascade::run`]'s own loop rather than a convention.
+pub struct CostedCascade {
+    stages: Vec<CascadeStage>,
+}
+
+impl std::fmt::Debug for CostedCascade {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter
+            .debug_struct("CostedCascade")
+            .field("stages", &self.stages)
+            .finish()
+    }
+}
+
+impl CostedCascade {
+    /// Declare the cascade. Refuses an empty stage family, a family above
+    /// [`CASCADE_STAGE_CEILING`] and a repeated stage name.
+    pub fn declare(stages: Vec<CascadeStage>) -> Result<Self, SelectionRefusal> {
+        if stages.is_empty() {
+            return Err(SelectionRefusal::EmptyFamily);
+        }
+        if stages.len() > CASCADE_STAGE_CEILING {
+            return Err(SelectionRefusal::CascadeTooLong {
+                declared: stages.len(),
+                ceiling: CASCADE_STAGE_CEILING,
+            });
+        }
+        let mut names: BTreeSet<&str> = BTreeSet::new();
+        for stage in &stages {
+            if !names.insert(stage.name()) {
+                return Err(SelectionRefusal::CascadeStageNameRepeated {
+                    name: stage.name().to_owned(),
+                });
+            }
+        }
+        Ok(Self { stages })
+    }
+
+    /// The stages, in declaration order.
+    pub fn stages(&self) -> &[CascadeStage] {
+        &self.stages
+    }
+
+    /// The `stages · candidates` work the run implies, checked with `checked_mul` against
+    /// [`COMPARISON_CEILING`] before any pass or allocation sized by it.
+    fn admit_work(&self, candidates: usize) -> Result<(), SelectionRefusal> {
+        let implied = self.stages.len().saturating_mul(candidates);
+        if implied > COMPARISON_CEILING {
+            return Err(SelectionRefusal::ComparisonPopulationTooLarge {
+                stage: "cost cascade",
+                implied,
+                designs: candidates,
+                ceiling: COMPARISON_CEILING,
+            });
+        }
+        Ok(())
+    }
+
+    /// **Run the cascade.** A stage runs only on the survivors of the cheaper stages, and only a
+    /// hard constraint or a certified bound discards.
+    ///
+    /// Lean counterpart: `cascadeSurvivors`, with `certified_cascade_preserves_the_frontier`.
+    pub fn run(
+        &self,
+        family: &DesignFamily,
+        candidates: &[DesignId],
+    ) -> Result<CascadeRun, SelectionRefusal> {
+        self.walk(family, candidates, CascadeReading::Cascaded)
+    }
+
+    /// **Run every expensive receiver on every candidate**, which is what the cascade is compared
+    /// with.
+    ///
+    /// Lean counterpart: `fullSurvivors`.
+    pub fn full_evaluation(
+        &self,
+        family: &DesignFamily,
+        candidates: &[DesignId],
+    ) -> Result<CascadeRun, SelectionRefusal> {
+        self.walk(family, candidates, CascadeReading::FullEvaluation)
+    }
+
+    /// **The exhibition**: the same cascade with every uncertified proxy's discard admitted, which
+    /// is what a scalar-first cascade does. Its survivors can be a strict subset of
+    /// [`CostedCascade::full_evaluation`]'s, and that difference is the loss.
+    ///
+    /// Lean counterpart: `uncertified_proxy_loses_a_frontier_design`.
+    pub fn run_admitting_every_proxy_discard(
+        &self,
+        family: &DesignFamily,
+        candidates: &[DesignId],
+    ) -> Result<CascadeRun, SelectionRefusal> {
+        self.walk(family, candidates, CascadeReading::ProxyDiscardsAdmitted)
+    }
+
+    fn walk(
+        &self,
+        family: &DesignFamily,
+        candidates: &[DesignId],
+        reading: CascadeReading,
+    ) -> Result<CascadeRun, SelectionRefusal> {
+        self.admit_work(candidates.len())?;
+        for id in candidates {
+            family.design(*id)?;
+        }
+        let mut carried: Vec<DesignId> = candidates.to_vec();
+        let mut stages = Vec::with_capacity(self.stages.len());
+        let mut total: Option<CostReceipt> = None;
+        for stage in &self.stages {
+            let entered = carried.clone();
+            let mut survived = Vec::new();
+            let mut discarded = Vec::new();
+            let mut would_have_discarded = Vec::new();
+            let mut per_candidate: Vec<(DesignId, CostReceipt)> = Vec::with_capacity(entered.len());
+            for id in &entered {
+                let design = family.design(*id)?;
+                let (admits, cost) = match reading {
+                    // The full evaluation runs the expensive receiver on everything and is charged
+                    // for it; the cheap reading is not taken at all.
+                    CascadeReading::FullEvaluation => {
+                        (stage.expensive_admits(design), (stage.expensive_cost)(design))
+                    }
+                    // The cascade runs the cheap reading, and the expensive receiver only where the
+                    // cheap reading admits — which is the whole point of the ordering.
+                    // A hard constraint's cheap test is its expensive test: run once, charge once.
+                    CascadeReading::Cascaded | CascadeReading::ProxyDiscardsAdmitted
+                        if stage.cheap_is_expensive() =>
+                    {
+                        (stage.cheap_admits(design), (stage.cheap_cost)(design))
+                    }
+                    CascadeReading::Cascaded | CascadeReading::ProxyDiscardsAdmitted => {
+                        let cheap = stage.cheap_admits(design);
+                        let cheap_cost = (stage.cheap_cost)(design);
+                        if cheap {
+                            let expensive_cost = (stage.expensive_cost)(design);
+                            (
+                                stage.expensive_admits(design),
+                                cheap_cost.compose(&expensive_cost),
+                            )
+                        } else {
+                            let licensed = stage.law().licenses_a_discard()
+                                || reading == CascadeReading::ProxyDiscardsAdmitted;
+                            if licensed {
+                                (false, cheap_cost)
+                            } else {
+                                // An uncertified proxy refused, and the law does not let it
+                                // discard: the expensive receiver decides and is charged for.
+                                would_have_discarded.push(*id);
+                                let expensive_cost = (stage.expensive_cost)(design);
+                                (
+                                    stage.expensive_admits(design),
+                                    cheap_cost.compose(&expensive_cost),
+                                )
+                            }
+                        }
+                    }
+                };
+                per_candidate.push((*id, cost));
+                if admits {
+                    survived.push(*id);
+                } else {
+                    discarded.push(Discard {
+                        design: *id,
+                        stage: stage.name().to_owned(),
+                        law: stage.law().label(),
+                        // Where the expensive receiver ran, it decided, and the discard is a
+                        // check at this design whatever the stage's law. Only a discard taken on
+                        // the cheap reading alone can rest on something not checked here.
+                        checked_at_this_design: reading == CascadeReading::FullEvaluation
+                            || stage.cheap_is_expensive()
+                            || stage.cheap_admits(design)
+                            || match stage.law() {
+                                DiscardLaw::CertifiedBound(certificate) => {
+                                    certificate.checked_at(*id)
+                                }
+                                _ => false,
+                            },
+                    });
+                }
+            }
+            let stage_cost = per_candidate.iter().fold(
+                empty_receipt(format!("cascade stage {:?}", stage.name())),
+                |total, (_, receipt)| total.compose(receipt),
+            );
+            total = Some(match total {
+                None => stage_cost.clone(),
+                Some(running) => running.compose(&stage_cost),
+            });
+            stages.push(StageRun {
+                stage: stage.name().to_owned(),
+                law: stage.law().label(),
+                entered,
+                survived: survived.clone(),
+                discarded,
+                would_have_discarded,
+                per_candidate,
+                stage_cost,
+            });
+            carried = survived;
+        }
+        Ok(CascadeRun {
+            schema: "holonic-engine.design-cost-cascade-run.v1".to_owned(),
+            reading,
+            stages,
+            survivors: carried,
+            total: total.unwrap_or_else(|| empty_receipt("an empty cascade")),
+        })
+    }
+}
+
+/// Which way a cost axis moved between two runs.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+pub enum CostDirection {
+    /// The cascade cost strictly less here.
+    Saved,
+    /// The two runs cost exactly the same here.
+    Equal,
+    /// The cascade cost strictly more here: a cheap stage is itself a cost.
+    Spent,
+}
+
+/// The exact difference between two runs at one cost axis. No float: the direction is a typed
+/// [`CostDirection`] and the magnitude is a `BigUint`.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct AxisSaving {
+    /// Which axis.
+    pub axis: Axis,
+    /// What the cascade cost there.
+    pub cascade: BigUint,
+    /// What the full evaluation cost there.
+    pub full: BigUint,
+    /// Whether the cascade cost less, the same or more.
+    pub direction: CostDirection,
+    /// The exact magnitude of the difference.
+    pub difference: BigUint,
+}
+
+/// **The cumulative cost the cascade saved against the full evaluation**, per axis and exactly.
+///
+/// A cheap stage is itself a cost, so a saving is not automatic: an axis where the cascade cost
+/// *more* is returned with [`Ordering::Greater`] rather than clamped to zero.
+pub fn cost_saving(cascade: &CascadeRun, full: &CascadeRun) -> Vec<AxisSaving> {
+    Axis::ALL
+        .iter()
+        .map(|axis| {
+            let left = cascade.total.count(*axis).clone();
+            let right = full.total.count(*axis).clone();
+            let direction = match left.cmp(&right) {
+                Ordering::Less => CostDirection::Saved,
+                Ordering::Equal => CostDirection::Equal,
+                Ordering::Greater => CostDirection::Spent,
+            };
+            let difference = if left > right {
+                &left - &right
+            } else {
+                &right - &left
+            };
+            AxisSaving {
+                axis: *axis,
+                cascade: left,
+                full: right,
+                direction,
+                difference,
+            }
+        })
+        .collect()
+}
+
+/// **Whether two runs kept the same candidates.** With every discarding stage certified this is
+/// true by `Foundation/DesignSelection.lean::certified_cascade_preserves_the_frontier`; with an
+/// uncertified proxy admitted it can be false, and that is the loss.
+pub fn survivors_agree(left: &CascadeRun, right: &CascadeRun) -> bool {
+    left.survivors == right.survivors
 }
 
 /// The occurrence identities of a design's faces, for a receipt.

@@ -690,6 +690,155 @@ theorem selection_contract :
       unread_at_a_declared_environment_refuses read envs e hmem hunread,
     aComponentCanContainASeparatedPair⟩
 
+/-! ## 9. B10 — the cost cascade, and when a cheap stage may discard
+
+[definition] The selection cascade of section 7 and the cost cascade of item **B10** are **one
+cascade with two readings**: what is decided, and what it costs. This section states the law that
+makes the cheap reading admissible at all. A stage runs a cheap test and stands in for an expensive
+receiver; it may discard only where the expensive receiver would also discard. A hard constraint is
+the degenerate case — the cheap test *is* the expensive one — and a **certified bound** is the
+general one: the cheap reading provably refuses only where the expensive one does.
+
+The worked physical instance is in `Foundation/GrainRestriction.lean`: at the *inflated* coarse
+aperture, `inflated_carries_every_fine_contact` says every non-`outside` fine contact is carried, so
+a coarse `outside` reading certifies a fine `outside` reading and the cheap stage's discard is
+sound. At the **equal** aperture it is not — `equal_aperture_is_not_lawful` — and the Rust owner
+measures the loss on the M5 material. -/
+
+/-- [definition] **One stage of the cascade**: the cheap reading it actually runs, and the expensive
+receiver it stands in for.
+
+Rust counterpart: `design_selection.rs::CascadeStage`. -/
+structure CascadeStage (D : Type u) where
+  /-- The stage's declared name, which is what a discard reports. -/
+  name : String
+  /-- The cheap reading the stage runs on every candidate that reaches it. -/
+  cheap : D → Bool
+  /-- The expensive receiver it stands in for. -/
+  expensive : D → Bool
+
+/-- [definition] **A certified bound**: the cheap reading refuses only where the expensive receiver
+also refuses. This is the whole content of "the cheap reading bounds the expensive one in the
+discarding direction".
+
+Rust counterpart: `design_selection.rs::DiscardLaw::CertifiedBound`. -/
+def Certified {D : Type u} (s : CascadeStage D) : Prop :=
+  ∀ d, s.cheap d = false → s.expensive d = false
+
+/-- [definition] A hard constraint read as a stage: the cheap test **is** the expensive one. -/
+def hardConstraintStage {D : Type u} (name : String) (admits : D → Bool) : CascadeStage D where
+  name := name
+  cheap := admits
+  expensive := admits
+
+/-- [proved-derived; formal-checked] A hard constraint is certified, trivially: every later stage
+issues the same refusal. -/
+theorem hardConstraintStage_is_certified {D : Type u} (name : String) (admits : D → Bool) :
+    Certified (hardConstraintStage name admits) := fun _ h => h
+
+/-- [definition] **What the cascade keeps**: a candidate that survives the cheap filter of every
+stage and the expensive receiver of every stage it thereby reaches. -/
+def cascadeSurvivors {D : Type u} (stages : List (CascadeStage D)) (population : List D) :
+    List D :=
+  population.filter (fun d => stages.all (fun s => s.cheap d && s.expensive d))
+
+/-- [definition] **What the full evaluation keeps**: every expensive receiver run on everything. -/
+def fullSurvivors {D : Type u} (stages : List (CascadeStage D)) (population : List D) : List D :=
+  population.filter (fun d => stages.all (fun s => s.expensive d))
+
+/-- The per-candidate step of the equality below. -/
+theorem all_cheap_and_expensive {D : Type u} (stages : List (CascadeStage D))
+    (certified : ∀ s ∈ stages, Certified s) (d : D) :
+    stages.all (fun s => s.cheap d && s.expensive d) = stages.all (fun s => s.expensive d) := by
+  induction stages with
+  | nil => rfl
+  | cons s rest ih =>
+      have head : Certified s := certified s (by simp)
+      have tail : ∀ t ∈ rest, Certified t := fun t ht => certified t (by simp [ht])
+      simp only [List.all_cons]
+      rw [ih tail]
+      cases hc : s.cheap d
+      · have expensive_refuses : s.expensive d = false := head d hc
+        simp [expensive_refuses]
+      · simp
+
+/-- [proved-derived; formal-checked] **With certified filters the cascade's frontier equals the full
+evaluation's frontier.** The cheap stages change what is *computed*, never what is *kept*. -/
+theorem certified_cascade_preserves_the_frontier {D : Type u} (stages : List (CascadeStage D))
+    (certified : ∀ s ∈ stages, Certified s) (population : List D) :
+    cascadeSurvivors stages population = fullSurvivors stages population := by
+  unfold cascadeSurvivors fullSurvivors
+  have step : (fun d => stages.all (fun s => s.cheap d && s.expensive d))
+      = (fun d => stages.all (fun s => s.expensive d)) :=
+    funext (all_cheap_and_expensive stages certified)
+  rw [step]
+
+/-- A cheap scalar proxy with no certificate: it refuses `false`, which the expensive receiver
+admits. -/
+def proxyStage : CascadeStage Bool where
+  name := "a cheap scalar proxy standing in for an expensive receiver, with no certificate"
+  cheap := fun d => d
+  expensive := fun _ => true
+
+/-- [proved-derived; formal-checked] It is not a certified bound. -/
+theorem proxyStage_is_not_certified : ¬ Certified proxyStage := by
+  intro certified
+  have refuses := certified false rfl
+  simp [proxyStage] at refuses
+
+/-- [proved-derived; formal-checked] **An uncertified proxy loses a design the full evaluation
+keeps.** This is the constructed instance; its design-level form is
+`scalarFirstDiscardsAFrontierDesign`, which cites `PresentationCost.unsupported_not_minimizer`. -/
+theorem uncertified_proxy_loses_a_frontier_design :
+    cascadeSurvivors [proxyStage] [false, true] ≠ fullSurvivors [proxyStage] [false, true] := by
+  decide
+
+/-- A certified cheap stage: the coarse contact receiver at the inflated aperture, whose `outside`
+reading certifies the fine receiver's `outside` reading. -/
+def certifiedStage : CascadeStage Bool where
+  name := "the coarse contact receiver at the inflated aperture"
+  cheap := fun d => d
+  expensive := fun d => d
+
+/-- [proved-derived; formal-checked] It is a certified bound. -/
+theorem certifiedStage_is_certified : Certified certifiedStage := fun _ h => h
+
+/-- [definition] How many candidates the expensive receiver of a stage is run on when the cheap
+filter runs first: the survivors of the cheap filter, and nothing else. -/
+def expensiveWork {D : Type u} (s : CascadeStage D) (population : List D) : Nat :=
+  (population.filter (fun d => s.cheap d)).length
+
+/-- [proved-derived; formal-checked] The expensive receiver is never run more often than the
+population. -/
+theorem expensiveWork_le_population {D : Type u} (s : CascadeStage D) (population : List D) :
+    expensiveWork s population ≤ population.length := by
+  unfold expensiveWork
+  exact List.length_filter_le _ _
+
+/-- [proved-derived; formal-checked] And on this population the certified cheap stage strictly
+saves: the expensive receiver runs once where the full evaluation runs it twice, and by
+`certified_cascade_preserves_the_frontier` the answer is the same. -/
+theorem the_certified_filter_saves_expensive_work :
+    expensiveWork certifiedStage [false, true] < ([false, true] : List Bool).length := by decide
+
+/-- [proved-derived; formal-checked] **The B10 cascade contract.** A hard constraint is certified; a
+cascade of certified stages returns exactly the full evaluation's survivors; an uncertified proxy
+does not, with the loss exhibited; and the expensive receiver runs only on the cheap filter's
+survivors. -/
+theorem cost_cascade_contract :
+    (∀ (name : String) (admits : Bool → Bool), Certified (hardConstraintStage name admits)) ∧
+      (∀ (stages : List (CascadeStage Bool)), (∀ s ∈ stages, Certified s) →
+        ∀ population, cascadeSurvivors stages population = fullSurvivors stages population) ∧
+      (¬ Certified proxyStage ∧
+        cascadeSurvivors [proxyStage] [false, true] ≠ fullSurvivors [proxyStage] [false, true]) ∧
+      (∀ (s : CascadeStage Bool) (population : List Bool),
+        expensiveWork s population ≤ population.length) :=
+  ⟨hardConstraintStage_is_certified,
+    fun stages certified population =>
+      certified_cascade_preserves_the_frontier stages certified population,
+    ⟨proxyStage_is_not_certified, uncertified_proxy_loses_a_frontier_design⟩,
+    expensiveWork_le_population⟩
+
 section Audit
 
 #print axioms notSeparatedWithinBound_does_not_license_merge
@@ -716,6 +865,15 @@ section Audit
 #print axioms indistinguishabilityIsNotTransitive
 #print axioms aComponentCanContainASeparatedPair
 #print axioms selection_contract
+#print axioms hardConstraintStage_is_certified
+#print axioms all_cheap_and_expensive
+#print axioms certified_cascade_preserves_the_frontier
+#print axioms proxyStage_is_not_certified
+#print axioms uncertified_proxy_loses_a_frontier_design
+#print axioms certifiedStage_is_certified
+#print axioms expensiveWork_le_population
+#print axioms the_certified_filter_saves_expensive_work
+#print axioms cost_cascade_contract
 
 end Audit
 

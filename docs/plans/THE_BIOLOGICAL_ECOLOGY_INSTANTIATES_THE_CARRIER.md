@@ -182,7 +182,10 @@ library path. The library owners are now
 and `deflate` submodules, and
 [`Foundation/ExteriorIntake.lean`](../../formal/elementary-holonics/ElementaryHolonics/Foundation/ExteriorIntake.lean).
 
-[established-bounded; implemented-exact; measured] Intake retains every `_atom_site` row, admits
+[established-bounded; implemented-exact; measured] Intake retains every `_atom_site` row — atom and
+residue labels, chain, element, alternate location, the three coordinate tokens, and the
+`occupancy` and `B_iso_or_equiv` columns where a presentation carries them, with the format's `.`
+and `?` cells read as absent — admits
 `<f2`, `<f4` and `<f8` uncertainty words through the exact decoders
 `exact_value::ieee754::decode_binary{16,32,64}_bits`, and reads a `.npz` container directly rather
 than a pre-extracted
@@ -447,7 +450,141 @@ prediction two loops, and the CUL1-bound prediction none — which the receiver 
 reports as zero. The loop contacts now come from the presentation's own within-component family
 through `presented_contact_loops`, with the filtration reading held to agreement and a
 disagreement returned as a typed refusal preferring neither source; on the three M5 windows the two
-readings agree exactly. The spectral and physicochemical receivers remain open.
+readings agree exactly. The spectral receiver remains open.
+
+[established-bounded; formal-checked; implemented-exact; measured] The **physicochemical half is
+returned**: [`physicochemical_receiver.rs`](../../crates/holonic-engine/src/physicochemical_receiver.rs)
+and
+[`Foundation/PhysicochemicalReceiver.lean`](../../formal/elementary-holonics/ElementaryHolonics/Foundation/PhysicochemicalReceiver.lean)
+own residue-class contact composition per family, hydrogen-bond **candidates**, steric overlaps, a
+burial **proxy** with an exact half-sphere exposure beside it, exact interface counts and rational
+ratios, and a declared finite electrostatic model carried as an exact enclosure. It founds no unit
+algebra: `quantity.rs` already owns `BaseUnits`, `Dimension`, `Quantity` and `Cast`, and the one
+composition this receiver adds is `UnitedInterval` — the *enclosure*-valued quantity, which
+`Quantity` is not, because every magnitude here is an interval. Adding two unlike dimensions is a
+typed refusal naming both. Converting an `e² Å⁻¹` reading into an energy is a `quantity::Cast` the
+caller supplies, and the chart change comes back as a `CastApplication` rather than happening
+silently.
+
+[established-bounded; implemented-exact] **No table is built in.** Residue classes, formal charges
+at a declared protonation, hydrogen-bond donor and acceptor heavy atoms, van der Waals radii and
+the dielectric are each an exterior declaration carrying a `TableGround` — a named source and a
+stated scope, both refused empty — and the whole `ParameterTables` travels by value into every
+reading exactly as `physical_intake::EnvironmentIndex` travels into an occurrence. The owner ships
+*named* declarations the caller chooses among and supplies no default; a residue or element outside
+a table's scope is refused by name and never filed under a fallback class or radius. Two readings
+taken under different tables are **not comparable**: `compare_across_tables` refuses naming both
+sets unless a `TablePassage` is supplied, and that constructor refuses any residue the two tables
+class differently and the declaration does not account for — the same no-silent-transport law
+`EnvironmentPassage` enforces across environments. The two shipped class tables differ at exactly
+one residue, histidine, and that difference *is* a pH claim.
+
+[established-bounded; measured] **A finding that is the receiver's primary result on the release.**
+A charged-state reading is a claim about a protonation state, so it needs a declared pH.
+`protonation_basis` returns `AcidityUndeclared` naming the axis and carrying the environment's own
+stated reason, and **all three M5 occurrences leave that axis undeclared** — "no pH and no
+protonation assumption is recorded anywhere in this release". The truthful primary return on the
+mounted data is therefore the refusal, and every charged reading below is obtained only through
+`ProtonationBasis::DeclaredAssumption`, whose ground travels into the reading and is checkable in
+it.
+
+[established-bounded; implemented-exact; formal-checked] **The exact readings and their laws.**
+Every distance question goes through `DistanceAperture::classify`, so an undecided reading stays
+undecided: a composition over a family carrying `Open` contacts is a **family of readings** between
+`refusing_bound` and `admitting_bound`, and `admitting = refusing + open` at every class pair
+(`admitting_eq_refusing_add_open`). Compositions are additive over disjoint families
+(`composition_additive_of_disjoint`), so an interface and a within-component fold decompose
+exactly. Every reading is invariant under a map preserving the pairwise separations and the
+declared class (`composition_invariant_under_isometry`) and under a class-preserving relabelling of
+the addresses (`composition_invariant_under_relabelling`). Hydrogen bonds are **candidates** and
+there is no `HydrogenBond` type at all: `candidate_ignores_hydrogen_geometry` and
+`two_geometries_one_candidate_reading` prove the reading cannot tell two geometries apart that
+differ only in where a hydrogen sits. There is no solvent-accessible surface area anywhere, because
+a rolling-probe area is a numerical integral: what is offered is an exact integer neighbour count
+named a proxy, and `half_sphere_exposure`, the exact count of neighbours on each side of the plane
+through a site normal to a declared reference direction, with the sites the interval arithmetic
+cannot place carried apart. `1/r` is irrational for a rational `r²` and is carried as an exact
+enclosure from `exact_value::AlgebraicRoot::reciprocal_square_root`'s Sturm certificate;
+`invEnclosure_contains` states the certificate in purely rational hypotheses and
+`invEnclosure_narrows` the monotone narrowing. The electrostatic model's approximations travel in
+the reading: point charges at the declared sites, one uniform declared permittivity, no solvent, no
+ions, no polarization, and the declared pair population as the model's own cutoff.
+
+[established-bounded; implemented-exact] **A finding that sharpens the plan: a rotation of a
+coordinate box is not a coordinate box.** A translation by an exact rational vector acts exactly on
+an interval coordinate box, so translation invariance holds on every presentation. A rotation maps
+an axis-aligned box to a set that is not axis-aligned, and re-enclosing it would widen the
+presentation into a different occurrence — so `RigidMotion::act` **refuses** a rotation of a box
+with width by name, and the full rigid-motion law is stated at point configurations, which is the
+same domain `rigidity_receiver::ExactConfiguration::from_presented` admits. The rotation itself is
+the composed Pythagorean `R_z(3/5,4/5)·R_x(5/13,12/13)`, and `RigidMotion::declare` checks
+`RᵀR = I` entry by entry over `Q` before a motion exists.
+
+[established-bounded; measured] **On the release, at the alpha-carbon interface.** Over the 10,368
+addressed pairs at 8 Å the admitted totals are **64 / 59 / 45** with **1 / 0 / 0** open, which are
+B8's recorded figures reached through this receiver's own founding of the family. The class composition separates all three
+presentations: hydrophobic–hydrophobic **7 / 6 / 3**, polar–polar **0 / 0 / 2**, hydrophobic–polar
+**8 / 7 / 3**, aromatic–hydrophobic **6 / 7 / 4**. The exact rational hydrophobic fractions are
+`7/64`, `6/59` and `3/45`; no scalar stands for the interface and every ratio carries the two
+counts it came from. **The charge receiver alone does not separate them**: salt-bridge candidates
+are `3 / 3 / 3` and like-charge contacts `1 / 1 / 1` on all three. On `relation_ladder`'s rungs the
+three presentations are pairwise **`NoRelation`** at this receiver family — the composition and the
+electrostatic enclosure are separators, so rung 4 `ReceiverEqual` is refuted for every pair, and a
+refuted rung 4 says nothing about rungs 1, 2 or 3. The designed presentation carries
+the release's single open reading, so its composition is genuinely a family and the other two are
+determinate. Under the declared protonation the electrostatic enclosure over the binder's 14,928
+addressed pairs — 1,458 of them contributing — separates all three as **disjoint** rational
+intervals in `e² Å⁻¹` at a declared relative permittivity of 4: approximately
+`[−0.645630, −0.624647]` for the designed structure, `[−0.608259, −0.608211]` for the free
+prediction and `[−0.568766, −0.568726]` for the CUL1-bound one, each an exact rational endpoint
+rendered. The designed structure's enclosure
+is **four hundred times wider** than either prediction's, and the reason is R5's finding in a second
+receiver: its coordinates are deposited to three decimals and theirs to six, so the deposited
+precision, not the chemistry, sets the width of the reading.
+
+[established-bounded; measured] **A finding on the five-residue window where the combinatorial
+receivers run out.** At the same declared five N-terminal RBX1 residues R3, R4 and R5 are blind on
+and only R1 separates, the **combinatorial half of this receiver is blind for the same reason** —
+the two predictions carry the same seven alpha-carbon contacts over the same residues, so the
+composition is identical — and its **charge reading is blind for a second, independent reason**:
+the window is `MET ALA ALA ALA MET`, which carries no formally charged residue at all, so the
+Coulomb sum over it is exactly zero for all three and separates nothing. What does separate the
+two predictions there is the **atom-grain burial proxy**, which reads heavy-atom geometry rather
+than the alpha-carbon contact set: summed per residue against the whole two-chain presentation it
+is `493 / 254 / 152 / 229 / 379` for the designed structure, `59 / 88 / 110 / 132 / 175` for the
+free prediction and `66 / 90 / 117 / 137 / 179` for the CUL1-bound one. Hydrogen-bond candidates
+there are `2 / 3 / 3` and steric overlaps `1 / 0 / 0`, which separate the designed structure from
+both predictions and not the two predictions from each other. Stated on `relation_ladder`'s rungs:
+at the window's *combinatorial* receiver family the two predictions are **`ReceiverEqual`** and the
+designed structure is `NoRelation` against both, while at the window's *atom-grain* family all three
+are pairwise `NoRelation`. Rung 4 at one declared receiver family is not rung 4 at another, which is
+the atlas thesis measured inside one receiver.
+
+[established-bounded; measured] **What this receiver does and does not surface of the wave-1
+predictor defect.** At a declared two-angstrom radius a carbonyl oxygen bonded to its own carbonyl
+carbon carries exactly one neighbour. Both of the designed structure's chain-terminal carbonyl
+oxygens do; **three of the two predictions' four carry none** — no atom at all within two
+angstroms, which for a heavy-atom model is no bonded partner. The fourth, the free prediction's
+RBX1 terminus, sits 21.8 Å from its own alpha carbon and still lands beside something, and the
+receiver says so rather than claiming the detection. The **steric reading is blind to the defect as
+a defect**: of the three unbonded oxygens it reports exactly one, and reports it as an *overlap*
+with whatever the stray atom landed beside rather than as a broken bond, while the CUL1-bound
+prediction's two appear in no overlap at all. A reading of atoms that are too close cannot see an
+atom that is too far. The reading that surfaces every one of them is the intra-residue covalent
+radius, which `grain_tower`'s measured grain radius already owns as B0's inflation witness; this
+receiver does not duplicate it.
+
+[established-bounded; implemented-exact] **The contract rows are registered and recomputed.**
+`receiver_atlas::ledger_entries` now carries thirty rows over five receivers, and `B7phys`'s three
+`Satisfied` rows are computed at every call by real verifier functions against this owner's own
+public worked witness: rebase equivariance under the exact rational rigid motion, source
+accountability (the per-class-pair counts sum to the admitted total, the three classes exhaust the
+population, and every candidate and every overlap names two standing sites and carries an exact
+interval re-derived from the presentation's coordinates), and energy balance (the electrostatic
+enclosure over a population is **exactly** the sum of its enclosures over a declared partition, with
+no widening). Declaration independence is **Failed**, because the declared table decides the reading
+and the owner ships the two tables that exhibit it; the gluing law with interface coupling and
+stability away from bifurcation are **Unproved** with the absent object named in each.
 
 [established-bounded; measured] **The intra-chain reading of the three M5 RBX1 presentations, at
 8 Å.** Over the whole 108-residue chain the population is `C(106,2) = 5,565` pairs at `k = 3` and
@@ -575,17 +712,143 @@ each of the three real environments they are a horizontal family, each design's 
 vertical family, the separator between the unperturbed and the seven-flip design is exactly those
 **7** contacts, and the release's single open reading is carried on neither side.
 
-[definition] **B9 — Evaluation discipline.** Leave-one-target-out, leave-one-interface-family-out,
-leave-one-generator-out, assay-specific calibration, predictor-disagreement subsets and
-positive/negative environment pairs. Close variants of one design lineage never straddle a split. A
-wet or external return is a new receiver occurrence and does not retroactively relabel every model
-output.
+[definition] **B9 — Evaluation discipline. Returned.** The six disciplines are six declared
+partitions of a design population by one typed key each — target, interface family,
+generator/predictor lineage, assay, disagreement class, environment pair — and the leakage law is
+structural rather than a convention. The library owners are
+[`evaluation_discipline.rs`](../../crates/holonic-engine/src/evaluation_discipline.rs) and
+[`Foundation/EvaluationDiscipline.lean`](../../formal/elementary-holonics/ElementaryHolonics/Foundation/EvaluationDiscipline.lean).
+It is a **new owner and not more of `design_selection`**: its carrier is the *quotient* of the
+design population by the lineage relation rather than the designs, its receivers carry a fitting
+history that a selection's `DeclaredReceiver` has no reason to carry, and its return is a
+conclusion with a scope rather than a survivor list. The cost cascade of B10 is the opposite case
+and extends `design_selection` instead — one cascade, two readings.
 
-[definition] **B10 — Cost cascade and receipts.** Cheap population filters, then a moderate
-structural population, then the constraint and interface receiver, then expensive plural
-prediction, then robust diverse release — with every run recording its tool, version, mode and
-numerical scope. Where an external optimized kit is used, its mode and scope belong in the receipt;
-the repository has verified no such kit and records the requirement regardless.
+[established-bounded; formal-checked; implemented-exact] **Lineage never straddles a split, by
+construction.** `LineageClasses` is the quotient of the design population by the relation the
+horizontal `physical_occurrence::Passage::<Horizontal>::mutation` passages generate: an admitted
+mutation is one `LineageEdge::Passage`, and two designs whose monomer sequences differ at no more
+than a declared `EditRadius` many sites carry a `LineageEdge::EditDistance` whose site list **is**
+the chain of single-site mutations joining them in sequence space, whether or not the family holds a
+face for each intermediate. A changed target component or a changed sequence length founds no edge,
+which is the mutation constructor's own refusal inherited rather than re-decided.
+`Split::from_class_partition` takes a partition of *classes*, so its sides are unions of whole
+classes and a straddle is not expressible; `Split::from_raw_designs` takes designs and returns
+`SplitStraddlesALineageClass` naming the pair, the shared class and the connecting chain; and
+`LineageClasses::straddle_of` returns that same leak as data, which is the converse witness. In
+Lean: `ofClassPredicate_does_not_straddle` against `rawSplit_straddles`, with
+`Lineage.cls_eq_of_rel` the fact that makes the first structural. `#print axioms` on the B9 theorems
+returns only `propext`, `Classical.choice` and `Quot.sound`, with no `sorryAx`.
+
+[established-bounded; formal-checked; implemented-exact] **Leakage through receivers, not only
+through members.** A `FittedReceiver` carries the occurrences and designs it was fitted on, and
+`evaluate_at` refuses at an occurrence it was fitted on and at any design lineage-equivalent to one
+it was fitted on — the leak no member-level split catches, since nothing crosses the split and the
+receiver still holds the evaluation side inside it. Success returns a `ReceiverAdmission` whose
+fields are private and whose only constructor is that check, so an admission cannot be written by
+hand. A `Calibration` is fitted within one assay and `carry_to` returns it unchanged there; across
+assays it is refused unless an `AssayBridge` joining exactly those two is supplied, which is the law
+`EnvironmentPassage` imposes on environments, restated for assays. Lean:
+`evaluateAt_refuses_a_lineage_equivalent_occurrence`, `across_assays_without_a_bridge_is_refused`
+and `a_bridge_between_other_assays_is_refused`.
+
+[proved-derived; formal-checked] **A wet or external return is a new receiver occurrence.** The
+earlier prediction's face is an occurrence at its own time and `ExternalComparison::state` returns
+it unchanged; what the return produces is a *new relation between two occurrences*, stated on a
+`relation_ladder::Rung` and carrying its own time index, strictly later than the prediction's. The
+rung is computed from the two exact readings and the declared tolerance — `ReceiverEqual` on exact
+equality, `WithinTolerance` inside the declared aperture, `NoRelation` otherwise — and never
+declared. The cited law is `standing.rs`'s
+`the_available_face_changes_while_the_source_does_not`: the available face changes while the source
+does not. An external return that is not later is refused, and an `Unread` return is refused by name
+because an unread return is not a return.
+
+[established-bounded; implemented-exact] **Predictor disagreement is a fibre property.**
+`disagreement_subsets` is `PluralFibre::partition`'s own four-way partition read as three evaluation
+subsets — the two unanimous roles are one subset because an evaluation splits on *whether* the
+predictors agree — and the open class takes precedence exactly as it does there, counted on neither
+side. **A finding that sharpens the plan:** a contact counts as agreeing only when the predictor's
+answer equals every member's decided class, and a separating contact takes two decided values by
+definition, so *no* point predictor agrees with every member on a separating contact. The separating
+subset's agreement rate is structurally zero for any such predictor, whatever its rate on the
+unanimous subset — which is a sharper statement than "performance there says nothing", and the
+worked instance exhibits it at `(1,1)` unanimous against `(1,2)` and `(1,3)` separating.
+
+[proved-derived; formal-checked] **What an evaluation may conclude.** `EvaluationConclusion` has
+three arms and no fourth: `EstablishedBounded` at its split and receiver, `GeneralizationRefuted`
+with its counterexample, and `NotRefutedWithinThisEvaluation` as its own return. There is no arm
+that affirms a generalization, `UniversalClaim` is uninhabited exactly as `RealizationProof` is, and
+`at_another_split` returns `None` at any split but the one the conclusion was drawn at. `read_held_out`
+takes a `ReceiverAdmission` by reference, so a conclusion cannot be drawn where the leakage law did
+not admit the reading.
+
+[definition] **B10 — Cost cascade and receipts. Returned.** The cascade half extends the B8 owner —
+[`design_selection.rs`](../../crates/holonic-engine/src/design_selection.rs) and
+[`Foundation/DesignSelection.lean`](../../formal/elementary-holonics/ElementaryHolonics/Foundation/DesignSelection.lean)
+— because it is *the same cascade read for what it costs* and not a second pipeline: a
+`CascadeStage` carries the cheap reading it runs, the expensive receiver it stands in for and a
+`presentation_cost::CostReceipt` per candidate for each, and `CostedCascade::run` runs a stage only
+on the survivors of the cheaper stages. The receipt half — `RunReceipt`, the named clocks and the
+tool-version readers — is in `evaluation_discipline.rs`, because a run receipt is evidence an
+evaluation stands on and not a property of a design population.
+
+[proved-derived; formal-checked; implemented-exact] **The soundness law of a cascade.** A stage may
+discard only under a `DiscardLaw::HardConstraint` — whose cheap test *is* its expensive test, so it
+is run once and charged once — or under a `DiscardLaw::CertifiedBound`, whose `Certified` token has
+no public constructor and is minted only by `CascadeStage::certified_bound` after checking, at every
+candidate of a declared probe, that the cheap reading refuses only where the expensive receiver
+refuses; the first violation is `CertificateRefuted` naming the design. A
+`DiscardLaw::UncertifiedProxy` **discards nothing**: what it would have removed is recorded in
+`StageRun::would_have_discarded` and carried forward, and `run_admitting_every_proxy_discard` exists
+only so the loss can be exhibited. In Lean, `certified_cascade_preserves_the_frontier` proves that a
+cascade of certified stages returns exactly the full evaluation's survivors, and
+`uncertified_proxy_loses_a_frontier_design` is the constructed instance where it does not;
+`scalarFirstDiscardsAFrontierDesign`, which cites `PresentationCost.unsupported_not_minimizer`, is
+the same loss at the design level. `cost_saving` returns the exact per-axis `BigUint` difference
+with a typed direction and is never clamped to zero, because a cheap stage is itself a cost.
+
+[established-bounded; measured] **The measured cascade, on the designed M5 structure, CPU only.**
+Four stages over the 10,368 addressed `binder × RBX1` residue pairs: the cheap alpha-carbon filter
+at the certified inflated aperture, the all-atom contact complex on its survivors, the rigidity
+receiver and the grade-zero Hodge reading over the surviving interface. The material is 96 binder
+residues carrying 473 atoms and 108 RBX1 residues carrying 857 atoms. The inflation is **measured,
+never declared**: the largest distance from an alpha carbon to an atom of its own residue is
+`7140003/10^6` Å, and `grain_tower::certified_coarse_aperture_squared` turns it into an inflated
+coarse aperture squared of `124099666840009/(2.5·10^11)`, about 496.40 Å². Stage one takes 10,368
+exact residue-pair classifications and discards 6,427, leaving 3,941; stage two takes **156,658**
+exact atom-pair classifications on those survivors and finds 304 residue pairs carrying an all-atom
+contact, where running it on everything would take **405,361** — a cumulative saving of **248,703**
+atom-pair classifications, about 61.4 per cent. The certified discard is sound on this material:
+**0 of the 6,427** discarded pairs carries an all-atom contact. **At the equal 8 Å aperture the same
+discard is unsound**, and the measurement says by how much: it would discard 10,303 pairs and lose
+**239 of the 304** all-atom contacts, 78.6 per cent — the residue-pair form of B0's 78.45 per cent
+at the contact level, on the designed structure alone. Stage three reads 107 occurrences and 169
+constraints with `rank J = 169`, `dim ker J = 152` and `dim ker Jᵀ = 0`; stage four reads 107 cells
+with `dim ker Δ₀ = 1` and `β₀ = 1`. The four named clocks, as exact integer nanoseconds from
+`std::time::Instant`: setup `133,873,256`, resident execution `41,086,275,664`, readout
+`145,116,707,158`, end to end `186,337,424,672`. The measurement is `#[ignore]`d with its run
+command in its own module header; the default test run does not take it.
+
+[established-bounded; source-inspected] **A finding that corrects this plan.** The sentence "the
+repository has verified no such kit" is wrong. This workstation carries **Boltz-2 2.2.1** and
+**torch 2.14.0+cu130** in the virtual environment an earlier session installed at
+`.local/venv-protein`, and a **ProteinMPNN** checkout at `.local/tools/ProteinMPNN` whose `HEAD` is
+`8907e6671bfbfc92303b5f79c4b5e6ce47cdef57`. Those three version strings are **read**, not recorded
+by hand: `evaluation_discipline::python_package_version` and `git_head` ask the tools themselves,
+and `ToolVersion::Read` carries a `Recorded` token with no public constructor, so a version that was
+not read cannot be written — the only other value is `ToolVersion::Unavailable{why}`, which says why.
+A `RunReceipt`'s fields are private and its only constructor is `RunRecorder::finish`, which refuses
+without an `end_to_end` clock; every clock reading is an exact integer nanosecond count carrying the
+declared source it came from. What the repository still has **no** measurement of is either kit's
+output: neither has been run against an M5 design here, and nothing in this increment changes the
+non-claim at the end of this document.
+
+[definition] **A finding that sharpens the plan.** A typed key and a lineage partition are two
+independent declarations and nothing makes them agree, so `Split::leave_one_out` is where they are
+reconciled: it computes the held-out set from the declared key and then refuses unless that set is a
+union of lineage classes. The declared `EditRadius` is not a nuisance parameter either — it decides
+the quotient, and on the worked four-design family the same population is four classes at radius
+zero, two at radius one and one at radius three. Neither the radius nor the key has a default.
 
 ## Extension order
 

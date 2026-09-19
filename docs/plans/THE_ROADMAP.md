@@ -241,17 +241,16 @@ documents hold the statements, owners and findings and are not re-narrated here.
 |---|---|---|
 | Shared carrier | C1–C8 and the tube join | Weierstrass division for the power-series form of `Λ/(ω_n)` |
 | Receiver atlas | R1–R7 | per-eigenvalue refinement on `ExactHodgeSpectrum`; `MarkovTwoNSuffices` |
-| Biological ecology | B0–B8, and B7 except its physicochemical receiver | B9 evaluation discipline; B10 cost cascade; the physicochemical receiver |
+| Biological ecology | B0–B10 | held-out agreement counts computed from a declared receiver family rather than supplied; a run of the installed predictors against an M5 design; the gluing law with interface coupling for the physicochemical receiver |
 | Exact device law | D1–D3, one engine instance adopted on the card | a second device ring of signed 128-bit words with the engine's carrier refusal; per-region operator family; base-pointer registry; the zero gather inside the adopted readout context; D4 stays an intention |
-| Generalized transport | T1 relation ladder, T2 standing/memory/extinction | T3 with T5; T4 with T7; T6 with T8 |
+| Generalized transport | T1 relation ladder, T2 standing/memory/extinction, T3 release over an edited family, T5 two-axis horizon | T4 with T7; T6 with T8; a plural family generic in its coordinate address (named by T3, not founded) |
 
-[definition] **The remaining order is one list.** (1) The rebased prospective reading of the shared
-section work, which is the Athena application's next discriminating return. (2) T3 release over an
-edited family with T5 the two-axis horizon. (3) T4 knot friction with T7 fold, cut and junction,
-which share the rigidity owner. (4) T6 neck invariants with T8 the jet tower, which share the pole
-and higher-difference owners. (5) B9, B10 and the physicochemical receiver, beside whichever wave
-has room. (6) The device ring and the items listed against it. The smaller open items in the table
-are taken inside the increment that next touches their owner, not as increments of their own.
+[definition] **The remaining order is one list.** (1) T4 knot friction with T7 fold, cut and
+junction, which share the rigidity owner. (2) T6 neck invariants with T8 the jet tower, which share
+the pole and higher-difference owners. (3) The device ring and the items listed against it. (4) The
+Athena application's complete-source session over the rebased shared section work, carried by
+[CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md). The smaller open items in the table are taken
+inside the increment that next touches their owner, not as increments of their own.
 
 ### Rules that settle recurring choices
 

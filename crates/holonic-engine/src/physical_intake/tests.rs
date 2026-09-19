@@ -1892,3 +1892,32 @@ fn the_module_header_publishes_the_bidirectional_correspondence() {
         }
     }
 }
+
+/// **The optional numeric columns of a row are retained, and the format's absent cell is no
+/// value.** Intake retained every row and dropped `occupancy` and `B_iso_or_equiv`; a row now
+/// carries both where the presentation does, `.` and `?` read as absent, and a malformed cell is
+/// refused rather than read as absent.
+#[test]
+fn occupancy_and_temperature_factor_are_retained_and_an_absent_cell_is_no_value() {
+    let head = "data_columns\nloop_\n_atom_site.group_PDB\n_atom_site.label_atom_id\n\
+                _atom_site.label_comp_id\n_atom_site.label_asym_id\n_atom_site.label_seq_id\n\
+                _atom_site.Cartn_x\n_atom_site.Cartn_y\n_atom_site.Cartn_z\n\
+                _atom_site.occupancy\n_atom_site.B_iso_or_equiv\n";
+    let text = format!(
+        "{head}ATOM N GLY A 1 1.0 2.0 3.0 1.00 35.25\nATOM CA GLY A 1 2.0 2.0 3.0 . ?\n#\n"
+    );
+    let presentation = StructurePresentation::parse("columns", &text).expect("reads");
+    let atoms = &presentation.chains[0].residues[0].atoms;
+    assert_eq!(
+        atoms[0].occupancy,
+        Some(DecimalToken::parse("1.00").expect("token"))
+    );
+    assert_eq!(
+        atoms[0].temperature_factor,
+        Some(DecimalToken::parse("35.25").expect("token"))
+    );
+    assert_eq!((&atoms[1].occupancy, &atoms[1].temperature_factor), (&None, &None));
+
+    let malformed = format!("{head}ATOM N GLY A 1 1.0 2.0 3.0 full 35.25\n#\n");
+    assert!(StructurePresentation::parse("columns", &malformed).is_err());
+}

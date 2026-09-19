@@ -67,6 +67,10 @@ pub mod arithmetic_dimensional;
 pub mod arithmetic_fiber;
 pub mod arithmetic_monodromy;
 pub mod arithmetic_phase;
+// T3 of `docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md`: release
+// over an edited artifact family `F_{k+1} = T_g(F_k) ∩ C_k`, the draft-observe-revise cycle as
+// a declared circuit, and the typed disposition. Paired with `Transport/ArtifactRelease.lean`.
+pub mod artifact_release;
 pub mod atlas;
 pub mod atmospheric_inverse;
 // ATHENA -- the chart transition from a holonic atlas to a tensor container. The suffix-link tree
@@ -235,6 +239,9 @@ pub mod dimensional_receiver;
 pub mod dimensional_wave;
 pub mod display;
 pub mod divisor_reconstruction;
+// B9 of the biological-ecology plan: typed evaluation splits with a leakage law, and B10's run
+// receipts and named clocks. Paired with `Foundation/EvaluationDiscipline.lean`.
+pub mod evaluation_discipline;
 pub mod evolution;
 pub mod exact_linear;
 mod factored_moment;
@@ -367,6 +374,12 @@ pub mod physical_intake;
 // and must not collide with the addressing at the crate root. A claim read at one environment is
 // a claim at that environment only, and carrying it elsewhere needs a supplied passage.
 pub mod physical_occurrence;
+// B7's physicochemical half: residue-class contact composition, hydrogen-bond *candidates*, steric
+// overlaps, a burial *proxy* and a declared finite electrostatic model carried as an exact
+// enclosure. Not glob-exported: its `ResidueClass`, `ParameterTables` and `RigidMotion` names are
+// local to this receiver. Every reading carries its unit and the declared parameter table it was
+// taken under, and a charged reading refuses on an undeclared acidity axis.
+pub mod physicochemical_receiver;
 pub mod placement;
 pub mod platform;
 #[cfg(all(target_os = "linux", feature = "desktop-x11"))]

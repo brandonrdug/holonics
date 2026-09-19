@@ -236,6 +236,11 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             "Transport/ContinuingTube.lean",
         ),
         (
+            include_str!("artifact_release.rs"),
+            "artifact_release.rs",
+            "Transport/ArtifactRelease.lean",
+        ),
+        (
             include_str!("iwasawa_tower.rs"),
             "iwasawa_tower.rs",
             "Foundation/IwasawaTower.lean",
@@ -299,6 +304,11 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             "Foundation/AperturedGradedComplex.lean",
         ),
         (
+            include_str!("physicochemical_receiver.rs"),
+            "physicochemical_receiver.rs",
+            "Foundation/PhysicochemicalReceiver.lean",
+        ),
+        (
             include_str!("standing.rs"),
             "standing.rs",
             "Foundation/Standing.lean",
@@ -307,6 +317,11 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             include_str!("design_selection.rs"),
             "design_selection.rs",
             "Foundation/DesignSelection.lean",
+        ),
+        (
+            include_str!("evaluation_discipline.rs"),
+            "evaluation_discipline.rs",
+            "Foundation/EvaluationDiscipline.lean",
         ),
     ]
 }

@@ -579,6 +579,286 @@ theorem no_transformer_from_the_released_coarse_face :
       (fun x : compatibleFibre => timingReading x.1)) :=
   ⟨fun t => t.excludesInsufficiency timingInsufficiency⟩
 
+/-! ## T5 — the horizon has two coordinates
+
+[definition] Item **T5** of
+`docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md`. The `width` above reads
+at a horizon of `h` steps of `Φ`. That fixes *where along the tube* the reading happens and says
+nothing about *at which grain*. Brandon, September 18: the smallest grain sees far and large things
+as curved and its nearest neighbours as sharp and lattice-like; the largest grain sees big things
+straight and the convergence toward the small as curved; and **both are distance into the horizon** —
+zooming from orbit down to an organism is as far into the horizon as looking out to the stars.
+
+[definition] The horizon is therefore a pair `(h, k)`: `h` longitudinal steps and `k` steps in the
+tower's index, in either direction. Three things are proved of it here and none of them is a
+restatement of the one-axis law:
+
+* the two coordinates are a **product** order and not one scale (`horizonWithin_is_not_total`), so
+  "how far into the horizon" is a pair and not a number;
+* the index distance is the length of a chain through a declared adjacency, it is **symmetric**
+  (`chainDistance_symm`) and it is the same distance in the order dual
+  (`chainDistance_orderDual`) — that is the exact sense in which distance toward the fine and
+  distance toward the coarse are one notion;
+* and the **reading** along those two directions is not symmetric at all
+  (`looking_toward_the_coarse_is_determined_and_toward_the_fine_is_plural`): a tower's only
+  transport is `restrict` and it runs one way, so toward the coarse the observer reads a single
+  determined **face** and toward the fine it reads the whole **fibre**. Both directions are far;
+  they are far in dual ways, and that asymmetry — not a symmetry — is the content.
+
+Rust owner: `crates/holonic-engine/src/receiver_release.rs::{Horizon, width_over_readings}` and
+`crates/holonic-engine/src/continuing_tube.rs::{Observer, IndexDirection, IndexReading,
+index_distance, HorizonReach, horizon_reach, two_axis_width}`. -/
+
+/-- [definition] **A horizon with two coordinates**: `h` longitudinal steps of `Φ` and `k` steps in
+the tower's index, in either direction.
+
+Rust counterpart: `receiver_release.rs::Horizon`, whose two fields are private and whose
+constructor checks both ceilings. -/
+structure Horizon where
+  /-- Steps of `Φ` along the tube. -/
+  longitudinal : ℕ
+  /-- Steps through the tower's index, in either direction. -/
+  index : ℕ
+  deriving DecidableEq, Repr
+
+namespace Horizon
+
+/-- [definition] The longitudinal-only horizon: the one the `width` above already reads at. -/
+def longitudinalOnly (h : ℕ) : Horizon := ⟨h, 0⟩
+
+/-- [definition] One horizon lies **within** another when it is no further along either axis. This
+is the product order, and it is the order the monotonicity law below is stated in. -/
+protected def Within (inner outer : Horizon) : Prop :=
+  inner.longitudinal ≤ outer.longitudinal ∧ inner.index ≤ outer.index
+
+end Horizon
+
+/-- [proved-derived; formal-checked] Every horizon lies within itself. -/
+theorem horizonWithin_refl (H : Horizon) : H.Within H := ⟨le_refl _, le_refl _⟩
+
+/-- [proved-derived; formal-checked] And the relation is transitive. -/
+theorem horizonWithin_trans {a b c : Horizon} (hab : a.Within b) (hbc : b.Within c) :
+    a.Within c :=
+  ⟨le_trans hab.1 hbc.1, le_trans hab.2 hbc.2⟩
+
+/-- [counterexample; formal-checked] **The two coordinates are not one scale.** Two steps along the
+tube and two steps through the grain are incomparable horizons: neither contains the other. "How far
+into the horizon" is therefore a pair, and no lexicographic order is imposed on it — which is why
+the Rust `Horizon` derives no `Ord`. -/
+theorem horizonWithin_is_not_total :
+    ¬ (Horizon.Within ⟨2, 0⟩ ⟨0, 2⟩) ∧ ¬ (Horizon.Within ⟨0, 2⟩ ⟨2, 0⟩) := by
+  constructor <;> simp [Horizon.Within]
+
+/-! ### Distance through a chain, on either axis -/
+
+/-- [definition] **Distance through a chain of a declared adjacency.** `ChainDistanceAtMost Adj k i j`
+holds when a chain of at most `k` adjacent steps runs from `i` to `j`. The adjacency is a parameter
+because *the same notion serves both axes*: along the tube it is the admitted step, and across the
+tower it is comparability of charts.
+
+Rust counterpart: `continuing_tube.rs::index_distance`, whose adjacency is the **cover** relation
+inside the declared chart aperture, and whose return is `IndexReading::NoChain` — a value, never an
+infinite distance — where no chain exists. -/
+inductive ChainDistanceAtMost {I : Type u} (Adj : I → I → Prop) : ℕ → I → I → Prop where
+  /-- Every chart is at distance zero from itself. -/
+  | here (k : ℕ) (i : I) : ChainDistanceAtMost Adj k i i
+  /-- One adjacent step, then a chain. -/
+  | step {k : ℕ} {i j l : I} (first : Adj i j) (rest : ChainDistanceAtMost Adj k j l) :
+      ChainDistanceAtMost Adj (k + 1) i l
+
+/-- [proved-derived; formal-checked] A chain inside `k` steps is inside every larger bound. -/
+theorem chainDistance_mono {I : Type u} {Adj : I → I → Prop} {k m : ℕ} {i j : I}
+    (h : ChainDistanceAtMost Adj k i j) : k ≤ m → ChainDistanceAtMost Adj m i j := by
+  induction h generalizing m with
+  | here _ i => intro _; exact .here m i
+  | step first _ ih =>
+      intro hkm
+      obtain ⟨m', rfl⟩ : ∃ m', m = m' + 1 := ⟨m - 1, by omega⟩
+      exact .step first (ih (by omega))
+
+/-- [proved-derived; formal-checked] A chain extends by one step at its far end. -/
+theorem chainDistance_snoc {I : Type u} {Adj : I → I → Prop} {k : ℕ} {i j l : I}
+    (h : ChainDistanceAtMost Adj k i j) : Adj j l → ChainDistanceAtMost Adj (k + 1) i l := by
+  induction h with
+  | here k i => intro last; exact .step last (.here k l)
+  | step first _ ih => intro last; exact .step first (ih last)
+
+/-- [proved-derived; formal-checked] **A chain distance over a symmetric adjacency is symmetric.**
+This is the formal half of Brandon's statement that distance toward the fine and distance toward the
+coarse are one notion: the *distance* does not know which way it is walked. -/
+theorem chainDistance_symm {I : Type u} {Adj : I → I → Prop}
+    (hsymm : ∀ a b, Adj a b → Adj b a) {k : ℕ} {i j : I}
+    (h : ChainDistanceAtMost Adj k i j) : ChainDistanceAtMost Adj k j i := by
+  induction h with
+  | here k i => exact .here k i
+  | step first _ ih => exact chainDistance_snoc ih (hsymm _ _ first)
+
+/-- [proved-derived; formal-checked] **The triangle inequality**, which is the law the
+observer-relative shift of a defect profile is proved from. -/
+theorem chainDistance_trans {I : Type u} {Adj : I → I → Prop} {a b : ℕ} {i j l : I}
+    (hij : ChainDistanceAtMost Adj a i j) :
+    ChainDistanceAtMost Adj b j l → ChainDistanceAtMost Adj (a + b) i l := by
+  induction hij with
+  | here _ _ => intro hjl; exact chainDistance_mono hjl (by omega)
+  | step first _ ih =>
+      intro hjl
+      have hstep := ChainDistanceAtMost.step first (ih hjl)
+      exact chainDistance_mono hstep (by omega)
+
+/-- [proved-derived; formal-checked] A chain over a weaker adjacency is a chain over a stronger
+one. -/
+theorem chainDistance_congr {I : Type u} {R S : I → I → Prop} (implies : ∀ a b, R a b → S a b)
+    {k : ℕ} {i j : I} (d : ChainDistanceAtMost R k i j) : ChainDistanceAtMost S k i j := by
+  induction d with
+  | here k i => exact .here k i
+  | step first _ ih => exact .step (implies _ _ first) ih
+
+/-- [definition] Two charts are **comparable** when the index order relates them either way. A chain
+of comparable charts is what an index distance walks, and where no such chain exists the passage is
+`Transport/ContinuingTube.lean::Wormhole` rather than a longer walk. -/
+def Comparable {I : Type u} [Preorder I] (i j : I) : Prop := i ≤ j ∨ j ≤ i
+
+/-- [proved-derived; formal-checked] Comparability is symmetric. -/
+theorem comparable_symm {I : Type u} [Preorder I] (i j : I) : Comparable i j → Comparable j i :=
+  Or.symm
+
+/-- [proved-derived; formal-checked] **The index distance is the same distance in the order dual.**
+`Iᵒᵈ` reverses `≤`, so what was a step toward the coarse becomes a step toward the fine; the chain
+distance is unchanged. Refining `k` steps below the observer's chart and coarsening `k` steps above
+it are one notion of distance, read in two directions. -/
+theorem chainDistance_orderDual {I : Type u} [Preorder I] (k : ℕ) (i j : I) :
+    ChainDistanceAtMost
+        (fun a b : I => Comparable (OrderDual.toDual a) (OrderDual.toDual b)) k i j ↔
+      ChainDistanceAtMost (Comparable (I := I)) k i j := by
+  constructor <;> intro h <;> exact chainDistance_congr (fun _ _ => Or.symm) h
+
+/-! ### The width over a two-axis horizon -/
+
+/-- [definition] **What an observer's horizon reaches**, as a family indexed by the horizon: a
+nonempty compatible family at each `(h, k)`, monotone in the product order. The Rust owner walks it
+(`continuing_tube.rs::horizon_reach`); here it is the hypothesis the width law needs and nothing
+more, because the law is indifferent to how the walk was made. -/
+structure TwoAxisReach (X : Type u) where
+  /-- The family reached at one horizon. -/
+  reach : Horizon → Finset X
+  /-- An observer always reaches itself. -/
+  nonempty : ∀ H, (reach H).Nonempty
+  /-- A wider horizon reaches a superset. -/
+  monotone : ∀ {inner outer : Horizon}, inner.Within outer → reach inner ⊆ reach outer
+
+/-- [definition] **The width over a two-axis horizon**: `w_R(s, i; h, k)`. It is the `width` above,
+taken over what the horizon reaches. Nothing is founded a second time. -/
+def twoAxisWidth {X : Type u} (r : TwoAxisReach X) (H : Horizon) (R : X → ℚ) : ℚ :=
+  width (r.reach H) (r.nonempty H) R
+
+/-- [proved-derived; formal-checked] **The two-axis width is monotone in the product order**, which
+is `width_mono` at a wider reach and is not a second monotonicity law. -/
+theorem twoAxisWidth_mono {X : Type u} (r : TwoAxisReach X) {inner outer : Horizon}
+    (h : inner.Within outer) (R : X → ℚ) :
+    twoAxisWidth r inner R ≤ twoAxisWidth r outer R :=
+  width_mono (r.monotone h) (r.nonempty inner) (r.nonempty outer) R
+
+/-- [proved-derived; formal-checked] Monotone in the longitudinal coordinate with the index one
+fixed. -/
+theorem twoAxisWidth_mono_longitudinal {X : Type u} (r : TwoAxisReach X) {h h' k : ℕ}
+    (hle : h ≤ h') (R : X → ℚ) :
+    twoAxisWidth r ⟨h, k⟩ R ≤ twoAxisWidth r ⟨h', k⟩ R :=
+  twoAxisWidth_mono r ⟨hle, le_refl k⟩ R
+
+/-- [proved-derived; formal-checked] And monotone in the index coordinate with the longitudinal one
+fixed: **going one grain further into the horizon never narrows the reading.** -/
+theorem twoAxisWidth_mono_index {X : Type u} (r : TwoAxisReach X) {h k k' : ℕ}
+    (hle : k ≤ k') (R : X → ℚ) :
+    twoAxisWidth r ⟨h, k⟩ R ≤ twoAxisWidth r ⟨h, k'⟩ R :=
+  twoAxisWidth_mono r ⟨le_refl h, hle⟩ R
+
+/-- [proved-derived; formal-checked] **At `k = 0` the two-axis width is the width this file already
+owned.** Every theorem proved of `width` above — `width_nonneg`, `abs_sub_le_width`,
+`width_le_of_bounds`, `width_mono`, `width_eq_zero_iff`,
+`releasable_at_every_tolerance_iff_width_zero`, `width_nonExpansive_factor` — is therefore a
+statement about the longitudinal-only case of this one, and none of them is restated. -/
+theorem twoAxisWidth_at_index_zero_is_the_longitudinal_width {X : Type u} (r : TwoAxisReach X)
+    (h : ℕ) (R : X → ℚ) :
+    twoAxisWidth r (Horizon.longitudinalOnly h) R =
+      width (r.reach ⟨h, 0⟩) (r.nonempty ⟨h, 0⟩) R := rfl
+
+/-- [proved-derived; formal-checked] The corollary in the form the one-axis owner states it: at
+`k = 0` the width is monotone in the horizon, which is `width_mono` and nothing else. -/
+theorem longitudinal_case_is_the_existing_width_law {X : Type u} (r : TwoAxisReach X) {h h' : ℕ}
+    (hle : h ≤ h') (R : X → ℚ) :
+    twoAxisWidth r (Horizon.longitudinalOnly h) R ≤
+      twoAxisWidth r (Horizon.longitudinalOnly h') R :=
+  twoAxisWidth_mono r ⟨hle, le_refl 0⟩ R
+
+/-! ### Toward the coarse is a face; toward the fine is a fibre -/
+
+/-- [definition] What an observer reads **toward a coarser chart**: the single face its own face
+restricts to. A tower's only transport is `restrict`, and `restrict` is a function. -/
+def coarseReach {X Y : Type u} [DecidableEq Y] (p : X → Y) (x : X) : Finset Y := {p x}
+
+theorem coarseReach_nonempty {X Y : Type u} [DecidableEq Y] (p : X → Y) (x : X) :
+    (coarseReach p x).Nonempty := ⟨p x, by simp [coarseReach]⟩
+
+/-- [proved-derived; formal-checked] **Toward the coarse the reading is determined, so its own width
+is zero at every receiver.** Whatever width a coarser chart contributes comes from the longitudinal
+axis or from a family of routes — never from the step itself. -/
+theorem coarse_width_eq_zero {X Y : Type u} [DecidableEq Y] (p : X → Y) (x : X) (R : Y → ℚ) :
+    width (coarseReach p x) (coarseReach_nonempty p x) R = 0 := by
+  simp [width, coarseReach]
+
+/-- [definition] What an observer reads **toward a finer chart**: the fibre — everything in the
+declared finer population that restricts to the face it holds. This is
+`Foundation/ReceiverAtlas.lean::LocalChart.preimageFibre` at one step of the tower. -/
+def fineFibre {X Y : Type u} [DecidableEq X] [DecidableEq Y] (F : Finset X) (p : X → Y) (y : Y) :
+    Finset X := F.filter (fun x => p x = y)
+
+/-- [definition] The exact one-step tower that separates the two directions: two fine faces, one
+coarse face, and the restriction that collapses them. -/
+def collapseFine : Finset ℚ := {0, 1}
+
+/-- [definition] Its restriction: both fine faces present the same coarse face. -/
+def collapse : ℚ → ℚ := fun _ => 0
+
+theorem mem_collapseFibre_zero : (0 : ℚ) ∈ fineFibre collapseFine collapse 0 := by
+  simp [fineFibre, collapse, collapseFine]
+
+theorem mem_collapseFibre_one : (1 : ℚ) ∈ fineFibre collapseFine collapse 0 := by
+  simp [fineFibre, collapse, collapseFine]
+
+theorem collapseFibre_nonempty : (fineFibre collapseFine collapse 0).Nonempty :=
+  ⟨0, mem_collapseFibre_zero⟩
+
+theorem collapseFibre_cases {x : ℚ} (hx : x ∈ fineFibre collapseFine collapse 0) :
+    x = 0 ∨ x = 1 := by
+  have hmem : x ∈ collapseFine := (Finset.mem_filter.mp hx).1
+  rw [collapseFine, Finset.mem_insert, Finset.mem_singleton] at hmem
+  exact hmem
+
+/-- [proved-derived; formal-checked] **The horizon is symmetric and the reading is not.** The index
+distance does not know which way it is walked (`chainDistance_symm`, `chainDistance_orderDual`), and
+yet one step toward the coarse returns a determined face of width `0` while one step toward the fine
+returns a fibre of width `1` at the identity receiver. Both directions are distance into the
+horizon; the asymmetry is between a **face** and a **fibre**, and it is exactly the asymmetry of
+`restrict`, which exists downward and has no upward inverse
+(`Foundation/ContinuingTower.lean::ResidualMigration.traversability_is_the_residual`). -/
+theorem looking_toward_the_coarse_is_determined_and_toward_the_fine_is_plural :
+    width (coarseReach collapse 1) (coarseReach_nonempty collapse 1) id = 0 ∧
+      width (fineFibre collapseFine collapse 0) collapseFibre_nonempty id = 1 := by
+  refine ⟨coarse_width_eq_zero collapse 1 id, le_antisymm ?_ ?_⟩
+  · have hband :
+        width (fineFibre collapseFine collapse 0) collapseFibre_nonempty id ≤ (1 : ℚ) - 0 := by
+      refine width_le_of_bounds collapseFibre_nonempty id ?_ ?_
+      · intro x hx
+        rcases collapseFibre_cases hx with rfl | rfl <;> norm_num
+      · intro x hx
+        rcases collapseFibre_cases hx with rfl | rfl <;> norm_num
+    linarith
+  · have := abs_sub_le_width collapseFibre_nonempty id mem_collapseFibre_one
+      mem_collapseFibre_zero
+    simp only [id_eq] at this
+    norm_num at this
+    exact this
+
 end Soma.Holonics.Foundation.ReceiverRelease
 
 section Audit
@@ -604,4 +884,20 @@ open Soma.Holonics.Foundation.ReceiverRelease
 #print axioms coarser_receiver_factors
 #print axioms timingInsufficiency
 #print axioms no_transformer_from_the_released_coarse_face
+#print axioms horizonWithin_trans
+#print axioms horizonWithin_is_not_total
+#print axioms chainDistance_mono
+#print axioms chainDistance_snoc
+#print axioms chainDistance_symm
+#print axioms chainDistance_trans
+#print axioms chainDistance_congr
+#print axioms comparable_symm
+#print axioms chainDistance_orderDual
+#print axioms twoAxisWidth_mono
+#print axioms twoAxisWidth_mono_longitudinal
+#print axioms twoAxisWidth_mono_index
+#print axioms twoAxisWidth_at_index_zero_is_the_longitudinal_width
+#print axioms longitudinal_case_is_the_existing_width_law
+#print axioms coarse_width_eq_zero
+#print axioms looking_toward_the_coarse_is_determined_and_toward_the_fine_is_plural
 end Audit

@@ -3,6 +3,7 @@ import ElementaryHolonics.Foundation.ContinuingTower
 import ElementaryHolonics.Foundation.BoundaryScalePassage
 import ElementaryHolonics.Foundation.GrainRestriction
 import ElementaryHolonics.Foundation.ReceiverAtlas
+import ElementaryHolonics.Foundation.ReceiverRelease
 
 /-!
 # The continuing tube: a tower is the transverse section of a tube, and a wormhole is exact
@@ -1030,6 +1031,411 @@ theorem projectionScalePassage_no_reverse_passage :
       Enclosure.interior :=
   Migration.not_reversePassage_of_not_injective _ projectionScalePassage_interior_not_injective
 
+/-! ## T5 — the observer, its two-axis horizon, and curvature as a function of distance
+
+[definition] Item **T5** of
+`docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md`. The horizon's two
+coordinates, the chain distance that measures both axes and the asymmetry between looking toward the
+coarse and looking toward the fine are `Foundation/ReceiverRelease.lean`'s
+(`Horizon`, `ChainDistanceAtMost`, `looking_toward_the_coarse_is_determined_and_toward_the_fine_is_plural`).
+What is added here is what those coordinates measure **on a tube**: which squares and circuits an
+observer at `(station, chart)` can see, and therefore what its defect profile reads.
+
+[proved-derived; formal-checked] Four statements, and none of them is a restatement of the square law
+above.
+
+* `tube_profile_is_flat_at_every_horizon` — a `Tube`'s profile is identically zero, because
+  `Tube.square` holds at every pair of charts and `tube_circuit_has_no_defect` at every circuit.
+  Curvature is therefore a property of **declared** circuits and non-commuting families, exactly as
+  this file already proved for the one-axis case.
+* `visibleSquare_shift` — two observers read the *same* region at horizons that differ by their own
+  chain distance. This is the exact relation between two grains' profiles, and it is
+  `chainDistance_trans`, the triangle inequality, and nothing else.
+* `flat_near_curved_far` — an exact declared tube whose every square commutes at every horizon,
+  whose circuit inside longitudinal distance `1` returns the identity, and whose circuit reaching
+  distance `2` does not. Locally a sharp lattice, globally curved.
+* `the_fine_observer_sees_at_one_step_what_the_coarse_one_sees_at_three` — an exact five-chart
+  ladder with one failing square at its top: the observer at the finest chart reads the defect at
+  `k = 1` and the observer three cover steps below it reads nothing until `k = 3`. Which is which
+  depends on the observer's grain.
+
+[proved-derived; formal-checked] And the profile is a **reading**: `receiver_defect_is_a_structural_defect`
+proves a receiver can only lose a defect, never invent one, and `ladderReceiverInsufficiency`
+exhibits a poorer receiver that reads flat exactly what a richer one separates —
+`Foundation/Receiver.lean::ReceiverInsufficiency`, cited and not rebuilt.
+
+Rust counterpart: `crates/holonic-engine/src/continuing_tube.rs::{Observer, HorizonDeclaration,
+horizon_reach, two_axis_width, DefectProfile, defect_profile, CrossRankPassage,
+classify_cross_rank, plan_routes, PresentationTube}`. -/
+
+open Soma.Holonics.Foundation.ReceiverRelease
+
+/-- [definition] **An observer**: a station and a chart. `receiver_release`'s width reads at `h`
+steps of `Φ`, which says where along the tube the reading happens and not at which grain; an
+observer is both.
+
+Rust counterpart: `continuing_tube.rs::Observer`. -/
+structure ObserverAt (Station : Type us) (Index : Type u) where
+  /-- Where along the tube it stands. -/
+  station : Station
+  /-- Which chart of the transverse section it reads at. -/
+  chart : Index
+
+/-- [definition] `j` **strictly refines** `i` when the order relates them one way only. -/
+def StrictlyRefines {Index : Type u} [Preorder Index] (i j : Index) : Prop := i ≤ j ∧ ¬ (j ≤ i)
+
+/-- [definition] `j` **covers** `i` inside a declared aperture: it strictly refines it and no
+declared chart lies strictly between. One cover is one step of the index ladder.
+
+[definition] This, and not bare comparability, is the adjacency the executable index distance walks
+(`continuing_tube.rs::index_distance`), and the reason is exact: on a linearly ordered index every
+pair of charts is comparable, so the comparability adjacency would put every chart one step away and
+no ladder of grains would have a length at all. The distance is therefore relative to the declared
+aperture and says so — adding an intermediate grain lengthens the chain through it, which is what a
+finer ladder *is*. -/
+def CoveredBy {Index : Type u} [Preorder Index] (aperture : Index → Prop) (i j : Index) : Prop :=
+  StrictlyRefines i j ∧ ¬ ∃ m, aperture m ∧ StrictlyRefines i m ∧ StrictlyRefines m j
+
+/-- [definition] The undirected cover adjacency: one step of the ladder, in either direction. -/
+def CoverAdjacent {Index : Type u} [Preorder Index] (aperture : Index → Prop) (i j : Index) : Prop :=
+  CoveredBy aperture i j ∨ CoveredBy aperture j i
+
+/-- [proved-derived; formal-checked] It is symmetric, which is why the index distance it measures is
+symmetric (`chainDistance_symm`): one step toward the fine and one step toward the coarse are one
+step. -/
+theorem coverAdjacent_symm {Index : Type u} [Preorder Index] (aperture : Index → Prop)
+    (i j : Index) : CoverAdjacent aperture i j → CoverAdjacent aperture j i := Or.symm
+
+/-- [proved-derived; formal-checked] And a cover step is a comparability, so a cover chain is a
+chain of comparable charts. -/
+theorem coverAdjacent_comparable {Index : Type u} [Preorder Index] {aperture : Index → Prop}
+    {i j : Index} (h : CoverAdjacent aperture i j) : Comparable i j := by
+  rcases h with ⟨⟨hle, _⟩, _⟩ | ⟨⟨hle, _⟩, _⟩
+  · exact Or.inl hle
+  · exact Or.inr hle
+
+/-- [definition] **The square at a step `(s, t)` between charts `i ≤ j` is visible to an observer at
+horizon `H`** when both stations lie within `H.longitudinal` steps of the observer's station and both
+charts within `H.index` steps of its chart, in the chain distance of the declared adjacencies. The
+same `ChainDistanceAtMost` measures both axes: that is Brandon's statement that both are distance
+into the horizon, carried in the type. -/
+def VisibleSquare {Station : Type us} {Index : Type u}
+    (stationAdj : Station → Station → Prop) (chartAdj : Index → Index → Prop)
+    (obs : ObserverAt Station Index) (H : Horizon) (s t : Station) (i j : Index) : Prop :=
+  ChainDistanceAtMost stationAdj H.longitudinal obs.station s ∧
+    ChainDistanceAtMost stationAdj H.longitudinal obs.station t ∧
+      ChainDistanceAtMost chartAdj H.index obs.chart i ∧
+        ChainDistanceAtMost chartAdj H.index obs.chart j
+
+/-- [proved-derived; formal-checked] **Two observers read the same region at horizons that differ by
+their own distance.** Whatever the first observer sees inside `(h, k)`, an observer `dS` steps away
+along the tube and `dI` steps away through the index sees inside `(dS + h, dI + k)`. This is the
+exact relation between two grains' defect profiles: it is the triangle inequality and nothing else,
+and it is why one observer reads a defect at `k = 1` that another does not reach until `k = 3`. -/
+theorem visibleSquare_shift {Station : Type us} {Index : Type u}
+    {stationAdj : Station → Station → Prop} {chartAdj : Index → Index → Prop}
+    {near far : ObserverAt Station Index} {H : Horizon} {dS dI : ℕ} {s t : Station} {i j : Index}
+    (hstation : ChainDistanceAtMost stationAdj dS far.station near.station)
+    (hchart : ChainDistanceAtMost chartAdj dI far.chart near.chart)
+    (hvis : VisibleSquare stationAdj chartAdj near H s t i j) :
+    VisibleSquare stationAdj chartAdj far ⟨dS + H.longitudinal, dI + H.index⟩ s t i j :=
+  ⟨chainDistance_trans hstation hvis.1, chainDistance_trans hstation hvis.2.1,
+    chainDistance_trans hchart hvis.2.2.1, chainDistance_trans hchart hvis.2.2.2⟩
+
+/-- [definition] **A declared tube**: a family of towers over a station type with a chartwise
+migration for every ordered pair of stations, and **no functor law**. The difference from `Tube` is
+the whole point: a declared family need not be functorial, so its circuits can carry holonomy while
+every one of its squares commutes.
+
+The executable `StationedTower` is weaker still, and the gap is stated rather than elided: it
+carries **no** naturality field, and `check_commuting_square` is precisely the operation that asks
+for one. `profileFlat_of_chartwise` is therefore a statement about families that *are* chartwise
+migrations; the ladder tube of `continuing_tube/tests.rs` is a declared family that is not one, and
+its square fails.
+
+Rust counterpart: `continuing_tube.rs::StationedTower`, with its square checked and never assumed. -/
+structure DeclaredTube.{us', ui', uf'} (Station : Type us') (Index : Type ui') [Preorder Index] where
+  /-- The transverse section at one station. -/
+  station : Station → Tower.{ui', uf'} Index
+  /-- The declared step from one station to another. -/
+  step : ∀ s t : Station, ChartwiseMigration (station s) (station t)
+
+namespace DeclaredTube
+
+variable {Station : Type us} {Index : Type u} [Preorder Index]
+
+/-- [definition] The **profile is flat** at an observer's horizon when every visible square
+commutes. -/
+def ProfileFlat (tube : DeclaredTube.{us, u, v} Station Index)
+    (stationAdj : Station → Station → Prop) (chartAdj : Index → Index → Prop)
+    (obs : ObserverAt Station Index) (H : Horizon) : Prop :=
+  ∀ {s t : Station} {i j : Index} (h : i ≤ j),
+    VisibleSquare stationAdj chartAdj obs H s t i j →
+      ∀ x : (tube.station s).Face j,
+        (tube.station t).restrict h ((tube.step s t).face j x)
+          = (tube.step s t).face i ((tube.station s).restrict h x)
+
+/-- [proved-derived; formal-checked] **Every square of a declared tube whose steps are chartwise
+migrations commutes, at every observer and every horizon.** The transverse axis carries no curvature
+of its own; what a declared family can carry is longitudinal holonomy, and `flat_near_curved_far`
+below exhibits exactly that. -/
+theorem profileFlat_of_chartwise (tube : DeclaredTube.{us, u, v} Station Index)
+    (stationAdj : Station → Station → Prop) (chartAdj : Index → Index → Prop)
+    (obs : ObserverAt Station Index) (H : Horizon) :
+    tube.ProfileFlat stationAdj chartAdj obs H :=
+  fun h _ x => (tube.step _ _).naturality h x
+
+end DeclaredTube
+
+/-- [proved-derived; formal-checked] **A `Tube`'s defect profile is identically zero at every
+observer and every horizon.** Its squares are `Tube.square` and its circuits are
+`tube_circuit_has_no_defect`; a functorial tube has nothing for a profile to read. Curvature
+therefore belongs to a declared circuit and a declared non-commuting family, which is what this file
+already proved of the one-axis case and is not weakened here. -/
+theorem tube_profile_is_flat_at_every_horizon {Station : Type uS} [Preorder Station]
+    {Index : Type u} [Preorder Index] (tube : Tube.{uS, u, v} Station Index)
+    (stationAdj : Station → Station → Prop) (chartAdj : Index → Index → Prop)
+    (obs : ObserverAt Station Index) (H : Horizon) {s t : Station} (hst : s ≤ t) {i j : Index}
+    (h : i ≤ j) (_visible : VisibleSquare stationAdj chartAdj obs H s t i j)
+    (x : (tube.station s).Face j) :
+    (tube.station t).restrict h ((tube.transport hst).face j x)
+      = (tube.transport hst).face i ((tube.station s).restrict h x) :=
+  tube.square hst h x
+
+/-! ### Flat near, curved far -/
+
+/-- [definition] The declared step of the three-station cycle: the identity everywhere except the
+closing step `2 → 0`, which is the Boolean flip. Every step is a chartwise migration, so every
+square commutes; the composite around the closed word `0 → 1 → 2 → 0` is the flip. -/
+def cycleStep : Fin 3 → Fin 3 → Circuit (twoChartTower Bool) := fun s t =>
+  if s = 2 ∧ t = 0 then flipCircuit else ChartwiseMigration.id _
+
+/-- [definition] The cycle as a declared tube: one transverse section at every station, and a
+declared step that is not functorial. -/
+def cycleTube : DeclaredTube.{0, 0, 0} (Fin 3) TwoCharts where
+  station _ := twoChartTower Bool
+  step := cycleStep
+
+/-- [definition] The closed word `0 → 1 → 0`, which stays inside longitudinal distance `1` of
+station `0`. -/
+def cycleShortCircuit : Circuit (twoChartTower Bool) :=
+  ChartwiseMigration.comp (cycleStep 1 0) (cycleStep 0 1)
+
+/-- [definition] The closed word `0 → 1 → 2 → 0`, which reaches station `2` — longitudinal distance
+`2` from the observer at station `0`. -/
+def cycleLongCircuit : Circuit (twoChartTower Bool) :=
+  ChartwiseMigration.comp (cycleStep 2 0)
+    (ChartwiseMigration.comp (cycleStep 1 2) (cycleStep 0 1))
+
+theorem cycleStep_zero_one : cycleStep 0 1 = ChartwiseMigration.id _ := by
+  simp [cycleStep]
+
+theorem cycleStep_one_zero : cycleStep 1 0 = ChartwiseMigration.id _ := by
+  simp [cycleStep]
+
+theorem cycleStep_one_two : cycleStep 1 2 = ChartwiseMigration.id _ := by
+  simp [cycleStep]
+
+theorem cycleStep_two_zero : cycleStep 2 0 = flipCircuit := by
+  simp [cycleStep]
+
+/-- [proved-derived; formal-checked] The near circuit returns every face: inside `(1, k)` of the
+observer at station `0` the tube is a sharp lattice. -/
+theorem cycleShortCircuit_has_no_defect : ¬ cycleShortCircuit.HasDefect := by
+  rintro ⟨i, x, hx⟩
+  exact hx (by simp [cycleShortCircuit, cycleStep_zero_one, cycleStep_one_zero,
+    ChartwiseMigration.id])
+
+/-- [counterexample; formal-checked] The far circuit does not: at longitudinal distance `2` the same
+tube carries holonomy. -/
+theorem cycleLongCircuit_hasDefect : cycleLongCircuit.HasDefect := by
+  refine ⟨TwoCharts.left, false, ?_⟩
+  intro hcontra
+  simp [cycleLongCircuit, cycleStep_zero_one, cycleStep_one_two, cycleStep_two_zero,
+    ChartwiseMigration.id, ChartwiseMigration.comp, flipCircuit] at hcontra
+
+/-- [counterexample; formal-checked] **Flat near, curved far.** One exact declared tube: every
+square commutes at every observer and every horizon, the closed circuit that stays within
+longitudinal distance `1` returns the identity, and the closed circuit that reaches distance `2`
+does not. Locally a sharp lattice; globally curved. The curvature is in the declared longitudinal
+family and never in the transverse ladder, which `Tower.restrict_roundTrip` excludes. -/
+theorem flat_near_curved_far :
+    (∀ (stationAdj : Fin 3 → Fin 3 → Prop) (chartAdj : TwoCharts → TwoCharts → Prop)
+        (obs : ObserverAt (Fin 3) TwoCharts) (H : Horizon),
+      cycleTube.ProfileFlat stationAdj chartAdj obs H) ∧
+      ¬ cycleShortCircuit.HasDefect ∧ cycleLongCircuit.HasDefect :=
+  ⟨fun stationAdj chartAdj obs H =>
+      DeclaredTube.profileFlat_of_chartwise cycleTube stationAdj chartAdj obs H,
+    cycleShortCircuit_has_no_defect, cycleLongCircuit_hasDefect⟩
+
+/-! ### Which is which depends on the observer's grain -/
+
+/-- [definition] The ladder index: one Boolean face at every chart of `ℕ`, with the identity
+restriction. Its cover adjacency is `|i − j| = 1`, so the ladder has a length and a grain three
+steps below another is three steps into its horizon. -/
+def ladderTower : Tower.{0, 0} ℕ := constantFaceTower ℕ Bool
+
+/-- [definition] The declared family on it: the identity at every chart but chart `4`, where it is
+the Boolean flip. Its square with the restriction fails exactly at the pairs that carry chart `4`. -/
+def ladderStep : ∀ i : ℕ, ladderTower.Face i → ladderTower.Face i :=
+  fun i b => if i = 4 then !b else b
+
+/-- [definition] The whole index as the declared aperture. -/
+def wholeAperture : ℕ → Prop := fun _ => True
+
+/-- [proved-derived; formal-checked] A cover of the ladder is a step of exactly one. -/
+theorem ladder_coveredBy_iff (i j : ℕ) : CoveredBy wholeAperture i j ↔ i + 1 = j := by
+  constructor
+  · rintro ⟨⟨hij, hji⟩, hmid⟩
+    by_contra hne
+    exact hmid ⟨i + 1, trivial, ⟨by omega, by omega⟩, by omega, by omega⟩
+  · rintro rfl
+    refine ⟨⟨by omega, by omega⟩, ?_⟩
+    rintro ⟨m, -, ⟨h1, h2⟩, h3, h4⟩
+    omega
+
+/-- [proved-derived; formal-checked] So one step of the index horizon is one grain, in either
+direction. -/
+theorem ladder_coverAdjacent_iff (i j : ℕ) :
+    CoverAdjacent wholeAperture i j ↔ (i + 1 = j ∨ j + 1 = i) := by
+  constructor
+  · rintro (h | h)
+    · exact Or.inl ((ladder_coveredBy_iff i j).mp h)
+    · exact Or.inr ((ladder_coveredBy_iff j i).mp h)
+  · rintro (h | h)
+    · exact Or.inl ((ladder_coveredBy_iff i j).mpr h)
+    · exact Or.inr ((ladder_coveredBy_iff j i).mpr h)
+
+/-- [proved-derived; formal-checked] **A chain of `k` cover steps joins charts whose ranks differ by
+at most `k`.** This is what makes the index distance a distance rather than a bound, and it is what
+lets a coarse observer's horizon be proved *too small* rather than merely not exhibited. -/
+theorem ladder_chain_rank_bound {k i j : ℕ}
+    (h : ChainDistanceAtMost (CoverAdjacent wholeAperture) k i j) :
+    i ≤ j + k ∧ j ≤ i + k := by
+  induction h with
+  | here k i => omega
+  | step first _ ih =>
+      have hstep := (ladder_coverAdjacent_iff _ _).mp first
+      omega
+
+/-- [proved-derived; formal-checked] At chart `4` the declared step is the flip. -/
+theorem ladderStep_at_four (b : Bool) : ladderStep 4 b = !b := rfl
+
+/-- [proved-derived; formal-checked] And at every other chart it is the identity. -/
+theorem ladderStep_below {i : ℕ} (hi : i ≠ 4) (b : Bool) : ladderStep i b = b := if_neg hi
+
+/-- [counterexample; formal-checked] The failing square of the ladder: between chart `4` and any
+coarser chart, restricting after the step is not the step after restricting. -/
+theorem ladderSquare_fails_at_the_top (i : ℕ) (hi : i ≠ 4) (hle : i ≤ 4) :
+    ladderTower.restrict hle (ladderStep 4 false)
+      ≠ ladderStep i (ladderTower.restrict hle false) := by
+  show (true : Bool) ≠ ladderStep i false
+  rw [ladderStep_below hi]
+  exact fun hcontra => Bool.noConfusion hcontra
+
+/-- [proved-derived; formal-checked] And every square whose two charts avoid chart `4` commutes: the
+defect is at that one rung of the ladder and nowhere else. -/
+theorem ladderSquare_commutes_below {i j : ℕ} (hi : i ≠ 4) (hj : j ≠ 4) (hle : i ≤ j) (x : Bool) :
+    ladderTower.restrict hle (ladderStep j x) = ladderStep i (ladderTower.restrict hle x) := by
+  show ladderStep j x = ladderStep i x
+  rw [ladderStep_below hi, ladderStep_below hj]
+
+/-- [proved-derived; formal-checked] **Which is which depends on the observer's grain.** The same
+region of the same ladder: the observer at chart `4` has the failing square inside its horizon at
+`k = 1`; the observer at chart `1`, three cover steps below it, cannot reach chart `4` at `k = 2` at
+all and reaches it at `k = 3`. Their two profiles of one region differ, and `visibleSquare_shift`
+relates them exactly by the observers' own index distance. -/
+theorem the_fine_observer_sees_at_one_step_what_the_coarse_one_sees_at_three :
+    ChainDistanceAtMost (CoverAdjacent wholeAperture) 1 4 3 ∧
+      ¬ ChainDistanceAtMost (CoverAdjacent wholeAperture) 2 1 4 ∧
+        ChainDistanceAtMost (CoverAdjacent wholeAperture) 3 1 4 ∧
+          (ladderTower.restrict (show (3 : ℕ) ≤ 4 by omega) (ladderStep 4 false)
+            ≠ ladderStep 3 (ladderTower.restrict (show (3 : ℕ) ≤ 4 by omega) false)) := by
+  refine ⟨?_, ?_, ?_, ladderSquare_fails_at_the_top 3 (by omega) (by omega)⟩
+  · exact ChainDistanceAtMost.step (j := 3) (by rw [ladder_coverAdjacent_iff]; omega)
+      (.here 0 3)
+  · intro hcontra
+    have := ladder_chain_rank_bound hcontra
+    omega
+  · exact ChainDistanceAtMost.step (j := 2) (by rw [ladder_coverAdjacent_iff]; omega)
+      (ChainDistanceAtMost.step (j := 3) (by rw [ladder_coverAdjacent_iff]; omega)
+        (ChainDistanceAtMost.step (j := 4) (by rw [ladder_coverAdjacent_iff]; omega)
+          (.here 0 4)))
+
+/-! ### The profile is a receiver reading -/
+
+/-- [proved-derived; formal-checked] **A receiver can only lose a defect, never invent one.** If a
+receiver separates the two routes of a square then the two routes' faces already differ; the
+converse fails, and the witness is below. -/
+theorem receiver_defect_is_a_structural_defect {Face : Type u} (R : Face → ℚ) {a b : Face}
+    (h : R a ≠ R b) : a ≠ b := fun hab => h (hab ▸ rfl)
+
+/-- [definition] The poorer receiver of the ladder's failing square: it reads both routes alike. -/
+def poorLadderReading : Bool → ℚ := fun _ => 0
+
+/-- [definition] The richer one: it separates them exactly. -/
+def richLadderReading : Bool → ℚ := fun b => if b then 1 else 0
+
+/-- [counterexample; formal-checked] **A poorer receiver reads flat what a richer one reads as
+curved.** The two routes of the ladder's top square return different faces; the poor receiver's
+discrepancy between them is `0` and the rich receiver's is `1`. The defect profile is therefore a
+reading of the region and not its identity. -/
+theorem a_poorer_receiver_reads_the_defect_flat :
+    ladderStep 4 false ≠ false ∧
+      poorLadderReading (ladderStep 4 false) = poorLadderReading false ∧
+        richLadderReading (ladderStep 4 false) ≠ richLadderReading false := by
+  refine ⟨fun hcontra => Bool.noConfusion hcontra, rfl, ?_⟩
+  show (1 : ℚ) ≠ 0
+  norm_num
+
+/-- [counterexample; formal-checked] And the reason no reading of the poor receiver could have
+recovered the defect: `Foundation/Receiver.lean::ReceiverInsufficiency`, cited and not rebuilt. -/
+def ladderReceiverInsufficiency :
+    Soma.Holonics.ReceiverInsufficiency poorLadderReading richLadderReading where
+  left := ladderStep 4 false
+  right := false
+  sameEntering := rfl
+  differentReturned := by
+    show (1 : ℚ) ≠ 0
+    norm_num
+
+/-- [proved-derived; formal-checked] Hence no receiver-to-receiver transformer carries the poor
+reading back to the rich one: a profile read flat cannot be un-flattened by reading it harder. -/
+theorem no_transformer_from_the_flat_reading :
+    IsEmpty (Soma.Holonics.ReceiverTransformer poorLadderReading richLadderReading) :=
+  ⟨fun t => t.excludesInsufficiency ladderReceiverInsufficiency⟩
+
+/-! ### Passages across ranks, and what each kind costs -/
+
+/-- [proved-derived; formal-checked] **A descending chain is the tube's own passage.** Every step is
+a restriction, so the composite follows refinement and is not a wormhole — cited from
+`Tube.refinementRoute_is_not_a_wormhole`, which is this file's own. An observer whose index horizon
+contains the chain sees it. -/
+theorem descending_chain_is_the_tubes_own {Station : Type uS} [Preorder Station] {Index : Type u}
+    [Preorder Index] (tube : Tube.{uS, u, v} Station Index) {s t : Station} (hst : s ≤ t)
+    (r : Index → Index) (r_mono : ∀ {i j : Index}, i ≤ j → r i ≤ r j)
+    (r_refines : ∀ j : Index, j ≤ r j) :
+    ¬ (tube.refinementRoute hst r r_mono r_refines).ConnectsIncomparableCharts :=
+  tube.refinementRoute_is_not_a_wormhole hst r r_mono r_refines
+
+/-- [proved-derived; formal-checked] **A rising step needs the retained residual**, and with it the
+fine face returns exactly. This is `ResidualMigration.traversability_is_the_residual` at one step of
+the ladder, cited through `reopen_apply` and not reproved: looking toward the fine is a fibre, and a
+route that rises pays for it by retaining what the restriction dropped. -/
+theorem rising_step_needs_the_retained_residual {Index : Type u} [Preorder Index]
+    {S T : Tower.{u, v} Index} (M : ResidualMigration S T) (j : Index) (x : S.Face (M.index j)) :
+    M.reopen j (M.face j x) (M.residual j x) = x :=
+  M.reopen_apply j x
+
+/-- [counterexample; formal-checked] **And where no chain of comparable charts exists at all, the
+passage is a wormhole** — `swapWormhole`, over an index with no common refinement. The three kinds
+are therefore inhabited and distinguished: the tube's own composite, the passage a retained residual
+buys, and the passage the tube does not have. -/
+theorem the_three_kinds_of_cross_rank_passage (Station : Type uS) [Preorder Station] (X : Type v)
+    (s t : Station) :
+    (swapWormhole Station X s t).passage.ConnectsIncomparableCharts :=
+  (swapWormhole Station X s t).crosses
+
 end Soma.Holonics.Transport.ContinuingTube
 
 section Audit
@@ -1089,5 +1495,25 @@ open Soma.Holonics.Transport.ContinuingTube
 #print axioms boundaryScaleResidualMigration
 #print axioms projectionScalePassage_interior_not_injective
 #print axioms projectionScalePassage_no_reverse_passage
+#print axioms visibleSquare_shift
+#print axioms DeclaredTube.profileFlat_of_chartwise
+#print axioms tube_profile_is_flat_at_every_horizon
+#print axioms coverAdjacent_symm
+#print axioms coverAdjacent_comparable
+#print axioms cycleShortCircuit_has_no_defect
+#print axioms cycleLongCircuit_hasDefect
+#print axioms flat_near_curved_far
+#print axioms ladder_coverAdjacent_iff
+#print axioms ladder_chain_rank_bound
+#print axioms ladderSquare_fails_at_the_top
+#print axioms ladderSquare_commutes_below
+#print axioms the_fine_observer_sees_at_one_step_what_the_coarse_one_sees_at_three
+#print axioms receiver_defect_is_a_structural_defect
+#print axioms a_poorer_receiver_reads_the_defect_flat
+#print axioms ladderReceiverInsufficiency
+#print axioms no_transformer_from_the_flat_reading
+#print axioms descending_chain_is_the_tubes_own
+#print axioms rising_step_needs_the_retained_residual
+#print axioms the_three_kinds_of_cross_rank_passage
 
 end Audit

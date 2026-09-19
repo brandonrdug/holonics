@@ -196,14 +196,89 @@ halves; `e_t = a_t²` is then proved by induction rather than assumed; and the m
 split closes exactly over the rationals. A linear system plus a quadratic form does not by itself
 give an exact rational energy ledger.
 
-[definition] **T3 — Release over an edited artifact family.** Compose `receiver_release`,
-`continuing_tube` and `physical_occurrence::PluralFibre` into the generation law above. The
-draft–observe–revise cycle is a **declared circuit**: a functorial tube has no holonomy, so the
-cycle on an embedding of interlinked tori is a circuit with a cocycle defect. "The intentions
-cancel" is the circuit's holonomy being the identity at the receiver; a revision loop is a
-nontrivial defect with no receiver change, and the periplus `P = RF` with residual `(P − I)x` is its
-reading. The typed disposition is the existing release return; no `NONE` candidate competes under a
-normalization.
+[established-bounded; formal-checked; implemented-exact] **T3 — Release over an edited artifact
+family. Returned.** Owners:
+[`Transport/ArtifactRelease.lean`](../../formal/elementary-holonics/ElementaryHolonics/Transport/ArtifactRelease.lean)
+(namespace `Soma.Holonics.Transport.ArtifactRelease`) and
+[`artifact_release.rs`](../../crates/holonic-engine/src/artifact_release.rs) with
+`artifact_release/tests.rs`.
+
+**The edited family is literally a tube.** `regionTower` / `RegionTower` is the transverse ladder —
+the face at a region is the assignment on it and `restrict` **is** `π_B` — and `rotationTube` /
+`RevisionCircuit` is the longitudinal axis. `F_{k+1} = T_{g_k}(F_k) ∩ C_k` is `step` (single-valued)
+and `stepMulti` (a swing with sub-swings), with `stepMulti_singleton` identifying the first as the
+second's one-branch case. The visible draft is one member and never the state. **The section shrinks
+and widens:** `restriction_never_widens` is `receiver_release`'s `width_mono` at the constraint,
+cited; `width_is_not_monotone_along_edits` is the other half by instance — the name swing carries one
+artifact to two admitted ones and the name region's width goes from `0` to `1`. Release is
+`ReceiverRelease.width` at a region (`releasable_iff_every_coordinate_width_is_zero`), and the
+executable `ArtifactFamily::region_width` **is** `width_enumerated` at a `RegionReading`. T5's
+two-axis `Horizon` is adopted for the transverse coordinate: `indexDistance` /
+`ArtifactFamily::index_distance` is a region's distance through the ladder, it is the `k` a horizon
+must declare, `region_width_at` computes the diameter with T5's own `width_over_readings`, and a
+horizon declaring another `k` is refused by name.
+
+**The revision cycle is a declared circuit.** `the_rotation_tube_carries_no_holonomy` cites
+`tube_circuit_has_no_defect` at the rotation tube, so draft–observe–revise is a *declared*
+`ChartwiseMigration` of the region tower into itself; "the intentions cancel" is
+`check_circuit_holonomy` returning `HolonomyVerdict::Identity` at the declared receivers and nothing
+weaker. `CircuitOutcome` types the three outcomes — **progress** (the receiver face changed, rung 2),
+**neutral rechart** (the artifact differs and the declared receivers do not see it, rung 4) and
+**revision loop** (`StopReplaying{route_class, residual}`, needing the returned visible face, a
+nonzero periplus residual `(P − I)x` *and* a route class repeated inside a declared bound) — beside
+`NoDefectWithinBound`, which affirms nothing:
+`no_defect_on_a_declared_face_is_not_cancellation` exhibits one circuit returning a declared face and
+moving an undeclared one. The typed disposition composes `ReleaseReturn` whole and adds only
+`Reframe` (a `RequiredChartChange` returned as a migration requirement) and `Refuse` (a
+`CausalObstruction`: an empty preimage fibre or an obstructed transport); `dispositionOf` is a
+function of the family and the receivers, and `no_candidate_carries_the_disposition` exhibits one
+artifact in two families whose dispositions differ, so no member of the candidate set carries it and
+no `NONE` competes under a normalization. The two media are typed differently with no coercion:
+`EditableDraft` revises any position, `IrrevocableUtterance` has no operation that changes its
+committed boundary, and `no_sequence_of_corrections_retracts` is *speech cannot retract, only
+correct* as a theorem. **Tori:** `windingCircuit` rotates two independent regions by the exact
+rational angles `1/3` and `1/4` of a turn inside `ZMod 12`; the two circuits commute, compose to the
+joint one, and `(3, 0) ≠ (0, 0)` is a nontrivial winding whose visible face returns — the phases are
+the finite `Z/3 × Z/4` exactly. The entangled pair does **not** span a torus: the commutator of the
+position-0 rotation and the shear is exactly the translation `y ↦ y − 1`, a lawful declared circuit
+with nontrivial holonomy. That the artifact is *embedded on interlinked tori* is graded
+`interpretation`; what is proved is finite and exact. Each of the 46 audited Lean declarations
+depends only on `propext`, `Classical.choice` and `Quot.sound` — four on none — and none on
+`sorryAx`. The Rust owner is the executable equivalent with 82 tests, exact `u32` token codes,
+`BigInt` windings, `BigUint` cardinalities and `BigRational` widths, and no float anywhere.
+
+[established-bounded] Four findings from building it, each changing the item as the paragraph above
+first stated it. **(1) Over a family, an edit supported off a released region cannot change its face
+at all, so a reopening is always an *emptying*.** The plan wrote "a revision loop is a nontrivial
+defect with no receiver change" as though a later edit elsewhere could rewrite a released face;
+`an_edit_supported_off_a_released_region_cannot_change_its_face` proves it cannot, because
+intersecting with a constraint only removes members and a transport that misses `B` commutes with
+`π_B`. So `reopening_from_outside_is_an_emptying`: after such a step the family is empty or the face
+stands, and `the_name_edit_empties_the_family` is the exact instance — the `Hermes` pivot leaves
+`T_g(F) ∩ C = ∅` at the pronoun released as *it*. The resolution requires an edit supported **on**
+the region (`the_correction_restores_the_family`), which is exactly the correction, and for an
+irrevocable medium that correction is an appended passage. **(2) "Independent versus entangled" is
+three different relations and the plan's single sentence conflates them.** Commuting on the family
+(`commutator_verdict`), chartwise locality (the two-axis square: `the_entangled_edit_is_not_chartwise`
+proves an edit reading a position it does not write admits no `ChartwiseMigration`, and
+`check_commuting_square` returns the defect at the region that cannot see its trigger) and constraint
+entanglement are independent. Brandon's own pair is separated only by the third:
+`commuting_does_not_separate_the_independent_from_the_entangled` shows `dog → cat` and `is → why` are
+both positionwise substitutions at distinct slots, so both commute and both are chartwise — the
+admitted role constraint is what keeps one family and empties the other. **(3) `PluralFibre` is not
+composable here and is cited as the analogue instead.** `physical_occurrence::PluralFibre`'s carrier
+is a population of `SituatedFamily` readings of **one** situated object over one distance aperture,
+addressing the same contact pairs; its `partition` into unanimous / separating / open-carrying
+contacts is exactly the shape of a region reading over an artifact family, but the family T3 needs is
+a family of *artifacts*, not of readings of one occurrence. The composition the item actually needs
+is `receiver_release::{CompatibleFamily, width_enumerated}`, which this owner uses. The concrete
+absent object, if the analogy is ever to be one type, is a plural family generic in its coordinate
+address; it is **not** founded here, because a fourth permanent public family for one task is the
+drift the contract forbids. **(4) Release over a family needs the transverse axis as a second
+coordinate, not a second width.** A region is a point of T5's index axis, and the pair `(h, k)` is a
+product order: `the_two_horizon_coordinates_are_not_one_scale` records that `(2, 0)` and `(0, 2)` are
+incomparable, so "how far into the horizon a release was taken" is a pair — how many edits, and how
+coarse the receiver's region — and never a number.
 
 [definition] **T4 — Knot friction and edit torque.** An artifact's kept receivers define a
 constraint complex. `ker J_keep` is the free edits, an empty compensating family is an obstructed
@@ -212,14 +287,95 @@ edit, self-stress support is entanglement, `J* r` is the edit torque, and the re
 `presentation_cost::CostReceipt`. This is `rigidity_receiver` applied to an artifact; it founds no
 second Jacobian.
 
-[definition] **T5 — The two-axis horizon.** `receiver_release`'s horizon is longitudinal only.
-Extend it to the transverse axis, so that distance into the horizon is distance in the tower's index
-in either direction: zooming from orbit to an organism is as far into the horizon as looking out to
-the stars. The observer-relative cocycle defect as a function of index distance is the curvature
-reading — squares between nearby grains commute and read as a sharp lattice, circuits reaching far
-in grain show defect and read as curved, and which is which depends on the observer's grain. The
-measured non-commutation of the atom-to-residue square is its first real instance. Tubes across
-ranks that no single grain exhibits are `Wormhole`s or passages with a retained residual.
+[established-bounded; formal-checked; implemented-exact] **T5 — The two-axis horizon. Returned.**
+Owners, extended in place:
+[`Foundation/ReceiverRelease.lean`](../../formal/elementary-holonics/ElementaryHolonics/Foundation/ReceiverRelease.lean)
+and [`receiver_release.rs`](../../crates/holonic-engine/src/receiver_release.rs) carry the horizon
+itself; [`Transport/ContinuingTube.lean`](../../formal/elementary-holonics/ElementaryHolonics/Transport/ContinuingTube.lean)
+and [`continuing_tube.rs`](../../crates/holonic-engine/src/continuing_tube.rs) carry what it measures
+on a tube. No third carrier is founded.
+
+**The observer is a station and a chart, and the horizon is a pair `(h, k)`.** `Horizon` is the two
+coordinates with both ceilings checked at its constructor and its wire route; `ChainDistanceAtMost`
+is one distance notion serving **both** axes, proved symmetric (`chainDistance_symm`), transitive
+(`chainDistance_trans`) and unchanged by the order dual (`chainDistance_orderDual`) — that is the
+exact sense in which refining `k` steps below the observer and coarsening `k` above it are one
+notion. `twoAxisWidth` is `width` over what the horizon reaches, monotone in each coordinate through
+`width_mono`, and at `k = 0` it **is** the width this repository already owned
+(`twoAxisWidth_at_index_zero_is_the_longitudinal_width`), so every theorem of `w_R(h)` is that case
+and none is restated. The executable side is `Observer`, `HorizonDeclaration`, `index_distance`,
+`horizon_reach` and `two_axis_width`, with the reach's coarse entries `Determined` and its fine
+entries `FibreMember`.
+
+**Curvature is the defect as a function of distance, and it is a reading.** `defect_profile` asks
+every square inside `(h, k)` through the owner's own `check_commuting_square` — one square at a time,
+so the count is of squares and not of the first failure — and every declared circuit inside it
+through `check_circuit_holonomy`. It returns the non-commuting count, every witness whole with both
+routes' faces, the circuit holonomies, the exact maximal discrepancy the declared receiver reads
+between two routes, and the `RelationLadder` rung the two routes stand on: `ReceiverEqual` when the
+receiver identifies them, `WithinTolerance` inside a declared tolerance, `NoRelation` beyond it —
+never `Identity`, which a defect excludes. `flat_near_curved_far` is an exact tube whose every square
+commutes at every horizon, whose circuit inside longitudinal distance `1` returns the identity and
+whose circuit reaching distance `2` does not;
+`the_fine_observer_sees_at_one_step_what_the_coarse_one_sees_at_three` is the five-chart ladder whose
+one failing square the finest observer reads at `k = 1` and an observer three covers below cannot
+reach at `k = 2` and reads at `k = 3`; `visibleSquare_shift` is the exact relation between the two,
+and it is the triangle inequality. `tube_profile_is_flat_at_every_horizon` is the functorial case:
+a `Tube`'s profile is identically zero, so curvature belongs to declared circuits and declared
+non-commuting families, as this contract already held. `receiver_defect_is_a_structural_defect` with
+`ladderReceiverInsufficiency` is the reading clause: a receiver can only lose a defect, never invent
+one, and a poorer one reads flat what a richer one separates.
+
+**Passages across ranks are classified and routes are enumerated, never ranked.**
+`classify_cross_rank` decides the three kinds exactly — a descending chain is the tube's own
+composite (`descending_chain_is_the_tubes_own`), a chain that must rise is traversable exactly when
+the residual is retained (`rising_step_needs_the_retained_residual`, which is
+`ResidualMigration.traversability_is_the_residual` cited), and no chain at all is a `Wormhole`.
+`plan_routes` enumerates every route inside a declared bound with its receipt: the residuals each
+reopening must retain, the squares it crossed with whether each commuted, and the face it delivers.
+Two routes to one address across a non-commuting square return two faces and the plan returns both;
+`RouteSet::ranked_by` is a declared receiver applied to the returned structure afterwards, and the
+library supplies none.
+
+**The real instance.** `PresentationTube` composes `GrainReadingTube` over the three M5 RBX1
+presentations: six stations `(presentation, reading)`, the atom↔residue grain tower as the transverse
+section, the alpha-carbon selection as the within-presentation step and the target presentation's own
+measured face as the between-presentation one. At `k = 0` neither the atom observer nor the residue
+observer has a second chart inside its horizon, so **neither reads any square at all**; at `k = 1`
+the atom observer reads `1` of `1` squares non-commuting and the residue observer `1` of `3`. The
+two routes of that square are the coarse and the fine reading, and their exact discrepancies are
+`239`, `307` and `550` over the three presentations — the measured `1,096` of `1,397` fine contacts
+against the `301` the alpha-carbon receiver sees, as the profile's own content and not as a new
+number. 39 tests on the tube owner and 35 on the release owner, exact `BigUint`/`Rat`/`BigInt`
+throughout, no float anywhere. Every audited Lean declaration depends only on `propext`,
+`Classical.choice` and `Quot.sound` — several on none — and none on `sorryAx`.
+
+[established-bounded] Six findings from building it, each changing the item as the paragraph above
+first stated it. **(1) The two coordinates are a product order and not one scale.** `(2, 0)` and
+`(0, 2)` are incomparable horizons (`horizonWithin_is_not_total`), so "distance into the horizon" is
+a pair; `Horizon` therefore carries no `Ord` and monotonicity is stated in the product order.
+**(2) The index distance needs the cover relation, and it is relative to the declared aperture.**
+Bare comparability makes every chart of a linearly ordered index one step away — atom would be
+adjacent to component — so the ladder would have no length. The executable distance walks *covers*
+inside the declared chart list, and adding an intermediate grain lengthens the chain through it. The
+aperture is part of the reading and travels in the receipt. **(3) The symmetry is in the distance
+and the asymmetry is in the reading, exactly.** A tower's only transport is `restrict` and it runs
+one way: toward the coarse the observer reads one determined **face**, whose own width is zero at
+every receiver, and toward the fine it reads the **fibre**, whose width is the fibre's diameter.
+Both directions are far; they are far in dual ways, and that is the precise content of the plan's
+symmetry clause. **(4) In the real instance the curvature is entirely on the grain axis.** The
+within-presentation grain square fails and the between-presentation environment square commutes,
+because the environment transport is constant in its source and a `GrainTower`'s coarse face *is*
+the restriction of its atom face. **(5) `physical_occurrence::Passage` does not type-check as this
+tube's longitudinal transport, and what it contributes is its law.** Its `Transition::apply` is
+constant in the source's classes, and that constancy is exactly what the cross-presentation transport
+implements; the face types differ (`OccurrenceFace` over a `physical_constraint_complex` against
+`GrainFace` over `GrainPair`s), no adapter exists in this repository, and founding one would be a
+second carrier for a law already available. **(6) A profile must distinguish "read and flat" from
+"not read".** A square asked with no declared face at its finer chart compares nothing, and counting
+it as commuting would manufacture flatness; `squares_with_no_declared_face` is its own count, and a
+bounded route search returns `NoRouteWithinBound` or `MoreRoutesThanDeclared` — never "unreachable",
+and never a truncated enumeration presented as complete.
 
 [definition] **T6 — Neck invariants.** A neck is a station where the section's width tends to zero.
 Its invariants as a point are already computed by separate owners and are not yet one reading: the
@@ -276,7 +432,7 @@ on the card; adopting the generated triple there is the next device increment.
 ## Order
 
 [definition] The order of what remains here, the wave shape and the rules that settle recurring
-choices are stated once, in [THE_ROADMAP](THE_ROADMAP.md#position-of-the-five-contracts). T1 and T2
-are returned and every later item states its results on `RelationLadder`'s rungs. T3 goes with T5,
-since release over a family needs the two-axis horizon; T4 with T7, which share the rigidity owner;
+choices are stated once, in [THE_ROADMAP](THE_ROADMAP.md#position-of-the-five-contracts). T1, T2 and T3
+are returned and every later item states its results on `RelationLadder`'s rungs. T3 went with T5,
+whose two-axis horizon it adopts for the region ladder; T4 with T7, which share the rigidity owner;
 T6 with T8, which share the pole and higher-difference owners.
