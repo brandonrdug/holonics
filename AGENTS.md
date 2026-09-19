@@ -62,6 +62,28 @@ systems; executable laws and future receivers determine what must be materialize
 Demand-driven generation and streaming follow actual dependencies and boundary summaries,
 including relevant offscreen effects, rather than requiring a whole world in memory.
 
+[project-postulate] **Reason and write in Holonic notation.** [The notation](docs/HOLONIC_NOTATION.md)
+is one dialect: typed Dirac primitives (a ket is a construction, a bra a receiver, a bracket a
+face, an operator a transport `Ĝ_(F'←F)`; a resolution of identity needs its declared metric),
+index notation for Holons as tensors (upper index a ket port, lower a bra port, contraction a
+joined line, raising and lowering only through a frame's metric, primed indices for frames), and
+the figure every expression has (oriented lines, vertices, loops; the Holonic Interaction as the
+unit). **A sign is a passage, never a state**: `−1 = e^{iπ}`, `i = e^{iπ/2}`; name the windings,
+and state a form's split and hand separately. Nothing is causally represented along one axis. A
+passage between neighbouring blocks is an arrow (`A_↗`, `A_↘`), not a pair of integers. An abstract
+expression is **unoriented** until causally framed, which is distinct from non-orientable. These
+are ratified rulings of August 8–14 and September 19, not proposals; an agent that meets them as
+news has not read the notation.
+
+[project-postulate] **The subjects are one operation in different material.** Name source
+geometry → receiver map → transport → returned residual. RH is the landmark law, Hodge the
+realization law, Navier–Stokes and complex Euler the transport law with and without dissipation,
+Iwasawa theory the tower of levels; the Lean tree holds about a thousand Millennium files (over
+five hundred Navier–Stokes, a hundred Hodge) and 140 under `RH/`. Commonalities between them and
+the active construction are the expected case and may be new mathematics: run
+`.agents/bin/prior-art`, recover the owner, and compose it. Do not present an already-owned
+relation as a discovery, and do not treat sustained mathematics as a change of subject.
+
 [project-postulate] **Difference is the only thing that is real.** Values are measured faces of
 situated differences; measurement is always a comparison through frames/receivers. Retain the
 comparands, reference, orientation, conditions and causal origin. Difference can be a structured

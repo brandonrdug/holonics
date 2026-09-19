@@ -78,9 +78,10 @@ axis and T7's directed entropy condition, not read off either alone.
 an arrow, not a pair of integers.** The indices `1, 2` of a cross block carry no magnitude; what
 matters is the direction of the shift. Write the upstream→downstream block `A_↗` (formerly `A₂₁`)
 and the return `A_↘` (formerly `A₁₂`); along one axis use `→ ← ↑ ↓`. The six signed unit shifts of
-three axes are the vertices of the octahedron. And **every `−1` is the half-turn `e^{iπ}`**, with
-`i = e^{iπ/2}` the quarter-turn; signs are phases, which is what lets a relation continue
-analytically.
+three axes are the vertices of the octahedron. **Every `−1` is the half-turn `e^{iπ}`**, with
+`i = e^{iπ/2}` the quarter-turn: this is the ratified August 8 law that a sign is a passage and
+never a state ([Holonic notation](../HOLONIC_NOTATION.md#arrows-signs-and-turns)), restated here
+because signs as phases are what let a relation continue analytically.
 
 [proved-derived; formal-checked] In that notation the chain's returned theorems read: the neck is
 `rank A_↗`; the conservative coupling returns with a half-turn, `Ω_↘ = e^{iπ} Ω_↗ᵀ`, and the
@@ -97,7 +98,12 @@ carries under which positivity.
 `λ ↦ −λ̄` — the finite form of a reflection functional equation `ξ(s) = ξ(1−s)`; `G ≻ 0` collapses
 the symmetric pairs onto the axis, which is `SpectralReading`'s licence and the shape of the
 reflection-positivity item [the Millennium frame](../canon/THE_MILLENNIUM_FRAME.md) names as
-missing. [proved-standard] For indefinite nondegenerate `G` with `κ` negative squares, at most
+missing. The analytic form of the same placement is already formal in `RH/`: heat-flow zero
+dynamics, `HurwitzLine` (a limit of on-seam families stays on the seam), `HurwitzPolynomial` and
+the Foster classes — a lossless chain (`M = 0`) is a Foster reactance, and turning `M` on is the
+finite analogue of the de Bruijn–Newman flow. The split is `Millennium/HodgeIndex`'s `(1, n−1)`
+and the passages are `winding_inertia.rs`'s; a bare `Inertia` count is a state reading.
+[proved-standard] For indefinite nondegenerate `G` with `κ` negative squares, at most
 `min(κ, n−κ)` eigenvalues lie in the open right half plane (Pontryagin); `G = diag(1, −1)`,
 `A = [[0,1],[1,0]]` attains it. Target: replace `NoLicenceWithoutDefiniteStorage`'s silence by that
 bounded licence, read from the `Inertia` it already computes.
@@ -108,7 +114,9 @@ the axis under dissipation are exactly the largest `A`-invariant subspace inside
 cycle classes dissipation cannot see. Euler is the `Ω`-only generator and Navier–Stokes adds
 `M = ν d*d`; the storage-rate identity is the energy identity `Ė = −2ν‖∇u‖²`; the complex-Euler
 analyticity strip is the neck's analytic width (#32). Target: state the on-axis count as the
-dimension of that invariant subspace and read it with `hodge_receiver` on the same incidence.
+dimension of that invariant subspace and read it with `hodge_receiver` on the same incidence,
+composing `Millennium/HodgeFiniteDecomposition` (`E = range d ⊕ range δ ⊕ ker Δ`) and
+`HodgeHarmonicRepresentative` rather than restating them.
 **Gluing.** The receiver atlas lists, per receiver, an unproved gluing law with interface
 coupling: an interconnection receiver (R1), Mayer–Vietoris or an interface-coupled Laplacian (R3),
 composition of sub-framework motion spaces (R4), persistence Mayer–Vietoris (R5), and the

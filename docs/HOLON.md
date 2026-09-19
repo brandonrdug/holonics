@@ -5,7 +5,8 @@
 [definition] Write a Holon in a declared tensor chart as **|H⟩_F**. H carries the Holonic
 entity mark (the recovered wavy underline); F specifies its frame, port/axis roles and
 pairing. The notation packages the object so it can be manipulated without expanding its
-construction record at every use. The existing Dirac convention is in
+construction record at every use. [Holonic notation](HOLONIC_NOTATION.md) is the consolidated
+reading surface (species, index conventions, signs as passages, arrows, orientation). The existing Dirac convention is in
 [the operations tablet](canon/TABLET_THE_OPERATIONS.md) and `research/papers/source/lib/dirac.typ`.
 
 ```text
