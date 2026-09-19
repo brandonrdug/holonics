@@ -97,6 +97,7 @@ Products and plan documents are names; organize work by the machinery.
 
 ```text
 # Wave <N> worker <k>/<n> — <owner>
+Issues you advance: #<n>, #<m> (read them with `gh issue view <n>`; do not edit them).
 Your paths (edit nothing outside; if you must, stop and report):  <paths>
 Shell is fish: use `bash -c` for pipelines. CUDA: PATH=/opt/cuda/bin:$PATH.
 Run only: <module-scoped commands>.  Forbidden: crate-wide/workspace/device runs.
@@ -113,6 +114,7 @@ OUTSIDE MY PATHS         path — why it was required
 RECEIPTS                 tab-separated lines for VERIFICATION_RECEIPTS.tsv
 PRIOR-ART RECEIPTS       the [source-audit …] lines run, and which records were read
 CLAIMS                   [grade; tags] statement — owner. Include every [agent-inferred] decision.
+ISSUES                   #n discharged / #m narrowed to <what remains> / NEW: title — labels
 OPEN OBLIGATIONS         the concrete absent object, with the existing owners it would compose
 NOT RUN                  crate-wide, workspace, device — primary owns these
 ```

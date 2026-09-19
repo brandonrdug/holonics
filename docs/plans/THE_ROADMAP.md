@@ -271,6 +271,12 @@ documents hold the statements, owners and findings and are not re-narrated here.
 | Exact device law | D1–D3, one engine instance adopted on the card | a second device ring of signed 128-bit words with the engine's carrier refusal; per-region operator family; base-pointer registry; common context ownership for module/stream/buffer handles; D4 stays an intention |
 | Generalized transport | T1 relation ladder, T2 standing/memory/extinction, T3 release over an edited family, T4 knot friction and edit torque, T5 two-axis horizon, T7 fold, cut and junction law | T6 with T8; a plural family generic in its coordinate address (named by T3, not founded); a faithful Israel-junction instance joining the existing Lorentzian/Einstein-fluid foundations to a four-dimensional hypersurface and its computed extrinsic curvature |
 
+[definition] The open joins of this table are itemized as
+[GitHub issues](https://github.com/brandonrdug/holonics/issues) under four milestones — Holonic
+Interaction chain, Predicted structures against references, Resident exact execution and
+Complete-source field session — with unmilestoned items as backlog. Issues index the work; this
+section orders it.
+
 [definition] **Construction proceeds by the shared operation's dependencies.**
 
 1. **Next shared increment: the Holonic Interaction chain.** Contact, neck and jet are stations

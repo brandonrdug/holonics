@@ -488,6 +488,16 @@ guard, not a production wall-time or semantic bound. Do not fragment a natural o
 to fit a clock or rerun unchanged expensive evidence without a new question. Keep owners cohesive
 through review, not a line-count approval ritual. Scope every reported check accurately.
 
+[definition] [GitHub issues](https://github.com/brandonrdug/holonics/issues) index the open work:
+each open join, defect and measurement is one issue, labelled by machinery (`interaction`, `tube`,
+`receiver`, `variation`, `realization`, `codec`), kind, layer and state, under a milestone that is
+a deliverable return. The roadmap remains the sole construction order and CONSTRUCTION_STATE the
+sole position; issues carry the itemized backlog so those documents do not. A worker prompt names
+the issues it advances; at wave close the primary closes each with its commit or narrows it to the
+concrete absent object, and opens issues for new obligations and for failures found by execution.
+`agent-inferred` marks a decision an agent made from the mathematics and carried on; there is no
+label for waiting on a ruling. The repository is public: issue text carries no private conversation.
+
 [definition] [`docs/VERIFICATION_RECEIPTS.tsv`](docs/VERIFICATION_RECEIPTS.tsv) is how "unchanged"
 is known: whoever runs a check appends its command, tree, result and duration. A receipt is the
 opposite of a gate. It records what a check already answered so the check is not repeated; it
