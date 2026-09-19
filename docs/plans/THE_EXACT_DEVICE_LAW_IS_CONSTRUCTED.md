@@ -5,6 +5,12 @@ states the engineering intentions for how the carrier's operations are realized 
 is extracted from exterior GPU technology into our own construction. External toolchains are
 reference and comparison material; the device law we execute is built here.
 
+[project-postulate] This contract realizes operations of the
+[general embedding composition](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-general-embedding-and-its-consuming-composition).
+Select a device extension from its actual consuming field/contact/receiver operation. Existing
+native paths and scientific reference calculations remain usable while a generated realization
+is extended; completing all of D1–D4 is not an application prerequisite.
+
 ## What exists
 
 [established-bounded; source-inspected] Sixty-nine top-level kernel files, about fourteen thousand
@@ -12,25 +18,28 @@ lines, compiled to PTX by `nvcc` from [`build.rs`](../../crates/holonic-engine/b
 further eleven headers under `kernels/refine_shell/`. The virtual architecture is read off the
 mounted device rather than authored, falling back to a declared floor and saying so aloud through a
 build warning. Sixty-five of the sixty-nine top-level files contain no floating type at all: `exact_integer.cuh` carries multi-limb signed-magnitude integers with an explicit
-overflow flag and widening to a 128-bit signed coefficient. The hot operation is exact integer and
-interval arithmetic with branch-on-exact-comparison, not numerical tensor work.
+overflow flag and widening to a 128-bit signed coefficient. The hot operation uses exact integer
+and interval arithmetic, including tensor/section operations and branch-on-exact-comparison.
 
 [established-bounded; source-inspected] `kernels/field_source_reflection.cuh` factors the scalar,
 shared-section forward and fixed-D joint adjoint entry points into one application of the same map,
 with `producer.rs::pushforward` and `::pullback` carrying the forward and pullback of a single
 `R_D = 2 P_D - I`.
-The cross-check comparing the collective covector against the independent host pullback is present
-and ignored, so that identity is source-verified and unmeasured.
+The cross-check comparing the collective covector against the independent host pullback is an
+explicitly enabled device test. The September 19 [review](../../research/records/2026-09-19_REPOSITORY_REVIEW_AFTER_THE_SHARED_CARRIER_CONSTRUCTION.md)
+ran the operative-source and direct-normal suites with ignored device cases included; the
+returned comparison has measured evidence at that scope.
 
 ## The arithmetic-regime split
 
 [definition] Irregular exact work and dense regular work want different abstractions, and the
 boundary is named here rather than rediscovered later. Exact integer and interval law — carry
 propagation, early exit on exact comparison, topology decided by a branch — stays in the explicit
-single-instruction-multiple-thread form where indexing, residency and refusal are ours. Dense
-regular tensor work, should any be constructed, belongs to a tile-shaped abstraction where
-partition determines layout. Neither regime is permitted to silently adopt the other's tooling, and
-no exterior scheduler may decide a committed current, topology, coefficient or branch.
+single-instruction-multiple-thread form where indexing, residency and refusal are ours. The
+existing dense exact matrix, feature and shared-section work can use the partition-generated
+tile abstraction where its declared law and representation are supported. Both are realizations
+of the same mathematical operations; execution layout does not create another engine. No exterior
+scheduler may decide a committed current, topology, coefficient or branch.
 
 ## What is extracted
 
@@ -476,7 +485,7 @@ richer local arm than a matvec. **One device ring**: the device arm realizes exa
 `Z/(2^61 - 1)`; the engine's kernels carry `__int128` multi-limb exact integers and interval
 enclosures that publish a radius in their last slot, and the generated triple carries no enclosure
 radius word. **`AccumulationLaw::IntegerAdd` has no device arm**, for the stated reason.
-**The engine side is not migrated**, and cannot be from here: `mount` cannot depend on
+**General engine migration beyond the first coordinate cross-check is open**, and cannot be from here: `mount` cannot depend on
 `holonic-engine`, so adopting the triple is a change in the engine's own crate against this owner's
 public declaration.
 

@@ -5,6 +5,13 @@ states the formalization and engineering intentions for the receiver side of the
 defined in [THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md).
 A receiver is a participating Holon, not a display.
 
+[project-postulate] The atlas belongs to the
+[general embedding composition](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-general-embedding-and-its-consuming-composition).
+Music/chords, protein structures and Athena outputs exercise receiving maps of that construction.
+Keep the producing incidence, material, phase and joint source/receiver evolution attached to
+each reading. A chord is a source-and-receiver response; it does not replace the contact dynamics
+that produced it or turn the embedding into one spectral fingerprint.
+
 ## The governing correction
 
 [definition] No object has one intrinsic face. Isospectral objects exist; one global spectrum

@@ -22,6 +22,86 @@ dependent face type, a coalgebraic continuation, a path category of generators a
 enrichment. No single face is the object, and no materialized face is admitted without its
 receiver, lineage, decoder, residual and cost.
 
+## The general embedding and its consuming composition
+
+[project-postulate] Brandon's September 19 clarification makes this object the central shared
+construction. Protein structures provide complex scientific application objects; Athena is an
+intelligence application of the same machinery; notes and chords express its modal and receiving
+relations. Robotics remains an exploratory thought. These are purposes and instances of this
+carrier, not alternative definitions of it.
+
+[definition] The tuple above organizes the same computational Holon written
+[`|H⟩_F`](../HOLON.md#the-object-and-its-notation). Its atlas of presentations retains the
+actual incidence `K`, constitutive/learned material `Theta`, joint current, internal modes and
+generating relations of [the field formula](../HNN_FORMULA.md#one-object-its-charts-and-its-recursive-geometry).
+The tower describes restriction across grain/aperture; the tube adds continuing transport;
+the atlas supplies receiving charts. Their metadata does not replace the evolving field.
+
+[definition] **The chains of knots and tori are a construction to realize through these
+operations.** Circulation carries oriented cycles, phase and connection holonomy. Independent
+commuting phases admit a toroidal chart; coupled, noncommuting passages retain their commutator
+and holonomy. A geometric linking claim additionally carries the embedding/contact relation.
+Constraint knots, topological knots and modal cycles are related readings to compose through
+explicit maps. T3's finite phase example and T4's rigidity knots supply useful restrictions of
+this picture; neither alone realizes the complete interlinked moving field. Its nonlinear
+invariant/preimage families can have intrinsic fractal geometry without tiled copies or a growing
+count of material units.
+
+| Part of this one object | Existing source / operation | Consuming join |
+|---|---|---|
+| Configuration, current and material | `HOLON`, `HNN_FORMULA`; native constitutive field and paired source/current owners | All following readings refer to this producing configuration, incidence and material, with admitted changes transported |
+| Grain, station and unresolved family | `continuing_tower`, `continuing_tube`, `physical_occurrence`, `receiver_release` | Restrict or transport the same family; retain a failed commuting square or unresolved fibre |
+| Oriented contact surface and exchange | `ReceiverStressEnergy`, `HOLONIC_FLUID_CONSTRUCTION`, exact `contact_receiver_faces`; `HodgeOperator`, `JunctionField`, `check_junction` | Bind face geometry, currents, boundary storage, material law and receiver motion to one contact calculation |
+| Differential and constraint response | Constitutive paired tangent/adjoint; `RigidityJacobian`, `KeptReceiverJacobian`, `edit_rigidity` | Derive the kept-face and contact maps from the producing configuration; pull the actual receiving difference back through them |
+| Modes and observable response | `causal_chord::Linearization`, `transfer_function`, rate form and acoustic receiver | Derive the linearization, excitation and receiving map from the same dynamics; keep cancellation, phase and local validity |
+| Embedding/receiving atlas | `receiver_atlas`, `grain_tower`, source/receiver restrictions | A protein presentation, acoustic face and Athena response use their own codecs and receivers over the shared operations |
+| Economical realization | Residual-carrying transitions, factored source relations, shared resident sections, `SectionLayout` | Rebase, factor, lower and reopen the required operation while retaining its receiver equation and cost |
+
+[open] **The immediate join is executable contact with its variation and continuing receiver.**
+The table names substantial existing constructions; it does not claim a single native call already
+composes every row. In particular, T4's `W²` and edit torque are exact constrained-edit readings.
+To use them for physical friction, supply the contact kinematics and constitutive response from
+the existing active-face/fluid owners, then derive the metric and adjoint used by that consumer.
+An authored edit metric remains a declared mathematical receiver where that is the requested law.
+
+[proved-derived] One concrete bridge, under an instantaneous tangent chart with compatible
+units, is the linear dissipative specialization. If relative slip at face `f` is
+`s_f = J_f(q) v` for generalized velocity `v`, and the constitutive traction opposes slip as
+`t_f^d = -D_f s_f` with `D_f` positive semidefinite in the declared power pairing, then
+
+```text
+P_diss = Σ_f ∫_(Σ_f) ⟨s_f, D_f s_f⟩ dA
+       = ⟨v, [Σ_f ∫_(Σ_f) J_f* D_f J_f dA] v⟩ >= 0.
+```
+
+This follows by substitution and the adjoint identity, and specializes the already constructed
+[slip/traction balance](../CONSTRAINT_MODES_AND_RECEIVER_FACES.md#the-overlap-has-stress-bearing-faces).
+It derives a configuration-space dissipation form from actual contact faces. Turning a position
+edit `delta q` into a velocity also requires its clock: on an interval of duration `h > 0`
+with fixed contact form and constant `v = delta q / h`, dissipated energy is
+`⟨delta q, M_contact delta q⟩ / h`. T4's generic `W²` is not automatically this energy.
+Conservative/elastic exchange, surface storage and outgoing radiation remain terms of the full
+balance. A moving receiver and a changed frame require the transported pairing and observer-work
+terms already retained by the active-face contract. This bridge is a derivation to implement at
+the consuming join, not a report that native face integration is complete.
+
+[definition] In a declared fixed local linearization, the same joint dynamics gives
+`A = D F`, the excitation map `B` and the receiver differential `C_R`, and therefore the existing
+causal chord `C_R(sI-A)^(-1)B`. A changing receiving Holon participates in the joint state and
+differential. A static spectrum or externally supplied matrix does not substitute for deriving
+these maps when the claim concerns the continuing interaction. The protein elastic-network
+controls, exact torus-contact control and native field variation are existing sources for this
+composition, with their particular material assumptions kept explicit.
+
+[project-postulate] Each application return carries its improvement back to the applicable
+shared owner and consumers. Protein-specific intake stays in its codec; a general contact,
+restriction or adjoint improvement belongs in the library and reaches Athena where applicable.
+Conversely, a general refinement/release/encoding improvement discovered through Athena returns
+to the same scientific operations. No application must wait for an unrelated conjecture endpoint
+or for every possible physical specialization of this object.
+
+## Compatible sections and the two axes
+
 [definition] The three lawful returns of an attempted global section are `unique`, `plural` and
 `obstructed`. A tower whose levels are all inhabited may still admit no coherent section; that
 obstruction is the object's content and is returned, never resolved by choosing a representative.

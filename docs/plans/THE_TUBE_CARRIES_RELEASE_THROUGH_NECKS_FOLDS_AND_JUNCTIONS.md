@@ -1,9 +1,10 @@
 # The tube carries release through necks, folds and junctions
 
 [definition] This is a construction contract subordinate to [THE_ROADMAP](THE_ROADMAP.md). It
-extends the [shared carrier](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md) and its
-[receiver atlas](THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md) from a static object and its
-readings to **generalized transport**: when a tube conducts, why, what is invariant at the places
+develops **generalized transport** through the
+[shared carrier](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md) and its
+[receiver atlas](THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md): when a tube conducts,
+why, what is invariant at the places
 where it pinches, folds or joins, and what relation a later occurrence bears to an earlier one. It
 adds no milestone. Each item is discharged inside the increment that consumes it, composes the
 owners named beside it, and founds a new owner only for the concrete absent object it names.
@@ -345,6 +346,15 @@ and resolves neither. What is *defined* is exact and finite — `W²`, `τ`, and
 per declared scale; that the three together are a *knot friction moment* in the sense of an
 electromagnetic moment is graded `interpretation`.
 
+[open] T4's next shared composition uses its exact work/torque receiver with T7 and the existing
+active-face/fluid law. Derive the contact Jacobian, traction/current and receiving pairing from
+the same configuration and material. The
+[contact-power pullback](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-general-embedding-and-its-consuming-composition)
+states a concrete dissipative specialization and the clock required to compare it with an edit.
+This joins the physical and computational interpretations without treating an arbitrary edit
+metric as a measured friction coefficient. Its consumers include the protein structural/dynamic
+application and the HNN field's actual variation.
+
 **The worked instances.** (a) The six-slot role frame on an **embedding-placement** chart: the
 slots are points of `ℚ²`, the kept faces are three declared separations and one declared linear
 role-agreement form, `dog → cat` moves the noun slot perpendicular to the separation the receiver
@@ -488,34 +498,40 @@ it as commuting would manufacture flatness; `squares_with_no_declared_face` is i
 bounded route search returns `NoRouteWithinBound` or `MoreRoutesThanDeclared` — never "unreachable",
 and never a truncated enumeration presented as complete.
 
-[definition] **T6 — Neck invariants.** A neck is a station where the section's width tends to zero.
-Its invariants as a point are already computed by separate owners and are not yet one reading: the
-residue and Laurent data at a pole, the holonomy of a circuit around it, the branching count and
-growth exponents at the pinch, the linking of the tubes that meet there, and the characteristic
-face. A prime is a neck carrying its own p-adic tube. On the fluid side the analyticity-strip width
-`δ(t)` of complex Euler is a pinching cross-section; vorticity-direction coherence is why most
-candidate singularities are causally cut off before they complete; helicity is the linking of
-vortex tubes and changes only at reconnection, a neck where topology changes. A whip is the same
-law in one dimension: conserved flux through a shrinking section drives the speed up until the
-medium's causal limit cuts it off as a shock. The contemporary, causally intersected blow-up is the
-object, not the classical unbounded one.
+[definition] **T6 — Neck invariants.** A neck reading specifies its continuing source family,
+station/clock, receiver and the section being narrowed. Geometric cross-sectional area, receiver
+uncertainty width and an analytic domain's width are different quantities. Relate them through
+the source's transport and constitutive equations. The existing residue/Laurent, holonomy,
+branching, linking and characteristic-face owners supply readings to assemble over that same
+source, each with its domain and units.
 
-[definition] **T7 — Folds, cuts and junctions under one law.** A fold is a reflection `R = 2P − I`
-across a crease applied to one side; a bounce is that fold read in the trajectory; a collision is
-the contact law between the layers the fold stacks. Unfolding at a tolerance is the fold catastrophe.
-A fold preserves intrinsic curvature and homology and is reversible exactly when its side-bit
-residual is retained, so `k` folds are the dyadic tube with `2^k` layers; a cut changes the complex
-and is a passage that breaks bonds; a plastic crease is a residual dissipated. A crease pattern is a
-hinge framework and is read by `rigidity_receiver`; the protein backbone is rigid origami of a
-one-dimensional linkage with `(φ, ψ)` hinges, the Ramachandran region being the crease angles
-collisions allow. A **junction law** is one typed object: the tangential part continuous, the normal
-part jumping, the jump being the source that lives on the joint — Kirchhoff's node law as the kernel
-of the boundary operator, the electromagnetic boundary conditions and Snell refraction,
-Rankine–Hugoniot, the Israel junction conditions, Plateau's laws, Kawasaki at a vertex. Valence,
-Euler characteristic contribution and an orientation bit complete it: the pair of pants and the
-Möbius shorts both contribute `chi = −1` and differ in orientability. It is composed over the
-existing gluing owners. **Both halves of this item are returned in the paragraphs below: the fold
-and cut half first, the junction law after it.**
+[interpretation] The prime/p-adic neck, pinching analyticity strip, vortex interaction and whip
+are proposed related realizations. Their source maps must be constructed. A shrinking section
+increases speed under the particular continuity law and flux assumptions that imply it; shocks,
+diffusion, boundary exchange and reconnection require the appropriate material/boundary terms.
+Helicity transport in particular retains its boundary and dissipative terms. These are active
+derivation targets connected to the existing fluid and T7 balance owners, not universal laws
+inferred from a shared word or picture.
+
+[project-postulate] **First consuming return with T8:** construct the neck/jet reading from a
+declared generator and its changing source/receiver chart; carry the compatible family and
+conservation/transport residual through the read. Use the
+[embedding composition](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-general-embedding-and-its-consuming-composition)
+to join the available contact, constitutive variation, pole and higher-difference operations.
+The existing torus-contact and protein/field constructions supply application material; reuse
+their laws and explicit approximations. Return the inferred local relation and its usable
+consumer even when a wider continuum singularity question remains open.
+Neck/width certificates describe their declared receiving scope; they add no universal certainty
+gate before output of a generated face.
+
+[definition] **T7 — Folds, cuts and junctions under one law. Returned at the scopes below.**
+The fold owner keeps the one-sided reflection, changed cross-crease distances and the side-bit
+needed to reopen. Its intrinsic/material reading, a quotient identifying overlapped points and
+an ambient isometry have different consequences; the returned theorems state which is used.
+Cuts carry changed incidence and gluing data. Junctions carry tangential agreement, normal
+current/source balance, orientation and the material/metric at the joint. The protein hinge
+framework, circuit, fluid and geometric controls are instances through these owners. Their
+findings below supersede the earlier blanket fold/homology and surface-orientation predictions.
 
 [established-bounded; formal-checked; implemented-exact] **T7 — The fold and the cut. Returned.**
 Owners: [`Transport/Fold.lean`](../../formal/elementary-holonics/ElementaryHolonics/Transport/Fold.lean)
@@ -718,8 +734,9 @@ Newtonian thin sheet**: the potential is continuous and its normal derivative ju
 source, in units where the coupling `4πG` **is** the declared unit, so no transcendental constant is
 approximated anywhere; it is not an instance of the Israel conditions and says so.
 `israel_junction_conditions` states those, grades them `proved-standard`, cites Israel 1966 and
-names what a faithful instance would owe — a Lorentzian metric, an embedded hypersurface, its
-extrinsic curvature and the Gauss–Codazzi relations, none of which this repository carries. **A film
+names the open four-dimensional hypersurface/extrinsic-curvature/Gauss–Codazzi composition.
+`HolonicCurvedArcEinstein.minkowskiMetric` and `NavierStokesCurvedTransport.EinsteinFluidDynamics`
+are existing Lorentzian and conservation foundations for that work. **A film
 junction**: Plateau's line law is proved as an equivalence and computed on an exact rational
 configuration. 42 tests, 43 audited Lean declarations depending only on `propext`,
 `Classical.choice` and `Quot.sound` — several on fewer and three on none — and none on `sorryAx`. Every
@@ -756,21 +773,31 @@ material changes `hodge_receiver`'s metric and nothing else in this owner moves.
 of the interface term the receiver atlas names as absent for the physicochemical receiver; it is not
 that receiver's term, and the atlas row for it is unchanged.
 
-[definition] **T8 — The jet tower and compression as a staircase.** The jet ladder `J^0 ← J^1 ← …`
-is a `Tower` whose restriction forgets the top derivative; every consistent jet sequence has a
-smooth section, so gluing is plural and only analytic sections glue uniquely. An event's **order**
-is the lowest derivative that jumps at the observer's grain, and it is grain-relative: a narrow bump
-in the `n`th derivative reads one order lower at a coarser grain. Compression descends to the order
-`k` at which the signal is sparse, stores the events and `k` boundary constants, and reopens by
-`k`-fold integration — a `Transition` whose residual is the boundary jet, with a cost receipt.
-`T = γ − 1` is the difference operator and Mahler's expansion makes `Λ = Z_p[[T]]` this staircase
-p-adically. Join to `HigherDifference*`; exact over rationals by finite differences.
+[definition] **T8 — The jet tower and compression as a staircase.** The finite jet ladder
+`J^0 ← J^1 ← …` restricts by forgetting higher derivatives in a declared chart. Begin with the
+existing `HigherDifference*`, local-jet and transported-calculus owners. The first exact
+realization uses declared polynomial/piecewise-polynomial or finite-difference data, its boundary
+jet and a reconstruction residual. A finite jet generally retains several possible continuations.
+
+[open] Smooth realization and analytic uniqueness are separate extension questions with their
+own compatibility and convergence hypotheses; the plan does not infer a global field from an
+arbitrary family of local jets. An event order is read through an explicit grain/receiver map.
+How that map changes the apparent derivative order must be computed, rather than fixed to a
+universal one-order drop. For a source admitting sparse higher differences, repeated integration
+with its boundary data gives a candidate encoding; check reconstruction, admitted future receivers
+and actual cost. A moving frame uses transported derivatives and its seam/connection terms.
+
+[interpretation] `T = gamma - 1` and the Mahler/Iwasawa instance supply a related difference
+staircase through the existing C8 owners. Establish the map between those declared coefficient
+and index categories; a p-adic difference chart and a real/complex time jet are not identified
+merely because both have levels. T6 and T8 share the source and its continuation in the embedding
+composition, so higher-order information returns to the same contact and receiving calculation.
 
 ## Carried from the four returned plans
 
-[definition] Biological: **B8** is returned as `design_selection` on `RelationLadder`'s equal
-potential; **B9** evaluation discipline, **B10** cost cascade and receipts, and the physicochemical
-receiver of B7 remain. Receivers: a per-eigenvalue refinement owner on `ExactHodgeSpectrum`, and
+[definition] Biological: **B8**, **B9**, **B10** and B7's physicochemical receiver have returned
+library owners. The live roadmap retains the application comparisons, computed held-out readings
+and physicochemical interface join still to carry through them. Receivers: a per-eigenvalue refinement owner on `ExactHodgeSpectrum`, and
 `MarkovTwoNSuffices`. Device: a second device ring of signed 128-bit words with the engine's carrier
 refusal, a per-region operator family and a base-pointer registry; **D4** stays an intention.
 Carrier: Weierstrass division for the power-series form of `Λ/(ω_n)`.

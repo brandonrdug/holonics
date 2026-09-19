@@ -1,6 +1,7 @@
 # The roadmap
 
-[definition] This is the sole construction order for HNN and Athena. Brandon's latest direct
+[definition] This is the sole construction order for the shared Holonics machinery and its
+scientific and HNN/Athena applications. Brandon's latest direct
 request governs. [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) holds the current operation,
 next edit and completion evidence. The [native specification](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 holds implementation contracts; [HNN_FORMULA](../HNN_FORMULA.md) defines the model and
@@ -29,6 +30,27 @@ those mathematical objects and their native consumers as one ambitious construct
 retains this direction across subjects and handoffs.
 
 ## Sustained objective and construction rhythm
+
+[project-postulate] **September 19 consolidation: the central construction is the general
+embedding object.** Its circulating modes, knots, interlinked contact geometry, participating
+receivers and continuing field belong to one Holon. The
+[shared embedding composition](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-general-embedding-and-its-consuming-composition)
+connects the existing object, tube, contact/stress, variation and receiver owners. Proteins supply
+a rich physical validation application; Athena supplies a developing intelligence application;
+music/chords expose modal and source/receiver structure. These applications contribute constraints,
+counterexamples and reusable operations to the same library. A successful protein construction
+does not exhaust the general object, and an Athena demonstration does not define its entire scope.
+
+| Shared construction | Scientific application now | Athena / other receiving application | Return to the shared library |
+|---|---|---|---|
+| Situated incidence, configuration and grain restriction | Atom/residue/component presentations, contact families and changing environments | Context regions, active contacts, internal modes and receiving boundaries | Compatible charts, actual incidence and retained preimage families |
+| Contact, material response and variation | Constraint response, folds, interface current/stress and declared physical dynamics | Constituted scattering, coupled field refinement and producing adjoints | The same contact/variation operation with explicit material, frame, units and residual |
+| Cycles, spectrum and receiving atlas | Rigidity, topology, modal response and physicochemical readings of one structure | Attention/participation and whole-field text, image or acoustic faces | Source-conditioned response maps; phase and modes survive changes of receiver |
+| Continuing transport, necks and jets | Localized events and changing fields across grain and time | Predictive release, revision, recurrence and compression | T6/T8 using the existing T4/T7 and analytic/variation owners |
+| Exact realization and cost | Reference calculations and data comparisons at declared approximation | Resident execution, saved continuation and economical reuse | Shared exact operators and codecs with a stated realization equation |
+
+[project-postulate] Robotics/kinetics simulation is an exploratory application idea retained from
+the September 19 message. It has no active work item, simulator choice or delivery obligation.
 
 [definition] The model is one continuing `(K,Θ,|H⟩)` with admitted incidence/transport K,
 constitutive and learned material Θ, and resident joint currents/interior modes. Receiving
@@ -91,8 +113,11 @@ and resource behavior needed by those tasks; interoperability is a later deliver
 
 ## Immediate mathematical application and implementation
 
-[project-postulate] Continue from the delivered field-backed core into its consuming Athena
-application. [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md#roadmap-position) holds the exact
+[project-postulate] Continue the shared embedding composition through the active mathematical
+operation and its consuming applications. The protein/physical and Athena returns use the same
+source owners; a defect revealed by either is repaired and generalized where its law applies.
+For the Athena application, continue from its delivered field-backed core.
+[CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md#roadmap-position) holds the exact
 milestone position and unclosed join. The [first increment contract](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#first-implementation-increment)
 retains the model equations and completed core responsibilities; it does not schedule repeated
 construction of that core. The [next consuming application](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-consuming-application)
@@ -228,28 +253,46 @@ the mathematical applications and the biological ecologies all instantiate; its
 [physical instance](THE_BIOLOGICAL_ECOLOGY_INSTANTIATES_THE_CARRIER.md); and its
 [device realization](THE_EXACT_DEVICE_LAW_IS_CONSTRUCTED.md); a fifth,
 [generalized transport](THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md), extends the
-carrier and its atlas from readings to when a tube conducts and why. They carry formalization and
-engineering intentions, not milestones. Each item is discharged inside the increment that consumes
-it, and none of them reorders the milestone table above.
+carrier and its atlas from readings to when a tube conducts and why. These are mathematical
+contracts for one construction. The Athena milestone table orders that product's deliveries;
+the shared construction and scientific applications follow the dependency order below. A letter
+prefix identifies a contract's source history, not a separate engine or competing schedule.
 
 ### Position of the five contracts
 
 [established-bounded; formal-checked; implemented-exact] One table is the live status; the contract
 documents hold the statements, owners and findings and are not re-narrated here.
 
-| Contract | Returned | Remaining, in order |
+| Contract | Returned | Concrete open joins |
 |---|---|---|
-| Shared carrier | C1–C8 and the tube join | Weierstrass division for the power-series form of `Λ/(ω_n)` |
+| Shared carrier | C1–C8 and the tube join | Compose the carrier/atlas with active contact faces, constitutive evolution and their variation at the existing consumers; Weierstrass division for the power-series form of `Λ/(ω_n)` remains a specialized mathematical item |
 | Receiver atlas | R1–R7 | per-eigenvalue refinement on `ExactHodgeSpectrum`; `MarkovTwoNSuffices` |
 | Biological ecology | B0–B10 | held-out agreement counts computed from a declared receiver family rather than supplied; a run of the installed predictors against an M5 design; the gluing law with interface coupling for the physicochemical receiver |
 | Exact device law | D1–D3, one engine instance adopted on the card | a second device ring of signed 128-bit words with the engine's carrier refusal; per-region operator family; base-pointer registry; common context ownership for module/stream/buffer handles; D4 stays an intention |
 | Generalized transport | T1 relation ladder, T2 standing/memory/extinction, T3 release over an edited family, T4 knot friction and edit torque, T5 two-axis horizon, T7 fold, cut and junction law | T6 with T8; a plural family generic in its coordinate address (named by T3, not founded); a faithful Israel-junction instance joining the existing Lorentzian/Einstein-fluid foundations to a four-dimensional hypersurface and its computed extrinsic curvature |
 
-[definition] **The remaining order is one list.** (1) T6 neck invariants with T8 the jet tower,
-which share the pole and higher-difference owners. (2) The device ring and the items listed against
-it. (3) The Athena application's complete-source session over the rebased shared section work,
-carried by [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md). The smaller open items in the table
-are taken inside the increment that next touches their owner, not as increments of their own.
+[definition] **Construction proceeds by the shared operation's dependencies.**
+
+1. **Next shared increment: contact, neck and jet composition.** T6/T8 remain the next unreturned
+   formal items. Build them from the existing T4/T7, field/flux and analytic owners as described in
+   the [embedding composition](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-general-embedding-and-its-consuming-composition).
+   Its return is a source-linked interaction and its receiver/variation/continuation, with the
+   physical and computational charts connected; a new collection of separately named examples
+   does not discharge that join.
+2. **Exercise available operations through the standing applications as their inputs exist.**
+   Protein work continues the environment-indexed structural/physical application, including
+   actual predictor/reference comparisons and computed evaluation readings. Athena continues the
+   complete-source field session and its applicable operator attachments. Either can expose a
+   shared missing law or representation. Neither waits for every item in the five contracts.
+3. **Lower the operation that needs resident execution.** The signed-word/radius realization,
+   per-region operators and common-context ownership belong at the consuming device boundary.
+   Existing lawful native paths continue while the generated path is extended. D4, Weierstrass
+   division and a full Israel instance are not universal gates before an application return.
+
+[project-postulate] The root brief in CONSTRUCTION_STATE names the active shared operation and
+the application evidence it is meant to produce. Subtasks carry their operands, owner and actual
+consumer back into that composition. Their closure updates the affected source, contracts and
+callers together; this uses the existing construction loop, not another project ledger.
 
 ### Rules that settle recurring choices
 
@@ -324,9 +367,10 @@ agent assumptions inside each increment; preserve actual mathematical and wire d
 
 ## Scope of deferred and completed work
 
-[definition] The old timed goal remains paused; its uncommitted operative-condition draft is
-preserved for inspection/integration. This roadmap authorizes ordinary construction without that
-mechanism. The draft's predictor assay does not select the model architecture. Existing inferred
+[historical] The old timed goal remains paused; its operative-condition/shared-section work was
+integrated in `24e74c64` and repaired further in `5343f316`. It is no longer an uncommitted draft.
+This roadmap authorizes ordinary construction without that goal mechanism. The earlier predictor
+assay does not select the model architecture. Existing inferred
 relations, local training, source/receiver laws and persistence returns remain usable evidence.
 
 [definition] Native assembly precedes further inherited-model-led production. Soulkiller's

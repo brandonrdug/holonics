@@ -8,20 +8,42 @@ read through the receivers of
 
 ## Why this instance
 
-[project-postulate] A protein is the only object in this programme carrying every chart type at
-once with an external referee: a discrete symbolic chart in its sequence, a continuous frame chart
-in its residue frames, a relational chart in its contact complex, spectral and topological charts
-over that complex, an environment index in pH, partners, solvent and species, and a genuine grain
-hierarchy from atom through residue to domain. Each of those corresponds to a distinct map type in
-the carrier — generator, transport, incidence, receiver, index, restriction — and each has a
-concrete instance that physical measurement can refute. Spectral placement has no environment
-index; text has no physical referee; a graph has no grain hierarchy anything can contradict. This
-instance is therefore the forcing function for the embedding object, which is an atlas of
-placements whose content is its transition maps.
+[project-postulate] Protein structures are the present rich scientific application of the
+[general embedding object](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-general-embedding-and-its-consuming-composition).
+They bring sequence, spatial frames, contact incidence, spectral/topological response, environment
+and atom/residue/domain grains into one demanding construction. Their complexity lets defects in
+several shared operations become visible together. This is why Brandon selected them; it is not
+an exclusivity theorem about which kinds of object can carry these relations.
 
-[definition] The competition is a convenient external surface and not the purpose. The purpose is
-the mathematics, and the ordered extension is protein, RNA, DNA and chromatin, viral worldtubes,
-cancer ecologies, and neurochemical modulation.
+[definition] The general object remains the continuing Holon with its interacting faces, material,
+currents and receiving atlas. Protein-specific sequences and file formats are application charts.
+The same contact, restriction, variation, response and encoding laws contribute to HNN/Athena
+and other scientific applications wherever their hypotheses and units apply. Other applications
+can also carry environments, physical receiving apparatus and testable grain relations.
+
+[definition] The competition is a convenient external comparison surface. The scientific work
+compares explicit constructions against structure data, independent calculations/predictors and,
+when supplied, physical measurements. These establish their respective scopes: an exact identity,
+a computational model comparison and an assay are different evidence about one application.
+RNA, DNA/chromatin, viral, cancer and neurochemical examples below retain wider research intentions;
+they are not an automatic queue of prerequisites for the general embedding or Athena.
+
+## Current application return and its shared consumers
+
+[established-bounded; source-inspected] B0–B10 supply intake, grains, occurrences, contact/constraint
+families, passages, receiver analyses, design/evaluation interfaces and cost receipts. The M5
+structures have exercised the shared library through actual all-atom/contact, modal, rigidity,
+topological and physicochemical readings. The returned constructors do not alone close the whole
+design application. Computed held-out agreement counts, an actual installed-predictor comparison
+and the physicochemical interface-gluing law remain named application work in the roadmap.
+
+[open] The dynamic join consumes the same source configuration and environment through active
+contact faces and material evolution. T4's exact constrained edit response and T7's junction
+balance are available inputs; the
+[contact-to-variation composition](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-general-embedding-and-its-consuming-composition)
+specifies how relative motion, traction, dissipation and receiving differentials join them.
+This physical instance supplies demanding tests for that reusable operation. Its input and
+constitutive calibration must remain attached when the result is read through another receiver.
 
 ## The object
 
@@ -450,7 +472,9 @@ prediction two loops, and the CUL1-bound prediction none — which the receiver 
 reports as zero. The loop contacts now come from the presentation's own within-component family
 through `presented_contact_loops`, with the filtration reading held to agreement and a
 disagreement returned as a typed refusal preferring neither source; on the three M5 windows the two
-readings agree exactly. The spectral receiver remains open.
+readings agree exactly. R3's spectral/Hodge receiver has since returned as `hodge_receiver` and
+`Foundation/HodgeReceiver.lean`; per-eigenvalue refinement on `ExactHodgeSpectrum` remains open,
+as recorded in the live roadmap.
 
 [established-bounded; formal-checked; implemented-exact; measured] The **physicochemical half is
 returned**: [`physicochemical_receiver.rs`](../../crates/holonic-engine/src/physicochemical_receiver.rs)
@@ -850,18 +874,18 @@ union of lineage classes. The declared `EditRadius` is not a nuisance parameter 
 the quotient, and on the worked four-design family the same population is four classes at radius
 zero, two at radius one and one at radius three. Neither the radius nor the key has a default.
 
-## Extension order
+## Extension relationships
 
-[definition] RNA is the first extension after protein because it supplies a discrete sequence, a
+[definition] RNA is a nearby extension of the protein construction because it supplies a discrete sequence, a
 nonlocal pairing incidence, pseudoknots, continuous configuration, ion and ligand modulation,
 cotranscriptional chronology and several functional faces in one manageable domain, and because two
 molecules reaching the same pairing diagram by different paths may respond differently afterwards —
-a direct biological use of the receiver-history law. DNA and chromatin follow, composing the
+a direct biological use of the receiver-history law. DNA and chromatin compose the
 existing bend-twist-stretch chart with base-pair frames, linking, twist and writhe, nucleosome and
 loop incidence, and transcription and repair receivers. Viral and cancer ecologies are compositions
 over those carriers, where a class is a receiver-relative equivalence under declared hosts,
 interventions and immune receivers rather than a taxonomic label. Neurochemical modulation is the
-mature target: a modulator enters as constitutive modulation `Theta(m,eta)` with its own slow
+further research target: a modulator enters as constitutive modulation `Theta(m,eta)` with its own slow
 dynamics, changing gain, time constants, excitability, coupling, plasticity and future sensitivity,
 so that two circuits with the same present firing face and different modulator state separate under
 the next stimulus or drug.

@@ -115,6 +115,18 @@ retains the first-person motivation, Eros nesting and landmark/interior reasonin
 mythic vocabulary. These orient construction and do not introduce deity-named modules,
 a new workflow ritual or another requirement to ask him for an explainer.
 
+[project-postulate] Brandon's September 19 consolidation centers the **general embedding object**:
+circulating modes, knots/tori, interacting contact faces, continuing fields and participating
+receivers. Protein design/structure work is a rich scientific application and validation target;
+Athena is an intelligence application; music/chords expose modal and receiving relations.
+Develop their applicable laws in shared owners and carry application findings back into those
+owners and consumers. The [shared embedding composition](docs/plans/THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-general-embedding-and-its-consuming-composition)
+binds the existing carrier, contact/stress, variation and atlas constructions. None of these
+application labels partitions the framework into independent engines. Robotics simulation remains
+an exploratory thought, with no active construction target. The roadmap schedules actual
+dependencies; completing every mathematical or device specialization is not a universal
+prerequisite for a usable scientific or Athena return.
+
 [project-postulate] The [Reality of Difference construction programme](docs/plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md)
 now connects the existing Swing, potential/fibre, tube/scale, constitutive, mathematical,
 quantum/geometric and physical-realization work. Its order belongs to the live roadmap.
