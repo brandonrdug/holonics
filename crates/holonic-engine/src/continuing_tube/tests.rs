@@ -143,6 +143,26 @@ fn a_face_the_section_does_not_carry_is_refused_by_the_transport() {
 }
 
 #[test]
+fn a_square_face_outside_the_declared_aperture_is_refused() {
+    let tower = ResidueTower::new(BigUint::from(2u32)).expect("base two founds a residue tower");
+    let tube = ConstantTube::new(tower, 2);
+    assert!(matches!(
+        check_commuting_square(&tube, &0, &1, &[0u32], &[(1u32, BigUint::zero())]),
+        Err(TubeRefusal::FaceOutsideAperture { chart: 1 })
+    ));
+}
+
+#[test]
+fn a_circuit_face_outside_the_declared_aperture_is_refused() {
+    let tower = ResidueTower::new(BigUint::from(2u32)).expect("base two founds a residue tower");
+    let tube = ConstantTube::new(tower, 2);
+    assert!(matches!(
+        check_circuit_holonomy(&tube, &[0u32, 0], &[0u32], &[(1u32, BigUint::zero())]),
+        Err(TubeRefusal::FaceOutsideAperture { chart: 1 })
+    ));
+}
+
+#[test]
 fn a_step_between_unordered_stations_is_refused() {
     let tower = ResidueTower::new(BigUint::from(2u32)).expect("base two founds a residue tower");
     let tube = ConstantTube::new(tower, 4);

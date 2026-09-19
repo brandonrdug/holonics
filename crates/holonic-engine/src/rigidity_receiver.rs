@@ -448,6 +448,7 @@ impl RigidityJacobian {
                 .ok_or(RigidityError::ConstraintProvenanceAbsent(*edge))?;
             constraints.insert(*edge, provenance);
         }
+        member.validate_structure()?;
         Self::found(
             member.presentation_lineage.clone(),
             configuration,
@@ -1135,6 +1136,9 @@ pub fn verify_removal_sensitivity(
 ///
 /// Indexed exactly as `physical_constraint_grading::ConstraintComplexFamily` is: by the
 /// resolutions of the open set, with the two bounds of the 1-cell inclusion order constructed.
+/// This is a computed summary receipt, not a remountable source presentation: its serialized
+/// bounds retain the reading but not the original physical complex and configuration needed to
+/// reproduce them. Consumers that need operative material must retain those source inputs.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RigidityFamily {
     pub schema: String,

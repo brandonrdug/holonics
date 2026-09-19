@@ -243,6 +243,9 @@ pub enum OpenContactLaw {
 }
 
 /// One member of the family: a graded chain complex together with the resolution that produced it.
+/// A remounted member can validate its internal algebraic/map coherence through
+/// [`Self::validate_structure`]; that check deliberately cannot reconstruct the original physical
+/// contact presentation from this aggregate receipt.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct GradedConstraintComplex {
     pub schema: String,
@@ -259,6 +262,134 @@ pub struct GradedConstraintComplex {
 }
 
 impl GradedConstraintComplex {
+    /// Validate the structural coherence needed by downstream Hodge/rigidity consumers.
+    ///
+    /// This checks the remounted report's own algebraic carrier and maps; it does not claim to
+    /// reconstruct the original physical contact presentation or prove that the report came from
+    /// `found_member`.
+    pub fn validate_structure(&self) -> Result<(), ConstraintGradingError> {
+        if self.schema != "holonic-engine.graded-constraint-complex.v1" {
+            return Err(ConstraintGradingError::MemberInvariant(
+                "graded-complex schema disagrees".to_owned(),
+            ));
+        }
+        self.complex.validate()?;
+        if self.edge_cells.keys().ne(self.edge_provenance.keys()) {
+            // Preserve the existing named orphan refusal when applicable.
+            if let Some(edge) = self.edge_provenance.keys().find(|e| !self.edge_cells.contains_key(e)) {
+                return Err(ConstraintGradingError::ProvenanceWithoutCell(*edge));
+            }
+            return Err(ConstraintGradingError::MemberInvariant(
+                "an edge cell has no provenance".to_owned(),
+            ));
+        }
+        let mut mapped = BTreeSet::new();
+        for cell in self.vertex_cells.values().chain(self.edge_cells.values()).chain(self.face_cells.values()) {
+            if !mapped.insert(*cell) {
+                return Err(ConstraintGradingError::MemberInvariant(
+                    "distinct mapped objects share one cell".to_owned(),
+                ));
+            }
+        }
+        if mapped != self.complex.cells().keys().copied().collect() {
+            return Err(ConstraintGradingError::MemberInvariant(
+                "object maps do not cover exactly the complex's cells".to_owned(),
+            ));
+        }
+        for (vertex, cell_id) in &self.vertex_cells {
+            let cell = self.complex.cell(*cell_id)?;
+            if cell.grade != 0 || !cell.boundary.is_zero() {
+                return Err(ConstraintGradingError::MemberInvariant(format!(
+                    "vertex {vertex:?} does not map to a boundary-free grade-zero cell"
+                )));
+            }
+        }
+        for (edge, cell_id) in &self.edge_cells {
+            let cell = self.complex.cell(*cell_id)?;
+            if cell.grade != 1 {
+                return Err(ConstraintGradingError::MemberInvariant(format!(
+                    "edge {edge:?} maps to grade {}",
+                    cell.grade
+                )));
+            }
+            let lower = self.vertex_cells.get(&edge.lower).ok_or_else(|| {
+                ConstraintGradingError::MemberInvariant(format!(
+                    "edge {edge:?} has no lower vertex cell"
+                ))
+            })?;
+            let upper = self.vertex_cells.get(&edge.upper).ok_or_else(|| {
+                ConstraintGradingError::MemberInvariant(format!(
+                    "edge {edge:?} has no upper vertex cell"
+                ))
+            })?;
+            let mut expected = CausalChain::default();
+            expected.add_term(*upper, ComparativeMultiplicity::positive(1_u8));
+            expected.add_term(*lower, ComparativeMultiplicity::negative(1_u8));
+            if cell.boundary != expected {
+                return Err(ConstraintGradingError::MemberInvariant(format!(
+                    "edge {edge:?} boundary disagrees with its vertex cells"
+                )));
+            }
+        }
+        for (edge, provenance) in &self.edge_provenance {
+            if !self.edge_cells.contains_key(edge) {
+                return Err(ConstraintGradingError::ProvenanceWithoutCell(*edge));
+            }
+            if *provenance == EdgeProvenance::ResolvedOpenContact
+                && !self.resolution.dispositions().get(edge).copied().unwrap_or(false)
+            {
+                return Err(ConstraintGradingError::MemberInvariant(format!(
+                    "resolved-open edge {edge:?} is not admitted by the resolution"
+                )));
+            }
+        }
+        for (edge, admitted) in self.resolution.dispositions() {
+            if *admitted
+                && self.edge_provenance.get(edge) != Some(&EdgeProvenance::ResolvedOpenContact)
+            {
+                return Err(ConstraintGradingError::MemberInvariant(format!(
+                    "resolution admits edge {edge:?} without a resolved-open edge cell"
+                )));
+            }
+        }
+        for (vertices, cell_id) in &self.face_cells {
+            if vertices[0] == vertices[1]
+                || vertices[1] == vertices[2]
+                || vertices[0] == vertices[2]
+            {
+                return Err(ConstraintGradingError::DegenerateFace(*vertices));
+            }
+            let cell = self.complex.cell(*cell_id)?;
+            if cell.grade != 2 {
+                return Err(ConstraintGradingError::MemberInvariant(format!(
+                    "face {vertices:?} maps to grade {}",
+                    cell.grade
+                )));
+            }
+            let face = ConstraintFace {
+                id: ConstraintFaceId(cell_id.0),
+                source_event: self.source_event,
+                vertices: *vertices,
+            };
+            let mut expected = CausalChain::default();
+            for (edge, hand) in face.boundary()? {
+                let edge_cell = self.edge_cells.get(&edge).ok_or_else(|| {
+                    ConstraintGradingError::FaceBoundaryNotFounded(*vertices)
+                })?;
+                expected.add_term(
+                    *edge_cell,
+                    ComparativeMultiplicity::from_hand(hand, 1_u8)?,
+                );
+            }
+            if cell.boundary != expected {
+                return Err(ConstraintGradingError::MemberInvariant(format!(
+                    "face {vertices:?} boundary disagrees with its edge cells"
+                )));
+            }
+        }
+        Ok(())
+    }
+
     /// The cells founded from resolved open contacts, named. Empty for the refusing member.
     ///
     /// [`found_member`] founds `edge_cells` and `edge_provenance` in one pass, so every member
@@ -641,6 +772,8 @@ pub enum ConstraintGradingError {
         "the one-cell {0:?} carries a declared provenance but no founded cell; this member's edge_provenance and edge_cells disagree"
     )]
     ProvenanceWithoutCell(ConstraintEdge),
+    #[error("the remounted graded member violates an internal invariant: {0}")]
+    MemberInvariant(String),
     #[error(
         "this presentation carries {open} open contacts, so its family has 2^{open} members; enumeration was bounded at {bound}"
     )]

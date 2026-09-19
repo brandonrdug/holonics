@@ -266,15 +266,27 @@ fn a_materialized_face_carries_its_plural_lineage() {
     assert_eq!(fibre.sections().len(), 3);
     assert!(!fibre.is_empty());
 
-    let materialized = MaterializedFace {
-        chart: 1u32,
-        face: nat(2),
-        lineage: fibre,
-    };
-    assert_eq!(materialized.lineage.sections().len(), 3);
+    let materialized = MaterializedFace::found(1u32, nat(2), fibre)
+        .expect("the lineage belongs to the materialized face");
+    assert_eq!(materialized.lineage().sections().len(), 3);
 
     let empty = ObservationFibre::over(1u32, nat(100), &population);
     assert!(empty.is_empty());
+}
+
+#[test]
+fn a_materialized_face_rejects_lineage_from_another_observation() {
+    let tower = ResidueTower::new(nat(3)).expect("3 is a usable base");
+    let GluingResult::Plural(population) =
+        glue_chain(&tower, &[0u32, 1, 2], nat(0)).expect("the residue tower is plural")
+    else {
+        panic!("the residue tower is plural over this chain");
+    };
+    let lineage = ObservationFibre::over(1u32, nat(2), &population);
+    assert!(matches!(
+        MaterializedFace::found(1u32, nat(1), lineage),
+        Err(TowerRefusal::MaterializedLineageDisagrees { .. })
+    ));
 }
 
 /// Mirrors `shiftTower_adjacent_not_surjective`: the adjacent fibre over the base face is empty, so

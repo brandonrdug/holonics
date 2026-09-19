@@ -179,6 +179,13 @@ pub enum JunctionRefusal {
         expected: usize,
         supplied: usize,
     },
+    #[error("the source dimension {source_dimension:?} does not match the flux dimension {flux:?}")]
+    SourceDimensionDisagrees {
+        flux: Dimension,
+        source_dimension: Dimension,
+    },
+    #[error("the junction cochains do not have the same joint key set")]
+    JunctionCochainKeysDisagree,
     #[error(
         "the declared extent {declared} exceeds this module's ceiling {ceiling}; a presentation \
          that outgrows its carrier is rebased or refused, never let through by a raised ceiling"
@@ -247,6 +254,15 @@ impl JointUnits {
         source: Dimension,
     ) -> Result<Self, JunctionRefusal> {
         let power = potential.product(&flux)?;
+        // In this discrete owner the source is the codifferential of the flux cochain, so it
+        // carries the same declared unit. This is a cochain-level equality, not a claim about
+        // pointwise density or a continuum divergence convention.
+        if source != flux {
+            return Err(JunctionRefusal::SourceDimensionDisagrees {
+                flux,
+                source_dimension: source,
+            });
+        }
         Ok(Self {
             lineage: lineage.into(),
             base,
@@ -654,8 +670,9 @@ impl JunctionLaw {
         }
         let joint: BTreeSet<CausalCellId> = normal_jump.keys().copied().collect();
         let source_keys: BTreeSet<CausalCellId> = source.keys().copied().collect();
-        if joint != source_keys {
-            return Err(JunctionRefusal::EmptyJoint);
+        let tangential_keys: BTreeSet<CausalCellId> = tangential.keys().copied().collect();
+        if joint != source_keys || joint != tangential_keys {
+            return Err(JunctionRefusal::JunctionCochainKeysDisagree);
         }
         Ok(Self {
             schema: JUNCTION_LAW_SCHEMA.to_owned(),
@@ -1808,10 +1825,15 @@ pub fn israel_junction_conditions() -> StatedLaw {
              4-dimensional chart; an embedded hypersurface with its unit normal; the induced \
              metric and the extrinsic curvature K_ij = nabla_i n_j computed from that embedding; \
              the Gauss-Codazzi relations relating them to the ambient curvature; and an exact \
-             carrier for all of it. This repository carries no Lorentzian metric, no embedded \
-             hypersurface and no extrinsic curvature, so nothing here is an instance of this law. \
-             What is built instead is the Newtonian sheet below, which is the law's weak-field \
-             scalar shadow and says so.",
+             carrier for all of it. The existing formal owner \
+             Millennium/HolonicCurvedArcEinstein.lean supplies minkowskiMetric with signature \
+             (-,+) and flatLorentzVacuumDynamics; \
+             Millennium/NavierStokesCurvedTransport.lean supplies EinsteinFluidDynamics and \
+             derives stress-energy conservation from its field equation and compatibility laws. \
+             This junction owner has not composed those foundations with a four-dimensional \
+             hypersurface, computed extrinsic curvature and Gauss-Codazzi realization. Its \
+             executable gravitational instance is the Newtonian sheet below, at its declared \
+             weak-field scalar scope.",
     }
 }
 

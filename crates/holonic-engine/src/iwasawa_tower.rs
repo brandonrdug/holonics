@@ -1,8 +1,8 @@
 //! **C8 — the Iwasawa tower: the finite computable shadow of `Λ = Z_p[[T]]` and its levels.**
 //!
 //! The object of this module is the chain of distinguished polynomials
-//! `ω_n(T) = (1+T)^(p^n) - 1`, the finite quotients `Λ/(ω_n)` they cut out, and the finite abelian
-//! groups `M/ω_n M` that a finitely presented `Λ`-module leaves at each level. Everything below is
+//! `ω_n(T) = (1+T)^(p^n) - 1`, the finite-rank quotients `Λ/(ω_n)` they cut out, and the finite abelian
+//! groups `M/ω_n M` when that specialization is finite (otherwise a typed refusal). Everything below is
 //! computed exactly over `num_bigint::BigInt` / `BigUint`. **No machine floating-point type and
 //! no float literal appears in this file**, which the test
 //! `the_module_source_contains_no_floating_point_type` checks against this file's own text; the
@@ -11,8 +11,13 @@
 //! # What this module computes and what it cites
 //!
 //! Iwasawa's theorem (Iwasawa 1959; see Washington, *Introduction to Cyclotomic Fields*, 2nd ed.,
-//! Theorem 13.13) says that for a finitely generated torsion `Λ`-module `M` there are integers
+//! Theorem 13.13), on a finitely generated torsion `Λ`-module `M` whose `ω_n` coinvariants are
+//! finite, supplies integers
 //! `μ ≥ 0`, `λ ≥ 0`, `ν` and an `n₀` with `|M/ω_n M| = p^(μ p^n + λ n + ν)` for all `n ≥ n₀`.
+//! The finiteness hypothesis cannot be omitted: `Λ/(T)` leaves `Z_p` at every level and is
+//! refused by `specialize`. The general classical form uses `ω_n/ω_n₀` relatively prime to the
+//! characteristic ideal (Sharifi, *Iwasawa Theory*, Theorem 2.4.7,
+//! <https://www.math.ucla.edu/~sharifi/notes/iwasawa-ch02.html>).
 //! **That theorem is cited, not proved here.** What this module does is *exhibit the shape
 //! numerically at small levels*: it measures `e_n` with `|M/ω_n M| = p^(e_n)` by an exact Smith
 //! normal form, solves the three-by-three integer system for `(μ, λ, ν)` over three consecutive

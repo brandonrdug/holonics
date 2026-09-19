@@ -645,6 +645,7 @@ impl HodgeOperator {
         metric: &MetricDeclaration,
         law: &BoundaryLaw,
     ) -> Result<Self, HodgeError> {
+        member.validate_structure()?;
         let condition = law.resolve(member)?;
         Self::found(
             member.presentation_lineage.clone(),

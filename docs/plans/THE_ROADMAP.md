@@ -242,8 +242,8 @@ documents hold the statements, owners and findings and are not re-narrated here.
 | Shared carrier | C1–C8 and the tube join | Weierstrass division for the power-series form of `Λ/(ω_n)` |
 | Receiver atlas | R1–R7 | per-eigenvalue refinement on `ExactHodgeSpectrum`; `MarkovTwoNSuffices` |
 | Biological ecology | B0–B10 | held-out agreement counts computed from a declared receiver family rather than supplied; a run of the installed predictors against an M5 design; the gluing law with interface coupling for the physicochemical receiver |
-| Exact device law | D1–D3, one engine instance adopted on the card | a second device ring of signed 128-bit words with the engine's carrier refusal; per-region operator family; base-pointer registry; the zero gather inside the adopted readout context; D4 stays an intention |
-| Generalized transport | T1 relation ladder, T2 standing/memory/extinction, T3 release over an edited family, T4 knot friction and edit torque, T5 two-axis horizon, T7 fold, cut and junction law | T6 with T8; a plural family generic in its coordinate address (named by T3, not founded); a faithful Israel-junction instance, which owes a Lorentzian metric and extrinsic curvature no owner carries |
+| Exact device law | D1–D3, one engine instance adopted on the card | a second device ring of signed 128-bit words with the engine's carrier refusal; per-region operator family; base-pointer registry; common context ownership for module/stream/buffer handles; D4 stays an intention |
+| Generalized transport | T1 relation ladder, T2 standing/memory/extinction, T3 release over an edited family, T4 knot friction and edit torque, T5 two-axis horizon, T7 fold, cut and junction law | T6 with T8; a plural family generic in its coordinate address (named by T3, not founded); a faithful Israel-junction instance joining the existing Lorentzian/Einstein-fluid foundations to a four-dimensional hypersurface and its computed extrinsic curvature |
 
 [definition] **The remaining order is one list.** (1) T6 neck invariants with T8 the jet tower,
 which share the pole and higher-difference owners. (2) The device ring and the items listed against
@@ -261,9 +261,11 @@ the framework does not determine goes to Brandon.
    brought to a reduced chart, factored, or placed differently — an exact, recorded, invertible
    change of presentation — or the obstruction is returned. A carrier is never widened and a
    ceiling is never raised to let a computation through.
-2. **A bounded search refutes and never affirms.** Equal potential, extinction, design equivalence
-   and separation-freedom are affirmed only by an exhibited certificate or isomorphism that the
-   library checks. "Not separated within the bound" is its own return.
+2. **A finite prefix alone does not establish a universal future claim.** Equal potential,
+   extinction, design equivalence and separation-freedom over all admitted continuations require
+   a checked certificate, isomorphism or completeness argument. A finite exact construction can
+   establish its declared finite claim, and a checked finite certificate can establish a wider
+   one. "Not separated within the bound" alone is its own return.
 3. **Equality is typed.** Identity belongs to an occurrence, persistence to lineage, sameness to a
    receiver, potential to a family of futures, memory to standing. A result states its rung on
    `RelationLadder`, and no rung below identity is promoted to it.

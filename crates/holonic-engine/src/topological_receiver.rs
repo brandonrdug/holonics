@@ -641,6 +641,22 @@ impl ApertureFiltration {
         if occurrences.is_empty() {
             return Err(TopologicalError::EmptyPopulation);
         }
+        if ceiling < Rat::zero() {
+            return Err(TopologicalError::NegativeCeiling);
+        }
+        let mut occurrence_set = BTreeSet::new();
+        for occurrence in &occurrences {
+            if !occurrence_set.insert(*occurrence) {
+                return Err(TopologicalError::OccurrenceAddressRepeated(*occurrence));
+            }
+        }
+        if component_of.len() != occurrences.len()
+            || component_of
+                .keys()
+                .any(|occurrence| !occurrence_set.contains(occurrence))
+        {
+            return Err(TopologicalError::ComponentMapDisagrees);
+        }
         let mut simplex_by_cell = BTreeMap::new();
         for (simplex, cell) in &cells_by_simplex {
             if simplex.iter().any(|at| *at >= occurrences.len()) {
@@ -2874,6 +2890,10 @@ pub enum TopologicalError {
     Configuration(#[from] RigidityError),
     #[error("a filtration needs at least one occurrence")]
     EmptyPopulation,
+    #[error("the declared occurrence population repeats {0:?}")]
+    OccurrenceAddressRepeated(ConstraintVertexId),
+    #[error("the component map does not address exactly the declared occurrence population")]
+    ComponentMapDisagrees,
     #[error("the declared top grade {0} is outside the range 1..=3 this receiver founds")]
     TopGradeOutsideRange(u32),
     #[error("a squared aperture ceiling is never negative")]

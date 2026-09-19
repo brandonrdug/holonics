@@ -1996,6 +1996,16 @@ fn a_transformation_naming_an_index_the_family_does_not_carry_is_refused() {
         family.design_situation(&[forged], 1),
         Err(SelectionRefusal::DesignAbsent { .. })
     ));
+    let forged_site = AdmittedTransformation::Mutation {
+        from: 0,
+        to: 1,
+        environment: 0,
+        site: 99,
+    };
+    assert!(matches!(
+        family.design_situation(&[forged_site], 1),
+        Err(SelectionRefusal::Passage(_))
+    ));
     let too_many: Vec<AdmittedTransformation> = std::iter::repeat_n(
         AdmittedTransformation::EnvironmentChange {
             from: 0,

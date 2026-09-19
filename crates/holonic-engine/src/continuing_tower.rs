@@ -143,6 +143,18 @@ pub enum TowerRefusal<I, F> {
         /// The chart with no witness.
         chart: I,
     },
+    /// The retained observation fibre belongs to a different chart or face than the materialized
+    /// presentation. Rust carries these indices as data where Lean carries them in dependent types.
+    MaterializedLineageDisagrees {
+        /// The materialized chart.
+        chart: I,
+        /// The materialized face.
+        face: F,
+        /// The fibre's chart.
+        lineage_chart: I,
+        /// The fibre's face.
+        lineage_face: F,
+    },
 }
 
 impl<I: Debug, F: Debug> fmt::Display for TowerRefusal<I, F> {
@@ -190,6 +202,16 @@ impl<I: Debug, F: Debug> fmt::Display for TowerRefusal<I, F> {
             Self::ChartMissing { chart } => {
                 write!(formatter, "the section carries no witness at chart {chart:?}")
             }
+            Self::MaterializedLineageDisagrees {
+                chart,
+                face,
+                lineage_chart,
+                lineage_face,
+            } => write!(
+                formatter,
+                "materialized chart/face {chart:?}/{face:?} disagrees with lineage \
+                 {lineage_chart:?}/{lineage_face:?}"
+            ),
         }
     }
 }
@@ -529,11 +551,42 @@ impl<I: Clone + Ord + Debug, F: Clone + Eq + Debug> ObservationFibre<I, F> {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MaterializedFace<I, F> {
     /// Where the face was read.
-    pub chart: I,
+    chart: I,
     /// What was read.
-    pub face: F,
+    face: F,
     /// The retained population behind it.
-    pub lineage: ObservationFibre<I, F>,
+    lineage: ObservationFibre<I, F>,
+}
+
+impl<I: Clone + Eq + Ord + Debug, F: Clone + Eq + Debug> MaterializedFace<I, F> {
+    /// Admit a face only with the observation fibre collected over the same chart and face.
+    pub fn found(
+        chart: I,
+        face: F,
+        lineage: ObservationFibre<I, F>,
+    ) -> Result<Self, TowerRefusal<I, F>> {
+        if lineage.chart() != &chart || lineage.face() != &face {
+            return Err(TowerRefusal::MaterializedLineageDisagrees {
+                chart,
+                face,
+                lineage_chart: lineage.chart().clone(),
+                lineage_face: lineage.face().clone(),
+            });
+        }
+        Ok(Self { chart, face, lineage })
+    }
+
+    pub fn chart(&self) -> &I {
+        &self.chart
+    }
+
+    pub fn face(&self) -> &F {
+        &self.face
+    }
+
+    pub fn lineage(&self) -> &ObservationFibre<I, F> {
+        &self.lineage
+    }
 }
 
 /// Where a chain refused to extend.

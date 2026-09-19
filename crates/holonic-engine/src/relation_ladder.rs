@@ -15,6 +15,7 @@
 //! | `rungMeet`, `rungMeet_comm`, `rungMeet_lower`, `rungMeet_greatest` | [`rung_meet`] |
 //! | `Situation` | [`Situation`], built by [`Situation::declare`] |
 //! | `SituationAuto`, `SituationAuto.step_natural`, `SituationAuto.observe_natural` | [`SituationAutomorphism`], [`Situation::check_automorphism`] |
+//! | `equalPotential_of_closedCarrier` | `Situation::automorphism_carrier_is_closed` and [`Situation::classify`] |
 //! | `ReceiverEqualAt`, `PresentAgreement` | [`Situation::present_agreement`] |
 //! | `EqualPotential`, `potential` | [`Situation::search_separator`] and [`PotentialVerdict`] |
 //! | `WithinTolerance`, `withinTolerance_symm`, `withinToleranceIterate` | [`ToleranceReading`] |
@@ -47,9 +48,10 @@
 //! Exhausting that ceiling without a separator returns
 //! [`PotentialVerdict::NotSeparatedWithinBound`], which carries the bound it ran under and is
 //! **never** reported as equal potential. The only executable route to [`Rung::EqualPotential`] is
-//! an automorphism whose equivariance was checked over a probe the caller declares to be the whole
-//! carrier — the Lean theorem `situationAutoImpliesEqualPotential` applied to a verified
-//! hypothesis. A probe that is not the whole carrier stays a probe
+//! an automorphism checked on a finite carrier containing both occurrences and closed under every
+//! admitted generator and both symmetry maps. The closure check supplies the finite situation to
+//! which `situationAutoImpliesEqualPotential` applies; a caller's completeness flag alone supplies
+//! no proof. A probe without that checked closure stays a probe
 //! ([`ClassificationNote::IsomorphismOnlyOnAProbe`]).
 //!
 //! # No floats, and every declared size is bounded before it is used
@@ -665,8 +667,8 @@ impl<S> Debug for SituationAutomorphism<S> {
 /// `receiverEquivarianceIsNecessary` and `generatorEquivarianceIsNecessary`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum EquivarianceReading<S, F> {
-    /// Both laws held at every probe occurrence. Whether that settles the rung is the caller's
-    /// declaration: see [`AutomorphismClaim::probe_is_the_whole_carrier`].
+    /// Both laws held at every probe occurrence. The classifier separately checks endpoint
+    /// membership and generator/symmetry closure before promoting this to an isomorphism.
     HeldOnProbe {
         /// How many occurrences were probed.
         probe: usize,
@@ -766,8 +768,9 @@ pub struct AutomorphismClaim<'a, S> {
     pub automorphism: &'a SituationAutomorphism<S>,
     /// The occurrences at which the two equivariance laws are checked.
     pub probe: &'a [S],
-    /// Whether the probe enumerates the whole carrier. Declared by the caller; the library cannot
-    /// verify it and does not pretend to.
+    /// Request a finite-carrier check. Retained for API compatibility: `true` does not establish
+    /// completeness. The classifier checks endpoint membership and closure under every generator
+    /// and both symmetry maps before establishing the isomorphism on that invariant carrier.
     pub probe_is_the_whole_carrier: bool,
 }
 
@@ -810,6 +813,8 @@ pub enum ClassificationNote {
     /// The equivariance held only on a probe the caller did not declare exhaustive, so rung 3 is
     /// not established. A probe stays a probe.
     IsomorphismOnlyOnAProbe,
+    /// The alleged carrier omits an endpoint or is not closed under its generators and symmetry.
+    AutomorphismCarrierNotClosed,
     /// The declared candidate symmetry failed one of the two equivariance laws.
     EquivarianceFails,
     /// No candidate symmetry was declared, so rung 3 was not examined.
@@ -1080,12 +1085,48 @@ where
         Ok(EquivarianceReading::HeldOnProbe { probe: probe.len() })
     }
 
+    /// Check the finite invariant carrier on which an exhaustive symmetry claim is made.
+    /// Closure extends the checked generator squares to every finite word by induction.
+    /// `S` may describe a larger ambient type; no claim about occurrences outside this carrier
+    /// is needed to establish the two contained occurrences' future equivalence.
+    fn automorphism_carrier_is_closed(
+        &self,
+        claim: &AutomorphismClaim<'_, S>,
+        left: &S,
+        right: &S,
+    ) -> Result<bool, LadderRefusal> {
+        let probe = claim.probe;
+        // Membership uses PartialEq, so count its worst-case comparisons before this work.
+        let implied = probe.len().checked_mul(probe.len())
+            .and_then(|n| n.checked_mul(self.generators.len() + 2))
+            .and_then(|n| probe.len().checked_mul(2).and_then(|ends| n.checked_add(ends)))
+            .unwrap_or(usize::MAX);
+        if implied > PROBE_CEILING {
+            return Err(LadderRefusal::ProbePopulationTooLarge { implied, ceiling: PROBE_CEILING });
+        }
+        if !probe.contains(left) || !probe.contains(right) {
+            return Ok(false);
+        }
+        for occurrence in probe {
+            if !probe.contains(&claim.automorphism.forward(occurrence)?)
+                || !probe.contains(&claim.automorphism.inverse(occurrence)?) {
+                return Ok(false);
+            }
+            for generator in &self.generators {
+                if !probe.contains(&generator.apply(occurrence)?) {
+                    return Ok(false);
+                }
+            }
+        }
+        Ok(true)
+    }
+
     /// **The classifier.** The strongest rung established, every rung established, the rung
     /// immediately above, and the separator witness refuting it when the bounded search found one.
     ///
     /// The one route to [`Rung::EqualPotential`] is a candidate symmetry whose equivariance was
-    /// checked over a probe the caller declares to be the whole carrier: that is the Lean theorem
-    /// `situationAutoImpliesEqualPotential` applied to a verified hypothesis. A bounded search that
+    /// checked over a finite invariant carrier containing both occurrences: that is the Lean
+    /// theorem `situationAutoImpliesEqualPotential` on the checked restriction. A bounded search that
     /// finds no separator establishes nothing above [`Rung::ReceiverEqual`].
     pub fn classify(
         &self,
@@ -1123,6 +1164,8 @@ where
                     (EquivarianceReading::HeldOnProbe { .. }, true, true) => {
                         if separator.is_some() {
                             notes.push(ClassificationNote::IsomorphismContradictedBySeparator);
+                        } else if !self.automorphism_carrier_is_closed(claim, left, right)? {
+                            notes.push(ClassificationNote::AutomorphismCarrierNotClosed);
                         } else {
                             isomorphism = true;
                         }

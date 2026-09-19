@@ -1,6 +1,19 @@
 # Construction state
 
-**Currency:** September 18, 2026. Active construction: a shared section realization of the
+**Currency:** September 19, 2026. The requested review of the work completed with Claude after
+the interrupted Codex session is complete. The [review and repairs](research/records/2026-09-19_REPOSITORY_REVIEW_AFTER_THE_SHARED_CARRIER_CONSTRUCTION.md)
+cover the seven intervening commits, original instructions, paired mathematical owners and
+application/device consumers. Full Lean and workspace/all-target compilation pass. The final
+default engine run passes all 3,134 tests. With device tests enabled and run serially, public HNN
+passes 107, mount 118, direct-normal material 138, resident sections 53, operative source eight,
+constitutive-fibre base nine, and engine adoption five. The record retains commands and scope.
+
+**Next construction:** the [roadmap's ordered list](docs/plans/THE_ROADMAP.md#position-of-the-five-contracts)
+starts with T6 neck invariants and T8's jet tower, then the device realization and the Athena
+complete-source session. The field application remains the consuming product; this broader
+library work follows Brandon's intervening direct instructions.
+
+**Athena consumer:** a shared section realization of the
 existing field reaction and reflection, so whole source regions use one local coefficient law
 instead of a global position-by-condition normal matrix. The native section reader, field
 section reflection/adjoint, same-model material update and complete-source session consumer
@@ -95,9 +108,12 @@ region's `2c × 2c` local block, not by an `L = I` block — and measured three 
 recorded in D3's open paragraph: the generated ring agrees with the engine's 128-bit `wide` only on
 words in `[0, 2^61 - 1)` and a general adoption owes a second **device** ring rather than a wider
 modulus; the enclosure radius is a second, accumulating address under `AccumulationLaw::IntegerAdd`,
-which has no device arm; and the triple returns an all-zero field when enacted inside the engine's
-adopted readout context although every receipt is fully proved, which is unexplained and is the
-first obstacle a real migration must clear. No engine result is changed by this module.
+which has no device arm. The September 18 report also described an all-zero result in the adopted
+readout context. The September 19 review's explicit adopted-context regression now returns the
+expected coordinates, as does the fresh-context arm; all five adoption checks pass on the card.
+The historical zero result is not reproduced. The comparison still stages through the host and
+omits the radius; general common-context ownership remains an API obligation. No production
+engine result is replaced by this module.
 
 [established-bounded; formal-checked; implemented-exact] September 18, second return: generalized
 transport T1, T2, T3 and T5 and the biological ecology B8–B10 with B7's physicochemical receiver are
@@ -185,16 +201,15 @@ port/entropy balances, the Hodge and inertia separations, and the energy/stress 
 recorded at what it actually proves. Three overstatements in the earlier draft are corrected:
 `diffusion.rs` carries no entropy reading, and entropy production is proved only for two cells;
 `R_D* = R_D` is a declared realization condition rather than a Lean theorem, while `R_D^2 = I` is
-proved; and `c^2 u^2 - |S|^2 >= 0` is instance-checked, not proved. The generator-relative rate
-form `Sigma_G = A*G + GA + G_dot` stays a written derivation with a named Lean home and exact
-hypotheses: its decision content — the signature and its behaviour under a chart change — is
-already exact and executable in `inertia.rs`, and no owner computes `Sigma_G`. The `Sigma_G = 0`
-critical-seam reading is recorded with its missing semisimplicity hypothesis (a defective
-generator can sit on the seam spectrally with no conserving receiver) and with the centering that
-makes the conjugate reflection and the Swing the same `2P - I` shape; neither is formalized,
-because the actual obstruction is the absent spectral realization, not the rate algebra. No
-native code, Lean proof or measured result was introduced by this synthesis, and the in-flight
-shared-section work was read only.
+proved; and `c^2 u^2 - |S|^2 >= 0` is instance-checked, not proved. The later causal-chord
+construction now supplies `causal_chord::rate_form` and `Foundation/CausalChord.lean::rateForm`
+for the constant-metric specialization `Sigma_G = A*G + GA`, its congruence law and the centered
+seam. It composes `inertia.rs` for the signature reading. A moving metric adds `G_dot`; that term
+is outside this specialization. The spectral implication requires positive definite `G`, and
+the converse requires semisimplicity; the Jordan control retains the failure when that
+hypothesis is absent. This rate algebra and its formal owners are available independently of
+constructing a spectral realization of a particular number-theoretic source. The September 15
+synthesis itself was a source review; the later implementation is a separate returned construction.
 
 [established-bounded; source-inspected] The latest synthesis recovers the June laboratory
 perception/mind/Eros line and original August/September messages, repairs stale live ontology

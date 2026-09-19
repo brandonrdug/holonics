@@ -121,6 +121,9 @@ pub enum SectionClause {
     ColourClass,
     /// The colouring is not proper for this incidence.
     ColouringProper,
+    /// The host descriptors used to stage the device tables do not match the descriptors supplied
+    /// for enactment.
+    TableProvenance,
 }
 
 impl SectionClause {
@@ -147,6 +150,7 @@ impl SectionClause {
             SectionClause::LaunchDerivation => "launch-derivation",
             SectionClause::ColourClass => "colour-class",
             SectionClause::ColouringProper => "colouring-proper",
+            SectionClause::TableProvenance => "table-provenance",
         }
     }
 }
@@ -1861,16 +1865,61 @@ pub struct SectionReceipts {
     pub scatter: Vec<FullyProvedReceipt>,
 }
 
+/// The host descriptors from which the device tables were staged.  The generated triple accepts
+/// the staged operator as its requested operator; there is no second operator at enactment to
+/// compare.  Layout and colouring remain explicit enactment inputs for API compatibility, so their
+/// contents are checked against this borrowed provenance before any driver call.
+#[derive(Debug, Clone, Copy)]
+struct SectionTableProvenance<'a> {
+    layout: &'a SectionLayout,
+    _operator: &'a LocalOperator<u64>,
+    colouring: Option<&'a RegionColouring>,
+}
+
+impl SectionTableProvenance<'_> {
+    fn verify(
+        &self,
+        layout: &SectionLayout,
+        colouring: Option<&RegionColouring>,
+    ) -> Sectioned<()> {
+        if self.layout != layout {
+            return Err(SectionRefusal::new(
+                SectionClause::TableProvenance,
+                "the enactment layout differs from the layout used to stage the device tables",
+            ));
+        }
+        match (self.colouring, colouring) {
+            (None, None) => Ok(()),
+            (Some(staged), Some(presented)) if staged == presented => Ok(()),
+            (None, Some(_)) => Err(SectionRefusal::new(
+                SectionClause::TableProvenance,
+                "enactment supplied a colouring but staging supplied none",
+            )),
+            (Some(_), None) => Err(SectionRefusal::new(
+                SectionClause::TableProvenance,
+                "staging supplied a colouring but enactment supplied none",
+            )),
+            (Some(_), Some(_)) => Err(SectionRefusal::new(
+                SectionClause::TableProvenance,
+                "the enactment colouring differs from the colouring used to stage the device tables",
+            )),
+        }
+    }
+}
+
 /// The device-resident tables the generated triple reads: the gather index, the region boundaries,
 /// the local operator's coefficients and, for an accumulating scatter, one region list per colour.
-pub struct SectionDeviceTables {
+/// The borrowed provenance prevents a same-sized but different incidence or colouring from being
+/// paired with these tables at enactment.
+pub struct SectionDeviceTables<'a> {
     index: DeviceBuffer<u32>,
     offsets: DeviceBuffer<u32>,
     coefficients: DeviceBuffer<u64>,
     colour_regions: Vec<DeviceBuffer<u32>>,
+    provenance: SectionTableProvenance<'a>,
 }
 
-impl SectionDeviceTables {
+impl SectionDeviceTables<'_> {
     /// Stage the generated tables onto the card.  Every extent comes from the layout, which
     /// generated it from the declaration.
     ///
@@ -1881,11 +1930,11 @@ impl SectionDeviceTables {
     /// [`SectionClause::CanonicalWord`], naming the first offending index; see
     /// [`ModularWords::verify_canonical`] for why refusal and not reduction.  The refusal is raised
     /// before any driver call, so a malformed declaration never reaches the card at all.
-    pub fn stage(
-        layout: &SectionLayout,
-        operator: &LocalOperator<u64>,
-        colouring: Option<&RegionColouring>,
-    ) -> Result<SectionDeviceTables> {
+    pub fn stage<'a>(
+        layout: &'a SectionLayout,
+        operator: &'a LocalOperator<u64>,
+        colouring: Option<&'a RegionColouring>,
+    ) -> Result<SectionDeviceTables<'a>> {
         if operator.width() != layout.tile().max_width() {
             return Err(SectionRefusal::new(
                 SectionClause::LocalOperatorWidth,
@@ -1898,6 +1947,9 @@ impl SectionDeviceTables {
             .into());
         }
         operator.verify_canonical(&ModularWords::DEVICE)?;
+        if let Some(colouring) = colouring {
+            colouring.verify_proper(layout)?;
+        }
         let index = DeviceBuffer::<u32>::alloc(layout.slots())?;
         index.copy_from_slice(layout.gather_index())?;
         let offsets = DeviceBuffer::<u32>::alloc(layout.regions() + 1)?;
@@ -1918,6 +1970,11 @@ impl SectionDeviceTables {
             offsets,
             coefficients,
             colour_regions,
+            provenance: SectionTableProvenance {
+                layout,
+                _operator: operator,
+                colouring,
+            },
         })
     }
 
@@ -1967,12 +2024,16 @@ impl<'m> SectionKernels<'m> {
         device: &Device,
         stream: &Stream,
         layout: &SectionLayout,
-        tables: &SectionDeviceTables,
+        tables: &SectionDeviceTables<'_>,
         colouring: Option<&RegionColouring>,
         source: &DeviceBuffer<u64>,
         local: &mut DeviceBuffer<u64>,
         target: &mut DeviceBuffer<u64>,
     ) -> Result<SectionReceipts> {
+        tables.provenance.verify(layout, colouring)?;
+        if let Some(colouring) = colouring {
+            colouring.verify_proper(layout)?;
+        }
         if let ScatterReceipt::Accumulated(law) = layout.receipt() {
             match law {
                 AccumulationLaw::ModularAdd { modulus } if modulus == section_cuda::MODULUS => {}
@@ -2173,7 +2234,7 @@ impl<'m> SectionApparatus<'m> {
         context: &Context,
         stream: &Stream,
         layout: &SectionLayout,
-        tables: &SectionDeviceTables,
+        tables: &SectionDeviceTables<'_>,
         colouring: Option<&RegionColouring>,
         x: &[u64],
     ) -> Result<(Vec<u64>, SectionReceipts)> {
@@ -2189,6 +2250,9 @@ impl<'m> SectionApparatus<'m> {
             .into());
         }
         ModularWords::DEVICE.verify_canonical(x, "global field")?;
+        // This convenience owner explicitly receives a context. Select it before allocation,
+        // not only at the final synchronization after work has already been submitted.
+        context.make_current()?;
         let source = DeviceBuffer::<u64>::alloc(x.len())?;
         source.copy_from_slice(x)?;
         let mut local = DeviceBuffer::<u64>::alloc_zeroed(layout.slots())?;

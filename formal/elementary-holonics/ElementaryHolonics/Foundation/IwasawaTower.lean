@@ -1248,16 +1248,23 @@ theorem weierstrassData_isEmpty_at_zero : IsEmpty (WeierstrassData p 0) := by
   · exact hg h0
   · exact hu h0
 
-/-- [established-bounded; cited-classical] **Iwasawa's growth theorem, stated and not proved.**
-For a finitely generated torsion `Λ`-module the finite quotients grow as
+/-- [definition] **The eventual finite-coinvariant growth law, stated and not proved.**
+For a finitely generated torsion `Λ`-module whose `ω_n` coinvariants are finite, their orders grow as
 `|M/ω_n M| = p^{μ p^n + λ n + ν}` for all large `n`.  Source: K. Iwasawa, *On Γ-extensions of
 algebraic number fields*, Bull. AMS 65 (1959) 183–226; L. Washington, *Introduction to Cyclotomic
 Fields*, 2nd ed. (GTM 83, 1997), Thm 13.13.  `μ` and `λ` are **growth exponents** read off a
 distinguished factorization; they are not an entropy, not a rate and not a score.  This file proves
-no instance of this `Prop`; the Rust owner exhibits it numerically at small `(p, n)` as exact
-integers. -/
-def TheGrowthLaw (M : Type v) [AddCommGroup M] [Module (Lambda p) M] (mu lambda nu : ℕ) : Prop :=
-  ∀ n : ℕ, Nat.card (M ⧸ omegaSubmodule p M n) = p ^ (mu * p ^ n + lambda * n + nu)
+no instance of this `Prop`; the Rust owner exhibits finite fits at small `(p, n)` as exact
+integers. Finiteness is essential: `Λ/(T)` has infinite `ω_n` coinvariants. The general classical
+form instead uses `ω_n/ω_n₀` coprime to the characteristic ideal; see Sharifi, *Iwasawa Theory*,
+Theorem 2.4.7, https://www.math.ucla.edu/~sharifi/notes/iwasawa-ch02.html .
+The offset `ν` is an integer and the equality is eventual, not an equality at every level. -/
+def TheGrowthLaw (M : Type v) [AddCommGroup M] [Module (Lambda p) M]
+    (mu lambda : ℕ) (nu : ℤ) : Prop :=
+  ∃ n₀ : ℕ, ∀ n ≥ n₀,
+    let exponent : ℤ := (mu : ℤ) * (p : ℤ) ^ n + (lambda : ℤ) * n + nu
+    Finite (M ⧸ omegaSubmodule p M n) ∧ 0 ≤ exponent ∧
+      Nat.card (M ⧸ omegaSubmodule p M n) = p ^ exponent.toNat
 
 end Growth
 

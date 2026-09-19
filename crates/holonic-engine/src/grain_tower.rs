@@ -298,9 +298,24 @@ pub fn join_contact_class(left: ContactClass, right: ContactClass) -> ContactCla
 /// equal exactly when they admit the same pairs with the same classes. The declared population
 /// itself is a separate count and travels in [`GrainCensus::pairs`].
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(try_from = "GrainFaceWire")]
 pub struct GrainFace {
     grain: Grain,
     classified: BTreeMap<GrainPair, ContactClass>,
+}
+
+#[derive(Deserialize)]
+struct GrainFaceWire {
+    grain: Grain,
+    classified: BTreeMap<GrainPair, ContactClass>,
+}
+
+impl TryFrom<GrainFaceWire> for GrainFace {
+    type Error = GrainRefusal;
+
+    fn try_from(wire: GrainFaceWire) -> Result<Self, Self::Error> {
+        GrainFace::founded(wire.grain, wire.classified)
+    }
 }
 
 impl GrainFace {
@@ -439,6 +454,7 @@ impl GrainResidual {
 /// Lean counterpart: `Foundation/GrainRestriction.lean::selectionTower`, which is one
 /// `Foundation/ContinuingTower.lean::Tower` over `Grain`.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(try_from = "GrainTowerWire")]
 pub struct GrainTower {
     /// The schema this tower serializes under.
     pub schema: String,
@@ -446,6 +462,25 @@ pub struct GrainTower {
     pub presentation_lineage: String,
     relation: ApertureRelation,
     atom_face: GrainFace,
+}
+
+#[derive(Deserialize)]
+struct GrainTowerWire {
+    schema: String,
+    presentation_lineage: String,
+    relation: ApertureRelation,
+    atom_face: GrainFace,
+}
+
+impl TryFrom<GrainTowerWire> for GrainTower {
+    type Error = GrainRefusal;
+
+    fn try_from(wire: GrainTowerWire) -> Result<Self, Self::Error> {
+        if wire.schema != "holonic-engine.grain-tower.v1" {
+            return Err(GrainRefusal::TowerSchemaUnsupported { schema: wire.schema });
+        }
+        GrainTower::found(wire.presentation_lineage, wire.relation, wire.atom_face)
+    }
 }
 
 impl GrainTower {
@@ -624,6 +659,7 @@ impl TowerRestrictTransition for GrainTower {
 /// Lean counterpart: `Foundation/GrainRestriction.lean::selectionTransition`, with
 /// `grain_residual_reopens_the_source`.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(try_from = "GrainSelectionWire")]
 pub struct GrainSelection {
     /// Exterior lineage of the selection rule, retained as testimony — `"label_atom_id == CA"` is
     /// a declaration about the presentation, never a mathematical property of the grain.
@@ -632,6 +668,58 @@ pub struct GrainSelection {
     fine: Grain,
     representative: BTreeMap<GrainCell, GrainCell>,
     inverse: BTreeMap<GrainCell, GrainCell>,
+}
+
+#[derive(Deserialize)]
+struct GrainSelectionWire {
+    lineage: String,
+    coarse: Grain,
+    fine: Grain,
+    representative: BTreeMap<GrainCell, GrainCell>,
+    inverse: BTreeMap<GrainCell, GrainCell>,
+}
+
+impl TryFrom<GrainSelectionWire> for GrainSelection {
+    type Error = GrainRefusal;
+
+    fn try_from(wire: GrainSelectionWire) -> Result<Self, Self::Error> {
+        if !Grain::refines(wire.coarse, wire.fine) {
+            return Err(GrainRefusal::NotASubGrain {
+                coarse: wire.coarse,
+                fine: wire.fine,
+            });
+        }
+        for (coarse_cell, fine_cell) in &wire.representative {
+            if coarse_cell.grain != wire.coarse || fine_cell.grain != wire.fine {
+                return Err(GrainRefusal::PairNotAtGrain {
+                    expected: wire.fine,
+                    found: fine_cell.grain,
+                });
+            }
+            if fine_cell.project(wire.coarse)? != *coarse_cell {
+                return Err(GrainRefusal::RepeatedRepresentative {
+                    cell: *coarse_cell,
+                });
+            }
+            if wire.inverse.get(fine_cell) != Some(coarse_cell) {
+                return Err(GrainRefusal::SelectionWireInconsistent);
+            }
+        }
+        if wire.inverse.len() != wire.representative.len()
+            || wire.inverse.iter().any(|(fine, coarse)| {
+                wire.representative.get(coarse) != Some(fine)
+            })
+        {
+            return Err(GrainRefusal::SelectionWireInconsistent);
+        }
+        Ok(Self {
+            lineage: wire.lineage,
+            coarse: wire.coarse,
+            fine: wire.fine,
+            representative: wire.representative,
+            inverse: wire.inverse,
+        })
+    }
 }
 
 impl GrainSelection {
@@ -1603,6 +1691,9 @@ pub struct CertificateRefutation {
 /// Why a grain construction refused.
 #[derive(Clone, Debug, PartialEq, Eq, Error)]
 pub enum GrainRefusal {
+    /// A remount cannot silently reinterpret an unknown wire schema.
+    #[error("unsupported grain tower schema {schema}")]
+    TowerSchemaUnsupported { schema: String },
     /// The named fine grain does not refine the named coarse grain.
     #[error("grain {fine:?} does not refine grain {coarse:?}")]
     NotASubGrain {
@@ -1646,6 +1737,9 @@ pub enum GrainRefusal {
         /// The cell.
         cell: GrainCell,
     },
+    /// The forward and inverse representative maps on a remounted selection disagree.
+    #[error("the selection wire's representative and inverse maps disagree")]
+    SelectionWireInconsistent,
     /// A coarse cell carries no representative.
     #[error("cell {cell:?} carries no representative, so the coarse receiver cannot read it")]
     NoRepresentative {

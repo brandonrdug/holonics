@@ -103,6 +103,16 @@ fn the_generated_reference_places_each_window_at_its_destination() {
 #[test]
 #[ignore = "requires CUDA; the generated D3 triple must reproduce the engine's hand-written enclosure scatter"]
 fn section_scatters_the_window_the_generated_triple_reproduces() {
+    compare_generated_scatter(false);
+}
+
+#[test]
+#[ignore = "requires CUDA; generated section kernels must run in the engine's own context"]
+fn generated_scatter_in_the_engine_context() {
+    compare_generated_scatter(true);
+}
+
+fn compare_generated_scatter(adopt_engine_context: bool) {
     use crate::embedding_fiber::ResidentReadout;
     use crate::native_ecology::constitutive_fibre::{
         ResidentConstitutiveSection, ResidentNormalEnclosureSection,
@@ -194,18 +204,23 @@ fn section_scatters_the_window_the_generated_triple_reproduces() {
             })
             .collect()
     };
-    // Everything the engine owns has been read, and the generated triple is enacted in a context
-    // of its own. **That is load-bearing and not tidiness.** Enacted inside the engine's adopted
-    // `ResidentReadout` context — same device, same thread, every receipt fully proved — the
-    // gather arm's tile reads back entirely zero and so does the target field; in a context from
-    // `mount::Context::create` the identical call reproduces the exact reference below. The cause
-    // is not identified here, and it is recorded as the first obstacle the engine-side adoption of
-    // D3 must clear, because the engine's own kernels must share a context with the generated ones
-    // for an adoption to be worth anything.
+    // Exercise both the standalone context and the engine's own retained context. A September 18
+    // report described a zero output in the latter; the explicit adopted-context regression now
+    // reproduces the exact reference as well. Context is selected before staging any resource.
+    // The comparison still crosses the host codec here; it does not implement a resident cast
+    // from the engine's signed enclosure words into this modular ring or carry its radius.
 
     mount::cuda::init().expect("the driver initializes");
     let device = mount::Device::get(0).expect("a device answers");
-    let _context = mount::Context::create(&device).expect("a context for the generated triple");
+    let _context = if adopt_engine_context {
+        mount::cuda::BorrowedContext::adopt(readout.raw_context())
+            .expect("the engine context is live")
+            .make_current()
+            .expect("the engine context is current");
+        None
+    } else {
+        Some(mount::Context::create(&device).expect("a context for the generated triple"))
+    };
     let module = mount::cuda::Module::load_ptx(mount::SOMA_PTX).expect("the soma PTX loads");
     let kernels = SectionKernels::resolve(&module).expect("the four entries resolve");
     let stream = mount::Stream::create().expect("a stream");

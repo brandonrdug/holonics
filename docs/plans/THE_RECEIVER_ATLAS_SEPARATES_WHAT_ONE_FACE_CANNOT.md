@@ -86,9 +86,10 @@ involution. Centering the conjugate reflection at one half gives `J = 2 P_+ - I`
 the invariant component is the seam and the anti-invariant component the transverse defect. The
 coefficient one half is the normalization separating one current into those two exact parts.
 
-[definition] `L*G + GL = G` is equivalent to `L - I/2` being `G`-skew and implies every eigenvalue
-has real part one half. The converse requires semisimplicity, since `G`-skewness forces
-diagonalizability; the usable statement is that a positive definite `G` with `A` `G`-skew exists
+[definition] `L*G + GL = G` is equivalent to `L - I/2` being `G`-skew. With `G` positive definite,
+this implies every eigenvalue has real part one half. An indefinite conserving form does not
+imply that placement. The converse requires semisimplicity; the usable statement is that a
+positive definite `G` with `A` `G`-skew exists
 exactly when `A` is semisimple with purely imaginary spectrum. The remaining obstruction to a seam
 theorem is the absent spectral realization, not the rate algebra.
 

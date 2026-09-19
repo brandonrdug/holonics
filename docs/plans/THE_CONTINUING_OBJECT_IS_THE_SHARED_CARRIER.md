@@ -509,9 +509,13 @@ the first — the same separation `ContinuingTower.theOrderFaceDoesNotDetermineT
 nonzero finite module annihilated by both `p` and `T` whose characteristic face is the unit ideal.
 `WeierstrassData` carries the distinguished factorization as data with `omegaWeierstrassData` a
 constructed instance and `weierstrassData_isEmpty_at_zero` a constructed non-instance; the growth
-law `|M/omega_n M| = p^(mu p^n + lambda n + nu)` is `TheGrowthLaw`, stated as an open `Prop` and
-cited to Iwasawa (1959) and Washington Thm 13.13 — **growth exponents, not entropy**, and no
-instance of it is proved. `TheMainConjecture` is the open `Prop` `char_Lambda(X) = (L_p)`:
+law `|M/omega_n M| = p^(mu p^n + lambda n + nu)` is `TheGrowthLaw`, stated as an open `Prop` with
+finite coinvariants, an eventual starting level and integer `nu`. The finite-coinvariant
+hypothesis is essential: `Lambda/(T)` is the native refusal control. The general classical
+form uses `omega_n/omega_n0` relatively prime to the characteristic ideal; see
+[Sharifi, Theorem 2.4.7](https://www.math.ucla.edu/~sharifi/notes/iwasawa-ch02.html), alongside
+Iwasawa (1959) and Washington Thm 13.13. These are growth exponents; no instance of this global
+law is proved here. `TheMainConjecture` is the open `Prop` `char_Lambda(X) = (L_p)`:
 receiver-exactness, the equality of two codimension-one faces, and
 `theMainConjectureIsNotSourceIdentity` proves that is not source identity by exhibiting one `L_p`
 satisfying it for two non-isomorphic modules. No proof of the main conjecture is claimed anywhere.

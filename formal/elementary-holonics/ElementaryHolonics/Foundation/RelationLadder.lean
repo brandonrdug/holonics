@@ -360,6 +360,36 @@ theorem situationAutoImpliesEqualPotential {S : Situation Generator Receiver Sou
   intro receiver word
   rw [← auto.carries, ← auto.transportWord_natural word x, auto.observe_natural]
 
+/-- [proved-derived; formal-checked] Checking naturality on a generator-closed carrier suffices
+for every future from an occurrence in it. A finite executable certificate need not enumerate
+the whole ambient source type, but it must check this closure; declaring a probe complete is
+not that hypothesis. Rust: `Situation::automorphism_carrier_is_closed`. -/
+theorem equalPotential_of_closedCarrier (S : Situation Generator Receiver Source Face)
+    (carrier : Set Source) (map : Source → Source)
+    (closed : ∀ g s, s ∈ carrier → S.step g s ∈ carrier)
+    (natural : ∀ g s, s ∈ carrier → map (S.step g s) = S.step g (map s))
+    (observes : ∀ r s, s ∈ carrier → S.observe r (map s) = S.observe r s)
+    {x y : Source} (hx : x ∈ carrier) (carries : map x = y) : EqualPotential S x y := by
+  have word_closed : ∀ (word : List Generator) s, s ∈ carrier →
+      transportWord S.step word s ∈ carrier := by
+    intro word
+    induction word with
+    | nil => intro s hs; exact hs
+    | cons g word ih =>
+      intro s hs
+      exact closed g _ (ih s hs)
+  have word_natural : ∀ (word : List Generator) s, s ∈ carrier →
+      map (transportWord S.step word s) = transportWord S.step word (map s) := by
+    intro word
+    induction word with
+    | nil => intro s _; rfl
+    | cons g word ih =>
+      intro s hs
+      simp only [transportWord_cons]
+      rw [natural g _ (word_closed word s hs), ih s hs]
+  intro receiver word
+  rw [← carries, ← word_natural word x hx, observes receiver _ (word_closed word x hx)]
+
 /-- [proved-derived; formal-checked] **Rung 5 implies rung 4 at every declared receiver.** This is
 `Foundation/CausalRelevance.lean::futureAgreement_le_presentAgreement`, cited. -/
 theorem equalPotentialImpliesPresentAgreement {S : Situation Generator Receiver Source Face}
@@ -1204,6 +1234,7 @@ open Soma.Holonics.Foundation.RelationLadder
 #print axioms rungMeet_greatest
 #print axioms no_rung_below_identity_entails_identity
 #print axioms situationAutoImpliesEqualPotential
+#print axioms equalPotential_of_closedCarrier
 #print axioms equalPotentialImpliesPresentAgreement
 #print axioms receiverEqualImpliesWithinTolerance
 #print axioms identityImpliesEveryRung

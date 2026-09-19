@@ -501,12 +501,14 @@ than an expectation.
    So even the cleanest instance is, in full, an injective coordinate scatter **plus** one
    accumulating address whose law has no device arm; the declaration carries the coordinates and
    says so.
-3. **One context, unresolved.** Enacting the generated triple inside the engine's adopted
-   `ResidentReadout` context — same device, same thread, every receipt fully proved — leaves the
-   gather arm's tile and the target field **entirely zero**; the identical call in a context from
-   `mount::Context::create` reproduces the exact reference. The cross-check therefore uses its own
-   context, and the cause is not identified. This is the first obstacle a real migration must
-   clear, because a migrated kernel must share the engine's context with the engine's own.
+3. **One context, now checked at this aperture.** The September 18 report described an all-zero
+   result inside the engine's adopted `ResidentReadout` context. The September 19 review added
+   `generated_scatter_in_the_engine_context`, explicitly selects that context before staging,
+   and returns the same coordinate result as both the hand-written scatter and the fresh-context
+   arm. All five adoption tests pass on the card. The old zero result is not reproduced and is
+   no longer a current blocker at this scope; its historical cause is unidentified. The test
+   still uses host readback/upload and omits the radius. General context ownership of module,
+   stream and buffer handles remains a separate API obligation.
 
 [definition] **D4 — A generator may compile its own device law.** A generator is a situated
 mathematical transformation, and a model that emits source is one application of that. A Holon that

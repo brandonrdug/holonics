@@ -213,6 +213,21 @@ fn a_mutation_naming_an_absent_design_is_refused() {
     ));
 }
 
+#[test]
+fn a_forged_mutation_site_is_rechecked_by_the_passage_owner() {
+    let family = four_designs();
+    let forged = AdmittedTransformation::Mutation {
+        from: 0,
+        to: 1,
+        environment: 0,
+        site: 99,
+    };
+    assert!(matches!(
+        LineageClasses::found(&family, &[forged], radius(1)),
+        Err(EvaluationRefusal::MutationPassageRefused(_))
+    ));
+}
+
 // ---------------------------------------------------------------------------------------------
 // 2. The split, and the leakage law
 // ---------------------------------------------------------------------------------------------

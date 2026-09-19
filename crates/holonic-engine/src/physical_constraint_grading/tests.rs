@@ -956,3 +956,32 @@ fn the_within_component_family_reaches_the_rigidity_and_hodge_receivers_unchange
     );
     assert_eq!(hodge_before.refusing.harmonic_dimension, 0);
 }
+
+#[test]
+fn a_remounted_member_with_a_provenance_without_its_edge_is_refused() {
+    let complex = folded_chain(point(-1, 1));
+    let mut member = graded_constraint_member(&complex, &OpenContactLaw::RefuseEveryOpen)
+        .expect("the refusing member founds");
+    let edge = *member
+        .edge_provenance
+        .keys()
+        .next()
+        .expect("the chain has an edge");
+    member.edge_cells.remove(&edge);
+    assert!(matches!(
+        member.validate_structure(),
+        Err(ConstraintGradingError::ProvenanceWithoutCell(found)) if found == edge
+    ));
+}
+
+#[test]
+fn dropping_both_edge_maps_cannot_change_the_complex_seen_by_rigidity() {
+    let complex = folded_chain(point(-1, 1));
+    let mut member = graded_constraint_member(&complex, &OpenContactLaw::RefuseEveryOpen).unwrap();
+    member.validate_structure().unwrap();
+    let edge = *member.edge_cells.keys().next().unwrap();
+    member.edge_cells.remove(&edge);
+    member.edge_provenance.remove(&edge);
+    // Hodge would still see this edge in `complex`, while rigidity formerly read just the map.
+    assert!(matches!(member.validate_structure(), Err(ConstraintGradingError::MemberInvariant(_))));
+}

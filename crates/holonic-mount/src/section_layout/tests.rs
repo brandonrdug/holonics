@@ -555,6 +555,95 @@ fn a_chain_of_overlapping_tiles_is_two_coloured() {
 }
 
 #[test]
+fn table_provenance_refuses_equal_size_different_incidence_and_offsets() {
+    let operator = symmetric_operator(2);
+    let layout_a = SectionLayout::generate(
+        IncidenceDeclaration::uniform(4, 2, vec![0, 1, 2, 3]).expect("layout A incidence"),
+        ScatterRequest::Injective,
+    )
+    .expect("layout A");
+    let layout_b = SectionLayout::generate(
+        IncidenceDeclaration::uniform(4, 2, vec![1, 0, 3, 2]).expect("layout B incidence"),
+        ScatterRequest::Injective,
+    )
+    .expect("layout B");
+    let staged = SectionTableProvenance {
+        layout: &layout_a,
+        _operator: &operator,
+        colouring: None,
+    };
+    let refusal = staged
+        .verify(&layout_b, None)
+        .expect_err("equal-sized incidence tables must not be interchangeable");
+    assert_eq!(refusal.clause, SectionClause::TableProvenance);
+
+    let ragged_a = SectionLayout::generate(
+        IncidenceDeclaration::new(4, vec![0, 1, 4], vec![0, 1, 2, 3]).expect("ragged A"),
+        ScatterRequest::Injective,
+    )
+    .expect("ragged layout A");
+    let ragged_b = SectionLayout::generate(
+        IncidenceDeclaration::new(4, vec![0, 3, 4], vec![0, 1, 2, 3]).expect("ragged B"),
+        ScatterRequest::Injective,
+    )
+    .expect("ragged layout B");
+    let staged = SectionTableProvenance {
+        layout: &ragged_a,
+        _operator: &operator,
+        colouring: None,
+    };
+    let refusal = staged
+        .verify(&ragged_b, None)
+        .expect_err("equal-sized offset tables must not be interchangeable");
+    assert_eq!(refusal.clause, SectionClause::TableProvenance);
+}
+
+#[test]
+fn table_provenance_refuses_a_different_proper_colouring() {
+    let layout = SectionLayout::generate(chain_1d(3, 2, 1), accumulated()).expect("layout");
+    let operator = symmetric_operator(2);
+    let staged_colouring = RegionColouring {
+        colours: vec![0, 1, 0],
+        classes: vec![vec![0, 2], vec![1]],
+        conflict_work: 0,
+    };
+    let presented_colouring = RegionColouring {
+        colours: vec![1, 0, 1],
+        classes: vec![vec![1], vec![0, 2]],
+        conflict_work: 0,
+    };
+    staged_colouring
+        .verify_proper(&layout)
+        .expect("staged colouring is proper");
+    presented_colouring
+        .verify_proper(&layout)
+        .expect("presented colouring is also proper");
+    let staged = SectionTableProvenance {
+        layout: &layout,
+        _operator: &operator,
+        colouring: Some(&staged_colouring),
+    };
+    let refusal = staged
+        .verify(&layout, Some(&presented_colouring))
+        .expect_err("proper colourings with different class assignments must not mix");
+    assert_eq!(refusal.clause, SectionClause::TableProvenance);
+}
+
+#[test]
+fn staging_refuses_an_improper_colouring_before_device_allocation() {
+    let layout = SectionLayout::generate(chain_1d(3, 2, 1), accumulated()).expect("layout");
+    let operator = symmetric_operator(2);
+    let improper = RegionColouring {
+        colours: vec![0, 1],
+        classes: vec![vec![0], vec![1]],
+        conflict_work: 0,
+    };
+    let refusal = SectionDeviceTables::stage(&layout, &operator, Some(&improper))
+        .err().expect("staging must verify the colouring before allocating tables");
+    assert_eq!(refusal.context, SectionClause::ColouringProper.name());
+}
+
+#[test]
 fn colouring_refuses_an_incidence_past_the_declared_work_ceiling_before_it_colours() {
     // Every slot on one address: the conflict work is quadratic in the slot population, and the
     // ceiling refuses it *before* the colouring loop runs.
@@ -764,6 +853,46 @@ fn the_declared_entry_population_matches_the_shared_abi() {
 // ---------------------------------------------------------------------------------------------
 // The device
 // ---------------------------------------------------------------------------------------------
+
+#[test]
+#[ignore = "requires a CUDA device visible to the test process"]
+fn device_enact_refuses_tables_from_a_different_equal_size_layout() -> crate::Result<()> {
+    crate::cuda::init()?;
+    let device = crate::Device::get(0)?;
+    let _context = crate::Context::create(&device)?;
+    let module = crate::cuda::Module::load_ptx(crate::SOMA_PTX)?;
+    let kernels = SectionKernels::resolve(&module)?;
+    let stream = crate::Stream::create()?;
+    let layout_a = SectionLayout::generate(
+        IncidenceDeclaration::uniform(4, 2, vec![0, 1, 2, 3]).expect("layout A incidence"),
+        ScatterRequest::Injective,
+    )
+    .expect("layout A");
+    let layout_b = SectionLayout::generate(
+        IncidenceDeclaration::uniform(4, 2, vec![1, 0, 3, 2]).expect("layout B incidence"),
+        ScatterRequest::Injective,
+    )
+    .expect("layout B");
+    let operator = symmetric_operator(2);
+    let tables = SectionDeviceTables::stage(&layout_a, &operator, None)?;
+    let source = crate::DeviceBuffer::<u64>::alloc_zeroed(layout_b.global_extent())?;
+    let mut local = crate::DeviceBuffer::<u64>::alloc_zeroed(layout_b.slots())?;
+    let mut target = crate::DeviceBuffer::<u64>::alloc_zeroed(layout_b.global_extent())?;
+    let error = kernels
+        .enact(
+            &device,
+            &stream,
+            &layout_b,
+            &tables,
+            None,
+            &source,
+            &mut local,
+            &mut target,
+        )
+        .expect_err("the staged table provenance must be checked before launch");
+    assert_eq!(error.context, SectionClause::TableProvenance.name());
+    Ok(())
+}
 
 /// The three declared cases plus an injective control, each enacted on the card and compared
 /// **bit for bit** against the exact cpu reference, with the four clocks reported separately.
@@ -1122,11 +1251,11 @@ fn the_device_ring_agrees_with_an_independent_reference_over_non_canonical_words
 /// Stage the device tables **around** the canonicality clause, so the four entries can be driven
 /// with coefficients no public mouth would let through. Reachable only from this test module —
 /// `SectionDeviceTables`' fields are private, and `stage` stays the only public way to fill them.
-fn stage_around_the_canonicality_clause(
-    layout: &SectionLayout,
-    operator: &LocalOperator<u64>,
-    colouring: Option<&RegionColouring>,
-) -> crate::Result<SectionDeviceTables> {
+fn stage_around_the_canonicality_clause<'a>(
+    layout: &'a SectionLayout,
+    operator: &'a LocalOperator<u64>,
+    colouring: Option<&'a RegionColouring>,
+) -> crate::Result<SectionDeviceTables<'a>> {
     let index = crate::DeviceBuffer::<u32>::alloc(layout.slots())?;
     index.copy_from_slice(layout.gather_index())?;
     let offsets = crate::DeviceBuffer::<u32>::alloc(layout.regions() + 1)?;
@@ -1147,6 +1276,11 @@ fn stage_around_the_canonicality_clause(
         offsets,
         coefficients,
         colour_regions,
+        provenance: SectionTableProvenance {
+            layout,
+            _operator: operator,
+            colouring,
+        },
     })
 }
 

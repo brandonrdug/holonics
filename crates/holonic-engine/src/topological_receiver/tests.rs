@@ -1921,6 +1921,54 @@ fn a_remounted_filtration_is_rechecked_and_contact_loops_never_indexes_unchecked
         TopologicalError::SimplexLabelDisagrees(_)
     ));
 
+    let negative_ceiling = DeclaredFiltration {
+        lineage: filtration.lineage.clone(),
+        source_event: filtration.source_event,
+        complex: filtration.complex.clone(),
+        occurrences: filtration.occurrences.clone(),
+        component_of: filtration.component_of.clone(),
+        cells_by_simplex: filtration.cells_by_simplex.clone(),
+        entry: filtration.entry.clone(),
+        ceiling: integer(-1),
+    };
+    assert!(matches!(
+        ApertureFiltration::found_declared(negative_ceiling),
+        Err(TopologicalError::NegativeCeiling)
+    ));
+
+    let mut repeated_occurrence = DeclaredFiltration {
+        lineage: filtration.lineage.clone(),
+        source_event: filtration.source_event,
+        complex: filtration.complex.clone(),
+        occurrences: filtration.occurrences.clone(),
+        component_of: filtration.component_of.clone(),
+        cells_by_simplex: filtration.cells_by_simplex.clone(),
+        entry: filtration.entry.clone(),
+        ceiling: filtration.ceiling.clone(),
+    };
+    repeated_occurrence.occurrences[1] = repeated_occurrence.occurrences[0];
+    assert!(matches!(
+        ApertureFiltration::found_declared(repeated_occurrence),
+        Err(TopologicalError::OccurrenceAddressRepeated(_))
+    ));
+
+    let mut component_map = filtration.component_of.clone();
+    component_map.remove(&filtration.occurrences[0]);
+    let malformed_components = DeclaredFiltration {
+        lineage: filtration.lineage.clone(),
+        source_event: filtration.source_event,
+        complex: filtration.complex.clone(),
+        occurrences: filtration.occurrences.clone(),
+        component_of: component_map,
+        cells_by_simplex: filtration.cells_by_simplex.clone(),
+        entry: filtration.entry.clone(),
+        ceiling: filtration.ceiling.clone(),
+    };
+    assert!(matches!(
+        ApertureFiltration::found_declared(malformed_components),
+        Err(TopologicalError::ComponentMapDisagrees)
+    ));
+
     // And `contact_loops` itself no longer indexes: on a filtration whose occurrences carry no
     // declared component the lookup still succeeds, and on any filtration it returns a typed
     // refusal rather than panicking.

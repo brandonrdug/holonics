@@ -114,10 +114,13 @@ drops the generator square, each exhibiting a bijection carrying `x` to `y` whos
 **(3) Which rung holds for `4` and `2^2` is a fact about the declared generator family, not about
 the pair**: under a family that only post-composes `eval` they have equal potential
 (`postcomposeFamilyGivesEqualPotential`); one construction generator separates them
-(`bumpExponentSeparatesThem`). **(4) A bounded search can never establish rung 5.**
+(`bumpExponentSeparatesThem`). **(4) Exhausting a history prefix alone does not establish rung 5.**
 `PotentialVerdict::NotSeparatedWithinBound` carries the bound it ran under and is never reported as
-equal potential; the one sound executable route to rung 5 is an equivariance check over a probe the
-caller declares to be the whole carrier, and a probe that is not stays a probe.
+equal potential. The executable symmetry route checks both occurrences belong to the finite
+carrier and that every admitted generator and both symmetry maps keep it closed. The checked
+generator squares and receiver triangles then cover every word from those occurrences by
+`equalPotential_of_closedCarrier`; a caller's completeness flag alone never promotes a probe.
+This can certify an invariant subcarrier of a larger ambient type.
 
 [established-bounded; formal-checked; implemented-exact] **T2 — Standing, memory and extinction.
 Returned.** Owners:

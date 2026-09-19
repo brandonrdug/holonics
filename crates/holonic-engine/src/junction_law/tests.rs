@@ -7,6 +7,7 @@ use num_traits::{One, Zero};
 use relational_geometry::Rat;
 
 use super::*;
+use crate::algebraic::CausalCellId;
 use crate::hodge_receiver::{BoundaryCondition, HodgeOperator, MetricDeclaration};
 use crate::quantity::BaseUnits;
 
@@ -197,6 +198,38 @@ fn a_network_declaration_is_bounded_and_its_refusals_are_named() {
     assert!(matches!(
         ResistiveNetwork::declare("test|empty", 2, &[]),
         Err(JunctionRefusal::EmptyInterface)
+    ));
+}
+
+#[test]
+fn source_units_must_match_the_declared_flux_cochain_units() {
+    let base = BaseUnits::declare(["V", "A"]).expect("base units");
+    let potential = base.unit("V").expect("potential");
+    let flux = base.unit("A").expect("flux");
+    let source = base.unit("V").expect("deliberately mismatched source");
+    assert!(matches!(
+        JointUnits::declare("test|bad-source-unit", base, potential, flux, source),
+        Err(JunctionRefusal::SourceDimensionDisagrees { .. })
+    ));
+}
+
+#[test]
+fn a_junction_law_requires_all_three_cochains_on_the_same_joint() {
+    let units = JointUnits::electrical().expect("units");
+    let joint = CausalCellId(0);
+    let foreign = CausalCellId(1);
+    assert!(matches!(
+        JunctionLaw::found(
+            "test|mismatched-joint",
+            3,
+            BTreeMap::from([(foreign, Rat::one())]),
+            BTreeMap::from([(joint, Rat::one())]),
+            BTreeMap::from([(joint, Rat::one())]),
+            -1,
+            OrientationBit::NotDeclared,
+            units,
+        ),
+        Err(JunctionRefusal::JunctionCochainKeysDisagree)
     ));
 }
 
@@ -759,8 +792,8 @@ fn the_israel_conditions_are_stated_and_say_what_a_faithful_instance_would_owe()
     assert!(law.statement.contains("induced"));
     assert!(law.owed.contains("Lorentzian"));
     assert!(
-        law.owed.contains("nothing here is an instance"),
-        "the statement must not read as an implementation claim"
+        law.owed.contains("Gauss-Codazzi"),
+        "the junction must name the geometric realization it still requires"
     );
 }
 

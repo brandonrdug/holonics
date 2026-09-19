@@ -141,13 +141,16 @@
 //!
 //! [proved-derived] With a constant symmetric metric `G` and `x' = A x`, the source-free change of
 //! `E_G = xᵀGx/2` is governed by `Σ_G = AᵀG + GA` ([`rate_form`]). Putting `A = L − I/2` gives
-//! `Σ_G = LᵀG + GL − G` ([`seam_form`]), so
+//! `Σ_G = LᵀG + GL − G` ([`seam_form`]). If `G` is positive definite, then
 //!
 //! ```text
 //! L*G + GL = G   ⟺   L − I/2 is G-skew   ⟹   every eigenvalue of L has Re = 1/2.
 //! ```
 //!
-//! The implication is unconditional. **The converse is false as usually stated**: it needs
+//! Positive definiteness is required for the spectral implication: an indefinite conserving
+//! form can carry real eigenvalues. For example `G = diag(1,-1)` and
+//! `A = [[0,1],[1,0]]` have `AᵀG + GA = 0` but eigenvalues `1,-1`.
+//! **The converse is false as usually stated**: it needs
 //! semisimplicity, and [`jordan_realification`] is the counterexample — purely imaginary spectrum,
 //! non-squarefree minimal polynomial, and no positive definite `G` making it `G`-skew.
 //! [`is_semisimple`] decides that exactly, as "the minimal polynomial equals its own squarefree

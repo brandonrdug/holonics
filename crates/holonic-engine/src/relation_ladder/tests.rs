@@ -352,6 +352,49 @@ fn a_probe_that_is_not_the_carrier_does_not_establish_the_isomorphism() {
     assert!(!classification.established.contains(&Rung::EqualPotential));
 }
 
+#[test]
+fn declaring_a_probe_complete_does_not_supply_its_missing_futures() {
+    let situation = Situation::declare(
+        vec![NamedGenerator::new("next-pair", |x: &u8| Ok(x.wrapping_add(2)))],
+        vec![NamedReceiver::new("distinguishes-next-pair", |x: &u8| Ok(*x == 3))],
+        0,
+    ).unwrap();
+    let symmetry = SituationAutomorphism::new("pair-swap", |x: &u8| Ok(x ^ 1), |x: &u8| Ok(x ^ 1));
+    // Both generator squares and receiver triangles hold on [0,1], but the next occurrences
+    // 2 and 3 are outside it and the receiver separates those. A caller's `true` cannot certify
+    // all futures just because this situation's separator search was requested only at depth 0.
+    for probe in [&[][..], &[0u8][..], &[0u8, 1][..]] {
+        let result = situation.classify(&0, &1, &Declarations {
+            automorphism: Some(AutomorphismClaim {
+                automorphism: &symmetry, probe, probe_is_the_whole_carrier: true,
+            }),
+            tolerance: None,
+        }).unwrap();
+        assert_eq!(result.strongest, Rung::ReceiverEqual);
+        assert!(result.notes.contains(&ClassificationNote::AutomorphismCarrierNotClosed));
+        assert!(!result.established.contains(&Rung::EqualPotential));
+    }
+}
+
+#[test]
+fn a_checked_finite_invariant_carrier_establishes_all_its_futures() {
+    let situation = Situation::declare(
+        vec![NamedGenerator::new("swap", |x: &u8| Ok(x ^ 1))],
+        vec![NamedReceiver::new("pair", |x: &u8| Ok(x / 2))],
+        0,
+    ).unwrap();
+    let symmetry = SituationAutomorphism::new("pair-swap", |x: &u8| Ok(x ^ 1), |x: &u8| Ok(x ^ 1));
+    let result = situation.classify(&0, &1, &Declarations {
+        automorphism: Some(AutomorphismClaim {
+            automorphism: &symmetry, probe: &[0, 1], probe_is_the_whole_carrier: true,
+        }),
+        tolerance: None,
+    }).unwrap();
+    // This is an invariant subcarrier of u8, sufficient for every word from these endpoints.
+    assert_eq!(result.strongest, Rung::Isomorphism);
+    assert!(result.established.contains(&Rung::EqualPotential));
+}
+
 /// Lean: `continuationWithoutAnyEqualFace`. The lineage is real and every rung below it fails.
 #[test]
 fn continuation_without_any_equal_face() {

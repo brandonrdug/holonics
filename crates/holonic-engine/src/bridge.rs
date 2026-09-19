@@ -310,6 +310,9 @@ pub fn status_meet(left: BridgeStatus, right: BridgeStatus) -> Option<BridgeStat
 /// The diagram a bridge claims to preserve, and whether the claim was discharged.
 ///
 /// Lean counterpart: the `Preserved` and `preserves` fields of `Foundation/Bridge.lean::Bridge`.
+/// This is an evidence declaration: the boolean records caller testimony and does not verify
+/// the named proposition. Executable consumers must check their concrete receiver square or use
+/// its proved realization; neither this record nor a bridge status supplies that check.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PreservationClaim {
     /// The diagram, named exactly.

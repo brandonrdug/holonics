@@ -201,6 +201,9 @@ pub enum TubeRefusal<S, I, F> {
         /// The claimed finer chart.
         fine: I,
     },
+    /// A supplied face names a chart outside the aperture whose square or circuit was declared.
+    /// It is refused rather than silently ignored and counted as checked.
+    FaceOutsideAperture { chart: I },
     /// A caller-declared aperture, face population or circuit word exceeded its bound. Nothing was
     /// allocated or iterated.
     DeclarationAboveCeiling {
@@ -236,6 +239,10 @@ impl<S: Debug, I: Debug, F: Debug> fmt::Display for TubeRefusal<S, I, F> {
             Self::OrdersDisagree { coarse, fine } => write!(
                 formatter,
                 "the two sections disagree on whether {fine:?} refines {coarse:?}"
+            ),
+            Self::FaceOutsideAperture { chart } => write!(
+                formatter,
+                "the supplied face names chart {chart:?}, outside the declared aperture"
             ),
             Self::DeclarationAboveCeiling { declared, ceiling } => write!(
                 formatter,
@@ -504,6 +511,11 @@ pub fn check_commuting_square<T: StationedTower>(
             });
         }
     }
+    if let Some((chart, _)) = faces.iter().find(|(chart, _)| !charts.contains(chart)) {
+        return Err(TubeRefusal::FaceOutsideAperture {
+            chart: chart.clone(),
+        });
+    }
     if !tube.follows(earlier, later) {
         return Err(TubeRefusal::NotAStep {
             earlier: earlier.clone(),
@@ -729,6 +741,11 @@ pub fn check_circuit_holonomy<T: StationedTower>(
                 ceiling: DECLARED_WORK_CEILING,
             });
         }
+    }
+    if let Some((chart, _)) = faces.iter().find(|(chart, _)| !charts.contains(chart)) {
+        return Err(TubeRefusal::FaceOutsideAperture {
+            chart: chart.clone(),
+        });
     }
     let (Some(first), Some(last)) = (circuit.first(), circuit.last()) else {
         return Err(TubeRefusal::EmptyCircuit);
@@ -2431,7 +2448,12 @@ pub fn defect_profile<T: StationedTower>(
                     earlier,
                     later,
                     &[coarse.clone(), fine.clone()],
-                    declaration.faces(),
+                    &declaration
+                        .faces()
+                        .iter()
+                        .filter(|(chart, _)| chart == fine)
+                        .cloned()
+                        .collect::<Vec<_>>(),
                 )?;
                 let defect = match verdict {
                     // A square asked with no face at its finer chart compared nothing. It is
@@ -2482,7 +2504,13 @@ pub fn defect_profile<T: StationedTower>(
             continue;
         }
         circuits_checked += 1;
-        let verdict = check_circuit_holonomy(tube, circuit, &visible, declaration.faces())?;
+        let visible_faces: Vec<_> = declaration
+            .faces()
+            .iter()
+            .filter(|(chart, _)| visible.contains(chart))
+            .cloned()
+            .collect();
+        let verdict = check_circuit_holonomy(tube, circuit, &visible, &visible_faces)?;
         if let HolonomyVerdict::Defect(defect) = verdict {
             holonomies.push(defect);
         }
@@ -3350,6 +3378,9 @@ fn reseat_grain_refusal(
         TubeRefusal::Section(inner) => TubeRefusal::Section(inner),
         TubeRefusal::OrdersDisagree { coarse, fine } => {
             TubeRefusal::OrdersDisagree { coarse, fine }
+        }
+        TubeRefusal::FaceOutsideAperture { chart } => {
+            TubeRefusal::FaceOutsideAperture { chart }
         }
         TubeRefusal::DeclarationAboveCeiling { declared, ceiling } => {
             TubeRefusal::DeclarationAboveCeiling { declared, ceiling }

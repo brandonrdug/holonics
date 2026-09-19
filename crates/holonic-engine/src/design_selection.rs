@@ -928,6 +928,40 @@ impl DesignFamily {
             .ok_or(SelectionRefusal::DesignAbsent { id })
     }
 
+    pub(crate) fn validate_mutation(
+        &self,
+        from: usize,
+        to: usize,
+        environment: usize,
+        site: u32,
+    ) -> Result<(), SelectionRefusal> {
+        if from >= self.designs.len() {
+            return Err(SelectionRefusal::DesignAbsent {
+                id: DesignId(from as u64),
+            });
+        }
+        if to >= self.designs.len() {
+            return Err(SelectionRefusal::DesignAbsent {
+                id: DesignId(to as u64),
+            });
+        }
+        let declared = self
+            .environments
+            .get(environment)
+            .ok_or_else(|| SelectionRefusal::EnvironmentAbsent {
+                label: format!("index {environment}"),
+            })?;
+        let source = self.designs[from]
+            .face(declared.label())
+            .expect("declare checked a face at every declared environment");
+        let target = self.designs[to]
+            .face(declared.label())
+            .expect("declare checked a face at every declared environment");
+        Passage::<Horizontal>::mutation(source, target, site)
+            .map(|_| ())
+            .map_err(SelectionRefusal::Passage)
+    }
+
     /// One declared environment by label.
     pub fn environment(&self, label: &str) -> Result<&DeclaredEnvironment, SelectionRefusal> {
         self.environments
@@ -2004,7 +2038,7 @@ impl DesignFamily {
                     from,
                     to,
                     environment,
-                    ..
+                    site,
                 } => {
                     for at in [from, to] {
                         if *at >= self.designs.len() {
@@ -2018,6 +2052,7 @@ impl DesignFamily {
                             label: format!("index {environment}"),
                         });
                     }
+                    self.validate_mutation(*from, *to, *environment, *site)?;
                 }
             }
         }

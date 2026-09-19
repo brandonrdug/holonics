@@ -91,7 +91,9 @@ use thiserror::Error;
 
 use crate::design_selection::{AdmittedTransformation, DesignFamily, DesignId, ReceiverReading};
 use crate::exact_value::ExactInterval;
-use crate::physical_occurrence::{DecidedClass, ExteriorDeclaration, OccurrenceId, PluralFibre};
+use crate::physical_occurrence::{
+    DecidedClass, ExteriorDeclaration, OccurrenceId, PassageRefusal, PluralFibre,
+};
 use crate::relation_ladder::Rung;
 use crate::standing::TimedFace;
 use crate::topological_receiver::{ValueOrder, compare_values};
@@ -223,6 +225,12 @@ pub enum EvaluationRefusal {
         /// How many the family carries.
         declared: usize,
     },
+    /// A mutation names an environment index the family does not carry.
+    #[error("the admitted mutation names environment index {index}, and the family carries {declared}")]
+    MutationNamesAnAbsentEnvironment { index: usize, declared: usize },
+    /// A manually assembled mutation failed the same passage law used by design selection.
+    #[error("the admitted mutation is not a lawful horizontal passage: {0}")]
+    MutationPassageRefused(#[from] PassageRefusal),
     /// A design identity the evaluation's population does not carry.
     #[error("the evaluation carries no design {id:?}")]
     DesignAbsent {
@@ -625,6 +633,22 @@ impl LineageClasses {
                         });
                     }
                 }
+                if *environment >= family.environments().len() {
+                    return Err(EvaluationRefusal::MutationNamesAnAbsentEnvironment {
+                        index: *environment,
+                        declared: family.environments().len(),
+                    });
+                }
+                family
+                    .validate_mutation(*from, *to, *environment, *site)
+                    .map_err(|refusal| match refusal {
+                        crate::design_selection::SelectionRefusal::Passage(error) => {
+                            EvaluationRefusal::MutationPassageRefused(error)
+                        }
+                        _ => EvaluationRefusal::NotStated {
+                            what: "mutation declaration",
+                        },
+                    })?;
                 edges.push(LineageEdge::Passage {
                     left: population[*from],
                     right: population[*to],

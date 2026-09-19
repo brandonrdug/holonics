@@ -103,6 +103,65 @@ fn the_contact_class_join_is_a_commutative_idempotent_semilattice_with_outside_a
     );
 }
 
+#[test]
+fn grain_face_wire_rechecks_pair_grain_and_outside_elision() {
+    let pair = atom_pair((0, 0, 0), (0, 0, 1));
+    assert!(matches!(
+        GrainFace::try_from(GrainFaceWire {
+            grain: Grain::Residue,
+            classified: BTreeMap::from([(pair, ContactClass::Inside)]),
+        }),
+        Err(GrainRefusal::PairNotAtGrain { .. })
+    ));
+    assert!(matches!(
+        GrainFace::try_from(GrainFaceWire {
+            grain: Grain::Atom,
+            classified: BTreeMap::from([(pair, ContactClass::Outside)]),
+        }),
+        Err(GrainRefusal::OutsideReadingStored { .. })
+    ));
+}
+
+#[test]
+fn grain_selection_wire_rechecks_projection_and_inverse() {
+    let coarse = residue_cell(0, 0);
+    let fine = atom(0, 0, 0);
+    let mut representative = BTreeMap::from([(coarse, fine)]);
+    let inverse = BTreeMap::from([(fine, coarse)]);
+    let valid = GrainSelection::try_from(GrainSelectionWire {
+        lineage: "wire".to_owned(),
+        coarse: Grain::Residue,
+        fine: Grain::Atom,
+        representative: representative.clone(),
+        inverse: inverse.clone(),
+    })
+    .expect("the wire's representative maps are coherent");
+    assert_eq!(valid.represented(), 1);
+
+    representative.insert(coarse, atom(0, 1, 0));
+    assert!(matches!(
+        GrainSelection::try_from(GrainSelectionWire {
+            lineage: "wire".to_owned(),
+            coarse: Grain::Residue,
+            fine: Grain::Atom,
+            representative,
+            inverse,
+        }),
+        Err(GrainRefusal::RepeatedRepresentative { .. })
+    ));
+
+    assert!(matches!(
+        GrainSelection::try_from(GrainSelectionWire {
+            lineage: "wire".to_owned(),
+            coarse: Grain::Residue,
+            fine: Grain::Atom,
+            representative: BTreeMap::from([(coarse, fine)]),
+            inverse: BTreeMap::new(),
+        }),
+        Err(GrainRefusal::SelectionWireInconsistent)
+    ));
+}
+
 /// The three-grain tower of one two-component presentation.
 ///
 /// Component 1 carries residues 1..=2, component 2 carries residue 1. One atom pair is `Inside`,
@@ -549,6 +608,9 @@ fn the_declared_relation_travels_with_the_tower() {
         ron::from_str(&ron::to_string(&tower).expect("the tower serializes")).expect("remounts");
     assert_eq!(round_trip.relation(), tower.relation());
     assert_eq!(round_trip.atom_face(), tower.atom_face());
+    let mut unknown_schema = tower.clone();
+    unknown_schema.schema = "holonic-engine.grain-tower.future".to_owned();
+    assert!(ron::from_str::<GrainTower>(&ron::to_string(&unknown_schema).unwrap()).is_err());
 
     let witness = InflationWitness::measure("worked", rational(64, 1), &worked_readings())
         .expect("an inflation is measured");
