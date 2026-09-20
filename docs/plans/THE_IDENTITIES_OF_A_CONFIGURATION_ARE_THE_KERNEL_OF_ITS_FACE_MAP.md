@@ -5,7 +5,31 @@ designs the **identity atlas**: an algorithmically generated, exactly certified 
 identities of a configuration family, their relations, their collapses into simpler geometries,
 and the landmark constants they force. It adds no milestone by itself and founds an owner only
 for the concrete absent object each intention names. Classical results are `proved-standard` with
-their names inline; the assembly is `interpretation` until its first instance returns.
+their names inline; the wider assembly retains its stated open obligations after the bounded
+first instance. GitHub's geometry/reuse milestone tracks the return; this contract does not
+create a separate construction order.
+
+## Existing construction and the returned subset
+
+[established-bounded; source-inspected] Wave 10 returned `identity_atlas` and
+`Geometry/TwoSidedIdentityAtlas.lean`: exact polynomial operations, chart-relative kernel
+certification, polynomial completion, special-fibre comparisons and the displayed T0–T2
+identities. The [Wave 10 audit](../../research/records/2026-09-20_WAVE_TEN_IS_REPAIRED_AND_THE_LIBRARY_RETURNS_TO_HELICAL_GENERATORS_AND_HNN.md)
+repairs certificate construction, unresolved returns and chart/matroid bounds. Coverage of an
+ambient variety is a separate source statement: a caller's prose is not a proof. T2's current
+return concerns the declared Gram chart; the shared [helical geometry](../HELICAL_GEOMETRY.md)
+provides its actual screw-form consumer and the orbit/contact geometry it previously omitted.
+
+[definition] I7/I8 continue existing subjects. `LandmarksAndModuli`, `Farey`, `Polarity` and
+`winding_inertia` own period/modulus and branch/winding returns. `PiIterationConstraint`,
+`MachinPhaseConstraint` and exact analytic owners carry π/e generators; the Copson–de Bruijn
+and de Bruijn–Newman families have distinct source laws. `GeneratorInference`,
+`GeneratorModeQuotient`, `ReceiverHistoryCompression`, `ReceiverCodeCost`, quadratic moments and
+the native factor/receiver owners already supply inferred families, sufficient continuation and
+encoding equations. The [September synthesis](../MATHEMATICS_AND_NATIVE_CONDUCT.md#constraint-defined-modes-and-named-de-bruijn-boundaries)
+and [helical source map](../HELICAL_GEOMETRY.md#landmarks-and-holonic-compression-already-have-owners)
+locate them. This atlas adds a polynomial relation-finding operation; it neither establishes
+those subjects for the first time nor completes their native composition by citing them.
 
 ## The governing statement
 

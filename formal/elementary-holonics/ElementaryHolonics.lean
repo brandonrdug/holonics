@@ -1142,3 +1142,4 @@ import ElementaryHolonics.Millennium.HolonicFiniteCausalAperture
 import ElementaryHolonics.Millennium.HolonicPantographicSwingJets
 
 import ElementaryHolonics.Geometry.TwoSidedIdentityAtlas
+import ElementaryHolonics.Geometry.ScrewGeometry

@@ -6,6 +6,15 @@ instructions intact. The repository belongs to one human operator, not an approv
 
 ## Sustained construction control
 
+[project-postulate] Brandon's latest request after the September 19 Wave 10 report returns active
+work to shared Holonics fundamentals in Rust and Lean, develops pairwise helical geometry as
+elementary construction, and refocuses the consuming application on HNN/Athena. Further protein
+and biology experiments are deferred; their useful source and evidence remain. The
+[helical guide](docs/HELICAL_GEOMETRY.md) connects the actual generators, frame/contact variation,
+landmark and continuing-compression owners. These subjects were already established: recover
+their source relations and consumers, not a new framework inferred from the latest small example.
+The roadmap/state own the detailed order and position; this ruling creates no new review ritual.
+
 [project-postulate] Before selecting work in a sustained construction run, use the active brief
 at the top of [CONSTRUCTION_STATE.md](CONSTRUCTION_STATE.md). It retains the user-authorized
 deliverable, unresolved consuming operation, next action and completion evidence. The

@@ -8,7 +8,12 @@ read through the receivers of
 
 ## Why this instance
 
-[project-postulate] Protein structures are the present rich scientific application of the
+[project-postulate] Further protein/biology construction is deferred by Brandon's latest
+post-Wave-10 request. This contract retains its scientific material and shared library obligations;
+the live roadmap now prioritizes elementary Holonics and HNN/Athena. It does not schedule new
+predictions, response runs or receiver tuning.
+
+[historical] Protein structures were selected as a rich scientific application of the
 [general embedding object](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-general-embedding-and-its-consuming-composition).
 They bring sequence, spatial frames, contact incidence, spectral/topological response, environment
 and atom/residue/domain grains into one demanding construction. Their complexity lets defects in
@@ -34,8 +39,10 @@ they are not an automatic queue of prerequisites for the general embedding or At
 families, passages, receiver analyses, design/evaluation interfaces and cost receipts. The M5
 structures have exercised the shared library through actual all-atom/contact, modal, rigidity,
 topological and physicochemical readings. The returned constructors do not alone close the whole
-design application. Computed held-out agreement counts, an actual installed-predictor comparison
-and the physicochemical interface-gluing law remain named application work in the roadmap.
+design application. The installed-predictor/design and later measured-RBX1 comparisons have
+returned at their declared receiver scopes. The full receiver-family evaluation and
+physicochemical interface-gluing obligations remain, with application continuation deferred;
+generic mathematical improvements stay attached to their shared owners.
 
 [open] The dynamic join consumes the same source configuration and environment through active
 contact faces and material evolution. T4's exact constrained edit response and T7's junction

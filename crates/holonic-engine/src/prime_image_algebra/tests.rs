@@ -571,9 +571,9 @@ fn a_declared_extent_past_the_ceiling_is_refused_before_any_allocation() {
 /// reproduces that species without the authenticated release: occurrences sit on a serpentine
 /// lattice path at a 3.8-unit spacing with a deterministic sub-lattice jitter that keeps the frame
 /// generic, coordinates carry the denominator `1000` the decimal grain produces, and a constraint
-/// is declared for the backbone and for every pair inside an 8.0-unit aperture — so a point
-/// carries on the order of eighteen contacts and the Jacobian is as dense and as coefficient-heavy
-/// as the measured one, rather than banded.
+/// is declared for the backbone and for every pair inside an 8.0-unit aperture. Its topology
+/// and coefficient height belong to this declared synthetic source. It is not the same matrix or a matched-input baseline for
+/// the measured M5 structures; equal coordinate extent does not equate coefficient complexity.
 pub(super) fn rigidity_jacobian(points: usize) -> ExactRatMatrix {
     let places = lattice_places(points);
     let columns = 3 * points;
@@ -686,17 +686,16 @@ fn the_measured_staircase() {
     }
 }
 
-/// **The same target read through the real consumer.**
+/// **Synthetic lattice material read through the production consumer.**
 ///
 /// `rigidity_receiver::rigidity_reading` is one of the two consumers Issue #50 measures, and this
 /// owner edits nothing in it: the Jacobian below is built through that module's own
 /// `ExactConfiguration` and `ConstraintEdge` constructors, from the same lattice places
 /// [`rigidity_jacobian`] uses, and the reading is taken by the public function unchanged.
 ///
-/// The consumer performs **three** separate reductions — `rank`, `kernel_basis` and
-/// `cokernel_annihilator` — and then checks rank–nullity, the cokernel count and Maxwell's
-/// identity against each other. Those three checks are an independent cross-examination of the
-/// certified path: a wrong rank or a short kernel fails them.
+/// The consumer shares the rank/kernel return and separately reads the cokernel; its
+/// rank–nullity, cokernel and Maxwell checks constrain those returned dimensions. These
+/// checks do not make the synthetic source equivalent to an unreturned measured input.
 ///
 /// Off by default; taken with `HOLONICS_PRIME_IMAGE_CONSUMER=324,612 cargo test --release
 /// -p holonic-engine --lib prime_image_algebra::tests::the_measured_consumer_reading -- --nocapture`.

@@ -77,8 +77,8 @@ use std::time::Instant;
 
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
-use relational_geometry::Rat;
-use serde::{Deserialize, Serialize};
+use relational_geometry::{Rat, RatVec3, ScrewGenerator};
+use serde::Serialize;
 use thiserror::Error;
 
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
@@ -92,9 +92,9 @@ mod tests;
 
 /// The largest declared monomial family this owner will evaluate.
 ///
-/// Not a budget: the evaluation matrix is `N × |Mon|` and its reduction is cubic in `|Mon|`, so a
-/// family past this extent is a different instance — `#50`'s consumer — and is refused by type
-/// rather than started and abandoned.
+/// This is an apparatus ceiling: the evaluation matrix is `N × |Mon|` and its reduction is cubic
+/// in `|Mon|`. A family past it is refused before work begins; the refusal does not change the
+/// mathematics of the declared family.
 pub const MONOMIAL_CEILING: usize = 512;
 
 /// The largest sample population a single walk will take.
@@ -104,8 +104,7 @@ pub const SAMPLE_CEILING: usize = 2048;
 pub const PARAMETER_CEILING: usize = 32;
 
 /// How many times a walk may answer a refused basis vector by adding its counterexample point and
-/// re-reading the kernel. Exceeding it is a contradiction between sampling and certification, not a
-/// budget overrun, and is returned as one.
+/// re-reading the kernel. Exceeding it returns an incomplete bounded-search refusal.
 pub const RESAMPLE_CEILING: usize = 6;
 
 /// The largest number of S-pairs a Buchberger completion will form.
@@ -123,6 +122,12 @@ pub const CHOW_GROUND_CEILING: usize = 10;
 pub enum IdentityAtlasError {
     #[error("a polynomial over {declared} variables met an exponent vector of length {found}")]
     VariableCountMismatch { declared: usize, found: usize },
+    #[error("polynomial operations require matching variable counts ({left} and {right})")]
+    PolynomialShapeMismatch { left: usize, right: usize },
+    #[error("polynomial exponent overflow during {operation}")]
+    ExponentOverflow { operation: &'static str },
+    #[error("polynomial total degree overflow")]
+    TotalDegreeOverflow,
     #[error("the declared monomial family has {found} members, past the ceiling of {ceiling}")]
     MonomialCeiling { found: usize, ceiling: usize },
     #[error("the walk asked for {found} samples, past the ceiling of {ceiling}")]
@@ -137,21 +142,47 @@ pub enum IdentityAtlasError {
         declared: usize,
         named: usize,
     },
-    #[error("chart `{chart}` speaks {found} parameters where the configuration declares {declared}")]
+    #[error(
+        "chart `{chart}` speaks {found} parameters where the configuration declares {declared}"
+    )]
     ChartParameterMismatch {
         chart: String,
         declared: usize,
         found: usize,
     },
+    #[error(
+        "chart `{chart}` polynomial has {found} variables where the parameters declare {declared}"
+    )]
+    ChartVariableCountMismatch {
+        chart: String,
+        declared: usize,
+        found: usize,
+    },
+    #[error("chart `{chart}` has a zero denominator")]
+    ZeroChartDenominator { chart: String },
+    #[error("sample refers to chart {found}, but the configuration has only {charts} charts")]
+    ChartIndex { found: usize, charts: usize },
+    #[error("grid span must be positive, found {found}")]
+    InvalidGridSpan { found: i64 },
+    #[error("grid span {span} overflows the integer candidate range")]
+    GridSpanOverflow { span: i64 },
     #[error("configuration `{name}` declares no chart, so no component of V is covered")]
     NoChart { name: String },
-    #[error("chart `{chart}` has a vanishing denominator at the sample point, which its declared domain excludes")]
+    #[error(
+        "chart `{chart}` has a vanishing denominator at the sample point, which its declared domain excludes"
+    )]
     DenominatorVanishes { chart: String },
     #[error(
         "the declared candidate grid gave only {found} admissible points where {needed} were needed"
     )]
     GridExhausted { found: usize, needed: usize },
-    #[error("after {taken} resamples a certified basis was still not reached; sampling and certification disagree")]
+    #[error(
+        "{refused} sampled kernel candidates were refused but no admissible counterexample was found"
+    )]
+    UnresolvedCertification { refused: usize },
+    #[error(
+        "after {taken} resamples a certified basis was still not reached within the declared search bound"
+    )]
     ResampleCeiling { taken: usize },
     #[error("a Buchberger completion formed {formed} S-pairs, past the ceiling of {ceiling}")]
     SPairCeiling { formed: usize, ceiling: usize },
@@ -185,7 +216,7 @@ fn rational(value: i64) -> Rat {
 ///
 /// Exponent vectors are dense over the declared variable count, so `BTreeMap` iteration is
 /// **lexicographic** and the graded-lex leading term is one linear scan. No `f32`/`f64` occurs.
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize)]
 pub struct ExactMultivariate {
     variables: usize,
     terms: BTreeMap<Vec<u32>, Rat>,
@@ -203,7 +234,9 @@ impl ExactMultivariate {
     /// A constant.
     pub fn constant(variables: usize, value: Rat) -> Self {
         let mut polynomial = Self::zero(variables);
-        polynomial.add_term(vec![0; variables], value);
+        if !value.is_zero() {
+            polynomial.terms.insert(vec![0; variables], value);
+        }
         polynomial
     }
 
@@ -218,7 +251,7 @@ impl ExactMultivariate {
         let mut exponents = vec![0; variables];
         exponents[index] = 1;
         let mut polynomial = Self::zero(variables);
-        polynomial.add_term(exponents, Rat::one());
+        polynomial.terms.insert(exponents, Rat::one());
         Ok(polynomial)
     }
 
@@ -234,8 +267,14 @@ impl ExactMultivariate {
                 found: exponents.len(),
             });
         }
+        exponents.iter().try_fold(0u32, |sum, exponent| {
+            sum.checked_add(*exponent)
+                .ok_or(IdentityAtlasError::TotalDegreeOverflow)
+        })?;
         let mut polynomial = Self::zero(variables);
-        polynomial.add_term(exponents, coefficient);
+        if !coefficient.is_zero() {
+            polynomial.terms.insert(exponents, coefficient);
+        }
         Ok(polynomial)
     }
 
@@ -252,15 +291,29 @@ impl ExactMultivariate {
                     found: exponents.len(),
                 });
             }
-            polynomial.add_term(exponents.to_vec(), rational(*coefficient));
+            polynomial.add_term(exponents.to_vec(), rational(*coefficient))?;
         }
         Ok(polynomial)
     }
 
-    fn add_term(&mut self, exponents: Vec<u32>, coefficient: Rat) {
-        if coefficient.is_zero() {
-            return;
+    fn add_term(
+        &mut self,
+        exponents: Vec<u32>,
+        coefficient: Rat,
+    ) -> Result<(), IdentityAtlasError> {
+        if exponents.len() != self.variables {
+            return Err(IdentityAtlasError::VariableCountMismatch {
+                declared: self.variables,
+                found: exponents.len(),
+            });
         }
+        if coefficient.is_zero() {
+            return Ok(());
+        }
+        exponents.iter().try_fold(0u32, |sum, exponent| {
+            sum.checked_add(*exponent)
+                .ok_or(IdentityAtlasError::TotalDegreeOverflow)
+        })?;
         match self.terms.get_mut(&exponents) {
             Some(existing) => {
                 *existing += coefficient;
@@ -272,6 +325,7 @@ impl ExactMultivariate {
                 self.terms.insert(exponents, coefficient);
             }
         }
+        Ok(())
     }
 
     /// The declared variable count.
@@ -295,8 +349,17 @@ impl ExactMultivariate {
     }
 
     /// The total degree, or `None` for the zero polynomial.
-    pub fn total_degree(&self) -> Option<u32> {
-        self.terms.keys().map(|key| key.iter().sum::<u32>()).max()
+    pub fn total_degree(&self) -> Result<Option<u32>, IdentityAtlasError> {
+        self.terms
+            .keys()
+            .map(|key| {
+                key.iter().try_fold(0u32, |sum, exponent| {
+                    sum.checked_add(*exponent)
+                        .ok_or(IdentityAtlasError::TotalDegreeOverflow)
+                })
+            })
+            .collect::<Result<Vec<_>, _>>()
+            .map(|degrees| degrees.into_iter().max())
     }
 
     /// The sum of the bit lengths of every numerator and denominator: the certificate's size.
@@ -310,21 +373,33 @@ impl ExactMultivariate {
     }
 
     /// Sum.
-    pub fn plus(&self, other: &Self) -> Self {
+    pub fn plus(&self, other: &Self) -> Result<Self, IdentityAtlasError> {
+        if self.variables != other.variables {
+            return Err(IdentityAtlasError::PolynomialShapeMismatch {
+                left: self.variables,
+                right: other.variables,
+            });
+        }
         let mut sum = self.clone();
         for (exponents, coefficient) in &other.terms {
-            sum.add_term(exponents.clone(), coefficient.clone());
+            sum.add_term(exponents.clone(), coefficient.clone())?;
         }
-        sum
+        Ok(sum)
     }
 
     /// Difference.
-    pub fn minus(&self, other: &Self) -> Self {
+    pub fn minus(&self, other: &Self) -> Result<Self, IdentityAtlasError> {
+        if self.variables != other.variables {
+            return Err(IdentityAtlasError::PolynomialShapeMismatch {
+                left: self.variables,
+                right: other.variables,
+            });
+        }
         let mut difference = self.clone();
         for (exponents, coefficient) in &other.terms {
-            difference.add_term(exponents.clone(), -coefficient);
+            difference.add_term(exponents.clone(), -coefficient)?;
         }
-        difference
+        Ok(difference)
     }
 
     /// Scaling by an exact rational.
@@ -340,28 +415,46 @@ impl ExactMultivariate {
     }
 
     /// Product.
-    pub fn times(&self, other: &Self) -> Self {
+    pub fn times(&self, other: &Self) -> Result<Self, IdentityAtlasError> {
+        if self.variables != other.variables {
+            return Err(IdentityAtlasError::PolynomialShapeMismatch {
+                left: self.variables,
+                right: other.variables,
+            });
+        }
         let mut product = Self::zero(self.variables);
         for (left, left_coefficient) in &self.terms {
             for (right, right_coefficient) in &other.terms {
                 let exponents: Vec<u32> = left
                     .iter()
                     .zip(right)
-                    .map(|(a, b)| a.saturating_add(*b))
-                    .collect();
-                product.add_term(exponents, left_coefficient * right_coefficient);
+                    .map(|(a, b)| {
+                        a.checked_add(*b)
+                            .ok_or(IdentityAtlasError::ExponentOverflow {
+                                operation: "multiplication",
+                            })
+                    })
+                    .collect::<Result<_, _>>()?;
+                product.add_term(exponents, left_coefficient * right_coefficient)?;
             }
         }
-        product
+        Ok(product)
     }
 
     /// Repeated product; `powered(0)` is one.
-    pub fn powered(&self, exponent: u32) -> Self {
+    pub fn powered(&self, mut exponent: u32) -> Result<Self, IdentityAtlasError> {
         let mut result = Self::constant(self.variables, Rat::one());
-        for _ in 0..exponent {
-            result = result.times(self);
+        let mut base = self.clone();
+        while exponent != 0 {
+            if exponent & 1 == 1 {
+                result = result.times(&base)?;
+            }
+            exponent >>= 1;
+            if exponent != 0 {
+                base = base.times(&base)?;
+            }
         }
-        result
+        Ok(result)
     }
 
     /// The exact value at a rational point.
@@ -376,9 +469,7 @@ impl ExactMultivariate {
         for (exponents, coefficient) in &self.terms {
             let mut value = coefficient.clone();
             for (slot, exponent) in exponents.iter().enumerate() {
-                for _ in 0..*exponent {
-                    value *= &point[slot];
-                }
+                value *= num_traits::Pow::pow(&point[slot], *exponent);
             }
             total += value;
         }
@@ -434,7 +525,7 @@ impl ExactMultivariate {
                     }
                 }
             }
-            out.add_term(kept, value);
+            out.add_term(kept, value)?;
         }
         Ok(out)
     }
@@ -493,11 +584,9 @@ impl ExactMultivariate {
 
 /// The graded-lexicographic order on exponent vectors: total degree, then lex.
 fn graded_lex(left: &[u32], right: &[u32]) -> Ordering {
-    let left_degree: u32 = left.iter().sum();
-    let right_degree: u32 = right.iter().sum();
-    left_degree
-        .cmp(&right_degree)
-        .then_with(|| left.cmp(right))
+    let left_degree: u64 = left.iter().map(|value| u64::from(*value)).sum();
+    let right_degree: u64 = right.iter().map(|value| u64::from(*value)).sum();
+    left_degree.cmp(&right_degree).then_with(|| left.cmp(right))
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -509,7 +598,7 @@ fn graded_lex(left: &[u32], right: &[u32]) -> Ordering {
 /// The contract's `Mon_d(F)`, generalized to the *declared* families the two-sided configurations
 /// actually need: the curvature `k` is a receiver whose own degree is bounded separately, so an
 /// identity uniform in `k` fits a family a fifth the size of the total-degree one.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct ReceiverFamily {
     names: Vec<String>,
     head: usize,
@@ -606,7 +695,11 @@ impl ReceiverFamily {
     /// How the family was declared, for the receipt.
     pub fn declaration(&self) -> String {
         if self.head >= self.width() {
-            format!("total degree <= {} in {} receivers", self.head_degree, self.width())
+            format!(
+                "total degree <= {} in {} receivers",
+                self.head_degree,
+                self.width()
+            )
         } else {
             format!(
                 "degree <= {} over the first {} receivers and <= {} over the remaining {}",
@@ -628,7 +721,7 @@ impl ReceiverFamily {
         }
         let mut polynomial = ExactMultivariate::zero(self.width());
         for (monomial, coefficient) in self.monomials.iter().zip(vector) {
-            polynomial.add_term(monomial.clone(), coefficient.clone());
+            polynomial.add_term(monomial.clone(), coefficient.clone())?;
         }
         Ok(polynomial)
     }
@@ -639,7 +732,7 @@ impl ReceiverFamily {
 /// Every receiver is written over the **same** declared denominator, so the domain is the single
 /// statement `denominator ≠ 0` and the certification multiplier is one power of it. A polynomial
 /// chart declares the denominator `1` and has no domain exclusion at all.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct RationalChart {
     name: String,
     parameters: Vec<String>,
@@ -661,6 +754,29 @@ impl RationalChart {
             return Err(IdentityAtlasError::ParameterCeiling {
                 found: parameters.len(),
                 ceiling: PARAMETER_CEILING,
+            });
+        }
+        let width = parameters.len();
+        if denominator.variables() != width {
+            return Err(IdentityAtlasError::ChartVariableCountMismatch {
+                chart: name.to_owned(),
+                declared: width,
+                found: denominator.variables(),
+            });
+        }
+        if denominator.is_zero() {
+            return Err(IdentityAtlasError::ZeroChartDenominator {
+                chart: name.to_owned(),
+            });
+        }
+        if let Some(numerator) = numerators
+            .iter()
+            .find(|numerator| numerator.variables() != width)
+        {
+            return Err(IdentityAtlasError::ChartVariableCountMismatch {
+                chart: name.to_owned(),
+                declared: width,
+                found: numerator.variables(),
             });
         }
         Ok(Self {
@@ -732,8 +848,10 @@ impl RationalChart {
 ///
 /// The coverage statement is carried, not inferred. `V(xy)` charted only on `y = 0` would certify
 /// `y`; the statement is where a reader sees which components a chart family reaches, and
-/// [`walk`] certifies every returned vector on **every** chart named here.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+/// [`walk`] certifies every returned vector on **every** chart named here. The resulting identity is
+/// scoped to the union of the supplied chart images; the coverage string is a declaration for that
+/// scope, not a machine-proved statement about an ambient variety.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct Configuration {
     name: String,
     family: ReceiverFamily,
@@ -757,6 +875,16 @@ impl Configuration {
             return Err(IdentityAtlasError::NoChart {
                 name: name.to_owned(),
             });
+        }
+        if grid_span <= 0 {
+            return Err(IdentityAtlasError::InvalidGridSpan { found: grid_span });
+        }
+        if grid_span
+            .checked_mul(2)
+            .and_then(|value| value.checked_add(1))
+            .is_none()
+        {
+            return Err(IdentityAtlasError::GridSpanOverflow { span: grid_span });
         }
         let parameters = charts[0].parameters.len();
         for chart in &charts {
@@ -817,7 +945,7 @@ impl Configuration {
     pub fn candidate_points(&self, wanted: usize) -> Vec<Vec<Rat>> {
         let mut state = self.grid_seed;
         let mut points = Vec::with_capacity(wanted);
-        let span = self.grid_span.max(1);
+        let span = self.grid_span;
         for _ in 0..wanted {
             let mut point = Vec::with_capacity(self.parameters());
             for _ in 0..self.parameters() {
@@ -842,7 +970,7 @@ impl Configuration {
 /// `sampled_rank` is a lower bound on the dimension of the received filtration until every basis
 /// vector is certified. One sample at `x = 0` gives rank 1 for `{1, x, x²}` whose filtered
 /// dimension is 3.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct KernelReading {
     /// The declared monomial count: the evaluation matrix's column count.
     pub monomials: usize,
@@ -881,6 +1009,12 @@ pub fn evaluation_matrix(
     }
     let mut rows = Vec::with_capacity(points.len());
     for (chart, point) in points {
+        if *chart >= configuration.charts().len() {
+            return Err(IdentityAtlasError::ChartIndex {
+                found: *chart,
+                charts: configuration.charts().len(),
+            });
+        }
         let receivers = configuration.charts()[*chart].receivers_at(point)?;
         let mut row = Vec::with_capacity(monomials.len());
         for monomial in monomials {
@@ -894,11 +1028,7 @@ pub fn evaluation_matrix(
         }
         rows.push(row);
     }
-    Ok(ExactRatMatrix::shaped(
-        rows.len(),
-        monomials.len(),
-        rows,
-    )?)
+    Ok(ExactRatMatrix::shaped(rows.len(), monomials.len(), rows)?)
 }
 
 /// Evaluate the face map at a declared sample population and read its kernel.
@@ -930,7 +1060,7 @@ pub fn sample_kernel(
 // ---------------------------------------------------------------------------------------------
 
 /// One chart's verdict on one candidate vector.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub enum ChartVerdict {
     /// The substituted numerator is the zero polynomial on this chart.
     Certified {
@@ -960,25 +1090,49 @@ impl ChartVerdict {
 }
 
 /// **A certified identity: the whole basis vector, proved on every declared chart.**
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct CertifiedIdentity {
     /// The identity as a polynomial in the receiver variables.
-    pub polynomial: ExactMultivariate,
+    polynomial: ExactMultivariate,
     /// One verdict per declared chart. Every one is `Certified` for this type to be returned.
-    pub verdicts: Vec<ChartVerdict>,
+    verdicts: Vec<ChartVerdict>,
     /// The total term count of the substituted numerators: the certificate's measured size.
-    pub certificate_terms: usize,
+    certificate_terms: usize,
     /// The total coefficient bit length of those numerators.
-    pub certificate_bits: u64,
+    certificate_bits: u64,
+}
+
+impl CertifiedIdentity {
+    pub fn polynomial(&self) -> &ExactMultivariate {
+        &self.polynomial
+    }
+    pub fn verdicts(&self) -> &[ChartVerdict] {
+        &self.verdicts
+    }
+    pub fn certificate_terms(&self) -> usize {
+        self.certificate_terms
+    }
+    pub fn certificate_bits(&self) -> u64 {
+        self.certificate_bits
+    }
 }
 
 /// A refused candidate, kept rather than dropped: the counterexample is what makes the next sample.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct RefusedCandidate {
     /// The candidate as a polynomial in the receiver variables.
-    pub polynomial: ExactMultivariate,
+    polynomial: ExactMultivariate,
     /// The chart verdicts, at least one of which refused.
-    pub verdicts: Vec<ChartVerdict>,
+    verdicts: Vec<ChartVerdict>,
+}
+
+impl RefusedCandidate {
+    pub fn polynomial(&self) -> &ExactMultivariate {
+        &self.polynomial
+    }
+    pub fn verdicts(&self) -> &[ChartVerdict] {
+        &self.verdicts
+    }
 }
 
 /// Certify one candidate vector by exact substitution on every declared chart.
@@ -1013,17 +1167,17 @@ pub fn certify(
                     continue;
                 }
                 total += *exponent;
-                term = term.times(&chart.numerators()[slot].powered(*exponent));
+                term = term.times(&chart.numerators()[slot].powered(*exponent)?)?;
             }
             if degree > total {
-                term = term.times(&chart.denominator().powered(degree - total));
+                term = term.times(&chart.denominator().powered(degree - total)?)?;
             }
             // The certificate's size is what the substitution **carried**, not what survived it: a
             // certified vector's numerator is the zero polynomial, and reporting zero terms would
             // report the answer instead of the cost.
             certificate_terms += term.term_count();
             certificate_bits += term.coefficient_bits();
-            numerator = numerator.plus(&term);
+            numerator = numerator.plus(&term)?;
         }
         if numerator.is_zero() {
             verdicts.push(ChartVerdict::Certified {
@@ -1073,7 +1227,7 @@ pub fn certify(
 // ---------------------------------------------------------------------------------------------
 
 /// One S-pair reduction: a node-to-node edge of I5's graph, kept rather than counted.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct SPairReduction {
     /// The two basis positions the pair came from.
     pub pair: (usize, usize),
@@ -1093,16 +1247,31 @@ pub struct SPairReduction {
 /// basis and does not generate `⟨x, y⟩`, so this type never asserts that its ideal is the face-map
 /// kernel. That second inclusion is [`BoundedDegreeCompleteness`]'s subject and, for all degrees,
 /// its named obligation.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct GroebnerClosure {
     /// The declared monomial order.
-    pub order: String,
+    order: String,
     /// The completed basis.
-    pub basis: Vec<ExactMultivariate>,
+    basis: Vec<ExactMultivariate>,
     /// Every S-pair the completion formed, with its verdict.
-    pub reductions: Vec<SPairReduction>,
+    reductions: Vec<SPairReduction>,
     /// The wall time of the completion, measured separately.
-    pub elapsed_millis: u128,
+    elapsed_millis: u128,
+}
+
+impl GroebnerClosure {
+    pub fn order(&self) -> &str {
+        &self.order
+    }
+    pub fn basis(&self) -> &[ExactMultivariate] {
+        &self.basis
+    }
+    pub fn reductions(&self) -> &[SPairReduction] {
+        &self.reductions
+    }
+    pub fn elapsed_millis(&self) -> u128 {
+        self.elapsed_millis
+    }
 }
 
 /// The normal form of `polynomial` modulo `divisors` under graded lex, with its step count.
@@ -1132,7 +1301,7 @@ pub fn normal_form(
                 .collect();
             let factor = &coefficient / lead_coefficient;
             let shift = ExactMultivariate::term(variables, quotient, factor)?;
-            working = working.minus(&shift.times(divisor));
+            working = working.minus(&shift.times(divisor)?)?;
             divided = true;
             steps += 1;
             if steps > REDUCTION_STEP_CEILING {
@@ -1144,12 +1313,9 @@ pub fn normal_form(
             break;
         }
         if !divided {
-            remainder.add_term(exponents.clone(), coefficient.clone());
-            working = working.minus(&ExactMultivariate::term(
-                variables,
-                exponents,
-                coefficient,
-            )?);
+            remainder.add_term(exponents.clone(), coefficient.clone())?;
+            working =
+                working.minus(&ExactMultivariate::term(variables, exponents, coefficient)?)?;
         }
     }
     Ok((remainder, steps))
@@ -1188,7 +1354,7 @@ fn s_polynomial(
         Rat::one() / right_coefficient,
     )?;
     Ok(Some((
-        left_shift.times(left).minus(&right_shift.times(right)),
+        left_shift.times(left)?.minus(&right_shift.times(right)?)?,
         false,
     )))
 }
@@ -1202,7 +1368,10 @@ fn lcm_of(left: &[u32], right: &[u32]) -> Vec<u32> {
 }
 
 fn divides(divisor: &[u32], dividend: &[u32]) -> bool {
-    divisor.iter().zip(dividend).all(|(need, have)| need <= have)
+    divisor
+        .iter()
+        .zip(dividend)
+        .all(|(need, have)| need <= have)
 }
 
 /// Interreduce a generating set before completion.
@@ -1246,9 +1415,7 @@ pub fn interreduce(
 ///
 /// This is implemented here. `Millennium/Border.lean` is about degeneration and receiver blindness
 /// and supplies no completion engine; nothing about this algorithm is inferred from that filename.
-pub fn buchberger(
-    generators: &[ExactMultivariate],
-) -> Result<GroebnerClosure, IdentityAtlasError> {
+pub fn buchberger(generators: &[ExactMultivariate]) -> Result<GroebnerClosure, IdentityAtlasError> {
     let started = Instant::now();
     let mut basis = interreduce(generators)?;
     let mut pending: BTreeSet<(usize, usize)> = BTreeSet::new();
@@ -1288,8 +1455,7 @@ pub fn buchberger(
                 ceiling: S_PAIR_CEILING,
             });
         }
-        let (Some(left_lead), Some(right_lead)) =
-            (leads[left].as_ref(), leads[right].as_ref())
+        let (Some(left_lead), Some(right_lead)) = (leads[left].as_ref(), leads[right].as_ref())
         else {
             continue;
         };
@@ -1348,8 +1514,9 @@ pub fn buchberger(
             }
         }
     }
-    // Reduce to a minimal basis with monic leading coefficients, so the returned certificate is
-    // canonical against the declared order.
+    // Reduce to a minimal basis with monic leading coefficients. The declared order makes the
+    // normal remainder deterministic for this returned basis; the basis itself need not be the
+    // unique reduced Gröbner basis.
     let mut minimal: Vec<ExactMultivariate> = Vec::new();
     for (index, member) in basis.iter().enumerate() {
         let Some((lead, _)) = member.leading() else {
@@ -1379,18 +1546,33 @@ pub fn buchberger(
 }
 
 /// **I4's reduction step: which certified identities are new generators and which are consequences.**
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct ElementaryReading {
     /// The certified identities that did **not** reduce to zero modulo the ideal generated by the
     /// lower-degree ones: the elementary generators of this configuration at this degree.
-    pub generators: Vec<ExactMultivariate>,
+    generators: Vec<ExactMultivariate>,
     /// How many certified identities reduced to zero, i.e. are consequences of the generators.
-    pub consequences: usize,
+    consequences: usize,
     /// The Gröbner closure of the generators alone — the ideal `J` every completeness claim is
     /// relative to.
-    pub closure: GroebnerClosure,
+    closure: GroebnerClosure,
     /// The reduction steps the reading took: a measured check cost.
-    pub reduction_steps: usize,
+    reduction_steps: usize,
+}
+
+impl ElementaryReading {
+    pub fn generators(&self) -> &[ExactMultivariate] {
+        &self.generators
+    }
+    pub fn consequences(&self) -> usize {
+        self.consequences
+    }
+    pub fn closure(&self) -> &GroebnerClosure {
+        &self.closure
+    }
+    pub fn reduction_steps(&self) -> usize {
+        self.reduction_steps
+    }
 }
 
 /// **Reduce the certified basis by degree and return the new generators.**
@@ -1404,15 +1586,22 @@ pub struct ElementaryReading {
 pub fn elementary_generators(
     certified: &[CertifiedIdentity],
 ) -> Result<ElementaryReading, IdentityAtlasError> {
-    let mut ordered: Vec<&ExactMultivariate> =
-        certified.iter().map(|identity| &identity.polynomial).collect();
-    ordered.sort_by_key(|polynomial| polynomial.total_degree().unwrap_or(0));
+    let mut ordered: Vec<(&ExactMultivariate, u32)> = certified
+        .iter()
+        .map(|identity| {
+            identity
+                .polynomial()
+                .total_degree()
+                .map(|degree| (identity.polynomial(), degree.unwrap_or(0)))
+        })
+        .collect::<Result<_, _>>()?;
+    ordered.sort_by_key(|(_, degree)| *degree);
     let mut generators: Vec<ExactMultivariate> = Vec::new();
     let mut closure = buchberger(&generators)?;
     let mut consequences = 0usize;
     let mut reduction_steps = 0usize;
-    for polynomial in ordered {
-        let (remainder, steps) = normal_form(polynomial, &closure.basis)?;
+    for (polynomial, _) in ordered {
+        let (remainder, steps) = normal_form(polynomial, closure.basis())?;
         reduction_steps += steps;
         if remainder.is_zero() {
             consequences += 1;
@@ -1430,16 +1619,31 @@ pub fn elementary_generators(
 }
 
 /// **Bounded-degree completeness, and the all-degree obligation it does not discharge.**
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct BoundedDegreeCompleteness {
     /// Whether every certified kernel vector reduced to zero modulo the closure.
-    pub every_certified_vector_reduces_to_zero: bool,
+    every_certified_vector_reduces_to_zero: bool,
     /// The positions of any that did not, kept rather than counted.
-    pub unreduced: Vec<usize>,
+    unreduced: Vec<usize>,
     /// The total reduction steps the check took: a measured check cost.
-    pub reduction_steps: usize,
+    reduction_steps: usize,
     /// The concrete absent object an all-degree claim would need.
-    pub remaining_obligation: String,
+    remaining_obligation: String,
+}
+
+impl BoundedDegreeCompleteness {
+    pub fn every_certified_vector_reduces_to_zero(&self) -> bool {
+        self.every_certified_vector_reduces_to_zero
+    }
+    pub fn unreduced(&self) -> &[usize] {
+        &self.unreduced
+    }
+    pub fn reduction_steps(&self) -> usize {
+        self.reduction_steps
+    }
+    pub fn remaining_obligation(&self) -> &str {
+        &self.remaining_obligation
+    }
 }
 
 /// Reduce every certified identity modulo the closure of the elementary generators.
@@ -1455,7 +1659,7 @@ pub fn bounded_degree_completeness(
     let mut unreduced = Vec::new();
     let mut reduction_steps = 0usize;
     for (index, identity) in certified.iter().enumerate() {
-        let (remainder, steps) = normal_form(&identity.polynomial, &closure.basis)?;
+        let (remainder, steps) = normal_form(identity.polynomial(), closure.basis())?;
         reduction_steps += steps;
         if !remainder.is_zero() {
             unreduced.push(index);
@@ -1477,7 +1681,7 @@ pub fn bounded_degree_completeness(
 // ---------------------------------------------------------------------------------------------
 
 /// Whether the column matroid was admissible at [`crate::matroid_chow`]'s supported scope.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub enum ChowScope {
     /// The simple ground set is small enough and its characteristic polynomial was read.
     Admitted {
@@ -1501,7 +1705,7 @@ pub enum ChowScope {
 /// `2^|E|` subsets and accepts **simple** matroids only, so zero columns (loops) and proportional
 /// columns (parallel pairs) must be named before anything is handed over, and a wide family is
 /// refused by extent. Both readings are returned; neither is skipped.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct ColumnMatroidReading {
     /// The full column count.
     pub ground: usize,
@@ -1532,6 +1736,12 @@ pub fn read_column_matroid(
     let monomials = family.monomials();
     let mut columns: Vec<Vec<Rat>> = vec![Vec::with_capacity(points.len()); monomials.len()];
     for (chart, point) in points {
+        if *chart >= configuration.charts().len() {
+            return Err(IdentityAtlasError::ChartIndex {
+                found: *chart,
+                charts: configuration.charts().len(),
+            });
+        }
         let receivers = configuration.charts()[*chart].receivers_at(point)?;
         for (index, monomial) in monomials.iter().enumerate() {
             let mut value = Rat::one();
@@ -1582,7 +1792,7 @@ pub fn read_column_matroid(
         let mut support: Vec<usize> = Vec::new();
         for (index, monomial) in monomials.iter().enumerate() {
             if identity
-                .polynomial
+                .polynomial()
                 .terms()
                 .get(monomial)
                 .is_some_and(|coefficient| !coefficient.is_zero())
@@ -1595,14 +1805,17 @@ pub fn read_column_matroid(
         support_is_circuit.push(circuit);
     }
 
-    let full_matroid_scope = if simple_ground > CHOW_GROUND_CEILING || !loops.is_empty() {
+    let full_matroid_scope = if simple_ground > CHOW_GROUND_CEILING
+        || !loops.is_empty()
+        || !parallel_classes.is_empty()
+    {
         ChowScope::Refused {
             reason: format!(
                 "matroid_chow::Matroid::from_rank_table is presented by the complete rank function \
                  over 2^|E| subsets and accepts simple matroids only; this column matroid has \
                  {} elements, {} of them loops, {} parallel class(es), and a simple ground set of \
-                 {} past the declared ceiling of {}. The simplification and the identity circuits \
-                 are returned instead.",
+                 {} against the declared ceiling of {}. The simplification and the identity circuits \
+                are returned instead.",
                 columns.len(),
                 loops.len(),
                 parallel_classes.len(),
@@ -1613,14 +1826,11 @@ pub fn read_column_matroid(
     } else {
         ChowScope::Admitted {
             ground: simple_ground,
-            rank: rank_of_columns(
-                &columns,
-                &(0..columns.len()).collect::<Vec<_>>(),
-            )?,
+            rank: rank_of_columns(&columns, &(0..columns.len()).collect::<Vec<_>>())?,
             reduced_characteristic: Vec::new(),
         }
     };
-    let chow = chow_reading_of_first_circuit(&identity_supports, &columns)?;
+    let chow = chow_reading_of_first_circuit(&identity_supports, &support_is_circuit, &columns)?;
 
     Ok(ColumnMatroidReading {
         ground: columns.len(),
@@ -1653,16 +1863,18 @@ fn proportional(left: &[Rat], right: &[Rat]) -> bool {
     ratio.is_some()
 }
 
-fn rank_of_columns(
-    columns: &[Vec<Rat>],
-    subset: &[usize],
-) -> Result<usize, IdentityAtlasError> {
+fn rank_of_columns(columns: &[Vec<Rat>], subset: &[usize]) -> Result<usize, IdentityAtlasError> {
     if subset.is_empty() {
         return Ok(0);
     }
     let rows = columns[subset[0]].len();
     let entries: Vec<Vec<Rat>> = (0..rows)
-        .map(|row| subset.iter().map(|index| columns[*index][row].clone()).collect())
+        .map(|row| {
+            subset
+                .iter()
+                .map(|index| columns[*index][row].clone())
+                .collect()
+        })
         .collect();
     let matrix = ExactRatMatrix::shaped(rows, subset.len(), entries)?;
     Ok(matrix.rank()?)
@@ -1690,9 +1902,14 @@ fn support_is_minimal_dependency(
 
 fn chow_reading_of_first_circuit(
     supports: &[Vec<usize>],
+    support_is_circuit: &[bool],
     columns: &[Vec<Rat>],
 ) -> Result<ChowScope, IdentityAtlasError> {
-    let Some(support) = supports.iter().find(|support| support.len() >= 3) else {
+    let Some(support) = supports
+        .iter()
+        .zip(support_is_circuit)
+        .find_map(|(support, is_circuit)| (*is_circuit && support.len() >= 3).then_some(support))
+    else {
         return Ok(ChowScope::Refused {
             reason: "no certified identity has a support of three or more columns, so no rank-two \
                      or higher simple matroid is presented"
@@ -1706,9 +1923,9 @@ fn chow_reading_of_first_circuit(
     let matroid = crate::matroid_chow::Matroid::uniform(rank, support.len());
     match matroid {
         Ok(matroid) => {
-            let reduced = matroid.reduced_characteristic_magnitudes().map_err(|error| {
-                IdentityAtlasError::Linear(error.to_string())
-            })?;
+            let reduced = matroid
+                .reduced_characteristic_magnitudes()
+                .map_err(|error| IdentityAtlasError::Linear(error.to_string()))?;
             Ok(ChowScope::Admitted {
                 ground: support.len(),
                 rank,
@@ -1729,35 +1946,105 @@ fn chow_reading_of_first_circuit(
 // ---------------------------------------------------------------------------------------------
 
 /// **What one configuration returns.**
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct AtlasReturn {
     /// The configuration's name.
-    pub configuration: String,
+    configuration: String,
     /// The declared monomial family's extent and declaration.
-    pub monomials: usize,
+    monomials: usize,
     /// How the family was declared.
-    pub declaration: String,
+    declaration: String,
     /// The final sample population.
-    pub samples: usize,
+    samples: usize,
     /// How many times a refused vector's counterexample was fed back as a sample.
-    pub resamples: usize,
+    resamples: usize,
     /// The sampled rank. Equal to the filtered dimension **because** every vector certified.
-    pub sampled_rank: usize,
+    sampled_rank: usize,
     /// `|Mon| − dim ker`, the cumulative Hilbert function of the received filtration through the
     /// declared degree — independent algebraic faces, not bits and not runtime.
-    pub filtered_dimension: usize,
+    filtered_dimension: usize,
     /// `dim ker`: the algebraic redundancy of the declared family.
-    pub redundancy: usize,
+    redundancy: usize,
     /// Every certified identity, exhibited whole.
-    pub identities: Vec<CertifiedIdentity>,
+    identities: Vec<CertifiedIdentity>,
     /// Every candidate that stayed refused, with its counterexample.
-    pub refusals: Vec<RefusedCandidate>,
+    refusals: Vec<RefusedCandidate>,
     /// The total certificate term count: a separately measured codec cost.
-    pub certificate_terms: usize,
+    certificate_terms: usize,
     /// The total certificate coefficient bit length.
-    pub certificate_bits: u64,
+    certificate_bits: u64,
     /// The wall time of the whole walk, measured separately from every algebraic quantity.
-    pub elapsed_millis: u128,
+    elapsed_millis: u128,
+}
+
+impl AtlasReturn {
+    fn from_walk(
+        configuration: &Configuration,
+        declaration: &str,
+        reading: &KernelReading,
+        samples: usize,
+        resamples: usize,
+        identities: Vec<CertifiedIdentity>,
+        refusals: Vec<RefusedCandidate>,
+        certificate_terms: usize,
+        certificate_bits: u64,
+        elapsed_millis: u128,
+    ) -> Self {
+        Self {
+            configuration: configuration.name().to_owned(),
+            monomials: reading.monomials,
+            declaration: declaration.to_owned(),
+            samples,
+            resamples,
+            sampled_rank: reading.sampled_rank,
+            filtered_dimension: reading.monomials - reading.kernel.len(),
+            redundancy: reading.kernel.len(),
+            identities,
+            refusals,
+            certificate_terms,
+            certificate_bits,
+            elapsed_millis,
+        }
+    }
+    pub fn configuration(&self) -> &str {
+        &self.configuration
+    }
+    pub fn monomials(&self) -> usize {
+        self.monomials
+    }
+    pub fn declaration(&self) -> &str {
+        &self.declaration
+    }
+    pub fn samples(&self) -> usize {
+        self.samples
+    }
+    pub fn resamples(&self) -> usize {
+        self.resamples
+    }
+    pub fn sampled_rank(&self) -> usize {
+        self.sampled_rank
+    }
+    pub fn filtered_dimension(&self) -> usize {
+        self.filtered_dimension
+    }
+    pub fn redundancy(&self) -> usize {
+        self.redundancy
+    }
+    pub fn identities(&self) -> &[CertifiedIdentity] {
+        &self.identities
+    }
+    pub fn refusals(&self) -> &[RefusedCandidate] {
+        &self.refusals
+    }
+    pub fn certificate_terms(&self) -> usize {
+        self.certificate_terms
+    }
+    pub fn certificate_bits(&self) -> u64 {
+        self.certificate_bits
+    }
+    pub fn elapsed_millis(&self) -> u128 {
+        self.elapsed_millis
+    }
 }
 
 /// Walk one configuration: discover, certify on every chart, and re-sample from counterexamples.
@@ -1810,7 +2097,7 @@ pub fn walk(configuration: &Configuration) -> Result<AtlasReturn, IdentityAtlasE
             match certify(configuration, vector, &candidates)? {
                 Ok(identity) => identities.push(identity),
                 Err(refused) => {
-                    for (chart, verdict) in refused.verdicts.iter().enumerate() {
+                    for (chart, verdict) in refused.verdicts().iter().enumerate() {
                         if let ChartVerdict::Refused {
                             counterexample: Some(point),
                             ..
@@ -1823,33 +2110,35 @@ pub fn walk(configuration: &Configuration) -> Result<AtlasReturn, IdentityAtlasE
                 }
             }
         }
-        if refusals.is_empty() || new_points.is_empty() || resamples == RESAMPLE_CEILING {
-            if !refusals.is_empty() && resamples == RESAMPLE_CEILING {
-                return Err(IdentityAtlasError::ResampleCeiling { taken: resamples });
-            }
+        if refusals.is_empty() {
             let certificate_terms = identities
                 .iter()
-                .map(|identity| identity.certificate_terms)
+                .map(|identity| identity.certificate_terms())
                 .sum();
             let certificate_bits = identities
                 .iter()
-                .map(|identity| identity.certificate_bits)
+                .map(|identity| identity.certificate_bits())
                 .sum();
-            return Ok(AtlasReturn {
-                configuration: configuration.name().to_owned(),
-                monomials: reading.monomials,
-                declaration: family.declaration(),
-                samples: points.len(),
+            return Ok(AtlasReturn::from_walk(
+                configuration,
+                &family.declaration(),
+                &reading,
+                points.len(),
                 resamples,
-                sampled_rank: reading.sampled_rank,
-                filtered_dimension: reading.monomials - reading.kernel.len(),
-                redundancy: reading.kernel.len(),
                 identities,
                 refusals,
                 certificate_terms,
                 certificate_bits,
-                elapsed_millis: started.elapsed().as_millis(),
+                started.elapsed().as_millis(),
+            ));
+        }
+        if new_points.is_empty() {
+            return Err(IdentityAtlasError::UnresolvedCertification {
+                refused: refusals.len(),
             });
+        }
+        if resamples == RESAMPLE_CEILING {
+            return Err(IdentityAtlasError::ResampleCeiling { taken: resamples });
         }
         points.extend(new_points);
         if points.len() > SAMPLE_CEILING {
@@ -1871,19 +2160,37 @@ pub fn walk(configuration: &Configuration) -> Result<AtlasReturn, IdentityAtlasE
 /// `u ↦ δx` has zero generic kernel and kernel `⟨u⟩` at `δ = 0`. The specialized kernel is
 /// therefore computed **independently** and reduced against the transported ideal; the
 /// non-vanishing remainders are the relations the collapse created.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct CollapseComparison {
     /// The collapse's name, including which chart family the specialized configuration declares.
-    pub collapse: String,
+    collapse: String,
     /// The dimension of the independently certified specialized kernel.
-    pub specialized_dimension: usize,
+    specialized_dimension: usize,
     /// The transported generic identities, specialized into the collapsed receiver family.
-    pub transported: Vec<ExactMultivariate>,
+    transported: Vec<ExactMultivariate>,
     /// The relations the collapse created: certified specialized identities with nonzero normal
     /// form modulo the transported ideal.
-    pub extra_relations: Vec<ExactMultivariate>,
+    extra_relations: Vec<ExactMultivariate>,
     /// Whether the specialized kernel is contained in the transported ideal at this degree.
-    pub specialized_lies_in_transported: bool,
+    specialized_lies_in_transported: bool,
+}
+
+impl CollapseComparison {
+    pub fn collapse(&self) -> &str {
+        &self.collapse
+    }
+    pub fn specialized_dimension(&self) -> usize {
+        self.specialized_dimension
+    }
+    pub fn transported(&self) -> &[ExactMultivariate] {
+        &self.transported
+    }
+    pub fn extra_relations(&self) -> &[ExactMultivariate] {
+        &self.extra_relations
+    }
+    pub fn specialized_lies_in_transported(&self) -> bool {
+        self.specialized_lies_in_transported
+    }
 }
 
 /// Transport the generic identities through a collapse and compare with the specialized kernel.
@@ -1896,22 +2203,22 @@ pub fn compare_collapse(
 ) -> Result<CollapseComparison, IdentityAtlasError> {
     let mut transported = Vec::new();
     for identity in generic {
-        let moved = identity.polynomial.specialized(assignment, retained)?;
+        let moved = identity.polynomial().specialized(assignment, retained)?;
         if !moved.is_zero() {
             transported.push(moved);
         }
     }
     let closure = buchberger(&transported)?;
     let mut extra_relations = Vec::new();
-    for identity in &specialized.identities {
-        let (remainder, _) = normal_form(&identity.polynomial, &closure.basis)?;
+    for identity in specialized.identities() {
+        let (remainder, _) = normal_form(identity.polynomial(), closure.basis())?;
         if !remainder.is_zero() {
             extra_relations.push(remainder);
         }
     }
     Ok(CollapseComparison {
         collapse: collapse.to_owned(),
-        specialized_dimension: specialized.identities.len(),
+        specialized_dimension: specialized.identities().len(),
         transported,
         specialized_lies_in_transported: extra_relations.is_empty(),
         extra_relations,
@@ -1956,20 +2263,21 @@ fn one_angle_chart(winding: i64) -> Result<RationalChart, IdentityAtlasError> {
 /// consequences at `(4, 2)`.
 ///
 /// **Coverage.** For `k ≠ 0` the principal winding already misses only the single point
-/// `(C, S) = (−1, 0)`, a codimension-two subset of the surface, so its image is dense. At `k = 0`
+/// `(C, S) = (−1, 0)`, a codimension-one section of the surface, so its image is dense. At `k = 0`
 /// the missed set is the whole line `C = −1`, which is a **component** of the fibre — the half-turn
 /// winding is what covers it, and without it `C − 1` would be wrongly certified.
 pub fn two_sided_angle(
     head_degree: u32,
     tail_degree: u32,
 ) -> Result<Configuration, IdentityAtlasError> {
-    let family = ReceiverFamily::graded_with_tail(&ONE_ANGLE_RECEIVERS, 2, head_degree, tail_degree)?;
+    let family =
+        ReceiverFamily::graded_with_tail(&ONE_ANGLE_RECEIVERS, 2, head_degree, tail_degree)?;
     Configuration::new(
         "T0 the two-sided circle over a variable curvature",
         family,
         vec![one_angle_chart(1)?, one_angle_chart(-1)?],
         "[proved-standard] The surface C^2 + k S^2 - 1 = 0 is irreducible over Q (it is linear in \
-         k with unit content), and the two half-angle windings cover it minus the codimension-two \
+         k with unit content), and the two half-angle windings cover it minus the codimension-one \
          locus {t -> infinity}. Every component of every fibre k = c is met: the principal winding \
          covers the sheet through (1, 0) and the half-turn winding the sheet through (-1, 0), \
          which at k = 0 are the two distinct components C = +1 and C = -1.",
@@ -2004,28 +2312,30 @@ fn addition_chart(
     let two_t1 = ExactMultivariate::from_integer_terms(3, &[(&[1, 0, 0], 2)])?;
     let two_t2 = ExactMultivariate::from_integer_terms(3, &[(&[0, 1, 0], 2)])?;
     let curvature = ExactMultivariate::from_integer_terms(3, &[(&[0, 0, 1], 1)])?;
-    let denominator = a.times(&b);
+    let denominator = a.times(&b)?;
     let third = first_winding * second_winding;
-    let scale = |polynomial: &ExactMultivariate, winding: i64| polynomial.scaled(&rational(winding));
+    let scale = |polynomial: Result<ExactMultivariate, IdentityAtlasError>, winding: i64| {
+        polynomial.map(|polynomial| polynomial.scaled(&rational(winding)))
+    };
 
     // C3 = (a b - 4 k t1 t2) / (A B); S3 = 2 (t1 + t2) (1 - k t1 t2) / (A B).
     let four_k_t1_t2 = ExactMultivariate::from_integer_terms(3, &[(&[1, 1, 1], 4)])?;
-    let cosine_three = lower_a.times(&lower_b).minus(&four_k_t1_t2);
+    let cosine_three = lower_a.times(&lower_b)?.minus(&four_k_t1_t2)?;
     let sum = ExactMultivariate::from_integer_terms(3, &[(&[1, 0, 0], 2), (&[0, 1, 0], 2)])?;
     let one_minus = ExactMultivariate::from_integer_terms(3, &[(&[0, 0, 0], 1), (&[1, 1, 1], -1)])?;
-    let sine_three = sum.times(&one_minus);
+    let sine_three = sum.times(&one_minus)?;
 
     RationalChart::new(
         &format!("winding ({first_winding}, {second_winding})"),
         &ADDITION_PARAMETERS,
         vec![
-            scale(&lower_a.times(&b), first_winding),
-            scale(&two_t1.times(&b), first_winding),
-            scale(&lower_b.times(&a), second_winding),
-            scale(&two_t2.times(&a), second_winding),
-            scale(&cosine_three, third),
-            scale(&sine_three, third),
-            curvature.times(&denominator),
+            scale(lower_a.times(&b), first_winding)?,
+            scale(two_t1.times(&b), first_winding)?,
+            scale(lower_b.times(&a), second_winding)?,
+            scale(two_t2.times(&a), second_winding)?,
+            scale(Ok(cosine_three), third)?,
+            scale(Ok(sine_three), third)?,
+            curvature.times(&denominator)?,
         ],
         denominator,
         "all rational (t1, t2, k) with (1 + k t1^2)(1 + k t2^2) != 0",
@@ -2043,7 +2353,8 @@ pub fn two_sided_addition(
     head_degree: u32,
     tail_degree: u32,
 ) -> Result<Configuration, IdentityAtlasError> {
-    let family = ReceiverFamily::graded_with_tail(&ADDITION_RECEIVERS, 6, head_degree, tail_degree)?;
+    let family =
+        ReceiverFamily::graded_with_tail(&ADDITION_RECEIVERS, 6, head_degree, tail_degree)?;
     Configuration::new(
         "T1 two two-sided angles and their sum, uniformly in k",
         family,
@@ -2075,24 +2386,26 @@ fn collapsed_addition_chart(
     let lower_b = ExactMultivariate::from_integer_terms(2, &[(&[0, 0], 1), (&[0, 2], -k)])?;
     let two_t1 = ExactMultivariate::from_integer_terms(2, &[(&[1, 0], 2)])?;
     let two_t2 = ExactMultivariate::from_integer_terms(2, &[(&[0, 1], 2)])?;
-    let denominator = a.times(&b);
+    let denominator = a.times(&b)?;
     let third = first_winding * second_winding;
     let four_k_t1_t2 = ExactMultivariate::from_integer_terms(2, &[(&[1, 1], 4 * k)])?;
-    let cosine_three = lower_a.times(&lower_b).minus(&four_k_t1_t2);
+    let cosine_three = lower_a.times(&lower_b)?.minus(&four_k_t1_t2)?;
     let sum = ExactMultivariate::from_integer_terms(2, &[(&[1, 0], 2), (&[0, 1], 2)])?;
     let one_minus = ExactMultivariate::from_integer_terms(2, &[(&[0, 0], 1), (&[1, 1], -k)])?;
-    let sine_three = sum.times(&one_minus);
-    let scale = |polynomial: &ExactMultivariate, winding: i64| polynomial.scaled(&rational(winding));
+    let sine_three = sum.times(&one_minus)?;
+    let scale = |polynomial: Result<ExactMultivariate, IdentityAtlasError>, winding: i64| {
+        polynomial.map(|polynomial| polynomial.scaled(&rational(winding)))
+    };
     RationalChart::new(
         &format!("k = {curvature}, winding ({first_winding}, {second_winding})"),
         &["t1", "t2"],
         vec![
-            scale(&lower_a.times(&b), first_winding),
-            scale(&two_t1.times(&b), first_winding),
-            scale(&lower_b.times(&a), second_winding),
-            scale(&two_t2.times(&a), second_winding),
-            scale(&cosine_three, third),
-            scale(&sine_three, third),
+            scale(lower_a.times(&b), first_winding)?,
+            scale(two_t1.times(&b), first_winding)?,
+            scale(lower_b.times(&a), second_winding)?,
+            scale(two_t2.times(&a), second_winding)?,
+            scale(Ok(cosine_three), third)?,
+            scale(Ok(sine_three), third)?,
         ],
         denominator,
         "all rational (t1, t2) with (1 + k t1^2)(1 + k t2^2) != 0 at the declared curvature",
@@ -2122,7 +2435,10 @@ pub fn collapsed_addition(
         _ => "declared",
     };
     Configuration::new(
-        &format!("T1 collapse: {name} (k = {curvature}), {} winding chart(s)", charts.len()),
+        &format!(
+            "T1 collapse: {name} (k = {curvature}), {} winding chart(s)",
+            charts.len()
+        ),
         family,
         charts,
         "[definition] The coverage of this collapse is exactly the declared winding family. With \
@@ -2169,12 +2485,14 @@ pub const HELICAL_RECEIVERS_AT: [&str; 10] = [
 /// transferred law of sines** for the helical triple, uniformly in `k`. At `k = 0` this is Study's
 /// spatial law for three lines; the `ι`-component is the one that carries the pitches and moments.
 ///
-/// **Coverage.** The chart is polynomial on the whole affine space of two-sided Gram data, so every
-/// certified relation is an identity of `Q[K, R, k]` and holds for **every** helical triple whose
-/// forms are those. The reverse inclusion — that no identity of the screw configuration is missed —
-/// rests on the screw-to-Gram map being dominant onto `Sym₃ ⊕ Sym₃`, which is the declared
-/// hypothesis and is exercised on real rational screws by this module's tests.
-pub fn helical_triple(head_degree: u32, tail_degree: u32) -> Result<Configuration, IdentityAtlasError> {
+/// **Coverage.** The supplied chart is polynomial on the whole affine space of two-sided Gram data,
+/// so every certified relation is an identity of `Q[K, R, k]` and holds for **every** helical triple
+/// whose forms are those. Equality with the full screw identity kernel additionally needs dominance
+/// of the screw-to-Gram map; the rational screw checks below establish soundness points only.
+pub fn helical_triple(
+    head_degree: u32,
+    tail_degree: u32,
+) -> Result<Configuration, IdentityAtlasError> {
     helical_configuration(None, head_degree, tail_degree)
 }
 
@@ -2220,32 +2538,33 @@ fn helical_configuration(
     let spq = |kjj: &ExactMultivariate,
                rjj: &ExactMultivariate,
                k1j: &ExactMultivariate,
-               r1j: &ExactMultivariate| {
+               r1j: &ExactMultivariate|
+     -> Result<_, IdentityAtlasError> {
         let real = k11
-            .times(kjj)
-            .plus(&curvature.times(&r11.times(rjj)))
-            .minus(&k1j.times(k1j))
-            .minus(&curvature.times(&r1j.times(r1j)));
+            .times(kjj)?
+            .plus(&curvature.times(&r11.times(rjj)?)?)?
+            .minus(&k1j.times(k1j)?)?
+            .minus(&curvature.times(&r1j.times(r1j)?)?)?;
         let imaginary = k11
-            .times(rjj)
-            .plus(&r11.times(kjj))
-            .minus(&two.times(&k1j.times(r1j)));
-        (real, imaginary)
+            .times(rjj)?
+            .plus(&r11.times(kjj)?)?
+            .minus(&two.times(&k1j.times(r1j)?)?)?;
+        Ok((real, imaginary))
     };
-    let (spq12k, spq12r) = spq(&k22, &r22, &k12, &r12);
-    let (spq13k, spq13r) = spq(&k33, &r33, &k13, &r13);
+    let (spq12k, spq12r) = spq(&k22, &r22, &k12, &r12)?;
+    let (spq13k, spq13r) = spq(&k33, &r33, &k13, &r13)?;
 
     // Cross = G11 G23 − G12 G13.
     let cross_real = k11
-        .times(&k23)
-        .plus(&curvature.times(&r11.times(&r23)))
-        .minus(&k12.times(&k13))
-        .minus(&curvature.times(&r12.times(&r13)));
+        .times(&k23)?
+        .plus(&curvature.times(&r11.times(&r23)?)?)?
+        .minus(&k12.times(&k13)?)?
+        .minus(&curvature.times(&r12.times(&r13)?)?)?;
     let cross_imaginary = k11
-        .times(&r23)
-        .plus(&r11.times(&k23))
-        .minus(&k12.times(&r13))
-        .minus(&r12.times(&k13));
+        .times(&r23)?
+        .plus(&r11.times(&k23)?)?
+        .minus(&k12.times(&r13)?)?
+        .minus(&r12.times(&k13)?)?;
 
     // det(K + x R) = det K + x tr(adj(K) R) + x² tr(adj(R) K) + x³ det R, then x = ι, ι² = k.
     let determinant = |a11: &ExactMultivariate,
@@ -2253,10 +2572,15 @@ fn helical_configuration(
                        a13: &ExactMultivariate,
                        a22: &ExactMultivariate,
                        a23: &ExactMultivariate,
-                       a33: &ExactMultivariate| {
-        a11.times(&a22.times(a33).minus(&a23.times(a23)))
-            .minus(&a12.times(&a12.times(a33).minus(&a23.times(a13))))
-            .plus(&a13.times(&a12.times(a23).minus(&a22.times(a13))))
+                       a33: &ExactMultivariate|
+     -> Result<ExactMultivariate, IdentityAtlasError> {
+        let first = a22.times(a33)?.minus(&a23.times(a23)?)?;
+        let second = a12.times(a33)?.minus(&a23.times(a13)?)?;
+        let third = a12.times(a23)?.minus(&a22.times(a13)?)?;
+        Ok(a11
+            .times(&first)?
+            .minus(&a12.times(&second)?)?
+            .plus(&a13.times(&third)?)?)
     };
     let adjugate_pairing = |a11: &ExactMultivariate,
                             a12: &ExactMultivariate,
@@ -2269,32 +2593,33 @@ fn helical_configuration(
                             b13: &ExactMultivariate,
                             b22: &ExactMultivariate,
                             b23: &ExactMultivariate,
-                            b33: &ExactMultivariate| {
+                            b33: &ExactMultivariate|
+     -> Result<ExactMultivariate, IdentityAtlasError> {
         // tr(adj(A) B) for symmetric A, B.
-        let adj11 = a22.times(a33).minus(&a23.times(a23));
-        let adj22 = a11.times(a33).minus(&a13.times(a13));
-        let adj33 = a11.times(a22).minus(&a12.times(a12));
-        let adj12 = a13.times(a23).minus(&a12.times(a33));
-        let adj13 = a12.times(a23).minus(&a13.times(a22));
-        let adj23 = a12.times(a13).minus(&a11.times(a23));
-        adj11
-            .times(b11)
-            .plus(&adj22.times(b22))
-            .plus(&adj33.times(b33))
-            .plus(&two.times(&adj12.times(b12)))
-            .plus(&two.times(&adj13.times(b13)))
-            .plus(&two.times(&adj23.times(b23)))
+        let adj11 = a22.times(a33)?.minus(&a23.times(a23)?)?;
+        let adj22 = a11.times(a33)?.minus(&a13.times(a13)?)?;
+        let adj33 = a11.times(a22)?.minus(&a12.times(a12)?)?;
+        let adj12 = a13.times(a23)?.minus(&a12.times(a33)?)?;
+        let adj13 = a12.times(a23)?.minus(&a13.times(a22)?)?;
+        let adj23 = a12.times(a13)?.minus(&a11.times(a23)?)?;
+        Ok(adj11
+            .times(b11)?
+            .plus(&adj22.times(b22)?)?
+            .plus(&adj33.times(b33)?)?
+            .plus(&two.times(&adj12.times(b12)?)?)?
+            .plus(&two.times(&adj13.times(b13)?)?)?
+            .plus(&two.times(&adj23.times(b23)?)?)?)
     };
-    let det_k = determinant(&k11, &k12, &k13, &k22, &k23, &k33);
-    let det_r = determinant(&r11, &r12, &r13, &r22, &r23, &r33);
+    let det_k = determinant(&k11, &k12, &k13, &k22, &k23, &k33)?;
+    let det_r = determinant(&r11, &r12, &r13, &r22, &r23, &r33)?;
     let adj_k_r = adjugate_pairing(
         &k11, &k12, &k13, &k22, &k23, &k33, &r11, &r12, &r13, &r22, &r23, &r33,
-    );
+    )?;
     let adj_r_k = adjugate_pairing(
         &r11, &r12, &r13, &r22, &r23, &r33, &k11, &k12, &k13, &k22, &k23, &k33,
-    );
-    let gram_real = det_k.plus(&curvature.times(&adj_r_k));
-    let gram_imaginary = adj_k_r.plus(&curvature.times(&det_r));
+    )?;
+    let gram_real = det_k.plus(&curvature.times(&adj_r_k)?)?;
+    let gram_imaginary = adj_k_r.plus(&curvature.times(&det_r)?)?;
 
     let parameters: &[&str] = if constant_curvature.is_some() {
         &HELICAL_PARAMETERS[..12]
@@ -2319,11 +2644,7 @@ fn helical_configuration(
         values.push(curvature.clone());
         &HELICAL_RECEIVERS
     };
-    let chart = RationalChart::polynomial(
-        "the two-sided Gram of the triple",
-        parameters,
-        values,
-    )?;
+    let chart = RationalChart::polynomial("the two-sided Gram of the triple", parameters, values)?;
     let family = ReceiverFamily::graded_with_tail(receivers, 10, head_degree, tail_degree)?;
     Configuration::new(
         &match constant_curvature {
@@ -2332,12 +2653,15 @@ fn helical_configuration(
         },
         family,
         vec![chart],
-        "[proved-standard for soundness] The chart is polynomial on the whole affine space of \
+        "[proved-standard for soundness] The supplied chart is polynomial on the whole affine space of \
          two-sided Gram data, so every certified relation is an identity of Q[K, R, k] and holds \
          for every helical triple. [agent-inferred for completeness] The reverse inclusion needs \
          the screw-to-Gram map (u_i, v_i) |-> (u_i . u_j, u_i . v_j + v_i . u_j) to be dominant \
-         onto Sym_3 (+) Sym_3, which it is by dimension (18 parameters, 12 coordinates, generic \
-         fibre O(3) x 0) and which the screw realization test exercises on rational screws.",
+         onto Sym_3 (+) Sym_3. The differential at U = I, V = 0 is \
+         (dU^T + dU, dV + dV^T), of rank 12 in characteristic zero; this is the dominance \
+         certificate. The generic fibre also carries the three-dimensional skew part of U^T V, \
+         in addition to the orthogonal U freedom. Rational screw tests provide soundness points, \
+         not the dominance proof.",
         4,
         0x5c_2e_77,
     )
@@ -2349,17 +2673,16 @@ fn helical_configuration(
 /// parameters in [`HELICAL_PARAMETERS`]' order at the declared curvature: a real configuration
 /// point, so a certified identity can be checked against actual helical axes rather than against
 /// the Gram chart alone.
-pub fn screw_gram_point(
-    screws: &[([Rat; 3], [Rat; 3]); 3],
-    curvature: Rat,
-) -> Vec<Rat> {
-    let dot = |left: &[Rat; 3], right: &[Rat; 3]| {
-        left.iter()
-            .zip(right)
-            .fold(Rat::zero(), |sum, (a, b)| sum + a * b)
+pub fn screw_gram_point(screws: &[([Rat; 3], [Rat; 3]); 3], curvature: Rat) -> Vec<Rat> {
+    let generator = |(angular, advance): &([Rat; 3], [Rat; 3])| {
+        ScrewGenerator::new(
+            RatVec3::new(angular[0].clone(), angular[1].clone(), angular[2].clone()),
+            RatVec3::new(advance[0].clone(), advance[1].clone(), advance[2].clone()),
+        )
     };
-    let killing = |i: usize, j: usize| dot(&screws[i].0, &screws[j].0);
-    let reciprocal = |i: usize, j: usize| dot(&screws[i].0, &screws[j].1) + dot(&screws[i].1, &screws[j].0);
+    let generators = screws.iter().map(generator).collect::<Vec<_>>();
+    let killing = |i: usize, j: usize| generators[i].angular_pairing(&generators[j]);
+    let reciprocal = |i: usize, j: usize| generators[i].reciprocal_pairing(&generators[j]);
     vec![
         killing(0, 0),
         killing(0, 1),

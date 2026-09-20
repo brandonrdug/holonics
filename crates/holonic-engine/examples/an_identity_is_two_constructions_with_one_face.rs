@@ -59,49 +59,52 @@ fn rule(title: &str) {
 }
 
 fn report(returned: &AtlasReturn, receiver_names: &[String]) {
-    println!("  configuration            {}", returned.configuration);
-    println!("  declared family          {}", returned.declaration);
+    println!("  configuration            {}", returned.configuration());
+    println!("  declared family          {}", returned.declaration());
     println!(
         "  |Mon|                    {}   samples {}   resamples {}",
-        returned.monomials, returned.samples, returned.resamples
+        returned.monomials(),
+        returned.samples(),
+        returned.resamples()
     );
     println!(
         "  sampled rank             {}   (a lower bound until every basis vector is certified)",
-        returned.sampled_rank
+        returned.sampled_rank()
     );
     println!(
         "  filtered dimension       {}   cumulative Hilbert function through the declared degree",
-        returned.filtered_dimension
+        returned.filtered_dimension()
     );
     println!(
         "  algebraic redundancy     {}   = dim ker E, the identities of the declared family",
-        returned.redundancy
+        returned.redundancy()
     );
     println!(
         "  certified                {}   refused {}",
-        returned.identities.len(),
-        returned.refusals.len()
+        returned.identities().len(),
+        returned.refusals().len()
     );
     println!(
         "  certificate size         {} terms, {} coefficient bits   [codec cost, measured separately]",
-        returned.certificate_terms, returned.certificate_bits
+        returned.certificate_terms(),
+        returned.certificate_bits()
     );
     println!(
         "  check cost               {} ms   [wall clock, measured separately]",
-        returned.elapsed_millis
+        returned.elapsed_millis()
     );
-    for (index, identity) in returned.identities.iter().enumerate() {
+    for (index, identity) in returned.identities().iter().enumerate() {
         println!(
             "    [{index:>2}] {}",
-            identity.polynomial.written(receiver_names)
+            identity.polynomial().written(receiver_names)
         );
     }
-    for refusal in &returned.refusals {
+    for refusal in returned.refusals() {
         println!(
             "    REFUSED {}",
-            refusal.polynomial.written(receiver_names)
+            refusal.polynomial().written(receiver_names)
         );
-        for verdict in &refusal.verdicts {
+        for verdict in refusal.verdicts() {
             if let ChartVerdict::Refused {
                 chart,
                 remainder_terms,
@@ -126,46 +129,50 @@ fn closure_report(
     println!(
         "  elementary generators    {} new, {} consequences ({} reduction steps) — I4's reduction \
          by increasing degree, in a filtered chart",
-        elementary.generators.len(),
-        elementary.consequences,
-        elementary.reduction_steps
+        elementary.generators().len(),
+        elementary.consequences(),
+        elementary.reduction_steps()
     );
-    for generator in &elementary.generators {
+    for generator in elementary.generators() {
         println!("    NEW  {}", generator.written(receiver_names));
     }
-    let closure = elementary.closure.clone();
+    let closure = elementary.closure().clone();
     let completeness = bounded_degree_completeness(identities, &closure)?;
     println!(
         "  Groebner closure         {} basis members under {} ({} S-pairs: {} discharged by the \
          product criterion, {} by the chain criterion, {} reduced, {} ms)",
-        closure.basis.len(),
-        closure.order,
-        closure.reductions.len(),
+        closure.basis().len(),
+        closure.order(),
+        closure.reductions().len(),
         closure
-            .reductions
+            .reductions()
             .iter()
             .filter(|reduction| reduction.coprime)
             .count(),
         closure
-            .reductions
+            .reductions()
             .iter()
             .filter(|reduction| reduction.chain)
             .count(),
         closure
-            .reductions
+            .reductions()
             .iter()
             .filter(|reduction| !reduction.chain && !reduction.coprime)
             .count(),
-        closure.elapsed_millis
+        closure.elapsed_millis()
     );
-    for member in &closure.basis {
+    for member in closure.basis() {
         println!("    G  {}", member.written(receiver_names));
     }
     println!(
         "  bounded-degree complete  {}   ({} reduction steps)",
-        completeness.every_certified_vector_reduces_to_zero, completeness.reduction_steps
+        completeness.every_certified_vector_reduces_to_zero(),
+        completeness.reduction_steps()
     );
-    println!("  STILL OWED               {}", completeness.remaining_obligation);
+    println!(
+        "  STILL OWED               {}",
+        completeness.remaining_obligation()
+    );
     Ok(())
 }
 
@@ -202,9 +209,7 @@ fn matroid_report(
         .iter()
         .zip(&reading.support_is_circuit)
     {
-        println!(
-            "    identity support {support:?} is a minimal sampled dependency: {circuit}"
-        );
+        println!("    identity support {support:?} is a minimal sampled dependency: {circuit}");
     }
     match &reading.chow {
         ChowScope::Admitted {
@@ -218,9 +223,9 @@ fn matroid_report(
         ChowScope::Refused { reason } => println!("  identity circuit REFUSED {reason}"),
     }
     match &reading.full_matroid_scope {
-        ChowScope::Admitted { ground, rank, .. } => println!(
-            "  whole column matroid     admissible: simple ground {ground}, rank {rank}"
-        ),
+        ChowScope::Admitted { ground, rank, .. } => {
+            println!("  whole column matroid     admissible: simple ground {ground}, rank {rank}")
+        }
         ChowScope::Refused { reason } => println!("  whole matroid REFUSED    {reason}"),
     }
     Ok(())
@@ -244,7 +249,7 @@ fn main() -> Result<(), IdentityAtlasError> {
     }
     let t0_return = walk(&t0)?;
     report(&t0_return, &t0_names);
-    matroid_report(&t0, &t0_return.identities)?;
+    matroid_report(&t0, t0_return.identities())?;
 
     rule("T0 — the bounded-degree consequences of that one generator");
     let wide = two_sided_angle(4, 2)?;
@@ -254,11 +259,13 @@ fn main() -> Result<(), IdentityAtlasError> {
         "\n  Every one of these is a monomial multiple of the single generator. The check is a\n\
          reduction, not a count:"
     );
-    let generator_closure = buchberger(&[t0_return.identities[0].polynomial.clone()])?;
-    let consequence_check = bounded_degree_completeness(&wide_return.identities, &generator_closure)?;
+    let generator_closure = buchberger(&[t0_return.identities()[0].polynomial().clone()])?;
+    let consequence_check =
+        bounded_degree_completeness(wide_return.identities(), &generator_closure)?;
     println!(
         "  every consequence reduces to zero modulo the generator: {}   ({} steps)",
-        consequence_check.every_certified_vector_reduces_to_zero, consequence_check.reduction_steps
+        consequence_check.every_certified_vector_reduces_to_zero(),
+        consequence_check.reduction_steps()
     );
 
     // ---------------------------------------------------------------------------------------
@@ -274,8 +281,8 @@ fn main() -> Result<(), IdentityAtlasError> {
     );
     let t1_return = walk(&t1)?;
     report(&t1_return, &t1_names);
-    closure_report(&t1_return.identities, &t1_names)?;
-    matroid_report(&t1, &t1_return.identities)?;
+    closure_report(t1_return.identities(), &t1_names)?;
+    matroid_report(&t1, t1_return.identities())?;
 
     // ---------------------------------------------------------------------------------------
     rule("T1 — the three collapses, each kernel computed SEPARATELY");
@@ -293,17 +300,17 @@ fn main() -> Result<(), IdentityAtlasError> {
         moved[6] = Some(rational(curvature));
         let comparison = compare_collapse(
             &format!("k -> {curvature}, all four windings"),
-            &t1_return.identities,
+            t1_return.identities(),
             &moved,
             &retained,
             &collapsed_return,
         )?;
         println!(
             "  transported generic ideal has {} generators; specialized kernel lies inside it: {}",
-            comparison.transported.len(),
-            comparison.specialized_lies_in_transported
+            comparison.transported().len(),
+            comparison.specialized_lies_in_transported()
         );
-        for relation in &comparison.extra_relations {
+        for relation in comparison.extra_relations() {
             println!(
                 "    EXTRA SPECIAL-FIBRE RELATION  {}",
                 relation.written(&collapsed_names)
@@ -328,36 +335,35 @@ fn main() -> Result<(), IdentityAtlasError> {
     let complete_return = walk(&complete)?;
     let partial = compare_collapse(
         "k -> 0, principal winding alone",
-        &t1_return.identities,
+        t1_return.identities(),
         &galilean,
         &retained,
         &principal_return,
     )?;
     println!(
         "\n  one winding gives {} certified identities; four windings give {}.",
-        principal_return.identities.len(),
-        complete_return.identities.len()
+        principal_return.identities().len(),
+        complete_return.identities().len()
     );
     println!(
         "  relations the one-chart declaration creates beyond the transported ideal: {}",
-        partial.extra_relations.len()
+        partial.extra_relations().len()
     );
-    for relation in partial.extra_relations.iter().take(6) {
+    for relation in partial.extra_relations().iter().take(6) {
         println!("    {}", relation.written(&collapsed_names));
     }
-    if partial.extra_relations.len() > 6 {
-        println!("    … and {} more", partial.extra_relations.len() - 6);
+    if partial.extra_relations().len() > 6 {
+        println!("    … and {} more", partial.extra_relations().len() - 6);
     }
 
     // C1 - 1 itself: certified on one chart, refused with a point on four.
     let width = COLLAPSED_ADDITION_RECEIVERS.len();
     let mut exponents = vec![0u32; width];
     exponents[0] = 1;
-    let candidate = ExactMultivariate::term(width, exponents, Rat::from_integer(BigInt::from(1)))?
-        .minus(&ExactMultivariate::constant(
-            width,
-            Rat::from_integer(BigInt::from(1)),
-        ));
+    let candidate =
+        ExactMultivariate::term(width, exponents, Rat::from_integer(BigInt::from(1)))?.minus(
+            &ExactMultivariate::constant(width, Rat::from_integer(BigInt::from(1))),
+        )?;
     let vector_of = |configuration: &Configuration, polynomial: &ExactMultivariate| {
         configuration
             .family()
@@ -384,7 +390,7 @@ fn main() -> Result<(), IdentityAtlasError> {
     match certify(&complete, &vector_of(&complete, &candidate), &grid)? {
         Ok(_) => println!("  C1 - 1 on all four windings: certified (this would be a bug)"),
         Err(refused) => {
-            for verdict in &refused.verdicts {
+            for verdict in refused.verdicts() {
                 if let ChartVerdict::Refused {
                     chart,
                     counterexample: Some(point),
@@ -418,7 +424,7 @@ fn main() -> Result<(), IdentityAtlasError> {
     );
     let t2_return = walk(&t2)?;
     report(&t2_return, &t2_names);
-    closure_report(&t2_return.identities, &t2_names)?;
+    closure_report(t2_return.identities(), &t2_names)?;
 
     println!(
         "\n  The same relations on REAL rational screws — three axis directions with rational\n\
@@ -439,9 +445,9 @@ fn main() -> Result<(), IdentityAtlasError> {
         let point = screw_gram_point(&screws, rational(curvature));
         let receivers = t2.charts()[0].receivers_at(&point)?;
         let mut held = true;
-        for identity in &t2_return.identities {
+        for identity in t2_return.identities() {
             let mut total = Rat::zero();
-            for (monomial, coefficient) in identity.polynomial.terms() {
+            for (monomial, coefficient) in identity.polynomial().terms() {
                 let mut term = coefficient.clone();
                 for (slot, exponent) in monomial.iter().enumerate() {
                     for _ in 0..*exponent {
@@ -474,7 +480,9 @@ fn main() -> Result<(), IdentityAtlasError> {
         let returned = walk(&ladder)?;
         println!(
             "  {head:>11} | {monomials:>5} | {:>7} | {:>10} | {:>7}",
-            returned.samples, returned.redundancy, returned.elapsed_millis
+            returned.samples(),
+            returned.redundancy(),
+            returned.elapsed_millis()
         );
     }
     match ReceiverFamily::graded_with_tail(&ADDITION_RECEIVERS, 6, 5, 1) {

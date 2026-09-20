@@ -1,16 +1,23 @@
 # The conditioned RBX1 static response returns its null fibre, its refusals and its sign
 
+[historical] Further runs of this application are deferred by the latest post-Wave-10 request.
+The [library audit](../../records/2026-09-20_WAVE_TEN_IS_REPAIRED_AND_THE_LIBRARY_RETURNS_TO_HELICAL_GENERATORS_AND_HNN.md)
+retains these measurements and repairs the generic response owner. In particular, the old
+response-family reading considered individually compatible input columns; the complete admissible
+family is `ker(Z*B)` and can include their combinations. Old family-rank fields below remain
+measurements of the earlier implementation, not evidence that the repaired full family was run.
+
 [measured] Dated 2026-09-19, on tree `27c72825`. Issue advanced: **#55**. Contract:
 [the conditioned structural response consumer](../../../docs/plans/THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-conditioned-structural-response-consumer).
 Counterexample that shaped it: the
 [plan audit](../../records/2026-09-19_THE_PLAN_AUDIT_RECONNECTS_SHARED_LAWS_CONSUMERS_AND_HARDWARE.md#verification).
 
-**What this is.** The program has so far *read* conformations other predictors produced. This is
-the first **source-conditioned static response the program generates itself**, scored against
+**What this is.** This experiment extends the preceding structural readings with a
+**source-conditioned static response**, scored against
 measurement already on disk. It is a bounded elastic experiment. It is **not** general structure
 prediction, and it is not an admission test for whether a generated response counts as prediction.
 
-**What it returned.** A failure, and the failure is the result. On the N-terminal arm the declared
+**What it returned.** On the N-terminal arm the declared
 uniform-compression response is **oriented opposite** to the measured free→bound change against
 both bound partners, and its *largest* unoriented overlap with a sibling model of the source NMR
 ensemble (`cos² = 0.821`, and the same sign in 19 of 19 models) exceeds its unoriented overlap with

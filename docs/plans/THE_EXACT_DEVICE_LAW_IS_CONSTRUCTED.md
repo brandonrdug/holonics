@@ -551,6 +551,12 @@ remain open where consumed. The roadmap selects the next operation below; D4 rem
 
 ### The shared exact algebra consumer
 
+[established-bounded; source-inspected] Wave 10 returned the host `prime_image_algebra` realization
+behind `ExactRatMatrix`; it did not return resident modular elimination. Its 324/612-coordinate
+benchmarks use synthetic lattice/bar data, not the earlier measured RBX1 matrices. The latest
+roadmap defers further protein runs and selects HNN/shared-library consumers. This preserves the
+unreturned device obligation without presenting the synthetic timing as its completion.
+
 [open] Issue #50 connects `exact_linear` and the contact/rigidity consumers to the existing
 hardware methodology. `SectionLayout` currently generates gather/local-apply/scatter over one
 declared ring and local operator. It does not already implement rational elimination, a changing
@@ -573,12 +579,16 @@ returns. A sequence of dependent pivots is not made independent by allocating mo
 | Characteristic polynomial | Reconstruct coefficients with a proved sufficient modulus/bound or another exact identity certificate. One modular polynomial does not determine rational coefficients. |
 | Inertia | Use a certified rational congruence or a certified real-rooted characteristic polynomial with sign/root counts; finite fields have no positive/negative ordering. PSD supplied by a contact construction can discharge that sign claim, but not an unknown rank or response. |
 
-[definition; agent-inferred] Start with rank/kernel/solve and sparse contact assembly at the
-existing rigidity and chain calls, because those are the measured consumers. Keep factors and
-intermediate sections resident and account separately for preparation, image work, reconstruction,
-verification, readout and full delivery. The reference path is retained for scoped exact
-comparisons; it is not a second production pipeline that must finish before a device passage is
-built. The first completion evidence is the 324-coordinate target and 612-coordinate complex,
-with the same receiver values or an explicit new representation/residual, actual thread/device
-placement and cost. No speedup in seconds is assumed in advance. Characteristic polynomial and
-general inertia follow when their consumers require them; they do not block a certified solve.
+[definition] Continue from the returned host rank/kernel/solve; do not rebuild that reference.
+The device passage still owes its pivot updates, supported arithmetic, live allocation/context
+ownership and consuming call. `ResidentBilinearFeatures`, `resident_section/bilinear.rs` and
+`exact_packet_linear.cuh` are existing **device** owners with wide rational packet/denominator
+and refusal conventions. They supply implementation material; their ring and operation do not
+automatically implement the modular elimination schedule. `SectionLayout`'s present shared local
+linear operator likewise needs the actual rank-one update or per-region coefficient operation.
+
+[definition] Retain factors and intermediate sections resident; account separately for preparation,
+image work, reconstruction, verification, readout and full delivery at the roadmap's selected
+HNN/shared-library consumer. The former 324/612 measured-protein criterion was not completed by
+the synthetic benchmarks and is now deferred with that application. Characteristic polynomial
+and general inertia follow when their consumers require them; they do not block a certified solve.

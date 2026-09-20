@@ -375,6 +375,10 @@ pub enum InteractionRefusal {
     /// The junction owner refused.
     #[error(transparent)]
     Junction(#[from] JunctionRefusal),
+    /// The certified prime-image rank or fibre owner refused. Preserve the exact cause so a
+    /// caller can distinguish a prime budget, reconstruction, cover, or extent refusal.
+    #[error(transparent)]
+    PrimeImage(#[from] crate::prime_image_algebra::PrimeImageRefusal),
 }
 
 fn bounded(
@@ -405,6 +409,30 @@ fn bounded_product(
     }
     bounded(what, work, ceiling)?;
     Ok(work)
+}
+
+/// Upper bound on the actual arithmetic loops in [`ContactFace::accumulate_into`]. The first
+/// contraction forms `D_f J_f` (`m²s` operations), and the second contracts it with `J_fᵀ`
+/// (`ms²` operations), where `m` is the response/slip extent and `s` is the support population.
+fn sparse_face_work(
+    slip_extent: usize,
+    support: usize,
+) -> Result<usize, InteractionRefusal> {
+    let pulled = bounded_product(
+        "a contact face's pulled sparse block",
+        &[slip_extent, slip_extent, support],
+        DECLARED_ASSEMBLY_CEILING,
+    )?;
+    let accumulated = bounded_product(
+        "a contact face's accumulated sparse block",
+        &[slip_extent, support, support],
+        DECLARED_ASSEMBLY_CEILING,
+    )?;
+    pulled
+        .checked_add(accumulated)
+        .ok_or(InteractionRefusal::WorkOverflows {
+            what: "a contact face's sparse work",
+        })
 }
 
 /// An exact rational from an integer. The only numeric literal path in this module.
@@ -907,19 +935,15 @@ impl ContactDissipation {
     /// entries whatever the joint dimension is, and the assembly costs
     ///
     /// ```text
-    /// Σ_f slip_extent_f · support_f²        instead of        faces · slip · dimension².
+    /// Σ_f (slip_extent_f² · support_f + slip_extent_f · support_f²).
     /// ```
     ///
-    /// **No ceiling moved.** [`DECLARED_ASSEMBLY_CEILING`] is unchanged at `2^26` and still bounds
-    /// both the arithmetic above *and* the assembled form's own `dimension²` residency, each
-    /// checked before the first entry is formed. What changed is that the quantity checked against
-    /// it is the one the operation actually has. At the 612-coordinate extent Issue #50 records as
-    /// refused, a bar face has `slip_extent = 1` and `support = 6`, so the dense bound charges
-    /// `612² = 374_544` per face and the ceiling admits **179 faces**, while the assembly performs
-    /// `36` per face and the same ceiling admits **1.8 million** — and the assembled form itself is
-    /// `374_544` entries, comfortably inside. A dense population, where every face touches every
-    /// coordinate, has `support = dimension` and reaches exactly the bound it always did; the test
-    /// `a_dense_face_population_still_meets_the_unchanged_ceiling` holds that.
+    /// **No ceiling moved.** [`DECLARED_ASSEMBLY_CEILING`] bounds those contractions,
+    /// the assembled form's `dimension²` residency, and the additional high-dimensional
+    /// signature probes. Every arithmetic term is charged before constructing the form.
+    /// At 612 coordinates a synthetic bar face with slip extent 1 and support 6 needs 42
+    /// contraction products, versus 374,544 entries in a dense face presentation. The
+    /// synthetic 204-site test demonstrates this shape; it is not the measured M5 complex.
     ///
     /// **One assembled form per reading.** The accumulation runs once into one sparse body; the
     /// previous form built a full `dimension × dimension` matrix per face and added it, which is
@@ -956,11 +980,7 @@ impl ContactDissipation {
             .collect::<Result<_, _>>()?;
         let mut arithmetic = 0usize;
         for (face, support) in faces.iter().zip(&supports) {
-            let block = bounded_product(
-                "a contact face's sparse block",
-                &[face.slip_extent(), support.len(), support.len()],
-                DECLARED_ASSEMBLY_CEILING,
-            )?;
+            let block = sparse_face_work(face.slip_extent(), support.len())?;
             arithmetic = arithmetic
                 .checked_add(block)
                 .ok_or(InteractionRefusal::WorkOverflows {
@@ -973,6 +993,52 @@ impl ContactDissipation {
             &[dimension, dimension],
             DECLARED_ASSEMBLY_CEILING,
         )?;
+
+        // Above the congruence ceiling, the independent face/form probes are part of the work
+        // this declaration admits. Charge the actual dense form pairing and each face's
+        // `weighted_power_under` loops before constructing the assembled body.
+        if dimension > DECLARED_ASSEMBLY_CONGRUENCE_CEILING {
+            let form_probe_work = bounded_product(
+                "a contact signature probe form",
+                &[dimension, dimension],
+                DECLARED_ASSEMBLY_CEILING,
+            )?;
+            let mut face_probe_work = 0usize;
+            for (face, support) in faces.iter().zip(&supports) {
+                let response = bounded_product(
+                    "a contact signature probe response",
+                    &[face.slip_extent(), face.slip_extent()],
+                    DECLARED_ASSEMBLY_CEILING,
+                )?;
+                let slip = bounded_product(
+                    "a contact signature probe slip",
+                    &[face.slip_extent(), support.len()],
+                    DECLARED_ASSEMBLY_CEILING,
+                )?;
+                face_probe_work = face_probe_work
+                    .checked_add(response)
+                    .and_then(|work| work.checked_add(slip))
+                    .ok_or(InteractionRefusal::WorkOverflows {
+                        what: "contact signature probe work",
+                    })?;
+            }
+            let per_probe = form_probe_work
+                .checked_add(face_probe_work)
+                .ok_or(InteractionRefusal::WorkOverflows {
+                    what: "contact signature probe work",
+                })?;
+            let probes = DECLARED_ASSEMBLY_PROBES.checked_mul(per_probe).ok_or(
+                InteractionRefusal::WorkOverflows {
+                    what: "contact signature probe work",
+                },
+            )?;
+            arithmetic = arithmetic
+                .checked_add(probes)
+                .ok_or(InteractionRefusal::WorkOverflows {
+                    what: "a contact assembly",
+                })?;
+            bounded("a contact assembly", arithmetic, DECLARED_ASSEMBLY_CEILING)?;
+        }
 
         // One assembled body, accumulated into once per face and only where the face reaches.
         let mut accumulated: BTreeMap<(usize, usize), Rat> = BTreeMap::new();
@@ -1057,13 +1123,7 @@ impl ContactDissipation {
                 });
             }
         }
-        let certificate = crate::prime_image_algebra::certified_kernel(assembled).map_err(|_| {
-            InteractionRefusal::DeclarationAboveCeiling {
-                what: "a certified assembly rank",
-                declared: assembled.columns(),
-                ceiling: DECLARED_ASSEMBLY_CEILING,
-            }
-        })?;
+        let certificate = crate::prime_image_algebra::certified_kernel(assembled)?;
         let dimension = assembled.columns();
         let rank = certificate.rank();
         for motion in certificate.kernel() {

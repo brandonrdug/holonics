@@ -1170,12 +1170,13 @@ fn the_612_coordinate_complex_that_the_dense_bound_refused_now_assembles() {
         dense_bound > DECLARED_ASSEMBLY_CEILING,
         "the dense bound is {dense_bound}, past the unchanged ceiling {DECLARED_ASSEMBLY_CEILING}"
     );
-    // What the sparse assembly checks instead, against that same ceiling.
+    // The pullback portion of the synthetic sparse work, against the same ceiling.
+    // Production additionally charges D*J and the signature probes; their bounds are tested below.
     let sparse_bound: usize = faces
         .iter()
         .map(|face| {
             let support = face.support().expect("support").len();
-            face.slip_extent() * support * support
+            sparse_face_work(face.slip_extent(), support).expect("bounded sparse work")
         })
         .sum();
     assert!(
@@ -1184,8 +1185,8 @@ fn the_612_coordinate_complex_that_the_dense_bound_refused_now_assembles() {
     );
     assert!(dimension * dimension <= DECLARED_ASSEMBLY_CEILING);
 
-    let assembled = ContactDissipation::assemble("m5-612", dimension, faces)
-        .expect("the 612-coordinate complex assembles");
+    let assembled = ContactDissipation::assemble("synthetic-204-site-bars", dimension, faces)
+        .expect("the synthetic 612-coordinate bar network assembles");
     assert_eq!(assembled.dimension(), 612);
     assert!(assembled.signature().is_positive_semidefinite());
     assert_eq!(assembled.signature().negative, 0);
@@ -1209,6 +1210,27 @@ fn the_612_coordinate_complex_that_the_dense_bound_refused_now_assembles() {
     // And the reading a consumer asks for still comes out: the contact kernel is the motion that
     // slips on no face, and it contains the six rigid motions of a three-dimensional frame.
     assert!(assembled.signature().zero >= 6);
+}
+
+#[test]
+fn sparse_work_charges_the_pulled_contraction_when_support_is_narrow() {
+    // A response/slip extent of 1024 touching one coordinate performs m²s + ms² work while
+    // forming D·J and Jᵀ·(D·J). The old support-only charge was only m·s² and understated it.
+    let work = sparse_face_work(1024, 1).expect("the individual terms fit");
+    assert_eq!(work, 1024usize * 1024 + 1024);
+    assert!(work > 1024, "the pulled contraction must be charged");
+}
+
+#[test]
+fn prime_image_refusal_keeps_its_specific_cause() {
+    use crate::prime_image_algebra::PrimeImageRefusal;
+
+    let refusal = InteractionRefusal::from(PrimeImageRefusal::PrimeCeiling {
+        consumed: 7,
+        ceiling: 8,
+    });
+    assert!(matches!(refusal, InteractionRefusal::PrimeImage(_)));
+    assert!(refusal.to_string().contains("prime charts"));
 }
 
 #[test]

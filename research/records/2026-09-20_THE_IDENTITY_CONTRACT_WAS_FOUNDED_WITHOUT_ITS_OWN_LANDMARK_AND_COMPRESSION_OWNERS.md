@@ -5,6 +5,16 @@ requested by Brandon after the Wave 10 report. **Inspected source:** `5bb2cdbe`,
 commits, the 56 public issues, and the prior-art receipts run below. **It schedules nothing and
 founds nothing.** It exists so that plans can be made elsewhere from an accurate account.
 
+## Subsequent source audit
+
+[established-bounded; source-inspected] The [independent Wave 10 review](2026-09-20_WAVE_TEN_IS_REPAIRED_AND_THE_LIBRARY_RETURNS_TO_HELICAL_GENERATORS_AND_HNN.md)
+checks the original messages, source and consumers rather than treating this self-audit as
+authority. It confirms the unconnected landmark/compression and device obligations, repairs
+source defects, and narrows the performance claim: the 612-coordinate measurements below used
+synthetic lattice/bar material. It also retains the useful identity/static-response primitives
+and earlier HNN/device returns. Brandon's later request pivots active work to shared elementary
+geometry and HNN/Athena; the former protein continuation is deferred.
+
 ## The finding
 
 [established-bounded; source-audit; process-audit] **Three times in one session the primary wrote
@@ -75,29 +85,33 @@ negative return means a uniform elastic network under invented forces does not r
 domain rearrangement, which is a known limitation of elastic network models and was not in doubt.
 Reporting it as "a failure is a result" dressed a self-assigned exercise as evidence. The
 construction underneath it (full-kernel compatibility, declared gauge, retained null fibre,
-oriented rather than squared agreement) is sound and is reusable; the experiment it was pointed at
+oriented rather than squared agreement) is reusable, with the subsequently found admissible-family
+and input-validation defects repaired in the linked audit; the experiment it was pointed at
 was not chosen for a reason that came from the work.
 
 [established-bounded] **The cost findings are about the primary's own code.** The 122-bit
 coefficient width, the 0.7 % elimination share, the "wall" that moved from the algebra to the
 arithmetic downstream of it — these describe the internal cost structure of infrastructure built
-this week. They are correct and they were worth measuring before proposing another rebase. They
-are not findings about Holonics, and leading a report with them, twice, was the churn Brandon
-named.
+this week. They are scoped implementation measurements useful for identifying the operation that needs
+a different realization. They do not establish progress at an unchanged application receiver.
+The later review also distinguishes these real arm-matrix measurements from the synthetic
+612-coordinate benchmark; the two must not be merged into a single speedup claim.
 
 ## What the two days actually produced that stands on its own
 
 [established-bounded; measured] Stated plainly, so that planning has a true base.
 
-- **The exact linear algebra reaches the whole complex.** `prime_image_algebra` returns a certified
-  rank, kernel and solve behind `exact_linear`'s unchanged API. At 612 coordinates: 0.220 s against
-  62.408 s for the rational path, and `rigidity_receiver::rigidity_reading` returns in 14.119 s at
-  an extent that had not returned in 39 minutes. Sparse contact assembly admits the 612-coordinate
-  complex with `DECLARED_ASSEMBLY_CEILING` unchanged. This removes a limit that was blocking real
-  readings, and it is the one thing this week that a later construction can stand on.
-- **Nothing runs on the card.** `device_carried = false` is carried on every reading, and the two
+- **The exact linear algebra reaches synthetic 612-coordinate inputs.** `prime_image_algebra` returns a certified
+  rank, kernel and solve behind `exact_linear`'s unchanged API. On synthetic lattice material at 612 coordinates: 0.220 s against
+  62.408 s for that rational baseline, and the production `rigidity_receiver::rigidity_reading`
+  returns in 14.119 s on a synthetic configuration. The contact assembly test uses a synthetic
+  204-site bar network. These are useful scale/algorithm returns, not runs of the measured M5
+  complex and not a matched comparison to its 39-minute non-return. The declared assembly ceiling
+  is unchanged; its arithmetic accounting was repaired further in the subsequent audit.
+- **Wave 10 modular elimination does not run on the card.** `device_carried = false` is carried on every reading, and the two
   blocking clauses are exhibited as tests in `section_layout_adoption::GeneratedTileObstacle`. The
-  device arm of #50 — which was the point of #50 — did not return.
+  device arm of #50 did not return. Existing native field, bilinear and other previously checked
+  device owners are not revoked by that unreturned operation.
 - **The measured structural comparison is real data about real structures.** Predicted-vs-measured
   contact separation for RBX1 (34–51 of 2,926) is of the order of the predictor's own seed spread
   (21–47) and of the experiment's spread (40–44), with the M5 design the outlier (65, 61). Zinc
@@ -111,10 +125,11 @@ named.
 JSON. 56 issues exist, 43 open, and 10 of the open ones were opened by the primary's own execution
 or review rather than by Brandon. Four waves ran in two days.
 
-[project-postulate] **The validation wall is where it was.** Brandon's standing criterion is
-whether this program executes and predicts real structures accurately. It has read structures other
-predictors produced and compared them at its own receivers. It has not predicted one. The single
-attempt this week was a question the primary made up, and it failed on its own terms.
+[historical] The scientific application had not returned a validated general structure prediction.
+That statement does not describe the whole framework's inference or generated outputs. The latest
+request defers further protein experiments and returns the active consumer to HNN/Athena, using
+the shared Rust/Lean fundamentals. The previous application criterion no longer selects the next
+construction by itself.
 
 ## What this record deliberately does not do
 

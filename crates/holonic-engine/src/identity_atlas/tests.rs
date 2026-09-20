@@ -43,16 +43,26 @@ fn the_sampled_rank_is_only_a_lower_bound_before_certification() {
         .collect();
     let full = sample_kernel(&configuration, &many).expect("four samples read");
     assert_eq!(full.sampled_rank, 3, "the true filtered dimension is three");
-    assert!(full.kernel.is_empty(), "and the line has no identity at degree two");
+    assert!(
+        full.kernel.is_empty(),
+        "and the line has no identity at degree two"
+    );
 
     // The thin reading's candidates are refused by exact substitution, which is the whole point.
     let candidates = configuration.candidate_points(32);
     let refusals = thin
         .kernel
         .iter()
-        .filter(|vector| certify(&configuration, vector, &candidates).expect("certification runs").is_err())
+        .filter(|vector| {
+            certify(&configuration, vector, &candidates)
+                .expect("certification runs")
+                .is_err()
+        })
         .count();
-    assert_eq!(refusals, 2, "every spurious direction is refused, not returned");
+    assert_eq!(
+        refusals, 2,
+        "every spurious direction is refused, not returned"
+    );
 }
 
 #[test]
@@ -168,22 +178,29 @@ fn the_addition_laws_are_recovered_uniformly_in_the_curvature() {
     // The sine addition law S3 − S1 C2 − C1 S2 is degree (2, 0) and must be in the certified span.
     let family = configuration.family();
     let mut sine_law = ExactMultivariate::zero(family.width());
-    let index = |name: &str| names.iter().position(|slot| slot == name).expect("a receiver");
+    let index = |name: &str| {
+        names
+            .iter()
+            .position(|slot| slot == name)
+            .expect("a receiver")
+    };
     let mut exponents = vec![0u32; family.width()];
     exponents[index("S3")] = 1;
-    sine_law = sine_law.plus(
-        &ExactMultivariate::term(family.width(), exponents, Rat::one()).expect("a term"),
-    );
+    sine_law = sine_law
+        .plus(&ExactMultivariate::term(family.width(), exponents, Rat::one()).expect("a term"))
+        .expect("matching shapes");
     let mut first = vec![0u32; family.width()];
     first[index("S1")] = 1;
     first[index("C2")] = 1;
     sine_law = sine_law
-        .minus(&ExactMultivariate::term(family.width(), first, Rat::one()).expect("a term"));
+        .minus(&ExactMultivariate::term(family.width(), first, Rat::one()).expect("a term"))
+        .expect("matching shapes");
     let mut second = vec![0u32; family.width()];
     second[index("C1")] = 1;
     second[index("S2")] = 1;
     sine_law = sine_law
-        .minus(&ExactMultivariate::term(family.width(), second, Rat::one()).expect("a term"));
+        .minus(&ExactMultivariate::term(family.width(), second, Rat::one()).expect("a term"))
+        .expect("matching shapes");
 
     let closure = buchberger(
         &returned
@@ -230,33 +247,45 @@ fn a_single_chart_wrongly_certifies_the_galilean_collapse() {
 
     let names = named(&COLLAPSED_ADDITION_RECEIVERS);
     let width = COLLAPSED_ADDITION_RECEIVERS.len();
-    let index = |name: &str| names.iter().position(|slot| slot == name).expect("a receiver");
+    let index = |name: &str| {
+        names
+            .iter()
+            .position(|slot| slot == name)
+            .expect("a receiver")
+    };
     let mut exponents = vec![0u32; width];
     exponents[index("C1")] = 1;
     let candidate = ExactMultivariate::term(width, exponents, Rat::one())
         .expect("a term")
-        .minus(&ExactMultivariate::constant(width, Rat::one()));
+        .minus(&ExactMultivariate::constant(width, Rat::one()))
+        .expect("matching shapes");
 
     let vector_of = |configuration: &Configuration, polynomial: &ExactMultivariate| {
         configuration
             .family()
             .monomials()
             .iter()
-            .map(|monomial| polynomial.terms().get(monomial).cloned().unwrap_or_else(Rat::zero))
+            .map(|monomial| {
+                polynomial
+                    .terms()
+                    .get(monomial)
+                    .cloned()
+                    .unwrap_or_else(Rat::zero)
+            })
             .collect::<Vec<_>>()
     };
 
     let grid = principal.candidate_points(64);
-    let on_one_chart = certify(&principal, &vector_of(&principal, &candidate), &grid)
-        .expect("certification runs");
+    let on_one_chart =
+        certify(&principal, &vector_of(&principal, &candidate), &grid).expect("certification runs");
     assert!(
         on_one_chart.is_ok(),
         "the principal winding alone certifies C1 - 1 — this is the coverage failure the contract \
          names, and it is reproduced here rather than assumed away"
     );
 
-    let on_all_charts = certify(&complete, &vector_of(&complete, &candidate), &grid)
-        .expect("certification runs");
+    let on_all_charts =
+        certify(&complete, &vector_of(&complete, &candidate), &grid).expect("certification runs");
     let refused = on_all_charts.expect_err("the four-winding chart family refuses C1 - 1");
     let counterexample = refused.verdicts.iter().find_map(|verdict| match verdict {
         ChartVerdict::Refused {
@@ -272,7 +301,10 @@ fn a_single_chart_wrongly_certifies_the_galilean_collapse() {
         chart.contains("-1"),
         "the half-turn winding is what sees the second component: {chart}"
     );
-    assert!(!value.is_zero(), "the counterexample point {point:?} gives a nonzero value");
+    assert!(
+        !value.is_zero(),
+        "the counterexample point {point:?} gives a nonzero value"
+    );
 }
 
 #[test]
@@ -364,7 +396,9 @@ fn the_circular_and_hyperbolic_collapses_add_nothing() {
 
 /// The two transferred relations as polynomials in the ten constant-curvature receivers, built by
 /// hand so the certified ideal can be asked whether it contains them.
-fn transferred_laws(curvature: i64) -> (ExactMultivariate, ExactMultivariate) {
+fn transferred_laws(
+    curvature: i64,
+) -> Result<(ExactMultivariate, ExactMultivariate), IdentityAtlasError> {
     let width = HELICAL_RECEIVERS_AT.len();
     let slot = |name: &str| {
         HELICAL_RECEIVERS_AT
@@ -381,18 +415,18 @@ fn transferred_laws(curvature: i64) -> (ExactMultivariate, ExactMultivariate) {
     };
     // 1-part: SpQ12K SpQ13K + k SpQ12R SpQ13R - CrossK^2 - k CrossR^2 - Qua1 GramK - k Pit1 GramR
     let killing = monomial(&["SpQ12K", "SpQ13K"], 1)
-        .plus(&monomial(&["SpQ12R", "SpQ13R"], curvature))
-        .minus(&monomial(&["CrossK", "CrossK"], 1))
-        .minus(&monomial(&["CrossR", "CrossR"], curvature))
-        .minus(&monomial(&["Qua1", "GramK"], 1))
-        .minus(&monomial(&["Pit1", "GramR"], curvature));
+        .plus(&monomial(&["SpQ12R", "SpQ13R"], curvature))?
+        .minus(&monomial(&["CrossK", "CrossK"], 1))?
+        .minus(&monomial(&["CrossR", "CrossR"], curvature))?
+        .minus(&monomial(&["Qua1", "GramK"], 1))?
+        .minus(&monomial(&["Pit1", "GramR"], curvature))?;
     // iota-part: SpQ12K SpQ13R + SpQ12R SpQ13K - 2 CrossK CrossR - Qua1 GramR - Pit1 GramK
     let reciprocal = monomial(&["SpQ12K", "SpQ13R"], 1)
-        .plus(&monomial(&["SpQ12R", "SpQ13K"], 1))
-        .minus(&monomial(&["CrossK", "CrossR"], 2))
-        .minus(&monomial(&["Qua1", "GramR"], 1))
-        .minus(&monomial(&["Pit1", "GramK"], 1));
-    (killing, reciprocal)
+        .plus(&monomial(&["SpQ12R", "SpQ13K"], 1))?
+        .minus(&monomial(&["CrossK", "CrossR"], 2))?
+        .minus(&monomial(&["Qua1", "GramR"], 1))?
+        .minus(&monomial(&["Pit1", "GramK"], 1))?;
+    Ok((killing, reciprocal))
 }
 
 #[test]
@@ -425,7 +459,7 @@ fn the_transferred_laws_of_the_helical_triple_are_certified_and_hold_on_real_scr
                 .collect::<Vec<_>>(),
         )
         .expect("closure");
-        let (killing, reciprocal) = transferred_laws(curvature);
+        let (killing, reciprocal) = transferred_laws(curvature).expect("laws build");
         for (law, label) in [(killing, "Killing part"), (reciprocal, "reciprocal part")] {
             let (remainder, _) = normal_form(&law, &closure.basis).expect("reduction runs");
             assert!(
@@ -487,8 +521,14 @@ fn the_transferred_laws_are_recovered_uniformly_in_the_curvature() {
         .collect();
     assert!(returned.identities.len() >= 2, "{written:?}");
     let carries = |needle: &str| written.iter().any(|identity| identity.contains(needle));
-    assert!(carries("Pit1"), "the reciprocal law carries the pitch: {written:?}");
-    assert!(carries("Curv"), "the Killing law is uniform in k: {written:?}");
+    assert!(
+        carries("Pit1"),
+        "the reciprocal law carries the pitch: {written:?}"
+    );
+    assert!(
+        carries("Curv"),
+        "the Killing law is uniform in k: {written:?}"
+    );
 }
 
 #[test]
@@ -510,8 +550,8 @@ fn the_column_matroid_is_read_at_its_owners_supported_scope() {
         })
         .take(48)
         .collect();
-    let reading =
-        read_column_matroid(&configuration, &points, &returned.identities).expect("the matroid reads");
+    let reading = read_column_matroid(&configuration, &points, &returned.identities)
+        .expect("the matroid reads");
     assert_eq!(reading.ground, configuration.family().monomials().len());
     assert_eq!(
         reading.identity_supports.len(),
@@ -625,6 +665,164 @@ fn a_refusal_is_typed_and_never_a_panic() {
     assert!(matches!(
         chart.receivers_at(&[Rat::zero()]),
         Err(IdentityAtlasError::DenominatorVanishes { .. })
+    ));
+
+    let zero_denominator = RationalChart::new(
+        "zero denominator",
+        &["x"],
+        vec![ExactMultivariate::constant(1, Rat::one())],
+        ExactMultivariate::zero(1),
+        "x != 0",
+    );
+    assert!(matches!(
+        zero_denominator,
+        Err(IdentityAtlasError::ZeroChartDenominator { .. })
+    ));
+
+    let mismatched_numerator = RationalChart::new(
+        "mismatched numerator",
+        &["x"],
+        vec![ExactMultivariate::variable(2, 0).expect("two-variable numerator")],
+        ExactMultivariate::constant(1, Rat::one()),
+        "all x",
+    );
+    assert!(matches!(
+        mismatched_numerator,
+        Err(IdentityAtlasError::ChartVariableCountMismatch { .. })
+    ));
+
+    let line = Configuration::new(
+        "line",
+        ReceiverFamily::total_degree(&["a"], 1).expect("family"),
+        vec![
+            RationalChart::polynomial(
+                "line",
+                &["x"],
+                vec![ExactMultivariate::variable(1, 0).expect("x")],
+            )
+            .expect("chart"),
+        ],
+        "the supplied line chart",
+        3,
+        1,
+    )
+    .expect("line");
+    assert!(matches!(
+        evaluation_matrix(&line, &[(1, vec![Rat::zero()])]),
+        Err(IdentityAtlasError::ChartIndex { .. })
+    ));
+    assert!(matches!(
+        Configuration::new(
+            "invalid span",
+            ReceiverFamily::total_degree(&["a"], 1).expect("family"),
+            line.charts().to_vec(),
+            "line",
+            0,
+            1,
+        ),
+        Err(IdentityAtlasError::InvalidGridSpan { .. })
+    ));
+    assert!(matches!(
+        Configuration::new(
+            "overflow span",
+            ReceiverFamily::total_degree(&["a"], 1).expect("family"),
+            line.charts().to_vec(),
+            "line",
+            i64::MAX,
+            1,
+        ),
+        Err(IdentityAtlasError::GridSpanOverflow { .. })
+    ));
+}
+
+#[test]
+fn unresolved_grid_refusal_is_typed_instead_of_returning_a_partial_atlas() {
+    let family = ReceiverFamily::total_degree(&["a"], 1).expect("family");
+    let a =
+        ExactMultivariate::from_integer_terms(1, &[(&[3], 1), (&[1], -1)]).expect("a(t) = t^3 - t");
+    let chart = RationalChart::polynomial("three-root chart", &["t"], vec![a]).expect("chart");
+    let configuration = Configuration::new(
+        "all candidate points are roots",
+        family,
+        vec![chart],
+        "the supplied polynomial chart",
+        1,
+        1,
+    )
+    .expect("configuration");
+    assert!(matches!(
+        walk(&configuration),
+        Err(IdentityAtlasError::UnresolvedCertification { .. })
+    ));
+}
+
+#[test]
+fn polynomial_arithmetic_refuses_shape_and_exponent_overflow() {
+    let one_variable = ExactMultivariate::variable(1, 0).expect("one variable");
+    let two_variables = ExactMultivariate::variable(2, 0).expect("two variables");
+    assert!(matches!(
+        one_variable.plus(&two_variables),
+        Err(IdentityAtlasError::PolynomialShapeMismatch { .. })
+    ));
+    assert!(matches!(
+        one_variable.times(&two_variables),
+        Err(IdentityAtlasError::PolynomialShapeMismatch { .. })
+    ));
+
+    let huge = ExactMultivariate::term(1, vec![u32::MAX], Rat::one()).expect("huge exponent");
+    assert_eq!(
+        huge.evaluate(&[Rat::one()]).expect("exact rational power"),
+        Rat::one()
+    );
+    assert!(matches!(
+        huge.times(&one_variable),
+        Err(IdentityAtlasError::ExponentOverflow { .. })
+    ));
+    assert!(matches!(
+        huge.powered(2),
+        Err(IdentityAtlasError::ExponentOverflow { .. })
+    ));
+    assert_eq!(
+        ExactMultivariate::constant(1, Rat::one())
+            .powered(u32::MAX)
+            .expect("checked exponentiation by squaring")
+            .evaluate(&[Rat::zero()])
+            .expect("constant evaluates"),
+        Rat::one()
+    );
+    assert!(matches!(
+        ExactMultivariate::term(2, vec![u32::MAX, u32::MAX], Rat::one()),
+        Err(IdentityAtlasError::TotalDegreeOverflow)
+    ));
+}
+
+#[test]
+fn a_parallel_column_is_refused_by_the_simple_chow_scope() {
+    let family = ReceiverFamily::total_degree(&["a", "b"], 1).expect("family");
+    let chart = RationalChart::polynomial(
+        "duplicated receivers",
+        &["x"],
+        vec![
+            ExactMultivariate::variable(1, 0).expect("a"),
+            ExactMultivariate::variable(1, 0).expect("b"),
+        ],
+    )
+    .expect("chart");
+    let configuration = Configuration::new(
+        "parallel columns",
+        family,
+        vec![chart],
+        "the supplied duplicated-receiver chart",
+        3,
+        1,
+    )
+    .expect("configuration");
+    let reading = read_column_matroid(&configuration, &[(0, vec![rational(2)])], &[])
+        .expect("matroid reading");
+    assert_eq!(reading.parallel_classes.len(), 1);
+    assert!(matches!(
+        reading.full_matroid_scope,
+        ChowScope::Refused { .. }
     ));
 }
 

@@ -33,17 +33,18 @@ use std::time::Instant;
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
 use relational_geometry::Rat;
-use serde_json::{Map, Value, json};
+use serde_json::{json, Map, Value};
 
 use holonic_engine::conditioned_static_response::{
-    ConditionedStiffness, DeclaredMetric, ElasticDeclaration, ForcingDeclaration, NullFibre,
-    OrientedAgreement, QuadranceResponse, ResponseFamilyReading, ResponseGauge, StaticResponse,
+    BlockCorrespondence, ConditionedStiffness, DeclaredMetric, ElasticDeclaration,
+    ForcingDeclaration, NullFibre, OrientedAgreement, QuadranceResponse, ResponseFamilyReading,
+    ResponseGauge, StaticResponse,
 };
 use holonic_engine::physical_constraint_complex::{ConstraintEdge, ConstraintVertexId};
 use holonic_engine::physical_constraint_grading::EdgeProvenance;
 use holonic_engine::physical_intake::mmcif::{ChainOccurrence, StructurePresentation};
 use holonic_engine::rigidity_receiver::{
-    ExactConfiguration, RigidityJacobian, TrivialMotionReading, rigidity_reading,
+    rigidity_reading, ExactConfiguration, RigidityJacobian, TrivialMotionReading,
 };
 
 // -------------------------------------------------------------------------------------------
@@ -82,10 +83,7 @@ const HELD_OUT: [(&str, &str, i32, &str); 2] = [
 ];
 
 /// The two established windows, in M5 residue numbering.
-const WINDOWS: [(&str, i32, i32); 2] = [
-    ("n_terminal_arm", 21, 38),
-    ("ring_core", 41, 80),
-];
+const WINDOWS: [(&str, i32, i32); 2] = [("n_terminal_arm", 21, 38), ("ring_core", 41, 80)];
 
 /// The residues 2LGV substitutes to keep RBX1 soluble without a cullin: `W27S, V30S, L32Q, W33S`
 /// (and the `GGG` linker at 9–11, outside both windows). A pair touching one of these is a
@@ -173,12 +171,10 @@ fn configuration_over(
     window: &[i32],
     places: &BTreeMap<i32, Vec<Rat>>,
 ) -> Result<ExactConfiguration, String> {
-    let declared = window.iter().enumerate().map(|(block, residue)| {
-        (
-            ConstraintVertexId(block as u64),
-            places[residue].clone(),
-        )
-    });
+    let declared = window
+        .iter()
+        .enumerate()
+        .map(|(block, residue)| (ConstraintVertexId(block as u64), places[residue].clone()));
     ExactConfiguration::declared(3, declared).map_err(|error| error.to_string())
 }
 
@@ -255,7 +251,10 @@ fn arguments() -> Result<Arguments, String> {
         }
     }
     if windows.is_empty() {
-        windows = WINDOWS.iter().map(|(name, _, _)| (*name).to_owned()).collect();
+        windows = WINDOWS
+            .iter()
+            .map(|(name, _, _)| (*name).to_owned())
+            .collect();
     }
     Ok(Arguments {
         structure_root: structure_root
@@ -271,7 +270,10 @@ fn arguments() -> Result<Arguments, String> {
 fn main() {
     match run() {
         Ok(report) => {
-            println!("{}", serde_json::to_string_pretty(&report).unwrap_or_default());
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&report).unwrap_or_default()
+            );
         }
         Err(refusal) => {
             eprintln!("refused: {refusal}");
@@ -419,8 +421,11 @@ fn run() -> Result<Value, String> {
     });
 
     if let Some(path) = &arguments.out {
-        std::fs::write(path, serde_json::to_string_pretty(&report).unwrap_or_default())
-            .map_err(|error| format!("{}: {error}", path.display()))?;
+        std::fs::write(
+            path,
+            serde_json::to_string_pretty(&report).unwrap_or_default(),
+        )
+        .map_err(|error| format!("{}: {error}", path.display()))?;
         eprintln!("wrote {}", path.display());
     }
     Ok(report)
@@ -462,7 +467,9 @@ fn run_window(
         }
     }
     if window.len() < 4 {
-        return Err(format!("window {name} resolves fewer than four residues everywhere"));
+        return Err(format!(
+            "window {name} resolves fewer than four residues everywhere"
+        ));
     }
 
     // -------- §2. the source configuration and the declared elastic energy ------------------
@@ -485,8 +492,8 @@ fn run_window(
     )
     .map_err(|error| error.to_string())?;
     let stiffness_started = Instant::now();
-    let stiffness =
-        ConditionedStiffness::declared(&jacobian, declaration).map_err(|error| error.to_string())?;
+    let stiffness = ConditionedStiffness::declared(&jacobian, declaration)
+        .map_err(|error| error.to_string())?;
     let stiffness_milliseconds = stiffness_started.elapsed().as_millis();
     // The coefficient width of `K`, which is what decides whether an exact reading of it is cheap:
     // `W = diag(gamma / (4 l^2))` puts one squared length into the denominator of every entry, so
@@ -500,17 +507,21 @@ fn run_window(
             .max()
             .unwrap_or(0)
     };
-    let stiffness_entry_bits = widest_entry_bits(&stiffness.matrix);
+    let stiffness_entry_bits = widest_entry_bits(stiffness.matrix());
     let jacobian_entry_bits = widest_entry_bits(&jacobian.matrix);
     let rank_started = Instant::now();
-    let stiffness_rank = stiffness.matrix.rank().map_err(|error| error.to_string())?;
+    let stiffness_rank = stiffness
+        .matrix()
+        .rank()
+        .map_err(|error| error.to_string())?;
     let rank_milliseconds = rank_started.elapsed().as_millis();
 
     // -------- §3. the full null fibre, the metric and the gauge -----------------------------
     let null_started = Instant::now();
-    let null_fibre = NullFibre::measure(&stiffness, &jacobian).map_err(|error| error.to_string())?;
+    let null_fibre =
+        NullFibre::measure(&stiffness, &jacobian).map_err(|error| error.to_string())?;
     let null_milliseconds = null_started.elapsed().as_millis();
-    let metric = DeclaredMetric::cartesian_identity(stiffness.coordinate_freedoms, "angstrom")
+    let metric = DeclaredMetric::cartesian_identity(stiffness.coordinate_freedoms(), "angstrom")
         .map_err(|error| error.to_string())?;
 
     // -------- §4. the forcing map and the force family --------------------------------------
@@ -595,6 +606,8 @@ fn run_window(
     let pairs: Vec<(usize, usize)> = (0..window.len())
         .flat_map(|lower| ((lower + 1)..window.len()).map(move |upper| (lower, upper)))
         .collect();
+    let correspondence = BlockCorrespondence::identity(window.len(), window.len())
+        .map_err(|error| error.to_string())?;
     let separated: Vec<usize> = pairs
         .iter()
         .enumerate()
@@ -621,8 +634,13 @@ fn run_window(
         let target = configuration_over(&window, places)?;
         measured.insert(
             entry.clone(),
-            QuadranceResponse::between(&configuration, &target, &pairs)
-                .map_err(|error| error.to_string())?,
+            QuadranceResponse::between_with_correspondence(
+                &configuration,
+                &target,
+                &correspondence,
+                &pairs,
+            )
+            .map_err(|error| error.to_string())?,
         );
     }
     // The source ensemble's own spread: the same receiver, model 1 against each other model.
@@ -630,8 +648,13 @@ fn run_window(
     for places in source_models.iter().skip(1) {
         let target = configuration_over(&window, places)?;
         ensemble.push(
-            QuadranceResponse::between(&configuration, &target, &pairs)
-                .map_err(|error| error.to_string())?,
+            QuadranceResponse::between_with_correspondence(
+                &configuration,
+                &target,
+                &correspondence,
+                &pairs,
+            )
+            .map_err(|error| error.to_string())?,
         );
     }
 
@@ -642,8 +665,8 @@ fn run_window(
             &configuration,
             loaded,
             provenance.clone(),
-            "declared uniform and per-generator magnitude laws below; NEVER fitted to a held-out \
-             displacement, and the scale diagnostic enters no score",
+            "caller-declared uniform and per-generator magnitude laws below; the caller reports no \
+             held-out displacement fitting, and the scale diagnostic enters no score",
         )
         .map_err(|error| error.to_string())?;
         let equilibrated = forcing
@@ -653,10 +676,7 @@ fn run_window(
         let generators = loaded.len();
         let laws: Vec<(&str, Vec<Rat>)> = vec![
             ("uniform_compression_u_plus_1", vec![Rat::one(); generators]),
-            (
-                "uniform_expansion_u_minus_1",
-                vec![integer(-1); generators],
-            ),
+            ("uniform_expansion_u_minus_1", vec![integer(-1); generators]),
             (
                 "alternating_by_generator_index",
                 (0..generators)
@@ -673,16 +693,20 @@ fn run_window(
 
         let mut force_readings = Vec::new();
         for (law, magnitudes) in &laws {
-            let force = forcing.force(magnitudes).map_err(|error| error.to_string())?;
+            let force = forcing
+                .force(magnitudes)
+                .map_err(|error| error.to_string())?;
             // The exact solve alone, timed beside the whole response so the cost of this consumer
             // is attributable rather than guessed at. Above `DECLARED_PRIME_IMAGE_CROSSOVER` this
             // is the certified prime-image reading; the rest of `solve` — the gauge fix, the
             // equilibrium application and the two residual checks — runs over the wide rationals
             // that reading returns.
             let fibre_started = Instant::now();
-            let fibre_probe = stiffness.matrix.preimage_fibre_with_work(&force);
+            let fibre_probe = stiffness.matrix().preimage_fibre_with_work(&force);
             let fibre_milliseconds = fibre_started.elapsed().as_millis();
-            let fibre_returned = fibre_probe.map(|(fibre, _)| fibre.is_some()).unwrap_or(false);
+            let fibre_returned = fibre_probe
+                .map(|(fibre, _)| fibre.is_some())
+                .unwrap_or(false);
             let solve_started = Instant::now();
             let response = StaticResponse::solve(
                 &stiffness,
@@ -803,10 +827,12 @@ fn run_window(
                         selection.iter().map(|at| changes[*at].clone()).collect();
                     let agreement = OrientedAgreement::between(&predicted, &observed)
                         .map_err(|error| error.to_string())?;
-                    let finite_agreement =
-                        OrientedAgreement::between(&predicted_finite, &observed)
-                            .map_err(|error| error.to_string())?;
-                    against.insert(measurement.clone(), agreement_value(&agreement, &finite_agreement));
+                    let finite_agreement = OrientedAgreement::between(&predicted_finite, &observed)
+                        .map_err(|error| error.to_string())?;
+                    against.insert(
+                        measurement.clone(),
+                        agreement_value(&agreement, &finite_agreement),
+                    );
                 }
 
                 // The control: the same predicted response against the source ensemble's own
@@ -934,7 +960,7 @@ fn run_window(
             .iter()
             .map(|(residue, absent)| json!({"m5_residue": residue, "unresolved_in": absent}))
             .collect::<Vec<_>>(),
-        "coordinate_freedoms": stiffness.coordinate_freedoms,
+        "coordinate_freedoms": stiffness.coordinate_freedoms(),
         "elastic_network": {
             "aperture_angstrom": ELASTIC_APERTURE,
             "contacts": contacts.len(),
@@ -946,16 +972,16 @@ fn run_window(
                  the bounded experiment, not a property of RBX1.",
         },
         "elastic_declaration": {
-            "energy_law": stiffness.declaration.energy_law,
-            "weight_law": stiffness.declaration.weight_law,
-            "pairing": stiffness.declaration.pairing,
-            "stiffness_unit": stiffness.declaration.stiffness_unit,
-            "length_unit": stiffness.declaration.length_unit,
-            "energy_unit": stiffness.declaration.energy_unit,
+            "energy_law": stiffness.declaration().energy_law,
+            "weight_law": stiffness.declaration().weight_law,
+            "pairing": stiffness.declaration().pairing,
+            "stiffness_unit": stiffness.declaration().stiffness_unit,
+            "length_unit": stiffness.declaration().length_unit,
+            "energy_unit": stiffness.declaration().energy_unit,
             "not_inherited_from_the_dissipation_form":
-                stiffness.declaration.not_inherited_from_the_dissipation_form,
-            "K_is_self_adjoint_defect": rational(&stiffness.self_adjoint_defect),
-            "K_rank": stiffness.rank,
+                stiffness.declaration().not_inherited_from_the_dissipation_form,
+            "K_is_self_adjoint_defect": rational(stiffness.self_adjoint_defect()),
+            "K_rank": stiffness.rank(),
             "build_milliseconds": stiffness_milliseconds,
             "widest_jacobian_entry_bits": jacobian_entry_bits,
             "widest_stiffness_entry_bits": stiffness_entry_bits,
@@ -979,7 +1005,7 @@ fn run_window(
                  incompatible forcing compatible.",
         },
         "gauge": ResponseGauge::MetricComplement.name(),
-        "metric": metric.name,
+        "metric": metric.name(),
         "receiver_scopes_declared": scopes
             .iter()
             .map(|(scope, selection)| json!({"scope": scope, "pairs": selection.len()}))

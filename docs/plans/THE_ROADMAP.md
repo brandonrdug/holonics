@@ -31,6 +31,16 @@ retains this direction across subjects and handoffs.
 
 ## Sustained objective and construction rhythm
 
+[project-postulate] **Latest September 19 request, after Wave 10: return the active construction
+focus to the Holonics library and HNN/Athena.** Further protein/biology experiments are deferred;
+their existing shared operators and evidence are retained. Develop the helical pair as elementary
+geometry using the already established frame, generator, contact, landmark and compression laws.
+The [helical guide](../HELICAL_GEOMETRY.md) owns that construction and the
+[Wave 10 audit](../../research/records/2026-09-20_WAVE_TEN_IS_REPAIRED_AND_THE_LIBRARY_RETURNS_TO_HELICAL_GENERATORS_AND_HNN.md)
+records the verified repairs. This is a change of active application focus, not a retraction of
+Holonics' wider mathematical/physical ambition or a demand to finish every formal specialization
+before useful Athena conduct.
+
 [project-postulate] **September 19 consolidation: the central construction is the general
 embedding object.** Its circulating modes, knots, interlinked contact geometry, participating
 receivers and continuing field belong to one Holon. The
@@ -41,7 +51,7 @@ music/chords expose modal and source/receiver structure. These applications cont
 counterexamples and reusable operations to the same library. A successful protein construction
 does not exhaust the general object, and an Athena demonstration does not define its entire scope.
 
-| Shared construction | Scientific application now | Athena / other receiving application | Return to the shared library |
+| Shared construction | Retained scientific instance | Athena / other receiving application | Return to the shared library |
 |---|---|---|---|
 | Situated incidence, configuration and grain restriction | Atom/residue/component presentations, contact families and changing environments | Context regions, active contacts, internal modes and receiving boundaries | Compatible charts, actual incidence and retained preimage families |
 | Contact, material response and variation | Constraint response, folds, interface current/stress and declared physical dynamics | Constituted scattering, coupled field refinement and producing adjoints | The same contact/variation operation with explicit material, frame, units and residual |
@@ -269,77 +279,62 @@ documents hold each statement's evidence, owners and findings.
 |---|---|---|
 | Shared carrier | C1–C8 and the tube join | Compose the carrier/atlas with active contact faces, constitutive evolution and their variation at the existing consumers; Weierstrass division for the power-series form of `Λ/(ω_n)` remains a specialized mathematical item |
 | Receiver atlas | R1–R7 | per-eigenvalue refinement on `ExactHodgeSpectrum`; `MarkovTwoNSuffices` |
-| Biological ecology | B0–B10; M5 predictor/design comparison and the subsequent measured RBX1 population | held-out agreement counts computed from a declared receiver family rather than supplied; the gluing law with interface coupling for the physicochemical receiver; the source-conditioned response experiment described below |
+| Biological ecology (application deferred) | B0–B10; predictor/design/measured RBX1 comparisons; bounded conditioned response | Further application runs are deferred. Generic evaluation, interface and codec obligations remain at their actual shared owners and do not schedule another biology campaign. |
 | Exact device law | D1–D3; one engine coordinate instance cross-checked on the card | resident rational algebra at its consuming calls (#50); signed 128-bit words and radius with the engine's carrier refusal where consumed; per-region operators; base-pointer registry; common context ownership; D4 stays an intention |
 | Generalized transport and the Holonic Interaction chain | T1–T8 at their declared scopes; the Holonic Interaction unit with media and contact exchange; the two-media chain read at the elastic-network consumer; structural analytic width for that elastic specialization at every admitted extent | the multi-neck chain; faces derived from contact geometry; the time/entropy crossing (#5); general analytic pole factors (#35); a plural family generic in its coordinate address; a faithful Israel-junction instance (#23) |
-| Identity discovery and reuse | The two-sided-angle derivation and identity-atlas design | Certified face-map kernels, complete-ideal certificates, collapse residuals and executable reuse (#48–#49); these are shared generator/compression work, with a bounded first instance, not a separate product or a prerequisite for every application |
+| Elementary helical geometry, identities and reuse | Shared screw generator, pair quadrance jet and formal local laws; bounded chart identities from the repaired atlas | Continue the generator/contact/receiving composition and existing landmark/future-quotient joins (#48–#49). Full ideal/graph/analytic claims retain their own open equations. |
 
-[definition] The open joins of this table are itemized as
-[GitHub issues](https://github.com/brandonrdug/holonics/issues) under four milestones — Holonic
-Interaction chain, Predicted structures against references, Resident exact execution and
-Complete-source field session — with unmilestoned items as backlog. Issues index the work; this
-section orders it.
+[definition] GitHub issues index these owners under the interaction-chain, resident-execution,
+complete-source-session and elementary-geometry/reuse delivery views. Scientific validation is a
+**deferred application** view. Unmilestoned specialized work remains searchable by source law and
+consumer. Milestones are views of shared work; this section supplies the construction order.
 
-[definition] **Construction proceeds by the shared operation's dependencies.**
+[definition] **Construction proceeds through the shared relation and its real consumer.**
 
-1. **Shared increment, first return made September 19: the Holonic Interaction chain.** Issues
-   #1–#4 returned the unit, the staircase, the neck and their join at the elastic-network
-   consumer. It continues as the multi-neck chain, measured contact faces and the predictor
-   comparison that exercises it (milestones *Holonic Interaction chain* and *Predicted structures
-   against references*). Contact, neck and jet are stations
-   and readings of one tube: a source, media with their constitutive laws, the necks where flux
-   converges and diverges between them, and a participating receiver. The
-   [tube contract](THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md#the-governing-statements)
-   recovers the typed August unit and its formal owners. T6/T8 have returned at the scopes above;
-   compose their remaining joins with T4/T7, field/flux and analytic owners as described in
-   the [embedding composition](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-general-embedding-and-its-consuming-composition).
-   Its return is a source-linked interaction and its receiver/variation/continuation, with the
-   physical and computational charts connected; a new collection of separately named examples
-   does not discharge that join.
-2. **Exercise available operations through the standing applications as their inputs exist.**
-   Protein work continues the environment-indexed structural/physical application, including
-   actual predictor/reference comparisons and computed evaluation readings. Athena continues the
-   complete-source field session and its applicable operator attachments. Either can expose a
-   shared missing law or representation. Neither waits for every item in the shared contracts.
-3. **Lower the operation that needs resident execution — and the measured one is exact linear
-   algebra.** September 19–20 execution on real RBX1 material showed what needs it: the exact
-   receiver paths inspected here (rigidity, the chain, contact assembly, inertia and the Hodge
-   reading; the identity atlas proposes to consume the same algebra) use host `BigRational` work on one
-   of twenty-four hardware threads with the GPU idle — 180 coordinates in 568 s, 324 not returned
-   in 39 minutes, the 612-coordinate complex refused. Rule 12 governs the repair: one shared
-   algebra owner, with rank/kernel/solve and sparse contact assembly as the first consuming
-   increment. Characteristic polynomial and inertia have their own certificates and need not
-   all finish before that increment returns. Word-size prime images bound arithmetic within
-   each image; reconstruction and verification still have a measured cost. The operation-specific
-   contracts are in [the device plan](THE_EXACT_DEVICE_LAW_IS_CONSTRUCTED.md#the-shared-exact-algebra-consumer).
-   **Its placement is not a new decision.** The repository's hardware-surface methodology owns it:
-   [the exact device law](THE_EXACT_DEVICE_LAW_IS_CONSTRUCTED.md) (launch receipts, exclusive
-   access, partition-generated layout, and the arithmetic-regime split that sends dense exact
-   matrix work to a supported generated tile form; the existing device ring is `2^61 − 1`), `hardware_cover.rs` and
-   its [governing record](../../research/records/2026-08-01_THE_HARDWARE_IS_A_RECEIVER_COVER_THE_CARD_MUST_CARRY_THE_CURRENT.md)
-   (CPU and GPU are charts of one caused body; a short card kernel at the end of a CPU-owned
-   passage does not make the card the owner), `launch_law.rs` with `DeviceLaunchLaw.lean` and
-   `ExactPartition.lean`, the independence/interchange receipt a parallel composition owes, and
-   the locality theorem that licenses a decomposition. The September 17–20 library owners were
-   built outside that methodology; the repair adopts it rather than founding a second one.
-   The signed-word/radius realization,
-   per-region operators and common-context ownership belong at the consuming device boundary.
-   Existing lawful native paths continue while the generated path is extended. D4, Weierstrass
-   division and a full Israel instance are not universal gates before an application return.
+1. **Consolidate the elementary objects at their actual library boundaries.** The helical pair
+   is two generators and two configurations, with frame transport, independent degenerations,
+   contact geometry and the full variation. The new `relational_geometry::screw` consumes existing
+   exact vector/affine owners; its forms are consumed by `identity_atlas::screw_gram_point`.
+   `Geometry/ScrewGeometry` joins the elementary formal entry point and existing quadratic-moment
+   law. Keep the supplied/inferred distinction: the polynomial atlas infers chart identities;
+   the generator, frame and material remain its declared source until their own formation law
+   constructs them. A certified polynomial basis is useful within that scope, not a completed
+   account of all Holonic Compression.
+2. **Carry the library's generating relations into the existing HNN field/session.** The next
+   application join is #16/#17: actual evolving region currents participate in the same
+   content-dependent transport/refinement and paired return. The current shared request calls
+   `preview_field_rows` once on rows prepared from the original source; a repeated fixed affine
+   map alone does not supply the missing content dependence. Compose the
+   [formula's](../HNN_FORMULA.md) `a_FG[Ψ] U_(F←G)[Ψ] Ψ_G` and both terms of its variation through
+   the existing resident source/bilinear/normal/constitutive owners and `NativeCoupledBody`.
+   Receive the complete source's generated section, its constraints, producing update and saved
+   continuation through the same public session. This consumes the machinery; it is not a new
+   standalone classifier, solver wrapper or mathematical demonstration in place of that call.
+3. **Make reuse and realization part of that consuming operation.** Apply existing
+   `ReceiverHistoryCompression`, `GeneratorModeQuotient`, `GeneratorInference`, phase/winding and
+   code-cost laws where the actual source maps meet their hypotheses. Expose the separator or
+   retained interior when `E_next T = U E` fails. Exact geometry/algebra reference owners remain
+   useful, while the hot HNN operation stays resident under `hardware_cover`, `launch_law` and
+   the supported packet/tile kernels. #50's host certified algebra returned; its modular pivot
+   device passage did not. Existing resident bilinear packet kernels are composition material,
+   with a different ring/ABI, not evidence that a modular pivot implementation is already wired.
+   Per-region operators and context ownership are addressed at the calls that consume them.
 
-[definition; agent-inferred] The next implementation assignment is the first consuming increment
-of #50, inferred from the measured rank/assembly obstruction: connect the certificate-bearing
-algebra and device passage to rigidity and the chain, then read the 324-coordinate target and
-612-coordinate complex with actual cost and placement. A CPU reference can check the same
-operation; completing a second CPU production pipeline is not a predecessor of device ownership.
-Prepare #55's source, force law and receiver alongside this work, using the
-[response contract](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-conditioned-structural-response-consumer).
-It is a conditional structural-response experiment, not a claim to general protein folding.
-The first certified identity family (#49) can use small existing exact owners while its larger
-evaluation matrices become another #50 consumer. The time/entropy join (#5) and contact geometry
-remain explicit shared obligations; neither is demoted merely because the present cost repair
-comes first. The complete-source session retains its own available native path and unresolved
-consumer; these scientific increments do not redefine its completion.
+[definition; agent-inferred] The next HNN assignment should own the complete region-refinement
+join and its public session return, inferred from the actual `shared_request` call and the
+standing field formula. Geometry, exact algebra and identity tasks name the operation they
+contribute to that join or their separate explicitly requested mathematical consequence. The
+helical development continues as shared mathematics; it is not converted into a new protein
+receiver task. Neither the full identity catalogue, the complete device plan, nor a Millennium
+endpoint is a universal prerequisite of the session.
+
+[established-bounded; source-inspected] Wave 10's 0.220 s rank/kernel and 14.119 s rigidity figures
+at 612 coordinates used **synthetic lattice/bar inputs**, including a real API call on synthetic
+material. They are valid scoped measurements; they are not matched-input speedups over the
+measured RBX1 run that failed to return. The original full-complex/device criterion therefore
+was not discharged by those timings. The latest application pivot removes that protein run from
+current order without rewriting it as completed. Further performance work reports its actual
+matrix, coefficient growth and placement at the new consuming operation.
 
 ### Issue divisions follow mathematical consumers
 
@@ -351,16 +346,12 @@ descriptions of the same open join. A measured observation belongs in evidence u
 names the next discriminating operation. An inferred decision is recorded with its reason and
 does not become an issue waiting for approval.
 
-[established-bounded; source-inspected] The
-[September 19 audit](../../research/records/2026-09-19_THE_PLAN_AUDIT_RECONNECTS_SHARED_LAWS_CONSUMERS_AND_HARDWARE.md#github-issue-disposition)
-contains the concrete issue dispositions and replacement contracts, and they have since been
-applied to the public tracker: #50 and #55 carry the replacement contracts in their bodies rather
-than a withdrawal in a comment; #27 is narrowed to serial multi-neck composition with #28 reopened
-for contact geometry; #49's sampled-kernel, Buchberger and Hilbert overclaims are replaced from the
-corrected I1–I8; #25 is navigation rather than a census; #41's false prohibition of a triangular
-port-Hamiltonian generator is corrected and it is closed as a decision record; the `Split`/
-`PluralFibre` defect returns to #9; and identity discovery has its own delivery milestone. Where an
-issue's body and this roadmap differ, the contract documents govern.
+[definition] The [Wave 10 audit](../../research/records/2026-09-20_WAVE_TEN_IS_REPAIRED_AND_THE_LIBRARY_RETURNS_TO_HELICAL_GENERATORS_AND_HNN.md)
+records the concrete issue reconciliation: completed wave/evidence scope is closed separately
+from unreturned device or generator work; #48/#49 retain elementary geometry and identity reuse;
+#16/#17 name the next HNN consumer; biology-specific continuation is deferred. Current bodies,
+not corrective comments alone, carry each item's operation and remaining return. The roadmap
+remains authoritative for order.
 
 [project-postulate] The root brief in CONSTRUCTION_STATE names the active shared operation and
 the application evidence it is meant to produce. Subtasks carry their operands, owner and actual

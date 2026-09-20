@@ -30,6 +30,14 @@ relations are part of this construction, not excluded by its software realizatio
 
 ## Reading the field architecture diagram
 
+[definition] The [helical elementary realization](HELICAL_GEOMETRY.md) makes one geometric
+instance of the following operator relations explicit: source generators and initial points,
+frame transport, pair contact differential, its geometric second variation and a quadratic
+receiver that factors through the existing moment owner. Its exact local source is available
+through `holonics::geometry`; it is not a replacement HNN architecture. The constant-generator
+case supplies a finite reusable receiver recurrence when the existing descent equation holds;
+changing generators retain the `ChangingReceiver` defect rather than deleting the interior.
+
 ![One received cut of the continuing coupled field](../research/experiments/hnn_field_architecture/continuing-field.png)
 
 [definition] The current [continuing-field construction](../research/experiments/hnn_field_architecture/CONTINUING_FIELD.md)

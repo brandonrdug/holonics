@@ -12,8 +12,8 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
 use super::*;
-use crate::physical_constraint_grading::EdgeProvenance;
 use crate::physical_constraint_complex::{ConstraintEdge, ConstraintVertexId};
+use crate::physical_constraint_grading::EdgeProvenance;
 use crate::rigidity_receiver::rigidity_reading;
 
 // ---------------------------------------------------------------------------------------------
@@ -126,7 +126,10 @@ fn metric_of(stiffness: &ConditionedStiffness) -> DeclaredMetric {
 fn the_stiffness_and_pseudoinverse_cross_blocks_have_different_ranks() {
     let (stiffness_rank, pseudo_rank, block) =
         neck_cross_block_counterexample().expect("the four-site witness recomputes");
-    assert_eq!(stiffness_rank, 1, "K's cross block on the cut {{1,2}}|{{3,4}}");
+    assert_eq!(
+        stiffness_rank, 1,
+        "K's cross block on the cut {{1,2}}|{{3,4}}"
+    );
     assert_eq!(pseudo_rank, 2, "the Moore-Penrose cross block");
 
     let eighth = |numerator: i64| Rat::new(BigInt::from(numerator), BigInt::from(8));
@@ -175,12 +178,18 @@ fn the_stiffness_is_self_adjoint_and_its_kernel_is_the_constraint_kernel() {
     assert_eq!(stiffness.coordinate_freedoms, 15);
 
     let reading = rigidity_reading(&jacobian).expect("the rigidity reading returns");
-    assert_eq!(stiffness.rank, reading.rank, "rank K = rank J for gamma > 0");
+    assert_eq!(
+        stiffness.rank, reading.rank,
+        "rank K = rank J for gamma > 0"
+    );
 
     let null = NullFibre::measure(&stiffness, &jacobian).expect("the null fibre measures");
     assert!(null.equals_constraint_kernel, "ker K = ker J is verified");
     assert_eq!(null.dimension, reading.motion_dimension);
-    assert_eq!(null.trivial_dimension, 6, "a spanning configuration in three dimensions");
+    assert_eq!(
+        null.trivial_dimension, 6,
+        "a spanning configuration in three dimensions"
+    );
     assert_eq!(null.internal_floppy_dimension, 0, "the solid is braced");
 }
 
@@ -190,7 +199,10 @@ fn the_null_fibre_carries_the_internal_floppy_modes_and_not_only_the_rigid_motio
     let stiffness = stiffness_of(&jacobian);
     let null = NullFibre::measure(&stiffness, &jacobian).expect("the null fibre measures");
     assert_eq!(null.trivial_dimension, 6);
-    assert_eq!(null.dimension, 9, "12 coordinates less 3 independent constraints");
+    assert_eq!(
+        null.dimension, 9,
+        "12 coordinates less 3 independent constraints"
+    );
     assert_eq!(
         null.internal_floppy_dimension, 3,
         "a reading that took Z to be the six rigid motions would be wrong by three dimensions"
@@ -205,7 +217,10 @@ fn the_elastic_energy_of_a_kernel_direction_is_exactly_zero() {
     let null = NullFibre::measure(&stiffness, &jacobian).expect("the null fibre measures");
     for vector in &null.basis {
         assert!(
-            stiffness.energy(vector).expect("the energy reads").is_zero(),
+            stiffness
+                .energy(vector)
+                .expect("the energy reads")
+                .is_zero(),
             "a null direction stores no elastic energy"
         );
     }
@@ -254,9 +269,7 @@ fn the_pinch_family_is_exactly_orthogonal_to_every_trivial_motion() {
     )
     .expect("the pinch family founds");
     assert!(
-        forcing
-            .self_equilibrated(&trivial)
-            .expect("the check runs"),
+        forcing.self_equilibrated(&trivial).expect("the check runs"),
         "net force and net moment both vanish, so Z* f can fail only on a floppy mode"
     );
     assert!(!forcing.held_out_displacement_used);
@@ -333,9 +346,7 @@ fn the_gauge_returns_one_representative_of_the_fibre_with_zero_residuals() {
         "unit magnitudes",
     )
     .expect("the pinch family founds");
-    let force = forcing
-        .force(&[Rat::one(), Rat::one()])
-        .expect("f = B u");
+    let force = forcing.force(&[Rat::one(), Rat::one()]).expect("f = B u");
 
     let response = StaticResponse::solve(
         &stiffness,
@@ -349,7 +360,10 @@ fn the_gauge_returns_one_representative_of_the_fibre_with_zero_residuals() {
     assert!(response.equilibrium_residual.iter().all(Rat::is_zero));
     assert!(response.gauge_residual.iter().all(Rat::is_zero));
     assert_eq!(response.null_fibre_dimension, null.dimension);
-    let displacement = response.displacement.clone().expect("a displacement returns");
+    let displacement = response
+        .displacement
+        .clone()
+        .expect("a displacement returns");
 
     // The gauge really is a choice inside an affine fibre: adding any kernel direction keeps the
     // equilibrium and breaks only the gauge.
@@ -367,6 +381,28 @@ fn the_gauge_returns_one_representative_of_the_fibre_with_zero_residuals() {
             .any(|pairing| !pairing.is_zero()),
         "but only one of them satisfies the declared gauge"
     );
+}
+
+#[test]
+fn a_supplied_null_fibre_must_be_the_actual_kernel_not_only_the_same_dimension() {
+    let places = configuration(1, &[(0, &[0]), (1, &[1])]);
+    let jacobian = jacobian("two-site-unit-bar-null-validation", &places, &[(0, 1)]);
+    let stiffness = stiffness_of(&jacobian);
+    let mut null = NullFibre::measure(&stiffness, &jacobian).expect("the null fibre measures");
+    null.basis[0] = vec![Rat::one(), Rat::zero()];
+    let metric = metric_of(&stiffness);
+    let error = StaticResponse::solve(
+        &stiffness,
+        &null,
+        &metric,
+        ResponseGauge::MetricComplement,
+        &[Rat::one(), integer(-1)],
+    )
+    .expect_err("a same-dimension non-kernel basis is refused");
+    assert!(matches!(
+        error,
+        StaticResponseError::NullFibreBasisVectorNotInKernel
+    ));
 }
 
 #[test]
@@ -427,13 +463,59 @@ fn the_family_reading_rank_matches_the_admissible_force_rank() {
         &forcing,
     )
     .expect("the family reading returns");
-    assert_eq!(reading.admissible_generators, 5, "every pinch is admissible here");
+    assert_eq!(
+        reading.admissible_generators, 5,
+        "every pinch is admissible here"
+    );
     assert!(reading.inadmissible_generators.is_empty());
     assert!(
         reading.response_rank_equals_force_rank,
         "the gauge-fixed response is a bijection on the admissible subspace"
     );
     assert!(reading.response_rank <= reading.stiffness_rank);
+}
+
+#[test]
+fn the_family_reading_uses_the_full_kernel_of_z_star_b() {
+    // A two-site unit bar gives K = [[1,-1],[-1,1]]. With B = I, neither e₁ nor e₂ is
+    // compatible with the translation null mode, but e₁ - e₂ is. Filtering columns one at a
+    // time would incorrectly report an empty admissible family.
+    let places = configuration(1, &[(0, &[0]), (1, &[1])]);
+    let jacobian = jacobian("two-site-unit-bar", &places, &[(0, 1)]);
+    let stiffness = stiffness_of(&jacobian);
+    let null = NullFibre::measure(&stiffness, &jacobian).expect("the null fibre measures");
+    let metric = metric_of(&stiffness);
+    let forcing = ForcingDeclaration::declared(
+        ExactRatMatrix::identity(2).expect("the identity forcing map stands"),
+        vec![
+            ForcingGenerator {
+                description: "first coordinate force".to_owned(),
+                loaded_blocks: vec![0],
+            },
+            ForcingGenerator {
+                description: "second coordinate force".to_owned(),
+                loaded_blocks: vec![1],
+            },
+        ],
+        "the two-site regression support",
+        "the declared coordinate basis",
+        "unit magnitudes",
+    )
+    .expect("the identity forcing map declares");
+
+    let reading = ResponseFamilyReading::read(
+        &stiffness,
+        &null,
+        &metric,
+        ResponseGauge::MetricComplement,
+        &forcing,
+    )
+    .expect("the full admissible family returns");
+    assert_eq!(reading.inadmissible_generators, vec![0, 1]);
+    assert_eq!(reading.admissible_generators, 1);
+    assert_eq!(reading.force_rank, 1);
+    assert_eq!(reading.response_rank, 1);
+    assert!(reading.response_rank_equals_force_rank);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -468,14 +550,36 @@ fn the_linearized_quadrance_change_differs_from_the_finite_one_by_exactly_the_qu
 fn the_measured_quadrance_change_ignores_every_rigid_motion() {
     let source = configuration(3, &[(0, &[0, 0, 0]), (1, &[2, 0, 0]), (2, &[0, 3, 0])]);
     // The same shape, translated by (10, 10, 10) and rotated by the quarter turn (x,y) -> (-y,x).
-    let moved = configuration(3, &[(0, &[10, 10, 10]), (1, &[10, 12, 10]), (2, &[7, 10, 10])]);
+    let moved = configuration(
+        3,
+        &[(0, &[10, 10, 10]), (1, &[10, 12, 10]), (2, &[7, 10, 10])],
+    );
     let pairs = [(0, 1), (0, 2), (1, 2)];
-    let change = QuadranceResponse::between(&source, &moved, &pairs)
-        .expect("the measured change returns");
+    let change =
+        QuadranceResponse::between(&source, &moved, &pairs).expect("the measured change returns");
     assert!(
         change.iter().all(Rat::is_zero),
         "the quadrance receiver needs no superposition and inherits none"
     );
+}
+
+#[test]
+fn measured_quadrance_change_requires_the_callers_block_correspondence() {
+    let source = configuration(1, &[(0, &[0]), (1, &[2]), (2, &[5])]);
+    // The target carries the same shape translated by ten units, but its chart order is [source
+    // block 1, source block 2, source block 0]. The explicit map restores the intended alignment.
+    let target = configuration(1, &[(0, &[12]), (1, &[15]), (2, &[10])]);
+    let correspondence = BlockCorrespondence::declared(3, 3, vec![2, 0, 1])
+        .expect("the caller's chart alignment stands");
+    let pairs = [(0, 1), (0, 2), (1, 2)];
+    let aligned =
+        QuadranceResponse::between_with_correspondence(&source, &target, &correspondence, &pairs)
+            .expect("the aligned comparison returns");
+    assert!(aligned.iter().all(Rat::is_zero));
+
+    let positional = QuadranceResponse::between(&source, &target, &pairs)
+        .expect("the identity convenience route returns");
+    assert!(positional.iter().any(|change| !change.is_zero()));
 }
 
 #[test]
@@ -494,8 +598,14 @@ fn the_unoriented_face_cannot_tell_a_response_from_its_opposite() {
         "cos^2 is blind to the orientation, which is why the sign is reported beside it"
     );
     assert!(agreeing.residual_quadrance < opposing.residual_quadrance);
-    assert!(agreeing.scale_diagnostic.expect("a diagnostic scale").is_positive());
-    assert!(opposing.scale_diagnostic.expect("a diagnostic scale").is_negative());
+    assert!(agreeing
+        .scale_diagnostic
+        .expect("a diagnostic scale")
+        .is_positive());
+    assert!(opposing
+        .scale_diagnostic
+        .expect("a diagnostic scale")
+        .is_negative());
 }
 
 #[test]
@@ -545,12 +655,10 @@ fn a_pinch_on_a_floppy_window_can_still_be_incompatible_and_says_which_mode_refu
         !response.compatible,
         "pulling the ends of an unbraced path is answered by a mechanism, not by a stress"
     );
-    assert!(
-        response
-            .retained_incompatible_force
-            .iter()
-            .any(|entry| !entry.is_zero())
-    );
+    assert!(response
+        .retained_incompatible_force
+        .iter()
+        .any(|entry| !entry.is_zero()));
     assert!(response.obstruction.is_some());
 }
 
@@ -576,7 +684,10 @@ fn a_pinch_along_an_existing_contact_is_answered_and_its_response_is_read_as_qua
         &force,
     )
     .expect("the response returns");
-    let displacement = response.displacement.clone().expect("a displacement returns");
+    let displacement = response
+        .displacement
+        .clone()
+        .expect("a displacement returns");
 
     let pairs: Vec<(usize, usize)> = vec![(0, 1), (0, 2), (1, 2), (3, 4)];
     let quadrance = QuadranceResponse::measure(&places, &displacement, &pairs, "angstrom^2")
@@ -589,8 +700,14 @@ fn a_pinch_along_an_existing_contact_is_answered_and_its_response_is_read_as_qua
          the content of the reading and an unoriented score would lose it"
     );
     assert!(
-        quadrance.quadratic_term.iter().all(|entry| !entry.is_negative()),
+        quadrance
+            .quadratic_term
+            .iter()
+            .all(|entry| !entry.is_negative()),
         "the dropped term is a sum of squares"
     );
-    assert!(response.elastic_energy.expect("an energy returns").is_positive());
+    assert!(response
+        .elastic_energy
+        .expect("an energy returns")
+        .is_positive());
 }

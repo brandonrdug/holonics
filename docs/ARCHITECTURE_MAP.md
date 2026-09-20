@@ -51,6 +51,26 @@ its unclosed consuming equation without requiring the reader to guess one spelli
 
 ## Participating receiver, motion and first-arrival families
 
+### Helical generators, algebraic identities and continuing reuse
+
+[definition] [Helical geometry](HELICAL_GEOMETRY.md) starts with the two actual generators and
+initial configurations, rather than identifying a Gram face with a whole pair. The following
+routes join recent owners to their existing elementary laws and actual consumers.
+
+| Shared operation | Formal source | Native owner and consumer | Scope / remaining equation |
+|---|---|---|---|
+| Screw generator and pair contact variation | `Geometry/ScrewGeometry`, using `HolonicQuadraticMomentCondensation` | `relational_geometry::screw::{ScrewGenerator,PairQuadranceJet}`; `identity_atlas::screw_gram_point` consumes the invariant pairings | Lean bracket/translation/jet/moment laws; exact Rust proper-frame and axis controls. Complete curves also retain orbit points, clocks, phase and constitutive law. |
+| Polynomial relation inference and collapse | `Geometry/TwoSidedIdentityAtlas` | `identity_atlas::{walk,certify,buchberger,compare_collapse}` → the identity example and shared screw Gram chart | Whole-basis certification on the supplied chart union; ambient coverage and all-degree kernel equality are separate obligations. A chart-relative identity is not source equality or a continuing codec. |
+| Certified matrix kernel and solve | Existing rank/nullity and rational algebra contracts | `prime_image_algebra` → `ExactRatMatrix::{rank_and_kernel,preimage_fibre}` → rigidity, identity and response callers | Modular images run on CPU; rational certificates decide the return. Resident pivot realization remains open; the 612-coordinate benchmarks are synthetic. |
+| Static response and admissible forcing family | `Physics/ConformationResponse` and `MechanicalReceiver` supply constitutive comparisons; the general finite solve is source-checked Rust, not claimed as a new paired Lean theorem | `conditioned_static_response::{StaticResponse,ResponseFamilyReading}` | Admissible parameters are `ker(Z*B)`, including compatible combinations of individually incompatible columns; a static gauge is not the off-pole transfer theorem. The RBX1 application is deferred. |
+| Landmarks and normalized constraint modes | `LandmarksAndModuli`, `Farey`, `Polarity`, `PiIterationConstraint`, `MachinPhaseConstraint`, distinct Copson/Newman source families | `winding_inertia`, exact analytic/recurrence and polynomial owners | Existing period, branch, winding and threshold relations precede the atlas. Follow [the source distinction](MATHEMATICS_AND_NATIVE_CONDUCT.md#constraint-defined-modes-and-named-de-bruijn-boundaries). |
+| Generator inference, modal reduction and future receivers | `GeneratorInference`, `GeneratorModeQuotient`, `ReceiverHistoryCompression`, `ChangingReceiver` | `exact_linear::{factor_receiver,kernel_modes}`, `receiver_history_compression`, resident bilinear/current owners | Preserve the actual decoder and `E_next T=U E`, or return the source-null separator and interior defect. Their mathematical or native scope is stated per call. |
+
+[definition] `Framework.Geometry` imports the helical law; `holonics::geometry` exposes its exact
+Rust realization without requiring a device backend. HNN continues through its existing native
+field/session callers. These entry points connect the library's mathematical and application
+scope without making every reference calculation a claimed resident model operation.
+
 [definition] [Receiver holarchy](RECEIVER_HOLARCHY.md) joins the existing receiving Holon,
 frame, stress/induction, entropy and future-receiver compression owners. New geometric
 `project_receiver_point_rate` and `project_point_with_motion` in

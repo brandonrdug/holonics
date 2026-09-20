@@ -24,6 +24,12 @@ receiver, lineage, decoder, residual and cost.
 
 ## The general embedding and its consuming composition
 
+[project-postulate] The latest post-Wave-10 request places the active application focus on
+HNN/Athena and shared Rust/Lean fundamentals. Further protein/biology runs are deferred. The
+[elementary helical guide](../HELICAL_GEOMETRY.md) supplies the actual two-generator/two-orbit
+construction, independent degenerations, contact variation and existing compression source maps.
+The following scientific instances remain mathematical material, not a competing active queue.
+
 [project-postulate] Brandon's September 19 clarification makes this object the central shared
 construction. Protein structures provide complex scientific application objects; Athena is an
 intelligence application of the same machinery; notes and chords express its modal and receiving
@@ -127,6 +133,10 @@ to the same scientific operations. No application must wait for an unrelated con
 or for every possible physical specialization of this object.
 
 ### The conditioned structural response consumer
+
+[historical] This was the selected Wave 10 scientific experiment. Its bounded result and the
+generic `conditioned_static_response` owner remain evidence; Brandon's latest request defers
+further RBX1 runs. The equations below retain the operation's contract and do not schedule it.
 
 [definition; agent-inferred] The proposed RBX1 experiment (#55) is a first **conditioned static
 response** at this scientific consumer, inferred from the available rigidity, contact and measured

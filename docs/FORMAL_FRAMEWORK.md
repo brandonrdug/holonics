@@ -33,6 +33,16 @@ GR-derived models are identified by their actual equations and approximation dom
 
 ## Computational objects and generation
 
+[definition] [Helical geometry](HELICAL_GEOMETRY.md) now gives an elementary specialization of
+generator, frame, contact and receiving variation: two screw generators act on two initial
+configurations; their pair quadrance has a source-derived gradient and full geometric Hessian.
+`Framework.Geometry` imports `Geometry/ScrewGeometry`, whose moment specialization consumes
+`HolonicQuadraticMomentCondensation`. `relational_geometry::screw` shares the existing exact
+vector/affine objects and is consumed by the identity atlas's screw Gram map. The guide keeps
+the proper-frame/axis Rust tests separate from the checked Lean bracket/translation/jet scope.
+It also reconnects the existing landmark, normalized-mode, inference and future-receiver
+compression owners; none is newly founded by this specialization.
+
 [definition] The [Holon specification](HOLON.md) is the current elementary operational
 synopsis: situated interfaces and faces, composition, frame transport, constitutive response,
 variation, inference, generation and modal representation. `Foundation/Holon.lean` owns the

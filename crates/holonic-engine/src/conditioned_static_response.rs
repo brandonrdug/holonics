@@ -197,7 +197,8 @@ impl ElasticDeclaration {
         if let Some(constraint) = stiffness.iter().position(Rat::is_negative) {
             return Err(StaticResponseError::NegativeStiffness { constraint });
         }
-        let mut declaration = Self::uniform(0, Rat::zero(), stiffness_unit, length_unit, energy_unit)?;
+        let mut declaration =
+            Self::uniform(0, Rat::zero(), stiffness_unit, length_unit, energy_unit)?;
         declaration.stiffness = stiffness;
         Ok(declaration)
     }
@@ -208,23 +209,54 @@ impl ElasticDeclaration {
 }
 
 /// **`K = J* W J`: the declared stiffness, self-adjoint by construction and checked.**
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct ConditionedStiffness {
-    pub schema: String,
-    pub presentation_lineage: String,
-    pub declaration: ElasticDeclaration,
+    schema: String,
+    presentation_lineage: String,
+    declaration: ElasticDeclaration,
     /// `w_c = γ_c / (4 ℓ_c²)`, exact.
-    pub weights: Vec<Rat>,
-    pub matrix: ExactRatMatrix,
-    pub coordinate_freedoms: usize,
-    pub constraint_count: usize,
-    pub rank: usize,
+    weights: Vec<Rat>,
+    matrix: ExactRatMatrix,
+    coordinate_freedoms: usize,
+    constraint_count: usize,
+    rank: usize,
     /// `Σ_{i<j} |K_ij − K_ji|`, returned so the self-adjointness is a number and not a promise.
-    pub self_adjoint_defect: Rat,
-    pub work: ExactWork,
+    self_adjoint_defect: Rat,
+    work: ExactWork,
 }
 
 impl ConditionedStiffness {
+    pub fn schema(&self) -> &str {
+        &self.schema
+    }
+    pub fn presentation_lineage(&self) -> &str {
+        &self.presentation_lineage
+    }
+    pub fn declaration(&self) -> &ElasticDeclaration {
+        &self.declaration
+    }
+    pub fn weights(&self) -> &[Rat] {
+        &self.weights
+    }
+    pub fn matrix(&self) -> &ExactRatMatrix {
+        &self.matrix
+    }
+    pub fn coordinate_freedoms(&self) -> usize {
+        self.coordinate_freedoms
+    }
+    pub fn constraint_count(&self) -> usize {
+        self.constraint_count
+    }
+    pub fn rank(&self) -> usize {
+        self.rank
+    }
+    pub fn self_adjoint_defect(&self) -> &Rat {
+        &self.self_adjoint_defect
+    }
+    pub fn work(&self) -> &ExactWork {
+        &self.work
+    }
+
     /// Build `K` from a rigidity Jacobian and a declared energy.
     ///
     /// Refuses a coincident constraint with positive stiffness: `ℓ_c² = 0` has no `γ_c/(4ℓ_c²)`,
@@ -378,6 +410,54 @@ impl NullFibre {
         }
         Ok(pairing)
     }
+
+    /// Validate that this serialized or caller-supplied basis is the complete kernel of `K`.
+    ///
+    /// The dimension alone is insufficient: two different subspaces can have the same dimension,
+    /// and using one of them for compatibility or gauge selection changes the receiver.  Every
+    /// basis vector must be in the actual kernel, the vectors must be independent, and their count
+    /// must equal the kernel dimension.  Those conditions make their span the complete kernel.
+    pub fn validate_against(
+        &self,
+        stiffness: &ConditionedStiffness,
+    ) -> Result<(), StaticResponseError> {
+        let width = stiffness.coordinate_freedoms;
+        if self.dimension != self.basis.len() {
+            return Err(StaticResponseError::NullFibreDimensionFieldDisagrees {
+                declared: self.dimension,
+                basis: self.basis.len(),
+            });
+        }
+        for vector in &self.basis {
+            if vector.len() != width {
+                return Err(StaticResponseError::Linear(ExactLinearError::ShapeMismatch));
+            }
+            if stiffness
+                .matrix
+                .apply(vector)?
+                .iter()
+                .any(|entry| !entry.is_zero())
+            {
+                return Err(StaticResponseError::NullFibreBasisVectorNotInKernel);
+            }
+        }
+        let basis_rank = if self.basis.is_empty() {
+            0
+        } else {
+            ExactRatMatrix::shaped(self.basis.len(), width, self.basis.clone())?.rank()?
+        };
+        if basis_rank != self.basis.len() {
+            return Err(StaticResponseError::NullFibreBasisIsDependent);
+        }
+        let actual_dimension = stiffness.matrix.kernel_basis()?.len();
+        if actual_dimension != self.basis.len() {
+            return Err(StaticResponseError::NullFibreDisagrees {
+                measured: self.basis.len(),
+                returned: actual_dimension,
+            });
+        }
+        Ok(())
+    }
 }
 
 // -------------------------------------------------------------------------------------------
@@ -385,15 +465,28 @@ impl NullFibre {
 // -------------------------------------------------------------------------------------------
 
 /// **The metric `G` on configuration space, declared and never defaulted.**
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct DeclaredMetric {
-    pub schema: String,
-    pub name: String,
-    pub unit: String,
-    pub matrix: ExactRatMatrix,
+    schema: String,
+    name: String,
+    unit: String,
+    matrix: ExactRatMatrix,
 }
 
 impl DeclaredMetric {
+    pub fn schema(&self) -> &str {
+        &self.schema
+    }
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+    pub fn unit(&self) -> &str {
+        &self.unit
+    }
+    pub fn matrix(&self) -> &ExactRatMatrix {
+        &self.matrix
+    }
+
     /// `G = I` on the declared Cartesian coordinate basis. This is a **declaration** that the
     /// coordinate basis is the one the gauge is orthogonal in, not an absence of one.
     pub fn cartesian_identity(
@@ -465,9 +558,9 @@ pub struct ForcingGenerator {
 /// **`B` and the provenance of everything it carries.**
 ///
 /// A contact site is a *support*. It fixes neither a direction nor a magnitude, and this type
-/// refuses to let those three provenances be confused: each is a separate declared string, and
-/// [`Self::held_out_displacement_used`] is a field so that a reading which fitted its own force to
-/// the measurement it is compared against cannot be mistaken for one that did not.
+/// records those three caller-declared provenances separately. The fields are testimony carried
+/// to the receiver; this API cannot prove that a caller did not inspect a held-out displacement
+/// while choosing a support, direction or magnitude.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ForcingDeclaration {
     pub schema: String,
@@ -477,8 +570,8 @@ pub struct ForcingDeclaration {
     pub support_provenance: String,
     pub direction_provenance: String,
     pub magnitude_provenance: String,
-    /// Must be `false`. A `true` here says the reading fitted its forcing or its scale to the
-    /// held-out displacement and is therefore not a prediction of it.
+    /// Caller testimony about held-out use. `true` records declared leakage; `false` does not prove
+    /// its absence because provenance cannot be established mechanically at this boundary.
     pub held_out_displacement_used: bool,
     /// `true` when every column is exactly orthogonal to every trivial motion — proved by
     /// construction for [`Self::pinch_family`] and **checked** by [`Self::self_equilibrated`].
@@ -684,6 +777,7 @@ impl StaticResponse {
         if force.len() != width || metric.matrix.rows() != width {
             return Err(StaticResponseError::Linear(ExactLinearError::ShapeMismatch));
         }
+        null.validate_against(stiffness)?;
         let pairing = null.compatibility_pairing(force)?;
         let compatible = pairing.iter().all(Rat::is_zero);
 
@@ -715,7 +809,8 @@ impl StaticResponse {
 
         let (fibre, solve_work) = stiffness.matrix.preimage_fibre_with_work(force)?;
         work = work.then(&solve_work);
-        let (particular, fibre_kernel) = fibre.ok_or(StaticResponseError::CompatibleForcingHasNoPreimage)?;
+        let (particular, fibre_kernel) =
+            fibre.ok_or(StaticResponseError::CompatibleForcingHasNoPreimage)?;
         if fibre_kernel.len() != null.dimension {
             return Err(StaticResponseError::NullFibreDisagrees {
                 measured: null.dimension,
@@ -724,9 +819,7 @@ impl StaticResponse {
         }
 
         let displacement = match gauge {
-            ResponseGauge::MetricComplement => {
-                gauge_fix(&null.basis, &metric.matrix, &particular)?
-            }
+            ResponseGauge::MetricComplement => gauge_fix(&null.basis, &metric.matrix, &particular)?,
         };
 
         let image = stiffness.matrix.apply(&displacement)?;
@@ -771,9 +864,10 @@ impl StaticResponse {
 
     /// **A different receiver, labelled as one.**
     ///
-    /// Solves `K δq = P f` for the *projected* forcing. This answers a question the declared one
-    /// did not ask: it silently replaces the forcing by its compatible shadow. It exists so that
-    /// the comparison can be made explicitly, and it is never what [`Self::solve`] returns.
+    /// Solves `K δq = P f` for the *Euclidean* projected forcing in the standard coordinate
+    /// pairing. This answers a question the declared one did not ask: it silently replaces the
+    /// forcing by its compatible shadow. The declared metric is used only for the returned gauge;
+    /// this receiver deliberately does not claim a metric-weighted least-squares projection.
     pub fn least_squares_projection(
         stiffness: &ConditionedStiffness,
         null: &NullFibre,
@@ -791,8 +885,9 @@ impl StaticResponse {
         Ok((
             response,
             retained,
-            "LEAST-SQUARES PROJECTION RECEIVER: the declared forcing was replaced by P f. This is \
-             not the declared static response and it does not answer the declared forcing.",
+            "LEAST-SQUARES PROJECTION RECEIVER (EUCLIDEAN; standard coordinate pairing): the \
+             declared forcing was replaced by P f. This is not the declared static response and it \
+             does not answer the declared forcing.",
         ))
     }
 }
@@ -930,9 +1025,29 @@ impl QuadranceResponse {
     /// The measured change between two configurations over the same pair list: `Q(q₁) − Q(q₀)`.
     ///
     /// This needs no displacement correspondence and no superposition — only the two quadrances.
+    /// It is the identity-alignment convenience route; callers comparing differently ordered
+    /// configurations must use [`Self::between_with_correspondence`].
     pub fn between(
         source: &ExactConfiguration,
         target: &ExactConfiguration,
+        pairs: &[(usize, usize)],
+    ) -> Result<Vec<Rat>, StaticResponseError> {
+        let correspondence = BlockCorrespondence::identity(
+            source.ordered_places().len(),
+            target.ordered_places().len(),
+        )?;
+        Self::between_with_correspondence(source, target, &correspondence, pairs)
+    }
+
+    /// The measured change between two configurations using an explicit block correspondence.
+    ///
+    /// The map is supplied by the caller because block position is a chart address, not semantic
+    /// identity. It carries no persistent identity of its own; it only states how this comparison
+    /// aligns the two declared configurations.
+    pub fn between_with_correspondence(
+        source: &ExactConfiguration,
+        target: &ExactConfiguration,
+        correspondence: &BlockCorrespondence,
         pairs: &[(usize, usize)],
     ) -> Result<Vec<Rat>, StaticResponseError> {
         source.validated()?;
@@ -940,18 +1055,24 @@ impl QuadranceResponse {
         if source.dimension() != target.dimension() {
             return Err(StaticResponseError::Linear(ExactLinearError::ShapeMismatch));
         }
+        correspondence.validate(source.ordered_places().len(), target.ordered_places().len())?;
         let dimension = source.dimension();
         let from = source.ordered_places();
         let to = target.ordered_places();
         let mut changes = Vec::with_capacity(pairs.len());
         for (lower, upper) in pairs {
-            let quadrance = |places: &[Vec<Rat>]| -> Result<Rat, StaticResponseError> {
+            let target_lower = correspondence.target_for(*lower)?;
+            let target_upper = correspondence.target_for(*upper)?;
+            let quadrance = |places: &[Vec<Rat>],
+                             lower: usize,
+                             upper: usize|
+             -> Result<Rat, StaticResponseError> {
                 let a = places
-                    .get(*lower)
-                    .ok_or(StaticResponseError::BlockOutsideConfiguration { block: *lower })?;
+                    .get(lower)
+                    .ok_or(StaticResponseError::BlockOutsideConfiguration { block: lower })?;
                 let b = places
-                    .get(*upper)
-                    .ok_or(StaticResponseError::BlockOutsideConfiguration { block: *upper })?;
+                    .get(upper)
+                    .ok_or(StaticResponseError::BlockOutsideConfiguration { block: upper })?;
                 let mut total = Rat::zero();
                 for axis in 0..dimension {
                     let difference = &a[axis] - &b[axis];
@@ -959,9 +1080,72 @@ impl QuadranceResponse {
                 }
                 Ok(total)
             };
-            changes.push(quadrance(&to)? - quadrance(&from)?);
+            changes.push(
+                quadrance(&to, target_lower, target_upper)? - quadrance(&from, *lower, *upper)?,
+            );
         }
         Ok(changes)
+    }
+}
+
+/// A caller-declared alignment from source block ordinals to target block ordinals.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BlockCorrespondence {
+    source_to_target: Vec<usize>,
+}
+
+impl BlockCorrespondence {
+    pub fn identity(
+        source_blocks: usize,
+        target_blocks: usize,
+    ) -> Result<Self, StaticResponseError> {
+        if source_blocks != target_blocks {
+            return Err(StaticResponseError::CorrespondenceIsNotInjective);
+        }
+        Ok(Self {
+            source_to_target: (0..source_blocks).collect(),
+        })
+    }
+
+    /// Declare a source-block to target-block map. Every source block must be mapped exactly once;
+    /// target blocks may contain additional unresolved material outside the compared source chart.
+    pub fn declared(
+        source_blocks: usize,
+        target_blocks: usize,
+        source_to_target: Vec<usize>,
+    ) -> Result<Self, StaticResponseError> {
+        let correspondence = Self { source_to_target };
+        correspondence.validate(source_blocks, target_blocks)?;
+        Ok(correspondence)
+    }
+
+    fn validate(
+        &self,
+        source_blocks: usize,
+        target_blocks: usize,
+    ) -> Result<(), StaticResponseError> {
+        let mut seen = std::collections::BTreeSet::new();
+        if self.source_to_target.len() != source_blocks
+            || self
+                .source_to_target
+                .iter()
+                .any(|target| *target >= target_blocks)
+            || self
+                .source_to_target
+                .iter()
+                .any(|target| !seen.insert(*target))
+        {
+            return Err(StaticResponseError::CorrespondenceIsNotInjective);
+        }
+        Ok(())
+    }
+
+    fn target_for(&self, source_block: usize) -> Result<usize, StaticResponseError> {
+        self.source_to_target.get(source_block).copied().ok_or(
+            StaticResponseError::BlockOutsideConfiguration {
+                block: source_block,
+            },
+        )
     }
 }
 
@@ -1067,21 +1251,23 @@ pub enum NeckIdentification {
     },
 }
 
-/// **A family of independent admissible forcings and the exact rank of the response it generates.**
+/// **The full admissible forcing family and the exact rank of the response it generates.**
 ///
 /// [proved-derived; implemented-exact] The certified statement is about the *operator*: restricted
 /// to `{f : Z* f = 0}` the gauge-fixed response `f ↦ δq` is a linear bijection onto
-/// `{δq : Z* G δq = 0}`, so its rank is `rank K`. That is read here by solving a whole basis of
-/// the admissible span and taking the exact rank of the resulting displacement matrix. A single
-/// observed displacement cannot produce this number; it tests membership and residual against the
-/// image and nothing more.
+/// `{δq : Z* G δq = 0}`, so its rank is `rank K`. For a declared `B`, admissible parameters are
+/// the full kernel of `Z*B`; an individual column can be incompatible while a linear combination
+/// of incompatible columns is compatible. This is read by solving a basis of `ker(Z*B)` and then
+/// taking the exact rank of the resulting force and displacement families. A single observed
+/// displacement cannot produce this number; it tests membership and residual against the image.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ResponseFamilyReading {
     pub schema: String,
-    /// Columns of `B` that are compatible, i.e. `Z* B e_k = 0`.
+    /// Dimension of the admissible parameter family `ker(Z*B)`, not merely individually compatible
+    /// columns.
     pub admissible_generators: usize,
     pub inadmissible_generators: Vec<usize>,
-    /// `rank` of the admissible columns of `B`.
+    /// `rank` of the forces generated by a basis of `ker(Z*B)`.
     pub force_rank: usize,
     /// `rank` of the displacements they generate.
     pub response_rank: usize,
@@ -1102,9 +1288,31 @@ impl ResponseFamilyReading {
     ) -> Result<Self, StaticResponseError> {
         let generators = forcing.matrix.columns();
         let width = stiffness.coordinate_freedoms;
+        null.validate_against(stiffness)?;
+        if forcing.matrix.rows() != width {
+            return Err(StaticResponseError::Linear(ExactLinearError::ShapeMismatch));
+        }
+
+        // The admissible parameter family is ker(Z*B), not the subset of B's columns that happen
+        // to be compatible one at a time. A linear combination of individually incompatible
+        // columns can be a valid static forcing.
+        let mut compatibility_rows = vec![vec![Rat::zero(); generators]; null.dimension];
+        for (row, vector) in null.basis.iter().enumerate() {
+            for column in 0..generators {
+                let force: Vec<Rat> = (0..width)
+                    .map(|at| forcing.matrix.get(at, column).cloned())
+                    .collect::<Result<_, _>>()?;
+                compatibility_rows[row][column] = dot(vector, &force);
+            }
+        }
+        let compatibility = ExactRatMatrix::shaped(null.dimension, generators, compatibility_rows)?;
+        let admissible_parameters = compatibility.kernel_basis()?;
         let mut admissible_forces: Vec<Vec<Rat>> = Vec::new();
         let mut displacements: Vec<Vec<Rat>> = Vec::new();
         let mut inadmissible = Vec::new();
+
+        // Retain the per-column diagnostic for report compatibility; the actual family below is
+        // generated from the full nullspace.
         for column in 0..generators {
             let force: Vec<Rat> = (0..width)
                 .map(|row| forcing.matrix.get(row, column).cloned())
@@ -1112,8 +1320,10 @@ impl ResponseFamilyReading {
             let pairing = null.compatibility_pairing(&force)?;
             if !pairing.iter().all(Rat::is_zero) {
                 inadmissible.push(column);
-                continue;
             }
+        }
+        for parameters in &admissible_parameters {
+            let force = forcing.matrix.apply(parameters)?;
             let response = StaticResponse::solve(stiffness, null, metric, gauge, &force)?;
             let displacement = response
                 .displacement
@@ -1134,7 +1344,7 @@ impl ResponseFamilyReading {
 
         Ok(Self {
             schema: CONDITIONED_STATIC_RESPONSE_SCHEMA.to_owned(),
-            admissible_generators: admissible_forces.len(),
+            admissible_generators: admissible_parameters.len(),
             inadmissible_generators: inadmissible,
             force_rank,
             response_rank,
@@ -1142,18 +1352,17 @@ impl ResponseFamilyReading {
             response_rank_equals_force_rank: force_rank == response_rank,
             neck: NeckIdentification::WithheldSingularStiffness {
                 null_dimension: null.dimension,
-                counterexample:
-                    "on the connected four-site path with K = [[1,-1,0,0],[-1,2,-1,0],\
+                counterexample: "on the connected four-site path with K = [[1,-1,0,0],[-1,2,-1,0],\
                      [0,-1,2,-1],[0,0,-1,1]] and cut {1,2}|{3,4} the stiffness cross block has \
                      rank 1 while the Moore-Penrose cross block [[-3,-1],[-5,-3]]/8 has rank 2, \
                      so C K^+ B is not H(0) = C(-A)^{-1} B and the off-pole neck theorem does not \
                      transfer"
-                        .to_owned(),
+                    .to_owned(),
             },
             one_displacement_does_not_read_a_rank:
-                "a rank statement needs this family of independent admissible forcings or a \
-                 certified operator factorization; one observed displacement tests membership and \
-                 residual against the image"
+                "a rank statement needs a basis of the full admissible parameter family ker(Z*B) \
+                 or a certified operator factorization; one observed displacement tests membership \
+                 and residual against the image"
                     .to_owned(),
         })
     }
@@ -1165,8 +1374,8 @@ impl ResponseFamilyReading {
 /// [counterexample; computational-witness] `K⁺ = (K + 11ᵀ/4)⁻¹ − 11ᵀ/4` for this `K`, whose kernel
 /// is exactly `span{(1,1,1,1)}`. The two cross ranks differ, which is what withholds the neck
 /// identification. Every entry below is a rational; no float is formed.
-pub fn neck_cross_block_counterexample()
--> Result<(usize, usize, Vec<Vec<Rat>>), StaticResponseError> {
+pub fn neck_cross_block_counterexample(
+) -> Result<(usize, usize, Vec<Vec<Rat>>), StaticResponseError> {
     let k = ExactRatMatrix::new(vec![
         vec![integer(1), integer(-1), integer(0), integer(0)],
         vec![integer(-1), integer(2), integer(-1), integer(0)],
@@ -1219,15 +1428,14 @@ pub enum StaticResponseError {
     Linear(#[from] ExactLinearError),
     #[error("the rigidity receiver refused: {0}")]
     Rigidity(#[from] Box<RigidityError>),
-    #[error("constraint {constraint} carries a negative spring constant; W must be positive semidefinite")]
+    #[error(
+        "constraint {constraint} carries a negative spring constant; W must be positive semidefinite"
+    )]
     NegativeStiffness { constraint: usize },
     #[error(
         "the declaration carries {declared} spring constants for {constraints} constraints; a stiffness is declared per constraint and never broadcast"
     )]
-    StiffnessPopulationDisagrees {
-        declared: usize,
-        constraints: usize,
-    },
+    StiffnessPopulationDisagrees { declared: usize, constraints: usize },
     #[error(
         "constraint {constraint} is coincident, so l^2 = 0 and gamma/(4 l^2) does not exist; a loaded zero-length spring is a modelling question and not a division"
     )]
@@ -1268,9 +1476,19 @@ pub enum StaticResponseError {
     GaugeResidualIsNotZero,
     #[error("the null fibre basis is linearly dependent; its Gram matrix is singular")]
     NullFibreBasisIsDependent,
+    #[error(
+        "the declared null-fibre dimension {declared} disagrees with its basis length {basis}"
+    )]
+    NullFibreDimensionFieldDisagrees { declared: usize, basis: usize },
+    #[error("a declared null-fibre basis vector is not in the stiffness kernel")]
+    NullFibreBasisVectorNotInKernel,
     #[error("Z* G Z is singular, so the declared gauge does not select a representative")]
     GaugeIsDegenerate,
-    #[error("the four-site witness failed a Penrose condition; the counterexample is not what it claims")]
+    #[error("the block correspondence is not injective over the declared source chart")]
+    CorrespondenceIsNotInjective,
+    #[error(
+        "the four-site witness failed a Penrose condition; the counterexample is not what it claims"
+    )]
     PenroseConditionFails,
 }
 
