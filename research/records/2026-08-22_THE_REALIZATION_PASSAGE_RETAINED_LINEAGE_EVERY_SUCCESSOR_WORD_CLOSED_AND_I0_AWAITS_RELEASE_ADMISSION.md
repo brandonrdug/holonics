@@ -79,7 +79,7 @@ passage and source-detached native rest.
 `output/the_physical_realization_passage_closes_over_every_successor_word`, 5,861,222 filesystem
 octets, with directory identity
 `3fa6afd363517abb51346c472817a786ad11a2d4f222c556821851844b11c3e0` in
-[`meta/OUTPUT_MANIFEST.tsv`](../../meta/OUTPUT_MANIFEST.tsv). Its members are:
+[`meta/OUTPUT_MANIFEST.tsv`](https://github.com/brandonrdug/holonics/blob/c90540456aa6f94ffec19aaeaed85276a6560f1c/meta/OUTPUT_MANIFEST.tsv). Its members are:
 
 | Member | SHA-256 |
 |---|---|
@@ -135,4 +135,3 @@ final code and artifact closure. The complete release receiver remains the only 
 [open] I1 begins only after release admission. I0 does not emit a recurrent complete textual
 passage, retain a causal boundary across successive Gemma fronts, enact a world return, or perform
 new condensation. Those are I1 and later receiver grades.
-

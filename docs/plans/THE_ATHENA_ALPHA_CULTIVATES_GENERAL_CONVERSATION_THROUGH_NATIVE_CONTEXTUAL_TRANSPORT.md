@@ -913,30 +913,35 @@ questions; a new endpoint campaign is not the critical path to HNN outputs.
 
 ### Field-session source map
 
-[established-bounded; source-inspected] This is the map for the active consumer (#16–#19),
-checked against `1dc61373`. **K** is `crates/holonic-engine/kernels/`. The
+[established-bounded; source-inspected] This map incorporates the Wave 11 ports at `76234843`
+and the September 20 audit repairs. **K** is `crates/holonic-engine/kernels/`. The
 [owner-network record](../../research/records/2026-09-20_THE_FIELD_SESSION_JOIN_HAS_ITS_OWNER_NETWORK_AND_NAMED_ABSENCES.md)
-holds every owner, test and governing record per relation; this table holds the call, the
-machinery to start from and the object that does not exist yet. An implementer begins here.
+retains the pre-port search and equations; the
+[Wave 11 record](../../research/records/2026-09-20_WAVE_ELEVEN_RETURNS_THE_SECTION_PORTS_AND_ITS_BASELINE_SHOWS_A_TEXT_WINDOW_ON_ONE_LANE.md)
+retains its original execution. Current position is in the state, order in the roadmap.
 
-| Operation at the consuming call | Start from | Does not exist yet |
+| Operation at the consuming call | Available owner / return | Remaining composition |
 |---|---|---|
-| Participation `a_FG[Ψ]` over a row's gathered region currents (#17) | Resident `C/field/receiver/normalized.rs` and `K/field_normalized_receiver.cuh::normalized_compare_faces`; exact reference `exponentiated_ratio/transport.rs::NormalizedKernel`; whole calculation `examples/connected_holonic_field.rs` | A **row-sectioned** normalized receiver: both resident entries refuse `rows != 1` and are keyed on field-history occurrences |
-| `δa·UΨ`: the return to the condition operand (#17) | `C/field/receiver/normalized/pullback.rs`, `K/field_material_pullback.cuh`; `NormalizedKernel::{differential,pullback}`; the derived response `w=(2I+JG⁻¹J*)⁻¹r`, `δM=wΨ*`, `z=G⁻¹J*w` in the [cotangent record](../../research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_HAS_A_CONTEXT_COTANGENT.md) | An **adjoint of `section_constitutive_bilinear_source`**: no owner returns a covector to the condition port |
-| Source⊗condition reaction with a content-valued condition (#17) | `C/resident/section/bilinear_features.rs`; `C/…/normal/direct/section.rs::read_applied_bilinear_section`; point form `direct.rs::read_applied_bilinear_joint` with `K/normal_applied_condition.cuh` | An enclosure-source **section** form; and the condition chart is pinned to one coordinate at founding (`shared_extents`, `found_bilinear_contact`, `found_features`), M's width being `s(1+k)+k` |
-| Refinement by re-entry of the generated section (#17) | `…/direct/section.rs::{from_points,sum_same_shape,restrict_components,scatter_components}`, `ResidentHeldSection`; point re-entry `C/field/resident_input.rs::advance_current_resident`; public, uncalled `NativeCoupledBody::receive_condition` | The **enclosure-section → next-source port** (`from_points` has no inverse); a section-level caller of the layer composition and iteration |
-| Section-scale change of D (#19) | Single-row `C/field/junction/operative/source/reflection_target.rs::apply_reflection_target` (used by `body/field.rs::observe`); `operative.rs` contact staging; `propagation.rs::propagate_causal_contacts`; `resident/condition_contact.rs` | Multi-row `section_field_reflection_target`/`_input_cotangent`; `observe_rows` is fixed-D by construction |
-| Source episode → request (#16) | `alpha/exposure.rs::ExposureReader` with `validate`/`development_parts`; `A/field_session.rs::from_exposures`; private exposure stream and the prepared, unexecuted `.local/evaluations/athena-shared-source-2026-09-15/` | **Any exposure→field-session driver**; a request/response aperture (`partial`, `output_symbols`) and the partition/role gates in `from_exposures` |
-| Recorded comparison, save, reopen (#16) | Field rest pending kinds 1–3, session wire v2, `observe_source` | A producing comparison in the shared chart (`prepare_shared` refuses `commit`/`retain_comparison`); an `ExposureCursor` in `NativeFieldSavedSession`; a shared-chart baseline and README |
-| Normal statistics at the measured width (#18) | `C/…/normal/layout.rs::NormalLayout::for_sources` (the explicit cost); resident factor/solve `K/field_normal_material.cuh`; host `factored_moment`, `derived_factor_cover`, `exact_linear/kernel_modes.rs`; resident `C/field/internal_mode.rs` | A factored variant of `NormalSourceChart`/`NormalLayout` and a resident adapter for any factored owner |
-| Repeated refinement word reused economically (milestone 3) | `receiver_history_compression/observable.rs::ObservableMomentReceiverHistoryCompression`, `exact_linear/kernel_modes.rs::compile_source_action`, `MathematicalRequest::Power` | A repeated-word compiler: `ResidentCoupledConstitutive::append_operation` re-evaluates the whole programme |
+| Participation `a_FG[Ψ]` (#17) | `C/field/receiver/normalized/section.rs` supplies row-sectioned participation, comparison and pullback (#57); exact `exponentiated_ratio::transport::NormalizedKernel` | Form the actual phase/current comparison on admitted incidence and supply its content-valued condition to the public shared-field caller |
+| `δa·UΨ`, return to the condition (#17) | `C/resident/section/bilinear_features.rs::pull_back`; `K/section_bilinear_adjoint.cuh` returns both input covectors (#58); normalized section pullback and the [context cotangent](../../research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_HAS_A_CONTEXT_COTANGENT.md) | Compose both variation terms through the same forward carriers, phase/connection and constitutive response |
+| Source⊗condition and enclosure refinement (#17) | `C/field/material_transport/normal/direct/section.rs` enclosed section/pair applications and `reapply_bilinear_enclosed` (#58) | Replace the caller's fixed one-coordinate condition with the specified geometric participation and re-enter the complete returned field; compose the layer/iteration operation |
+| Section-scale change of D (#19) | Single-row operative reflection target/input cotangent and staged contact; `observe_rows` deliberately supplies fixed-D scattering | Derive and consume the multi-row D update, including its producing operands; it is distinct from the already available condition covector |
+| Exposure → request and recorded response (#16/#59) | `FieldSectionRequest::from_exposures`, declared `ExposureAperture`, `examples/athena_exposure_field.rs`, manifest/partition/role validation | Broader contextual source attachment and development/evaluation episodes through the geometric join, with receiver-correct target lengths |
+| Saved comparison and source cursor (#59) | Shared retained requests, `ExposureCursor` in session v3, and optional recorded-event pairing metadata; delayed pairs survive a checkpoint | Legacy comparisons without pairing metadata remain preserved but cannot be auto-associated. Shared-source observation uses current material; a producing-state gradient requires its own retained forward operands when that law is selected |
+| Normal statistics at the measured width (#18) | `NormalLayout::for_sources`, resident normal factor/solve; `factored_moment`, `derived_factor_cover`, `exact_linear/kernel_modes`, resident internal modes | Select and implement a factored `NormalSourceChart`/resident adapter at the join's actual measured width and coefficient growth |
+| Repeated refinement word (milestone 3) | `ObservableMomentReceiverHistoryCompression`, `compile_source_action`, `MathematicalRequest::Power` | Bind the actual field word and receiver to induced action/decoder; `append_operation` still re-evaluates the retained programme |
+
+[definition] Enclosure rows seal their encoded words while carrying a separate radius. The
+Wave 11 APIs propagate nonzero radii; `source == source_hi` validates the packet, not a zero
+physical radius. Read the carrier layout and existing positive-radius tests before narrowing a
+port's domain. The mathematical source is a family; a chosen centre does not erase it.
 
 #### The embedding and decoding objects are the linked toroidal field
 
 [project-postulate] Brandon's September 14–19 direct messages (private extract:
 `.local/message-recovery-2026-09-20/`) fix what is being embedded and decoded. The embedding
 object is a chain of interlinked tori/knots: circulating phase modes on overlapping field domains
-whose shared volumes carry friction/contact faces, with heads and layers as charts of that one
+whose shared cells carry declared contact/material interactions, with heads and layers as charts of that one
 object and fractal geometry in its recurrence. Attention is a situated comparison on admitted
 contact; generation is refinement of the whole field released at a boundary, never a
 token-by-token prediction; decoding is an integration read by a participating receiver Holon
@@ -947,52 +952,54 @@ whose frame moves relative to the field. The repository's statement of it is
 
 | Part of the object | Existing realization | At the field session |
 |---|---|---|
-| Linked toroidal carrier, shared contact cells, material advection | [`intrinsic_holonic_flow`](../../research/experiments/intrinsic_holonic_flow/README.md): six linked tori, 240 multiply-owned cells, exact incompressible flow; `simplicial`, `algebraic::GradedCausalComplex`, `analytic_field` torus charts, `HolonicTorusKnots.lean`, `traversible_chain::BandReading` | Absent. The source enters as one-hot hex-nibble codewords in offset windows `[-2..2]`; the incidence is a text offset list |
-| Phase attention on admitted incidence | `s^h_ij=β_h cos(2π(q_i−q_j−φ_ij))`, `a^h=softmax(s^h)`, sigmoid reaction, complete `∂V` with inbound and outbound participation (same reference); `NormalizedKernel`; Wave 11's row-sectioned receiver and pullback | No participation; constant condition |
+| Linked toroidal carrier, shared contact cells, material advection | [`intrinsic_holonic_flow`](../../research/experiments/intrinsic_holonic_flow/README.md): six linked tori, 240 multiply-owned cells, exact incompressible flow; `simplicial`, `algebraic::GradedCausalComplex`, `analytic_field` torus charts, `HolonicTorusKnots.lean`, `traversible_chain::BandReading` | The current caller prepares symbol-basis rows from supplied text offsets. It does not yet bind this domain/connection law; the existing complex section carrier remains reusable |
+| Phase attention on admitted incidence | `s^h_ij=β_h cos(2π(q_i−q_j−φ_ij))`, `a^h=softmax(s^h)`, sigmoid reaction, complete `∂V` with inbound and outbound participation (same reference); `NormalizedKernel`; Wave 11's row-sectioned receiver and pullback | `prepare_shared` supplies a constant condition; the row-sectioned participation/pullback ports are available for the join |
 | Whole-field refinement | Symplectic split step `q'=q+κ sin 2πp`, `p'=p−∇V(q')`; resolvent `(I−λL²)x*=(1−λ)h` and its sensitivity in [`connected_holonic_field`](../../research/experiments/connected_holonic_field/README.md); `Holon.ofEvolution` | One reaction-plus-reflection pass |
 | Contact faces and exchange | Phase-sensitive dissipative contact with its energy identity; `contact_receiver_faces`, `ReceiverStressEnergy`, [active faces](../CONSTRAINT_MODES_AND_RECEIVER_FACES.md#the-overlap-has-stress-bearing-faces) | The D-reflection only |
 | Decoding by a participating receiver | Geometric decoder `A(x)=Σψ_iφ_i(x)` in the toroidal basis; [receiving Holon](../RECEIVER_HOLARCHY.md); first-arrival populations | Per-position unit-basis selection |
 
-[definition; agent-inferred] The shared-region nibble chart is a text codec and a first
-receiver, not the embedding object. #17's join realizes the object above on the resident body:
-currents on linked toroidal phase channels over a geometrically admitted incidence with its
-connection `φ`, participation as the normalized phase comparison on that incidence, refinement
-of the whole field, and the text section as one receiving face of its boundary. The overlapping
-domains' shared cells are both the contact faces and the co-present cells that #61 places across
-the cover. Inferred from the two exterior references being the only realizations of the object
-and the formula's statement that "the native model assembly still belongs to the active
-field/body". Wave 11's ports are the operators this composition calls.
+[definition; agent-inferred] #17 composes currents on linked toroidal phase channels,
+geometrically admitted incidence and connection φ, phase-sensitive participation, whole-field
+refinement and a participating boundary receiver. This follows the direct geometric objective
+and the available owners above. A text nibble/word/scalar chart supplies one exterior source and
+receiver; its storage type does not decide the internal topology. The intrinsic nonlinear phase
+reference and the older connected linear solve are controls for their respective equations,
+not interchangeable specifications of the whole model. Symplectic split steps preserve their
+stated structure; they do not automatically conserve the unsplit energy or prove convergence.
 
-#### The section is one Holon; its regions are co-present cells
+#### The section's causal decomposition determines its hardware placement
 
-[project-postulate] The shared-region chart is one continuing section read through overlapping
-regions. Each region reads shared immutable standing (the source section, M, D) and writes one
-disjoint centre window. Its region events therefore commute, `Λ_eΛ_f=Λ_fΛ_e`, including lineage
-and obstruction: they are one class of the trace monoid, logically co-present. The
-[hardware-cover ruling](../../research/records/2026-08-01_THE_HARDWARE_IS_A_RECEIVER_COVER_THE_CARD_MUST_CARRY_THE_CURRENT.md)
-governs their realization: physical serialization is a lax realization coordinate and creates no
-causality; a lane, block or thread is not a holon; the card must carry the current. Cost is
-reported as cells, lanes occupied and idle, and service rounds `R=ceil(N/C)` — the quantities of
-the cover — and not as the size of a matrix.
+[definition] For a fixed source cut, immutable source/M/D reads and disjoint staged centre
+outputs offer a candidate independent row population. Certify the **complete** read/write,
+lineage, obstruction and logical-resource effects before asserting `Λ_eΛ_f=Λ_fΛ_e`. Repeated
+refinement introduces dependencies between steps; material accumulation needs its own reduction
+law. Contact is the declared interaction, and is distinct from the independence of an execution
+partition. #61 implements this realization inside the #17 join, from its actual operands.
 
-| Realization relation | Existing owner | At the section path |
+| Realization relation | Existing owner | Consuming obligation |
 |---|---|---|
-| Regions of one section, completeness and disjointness computed | `section_partition.rs::{SectionRegion,SectionPartition,certify,CellReceipt::is_interchangeable,SharedRead}` | Not called; the regions exist only as row indices |
-| Independence licensing a placement | `interchange::certify_footprints`; `hardware_cover.rs::{CoverDecomposition::of,independence,work}` | Not called by `constitutive_fibre` or `holonics-hna` |
-| Partition generates layout: gather → one shared local operator → injective or coloured scatter | `holonic-mount::section_layout::SectionLayout::generate`; Lean `Foundation/SectionLayout.lean`; `section_layout_adoption.rs` already proves `scatter_components` is an instance | Only the scatter is declared. The shared chart is exactly this shape: one M and D for every region |
-| A launch is a passage owing a receipt; threads biject with cells | `holonic-mount::launch_law::{LaunchRequirement,LawfulLaunch,PartitionedWrite}`; Lean `Foundation/DeviceLaunchLaw.lean::linear_thread_bijective` | Section kernels guard `blockIdx.x||threadIdx.x` and loop rows on one lane; `bilinear_features` issues one launch per row from a host loop |
-| Service pressure of a population on finite lanes | `receiver_current.rs::ExactReceiverCurrentLaw`; `SectionPartition`'s `SpeciesPressure` | Unmeasured; the baseline's clocks are this dilation with `C=1` |
+| Complete region partition and shared reads | `section_partition::{SectionRegion,SectionPartition,certify,CellReceipt::is_interchangeable,SharedRead}` | Construct and validate the selected geometric/source cut, boundary and staged outputs |
+| Independence licensing placement | `interchange::certify_footprints`; `hardware_cover::{CoverDecomposition::of,independence,work}` | Certify the operation including its retained effects, not just distinct row numbers |
+| Gather → shared operator → scatter | `holonic-mount::section_layout::SectionLayout::generate`; `Foundation/SectionLayout.lean`; `section_layout_adoption` | Extend the current scatter instance through source gather and the joined geometric operation |
+| Lawful launch | `holonic-mount::launch_law`; `Foundation/DeviceLaunchLaw.lean` | Map independent cells/features to the available cover and keep refinement/update dependencies explicit |
+| Cost at that cover | `receiver_current::ExactReceiverCurrentLaw`; `SectionPartition::SpeciesPressure` | Measure operation work, occupied/idle lanes, service rounds, transfer, memory and end-to-end time on the same source |
 
-[established-bounded; measured; source-inspected] The first shared-chart baseline (110 s
-generation and 196 s update medians over 2,110–11,800 co-present regions) is this lax
-realization at one occupied lane, not a property of the model's law. It is not evidence about
-the normal statistics (#18), whose factor and solve act once per update.
+[established-bounded; source-inspected] The applied-condition and bilinear-adjoint section
+kernels launch one block/one active thread and loop over rows; feature preparation also issues
+per-row launches. The normalized receiver instead launches one block per row with thread zero
+active. These paths are resident, but they do not yet provide a common partition-generated
+parallel realization. A blanket “the whole model occupies one lane” overstates this inspection.
 
-[definition; agent-inferred] Regions couple through each row's gathered neighbour currents and
-their participation; the centre-window scatter remains injective, so the device arm of
-`AccumulationLaw::IntegerAdd` (#13) is not a dependency of this join. Resident exact elimination
-(#50) has no consumer on this path: the normal factor/solve is already resident and every
-`exact_linear` call here is below the certified-path crossover.
+[established-bounded; measured] The shared-chart baseline records median generation of 110 s
+and update of 196 s on its bounded source population. Those clocks measure the current entire
+path; they do not isolate normal statistics, prove one cause of the cost, or measure the joined
+geometric model. Reuse the [same recorded inputs and baseline](../../research/experiments/athena_field/shared/README.md)
+when comparing a realization change.
+
+[definition; agent-inferred] An injective centre scatter can use disjoint writes without the
+integer-add device reduction (#13); re-check that property when the output/geometry changes.
+The current field normal factor/solve is already resident. General modular exact elimination
+(#50) serves separate structural-library consumers and is outside the active HNN order.
 
 ### Coupled-wave source map (September 13)
 

@@ -1,177 +1,187 @@
-# Holonics — Claude's operating document
+# Holonics — Claude operating guide
 
-Holonics is Brandon's mathematical, physical and computational theory of everything, built as one
-Rust + Lean + CUDA library. **HNN** (Holonic Neural Network) is the machinery, **Athena** its first
-product, **Eros** the whole formative machine Athena lives inside. One human operator: Brandon. His
-latest message governs. The repository is public; `.local/` is private.
+Holonics is Brandon's mathematical, physical and computational framework. **HNN** is the machinery,
+**Athena** its first intended product, and **Eros** the collective formative organization and the
+composition within it. Brandon's latest direct request governs. This is Claude's self-contained
+project guide; Codex uses [AGENTS.md](AGENTS.md). Both use the mathematical definitions and source
+maps in [THE_MACHINE](docs/THE_MACHINE.md), [HOLON](docs/HOLON.md) and [HNN_FORMULA](docs/HNN_FORMULA.md).
 
-Everything below is loaded into every Claude session and subagent. The mathematics here is the
-implementation specification. It is never background to "the code".
+Read the machine, [CONSTRUCTION_STATE](CONSTRUCTION_STATE.md) and the complete
+[roadmap](docs/plans/THE_ROADMAP.md) once for the current task, retaining already-read context.
+Worker prompts name this guide and the specific machine/source material to read. Make that context
+explicit rather than relying on an assumption about which files a particular harness loaded.
 
-## 1. The machine
+## 1. The object and its equations
 
-An HNN is one continuing field: **a chain of interlinked tori**. Each torus carries circulating
-phase modes; neighbouring tori overlap, and the shared volume is a **contact face** where currents
-meet with friction, exchange energy and deposit heat. A **Holon** `|H⟩_F` is that field in a frame
-`F`: a whole and a part at once, at every grain. Heads, layers, levels and time steps are charts of
-the one object. A **receiver** `⟨r|` is another participating Holon with its own moving frame;
-every readout, stored file and displayed image is a face `⟨r|H⟩` it receives. Plates and a
-capacitating medium recur at every scale: ground/atmosphere, membrane/cytosol, neuron/neurochemistry.
+[project-postulate] HNN is one continuing geometric field: circulating phase modes, interlinked
+toroidal domains, helical passages, active contacts and participating receivers. A Holon `|H⟩_F`
+carries incidence K, material Θ, joint currents/modes and interior storage in frame F; it is a whole
+and a part simultaneously. The geometry is how information is carried, compared, transformed and
+learned. Every value is a situated comparison; its source, orientation and receiving scope remain.
+The full theory-of-everything ambition and consumer-hardware usefulness guide the construction.
 
-```text
-State            M = (K, Θ, x)        K oriented contact incidence · Θ constitutive material · x currents and modes
-Output           y_F = ρ_F( b_H(x) )  b_H boundary current · ρ_F the receiver's reading
-Transport        |H'⟩_F' = Ĝ_(F'←F)|H⟩_F           Interaction   C^c = I^c_ab A^a B^b
-Unit             |source⟩ → H_int (standing medium) → H_pert (dynamic) → ⟨perspective|     a neck joins two media
-Embedding        occurrence ↦ amplitude·e^{2πi q} on Tⁿ ; which tori link = K ; connection φ_ij on each contact
-Sequence/time    helix: ξ=(ω,v), V_ξ(x)=ω×x+v, |H(s)⟩=exp(sξ̂)|H(0)⟩ ; ω=0 shift/SSM, v=0 periodic mode
-Helical pair     Δ=x_a(s)−x_b(t), Q=⟨Δ|Δ⟩, DQ=(2Δ·v_a, −2Δ·v_b), D²Q keeps the Δ·a terms ; K=ω·ω', R=ω·v'+v·ω'
-Attention        s_ij = β cos 2π(q_i − q_j − φ_ij),  a_i· = softmax over E_i (admitted contacts only)
-                 T_F[Ψ] = Σ_G a_FG[Ψ] U_(F←G)[Ψ] Ψ_G            (Re⟨Q_i,K_j⟩ is this cosine, amplitude-weighted)
-Learning         δT = Σ a δ(UΨ) + Σ δa UΨ,   δa = J δs,  J = diag(a) − a aᵀ ; returned by the paired adjoint
-                 cross-entropy covector q−p ; squared-probability covector J_p(q−p)
-Native reaction  incoming = s + M·[s, c, c⊗s] ;  out = S_D(incoming, b) (scattering through D, interior b)
-Normal law       H ← H + f f*,  B ← B + t f*,  W H = B          (statistics, never stored samples)
-Generation       x(τ₀)=I_h(ξ), ∂_τ x = F_(Θ,K)(x,h,τ)  — whole-field refinement, never a token index
-                 reference step  q' = q + κ sin 2πp,  p' = p − ∇V(q') ; implicit (I − λB)x* = (1−λ)h, dB=(dL)L+L(dL)
-Decoding         receiver integrates the boundary along its cycles: A(x)=Σ ψ_i φ_i(x) ; text/image/sound are faces
-Compression      E_next T = U E and D E = ρ, else keep the separator (ker E ⊄ ker E T) ; commensurate windings close:
-                 a (p,q) torus knot is a finite recurrence ; identities of a configuration = kernel of its face map
-Recursion        A_0=A, A_(n+1)=Φ⁻¹(A_n)∖A  first-arrival sets: fractal geometry at a fixed number of state axes
-Tube             the object over time ; a tower is one frame of it ; a staircase its passage between grains/jet orders
-```
-
-**Why the big mathematics is here.** Hodge = which cycles are realized. RH = where spectral
-landmarks sit (the `1/2` is a conservation of faces under a reflection). Complex Euler and
-Navier–Stokes = how flux transports without and with dissipation. Iwasawa = the tower of grains.
-The engine executes exactly these objects. Their conjectures are side quests; their objects are parts.
-Expect commonalities between them and whatever you are building; find the owner and compose it.
-
-**Notation.** Dirac kets/bras/brackets typed by frame; Einstein indices for Holons as tensors
-(upper = ket port, lower = bra port, raise/lower only through a frame's metric); every expression
-has a figure (oriented lines, vertices, loops). A sign is a passage: `−1 = e^{iπ}`, `i = e^{iπ/2}`.
-A move between neighbouring blocks is an arrow (`A_↗`, `A_↘`), not an index pair. A constant
-(`π`, `e`, `φ`, de Bruijn–Newman `Λ`) is a constraint mode; a float is one face of it. An abstract
-expression is *unoriented* until causally framed. Full dialect: `docs/HOLONIC_NOTATION.md`.
-
-## 2. Where it lives
-
-| Part | Lean (`formal/elementary-holonics/ElementaryHolonics/`) | Rust (`crates/holonic-engine/src/` unless noted) | Resident on the card today |
-|---|---|---|---|
-| Linked toroidal carrier, contact cells | `Millennium/HolonicTorusKnots`, `Foundation/{Holon,HolonTensorLens}` | `simplicial`, `algebraic`, `analytic_field`, `traversible_chain`; reference `research/experiments/intrinsic_holonic_flow` | **No.** Native carrier is a generic section |
-| Helix, helical pair, identities | `Geometry/{ScrewGeometry,TwoSidedIdentityAtlas}` | `crates/relational-geometry/src/screw.rs`, `identity_atlas` | **No** |
-| Phase attention + variation | `Computation/{HolonicAdjointNormalization,AttentionModeCompression}` | `exponentiated_ratio/transport.rs::NormalizedKernel`; reference `research/experiments/connected_holonic_field` | Row-sectioned receiver, pullback, condition covector exist (Wave 11); not yet on a toroidal incidence |
-| Contact, friction, energy | `Physics/{PhaseContactPassage,ReceiverStressEnergy,CoupledIncidence}` | `holonic_interaction`, `junction_law`, `neck`, `fold` | D-scattering and paired adjoint in `native_ecology/constitutive_fibre/field/` |
-| Refinement and release | `Foundation/Holon.ofEvolution`, `Transport/ReceiverPotential` | `receiver_release`, `continuing_tube`, `jet_staircase` | One reaction+reflection pass; re-entry port exists |
-| Receiver, decoding | `Foundation/Receiver`, `Transport/ChangingReceiver` | `receiver_atlas`, `docs/RECEIVER_HOLARCHY.md` | Unit-basis symbol selection: a text codec only |
-| Closure, landmarks, compression | `Foundation/{ReceiverHistoryCompression,GeneratorModeQuotient,JointReceiverDescent}`, `Millennium/{LandmarksAndModuli,Farey,HolonicQuadraticMomentCondensation}` | `exact_linear/{contextual,kernel_modes}.rs`, `receiver_history_compression/`, `winding_inertia` | `field/internal_mode.rs`, `recurrent_condensation`; not bound to the session |
-| Co-present cells on hardware | `Foundation/{SectionLayout,DeviceLaunchLaw}` | `hardware_cover`, `section_partition`, `crates/holonic-mount/src/{section_layout,launch_law}.rs` | **Not called by the field path** (#61) |
+[definition] Independent commuting phases admit a toroidal chart. Linked/overlapping domains have
+actual common cells and an interaction law; overlap alone does not supply friction. A helical object
+has a generator **and an initial configuration**, with its own clock/parameter. A receiver is a
+participating Holon whose reading can also have a simpler fixed-frame specialization.
 
 ```text
-crates/holonic-engine      exact library + native ecology + CUDA kernels (kernels/*.cuh, exact_resident_section.cu)
-crates/holonics-hna        the HNN crate: src/native/{field_session.rs, field_session/shared.rs,
-                           coupled_wave/body/field{,/section}.rs, mathematical.rs}, src/alpha/exposure.rs, src/stream.rs
-crates/relational-geometry exact geometry (RatVec3, AffineMap3, screw, exact_analysis)
-crates/holonic-{life,mount,body,abi,…}  lifecycle, CUDA mount/launch law, substrate
-applications/holonics-workbench         CLI `holonics` (hna field-session …) ; applications/conversation-data  corpus packager
-formal/elementary-holonics              ~1,350 Lean files: Millennium/ 1,004 (NS > 500, Hodge ~100), RH/ 140, Foundation, Physics, …
-research/records/                       ~1,575 dated records; filenames are full-sentence titles = the cheapest index
-research/experiments/ , research/papers/source/papers/{elementary-holon-generation,hnn-information-chemistry,…}
-docs/                                   THE_MACHINE, HOLON, HNN_FORMULA, HELICAL_GEOMETRY, ARCHITECTURE_MAP (owner crosswalk),
-                                        plans/THE_ROADMAP (order), plans/THE_ATHENA_ALPHA… (spec + field-session source map), canon/
-CONSTRUCTION_STATE.md                   current position and next action
-.local/                                 private: datasets/ (conversation corpus + exposure stream), evaluations/, artifacts/
-~/Workspaces/laboratory                 frozen predecessor repository; Brandon's earlier reasoning lives there
+Object           (K, Θ, Ψ, interior) in frame F; its displayed vector/file is a chart
+Transport        |H'⟩_(F') = Ĝ_(F'←F)|H⟩_F         Output   y = ρ_F b_H(H')
+Interaction      |source⟩ → [standing H_int, dynamic H_pert, contact/material law] → ⟨perspective|
+Helical source   ξ=(ω,v), V_ξ(x)=ω×x+v; two objects retain both generators and initial configurations
+Pair receiver    Δ=x_a(s)−x_b(t), Q=⟨Δ|Δ⟩; DQ and D²Q include both motions and geometric Δ·a terms
+Participation    T_F[Ψ]=Σ_G a_FG[Ψ] U_(F←G)[Ψ] Ψ_G over admitted contacts
+Phase chart      s_ij=β cos(2π(q_i−q_j−φ_ij)), a=softmax(s); this unit-phase restriction has a connection φ
+Variation        δT=Σ a δ(UΨ)+Σ δa UΨ, δa=(diag(a)−aa*)δs
+Local reaction   Φ(s,c)=s⊕c⊕(c⊗s), incoming=s+MΦ(s,c), out=S_D(incoming,b)
+Normal law       H=H₀+Σw f f*, B=B₀+Σw t f*, W H=B, with declared prior/weights/receiver
+Generation       ∂_τ x=F_(K,Θ)(x,h,τ); refine the joint field and receive its boundary
+Compression      D E=ρ, E_next T_g=U_g E; otherwise retain the separator, interior and defect
+Recursion        A₀=A, A_(n+1)=Φ⁻¹(A_n)∖A: receiver-first-arrival populations of the actual recurrence
 ```
 
-The native crates name no torus, helix or knot anywhere. The object is realized in Lean,
-`relational-geometry` and exterior reference experiments. **That gap is the work**, and it is never
-evidence that the geometry is unrelated to the engine. Native code being generic linear algebra is
-the thing being replaced, not the ontology.
+[definition] Learning uses the covector of a declared comparison. With prediction p and target q,
+`p−q` is the cross-entropy logit gradient; `q−p` is its descent/update covector. Squared-probability
+error also passes through the softmax Jacobian. Physical dissipation `⟨Jv,DJv⟩`, stored-energy
+change and a learning loss are distinct quantities until a constitutive/receiver law connects them.
+The paired adjoint uses the operands that produced the forward carriers.
 
-## 3. Arithmetic and hardware are part of the mathematics
+[definition] Exact representation keeps constraints, branch, units, winding and remainder.
+Periodic closure additionally needs a period/commensurability relation; an exact rational or
+algebraic phase can have nonperiodic transport. The [helical guide](docs/HELICAL_GEOMETRY.md) and
+[constraint-mode guide](docs/CONSTRAINT_MODES_AND_RECEIVER_FACES.md) supply the actual cases.
 
-- **Exact, no floats on a deciding path.** Values are rationals or dyadic enclosures `centre ± radius`
-  at a declared grain, on a signed 128-bit carrier. `rg -n '\bf32\b|\bf64\b' <files>` and account for
-  every hit. Floats are fine for exterior plots and measured statistics.
-- **Growth is answered by rebasing**: divide by the gcd, factor, change chart, take prime images with
-  a certificate. Never widen a carrier or raise a ceiling. A refusal names its cause.
-- **The card carries the current.** Region events that read shared immutable standing and write
-  disjoint outputs commute, `Λ_e Λ_f = Λ_f Λ_e`: they are co-present. Certify the partition
-  (`section_partition`), license placement by independence (`hardware_cover`), generate
-  gather → shared operator → scatter (`SectionLayout`), launch with threads in bijection with cells
-  (`launch_law`). A kernel that guards `blockIdx.x||threadIdx.x` and loops rows uses one lane of the
-  card. Report cost as cells, lanes occupied/idle and service rounds `R = ceil(N/C)`. Admission of a
-  device realization is `D∘K∘E = Λ` against the exact reference. Governing record:
-  `research/records/2026-08-01_THE_HARDWARE_IS_A_RECEIVER_COVER_THE_CARD_MUST_CARRY_THE_CURRENT.md`.
-- **Lean is exterior verification.** It never runs inside cultivation or inference. Rust mirrors the
-  formalized objects as a standard library; a formalized law gets its native owner.
-- **Every value enters through its constructor**; wires and remounts re-validate; declared sizes are
-  bounded before the work they size.
+[project-postulate] Hodge's realization/cycle laws, RH's source-qualified spectral-placement laws,
+Euler/Navier–Stokes transport, Iwasawa levels and the geometric/physical/information constructions
+are implementation material at their stated hypotheses. Their conjecture endpoints are separate
+claims. Recover the applicable relation and compose it; an isolated example does not reset the
+framework's accumulated capability. Solvers, generator inference and Holonic Encoding are learning
+and intelligence at their supplied/inferred scope.
 
-## 4. Working here
+[definition] Use [Holonic notation](docs/HOLONIC_NOTATION.md): typed kets, bras, faces and frame
+transports; upper/lower tensor ports and an explicit metric for raising/lowering; oriented lines,
+vertices and loops. `−1=e^{iπ}` and `i=e^{iπ/2}` are passages; name windings and state split/hand.
+Neighbouring block passages use `A_↗`, `A_↘`. Abstract expressions are unoriented until framed.
+Context means actual incidence, current, material/storage, local clocks and the interior return
+needed by continuation. Limited observations may retain a plural Preimage Fibre without a perfect
+inverse or an event archive.
 
-**Before planning anything**, say which part of §1 the task realizes and what the "resident" column
-of §2 becomes. If the geometry does not appear in your description of the task, you have lost the
-object. Then find what exists:
+## 2. Where the implementation lives
+
+| Operation | Source owner |
+|---|---|
+| Public model and move owner | `crates/holonics-hna/src/native.rs`; `native/coupled_wave/body/field.rs`, `field/section.rs`; `NativeCoupledBody` |
+| Session, region preparation and observed return | `crates/holonics-hna/src/native/field_session.rs`, `field_session/shared.rs`; inspect the actual `prepare_shared`/`shared_request`/`observe_rows` calls |
+| Real source and its comparison/cursor | `crates/holonics-hna/src/alpha/exposure.rs`, `examples/athena_exposure_field.rs`; [conversation data](docs/CONVERSATION_DATA.md) |
+| Constitutive field and paired source/current | `crates/holonic-engine/src/native_ecology/constitutive_fibre/field/`: source/reflection/target, material transport, receivers and internal modes |
+| Normalization and adjoints | `field/receiver/normalized{,.rs}`, `field/material_transport/normal/direct/section.rs`, `resident/section/bilinear_features.rs`; exact reference `exponentiated_ratio::transport::NormalizedKernel` |
+| Kernels and their Rust binders | `crates/holonic-engine/kernels/{exact_resident_section.cu,field_normalized_receiver.cuh,normal_applied_condition.cuh,section_bilinear_adjoint.cuh}`; `src/resident_section/` |
+| Hardware law | `hardware_cover`, `section_partition`; `crates/holonic-mount/src/{cuda,launch_law,section_layout}.rs` |
+| Exact geometry and helical pair | `crates/relational-geometry/src/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs` |
+| Algebra and economical continuation | `exact_linear`, `prime_image_algebra`, `receiver_history_compression`, `winding_inertia`; resident bilinear/normal/word/mode owners at their separate call boundaries |
+| Public framework | `crates/holonics/src/lib.rs`: `geometry` and `structure` without default native features; `holonics-hna` for HNN |
+| Lean | `formal/elementary-holonics/ElementaryHolonics/Framework.lean` and its Core/Geometry/Dynamics/Information/Physics/Computation entry points |
+| Applications and evidence | `applications/holonics-workbench`, `applications/conversation-data`; `research/{records,experiments,papers,notebook}`; [layout](docs/REPOSITORY.md) |
+
+[definition] **Enclosure ABI:** sealed low/high carrier words can encode a definite centre and
+an independently nonzero radius. Equality of those words is not a zero-radius test. Read the row
+layout, grain, denominator and radius slot before judging propagation or refusal. The native
+normal and normalized-receiver section tests exercise nonzero source/condition/covector radii.
+A joint ball, a family with shared parameters and independent coordinate intervals have different
+information; use the representation the consuming equation needs.
+
+[definition] **Hardware:** co-present regions execute together when complete read/write, lineage,
+obstruction and resource effects commute. Shared immutable input and disjoint staged output are
+one sufficient pattern; mutable overlap needs its actual interchange/reduction law. Certify the
+partition, read device capacity, derive layout/launch and retain the current on the card. One
+block per row with one active thread, one thread looping all rows, and useful parallel work within
+a row are different realizations. Report the actual one, not only the word “resident”.
+
+## 3. Recover the research before choosing an implementation
+
+The maintained [research routes](research/records/README.md) link useful records directly to
+formal/native owners. Begin with the task's subject, not only a recently proposed algorithm.
+
+- **Landmarks/phase/constants:** `LandmarksAndModuli`, `Farey`, `Polarity`, `PiIterationConstraint`,
+  `MachinPhaseConstraint`, `winding_inertia`, exact analytic owners; qualify the distinct Copson
+  and Newman source families.
+- **Inference/normalization/compression:** `GeneratorInference`, `HolonicAdjointNormalization`,
+  `AttentionModeCompression`, `GeneratorModeQuotient`, `ReceiverHistoryCompression`,
+  `ReceiverCodeCost`, quadratic moments and their native factor/receiver/mode consumers.
+- **Geometry/physics:** [helical geometry](docs/HELICAL_GEOMETRY.md),
+  [fluid construction](docs/HOLONIC_FLUID_CONSTRUCTION.md),
+  [active faces](docs/CONSTRAINT_MODES_AND_RECEIVER_FACES.md),
+  [intrinsic field](research/experiments/intrinsic_holonic_flow/README.md),
+  [mathematics/native synthesis](docs/MATHEMATICS_AND_NATIVE_CONDUCT.md).
+- **Data and prior decisions:** [conversation data](docs/CONVERSATION_DATA.md),
+  [retractions](docs/RETRACTIONS.md), [evidence/log protocol](docs/AGENT_PROTOCOL.md), and the frozen
+  `~/Workspaces/laboratory` at the relevant source revision.
 
 ```bash
-.agents/bin/prior-art 'prose name|LeanCamelCase|rust_snake_case|classical name'   # searches Lean, crates, docs, record titles
-rg -n '<term>' docs/ARCHITECTURE_MAP.md                                          # owner crosswalk; search it, don't read it through
-ls research/records | grep -i '<subject>'                                        # titles are sentences
-gh issue list --state open ; gh issue view <n>                                    # itemized backlog, milestones = deliverable returns
+.agents/bin/prior-art 'subject|LeanName|rust_name|classical spelling'
+rg -n '<term>' docs/ARCHITECTURE_MAP.md
+rg --files research/records | rg -i '<subject|alternate spelling>'
+gh issue view <number> --repo brandonrdug/holonics
 ```
 
-Search the subject's own vocabulary, not the phrase that raised it; one hit is not the owner. Whether
-machinery exists is answerable from the tree, so answer it from the tree. Most subjects Brandon
-raises are already established here and he has usually said them before: recover them, and respond
-from inside the framework.
+Read the matched record and its actual source/caller. The task identifies the known operands,
+inferred unknown, generating law, receiver and returned residual. Native HNN foundations remain
+prior to further inherited-model production; Soulkiller's admitted material retains its recorded
+scope. [Architecture](docs/ARCHITECTURE.md), [Soulkiller](docs/SOULKILLER.md), [Athena](docs/ATHENA.md)
+and [interoperability](docs/INTEROPERABILITY.md) define those interfaces. Keep existing API/wire names.
 
-**Decide and proceed.** Resolve choices from the mathematics, mark the sentence `[agent-inferred]`
-with what it was inferred from, and carry on; Brandon corrects retroactively. Ask him only for a
-choice the framework cannot determine. The strongest validation is execution against reality.
+## 4. Work, verify and document the return
 
-**Write documentation.** New documents, records and maps are wanted whenever they network the
-mathematics to the implementation. Records go in `research/records/` as
-`YYYY-MM-DD_FULL_SENTENCE_TITLE.md`; update `docs/ARCHITECTURE_MAP.md` when an owner changes; put the
-context a task needs where the task is described (issue body, source map). State what a thing **is**,
-its equation and where it lives. Claims carry one grade from `docs/canon/EPISTEMIC_GRADES.md`
-(`[definition]`, `[project-postulate]`, `[proved-derived]`, `[established-bounded; …]`,
-`[interpretation]`, `[agent-inferred]`).
+[project-postulate] Resolve routine choices from the mathematics, annotate inferred choices with
+their reason, and proceed. Implement the relation and its actual consumer together. Stage changes
+under one move owner; use the producing material for its adjoint and publish the successor when
+its return succeeds. Inspect the generated result and measured cost at the declared receiver.
+A scalar loss or benchmark has its source, units and population; it is not intrinsic identity.
 
-**Report in the object's terms.** What was constructed or inferred, its equation, where it applies,
-what it cost. No apology, self-blame, surprise at established subjects, or invented "walls".
+[project-postulate] Create and reorganize documentation when it makes the mathematics or source
+usable. Put reusable definitions in their guide, implementation beside its owner, substantial
+research in dated records, current order in the roadmap and current position in the state.
+Connect the record to its subject route, code and issue body. [Epistemic grades](docs/canon/EPISTEMIC_GRADES.md)
+separate truth status from evidence; `agent-inferred` annotates a decision rather than proving it.
+[The document law](docs/canon/THE_DOCUMENT_LAW.md) gives the shared placement convention.
 
-**Build and check** (shell is fish: wrap pipelines in `bash -c '…'`; CUDA needs `PATH=/opt/cuda/bin:$PATH`):
+Commands below use Bash; invoke Bash explicitly if the active shell is fish. CUDA may need
+`PATH=/opt/cuda/bin:$PATH`. [DEVELOPMENT](docs/DEVELOPMENT.md) owns the detailed procedure.
 
 ```bash
-cargo check -p holonic-engine --lib                                   # ~25 s warm; first CUDA build ~90 s+
-cargo test  -p <crate> --lib <module::path>::                         # module scope
-cargo test  -p holonic-engine -p holonics-hna -p relational-geometry --lib     # broad host run (~100 s)
-flock .local/gpu.lock cargo test -p <crate> --lib <exact::test> -- --ignored --exact --test-threads=1   # device: one process at a time
-bash tools/lean_check.sh [ElementaryHolonics.Framework.Geometry]      # Lean, with #print axioms on new theorems
-cargo build -p holonics-workbench && target/debug/holonics --format jsonl hna field-session --source <spec.json> --input -
+cargo check -p holonic-engine --lib
+cargo test -p <crate> --lib <module>::
+cargo test -p holonic-engine -p holonics-hna -p relational-geometry --lib
+flock .local/gpu.lock cargo test -p <crate> --lib <module>:: -- --include-ignored --test-threads=1
+bash tools/lean_check.sh ElementaryHolonics.Framework.Geometry
+bash tools/lean_check.sh ElementaryHolonics  # complete research umbrella when that scope changed
+rustfmt --edition 2024 --config skip_children=true <explicit-changed-files.rs>
+git diff --check
 ```
 
-Append what you ran to `docs/VERIFICATION_RECEIPTS.tsv`; a receipt whose tree is unchanged is not
-re-run. A timeout is an incomplete check. Commit and push coherent verified work on `main`; messages
-end with `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`. Never `git restore`,
-`checkout --`, `stash`, `reset`, `clean` or crate-wide `cargo fmt` in the shared tree. Preserve
-unrelated local files. Conversation text from `.local/` never enters a commit, issue or log:
-counts, schemas and timings only.
+Check current device use before GPU tests; the file lock coordinates only processes taking it.
+Record command, tree, scope and result in [VERIFICATION_RECEIPTS](docs/VERIFICATION_RECEIPTS.tsv).
+Reuse unchanged receipts. The primary verifies the combined changed scope; a later isolated fix
+needs its own scope rather than a replay of every suite. Lean verifies mathematics outside native
+cultivation/inference. The normal Lake default is `ElementaryHolonics.Framework`, not the complete
+research umbrella. Timeouts remain incomplete evidence.
 
-**Delegation.** At most three Opus 5 workers in parallel on disjoint owner paths, then one Sonnet 5
-reviewer that spawns nothing; fewer when the work does not split; a join that consumes several
-returns is sequential. Every worker prompt names the part of the machine it realizes, its issues,
-its exact paths, the owners to start from, the governing records and the reference calculation to
-match (`docs/WORKER_BRIEF.md` has the skeleton). The primary inspects the changed owner and its
-consuming call, runs the one integrated broad run and the one serial device run, reconciles issues
-and commits.
+[project-postulate] Claude delegates to at most **three Opus 5 workers** on disjoint owner paths,
+then **one Sonnet 5 reviewer that spawns nothing**; use fewer workers when the work does not split,
+and a sequential join when it consumes multiple returns. Every prompt supplies this guide, the
+machine/source material, exact paths, existing owners, equations, consumer and relevant receipts.
+[WORKER_BRIEF](docs/WORKER_BRIEF.md) has the concrete template. The primary inspects source and
+integrates returned changes; worker measurements are reusable receipts.
 
-**Position.** Active: the HNN field session becoming the machine of §1 — #61 (regions across the
-hardware cover), #17 (phase attention and refinement on a toroidal incidence, using the Wave 11
-ports #57/#58), #16/#59 (real conversation episodes from the private exposure stream), #18, #19,
-and #48/#49 (helical pair into the moment-compression and phase-closure owners). Deferred:
-protein/biology runs; resident exact elimination (#50) has no HNN consumer. `CONSTRUCTION_STATE.md`
-and `docs/plans/THE_ROADMAP.md` hold the live position and order; `AGENTS.md` is Astra's (Codex)
-contract and holds Brandon's dated rulings.
+[project-postulate] This is a shared checkout. Stage and format explicit owned paths; preserve
+other agents' and the user's work. A broad restore/reset/stash/clean is not a way to tidy another
+owner's diff. Constructors and remounts validate carrying values, checked extents precede work,
+and exact growth is handled by rebase/factor/representation change with its decoder and residual.
+Commit and push coherent verified work on the task's branch. If adding a co-author credit, use
+actual attribution rather than a hardcoded model name.
+
+[definition] The repository is public; `.local/` contains private datasets, captures, models and
+run artifacts. Publish source and scoped evidence without raw private conversation or source
+paths. Dataset roles and provenance are exterior codec information, not native semantic IDs.
+The current application position and next action live only in CONSTRUCTION_STATE and the roadmap.

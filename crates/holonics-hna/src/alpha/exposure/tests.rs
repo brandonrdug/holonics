@@ -1,6 +1,6 @@
 use super::*;
-use serde_json::{json, Value};
-use std::fs;
+use serde_json::{Value, json};
+use std::{collections::BTreeSet, fs};
 
 fn manifest() -> Value {
     json!({
@@ -68,9 +68,11 @@ fn actual_response_is_a_later_frame_and_pending_delivery_survives_reopen() {
         request.development_parts().unwrap()[0].text.as_deref(),
         Some("Explain the relation")
     );
-    assert!(!serde_json::to_string(request)
-        .unwrap()
-        .contains("An observed answer"));
+    assert!(
+        !serde_json::to_string(request)
+            .unwrap()
+            .contains("An observed answer")
+    );
     assert_eq!(reader.cursor(), initial);
     assert!(reader.acknowledge(1).is_err());
     drop(reader);
@@ -98,7 +100,10 @@ fn actual_response_is_a_later_frame_and_pending_delivery_survives_reopen() {
 #[test]
 fn consumer_failure_after_source_part_begins_keeps_occurrence_pending() {
     let root = tempfile::tempdir().unwrap();
-    let path = write_stream(root.path(), &[occurrence(0, "request", "human", "native source")]);
+    let path = write_stream(
+        root.path(),
+        &[occurrence(0, "request", "human", "native source")],
+    );
     let mut reader = ExposureReader::open(path).unwrap();
     let before = reader.cursor();
     let sequence = reader.peek().unwrap().unwrap().sequence;
@@ -342,6 +347,9 @@ fn recorded_comparison_request_reads_one_relation_kind_beside_unusable_links() {
     frame.views.push(frame.views[0].clone());
     frame.views[1].links = vec![tool];
     assert!(frame.recorded_comparison_request().is_err());
+    frame.views.swap(0, 1);
+    assert!(frame.recorded_comparison_request().is_err());
+    frame.views.swap(0, 1);
     frame.views.pop();
     let mut other = link.clone();
     other.target.as_mut().unwrap().record_group = "declared:different".into();
@@ -356,4 +364,48 @@ fn recorded_comparison_request_reads_one_relation_kind_beside_unusable_links() {
     frame.views.push(frame.views[0].clone());
     frame.views[1].author_class = "agent-visible".into();
     assert!(frame.shared_author_class().is_err());
+}
+
+#[test]
+fn recorded_comparison_target_preserves_event_coordinate_and_rejects_cross_view_disagreement() {
+    let mut frame: ExposureOccurrence =
+        serde_json::from_value(occurrence(3, "reply", "agent-visible", "response")).unwrap();
+    let link = ExposureLink {
+        kind: "comparison-request".into(),
+        target_event: Some(1),
+        reference: None,
+        evidence: "captured".into(),
+        target: Some(ExposureTarget {
+            event: 1,
+            source: 1,
+            provider: "codex".into(),
+            record_group: "declared:request".into(),
+            timestamp: None,
+            normalized_timestamp: None,
+        }),
+        availability: ExposureAvailability::Prior,
+    };
+    frame.views[0].links = vec![link.clone()];
+    let (family, aliases) = frame
+        .recorded_comparison_request_targets()
+        .unwrap()
+        .unwrap();
+    assert_eq!(family.record_group, "declared:request");
+    assert_eq!(aliases, BTreeSet::from([1]));
+    frame.views.push(frame.views[0].clone());
+    let mut disagreement = link;
+    disagreement.target_event = Some(2);
+    disagreement.target.as_mut().unwrap().event = 2;
+    frame.views[1].links = vec![disagreement];
+    let (_, aliases) = frame
+        .recorded_comparison_request_targets()
+        .unwrap()
+        .unwrap();
+    assert_eq!(aliases, BTreeSet::from([1, 2]));
+    frame.views[1].links[0]
+        .target
+        .as_mut()
+        .unwrap()
+        .record_group = "declared:other".into();
+    assert!(frame.recorded_comparison_request_targets().is_err());
 }

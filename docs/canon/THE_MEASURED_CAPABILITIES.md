@@ -59,7 +59,7 @@ confidence.
 | driver | black box | recovered | certificate |
 |---|---|---|---|
 | `bit_black_box_reconstruction` | an opaque recurrent bit transducer, callable only by ABI | `WrappingAdd, rot 5, Xor 183, WrappingAdd, rot 3`; candidates `147456 → 1024 → 32 → 16 → 8 → 4 → 2 → 1` | exhaustive comparison over every admitted width, 87,380 vertices; independent x86 re-encoding parity |
-| `foreign_codec_intake` · `codec_separation_cross_check` | `Box<dyn Fn(&str) -> Vec<String>>` | symbol classes, per-class Emit/Drop, boundary table, gauge freedom | family `{w : 1 ≤ |w| ≤ radius}` **exhausted — 25,259 calls**; independent Nerode route must agree, and three deliberately wrong readings must disagree |
+| `foreign_codec_intake` · `codec_separation_cross_check` | `Box<dyn Fn(&str) -> Vec<String>>` | symbol classes, per-class Emit/Drop, boundary table, gauge freedom | family `{w : 1 ≤ \|w\| ≤ radius}` **exhausted — 25,259 calls**; independent Nerode route must agree, and three deliberately wrong readings must disagree |
 | `divisor_receiver_reconstruction` | boolean common-generator contact only | 10 latent generators recovering primes 2..29 with exact support; `∂² = 0` | **27,404 held-out sections, residuals (0,0)** |
 | `causal_state_grammar_experiment` | 920 events over a world membrane | 8 states, 24 transitions, 92 predictions | 1 prediction obstruction **retained**, not smoothed |
 | `the_statement_is_founded` | a population of opaque statement strings | bracket pair, separator, split, head arities `{"exactCarrier": {1}}` | recovered only when **exactly one** candidate qualifies over every statement; all else retained as named residue |
@@ -225,7 +225,7 @@ comm -23 <(find target -path '*/examples/*' -maxdepth 3 -type f -executable ! -n
 eleven were `crates/holonic-engine/examples/`, four were `crates/holonic-life/examples/`.
 
 **All fifteen were run on 2026-08-09 and their returns are transcribed verbatim** in
-[`tools/baselines/ORPHAN_BINARY_RETURNS.txt`](../meta/ORPHAN_BINARY_RETURNS.txt), with each binary's sha256,
+[the historical orphan-binary transcript](https://github.com/brandonrdug/holonics/blob/2a36a5e7/meta/ORPHAN_BINARY_RETURNS.txt), with each binary's sha256,
 mtime, exit code and elapsed time. Fourteen returned; `scratch_bring_search` did not terminate in
 300 s in release and is an aperture-less search. The returns are **ungraded and not citable as
 established** — §8 forbids grading a receipt whose implementation cannot be read, and these

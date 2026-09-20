@@ -1,11 +1,13 @@
 # Rust libraries
 
-[definition] All live host Rust libraries belong here; executable consumers belong under
-`applications/`, and independent device-only builds under `accelerators/`.
+[definition] Live host Rust libraries belong here. Applications live under `applications/`; a library's
+examples and focused executable controls live beside that owner under `examples/`. Independent
+device-only builds live under `accelerators/`. Start with [the machine](../docs/THE_MACHINE.md)
+and follow the actual source/consumer map.
 
 | Library | Responsibility |
 |---|---|
-| `holonics` | Public framework namespaces: HNA, Soulkiller and interoperability. |
+| `holonics` | Public structural/geometric namespaces and native HNN, Soulkiller and interoperability interfaces. |
 | `holonics-hna` | Native application/session API, exterior codecs and bounded artifact adapters. |
 | `holonics-workspace` | The specialized persistent snapshot/workspace artifact family. |
 | `holonic-engine` | Native mathematical computation, resident CUDA laws, operator ecology, dismantling and comparison owners. |

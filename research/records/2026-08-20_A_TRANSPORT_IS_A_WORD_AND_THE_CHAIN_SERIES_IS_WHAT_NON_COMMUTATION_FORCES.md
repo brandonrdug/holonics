@@ -11,7 +11,7 @@ The active deed is W1. **No engine source is touched**; the only tree written un
 **Truth status:** `proved-derived` for every Lean theorem, kernel-checked and audited free of
 `sorryAx`; `proved-standard` for the classical results cited as asides; `interpretation` for the
 correspondences; `open` for §6.
-**Companion:** [`research/equation-atlas/`](../equation-atlas) — seven equations and seven
+**Companion:** [`archive/equation-atlas/`](../../archive/equation-atlas) — seven equations and seven
 relations appended.
 **Predecessor:**
 [`2026-08-20_THE_SWING_IS_HARMONIC_CONJUGATION_AND_THE_FROZEN_BOARD_DECIDES_ITS_PUZZLE.md`](2026-08-20_THE_SWING_IS_HARMONIC_CONJUGATION_AND_THE_FROZEN_BOARD_DECIDES_ITS_PUZZLE.md).

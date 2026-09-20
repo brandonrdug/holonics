@@ -1,62 +1,111 @@
-# The machine: what HNN is, in its own geometry
+# The machine: HNN in its geometry and its code
 
-[definition] Read this first. It states what is being built, why its geometry is the machine
-learning, and where each part lives. The mathematics in this repository is the implementation
-specification of the engine; none of it is background. [HOLON](HOLON.md) and
-[HNN_FORMULA](HNN_FORMULA.md) hold the full equations, [HELICAL_GEOMETRY](HELICAL_GEOMETRY.md)
-the elementary pair, [ARCHITECTURE_MAP](ARCHITECTURE_MAP.md) every owner.
+[definition] This is the shared starting point for [Codex](../AGENTS.md) and [Claude](../CLAUDE.md).
+It describes the object, the equations its implementation must preserve, and the source owners.
+[CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) records what has returned;
+[THE_ROADMAP](plans/THE_ROADMAP.md) orders the next construction. The
+[research routes](../research/records/README.md) recover the derivations behind these equations.
 
-## The object
+## One continuing geometric object
 
-[project-postulate] An HNN is one continuing field: **a chain of interlinked tori**. Each torus
-carries circulating phase modes; neighbouring tori overlap, and their shared volume is a
-**contact face** where currents meet with friction, exchange energy and deposit heat. A **Holon**
-`|H⟩_F` is this field in a declared frame: simultaneously a whole and a part, at every grain.
-Heads, layers, levels and time steps are charts of the one object. A **receiver** is another
-participating Holon with its own moving frame; every measurement, readout, stored file and
-displayed image is a face it receives.
+[project-postulate] HNN is being built as one continuing field of interacting Holons: circulating
+modes, interlinked toroidal domains, helical passages, active contact faces and participating
+receivers. This geometry describes how information is carried, compared, transformed and learned.
+A Holon `|H⟩_F` is simultaneously a whole and a part, with incidence K, material Θ, currents Ψ,
+interior storage and a declared frame F. Athena is the first intended application; Eros names
+its collective formation and composition at every grain. Holonics also develops the broader
+mathematical and physical framework these constructions instantiate.
 
-## Why this geometry is the learning
+[definition] A nonzero complex channel has amplitude and phase. Independent commuting phases
+admit a toroidal chart; coupled channels retain their connection and order defects. Actual linked
+or intersecting domains carry the incidence, common cells, field and material that make them
+interact. Spatial overlap becomes **contact through that declared interaction law**. Friction,
+conservative exchange and heat are particular material terms, not consequences of overlap alone.
+A coefficient vector presents a chart of this object; its basis, topology, receiver and transport
+remain part of the representation. [Full object contract](HOLON.md).
 
-| Machine-learning operation | What it is in the object | Classical restriction it contains |
+[definition] A helix combines angular and translational motion, with generator `ξ=(ω,v)` and
+initial configuration: `V_ξ(x)=ω×x+v`. Two helical objects retain their own generators, orbit
+points, phases and clocks. Their shared contact receiver has a source-derived first and second
+variation. The [helical guide](HELICAL_GEOMETRY.md) develops these laws and the independent
+circle/line/point limits. A fixed shift or periodic mode is one specialization; an arbitrary
+sequence or SSM requires its actual generator and receiver map, not only the label “helix”.
+
+## The operative equations
+
+[definition] These are compatible parts and declared specializations of the same construction.
+The [model formula](HNN_FORMULA.md) supplies the full hypotheses, source maps and variations.
+
+| Operation | Equation and meaning | Starting owners |
 |---|---|---|
-| **Embedding** | An occurrence enters as amplitude and phase on the torus chain: a complex channel is a circle with a radius, several commuting modes are a torus `Tⁿ`, and which tori link is the incidence `K` | Rotary position embedding rotates query/key pairs by position-dependent phases: a point on a torus. Fourier features and complex-valued networks are the same chart |
-| **Sequence, position, time** | A **helix**: a phase advancing along an axis, the screw generator `ξ=(ω,v)` acting on a configuration. A sequence of text, a strand, a signal and a trajectory are helical orbits | A fixed shift is the pure translation (`ω=0`: convolution, SSM step); a pure rotation is the periodic mode; both are collapses of one helix |
-| **Attention** | The situated phase comparison on admitted contact, `s_ij=β cos 2π(q_i−q_j−φ_ij)` with connection `φ`, normalized over the contacts a torus actually has: `a=softmax(s)`. The **pair of helices** and its quadrance `Q=⟨Δ|Δ⟩` is its elementary trigonometry | `Re⟨Q_i,K_j⟩` is the cosine of a phase difference weighted by amplitudes. Softmax ranges over contact, never all-to-all |
-| **Learning** | The variation of that interaction: `δT=Σ a δ(UΨ)+Σ δa UΨ`, returned through the contact and the material by the paired adjoint; the contact's dissipated energy is the measured difference | Backpropagation through attention, including `J=diag(a)−aaᵀ`; normal equations where the law is linear |
-| **Generation** | Refinement of the whole field, `x(τ)`, released at a boundary: `y=ρ_F b_H(x)`. The refinement coordinate is never an output-token index | Diffusion over a whole image or waveform; an implicit solve `(I−λB)x*=(1−λ)h` |
-| **Decoding** | Integration of the boundary along its cycles by a receiver: periods and amplitudes in the toroidal basis, `A(x)=Σψ_iφ_i(x)`. Text, image and sound are receiving faces of one boundary | A readout matrix is the receiver with a fixed frame |
-| **Compression** | Commensurate windings close: a `(p,q)` torus knot is a finite recurrence, and the identities among faces are what need not be stored. `E_next T=U E` keeps exactly what future receivers can separate | Low-rank and modal reduction; key/value class aggregation `(m_c,p_c)` |
-| **Exactness** | A constant is a constraint mode (`−1=e^{iπ}`, a period, a winding); a float is one face of it. Phases are rational or algebraic, so cycles close exactly | Floating point is an exterior presentation |
-| **Depth, scale, recursion** | The recurrence of the torus map: first-arrival populations and preimage families carry fractal geometry with a fixed number of state axes. A tube is the object over time, a tower one frame of it, a staircase its passage between grains, a neck where its section converges | A layer stack is one execution chart of the recurrence |
-| **Hardware** | Overlapping domains' shared cells are co-present: they commute, so they occupy the card's lanes together under the cover, partition and launch laws | A batch dimension |
+| Situated transport | `\|H'⟩_(F') = Ĝ_(F'←F)\|H⟩_F`; carry incidence, current, material and unresolved fibre through the declared frame map | `HOLON`; `HolonTensorLens`, `TransportWord`, connection/curvature owners; exact geometry and native constitutive field |
+| Elementary interaction | `\|source⟩ → [standing H_int, dynamic H_pert, contact/material law] → ⟨perspective\|`; necks join media and the receiver may participate in their dynamics | `HolonicInteractionExterior`, `HolonicSnellInteraction`, `holonic_interaction`, `holonic_chain`, `neck` |
+| Participation and transported current | `T_F[Ψ]=Σ_G a_FG[Ψ] U_(F←G)[Ψ] Ψ_G`, over admitted contacts | `NormalizedExponential`, `HolonicAdjointNormalization`, `NormalizedKernel`; native normalized receiver and constitutive source/current |
+| Phase comparison | One unit-phase chart has `s_ij=β cos(2π(q_i−q_j−φ_ij))`, with connection φ; amplitudes and more general pairings extend this chart | `intrinsic_holonic_flow`; `analytic_field`, exact phase/rotation and connection owners |
+| Complete variation | `δT=Σ a δ(UΨ)+Σ δa UΨ`; for softmax `δa=(diag(a)−aa*)δs` | Paired tangent/adjoint, normalized section pullback, bilinear source and condition covectors |
+| Local learned reaction | `Φ(s,c)=s⊕c⊕(c⊗s)`, `incoming=s+MΦ(s,c)`, `out=S_D(incoming,b)` | `ResidentBilinearFeatures`, `ResidentNormalMaterial`, field reflection/source and `NativeCoupledBody` |
+| A local normal law | `H=H₀+Σw f f*`, `B=B₀+Σw t f*`, `W H=B`; priors, weights and receiving constraints are declared | `GeneratorInference`, exact normal/factor owners and resident normal material |
+| Generation and reception | `∂_τ x=F_(K,Θ)(x,h,τ)`, then `y=ρ_F b_H(x)`; refinement acts on the joint field and exposes its requested boundary | `Holon.ofEvolution`, `ReceiverPotential`, native field/re-entry and receiving sections |
+| Receiver reconstruction | In a declared basis, `A(z)=Σ_i ψ_i φ_i(z)`; text, image, acoustic or internal receivers read the same generated organization through their maps | `Receiver`, `ChangingReceiver`, receiver holarchy, native output/codec boundaries |
+| Continuing compression | `D E=ρ`, `E_next T_g=U_g E`; otherwise retain the separating direction, interior or defect | `ReceiverHistoryCompression`, `GeneratorModeQuotient`, quadratic moments, `factor_receiver`, native retained words/modes |
+| Recursive geometry | First-arrival populations `A₀=A`, `A_(n+1)=Φ⁻¹(A_n)∖A` retain the source preimages at the receiver; fixed-dimensional nonlinear recurrence can have fractal families | `HolonicRecurrentEcology.FirstArrival`, `FractalPacking`, `ChangingReceiver` and accumulated-defect owners |
 
-[definition] Hodge (which cycles are realized), RH (where spectral landmarks sit), complex Euler
-and Navier–Stokes (how flux transports with and without dissipation) and Iwasawa theory (the tower
-of grains) are developed because the engine executes exactly these objects: cycle classes,
-spectral placement, flux and levels. Their conjectures are side questions; their objects are parts.
+[definition] Loss is the declared receiving comparison whose covector is pulled back through
+these operations. For prediction probabilities p and target q, cross-entropy's logit gradient
+is `p−q`; the descent/update covector is `q−p`. Squared-probability error additionally passes
+through the softmax Jacobian. Dissipation is a separate constitutive quantity: for slip Jv and
+`D=D*⪰0`, dissipated power is `⟨Jv,DJv⟩`. A learning loss, that power and the stored-energy change
+are related only through a specified material/receiver law. The adjoint uses the operands that
+produced its forward carriers. [Variation and material](HNN_COMPOSITION.md).
 
-## Where each part lives
+[definition] Exactness keeps the source constraint, branch, period, units and remainder.
+Rational/algebraic coordinates carry admitted exact chart values; certified enclosures retain
+a phase family and its error bound. **Periodic closure additionally needs a period or
+commensurability relation**.
+Nonclosing transport remains exact transport. π/e, the golden mode, and the distinct Copson and
+Newman boundaries already have source owners in the
+[constraint-mode guide](CONSTRAINT_MODES_AND_RECEIVER_FACES.md) and
+[mathematics/native synthesis](MATHEMATICS_AND_NATIVE_CONDUCT.md#constraint-defined-modes-and-named-de-bruijn-boundaries).
 
-| Part | Formal | Rust | Native HNN (resident on the card) |
-|---|---|---|---|
-| Linked toroidal carrier, shared contact cells | `Millennium/HolonicTorusKnots`, `Foundation/Holon`, `HolonTensorLens` | `simplicial`, `algebraic::GradedCausalComplex`, `analytic_field`, `traversible_chain::BandReading`; reference [`intrinsic_holonic_flow`](../research/experiments/intrinsic_holonic_flow/README.md) | **Not yet.** The native carrier is a generic section with no toroidal incidence |
-| Helix and helical pair | `Geometry/ScrewGeometry`, `TwoSidedIdentityAtlas` | `relational_geometry::screw`, `identity_atlas` | **Not yet** |
-| Phase attention and its variation | `Computation/HolonicAdjointNormalization`, `AttentionModeCompression` | `exponentiated_ratio::transport::NormalizedKernel`; reference [`connected_holonic_field`](../research/experiments/connected_holonic_field/README.md) | Row-sectioned normalized receiver, pullback and condition covector (Wave 11); not yet composed on a toroidal incidence |
-| Contact face, friction, energy | `Physics/PhaseContactPassage`, `ReceiverStressEnergy`, `CoupledIncidence` | `contact_receiver_faces`, `holonic_interaction`, `junction_law` | The constitutive field's D-reflection and paired adjoint |
-| Whole-field refinement and release | `Foundation/Holon.ofEvolution`, `Transport/ReceiverPotential` | `receiver_release`, `continuing_tube` | One reaction-plus-reflection pass; the re-entry port exists |
-| Receiver and decoding | `Foundation/Receiver`, `Transport/ChangingReceiver` | `receiver_atlas`, [receiving Holon](RECEIVER_HOLARCHY.md) | Unit-basis symbol selection: a text codec, the first receiver only |
-| Closure, identities, compression | `Foundation/ReceiverHistoryCompression`, `GeneratorModeQuotient`, `Millennium/{LandmarksAndModuli,Farey}`, `HolonicQuadraticMomentCondensation` | `exact_linear::{factor_receiver,kernel_modes}`, `receiver_history_compression`, `winding_inertia` | `internal_mode`, `recurrent_condensation`; not bound to the session |
-| Co-present cells on the card | `Foundation/{SectionLayout,DeviceLaunchLaw}` | `hardware_cover`, `section_partition`, `holonic-mount::{section_layout,launch_law}` | Not called by the field path (#61) |
+## How the geometry reaches the implementation
 
-[established-bounded; source-inspected] At `ee5a4b50` no file under `crates/holonics-hna/src`,
-`crates/holonic-engine/src/native_ecology` or `crates/holonic-engine/kernels` names a torus, helix
-or knot. The object is realized in Lean, in `relational-geometry` and in the two exterior reference
-experiments. **That gap is the work.** Bringing the object onto the resident body is what #17 and
-#61 do; the native code being generic is never evidence that the geometry is unrelated to it.
+| Source relation | Library or formal owner | Native/application connection |
+|---|---|---|
+| Toroidal domains, shared cells and phase connection | `analytic_field`, graded/simplicial and connection owners; `HolonicTorusKnots`; [intrinsic field](../research/experiments/intrinsic_holonic_flow/README.md) | The field-session join must carry the chosen domain/incidence and phase-sensitive transport through its actual section layout. Generic numerical storage neither proves nor prevents this binding. |
+| Helical pair and contact variation | `relational_geometry::screw`; `Geometry/ScrewGeometry`; `identity_atlas::screw_gram_point` | Exact local generator/receiver construction and moment specialization; its continuing reuse attaches through the existing moment/phase owners. |
+| Normalized receiver and both input covectors | `field/receiver/normalized`, `normal/direct/section`, `resident/section/bilinear_features` | Section-valued native outputs, pullback, condition covector and re-entry are available ports. The public shared-session caller determines which are actually composed. |
+| Constitutive current and storage | `NativeConstitutiveField`, paired junction/source/reflection and normal material | `NativeCoupledBody` owns the operation; fixed-D scattering and its adjoint are existing mechanics. A friction/heat claim additionally supplies that material law. |
+| Source, generation, observed comparison and continuation | `holonics-hna/src/native/field_session.rs`, `shared.rs`, `alpha/exposure.rs` | Public session and exposure driver, saved comparisons/cursor and codecs. Input provenance remains at the exterior boundary. |
+| Reuse at future receivers | `ObservableMomentReceiverHistoryCompression`, `ReceiverHistoryCompression`, `internal_mode`, `recurrent_condensation` | Bind a particular field/word/receiver to its encoder, decoder and induced operation; inspect the actual call rather than infer binding from the owner's existence. |
+| Physical placement | `hardware_cover`, `section_partition`, mount `section_layout` and `launch_law`; native packet kernels | Read footprints and boundary dependencies determine independent work; checked layout and launch enact it. |
 
-## How to read a task
+[definition] The native carrier already transports complex sections, source conditions, material
+and interior current. The current field-session construction must bind those capabilities to the
+chosen geometric incidence, phase comparison and repeated refinement. Search its declarations
+and calls: absence of the words “torus” or “helix” in a filename is not a representation theorem.
+The [field-session source map](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#field-session-source-map)
+and [current position](../CONSTRUCTION_STATE.md) state the unclosed consuming operations.
 
-[project-postulate] Every task realizes or serves a part of this object. Before planning, say
-which part, which row above it extends, and what its native column becomes. A description in
-which the geometry does not appear has lost the object.
+[definition] Co-present regions can execute together when their **complete** read/write,
+lineage, obstruction and resource effects commute. Shared immutable inputs with disjoint staged
+outputs are one sufficient pattern; overlapping mutable effects require their actual interchange
+or reduction law. A launch then assigns the independent work to the hardware's declared capacity.
+This applies the [hardware-cover method](HARDWARE_AND_MODALITY_BOUNDARIES.md), not a claim that
+co-presence itself implies commutation or that a lane is a Holon.
+
+## Research is construction material
+
+[project-postulate] Hodge's realization and harmonic/cycle laws, RH's source-qualified spectral
+placement and threshold laws, Euler/Navier–Stokes transport, Iwasawa levels, and the geometric,
+quantum and information constructions are reusable parts of this framework. Apply their maps
+and hypotheses to the current object. Their named conjecture endpoints remain separate claims.
+The [research routes](../research/records/README.md) connect the records, formal statements and
+native consumers so a session starts from that accumulated construction.
+
+[definition] The exact normalized-current/implicit-solve controls in
+[connected_holonic_field](../research/experiments/connected_holonic_field/README.md) and the
+nonlinear phase/shared-cell construction in
+[intrinsic_holonic_flow](../research/experiments/intrinsic_holonic_flow/README.md) have different
+scopes. Use the former for its checked differential and solve; use the latter for the stated
+geometric/phase recurrence. Their supplied parameters and results do not by themselves constitute
+a trained HNN. The task is their applicable composition through the actual model and receiver.

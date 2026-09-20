@@ -246,7 +246,7 @@ An intelligent computational organ is strictly catalytic: it lowers the work vec
    * Verify contact boundaries algebraically, generating exact topological certificates of closure without floating-point thresholding artifacts.
 2. **Combinatorial Rigidity & Phase Seam Percolation**:
    * Implement a native Pebble Game algorithm over `PhysicalConstraintComplex` to map rigid clusters, hinges, and self-stresses.
-   * Track phase seams where temperature or pH transitions (governed by the exact sigmoid charts in [`research/equation-atlas/equations.jsonl`](../equation-atlas/equations.jsonl#L207-L208)) alter the active constraint population $C_\eta$.
+   * Track phase seams where temperature or pH transitions (governed by the exact sigmoid charts in [`archive/equation-atlas/equations.jsonl`](../../archive/equation-atlas/equations.jsonl#L207-L208)) alter the active constraint population $C_\eta$.
 3. **$\mathrm{SE}(3)$ Flow Matching Transport**:
    * Formalize continuous generative transport on $\mathrm{SE}(3)^N$ as an interior flow matching organ.
    * Verify that smooth trajectory integration respects exact constraint potentials, generating native conformational ensembles without foreign pair-representation modules.

@@ -347,7 +347,7 @@ not return:
 
 **Truth status: counterexample.**
 
-Every law founded by [phoenix/site.rs](../../crates/holonic-engine/examples/phoenix/site.rs) receives
+Every law founded by [phoenix/site.rs](../../archive/retired-phoenix-rust/holonic-engine-examples/phoenix/site.rs) receives
 
 ~~~text
 SourceTestimony::AuthoritativeDescription {

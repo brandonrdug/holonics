@@ -294,9 +294,21 @@ impl ExposureOccurrence {
     /// relation kind and ignores every other; a tool or candidate link elsewhere in the family
     /// neither supplies a partner nor refuses this one. An absent relation stays absent.
     pub fn recorded_comparison_request(&self) -> Result<Option<ExposureFamily>, ExposureError> {
-        let mut common: Option<BTreeSet<ExposureFamily>> = None;
+        Ok(self
+            .recorded_comparison_request_targets()?
+            .map(|(family, _)| family))
+    }
+
+    /// The common recorded comparison family and all event coordinates named by its captured
+    /// views. Captured providers may expose different event aliases for one family; preserving
+    /// their union avoids choosing the first view by order.
+    pub fn recorded_comparison_request_targets(
+        &self,
+    ) -> Result<Option<(ExposureFamily, BTreeSet<u64>)>, ExposureError> {
+        let mut common_family: Option<Option<ExposureFamily>> = None;
+        let mut aliases = BTreeSet::new();
         for view in &self.views {
-            let mut partners = BTreeSet::new();
+            let mut view_family: Option<ExposureFamily> = None;
             for link in &view.links {
                 if link.kind != "comparison-request" {
                     continue;
@@ -309,25 +321,35 @@ impl ExposureOccurrence {
                 let target = link.target.as_ref().ok_or(ExposureError::Open(
                     "recorded comparison request has no source coordinate",
                 ))?;
-                partners.insert(ExposureFamily {
+                let family = ExposureFamily {
                     provider: target.provider.clone(),
                     record_group: target.record_group.clone(),
-                });
+                };
+                if view_family
+                    .as_ref()
+                    .is_some_and(|previous| *previous != family)
+                {
+                    return Err(ExposureError::Open(
+                        "several recorded comparison families require a wider source port",
+                    ));
+                }
+                view_family = Some(family);
+                aliases.insert(target.event);
             }
-            if common.as_ref().is_some_and(|previous| *previous != partners) {
+            if common_family
+                .as_ref()
+                .is_some_and(|previous| previous != &view_family)
+            {
                 return Err(ExposureError::Open(
-                    "captured views disagree on the recorded comparison request",
+                    "captured views disagree on the recorded comparison family",
                 ));
             }
-            common = Some(partners);
+            common_family = Some(view_family);
         }
-        let partners = common.ok_or(ExposureError::Open("no captured views"))?;
-        if partners.len() > 1 {
-            return Err(ExposureError::Open(
-                "several recorded comparison requests require a wider source port",
-            ));
+        if self.views.is_empty() {
+            return Err(ExposureError::Open("no captured views"));
         }
-        Ok(partners.into_iter().next())
+        Ok(common_family.flatten().map(|family| (family, aliases)))
     }
 
     /// The same visible material in every captured view of this declared occurrence. This

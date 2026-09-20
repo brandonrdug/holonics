@@ -1163,7 +1163,7 @@ maps naming where a deed would begin, not evidence that a problem moved.
 **Truth status: definition.**
 
 The new seed store is
-[`research/equation-atlas/README.md`](../equation-atlas/README.md). It is a curated exterior research chart of
+[`archive/equation-atlas/README.md`](../../archive/equation-atlas/README.md). It is a curated exterior research chart of
 equation formulations and evidence-backed relations. It is not the runtime topology, an equation
 parser, an AST, a CAS, a solver, a proof checker, or the semantic owner of mathematics.
 

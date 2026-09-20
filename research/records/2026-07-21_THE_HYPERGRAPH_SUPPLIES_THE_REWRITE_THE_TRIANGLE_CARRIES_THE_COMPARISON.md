@@ -21,7 +21,7 @@ pixels. It is closer to a **rewrite-enriched oriented event complex**:
 “Triangle,” “hypergraph,” “manifold,” “circuit,” and “field” therefore name different faces of one
 candidate construction. None can replace the others.
 
-The normative typed version is deposited in [`ELEMENTARY_MECHANICS.md`](../ELEMENTARY_MECHANICS.md).
+The normative typed version is deposited in [`archive/reference/minimum-mechanics-a07ff376/src/soma/ELEMENTARY_MECHANICS.md`](../../archive/reference/minimum-mechanics-a07ff376/src/soma/ELEMENTARY_MECHANICS.md).
 
 ## I · Why an ordinary cellular automaton is too absolute
 

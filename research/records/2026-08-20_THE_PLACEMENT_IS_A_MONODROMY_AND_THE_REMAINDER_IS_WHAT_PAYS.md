@@ -10,7 +10,7 @@ The active deed is W1. **No engine source is touched.**
 **Truth status:** `established-bounded` for the corrections in §1; `proved-derived` for every Lean
 theorem, kernel-checked and audited free of `sorryAx`; `proved-standard` for cited classical
 results; `interpretation` for every correspondence; `open` for §5.
-**Companion:** [`research/equation-atlas/`](../equation-atlas) — five equations and six relations
+**Companion:** [`archive/equation-atlas/`](../../archive/equation-atlas) — five equations and six relations
 appended.
 
 ## Provenance

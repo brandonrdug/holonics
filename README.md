@@ -1,5 +1,7 @@
 # Holonics
 
+[The machine and its mathematics](docs/THE_MACHINE.md) · [Research reading routes](research/records/README.md) · [Repository guide](docs/REPOSITORY.md)
+
 [project-postulate] **Holonics is a theory of everything grounded in the reality of difference.**
 It develops a mathematical, physical and philosophical framework for how situated things exist,
 interact, change and become observable. Mathematics, computation, physics and living systems

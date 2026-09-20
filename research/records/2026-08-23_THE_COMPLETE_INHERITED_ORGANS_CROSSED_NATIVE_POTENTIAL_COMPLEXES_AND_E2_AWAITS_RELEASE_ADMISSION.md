@@ -11,7 +11,7 @@
 than `TextCodeword | VisionPatch | AudioFrame`. Source boundary names and extents remain exterior
 testimony; no alias, fallback, dual schema, or media discriminator remains in the active Rust
 dependency cone. The exact refactor is owned by
-[`heterogeneous_fusion.rs`](../../crates/holonic-engine/src/phoenix/heterogeneous_fusion.rs).
+[`heterogeneous_fusion.rs`](../../crates/holonic-engine/src/native_ecology/heterogeneous_fusion.rs).
 
 [implemented-exact; measured] The E2 driver mounted raw restrictions of the admitted E1 page and
 four raw 16-kHz signed-PCM occurrences. The optical restrictions met respectively 165, 163, 142,

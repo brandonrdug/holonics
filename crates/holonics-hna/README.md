@@ -1,7 +1,8 @@
 # HNN application interfaces
 
 [definition] Use the public framework through `holonics::hna`; this crate owns its application
-adapters. The [native guide](../../docs/NATIVE_HNA.md) documents the ground-up phase body;
+adapters. [The machine](../../docs/THE_MACHINE.md) and [research routes](../../research/records/README.md)
+connect its geometry and existing mathematical owners. The [native guide](../../docs/NATIVE_HNA.md) documents the ground-up phase body;
 the [Athena guide](../../docs/ATHENA.md) retains the inherited-operator interface and artifact scopes.
 
 [established-bounded; implemented-exact] `native::{NativeModelSpec, with_native_session,
@@ -47,8 +48,13 @@ supplied coordinates while the field generates the others jointly. `generate_rec
 returns both raw and received sections. Its target pullback and pending restart retain the
 receiver mask and original output extent; older text-session checkpoints remain readable.
 
-This is the first finite model operation; useful Athena conversation and broader receiving
-applications remain in the live construction order.
+[established-bounded; source-inspected] The [shared-region session](../../research/experiments/athena_field/shared/README.md)
+uses one local M/D across source regions, with coefficient shape independent of source aperture.
+`athena_exposure_field` attaches validated held requests/free response extents, recorded comparison
+relations and the source cursor. Retained pairing metadata supports delayed responses and reopen;
+older comparisons without that metadata stay preserved. The [source map](../../docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#field-session-source-map)
+names the next geometric participation/refinement join through the existing native ports.
+Useful Athena conversation and broader receiving applications remain in the live construction order.
 
 ## Earlier inherited-operator interface
 
@@ -95,7 +101,8 @@ model operation. The `alpha_exposure` example inspects metadata and demonstrates
 restart without printing private material. The [data guide](../../docs/CONVERSATION_DATA.md#athena-alpha-causal-exposure)
 documents its partition and availability boundary; the
 [active blueprint](../../docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
-still requires the actual native attachment, learned codec, model and useful product.
+uses the native field/session attachment above and continues its geometric model, learned encoding
+and useful product return. The reader itself remains an exterior source boundary.
 
 [established-bounded; implemented-exact] The continuing normal-wave example now has `compare` and
 `compare-applied` modes over actual same-part prefix/tail source material. They use the public

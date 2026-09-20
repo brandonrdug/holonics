@@ -20,8 +20,9 @@ their actual laws, rather than being redirected to a familiar small demonstratio
 
 Resolve the checkout root first. The local repositories are usually
 `~/Workspaces/holonics` and the frozen predecessor `~/Workspaces/laboratory`.
-Use the active repository's AGENTS, current position and roadmap, retaining context already
-read. This skill provides a method, not another authority or schedule.
+Use the active repository's machine, harness guide, current position and roadmap, retaining context
+already read. The [research reading routes](../../../research/records/README.md) connect the
+subject's records, mathematical guide and actual source owners. This skill provides a method, not another authority or schedule.
 
 Read the user's requested relation and the current subject guide. Search both its vocabulary
 and its mathematical operations, then follow the actual source imports/callers. A file whose

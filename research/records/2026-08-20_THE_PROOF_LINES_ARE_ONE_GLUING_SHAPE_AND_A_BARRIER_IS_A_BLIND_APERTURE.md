@@ -12,7 +12,7 @@ W1; M0–M3 remain blocked until W5 passes.
 **Truth status:** `proved-derived` for every Lean theorem, each kernel-checked and audited to be
 free of `sorryAx`; `established-bounded` for the survey; `interpretation` for the readings;
 `open` for every named conjecture, none of which is formalized here.
-**Companion:** the laws are in [`research/equation-atlas/`](../equation-atlas) — nine equations
+**Companion:** the laws are in [`archive/equation-atlas/`](../../archive/equation-atlas) — nine equations
 and seven relations appended, each citing its Lean owner.
 
 ## Provenance

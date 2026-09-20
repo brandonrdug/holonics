@@ -306,29 +306,36 @@ consumer. Milestones are views of shared work; this section supplies the constru
    [field-session source map](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#field-session-source-map)
    names, per operation, the machinery to start from and the object that does not exist; the
    [owner-network record](../../research/records/2026-09-20_THE_FIELD_SESSION_JOIN_HAS_ITS_OWNER_NETWORK_AND_NAMED_ABSENCES.md)
-   holds every owner, test and governing record. The order follows those absences:
-   - **Ports, in parallel on disjoint owner paths.** (a) The row-sectioned normalized receiver
-     and its pullback (#57). (b) The bilinear-source adjoint to the condition operand, the
-     enclosure-source section form and the re-entry port (#58). (c) The session and source: an
-     exposure→field-session driver with a request/response aperture and its partition/role
-     gates, a producing comparison in the shared chart, the exposure cursor in the saved
-     session, and the first executed shared-chart baseline with its README (#59).
-   - **Realization of the section's regions (#61), before the join.** The first shared-chart
-     baseline occupies one lane of the card: the section kernels loop their rows on a single
-     thread and the features are launched row by row from the host. The regions are co-present
-     cells of one section, with shared reads and disjoint outputs. Certify that partition, place it
-     across the cover by its independence, generate gather → shared local operator → scatter from
-     it, and launch under the launch law, following the
-     [hardware-cover ruling](../../research/records/2026-08-01_THE_HARDWARE_IS_A_RECEIVER_COVER_THE_CARD_MUST_CARRY_THE_CURRENT.md).
-     The Wave 11 ports enter the join through this realization, not beside it.
-   - **The join, sequential.** `prepare_rows`, `observe_rows`, `shared_request` and the founding
-     chart compose participation over gathered neighbour currents, refinement by re-entry and
-     both variation terms, checked against `connected_holonic_field` and the exact
-     `NormalizedKernel` reference.
-   - **Episodes.** Development families train through the public session; held-out evaluation
-     families are inspected with the existing kit; the saved session reopens with its cursor;
-     cost is reported as cells, lanes and service rounds against the retained baselines. #18 is
-     answered at the width this run measures, after #61 has removed the one-lane realization, and #19 supplies the section-scale change of D that `observe_rows` lacks.
+   retains the pre-port search and equations. The executable order is now:
+   - **Compose the returned ports into the geometric operation (#17).** #57 supplies section
+     participation/pullback; #58 supplies the bilinear condition covector and enclosure re-entry.
+     #59 supplies the exposure/session boundary, retained comparisons and saved source cursor.
+     Start at `prepare_rows`, `observe_rows`, `shared_request` and the founding chart. Bind
+     the admitted domain/incidence, phase connection and content-valued participation, then
+     whole-field refinement with both terms of its variation. Use `intrinsic_holonic_flow`
+     for the specified nonlinear phase/shared-cell recurrence, and `connected_holonic_field`
+     plus exact `NormalizedKernel` for their narrower differential/linear-solve controls.
+   - **Realize that same operation across the hardware cover (#61 within #17).** Derive its
+     actual read/write, boundary, lineage, obstruction and resource footprints before placing
+     independent cells/features. Generate gather → shared operator → scatter through the
+     existing partition/layout/launch owners. Current applied-condition/adjoint rows are serial;
+     normalized rows already have one block per row, with thread zero active. The whole path
+     needs measured placement, not a blanket one-lane diagnosis. Preserve dependency between
+     refinement steps and the law of shared material accumulation. Establishing the geometric
+     representation and its causal partition is part of this one join; a standalone speedup of
+     the old text-window chart is not a prerequisite campaign.
+   - **Carry real source episodes through the joined public session (#16/#59).** Preserve the
+     recorded request family and capture-event aliases, delayed comparisons and restart;
+     attach the declared contextual boundary. Development sources update the model and the
+     existing evaluation kit receives held-out families. Report source/receiver extents, actual
+     generated face, model update, continuation, lanes/service rounds, transfer, memory and
+     end-to-end cost against the retained matching baselines. Complete the `assessment.json`
+     consumer where the kit uses that result. Legacy unpaired rests retain their explicit limit.
+   - **Extend the law at the consuming pressure it exposes.** #19 supplies section-scale D
+     variation when the chosen update requires changing D; #18 supplies factored normal
+     statistics at the actual width. Fixed-D inference and current-material observation remain
+     valid declared operations. A producing-state gradient must retain its own forward operands;
+     an epoch number alone does not supply them.
 3. **Make reuse and realization part of that consuming operation (#48/#49).** The helical pair's
    product-current bridge already has its owner in moment form:
    `ObservableMomentReceiverHistoryCompression` with
@@ -341,11 +348,13 @@ consumer. Milestones are views of shared work; this section supplies the constru
    certified crossover. It remains library work for the structural consumers and is not in this
    order.
 
-[definition; agent-inferred] The port sets were split from the disjoint files the absences live
-in, and the join made sequential because it consumes all three returns. Geometry, exact algebra
-and identity tasks name the operation they contribute to that join or their separately requested
-mathematical consequence. Neither the full identity catalogue, the complete device plan, nor a
-Millennium endpoint is a universal prerequisite of the session.
+[definition; agent-inferred] #17 owns the mathematical/consumer join, #61 its hardware
+realization, #59 the durable source boundary, and #16 the episode return. #57/#58 are completed
+operator dependencies, not new work queues. This division follows distinct owned operations
+and lets each issue close on its stated return without declaring the application complete.
+The helical compression caller (#48) remains independent shared-library work beside this join;
+its source/receiver law also supplies reuse for the field's repeated words. No full identity
+catalogue, complete device specialization or Millennium endpoint gates this return.
 
 [established-bounded; source-inspected] Wave 10's 0.220 s rank/kernel and 14.119 s rigidity figures
 at 612 coordinates used **synthetic lattice/bar inputs**, including a real API call on synthetic
@@ -366,10 +375,10 @@ names the next discriminating operation. An inferred decision is recorded with i
 does not become an issue waiting for approval.
 
 [definition] The [Wave 10 audit](../../research/records/2026-09-20_WAVE_TEN_IS_REPAIRED_AND_THE_LIBRARY_RETURNS_TO_HELICAL_GENERATORS_AND_HNN.md)
-records the concrete issue reconciliation: completed wave/evidence scope is closed separately
+records the earlier issue reconciliation: completed wave/evidence scope is closed separately
 from unreturned device or generator work; #48/#49 retain elementary geometry and identity reuse;
-#16/#17 name the next HNN consumer; biology-specific continuation is deferred. Current bodies,
-not corrective comments alone, carry each item's operation and remaining return. The roadmap
+#16/#17 name the next HNN consumer; biology-specific continuation is deferred. The September 20 operating-guide audit updates #57–#61 and their #16/#17 consumers after
+the actual port and driver returns. Current bodies carry each item's operation and remainder. The roadmap
 remains authoritative for order.
 
 [project-postulate] The root brief in CONSTRUCTION_STATE names the active shared operation and
@@ -377,60 +386,15 @@ the application evidence it is meant to produce. Subtasks carry their operands, 
 consumer back into that composition. Their closure updates the affected source, contracts and
 callers together; this uses the existing construction loop, not another project ledger.
 
-### Rules that settle recurring choices
+### Construction practice
 
-[project-postulate] These follow from the operating contract and the framework. An agent applies
-them and records the application; it does not return them as a question. Only a material choice
-the framework does not determine goes to Brandon.
-
-1. **Resource pressure is answered by rebasing.** A presentation that outgrows its carrier is
-   brought to a reduced chart, factored, or placed differently — an exact, recorded, invertible
-   change of presentation — or the obstruction is returned. A carrier is never widened and a
-   ceiling is never raised to let a computation through.
-2. **A finite prefix alone does not establish a universal future claim.** Equal potential,
-   extinction, design equivalence and separation-freedom over all admitted continuations require
-   a checked certificate, isomorphism or completeness argument. A finite exact construction can
-   establish its declared finite claim, and a checked finite certificate can establish a wider
-   one. "Not separated within the bound" alone is its own return.
-3. **Equality is typed.** Identity belongs to an occurrence, persistence to lineage, sameness to a
-   receiver, potential to a family of futures, memory to standing. A result states its rung on
-   `RelationLadder`, and no rung below identity is promoted to it.
-4. **Open is carried, never rounded.** An undecided comparison, an unread environment and an
-   overlapping interval stay plural through every consumer; none is a best case, a worst case or a
-   tie-break.
-5. **A value enters only through its constructor.** Every wire, every receipt and every
-   certificate is routed through the checks that found it; a remount re-runs what it can and says
-   what it is not testimony for.
-6. **Declared sizes are bounded before the work they size.** Allocation, recursion, enumeration and
-   products from a caller's declaration are preceded by a checked bound and a typed refusal.
-7. **Compose before founding.** Search by the relation, attempt the composition, and found an owner
-   only for the concrete absent object named. Every paired owner is registered with the citation
-   check, so a Lean name cited from Rust that no Lean file declares fails the test suite.
-8. **Device evidence is serial.** CUDA tests run one process at a time and single-threaded; the
-   allocation calibration reads the whole device's free extent and cannot attribute a concurrent
-   allocation.
-9. **A wave is closed before the next opens.** At most three constructing agents on disjoint owner
-   paths and one reviewer that spawns none; a wave that does not split that way runs with fewer
-   agents, never more. Workers run their own module scopes and return receipt lines. The primary's
-   closing verification is one integrated broad run, one serial device run when native conduct
-   changed and the Lean build when Lean changed, on the combined tree; it does not re-run a scope
-   whose [receipt](../VERIFICATION_RECEIPTS.tsv) names the current tree. The reviewer's confirmed
-   defects are repaired in the same wave; the wave is committed and pushed with the construction
-   state updated. The [worker brief](../WORKER_BRIEF.md) holds the protocol and templates.
-10. **Absence and novelty carry a search receipt.** "The repository has no X" and a newly founded
-   unit each sit beside a `.agents/bin/prior-art` receipt. A nonzero search names the existing
-   owner instead.
-11. **A choice the mathematics determines is made, marked `[agent-inferred]`, and carried on.**
-   Brandon corrects it retroactively. Execution against real targets is the validation every
-   other check serves.
-12. **An exact computation that grows is rebased before it is run longer.** Rational elimination
-   on one thread is a reference path, never a production path. Coefficient growth is answered by
-   a suitable factorization or prime images with an operation-specific exact certificate;
-   independent images may run in parallel under the existing hardware cover, and the hot native
-   operation is placed on the device. A reading whose value is forced by a theorem is returned
-   from that theorem's checked hypotheses; it remains a useful derived reading, not an independent
-   empirical validation. An agent that meets a minutes-long exact run reports the method
-   and the placement before proposing to make the surrounding code cheaper.
+[project-postulate] Apply the [development method](../DEVELOPMENT.md) and harness-specific
+[worker brief](../WORKER_BRIEF.md) at the owning call. Exact growth is answered by a supported
+rebase/factor/placement with its decoder and residual. Parallel execution follows full
+footprint/interchange evidence. Tests and source receipts retain their changed tree and scope;
+GPU tests run serially. Consolidate the changed guide, current issue body and state in the same
+return, commit/push verified owned changes, and proceed from the next consuming equation.
+This roadmap schedules the construction; it does not duplicate the operating contracts.
 
 ## All current plan documents and their roles
 

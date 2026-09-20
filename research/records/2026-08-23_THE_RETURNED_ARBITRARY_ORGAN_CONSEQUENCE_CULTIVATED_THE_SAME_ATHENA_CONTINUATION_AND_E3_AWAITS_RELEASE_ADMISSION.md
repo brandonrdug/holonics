@@ -5,7 +5,7 @@
 **Truth status:** each material claim is graded inline; this record does not advance the construction
 state.
 
-[implemented-exact] [`boundary_cultivation.rs`](../../crates/holonic-engine/src/phoenix/boundary_cultivation.rs)
+[implemented-exact] [`boundary_cultivation.rs`](../../crates/holonic-engine/src/native_ecology/boundary_cultivation.rs)
 owns the previously absent edge from E2's provisional candidate to one parented durable
 nominal-boundary continuation. The owner contains no media enum, source payload, prompt, lookup,
 score, counter, archive or compatibility decoder. Its durable delta is the exact predecessor/state

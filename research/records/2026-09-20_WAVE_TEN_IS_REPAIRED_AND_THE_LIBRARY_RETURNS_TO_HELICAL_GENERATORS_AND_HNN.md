@@ -190,7 +190,7 @@ audit-team implementation error, not attributed to Claude's wave. The primary ow
 verification of the combined tree; no broader cleanup was authorized.
 
 [established-bounded; process-audit] The first integrated Rust return passed 3,308 engine tests
-(with 415 explicitly ignored device/measurement cases) and 66 geometry tests. The full Lean build
+(with 415 explicitly ignored device/measurement cases) and 66 geometry tests. The default `ElementaryHolonics.Framework` Lean build
 passed 9,183 jobs; all 18 new screw theorem axiom prints contain only the standing
 `propext`, `Classical.choice`, `Quot.sound` or no axioms. Both changed example consumers compile.
 The subsequent polynomial-overflow discovery is covered by the final focused Rust return below;

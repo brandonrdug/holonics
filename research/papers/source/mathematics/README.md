@@ -37,7 +37,7 @@ computational, and open objects remain typed apart.
 ## Exterior equation material
 
 The curated machine-readable equation and relation store lives at
-[`research/equation-atlas/README.md`](../../../equation-atlas/README.md), outside this reusable object
+[`archive/equation-atlas/README.md`](../../../../archive/equation-atlas/README.md), outside this reusable object
 registry. That store contains exterior formulation occurrences, contexts, receiver scopes and
 graded research correspondences. It is material for a later codec intake, not a second theorem
 library and not the semantic owner of its formulas.

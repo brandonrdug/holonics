@@ -39,7 +39,7 @@ surjectivity hypothesis occurs.
 ## Runtime carrier
 
 [established-bounded; implemented-exact] New owner
-[`soma/life/src/athena_native/situated_difference.rs`](../../soma/life/src/athena_native/situated_difference.rs)
+[`crates/holonic-life/src/native_intelligence/situated_difference.rs`](../../crates/holonic-life/src/native_intelligence/situated_difference.rs)
 composes the admitted K3 `NativeConductedSection` with existing exact-linear, cross-chart,
 Complex-Parametron, pullback, fibre, obstruction, and receiver-constitution owners.  Its
 `SituatedDifferenceSection` retains:

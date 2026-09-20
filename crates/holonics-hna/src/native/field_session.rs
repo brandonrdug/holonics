@@ -4,7 +4,7 @@
 use super::section_input::SymbolCurrentChart;
 mod shared;
 use super::{NativeCoupledBody, NativeFieldReactionPort, NativeSessionError, SavedCoupledBody};
-use crate::{publish_new, HnaStream, HnaStreamState, PublicationReceipt};
+use crate::{HnaStream, HnaStreamState, PublicationReceipt, publish_new};
 use holonic_engine::{
     codec_recovery::{Symbol, SymbolAlphabet},
     embedding_fiber::ResidentReadout,
@@ -16,7 +16,7 @@ use holonic_engine::{
     resident_section::{ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface},
 };
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::{
     collections::BTreeMap,
     fs::File,
@@ -150,26 +150,27 @@ impl FieldSectionRequest {
     ) -> Result<Self> {
         let (held_cap, context_cap) = aperture.bounded(spec)?;
         let chart = spec.chart()?;
-        let text = |event: &crate::alpha::exposure::ExposureOccurrence, cap: usize| -> Result<String> {
-            event.validate(manifest).map_err(invalid)?;
-            let text = event
-                .development_parts()
-                .map_err(invalid)?
-                .iter()
-                .map(|p| {
-                    p.text.as_deref().ok_or_else(|| {
-                        invalid("this field text codec requires visible textual parts")
+        let text =
+            |event: &crate::alpha::exposure::ExposureOccurrence, cap: usize| -> Result<String> {
+                event.validate(manifest).map_err(invalid)?;
+                let text = event
+                    .development_parts()
+                    .map_err(invalid)?
+                    .iter()
+                    .map(|p| {
+                        p.text.as_deref().ok_or_else(|| {
+                            invalid("this field text codec requires visible textual parts")
+                        })
                     })
-                })
-                .collect::<Result<Vec<_>>>()?
-                .concat();
-            if text.len() > cap {
-                return Err(invalid(
-                    "recorded material is longer than the declared exposure aperture",
-                ));
-            }
-            Ok(text)
-        };
+                    .collect::<Result<Vec<_>>>()?
+                    .concat();
+                if text.len() > cap {
+                    return Err(invalid(
+                        "recorded material is longer than the declared exposure aperture",
+                    ));
+                }
+                Ok(text)
+            };
         if request.shared_author_class().map_err(invalid)? != "human" {
             return Err(invalid(
                 "a held request position takes human-authored recorded material only",
@@ -227,9 +228,20 @@ impl FieldSessionSpec {
         if self.section_symbols == 0 || !(1..=120).contains(&self.fractional_bits) {
             return Err(invalid("field section extent/grain"));
         }
-        if self.codec == FieldTextCodec::Utf8Nibbles && (self.symbols.len()!=16 || self.source_chart!=FieldSourceChart::SharedRegions) {return Err(invalid("UTF-8 nibble codec requires sixteen declared symbols and shared-regions"));}
-        if self.source_chart==FieldSourceChart::SharedRegions {self.shared_extents()?;}
-        else if !self.region_offsets.is_empty(){return Err(invalid("region offsets require the shared-regions source chart"));}
+        if self.codec == FieldTextCodec::Utf8Nibbles
+            && (self.symbols.len() != 16 || self.source_chart != FieldSourceChart::SharedRegions)
+        {
+            return Err(invalid(
+                "UTF-8 nibble codec requires sixteen declared symbols and shared-regions",
+            ));
+        }
+        if self.source_chart == FieldSourceChart::SharedRegions {
+            self.shared_extents()?;
+        } else if !self.region_offsets.is_empty() {
+            return Err(invalid(
+                "region offsets require the shared-regions source chart",
+            ));
+        }
         for symbol in &self.symbols {
             let valid = match self.codec {
                 FieldTextCodec::UnicodeScalars => symbol.chars().count() == 1,
@@ -252,7 +264,9 @@ impl FieldSessionSpec {
         Ok(SymbolCurrentChart::declared(alphabet))
     }
     fn extents(&self) -> Result<(usize, usize, usize)> {
-        if self.source_chart==FieldSourceChart::SharedRegions{return self.shared_extents();}
+        if self.source_chart == FieldSourceChart::SharedRegions {
+            return self.shared_extents();
+        }
         let regions = match self.source_chart {
             FieldSourceChart::SharedRegions => unreachable!(),
             FieldSourceChart::TensorCondition => self.section_symbols,
@@ -288,8 +302,17 @@ impl FieldSessionSpec {
     }
     fn symbols_of(&self, chart: &SymbolCurrentChart, text: &str) -> Result<Vec<Symbol>> {
         match self.codec {
-            FieldTextCodec::Utf8Nibbles => text.as_bytes().iter().flat_map(|b|[b>>4,b&15]).map(|n|
-                chart.alphabet().symbol_of(&self.symbols[n as usize]).ok_or_else(||invalid("nibble outside codec"))).collect(),
+            FieldTextCodec::Utf8Nibbles => text
+                .as_bytes()
+                .iter()
+                .flat_map(|b| [b >> 4, b & 15])
+                .map(|n| {
+                    chart
+                        .alphabet()
+                        .symbol_of(&self.symbols[n as usize])
+                        .ok_or_else(|| invalid("nibble outside codec"))
+                })
+                .collect(),
             FieldTextCodec::UnicodeScalars => chart.decode_text(text),
             FieldTextCodec::WhitespaceWords => text
                 .split_whitespace()
@@ -301,6 +324,16 @@ impl FieldSessionSpec {
                 .collect(),
         }
     }
+}
+
+/// Exterior recorded-source aliases and receiver extent for one retained comparison.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RetainedExposurePairing {
+    pub family: crate::alpha::exposure::ExposureFamily,
+    pub request_events: Vec<u64>,
+    pub response_symbols: usize,
+    pub request_text: String,
 }
 
 /// A recorded comparison retained at the cut that produced it on the shared-regions chart.
@@ -315,7 +348,61 @@ pub struct RetainedSharedSource {
     pub held: Vec<bool>,
     pub output_symbols: usize,
     pub producing_epoch: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub exposure_pairing: Option<RetainedExposurePairing>,
 }
+fn validate_exposure_pairing(
+    pairing: &RetainedExposurePairing,
+    retained: &RetainedSharedSource,
+    spec: &FieldSessionSpec,
+    chart: &SymbolCurrentChart,
+) -> Result<()> {
+    if pairing.family.provider.is_empty()
+        || pairing.family.record_group.is_empty()
+        || pairing.request_events.is_empty()
+        || pairing.request_events.contains(&0)
+        || pairing.request_events.windows(2).any(|p| p[0] >= p[1])
+        || pairing.response_symbols == 0
+    {
+        return Err(invalid("retained exposure pairing coordinates"));
+    }
+    let parts = retained
+        .request
+        .partial
+        .as_ref()
+        .ok_or_else(|| invalid("retained exposure request has no held partial"))?;
+    let held = parts.iter().take_while(|p| p.is_some()).count();
+    if parts.len() != retained.output_symbols
+        || parts[held..].iter().any(Option::is_some)
+        || retained.output_symbols.checked_sub(held) != Some(pairing.response_symbols)
+    {
+        return Err(invalid("retained exposure request/response extent"));
+    }
+    let expected = parts[..held]
+        .iter()
+        .map(|p| {
+            chart
+                .alphabet()
+                .symbol_of(p.as_ref().unwrap())
+                .ok_or_else(|| invalid("retained exposure held symbol is outside its chart"))
+        })
+        .collect::<Result<Vec<_>>>()?;
+    if expected != spec.symbols_of(chart, &pairing.request_text)? {
+        return Err(invalid(
+            "retained exposure request text disagrees with held symbols",
+        ));
+    }
+    if retained
+        .held
+        .iter()
+        .enumerate()
+        .any(|(i, fixed)| *fixed != (i / spec.symbols.len() < held))
+    {
+        return Err(invalid("retained exposure receiver mask"));
+    }
+    Ok(())
+}
+
 pub struct NativeFieldSession<'c> {
     surface: &'c ResidentSurface<'c>,
     spec: FieldSessionSpec,
@@ -593,7 +680,9 @@ impl<'c> NativeFieldSession<'c> {
         })
     }
     pub fn request(&mut self, request: &FieldSectionRequest) -> Result<Value> {
-        if self.spec.source_chart==FieldSourceChart::SharedRegions{return self.shared_request(request);}
+        if self.spec.source_chart == FieldSourceChart::SharedRegions {
+            return self.shared_request(request);
+        }
         if request.retain_comparison && !request.commit {
             return Err(invalid(
                 "a retained target requires committed field generation",
@@ -638,7 +727,7 @@ impl<'c> NativeFieldSession<'c> {
                 return Ok(
                     json!({"schema":"org.holonics.hna.field-section.v1", "status":"committed-receiver-refused", "committed":true,
                 "comparison":produced.comparison_id(),"producing_epoch":produced.producing_epoch(),"error":error.to_string(),"anatomy":self.inspect()}),
-                )
+                );
             }
             Err(error) => return Err(error),
         };
@@ -666,7 +755,9 @@ impl<'c> NativeFieldSession<'c> {
         )
     }
     pub fn observe(&mut self, source: u64, text: &str, step_bits: u32) -> Result<Value> {
-        if self.spec.source_chart==FieldSourceChart::SharedRegions{return self.observe_retained_source(source,text,step_bits);}
+        if self.spec.source_chart == FieldSourceChart::SharedRegions {
+            return self.observe_retained_source(source, text, step_bits);
+        }
         let start = Instant::now();
         let target = if self.spec.source_chart == FieldSourceChart::JointRegions {
             let expected = *self
@@ -723,6 +814,57 @@ impl<'c> NativeFieldSession<'c> {
     }
     pub fn retained_shared_comparisons(&self) -> Vec<u64> {
         self.retained_shared.keys().copied().collect()
+    }
+    pub fn attach_exposure_pairing(
+        &mut self,
+        comparison: u64,
+        family: crate::alpha::exposure::ExposureFamily,
+        mut request_events: Vec<u64>,
+        request_text: String,
+    ) -> Result<()> {
+        request_events.sort_unstable();
+        request_events.dedup();
+        let retained = self
+            .retained_shared
+            .get(&comparison)
+            .ok_or_else(|| invalid("unknown retained shared-source comparison"))?;
+        if retained.exposure_pairing.is_some() {
+            return Err(invalid("retained exposure pairing is already attached"));
+        }
+        let held = retained
+            .request
+            .partial
+            .as_ref()
+            .ok_or_else(|| invalid("retained exposure request has no held partial"))?
+            .iter()
+            .take_while(|part| part.is_some())
+            .count();
+        let pairing = RetainedExposurePairing {
+            family,
+            request_events,
+            request_text,
+            response_symbols: retained
+                .output_symbols
+                .checked_sub(held)
+                .ok_or_else(|| invalid("retained exposure response extent"))?,
+        };
+        validate_exposure_pairing(&pairing, retained, &self.spec, &self.chart)?;
+        self.retained_shared
+            .get_mut(&comparison)
+            .unwrap()
+            .exposure_pairing = Some(pairing);
+        Ok(())
+    }
+    pub fn retained_exposure_pairings(&self) -> Vec<(u64, RetainedExposurePairing)> {
+        self.retained_shared
+            .iter()
+            .filter_map(|(id, retained)| {
+                retained
+                    .exposure_pairing
+                    .clone()
+                    .map(|pairing| (*id, pairing))
+            })
+            .collect()
     }
     pub fn spec(&self) -> &FieldSessionSpec {
         &self.spec
@@ -853,7 +995,7 @@ impl NativeFieldSavedSession {
             issued_shared,
             exposure,
         } = header;
-        spec.chart()?;
+        let chart = spec.chart()?;
         state.validate().map_err(invalid)?;
         // A remounted wire re-checks its own operands. The rows themselves are rebuilt from the
         // retained request at application; only its declared extents can be checked here.
@@ -863,18 +1005,26 @@ impl NativeFieldSavedSession {
                 || !retained.request.retain_comparison
                 || retained.output_symbols == 0
                 || retained.output_symbols > spec.section_symbols
-                || Some(retained.held.len()) != retained.output_symbols.checked_mul(spec.symbols.len())
+                || Some(retained.held.len())
+                    != retained.output_symbols.checked_mul(spec.symbols.len())
                 || retained.held.iter().all(|fixed| *fixed)
         }) || (!retained_shared.is_empty()
             && spec.source_chart != FieldSourceChart::SharedRegions)
         {
             return Err(invalid("retained shared-source comparison operands"));
         }
+        for retained in retained_shared.values() {
+            if let Some(pairing) = &retained.exposure_pairing {
+                validate_exposure_pairing(pairing, retained, &spec, &chart)?;
+            }
+        }
         if exposure
             .as_ref()
             .is_some_and(|cursor| cursor.byte_offset > cursor.source.octets)
         {
-            return Err(invalid("saved exposure cursor is outside its pinned source"));
+            return Err(invalid(
+                "saved exposure cursor is outside its pinned source",
+            ));
         }
         let bytes = blob(&mut input)?;
         let body = SavedCoupledBody::read(&mut bytes.as_slice(), bytes.len() as u64)?;
@@ -992,9 +1142,10 @@ mod tests {
             // b still refers to material from BEFORE the update just performed.
             s.checkpoint(&path, &HnaStreamState::default())?;
             let returned = s.observe(b["comparison"].as_u64().unwrap(), "c", 3)?;
-            assert!(s
-                .observe(b["comparison"].as_u64().unwrap(), "c", 3)
-                .is_err());
+            assert!(
+                s.observe(b["comparison"].as_u64().unwrap(), "c", 3)
+                    .is_err()
+            );
             Ok((returned["returned"].clone(), s.inspect_current()?))
         })
         .unwrap();
@@ -1077,9 +1228,11 @@ mod delivery_tests {
         line.push(b'\n');
         let epoch = with_field_session(&spec, |s| {
             let mut stream = HnaStream::new();
-            assert!(stream
-                .pump_field(s, &mut std::io::Cursor::new(&line), &mut Refuse)
-                .is_err());
+            assert!(
+                stream
+                    .pump_field(s, &mut std::io::Cursor::new(&line), &mut Refuse)
+                    .is_err()
+            );
             assert!(stream.state().output.is_some());
             assert_eq!(s.inspect()["pending"], 1);
             s.checkpoint(&path, stream.state())?;
@@ -1110,7 +1263,7 @@ mod delivery_tests {
 #[cfg(test)]
 mod exposure_tests {
     use super::*;
-    use crate::alpha::exposure::{ExposureManifest, ExposureOccurrence, EXPOSURE_SCHEMA};
+    use crate::alpha::exposure::{EXPOSURE_SCHEMA, ExposureManifest, ExposureOccurrence};
     fn manifest() -> ExposureManifest {
         serde_json::from_value(json!({"schema":EXPOSURE_SCHEMA,"kind":"manifest",
             "temporal_cut":"2026-09-04T00:00:00Z","temporal_cut_normalized":"2026-09-04T00:00:00.000000+00:00",
@@ -1125,7 +1278,11 @@ mod exposure_tests {
         parent: Option<&str>,
         text: &str,
     ) -> ExposureOccurrence {
-        let kind = if role == "human" { "human-text" } else { "agent-text" };
+        let kind = if role == "human" {
+            "human-text"
+        } else {
+            "agent-text"
+        };
         serde_json::from_value(json!({"schema":EXPOSURE_SCHEMA,"kind":"occurrence-family","sequence":sequence,
             "position":{"first_source":1,"first_record":sequence+1,"first_event":sequence+1},
             "family":{"provider":"codex","record_group":format!("declared:{name}")},
@@ -1149,6 +1306,85 @@ mod exposure_tests {
             fractional_bits: 48,
         }
     }
+
+    #[test]
+    fn retained_exposure_pairing_roundtrips_and_legacy_payload_defaults() {
+        let request = FieldSectionRequest {
+            text: String::new(),
+            partial: Some(vec![Some("0".into()), None]),
+            output_symbols: Some(2),
+            context: Vec::new(),
+            commit: false,
+            retain_comparison: true,
+        };
+        let retained = RetainedSharedSource {
+            request,
+            held: vec![true, false],
+            output_symbols: 2,
+            producing_epoch: 7,
+            exposure_pairing: Some(RetainedExposurePairing {
+                family: crate::alpha::exposure::ExposureFamily {
+                    provider: "codex".into(),
+                    record_group: "declared:request".into(),
+                },
+                request_events: vec![11, 12],
+                response_symbols: 1,
+                request_text: "source".into(),
+            }),
+        };
+        let wire = serde_json::to_value(&retained).unwrap();
+        let roundtrip: RetainedSharedSource = serde_json::from_value(wire.clone()).unwrap();
+        assert_eq!(roundtrip, retained);
+        let mut legacy = wire.as_object().unwrap().clone();
+        legacy.remove("exposure_pairing");
+        let restored: RetainedSharedSource = serde_json::from_value(Value::Object(legacy)).unwrap();
+        assert!(restored.exposure_pairing.is_none());
+    }
+    #[test]
+    fn saved_pairing_validates_its_original_receiver_and_source_text() {
+        let spec = spec();
+        let chart = spec.chart().unwrap();
+        let retained = RetainedSharedSource {
+            request: FieldSectionRequest {
+                text: String::new(),
+                partial: Some(vec![Some("6".into()), Some("1".into()), None, None]),
+                output_symbols: Some(4),
+                context: vec![],
+                commit: false,
+                retain_comparison: true,
+            },
+            held: (0..64).map(|i| i < 32).collect(),
+            output_symbols: 4,
+            producing_epoch: 0,
+            exposure_pairing: None,
+        };
+        let pairing = RetainedExposurePairing {
+            family: crate::alpha::exposure::ExposureFamily {
+                provider: "codex".into(),
+                record_group: "request".into(),
+            },
+            request_events: vec![1, 3],
+            response_symbols: 2,
+            request_text: "a".into(),
+        };
+        assert!(validate_exposure_pairing(&pairing, &retained, &spec, &chart).is_ok());
+        let mut changed = pairing.clone();
+        changed.request_text = "b".into();
+        assert!(validate_exposure_pairing(&changed, &retained, &spec, &chart).is_err());
+        changed = pairing.clone();
+        changed.response_symbols = 4;
+        assert!(validate_exposure_pairing(&changed, &retained, &spec, &chart).is_err());
+        changed = pairing.clone();
+        changed.request_events = vec![1, 1];
+        assert!(validate_exposure_pairing(&changed, &retained, &spec, &chart).is_err());
+        let mut changed = retained.clone();
+        changed.request.partial.as_mut().unwrap().swap(1, 2);
+        assert!(validate_exposure_pairing(&pairing, &changed, &spec, &chart).is_err());
+        let mut changed = retained;
+        changed.held[0] = false;
+        assert!(validate_exposure_pairing(&pairing, &changed, &spec, &chart).is_err());
+    }
+
     fn aperture() -> ExposureAperture {
         ExposureAperture {
             request_bytes: 8,
@@ -1160,7 +1396,10 @@ mod exposure_tests {
     fn a_response_aperture_that_splits_a_codec_byte_is_refused_before_any_material() {
         // Two nibbles per byte: no target text has an odd symbol count, so an odd free extent
         // could be retained and never observed.
-        let odd = ExposureAperture { response_symbols: 5, ..aperture() };
+        let odd = ExposureAperture {
+            response_symbols: 5,
+            ..aperture()
+        };
         assert!(odd.bounded(&spec()).is_err());
         assert!(aperture().bounded(&spec()).is_ok());
     }
@@ -1387,9 +1626,10 @@ mod joint_region_tests {
             let b = s.request(&request(vec![None], "c"))?;
             s.observe(a["comparison"].as_u64().unwrap(), "ab", 1)?;
             s.checkpoint(&path, &HnaStreamState::default())?;
-            assert!(s
-                .observe(b["comparison"].as_u64().unwrap(), "cc", 1)
-                .is_err());
+            assert!(
+                s.observe(b["comparison"].as_u64().unwrap(), "cc", 1)
+                    .is_err()
+            );
             let returned = s.observe(b["comparison"].as_u64().unwrap(), "c", 1)?;
             Ok((returned["returned"].clone(), s.inspect_current()?))
         })
@@ -1417,10 +1657,12 @@ mod joint_region_tests {
             let after = s.inspect_current()?;
             assert_eq!(before["material"], after["material"]);
             assert_eq!(before["reaction"], after["reaction"]);
-            assert!(comparison["returned"]["parameter_update"]
-                .as_str()
-                .unwrap()
-                .starts_with("zero"));
+            assert!(
+                comparison["returned"]["parameter_update"]
+                    .as_str()
+                    .unwrap()
+                    .starts_with("zero")
+            );
             assert_ne!(
                 comparison["returned"]["held_difference"]["coordinates"][0]["difference"]["real"],
                 json!([[0, []], [1, [1]]])

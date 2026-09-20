@@ -4,9 +4,9 @@
 **Authority:** admission record for the second station of
 [`../../blueprint/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md`](../../archive/plans/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md)  
 **Driver:**
-[`../../soma/life/examples/the_candidate_departs_before_sibling_testimony_returns.rs`](../../soma/life/examples/the_candidate_departs_before_sibling_testimony_returns.rs)  
+[`../../archive/retired-phoenix-rust/life-examples/the_candidate_departs_before_sibling_testimony_returns.rs`](../../archive/retired-phoenix-rust/life-examples/the_candidate_departs_before_sibling_testimony_returns.rs)
 **Owner:**
-[`../../soma/life/src/athena_returned_defect.rs`](../../soma/life/src/athena_returned_defect.rs)  
+[`athena_returned_defect.rs`](https://github.com/brandonrdug/holonics/blob/4caee05bc50a304344db942150ee743865becd4f/soma/life/src/athena_returned_defect.rs)  
 **Returned artifact:** `output/the_candidate_departs_before_sibling_testimony_returns/`  
 **Artifact identity:** `bf202d8c45e5ed1a300ea1ebc5290c1edc0a2db8e9f1e8b51e12e62e38d35709`
 

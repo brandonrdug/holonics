@@ -5,7 +5,7 @@
 **Truth status:** each material claim is graded inline; this record does not advance the construction
 state.
 
-[implemented-exact] [`native_membrane.rs`](../../crates/holonic-engine/src/phoenix/native_membrane.rs)
+[implemented-exact] [`native_membrane.rs`](https://github.com/brandonrdug/holonics/blob/2eba9ec4d54a8503cb0a8c45593521700bf65fcf/crates/holonic-engine/src/phoenix/native_membrane.rs)
 composes the existing causal membrane, E3 cultivated rest, E2 nominal-boundary reconstruction
 fibres, resident joint-transport law and exact interchange owner. `NativeInferenceMembrane` owns the
 continuing product and resident card once and is not `Clone`; branches retain only addressed local

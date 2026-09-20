@@ -9,12 +9,13 @@ mathematical subject or a source dependency is obsolete.
 | Question | Owner |
 |---|---|
 | What is being built, and why is its geometry the learning? | [`THE_MACHINE.md`](THE_MACHINE.md): read first |
+| Where are the relevant derivations and experiments? | [Research routes](../research/records/README.md) connect subject, source law and consumer; [research entry](../research/README.md) distinguishes records, experiments, notebook and papers |
 | What does the framework mean? | `docs/canon/`, with `FORMAL_FRAMEWORK.md` connecting formal subject owners |
 | What machinery is being built? | `ARCHITECTURE.md`, `HNN_COMPOSITION.md`, and the HNN network contract in the linked blueprint |
 | What must a changed operation preserve? | Its formal/native owner and the blueprint's mathematical implementation contract |
 | In what dependency order do we work? | `docs/plans/THE_ROADMAP.md` only |
 | What has returned and what is unfinished now? | `CONSTRUCTION_STATE.md` only; completed evidence is linked to dated records |
-| How do agents construct, measure and audit? | `AGENTS.md`, `DEVELOPMENT.md`, `AGENT_PROTOCOL.md` and the focused research skill |
+| How do agents construct, measure and audit? | `AGENTS.md` for Codex, `CLAUDE.md` for Claude, `DEVELOPMENT.md`, `AGENT_PROTOCOL.md` and the focused research skill |
 | How does a caller use an existing interface? | The relevant interface guide, such as `NATIVE_HNA.md`; API/wire labels remain stable |
 
 [project-postulate] Consolidation updates the owner of a statement and its current consumers.
@@ -80,7 +81,8 @@ when following an old inline path. No compatibility symlink makes an old root lo
 
 Start with [architecture](ARCHITECTURE.md), [Soulkiller](SOULKILLER.md), [Athena](ATHENA.md) and
 [interop](INTEROPERABILITY.md). The [owner map](ARCHITECTURE_MAP.md) connects formal and executable
-relations. Dated records remain in `research/records/`; the
+relations. Start with the [subject routes](../research/records/README.md), then the linked records
+and actual source. Dated records remain in `research/records/`; the
 [repository evidence protocol](AGENT_PROTOCOL.md) explains source and correction lineage. The
 one-time imported testimony is local documentation; no database or connector is required.
 The old generated claim index and equation atlas remain archived.

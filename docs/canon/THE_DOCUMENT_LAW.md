@@ -1,63 +1,73 @@
 # The document law
 
-**Reconciled September 4 and September 6, 2026 under Brandon's consolidation instructions.**
-**Truth status:** `project-postulate` — repository documentation discipline, not mathematics.
-
-The former document law is preserved in
-[the pre-consolidation record](../../archive/operations/DOCUMENT_LAW_BEFORE_HNA_CONSOLIDATION.md).
-Its mandatory generated index, metadata checks, census, document-size rules and two-commit ritual
-are superseded. They are historical practices, not obligations on current work.
+[project-postulate] Documentation makes the mathematics, implementation and evidence usable.
+Create, revise or reorganize it when the work needs an explanation, source route or construction
+contract. Brandon's latest direct request governs; these conventions support that work.
 
 ## Authority and location
 
-Brandon's latest direct instruction governs. Documentation makes the actual work legible; it
-does not create another approval layer for the sole human operator.
-
 | Material | Home and responsibility |
 |---|---|
-| Operating contract | Root `AGENTS.md`, shared by Codex and Claude; there is no separate `CLAUDE.md`. |
-| Construction order | `docs/plans/THE_ROADMAP.md` and its explicitly admitted current plan. |
-| Current position | Root `CONSTRUCTION_STATE.md`, concise and updated when the work changes. |
-| Architecture and interfaces | `docs/ARCHITECTURE.md`, the Soulkiller/Athena/interoperability guides, and the actual public source owners. |
-| Doctrine | `docs/canon/`, with explicit grades and decisive evidence. |
-| Evidence | `research/records/`, experiments, papers and formal source at their declared scopes. |
-| Navigation | The repository layout, subject guides, manual `docs/ARCHITECTURE_MAP.md` and linked dated evidence. |
-| Superseded material | `archive/`, dated and retained as provenance; it schedules nothing. |
+| Shared machine description | [THE_MACHINE](../THE_MACHINE.md): the object, operative equations and implementation routes |
+| Harness entry points | Root [AGENTS.md](../../AGENTS.md) for Codex and self-contained [CLAUDE.md](../../CLAUDE.md) for Claude; both use the shared mathematical sources |
+| Construction order | [THE_ROADMAP](../plans/THE_ROADMAP.md), with supporting plans providing contracts rather than separate schedules |
+| Current position | [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md): active object, unclosed consuming operation, next action and completion evidence |
+| Mathematical/object/interface contracts | Subject guides, [HOLON](../HOLON.md), [HNN_FORMULA](../HNN_FORMULA.md), formal statements and actual native owners |
+| Doctrine and durable interpretation | `docs/canon/`, with its decisive source and exact claim scope |
+| Research and result evidence | `research/records/`, experiments, papers and notebooks at their stated scopes |
+| Discovery and navigation | [Research routes](../../research/records/README.md), [repository guide](../REPOSITORY.md), [owner map](../ARCHITECTURE_MAP.md) and direct source links |
+| Historical material | `archive/`, preserved with date/provenance and a route to the current source |
 
-Historical evidence inside a doctrinal file stays historical. A date, filename, old imperative,
-test count or confident agent assertion cannot promote it into present authority.
+[definition] A useful entry point states what a thing is, its equation, where it lives and what
+consumes it. A task-specific plan supplies the operands and open relation needed for the next
+implementation. A research record preserves the substantial derivation or result and its source;
+its title should make the relation discoverable. A recorded older next step does not override
+current order.
+
+## Connect a changed relation
+
+[project-postulate] Update the owning statement and its consumers together. When a mathematical
+or implementation return changes the active picture, connect:
+
+1. The source equation, hypotheses and formal/native owner.
+2. The actual consuming call and its returned result or remaining defect.
+3. The relevant subject guide and research route.
+4. The issue body and current state where that change affects the active work.
+
+[definition] Use one detailed owner for a substantial explanation and link to it from other
+entry points. Compact self-contained harness summaries are intentional; copied current-status
+lists and repeated contradictory rules are not useful substitutes for that owner. New subject
+maps and records are welcome when they add navigable content. A file census, size quota or
+mandatory document-generation process does not establish that connection.
 
 ## Claims and corrections
 
-Every material claim carries one truth-status grade and applicable evidence tags from
-[EPISTEMIC_GRADES.md](EPISTEMIC_GRADES.md). Separate the mathematical statement, its hypotheses,
-implementation, measured receiver scope and intended product. A summary must not assert more than
-its evidence. Formal acceptance, numerical agreement and useful application behavior answer
-different questions.
+[definition] Every material claim has one truth status and applicable evidence tags from
+[EPISTEMIC_GRADES](EPISTEMIC_GRADES.md). A theorem, an implementation, a measured run and a
+rendered presentation have different supporting evidence. Experiments and papers can contain
+actual mathematical or machine returns; grade the operation, not its directory or language.
 
-Correct a false live statement where it occurs, and link its decisive evidence or retraction.
-Keep measured and quoted historical content intact; explain subsequent narrowing explicitly.
-Use dated records for substantial returned results, not as a compulsory ceremony for every edit.
-Code, its documentation and its tests may be committed coherently together.
+[project-postulate] Correct false live statements in place and link the decisive source. Preserve
+historical measurements and quoted messages with their original scope; explain later narrowing
+without replacing a source by a confession or an agent's summary. A script/library disagreement
+is resolved by checking the equation and both implementations. Source code is inspectable
+evidence, not infallible authority over a reference calculation.
 
-Preserve obsolete material recoverably before archiving. The archive path and a concise
-supersession note identify its disposition; no second ledger or mandatory supersession index is
-required. Age helps recover forgotten work, but does not decide whether its subject is obsolete.
+[definition] Keep public records free of raw private captures and machine-specific source paths.
+The [evidence protocol](../AGENT_PROTOCOL.md) retains source coordinates and chronology. Code,
+documentation and their checks can be committed together. Relocations preserve source and links;
+archive a superseded reading surface recoverably when it is still useful provenance.
 
-## Navigation and maintenance
+## Verification and continuity
 
-Use direct links to the relevant source or subject guide. Update the manual owner map when its
-owner changes. Do not maintain file counts, regenerate an all-repository index or create another
-catalogue merely to keep a previous catalogue current. The external memory database is retired;
-needed testimony lives in repository documentation under the
-[local evidence protocol](../AGENT_PROTOCOL.md). The equation atlas and generated claim index
-remain archived, with no replacement census.
+[project-postulate] Validate the changed relation and the documentation paths it uses. Run the
+relevant implementation, formal or application checks; reuse unchanged recorded receipts.
+A documentation edit needs the checks that answer its claims, not an automatic rebuild of every
+paper or backend. The [development guide](../DEVELOPMENT.md) states the commands and scopes.
 
-Maintain documentation when the subject changes. Review the links and claims actually affected.
-Do not make untouched Typst papers, document regexes, heading conventions or source-size ledgers
-conditions for an unrelated code change. The relevant Cargo, native and Lean checks are described
-in [the development guide](../DEVELOPMENT.md); no blanket validation suite is required.
-
-Keep the root position and roadmap free of running audit diaries. Completed history belongs in
-its existing records and Git. A completed position may be `NONE`; neither navigation nor an
-agent's desire for another task creates construction authority.
+[historical] The earlier generated claim index, equation database, document-size gates and
+mandatory multi-commit ritual remain retired. Their source is preserved in
+[the pre-consolidation document law](../../archive/operations/DOCUMENT_LAW_BEFORE_HNA_CONSOLIDATION.md).
+Current navigation uses maintained subject routes and actual source, not a replacement grading
+registry. The September 20 consolidation also retires the blanket experiment-directory disclaimer
+and the August-only research entry page; their historical snapshots are linked from research.

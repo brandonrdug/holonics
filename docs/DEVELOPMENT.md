@@ -1,213 +1,120 @@
 # Building and developing Holonics
 
-[definition] Use the root Cargo workspace for host Rust code. Device-only targets under
-`accelerators/` keep their declared toolchains. Lean and Typst are verification/exposition
-apparatus; they are not dependencies that schedule native inference.
+Read [the machine](THE_MACHINE.md), your harness guide ([Codex](../AGENTS.md),
+[Claude](../CLAUDE.md)) and the active state/roadmap. This guide gives the mathematical
+implementation method, actual build/measurement commands and shared-workspace practice.
 
 ## Mathematical implementation and continuation
 
-[project-postulate] HNN is the architecture being constructed; Eros names the collective
-formative machine and its nested interactions; Athena is its first intended product. “Continue
-Athena” carries the accumulated physical/mathematical constructions into their shared executable
-objects. The [construction ethos](canon/THE_REALITY_OF_DIFFERENCE.md#construct-cognition-through-the-shared-objects)
-keeps conscious-experience motivation, faces, active media, coarse graining and interior inference
-present in this work. A new source domain is an opportunity to generalize and join those objects.
-Use the [network contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-hnn-network-and-its-mathematical-contract)
-to locate the operation a change serves. Generator formation, compression and navigation use
-the same retained mathematical organization. Product labels, test cases and export languages
-do not divide that organization into independent engines or replacement objectives.
+[project-postulate] Construct the requested relation through its existing owners and consuming
+application. HNN's field, geometry, source/receiver maps and learned material are one machine.
+The [Holon](HOLON.md), [model formula](HNN_FORMULA.md), [research routes](../research/records/README.md)
+and [native source map](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#field-session-source-map)
+supply concrete starting material. A mathematical result can also be its own requested return.
 
-[definition] A semantic implementation change has a mathematical contract in its owner or
-the blueprint: the typed source and target, known data and inferred unknown, hypotheses and
-constitutive/inference law, receiver, and the equation its execution must preserve. State the
-actual function or family being computed. For example, `WH=B` requires its source features and
-moment convention, including whether H contains a prior; a statement that a return changes
-standing supplies none of these. Reuse the existing formal theorem and construct its consuming
-instance. Extend the formal owner when the mathematical statement changes. No additional proof
-assistant invocation belongs inside native inference or in an ordinary interface-only edit.
+[definition] An implementation contract names the typed source and target, supplied data,
+inferred unknown, hypotheses, generating/constitutive law, receiver and preserved equation.
+For `W H=B`, for example, retain the feature/moment convention, prior and targets. For a
+geometric contact, retain incidence, frame, material, units and the full variation.
 
-[definition] Distinguish supplied, evaluated and inferred objects in that account. Applying
-supplied restrictions `A x` and `C x` evaluates their sections; it does not infer A or C.
-Inference may instead concern coefficients or a compatible function family in that declared
-chart. State the unknown of this increment without denying the computation's mathematical value
-or claiming an unconstructed broader organization.
-
-| Change in the construction | Mathematical obligation at its consumer |
+| Change | Equation / evidence at the consumer |
 |---|---|
-| Source or condition attachment | Identify the participating pre-target carriers and restrictions. A caller-supplied map is a supplied map; a formation claim identifies the native operation that constructs it. Target-derived successor conditions are unavailable to their own earlier prediction. |
-| Serial or parallel composition | Preserve domains, joining equalities and shared parameters. For `z=xh`, `mz=v`, retain z's constraint in both uses. Parallel execution additionally preserves the complete successor and resources under the admitted interchange law. |
-| Kernel or representation change | State a realization equation, such as `decode_Y(native_T(encode_X(x)))=T(x)` on the admitted domain. An enclosure retains the source family and its signed/oriented defect with a bound; a numerical centre is not an exact source. |
-| Observation-driven formation | Use the original producing operands and the selected existing update law. Distinguish changing a parameter from changing its source chart; include mixed terms when both change. An observed coefficient fit and inferred incidence are different claims. |
-| Compression and continued use | Construct E, U and D with `E_next T=U E` and `D E=rho` for the requested future family, including admitted material changes and pending returns. A separator identifies the coordinate or condition to retain. A shorter file or replay cache does not establish these equations. |
-| Physical or information measurement | Retain comparands, orientation, receiver and units. A physical consequence additionally uses its constitutive/boundary law and clock. Loss, cross-entropy and runtime statistics measure their declared populations. |
+| Source or condition attachment | Identify the actual pre-target carriers/restrictions and any inferred map; keep source and condition correlations in their common parameter family. |
+| Serial composition | Retain the joining occurrence/equality and the complete second operation on the first return. Equal endpoint counts do not supply the join. |
+| Parallel composition | Establish commutation of full read/write, lineage, obstruction and resource effects; use a checked partition/interchange law for the actual operation. |
+| Representation or kernel | State `decode_Y(T_native(encode_X(x)))=T(x)` on its domain, or return the source family and oriented error enclosure. |
+| Material update | Use the actual producing operands and chosen update law; include mixed terms when current and material both change. |
+| Compression | Construct encoder E, induced action U and decoder D with `E_next T=U E`, `D E=ρ`; preserve the required source fibre, interior and cost. |
+| Physical/experimental measurement | Retain the comparands, receiver, units, constitutive/boundary laws and clock. Compare implementations on the same actual input. |
 
-[project-postulate] These obligations are local to the changed relation. They are not a new
-universal intelligence theorem or a requirement to rebuild every proof before producing output.
-A preview already returns its generated face. A commit publishes the specified successor;
-a later observation invokes its comparison/update contract when present. Do not require all
-three in every operation or invent an observation for an exact solver result.
+[definition] Separate the case a failure exposes, then repair that operation:
 
-[definition] Diagnose the obstruction precisely before changing scope:
+- An existing returned object with no caller needs the actual attachment.
+- A carrier unable to express a term needs a lawful rebase, factor or richer supported chart.
+- A wrong derivative/material law needs its complete directional residual and corrected equation.
+- Resource growth needs its measured factorization, precision or placement change.
+- An unproved consequence needs the source statement, attempted derivation and remaining equation.
 
-- **Unconnected caller:** both operations exist; name their types, producing operands and the
-  call that must consume the return. Complete that connection and its public consumer.
-- **Representation mismatch:** show the term or source family that the current carrier cannot
-  express, such as a parameter product outside an affine family. Change the representation
-  through existing factor/section owners and account for its decoder and cost.
-  A `REFUSED_CARRIER` is this diagnosis and never a licence to widen a word. Measure first
-  whether the *deposited* presentation is reducible — size reduction, LLL over the same row
-  lattice and the rational reduced echelon form answer that — and say what the reduced size is.
-  Two rebases follow, in this order. **Inside one operation:** content-reduce the elimination
-  step against its pivot before the products, so an intermediate never carries a factor the
-  following normalization divides straight back out
-  (`kernels/exact_resident_section.cu::fibre_rebase_step`); the reported values are unchanged.
-  **Across operations:** carry the relation in its factored chart — the retained ordered word —
-  instead of the expanded composite, when the composite is the only thing that leaves the
-  carrier (`…/wave/family/receiver.rs::read_prospective`). A factored reading owes the exact
-  condition under which it equals the expanded one, a test that both charts agree on material
-  small enough to read both ways, and a typed refusal where that condition fails.
-  `Foundation/RelationPresentation.lean` is the law that the two charts read identically.
-- **Unproved mathematical claim:** state the proposition, hypotheses and attempted derivation
-  or counterexample. Develop the relevant formal owner. Source absence alone is not a proof
-  that the mathematical construction is absent from the framework.
+[established-bounded; source-inspected] Two existing rebases are useful concrete examples.
+`exact_resident_section.cu::fibre_rebase_step` content-reduces elimination operands before products,
+removing factors that normalization would otherwise divide away afterward. The prospective
+family reader in `normal/direct/wave/family/receiver.rs` retains an ordered generating word when
+its expanded composite exceeds the carrier. `Foundation/RelationPresentation.lean` states the
+receiver equality; the supported factored case and vertical-fibre refusal are part of that law.
+These are representation changes with a decoder, not permission to widen an exact word silently.
 
-[project-postulate] When a construction uses a named constant or transcendental operation,
-recover its normalized constraint, branch/period and source family before interpreting its
-numeric face. Exact evaluation retains the generating expression and oriented remainder;
-changing decimal notation alone does not make a float-based state/branch decision exact.
-Use the [constraint-mode/active-face contract](CONSTRAINT_MODES_AND_RECEIVER_FACES.md) for the
-chronological exp/phase, Gamma/zeta, golden/de Bruijn and Lorentz/gyro/stress connections.
-A physical receiver participates through the field/material interaction; an exterior renderer
-is a typed projection and supplies no hidden native controller. These duties repair the
-consuming relation rather than introduce another universal approval or proof gate.
+[definition] Read native wire layouts before interpreting a comparison. A sealed point-valued
+carrier can encode the centre **and a nonzero radius** of a represented family. Normalized
+sections, bilinear covectors and re-entry use those fields and their grain/denominator. The
+Rust declaration, kernel argument order and actual consuming call must agree. Keep constructor
+and remount validation on the carrying path, with checked extents before allocation/work.
 
-[project-postulate] For generative/physical geometry, identify the complete object and its
-actual nonlinear operation before selecting a figure or computational simplification. State
-which restriction, projection or section the picture reads and which couplings it retains.
-A named example must retain the mechanism being explained: global affine contraction cannot
-stand in for saddle-mediated recursion, and separated IFS copies cannot stand in for an
-intersecting field's intrinsic return geometry. These are construction choices to correct,
-not reasons to add another acceptance gate. A mathematical correction also reaches its
-actual library/consumer interfaces in the same return: update the affected operations and
-verify their equation, rather than leaving an upgraded theorem beside an unaware implementation. Recover recurrence/preimage, manifold/higher-cell,
-connection and constitutive owners together; the filename `FractalPacking` does not bound the
-framework's meaning of fractals. The [intrinsic field formula](HNN_FORMULA.md#one-object-its-charts-and-its-recursive-geometry)
-provides the current source route.
+[project-postulate] Preserve the complete object through a change. A physical receiving Holon can
+have motion, material and storage; its derivative includes those terms. A phase/constant has its
+normalized constraint, branch/winding and remainder. A generated face can be received before a
+unique source is known. The source, law and receiver determine what must be retained.
 
-[project-postulate] A bounded example answers a named question in that contract. Its driver may
-supply admitted inputs and inspect outputs; it cannot supply the disputed organization or answer
-and then count that as formation. Once the example answers its question, use the result in the
-named consumer. Do not expand it for another isolated success. Small exact results and physical
-models remain valuable at their stated domains; their size is not the criterion.
-
-[project-postulate] Follow the roadmap's dependency order while maintaining the affected owners.
-A completed local test does not cancel its consuming obligation. Consolidate duplicated
-representations, wrappers and exports as those consumers change. Preserve mathematical,
-ownership and wire distinctions; do not give each implementation task a permanent public family.
-
-[project-postulate] Format only the changed owners. A workspace `cargo fmt` rewrites unrelated
-applications and research sources in this checkout; isolated work uses
-`rustfmt --config skip_children=true` on its explicit Rust files. Inspect the resulting diff.
-This applies to delegated tasks as well as primary-agent edits.
-
-[project-postulate] A handoff retains the original requested outcome and the current mathematical
-contract, its source/native owners, the result returned and the next unresolved consumer. Record
-agent-chosen assumptions as choices, with the reason for their scope. Sustained construction
-follows the direct request; a goal command is not required. Any goal text and compaction summaries
-do not supersede the roadmap or turn a subsidiary task into the objective. Keep current position only in CONSTRUCTION_STATE, order only in the roadmap,
-contracts in the blueprint and owners, and completed evidence in dated records. Correct a stale
-clause in place; appending a contrary instruction elsewhere is not consolidation.
+[project-postulate] Consolidation is part of implementation: reconcile duplicate owners and
+update the changed guide, record, source map and issue body together. Create documentation when
+it supplies a useful explanation, contract or retrieval route. Existing source and dated evidence
+are retained recoverably. Keep current order in the roadmap and current position in the state.
 
 ### Orchestrated construction cycles
 
-[project-postulate] Brandon's authorized workflow keeps the primary agent responsible for
-mathematical decisions, consuming implementation, integration and verification. Delegated workers
-(Luna under Codex; up to three Opus 5 workers and one Sonnet 5 reviewer under Claude, per the
-[worker brief](WORKER_BRIEF.md)) handle bounded independent source, proof, kernel or regression
-tasks with explicit, disjoint ownership.
-Their returns feed the same consuming implementation. The following control applies to sustained
-construction; ordinary repairs and user-requested bounded tasks do not acquire another process.
+[definition] The active brief retains the user objective, mathematical unknown, source/receiver,
+existing owners, next edit and completion evidence. At a scope transition or context handoff:
 
-[definition] Keep one short active brief in CONSTRUCTION_STATE, linked to the roadmap and exact
-blueprint contract: **authorized deliverable; consuming operation and existing owners; verified
-return and unclosed obligations; selected next action and why it advances that operation; evidence
-that would complete it.** Keep proposed scope changes visibly distinct from user rulings. Do not
-create a second plan, enumerate every edit, or rewrite the brief at each tool call.
+1. Recover that brief and the applicable mathematical source already available.
+2. Check the proposed edit against the actual consuming equation/call.
+3. Construct and integrate the owned changes, using bounded independent workers where useful.
+4. Inspect the returned result and record its scope, cost, residual and next unresolved operation.
 
-[project-postulate] Execute this loop at a substantive return, a proposed change of source/domain
-or completion criterion, or compaction that leaves the next action ambiguous:
+[project-postulate] The primary owns integration and the mathematical choice. Worker prompts
+carry the relevant source context through [WORKER_BRIEF](WORKER_BRIEF.md); judgements are
+inspected against source, measurements are reusable receipts. Shared immutable standing and
+owned differences preserve one continuing ecology. A helper or test advances its consumer;
+its success does not replace an unfinished requested return.
 
-1. **Select from the brief and the accumulated construction.** Name the shared object or
-   interaction being strengthened, the mathematical/physical relations already available, and
-   the consuming operation. Carry a keystone's role in the whole even when its local output is
-   small. If the work returns a theorem, helper or measurement, carry its required native or
-   mathematical consumption in the same assignment. A failed fixture does not choose the goal.
-2. **Check the model equation at the consumer.** Root compares the proposed edit with the
-   [model formula](HNN_FORMULA.md), direct request and actual invoked operator. Identify which
-   current, constitutive map, differential or representation changes and what requested output
-   it affects. A worker is optional for a specific independent source question, not a required
-   reviewer of each scope change. A workflow rehearsal does not verify autonomous reliability.
-3. **Construct and integrate.** Root owns the mathematical choice and joined implementation.
-   Delegate bounded parts when useful. Tests answer the selected operation's uncertainty;
-   they do not become independent campaign destinations. Repair exposed defects without
-   replacing the deliverable with their apparatus.
-4. **Close against the requested result.** Report the returned function/product and executed
-   consumer, applicable source family, remaining defect and relevant work/representation costs.
-   A component pass is an intermediate return. Keep the same deliverable active while its
-   consuming call or promised encoding remains unclosed; do not announce completion and merely
-   rename that obligation as the next cycle.
+[definition] A handoff carries the purpose as well as mechanics: governing user direction,
+current unknown, available relations, actual source/receiver and consumer, meaningful failed
+alternatives and next discriminating return. Completed evidence stays linked rather than queued
+for replay. A paused timed goal stays paused. A new direct request can revise the operation and
+its documentation without requiring another ceremonial approval.
 
-[project-postulate] A scope objection returns work to the existing consuming operation, not
-to another audit or policy-writing loop. One resolved comparison covers routine dependent edits;
-do not review every patch or rerun an unchanged check. A new mathematical obstruction can change
-the implementation route, with its failed equation and revised route recorded. It does not
-silently shrink the user's deliverable or require a new user permission for authorized work.
-
-[project-postulate] Compaction retains the unified machine objective, accumulated usable
-relations and why the current keystone matters, together with this brief's unresolved operation,
-selected action, changed owners, running checks, actual model invocation/output and disposition
-of the last human occurrence. Resume that action when it is clear; completed links are not new
-requests. A paused goal stays paused.
-An explicit new user request can steer the work without replacing the full programme. The
-loop is an execution practice, not a theorem of model behavior or a runtime intelligence gate.
-
-[definition] Repository-wide review means following the live roots, subject boundaries and
-critical source-to-application maps, then repairing the in-scope contradictions found. Record
-the inspected aperture and validation performed. It is not a claim that every theorem, archived
-experiment, backend or external model was rerun. A fresh source census or universal validation
-gate supplies no substitute for the requested construction.
+[project-postulate] Repository-wide documentation review follows every relevant root, its entry
+points, subject boundaries and source-to-application links. It includes correcting the live
+contradictions and organizing the needed research. Use the scope the user requested; document
+categories are not automatic exclusions. Verification establishes the inspected/changed relations,
+not an unsupported claim that every historical theorem was re-proved.
 
 ## Research recovery and derivation
 
-[project-postulate] The [Holonics research skill](../.agents/skills/holonics-research/SKILL.md)
-is the discoverable entry point for resumed derivations, cross-domain synthesis and
-missing-mechanism reviews. It routes to physics, mathematics or computation guidance without
-loading the whole archive. AGENTS, the current position and roadmap retain their authority;
-the skill creates no new scheduler or universal review requirement.
+[definition] The [research skill](../.agents/skills/holonics-research/SKILL.md) supplies focused
+mathematics, physics and computation routes. [Research reading routes](../research/records/README.md)
+connect important records to maintained guides and formal/native owners. Read the source law,
+not merely its filename or an agent summary.
 
-[definition] The September 13 physics omission was a recovery and follow-through failure:
-the narrow knot/biology inspection did not recover the existing String/M, supergravity,
-gauge/action and matter-Hamiltonian chain before describing the atomic map as hypothetical.
-The [recovery and derivation record](../research/records/2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md)
-shows the omitted source and the resulting exact extensions. The existing
-[explorative-failure doctrine](canon/THE_EXPLORATIVE_FAILURE.md) and
-[epistemic grades](canon/EPISTEMIC_GRADES.md#interpretation-is-a-theorem-development-state)
-already prohibited substituting a new noun or a repeated boundary statement for this work.
+[project-postulate] Search both a subject's vocabulary and its operations before an absence
+claim, new owner, plan assumption or question that existing machinery can answer:
 
-| Observed failure | Corrective action at the decision point |
-|---|---|
-| Inferring a missing construction from one named file | Search the relation and follow its actual source/consumer chain; use invoked historical material to find the relevant descendants |
-| Ending with "needs a map" or "hypothesis" | Write and attempt the first connecting equation; derive a consequence or expose the exact failure and work that relation |
-| Returning broad physics to familiar HNN work | Keep the requested physical/math output in the continuing brief and deliver it through its own source law |
-| Replacing an explicit equation with a qualitative learning criterion | Name the supplied data, unknown, generation/update equation and requested receiver; use the resulting output |
-| Treating exactness as a ban on observer statistics | Keep the native semantic path exact and measure its external performance in declared clocks/units |
-| Reporting an agent's summary before inspecting its return | Read the changed owner and consuming output; compare the exact statement and measurement population before promotion |
+```sh
+.agents/bin/prior-art 'subject|LeanName|rust_name|classical spelling'
+rg --files research/records | rg -i 'subject|alternate spelling'
+rg -n '<operation>' docs/ARCHITECTURE_MAP.md
+```
 
-[project-postulate] A research brief carries the requested consequence, its broader purpose,
-current equation, recovered owners, relevant failed composition and next discriminating
-return. Preserve it before a handoff; retain completed evidence by links. Resume the next
-operation rather than restating the whole ambition, rereading unchanged archives or
-re-demonstrating the same bounded result. Ordinary small edits retain ordinary small checks.
+[definition] The prior-art helper searches current code, documentation, all research roots and archived
+source, grouping matching addresses by root. Invalid queries fail instead of producing false
+absence receipts. A search receipt records its revision, aperture and terms. Hits identify material
+to inspect; they do not prove a composition. Zero hits support only the searched aperture's
+absence. Follow the mathematical source, imports and consumers to distinguish an unconnected
+call, unsupported representation and unproved claim. A physical question returns its physical/
+mathematical consequence rather than being redirected by an application label.
+
+[project-postulate] Interpretations progress through an attempted connecting equation and its
+derivation, counterexample or residual. Exact inference and scoped approximations keep their
+actual consequences. Source inspection, mathematical proof, runtime evidence and an exterior
+plot are different evidence scopes; none is selected merely by the directory containing it.
 
 ## Rust and CUDA
 
@@ -234,18 +141,21 @@ states the dependency and implementation boundaries. The facade re-exports its o
 
 ## Training and inference
 
+The current field/session recipes start in [NATIVE_HNA](NATIVE_HNA.md) and the
+[shared-field experiment](../research/experiments/athena_field/shared/README.md). The prepared
+source, manifest, partition, comparison relation and cursor are described in
+[CONVERSATION_DATA](CONVERSATION_DATA.md). The public application uses the existing model and
+session; a saved source cursor and a learned model are different pieces of the return.
+
 ```sh
-target/debug/holonics hna infer /path/to/supported/model 'Explain holonics briefly.'
-target/debug/holonics --format json hna train /path/to/supported/model sequence.json
-target/debug/holonics --format json hna run request.json
-target/debug/holonics hna inspect /path/to/native.rest
+cargo build -p holonics-workbench --bin holonics
+target/debug/holonics --format jsonl hna field-session --source <spec.json> --input -
+cargo check -p holonics-hna --example athena_exposure_field
 ```
 
-The [native guide](NATIVE_HNA.md) gives the current ground-up phase-session recipes. The
-commands above use the earlier inherited-operator chart, whose campaign remains paused.
-The [Athena guide](ATHENA.md) defines those request and artifact scopes. The current training
-command consumes a continuing prefix sequence and returns a run receipt. A checkpoint/export
-must not be inferred from that receipt.
+The earlier inherited-operator `infer`/`train` interfaces retain their separate artifact scope in
+[ATHENA](ATHENA.md). A run receipt is evidence for the operation it reports; persistence or
+executable export has its own actual artifact/decoder and consumer.
 
 ## Formal work and papers
 
@@ -374,7 +284,7 @@ every example and belongs to a workspace-wide source move. `target/` had grown t
 September 19 and was cleaned; keep models, rests and evidence out of it.
 
 [definition] `CONSTRUCTION_STATE.md` records the current position and
-`docs/plans/THE_ROADMAP.md` orders construction. AGENTS.md is the shared agent operating
-contract for both Codex and Claude. The [repository guide](REPOSITORY.md) explains historical
+`docs/plans/THE_ROADMAP.md` orders construction. The shared machine and mathematical guides support the harness-specific
+AGENTS.md (Codex) and CLAUDE.md (Claude). The [repository guide](REPOSITORY.md) explains historical
 paths and backup recovery. Keep exact raw runtime evidence in dated research receipts, and
 private reproducible working data in `.local/`.

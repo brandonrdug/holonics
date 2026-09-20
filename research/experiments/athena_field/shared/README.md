@@ -114,15 +114,19 @@ development-partition, human-authored request material only, and emits
 `partial = [request symbols…, null × response extent]` with `output_symbols` set. The caller
 declares that aperture (`ExposureAperture`), and it is bounded against the session's own capacity
 before it sizes anything. The recorded responding occurrence — the family a frame records as its
-own `comparison-request` partner — arrives afterwards as an observed comparison. It is an
+own `comparison-request` partner — arrives afterwards as an observed comparison. The audit
+repair retains all captured request-event aliases within that declared family, rather than
+selecting the first capture or requiring adjacency. It is an
 observed candidate, never gold.
 
 [established-bounded; measured] `NativeFieldSavedSession` carries an `ExposureCursor` beside the
 trained model in a version-3 rest that keeps versions 1 and 2 readable, so the cold source
 position and the state that consumed it are published in one atomic file
 ([conversation data](../../../../docs/CONVERSATION_DATA.md#athena-alpha-causal-exposure)). A
-frame is acknowledged only after its complete native use, so an unacknowledged frame's cursor
-still names it and a reopened session redelivers it. Two named device tests hold these:
+selected native request or observation is acknowledged after successful use, so a retryable
+refusal keeps its source position. Explicitly excluded frames are counted and consumed without
+a model update. The audit repaired the original driver's unconditional acknowledgement after
+a failed request and its release of delayed comparisons. Two named device tests hold these:
 `retained_shared_comparison_applies_once_after_reopen` and
 `exposure_cursor_and_trained_state_reopen_together` ([output](checks/device-tests.txt)).
 The [driver](../../../../crates/holonics-hna/examples/athena_exposure_field.rs) walks development
@@ -156,18 +160,29 @@ target/debug/examples/athena_exposure_field \
 
 ## Limits
 
-[established-bounded; source-inspected] The driver resolves the request/response pairing within
-one process: it never checkpoints while holding a retained comparison it alone can attribute, and
-it releases and counts an unattributable one found at reopen. A persisted exterior pairing
-journal, so a pair can span a restart, does not exist. A shared-source update applies at the
-material current when it arrives; the retained comparison therefore reports both its producing
-epoch and the epoch that applied it rather than asserting they are equal. `shared_prior_parent`
-still refuses any tool or candidate link, so this driver supplies no preceding context for such
-frames and counts them. Dense normal statistics and fixed incidence remain explicit costs: one
-development observation over 8,926 free rows took 496 seconds and peaked at 1.22 GB of native
-sections. The driver has not been run at a conversational aperture: these two budgets admitted
-one request each at 512 bytes, so nothing here measures how the bridge behaves over long
-requests or long recorded responses.
+[established-bounded; source-inspected] The September 20 audit repairs the driver at
+`athena_exposure_field`: pending comparisons retain their request family, all captured event
+aliases, source text and original free receiving extent in the session. Intervening frames,
+checkpoint/reopen and a changed aperture for later requests do not release that comparison.
+The source cursor is attached before consumption; a native failure retains it. Response text is
+sliced in nibble/Unicode-scalar/word units as declared. Saved metadata validates its source,
+receiving mask and extent. Legacy shared rests without pairing metadata remain readable and
+retain their comparisons, but cannot automatically identify a responding exposure.
+
+[definition] The shared-source update still applies at the material current when it arrives and
+reports both producing/applying epochs. The optional `--context-bytes` is an exterior aperture;
+zero explicitly requests request-only input. For a positive aperture, the driver keeps a bounded
+process-local cache of validated frames, including metadata in its reported octet budget, and
+follows an available recorded prior chain. Missing/unsupported chains are explicitly counted;
+it does not silently claim a complete contextual boundary. The cache is not persisted, so durable
+wider contextual attachment remains #59/#16 work at the public consumer. Its supplied source
+chart and constant condition still require the geometric #17 join.
+
+[established-bounded; measured] The two original private-source budgets above each admitted one
+request at 512 bytes. They are retained pre-audit measurements, not evidence of long-context or
+general conversational conduct. The audit's public synthetic regression instead checks delayed
+captured-event pairing, changed-aperture restart, a refused update and exactly-once successful
+retry. [Audit and checks](../../../records/2026-09-20_THE_OPERATING_GUIDES_CARRY_THE_MACHINE_AND_RESEARCH_INTO_THE_CONSUMER.md).
 
 [established-bounded; source-inspected] `quality.py` now carries a `shared` family that consumes
 [results.json](results.json) in both modes and refuses a withheld-position count that arrives

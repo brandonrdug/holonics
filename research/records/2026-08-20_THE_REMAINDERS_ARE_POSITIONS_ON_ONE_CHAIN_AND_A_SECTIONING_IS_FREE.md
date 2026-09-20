@@ -9,7 +9,7 @@
 The active deed is W1. **No engine source is touched.**
 **Truth status:** `proved-derived` for every Lean theorem, kernel-checked and audited free of
 `sorryAx`; `proved-standard` for the cited classical results; `interpretation` for the readings.
-**Companion:** [`research/equation-atlas/`](../equation-atlas) — six equations and six relations
+**Companion:** [`archive/equation-atlas/`](../../archive/equation-atlas) — six equations and six relations
 appended.
 **Predecessor:**
 [`2026-08-20_THE_PLACEMENT_IS_A_MONODROMY_AND_THE_REMAINDER_IS_WHAT_PAYS.md`](2026-08-20_THE_PLACEMENT_IS_A_MONODROMY_AND_THE_REMAINDER_IS_WHAT_PAYS.md),

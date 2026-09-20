@@ -1,7 +1,8 @@
 # Holonics symbolic mathematics notebook
 
-This is a personal mathematical research surface. It is not an engine phase, a construction
-receipt, or a source of standing for the holonics repository.
+This is a symbolic mathematical research surface. Its derivations and Lean checks establish
+their stated mathematical scope. Reusable results connect to the [research routes](../records/README.md)
+and their formal/library owners; current construction order remains in the roadmap.
 
 The notebook assumes familiarity with ordinary linear-algebra computation. It does not use
 arbitrary numerical substitutions as a default route to understanding. Its primary object is a
@@ -35,17 +36,17 @@ source separation.
 From the repository root:
 
 ```sh
-./notebook/check.sh
+bash research/notebook/check.sh
 ```
 
 This produces:
 
-- `notebook/build/notebook.pdf`, the open workbench;
-- `notebook/build/notebook-solutions.pdf`, the derivation companion;
-- `notebook/build/notebook.png`, a first-page preview; and
-- `notebook/build/attempt-sheet.pdf`, a reusable symbolic algebra canvas.
+- `research/notebook/build/notebook.pdf`, the open workbench;
+- `research/notebook/build/notebook-solutions.pdf`, the derivation companion;
+- `research/notebook/build/notebook.png`, a first-page preview; and
+- `research/notebook/build/attempt-sheet.pdf`, a reusable symbolic algebra canvas.
 
-The command also checks `notebook/lean/U001Trace.lean` through the repository's pinned
+The command also checks `research/notebook/lean/U001Trace.lean` through the repository's pinned
 `formal/elementary-holonics` Lean/Mathlib environment without modifying that package.
 
 ## Figure grammar

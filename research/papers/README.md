@@ -1,14 +1,18 @@
 # Papers
 
+Start from [the machine](../../docs/THE_MACHINE.md) and the [research routes](../records/README.md)
+for the current mathematical/source connections. Papers are authored exposition and research;
+their statements retain their own hypotheses and source revisions.
+
 - [Elementary Holonics: objects, generation and coupled fields](rendered/elementary-holon-generation.pdf)
-  is the current ten-page computational synopsis. It renders the maintained Holon/model
+  is the computational synopsis. It renders the maintained Holon/model
   specification using [reusable equations and diagrams](source/holonics/computational-holon.typ).
   [Editable source](source/papers/elementary-holon-generation/main.typ).
 
 - `source/` is the complete authored Typst paper and dependency-ordered mathematics corpus copied
   from the laboratory.
-- `rendered/` contains ten PDFs regenerated from the extracted source after validation, including
-  the categorical paper which had no prior rendered artifact.
+- `rendered/` contains generated PDF artifacts; use each paper's editable source and recorded
+  verification scope when revising or citing it.
 
 The mathematical spine begins at `source/synopsis/README.md`, `source/holonics/registry.typ`, and
 `source/holonics/foundations.typ`. Individual entries carry epistemic grades and explicit

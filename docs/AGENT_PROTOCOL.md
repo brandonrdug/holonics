@@ -1,6 +1,7 @@
 # Repository evidence protocol
 
-[definition] Shared operating support for [AGENTS.md](../AGENTS.md). Consult the relevant section;
+[definition] Shared evidence support for [AGENTS.md](../AGENTS.md) and [CLAUDE.md](../CLAUDE.md).
+Use [research routes](../research/records/README.md) for subject recovery; consult the relevant section;
 do not treat historical testimony or the exterior memory apparatus as construction authority.
 Paths in code spans are repository-relative.
 

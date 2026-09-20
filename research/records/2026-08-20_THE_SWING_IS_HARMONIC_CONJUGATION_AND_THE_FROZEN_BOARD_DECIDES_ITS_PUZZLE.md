@@ -11,7 +11,7 @@ The active deed is W1. **No engine source is touched**; the only tree written un
 **Truth status:** `proved-derived` for every Lean theorem, each kernel-checked and audited free of
 `sorryAx`; `proved-standard` for the classical physics cited; `interpretation` for the readings;
 `open` for what §6 names.
-**Companion:** [`research/equation-atlas/`](../equation-atlas) — twelve equations and ten
+**Companion:** [`archive/equation-atlas/`](../../archive/equation-atlas) — twelve equations and ten
 relations appended, each citing its Lean owner or its source.
 **Predecessor:**
 [`2026-08-20_THE_PROOF_LINES_ARE_ONE_GLUING_SHAPE_AND_A_BARRIER_IS_A_BLIND_APERTURE.md`](2026-08-20_THE_PROOF_LINES_ARE_ONE_GLUING_SHAPE_AND_A_BARRIER_IS_A_BLIND_APERTURE.md),

@@ -10,4 +10,4 @@ the host owners. The native engine's main CUDA source remains beside its Rust ow
 - `cuda-smoke/`: device boundary smoke target.
 
 Read each target's own manifest/build instructions before rebuilding an artifact. Their
-toolchain constraints do not define HNA's internal topology or constitute a second runtime.
+toolchain constraints do not define HNN's internal topology or constitute a second runtime.

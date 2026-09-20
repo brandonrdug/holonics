@@ -92,7 +92,7 @@ flowchart LR
 [established-bounded] In [`Computation/NativeTransportScaffold.lean`](../../formal/elementary-holonics/ElementaryHolonics/Computation/NativeTransportScaffold.lean) and `crates/holonic-engine/src/native_spool/scaffold.rs`:
 - A scaffold packages `profiledHolons`, `windings`, `compositions`, and `openObligations`.
 - In architectural construction and optics, **scaffolding is temporary staging**: it holds up the arch until the keystone is placed, or acts as an exterior lensing frame that guides initial excitation.
-- In `SCF5` ([`CONSTRUCTION_STATE.md:223–228`](../../CONSTRUCTION_STATE.md#L223-L228)), `ScaffoldReleasePassage` proves that once native hexis is cultivated, the inherited scaffolding is **withdrawn**, leaving behind only native cultivated morphology.
+- In `SCF5` ([the historical SCF5 return](https://github.com/brandonrdug/holonics/blob/da1eaebf36422b0435478ce61b90731275dadb0f/CONSTRUCTION_STATE.md#L420-L425)), `ScaffoldReleasePassage` proves that once native hexis is cultivated, the inherited scaffolding is **withdrawn**, leaving behind only native cultivated morphology.
 - Therefore, calling the permanent, cultivated body a "scaffold" is a category mistake: the scaffold is the temporary armature; the cultivated body is what survives.
 
 ### 2.3 `MorphologyPackage` vs. `MorphologyHolons`

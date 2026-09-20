@@ -1,47 +1,33 @@
-# EXTERIOR INSTRUMENTS — nothing here is part of the body
+# Experiments and executable evidence
 
-> **BANNER. This directory is not the machine.** The experiment readers are exterior instruments,
-> often Python or numpy, against material the engine also reads. Nothing here is an organ, nothing
-> here is a driver, and **no figure produced here is a machine return.** The live layout and source
-> ownership are governed by [`AGENTS.md`](../../AGENTS.md) and [`docs/REPOSITORY.md`](../../docs/REPOSITORY.md).
+Experiments exercise mathematical constructions, native code and application receivers. This
+root contains actual HNN runs, exact reference calculations, external-model comparisons and
+visualizations. Read each experiment's source, inputs, command, receiver and result: location or
+implementation language alone does not decide what its evidence establishes.
 
-## Why the banner exists
+| Question / returned scope | Entry point |
+|---|---|
+| Native field generation, learning and rest | [Athena field](athena_field/README.md) and [field session](athena_field/session/README.md) |
+| Shared-region field and prepared exposure baseline | [Shared field](athena_field/shared/README.md); its exact source and unresolved episode/refinement joins are stated there |
+| Interlinked toroidal domains, shared cells and nonlinear phase dynamics | [Intrinsic Holonic flow](intrinsic_holonic_flow/README.md), including its exact enclosure implementation |
+| Exact normalized-current variation and a linear implicit solve | [Connected field](connected_holonic_field/README.md); a mathematical control with a different scope from the nonlinear intrinsic model |
+| Generation, learned operators and conditional receiving families | [Contextual prediction/release](contextual_prediction_release/README.md), [native generator law](native_generator_law/) |
+| Scoped output and performance measurements | [Native performance kit](native_performance_benchmark/README.md), linked commands and retained samples |
+| Earlier scientific comparisons | [M5 predicted/measured structures](m5_predicted_vs_reference/README.md), [conditioned response](conditioned_rbx1_static_response/README.md); application continuation is deferred |
 
-An audit on 2026-08-15 measured a standing failure in how this repository gets read:
+A useful experiment identifies what was supplied and what the program inferred or generated.
+Retain the actual source revision and input population, result artifact, command, clock, units,
+uncertainty and unfinished operations. A native result recorded here remains native evidence;
+a rendered figure presents its declared receiver. An external reference can expose a library
+bug. Resolve a disagreement by checking the shared equation, its hypotheses and both realizations.
 
-> Owned instruments are run heavily for *"does the tree still pass"* and bypassed almost entirely
-> for *"does this reach anything, is this present, does this law hold."*
+Keep source-neutral mathematics in its library owner and let the driver mount inputs and receive
+outputs. Store private data and large local runtime artifacts under `.local/`; publish reproducible
+source and permitted evidence. Reuse a recorded unchanged result when it already answers the
+question. A changed input, operation or receiver requires its own scope and comparison.
 
-179 instruments were wired on the spot across three days to answer the second kind of question,
-nineteen of them re-implementing mathematics the body already owns exactly, **fifteen of those in
-floating point, in a workspace whose library crates contain none.** A directory of committed numpy
-that answers questions about engine material is the durable form of that habit: it looks like an
-owned instrument because it has a path.
-
-So the rule is stated once, here, and applies to everything under this directory:
-
-- **A reading taken here may be cited as an analysis and never as a return.** The distinction is the
-  one `CLAUDE.md` draws between a receipt and the implementation: a figure computed outside the body
-  says nothing about what the body can do.
-- **Where an interior owner exists, it governs.** A disagreement between a script here and a Rust
-  owner is resolved in favour of the owner, and the script is the thing to fix.
-- **Every deposit built on a reading from here carries this banner's substance**, or it is
-  presenting an outside analysis as an engine capability.
-
-## `deposited_map/` — 1,043 lines of numpy over a foreign pretrained map
-
-Its record is
-`research/records/2026-08-13_THE_DEPOSITED_MAP_IS_READ_BY_RATIO_AND_WINDING_THE_ARCHETYPE_IS_A_FINITE_TYPE_WITH_INFINITE_MODULI.md`,
-whose own errata — written the day of deposit — states the position and then names four defects in
-the instrument, the sharpest being that the population statistics are taken over units that are not
-independent: `read_map.py:81` computes the KV group as `head // (nq // nkv)`, so four heads share one
-`W_V` and there are **84** distinct value maps rather than 336. Every per-head figure in that record
-counts correlated units as independent.
-
-**The interior owners of the same reading are `crates/holonic-engine/src/embedding_fiber.rs` and the
-driver `crates/holonic-engine/examples/the_readout_returns_a_fiber_not_a_winner.rs`.** They are exact
-and they conduct. Porting the reading into them is a construction and is not scheduled here; until it
-happens, this directory is retained as the provenance of a dated analysis and for nothing else.
-
-The `.json` files beside the scripts are that analysis's own output, kept so the record's figures can
-be re-read rather than re-run.
+The [research routes](../records/README.md) connect these runs to derivations and formal/native
+owners. [DEVELOPMENT](../../docs/DEVELOPMENT.md) defines measurement and validation conventions.
+The former blanket exterior-only banner is retained as
+[historical evidence](../../archive/operations/EXPERIMENT_READING_RULES_BEFORE_2026-09-20.md);
+it does not grade every experiment in this directory.

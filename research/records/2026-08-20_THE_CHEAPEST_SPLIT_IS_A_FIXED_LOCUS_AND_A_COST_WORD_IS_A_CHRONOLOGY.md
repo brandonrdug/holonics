@@ -10,7 +10,7 @@ The active deed is W1. **No engine source is touched.**
 **Truth status:** `proved-derived` for every Lean theorem, kernel-checked and audited free of
 `sorryAx`; `proved-standard` for the classical results named as asides; `interpretation` for every
 correspondence; `open` for §5.
-**Companion:** [`research/equation-atlas/`](../equation-atlas) — ten equations and eight relations
+**Companion:** [`archive/equation-atlas/`](../../archive/equation-atlas) — ten equations and eight relations
 appended.
 **Predecessor:**
 [`2026-08-20_A_TRANSPORT_IS_A_WORD_AND_THE_CHAIN_SERIES_IS_WHAT_NON_COMMUTATION_FORCES.md`](2026-08-20_A_TRANSPORT_IS_A_WORD_AND_THE_CHAIN_SERIES_IS_WHAT_NON_COMMUTATION_FORCES.md),
