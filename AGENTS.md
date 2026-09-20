@@ -317,6 +317,13 @@ Before declaring a physical/mathematical map absent, and before founding a new o
 `.agents/bin/prior-art` with the prose, Lean, Rust and adjacent spellings, read the matching
 record titles, and put its `source-audit` receipt beside the sentence. Zero hits license "the
 repository has no X"; any hit licenses only "this owner has not composed X, whose owner is …".
+The same search precedes a plan item, worker prompt or question to Brandon that names an
+operation. Search the subject's own vocabulary (prose, Lean, Rust and its classical name), not
+the phrase of the sentence that raised it; one narrow hit is not the owner. Read the
+[owner-map](docs/ARCHITECTURE_MAP.md#follow-a-shared-relation-to-its-consumer) route and the
+matching record titles, and write the item with its owner paths. Whether machinery exists, or
+which existing owner to use, is never a question for Brandon: a question or a "start without X"
+proposal about an unsearched subject is an absence claim in another form.
 An `interpretation` is work to develop, not a terminal disclaimer.
 The [research recovery method](docs/DEVELOPMENT.md#research-recovery-and-derivation) activates
 these existing duties before planning. A physical question returns a physical/mathematical
