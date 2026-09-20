@@ -747,9 +747,12 @@ independence, because the declared coefficient field decides the reading — the
 separates `ℚ` from `𝔽₂` — and an `Open` aperture order makes the two order bounds two readings of
 one presentation. Neither dependence is hidden: `integral_profile` returns the integral torsion
 beside the field reading and `sublevel_family` returns both order bounds. **Unproved, with the
-concrete absent law named in each row:** every receiver's gluing law with interface coupling — no
-interconnection receiver for R1, no Mayer–Vietoris or interface-coupled Laplacian for R3, no
-composition of sub-framework motion spaces for R4, no persistence Mayer–Vietoris for R5 — every
+concrete open law named in each row:** the general receiver gluing laws with interface coupling.
+The later two-media `holonic_chain` supplies a bounded R1 interconnection and R4 hinge reading;
+these do not automatically discharge R7's general atlas-law declarations. R3's Mayer–Vietoris or
+interface-coupled Laplacian and R5's persistence gluing remain open, with their distinct maps
+connected in the [tube contract](THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md#the-governing-statements).
+Also open: every
 receiver's stability away from bifurcation, R1's energy balance, R3's source accountability, and
 R3's rebase equivariance, because `hodge_receiver` declares no chart-change action on a graded
 complex for a reading to be equivariant under. **Not applicable, with the reason named:** energy

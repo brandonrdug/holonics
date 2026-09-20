@@ -30,6 +30,23 @@ intelligence application of the same machinery; notes and chords express its mod
 relations. Robotics remains an exploratory thought. These are purposes and instances of this
 carrier, not alternative definitions of it.
 
+[project-postulate] The later September 19 Codex discussion supplies the reason for this
+generality: a bounded Holon is simultaneously a whole and a participating part. The siphonophore
+is a biological illustration of that recursive relation, not a new organism-specific work queue.
+An organ relation concerns internal incidence and reciprocal dependence of continuing flux/entropy
+cycles under a declared separation, environment and horizon; co-presence or one molecular loss
+does not decide it. A Rubik configuration is likewise a face at a declared receiver, with its
+admitted moves and unresolved orientation/configuration fibre. The graph, torus and biological
+presentations must retain the same source-conditioned passages rather than become separate
+machinery named after examples. Original-message coordinates and their scope are retained in the
+[September 19 audit](../../research/records/2026-09-19_THE_PLAN_AUDIT_RECONNECTS_SHARED_LAWS_CONSUMERS_AND_HARDWARE.md#direct-message-recovery).
+
+[project-postulate] The [identity atlas](THE_IDENTITIES_OF_A_CONFIGURATION_ARE_THE_KERNEL_OF_ITS_FACE_MAP.md)
+serves that same purpose: construct reusable relations and lawful reductions between faces,
+including their exceptional fibres and future transport. The helical pair is its first geometric
+consumer. Its value to generator formation and Holonic Compression does not depend on a protein
+score, and a normal form alone does not yet provide the continuing decoder law.
+
 [definition] The tuple above organizes the same computational Holon written
 [`|H⟩_F`](../HOLON.md#the-object-and-its-notation). Its atlas of presentations retains the
 actual incidence `K`, constitutive/learned material `Theta`, joint current, internal modes and
@@ -108,6 +125,51 @@ restriction or adjoint improvement belongs in the library and reaches Athena whe
 Conversely, a general refinement/release/encoding improvement discovered through Athena returns
 to the same scientific operations. No application must wait for an unrelated conjecture endpoint
 or for every possible physical specialization of this object.
+
+### The conditioned structural response consumer
+
+[definition; agent-inferred] The proposed RBX1 experiment (#55) is a first **conditioned static
+response** at this scientific consumer, inferred from the available rigidity, contact and measured
+structure owners. It tests a declared local elastic approximation. It does not replace the
+general embedding objective, the identity construction or the standing Athena application.
+
+[definition] Declare the source configuration `|q₀⟩`, resolved residue correspondence, environment,
+elastic energy and metric before receiving the comparison structure. For a weighted local model,
+`K = J* W J`, where `J` is the source constraint differential and `W = W* ⪰ 0` carries the
+stiffness and units in the declared pairing. K is then self-adjoint. The existing elastic chain uses the same matrix expression as a dissipation form with
+`Ω = 0, G = I`; interpreting it as physical stiffness requires this energy/units declaration.
+Declare a forcing map `B` and force family `|u⟩`, with `|f⟩ = B|u⟩`. Contact sites alone do not
+determine force directions or magnitudes. If bound-structure contacts supply B, report that
+conditioning explicitly and do not use the held-out displacement to fit its own force or scale.
+
+[conditional] Let the columns of Z span the **full** `ker K`, including any internal floppy
+modes, and let P project onto its complement in the declared metric. A static equilibrium
+requires `Z* f = 0`. With that compatibility and a declared gauge, solve `K δq = f` on the
+complement and return the gauge, null fibre and residual. For incompatible forcing, retain
+`(I−P)f`; a least-squares projection is a different, explicitly labelled receiver. The existing
+`exact_linear::preimage_fibre` and rigidity kernel are the starting owners.
+
+[counterexample; source-inspected; computational-witness] This is not the existing `H(0) = C(−A)⁻¹B`. With
+`A = −J*J`, rigid motions already make A singular. `HolonicChain::transfer_at` requires an actual
+inverse and refuses a pole. The off-pole neck theorem therefore cannot be copied onto `C K⁺ B`.
+For the connected four-site path, cut `{1,2}|{3,4}`, the stiffness cross block has rank 1 but the
+Moore–Penrose inverse's cross block is `[[-3,−1],[−5,−3]]/8`, of rank 2. This follows exactly from
+`K⁺ = (K + 11ᵀ/4)⁻¹ − 11ᵀ/4`, with `K = [[1,−1,0,0],[−1,2,−1,0],[0,−1,2,−1],[0,0,−1,1]]`.
+The full kernel is `span{(1,1,1,1)}`; projecting a force onto its complement may change its support.
+The [audit](../../research/records/2026-09-19_THE_PLAN_AUDIT_RECONNECTS_SHARED_LAWS_CONSUMERS_AND_HARDWARE.md#verification)
+checks this counterexample with exact fractions. Derive the static factorization for the actual anchored or projected
+system, retaining its boundary reaction, before comparing its response rank to a neck section.
+
+[definition] The receiver returns the **oriented** predicted and measured pairwise-quadrance
+changes and their residual, with correspondences, units and unresolved coordinates retained.
+Report signed agreement; `cos²` alone scores an opposite response identically and is only an
+additional unoriented face. Distinguish the linearized quadrance change from the finite change
+including its quadratic displacement term. Compare with the source NMR ensemble and declared
+same-support force controls, retaining the different bound partners and measurement conditions.
+One observed displacement tests membership/residual against a predicted image; a response-rank
+claim requires a family of independent admissible forcings or a certified operator factorization.
+These checks concern the constitutive model's applicability, not another admission test for
+whether an exact generated response counts as prediction.
 
 ## Compatible sections and the two axes
 

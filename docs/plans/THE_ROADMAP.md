@@ -258,18 +258,21 @@ contracts for one construction. The Athena milestone table orders that product's
 the shared construction and scientific applications follow the dependency order below. A letter
 prefix identifies a contract's source history, not a separate engine or competing schedule.
 
-### Position of the five contracts
+<a id="position-of-the-five-contracts"></a>
 
-[established-bounded; formal-checked; implemented-exact] One table is the live status; the contract
-documents hold the statements, owners and findings and are not re-narrated here.
+### Position of the shared contracts
+
+[definition] This table distinguishes returned constructions, designs and open joins. The contract
+documents hold each statement's evidence, owners and findings.
 
 | Contract | Returned | Concrete open joins |
 |---|---|---|
 | Shared carrier | C1–C8 and the tube join | Compose the carrier/atlas with active contact faces, constitutive evolution and their variation at the existing consumers; Weierstrass division for the power-series form of `Λ/(ω_n)` remains a specialized mathematical item |
 | Receiver atlas | R1–R7 | per-eigenvalue refinement on `ExactHodgeSpectrum`; `MarkovTwoNSuffices` |
-| Biological ecology | B0–B10 | held-out agreement counts computed from a declared receiver family rather than supplied; a run of the installed predictors against an M5 design; the gluing law with interface coupling for the physicochemical receiver |
-| Exact device law | D1–D3, one engine instance adopted on the card | a second device ring of signed 128-bit words with the engine's carrier refusal; per-region operator family; base-pointer registry; common context ownership for module/stream/buffer handles; D4 stays an intention |
-| Generalized transport and the Holonic Interaction chain | T1 relation ladder, T2 standing/memory/extinction, T3 release over an edited family, T4 knot friction and edit torque, T5 two-axis horizon, T6 neck station, T7 fold, cut and junction law, T8 jet staircase; the Holonic Interaction unit with media and contact exchange; the two-media chain read at the elastic-network consumer on real structure | the multi-neck chain; faces derived from contact geometry; the time/entropy crossing (#5); analytic width above 24 coordinates; a plural family generic in its coordinate address; a faithful Israel-junction instance (#23) |
+| Biological ecology | B0–B10; M5 predictor/design comparison and the subsequent measured RBX1 population | held-out agreement counts computed from a declared receiver family rather than supplied; the gluing law with interface coupling for the physicochemical receiver; the source-conditioned response experiment described below |
+| Exact device law | D1–D3; one engine coordinate instance cross-checked on the card | resident rational algebra at its consuming calls (#50); signed 128-bit words and radius with the engine's carrier refusal where consumed; per-region operators; base-pointer registry; common context ownership; D4 stays an intention |
+| Generalized transport and the Holonic Interaction chain | T1–T8 at their declared scopes; the Holonic Interaction unit with media and contact exchange; the two-media chain read at the elastic-network consumer; structural analytic width for that elastic specialization at every admitted extent | the multi-neck chain; faces derived from contact geometry; the time/entropy crossing (#5); general analytic pole factors (#35); a plural family generic in its coordinate address; a faithful Israel-junction instance (#23) |
+| Identity discovery and reuse | The two-sided-angle derivation and identity-atlas design | Certified face-map kernels, complete-ideal certificates, collapse residuals and executable reuse (#48–#49); these are shared generator/compression work, with a bounded first instance, not a separate product or a prerequisite for every application |
 
 [definition] The open joins of this table are itemized as
 [GitHub issues](https://github.com/brandonrdug/holonics/issues) under four milestones — Holonic
@@ -287,8 +290,8 @@ section orders it.
    and readings of one tube: a source, media with their constitutive laws, the necks where flux
    converges and diverges between them, and a participating receiver. The
    [tube contract](THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md#the-governing-statements)
-   recovers the typed August unit and its formal owners. T6/T8 remain the next unreturned
-   formal items. Build them from the existing T4/T7, field/flux and analytic owners as described in
+   recovers the typed August unit and its formal owners. T6/T8 have returned at the scopes above;
+   compose their remaining joins with T4/T7, field/flux and analytic owners as described in
    the [embedding composition](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-general-embedding-and-its-consuming-composition).
    Its return is a source-linked interaction and its receiver/variation/continuation, with the
    physical and computational charts connected; a new collection of separately named examples
@@ -297,19 +300,22 @@ section orders it.
    Protein work continues the environment-indexed structural/physical application, including
    actual predictor/reference comparisons and computed evaluation readings. Athena continues the
    complete-source field session and its applicable operator attachments. Either can expose a
-   shared missing law or representation. Neither waits for every item in the five contracts.
+   shared missing law or representation. Neither waits for every item in the shared contracts.
 3. **Lower the operation that needs resident execution — and the measured one is exact linear
-   algebra.** September 19–20 execution on real RBX1 material showed what needs it: every exact
-   receiver of the shared library (rigidity, the chain, contact assembly, inertia, the Hodge
-   reading, and the identity atlas's kernel) runs textbook Gauss–Jordan over `BigRational` on one
+   algebra.** September 19–20 execution on real RBX1 material showed what needs it: the exact
+   receiver paths inspected here (rigidity, the chain, contact assembly, inertia and the Hodge
+   reading; the identity atlas proposes to consume the same algebra) use host `BigRational` work on one
    of twenty-four hardware threads with the GPU idle — 180 coordinates in 568 s, 324 not returned
    in 39 minutes, the 612-coordinate complex refused. Rule 12 governs the repair: one shared
-   primitive for rank, kernel, solve, characteristic polynomial and inertia, rebased through
-   word-size prime images (no coefficient growth) with an exact certificate returned to `ℚ`.
+   algebra owner, with rank/kernel/solve and sparse contact assembly as the first consuming
+   increment. Characteristic polynomial and inertia have their own certificates and need not
+   all finish before that increment returns. Word-size prime images bound arithmetic within
+   each image; reconstruction and verification still have a measured cost. The operation-specific
+   contracts are in [the device plan](THE_EXACT_DEVICE_LAW_IS_CONSTRUCTED.md#the-shared-exact-algebra-consumer).
    **Its placement is not a new decision.** The repository's hardware-surface methodology owns it:
    [the exact device law](THE_EXACT_DEVICE_LAW_IS_CONSTRUCTED.md) (launch receipts, exclusive
    access, partition-generated layout, and the arithmetic-regime split that sends dense exact
-   matrix work to the generated tile form on the device's `2^61 − 1` ring), `hardware_cover.rs` and
+   matrix work to a supported generated tile form; the existing device ring is `2^61 − 1`), `hardware_cover.rs` and
    its [governing record](../../research/records/2026-08-01_THE_HARDWARE_IS_A_RECEIVER_COVER_THE_CARD_MUST_CARRY_THE_CURRENT.md)
    (CPU and GPU are charts of one caused body; a short card kernel at the end of a CPU-owned
    passage does not make the card the owner), `launch_law.rs` with `DeviceLaunchLaw.lean` and
@@ -320,6 +326,37 @@ section orders it.
    per-region operators and common-context ownership belong at the consuming device boundary.
    Existing lawful native paths continue while the generated path is extended. D4, Weierstrass
    division and a full Israel instance are not universal gates before an application return.
+
+[definition; agent-inferred] The next implementation assignment is the first consuming increment
+of #50, inferred from the measured rank/assembly obstruction: connect the certificate-bearing
+algebra and device passage to rigidity and the chain, then read the 324-coordinate target and
+612-coordinate complex with actual cost and placement. A CPU reference can check the same
+operation; completing a second CPU production pipeline is not a predecessor of device ownership.
+Prepare #55's source, force law and receiver alongside this work, using the
+[response contract](THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-conditioned-structural-response-consumer).
+It is a conditional structural-response experiment, not a claim to general protein folding.
+The first certified identity family (#49) can use small existing exact owners while its larger
+evaluation matrices become another #50 consumer. The time/entropy join (#5) and contact geometry
+remain explicit shared obligations; neither is demoted merely because the present cost repair
+comes first. The complete-source session retains its own available native path and unresolved
+consumer; these scientific increments do not redefine its completion.
+
+### Issue divisions follow mathematical consumers
+
+[definition] Machinery labels remain useful; a milestone names a returned operation, not a
+product silo. A shared issue names the source law, receiver, actual owning call and consuming
+applications. Application labels and formal/native layers are cross-references, not separate
+engines. Split work when its law, owner or independently testable return differs; combine duplicate
+descriptions of the same open join. A measured observation belongs in evidence unless the issue
+names the next discriminating operation. An inferred decision is recorded with its reason and
+does not become an issue waiting for approval.
+
+[established-bounded; source-inspected] The
+[September 19 audit](../../research/records/2026-09-19_THE_PLAN_AUDIT_RECONNECTS_SHARED_LAWS_CONSUMERS_AND_HARDWARE.md#github-issue-disposition)
+contains the concrete issue dispositions and replacement contracts. In particular, #27 currently
+bundles serial chain composition, contact geometry and several receiver gluing laws; #9/#51 overlap;
+#50's body still contains an ordering withdrawn only in a comment. The local contracts here are
+corrected; the audit's proposed GitHub edits are not claims that the remote issues were changed.
 
 [project-postulate] The root brief in CONSTRUCTION_STATE names the active shared operation and
 the application evidence it is meant to produce. Subtasks carry their operands, owner and actual
@@ -374,9 +411,11 @@ the framework does not determine goes to Brandon.
    other check serves.
 12. **An exact computation that grows is rebased before it is run longer.** Rational elimination
    on one thread is a reference path, never a production path. Coefficient growth is answered by
-   prime images with an exact certificate, independent images run in parallel, and a hot exact
-   operation is placed on the device; a reading whose value is forced by a theorem is returned by
-   the theorem and not computed. An agent that meets a minutes-long exact run reports the method
+   a suitable factorization or prime images with an operation-specific exact certificate;
+   independent images may run in parallel under the existing hardware cover, and the hot native
+   operation is placed on the device. A reading whose value is forced by a theorem is returned
+   from that theorem's checked hypotheses; it remains a useful derived reading, not an independent
+   empirical validation. An agent that meets a minutes-long exact run reports the method
    and the placement before proposing to make the surrounding code cheaper.
 
 ## All current plan documents and their roles

@@ -96,11 +96,13 @@
 //! [agent-inferred] Two corrections to the proposed law, inferred from `portGenerator`'s own
 //! algebra rather than from the contract:
 //!
-//! 1. The one-directional product form `C₂(sI−A₂₂)⁻¹U · V(sI−A₁₁)⁻¹B₁` requires `A₁₂ = 0`, which a
-//!    **port-Hamiltonian coupling never satisfies**: the interconnection places `K` at `Ω[to,from]`
-//!    and `−Kᵀ` at `Ω[from,to]` at once, and a dissipative contact face is symmetric. The
-//!    bidirectional statement above is therefore the operative one, and it needs no Schur
-//!    complement: `X₁₁` already carries the feedback.
+//! 1. The one-directional product form `C₂(sI−A₂₂)⁻¹U · V(sI−A₁₁)⁻¹B₁` requires `A₁₂ = 0`.
+//!    A skew interconnection and a symmetric contact generally supply feedback, but their
+//!    contributions can cancel in one block of the full `A = (Ω − M)G`: with `G = I`,
+//!    `Ω = [[0,1],[-1,0]]` and `M = [[1,1],[1,1]]`, `A₁₂ = 0` and `A₂₁ = -2`.
+//!    Thus triangularity is a property to check, not one forbidden by port-Hamiltonian form.
+//!    The bidirectional statement above covers the general case without assuming it:
+//!    `X₁₁` already carries the feedback.
 //! 2. The neck's rank is the rank of `A₂₁ = (Ω₂₁ − M₂₁) G₁`, **not** of `Ω₂₁ − M₂₁` alone. A
 //!    singular upstream storage form lowers it further, and [`NeckCoupling`] returns both numbers
 //!    so the two are never confused.
@@ -1210,7 +1212,8 @@ impl HolonicChain {
 
     /// **The chain's three widths and the declared link between two of them.**
     ///
-    /// The geometric section is the neck's; the analytic width is
+    /// The geometric section is the neck's; the analytic width comes from the structural
+    /// real-spectrum licence when its pole-existence hypotheses hold, otherwise from
     /// [`crate::neck::analytic_width`] over this chain's own pole atlas; the receiver width is
     /// whatever the caller has already read through
     /// [`crate::neck::neck_two_axis_width`], which is that owner's and is not recomputed here.
@@ -2063,7 +2066,7 @@ impl ChainWidths {
         &self.triple.geometric
     }
 
-    /// The analytic width, when the atlas was within its bound.
+    /// The analytic width, when licensed by structure or resolved by the bounded pole atlas.
     pub fn analytic(&self) -> Option<&AnalyticWidth> {
         self.triple.analytic.as_ref()
     }

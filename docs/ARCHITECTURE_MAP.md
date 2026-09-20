@@ -1,4 +1,4 @@
-# Universal Lean–Rust–CUDA catalog
+# Mathematical and executable owner map
 
 **Status:** descriptive navigation maintained with owner changes. This catalog schedules nothing,
 grades nothing by itself, and has no generator or release gate. The roadmap and construction state
@@ -29,6 +29,25 @@ Each row connects one mathematical relation to its live formal and executable pr
 
 Paths are stable owner addresses, not line citations. A hash, filename, count, output artifact, or
 test result never upgrades a correspondence.
+
+## Follow a shared relation to its consumer
+
+[definition] Start with the operation and its hypotheses, then follow its formal statement,
+native call and receiver. These routes connect subject spellings; the detailed rows below retain
+declarations and scope. A filename match supplies an entry point, not an implemented composition.
+
+| Relation and alternate vocabulary | Route through the existing owners | Consuming boundary |
+|---|---|---|
+| Contact, slip, friction, stiffness, constraint response | [Shared contact/variation contract](plans/THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-general-embedding-and-its-consuming-composition) → `rigidity_receiver::RigidityJacobian`, `holonic_interaction::ContactFace`, `exact_contact`, `contact_gluing` | `holonic_chain::elastic_chain` currently consumes rigidity rows; geometric area/slip and a calibrated elastic energy require their stated joins |
+| Neck, transfer, pinhole, resolvent, static response | `Transport/HolonicChain.lean` ↔ `holonic_chain::{transfer_at,rank_reading}` → [conditioned response](plans/THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-conditioned-structural-response-consumer) | Off-pole dynamic rank, a measured transfer and a singular static solve are distinct calls/claims |
+| Cycles, Hodge, invisible modes, spectral placement | [Tube source maps](plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md#the-governing-statements) → `HodgeFiniteDecomposition`, `ConductiveFluidReflection`, `hodge_receiver`, `holonic_interaction::SpectralReading` | A cochain map, metric and boundary connect these readings; a rigidity kernel alone is not a homology group |
+| Identity, annihilator, kernel discovery, collapse, compression | [Identity contract I1–I8](plans/THE_IDENTITIES_OF_A_CONFIGURATION_ARE_THE_KERNEL_OF_ITS_FACE_MAP.md#the-design) → `algebraic`, `exact_linear`, `rational_polynomial`, `matroid_chow`, `skein` | Certified sampled kernel → declared face-map kernel → lawful rewrite/decoder; `Border.lean` is degeneration evidence, not a Gröbner implementation |
+| Exact algebra, rebasing, hardware surface, resident section | [Exact algebra consumer](plans/THE_EXACT_DEVICE_LAW_IS_CONSTRUCTED.md#the-shared-exact-algebra-consumer) → `exact_linear`, `hardware_cover`, `launch_law`, `section_layout`, `section_layout_adoption` | Rigidity/chain and identity evaluation expose the algebra cost; the existing field-session device path remains its own consuming realization |
+
+[project-postulate] Maintain the routes a changed relation actually uses. Put detailed derivations
+beside their owners and link the returned consumer back here. Percentage coverage of Lean files
+and a per-file census do not establish navigability; a usable route reaches the relevant law and
+its unclosed consuming equation without requiring the reader to guess one spelling.
 
 ## Participating receiver, motion and first-arrival families
 

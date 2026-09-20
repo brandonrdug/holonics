@@ -543,10 +543,42 @@ so. Installed capacity and a vendor rating are not measured bandwidth or power.
 
 ## Immediate work
 
-[definition] Un-ignore and measure the collective-versus-per-row adjoint cross-check, so the shared
-`R_D` identity carries a measurement rather than an inspection. Then D1 and D2 against the existing
-kernel set, since both are contracts over calls that already exist. D3 is Returned at the scope
-stated above; its remaining work is the engine-side adoption named in its `[open]`, which belongs to
-the crate that owns those kernels and whose first declaration and device cross-check now exist in
-`holonic-engine::section_layout_adoption`. D4 remains an intention until a consuming construction asks for
-it.
+[established-bounded; source-inspected] The collective-versus-per-row adjoint comparison, D1 and
+D2 already have the scoped receipts described above. D3's generated modular operation and engine
+coordinate cross-check have returned; `section_layout_adoption` explicitly remains a cross-check,
+not a production replacement for signed coordinates and enclosure radii. Those adoption seams
+remain open where consumed. The roadmap selects the next operation below; D4 remains an intention.
+
+### The shared exact algebra consumer
+
+[open] Issue #50 connects `exact_linear` and the contact/rigidity consumers to the existing
+hardware methodology. `SectionLayout` currently generates gather/local-apply/scatter over one
+declared ring and local operator. It does not already implement rational elimination, a changing
+pivot schedule, multi-prime reconstruction or a rational rank certificate. Extend the supported
+operation through `hardware_cover`, `launch_law` and the appropriate generated-tile/SIMT boundary;
+do not infer a solver merely from the presence of modular matrix multiplication.
+
+[definition] For a rational map `A : X → Y`, clear denominators with recorded nonzero row scales
+and retain their decoder. An admissible prime image is one chart of that integer relation.
+The fixed `2^61 − 1` ring is a useful image, not an injective encoding of arbitrary rationals.
+Additional moduli or lifting stages need their own supported arithmetic and reconstruction law.
+Independent images share immutable input and own their output; the reconstruction consumes their
+returns. A sequence of dependent pivots is not made independent by allocating more threads.
+
+| Returned operation | Exact certificate at its consumer |
+|---|---|
+| Rank and kernel | A nonzero modular minor gives `rank_Q A ≥ r`. Exhibit `n−r` **independent** rational kernel vectors and check `A N = 0`; together these give equality. Zero or duplicated vectors do not certify a basis. Retain bad-prime/pivot-profile handling. |
+| Solve / preimage fibre | Check `A x = b`, return the full kernel for nonunique solutions, or an exact incompatibility witness. A metric-selected representative additionally declares its metric and complement. |
+| RREF | Check equivalence to the original row space and canonical pivot/normalization conditions. A matching rank alone does not certify the returned rows. |
+| Characteristic polynomial | Reconstruct coefficients with a proved sufficient modulus/bound or another exact identity certificate. One modular polynomial does not determine rational coefficients. |
+| Inertia | Use a certified rational congruence or a certified real-rooted characteristic polynomial with sign/root counts; finite fields have no positive/negative ordering. PSD supplied by a contact construction can discharge that sign claim, but not an unknown rank or response. |
+
+[definition; agent-inferred] Start with rank/kernel/solve and sparse contact assembly at the
+existing rigidity and chain calls, because those are the measured consumers. Keep factors and
+intermediate sections resident and account separately for preparation, image work, reconstruction,
+verification, readout and full delivery. The reference path is retained for scoped exact
+comparisons; it is not a second production pipeline that must finish before a device passage is
+built. The first completion evidence is the 324-coordinate target and 612-coordinate complex,
+with the same receiver values or an explicit new representation/residual, actual thread/device
+placement and cost. No speedup in seconds is assumed in advance. Characteristic polynomial and
+general inertia follow when their consumers require them; they do not block a certified solve.

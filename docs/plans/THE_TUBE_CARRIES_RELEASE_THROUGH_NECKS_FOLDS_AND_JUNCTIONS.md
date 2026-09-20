@@ -88,8 +88,9 @@ because signs as phases are what let a relation continue analytically.
 dissipative one with none, `M_↘ = M_↗ᵀ`; reversal exchanges `↗` and `↘`
 (`HolonicChain.lean::adjoint_is_the_reversed_structure`), so everything built from `M` is
 reversal-even and the signed flux is reversal-odd. With `Ω = e^{iπ/2}H`, `H` Hermitian, the
-generator is `A = (e^{iπ/2}H + e^{iπ}M)G`: for `G ≻ 0` the conservative part places spectrum on the
-axis (phase `±π/2`) and the dissipative part on the negative real line (phase `π`). The two parts
+generator is `A = (e^{iπ/2}H + e^{iπ}M)G`: for `G ≻ 0` and `M = M* ⪰ 0`, the conservative part places spectrum on the
+imaginary axis (nonzero phase `±π/2`) and the dissipative part on the nonpositive real line
+(nonzero phase `π`); their sum has spectrum in the closed left half-plane. The two parts
 sit a quarter-turn apart, and spectral placement is the question of which phases a generator
 carries under which positivity.
 
@@ -103,28 +104,39 @@ dynamics, `HurwitzLine` (a limit of on-seam families stays on the seam), `Hurwit
 the Foster classes — a lossless chain (`M = 0`) is a Foster reactance, and turning `M` on is the
 finite analogue of the de Bruijn–Newman flow. The split is `Millennium/HodgeIndex`'s `(1, n−1)`
 and the passages are `winding_inertia.rs`'s; a bare `Inertia` count is a state reading.
-[proved-standard] For indefinite nondegenerate `G` with `κ` negative squares, at most
+[proved-standard] For a `G`-skew generator and indefinite nondegenerate `G` with `κ` negative squares, at most
 `min(κ, n−κ)` eigenvalues lie in the open right half plane (Pontryagin); `G = diag(1, −1)`,
-`A = [[0,1],[1,0]]` attains it. Target: replace `NoLicenceWithoutDefiniteStorage`'s silence by that
-bounded licence, read from the `Inertia` it already computes.
+`A = [[0,1],[1,0]]` attains it. The structural spectral reading now returns this bounded licence
+from its inertia; #54 retains the specific Lean lift. This conservative bound is not asserted for
+an arbitrary mixed dissipative generator with indefinite storage.
 [source-audit 2026-09-19 5a406e17] prior-art 'pontryagin|krein|negative squares|indefinite inner product' -> 3 files, none in this sense (they concern the Pontryagin dual).
-**Hodge cycles.** `M_contact = Σ_f w_f J_fᵀD_fJ_f` is a weighted Hodge Laplacian `d*⋆d` when the
-slip maps are coboundary rows. Its kernel is the zero-slip motions; the eigenvalues that stay on
-the axis under dissipation are exactly the largest `A`-invariant subspace inside `ker(MG)` — the
-cycle classes dissipation cannot see. Euler is the `Ω`-only generator and Navier–Stokes adds
-`M = ν d*d`; the storage-rate identity is the energy identity `Ė = −2ν‖∇u‖²`; the complex-Euler
-analyticity strip is the neck's analytic width (#32). Target: state the on-axis count as the
-dimension of that invariant subspace and read it with `hodge_receiver` on the same incidence,
-composing `Millennium/HodgeFiniteDecomposition` (`E = range d ⊕ range δ ⊕ ker Δ`) and
-`HodgeHarmonicRepresentative` rather than restating them.
+**Hodge cycles.** `M_contact = Σ_f w_f J_fᵀD_fJ_f` specializes to the upper weighted term
+`d*⋆d` when the slip maps are the declared coboundary. With positive face response its kernel is
+the zero-slip subspace; semidefinite response also retains the material's blind directions.
+Harmonic representatives at degree k require the lower term as well,
+`Δ_k = d_(k−1)d_(k−1)* + d_k*d_k`, or an explicitly closed/co-closed restriction. A rigidity
+motion kernel is therefore not automatically a space of homology classes. Compose the existing
+`HodgeFiniteDecomposition`, `HodgeHarmonicRepresentative` and `hodge_receiver` through an actual
+cochain map. Under definite storage and semidefinite dissipation, the continuing on-axis modes
+are the invariant subspace inside `ker(MG)`; the structural licence now returns this finite
+reading, with its remaining formal lifts tracked by #54. Relate the Euler/Navier–Stokes
+specializations to their actual Galerkin advection, metric, boundary and dissipation owners
+(`Physics/ConductiveFluidReflection.lean`), including energy normalization. The correspondence
+between a complex-Euler analyticity strip and a finite neck's pole-width receiver remains #32's
+source-map construction, not an equality supplied by the word “width”.
 **Gluing.** The receiver atlas lists, per receiver, an unproved gluing law with interface
 coupling: an interconnection receiver (R1), Mayer–Vietoris or an interface-coupled Laplacian (R3),
 composition of sub-framework motion spaces (R4), persistence Mayer–Vietoris (R5), and the
 physicochemical interface (#10). `holonic_chain` returned R1's and, in hinge form, R4's. These are
-one construction — the gluing law across a neck, whose connecting map has rank at most
-`rank A_↗` — and the multi-neck chain and measured contact faces (#27) are its continuation, not
-separate campaigns. The Euler characteristic that gluing must respect is the Poincaré polynomial
-at the half-turn, `χ = Σ_k e^{iπk} b_k`.
+related constructions to compose across the same interface. The dynamic transfer bound
+`rank H(s) ≤ rank A_↗` has the port and inverse hypotheses of its source theorem; it does not
+bound a Mayer–Vietoris connecting homomorphism without a factorization relating the two maps.
+The serial multi-neck extension, geometric construction of `J_f,w_f`, and the topological or
+physicochemical gluing laws have distinct operands and completion evidence. #27 coordinates these
+connections without making every receiver theorem a prerequisite of serial composition. #28 was
+folded into #27, not implemented by that closure. For a finite subcomplex cover, the gluing
+comparison also checks `χ(U∪V)=χ(U)+χ(V)−χ(U∩V)`, with
+`χ = Σ_k e^{iπk} b_k`; the intersection and chain maps are part of that hypothesis.
 
 [definition] The tower `z = i^{i^{i^{⋰}}}` is the constant defined by the constraint `z = i^z =
 e^{(iπ/2)z}` on the principal branch, `z = (2i/π)·W(−iπ/2)`, an attracting fixed point

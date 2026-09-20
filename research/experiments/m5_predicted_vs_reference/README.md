@@ -1,5 +1,12 @@
 # The M5 design's predicted structures read against its reference presentations
 
+[historical] Reading order: sections 1–11 retain the first September 19 run, including its
+analytic-width refusals and former resolvent limit. Sections 12 onward record the later measured
+population and theorem-backed chain. The elastic specialization's structural analytic width is
+now decided at admitted extents; the later assembly/arithmetic limits remain. The
+[plan audit](../../records/2026-09-19_THE_PLAN_AUDIT_RECONNECTS_SHARED_LAWS_CONSUMERS_AND_HARDWARE.md)
+separates these historical measurements from the next conditioned-response construction.
+
 [definition] This experiment runs a real structure predictor on the M5 object's own sequences and
 reads the result against the authenticated reference presentations **through the library's existing
 receivers**, with a declared passage. It founds nothing. Every number below came out of a command
