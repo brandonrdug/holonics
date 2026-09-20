@@ -47,19 +47,29 @@ tensor charts.
 
 ## Arrows, signs and turns
 
-[project-postulate] **A sign is a passage, never a state.** `−1 = e^{iπ}` is the half-turn and
-`i = e^{iπ/2}` the quarter-turn, the hand. ℝ sees only the two fixed points of conjugation on the
-unit circle, so a bare sign is what remains of a phase after its winding is deleted — the float
-defect one level down. Subtraction is addition with one argument carried through the half-turn.
-**A count of signs is a state reading: name the windings** (`winding_inertia.rs` names what
-`inertia.rs` splits). Positivity is a declared side: state the **split** (`1` against `n−1`) and the
-**hand** (which side is called positive) separately; the null cone between the two cones is the
-vacuous difference, and a definite form is one whose null cone is empty.
+[definition] A binary state records a polarized distinction in a declared axis/frame: this
+side or that side. `0/1`, `false/true` and `−1/+1` can label that distinction through different
+charts. The labels do not determine physical amplitude: binary `0` can name one side rather
+than an absent current. In the existing `PhaseCarrier` convention, `false` has phase 0 and
+sign +1; `true` has phase π and sign −1. The half-turn swaps the two carriers.
 
-[project-postulate] **Nothing is causally represented along only one axis.** The second axis —
-"imaginary" only in classical vocabulary — is the orientation axis, and it is recovered, not added.
-A reading that moved nothing when the axis is restored was already symmetric; one that collapses
-without it had deleted a hand.
+[proved-derived; formal-checked] On that locked two-sheet population,
+`−w cos(θ_i−θ_j)=−w ε_i ε_j` with the declared interaction weight w.
+`PhaseCarrier.lean::phaseNetworkEnergy_binaryPhase` carries this through the complete finite coupling
+population. Binary polarization therefore already has an energetic and compositional realization
+here; it is not supplied by the spelling of a Boolean or by a machine-word size.
+
+[definition] The state and the operation on it have different roles. Multiplication by
+`−1=e^{iπ}` enacts a half-turn on the declared complex carrier; `i=e^{iπ/2}` enacts a quarter-turn.
+A sign may also be the resulting state face. Composition retains the actual path, frame and
+winding rather than identifying a full turn history with its final binary face. Positivity
+retains its declared split and choice of hand; the existing `winding_inertia` and `inertia`
+own the corresponding winding and signature readings. [Binary phase and coupled energy](../formal/elementary-holonics/ElementaryHolonics/Physics/PhaseCarrier.lean).
+
+[definition] A one-axis binary reading is an admitted face of a framed source. It need not
+identify the full source. An operation using relative quadrature, phase or further directional
+structure carries those operands and the corresponding receiver map. A scalar face and a
+complex carrier therefore have different information, rather than a universal required axis count.
 
 [project-postulate] Brandon, September 19: **a passage between neighbouring blocks or stations is
 written as an arrow.** The integers of `A₂₁` carry no magnitude; the direction of the shift is the
@@ -102,25 +112,18 @@ orientability is a reading of the continuing object at a station, not a fixed at
 configuration can be unoriented, become oriented under a frame, and acquire or lose a twisted
 loop as contacts form.
 
-## Notes, chords, quartets and octets
+## Compositional examples
 
-[project-postulate] Brandon's September 20 terminology preference places musical and geometric
-composition in the working language. Use **note** for a situated modal contribution and **chord**
-for a co-present composition where those meanings fit; **quartet** and **octet** name four or eight
-participating constituents of the described ensemble. Their amplitude, relative phase, voicing,
-clock, incidence and receiving frame give the terms mathematical content. Legacy machine storage
-widths are stated literally as four-bit or eight-bit fields.
-
-[definition] In a declared linear mode chart, `|C⟩=Σ_j a_j|n_j⟩` carries the coherent
-contributions before `⟨r|C⟩` is read. A general interacting chord carries its joint occurrence
-and constitutive law, including shared sources; it need not reduce to a linear sum. A chord-class
-receiver can identify a reusable class while its performances retain different phase, timing
-and spatial faces. A progression is an ordered composition of passages with actual joins.
-The number of constituents alone specifies neither that composition nor a storage representation.
+[definition] Musical composition is one useful example of Holonic joining. In a declared
+linear mode chart, `|C⟩=Σ_j a_j|n_j⟩` carries coherent contributions before `⟨r|C⟩` is read.
+A general interaction retains its joint occurrence and constitutive law. A chord-class receiver
+can identify a reusable class while performances retain different phase, timing and spatial
+faces; a progression retains ordered passages and actual joins. These examples do not define
+general computational quanta or prescribe their names.
 The [class/occurrence construction](../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md#class-composed-occurrence-and-progression)
 and [music/receiver synthesis](../research/records/2026-09-14_HEAR_THE_MUSIC_SITUATED_RELEASE_AND_SELF_MOTION.md#hear-the-chord-the-interval-and-the-progression)
-supply the existing source, and [HNN composition](HNN_COMPOSITION.md#derive-the-grain-from-the-interaction-and-receiver)
-connects it to the continuing machine.
+retain that example's content. The [compression/intelligence/navigation construction](canon/THE_REALITY_OF_DIFFERENCE.md#current-changes-form-later-current-encounters-that-form)
+concerns the reusable paths and generating relations across these different presentations.
 
 ## The same form in every subject
 

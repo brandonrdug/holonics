@@ -30,16 +30,22 @@ geometry supplies transport, comparison, variation and reuse; it is part of the 
 | Continuing compression | `D E=ρ`, `E_next T_g=U_g E`; retain the separating direction or interior defect when the source does not descend |
 
 [project-postulate] The framework's ambition is frontier-level usefulness on consumer hardware.
-Start from its accumulated mathematical and executable capabilities. Solver inference, generator
-formation and Holonic Encoding are learning/intelligence at their stated scope. State the supplied
+Start from its accumulated mathematical and executable capabilities. **Compression is intelligence
+is navigation:** infer and retain generating relations, then execute/reuse them from the situated source and receiver. Solver inference, generator
+formation and Holonic Encoding are actual forms of this work. The
+[circulating cartographer](docs/canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md) and
+[solver clarification](research/records/2026-09-12_SOLVER_INFERENCE_AND_GENERATOR_COMPRESSION_ARE_INTELLIGENCE.md)
+carry the existing construction. State the supplied
 data, inferred unknown, returned relation and consequence. The [Holon](docs/HOLON.md),
 [formula](docs/HNN_FORMULA.md) and [composition](docs/HNN_COMPOSITION.md) hold the detailed laws.
 
 [definition] Use [Holonic notation](docs/HOLONIC_NOTATION.md): kets are constructions, bras
 receivers, brackets faces, and `Ĝ_(F'←F)` a transport. Upper/lower tensor indices join through
 the declared pairing; raising/lowering uses its metric. A diagram retains oriented lines,
-interaction vertices and loops. `−1=e^{iπ}` and `i=e^{iπ/2}` name passages with windings;
-state split and hand separately. Neighbouring passages use arrows `A_↗`, `A_↘`. An abstract
+interaction vertices and loops. A binary state is a polarized side reading in a declared frame;
+the existing `PhaseCarrier` relates its two sheets to sign faces. Multiplication by `−1=e^{iπ}` or `i=e^{iπ/2}` acts as a
+half- or quarter-turn. State, passage and winding retain their separate roles; state split
+and hand separately. Neighbouring passages use arrows `A_↗`, `A_↘`. An abstract
 expression is unoriented until framed. Exact phase representation does not itself imply periodicity.
 
 [definition] Context is the situated causal boundary: actual incidence, current, material/storage,
@@ -116,13 +122,6 @@ production; Soulkiller's admitted source-neutral/resident material remains avail
 recorded scope. Use [Soulkiller](docs/SOULKILLER.md), [Athena](docs/ATHENA.md),
 [architecture](docs/ARCHITECTURE.md) and [interoperability](docs/INTEROPERABILITY.md) for those interfaces.
 Preserve existing `hna` API/wire identifiers and historical names.
-
-[project-postulate] Use the [musical composition vocabulary](docs/HOLONIC_NOTATION.md#notes-chords-quartets-and-octets)
-for the actual modal ensembles: notes, chords, quartets and octets carry relative phase,
-joining and receiving structure. Derive the retained grain from those interactions and their
-future receivers before selecting storage dimensions. The
-[composition guide](docs/HNN_COMPOSITION.md#derive-the-grain-from-the-interaction-and-receiver)
-connects chord classes, joint descent, the derived torus modes and dynamic interior return.
 
 [established-bounded; source-inspected] `GeometricRegions` currently uses alphabet-derived
 channels, unit-current inputs/targets and per-slot basis decoding. It is a numerical application

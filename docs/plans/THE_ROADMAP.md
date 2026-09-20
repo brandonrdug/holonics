@@ -136,14 +136,38 @@ still a symbol-basis control. Its two-hop reach measurement does not make larger
 architectural repair. The [source-level correction](../../research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md#correction-the-nibble-control-is-not-holonic-encoding)
 updates the claim without discarding the scoped checks.
 
-[definition] Continue the already-established
-[Holonic Encoding construction](../../research/records/2026-09-11_HOLONIC_ENCODING_RETAINS_TRANSFORMATION_GRAIN_ACROSS_MODALITIES.md)
-through #17/#16: form situated source/condition transformations and their encoded passages,
-bind the receiving decoder and induced continuing action, and retain the actual fibre/defect
-where descent is incomplete. The laws are `D_r E=ρ_r` and `E_next T=U E` at their declared
-scope. Text serialization follows its receiving map. #19 supplies additional incidence/material
-variation; #18/#61 realize the actual composed operation at measured cost. Byte sanitization,
-a larger vocabulary or expanded nibble support does not return that construction.
+[project-postulate] The construction remains **compression is intelligence is navigation**:
+infer an applicable generator from constraints, execute its requested consequences, and retain
+an economical representation for subsequent use. Polarized binary states and oriented passages
+are existing elementary structures; the latest musical labels were suggestions, not a division
+of the machine. The source/condition, generator and receiving work below is one integrated
+operation. The [September 12–13 correction](../../research/records/2026-09-13_GENERATOR_MEANING_AND_CAMPAIGN_DRIFT_AUDIT.md)
+already distinguishes that work from code printing, generic cause/effect and repeated small assays.
+
+[definition] The immediate implementation order is:
+
+1. **Source/condition attachment (#17).** Change `NativeFieldSession::found` and
+   `prepare_geometric` so the actual field, source and receiver determine the native model
+   declaration. Bind pre-target resident preparation through `s=A x_pre`, `c=C x_pre` to the
+   existing contextual-section, condition-preimage/contact and neighborhood formation owners.
+   The [existing construction](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-source-and-condition-construction)
+   specifies the source-null contrast and the inferred relation; accepting caller-authored maps
+   or choosing a larger alphabet does not complete it.
+2. **Use the formed operation in that same body (#17/#16, #19 where D/incidence changes).**
+   Execute the inferred source-conditioned generator and receive its joint consequence through
+   the actual receiving map. A continuing invocation carries the field current/interior and
+   needed source family. Report the inferred function, factor or condition family and its use
+   on the requested new input, not only changed coefficients or successful persistence. Pure
+   solver requests use their supplied constraints and need no invented observation event.
+3. **Compile the repeated action being used (#18/#61, with the shared #48 owners where applicable).**
+   Use existing factor, mode, moment and recurrence representations for admitted portions of
+   that same generator; keep the required nonlinear/receiver remainder. The current source,
+   receiver and pending returns determine what must survive. Compression accompanies useful
+   inference/generation; it is not a later independent codec project or a universal inverse gate.
+
+The mathematical workshop, field model and source/evaluation interfaces already exist. This
+order composes their actual owners and preserves their known results; it does not restart their
+construction or create separate intelligence, navigation, music or storage subsystems.
 
 ## Immediate mathematical application and implementation
 

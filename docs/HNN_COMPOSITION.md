@@ -205,11 +205,11 @@ encoding it. The roadmap and blueprint retain the concrete implementation order 
 
 ## Derive the grain from the interaction and receiver
 
-[project-postulate] Brandon's September 20 breadth correction governs the construction's starting
-point. Notes, chords, quartets and octets refer to the participating modal/compositional objects
-at their stated scope. Begin with their situated source, material, interaction, clocks and receiver;
-derive the retained degrees of freedom and their action; then realize that chart in Rust and on
-the device. A machine word width or alphabet cardinality is a presentation choice.
+[definition] A polarized distinction can be expressed as a binary state in a declared axis/frame.
+Its changes compose into oriented passages with actual joining conditions, clocks and receiving
+faces. The phase, Swing, current and path owners already realize such constructions. Musical
+composition supplies examples of relations among parts; its names are not a taxonomy of the
+computational quanta. The source, material and receiver determine the applicable representation.
 
 [definition] A reusable chord class and a performance are different receivers of a source.
 Voicing, timing, phase, instrument and spatial coupling can vary behind one class face. A
@@ -218,6 +218,15 @@ progression also retains its ordered joining. In a coherent linear chart, receiv
 The [music synthesis](../research/records/2026-09-14_HEAR_THE_MUSIC_SITUATED_RELEASE_AND_SELF_MOTION.md)
 works this through active receiver motion, spatial hearing and predictive release. Its source
 class does not require identifying one unique historical performance before useful inference.
+
+[project-postulate] **Compression is intelligence is navigation** describes inference and reuse
+of the generating relation itself. The unknown can be an executable factorization, recurrence,
+condition family or encoded transport. Existing solver and generator owners construct these
+objects from constraints and reuse their receiving consequences. Source/condition formation,
+execution and economical representation therefore meet in the same operation; a classifier label
+or a generic statement that one event changes another does not specify the inferred object.
+[Existing navigation joint](../research/records/2026-08-14_THE_MAP_IS_PRIOR_TO_THE_SHORTCUT_TOLERANCE_IS_WHERE_THE_ARC_STOPS_REACHING_AND_A_DIRECTION_COSTS_LOG_LOG.md),
+[solver/formation clarification](../research/records/2026-09-12_SOLVER_INFERENCE_AND_GENERATOR_COMPRESSION_ARE_INTELLIGENCE.md).
 
 [proved-derived; formal-checked] A receiving family defines which differences may be collapsed.
 For additive transport the exact criterion is preservation of its joint blind subgroup

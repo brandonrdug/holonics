@@ -31,13 +31,20 @@ variation. The [helical guide](HELICAL_GEOMETRY.md) develops these laws and the 
 circle/line/point limits. A fixed shift or periodic mode is one specialization; an arbitrary
 sequence or SSM requires its actual generator and receiver map, not only the label “helix”.
 
-[definition] Musical composition supplies a working reading of this object: notes contribute
-modes; chords join them under actual source/receiver conditions; quartets and octets name the
-participating ensembles where applicable. A class face can be reusable while phase, timing and
-spatial differences remain in its fibre. The retained dimension follows from the interaction
-and future receivers, as in the derived clocked-torus cut/face modes. The
-[composition guide](HNN_COMPOSITION.md#derive-the-grain-from-the-interaction-and-receiver)
-connects those existing laws before any storage chart is selected.
+[definition] The elementary binary face is a polarized distinction relative to an axis/frame.
+The existing `PhaseCarrier.lean::binaryPhase` and `spinFace` realize two phase sheets separated by a
+half-turn; their coupled phase energy has the exact binary Ising restriction. Binary states,
+oriented changes and composed paths belong to the construction before a machine-word grouping
+or an application alphabet is chosen. [Notation and existing phase owner](HOLONIC_NOTATION.md#arrows-signs-and-turns).
+
+[project-postulate] **Compression is intelligence is navigation:** infer a generating relation
+from the available constraints, retain a representation that can execute its consequences, and
+navigate/reuse that construction from the current source and receiving situation. The map is
+also the material through which later conduct proceeds. This is the existing
+[circulating-cartographer account](canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md), with constructive
+[solver inference](../research/records/2026-09-12_SOLVER_INFERENCE_AND_GENERATOR_COMPRESSION_ARE_INTELLIGENCE.md)
+and generator/receiver descent as actual implementations. It is not a division into three new
+faculties or a criterion postponed until conversational output succeeds.
 
 ## The operative equations
 

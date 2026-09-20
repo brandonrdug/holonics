@@ -328,11 +328,13 @@ returns its linear moment restriction; it does not prove closure of this nonline
 
 ## Breadth review: the mathematical object precedes the runtime chart
 
-[project-postulate] Brandon's next correction asks for careful mathematical breadth and prefers
-notes, chords, quartets and octets when those describe the actual construction. The problem is
-how the work was conceived, not merely its terminology. This review follows the existing
-Holon/notation, musical class/occurrence, clocked torus, phase/landmark, joint compression,
-constitutive/receiver and reflected-interior sources before returning to the application code.
+[historical; source-inspected] This review at `e5d97859` wrongly promoted Brandon's suggested
+musical comparisons into prescribed computational vocabulary. His subsequent clarification
+withdraws that reading: the examples questioned the agent's divisions, not named the quanta.
+The elementary binary reading is a polarized distinction along a declared axis; state, passage
+and composed path have their respective roles. The naming prescription has been removed from
+the operating guides and notation. The valid musical class/occurrence examples below remain
+examples alongside the other mathematical constructions.
 
 [established-bounded; source-inspected] The primary re-opened eleven original user messages:
 Codex task `01a0a067-40b7-7420-9d7c-78a34b558023`, lines 410, 738, 2550, 4052, 5871, 7515,
@@ -350,6 +352,26 @@ Encoding, September 11), `2f196939` (mass-preserving attention/mode compression,
 `c4dff43c` (mass-energy/Maxwell transport), `e0b6bf90` (Swing/fluid/interior stress), and
 `173855f7` (active receiver motion, September 14). These dependencies precede the campaign.
 They are construction material to consume, not subjects awaiting rediscovery.
+
+[established-bounded; source-inspected] Further recovery re-opened the original Codex messages
+in tasks `01a08d68-06a4-7ab1-a494-46b8f58e3832` (lines 11738, 12174, 12345, 12916),
+`01a095f2-3f4f-7012-a914-f4fb5c419fa5` (210, 234, 2838, 5338), and
+`01a098fe-f3e1-7e33-80a3-2f1bfd64d4f5` (4047, 5605, 5734, 5762), covering September 11–13.
+Claude's input history at September 1, 3 and 5 supplies the corresponding polarization,
+compression/navigation and apparatus-division questions. The September 11 instruction explicitly
+allows BPE as an ontologically meaningful but directionally/dimensionally limited construction.
+The requested lift is not a ban on binary data, codecs or supplied mathematical charts.
+
+[project-postulate] **Compression is intelligence is navigation** already governs the
+[circulating cartographer](../../docs/canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md), the
+[August navigation joint](2026-08-14_THE_MAP_IS_PRIOR_TO_THE_SHORTCUT_TOLERANCE_IS_WHERE_THE_ARC_STOPS_REACHING_AND_A_DIRECTION_COSTS_LOG_LOG.md),
+and the [September solver correction](2026-09-12_SOLVER_INFERENCE_AND_GENERATOR_COMPRESSION_ARE_INTELLIGENCE.md).
+The inferred object is a generating function, factorization, recurrence or condition family;
+its executable representation retains and reuses the relevant paths and receiving consequences.
+My campaign substituted an available alphabet-based assembly for the specified source/condition
+formation, and the following review then literalized suggested names. Those were my choices,
+not missing user direction. The current roadmap reconnects the existing implementation work;
+this correction introduces no new conduct policy, test gate or validation apparatus.
 
 ### Mathematical consequences recovered from that breadth
 

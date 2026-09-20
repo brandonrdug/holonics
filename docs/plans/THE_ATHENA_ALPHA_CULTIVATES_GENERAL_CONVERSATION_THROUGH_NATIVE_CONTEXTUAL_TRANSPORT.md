@@ -1216,6 +1216,14 @@ remain the final codec; the present generator already advances before it is deco
 
 ### The source and condition construction
 
+[definition] This is the next attachment in the current field session. `NativeFieldSession::found`
+and `prepare_geometric` currently let alphabet dimensions and flattened symbol positions choose
+the founding/preparation chart. The replacement derives that declaration and the restrictions
+below from the actual constituted field, participating source/receiver and pre-target resident
+state. The geometric/adjoint ports and the existing mathematical workshop are returned dependencies;
+the inferred generator must be consumed by the same continuing body. Binary polarized faces
+remain legitimate source presentations. Musical examples prescribe no computational unit names.
+
 [project-postulate] This section implements local restrictions of the whole causal situation
 specified above. Source-null contrasts diagnose a declared receiver's lost distinctions; they
 do not define context as a classification of text preparations. Compose available current,

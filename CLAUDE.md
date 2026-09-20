@@ -56,23 +56,20 @@ algebraic phase can have nonperiodic transport. The [helical guide](docs/HELICAL
 Euler/Navier–Stokes transport, Iwasawa levels and the geometric/physical/information constructions
 are implementation material at their stated hypotheses. Their conjecture endpoints are separate
 claims. Recover the applicable relation and compose it; an isolated example does not reset the
-framework's accumulated capability. Solvers, generator inference and Holonic Encoding are learning
-and intelligence at their supplied/inferred scope.
+framework's accumulated capability. **Compression is intelligence is navigation** names the same
+construction: infer and retain generating relations, then execute/reuse them from the situated source and receiver. Solvers,
+generator inference and Holonic Encoding already realize parts of it; the
+[circulating cartographer](docs/canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md) carries this source.
 
 [definition] Use [Holonic notation](docs/HOLONIC_NOTATION.md): typed kets, bras, faces and frame
 transports; upper/lower tensor ports and an explicit metric for raising/lowering; oriented lines,
-vertices and loops. `−1=e^{iπ}` and `i=e^{iπ/2}` are passages; name windings and state split/hand.
+vertices and loops. Binary states are polarized side readings in a declared frame. `PhaseCarrier`
+relates its two sheets to sign faces; multiplication by `−1=e^{iπ}` and `i=e^{iπ/2}` enacts half- and
+quarter-turns. State, passage and winding have separate roles; split/hand remain explicit.
 Neighbouring block passages use `A_↗`, `A_↘`. Abstract expressions are unoriented until framed.
 Context means actual incidence, current, material/storage, local clocks and the interior return
 needed by continuation. Limited observations may retain a plural Preimage Fibre without a perfect
 inverse or an event archive.
-
-[project-postulate] Use the [musical composition vocabulary](docs/HOLONIC_NOTATION.md#notes-chords-quartets-and-octets)
-for the actual modal ensembles: notes, chords, quartets and octets carry relative phase,
-joining and receiving structure. Derive the retained grain from those interactions and their
-future receivers before selecting storage dimensions. The
-[composition guide](docs/HNN_COMPOSITION.md#derive-the-grain-from-the-interaction-and-receiver)
-connects chord classes, joint descent, the derived torus modes and dynamic interior return.
 
 [established-bounded; source-inspected] `GeometricRegions` currently uses alphabet-derived
 channels, unit-current inputs/targets and per-slot basis decoding. It is a numerical application

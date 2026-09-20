@@ -22,9 +22,24 @@ Read [HOLON](../../docs/HOLON.md), [HNN_FORMULA](../../docs/HNN_FORMULA.md) and 
 Start in `holonics-hna::NativeCoupledBody`, `native/field_session` and the native constitutive
 field/source/current owners. The model's actual caller decides whether a helper is connected.
 
-## Notes, chords, modal ensembles and participating receivers
+## Polarized distinctions, pathways and compression/intelligence/navigation
 
-Read [musical notation](../../docs/HOLONIC_NOTATION.md#notes-chords-quartets-and-octets),
+Read [binary state and oriented passage](../../docs/HOLONIC_NOTATION.md#arrows-signs-and-turns),
+[the circulating cartographer](../../docs/canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md) and
+[the adopted construction](../../docs/canon/THE_REALITY_OF_DIFFERENCE.md#current-changes-form-later-current-encounters-that-form).
+
+- [The map is prior to the shortcut](2026-08-14_THE_MAP_IS_PRIOR_TO_THE_SHORTCUT_TOLERANCE_IS_WHERE_THE_ARC_STOPS_REACHING_AND_A_DIRECTION_COSTS_LOG_LOG.md): the navigation joint and reuse relative to what already stands.
+- [Holonic Solver factorization](2026-09-11_HOLONIC_SOLVER_NAVIGATES_EXACT_GENERATOR_FACTORIZATIONS.md): constructing an executable generating relation from constraints.
+- [Solver inference and generator compression are intelligence](2026-09-12_SOLVER_INFERENCE_AND_GENERATOR_COMPRESSION_ARE_INTELLIGENCE.md): the original correction to generic state-change and history-recording substitutes.
+- [Generator meaning and campaign drift](2026-09-13_GENERATOR_MEANING_AND_CAMPAIGN_DRIFT_AUDIT.md): original messages, implementation substitutions and the still-relevant source/condition attachment.
+
+`PhaseCarrier` supplies binary sheets and their coupled energy; `Chronology`/`Navigation` retain
+ordered Swing words; generator factorization and native condition preimages infer relations;
+receiver/mode descent compiles their future action. These are connected parts of the same work.
+
+## Composition and participating receivers
+
+Read [compositional examples](../../docs/HOLONIC_NOTATION.md#compositional-examples),
 [the receiver holarchy](../../docs/RECEIVER_HOLARCHY.md) and
 [derived grain in the HNN composition](../../docs/HNN_COMPOSITION.md#derive-the-grain-from-the-interaction-and-receiver).
 
@@ -35,7 +50,7 @@ Read [musical notation](../../docs/HOLONIC_NOTATION.md#notes-chords-quartets-and
 
 Follow `ReceiverHistoryCompression`, `JointReceiverDescent`, `AttentionModeCompression`,
 `FourTorusParametronCurrent`, `PhaseCarrier`, and `ReflectedBoundaryMemory` through their actual
-hypotheses and consumers. Quartet/octet cardinality alone does not select a machine-word layout.
+hypotheses and consumers. Musical names are examples, not computational unit names.
 
 ## Normalization, learning and the paired return
 
