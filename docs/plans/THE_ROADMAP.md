@@ -353,10 +353,14 @@ does not become an issue waiting for approval.
 
 [established-bounded; source-inspected] The
 [September 19 audit](../../research/records/2026-09-19_THE_PLAN_AUDIT_RECONNECTS_SHARED_LAWS_CONSUMERS_AND_HARDWARE.md#github-issue-disposition)
-contains the concrete issue dispositions and replacement contracts. In particular, #27 currently
-bundles serial chain composition, contact geometry and several receiver gluing laws; #9/#51 overlap;
-#50's body still contains an ordering withdrawn only in a comment. The local contracts here are
-corrected; the audit's proposed GitHub edits are not claims that the remote issues were changed.
+contains the concrete issue dispositions and replacement contracts, and they have since been
+applied to the public tracker: #50 and #55 carry the replacement contracts in their bodies rather
+than a withdrawal in a comment; #27 is narrowed to serial multi-neck composition with #28 reopened
+for contact geometry; #49's sampled-kernel, Buchberger and Hilbert overclaims are replaced from the
+corrected I1–I8; #25 is navigation rather than a census; #41's false prohibition of a triangular
+port-Hamiltonian generator is corrected and it is closed as a decision record; the `Split`/
+`PluralFibre` defect returns to #9; and identity discovery has its own delivery milestone. Where an
+issue's body and this roadmap differ, the contract documents govern.
 
 [project-postulate] The root brief in CONSTRUCTION_STATE names the active shared operation and
 the application evidence it is meant to produce. Subtasks carry their operands, owner and actual
