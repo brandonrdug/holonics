@@ -305,10 +305,17 @@ section orders it.
    of twenty-four hardware threads with the GPU idle — 180 coordinates in 568 s, 324 not returned
    in 39 minutes, the 612-coordinate complex refused. Rule 12 governs the repair: one shared
    primitive for rank, kernel, solve, characteristic polynomial and inertia, rebased through
-   word-size prime images (no coefficient growth), run in parallel over primes on the CPU first
-   and placed on the device's existing `2^61 − 1` ring (`holonic-mount::section_layout`) when the
-   extent warrants, with an exact certificate returned to `ℚ` (a verified kernel basis, rational
-   reconstruction within a Hadamard bound, Descartes on a real-rooted characteristic polynomial).
+   word-size prime images (no coefficient growth) with an exact certificate returned to `ℚ`.
+   **Its placement is not a new decision.** The repository's hardware-surface methodology owns it:
+   [the exact device law](THE_EXACT_DEVICE_LAW_IS_CONSTRUCTED.md) (launch receipts, exclusive
+   access, partition-generated layout, and the arithmetic-regime split that sends dense exact
+   matrix work to the generated tile form on the device's `2^61 − 1` ring), `hardware_cover.rs` and
+   its [governing record](../../research/records/2026-08-01_THE_HARDWARE_IS_A_RECEIVER_COVER_THE_CARD_MUST_CARRY_THE_CURRENT.md)
+   (CPU and GPU are charts of one caused body; a short card kernel at the end of a CPU-owned
+   passage does not make the card the owner), `launch_law.rs` with `DeviceLaunchLaw.lean` and
+   `ExactPartition.lean`, the independence/interchange receipt a parallel composition owes, and
+   the locality theorem that licenses a decomposition. The September 17–20 library owners were
+   built outside that methodology; the repair adopts it rather than founding a second one.
    The signed-word/radius realization,
    per-region operators and common-context ownership belong at the consuming device boundary.
    Existing lawful native paths continue while the generated path is extended. D4, Weierstrass
