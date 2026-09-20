@@ -49,53 +49,113 @@ fn normal_prediction_forms_from_native_condition_and_preserves_its_moments() {
     let s = ResidentSurface::on(&readout).unwrap();
     let initial = points(&s, &[0, 1, 3, 0]);
     let mut body = ResidentGeneratorNeighborhood::with_shared_condition(
-        learned_pair(&s), current(&initial), ConditionContactMetric::UnitAdmittanceRealification,
-    ).unwrap();
+        learned_pair(&s),
+        current(&initial),
+        ConditionContactMetric::UnitAdmittanceRealification,
+    )
+    .unwrap();
     let normal = ResidentNormalMaterial::found_features(&s, 5, 1, ResidentGrain(16)).unwrap();
-    body.attach_normal_prediction(0, normal).unwrap_or_else(|(_, e)| panic!("{e:?}"));
+    body.attach_normal_prediction(0, normal)
+        .unwrap_or_else(|(_, e)| panic!("{e:?}"));
     let source = points(&s, &[1, 0]);
     let fresh = points(&s, &[2, 3]);
     let observed = points(&s, &[3, 4]);
-    let q = |n:i64| Rat::from_integer(n.into());
+    let q = |n: i64| Rat::from_integer(n.into());
     let independent = value(&body.read(1, current(&fresh)).unwrap());
-    assert_eq!(value(&body.read(0, current(&fresh)).unwrap()), vec![q(0),q(0)]);
+    assert_eq!(
+        value(&body.read(0, current(&fresh)).unwrap()),
+        vec![q(0), q(0)]
+    );
     let reads = s.census().section_read_outs;
-    let step = body.advance(0, current(&source), Some(current(&observed))).unwrap();
+    let step = body
+        .advance(0, current(&source), Some(current(&observed)))
+        .unwrap();
     assert_eq!(s.census().section_read_outs, reads);
-    assert_eq!(step.contact.as_ref().unwrap().inspect().unwrap().successor,
-        vec![q(3),q(4),q(3),q(0)]);
+    assert_eq!(
+        step.contact.as_ref().unwrap().inspect().unwrap().successor,
+        vec![q(3), q(4), q(3), q(0)]
+    );
     assert_eq!(value(&body.read(1, current(&fresh)).unwrap()), independent);
 
     let normal = body.predictive_material(0).unwrap().unwrap();
-    assert_eq!(normal.observations(),1);
+    assert_eq!(normal.observations(), 1);
     let state = normal.inspect().unwrap();
     // h at the producing cut was (i,3), NOT the target-conditioned successor (3+4i,3).
-    let u = [(1,0),(0,1),(3,0),(0,1),(3,0)];
-    for (i,&(ar,ai)) in u.iter().enumerate() {
-        assert_eq!(state.cross_source[0][i].real, q(3*ar+4*ai));
-        assert_eq!(state.cross_source[0][i].imaginary, q(4*ar-3*ai));
-        for (j,&(br,bi)) in u.iter().enumerate() {
-            assert_eq!(state.source_normal[i][j].real,q(ar*br+ai*bi+i64::from(i==j)));
-            assert_eq!(state.source_normal[i][j].imaginary,q(ai*br-ar*bi));
+    let u = [(1, 0), (0, 1), (3, 0), (0, 1), (3, 0)];
+    for (i, &(ar, ai)) in u.iter().enumerate() {
+        assert_eq!(state.cross_source[0][i].real, q(3 * ar + 4 * ai));
+        assert_eq!(state.cross_source[0][i].imaginary, q(4 * ar - 3 * ai));
+        for (j, &(br, bi)) in u.iter().enumerate() {
+            assert_eq!(
+                state.source_normal[i][j].real,
+                q(ar * br + ai * bi + i64::from(i == j))
+            );
+            assert_eq!(state.source_normal[i][j].imaginary, q(ai * br - ar * bi));
         }
     }
     // Fresh evaluation uses the NEW carried h. Independently contract the stored M with
     // (x,h,h*x); this checks the applied graph/consumer, not the ideal normal minimizer.
-    let next_u = [(2,3),(3,4),(3,0),(-6,17),(6,9)];
-    let mut expected = [q(0),q(0)];
-    for (coefficient,(re,im)) in state.material.coefficients[0].iter().zip(next_u) {
-        expected[0] += &coefficient.real*q(re)-&coefficient.imaginary*q(im);
-        expected[1] += &coefficient.real*q(im)+&coefficient.imaginary*q(re);
+    let next_u = [(2, 3), (3, 4), (3, 0), (-6, 17), (6, 9)];
+    let mut expected = [q(0), q(0)];
+    for (coefficient, (re, im)) in state.material.coefficients[0].iter().zip(next_u) {
+        expected[0] += &coefficient.real * q(re) - &coefficient.imaginary * q(im);
+        expected[1] += &coefficient.real * q(im) + &coefficient.imaginary * q(re);
     }
-    let output = value(&body.read(0,current(&fresh)).unwrap());
-    assert_eq!(output,expected);
+    let output = value(&body.read(0, current(&fresh)).unwrap());
+    assert_eq!(output, expected);
     let saved = body.rest().unwrap();
-    let mut bytes = Vec::new(); saved.write(&mut bytes).unwrap();
+    let mut bytes = Vec::new();
+    saved.write(&mut bytes).unwrap();
     assert!(bytes.starts_with(b"HOLONIC-GENERATOR-NEIGHBORHOOD\x02"));
+    // The child material remains wire-validated even though parent snapshot validation now
+    // trusts an already-founded native child. Corrupt the first predictive material payload
+    // without changing the enclosing neighborhood lengths: nested NormalMaterialRest::read
+    // must reject it before GeneratorNeighborhoodRest can be assembled.
+    let mut malformed = bytes.clone();
+    let mut cursor = b"HOLONIC-GENERATOR-NEIGHBORHOOD\x02".len();
+    let blob_len = |wire: &[u8], at: &mut usize| -> usize {
+        let mut length = [0u8; 8];
+        length.copy_from_slice(&wire[*at..*at + 8]);
+        *at += 8;
+        let len = u64::from_le_bytes(length) as usize;
+        let start = *at;
+        *at += len;
+        start
+    };
+    let _header = blob_len(&malformed, &mut cursor);
+    let _condition = blob_len(&malformed, &mut cursor);
+    let _law0 = blob_len(&malformed, &mut cursor);
+    let _law1 = blob_len(&malformed, &mut cursor);
+    let predictive = blob_len(&malformed, &mut cursor);
+    // Descend through the child normal-material header and its point section, then corrupt the
+    // target-energy moment exactly as the normal-rest tests do. The payload still parses as a
+    // ResidentSectionRest; rejection therefore exercises NormalMaterialRest geometry validation,
+    // rather than a superficial magic/length failure.
+    let normal_magic = b"HOLONIC-NORMAL-MATERIAL".len();
+    let mut child = predictive + normal_magic + 1;
+    let header_bytes = blob_len(&malformed, &mut child);
+    assert!(header_bytes > 0);
+    let state_start = blob_len(&malformed, &mut child);
+    let state_end = child;
+    // This fixture's feature chart has five sources and one target. Its native state layout is
+    // matrix (26 words), Gram (50 moments), cross (10 moments), then four scalar moments; the
+    // third scalar is target energy. MomentWire is 18 words at this fixed carrier.
+    let energy_word = 26 + 50 * 18 + 10 * 18 + 2 * 18;
+    let energy_at = state_start + 24 + energy_word * 8;
+    let energy_end = energy_at + 18 * 8;
+    assert!(energy_end <= state_end);
+    assert!(malformed[energy_at..energy_end].iter().any(|word| *word != 0));
+    malformed[energy_at..energy_end].fill(0);
+    assert!(
+        GeneratorNeighborhoodRest::read(&mut malformed.as_slice(), malformed.len() as u64).is_err()
+    );
     drop(body);
-    let restored = GeneratorNeighborhoodRest::read(&mut bytes.as_slice(),bytes.len() as u64).unwrap().remount(&s).unwrap();
-    assert_eq!(restored.rest().unwrap(),saved);
-    assert_eq!(value(&restored.read(0,current(&fresh)).unwrap()),output);
+    let restored = GeneratorNeighborhoodRest::read(&mut bytes.as_slice(), bytes.len() as u64)
+        .unwrap()
+        .remount(&s)
+        .unwrap();
+    assert_eq!(restored.rest().unwrap(), saved);
+    assert_eq!(value(&restored.read(0, current(&fresh)).unwrap()), output);
 }
 
 #[test]

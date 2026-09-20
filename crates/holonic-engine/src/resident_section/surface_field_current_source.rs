@@ -16,26 +16,86 @@ impl<'chart> ResidentSurface<'chart> {
         work: &ResidentSection<'chart>,
         dots: &ResidentSection<'chart>,
         out: &ResidentSection<'chart>,
+        flags: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
         let fail = || Self::operative_error();
-        let width = d.checked_add(count.checked_mul(2).ok_or_else(fail)?).ok_or_else(fail)?;
-        let row_stride = 2usize.checked_mul(width.checked_add(1).ok_or_else(fail)?).ok_or_else(fail)?;
-        let factor_words = d.checked_mul(d).and_then(|n| n.checked_add(d)?.checked_mul(2)).ok_or_else(fail)?;
-        let work_words = d.checked_mul(3).and_then(|n| n.checked_add(count)?.checked_add(d / 2)?.checked_mul(2)).ok_or_else(fail)?;
-        if d == 0 || d % 2 != 0 || rows.rows == 0 || !(1..=120).contains(&grain)
-            || rows.width != row_stride || out.rows != rows.rows || out.width != row_stride
-            || !self.operative_shape(map, count.max(1), 2 * d) || !self.operative_shape(bounds, 1, 4)
-            || !self.operative_shape(factor, 1, factor_words) || !self.operative_shape(work, 1, work_words)
-            || !self.operative_shape(dots, count.max(1), 10)
-            || !std::ptr::eq(rows.surface(), self) || !std::ptr::eq(out.surface(), self)
-        { return Err(fail()); }
+        let width = d
+            .checked_add(count.checked_mul(2).ok_or_else(fail)?)
+            .ok_or_else(fail)?;
+        let row_stride = 2usize
+            .checked_mul(width.checked_add(1).ok_or_else(fail)?)
+            .ok_or_else(fail)?;
+        let factor_words = d
+            .checked_mul(d)
+            .and_then(|n| n.checked_add(d)?.checked_mul(2))
+            .ok_or_else(fail)?;
+        let work_words = d
+            .checked_mul(3)
+            .and_then(|n| n.checked_add(count)?.checked_add(d / 2)?.checked_mul(2))
+            .ok_or_else(fail)?;
+        if d == 0
+            || d % 2 != 0
+            || rows.rows == 0
+            || !(1..=120).contains(&grain)
+            || rows.width != row_stride
+            || out.rows != rows.rows
+            || out.width != row_stride
+            || !self.operative_shape(map, count.max(1), 2 * d)
+            || !self.operative_shape(bounds, 1, 4)
+            || !self.operative_shape(factor, 1, factor_words)
+            || !self.operative_shape(work, rows.rows, work_words)
+            || !self.operative_shape(
+                dots,
+                rows.rows.checked_mul(count.max(1)).ok_or_else(fail)?,
+                10,
+            )
+            || !self.operative_shape(flags, rows.rows, SLOT_WORDS / 2)
+            || !std::ptr::eq(rows.surface(), self)
+            || !std::ptr::eq(out.surface(), self)
+        {
+            return Err(fail());
+        }
         let mut p = Params::new();
-        for v in [map, bounds, factor, rows] { p.ptr(v.lo_device_ptr()).ptr(v.hi_device_ptr()); }
-        p.u32(rows.width as u32).u32(rows.rows as u32).u32(d as u32).u32(count as u32).u32(grain)
-            .ptr(work.lo_device_ptr()).ptr(dots.lo_device_ptr())
-            .ptr(out.lo_device_ptr()).ptr(out.hi_device_ptr())
-            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
-        self.record_blocks(lane, "section_field_source_reflection_joint_section", 1, self.launch.block_x, 0, &mut p, "field-source-reflection-joint-section")
+        for v in [map, bounds, factor, rows] {
+            p.ptr(v.lo_device_ptr()).ptr(v.hi_device_ptr());
+        }
+        p.u32(rows.width as u32)
+            .u32(rows.rows as u32)
+            .u32(d as u32)
+            .u32(count as u32)
+            .u32(grain)
+            .ptr(work.lo_device_ptr())
+            .ptr(dots.lo_device_ptr())
+            .ptr(out.lo_device_ptr())
+            .ptr(out.hi_device_ptr())
+            .ptr(flags.lo_device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_field_source_reflection_joint_section",
+            rows.rows,
+            self.launch.block_x,
+            0,
+            &mut p,
+            "field-source-reflection-joint-section",
+        )?;
+        let mut collect = Params::new();
+        collect
+            .ptr(flags.lo_device_ptr())
+            .u32(rows.rows as u32)
+            .ptr(lane.slot);
+        self.record_blocks(
+            lane,
+            "section_enclosure_collect_row_status",
+            rows.rows,
+            1,
+            0,
+            &mut collect,
+            "field-source-reflection-joint-status",
+        )
     }
 
     pub(crate) fn record_field_source_reflection_section(
@@ -53,6 +113,7 @@ impl<'chart> ResidentSurface<'chart> {
         trace: &ResidentSection<'chart>,
         joint_input: &ResidentSection<'chart>,
         out: &ResidentSection<'chart>,
+        flags: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
         let fail = || Self::operative_error();
         let width = d
@@ -81,12 +142,13 @@ impl<'chart> ResidentSurface<'chart> {
             || !self.operative_shape(map, count.max(1), 2 * d)
             || !self.operative_shape(bounds, 1, 4)
             || !self.operative_shape(factor, 1, factor_words)
-            || !self.operative_shape(work, 1, work_words)
+            || !self.operative_shape(work, rows.rows(), work_words)
             || !self.operative_shape(
                 dots,
-                count.max(1),
+                rows.rows().checked_mul(count.max(1)).ok_or_else(fail)?,
                 10,
             )
+            || !self.operative_shape(flags, rows.rows(), SLOT_WORDS / 2)
             || !self.operative_shape(trace, rows.rows(), 18 * d)
             || !self.operative_shape(rows.resident_section(), rows.rows(), row_stride)
             || !self.operative_shape(joint_input, rows.rows(), out_stride)
@@ -115,6 +177,7 @@ impl<'chart> ResidentSurface<'chart> {
             .ptr(joint_input.hi_device_ptr())
             .ptr(out.lo_device_ptr())
             .ptr(out.hi_device_ptr())
+            .ptr(flags.lo_device_ptr())
             .ptr(lane.slot)
             .ptr(lane.census)
             .ptr(lane.lineage)
@@ -122,11 +185,25 @@ impl<'chart> ResidentSurface<'chart> {
         self.record_blocks(
             lane,
             "section_field_source_reflection_section",
-            1,
+            rows.rows(),
             self.launch.block_x,
             0,
             &mut p,
             "field-source-reflection-section",
+        )?;
+        let mut collect = Params::new();
+        collect
+            .ptr(flags.lo_device_ptr())
+            .u32(rows.rows() as u32)
+            .ptr(lane.slot);
+        self.record_blocks(
+            lane,
+            "section_enclosure_collect_row_status",
+            rows.rows(),
+            1,
+            0,
+            &mut collect,
+            "field-source-reflection-status",
         )
     }
     pub(crate) fn record_field_source_factor(

@@ -56,8 +56,16 @@ impl GeneratorNeighborhoodRest {
     /// and from formation occurrences in the compatibility relation.
     pub(crate) fn action_cut(&self, member: usize) -> Result<u64, ConstitutiveFibreError> {
         match self.predictive_material(member)? {
-            Some(_) => self.laws.get(member).and_then(|law|u64::try_from(law.source_width()).ok()).ok_or(ConstitutiveFibreError::Shape),
-            None => self.laws.get(member).map(|v|v.occurrences()).ok_or(ConstitutiveFibreError::Shape),
+            Some(_) => self
+                .laws
+                .get(member)
+                .and_then(|law| u64::try_from(law.source_width()).ok())
+                .ok_or(ConstitutiveFibreError::Shape),
+            None => self
+                .laws
+                .get(member)
+                .map(|v| v.occurrences())
+                .ok_or(ConstitutiveFibreError::Shape),
         }
     }
     pub fn predictive_material(
@@ -95,7 +103,11 @@ impl GeneratorNeighborhoodRest {
         }
         for (law, predictive) in self.laws.iter().zip(&self.predictive) {
             let Some(material) = predictive else { continue };
-            material.validate()?;
+            // NormalMaterialRest is immutable and already founded: its fields are private,
+            // public wire/chart constructors validate the complete geometry and numerical
+            // witness, and the native producer is the private from_native_chart path. Keep
+            // this parent validator focused on cross-owner chart/target relations; replaying
+            // the child's O(n^3) source-energy proof here duplicated rest() and write().
             let ConstitutiveSourceChart::BilinearContact {
                 source_complex: ns,
                 condition_complex: nc,
@@ -108,9 +120,9 @@ impl GeneratorNeighborhoodRest {
                 .and_then(|n| n.checked_add(ns))
                 .and_then(|n| n.checked_add(nc))
                 .ok_or(ConstitutiveFibreError::Shape)?;
-            let admitted=match material.source_chart() {
-                NormalSourceChart::Features{source_complex}=>source_complex==features,
-                NormalSourceChart::Wave{roots}=>roots.checked_mul(3)==Some(ns),
+            let admitted = match material.source_chart() {
+                NormalSourceChart::Features { source_complex } => source_complex == features,
+                NormalSourceChart::Wave { roots } => roots.checked_mul(3) == Some(ns),
             };
             if !admitted
                 || law.target_width() % 2 != 0
@@ -147,25 +159,33 @@ impl GeneratorNeighborhoodRest {
         let has_predictive = self.predictive.iter().any(Option::is_some);
         if !has_predictive {
             out.write_all(MAGIC).map_err(error)?;
-            blob(out, &serde_json::to_vec(&Header {
-                members: self.laws.len(),
-                epoch: self.epoch,
-                evidence: self.evidence.as_ref().map(|e| EvidenceHeader {
-                    member: e.member,
-                    epoch: e.epoch,
-                }),
-            }).map_err(error)?)?;
+            blob(
+                out,
+                &serde_json::to_vec(&Header {
+                    members: self.laws.len(),
+                    epoch: self.epoch,
+                    evidence: self.evidence.as_ref().map(|e| EvidenceHeader {
+                        member: e.member,
+                        epoch: e.epoch,
+                    }),
+                })
+                .map_err(error)?,
+            )?;
         } else {
             out.write_all(MAGIC_V2).map_err(error)?;
-            blob(out, &serde_json::to_vec(&HeaderV2 {
-                members: self.laws.len(),
-                epoch: self.epoch,
-                predictive: self.predictive.iter().map(Option::is_some).collect(),
-                evidence: self.evidence.as_ref().map(|e| EvidenceHeader {
-                    member: e.member,
-                    epoch: e.epoch,
-                }),
-            }).map_err(error)?)?;
+            blob(
+                out,
+                &serde_json::to_vec(&HeaderV2 {
+                    members: self.laws.len(),
+                    epoch: self.epoch,
+                    predictive: self.predictive.iter().map(Option::is_some).collect(),
+                    evidence: self.evidence.as_ref().map(|e| EvidenceHeader {
+                        member: e.member,
+                        epoch: e.epoch,
+                    }),
+                })
+                .map_err(error)?,
+            )?;
         }
         let mut bytes = Vec::new();
         self.condition.write(&mut bytes)?;
@@ -237,7 +257,10 @@ impl GeneratorNeighborhoodRest {
         for flag in predictive_flags {
             predictive.push(if flag {
                 let bytes = read_blob(&mut input)?;
-                Some(NormalMaterialRest::read(&mut bytes.as_slice(), bytes.len() as u64)?)
+                Some(NormalMaterialRest::read(
+                    &mut bytes.as_slice(),
+                    bytes.len() as u64,
+                )?)
             } else {
                 None
             });

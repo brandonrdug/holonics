@@ -251,6 +251,21 @@ report its own capability census rather than reuse CUDA warp or block constants.
 
 ## Present Linux/CUDA boundary
 
+[definition] Host upload completion and device availability are distinct events. CUDA's
+pageable-memory `cuMemcpyHtoD` may return once host staging finishes while DMA is still in
+flight. A later nonblocking stream therefore needs an explicit completion edge. The synchronous
+slice/range methods in `holonic-mount/src/cuda.rs` complete their legacy-stream transfer before
+returning a ready destination; the explicit asynchronous interface keeps its caller-owned stream
+and storage lifetime. This is a transport obligation of the actual source, before any field
+kernel interprets its words. [CUDA synchronization contract](https://docs.nvidia.com/cuda/cuda-driver-api/api-sync-behavior.html).
+
+[established-bounded; source-inspected] The geometric campaign exposed this missing edge as
+intermittent malformed gather packets that were valid when subsequently inspected on the host.
+It also corrected row receipts to the complete 16-u32 `SLOT_WORDS` layout. The
+[campaign record](../research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md)
+retains the reproducer, instrumented checks and actual source continuation. Logical row
+independence includes the arrival of immutable inputs, not only disjoint output addresses.
+
 [established-bounded; source-inspected] The host workspace declares `mount` as an unconditional
 engine dependency ([`holonic-engine/Cargo.toml`](../crates/holonic-engine/Cargo.toml)). The
 mount crate is a CUDA Driver API wrapper and links `libcuda` in

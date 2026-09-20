@@ -105,9 +105,9 @@ extern "C" __global__ __launch_bounds__(512) void section_field_source_reflectio
     const int64_t *rows,const int64_t *rows_hi,uint32_t row_stride,uint32_t row_count,
     const int64_t *source,const int64_t *source_hi,uint32_t source_at,uint32_t d,uint32_t count,uint32_t grain,
     int64_t *work,int64_t *dots,int64_t *trace,int64_t *trace_hi,
-    int64_t *joint_input,int64_t *joint_input_hi,int64_t *out,int64_t *out_hi,
-    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
-    if(blockIdx.x||upstream_refused(census,lineage,lineage_count,slot))return;
+    int64_t *joint_input,int64_t *joint_input_hi,int64_t *out,int64_t *out_hi,int64_t *flags,
+    uint32_t *global_slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+    uint32_t row=blockIdx.x;if(row>=row_count)return;uint32_t *slot=(uint32_t *)(flags+(SLOT_WORDS/2u)*(size_t)row);if(!threadIdx.x){for(uint32_t i=0;i<SLOT_WORDS;++i)slot[i]=0;upstream_refused(census,lineage,lineage_count,slot);}__syncthreads();if(slot[SLOT_REFUSED])return;(void)global_slot;
     const uint32_t width=d+2u*count;
     const wide *packed=(const wide*)(source+source_at);
     field_source_validate(map,map_hi,bounds,bounds_hi,factor,factor_hi,d,count,grain,slot);
@@ -116,7 +116,7 @@ extern "C" __global__ __launch_bounds__(512) void section_field_source_reflectio
         for(size_t i=0;i<2u*((size_t)width+1u);++i)if(source[source_at+i]!=source_hi[source_at+i])atomicOr(slot,REFUSED_MALFORMED);
     }
     __syncthreads();if(*slot)return;
-    for(uint32_t row=0;row<row_count;++row){
+    {
         const size_t xa=(size_t)row*row_stride,oa=(size_t)row*2u*(width+1u);
         const wide *x=(const wide*)(rows+xa);
         wide *joined=(wide*)(joint_input+oa);
@@ -127,12 +127,12 @@ extern "C" __global__ __launch_bounds__(512) void section_field_source_reflectio
             for(uint32_t j=0;j<2u*count;++j)joined[d+j]=packed[d+j];
             joined[width]=add_checked(x[d],packed[width],slot);
         }
-        __syncthreads();if(*slot)return;
+        __syncthreads();
+        if(*slot)return;
         const size_t ta=(size_t)row*18u*d;
-        field_source_apply((const wide*)map,((const wide*)bounds)[0],(const wide*)factor,joined,d,count,grain,(wide*)work,dots,trace+ta,trace_hi+ta,(wide*)(out+oa),slot);
+        field_source_apply((const wide*)map,((const wide*)bounds)[0],(const wide*)factor,joined,d,count,grain,(wide*)(work+(size_t)row*2u*(d*3u+count+d/2u)),dots+(size_t)row*count*10u,trace+ta,trace_hi+ta,(wide*)(out+oa),slot);
         if(*slot)return;
         for(size_t j=threadIdx.x;j<2u*((size_t)width+1u);j+=blockDim.x){joint_input_hi[oa+j]=joint_input[oa+j];out_hi[oa+j]=out[oa+j];}
-        __syncthreads();
     }
 }
 
@@ -140,24 +140,24 @@ extern "C" __global__ __launch_bounds__(512) void section_field_source_reflectio
     const int64_t *map,const int64_t *map_hi,const int64_t *bounds,const int64_t *bounds_hi,
     const int64_t *factor,const int64_t *factor_hi,
     const int64_t *rows,const int64_t *rows_hi,uint32_t row_stride,uint32_t row_count,
-    uint32_t d,uint32_t count,uint32_t grain,int64_t *work,int64_t *dots,int64_t *out,int64_t *out_hi,
-    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
-    if(blockIdx.x||upstream_refused(census,lineage,lineage_count,slot))return;
+    uint32_t d,uint32_t count,uint32_t grain,int64_t *work,int64_t *dots,int64_t *out,int64_t *out_hi,int64_t *flags,
+    uint32_t *global_slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+    uint32_t row=blockIdx.x;if(row>=row_count)return;uint32_t *slot=(uint32_t *)(flags+(SLOT_WORDS/2u)*(size_t)row);if(!threadIdx.x){for(uint32_t i=0;i<SLOT_WORDS;++i)slot[i]=0;upstream_refused(census,lineage,lineage_count,slot);}__syncthreads();if(slot[SLOT_REFUSED])return;(void)global_slot;
     const uint32_t width=d+2u*count;
     field_source_validate(map,map_hi,bounds,bounds_hi,factor,factor_hi,d,count,grain,slot);
     if(!threadIdx.x&&(!row_count||row_stride!=2u*(width+1u)))atomicOr(slot,REFUSED_MALFORMED);
     __syncthreads();if(*slot)return;
-    for(uint32_t row=0;row<row_count;++row){
+    {
         const size_t at=(size_t)row*row_stride;
         const wide *x=(const wide*)(rows+at);
         if(!threadIdx.x){
             for(size_t i=0;i<row_stride;++i)if(rows[at+i]!=rows_hi[at+i])atomicOr(slot,REFUSED_MALFORMED);
             if(x[width]<0)atomicOr(slot,REFUSED_MALFORMED);
         }
-        __syncthreads();if(*slot)return;
-        field_source_apply((const wide*)map,((const wide*)bounds)[0],(const wide*)factor,x,d,count,grain,(wide*)work,dots,nullptr,nullptr,(wide*)(out+at),slot);
+        __syncthreads();
+        if(*slot)return;
+        field_source_apply((const wide*)map,((const wide*)bounds)[0],(const wide*)factor,x,d,count,grain,(wide*)(work+(size_t)row*2u*(d*3u+count+d/2u)),dots+(size_t)row*count*10u,nullptr,nullptr,(wide*)(out+at),slot);
         if(*slot)return;
         for(size_t j=threadIdx.x;j<row_stride;j+=blockDim.x)out_hi[at+j]=out[at+j];
-        __syncthreads();
     }
 }

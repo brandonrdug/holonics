@@ -57,14 +57,14 @@ Paths in this table are relative to `crates/` unless stated otherwise. These are
 | Work | Owning call / source to inspect |
 |---|---|
 | Public HNN model | `holonics-hna/src/native.rs`; `native/coupled_wave/body/field.rs` and `field/section.rs`; `NativeCoupledBody` is the move owner |
-| Field session and source rows | `holonics-hna/src/native/field_session.rs`, `field_session/shared.rs`; inspect `prepare_shared`, `shared_request`, `observe_rows` and their caller |
+| Field session and source rows | `holonics-hna/src/native/field_session.rs`, `field_session/{shared,geometric}.rs`; `field_geometry.rs` compiles analytic incidence; `body/field/geometric.rs` composes phase participation, held refinement and its complete return |
 | Exposure, source/response relations and resume | `holonics-hna/src/alpha/exposure.rs`; `examples/athena_exposure_field.rs`; [conversation data](docs/CONVERSATION_DATA.md) |
 | Constitutive field, source and paired return | `holonic-engine/src/native_ecology/constitutive_fibre/field/`; source/reflection/target, material transport, internal modes and receiver |
-| Normalized sections and pullback | `field/receiver/normalized{,.rs}` below that field; `holonic-engine/kernels/field_normalized_receiver.cuh`; exact reference `exponentiated_ratio::transport::NormalizedKernel` |
+| Normalized sections and pullback | `field/receiver/normalized{,.rs}` and `normalized/phase.rs` below that field; `holonic-engine/kernels/field_normalized_receiver.cuh`; exact reference `exponentiated_ratio::transport::NormalizedKernel` |
 | Bilinear source/condition and normal law | `resident/section/bilinear_features.rs`, `field/material_transport/normal/direct/section.rs`; `section_bilinear_adjoint.cuh`, `normal_applied_condition.cuh` |
 | Resident packets, kernels and launch | `holonic-engine/src/resident_section{,.rs}`; `kernels/exact_resident_section.cu`, `exact_packet_linear.cuh`; `holonic-mount/src/{cuda,launch_law,section_layout}.rs` |
 | Exact algebra / generator reduction | `holonic-engine/src/exact_linear{,.rs}`, `prime_image_algebra.rs`, `receiver_history_compression/`, `winding_inertia.rs`; host/reference and resident APIs have distinct scopes |
-| Helical and geometric source | `relational-geometry/src/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs` |
+| Helical and geometric source | `relational-geometry/src/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs`; `receiver_history_compression/observable.rs::HelicalMomentReuse` binds finite pair actions to the existing moment decoder |
 | Framework facade | `holonics/src/lib.rs`: `geometry` and `structure` work without the default native feature; HNN implementation is `holonics-hna` |
 | Formal entry | `formal/elementary-holonics/ElementaryHolonics/Framework.lean`: Core, Geometry, Dynamics, Information, Physics, Computation; [formal guide](docs/FORMAL_FRAMEWORK.md) |
 | Application interfaces | `applications/holonics-workbench`; `applications/conversation-data`; [repository layout](docs/REPOSITORY.md) |
@@ -75,6 +75,16 @@ packet; it does not assert that the represented radius is zero. Read the row lay
 denominator and radius position before interpreting a check. `ResidentNormalEnclosureSection`,
 `normal_applied_condition.cuh` and `field_normalized_receiver.cuh` exhibit this distinction.
 An enclosing ball and independent coordinate intervals also have different retained information.
+
+[definition] `upstream_refused` consumes a complete `SLOT_WORDS` receipt (16 u32 words),
+including lineage fields. Independent rows own complete receipts through launch; the final
+barrier joins their statuses. Host allocation, kernel stride and logical placement share
+`resident_section::SLOT_WORDS` as the Rust layout owner.
+
+[definition] A ready native upload includes device completion. Pageable host-to-device copies
+can return after host staging; the synchronous `holonic-mount` slice/range methods complete
+their legacy-stream transfer before a nonblocking passage consumes the destination. Explicit
+asynchronous copies retain their caller-owned event/stream dependency.
 
 [definition] The native hot operation uses exact integer/rational packets and dyadic enclosures
 with checked carriers. CPU code owns codecs, I/O and declared reference/certificate work; native

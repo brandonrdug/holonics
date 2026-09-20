@@ -206,6 +206,174 @@ fn an_immutable_source_pin_refuses_changed_data_on_resume() {
 }
 
 #[test]
+fn recorded_context_reopens_from_the_verified_prefix_index() {
+    let root = tempfile::tempdir().unwrap();
+    let parent = occurrence(0, "parent", "human", "prior");
+    let repeated_parent = occurrence(1, "parent", "human", "later-parent");
+    let mut child = occurrence(2, "child", "human", "current");
+    child["views"][0]["normalized_timestamp"] = json!("2026-09-03T02:00:00.000000+00:00");
+    child["views"][0]["timestamp"] = json!("2026-09-03T02:00:00Z");
+    child["views"][0]["links"] = json!([{
+        "kind":"provider-parent", "target_event":1, "reference":"parent",
+        "evidence":"captured", "availability":"prior",
+        "target":{"event":1,"source":1,"provider":"codex",
+            "record_group":"declared:parent","timestamp":"2026-09-03T00:00:00Z",
+            "normalized_timestamp":"2026-09-03T00:00:00.000000+00:00"}
+    }]);
+    let path = write_stream(root.path(), &[parent, repeated_parent, child]);
+    let mut reader = ExposureReader::open(&path).unwrap();
+    reader.peek().unwrap();
+    reader.acknowledge(0).unwrap();
+    reader.peek().unwrap();
+    reader.acknowledge(1).unwrap();
+    let cursor = reader.cursor();
+    let request = reader.peek().unwrap().unwrap().clone();
+    let context = reader.recorded_context(&request, 128).unwrap();
+    assert_eq!(context.len(), 1);
+    assert_eq!(context[0].family.record_group, "declared:parent");
+    assert_eq!(context[0].sequence, 0);
+    assert_eq!(reader.context_stats().index_entries, 2);
+    let prefix_octets=cursor.byte_offset-reader.header_end;
+    assert_eq!(reader.context_stats().index_scan_octets,prefix_octets);
+    drop(reader);
+
+    let mut reopened = ExposureReader::resume(cursor).unwrap();
+    let request = reopened.peek().unwrap().unwrap().clone();
+    let context = reopened.recorded_context(&request, 128).unwrap();
+    assert_eq!(context.len(), 1);
+    assert_eq!(
+        reopened.context_stats().index_scan_octets,
+        prefix_octets
+    );
+}
+
+#[test]
+fn unavailable_recorded_context_keeps_the_source_cursor_at_the_pending_frame() {
+    let root = tempfile::tempdir().unwrap();
+    let mut child = occurrence(0, "child", "human", "current");
+    child["views"][0]["normalized_timestamp"] = json!("2026-09-03T01:00:00.000000+00:00");
+    child["views"][0]["timestamp"] = json!("2026-09-03T01:00:00Z");
+    child["views"][0]["links"] = json!([{
+        "kind":"provider-parent", "target_event":99, "reference":"missing-parent",
+        "evidence":"captured", "availability":"prior",
+        "target":{"event":99,"source":1,"provider":"codex",
+            "record_group":"declared:parent","timestamp":"2026-09-03T00:00:00Z",
+            "normalized_timestamp":"2026-09-03T00:00:00.000000+00:00"}
+    }]);
+    let path = write_stream(root.path(), &[child]);
+    let mut reader = ExposureReader::open(&path).unwrap();
+    let before = reader.cursor();
+    let request = reader.peek().unwrap().unwrap().clone();
+    assert!(reader.recorded_context(&request, 128).is_err());
+    assert_eq!(reader.cursor(), before);
+    assert_eq!(reader.peek().unwrap().unwrap().sequence, 0);
+}
+
+#[test]
+fn ambiguous_capture_aliases_refuse_context_selection() {
+    let root = tempfile::tempdir().unwrap();
+    let parent = occurrence(0, "parent", "human", "first");
+    let mut duplicate = occurrence(1, "parent", "human", "duplicate-alias");
+    duplicate["views"][0]["event"] = json!(1);
+    duplicate["views"][0]["record"]["number"] = json!(2);
+    duplicate["position"]["first_record"] = json!(2);
+    duplicate["position"]["first_event"] = json!(1);
+    let mut child = occurrence(2, "child", "human", "current");
+    child["views"][0]["normalized_timestamp"] = json!("2026-09-03T02:00:00.000000+00:00");
+    child["views"][0]["timestamp"] = json!("2026-09-03T02:00:00Z");
+    child["views"][0]["links"] = json!([{
+        "kind":"provider-parent", "target_event":1, "reference":"ambiguous-parent",
+        "evidence":"captured", "availability":"prior",
+        "target":{"event":1,"source":1,"provider":"codex",
+            "record_group":"declared:parent","timestamp":"2026-09-03T00:00:00Z",
+            "normalized_timestamp":"2026-09-03T00:00:00.000000+00:00"}
+    }]);
+    let path = write_stream(root.path(), &[parent, duplicate, child]);
+    let mut reader = ExposureReader::open(&path).unwrap();
+    reader.peek().unwrap();
+    reader.acknowledge(0).unwrap();
+    reader.peek().unwrap();
+    reader.acknowledge(1).unwrap();
+    let before = reader.cursor();
+    let request = reader.peek().unwrap().unwrap().clone();
+    assert!(matches!(
+        reader.recorded_context(&request, 128),
+        Err(ExposureError::Open(
+            "recorded context aliases resolve ambiguously"
+        ))
+    ));
+    assert_eq!(reader.cursor(), before);
+}
+
+#[test]
+fn malformed_future_frame_does_not_block_a_valid_present_context() {
+    let root = tempfile::tempdir().unwrap();
+    let parent = occurrence(0, "parent", "human", "prior");
+    let mut child = occurrence(1, "child", "human", "current");
+    child["views"][0]["normalized_timestamp"] = json!("2026-09-03T01:00:00.000000+00:00");
+    child["views"][0]["timestamp"] = json!("2026-09-03T01:00:00Z");
+    child["views"][0]["links"] = json!([{
+        "kind":"provider-parent", "target_event":1, "reference":"parent",
+        "evidence":"captured", "availability":"prior",
+        "target":{"event":1,"source":1,"provider":"codex",
+            "record_group":"declared:parent","timestamp":"2026-09-03T00:00:00Z",
+            "normalized_timestamp":"2026-09-03T00:00:00.000000+00:00"}
+    }]);
+    let path = write_stream(root.path(), &[parent, child]);
+    let mut bytes = fs::read(&path).unwrap();
+    bytes.extend_from_slice(b"{malformed future frame}\n");
+    fs::write(&path, bytes).unwrap();
+    let mut reader = ExposureReader::open(&path).unwrap();
+    reader.peek().unwrap();
+    reader.acknowledge(0).unwrap();
+    let request = reader.peek().unwrap().unwrap().clone();
+    assert_eq!(reader.recorded_context(&request, 128).unwrap().len(), 1);
+    reader.acknowledge(1).unwrap();
+    assert!(reader.peek().is_err());
+}
+
+#[test]
+fn context_aperture_is_cumulative_across_the_recorded_chain() {
+    let root = tempfile::tempdir().unwrap();
+    let grandparent = occurrence(0, "grandparent", "human", "first");
+    let mut parent = occurrence(1, "parent", "human", "second");
+    parent["views"][0]["normalized_timestamp"] = json!("2026-09-03T01:00:00.000000+00:00");
+    parent["views"][0]["timestamp"] = json!("2026-09-03T01:00:00Z");
+    parent["views"][0]["links"] = json!([{
+        "kind":"provider-parent", "target_event":1, "reference":"grandparent",
+        "evidence":"captured", "availability":"prior",
+        "target":{"event":1,"source":1,"provider":"codex",
+            "record_group":"declared:grandparent","timestamp":"2026-09-03T00:00:00Z",
+            "normalized_timestamp":"2026-09-03T00:00:00.000000+00:00"}
+    }]);
+    let mut child = occurrence(2, "child", "human", "current");
+    child["views"][0]["normalized_timestamp"] = json!("2026-09-03T02:00:00.000000+00:00");
+    child["views"][0]["timestamp"] = json!("2026-09-03T02:00:00Z");
+    child["views"][0]["links"] = json!([{
+        "kind":"provider-parent", "target_event":2, "reference":"parent",
+        "evidence":"captured", "availability":"prior",
+        "target":{"event":2,"source":1,"provider":"codex",
+            "record_group":"declared:parent","timestamp":"2026-09-03T01:00:00Z",
+            "normalized_timestamp":"2026-09-03T01:00:00.000000+00:00"}
+    }]);
+    let path = write_stream(root.path(), &[grandparent, parent, child]);
+    let mut reader = ExposureReader::open(&path).unwrap();
+    reader.peek().unwrap();
+    reader.acknowledge(0).unwrap();
+    reader.peek().unwrap();
+    reader.acknowledge(1).unwrap();
+    let before = reader.cursor();
+    let request = reader.peek().unwrap().unwrap().clone();
+    assert!(matches!(
+        reader.recorded_context(&request, 9),
+        Err(ExposureError::Open(
+            "recorded context exceeds the declared byte aperture"
+        ))
+    ));
+    assert_eq!(reader.cursor(), before);
+}
+
+#[test]
 fn incomplete_or_reordered_frames_do_not_advance_a_saved_cursor() {
     let root = tempfile::tempdir().unwrap();
     let path = write_stream(

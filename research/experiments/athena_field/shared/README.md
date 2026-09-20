@@ -171,12 +171,18 @@ retain their comparisons, but cannot automatically identify a responding exposur
 
 [definition] The shared-source update still applies at the material current when it arrives and
 reports both producing/applying epochs. The optional `--context-bytes` is an exterior aperture;
-zero explicitly requests request-only input. For a positive aperture, the driver keeps a bounded
-process-local cache of validated frames, including metadata in its reported octet budget, and
-follows an available recorded prior chain. Missing/unsupported chains are explicitly counted;
-it does not silently claim a complete contextual boundary. The cache is not persisted, so durable
-wider contextual attachment remains #59/#16 work at the public consumer. Its supplied source
-chart and constant condition still require the geometric #17 join.
+zero explicitly requests request-only input. For a positive aperture, the driver asks
+`ExposureReader::recorded_context` for the recorded prior chain. The reader lazily scans the
+verified, immutable exposure wire only through the current request's preceding sequence into a
+family/sequence/byte-offset index, then seeks each required occurrence; it does not replay that
+prefix for every request or add native event history. Reopening the session and source rebuilds
+the needed prefix index only after the source's pinned octet count and SHA-256 validate. The
+report exposes indexed entries, scanned prefix octets and lookup frames/octets so this measured
+source lookup cost remains visible. Missing, unavailable, ambiguous and over-aperture chains are
+explicitly counted, and the native bridge still enforces the declared context byte aperture. The
+index itself is an ephemeral view; the durable record is the pinned source wire and its saved
+cursor, so no sidecar index can outlive or weaken source validation. Its supplied source chart and
+constant condition still require the geometric #17 join.
 
 [established-bounded; measured] The two original private-source budgets above each admitted one
 request at 512 bytes. They are retained pre-audit measurements, not evidence of long-context or

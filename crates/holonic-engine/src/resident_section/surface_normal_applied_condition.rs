@@ -16,7 +16,9 @@ impl<'c> ResidentSurface<'c> {
         out: &ResidentSection<'c>,
     ) -> Result<(), ResidentRefusal> {
         let fail = Self::operative_error;
-        if identity && (joint.is_some() || source.width != 2*targets) { return Err(fail()); }
+        if identity && (joint.is_some() || source.width != 2 * targets) {
+            return Err(fail());
+        }
         self.validate_normal_input(source.into(), source.grain.0)?;
         self.validate_normal_input(ResidentNormalInput::Point(condition), source.grain.0)?;
         let d = joint.map_or(source.width, |(d, _)| d);
@@ -64,7 +66,11 @@ impl<'c> ResidentSurface<'c> {
             .ptr(external.section.lo.device_ptr())
             .ptr(external.section.hi.device_ptr())
             .u32(external.offset as u32)
-            .u32(if identity { 2 } else { u32::from(joint.is_some()) })
+            .u32(if identity {
+                2
+            } else {
+                u32::from(joint.is_some())
+            })
             .ptr(condition.section.lo.device_ptr())
             .ptr(condition.section.hi.device_ptr())
             .u32(condition.offset as u32)
@@ -109,6 +115,7 @@ impl<'c> ResidentSurface<'c> {
         identity: bool,
         grain: u32,
         out: &ResidentSection<'c>,
+        flags: &ResidentSection<'c>,
     ) -> Result<(), ResidentRefusal> {
         let fail = Self::operative_error;
         let point = || ResidentRefusal::Declaration {
@@ -179,6 +186,7 @@ impl<'c> ResidentSurface<'c> {
             || !self.operative_shape(state, 1, words)
             || !self.operative_shape(source, rows, source_words)
             || !self.operative_shape(out, rows, output_words)
+            || !self.operative_shape(flags, rows, SLOT_WORDS / 2)
         {
             return Err(fail());
         }
@@ -201,6 +209,7 @@ impl<'c> ResidentSurface<'c> {
             .u32(grain)
             .ptr(out.lo.device_ptr())
             .ptr(out.hi.device_ptr())
+            .ptr(flags.lo.device_ptr())
             .ptr(lane.slot)
             .ptr(lane.census)
             .ptr(lane.lineage)
@@ -208,11 +217,25 @@ impl<'c> ResidentSurface<'c> {
         self.record_blocks(
             lane,
             "section_normal_applied_condition_rows",
-            1,
+            rows,
             1,
             scratch,
             &mut p,
             "normal-applied-condition-rows",
+        )?;
+        let mut collect = Params::new();
+        collect
+            .ptr(flags.lo.device_ptr())
+            .u32(rows as u32)
+            .ptr(lane.slot);
+        self.record_blocks(
+            lane,
+            "section_enclosure_collect_row_status",
+            rows,
+            1,
+            0,
+            &mut collect,
+            "normal-applied-condition-row-status",
         )
     }
 }

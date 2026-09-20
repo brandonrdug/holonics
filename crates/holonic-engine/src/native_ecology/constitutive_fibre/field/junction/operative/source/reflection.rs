@@ -1,4 +1,5 @@
 use super::*;
+use crate::resident_section::SLOT_WORDS;
 
 /// One producing source reflection applied to a row section. Every row shares the same source
 /// cut, factor and internal `b` branch; only its boundary current and enclosing radius differ.
@@ -27,10 +28,17 @@ impl<'a, 'c> NativeFieldReflectionSection<'a, 'c> {
         self.output
     }
     pub fn inspect_residuals(&self) -> Result<Vec<Vec<ExactComplexWaveCurrent>>, Error> {
-        let words=self.source.surface.read_out(&self.trace)?;
-        words.chunks_exact(self.trace.width()).map(|row|
-            super::super::decode_reflection_residual(row,self.source.boundary_components(),self.source.grain)
-        ).collect()
+        let words = self.source.surface.read_out(&self.trace)?;
+        words
+            .chunks_exact(self.trace.width())
+            .map(|row| {
+                super::super::decode_reflection_residual(
+                    row,
+                    self.source.boundary_components(),
+                    self.source.grain,
+                )
+            })
+            .collect()
     }
 
     /// Form and pull back a fixed-D output residual for every target row in one resident passage.
@@ -47,24 +55,63 @@ impl<'a, 'c> NativeFieldReflectionSection<'a, 'c> {
         let d = source.boundary_components();
         let count = source.births.len();
         let width = d.checked_add(2 * count).ok_or(Error::Shape)?;
-        if self.output.rows() == 0 || targets.rows() != self.output.rows()
-            || targets.components() != d || targets.grain() != self.output.grain()
-            || step_bits > 120 { return Err(Error::Shape); }
-        if let Some(mask) = mask {
-            if mask.rows() != 1 || mask.width() != d / 2 || mask.grain().0 != 0 { return Err(Error::Shape); }
-        }
-        let target_residual = surface.fresh_section(targets.rows(), 2 * (width + 1), ResidentGrain(0))?;
-        let mut p = surface.begin_passage(&[vec![]]).map_err(|e| Error::Arithmetic(e.to_string()))?;
+        if self.output.rows() == 0
+            || targets.rows() != self.output.rows()
+            || targets.components() != d
+            || targets.grain() != self.output.grain()
+            || step_bits > 120
         {
-            let lane = p.open(0, &[]).map_err(|e| Error::Arithmetic(e.to_string()))?;
-            surface.record_field_target_residual_section(&lane, self.output.resident_section(), targets.resident_section(), mask, d, count, targets.rows(), step_bits, &target_residual)
+            return Err(Error::Shape);
+        }
+        if let Some(mask) = mask {
+            if mask.rows() != 1 || mask.width() != d / 2 || mask.grain().0 != 0 {
+                return Err(Error::Shape);
+            }
+        }
+        let target_residual =
+            surface.fresh_section(targets.rows(), 2 * (width + 1), ResidentGrain(0))?;
+        let mut p = surface
+            .begin_passage(&[vec![]])
+            .map_err(|e| Error::Arithmetic(e.to_string()))?;
+        {
+            let lane = p
+                .open(0, &[])
+                .map_err(|e| Error::Arithmetic(e.to_string()))?;
+            surface
+                .record_field_target_residual_section(
+                    &lane,
+                    self.output.resident_section(),
+                    targets.resident_section(),
+                    mask,
+                    d,
+                    count,
+                    targets.rows(),
+                    step_bits,
+                    &target_residual,
+                )
                 .map_err(|e| Error::Arithmetic(e.to_string()))?;
         }
-        p.close(0, &target_residual, 64).map_err(|e| Error::Arithmetic(e.to_string()))?;
-        let receipt = p.finish().map_err(|e| Error::Arithmetic(e.to_string()))?.launch()
+        p.close(0, &target_residual, 64)
             .map_err(|e| Error::Arithmetic(e.to_string()))?;
-        if !receipt.obstruction.is_empty() { return Err(Error::Arithmetic(format!("field target residual: {:?}", receipt.obstruction))); }
-        let residual = ResidentNormalEnclosureSection::from_resident(surface, target_residual, targets.rows(), width, self.output.grain()).map_err(|_| Error::Shape)?;
+        let receipt = p
+            .finish()
+            .map_err(|e| Error::Arithmetic(e.to_string()))?
+            .launch()
+            .map_err(|e| Error::Arithmetic(e.to_string()))?;
+        if !receipt.obstruction.is_empty() {
+            return Err(Error::Arithmetic(format!(
+                "field target residual: {:?}",
+                receipt.obstruction
+            )));
+        }
+        let residual = ResidentNormalEnclosureSection::from_resident(
+            surface,
+            target_residual,
+            targets.rows(),
+            width,
+            self.output.grain(),
+        )
+        .map_err(|_| Error::Shape)?;
         self.reflect_joint_section(&residual)
     }
 
@@ -79,29 +126,76 @@ impl<'a, 'c> NativeFieldReflectionSection<'a, 'c> {
         let d = source.boundary_components();
         let count = source.births.len();
         let width = d.checked_add(2 * count).ok_or(Error::Shape)?;
-        if inputs.rows() == 0 || inputs.components() != width || inputs.grain() != self.output.grain()
-            || !std::ptr::eq(inputs.resident_section().surface(), surface) { return Err(Error::Shape); }
-        let factor = self
-            .source
-            .reflection
-            .get()
-            .ok_or(Error::Uncertain)?;
-        let output = surface.fresh_section(inputs.rows(), 2 * (width + 1), ResidentGrain(0))?;
-        let work = surface.fresh_section(1, d.checked_mul(3).and_then(|v| v.checked_add(count)?.checked_add(d / 2)?.checked_mul(2)).ok_or(Error::Shape)?, ResidentGrain(0))?;
-        let dots = surface.fresh_section(count.max(1), 10, ResidentGrain(0))?;
-        let mut p = surface.begin_passage(&[vec![]]).map_err(|e| Error::Arithmetic(e.to_string()))?;
+        if inputs.rows() == 0
+            || inputs.components() != width
+            || inputs.grain() != self.output.grain()
+            || !std::ptr::eq(inputs.resident_section().surface(), surface)
         {
-            let lane = p.open(0, &[]).map_err(|e| Error::Arithmetic(e.to_string()))?;
-            surface.record_field_source_reflection_joint_section(&lane, &source._producing.map, &source._producing.bounds,
-                factor, inputs.resident_section(), d, count, source.grain, &work, &dots, &output)
+            return Err(Error::Shape);
+        }
+        let factor = self.source.reflection.get().ok_or(Error::Uncertain)?;
+        let output = surface.fresh_section(inputs.rows(), 2 * (width + 1), ResidentGrain(0))?;
+        let flags = surface.fresh_section(inputs.rows(), SLOT_WORDS / 2, ResidentGrain(0))?;
+        let work = surface.fresh_section(
+            inputs.rows(),
+            d.checked_mul(3)
+                .and_then(|v| v.checked_add(count)?.checked_add(d / 2)?.checked_mul(2))
+                .ok_or(Error::Shape)?,
+            ResidentGrain(0),
+        )?;
+        let dots = surface.fresh_section(
+            inputs
+                .rows()
+                .checked_mul(count.max(1))
+                .ok_or(Error::Shape)?,
+            10,
+            ResidentGrain(0),
+        )?;
+        let mut p = surface
+            .begin_passage(&[vec![]])
+            .map_err(|e| Error::Arithmetic(e.to_string()))?;
+        {
+            let lane = p
+                .open(0, &[])
+                .map_err(|e| Error::Arithmetic(e.to_string()))?;
+            surface
+                .record_field_source_reflection_joint_section(
+                    &lane,
+                    &source._producing.map,
+                    &source._producing.bounds,
+                    factor,
+                    inputs.resident_section(),
+                    d,
+                    count,
+                    source.grain,
+                    &work,
+                    &dots,
+                    &output,
+                    &flags,
+                )
                 .map_err(|e| Error::Arithmetic(e.to_string()))?;
         }
-        p.close(0, &output, 64).map_err(|e| Error::Arithmetic(e.to_string()))?;
-        let receipt = p.finish().map_err(|e| Error::Arithmetic(e.to_string()))?.launch()
+        p.close(0, &output, 64)
             .map_err(|e| Error::Arithmetic(e.to_string()))?;
-        if !receipt.obstruction.is_empty() { return Err(Error::Arithmetic(format!("fixed-D joint reflection: {:?}", receipt.obstruction))); }
-        ResidentNormalEnclosureSection::from_resident(surface, output, inputs.rows(), width, inputs.grain())
-            .map_err(|_| Error::Shape)
+        let receipt = p
+            .finish()
+            .map_err(|e| Error::Arithmetic(e.to_string()))?
+            .launch()
+            .map_err(|e| Error::Arithmetic(e.to_string()))?;
+        if !receipt.obstruction.is_empty() {
+            return Err(Error::Arithmetic(format!(
+                "fixed-D joint reflection: {:?}",
+                receipt.obstruction
+            )));
+        }
+        ResidentNormalEnclosureSection::from_resident(
+            surface,
+            output,
+            inputs.rows(),
+            width,
+            inputs.grain(),
+        )
+        .map_err(|_| Error::Shape)
     }
 }
 
@@ -279,6 +373,9 @@ impl<'c> NativeFieldCurrentSource<'c> {
             2 * (out_width + 1),
             ResidentGrain(0),
         )?;
+        let flags =
+            self.surface
+                .fresh_section(boundary_rows.rows(), SLOT_WORDS / 2, ResidentGrain(0))?;
         let joint_input = self.surface.fresh_section(
             boundary_rows.rows(),
             2 * (out_width + 1),
@@ -288,15 +385,20 @@ impl<'c> NativeFieldCurrentSource<'c> {
             .surface
             .fresh_section(boundary_rows.rows(), 18 * d, ResidentGrain(0))?;
         let work = self.surface.fresh_section(
-            1,
+            boundary_rows.rows(),
             d.checked_mul(3)
                 .and_then(|v| v.checked_add(count)?.checked_add(d / 2)?.checked_mul(2))
                 .ok_or(Error::Shape)?,
             ResidentGrain(0),
         )?;
-        let dots =
-            self.surface
-                .fresh_section(count.max(1), 10, ResidentGrain(0))?;
+        let dots = self.surface.fresh_section(
+            boundary_rows
+                .rows()
+                .checked_mul(count.max(1))
+                .ok_or(Error::Shape)?,
+            10,
+            ResidentGrain(0),
+        )?;
         let mut p = self.surface.begin_passage(&[vec![]])?;
         {
             let lane = p.open(0, &[])?;
@@ -314,6 +416,7 @@ impl<'c> NativeFieldCurrentSource<'c> {
                 &trace,
                 &joint_input,
                 &output,
+                &flags,
             )?;
         }
         p.close(0, &output, 64)?;

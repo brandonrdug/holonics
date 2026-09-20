@@ -1,5 +1,7 @@
 use super::*;
+use crate::resident_section::SLOT_WORDS;
 use std::rc::Rc;
+mod composition;
 
 /// One resident enclosure per source row, produced by one applied normal-material passage.
 /// The complete section remains on the resident surface; row views borrow its packet and do not
@@ -105,10 +107,7 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
         })
     }
 
-    pub fn sum_same_shape(
-        &self,
-        other: &Self,
-    ) -> Result<Self, ConstitutiveFibreError> {
+    pub fn sum_same_shape(&self, other: &Self) -> Result<Self, ConstitutiveFibreError> {
         if self.rows != other.rows
             || self.width != other.width
             || self.grain != other.grain
@@ -121,7 +120,9 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
             .checked_add(1)
             .and_then(|n| n.checked_mul(2))
             .ok_or(ConstitutiveFibreError::Shape)?;
-        let output = self.surface.fresh_section(self.rows, stride, ResidentGrain(0))?;
+        let output = self
+            .surface
+            .fresh_section(self.rows, stride, ResidentGrain(0))?;
         let mut pass = self.surface.begin_passage(&[vec![]])?;
         {
             let lane = pass.open(0, &[])?;
@@ -152,11 +153,7 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
             .end
             .checked_sub(range.start)
             .ok_or(ConstitutiveFibreError::Shape)?;
-        if count == 0
-            || count % 2 != 0
-            || range.start % 2 != 0
-            || range.end > self.width
-        {
+        if count == 0 || count % 2 != 0 || range.start % 2 != 0 || range.end > self.width {
             return Err(ConstitutiveFibreError::Shape);
         }
         let output = self.surface.fresh_section(
@@ -303,7 +300,10 @@ impl<'c> ResidentNormalMaterialView<'c> {
         &self,
         source: ResidentConstitutiveSection<'a, 'c>,
     ) -> Result<ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
-        let source_complex = self.source_chart.complex_sources().ok_or(ConstitutiveFibreError::Shape)?;
+        let source_complex = self
+            .source_chart
+            .complex_sources()
+            .ok_or(ConstitutiveFibreError::Shape)?;
         let expected = source_complex
             .checked_mul(2)
             .ok_or(ConstitutiveFibreError::Shape)?;
@@ -475,7 +475,11 @@ impl<'c> ResidentNormalMaterialView<'c> {
                 })
             || source.grain() != self.grain
             || !std::ptr::eq(source.surface, self.surface)
-            || (identity && d != self.targets.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?)
+            || (identity
+                && d != self
+                    .targets
+                    .checked_mul(2)
+                    .ok_or(ConstitutiveFibreError::Shape)?)
         {
             return Err(ConstitutiveFibreError::Shape);
         }
@@ -494,6 +498,9 @@ impl<'c> ResidentNormalMaterialView<'c> {
                 .ok_or(ConstitutiveFibreError::Shape)?,
             ResidentGrain(0),
         )?;
+        let flags = self
+            .surface
+            .fresh_section(rows, SLOT_WORDS / 2, ResidentGrain(0))?;
         let mut pass = self.surface.begin_passage(&[vec![]])?;
         {
             let lane = pass.open(0, &[])?;
@@ -511,6 +518,7 @@ impl<'c> ResidentNormalMaterialView<'c> {
                 identity,
                 self.grain.0,
                 &output,
+                &flags,
             )?;
         }
         pass.close(0, &output, 64)?;

@@ -71,18 +71,22 @@ Newman boundaries already have source owners in the
 
 | Source relation | Library or formal owner | Native/application connection |
 |---|---|---|
-| Toroidal domains, shared cells and phase connection | `analytic_field`, graded/simplicial and connection owners; `HolonicTorusKnots`; [intrinsic field](../research/experiments/intrinsic_holonic_flow/README.md) | The field-session join must carry the chosen domain/incidence and phase-sensitive transport through its actual section layout. Generic numerical storage neither proves nor prevents this binding. |
-| Helical pair and contact variation | `relational_geometry::screw`; `Geometry/ScrewGeometry`; `identity_atlas::screw_gram_point` | Exact local generator/receiver construction and moment specialization; its continuing reuse attaches through the existing moment/phase owners. |
-| Normalized receiver and both input covectors | `field/receiver/normalized`, `normal/direct/section`, `resident/section/bilinear_features` | Section-valued native outputs, pullback, condition covector and re-entry are available ports. The public shared-session caller determines which are actually composed. |
+| Toroidal domains, shared cells and phase connection | `analytic_field`, graded/simplicial and connection owners; `HolonicTorusKnots`; [intrinsic field](../research/experiments/intrinsic_holonic_flow/README.md) | `GeometricFieldSpec` validates existing analytic junctions/arcs and compiles their phase transport. `field_session/geometric.rs` executes that incidence through the public body. The supplied linked-torus boundary network has a narrower domain than the intrinsic volume/advection reference. |
+| Helical pair and contact variation | `relational_geometry::screw`; `Geometry/ScrewGeometry`; `identity_atlas::screw_gram_point` | `HelicalMomentReuse` binds situated finite pair actions and quadrance to the existing observable-moment compression. Lifted phase closure preserves extra turns; an ambient moment fibre retains its physical-configuration restrictions. |
+| Normalized receiver and both input covectors | `field/receiver/normalized/phase.rs`, `normal/direct/section/composition.rs`, `resident/section/bilinear_features` | The geometric word calls the existing normalized receiver and pullback, both bilinear covectors, M transpose and fixed-D reflection. It returns through every refinement stage before one staged material update. |
 | Constitutive current and storage | `NativeConstitutiveField`, paired junction/source/reflection and normal material | `NativeCoupledBody` owns the operation; fixed-D scattering and its adjoint are existing mechanics. A friction/heat claim additionally supplies that material law. |
-| Source, generation, observed comparison and continuation | `holonics-hna/src/native/field_session.rs`, `shared.rs`, `alpha/exposure.rs` | Public session and exposure driver, saved comparisons/cursor and codecs. Input provenance remains at the exterior boundary. |
+| Source, generation, observed comparison and continuation | `holonics-hna/src/native/field_session.rs`, `shared.rs`, `geometric.rs`, `alpha/exposure.rs` | Public session and exposure driver, saved comparisons/cursor and codecs. Recorded context is recovered from the verified prior source prefix across restart. Input provenance remains at the exterior boundary. |
 | Reuse at future receivers | `ObservableMomentReceiverHistoryCompression`, `ReceiverHistoryCompression`, `internal_mode`, `recurrent_condensation` | Bind a particular field/word/receiver to its encoder, decoder and induced operation; inspect the actual call rather than infer binding from the owner's existence. |
 | Physical placement | `hardware_cover`, `section_partition`, mount `section_layout` and `launch_law`; native packet kernels | Read footprints and boundary dependencies determine independent work; checked layout and launch enact it. |
 
-[definition] The native carrier already transports complex sections, source conditions, material
-and interior current. The current field-session construction must bind those capabilities to the
-chosen geometric incidence, phase comparison and repeated refinement. Search its declarations
-and calls: absence of the words “torus” or “helix” in a filename is not a representation theorem.
+[established-bounded; source-inspected] The geometric session now binds complex sections,
+analytic incidence and phase comparison to a finite held-boundary refinement word. Geometry,
+β, the refinement extent, D and the exterior symbol chart are supplied; M develops through the
+whole word's paired return. This preview does not yet commit a continuing global phase field,
+learn the receiving geometry or compress the nonlinear word. The
+[implemented equation](HNN_FORMULA.md#the-geometric-session-word) and
+[campaign record](../research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md)
+retain those exact boundaries.
 The [field-session source map](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#field-session-source-map)
 and [current position](../CONSTRUCTION_STATE.md) state the unclosed consuming operations.
 

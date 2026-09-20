@@ -117,7 +117,7 @@ impl<'chart> ResidentSurface<'chart> {
         observation: Option<&ResidentSection<'chart>>, rows: usize, nodes: usize,
         group_width: usize, grain: u32, terms: SeriesAperture, packet_face: bool,
         report: &ResidentSection<'chart>, participation: &ResidentSection<'chart>,
-        difference: &ResidentSection<'chart>, potential: &ResidentSection<'chart>,
+        difference: &ResidentSection<'chart>, potential: &ResidentSection<'chart>, flags: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
         let fail = || ResidentRefusal::Declaration {
             operation: "rows-normalized-receiver",
@@ -145,9 +145,10 @@ impl<'chart> ResidentSurface<'chart> {
             || !ball(participation)
             || !ball(difference)
             || !ball(potential)
+            || flags.rows != rows || flags.width != SLOT_WORDS / 2
             || report.rows != rows
             || report.width != report_words
-            || [prediction, compared, report, participation, difference, potential]
+            || [prediction, compared, report, participation, difference, potential, flags]
                 .iter()
                 .any(|s| s.grain.0 != 0 || !std::ptr::eq(s.surface, self))
         {
@@ -164,6 +165,7 @@ impl<'chart> ResidentSurface<'chart> {
             .ptr(participation.lo.device_ptr()).ptr(participation.hi.device_ptr())
             .ptr(difference.lo.device_ptr()).ptr(difference.hi.device_ptr())
             .ptr(potential.lo.device_ptr()).ptr(potential.hi.device_ptr())
+            .ptr(flags.lo.device_ptr())
             .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
         self.record_blocks(lane, "section_rows_normalized_receiver", rows,
             self.declaration.warp_size.max(1), 0, &mut params, "rows-normalized-receiver")
@@ -175,7 +177,7 @@ impl<'chart> ResidentSurface<'chart> {
     pub(crate) fn record_rows_normalized_pullback(
         &self, lane: &Lane<'_, 'chart>, face: &ResidentSection<'chart>,
         covector: &ResidentSection<'chart>, rows: usize, nodes: usize, group_width: usize,
-        grain: u32, report: &ResidentSection<'chart>, potential: &ResidentSection<'chart>,
+        grain: u32, report: &ResidentSection<'chart>, potential: &ResidentSection<'chart>, flags: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
         let fail = || ResidentRefusal::Declaration {
             operation: "rows-normalized-pullback",
@@ -202,7 +204,8 @@ impl<'chart> ResidentSurface<'chart> {
             || covector.width != ball_words
             || potential.rows != rows
             || potential.width != ball_words
-            || [face, covector, report, potential]
+            || flags.rows != rows || flags.width != SLOT_WORDS / 2
+            || [face, covector, report, potential, flags]
                 .iter()
                 .any(|s| s.grain.0 != 0 || !std::ptr::eq(s.surface, self))
         {
@@ -215,6 +218,7 @@ impl<'chart> ResidentSurface<'chart> {
             .ptr(covector.lo.device_ptr()).ptr(covector.hi.device_ptr())
             .ptr(report.lo.device_ptr()).ptr(report.hi.device_ptr())
             .ptr(potential.lo.device_ptr()).ptr(potential.hi.device_ptr())
+            .ptr(flags.lo.device_ptr())
             .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
         self.record_blocks(lane, "section_rows_normalized_pullback", rows,
             self.declaration.warp_size.max(1), 0, &mut params, "rows-normalized-pullback")

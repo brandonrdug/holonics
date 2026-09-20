@@ -83,9 +83,9 @@ extern "C" __global__ void section_normal_applied_condition_rows(
  const int64_t *condition,const int64_t *condition_hi,uint32_t condition_stride,
  uint32_t condition_enclosed,uint32_t condition_rational,
  uint32_t rows,uint32_t d,uint32_t k,uint32_t targets,uint32_t identity,uint32_t grain,
- int64_t *out,int64_t *out_hi,
- uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
- if(blockIdx.x||threadIdx.x||upstream_refused(census,lineage,lineage_count,slot))return;
+ int64_t *out,int64_t *out_hi,int64_t *flags,
+ uint32_t *global_slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+ if(threadIdx.x)return;uint32_t row=blockIdx.x;if(row>=rows)return;uint32_t *status=(uint32_t *)(flags+(SLOT_WORDS/2u)*(size_t)row);uint32_t *slot=status;for(uint32_t i=0;i<SLOT_WORDS;++i)status[i]=0;if(upstream_refused(census,lineage,lineage_count,status))return; (void)global_slot;
  if(!rows||!d||!k||(d&1u)||(k&1u)||!targets||grain<1||grain>120||identity>1||condition_enclosed>1
     ||(identity&&d!=2u*targets)){atomicOr(slot,REFUSED_MALFORMED);return;}
  const uint32_t width=identity?d:2u*targets;
@@ -94,10 +94,10 @@ extern "C" __global__ void section_normal_applied_condition_rows(
  if(*slot)return;
  const wide *M=(const wide *)state;
  const wide S=(wide)1<<grain;
- const size_t source_row=2u*((size_t)d+1u),out_row=2u*((size_t)width+1u);
+ const size_t source_row=2u*((size_t)d+1u),out_row=2u*((size_t)width+1u);const size_t source_at=(size_t)row*source_stride,condition_at=(size_t)row*condition_stride,out_at=(size_t)row*out_row;
  extern __shared__ wide applied_condition_scratch[];
- for(uint32_t row=0;row<rows;++row){
-  const size_t sa=(size_t)row*source_stride,ca=(size_t)row*condition_stride;
+ {
+  const size_t sa=source_at,ca=condition_at;
   for(size_t j=0;j<source_row;++j)if(source[sa+j]!=source_hi[sa+j]){atomicOr(slot,REFUSED_MALFORMED);return;}
   const wide *x=(const wide *)(source+sa);
   if(x[d]<0){atomicOr(slot,REFUSED_MALFORMED);return;}
@@ -120,7 +120,7 @@ extern "C" __global__ void section_normal_applied_condition_rows(
   }
   if(den<=0){atomicOr(slot,REFUSED_MALFORMED);return;}
   const wide *h=applied_condition_scratch;
-  wide *y=(wide *)(out+(size_t)row*out_row);
+  wide *y=(wide *)(out+out_at);
   MomentInteger denominator=normal_wide(S)*normal_wide(den);
   MomentInteger gain,square,condition_gain,condition_square,mixed_gain,mixed_square;
   wide rounding=0;
@@ -203,7 +203,7 @@ extern "C" __global__ void section_normal_applied_condition_rows(
    }
   }
   y[width]=radius;
-  if(*slot)return;
+  if(*status)return;
  }
- for(size_t j=0;j<out_row*rows;++j)out_hi[j]=out[j];
+ for(size_t j=0;j<out_row;++j)out_hi[out_at+j]=out[out_at+j];
 }

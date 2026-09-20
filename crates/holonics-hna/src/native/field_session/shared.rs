@@ -282,6 +282,7 @@ impl<'c> NativeFieldSession<'c> {
         text: &str,
         step_bits: u32,
     ) -> Result<Value> {
+        if self.spec.source_chart == FieldSourceChart::GeometricRegions { return self.observe_geometric_source(request,text,step_bits,true); }
         if self.spec.source_chart != FieldSourceChart::SharedRegions {
             return Err(invalid("observe-field-source requires shared-regions"));
         }
@@ -386,6 +387,7 @@ mod tests {
             context_symbols: 4096,
             region_offsets: vec![-1, 0, 1],
             source_chart: FieldSourceChart::SharedRegions,
+            geometry: None,
             codec: FieldTextCodec::Utf8Nibbles,
             fractional_bits: 48,
         }

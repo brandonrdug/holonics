@@ -15,6 +15,7 @@ holonic-structure = { workspace = true }
 # the one census `crates/holonic-mount` owns rather than declaring a second `#[link(name = "cuda")]` regime.
 mount = { path = "../holonic-mount" }
 num-bigint = { workspace = true }
+num-integer = "0.1.46"
 num-rational = { workspace = true }
 num-traits = { workspace = true }
 relational-geometry = { workspace = true }

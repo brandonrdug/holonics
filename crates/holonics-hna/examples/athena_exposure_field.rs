@@ -6,12 +6,12 @@
 //! a frame is acknowledged only after its native use, and the cursor is attached to the same
 //! atomic checkpoint file as the model.
 //!
-//! This driver prints counts, declared refusal labels and timings only. It never prints, logs
-//! or persists message text, and it never echoes a native refusal string, because a refusal can
-//! quote source material. Refusal reasons are this driver's own fixed vocabulary.
+//! Public reports contain counts, declared refusal labels and timings. A caller may explicitly
+//! request a new private diagnostic file for a native failure; that file can quote source
+//! material and is created with owner-only permissions. Reports never include its contents.
 use holonics_hna::{
     HnaStreamState,
-    alpha::exposure::{ExposureFamily, ExposureOccurrence, ExposureReader},
+    alpha::exposure::{ExposureError, ExposureFamily, ExposureOccurrence, ExposureReader},
     native::{
         ExposureAperture, FieldSectionRequest, FieldSessionSpec, FieldSourceChart, FieldTextCodec,
         NativeFieldSavedSession, NativeFieldSession, with_field_session,
@@ -20,7 +20,6 @@ use holonics_hna::{
 use serde_json::{Value, json};
 use std::{
     collections::BTreeMap,
-    collections::VecDeque,
     fs::File,
     io::Write,
     path::{Path, PathBuf},
@@ -55,6 +54,7 @@ struct Options {
     aperture: ExposureAperture,
     step_bits: u32,
     report: Option<PathBuf>,
+    private_diagnostic: Option<PathBuf>,
 }
 
 fn options() -> Result<Options, String> {
@@ -69,6 +69,7 @@ fn options() -> Result<Options, String> {
     let mut context_bytes = 0;
     let mut step_bits = 1;
     let mut report = None;
+    let mut private_diagnostic = None;
     let value = |args: &mut dyn Iterator<Item = String>, name: &str| {
         args.next().ok_or_else(|| format!("missing {name}"))
     };
@@ -110,6 +111,10 @@ fn options() -> Result<Options, String> {
                     .map_err(|e| e.to_string())?
             }
             "--report" => report = Some(PathBuf::from(value(&mut args, "report path")?)),
+            "--private-diagnostic" => {
+                private_diagnostic =
+                    Some(PathBuf::from(value(&mut args, "private diagnostic path")?))
+            }
             _ => return Err(format!("unknown option {arg}")),
         }
     }
@@ -132,7 +137,22 @@ fn options() -> Result<Options, String> {
         },
         step_bits,
         report,
+        private_diagnostic,
     })
+}
+
+fn private_failure(options: &Options, error: &impl std::fmt::Display) -> std::io::Result<()> {
+    let Some(path) = &options.private_diagnostic else {
+        return Ok(());
+    };
+    let mut create = std::fs::OpenOptions::new();
+    create.write(true).create_new(true);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        create.mode(0o600);
+    }
+    writeln!(create.open(path)?, "{error}")
 }
 
 /// The held request text and its recorded response share one section: the response prefix is
@@ -195,64 +215,6 @@ struct Pending {
     response_symbols: usize,
 }
 
-/// The cache is an exterior memory boundary derived from the caller's declared context aperture.
-/// A zero aperture deliberately retains no context; it does not turn a request-only walk into a
-/// missing-context refusal.
-fn cache_exposure(
-    history: &mut VecDeque<(ExposureOccurrence, usize)>,
-    event: ExposureOccurrence,
-    max_octets: usize,
-) {
-    if max_octets == 0 {
-        return;
-    }
-    let octets = serde_json::to_vec(&event).map_or(usize::MAX, |bytes| bytes.len());
-    if max_octets == 0 || octets > max_octets {
-        return;
-    }
-    history.push_back((event, octets));
-    let mut total = history
-        .iter()
-        .fold(0usize, |n, (_, size)| n.saturating_add(*size));
-    while total > max_octets {
-        if let Some((_, size)) = history.pop_front() {
-            total = total.saturating_sub(size);
-        } else {
-            break;
-        }
-    }
-}
-
-fn recorded_context<'a>(
-    history: &'a VecDeque<(ExposureOccurrence, usize)>,
-    request: &ExposureOccurrence,
-    context_bytes: usize,
-) -> Result<Vec<&'a ExposureOccurrence>, &'static str> {
-    if context_bytes == 0 {
-        return Ok(Vec::new());
-    }
-    let mut chain = Vec::new();
-    let mut next_family = request
-        .shared_prior_parent()
-        .map_err(|_| "context-unavailable")?;
-    let mut next_sequence = request.sequence;
-    while let Some(family) = next_family {
-        let Some(parent) = history.iter().rev().find(|(candidate, _)| {
-            candidate.sequence < next_sequence && candidate.family == family
-        }) else {
-            return Err("context-unavailable");
-        };
-        next_sequence = parent.0.sequence;
-        next_family = parent
-            .0
-            .shared_prior_parent()
-            .map_err(|_| "context-unavailable")?;
-        chain.push(&parent.0);
-    }
-    chain.reverse();
-    Ok(chain)
-}
-
 struct Walk {
     counts: BTreeMap<&'static str, u64>,
     generation_us: Vec<u128>,
@@ -262,6 +224,10 @@ struct Walk {
     held_symbols: u64,
     released_on_open: usize,
     retained_on_open: usize,
+    context_index_entries: u64,
+    context_index_scan_octets: u64,
+    context_lookup_frames: u64,
+    context_lookup_octets: u64,
 }
 
 impl Walk {
@@ -302,7 +268,6 @@ fn walk(
         })
         .collect();
     session.attach_exposure_cursor(reader.cursor());
-    let mut history: VecDeque<(ExposureOccurrence, usize)> = VecDeque::new();
     while state.frames < options.frames {
         let Some(frame) = reader.peek()? else { break };
         let frame = frame.clone();
@@ -350,10 +315,14 @@ fn walk(
                                 reader.acknowledge(frame.sequence)?;
                                 state.acknowledged += 1;
                                 session.attach_exposure_cursor(reader.cursor());
-                                cache_exposure(&mut history, frame, options.aperture.context_bytes);
                                 continue;
                             }
-                            Err(_) => {
+                            Err(error) => {
+                                if private_failure(options, &error).is_err() {
+                                    eprintln!(
+                                        "private diagnostic write failed; source remains retryable"
+                                    );
+                                }
                                 state.count("native-observation-refused");
                                 break;
                             }
@@ -377,22 +346,37 @@ fn walk(
             reader.acknowledge(frame.sequence)?;
             state.acknowledged += 1;
             session.attach_exposure_cursor(reader.cursor());
-            cache_exposure(&mut history, frame, options.aperture.context_bytes);
             continue;
         }
         // A held request position takes development-partition, human-authored material only.
         // Every other admission gate lives in the bridge; this counts what it refuses.
-        let context = match recorded_context(&history, &frame, options.aperture.context_bytes) {
+        // Build the source index only for an actually admissible request candidate. Response,
+        // evaluation and role-refused frames remain explicit bridge outcomes without paying a
+        // context lookup that cannot be consumed.
+        let context_owned = match (
+            frame.development_parts().is_ok(),
+            frame
+                .shared_author_class()
+                .is_ok_and(|role| role == "human"),
+        ) {
+            (true, true) => reader.recorded_context(&frame, options.aperture.context_bytes),
+            _ => Ok(Vec::new()),
+        };
+        let context_owned = match context_owned {
             Ok(context) => context,
-            Err(label) => {
-                state.count(label);
+            Err(ExposureError::Open(_)) => {
+                state.count("context-unavailable");
                 reader.acknowledge(frame.sequence)?;
                 state.acknowledged += 1;
                 session.attach_exposure_cursor(reader.cursor());
-                cache_exposure(&mut history, frame, options.aperture.context_bytes);
                 continue;
             }
+            Err(_) => {
+                state.count("context-unavailable");
+                break;
+            }
         };
+        let context = context_owned.iter().collect::<Vec<_>>();
         let bridged = FieldSectionRequest::from_exposures(
             &spec,
             &options.aperture,
@@ -432,7 +416,6 @@ fn walk(
                 reader.acknowledge(frame.sequence)?;
                 state.acknowledged += 1;
                 session.attach_exposure_cursor(reader.cursor());
-                cache_exposure(&mut history, frame, options.aperture.context_bytes);
                 continue;
             }
         };
@@ -482,7 +465,10 @@ fn walk(
                     });
                 }
             }
-            Err(_) => {
+            Err(error) => {
+                if private_failure(options, &error).is_err() {
+                    eprintln!("private diagnostic write failed; source remains retryable");
+                }
                 state.count("native-request-refused");
                 break;
             }
@@ -491,8 +477,12 @@ fn walk(
         reader.acknowledge(frame.sequence)?;
         state.acknowledged += 1;
         session.attach_exposure_cursor(reader.cursor());
-        cache_exposure(&mut history, frame, options.aperture.context_bytes);
     }
+    let context_stats = reader.context_stats();
+    state.context_index_entries = context_stats.index_entries;
+    state.context_index_scan_octets = context_stats.index_scan_octets;
+    state.context_lookup_frames = context_stats.lookup_frames;
+    state.context_lookup_octets = context_stats.lookup_octets;
     // Outstanding retained comparisons remain in the session rest and are retried by a later
     // process; dropping them would detach the source cursor from its producing cut.
     Ok(())
@@ -505,6 +495,13 @@ fn report(options: &Options, state: &mut Walk, wall: u128, anatomy: Value) -> Va
         "frames_declared":options.frames,"frames_peeked":state.frames,"frames_acknowledged":state.acknowledged,
         "aperture":options.aperture,"step_bits":options.step_bits,
         "context_cache_budget_bytes":options.aperture.context_bytes,
+        "context_source_lookup":{
+            "index_entries":state.context_index_entries,
+            "index_scan_octets":state.context_index_scan_octets,
+            "lookup_frames":state.context_lookup_frames,
+            "lookup_octets":state.context_lookup_octets,
+            "index":"lazy metadata scan of the verified exposure wire; no native event history",
+        },
         "held_request_symbols":state.held_symbols,
         "retained_released_at_open":state.released_on_open,
         "retained_pending_at_open":state.retained_on_open,
@@ -529,7 +526,10 @@ fn publish(options: &Options, value: &Value) -> Result<(), Box<dyn std::error::E
 
 fn spec_of(path: &Path) -> Result<FieldSessionSpec, Box<dyn std::error::Error>> {
     let spec: FieldSessionSpec = serde_json::from_reader(File::open(path)?)?;
-    if spec.source_chart != FieldSourceChart::SharedRegions {
+    if !matches!(
+        spec.source_chart,
+        FieldSourceChart::SharedRegions | FieldSourceChart::GeometricRegions
+    ) {
         return Err(
             "this driver's held/free aperture requires the shared-regions source chart".into(),
         );
@@ -548,6 +548,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         held_symbols: 0,
         released_on_open: 0,
         retained_on_open: 0,
+        context_index_entries: 0,
+        context_index_scan_octets: 0,
+        context_lookup_frames: 0,
+        context_lookup_octets: 0,
     };
     let start = Instant::now();
     let anatomy = match (&options.resume, &options.exposure, &options.spec) {
@@ -623,6 +627,7 @@ mod tests {
             context_symbols: 0,
             region_offsets: vec![0],
             source_chart: FieldSourceChart::SharedRegions,
+            geometry: None,
             codec: FieldTextCodec::UnicodeScalars,
             fractional_bits: 1,
         };
@@ -694,6 +699,7 @@ mod tests {
             context_symbols: 0,
             region_offsets: vec![0],
             source_chart: FieldSourceChart::SharedRegions,
+            geometry: None,
             codec: FieldTextCodec::UnicodeScalars,
             fractional_bits: 48,
         }
@@ -712,6 +718,7 @@ mod tests {
             },
             step_bits: 1,
             report: None,
+            private_diagnostic: None,
         }
     }
     fn counters() -> Walk {
@@ -724,6 +731,10 @@ mod tests {
             held_symbols: 0,
             released_on_open: 0,
             retained_on_open: 0,
+            context_index_entries: 0,
+            context_index_scan_octets: 0,
+            context_lookup_frames: 0,
+            context_lookup_octets: 0,
         }
     }
     fn app_error(error: Box<dyn std::error::Error>) -> holonics_hna::native::NativeSessionError {
@@ -731,7 +742,7 @@ mod tests {
     }
 
     #[test]
-    fn context_aperture_is_explicit_and_missing_parents_are_not_silently_filled() {
+    fn context_aperture_is_explicit_and_reopened_lookup_uses_the_pinned_source() {
         let mut request: ExposureOccurrence =
             serde_json::from_value(fixture_frame(2, "child", "human", "a")).unwrap();
         let mut parent = fixture_frame(0, "request", "human", "b");
@@ -739,23 +750,39 @@ mod tests {
         request.views[0].links =
             serde_json::from_value(parent["views"][0]["links"].clone()).unwrap();
         request.views[0].links[0].kind = "provider-parent".into();
-        assert!(
-            recorded_context(&VecDeque::new(), &request, 0)
-                .unwrap()
-                .is_empty()
+        // The child's prior link targets this parent; the parent has no link to itself.
+        parent["views"][0]["links"] = json!([]);
+        let dir = tempfile::tempdir().unwrap();
+        let source = dir.path().join("exposure.jsonl");
+        let mut wire_parent = serde_json::to_value(&parent).unwrap();
+        wire_parent["family"]["record_group"] = json!("declared:request");
+        let mut wire_request = serde_json::to_value(&request).unwrap();
+        wire_request["family"]["record_group"] = json!("declared:child");
+        stream(
+            &source,
+            &[
+                wire_parent,
+                fixture_frame(1, "intervening", "human", "x"),
+                wire_request,
+            ],
         );
-        assert_eq!(
-            recorded_context(&VecDeque::new(), &request, 4096).unwrap_err(),
-            "context-unavailable"
-        );
-        let parent: ExposureOccurrence =
-            serde_json::from_value(fixture_frame(0, "request", "human", "b")).unwrap();
-        let size = serde_json::to_vec(&parent).unwrap().len();
-        let mut cache = VecDeque::new();
-        cache_exposure(&mut cache, parent.clone(), size - 1);
-        assert!(cache.is_empty());
-        cache_exposure(&mut cache, parent, size);
-        assert_eq!(recorded_context(&cache, &request, size).unwrap().len(), 1);
+        let mut reader = ExposureReader::open(&source).unwrap();
+        assert!(reader.recorded_context(&request, 0).unwrap().is_empty());
+        reader.peek().unwrap();
+        reader.acknowledge(0).unwrap();
+        reader.peek().unwrap();
+        reader.acknowledge(1).unwrap();
+        let cursor = reader.cursor();
+        let restored = reader.peek().unwrap().unwrap().clone();
+        let context = reader.recorded_context(&restored, 4096).unwrap();
+        assert_eq!(context.len(), 1);
+        assert_eq!(context[0].family.record_group, "declared:request");
+        drop(reader);
+        let mut reopened = ExposureReader::resume(cursor).unwrap();
+        let restored = reopened.peek().unwrap().unwrap().clone();
+        let context = reopened.recorded_context(&restored, 4096).unwrap();
+        assert_eq!(context.len(), 1);
+        assert_eq!(reopened.context_stats().index_entries, 2);
     }
 
     #[test]
@@ -807,6 +834,8 @@ mod tests {
                 let mut options = fixture_options(&retry, 1);
                 options.aperture.response_symbols = 2; // applies only to new requests
                 options.step_bits = 121; // typed failure before the material commit
+                // A diagnostic I/O failure must not discard the retryable source/model cut.
+                options.private_diagnostic = Some(dir.path().to_owned());
                 let mut state = counters();
                 walk(session, &mut reader, &options, &mut state).map_err(app_error)?;
                 assert_eq!(state.counts.get("native-observation-refused"), Some(&1));

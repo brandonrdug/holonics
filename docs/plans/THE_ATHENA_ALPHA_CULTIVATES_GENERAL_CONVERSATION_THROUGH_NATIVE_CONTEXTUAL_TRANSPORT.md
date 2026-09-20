@@ -913,8 +913,8 @@ questions; a new endpoint campaign is not the critical path to HNN outputs.
 
 ### Field-session source map
 
-[established-bounded; source-inspected] This map incorporates the Wave 11 ports at `76234843`
-and the September 20 audit repairs. **K** is `crates/holonic-engine/kernels/`. The
+[established-bounded; source-inspected] This map incorporates the Wave 11 ports at `76234843`,
+the September 20 audit, and the [geometric campaign](../../research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md). **K** is `crates/holonic-engine/kernels/`. The
 [owner-network record](../../research/records/2026-09-20_THE_FIELD_SESSION_JOIN_HAS_ITS_OWNER_NETWORK_AND_NAMED_ABSENCES.md)
 retains the pre-port search and equations; the
 [Wave 11 record](../../research/records/2026-09-20_WAVE_ELEVEN_RETURNS_THE_SECTION_PORTS_AND_ITS_BASELINE_SHOWS_A_TEXT_WINDOW_ON_ONE_LANE.md)
@@ -922,14 +922,14 @@ retains its original execution. Current position is in the state, order in the r
 
 | Operation at the consuming call | Available owner / return | Remaining composition |
 |---|---|---|
-| Participation `a_FG[Ψ]` (#17) | `C/field/receiver/normalized/section.rs` supplies row-sectioned participation, comparison and pullback (#57); exact `exponentiated_ratio::transport::NormalizedKernel` | Form the actual phase/current comparison on admitted incidence and supply its content-valued condition to the public shared-field caller |
-| `δa·UΨ`, return to the condition (#17) | `C/resident/section/bilinear_features.rs::pull_back`; `K/section_bilinear_adjoint.cuh` returns both input covectors (#58); normalized section pullback and the [context cotangent](../../research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_HAS_A_CONTEXT_COTANGENT.md) | Compose both variation terms through the same forward carriers, phase/connection and constitutive response |
-| Source⊗condition and enclosure refinement (#17) | `C/field/material_transport/normal/direct/section.rs` enclosed section/pair applications and `reapply_bilinear_enclosed` (#58) | Replace the caller's fixed one-coordinate condition with the specified geometric participation and re-enter the complete returned field; compose the layer/iteration operation |
-| Section-scale change of D (#19) | Single-row operative reflection target/input cotangent and staged contact; `observe_rows` deliberately supplies fixed-D scattering | Derive and consume the multi-row D update, including its producing operands; it is distinct from the already available condition covector |
-| Exposure → request and recorded response (#16/#59) | `FieldSectionRequest::from_exposures`, declared `ExposureAperture`, `examples/athena_exposure_field.rs`, manifest/partition/role validation | Broader contextual source attachment and development/evaluation episodes through the geometric join, with receiver-correct target lengths |
-| Saved comparison and source cursor (#59) | Shared retained requests, `ExposureCursor` in session v3, and optional recorded-event pairing metadata; delayed pairs survive a checkpoint | Legacy comparisons without pairing metadata remain preserved but cannot be auto-associated. Shared-source observation uses current material; a producing-state gradient requires its own retained forward operands when that law is selected |
-| Normal statistics at the measured width (#18) | `NormalLayout::for_sources`, resident normal factor/solve; `factored_moment`, `derived_factor_cover`, `exact_linear/kernel_modes`, resident internal modes | Select and implement a factored `NormalSourceChart`/resident adapter at the join's actual measured width and coefficient growth |
-| Repeated refinement word (milestone 3) | `ObservableMomentReceiverHistoryCompression`, `compile_source_action`, `MathematicalRequest::Power` | Bind the actual field word and receiver to induced action/decoder; `append_operation` still re-evaluates the retained programme |
+| Participation `a_FG[Ψ]` (#17) | `A/field_geometry.rs` compiles validated analytic incidence/U; `C/field/receiver/normalized/phase.rs` consumes the existing normalized receiver for `s_j=β Re⟨q,U_j k_j⟩` | Broader source and participating-receiver formation through the same field; supplied U/geometry are explicit operands |
+| `δa·UΨ`, return to the condition (#17) | `A/coupled_wave/body/field/geometric.rs` retains query, transported neighbors, normalized report and reaction at each stage; both phase and bilinear covectors return through M* and fixed-D reflection | Changing geometry/U/D requires their additional variation; current fixed-operand derivative is implemented |
+| Source⊗condition and enclosure refinement (#17) | `C/field/material_transport/normal/direct/section/composition.rs`; `K/enclosure_composition.cuh`; `A/field_session/geometric.rs` | Finite whole-field held refinement is returned. A committed continuing global current and nonlinear word compression remain distinct work |
+| Section-scale change of D (#19) | Single-row operative reflection target/input cotangent and staged contact; both shared and geometric section observations supply fixed-D scattering | Derive and consume multi-row D/contact changes with their producing operands |
+| Exposure → request and recorded response (#16/#59) | `ExposureReader::recorded_context` indexes the verified prior prefix; `FieldSectionRequest::from_exposures`, `ExposureAperture`, `examples/athena_exposure_field.rs` | Grow episode/task breadth from actual generated consequences; support wider/partial source and receiving apertures without invented targets |
+| Saved comparison and source cursor (#59) | Shared/geometric retained requests, `ExposureCursor`, captured-event aliases and original response extent; context lookup rebuilds from the immutable source | Legacy comparisons without pairing metadata remain preserved but cannot be auto-associated. Observations use current material; a saved old-material gradient needs its own operands |
+| Normal statistics at the measured width (#18) | `NormalLayout::for_sources`, resident normal factor/solve; geometric nibble example has 75 complex features and 18 targets. Immutable native rest no longer repeats the child source-energy proof | Exact untrusted trained-rest validation remains CPU work; factor/locality adaptation responds to this measured cost and wider charts |
+| Repeated refinement word (milestone 3) | `HelicalMomentReuse` now binds situated finite pair actions to `ObservableMomentReceiverHistoryCompression`; `compile_source_action` and `MathematicalRequest::Power` remain available | The helical moment restriction is returned; a content-dependent HNN word still needs its induced action/decoder or retained nonlinear defect |
 
 [definition] Enclosure rows seal their encoded words while carrying a separate radius. The
 Wave 11 APIs propagate nonzero radii; `source == source_hi` validates the packet, not a zero
@@ -952,11 +952,11 @@ whose frame moves relative to the field. The repository's statement of it is
 
 | Part of the object | Existing realization | At the field session |
 |---|---|---|
-| Linked toroidal carrier, shared contact cells, material advection | [`intrinsic_holonic_flow`](../../research/experiments/intrinsic_holonic_flow/README.md): six linked tori, 240 multiply-owned cells, exact incompressible flow; `simplicial`, `algebraic::GradedCausalComplex`, `analytic_field` torus charts, `HolonicTorusKnots.lean`, `traversible_chain::BandReading` | The current caller prepares symbol-basis rows from supplied text offsets. It does not yet bind this domain/connection law; the existing complex section carrier remains reusable |
-| Phase attention on admitted incidence | `s^h_ij=β_h cos(2π(q_i−q_j−φ_ij))`, `a^h=softmax(s^h)`, sigmoid reaction, complete `∂V` with inbound and outbound participation (same reference); `NormalizedKernel`; Wave 11's row-sectioned receiver and pullback | `prepare_shared` supplies a constant condition; the row-sectioned participation/pullback ports are available for the join |
-| Whole-field refinement | Symplectic split step `q'=q+κ sin 2πp`, `p'=p−∇V(q')`; resolvent `(I−λL²)x*=(1−λ)h` and its sensitivity in [`connected_holonic_field`](../../research/experiments/connected_holonic_field/README.md); `Holon.ofEvolution` | One reaction-plus-reflection pass |
+| Linked toroidal carrier, shared contact cells, material advection | [`intrinsic_holonic_flow`](../../research/experiments/intrinsic_holonic_flow/README.md): six linked tori, 240 multiply-owned cells, exact incompressible flow; `simplicial`, `algebraic::GradedCausalComplex`, `analytic_field` torus charts, `HolonicTorusKnots.lean`, `traversible_chain::BandReading` | `GeometricRegions` binds existing analytic longitude arcs and their shared junction to complex field rows. Full volume/advection/contact dynamics remain the intrinsic reference’s separate specialization |
+| Phase attention on admitted incidence | `s^h_ij=β_h cos(2π(q_i−q_j−φ_ij))`, `a^h=softmax(s^h)`, sigmoid reaction, complete `∂V` with inbound and outbound participation (same reference); `NormalizedKernel`; Wave 11's row-sectioned receiver and pullback | `geometric_word` computes amplitude/phase logits, calls the existing normalized receiver, and returns both participation and transported-current covectors. `SharedRegions` remains the fixed-condition legacy chart |
+| Whole-field refinement | Symplectic split step `q'=q+κ sin 2πp`, `p'=p−∇V(q')`; resolvent `(I−λL²)x*=(1−λ)h` and its sensitivity in [`connected_holonic_field`](../../research/experiments/connected_holonic_field/README.md); `Holon.ofEvolution` | A declared finite held relaxation of the whole analytic boundary network. Its complete paired return is implemented; symplectic/implicit variants retain their own laws |
 | Contact faces and exchange | Phase-sensitive dissipative contact with its energy identity; `contact_receiver_faces`, `ReceiverStressEnergy`, [active faces](../CONSTRAINT_MODES_AND_RECEIVER_FACES.md#the-overlap-has-stress-bearing-faces) | The D-reflection only |
-| Decoding by a participating receiver | Geometric decoder `A(x)=Σψ_iφ_i(x)` in the toroidal basis; [receiving Holon](../RECEIVER_HOLARCHY.md); first-arrival populations | Per-position unit-basis selection |
+| Decoding by a participating receiver | Geometric decoder `A(x)=Σψ_iφ_i(x)` in the toroidal basis; [receiving Holon](../RECEIVER_HOLARCHY.md); first-arrival populations | A supplied slot-to-junction receiver selects the emitted symbol basis. Its physical motion/material and learned encoding are not yet formed by this caller |
 
 [definition; agent-inferred] #17 composes currents on linked toroidal phase channels,
 geometrically admitted incidence and connection φ, phase-sensitive participation, whole-field
@@ -978,20 +978,21 @@ partition. #61 implements this realization inside the #17 join, from its actual 
 
 | Realization relation | Existing owner | Consuming obligation |
 |---|---|---|
-| Complete region partition and shared reads | `section_partition::{SectionRegion,SectionPartition,certify,CellReceipt::is_interchangeable,SharedRead}` | Construct and validate the selected geometric/source cut, boundary and staged outputs |
-| Independence licensing placement | `interchange::certify_footprints`; `hardware_cover::{CoverDecomposition::of,independence,work}` | Certify the operation including its retained effects, not just distinct row numbers |
-| Gather → shared operator → scatter | `holonic-mount::section_layout::SectionLayout::generate`; `Foundation/SectionLayout.lean`; `section_layout_adoption` | Extend the current scatter instance through source gather and the joined geometric operation |
-| Lawful launch | `holonic-mount::launch_law`; `Foundation/DeviceLaunchLaw.lean` | Map independent cells/features to the available cover and keep refinement/update dependencies explicit |
+| Complete region partition and shared reads | `section_partition::{SectionRegion,SectionPartition,certify,CellReceipt::is_interchangeable,SharedRead}` | `field_geometry/placement.rs` certifies forward/reverse staged rows and admitted source reads, with conservative reverse support and complete row receipts |
+| Independence licensing placement | `interchange::certify_footprints`; `hardware_cover::{CoverDecomposition::of,independence,work}` | Mounted device-only cover and immutable D/M ports gate the actual geometric word; normal fitting is one joined update |
+| Gather → shared operator → scatter | `holonic-mount::section_layout::SectionLayout::generate`; `Foundation/SectionLayout.lean`; `section_layout_adoption` | Phased gather/transpose and enclosed local features run resident. The logical row certificate and hand-written packet kernels share the compiled chart; a fully generated/fused schedule remains open |
+| Lawful launch | `holonic-mount::launch_law`; `Foundation/DeviceLaunchLaw.lean` | Row blocks use the mounted launch limits. Refinement stages and shared-material reduction remain ordered dependencies |
 | Cost at that cover | `receiver_current::ExactReceiverCurrentLaw`; `SectionPartition::SpeciesPressure` | Measure operation work, occupied/idle lanes, service rounds, transfer, memory and end-to-end time on the same source |
 
-[established-bounded; source-inspected] The applied-condition and bilinear-adjoint section
-kernels launch one block/one active thread and loop over rows; feature preparation also issues
-per-row launches. The normalized receiver instead launches one block per row with thread zero
-active. These paths are resident, but they do not yet provide a common partition-generated
-parallel realization. A blanket “the whole model occupies one lane” overstates this inspection.
+[established-bounded; source-inspected] Applied-condition and field-reflection sections now
+launch separate row blocks with row-owned work, complete lineage receipts and a final status
+union. The geometric bilinear/phase ports also place rows independently; the normalized owner
+retains its existing row blocks. Within-row arithmetic remains largely serial, and the normal
+factor/update remains a shared reduction. The current certificate describes logical staged
+rows and cover-derived placement, not observed lane occupancy or a fully generated schedule.
 
 [established-bounded; measured] The shared-chart baseline records median generation of 110 s
-and update of 196 s on its bounded source population. Those clocks measure the current entire
+and update of 196 s on its bounded source population. Those historical clocks measure that entire
 path; they do not isolate normal statistics, prove one cause of the cost, or measure the joined
 geometric model. Reuse the [same recorded inputs and baseline](../../research/experiments/athena_field/shared/README.md)
 when comparing a realization change.

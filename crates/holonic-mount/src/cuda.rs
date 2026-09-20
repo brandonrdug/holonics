@@ -79,6 +79,24 @@ fn check(code: i32, context: &'static str) -> Result<()> {
     }
 }
 
+/// Complete a synchronous host-to-device transfer before a consumer on an arbitrary
+/// nonblocking stream may read it. CUDA permits a pageable-source `cuMemcpyHtoD_v2` to return
+/// after staging the host bytes while the DMA continues; the legacy stream synchronization is
+/// the narrow completion edge for that transfer. Explicit async copies keep their caller-owned
+/// stream/event contract and do not use this helper.
+unsafe fn copy_h_to_d_sync(
+    destination: ffi::CUdeviceptr,
+    source: *const c_void,
+    bytes: usize,
+    context: &'static str,
+) -> Result<()> {
+    check(ffi::cuMemcpyHtoD_v2(destination, source, bytes), context)?;
+    check(
+        ffi::cuStreamSynchronize(core::ptr::null_mut()),
+        "cuStreamSynchronize(legacy host-to-device copy)",
+    )
+}
+
 /// Initialise the driver. Idempotent; call once before anything else.
 pub fn init() -> Result<()> {
     unsafe { check(ffi::cuInit(0), "cuInit") }
@@ -377,7 +395,6 @@ impl PinnedHost {
     pub fn as_mut_octets(&mut self) -> &mut [u8] {
         unsafe { core::slice::from_raw_parts_mut(self.pointer.cast::<u8>(), self.octets) }
     }
-
 }
 
 impl Drop for PinnedHost {
@@ -848,8 +865,7 @@ fn retry_allocation_measurement(mut attempt: impl FnMut() -> Result<usize>) -> R
                         ),
                     ));
                 }
-                ALLOCATION_CALIBRATION_RETRIES
-                    .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                ALLOCATION_CALIBRATION_RETRIES.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
                 continue;
             }
             Err(error) => return Err(error),
@@ -1527,8 +1543,10 @@ impl<T: DeviceZeroable> VirtualDeviceBuffer<T> {
             )
         })?;
         unsafe {
-            check(
-                ffi::cuMemcpyHtoD_v2(destination, src.as_ptr() as *const c_void, bytes),
+            copy_h_to_d_sync(
+                destination,
+                src.as_ptr() as *const c_void,
+                bytes,
                 "cuMemcpyHtoD_v2(VMM range)",
             )
         }
@@ -1677,8 +1695,10 @@ impl<T: Copy> DeviceBuffer<T> {
         assert_eq!(src.len(), self.len, "cpu->device length mismatch");
         let bytes = self.len * core::mem::size_of::<T>();
         unsafe {
-            check(
-                ffi::cuMemcpyHtoD_v2(self.ptr, src.as_ptr() as *const c_void, bytes),
+            copy_h_to_d_sync(
+                self.ptr,
+                src.as_ptr() as *const c_void,
+                bytes,
                 "cuMemcpyHtoD_v2",
             )
         }
@@ -1731,8 +1751,10 @@ impl<T: Copy> DeviceBuffer<T> {
             )
         })?;
         unsafe {
-            check(
-                ffi::cuMemcpyHtoD_v2(destination, src.as_ptr() as *const c_void, bytes),
+            copy_h_to_d_sync(
+                destination,
+                src.as_ptr() as *const c_void,
+                bytes,
                 "cuMemcpyHtoD_v2(range)",
             )
         }

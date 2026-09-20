@@ -53,8 +53,19 @@ uses one local M/D across source regions, with coefficient shape independent of 
 `athena_exposure_field` attaches validated held requests/free response extents, recorded comparison
 relations and the source cursor. Retained pairing metadata supports delayed responses and reopen;
 older comparisons without that metadata stay preserved. The [source map](../../docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#field-session-source-map)
-names the next geometric participation/refinement join through the existing native ports.
+names the geometric participation/refinement join through the existing native ports.
 Useful Athena conversation and broader receiving applications remain in the live construction order.
+
+[established-bounded; source-inspected] `FieldSourceChart::GeometricRegions` now binds validated
+analytic junctions/arcs and their phase passages to a finite whole-field refinement under the
+same public body. `GeometricFieldSpec` supplies the geometry and exterior slot chart;
+`field/receiver/normalized/phase.rs` calls the existing normalized receiver and both covectors.
+The complete reverse word precedes one staged normal update. M, pending comparisons and the
+verified recorded-source cursor survive restart; the generated global phase section is a preview.
+The [geometric application](../../research/experiments/athena_field/geometric/README.md) supplies
+the spec constructor, actual source driver and quality receiver. Its supplied symbol basis and
+fixed geometry retain their scope; they do not establish learned receiving geometry or useful
+general conversation.
 
 ## Earlier inherited-operator interface
 

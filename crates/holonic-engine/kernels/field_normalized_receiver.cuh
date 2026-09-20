@@ -253,14 +253,14 @@ extern "C" __global__ __launch_bounds__(512) void section_rows_normalized_receiv
     uint32_t rows,uint32_t nodes,uint32_t group_width,uint32_t grain,uint32_t terms,
     uint32_t packet_face,int64_t *report_lo,int64_t *report_hi,
     int64_t *participation,int64_t *participation_hi,
-    int64_t *difference,int64_t *difference_hi,int64_t *potential,int64_t *potential_hi,
-    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
+    int64_t *difference,int64_t *difference_hi,int64_t *potential,int64_t *potential_hi,int64_t *flags,
+    uint32_t *global_slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
 ) {
-    if(threadIdx.x)return;
-    if(upstream_refused(census,lineage,lineage_count,slot))return;
+    if(threadIdx.x)return;uint32_t row=blockIdx.x;if(row>=rows)return;uint32_t *slot=(uint32_t *)(flags+(SLOT_WORDS/2u)*(size_t)row);for(uint32_t i=0;i<SLOT_WORDS;++i)slot[i]=0;
+    if(upstream_refused(census,lineage,lineage_count,slot))return;(void)global_slot;
     if(!rows||!nodes||!group_width||nodes%group_width||grain<1||grain>120||!terms||terms==UINT32_MAX
        ||packet_face>1u||compare>1u){atomicOr(slot,REFUSED_MALFORMED);return;}
-    uint32_t row=blockIdx.x;if(row>=rows)return;
+    if(row>=rows)return;
     const size_t ball_wides=2u*(size_t)nodes+1u,stride=2u*ball_wides;
     const size_t at=(size_t)row*stride,report_at=(size_t)row*20u*(size_t)nodes;
     if(!normalized_row_is_point(prediction,prediction_hi,at,stride,slot))return;
@@ -296,15 +296,15 @@ extern "C" __global__ __launch_bounds__(512) void section_rows_normalized_receiv
 extern "C" __global__ __launch_bounds__(512) void section_rows_normalized_pullback(
     const int64_t *face,uint32_t rows,uint32_t nodes,uint32_t group_width,uint32_t grain,
     const int64_t *covector,const int64_t *covector_hi,
-    int64_t *report_lo,int64_t *report_hi,int64_t *potential,int64_t *potential_hi,
-    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
+    int64_t *report_lo,int64_t *report_hi,int64_t *potential,int64_t *potential_hi,int64_t *flags,
+    uint32_t *global_slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
 ) {
-    if(threadIdx.x)return;
-    if(upstream_refused(census,lineage,lineage_count,slot))return;
+    if(threadIdx.x)return;uint32_t row=blockIdx.x;if(row>=rows)return;uint32_t *slot=(uint32_t *)(flags+(SLOT_WORDS/2u)*(size_t)row);for(uint32_t i=0;i<SLOT_WORDS;++i)slot[i]=0;
+    if(upstream_refused(census,lineage,lineage_count,slot))return;(void)global_slot;
     if(!rows||!nodes||!group_width||nodes%group_width||grain<1||grain>120){
         atomicOr(slot,REFUSED_MALFORMED);return;
     }
-    uint32_t row=blockIdx.x;if(row>=rows)return;
+    if(row>=rows)return;
     const size_t ball_wides=2u*(size_t)nodes+1u,stride=2u*ball_wides;
     const size_t at=(size_t)row*stride,report_at=(size_t)row*20u*(size_t)nodes;
     if(!normalized_row_is_point(covector,covector_hi,at,stride,slot))return;

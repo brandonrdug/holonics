@@ -218,11 +218,12 @@ request/context/repository input separately from recorded candidate replies and 
 observations. It calls this packager's visible views and private publication; it adds no second
 log parser or native learner. Repository snapshots are explicitly supplied to the new experiment,
 not silently treated as earlier knowledge. A full episode is the application target; passing a
-small symbol completion does not stand in for evaluating that episode.
+small symbol completion does not stand in for evaluating that episode. The geometric source/session
+and current checkpoint-validation scope are recorded in [the September 20 geometric field record](../research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md).
 
 ## Cultivation and machine transfer
 
-[definition] The subsequent [Athena synthesis](ATHENA.md#athena-alpha-and-the-next-cultivation)
+[definition] The subsequent [Athena synthesis](ATHENA.md#athena-alpha-and-the-finite-construction-programme)
 places this package in the general English, code and mathematics cultivation direction. It keeps
 actual available ancestry, paired response and later human return distinct when mounting native
 material. The preparation application supplies no native current by subtracting token IDs and no
@@ -317,6 +318,24 @@ occurrence — the family a frame records as its own `comparison-request` partne
 `ExposureOccurrence::recorded_comparison_request` — arrives afterwards as an observed comparison
 retained at its producing cut. It is an observed candidate, never gold, and the exterior cursor
 plus this pairing still establish delivery and use, not cultivated capability.
+
+[established-bounded; implemented-exact] `ExposureReader::recorded_context` now resolves the
+request's recorded parent chain through a lazily built index over the verified source prefix. The
+index retains source offsets, sequence/family coordinates and frame extents; it does not retain
+native state or message text. A frame is admitted only when its parent aliases resolve to one
+prior occurrence. Duplicate capture aliases refuse with an explicit ambiguity; missing or several
+prior occurrences remain an open context. The requested `context_bytes` is a cumulative aperture
+over the complete visible text parts of the chain, so a chain can exceed the aperture even when
+each individual parent fits. The index scan and later frame lookups are returned in
+`ExposureContextStats`, and reopening from `ExposureCursor` rebuilds only the pinned prior prefix
+needed by the request. Failure leaves the pending frame and saved cursor unchanged.
+
+The real source consumer is the `athena_exposure_field` application: it resolves this context,
+passes the admitted request/context aperture into the public field session, and acknowledges the
+source frame only after the native operation succeeds. A checkpoint therefore carries the cursor
+beside the native successor; a restart redelivers an unacknowledged frame instead of silently
+advancing cold delivery. The geometric field has a separate bounded source driver documented in
+the [geometric experiment](../research/experiments/athena_field/geometric/README.md).
 
 [established-bounded; measured] The [AC0 return](../research/records/2026-09-06_AC0_THE_CONVERSATIONS_ENTER_AS_SEPARATE_OCCURRENCES_AND_THE_COLD_CURSOR_RESTARTS.md)
 contains the actual 184,572,827-byte private exposure: 36,920 families, 49,928 captured views,

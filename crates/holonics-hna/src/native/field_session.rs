@@ -3,6 +3,7 @@
 //! complete unit-basis sections and an ordered context tensor, and learns its own D/M action.
 use super::section_input::SymbolCurrentChart;
 mod shared;
+mod geometric;
 use super::{NativeCoupledBody, NativeFieldReactionPort, NativeSessionError, SavedCoupledBody};
 use crate::{HnaStream, HnaStreamState, PublicationReceipt, publish_new};
 use holonic_engine::{
@@ -49,6 +50,7 @@ pub enum FieldSourceChart {
     TensorCondition,
     JointRegions,
     SharedRegions,
+    GeometricRegions,
 }
 fn tensor_condition(chart: &FieldSourceChart) -> bool {
     *chart == FieldSourceChart::TensorCondition
@@ -64,6 +66,8 @@ pub struct FieldSessionSpec {
     pub region_offsets: Vec<isize>,
     #[serde(default, skip_serializing_if = "tensor_condition")]
     pub source_chart: FieldSourceChart,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub geometry: Option<super::GeometricFieldSpec>,
     #[serde(default)]
     pub codec: FieldTextCodec,
     #[serde(default = "grain")]
@@ -225,17 +229,20 @@ impl FieldSectionRequest {
 }
 impl FieldSessionSpec {
     fn chart(&self) -> Result<SymbolCurrentChart> {
+        if self.source_chart != FieldSourceChart::GeometricRegions && self.geometry.is_some() { return Err(invalid("geometric standing requires the geometric source chart")); }
         if self.section_symbols == 0 || !(1..=120).contains(&self.fractional_bits) {
             return Err(invalid("field section extent/grain"));
         }
         if self.codec == FieldTextCodec::Utf8Nibbles
-            && (self.symbols.len() != 16 || self.source_chart != FieldSourceChart::SharedRegions)
+            && (self.symbols.len() != 16 || !matches!(self.source_chart, FieldSourceChart::SharedRegions | FieldSourceChart::GeometricRegions))
         {
             return Err(invalid(
                 "UTF-8 nibble codec requires sixteen declared symbols and shared-regions",
             ));
         }
-        if self.source_chart == FieldSourceChart::SharedRegions {
+        if self.source_chart == FieldSourceChart::GeometricRegions {
+            self.geometric_extents()?;
+        } else if self.source_chart == FieldSourceChart::SharedRegions {
             self.shared_extents()?;
         } else if !self.region_offsets.is_empty() {
             return Err(invalid(
@@ -264,11 +271,14 @@ impl FieldSessionSpec {
         Ok(SymbolCurrentChart::declared(alphabet))
     }
     fn extents(&self) -> Result<(usize, usize, usize)> {
+        if self.source_chart == FieldSourceChart::GeometricRegions {
+            return self.geometric_extents();
+        }
         if self.source_chart == FieldSourceChart::SharedRegions {
             return self.shared_extents();
         }
         let regions = match self.source_chart {
-            FieldSourceChart::SharedRegions => unreachable!(),
+            FieldSourceChart::SharedRegions | FieldSourceChart::GeometricRegions => unreachable!(),
             FieldSourceChart::TensorCondition => self.section_symbols,
             FieldSourceChart::JointRegions => self
                 .section_symbols
@@ -283,7 +293,7 @@ impl FieldSessionSpec {
             .ok_or_else(|| invalid("field node extent"))?
             / 3;
         let context = match self.source_chart {
-            FieldSourceChart::SharedRegions => unreachable!(),
+            FieldSourceChart::SharedRegions | FieldSourceChart::GeometricRegions => unreachable!(),
             FieldSourceChart::TensorCondition => self
                 .symbols
                 .len()
@@ -408,6 +418,7 @@ pub struct NativeFieldSession<'c> {
     spec: FieldSessionSpec,
     chart: SymbolCurrentChart,
     body: NativeCoupledBody<'c>,
+    compiled_geometry: Option<std::rc::Rc<super::field_geometry::CompiledFieldGeometry>>,
     pending_extents: BTreeMap<u64, usize>,
     retained_shared: BTreeMap<u64, RetainedSharedSource>,
     issued_shared: u64,
@@ -483,6 +494,7 @@ impl<'c> NativeFieldSession<'c> {
         .map_err(|r| r.reason)?;
         Ok(Self {
             surface,
+            compiled_geometry: spec.geometry.as_ref().map(|g|g.compile().map(std::rc::Rc::new)).transpose()?,
             spec: spec.clone(),
             chart,
             body,
@@ -680,6 +692,9 @@ impl<'c> NativeFieldSession<'c> {
         })
     }
     pub fn request(&mut self, request: &FieldSectionRequest) -> Result<Value> {
+        if self.spec.source_chart == FieldSourceChart::GeometricRegions {
+            return self.geometric_request(request);
+        }
         if self.spec.source_chart == FieldSourceChart::SharedRegions {
             return self.shared_request(request);
         }
@@ -755,6 +770,9 @@ impl<'c> NativeFieldSession<'c> {
         )
     }
     pub fn observe(&mut self, source: u64, text: &str, step_bits: u32) -> Result<Value> {
+        if self.spec.source_chart == FieldSourceChart::GeometricRegions {
+            return self.observe_retained_geometric(source, text, step_bits);
+        }
         if self.spec.source_chart == FieldSourceChart::SharedRegions {
             return self.observe_retained_source(source, text, step_bits);
         }
@@ -789,7 +807,7 @@ impl<'c> NativeFieldSession<'c> {
         )
     }
     pub fn release(&mut self, source: u64) -> Result<Value> {
-        if self.spec.source_chart == FieldSourceChart::SharedRegions {
+        if matches!(self.spec.source_chart, FieldSourceChart::SharedRegions | FieldSourceChart::GeometricRegions) {
             self.retained_shared
                 .remove(&source)
                 .ok_or_else(|| invalid("unknown retained shared-source comparison"))?;
@@ -1009,7 +1027,7 @@ impl NativeFieldSavedSession {
                     != retained.output_symbols.checked_mul(spec.symbols.len())
                 || retained.held.iter().all(|fixed| *fixed)
         }) || (!retained_shared.is_empty()
-            && spec.source_chart != FieldSourceChart::SharedRegions)
+            && !matches!(spec.source_chart, FieldSourceChart::SharedRegions | FieldSourceChart::GeometricRegions))
         {
             return Err(invalid("retained shared-source comparison operands"));
         }
@@ -1062,6 +1080,7 @@ impl NativeFieldSavedSession {
         let chart = self.spec.chart()?;
         let mut session = NativeFieldSession {
             surface: &surface,
+            compiled_geometry: self.spec.geometry.as_ref().map(|g|g.compile().map(std::rc::Rc::new)).transpose()?,
             spec: self.spec,
             chart,
             body: self.body.remount(&surface)?,
@@ -1124,6 +1143,7 @@ mod tests {
             context_symbols: 0,
             region_offsets: vec![],
             source_chart: FieldSourceChart::TensorCondition,
+            geometry: None,
             codec: FieldTextCodec::UnicodeScalars,
             fractional_bits: 48,
         };
@@ -1169,6 +1189,7 @@ mod tests {
             context_symbols: 2,
             region_offsets: vec![],
             source_chart: FieldSourceChart::TensorCondition,
+            geometry: None,
             codec: FieldTextCodec::WhitespaceWords,
             fractional_bits: 48,
         };
@@ -1208,6 +1229,7 @@ mod delivery_tests {
             context_symbols: 0,
             region_offsets: vec![],
             source_chart: FieldSourceChart::TensorCondition,
+            geometry: None,
             codec: FieldTextCodec::UnicodeScalars,
             fractional_bits: 48,
         };
@@ -1302,6 +1324,7 @@ mod exposure_tests {
             context_symbols: 16,
             region_offsets: vec![-2, -1, 0, 1, 2],
             source_chart: FieldSourceChart::SharedRegions,
+            geometry: None,
             codec: FieldTextCodec::Utf8Nibbles,
             fractional_bits: 48,
         }
@@ -1572,6 +1595,7 @@ mod joint_region_tests {
             context_symbols: 1,
             region_offsets: vec![],
             source_chart: FieldSourceChart::JointRegions,
+            geometry: None,
             codec: FieldTextCodec::UnicodeScalars,
             fractional_bits: 48,
         }

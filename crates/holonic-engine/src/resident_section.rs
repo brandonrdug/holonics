@@ -43,7 +43,7 @@
 //!
 //! # The census array, and how a refusal travels — along the lineage, never through a shared word
 //!
-//! Every occurrence owns twelve 32-bit words on the card ([`SLOT_WORDS`]) and nothing else is
+//! Every occurrence owns sixteen 32-bit words on the card ([`SLOT_WORDS`]) and nothing else is
 //! shared. A kernel that would leave the exact carrier, meets malformed material, or inverts an
 //! enclosure writes its own flags and nothing plausible; the census kernel that follows it measures
 //! the widest octave and enclosure and **compares the octave against the a-priori bound the
@@ -111,6 +111,9 @@ mod surface_normal_coupled;
 mod surface_wave_relation;
 mod surface_wave_source;
 mod surface_material_support;
+mod surface_phase_participation;
+mod surface_enclosure_composition;
+pub(crate) use surface_enclosure_composition::EnclosureComposition;
 #[path = "resident_section/surface_condition.rs"]
 mod surface_condition;
 #[path = "resident_section/surface_fibre_image.rs"]
@@ -166,7 +169,7 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 60] = [
+pub const KERNELS: [&str; 72] = [
     "section_constitutive_rechart",
     "section_constitutive_circulation",
     "section_constitutive_fibre",
@@ -241,6 +244,18 @@ pub const KERNELS: [&str; 60] = [
     "section_normal_enclosure_sum_section",
     "section_normal_enclosure_scatter_section",
     "section_normal_enclosure_restrict_section",
+    "section_phase_participation",
+    "section_phase_participation_weighted",
+    "section_phase_participation_terms",
+    "section_phase_participation_adjoint",
+    "section_enclosure_gather_phase",
+    "section_enclosure_scatter_phase_adjoint",
+    "section_enclosure_refine_rows",
+    "section_enclosure_bilinear_features",
+    "section_enclosure_bilinear_adjoint",
+    "section_normal_enclosed_adjoint",
+    "section_enclosure_collect_row_status",
+    "section_enclosure_concatenate_rows",
 ];
 
 #[path = "resident_section/surface_field_current_source.rs"]
@@ -544,6 +559,8 @@ pub struct TransferCensus {
     pub deed_launches: u64,
     /// Kernel launches issued directly, outside any passage — the arithmetic control only.
     pub control_launches: u64,
+    /// Explicit waits counted by this surface, excluding driver-internal waits and the
+    /// synchronous mount wrapper's upload-completion waits.
     pub synchronizations: u64,
     pub allocations: u64,
     pub resident_octets_now: u64,

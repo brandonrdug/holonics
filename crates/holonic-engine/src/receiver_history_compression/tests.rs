@@ -3,7 +3,11 @@ mod tests {
     use crate::exact_linear::ExactRatMatrix;
     use crate::receiver_exact_compression::{Observation, compress};
     use crate::receiver_history_compression::*;
-    use relational_geometry::Rat;
+    use num_traits::Zero;
+    use relational_geometry::{
+        AffineMap3, PairFiniteMotion, Rat, RatMat3, RatVec3, RationalPhase, ScrewGenerator,
+        ScrewPair, SituatedScrew, cayley_rotation_z, integer,
+    };
 
     fn exact(entries: &[[i64; 3]; 3]) -> ExactRatMatrix {
         ExactRatMatrix::new(
@@ -17,6 +21,84 @@ mod tests {
                 .collect(),
         )
         .expect("exact 3 by 3 matrix")
+    }
+
+    #[test]
+    fn situated_screw_pair_reuses_moment_actions_and_returns_phase_and_separator() {
+        let pair = ScrewPair::new(
+            SituatedScrew::new(
+                ScrewGenerator::new(RatVec3::from_i64(0, 0, 1), RatVec3::zero()),
+                RatVec3::from_i64(1, 0, 0),
+            ),
+            SituatedScrew::new(
+                ScrewGenerator::new(RatVec3::zero(), RatVec3::from_i64(0, 0, 1)),
+                RatVec3::from_i64(0, 2, 0),
+            ),
+        );
+        let quarter = PairFiniteMotion::with_phase(
+            AffineMap3::rotation_about(&RatVec3::zero(), cayley_rotation_z(&integer(1))),
+            AffineMap3::identity(),
+            RationalPhase::new(integer(1), 0),
+        )
+        .unwrap();
+        let translation = PairFiniteMotion::new(
+            AffineMap3::identity(),
+            AffineMap3 {
+                linear: RatMat3::identity(),
+                translation: RatVec3::from_i64(1, 0, 0),
+            },
+        )
+        .unwrap();
+        let reuse =
+            HelicalMomentReuse::found(&pair, vec![quarter, translation], &[Some(4), Some(1)])
+                .expect("finite screw pair enters existing moment receiver");
+        assert_eq!(reuse.initial_decode.value, pair.quadrance());
+        assert!(
+            reuse
+                .transports
+                .iter()
+                .all(HelicalMomentTransport::commutes)
+        );
+        assert!(matches!(
+            reuse.phase_closures[0],
+            Some(HelicalPhaseClosure::Closed {
+                period: 4,
+                parameter: Some(_),
+                winding: Some(1),
+                ..
+            })
+        ));
+        assert!(matches!(
+            reuse.phase_closures[1],
+            Some(HelicalPhaseClosure::NonClosing { period: 1, .. })
+        ));
+        let ordered = reuse.ordered_word(&[0, 1, 0]).unwrap();
+        assert!(ordered.commutes());
+        assert_eq!(ordered.word, vec![0, 1, 0]);
+
+        let hidden = reuse
+            .compression
+            .reconstruction_kernel_basis
+            .first()
+            .expect("pair receiver leaves a reconstruction fibre");
+        let coordinate = hidden
+            .iter()
+            .position(|entry| !entry.is_zero())
+            .expect("kernel direction has a nonzero coordinate");
+        let mut changed = vec![vec![Rat::from_integer(0.into()); 8]; 8];
+        changed[coordinate / 8][coordinate % 8] = Rat::from_integer(1.into());
+        let separator = reuse
+            .changed_receiver_separator(&ExactRatMatrix::new(changed).unwrap())
+            .unwrap()
+            .expect("changed receiver is separated by the retained fibre");
+        assert_eq!(
+            separator.scope,
+            ObservableMomentSeparatorScope::AmbientLinearMoment
+        );
+        assert_eq!(separator.receiver_change, hidden[coordinate]);
+        assert!(reuse.moment_admissibility.symmetric_rank_one);
+        assert!(reuse.moment_admissibility.homogeneous_coordinates_fixed);
+        assert!(!reuse.moment_admissibility.source_clock_constraints_declared);
     }
 
     #[test]

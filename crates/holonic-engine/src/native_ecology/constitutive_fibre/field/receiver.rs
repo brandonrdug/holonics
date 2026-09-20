@@ -4,7 +4,8 @@ use super::*;
 mod normalized;
 mod packet;
 pub use packet::{NativeMaterialActuation,NativeMaterialPacketReading,NativePacketQuadrature};
-pub use normalized::{NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn,
+pub use normalized::{
+    NativePhaseParticipation, NativePhaseParticipationAdjoint,NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn,
     NativeMaterialPullbackMetric, NativeMaterialSourcePullback, NativeMaterialSourcePullbackReading,
     NativeNormalizedFaceMeasure, NativeNormalizedSection, NativeNormalizedSectionPullback,
     NativeNormalizedSectionPullbackReading, NativeNormalizedSectionRowReading};

@@ -17,6 +17,7 @@ Read [HOLON](../../docs/HOLON.md), [HNN_FORMULA](../../docs/HNN_FORMULA.md) and 
 - [Eros unifies faces, landmarks and the continuing machine](2026-09-15_EROS_UNIFIES_FACES_LANDMARKS_AND_THE_CONTINUING_MACHINE.md): the purpose and whole/part construction behind the model.
 - [The operating guides carry the machine and research into the consumer](2026-09-20_THE_OPERATING_GUIDES_CARRY_THE_MACHINE_AND_RESEARCH_INTO_THE_CONSUMER.md): consolidation, verified driver repairs and the finalized issue division.
 - [The field-session join has its owner network](2026-09-20_THE_FIELD_SESSION_JOIN_HAS_ITS_OWNER_NETWORK_AND_NAMED_ABSENCES.md): the local source, variation, re-entry and exposure calls; use the live state for later returns.
+- [The geometric field refines and returns its complete paired current](2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md): validated analytic source arcs, the resident geometric word and paired return, row placement evidence, lifted helical phase and the bounded real-source experiment.
 
 Start in `holonics-hna::NativeCoupledBody`, `native/field_session` and the native constitutive
 field/source/current owners. The model's actual caller decides whether a helper is connected.
@@ -67,6 +68,7 @@ Read [helical geometry](../../docs/HELICAL_GEOMETRY.md), [the Holon](../../docs/
 
 - [Clocked torus currents continue through a retained fibre](2026-09-08_CLOCKED_TORUS_CURRENTS_CONTINUE_THROUGH_A_RETAINED_FIBRE.md): phase, clock and continuing current.
 - [The helical-pair question](2026-09-19_THE_TRIGONOMETRY_OF_A_HELICAL_PAIR_IS_TRIGONOMETRY_OVER_A_TWO_SIDED_ANGLE.md): original synthesis with its later elementary corrections.
+- [The geometric field refines and returns its complete paired current](2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md): the actual geometric field consumer and its situated-pair moment/phase reuse.
 - [Rubik faces lift to torus intersections and navigation](2026-09-19_RUBIK_FACES_LIFT_TO_TORUS_INTERSECTIONS_AND_NAVIGATION_GRAPHS.md): a configuration as a receiver face with its source fibre and generators.
 - [Siphonophore holons and recursive entropic cycles](2026-09-19_SIPHONOPHORE_HOLONS_RESOLVE_ORGANISM_IDENTITY_THROUGH_RECURSIVE_ENTROPIC_CYCLES.md): whole/part identity and the physical conditions of the organ interpretation.
 

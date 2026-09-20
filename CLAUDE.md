@@ -72,13 +72,13 @@ inverse or an event archive.
 | Operation | Source owner |
 |---|---|
 | Public model and move owner | `crates/holonics-hna/src/native.rs`; `native/coupled_wave/body/field.rs`, `field/section.rs`; `NativeCoupledBody` |
-| Session, region preparation and observed return | `crates/holonics-hna/src/native/field_session.rs`, `field_session/shared.rs`; inspect the actual `prepare_shared`/`shared_request`/`observe_rows` calls |
+| Session, region preparation and observed return | `crates/holonics-hna/src/native/field_session.rs`, `field_session/{shared,geometric}.rs`; `field_geometry.rs` compiles analytic incidence; `body/field/geometric.rs` composes phase participation, held refinement and its complete return |
 | Real source and its comparison/cursor | `crates/holonics-hna/src/alpha/exposure.rs`, `examples/athena_exposure_field.rs`; [conversation data](docs/CONVERSATION_DATA.md) |
 | Constitutive field and paired source/current | `crates/holonic-engine/src/native_ecology/constitutive_fibre/field/`: source/reflection/target, material transport, receivers and internal modes |
-| Normalization and adjoints | `field/receiver/normalized{,.rs}`, `field/material_transport/normal/direct/section.rs`, `resident/section/bilinear_features.rs`; exact reference `exponentiated_ratio::transport::NormalizedKernel` |
+| Normalization and adjoints | `field/receiver/normalized{,.rs}`, `normalized/phase.rs`, `field/material_transport/normal/direct/section{,/composition}.rs`, `resident/section/bilinear_features.rs`; exact reference `exponentiated_ratio::transport::NormalizedKernel` |
 | Kernels and their Rust binders | `crates/holonic-engine/kernels/{exact_resident_section.cu,field_normalized_receiver.cuh,normal_applied_condition.cuh,section_bilinear_adjoint.cuh}`; `src/resident_section/` |
 | Hardware law | `hardware_cover`, `section_partition`; `crates/holonic-mount/src/{cuda,launch_law,section_layout}.rs` |
-| Exact geometry and helical pair | `crates/relational-geometry/src/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs` |
+| Exact geometry and helical pair | `crates/relational-geometry/src/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs`; `receiver_history_compression/observable.rs::HelicalMomentReuse` binds finite pair actions to the existing moment decoder |
 | Algebra and economical continuation | `exact_linear`, `prime_image_algebra`, `receiver_history_compression`, `winding_inertia`; resident bilinear/normal/word/mode owners at their separate call boundaries |
 | Public framework | `crates/holonics/src/lib.rs`: `geometry` and `structure` without default native features; `holonics-hna` for HNN |
 | Lean | `formal/elementary-holonics/ElementaryHolonics/Framework.lean` and its Core/Geometry/Dynamics/Information/Physics/Computation entry points |
@@ -88,6 +88,16 @@ inverse or an event archive.
 an independently nonzero radius. Equality of those words is not a zero-radius test. Read the row
 layout, grain, denominator and radius slot before judging propagation or refusal. The native
 normal and normalized-receiver section tests exercise nonzero source/condition/covector radii.
+
+[definition] A kernel using `upstream_refused` supplies a complete `SLOT_WORDS` receipt
+(16 u32 words), including lineage fields. Independent rows own those complete receipts until
+their deterministic barrier joins the statuses. Host allocations, kernel stride and logical
+placement use that same layout; `resident_section::SLOT_WORDS` is the Rust owner.
+
+[definition] A ready native upload includes device completion. Pageable host-to-device copies
+can return after host staging; synchronous `holonic-mount` slice/range methods complete the
+legacy-stream transfer before a nonblocking passage reads it. Explicit asynchronous copies
+retain their caller-owned event/stream dependency.
 A joint ball, a family with shared parameters and independent coordinate intervals have different
 information; use the representation the consuming equation needs.
 

@@ -466,6 +466,46 @@ flowchart LR
     C[Mode factors, recurrence and boundary memory] --- S
 ```
 
+### The geometric session word
+
+[established-bounded; source-inspected] `GeometricFieldSpec` and
+`NativeCoupledBody::preview_geometric_rows` now compose the analytic junction/arc owner,
+the existing normalized section receiver, constituted reaction and a finite joint refinement.
+`FieldSourceChart::GeometricRegions` binds this operation through the public field session.
+For each receiving site and its admitted incoming ports, the executed specialization is
+
+```text
+u_j = U_j k_j,             s_j = β Re⟨q,u_j⟩,
+p = softmax(s),            y = Σ_j p_j u_j,
+Φ = y ⊕ p ⊕ (p ⊗ y),     r = S_D(y + MΦ, b),
+x_next = H seed + (I−H)((1−μ)seed + μ r),     μ = 2^(−relaxation_bits).
+```
+
+[definition] U is the declared complete modal phase passage on the admitted arc. Unit
+single-channel comparison specializes to cosine phase comparison; amplitudes remain in the
+general pairing. H holds the supplied boundary coordinates through every stage. The supplied
+linked-torus instance uses exact longitude arcs and their shared junction. This finite
+relaxation is a declared boundary-network law; the intrinsic reference's volume advection,
+Hamiltonian shear and material dissipation have their own equations and are not implied by it.
+
+[proved-derived] The same producing carriers give
+`r_j=Re⟨g_y,u_j⟩+Re(g_p[j])`, `h=(diag(p)−ppᵀ)r`,
+`g_q=βΣ_j h_j u_j`, `g_u[j]=p_j g_y+βh_j q`, and `g_k[j]=U_j* g_u[j]`.
+The existing normalized receiver supplies h. Each stage returns through M*, both arms of Φ,
+fixed-D reflection, phase and repeated-address scatter. Refinement adds
+`[H+(I−H)(1−μ)]g` directly to the seed and `(I−H)μg` through r. The full reverse word
+stages all local reaction targets together before one normal update; it never changes M
+halfway through that return.
+
+[definition] Geometry, U, D, b, β and the finite extent are fixed operands during this word.
+Saved geometric comparisons retain source and receiving conditions and use the current material
+when observed. M and pending comparisons persist; a generated global phase field is currently
+an ephemeral preview. Learned receiving geometry, changing D and economical nonlinear
+continuation remain actual consuming work. The
+[campaign derivation and checks](../research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md)
+and [source map](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#field-session-source-map)
+connect the implementation, residuals, source episodes and these remaining terms.
+
 ## 2. Transformer, convolution, SSM and diffusion operators
 
 ### One connected tensor computation

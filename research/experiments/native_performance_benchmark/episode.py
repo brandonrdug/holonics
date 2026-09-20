@@ -45,7 +45,7 @@ def prepare(dataset,request_id,context_ids,references,output):
             view=corpus.event_view(db,event)
             if event==request_id or event in candidates or clock(view['timestamp'])>=clock(request['timestamp']):
                 raise ValueError('context contains the request, a response, or later material')
-            if view['author_class'] not in ('human','agent'):
+            if view['author_class'] not in ('human','agent','agent-visible'):
                 raise ValueError('context must select a visible human/agent occurrence explicitly')
             context.append(corpus.visible_view(db,event,'human-text' if view['author_class']=='human' else 'agent-text'))
         followups=[]

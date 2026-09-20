@@ -30,6 +30,22 @@ observation flags, and supports partial and variable-length receiving sections w
 The raw field evolves through its existing scattering; `ResidentHeldSection` receives the given
 and generated coordinates. The target covector follows that receiver before the full adjoint.
 
+[established-bounded; source-inspected] `FieldSourceChart::GeometricRegions` compiles a
+`GeometricFieldSpec` from existing analytic junctions, arcs, modes and source events. The public
+body applies phase-sensitive normalized participation, bilinear reaction and fixed-D reflection
+through a finite held-boundary refinement word. Its reverse retains all producing carriers,
+returns through both input covectors and every stage, then stages one normal material update.
+See the [implemented equation](HNN_FORMULA.md#the-geometric-session-word) and
+[geometric application](../research/experiments/athena_field/geometric/README.md).
+
+[definition] The shared/geometric source chart retains the original request, receiving extent,
+mask and producing epoch; later observation evaluates its fixed-D return at current M.
+Geometry, M and pending comparisons persist. A generated geometric global phase section is
+currently a preview rather than committed dynamic interior. `ExposureReader::recorded_context`
+recovers the required strictly prior parent chain from the verified source after restart.
+Fresh snapshots trust their immutable admitted child material; untrusted normal-rest reads
+still validate the full geometry and numerical witness.
+
 ## Learned local law
 
 [established-bounded; implemented-exact] The [caller-controlled mathematical session](../research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md)

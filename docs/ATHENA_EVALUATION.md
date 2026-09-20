@@ -20,6 +20,9 @@ recovers the repeated experimental families and their failures. The existing
 [native benchmark apparatus](../research/experiments/native_performance_benchmark/README.md)
 now hosts the shared consequence receivers as well as performance measurements. This guide
 owns their methodology; the roadmap and construction state retain construction order/position.
+The current geometric field/session and bounded helical/placement return is recorded in
+[the September 20 geometric field record](../research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md);
+its final real-source checkpoint comparison remains under validation.
 
 ## The common mathematical question
 
@@ -143,6 +146,25 @@ The current small symbol chart cannot be substituted for this full application m
 reducing a real request to a color label. The consuming field source/refinement remains the
 construction brief's implementation responsibility.
 
+[established-bounded; source-inspected] The same quality owner has an `episode` mode for the
+geometric receiver. It consumes the private `input.json`, its separate `assessment.json`, and a
+new generated result; the input is the declared retrospective/source scope, while recorded
+assistant candidates and later observations stay in assessment. `constraint_judgments` may remain
+empty while review is pending. When present, every judgment is `satisfied`, `contradicted` or
+`unresolved`, names its source and evidence, and carries the SHA-256 of that exact generated
+result. A historical candidate is therefore nongold testimony, and a judgment cannot silently
+move to a different generated output.
+
+[established-bounded; source-inspected] The geometric real-source driver is
+[`research/experiments/athena_field/geometric/run.py`](../research/experiments/athena_field/geometric/run.py).
+It keeps the supplied event/family/relationship source and runs the existing
+`athena_exposure_field`/public session boundaries; its development mode records split/resume and
+uninterrupted controls, while its evaluation mode emits a new read-only geometric result. The
+quality receiver checks the declared UTF-8 nibble extent and the native decode outcome: invalid
+UTF-8 is retained as an actual generated failure with its decode error, not discarded by a parser.
+The campaign record verifies checkpoint repair and split/whole equality and records the actual
+invalid-UTF-8 evaluation output. Useful conversation remains open.
+
 ## Executable kit and maintained profiles
 
 [definition] The shared entry points live beside the existing performance owner:
@@ -162,6 +184,12 @@ python3 research/experiments/native_performance_benchmark/episode.py \
   --request-event 3398355 \
   --repository-ref d0588238:docs/HNN_FORMULA.md \
   --output .local/evaluations/new-source-episode
+
+# Assess one new geometric result beside its private input/assessment pair.
+python3 research/experiments/native_performance_benchmark/quality.py episode \
+  --episode .local/evaluations/new-source-episode \
+  --generated .local/evaluations/geometric-evaluation/result.json \
+  --output .local/evaluations/geometric-consequence
 ```
 
 [definition] These are fixed, documented regression/measurement profiles, not a benchmark
@@ -171,6 +199,10 @@ updates then law-family queries and exact constructions. Changing that recipe ch
 profile and its reference law. The target checks remain exterior and never enter evaluation
 requests as answers. Recorded mode does not imply fresh execution; live mode preserves commands,
 binary checksum, requests, events, stderr and the existing per-child resource observations.
+The `episode` mode writes a new consequence result beside the generated-result SHA and the
+identified assessment testimony; an empty judgment list is a pending review, not an automatic
+pass. It preserves invalid UTF-8 as a native decode failure and preserves historical candidates
+as nongold observations.
 
 [established-bounded; measured] The integrated kit rechecked and freshly returned 39/39 field
 responses, 45/45 generated missing values and 63/63 supplied values. The mathematical profile

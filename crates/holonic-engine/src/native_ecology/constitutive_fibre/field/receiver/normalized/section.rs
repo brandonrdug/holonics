@@ -10,6 +10,7 @@
 //! is written. The producing operand rows stay the caller's; this face retains no occurrence
 //! lineage, because a section row is an address in an exterior chart, not a field occurrence.
 use super::*;
+use crate::resident_section::SLOT_WORDS;
 
 /// The measure a declared group is normalized under. The exponential face reads the real
 /// potentials of the row; the packet face reads a complete complex amplitude carrier and
@@ -114,13 +115,21 @@ impl SectionFaceChart {
             return Err(fail());
         }
         let report_words = nodes.checked_mul(20).ok_or_else(fail)?;
-        let ball_words = components.checked_add(1).and_then(|n| n.checked_mul(2)).ok_or_else(fail)?;
+        let ball_words = components
+            .checked_add(1)
+            .and_then(|n| n.checked_mul(2))
+            .ok_or_else(fail)?;
         rows.checked_mul(report_words).ok_or_else(fail)?;
         rows.checked_mul(ball_words).ok_or_else(fail)?;
         if rows > u32::MAX as usize || nodes > u32::MAX as usize / 20 {
             return Err(fail());
         }
-        Ok(Self { rows, nodes, report_words, ball_words })
+        Ok(Self {
+            rows,
+            nodes,
+            report_words,
+            ball_words,
+        })
     }
 }
 
@@ -176,9 +185,11 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
             SectionFaceChart::declare(self.rows(), self.components(), group_width, self.grain())?;
         let surface = self.resident_section().surface();
         let report = surface.fresh_section(chart.rows, chart.report_words, ResidentGrain(0))?;
-        let participation = surface.fresh_section(chart.rows, chart.ball_words, ResidentGrain(0))?;
+        let participation =
+            surface.fresh_section(chart.rows, chart.ball_words, ResidentGrain(0))?;
         let difference = surface.fresh_section(chart.rows, chart.ball_words, ResidentGrain(0))?;
         let potential = surface.fresh_section(chart.rows, chart.ball_words, ResidentGrain(0))?;
+        let flags = surface.fresh_section(chart.rows, SLOT_WORDS / 2, ResidentGrain(0))?;
         let mut passage = surface.begin_passage(&[vec![]])?;
         {
             let lane = passage.open(0, &[])?;
@@ -196,7 +207,9 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
                 &participation,
                 &difference,
                 &potential,
+                &flags,
             )?;
+            surface.collect_phase_status(&lane, &flags, chart.rows)?;
         }
         passage.close(0, &report, 64)?;
         let receipt = passage.finish()?.launch()?;
@@ -207,7 +220,13 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
             )));
         }
         let ball = |section| {
-            Self::from_resident(surface, section, chart.rows, self.components(), self.grain())
+            Self::from_resident(
+                surface,
+                section,
+                chart.rows,
+                self.components(),
+                self.grain(),
+            )
         };
         Ok(NativeNormalizedSection {
             surface,
@@ -269,7 +288,9 @@ impl<'c> NativeNormalizedSection<'c> {
     pub fn returned_difference(
         &self,
     ) -> Result<&ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
-        self.difference.as_ref().ok_or(ConstitutiveFibreError::Shape)
+        self.difference
+            .as_ref()
+            .ok_or(ConstitutiveFibreError::Shape)
     }
 
     /// `J_p(q-p)`, in that same chart. Present only when a comparison face was supplied.
@@ -305,8 +326,13 @@ impl<'c> NativeNormalizedSection<'c> {
             .into_iter()
             .enumerate()
             .map(|(row, raw)| {
-                let [prediction, observation, returned_difference, potential_pullback, centered_difference] =
-                    decode_normalized_report(&raw, self.nodes, self.group_width, self.grain.0)?;
+                let [
+                    prediction,
+                    observation,
+                    returned_difference,
+                    potential_pullback,
+                    centered_difference,
+                ] = decode_normalized_report(&raw, self.nodes, self.group_width, self.grain.0)?;
                 Ok(NativeNormalizedMaterialReading {
                     source: row,
                     receiving: row,
@@ -358,15 +384,12 @@ impl<'c> NativeNormalizedSection<'c> {
         {
             return Err(ConstitutiveFibreError::Shape);
         }
-        let chart = SectionFaceChart::declare(
-            self.rows,
-            2 * self.nodes,
-            self.group_width,
-            self.grain,
-        )?;
+        let chart =
+            SectionFaceChart::declare(self.rows, 2 * self.nodes, self.group_width, self.grain)?;
         let surface = self.surface;
         let report = surface.fresh_section(chart.rows, chart.report_words, ResidentGrain(0))?;
         let potentials = surface.fresh_section(chart.rows, chart.ball_words, ResidentGrain(0))?;
+        let flags = surface.fresh_section(chart.rows, SLOT_WORDS / 2, ResidentGrain(0))?;
         let mut passage = surface.begin_passage(&[vec![]])?;
         {
             let lane = passage.open(0, &[])?;
@@ -380,7 +403,9 @@ impl<'c> NativeNormalizedSection<'c> {
                 self.grain.0,
                 &report,
                 &potentials,
+                &flags,
             )?;
+            surface.collect_phase_status(&lane, &flags, chart.rows)?;
         }
         passage.close(0, &report, 64)?;
         let receipt = passage.finish()?.launch()?;

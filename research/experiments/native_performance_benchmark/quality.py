@@ -237,12 +237,102 @@ def evaluate(mode, output, binary):
     return result
 
 
+def assess_episode(episode, generated, output):
+    """Receive one new native result beside the separate historical assessment, with no gold substitution."""
+    source=json.loads((episode/'input.json').read_text())
+    assessment=json.loads((episode/'assessment.json').read_text())
+    run=json.loads(generated.read_text())
+    generated_sha256=hashlib.sha256(generated.read_bytes()).hexdigest()
+    request_id=source['request']['id']
+    if assessment['request_event']!=request_id or run['request_event']!=request_id:
+        raise ValueError('source, assessment and new run name different requests')
+    if source.get('candidate_or_later_return_included') is not False or assessment.get('assistant_is_gold') is not False:
+        raise ValueError('episode does not preserve its source/assessment boundary')
+    if run.get('schema')!='holonics.geometric-episode-run.v1' or run.get('codec')!='utf8-nibbles' or run.get('material_update') is not False:
+        raise ValueError('this receiver expects read-only native nibble episode output')
+    value=run['native_value']
+    if not isinstance(value, dict) or value.get('schema')!='org.holonics.hna.field-section.v1':
+        raise ValueError('generated result does not carry a public field-section value')
+    if value.get('source_chart')!='geometric-regions':
+        raise ValueError('generated result does not carry the geometric source chart')
+    request=''.join(part['text'] for part in source['request']['parts']).encode()
+    raw_output_bytes=value.get('output_bytes')
+    if not isinstance(raw_output_bytes, list) or any(not isinstance(byte, int) or not 0 <= byte <= 255 for byte in raw_output_bytes):
+        raise ValueError('generated output bytes are not an octet list')
+    output_bytes=bytes(raw_output_bytes)
+    response_symbols=run.get('response_symbols')
+    if not isinstance(response_symbols, int) or response_symbols <= 0 or response_symbols % 2:
+        raise ValueError('UTF-8 nibble response extent must be a positive even symbol count')
+    if run.get('held_request_octets')!=len(request) or len(output_bytes)*2!=len(value.get('symbols', [])):
+        raise ValueError('declared native byte/symbol receiving extent disagrees')
+    if value.get('output_symbols') != len(value.get('symbols', [])) or len(value.get('selections', [])) != value.get('output_symbols'):
+        raise ValueError('generated symbols and selections have different receiving extents')
+    if len(output_bytes)*2!=2*len(request)+response_symbols:
+        raise ValueError('generated face changed the declared response extent')
+    expected_symbols=[digit for byte in output_bytes for digit in (format(byte >> 4, 'x'), format(byte & 15, 'x'))]
+    if value.get('symbols')!=expected_symbols:
+        raise ValueError('generated symbols disagree with the output byte carrier')
+    if any(not isinstance(face, dict) or not isinstance(face.get('selected'), int) or not 0 <= face['selected'] < 16
+           for face in value['selections']):
+        raise ValueError('generated nibble selections are malformed')
+    if [face['selected'] for face in value['selections']]!=[int(digit, 16) for digit in expected_symbols]:
+        raise ValueError('generated selections disagree with the output byte carrier')
+    free=output_bytes[len(request):]
+    try:
+        text=free.decode('utf-8'); decoded=True
+        printable=sum(char.isprintable() or char in '\n\r\t' for char in text)
+        characters=len(text)
+    except UnicodeDecodeError:
+        decoded=False;printable=None;characters=None
+    try:
+        output_bytes.decode('utf-8'); whole_decoded=True
+    except UnicodeDecodeError:
+        whole_decoded=False
+    native_decode_error=value.get('decode_error')
+    if whole_decoded and native_decode_error not in (None, ''):
+        raise ValueError('native decode error disagrees with valid UTF-8 output')
+    if not whole_decoded and not native_decode_error:
+        raise ValueError('invalid UTF-8 output has no native decode error')
+    judgments=assessment.get('constraint_judgments',[])
+    for judgment in judgments:
+        if (judgment.get('status') not in ['satisfied','contradicted','unresolved']
+                or not judgment.get('source') or not judgment.get('evidence')
+                or judgment.get('generated_sha256')!=generated_sha256):
+            raise ValueError('a source judgment requires status, source, evidence and this generated SHA-256')
+    result={'schema':'holonics.episode-consequence.v1','request_event':request_id,
+        'source_scope':source['scope'],'native_source_chart':value.get('source_chart'),
+        'generated_sha256':generated_sha256,
+        'supplied_request_octets':len(request),'request_preserved':output_bytes[:len(request)]==request,
+        'generated_octets':len(free),'generated_utf8':decoded,'generated_characters':characters,
+        'printable_or_layout_characters':printable,'elapsed_us':value.get('elapsed_us'),
+        'robust_free_symbol_faces':sum(face.get('robust') is True for face in value['selections'][2*len(request):]),
+        'free_symbol_faces':response_symbols,
+        'historical_assessment':{'recorded_candidates':len(assessment['recorded_candidates']),
+            'later_observations':len(assessment['recorded_later_observations']),
+            'assistant_is_gold':False,'later_observations_are_new_output_feedback':False},
+        'constraint_judgments':judgments,
+        'judgment_scope':'identified review testimony; encoding/extent checks alone do not assess conversation usefulness',
+        'material_update':False}
+    output.mkdir(parents=True,exist_ok=False,mode=0o700)
+    # The result contains no message text, but its provenance remains a private episode.
+    import os
+    with os.fdopen(os.open(output/'result.json',os.O_CREAT|os.O_EXCL|os.O_WRONLY,0o600),'w') as file:
+        json.dump(result,file,indent=2);file.write('\n')
+    return result
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode',choices=['recorded','run'])
+    parser.add_argument('mode',choices=['recorded','run','episode'])
     parser.add_argument('--output',type=Path,required=True,help='new result directory, never overwritten')
     parser.add_argument('--binary',type=Path,default=ROOT/'target/debug/holonics')
+    parser.add_argument('--episode',type=Path,help='private input.json/assessment.json directory')
+    parser.add_argument('--generated',type=Path,help='new native geometric episode result')
     args=parser.parse_args()
+    if args.mode=='episode':
+        if args.episode is None or args.generated is None:parser.error('episode mode requires --episode and --generated')
+        result=assess_episode(args.episode,args.generated,args.output.resolve())
+        print(json.dumps(result));return
     result=evaluate(args.mode,args.output.resolve(),args.binary.resolve())
     # Exit means the receiver ran; per-family failures remain visible, never a global AI verdict.
     print(json.dumps({'output':str(args.output/'result.json'),'mode':args.mode,

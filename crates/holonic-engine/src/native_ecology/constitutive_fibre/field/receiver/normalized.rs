@@ -261,5 +261,8 @@ pub use section::{
     NativeNormalizedSectionPullbackReading, NativeNormalizedSectionRowReading,
 };
 
+mod phase;
+pub use phase::{NativePhaseParticipation, NativePhaseParticipationAdjoint};
+
 #[cfg(test)]
 mod tests;

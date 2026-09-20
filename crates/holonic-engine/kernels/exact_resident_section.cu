@@ -29,7 +29,7 @@
 //
 // # The census is per occurrence, and refusals travel along the lineage — never through a shared word
 //
-// The apparatus hands every occurrence its own twelve-word slot in one resident census array:
+// The apparatus hands every occurrence its own sixteen-word slot in one resident census array:
 //
 //   [0]  refused flags        written by the semantic kernel (atomicOr)
 //   [1]  reach census         the contact's greatest reach (atomicMax)
@@ -1704,6 +1704,8 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 #include "normal_held_section.cuh"
 #include "normal_wave.cuh"
 #include "normal_applied_condition.cuh"
+#include "enclosure_composition.cuh"
+#include "phase_participation.cuh"
 #include "normal_wave_source.cuh"
 #include "normal_wave_family.cuh"
 #include "normal_family_receiver.cuh"

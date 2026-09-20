@@ -121,6 +121,23 @@ adaptation, perfect compression and every modality are not a serial barrier to t
 useful task. The first usable product combines demonstrated task quality with the durability
 and resource behavior needed by those tasks; interoperability is a later delivery.
 
+[established-bounded; source-inspected] The September 20 [geometric campaign](../../research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md)
+returns a new milestone-1 composition through the existing public body: validated analytic
+incidence/phase, native normalized participation, finite held refinement and the complete
+fixed-operand paired update. Recorded context and pending comparisons use the source/session
+restart boundary; elementary helical moment/phase reuse attaches to its existing compression
+owner. These are returned dependencies for the following work, not new foundations to reconstruct.
+
+[definition] The next milestone-2/3 construction acts on the measured source/receiver defect
+in that same operation. At fixed material the supplied two-step longitude chart has only two-hop
+request reach; most of its emitted free section cannot depend on the current request. Form its
+source/receiving restrictions and participating boundary/continuing current through the existing
+receiver, mode and interior owners, then inspect the same episode's output and full return.
+#17 owns that composition, #16 its actual application and assessment, #19 the extra variation
+when incidence/D changes, and #18 factor/locality realization at measured statistic or validated-rest
+cost. #61 continues measured placement and economical execution of this operation. The order
+already admits these couplings; another elementary fixture or bulk exposure does not replace them.
+
 ## Immediate mathematical application and implementation
 
 [project-postulate] Continue the shared embedding composition through the active mathematical

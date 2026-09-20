@@ -232,7 +232,19 @@ impl ExposureOccurrence {
     /// attachment has one contextual source port; differing parents or unavailable relations
     /// remain open rather than selecting a link by order or provider preference.
     pub fn shared_prior_parent(&self) -> Result<Option<ExposureFamily>, ExposureError> {
+        Ok(self
+            .shared_prior_parent_targets()?
+            .map(|(family, _)| family))
+    }
+
+    /// The common prior parent family and all captured event aliases naming that family. Event
+    /// aliases stay attached to the lookup so a repeated provider family cannot silently select
+    /// its latest occurrence by sequence alone.
+    pub fn shared_prior_parent_targets(
+        &self,
+    ) -> Result<Option<(ExposureFamily, BTreeSet<u64>)>, ExposureError> {
         let mut common: Option<BTreeSet<ExposureFamily>> = None;
+        let mut aliases = BTreeSet::new();
         for view in &self.views {
             let mut parents = BTreeSet::new();
             for link in &view.links {
@@ -253,6 +265,7 @@ impl ExposureOccurrence {
                     provider: target.provider.clone(),
                     record_group: target.record_group.clone(),
                 });
+                aliases.insert(target.event);
             }
             if common.as_ref().is_some_and(|previous| *previous != parents) {
                 return Err(ExposureError::Open(
@@ -267,7 +280,7 @@ impl ExposureOccurrence {
                 "several parent families require a wider contextual source port",
             ));
         }
-        Ok(parents.into_iter().next())
+        Ok(parents.into_iter().next().map(|family| (family, aliases)))
     }
 
     /// The one author role every captured view of this declared occurrence testifies to. The
@@ -560,6 +573,43 @@ pub struct ExposureCursor {
     pub byte_offset: u64,
 }
 
+/// Bounded cost of reconstructing recorded context from the pinned exposure wire. The index is
+/// exterior metadata: it retains offsets and family/sequence coordinates, never native state or
+/// message material. A reader builds it once, lazily, and seeks the verified wire for each frame
+/// needed by a context chain.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ExposureContextStats {
+    pub index_entries: u64,
+    pub index_scan_octets: u64,
+    pub lookup_frames: u64,
+    pub lookup_octets: u64,
+}
+
+#[derive(Clone, Debug)]
+struct ExposureIndexEntry {
+    sequence: u64,
+    byte_offset: u64,
+    family: ExposureFamily,
+    octets: u64,
+}
+
+#[derive(Clone, Copy, Debug)]
+enum ExposureAliasResolution {
+    Entry(usize),
+    Ambiguous,
+}
+
+#[derive(Default)]
+struct ExposureContextIndex {
+    by_alias: BTreeMap<(ExposureFamily, u64), ExposureAliasResolution>,
+    entries: Vec<ExposureIndexEntry>,
+    next_sequence: u64,
+    next_offset: u64,
+    blocked_at: Option<u64>,
+    stats: ExposureContextStats,
+}
+
 struct PendingOccurrence {
     frame: ExposureOccurrence,
     after: u64,
@@ -572,9 +622,11 @@ pub struct ExposureReader {
     input: BufReader<File>,
     manifest: ExposureManifest,
     cursor: ExposureCursor,
+    header_end: u64,
     pending: Option<PendingOccurrence>,
     stopped: bool,
     source_positions: BTreeMap<u64, usize>,
+    context_index: Option<ExposureContextIndex>,
 }
 
 impl ExposureReader {
@@ -634,9 +686,11 @@ impl ExposureReader {
             input,
             manifest,
             cursor,
+            header_end,
             pending: None,
             stopped: false,
             source_positions,
+            context_index: None,
         })
     }
 
@@ -645,6 +699,249 @@ impl ExposureReader {
     }
     pub fn cursor(&self) -> ExposureCursor {
         self.cursor.clone()
+    }
+
+    /// Return the recorded prior exposure chain for `request` from the immutable source wire.
+    /// Context bytes are the cumulative receiving aperture. Zero returns an empty context; a
+    /// positive value admits only a complete recorded chain whose visible material fits that
+    /// byte aperture. The exterior index scans the pinned source prefix through this request once,
+    /// then seeks each admitted parent.
+    pub fn recorded_context(
+        &mut self,
+        request: &ExposureOccurrence,
+        context_bytes: usize,
+    ) -> Result<Vec<ExposureOccurrence>, ExposureError> {
+        if context_bytes == 0 {
+            return Ok(Vec::new());
+        }
+        self.ensure_context_index(request.sequence)?;
+        let mut next_parent = request.shared_prior_parent_targets()?;
+        let mut next_sequence = request.sequence;
+        let mut chain = Vec::new();
+        let mut context_octets = 0usize;
+        while let Some((family, aliases)) = next_parent {
+            if self.alias_is_ambiguous(&family, &aliases) {
+                return Err(ExposureError::Open(
+                    "recorded context aliases resolve ambiguously",
+                ));
+            }
+            let entry_index =
+                self.context_index
+                    .as_ref()
+                    .map(|index| {
+                        aliases
+                            .iter()
+                            .filter_map(|event| {
+                                index.by_alias.get(&(family.clone(), *event)).and_then(
+                                    |resolution| match resolution {
+                                        ExposureAliasResolution::Entry(index) => Some(*index),
+                                        ExposureAliasResolution::Ambiguous => None,
+                                    },
+                                )
+                            })
+                            .collect::<BTreeSet<_>>()
+                    })
+                    .ok_or(ExposureError::Open(
+                        "recorded context is unavailable in the pinned source",
+                    ))?;
+            let entry_index = match entry_index.len() {
+                0 => {
+                    return Err(ExposureError::Open(
+                        "recorded context is unavailable in the pinned source",
+                    ));
+                }
+                1 => *entry_index.iter().next().expect("one entry"),
+                _ => {
+                    return Err(ExposureError::Open(
+                        "recorded context aliases resolve to several prior occurrences",
+                    ));
+                }
+            };
+            let entry = self
+                .context_index
+                .as_ref()
+                .and_then(|index| index.entries.get(entry_index))
+                .filter(|entry| entry.sequence < next_sequence)
+                .cloned()
+                .ok_or(ExposureError::Open(
+                    "recorded context is unavailable in the pinned source",
+                ))?;
+            let parent = self.read_indexed(&entry)?;
+            let parent_octets = parent
+                .development_parts()?
+                .iter()
+                .map(|part| {
+                    part.text
+                        .as_deref()
+                        .map(str::len)
+                        .ok_or(ExposureError::Open("recorded context has no visible text"))
+                })
+                .try_fold(0usize, |total, octets| {
+                    octets?
+                        .checked_add(total)
+                        .ok_or_else(|| boundary("recorded context byte aperture overflow"))
+                })?;
+            context_octets = context_octets
+                .checked_add(parent_octets)
+                .ok_or_else(|| boundary("recorded context byte aperture overflow"))?;
+            if context_octets > context_bytes {
+                return Err(ExposureError::Open(
+                    "recorded context exceeds the declared byte aperture",
+                ));
+            }
+            next_sequence = parent.sequence;
+            next_parent = parent.shared_prior_parent_targets()?;
+            chain.push(parent);
+        }
+        chain.reverse();
+        Ok(chain)
+    }
+
+    pub fn context_stats(&self) -> ExposureContextStats {
+        self.context_index
+            .as_ref()
+            .map_or_else(ExposureContextStats::default, |index| index.stats)
+    }
+
+    fn alias_is_ambiguous(&self, family: &ExposureFamily, aliases: &BTreeSet<u64>) -> bool {
+        aliases.iter().any(|event| {
+            matches!(
+                self.context_index
+                    .as_ref()
+                    .and_then(|index| index.by_alias.get(&(family.clone(), *event))),
+                Some(ExposureAliasResolution::Ambiguous)
+            )
+        })
+    }
+
+    fn ensure_context_index(&mut self, through_sequence: u64) -> Result<(), ExposureError> {
+        let mut index = self
+            .context_index
+            .take()
+            .unwrap_or_else(|| ExposureContextIndex {
+                next_offset: self.header_end,
+                ..ExposureContextIndex::default()
+            });
+        if index.next_sequence >= through_sequence {
+            self.context_index = Some(index);
+            return Ok(());
+        }
+        if index
+            .blocked_at
+            .is_some_and(|sequence| sequence < through_sequence)
+        {
+            self.context_index = Some(index);
+            return Err(boundary(
+                "recorded context index stopped at a malformed source frame",
+            ));
+        }
+        let saved = match self.input.stream_position() {
+            Ok(saved) => saved,
+            Err(error) => {
+                self.context_index = Some(index);
+                return Err(error.into());
+            }
+        };
+        if let Err(error) = self.input.seek(SeekFrom::Start(index.next_offset)) {
+            self.context_index = Some(index);
+            return Err(error.into());
+        }
+        let result = (|| {
+            while index.next_sequence < through_sequence {
+                let offset = self.input.stream_position()?;
+                let mut line = Vec::new();
+                if self.input.read_until(b'\n', &mut line)? == 0 {
+                    return Err(boundary("recorded context source prefix is incomplete"));
+                }
+                if !line.ends_with(b"\n") {
+                    return Err(boundary("occurrence frame is incomplete"));
+                }
+                let frame: ExposureOccurrence = serde_json::from_slice(&line)?;
+                if frame.sequence != index.next_sequence {
+                    return Err(boundary("occurrence sequence disagrees with source index"));
+                }
+                frame.validate_with_sources(&self.manifest, &self.source_positions)?;
+                let entry_index = index.entries.len();
+                let after = self.input.stream_position()?;
+                let entry = ExposureIndexEntry {
+                    sequence: frame.sequence,
+                    byte_offset: offset,
+                    family: frame.family.clone(),
+                    octets: u64::try_from(line.len())
+                        .map_err(|_| boundary("occurrence frame extent overflow"))?,
+                };
+                index.entries.push(entry);
+                for event in frame.views.iter().map(|view| view.event) {
+                    let key = (frame.family.clone(), event);
+                    match index.by_alias.entry(key) {
+                        std::collections::btree_map::Entry::Vacant(slot) => {
+                            slot.insert(ExposureAliasResolution::Entry(entry_index));
+                        }
+                        std::collections::btree_map::Entry::Occupied(mut slot) => {
+                            *slot.get_mut() = ExposureAliasResolution::Ambiguous;
+                        }
+                    }
+                }
+                index.next_sequence = index
+                    .next_sequence
+                    .checked_add(1)
+                    .ok_or_else(|| boundary("exposure sequence exhausted"))?;
+                index.next_offset = after;
+                index.stats.index_entries = index.next_sequence;
+                index.stats.index_scan_octets = index.next_offset - self.header_end;
+            }
+            Ok(())
+        })();
+        if result.is_err() {
+            index.blocked_at = Some(index.next_sequence);
+        }
+        let restore = self.input.seek(SeekFrom::Start(saved));
+        self.context_index = Some(index);
+        match (result, restore) {
+            (Err(error), _) => return Err(error),
+            (Ok(()), Err(error)) => return Err(error.into()),
+            (Ok(()), Ok(_)) => {}
+        }
+        Ok(())
+    }
+
+    fn read_indexed(
+        &mut self,
+        entry: &ExposureIndexEntry,
+    ) -> Result<ExposureOccurrence, ExposureError> {
+        let saved = self.input.stream_position()?;
+        self.input.seek(SeekFrom::Start(entry.byte_offset))?;
+        let mut line = Vec::new();
+        let result = (|| {
+            if self.input.read_until(b'\n', &mut line)? == 0 || !line.ends_with(b"\n") {
+                return Err(boundary("indexed occurrence frame is incomplete"));
+            }
+            let frame: ExposureOccurrence = serde_json::from_slice(&line)?;
+            if frame.sequence != entry.sequence
+                || frame.family != entry.family
+                || u64::try_from(line.len()).unwrap_or(u64::MAX) != entry.octets
+            {
+                return Err(boundary(
+                    "indexed occurrence disagrees with source metadata",
+                ));
+            }
+            frame.validate_with_sources(&self.manifest, &self.source_positions)?;
+            Ok(frame)
+        })();
+        let restore = self.input.seek(SeekFrom::Start(saved));
+        let frame = match (result, restore) {
+            (Err(error), _) => return Err(error),
+            (Ok(_), Err(error)) => return Err(error.into()),
+            (Ok(frame), Ok(_)) => frame,
+        };
+        if let Some(index) = &mut self.context_index {
+            index.stats.lookup_frames = index.stats.lookup_frames.saturating_add(1);
+            index.stats.lookup_octets = index
+                .stats
+                .lookup_octets
+                .saturating_add(u64::try_from(line.len()).unwrap_or(u64::MAX));
+        }
+        Ok(frame)
     }
 
     pub fn peek(&mut self) -> Result<Option<&ExposureOccurrence>, ExposureError> {
