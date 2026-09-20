@@ -1583,7 +1583,7 @@
         "pH and protonation assumption",
         "membrane or soluble context"
       ],
-      "file": "/home/b/Downloads/holonics-m5-rbx1-rank05/designed-free-rbx1.cif",
+      "file": "<M5_STRUCTURE_ROOT>/designed-free-rbx1.cif",
       "first_m5_residue": 1,
       "group": "designed",
       "last_m5_residue": 108,
@@ -1600,7 +1600,7 @@
         "pH and protonation assumption",
         "membrane or soluble context"
       ],
-      "file": "/home/b/Downloads/holonics-m5-rbx1-rank05/ptxv2-free-rbx1-seed2.cif",
+      "file": "<M5_STRUCTURE_ROOT>/ptxv2-free-rbx1-seed2.cif",
       "first_m5_residue": 1,
       "group": "protenix-free",
       "last_m5_residue": 108,
@@ -1617,7 +1617,7 @@
         "pH and protonation assumption",
         "membrane or soluble context"
       ],
-      "file": "/home/b/Downloads/holonics-m5-rbx1-rank05/ptxv2-cul1-rbx1-seed0.cif",
+      "file": "<M5_STRUCTURE_ROOT>/ptxv2-cul1-rbx1-seed0.cif",
       "first_m5_residue": 1,
       "group": "protenix-cul1",
       "last_m5_residue": 108,
