@@ -97,6 +97,15 @@ or reduction law. A launch then assigns the independent work to the hardware's d
 This applies the [hardware-cover method](HARDWARE_AND_MODALITY_BOUNDARIES.md), not a claim that
 co-presence itself implies commutation or that a lane is a Holon.
 
+[established-bounded; source-inspected] **Current encoding boundary:** `GeometricRegions`
+derives its channel width, unit-current inputs, slot placement and observation targets from a
+supplied alphabet. The nibble example therefore shapes the application beyond final text
+serialization. Its text decoder selects basis coordinates and assembles bytes; it does not call
+the separate helical moment compression. Use the existing
+[Holonic Encoding construction](../research/records/2026-09-11_HOLONIC_ENCODING_RETAINS_TRANSFORMATION_GRAIN_ACROSS_MODALITIES.md)
+and the [campaign correction](../research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md#correction-the-nibble-control-is-not-holonic-encoding)
+when continuing the actual encoder/passage/receiver composition.
+
 ## Research is construction material
 
 [project-postulate] Hodge's realization and harmonic/cycle laws, RH's source-qualified spectral

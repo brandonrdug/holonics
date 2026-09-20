@@ -10,6 +10,51 @@ helical moment/phase caller, and carries actual recorded context across restart.
 biology continuation remain deferred. Existing mathematical and application returns retain their
 scopes; this increment does not reset the framework to its small verification cases.
 
+## Correction: the nibble control is not Holonic Encoding
+
+[project-postulate] Brandon's subsequent direct question challenges the UTF-8 output path and
+its compatibility with toroidal/helical Holonic Encoding and Compression. This correction
+supersedes the campaign's suggestion that an exterior codec and limited request reach adequately
+described the remaining representation work. The existing
+[September 11 construction](2026-09-11_HOLONIC_ENCODING_RETAINS_TRANSFORMATION_GRAIN_ACROSS_MODALITIES.md)
+already requires situated transformation/receiver formation and reuse; this is recovered work,
+not a new architectural requirement.
+
+[established-bounded; source-inspected] `Utf8Nibbles` predates this campaign in `SharedRegions`.
+Codex selected it in the new `athena_geometric_spec` and carried it into `GeometricRegions`.
+The actual path is `text.as_bytes()` → two nibble symbols per byte → unit-coordinate currents
+at ordered junction slots → geometric refinement → one real-centre basis selection per output
+slot → `(high << 4) | low` → `String::from_utf8`. The emitted `ee ff …` fails that final parser:
+`ff` is not a valid UTF-8 byte, and `ee` needs valid continuation bytes. Nothing in that chosen
+basis receiver imposes a valid text reconstruction relation. Non-robust selections are still
+converted into candidate bytes; their reported uncertainty does not make them resolved text.
+
+[established-bounded; source-inspected] This choice does more than serialize a final face.
+`geometric_extents` derives the local channel/feature shape from `symbols.len()`;
+`prepare_geometric` assigns each codec symbol a unit coordinate and a junction slot;
+`observe_geometric_source` constructs targets in that same alphabet. Thus the codec determines
+the source grain, boundary granularity and learned comparison in this application. Calling it
+merely exterior understated its architectural role. The phase transport and paired current
+operators remain real operations, but their symbol-basis caller is a bounded control, not the
+completed Holonic Encoding/decoding construction requested for Athena.
+
+[established-bounded; source-inspected] The HNN session has no call to `HelicalMomentReuse` or
+`ObservableMomentReceiverHistoryCompression`. The campaign's helical moment decoder is an
+independent library consumer, not the decoder used to produce these text bytes. No encoder E,
+induced action U and receiver decoder D for this text path were constructed with
+`D_r E=ρ_r` and `E_next T=U E`, or an explicit retained defect/fibre at the applicable scope.
+The 2/128 reach count describes the imposed nibble-position chart; adding reach or forcing valid
+Unicode would not supply the missing transformation/receiver construction.
+
+[project-postulate] The next #17/#16 operation must bind the existing situated source/condition,
+transformation formation, receiver descent and retained-interior owners through the actual
+field consumer. Construct the encoded passage and its receiving action together, keeping phase,
+order, clocks, shared source and required fibre. A requested text face may finally be serialized
+as UTF-8 through its exterior interface. Alphabet selection or byte validity alone is not the
+encoding or compression law. Existing numerical/correctness and source-restart evidence below
+retains its control scope; this correction does not claim that the code's encoding has been
+repaired.
+
 ## The source geometry reaches the actual model
 
 [established-bounded; source-inspected] `native/field_geometry.rs::GeometricFieldSpec` consumes

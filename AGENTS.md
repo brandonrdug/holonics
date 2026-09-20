@@ -117,6 +117,12 @@ recorded scope. Use [Soulkiller](docs/SOULKILLER.md), [Athena](docs/ATHENA.md),
 [architecture](docs/ARCHITECTURE.md) and [interoperability](docs/INTEROPERABILITY.md) for those interfaces.
 Preserve existing `hna` API/wire identifiers and historical names.
 
+[established-bounded; source-inspected] `GeometricRegions` currently uses alphabet-derived
+channels, unit-current inputs/targets and per-slot basis decoding. It is a numerical application
+control; `HelicalMomentReuse` is a separate caller. The next encoder/decoder work follows the
+[existing Holonic Encoding construction](research/records/2026-09-11_HOLONIC_ENCODING_RETAINS_TRANSFORMATION_GRAIN_ACROSS_MODALITIES.md)
+and the [campaign correction](research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md#correction-the-nibble-control-is-not-holonic-encoding).
+
 ## Construct, connect, verify
 
 1. Identify the requested object, mathematical unknown, source/receiver and actual consuming call

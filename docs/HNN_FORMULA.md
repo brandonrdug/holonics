@@ -468,6 +468,12 @@ flowchart LR
 
 ### The geometric session word
 
+[established-bounded; source-inspected] This section records an implemented numerical word.
+Its current session caller derives channels, source slots and targets from a supplied symbol
+alphabet and decodes with per-slot basis selection. It has not constructed the intended Holonic
+Encoding and Compression maps. The [campaign correction](../research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md#correction-the-nibble-control-is-not-holonic-encoding)
+locates that substitution and the existing construction to bind.
+
 [established-bounded; source-inspected] `GeometricFieldSpec` and
 `NativeCoupledBody::preview_geometric_rows` now compose the analytic junction/arc owner,
 the existing normalized section receiver, constituted reaction and a finite joint refinement.

@@ -1,5 +1,13 @@
 # Analytic geometric field and bounded real-source experiment
 
+
+The [campaign correction](../../../records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md#correction-the-nibble-control-is-not-holonic-encoding)
+classifies this as a supplied symbol-basis control. Alphabet size determines its channels;
+codec symbols determine site inputs and targets; its receiver selects and packs nibbles. This
+path has no Holonic Compression encoder/induced-action/decoder binding. The independent helical
+moment adapter is not called here. Recorded byte validity and source reach therefore assess
+this control, not the intended Holonic Encoding construction.
+
 This experiment drives the public `NativeFieldSession` through the `GeometricRegions` source
 chart. The supplied source is the validated linked-torus boundary construction in
 `crates/holonics-hna/examples/support/linked_torus_field.rs`: junctions, oriented arcs, endpoint

@@ -938,6 +938,13 @@ port's domain. The mathematical source is a family; a chosen centre does not era
 
 #### The embedding and decoding objects are the linked toroidal field
 
+[established-bounded; source-inspected] The September 20 caller still places one unit-basis
+codec symbol at each declared slot and trains against the same symbol basis. Its output selects
+nibbles and packs bytes; `HelicalMomentReuse` is not connected to this path. The
+[campaign correction](../../research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md#correction-the-nibble-control-is-not-holonic-encoding)
+therefore retains this as a numerical control. The next consuming work is the existing
+transformation/receiver encoding composition, not enlargement or Unicode repair of that chart.
+
 [project-postulate] Brandon's September 14–19 direct messages (private extract:
 `.local/message-recovery-2026-09-20/`) fix what is being embedded and decoded. The embedding
 object is a chain of interlinked tori/knots: circulating phase modes on overlapping field domains

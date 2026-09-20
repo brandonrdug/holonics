@@ -122,21 +122,28 @@ useful task. The first usable product combines demonstrated task quality with th
 and resource behavior needed by those tasks; interoperability is a later delivery.
 
 [established-bounded; source-inspected] The September 20 [geometric campaign](../../research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md)
-returns a new milestone-1 composition through the existing public body: validated analytic
-incidence/phase, native normalized participation, finite held refinement and the complete
-fixed-operand paired update. Recorded context and pending comparisons use the source/session
+returns reusable native operations and a supplied-symbol control through the existing public
+body: validated analytic incidence/phase, normalized participation, finite held refinement and
+the complete fixed-operand paired update. The control does not complete Holonic Encoding. Recorded context and pending comparisons use the source/session
 restart boundary; elementary helical moment/phase reuse attaches to its existing compression
 owner. These are returned dependencies for the following work, not new foundations to reconstruct.
 
-[definition] The next milestone-2/3 construction acts on the measured source/receiver defect
-in that same operation. At fixed material the supplied two-step longitude chart has only two-hop
-request reach; most of its emitted free section cannot depend on the current request. Form its
-source/receiving restrictions and participating boundary/continuing current through the existing
-receiver, mode and interior owners, then inspect the same episode's output and full return.
-#17 owns that composition, #16 its actual application and assessment, #19 the extra variation
-when incidence/D changes, and #18 factor/locality realization at measured statistic or validated-rest
-cost. #61 continues measured placement and economical execution of this operation. The order
-already admits these couplings; another elementary fixture or bulk exposure does not replace them.
+[project-postulate] Brandon’s subsequent UTF-8 correction identifies an earlier representation
+substitution in that campaign. The supplied nibble alphabet determines channel width, slot
+placement and training targets; the output is per-slot basis selection, not the separate helical
+compression decoder. The native geometric/adjoint ports are returned, while this application is
+still a symbol-basis control. Its two-hop reach measurement does not make larger reach the
+architectural repair. The [source-level correction](../../research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md#correction-the-nibble-control-is-not-holonic-encoding)
+updates the claim without discarding the scoped checks.
+
+[definition] Continue the already-established
+[Holonic Encoding construction](../../research/records/2026-09-11_HOLONIC_ENCODING_RETAINS_TRANSFORMATION_GRAIN_ACROSS_MODALITIES.md)
+through #17/#16: form situated source/condition transformations and their encoded passages,
+bind the receiving decoder and induced continuing action, and retain the actual fibre/defect
+where descent is incomplete. The laws are `D_r E=ρ_r` and `E_next T=U E` at their declared
+scope. Text serialization follows its receiving map. #19 supplies additional incidence/material
+variation; #18/#61 realize the actual composed operation at measured cost. Byte sanitization,
+a larger vocabulary or expanded nibble support does not return that construction.
 
 ## Immediate mathematical application and implementation
 
