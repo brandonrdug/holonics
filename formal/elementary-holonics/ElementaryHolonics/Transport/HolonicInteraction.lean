@@ -321,6 +321,162 @@ theorem storage_rate_neg_of_active_slip (Omega M G : Matrix (Fin n) (Fin n) ℚ)
   rw [storage_rate_reading Omega M G hG hOmega hM]
   linarith
 
+/-! ## 4b. What structure places: the `G`-self-adjoint generator and the conservative core -/
+
+/-- [proved-derived; formal-checked] **A generator with no skew structure is self-adjoint in the
+`G`-pairing.** `A = −M G` satisfies `Aᵀ G = G A` exactly, for any symmetric `G` and symmetric `M`,
+definite or not. This is the algebraic half of the real-spectrum licence: it says `(G A, G)` is a
+pair of symmetric forms, and the spectral half — that such a pair with `G ≻ 0` is simultaneously
+diagonalizable by congruence, so `A = G⁻¹(G A)` has real spectrum — is `[proved-standard]`
+(Horn & Johnson, *Matrix Analysis*, 2nd ed., Theorem 4.5.15) and is cited, not lifted. -/
+theorem selfAdjoint_of_no_structure (M G : Matrix (Fin n) (Fin n) ℚ) (hG : Gᵀ = G) (hM : Mᵀ = M) :
+    (portGenerator 0 M G)ᵀ * G = G * portGenerator 0 M G := by
+  have adjoint : (portGenerator 0 M G)ᵀ = G * (-M) := by
+    rw [portGenerator, Matrix.transpose_mul, Matrix.transpose_sub, hM, hG, Matrix.transpose_zero]
+    noncomm_ring
+  rw [adjoint, portGenerator]
+  noncomm_ring
+
+/-- [proved-derived; formal-checked] **The symmetrized generator is minus the congruent
+dissipation.** `G A = −G M G` for `A = −M G`, and the right-hand side is the form whose split
+Sylvester's law makes the split of `σ(A)`. -/
+theorem symmetrized_generator_of_no_structure (M G : Matrix (Fin n) (Fin n) ℚ) :
+    G * portGenerator 0 M G = -(G * M * G) := by
+  rw [portGenerator]
+  noncomm_ring
+
+/-- [proved-derived; formal-checked] **A nonnegative quadratic in one rational variable has no
+linear term.** The discriminant step, stated once so the two places that need it share it. -/
+theorem linear_term_vanishes_of_nonneg {c d : ℚ} (hd : 0 ≤ d)
+    (h : ∀ t : ℚ, 0 ≤ 2 * t * c + t ^ 2 * d) : c = 0 := by
+  rcases eq_or_lt_of_le hd with hzero | hpos
+  · have h1 := h 1
+    have h2 := h (-1)
+    rw [← hzero] at h1 h2
+    linarith
+  · by_contra hne
+    have hdne : d ≠ 0 := ne_of_gt hpos
+    have hkey := h (-c / d)
+    have expand : 2 * (-c / d) * c + (-c / d) ^ 2 * d = -(c ^ 2) / d := by
+      field_simp
+      ring
+    rw [expand] at hkey
+    have hmul : 0 ≤ -(c ^ 2) / d * d := mul_nonneg hkey hpos.le
+    rw [div_mul_cancel₀ _ hdne] at hmul
+    have hcc : c * c = 0 := by nlinarith [mul_self_nonneg c]
+    rcases mul_eq_zero.mp hcc with hz | hz <;> exact hne hz
+
+/-- [proved-derived; formal-checked] **A positive semidefinite form annihilates its own null
+cone.** `⟨w, M w⟩ = 0` forces `M w = 0` — the operator statement, not merely the quadratic one.
+This is what turns "no dissipation is read along this motion" into "dissipation does not see this
+motion at all", and it is the step the conservative core rests on. -/
+theorem psd_mulVec_eq_zero_of_quad_eq_zero {M : Matrix (Fin n) (Fin n) ℚ}
+    (hM : ∀ s : Fin n → ℚ, 0 ≤ quad M s) (hMsymm : Mᵀ = M) {w : Fin n → ℚ}
+    (hw : quad M w = 0) : M *ᵥ w = 0 := by
+  have cross : ∀ u : Fin n → ℚ, u ⬝ᵥ (M *ᵥ w) = w ⬝ᵥ (M *ᵥ u) := by
+    intro u
+    rw [Matrix.dotProduct_mulVec, ← Matrix.mulVec_transpose, hMsymm]
+    exact dotProduct_comm _ _
+  have orthogonal : ∀ u : Fin n → ℚ, u ⬝ᵥ (M *ᵥ w) = 0 := by
+    intro u
+    refine linear_term_vanishes_of_nonneg (hM u) ?_
+    intro t
+    have expanded : quad M (w + t • u)
+        = 2 * t * (u ⬝ᵥ (M *ᵥ w)) + t ^ 2 * quad M u := by
+      simp only [quad, Matrix.mulVec_add, Matrix.mulVec_smul, dotProduct_add, add_dotProduct,
+        dotProduct_smul, smul_dotProduct, smul_eq_mul] at hw ⊢
+      rw [hw, ← cross u]
+      ring
+    rw [← expanded]
+    exact hM _
+  ext i
+  have single := orthogonal (Pi.single i 1)
+  simpa [dotProduct, Pi.single_apply, Finset.sum_ite_eq'] using single
+
+/-- [proved-derived; formal-checked] **On the modes dissipation cannot see, the generator is the
+skew structure alone.** `M G v = 0` makes `A v = Ω G v`, which is the whole content of the
+conservative core: there the motion is carried by `Ω` and the storage reading is constant. -/
+theorem generator_is_conservative_on_the_core (Omega M G : Matrix (Fin n) (Fin n) ℚ)
+    {v : Fin n → ℚ} (hv : (M * G) *ᵥ v = 0) :
+    portGenerator Omega M G *ᵥ v = (Omega * G) *ᵥ v := by
+  have expand : portGenerator Omega M G = Omega * G - M * G := by
+    rw [portGenerator]; noncomm_ring
+  rw [expand, Matrix.sub_mulVec, hv, sub_zero]
+
+/-- [proved-derived; formal-checked] **The unobservable subspace is `A`-invariant.** A motion every
+block `M G Aᵏ` annihilates is carried by `A` to another such motion, so the stack's kernel really
+is the largest `A`-invariant subspace inside `ker(M G)` and not merely a subspace of it. -/
+theorem core_is_generator_invariant {A K : Matrix (Fin n) (Fin n) ℚ} {v : Fin n → ℚ}
+    (hv : ∀ k : ℕ, (K * A ^ k) *ᵥ v = 0) :
+    ∀ k : ℕ, (K * A ^ k) *ᵥ (A *ᵥ v) = 0 := by
+  intro k
+  have shift : (K * A ^ k) *ᵥ (A *ᵥ v) = (K * A ^ (k + 1)) *ᵥ v := by
+    rw [Matrix.mulVec_mulVec, pow_succ, ← Matrix.mul_assoc]
+  rw [shift]
+  exact hv (k + 1)
+
+/-- [proved-derived; formal-checked] The core lies inside `ker(M G)`: the `k = 0` block is `K`
+itself. -/
+theorem core_le_ker {A K : Matrix (Fin n) (Fin n) ℚ} {v : Fin n → ℚ}
+    (hv : ∀ k : ℕ, (K * A ^ k) *ᵥ v = 0) : K *ᵥ v = 0 := by
+  have := hv 0
+  simpa using this
+
+/-- [proved-derived; formal-checked] **The rate form at a motion is twice the storage pairing of
+the drift.** With `G` symmetric the two halves of `AᵀG + GA` read the same number. -/
+theorem quad_rateForm_eq_two_pairing (A G : Matrix (Fin n) (Fin n) ℚ) (hG : Gᵀ = G)
+    (v : Fin n → ℚ) :
+    quad (rateFormQ A G) v = 2 * ((G *ᵥ v) ⬝ᵥ (A *ᵥ v)) := by
+  have left : v ⬝ᵥ ((Aᵀ * G) *ᵥ v) = (G *ᵥ v) ⬝ᵥ (A *ᵥ v) := by
+    rw [← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec, ← Matrix.mulVec_transpose,
+      Matrix.transpose_transpose]
+    exact dotProduct_comm _ _
+  have right : v ⬝ᵥ ((G * A) *ᵥ v) = (G *ᵥ v) ⬝ᵥ (A *ᵥ v) := by
+    rw [← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec, ← Matrix.mulVec_transpose, hG]
+  rw [quad, rateFormQ, Matrix.add_mulVec, dotProduct_add, left, right]
+  ring
+
+/-- [proved-derived; formal-checked] **The rate identity at an eigenvector.** For any real
+eigenvalue of the port-Hamiltonian generator, `λ ⟨v, G v⟩ = −⟨G v, M (G v)⟩`: the skew structure
+reads exactly nothing, so the eigenvalue is the dissipated power per unit storage, with a sign. -/
+theorem eigenvalue_reads_the_dissipation (Omega M G : Matrix (Fin n) (Fin n) ℚ) (hG : Gᵀ = G)
+    (hOmega : Omegaᵀ = -Omega) (hM : Mᵀ = M) {v : Fin n → ℚ} {lam : ℚ}
+    (hv : portGenerator Omega M G *ᵥ v = lam • v) :
+    lam * quad G v = -quad M (G *ᵥ v) := by
+  have rate := storage_rate_reading Omega M G hG hOmega hM v
+  have pairing := quad_rateForm_eq_two_pairing (portGenerator Omega M G) G hG v
+  rw [hv, dotProduct_smul, smul_eq_mul, dotProduct_comm (G *ᵥ v) v, rate] at pairing
+  simp only [quad] at pairing ⊢
+  linarith [pairing]
+
+/-- [proved-derived; formal-checked] **A real eigenvalue of a generator over a positive definite
+storage form is nonpositive**, and it is zero exactly where dissipation does not see the mode. The
+second half is the finite LaSalle condition: the on-axis real modes are exactly the ones inside
+`ker(M G)`. -/
+theorem real_eigenvalue_nonpos_and_zero_iff_unseen (Omega M G : Matrix (Fin n) (Fin n) ℚ)
+    (hG : Gᵀ = G) (hOmega : Omegaᵀ = -Omega) (hM : Mᵀ = M)
+    (hMpsd : ∀ s : Fin n → ℚ, 0 ≤ quad M s) {v : Fin n → ℚ} {lam : ℚ}
+    (hstorage : 0 < quad G v) (hv : portGenerator Omega M G *ᵥ v = lam • v) :
+    lam ≤ 0 ∧ (lam = 0 ↔ (M * G) *ᵥ v = 0) := by
+  have identity := eigenvalue_reads_the_dissipation Omega M G hG hOmega hM hv
+  have nonneg := hMpsd (G *ᵥ v)
+  refine ⟨by nlinarith [identity, nonneg, hstorage], ?_⟩
+  constructor
+  · intro hzero
+    rw [hzero, zero_mul] at identity
+    have vanishes : quad M (G *ᵥ v) = 0 := by linarith
+    have annihilated := psd_mulVec_eq_zero_of_quad_eq_zero hMpsd hM vanishes
+    rw [← Matrix.mulVec_mulVec]
+    exact annihilated
+  · intro hunseen
+    have vanishes : quad M (G *ᵥ v) = 0 := by
+      rw [quad, Matrix.mulVec_mulVec, hunseen]
+      simp
+    rw [vanishes, neg_zero] at identity
+    rcases mul_eq_zero.mp identity with h | h
+    · exact h
+    · exact absurd h (ne_of_gt hstorage)
+
 /-! ## 5. The defect: a vanishing rate form places no spectrum without a definite storage form -/
 
 /-- [definition] The indefinite storage form `diag(1, −1)`. -/
@@ -407,6 +563,16 @@ namespace Audit
 #print axioms indefiniteStorage_rate_form_vanishes
 #print axioms swapGenerator_has_a_right_half_plane_mode
 #print axioms vanishing_rate_form_places_no_spectrum
+#print axioms selfAdjoint_of_no_structure
+#print axioms symmetrized_generator_of_no_structure
+#print axioms linear_term_vanishes_of_nonneg
+#print axioms psd_mulVec_eq_zero_of_quad_eq_zero
+#print axioms generator_is_conservative_on_the_core
+#print axioms core_is_generator_invariant
+#print axioms core_le_ker
+#print axioms quad_rateForm_eq_two_pairing
+#print axioms eigenvalue_reads_the_dissipation
+#print axioms real_eigenvalue_nonpos_and_zero_iff_unseen
 #print axioms interface_tangential_agreement_retains_normal_remainder
 
 end Audit

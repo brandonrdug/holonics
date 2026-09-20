@@ -30,7 +30,14 @@
 //!   algebraic factor. No square root appears on any deciding path: for an irreducible
 //!   `x² + b x + c` with `4c − b² > 0` the squared half-width is `(4c − b²)/4` exactly, and a
 //!   factor of degree above two that no rational decides is returned in its own `undecided` list
-//!   rather than chosen.
+//!   rather than chosen. **A second, structural arm**
+//!   ([`analytic_width_of_real_spectrum`]) decides the same width from a placement instead of a
+//!   pole: when the caller's generator carries a [`RealSpectrumLicence`] every eigenvalue is
+//!   real, so every pole is, the strip has closed and the squared half-width is exactly `0` — at
+//!   any extent, with no characteristic polynomial formed. This owner does not decide which
+//!   licence a generator carries; that reading belongs to
+//!   [`crate::holonic_interaction::HolonicInteraction::structural_placement`] and the licence is
+//!   carried on the certificate so what the width rests on stays visible on the wire.
 //!
 //! [definition] They are related **only** through a declared [`ConstitutiveLink`], which names its
 //! own domain and returns a residual. Nothing in this owner converts one width into another
@@ -340,6 +347,29 @@ pub enum AnalyticCertificate {
         linear: Rat,
         constant: Rat,
     },
+    /// **The spectrum is on the real axis by structure, so the strip has closed without a pole
+    /// being computed.** The licence names the theorem; `extent` is the chart it holds on, and it
+    /// is carried because a placement over an empty chart places nothing.
+    StructurallyPlacedOnTheRealAxis {
+        licence: RealSpectrumLicence,
+        extent: usize,
+    },
+}
+
+/// **Why a spectrum is known real without any root being isolated.**
+///
+/// [definition] This owner does not decide which licence a generator carries — that is
+/// [`crate::holonic_interaction::HolonicInteraction::structural_placement`]'s reading. It carries
+/// the name so the certificate says what it rests on, and so a caller reading the width back off
+/// the wire can see that no pole was formed.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum RealSpectrumLicence {
+    /// `A = −M G` with `G ≻ 0` symmetric and `M ⪰ 0` symmetric: `AᵀG = GA`, so `A` is
+    /// self-adjoint in the `G`-pairing, `S = G A` is symmetric, and the pair `(S, G)` is
+    /// simultaneously diagonalizable by congruence. Every eigenvalue is real and `≤ 0`, so every
+    /// pole of `C (sI − A)⁻¹ B` is real and the squared half-width is exactly `0`.
+    GSelfAdjointNegativeSemidefinite,
 }
 
 /// **(c) The analytic width: the squared distance from the real axis to the nearest pole.**
@@ -441,6 +471,31 @@ pub fn analytic_width(atlas: &PoleAtlas) -> Result<AnalyticWidth, NeckRefusal> {
         squared_half_width,
         attaining,
         undecided,
+    })
+}
+
+/// **The analytic width of a structurally placed spectrum — a certificate, not a pole reading.**
+///
+/// [proved-standard] When a caller's generator carries a [`RealSpectrumLicence`], every
+/// eigenvalue of `A` is real; the poles of `C (sI − A)⁻¹ B` are a subset of `σ(A)`, so every pole
+/// is real and the squared distance from the real axis to the nearest one is exactly `0`. **The
+/// strip has closed**, at any extent, without a characteristic polynomial being formed — which is
+/// the whole point: this is the arm that decides a face the pole atlas cannot reach.
+///
+/// `extent` is the chart the placement holds on. A placement over an empty chart places nothing,
+/// and the refusal is [`NeckRefusal::NoPoleToRead`] — the same refusal an empty atlas earns, for
+/// the same reason.
+pub fn analytic_width_of_real_spectrum(
+    licence: RealSpectrumLicence,
+    extent: usize,
+) -> Result<AnalyticWidth, NeckRefusal> {
+    if extent == 0 {
+        return Err(NeckRefusal::NoPoleToRead);
+    }
+    Ok(AnalyticWidth {
+        squared_half_width: Rat::zero(),
+        attaining: AnalyticCertificate::StructurallyPlacedOnTheRealAxis { licence, extent },
+        undecided: Vec::new(),
     })
 }
 

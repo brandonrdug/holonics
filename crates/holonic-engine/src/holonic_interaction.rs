@@ -24,7 +24,11 @@
 //! | `rateFormQ`, `portGenerator`, `port_storage_rate` | [`Medium::generator`] and [`StorageRateReading`], read through [`crate::causal_chord::rate_form`] |
 //! | `port_storage_rate_zero_of_no_dissipation` | [`StorageRateReading::is_conservative`] |
 //! | `quad_congruence`, `storage_rate_reading`, `storage_rate_nonpos`, `storage_rate_neg_of_active_slip` | [`StorageRateReading::predicted`] and [`SpectralReading`] |
-//! | `indefiniteStorage_rate_form_vanishes`, `swapGenerator_has_a_right_half_plane_mode`, `vanishing_rate_form_places_no_spectrum` | [`SpectralReading::NoLicenceWithoutDefiniteStorage`] |
+//! | `indefiniteStorage_rate_form_vanishes`, `swapGenerator_has_a_right_half_plane_mode`, `vanishing_rate_form_places_no_spectrum` | [`StructuralPlacement::PontryaginBounded`], the arm that bounds where it used to fall silent |
+//! | `selfAdjoint_of_no_structure`, `symmetrized_generator_of_no_structure` | [`StructuralPlacement::RealNonpositive`], which decides an analytic width with no pole |
+//! | `psd_mulVec_eq_zero_of_quad_eq_zero`, `linear_term_vanishes_of_nonneg` | the step the conservative core rests on |
+//! | `generator_is_conservative_on_the_core`, `core_is_generator_invariant`, `core_le_ker` | [`ConservativeCore`] and its observability stack |
+//! | `quad_rateForm_eq_two_pairing`, `eigenvalue_reads_the_dissipation`, `real_eigenvalue_nonpos_and_zero_iff_unseen` | [`SpectralLicence::NonGrowth`] and the LaSalle condition [`ConservativeCore::is_trivial`] |
 //! | `interface_tangential_agreement_retains_normal_remainder` | [`InterfaceReading`], whose normal half is [`crate::junction_law::check_junction`] |
 //! | `tangentialConservation_retainsNormalRemainder`, `snellCompatible_iff`, `finiteInterfaceChain_eq_exterior` | the same reading's retained normal remainder |
 //!
@@ -86,13 +90,33 @@
 //! with `−2 G M G` entry by entry; conservation at `M = 0` and strict decay on the slip-active
 //! subspace are consequences of the identity, not separate code.
 //!
-//! # The defect this owner refuses to repeat
+//! # The defect this owner refuses to repeat — and the silence it no longer keeps
 //!
 //! [proved-derived] `G = diag(1, −1)` with `A = [[0,1],[1,0]]` has `AᵀG + GA = 0` and eigenvalues
 //! `±1`. **A vanishing or negative-semidefinite rate form licenses no spectral placement without
-//! positive definiteness of `G`.** [`SpectralReading`] is therefore a three-armed typed return
-//! guarded by [`crate::inertia::inertia`], and its licensed arm additionally cross-checks the
-//! exact half-plane count against the licence it claims, refusing on contradiction.
+//! positive definiteness of `G`.** That refusal stands. What no longer stands is the *silence*
+//! beside it: an indefinite **nondegenerate** `G` with a vanishing rate form makes `A` `G`-skew,
+//! and a `G`-skew generator over a form with `κ = min(p, q)` negative squares carries **at most
+//! `κ`** eigenvalues in the open right half plane, with the whole spectrum symmetric under
+//! `λ ↦ −λ̄`. That pair attains the bound at `κ = 1`, and
+//! [`StructuralPlacement::PontryaginBounded`] returns it.
+//!
+//! [definition] The reading is therefore in two parts, and they are kept apart on purpose.
+//! [`HolonicInteraction::structural_placement`] is what **structure alone** places — it forms no
+//! characteristic polynomial, no resolvent and no `n × n` product, so it is available at every
+//! extent, and it is what lets `holonic_chain.rs` decide an analytic face on a 324-coordinate
+//! chart the pole atlas cannot reach. [`HolonicInteraction::spectral_reading`] adds the exact
+//! half-plane count where the extent is within [`SPECTRAL_COUNT_CEILING`] and the conservative
+//! core where it is within [`CONSERVATIVE_CORE_CEILING`], **cross-checks every arm against
+//! them**, and refuses by name on a disagreement. Above either ceiling the reading is returned
+//! licence-only, marked [`CountScope::LicenceOnly`]; the licence still holds and no count is
+//! invented.
+//!
+//! [project-postulate] Every sign count in the public reading is a **split and a hand**, never a
+//! bare signature: `docs/HOLONIC_NOTATION.md` rules that a count of signs is a state reading and
+//! that a sign is a passage. [`FormSplit`] carries the split, the hand, the null cone and — where
+//! the form is a symmetric circulant — the **named windings** of its passages, taken from
+//! [`crate::winding_inertia::winding_inertia`], which is that naming's owner.
 //!
 //! # The interface between two media
 //!
@@ -134,6 +158,7 @@ use crate::inertia::{Inertia, InertiaError, SymmetricForm, inertia};
 use crate::junction_law::{
     Interface, JointUnits, JunctionField, JunctionRefusal, JunctionVerdict, check_junction,
 };
+use crate::winding_inertia::{Hand, SymmetricCirculant, WindingInertia, winding_inertia};
 
 pub const HOLONIC_INTERACTION_SCHEMA: &str = "holonic-engine.holonic-interaction.v1";
 
@@ -155,6 +180,29 @@ pub const DECLARED_MEDIUM_CEILING: usize = 256;
 
 /// The ceiling on the arithmetic work of one contact assembly, `faces × slip × dimension²`.
 pub const DECLARED_ASSEMBLY_CEILING: usize = 1 << 26;
+
+/// **The joint extent above which the exact half-plane count is not taken.**
+///
+/// [definition] The count is a Faddeev–LeVerrier characteristic polynomial followed by a Sturm
+/// Cauchy index — quartic in the extent with unbounded rational coefficient growth. Above this
+/// ceiling [`HolonicInteraction::spectral_reading`] returns its **licence only**, marked as such
+/// by [`SpectralReading::count_scope`], and invents no count. What structure places is placed at
+/// every extent; only the independent measurement stops here.
+pub const SPECTRAL_COUNT_CEILING: usize = 24;
+
+/// **The joint extent above which the conservative core is not computed.**
+///
+/// [definition] The core is an observability stack `M G, M G A, M G A², …` reduced after every
+/// block: one exact matrix product and one reduction per block, at most `extent` blocks. Above
+/// this ceiling [`HolonicInteraction::conservative_core`] refuses by name rather than running.
+pub const CONSERVATIVE_CORE_CEILING: usize = 64;
+
+/// **The extent above which a form's passages are not named by winding.**
+///
+/// [definition] [`crate::winding_inertia::winding_inertia`] isolates one algebraic root per
+/// character against a Sturm chain. The split is available at every extent; the *naming* of the
+/// passages stops here, and its absence is reported as absence rather than as a defect.
+pub const WINDING_EXTENT_CEILING: usize = 16;
 
 /// Every way this module declines to answer. A refusal is a return; nothing here panics.
 #[derive(Debug, Error)]
@@ -226,6 +274,48 @@ pub enum InteractionRefusal {
          eigenvalues sit where the exact half-plane count found them"
     )]
     SpectralContradiction { right: usize },
+    /// The conservative core and the exact on-axis count disagreed. With `G ≻ 0` and `M ⪰ 0` the
+    /// two are the same number — the on-axis eigenvalues are exactly the modes dissipation cannot
+    /// see — so a disagreement is a defect in the exact arithmetic and is refused by name.
+    #[error(
+        "the largest `A`-invariant subspace inside `ker(M G)` has dimension {core}, yet the exact \
+         half-plane count found {axis} eigenvalues on the axis; with a positive definite storage \
+         form the two are the same number"
+    )]
+    ConservativeCoreDisagrees { core: usize, axis: usize },
+    /// The real-spectrum placement and the exact half-plane count disagree on the split. With
+    /// `G ≻ 0` and `Ω = 0` the symmetric form `G A = −G M G` is congruent to a real diagonal
+    /// carrying `σ(A)` itself, so by Sylvester's law its split **is** the spectrum's split —
+    /// computed by an elimination that never forms a polynomial, against a Cauchy index that
+    /// never forms a form. A disagreement is an arithmetic defect and is refused by name.
+    #[error(
+        "the generator is self-adjoint in the G-pairing, so `G A` splits the spectrum: it reads \
+         ({left} left, {axis} on the axis, {right} right), yet the exact half-plane count found \
+         ({counted_left}, {counted_axis}, {counted_right})"
+    )]
+    RealSpectrumSplitDisagrees {
+        left: usize,
+        axis: usize,
+        right: usize,
+        counted_left: usize,
+        counted_axis: usize,
+        counted_right: usize,
+    },
+    /// The Pontryagin bound was exceeded by the exact count. A `G`-skew generator over a storage
+    /// form with `κ` negative squares carries at most `min(κ, n − κ)` eigenvalues strictly to the
+    /// right of the axis, and its spectrum is symmetric under `λ ↦ −λ̄`; both are checked.
+    #[error(
+        "the storage form splits {positive} against {negative} and the rate form vanishes, so at \
+         most {at_most} eigenvalues may lie strictly to the right — the exact count found \
+         {right}, with {left} strictly to the left"
+    )]
+    PontryaginBoundViolated {
+        positive: usize,
+        negative: usize,
+        at_most: usize,
+        right: usize,
+        left: usize,
+    },
     /// The exact linear carrier refused.
     #[error(transparent)]
     Linear(#[from] ExactLinearError),
@@ -1999,56 +2089,274 @@ impl HolonicInteraction {
         })
     }
 
-    /// **What, if anything, the rate form licenses about the spectrum.**
+    /// **Where structure alone places `σ(A)`, before any count is taken.**
+    ///
+    /// [definition] This reading forms **no** characteristic polynomial, **no** resolvent and
+    /// **no** `n × n` product: it reads `Ω`, the assembled `M` with the signature its own
+    /// constructor already certified, and the split of `G`. That is why it is available at every
+    /// extent, and why [`crate::holonic_chain::HolonicChain::chain_widths`] can decide an
+    /// analytic face on a chart the pole atlas cannot reach.
+    ///
+    /// Which arm holds is decided in this order, because the earlier arms are strictly stronger
+    /// where they overlap: a generator with neither structure nor dissipation is the zero
+    /// generator, whose spectrum `{0}` is the one point the real and the on-axis arms share, and
+    /// the real arm is the one that decides a width.
+    pub fn structural_placement(&self) -> Result<StructuralPlacement, InteractionRefusal> {
+        let extent = self.joint_dimension();
+        if extent == 0 {
+            return Err(InteractionRefusal::EmptyDeclaration {
+                what: "an interaction's joint chart",
+            });
+        }
+        let storage = self.joint_storage()?;
+        let structure = self.joint_structure()?;
+        let dissipation = self.joint_dissipation()?;
+        let split = FormSplit::of(&storage);
+        // `Ω = 0` and `M = 0` are read off the assembled blocks, not declared.
+        let no_structure = structure.entries().iter().all(|entry| entry.is_zero());
+        let lossless = (0..extent)
+            .all(|row| (0..extent).all(|column| dissipation.form().at(row, column).is_zero()));
+        let storage_split = split.split;
+        let placement = if split.is_positive_definite() {
+            if no_structure {
+                StructuralPlacement::RealNonpositive
+            } else if lossless {
+                StructuralPlacement::OnTheOrientationAxis
+            } else {
+                StructuralPlacement::NonGrowth
+            }
+        } else if split.null > 0 {
+            StructuralPlacement::Unlicensed {
+                because: "the storage form is degenerate: it is neither definite, so that the \
+                          rate form places the spectrum, nor nondegenerate, so that the \
+                          Pontryagin bound applies to a G-skew generator",
+            }
+        } else if lossless {
+            StructuralPlacement::PontryaginBounded {
+                right_at_most: storage_split.0.min(storage_split.1),
+            }
+        } else {
+            StructuralPlacement::Unlicensed {
+                because: "the storage form is indefinite and the generator is not G-skew; the \
+                          dissipative extension of the Pontryagin bound to an indefinite storage \
+                          form is not claimed by this owner",
+            }
+        };
+        Ok(placement)
+    }
+
+    /// **The conservative core: the largest `A`-invariant subspace inside `ker(M G)`.**
+    ///
+    /// [proved-derived] `G ≻ 0` makes `A` similar to `Ω̃ − M̃` with `Ω̃` skew and `M̃ ⪰ 0`
+    /// symmetric, so `Re λ ‖v‖² = −⟨v, M̃ v⟩` at every eigenvector: an eigenvalue sits on the
+    /// axis exactly when its eigenvector is annihilated by the dissipation. The sum of the
+    /// on-axis eigenspaces is therefore the largest `A`-invariant subspace inside `ker(M G)`, and
+    /// on it `A` acts as `Ω G` — skew in the `G`-pairing, hence semisimple, which is where
+    /// `G ≻ 0` is used and why the count is a dimension and not an upper bound.
+    ///
+    /// [implemented-exact] It is computed as the unobservable subspace of the pair `(A, M G)`:
+    /// the kernel of the stack `M G, M G A, M G A², …`, reduced after every block and stopped the
+    /// first time its rank does not grow. **These are the classes dissipation cannot see** —
+    /// `Millennium/HodgeHarmonicRepresentative.lean`'s `ker Δ` when the slip maps are coboundary
+    /// rows, because then `M_contact = Σ w JᵀDJ` is a weighted Hodge Laplacian.
+    ///
+    /// **The subspace is returned for any storage form; its reading as the on-axis count holds
+    /// only for `G ≻ 0`.** [`HolonicInteraction::spectral_reading`] checks that before it reads
+    /// the dimension as a count. A caller that takes the core directly on an indefinite `G` holds
+    /// an exact invariant subspace and no spectral statement, and must check
+    /// [`HolonicInteraction::structural_placement`] itself.
+    pub fn conservative_core(&self) -> Result<ConservativeCore, InteractionRefusal> {
+        let extent = self.joint_dimension();
+        if extent == 0 {
+            return Err(InteractionRefusal::EmptyDeclaration {
+                what: "an interaction's joint chart",
+            });
+        }
+        bounded(
+            "a conservative core's joint chart",
+            extent,
+            CONSERVATIVE_CORE_CEILING,
+        )?;
+        let storage = form_matrix(&self.joint_storage()?)?;
+        let dissipation = self.joint_dissipation()?.matrix()?;
+        let generator = self.generator()?;
+        // `M G` is what the storage reading's dissipation sees; `A` is what carries a motion.
+        let observer = dissipation.multiply(&storage)?;
+        let mut block = observer.clone();
+        let (mut reduced, mut pivots, _) = observer.reduced_row_echelon()?;
+        let mut stack = keep_pivot_rows(&reduced, pivots.len(), extent)?;
+        let mut blocks = 1usize;
+        while blocks < extent && pivots.len() < extent {
+            block = block.multiply(&generator)?;
+            let mut rows = stack.to_rows();
+            rows.extend(block.to_rows());
+            let candidate = ExactRatMatrix::shaped(rows.len(), extent, rows)?;
+            let (grown, grown_pivots, _) = candidate.reduced_row_echelon()?;
+            blocks += 1;
+            if grown_pivots.len() == pivots.len() {
+                break;
+            }
+            reduced = grown;
+            pivots = grown_pivots;
+            stack = keep_pivot_rows(&reduced, pivots.len(), extent)?;
+        }
+        let basis = stack.kernel_basis()?;
+        Ok(ConservativeCore {
+            lineage: format!("{}|conservative-core", self.lineage),
+            dimension: basis.len(),
+            observable_rank: pivots.len(),
+            blocks,
+            extent,
+            basis,
+        })
+    }
+
+    /// **What structure and the exact count together license about the spectrum.**
+    ///
+    /// The structural arm is [`HolonicInteraction::structural_placement`] and is available at
+    /// every extent. The exact half-plane count is taken only within [`SPECTRAL_COUNT_CEILING`],
+    /// and the conservative core only within [`CONSERVATIVE_CORE_CEILING`]; above either, the
+    /// reading is returned **licence-only** and says so through
+    /// [`SpectralReading::count_scope`]. Where both are present they are cross-checked, and a
+    /// disagreement is refused by name rather than reconciled.
     pub fn spectral_reading(&self) -> Result<SpectralReading, InteractionRefusal> {
         let reading = self.storage_rate()?;
-        let generator = self.generator()?;
-        let characteristic = generator.characteristic_polynomial()?;
-        let half_plane = half_plane_count(&characteristic)?;
-        let storage = reading.storage_inertia;
-        let rate = reading.rate_inertia;
-        if !storage.is_positive_definite() {
-            return Ok(SpectralReading::NoLicenceWithoutDefiniteStorage {
-                storage,
-                rate,
-                half_plane,
-            });
-        }
-        if rate.positive > 0 {
-            return Ok(SpectralReading::StorageGrows {
-                storage,
-                rate,
-                half_plane,
-            });
-        }
-        // `G ≻ 0` and `AᵀG + GA ⪯ 0` force `Re λ ≤ 0` for every eigenvalue. The exact half-plane
-        // count is the independent measurement of the same fact, and a disagreement is a defect
-        // in the exact arithmetic, not a rounding difference: it is refused by name.
-        if half_plane.right > 0 {
-            return Err(InteractionRefusal::SpectralContradiction {
-                right: half_plane.right,
-            });
-        }
-        // Non-growth is all the rate form gives. `M = 0` is the conservative oscillator: `G ≻ 0`,
-        // a vanishing rate form, and every eigenvalue on the axis. Decay is licensed only when
-        // the exact count finds no eigenvalue on the axis; a negative DEFINITE rate form forces
-        // that, and an axis eigenvalue beside one is refused by name.
-        if half_plane.axis > 0 {
-            if rate.is_negative_definite() {
-                return Err(InteractionRefusal::SpectralContradiction {
-                    right: half_plane.axis,
-                });
+        let placement = self.structural_placement()?;
+        let extent = self.joint_dimension();
+        let storage = FormSplit::of(&self.joint_storage()?);
+        let rate = FormSplit::of(reading.rate());
+        let (half_plane, count_scope) = if extent > SPECTRAL_COUNT_CEILING {
+            (
+                None,
+                CountScope::LicenceOnly {
+                    extent,
+                    ceiling: SPECTRAL_COUNT_CEILING,
+                },
+            )
+        } else {
+            let generator = self.generator()?;
+            let characteristic = generator.characteristic_polynomial()?;
+            (Some(half_plane_count(&characteristic)?), CountScope::Taken)
+        };
+        let core = if matches!(
+            placement,
+            StructuralPlacement::RealNonpositive
+                | StructuralPlacement::OnTheOrientationAxis
+                | StructuralPlacement::NonGrowth
+        ) && extent <= CONSERVATIVE_CORE_CEILING
+        {
+            Some(self.conservative_core()?)
+        } else {
+            None
+        };
+
+        // Every cross-check below is between a licence and an independent measurement of the same
+        // fact. Neither is discarded on a disagreement; the reading refuses.
+        if let Some(count) = &half_plane {
+            match &placement {
+                StructuralPlacement::RealNonpositive
+                | StructuralPlacement::OnTheOrientationAxis
+                | StructuralPlacement::NonGrowth => {
+                    if count.right > 0 {
+                        return Err(InteractionRefusal::SpectralContradiction {
+                            right: count.right,
+                        });
+                    }
+                    // The self-adjoint arm carries a second, sharper cross-check that costs
+                    // nothing: `G A = −G M G` is symmetric and congruent to a real diagonal
+                    // carrying `σ(A)`, so Sylvester's law makes the split of `G M G` the split of
+                    // the spectrum — with the two sides swapped, because of the minus. The
+                    // elimination that produced it never formed a polynomial and the Cauchy index
+                    // that produced the count never formed a form.
+                    if matches!(placement, StructuralPlacement::RealNonpositive) {
+                        let congruent = reading.congruent_inertia;
+                        if congruent.positive != count.left
+                            || congruent.zero != count.axis
+                            || congruent.negative != count.right
+                        {
+                            return Err(InteractionRefusal::RealSpectrumSplitDisagrees {
+                                left: congruent.positive,
+                                axis: congruent.zero,
+                                right: congruent.negative,
+                                counted_left: count.left,
+                                counted_axis: count.axis,
+                                counted_right: count.right,
+                            });
+                        }
+                    }
+                    if let Some(core) = &core
+                        && core.dimension != count.axis
+                    {
+                        return Err(InteractionRefusal::ConservativeCoreDisagrees {
+                            core: core.dimension,
+                            axis: count.axis,
+                        });
+                    }
+                }
+                StructuralPlacement::PontryaginBounded { right_at_most } => {
+                    // Both halves of the licence: the bound itself, and the `λ ↦ −λ̄` symmetry a
+                    // `G`-skew generator carries, which makes the two open half planes equinumerous.
+                    if count.right > *right_at_most || count.right != count.left {
+                        return Err(InteractionRefusal::PontryaginBoundViolated {
+                            positive: storage.split.0,
+                            negative: storage.split.1,
+                            at_most: *right_at_most,
+                            right: count.right,
+                            left: count.left,
+                        });
+                    }
+                }
+                StructuralPlacement::Unlicensed { .. } => {}
             }
-            return Ok(SpectralReading::NonGrowthLicensed {
-                storage,
-                rate,
-                half_plane,
-            });
         }
-        Ok(SpectralReading::DecayLicensed {
+
+        // The licence the whole reading carries. Decay is the LaSalle arm: `G ≻ 0`, `M ⪰ 0`, and
+        // a trivial conservative core. When the core was not taken, decay is licensed only by the
+        // exact count, and when neither is present the reading stops at non-growth.
+        let licence = if !storage.is_positive_definite() {
+            match &placement {
+                StructuralPlacement::PontryaginBounded { right_at_most } => {
+                    SpectralLicence::PontryaginBounded {
+                        right_at_most: *right_at_most,
+                    }
+                }
+                StructuralPlacement::Unlicensed { because } => {
+                    SpectralLicence::Withheld { because }
+                }
+                _ => SpectralLicence::Withheld {
+                    because: "the storage form is not positive definite",
+                },
+            }
+        } else if rate.split.0 > 0 {
+            SpectralLicence::StorageGrows
+        } else {
+            let decays = match (&core, &half_plane) {
+                (Some(core), _) => core.dimension == 0,
+                (None, Some(count)) => count.axis == 0,
+                (None, None) => false,
+            };
+            if decays {
+                SpectralLicence::Decay
+            } else {
+                match placement {
+                    StructuralPlacement::RealNonpositive => SpectralLicence::RealNonpositive,
+                    StructuralPlacement::OnTheOrientationAxis => {
+                        SpectralLicence::OnTheOrientationAxis
+                    }
+                    _ => SpectralLicence::NonGrowth,
+                }
+            }
+        };
+
+        Ok(SpectralReading {
+            lineage: format!("{}|spectral", self.lineage),
+            placement,
+            licence,
             storage,
             rate,
             half_plane,
+            count_scope,
+            core,
         })
     }
 
@@ -2229,85 +2537,343 @@ impl StorageRateReading {
     }
 }
 
-/// **What the rate form licenses about the spectrum — and what it does not.**
+/// **A form's placement, stated as its split and its hand — never as a bare count of signs.**
 ///
-/// [definition] The three arms exist because the September 18 review corrected exactly this
-/// defect: a vanishing or negative-semidefinite rate form says nothing about eigenvalues unless
-/// the storage form is positive definite. `G = diag(1, −1)` with `A = [[0,1],[1,0]]` has
-/// `AᵀG + GA = 0` and eigenvalues `±1`.
+/// [project-postulate] `docs/HOLONIC_NOTATION.md`: *a sign is a passage, never a state*, and *a
+/// count of signs is a state reading*. The **split** is what no frame touches — `1` against
+/// `n−1`, the shape `Millennium/HodgeIndex.lean` carries as "one plus, and the minus is the
+/// anchor" — where the minus half is not a second phenomenon but the anchor of the same
+/// realizer. The **hand** is which side is called positive, and it is a declared convention:
+/// negating a form swaps the two hands and moves no split. Where the form is a symmetric
+/// circulant its passages are **named by their windings** through
+/// [`crate::winding_inertia::winding_inertia`], which is the owner of that naming; this reading
+/// composes it and re-founds nothing.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
-pub enum SpectralReading {
-    /// `G ≻ 0`, `AᵀG + GA ⪯ 0`, and the exact half-plane count finds **no eigenvalue on the axis
-    /// or to its right**: every eigenvalue satisfies `Re λ < 0` and every motion decays. The
-    /// strictness comes from the count (or from a negative definite rate form, which forces it),
-    /// never from semidefiniteness alone.
-    DecayLicensed {
-        storage: Inertia,
-        rate: Inertia,
-        half_plane: HalfPlaneCount,
-    },
-    /// `G ≻ 0` and `AᵀG + GA ⪯ 0` with eigenvalues on the axis: every eigenvalue satisfies
-    /// `Re λ ≤ 0` and the storage reading never grows, **which is not decay**. The undamped
-    /// oscillator (`M = 0`) lands here, as does any chain whose dissipation leaves a conservative
-    /// invariant subspace untouched.
-    NonGrowthLicensed {
-        storage: Inertia,
-        rate: Inertia,
-        half_plane: HalfPlaneCount,
-    },
-    /// `G ≻ 0` but the rate form has a positive direction: the storage reading grows along it and
-    /// nothing is licensed. The measured half-plane count is returned as a measurement.
-    StorageGrows {
-        storage: Inertia,
-        rate: Inertia,
-        half_plane: HalfPlaneCount,
-    },
-    /// **`G` is not positive definite, so the rate form places no spectrum at all.** The
-    /// half-plane count is returned because it was measured, not because it follows.
-    NoLicenceWithoutDefiniteStorage {
-        storage: Inertia,
-        rate: Inertia,
-        half_plane: HalfPlaneCount,
-    },
+pub struct FormSplit {
+    /// `(the directions on the hand's side, the directions past it)`. Invariant under congruence.
+    pub split: (usize, usize),
+    /// Which side is called positive. [`Hand::WithTheTurn`] is the side the form returns positive
+    /// on, which is this owner's declared convention and not a property of the form.
+    pub hand: Hand,
+    /// Where traversal returns nothing: the dimension of the null cone. A definite form is one
+    /// whose null cone is empty.
+    pub null: usize,
+    /// The chart the form is read on.
+    pub extent: usize,
+    /// The named passages, present exactly when the form is a symmetric circulant within
+    /// [`WINDING_EXTENT_CEILING`]. **Absent is absence, not a defect**: most forms carry no cyclic
+    /// symmetry for any character group to factor through, and naming their passages by winding
+    /// would be a fabrication — which is why
+    /// [`crate::winding_inertia::SymmetricCirculant::from_symmetric_form`] refuses them.
+    pub windings: Option<WindingInertia>,
+}
+
+impl FormSplit {
+    /// Read a form's split, its hand and — where a cyclic symmetry exists — its windings.
+    pub fn of(form: &SymmetricForm) -> Self {
+        let reading = inertia(form);
+        let windings = if form.extent() == 0 || form.extent() > WINDING_EXTENT_CEILING {
+            None
+        } else {
+            SymmetricCirculant::from_symmetric_form(form)
+                .ok()
+                .and_then(|circulant| winding_inertia(&circulant).ok())
+        };
+        Self {
+            split: (reading.positive, reading.negative),
+            hand: Hand::WithTheTurn,
+            null: reading.zero,
+            extent: form.extent(),
+            windings,
+        }
+    }
+
+    /// The same reading as a bare signature count, for cross-checking an elimination that never
+    /// saw the symmetry. **This is the only place a count appears**, and it exists so the naming
+    /// can be checked, not so it can be replaced.
+    pub fn as_inertia(&self) -> Inertia {
+        Inertia {
+            positive: self.split.0,
+            zero: self.null,
+            negative: self.split.1,
+        }
+    }
+
+    /// Whether the null cone is empty and every direction returns on the hand's side.
+    pub fn is_positive_definite(&self) -> bool {
+        self.as_inertia().is_positive_definite()
+    }
+
+    /// The windings of the passages returning on the named hand, when the passages were named.
+    pub fn windings_of(&self, hand: Hand) -> Option<Vec<Rat>> {
+        self.windings
+            .as_ref()
+            .map(|named| named.windings_of(hand))
+    }
+}
+
+/// **Where structure alone places `σ(A)`, before any count is taken.**
+///
+/// [definition] Each arm is a theorem about `A = (Ω − M) G` and the split of `G`, and none of
+/// them forms a characteristic polynomial. The arms are cross-checked against the exact
+/// half-plane count wherever that count is within [`SPECTRAL_COUNT_CEILING`], and are returned
+/// alone — marked [`CountScope::LicenceOnly`] — above it.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub enum StructuralPlacement {
+    /// **`G ≻ 0` and `Ω = 0`: the spectrum is real and nonpositive.**
+    ///
+    /// [proved-standard] `A = −M G` satisfies `AᵀG = GA`, so it is self-adjoint in the
+    /// `G`-pairing; `S = G A = −G M G` is symmetric and `G ≻ 0`, so by simultaneous
+    /// diagonalization by congruence of the pair `(S, G)` (Horn & Johnson, *Matrix Analysis*,
+    /// 2nd ed., Theorem 4.5.15: for Hermitian `G ≻ 0` and Hermitian `S` there is a nonsingular
+    /// `T` with `T*GT = I` and `T*ST = Λ` real diagonal) `A = G⁻¹S` is similar to `Λ`. Its
+    /// spectrum is therefore real, and `M ⪰ 0` makes `Λ ⪯ 0`. The Lean lift carries the algebraic
+    /// half (`Transport/HolonicInteraction.lean::selfAdjoint_of_no_structure`,
+    /// `real_eigenvalue_nonpos_and_zero_iff_unseen` at `Ω = 0`, which covers REAL eigenvalues
+    /// only); the diagonalization, and with it the realness of every eigenvalue, is cited,
+    /// not lifted.
+    ///
+    /// **This is the arm that decides an analytic width without a pole**: the squared distance
+    /// from the real axis to the nearest pole is `0` by placement, at any extent.
+    RealNonpositive,
+    /// **`G ≻ 0` and `M = 0`: the spectrum is on the orientation axis, in both directions.**
+    ///
+    /// [proved-derived] `AᵀG + GA = −2 G M G = 0`, so `A` is `G`-skew and `G ≻ 0` makes the
+    /// `G`-pairing an inner product: every eigenvalue is purely imaginary and `A` is semisimple.
+    /// A lossless chain is a Foster reactance — `RH/FosterTanks.lean` reads exactly that finite
+    /// face, "the zeros are Foster tanks", with positivity of the inductance holding **iff** the
+    /// pole sits on the seam — and turning `M` on is the finite analogue of the heat-flow zero
+    /// dynamics. A limit of on-seam families stays on the seam: `RH/HurwitzLine.lean`. **The squared half-width is the smallest squared nonzero frequency
+    /// and is NOT structurally known**; that one still needs the pole atlas.
+    OnTheOrientationAxis,
+    /// **`G ≻ 0`, `M ⪰ 0`, `Ω ≠ 0`: non-growth, with the on-axis part named.**
+    ///
+    /// [proved-derived] `Re λ ≤ 0` for every eigenvalue, and the number on the axis is exactly
+    /// [`ConservativeCore::dimension`] — the largest `A`-invariant subspace inside `ker(M G)`.
+    /// Decay is licensed exactly when that subspace is `{0}`, which is LaSalle's condition read
+    /// on a finite chart.
+    NonGrowth,
+    /// **`G` indefinite and nondegenerate with the rate form vanishing: a bounded licence, not
+    /// silence.**
+    ///
+    /// [proved-standard] `AᵀG + GA = 0` with `G` nondegenerate makes `A` `G`-skew, so
+    /// `σ(A)` is symmetric under `λ ↦ −λ̄` (the finite form of a reflection functional equation,
+    /// and the reason `RH/HurwitzLine.lean`'s limit of on-seam families stays on the seam), and
+    /// a storage form with `κ = min(p, q)` negative squares admits **at most `κ` eigenvalues in
+    /// the open right half plane**. Source: I. S. Iohvidov, M. G. Kreĭn and H. Langer,
+    /// *Introduction to the Spectral Theory of Operators in Spaces with an Indefinite Metric*
+    /// (1982), and Gohberg, Lancaster & Rodman, *Matrices and Indefinite Scalar Products* (1983),
+    /// Chapter I: a `G`-skew-adjoint operator on a Pontryagin space `Π_κ` has at most `κ`
+    /// eigenvalues in an open half plane, counted with multiplicity. `G = diag(1, −1)` with
+    /// `A = [[0,1],[1,0]]` attains the bound.
+    PontryaginBounded { right_at_most: usize },
+    /// Structure licenses nothing here, and the reason is named rather than left silent.
+    Unlicensed { because: &'static str },
+}
+
+/// Whether the exact half-plane count was taken, or the reading is its licence alone.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub enum CountScope {
+    /// The characteristic polynomial was formed and its Cauchy index taken.
+    Taken,
+    /// The joint chart is above [`SPECTRAL_COUNT_CEILING`]. **The licence still holds**; only the
+    /// independent measurement of it stops here, and no count is invented.
+    LicenceOnly { extent: usize, ceiling: usize },
+}
+
+impl CountScope {
+    /// Whether an exact count accompanies the licence.
+    pub fn is_taken(&self) -> bool {
+        matches!(self, Self::Taken)
+    }
+}
+
+/// **The largest `A`-invariant subspace inside `ker(M G)`: the modes dissipation cannot see.**
+///
+/// [definition] Computed as the unobservable subspace of the pair `(A, M G)` — the kernel of the
+/// stack `M G, M G A, M G A², …`, reduced after every block and stopped the first time the rank
+/// does not grow. The basis is exhibited, not summarized by the count.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct ConservativeCore {
+    lineage: String,
+    dimension: usize,
+    observable_rank: usize,
+    blocks: usize,
+    extent: usize,
+    basis: Vec<Vec<Rat>>,
+}
+
+impl ConservativeCore {
+    pub fn lineage(&self) -> &str {
+        &self.lineage
+    }
+
+    /// The dimension of the core. With `G ≻ 0` and `M ⪰ 0` this **is** the number of eigenvalues
+    /// on the axis, and [`HolonicInteraction::spectral_reading`] cross-checks it against
+    /// `half_plane.axis` wherever that count was taken.
+    pub fn dimension(&self) -> usize {
+        self.dimension
+    }
+
+    /// The rank of the observability stack: the dimension of what dissipation does see.
+    pub fn observable_rank(&self) -> usize {
+        self.observable_rank
+    }
+
+    /// How many blocks `M G Aᵏ` the stack needed before its rank stopped growing.
+    pub fn blocks(&self) -> usize {
+        self.blocks
+    }
+
+    pub fn extent(&self) -> usize {
+        self.extent
+    }
+
+    /// A basis of the core in the joint chart, exhibited.
+    pub fn basis(&self) -> &[Vec<Rat>] {
+        &self.basis
+    }
+
+    /// Whether dissipation reaches every mode. Decay is licensed exactly here.
+    pub fn is_trivial(&self) -> bool {
+        self.dimension == 0
+    }
+}
+
+/// **What the whole reading licenses about the spectrum — and what it does not.**
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub enum SpectralLicence {
+    /// Every eigenvalue satisfies `Re λ < 0` and every motion decays.
+    Decay,
+    /// Every eigenvalue is real and `≤ 0` ([`StructuralPlacement::RealNonpositive`]), with a
+    /// nontrivial conservative core, so this is non-growth and **not** decay.
+    RealNonpositive,
+    /// Every eigenvalue sits on the orientation axis, in both directions — the conservative arm.
+    OnTheOrientationAxis,
+    /// `Re λ ≤ 0` and the storage reading never grows, which is not decay.
+    NonGrowth,
+    /// `G ≻ 0` but the rate form has a direction on the hand's side: the storage reading grows
+    /// along it and nothing is licensed.
+    StorageGrows,
+    /// `G` indefinite and nondegenerate with a vanishing rate form: at most `right_at_most`
+    /// eigenvalues strictly to the right, and a spectrum symmetric under `λ ↦ −λ̄`.
+    PontryaginBounded { right_at_most: usize },
+    /// Nothing is licensed, and the reason is named.
+    Withheld { because: &'static str },
+}
+
+/// **The spectral reading: a structural placement, a licence, and the count that checks them.**
+///
+/// [definition] The September 18 review corrected the defect this reading exists to refuse: a
+/// vanishing or negative-semidefinite rate form says nothing about eigenvalues unless the storage
+/// form is positive definite. `G = diag(1, −1)` with `A = [[0,1],[1,0]]` has `AᵀG + GA = 0` and
+/// eigenvalues `±1` — and now, rather than silence, it returns the Pontryagin bound `1`, which it
+/// attains.
+///
+/// [definition] **Owners this reading composes rather than restates.** The rate form itself is
+/// `Foundation/CausalChord.lean::rateForm`, read through [`crate::causal_chord::rate_form`]; the
+/// exact count is [`crate::causal_chord::half_plane_count`]; whether a conserving receiver exists
+/// at all — the positive definite member of `{G : AᵀG + GA = 0}`, with its refutation exhibited —
+/// is [`crate::causal_chord::conserving_receiver_space`], and the semisimplicity the seam slogan
+/// drops is [`crate::causal_chord::is_semisimple`]. On the mathematics side: a lossless chain is
+/// a Foster reactance and its tanks resonate on the seam exactly when the inductance is positive
+/// (`RH/FosterTanks.lean`); the zero-counting law the half-plane count is the finite face of is
+/// `RH/HurwitzPolynomial.lean`, and a limit of on-seam families stays on the seam
+/// (`RH/HurwitzLine.lean`). The conservative core's classes are the ones dissipation cannot see —
+/// `ker Δ` in `Millennium/HodgeFiniteDecomposition.lean` and
+/// `Millennium/HodgeHarmonicRepresentative.lean`, because `M_contact = Σ w JᵀDJ` is a weighted
+/// Hodge Laplacian when the slip maps are coboundary rows — and the split-and-hand wording is
+/// `Millennium/HodgeIndex.lean`'s `(1, n−1)`.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct SpectralReading {
+    lineage: String,
+    placement: StructuralPlacement,
+    licence: SpectralLicence,
+    storage: FormSplit,
+    rate: FormSplit,
+    half_plane: Option<HalfPlaneCount>,
+    count_scope: CountScope,
+    core: Option<ConservativeCore>,
 }
 
 impl SpectralReading {
-    /// The exact half-plane count, in every arm. It is a measurement of the characteristic
-    /// polynomial and never a consequence of the rate form outside [`SpectralReading::
-    /// DecayLicensed`].
-    pub fn half_plane(&self) -> &HalfPlaneCount {
-        match self {
-            Self::DecayLicensed { half_plane, .. }
-            | Self::NonGrowthLicensed { half_plane, .. }
-            | Self::StorageGrows { half_plane, .. }
-            | Self::NoLicenceWithoutDefiniteStorage { half_plane, .. } => half_plane,
-        }
+    pub fn lineage(&self) -> &str {
+        &self.lineage
     }
 
-    /// The storage form's signature, in every arm.
-    pub fn storage(&self) -> &Inertia {
-        match self {
-            Self::DecayLicensed { storage, .. }
-            | Self::NonGrowthLicensed { storage, .. }
-            | Self::StorageGrows { storage, .. }
-            | Self::NoLicenceWithoutDefiniteStorage { storage, .. } => storage,
-        }
+    /// Where structure alone places the spectrum. Available at every extent.
+    pub fn placement(&self) -> StructuralPlacement {
+        self.placement
     }
 
-    /// **Whether asymptotic decay is licensed.** Only the arm whose exact count found every
-    /// eigenvalue strictly in the left half plane.
+    /// What the whole reading licenses.
+    pub fn licence(&self) -> SpectralLicence {
+        self.licence
+    }
+
+    /// The exact half-plane count, when it was taken. `None` is
+    /// [`CountScope::LicenceOnly`] and never a failure.
+    pub fn half_plane(&self) -> Option<&HalfPlaneCount> {
+        self.half_plane.as_ref()
+    }
+
+    /// Whether the count was taken, and if not, at what bound it stopped.
+    pub fn count_scope(&self) -> CountScope {
+        self.count_scope
+    }
+
+    /// The storage form's split and hand. **Indefinite is lawful** and withholds no reading but
+    /// the unconditional spectral one — which the Pontryagin arm now bounds rather than refuses.
+    pub fn storage(&self) -> &FormSplit {
+        &self.storage
+    }
+
+    /// The rate form's split and hand.
+    pub fn rate(&self) -> &FormSplit {
+        &self.rate
+    }
+
+    /// The conservative core, when it was taken within its ceiling.
+    pub fn conservative_core(&self) -> Option<&ConservativeCore> {
+        self.core.as_ref()
+    }
+
+    /// **Whether asymptotic decay is licensed.**
     pub fn licenses_decay(&self) -> bool {
-        matches!(self, Self::DecayLicensed { .. })
+        matches!(self.licence, SpectralLicence::Decay)
     }
 
-    /// **Whether non-growth (`Re λ ≤ 0`) is licensed**: either licensed arm. Strictly weaker than
+    /// **Whether non-growth (`Re λ ≤ 0`) is licensed.** Strictly weaker than
     /// [`SpectralReading::licenses_decay`].
     pub fn licenses_non_growth(&self) -> bool {
         matches!(
-            self,
-            Self::DecayLicensed { .. } | Self::NonGrowthLicensed { .. }
+            self.licence,
+            SpectralLicence::Decay
+                | SpectralLicence::RealNonpositive
+                | SpectralLicence::OnTheOrientationAxis
+                | SpectralLicence::NonGrowth
         )
     }
+
+    /// **Whether the spectrum is licensed real.** This is the placement the analytic width is
+    /// decided from without a pole being computed.
+    pub fn licenses_real_spectrum(&self) -> bool {
+        matches!(self.placement, StructuralPlacement::RealNonpositive)
+    }
+}
+
+/// Keep the `rank` nonzero rows of a reduction, so an observability stack never grows past the
+/// chart it is read on.
+fn keep_pivot_rows(
+    reduced: &ExactRatMatrix,
+    rank: usize,
+    extent: usize,
+) -> Result<ExactRatMatrix, InteractionRefusal> {
+    let rows = reduced.to_rows().into_iter().take(rank).collect::<Vec<_>>();
+    if rows.is_empty() {
+        return Ok(ExactRatMatrix::zero(1, extent)?);
+    }
+    Ok(ExactRatMatrix::shaped(rows.len(), extent, rows)?)
 }
 
 // ===============================================================================================

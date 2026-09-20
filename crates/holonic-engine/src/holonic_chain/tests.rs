@@ -21,10 +21,13 @@ use crate::causal_chord::PoleReading;
 use crate::exact_linear::ExactRatMatrix;
 use crate::holonic_interaction::{
     ApertureChart, Carrier, ContactFace, Coupling, HolonicInteraction, Medium, MediumContact,
-    Perspective, ReceiverBody, SourceCurrent,
+    Perspective, ReceiverBody, SourceCurrent, SpectralLicence, StructuralPlacement,
 };
 use crate::inertia::SymmetricForm;
-use crate::neck::{ConstitutiveLink, NeckReading, WidthFace};
+use crate::neck::{
+    AnalyticCertificate, ConstitutiveLink, NeckReading, RealSpectrumLicence, WidthFace,
+};
+use crate::winding_inertia::Hand;
 use crate::physical_constraint_complex::{ConstraintEdge, ConstraintVertexId};
 use crate::physical_constraint_grading::EdgeProvenance;
 use crate::rigidity_receiver::{ExactConfiguration, RigidityJacobian, rigidity_reading};
@@ -372,6 +375,30 @@ fn a_rank_one_coupling_is_a_pinhole_that_bounds_every_transfer() {
     for (probe, rank) in reading.measured() {
         assert!(*rank <= 1, "the probe {probe} has rank {rank}, above the neck");
     }
+}
+
+/// **A closed neck has no pole, so it has no analytic width — whatever the generator's spectrum.**
+/// A width is a distance to a pole of the transfer; `H ≡ 0` has none. A structural placement of
+/// the spectrum must not be read as a width of zero here (review finding, September 19).
+#[test]
+fn a_closed_neck_has_no_pole_and_therefore_no_analytic_width() {
+    let chain = closed_chain();
+    let state = vec![int(1), int(1), int(1), int(1)];
+    let stations = chain.power_stations(&state, &[int(1)]).expect("the stations read");
+    let link = ConstitutiveLink::declare(
+        "test|closed-link",
+        "the declared receiving scope of this chain",
+        WidthFace::Geometric,
+        WidthFace::Analytic,
+        Rat::one(),
+    )
+    .expect("the link stands");
+    let widths = chain
+        .chain_widths(&stations, None, link)
+        .expect("the widths read");
+    assert_eq!(widths.scope(), AnalyticScope::TransferHasNoPole);
+    assert!(!widths.scope().is_decided());
+    assert!(widths.analytic().is_none(), "no pole, so no width is returned");
 }
 
 /// **Closed.** With no coupling and no contact the two media do not communicate: the neck's rank
@@ -1105,6 +1132,28 @@ fn a_cut_that_is_not_a_partition_is_refused() {
 // =============================================================================================
 
 const STRUCTURE_ROOT_ENV: &str = "HOLONICS_M5_STRUCTURE_ROOT";
+/// The residue window the **escalated** chain reading is taken on, declared here and overridable
+/// so the cost curve can be swept without rebuilding. The default is the largest window measured
+/// to return; the whole 108-residue chain is reached by setting it, and what stops the reading
+/// there is a measurement this test prints rather than a ceiling anyone raised.
+const CHAIN_WINDOW_ENV: &str = "HOLONICS_M5_CHAIN_WINDOW";
+/// 60 residues, 180 coordinates: the largest escalated window measured to return on this
+/// workstation, in release, on 2026-09-19. The whole reading's cost curve, swept with
+/// [`CHAIN_WINDOW_ENV`]:
+///
+/// ```text
+///   coordinates   determined rank   power balance   analytic face   whole reading
+///        72            1.3 s            3.2 s        DECIDED 1.9 s       7.0 s
+///       120           30.7 s           76.2 s       DECIDED 45.9 s     168.1 s
+///       180          101.4 s          258.5 s      DECIDED 157.5 s     568.1 s
+///       324             — did not return in 39 minutes; killed, not refused —
+/// ```
+///
+/// **No resolvent inverse is taken at any of these extents** and the pole atlas is never formed:
+/// what grows is the exact rational assembly and certification of the `n`-chart contact form,
+/// which every call touching the generator re-does. That is a rebasing (a sparse face assembly,
+/// and a `ContactDissipation` carried rather than reassembled), not a ceiling to raise.
+const DEFAULT_CHAIN_WINDOW: usize = 60;
 const DEFAULT_STRUCTURE_ROOT: &str = "/home/b/Downloads/holonics-m5-rbx1-rank05";
 /// The RBX1 chain is the one component present in all three presentations.
 const RBX1_RESIDUES: usize = 108;
@@ -1279,8 +1328,16 @@ fn measured_jacobian(
 /// the power balance with its residual, the Markov order across the hinge, the neck reading and
 /// the comparison against a cut placed elsewhere.
 ///
-/// The joint chart is `3 × 12 = 36` coordinates, above [`ANALYTIC_EXTENT_CEILING`], so the analytic
-/// width is returned **not decided within its bound** and no value is invented for it.
+/// The joint chart is `3 × 12 = 36` coordinates, above [`ANALYTIC_EXTENT_CEILING`] — and the
+/// analytic face is **decided anyway**, because `Ω = 0`, `G = I` and `M = JᵀJ` place the spectrum
+/// on the real axis by structure and the pole atlas is never formed. The rank is decided the same
+/// way: both ports are identities on their blocks, so the nullity theorem fixes it and no
+/// resolvent inverse is taken. Both routes are then cross-checked against the ones that measure.
+///
+/// The reading is then **escalated** to a larger real window, declared by
+/// [`CHAIN_WINDOW_ENV`] and defaulting to [`DEFAULT_CHAIN_WINDOW`], and finally attempted on the
+/// whole 204-monomer complex, where it is refused by a ceiling this test reports rather than
+/// widens.
 ///
 /// **Absent the release this test refuses.** Every law this module owns is checked without any
 /// fixture by the synthetic tests above, in particular
@@ -1371,12 +1428,39 @@ fn the_measured_hinge_of_one_m5_presentation_reads_as_one_chain() {
         widest.section
     );
 
-    let bound = chain.rank_bound(&[int(1), int(7)]).expect("the rank bound reads");
+    // **The determined arm: no resolvent inverse at all.** Both ports are identities on their
+    // blocks, so the nullity theorem fixes `rank H(s) = rank A_↗ = r` at every probe off the
+    // joint poles.
+    let at_determined = std::time::Instant::now();
+    let bound = chain.rank_bound(&[]).expect("the determined rank reads");
+    let determined_cost = at_determined.elapsed();
+    assert!(bound.is_determined(), "the ports read the whole neck");
+    assert!(bound.measured().is_empty(), "no resolvent was formed");
     eprintln!(
-        "[measured] neck section {} bounds the cross-domain transfer; measured ranks {:?}",
+        "[measured] determined rank {} (neck section {}, ports {}/{} and {}/{}) in {:.2} s — no \
+         resolvent inverse",
+        bound.attained(),
         bound.bound(),
-        bound.measured().iter().map(|(_, rank)| *rank).collect::<Vec<_>>()
+        bound.ports().upstream_rank,
+        bound.ports().upstream_extent,
+        bound.ports().downstream_rank,
+        bound.ports().downstream_extent,
+        determined_cost.as_secs_f64()
     );
+
+    // The same number by the route this reading used to take: two exact resolvent inverses on the
+    // joint chart. The two must agree, and the cost difference is the point.
+    let at_measured = std::time::Instant::now();
+    let measured = chain
+        .rank_reading(RankRoute::Measured, &[int(1), int(7)])
+        .expect("the measured rank reads");
+    let measured_cost = at_measured.elapsed();
+    eprintln!(
+        "[measured] measured ranks {:?} at two probes in {:.2} s — two exact resolvent inverses",
+        measured.measured().iter().map(|(_, rank)| *rank).collect::<Vec<_>>(),
+        measured_cost.as_secs_f64()
+    );
+    assert_eq!(measured.attained(), bound.attained());
 
     let extent = chain.interaction().joint_dimension();
     let state: Vec<Rat> = (0..extent).map(|at| int(at as i64 % 7 - 3)).collect();
@@ -1412,8 +1496,10 @@ fn the_measured_hinge_of_one_m5_presentation_reads_as_one_chain() {
     );
     assert!(staircase.has_no_direct_feedthrough());
 
-    // The analytic width stops at its declared bound rather than attempting a 36-coordinate exact
-    // characteristic polynomial, and says so.
+    // **The analytic face is decided by structure, not left undecided within a bound.** `Ω = 0`,
+    // `G = I`, `M = JᵀJ`: `A = −M` is self-adjoint in the `G`-pairing, its spectrum is real, and
+    // the strip has closed — at 36 coordinates and at any other extent, with no characteristic
+    // polynomial formed.
     let link = ConstitutiveLink::declare(
         "designed-free|link",
         "the declared receiving scope of this window",
@@ -1428,16 +1514,508 @@ fn the_measured_hinge_of_one_m5_presentation_reads_as_one_chain() {
     eprintln!("[measured] analytic scope: {:?}", widths.scope());
     assert_eq!(
         widths.scope(),
-        AnalyticScope::NotDecidedWithinBound {
-            extent: 3 * WINDOW,
-            ceiling: ANALYTIC_EXTENT_CEILING
+        AnalyticScope::StructurallyPlaced {
+            licence: RealSpectrumLicence::GSelfAdjointNegativeSemidefinite
         }
     );
-    assert!(widths.analytic().is_none(), "no width was invented");
+    let analytic = widths.analytic().expect("the analytic face is decided");
+    assert!(analytic.squared_half_width().is_zero());
+    eprintln!(
+        "[measured] squared analytic half-width {} by {:?}",
+        analytic.squared_half_width(),
+        analytic.attaining()
+    );
 
     eprintln!(
         "[measured] the whole chain reading cost {:.1} s of wall clock",
         started.elapsed().as_secs_f64()
+    );
+
+    // =========================================================================================
+    // The same reading on the largest real window this release carries.
+    // =========================================================================================
+    //
+    // The hinge SCAN is not taken at these extents: it is
+    // `cuts × constraints × split × (width − split)` exact rational multiplications, a different
+    // reading with a different cost, and nothing below needs it. The cut is **declared** at the
+    // chain's midpoint and is said to be declared.
+    let window = match std::env::var(CHAIN_WINDOW_ENV) {
+        Err(_) => DEFAULT_CHAIN_WINDOW,
+        Ok(declared) => match declared.parse::<usize>() {
+            Ok(window) if (4..=RBX1_RESIDUES).contains(&window) => window,
+            _ => panic!(
+                "{CHAIN_WINDOW_ENV}={declared} is not a window of 4 to {RBX1_RESIDUES} residues; \
+                 a declared window is never silently replaced by the default"
+            ),
+        },
+    };
+    let at_whole = std::time::Instant::now();
+    let whole = measured_jacobian("designed-free", &root.join("designed-free-rbx1.cif"), window)
+        .unwrap_or_else(|error| panic!("designed-free: {error}"));
+    eprintln!(
+        "[measured] escalated window: {window} residues, {} coordinates, {} constraints, \
+         Jacobian in {:.1} s",
+        3 * window,
+        whole.constraint_count(),
+        at_whole.elapsed().as_secs_f64()
+    );
+    let at_build = std::time::Instant::now();
+    let whole_chain = elastic_chain("designed-free|rbx1|escalated", &whole, window / 2)
+        .expect("the chain builds at the declared midpoint cut");
+    assert_eq!(whole_chain.interaction().joint_dimension(), 3 * window);
+    eprintln!(
+        "[measured] escalated chain assembled in {:.1} s",
+        at_build.elapsed().as_secs_f64()
+    );
+
+    let at_placement = std::time::Instant::now();
+    let placement = whole_chain
+        .interaction()
+        .structural_placement()
+        .expect("the placement reads");
+    eprintln!(
+        "[measured] structural placement {:?} in {:.1} s",
+        placement,
+        at_placement.elapsed().as_secs_f64()
+    );
+    assert_eq!(placement, StructuralPlacement::RealNonpositive);
+
+    let at_rank = std::time::Instant::now();
+    let whole_rank = whole_chain
+        .rank_bound(&[])
+        .expect("the determined rank reads");
+    assert!(whole_rank.is_determined());
+    eprintln!(
+        "[measured] determined rank {} at {} coordinates in {:.1} s — no resolvent inverse \
+         (the resolvent ceiling is {RESOLVENT_EXTENT_CEILING} and was never approached)",
+        whole_rank.attained(),
+        3 * window,
+        at_rank.elapsed().as_secs_f64()
+    );
+
+    let whole_extent = whole_chain.interaction().joint_dimension();
+    let whole_state: Vec<Rat> = (0..whole_extent).map(|at| int(at as i64 % 7 - 3)).collect();
+    let whole_ports = whole_chain.interaction().source().ports().len();
+    let whole_input: Vec<Rat> = (0..whole_ports).map(|at| int(at as i64 % 5 - 2)).collect();
+    let at_stations = std::time::Instant::now();
+    let whole_stations = whole_chain
+        .power_stations(&whole_state, &whole_input)
+        .expect("the stations read");
+    assert!(whole_stations.transport_residual().is_zero());
+    assert!(whole_stations.rate_form_residual().is_zero());
+    assert!(whole_stations.balances());
+    eprintln!(
+        "[measured] the power balance closes at {whole_extent} coordinates in {:.1} s",
+        at_stations.elapsed().as_secs_f64()
+    );
+
+    let at_widths = std::time::Instant::now();
+    let whole_link = ConstitutiveLink::declare(
+        "designed-free|whole-link",
+        "the declared receiving scope of the whole target chain",
+        WidthFace::Geometric,
+        WidthFace::Analytic,
+        Rat::one(),
+    )
+    .expect("the link stands");
+    let whole_widths = whole_chain
+        .chain_widths(&whole_stations, None, whole_link)
+        .expect("the widths read");
+    assert_eq!(
+        whole_widths.scope(),
+        AnalyticScope::StructurallyPlaced {
+            licence: RealSpectrumLicence::GSelfAdjointNegativeSemidefinite
+        }
+    );
+    assert!(
+        whole_widths
+            .analytic()
+            .expect("the analytic face is decided")
+            .squared_half_width()
+            .is_zero()
+    );
+    eprintln!(
+        "[measured] the analytic face is DECIDED at {whole_extent} coordinates in {:.1} s \
+         (the pole-atlas ceiling is {ANALYTIC_EXTENT_CEILING} and was never approached)",
+        at_widths.elapsed().as_secs_f64()
+    );
+    eprintln!(
+        "[measured] the escalated {window}-residue chain reading cost {:.1} s of wall clock",
+        at_whole.elapsed().as_secs_f64()
+    );
+
+    // =========================================================================================
+    // The whole 204-monomer complex: 612 coordinates. Reported, not forced.
+    // =========================================================================================
+    //
+    // `ContactDissipation::assemble` bounds its work by `faces × slip × dimension²` against
+    // `DECLARED_ASSEMBLY_CEILING`. At 926 constraints on a 612-coordinate chart that declares
+    // `926 × 1 × 612² = 346 827 744`, above the ceiling `67 108 864`, so the joint dissipation is
+    // refused **before anything is allocated**. The ceiling is not widened to let the reading
+    // through: what the number says is that the bound counts a dense outer product for a face
+    // that is one sparse row with at most six nonzero entries, and the answer to that is a sparse
+    // assembly, which is a rebasing and not a bigger ceiling.
+    let complex = complex_jacobian("designed-free", &root.join("designed-free-rbx1.cif"))
+        .unwrap_or_else(|error| panic!("designed-free complex: {error}"));
+    eprintln!(
+        "[measured] whole complex: {} sites, {} coordinates, {} constraints",
+        complex.occurrence_count(),
+        3 * complex.occurrence_count(),
+        complex.constraint_count()
+    );
+    assert_eq!(complex.occurrence_count(), 204);
+    let refused = elastic_chain(
+        "designed-free|complex",
+        &complex,
+        complex.occurrence_count() / 2,
+    )
+    .and_then(|chain| chain.interaction().generator().map_err(Into::into));
+    match refused {
+        Err(error) => eprintln!("[measured] the complex is refused by name: {error}"),
+        Ok(_) => panic!("the complex assembled; this test's account of the ceiling is stale"),
+    }
+}
+
+/// The rigidity Jacobian of **every** alpha carbon this presentation carries: both chains, in
+/// chain order, with the backbone inside each chain and the 8 Å aperture across all of them.
+fn complex_jacobian(lineage: &'static str, path: &Path) -> Result<RigidityJacobian, String> {
+    let chains = read_alpha_carbons(path)?;
+    let mut places = Vec::new();
+    let mut backbone = std::collections::BTreeSet::new();
+    for residues in chains.values() {
+        let offset = places.len();
+        for step in 0..residues.len().saturating_sub(1) {
+            backbone.insert((offset + step, offset + step + 1));
+        }
+        places.extend(residues.iter().cloned());
+    }
+    let sites = places.len();
+    let configuration = ExactConfiguration::declared(
+        3,
+        places
+            .iter()
+            .enumerate()
+            .map(|(at, point)| (ConstraintVertexId(at as u64 + 1), point.clone())),
+    )
+    .map_err(|error| error.to_string())?;
+    let aperture = Rat::from_integer(BigInt::from(CONTACT_SQUARED));
+    let mut constraints = BTreeMap::new();
+    for left in 0..sites {
+        for right in (left + 1)..sites {
+            let bonded = backbone.contains(&(left, right));
+            if !bonded && squared_distance(&places[left], &places[right]) > aperture {
+                continue;
+            }
+            let (edge, _) = ConstraintEdge::new(
+                ConstraintVertexId(left as u64 + 1),
+                ConstraintVertexId(right as u64 + 1),
+            )
+            .map_err(|error| error.to_string())?;
+            constraints.insert(
+                edge,
+                if bonded {
+                    EdgeProvenance::Polygonal
+                } else {
+                    EdgeProvenance::AdmittedContact
+                },
+            );
+        }
+    }
+    RigidityJacobian::found(lineage, &configuration, &constraints).map_err(|error| error.to_string())
+}
+
+/// **The rank is determined by a theorem, and the measurement agrees — including at a probe the
+/// Lean theorem does not cover.**
+///
+/// The chain is `|source⟩ → 1 mode → skew neck → 2 modes → ⟨perspective|` with a dissipative face
+/// on the downstream medium's first coordinate. Both ports are identities on their blocks, so
+/// `B₁` has full row rank and `C₂` full column rank and the determined arm applies:
+/// `rank H(s) = rank A_↗ = 1` at every probe off the joint poles, with no resolvent formed.
+///
+/// `A₂₂ = [[−1, 0], [0, 0]]` has the eigenvalues `−1` and `0`, so `N₂₂ = sI − A₂₂` is **singular
+/// at `s = −1`** — and the joint `N = sI − A` is not, because `−1` is not a joint pole. That is
+/// exactly the probe `HolonicChain.lean::transfer_rank_le_neck_rank` cannot reach (its `hQ`
+/// hypothesis asks for `N₂₂` invertible) and the Fiedler–Markham nullity theorem covers
+/// unconditionally. The measured route is taken there and must agree with the determined one.
+#[test]
+fn the_determined_rank_agrees_with_the_measured_one_where_the_downstream_block_is_singular() {
+    let upstream = Medium::declared("test|upstream", identity(1), matrix(1, 1, &[0]), Vec::new())
+        .expect("the upstream medium stands");
+    let downstream = Medium::declared(
+        "test|downstream",
+        identity(2),
+        matrix(2, 2, &[0, 0, 0, 0]),
+        vec![
+            ContactFace::declared(
+                "test|downstream-face",
+                matrix(1, 2, &[1, 0]),
+                identity(1),
+                Rat::one(),
+            )
+            .expect("the face stands"),
+        ],
+    )
+    .expect("the downstream medium stands");
+    let coupling = Coupling::declared(
+        "test|neck",
+        Carrier::Medium(0),
+        Carrier::Medium(1),
+        matrix(2, 1, &[1, 0]),
+    )
+    .expect("the coupling stands");
+    let source = SourceCurrent::declared(
+        "test|source",
+        Carrier::Medium(0),
+        matrix(1, 1, &[1]),
+        vec!["drive".to_owned()],
+    )
+    .expect("the source stands");
+    let perspective = Perspective::standing(
+        "test|perspective",
+        Carrier::Medium(1),
+        matrix(2, 2, &[1, 0, 0, 1]),
+        vec!["read-0".to_owned(), "read-1".to_owned()],
+    )
+    .expect("the perspective stands");
+    let interaction = HolonicInteraction::declared(
+        "test|determined-chain",
+        source,
+        vec![upstream, downstream],
+        Vec::new(),
+        vec![coupling],
+        None,
+        perspective,
+    )
+    .expect("the interaction stands");
+    let chain = HolonicChain::over("test|determined-chain", interaction).expect("the chain reads");
+
+    // The blocks are what the argument says they are.
+    let generator = chain.interaction().generator().expect("the generator assembles");
+    let downstream_block = matrix(2, 2, &[-1, 0, 0, 0]);
+    for row in 0..2 {
+        for column in 0..2 {
+            assert_eq!(
+                generator.get(1 + row, 1 + column).expect("an entry"),
+                downstream_block.get(row, column).expect("an entry"),
+                "A₂₂ is the isolated downstream medium's own generator"
+            );
+        }
+    }
+
+    let ports = chain.port_ranks().expect("the port ranks read");
+    assert!(ports.ports_are_separated);
+    assert_eq!((ports.upstream_rank, ports.upstream_extent), (1, 1));
+    assert_eq!((ports.downstream_rank, ports.downstream_extent), (2, 2));
+    assert!(ports.are_full_rank_on_their_blocks);
+
+    // The determined arm takes no probe at all and forms no resolvent.
+    let determined = chain
+        .rank_reading(RankRoute::Determined, &[])
+        .expect("the determined rank reads with no probe");
+    assert!(determined.is_determined());
+    assert_eq!(determined.licence(), RankLicence::Determined { rank: 1 });
+    assert_eq!(determined.bound(), 1);
+    assert_eq!(determined.port_bound(), 1);
+    assert_eq!(determined.attained(), 1);
+    assert!(determined.bound_is_attained());
+    assert!(
+        determined.measured().is_empty(),
+        "the determined arm measures nothing"
+    );
+
+    // `s = −1` is an eigenvalue of the isolated downstream medium, so `N₂₂` is singular there;
+    // the joint `N` is not, because `−1` is not a root of `λ(λ² + λ + 1)`.
+    let downstream_characteristic = downstream_block
+        .characteristic_polynomial()
+        .expect("the downstream characteristic polynomial");
+    assert!(
+        downstream_characteristic
+            .evaluate(&int(-1))
+            .is_zero(),
+        "s = −1 is an eigenvalue of A₂₂, so N₂₂ is singular there"
+    );
+    let joint_characteristic = generator
+        .characteristic_polynomial()
+        .expect("the joint characteristic polynomial");
+    assert!(
+        !joint_characteristic.evaluate(&int(-1)).is_zero(),
+        "and it is not a joint pole, so the resolvent exists there"
+    );
+
+    let measured = chain
+        .rank_reading(RankRoute::Measured, &[int(-1), int(2), int(5)])
+        .expect("the measured rank reads");
+    assert!(!measured.is_determined());
+    assert_eq!(measured.licence(), RankLicence::Bounded { bound: 1 });
+    for (probe, rank) in measured.measured() {
+        assert_eq!(
+            *rank,
+            determined.attained(),
+            "the measured rank at the probe {probe} must be the determined one"
+        );
+    }
+    assert_eq!(measured.attained(), determined.attained());
+}
+
+/// **A chain whose ports do not read their whole blocks takes the bound, not the theorem.**
+///
+/// The skew chain's aperture is one covector on a three-mode medium, so `C₂` has rank `1 < 3` and
+/// the determined arm is withheld by name: the reading falls back to measuring at the declared
+/// probes, and `port_bound` is the tighter `min(r, rank B₁, rank C₂)`.
+#[test]
+fn a_port_that_does_not_read_its_block_withholds_the_determined_arm() {
+    let chain = skew_chain(&[1, 0, 0]);
+    let ports = chain.port_ranks().expect("the port ranks read");
+    assert!(ports.ports_are_separated);
+    assert_eq!((ports.downstream_rank, ports.downstream_extent), (1, 3));
+    assert!(!ports.are_full_rank_on_their_blocks);
+
+    let reading = chain
+        .rank_reading(RankRoute::Determined, &[int(1), int(2)])
+        .expect("the reading falls back to measuring");
+    assert!(!reading.is_determined());
+    assert_eq!(reading.port_bound(), 1);
+    assert_eq!(reading.measured().len(), 2);
+    assert!(
+        chain.rank_reading(RankRoute::Determined, &[]).is_err(),
+        "with the theorem withheld there is nothing to read without a probe"
+    );
+}
+
+/// **The analytic face of an elastic chain is decided by structure, at any extent, with no pole
+/// computed.**
+///
+/// `Ω = 0`, `G = I`, `M = JᵀJ`: `A = −M` is self-adjoint in the `G`-pairing, so every eigenvalue
+/// is real and `≤ 0`, every pole is real and the strip has closed. The twelve-coordinate synthetic
+/// hinge is *below* [`ANALYTIC_EXTENT_CEILING`], so the two routes can be compared directly: the
+/// pole atlas must agree with the placement.
+#[test]
+fn the_elastic_chain_decides_its_analytic_face_by_structure_and_the_atlas_agrees() {
+    let jacobian = two_triangles_and_a_hinge();
+    let search = hinge_by_minimal_section(&jacobian, 1, CUT_CEILING).expect("the search returns");
+    let chain = elastic_chain("synthetic-hinge", &jacobian, search.cut()).expect("the chain builds");
+    assert_eq!(chain.interaction().joint_dimension(), 12);
+
+    let placement = chain
+        .interaction()
+        .structural_placement()
+        .expect("the placement reads");
+    assert_eq!(placement, StructuralPlacement::RealNonpositive);
+
+    // At twelve coordinates the count is within its bound, so the placement is cross-checked
+    // three ways at once: `right = 0` from the licence, the conservative core against the on-axis
+    // count, and — the sharp one — the split of `G M G` against the whole half-plane count, which
+    // is Sylvester's law standing in for the spectral theorem. A disagreement refuses; this call
+    // returning at all is the check.
+    let spectrum = chain
+        .interaction()
+        .spectral_reading()
+        .expect("the spectral reading returns");
+    assert_eq!(spectrum.licence(), SpectralLicence::RealNonpositive);
+    assert!(spectrum.licenses_real_spectrum());
+    assert!(spectrum.licenses_non_growth() && !spectrum.licenses_decay());
+    let reading = rigidity_reading(&jacobian).expect("the rigidity reading returns");
+    let half_plane = spectrum.half_plane().expect("the count is within its bound");
+    assert_eq!(half_plane.right, 0, "nothing grows in an elastic network");
+    assert_eq!(
+        half_plane.left, reading.rank,
+        "the constrained directions are the decaying ones"
+    );
+    assert_eq!(
+        half_plane.axis,
+        12 - reading.rank,
+        "and ker J — the rigid motions and the mechanisms — is what stays on the axis"
+    );
+    let core = spectrum
+        .conservative_core()
+        .expect("the core is within its ceiling");
+    assert_eq!(core.dimension(), 12 - reading.rank);
+    assert_eq!(core.dimension(), core.basis().len());
+
+    let state: Vec<Rat> = (0..12).map(|at| int(at as i64 % 5 - 2)).collect();
+    let input: Vec<Rat> = (0..6).map(|at| int(at as i64 - 3)).collect();
+    let stations = chain.power_stations(&state, &input).expect("the stations read");
+    let link = ConstitutiveLink::declare(
+        "synthetic|link",
+        "the declared receiving scope of this chain",
+        WidthFace::Geometric,
+        WidthFace::Analytic,
+        Rat::one(),
+    )
+    .expect("the link stands");
+    let widths = chain
+        .chain_widths(&stations, None, link)
+        .expect("the widths read");
+    assert_eq!(
+        widths.scope(),
+        AnalyticScope::StructurallyPlaced {
+            licence: RealSpectrumLicence::GSelfAdjointNegativeSemidefinite
+        }
+    );
+    assert!(widths.scope().is_decided());
+    let analytic = widths.analytic().expect("the analytic face is decided");
+    assert!(analytic.squared_half_width().is_zero());
+    assert!(analytic.is_complete(), "nothing was left undecided");
+    assert_eq!(
+        analytic.attaining(),
+        &AnalyticCertificate::StructurallyPlacedOnTheRealAxis {
+            licence: RealSpectrumLicence::GSelfAdjointNegativeSemidefinite,
+            extent: 12
+        }
+    );
+
+    // The independent route, within its own ceiling: the pole atlas of the same chain. Its width
+    // must be the same number, reached by computing poles rather than by placing them.
+    let atlas = chain.poles(PoleReading::Named).expect("the atlas reads");
+    let measured = crate::neck::analytic_width(&atlas).expect("the measured width reads");
+    assert!(
+        measured.squared_half_width().is_zero(),
+        "a real spectrum closes the strip, however the width is reached"
+    );
+}
+
+/// **The conservative core is the on-axis count, and dissipation is what removes it.**
+///
+/// A two-medium chain with one dissipative face at the neck: the modes the dissipation cannot see
+/// are exactly the eigenvalues that stay on the axis, which is LaSalle's condition on a finite
+/// chart. The core is computed from `M G, M G A, …` and compared with the exact half-plane count,
+/// which knows nothing of invariant subspaces.
+#[test]
+fn the_conservative_core_is_the_on_axis_count_of_a_dissipative_chain() {
+    let chain = dissipative_chain(&[1, 0, 0]);
+    let spectrum = chain
+        .interaction()
+        .spectral_reading()
+        .expect("the spectral reading returns");
+    assert_eq!(
+        spectrum.placement(),
+        StructuralPlacement::NonGrowth,
+        "the downstream medium carries a skew structure, so this is the general arm and not the \
+         self-adjoint one"
+    );
+    let core = spectrum
+        .conservative_core()
+        .expect("the core is within its ceiling");
+    let half_plane = spectrum
+        .half_plane()
+        .expect("the count is within its bound");
+    assert_eq!(
+        core.dimension(),
+        half_plane.axis,
+        "the largest A-invariant subspace inside ker(M G) is the on-axis count"
+    );
+    assert_eq!(half_plane.right, 0, "nothing grows");
+    assert_eq!(
+        spectrum.licenses_decay(),
+        core.is_trivial(),
+        "decay is licensed exactly when dissipation sees every mode"
+    );
+    // The split-and-hand wording, never a bare count of signs.
+    assert_eq!(spectrum.storage().split, (4, 0));
+    assert_eq!(spectrum.storage().hand, Hand::WithTheTurn);
+    assert!(
+        spectrum.storage().windings.is_some(),
+        "the storage form of this chain is a symmetric circulant, so its passages are named"
     );
 }
 

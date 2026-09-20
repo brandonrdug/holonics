@@ -18,6 +18,8 @@
 //! | `port_transfer_is_the_cross_block`, `mul_onUpstream`, `onDownstream_mul` | [`HolonicChain::transfer_at`] |
 //! | `cross_block_of_inverse`, `resolvent_cross_block` | the same reading's resolvent block |
 //! | `transfer_factors_through_the_neck`, `transfer_rank_le_neck_rank` | [`HolonicChain::rank_bound`] and [`RankBoundReading`] |
+//! | `full_rank_ports_read_the_whole_neck` | [`RankLicence::Determined`], the arm that takes no resolvent |
+//! | `full_rank_ports_read_a_pinhole_as_one` | the same arm at `r = 1` |
 //! | `pinhole_transfer_rank_le_one` | [`NeckCoupling::is_pinhole`] |
 //! | `cross_block_pow_eq_zero_of_closed`, `markov_eq_zero_of_closed_neck` | [`HolonicChain::markov`] on a closed neck, and [`crate::neck::NeckReading::Closed`] |
 //! | `markov`, `markov_zero_of_separated_ports`, `markov_one_eq_neck_product` | [`HolonicChain::markov`] and [`MarkovStaircase`] |
@@ -33,11 +35,53 @@
 //! | `no_direction_undoes_the_dissipation` | [`ReversalReading::dissipation_is_even`] |
 //! | `reciprocity_of_the_reversed_chain`, `reversal_preserves_the_transfer_rank` | [`ReversalReading::reciprocal`] |
 //!
+//! # 0. The rank is a theorem before it is a measurement
+//!
+//! [proved-standard] The **nullity theorem** — complementary blocks of a nonsingular matrix and
+//! of its inverse have equal nullity (R. L. Gustafson, *A note on matrix inversion*, Linear
+//! Algebra Appl. 57 (1984), Theorem 1; M. Fiedler and T. L. Markham, Linear Algebra Appl. 74
+//! (1986)) — applied to `N = sI − A` with the two-block split `{upstream}` against
+//! `{downstream}` gives, at **every** probe off the joint poles and with no hypothesis on `N₂₂`,
+//!
+//! ```text
+//!   rank X_↗ = rank N_↗ = rank A_↗ = r.
+//! ```
+//!
+//! When the ports read the whole neck — `B₁` of full row rank on the upstream block, `C₂` of full
+//! column rank on the downstream one, which the elastic chain's `B₁ = I`, `C₂ = I` satisfy — `C₂`
+//! has a left inverse and `B₁` a right inverse, so `rank H(s) = rank X_↗ = r` **exactly**. That is
+//! `HolonicChain.lean::full_rank_ports_read_the_whole_neck`, which takes the nullity statement as
+//! one named hypothesis so the standard theorem never enters as an axiom; its own lift is issue
+//! #34. [`RankLicence::Determined`] is that reading, and **it forms no resolvent inverse**. The
+//! measured route stays available by name ([`RankRoute::Measured`]) and is what a rank-deficient
+//! port population takes.
+//!
+//! [proved-standard] The other determined face is the **analytic width**. With `Ω = 0`, `G ≻ 0`
+//! and `M ⪰ 0` the generator `A = −M G` satisfies `AᵀG = GA`
+//! (`HolonicInteraction.lean::selfAdjoint_of_no_structure`), so `G A` is symmetric and the pair
+//! `(G A, G)` is simultaneously diagonalizable by congruence (Horn & Johnson, *Matrix Analysis*,
+//! 2nd ed., Theorem 4.5.15): every eigenvalue is real and `≤ 0`. Every pole is therefore real,
+//! the strip has closed, and the squared half-width is `0` **at any extent** —
+//! [`AnalyticScope::StructurallyPlaced`], through
+//! [`crate::neck::analytic_width_of_real_spectrum`]. The pole atlas and
+//! [`ANALYTIC_EXTENT_CEILING`] stay where they belong: the mixed `Ω, M` generator, whose
+//! half-width is the smallest squared nonzero frequency and is not structurally known.
+//!
+//! **The one reading here that cannot avoid a resolvent** is
+//! [`HolonicChain::reversal_reading`]'s reciprocity face, `H_adjoint(s) = H(s)ᵀ`, because that is
+//! a claim about the transfer at a probe and not about its rank; it refuses an empty probe
+//! population rather than passing vacuously. The power stations, the Markov staircase, the
+//! sections, the tube profile, both holonomies, the telescope residual and the three widths form
+//! no inverse at all.
+//!
 //! # 1. The neck is the rank of the coupling between consecutive media
 //!
 //! [proved-derived; formal-checked; implemented-exact] Split the joint chart into the upstream
 //! medium's coordinates and the downstream medium's. The generator's `(downstream, upstream)`
-//! block `A₂₁` is **the neck**. From `N X = 1` alone — that is, from the second block row of the
+//! block is **the neck**, and it is a **passage**, so it is written `A_↗` — upstream to
+//! downstream — with `A_↘` its return; `docs/HOLONIC_NOTATION.md` rules that the integers of
+//! `A₂₁` carry no magnitude and the direction of the shift is the content. The Lean name is
+//! `crossBlock` and no API is renamed by the ruling. From `N X = 1` alone — that is, from the second block row of the
 //! resolvent identity, with no Schur complement formed — the resolvent's own cross block is
 //! `X₂₁ = N₂₂⁻¹ A₂₁ X₁₁`, so with a rank factorization `A₂₁ = U V` of inner width `r`
 //!
@@ -172,7 +216,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 use relational_geometry::Rat;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::algebraic::CausalCellId;
@@ -181,7 +225,7 @@ use crate::continuing_tube::check_circuit_holonomy;
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::holonic_interaction::{
     Carrier, ContactFace, Coupling, HolonicInteraction, InteractionRefusal, InterfaceReading,
-    Medium, MediumContact, Perspective, ReceiverBody, SourceCurrent,
+    Medium, MediumContact, Perspective, ReceiverBody, SourceCurrent, StructuralPlacement,
 };
 use crate::inertia::{InertiaError, SymmetricForm};
 use crate::jet_staircase::{FiniteJet, JetChart, JetLadder, StaircaseRefusal, jet_ladder};
@@ -190,8 +234,9 @@ use crate::junction_law::{
 };
 use crate::neck::{
     AnalyticWidth, ConstitutiveLink, GeometricSection, JetOrderAtNeck, LinkResidual, NeckInvariants,
-    NeckReading, NeckRefusal, NeckTube, ReceiverUncertaintyWidth, TubeProfile, WidthFace,
-    WidthTriple, analytic_width, check_constitutive_link, holonomy_is_identity, jet_order_at_neck,
+    NeckReading, NeckRefusal, NeckTube, RealSpectrumLicence, ReceiverUncertaintyWidth, TubeProfile,
+    WidthFace, WidthTriple, analytic_width, analytic_width_of_real_spectrum,
+    check_constitutive_link, holonomy_is_identity, jet_order_at_neck,
 };
 use crate::rigidity_receiver::{RigidityError, RigidityJacobian};
 
@@ -280,12 +325,14 @@ pub enum ChainRefusal {
     /// A probe point sits on a pole, so the resolvent there does not exist.
     #[error("the probe `{probe}` sits on a pole of the chain: `sI − A` is singular there")]
     ProbeOnAPole { probe: String },
-    /// The neck's rank bound was violated by an exact computation. The nullity theorem forbids it
-    /// at every probe off the joint poles, so this is a defect in the arithmetic, not a rounding
-    /// difference, and it is refused by name.
+    /// The bound `min(r, rank B₁, rank C₂)` was violated by an exact computation. The nullity
+    /// theorem forbids `rank X_↗ > rank A_↗` at every probe off the joint poles, and a port
+    /// carries no more than its own rank, so this is a defect in the arithmetic rather than a
+    /// rounding difference, and it is refused by name.
     #[error(
-        "at the probe `{probe}` the transfer has rank {observed}, above the neck's rank {bound}; \
-         complementary blocks of a matrix and its inverse have equal nullity, so this cannot happen"
+        "at the probe `{probe}` the transfer has rank {observed}, above `min(r, rank B₁, \
+         rank C₂)` = {bound}; complementary blocks of a matrix and of its inverse have equal \
+         nullity and no port carries more than its own rank, so this cannot happen"
     )]
     RankBoundViolated {
         probe: String,
@@ -587,35 +634,76 @@ impl HolonicChain {
         Ok(readout.multiply(&resolvent)?.multiply(&excitation)?)
     }
 
-    /// **The rank bound at the neck, measured.** Every declared probe's exact transfer rank is
-    /// computed and compared against the coupling's rank; a violation is refused by name.
+    /// **The rank reading at the neck, by whichever route the caller selects.**
     ///
-    /// [proved-derived; formal-checked] Where the downstream block `N₂₂ = sI − A₂₂` is itself
-    /// invertible, `HolonicChain.lean::transfer_rank_le_neck_rank` proves the bound; that
-    /// hypothesis is separate from the joint resolvent existing and this function does not test
-    /// it. [proved-standard] At every probe off the joint poles the bound still holds, by the
-    /// Fiedler–Markham nullity theorem: complementary blocks of a nonsingular matrix and of its
-    /// inverse have equal nullity, so `rank X₂₁ = rank N₂₁ = rank A₂₁` exactly, and
-    /// `rank(C₂ X₂₁ B₁) ≤ r`. The Lean lift of that unconditional form is owed; a probe at an
-    /// eigenvalue of the isolated downstream medium is covered by the standard theorem only.
-    pub fn rank_bound(&self, probes: &[Rat]) -> Result<RankBoundReading, ChainRefusal> {
+    /// [proved-standard] **Where the ports are full rank on their blocks, the rank is a theorem
+    /// and no resolvent is formed.** By the Fiedler–Markham nullity theorem — complementary
+    /// blocks of a nonsingular matrix and of its inverse have equal nullity (M. Fiedler and
+    /// T. L. Markham, *Completing a matrix when certain entries of its inverse are specified*,
+    /// Linear Algebra Appl. 74 (1986); the general form is R. L. Gustafson, *A note on matrix
+    /// inversion*, Linear Algebra Appl. 57 (1984), Theorem 1) — at every probe `s` off the joint
+    /// poles
+    ///
+    /// ```text
+    ///   rank X_↗ = rank N_↗ = rank A_↗ = r,        N = sI − A,  N_↗ = −A_↗
+    /// ```
+    ///
+    /// with **no hypothesis on `N₂₂`**. If moreover `C₂` has full column rank on the downstream
+    /// block and `B₁` full row rank on the upstream one, then `C₂` has a left inverse and `B₁` a
+    /// right inverse, so `rank H(s) = rank(C₂ X_↗ B₁) = rank X_↗ = r` **exactly**, at every such
+    /// probe. The Lean lift of the nullity theorem itself is owed and is issue #34;
+    /// `HolonicChain.lean::full_rank_ports_read_the_whole_neck` carries the second half with the
+    /// nullity statement as one named hypothesis, so the standard theorem enters as a hypothesis
+    /// and never as an axiom.
+    ///
+    /// In general only `rank H ≤ min(r, rank B₁, rank C₂)` holds, and that is what
+    /// [`RankBoundReading::port_bound`] returns; the declared probes are then measured, each one
+    /// an exact resolvent inverse.
+    ///
+    /// [agent-inferred] The determined arm is withheld from a chain whose receiver
+    /// **participates**, because then the joint chart carries three blocks and the complementary
+    /// pair the nullity theorem needs is `{upstream}` against `{downstream, receiver}` — whose
+    /// cross block is not the neck the aperture reads through. Inferred from the theorem's own
+    /// hypothesis (a two-set partition of the index set), not from the contract. Such a chain
+    /// takes the measured route and says so.
+    pub fn rank_reading(
+        &self,
+        route: RankRoute,
+        probes: &[Rat],
+    ) -> Result<RankBoundReading, ChainRefusal> {
+        let coupling = self.neck_coupling()?;
+        let ports = self.port_ranks()?;
+        let bound = coupling.rank;
+        let port_bound = bound.min(ports.upstream_rank).min(ports.downstream_rank);
+        let determined = route == RankRoute::Determined && ports.are_full_rank_on_their_blocks;
+        if determined {
+            // Nothing below forms a resolvent. `attained` is the theorem's value, not a maximum
+            // over anything measured, and `measured` is empty because nothing was measured.
+            return Ok(RankBoundReading {
+                lineage: format!("{}|rank-determined", self.lineage),
+                bound,
+                port_bound,
+                ports,
+                licence: RankLicence::Determined { rank: bound },
+                measured: Vec::new(),
+                attained: bound,
+            });
+        }
         if probes.is_empty() {
             return Err(ChainRefusal::EmptyDeclaration {
                 what: "a rank reading's probe population",
             });
         }
         bounded("a rank reading's probe population", probes.len(), PROBE_CEILING)?;
-        let coupling = self.neck_coupling()?;
-        let bound = coupling.rank;
         let mut measured = Vec::with_capacity(probes.len());
         for probe in probes {
             let transfer = self.transfer_at(probe)?;
             let observed = transfer.rank()?;
-            if observed > bound {
+            if observed > port_bound {
                 return Err(ChainRefusal::RankBoundViolated {
                     probe: probe.to_string(),
                     observed,
-                    bound,
+                    bound: port_bound,
                 });
             }
             measured.push((probe.clone(), observed));
@@ -624,8 +712,90 @@ impl HolonicChain {
         Ok(RankBoundReading {
             lineage: format!("{}|rank-bound", self.lineage),
             bound,
+            port_bound,
+            ports,
+            licence: RankLicence::Bounded { bound: port_bound },
             measured,
             attained,
+        })
+    }
+
+    /// **The rank reading, preferring the theorem.** This is the call the chain's own readings
+    /// make: it returns the determined rank with no resolvent wherever the ports admit it, and
+    /// falls back to measuring at the declared probes where they do not. A caller who wants the
+    /// resolvent taken regardless asks for it by name through
+    /// [`HolonicChain::rank_reading`] with [`RankRoute::Measured`].
+    pub fn rank_bound(&self, probes: &[Rat]) -> Result<RankBoundReading, ChainRefusal> {
+        self.rank_reading(RankRoute::Determined, probes)
+    }
+
+    /// **The two ports' ranks on their own blocks, and whether they read the whole neck.**
+    ///
+    /// `B₁` is the excitation restricted to the upstream rows, `C₂` the readout restricted to the
+    /// downstream columns. Both are checked to vanish off their blocks — a port that straddles
+    /// the neck is not a port of this chain's reading — and their ranks are exact.
+    pub fn port_ranks(&self) -> Result<PortRanks, ChainRefusal> {
+        let excitation = self.interaction.excitation()?;
+        let readout = self.interaction.readout()?;
+        let upstream_offset = self.interaction.block_offset(self.upstream)?;
+        let upstream_extent = self.interaction.block_extent(self.upstream)?;
+        let downstream_offset = self.interaction.block_offset(self.downstream)?;
+        let downstream_extent = self.interaction.block_extent(self.downstream)?;
+        let extent = self.interaction.joint_dimension();
+
+        let mut upstream_rows = Vec::with_capacity(upstream_extent);
+        for row in 0..upstream_extent {
+            upstream_rows.push(excitation.row(upstream_offset + row)?.to_vec());
+        }
+        let excitation_is_on_the_upstream_block = (0..extent)
+            .filter(|row| *row < upstream_offset || *row >= upstream_offset + upstream_extent)
+            .all(|row| {
+                excitation
+                    .row(row)
+                    .map(|entries| entries.iter().all(|entry| entry.is_zero()))
+                    .unwrap_or(false)
+            });
+
+        let mut downstream_rows = Vec::with_capacity(readout.rows());
+        for row in 0..readout.rows() {
+            let line = readout.row(row)?;
+            downstream_rows
+                .push(line[downstream_offset..downstream_offset + downstream_extent].to_vec());
+        }
+        let readout_is_on_the_downstream_block = (0..readout.rows()).all(|row| {
+            readout
+                .row(row)
+                .map(|line| {
+                    line.iter().enumerate().all(|(column, entry)| {
+                        entry.is_zero()
+                            || (column >= downstream_offset
+                                && column < downstream_offset + downstream_extent)
+                    })
+                })
+                .unwrap_or(false)
+        });
+
+        let upstream_port = ExactRatMatrix::shaped(
+            upstream_extent,
+            excitation.columns(),
+            upstream_rows,
+        )?;
+        let downstream_port =
+            ExactRatMatrix::shaped(readout.rows(), downstream_extent, downstream_rows)?;
+        let upstream_rank = upstream_port.rank()?;
+        let downstream_rank = downstream_port.rank()?;
+        let separated = excitation_is_on_the_upstream_block && readout_is_on_the_downstream_block;
+        Ok(PortRanks {
+            upstream_rank,
+            upstream_extent,
+            downstream_rank,
+            downstream_extent,
+            ports_are_separated: separated,
+            receiver_participates: self.receiver_participates(),
+            are_full_rank_on_their_blocks: separated
+                && !self.receiver_participates()
+                && upstream_rank == upstream_extent
+                && downstream_rank == downstream_extent,
         })
     }
 
@@ -1056,7 +1226,31 @@ impl HolonicChain {
         // tube's narrowest section: a one-port source is narrow without being a neck.
         let geometric = tube.profile.sections()[NECK_STATION].clone();
         let extent = self.interaction.joint_dimension();
-        let (analytic, scope) = if extent > ANALYTIC_EXTENT_CEILING {
+        // **Structure first.** A `G`-self-adjoint generator has a real spectrum, so the strip has
+        // closed and the squared half-width is `0` — a licence, at any extent, with no
+        // characteristic polynomial formed. The pole atlas and its ceiling stay exactly where
+        // they belong: the mixed `Ω, M` generator, whose half-width is the smallest squared
+        // nonzero frequency and is not structurally known.
+        //
+        // A width is the distance to a pole, so the placement decides it only where a pole is
+        // known to EXIST. A strictly proper transfer has a pole exactly when it is not identically
+        // zero, and the determined rank says which: `r > 0` means `H ≢ 0`; a closed neck (`r = 0`)
+        // forces every Markov parameter to zero (`markov_eq_zero_of_closed_neck`), so `H ≡ 0` and
+        // there is no pole and no width. With ports that do not read the whole neck the placement
+        // alone cannot say, and the pole atlas decides within its ceiling.
+        let placement = self.interaction.structural_placement()?;
+        let real_by_structure = matches!(placement, StructuralPlacement::RealNonpositive);
+        let neck = self.neck_coupling()?;
+        let ports = self.port_ranks()?;
+        let (analytic, scope) = if neck.is_closed() {
+            (None, AnalyticScope::TransferHasNoPole)
+        } else if real_by_structure && ports.are_full_rank_on_their_blocks {
+            let licence = RealSpectrumLicence::GSelfAdjointNegativeSemidefinite;
+            (
+                Some(analytic_width_of_real_spectrum(licence, extent)?),
+                AnalyticScope::StructurallyPlaced { licence },
+            )
+        } else if extent > ANALYTIC_EXTENT_CEILING {
             (
                 None,
                 AnalyticScope::NotDecidedWithinBound {
@@ -1266,6 +1460,17 @@ impl HolonicChain {
         state: &[Rat],
         input: &[Rat],
     ) -> Result<ReversalReading, ChainRefusal> {
+        // **The one reading in this module that cannot avoid a resolvent.** The rank halves are
+        // determined by the nullity theorem and cost nothing, but reciprocity is the statement
+        // `H_adjoint(s) = H(s)ᵀ` *at a probe*: it is a claim about the transfer itself, not about
+        // its rank, so it is measured or it is not made. An empty probe population would make it
+        // vacuously true, which is why it is refused by name here rather than in
+        // [`HolonicChain::rank_reading`], whose determined arm needs no probe at all.
+        if probes.is_empty() {
+            return Err(ChainRefusal::EmptyDeclaration {
+                what: "a reversal reading's probe population",
+            });
+        }
         let forward = self.rank_bound(probes)?;
         let mut reciprocal = true;
         for probe in probes {
@@ -1485,11 +1690,64 @@ impl NeckCoupling {
     }
 }
 
-/// What the measured rank bound returned.
+/// **Which route a rank reading takes.**
+///
+/// [definition] The two routes answer the same question and cost differently. `Determined` is the
+/// theorem: where the ports read the whole neck it returns `r` with no resolvent formed, and
+/// where they do not it falls back to measuring. `Measured` forms the resolvent at every declared
+/// probe regardless, which is what a caller cross-checking the theorem asks for.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum RankRoute {
+    /// Prefer the theorem; measure only where the ports do not admit it.
+    Determined,
+    /// Form the resolvent at every declared probe.
+    Measured,
+}
+
+/// **How a rank reading knows its value.**
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub enum RankLicence {
+    /// The ports are full rank on their blocks, so `rank H(s) = rank A_↗ = r` at every probe off
+    /// the joint poles. **No resolvent was formed.** The licence is the Fiedler–Markham nullity
+    /// theorem [proved-standard], whose Lean lift is owed (issue #34).
+    Determined { rank: usize },
+    /// `rank H(s) ≤ min(r, rank B₁, rank C₂)`; what the declared probes attained is measured.
+    Bounded { bound: usize },
+}
+
+/// **The two ports' ranks on their own blocks.**
+///
+/// [definition] `B₁` is the excitation restricted to the upstream rows and `C₂` the readout
+/// restricted to the downstream columns. `are_full_rank_on_their_blocks` is the hypothesis the
+/// determined arm runs on: separated ports, no participating receiver, and each port of full rank
+/// on its block.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub struct PortRanks {
+    /// `rank B₁`.
+    pub upstream_rank: usize,
+    /// The upstream medium's own dimension: `B₁` is full row rank exactly when the two agree.
+    pub upstream_extent: usize,
+    /// `rank C₂`.
+    pub downstream_rank: usize,
+    /// The downstream medium's own dimension: `C₂` is full column rank exactly when they agree.
+    pub downstream_extent: usize,
+    /// Whether each port vanishes off its own block.
+    pub ports_are_separated: bool,
+    /// Whether the receiver joins the joint chart, which makes the chart three-blocked.
+    pub receiver_participates: bool,
+    /// Whether the determined arm applies.
+    pub are_full_rank_on_their_blocks: bool,
+}
+
+/// **What a chain's cross-domain transfer rank is, and how the reading knows it.**
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct RankBoundReading {
     lineage: String,
     bound: usize,
+    port_bound: usize,
+    ports: PortRanks,
+    licence: RankLicence,
     measured: Vec<(Rat, usize)>,
     attained: usize,
 }
@@ -1499,24 +1757,46 @@ impl RankBoundReading {
         &self.lineage
     }
 
-    /// `r`, the neck's rank: the bound the factorization proves.
+    /// `r = rank A_↗`, the neck's own rank: the bound the factorization proves.
     pub fn bound(&self) -> usize {
         self.bound
     }
 
-    /// Every declared probe and the exact rank of the transfer there.
+    /// `min(r, rank B₁, rank C₂)`: the bound that also counts what the ports can carry. Equal to
+    /// [`RankBoundReading::bound`] exactly when the ports read the whole neck.
+    pub fn port_bound(&self) -> usize {
+        self.port_bound
+    }
+
+    /// The two ports' ranks on their blocks.
+    pub fn ports(&self) -> &PortRanks {
+        &self.ports
+    }
+
+    /// How this reading knows its value: a theorem, or a measurement at declared probes.
+    pub fn licence(&self) -> RankLicence {
+        self.licence
+    }
+
+    /// Whether the value is determined by the nullity theorem, with no resolvent formed.
+    pub fn is_determined(&self) -> bool {
+        matches!(self.licence, RankLicence::Determined { .. })
+    }
+
+    /// Every declared probe and the exact rank of the transfer there. **Empty in the determined
+    /// arm**, because nothing was measured there.
     pub fn measured(&self) -> &[(Rat, usize)] {
         &self.measured
     }
 
-    /// The largest rank any probe attained. Equal to the bound when the bound is sharp at some
-    /// probe, and smaller when the declared probes did not reach it — which is a statement about
-    /// the probes, not about the chain.
+    /// The rank the transfer has. In the determined arm this is the theorem's value; in the
+    /// measured arm it is the largest rank any declared probe attained, which is smaller than the
+    /// bound when the probes did not reach it — a statement about the probes, not the chain.
     pub fn attained(&self) -> usize {
         self.attained
     }
 
-    /// Whether some declared probe attained the bound.
+    /// Whether the neck's rank is attained: proved in the determined arm, measured otherwise.
     pub fn bound_is_attained(&self) -> bool {
         self.attained == self.bound
     }
@@ -1733,13 +2013,30 @@ impl MarkovStaircase {
     }
 }
 
-/// Whether the analytic width was taken, or left undecided within its declared bound.
+/// Whether the analytic width was taken, placed by structure, or left undecided within its bound.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 pub enum AnalyticScope {
     /// The pole atlas was taken and the width is present.
     Taken,
-    /// The joint extent exceeded the ceiling at which this owner stops; no width was invented.
+    /// **The spectrum is placed on the real axis by structure, so the width is decided at any
+    /// extent and no pole was computed.** The licence is named and the certificate carries it.
+    /// This is the arm `Ω = 0`, `G ≻ 0`, `M ⪰ 0` — the elastic network — lands in.
+    StructurallyPlaced { licence: RealSpectrumLicence },
+    /// **The neck is closed, so the transfer vanishes identically and has no pole.** A width is a
+    /// distance to a pole; none exists, and a placement of the generator's spectrum does not
+    /// make one. This is a decided absence, not a width of zero.
+    TransferHasNoPole,
+    /// The joint extent exceeded the ceiling at which the pole atlas stops **and** structure
+    /// placed nothing; no width was invented. The mixed `Ω, M` generator is the case that stays
+    /// here, and its ceiling is the one that belongs to it.
     NotDecidedWithinBound { extent: usize, ceiling: usize },
+}
+
+impl AnalyticScope {
+    /// Whether an analytic width accompanies the reading, by either route.
+    pub fn is_decided(&self) -> bool {
+        matches!(self, Self::Taken | Self::StructurallyPlaced { .. })
+    }
 }
 
 /// The chain's three widths, each still in its own type, with the declared link's residual.

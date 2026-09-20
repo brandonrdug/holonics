@@ -338,14 +338,36 @@ fn the_chain_poles_leave_the_axis_exactly_when_the_shared_face_becomes_dissipati
         standing_spectrum.licenses_non_growth() && !standing_spectrum.licenses_decay(),
         "an undamped oscillator is licensed non-growth, never decay: all four poles sit on the axis"
     );
-    assert!(matches!(
-        standing_spectrum,
-        SpectralReading::NonGrowthLicensed { .. }
-    ));
-    assert_eq!(standing_spectrum.half_plane().degree, 4);
-    assert_eq!(standing_spectrum.half_plane().axis, 4, "±i and ±2i");
-    assert_eq!(standing_spectrum.half_plane().left, 0);
-    assert_eq!(standing_spectrum.half_plane().right, 0);
+    // `G ≻ 0`, `M = 0`, `Ω ≠ 0`: the conservative arm, named by structure before any count.
+    assert_eq!(
+        standing_spectrum.placement(),
+        StructuralPlacement::OnTheOrientationAxis
+    );
+    assert_eq!(
+        standing_spectrum.licence(),
+        SpectralLicence::OnTheOrientationAxis
+    );
+    // The split-and-hand wording, not a bare count of signs.
+    assert_eq!(standing_spectrum.storage().split, (4, 0));
+    assert_eq!(standing_spectrum.storage().hand, Hand::WithTheTurn);
+    assert_eq!(standing_spectrum.storage().null, 0);
+    // With `M = 0` nothing dissipates, so the whole chart is the conservative core — and it
+    // agrees with the exact on-axis count, which is the cross-check.
+    let core = standing_spectrum
+        .conservative_core()
+        .expect("the core is within its ceiling");
+    assert_eq!(core.dimension(), 4);
+    assert_eq!(
+        core.dimension(),
+        standing_spectrum
+            .half_plane()
+            .expect("the count is within its bound")
+            .axis
+    );
+    assert_eq!(standing_spectrum.half_plane().expect("the count is within its bound").degree, 4);
+    assert_eq!(standing_spectrum.half_plane().expect("the count is within its bound").axis, 4, "±i and ±2i");
+    assert_eq!(standing_spectrum.half_plane().expect("the count is within its bound").left, 0);
+    assert_eq!(standing_spectrum.half_plane().expect("the count is within its bound").right, 0);
 
     let modulated = unit.modulated().expect("the modulated unit");
     let modulated_rate = modulated.storage_rate().expect("a rate reading");
@@ -374,16 +396,16 @@ fn the_chain_poles_leave_the_axis_exactly_when_the_shared_face_becomes_dissipati
     assert!(modulated_spectrum.licenses_non_growth());
     assert_eq!(
         modulated_spectrum.licenses_decay(),
-        modulated_spectrum.half_plane().axis == 0,
+        modulated_spectrum.half_plane().expect("the count is within its bound").axis == 0,
         "decay is licensed exactly when the exact count leaves no pole on the axis"
     );
-    assert_eq!(modulated_spectrum.half_plane().right, 0);
+    assert_eq!(modulated_spectrum.half_plane().expect("the count is within its bound").right, 0);
     assert!(
-        modulated_spectrum.half_plane().left > 0,
+        modulated_spectrum.half_plane().expect("the count is within its bound").left > 0,
         "the dissipative face pulls poles into the left half plane"
     );
     assert!(
-        modulated_spectrum.half_plane().axis < 4,
+        modulated_spectrum.half_plane().expect("the count is within its bound").axis < 4,
         "and off the axis they went"
     );
 
@@ -482,15 +504,28 @@ fn a_vanishing_rate_form_over_an_indefinite_storage_form_licenses_no_spectral_pl
         !spectrum.licenses_decay(),
         "no decay may be claimed from a vanishing rate form without a definite storage form"
     );
-    match spectrum {
-        SpectralReading::NoLicenceWithoutDefiniteStorage { half_plane, .. } => {
-            assert_eq!(half_plane.degree, 2);
-            assert_eq!(half_plane.left, 1);
-            assert_eq!(half_plane.right, 1, "the eigenvalue +1 is right there");
-            assert_eq!(half_plane.axis, 0);
-        }
-        other => panic!("expected the withheld licence, got {other:?}"),
-    }
+    // **Not silence any more: a bounded licence.** `G` is indefinite and nondegenerate with the
+    // split `1` against `1`, and the rate form vanishes, so the generator is `G`-skew: at most
+    // `min(1, 1) = 1` eigenvalue lies strictly to the right, and the spectrum is symmetric under
+    // `λ ↦ −λ̄`. The pair attains the bound exactly.
+    assert_eq!(
+        spectrum.placement(),
+        StructuralPlacement::PontryaginBounded { right_at_most: 1 }
+    );
+    assert_eq!(
+        spectrum.licence(),
+        SpectralLicence::PontryaginBounded { right_at_most: 1 }
+    );
+    assert_eq!(spectrum.storage().split, (1, 1));
+    assert_eq!(spectrum.storage().null, 0, "nondegenerate, which the bound needs");
+    let half_plane = spectrum
+        .half_plane()
+        .expect("the count is within its bound");
+    assert_eq!(half_plane.degree, 2);
+    assert_eq!(half_plane.left, 1);
+    assert_eq!(half_plane.right, 1, "the eigenvalue +1 is right there");
+    assert_eq!(half_plane.axis, 0);
+    assert_eq!(half_plane.right, 1, "and the bound min(p, q) = 1 is attained");
 }
 
 // =============================================================================================
@@ -748,7 +783,7 @@ fn a_perturbation_of_a_mediums_constitutive_data_goes_back_through_its_construct
     let standing = unit.standing().expect("the standing unit");
     let modulated = unit.modulated().expect("the modulated unit");
     assert_eq!(
-        standing.spectral_reading().expect("a reading").half_plane().axis,
+        standing.spectral_reading().expect("a reading").half_plane().expect("the count is within its bound").axis,
         2
     );
     assert_eq!(

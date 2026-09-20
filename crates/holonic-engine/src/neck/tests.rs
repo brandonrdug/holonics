@@ -119,6 +119,42 @@ fn a_link_from_a_face_to_itself_and_a_negative_section_are_refused_by_name() {
     assert!(closed.is_closed());
 }
 
+/// **A structurally placed spectrum closes the strip without a pole being computed.**
+///
+/// The consumer arm this owner carries for
+/// `holonic_interaction.rs::StructuralPlacement::RealNonpositive`: the licence is named on the
+/// certificate, the squared half-width is exactly zero, nothing is left undecided, and a
+/// placement over an empty chart places nothing and is refused by the same name an empty atlas
+/// earns.
+#[test]
+fn a_structurally_placed_real_spectrum_decides_the_width_with_no_pole() {
+    let width = analytic_width_of_real_spectrum(
+        RealSpectrumLicence::GSelfAdjointNegativeSemidefinite,
+        324,
+    )
+    .expect("the placement decides the width");
+    assert!(width.squared_half_width().is_zero());
+    assert!(width.is_complete(), "no factor was left undecided");
+    assert_eq!(
+        width.attaining(),
+        &AnalyticCertificate::StructurallyPlacedOnTheRealAxis {
+            licence: RealSpectrumLicence::GSelfAdjointNegativeSemidefinite,
+            extent: 324
+        }
+    );
+    // The same number the pole route reaches on a real-rooted denominator, by a different route.
+    let by_poles = analytic_width_of_denominator(&RationalPolynomial::new(vector(&[-1, 0, 1])))
+        .expect("the width returns");
+    assert_eq!(width.squared_half_width(), by_poles.squared_half_width());
+    assert!(matches!(
+        analytic_width_of_real_spectrum(
+            RealSpectrumLicence::GSelfAdjointNegativeSemidefinite,
+            0
+        ),
+        Err(NeckRefusal::NoPoleToRead)
+    ));
+}
+
 #[test]
 fn the_analytic_width_is_a_squared_rational_and_names_what_it_did_not_decide() {
     // A pole on the real axis: the strip has closed and the squared half-width is zero.

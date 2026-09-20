@@ -261,6 +261,55 @@ theorem pinhole_transfer_rank_le_one
     (C * X * B).rank ≤ 1 :=
   transfer_rank_le_neck_rank hC hB hX hQ hfactor
 
+/-- [proved-derived; formal-checked] **Full-rank ports read the whole neck: the rank is not a
+bound but an equality.** `Cl` is a left inverse of the downstream port and `Br` a right inverse of
+the upstream one — which over a field is exactly full column rank for `C₂` and full row rank for
+`B₁` — so the two ports neither lose nor add a channel and the transfer's rank is the rank of the
+resolvent's own cross block.
+
+The **nullity theorem** enters as the single named hypothesis `hnullity`, never as an axiom:
+complementary blocks of a nonsingular matrix and of its inverse have equal nullity, so
+`rank X_↗ = rank N_↗ = rank A_↗` at every probe off the joint poles with **no hypothesis on
+`N₂₂`**. Its own lift is owed and is issue #34 — `[proved-standard]` (R. L. Gustafson, *A note on
+matrix inversion*, Linear Algebra Appl. 57 (1984), Theorem 1; M. Fiedler and T. L. Markham,
+Linear Algebra Appl. 74 (1986)). Composing the two gives `rank H(s) = rank A_↗ = r` exactly, with
+no resolvent inverse taken — which is what `holonic_chain.rs::RankLicence::Determined` returns. -/
+theorem full_rank_ports_read_the_whole_neck
+    {A X : Matrix (Joint n₁ n₂) (Joint n₁ n₂) ℚ}
+    {C : Matrix (Fin q) (Joint n₁ n₂) ℚ} {B : Matrix (Joint n₁ n₂) (Fin p) ℚ}
+    {Cl : Matrix (Fin n₂) (Fin q) ℚ} {Br : Matrix (Fin p) (Fin n₁) ℚ}
+    (hC : OnDownstream C) (hB : OnUpstream B)
+    (hCl : Cl * downstreamPort C = 1) (hBr : upstreamPort B * Br = 1)
+    (hnullity : (X.submatrix Sum.inr Sum.inl).rank = (crossBlock A).rank) :
+    (C * X * B).rank = (crossBlock A).rank := by
+  rw [port_transfer_is_the_cross_block hC hB, ← hnullity]
+  set Y := X.submatrix Sum.inr Sum.inl with hY
+  have upper : (downstreamPort C * Y * upstreamPort B).rank ≤ Y.rank :=
+    le_trans (Matrix.rank_mul_le_left _ _) (Matrix.rank_mul_le_right _ _)
+  have recover : Cl * (downstreamPort C * Y * upstreamPort B) * Br = Y := by
+    have regroup : Cl * (downstreamPort C * Y * upstreamPort B) * Br
+        = Cl * downstreamPort C * (Y * (upstreamPort B * Br)) := by
+      simp only [Matrix.mul_assoc]
+    rw [regroup, hCl, hBr, Matrix.one_mul, Matrix.mul_one]
+  have lower : Y.rank ≤ (downstreamPort C * Y * upstreamPort B).rank := by
+    conv_lhs => rw [← recover]
+    exact le_trans (Matrix.rank_mul_le_left _ _) (Matrix.rank_mul_le_right _ _)
+  exact le_antisymm upper lower
+
+/-- [proved-derived; formal-checked] **The pinhole, determined.** With full-rank ports a rank-one
+coupling makes the transfer rank exactly one, not at most one: the single channel is carried, not
+merely bounded. -/
+theorem full_rank_ports_read_a_pinhole_as_one
+    {A X : Matrix (Joint n₁ n₂) (Joint n₁ n₂) ℚ}
+    {C : Matrix (Fin q) (Joint n₁ n₂) ℚ} {B : Matrix (Joint n₁ n₂) (Fin p) ℚ}
+    {Cl : Matrix (Fin n₂) (Fin q) ℚ} {Br : Matrix (Fin p) (Fin n₁) ℚ}
+    (hC : OnDownstream C) (hB : OnUpstream B)
+    (hCl : Cl * downstreamPort C = 1) (hBr : upstreamPort B * Br = 1)
+    (hnullity : (X.submatrix Sum.inr Sum.inl).rank = (crossBlock A).rank)
+    (hpinhole : (crossBlock A).rank = 1) :
+    (C * X * B).rank = 1 := by
+  rw [full_rank_ports_read_the_whole_neck hC hB hCl hBr hnullity, hpinhole]
+
 /-! ## 3. A closed neck transmits nothing -/
 
 /-- [proved-derived; formal-checked] With a vanishing coupling the upstream block is invariant, so
@@ -589,6 +638,8 @@ namespace Audit
 #print axioms transfer_factors_through_the_neck
 #print axioms transfer_rank_le_neck_rank
 #print axioms pinhole_transfer_rank_le_one
+#print axioms full_rank_ports_read_the_whole_neck
+#print axioms full_rank_ports_read_a_pinhole_as_one
 #print axioms cross_block_pow_eq_zero_of_closed
 #print axioms markov_eq_zero_of_closed_neck
 #print axioms markov_is_the_separating_atlas_parameter

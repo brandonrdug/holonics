@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # The two M5 sequences, taken from the authenticated mmCIF files' own `_atom_site` rows rather than
 # retyped. Prints one FASTA record per chain, with the chain's residue count in the header comment.
-# Usage: extract_sequences.sh /home/b/Downloads/holonics-m5-rbx1-rank05/designed-free-rbx1.cif
+# Usage: extract_sequences.sh <M5_STRUCTURE_ROOT>/designed-free-rbx1.cif
 set -euo pipefail
 python3 - "$@" <<'PY'
 import sys, collections

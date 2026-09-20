@@ -86,7 +86,7 @@
     }
   ],
   "reference_presentations": {
-    "note": "Not run here. The authenticated M5 release at /home/b/Downloads/holonics-m5-rbx1-rank05 supplies them, and this experiment reads them unchanged.",
+    "note": "Not run here. The authenticated M5 release at <M5_STRUCTURE_ROOT> supplies them, and this experiment reads them unchanged.",
     "designed": "designed-free-rbx1.cif — the design itself, no uncertainty array",
     "protenix-free": "ptxv2-free-rbx1-seed2.cif with ptxv2-free-rbx1-seed2-pae.npz",
     "protenix-cul1": "ptxv2-cul1-rbx1-seed0.cif with ptxv2-cul1-rbx1-seed0-pae.npz"

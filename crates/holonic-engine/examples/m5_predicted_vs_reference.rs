@@ -37,8 +37,10 @@
 //! [definition] `mod exterior_float_baseline` is the **only** `f64` in this file, it reads the
 //! mmCIF decimal tokens' own retained strings rather than any library value, and nothing it returns
 //! enters a library call. It exists because a reader who has never met this repository knows what a
-//! Cα RMSD is; it decides nothing. Every `f64` in this example is inside that module or is a wall
-//! clock printed in seconds.
+//! Cα RMSD is; it decides nothing. Every `f64` in this example is inside that module, or is a wall
+//! clock printed in seconds, or is `IndexedPresentation::float_places_by_m5` — which is filled from
+//! the mmCIF decimal tokens' own strings, is read by that module and by nothing else, and whose
+//! only output is a JSON field named `exterior_float_rmsd_angstrom_*`.
 //!
 //! # Run
 //!
@@ -54,6 +56,10 @@ use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 use holonic_engine::EventId;
+use holonic_engine::evaluation_discipline::{
+    DisagreementClass, disagreement_subsets, performance_on,
+};
+use holonic_engine::exact_value::ExactInterval;
 use holonic_engine::holonic_chain::{
     ANALYTIC_EXTENT_CEILING, AnalyticScope, CUT_CEILING, HingeVerdict, elastic_chain,
     hinge_by_minimal_section,
@@ -61,21 +67,26 @@ use holonic_engine::holonic_chain::{
 use holonic_engine::neck::{ConstitutiveLink, WidthFace};
 use holonic_engine::physical_constraint_complex::{
     ConstraintComponentId, ConstraintEdge, ConstraintVertexId, ContactClass, DistanceAperture,
+    PairUncertainty,
 };
 use holonic_engine::physical_constraint_grading::EdgeProvenance;
 use holonic_engine::physical_intake::mmcif::{ChainOccurrence, StructurePresentation};
 use holonic_engine::physical_intake::{
     AddressedUncertainty, ComponentGrain, DesignLineage, EnvironmentIndex as PresentedIndex,
-    TargetEcology, TokenAddress, component_material, found_constraint_complex,
+    TargetEcology, TokenAddress, component_material, enacted_within_component_classes,
+    found_constraint_complex,
 };
-use holonic_engine::physical_occurrence::plural_fibre::PluralFibre;
+use holonic_engine::physical_occurrence::plural_fibre::{DecidedClass, PluralFibre};
 use holonic_engine::physical_occurrence::{
-    AssayFormat, Coordinate, CoordinateName, CoordinateValue, Environment, EnvironmentPassage,
-    LigandComplement, Occurrence, OccurrenceId, OccurrenceKind, OligomericState, PartnerPanel,
-    SituatedFamily, SpeciesHomolog, compare_here, compare_through,
+    Acidity, AssayFormat, Coordinate, CoordinateName, CoordinateValue, Environment,
+    EnvironmentPassage, LigandComplement, Occurrence, OccurrenceId, OccurrenceKind,
+    OligomericState, PartnerPanel, SituatedFamily, SpeciesHomolog, compare_here, compare_through,
 };
 use holonic_engine::rigidity_receiver::{
     ExactConfiguration, RigidityJacobian, removal_sensitivity, rigid_clusters, rigidity_reading,
+};
+use holonic_engine::topological_receiver::{
+    ApertureFiltration, Coefficients, FiltrationOrder, OrderLaw, persistence,
 };
 use num_bigint::BigInt;
 use num_traits::Zero;
@@ -933,6 +944,12 @@ fn chain_block(name: &str, jacobian: &RigidityJacobian) -> Result<Value, String>
         AnalyticScope::NotDecidedWithinBound { extent, ceiling } => json!({
             "kind": "NotDecidedWithinBound", "extent": extent, "ceiling": ceiling,
         }),
+        // Wave 9 worker L added `AnalyticScope::StructurallyPlaced { licence }` to
+        // `holonic_chain` while this ran. This example may not repair that owner, so the arm
+        // records the variant by its own `Debug` rather than reaching into a type it does not
+        // own; the 2026-09-19 reading is otherwise unchanged and still reports
+        // `NotDecidedWithinBound` wherever the chain reading returns it.
+        other => json!({"kind": format!("{other:?}")}),
     };
 
     Ok(json!({
@@ -946,6 +963,10 @@ fn chain_block(name: &str, jacobian: &RigidityJacobian) -> Result<Value, String>
         "is_dissipative": coupling.is_dissipative(),
         "rank_bound": bound.bound(),
         "rank_attained": bound.attained(),
+        // Which route produced the rank: the nullity theorem (no resolvent, `measured_ranks`
+        // empty) or a measurement at the declared probes.
+        "rank_is_determined_by_theorem": bound.is_determined(),
+        "rank_licence": format!("{:?}", bound.licence()),
         "bound_is_attained": bound.bound_is_attained(),
         "measured_ranks": bound.measured().iter().map(|(_, rank)| *rank).collect::<Vec<_>>(),
         "transport_residual_is_zero": stations.transport_residual().is_zero(),
@@ -959,7 +980,9 @@ fn chain_block(name: &str, jacobian: &RigidityJacobian) -> Result<Value, String>
         "read_to": staircase.read_to(),
         "no_direct_feedthrough": staircase.has_no_direct_feedthrough(),
         "analytic_scope": analytic_scope,
-        "analytic_width_invented": widths.analytic().is_some(),
+        // Present either because the pole atlas was taken or because structure placed the
+        // spectrum; `analytic_scope` says which. Nothing is invented in either case.
+        "analytic_width_present": widths.analytic().is_some(),
         "analytic_extent_ceiling": ANALYTIC_EXTENT_CEILING,
         "nanos": started.elapsed().as_nanos(),
     }))
@@ -1142,14 +1165,1325 @@ mod exterior_float_baseline {
 }
 
 // ==============================================================================================
-// the driver
+// 2026-09-20 — measured presentations, the zinc runs and the seed population
+//
+// [definition] Everything below is the **same three receivers** read on three new kinds of
+// presentation: a measured RBX1 structure, a prediction made WITH the zinc cofactor, and a seed
+// population instead of one seed. It founds nothing and adds no receiver. It adds one declared
+// scope — the **commonly resolved residue range** — because a measured structure does not resolve
+// every residue, and one declared receiver the M5 object check already licenses but yesterday did
+// not use: the target chain's **within-component** contact family, `left == right`, which is the
+// only contact receiver a target-only presentation can be addressed at.
+//
+// The whole section is skipped unless `--manifest` names a file, so the 2026-09-19 run above is
+// reproduced unchanged by the 2026-09-19 command line.
 // ==============================================================================================
+
+/// The within-component receiver's declared chain separation. Two occurrences one or two positions
+/// apart are inside any protein aperture whatever the fold does, so they carry no reading; the
+/// owner refuses a separation below 2 as covalent and this scope declares 3.
+const DEFAULT_MINIMUM_SEPARATION: u32 = 3;
+/// The cell ceiling of the aperture filtration. The topological receiver is taken at top grade 1 —
+/// vertices and edges — so the cell population is at most `n + C(n,2)`.
+const TOPOLOGY_CELL_BOUND: usize = 1 << 20;
+/// The persistence reduction's declared work ceiling.
+const PERSISTENCE_WORK_BOUND: usize = 1 << 24;
+
+/// One presentation, mounted and addressed by the **M5 target's own residue index**.
+///
+/// [definition] `residue_by_m5` is keyed by the M5 target's 1-based residue index, so a measured
+/// entry whose `label_seq_id` starts at 2 and a prediction whose chain starts at 1 are addressed
+/// identically and a comparison between them is a comparison of the same residues. A residue the
+/// presentation does not resolve is simply absent from the map — never a zero, never a gap filled.
+struct IndexedPresentation {
+    name: String,
+    group: String,
+    seed: Option<i64>,
+    measured_entry: Option<String>,
+    ensemble_model: Option<i64>,
+    environment: Environment,
+    kind: OccurrenceKind,
+    residue_by_m5: BTreeMap<u32, holonic_engine::physical_intake::mmcif::ResidueOccurrence>,
+    places_by_m5: BTreeMap<u32, Vec<Rat>>,
+    float_places_by_m5: BTreeMap<u32, [f64; 3]>,
+    carries_binder: bool,
+    intake_nanos: u128,
+}
+
+/// A decimal string as an exact rational: `"8.0"` is `80/10`, never `8.0f64`. The only decimal
+/// this example parses outside the library's own `DecimalToken`, and it parses a *declaration*
+/// (a deposited pH) rather than a coordinate.
+fn exact_decimal(token: &str) -> Option<Rat> {
+    let token = token.trim();
+    let (sign, token) = match token.strip_prefix('-') {
+        Some(rest) => (-1i64, rest),
+        None => (1i64, token.strip_prefix('+').unwrap_or(token)),
+    };
+    let (whole, fraction) = match token.split_once('.') {
+        Some((whole, fraction)) => (whole, fraction),
+        None => (token, ""),
+    };
+    if whole.is_empty() && fraction.is_empty() {
+        return None;
+    }
+    let digits = format!("{whole}{fraction}");
+    if digits.is_empty() || !digits.bytes().all(|byte| byte.is_ascii_digit()) {
+        return None;
+    }
+    let numerator = digits.parse::<BigInt>().ok()? * BigInt::from(sign);
+    let denominator = BigInt::from(10u32).pow(fraction.len() as u32);
+    Some(Rat::new(numerator, denominator))
+}
+
+fn field<'a>(entry: &'a Value, key: &str) -> Result<&'a Value, String> {
+    entry
+        .get(key)
+        .ok_or_else(|| format!("the manifest entry carries no {key:?}"))
+}
+
+fn text(entry: &Value, key: &str) -> Result<String, String> {
+    field(entry, key)?
+        .as_str()
+        .map(str::to_owned)
+        .ok_or_else(|| format!("the manifest entry's {key:?} is not a string"))
+}
+
+fn copies_of(entry: &Value, key: &str) -> BTreeMap<String, u32> {
+    entry
+        .get(key)
+        .and_then(Value::as_object)
+        .map(|map| {
+            map.iter()
+                .filter_map(|(name, count)| {
+                    count.as_u64().map(|count| (name.clone(), count as u32))
+                })
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+fn manifest_kind(entry: &Value) -> Result<OccurrenceKind, String> {
+    let kind = field(entry, "occurrence_kind")?;
+    if let Some(one) = kind.get("measured") {
+        return Ok(OccurrenceKind::Measured {
+            apparatus: one["apparatus"].as_str().unwrap_or_default().to_owned(),
+        });
+    }
+    if let Some(one) = kind.get("predicted") {
+        return Ok(OccurrenceKind::Predicted {
+            predictor: one["predictor"].as_str().unwrap_or_default().to_owned(),
+            seed: one["seed"].as_str().unwrap_or_default().to_owned(),
+        });
+    }
+    if let Some(one) = kind.get("designed") {
+        return Ok(OccurrenceKind::Designed {
+            generator: one["generator"].as_str().unwrap_or_default().to_owned(),
+            rounds: 0,
+        });
+    }
+    Err("the manifest entry names no occurrence kind".to_owned())
+}
+
+fn manifest_assay(entry: &Value) -> Result<AssayFormat, String> {
+    let assay = field(entry, "assay")?;
+    if let Some(one) = assay.get("in_silico") {
+        return Ok(AssayFormat::InSilicoPrediction {
+            predictor: one["predictor"].as_str().unwrap_or_default().to_owned(),
+            seed: one["seed"].as_str().unwrap_or_default().to_owned(),
+        });
+    }
+    if let Some(one) = assay.get("declared") {
+        return Ok(AssayFormat::Declared {
+            description: one["description"].as_str().unwrap_or_default().to_owned(),
+        });
+    }
+    Err("the manifest entry names no assay format".to_owned())
+}
+
+/// The typed environment index of one manifest entry. The same eight axes as above; the two the
+/// 2026-09-19 presentations all left undeclared are **declared here wherever the deposition states
+/// them**, so a measured crystal's pH really does enter and really does make the passage name that
+/// axis.
+fn manifest_environment(entry: &Value, presented: PresentedIndex) -> Result<Environment, String> {
+    let with_ground = |value: CoordinateValue, ground: &str| {
+        Coordinate::declared(value, ground).map_err(|error| error.to_string())
+    };
+    let undeclared = |why: &str| Coordinate::undeclared(why).map_err(|error| error.to_string());
+    let name = text(entry, "name")?;
+    let acidity = match entry.get("acidity").filter(|value| !value.is_null()) {
+        Some(one) => {
+            let p_h = one["p_h"].as_str().unwrap_or_default();
+            let exact = exact_decimal(p_h)
+                .ok_or_else(|| format!("{name}: the declared pH {p_h:?} is not an exact decimal"))?;
+            with_ground(
+                CoordinateValue::Acidity(Acidity {
+                    p_h: ExactInterval::point(exact),
+                    protonation_assumption: one["protonation_assumption"]
+                        .as_str()
+                        .unwrap_or_default()
+                        .to_owned(),
+                }),
+                one["ground"].as_str().unwrap_or_default(),
+            )?
+        }
+        None => undeclared(
+            "this presentation records no pH and no protonation assumption: a structure predictor \
+             emits none, the design pipeline records none, and a cryo-EM or NMR deposition states \
+             none in the fields this intake reads. Inventing one would be a default",
+        )?,
+    };
+    Environment::found(
+        format!("{name} / typed environment index"),
+        presented,
+        [
+            (
+                CoordinateName::Species,
+                with_ground(
+                    CoordinateValue::Species(SpeciesHomolog {
+                        species: "Homo sapiens".to_owned(),
+                        homolog: "RBX1 (RING-box protein 1)".to_owned(),
+                    }),
+                    "the M5 release names its target as human RBX1, and every presentation here \
+                     carries that sequence over the residues it resolves, up to the monomer \
+                     disagreements the staging record names one by one",
+                )?,
+            ),
+            (
+                CoordinateName::Conformation,
+                with_ground(
+                    CoordinateValue::Conformation(text(entry, "conformation")?),
+                    &text(entry, "conformation_ground")?,
+                )?,
+            ),
+            (
+                CoordinateName::OligomericState,
+                with_ground(
+                    CoordinateValue::OligomericState(OligomericState {
+                        copies: copies_of(entry, "oligomeric_copies"),
+                    }),
+                    "the polymer entities the source states are present — for a measured entry the \
+                     whole deposited assembly, not only the chain that was staged for this receiver",
+                )?,
+            ),
+            (CoordinateName::Acidity, acidity),
+            (
+                CoordinateName::Solvation,
+                undeclared(
+                    "no membrane or buffer context is recorded: a crystallisation liquor is the \
+                     condition the crystal grew in and not a solvation context of the refined \
+                     coordinates, and the absence of a lipid component in a predicted file is not \
+                     a declaration of solubility",
+                )?,
+            ),
+            (
+                CoordinateName::Cofactors,
+                with_ground(
+                    CoordinateValue::Cofactors(LigandComplement {
+                        copies: copies_of(entry, "cofactors"),
+                    }),
+                    &text(entry, "cofactor_ground")?,
+                )?,
+            ),
+            (
+                CoordinateName::Assay,
+                with_ground(CoordinateValue::Assay(manifest_assay(entry)?), &text(entry, "assay_ground")?)?,
+            ),
+            (
+                CoordinateName::Partners,
+                with_ground(
+                    CoordinateValue::Partners(PartnerPanel {
+                        intended: BTreeSet::from(["RBX1".to_owned()]),
+                        unintended: BTreeSet::new(),
+                    }),
+                    "the design's declared target is RBX1; no presentation here names a \
+                     counter-target, and the empty unintended panel is that statement rather than \
+                     a default",
+                )?,
+            ),
+        ],
+    )
+    .map_err(|error| error.to_string())
+}
+
+/// Mount one manifest entry and index it by the M5 target's residue numbering.
+fn mount_indexed(entry: &Value, ordinal: u64) -> Result<IndexedPresentation, String> {
+    let started = Instant::now();
+    let name = text(entry, "name")?;
+    let path = PathBuf::from(text(entry, "file")?);
+    let structure = StructurePresentation::read(&path)
+        .map_err(|error| format!("{}: {error}", path.display()))?;
+
+    // The object check. A prediction or the design is addressed exactly as it was yesterday, by
+    // the M5 object's own monomer count; a measured entry, which resolves fewer residues than the
+    // object has, is addressed by the deposition's own `label_asym_id` and the staging record's
+    // ungapped offset — both of which the staging script checked monomer by monomer.
+    let target = match entry
+        .get("target_chain_label_asym_id")
+        .and_then(Value::as_str)
+    {
+        Some(label) => structure
+            .chain(label)
+            .map_err(|error| format!("{name}: chain {label}: {error}"))?
+            .clone(),
+        None => structure
+            .chain_with_residue_count(TARGET_RESIDUES)
+            .map_err(|error| format!("{name}: target chain ({TARGET_RESIDUES} residues): {error}"))?
+            .clone(),
+    };
+    let offset = entry
+        .get("label_seq_id_to_m5_offset")
+        .and_then(Value::as_i64)
+        .unwrap_or(0) as i32;
+    let carries_binder = entry
+        .get("carries_binder")
+        .and_then(Value::as_bool)
+        .unwrap_or(false);
+
+    let mut residue_by_m5 = BTreeMap::new();
+    let mut places_by_m5 = BTreeMap::new();
+    let mut float_places_by_m5 = BTreeMap::new();
+    for residue in &target.residues {
+        let at = residue.source_ordinal + offset;
+        if at < 1 || at as usize > TARGET_RESIDUES {
+            continue;
+        }
+        let Some(position) = residue
+            .labelled_atom(REPRESENTATIVE)
+            .map_err(|error| format!("{name}: {error}"))?
+        else {
+            continue;
+        };
+        let atom = &residue.atoms[position];
+        places_by_m5.insert(
+            at as u32,
+            vec![
+                atom.x.exact_centre().map_err(|e| e.to_string())?,
+                atom.y.exact_centre().map_err(|e| e.to_string())?,
+                atom.z.exact_centre().map_err(|e| e.to_string())?,
+            ],
+        );
+        if let (Ok(x), Ok(y), Ok(z)) = (
+            atom.x.token.parse::<f64>(),
+            atom.y.token.parse::<f64>(),
+            atom.z.token.parse::<f64>(),
+        ) {
+            float_places_by_m5.insert(at as u32, [x, y, z]);
+        }
+        residue_by_m5.insert(at as u32, residue.clone());
+    }
+
+    let tokens = residue_by_m5
+        .values()
+        .map(|residue| TokenAddress {
+            chain: target.label_asym_id.clone(),
+            residue: residue.source_ordinal,
+            entity: target.entity.clone(),
+        })
+        .collect::<Vec<_>>();
+    let ecology = field(entry, "ecology")?;
+    let lineage = field(entry, "lineage")?;
+    let presented = PresentedIndex::declared(
+        text(entry, "declaration")?,
+        TargetEcology {
+            target: ecology["target"].as_str().unwrap_or_default().to_owned(),
+            target_form: ecology["target_form"].as_str().unwrap_or_default().to_owned(),
+            stoichiometry: ecology["stoichiometry"].as_str().unwrap_or_default().to_owned(),
+            cofolding_model: ecology["cofolding_model"].as_str().unwrap_or_default().to_owned(),
+        },
+        DesignLineage {
+            design_uuid: lineage["design_uuid"].as_str().unwrap_or_default().to_owned(),
+            design_name: lineage["design_name"].as_str().unwrap_or_default().to_owned(),
+            seed: lineage["seed"].as_str().unwrap_or_default().to_owned(),
+        },
+        tokens,
+    )
+    .map_err(|error| format!("{name}: {error}"))?;
+
+    Ok(IndexedPresentation {
+        name: name.clone(),
+        group: text(entry, "group")?,
+        seed: entry.get("seed").and_then(Value::as_i64),
+        measured_entry: entry
+            .get("measured_entry")
+            .and_then(Value::as_str)
+            .map(str::to_owned),
+        ensemble_model: entry.get("ensemble_model").and_then(Value::as_i64),
+        environment: manifest_environment(entry, presented)?,
+        kind: manifest_kind(entry)?,
+        residue_by_m5,
+        places_by_m5,
+        float_places_by_m5,
+        carries_binder,
+        intake_nanos: started.elapsed().as_nanos(),
+    })
+    .map(|mut one| {
+        let _ = ordinal;
+        one.name = name;
+        one
+    })
+}
+
+/// The presentation's chain restricted to a declared M5 residue list, renumbered so that the
+/// component's own ordinals **are** the M5 residue indices.
+fn restricted_chain(
+    one: &IndexedPresentation,
+    residues: &[u32],
+) -> Result<ChainOccurrence, String> {
+    let mut kept = Vec::with_capacity(residues.len());
+    for at in residues {
+        let residue = one
+            .residue_by_m5
+            .get(at)
+            .ok_or_else(|| format!("{}: M5 residue {at} is not resolved", one.name))?;
+        let mut residue = residue.clone();
+        residue.source_ordinal = *at as i32;
+        kept.push(residue);
+    }
+    let atom_occurrences = kept.iter().map(|residue| residue.atoms.len()).sum();
+    Ok(ChainOccurrence {
+        label_asym_id: "RBX1".to_owned(),
+        entity: None,
+        residues: kept,
+        atom_occurrences,
+    })
+}
+
+fn no_uncertainty(pairs: &[(u32, u32)]) -> BTreeMap<(u32, u32), PairUncertainty> {
+    pairs
+        .iter()
+        .map(|pair| {
+            (
+                *pair,
+                PairUncertainty {
+                    source_lineage: "declared: this receiver reads no directional uncertainty, \
+                                     and a zero-width statement of that is not an uncertainty claim"
+                        .to_owned(),
+                    row_given_column_bits: 0,
+                    column_given_row_bits: 0,
+                    row_given_column: ExactInterval::point(Rat::from_integer(BigInt::from(0))),
+                    column_given_row: ExactInterval::point(Rat::from_integer(BigInt::from(0))),
+                    row_given_column_ulp: Rat::from_integer(BigInt::from(0)),
+                    column_given_row_ulp: Rat::from_integer(BigInt::from(0)),
+                },
+            )
+        })
+        .collect()
+}
+
+/// One presentation's **within-component** alpha-carbon contact family over a declared residue
+/// list, together with the topological receiver's reading of the same complex.
+///
+/// [definition] The classes are enacted by `enacted_within_component_classes` and audited by
+/// `found_within_component_contact_family`; nothing about them is supplied here. The pair
+/// population is `C(n − k + 1, 2)` for the declared separation `k`, computed by the owner.
+fn within_component_reading(
+    one: &IndexedPresentation,
+    residues: &[u32],
+    separation: u32,
+    ordinal: u64,
+    scope: &str,
+) -> Result<(SituatedFamily, Value), String> {
+    let chain = restricted_chain(one, residues)?;
+    let grain = ComponentGrain::Representative {
+        atom_label: REPRESENTATIVE.to_owned(),
+    };
+    let lineage = format!("{} / {scope}", one.name);
+    let material = component_material(&chain, &lineage, &grain, RESIDENT_DECIMAL_PLACES)
+        .map_err(|error| format!("{}: {error}", one.name))?;
+    let mut complex = found_constraint_complex(&lineage, EventId(ordinal), vec![material], Vec::new())
+        .map_err(|error| format!("{}: {error}", one.name))?;
+    let component = ConstraintComponentId(1);
+    let aperture = aperture();
+    let started = Instant::now();
+    let enacted = enacted_within_component_classes(&complex, component, separation, &aperture)
+        .map_err(|error| format!("{}: {error}", one.name))?;
+    let pairs = complex
+        .within_component_pairs(component, separation)
+        .map_err(|error| format!("{}: {error}", one.name))?;
+    complex
+        .found_within_component_contact_family(
+            component,
+            separation,
+            aperture.clone(),
+            &enacted,
+            &no_uncertainty(&pairs),
+        )
+        .map_err(|error| format!("{}: {error}", one.name))?;
+    let family_nanos = started.elapsed().as_nanos();
+
+    // Receiver 4 — the topological one, on exactly this complex: the aperture filtration truncated
+    // at the same 8 Å squared ceiling and at top grade 1, so the reading is the contact graph's
+    // own connected components and independent cycles, exactly, over ℚ.
+    let started = Instant::now();
+    let topology = match ApertureFiltration::from_presented(
+        &complex,
+        int(CONTACT_SQUARED),
+        1,
+        TOPOLOGY_CELL_BOUND,
+    ) {
+        Ok(filtration) => match FiltrationOrder::found(&filtration, &OrderLaw::ByLowerBound) {
+            Ok(order) => match persistence(
+                &filtration,
+                &order,
+                &Coefficients::Rational,
+                PERSISTENCE_WORK_BOUND,
+            ) {
+                Ok(reading) => json!({
+                    "cells": filtration.cell_count(),
+                    "order_is_determinate": filtration.order_is_determinate(),
+                    "connected_components": reading.essential_count(0),
+                    "independent_cycles": reading.essential_count(1),
+                    "finite_pairs_grade_0": reading.pairs_at_grade(0).len(),
+                    "nanos": started.elapsed().as_nanos(),
+                }),
+                Err(error) => json!({"refusal": error.to_string()}),
+            },
+            Err(error) => json!({"refusal": error.to_string()}),
+        },
+        Err(error) => json!({"refusal": error.to_string()}),
+    };
+
+    let occurrence = Occurrence::found(
+        OccurrenceId(ordinal),
+        one.kind.clone(),
+        lineage.clone(),
+        one.environment.clone(),
+        complex,
+    );
+    let family = occurrence
+        .founded_family(
+            format!("the target chain's within-component alpha-carbon family at {scope}"),
+            component,
+            component,
+        )
+        .map_err(|error| format!("{}: {error}", one.name))?;
+    let receipt = json!({
+        "presentation": one.name,
+        "scope": scope,
+        "occurrences": residues.len(),
+        "addressed_pairs": family.readings.len(),
+        "classes": class_counts(&family),
+        "topological_receiver": topology,
+        "family_nanos": family_nanos,
+    });
+    Ok((family, receipt))
+}
+
+/// The rigidity Jacobian over a declared M5 residue list. A step is **polygonal only when the two
+/// occurrences are consecutive in the M5 index**: a measured structure with an unresolved loop has
+/// a jump there, and calling that jump a backbone bond would invent a constraint no presentation
+/// carries. Every other pair inside the exact aperture is an admitted contact, as above.
+fn indexed_jacobian(
+    lineage: &str,
+    one: &IndexedPresentation,
+    residues: &[u32],
+) -> Result<RigidityJacobian, String> {
+    let places = residues
+        .iter()
+        .map(|at| {
+            one.places_by_m5
+                .get(at)
+                .cloned()
+                .ok_or_else(|| format!("{}: M5 residue {at} is not resolved", one.name))
+        })
+        .collect::<Result<Vec<_>, String>>()?;
+    let configuration = ExactConfiguration::declared(
+        3,
+        places
+            .iter()
+            .enumerate()
+            .map(|(at, point)| (ConstraintVertexId(at as u64 + 1), point.clone())),
+    )
+    .map_err(|error| error.to_string())?;
+    let squared = int(CONTACT_SQUARED);
+    let mut constraints = BTreeMap::new();
+    for left in 0..residues.len() {
+        for right in (left + 1)..residues.len() {
+            let backbone = residues[right] == residues[left] + 1;
+            if !backbone && squared_distance(&places[left], &places[right]) > squared {
+                continue;
+            }
+            let (edge, _) = ConstraintEdge::new(
+                ConstraintVertexId(left as u64 + 1),
+                ConstraintVertexId(right as u64 + 1),
+            )
+            .map_err(|error| error.to_string())?;
+            constraints.insert(
+                edge,
+                if backbone {
+                    EdgeProvenance::Polygonal
+                } else {
+                    EdgeProvenance::AdmittedContact
+                },
+            );
+        }
+    }
+    RigidityJacobian::found(lineage.to_owned(), &configuration, &constraints)
+        .map_err(|error| error.to_string())
+}
+
+/// `(agreeing, separating, open-carrying)` between two members of one fibre, by name.
+fn separator_row(
+    fibre: &PluralFibre,
+    names: &[String],
+    left: usize,
+    right: usize,
+) -> Result<Value, String> {
+    let separator = fibre
+        .separator_between(left, right)
+        .map_err(|error| error.to_string())?;
+    Ok(json!({
+        "left": names[left],
+        "right": names[right],
+        "agreeing": separator.agreeing,
+        "separating": separator.separating.len(),
+        "open_carrying": separator.open_carrying.len(),
+        "indistinguishable": separator.is_empty(),
+    }))
+}
+
+/// The five-number summary of a population of separating counts. Integers throughout: these are
+/// counts of exactly classified contacts, not statistics of a float.
+fn spread(values: &mut Vec<usize>) -> Value {
+    values.sort_unstable();
+    if values.is_empty() {
+        return json!({"population": 0});
+    }
+    let at = |q: usize| values[(values.len() - 1) * q / 4];
+    json!({
+        "population": values.len(),
+        "minimum": values[0],
+        "lower_quartile": at(1),
+        "median": at(2),
+        "upper_quartile": at(3),
+        "maximum": values[values.len() - 1],
+        "total": values.iter().sum::<usize>(),
+    })
+}
 
 fn argument(args: &[String], flag: &str, fallback: &str) -> String {
     args.windows(2)
         .find(|pair| pair[0] == flag)
         .map(|pair| pair[1].clone())
         .unwrap_or_else(|| fallback.to_owned())
+}
+
+/// **The 2026-09-20 reading**: measured presentations, zinc, and the seed population, at the
+/// within-component contact receiver, the rigidity receiver, the topological receiver and the
+/// exterior baseline, over the declared commonly resolved residue range.
+fn measured_and_population(manifest_path: &Path, whole_range: bool) -> Result<Value, String> {
+    let whole = Instant::now();
+    let manifest: Value = serde_json::from_str(
+        &std::fs::read_to_string(manifest_path).map_err(|error| error.to_string())?,
+    )
+    .map_err(|error| error.to_string())?;
+    let separation = manifest
+        .get("minimum_chain_separation")
+        .and_then(Value::as_u64)
+        .unwrap_or(DEFAULT_MINIMUM_SEPARATION as u64) as u32;
+    let residues_of = |key: &str| -> Vec<u32> {
+        manifest
+            .get(key)
+            .and_then(Value::as_array)
+            .map(|rows| rows.iter().filter_map(Value::as_u64).map(|at| at as u32).collect())
+            .unwrap_or_default()
+    };
+    // Two declared scopes. `resolved` is every M5 residue every measured model resolves; `typed`
+    // additionally drops the residues at which some measured entry carries a different monomer —
+    // the solution-NMR construct's four solubilizing substitutions and its N-terminal linker.
+    let resolved = residues_of("commonly_resolved_m5_residues");
+    let typed = residues_of("commonly_resolved_and_identically_typed_m5_residues");
+    let differing = residues_of("m5_residues_whose_monomer_differs_in_some_measured_entry");
+
+    // ------------------------------------------------------------------------------- the intake
+    let entries = manifest
+        .get("presentations")
+        .and_then(Value::as_array)
+        .ok_or("the manifest carries no presentations")?;
+    let mut mounted: Vec<IndexedPresentation> = Vec::new();
+    let mut intake_rows = Vec::new();
+    for (at, entry) in entries.iter().enumerate() {
+        match mount_indexed(entry, at as u64 + 1) {
+            Ok(one) => {
+                intake_rows.push(json!({
+                    "presentation": one.name,
+                    "group": one.group,
+                    "admitted": true,
+                    "seed": one.seed,
+                    "ensemble_model": one.ensemble_model,
+                    "file": entry.get("file"),
+                    "residues_resolved_in_the_m5_index": one.places_by_m5.len(),
+                    "first_m5_residue": one.places_by_m5.keys().next(),
+                    "last_m5_residue": one.places_by_m5.keys().next_back(),
+                    "carries_the_binder_chain": one.carries_binder,
+                    "environment_undeclared_axes": one.environment.undeclared_names().iter()
+                        .map(|name| name.label()).collect::<Vec<_>>(),
+                    "nanos": one.intake_nanos,
+                }));
+                eprintln!("[2026-09-20 intake] {} admitted", one.name);
+                mounted.push(one);
+            }
+            Err(refusal) => {
+                eprintln!("[2026-09-20 intake] REFUSED: {refusal}");
+                intake_rows.push(json!({
+                    "presentation": entry.get("name"),
+                    "admitted": false,
+                    "refusal": refusal,
+                }));
+            }
+        }
+    }
+
+    // ------------------------------------------------- the within-component family at each scope
+    // ------------------------------------------------ the join: the chain reading, measured too
+    //
+    // `--chain-join` takes ONLY this reading and returns: the theorem-backed chain reading (wave 9)
+    // on three consecutive, commonly resolved M5 windows — arm 21–32, core 41–52, core 41–63 — for
+    // every measured reference (first model of an ensemble), the design, both Protenix runs and
+    // seed 0 of each predicted condition. The hinge is each presentation's own minimal-section cut.
+    if std::env::args().any(|flag| flag == "--chain-join") {
+        let windows: [(&str, Vec<u32>); 3] = [
+            ("arm-21-32", (21..=32).collect()),
+            ("core-41-52", (41..=52).collect()),
+            ("core-41-63", (41..=63).collect()),
+        ];
+        let mut rows = Vec::new();
+        for (label, residues) in &windows {
+            for one in &mounted {
+                if !(one.seed.unwrap_or(0) == 0 && one.ensemble_model.unwrap_or(1) == 1) {
+                    continue;
+                }
+                let lineage = format!("{}|rbx1|{label}", one.name);
+                eprintln!("[chain-join] {} {label}", one.name);
+                let row = indexed_jacobian(&lineage, one, residues)
+                    .and_then(|jacobian| chain_block(&one.name, &jacobian));
+                rows.push(match row {
+                    Ok(mut receipt) => {
+                        receipt["window"] = json!(label);
+                        receipt["group"] = json!(one.group);
+                        receipt
+                    }
+                    Err(refusal) => json!({
+                        "presentation": one.name, "window": label, "refusal": refusal,
+                    }),
+                });
+            }
+        }
+        return Ok(json!({ "schema": "m5-chain-join/1", "intake": intake_rows, "chain_join": rows }));
+    }
+
+    let mut scope_rows = Vec::new();
+    let mut ordinal = 1_000_u64;
+    let mut typed_families: Vec<(String, String, SituatedFamily)> = Vec::new();
+    for (scope, residues) in [
+        ("commonly-resolved", &resolved),
+        ("commonly-resolved-and-identically-typed", &typed),
+    ] {
+        if residues.is_empty() {
+            continue;
+        }
+        let started = Instant::now();
+        let mut per_presentation = Vec::new();
+        let mut families: Vec<(String, String, SituatedFamily)> = Vec::new();
+        for one in &mounted {
+            ordinal += 1;
+            match within_component_reading(one, residues, separation, ordinal, scope) {
+                Ok((family, receipt)) => {
+                    per_presentation.push(receipt);
+                    families.push((one.name.clone(), one.group.clone(), family));
+                }
+                Err(refusal) => per_presentation.push(json!({
+                    "presentation": one.name, "scope": scope, "refusal": refusal,
+                })),
+            }
+        }
+        let intake_nanos = started.elapsed().as_nanos();
+
+        // The typed refusal first: at the commonly-resolved scope the NMR construct's monomers
+        // differ, so the fibre is not over one object and the owner says so by name.
+        let whole_fibre =
+            PluralFibre::over_one_candidate(families.iter().map(|(_, _, f)| f.clone()).collect());
+        let refusal = whole_fibre.as_ref().err().map(|error| error.to_string());
+
+        // The fibre over the members that do share one kinship with the design.
+        let reference_kinship = families
+            .iter()
+            .find(|(name, _, _)| name == "designed")
+            .map(|(_, _, family)| family.kinship());
+        let admitted: Vec<(String, String, SituatedFamily)> = match &reference_kinship {
+            Some(kinship) => families
+                .iter()
+                .filter(|(_, _, family)| family.kinship() == *kinship)
+                .cloned()
+                .collect(),
+            None => families.clone(),
+        };
+        let excluded: Vec<&str> = families
+            .iter()
+            .filter(|(name, _, _)| !admitted.iter().any(|(other, _, _)| other == name))
+            .map(|(name, _, _)| name.as_str())
+            .collect();
+
+        let names: Vec<String> = admitted.iter().map(|(name, _, _)| name.clone()).collect();
+        let groups: Vec<String> = admitted.iter().map(|(_, group, _)| group.clone()).collect();
+        let fibre = PluralFibre::over_one_candidate(
+            admitted.iter().map(|(_, _, family)| family.clone()).collect(),
+        )
+        .map_err(|error| format!("the {scope} fibre refuses: {error}"))?;
+        let started = Instant::now();
+        let partition = fibre.partition();
+        let mut role_totals: BTreeMap<&'static str, usize> = BTreeMap::new();
+        for pair in fibre.addressed() {
+            *role_totals
+                .entry(fibre.role_of(pair).map_err(|e| e.to_string())?.label())
+                .or_default() += 1;
+        }
+        // Every ordered pair's separator, by name, plus the three spreads the question needs.
+        let mut pairwise = Vec::new();
+        let mut within_group: BTreeMap<String, Vec<usize>> = BTreeMap::new();
+        let mut between_groups: BTreeMap<String, Vec<usize>> = BTreeMap::new();
+        for left in 0..names.len() {
+            for right in (left + 1)..names.len() {
+                let row = separator_row(&fibre, &names, left, right)?;
+                let count = row["separating"].as_u64().unwrap_or(0) as usize;
+                if groups[left] == groups[right] {
+                    within_group.entry(groups[left].clone()).or_default().push(count);
+                } else {
+                    let key = if groups[left] <= groups[right] {
+                        format!("{} vs {}", groups[left], groups[right])
+                    } else {
+                        format!("{} vs {}", groups[right], groups[left])
+                    };
+                    between_groups.entry(key).or_default().push(count);
+                }
+                pairwise.push(row);
+            }
+        }
+        let pairwise_nanos = started.elapsed().as_nanos();
+
+        // Systematic against sampling: for each measured reference and each predicted group, the
+        // contacts on which EVERY member of the group differs from the reference (a systematic
+        // disagreement of that condition) against those on which the members split (sampling).
+        let mut systematic = Vec::new();
+        for (reference_at, reference_name) in names.iter().enumerate() {
+            if !reference_name.starts_with("measured-") {
+                continue;
+            }
+            let mut by_group: BTreeMap<&str, Vec<usize>> = BTreeMap::new();
+            for (at, group) in groups.iter().enumerate() {
+                if group.starts_with("boltz2-") || group == "designed" || group.starts_with("protenix") {
+                    by_group.entry(group.as_str()).or_default().push(at);
+                }
+            }
+            for (group, members) in by_group {
+                if members.len() < 2 {
+                    continue;
+                }
+                let reference = &admitted[reference_at].2;
+                let mut unanimous = 0usize;
+                let mut flipping = 0usize;
+                let mut open = 0usize;
+                for at in 0..reference.readings.len() {
+                    let Some(base) = DecidedClass::of(reference.readings[at].class) else {
+                        open += 1;
+                        continue;
+                    };
+                    let mut differs = 0usize;
+                    let mut decided = 0usize;
+                    for member in &members {
+                        match DecidedClass::of(admitted[*member].2.readings[at].class) {
+                            None => {}
+                            Some(class) => {
+                                decided += 1;
+                                if class != base {
+                                    differs += 1;
+                                }
+                            }
+                        }
+                    }
+                    if differs == 0 {
+                        continue;
+                    }
+                    if differs == decided {
+                        unanimous += 1;
+                    } else {
+                        flipping += 1;
+                    }
+                }
+                systematic.push(json!({
+                    "measured_reference": reference_name,
+                    "group": group,
+                    "members": members.len(),
+                    "separating_unanimously_across_the_population": unanimous,
+                    "separating_but_flipping_between_members": flipping,
+                    "reference_open_readings": open,
+                }));
+            }
+        }
+
+        // Issue #9 — the held-out agreement count over a declared receiver FAMILY, taken over the
+        // seed population by `evaluation_discipline`'s own leave-one-out shape: the disagreement
+        // subsets are computed on the development side (the population minus the held-out member)
+        // and the held-out member is scored at them, so nothing it carries entered the fitting.
+        let mut held_out_rows = Vec::new();
+        let mut by_group: BTreeMap<&str, Vec<usize>> = BTreeMap::new();
+        for (at, group) in groups.iter().enumerate() {
+            by_group.entry(group.as_str()).or_default().push(at);
+        }
+        for (group, members) in &by_group {
+            if members.len() < 3 {
+                continue;
+            }
+            for held in members {
+                let development: Vec<SituatedFamily> = members
+                    .iter()
+                    .filter(|at| *at != held)
+                    .map(|at| admitted[*at].2.clone())
+                    .collect();
+                let development_fibre = PluralFibre::over_one_candidate(development)
+                    .map_err(|error| error.to_string())?;
+                let subsets = disagreement_subsets(&development_fibre);
+                let held_family = &admitted[*held].2;
+                let classes: BTreeMap<(u32, u32), Option<DecidedClass>> = held_family
+                    .readings
+                    .iter()
+                    .map(|reading| (reading.pair, DecidedClass::of(reading.class)))
+                    .collect();
+                // `performance_on` takes a total map; a held-out reading that is itself open is a
+                // reading the held-out member does not decide, and it is counted separately below
+                // rather than being given a class it does not have.
+                let held_open = classes.values().filter(|class| class.is_none()).count();
+                let predictor = |pair: (u32, u32)| -> DecidedClass {
+                    classes
+                        .get(&pair)
+                        .copied()
+                        .flatten()
+                        .unwrap_or(DecidedClass::Excluded)
+                };
+                let mut per_subset = Vec::new();
+                for subset in [DisagreementClass::Unanimous, DisagreementClass::Separating] {
+                    let performance =
+                        performance_on(&development_fibre, &subsets, subset, &predictor)
+                            .map_err(|error| error.to_string())?;
+                    per_subset.push(json!({
+                        "subset": format!("{subset:?}"),
+                        "population": performance.population,
+                        "agreeing": performance.agreeing,
+                        "disagreeing": performance.disagreeing,
+                        "carried_open": performance.carried_open,
+                    }));
+                }
+                held_out_rows.push(json!({
+                    "group": group,
+                    "held_out": names[*held],
+                    "development_members": members.len() - 1,
+                    "contact_receiver": per_subset,
+                    "held_out_open_readings": held_open,
+                }));
+            }
+        }
+
+        scope_rows.push(json!({
+            "scope": scope,
+            "residues": residues.len(),
+            "first_residue": residues.first(),
+            "last_residue": residues.last(),
+            "minimum_chain_separation": separation,
+            "addressed_pairs": fibre.contacts(),
+            "members": names,
+            "refused_at_the_whole_fibre": refusal,
+            "excluded_by_object_kinship": excluded,
+            "per_presentation": per_presentation,
+            "fibre_roles": role_totals,
+            "fibre_is_a_partition": partition.is_a_partition(),
+            "pairwise": pairwise,
+            "seed_spread_within_each_group": within_group
+                .iter()
+                .map(|(group, values)| json!({"group": group, "separating": spread(&mut values.clone())}))
+                .collect::<Vec<_>>(),
+            "separation_between_groups": between_groups
+                .iter()
+                .map(|(pair, values)| json!({"pair": pair, "separating": spread(&mut values.clone())}))
+                .collect::<Vec<_>>(),
+            "systematic_against_sampling": systematic,
+            "held_out_agreement_contact_receiver": held_out_rows,
+            "nanos": {"intake_and_families": intake_nanos, "pairwise": pairwise_nanos},
+        }));
+        if scope == "commonly-resolved-and-identically-typed" {
+            typed_families = families;
+        }
+    }
+
+    // --------------------------------------------- the rigidity and topological receivers, windowed
+    let arm: Vec<u32> = typed.iter().copied().filter(|at| *at <= 40).collect();
+    let core: Vec<u32> = typed.iter().copied().filter(|at| *at > 40 && *at <= 80).collect();
+    let mut windows: Vec<(&str, Vec<u32>)> = vec![
+        ("arm-1-40-intersect-common", arm),
+        ("core-41-80-intersect-common", core),
+    ];
+    if whole_range {
+        windows.push(("whole-commonly-resolved-and-typed", typed.clone()));
+    }
+    let mut rigidity_rows = Vec::new();
+    for (label, residues) in &windows {
+        if residues.len() < 4 {
+            continue;
+        }
+        for one in &mounted {
+            // The whole commonly resolved range is 237 exact coordinates and the exact RREF's cost
+            // grows with the elimination work AND with coefficient growth, so it is taken on a
+            // declared short list — every measured reference, the design, both Protenix runs and
+            // seed 0 of each predicted condition — and the cost of that is the reported cost.
+            if *label == "whole-commonly-resolved-and-typed"
+                && !(one.seed.unwrap_or(0) == 0 && one.ensemble_model.unwrap_or(1) == 1)
+            {
+                continue;
+            }
+            let jacobian = match indexed_jacobian(
+                &format!("{}|rbx1|{label}", one.name),
+                one,
+                residues,
+            ) {
+                Ok(jacobian) => jacobian,
+                Err(refusal) => {
+                    rigidity_rows.push(json!({
+                        "presentation": one.name, "window": label, "refusal": refusal,
+                    }));
+                    continue;
+                }
+            };
+            eprintln!("[2026-09-20 rigidity] {} {label}", one.name);
+            match rigidity_block(&one.name, &jacobian) {
+                Ok((mut receipt, _)) => {
+                    receipt["window"] = json!(label);
+                    receipt["group"] = json!(one.group);
+                    receipt["window_residues"] = json!(residues.len());
+                    rigidity_rows.push(receipt);
+                }
+                Err(refusal) => rigidity_rows.push(json!({
+                    "presentation": one.name, "window": label, "refusal": refusal,
+                })),
+            }
+        }
+    }
+
+    // #9's family fold: at each window, which rigidity invariants the development side is
+    // unanimous on, and whether the held-out member agrees at every one of them. The family count
+    // is the conjunction of the contact receiver's held-out agreement and this one.
+    let mut rigidity_family = Vec::new();
+    for (label, _) in &windows {
+        let mut by_group: BTreeMap<String, Vec<&Value>> = BTreeMap::new();
+        for row in &rigidity_rows {
+            if row.get("window").and_then(Value::as_str) != Some(label) {
+                continue;
+            }
+            if let Some(group) = row.get("group").and_then(Value::as_str) {
+                by_group.entry(group.to_owned()).or_default().push(row);
+            }
+        }
+        let invariants = [
+            "rank_jacobian",
+            "motion_dimension",
+            "internal_motion_dimension",
+            "self_stress_dimension",
+            "rigid_clusters",
+            "constraints",
+        ];
+        for (group, rows) in by_group {
+            if rows.len() < 3 {
+                continue;
+            }
+            for held in 0..rows.len() {
+                let mut unanimous = 0usize;
+                let mut agreeing = 0usize;
+                let mut per_invariant = BTreeMap::new();
+                for name in invariants {
+                    let values: BTreeSet<i64> = rows
+                        .iter()
+                        .enumerate()
+                        .filter(|(at, _)| *at != held)
+                        .filter_map(|(_, row)| row.get(name).and_then(Value::as_i64))
+                        .collect();
+                    if values.len() != 1 {
+                        per_invariant.insert(name, "development-side-is-not-unanimous");
+                        continue;
+                    }
+                    unanimous += 1;
+                    if rows[held].get(name).and_then(Value::as_i64) == values.iter().next().copied()
+                    {
+                        agreeing += 1;
+                        per_invariant.insert(name, "agrees");
+                    } else {
+                        per_invariant.insert(name, "separates");
+                    }
+                }
+                rigidity_family.push(json!({
+                    "window": label,
+                    "group": group,
+                    "held_out": rows[held].get("presentation"),
+                    "development_members": rows.len() - 1,
+                    "invariants_addressed": invariants.len(),
+                    "invariants_the_development_side_is_unanimous_on": unanimous,
+                    "held_out_agrees_at": agreeing,
+                    "held_out_separates_at": unanimous - agreeing,
+                    "per_invariant": per_invariant,
+                }));
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------------------------- issue #9
+    // **The held-out agreement count over the declared receiver FAMILY.**
+    //
+    // [definition] The family is `contact ∧ rigidity ∧ topological`, all three read on the same
+    // 79 commonly resolved and identically typed residues of the target chain. For each held-out
+    // member `h` of a population `P`, the development side is `P \ {h}`; an *addressed family
+    // item* is a contact the development side classifies unanimously, or a rigidity invariant it
+    // reads unanimously, or a topological invariant it reads unanimously. The count is how many of
+    // those items `h` agrees at. Nothing about the three receivers' readings is supplied: the
+    // contact subsets come from `evaluation_discipline::disagreement_subsets` over the development
+    // fibre and the score from `performance_on`; the rigidity and topological readings are the
+    // owners' own.
+    //
+    // **What it cannot say.** It is agreement between presentations of one object, never
+    // realization: nothing here says any member is right. The development side's unanimity is a
+    // property of this finite sample, so an item it splits on is excluded from the count by
+    // construction — and on the development-*separating* subset `performance_on` necessarily
+    // returns zero agreeing, because a single class cannot equal two different ones. That zero is
+    // a structural fact about the subset and is not a result.
+    let mut family_rows = Vec::new();
+    {
+        let typed_scope = scope_rows
+            .iter()
+            .find(|row| row["scope"] == "commonly-resolved-and-identically-typed");
+        let contact_rows: Vec<&Value> = typed_scope
+            .and_then(|row| row["held_out_agreement_contact_receiver"].as_array())
+            .map(|rows| rows.iter().collect())
+            .unwrap_or_default();
+        // The topological receiver's two integer invariants, by presentation.
+        let mut topology: BTreeMap<String, (Option<i64>, Option<i64>)> = BTreeMap::new();
+        let mut group_of: BTreeMap<String, String> = BTreeMap::new();
+        for one in &mounted {
+            group_of.insert(one.name.clone(), one.group.clone());
+        }
+        if let Some(rows) = typed_scope.and_then(|row| row["per_presentation"].as_array()) {
+            for row in rows {
+                let Some(name) = row["presentation"].as_str() else {
+                    continue;
+                };
+                let reading = &row["topological_receiver"];
+                topology.insert(
+                    name.to_owned(),
+                    (
+                        reading["connected_components"].as_i64(),
+                        reading["independent_cycles"].as_i64(),
+                    ),
+                );
+            }
+        }
+        for contact in &contact_rows {
+            let Some(held) = contact["held_out"].as_str() else {
+                continue;
+            };
+            let Some(group) = contact["group"].as_str() else {
+                continue;
+            };
+            let unanimous_subset = contact["contact_receiver"]
+                .as_array()
+                .and_then(|rows| rows.iter().find(|row| row["subset"] == "Unanimous"))
+                .cloned()
+                .unwrap_or(Value::Null);
+            let contact_addressed = unanimous_subset["population"].as_u64().unwrap_or(0) as usize;
+            let contact_agreeing = unanimous_subset["agreeing"].as_u64().unwrap_or(0) as usize;
+
+            let mut rigidity_addressed = 0usize;
+            let mut rigidity_agreeing = 0usize;
+            for row in &rigidity_family {
+                if row["held_out"].as_str() == Some(held) {
+                    rigidity_addressed += row["invariants_the_development_side_is_unanimous_on"]
+                        .as_u64()
+                        .unwrap_or(0) as usize;
+                    rigidity_agreeing += row["held_out_agrees_at"].as_u64().unwrap_or(0) as usize;
+                }
+            }
+
+            let siblings: Vec<&String> = group_of
+                .iter()
+                .filter(|(name, other)| other.as_str() == group && name.as_str() != held)
+                .map(|(name, _)| name)
+                .collect();
+            let mut topological_addressed = 0usize;
+            let mut topological_agreeing = 0usize;
+            for axis in 0..2 {
+                let values: BTreeSet<i64> = siblings
+                    .iter()
+                    .filter_map(|name| topology.get(*name))
+                    .filter_map(|reading| if axis == 0 { reading.0 } else { reading.1 })
+                    .collect();
+                if values.len() != 1 {
+                    continue;
+                }
+                topological_addressed += 1;
+                let mine = topology
+                    .get(held)
+                    .and_then(|reading| if axis == 0 { reading.0 } else { reading.1 });
+                if mine == values.iter().next().copied() {
+                    topological_agreeing += 1;
+                }
+            }
+
+            family_rows.push(json!({
+                "receiver_family": ["contact", "rigidity", "topological"],
+                "group": group,
+                "held_out": held,
+                "development_members": contact["development_members"],
+                "contact": {"addressed": contact_addressed, "agreeing": contact_agreeing},
+                "rigidity": {"addressed": rigidity_addressed, "agreeing": rigidity_agreeing},
+                "topological": {
+                    "addressed": topological_addressed, "agreeing": topological_agreeing,
+                },
+                "family_addressed": contact_addressed + rigidity_addressed + topological_addressed,
+                "family_agreeing": contact_agreeing + rigidity_agreeing + topological_agreeing,
+                "family_separating": (contact_addressed + rigidity_addressed
+                    + topological_addressed)
+                    - (contact_agreeing + rigidity_agreeing + topological_agreeing),
+            }));
+        }
+    }
+
+    // ------------------------------------------------------------- the exterior float baseline
+    // Exterior, float, load-bearing for nothing: Cα RMSD after Kabsch superposition against each
+    // measured reference over exactly the commonly resolved and identically typed residues.
+    let mut baseline_rows = Vec::new();
+    let references: Vec<&IndexedPresentation> = mounted
+        .iter()
+        .filter(|one| {
+            one.measured_entry.is_some() && one.ensemble_model.unwrap_or(1) == 1
+        })
+        .collect();
+    let float_on = |one: &IndexedPresentation, residues: &[u32]| -> Option<Vec<[f64; 3]>> {
+        residues
+            .iter()
+            .map(|at| one.float_places_by_m5.get(at).copied())
+            .collect()
+    };
+    for one in &mounted {
+        let mut against = Vec::new();
+        for reference in &references {
+            let (Some(left), Some(right)) = (float_on(reference, &typed), float_on(one, &typed))
+            else {
+                continue;
+            };
+            let whole_rmsd = exterior_float_baseline::rmsd_after_superposition(&left, &right);
+            let core_only: Vec<u32> = typed.iter().copied().filter(|at| *at > 40 && *at <= 80).collect();
+            let arm_only: Vec<u32> = typed.iter().copied().filter(|at| *at <= 40).collect();
+            let window_rmsd = |window: &[u32]| -> Option<f64> {
+                let left = float_on(reference, window)?;
+                let right = float_on(one, window)?;
+                exterior_float_baseline::rmsd_after_superposition(&left, &right)
+            };
+            against.push(json!({
+                "measured_reference": reference.name,
+                "exterior_float_rmsd_angstrom_common_range": whole_rmsd,
+                "exterior_float_rmsd_angstrom_core_41_80": window_rmsd(&core_only),
+                "exterior_float_rmsd_angstrom_arm_1_40": window_rmsd(&arm_only),
+            }));
+        }
+        baseline_rows.push(json!({
+            "presentation": one.name,
+            "group": one.group,
+            "against_each_measured_reference": against,
+        }));
+    }
+
+    // ------------------------------------------------ the typed refusal and the passage that lifts it
+    let mut passage_rows = Vec::new();
+    if let Some((reference_name, _, reference_family)) = typed_families
+        .iter()
+        .find(|(name, _, _)| name.starts_with("measured-3DPL"))
+    {
+        let reference_environment = mounted
+            .iter()
+            .find(|one| &one.name == reference_name)
+            .map(|one| one.environment.clone());
+        let mut seen: BTreeSet<&str> = BTreeSet::new();
+        for (name, group, family) in &typed_families {
+            if name == reference_name || !seen.insert(group.as_str()) {
+                continue;
+            }
+            let Some(left_environment) = reference_environment.clone() else {
+                continue;
+            };
+            let Some(right) = mounted.iter().find(|one| &one.name == name) else {
+                continue;
+            };
+            let refusal = compare_here(reference_family, family)
+                .err()
+                .map(|error| error.to_string());
+            let divergent = left_environment
+                .disagreement(&right.environment)
+                .names()
+                .into_iter()
+                .collect::<Vec<_>>();
+            let passage = EnvironmentPassage::declare(
+                format!(
+                    "the measured RBX1 and {name} are the same target chain read under different \
+                     declarations; the passage accounts for exactly the axes on which they diverge \
+                     and returns the environment the measured claim was read at as its own residual"
+                ),
+                left_environment,
+                right.environment.clone(),
+                divergent,
+            )
+            .map_err(|error| error.to_string())?;
+            let carried = compare_through(reference_family, family, &passage)
+                .map_err(|error| error.to_string())?;
+            passage_rows.push(json!({
+                "left": reference_name,
+                "right": name,
+                "refusal_without_a_passage": refusal,
+                "axes_the_passage_accounts_for": passage.accounted().iter()
+                    .map(|name| name.label()).collect::<Vec<_>>(),
+                "read_at_residual": carried.read_at.lineage,
+                "pairs": carried.comparison.pairs,
+                "agreeing": carried.comparison.agreeing,
+                "separating": carried.comparison.separating.len(),
+            }));
+        }
+    }
+
+    Ok(json!({
+        "schema": "holonics.m5-measured-zinc-and-seed-population.v1",
+        "dated": "2026-09-20",
+        "declared_scopes": {
+            "minimum_chain_separation": separation,
+            "commonly_resolved_m5_residues": resolved,
+            "commonly_resolved_and_identically_typed_m5_residues": typed,
+            "m5_residues_whose_monomer_differs_in_some_measured_entry": differing,
+            "contact_aperture_squared_angstrom": CONTACT_SQUARED,
+            "representative_atom": REPRESENTATIVE,
+            "topology_top_grade": 1,
+        },
+        "intake": intake_rows,
+        "within_component_contact_receiver": scope_rows,
+        "rigidity_receiver_windows": rigidity_rows,
+        "held_out_agreement_rigidity_receiver": rigidity_family,
+        "held_out_agreement_over_the_receiver_family": family_rows,
+        "what_the_family_count_cannot_say": [
+            "it is agreement between presentations of one object at three receivers, never \
+             realization: no member is said to be right",
+            "an item the development side splits on is excluded by construction, so the count is \
+             conditioned on this finite sample's unanimity",
+            "on the development-separating contact subset `performance_on` necessarily returns \
+             zero agreeing, because one class cannot equal two different ones; that zero is \
+             structural and is not a result",
+            "it is taken at one aperture, one representative atom, one residue range and one \
+             chain separation, and says nothing outside them",
+        ],
+        "measured_passages": passage_rows,
+        "exterior_float_baseline_against_the_measured_structures": baseline_rows,
+        "whole_run_nanos": whole.elapsed().as_nanos(),
+    }))
 }
 
 fn main() -> Result<(), String> {
@@ -1169,6 +2503,38 @@ fn main() -> Result<(), String> {
         "--out",
         "research/experiments/m5_predicted_vs_reference/results.json",
     );
+    // The 2026-09-20 section. It runs only when a manifest is named, so the 2026-09-19 command
+    // line reproduces the 2026-09-19 reading unchanged.
+    let manifest = argument(&args, "--manifest", "");
+    if !manifest.is_empty() {
+        let out2 = argument(
+            &args,
+            "--out-measured",
+            "research/experiments/m5_predicted_vs_reference/measured_readings.json",
+        );
+        let started = Instant::now();
+        let results = measured_and_population(
+            Path::new(&manifest),
+            args.iter().any(|flag| flag == "--whole-range-rigidity"),
+        )?;
+        let out2 = Path::new(&out2);
+        if let Some(parent) = out2.parent() {
+            std::fs::create_dir_all(parent).map_err(|error| error.to_string())?;
+        }
+        std::fs::write(
+            out2,
+            serde_json::to_string_pretty(&results).map_err(|error| error.to_string())?,
+        )
+        .map_err(|error| error.to_string())?;
+        eprintln!(
+            "[done 2026-09-20] {} in {:.1} s",
+            out2.display(),
+            started.elapsed().as_secs_f64()
+        );
+        if args.iter().any(|flag| flag == "--skip-2026-09-19") {
+            return Ok(());
+        }
+    }
     let whole = Instant::now();
 
     let declared = declared_presentations(&structure_root, &boltz_root);

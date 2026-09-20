@@ -98,7 +98,7 @@
       }
     ],
     "reference_presentations": {
-      "note": "Not run here. The authenticated M5 release at /home/b/Downloads/holonics-m5-rbx1-rank05 supplies them, and this experiment reads them unchanged.",
+      "note": "Not run here. The authenticated M5 release at <M5_STRUCTURE_ROOT> supplies them, and this experiment reads them unchanged.",
       "designed": "designed-free-rbx1.cif \u2014 the design itself, no uncertainty array",
       "protenix-free": "ptxv2-free-rbx1-seed2.cif with ptxv2-free-rbx1-seed2-pae.npz",
       "protenix-cul1": "ptxv2-cul1-rbx1-seed0.cif with ptxv2-cul1-rbx1-seed0-pae.npz"
@@ -5157,7 +5157,7 @@
           "pH and protonation assumption",
           "membrane or soluble context"
         ],
-        "file": "/home/b/Downloads/holonics-m5-rbx1-rank05/designed-free-rbx1.cif",
+        "file": "<M5_STRUCTURE_ROOT>/designed-free-rbx1.cif",
         "nanos": 188689788,
         "object_check": {
           "binder_chain": "Axp",
@@ -5200,7 +5200,7 @@
           "pH and protonation assumption",
           "membrane or soluble context"
         ],
-        "file": "/home/b/Downloads/holonics-m5-rbx1-rank05/ptxv2-free-rbx1-seed2.cif",
+        "file": "<M5_STRUCTURE_ROOT>/ptxv2-free-rbx1-seed2.cif",
         "nanos": 331908356,
         "object_check": {
           "binder_chain": "B",
@@ -5243,7 +5243,7 @@
           "pH and protonation assumption",
           "membrane or soluble context"
         ],
-        "file": "/home/b/Downloads/holonics-m5-rbx1-rank05/ptxv2-cul1-rbx1-seed0.cif",
+        "file": "<M5_STRUCTURE_ROOT>/ptxv2-cul1-rbx1-seed0.cif",
         "nanos": 444228083,
         "object_check": {
           "binder_chain": "C",
@@ -5291,7 +5291,7 @@
           "pH and protonation assumption",
           "membrane or soluble context"
         ],
-        "file": "/home/b/Workspaces/holonics/.local/m5-prediction-2026-09-19/presentations/boltz2-complex-seed0.cif",
+        "file": ".local/m5-prediction-2026-09-19/presentations/boltz2-complex-seed0.cif",
         "nanos": 254362605,
         "object_check": {
           "binder_chain": "B",
@@ -5319,7 +5319,7 @@
           "pH and protonation assumption",
           "membrane or soluble context"
         ],
-        "file": "/home/b/Workspaces/holonics/.local/m5-prediction-2026-09-19/presentations/boltz2-complex-seed1.cif",
+        "file": ".local/m5-prediction-2026-09-19/presentations/boltz2-complex-seed1.cif",
         "nanos": 259539271,
         "object_check": {
           "binder_chain": "B",
@@ -5347,7 +5347,7 @@
           "pH and protonation assumption",
           "membrane or soluble context"
         ],
-        "file": "/home/b/Workspaces/holonics/.local/m5-prediction-2026-09-19/presentations/boltz2-target-seed0.cif",
+        "file": ".local/m5-prediction-2026-09-19/presentations/boltz2-target-seed0.cif",
         "nanos": 11885258,
         "object_check": {
           "binder_chain": null,
@@ -5359,7 +5359,7 @@
               "residues": 108
             }
           ],
-          "cross_receiver_refusal": "/home/b/Workspaces/holonics/.local/m5-prediction-2026-09-19/presentations/boltz2-target-seed0.cif carries 0 chains of 96 residues, so the address is not one",
+          "cross_receiver_refusal": ".local/m5-prediction-2026-09-19/presentations/boltz2-target-seed0.cif carries 0 chains of 96 residues, so the address is not one",
           "target_chain": "A"
         },
         "presentation": "boltz2-target-seed0"
@@ -5370,7 +5370,7 @@
           "pH and protonation assumption",
           "membrane or soluble context"
         ],
-        "file": "/home/b/Workspaces/holonics/.local/m5-prediction-2026-09-19/presentations/boltz2-target-seed1.cif",
+        "file": ".local/m5-prediction-2026-09-19/presentations/boltz2-target-seed1.cif",
         "nanos": 1436729,
         "object_check": {
           "binder_chain": null,
@@ -5382,7 +5382,7 @@
               "residues": 108
             }
           ],
-          "cross_receiver_refusal": "/home/b/Workspaces/holonics/.local/m5-prediction-2026-09-19/presentations/boltz2-target-seed1.cif carries 0 chains of 96 residues, so the address is not one",
+          "cross_receiver_refusal": ".local/m5-prediction-2026-09-19/presentations/boltz2-target-seed1.cif carries 0 chains of 96 residues, so the address is not one",
           "target_chain": "A"
         },
         "presentation": "boltz2-target-seed1"
