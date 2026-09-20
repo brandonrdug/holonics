@@ -82,6 +82,7 @@ retroactively. There is no state for waiting on a ruling; an unresolved question
 | Every Lean name cited from Rust exists | `cargo test -p holonic-engine --lib lean_citations::` |
 | A value enters only through its constructor; wires and remounts re-validate | inspect `pub` fields and `Deserialize` impls in your files |
 | Declared sizes are bounded before the work they size | `rg -n 'with_capacity\|vec!\[' <your files>` against the owner's ceiling convention |
+| An exact run that takes minutes is rebased, not waited on (roadmap rule 12) | report the method and placement: `BigRational` elimination on one thread is a reference path; prime images in parallel with an exact certificate, then the device ring, are the production path; a value a theorem forces is returned by the theorem |
 | Plan tags (T6, B7, D3 …) | `rg -n '\*\*T6\b' docs/plans` |
 | Owner lookup | `rg -n '<term>' docs/ARCHITECTURE_MAP.md` — search it, do not read it through |
 

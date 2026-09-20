@@ -298,7 +298,18 @@ section orders it.
    actual predictor/reference comparisons and computed evaluation readings. Athena continues the
    complete-source field session and its applicable operator attachments. Either can expose a
    shared missing law or representation. Neither waits for every item in the five contracts.
-3. **Lower the operation that needs resident execution.** The signed-word/radius realization,
+3. **Lower the operation that needs resident execution — and the measured one is exact linear
+   algebra.** September 19–20 execution on real RBX1 material showed what needs it: every exact
+   receiver of the shared library (rigidity, the chain, contact assembly, inertia, the Hodge
+   reading, and the identity atlas's kernel) runs textbook Gauss–Jordan over `BigRational` on one
+   of twenty-four hardware threads with the GPU idle — 180 coordinates in 568 s, 324 not returned
+   in 39 minutes, the 612-coordinate complex refused. Rule 12 governs the repair: one shared
+   primitive for rank, kernel, solve, characteristic polynomial and inertia, rebased through
+   word-size prime images (no coefficient growth), run in parallel over primes on the CPU first
+   and placed on the device's existing `2^61 − 1` ring (`holonic-mount::section_layout`) when the
+   extent warrants, with an exact certificate returned to `ℚ` (a verified kernel basis, rational
+   reconstruction within a Hadamard bound, Descartes on a real-rooted characteristic polynomial).
+   The signed-word/radius realization,
    per-region operators and common-context ownership belong at the consuming device boundary.
    Existing lawful native paths continue while the generated path is extended. D4, Weierstrass
    division and a full Israel instance are not universal gates before an application return.
@@ -354,6 +365,12 @@ the framework does not determine goes to Brandon.
 11. **A choice the mathematics determines is made, marked `[agent-inferred]`, and carried on.**
    Brandon corrects it retroactively. Execution against real targets is the validation every
    other check serves.
+12. **An exact computation that grows is rebased before it is run longer.** Rational elimination
+   on one thread is a reference path, never a production path. Coefficient growth is answered by
+   prime images with an exact certificate, independent images run in parallel, and a hot exact
+   operation is placed on the device; a reading whose value is forced by a theorem is returned by
+   the theorem and not computed. An agent that meets a minutes-long exact run reports the method
+   and the placement before proposing to make the surrounding code cheaper.
 
 ## All current plan documents and their roles
 
