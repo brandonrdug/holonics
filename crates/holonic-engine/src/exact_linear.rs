@@ -71,6 +71,50 @@ pub use contextual::{
     ReceiverFactorization,
 };
 
+/// **The declared side above which a reduction is the certified prime-image one.**
+///
+/// [definition; agent-inferred] See [`ExactRatMatrix::certified_reading`] for what this is
+/// inferred from and why it is `min(rows, columns)` rather than an entry population. Below it the
+/// textbook rational Gauss–Jordan below owns the reduction unchanged; above it the returned values
+/// are identical and the certificate is the authority.
+///
+/// `48` is sixteen three-dimensional occurrences — the smallest extent at which any of the
+/// measured rigidity, chain and contact consumers reads.
+pub const DECLARED_PRIME_IMAGE_CROSSOVER: usize = 48;
+
+/// The work a certified reading performed, in the coordinates [`crate::exact_work::ExactWork`]
+/// names, with nothing invented.
+///
+/// [definition] The prime-image path's arithmetic is in **machine words**, not in rationals, so
+/// its ring multiplications are reported as multiplications and its cumulative/peak widths come
+/// only from the rationals actually written into the return. The **dependency span is the pivot
+/// count**, as it was for the rational reduction and for the same reason: one image is a sequence
+/// of dependent pivots, and placing the images on more lanes does not shorten it.
+fn certified_work(
+    certificate: &crate::prime_image_algebra::KernelCertificate,
+) -> crate::exact_work::ExactWork {
+    let cost = certificate.cost();
+    let mut work = crate::exact_work::ExactWork::nothing();
+    work.resident(
+        u64::try_from(certificate.rows().saturating_mul(certificate.columns())).unwrap_or(u64::MAX),
+    );
+    work.multiplied(
+        cost.image_multiplications
+            .saturating_add(cost.verification_multiplications),
+    );
+    work.added(cost.lifted_entries);
+    work.divided(cost.reconstructed_entries);
+    for _ in 0..cost.dependency_span {
+        work.stepped();
+    }
+    for vector in certificate.kernel() {
+        for entry in vector {
+            work.wrote(entry);
+        }
+    }
+    work
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ExactRatMatrix {
     rows: usize,
@@ -711,9 +755,21 @@ impl ExactRatMatrix {
     ///
     /// One primitive under everything below. `inverse` predates it and keeps its own augmented
     /// elimination, so the certificate it already carries is untouched.
+    ///
+    /// **Above [`DECLARED_PRIME_IMAGE_CROSSOVER`] the reduction is the certified prime-image one**
+    /// and the returned rows are identical: a reduced row echelon form is canonical, so the two
+    /// paths cannot disagree about it, and
+    /// [`crate::prime_image_algebra::KernelCertificate::reduced_rows`] reconstructs nothing extra
+    /// to produce it. See [`Self::certified_reading`] for why the signature is unchanged.
     pub fn reduced_row_echelon(
         &self,
     ) -> Result<(Self, Vec<usize>, crate::exact_work::ExactWork), ExactLinearError> {
+        if let Some(certificate) = self.certified_reading() {
+            let work = certified_work(&certificate);
+            let rows = certificate.reduced_rows();
+            let pivots = certificate.pivot_columns().to_vec();
+            return Ok((Self::shaped(self.rows, self.columns, rows)?, pivots, work));
+        }
         let mut work = crate::exact_work::ExactWork::nothing();
         work.resident(u64::try_from(self.rows.saturating_mul(self.columns)).unwrap_or(u64::MAX));
         let mut rows = self.to_rows();
@@ -758,8 +814,65 @@ impl ExactRatMatrix {
     }
 
     /// The rank, read off the reduction rather than declared.
+    ///
+    /// Above [`DECLARED_PRIME_IMAGE_CROSSOVER`] this is the **certified** rank: `≥ r` from a
+    /// nonzero modular minor and `≤ r` from `n − r` exhibited independent rational kernel vectors
+    /// checked against this matrix over ℚ. Below it, the rational reduction's pivot count.
     pub fn rank(&self) -> Result<usize, ExactLinearError> {
+        if let Some(certificate) = self.certified_reading() {
+            return Ok(certificate.rank());
+        }
         Ok(self.reduced_row_echelon()?.1.len())
+    }
+
+    /// **The certified reading of this map, or `None` where the rational reduction owns it.**
+    ///
+    /// [definition; agent-inferred] The crossover is on `min(rows, columns)`, which bounds the
+    /// rank, because the rational path's cost is driven by **coefficient growth** — the
+    /// intermediate entries of a rational elimination are minors of the input, whose bit width
+    /// grows with the rank — and not by the entry population. Inferred from the measured staircase
+    /// of `prime_image_algebra::tests::the_measured_staircase`, taken on the rigidity species the
+    /// M5 consumers read (release, this machine, 24 lanes):
+    ///
+    /// ```text
+    /// coordinates     24     36     48     60     72    120    180    240    324    612
+    /// rational  (s)  0.012  0.036  0.077  0.176  0.284  1.152  2.889  6.113 12.334 62.408
+    /// certified (s)  0.002  0.002  0.003  0.004  0.005  0.010  0.021  0.033  0.060  0.220
+    /// ```
+    ///
+    /// The crossing is already below 24 on this material — the certified reading is six times
+    /// faster at the smallest extent measured and two hundred and eighty times faster at 612. `48`
+    /// is therefore **deliberately conservative**: it is the smallest extent any of the measured
+    /// rigidity, chain and contact consumers reads (sixteen three-dimensional occurrences), and it
+    /// leaves every smaller matrix in the repository on the path it was on, where a certified
+    /// reading's fixed cost — twenty-four charts decided and reduced — would be the larger share.
+    ///
+    /// **A refusal falls back rather than propagating.** The rational path is exact and total, so a
+    /// reading that exhausts its prime budget or fails its own verification costs a slower return,
+    /// never a wrong one. This is the only reason the public signatures could stay as they are, and
+    /// two other owners are consuming them right now.
+    fn certified_reading(&self) -> Option<crate::prime_image_algebra::KernelCertificate> {
+        if self.rows.min(self.columns) < DECLARED_PRIME_IMAGE_CROSSOVER {
+            return None;
+        }
+        crate::prime_image_algebra::certified_kernel(self).ok()
+    }
+
+    /// **The rank and the kernel from one reading, for a consumer that wants both.**
+    ///
+    /// [definition] `rank` and `kernel_basis` are separate entry points and each performs its own
+    /// reduction, which above the crossover means deciding charts, lifting and verifying a whole
+    /// certificate twice over the same matrix. Nothing is wrong with either answer — they are the
+    /// same certificate computed twice — but the second one is arithmetic already done. A consumer
+    /// that needs both asks here instead. Found by the Wave 10 reviewer on
+    /// `rigidity_receiver::rigidity_reading`, which is such a consumer.
+    pub fn rank_and_kernel(&self) -> Result<(usize, Vec<Vec<Rat>>), ExactLinearError> {
+        if let Some(certificate) = self.certified_reading() {
+            return Ok((certificate.rank(), certificate.kernel().to_vec()));
+        }
+        let (reduced, pivots, _) = self.reduced_row_echelon()?;
+        let kernel = self.kernel_basis_from_reduced(&reduced, &pivots)?;
+        Ok((pivots.len(), kernel))
     }
 
     /// **A basis of `ker(T)`: the directions this map collapses.**
@@ -768,6 +881,9 @@ impl ExactRatMatrix {
     /// population is exhibited rather than summarized by a count. An empty return is a genuine
     /// zero: the map collapses nothing.
     pub fn kernel_basis(&self) -> Result<Vec<Vec<Rat>>, ExactLinearError> {
+        if let Some(certificate) = self.certified_reading() {
+            return Ok(certificate.kernel().to_vec());
+        }
         let (reduced, pivots, _) = self.reduced_row_echelon()?;
         self.kernel_basis_from_reduced(&reduced, &pivots)
     }
@@ -844,6 +960,15 @@ impl ExactRatMatrix {
     > {
         if target.len() != self.rows {
             return Err(ExactLinearError::ShapeMismatch);
+        }
+        if self.rows.min(self.columns) >= DECLARED_PRIME_IMAGE_CROSSOVER
+            && let Ok((fibre, certificate)) =
+                crate::prime_image_algebra::certified_fibre(self, target)
+        {
+            // `A x = b` is one clause of the augmented certificate's own `[A | b] N = 0`, already
+            // checked over Q; `None` is the augmented column taken as a pivot, which is exactly
+            // `rank [A | b] = rank A + 1`.
+            return Ok((fibre, certified_work(&certificate)));
         }
         let mut augmented = self.to_rows();
         for (row, value) in augmented.iter_mut().zip(target) {
@@ -1508,5 +1633,132 @@ mod tests {
         );
         assert!(!work.entries_written.is_zero());
         assert!(!work.cumulative_bits.is_zero());
+    }
+
+    /// **The two paths return the same values across the crossover, checked on the same matrix.**
+    ///
+    /// The public signatures did not change, so the only thing that could change is a returned
+    /// value, and this is where that is refused. The fixture is built at the crossover and read
+    /// twice: once through the public API, which takes the certified path, and once through the
+    /// rational reduction, reached by transposing into a shape below the crossover is not
+    /// available — so the rational answer is derived here from the same primitive the path below
+    /// the crossover uses.
+    #[test]
+    fn the_certified_path_and_the_rational_path_return_the_same_reduction() {
+        // Deterministic, generic, and exactly at the crossover so both paths are reachable.
+        let side = DECLARED_PRIME_IMAGE_CROSSOVER;
+        let rows: Vec<Vec<Rat>> = (0..side)
+            .map(|row| {
+                (0..side)
+                    .map(|column| {
+                        let value = ((row * 31 + column * 17) % 23) as i64 - 11;
+                        // The last two rows are dependent, so the map has a real kernel to exhibit.
+                        rat(value, if column % 3 == 0 { 2 } else { 1 })
+                    })
+                    .collect()
+            })
+            .collect();
+        let mut rows = rows;
+        rows[side - 1] = rows[0].clone();
+        rows[side - 2] = rows[1]
+            .iter()
+            .zip(&rows[2])
+            .map(|(left, right)| left + right)
+            .collect();
+        let map = ExactRatMatrix::shaped(side, side, rows).expect("a square fixture");
+
+        let certificate = map.certified_reading().expect("the certified path is taken");
+        certificate
+            .verify(&map)
+            .expect("the certificate verifies against this very matrix");
+
+        // The rational primitive, reached directly so the comparison is between the two paths and
+        // not between one path and itself.
+        let mut work = crate::exact_work::ExactWork::nothing();
+        work.resident(u64::try_from(side * side).unwrap_or(u64::MAX));
+        let mut rational_rows = map.to_rows();
+        let mut rational_pivots: Vec<usize> = Vec::new();
+        let mut pivot_row = 0usize;
+        for column in 0..side {
+            if pivot_row >= side {
+                break;
+            }
+            let Some(found) = (pivot_row..side).find(|row| !rational_rows[*row][column].is_zero())
+            else {
+                continue;
+            };
+            rational_rows.swap(found, pivot_row);
+            let divisor = rational_rows[pivot_row][column].clone();
+            for entry in &mut rational_rows[pivot_row] {
+                *entry /= &divisor;
+            }
+            let pivot = rational_rows[pivot_row].clone();
+            for row in 0..side {
+                if row == pivot_row || rational_rows[row][column].is_zero() {
+                    continue;
+                }
+                let factor = rational_rows[row][column].clone();
+                for (entry, above) in rational_rows[row].iter_mut().zip(&pivot) {
+                    *entry -= &factor * above;
+                }
+            }
+            rational_pivots.push(column);
+            pivot_row += 1;
+        }
+
+        assert_eq!(certificate.rank(), rational_pivots.len());
+        assert_eq!(certificate.pivot_columns(), rational_pivots.as_slice());
+        assert_eq!(certificate.reduced_rows(), rational_rows);
+        assert_eq!(map.rank().expect("rank"), rational_pivots.len());
+        let (reduced, pivots, _) = map.reduced_row_echelon().expect("reduced");
+        assert_eq!(reduced.to_rows(), rational_rows);
+        assert_eq!(pivots, rational_pivots);
+
+        // And the kernel the public entry returns is the canonical one the rational reduction
+        // determines, vector for vector.
+        let reduced_matrix = ExactRatMatrix::shaped(side, side, rational_rows).expect("shaped");
+        let rational_kernel = map
+            .kernel_basis_from_reduced(&reduced_matrix, &rational_pivots)
+            .expect("the rational kernel");
+        assert_eq!(map.kernel_basis().expect("kernel"), rational_kernel);
+        assert!(!rational_kernel.is_empty(), "the fixture has a kernel to exhibit");
+    }
+
+    /// The fibre is the same object on both sides of the crossover, target by target.
+    #[test]
+    fn the_certified_fibre_agrees_with_the_rational_one_at_the_crossover() {
+        let side = DECLARED_PRIME_IMAGE_CROSSOVER;
+        let rows: Vec<Vec<Rat>> = (0..side)
+            .map(|row| {
+                (0..side)
+                    .map(|column| rat(((row * 13 + column * 29) % 19) as i64 - 9, 1))
+                    .collect()
+            })
+            .collect();
+        let map = ExactRatMatrix::shaped(side, side, rows).expect("a square fixture");
+        let source: Vec<Rat> = (0..side).map(|at| rat(at as i64 - 5, 3)).collect();
+        let target = map.apply(&source).expect("a reachable target");
+
+        let (fibre, work) = map
+            .preimage_fibre_with_work(&target)
+            .expect("the fibre returns");
+        let (particular, kernel) = fibre.expect("a reachable target has a fibre");
+        assert_eq!(map.apply(&particular).expect("applied"), target);
+        for vector in &kernel {
+            assert!(
+                map.apply(vector)
+                    .expect("applied")
+                    .iter()
+                    .all(num_traits::Zero::is_zero)
+            );
+        }
+        assert!(!work.multiplications.is_zero());
+        // The particular point is the canonical one: zero on every free coordinate.
+        let (_, pivots, _) = map.reduced_row_echelon().expect("reduced");
+        for column in 0..side {
+            if !pivots.contains(&column) {
+                assert!(particular[column].is_zero(), "canonical on the free coordinates");
+            }
+        }
     }
 }

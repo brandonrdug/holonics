@@ -746,8 +746,9 @@ pub fn rigidity_reading(jacobian: &RigidityJacobian) -> Result<RigidityReading, 
     let constraint_count = jacobian.constraint_count();
     let coordinate_freedoms = jacobian.coordinate_freedoms();
 
-    let rank = jacobian.matrix.rank()?;
-    let motions = jacobian.matrix.kernel_basis()?;
+    // One reading, not two: above the prime-image crossover `rank` and `kernel_basis` each decide
+    // charts, lift and verify their own certificate over this same matrix.
+    let (rank, motions) = jacobian.matrix.rank_and_kernel()?;
     let motion_dimension = motions.len();
     if rank + motion_dimension != coordinate_freedoms {
         return Err(RigidityError::RankNullityFails {

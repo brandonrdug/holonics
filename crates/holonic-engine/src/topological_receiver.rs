@@ -1070,7 +1070,7 @@ fn power_modulo(base: u64, mut exponent: u64, modulus: u64) -> u64 {
 
 /// **Primality, decided.** Deterministic Miller–Rabin over [`MILLER_RABIN_BASES`], which is exact
 /// for every `u64`. No probabilistic acceptance and no early exit on a guess.
-fn is_prime(value: u64) -> bool {
+pub(crate) fn is_prime(value: u64) -> bool {
     if value < 2 {
         return false;
     }

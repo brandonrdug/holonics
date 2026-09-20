@@ -182,5 +182,64 @@ pub fn window_placement_operator(count: usize, entry_ceiling: usize) -> Sectione
     LocalOperator::dense_canonical(width, table, &ModularWords::DEVICE)
 }
 
+// ===============================================================================================
+// Issue #50: what the generated tile boundary supports, and what the exact algebra needs of it
+// ===============================================================================================
+
+/// **The clause that blocks each of Issue #50's two operations at the generated tile boundary.**
+///
+/// [definition] The contract forbids inferring a solver from the presence of a generated modular
+/// matrix product, and this is the declaration that keeps that honest: each operation is named
+/// against the clause of `mount::section_layout` it does not satisfy, and
+/// [`self::tests`] exhibits the second one rather than asserting it.
+///
+/// Neither is a defect in either owner. `SectionLayout` generates `Σ_r P_rᵀ L_r P_r` faithfully;
+/// these are two operations that are not of that form as the declaration stands.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum GeneratedTileObstacle {
+    /// **A modular pivot sweep is not a linear local apply.**
+    ///
+    /// `SectionLayout::apply_local_reference` and the generated `APPLY` entry compute
+    /// `L · (gathered x)` for a table `L` fixed before the call. The elimination's update is
+    /// `a_ij ← a_ij − m_i · a_kj`, whose multiplier `m_i = a_ik` is **read from the field**: the
+    /// operation is bilinear in two gathered words where the generated apply is linear in one.
+    /// No choice of `L` expresses it, and no schedule of launches does either, because `m_i`
+    /// changes at every pivot.
+    ///
+    /// The extension this names is a generated entry whose local apply takes a *second* gathered
+    /// operand — a rank-one update tile — with its own declared ring, `launch_law` requirement and
+    /// exclusive-write partition per pivot. That is a new kernel, not a new caller.
+    PivotSweepIsBilinear,
+    /// **A contact assembly needs one local operator per region, not one shared by all.**
+    ///
+    /// `SectionLayout::assemble_dense` and `SectionKernels::enact` both take a single
+    /// `&LocalOperator<V>`, and every region uses its leading `width(r) × width(r)` block of *that*
+    /// table. `M_contact = Σ_f w_f J_fᵀ D_f J_f` is exactly the assembly identity the layout names,
+    /// with region `f` the face's support — but `L_f = w_f J_fᵀ D_f J_f` differs per face, and two
+    /// bars in different directions have different blocks.
+    ///
+    /// The extension this names is a per-region coefficient offset in the staged table — one
+    /// `u32` offsets array beside the existing region offsets — so the generated apply reads
+    /// `L_r` instead of `L`. That is the smaller of the two extensions and it is the one that would
+    /// place the contact assembly, not the elimination, on the card.
+    SharedLocalOperator,
+}
+
+impl GeneratedTileObstacle {
+    /// The operation this obstacle blocks, and the clause it violates, in one line each.
+    pub const fn declared(self) -> (&'static str, &'static str) {
+        match self {
+            Self::PivotSweepIsBilinear => (
+                "prime_image_algebra::PrimeImage::reduce, one chart's modular Gauss-Jordan",
+                "the generated local apply is linear in one gathered operand",
+            ),
+            Self::SharedLocalOperator => (
+                "holonic_interaction::ContactDissipation::assemble, the sparse contact assembly",
+                "one LocalOperator is shared by every region of a SectionLayout",
+            ),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests;

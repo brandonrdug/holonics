@@ -1140,3 +1140,5 @@ import ElementaryHolonics.Millennium.NavierStokesOrderedChronologyFactorial
 import ElementaryHolonics.Millennium.MillenniumDifferenceAtlas
 import ElementaryHolonics.Millennium.HolonicFiniteCausalAperture
 import ElementaryHolonics.Millennium.HolonicPantographicSwingJets
+
+import ElementaryHolonics.Geometry.TwoSidedIdentityAtlas

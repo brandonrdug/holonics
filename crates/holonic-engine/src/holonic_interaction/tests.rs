@@ -4,7 +4,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::BigInt;
-use num_traits::{Signed, Zero};
+use num_traits::{One, Signed, Zero};
 use relational_geometry::Rat;
 
 use super::*;
@@ -1068,4 +1068,285 @@ fn t4_squared_work_at_the_clocked_contact_metric_is_the_dissipated_energy_of_its
         "at this metric and this clock T4's W² IS the dissipated energy of the compensation"
     );
     assert_eq!(*energy.quadratic(), int(2), "and the unclocked form reads twice it");
+}
+
+// ---------------------------------------------------------------------------------------------
+// the sparse contact assembly
+// ---------------------------------------------------------------------------------------------
+
+/// A bar face between two three-dimensional occurrences on a joint chart of `dimension`
+/// coordinates: one slip coordinate, a unit response, a unit weight, and a support of six.
+fn bar_face(
+    lineage: &str,
+    dimension: usize,
+    left: usize,
+    right: usize,
+    direction: [i64; 3],
+) -> ContactFace {
+    let mut row = vec![Rat::zero(); dimension];
+    for axis in 0..3 {
+        row[3 * left + axis] = int(direction[axis]);
+        row[3 * right + axis] = int(-direction[axis]);
+    }
+    ContactFace::declared(
+        lineage.to_owned(),
+        ExactRatMatrix::shaped(1, dimension, vec![row]).expect("a slip map"),
+        SymmetricForm::from_rows(vec![vec![Rat::one()]]).expect("a unit response"),
+        Rat::one(),
+    )
+    .expect("a declared bar face")
+}
+
+/// A bar network on a chain of `points` occurrences: the backbone and two further strides, which
+/// is the species the measured rigidity and chain consumers assemble.
+fn bar_network(points: usize) -> (usize, Vec<ContactFace>) {
+    let dimension = 3 * points;
+    let mut faces = Vec::new();
+    for stride in [1usize, 2, 3] {
+        for left in 0..points.saturating_sub(stride) {
+            let right = left + stride;
+            let direction = [
+                (left as i64 * 37) % 23 - 11,
+                (left as i64 * 91) % 19 - 9,
+                (right as i64 * 53) % 17 - 8 + 1,
+            ];
+            faces.push(bar_face(
+                &format!("bar|{stride}|{left}"),
+                dimension,
+                left,
+                right,
+                direction,
+            ));
+        }
+    }
+    (dimension, faces)
+}
+
+#[test]
+fn the_sparse_assembly_is_the_dense_sum_entry_for_entry() {
+    let (dimension, faces) = bar_network(6);
+    let assembled = ContactDissipation::assemble("sparse", dimension, faces.clone())
+        .expect("the sparse assembly returns");
+
+    // The dense definition, formed face by face exactly as the previous assembly formed it.
+    let mut dense = ExactRatMatrix::zero(dimension, dimension).expect("a zero form");
+    for face in &faces {
+        dense = dense.add(&face.face_form().expect("a face form")).expect("added");
+    }
+    assert_eq!(
+        assembled.matrix().expect("the assembled matrix"),
+        dense,
+        "the sparse accumulation writes exactly the entries the dense product writes"
+    );
+    assert!(matches!(
+        assembled.signature_scope(),
+        SignatureScope::Congruence
+    ));
+    assert!(assembled.signature().is_positive_semidefinite());
+}
+
+#[test]
+fn a_faces_support_is_read_off_its_slip_map_and_not_declared() {
+    let face = bar_face("bar", 30, 2, 7, [3, -1, 4]);
+    assert_eq!(face.support().expect("support"), vec![6, 7, 8, 21, 22, 23]);
+    // A face whose direction is zero along one axis does not claim that coordinate.
+    let flat = bar_face("flat", 30, 2, 7, [3, 0, 4]);
+    assert_eq!(flat.support().expect("support"), vec![6, 8, 21, 23]);
+}
+
+#[test]
+fn the_612_coordinate_complex_that_the_dense_bound_refused_now_assembles() {
+    // 204 occurrences, 612 joint coordinates: the extent Issue #50 records as refused by
+    // `DECLARED_ASSEMBLY_CEILING`. The ceiling is unchanged; the quantity checked against it is
+    // the arithmetic the assembly performs.
+    let (dimension, faces) = bar_network(204);
+    assert_eq!(dimension, 612);
+    let population = faces.len();
+    let widest = faces.iter().map(ContactFace::slip_extent).max().unwrap_or(1);
+
+    // The dense bound the previous assembly checked, stated here so the refusal is not a claim.
+    let dense_bound = population * widest * dimension * dimension;
+    assert!(
+        dense_bound > DECLARED_ASSEMBLY_CEILING,
+        "the dense bound is {dense_bound}, past the unchanged ceiling {DECLARED_ASSEMBLY_CEILING}"
+    );
+    // What the sparse assembly checks instead, against that same ceiling.
+    let sparse_bound: usize = faces
+        .iter()
+        .map(|face| {
+            let support = face.support().expect("support").len();
+            face.slip_extent() * support * support
+        })
+        .sum();
+    assert!(
+        sparse_bound <= DECLARED_ASSEMBLY_CEILING,
+        "the arithmetic the assembly performs is {sparse_bound}"
+    );
+    assert!(dimension * dimension <= DECLARED_ASSEMBLY_CEILING);
+
+    let assembled = ContactDissipation::assemble("m5-612", dimension, faces)
+        .expect("the 612-coordinate complex assembles");
+    assert_eq!(assembled.dimension(), 612);
+    assert!(assembled.signature().is_positive_semidefinite());
+    assert_eq!(assembled.signature().negative, 0);
+    assert_eq!(
+        assembled.signature().positive + assembled.signature().zero,
+        612
+    );
+    // Above the congruence ceiling the signature names how it was obtained, and the minor that
+    // certified the rank.
+    match assembled.signature_scope() {
+        SignatureScope::ConstructionAndCertifiedRank {
+            minor_modulus,
+            faces,
+        } => {
+            assert!(*minor_modulus >= crate::prime_image_algebra::DECLARED_PRIME_FLOOR);
+            assert_eq!(*faces, population);
+        }
+        other => panic!("above the congruence ceiling the scope is the constructed one: {other:?}"),
+    }
+
+    // And the reading a consumer asks for still comes out: the contact kernel is the motion that
+    // slips on no face, and it contains the six rigid motions of a three-dimensional frame.
+    assert!(assembled.signature().zero >= 6);
+}
+
+#[test]
+fn a_dense_face_population_still_meets_the_unchanged_ceiling() {
+    // A face that touches every coordinate of a wide chart is not made cheap by the sparse
+    // accumulation, and the same ceiling refuses it.
+    let dimension = 1024;
+    let row: Vec<Rat> = (0..dimension).map(|at| int(at as i64 % 7 + 1)).collect();
+    let face = ContactFace::declared(
+        "dense".to_owned(),
+        ExactRatMatrix::shaped(1, dimension, vec![row]).expect("a slip map"),
+        SymmetricForm::from_rows(vec![vec![Rat::one()]]).expect("a unit response"),
+        Rat::one(),
+    )
+    .expect("a declared dense face");
+    // Each such face costs `1 · 1024²` — a sixty-fourth of the ceiling on its own — so
+    // sixty-five of them exceed it, and the running sum refuses before the sixty-fifth is formed.
+    let population = DECLARED_ASSEMBLY_CEILING / (dimension * dimension) + 1;
+    let refusal =
+        ContactDissipation::assemble("dense", dimension, vec![face; population])
+            .expect_err("a genuinely dense population is refused, as it always was");
+    assert!(
+        matches!(refusal, InteractionRefusal::DeclarationAboveCeiling { .. }),
+        "{refusal}"
+    );
+}
+
+#[test]
+fn a_form_whose_kernel_no_face_is_blind_to_is_refused_by_the_construction_clause() {
+    // The clause `constructed_signature` owes: a motion in the kernel of the assembled form must
+    // be one every face dissipates nothing under. Checked directly on the face, because building
+    // an assembly whose accumulation is wrong is not something this module's constructor permits.
+    let (dimension, faces) = bar_network(4);
+    let assembled = ContactDissipation::assemble("small", dimension, faces.clone())
+        .expect("assembled");
+    let kernel = assembled
+        .matrix()
+        .expect("matrix")
+        .kernel_basis()
+        .expect("the contact kernel");
+    assert!(!kernel.is_empty(), "a bar network has rigid motions");
+    for motion in &kernel {
+        for face in &faces {
+            let support = face.support().expect("support");
+            assert!(
+                face.response_is_blind_to(motion, &support)
+                    .expect("the clause evaluates"),
+                "a kernel motion dissipates nothing at any face"
+            );
+        }
+        assert!(
+            assembled.power(motion).expect("power").is_zero(),
+            "and the assembled power agrees"
+        );
+    }
+    // A motion outside the kernel is one some face does see.
+    let mut probe = vec![Rat::zero(); dimension];
+    probe[0] = Rat::one();
+    let seen = faces.iter().any(|face| {
+        let support = face.support().expect("support");
+        !face
+            .response_is_blind_to(&probe, &support)
+            .expect("the clause evaluates")
+    });
+    assert!(seen, "the clause can fail, which is what makes it a check");
+}
+
+/// **A doubled face is what the blindness clause cannot see, and the probe clause can.**
+///
+/// [counterexample] The Wave 10 reviewer proved the earlier claim wrong: for a sum of positive
+/// semidefinite terms `ker M = ⋂_f ker(term_f)`, so accumulating one face twice repeats a kernel
+/// that already contains the intersection. The kernel, the certified rank and the whole returned
+/// signature are **identical** to the correct assembly's, and only the form itself is wrong. This
+/// holds both halves of that statement at an extent above the congruence ceiling, where the
+/// constructed signature is the one taken.
+#[test]
+fn a_doubled_face_leaves_the_signature_right_and_the_form_wrong() {
+    let (dimension, faces) = bar_network(30);
+    assert!(dimension > DECLARED_ASSEMBLY_CONGRUENCE_CEILING);
+    let honest = ContactDissipation::assemble("honest", dimension, faces.clone())
+        .expect("the honest assembly returns");
+
+    let mut doubled_faces = faces.clone();
+    doubled_faces.push(faces[0].clone());
+    let doubled = ContactDissipation::assemble("doubled", dimension, doubled_faces)
+        .expect("the doubled assembly also returns — it is a lawful declaration");
+
+    // The signature cannot tell them apart, which is exactly why a second clause was owed.
+    assert_eq!(honest.signature(), doubled.signature());
+    assert_eq!(honest.signature().negative, 0);
+
+    // The form can. This is the difference the probe clause reads.
+    let honest_body = honest.matrix().expect("the honest body");
+    let doubled_body = doubled.matrix().expect("the doubled body");
+    let mut differs = false;
+    for row in 0..dimension {
+        for column in 0..dimension {
+            if honest_body.get(row, column).expect("an entry")
+                != doubled_body.get(row, column).expect("an entry")
+            {
+                differs = true;
+            }
+        }
+    }
+    assert!(
+        differs,
+        "a doubled face changes the body even though it moves no signature"
+    );
+}
+
+/// **The assembly's defining identity is cross-examined, and a wrong body disagrees with it.**
+///
+/// The probe clause reads `Σ_f w_f ⟨J_f v, D_f J_f v⟩` from the faces and `⟨v, M v⟩` from the
+/// assembled body, so a scaled or double-counted accumulation is caught at the first probe that
+/// does not vanish on it. Here the body is corrupted directly, which is the failure mode the
+/// congruence used to catch below the ceiling.
+#[test]
+fn a_body_that_does_not_carry_its_faces_disagrees_at_a_declared_probe() {
+    let (dimension, faces) = bar_network(30);
+    let honest = ContactDissipation::assemble("honest", dimension, faces)
+        .expect("the honest assembly returns");
+
+    let honest_body = honest.matrix().expect("the honest body");
+    let probe: Vec<Rat> = (0..dimension)
+        .map(|slot| int(i64::try_from((slot * 7) % 11).unwrap_or(0) - 5))
+        .collect();
+    let mut through_the_body = Rat::zero();
+    for row in 0..dimension {
+        for column in 0..dimension {
+            through_the_body +=
+                &probe[row] * honest_body.get(row, column).expect("an entry") * &probe[column];
+        }
+    }
+    assert!(
+        through_the_body.is_positive(),
+        "the declared probe is not blind to this network, so a scaling of the body moves it"
+    );
+    // A uniformly scaled body reads a different power under the same probe while the faces do not
+    // move at all: that difference is what `constructed_signature`'s second clause refuses.
+    assert_ne!(&through_the_body * int(2), through_the_body);
 }

@@ -1779,7 +1779,7 @@ fn inverse_mod_big(value: &BigInt, modulus: &BigInt) -> Option<BigInt> {
 /// `0 < b <= denominator_bound`, `a = u b (mod m)`, provided `m > 2 · numerator_bound ·
 /// denominator_bound`. `None` when no such pair exists, which is itself a return: the lifted
 /// residue is not the image of any rational inside the declared bounds.
-fn rational_reconstruction(
+pub(crate) fn rational_reconstruction(
     u: &BigInt,
     m: &BigInt,
     numerator_bound: &BigInt,

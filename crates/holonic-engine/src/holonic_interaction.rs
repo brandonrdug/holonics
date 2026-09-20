@@ -181,6 +181,38 @@ pub const DECLARED_MEDIUM_CEILING: usize = 256;
 /// The ceiling on the arithmetic work of one contact assembly, `faces × slip × dimension²`.
 pub const DECLARED_ASSEMBLY_CEILING: usize = 1 << 26;
 
+/// **The joint dimension above which the assembled signature is not taken by congruence.**
+///
+/// [definition] [`crate::inertia::inertia`] is a symmetric elimination over `Rat`: cubic in the
+/// extent with the same unbounded coefficient growth that
+/// [`crate::exact_linear::DECLARED_PRIME_IMAGE_CROSSOVER`] exists to answer, and it is why a
+/// 612-coordinate complex could not be read even once its assembly fitted. Above this ceiling the
+/// signature is still **complete and exact**, and it is obtained differently:
+/// `negative = 0` because the assembly is positive semidefinite *by construction* — every face
+/// weight is strictly positive and every face response is certified positive semidefinite at
+/// [`ContactFace::declared`], and `vᵀ (w J^T D J) v = w ⟨Jv, D Jv⟩ ≥ 0` — and `positive` is the
+/// **certified rank** of the assembled form through
+/// [`crate::prime_image_algebra`], with `zero = dimension − positive`. Which of the two was taken
+/// is named by [`ContactDissipation::signature_scope`] and is never left to be inferred.
+///
+/// The value is [`CONSERVATIVE_CORE_CEILING`]'s, and for the same reason: it is the extent at which
+/// this module already judges a cubic rational elimination to be the thing that must stop.
+pub const DECLARED_ASSEMBLY_CONGRUENCE_CEILING: usize = 64;
+
+/// **How many declared probes cross-examine the assembly's defining identity.**
+///
+/// [definition; agent-inferred] Above [`DECLARED_ASSEMBLY_CONGRUENCE_CEILING`] the signature comes
+/// from the construction plus a certified rank, and the kernel-blindness clause that discharges the
+/// construction is blind to a **doubled** face — it changes neither the kernel nor the rank. The
+/// probes close that hole by checking `⟨v, M v⟩ = Σ_f w_f ⟨J_f v, D_f J_f v⟩` directly, reading the
+/// right-hand side from the faces and the left from the assembled body, so the two sides cannot be
+/// the same arithmetic twice. Four is inferred from the cost: each probe is one `dimension²` form
+/// application and one pass over the faces, against the `dimension³` congruence this scope exists
+/// to avoid; a family that misses an error on all four has to vanish on four declared vectors at
+/// once. A probe family is not polarization over a basis, and the doc of
+/// [`ContactDissipation::constructed_signature`] says so rather than implying a proof.
+pub const DECLARED_ASSEMBLY_PROBES: usize = 4;
+
 /// **The joint extent above which the exact half-plane count is not taken.**
 ///
 /// [definition] The count is a Faddeev–LeVerrier characteristic polynomial followed by a Sturm
@@ -258,6 +290,18 @@ pub enum InteractionRefusal {
         lineage: String,
         positive: usize,
         negative: usize,
+    },
+    /// The assembled body does not carry its own faces: `⟨v, M v⟩ ≠ Σ_f w_f ⟨J_f v, D_f J_f v⟩` at
+    /// a declared probe. A dropped, doubled, scaled or misplaced contribution reaches this and not
+    /// the blindness clause, which a doubled face passes with its kernel and rank intact.
+    #[error(
+        "the assembled contact form `{lineage}` does not carry its {faces} faces: the defining \
+         identity failed at declared probe {probe}"
+    )]
+    AssemblyDoesNotCarryItsFaces {
+        lineage: String,
+        probe: usize,
+        faces: usize,
     },
     /// A carrier index names a medium the interaction does not carry, or the perspective's own
     /// block when the perspective declares none.
@@ -619,6 +663,152 @@ impl ContactFace {
         Ok(pulled.scaled(&self.weight))
     }
 
+    /// **The joint coordinates this face actually reaches**, read off its slip map in increasing
+    /// order. A face embedded on a wide chart touches only the columns its own declaration placed
+    /// there, and that is what makes the assembly sparse.
+    pub fn support(&self) -> Result<Vec<usize>, InteractionRefusal> {
+        let mut support = Vec::new();
+        for column in 0..self.dimension() {
+            if (0..self.slip_extent()).any(|row| {
+                self.slip
+                    .get(row, column)
+                    .is_ok_and(|entry| !entry.is_zero())
+            }) {
+                support.push(column);
+            }
+        }
+        Ok(support)
+    }
+
+    /// Accumulate `w_f J_fᵀ D_f J_f` into a shared sparse body, touching only this face's support.
+    ///
+    /// [definition] The dense form is `Σ_{a,b} w J[a][i] D[a][b] J[b][j]`; the accumulation below
+    /// is that sum with `i, j` ranging over the support alone, which is where every other entry of
+    /// it is zero. Nothing is approximated and no entry is skipped that the dense product would
+    /// have written.
+    fn accumulate_into(
+        &self,
+        support: &[usize],
+        accumulated: &mut BTreeMap<(usize, usize), Rat>,
+    ) -> Result<(), InteractionRefusal> {
+        let extent = self.slip_extent();
+        // `D_f J_f` restricted to the support: `extent × support`.
+        let mut pulled = vec![Rat::zero(); extent * support.len()];
+        for row in 0..extent {
+            for (at, column) in support.iter().enumerate() {
+                let mut total = Rat::zero();
+                for inner in 0..extent {
+                    let coefficient = self.response.at(row, inner);
+                    if coefficient.is_zero() {
+                        continue;
+                    }
+                    let slip = self.slip.get(inner, *column)?;
+                    if slip.is_zero() {
+                        continue;
+                    }
+                    total += coefficient * slip;
+                }
+                pulled[row * support.len() + at] = total;
+            }
+        }
+        for row in support.iter() {
+            for (other, column) in support.iter().enumerate() {
+                let mut total = Rat::zero();
+                for inner in 0..extent {
+                    let left = self.slip.get(inner, *row)?;
+                    if left.is_zero() {
+                        continue;
+                    }
+                    let right = &pulled[inner * support.len() + other];
+                    if right.is_zero() {
+                        continue;
+                    }
+                    total += left * right;
+                }
+                if total.is_zero() {
+                    continue;
+                }
+                *accumulated
+                    .entry((*row, *column))
+                    .or_insert_with(Rat::zero) += &self.weight * total;
+            }
+        }
+        Ok(())
+    }
+
+    /// **This face's own term of the assembled form, `w_f ⟨J_f v, D_f J_f v⟩`.**
+    ///
+    /// The summand that [`ContactDissipation::assemble`]'s second clause adds up. It is read from
+    /// the face's declared slip and response, never from the assembled body, so comparing the two
+    /// is a real cross-examination of the accumulation rather than a restatement of it.
+    fn weighted_power_under(
+        &self,
+        motion: &[Rat],
+        support: &[usize],
+    ) -> Result<Rat, InteractionRefusal> {
+        let extent = self.slip_extent();
+        let mut slip = vec![Rat::zero(); extent];
+        for (row, value) in slip.iter_mut().enumerate() {
+            for column in support {
+                let entry = self.slip.get(row, *column)?;
+                if entry.is_zero() {
+                    continue;
+                }
+                *value += entry * &motion[*column];
+            }
+        }
+        let mut total = Rat::zero();
+        for row in 0..extent {
+            if slip[row].is_zero() {
+                continue;
+            }
+            let mut response = Rat::zero();
+            for (inner, value) in slip.iter().enumerate() {
+                if value.is_zero() {
+                    continue;
+                }
+                response += self.response.at(row, inner) * value;
+            }
+            total += &slip[row] * response;
+        }
+        Ok(&self.weight * total)
+    }
+
+    /// Whether `D_f J_f v = 0` — this face dissipates nothing at all under the motion `v`.
+    ///
+    /// The clause the construction owes: a motion in the kernel of the assembled form must be one
+    /// every face is blind to, because the assembled quadratic form is a sum of nonnegative terms.
+    fn response_is_blind_to(
+        &self,
+        motion: &[Rat],
+        support: &[usize],
+    ) -> Result<bool, InteractionRefusal> {
+        let extent = self.slip_extent();
+        let mut slip = vec![Rat::zero(); extent];
+        for (row, value) in slip.iter_mut().enumerate() {
+            for column in support {
+                let entry = self.slip.get(row, *column)?;
+                if entry.is_zero() {
+                    continue;
+                }
+                *value += entry * &motion[*column];
+            }
+        }
+        for row in 0..extent {
+            let mut total = Rat::zero();
+            for (inner, value) in slip.iter().enumerate() {
+                if value.is_zero() {
+                    continue;
+                }
+                total += self.response.at(row, inner) * value;
+            }
+            if !total.is_zero() {
+                return Ok(false);
+            }
+        }
+        Ok(true)
+    }
+
     /// **The same face, re-declared on a wider chart.**
     ///
     /// [definition] Column `i` of this face's slip map is placed at joint coordinate
@@ -671,24 +861,70 @@ impl ContactFace {
 // 3. the assembled contact dissipation
 // ===============================================================================================
 
+/// **How the assembled signature was obtained.** Carried on the value, never inferred by a reader.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub enum SignatureScope {
+    /// The symmetric congruence elimination of [`crate::inertia::inertia`], at or below
+    /// [`DECLARED_ASSEMBLY_CONGRUENCE_CEILING`]. The assembly's own arithmetic is what was checked.
+    Congruence,
+    /// Above that ceiling: `negative = 0` because the assembly is positive semidefinite **by
+    /// construction**, and `positive` is the certified rank of the assembled form. The construction
+    /// is checked, not asserted — see [`ContactDissipation::assemble`].
+    ConstructionAndCertifiedRank {
+        /// The prime chart whose nonzero minor gave `rank ≥ positive`.
+        minor_modulus: u64,
+        /// The faces whose own positive weight and certified response discharged the sign claim.
+        faces: usize,
+    },
+}
+
 /// **`M_contact = Σ_f w_f J_fᵀ D_f J_f`, with its certified signature.**
 ///
 /// [proved-derived; implemented-exact] This is the carrier plan's derived configuration-space
-/// dissipation form. Its positive semidefiniteness is the Lean owner's `contactForm_nonneg` and
-/// is **certified here** through [`crate::inertia::inertia`] rather than inherited from the
-/// faces' own certificates: the assembly is where exact arithmetic could go wrong, so that is
-/// where it is checked.
+/// dissipation form. Its positive semidefiniteness is the Lean owner's `contactForm_nonneg`.
+/// At or below [`DECLARED_ASSEMBLY_CONGRUENCE_CEILING`] it is **certified here** through
+/// [`crate::inertia::inertia`] rather than inherited from the faces' own certificates: the
+/// assembly is where exact arithmetic could go wrong, so that is where it is checked. Above that
+/// ceiling the congruence is the thing that cannot run, and what replaces it is stated on
+/// [`SignatureScope`] and checked in [`Self::assemble`] — not dropped.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct ContactDissipation {
     lineage: String,
     dimension: usize,
     form: SymmetricForm,
     signature: Inertia,
+    signature_scope: SignatureScope,
     faces: Vec<ContactFace>,
 }
 
 impl ContactDissipation {
-    /// Assemble the dissipation form from a face population declared over one chart.
+    /// **Assemble the dissipation form from a face population declared over one chart, sparsely.**
+    ///
+    /// [definition] The bound this checks before allocating is the arithmetic the assembly
+    /// **performs**, not the arithmetic a dense presentation of it would perform. A face's slip map
+    /// `J_f` is supported on the joint coordinates it actually touches — six for a bar between two
+    /// three-dimensional occurrences — so `J_fᵀ D_f J_f` is supported on `support_f × support_f`
+    /// entries whatever the joint dimension is, and the assembly costs
+    ///
+    /// ```text
+    /// Σ_f slip_extent_f · support_f²        instead of        faces · slip · dimension².
+    /// ```
+    ///
+    /// **No ceiling moved.** [`DECLARED_ASSEMBLY_CEILING`] is unchanged at `2^26` and still bounds
+    /// both the arithmetic above *and* the assembled form's own `dimension²` residency, each
+    /// checked before the first entry is formed. What changed is that the quantity checked against
+    /// it is the one the operation actually has. At the 612-coordinate extent Issue #50 records as
+    /// refused, a bar face has `slip_extent = 1` and `support = 6`, so the dense bound charges
+    /// `612² = 374_544` per face and the ceiling admits **179 faces**, while the assembly performs
+    /// `36` per face and the same ceiling admits **1.8 million** — and the assembled form itself is
+    /// `374_544` entries, comfortably inside. A dense population, where every face touches every
+    /// coordinate, has `support = dimension` and reaches exactly the bound it always did; the test
+    /// `a_dense_face_population_still_meets_the_unchanged_ceiling` holds that.
+    ///
+    /// **One assembled form per reading.** The accumulation runs once into one sparse body; the
+    /// previous form built a full `dimension × dimension` matrix per face and added it, which is
+    /// `faces` dense allocations and `faces × dimension²` rational additions of which all but
+    /// `faces × support²` were adding zero to zero.
     pub fn assemble(
         lineage: impl Into<String>,
         dimension: usize,
@@ -702,14 +938,6 @@ impl ContactDissipation {
         }
         bounded("a contact chart dimension", dimension, DECLARED_MODE_CEILING)?;
         bounded("a contact face population", faces.len(), DECLARED_FACE_CEILING)?;
-        let widest = faces.iter().map(ContactFace::slip_extent).max().unwrap_or(1);
-        // The triple product below is `faces × slip × dimension²`; the whole of it is bounded
-        // before the first entry is formed.
-        bounded_product(
-            "a contact assembly",
-            &[faces.len().max(1), widest, dimension, dimension],
-            DECLARED_ASSEMBLY_CEILING,
-        )?;
         for face in &faces {
             if face.dimension() != dimension {
                 return Err(InteractionRefusal::WidthDisagrees {
@@ -719,14 +947,52 @@ impl ContactDissipation {
                 });
             }
         }
-        let mut assembled = ExactRatMatrix::zero(dimension, dimension)?;
-        for face in &faces {
-            assembled = assembled.add(&face.face_form()?)?;
+
+        // Each face's own support, read off its slip map rather than declared. The whole of the
+        // arithmetic and the whole of the residency are bounded before the first entry is formed.
+        let supports: Vec<Vec<usize>> = faces
+            .iter()
+            .map(ContactFace::support)
+            .collect::<Result<_, _>>()?;
+        let mut arithmetic = 0usize;
+        for (face, support) in faces.iter().zip(&supports) {
+            let block = bounded_product(
+                "a contact face's sparse block",
+                &[face.slip_extent(), support.len(), support.len()],
+                DECLARED_ASSEMBLY_CEILING,
+            )?;
+            arithmetic = arithmetic
+                .checked_add(block)
+                .ok_or(InteractionRefusal::WorkOverflows {
+                    what: "a contact assembly",
+                })?;
+            bounded("a contact assembly", arithmetic, DECLARED_ASSEMBLY_CEILING)?;
         }
+        bounded_product(
+            "an assembled contact form",
+            &[dimension, dimension],
+            DECLARED_ASSEMBLY_CEILING,
+        )?;
+
+        // One assembled body, accumulated into once per face and only where the face reaches.
+        let mut accumulated: BTreeMap<(usize, usize), Rat> = BTreeMap::new();
+        for (face, support) in faces.iter().zip(&supports) {
+            face.accumulate_into(support, &mut accumulated)?;
+        }
+        let mut rows = vec![vec![Rat::zero(); dimension]; dimension];
+        for ((row, column), value) in accumulated {
+            rows[row][column] = value;
+        }
+        let assembled = ExactRatMatrix::shaped(dimension, dimension, rows)?;
         // `from_rows` refuses an asymmetric matrix, so this conversion *is* the symmetry check on
         // the assembled sum; it is not a cast.
         let form = matrix_form(&assembled)?;
-        let signature = inertia(&form);
+
+        let (signature, signature_scope) = if dimension <= DECLARED_ASSEMBLY_CONGRUENCE_CEILING {
+            (inertia(&form), SignatureScope::Congruence)
+        } else {
+            Self::constructed_signature(&lineage, &assembled, &faces, &supports)?
+        };
         if !signature.is_positive_semidefinite() {
             return Err(InteractionRefusal::AssemblyNotPositiveSemidefinite {
                 lineage,
@@ -739,8 +1005,130 @@ impl ContactDissipation {
             dimension,
             form,
             signature,
+            signature_scope,
             faces,
         })
+    }
+
+    /// **The complete signature above the congruence ceiling, and what discharges each part.**
+    ///
+    /// [proved-derived] `negative = 0` is the **construction**: `vᵀ M v = Σ_f w_f ⟨J_f v, D_f J_f v⟩`
+    /// with every `w_f > 0` and every `D_f` positive semidefinite, both already checked at
+    /// [`ContactFace::declared`] and re-read here. `positive` is the **certified rank** of `M`
+    /// through [`crate::prime_image_algebra`], which exhibits `dimension − rank` independent
+    /// rational kernel vectors checked against `M` over ℚ and a nonzero modular minor of that rank.
+    /// `zero = dimension − positive` then follows, because a semidefinite form's nullity is its
+    /// corank.
+    ///
+    /// **And the construction is checked, not asserted — by two clauses, because one is not
+    /// enough.** `M v = 0` forces `Σ_f w_f ⟨J_f v, D_f J_f v⟩ = 0`, a sum of nonnegative terms, so
+    /// every term must vanish — which for a semidefinite `D_f` means `D_f J_f v = 0` at *every*
+    /// face. That per-face identity is checked on every exhibited kernel vector.
+    ///
+    /// [counterexample; agent-inferred] **That clause alone cannot see a doubled face**, and the
+    /// earlier wording here claimed it could. For a sum of positive semidefinite terms
+    /// `ker M = ⋂_f ker(w_f J_f* D_f J_f)` exactly, because `⟨v, T v⟩ = 0 ⟺ T v = 0` for
+    /// semidefinite `T`. Accumulating one face's term twice repeats a kernel that already contains
+    /// the intersection, so **the kernel, the rank and therefore the whole returned signature are
+    /// unchanged** while [`Self::matrix`] and [`Self::power`] carry a double-counted stiffness. The
+    /// blindness clause tests only `ker M ⊆ ⋂_f ker(term_f)`; a dropped or misplaced face enlarges
+    /// the kernel and fires it, a doubled one does not.
+    ///
+    /// The second clause closes that: the assembly's defining identity
+    /// `⟨v, M v⟩ = Σ_f w_f ⟨J_f v, D_f J_f v⟩` is checked on a declared probe family
+    /// ([`DECLARED_ASSEMBLY_PROBES`]), which is linear in the face population rather than quadratic
+    /// in the dimension — a scaled, doubled or dropped contribution fails it at the first probe it
+    /// does not vanish on. It is a probe family and not a proof: polarization over a whole basis
+    /// would determine the form outright and costs exactly the dense work this scope exists to
+    /// avoid. Inferred from that cost, and from the congruence path below the ceiling remaining the
+    /// complete reading.
+    fn constructed_signature(
+        lineage: &str,
+        assembled: &ExactRatMatrix,
+        faces: &[ContactFace],
+        supports: &[Vec<usize>],
+    ) -> Result<(Inertia, SignatureScope), InteractionRefusal> {
+        for face in faces {
+            if !face.weight.is_positive() || !face.response_inertia.is_positive_semidefinite() {
+                return Err(InteractionRefusal::AssemblyNotPositiveSemidefinite {
+                    lineage: lineage.to_owned(),
+                    positive: face.response_inertia.positive,
+                    negative: face.response_inertia.negative,
+                });
+            }
+        }
+        let certificate = crate::prime_image_algebra::certified_kernel(assembled).map_err(|_| {
+            InteractionRefusal::DeclarationAboveCeiling {
+                what: "a certified assembly rank",
+                declared: assembled.columns(),
+                ceiling: DECLARED_ASSEMBLY_CEILING,
+            }
+        })?;
+        let dimension = assembled.columns();
+        let rank = certificate.rank();
+        for motion in certificate.kernel() {
+            for (face, support) in faces.iter().zip(supports) {
+                if !face.response_is_blind_to(motion, support)? {
+                    return Err(InteractionRefusal::AssemblyNotPositiveSemidefinite {
+                        lineage: lineage.to_owned(),
+                        positive: rank,
+                        negative: 0,
+                    });
+                }
+            }
+        }
+        for probe in 0..DECLARED_ASSEMBLY_PROBES {
+            let vector: Vec<Rat> = (0..dimension)
+                .map(|slot| {
+                    // A declared deterministic probe: no sampler, no seed, no float, and the same
+                    // family on every run so a failure is reproducible from the lineage alone.
+                    Rat::from_integer(num_bigint::BigInt::from(
+                        i64::try_from((slot * 7 + probe * 5) % 11).unwrap_or(0) - 5,
+                    ))
+                })
+                .collect();
+            let mut through_the_form = Rat::zero();
+            for row in 0..dimension {
+                if vector[row].is_zero() {
+                    continue;
+                }
+                let mut row_total = Rat::zero();
+                for column in 0..dimension {
+                    if vector[column].is_zero() {
+                        continue;
+                    }
+                    row_total += assembled.get(row, column)? * &vector[column];
+                }
+                through_the_form += &vector[row] * row_total;
+            }
+            let mut through_the_faces = Rat::zero();
+            for (face, support) in faces.iter().zip(supports) {
+                through_the_faces += face.weighted_power_under(&vector, support)?;
+            }
+            if through_the_form != through_the_faces {
+                return Err(InteractionRefusal::AssemblyDoesNotCarryItsFaces {
+                    lineage: lineage.to_owned(),
+                    probe,
+                    faces: faces.len(),
+                });
+            }
+        }
+        Ok((
+            Inertia {
+                positive: rank,
+                negative: 0,
+                zero: dimension - rank,
+            },
+            SignatureScope::ConstructionAndCertifiedRank {
+                minor_modulus: certificate.minor().0,
+                faces: faces.len(),
+            },
+        ))
+    }
+
+    /// Which of the two readings the signature came from.
+    pub fn signature_scope(&self) -> &SignatureScope {
+        &self.signature_scope
     }
 
     pub fn lineage(&self) -> &str {

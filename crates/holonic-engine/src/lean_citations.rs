@@ -350,6 +350,11 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             "holonic_chain.rs",
             "Transport/HolonicChain.lean",
         ),
+        (
+            include_str!("identity_atlas.rs"),
+            "identity_atlas.rs",
+            "Geometry/TwoSidedIdentityAtlas.lean",
+        ),
     ]
 }
 
@@ -500,7 +505,11 @@ fn collect_rust_sources(directory: &Path, into: &mut Vec<PathBuf>) {
 /// Every `Foundation/<File>.lean::<Name>` or `Transport/<File>.lean::<Name>` citation in a source.
 fn inline_citations(source: &str) -> Vec<(String, String)> {
     let mut found = Vec::new();
-    for prefix in ["Foundation/", "Transport/", "Physics/"] {
+    // `Geometry/` joined the scan when `identity_atlas` paired with
+    // `Geometry/TwoSidedIdentityAtlas.lean`; a directory absent from this list is a hole in the
+    // check, not an exemption, and `jet_staircase`'s `Geometry/SixSphereMonodromy.lean::M0` was
+    // already being carried unchecked.
+    for prefix in ["Foundation/", "Transport/", "Physics/", "Geometry/"] {
         let mut rest = source;
         while let Some(at) = rest.find(prefix) {
             let tail = &rest[at..];

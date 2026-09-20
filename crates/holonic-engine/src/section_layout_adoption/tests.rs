@@ -271,3 +271,138 @@ fn compare_generated_scatter(adopt_engine_context: bool) {
         engine.radius,
     );
 }
+
+// ---------------------------------------------------------------------------------------------
+// Issue #50: the two obstacles, exhibited rather than asserted
+// ---------------------------------------------------------------------------------------------
+
+/// **`SharedLocalOperator`, exhibited.** Two bar faces on one joint chart, with different
+/// directions and therefore different local blocks. `SectionLayout::assemble_dense` assembles
+/// `Σ_r P_rᵀ L P_r` with one shared `L`, and the test shows that **neither** face's own block,
+/// used as that shared `L`, produces the true `Σ_f L_f` — which is what `SharedLocalOperator`
+/// says and is why the sparse contact assembly cannot be placed through this boundary as it
+/// stands.
+///
+/// The ring is `Z/(2^61 - 1)`, the one `SectionKernels` realizes; the two blocks are built from
+/// small nonnegative integers, so every coefficient is its own canonical residue and the
+/// comparison is a comparison of integers rather than of folds.
+#[test]
+fn the_shared_local_operator_cannot_carry_two_faces_with_different_blocks() {
+    use mount::{AccumulationLaw, CheckedIntegers, ExactRing, IncidenceDeclaration, LocalOperator, ScatterRequest, SectionLayout};
+
+    // A joint chart of three coordinates; face 0 reaches coordinates {0, 1}, face 1 reaches
+    // {1, 2}. One region per face, each two slots wide.
+    const EXTENT: usize = 3;
+    const WIDTH: usize = 2;
+    let incidence = IncidenceDeclaration::uniform(EXTENT, WIDTH, vec![0, 1, 1, 2])
+        .expect("a lawful two-region incidence");
+    let layout = SectionLayout::generate(incidence, ScatterRequest::Accumulated(AccumulationLaw::IntegerAdd)).expect("the layout generates");
+    let ring = CheckedIntegers;
+
+    // `L_0 = J_0ᵀ J_0` for the slip covector `J_0 = (1, -1)` on its support, and `L_1` for
+    // `J_1 = (2, 3)` on its own. They are different tables, which is the whole point.
+    let block_zero = LocalOperator::dense(WIDTH, vec![1, -1, -1, 1]).expect("a 2x2 block");
+    let block_one = LocalOperator::dense(WIDTH, vec![4, 6, 6, 9]).expect("a 2x2 block");
+
+    // The true assembly `Σ_f P_fᵀ L_f P_f`, written out by hand at the three joint coordinates.
+    //   face 0 at {0,1}: [[1,-1],[-1,1]]      face 1 at {1,2}: [[4,6],[6,9]]
+    let truth: Vec<i64> = vec![
+        1, -1, 0, //
+        -1, 1 + 4, 6, //
+        0, 6, 9,
+    ];
+
+    let with_zero = layout
+        .assemble_dense(&ring, &block_zero, EXTENT * EXTENT)
+        .expect("the shared assembly returns");
+    let with_one = layout
+        .assemble_dense(&ring, &block_one, EXTENT * EXTENT)
+        .expect("the shared assembly returns");
+    assert_ne!(
+        with_zero, truth,
+        "one shared operator taken from face 0 does not assemble the two-face form"
+    );
+    assert_ne!(
+        with_one, truth,
+        "and neither does one taken from face 1"
+    );
+
+    // And the obstacle is *only* the sharing: with one region the generated assembly is exact.
+    let single = IncidenceDeclaration::uniform(EXTENT, WIDTH, vec![0, 1])
+        .expect("a lawful one-region incidence");
+    let single = SectionLayout::generate(single, ScatterRequest::Injective).expect("the layout generates");
+    assert_eq!(
+        single
+            .assemble_dense(&ring, &block_zero, EXTENT * EXTENT)
+            .expect("assembled"),
+        vec![1, -1, 0, -1, 1, 0, 0, 0, 0],
+        "one face is an instance of the generated assembly identity exactly"
+    );
+    let _ = ring.law();
+
+    let (operation, clause) = GeneratedTileObstacle::SharedLocalOperator.declared();
+    assert!(operation.contains("ContactDissipation::assemble"));
+    assert!(clause.contains("shared by every region"));
+}
+
+/// **`PivotSweepIsBilinear`, stated against the signature that makes it true.**
+///
+/// The claim is about a *type*, not about a value: `apply_local_reference` takes the operator by
+/// reference before the call and the tile by mutable reference, so the coefficient the apply
+/// multiplies by cannot depend on the field. The test below holds that shape: applying any fixed
+/// local operator to a gathered tile is linear in the tile, so it maps zero to zero and respects
+/// addition — and a pivot update does neither, because `a_ij − a_ik · a_kj` is quadratic in the
+/// field it reads.
+#[test]
+fn a_fixed_local_apply_is_linear_in_the_field_and_a_pivot_update_is_not() {
+    use mount::{AccumulationLaw, CheckedIntegers, IncidenceDeclaration, LocalOperator, ScatterRequest, SectionLayout};
+
+    const EXTENT: usize = 4;
+    const WIDTH: usize = 2;
+    let incidence = IncidenceDeclaration::uniform(EXTENT, WIDTH, vec![0, 1, 2, 3])
+        .expect("a lawful incidence");
+    let layout = SectionLayout::generate(incidence, ScatterRequest::Accumulated(AccumulationLaw::IntegerAdd)).expect("the layout generates");
+    let ring = CheckedIntegers;
+    let operator = LocalOperator::dense(WIDTH, vec![1, -1, 0, 1]).expect("a 2x2 block");
+
+    let left: Vec<i64> = vec![3, 5, 7, 11];
+    let right: Vec<i64> = vec![-2, 4, 1, 0];
+    let sum: Vec<i64> = left.iter().zip(&right).map(|(a, b)| a + b).collect();
+
+    let apply = |x: &[i64]| {
+        layout
+            .apply_reference(&ring, &operator, x)
+            .expect("the reference apply returns")
+    };
+    let zeros = vec![0i64; EXTENT];
+    assert_eq!(apply(&zeros), zeros, "a fixed local apply maps zero to zero");
+    let additive: Vec<i64> = apply(&left)
+        .iter()
+        .zip(apply(&right))
+        .map(|(a, b)| a + b)
+        .collect();
+    assert_eq!(apply(&sum), additive, "and it respects addition: it is linear");
+
+    // The pivot update the modular elimination performs, on the same field: `x_1 -= x_0 * x_1`
+    // is the shape of `a_ij -= m_i * a_kj`, and it is neither of the two.
+    let pivot = |x: &[i64]| -> Vec<i64> {
+        let mut out = x.to_vec();
+        out[1] -= x[0] * x[1];
+        out
+    };
+    assert_eq!(pivot(&zeros), zeros);
+    let pivot_additive: Vec<i64> = pivot(&left)
+        .iter()
+        .zip(pivot(&right))
+        .map(|(a, b)| a + b)
+        .collect();
+    assert_ne!(
+        pivot(&sum),
+        pivot_additive,
+        "the pivot update is bilinear in the field it reads, so no fixed local operator is it"
+    );
+
+    let (operation, clause) = GeneratedTileObstacle::PivotSweepIsBilinear.declared();
+    assert!(operation.contains("PrimeImage::reduce"));
+    assert!(clause.contains("linear in one gathered operand"));
+}

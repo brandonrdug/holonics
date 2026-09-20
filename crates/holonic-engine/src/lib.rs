@@ -132,6 +132,14 @@ pub mod collocation;
 // glob-exported: `ItemId`, `ReceiverId` and `Observation` reach it from
 // `receiver_exact_compression` and collide at the crate root.
 pub mod conditioned_derivation;
+// The conditioned static response **#55**: a declared elastic energy `K = J* W J` with its
+// stiffness and units, a declared forcing `f = B u`, the full kernel `Z` of `K` — internal floppy
+// modes and not only the rigid motions — a declared gauge, and the oriented pairwise-quadrance
+// receiver its displacement is read through. Declared and not glob-exported: `ElasticDeclaration`,
+// `NullFibre`, `StaticResponse` and `OrientedAgreement` are local to this consumer, and
+// `DeclaredMetric` would collide with the metric names already at the crate root. Contract:
+// `docs/plans/THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-conditioned-structural-response-consumer`.
+pub mod conditioned_static_response;
 pub mod conic;
 /// The continuing tower carrier: faces over a refinement order, the gluing trichotomy, and the
 /// non-invertible transition that carries its residual. Paired with
@@ -311,6 +319,13 @@ pub mod holonic_complex;
 // `formal/elementary-holonics/ElementaryHolonics/Transport/HolonicInteraction.lean`.
 pub mod holonic_interaction;
 pub mod image;
+// The identities of a configuration are the kernel of its face map: exact kernel discovery over a
+// declared receiver family, certification by exact substitution on every declared chart, Buchberger
+// closure of the ideal the certified generators generate, and collapse comparison. Declared, never
+// glob-exported: it names `ExactMultivariate`, `Configuration` and `walk`, which are general words
+// this crate already spends elsewhere. Paired with
+// `formal/elementary-holonics/ElementaryHolonics/Geometry/TwoSidedIdentityAtlas.lean`.
+pub mod identity_atlas;
 pub mod implicit;
 // Sylvester's law of inertia over exact rationals: the signature of a symmetric form, which is the
 // only way a positivity claim in this body can be a claim about material rather than about the
@@ -675,3 +690,9 @@ pub use simplicial::*;
 pub use tube::*;
 pub use wave_propagation::*;
 pub use world::*;
+
+// Issue #50: one certificate-bearing rank/kernel/solve reached through bounded prime charts, with
+// rational reconstruction and an exact verification owning the return. `exact_linear`'s public API
+// routes through it above a declared extent; the certificate types are reachable here for a
+// consumer that wants the witness rather than only the value.
+pub mod prime_image_algebra;
