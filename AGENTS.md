@@ -117,6 +117,13 @@ recorded scope. Use [Soulkiller](docs/SOULKILLER.md), [Athena](docs/ATHENA.md),
 [architecture](docs/ARCHITECTURE.md) and [interoperability](docs/INTEROPERABILITY.md) for those interfaces.
 Preserve existing `hna` API/wire identifiers and historical names.
 
+[project-postulate] Use the [musical composition vocabulary](docs/HOLONIC_NOTATION.md#notes-chords-quartets-and-octets)
+for the actual modal ensembles: notes, chords, quartets and octets carry relative phase,
+joining and receiving structure. Derive the retained grain from those interactions and their
+future receivers before selecting storage dimensions. The
+[composition guide](docs/HNN_COMPOSITION.md#derive-the-grain-from-the-interaction-and-receiver)
+connects chord classes, joint descent, the derived torus modes and dynamic interior return.
+
 [established-bounded; source-inspected] `GeometricRegions` currently uses alphabet-derived
 channels, unit-current inputs/targets and per-slot basis decoding. It is a numerical application
 control; `HelicalMomentReuse` is a separate caller. The next encoder/decoder work follows the

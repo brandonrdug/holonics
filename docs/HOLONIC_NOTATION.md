@@ -102,6 +102,26 @@ orientability is a reading of the continuing object at a station, not a fixed at
 configuration can be unoriented, become oriented under a frame, and acquire or lose a twisted
 loop as contacts form.
 
+## Notes, chords, quartets and octets
+
+[project-postulate] Brandon's September 20 terminology preference places musical and geometric
+composition in the working language. Use **note** for a situated modal contribution and **chord**
+for a co-present composition where those meanings fit; **quartet** and **octet** name four or eight
+participating constituents of the described ensemble. Their amplitude, relative phase, voicing,
+clock, incidence and receiving frame give the terms mathematical content. Legacy machine storage
+widths are stated literally as four-bit or eight-bit fields.
+
+[definition] In a declared linear mode chart, `|C⟩=Σ_j a_j|n_j⟩` carries the coherent
+contributions before `⟨r|C⟩` is read. A general interacting chord carries its joint occurrence
+and constitutive law, including shared sources; it need not reduce to a linear sum. A chord-class
+receiver can identify a reusable class while its performances retain different phase, timing
+and spatial faces. A progression is an ordered composition of passages with actual joins.
+The number of constituents alone specifies neither that composition nor a storage representation.
+The [class/occurrence construction](../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md#class-composed-occurrence-and-progression)
+and [music/receiver synthesis](../research/records/2026-09-14_HEAR_THE_MUSIC_SITUATED_RELEASE_AND_SELF_MOTION.md#hear-the-chord-the-interval-and-the-progression)
+supply the existing source, and [HNN composition](HNN_COMPOSITION.md#derive-the-grain-from-the-interaction-and-receiver)
+connects it to the continuing machine.
+
 ## The same form in every subject
 
 [project-postulate] Mathematics, physics, biology, language and code are materials carried by one

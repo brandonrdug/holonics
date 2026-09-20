@@ -203,6 +203,57 @@ are not an independent context-extraction stage or a prerequisite to every kind 
 Inspect the actual lattice/field conduct and output; use the dynamic reflection defect when
 encoding it. The roadmap and blueprint retain the concrete implementation order and bindings.
 
+## Derive the grain from the interaction and receiver
+
+[project-postulate] Brandon's September 20 breadth correction governs the construction's starting
+point. Notes, chords, quartets and octets refer to the participating modal/compositional objects
+at their stated scope. Begin with their situated source, material, interaction, clocks and receiver;
+derive the retained degrees of freedom and their action; then realize that chart in Rust and on
+the device. A machine word width or alphabet cardinality is a presentation choice.
+
+[definition] A reusable chord class and a performance are different receivers of a source.
+Voicing, timing, phase, instrument and spatial coupling can vary behind one class face. A
+progression also retains its ordered joining. In a coherent linear chart, receiving a sum gives
+`|Σu_j|²=Σ|u_j|²+2 Re Σ_(j<k) conjugate(u_j)u_k`; separate magnitudes omit those cross terms.
+The [music synthesis](../research/records/2026-09-14_HEAR_THE_MUSIC_SITUATED_RELEASE_AND_SELF_MOTION.md)
+works this through active receiver motion, spatial hearing and predictive release. Its source
+class does not require identifying one unique historical performance before useful inference.
+
+[proved-derived; formal-checked] A receiving family defines which differences may be collapsed.
+For additive transport the exact criterion is preservation of its joint blind subgroup
+(`JointReceiverDescent.joint_generator_descends_iff`). `ReceiverHistoryCompression` then extends
+the generator square through ordered words without enumerating all histories. The executable
+`KernelModeReduction` retains mass and weighted currents before normalization and returns a
+source-null separator if the source action does not descend. A per-coordinate winning label
+is one projected face; its future sufficiency still belongs to this relation.
+
+[established-bounded; source-inspected] The [clocked torus construction](../research/records/2026-09-08_CLOCKED_TORUS_CURRENTS_CONTINUE_THROUGH_A_RETAINED_FIBRE.md)
+already demonstrates derived grain. Four cut coordinates and two active face coordinates give
+`j=Jq+Dz+r`, `Cr=Dᵀr=0`. The number six follows from the actual `[J D]` rank, while active Gram
+modes 3 and 5 follow from `DᵀD=[[4,1],[1,4]]`. Under its specified varying-material law,
+`q'=q+u`, `(I+τMG)z'=z+f−τMHq'`, `r'=r`. This is a reusable source/receiver reduction with a
+retained interior; it prescribes neither six universal HNN channels nor a byte-derived grain.
+The native field also has `condense_shared_drive_mode`, whose equal-drive difference advances
+by the descended `−1` action. Compression has existing formal, exact and resident realizations.
+
+[proved-derived] A receiving Holon participates through `y=ρ(x_S,x_R,t)`, giving
+`y_dot=D_Sρ F_S+D_Rρ F_R+∂_tρ`. A changing-frame interpretation transports both the current and
+receiver. Physical receiver motion changes the interaction. The
+[reflected interior law](FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md#elimination-retains-the-boundarys-dynamical-memory)
+likewise retains `r_dot=(D−KB)r+(C+DK−KA−KBK−K_dot)x+g−Kf`.
+These are concrete source, receiver and memory terms to compose; a fixed output projection or
+persistent material matrix alone does not instantiate the full continuing relation.
+
+[established-bounded; source-inspected] In the September 20 control, `geometric_extents` derives
+widths from the alphabet; `prepare_geometric` flattens the supplied context into symbol positions;
+`NativeFieldSession::found` founds a repeated unit junction/material chart at those widths.
+`geometric_word` then uses real analytic incidence and complex phase transport. Its producing
+carriers and paired derivative retain quadratures during the word. The shortcomings are the
+unformed source/receiver encoding, restricted constitutive assembly and uncommitted global
+continuing current; they are not an absence of all geometric or complex arithmetic.
+The [campaign review](../research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md#breadth-review-the-mathematical-object-precedes-the-runtime-chart)
+records the original direction and the mathematical comparisons behind this assessment.
+
 ## Holonic Encoding
 
 [definition] **Holonic Encoding** names the situated formation and reuse of causal

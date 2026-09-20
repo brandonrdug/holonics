@@ -184,10 +184,12 @@ the action and metric needed for each extension.
 | Cost, mass and tolerance | `ReceiverCodeCost`, `presentation_cost`, `AttentionModeCompression`, `AccumulatedReceiverDefect`; retain encoding/decoder work, complete class mass and transported residuals |
 
 [proved-derived] A useful helical compression bridge can be written now. For two situated initial
-configurations let `y=(x_a,x_b,1)` and let each admitted finite affine motion act on its own
-homogeneous four-vector. Their quadrance is a quadratic receiver `Q=yᵀS y`, with the spatial
-block `S=[[I,−I],[−I,I]]`; the initial moment is symmetric rank one and its two homogeneous
-coordinates are fixed to one. The product-current identity `Z=y⊗y` and its finite transport are
+configurations let `y=(x_a,1,x_b,1)` be the eight-coordinate concatenation of their two
+homogeneous four-vectors. Each admitted finite affine motion acts on its corresponding block.
+Their quadrance is `Q=yᵀS_h y`, where `S_h` embeds the six-coordinate spatial receiver
+`S=[[I,−I],[−I,I]]` at indices `(0,1,2,4,5,6)` and has zero rows/columns at the two homogeneous
+positions `(3,7)`. The initial moment is symmetric rank one and both homogeneous coordinates
+are fixed to one. The product-current identity `Z=y⊗y` and its finite transport are
 the existing moment receiver's source relation. An invariant receiving row space supplies an exact
 reduced recurrence. This does not derive an exponential from a screw generator: a finite map is
 accepted only as an exact proper affine action supplied by the caller, and a phase label is bound

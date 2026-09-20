@@ -325,3 +325,96 @@ Increasing exposure around unchanged disconnected support does not address this 
 owns the variation when incidence/D changes; #18 owns a factor/locality realization where the
 measured normal-statistic or validated-rest cost requires it. The helical moment adapter already
 returns its linear moment restriction; it does not prove closure of this nonlinear word.
+
+## Breadth review: the mathematical object precedes the runtime chart
+
+[project-postulate] Brandon's next correction asks for careful mathematical breadth and prefers
+notes, chords, quartets and octets when those describe the actual construction. The problem is
+how the work was conceived, not merely its terminology. This review follows the existing
+Holon/notation, musical class/occurrence, clocked torus, phase/landmark, joint compression,
+constitutive/receiver and reflected-interior sources before returning to the application code.
+
+[established-bounded; source-inspected] The primary re-opened eleven original user messages:
+Codex task `01a0a067-40b7-7420-9d7c-78a34b558023`, lines 410, 738, 2550, 4052, 5871, 7515,
+11607 and 13720 (September 14–19); Claude session `b54c405b-ee36-4f84-b16c-a1d76d400170`,
+lines 723, 967 and 1008 (September 19). Roles, message identifiers, timestamps and complete text
+were inspected at those original locations; raw extracts remain private. The older recovered
+index supplied discovery coordinates, not original-message verification or an exhaustive month
+census. These messages ask for modality-general release, high-level Holonic operations, active
+relativistic receivers, continuing plates/material, and the general knot/tori embedding object.
+The musical analogy is explicitly about that shared object, not a separate audio application.
+
+[historical; source-inspected] The relevant history already includes the August compression and
+landmark work, `b1010d49` (clocked torus and retained fibre, September 8), `9f237c9d` (Holonic
+Encoding, September 11), `2f196939` (mass-preserving attention/mode compression, September 12),
+`c4dff43c` (mass-energy/Maxwell transport), `e0b6bf90` (Swing/fluid/interior stress), and
+`173855f7` (active receiver motion, September 14). These dependencies precede the campaign.
+They are construction material to consume, not subjects awaiting rediscovery.
+
+### Mathematical consequences recovered from that breadth
+
+| Source family | Concrete relation and its meaning for this work |
+|---|---|
+| [Holonic notation](../../docs/HOLONIC_NOTATION.md) and [Holon](../../docs/HOLON.md) | A ket is a construction, a bra is its receiver and a bracket is a face. A cardinality or stored coordinate does not determine the joining law. Four participating voices, a period-four orbit and two coupled pairs have different structure even where one count agrees. |
+| [Chord class, performance and progression](2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md#class-composed-occurrence-and-progression) | A reusable chord class may be understood without selecting one performance. Its fibre retains voicing, phase, timing and spatial differences that another receiver can distinguish. A chord's co-present composition and a progression's ordered passages require different joins. |
+| [Active music receiver](2026-09-14_HEAR_THE_MUSIC_SITUATED_RELEASE_AND_SELF_MOTION.md) | In a coherent resolved mode, `|Σu_j|²=Σ|u_j|²+2 Re Σ_(j<k) conjugate(u_j)u_k`. Separate magnitudes omit the interaction terms. Distinct frequencies and receiving time windows retain their own spectral/temporal conditions. |
+| [Joint receiver descent](../../formal/elementary-holonics/ElementaryHolonics/Foundation/JointReceiverDescent.lean) and [history compression](../../formal/elementary-holonics/ElementaryHolonics/Foundation/ReceiverHistoryCompression.lean) | The additive joint blind subgroup must be invariant under the admitted generators. Generator-wise commutation then preserves every ordered future receiver face without enumerating histories. A quotient keeps a compatible fibre; a decoder and its cost remain additional executable obligations. |
+| [Attention mode compression](../../formal/elementary-holonics/ElementaryHolonics/Computation/AttentionModeCompression.lean) | When the comparison kernel factors through the class map, retain each class's mass and weighted current, then normalize. `normalized_attention_exact` states the nonzero-denominator relation. Independently normalized means are not associative: the formal `0,0,4` control gives two different results under regrouping. This matters for nested ensembles. |
+| [Clocked torus/Parametron current](2026-09-08_CLOCKED_TORUS_CURRENTS_CONTINUE_THROUGH_A_RETAINED_FIBRE.md) | `j=Jq+Dz+r` derives four cut and two active-face coordinates, with `Cr=Dᵀr=0`. The active Gram matrix has modes 3 and 5; the six-dimensional image is derived from incidence, not chosen from an alphabet or universal channel count. The admitted update retains `r'=r` and the addressed clock. |
+| [Phase carrier](../../formal/elementary-holonics/ElementaryHolonics/Physics/PhaseCarrier.lean), [landmarks](../../formal/elementary-holonics/ElementaryHolonics/Millennium/LandmarksAndModuli.lean) and [Iwasawa tower](../../formal/elementary-holonics/ElementaryHolonics/Foundation/IwasawaTower.lean) | A present phase face can hide winding or quadrature; a successor can expose it. Period/modulus relations and compatible tower transitions are actual generators and quotients. Equal order or characteristic faces do not determine source modules. Growth exponents and conjectural endpoints retain their stated scope. |
+| [Helical interaction](../../docs/HELICAL_GEOMETRY.md) | Two generators, initial configurations, clocks and contact material determine the interaction. The quadrance Hessian includes `Δ·acceleration` terms, not only a Gram matrix. A finite supplied pair action and a clock-qualified screw flow are different supplied constructions. |
+| [Receiver motion and reflected interior](../../docs/FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md#elimination-retains-the-boundarys-dynamical-memory) | `y_dot=D_Sρ F_S+D_Rρ F_R+∂_tρ`; the receiver is in the interaction. With `z=Kx+r`, the interior return is `(D−KB)r+(C+DK−KA−KBK−K_dot)x+g−Kf`. A currently invisible or equilibrated interior need not stay invisible. |
+| [Mass-energy and fluid/field composition](../../docs/MASS_ENERGY_AND_CAUSAL_TRANSPORT.md) | Composite invariant mass includes the cross pairing of four-momenta, just as coherent reception retains cross terms. Hodge/pressure elimination, fluid triad interactions and Maxwell/constitutive stress carry their own source, metric and balance laws. These are reusable mathematical structures; their physical coefficients or conjecture endpoints are not supplied by a software label. |
+
+[proved-derived] A direct separator applies to the current output receiver. In a two-mode complex
+chart consider `x₊=(1/2,i)` and `x₋=(1/2,−i)`. The fixed real-centre winning-coordinate receiver
+selects coordinate 0 for both. Under the same physical quarter-turn `T x=−i x` with that receiver
+held fixed, it selects coordinate 1 for `T x₊` and coordinate 0 for `T x₋`. Thus the selected
+symbol alone does not carry the phase distinction needed by this admitted future reading.
+This exhibits the separation mechanism in `PhaseCarrier.realReceiver_null_reopens` and the
+history-compression principle; the displayed winning-coordinate example is a derived check,
+not a new Lean theorem. A common coordinate rebase would also transport the receiver and is a
+different comparison. Exact rational real/imaginary arithmetic checks this displayed example.
+
+[established-bounded; source-inspected] The current native geometric word **does** retain both
+quadratures in its transported currents and paired derivative. The separator above does not
+show that those kernels discarded phase. It shows why the selected output label is insufficient
+as a continuing encoded carrier unless the missing distinction is retained elsewhere under the
+actual future law. The present caller has no such constructed text-passage encoding binding.
+
+### The actual consuming differences
+
+[established-bounded; source-inspected] `NativeFieldSession::found` derives its root/feature
+widths from the session specification and founds repeated unit junctions, two priming passages
+and the normal reaction. `prepare_geometric` flattens the supplied context into alphabet
+positions and sets unit-coordinate currents. The separately validated analytic arcs supply the
+phase/incidence used by `geometric_word`; they do not themselves derive that unit material,
+receiver or source representation from the requested transformation family. The current readout
+is a fixed real-basis projection, and the generated global current is a preview. These exact
+call choices explain the conceptual gap more precisely than saying the code has no geometry,
+no learning or no complex arithmetic.
+
+[established-bounded; source-inspected] Useful formation and reduction owners already exist:
+`ResidentGeneratorNeighborhood` consumes `read_condition_preimage`, `prepare_contact` and
+`prepare_bilinear_contact`; `KernelModeReduction` retains mass/current and compiles descended
+source action or returns `SeparatedFibre`; `NativeConstitutiveField::condense_shared_drive_mode`
+returns the equal-drive difference's `−1` action on the resident surface. The helical moment
+caller closes receiver forms under `T* H T`. Their hypotheses and consumers determine where to
+compose them. Neither a new wrapper full of optional fields nor a new word for a storage unit
+performs that composition.
+
+[established-bounded; source-inspected] This review also corrects a concrete notation defect in
+`HELICAL_GEOMETRY`: the implemented pair uses `(x_a,1,x_b,1)` in eight homogeneous coordinates,
+not the previously written seven-coordinate `(x_a,x_b,1)`. Its two four-vector blocks describe
+two situated objects; coordinate count is not a count of notes or Holons. The eight-dimensional
+quadrance receiver has zero homogeneous rows/columns and the six-dimensional spatial difference
+block. An exact contraction check returns the same quadrance 22 in both presentations.
+
+[project-postulate] The continuing construction starts with the joint modal/compositional object
+and its actual receiver, forms the applicable transformation and retained fibre, and derives
+its native chart from that law. Generation, received comparison and economical continuation
+remain coupled at the same model owner. Approximate or partial learned constructions retain
+their stated error/family; no universal exact-inverse requirement is added. The active brief
+continues the existing source/receiver encoding work with this mathematical content. This
+breadth review changes terminology, source connections and the construction basis; it does not
+claim a newly implemented HNN encoder, learned musical model or new Lean theorem.

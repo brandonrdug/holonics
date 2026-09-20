@@ -22,6 +22,21 @@ Read [HOLON](../../docs/HOLON.md), [HNN_FORMULA](../../docs/HNN_FORMULA.md) and 
 Start in `holonics-hna::NativeCoupledBody`, `native/field_session` and the native constitutive
 field/source/current owners. The model's actual caller decides whether a helper is connected.
 
+## Notes, chords, modal ensembles and participating receivers
+
+Read [musical notation](../../docs/HOLONIC_NOTATION.md#notes-chords-quartets-and-octets),
+[the receiver holarchy](../../docs/RECEIVER_HOLARCHY.md) and
+[derived grain in the HNN composition](../../docs/HNN_COMPOSITION.md#derive-the-grain-from-the-interaction-and-receiver).
+
+- [Class, composed occurrence and progression](2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md#class-composed-occurrence-and-progression): reusable chord classes, performances, coherent phase and ordered passages.
+- [Hear the music](2026-09-14_HEAR_THE_MUSIC_SITUATED_RELEASE_AND_SELF_MOTION.md): spatial and self-motion, joint reception and source-qualified release.
+- [Clocked torus current](2026-09-08_CLOCKED_TORUS_CURRENTS_CONTINUE_THROUGH_A_RETAINED_FIBRE.md): derived cut/face modes and retained interior.
+- [The campaign breadth review](2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md#breadth-review-the-mathematical-object-precedes-the-runtime-chart): the source-level distinction between these objects and the imposed alphabet chart.
+
+Follow `ReceiverHistoryCompression`, `JointReceiverDescent`, `AttentionModeCompression`,
+`FourTorusParametronCurrent`, `PhaseCarrier`, and `ReflectedBoundaryMemory` through their actual
+hypotheses and consumers. Quartet/octet cardinality alone does not select a machine-word layout.
+
 ## Normalization, learning and the paired return
 
 Read [the composition](../../docs/HNN_COMPOSITION.md) and

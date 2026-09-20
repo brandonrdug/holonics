@@ -31,6 +31,14 @@ variation. The [helical guide](HELICAL_GEOMETRY.md) develops these laws and the 
 circle/line/point limits. A fixed shift or periodic mode is one specialization; an arbitrary
 sequence or SSM requires its actual generator and receiver map, not only the label “helix”.
 
+[definition] Musical composition supplies a working reading of this object: notes contribute
+modes; chords join them under actual source/receiver conditions; quartets and octets name the
+participating ensembles where applicable. A class face can be reusable while phase, timing and
+spatial differences remain in its fibre. The retained dimension follows from the interaction
+and future receivers, as in the derived clocked-torus cut/face modes. The
+[composition guide](HNN_COMPOSITION.md#derive-the-grain-from-the-interaction-and-receiver)
+connects those existing laws before any storage chart is selected.
+
 ## The operative equations
 
 [definition] These are compatible parts and declared specializations of the same construction.
