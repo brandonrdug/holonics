@@ -30,8 +30,8 @@ impl FieldSessionSpec {
 
 impl<'c> NativeFieldSession<'c> {
     fn prepare_shared(&self, request:&FieldSectionRequest)->Result<SharedPreparation<'c>> {
-        if request.commit || request.retain_comparison {
-            return Err(invalid("shared regions are receiving cuts at one field state; use observe-field-source for a complete source/target update"));
+        if request.commit {
+            return Err(invalid("shared regions are receiving cuts at one field state; use observe-field-source, or retain this cut's comparison, for a complete source/target update"));
         }
         if request.partial.is_some() && !request.text.is_empty(){return Err(invalid("supply text or partial regions, not both"));}
         let partial=match &request.partial {
@@ -89,6 +89,16 @@ impl<'c> NativeFieldSession<'c> {
 
     pub(super) fn shared_request(&mut self,request:&FieldSectionRequest)->Result<Value>{
         let start=Instant::now();let prepared=self.prepare_shared(request)?;
+        // Retention is the shared chart's producing cut: the operands that built these rows are
+        // kept so their recorded target can arrive later, here or after reopen, exactly once.
+        let comparison=if request.retain_comparison {
+            if prepared.destinations.is_empty(){return Err(invalid("a retained comparison requires at least one free receiving position"));}
+            let id=self.issued_shared;
+            self.issued_shared=id.checked_add(1).ok_or_else(||invalid("shared-source comparison identifiers exhausted"))?;
+            self.retained_shared.insert(id,RetainedSharedSource{request:request.clone(),held:prepared.held.clone(),
+                output_symbols:prepared.output_symbols,producing_epoch:self.body.epoch()});
+            Some(id)
+        }else{None};
         let grain=ResidentGrain(self.spec.fractional_bits);
         let given=ResidentNormalInput::from(ResidentConstitutiveCurrent::integers(&prepared.given)?).enclosure(self.surface,grain)?;
         let generation=Instant::now();
@@ -117,7 +127,7 @@ impl<'c> NativeFieldSession<'c> {
         };
         Ok(json!({"schema":"org.holonics.hna.field-section.v1","scope":"shared-field receiving section; supplied local incidence and shared constitutive material",
             "text":text,"output_bytes":bytes,"decode_error":decode_error,"symbols":symbols,"selections":selections,
-            "comparison":null,"committed":false,"producing_epoch":self.body.epoch(),
+            "comparison":comparison,"committed":false,"producing_epoch":self.body.epoch(),
             "output_symbols":prepared.output_symbols,"generated_positions":prepared.destinations,
             "source_chart":"shared-regions","local_complex":self.spec.shared_extents()?.0*3,
             "generation_us":generation_us,"elapsed_us":start.elapsed().as_micros(),
@@ -128,7 +138,31 @@ impl<'c> NativeFieldSession<'c> {
     /// separate from the source preparation and never determine its neighborhood or inputs.
     pub fn observe_source(&mut self,request:&FieldSectionRequest,text:&str,step_bits:u32)->Result<Value>{
         if self.spec.source_chart!=FieldSourceChart::SharedRegions{return Err(invalid("observe-field-source requires shared-regions"));}
-        let start=Instant::now();let prepared=self.prepare_shared(request)?;
+        let prepared=self.prepare_shared(request)?;
+        self.observe_prepared(&prepared,request,text,step_bits)
+    }
+
+    /// Apply one retained comparison exactly once, in this process or after reopen. The retained
+    /// request re-prepares the producing rows and must agree with the receiving face it was
+    /// retained at; the epoch that produced the cut and the epoch that applies it are both
+    /// reported, because a shared-source update acts at the material current when it arrives.
+    pub(super) fn observe_retained_source(&mut self,id:u64,text:&str,step_bits:u32)->Result<Value>{
+        let retained=self.retained_shared.get(&id).ok_or_else(||invalid("unknown retained shared-source comparison"))?.clone();
+        let prepared=self.prepare_shared(&retained.request)?;
+        if prepared.held!=retained.held || prepared.output_symbols!=retained.output_symbols {
+            return Err(invalid("retained comparison operands disagree with their re-prepared receiving face"));
+        }
+        let mut returned=self.observe_prepared(&prepared,&retained.request,text,step_bits)?;
+        self.retained_shared.remove(&id);
+        returned["comparison"]=json!(id);
+        returned["producing_epoch"]=json!(retained.producing_epoch);
+        returned["applied_epoch"]=json!(self.body.epoch());
+        returned["anatomy"]=self.inspect();
+        Ok(returned)
+    }
+
+    fn observe_prepared(&mut self,prepared:&SharedPreparation<'c>,request:&FieldSectionRequest,text:&str,step_bits:u32)->Result<Value>{
+        let start=Instant::now();
         let target=self.spec.symbols_of(&self.chart,text)?;
         if target.len()!=prepared.output_symbols{return Err(invalid("target does not match the requested receiving extent"));}
         let held_disagreements=request.partial.as_ref().map(|parts|parts.iter().take(target.len()).enumerate()
@@ -196,6 +230,35 @@ mod tests {
             for k in ["text","output_bytes","symbols","selections","producing_epoch","generated_positions","selection_bound"]{
                 assert_eq!(actual[k],expected[k],"{k}");
             }Ok(())
+        }).unwrap();
+    }
+    #[test]
+    #[ignore="requires CUDA; a retained shared-source comparison survives reopen and applies exactly once"]
+    fn retained_shared_comparison_applies_once_after_reopen(){
+        let dir=tempfile::tempdir().unwrap();let path=dir.path().join("retained.session");
+        let mut request=partial("faces carry current",6);request.retain_comparison=true;
+        let (before,produced)=with_field_session(&spec(),|s|{
+            let produced=s.request(&request)?;
+            assert_eq!(produced["comparison"],0);
+            assert_eq!(s.inspect()["retained_shared"],json!([0]));
+            // The comparison is retained, not applied: this cut's material is untouched.
+            let before=s.inspect_current()?;
+            s.checkpoint(&path,&HnaStreamState::default())?;
+            Ok((before,produced))
+        }).unwrap();
+        NativeFieldSavedSession::open(&path).unwrap().with_session(|s,_|{
+            assert_eq!(s.retained_shared_comparisons(),[0]);
+            assert!(s.observe(1,"faces carry current",1).is_err());
+            assert!(s.observe(0,"short",1).is_err());
+            assert_eq!(s.inspect_current()?,before);
+            let returned=s.observe(0,"faces carry current",1)?;
+            assert_eq!(returned["comparison"],0);
+            assert_eq!(returned["producing_epoch"],produced["producing_epoch"]);
+            assert_eq!(returned["returned"]["rows"],2);
+            assert_ne!(s.inspect_current()?["reaction"],before["reaction"]);
+            assert!(s.observe(0,"faces carry current",1).is_err());
+            assert_eq!(s.retained_shared_comparisons(),Vec::<u64>::new());
+            Ok(())
         }).unwrap();
     }
     #[test]

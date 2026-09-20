@@ -8,6 +8,7 @@ mathematical subject or a source dependency is obsolete.
 
 | Question | Owner |
 |---|---|
+| What is being built, and why is its geometry the learning? | [`THE_MACHINE.md`](THE_MACHINE.md): read first |
 | What does the framework mean? | `docs/canon/`, with `FORMAL_FRAMEWORK.md` connecting formal subject owners |
 | What machinery is being built? | `ARCHITECTURE.md`, `HNN_COMPOSITION.md`, and the HNN network contract in the linked blueprint |
 | What must a changed operation preserve? | Its formal/native owner and the blueprint's mathematical implementation contract |

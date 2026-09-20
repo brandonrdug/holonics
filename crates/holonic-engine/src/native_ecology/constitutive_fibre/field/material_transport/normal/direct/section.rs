@@ -269,6 +269,30 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
         }
         ResidentNormalEnclosure::from_resident(self.surface, output, output_width, self.grain)
     }
+
+    /// Carry this generated section forward as the next source of the same conditioned
+    /// reaction. `from_points` mounts exact point rows; this is its re-entry counterpart, and
+    /// the radius each row already carries is transported by the law rather than discarded or
+    /// silently read as a centre. `identity` returns `x + M·φ(x,c)` by contracting `(I+A(c))`
+    /// on the shared source, which is what a refinement step composes.
+    pub fn reapply_bilinear<'a>(
+        &self,
+        material: &ResidentNormalMaterialView<'c>,
+        condition: ResidentConstitutiveSection<'a, 'c>,
+        identity: bool,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        material.read_applied_bilinear_enclosed_section(self, condition, identity)
+    }
+
+    /// The same re-entry when the condition of a row is itself an enclosure.
+    pub fn reapply_bilinear_enclosed(
+        &self,
+        material: &ResidentNormalMaterialView<'c>,
+        condition: &ResidentNormalEnclosureSection<'c>,
+        identity: bool,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        material.read_applied_bilinear_enclosed_pair(self, condition, identity)
+    }
 }
 
 impl<'c> ResidentNormalMaterialView<'c> {
@@ -372,6 +396,133 @@ impl<'c> ResidentNormalMaterialView<'c> {
         let joined = source.bilinear_features(self.surface, condition)?;
         self.read_applied_section(joined.features())
     }
+
+    /// `M·φ(s,c)` over a section of source rows that are already enclosures, with exact
+    /// rational point condition rows. Row by row this is the single-row
+    /// [`ResidentNormalMaterialView::read_applied_bilinear`] (or `_identity` when `identity`
+    /// is set), and at zero source radius it encloses `read_applied_bilinear_section`.
+    pub fn read_applied_bilinear_enclosed_section<'a>(
+        &self,
+        source: &ResidentNormalEnclosureSection<'c>,
+        condition: ResidentConstitutiveSection<'a, 'c>,
+        identity: bool,
+    ) -> Result<ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
+        if condition.section.grain().0 != 0
+            || !std::ptr::eq(condition.section.surface(), self.surface)
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        self.applied_condition_rows(
+            source,
+            condition.section,
+            condition.components(),
+            condition.rational,
+            false,
+            condition.rows(),
+            identity,
+        )
+    }
+
+    /// The same law when the condition rows are themselves enclosures. Writing `s = x+ε` and
+    /// `c = h+δ`, the reaction is `M·φ(x,h) + A(h)ε + L_x δ + Q(δ,ε)`, so the returned radius
+    /// is `‖A(h)‖ρ_s + ‖L_x‖ρ_c + ‖Q‖ρ_sρ_c`. No enclosure centre is taken for a point.
+    pub fn read_applied_bilinear_enclosed_pair(
+        &self,
+        source: &ResidentNormalEnclosureSection<'c>,
+        condition: &ResidentNormalEnclosureSection<'c>,
+        identity: bool,
+    ) -> Result<ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
+        if condition.grain() != self.grain || !std::ptr::eq(condition.surface, self.surface) {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        self.applied_condition_rows(
+            source,
+            condition.resident_section(),
+            condition.components(),
+            false,
+            true,
+            condition.rows(),
+            identity,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn applied_condition_rows(
+        &self,
+        source: &ResidentNormalEnclosureSection<'c>,
+        condition: &ResidentSection<'c>,
+        k: usize,
+        condition_rational: bool,
+        condition_enclosed: bool,
+        condition_rows: usize,
+        identity: bool,
+    ) -> Result<ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
+        let rows = source.rows();
+        let d = source.components();
+        let features = d
+            .checked_mul(k / 2)
+            .and_then(|v| v.checked_add(d)?.checked_add(k))
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        if rows == 0
+            || rows != condition_rows
+            || d == 0
+            || k == 0
+            || d % 2 != 0
+            || k % 2 != 0
+            || self.source_chart
+                != (NormalSourceChart::Features {
+                    source_complex: features / 2,
+                })
+            || source.grain() != self.grain
+            || !std::ptr::eq(source.surface, self.surface)
+            || (identity && d != self.targets.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?)
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let width = if identity {
+            d
+        } else {
+            self.targets
+                .checked_mul(2)
+                .ok_or(ConstitutiveFibreError::Shape)?
+        };
+        let output = self.surface.fresh_section(
+            rows,
+            width
+                .checked_add(1)
+                .and_then(|n| n.checked_mul(2))
+                .ok_or(ConstitutiveFibreError::Shape)?,
+            ResidentGrain(0),
+        )?;
+        let mut pass = self.surface.begin_passage(&[vec![]])?;
+        {
+            let lane = pass.open(0, &[])?;
+            self.surface.record_normal_applied_condition_rows(
+                &lane,
+                &self.state,
+                source.resident_section(),
+                condition,
+                k,
+                condition_rational,
+                condition_enclosed,
+                rows,
+                d,
+                self.targets,
+                identity,
+                self.grain.0,
+                &output,
+            )?;
+        }
+        pass.close(0, &output, 64)?;
+        let result = pass.finish()?.launch()?;
+        if !result.obstruction.is_empty() {
+            return Err(ConstitutiveFibreError::Arithmetic(format!(
+                "applied conditional reaction section: {:?}",
+                result.obstruction
+            )));
+        }
+        ResidentNormalEnclosureSection::from_resident(self.surface, output, rows, width, self.grain)
+    }
 }
 
 impl<'c> ResidentNormalMaterial<'c> {
@@ -429,6 +580,26 @@ impl<'c> ResidentNormalMaterial<'c> {
     ) -> Result<ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
         self.retained_view()
             .read_applied_bilinear_section(source, condition)
+    }
+
+    pub fn read_applied_bilinear_enclosed_section<'a>(
+        &self,
+        source: &ResidentNormalEnclosureSection<'c>,
+        condition: ResidentConstitutiveSection<'a, 'c>,
+        identity: bool,
+    ) -> Result<ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
+        self.retained_view()
+            .read_applied_bilinear_enclosed_section(source, condition, identity)
+    }
+
+    pub fn read_applied_bilinear_enclosed_pair(
+        &self,
+        source: &ResidentNormalEnclosureSection<'c>,
+        condition: &ResidentNormalEnclosureSection<'c>,
+        identity: bool,
+    ) -> Result<ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
+        self.retained_view()
+            .read_applied_bilinear_enclosed_pair(source, condition, identity)
     }
 }
 

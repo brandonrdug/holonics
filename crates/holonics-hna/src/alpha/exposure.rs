@@ -270,6 +270,66 @@ impl ExposureOccurrence {
         Ok(parents.into_iter().next())
     }
 
+    /// The one author role every captured view of this declared occurrence testifies to. The
+    /// role admits or refuses material at an exterior boundary; it never becomes a native
+    /// amplitude, a route selector or evidence that the occurrence answered anything.
+    pub fn shared_author_class(&self) -> Result<&str, ExposureError> {
+        let first = self
+            .views
+            .first()
+            .ok_or(ExposureError::Open("no captured views"))?;
+        if self.views[1..]
+            .iter()
+            .any(|view| view.author_class != first.author_class)
+        {
+            return Err(ExposureError::Open(
+                "captured views disagree on the author role",
+            ));
+        }
+        Ok(&first.author_class)
+    }
+
+    /// The request family this responding occurrence records as its own comparison partner.
+    /// `comparison-request` belongs to the actual responding occurrence, so this reads that one
+    /// relation kind and ignores every other; a tool or candidate link elsewhere in the family
+    /// neither supplies a partner nor refuses this one. An absent relation stays absent.
+    pub fn recorded_comparison_request(&self) -> Result<Option<ExposureFamily>, ExposureError> {
+        let mut common: Option<BTreeSet<ExposureFamily>> = None;
+        for view in &self.views {
+            let mut partners = BTreeSet::new();
+            for link in &view.links {
+                if link.kind != "comparison-request" {
+                    continue;
+                }
+                if link.availability != ExposureAvailability::Prior {
+                    return Err(ExposureError::Open(
+                        "recorded comparison request is not an available prior occurrence",
+                    ));
+                }
+                let target = link.target.as_ref().ok_or(ExposureError::Open(
+                    "recorded comparison request has no source coordinate",
+                ))?;
+                partners.insert(ExposureFamily {
+                    provider: target.provider.clone(),
+                    record_group: target.record_group.clone(),
+                });
+            }
+            if common.as_ref().is_some_and(|previous| *previous != partners) {
+                return Err(ExposureError::Open(
+                    "captured views disagree on the recorded comparison request",
+                ));
+            }
+            common = Some(partners);
+        }
+        let partners = common.ok_or(ExposureError::Open("no captured views"))?;
+        if partners.len() > 1 {
+            return Err(ExposureError::Open(
+                "several recorded comparison requests require a wider source port",
+            ));
+        }
+        Ok(partners.into_iter().next())
+    }
+
     /// The same visible material in every captured view of this declared occurrence. This
     /// compares exterior presentations only; it neither chooses an incompatible view nor
     /// identifies equal text from distinct occurrences. Source/context views remain attached.

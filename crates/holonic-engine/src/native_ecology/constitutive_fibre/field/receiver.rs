@@ -5,7 +5,9 @@ mod normalized;
 mod packet;
 pub use packet::{NativeMaterialActuation,NativeMaterialPacketReading,NativePacketQuadrature};
 pub use normalized::{NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn,
-    NativeMaterialPullbackMetric, NativeMaterialSourcePullback, NativeMaterialSourcePullbackReading};
+    NativeMaterialPullbackMetric, NativeMaterialSourcePullback, NativeMaterialSourcePullbackReading,
+    NativeNormalizedFaceMeasure, NativeNormalizedSection, NativeNormalizedSectionPullback,
+    NativeNormalizedSectionPullbackReading, NativeNormalizedSectionRowReading};
 
 impl ConstitutiveDifferentialReading {
     /// Convert an actually field-qualified relation receiver, preserving the historical source

@@ -87,19 +87,73 @@ pub struct FieldSectionRequest {
     #[serde(default)]
     pub retain_comparison: bool,
 }
+/// The caller's declared exposure aperture: how much recorded request material may be held at
+/// the receiving face, how far the free response extent reaches past it, and how much preceding
+/// material may accompany them. Byte caps are exterior presentation boundaries; they are refused
+/// against, never silently trimmed, and the symbol counts they bound size the actual section.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ExposureAperture {
+    pub request_bytes: usize,
+    /// Free receiving positions in declared codec symbols, generated after the held request.
+    pub response_symbols: usize,
+    #[serde(default)]
+    pub context_bytes: usize,
+}
+impl ExposureAperture {
+    /// Bound the declared aperture against the session's own capacity before any recorded
+    /// material is read. One presentation byte can supply at most `per_byte` codec symbols.
+    fn bounded(&self, spec: &FieldSessionSpec) -> Result<(usize, usize)> {
+        let per_byte = usize::from(spec.codec == FieldTextCodec::Utf8Nibbles) + 1;
+        let held = self
+            .request_bytes
+            .checked_mul(per_byte)
+            .ok_or_else(|| invalid("declared exposure request aperture"))?;
+        let context = self
+            .context_bytes
+            .checked_mul(per_byte)
+            .ok_or_else(|| invalid("declared exposure context aperture"))?;
+        // A byte codec receives whole bytes: an extent that splits one can never be observed,
+        // because every target text decodes to a multiple of `per_byte` symbols.
+        if self.response_symbols % per_byte != 0 {
+            return Err(invalid(
+                "declared response aperture splits a codec byte; no target text can meet it",
+            ));
+        }
+        if self.response_symbols == 0
+            || held
+                .checked_add(self.response_symbols)
+                .is_none_or(|n| n > spec.section_symbols)
+            || context > spec.context_symbols
+        {
+            return Err(invalid(
+                "declared exposure aperture exceeds this session's section/context capacity",
+            ));
+        }
+        Ok((held, context))
+    }
+}
 impl FieldSectionRequest {
-    /// Exterior bridge from validated exposure families. Callers select the source aperture;
-    /// each supplied preceding family must be the recorded prior parent of the next one.
-    /// ExposureReader validates the records; their paths/IDs never become native amplitudes.
+    /// Exterior bridge from validated exposure families to a held request with a free receiving
+    /// extent. Only development-partition, human-authored request material supplies the held
+    /// positions; each supplied preceding family must be the recorded prior parent of the next
+    /// one. Every frame revalidates against its own manifest here, because a bridge is a wire.
+    /// The records' paths, roles and IDs stay exterior; they never become native amplitudes.
     pub fn from_exposures(
+        spec: &FieldSessionSpec,
+        aperture: &ExposureAperture,
+        manifest: &crate::alpha::exposure::ExposureManifest,
         request: &crate::alpha::exposure::ExposureOccurrence,
         context: &[&crate::alpha::exposure::ExposureOccurrence],
         commit: bool,
         retain_comparison: bool,
     ) -> Result<Self> {
-        fn text(event: &crate::alpha::exposure::ExposureOccurrence) -> Result<String> {
-            event
-                .shared_visible_parts()
+        let (held_cap, context_cap) = aperture.bounded(spec)?;
+        let chart = spec.chart()?;
+        let text = |event: &crate::alpha::exposure::ExposureOccurrence, cap: usize| -> Result<String> {
+            event.validate(manifest).map_err(invalid)?;
+            let text = event
+                .development_parts()
                 .map_err(invalid)?
                 .iter()
                 .map(|p| {
@@ -107,8 +161,19 @@ impl FieldSectionRequest {
                         invalid("this field text codec requires visible textual parts")
                     })
                 })
-                .collect::<Result<Vec<_>>>()
-                .map(|p| p.concat())
+                .collect::<Result<Vec<_>>>()?
+                .concat();
+            if text.len() > cap {
+                return Err(invalid(
+                    "recorded material is longer than the declared exposure aperture",
+                ));
+            }
+            Ok(text)
+        };
+        if request.shared_author_class().map_err(invalid)? != "human" {
+            return Err(invalid(
+                "a held request position takes human-authored recorded material only",
+            ));
         }
         let chain = context
             .iter()
@@ -122,14 +187,36 @@ impl FieldSectionRequest {
                 return Err(invalid("context is not the recorded prior exposure chain"));
             }
         }
+        let held = spec
+            .symbols_of(&chart, &text(request, aperture.request_bytes)?)?
+            .into_iter()
+            .map(|symbol| Some(spec.symbols[symbol.0 as usize].clone()))
+            .collect::<Vec<_>>();
+        if held.len() > held_cap {
+            return Err(invalid(
+                "held request positions exceed the declared exposure aperture",
+            ));
+        }
+        let mut partial = held;
+        partial.resize(partial.len() + aperture.response_symbols, None);
+        let context = context
+            .iter()
+            .map(|event| text(event, aperture.context_bytes))
+            .collect::<Result<Vec<_>>>()?;
+        let preceding = context
+            .iter()
+            .map(|part| Ok(spec.symbols_of(&chart, part)?.len()))
+            .sum::<Result<usize>>()?;
+        if preceding > context_cap {
+            return Err(invalid(
+                "preceding positions exceed the declared exposure aperture",
+            ));
+        }
         Ok(Self {
-            text: text(request)?,
-            partial: None,
-            output_symbols: None,
-            context: context
-                .iter()
-                .map(|event| text(event))
-                .collect::<Result<Vec<_>>>()?,
+            text: String::new(),
+            output_symbols: Some(partial.len()),
+            partial: Some(partial),
+            context,
             commit,
             retain_comparison,
         })
@@ -216,12 +303,28 @@ impl FieldSessionSpec {
     }
 }
 
+/// A recorded comparison retained at the cut that produced it on the shared-regions chart.
+/// That chart's rows are a function of the declared source addresses alone, so these
+/// request-level operands re-prepare exactly the producing rows without copying the row law
+/// into this wire. The producing epoch travels with them and is reported beside the epoch that
+/// actually applies them, because a shared-source update acts at the current material.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RetainedSharedSource {
+    pub request: FieldSectionRequest,
+    pub held: Vec<bool>,
+    pub output_symbols: usize,
+    pub producing_epoch: u64,
+}
 pub struct NativeFieldSession<'c> {
     surface: &'c ResidentSurface<'c>,
     spec: FieldSessionSpec,
     chart: SymbolCurrentChart,
     body: NativeCoupledBody<'c>,
     pending_extents: BTreeMap<u64, usize>,
+    retained_shared: BTreeMap<u64, RetainedSharedSource>,
+    issued_shared: u64,
+    exposure: Option<crate::alpha::exposure::ExposureCursor>,
 }
 struct PreparedFieldSection<'c> {
     input: ResidentSection<'c>,
@@ -297,6 +400,9 @@ impl<'c> NativeFieldSession<'c> {
             chart,
             body,
             pending_extents: BTreeMap::new(),
+            retained_shared: BTreeMap::new(),
+            issued_shared: 0,
+            exposure: None,
         })
     }
     fn mount_text(&self, text: &str) -> Result<ResidentSection<'c>> {
@@ -560,6 +666,7 @@ impl<'c> NativeFieldSession<'c> {
         )
     }
     pub fn observe(&mut self, source: u64, text: &str, step_bits: u32) -> Result<Value> {
+        if self.spec.source_chart==FieldSourceChart::SharedRegions{return self.observe_retained_source(source,text,step_bits);}
         let start = Instant::now();
         let target = if self.spec.source_chart == FieldSourceChart::JointRegions {
             let expected = *self
@@ -591,12 +698,34 @@ impl<'c> NativeFieldSession<'c> {
         )
     }
     pub fn release(&mut self, source: u64) -> Result<Value> {
+        if self.spec.source_chart == FieldSourceChart::SharedRegions {
+            self.retained_shared
+                .remove(&source)
+                .ok_or_else(|| invalid("unknown retained shared-source comparison"))?;
+            return Ok(json!({"released":source,"anatomy":self.inspect()}));
+        }
         self.body.release(source)?;
         self.pending_extents.remove(&source);
         Ok(json!({"released":source,"anatomy":self.inspect()}))
     }
     pub fn inspect(&self) -> Value {
-        json!({"kind":"constituted-field-session","epoch":self.body.epoch(),"pending":self.body.pending_coupled_predictions(),"pending_comparisons":self.body.pending_ids().ok(),"spec":self.spec,"census":self.surface.census()})
+        json!({"kind":"constituted-field-session","epoch":self.body.epoch(),"pending":self.body.pending_coupled_predictions(),"pending_comparisons":self.body.pending_ids().ok(),
+        "retained_shared":self.retained_shared.keys().collect::<Vec<_>>(),"spec":self.spec,"census":self.surface.census()})
+    }
+    /// The cold exposure position this session's trained state has actually consumed. AC3: it
+    /// is published inside the same atomic checkpoint file as the model, never beside it. The
+    /// cursor still names a frame the reader has not acknowledged; that is the resumable case.
+    pub fn attach_exposure_cursor(&mut self, cursor: crate::alpha::exposure::ExposureCursor) {
+        self.exposure = Some(cursor);
+    }
+    pub fn exposure_cursor(&self) -> Option<&crate::alpha::exposure::ExposureCursor> {
+        self.exposure.as_ref()
+    }
+    pub fn retained_shared_comparisons(&self) -> Vec<u64> {
+        self.retained_shared.keys().copied().collect()
+    }
+    pub fn spec(&self) -> &FieldSessionSpec {
+        &self.spec
     }
     pub fn inspect_current(&mut self) -> Result<Value> {
         self.body.inspect_current()
@@ -612,6 +741,9 @@ impl<'c> NativeFieldSession<'c> {
             state: state.clone(),
             body: rest,
             pending_extents: self.pending_extents.clone(),
+            retained_shared: self.retained_shared.clone(),
+            issued_shared: self.issued_shared,
+            exposure: self.exposure.clone(),
         };
         let mut bytes = Vec::new();
         saved.write(&mut bytes)?;
@@ -620,18 +752,44 @@ impl<'c> NativeFieldSession<'c> {
 }
 const MAGIC: &[u8] = b"HNA-FIELD-SESSION\x01";
 const REGIONS_MAGIC: &[u8] = b"HNA-FIELD-SESSION\x02";
+/// Version 3 adds the retained shared-source comparisons and the exposure cursor. Versions 1
+/// and 2 stay readable: their tuple headers simply carry neither.
+const SOURCE_MAGIC: &[u8] = b"HNA-FIELD-SESSION\x03";
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct FieldSessionHeader {
+    spec: FieldSessionSpec,
+    state: HnaStreamState,
+    pending_extents: BTreeMap<u64, usize>,
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    retained_shared: BTreeMap<u64, RetainedSharedSource>,
+    #[serde(default)]
+    issued_shared: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    exposure: Option<crate::alpha::exposure::ExposureCursor>,
+}
 pub struct NativeFieldSavedSession {
     spec: FieldSessionSpec,
     state: HnaStreamState,
     body: SavedCoupledBody,
     pending_extents: BTreeMap<u64, usize>,
+    retained_shared: BTreeMap<u64, RetainedSharedSource>,
+    issued_shared: u64,
+    exposure: Option<crate::alpha::exposure::ExposureCursor>,
 }
 impl NativeFieldSavedSession {
     fn write(&self, out: &mut impl Write) -> Result<()> {
-        let header = serde_json::to_vec(&(&self.spec, &self.state, &self.pending_extents))?;
+        let header = serde_json::to_vec(&FieldSessionHeader {
+            spec: self.spec.clone(),
+            state: self.state.clone(),
+            pending_extents: self.pending_extents.clone(),
+            retained_shared: self.retained_shared.clone(),
+            issued_shared: self.issued_shared,
+            exposure: self.exposure.clone(),
+        })?;
         let mut body = Vec::new();
         self.body.write(&mut body)?;
-        out.write_all(REGIONS_MAGIC)?;
+        out.write_all(SOURCE_MAGIC)?;
         for bytes in [&header, &body] {
             out.write_all(&(bytes.len() as u64).to_le_bytes())?;
             out.write_all(bytes)?;
@@ -647,8 +805,9 @@ impl NativeFieldSavedSession {
         let mut input = input.take(octets);
         let mut magic = vec![0; MAGIC.len()];
         input.read_exact(&mut magic)?;
+        let sources = magic == SOURCE_MAGIC;
         let regions = magic == REGIONS_MAGIC;
-        if magic != MAGIC && !regions {
+        if magic != MAGIC && !regions && !sources {
             return Err(invalid("unsupported field-session rest"));
         }
         fn blob(input: &mut std::io::Take<impl Read>) -> Result<Vec<u8>> {
@@ -667,19 +826,56 @@ impl NativeFieldSavedSession {
             Ok(bytes)
         }
         let header = blob(&mut input)?;
-        let (spec, state, pending_extents): (
-            FieldSessionSpec,
-            HnaStreamState,
-            BTreeMap<u64, usize>,
-        ) = if regions {
+        let header: FieldSessionHeader = if sources {
             serde_json::from_slice(&header)?
         } else {
-            let (spec, state): (FieldSessionSpec, HnaStreamState) =
-                serde_json::from_slice(&header)?;
-            (spec, state, BTreeMap::new())
+            let (spec, state, pending_extents) = if regions {
+                serde_json::from_slice(&header)?
+            } else {
+                let (spec, state): (FieldSessionSpec, HnaStreamState) =
+                    serde_json::from_slice(&header)?;
+                (spec, state, BTreeMap::new())
+            };
+            FieldSessionHeader {
+                spec,
+                state,
+                pending_extents,
+                retained_shared: BTreeMap::new(),
+                issued_shared: 0,
+                exposure: None,
+            }
         };
+        let FieldSessionHeader {
+            spec,
+            state,
+            pending_extents,
+            retained_shared,
+            issued_shared,
+            exposure,
+        } = header;
         spec.chart()?;
         state.validate().map_err(invalid)?;
+        // A remounted wire re-checks its own operands. The rows themselves are rebuilt from the
+        // retained request at application; only its declared extents can be checked here.
+        if retained_shared.iter().any(|(id, retained)| {
+            *id >= issued_shared
+                || retained.request.commit
+                || !retained.request.retain_comparison
+                || retained.output_symbols == 0
+                || retained.output_symbols > spec.section_symbols
+                || Some(retained.held.len()) != retained.output_symbols.checked_mul(spec.symbols.len())
+                || retained.held.iter().all(|fixed| *fixed)
+        }) || (!retained_shared.is_empty()
+            && spec.source_chart != FieldSourceChart::SharedRegions)
+        {
+            return Err(invalid("retained shared-source comparison operands"));
+        }
+        if exposure
+            .as_ref()
+            .is_some_and(|cursor| cursor.byte_offset > cursor.source.octets)
+        {
+            return Err(invalid("saved exposure cursor is outside its pinned source"));
+        }
         let bytes = blob(&mut input)?;
         let body = SavedCoupledBody::read(&mut bytes.as_slice(), bytes.len() as u64)?;
         if !matches!(body, SavedCoupledBody::Field(_))
@@ -699,7 +895,13 @@ impl NativeFieldSavedSession {
             state,
             body,
             pending_extents,
+            retained_shared,
+            issued_shared,
+            exposure,
         })
+    }
+    pub fn exposure_cursor(&self) -> Option<&crate::alpha::exposure::ExposureCursor> {
+        self.exposure.as_ref()
     }
     pub fn with_session<T>(
         self,
@@ -714,6 +916,9 @@ impl NativeFieldSavedSession {
             chart,
             body: self.body.remount(&surface)?,
             pending_extents: self.pending_extents,
+            retained_shared: self.retained_shared,
+            issued_shared: self.issued_shared,
+            exposure: self.exposure,
         };
         let (nodes, context, _) = session.spec.extents()?;
         if session.body.field_dimensions()?
@@ -729,8 +934,11 @@ impl NativeFieldSavedSession {
             ));
         }
         for id in session.body.pending_ids()? {
+            // Only the legacy tensor-condition chart receives its whole declared section, so
+            // only it can back-fill a missing extent. A variable-extent chart must refuse;
+            // the shared chart's section capacity is a source aperture, not a response length.
             if !session.pending_extents.contains_key(&id) {
-                if session.spec.source_chart == FieldSourceChart::JointRegions {
+                if session.spec.source_chart != FieldSourceChart::TensorCondition {
                     return Err(invalid("missing pending field receiving extent"));
                 }
                 session
@@ -902,28 +1110,216 @@ mod delivery_tests {
 #[cfg(test)]
 mod exposure_tests {
     use super::*;
-    use crate::alpha::exposure::ExposureOccurrence;
-    fn event(sequence: u64, name: &str, parent: Option<&str>, text: &str) -> ExposureOccurrence {
-        serde_json::from_value(json!({"schema":"org.holonics.conversation-exposure.v1","kind":"occurrence-family","sequence":sequence,
-            "position":{"first_source":0,"first_record":sequence,"first_event":sequence},"family":{"provider":"codex","record_group":name},
-            "partition":"development","partition_reasons":[],"conflicts":[],"views":[{"event":sequence,"source":0,"provider":"codex",
-                "record":{"number":sequence,"byte_start":0,"byte_end":1},"author_class":"human","record_kind":"message","flags":[],"provider_metadata":{},
-                "visible_parts":[{"ordinal":0,"pointer":"/text","kind":"text","text":text}],"nonvisible_part_references":[],
-                "links":parent.map(|p|vec![json!({"kind":"provider-parent","evidence":"declared test source relationship","availability":"prior",
-                    "target":{"event":sequence-1,"source":0,"provider":"codex","record_group":p}})]).unwrap_or_default()}]})).unwrap()
+    use crate::alpha::exposure::{ExposureManifest, ExposureOccurrence, EXPOSURE_SCHEMA};
+    fn manifest() -> ExposureManifest {
+        serde_json::from_value(json!({"schema":EXPOSURE_SCHEMA,"kind":"manifest",
+            "temporal_cut":"2026-09-04T00:00:00Z","temporal_cut_normalized":"2026-09-04T00:00:00.000000+00:00",
+            "private_sources":[{"source":1,"provider":"codex","private_path":"private/source.jsonl","captured_octets":10000,"records":100}],
+            "visible_parts":{},"boundary":{}}))
+        .unwrap()
+    }
+    fn event(
+        sequence: u64,
+        name: &str,
+        role: &str,
+        parent: Option<&str>,
+        text: &str,
+    ) -> ExposureOccurrence {
+        let kind = if role == "human" { "human-text" } else { "agent-text" };
+        serde_json::from_value(json!({"schema":EXPOSURE_SCHEMA,"kind":"occurrence-family","sequence":sequence,
+            "position":{"first_source":1,"first_record":sequence+1,"first_event":sequence+1},
+            "family":{"provider":"codex","record_group":format!("declared:{name}")},
+            "partition":"development","partition_reasons":[],"conflicts":[],"views":[{"event":sequence+1,"source":1,"provider":"codex",
+                "record":{"number":sequence+1,"byte_start":sequence*100,"byte_end":(sequence+1)*100},
+                "normalized_timestamp":format!("2026-09-0{}T00:00:00.000000+00:00",sequence+1),
+                "native_id":name,"author_class":role,"record_kind":"message","flags":[],"provider_metadata":{},
+                "visible_parts":[{"ordinal":0,"pointer":"/text","kind":kind,"text":text}],"nonvisible_part_references":[],
+                "links":parent.map(|p|vec![json!({"kind":"provider-parent","evidence":"declared test source relationship","availability":"prior","target_event":sequence,
+                    "target":{"event":sequence,"source":1,"provider":"codex","record_group":format!("declared:{p}"),
+                        "normalized_timestamp":format!("2026-09-0{sequence}T00:00:00.000000+00:00")}})]).unwrap_or_default()}]})).unwrap()
+    }
+    fn spec() -> FieldSessionSpec {
+        FieldSessionSpec {
+            symbols: (0..16).map(|n| format!("{n:x}")).collect(),
+            section_symbols: 64,
+            context_symbols: 16,
+            region_offsets: vec![-2, -1, 0, 1, 2],
+            source_chart: FieldSourceChart::SharedRegions,
+            codec: FieldTextCodec::Utf8Nibbles,
+            fractional_bits: 48,
+        }
+    }
+    fn aperture() -> ExposureAperture {
+        ExposureAperture {
+            request_bytes: 8,
+            response_symbols: 6,
+            context_bytes: 4,
+        }
     }
     #[test]
-    fn exposure_bridge_preserves_whole_parts_and_rejects_a_future_or_wrong_parent() {
-        let before = event(0, "before", None, "red");
-        let request = event(1, "request", Some("before"), "red blue");
-        let prepared =
-            FieldSectionRequest::from_exposures(&request, &[&before], false, false).unwrap();
-        assert_eq!(prepared.text, "red blue");
-        assert_eq!(prepared.context, ["red"]);
-        let other = event(0, "unrelated", None, "red");
-        assert!(FieldSectionRequest::from_exposures(&request, &[&other], false, false).is_err());
-        let future = event(2, "before", None, "red");
-        assert!(FieldSectionRequest::from_exposures(&request, &[&future], false, false).is_err());
+    fn a_response_aperture_that_splits_a_codec_byte_is_refused_before_any_material() {
+        // Two nibbles per byte: no target text has an odd symbol count, so an odd free extent
+        // could be retained and never observed.
+        let odd = ExposureAperture { response_symbols: 5, ..aperture() };
+        assert!(odd.bounded(&spec()).is_err());
+        assert!(aperture().bounded(&spec()).is_ok());
+    }
+    #[test]
+    fn exposure_bridge_holds_the_request_and_leaves_its_response_extent_free() {
+        let before = event(0, "before", "human", None, "ab");
+        let request = event(1, "request", "human", Some("before"), "cd");
+        let prepared = FieldSectionRequest::from_exposures(
+            &spec(),
+            &aperture(),
+            &manifest(),
+            &request,
+            &[&before],
+            false,
+            true,
+        )
+        .unwrap();
+        // Four held request nibbles, then exactly the declared free receiving extent.
+        assert_eq!(prepared.text, "");
+        assert_eq!(prepared.output_symbols, Some(10));
+        assert_eq!(
+            prepared.partial.unwrap(),
+            [
+                Some("6".into()),
+                Some("3".into()),
+                Some("6".into()),
+                Some("4".into()),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None
+            ]
+        );
+        assert_eq!(prepared.context, ["ab"]);
+        let bridge = |request: &ExposureOccurrence, context: &[&ExposureOccurrence]| {
+            FieldSectionRequest::from_exposures(
+                &spec(),
+                &aperture(),
+                &manifest(),
+                request,
+                context,
+                false,
+                true,
+            )
+        };
+        let other = event(0, "unrelated", "human", None, "ab");
+        assert!(bridge(&request, &[&other]).is_err());
+        let future = event(2, "before", "human", None, "ab");
+        assert!(bridge(&request, &[&future]).is_err());
+        assert!(bridge(&event(1, "long", "human", None, "123456789"), &[]).is_err());
+        assert!(bridge(&event(1, "agent", "agent-visible", None, "cd"), &[]).is_err());
+        let mut evaluation = event(1, "later", "human", None, "cd");
+        evaluation.partition = crate::alpha::exposure::ExposurePartition::Evaluation;
+        assert!(bridge(&evaluation, &[]).is_err());
+        let mut deferred = event(1, "held", "human", None, "cd");
+        deferred.partition = crate::alpha::exposure::ExposurePartition::Deferred;
+        deferred.partition_reasons = vec!["conflicting captured times".into()];
+        assert!(bridge(&deferred, &[]).is_err());
+        let mut unvalidated = event(1, "request", "human", None, "cd");
+        unvalidated.views[0].record.byte_end = 0;
+        assert!(bridge(&unvalidated, &[]).is_err());
+    }
+    #[test]
+    #[ignore = "requires CUDA; the cold exposure position and the state that consumed it are published in one file"]
+    fn exposure_cursor_and_trained_state_reopen_together() {
+        let dir = tempfile::tempdir().unwrap();
+        let wire = dir.path().join("exposure.jsonl");
+        let mut bytes = serde_json::to_vec(&manifest()).unwrap();
+        bytes.push(b'\n');
+        for frame in [
+            event(0, "request", "human", None, "cd"),
+            event(1, "reply", "agent-visible", None, "ef"),
+        ] {
+            bytes.extend(serde_json::to_vec(&frame).unwrap());
+            bytes.push(b'\n');
+        }
+        std::fs::write(&wire, bytes).unwrap();
+        let pending = dir.path().join("pending.session");
+        let mut reader = crate::alpha::exposure::ExposureReader::open(&wire).unwrap();
+        let frame = reader.peek().unwrap().unwrap().clone();
+        let request = FieldSectionRequest::from_exposures(
+            &spec(),
+            &aperture(),
+            reader.manifest(),
+            &frame,
+            &[],
+            false,
+            true,
+        )
+        .unwrap();
+        with_field_session(&spec(), |s| {
+            assert_eq!(s.request(&request)?["comparison"], 0);
+            // The frame is not acknowledged, so the published cursor still names it.
+            s.attach_exposure_cursor(reader.cursor());
+            s.checkpoint(&pending, &HnaStreamState::default())?;
+            Ok(())
+        })
+        .unwrap();
+        let saved = NativeFieldSavedSession::open(&pending).unwrap();
+        let cursor = saved.exposure_cursor().cloned().unwrap();
+        assert_eq!(cursor.next_sequence, 0);
+        let continued = dir.path().join("continued.session");
+        saved
+            .with_session(|s, _| {
+                assert_eq!(s.exposure_cursor(), Some(&cursor));
+                let mut resumed =
+                    crate::alpha::exposure::ExposureReader::resume(cursor).map_err(invalid)?;
+                assert_eq!(resumed.peek().map_err(invalid)?.unwrap().sequence, 0);
+                s.observe(0, "cdefg", 1)?;
+                resumed.acknowledge(0).map_err(invalid)?;
+                s.attach_exposure_cursor(resumed.cursor());
+                s.checkpoint(&continued, &HnaStreamState::default())
+            })
+            .unwrap();
+        let saved = NativeFieldSavedSession::open(&continued).unwrap();
+        let cursor = saved.exposure_cursor().cloned().unwrap();
+        assert_eq!(cursor.next_sequence, 1);
+        saved
+            .with_session(|s, _| {
+                assert!(s.retained_shared_comparisons().is_empty());
+                assert_eq!(
+                    crate::alpha::exposure::ExposureReader::resume(cursor)
+                        .map_err(invalid)?
+                        .peek()
+                        .map_err(invalid)?
+                        .unwrap()
+                        .sequence,
+                    1
+                );
+                Ok(())
+            })
+            .unwrap();
+    }
+    #[test]
+    fn declared_exposure_aperture_is_bounded_before_it_sizes_a_section() {
+        let spec = spec();
+        assert_eq!(aperture().bounded(&spec).unwrap(), (16, 8));
+        for refused in [
+            ExposureAperture {
+                response_symbols: 0,
+                ..aperture()
+            },
+            ExposureAperture {
+                request_bytes: 32,
+                ..aperture()
+            },
+            ExposureAperture {
+                context_bytes: 9,
+                ..aperture()
+            },
+            ExposureAperture {
+                request_bytes: usize::MAX,
+                ..aperture()
+            },
+        ] {
+            assert!(refused.bounded(&spec).is_err());
+        }
     }
 }
 

@@ -19,6 +19,7 @@ import benchmark
 
 ROOT = Path(__file__).resolve().parents[3]
 FIELD = ROOT / 'research/experiments/athena_field/pattern'
+SHARED = ROOT / 'research/experiments/athena_field/shared'
 MATH = ROOT / 'research/experiments/contextual_prediction_release'
 
 
@@ -77,6 +78,39 @@ def check_field(events, cases=None):
                   'selections': value['selections']}
         report['families'].setdefault(family, []).append(result)
     return report
+
+
+def check_shared(report=None):
+    """The complete-source family: one withheld source generated in one joint section.
+
+    Its prepared inputs are a private conversation/repository episode and repository documents,
+    so this receiver consumes the experiment's published aggregate rather than re-executing it,
+    and no text passes through here. It refuses a withheld-position count that arrives without
+    its content-free comparators, and a family whose receiving extent or supplied positions were
+    not preserved, because those are the conditions under which the count means anything.
+    """
+    value = json.loads((SHARED / 'results.json').read_text()) if report is None else report
+    result = {'consumer': 'NativeFieldSession / shared-regions complete source',
+              'supplied': 'complete source observations and every unmasked byte position of the withheld source',
+              'inferred': 'the withheld byte positions, generated together in one joint section',
+              'scope': 'recorded aggregate over a declared bounded prefix; the prepared inputs are private',
+              'execution': 'recorded only: this family has no fresh-execution profile, because re-running it would read private material',
+              'development': value['development'], 'families': []}
+    for family in value['validation']['families']:
+        comparators = ('most_frequent_byte_predictor_correct', 'copy_previous_byte_predictor_correct')
+        if any(key not in family for key in comparators):
+            raise ValueError('a withheld-position count must arrive beside its content-free comparators')
+        if not family['extent_agrees'] or family['supplied_preserved'] != family['supplied_positions']:
+            raise ValueError('the receiving extent or a supplied position was not preserved')
+        result['families'].append({
+            'source': family['source'], 'source_bytes': family['source_bytes'],
+            'inferred_count': family['withheld_positions'], 'inferred_correct': family['withheld_correct'],
+            'inferred_symbol_count': family['withheld_nibble_positions'],
+            'inferred_symbol_correct': family['withheld_nibbles_correct'],
+            'supplied_count': family['supplied_positions'], 'supplied_preserved': family['supplied_preserved'],
+            'decodes_as_utf8': family['decodes_as_utf8'], 'radius': family['selection_bound'],
+            'content_free_comparators': {key: family[key] for key in comparators}})
+    return result
 
 
 def factor_tensor(factors):
@@ -170,8 +204,15 @@ def evaluate(mode, output, binary):
               'aggregate_intelligence_score': None, 'sources': {}, 'workloads': {},
               'application_target': {'material': 'refined conversation exposure and repository sources at declared revisions',
                   'contract': 'docs/ATHENA_EVALUATION.md',
-                  'status': 'not measured by these mechanism populations; keep whole episodes and actual constraints',
+                  'status': 'one bounded complete-source run exists (the shared workload below); these mechanism populations still do not measure the application target, and whole episodes and actual constraints remain the contract',
                   'automatic_gold_from_assistant': False}}
+    # The shared family is recorded in both modes: its prepared inputs are private, so a fresh
+    # execution belongs to its own experiment, not to this public receiver.
+    result['sources']['shared'] = str((SHARED / 'results.json').relative_to(ROOT))
+    try:
+        result['workloads']['shared'] = check_shared()
+    except (ValueError, KeyError, TypeError, IndexError, OSError) as error:
+        result['workloads']['shared'] = {'error': str(error)}
     if mode == 'recorded':
         field = [r for r in load_lines(FIELD/'run/evaluation-events.jsonl') if r['event']=='field-request']
         math = load_lines(MATH/'responses.jsonl')

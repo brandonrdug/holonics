@@ -313,14 +313,22 @@ consumer. Milestones are views of shared work; this section supplies the constru
      exposure→field-session driver with a request/response aperture and its partition/role
      gates, a producing comparison in the shared chart, the exposure cursor in the saved
      session, and the first executed shared-chart baseline with its README (#59).
+   - **Realization of the section's regions (#61), before the join.** The first shared-chart
+     baseline occupies one lane of the card: the section kernels loop their rows on a single
+     thread and the features are launched row by row from the host. The regions are co-present
+     cells of one section, with shared reads and disjoint outputs. Certify that partition, place it
+     across the cover by its independence, generate gather → shared local operator → scatter from
+     it, and launch under the launch law, following the
+     [hardware-cover ruling](../../research/records/2026-08-01_THE_HARDWARE_IS_A_RECEIVER_COVER_THE_CARD_MUST_CARRY_THE_CURRENT.md).
+     The Wave 11 ports enter the join through this realization, not beside it.
    - **The join, sequential.** `prepare_rows`, `observe_rows`, `shared_request` and the founding
      chart compose participation over gathered neighbour currents, refinement by re-entry and
      both variation terms, checked against `connected_holonic_field` and the exact
      `NormalizedKernel` reference.
    - **Episodes.** Development families train through the public session; held-out evaluation
      families are inspected with the existing kit; the saved session reopens with its cursor;
-     cost is reported against the retained baselines. #18 is answered at the width this run
-     measures, and #19 supplies the section-scale change of D that `observe_rows` lacks.
+     cost is reported as cells, lanes and service rounds against the retained baselines. #18 is
+     answered at the width this run measures, after #61 has removed the one-lane realization, and #19 supplies the section-scale change of D that `observe_rows` lacks.
 3. **Make reuse and realization part of that consuming operation (#48/#49).** The helical pair's
    product-current bridge already has its owner in moment form:
    `ObservableMomentReceiverHistoryCompression` with

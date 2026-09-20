@@ -248,6 +248,7 @@ mod surface_field_current_source;
 mod surface_field_reflection_commit;
 mod surface_field_reflection_target;
 mod surface_normal_held_section;
+mod surface_bilinear_adjoint;
 
 /// `CUdevice_attribute` selectors from `cuda.h`, fixed by the foreign interface.
 const ATTRIBUTE_MAX_THREADS_PER_BLOCK: i32 = 1;

@@ -1,0 +1,18 @@
+running 14 tests
+test native::field_session::delivery_tests::field_stream_preserves_committed_response_across_write_failure ... ignored, requires CUDA; failed output drains after restart without regenerating the field
+test native::field_session::exposure_tests::exposure_cursor_and_trained_state_reopen_together ... ignored, requires CUDA; the cold exposure position and the state that consumed it are published in one file
+test native::field_session::joint_region_tests::fully_held_receiver_does_not_deposit_its_own_output ... ignored, requires CUDA; a fully held face has no parameter derivative and exposes contradictory data
+test native::field_session::joint_region_tests::joint_source_distinguishes_unknown_from_inactive_and_context ... ignored, requires CUDA; active, observed and held are distinct region maps
+test native::field_session::joint_region_tests::partial_receiver_reopens_after_intervening_material_update ... ignored, requires CUDA; receiver mask and variable target extent survive a delayed comparison
+test native::field_session::shared::tests::completely_observed_source_reports_a_conflict_without_deposition ... ignored, requires CUDA; fixed source disagreements are reported rather than trained as invented observations
+test native::field_session::shared::tests::retained_shared_comparison_applies_once_after_reopen ... ignored, requires CUDA; a retained shared-source comparison survives reopen and applies exactly once
+test native::field_session::shared::tests::shared_source_updates_and_reopens_without_a_position_sized_model ... ignored, requires CUDA; complete source observation updates shared material and reopens the same receiving face
+test native::field_session::tests::field_session_reopens_old_producing_material_and_returns_once ... ignored, requires CUDA; actual outstanding field comparison resumes with its producing D/M
+test native::field_session::joint_region_tests::region_extents_grow_with_regions_and_retain_legacy_chart ... ok
+test native::field_session::exposure_tests::declared_exposure_aperture_is_bounded_before_it_sizes_a_section ... ok
+test native::field_session::shared::tests::coefficient_shape_is_independent_of_the_complete_source_aperture ... ok
+test native::field_session::tests::text_codec_and_extents_are_declared ... ok
+test native::field_session::exposure_tests::exposure_bridge_holds_the_request_and_leaves_its_response_extent_free ... ok
+
+test result: ok. 5 passed; 0 failed; 9 ignored; 0 measured; 97 filtered out; finished in 0.00s
+

@@ -14,7 +14,7 @@ pub mod section_input;
 pub mod mathematical;
 pub use mathematical::{with_mathematical_session, MathematicalRequest, NativeMathematicalSession};
 mod field_session;
-pub use field_session::{FieldTextCodec,FieldSourceChart,FieldSessionSpec,FieldSectionRequest,NativeFieldSession,NativeFieldSavedSession,with_field_session};
+pub use field_session::{FieldTextCodec,FieldSourceChart,FieldSessionSpec,FieldSectionRequest,ExposureAperture,RetainedSharedSource,NativeFieldSession,NativeFieldSavedSession,with_field_session};
 mod normal_wave;
 mod coupled_wave;
 pub use coupled_wave::{NativeFieldReactionPort,SavedCoupledBody,NativeFieldAttachRefusal,NativeFieldGeneratedSection,NativeFieldModelRest,NativeCoupledBody,NativeCoupledWaveSession,NativeCoupledWaveSavedSession,NativeCoupledWaveAttachRefusal};

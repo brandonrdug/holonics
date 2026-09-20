@@ -931,6 +931,63 @@ machinery to start from and the object that does not exist yet. An implementer b
 | Normal statistics at the measured width (#18) | `C/…/normal/layout.rs::NormalLayout::for_sources` (the explicit cost); resident factor/solve `K/field_normal_material.cuh`; host `factored_moment`, `derived_factor_cover`, `exact_linear/kernel_modes.rs`; resident `C/field/internal_mode.rs` | A factored variant of `NormalSourceChart`/`NormalLayout` and a resident adapter for any factored owner |
 | Repeated refinement word reused economically (milestone 3) | `receiver_history_compression/observable.rs::ObservableMomentReceiverHistoryCompression`, `exact_linear/kernel_modes.rs::compile_source_action`, `MathematicalRequest::Power` | A repeated-word compiler: `ResidentCoupledConstitutive::append_operation` re-evaluates the whole programme |
 
+#### The embedding and decoding objects are the linked toroidal field
+
+[project-postulate] Brandon's September 14–19 direct messages (private extract:
+`.local/message-recovery-2026-09-20/`) fix what is being embedded and decoded. The embedding
+object is a chain of interlinked tori/knots: circulating phase modes on overlapping field domains
+whose shared volumes carry friction/contact faces, with heads and layers as charts of that one
+object and fractal geometry in its recurrence. Attention is a situated comparison on admitted
+contact; generation is refinement of the whole field released at a boundary, never a
+token-by-token prediction; decoding is an integration read by a participating receiver Holon
+whose frame moves relative to the field. The repository's statement of it is
+[one object, its charts and its recursive geometry](../HNN_FORMULA.md#one-object-its-charts-and-its-recursive-geometry),
+[one connected tensor computation](../HNN_FORMULA.md#one-connected-tensor-computation) and
+[the computational Holon](../HOLON.md).
+
+| Part of the object | Existing realization | At the field session |
+|---|---|---|
+| Linked toroidal carrier, shared contact cells, material advection | [`intrinsic_holonic_flow`](../../research/experiments/intrinsic_holonic_flow/README.md): six linked tori, 240 multiply-owned cells, exact incompressible flow; `simplicial`, `algebraic::GradedCausalComplex`, `analytic_field` torus charts, `HolonicTorusKnots.lean`, `traversible_chain::BandReading` | Absent. The source enters as one-hot hex-nibble codewords in offset windows `[-2..2]`; the incidence is a text offset list |
+| Phase attention on admitted incidence | `s^h_ij=β_h cos(2π(q_i−q_j−φ_ij))`, `a^h=softmax(s^h)`, sigmoid reaction, complete `∂V` with inbound and outbound participation (same reference); `NormalizedKernel`; Wave 11's row-sectioned receiver and pullback | No participation; constant condition |
+| Whole-field refinement | Symplectic split step `q'=q+κ sin 2πp`, `p'=p−∇V(q')`; resolvent `(I−λL²)x*=(1−λ)h` and its sensitivity in [`connected_holonic_field`](../../research/experiments/connected_holonic_field/README.md); `Holon.ofEvolution` | One reaction-plus-reflection pass |
+| Contact faces and exchange | Phase-sensitive dissipative contact with its energy identity; `contact_receiver_faces`, `ReceiverStressEnergy`, [active faces](../CONSTRAINT_MODES_AND_RECEIVER_FACES.md#the-overlap-has-stress-bearing-faces) | The D-reflection only |
+| Decoding by a participating receiver | Geometric decoder `A(x)=Σψ_iφ_i(x)` in the toroidal basis; [receiving Holon](../RECEIVER_HOLARCHY.md); first-arrival populations | Per-position unit-basis selection |
+
+[definition; agent-inferred] The shared-region nibble chart is a text codec and a first
+receiver, not the embedding object. #17's join realizes the object above on the resident body:
+currents on linked toroidal phase channels over a geometrically admitted incidence with its
+connection `φ`, participation as the normalized phase comparison on that incidence, refinement
+of the whole field, and the text section as one receiving face of its boundary. The overlapping
+domains' shared cells are both the contact faces and the co-present cells that #61 places across
+the cover. Inferred from the two exterior references being the only realizations of the object
+and the formula's statement that "the native model assembly still belongs to the active
+field/body". Wave 11's ports are the operators this composition calls.
+
+#### The section is one Holon; its regions are co-present cells
+
+[project-postulate] The shared-region chart is one continuing section read through overlapping
+regions. Each region reads shared immutable standing (the source section, M, D) and writes one
+disjoint centre window. Its region events therefore commute, `Λ_eΛ_f=Λ_fΛ_e`, including lineage
+and obstruction: they are one class of the trace monoid, logically co-present. The
+[hardware-cover ruling](../../research/records/2026-08-01_THE_HARDWARE_IS_A_RECEIVER_COVER_THE_CARD_MUST_CARRY_THE_CURRENT.md)
+governs their realization: physical serialization is a lax realization coordinate and creates no
+causality; a lane, block or thread is not a holon; the card must carry the current. Cost is
+reported as cells, lanes occupied and idle, and service rounds `R=ceil(N/C)` — the quantities of
+the cover — and not as the size of a matrix.
+
+| Realization relation | Existing owner | At the section path |
+|---|---|---|
+| Regions of one section, completeness and disjointness computed | `section_partition.rs::{SectionRegion,SectionPartition,certify,CellReceipt::is_interchangeable,SharedRead}` | Not called; the regions exist only as row indices |
+| Independence licensing a placement | `interchange::certify_footprints`; `hardware_cover.rs::{CoverDecomposition::of,independence,work}` | Not called by `constitutive_fibre` or `holonics-hna` |
+| Partition generates layout: gather → one shared local operator → injective or coloured scatter | `holonic-mount::section_layout::SectionLayout::generate`; Lean `Foundation/SectionLayout.lean`; `section_layout_adoption.rs` already proves `scatter_components` is an instance | Only the scatter is declared. The shared chart is exactly this shape: one M and D for every region |
+| A launch is a passage owing a receipt; threads biject with cells | `holonic-mount::launch_law::{LaunchRequirement,LawfulLaunch,PartitionedWrite}`; Lean `Foundation/DeviceLaunchLaw.lean::linear_thread_bijective` | Section kernels guard `blockIdx.x||threadIdx.x` and loop rows on one lane; `bilinear_features` issues one launch per row from a host loop |
+| Service pressure of a population on finite lanes | `receiver_current.rs::ExactReceiverCurrentLaw`; `SectionPartition`'s `SpeciesPressure` | Unmeasured; the baseline's clocks are this dilation with `C=1` |
+
+[established-bounded; measured; source-inspected] The first shared-chart baseline (110 s
+generation and 196 s update medians over 2,110–11,800 co-present regions) is this lax
+realization at one occupied lane, not a property of the model's law. It is not evidence about
+the normal statistics (#18), whose factor and solve act once per update.
+
 [definition; agent-inferred] Regions couple through each row's gathered neighbour currents and
 their participation; the centre-window scatter remains injective, so the device arm of
 `AccumulationLaw::IntegerAdd` (#13) is not a dependency of this join. Resident exact elimination

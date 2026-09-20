@@ -229,3 +229,197 @@ fn enclosed_batch_has_the_sequential_endpoint_without_input_retention() {
     assert!(batch.receive_many(&wrong).is_err());
     assert_eq!(batch.rest().unwrap(), before);
 }
+
+/// Wide (paired-word) carrier packing, as the normal state and every enclosure use it.
+fn wide_words<'c>(surface: &'c ResidentSurface<'c>, values: &[i128]) -> ResidentSection<'c> {
+    let words = values
+        .iter()
+        .flat_map(|v| {
+            let bytes = v.to_le_bytes();
+            [
+                i64::from_le_bytes(bytes[..8].try_into().unwrap()),
+                i64::from_le_bytes(bytes[8..].try_into().unwrap()),
+            ]
+        })
+        .map(|v| (v, v))
+        .collect();
+    surface
+        .mount_section_rest(
+            &ResidentSectionRest::found(1, values.len() * 2, ResidentGrain(0), 64, words).unwrap(),
+        )
+        .unwrap()
+}
+
+fn balls_meet(left: &NativeFieldCurrentBall, right: &NativeFieldCurrentBall) -> bool {
+    let separation: Rat = left
+        .center
+        .iter()
+        .zip(&right.center)
+        .map(|(a, b)| {
+            let re = &a.real - &b.real;
+            let im = &a.imaginary - &b.imaginary;
+            &re * &re + &im * &im
+        })
+        .sum();
+    let reach = &left.radius + &right.radius;
+    separation <= &reach * &reach
+}
+
+#[test]
+#[ignore = "requires CUDA; the row-sectioned applied condition agrees with the single-row owner, encloses the point section and re-enters as a source"]
+fn enclosed_condition_rows_agree_row_by_row_and_re_enter_as_the_next_source() {
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let grain = ResidentGrain(16);
+    let scale = 1i128 << grain.0;
+    let normal = ResidentNormalMaterial::found_features(&s, 3, 1, grain).unwrap();
+    // Explicit coefficient fixture: A(h)=i+(1-i)h, c(h)=2h. The test covers its realised
+    // action over a section of rows, not a fitted-learning claim.
+    let rest = normal.rest().unwrap();
+    let mut state = wides(&rest.state().intervals).unwrap();
+    state[..6].copy_from_slice(&[0, scale, 2 * scale, 0, scale, -scale]);
+    let view = ResidentNormalMaterialView {
+        surface: &s,
+        state: Rc::new(wide_words(&s, &state)),
+        source_chart: NormalSourceChart::Features { source_complex: 3 },
+        targets: 1,
+        grain,
+        observations: 0,
+    };
+    let source_words = points(&s, 2, 3, &[1, 0, 1, 0, -2, 1]);
+    let condition_words = points(&s, 2, 3, &[1, 1, 1, 1, 0, 2]);
+    let source_points = ResidentConstitutiveSection::rationals(&source_words).unwrap();
+    let condition_points = ResidentConstitutiveSection::rationals(&condition_words).unwrap();
+    let source = ResidentNormalEnclosureSection::from_points(source_points, grain).unwrap();
+    let reads = s.census().section_read_outs;
+    let reaction = view
+        .read_applied_bilinear_enclosed_section(&source, condition_points, false)
+        .unwrap();
+    let incoming = view
+        .read_applied_bilinear_enclosed_section(&source, condition_points, true)
+        .unwrap();
+    // One enclosure section re-enters as the next source with its radius intact, and the
+    // whole chain stays resident: no row was read back to the host to make it a point.
+    let again = reaction
+        .reapply_bilinear(&view, condition_points, true)
+        .unwrap();
+    assert_eq!(s.census().section_read_outs, reads);
+    assert_eq!(reaction.rows(), 2);
+    assert_eq!(reaction.components(), 2);
+    assert_eq!(again.components(), 2);
+    let value = |re: i64, im: i64| {
+        ExactComplexWaveCurrent::new(Rat::from_integer(re.into()), Rat::from_integer(im.into()))
+    };
+    // y = i·s + 2·h + (1-i)·h·s, then the identity path x + y on the shared source.
+    let expected = [
+        (value(4, 3), value(5, 3)),
+        (value(2, -1), value(2, -3)),
+    ];
+    for (row, (reacted, incame)) in expected.iter().enumerate() {
+        let single = view
+            .read_applied_bilinear(source.row(row).unwrap(), condition_points.row(row).unwrap())
+            .unwrap()
+            .inspect()
+            .unwrap();
+        let sectioned = reaction.row(row).unwrap().inspect().unwrap();
+        assert_eq!(sectioned.center, single.center);
+        assert_eq!(sectioned.radius, single.radius);
+        assert_eq!(sectioned.center, vec![reacted.clone()]);
+        let single = view
+            .read_applied_bilinear_identity(
+                source.row(row).unwrap(),
+                condition_points.row(row).unwrap(),
+            )
+            .unwrap()
+            .inspect()
+            .unwrap();
+        let sectioned = incoming.row(row).unwrap().inspect().unwrap();
+        assert_eq!(sectioned.center, single.center);
+        assert_eq!(sectioned.radius, single.radius);
+        assert_eq!(sectioned.center, vec![incame.clone()]);
+    }
+    // At zero radius the same rows are the point-section owner's rows.
+    let point_section = view
+        .read_applied_bilinear_section(source_points, condition_points)
+        .unwrap();
+    for row in 0..2 {
+        assert_eq!(
+            point_section.row(row).unwrap().inspect().unwrap().center,
+            reaction.row(row).unwrap().inspect().unwrap().center
+        );
+    }
+    // A source row that is not dyadic enters as a genuine enclosure; the returned ball still
+    // holds the exact point-section value, which is what refinement re-entry depends on.
+    let thirds = points(&s, 2, 3, &[1, 0, 3, 0, -2, 1]);
+    let thirds_points = ResidentConstitutiveSection::rationals(&thirds).unwrap();
+    let thirds_source = ResidentNormalEnclosureSection::from_points(thirds_points, grain).unwrap();
+    assert!(!thirds_source.row(0).unwrap().inspect().unwrap().radius.is_zero());
+    let enclosed = view
+        .read_applied_bilinear_enclosed_section(&thirds_source, condition_points, false)
+        .unwrap();
+    let exact = view
+        .read_applied_bilinear_section(thirds_points, condition_points)
+        .unwrap();
+    for row in 0..2 {
+        assert!(balls_meet(
+            &enclosed.row(row).unwrap().inspect().unwrap(),
+            &exact.row(row).unwrap().inspect().unwrap()
+        ));
+    }
+    // A condition row that is itself an enclosure adds its own transported term, and the
+    // result still holds the value the exact point condition produces.
+    let condition_enclosure =
+        ResidentNormalEnclosureSection::from_points(condition_points, grain).unwrap();
+    let paired = view
+        .read_applied_bilinear_enclosed_pair(&source, &condition_enclosure, false)
+        .unwrap();
+    for row in 0..2 {
+        assert!(balls_meet(
+            &paired.row(row).unwrap().inspect().unwrap(),
+            &reaction.row(row).unwrap().inspect().unwrap()
+        ));
+    }
+    let uncertain_condition = points(&s, 2, 3, &[1, 1, 3, 1, 0, 2]);
+    let uncertain_condition = ResidentNormalEnclosureSection::from_points(
+        ResidentConstitutiveSection::rationals(&uncertain_condition).unwrap(),
+        grain,
+    )
+    .unwrap();
+    let widened = view
+        .read_applied_bilinear_enclosed_pair(&source, &uncertain_condition, false)
+        .unwrap();
+    assert!(
+        widened.row(0).unwrap().inspect().unwrap().radius
+            > paired.row(0).unwrap().inspect().unwrap().radius
+    );
+    // Shape, parity and chart refusals. None of them silently restricts or pads an operand.
+    let single_row = points(&s, 1, 3, &[1, 1, 1]);
+    assert!(view
+        .read_applied_bilinear_enclosed_section(
+            &source,
+            ResidentConstitutiveSection::rationals(&single_row).unwrap(),
+            false
+        )
+        .is_err());
+    let odd = points(&s, 2, 2, &[1, 1, 1, 1]);
+    assert!(view
+        .read_applied_bilinear_enclosed_section(
+            &source,
+            ResidentConstitutiveSection::rationals(&odd).unwrap(),
+            false
+        )
+        .is_err());
+    let wide_source = points(&s, 2, 5, &[1, 0, 0, 0, 1, 0, 0, 1, 0, 1]);
+    let wide_source = ResidentNormalEnclosureSection::from_points(
+        ResidentConstitutiveSection::rationals(&wide_source).unwrap(),
+        grain,
+    )
+    .unwrap();
+    assert!(view
+        .read_applied_bilinear_enclosed_section(&wide_source, condition_points, false)
+        .is_err());
+    let coarse = ResidentNormalEnclosureSection::from_points(source_points, ResidentGrain(20)).unwrap();
+    assert!(view
+        .read_applied_bilinear_enclosed_section(&coarse, condition_points, false)
+        .is_err());
+}

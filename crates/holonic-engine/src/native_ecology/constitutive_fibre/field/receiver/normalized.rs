@@ -55,6 +55,57 @@ pub struct NativeNormalizedMaterialReading<
     pub centered_difference: Vec<ExactInterval>,
 }
 
+/// The ten-wide report decoder, shared by the occurrence receiver and the row-sectioned one.
+/// `raw` is one row: `10*nodes` signed wides read as five outward interval families at the
+/// declared grain. Both probability faces are checked against the unit interval and against
+/// their declared group sums; a face that cannot bracket one is uncertain, not repaired.
+fn decode_normalized_report(
+    raw: &[i128],
+    nodes: usize,
+    group_width: usize,
+    grain: u32,
+) -> Result<[Vec<ExactInterval>; 5], ConstitutiveFibreError> {
+    if raw.len() != 10 * nodes || group_width == 0 || nodes % group_width != 0 {
+        return Err(ConstitutiveFibreError::Shape);
+    }
+    let scale = BigInt::one() << grain;
+    let read = |offset: usize| -> Result<Vec<ExactInterval>, ConstitutiveFibreError> {
+        (0..nodes)
+            .map(|i| {
+                ExactInterval::new(
+                    Rat::new(raw[10 * i + offset].into(), scale.clone()),
+                    Rat::new(raw[10 * i + offset + 1].into(), scale.clone()),
+                )
+                .map_err(|e| ConstitutiveFibreError::Arithmetic(e.to_string()))
+            })
+            .collect()
+    };
+    let prediction = read(0)?;
+    let observation = read(2)?;
+    for family in [&prediction, &observation] {
+        if family
+            .iter()
+            .any(|v| v.lower < Rat::zero() || v.upper > Rat::one())
+        {
+            return Err(ConstitutiveFibreError::Uncertain);
+        }
+        for group in family.chunks_exact(group_width) {
+            let lower: Rat = group.iter().map(|v| &v.lower).sum();
+            let upper: Rat = group.iter().map(|v| &v.upper).sum();
+            if lower > Rat::one() || upper < Rat::one() {
+                return Err(ConstitutiveFibreError::Uncertain);
+            }
+        }
+    }
+    Ok([
+        prediction,
+        observation,
+        read(4)?,
+        read(6)?,
+        read(8)?,
+    ])
+}
+
 impl<'chart, Provenance: Clone, Chart: Clone, Origin>
     NativeNormalizedMaterialReturn<'chart, Provenance, Chart, Origin>
 {
@@ -96,38 +147,8 @@ impl<'chart, Provenance: Clone, Chart: Clone, Origin>
     ) -> Result<NativeNormalizedMaterialReading<Provenance, Chart>, ConstitutiveFibreError> {
         let rest = self.surface.detach_section(&self.output, 64)?;
         let raw = material_transport::wides(&rest.intervals)?;
-        if raw.len() != 10 * self.nodes {
-            return Err(ConstitutiveFibreError::Shape);
-        }
-        let scale = BigInt::one() << self.grain;
-        let read = |offset: usize| -> Result<Vec<ExactInterval>, ConstitutiveFibreError> {
-            (0..self.nodes)
-                .map(|i| {
-                    ExactInterval::new(
-                        Rat::new(raw[10 * i + offset].into(), scale.clone()),
-                        Rat::new(raw[10 * i + offset + 1].into(), scale.clone()),
-                    )
-                    .map_err(|e| ConstitutiveFibreError::Arithmetic(e.to_string()))
-                })
-                .collect()
-        };
-        let prediction = read(0)?;
-        let observation = read(2)?;
-        for family in [&prediction, &observation] {
-            if family
-                .iter()
-                .any(|v| v.lower < Rat::zero() || v.upper > Rat::one())
-            {
-                return Err(ConstitutiveFibreError::Uncertain);
-            }
-            for group in family.chunks_exact(self.group_width) {
-                let lower: Rat = group.iter().map(|v| &v.lower).sum();
-                let upper: Rat = group.iter().map(|v| &v.upper).sum();
-                if lower > Rat::one() || upper < Rat::one() {
-                    return Err(ConstitutiveFibreError::Uncertain);
-                }
-            }
-        }
+        let [prediction, observation, returned_difference, potential_pullback, centered_difference] =
+            decode_normalized_report(&raw, self.nodes, self.group_width, self.grain)?;
         Ok(NativeNormalizedMaterialReading {
             source: self.source.clone(),
             receiving: self.receiving.clone(),
@@ -137,9 +158,9 @@ impl<'chart, Provenance: Clone, Chart: Clone, Origin>
             target_chart: self.target_chart.clone(),
             prediction,
             observation,
-            returned_difference: read(4)?,
-            potential_pullback: read(6)?,
-            centered_difference: read(8)?,
+            returned_difference,
+            potential_pullback,
+            centered_difference,
         })
     }
 }
@@ -232,6 +253,12 @@ impl<'chart> NativeConstitutiveField<'chart> {
 mod pullback;
 pub use pullback::{
     NativeMaterialPullbackMetric, NativeMaterialSourcePullback, NativeMaterialSourcePullbackReading,
+};
+
+mod section;
+pub use section::{
+    NativeNormalizedFaceMeasure, NativeNormalizedSection, NativeNormalizedSectionPullback,
+    NativeNormalizedSectionPullbackReading, NativeNormalizedSectionRowReading,
 };
 
 #[cfg(test)]

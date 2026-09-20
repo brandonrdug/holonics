@@ -72,7 +72,9 @@ pub use material_transport::{NormalSourceChart,
 };
 pub use receiver::{NativeFieldDifferentialReading, NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn,
     NativeMaterialPacketReading, NativePacketQuadrature, NativeMaterialActuation,
-    NativeMaterialPullbackMetric, NativeMaterialSourcePullback, NativeMaterialSourcePullbackReading};
+    NativeMaterialPullbackMetric, NativeMaterialSourcePullback, NativeMaterialSourcePullbackReading,
+    NativeNormalizedFaceMeasure, NativeNormalizedSection, NativeNormalizedSectionPullback,
+    NativeNormalizedSectionPullbackReading, NativeNormalizedSectionRowReading};
 pub use resident_input::NativeFieldIncoming;
 pub use material_transport::ResidentNormalEnclosureSection;
 pub use rest::NativeFieldRest;

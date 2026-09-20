@@ -1,7 +1,10 @@
 # AGENTS.md — Holonics operating contract
 
 Brandon's latest direct request governs. This is the one shared contract for Codex (Astra) and
-Claude; there is no separate CLAUDE.md. Either primary may refine it, keeping the other's harness
+Claude. Claude sessions and their subagents load [`CLAUDE.md`](CLAUDE.md), Claude's self-contained
+operating document (the machine, its equations, the code map, commands); Codex loads this file.
+**Read [the machine](docs/THE_MACHINE.md) first: it states what HNN is in its own geometry, why
+that geometry is the learning, and where each part lives.** Either primary may refine it, keeping the other's harness
 instructions intact. The repository belongs to one human operator, not an approval committee.
 
 ## Sustained construction control
@@ -281,8 +284,8 @@ before resuming the HNN line. Do not substitute an authored classifier, score, s
 or per-language rule for contextual transport inside HNN. Reuse existing native owners; ground-up does not mean no
 foundations. Inherited-model work is deferred, not universally banned.
 
-1. Read this contract, [CONSTRUCTION_STATE.md](CONSTRUCTION_STATE.md), and the complete
-   [live roadmap](docs/plans/THE_ROADMAP.md).
+1. Read [the machine](docs/THE_MACHINE.md), this contract, [CONSTRUCTION_STATE.md](CONSTRUCTION_STATE.md),
+   and the complete [live roadmap](docs/plans/THE_ROADMAP.md).
 2. Read the relevant current architecture/interface guide and exact source owners. Use
    [ARCHITECTURE_MAP.md](docs/ARCHITECTURE_MAP.md) to cross Lean, Rust and CUDA ownership,
    and the subject guides, dated research directories and repository-local evidence to find support.

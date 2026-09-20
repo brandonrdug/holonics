@@ -1,8 +1,9 @@
 # Worker brief, receipts and wave protocol
 
 [definition] This is the part of the [operating contract](../AGENTS.md) a delegated worker needs.
-The primary agent inlines the relevant sections into each worker prompt, so a worker does not read
-AGENTS.md, the roadmap, DEVELOPMENT.md or CONSTRUCTION_STATE. It schedules nothing and gates
+A Claude worker receives the machine, its equations and the code map through the repository's
+[`CLAUDE.md`](../CLAUDE.md), which the harness loads into every subagent; the primary inlines the relevant sections below and names the part of the
+machine the task realizes, so a worker does not read the roadmap, DEVELOPMENT.md or CONSTRUCTION_STATE. It schedules nothing and gates
 nothing. The strongest validation in this project is execution against reality — the program
 running, predicting real structures accurately, at a usable cost. Everything here exists to stop
 repeating work that has already been answered, so that effort goes there.
@@ -103,6 +104,7 @@ Your paths (edit nothing outside; if you must, stop and report):  <paths>
 Shell is fish: use `bash -c` for pipelines. CUDA: PATH=/opt/cuda/bin:$PATH.
 Run only: <module-scoped commands>.  Forbidden: crate-wide/workspace/device runs.
 Sections of docs/WORKER_BRIEF.md inlined: receipts, prior-art, decisions, invariants, vocabulary.
+Part of the machine: <row of docs/THE_MACHINE.md this realizes, and what its native column becomes>.
 Contract: <plan document and anchor>.  Existing owners to compose: <files/declarations>.
 Task: <operands, law, consumer, completion evidence>.
 ```

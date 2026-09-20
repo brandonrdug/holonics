@@ -54,6 +54,7 @@ fn main() {
     println!("cargo:rerun-if-changed=kernels/exact_packet_linear.cuh");
     println!("cargo:rerun-if-changed=kernels/direct_normal_material.cuh");
     println!("cargo:rerun-if-changed=kernels/normal_applied_relation.cuh");
+    println!("cargo:rerun-if-changed=kernels/section_bilinear_adjoint.cuh");
     println!("cargo:rerun-if-changed=kernels/normal_material_section.cuh");
     println!("cargo:rerun-if-changed=kernels/current_difference_section.cuh");
     println!("cargo:rerun-if-changed=kernels/normal_wave.cuh");

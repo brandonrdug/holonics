@@ -1717,6 +1717,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 #include "passive_current_ball.cuh"
 #include "normal_source_actuation.cuh"
 #include "constitutive_field.cuh"
+#include "section_bilinear_adjoint.cuh"
 
 // Candidate finite passive-contact projection.  One block owns one query row and first forms the
 // founding row's shared d/D/N and the query row's dot interval; `founding_rows == 1` broadcasts

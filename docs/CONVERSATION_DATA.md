@@ -303,6 +303,21 @@ target/debug/examples/alpha_exposure .local/artifacts/athena-alpha/ac0/NEW-curso
 records cold delivery only. AC3 must pair it atomically with the actual native successor before
 claiming resumable cultivation. File readback is not a native operation or a trained checkpoint.
 
+[established-bounded; implemented-exact] `NativeFieldSession` now carries that pairing.
+`attach_exposure_cursor` holds one `ExposureCursor`, and the existing `checkpoint` publication
+writes it inside the same atomically published session file as the trained model, in a version-3
+field-session rest that keeps versions 1 and 2 readable. A frame is acknowledged only after its
+complete native use, so an unacknowledged frame's cursor still names that frame and a reopened
+session redelivers it; the saved position and the state that consumed it can therefore not
+diverge across a restart. `FieldSectionRequest::from_exposures` is the bridge: it revalidates
+each frame against its manifest, admits development-partition, human-authored request material
+only, and builds a held request with a declared free response extent
+(`ExposureAperture::{request_bytes,response_symbols,context_bytes}`). The recorded responding
+occurrence — the family a frame records as its own `comparison-request` partner, read by
+`ExposureOccurrence::recorded_comparison_request` — arrives afterwards as an observed comparison
+retained at its producing cut. It is an observed candidate, never gold, and the exterior cursor
+plus this pairing still establish delivery and use, not cultivated capability.
+
 [established-bounded; measured] The [AC0 return](../research/records/2026-09-06_AC0_THE_CONVERSATIONS_ENTER_AS_SEPARATE_OCCURRENCES_AND_THE_COLD_CURSOR_RESTARTS.md)
 contains the actual 184,572,827-byte private exposure: 36,920 families, 49,928 captured views,
 34,046 development / 1,121 evaluation / 1,753 deferred families. All 49,142 visible source events

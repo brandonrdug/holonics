@@ -108,6 +108,118 @@ impl<'chart> ResidentSurface<'chart> {
             self.declaration.warp_size.max(1),0,&mut params,"field-normalized-receiver")
     }
 
+    /// Record the same normalized comparison over every row of a typed enclosure section. Each
+    /// operand row is one region's ball, `2*(2*nodes+1)` words; the report is `20*nodes` words a
+    /// row and each returned face is again a ball of the operand's own chart. One block per row.
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_rows_normalized_receiver(
+        &self, lane: &Lane<'_, 'chart>, prediction: &ResidentSection<'chart>,
+        observation: Option<&ResidentSection<'chart>>, rows: usize, nodes: usize,
+        group_width: usize, grain: u32, terms: SeriesAperture, packet_face: bool,
+        report: &ResidentSection<'chart>, participation: &ResidentSection<'chart>,
+        difference: &ResidentSection<'chart>, potential: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || ResidentRefusal::Declaration {
+            operation: "rows-normalized-receiver",
+            what: "incompatible row-sectioned normalized receiver chart".into(),
+        };
+        let report_words = nodes.checked_mul(20).ok_or_else(fail)?;
+        let ball_words = nodes
+            .checked_mul(2)
+            .and_then(|n| n.checked_add(1))
+            .and_then(|n| n.checked_mul(2))
+            .ok_or_else(fail)?;
+        let compared = observation.unwrap_or(prediction);
+        let ball = |s: &ResidentSection<'chart>| s.rows == rows && s.width == ball_words;
+        if rows == 0
+            || rows > u32::MAX as usize
+            || nodes == 0
+            || nodes > u32::MAX as usize / 20
+            || group_width == 0
+            || nodes % group_width != 0
+            || !(1..=120).contains(&grain)
+            || terms.0 == 0
+            || terms.0 == u32::MAX
+            || !ball(prediction)
+            || !ball(compared)
+            || !ball(participation)
+            || !ball(difference)
+            || !ball(potential)
+            || report.rows != rows
+            || report.width != report_words
+            || [prediction, compared, report, participation, difference, potential]
+                .iter()
+                .any(|s| s.grain.0 != 0 || !std::ptr::eq(s.surface, self))
+        {
+            return Err(fail());
+        }
+        let mut params = Params::new();
+        params
+            .ptr(prediction.lo.device_ptr()).ptr(prediction.hi.device_ptr())
+            .ptr(compared.lo.device_ptr()).ptr(compared.hi.device_ptr())
+            .u32(u32::from(observation.is_some()))
+            .u32(rows as u32).u32(nodes as u32).u32(group_width as u32)
+            .u32(grain).u32(terms.0).u32(u32::from(packet_face))
+            .ptr(report.lo.device_ptr()).ptr(report.hi.device_ptr())
+            .ptr(participation.lo.device_ptr()).ptr(participation.hi.device_ptr())
+            .ptr(difference.lo.device_ptr()).ptr(difference.hi.device_ptr())
+            .ptr(potential.lo.device_ptr()).ptr(potential.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane, "section_rows_normalized_receiver", rows,
+            self.declaration.warp_size.max(1), 0, &mut params, "rows-normalized-receiver")
+    }
+
+    /// Record the return of a covector section through the normalized face of the same section:
+    /// `J_p g` row by row, reading `p` from the face report the covector was declared on.
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_rows_normalized_pullback(
+        &self, lane: &Lane<'_, 'chart>, face: &ResidentSection<'chart>,
+        covector: &ResidentSection<'chart>, rows: usize, nodes: usize, group_width: usize,
+        grain: u32, report: &ResidentSection<'chart>, potential: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || ResidentRefusal::Declaration {
+            operation: "rows-normalized-pullback",
+            what: "incompatible row-sectioned normalized covector chart".into(),
+        };
+        let report_words = nodes.checked_mul(20).ok_or_else(fail)?;
+        let ball_words = nodes
+            .checked_mul(2)
+            .and_then(|n| n.checked_add(1))
+            .and_then(|n| n.checked_mul(2))
+            .ok_or_else(fail)?;
+        if rows == 0
+            || rows > u32::MAX as usize
+            || nodes == 0
+            || nodes > u32::MAX as usize / 20
+            || group_width == 0
+            || nodes % group_width != 0
+            || !(1..=120).contains(&grain)
+            || face.rows != rows
+            || face.width != report_words
+            || report.rows != rows
+            || report.width != report_words
+            || covector.rows != rows
+            || covector.width != ball_words
+            || potential.rows != rows
+            || potential.width != ball_words
+            || [face, covector, report, potential]
+                .iter()
+                .any(|s| s.grain.0 != 0 || !std::ptr::eq(s.surface, self))
+        {
+            return Err(fail());
+        }
+        let mut params = Params::new();
+        params
+            .ptr(face.lo.device_ptr())
+            .u32(rows as u32).u32(nodes as u32).u32(group_width as u32).u32(grain)
+            .ptr(covector.lo.device_ptr()).ptr(covector.hi.device_ptr())
+            .ptr(report.lo.device_ptr()).ptr(report.hi.device_ptr())
+            .ptr(potential.lo.device_ptr()).ptr(potential.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane, "section_rows_normalized_pullback", rows,
+            self.declaration.warp_size.max(1), 0, &mut params, "rows-normalized-pullback")
+    }
+
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn record_normalized_sum_receiver(
         &self, lane: &Lane<'_, 'chart>, anchor: &ResidentSection<'chart>, anchor_at: usize,

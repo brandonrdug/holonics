@@ -301,3 +301,59 @@ fn shared_parent_keeps_common_evidence_and_refuses_a_link_order_choice() {
         assert!(frame.shared_prior_parent().is_err());
     }
 }
+
+#[test]
+fn recorded_comparison_request_reads_one_relation_kind_beside_unusable_links() {
+    let mut frame: ExposureOccurrence =
+        serde_json::from_value(occurrence(3, "reply", "agent-visible", "response")).unwrap();
+    assert_eq!(frame.shared_author_class().unwrap(), "agent-visible");
+    assert_eq!(frame.recorded_comparison_request().unwrap(), None);
+    let link = ExposureLink {
+        kind: "comparison-request".into(),
+        target_event: Some(1),
+        reference: None,
+        evidence: "captured".into(),
+        target: Some(ExposureTarget {
+            event: 1,
+            source: 1,
+            provider: "codex".into(),
+            record_group: "declared:request".into(),
+            timestamp: None,
+            normalized_timestamp: None,
+        }),
+        availability: ExposureAvailability::Prior,
+    };
+    let tool = ExposureLink {
+        kind: "tool-result-candidate".into(),
+        availability: ExposureAvailability::Ambiguous,
+        ..link.clone()
+    };
+    frame.views[0].links = vec![tool.clone(), link.clone()];
+    // The wider parent port still refuses this family; the recorded partner remains readable.
+    assert!(frame.shared_prior_parent().is_err());
+    assert_eq!(
+        frame
+            .recorded_comparison_request()
+            .unwrap()
+            .unwrap()
+            .record_group,
+        "declared:request"
+    );
+    frame.views.push(frame.views[0].clone());
+    frame.views[1].links = vec![tool];
+    assert!(frame.recorded_comparison_request().is_err());
+    frame.views.pop();
+    let mut other = link.clone();
+    other.target.as_mut().unwrap().record_group = "declared:different".into();
+    frame.views[0].links = vec![link.clone(), other];
+    assert!(frame.recorded_comparison_request().is_err());
+    frame.views[0].links = vec![ExposureLink {
+        availability: ExposureAvailability::NotPrior,
+        ..link
+    }];
+    assert!(frame.recorded_comparison_request().is_err());
+    frame.views[0].author_class = "human".into();
+    frame.views.push(frame.views[0].clone());
+    frame.views[1].author_class = "agent-visible".into();
+    assert!(frame.shared_author_class().is_err());
+}

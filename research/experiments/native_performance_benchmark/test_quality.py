@@ -1,5 +1,6 @@
 import copy
 from fractions import Fraction as Q
+import json
 import unittest
 
 import quality
@@ -22,6 +23,19 @@ class ConsequenceReceiversTest(unittest.TestCase):
         rows=[r for group in quality.check_field(changed)['families'].values() for r in group]
         self.assertFalse(rows[0]['complete_correct'])
         self.assertFalse(rows[0]['presentation_agrees_with_symbols'])
+
+    def test_shared_family_refuses_a_count_without_its_comparators_or_preserved_source(self):
+        report=quality.check_shared()
+        self.assertEqual(len(report['families']),2)
+        self.assertTrue(all(f['supplied_preserved']==f['supplied_count'] for f in report['families']))
+        self.assertTrue(all(f['content_free_comparators'] for f in report['families']))
+        value=json.loads((quality.SHARED/'results.json').read_text())
+        missing=copy.deepcopy(value);del missing['validation']['families'][0]['most_frequent_byte_predictor_correct']
+        with self.assertRaises(ValueError):quality.check_shared(missing)
+        lost=copy.deepcopy(value);lost['validation']['families'][0]['supplied_preserved']-=1
+        with self.assertRaises(ValueError):quality.check_shared(lost)
+        short=copy.deepcopy(value);short['validation']['families'][1]['extent_agrees']=False
+        with self.assertRaises(ValueError):quality.check_shared(short)
 
     def test_missing_or_refused_responses_cannot_silently_zip_to_success(self):
         with self.assertRaises(ValueError):quality.check_events([],1,'field-request')
