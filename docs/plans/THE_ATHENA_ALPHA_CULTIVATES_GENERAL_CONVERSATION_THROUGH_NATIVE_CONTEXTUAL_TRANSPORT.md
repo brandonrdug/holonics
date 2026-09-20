@@ -909,6 +909,36 @@ questions; a new endpoint campaign is not the critical path to HNN outputs.
 `C/field/material_transport/normal/direct/wave/`. **A** is
 `crates/holonics-hna/src/native/`. These abbreviations are navigation only.
 
+<a id="field-session-source-map"></a>
+
+### Field-session source map
+
+[established-bounded; source-inspected] This is the map for the active consumer (#16–#19),
+checked against `1dc61373`. **K** is `crates/holonic-engine/kernels/`. The
+[owner-network record](../../research/records/2026-09-20_THE_FIELD_SESSION_JOIN_HAS_ITS_OWNER_NETWORK_AND_NAMED_ABSENCES.md)
+holds every owner, test and governing record per relation; this table holds the call, the
+machinery to start from and the object that does not exist yet. An implementer begins here.
+
+| Operation at the consuming call | Start from | Does not exist yet |
+|---|---|---|
+| Participation `a_FG[Ψ]` over a row's gathered region currents (#17) | Resident `C/field/receiver/normalized.rs` and `K/field_normalized_receiver.cuh::normalized_compare_faces`; exact reference `exponentiated_ratio/transport.rs::NormalizedKernel`; whole calculation `examples/connected_holonic_field.rs` | A **row-sectioned** normalized receiver: both resident entries refuse `rows != 1` and are keyed on field-history occurrences |
+| `δa·UΨ`: the return to the condition operand (#17) | `C/field/receiver/normalized/pullback.rs`, `K/field_material_pullback.cuh`; `NormalizedKernel::{differential,pullback}`; the derived response `w=(2I+JG⁻¹J*)⁻¹r`, `δM=wΨ*`, `z=G⁻¹J*w` in the [cotangent record](../../research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_HAS_A_CONTEXT_COTANGENT.md) | An **adjoint of `section_constitutive_bilinear_source`**: no owner returns a covector to the condition port |
+| Source⊗condition reaction with a content-valued condition (#17) | `C/resident/section/bilinear_features.rs`; `C/…/normal/direct/section.rs::read_applied_bilinear_section`; point form `direct.rs::read_applied_bilinear_joint` with `K/normal_applied_condition.cuh` | An enclosure-source **section** form; and the condition chart is pinned to one coordinate at founding (`shared_extents`, `found_bilinear_contact`, `found_features`), M's width being `s(1+k)+k` |
+| Refinement by re-entry of the generated section (#17) | `…/direct/section.rs::{from_points,sum_same_shape,restrict_components,scatter_components}`, `ResidentHeldSection`; point re-entry `C/field/resident_input.rs::advance_current_resident`; public, uncalled `NativeCoupledBody::receive_condition` | The **enclosure-section → next-source port** (`from_points` has no inverse); a section-level caller of the layer composition and iteration |
+| Section-scale change of D (#19) | Single-row `C/field/junction/operative/source/reflection_target.rs::apply_reflection_target` (used by `body/field.rs::observe`); `operative.rs` contact staging; `propagation.rs::propagate_causal_contacts`; `resident/condition_contact.rs` | Multi-row `section_field_reflection_target`/`_input_cotangent`; `observe_rows` is fixed-D by construction |
+| Source episode → request (#16) | `alpha/exposure.rs::ExposureReader` with `validate`/`development_parts`; `A/field_session.rs::from_exposures`; private exposure stream and the prepared, unexecuted `.local/evaluations/athena-shared-source-2026-09-15/` | **Any exposure→field-session driver**; a request/response aperture (`partial`, `output_symbols`) and the partition/role gates in `from_exposures` |
+| Recorded comparison, save, reopen (#16) | Field rest pending kinds 1–3, session wire v2, `observe_source` | A producing comparison in the shared chart (`prepare_shared` refuses `commit`/`retain_comparison`); an `ExposureCursor` in `NativeFieldSavedSession`; a shared-chart baseline and README |
+| Normal statistics at the measured width (#18) | `C/…/normal/layout.rs::NormalLayout::for_sources` (the explicit cost); resident factor/solve `K/field_normal_material.cuh`; host `factored_moment`, `derived_factor_cover`, `exact_linear/kernel_modes.rs`; resident `C/field/internal_mode.rs` | A factored variant of `NormalSourceChart`/`NormalLayout` and a resident adapter for any factored owner |
+| Repeated refinement word reused economically (milestone 3) | `receiver_history_compression/observable.rs::ObservableMomentReceiverHistoryCompression`, `exact_linear/kernel_modes.rs::compile_source_action`, `MathematicalRequest::Power` | A repeated-word compiler: `ResidentCoupledConstitutive::append_operation` re-evaluates the whole programme |
+
+[definition; agent-inferred] Regions couple through each row's gathered neighbour currents and
+their participation; the centre-window scatter remains injective, so the device arm of
+`AccumulationLaw::IntegerAdd` (#13) is not a dependency of this join. Resident exact elimination
+(#50) has no consumer on this path: the normal factor/solve is already resident and every
+`exact_linear` call here is below the certified-path crossover.
+
+### Coupled-wave source map (September 13)
+
 [established-bounded; source-inspected] The September 13 pickup checks this source map against
 `eee6ab9d`. The earlier [pickup review](../../research/records/2026-09-12_THE_RETURN_CYCLE_STANDS_AND_THE_PICKUP_FOLLOWS_SOURCE_APPLICABILITY.md)
 retains its original consuming-path audit. The joint preview, public fixed-operator Power and

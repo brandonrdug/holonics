@@ -282,7 +282,7 @@ documents hold each statement's evidence, owners and findings.
 | Biological ecology (application deferred) | B0–B10; predictor/design/measured RBX1 comparisons; bounded conditioned response | Further application runs are deferred. Generic evaluation, interface and codec obligations remain at their actual shared owners and do not schedule another biology campaign. |
 | Exact device law | D1–D3; one engine coordinate instance cross-checked on the card | resident rational algebra at its consuming calls (#50); signed 128-bit words and radius with the engine's carrier refusal where consumed; per-region operators; base-pointer registry; common context ownership; D4 stays an intention |
 | Generalized transport and the Holonic Interaction chain | T1–T8 at their declared scopes; the Holonic Interaction unit with media and contact exchange; the two-media chain read at the elastic-network consumer; structural analytic width for that elastic specialization at every admitted extent | the multi-neck chain; faces derived from contact geometry; the time/entropy crossing (#5); general analytic pole factors (#35); a plural family generic in its coordinate address; a faithful Israel-junction instance (#23) |
-| Elementary helical geometry, identities and reuse | Shared screw generator, pair quadrance jet and formal local laws; bounded chart identities from the repaired atlas | Continue the generator/contact/receiving composition and existing landmark/future-quotient joins (#48–#49). Full ideal/graph/analytic claims retain their own open equations. |
+| Elementary helical geometry, identities and reuse | Shared screw generator, pair quadrance jet and formal local laws; bounded chart identities from the repaired atlas | The screw pair's caller into the existing moment compression and phase-closure owners, and the repeated-word compiler on the HNN side (#48–#49). Full ideal/graph/analytic claims retain their own open equations. |
 
 [definition] GitHub issues index these owners under the interaction-chain, resident-execution,
 complete-source-session and elementary-geometry/reuse delivery views. Scientific validation is a
@@ -300,33 +300,44 @@ consumer. Milestones are views of shared work; this section supplies the constru
    the generator, frame and material remain its declared source until their own formation law
    constructs them. A certified polynomial basis is useful within that scope, not a completed
    account of all Holonic Compression.
-2. **Carry the library's generating relations into the existing HNN field/session.** The next
-   application join is #16/#17: actual evolving region currents participate in the same
-   content-dependent transport/refinement and paired return. The current shared request calls
-   `preview_field_rows` once on rows prepared from the original source; a repeated fixed affine
-   map alone does not supply the missing content dependence. Compose the
-   [formula's](../HNN_FORMULA.md) `a_FG[Ψ] U_(F←G)[Ψ] Ψ_G` and both terms of its variation through
-   the existing resident source/bilinear/normal/constitutive owners and `NativeCoupledBody`.
-   Receive the complete source's generated section, its constraints, producing update and saved
-   continuation through the same public session. This consumes the machinery; it is not a new
-   standalone classifier, solver wrapper or mathematical demonstration in place of that call.
-3. **Make reuse and realization part of that consuming operation.** Apply existing
-   `ReceiverHistoryCompression`, `GeneratorModeQuotient`, `GeneratorInference`, phase/winding and
-   code-cost laws where the actual source maps meet their hypotheses. Expose the separator or
-   retained interior when `E_next T = U E` fails. Exact geometry/algebra reference owners remain
-   useful, while the hot HNN operation stays resident under `hardware_cover`, `launch_law` and
-   the supported packet/tile kernels. #50's host certified algebra returned; its modular pivot
-   device passage did not. Existing resident bilinear packet kernels are composition material,
-   with a different ring/ABI, not evidence that a modular pivot implementation is already wired.
-   Per-region operators and context ownership are addressed at the calls that consume them.
+2. **Carry the library's generating relations into the existing HNN field/session (#16/#17).**
+   The law is the [formula's](../HNN_FORMULA.md) `a_FG[Ψ] U_(F←G)[Ψ] Ψ_G` with both terms of its
+   variation, through `NativeCoupledBody` and the public session. The
+   [field-session source map](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#field-session-source-map)
+   names, per operation, the machinery to start from and the object that does not exist; the
+   [owner-network record](../../research/records/2026-09-20_THE_FIELD_SESSION_JOIN_HAS_ITS_OWNER_NETWORK_AND_NAMED_ABSENCES.md)
+   holds every owner, test and governing record. The order follows those absences:
+   - **Ports, in parallel on disjoint owner paths.** (a) The row-sectioned normalized receiver
+     and its pullback. (b) The bilinear-source adjoint to the condition operand, the
+     enclosure-source section form and the re-entry port. (c) The session and source: an
+     exposure→field-session driver with a request/response aperture and its partition/role
+     gates, a producing comparison in the shared chart, the exposure cursor in the saved
+     session, and the first executed shared-chart baseline with its README.
+   - **The join, sequential.** `prepare_rows`, `observe_rows`, `shared_request` and the founding
+     chart compose participation over gathered neighbour currents, refinement by re-entry and
+     both variation terms, checked against `connected_holonic_field` and the exact
+     `NormalizedKernel` reference.
+   - **Episodes.** Development families train through the public session; held-out evaluation
+     families are inspected with the existing kit; the saved session reopens with its cursor;
+     cost is reported against the retained baselines. #18 is answered at the width this run
+     measures, and #19 supplies the section-scale change of D that `observe_rows` lacks.
+3. **Make reuse and realization part of that consuming operation (#48/#49).** The helical pair's
+   product-current bridge already has its owner in moment form:
+   `ObservableMomentReceiverHistoryCompression` with
+   `quadraticMoment_generatedWord_eq_transportMomentWord`. Give `relational_geometry::screw` its
+   caller there with the pair receiver, and its phase-closure reading through the existing
+   winding/landmark owners; expose the separator when `E_next T = U E` fails. The same owners
+   then meet the join's repeated refinement word, where `append_operation` presently re-evaluates
+   the whole programme. Resident exact elimination (#50, #12–#15) has no consumer on the HNN
+   path: the normal factor/solve is already resident and the path's exact calls are below the
+   certified crossover. It remains library work for the structural consumers and is not in this
+   order.
 
-[definition; agent-inferred] The next HNN assignment should own the complete region-refinement
-join and its public session return, inferred from the actual `shared_request` call and the
-standing field formula. Geometry, exact algebra and identity tasks name the operation they
-contribute to that join or their separate explicitly requested mathematical consequence. The
-helical development continues as shared mathematics; it is not converted into a new protein
-receiver task. Neither the full identity catalogue, the complete device plan, nor a Millennium
-endpoint is a universal prerequisite of the session.
+[definition; agent-inferred] The port sets were split from the disjoint files the absences live
+in, and the join made sequential because it consumes all three returns. Geometry, exact algebra
+and identity tasks name the operation they contribute to that join or their separately requested
+mathematical consequence. Neither the full identity catalogue, the complete device plan, nor a
+Millennium endpoint is a universal prerequisite of the session.
 
 [established-bounded; source-inspected] Wave 10's 0.220 s rank/kernel and 14.119 s rigidity figures
 at 612 coordinates used **synthetic lattice/bar inputs**, including a real API call on synthetic
