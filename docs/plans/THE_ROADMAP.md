@@ -308,11 +308,11 @@ consumer. Milestones are views of shared work; this section supplies the constru
    [owner-network record](../../research/records/2026-09-20_THE_FIELD_SESSION_JOIN_HAS_ITS_OWNER_NETWORK_AND_NAMED_ABSENCES.md)
    holds every owner, test and governing record. The order follows those absences:
    - **Ports, in parallel on disjoint owner paths.** (a) The row-sectioned normalized receiver
-     and its pullback. (b) The bilinear-source adjoint to the condition operand, the
-     enclosure-source section form and the re-entry port. (c) The session and source: an
+     and its pullback (#57). (b) The bilinear-source adjoint to the condition operand, the
+     enclosure-source section form and the re-entry port (#58). (c) The session and source: an
      exposure→field-session driver with a request/response aperture and its partition/role
      gates, a producing comparison in the shared chart, the exposure cursor in the saved
-     session, and the first executed shared-chart baseline with its README.
+     session, and the first executed shared-chart baseline with its README (#59).
    - **The join, sequential.** `prepare_rows`, `observe_rows`, `shared_request` and the founding
      chart compose participation over gathered neighbour currents, refinement by re-entry and
      both variation terms, checked against `connected_holonic_field` and the exact
