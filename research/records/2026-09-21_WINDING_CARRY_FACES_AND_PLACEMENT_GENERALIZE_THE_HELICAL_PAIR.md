@@ -8,6 +8,8 @@ them. The reusable definitions live in the
 source recovery and the boundary between theorem and correspondence. No native HNN behavior
 changed.
 
+[historical] The later [design iteration](2026-09-21_THE_GENERATOR_MACHINE_RETAINS_ITS_SOURCE_AND_RECEIVING_LAWS.md) preserves this return and corrects its source-moment attribution, zero-power/lock and closure domains, harmonic-standing scope, spectral/functionality claim and cost contract. Use the live guides and native contract for the finalized implementation. The measurements and original source audit below retain their recorded scope.
+
 ## Direction
 
 [project-postulate] Brandon's September 21 message, written deliberately coarsely and asking for

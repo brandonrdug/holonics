@@ -87,10 +87,10 @@ the obligation it leaves in #62.
 
 [project-postulate] **September 21: the unit's general objects are one picture and stay
 attached.** The [winding guide](../WINDING_CARRY_AND_PLACEMENT.md) states them with checked laws
-and owners: the helix as a circle with its carry cocycle, the pair's lock as the zero-power
-direction with a modular (Farey) address and mediant cost, the determinant, trace sequence and
+and owners: the helix as a circle with its carry cocycle, the pair's no-slip direction
+(zero power under definite response) with a modular (Farey) address and mediant cost, the determinant, trace sequence and
 transfer determinant that phase carriage conserves with placement by signature, the holonomy a
-cell reads with the dormant mode as its harmonic class, the tube between cross-section charts
+cell reads with harmonic standing relative to node/cell receivers, the tube between cross-section charts
 read as a map or a pairing, and continuation through a tower. Their Lean owners are
 `Geometry/{PhaseCarry,PairResonance}` and `Transport/{GeneratorTraceFaces,CellHolonomy}`; the
 exact native owner is `relational_geometry::winding`. Primes, `ζ`, `Λ_DN`, elliptic curves, Hodge
@@ -130,6 +130,12 @@ now adds actual contextual text, producing-comparison and delivery restart. Broa
 conduct and economical representation continue through that consumer. Fitting another predictor
 to the field is a separate application.
 
+[project-postulate] The current September 21 pass finalizes designs and elementary formal
+contracts before the user initiates the implementation campaign. The
+[iteration record](../../research/records/2026-09-21_THE_GENERATOR_MACHINE_RETAINS_ITS_SOURCE_AND_RECEIVING_LAWS.md)
+resolves the source-moment, chart, phase, kernel, standing and invariant boundaries. The
+construction below is the agreed next order; this pass does not begin its native packets.
+
 ## Athena construction order
 
 [definition] These are ordered delivery milestones. Data attachment, appropriate tests,
@@ -139,7 +145,7 @@ begin where its inputs exist; it must not delay the first trainable model operat
 | Milestone | Construction and dependencies | Delivered result |
 |---|---|---|
 | **1. One trainable HNN model** | Attach the operative field to the existing public body; compose admitted transport, local learned reaction, joint generation and producing-material update. Bind one complete input/output section and its observed target. | A public invocation generates an actual joint section; a real comparison develops its generating material; held-out inputs use that material. Report the source, output, target, update law, error and execution cost. |
-| **2. Helical pair interaction sites, phase-carried context and situated generator inference** | Join `ScrewPair` and `HolonicInteraction` in the engine; build the field from a fixed generator machine whose phases carry the source and whose receiving positions are phases; use the full pair receiver and its jet pullback; infer configurations, rates and admitted pairs by closure; bind standing and release. Retain changing incidence, the compatibility family and the complete producing return. | Changed phase, surroundings or receiving conditions reuse the same generating material and produce the corresponding consequence. Resident state does not scale with source length. A dormant generator re-engages at its admitted future scope; unsupported directions retain their source/representation defect. |
+| **2. Helical pair interaction sites, phase-carried context and situated generator inference** | Join `ScrewPair` and `HolonicInteraction` in the engine; build the field from a fixed generator machine whose phases carry the source and whose receiving positions are phases; use the full pair receiver and its jet pullback; infer configurations, rates and admitted pairs by closure; bind standing and release. Retain changing incidence, the compatibility family and the complete producing return. | Changed phase, surroundings or receiving conditions reuse the same generating material and produce the corresponding consequence. Generator count and a certified statistic's coordinate count do not scale with source length; ingestion, exact bit growth and retained defects are measured. A dormant generator re-engages at its admitted future scope; unsupported directions retain their source/representation defect. |
 | **3. Efficient continuation and durable learning** | Compile the repeated action actually encountered, retaining interior memory, joint fibres and pending comparisons. Bind native rest/remount to this complete body and application continuation. Work starts during milestones 1–2 where already lawful. | Repeated execution uses a reusable representation rather than growing a replay programme without bound. A saved model resumes generation and an outstanding observed return with the same declared consequences. Report time, transfers, memory and exact bit growth. |
 | **4. Useful Athena conversation, mathematics and code** | Bind prepared dialogue/source parts and whole-section text decoding to the trained body. Compose existing mathematical functions and structured tool requests through the same session. Follow tool results as actual observations. | Inspect held-out contextual replies, correction/continuation, explanation and working code/tool outputs through the public application. Publish successes and failures; nonempty strings and lower training loss do not substitute for these tasks. |
 | **5. Optical/acoustic, motor and mixed receiving tasks** | Bind the same generator/current operation to image, acoustic, articulated-control and mixed charts, with geometry, actuation, rate, partial observation and reconstruction boundaries. Those contracts inform milestones 1–3 already; concrete simulator execution belongs to its application increment. | Generated fields and action-conditioned receiving consequences reuse the same model/update mechanism. A physical case retains applied actuation and measured return, control cadence and reset provenance; a mixed-source task uses its actual cross-modal source relation. |
@@ -232,35 +238,35 @@ has the following implementation position, in dependency order:
    HnaStream and the exposure/workbench caller retain source regions, actual joins,
    original receiver and pending delivery. Source and response extents are receiving apertures,
    not native clocks or alphabet-derived geometry.
-4. **Join the pair to the interaction and chain (#28/#48, #27; formal #62).** Declare
-   `ContactFace`/`MediumContact`/`HolonicInteraction` from a `ScrewPair` and its jet, then the
-   ordered `SituatedScrew` chain with recharted Jacobian columns and per-pair contacts. Exact
-   tests mirror the `HelicalPairInteraction` theorems. `screw.rs` is consumed unchanged.
-5. **Build the machine geometry in HNA (#17).** Each generator carries a `RationalPhase` with
-   its carry level (`winding::Odometer`), each admitted pair a `LockAddress` and tolerance, each
-   site a `SiteFactor`, and the incidence complex its cells, so participation, cell flux and
-   the retained harmonic class are read from one complex. A generator-family `GeometricFieldSpec`;
-   phase-carried source moments `m_g`, `M_gh(δ)`; receiving phases with a fixed phase-offset
-   port; full pair-receiver participation with the jet pullback; the legacy ring layout
-   preserved for saved models. Global D/b, the normal law, producing return, publication and
-   rest are consumed as returned.
-6. **Material, closure inference, standing and release (#17, #49).** Pair-jet features in the
-   normal law; closure inference of rates, configurations and admitted pairs with plural
-   families retained; `native_source`/`formation` compatibility carried through the public
-   invocation, preserving `Delta_i=U_i q_i-q_r` and the original target port; `standing.rs` and
-   `receiver_release.rs` bound to dormant generators, a dormant generator being a harmonic
-   class that a cycle receiver reads (`CellHolonomy.dormant_mode_is_locally_silent`). A terminal
-   face is not a measured hidden reaction.
-7. **Economy and episodes (#18/#61, #16).** Moment accumulation is the compact source-span
-   statistic; stepped words use the generator power and phases advance by winding rather than
-   by step; a compressed machine is checked against Newton's identities between its transfer
-   determinant and trace sequence (`winding::Machine`); resident state is independent of source
-   length and the actual launch realization is reported. Inspect the recorded contextual,
-   mathematical and code episodes and a motor-chart chain control at their actual receivers.
-   The returned helical/native examples and checks are dependencies, not a campaign to repeat.
+4. **Join the pair to the interaction and chain (#28/#48, #27; formal #62).** Derive
+   `J=[v_a|−v_b]` with its frame, units and rate-port embedding; retain the PSD material
+   kernel and the definite no-slip specialization. The serial kinematic chain declares finite
+   motions compatible with its generators and clocks; its contact integration consumes the
+   pair adapter. Existing `screw.rs` is the source, not a placeholder for a new screw theory.
+5. **Build the machine geometry and source/receiver binding (#17).** Declare the maps from
+   resident current to configuration and from geometric actions to current transport. Retain
+   actual phase/lift and closure witnesses; `RationalPhase` is a Cayley chart and finite
+   `Odometer` levels need closure. Add oriented cell incidence and the represented material
+   blocks. Bind source-driven helical recurrence, scoped phase moments and oriented pair
+   statistics with their source fibre. A tagged receiving-phase binding preserves old slot
+   semantics. The full pair score and its chart/feature pullback consume the existing global
+   D/b action, normal law, producing return, publication and rest.
+6. **Material, closure inference, standing and release (#17, #49).** Return all pair-feature,
+   geometry, material and clock derivatives; normal fitting of W at supplied features does
+   not itself fit nonlinear geometry. Closure constraints retain one jointly compatible
+   configuration/boundary family through the public invocation. Bind general standing with
+   its future separator and a harmonic-cycle control on the declared positive complex.
+7. **Economy and episodes (#18/#61, #16).** Certify source/receiver and action descent for the
+   admitted statistic, retaining a separating remainder otherwise. Uniform fixed-material
+   words may use the generator-power identity; changing material and nonuniform steps need
+   their actual recurrence. Newton identities check spectral consistency, not functionality.
+   Report fixed topology/statistic dimensions, ingestion, output, exact bit growth, buffers,
+   pending cuts and the native launch. Inspect the recorded contextual, mathematical/code
+   episodes and motor-chart consequence; both recorded text failures stay open.
 
 The [packet table](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition)
-gives owner paths and returns. Items 4 and the formal work are independent of 5; 5 consumes 4;
+gives owner paths, equations and returns. Pair contact and the chain's kinematic portion can
+start independently; chain contact integration and machine geometry consume the pair contact;
 6–7 consume 5.
 
 [definition] Root owns the reaction/adjoint integration and final application. The bounded

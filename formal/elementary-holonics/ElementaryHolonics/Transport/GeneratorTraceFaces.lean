@@ -126,4 +126,53 @@ theorem machine_trace_sequence (M : σ → Matrix (Fin 2) (Fin 2) R) (k : ℕ) :
 
 end Machine
 
+/-! ## 4. Trace faces are invariants, not a complete action certificate -/
+
+/-- [definition] The identity two-state action used by the separating witness below. -/
+def identityTwo : Matrix (Fin 2) (Fin 2) ℚ := 1
+
+/-- [definition] A nontrivial unipotent shear with the same trace and determinant faces as
+`identityTwo`. -/
+def unipotentTwo : Matrix (Fin 2) (Fin 2) ℚ := !![1, 1; 0, 1]
+
+/-- [proved-derived; formal-checked] The shear's powers retain their nilpotent off-diagonal. -/
+theorem unipotentTwo_pow (k : ℕ) :
+    unipotentTwo ^ k = !![1, (k : ℚ); 0, 1] := by
+  induction k with
+  | zero =>
+      ext i j
+      fin_cases i <;> fin_cases j <;> simp [unipotentTwo]
+  | succ k ih =>
+      rw [pow_succ, ih]
+      ext i j
+      fin_cases i <;> fin_cases j <;>
+        simp [unipotentTwo, Matrix.mul_apply, Fin.sum_univ_two]
+      all_goals ring
+
+/-- [counterexample; formal-checked] The identity and unipotent actions have identical trace
+sequences, so those faces alone do not certify equality of the transported action. -/
+theorem identityTwo_trace_powers_eq_unipotentTwo (k : ℕ) :
+    (identityTwo ^ k).trace = (unipotentTwo ^ k).trace := by
+  rw [unipotentTwo_pow]
+  norm_num [identityTwo, Matrix.trace_fin_two_of]
+
+/-- [counterexample; formal-checked] The identity and unipotent actions also have the same
+transfer determinant at every scalar `T`. -/
+theorem identityTwo_transfer_determinant_eq_unipotentTwo (T : ℚ) :
+    ((1 : Matrix (Fin 2) (Fin 2) ℚ) - T • identityTwo).det =
+      ((1 : Matrix (Fin 2) (Fin 2) ℚ) - T • unipotentTwo).det := by
+  simp only [identityTwo, unipotentTwo]
+  rw [Matrix.det_fin_two, Matrix.det_fin_two]
+  simp [Matrix.sub_apply, Matrix.smul_apply, smul_eq_mul]
+
+/-- [definition] The second basis state used as the source in the separating receiver. -/
+def sourceE₂ : Fin 2 → ℚ := ![0, 1]
+
+/-- [counterexample; formal-checked] A source/receiver face distinguishes the two actions in one
+step: the first coordinate of `e₂` is zero after the identity and one after the shear. -/
+theorem identityTwo_and_unipotentTwo_are_separated_by_source_receiver :
+    (identityTwo *ᵥ sourceE₂) 0 ≠ (unipotentTwo *ᵥ sourceE₂) 0 := by
+  norm_num [identityTwo, unipotentTwo, sourceE₂, Matrix.mulVec, dotProduct,
+    Fin.sum_univ_two]
+
 end Soma.Holonics.Transport.GeneratorTraceFaces

@@ -162,7 +162,7 @@ alone supplies none of them. This is how the helical object reaches the Holonic 
 [definition] The slip map of a pair is its relative velocity on the two parameters,
 `J=[v_a | −v_b]` with `Δ̇=J(ṡ,ṫ)`. It is the `J_f` of a `holonic_interaction::ContactFace`;
 the face's `D_f`, weight and `Clock` remain declared material. A `HolonicInteraction` whose
-media coordinates are the pair parameters and whose faces take this slip map is the
+declared rate ports carry the pair parameter rates and whose faces take this slip map is the
 [helical pair interaction unit](HOLON.md#the-helical-pair-interaction-unit), the site of an HNN
 and the contact of an articulated body.
 
@@ -173,33 +173,49 @@ proves, over ℚ at one configuration:
 pairSlip_mulVec                J(ṡ,ṫ)=ṡ v_a−ṫ v_b
 pairSlip_transpose_mulVec      J*Δ=(Δ·v_a, −Δ·v_b),  so DQ=2J*Δ
 pair_face_power                ⟨u,(w J*DJ)u⟩ = w⟨Ju, D Ju⟩
-pair_face_power_eq_zero_iff    on a dissipative face, zero power ⇔ ṡ v_a=ṫ v_b
+pair_face_power_eq_zero_iff    with null-definite D, zero power ⇔ ṡ v_a=ṫ v_b
+pair_face_power_eq_zero_iff_material_null
+                               with D symmetric PSD and w>0, zero power ⇔ D J u=0
 pairQuadranceTwoJet_eq_slip_contact_geometric
                                Q₂ = ⟨Δ|Δ⟩ + 2(s,t)·J*Δ + ⟨(s,t),J*J(s,t)⟩ + (s²Δ·a_a − t²Δ·a_b)
 bilinear_score_eq_polarized_quadrance
                                ⟨a|b⟩=(⟨a|a⟩+⟨b|b⟩−⟨a−b|a−b⟩)/2
 ```
 
-The zero-power kernel is synchronized passage: meshing, rolling or co-moving contact. It is the
-incidence law between `s` and `t` read from material, and it does not identify the parameters.
+For positive weight and material definite on attainable slips, the zero-power kernel is
+synchronized passage. A semidefinite response can be blind to nonzero slip; preserve that
+material kernel. An instantaneous lock is a local rate relation, not proof of periodic closure
+or attraction. The two parameters remain independent.
 The second variation is the isotropic contact form of the same slip map plus each object's own
 `Δ·a` term. A bilinear participation score is the pair quadrance up to the two self-energies,
 so the unit-phase chart `β cos(2π(q_i−q_j−φ_ij))` is this pair with zero advance and unit radii.
+
+[definition] The pair parameter rate `u`, spatial slip `J u`, and resident current `q` are
+separate charts. A port map `C` from medium co-state to pair rates gives
+`M_medium=C* J*D_f J C` and medium dissipation at `J C Gz`. This does not identify `Gz` with
+physical configuration velocity. The native pair adapter declares those units and maps.
+For features `(Δ,Q,DQ)`, the parameter pullback is
+`J*λ_Δ + λ_Q DQ + (D²Q)*λ_DQ`; `PairQuadranceJet::pullback` supplies only `λ_Q DQ`.
+Geometry/material/clock derivatives and the chart from field current are additional terms.
+A conjugated physical return `A⁻¹FA` agrees with an adjoint construction only under the declared
+isometry/duality; the incident field continues to use the full derivative adjoint.
 
 [definition] **Winding.** A torus chart reads a phase modulo its closure. The helix
 `x(s)=(r e^{i(as+φ)}, bs)` is the lift that retains the winding: two parameters one full turn
 apart agree on the circle and differ by `b·2π/a` along the axis. For a coaxial pair the
 quadrance is `|r_a e^{iα}−r_b e^{iβ}|²+(b_a s−b_b t+c)²`, the periodic and axial parts
 together; a general pair reads both through the same `Δ` with its axis offset and inclination.
-`RationalPhase` carries the chart phase and `extra_turns`; `lifted_winding` and `closes_after`
-decide closure. Order and distance along a source passage are read through the advance, not
+`RationalPhase` carries a rational Cayley half-angle and `extra_turns`; its coordinate is
+not a rational turn rate. `lifted_winding` and `closes_after` check a supplied finite period,
+which a general rational Cayley point need not possess. Order and distance along a source passage are read through the advance, not
 through a separate site per occurrence.
 
 [proved-derived; formal-checked] **Phase-carried material.** In any group, fixed material `P`
 carried by a phase shift `S` is `phaseTransport S P d=S⁻ᵈPSᵈ`. Stepping conjugates the carried
 material (`phaseTransport_add`); a closing shift gives the toroidal chart
-(`phaseTransport_add_period`); a stream of n occurrences composes to `(PS⁻¹)ⁿSⁿ`
-(`steppedWord_eq_generator_power`), one act-and-advance generator whose power is the stream.
+(`phaseTransport_add_period`); n uniform steps through fixed material P compose to `(PS⁻¹)ⁿSⁿ`
+(`steppedWord_eq_generator_power`). Source-dependent materials or nonuniform steps retain
+their ordered word unless a separate action-descent law compresses it.
 A forward passage with reflection returns through the producing operands, `A⁻¹FA`, involutive
 and fixed-point-free when the reflection is (`reflectedReturn_involutive`,
 `reflectedReturn_no_fixed_point`). A closed path of observed boundary relations under one
@@ -215,13 +231,15 @@ general rows of the collapse table; joint space is the torus chart of the revolu
 a line per prismatic parameter; `reciprocal_pairing` is wrench–twist power; each link–link or
 link–object contact is one pair interaction. Exact finite motions remain supplied `AffineMap3`
 actions with their `RationalPhase`; a general affine action is not identified with `exp(tξ)`.
-The native chain consumer is #27 and the face derivation #28; their formal counterparts are #62.
+For a continuous chain Jacobian, each supplied finite motion must also satisfy its
+generator/parameter differential law; an arbitrary proper rigid matrix with a phase label does
+not establish that correspondence. The native chain consumer is #27 and the face derivation #28; their formal counterparts are #62.
 
 [definition] The [winding guide](WINDING_CARRY_AND_PLACEMENT.md) continues these laws: the
 carry cocycle behind the winding (`Geometry/PhaseCarry`), a lock as the zero-power direction with
 its Farey address and mediant cost (`Geometry/PairResonance`), the determinant, trace sequence
 and transfer determinant that phase carriage conserves (`Transport/GeneratorTraceFaces`), and
-the holonomy of a cell with the dormant mode as its harmonic class (`Transport/CellHolonomy`).
+the holonomy of a cell with harmonic standing relative to node/cell receivers (`Transport/CellHolonomy`).
 `relational_geometry::winding` is their exact native owner.
 
 ## Two-sided angles are an algebraic chart of this construction

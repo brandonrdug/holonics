@@ -72,9 +72,16 @@ or motor chart is a boundary of it.
 [definition] The unit continues into six general objects, stated with their checked laws and
 owners in the [winding guide](WINDING_CARRY_AND_PLACEMENT.md): the helix as a circle with its
 carry, the pair's modular lock address, the faces phase carriage conserves with placement by
-signature, the holonomy a cell reads with the dormant mode as its harmonic class, the tube
+signature, the holonomy a cell reads with harmonic standing for its node/cell receivers, the tube
 between two cross-section charts, and continuation through a tower. Arithmetic, physical and
 learning applications are instances of these objects.
+
+[definition] These joins retain their domains: pair no-slip follows from zero dissipation only
+for material definite on attainable slips; finite phase closure needs its own witness; source
+moments and spectral faces license only their declared receivers. Source order, chart/action
+maps, clock/lift, complete feature pullback and saved receiver identity are fixed in the
+[native machine contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition).
+Fixed generator count does not remove ingestion, output or exact bit-growth costs.
 
 [definition] These are compatible parts and declared specializations of the same construction.
 The [model formula](HNN_FORMULA.md) supplies the full hypotheses, source maps and variations.

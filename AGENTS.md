@@ -30,7 +30,8 @@ when working on recall, relevance, homeostasis or action inference.
 a `HolonicInteraction` over a `ScrewPair` whose contact slip map is the pair's relative velocity.
 HNN sites are generators with initial configurations, admitted pairs are arcs and the machine's
 phases carry context. A source passage enters as phase-carried helical moments, a response
-position is a receiving phase, and the machine's size is independent of source length. The
+position is a receiving phase, and generator count is independent of source length. Ingestion,
+exact bit growth and retained source defects have their own costs. The
 rotor machine (material carried by a phase shift, reflected return through the producing
 operands), the Bombe (configuration inference by pairwise loop closure) and an articulated body
 (an ordered chain of `SituatedScrew`s) are instances. State a design in these operands before
@@ -40,19 +41,28 @@ implementing it; a text, image, acoustic or motor chart is a boundary of this ob
 ([winding guide](docs/WINDING_CARRY_AND_PLACEMENT.md),
 [record](research/records/2026-09-21_WINDING_CARRY_FACES_AND_PLACEMENT_GENERALIZE_THE_HELICAL_PAIR.md)).
 The pair unit continues into six general objects, and a design or worker brief states which it
-touches and keeps the rest attached: (1) **helix = circle + carry** — the carry is the cocycle
-gluing one level onto the next, the state retains the winding that carried material forgets;
-(2) **pair = torus with a modular address** — a lock is the zero-power direction, addressed by
-its Farey word, and a tolerance selects the mediant; (3) **generator = rotation × dilation** —
-phase carriage conserves determinant, trace sequence and transfer determinant, and placement is
-rotation after a common dilation, decided by signature; (4) **face = holonomy around a cell** —
-class functions are the gauge-free faces, an affine holonomy is a screw with its Burgers step,
-and a dormant mode is the harmonic class; (5) **tube = transfer between cross-section charts**,
-read as a map or as a pairing, with integration by reflection as its boundary elimination;
-(6) **continuing = a thread through a tower with deterministic lifting**, and compression of
-functionality keeps future-distinguishing classes and the carries between levels. Primes, `ζ`,
-`Λ_DN`, elliptic curves, Hodge classes, Einstein's tensors, rotor machines and articulated
-bodies are instances with graded scope; none owns a private version of these objects.
+touches and keeps the rest attached: (1) **helix = circle + carry** — retain the cocycle and
+lift; phase-only material descent needs closure/commutation; (2) **pair = torus with a modular
+address** — a no-slip direction has a Farey address in the positive rational chart; material
+null slip, signs and stationary cases retain their own domains; (3) **generator faces and
+placement** — frame carriage conserves determinant, trace sequence and transfer determinant;
+rotation–dilation and signature placement require their stated metric/spectral hypotheses;
+(4) **face = holonomy around a cell** — class functions are gauge-free, a proper rigid holonomy
+has a screw reading, a flat affine holonomy has a Burgers translation, and harmonic standing
+is relative to node/cell receivers; (5) **tube = transfer between cross-section charts** — map
+and pairing readings use a declared duality, with reflection eliminating the interior where
+its law applies; (6) **continuing = a compatible thread through a tower** — unique lifting
+requires its lifting condition. Compression keeps future-distinguishing classes and the gluing
+between levels. Primes, `ζ`, `Λ_DN`, elliptic curves, Hodge classes, Einstein's tensors, rotor
+machines and articulated bodies are instances with graded scope, using these shared objects.
+
+[definition] The [finalized machine contract](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition)
+keeps configuration, rate, storage and resident-current charts distinct. `RationalPhase` is a
+Cayley half-angle chart, not a rational turn rate; finite odometer levels require closure.
+Moment and trace equality preserve their declared faces; functionality also needs `D E=ρ`
+and `E_next T=U E`, including source order and changed receivers. `PairQuadranceJet::pullback`
+is only the scalar-Q parameter return; the full feature/material/clock adjoint remains owed
+where consumed. Harmonic standing is a concrete receiver-relative instance of general standing.
 
 [definition] One Holon `|H⟩_F` carries situated incidence K, constitutive/learned material Θ,
 joint currents and internal modes, a frame F, and participating receivers. Circulating modes,
@@ -69,13 +79,13 @@ geometry supplies transport, comparison, variation and reuse; it is part of the 
 | Normal/factor inference | `W H=B` for the declared source/target statistics, prior and weights; preserve an unresolved null fibre |
 | Generation | Refine the joint field under source and receiving conditions, then emit its boundary face; the refinement coordinate is distinct from an output-token index |
 | Contact variation | `Q=⟨Δ\|Δ⟩`, with both sources' motion; the second variation includes geometric/prestress terms as well as a Gram term |
-| Pair contact | `J=[v_a\|−v_b]`, `DQ=2J*Δ`, `D²Q=2J*J+2diag(Δ·a_a,−Δ·a_b)`; `M_contact=Σw J*DJ`; zero power ⇔ `ṡv_a=ṫv_b`; a bilinear score is the polarized pair quadrance, so the unit-phase chart is the pair at zero advance and unit radii |
-| Phase carriage | `R_d=S⁻ᵈPSᵈ`; return `A⁻¹FA`; n occurrences compose to `(PS⁻¹)ⁿSⁿ`; a menu loop closes ⇔ the stage word fixes the boundary image; the helix is the winding-retaining lift of a torus chart |
+| Pair contact | `J=[v_a\|−v_b]`, `DQ=2J*Δ`, `D²Q=2J*J+2diag(Δ·a_a,−Δ·a_b)`; `M_contact=Σw J*DJ`; zero power ⇔ `D_f J u=0`; definite response on attainable slips gives `ṡv_a=ṫv_b`; a bilinear score is the polarized pair quadrance, so the unit-phase chart is the pair at zero advance and unit radii |
+| Phase carriage | `R_d=S⁻ᵈPSᵈ`; return `A⁻¹FA`; n uniform steps through fixed P compose to `(PS⁻¹)ⁿSⁿ`; a menu loop closes ⇔ the stage word fixes the boundary image; the helix is the winding-retaining lift of a torus chart |
 | Carry | `x=phase+n·winding`; `winding(x+y)=winding x+winding y+carry`; the carry is a cocycle and is content (`ℤ/4≄ℤ/2×ℤ/2`); `Sⁿ=C ⇒ S^(d+nk)=S^d·C^k`; the odometer's upper level advances by the lower winding |
-| Lock and address | `q·v_a=p·v_b` ⇔ zero power; neighbours ⇔ `p'q−pq'=1`; the mediant is the cheapest lock between; an address is a word in ⟨step, inversion⟩ |
-| Trace faces and placement | `(S⁻ᵈPSᵈ)ᵏ=S⁻ᵈPᵏSᵈ`; `det`, `tr(Mᵏ)`, `det(1−T·M)` conserved; machine `∏(1−a_gT+q_gT²)`, `Σ tr(M_gᵏ)`; rotation ⇔ `a²<4q`; placement by signature |
-| Cell holonomy and dormant class | `H=g₀₁g₁₂g₂₀ ↦ k₀⁻¹Hk₀`; `d₁(A+d₀φ)=d₁A`; a harmonic mode is silent at nodes and cells, is not a potential and is retained by its class |
-| Source and receiving phases | `m_g=Σ_k Ĝ_g(k)⁻¹E(u_k)`, pair relation `M_gh(δ)` at relative offset δ, `y_j=ρ_R(Ĝ(j)q)`; each generator advances by its own rate and the codec unit is not a native clock |
+| Lock and address | `q·v_a=p·v_b` ⇔ no-slip (zero power under definite response); neighbours ⇔ `p'q−pq'=1`; the mediant is the cheapest lock between; an address is a word in ⟨step, inversion⟩ |
+| Trace faces and placement | `(S⁻ᵈPSᵈ)ᵏ=S⁻ᵈPᵏSᵈ`; `det`, `tr(Mᵏ)`, `det(1−T·M)` conserved; block-diagonal machine `∏(1−a_gT+q_gT²)`, `Σ tr(M_gᵏ)`; `SiteKind::Rotation` ⇔ `a²<4q`; placement under its signature hypotheses |
+| Cell holonomy and dormant class | `H=g₀₁g₁₂g₂₀ ↦ k₀⁻¹Hk₀`; `d₁(A+d₀φ)=d₁A`; a harmonic mode is silent at node/cell receivers; a harmonic potential is zero; retain its class |
+| Source and receiving phases | `m_g=Σ_k Ĝ_g(τ_g(k))⁻¹E_g(u_k)`, pair relation `M_gh(δ)` at relative offset δ, `y_j=ρ_R(Ĝ(j)q)`; each generator advances by its own rate and the codec unit is not a native clock |
 | Continuing compression | `D E=ρ`, `E_next T_g=U_g E`; retain the separating direction or interior defect when the source does not descend |
 
 [project-postulate] The framework's ambition is frontier-level usefulness on consumer hardware.

@@ -38,18 +38,30 @@ Retained material can support dormant availability between active modes; its fut
 receiver descent determine what compression may discard. Recurrence and homeostasis refer to
 the constituted driven dynamics, with storage, flux and dissipation at their actual units.
 
-[definition] The operands of this model are those of the
-[helical pair interaction](HOLON.md#the-helical-pair-interaction-unit). `U_(F←G)` is the phase
-carriage of fixed material between two generators; the participation score is the pair
-receiver; `Δ_i=U_i q_i−q_r` is the pair separation; the reflected return `A⁻¹FA` traverses the
-producing operands; the local adjoint is the pair-jet pullback. A source passage enters as
-`m_g=Σ_k Ĝ_g(k)⁻¹E(u_k)` and a response position is the receiving phase `y_j=ρ_R(Ĝ(j)q)`.
+[definition] The operands of this model are organized by the
+[helical pair interaction](HOLON.md#the-helical-pair-interaction-unit). A declared representation
+maps its geometric passage into current transport `U_(F←G)`; a configuration chart maps the
+resident state into the spatial pair receiver. The field difference `Delta_i=U_i q_i−q_r`
+and the spatial separation `Δ=x_a−x_b` keep those chart maps explicit. Participation consumes
+the full pair face and its complete differential. `PairQuadranceJet::pullback` supplies the
+scalar-Q parameter term; feature `(Δ,Q,DQ)`, chart, material and clock variations add their
+own terms. The physical group return `A⁻¹FA` agrees with an inverse/adjoint identification only
+under the declared isometry; the incident word keeps its actual derivative adjoint.
 
-[definition] The current incident word below is an implemented specialization of this law: the
-pair at zero advance and unit radii, on a ring with one site per source cell.
+A source passage drives the continuing machine. On an admitted linear source chart it may
+accumulate `m_g=Σ_k Ĝ_g(τ_g(k))⁻¹E_g(u_k)` and oriented pair moments, retaining the decoder,
+source fibre and future-action/injection square. A response position reads
+`y_j=ρ_R(Ĝ_R(τ_R(j))q)` through a separately tagged phase binding. The
+[finalized native contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition)
+states these maps, known/inferred operands, updates, closure hypotheses and cost scope.
+
+[established-bounded; source-inspected] The current incident word below implements bilinear
+current participation on a ring with one site per source cell. Its unit-phase restriction is
+the zero-advance, unit-radius pair chart; general current amplitudes retain the two
+self-energy terms in polarization. It does not yet instantiate the moving `ScrewPair` contact.
 Its learned M/D already apply to new currents. `IncidentTextReceiver` reads one boundary;
-its character/support comparison is not the universal learning objective or the only possible
-consequence. The [composition boundary](HNN_COMPOSITION.md#implemented-incident-field-composition-boundary)
+its character/support comparison is one receiving consequence. The
+[composition boundary](HNN_COMPOSITION.md#implemented-incident-field-composition-boundary)
 identifies the unconnected compatibility/future-mode work without refounding the model.
 
 [definition] The [helical elementary realization](HELICAL_GEOMETRY.md) makes one geometric

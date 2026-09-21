@@ -48,8 +48,9 @@ compression owners; none is newly founded by this specialization.
 the formal statement of the [helical pair interaction unit](HOLON.md#the-helical-pair-interaction-unit).
 It joins `Geometry/ScrewGeometry` to `Transport/HolonicInteraction`: the pair's relative
 velocity is a contact slip map (`pairSlip_mulVec`, `pairSlip_transpose_mulVec`), the face power
-is the material read at that velocity with synchronized passage as its zero-power kernel
-(`pair_face_power`, `pair_face_power_eq_zero_iff`), the pair two-jet is separation, slip
+is the material read at that velocity; PSD zero power is the material-null slip kernel
+(`pair_face_power_eq_zero_iff_material_null`), with synchronized passage under definiteness
+on attainable slips (`pair_face_power_eq_zero_iff_zero_slip_of_material_null`), the pair two-jet is separation, slip
 pullback, isotropic contact form and geometric term
 (`pairQuadranceTwoJet_eq_slip_contact_geometric`), and a bilinear participation score is a
 polarized pair quadrance (`bilinear_score_eq_polarized_quadrance`). In an arbitrary group it
@@ -61,10 +62,10 @@ states phase-carried material and stepping (`phaseTransport_add`, `phaseTranspor
 `Foundation/{ReceiverRelease,Standing}`, which the default target previously omitted.
 
 [proved-derived; formal-checked] Four further modules state the general objects of the
-[winding guide](WINDING_CARRY_AND_PLACEMENT.md), 38 theorems on standard axioms:
+[winding guide](WINDING_CARRY_AND_PLACEMENT.md), initially 38 theorems on standard axioms:
 `Geometry/PhaseCarry` (winding additivity up to the carry, the carry cocycle, `ℤ/4≄ℤ/2×ℤ/2`, the
 odometer cascade, the central carry retained by the state) and `Geometry/PairResonance` (lock =
-zero-power direction, unimodular neighbours, mediant cost, conserved intersection, the diagonal
+zero-slip direction (zero power under its definiteness hypothesis), unimodular neighbours, mediant cost, conserved intersection, the diagonal
 winding of coprime circles) are imported by `Framework.Geometry`;
 `Transport/GeneratorTraceFaces` (determinant, trace sequence and transfer determinant conserved
 by phase carriage; the machine's product factor and summed trace sequence, over
@@ -75,14 +76,25 @@ umbrella additionally imports `RH/ZeroPairLock`, which joins the pair face to `R
 the reflected pair `(σ,γ)`, `(1−σ,γ)` is locked exactly on the seam, and for `γ ≠ 0` exactly when
 the tank's inductance is a positive real.
 
-[open] #62 owns the formal counterparts still owed: proper-rotation recharting and axis
-extraction, the serial chain and its Jacobian columns, `RationalPhase` winding and closure, the
-stepped machine as a `TransportWord`/`ReceiverHistoryCompression` instance, the helical moment
-as a compressed source span, standing of a dormant generator, and the incident reaction's
-complex variation with pair-jet features. From the September 19 exact-algebra wave (`5bb2cdbe`)
-through `73ff9950`, 141 native source files changed against 7 Lean files. A
-native packet that adds or changes a mathematical law lands with its Lean counterpart under
-the matching entry point, or names the obligation it leaves in #62.
+[proved-derived; formal-checked] The final design iteration adds the pair PSD material-null
+law and its attainable-slip specialization, plus
+`CellHolonomy.closed_field_retains_unique_harmonic_mode` by the existing Hodge uniqueness law.
+`GeneratorTraceFaces` now proves that identity and a nontrivial unipotent shear have equal
+trace powers and transfer determinants yet differ at a supplied source/receiver. These
+statements keep harmonic standing relative to node/cell receivers and spectral faces distinct
+from the full future-action certificate. The [iteration record](../research/records/2026-09-21_THE_GENERATOR_MACHINE_RETAINS_ITS_SOURCE_AND_RECEIVING_LAWS.md)
+and [receipts](VERIFICATION_RECEIPTS.tsv) give their checked scope.
+
+[open] #62 owns the actual remaining joins: proper-rotation recharting/axis extraction;
+serial finite motions compatible with their generators and Jacobian; Cayley phase versus
+clock/lift and checked closure; source-indexed moment accumulation with decoder, ordered
+future-action descent and physical fibre; current/configuration/rate charts and the complete
+feature/material/clock derivative; an actual later-phase `StandingLaw` instance. Carry towers,
+Farey words, the next Foster population identity, conditional signature placement and
+rigid/affine holonomy keep their source domains. General linear material conjugated by an invertible frame remains to be joined beyond the
+current unit-valued phase-material theorem; reset material need not be invertible. Newton identities are invariant checks,
+not compression sufficiency. Each native packet lands with its matching formal law or names
+the concrete remaining obligation in #62; unchanged source receipts remain usable.
 
 [definition] The [Holon specification](HOLON.md) is the current elementary operational
 synopsis: situated interfaces and faces, composition, frame transport, constitutive response,

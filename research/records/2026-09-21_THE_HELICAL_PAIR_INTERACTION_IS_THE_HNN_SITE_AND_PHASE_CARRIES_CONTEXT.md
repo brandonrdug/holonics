@@ -9,6 +9,8 @@ The [Holon](../../docs/HOLON.md#the-helical-pair-interaction-unit) and
 [helical guide](../../docs/HELICAL_GEOMETRY.md#the-pair-is-a-holonic-interaction-contact) own the
 definitions; the [roadmap](../../docs/plans/THE_ROADMAP.md) owns order.
 
+[historical] The later [design iteration](2026-09-21_THE_GENERATOR_MACHINE_RETAINS_ITS_SOURCE_AND_RECEIVING_LAWS.md) preserves this return and corrects its source-moment attribution, zero-power/lock and closure domains, harmonic-standing scope, spectral/functionality claim and cost contract. Use the live guides and native contract for the finalized implementation. The measurements and original source audit below retain their recorded scope.
+
 ## Direction
 
 [project-postulate] Brandon's September 21 direction: the framework already supplies one

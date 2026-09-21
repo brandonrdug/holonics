@@ -69,9 +69,11 @@ theorem pair_face_power (w : ℚ) (va vb : Vec) (D : Matrix (Fin 3) (Fin 3) ℚ)
   rw [quad_faceForm, pairSlip_mulVec]
 
 /-- [proved-derived; formal-checked] **Synchronized passage is the zero-power kernel.** On a
-dissipative face of positive weight, a pair motion dissipates nothing exactly when the two
-objects' contact velocities agree. This is the incidence/synchronization law between `s` and `t`
-read from the material, not an identification of the two parameters. -/
+positive-weight face whose quadratic null cone is trivial, a pair motion reads zero power exactly
+when the two objects' contact velocities agree. This theorem assumes null-definiteness, but not
+nonnegativity of the form; the positive-semidefinite material version below returns the stronger
+operator null statement. This is the incidence/synchronization law between `s` and `t` read from
+the material, not an identification of the two parameters. -/
 theorem pair_face_power_eq_zero_iff {w : ℚ} (hw : 0 < w) (va vb : Vec)
     (D : Matrix (Fin 3) (Fin 3) ℚ)
     (hdefinite : ∀ x : Vec, x ⬝ᵥ (D *ᵥ x) = 0 → x = 0) (u : Fin 2 → ℚ) :
@@ -84,6 +86,46 @@ theorem pair_face_power_eq_zero_iff {w : ℚ} (hw : 0 < w) (va vb : Vec)
     · exact sub_eq_zero.mp (hdefinite _ hs)
   · intro h
     rw [h, sub_self]
+    simp
+
+/-! A positive-semidefinite material distinguishes quadratic null power from zero slip: the
+material current can vanish while a nonzero relative velocity remains in its nullspace. -/
+
+/-- [proved-derived; formal-checked] **Material-null pair power.** For a symmetric positive
+semidefinite material, zero pair power is equivalent to the constitutive material current seeing
+no slip. The pair's kinematic slip is retained on the right, so this does not silently identify a
+material null direction with synchronization. -/
+theorem pair_face_power_eq_zero_iff_material_null {w : ℚ} (hw : 0 < w) (va vb : Vec)
+    (D : Matrix (Fin 3) (Fin 3) ℚ)
+    (hDpsd : ∀ s : Vec, 0 ≤ quad D s)
+    (hDsymm : Dᵀ = D) (u : Fin 2 → ℚ) :
+    quad (faceForm w (pairSlip va vb) D) u = 0 ↔
+      D *ᵥ (pairSlip va vb *ᵥ u) = 0 := by
+  rw [quad_faceForm]
+  constructor
+  · intro h
+    apply psd_mulVec_eq_zero_of_quad_eq_zero hDpsd hDsymm
+    rcases mul_eq_zero.mp h with hw0 | hquad
+    · exact (hw.ne' hw0).elim
+    · exact hquad
+  · intro h
+    rw [h]
+    simp
+
+/-- [proved-derived; formal-checked] **Definite material restores the zero-slip kernel.** If the
+positive-semidefinite material has no nonzero null direction among attainable pair slips,
+its zero-power motions are exactly the pair's zero-slip motions. -/
+theorem pair_face_power_eq_zero_iff_zero_slip_of_material_null {w : ℚ} (hw : 0 < w)
+    (va vb : Vec) (D : Matrix (Fin 3) (Fin 3) ℚ)
+    (hDpsd : ∀ s : Vec, 0 ≤ quad D s) (hDsymm : Dᵀ = D)
+    (hDnull : ∀ v : Fin 2 → ℚ, D *ᵥ (pairSlip va vb *ᵥ v) = 0 →
+      pairSlip va vb *ᵥ v = 0) (u : Fin 2 → ℚ) :
+    quad (faceForm w (pairSlip va vb) D) u = 0 ↔ pairSlip va vb *ᵥ u = 0 := by
+  rw [pair_face_power_eq_zero_iff_material_null hw va vb D hDpsd hDsymm u]
+  constructor
+  · exact fun h => hDnull u h
+  · intro h
+    rw [h]
     simp
 
 /-- [proved-derived; formal-checked] **The pair quadrance two-jet is separation, slip pullback,

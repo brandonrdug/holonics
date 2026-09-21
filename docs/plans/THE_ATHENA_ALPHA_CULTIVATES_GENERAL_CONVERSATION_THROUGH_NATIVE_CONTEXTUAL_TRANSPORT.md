@@ -1252,112 +1252,203 @@ family; `IncidentFieldModel::evaluate` applies its normal M directly through the
 The global D/b action, normal law, complete producing return, atomic publication, frozen
 cuts, rest/remount and hardware receipts are returned machinery and carry over unchanged.
 
-[definition; agent-inferred] **Machine geometry.** A declared finite family of `SituatedScrew`
-sites with admitted pairs forms the machine; its size is a model choice independent of source
-and response length. `GeometricFieldSpec` is built from that family: junctions are generator
-sites, arcs are admitted pairs, and each arc's `ExactWavePhaseTransport` comes from the two
-generators' `RationalPhase`s. Several rates supply several grains concurrently. The ring
-layout remains the recorded binding of saved models and a legacy control.
+[definition; agent-inferred] **Machine declaration and coordinate maps.** A finite family of
+`SituatedScrew` sites and admitted pair contacts forms the machine; generator count is a model
+choice independent of source/response length. A site retains its generator, configuration,
+phase transport and lift, material and internal modes. An arc retains its endpoints, common
+frame, slip map, material and clock. The field also declares oriented cells where a cell
+receiver is used. `GeometricFieldSpec` gains a versioned generator-machine binding; the legacy
+ring layout and its saved slot binding keep their recorded meaning.
 
-[definition; agent-inferred] **Source.** An ordered source passage enters through a boundary
-port whose chart is the existing encoder material. Occurrence k is received at the generators'
-phases after k admitted steps:
+The pair's two parameter coordinates, its three spatial slip coordinates and the resident
+complex current are distinct types. The declaration supplies the configuration chart
+`κ_g(q,Θ)` and its differential, plus a representation `Ĝ_g` of each admitted geometric action
+on the site's current space. For an affine spatial action this can use the existing homogeneous
+lift at the declared spatial port; any additional current coordinates need their own action.
+The realization is `κ_g(U_g q,Θ')=T_g(κ_g(q,Θ))`, or a retained defect. Relative phase supplies
+`ExactWavePhaseTransport` only on its unit-circle complex mode; it does not by itself construct
+the axial/current action or identify a field difference `Uq−q` with spatial separation.
+
+A pair face acts on **rates** `u=(ṡ,ṫ)` with `J u=ṡv_a−ṫv_b`. `MediumContact` embeds its two
+columns into the two named media blocks, retaining orientation and parameter units. The
+linear medium supplies a rate-port map `C_f`, so `u_f=C_f Gz`,
+`M_medium=Σ_f w_f C_f*J_f*D_f J_f C_f`, and `ż=(Ω−M_medium)Gz+Bu`. Its storage rate
+reads `−2Σ_f w_f⟨J_f C_f Gz,D_f J_f C_f Gz⟩` plus the drive term. This is not automatically
+dissipation at physical configuration velocity. A physical instance exhibits that rate map
+and its adjoint; a configured
+pair contact is otherwise a local linearization. Retain `D_f⪰0`, `w_f>0`; zero dissipation
+means `D_f J u=0`, and means synchronized no-slip only when `D_f` is definite on `im J`.
+
+[definition; agent-inferred] **Clocks, lift and closure.** Source occurrence `k`, physical or
+model clock `τ_g(k)`, and the whole-field refinement coordinate remain distinct. Each site
+supplies its clock map and actual finite action. `RationalPhase.parameter` is the Cayley
+half-angle coordinate, not a rational turn rate. `Odometer` is used for a declared finite
+period with its closure witness; nonclosing exact actions retain their endpoint/lift and
+are admitted. `PairFiniteMotion::with_phase` currently binds only its documented z-axis
+Cayley/identity-partner specialization; a general pair requires the action/phase correspondence.
+A Farey address applies to a nonzero positive rate ratio; stationary, opposite-sign and
+higher-dimensional lock kernels retain their actual directions. An instantaneous lock,
+periodic closure and attraction to a locked trajectory are separate returns. A tolerance
+interval selects a cheapest rational; a finite search additionally declares a denominator or
+word bound and carries the approximation's receiving error over its engagement horizon.
+
+[definition; agent-inferred] **Ordered source and its statistic.** Known data are the ordered
+source cells `u_k`, part/reply/provenance relations, source charts `E_g`, clocks `τ_g`, held
+boundary, initial standing and the requested receiving scope. The receiving target never
+supplies a source condition. A source occurrence drives the same machine through its admitted
+helical transport and incident reaction; its streaming recurrence is
+`z_(k+1)=T_(u_k,δτ_k;Θ)(z_k)`. This ingestion recurrence is distinct from the finite joint
+refinement word. It retains enough continuation to develop the generating relation and
+receive changed conditions through the existing `NativeCoupledBody`.
+
+For a declared linear transported source chart, useful candidate statistics are
 
 ```text
-m_g = Σ_k Ĝ_g(k)⁻¹ E(u_k)                              helical moment at site g, winding retained
-M_gh(δ) = Σ_k ⟨Ĝ_g(k)E(u_k) | Ĝ_h(k+δ)E(u_{k+δ})⟩      pair relation at relative offset δ
-stream action = (P S⁻¹)ⁿ Sⁿ                             steppedWord_eq_generator_power
+m_g(n) = Σ_(0≤k<n) Ĝ_g(τ_g(k))⁻¹ E_g(u_k)
+m_g(n+1) = m_g(n) + Ĝ_g(τ_g(n))⁻¹ E_g(u_n)
+C_gh(δ) = Σ_(0≤k,k+δ<n) v_g(k) ⊗ v_h(k+δ)*,  v_g(k)=Ĝ_g(τ_g(k))E_g(u_k)
+M_gh(δ) = contraction of C_gh(δ) by the declared pair receiver.
 ```
 
-`HelicalMomentReuse` and the quadratic moment condensation own the exact compression of these
-moments, their ordered words and ambient fibre; the pair relations at relative offsets are the
-source's menu, with an adjacent-pair merge as offset one. Each generator advances by its own
-declared or inferred rate, including zero. The exterior codec unit does not define a native
-clock. `IncidentPreparation` keeps cells, parts, reply joins and provenance and binds them by
-phase offset instead of `slot_rows`.
+The finite offset set, ordering/orientation, boundary terms, common frame and pairing are
+part of this statistic. If a future pair receiver can change, retain its required tensor
+span rather than only one scalar contraction. Equal first/second moments retain a plural
+source fibre: with identity phases and one-hot `E(a),E(b)`, `[a,b]` and `[b,a]` have equal
+first moments and scalar offset correlations, while an ordered receiver distinguishes them.
+An oriented cross moment distinguishes this example; no fixed list of offsets thereby
+reconstructs every passage. Retain future-distinguishing directions or the source-qualified
+remainder where the requested operation does not descend.
 
-[definition; agent-inferred] **Receiving.** A response position is a receiving phase,
-`y_j=ρ_R(Ĝ(j)q)`, read by the same receiving material at each phase. `response_port_start`
-becomes a phase offset with the same fixed binding in generation, comparison and rest. Response
-extent is a received termination face along the axial coordinate, not a material whose rows
-scale with the aperture. Participation uses the full pair receiver, periodic and axial parts
-together, and its covector returns through `PairQuadranceJet::pullback`. Joint whole-section
-refinement and the one global `q/b` run over the machine's sites; the producing return
-traverses the same `Ĝ` operands in reverse (`reflectedReturn`).
+`HelicalMomentReuse` currently lifts **one pair configuration** to a symmetric homogeneous
+moment and descends its supplied finite actions. `HolonicQuadraticMomentCondensation` owns
+weighted second-moment contractions. Neither already implements this source-passage encoder.
+Packet 3 constructs that binding; packet 6 reduces it only with a declared source family,
+encoder `E_c`, decoder `D_R` and induced actions satisfying
 
-[definition; agent-inferred] **Material and inference.** Learned material is the generators'
-rates and advances, initial configurations and relative phases, contact material `D_f`, the
-reaction/reflection `M/D` and the boundary charts `E/R`. The normal law is unchanged and its
-features include the pair jet `(Δ,Q,DQ)`. Which pairs are admitted and which rational rates close
-is inferred by closure over observed pairs (`closes_after`, `lifted_winding`, the identity
-atlas kernel, `GeneratorInference`, `menu_loop_closure`), with compatible configurations left
-plural. A generator with no participation at the present phase retains material,
-configuration, phase and winding under `standing.rs`; its re-engagement releases through
-`receiver_release.rs`.
+```text
+D_R E_c = ρ_R,             E_c,next T_a = U_a E_c
+a includes source injection (u,δτ), refinement, changed receivers and admitted continuation
+```
 
-[definition] Preserve the operands when composing these owners. With observed source o,
-held boundary h, producing refinement law `F_Θ`, receiver R and requested face family Y,
-the compatible family satisfies
+on the admitted domain, including order, clocks and incident restrictions. The statistic
+state includes the necessary clock, offset boundary buffers, provenance restrictions and
+retained remainder. In particular, its source-injection update must intertwine the source-driven
+`T_(u,δτ;Θ)`, not merely transport an already prepared moment. If a nonlinear incident/receiving
+operation does not factor, that recurrence remains executable and the moment certifies only
+its declared linear/bilinear subreceivers. Physical realizability remains a constraint on the moment fibre. The fixed-material
+identity `(P S⁻¹)ⁿ Sⁿ` compresses its **repeated P, uniform-step** word. Different input-dependent
+`P(u_k)` or nonuniform steps require their ordered product or a proved descended recurrence;
+an exponent containing only the source length cannot replace their source content.
+
+[definition; agent-inferred] **Receiving and complete return.** A response position is a
+receiving phase, `y_j=ρ_R(Ĝ_R(τ_R(j))q)`. A new tagged phase binding serializes receiver/site
+identity, phase origin and lift, clock, requested aperture and termination receiver. The
+existing `response_port_start` remains a slot index for old models; it is not silently cast to
+a phase. Generation, comparison, delayed return and rest consume the same producing binding.
+The termination face is shared material evaluated along the receiving phase/axial chart;
+its parameters do not grow by assigning a fresh row per requested output position.
+
+The full pair score is a declared function of its geometric receiver; the first quadrance
+chart uses `s_gh=−β_g Q_gh/2`, with a shared β within each receiving row and inverse-quadrance
+units in the mapped spatial metric. It agrees with the old bilinear unit-radius score up to a receiving-row constant only
+on that equal-self-energy, shared-β chart. For pair-dependent β the omitted β-weighted
+self-energy sum must itself be row-constant or explicitly retained. General radii/advances retain their self-energy terms when
+comparing with the old score. `κ` connects this geometry to the resident source; it is included
+in the derivative. Normalized participation still returns both `δa·Uq` and `a·δ(Uq)`.
+
+For pair features `f=(Δ,Q,DQ)` at fixed generators and parameter vector `θ=(s,t)`,
+
+```text
+δΔ = J δθ,     δQ = DQ·δθ,     δ(DQ) = D²Q δθ
+(D_θ f)* (λ_Δ,λ_Q,λ_DQ) = J*λ_Δ + λ_Q DQ + (D²Q)*λ_DQ.
+```
+
+`PairQuadranceJet::pullback` implements only the middle summand. Learned generators,
+configurations, clocks, weights, material and charts receive their separate derivatives;
+compose through `κ` and `Ĝ`, keeping the geometric/prestress Hessian term. The normal equation
+solves for W at supplied feature rows; it does not infer nonlinear geometry parameters merely
+because those parameters generated the rows. Their update uses the complete producing
+covector and an explicitly declared constrained proposal, revalidated before publication.
+
+A group return `A⁻¹FA` is a conjugated physical passage. A cotangent pullback is the adjoint
+of the derivative in the declared pairing; it uses `A*` for a linear forward A. Inverse and
+adjoint coincide for an isometry, including permutation matrices in their standard pairing.
+The nonlinear incident word uses its existing complete adjoint, not a substituted group
+inverse. Whole-section refinement and one global D/b remain over machine sites; producing
+maps and compatible material changes are frozen/staged as in the returned implementation.
+Rational finite differences test the jet exactly on polynomial/translation controls and by a
+convergent difference with its remainder on general finite helical motion; a local two-jet is
+not an exact finite displacement formula.
+
+[definition; agent-inferred] **Inference, cells and standing.** Supplied geometry, observations
+and priors constrain the unknown rates/advances, initial configurations, relative phases,
+admitted pairs, `D_f`, M/D and E/R. Loop closure yields constraints on a *shared* configuration
+and boundary map; all observed edges, frame equations, domains and retained fibres must be
+satisfied together. A loop fixed point or a sampled identity is not by itself existence or
+uniqueness of a globally compatible source. Use the existing identity/normal/conditional
+owners at their actual scopes, with the full nonlinear residual retained.
+
+With source observation o, held boundary h, producing law `F_Θ`, receiver R and requested
+face family Y, the admitted family satisfies
 
 ```text
 O(z_0)=o,  held(z_j)=h_j,
 c_j=Π_K(z_j),  z_(j+1)=F_Θ(z_j,c_j;h_j),  ρ_R(z_N) ∈ Y.
 ```
 
-The indices name the finite producing word, not an event-archive requirement: its family may
-be carried implicitly by shared parameters, factors and an executable recurrence. Here `Π_K`
-includes the actual incident restrictions `c_i=U_i q_i−q_r` at each step; it does not grant
-independent variation to copies of the same source. A fixed-source local bilinear restriction
-is affine in c and can use the existing contextual preimage. A general whole-word inverse
-retains its nonlinear constraints and unresolved family. The producing adjoint is the local
-variation used to develop material or navigate constraints, not proof of a unique inverse.
-`form_native_reaction` accepts an observed pre-reflection reaction. A final receiving outcome
-must pass through the actual producing maps; it cannot be relabelled as that hidden target.
+`Π_K` includes `Delta_i=U_i q_i−q_r`; copies of one source do not vary independently.
+`form_native_reaction` accepts an observed pre-reflection reaction. A final text, mathematical
+or motor consequence constrains its actual producing maps, not an invented hidden target.
 
-[definition; agent-inferred] **Packets, in dependency order, on disjoint owner paths:**
+For the declared positive weighted additive complex, a harmonic class is silent to node
+and cell receivers and can be read by a cycle receiver. This is one concrete standing/release
+control. General dormant availability uses `StandingLaw` for all admitted future actions and
+receivers, retaining other directions when needed. A multiplicative cell holonomy and this
+additive complex require an explicit representation/linearization. Conserved site trace faces
+belong to a supplied material block and unchanged frame carriage; learning can change that
+material. The block-diagonal factor product and Newton identities check spectral faces;
+`D_R E_c=ρ_R` and the action square above certify functionality.
+
+[definition; agent-inferred] **Packets and dependencies.** Paths below are relative to `crates/`
+except the formal row. Ownership is split per dispatch; rows listing the same file are
+sequential, not promises of disjoint edits.
 
 | Packet | Owner paths | Return | Issue |
 |---|---|---|---|
-| 1. Pair contact | `holonic-engine/src/holonic_interaction.rs` with a helical submodule; `relational-geometry/src/screw.rs` consumed unchanged | `ContactFace`/`MediumContact`/`HolonicInteraction` declared from a `ScrewPair` and its jet with declared `D_f`, weight and `Clock`; exact tests mirror each `HelicalPairInteraction` theorem | #28, #48 |
-| 2. Serial chain | `holonic-engine/src/holonic_chain.rs` | Ordered `SituatedScrew` chain: finite motion product, recharted Jacobian columns, per-pair contacts, revolute/prismatic rows, a planar closure control | #27 |
-| 3. Machine geometry | `holonics-hna/src/native/field_geometry.rs`, `field_session/{incidence,incident_preparation,incident_application}.rs`, a machine spec beside `examples/support/linked_torus_field.rs` | Generator-family `GeometricFieldSpec`; phase-carried source moments; receiving phases; full pair-receiver participation with jet pullback; legacy layout preserved | #17 |
-| 4. Material and closure inference | `body/field/{formation,incident}.rs`, `field_session/native_source.rs`, `identity_atlas` and `GeneratorInference` consumers | Pair-jet features in the normal law; closure inference of rates, configurations and admitted pairs; plural families carried through the public invocation | #17, #49 |
-| 5. Standing and release | HNA binding of `standing.rs` and `receiver_release.rs` | A dormant generator retained through an inactive interval and re-engaged at a later phase with its future separator | #17 |
-| 6. Economy | `receiver_history_compression`, `hardware_cover`, `section_partition` | Moment accumulation as the compact source-span statistic; stepped words by generator power; resident state independent of source length; actual launch realization reported | #18, #61 |
-| 7. Episodes | `alpha/exposure.rs`, `examples/athena_exposure_field.rs` | Recorded Athena, mathematical and code episodes on the machine; a motor-chart control inferring chain phases for a requested receiving face, without a simulator | #16 |
-| 8. Formal | `formal/elementary-holonics/ElementaryHolonics/{Geometry,Transport,Foundation}` | The obligations listed in #62 | #62 |
+| 1. Pair contact | `holonic-engine/src/holonic_interaction.rs` with a helical submodule; existing `relational-geometry/src/screw.rs` | Pair-derived face, two-media embedding, PSD material kernel, definite no-slip specialization, frame/rate/clock correspondence | #28, #48 |
+| 2. Serial chain | `holonic-engine/src/holonic_chain.rs` and a serial-screw submodule | Ordered proper rigid motions, their generator/parameter compatibility, recharted spatial Jacobian columns, revolute/prismatic limits; contact integration consumes packet 1 | #27 |
+| 3. Machine geometry, source and receiver | `holonics-hna/src/native/field_geometry.rs`, `field_session/{incidence,incident_preparation,incident_application}.rs`, a machine spec beside `examples/support/linked_torus_field.rs` | Declared chart/action maps, clock/lift and cell incidence; source-driven machine and scoped moment binding; tagged phase receiver; full pair participation/return; old model semantics retained | #17 |
+| 4. Material and closure inference | `body/field/{formation,incident}.rs`, `field_session/native_source.rs`, actual `identity_atlas`/`GeneratorInference` consumers | Pair-feature and material derivatives, constrained geometry proposals and jointly compatible closure families through the public invocation | #17, #49 |
+| 5. Standing and release | HNA binding of `standing.rs` and `receiver_release.rs` | Retained dormant generator with later-phase separator; harmonic-cycle control for the declared complex; changing receiver/transport defect retained | #17 |
+| 6. Economy | `receiver_history_compression`, source accumulation, `hardware_cover`, `section_partition` | Source/receiver descent or separating remainder; fixed machine/moment coordinate counts where lawful; ingestion, bit growth, buffers and resident refinement measured separately | #18, #61 |
+| 7. Episodes | `alpha/exposure.rs`, `examples/athena_exposure_field.rs` | Recorded Athena, mathematical and code episodes; a motor-chart control inferring chain phases for a requested face, without a simulator | #16 |
+| 8. Formal | `formal/elementary-holonics/ElementaryHolonics/{Geometry,Transport,Foundation,Computation,Millennium}` | Matching laws and concrete remaining obligations in #62, consumed alongside their native packets | #62 |
 
-[definition] Each packet states the [winding guide's operands](../WINDING_CARRY_AND_PLACEMENT.md#8-using-the-picture-in-a-design)
-it touches. Packet 1 reports the pair face's locks through `winding::LockAddress`. Packet 3
-gives each generator a `RationalPhase` with its carry level (`Odometer`), each admitted pair its
-lock address and tolerance, each site a `SiteFactor`, and the incidence complex its cells, so
-participation, cell flux and the retained harmonic class are read from one complex. Packet 5
-realizes a dormant generator as a harmonic class read by a cycle receiver. Packet 6 advances
-phases by winding rather than by step and checks a compressed machine against Newton's
-identities between its transfer determinant and trace sequence. Packet 8 adds the carry tower
-joined to `IwasawaTower.padicTower`, the lock address joined to `Farey.cfProd`, the Foster pair
-identity as a pair quadrance, signature placement for the pair medium (#54) and the affine
-holonomy as a screw with its Burgers step.
+Packet 1 and the kinematic part of 2 can start independently; 2's contact integration and 3
+consume 1. Packets 4–6 consume 3 and share any HNA paths sequentially; 7 uses their required
+returns and 2 for its motor chart. Packet 8 accompanies each law; it is not a blanket proof
+campaign before native work. The [winding operands](../WINDING_CARRY_AND_PLACEMENT.md#8-using-the-picture-in-a-design)
+remain attached: actual phase/lift, admitted lock relation/address, represented material faces,
+cell transports and retained class, tube map/pairing with its duality, and continuation with
+its unresolved fibre. Generalized carry towers, Farey-word correspondence, the next Foster
+population identity, signature placement and rigid affine holonomy retain their scoped #62
+obligations; their arithmetic endpoints do not gate the machine.
 
-Packets 1, 2 and 8 are independent of 3; 3 consumes 1; 4–7 consume 3. Keep the current
-normal M/D reuse; do not replace it with a word archive. Bind an applicable compression
-owner with `D E=ρ` and `E_next T_a=U_a E`, including action domain/incident constraints.
-Where the nonlinear word does not close, execute and retain the remainder.
-`NativeSharedDriveMode`'s equal-drive legacy-current law and the fixed linear moment quotient
-do not automatically cover the refined incident current.
+[definition] The return uses the same generating material at a changed phase, source and
+receiver, retains an inactive generator needed later, and exposes the complete residual and
+actual episode results. Model topology and the admitted statistic's coordinate count are
+independent of source length; reading n source cells still costs at least n cell accesses,
+output costs its requested extent, and winding/coefficient bit lengths can grow. Report those
+costs, moment rank, offset buffers, pending producing cuts and retained remainder separately.
+A fixed finite carrier does not promise exact recall of arbitrary unbounded text. A supported
+rebase/factor/restriction keeps its decoder and error; failures to descend retain the separating
+information. The two recorded text failures remain open in #16.
 
-[definition] The returned evidence is the same generating material consumed at a changed
-phase, source and receiver; resident state and cost that do not scale with source length; a
-dormant generator re-engaged; exact agreement of the jet pullback with rational differences;
-and the inspected episode consequences with their complete residual, including unchanged
-failure cases. Repeated character reproduction, another unchanged screw-bracket example or
-a policy reset cannot substitute for that return.
-
-[definition] Robotics contributes observation/actuation units, partial state, held commands,
+[definition] Robotics supplies observation/actuation units, partial state, held commands,
 physical/control clocks and reset/return semantics through the
 [simulator boundary](../HARDWARE_AND_MODALITY_BOUNDARIES.md#robotics-and-simulation-boundary).
 These constrain the shared interface now. Simulator installation/execution and a particular
-RL learner are not prerequisites for this native composition.
+RL learner are outside the next native composition.
 
 #### Returned incident specialization
 

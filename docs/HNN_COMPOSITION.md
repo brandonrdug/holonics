@@ -375,7 +375,8 @@ specifies the source/target-preserving join and future-action reuse.
 unit radii. Its Athena geometry places one `TorusLongitude` junction per source cell, its
 encoder is one column per exterior symbol and its receiver a per-slot face, so site count and
 the support statistic grow with source length. The contract's packets build the field from a
-fixed generator machine with phase-carried source moments, receiving phases, the full pair
+fixed generator machine with source-qualified phase moments, explicit current/configuration
+charts, receiving phases, the full pair
 receiver and its jet pullback; the reaction, global D/b, normal law, producing return,
 publication and rest below are consumed unchanged.
 
