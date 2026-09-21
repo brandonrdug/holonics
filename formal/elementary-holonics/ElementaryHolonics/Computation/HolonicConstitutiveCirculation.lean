@@ -132,6 +132,70 @@ def phaseRotate (c s : ℚ) (phase : Phase) : Phase :=
 
 def phaseNormSquare (phase : Phase) : ℚ := phase.1 ^ 2 + phase.2 ^ 2
 
+/-! ## Standing source, incident condition and the legacy feature chart
+
+The incident drive and the constitutive source are separate operands.  The small witness below
+keeps the old `(y,p)` chart honest: it has the same participation drive and weights for two
+different standing sources, so no decoder from that chart can recover the new reaction source.
+-/
+
+abbrev OldParticipationFeature := Phase × (ℚ × ℚ)
+
+def standingZero : Phase := (0, 0)
+
+def standingImaginary : Phase := (0, 1)
+
+def incidentPlus : Phase := (1, 0)
+
+def incidentMinus : Phase := (-1, 0)
+
+def participationDrive : Phase :=
+  ((incidentPlus.1 + incidentMinus.1) / 2,
+    (incidentPlus.2 + incidentMinus.2) / 2)
+
+def participationWeights : ℚ × ℚ := (1 / 2, 1 / 2)
+
+def oldParticipationFeature : OldParticipationFeature :=
+  (participationDrive, participationWeights)
+
+def oldParticipationFeatureFor (_standing : Phase) : OldParticipationFeature :=
+  oldParticipationFeature
+
+def incidentDifference (standing incident : Phase) : Phase :=
+  (incident.1 - standing.1, incident.2 - standing.2)
+
+def constitutiveFeature (standing incident : Phase) : Phase × Phase :=
+  (standing, incidentDifference standing incident)
+
+theorem oldParticipationFeature_same_for_zero_and_imaginary :
+    oldParticipationFeatureFor standingZero =
+      oldParticipationFeatureFor standingImaginary := rfl
+
+theorem legacy_feature_witness_values :
+    participationDrive = standingZero ∧
+      participationWeights = ((1 / 2 : ℚ), (1 / 2 : ℚ)) := by
+  constructor <;> norm_num [participationDrive, participationWeights, incidentPlus,
+    incidentMinus, standingZero]
+
+theorem constitutiveFeature_distinguishes_zero_and_imaginary :
+    constitutiveFeature standingZero incidentPlus ≠
+      constitutiveFeature standingImaginary incidentPlus := by
+  intro h
+  have hs : standingZero = standingImaginary := congrArg Prod.fst h
+  norm_num [standingZero, standingImaginary] at hs
+
+theorem oldParticipationFeature_cannot_recover_standing_source :
+    ¬ ∃ recover : OldParticipationFeature → Phase,
+      recover (oldParticipationFeatureFor standingZero) = standingZero ∧
+        recover (oldParticipationFeatureFor standingImaginary) = standingImaginary := by
+  rintro ⟨recover, hz, hi⟩
+  have hsame : recover (oldParticipationFeatureFor standingZero) =
+      recover (oldParticipationFeatureFor standingImaginary) := by
+    rw [oldParticipationFeature_same_for_zero_and_imaginary]
+  rw [hz] at hsame
+  rw [hi] at hsame
+  norm_num [standingZero, standingImaginary] at hsame
+
 theorem phaseRotate_normSquare
     {c s : ℚ} (unit : c ^ 2 + s ^ 2 = 1) (phase : Phase) :
     phaseNormSquare (phaseRotate c s phase) = phaseNormSquare phase := by
@@ -459,6 +523,10 @@ open Soma.Holonics.Computation.HolonicConstitutiveCirculation
 #print axioms phase_weighted_square_energy
 #print axioms emitted_smul
 #print axioms successorHeld_smul
+#print axioms oldParticipationFeature_same_for_zero_and_imaginary
+#print axioms legacy_feature_witness_values
+#print axioms constitutiveFeature_distinguishes_zero_and_imaginary
+#print axioms oldParticipationFeature_cannot_recover_standing_source
 #print axioms phaseEmitted_rotate_covariant
 #print axioms phaseSuccessorHeld_rotate_covariant
 #print axioms emitted_ticket_admitted

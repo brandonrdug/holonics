@@ -15,6 +15,35 @@ pub struct ResidentNormalEnclosureSection<'c> {
 }
 
 impl<'c> ResidentNormalEnclosureSection<'c> {
+    /// Append the homogeneous complex coordinate on device, carrying each row's
+    /// existing radius into the enlarged joint packet.
+    pub fn append_homogeneous(&self) -> Result<Self, ConstitutiveFibreError> {
+        let output =
+            self.surface
+                .fresh_section(self.rows, 2 * (self.width + 3), ResidentGrain(0))?;
+        let mut pass = self.surface.begin_passage(&[vec![]])?;
+        {
+            let lane = pass.open(0, &[])?;
+            self.surface.record_enclosure_append_homogeneous(
+                &lane,
+                &self.section,
+                self.rows,
+                self.width,
+                self.grain.0,
+                &output,
+            )?;
+        }
+        pass.close(0, &output, 64)?;
+        let result = pass.finish()?.launch()?;
+        if !result.obstruction.is_empty() {
+            return Err(ConstitutiveFibreError::Arithmetic(format!(
+                "append homogeneous enclosure: {:?}",
+                result.obstruction
+            )));
+        }
+        Self::from_resident(self.surface, output, self.rows, self.width + 2, self.grain)
+    }
+
     pub fn from_points<'a>(
         source: ResidentConstitutiveSection<'a, 'c>,
         grain: ResidentGrain,
@@ -85,6 +114,38 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
 
     pub fn grain(&self) -> ResidentGrain {
         self.grain
+    }
+
+    /// Durable cold packet for a complete row enclosure. Numeric hot paths stay
+    /// resident; this is an explicit rest boundary for pending application words.
+    pub fn rest(&self) -> Result<ResidentSectionRest, ConstitutiveFibreError> {
+        Ok(self.surface.detach_section(&self.section, i64::BITS)?)
+    }
+
+    pub fn remount(
+        surface: &'c ResidentSurface<'c>,
+        rest: ResidentSectionRest,
+        rows: usize,
+        width: usize,
+        grain: ResidentGrain,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        let stride = width
+            .checked_add(1)
+            .and_then(|n| n.checked_mul(2))
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        if rows == 0 || width == 0 || width % 2 != 0 || !(1..=120).contains(&grain.0) {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        crate::native_ecology::constitutive_fibre::circulation::rest::point_section(
+            &rest, rows, stride,
+        )?;
+        for row in rest.intervals.chunks_exact(stride) {
+            if wides(row)?[width] < 0 {
+                return Err(ConstitutiveFibreError::Uncertain);
+            }
+        }
+        let section = surface.mount_section_rest(&rest)?;
+        Self::from_resident(surface, section, rows, width, grain)
     }
 
     pub(crate) fn resident_section(&self) -> &ResidentSection<'c> {
@@ -293,6 +354,74 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
 }
 
 impl<'c> ResidentNormalMaterialView<'c> {
+    /// Apply the retained map to an already-enclosed feature section entirely
+    /// on the resident device. The centre and radius remain one joint packet.
+    pub fn read_applied_enclosed_section(
+        &self,
+        features: &ResidentNormalEnclosureSection<'c>,
+    ) -> Result<ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
+        let source_complex = self
+            .source_chart
+            .complex_sources()
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        if features.components() != 2 * source_complex
+            || features.grain() != self.grain
+            || !std::ptr::eq(features.resident_section().surface(), self.surface)
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let rows = features.rows();
+        let stride = self
+            .targets
+            .checked_mul(2)
+            .and_then(|n| n.checked_add(1))
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let output = self
+            .surface
+            .fresh_section(rows, 2 * stride, ResidentGrain(0))?;
+        let work = self.surface.fresh_section(
+            rows,
+            self.targets
+                .checked_mul(4)
+                .ok_or(ConstitutiveFibreError::Shape)?,
+            ResidentGrain(0),
+        )?;
+        let flags = self
+            .surface
+            .fresh_section(rows, SLOT_WORDS / 2, ResidentGrain(0))?;
+        let mut pass = self.surface.begin_passage(&[vec![]])?;
+        {
+            let lane = pass.open(0, &[])?;
+            self.surface.record_normal_applied_enclosed_features(
+                &lane,
+                &self.state,
+                features.resident_section(),
+                rows,
+                source_complex,
+                self.targets,
+                self.grain.0,
+                &output,
+                &work,
+                &flags,
+            )?;
+        }
+        pass.close(0, &output, 64)?;
+        let result = pass.finish()?.launch()?;
+        if !result.obstruction.is_empty() {
+            return Err(ConstitutiveFibreError::Arithmetic(format!(
+                "applied enclosed normal section: {:?}",
+                result.obstruction
+            )));
+        }
+        ResidentNormalEnclosureSection::from_resident(
+            self.surface,
+            output,
+            rows,
+            2 * self.targets,
+            self.grain,
+        )
+    }
+
     /// Apply the retained coefficient map to every row of one resident source section. The
     /// source section is validated as an exact point/rational packet and the output retains its
     /// complete per-row enclosure bounds without mutating the material.
@@ -534,6 +663,53 @@ impl<'c> ResidentNormalMaterialView<'c> {
 }
 
 impl<'c> ResidentNormalMaterial<'c> {
+    /// Stage one producing covector return on the resident device.  The current
+    /// map is applied to the retained feature enclosure, the returned native
+    /// covector is scaled by `2^-step_bits`, and the two packets are summed before
+    /// the existing normal observation staging runs.  No coefficient or covector
+    /// centre is read back to the host and `self` is unchanged on refusal.
+    pub fn stage_covector_return(
+        &self,
+        features: &ResidentNormalEnclosureSection<'c>,
+        covectors: &ResidentNormalEnclosureSection<'c>,
+        step_bits: u32,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        if features.rows() == 0
+            || features.components()
+                != self
+                    .source_complex()
+                    .checked_mul(2)
+                    .ok_or(ConstitutiveFibreError::Shape)?
+            || covectors.rows() != features.rows()
+            || covectors.components()
+                != self
+                    .targets
+                    .checked_mul(2)
+                    .ok_or(ConstitutiveFibreError::Shape)?
+            || features.grain() != self.grain
+            || covectors.grain() != self.grain
+            || !std::ptr::eq(features.surface, self.surface)
+            || !std::ptr::eq(covectors.surface, self.surface)
+            || step_bits > 120
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+
+        let current = self
+            .retained_view()
+            .read_applied_enclosed_section(features)?;
+        let zero = ResidentNormalEnclosureSection::zeros(
+            self.surface,
+            covectors.rows(),
+            covectors.components(),
+            self.grain,
+        )?;
+        let held = vec![false; covectors.rows() * (covectors.components() / 2)];
+        let scaled = covectors.held_refinement(&zero, &held, step_bits)?;
+        let proxy = current.sum_same_shape(&scaled)?;
+        self.stage_receive_enclosed_section(features, &proxy)
+    }
+
     pub fn stage_receive_enclosed_section(
         &self,
         source: &ResidentNormalEnclosureSection<'c>,
@@ -565,6 +741,7 @@ impl<'c> ResidentNormalMaterial<'c> {
             targets: self.targets,
             grain: self.grain,
             observations: self.observations,
+            prior: self.prior.clone(),
         };
         let mut pairs = Vec::with_capacity(source.rows());
         for row in 0..source.rows() {
@@ -624,6 +801,7 @@ pub struct ResidentNormalSectionReturn<'a, 'c> {
     source_chart: NormalSourceChart,
     targets: usize,
     grain: ResidentGrain,
+    prior_material: Option<NativeNormalPrior>,
     pub predecessor_observations: u64,
     pub successor_observations: u64,
 }
@@ -668,21 +846,27 @@ impl<'a, 'c> ResidentNormalSectionReturn<'a, 'c> {
     pub fn inspect_before_operator(
         &self,
     ) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
-        decode_state_layout(
-            &self.surface.detach_section(&self.prior, i64::BITS)?,
-            self.source_chart.layout(self.targets)?,
-            self.targets,
-            self.grain.0,
+        expose_data_energy(
+            decode_state_layout(
+                &self.surface.detach_section(&self.prior, i64::BITS)?,
+                self.source_chart.layout(self.targets)?,
+                self.targets,
+                self.grain.0,
+            )?,
+            self.prior_material.as_ref(),
         )
     }
     pub fn inspect_after_operator(
         &self,
     ) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
-        decode_state_layout(
-            &self.surface.detach_section(&self.successor, i64::BITS)?,
-            self.source_chart.layout(self.targets)?,
-            self.targets,
-            self.grain.0,
+        expose_data_energy(
+            decode_state_layout(
+                &self.surface.detach_section(&self.successor, i64::BITS)?,
+                self.source_chart.layout(self.targets)?,
+                self.targets,
+                self.grain.0,
+            )?,
+            self.prior_material.as_ref(),
         )
     }
     /// Read the entire field once at the explicitly requested exterior receiver.
@@ -866,6 +1050,7 @@ impl<'c> ResidentNormalMaterial<'c> {
             source_chart: self.source_chart,
             targets: self.targets,
             grain: self.grain,
+            prior_material: self.prior.clone(),
             predecessor_observations,
             successor_observations: count,
         })
@@ -873,4 +1058,134 @@ impl<'c> ResidentNormalMaterial<'c> {
 }
 
 #[cfg(test)]
+mod covector_return_tests {
+    use super::*;
+    use crate::embedding_fiber::ResidentReadout;
+
+    #[test]
+    #[ignore = "requires CUDA; resident normal proxy stages current·feature + 2^-step_bits·g without host arithmetic"]
+    fn covector_return_stages_scalar_and_complex_proxy_without_live_mutation() {
+        let readout = ResidentReadout::new().unwrap();
+        let surface = ResidentSurface::on(&readout).unwrap();
+        let packet = surface
+            .mount_section_rest(
+                &ResidentSectionRest::found(
+                    1,
+                    2,
+                    ResidentGrain(0),
+                    i64::BITS,
+                    vec![(1, 1), (0, 0)],
+                )
+                .unwrap(),
+            )
+            .unwrap();
+        let features = ResidentNormalEnclosureSection::from_points(
+            ResidentConstitutiveSection::integers(&packet).unwrap(),
+            ResidentGrain(16),
+        )
+        .unwrap();
+        let covector_packet = surface
+            .mount_section_rest(
+                &ResidentSectionRest::found(
+                    1,
+                    2,
+                    ResidentGrain(0),
+                    i64::BITS,
+                    vec![(1, 1), (1, 1)],
+                )
+                .unwrap(),
+            )
+            .unwrap();
+        let covector = ResidentNormalEnclosureSection::from_points(
+            ResidentConstitutiveSection::integers(&covector_packet).unwrap(),
+            ResidentGrain(16),
+        )
+        .unwrap();
+        let material =
+            ResidentNormalMaterial::found_features(&surface, 1, 1, ResidentGrain(16)).unwrap();
+        let staged = material
+            .stage_covector_return(&features, &covector, 1)
+            .unwrap();
+        assert_eq!(
+            material.observations(),
+            0,
+            "prepare must not mutate the live cut"
+        );
+        assert_eq!(staged.observations(), 1);
+        let state = staged.inspect().unwrap();
+        // f=1 and g=(1+i), sigma=1/2; H=2, B=(1+i)/2 and the normal reference
+        // is (1+i)/4. The applied positive numerical proposal carries its actual defect.
+        assert_eq!(state.source_normal[0][0],ExactComplexWaveCurrent::new(Rat::from_integer(2.into()),Rat::zero()));
+        assert_eq!(state.cross_source[0][0],ExactComplexWaveCurrent::new(Rat::new(1.into(),2.into()),Rat::new(1.into(),2.into())));
+        let reference=ExactComplexWaveCurrent::new(Rat::new(1.into(),4.into()),Rat::new(1.into(),4.into()));
+        assert!(state.material.coefficients[0][0].subtract(&reference).norm_square()
+            <= &state.material.radius*&state.material.radius);
+    }
+}
+
+#[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod applied_enclosed_features_tests {
+    use super::*;
+    use crate::embedding_fiber::ResidentReadout;
+
+    #[test]
+    #[ignore = "requires CUDA; three resident rows use one applied normal owner without host per-row transfers"]
+    fn applied_enclosed_rows_use_one_owner_and_retain_row_order() {
+        let readout = ResidentReadout::new().unwrap();
+        let surface = ResidentSurface::on(&readout).unwrap();
+        let prior = NativeNormalPrior::from_coefficients(vec![vec![ExactComplexWaveCurrent::new(
+            Rat::from_integer(2.into()),
+            Rat::zero(),
+        )]])
+        .unwrap();
+        let material = ResidentNormalMaterial::found_features_with_prior(
+            &surface,
+            1,
+            1,
+            ResidentGrain(16),
+            prior,
+        )
+        .unwrap();
+        let raw = surface
+            .mount_section_rest(
+                &ResidentSectionRest::found(
+                    3,
+                    2,
+                    ResidentGrain(0),
+                    i64::BITS,
+                    vec![(1, 1), (0, 0), (2, 2), (0, 0), (3, 3), (0, 0)],
+                )
+                .unwrap(),
+            )
+            .unwrap();
+        let features = ResidentNormalEnclosureSection::from_points(
+            ResidentConstitutiveSection::integers(&raw).unwrap(),
+            ResidentGrain(16),
+        )
+        .unwrap();
+        let reads = surface.census().section_read_outs;
+        let applied = material
+            .retained_view()
+            .read_applied_enclosed_section(&features)
+            .unwrap();
+        assert_eq!(surface.census().section_read_outs, reads);
+        let values = (0..3)
+            .map(|row| {
+                applied.row(row).unwrap().inspect().unwrap().center[0]
+                    .real
+                    .clone()
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(
+            values,
+            vec![
+                Rat::from_integer(2.into()),
+                Rat::from_integer(4.into()),
+                Rat::from_integer(6.into())
+            ]
+        );
+    }
+}

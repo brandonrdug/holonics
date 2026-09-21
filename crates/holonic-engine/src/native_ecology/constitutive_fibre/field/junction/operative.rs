@@ -4,14 +4,18 @@
 //! separate obligations; these carriers never mutate the borrowed field.
 use super::super::material_transport::wides;
 use super::*;
-mod response;
 mod deposit;
+mod response;
 pub use deposit::NativeContactDepositReading;
-pub use response::{NativeMaterialResponseChart, NativeMaterialContactResponse, NativeMaterialContactResponseReading, NativeRetainedMaterialRelation, NativeMaterialContactStepComparison, NativeFiniteMaterialResponse};
+pub use response::{
+    NativeFiniteMaterialResponse, NativeMaterialContactResponse,
+    NativeMaterialContactResponseReading, NativeMaterialContactStepComparison,
+    NativeMaterialResponseChart, NativeRetainedMaterialRelation,
+};
 
 /// The numerical realization of a NEW contact deposit, not an identification of its source.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, serde::Deserialize)]
-#[serde(rename_all="kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum NativeContactRealization {
     /// Continue the enclosed unrounded response; its comparison error enters map uncertainty.
     #[default]
@@ -27,31 +31,64 @@ pub struct NativeOperativeContactBirth {
     pub source: usize,
     pub receiving: usize,
 }
-pub(in super::super) mod rest;
 mod current_factor;
-mod propagation;
+mod factor_return;
 mod map_source;
+mod propagation;
+pub(in super::super) mod rest;
 mod source;
-use map_source::{OperativeMapProgram,OperativeSourceOverlap};
-use propagation::CausalPropagationSections;
-pub use propagation::{NativeCausalContactPropagation,NativeCausalContactPropagationReading,NativeCausalContactJoinReading};
 pub use current_factor::NativeOperativeCurrentFactorCondensation;
-pub use source::{NativeFieldCurrentSource, NativeFieldCurrentSourceRest,NativeFieldReflection,NativeFieldReflectionSection,NativeFieldReflectionTarget};
+use map_source::{OperativeMapProgram, OperativeSourceOverlap};
+use propagation::CausalPropagationSections;
+pub use propagation::{
+    NativeCausalContactJoinReading, NativeCausalContactPropagation,
+    NativeCausalContactPropagationReading,
+};
+pub use source::{
+    NativeFieldAction, NativeFieldActionFactorization, NativeFieldActionPullback,
+    NativeFieldContactOrigin, NativeFieldCurrentSource, NativeFieldCurrentSourceRest,
+    NativeFieldDeclaredIncidence, NativeFieldGlobalMaterialCommit,
+    NativeFieldJointCurrentCommit, NativeFieldJointLayout, NativeFieldMatrixFreeAction,
+    NativeFieldReflection, NativeFieldReflectionSection, NativeFieldReflectionTarget,
+};
 
 pub(in super::super) struct OperativeSections<'c> {
     pub(in super::super) map: Rc<ResidentSection<'c>>,
     pub(in super::super) b: Rc<ResidentSection<'c>>,
     pub(in super::super) bounds: Rc<ResidentSection<'c>>,
-    pub(in super::super) covariance: ResidentSection<'c>,
+    /// Dense covariance is a legacy/reference cache. Declared matrix-free action never fills it.
+    pub(in super::super) covariance: std::cell::OnceCell<DenseCovariance<'c>>,
     pub(in super::super) aggregate: ResidentSection<'c>,
     pub(in super::super) moment_bounds: ResidentSection<'c>,
+    pub(in super::super) factor_program: Option<Rc<OperativeFactorProgram<'c>>>,
+}
+/// Resident sparse-incidence plus low-rank material program for the declared D operator.
+pub(in super::super) struct OperativeFactorProgram<'c> {
+    pub row_offsets: Rc<ResidentSection<'c>>,
+    pub columns: Rc<ResidentSection<'c>>,
+    pub values: Rc<ResidentSection<'c>>,
+    pub transpose_offsets: Rc<ResidentSection<'c>>,
+    pub transpose_rows: Rc<ResidentSection<'c>>,
+    pub transpose_values: Rc<ResidentSection<'c>>,
+    pub left: Rc<ResidentSection<'c>>,
+    pub right: Rc<ResidentSection<'c>>,
+    pub defects: Rc<ResidentSection<'c>>,
+    pub rows: usize,
+    pub boundary_components: usize,
+    pub rank: usize,
+    pub nonzeros: usize,
+}
+pub(in super::super) struct DenseCovariance<'c> {
+    pub(in super::super) matrix: ResidentSection<'c>,
+    pub(in super::super) bound: ResidentSection<'c>,
 }
 // Only the native joint-return producer may supply these packed carriers and their complete
 // delta radii. There is intentionally no public constructor taking an authored learning delta.
 pub(super) struct OperativeReturn<'c> {
-    at_cut:usize,contact_count:usize,
+    at_cut: usize,
+    contact_count: usize,
     // Zero extension beyond the actual producing contact population.
-    factor_count:usize,
+    factor_count: usize,
     realization: NativeContactRealization,
     origin: Rc<()>,
     ports: Rc<ResidentSection<'c>>,
@@ -68,27 +105,29 @@ pub struct NativeOperativeContactStaging<'f, 'c> {
     origin: Rc<()>,
     grain: u32,
     births: Vec<NativeOperativeContactBirth>,
+    declared_origins: Vec<NativeFieldContactOrigin>,
     sections: Rc<OperativeSections<'c>>,
     // Retained return carriers are chronological generators of the new map/current, not
     // rewritten source descriptions. A failed attempt is never appended here.
     returns: Vec<Rc<OperativeReturn<'c>>>,
-    program:Option<OperativeMapProgram<'c>>,
+    program: Option<OperativeMapProgram<'c>>,
 }
 
 pub(in super::super) struct OperativeState<'c> {
     // Immutable producing carriers at the two most recent emission cuts. This is a
     // performance cache, not a context window: older producers retain their decoder.
-    recent_producers:std::collections::VecDeque<(usize,usize,Rc<OperativeSections<'c>>)>,
-    recent_propagations:std::collections::VecDeque<(usize,Rc<CausalPropagationSections<'c>>)>,
-    pub(in super::super) propagate_from:Option<usize>,
+    recent_producers: std::collections::VecDeque<(usize, usize, Rc<OperativeSections<'c>>)>,
+    recent_propagations: std::collections::VecDeque<(usize, Rc<CausalPropagationSections<'c>>)>,
+    pub(in super::super) propagate_from: Option<usize>,
     pub(in super::super) sections: Rc<OperativeSections<'c>>,
     pub(in super::super) initial: Rc<OperativeSections<'c>>,
     pub(in super::super) activated_at: usize,
     pub(in super::super) grain: u32,
     pub(in super::super) births: Vec<NativeOperativeContactBirth>,
+    pub(in super::super) declared_origins: Vec<NativeFieldContactOrigin>,
     origin: Rc<()>,
     returns: Vec<Rc<OperativeReturn<'c>>>,
-    program:Option<OperativeMapProgram<'c>>,
+    program: Option<OperativeMapProgram<'c>>,
 }
 pub(in super::super) struct PendingOperative<'c> {
     origin: Rc<()>,
@@ -96,51 +135,88 @@ pub(in super::super) struct PendingOperative<'c> {
     pub(in super::super) trace: Rc<ResidentSection<'c>>,
     pub(in super::super) table: ResidentSection<'c>,
     pub(in super::super) _scratch: ResidentSection<'c>,
+    pub(in super::super) _covariance: ResidentSection<'c>,
     pub(in super::super) count: usize,
-    birth:Option<Rc<ResidentSection<'c>>>,
-    pub(in super::super) propagation:Option<Rc<CausalPropagationSections<'c>>>,
-    propagation_input_bounds:Option<Rc<ResidentSection<'c>>>,
+    birth: Option<Rc<ResidentSection<'c>>>,
+    pub(in super::super) propagation: Option<Rc<CausalPropagationSections<'c>>>,
+    propagation_input_bounds: Option<Rc<ResidentSection<'c>>>,
 }
 pub(in super::super) struct HeldOperative<'c> {
     pub(in super::super) b: Rc<ResidentSection<'c>>,
     pub(in super::super) bounds: Rc<ResidentSection<'c>>,
     pub(in super::super) trace: Rc<ResidentSection<'c>>,
     pub(in super::super) count: usize,
-    pub(in super::super) propagation_input_bounds:Option<Rc<ResidentSection<'c>>>,
+    pub(in super::super) propagation_input_bounds: Option<Rc<ResidentSection<'c>>>,
 }
 /// Storage retained by the operative return journal, separate from historical field reports.
 /// These carriers are distinct per committed return; temporary handles share the same buffers.
-#[derive(Debug,Serialize)]
+#[derive(Debug, Serialize)]
 pub struct NativeOperativeReturnStorage {
-    pub returns:usize,
-    pub port_octets:u64,
-    pub current_factor_octets:u64,
-    pub internal_delta_octets:u64,
-    pub bound_octets:u64,
-    pub implicit_zero_delta_returns:usize,
-    pub current_difference_returns:usize,
-    pub logical_internal_delta_octets:u64,
-    pub logical_current_factor_octets:u64,
-    pub total_octets:u64,
-    pub source_overlap_octets:u64,
+    pub returns: usize,
+    pub port_octets: u64,
+    pub current_factor_octets: u64,
+    pub internal_delta_octets: u64,
+    pub bound_octets: u64,
+    pub implicit_zero_delta_returns: usize,
+    pub current_difference_returns: usize,
+    pub logical_internal_delta_octets: u64,
+    pub logical_current_factor_octets: u64,
+    pub total_octets: u64,
+    pub source_overlap_octets: u64,
     /// Referenced anchor/birth storage; the anchor can share the current map before its change.
-    pub map_source_octets:u64,
+    pub map_source_octets: u64,
 }
-impl NativeConstitutiveField<'_>{
-    pub fn operative_return_storage(&self)->Option<NativeOperativeReturnStorage>{
-        let op=self.junction.as_ref()?.operative.as_ref()?;
-        let mut out=NativeOperativeReturnStorage{returns:op.returns.len(),port_octets:0,current_factor_octets:0,internal_delta_octets:0,bound_octets:0,implicit_zero_delta_returns:0,current_difference_returns:0,logical_internal_delta_octets:0,logical_current_factor_octets:0,total_octets:0,source_overlap_octets:0,map_source_octets:0};
-        for r in &op.returns {out.port_octets+=r.ports.resident_octets();out.current_factor_octets+=r.currents.resident_octets();out.internal_delta_octets+=r.b.as_ref().map_or(0,|b|b.resident_octets());out.bound_octets+=r.bounds.resident_octets();out.implicit_zero_delta_returns+=usize::from(r.b.is_none());out.current_difference_returns+=usize::from(r.current_difference_source.is_some());out.logical_internal_delta_octets+=64*r.contact_count.max(1) as u64;out.logical_current_factor_octets+=128*r.contact_count.max(1) as u64;}
-        out.source_overlap_octets=op.returns.iter().filter_map(|r|r.source_overlap.as_ref()).map(|h|h.coefficients.resident_octets()+h.errors.resident_octets()).sum();
-        out.map_source_octets=op.program.as_ref().map_or(0,|p|p.map.resident_octets()+p.births.iter().map(|b|b.resident_octets()).sum::<u64>());
-        out.total_octets=out.port_octets+out.current_factor_octets+out.internal_delta_octets+out.bound_octets+out.source_overlap_octets;Some(out)
+impl NativeConstitutiveField<'_> {
+    pub fn operative_return_storage(&self) -> Option<NativeOperativeReturnStorage> {
+        let op = self.junction.as_ref()?.operative.as_ref()?;
+        let mut out = NativeOperativeReturnStorage {
+            returns: op.returns.len(),
+            port_octets: 0,
+            current_factor_octets: 0,
+            internal_delta_octets: 0,
+            bound_octets: 0,
+            implicit_zero_delta_returns: 0,
+            current_difference_returns: 0,
+            logical_internal_delta_octets: 0,
+            logical_current_factor_octets: 0,
+            total_octets: 0,
+            source_overlap_octets: 0,
+            map_source_octets: 0,
+        };
+        for r in &op.returns {
+            out.port_octets += r.ports.resident_octets();
+            out.current_factor_octets += r.currents.resident_octets();
+            out.internal_delta_octets += r.b.as_ref().map_or(0, |b| b.resident_octets());
+            out.bound_octets += r.bounds.resident_octets();
+            out.implicit_zero_delta_returns += usize::from(r.b.is_none());
+            out.current_difference_returns += usize::from(r.current_difference_source.is_some());
+            out.logical_internal_delta_octets += 64 * r.contact_count.max(1) as u64;
+            out.logical_current_factor_octets += 128 * r.contact_count.max(1) as u64;
+        }
+        out.source_overlap_octets = op
+            .returns
+            .iter()
+            .filter_map(|r| r.source_overlap.as_ref())
+            .map(|h| h.coefficients.resident_octets() + h.errors.resident_octets())
+            .sum();
+        out.map_source_octets = op.program.as_ref().map_or(0, |p| {
+            p.map.resident_octets() + p.births.iter().map(|b| b.resident_octets()).sum::<u64>()
+        });
+        out.total_octets = out.port_octets
+            + out.current_factor_octets
+            + out.internal_delta_octets
+            + out.bound_octets
+            + out.source_overlap_octets;
+        Some(out)
     }
 }
 
 impl<'c> OperativeState<'c> {
-    pub(in super::super) fn reserve_birth(&mut self) -> Result<(),Error> {
-        self.births.try_reserve(1).map_err(|_|Error::Shape)?;
-        if let Some(program)=&mut self.program {program.births.try_reserve(1).map_err(|_|Error::Shape)?;}
+    pub(in super::super) fn reserve_birth(&mut self) -> Result<(), Error> {
+        self.births.try_reserve(1).map_err(|_| Error::Shape)?;
+        if let Some(program) = &mut self.program {
+            program.births.try_reserve(1).map_err(|_| Error::Shape)?;
+        }
         Ok(())
     }
     /// The older alternating-prefix current decoder needs unchanged contacts and no separate
@@ -167,25 +243,43 @@ impl<'c> OperativeState<'c> {
             return Err(Error::Shape);
         }
         let sections = sections(surface, d, count)?;
+        let covariance = surface.fresh_section(1, 4 * (d / 2) * (d / 2), ResidentGrain(0))?;
         let scratch =
             surface.fresh_section(1, 2 * (m * m + m) + 12 * count.max(1), ResidentGrain(0))?;
         let trace = Rc::new(surface.fresh_section(1, 18 * d + 12, ResidentGrain(0))?);
-        let birth=(linked && self.program.is_some()).then(||surface.fresh_section(1,2*d,ResidentGrain(0)).map(Rc::new)).transpose()?;
-        let propagation=self.propagate_from.map(|_|CausalPropagationSections::prepare(surface,&self.births)).transpose()?;
-        let propagation_input_bounds=propagation.as_ref().map(|_|Rc::clone(&self.sections.bounds));
+        let birth = (linked && self.program.is_some())
+            .then(|| {
+                surface
+                    .fresh_section(1, 2 * d, ResidentGrain(0))
+                    .map(Rc::new)
+            })
+            .transpose()?;
+        let propagation = self
+            .propagate_from
+            .map(|_| CausalPropagationSections::prepare(surface, &self.births))
+            .transpose()?;
+        let propagation_input_bounds = propagation
+            .as_ref()
+            .map(|_| Rc::clone(&self.sections.bounds));
         let mut words = vec![];
         for ptr in [
             self.sections.map.lo_device_ptr(),
-            propagation.as_ref().map_or_else(||self.sections.b.lo_device_ptr(),|p|p.current.lo_device_ptr()),
-            propagation.as_ref().map_or_else(||self.sections.bounds.lo_device_ptr(),|p|p.bounds.lo_device_ptr()),
+            propagation.as_ref().map_or_else(
+                || self.sections.b.lo_device_ptr(),
+                |p| p.current.lo_device_ptr(),
+            ),
+            propagation.as_ref().map_or_else(
+                || self.sections.bounds.lo_device_ptr(),
+                |p| p.bounds.lo_device_ptr(),
+            ),
             sections.map.lo_device_ptr(),
             sections.map.hi_device_ptr(),
             sections.b.lo_device_ptr(),
             sections.b.hi_device_ptr(),
             sections.bounds.lo_device_ptr(),
             sections.bounds.hi_device_ptr(),
-            sections.covariance.lo_device_ptr(),
-            sections.covariance.hi_device_ptr(),
+            covariance.lo_device_ptr(),
+            covariance.hi_device_ptr(),
             sections.aggregate.lo_device_ptr(),
             sections.aggregate.hi_device_ptr(),
             sections.moment_bounds.lo_device_ptr(),
@@ -195,8 +289,8 @@ impl<'c> OperativeState<'c> {
             trace.hi_device_ptr(),
             self.births.len() as u64,
             count as u64,
-            birth.as_ref().map_or(0,|b|b.lo_device_ptr()),
-            birth.as_ref().map_or(0,|b|b.hi_device_ptr()),
+            birth.as_ref().map_or(0, |b| b.lo_device_ptr()),
+            birth.as_ref().map_or(0, |b| b.hi_device_ptr()),
         ] {
             words.push((ptr as i64, ptr as i64));
         }
@@ -209,9 +303,11 @@ impl<'c> OperativeState<'c> {
             trace,
             table,
             _scratch: scratch,
+            _covariance: covariance,
             count,
             birth,
-            propagation,propagation_input_bounds,
+            propagation,
+            propagation_input_bounds,
         })
     }
     pub(in super::super) fn receive(
@@ -221,16 +317,27 @@ impl<'c> OperativeState<'c> {
         at: usize,
     ) {
         if let Some(source) = source {
-            if let Some(program)=&mut self.program {program.births.push(next.birth.as_ref().expect("prepared birth column").clone());}
+            if let Some(program) = &mut self.program {
+                program
+                    .births
+                    .push(next.birth.as_ref().expect("prepared birth column").clone());
+            }
             self.births.push(NativeOperativeContactBirth {
                 source,
                 receiving: at,
             });
         }
-        self.recent_producers.push_back((at,next.count,Rc::clone(&next.sections)));
-        while self.recent_producers.len()>2 {self.recent_producers.pop_front();}
-        if let Some(word)=next.propagation {self.recent_propagations.push_back((at,word));}
-        while self.recent_propagations.len()>2 {self.recent_propagations.pop_front();}
+        self.recent_producers
+            .push_back((at, next.count, Rc::clone(&next.sections)));
+        while self.recent_producers.len() > 2 {
+            self.recent_producers.pop_front();
+        }
+        if let Some(word) = next.propagation {
+            self.recent_propagations.push_back((at, word));
+        }
+        while self.recent_propagations.len() > 2 {
+            self.recent_propagations.pop_front();
+        }
         self.sections = next.sections;
         self.origin = next.origin;
     }
@@ -242,7 +349,7 @@ impl<'c> PendingOperative<'c> {
             bounds: Rc::clone(&self.sections.bounds),
             trace: Rc::clone(&self.trace),
             count: self.count,
-            propagation_input_bounds:self.propagation_input_bounds.clone(),
+            propagation_input_bounds: self.propagation_input_bounds.clone(),
         }
     }
 }
@@ -270,23 +377,174 @@ pub(in super::super) fn sections<'c>(
     d: usize,
     k: usize,
 ) -> Result<Rc<OperativeSections<'c>>, Error> {
-    let m = d / 2;
-    let sq = m.checked_mul(m).ok_or(Error::Shape)?;
     Ok(Rc::new(OperativeSections {
         map: Rc::new(surface.fresh_section(k.max(1), 2 * d, ResidentGrain(0))?),
         b: Rc::new(surface.fresh_section(k.max(1), 4, ResidentGrain(0))?),
         bounds: Rc::new(surface.fresh_section(1, 4, ResidentGrain(0))?),
-        covariance: surface.fresh_section(1, 4 * sq, ResidentGrain(0))?,
+        covariance: std::cell::OnceCell::new(),
         aggregate: surface.fresh_section(1, 2 * d, ResidentGrain(0))?,
         moment_bounds: surface.fresh_section(1, 8, ResidentGrain(0))?,
+        factor_program: None,
+    }))
+}
+
+pub(in super::super) fn factored_sections<'c>(
+    surface: &'c ResidentSurface<'c>,
+    d: usize,
+    k: usize,
+) -> Result<Rc<OperativeSections<'c>>, Error> {
+    let mount_zero = |rows: usize, width: usize| -> Result<ResidentSection<'c>, Error> {
+        let words = vec![(0i64, 0i64); rows.checked_mul(width).ok_or(Error::Shape)?];
+        Ok(surface.mount_section_rest(
+            &ResidentSectionRest::found(rows, width, ResidentGrain(0), 64, words)
+                .map_err(|_| Error::Shape)?,
+        )?)
+    };
+    Ok(Rc::new(OperativeSections {
+        map: Rc::new(mount_zero(1, 2 * d)?),
+        b: Rc::new(mount_zero(k.max(1), 4)?),
+        bounds: Rc::new(mount_zero(1, 4)?),
+        covariance: std::cell::OnceCell::new(),
+        aggregate: mount_zero(1, 2 * d)?,
+        moment_bounds: mount_zero(1, 8)?,
+        factor_program: None,
     }))
 }
 impl<'c> OperativeSections<'c> {
     pub(in super::super) fn current(&self) -> [&ResidentSection<'c>; 3] {
         [&self.map, &self.b, &self.bounds]
     }
-    pub(in super::super) fn moments(&self) -> [&ResidentSection<'c>; 3] {
-        [&self.covariance, &self.aggregate, &self.moment_bounds]
+
+    /// Recompute the factored D b aggregate and its certified norm/radius packet on the
+    /// resident device. A declared source is admitted only after this packet completes;
+    /// zero-initialised staging buffers are never published as a certificate.
+    pub(in super::super) fn refresh_factor_aggregate(
+        &self,
+        surface: &'c ResidentSurface<'c>,
+        grain: u32,
+    ) -> Result<(), Error> {
+        let program = self.factor_program.as_ref().ok_or(Error::Shape)?;
+        let d = program.boundary_components;
+        let count = program.rows;
+        let work = surface.fresh_section(
+            1,
+            2 * d
+                .checked_add(2 * count)
+                .and_then(|v| v.checked_add(3 * program.rank))
+                .and_then(|v| v.checked_add(1))
+                .ok_or(Error::Shape)?,
+            ResidentGrain(0),
+        )?;
+        let mut passage = surface.begin_passage(&[vec![]])?;
+        {
+            let lane = passage.open(0, &[])?;
+            surface.record_field_factor_aggregate(
+                &lane,
+                &program.row_offsets,
+                &program.columns,
+                &program.values,
+                &program.transpose_offsets,
+                &program.transpose_rows,
+                &program.transpose_values,
+                &program.left,
+                &program.right,
+                &program.defects,
+                &self.b,
+                &self.bounds,
+                d,
+                count,
+                program.nonzeros,
+                program.rank,
+                grain,
+                &self.aggregate,
+                &self.moment_bounds,
+                &work,
+            )?;
+        }
+        passage.close(0, &self.moment_bounds, 64)?;
+        let completion = passage.finish()?.launch()?;
+        if !completion.obstruction.is_empty() {
+            return Err(Error::Arithmetic(format!(
+                "factored aggregate: {:?}",
+                completion.obstruction
+            )));
+        }
+        Ok(())
+    }
+    pub(in super::super) fn dense_moments(&self) -> Result<[&ResidentSection<'c>; 3], Error> {
+        Ok([
+            &self.covariance.get().ok_or(Error::Uncertain)?.matrix,
+            &self.aggregate,
+            &self.covariance.get().ok_or(Error::Uncertain)?.bound,
+        ])
+    }
+
+    pub(in super::super) fn ensure_covariance(
+        &self,
+        surface: &'c ResidentSurface<'c>,
+        d: usize,
+        count: usize,
+        grain: u32,
+    ) -> Result<&ResidentSection<'c>, Error> {
+        if self.factor_program.is_some() {
+            return Err(invalid(
+                "dense covariance receiver requires explicit factor-program realization",
+            ));
+        }
+        if self.covariance.get().is_none() {
+            let m = d / 2;
+            let covariance = surface.fresh_section(1, 4 * m * m, ResidentGrain(0))?;
+            let dense_aggregate = surface.fresh_section(1, 2 * d, ResidentGrain(0))?;
+            let dense_bounds = surface.fresh_section(1, 8, ResidentGrain(0))?;
+            let rounds = surface.fresh_section(1, 2 * (m * m + m), ResidentGrain(0))?;
+            let mut passage = surface.begin_passage(&[vec![]])?;
+            {
+                let lane = passage.open(0, &[])?;
+                surface.record_operative_moments(
+                    &lane,
+                    d,
+                    count,
+                    grain,
+                    self.current(),
+                    [&covariance, &dense_aggregate, &dense_bounds],
+                    &rounds,
+                )?;
+            }
+            passage.close(0, &dense_bounds, 64)?;
+            let completion = passage.finish()?.launch()?;
+            if !completion.obstruction.is_empty() {
+                return Err(Error::Arithmetic(format!(
+                    "dense operative covariance: {:?}",
+                    completion.obstruction
+                )));
+            }
+            self.covariance
+                .set(DenseCovariance {
+                    matrix: covariance,
+                    bound: dense_bounds,
+                })
+                .map_err(|_| Error::Uncertain)?;
+        }
+        Ok(&self.covariance.get().ok_or(Error::Uncertain)?.matrix)
+    }
+
+    pub(in super::super) fn reserve_covariance(
+        &self,
+        surface: &'c ResidentSurface<'c>,
+        d: usize,
+    ) -> Result<&ResidentSection<'c>, Error> {
+        if self.covariance.get().is_none() {
+            self.covariance
+                .set(DenseCovariance {
+                    matrix: surface.fresh_section(1, 4 * (d / 2) * (d / 2), ResidentGrain(0))?,
+                    bound: surface.fresh_section(1, 8, ResidentGrain(0))?,
+                })
+                .map_err(|_| Error::Uncertain)?;
+        }
+        self.covariance
+            .get()
+            .map(|c| &c.matrix)
+            .ok_or(Error::Uncertain)
     }
 }
 impl<'c> NativeConstitutiveField<'c> {
@@ -315,7 +573,10 @@ impl<'c> NativeConstitutiveField<'c> {
     }
     /// Number of committed operative return generators; this is chronology, not a quality score.
     pub fn operative_return_count(&self) -> Option<usize> {
-        self.junction.as_ref().and_then(|j|j.operative.as_ref()).map(|o|o.returns.len())
+        self.junction
+            .as_ref()
+            .and_then(|j| j.operative.as_ref())
+            .map(|o| o.returns.len())
     }
     /// Prepare the existing contact map and full internal-current carrier on the device.
     /// This borrows the one source ecology and issues no source handle or state publication.
@@ -331,9 +592,10 @@ impl<'c> NativeConstitutiveField<'c> {
                 origin: Rc::clone(&owned.origin),
                 grain: owned.grain,
                 births: owned.births.clone(),
+                declared_origins: owned.declared_origins.clone(),
                 sections: Rc::clone(&owned.sections),
                 returns: owned.returns.clone(),
-                program:owned.program.clone(),
+                program: owned.program.clone(),
             });
         }
         let grain = match self.junction_representation() {
@@ -416,7 +678,7 @@ impl<'c> NativeConstitutiveField<'c> {
         )?;
         let staged = sections(surface, d, k)?;
         let scratch = surface.fresh_section(k.max(1), 4 * d + 8, ResidentGrain(0))?;
-        let rounds = surface.fresh_section(1, 2 * ((d / 2) * (d / 2) + d / 2), ResidentGrain(0))?;
+        let rounds = surface.fresh_section(1, d, ResidentGrain(0))?;
         let mut passage = surface.begin_passage(&[vec![], vec![0]])?;
         {
             let lane = passage.open(0, &[])?;
@@ -437,13 +699,14 @@ impl<'c> NativeConstitutiveField<'c> {
         passage.close(0, &staged.bounds, 64)?;
         {
             let lane = passage.open(1, &[0])?;
-            surface.record_operative_moments(
+            surface.record_operative_aggregate(
                 &lane,
                 d,
                 k,
                 grain,
                 staged.current(),
-                staged.moments(),
+                &staged.aggregate,
+                &staged.moment_bounds,
                 &rounds,
             )?;
         }
@@ -457,9 +720,10 @@ impl<'c> NativeConstitutiveField<'c> {
             origin: Rc::new(()),
             grain,
             births,
+            declared_origins: Vec::new(),
             sections: staged,
             returns: vec![],
-            program:None,
+            program: None,
         })
     }
 }
@@ -467,20 +731,31 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
     // Owner-only adoption after a complete native constitutive return. Birth identity and
     // activation standing remain in the existing ecology; only its staged differences move.
     #[cfg(test)]
-    fn into_update(self)->(Rc<OperativeSections<'c>>,Rc<()>,Vec<Rc<OperativeReturn<'c>>>,Option<OperativeMapProgram<'c>>) {(self.sections,self.origin,self.returns,self.program)}
+    fn into_update(
+        self,
+    ) -> (
+        Rc<OperativeSections<'c>>,
+        Rc<()>,
+        Vec<Rc<OperativeReturn<'c>>>,
+        Option<OperativeMapProgram<'c>>,
+    ) {
+        (self.sections, self.origin, self.returns, self.program)
+    }
     pub(in super::super) fn into_owned(self) -> OperativeState<'c> {
         let activated_at = self.field_cut();
         OperativeState {
-            recent_producers:Default::default(),
-            recent_propagations:Default::default(),propagate_from:None,
+            recent_producers: Default::default(),
+            recent_propagations: Default::default(),
+            propagate_from: None,
             initial: Rc::clone(&self.sections),
             sections: self.sections,
             activated_at,
             grain: self.grain,
             births: self.births,
+            declared_origins: self.declared_origins,
             origin: self.origin,
             returns: self.returns,
-            program:self.program,
+            program: self.program,
         }
     }
     pub fn field_cut(&self) -> usize {
@@ -495,26 +770,50 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
     // The field's material-contact producer stages every component;
     // the borrowed source, its old returns and its exact decoder survive refusal unchanged.
     pub(super) fn stage_return(&self, returned: Rc<OperativeReturn<'c>>) -> Result<Self, Error> {
-        let currents=self.field.resolve_operative_current_factors(&returned)?;
-        self.stage_return_using(returned,&currents)
+        let currents = self.field.resolve_operative_current_factors(&returned)?;
+        self.stage_return_using(returned, &currents)
     }
-    pub(super) fn stage_return_using(&self, returned: Rc<OperativeReturn<'c>>,
-        currents: &Rc<ResidentSection<'c>>) -> Result<Self, Error> {
-        self.stage_return_using_image(returned,currents,None)
+    pub(super) fn stage_return_using(
+        &self,
+        returned: Rc<OperativeReturn<'c>>,
+        currents: &Rc<ResidentSection<'c>>,
+    ) -> Result<Self, Error> {
+        self.stage_return_using_image(returned, currents, None)
     }
-    pub(super) fn stage_return_using_image(&self, returned:Rc<OperativeReturn<'c>>, currents:&Rc<ResidentSection<'c>>, image:Option<ResidentNormalEnclosureView<'_, 'c>>) -> Result<Self,Error> {
-        if image.is_some() && (returned.factor_count!=0 || returned.b.is_none() || returned.source_overlap.is_some()){return Err(Error::Shape);}
-        if returned.source_overlap.is_some(){return self.stage_source_return(returned,currents);}
-        if !Rc::ptr_eq(&self.origin, &returned.origin) || returned.at_cut!=self.field_cut() || returned.contact_count!=self.births.len() {
+    pub(super) fn stage_return_using_image(
+        &self,
+        returned: Rc<OperativeReturn<'c>>,
+        currents: &Rc<ResidentSection<'c>>,
+        image: Option<ResidentNormalEnclosureView<'_, 'c>>,
+    ) -> Result<Self, Error> {
+        if image.is_some()
+            && (returned.factor_count != 0
+                || returned.b.is_none()
+                || returned.source_overlap.is_some())
+        {
+            return Err(Error::Shape);
+        }
+        if returned.source_overlap.is_some() {
+            return self.stage_source_return(returned, currents);
+        }
+        if !Rc::ptr_eq(&self.origin, &returned.origin)
+            || returned.at_cut != self.field_cut()
+            || returned.contact_count != self.births.len()
+        {
             return Err(Error::ForeignOccurrence);
+        }
+        if self.sections.factor_program.is_some() {
+            return self.stage_factor_return(returned, currents, image);
         }
         let surface = self.field.relation.surface;
         let d = 6 * self.field.nodes();
         let k = self.births.len();
         let mut staged = sections(surface, d, k)?;
+        Rc::get_mut(&mut staged)
+            .ok_or(Error::Uncertain)?
+            .factor_program = self.sections.factor_program.clone();
         let update_rounds = surface.fresh_section(k.max(1), 2, ResidentGrain(0))?;
-        let moments_rounds =
-            surface.fresh_section(1, 2 * ((d / 2) * (d / 2) + d / 2), ResidentGrain(0))?;
+        let moments_rounds = surface.fresh_section(1, d, ResidentGrain(0))?;
         let mut passage = surface.begin_passage(&[vec![], vec![0]])?;
         {
             let lane = passage.open(0, &[])?;
@@ -525,30 +824,27 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
                 self.grain,
                 returned.realization == NativeContactRealization::DyadicDeposit,
                 self.sections.current(),
-                [
-                    &returned.ports,
-                    currents,
-                    &returned.bounds,
-                ],
+                [&returned.ports, currents, &returned.bounds],
                 returned.b.as_deref(),
                 returned.factor_count,
                 staged.current(),
                 &update_rounds,
             )?;
-            if let Some(image)=image {
-                surface.record_field_reflection_current_bound(&lane,image,k,&staged.bounds)?;
+            if let Some(image) = image {
+                surface.record_field_reflection_current_bound(&lane, image, k, &staged.bounds)?;
             }
         }
         passage.close(0, &staged.bounds, 64)?;
         {
             let lane = passage.open(1, &[0])?;
-            surface.record_operative_moments(
+            surface.record_operative_aggregate(
                 &lane,
                 d,
                 k,
                 self.grain,
                 staged.current(),
-                staged.moments(),
+                &staged.aggregate,
+                &staged.moment_bounds,
                 &moments_rounds,
             )?;
         }
@@ -569,9 +865,10 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
             origin: Rc::new(()),
             grain: self.grain,
             births: self.births.clone(),
+            declared_origins: self.declared_origins.clone(),
             sections: staged,
             returns,
-            program:self.program.clone(),
+            program: self.program.clone(),
         })
     }
     pub fn inspect(&self) -> Result<NativeOperativeContactReading, Error> {
@@ -585,24 +882,27 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
     }
 }
 
-pub(in super::super) fn inspect_sections(
-    field: &NativeConstitutiveField<'_>,
+pub(in super::super) fn inspect_sections<'c>(
+    field: &NativeConstitutiveField<'c>,
     grain: u32,
     births: &[NativeOperativeContactBirth],
-    sections: &OperativeSections<'_>,
+    sections: &OperativeSections<'c>,
     staged_returns: usize,
 ) -> Result<NativeOperativeContactReading, Error> {
     let surface = field.relation.surface;
     let d = 6 * field.nodes();
     let m = d / 2;
     let k = births.len();
+    sections.ensure_covariance(field.relation.surface, d, k, grain)?;
     let read = |s: &ResidentSection<'_>| -> Result<Vec<i128>, Error> {
         wides(&surface.detach_section(s, 64)?.intervals)
     };
     let map = read(&sections.map)?;
     let b = read(&sections.b)?;
     let e = read(&sections.bounds)?;
-    let cov = read(&sections.covariance)?;
+    let dense = sections.covariance.get().ok_or(Error::Uncertain)?;
+    let cov = read(&dense.matrix)?;
+    let dense_bounds = read(&dense.bound)?;
     let h = read(&sections.aggregate)?;
     let bounds = read(&sections.moment_bounds)?;
     if e.iter().chain(&bounds).any(|v| *v < 0) {
@@ -626,7 +926,7 @@ pub(in super::super) fn inspect_sections(
             radius: q(e[1]),
         },
         covariance: cov.chunks_exact(2 * m).map(waves).collect(),
-        covariance_radius: q(bounds[0]),
+        covariance_radius: q(dense_bounds[0]),
         aggregate: NativeFieldCurrentBall {
             center: waves(&h),
             radius: q(bounds[1]),
@@ -679,7 +979,7 @@ pub(in super::super) fn decode_reflection(
     }
     let scale = num_bigint::BigInt::from(1) << grain;
     let q = |x: i128| Rat::new(x.into(), scale.clone());
-    let numerical_residual=decode_reflection_residual(&trace.intervals[..18*d],d,grain)?;
+    let numerical_residual = decode_reflection_residual(&trace.intervals[..18 * d], d, grain)?;
     Ok(NativeOperativeReflectionReading {
         potential: base.potential,
         outgoing: base.outgoing,
@@ -740,9 +1040,14 @@ impl NativeConstitutiveField<'_> {
     }
 }
 
-pub(in super::super) fn decode_reflection_residual(words:&[(i64,i64)],d:usize,grain:u32)
-    ->Result<Vec<ExactComplexWaveCurrent>,Error>{
-    if words.len()!=18*d||words.iter().any(|(a,b)|a!=b){return Err(invalid("reflection residual shape"));}
+pub(in super::super) fn decode_reflection_residual(
+    words: &[(i64, i64)],
+    d: usize,
+    grain: u32,
+) -> Result<Vec<ExactComplexWaveCurrent>, Error> {
+    if words.len() != 18 * d || words.iter().any(|(a, b)| a != b) {
+        return Err(invalid("reflection residual shape"));
+    }
     let cube = num_bigint::BigInt::from(1) << (3 * grain);
     let integer = |row: usize| -> Result<num_bigint::BigInt, Error> {
         let w = &words[18 * row..18 * (row + 1)];

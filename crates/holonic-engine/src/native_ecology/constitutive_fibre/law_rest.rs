@@ -15,6 +15,8 @@ struct LawChart {
     target_width: usize,
     source_chart: ConstitutiveSourceChart,
     occurrences: u64,
+    #[serde(default)]
+    source_only: bool,
 }
 
 /// The relation is generative material for its declared local source law. Chronology is a cut,
@@ -38,6 +40,9 @@ impl ConstitutiveFibreRest {
     }
     pub fn occurrences(&self) -> u64 {
         self.chart.occurrences
+    }
+    pub fn source_only(&self) -> bool {
+        self.chart.source_only
     }
     pub fn relation(&self) -> &ResidentSectionRest {
         &self.basis
@@ -74,16 +79,28 @@ impl ConstitutiveFibreRest {
                 return Err(ConstitutiveFibreError::Shape);
             }
         }
-        point_section(&self.basis, width, width)?;
-        for p in 0..width {
-            let row = &self.basis.intervals[p * width..(p + 1) * width];
-            if row[p].0 < 0
-                || row[..p].iter().any(|v| v.0 != 0)
-                || (row[p].0 == 0 && row.iter().any(|v| v.0 != 0))
+        if h.source_only {
+            if self.basis.rows != 1 || self.basis.width != 1 || self.basis.intervals != vec![(0, 0)]
             {
                 return Err(ConstitutiveFibreError::Rest(
-                    "constitutive law is not positive-pivot echelon material".into(),
+                    "source-only constitutive witness".into(),
                 ));
+            }
+            if h.occurrences != 0 {
+                return Err(ConstitutiveFibreError::Shape);
+            }
+        } else {
+            point_section(&self.basis, width, width)?;
+            for p in 0..width {
+                let row = &self.basis.intervals[p * width..(p + 1) * width];
+                if row[p].0 < 0
+                    || row[..p].iter().any(|v| v.0 != 0)
+                    || (row[p].0 == 0 && row.iter().any(|v| v.0 != 0))
+                {
+                    return Err(ConstitutiveFibreError::Rest(
+                        "constitutive law is not positive-pivot echelon material".into(),
+                    ));
+                }
             }
         }
         if self.rank() as u64 > h.occurrences {
@@ -116,11 +133,15 @@ impl ConstitutiveFibreRest {
         surface: &'c ResidentSurface<'c>,
     ) -> Result<ResidentConstitutiveFibre<'c>, ConstitutiveFibreError> {
         self.validate()?;
-        ResidentConstitutiveFibre::check_extent(
-            surface,
-            self.chart.source_width,
-            self.chart.target_width,
-        )?;
+        if !self.chart.source_only {
+            ResidentConstitutiveFibre::check_extent(
+                surface,
+                self.chart.source_width,
+                self.chart.target_width,
+            )?;
+        } else if self.chart.source_width == 0 || self.chart.target_width == 0 {
+            return Err(ConstitutiveFibreError::Shape);
+        }
         Ok(ResidentConstitutiveFibre {
             basis: surface.mount_section_rest(&self.basis)?,
             basis_owner: Rc::new(()),
@@ -130,6 +151,7 @@ impl ConstitutiveFibreRest {
             source_chart: self.chart.source_chart,
             occurrences: self.chart.occurrences,
             usable: true,
+            source_only: self.chart.source_only,
         })
     }
 }
@@ -150,6 +172,7 @@ impl ResidentConstitutiveFibre<'_> {
                 target_width: self.target_width,
                 source_chart: self.source_chart,
                 occurrences: self.occurrences,
+                source_only: self.source_only,
             },
             basis: self.surface.detach_section(&self.basis, 64)?,
         };

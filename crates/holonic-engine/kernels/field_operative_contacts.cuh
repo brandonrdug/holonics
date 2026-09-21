@@ -126,17 +126,18 @@ __device__ void operative_moments_prepare(
             for(uint32_t k=0;k<count;++k)history_complex_add_product(re,im,map[(size_t)k*D+2u*i],map[(size_t)k*D+2u*i+1u],b[2u*k],b[2u*k+1u],false);
             h[2u*i]=operative_grid(re,grain,&omitted,slot);h[2u*i+1u]=operative_grid(im,grain,&omitted,slot);
         }
-        rounds[ij]=omitted;
+        rounds[RefreshCovariance?ij:ij-(size_t)m*m]=omitted;
     }
     __syncthreads();if(*slot)return;
     if(!threadIdx.x){
         HistoryInteger dn,bn;wide rc=0,rh=0;
-        if constexpr(RefreshCovariance)for(size_t i=0;i<(size_t)count*D;++i)dn=dn+history_integer(map[i])*history_integer(map[i]);
+        for(size_t i=0;i<(size_t)count*D;++i)dn=dn+history_integer(map[i])*history_integer(map[i]);
         for(size_t i=0;i<2u*(size_t)count;++i)bn=bn+history_integer(b[i])*history_integer(b[i]);
-        wide nd=RefreshCovariance?history_norm_ceiling(dn,slot):((wide *)out_bounds_lo)[2],nb=history_norm_ceiling(bn,slot);
+        wide nd=history_norm_ceiling(dn,slot),nb=history_norm_ceiling(bn,slot);
         if constexpr(RefreshCovariance)for(size_t i=0;i<(size_t)m*m;++i)rc=add_checked(rc,rounds[i],slot);
-        for(size_t i=(size_t)m*m;i<(size_t)m*m+m;++i)rh=add_checked(rh,rounds[i],slot);
-        wide ec=RefreshCovariance?add_checked(ft_ceil_product(add_checked(product_checked(2,nd,slot),e[0],slot),e[0],grain,slot),rc,slot):((wide *)out_bounds_lo)[0];
+        for(size_t i=(size_t)m*m;i<(size_t)m*m+m;++i)
+            rh=add_checked(rh,rounds[RefreshCovariance?i:i-(size_t)m*m],slot);
+        wide ec=RefreshCovariance?add_checked(ft_ceil_product(add_checked(product_checked(2,nd,slot),e[0],slot),e[0],grain,slot),rc,slot):0;
         wide eh=add_checked(ft_ceil_product(nd,e[1],grain,slot),add_checked(ft_ceil_product(nb,e[0],grain,slot),ft_ceil_product(e[0],e[1],grain,slot),slot),slot);
         ((wide *)out_bounds_lo)[0]=ec;((wide *)out_bounds_lo)[1]=add_checked(eh,rh,slot);
         ((wide *)out_bounds_lo)[2]=nd;((wide *)out_bounds_lo)[3]=nb;
@@ -152,4 +153,19 @@ extern "C" __global__ void __launch_bounds__(512) section_field_operative_moment
 ){
     if(blockIdx.x)return;if(upstream_refused(census,lineage,lineage_count,slot))return;
     operative_moments_prepare(map_wire,b_wire,bounds,D,count,grain,c_lo,c_hi,h_lo,h_hi,out_bounds_lo,out_bounds_hi,rounds,slot);
+}
+
+// Factored operative state refresh: recompute D*b, aggregate and all current/norm bounds while
+// deliberately skipping the dense C=D*D* covariance. Dense C remains an explicit reference cache.
+extern "C" __global__ void __launch_bounds__(512) section_field_operative_aggregate(
+    const int64_t *map_wire,const int64_t *b_wire,const int64_t *bounds,
+    uint32_t D,uint32_t count,uint32_t grain,
+    int64_t *aggregate_lo,int64_t *aggregate_hi,int64_t *out_bounds_lo,int64_t *out_bounds_hi,
+    wide *rounds,uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
+){
+    if(blockIdx.x||upstream_refused(census,lineage,lineage_count,slot))return;
+    operative_moments_prepare<false>(
+        map_wire,b_wire,bounds,D,count,grain,
+        aggregate_lo,aggregate_hi,aggregate_lo,aggregate_hi,
+        out_bounds_lo,out_bounds_hi,rounds,slot);
 }

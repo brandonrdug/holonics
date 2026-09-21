@@ -13,6 +13,8 @@ struct Header {
     targets: usize,
     grain: u32,
     observations: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    prior: Option<NativeNormalPrior>,
 }
 // Version-one wire chart only; the live/rest owner stores one source declaration.
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -45,6 +47,9 @@ impl NormalMaterialRest {
     pub fn observations(&self) -> u64 {
         self.header.observations
     }
+    pub fn prior(&self) -> Option<&NativeNormalPrior> {
+        self.header.prior.as_ref()
+    }
     pub fn state(&self) -> &ResidentSectionRest {
         &self.state
     }
@@ -75,12 +80,34 @@ impl NormalMaterialRest {
         if !(1..=120).contains(&grain.0) {
             return Err(ConstitutiveFibreError::Shape);
         }
+        Self::from_chart_state_data_with_prior(
+            source_chart,
+            targets,
+            grain,
+            observations,
+            state,
+            None,
+        )
+    }
+    fn from_chart_state_data_with_prior(
+        source_chart: NormalSourceChart,
+        targets: usize,
+        grain: ResidentGrain,
+        observations: u64,
+        state: ResidentSectionRest,
+        prior: Option<NativeNormalPrior>,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        source_chart.layout(targets)?;
+        if !(1..=120).contains(&grain.0) {
+            return Err(ConstitutiveFibreError::Shape);
+        }
         let value = Self {
             header: Header {
                 source_chart,
                 targets,
                 grain: grain.0,
                 observations,
+                prior,
             },
             state,
         };
@@ -110,6 +137,16 @@ impl NormalMaterialRest {
         observations: u64,
         state: ResidentSectionRest,
     ) -> Result<Self, ConstitutiveFibreError> {
+        Self::from_native_chart_with_prior(source_chart, targets, grain, observations, state, None)
+    }
+    fn from_native_chart_with_prior(
+        source_chart: NormalSourceChart,
+        targets: usize,
+        grain: ResidentGrain,
+        observations: u64,
+        state: ResidentSectionRest,
+        prior: Option<NativeNormalPrior>,
+    ) -> Result<Self, ConstitutiveFibreError> {
         point_section(&state, 1, source_chart.layout(targets)?.state_words)?;
         Ok(Self {
             header: Header {
@@ -117,6 +154,7 @@ impl NormalMaterialRest {
                 targets,
                 grain: grain.0,
                 observations,
+                prior,
             },
             state,
         })
@@ -129,7 +167,42 @@ impl NormalMaterialRest {
             h.targets,
             h.grain,
         )?;
-        validate_geometry(&value, h.observations)?;
+        if let Some(prior) = &h.prior {
+            let mut data = value.clone();
+            let prior_energy: Rat = prior
+                .cross_source
+                .iter()
+                .flatten()
+                .map(ExactComplexWaveCurrent::norm_square)
+                .sum();
+            if prior_energy != prior.target_energy || data.target_energy < prior.target_energy {
+                return Err(invalid(
+                    "normal prior energy does not match its coefficient seed",
+                ));
+            }
+            if data.cross_source.len() != prior.cross_source.len()
+                || data
+                    .cross_source
+                    .iter()
+                    .any(|row| row.len() != prior.source_complex())
+            {
+                return Err(ConstitutiveFibreError::Shape);
+            }
+            for (row, p) in data.cross_source.iter_mut().zip(&prior.cross_source) {
+                for (b, b0) in row.iter_mut().zip(p) {
+                    *b = b.subtract(b0);
+                }
+            }
+            // The resident scalar is Q_data+C₀ for the kernel's augmented
+            // reference bound; the cold geometry validator consumes Q_data.
+            data.target_energy -= &prior.target_energy;
+            validate_geometry(&data, h.observations)?;
+        } else {
+            validate_geometry(&value, h.observations)?;
+        }
+        // Geometry uses observed increments after subtracting B0/C0. The numerical
+        // witness uses the COMPLETE H/B and augmented energy Q_data+C0, exactly as
+        // the native coefficient solve does, including for an unobserved nonzero prior.
         let layout = h.source_chart.layout(h.targets)?;
         let numeric = wides(&self.state.intervals[..layout.matrix_words])?;
         let error = numeric[layout.cross_values];
@@ -172,6 +245,7 @@ impl NormalMaterialRest {
                     targets: h.targets,
                     grain: h.grain,
                     observations: h.observations,
+                    prior: None,
                 }
             }
             2 => serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?,
@@ -181,12 +255,13 @@ impl NormalMaterialRest {
         if input.limit() != 0 {
             return Err(invalid("trailing normal material bytes"));
         }
-        Self::from_chart_state_data(
+        Self::from_chart_state_data_with_prior(
             header.source_chart,
             header.targets,
             ResidentGrain(header.grain),
             header.observations,
             state,
+            header.prior,
         )
     }
     pub fn remount<'c>(
@@ -201,17 +276,19 @@ impl NormalMaterialRest {
             targets: self.header.targets,
             grain: ResidentGrain(self.header.grain),
             observations: self.header.observations,
+            prior: self.header.prior.clone(),
         })
     }
 }
 impl ResidentNormalMaterial<'_> {
     pub fn rest(&self) -> Result<NormalMaterialRest, ConstitutiveFibreError> {
-        NormalMaterialRest::from_native_chart(
+        NormalMaterialRest::from_native_chart_with_prior(
             self.source_chart,
             self.targets,
             self.grain,
             self.observations,
             self.state_wire()?,
+            self.prior.clone(),
         )
     }
 }
@@ -222,8 +299,12 @@ fn validate_geometry(
     value: &NativeNormalMaterialState,
     observations: u64,
 ) -> Result<(), ConstitutiveFibreError> {
-    use crate::inertia::{positive_source_energy, SymmetricForm};
+    use crate::inertia::{SymmetricForm, positive_source_energy};
     let m = value.source_normal.len();
+    if m == 0 || value.source_normal.iter().any(|row| row.len()!=m)
+        || value.cross_source.iter().any(|row| row.len()!=m) {
+        return Err(invalid("normal geometry dimensions"));
+    }
     if [
         &value.source_normal_error,
         &value.cross_source_error,
@@ -234,6 +315,29 @@ fn validate_geometry(
     .any(|v| v.is_negative())
     {
         return Err(invalid("negative normal moment bound"));
+    }
+    if observations == 0 {
+        // No data increments means the supplied geometry is exactly H0=I, B_data=0,
+        // Q_data=0. This establishes the same full null-fibre condition without forming
+        // an expanded zero Schur problem. The applied coefficient witness is checked
+        // separately by validate_numerical_witness_layout, including nonzero priors.
+        if value.source_normal.iter().enumerate().any(|(i, row)| {
+            row.len() != m
+                || row.iter().enumerate().any(|(j, z)| {
+                    !z.imaginary.is_zero()
+                        || z.real != if i == j { Rat::one() } else { Rat::zero() }
+                })
+        }) || value.cross_source.iter().flatten().any(|z| !z.is_zero())
+            || !value.target_energy.is_zero()
+            || !value.source_normal_error.is_zero()
+            || !value.cross_source_error.is_zero()
+            || !value.target_energy_error.is_zero()
+        {
+            return Err(invalid(
+                "unobserved normal geometry differs from its declared prior",
+            ));
+        }
+        return Ok(());
     }
     let mut g = value.source_normal.clone();
     for i in 0..m {

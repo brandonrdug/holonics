@@ -12,6 +12,11 @@ impl<'chart> NativeConstitutiveField<'chart> {
         &mut self,
         source: &NativeFieldSourceAnchor,
     ) -> Result<ResidentConstitutiveReturn<'chart>, ConstitutiveFibreError> {
+        if self.relation.source_only() {
+            return Err(ConstitutiveFibreError::Rest(
+                "source-only field has no constitutive source extraction".into(),
+            ));
+        }
         if !self.relation.usable || self.pending.is_some() {
             return Err(ConstitutiveFibreError::Uncertain);
         }

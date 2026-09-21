@@ -87,6 +87,115 @@ theorem causalAdjoint_carries_declared_scale
     transport.adjoint (scale • returned) = scale • transport.adjoint returned :=
   map_smul transport.adjoint scale returned
 
+/-! ## Full joint held relaxation and its algebraic return
+
+The boundary and internal carriers are one product space.  `jointHeldRelaxation` therefore keeps
+the held mask and the source-derived scatter on the complete `(q,b)` operand.  Its linear part is
+the map whose dual pullback returns a receiver covector; the affine anchor has no differential.
+-/
+
+section JointHeldRelaxation
+
+variable {V W : Type*} [AddCommGroup V] [Module ℝ V]
+  [AddCommGroup W] [Module ℝ W]
+
+def sourceDerivedProjection (D : W →ₗ[ℝ] V) (Dt : V →ₗ[ℝ] W)
+    (Kinv : V →ₗ[ℝ] V) : (V × W) →ₗ[ℝ] (V × W) where
+  toFun x := (Kinv (x.1 + D x.2), Dt (Kinv (x.1 + D x.2)))
+  map_add' x y := by simp [map_add, add_assoc, add_left_comm, add_comm]
+  map_smul' c x := by simp
+
+def sourceDerivedScatter (D : W →ₗ[ℝ] V) (Dt : V →ₗ[ℝ] W)
+    (Kinv : V →ₗ[ℝ] V) : (V × W) →ₗ[ℝ] (V × W) :=
+  (2 : ℝ) • sourceDerivedProjection D Dt Kinv - LinearMap.id
+
+def normalSolveHypothesis (D : W →ₗ[ℝ] V) (Dt : V →ₗ[ℝ] W)
+    (Kinv : V →ₗ[ℝ] V) : Prop :=
+  Kinv.comp (LinearMap.id + D.comp Dt) = LinearMap.id
+
+theorem sourceDerivedProjection_idempotent
+    (D : W →ₗ[ℝ] V) (Dt : V →ₗ[ℝ] W) (Kinv : V →ₗ[ℝ] V)
+    (hsolve : normalSolveHypothesis D Dt Kinv) (x : V × W) :
+    sourceDerivedProjection D Dt Kinv (sourceDerivedProjection D Dt Kinv x) =
+      sourceDerivedProjection D Dt Kinv x := by
+  have h := LinearMap.congr_fun hsolve (Kinv (x.1 + D x.2))
+  change Kinv (Kinv (x.1 + D x.2) + D (Dt (Kinv (x.1 + D x.2)))) =
+    Kinv (x.1 + D x.2) at h
+  dsimp [sourceDerivedProjection]
+  rw [h]
+
+theorem sourceDerivedScatter_involutive
+    (D : W →ₗ[ℝ] V) (Dt : V →ₗ[ℝ] W) (Kinv : V →ₗ[ℝ] V)
+    (hsolve : normalSolveHypothesis D Dt Kinv) (x : V × W) :
+    sourceDerivedScatter D Dt Kinv (sourceDerivedScatter D Dt Kinv x) = x := by
+  let P := sourceDerivedProjection D Dt Kinv
+  have hP : P (P x) = P x := sourceDerivedProjection_idempotent D Dt Kinv hsolve x
+  change (2 : ℝ) • P ((2 : ℝ) • P x - x) - ((2 : ℝ) • P x - x) = x
+  rw [map_sub, map_smul, hP]
+  module
+
+def jointHeldLinearPart {X : Type*} [AddCommGroup X] [Module ℝ X]
+    (hold scatter : X →ₗ[ℝ] X) (mu : ℝ) : X →ₗ[ℝ] X :=
+  ((LinearMap.id : X →ₗ[ℝ] X) - hold).comp (mu • scatter)
+
+def jointHeldRelaxation {X : Type*} [AddCommGroup X] [Module ℝ X]
+    (hold scatter : X →ₗ[ℝ] X) (mu : ℝ) (anchor z : X) : X :=
+  hold anchor + ((LinearMap.id : X →ₗ[ℝ] X) - hold)
+    ((1 - mu) • anchor + mu • scatter z)
+
+def jointHeldPullback {X : Type*} [AddCommGroup X] [Module ℝ X]
+    (hold scatter : X →ₗ[ℝ] X) (mu : ℝ) (covector : Module.Dual ℝ X) :
+    Module.Dual ℝ X :=
+  (jointHeldLinearPart hold scatter mu).dualMap covector
+
+theorem jointHeldRelaxation_linear_part
+    {X : Type*} [AddCommGroup X] [Module ℝ X]
+    (hold scatter : X →ₗ[ℝ] X) (mu : ℝ) (anchor z : X) :
+    jointHeldRelaxation hold scatter mu anchor z =
+      hold anchor + (jointHeldLinearPart hold scatter mu) z +
+        ((LinearMap.id : X →ₗ[ℝ] X) - hold) ((1 - mu) • anchor) := by
+  change hold anchor + ((LinearMap.id : X →ₗ[ℝ] X) - hold)
+      ((1 - mu) • anchor + mu • scatter z) =
+    hold anchor + ((LinearMap.id : X →ₗ[ℝ] X) - hold) (mu • scatter z) +
+      ((LinearMap.id : X →ₗ[ℝ] X) - hold) ((1 - mu) • anchor)
+  rw [map_add]
+  ac_rfl
+
+theorem jointHeldPullback_eq_dual_linear_part
+    {X : Type*} [AddCommGroup X] [Module ℝ X]
+    (hold scatter : X →ₗ[ℝ] X) (mu : ℝ) (covector : Module.Dual ℝ X) :
+    jointHeldPullback hold scatter mu covector =
+      (jointHeldLinearPart hold scatter mu).dualMap covector := rfl
+
+theorem sourceDerived_jointHeldPullback
+    (D : W →ₗ[ℝ] V) (Dt : V →ₗ[ℝ] W) (Kinv : V →ₗ[ℝ] V)
+    (hold : (V × W) →ₗ[ℝ] (V × W)) (mu : ℝ)
+    (covector : Module.Dual ℝ (V × W)) :
+    jointHeldPullback hold (sourceDerivedScatter D Dt Kinv) mu covector =
+      (jointHeldLinearPart hold (sourceDerivedScatter D Dt Kinv) mu).dualMap
+        covector := rfl
+
+theorem sourceDerived_jointHeldRelaxation_scatter_invariant
+    (D : W →ₗ[ℝ] V) (Dt : V →ₗ[ℝ] W) (Kinv : V →ₗ[ℝ] V)
+    (hsolve : normalSolveHypothesis D Dt Kinv)
+    (hold : (V × W) →ₗ[ℝ] (V × W)) (mu : ℝ)
+    (anchor z : V × W) :
+    jointHeldRelaxation hold (sourceDerivedScatter D Dt Kinv) mu anchor
+        (sourceDerivedScatter D Dt Kinv
+          (sourceDerivedScatter D Dt Kinv z)) =
+      jointHeldRelaxation hold (sourceDerivedScatter D Dt Kinv) mu anchor z := by
+  rw [sourceDerivedScatter_involutive D Dt Kinv hsolve z]
+
+theorem dualMap_comp_reverse_order
+    {X Y Z : Type*} [AddCommGroup X] [Module ℝ X]
+    [AddCommGroup Y] [Module ℝ Y] [AddCommGroup Z] [Module ℝ Z]
+    (first : X →ₗ[ℝ] Y) (second : Y →ₗ[ℝ] Z)
+    (covector : Module.Dual ℝ Z) :
+    (second.comp first).dualMap covector = first.dualMap (second.dualMap covector) := by
+  rfl
+
+end JointHeldRelaxation
+
 namespace NormalizedExponential
 
 variable {Index : Type uI} [Fintype Index] [Nonempty Index]
@@ -422,6 +531,12 @@ section Audit
 
 #print axioms MetricGradientChart.lower_gradient
 #print axioms causalAdjoint_returns_in_reverse_factor_order
+#print axioms sourceDerivedProjection_idempotent
+#print axioms sourceDerivedScatter_involutive
+#print axioms jointHeldRelaxation_linear_part
+#print axioms sourceDerived_jointHeldPullback
+#print axioms sourceDerived_jointHeldRelaxation_scatter_invariant
+#print axioms dualMap_comp_reverse_order
 #print axioms NormalizedExponential.face_add_common
 #print axioms NormalizedExponential.sum_laplacianReturn_zero
 #print axioms NormalizedExponential.quadratic_laplacianReturn

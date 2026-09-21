@@ -9,22 +9,29 @@ pub struct NormalRealizationRefinement<'c> {
     pub before_grain: ResidentGrain,
     pub after_grain: ResidentGrain,
     pub observations: u64,
+    prior: Option<NativeNormalPrior>,
 }
 impl NormalRealizationRefinement<'_> {
     pub fn inspect_before(&self) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
-        decode_state_layout(
-            &self.surface.detach_section(&self.before, 64)?,
-            self.source_chart.layout(self.targets)?,
-            self.targets,
-            self.before_grain.0,
+        expose_data_energy(
+            decode_state_layout(
+                &self.surface.detach_section(&self.before, 64)?,
+                self.source_chart.layout(self.targets)?,
+                self.targets,
+                self.before_grain.0,
+            )?,
+            self.prior.as_ref(),
         )
     }
     pub fn inspect_after(&self) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
-        decode_state_layout(
-            &self.surface.detach_section(&self.after, 64)?,
-            self.source_chart.layout(self.targets)?,
-            self.targets,
-            self.after_grain.0,
+        expose_data_energy(
+            decode_state_layout(
+                &self.surface.detach_section(&self.after, 64)?,
+                self.source_chart.layout(self.targets)?,
+                self.targets,
+                self.after_grain.0,
+            )?,
+            self.prior.as_ref(),
         )
     }
 }
@@ -77,6 +84,7 @@ impl<'c> ResidentNormalMaterial<'c> {
             before_grain,
             after_grain: grain,
             observations: self.observations,
+            prior: self.prior.clone(),
         })
     }
 }

@@ -107,6 +107,11 @@ fn main() {
     println!("cargo:rerun-if-changed=kernels/refine_shell/membrane_state_addressed.cuh");
     println!("cargo:rerun-if-changed=kernels/exact_embedding_fiber.cu");
     println!("cargo:rerun-if-changed=kernels/exact_resident_section.cu");
+    println!("cargo:rerun-if-changed=kernels/enclosure_incident.cuh");
+    println!("cargo:rerun-if-changed=kernels/global_field_action.cuh");
+    println!("cargo:rerun-if-changed=kernels/field_factor_action.cuh");
+    println!("cargo:rerun-if-changed=kernels/field_factor_material.cuh");
+    println!("cargo:rerun-if-changed=kernels/normal_applied_features.cuh");
     println!("cargo:rerun-if-changed=kernels/constitutive_condition_preimage.cuh");
     println!("cargo:rerun-if-changed=kernels/constitutive_condition_image.cuh");
     println!("cargo:rerun-if-changed=kernels/constitutive_relation_image.cuh");

@@ -101,6 +101,70 @@ theorem collapsed_pair_obstructs_exact_reconstruction
 
 end AutoencodingChart
 
+/-! ## Finite codec bootstrap
+
+The first source/receiver rows are a material prior.  Their score is a squared-distance chart,
+so distinct nonzero columns already have a finite receiving margin before observations arrive.
+The reindexing operations below express the codec permutation law by the same source action on
+encoder columns and decoder rows.
+-/
+
+namespace CodecBootstrap
+
+variable {Source Latent : Type*} [Fintype Source] [Fintype Latent]
+
+abbrev Embedding (Latent : Type*) := EuclideanSpace ℝ Latent
+abbrev Row (Latent : Type*) := Embedding Latent × ℝ
+
+def row (embedding : Source → Embedding Latent) (source : Source) : Row Latent :=
+  ((2 : ℝ) • embedding source, -‖embedding source‖ ^ 2)
+
+def score (decoderRow : Row Latent) (latent : Embedding Latent) : ℝ :=
+  inner ℝ decoderRow.1 latent + decoderRow.2
+
+def permuteEmbedding (permutation : Source ≃ Source)
+    (embedding : Source → Embedding Latent) : Source → Embedding Latent :=
+  fun source ↦ embedding (permutation.symm source)
+
+def permuteRows (permutation : Source ≃ Source) (rows : Source → Row Latent) :
+    Source → Row Latent :=
+  fun source ↦ rows (permutation.symm source)
+
+theorem row_is_bootstrap (embedding : Source → Embedding Latent) (source : Source) :
+    row embedding source = ((2 : ℝ) • embedding source, -‖embedding source‖ ^ 2) := rfl
+
+theorem bootstrap_margin (embedding : Source → Embedding Latent) (s t : Source) :
+    score (row embedding t) (embedding t) - score (row embedding s) (embedding t) =
+      ‖embedding t - embedding s‖ ^ 2 := by
+  simp only [score, row, real_inner_smul_left, real_inner_smul_right,
+    real_inner_self_eq_norm_sq]
+  rw [norm_sub_sq_real]
+  rw [real_inner_comm (embedding s) (embedding t)]
+  ring
+
+theorem strict_bootstrap_margin {embedding : Source → Embedding Latent} {s t : Source}
+    (distinct : embedding t ≠ embedding s) :
+    0 < score (row embedding t) (embedding t) -
+      score (row embedding s) (embedding t) := by
+  rw [bootstrap_margin]
+  exact sq_pos_of_pos (norm_pos_iff.mpr (sub_ne_zero.mpr distinct))
+
+theorem row_permutation_covariant (permutation : Source ≃ Source)
+    (embedding : Source → Embedding Latent) (source : Source) :
+    row (permuteEmbedding permutation embedding) source =
+      row embedding (permutation.symm source) := rfl
+
+theorem score_permutation_covariant (permutation : Source ≃ Source)
+    (embedding : Source → Embedding Latent) (source : Source) (latent : Embedding Latent) :
+    score (row (permuteEmbedding permutation embedding) source) latent =
+      score (row embedding (permutation.symm source)) latent := rfl
+
+theorem rows_permutation_covariant (permutation : Source ≃ Source)
+    (rows : Source → Row Latent) (source : Source) :
+    permuteRows permutation rows source = rows (permutation.symm source) := rfl
+
+end CodecBootstrap
+
 /-! ## A LoRA-like overlay is a restricted factorized morphology passage -/
 
 structure FactorizedLinearOverlay
@@ -229,6 +293,11 @@ end WorldReturnedCultivation
 
 section Audit
 
+#print axioms CodecBootstrap.bootstrap_margin
+#print axioms CodecBootstrap.strict_bootstrap_margin
+#print axioms CodecBootstrap.row_permutation_covariant
+#print axioms CodecBootstrap.score_permutation_covariant
+#print axioms CodecBootstrap.rows_permutation_covariant
 #print axioms ScalarObjective.no_complete_descent_of_separator
 #print axioms GradientProposal.candidate_is_metric_raised_return
 #print axioms AutoencodingChart.collapsed_pair_obstructs_exact_reconstruction

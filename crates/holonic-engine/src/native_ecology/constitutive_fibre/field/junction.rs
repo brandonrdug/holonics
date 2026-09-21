@@ -7,12 +7,31 @@
 use super::*;
 
 mod enclosure;
-mod producer;
 pub(super) mod operative;
-pub use operative::{NativeOperativeCurrentFactorCondensation,NativeOperativeReturnStorage,NativeOperativeReflectionReading,NativeOperativeContactBirth, NativeOperativeContactReading, NativeOperativeContactStaging,
-    NativeMaterialResponseChart, NativeMaterialContactResponse, NativeMaterialContactResponseReading, NativeRetainedMaterialRelation, NativeMaterialContactStepComparison, NativeFiniteMaterialResponse, NativeContactRealization, NativeContactDepositReading, NativeFieldCurrentSource, NativeFieldCurrentSourceRest, NativeFieldReflectionTarget, NativeFieldReflection, NativeFieldReflectionSection};
-pub use producer::{CausalContactPropagation, CausalContactPropagationCotangent, CausalContactPropagationEnclosure, PairedContactCotangent, PairedJunctionCotangent, PairedJunctionLinearization, PairedJunctionTangent,JointMaterialContactResponse,joint_material_contact};
-pub use operative::{NativeCausalContactPropagation,NativeCausalContactPropagationReading,NativeCausalContactJoinReading};
+mod producer;
+pub use operative::{
+    NativeCausalContactJoinReading, NativeCausalContactPropagation,
+    NativeCausalContactPropagationReading,
+};
+pub use operative::{
+    NativeContactDepositReading, NativeContactRealization, NativeFieldCurrentSource,
+    NativeFieldCurrentSourceRest, NativeFieldReflection, NativeFieldReflectionSection,
+    NativeFieldReflectionTarget, NativeFiniteMaterialResponse, NativeMaterialContactResponse,
+    NativeMaterialContactResponseReading, NativeMaterialContactStepComparison,
+    NativeMaterialResponseChart, NativeOperativeContactBirth, NativeOperativeContactReading,
+    NativeOperativeContactStaging, NativeOperativeCurrentFactorCondensation,
+    NativeOperativeReflectionReading, NativeOperativeReturnStorage, NativeRetainedMaterialRelation,
+};
+pub use operative::{
+    NativeFieldAction, NativeFieldActionFactorization, NativeFieldActionPullback,
+    NativeFieldContactOrigin, NativeFieldDeclaredIncidence, NativeFieldGlobalMaterialCommit,
+    NativeFieldJointCurrentCommit, NativeFieldJointLayout, NativeFieldMatrixFreeAction,
+};
+pub use producer::{
+    CausalContactPropagation, CausalContactPropagationCotangent, CausalContactPropagationEnclosure,
+    JointMaterialContactResponse, PairedContactCotangent, PairedJunctionCotangent,
+    PairedJunctionLinearization, PairedJunctionTangent, joint_material_contact,
+};
 #[cfg(test)]
 mod solver_tests;
 pub use enclosure::{
@@ -99,7 +118,11 @@ pub(super) struct PairedJunction<'chart> {
     pub(super) covariance: ResidentSection<'chart>,
     pub(super) current: Rc<ResidentSection<'chart>>,
     // Immutable joint image, qualified by the exact report and internal-current owners.
-    pub(super) joint_current: Option<(Rc<ResidentSection<'chart>>, Rc<ResidentSection<'chart>>, Rc<ResidentSection<'chart>>)>,
+    pub(super) joint_current: Option<(
+        Rc<ResidentSection<'chart>>,
+        Rc<ResidentSection<'chart>>,
+        Rc<ResidentSection<'chart>>,
+    )>,
     pub(super) operative: Option<operative::OperativeState<'chart>>,
 }
 
@@ -140,6 +163,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             surface,
             material,
             NativeFieldJunctionRepresentation::RationalWords,
+            false,
         )
     }
 
@@ -159,6 +183,25 @@ impl<'chart> NativeConstitutiveField<'chart> {
             NativeFieldJunctionRepresentation::EnclosedDyadic {
                 fractional_bits: grain.0,
             },
+            false,
+        )
+    }
+
+    pub fn found_incident_source_only(
+        surface: &'chart ResidentSurface<'chart>,
+        material: Vec<NativeJunctionSeed>,
+        grain: ResidentGrain,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        if !(1..=120).contains(&grain.0) {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        Self::found_with_junction_representation(
+            surface,
+            material,
+            NativeFieldJunctionRepresentation::EnclosedDyadic {
+                fractional_bits: grain.0,
+            },
+            true,
         )
     }
 
@@ -166,6 +209,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         surface: &'chart ResidentSurface<'chart>,
         material: Vec<NativeJunctionSeed>,
         representation: NativeFieldJunctionRepresentation,
+        source_only: bool,
     ) -> Result<Self, ConstitutiveFibreError> {
         if material
             .iter()
@@ -173,14 +217,20 @@ impl<'chart> NativeConstitutiveField<'chart> {
         {
             return Err(ConstitutiveFibreError::Shape);
         }
-        let mut body = Self::found(surface, material)?;
+        let mut body = Self::found_with_mode(surface, material, source_only)?;
         let width = body.relation.source_width + body.relation.target_width;
         let count = width
             .checked_mul(width)
             .and_then(|n| n.checked_add(1))
             .ok_or(ConstitutiveFibreError::Shape)?;
-        let mut covariance = vec![(0, 0); count];
-        covariance[count - 1] = (1, 1);
+        let mut covariance = if source_only {
+            vec![(0, 0)]
+        } else {
+            vec![(0, 0); count]
+        };
+        if !source_only {
+            covariance[count - 1] = (1, 1);
+        }
         let mut report = vec![(0, 0); representation.report_words(width)];
         match representation {
             NativeFieldJunctionRepresentation::RationalWords => {
@@ -232,8 +282,10 @@ impl<'chart> NativeConstitutiveField<'chart> {
         &mut self,
         solver: NativeFieldJunctionSolver,
     ) -> Result<(), ConstitutiveFibreError> {
-        if self.has_operative_contacts() && solver!=NativeFieldJunctionSolver::Full {
-            return Err(ConstitutiveFibreError::Rest("operative reflection currently uses the full numerical factorization".into()));
+        if self.has_operative_contacts() && solver != NativeFieldJunctionSolver::Full {
+            return Err(ConstitutiveFibreError::Rest(
+                "operative reflection currently uses the full numerical factorization".into(),
+            ));
         }
         if !self.relation.usable || self.pending.is_some() {
             return Err(ConstitutiveFibreError::Uncertain);
@@ -256,7 +308,16 @@ impl<'chart> NativeConstitutiveField<'chart> {
     pub fn inspect_junction_covariance(
         &self,
     ) -> Result<Option<ResidentSectionRest>, ConstitutiveFibreError> {
-        if self.has_operative_contacts() {return Err(ConstitutiveFibreError::Rest("operative covariance uses its complex enclosure receiver".into()));}
+        if self.relation.source_only() {
+            return Err(ConstitutiveFibreError::Rest(
+                "source-only field has no paired covariance".into(),
+            ));
+        }
+        if self.has_operative_contacts() {
+            return Err(ConstitutiveFibreError::Rest(
+                "operative covariance uses its complex enclosure receiver".into(),
+            ));
+        }
         self.junction
             .as_ref()
             .map(|junction| {
@@ -285,7 +346,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
     pub fn inspect_internal_currents(
         &self,
     ) -> Result<Option<Vec<NativeFieldInternalCurrent>>, ConstitutiveFibreError> {
-        if self.has_operative_contacts() {return Err(ConstitutiveFibreError::Rest("operative internal currents require their enclosed current receiver and chronological decoder".into()));}
+        if self.has_operative_contacts() {
+            return Err(ConstitutiveFibreError::Rest("operative internal currents require their enclosed current receiver and chronological decoder".into()));
+        }
         if !self.relation.usable || self.pending.is_some() {
             return Err(ConstitutiveFibreError::Uncertain);
         }
@@ -376,7 +439,8 @@ impl<'chart> NativeConstitutiveField<'chart> {
     }
 
     pub(super) fn prepare_junction(
-        &self, linked: bool,
+        &self,
+        linked: bool,
     ) -> Result<Option<(PendingJunction<'chart>, ResidentSection<'chart>)>, ConstitutiveFibreError>
     {
         let Some(junction) = self.junction.as_ref() else {
@@ -397,7 +461,11 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .ok_or(ConstitutiveFibreError::Shape)?;
         Ok(Some((
             PendingJunction {
-                operative: junction.operative.as_ref().map(|o|o.prepare(surface,self.nodes(),linked)).transpose()?,
+                operative: junction
+                    .operative
+                    .as_ref()
+                    .map(|o| o.prepare(surface, self.nodes(), linked))
+                    .transpose()?,
                 covariance: surface.fresh_section(1, width * width + 1, ResidentGrain(0))?,
                 report: Rc::new(surface.fresh_section(
                     1,
@@ -415,9 +483,15 @@ impl<'chart> NativeConstitutiveField<'chart> {
         let Some(pending) = self.pending_junction.as_ref() else {
             return Ok(None);
         };
-        if let Some(op)=&pending.operative {
-            return operative::decode_reflection(self.relation.surface,&pending.report,&op.history(),self.nodes(),self.transport_grain()?)
-                .map(|r|Some(NativeFieldJunctionReading::Operative(r)));
+        if let Some(op) = &pending.operative {
+            return operative::decode_reflection(
+                self.relation.surface,
+                &pending.report,
+                &op.history(),
+                self.nodes(),
+                self.transport_grain()?,
+            )
+            .map(|r| Some(NativeFieldJunctionReading::Operative(r)));
         }
         let words = self.relation.surface.read_out(&pending.report)?;
         let width = self.relation.source_width + self.relation.target_width;

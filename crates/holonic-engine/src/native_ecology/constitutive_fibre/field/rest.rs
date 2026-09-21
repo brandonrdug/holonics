@@ -1,12 +1,15 @@
 //! Complete cold field chart and explicitly supplied capabilities. Remount consumes the rest
 //! and installs its sections directly; it does not replay development or regenerate dropped handles.
+use super::junction::operative::{
+    OperativeState,
+    rest::{OperativeHistoryRest, OperativeRest, OperativeWire},
+};
 use super::*;
-use super::junction::operative::{OperativeState,rest::{OperativeWire,OperativeRest,OperativeHistoryRest}};
 use crate::native_ecology::constitutive_fibre::circulation::rest::{
     blob, expect, point_section, read_blob,
 };
-use serde::{Deserialize, Serialize};
 use num_bigint::BigInt;
+use serde::{Deserialize, Serialize};
 use std::io::{Read, Write};
 
 const MAGIC: &[u8] = b"HNA-NATIVE-FIELD-REST\x01";
@@ -76,16 +79,18 @@ struct Header {
         skip_serializing_if = "NativeMaterialTransportSource::is_outgoing"
     )]
     transport_source: NativeMaterialTransportSource,
-    #[serde(default,skip_serializing_if="NativeMaterialTarget::is_direct")]
+    #[serde(default, skip_serializing_if = "NativeMaterialTarget::is_direct")]
     transport_target: NativeMaterialTarget,
-    #[serde(default,skip_serializing_if="Option::is_none")]
-    operative:Option<OperativeWire>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    operative: Option<OperativeWire>,
     source_slots: Vec<Option<usize>>,
     anchor_slots: Vec<Option<usize>>,
+    #[serde(default)]
+    source_only: bool,
 }
 #[derive(Debug, PartialEq, Eq)]
 pub(super) struct HeldRest {
-    pub(super) operative:Option<OperativeHistoryRest>,
+    pub(super) operative: Option<OperativeHistoryRest>,
     pub(super) source: ResidentSectionRest,
     pub(super) incoming: Option<ResidentSectionRest>,
     pub(super) junction: Option<ResidentSectionRest>,
@@ -95,7 +100,7 @@ pub(super) struct HeldRest {
 /// Serialized chart, not another live ecology. Deliberately not Clone.
 #[derive(Debug, PartialEq, Eq)]
 pub struct NativeFieldRest {
-    operative:Option<OperativeRest>,
+    operative: Option<OperativeRest>,
     header: Header,
     seed: ResidentSectionRest,
     memory: ResidentSectionRest,
@@ -152,7 +157,7 @@ fn junction_section(
 fn transport_section(
     rest: &ResidentSectionRest,
     nodes: usize,
-    targets:usize,
+    targets: usize,
     linked: bool,
 ) -> Result<i128, Error> {
     point_section(rest, 1, 24 * targets + 12 * nodes + 24)?;
@@ -172,7 +177,11 @@ fn transport_section(
 }
 
 impl NativeFieldRest {
-    pub fn material_target(&self)->Option<NativeMaterialTarget>{self.header.transport.then_some(self.header.transport_target)}
+    pub fn material_target(&self) -> Option<NativeMaterialTarget> {
+        self.header
+            .transport
+            .then_some(self.header.transport_target)
+    }
     pub fn nodes(&self) -> usize {
         self.header.nodes
     }
@@ -217,8 +226,11 @@ impl NativeFieldRest {
             || h.history.len() != self.history.len()
             || h.junction.is_some() != self.covariance.is_some()
             || h.transport != self.transport.is_some()
-            || (!h.transport && (!h.transport_source.is_outgoing() || !h.transport_target.is_direct()))
-            || h.transport_source.report_words_for(n,h.transport_target).is_none()
+            || (!h.transport
+                && (!h.transport_source.is_outgoing() || !h.transport_target.is_direct()))
+            || h.transport_source
+                .report_words_for(n, h.transport_target)
+                .is_none()
             || self.initial_junction.is_some() != (h.junction.is_some() && h.history.is_empty())
             || (self.current_junction.is_some() && (h.junction.is_none() || h.history.is_empty()))
         {
@@ -311,7 +323,21 @@ impl NativeFieldRest {
         }
         point_section(&self.seed, n, 5)?;
         point_section(&self.memory, n, 3)?;
-        point_section(&self.basis, dimension, dimension)?;
+        if h.source_only {
+            if self.basis.rows != 1 || self.basis.width != 1 || self.basis.intervals != vec![(0, 0)]
+            {
+                return Err(invalid("source-only field basis witness"));
+            }
+            if self.covariance.as_ref().is_some_and(|covariance| {
+                covariance.rows != 1
+                    || covariance.width != 1
+                    || covariance.intervals != vec![(0, 0)]
+            }) {
+                return Err(invalid("source-only field covariance witness"));
+            }
+        } else {
+            point_section(&self.basis, dimension, dimension)?;
+        }
         for (i, seed) in h.material.iter().enumerate() {
             let t = seed.incoming_transport.words();
             let expected = [
@@ -338,50 +364,57 @@ impl NativeFieldRest {
             }
         }
         let mut rank = 0;
-        for p in 0..dimension {
-            let row = &self.basis.intervals[p * dimension..(p + 1) * dimension];
-            if row[p].0 < 0
-                || row[..p].iter().any(|v| v.0 != 0)
-                || (row[p].0 == 0 && row.iter().any(|v| v.0 != 0))
-            {
-                return Err(invalid("field relation echelon shape"));
+        if !h.source_only {
+            for p in 0..dimension {
+                let row = &self.basis.intervals[p * dimension..(p + 1) * dimension];
+                if row[p].0 < 0
+                    || row[..p].iter().any(|v| v.0 != 0)
+                    || (row[p].0 == 0 && row.iter().any(|v| v.0 != 0))
+                {
+                    return Err(invalid("field relation echelon shape"));
+                }
+                rank += usize::from(row[p].0 > 0);
             }
-            rank += usize::from(row[p].0 > 0);
         }
-        if let Some(covariance) = &self.covariance {
-            point_section(covariance, 1, covariance_width)?;
-            if covariance.intervals[covariance_width - 1].0 <= 0 {
-                return Err(invalid("covariance denominator"));
-            }
-            for i in 0..dimension {
-                for j in 0..dimension {
-                    if covariance.intervals[i * dimension + j]
-                        != covariance.intervals[j * dimension + i]
-                    {
-                        return Err(invalid("covariance symmetry"));
+        if !h.source_only {
+            if let Some(covariance) = &self.covariance {
+                point_section(covariance, 1, covariance_width)?;
+                if covariance.intervals[covariance_width - 1].0 <= 0 {
+                    return Err(invalid("covariance denominator"));
+                }
+                for i in 0..dimension {
+                    for j in 0..dimension {
+                        if covariance.intervals[i * dimension + j]
+                            != covariance.intervals[j * dimension + i]
+                        {
+                            return Err(invalid("covariance symmetry"));
+                        }
                     }
                 }
-            }
-            for i in (0..dimension).step_by(2) {
-                for j in (0..dimension).step_by(2) {
-                    if covariance.intervals[i * dimension + j]
-                        != covariance.intervals[(i + 1) * dimension + j + 1]
-                        || covariance.intervals[i * dimension + j + 1].0 as i128
-                            + covariance.intervals[(i + 1) * dimension + j].0 as i128
-                            != 0
-                    {
-                        return Err(invalid("covariance is outside the complex current chart"));
+                for i in (0..dimension).step_by(2) {
+                    for j in (0..dimension).step_by(2) {
+                        if covariance.intervals[i * dimension + j]
+                            != covariance.intervals[(i + 1) * dimension + j + 1]
+                            || covariance.intervals[i * dimension + j + 1].0 as i128
+                                + covariance.intervals[(i + 1) * dimension + j].0 as i128
+                                != 0
+                        {
+                            return Err(invalid("covariance is outside the complex current chart"));
+                        }
                     }
                 }
+                if h.history.is_empty()
+                    && (covariance.intervals[..covariance_width - 1]
+                        .iter()
+                        .any(|v| v.0 != 0)
+                        || covariance.intervals[covariance_width - 1].0 != 1)
+                {
+                    return Err(invalid("an empty field has a nonzero contact moment"));
+                }
             }
-            if h.history.is_empty()
-                && (covariance.intervals[..covariance_width - 1]
-                    .iter()
-                    .any(|v| v.0 != 0)
-                    || covariance.intervals[covariance_width - 1].0 != 1)
-            {
-                return Err(invalid("an empty field has a nonzero contact moment"));
-            }
+        }
+        if h.source_only && !h.history.is_empty() {
+            return Err(invalid("source-only field has legacy history"));
         }
         let mut received = vec![false; h.history.len()];
         let mut preceding_rank = 0usize;
@@ -419,7 +452,11 @@ impl NativeFieldRest {
             match (event.lineage.received_from, event.lineage.source_contact) {
                 (None, None) => {}
                 (Some(source), Some(kind)) if source < at => {
-                    if matches!(kind,NativeFieldSourceContact::Emission|NativeFieldSourceContact::MaterialActuation{..}) {
+                    if matches!(
+                        kind,
+                        NativeFieldSourceContact::Emission
+                            | NativeFieldSourceContact::MaterialActuation { .. }
+                    ) {
                         if received[source] {
                             return Err(invalid("reused linear emission"));
                         }
@@ -428,20 +465,58 @@ impl NativeFieldRest {
                 }
                 _ => return Err(invalid("field receiving source")),
             }
-            if let Some(NativeFieldSourceContact::MaterialActuation{quadrature,coordinate})=event.lineage.source_contact {
-                let NativeMaterialTarget::TensorProduct{..}=h.transport_target else{return Err(invalid("actuation target chart"));};
-                let targets=h.transport_target.dimension(n).ok_or(Error::Shape)?;
-                if !h.transport_source.is_operative() || coordinate>=targets{return Err(invalid("actuation source chart"));}
-                let source=event.lineage.received_from.ok_or_else(||invalid("missing actuation source"))?;
-                let original=self.history[source].transport.as_ref().ok_or_else(||invalid("missing source material"))?;
-                let raw=packed(original)?;let axis=if quadrature==NativePacketQuadrature::Real{0}else{1};
-                let radius=BigInt::from(raw[2*targets]);let selected=BigInt::from(raw[2*coordinate+axis]);
-                for j in 0..targets {if j!=coordinate {let gap=&selected-BigInt::from(raw[2*j+axis]);
-                    if gap<=BigInt::from(0) || &gap*&gap<=BigInt::from(2)*&radius*&radius{return Err(invalid("actuation source face is not fixed"));}}}
-                let NativeFieldIncoming::Exterior(input)=&event.lineage.incoming else{return Err(invalid("actuation input chart"));};
-                let amplitude=h.transport_target.tensor_basis_amplitude(coordinate,input)?;
-                let projection=if axis==0{amplitude.real}else{amplitude.imaginary};
-                if projection<=Rat::from_integer(0.into()){return Err(invalid("actuation receiving quadrature"));}
+            if let Some(NativeFieldSourceContact::MaterialActuation {
+                quadrature,
+                coordinate,
+            }) = event.lineage.source_contact
+            {
+                let NativeMaterialTarget::TensorProduct { .. } = h.transport_target else {
+                    return Err(invalid("actuation target chart"));
+                };
+                let targets = h.transport_target.dimension(n).ok_or(Error::Shape)?;
+                if !h.transport_source.is_operative() || coordinate >= targets {
+                    return Err(invalid("actuation source chart"));
+                }
+                let source = event
+                    .lineage
+                    .received_from
+                    .ok_or_else(|| invalid("missing actuation source"))?;
+                let original = self.history[source]
+                    .transport
+                    .as_ref()
+                    .ok_or_else(|| invalid("missing source material"))?;
+                let raw = packed(original)?;
+                let axis = if quadrature == NativePacketQuadrature::Real {
+                    0
+                } else {
+                    1
+                };
+                let radius = BigInt::from(raw[2 * targets]);
+                let selected = BigInt::from(raw[2 * coordinate + axis]);
+                for j in 0..targets {
+                    if j != coordinate {
+                        let gap = &selected - BigInt::from(raw[2 * j + axis]);
+                        if gap <= BigInt::from(0)
+                            || &gap * &gap <= BigInt::from(2) * &radius * &radius
+                        {
+                            return Err(invalid("actuation source face is not fixed"));
+                        }
+                    }
+                }
+                let NativeFieldIncoming::Exterior(input) = &event.lineage.incoming else {
+                    return Err(invalid("actuation input chart"));
+                };
+                let amplitude = h
+                    .transport_target
+                    .tensor_basis_amplitude(coordinate, input)?;
+                let projection = if axis == 0 {
+                    amplitude.real
+                } else {
+                    amplitude.imaginary
+                };
+                if projection <= Rat::from_integer(0.into()) {
+                    return Err(invalid("actuation receiving quadrature"));
+                }
             }
             point_section(&rest.source, 1, report_width)?;
             let w = &rest.source.intervals;
@@ -474,17 +549,23 @@ impl NativeFieldRest {
                 junction_section(section, dimension, wire.representation)?;
             }
             if let Some(section) = &rest.transport {
-                let error = if h.transport_source==NativeMaterialTransportSource::OperativeNormal {
-                    let t=h.transport_target.dimension(n).ok_or(Error::Shape)?;
-                    let error=material_transport::normal::validate_report(section,n,t,linked)?;
-                    if let Some(source)=event.lineage.observed_source(){
-                        let origin=self.history[source].junction.as_ref().ok_or(Error::Shape)?;
-                        let d=6*n;let start=2*(d+1);let at=12*(2*t+1);
-                        if section.intervals[at..at+2*(d+1)]!=origin.intervals[start..start+2*(d+1)]{return Err(invalid("normal source incidence"));}
+                let error = if h.transport_source == NativeMaterialTransportSource::OperativeNormal
+                {
+                    let t = h.transport_target.dimension(n).ok_or(Error::Shape)?;
+                    let error = material_transport::normal::validate_report(section, n, t, linked)?;
+                    if let Some(source) = event.lineage.observed_source() {
+                        let origin = self.history[source].junction.as_ref().ok_or(Error::Shape)?;
+                        let d = 6 * n;
+                        let start = 2 * (d + 1);
+                        let at = 12 * (2 * t + 1);
+                        if section.intervals[at..at + 2 * (d + 1)]
+                            != origin.intervals[start..start + 2 * (d + 1)]
+                        {
+                            return Err(invalid("normal source incidence"));
+                        }
                     }
                     error
-                } else if !h.transport_source.is_linear()
-                {
+                } else if !h.transport_source.is_linear() {
                     let grain = match h.junction.as_ref().map(|j| j.representation) {
                         Some(NativeFieldJunctionRepresentation::EnclosedDyadic {
                             fractional_bits,
@@ -494,8 +575,17 @@ impl NativeFieldRest {
                     match h.transport_source {
                         NativeMaterialTransportSource::Contextual
                         | NativeMaterialTransportSource::BilinearContextual
-                        | NativeMaterialTransportSource::OperativeContextual | NativeMaterialTransportSource::OperativeBoundary => {
-                            material_transport::contextual::validate_report_for(section, n, h.transport_target.dimension(n).ok_or_else(||invalid("material target extent"))?, grain, at)?
+                        | NativeMaterialTransportSource::OperativeContextual
+                        | NativeMaterialTransportSource::OperativeBoundary => {
+                            material_transport::contextual::validate_report_for(
+                                section,
+                                n,
+                                h.transport_target
+                                    .dimension(n)
+                                    .ok_or_else(|| invalid("material target extent"))?,
+                                grain,
+                                at,
+                            )?
                         }
                         NativeMaterialTransportSource::HomogeneousMoment => {
                             material_transport::moment::validate_report(section, n, grain, at)?
@@ -503,9 +593,18 @@ impl NativeFieldRest {
                         _ => material_transport::complete::validate_report(section, n, grain, at)?,
                     }
                 } else {
-                    transport_section(section, n, h.transport_target.dimension(n).ok_or_else(||invalid("material target extent"))?, linked)?
+                    transport_section(
+                        section,
+                        n,
+                        h.transport_target
+                            .dimension(n)
+                            .ok_or_else(|| invalid("material target extent"))?,
+                        linked,
+                    )?
                 };
-                if h.transport_source!=NativeMaterialTransportSource::OperativeNormal && error < coefficient_error {
+                if h.transport_source != NativeMaterialTransportSource::OperativeNormal
+                    && error < coefficient_error
+                {
                     return Err(invalid("coefficient error chronology"));
                 }
                 coefficient_error = error;
@@ -513,26 +612,72 @@ impl NativeFieldRest {
                     h.transport_source,
                     NativeMaterialTransportSource::Contextual
                         | NativeMaterialTransportSource::BilinearContextual
-                        | NativeMaterialTransportSource::OperativeContextual | NativeMaterialTransportSource::OperativeBoundary
+                        | NativeMaterialTransportSource::OperativeContextual
+                        | NativeMaterialTransportSource::OperativeBoundary
                 ) {
                     let [_, output, input, context, _, meta, _] =
-                        material_transport::contextual::offsets_for(n,h.transport_target.dimension(n).ok_or_else(||invalid("material target extent"))?);
-                    let version = if h.transport_source==NativeMaterialTransportSource::OperativeBoundary {4} else if h.transport_source==NativeMaterialTransportSource::OperativeContextual {3} else if h.transport_source
-                        == NativeMaterialTransportSource::BilinearContextual
-                    {
-                        2
-                    } else {
-                        1
-                    };
+                        material_transport::contextual::offsets_for(
+                            n,
+                            h.transport_target
+                                .dimension(n)
+                                .ok_or_else(|| invalid("material target extent"))?,
+                        );
+                    let version =
+                        if h.transport_source == NativeMaterialTransportSource::OperativeBoundary {
+                            4
+                        } else if h.transport_source
+                            == NativeMaterialTransportSource::OperativeContextual
+                        {
+                            3
+                        } else if h.transport_source
+                            == NativeMaterialTransportSource::BilinearContextual
+                        {
+                            2
+                        } else {
+                            1
+                        };
                     if section.intervals[meta + 3].0 != version {
                         return Err(invalid("contextual chart version"));
                     }
-                    if version>=3 {
-                        let op=rest.operative.as_ref().ok_or_else(||invalid("missing operative material source"))?;
-                        let grain=self.header.junction.as_ref().and_then(|j|match j.representation {NativeFieldJunctionRepresentation::EnclosedDyadic{fractional_bits}=>Some(fractional_bits),_=>None}).ok_or_else(||invalid("operative grain"))?;
-                        if version==4 {material_transport::contextual::validate_boundary_profile(&section.intervals[context..context+36*n+22],n,grain,at)?;}
-                        else {material_transport::contextual::validate_operative_profile(&section.intervals[context..context+36*n+22],n,grain,at,Some(&op.b))?;}
-                        if material_transport::wides(&section.intervals[context+36*n+16..context+36*n+18])?[0]!=material_transport::wides(&op.bounds.intervals)?[1] {return Err(invalid("operative material source radius"));}
+                    if version >= 3 {
+                        let op = rest
+                            .operative
+                            .as_ref()
+                            .ok_or_else(|| invalid("missing operative material source"))?;
+                        let grain = self
+                            .header
+                            .junction
+                            .as_ref()
+                            .and_then(|j| match j.representation {
+                                NativeFieldJunctionRepresentation::EnclosedDyadic {
+                                    fractional_bits,
+                                } => Some(fractional_bits),
+                                _ => None,
+                            })
+                            .ok_or_else(|| invalid("operative grain"))?;
+                        if version == 4 {
+                            material_transport::contextual::validate_boundary_profile(
+                                &section.intervals[context..context + 36 * n + 22],
+                                n,
+                                grain,
+                                at,
+                            )?;
+                        } else {
+                            material_transport::contextual::validate_operative_profile(
+                                &section.intervals[context..context + 36 * n + 22],
+                                n,
+                                grain,
+                                at,
+                                Some(&op.b),
+                            )?;
+                        }
+                        if material_transport::wides(
+                            &section.intervals[context + 36 * n + 16..context + 36 * n + 18],
+                        )?[0]
+                            != material_transport::wides(&op.bounds.intervals)?[1]
+                        {
+                            return Err(invalid("operative material source radius"));
+                        }
                     }
                     let source = event.lineage.observed_source();
                     if section.intervals[meta + 1].0 != source.map_or(-1, |v| v as i64) {
@@ -562,53 +707,82 @@ impl NativeFieldRest {
             junction_section(section, dimension, wire.representation)?;
         }
         if let Some(image) = &self.joint_current {
-            let wire = h.operative.as_ref().ok_or_else(|| invalid("joint image without operative state"))?;
+            let wire = h
+                .operative
+                .as_ref()
+                .ok_or_else(|| invalid("joint image without operative state"))?;
             let k = wire.births.len();
             let d = dimension;
-            let width = d.checked_add(2*k).ok_or(Error::Shape)?;
-            point_section(image, 1, 2*(width+1))?;
+            let width = d.checked_add(2 * k).ok_or(Error::Shape)?;
+            point_section(image, 1, 2 * (width + 1))?;
             let values = packed(image)?;
-            let report = self.current_junction.as_ref()
-                .or_else(||self.history.last().and_then(|h|h.junction.as_ref()))
-                .or(self.initial_junction.as_ref()).ok_or_else(||invalid("joint image report"))?;
+            let report = self
+                .current_junction
+                .as_ref()
+                .or_else(|| self.history.last().and_then(|h| h.junction.as_ref()))
+                .or(self.initial_junction.as_ref())
+                .ok_or_else(|| invalid("joint image report"))?;
             let report_values = packed(report)?;
             let b_values = packed(&self.operative.as_ref().ok_or(Error::Shape)?.current[1])?;
-            if values[width]<0 || report_values.len()<2*(d+1) || b_values.len()<2*k {
+            if values[width] < 0 || report_values.len() < 2 * (d + 1) || b_values.len() < 2 * k {
                 return Err(invalid("joint image extent/radius"));
             }
             // Publication gives the outward restriction exactly this joint radius; the
             // potential is a different block and must not be substituted for outgoing w.
-            if values[..d] != report_values[d+1..2*d+1] || values[d..width] != b_values[..2*k]
-                || values[width] != report_values[2*d+1] {
-                return Err(invalid("joint image disagrees with outgoing report/internal current"));
+            if values[..d] != report_values[d + 1..2 * d + 1]
+                || values[d..width] != b_values[..2 * k]
+                || values[width] != report_values[2 * d + 1]
+            {
+                return Err(invalid(
+                    "joint image disagrees with outgoing report/internal current",
+                ));
             }
         }
         if let (Some(wire), Some(section)) = (&h.junction, &self.initial_junction) {
             junction_section(section, dimension, wire.representation)?;
-            if self.joint_current.is_none() { match wire.representation {
-                NativeFieldJunctionRepresentation::RationalWords => {
-                    for block in section.intervals.chunks_exact(dimension + 1) {
-                        if block[..dimension].iter().any(|v| v.0 != 0) || block[dimension].0 != 1 {
-                            return Err(invalid("initial exact junction"));
+            if self.joint_current.is_none() {
+                match wire.representation {
+                    NativeFieldJunctionRepresentation::RationalWords => {
+                        for block in section.intervals.chunks_exact(dimension + 1) {
+                            if block[..dimension].iter().any(|v| v.0 != 0)
+                                || block[dimension].0 != 1
+                            {
+                                return Err(invalid("initial exact junction"));
+                            }
+                        }
+                    }
+                    NativeFieldJunctionRepresentation::EnclosedDyadic { .. } => {
+                        let values = packed(section)?;
+                        if values[..values.len() - 1].iter().any(|v| *v != 0)
+                            || values.last() != Some(&1)
+                        {
+                            return Err(invalid("initial enclosed junction"));
                         }
                     }
                 }
-                NativeFieldJunctionRepresentation::EnclosedDyadic { .. } => {
-                    let values = packed(section)?;
-                    if values[..values.len() - 1].iter().any(|v| *v != 0)
-                        || values.last() != Some(&1)
-                    {
-                        return Err(invalid("initial enclosed junction"));
-                    }
-                }
-            }
             }
         }
         if let Some(state) = &self.transport {
-            if h.transport_source==NativeMaterialTransportSource::OperativeNormal {
-                let grain=match h.junction.as_ref().map(|j|j.representation){Some(NativeFieldJunctionRepresentation::EnclosedDyadic{fractional_bits})=>fractional_bits,_=>return Err(invalid("normal material grain"))};
-                material_transport::normal::validate_state(state,n,h.transport_target.dimension(n).ok_or(Error::Shape)?,grain,coefficient_error,
-                    h.history.iter().zip(&self.history).map(|(event,row)|(event.lineage.observed_source().is_some(),row.transport.as_ref().unwrap())))?;
+            if h.transport_source == NativeMaterialTransportSource::OperativeNormal {
+                let grain = match h.junction.as_ref().map(|j| j.representation) {
+                    Some(NativeFieldJunctionRepresentation::EnclosedDyadic { fractional_bits }) => {
+                        fractional_bits
+                    }
+                    _ => return Err(invalid("normal material grain")),
+                };
+                material_transport::normal::validate_state(
+                    state,
+                    n,
+                    h.transport_target.dimension(n).ok_or(Error::Shape)?,
+                    grain,
+                    coefficient_error,
+                    h.history.iter().zip(&self.history).map(|(event, row)| {
+                        (
+                            event.lineage.observed_source().is_some(),
+                            row.transport.as_ref().unwrap(),
+                        )
+                    }),
+                )?;
             } else if !h.transport_source.is_linear() {
                 let grain = match h.junction.as_ref().map(|j| j.representation) {
                     Some(NativeFieldJunctionRepresentation::EnclosedDyadic { fractional_bits }) => {
@@ -621,7 +795,8 @@ impl NativeFieldRest {
                     NativeMaterialTransportSource::HomogeneousMoment
                         | NativeMaterialTransportSource::Contextual
                         | NativeMaterialTransportSource::BilinearContextual
-                        | NativeMaterialTransportSource::OperativeContextual | NativeMaterialTransportSource::OperativeBoundary
+                        | NativeMaterialTransportSource::OperativeContextual
+                        | NativeMaterialTransportSource::OperativeBoundary
                 ) {
                     material_transport::moment::validate_state
                 } else {
@@ -629,7 +804,13 @@ impl NativeFieldRest {
                 };
                 validate(state, n, grain, h.history.len(), coefficient_error)?;
             } else {
-                point_section(state, 1, h.transport_source.state_words_for(n,h.transport_target).ok_or_else(||invalid("material state extent"))?)?;
+                point_section(
+                    state,
+                    1,
+                    h.transport_source
+                        .state_words_for(n, h.transport_target)
+                        .ok_or_else(|| invalid("material state extent"))?,
+                )?;
                 let values = packed(state)?;
                 if values.last().copied() != Some(coefficient_error)
                     || (h.history.is_empty() && values.iter().any(|v| *v != 0))
@@ -638,55 +819,130 @@ impl NativeFieldRest {
                 }
             }
         }
-        if h.transport_source.is_operative() && h.operative.as_ref().is_none_or(|o|o.activated_at!=0) {return Err(invalid("operative material requires its complete current history"));}
-        if h.operative.is_some()!=self.operative.is_some(){return Err(invalid("operative state presence"));}
-        if let Some(wire)=&h.operative {
-            if wire.activated_at>h.history.len() || h.junction.as_ref().is_none_or(|j|!matches!(j.representation,NativeFieldJunctionRepresentation::EnclosedDyadic{..})) {
+        if h.transport_source.is_operative()
+            && h.operative.as_ref().is_none_or(|o| o.activated_at != 0)
+        {
+            return Err(invalid(
+                "operative material requires its complete current history",
+            ));
+        }
+        if h.operative.is_some() != self.operative.is_some() {
+            return Err(invalid("operative state presence"));
+        }
+        if let Some(wire) = &h.operative {
+            if wire.activated_at > h.history.len()
+                || h.junction.as_ref().is_none_or(|j| {
+                    !matches!(
+                        j.representation,
+                        NativeFieldJunctionRepresentation::EnclosedDyadic { .. }
+                    )
+                })
+            {
                 return Err(invalid("operative activation or representation"));
             }
-            let births=h.history.iter().enumerate().filter_map(|(receiving,e)|e.lineage.observed_source().map(|source|NativeOperativeContactBirth{source,receiving})).collect::<Vec<_>>();
-            if wire.births!=births {return Err(invalid("operative birth lineage"));}
-            self.operative.as_ref().unwrap().validate(wire,n)?;
-            if wire.return_frames.iter().any(|r|r.at_cut>h.history.len()){return Err(invalid("operative return beyond field cut"));}
-            if wire.map_program.as_ref().is_some_and(|p|p.at_cut>h.history.len()){return Err(invalid("map program beyond field cut"));}
-            if wire.propagate_from.is_some_and(|at|at<wire.activated_at || at>h.history.len()
-                || wire.map_program.as_ref().is_none_or(|p|p.at_cut>at)) {return Err(invalid("propagation activation"));}
+            let births = h
+                .history
+                .iter()
+                .enumerate()
+                .filter_map(|(receiving, e)| {
+                    e.lineage
+                        .observed_source()
+                        .map(|source| NativeOperativeContactBirth { source, receiving })
+                })
+                .collect::<Vec<_>>();
+            if wire.declared_origins.is_empty() {
+                if wire.births != births { return Err(invalid("operative birth lineage")); }
+            } else if !births.is_empty() || wire.declared_origins.len()!=wire.births.len()
+                || wire.declared_origins.iter().zip(&wire.births).enumerate().any(|(column,(origin,birth))|
+                    !origin.is_declared() || origin.column()!=column || origin.source()!=birth.source || origin.receiving()!=birth.receiving) {
+                return Err(invalid("declared operative contact lineage"));
+            }
+            self.operative.as_ref().unwrap().validate(wire, n)?;
+            if wire
+                .return_frames
+                .iter()
+                .any(|r| r.at_cut > h.history.len())
+            {
+                return Err(invalid("operative return beyond field cut"));
+            }
+            if wire
+                .map_program
+                .as_ref()
+                .is_some_and(|p| p.at_cut > h.history.len())
+            {
+                return Err(invalid("map program beyond field cut"));
+            }
+            if wire.propagate_from.is_some_and(|at| {
+                at < wire.activated_at
+                    || at > h.history.len()
+                    || wire.map_program.as_ref().is_none_or(|p| p.at_cut > at)
+            }) {
+                return Err(invalid("propagation activation"));
+            }
             for frame in &wire.return_frames {
-                if let Some(overlap)=&frame.source_overlap {
-                    if frame.at_cut.checked_sub(1).is_none_or(|receiving|h.history.get(receiving)
-                        .is_none_or(|event|event.lineage.observed_source()!=Some(overlap.source))) {
+                if let Some(overlap) = &frame.source_overlap {
+                    if frame.at_cut.checked_sub(1).is_none_or(|receiving| {
+                        h.history.get(receiving).is_none_or(|event| {
+                            event.lineage.observed_source() != Some(overlap.source)
+                        })
+                    }) {
                         return Err(invalid("source-map return lineage"));
                     }
                 }
-                if let Some(source)=frame.current_difference_source {
-                    if wire.propagate_from.is_some_and(|from|source>=from)
-                        && frame.source_overlap.as_ref().is_none_or(|h|h.source!=source) {
+                if let Some(source) = frame.current_difference_source {
+                    if wire.propagate_from.is_some_and(|from| source >= from)
+                        && frame
+                            .source_overlap
+                            .as_ref()
+                            .is_none_or(|h| h.source != source)
+                    {
                         return Err(invalid("propagated current-factor source dependency"));
                     }
-                    if source<wire.activated_at || frame.at_cut.checked_sub(1).is_none_or(|receiving|
-                        h.history.get(receiving).is_none_or(|event|event.lineage.observed_source()!=Some(source))) {
+                    if source < wire.activated_at
+                        || frame.at_cut.checked_sub(1).is_none_or(|receiving| {
+                            h.history
+                                .get(receiving)
+                                .is_none_or(|event| event.lineage.observed_source() != Some(source))
+                        })
+                    {
                         return Err(invalid("current-factor source lineage"));
                     }
-                    let after=self.history.get(source).and_then(|h|h.operative.as_ref())
-                        .ok_or_else(||invalid("current-factor source current"))?;
-                    if after.count!=frame.factor_count.unwrap_or(frame.contact_count) {
+                    let after = self
+                        .history
+                        .get(source)
+                        .and_then(|h| h.operative.as_ref())
+                        .ok_or_else(|| invalid("current-factor source current"))?;
+                    if after.count != frame.factor_count.unwrap_or(frame.contact_count) {
                         return Err(invalid("current-factor source population"));
                     }
                 }
             }
-            if let Some(last)=self.history.last().and_then(|h|h.operative.as_ref()) {
-                let current=&self.operative.as_ref().unwrap().current;
-                if current[1]!=last.b || material_transport::wides(&current[2].intervals)?[1]!=material_transport::wides(&last.bounds.intervals)?[1] {return Err(invalid("operative current/history boundary"));}
+            if let Some(last) = self.history.last().and_then(|h| h.operative.as_ref()) {
+                let current = &self.operative.as_ref().unwrap().current;
+                if current[1] != last.b
+                    || material_transport::wides(&current[2].intervals)?[1]
+                        != material_transport::wides(&last.bounds.intervals)?[1]
+                {
+                    return Err(invalid("operative current/history boundary"));
+                }
             }
-
         }
-        let mut contacts=0;
-        for (at,(event,rest)) in h.history.iter().zip(&self.history).enumerate(){
-            contacts+=usize::from(event.lineage.observed_source().is_some());
-            if rest.operative.is_some()!=h.operative.as_ref().is_some_and(|o|at>=o.activated_at){return Err(invalid("operative historical presence"));}
-            if let Some(op)=&rest.operative{
-                op.validate(dimension,contacts)?;
-                if op.propagation_input_bounds.is_some()!=h.operative.as_ref().and_then(|o|o.propagate_from).is_some_and(|from|at>=from){
+        let mut contacts = 0;
+        for (at, (event, rest)) in h.history.iter().zip(&self.history).enumerate() {
+            contacts += usize::from(event.lineage.observed_source().is_some());
+            if rest.operative.is_some()
+                != h.operative.as_ref().is_some_and(|o| at >= o.activated_at)
+            {
+                return Err(invalid("operative historical presence"));
+            }
+            if let Some(op) = &rest.operative {
+                op.validate(dimension, contacts)?;
+                if op.propagation_input_bounds.is_some()
+                    != h.operative
+                        .as_ref()
+                        .and_then(|o| o.propagate_from)
+                        .is_some_and(|from| at >= from)
+                {
                     return Err(invalid("historical propagation presence"));
                 }
             }
@@ -709,85 +965,216 @@ impl NativeFieldRest {
     }
     pub fn write(&self, out: &mut impl Write) -> Result<(), Error> {
         self.validate()?;
-        let packing=self.header.transport_source.is_operative() && self.header.transport_source.is_projector()
+        let packing = self.header.transport_source.is_operative()
+            && self.header.transport_source.is_projector()
             && !self.header.transport_target.is_direct();
-        let magic = if self.joint_current.is_some() { if packing { JOINT_PACKED_MAGIC } else { JOINT_MAGIC } } else { match (packing, self.current_junction.is_some()) {
-            (false, false) => MAGIC, (true, false) => PACKED_MAGIC,
-            (false, true) => CURRENT_MAGIC, (true, true) => CURRENT_PACKED_MAGIC,
-        }};
+        let magic = if self.joint_current.is_some() {
+            if packing {
+                JOINT_PACKED_MAGIC
+            } else {
+                JOINT_MAGIC
+            }
+        } else {
+            match (packing, self.current_junction.is_some()) {
+                (false, false) => MAGIC,
+                (true, false) => PACKED_MAGIC,
+                (false, true) => CURRENT_MAGIC,
+                (true, true) => CURRENT_PACKED_MAGIC,
+            }
+        };
         out.write_all(magic).map_err(invalid)?;
         blob(out, &serde_json::to_vec(&self.header).map_err(invalid)?)?;
-        if self.joint_current.is_some() { out.write_all(&[u8::from(self.current_junction.is_some())]).map_err(invalid)?; }
-        fn section(out:&mut impl Write,s:&ResidentSectionRest)->Result<(),Error>{blob(out,&point_bytes(s)?)}
-        section(out,&self.seed)?;section(out,&self.memory)?;section(out,&self.basis)?;
-        for s in [&self.covariance,&self.initial_junction,&self.transport,&self.current_junction,&self.joint_current].into_iter().flatten(){section(out,s)?;}
-        if let Some(op)=&self.operative {op.write(&mut |s|section(out,s))?;}
-        for (at,h) in self.history.iter().enumerate() {
-            section(out,&h.source)?;
-            if let Some(s)=&h.junction{section(out,s)?;}
-            if let Some(s)=&h.transport{
-                if packing {
-                    let packed=NativeMaterialReportPackingRest::from_report(self.header.history[at].lineage.clone(),
-                        self.header.transport_target,self.header.nodes,s)?;
-                    let mut encoded=vec![1];packed.write(&mut encoded)?;
-                    if encoded.len()<s.intervals.len().checked_mul(8).and_then(|n|n.checked_add(25)).ok_or(Error::Shape)? {blob(out,&encoded)?;}
-                    else {let mut bytes=vec![0];bytes.extend(point_bytes(s)?);blob(out,&bytes)?;}
-                } else {section(out,s)?;}
+        if self.joint_current.is_some() {
+            out.write_all(&[u8::from(self.current_junction.is_some())])
+                .map_err(invalid)?;
+        }
+        fn section(out: &mut impl Write, s: &ResidentSectionRest) -> Result<(), Error> {
+            blob(out, &point_bytes(s)?)
+        }
+        section(out, &self.seed)?;
+        section(out, &self.memory)?;
+        section(out, &self.basis)?;
+        for s in [
+            &self.covariance,
+            &self.initial_junction,
+            &self.transport,
+            &self.current_junction,
+            &self.joint_current,
+        ]
+        .into_iter()
+        .flatten()
+        {
+            section(out, s)?;
+        }
+        if let Some(op) = &self.operative {
+            op.write(&mut |s| section(out, s))?;
+        }
+        for (at, h) in self.history.iter().enumerate() {
+            section(out, &h.source)?;
+            if let Some(s) = &h.junction {
+                section(out, s)?;
             }
-            if let Some(s)=&h.incoming{section(out,s)?;}
-            if let Some(op)=&h.operative{op.write(&mut |s|section(out,s))?;}
+            if let Some(s) = &h.transport {
+                if packing {
+                    let packed = NativeMaterialReportPackingRest::from_report(
+                        self.header.history[at].lineage.clone(),
+                        self.header.transport_target,
+                        self.header.nodes,
+                        s,
+                    )?;
+                    let mut encoded = vec![1];
+                    packed.write(&mut encoded)?;
+                    if encoded.len()
+                        < s.intervals
+                            .len()
+                            .checked_mul(8)
+                            .and_then(|n| n.checked_add(25))
+                            .ok_or(Error::Shape)?
+                    {
+                        blob(out, &encoded)?;
+                    } else {
+                        let mut bytes = vec![0];
+                        bytes.extend(point_bytes(s)?);
+                        blob(out, &bytes)?;
+                    }
+                } else {
+                    section(out, s)?;
+                }
+            }
+            if let Some(s) = &h.incoming {
+                section(out, s)?;
+            }
+            if let Some(op) = &h.operative {
+                op.write(&mut |s| section(out, s))?;
+            }
         }
         out.write_all(END).map_err(invalid)
     }
     pub fn read(input: &mut impl Read, octets: u64) -> Result<Self, Error> {
-        let mut input=input.take(octets);let mut magic=vec![0;MAGIC.len()];input.read_exact(&mut magic).map_err(invalid)?;
-        let joint=magic==JOINT_MAGIC || magic==JOINT_PACKED_MAGIC;
-        let packing=magic==PACKED_MAGIC || magic==CURRENT_PACKED_MAGIC || magic==JOINT_PACKED_MAGIC;
-        let contemporary=magic==CURRENT_MAGIC || magic==CURRENT_PACKED_MAGIC;
-        if !packing && !contemporary && !joint && magic!=MAGIC{return Err(invalid("unsupported field rest version"));}
-        let header: Header=serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
-        if packing && (!header.transport_source.is_operative() || !header.transport_source.is_projector() || header.transport_target.is_direct()){
+        let mut input = input.take(octets);
+        let mut magic = vec![0; MAGIC.len()];
+        input.read_exact(&mut magic).map_err(invalid)?;
+        let joint = magic == JOINT_MAGIC || magic == JOINT_PACKED_MAGIC;
+        let packing =
+            magic == PACKED_MAGIC || magic == CURRENT_PACKED_MAGIC || magic == JOINT_PACKED_MAGIC;
+        let contemporary = magic == CURRENT_MAGIC || magic == CURRENT_PACKED_MAGIC;
+        if !packing && !contemporary && !joint && magic != MAGIC {
+            return Err(invalid("unsupported field rest version"));
+        }
+        let header: Header = serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
+        if packing
+            && (!header.transport_source.is_operative()
+                || !header.transport_source.is_projector()
+                || header.transport_target.is_direct())
+        {
             return Err(invalid("packed field target chart"));
         }
-        let contemporary=if joint {
-            let mut flag=[0]; input.read_exact(&mut flag).map_err(invalid)?;
-            match flag[0] {0=>false,1=>true,_=>return Err(invalid("joint current-report presence"))}
-        } else {contemporary};
-        fn section(input:&mut std::io::Take<impl Read>)->Result<ResidentSectionRest,Error>{read_point(&read_blob(input)?)}
-        let seed=section(&mut input)?;let memory=section(&mut input)?;let basis=section(&mut input)?;
-        let covariance=header.junction.as_ref().map(|_|section(&mut input)).transpose()?;
-        let initial_junction=(header.junction.is_some() && header.history.is_empty()).then(||section(&mut input)).transpose()?;
-        let transport=header.transport.then(||section(&mut input)).transpose()?;
-        let current_junction=contemporary.then(||section(&mut input)).transpose()?;
-        let joint_current=joint.then(||section(&mut input)).transpose()?;
-        let operative=header.operative.as_ref().map(|w|OperativeRest::read(w,&mut ||section(&mut input))).transpose()?;
-        let mut history=Vec::new();
-        for (at,event) in header.history.iter().enumerate(){
-            let source=section(&mut input)?;
-            let junction=header.junction.as_ref().map(|_|section(&mut input)).transpose()?;
-            let transport=if header.transport {
+        let contemporary = if joint {
+            let mut flag = [0];
+            input.read_exact(&mut flag).map_err(invalid)?;
+            match flag[0] {
+                0 => false,
+                1 => true,
+                _ => return Err(invalid("joint current-report presence")),
+            }
+        } else {
+            contemporary
+        };
+        fn section(input: &mut std::io::Take<impl Read>) -> Result<ResidentSectionRest, Error> {
+            read_point(&read_blob(input)?)
+        }
+        let seed = section(&mut input)?;
+        let memory = section(&mut input)?;
+        let basis = section(&mut input)?;
+        let covariance = header
+            .junction
+            .as_ref()
+            .map(|_| section(&mut input))
+            .transpose()?;
+        let initial_junction = (header.junction.is_some() && header.history.is_empty())
+            .then(|| section(&mut input))
+            .transpose()?;
+        let transport = header.transport.then(|| section(&mut input)).transpose()?;
+        let current_junction = contemporary.then(|| section(&mut input)).transpose()?;
+        let joint_current = joint.then(|| section(&mut input)).transpose()?;
+        let operative = header
+            .operative
+            .as_ref()
+            .map(|w| OperativeRest::read(w, &mut || section(&mut input)))
+            .transpose()?;
+        let mut history = Vec::new();
+        for (at, event) in header.history.iter().enumerate() {
+            let source = section(&mut input)?;
+            let junction = header
+                .junction
+                .as_ref()
+                .map(|_| section(&mut input))
+                .transpose()?;
+            let transport = if header.transport {
                 Some(if packing {
-                    let bytes=read_blob(&mut input)?;
-                    match bytes.first(){
-                        Some(0)=>read_point(&bytes[1..])?,
-                        Some(1)=>{
-                            let packed=NativeMaterialReportPackingRest::read(&mut &bytes[1..],(bytes.len()-1) as u64)?;
-                            if packed.lineage!=event.lineage || packed.nodes!=header.nodes || packed.target_chart!=header.transport_target{
+                    let bytes = read_blob(&mut input)?;
+                    match bytes.first() {
+                        Some(0) => read_point(&bytes[1..])?,
+                        Some(1) => {
+                            let packed = NativeMaterialReportPackingRest::read(
+                                &mut &bytes[1..],
+                                (bytes.len() - 1) as u64,
+                            )?;
+                            if packed.lineage != event.lineage
+                                || packed.nodes != header.nodes
+                                || packed.target_chart != header.transport_target
+                            {
                                 return Err(invalid("packed material source/chart mismatch"));
                             }
                             packed.unfold_rest()?
-                        },
-                        _=>return Err(invalid("unknown material report codec")),
+                        }
+                        _ => return Err(invalid("unknown material report codec")),
                     }
-                } else {section(&mut input)?})
-            } else {None};
-            let incoming=event.lineage.incoming.is_resident().then(||section(&mut input)).transpose()?;
-            let op=header.operative.as_ref().is_some_and(|o|at>=o.activated_at).then(||OperativeHistoryRest::read(&mut ||section(&mut input))).transpose()?;
-            history.push(HeldRest{source,junction,transport,incoming,operative:op});
+                } else {
+                    section(&mut input)?
+                })
+            } else {
+                None
+            };
+            let incoming = event
+                .lineage
+                .incoming
+                .is_resident()
+                .then(|| section(&mut input))
+                .transpose()?;
+            let op = header
+                .operative
+                .as_ref()
+                .is_some_and(|o| at >= o.activated_at)
+                .then(|| OperativeHistoryRest::read(&mut || section(&mut input)))
+                .transpose()?;
+            history.push(HeldRest {
+                source,
+                junction,
+                transport,
+                incoming,
+                operative: op,
+            });
         }
-        expect(&mut input,END)?;
-        if input.limit()!=0{return Err(invalid("trailing field rest bytes"));}
-        let rest=Self{operative,header,seed,memory,basis,covariance,initial_junction,current_junction,joint_current,transport,history};rest.validate()?;Ok(rest)
+        expect(&mut input, END)?;
+        if input.limit() != 0 {
+            return Err(invalid("trailing field rest bytes"));
+        }
+        let rest = Self {
+            operative,
+            header,
+            seed,
+            memory,
+            basis,
+            covariance,
+            initial_junction,
+            current_junction,
+            joint_current,
+            transport,
+            history,
+        };
+        rest.validate()?;
+        Ok(rest)
     }
 }
 
@@ -883,11 +1270,21 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 transport: self.transport.is_some(),
                 transport_source: self.material_transport_source().unwrap_or_default(),
                 transport_target: self.material_target().unwrap_or_default(),
-                operative:self.junction.as_ref().and_then(|j|j.operative.as_ref()).map(|o|o.wire()),
+                operative: self
+                    .junction
+                    .as_ref()
+                    .and_then(|j| j.operative.as_ref())
+                    .map(|o| o.wire()),
                 source_slots,
                 anchor_slots,
+                source_only: self.relation.source_only,
             },
-            operative:self.junction.as_ref().and_then(|j|j.operative.as_ref()).map(|o|o.rest(self.relation.surface)).transpose()?,
+            operative: self
+                .junction
+                .as_ref()
+                .and_then(|j| j.operative.as_ref())
+                .map(|o| o.rest(self.relation.surface))
+                .transpose()?,
             seed: section(&self.seed)?,
             memory: section(&self.memory)?,
             basis: section(&self.relation.basis)?,
@@ -904,16 +1301,27 @@ impl<'chart> NativeConstitutiveField<'chart> {
             } else {
                 None
             },
-            joint_current: self.junction.as_ref().and_then(|j|j.valid_joint_current())
-                .map(|image|section(image)).transpose()?,
+            joint_current: self
+                .junction
+                .as_ref()
+                .and_then(|j| j.valid_joint_current())
+                .map(|image| section(image))
+                .transpose()?,
             // Keep the actual contemporary report independently of ordinary observation
             // history. Pointer identity avoids copying the usual unchanged last report.
             current_junction: match (&self.junction, self.history.last()) {
                 (Some(j), Some(last)) => {
-                    let same = last.resident.as_ref().and_then(|h| h.junction.as_ref())
+                    let same = last
+                        .resident
+                        .as_ref()
+                        .and_then(|h| h.junction.as_ref())
                         .is_some_and(|previous| Rc::ptr_eq(previous, &j.current));
-                    if same { None } else { Some(section(&j.current)?) }
-                },
+                    if same {
+                        None
+                    } else {
+                        Some(section(&j.current)?)
+                    }
+                }
                 _ => None,
             },
             transport: self
@@ -981,7 +1389,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .and_then(|v| v.checked_mul(16))
             .ok_or(Error::Shape)?;
         let available = surface.declaration().max_sectiond_bytes;
-        if scratch > available as usize {
+        if !rest.header.source_only && scratch > available as usize {
             return Err(Error::ScratchAperture {
                 required: scratch,
                 available,
@@ -1083,14 +1491,31 @@ impl<'chart> NativeConstitutiveField<'chart> {
             } else {
                 Rc::new(surface.mount_section_rest(&initial_junction.expect("initial junction"))?)
             };
-            let operative = match (h.operative,operative) {
-                (Some(wire),Some(rest))=>Some(OperativeState::remount(surface,wire,rest,match j.representation {NativeFieldJunctionRepresentation::EnclosedDyadic{fractional_bits}=>fractional_bits,_=>return Err(invalid("operative representation"))})?),
-                (None,None)=>None,_=>return Err(invalid("operative state presence")),
+            let operative = match (h.operative, operative) {
+                (Some(wire), Some(rest)) => Some(OperativeState::remount(
+                    surface,
+                    wire,
+                    rest,
+                    match j.representation {
+                        NativeFieldJunctionRepresentation::EnclosedDyadic { fractional_bits } => {
+                            fractional_bits
+                        }
+                        _ => return Err(invalid("operative representation")),
+                    },
+                )?),
+                (None, None) => None,
+                _ => return Err(invalid("operative state presence")),
             };
-            let joint_current = joint_current.map(|image| {
-                let op=operative.as_ref().ok_or(Error::Shape)?;
-                Ok::<_,Error>((Rc::clone(&current),Rc::clone(&op.sections.b),Rc::new(surface.mount_section_rest(&image)?)))
-            }).transpose()?;
+            let joint_current = joint_current
+                .map(|image| {
+                    let op = operative.as_ref().ok_or(Error::Shape)?;
+                    Ok::<_, Error>((
+                        Rc::clone(&current),
+                        Rc::clone(&op.sections.b),
+                        Rc::new(surface.mount_section_rest(&image)?),
+                    ))
+                })
+                .transpose()?;
             Some(PairedJunction {
                 representation: j.representation,
                 solver: j.solver,
@@ -1114,6 +1539,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 target_width: 2 * h.nodes,
                 occurrences,
                 usable: true,
+                source_only: h.source_only,
             },
             material: h.material,
             frame: Rc::clone(frames.last().expect("frames")),

@@ -30,19 +30,19 @@ mod law_rest;
 mod resident;
 pub use law_rest::ConstitutiveFibreRest;
 pub use resident::{
-    FieldReactionEnclosure, FieldReactionEnclosureRest, PreparedFieldReaction,
     AffineContactReading, ConditionContactMetric, ConditionContactReading, ConditionContactStatus,
     ConditionCoverage, ConditionCurrentRest, ConditionImageReading, ConditionPreimageReading,
     ConditionPreimageRest, ConstitutiveDifferentialReading, ConstitutiveImageReading,
     ConstitutiveImageReceiver, ConstitutiveReturnRest, ContextualSectionOrigin,
-    GeneratorNeighborhoodRest, GeneratorNeighborhoodStep, NeighborhoodEvidence,
-    NeighborhoodEvidenceRest, NormalWaveRelationRest, PreparedConditionContact,
-    ResidentAffineContact, ResidentConditionContact, ResidentConditionCurrent,
+    FieldReactionEnclosure, FieldReactionEnclosureRest, GeneratorNeighborhoodRest,
+    GeneratorNeighborhoodStep, NeighborhoodEvidence, NeighborhoodEvidenceRest,
+    NormalWaveRelationRest, PreparedConditionContact, PreparedFieldReaction, ResidentAffineContact,
+    ResidentBilinearFeatures, ResidentConditionContact, ResidentConditionCurrent,
     ResidentConditionImage, ResidentConditionPreimage, ResidentConditionStanding,
     ResidentConstitutiveCurrent, ResidentConstitutiveImage, ResidentConstitutiveRefinement,
     ResidentConstitutiveReturn, ResidentConstitutiveSection, ResidentContextualSection,
     ResidentDifferenceSection, ResidentGeneratorNeighborhood, ResidentSourcePairs,
-    ResidentBilinearFeatures, ResidentWavePullback, ResidentWaveRelation, ResidentWaveSourceContact, WaveSourceReceiver,
+    ResidentWavePullback, ResidentWaveRelation, ResidentWaveSourceContact, WaveSourceReceiver,
 };
 
 /// Declared local source law, bound at founding rather than inferred from an array's width.
@@ -124,6 +124,7 @@ pub struct ResidentConstitutiveFibre<'chart> {
     source_chart: ConstitutiveSourceChart,
     occurrences: u64,
     usable: bool,
+    source_only: bool,
 }
 
 impl<'chart> ResidentConstitutiveFibre<'chart> {
@@ -176,6 +177,34 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
             source_chart: ConstitutiveSourceChart::Linear,
             occurrences: 0,
             usable: true,
+            source_only: false,
+        })
+    }
+
+    /// Compact incident foundation with no dense source/target basis. The one
+    /// resident word is a tagged zero-rank witness, never a substitute dense map.
+    pub fn found_source_only(
+        surface: &'chart ResidentSurface<'chart>,
+        source_width: usize,
+        target_width: usize,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        if source_width == 0 || target_width == 0 {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let basis = surface.mount_section_rest(
+            &ResidentSectionRest::found(1, 1, ResidentGrain(0), 64, vec![(0, 0)])
+                .map_err(|_| ConstitutiveFibreError::Shape)?,
+        )?;
+        Ok(Self {
+            basis,
+            basis_owner: Rc::new(()),
+            surface,
+            source_width,
+            target_width,
+            source_chart: ConstitutiveSourceChart::Linear,
+            occurrences: 0,
+            usable: true,
+            source_only: true,
         })
     }
 
@@ -185,6 +214,9 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
 
     pub fn source_chart(&self) -> ConstitutiveSourceChart {
         self.source_chart
+    }
+    pub fn source_only(&self) -> bool {
+        self.source_only
     }
 
     /// Found the existing local relation over an explicit two-current contact. No coefficient,
@@ -230,7 +262,7 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
         source: &[i64],
         receiving: Option<&[i64]>,
     ) -> Result<ConstitutiveFibreReturn, ConstitutiveFibreError> {
-        if !self.usable {
+        if self.source_only || !self.usable {
             return Err(ConstitutiveFibreError::Uncertain);
         }
         if self.source_chart != ConstitutiveSourceChart::Linear

@@ -17,6 +17,11 @@ impl<'chart> NativeConstitutiveField<'chart> {
         if !self.relation.usable || self.pending.is_some() {
             return Err(ConstitutiveFibreError::Uncertain);
         }
+        if self.relation.source_only() {
+            return Err(ConstitutiveFibreError::Rest(
+                "source-only field cannot rechart its legacy basis".into(),
+            ));
+        }
         let nodes = self.material.len();
         if gauges.len() != nodes || gauges.iter().any(|gauge| !gauge.is_unit()) {
             return Err(ConstitutiveFibreError::Shape);

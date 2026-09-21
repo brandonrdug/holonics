@@ -1,4 +1,19 @@
 use super::*;
+
+#[test]
+#[ignore = "requires CUDA; homogeneous feature is one at the packet grain, not one carrier unit"]
+fn homogeneous_feature_retains_the_declared_unit_and_radius() {
+    let readout=ResidentReadout::new().unwrap();
+    let surface=ResidentSurface::on(&readout).unwrap();
+    let raw=surface.mount_section_rest(&ResidentSectionRest::found(1,2,ResidentGrain(0),64,vec![(3,3),(-2,-2)]).unwrap()).unwrap();
+    let source=ResidentNormalEnclosureSection::from_points(ResidentConstitutiveSection::integers(&raw).unwrap(),ResidentGrain(16)).unwrap();
+    let expanded=source.append_homogeneous().unwrap();
+    let before=source.row(0).unwrap().inspect().unwrap();
+    let after=expanded.row(0).unwrap().inspect().unwrap();
+    assert_eq!(after.center[0],before.center[0]);
+    assert_eq!(after.center[1],ExactComplexWaveCurrent::one());
+    assert_eq!(after.radius,before.radius);
+}
 use crate::embedding_fiber::ResidentReadout;
 
 fn points<'c>(
@@ -278,7 +293,7 @@ fn enclosed_condition_rows_agree_row_by_row_and_re_enter_as_the_next_source() {
     let rest = normal.rest().unwrap();
     let mut state = wides(&rest.state().intervals).unwrap();
     state[..6].copy_from_slice(&[0, scale, 2 * scale, 0, scale, -scale]);
-    let view = ResidentNormalMaterialView {
+    let view = ResidentNormalMaterialView { prior: None,
         surface: &s,
         state: Rc::new(wide_words(&s, &state)),
         source_chart: NormalSourceChart::Features { source_complex: 3 },

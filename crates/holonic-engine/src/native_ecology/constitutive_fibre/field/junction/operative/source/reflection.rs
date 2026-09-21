@@ -248,6 +248,9 @@ impl<'c> NativeFieldCurrentSource<'c> {
         let s = self.surface;
         let d = self.boundary_components();
         let k = self.births.len();
+        let covariance = self
+            ._producing
+            .ensure_covariance(s, d, k, self.grain)?;
         if self.reflection.get().is_none() {
             let words = d
                 .checked_mul(d)
@@ -259,7 +262,7 @@ impl<'c> NativeFieldCurrentSource<'c> {
                 let lane = p.open(0, &[])?;
                 s.record_field_source_factor(
                     &lane,
-                    &self._producing.covariance,
+                    covariance,
                     d,
                     self.grain,
                     &factor,
@@ -340,6 +343,9 @@ impl<'c> NativeFieldCurrentSource<'c> {
         let factor = if let Some(factor) = self.reflection.get() {
             factor
         } else {
+            let covariance = self
+                ._producing
+                .ensure_covariance(self.surface, d, count, self.grain)?;
             let words = d
                 .checked_mul(d)
                 .and_then(|v| v.checked_add(d)?.checked_mul(2))
@@ -350,7 +356,7 @@ impl<'c> NativeFieldCurrentSource<'c> {
                 let lane = p.open(0, &[])?;
                 self.surface.record_field_source_factor(
                     &lane,
-                    &self._producing.covariance,
+                    covariance,
                     d,
                     self.grain,
                     &factor,

@@ -87,7 +87,9 @@ pub(in crate::native_ecology::constitutive_fibre) fn point_section(
 
 // Every admitted section in this point wire has exact i64 codewords. Store each codeword once
 // and reconstruct both identical endpoints. This does not quotient a current ball or a fibre.
-pub(in crate::native_ecology::constitutive_fibre) fn point_bytes(section: &ResidentSectionRest) -> Result<Vec<u8>, Error> {
+pub(in crate::native_ecology::constitutive_fibre) fn point_bytes(
+    section: &ResidentSectionRest,
+) -> Result<Vec<u8>, Error> {
     point_section(section, section.rows, section.width)?;
     let extent = section
         .intervals
@@ -105,7 +107,9 @@ pub(in crate::native_ecology::constitutive_fibre) fn point_bytes(section: &Resid
     }
     Ok(bytes)
 }
-pub(in crate::native_ecology::constitutive_fibre) fn read_point(bytes: &[u8]) -> Result<ResidentSectionRest, Error> {
+pub(in crate::native_ecology::constitutive_fibre) fn read_point(
+    bytes: &[u8],
+) -> Result<ResidentSectionRest, Error> {
     if bytes.len() < 24 {
         return Err(invalid("point section header"));
     }
@@ -624,6 +628,7 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
                 target_width: 2,
                 occurrences,
                 usable: true,
+                source_only: false,
             },
             material: Rc::clone(&materials[h.current_material]),
             frame: Rc::clone(frames.last().expect("validated frames")),

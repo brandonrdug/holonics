@@ -85,6 +85,7 @@ impl<'c> ResidentNormalMaterial<'c> {
                 .observations
                 .checked_add(1)
                 .ok_or(ConstitutiveFibreError::Shape)?,
+            prior: self.prior.clone(),
         })
     }
 

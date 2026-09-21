@@ -10,7 +10,8 @@ pub(crate) enum EnclosureComposition<'a, 'c> {
     },
     GatherAdjoint {
         input: &'a ResidentSection<'c>,
-        map: &'a ResidentSection<'c>,
+        offsets: &'a ResidentSection<'c>,
+        entries: &'a ResidentSection<'c>,
         components: usize,
     },
     Concatenate {
@@ -106,20 +107,26 @@ impl<'c> ResidentSurface<'c> {
             }
             EnclosureComposition::GatherAdjoint {
                 input,
-                map,
+                offsets,
+                entries,
                 components: d,
             } => {
                 if outputs.len() != 1
                     || !ball(input, input.rows(), d)
                     || !ball(out, rows, d)
-                    || !self.operative_shape(map, input.rows(), 4)
+                    || rows
+                        .checked_add(1)
+                        .is_none_or(|n| !self.operative_shape(offsets, n, 1))
+                    || !self.operative_shape(entries, input.rows(), 4)
                 {
                     return Err(fail());
                 }
                 p.ptr(input.lo.device_ptr())
                     .ptr(input.hi.device_ptr())
-                    .ptr(map.lo.device_ptr())
-                    .ptr(map.hi.device_ptr())
+                    .ptr(offsets.lo.device_ptr())
+                    .ptr(offsets.hi.device_ptr())
+                    .ptr(entries.lo.device_ptr())
+                    .ptr(entries.hi.device_ptr())
                     .u32(input.rows() as u32)
                     .u32(rows as u32)
                     .u32(d as u32);

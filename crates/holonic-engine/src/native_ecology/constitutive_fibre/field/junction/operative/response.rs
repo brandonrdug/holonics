@@ -220,9 +220,9 @@ impl<'c> NativeConstitutiveField<'c> {
         let producing=if let Some(cached)=cached {cached} else if op.program.is_some() {
             let map=self.operative_producing_map(source)?;
             let mut producing=sections(surface,d,k)?;let p=Rc::get_mut(&mut producing).unwrap();p.map=map;p.b=b;p.bounds=bounds;
-            let rounds=surface.fresh_section(1,2*((d/2)*(d/2)+d/2),ResidentGrain(0))?;
+            let rounds=surface.fresh_section(1,d,ResidentGrain(0))?;
             let mut passage=surface.begin_passage(&[vec![]])?;
-            {let lane=passage.open(0,&[])?;surface.record_operative_moments(&lane,d,k,query.grain,producing.current(),producing.moments(),&rounds)?;}
+            {let lane=passage.open(0,&[])?;surface.record_operative_aggregate(&lane,d,k,query.grain,producing.current(),&producing.aggregate,&producing.moment_bounds,&rounds)?;}
             passage.close(0,&producing.moment_bounds,64)?;
             let receipt=passage.finish()?.launch()?;
             if !receipt.obstruction.is_empty(){return Err(Error::Arithmetic(format!("source-map moments: {:?}",receipt.obstruction)));}
@@ -238,7 +238,7 @@ impl<'c> NativeConstitutiveField<'c> {
             if pointers.is_empty(){pointers.resize(3,(0,0));}
             let journal=surface.mount_section_rest(&ResidentSectionRest::found(later.len().max(1),3,ResidentGrain(0),64,pointers).map_err(invalid)?)?;
             let mut producing=sections(surface,d,k)?;let p=Rc::get_mut(&mut producing).unwrap();p.b=b;p.bounds=bounds;
-            let moment_rounds=surface.fresh_section(1,2*((d/2)*(d/2)+d/2),ResidentGrain(0))?;
+            let moment_rounds=surface.fresh_section(1,d,ResidentGrain(0))?;
             recovery=Some((journal,moment_rounds,later.len()));producing
         };
         let ports = Rc::new(surface.fresh_section(2, 2 * d, ResidentGrain(0))?);
@@ -248,25 +248,27 @@ impl<'c> NativeConstitutiveField<'c> {
         let workspace =
             surface.fresh_section(1, 2 * (d * d + 3 * d + 4 * k + 2), ResidentGrain(0))?;
         let dots = surface.fresh_section(k.max(1), 10, ResidentGrain(0))?;
-        let lanes=if recovery.is_some(){vec![vec![],vec![0],vec![1]]}else{vec![vec![]]};
-        let final_lane=lanes.len()-1;let predecessors=lanes[final_lane].clone();
-        let mut passage=surface.begin_passage(&lanes)?;
         if let Some((journal,moment_rounds,later))=&recovery {
-            {let lane=passage.open(0,&[])?;surface.record_operative_producing_map(&lane,&op.sections.map,journal,*later,d,k,query.grain,&producing.map)?;}
-            passage.close(0,&producing.map,64)?;
-            {let lane=passage.open(1,&[0])?;surface.record_operative_moments(&lane,d,k,query.grain,producing.current(),producing.moments(),moment_rounds)?;}
-            passage.close(1,&producing.moment_bounds,64)?;
+            let mut recovery_passage=surface.begin_passage(&[vec![],vec![0]])?;
+            {let lane=recovery_passage.open(0,&[])?;surface.record_operative_producing_map(&lane,&op.sections.map,journal,*later,d,k,query.grain,&producing.map)?;}
+            recovery_passage.close(0,&producing.map,64)?;
+            {let lane=recovery_passage.open(1,&[0])?;surface.record_operative_aggregate(&lane,d,k,query.grain,producing.current(),&producing.aggregate,&producing.moment_bounds,moment_rounds)?;}
+            recovery_passage.close(1,&producing.moment_bounds,64)?;
+            let completion=recovery_passage.finish()?.launch()?;
+            if !completion.obstruction.is_empty(){return Err(Error::Arithmetic(format!("source-map moments: {:?}",completion.obstruction)));}
         }
+        producing.ensure_covariance(surface, d, k, query.grain)?;
+        let mut passage=surface.begin_passage(&[vec![]])?;
         {
-            let lane=passage.open(final_lane,&predecessors)?;
+            let lane=passage.open(0,&[])?;
             surface.record_operative_material_adjoint(
                 &lane,
                 [
                     &producing.map,
                     &producing.b,
                     &producing.bounds,
-                    &producing.covariance,
-                    &producing.moment_bounds,
+                    &producing.covariance.get().ok_or(Error::Uncertain)?.matrix,
+                    &producing.covariance.get().ok_or(Error::Uncertain)?.bound,
                     &forward,
                     &query.output,
                 ],
@@ -278,7 +280,7 @@ impl<'c> NativeConstitutiveField<'c> {
                 &dots,
             )?;
         }
-        passage.close(final_lane, &diagnostics, 64)?;
+        passage.close(0, &diagnostics, 64)?;
         let receipt = passage.finish()?.launch()?;
         if !receipt.obstruction.is_empty() {
             return Err(Error::Arithmetic(format!(

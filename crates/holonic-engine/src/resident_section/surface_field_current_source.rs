@@ -3,6 +3,18 @@ use crate::native_ecology::constitutive_fibre::ResidentNormalEnclosureSection;
 use crate::native_ecology::constitutive_fibre::{ResidentNormalEnclosureView, ResidentNormalInput};
 
 impl<'chart> ResidentSurface<'chart> {
+    /// Copy one complete enclosure on the resident surface.  This is used when a relaxed
+    /// endpoint crosses the source/commit seam; the copy stays device resident and never
+    /// detaches the endpoint into a host rest packet.
+    pub(crate) fn record_field_enclosure_copy(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        source: ResidentNormalEnclosureView<'_, 'chart>,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        self.record_normal_enclosure_pair(lane, source, source, 0, out)
+    }
+
     pub(crate) fn record_field_source_reflection_joint_section(
         &self,
         lane: &Lane<'_, 'chart>,

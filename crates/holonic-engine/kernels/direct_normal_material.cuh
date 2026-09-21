@@ -78,7 +78,7 @@ __device__ void direct_normal_pack(
 }
 
 // Parallel target rows, followed by their complete joint-radius bound.
-__device__ void direct_normal_predict_mode_sources(const int64_t *old,const wide *current,
+__device__ void direct_normal_predict_ball_sources(const int64_t *old,const wide *ball,
     uint32_t m,uint32_t targets,uint32_t grain,wide *out,int64_t *work,bool full_report,
     bool reference,uint32_t *slot){
     const uint32_t d=NORMAL_QUADRATURES*m,R=2u*targets;
@@ -88,7 +88,7 @@ __device__ void direct_normal_predict_mode_sources(const int64_t *old,const wide
         wide norm=0;
         for(uint32_t j=0;j<d;++j)norm=add_checked(norm,ft_abs(M[(size_t)row*d+j],slot),slot);
         ((wide *)work)[2u*row]=norm;
-        ((wide *)work)[2u*row+1u]=linear_material_row(M,nullptr,current+d+1u,row,
+        ((wide *)work)[2u*row+1u]=linear_material_row(M,nullptr,ball,row,
             m,grain,out,slot);
     }
     __syncthreads();if(*slot)return;
@@ -101,7 +101,7 @@ __device__ void direct_normal_predict_mode_sources(const int64_t *old,const wide
         // Reference transport pays the retained coefficient defect. Applied transport uses
         // the stored operator as the law, while retaining source enclosure and rounding.
         wide error=reference?M[(size_t)R*m]:0;
-        out[R]=ft_prediction_error(error,norm,current+d+1u,d,current[2u*(d+1u)-1u],remainder,grain,slot);
+        out[R]=ft_prediction_error(error,norm,ball,d,ball[d],remainder,grain,slot);
         if(full_report){
         size_t at=normal_metadata_at_sources(m,targets);
         out[at]=M[(size_t)R*m];out[at+1u]=M[(size_t)R*m+1u];out[at+2u]=norm;
@@ -111,6 +111,12 @@ __device__ void direct_normal_predict_mode_sources(const int64_t *old,const wide
         }
     }
     __syncthreads();if(*slot)return;
+}
+
+__device__ void direct_normal_predict_mode_sources(const int64_t *old,const wide *current,
+    uint32_t m,uint32_t targets,uint32_t grain,wide *out,int64_t *work,bool full_report,
+    bool reference,uint32_t *slot){
+    direct_normal_predict_ball_sources(old,current+NORMAL_QUADRATURES*m+1u,m,targets,grain,out,work,full_report,reference,slot);
 }
 
 __device__ void direct_normal_predict_mode(const int64_t *old,const wide *current,

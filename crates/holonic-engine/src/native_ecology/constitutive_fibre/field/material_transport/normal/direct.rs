@@ -5,14 +5,16 @@ use super::*;
 use std::rc::Rc;
 mod rest;
 pub use rest::NormalMaterialRest;
+mod boundary;
+pub use boundary::{BoundaryMaterialMaps, BoundaryMaterialSeed};
 mod refine;
 pub use refine::NormalRealizationRefinement;
 
+#[cfg(test)]
+mod conditional_tests;
 mod enclosure;
 mod enclosure_ports;
 mod held_section;
-#[cfg(test)]
-mod conditional_tests;
 pub use enclosure::{ResidentNormalEnclosure, ResidentNormalEnclosureView, ResidentNormalInput};
 pub use held_section::{ResidentHeldSection, ResidentHeldSectionRest};
 mod applied_relation;
@@ -81,11 +83,13 @@ pub struct ResidentNormalMaterial<'c> {
     targets: usize,
     grain: ResidentGrain,
     observations: u64,
+    pub(crate) prior: Option<NativeNormalPrior>,
 }
 
 /// Immutable resident state retained by a source-qualified forecast.  This deliberately keeps
 /// the mounted section and its declared chart metadata; numerical detachment belongs to an
 /// explicit observer and is never part of the native forecast path.
+#[derive(Clone)]
 pub struct ResidentNormalMaterialView<'c> {
     pub(crate) surface: &'c ResidentSurface<'c>,
     pub(crate) state: Rc<ResidentSection<'c>>,
@@ -93,80 +97,250 @@ pub struct ResidentNormalMaterialView<'c> {
     pub(crate) targets: usize,
     pub(crate) grain: ResidentGrain,
     pub(crate) observations: u64,
+    pub(crate) prior: Option<NativeNormalPrior>,
 }
 
 impl<'c> ResidentNormalMaterialView<'c> {
-    pub fn rest(&self)->Result<NormalMaterialRest,ConstitutiveFibreError>{
-        ResidentNormalMaterial{surface:self.surface,state:Rc::clone(&self.state),source_chart:self.source_chart,targets:self.targets,grain:self.grain,observations:self.observations}.rest()
+    pub fn observations(&self) -> u64 {
+        self.observations
+    }
+    pub fn prior(&self) -> Option<&NativeNormalPrior> {
+        self.prior.as_ref()
+    }
+    pub fn rest(&self) -> Result<NormalMaterialRest, ConstitutiveFibreError> {
+        ResidentNormalMaterial {
+            surface: self.surface,
+            state: Rc::clone(&self.state),
+            source_chart: self.source_chart,
+            targets: self.targets,
+            grain: self.grain,
+            observations: self.observations,
+            prior: self.prior.clone(),
+        }
+        .rest()
     }
     /// Evaluate the retained immutable coefficient state at this producing cut. No mutable
     /// learner is exposed by this view, and no numerical state is detached to the host.
-    pub fn read<'a>(&self, source:impl Into<ResidentNormalInput<'a,'c>>)
-        ->Result<ResidentNormalReturn<'a,'c>,ConstitutiveFibreError>{
-        let retained=ResidentNormalMaterial{surface:self.surface,state:Rc::clone(&self.state),
-            source_chart:self.source_chart,targets:self.targets,grain:self.grain,observations:self.observations};
+    pub fn read<'a>(
+        &self,
+        source: impl Into<ResidentNormalInput<'a, 'c>>,
+    ) -> Result<ResidentNormalReturn<'a, 'c>, ConstitutiveFibreError> {
+        let retained = ResidentNormalMaterial {
+            surface: self.surface,
+            state: Rc::clone(&self.state),
+            source_chart: self.source_chart,
+            targets: self.targets,
+            grain: self.grain,
+            observations: self.observations,
+            prior: self.prior.clone(),
+        };
         retained.read(source)
     }
     /// The stored coefficient map is the executed law; its normal-reference defect remains
     /// available through this immutable material witness.
-    pub fn read_applied<'a>(&self, source: impl Into<ResidentNormalInput<'a, 'c>>)
-        -> Result<ResidentNormalReturn<'a, 'c>, ConstitutiveFibreError> {
-        let retained=ResidentNormalMaterial{surface:self.surface,state:Rc::clone(&self.state),
-            source_chart:self.source_chart,targets:self.targets,grain:self.grain,observations:self.observations};
+    pub fn read_applied<'a>(
+        &self,
+        source: impl Into<ResidentNormalInput<'a, 'c>>,
+    ) -> Result<ResidentNormalReturn<'a, 'c>, ConstitutiveFibreError> {
+        let retained = ResidentNormalMaterial {
+            surface: self.surface,
+            state: Rc::clone(&self.state),
+            source_chart: self.source_chart,
+            targets: self.targets,
+            grain: self.grain,
+            observations: self.observations,
+            prior: self.prior.clone(),
+        };
         retained.read_applied(source)
     }
     /// Execute M[s,h,h⊗s] at fixed exact h, retaining the actual affine source restriction.
     /// Only A(h), not the independent condition coefficients, transports source uncertainty.
-    pub fn read_applied_bilinear(&self, source:ResidentNormalEnclosureView<'_, 'c>, condition:ResidentConstitutiveCurrent<'_, 'c>)
-        -> Result<ResidentNormalEnclosure<'c>,ConstitutiveFibreError> {
-        let d=source.components();let k=condition.components();
-        let features=d.checked_mul(k/2).and_then(|v|v.checked_add(d)?.checked_add(k)).ok_or(ConstitutiveFibreError::Shape)?;
-        if self.source_chart != (NormalSourceChart::Features{source_complex:features/2}) || source.grain()!=self.grain {return Err(ConstitutiveFibreError::Shape);}
-        let width=self.targets.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?;
-        let section=self.surface.fresh_section(1,2*(width+1),ResidentGrain(0))?;
-        let mut pass=self.surface.begin_passage(&[vec![]])?;
-        {let lane=pass.open(0,&[])?;self.surface.record_normal_applied_condition(&lane,&self.state,source,condition,self.targets,None,false,&section)?;}
-        pass.close(0,&section,64)?;let result=pass.finish()?.launch()?;
-        if !result.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("applied conditional reaction: {:?}",result.obstruction)));}
-        Ok(ResidentNormalEnclosure{surface:self.surface,section,width,grain:self.grain})
+    pub fn read_applied_bilinear(
+        &self,
+        source: ResidentNormalEnclosureView<'_, 'c>,
+        condition: ResidentConstitutiveCurrent<'_, 'c>,
+    ) -> Result<ResidentNormalEnclosure<'c>, ConstitutiveFibreError> {
+        let d = source.components();
+        let k = condition.components();
+        let features = d
+            .checked_mul(k / 2)
+            .and_then(|v| v.checked_add(d)?.checked_add(k))
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        if self.source_chart
+            != (NormalSourceChart::Features {
+                source_complex: features / 2,
+            })
+            || source.grain() != self.grain
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let width = self
+            .targets
+            .checked_mul(2)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let section = self
+            .surface
+            .fresh_section(1, 2 * (width + 1), ResidentGrain(0))?;
+        let mut pass = self.surface.begin_passage(&[vec![]])?;
+        {
+            let lane = pass.open(0, &[])?;
+            self.surface.record_normal_applied_condition(
+                &lane,
+                &self.state,
+                source,
+                condition,
+                self.targets,
+                None,
+                false,
+                &section,
+            )?;
+        }
+        pass.close(0, &section, 64)?;
+        let result = pass.finish()?.launch()?;
+        if !result.obstruction.is_empty() {
+            return Err(ConstitutiveFibreError::Arithmetic(format!(
+                "applied conditional reaction: {:?}",
+                result.obstruction
+            )));
+        }
+        Ok(ResidentNormalEnclosure {
+            surface: self.surface,
+            section,
+            width,
+            grain: self.grain,
+        })
     }
     /// Execute x+M[x,h,h⊗x] as one affine action of the incoming source. The
     /// identity path and reaction share x; its uncertainty is transported by I+A(h).
-    pub fn read_applied_bilinear_identity(&self, source:ResidentNormalEnclosureView<'_, 'c>, condition:ResidentConstitutiveCurrent<'_, 'c>)
-        -> Result<ResidentNormalEnclosure<'c>,ConstitutiveFibreError> {
-        let d=source.components();let k=condition.components();
-        let features=d.checked_mul(k/2).and_then(|v|v.checked_add(d)?.checked_add(k)).ok_or(ConstitutiveFibreError::Shape)?;
-        if self.source_chart != (NormalSourceChart::Features{source_complex:features/2}) || source.grain()!=self.grain || d!=2*self.targets {return Err(ConstitutiveFibreError::Shape);}
-        let section=self.surface.fresh_section(1,2*(d+1),ResidentGrain(0))?;
-        let mut pass=self.surface.begin_passage(&[vec![]])?;
-        {let lane=pass.open(0,&[])?;self.surface.record_normal_applied_condition(&lane,&self.state,source,condition,self.targets,None,true,&section)?;}
-        pass.close(0,&section,64)?;let result=pass.finish()?.launch()?;
-        if !result.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("incoming conditional reaction: {:?}",result.obstruction)));}
-        Ok(ResidentNormalEnclosure{surface:self.surface,section,width:d,grain:self.grain})
+    pub fn read_applied_bilinear_identity(
+        &self,
+        source: ResidentNormalEnclosureView<'_, 'c>,
+        condition: ResidentConstitutiveCurrent<'_, 'c>,
+    ) -> Result<ResidentNormalEnclosure<'c>, ConstitutiveFibreError> {
+        let d = source.components();
+        let k = condition.components();
+        let features = d
+            .checked_mul(k / 2)
+            .and_then(|v| v.checked_add(d)?.checked_add(k))
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        if self.source_chart
+            != (NormalSourceChart::Features {
+                source_complex: features / 2,
+            })
+            || source.grain() != self.grain
+            || d != 2 * self.targets
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let section = self
+            .surface
+            .fresh_section(1, 2 * (d + 1), ResidentGrain(0))?;
+        let mut pass = self.surface.begin_passage(&[vec![]])?;
+        {
+            let lane = pass.open(0, &[])?;
+            self.surface.record_normal_applied_condition(
+                &lane,
+                &self.state,
+                source,
+                condition,
+                self.targets,
+                None,
+                true,
+                &section,
+            )?;
+        }
+        pass.close(0, &section, 64)?;
+        let result = pass.finish()?.launch()?;
+        if !result.obstruction.is_empty() {
+            return Err(ConstitutiveFibreError::Arithmetic(format!(
+                "incoming conditional reaction: {:?}",
+                result.obstruction
+            )));
+        }
+        Ok(ResidentNormalEnclosure {
+            surface: self.surface,
+            section,
+            width: d,
+            grain: self.grain,
+        })
     }
     /// At fixed h apply (s,b) -> (x+A(h)s+c(h),b) to one joint ball. The
     /// unchanged tail is part of that same source, not an independently joined enclosure.
     pub fn read_applied_bilinear_joint(
-        &self, source: ResidentNormalEnclosureView<'_, 'c>, boundary_components: usize,
-        condition: ResidentConstitutiveCurrent<'_, 'c>, external: ResidentNormalEnclosureView<'_, 'c>,
+        &self,
+        source: ResidentNormalEnclosureView<'_, 'c>,
+        boundary_components: usize,
+        condition: ResidentConstitutiveCurrent<'_, 'c>,
+        external: ResidentNormalEnclosureView<'_, 'c>,
     ) -> Result<ResidentNormalEnclosure<'c>, ConstitutiveFibreError> {
-        let d=boundary_components; let k=condition.components();
-        let features=d.checked_mul(k/2).and_then(|v|v.checked_add(d)?.checked_add(k)).ok_or(ConstitutiveFibreError::Shape)?;
-        if self.source_chart != (NormalSourceChart::Features{source_complex:features/2})
-            || source.grain()!=self.grain || external.grain()!=self.grain { return Err(ConstitutiveFibreError::Shape); }
-        let tail=source.components().checked_sub(d).ok_or(ConstitutiveFibreError::Shape)?;
-        let width=self.targets.checked_mul(2).and_then(|v|v.checked_add(tail)).ok_or(ConstitutiveFibreError::Shape)?;
-        let words=width.checked_add(1).and_then(|v|v.checked_mul(2)).ok_or(ConstitutiveFibreError::Shape)?;
-        let section=self.surface.fresh_section(1,words,ResidentGrain(0))?;
-        let mut pass=self.surface.begin_passage(&[vec![]])?;
-        {let lane=pass.open(0,&[])?; self.surface.record_normal_applied_condition(&lane,&self.state,source,condition,self.targets,Some((d,external)),false,&section)?;}
-        pass.close(0,&section,64)?; let result=pass.finish()?.launch()?;
-        if !result.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("applied conditional joint current: {:?}",result.obstruction)));}
-        Ok(ResidentNormalEnclosure{surface:self.surface,section,width,grain:self.grain})
+        let d = boundary_components;
+        let k = condition.components();
+        let features = d
+            .checked_mul(k / 2)
+            .and_then(|v| v.checked_add(d)?.checked_add(k))
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        if self.source_chart
+            != (NormalSourceChart::Features {
+                source_complex: features / 2,
+            })
+            || source.grain() != self.grain
+            || external.grain() != self.grain
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let tail = source
+            .components()
+            .checked_sub(d)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let width = self
+            .targets
+            .checked_mul(2)
+            .and_then(|v| v.checked_add(tail))
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let words = width
+            .checked_add(1)
+            .and_then(|v| v.checked_mul(2))
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let section = self.surface.fresh_section(1, words, ResidentGrain(0))?;
+        let mut pass = self.surface.begin_passage(&[vec![]])?;
+        {
+            let lane = pass.open(0, &[])?;
+            self.surface.record_normal_applied_condition(
+                &lane,
+                &self.state,
+                source,
+                condition,
+                self.targets,
+                Some((d, external)),
+                false,
+                &section,
+            )?;
+        }
+        pass.close(0, &section, 64)?;
+        let result = pass.finish()?.launch()?;
+        if !result.obstruction.is_empty() {
+            return Err(ConstitutiveFibreError::Arithmetic(format!(
+                "applied conditional joint current: {:?}",
+                result.obstruction
+            )));
+        }
+        Ok(ResidentNormalEnclosure {
+            surface: self.surface,
+            section,
+            width,
+            grain: self.grain,
+        })
     }
-    pub fn inspect(&self)->Result<NativeNormalMaterialState,ConstitutiveFibreError>{
-        decode_state_layout(&self.surface.detach_section(&self.state,i64::BITS)?,
-            self.source_chart.layout(self.targets)?,self.targets,self.grain.0)
+    pub fn inspect(&self) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
+        expose_data_energy(
+            decode_state_layout(
+                &self.surface.detach_section(&self.state, i64::BITS)?,
+                self.source_chart.layout(self.targets)?,
+                self.targets,
+                self.grain.0,
+            )?,
+            self.prior.as_ref(),
+        )
     }
 }
 
@@ -218,7 +392,10 @@ impl<'a, 'c> ResidentNormalReturn<'a, 'c> {
     }
 }
 impl<'c> ResidentNormalMaterial<'c> {
-    pub(crate) fn retained_view(&self) -> ResidentNormalMaterialView<'c> {
+    /// Retain an immutable resident producing cut for a forecast or delayed
+    /// receiver.  The view keeps the device section and does not detach its
+    /// numerical state to the host.
+    pub fn retained_view(&self) -> ResidentNormalMaterialView<'c> {
         ResidentNormalMaterialView {
             surface: self.surface,
             state: Rc::clone(&self.state),
@@ -226,6 +403,7 @@ impl<'c> ResidentNormalMaterial<'c> {
             targets: self.targets,
             grain: self.grain,
             observations: self.observations,
+            prior: self.prior.clone(),
         }
     }
     /// Found the existing unit-prior normal law. `roots` declares three equal complex port
@@ -254,6 +432,41 @@ impl<'c> ResidentNormalMaterial<'c> {
             grain,
         )
     }
+
+    /// Found a feature chart with the explicit nonzero normal prior H₀=I,
+    /// B₀=W₀.  Legacy constructors retain their zero B₀ behavior.
+    pub fn found_features_with_prior(
+        surface: &'c ResidentSurface<'c>,
+        source_complex: usize,
+        targets: usize,
+        grain: ResidentGrain,
+        prior: NativeNormalPrior,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        if !(1..=120).contains(&grain.0) {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let source_chart = NormalSourceChart::Features { source_complex };
+        let layout = source_chart.layout(targets)?;
+        let values =
+            initial_words_for_sources_with_prior(layout.sources, targets, grain.0, &prior)?;
+        let state = surface.mount_section_rest(
+            &ResidentSectionRest::found(1, values.len(), ResidentGrain(0), i64::BITS, values)
+                .map_err(invalid)?,
+        )?;
+        Ok(Self {
+            surface,
+            state: Rc::new(state),
+            source_chart,
+            targets,
+            grain,
+            observations: 0,
+            prior: Some(prior),
+        })
+    }
+
+    pub fn prior(&self) -> Option<&NativeNormalPrior> {
+        self.prior.as_ref()
+    }
     fn found_in_chart(
         surface: &'c ResidentSurface<'c>,
         source_chart: NormalSourceChart,
@@ -276,6 +489,7 @@ impl<'c> ResidentNormalMaterial<'c> {
             targets,
             grain,
             observations: 0,
+            prior: None,
         })
     }
     pub fn observations(&self) -> u64 {
@@ -301,11 +515,14 @@ impl<'c> ResidentNormalMaterial<'c> {
         self.grain
     }
     pub fn inspect(&self) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
-        decode_state_layout(
-            &self.surface.detach_section(&self.state, i64::BITS)?,
-            self.source_chart.layout(self.targets)?,
-            self.targets,
-            self.grain.0,
+        expose_data_energy(
+            decode_state_layout(
+                &self.surface.detach_section(&self.state, i64::BITS)?,
+                self.source_chart.layout(self.targets)?,
+                self.targets,
+                self.grain.0,
+            )?,
+            self.prior.as_ref(),
         )
     }
     /// Durable boundary data for this owner, containing accumulated geometry and numerical
@@ -322,8 +539,10 @@ impl<'c> ResidentNormalMaterial<'c> {
     /// Apply the stored dyadic coefficient map. Input-family and arithmetic errors remain in
     /// the output; the separate normal-equation comparison remains in the returned metadata
     /// and material. This is the same applied/reference distinction used by native wave transport.
-    pub fn read_applied<'a>(&self, source: impl Into<ResidentNormalInput<'a, 'c>>)
-        -> Result<ResidentNormalReturn<'a, 'c>, ConstitutiveFibreError> {
+    pub fn read_applied<'a>(
+        &self,
+        source: impl Into<ResidentNormalInput<'a, 'c>>,
+    ) -> Result<ResidentNormalReturn<'a, 'c>, ConstitutiveFibreError> {
         Ok(self.prepare_mode(source.into(), None, false)?.0)
     }
     pub fn receive<'a>(
@@ -349,7 +568,8 @@ impl<'c> ResidentNormalMaterial<'c> {
         source: ResidentNormalInput<'a, 'c>,
         observed: Option<ResidentNormalInput<'a, 'c>>,
         reference: bool,
-    ) -> Result<(ResidentNormalReturn<'a, 'c>, Option<ResidentSection<'c>>), ConstitutiveFibreError> {
+    ) -> Result<(ResidentNormalReturn<'a, 'c>, Option<ResidentSection<'c>>), ConstitutiveFibreError>
+    {
         let layout = self.source_chart.layout(self.targets)?;
         if source.width() != layout.source_components
             || observed.is_some_and(|y| y.width() != layout.target_components)

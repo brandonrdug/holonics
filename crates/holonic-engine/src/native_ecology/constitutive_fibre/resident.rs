@@ -6,7 +6,10 @@
 
 use super::*;
 mod section;
-pub use section::{ResidentBilinearFeatures, ResidentConstitutiveSection, ResidentDifferenceSection, ResidentSourcePairs};
+pub use section::{
+    ResidentBilinearFeatures, ResidentConstitutiveSection, ResidentDifferenceSection,
+    ResidentSourcePairs,
+};
 mod return_rest;
 pub use return_rest::ConstitutiveReturnRest;
 
@@ -22,13 +25,24 @@ pub(crate) struct PreparedConstitutiveFormation<'chart> {
 impl<'c> PreparedConstitutiveFormation<'c> {
     /// Move staged material into one conditional realization; the continuing predecessor
     /// remains unchanged. No ecology is copied to make this executable material view.
-    pub(crate) fn into_alternative(self)->(ResidentConstitutiveFibre<'c>,ResidentConstitutiveReturn<'c>){
-        let material=ResidentConstitutiveFibre {
-            surface:self.returned.surface,basis:self.basis,basis_owner:self.successor_owner,
-            source_width:self.returned.source_width,target_width:self.returned.target_width,
-            source_chart:self.returned.source_chart,occurrences:self.returned.occurrence,usable:true,
+    pub(crate) fn into_alternative(
+        self,
+    ) -> (
+        ResidentConstitutiveFibre<'c>,
+        ResidentConstitutiveReturn<'c>,
+    ) {
+        let material = ResidentConstitutiveFibre {
+            surface: self.returned.surface,
+            basis: self.basis,
+            basis_owner: self.successor_owner,
+            source_width: self.returned.source_width,
+            target_width: self.returned.target_width,
+            source_chart: self.returned.source_chart,
+            occurrences: self.returned.occurrence,
+            usable: true,
+            source_only: false,
         };
-        (material,self.returned)
+        (material, self.returned)
     }
 }
 
@@ -59,20 +73,53 @@ pub struct ResidentConstitutiveCurrent<'a, 'chart> {
 
 impl<'a, 'chart> ResidentConstitutiveCurrent<'a, 'chart> {
     /// Number of real coordinate components in the declared current chart.
-    pub fn components(&self) -> usize { self.width }
+    pub fn components(&self) -> usize {
+        self.width
+    }
     /// Restrict complex coordinate pairs while retaining the same source and denominator.
-    pub fn restrict_components(self, range:std::ops::Range<usize>) -> Result<Self,ConstitutiveFibreError> {
-        if range.start>=range.end || range.end>self.width || range.start%2!=0 || range.end%2!=0 {return Err(ConstitutiveFibreError::Shape);}
-        Ok(Self{offset:self.offset.checked_add(range.start).ok_or(ConstitutiveFibreError::Shape)?,width:range.end-range.start,..self})
+    pub fn restrict_components(
+        self,
+        range: std::ops::Range<usize>,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        if range.start >= range.end
+            || range.end > self.width
+            || range.start % 2 != 0
+            || range.end % 2 != 0
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        Ok(Self {
+            offset: self
+                .offset
+                .checked_add(range.start)
+                .ok_or(ConstitutiveFibreError::Shape)?,
+            width: range.end - range.start,
+            ..self
+        })
     }
     /// Retain this exact point-current operand in a rational packet on its supplied surface.
-    pub fn to_owned(self,surface:&'chart ResidentSurface<'chart>)->Result<ResidentSection<'chart>,ConstitutiveFibreError>{
-        let width=self.width.checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
-        let out=surface.fresh_section(1,width,ResidentGrain(0))?;
-        let mut p=surface.begin_passage(&[vec![]])?;
-        {let lane=p.open(0,&[])?;surface.record_constitutive_current_snapshot(&lane,self,&out)?;}
-        p.close(0,&out,64)?;let r=p.finish()?.launch()?;
-        if !r.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("point-current snapshot: {:?}",r.obstruction)));}
+    pub fn to_owned(
+        self,
+        surface: &'chart ResidentSurface<'chart>,
+    ) -> Result<ResidentSection<'chart>, ConstitutiveFibreError> {
+        let width = self
+            .width
+            .checked_add(1)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let out = surface.fresh_section(1, width, ResidentGrain(0))?;
+        let mut p = surface.begin_passage(&[vec![]])?;
+        {
+            let lane = p.open(0, &[])?;
+            surface.record_constitutive_current_snapshot(&lane, self, &out)?;
+        }
+        p.close(0, &out, 64)?;
+        let r = p.finish()?.launch()?;
+        if !r.obstruction.is_empty() {
+            return Err(ConstitutiveFibreError::Arithmetic(format!(
+                "point-current snapshot: {:?}",
+                r.obstruction
+            )));
+        }
         Ok(out)
     }
     /// Exact numerator coordinates followed by one common denominator. Pointness and a positive
@@ -293,7 +340,7 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
         condition: ResidentConstitutiveCurrent<'_, 'chart>,
         receiving: Option<ResidentConstitutiveCurrent<'_, 'chart>>,
     ) -> Result<PreparedConstitutiveFormation<'chart>, ConstitutiveFibreError> {
-        if !self.usable {
+        if self.source_only || !self.usable {
             return Err(ConstitutiveFibreError::Uncertain);
         }
         let predecessor_owner = Rc::clone(&self.basis_owner);
@@ -309,6 +356,7 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
             source_chart: self.source_chart,
             occurrences: self.occurrences,
             usable: true,
+            source_only: self.source_only,
         };
         match staged.advance_bilinear_contact(source, condition, receiving) {
             Ok(returned) => Ok(PreparedConstitutiveFormation {
@@ -402,7 +450,7 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
         condition: Option<ResidentConstitutiveCurrent<'_, 'chart>>,
         receiving: Option<ResidentConstitutiveCurrent<'_, 'chart>>,
     ) -> Result<ResidentConstitutiveReturn<'chart>, ConstitutiveFibreError> {
-        if !self.usable {
+        if self.source_only || !self.usable {
             return Err(ConstitutiveFibreError::Uncertain);
         }
         let valid_source = match (self.source_chart, condition) {
@@ -495,14 +543,18 @@ mod contact_tests;
 mod law_rest_tests;
 
 mod neighborhood;
-pub(crate) use neighborhood::{GeneratorMaterial, PredictiveMaterial, ResidentNeighborhoodAlternative};
+pub(crate) use neighborhood::{
+    GeneratorMaterial, PredictiveMaterial, ResidentNeighborhoodAlternative,
+};
 mod read;
+#[allow(unused_imports)]
+pub use neighborhood::field_reaction::{
+    FieldReactionEnclosure, FieldReactionEnclosureRest, PreparedFieldReaction,
+};
 pub use neighborhood::{
     GeneratorNeighborhoodRest, GeneratorNeighborhoodStep, NeighborhoodEvidence,
     NeighborhoodEvidenceRest, ResidentGeneratorNeighborhood,
 };
-#[allow(unused_imports)]
-pub use neighborhood::field_reaction::{FieldReactionEnclosure,FieldReactionEnclosureRest,PreparedFieldReaction};
 
 mod preimage;
 pub use preimage::{ConditionPreimageReading, ConditionPreimageRest, ResidentConditionPreimage};
@@ -526,5 +578,6 @@ pub use context_section::{ContextualSectionOrigin, ResidentContextualSection};
 
 mod wave_relation;
 pub use wave_relation::{
-    NormalWaveRelationRest, ResidentWavePullback, ResidentWaveRelation, ResidentWaveSourceContact, WaveSourceReceiver,
+    NormalWaveRelationRest, ResidentWavePullback, ResidentWaveRelation, ResidentWaveSourceContact,
+    WaveSourceReceiver,
 };

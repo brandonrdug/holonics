@@ -179,4 +179,56 @@ impl<'c> ResidentSurface<'c> {
             "operative-contacts",
         )
     }
+
+    pub(crate) fn record_operative_aggregate(
+        &self,
+        lane: &Lane<'_, 'c>,
+        d: usize,
+        count: usize,
+        grain: u32,
+        input: [&ResidentSection<'c>; 3],
+        aggregate: &ResidentSection<'c>,
+        moment_bounds: &ResidentSection<'c>,
+        rounds: &ResidentSection<'c>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = Self::operative_error;
+        if d == 0
+            || d % 2 != 0
+            || d > u32::MAX as usize
+            || count > u32::MAX as usize
+            || !(1..=120).contains(&grain)
+            || !self.operative_shape(input[0], count.max(1), 2 * d)
+            || !self.operative_shape(input[1], count.max(1), 4)
+            || !self.operative_shape(input[2], 1, 4)
+            || !self.operative_shape(aggregate, 1, 2 * d)
+            || !self.operative_shape(moment_bounds, 1, 8)
+            || !self
+                .operative_shape(rounds, 1, 2 * (d / 2))
+        {
+            return Err(fail());
+        }
+        let mut p = Params::new();
+        for s in input {
+            p.ptr(s.lo_device_ptr());
+        }
+        p.u32(d as u32).u32(count as u32).u32(grain);
+        p.ptr(aggregate.lo_device_ptr())
+            .ptr(aggregate.hi_device_ptr())
+            .ptr(moment_bounds.lo_device_ptr())
+            .ptr(moment_bounds.hi_device_ptr())
+            .ptr(rounds.lo_device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_field_operative_aggregate",
+            1,
+            self.launch.block_x,
+            0,
+            &mut p,
+            "operative-aggregate",
+        )
+    }
 }

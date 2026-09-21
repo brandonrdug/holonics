@@ -113,6 +113,11 @@ mod surface_wave_source;
 mod surface_material_support;
 mod surface_phase_participation;
 mod surface_enclosure_composition;
+mod surface_incident;
+mod surface_global_field_action;
+mod surface_field_factor_action;
+mod surface_field_factor_material;
+mod surface_normal_applied_features;
 pub(crate) use surface_enclosure_composition::EnclosureComposition;
 #[path = "resident_section/surface_condition.rs"]
 mod surface_condition;
@@ -169,7 +174,7 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 72] = [
+pub const KERNELS: [&str; 87] = [
     "section_constitutive_rechart",
     "section_constitutive_circulation",
     "section_constitutive_fibre",
@@ -256,6 +261,21 @@ pub const KERNELS: [&str; 72] = [
     "section_normal_enclosed_adjoint",
     "section_enclosure_collect_row_status",
     "section_enclosure_concatenate_rows",
+    "section_enclosure_regroup",
+    "section_enclosure_append_homogeneous",
+    "section_normal_applied_enclosed_features",
+    "section_field_global_action",
+    "section_field_global_pullback",
+    "section_field_global_residual_trace",
+    "section_field_global_scale_ports",
+    "section_field_operative_aggregate",
+    "section_field_factor_action",
+    "section_field_factor_aggregate",
+    "section_field_factor_pullback",
+    "section_field_factor_append",
+    "section_field_factor_current",
+    "section_field_factor_delta_bound",
+    "section_normal_enclosure_zero",
 ];
 
 #[path = "resident_section/surface_field_current_source.rs"]

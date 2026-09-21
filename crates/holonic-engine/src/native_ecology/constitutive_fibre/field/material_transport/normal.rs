@@ -2,7 +2,7 @@
 //! common source chart; a numerical material matrix is bounded by its full normal residual.
 use super::*;
 use crate::native_ecology::constitutive_fibre::circulation::rest::point_section;
-use num_traits::{Signed, Zero};
+use num_traits::{Signed, ToPrimitive, Zero};
 
 mod layout;
 use layout::{MomentWire, NormalLayout, ReportBall, STATISTIC_SCALARS};
@@ -16,9 +16,15 @@ pub(crate) fn report_words(n: usize, t: usize) -> Option<usize> {
 pub(crate) fn workspace_words(n: usize, t: usize) -> Option<usize> {
     Some(NormalLayout::new(n, t)?.workspace_words)
 }
-pub(crate) fn feature_state_words(sources: usize, targets: usize) -> Option<usize> { Some(NormalLayout::for_sources(sources, targets)?.state_words) }
-pub(crate) fn feature_report_words(sources: usize, targets: usize) -> Option<usize> { Some(NormalLayout::for_sources(sources, targets)?.report_words) }
-pub(crate) fn feature_workspace_words(sources: usize, targets: usize) -> Option<usize> { Some(NormalLayout::for_sources(sources, targets)?.workspace_words) }
+pub(crate) fn feature_state_words(sources: usize, targets: usize) -> Option<usize> {
+    Some(NormalLayout::for_sources(sources, targets)?.state_words)
+}
+pub(crate) fn feature_report_words(sources: usize, targets: usize) -> Option<usize> {
+    Some(NormalLayout::for_sources(sources, targets)?.report_words)
+}
+pub(crate) fn feature_workspace_words(sources: usize, targets: usize) -> Option<usize> {
+    Some(NormalLayout::for_sources(sources, targets)?.workspace_words)
+}
 pub(super) fn initial_words(
     n: usize,
     t: usize,
@@ -45,6 +51,101 @@ fn initial_words_for_sources(
         let v = 1i64 << (square_scale_bit % MomentWire::LIMB_BITS);
         out[at] = (v, v);
     }
+    Ok(out)
+}
+
+/// Seed a normal chart with H₀=I and an explicit B₀=W₀H₀.  The resident wire
+/// stores moments at S², where S=2^grain; requiring a dyadic prior at the chart
+/// grain keeps this initialization exact and avoids a host floating-point path.
+pub(super) fn initial_words_for_sources_with_prior(
+    sources: usize,
+    targets: usize,
+    grain: u32,
+    prior: &NativeNormalPrior,
+) -> Result<Vec<(i64, i64)>, ConstitutiveFibreError> {
+    if prior.targets() != targets || prior.source_complex() != sources {
+        return Err(ConstitutiveFibreError::Shape);
+    }
+    let layout =
+        NormalLayout::for_sources(sources, targets).ok_or(ConstitutiveFibreError::Shape)?;
+    let mut out = initial_words_for_sources(sources, targets, grain)?;
+    let scale = BigInt::one() << grain;
+    let moment = |value: &Rat| -> Result<BigInt, ConstitutiveFibreError> {
+        let numerator = value.numer().clone() * &scale * &scale;
+        let denominator = value.denom();
+        if &numerator % denominator != BigInt::zero() {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        Ok(numerator / denominator)
+    };
+    let write = |value: BigInt, dst: &mut [(i64, i64)]| -> Result<(), ConstitutiveFibreError> {
+        if dst.len() != MomentWire::WORDS {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let negative = value.is_negative();
+        let absolute = value.abs();
+        let mut rest = absolute;
+        for limb in &mut dst[..MomentWire::LIMBS] {
+            let value_limb = (rest.clone() & BigInt::from(u32::MAX))
+                .to_u32()
+                .ok_or(ConstitutiveFibreError::Shape)? as i64;
+            *limb = (value_limb, value_limb);
+            rest >>= MomentWire::LIMB_BITS;
+        }
+        if !rest.is_zero() {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        dst[MomentWire::LIMBS] = (i64::from(negative), i64::from(negative));
+        Ok(())
+    };
+    let b = layout.cross_words_at();
+    for (row, values) in prior.cross_source.iter().enumerate() {
+        for (column, value) in values.iter().enumerate() {
+            let at = b + MomentWire::COMPLEX_WORDS * (row * sources + column);
+            write(moment(&value.real)?, &mut out[at..at + MomentWire::WORDS])?;
+            write(
+                moment(&value.imaginary)?,
+                &mut out[at + MomentWire::WORDS..at + MomentWire::COMPLEX_WORDS],
+            )?;
+        }
+    }
+    // H0=I and B0=W0 imply the initial applied operator is W0 itself. Populate its
+    // checked wide coefficients as well as the statistics; an all-zero applied map
+    // would silently discard the prior and kill the codec's initial correspondence.
+    let mut coefficient_norm = 0i128;
+    for (row, values) in prior.cross_source.iter().enumerate() {
+        for (column, value) in values.iter().enumerate() {
+            for (quadrature, coordinate) in [&value.real, &value.imaginary].into_iter().enumerate()
+            {
+                let scaled = coordinate.numer() * &scale;
+                if &scaled % coordinate.denom() != BigInt::zero() {
+                    return Err(ConstitutiveFibreError::Shape);
+                }
+                let coefficient = (scaled / coordinate.denom())
+                    .to_i128()
+                    .ok_or(ConstitutiveFibreError::Shape)?;
+                coefficient_norm = coefficient_norm
+                    .checked_add(
+                        coefficient
+                            .checked_abs()
+                            .ok_or(ConstitutiveFibreError::Shape)?,
+                    )
+                    .ok_or(ConstitutiveFibreError::Shape)?;
+                let at = 2 * (2 * (row * sources + column) + quadrature);
+                out[at] = (coefficient as i64, coefficient as i64);
+                out[at + 1] = ((coefficient >> 64) as i64, (coefficient >> 64) as i64);
+            }
+        }
+    }
+    let norm_at = 2 * (layout.cross_values + 2);
+    out[norm_at] = (coefficient_norm as i64, coefficient_norm as i64);
+    out[norm_at + 1] = (
+        (coefficient_norm >> 64) as i64,
+        (coefficient_norm >> 64) as i64,
+    );
+    let c = moment(&prior.target_energy)?;
+    let at = layout.scalar_words_at() + 2 * MomentWire::WORDS;
+    write(c, &mut out[at..at + MomentWire::WORDS])?;
     Ok(out)
 }
 fn invalid(s: impl std::fmt::Display) -> ConstitutiveFibreError {
@@ -276,6 +377,17 @@ fn validate_numerical_witness_layout(
     if norm != BigInt::from(matrix[bb + 2]) {
         return Err(invalid("coefficient norm"));
     }
+    // The same exact WH-B witness through its actual nonzero moment entries.
+    // Unit-prior directions and sparse observed source support need no dense matrix product.
+    let support = (0..m)
+        .map(|k| {
+            (0..m)
+                .filter(|&j| {
+                    !expected[2 * (k * m + j)].is_zero() || !expected[2 * (k * m + j) + 1].is_zero()
+                })
+                .collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>();
     let mut residual = BigInt::zero();
     for row in 0..t {
         if matrix[2 * row * m..2 * (row + 1) * m]
@@ -287,20 +399,26 @@ fn validate_numerical_witness_layout(
         {
             continue;
         }
-        for j in 0..m {
-            let mut re = BigInt::zero();
-            let mut im = BigInt::zero();
-            for k in 0..m {
-                let ar = BigInt::from(matrix[2 * (row * m + k)]);
-                let ai = BigInt::from(matrix[2 * (row * m + k) + 1]);
+        let mut real = vec![BigInt::zero(); m];
+        let mut imaginary = vec![BigInt::zero(); m];
+        for k in 0..m {
+            let at = 2 * (row * m + k);
+            if matrix[at] == 0 && matrix[at + 1] == 0 {
+                continue;
+            }
+            let ar = BigInt::from(matrix[at]);
+            let ai = BigInt::from(matrix[at + 1]);
+            for &j in &support[k] {
                 let br = &expected[2 * (k * m + j)];
                 let bi = &expected[2 * (k * m + j) + 1];
-                re += &ar * br - &ai * bi;
-                im += &ar * bi + &ai * br;
+                real[j] += &ar * br - &ai * bi;
+                imaginary[j] += &ar * bi + &ai * br;
             }
-            re -= &scale * &expected[hh + 2 * (row * m + j)];
-            im -= &scale * &expected[hh + 2 * (row * m + j) + 1];
-            residual += re.abs() + im.abs();
+        }
+        for j in 0..m {
+            real[j] -= &scale * &expected[hh + 2 * (row * m + j)];
+            imaginary[j] -= &scale * &expected[hh + 2 * (row * m + j) + 1];
+            residual += real[j].abs() + imaginary[j].abs();
         }
     }
     let ceil = |v: &BigInt| {
@@ -351,7 +469,7 @@ pub struct NativeNormalMaterialReading {
     pub cross_source_error_upper: Rat,
     pub increments: [Rat; 4],
 }
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub struct NativeNormalMaterialState {
     pub material: NativeFieldMaterialTransportState,
     pub source_normal: Vec<Vec<ExactComplexWaveCurrent>>,
@@ -361,6 +479,46 @@ pub struct NativeNormalMaterialState {
     pub target_energy: Rat,
     pub target_energy_error: Rat,
     pub normal_residual_upper: Rat,
+}
+
+/// Immutable nonzero coefficient prior for a normal chart.  `cross_source` is
+/// `B_0 = W_0 H_0` and `target_energy` is `C_0 = ||W_0||²`; the observed
+/// `target_energy` retained in a state remains Q_data.  Keeping this operand
+/// separate prevents a prior from being reported as an observation.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
+pub struct NativeNormalPrior {
+    pub cross_source: Vec<Vec<ExactComplexWaveCurrent>>,
+    pub target_energy: Rat,
+}
+
+impl NativeNormalPrior {
+    pub fn from_coefficients(
+        coefficients: Vec<Vec<ExactComplexWaveCurrent>>,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        if coefficients.is_empty()
+            || coefficients
+                .iter()
+                .any(|row| row.len() != coefficients[0].len())
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let target_energy = coefficients
+            .iter()
+            .flatten()
+            .map(ExactComplexWaveCurrent::norm_square)
+            .sum();
+        Ok(Self {
+            cross_source: coefficients,
+            target_energy,
+        })
+    }
+
+    pub fn source_complex(&self) -> usize {
+        self.cross_source.first().map_or(0, Vec::len)
+    }
+    pub fn targets(&self) -> usize {
+        self.cross_source.len()
+    }
 }
 
 /// Cold objective comparison in the unit-prior source chart. This describes the observed
@@ -382,6 +540,56 @@ pub struct NativeNormalMaterialObjective {
 }
 
 impl NativeNormalMaterialState {
+    /// Evaluate the normal objective with a supplied immutable prior.  The resident
+    /// state carries total H/B, while its Q_data remains the observed/proxy-target
+    /// energy; this method forms B-B0 and adds C0 only for the objective.
+    pub fn objective_with_prior(
+        &self,
+        prior: &NativeNormalPrior,
+    ) -> Result<NativeNormalMaterialObjective, ConstitutiveFibreError> {
+        if prior.targets() != self.cross_source.len()
+            || prior.source_complex() != self.source_normal.len()
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let mut data = self.clone();
+        for (row, p) in data.cross_source.iter_mut().zip(&prior.cross_source) {
+            for (value, prior_value) in row.iter_mut().zip(p) {
+                *value = value.subtract(prior_value);
+            }
+        }
+        data.target_energy += &prior.target_energy;
+        data.objective()
+    }
+
+    /// Validate the prior's dimensions and the retained H-I/B-B0 split without
+    /// conflating its C0 with Q_data.  Source-family uncertainty remains separate.
+    pub fn validate_prior(&self, prior: &NativeNormalPrior) -> Result<(), ConstitutiveFibreError> {
+        if prior.targets() != self.cross_source.len()
+            || prior.source_complex() != self.source_normal.len()
+            || self
+                .source_normal
+                .iter()
+                .any(|row| row.len() != self.source_normal.len())
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        // Validate the observed source geometry as H-I. A nonzero prior does
+        // not require a fresh chart after observations have accumulated.
+        for i in 0..self.source_normal.len() {
+            for j in 0..self.source_normal.len() {
+                if self.source_normal[i][j] != self.source_normal[j][i].conjugate() {
+                    return Err(ConstitutiveFibreError::Uncertain);
+                }
+            }
+            let observed_diagonal = &self.source_normal[i][i].real - Rat::one();
+            if observed_diagonal.is_negative() {
+                return Err(ConstitutiveFibreError::Uncertain);
+            }
+        }
+        Ok(())
+    }
+
     /// Decode the signed numerical normal residual from its retained exact factors.
     /// Source/target family uncertainty remains in the separate normal and cross-source bounds.
     pub fn normal_residual(
@@ -712,27 +920,45 @@ fn decode_state_layout(
     })
 }
 
+/// The resident scalar keeps Q_data+C₀ so the existing CUDA normal-fit ABI can
+/// use the augmented reference bound.  Exterior inspection exposes Q_data alone;
+/// the prior remains an explicit sibling operand.
+pub(super) fn expose_data_energy(
+    mut state: NativeNormalMaterialState,
+    prior: Option<&NativeNormalPrior>,
+) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
+    if let Some(prior) = prior {
+        if state.target_energy < prior.target_energy {
+            return Err(ConstitutiveFibreError::Uncertain);
+        }
+        state.target_energy -= &prior.target_energy;
+    }
+    Ok(state)
+}
+
 mod direct;
 pub use direct::{
-    CompiledCoupledJoint, ConstitutiveComparisonSection, ConstitutiveSourceFrame,
-    ConstitutiveSourceRefusal, CoupledConstitutiveAlternative, CoupledConstitutiveFamily,
-    CoupledConstitutiveRefusal, CoupledConstitutiveRest, CoupledJointEvaluation,
-    CoupledJointReading, FamilyBasisReading, FamilyBasisSelection, NormalBasisScore,
-    NormalBasisSelection, NormalContinuationJoin, NormalContinuationPullback,
-    NormalCoupledAttachRefusal, NormalCoupledComparison, NormalCoupledObservation, NormalCoupledContact,
-    NormalCoupledContinuation, NormalCoupledPrediction, NormalCoupledProducingHandle,
-    NormalCoupledReception, NormalCoupledSourceActuation, NormalCoupledStep, NormalFamilyBasisFace,
+    BoundaryMaterialMaps, BoundaryMaterialSeed, CompiledCoupledJoint,
+    ConstitutiveComparisonSection, ConstitutiveSourceFrame, ConstitutiveSourceRefusal,
+    CoupledConstitutiveAlternative, CoupledConstitutiveFamily, CoupledConstitutiveRefusal,
+    CoupledConstitutiveRest, CoupledJointEvaluation, CoupledJointReading, FamilyBasisReading,
+    FamilyBasisSelection, NormalBasisScore, NormalBasisSelection, NormalContinuationJoin,
+    NormalContinuationPullback, NormalCoupledAttachRefusal, NormalCoupledComparison,
+    NormalCoupledContact, NormalCoupledContinuation, NormalCoupledObservation,
+    NormalCoupledPrediction, NormalCoupledProducingHandle, NormalCoupledReception,
+    NormalCoupledSourceActuation, NormalCoupledStep, NormalFamilyBasisFace,
     NormalFamilyComparisonRow, NormalFamilyPullback, NormalFamilyReceiverReading,
     NormalFamilySupport, NormalMaterialRest, NormalProducingHandle, NormalRealizationRefinement,
-    NormalReceiverCoordinates, NormalSourceActuation, NormalSourceChart, NormalWaveBasisChart,
-    NormalWaveBasisFace, NormalWaveBasisReading, NormalWaveComparison, NormalWaveComparisonReading,
-    NormalWaveCoupled, NormalWaveCurrent, NormalWaveDevelopment, NormalWaveFacePacket,
-    NormalWaveFamily, NormalWaveFamilyReceiver, NormalWaveFamilyRest, NormalWaveFibre,
-    NormalWaveJointSource, NormalWavePrediction, NormalWaveReading, NormalWaveReception,
-    NormalWaveReceptionReading, NormalWaveReference, NormalWaveReferenceReading, NormalWaveRest,
-    NormalWaveSeedKind, NormalWaveSeedRefusal, NormalWaveSource, NormalWaveStep,
-    NormalWaveTransport, NormalWaveTransportChange, NormalWaveWord, ResidentCoupledConstitutive,
-    ResidentHeldSection, ResidentHeldSectionRest, ResidentNormalEnclosure, ResidentNormalEnclosureSection, ResidentNormalEnclosureView, ResidentNormalInput,
-    ResidentNormalMaterial, ResidentNormalMaterialView, ResidentNormalReturn,
-    NormalSectionBasisFace, ResidentNormalSectionReturn, ResidentNormalWave,
+    NormalReceiverCoordinates, NormalSectionBasisFace, NormalSourceActuation, NormalSourceChart,
+    NormalWaveBasisChart, NormalWaveBasisFace, NormalWaveBasisReading, NormalWaveComparison,
+    NormalWaveComparisonReading, NormalWaveCoupled, NormalWaveCurrent, NormalWaveDevelopment,
+    NormalWaveFacePacket, NormalWaveFamily, NormalWaveFamilyReceiver, NormalWaveFamilyRest,
+    NormalWaveFibre, NormalWaveJointSource, NormalWavePrediction, NormalWaveReading,
+    NormalWaveReception, NormalWaveReceptionReading, NormalWaveReference,
+    NormalWaveReferenceReading, NormalWaveRest, NormalWaveSeedKind, NormalWaveSeedRefusal,
+    NormalWaveSource, NormalWaveStep, NormalWaveTransport, NormalWaveTransportChange,
+    NormalWaveWord, ResidentCoupledConstitutive, ResidentHeldSection, ResidentHeldSectionRest,
+    ResidentNormalEnclosure, ResidentNormalEnclosureSection, ResidentNormalEnclosureView,
+    ResidentNormalInput, ResidentNormalMaterial, ResidentNormalMaterialView, ResidentNormalReturn,
+    ResidentNormalSectionReturn, ResidentNormalWave,
 };

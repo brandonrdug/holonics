@@ -7,6 +7,7 @@ fn law() -> ConstitutiveFibreRest {
             target_width: 1,
             source_chart: ConstitutiveSourceChart::Linear,
             occurrences: 1,
+            source_only: false,
         },
         basis: ResidentSectionRest::found(
             2,

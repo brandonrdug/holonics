@@ -104,6 +104,9 @@ impl<'b, 'c> NativeFieldReflection<'b, 'c> {
         let surface = source.surface;
         let d = source.boundary_components();
         let k = source.births.len();
+        let covariance = source
+            ._producing
+            .ensure_covariance(surface, d, k, source.grain)?;
         let n = d / 6;
         if d % 6 != 0 || target.grain() != ResidentGrain(source.grain) {
             return Err(Error::Shape);
@@ -145,8 +148,8 @@ impl<'b, 'c> NativeFieldReflection<'b, 'c> {
                     &source._producing.map,
                     &after_b,
                     &bounds,
-                    &source._producing.covariance,
-                    &source._producing.moment_bounds,
+                    covariance,
+                    &source._producing.covariance.get().ok_or(Error::Uncertain)?.bound,
                     &forward,
                     &query,
                 ],

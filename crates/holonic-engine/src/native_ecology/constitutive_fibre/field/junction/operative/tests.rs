@@ -58,17 +58,27 @@ fn assert_fresh_moments(field: &NativeConstitutiveField<'_>) {
     let surface = field.relation.surface;
     let d = 6 * field.nodes();
     let m = d / 2;
-    let rebuilt = sections(surface, d, op.births.len()).unwrap();
+    op.sections
+        .ensure_covariance(surface, d, op.births.len(), op.grain)
+        .unwrap();
+    let covariance = surface.fresh_section(1, 4 * m * m, ResidentGrain(0)).unwrap();
+    let aggregate = surface.fresh_section(1, 2 * d, ResidentGrain(0)).unwrap();
+    let moment_bounds = surface.fresh_section(1, 8, ResidentGrain(0)).unwrap();
+    let rebuilt_moments = [&covariance, &aggregate, &moment_bounds];
     let rounds = surface.fresh_section(1, 2 * (m * m + m), ResidentGrain(0)).unwrap();
     let mut passage = surface.begin_passage(&[vec![]]).unwrap();
     {
         let lane = passage.open(0, &[]).unwrap();
         surface.record_operative_moments(&lane, d, op.births.len(), op.grain,
-            op.sections.current(), rebuilt.moments(), &rounds).unwrap();
+            op.sections.current(), rebuilt_moments, &rounds).unwrap();
     }
-    passage.close(0, &rebuilt.moment_bounds, 64).unwrap();
+    passage.close(0, &moment_bounds, 64).unwrap();
     assert!(passage.finish().unwrap().launch().unwrap().obstruction.is_empty());
-    for (actual, full) in op.sections.moments().into_iter().zip(rebuilt.moments()) {
+    for (actual, full) in [
+        &op.sections.covariance.get().unwrap().matrix,
+        &op.sections.aggregate,
+        &op.sections.covariance.get().unwrap().bound,
+    ].into_iter().zip(rebuilt_moments) {
         assert_eq!(surface.detach_section(actual, 64).unwrap(),
             surface.detach_section(full, 64).unwrap());
     }
@@ -237,8 +247,11 @@ fn coupled_return_stages_map_current_and_moments_without_partial_publication() {
     let exact = field.inspect_internal_currents().unwrap().unwrap();
     let view = field.stage_operative_contacts().unwrap();
     let original = serde_json::to_value(view.inspect().unwrap()).unwrap();
-    // The map update fits wide words, but its squared moment does not. The second lane refuses.
-    assert!(view.stage_return(returned(&view, true)).is_err());
+    // The map fits its carrier. Its optional squared-moment receiver does not: lazy
+    // realization refuses without installing a partial cache or changing the original map.
+    let large = view.stage_return(returned(&view, true)).unwrap();
+    assert!(large.inspect().is_err());
+    assert!(large.sections.covariance.get().is_none());
     assert_eq!(
         serde_json::to_value(view.inspect().unwrap()).unwrap(),
         original

@@ -88,6 +88,9 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
                 return Err(ConstitutiveFibreError::Shape);
             }
             let den = phase.cosine.denom().lcm(phase.sine.denom());
+            if den <= num_bigint::BigInt::from(0) {
+                return Err(ConstitutiveFibreError::Shape);
+            }
             let c = phase.cosine.numer() * (&den / phase.cosine.denom());
             let s = phase.sine.numer() * (&den / phase.sine.denom());
             let tuple = [
@@ -101,6 +104,73 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
         let rest = ResidentSectionRest::found(addresses.len(), 4, ResidentGrain(0), 64, values)
             .map_err(|_| ConstitutiveFibreError::Shape)?;
         self.surface.mount_section_rest(&rest).map_err(Into::into)
+    }
+    fn phase_adjoint_map(
+        &self,
+        addresses: &[usize],
+        phases: &[ExactWavePhaseTransport],
+        extent: usize,
+    ) -> Result<(ResidentSection<'c>, ResidentSection<'c>), ConstitutiveFibreError> {
+        if addresses.len() != self.rows
+            || phases.len() != addresses.len()
+            || addresses.is_empty()
+            || addresses.iter().any(|a| *a >= extent)
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let mut grouped = vec![Vec::<[(i64, i64); 4]>::new(); extent];
+        for (input, (&address, phase)) in addresses.iter().zip(phases).enumerate() {
+            if &phase.cosine * &phase.cosine + &phase.sine * &phase.sine != Rat::one() {
+                return Err(ConstitutiveFibreError::Shape);
+            }
+            let den = phase.cosine.denom().lcm(phase.sine.denom());
+            if den <= num_bigint::BigInt::from(0) {
+                return Err(ConstitutiveFibreError::Shape);
+            }
+            let c = phase.cosine.numer() * (&den / phase.cosine.denom());
+            let s = phase.sine.numer() * (&den / phase.sine.denom());
+            grouped[address].push([
+                (
+                    i64::try_from(input).map_err(|_| ConstitutiveFibreError::Shape)?,
+                    i64::try_from(input).map_err(|_| ConstitutiveFibreError::Shape)?,
+                ),
+                (
+                    c.to_i64().ok_or(ConstitutiveFibreError::Uncertain)?,
+                    c.to_i64().ok_or(ConstitutiveFibreError::Uncertain)?,
+                ),
+                (
+                    s.to_i64().ok_or(ConstitutiveFibreError::Uncertain)?,
+                    s.to_i64().ok_or(ConstitutiveFibreError::Uncertain)?,
+                ),
+                (
+                    den.to_i64().ok_or(ConstitutiveFibreError::Uncertain)?,
+                    den.to_i64().ok_or(ConstitutiveFibreError::Uncertain)?,
+                ),
+            ]);
+        }
+        let mut offsets = Vec::with_capacity(extent + 1);
+        offsets.push((0, 0));
+        let mut total = 0usize;
+        let mut entries = Vec::with_capacity(addresses.len() * 4);
+        for group in grouped {
+            total = total
+                .checked_add(group.len())
+                .ok_or(ConstitutiveFibreError::Shape)?;
+            offsets.push((
+                i64::try_from(total).map_err(|_| ConstitutiveFibreError::Shape)?,
+                i64::try_from(total).map_err(|_| ConstitutiveFibreError::Shape)?,
+            ));
+            entries.extend(group.into_iter().flatten());
+        }
+        let offsets = self.surface.mount_section_rest(
+            &ResidentSectionRest::found(extent + 1, 1, ResidentGrain(0), 64, offsets)
+                .map_err(|_| ConstitutiveFibreError::Shape)?,
+        )?;
+        let entries = self.surface.mount_section_rest(
+            &ResidentSectionRest::found(addresses.len(), 4, ResidentGrain(0), 64, entries)
+                .map_err(|_| ConstitutiveFibreError::Shape)?,
+        )?;
+        Ok((offsets, entries))
     }
     /// Gather the stated source rows and apply the existing exact unit phase on every channel.
     /// Optional enlargement appends exact zero coordinates, preserving the original radius.
@@ -168,12 +238,13 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
         if addresses.len() != self.rows {
             return Err(ConstitutiveFibreError::Shape);
         }
-        let map = self.phase_map(addresses, phases, output_rows)?;
+        let (offsets, entries) = self.phase_adjoint_map(addresses, phases, output_rows)?;
         let out = self.composition_output(output_rows, self.width)?;
         self.enact_composition(
             EnclosureComposition::GatherAdjoint {
                 input: &self.section,
-                map: &map,
+                offsets: &offsets,
+                entries: &entries,
                 components: self.width,
             },
             &[&out],

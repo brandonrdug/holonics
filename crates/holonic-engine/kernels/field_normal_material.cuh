@@ -88,19 +88,82 @@ __device__ void normal_fit_sources(int64_t *state,uint32_t m,uint32_t targets,ui
         a[ij]=i==j?add_checked(value,(wide)d,slot):value;
     }
     __syncthreads();if(*slot)return;
-    field_enclosed_factor(a,diag,d,grain,slot);if(*slot)return;
+    // Compile the actual proposal into its coupled coordinate block and independent
+    // diagonal remainder. All H/B statistics stay in their original chart, and the exact
+    // WH-B residual below still certifies the COMPLETE normal problem. A later observation
+    // can couple any of these coordinates; the decomposition is rebuilt for that successor.
+    __shared__ uint32_t coupled_dimension;
+    for(uint32_t i=threadIdx.x;i<d;i+=blockDim.x){
+        bool coupled=false;
+        for(uint32_t j=0;j<d&&!coupled;++j)if(i!=j&&a[(size_t)i*d+j]!=0)coupled=true;
+        diag[i]=coupled?1:0;
+    }
+    __syncthreads();
+    if(!threadIdx.x){
+        uint32_t count=0;
+        // In-place compaction writes only flags already consumed by this traversal.
+        for(uint32_t i=0;i<d;++i)if(diag[i])diag[count++]=(wide)i;
+        coupled_dimension=count;
+    }
+    __syncthreads();
+    const uint32_t f=coupled_dimension;
+    // For f<d the unused square tail has at least f words. Its map survives factorization.
+    wide *coordinate_map=f<d?a+(size_t)f*f:nullptr;
+    if(f<d){
+        for(uint32_t j=threadIdx.x;j<f;j+=blockDim.x)coordinate_map[j]=diag[j];
+        __syncthreads();
+        for(size_t ij=threadIdx.x;ij<(size_t)f*f;ij+=blockDim.x){
+            uint32_t i=(uint32_t)coordinate_map[ij/f],j=(uint32_t)coordinate_map[ij%f];
+            const int64_t *h=H+COMPLEX_MOMENT_WIRE_WORDS*((size_t)(i/2u)*m+j/2u);
+            wide value=normal_grid(normal_read(h+((i&1u)==(j&1u)?0u:MOMENT_WIRE_WORDS),slot),grain,false,slot);
+            if(!(i&1u)&&(j&1u))value=sub_checked(0,value,slot);
+            // Use the ORIGINAL d majorant, so this is the same numerical proposal.
+            a[ij]=i==j?add_checked(value,(wide)d,slot):value;
+        }
+        __syncthreads();if(*slot)return;
+    }
+    if(f)field_enclosed_factor(a,diag,f,grain,slot);
+    __syncthreads();if(*slot)return;
     for(uint32_t row=threadIdx.x;row<targets;row+=blockDim.x){
         wide *r=rhs+(size_t)row*d,*out=M+(size_t)row*d;bool nonzero=false;
-        for(uint32_t j=0;j<d;++j){MomentInteger b=normal_read(B+MOMENT_WIRE_WORDS*((size_t)row*d+j),slot);nonzero=nonzero||!b.is_zero();r[j]=normal_grid((j&1u)?-b:b,grain,false,slot);out[j]=0;}
-        if(nonzero){
-            field_enclosed_solve(a,diag,d,grain,r,out,slot);
-            for(uint32_t j=1;j<d;j+=2u)out[j]=sub_checked(0,out[j],slot);
+        for(uint32_t j=0;j<d;++j)out[j]=0;
+        for(uint32_t j=0;j<f;++j){
+            uint32_t original=f==d?j:(uint32_t)coordinate_map[j];
+            MomentInteger b=normal_read(B+MOMENT_WIRE_WORDS*((size_t)row*d+original),slot);
+            nonzero=nonzero||!b.is_zero();
+            r[j]=normal_grid((original&1u)?-b:b,grain,false,slot);
+        }
+        if(nonzero&&f){
+            field_enclosed_solve(a,diag,f,grain,r,out,slot);
+            // Ordered indices satisfy map[j]>=j. Reverse scattering therefore preserves
+            // every not-yet-consumed compressed coefficient without another matrix buffer.
+            for(uint32_t j=f;j-->0;){
+                uint32_t original=f==d?j:(uint32_t)coordinate_map[j];wide value=out[j];
+                if(original!=j)out[j]=0;
+                out[original]=(original&1u)?sub_checked(0,value,slot):value;
+            }
+        }
+        if(f<d){
+            uint32_t active=0;
+            for(uint32_t j=0;j<d;++j){
+                if(active<f&&(uint32_t)coordinate_map[active]==j){++active;continue;}
+                MomentInteger b=normal_read(B+MOMENT_WIRE_WORDS*((size_t)row*d+j),slot);
+                if(b.is_zero())continue;
+                nonzero=true;
+                const int64_t *h=H+COMPLEX_MOMENT_WIRE_WORDS*((size_t)(j/2u)*m+j/2u);
+                wide isolated_diagonal=add_checked(normal_grid(normal_read(h,slot),grain,false,slot),(wide)d,slot);
+                wide single_rhs=normal_grid((j&1u)?-b:b,grain,false,slot),solved=0;
+                field_enclosed_solve(&isolated_diagonal,&isolated_diagonal,1,grain,&single_rhs,&solved,slot);
+                out[j]=(j&1u)?sub_checked(0,solved,slot):solved;
+            }
         }
         MomentInteger residual;wide norm=0;
         for(uint32_t j=0;j<d;++j)norm=add_checked(norm,ft_abs(out[j],slot),slot);
+        uint32_t contributing=0;
+        if(nonzero)for(uint32_t k=0;k<m;++k)if(out[2u*k]!=0||out[2u*k+1u]!=0)r[contributing++]=(wide)k;
         if(nonzero)for(uint32_t j=0;j<m;++j){
             MomentInteger re,im;
-            for(uint32_t k=0;k<m;++k){const int64_t *h=H+COMPLEX_MOMENT_WIRE_WORDS*((size_t)k*m+j);
+            for(uint32_t at=0;at<contributing;++at){uint32_t k=(uint32_t)r[at];const int64_t *h=H+COMPLEX_MOMENT_WIRE_WORDS*((size_t)k*m+j);
                 normal_product(re,im,normal_wide(out[2u*k]),normal_wide(out[2u*k+1u]),normal_read(h,slot),normal_read(h+MOMENT_WIRE_WORDS,slot),false);}
             const int64_t *b=B+COMPLEX_MOMENT_WIRE_WORDS*((size_t)row*m+j);MomentInteger S=moment_lift(complete_power(grain,slot));
             re=re-S*normal_read(b,slot);im=im-S*normal_read(b+MOMENT_WIRE_WORDS,slot);
@@ -115,8 +178,10 @@ __device__ void normal_fit_sources(int64_t *state,uint32_t m,uint32_t targets,ui
         MomentInteger eh=normal_read(scalars,slot),eb=normal_read(scalars+MOMENT_WIRE_WORDS,slot),S=moment_lift(complete_power(grain,slot));
         if(eh.negative||eb.negative)atomicOr(slot,REFUSED_MALFORMED);
         MomentInteger bound=residual+normal_wide(norm)*eh+S*eb;
-        // A unit-prior minimizer P satisfies ||P||_F^2 <= target energy: compare its
-        // objective with the zero operator. Hence ||M-P|| <= ||M||_1+sqrt(C+EC),
+        // Pair P(I+sum f f*)=W0+sum y f* with P. Cauchy on (P,Pf) and (W0,y)
+        // bounds the fitted energy, hence ||P||_F^2, by C=||W0||_F^2+Q_data.
+        // AccumulatedNormalResponse proves this matrix-to-energy and Cauchy chain.
+        // Therefore ||M-P|| <= ||M||_1+sqrt(C+EC),
         // independently of source conditioning. Keep the tighter of two valid bounds.
         // Reuse the exact integer norm owner for an outward square root. The energy
         // numerator is at S^2, so its root is already at S. Compare before narrowing:

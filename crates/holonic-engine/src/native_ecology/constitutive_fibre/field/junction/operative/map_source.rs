@@ -345,13 +345,14 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
         let d = 6 * self.field.nodes();
         let source = self.field.operative_producing_map(h.source)?;
         let births = self.field.operative_birth_addresses(count)?;
-        let next = sections(surface, d, count)?;
+        let mut next = sections(surface, d, count)?;
+        Rc::get_mut(&mut next).ok_or(Error::Uncertain)?.factor_program =
+            self.sections.factor_program.clone();
         let history_words = 2 * std::mem::size_of::<i128>() / std::mem::size_of::<i64>() + 1;
         let scratch =
             surface.fresh_section(d / 2, 2 * history_words * count.max(1), ResidentGrain(0))?;
         let rounds = surface.fresh_section(1, d, ResidentGrain(0))?;
-        let moments =
-            surface.fresh_section(1, 2 * ((d / 2) * (d / 2) + d / 2), ResidentGrain(0))?;
+        let moments = surface.fresh_section(1, d, ResidentGrain(0))?;
         let mut passage = surface.begin_passage(&[vec![], vec![0], vec![1]])?;
         {
             let lane = passage.open(0, &[])?;
@@ -391,13 +392,14 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
         passage.close(1, &next.bounds, 64)?;
         {
             let lane = passage.open(2, &[1])?;
-            surface.record_operative_moments(
+            surface.record_operative_aggregate(
                 &lane,
                 d,
                 count,
                 self.grain,
                 next.current(),
-                next.moments(),
+                &next.aggregate,
+                &next.moment_bounds,
                 &moments,
             )?;
         }
@@ -423,6 +425,7 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
             origin: Rc::new(()),
             grain: self.grain,
             births: self.births.clone(),
+            declared_origins: self.declared_origins.clone(),
             sections: next,
             returns,
             program: Some(program),

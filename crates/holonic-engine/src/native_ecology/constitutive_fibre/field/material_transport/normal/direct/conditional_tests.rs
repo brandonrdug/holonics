@@ -34,7 +34,7 @@ fn conditional_joint_map_preserves_shared_radius_and_affine_tail() {
     let rest = normal.rest().unwrap();
     let mut words = wides(&rest.state().intervals).unwrap();
     words[..6].copy_from_slice(&[0, scale, 2 * scale, 0, scale, -scale]);
-    let view = ResidentNormalMaterialView {
+    let view = ResidentNormalMaterialView { prior: None,
         surface: &surface,
         state: Rc::new(mount(&surface, &words)),
         source_chart: NormalSourceChart::Features { source_complex: 3 },
@@ -124,7 +124,7 @@ fn conditional_joint_map_preserves_shared_radius_and_affine_tail() {
     }
     // Zero A removes boundary uncertainty but must not discard the uncertain interior.
     words[..6].fill(0);
-    let zero = ResidentNormalMaterialView {
+    let zero = ResidentNormalMaterialView { prior: None,
         state: Rc::new(mount(&surface, &words)),
         ..view
     };
@@ -155,7 +155,7 @@ fn incoming_reaction_cancels_the_same_source_before_bounding(){
     let ro=ResidentReadout::new().unwrap();let surface=ResidentSurface::on(&ro).unwrap();let grain=ResidentGrain(16);let scale=1i128<<16;
     let normal=ResidentNormalMaterial::found_features(&surface,3,1,grain).unwrap();let rest=normal.rest().unwrap();
     let mut words=wides(&rest.state().intervals).unwrap();words[..6].copy_from_slice(&[-scale,0,2*scale,0,0,0]);
-    let material=ResidentNormalMaterialView{surface:&surface,state:Rc::new(mount(&surface,&words)),source_chart:NormalSourceChart::Features{source_complex:3},targets:1,grain,observations:0};
+    let material=ResidentNormalMaterialView{prior:None,surface:&surface,state:Rc::new(mount(&surface,&words)),source_chart:NormalSourceChart::Features{source_complex:3},targets:1,grain,observations:0};
     let input=mount(&surface,&[scale,2*scale,scale]);
     let input=ResidentNormalEnclosureView{surface:&surface,section:&input,offset:0,width:2,grain};
     let h=surface.mount_section_rest(&ResidentSectionRest::found(1,2,ResidentGrain(0),64,vec![(1,1),(0,0)]).unwrap()).unwrap();

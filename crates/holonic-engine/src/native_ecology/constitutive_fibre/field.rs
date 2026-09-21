@@ -16,17 +16,30 @@ use crate::dimensional_wave::ExactComplexWaveCurrent;
 use std::rc::Rc;
 
 mod archive;
-mod current_history_source;
-mod contextual_lift;
 mod context_section;
+mod contextual_lift;
+mod current_history_source;
 pub use contextual_lift::{
     NativeContextContrastInspection, NativeContextContrastStatus, NativeContextualLiftInspection,
 };
+mod incident_section;
 mod internal_current;
 mod internal_mode;
 mod junction;
+pub use junction::{
+    NativeFieldAction, NativeFieldActionFactorization, NativeFieldActionPullback,
+    NativeFieldContactOrigin, NativeFieldDeclaredIncidence, NativeFieldGlobalMaterialCommit,
+    NativeFieldJointCurrentCommit, NativeFieldJointLayout, NativeFieldMatrixFreeAction,
+};
 mod material_transport;
-pub(crate) use material_transport::normal::{feature_state_words as normal_feature_state_words, feature_report_words as normal_feature_report_words, feature_workspace_words as normal_feature_workspace_words, state_words as normal_material_state_words, report_words as normal_material_report_words, workspace_words as normal_material_workspace_words};
+pub(crate) use material_transport::normal::{
+    feature_report_words as normal_feature_report_words,
+    feature_state_words as normal_feature_state_words,
+    feature_workspace_words as normal_feature_workspace_words,
+    report_words as normal_material_report_words, state_words as normal_material_state_words,
+    workspace_words as normal_material_workspace_words,
+};
+pub use material_transport::{BoundaryMaterialMaps, BoundaryMaterialSeed, NativeNormalPrior};
 mod receiver;
 mod rechart;
 mod relation_current;
@@ -45,38 +58,69 @@ pub use internal_mode::{
     NativeSharedDriveMode, NativeSharedDriveModeReading, NativeSharedDriveModeRest,
     NativeSharedDriveModeReturn,
 };
-pub use junction::{NativeOperativeCurrentFactorCondensation,NativeOperativeReturnStorage,
-    NativeFieldCurrentBall, NativeFieldCurrentSource, NativeFieldCurrentSourceRest, NativeFieldReflectionTarget, NativeFieldReflection, NativeFieldReflectionSection, NativeFieldEnclosedJunctionReading, NativeFieldExactJunctionReading,
-    NativeFieldInternalCurrent, NativeFieldInternalCurrentBall, NativeFieldJunctionReading,
-    NativeFieldJunctionRepresentation, NativeFieldJunctionSolver,
-    PairedContactCotangent, PairedJunctionCotangent, PairedJunctionLinearization, PairedJunctionTangent,
+pub use junction::{
     CausalContactPropagation, CausalContactPropagationCotangent, CausalContactPropagationEnclosure,
-    NativeCausalContactPropagation,NativeCausalContactPropagationReading,NativeCausalContactJoinReading,
-    JointMaterialContactResponse,joint_material_contact,
-    NativeOperativeContactBirth, NativeOperativeContactReading, NativeOperativeContactStaging, NativeOperativeReflectionReading,
-    NativeMaterialResponseChart, NativeMaterialContactResponse, NativeMaterialContactResponseReading, NativeRetainedMaterialRelation, NativeMaterialContactStepComparison, NativeFiniteMaterialResponse,
-    NativeContactRealization,
-    NativeContactDepositReading,
+    JointMaterialContactResponse, NativeCausalContactJoinReading, NativeCausalContactPropagation,
+    NativeCausalContactPropagationReading, NativeContactDepositReading, NativeContactRealization,
+    NativeFieldCurrentBall, NativeFieldCurrentSource, NativeFieldCurrentSourceRest,
+    NativeFieldEnclosedJunctionReading, NativeFieldExactJunctionReading,
+    NativeFieldInternalCurrent, NativeFieldInternalCurrentBall, NativeFieldJunctionReading,
+    NativeFieldJunctionRepresentation, NativeFieldJunctionSolver, NativeFieldReflection,
+    NativeFieldReflectionSection, NativeFieldReflectionTarget, NativeFiniteMaterialResponse,
+    NativeMaterialContactResponse, NativeMaterialContactResponseReading,
+    NativeMaterialContactStepComparison, NativeMaterialResponseChart, NativeOperativeContactBirth,
+    NativeOperativeContactReading, NativeOperativeContactStaging,
+    NativeOperativeCurrentFactorCondensation, NativeOperativeReflectionReading,
+    NativeOperativeReturnStorage, NativeRetainedMaterialRelation, PairedContactCotangent,
+    PairedJunctionCotangent, PairedJunctionLinearization, PairedJunctionTangent,
+    joint_material_contact,
 };
 use junction::{PairedJunction, PendingJunction};
-use material_transport::{MaterialTransport, PendingMaterialTransport};
-pub use material_transport::{NormalSourceChart,
-    NativeMaterialReportPacking, NativeMaterialReportPackingRest,
-    NativeCompleteMaterialTransportReading, NativeCompleteMaterialTransportState,
-    NativeFieldExactMaterialTransport, NativeFieldMaterialTransportReading,
-    NativeFieldMaterialTransportResidual, NativeFieldMaterialTransportState,
-    NativeMaterialModeComponent, NativeMaterialModeDifferential, NativeMaterialModeReading,
-    NativeMaterialModeReturn, NativeMaterialModeUnfolding, NativeMaterialTransportSource,
-    NativeMaterialTarget, NormalSectionBasisFace,
-    NativeNormalMaterialObjective, NativeNormalMaterialReading, NativeNormalMaterialState, ResidentNormalMaterial, ResidentNormalMaterialView, NormalMaterialRest, NormalRealizationRefinement, ResidentNormalReturn, ResidentNormalWave, NormalWaveWord, NormalWaveCoupled, NormalCoupledAttachRefusal, NormalCoupledContact, NormalCoupledStep, NormalCoupledReception, NormalCoupledSourceActuation, NormalCoupledProducingHandle, NormalCoupledPrediction, NormalCoupledComparison, NormalCoupledObservation, ConstitutiveComparisonSection, ConstitutiveSourceFrame, ResidentCoupledConstitutive, CoupledConstitutiveRefusal, ConstitutiveSourceRefusal, CoupledConstitutiveRest, NormalCoupledContinuation, NormalContinuationPullback, NormalContinuationJoin, CoupledConstitutiveFamily, CoupledConstitutiveAlternative, CompiledCoupledJoint, CoupledJointEvaluation, CoupledJointReading, NormalFamilyComparisonRow, NormalWaveCurrent, NormalWaveFibre, NormalWaveStep, NormalWaveReading, NormalWaveRest, NormalWaveSeedRefusal, NormalWaveSeedKind, NormalWaveReception, NormalWaveReceptionReading, NormalWaveDevelopment, NormalSourceActuation, NormalProducingHandle, NormalWavePrediction, NormalWaveComparison, NormalWaveComparisonReading, NormalWaveTransport, NormalWaveTransportChange, NormalWaveReference, NormalWaveReferenceReading, NormalWaveBasisChart, NormalWaveBasisFace, NormalWaveBasisReading, NormalBasisSelection, NormalBasisScore, NormalWaveSource, NormalWaveJointSource, NormalReceiverCoordinates,NormalWaveFacePacket, NormalFamilyPullback, NormalWaveFamily, NormalWaveFamilyRest, NormalFamilyBasisFace, FamilyBasisSelection, FamilyBasisReading, NormalFamilySupport, NormalFamilyReceiverReading, NormalWaveFamilyReceiver, ResidentNormalSectionReturn, ResidentNormalInput, ResidentHeldSection, ResidentHeldSectionRest, ResidentNormalEnclosure, ResidentNormalEnclosureView, NativeMomentMaterialReading, NativeContextualMaterialReading, NativeOperativeContextReading, NativeVisibleSourceReading,
-};
-pub use receiver::{NativeFieldDifferentialReading, NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn,
-    NativeMaterialPacketReading, NativePacketQuadrature, NativeMaterialActuation,
-    NativeMaterialPullbackMetric, NativeMaterialSourcePullback, NativeMaterialSourcePullbackReading,
-    NativePhaseParticipation, NativePhaseParticipationAdjoint, NativeNormalizedFaceMeasure, NativeNormalizedSection, NativeNormalizedSectionPullback,
-    NativeNormalizedSectionPullbackReading, NativeNormalizedSectionRowReading};
-pub use resident_input::NativeFieldIncoming;
 pub use material_transport::ResidentNormalEnclosureSection;
+pub use material_transport::{
+    CompiledCoupledJoint, ConstitutiveComparisonSection, ConstitutiveSourceFrame,
+    ConstitutiveSourceRefusal, CoupledConstitutiveAlternative, CoupledConstitutiveFamily,
+    CoupledConstitutiveRefusal, CoupledConstitutiveRest, CoupledJointEvaluation,
+    CoupledJointReading, FamilyBasisReading, FamilyBasisSelection,
+    NativeCompleteMaterialTransportReading, NativeCompleteMaterialTransportState,
+    NativeContextualMaterialReading, NativeFieldExactMaterialTransport,
+    NativeFieldMaterialTransportReading, NativeFieldMaterialTransportResidual,
+    NativeFieldMaterialTransportState, NativeMaterialModeComponent, NativeMaterialModeDifferential,
+    NativeMaterialModeReading, NativeMaterialModeReturn, NativeMaterialModeUnfolding,
+    NativeMaterialReportPacking, NativeMaterialReportPackingRest, NativeMaterialTarget,
+    NativeMaterialTransportSource, NativeMomentMaterialReading, NativeNormalMaterialObjective,
+    NativeNormalMaterialReading, NativeNormalMaterialState, NativeOperativeContextReading,
+    NativeVisibleSourceReading, NormalBasisScore, NormalBasisSelection, NormalContinuationJoin,
+    NormalContinuationPullback, NormalCoupledAttachRefusal, NormalCoupledComparison,
+    NormalCoupledContact, NormalCoupledContinuation, NormalCoupledObservation,
+    NormalCoupledPrediction, NormalCoupledProducingHandle, NormalCoupledReception,
+    NormalCoupledSourceActuation, NormalCoupledStep, NormalFamilyBasisFace,
+    NormalFamilyComparisonRow, NormalFamilyPullback, NormalFamilyReceiverReading,
+    NormalFamilySupport, NormalMaterialRest, NormalProducingHandle, NormalRealizationRefinement,
+    NormalReceiverCoordinates, NormalSectionBasisFace, NormalSourceActuation, NormalSourceChart,
+    NormalWaveBasisChart, NormalWaveBasisFace, NormalWaveBasisReading, NormalWaveComparison,
+    NormalWaveComparisonReading, NormalWaveCoupled, NormalWaveCurrent, NormalWaveDevelopment,
+    NormalWaveFacePacket, NormalWaveFamily, NormalWaveFamilyReceiver, NormalWaveFamilyRest,
+    NormalWaveFibre, NormalWaveJointSource, NormalWavePrediction, NormalWaveReading,
+    NormalWaveReception, NormalWaveReceptionReading, NormalWaveReference,
+    NormalWaveReferenceReading, NormalWaveRest, NormalWaveSeedKind, NormalWaveSeedRefusal,
+    NormalWaveSource, NormalWaveStep, NormalWaveTransport, NormalWaveTransportChange,
+    NormalWaveWord, ResidentCoupledConstitutive, ResidentHeldSection, ResidentHeldSectionRest,
+    ResidentNormalEnclosure, ResidentNormalEnclosureView, ResidentNormalInput,
+    ResidentNormalMaterial, ResidentNormalMaterialView, ResidentNormalReturn,
+    ResidentNormalSectionReturn, ResidentNormalWave,
+};
+use material_transport::{MaterialTransport, PendingMaterialTransport};
+pub use receiver::{
+    NativeFieldDifferentialReading, NativeMaterialActuation, NativeMaterialPacketReading,
+    NativeMaterialPullbackMetric, NativeMaterialSourcePullback,
+    NativeMaterialSourcePullbackReading, NativeNormalizedFaceMeasure,
+    NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn, NativeNormalizedSection,
+    NativeNormalizedSectionPullback, NativeNormalizedSectionPullbackReading,
+    NativeNormalizedSectionRowReading, NativePacketQuadrature, NativePhaseParticipation,
+    NativePhaseParticipationAdjoint,
+};
+pub use resident_input::NativeFieldIncoming;
 pub use rest::NativeFieldRest;
 
 /// One actual emitted source from this live body. It is linear; the caller cannot manufacture
@@ -100,7 +144,10 @@ pub struct NativeFieldSourceAnchor {
 pub enum NativeFieldSourceContact {
     Emission,
     RetainedAnchor,
-    MaterialActuation { quadrature:NativePacketQuadrature, coordinate:usize },
+    MaterialActuation {
+        quadrature: NativePacketQuadrature,
+        coordinate: usize,
+    },
 }
 
 #[derive(Debug)]
@@ -108,19 +155,30 @@ pub struct NativeFieldOccurrence {
     incoming: Vec<NativePhaseCurrent>,
     source: Option<NativeFieldEmission>,
     anchor: Option<NativeFieldSourceAnchor>,
-    actuation:Option<NativeMaterialActuation>,
+    actuation: Option<NativeMaterialActuation>,
 }
 
 impl NativeFieldOccurrence {
-    pub fn actuating(source:NativeFieldEmission,incoming:Vec<NativePhaseCurrent>,actuation:NativeMaterialActuation)->Self{
-        Self{incoming,source:Some(source),anchor:None,actuation:Some(actuation)}
+    pub fn actuating(
+        source: NativeFieldEmission,
+        incoming: Vec<NativePhaseCurrent>,
+        actuation: NativeMaterialActuation,
+    ) -> Self {
+        Self {
+            incoming,
+            source: Some(source),
+            anchor: None,
+            actuation: Some(actuation),
+        }
     }
-    pub fn material_actuation(&self)->Option<&NativeMaterialActuation>{self.actuation.as_ref()}
+    pub fn material_actuation(&self) -> Option<&NativeMaterialActuation> {
+        self.actuation.as_ref()
+    }
 
     pub fn entering(incoming: Vec<NativePhaseCurrent>) -> Self {
         Self {
             incoming,
-            actuation:None,
+            actuation: None,
             source: None,
             anchor: None,
         }
@@ -128,7 +186,7 @@ impl NativeFieldOccurrence {
     pub fn through(source: NativeFieldEmission, incoming: Vec<NativePhaseCurrent>) -> Self {
         Self {
             incoming,
-            actuation:None,
+            actuation: None,
             source: Some(source),
             anchor: None,
         }
@@ -141,7 +199,7 @@ impl NativeFieldOccurrence {
     ) -> Self {
         Self {
             incoming,
-            actuation:None,
+            actuation: None,
             source: None,
             anchor: Some(anchor.clone()),
         }
@@ -174,8 +232,15 @@ pub struct NativeFieldLineage {
 
 impl NativeFieldLineage {
     /// An applied transport retains its source edge without adding an observed relation.
-    pub fn observed_source(&self)->Option<usize>{
-        if matches!(self.source_contact,Some(NativeFieldSourceContact::MaterialActuation{..})){None}else{self.received_from}
+    pub fn observed_source(&self) -> Option<usize> {
+        if matches!(
+            self.source_contact,
+            Some(NativeFieldSourceContact::MaterialActuation { .. })
+        ) {
+            None
+        } else {
+            self.received_from
+        }
     }
 }
 
@@ -282,6 +347,14 @@ impl<'chart> NativeConstitutiveField<'chart> {
         surface: &'chart ResidentSurface<'chart>,
         material: Vec<NativeJunctionSeed>,
     ) -> Result<Self, ConstitutiveFibreError> {
+        Self::found_with_mode(surface, material, false)
+    }
+
+    fn found_with_mode(
+        surface: &'chart ResidentSurface<'chart>,
+        material: Vec<NativeJunctionSeed>,
+        source_only: bool,
+    ) -> Result<Self, ConstitutiveFibreError> {
         let nodes = material.len();
         let source_width = nodes.checked_mul(4).ok_or(ConstitutiveFibreError::Shape)?;
         let target_width = nodes.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?;
@@ -293,7 +366,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         if nodes == 0 {
             return Err(ConstitutiveFibreError::Shape);
         }
-        if scratch > available as usize {
+        if !source_only && scratch > available as usize {
             return Err(ConstitutiveFibreError::ScratchAperture {
                 required: scratch,
                 available,
@@ -302,7 +375,11 @@ impl<'chart> NativeConstitutiveField<'chart> {
         for node in &material {
             node.validate()?;
         }
-        let relation = ResidentConstitutiveFibre::found(surface, source_width, target_width)?;
+        let relation = if source_only {
+            ResidentConstitutiveFibre::found_source_only(surface, source_width, target_width)?
+        } else {
+            ResidentConstitutiveFibre::found(surface, source_width, target_width)?
+        };
         let mut seed_words = Vec::new();
         let mut memory_words = Vec::new();
         for node in &material {
@@ -612,6 +689,11 @@ impl<'chart> NativeConstitutiveField<'chart> {
             &NativeFieldOccurrence,
         ) -> Result<Observed, ConstitutiveFibreError>,
     ) -> Result<(NativeFieldContinuation, Observed), ConstitutiveFibreError> {
+        if self.relation.source_only() {
+            return Err(ConstitutiveFibreError::Rest(
+                "source-only field has no legacy constitutive advance".into(),
+            ));
+        }
         if !self.relation.usable || self.pending.is_some() {
             return Err(ConstitutiveFibreError::Uncertain);
         }
@@ -641,13 +723,28 @@ impl<'chart> NativeConstitutiveField<'chart> {
         } else {
             None
         };
-        let actuation=if let Some(a)=&occurrence.actuation {
-            let source=occurrence.source.as_ref().ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
-            if resident_current.is_some() || !a.describes_source(source) || !Rc::ptr_eq(&self.owner,&a.owner)
-                || Some(a.reading.target_chart)!=self.material_target(){return Err(ConstitutiveFibreError::ForeignOccurrence);}
-            Some((a.reading.quadrature,a.reading.selected.ok_or(ConstitutiveFibreError::Uncertain)?))
-        }else{None};
-        let observed_source_at=if actuation.is_some(){None}else{source_at};
+        let actuation = if let Some(a) = &occurrence.actuation {
+            let source = occurrence
+                .source
+                .as_ref()
+                .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
+            if resident_current.is_some()
+                || !a.describes_source(source)
+                || !Rc::ptr_eq(&self.owner, &a.owner)
+                || Some(a.reading.target_chart) != self.material_target()
+            {
+                return Err(ConstitutiveFibreError::ForeignOccurrence);
+            }
+            Some((
+                a.reading.quadrature,
+                a.reading
+                    .selected
+                    .ok_or(ConstitutiveFibreError::Uncertain)?,
+            ))
+        } else {
+            None
+        };
+        let observed_source_at = if actuation.is_some() { None } else { source_at };
         if let Some(at) = source_at {
             self.mount_history_source(at)?;
         }
@@ -656,9 +753,11 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .occurrences
             .checked_add(1)
             .ok_or(ConstitutiveFibreError::Shape)?;
-        if observed_source_at.is_some() {if let Some(o)=self.junction.as_mut().and_then(|j|j.operative.as_mut()) {
-            o.reserve_birth()?;
-        }}
+        if observed_source_at.is_some() {
+            if let Some(o) = self.junction.as_mut().and_then(|j| j.operative.as_mut()) {
+                o.reserve_birth()?;
+            }
+        }
         self.history
             .try_reserve(1)
             .map_err(|_| ConstitutiveFibreError::Shape)?;
@@ -668,16 +767,23 @@ impl<'chart> NativeConstitutiveField<'chart> {
             frame: self.frame.view.ordinal,
             predecessor_state: at.checked_sub(1),
             received_from: source_at,
-            source_contact: if let Some((quadrature,coordinate))=actuation {Some(NativeFieldSourceContact::MaterialActuation{quadrature,coordinate})}else{occurrence
-                .source
-                .as_ref()
-                .map(|_| NativeFieldSourceContact::Emission)
-                .or_else(|| {
-                    occurrence
-                        .anchor
-                        .as_ref()
-                        .map(|_| NativeFieldSourceContact::RetainedAnchor)
-                })},
+            source_contact: if let Some((quadrature, coordinate)) = actuation {
+                Some(NativeFieldSourceContact::MaterialActuation {
+                    quadrature,
+                    coordinate,
+                })
+            } else {
+                occurrence
+                    .source
+                    .as_ref()
+                    .map(|_| NativeFieldSourceContact::Emission)
+                    .or_else(|| {
+                        occurrence
+                            .anchor
+                            .as_ref()
+                            .map(|_| NativeFieldSourceContact::RetainedAnchor)
+                    })
+            },
             incoming: if resident_current.is_some() {
                 NativeFieldIncoming::Resident {
                     resident_nodes: self.nodes(),
@@ -712,25 +818,47 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .and_then(|v| v.checked_add(9))
             .ok_or(ConstitutiveFibreError::Shape)?;
         let output = surface.fresh_section(1, output_width, ResidentGrain(0))?;
-        if self.transport.as_ref().is_some_and(|t|!t.source.is_operative()) && self.junction.as_ref().and_then(|j|j.operative.as_ref()).is_some_and(|o|!o.has_legacy_current_decoder()) {
-            return Err(ConstitutiveFibreError::Rest("this material source requires the operative current decoder".into()));
+        if self
+            .transport
+            .as_ref()
+            .is_some_and(|t| !t.source.is_operative())
+            && self
+                .junction
+                .as_ref()
+                .and_then(|j| j.operative.as_ref())
+                .is_some_and(|o| !o.has_legacy_current_decoder())
+        {
+            return Err(ConstitutiveFibreError::Rest(
+                "this material source requires the operative current decoder".into(),
+            ));
         }
         #[cfg(test)]
         let fused_contextual = self.fused_contextual;
         #[cfg(not(test))]
         let fused_contextual = false;
-        let material_target=self.transport.as_ref().map_or((self.nodes(),0),|t|(t.target.dimension(self.nodes()).unwrap(),t.target.kernel()));
+        let material_target = self.transport.as_ref().map_or((self.nodes(), 0), |t| {
+            (t.target.dimension(self.nodes()).unwrap(), t.target.kernel())
+        });
         let prepared = self.prepare_junction(observed_source_at.is_some())?;
         let prepared_transport = self.prepare_material_transport(observed_source_at)?;
-        let actuation_target=actuation.map(|_|surface.fresh_section(1,4*material_target.0+2,ResidentGrain(0))).transpose()?;
-        let propagation=prepared.as_ref().and_then(|(p,_)|p.operative.as_ref()).and_then(|p|p.propagation.as_ref());
-        let mut lineage_lanes=Vec::new();
-        if resident_current.is_some(){lineage_lanes.push(vec![]);}
-        let propagation_lane=propagation.map(|_| {
-            let index=lineage_lanes.len();lineage_lanes.push(index.checked_sub(1).into_iter().collect());index
+        let actuation_target = actuation
+            .map(|_| surface.fresh_section(1, 4 * material_target.0 + 2, ResidentGrain(0)))
+            .transpose()?;
+        let propagation = prepared
+            .as_ref()
+            .and_then(|(p, _)| p.operative.as_ref())
+            .and_then(|p| p.propagation.as_ref());
+        let mut lineage_lanes = Vec::new();
+        if resident_current.is_some() {
+            lineage_lanes.push(vec![]);
+        }
+        let propagation_lane = propagation.map(|_| {
+            let index = lineage_lanes.len();
+            lineage_lanes.push(index.checked_sub(1).into_iter().collect());
+            index
         });
-        let field_lane=lineage_lanes.len();
-        let predecessors=field_lane.checked_sub(1).into_iter().collect::<Vec<_>>();
+        let field_lane = lineage_lanes.len();
+        let predecessors = field_lane.checked_sub(1).into_iter().collect::<Vec<_>>();
         lineage_lanes.push(predecessors.clone());
         let mut passage = surface.begin_passage(&lineage_lanes)?;
         if let Some(current) = resident_current {
@@ -740,18 +868,35 @@ impl<'chart> NativeConstitutiveField<'chart> {
             }
             passage.close(0, &input, 64)?;
         }
-        if let Some(index)=propagation_lane {
-            let word=propagation.unwrap();
-            {let lane=passage.open(index,&lineage_lanes[index])?;
-                let op=self.junction.as_ref().unwrap().operative.as_ref().unwrap();
-                word.record(surface,&lane,op.sections.current(),self.nodes(),op.grain)?;
+        if let Some(index) = propagation_lane {
+            let word = propagation.unwrap();
+            {
+                let lane = passage.open(index, &lineage_lanes[index])?;
+                let op = self.junction.as_ref().unwrap().operative.as_ref().unwrap();
+                word.record(
+                    surface,
+                    &lane,
+                    op.sections.current(),
+                    self.nodes(),
+                    op.grain,
+                )?;
             }
-            passage.close(index,&word.bounds,64)?;
+            passage.close(index, &word.bounds, 64)?;
         }
         {
             let lane = passage.open(field_lane, &predecessors)?;
-            if let Some((quadrature,coordinate))=actuation {
-                surface.record_material_actuation(&lane,&input,self.nodes(),material_target.0,material_target.1,self.transport_grain()?,quadrature,coordinate,actuation_target.as_ref().unwrap())?;
+            if let Some((quadrature, coordinate)) = actuation {
+                surface.record_material_actuation(
+                    &lane,
+                    &input,
+                    self.nodes(),
+                    material_target.0,
+                    material_target.1,
+                    self.transport_grain()?,
+                    quadrature,
+                    coordinate,
+                    actuation_target.as_ref().unwrap(),
+                )?;
             }
             if let Some(refresh) = prepared_transport.as_ref().and_then(|p| p.refresh.as_ref()) {
                 if let Some(weights) = &refresh.moment_weights {
@@ -829,7 +974,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
                             &next.delta,
                             next.report.as_ref(),
                             old.source.kernel(),
-                            next.normal_workspace.as_ref().or_else(||next.refresh.as_ref().map(|r| &r.output)),
+                            next.normal_workspace
+                                .as_ref()
+                                .or_else(|| next.refresh.as_ref().map(|r| &r.output)),
                         )
                     }),
                 at as u64,
@@ -837,8 +984,22 @@ impl<'chart> NativeConstitutiveField<'chart> {
                     .as_ref()
                     .and_then(|p| p.moment.as_ref())
                     .map(|p| (&p.table, p.count, &p.weights)),
-                prepared_transport.as_ref().and_then(|p|p.contextual.as_ref()).map(|p|(&p.table,&p.weights,&p.evaluations,observed_source_at.unwrap_or(0) as u64,(!fused_contextual).then_some(&p.commit))),
-                prepared.as_ref().and_then(|(p,_)|p.operative.as_ref()).map(|p|&p.table),
+                prepared_transport
+                    .as_ref()
+                    .and_then(|p| p.contextual.as_ref())
+                    .map(|p| {
+                        (
+                            &p.table,
+                            &p.weights,
+                            &p.evaluations,
+                            observed_source_at.unwrap_or(0) as u64,
+                            (!fused_contextual).then_some(&p.commit),
+                        )
+                    }),
+                prepared
+                    .as_ref()
+                    .and_then(|(p, _)| p.operative.as_ref())
+                    .map(|p| &p.table),
                 material_target,
                 &output,
             )?;
@@ -854,7 +1015,10 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 transport: prepared_transport
                     .as_ref()
                     .map(|next| Rc::clone(&next.report)),
-                operative: prepared.as_ref().and_then(|(p,_)|p.operative.as_ref()).map(|p|p.history()),
+                operative: prepared
+                    .as_ref()
+                    .and_then(|(p, _)| p.operative.as_ref())
+                    .map(|p| p.history()),
             }),
             lineage: lineage.clone(),
             frame: Rc::clone(&self.frame),
@@ -894,8 +1058,13 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 .as_ref()
                 .expect("existing junction")
                 .representation;
-            let mut operative=self.junction.as_mut().unwrap().operative.take();
-            if let Some(pending)=next.operative.take() {operative.as_mut().unwrap().receive(pending,observed_source_at,at);}
+            let mut operative = self.junction.as_mut().unwrap().operative.take();
+            if let Some(pending) = next.operative.take() {
+                operative
+                    .as_mut()
+                    .unwrap()
+                    .receive(pending, observed_source_at, at);
+            }
             self.junction = Some(PairedJunction {
                 representation,
                 solver: self.junction.as_ref().expect("existing junction").solver,
@@ -907,11 +1076,16 @@ impl<'chart> NativeConstitutiveField<'chart> {
         }
         self.relation.occurrences = next;
         if let Some(pending) = self.pending_transport.take() {
-            let transport = self.transport.as_mut().expect("completed material transport");
+            let transport = self
+                .transport
+                .as_mut()
+                .expect("completed material transport");
             if transport.source == NativeMaterialTransportSource::OperativeNormal {
                 // The successful kernel has already produced this complete finite normal fit.
                 // Transfer its immutable staging, rather than solving it again in the adjoint.
-                transport.recent_normal_producers.push_back((at, Rc::new(pending.delta)));
+                transport
+                    .recent_normal_producers
+                    .push_back((at, Rc::new(pending.delta)));
                 while transport.recent_normal_producers.len() > 2 {
                     transport.recent_normal_producers.pop_front();
                 }

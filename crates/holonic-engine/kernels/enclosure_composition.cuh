@@ -59,19 +59,24 @@ extern "C" __global__ void section_enclosure_gather_phase(
  y[out_d]=add_checked(v[d],round,status);ec_seal(ow,oh+2u*((size_t)out_d+1u)*row,out_d,status);
 }
 extern "C" __global__ void section_enclosure_scatter_phase_adjoint(
- const int64_t *x,const int64_t *xh,const int64_t *map,const int64_t *mh,
+ const int64_t *x,const int64_t *xh,const int64_t *offsets,const int64_t *offsets_hi,
+ const int64_t *entries,const int64_t *entries_hi,
  uint32_t rows,uint32_t output_rows,uint32_t d,
  int64_t *out,int64_t *oh,int64_t *flags,
  uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
  if(threadIdx.x)return;uint32_t row=blockIdx.x;if(row>=output_rows)return;
  uint32_t *status=ec_status(flags,row);if(upstream_refused(census,lineage,lineage_count,status))return;
  int64_t *ow=out+2u*((size_t)d+1u)*row;wide *y=(wide*)ow;for(uint32_t j=0;j<=d;++j)y[j]=0;
- for(uint32_t at=0;at<rows;++at){
-  const int64_t *m=map+4u*(size_t)at;
-  for(uint32_t j=0;j<4;++j)if(m[j]!=mh[4u*(size_t)at+j])atomicOr(status,REFUSED_MALFORMED);
-  if(m[0]<0||(uint64_t)m[0]>=output_rows||m[3]<=0){atomicOr(status,REFUSED_MALFORMED);return;}
-  if((uint64_t)m[0]!=row)continue;
-  const int64_t *a=x+2u*((size_t)d+1u)*at,*ah=xh+2u*((size_t)d+1u)*at;
+ const int64_t *lo=offsets+(size_t)row,*hi=offsets_hi+(size_t)row;
+ const int64_t *next=offsets+(size_t)(row+1),*next_hi=offsets_hi+(size_t)(row+1);
+ if(lo[0]!=hi[0]||next[0]!=next_hi[0]
+    ||lo[0]<0||next[0]<lo[0]||next[0]>(int64_t)rows){atomicOr(status,REFUSED_MALFORMED);return;}
+ uint32_t start=(uint32_t)lo[0],end=(uint32_t)next[0];
+ for(uint32_t at=start;at<end;++at){
+  const int64_t *m=entries+4u*(size_t)at,*mh=entries_hi+4u*(size_t)at;
+  for(uint32_t j=0;j<4;++j)if(m[j]!=mh[j])atomicOr(status,REFUSED_MALFORMED);
+  if(m[0]<0||(uint64_t)m[0]>=rows||m[3]<=0){atomicOr(status,REFUSED_MALFORMED);return;}
+  const int64_t *a=x+2u*((size_t)d+1u)*(uint32_t)m[0],*ah=xh+2u*((size_t)d+1u)*(uint32_t)m[0];
   if(!ec_ball(a,ah,d,status))return;const wide *v=(const wide*)a;
   y[d]=add_checked(y[d],v[d],status);
   for(uint32_t j=0;j<d;j+=2u){

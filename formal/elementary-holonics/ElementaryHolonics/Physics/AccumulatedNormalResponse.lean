@@ -23,6 +23,8 @@ abbrev Column (Index : Type*) := Matrix Index Unit ℂ
 
 variable {Source Target : Type*} [Fintype Source] [Fintype Target]
 
+local instance (priority := 100) : DecidableEq Source := Classical.decEq Source
+
 def updatedGram (H : Matrix Source Source ℂ) (x : Column Source) : Matrix Source Source ℂ :=
   H + x * x.conjTranspose
 
@@ -41,16 +43,19 @@ def normalResidual (M : Matrix Target Source ℂ) (H : Matrix Source Source ℂ)
 /-! ## Finite quadratic objective bounds -/
 
 /-- The matrix entries represented in the finite Euclidean space of complex coordinates. -/
-def matrixVector (M : Matrix Target Source ℂ) : EuclideanSpace ℂ (Target × Source) :=
-  (EuclideanSpace.equiv (Target × Source) ℂ).symm
+def matrixVector {I J : Type*} [Fintype I] [Fintype J]
+    (M : Matrix I J ℂ) : EuclideanSpace ℂ (I × J) :=
+  (EuclideanSpace.equiv (I × J) ℂ).symm
     (fun index ↦ M index.1 index.2)
 
 /-- The squared Frobenius norm in the declared finite complex matrix chart. -/
-def frobeniusSq (M : Matrix Target Source ℂ) : ℝ :=
+def frobeniusSq {I J : Type*} [Fintype I] [Fintype J]
+    (M : Matrix I J ℂ) : ℝ :=
   ‖matrixVector M‖ ^ 2
 
 /-- The Frobenius norm in the declared finite complex matrix chart. -/
-def frobeniusNorm (M : Matrix Target Source ℂ) : ℝ :=
+def frobeniusNorm {I J : Type*} [Fintype I] [Fintype J]
+    (M : Matrix I J ℂ) : ℝ :=
   ‖matrixVector M‖
 
 theorem frobeniusNorm_sub_le (M P : Matrix Target Source ℂ) :
@@ -75,9 +80,88 @@ def normalObjective (samples : List (Sample Source Target)) (M : Matrix Target S
     (samples.map (fun sample ↦
       frobeniusSq (M * sample.1 - sample.2))).sum
 
+/-- The nonzero-prior objective used by the resident normal solve. -/
+def normalObjectiveWithPrior (W₀ : Matrix Target Source ℂ)
+    (samples : List (Sample Source Target)) (M : Matrix Target Source ℂ) : ℝ :=
+  frobeniusSq (M - W₀) +
+    (samples.map (fun sample ↦
+      frobeniusSq (M * sample.1 - sample.2))).sum
+
 theorem frobeniusSq_nonneg (M : Matrix Target Source ℂ) :
     0 ≤ frobeniusSq M := by
   exact sq_nonneg _
+
+/-! ## Explicit unit prior and the derived normal target
+
+The prior block is retained in the normal source independently of observed target energy.  The
+two quantities are named separately here so a zero-data packet does not silently erase a nonzero
+material prior.
+-/
+
+def unitPriorGram : Matrix Source Source ℂ := 1
+
+def unitPriorCross (W₀ : Matrix Target Source ℂ) : Matrix Target Source ℂ := W₀
+
+def unitPriorEnergy (W₀ : Matrix Target Source ℂ) : ℝ := frobeniusSq W₀
+
+def observedTargetEnergy (samples : List (Sample Source Target)) : ℝ :=
+  (samples.map (fun sample ↦ frobeniusSq sample.2)).sum
+
+def augmentedTargetEnergy (W₀ : Matrix Target Source ℂ)
+    (samples : List (Sample Source Target)) : ℝ :=
+  unitPriorEnergy W₀ + observedTargetEnergy samples
+
+theorem unitPrior_data_separation (W₀ : Matrix Target Source ℂ) :
+    unitPriorGram = (1 : Matrix Source Source ℂ) ∧
+      unitPriorCross W₀ = W₀ ∧
+      unitPriorEnergy W₀ = frobeniusSq W₀ := by
+  exact ⟨rfl, rfl, rfl⟩
+
+theorem observedTargetEnergy_eq_data (samples : List (Sample Source Target)) :
+    observedTargetEnergy samples =
+      (samples.map (fun sample ↦ frobeniusSq sample.2)).sum := rfl
+
+theorem augmentedTargetEnergy_nonneg (W₀ : Matrix Target Source ℂ)
+    (samples : List (Sample Source Target))
+    (hdata : 0 ≤ observedTargetEnergy samples) :
+    0 ≤ augmentedTargetEnergy W₀ samples := by
+  exact add_nonneg (frobeniusSq_nonneg W₀) hdata
+
+theorem unitPriorEnergy_pos [Nonempty (Target × Source)]
+    (W₀ : Matrix Target Source ℂ) (hW₀ : W₀ ≠ 0) :
+    0 < unitPriorEnergy W₀ := by
+  have hvec : matrixVector W₀ ≠ 0 := by
+    intro hz
+    apply hW₀
+    funext i j
+    have hi := congrArg (fun v => v (i, j)) hz
+    simpa [matrixVector] using hi
+  exact sq_pos_of_pos (norm_pos_iff.mpr hvec)
+
+/-! A derived covector is staged as a normal target at the current material. -/
+
+def normalProxyTarget (W : Matrix Target Source ℂ) (f : Column Source)
+    (sigma : ℝ) (g : Column Target) : Column Target :=
+  W * f + sigma • g
+
+def normalProxyCross (B W : Matrix Target Source ℂ) (f : Column Source)
+    (sigma : ℝ) (g : Column Target) : Matrix Target Source ℂ :=
+  B + normalProxyTarget W f sigma g * f.conjTranspose
+
+theorem normalProxyTarget_eq_current_mul_feature_add_covector
+    (W : Matrix Target Source ℂ) (f : Column Source) (sigma : ℝ) (g : Column Target) :
+    normalProxyTarget W f sigma g = W * f + sigma • g := rfl
+
+theorem normalProxyTarget_residual_eq_scaled_covector
+    (W : Matrix Target Source ℂ) (f : Column Source) (sigma : ℝ) (g : Column Target) :
+    normalProxyTarget W f sigma g - W * f = sigma • g := by
+  simp [normalProxyTarget]
+
+theorem normalProxyCross_eq_updatedCross
+    (B W : Matrix Target Source ℂ) (f : Column Source)
+    (sigma : ℝ) (g : Column Target) :
+    normalProxyCross B W f sigma g =
+      updatedCross B (normalProxyTarget W f sigma g) f := rfl
 
 theorem weighted_cauchy_schwarz {I : Type*} [Fintype I]
     (a x : I → ℝ) (ha : ∀ i, 0 ≤ a i) :
@@ -279,6 +363,319 @@ theorem normal_minimizer_frobenius_norm_le_sqrt_target
   have hsqrt_nonneg : 0 ≤ Real.sqrt targetEnergy := Real.sqrt_nonneg _
   nlinarith
 
+def realMatrixPairing {I J : Type*} [Fintype I] [Fintype J]
+    (A B : Matrix I J ℂ) : ℝ :=
+  inner ℝ (matrixVector A) (matrixVector B)
+
+def normalFittedEnergy (samples : List (Sample Source Target))
+    (P : Matrix Target Source ℂ) : ℝ :=
+  frobeniusSq P +
+    (samples.map (fun sample ↦ frobeniusSq (P * sample.1))).sum
+
+def normalCrossEnergy (W₀ : Matrix Target Source ℂ)
+    (samples : List (Sample Source Target)) (P : Matrix Target Source ℂ) : ℝ :=
+  realMatrixPairing P W₀ +
+    (samples.map (fun sample ↦ realMatrixPairing (P * sample.1) sample.2)).sum
+
+/-- The scalar energy identity returned by a nonzero-prior normal solve.  The matrix normal
+equation `P * (I + Σ f f*) = W₀ + Σ y f*` reduces to this identity by pairing with P. -/
+def normalSolveEnergyEquation (W₀ : Matrix Target Source ℂ)
+    (samples : List (Sample Source Target)) (P : Matrix Target Source ℂ) : Prop :=
+  normalFittedEnergy samples P = normalCrossEnergy W₀ samples P
+
+/-! The rectangular bridge used by the normal equation.  The left side is the Frobenius
+pairing in the `Target × Source` chart; the right side pairs the two columns after the
+source contraction.  It is proved by expanding the finite coordinates, rather than by
+invoking a square trace theorem whose index types would hide the rectangular reindexing. -/
+theorem realMatrixPairing_mul_outer_eq
+    (P : Matrix Target Source ℂ) (y : Column Target) (f : Column Source) :
+    realMatrixPairing P (y * f.conjTranspose) =
+      realMatrixPairing (P * f) y := by
+  classical
+  simp [realMatrixPairing, matrixVector, PiLp.inner_apply, Matrix.mul_apply,
+    Matrix.conjTranspose_apply, dotProduct]
+  simp only [Fintype.sum_prod_type]
+  simp [Fintype.sum_unique, Finset.sum_sub_distrib, Finset.mul_sum]
+  rw [← Finset.sum_sub_distrib]
+  apply Finset.sum_congr rfl
+  intro target htarget
+  simp only [mul_sub, Finset.mul_sum]
+  rw [← Finset.sum_sub_distrib, ← Finset.sum_sub_distrib]
+  apply Finset.sum_congr rfl
+  intro source hsource
+  ring
+
+def normalSampleGram (samples : List (Sample Source Target)) : Matrix Source Source ℂ :=
+  (samples.map (fun sample ↦ sample.1 * sample.1.conjTranspose)).sum
+
+def normalSampleCross (samples : List (Sample Source Target)) : Matrix Target Source ℂ :=
+  (samples.map (fun sample ↦ sample.2 * sample.1.conjTranspose)).sum
+
+private theorem realMatrixPairing_add_right
+    (A B C : Matrix Target Source ℂ) :
+    realMatrixPairing A (B + C) = realMatrixPairing A B + realMatrixPairing A C := by
+  have hvec : matrixVector (B + C) = matrixVector B + matrixVector C := by
+    apply (EuclideanSpace.equiv (Target × Source) ℂ).injective
+    funext index
+    simp [matrixVector]
+  rw [realMatrixPairing, hvec, inner_add_right]
+  rfl
+
+private theorem realMatrixPairing_sum_right
+    (A : Matrix Target Source ℂ) (xs : List (Matrix Target Source ℂ)) :
+    realMatrixPairing A xs.sum = (xs.map (realMatrixPairing A)).sum := by
+  induction xs with
+  | nil =>
+      simp [realMatrixPairing, matrixVector, PiLp.inner_apply]
+  | cons x xs ih =>
+      simp only [List.sum_cons, List.map_cons]
+      rw [realMatrixPairing_add_right, ih]
+
+private theorem matrix_mul_list_sum
+    (P : Matrix Target Source ℂ) (xs : List (Matrix Source Source ℂ)) :
+    P * xs.sum = (xs.map (fun X ↦ P * X)).sum := by
+  induction xs with
+  | nil => simp
+  | cons X xs ih =>
+      simp only [List.sum_cons, List.map_cons]
+      rw [Matrix.mul_add, ih]
+
+theorem normalSolveEnergyEquation_of_matrix_equation
+    (W₀ P : Matrix Target Source ℂ) (samples : List (Sample Source Target))
+    (matrix_equation :
+      P * (1 + normalSampleGram samples) = W₀ + normalSampleCross samples) :
+    normalSolveEnergyEquation W₀ samples P := by
+  have hleft :
+      realMatrixPairing P (P * (1 + normalSampleGram samples)) =
+        normalFittedEnergy samples P := by
+    rw [Matrix.mul_add, Matrix.mul_one, realMatrixPairing_add_right]
+    have hself : realMatrixPairing P P = frobeniusSq P := by
+      simpa [realMatrixPairing, frobeniusSq] using
+        (real_inner_self_eq_norm_sq (matrixVector P))
+    rw [hself, normalSampleGram, matrix_mul_list_sum,
+      realMatrixPairing_sum_right]
+    simp only [normalFittedEnergy, List.map_map, Function.comp_apply]
+    apply congrArg (fun z ↦ frobeniusSq P + z)
+    apply congrArg List.sum
+    apply List.map_congr_left
+    intro sample hsample
+    have hbridge := realMatrixPairing_mul_outer_eq P (P * sample.1) sample.1
+    have hself : realMatrixPairing (P * sample.1) (P * sample.1) =
+        frobeniusSq (P * sample.1) := by
+      simpa [realMatrixPairing, frobeniusSq] using
+        (real_inner_self_eq_norm_sq (matrixVector (P * sample.1)))
+    simpa [Matrix.mul_assoc] using hbridge.trans hself
+  have hright :
+      realMatrixPairing P (W₀ + normalSampleCross samples) =
+        normalCrossEnergy W₀ samples P := by
+    rw [realMatrixPairing_add_right, normalSampleCross,
+      realMatrixPairing_sum_right]
+    apply congrArg (fun z ↦ realMatrixPairing P W₀ + z)
+    rw [List.map_map]
+    apply congrArg List.sum
+    apply List.map_congr_left
+    intro sample hsample
+    exact realMatrixPairing_mul_outer_eq P sample.2 sample.1
+  unfold normalSolveEnergyEquation
+  calc
+    normalFittedEnergy samples P =
+        realMatrixPairing P (P * (1 + normalSampleGram samples)) := hleft.symm
+    _ = realMatrixPairing P (W₀ + normalSampleCross samples) := by rw [matrix_equation]
+    _ = normalCrossEnergy W₀ samples P := hright
+
+private theorem list_cauchy_sq (xs ys : List ℝ) :
+    (List.zipWith (· * ·) xs ys).sum ^ 2 ≤
+      (xs.map (fun x => x ^ 2)).sum * (ys.map (fun y => y ^ 2)).sum := by
+  induction xs generalizing ys with
+  | nil => simp
+  | cons x xs ih =>
+    cases ys with
+    | nil => simp
+    | cons y ys =>
+      let A := (xs.map (fun z => z ^ 2)).sum
+      let B := (ys.map (fun z => z ^ 2)).sum
+      let c := (List.zipWith (· * ·) xs ys).sum
+      have hrest : c ^ 2 ≤ A * B := by simpa [A, B, c] using ih ys
+      have list_sq_nonneg : ∀ (zs : List ℝ),
+          0 ≤ (zs.map (fun z => z ^ 2)).sum := by
+        intro zs
+        induction zs with
+        | nil => simp
+        | cons z zs ih =>
+          simp only [List.map_cons, List.sum_cons]
+          linarith [sq_nonneg z]
+      have hAnonneg : 0 ≤ A := by simpa [A] using list_sq_nonneg xs
+      have hBnonneg : 0 ≤ B := by simpa [B] using list_sq_nonneg ys
+      by_cases hB : 0 < B
+      · have hs := sq_nonneg (x * B - y * c)
+        have hm : 0 ≤ B * (A * B - c ^ 2) :=
+          mul_nonneg (le_of_lt hB) (sub_nonneg.mpr hrest)
+        dsimp [A, B, c] at *
+        simp only [List.sum_cons, List.map_cons]
+        nlinarith
+      · have hB0 : B = 0 := le_antisymm (le_of_not_gt hB) hBnonneg
+        have hc2 : c ^ 2 ≤ 0 := by rw [hB0, mul_zero] at hrest; exact hrest
+        have hc : c = 0 := by nlinarith
+        dsimp [A, B, c] at *
+        simp only [List.sum_cons, List.map_cons, hB0, hc]
+        nlinarith [hAnonneg]
+
+private theorem list_sum_neg (xs : List ℝ) :
+    (xs.map (fun x => -x)).sum = -(xs.map (fun x => x)).sum := by
+  induction xs with
+  | nil => simp
+  | cons x xs ih =>
+    simp only [List.map_cons, List.sum_cons]
+    rw [ih]
+    ring
+
+private theorem list_sum_map_neg {α : Type*} (xs : List α) (f : α → ℝ) :
+    (xs.map (fun x => -f x)).sum = -(xs.map f).sum := by
+  induction xs with
+  | nil => simp
+  | cons x xs ih =>
+    simp only [List.map_cons, List.sum_cons]
+    rw [ih]
+    ring
+
+theorem normal_augmented_cauchy
+    (samples : List (Sample Source Target)) (W₀ P : Matrix Target Source ℂ) :
+    normalCrossEnergy W₀ samples P ^ 2 ≤
+      normalFittedEnergy samples P * augmentedTargetEnergy W₀ samples := by
+  let xs : List ℝ := frobeniusNorm P ::
+    samples.map (fun sample ↦ frobeniusNorm (P * sample.1))
+  let ys : List ℝ := frobeniusNorm W₀ ::
+    samples.map (fun sample ↦ frobeniusNorm sample.2)
+  let cross : ℝ :=
+    (List.zipWith (· * ·) xs ys).sum
+  have hcross : |normalCrossEnergy W₀ samples P| ≤ cross := by
+    have h0 := abs_real_inner_le_norm (matrixVector P) (matrixVector W₀)
+    have h0' : -frobeniusNorm P * frobeniusNorm W₀ ≤ realMatrixPairing P W₀ ∧
+        realMatrixPairing P W₀ ≤ frobeniusNorm P * frobeniusNorm W₀ := by
+      simpa [realMatrixPairing, frobeniusNorm] using (abs_le.mp h0)
+    have hs :
+        (samples.map (fun sample => realMatrixPairing (P * sample.1) sample.2)).sum ≤
+          (samples.map (fun sample =>
+            frobeniusNorm (P * sample.1) * frobeniusNorm sample.2)).sum :=
+      List.sum_le_sum (fun (sample : Sample Source Target) hsample => by
+        simpa [realMatrixPairing, frobeniusNorm] using
+          (abs_le.mp (abs_real_inner_le_norm (matrixVector (P * sample.1))
+            (matrixVector sample.2))).2)
+    have hs' :
+        (samples.map (fun sample =>
+          -frobeniusNorm (P * sample.1) * frobeniusNorm sample.2)).sum ≤
+            (samples.map (fun sample => realMatrixPairing (P * sample.1) sample.2)).sum :=
+      List.sum_le_sum (fun (sample : Sample Source Target) hsample => by
+        simpa [realMatrixPairing, frobeniusNorm] using
+          (abs_le.mp (abs_real_inner_le_norm (matrixVector (P * sample.1))
+            (matrixVector sample.2))).1)
+    have hzip :
+        List.zipWith (· * ·)
+            (samples.map (fun sample => frobeniusNorm (P * sample.1)))
+            (samples.map (fun sample => frobeniusNorm sample.2)) =
+          samples.map (fun sample =>
+            frobeniusNorm (P * sample.1) * frobeniusNorm sample.2) := by
+      induction samples with
+      | nil => rfl
+      | cons sample samples ih => simp [ih]
+    have hupper : normalCrossEnergy W₀ samples P ≤ cross := by
+      dsimp [normalCrossEnergy, cross, xs, ys]
+      rw [hzip]
+      exact add_le_add h0'.2 hs
+    have hlower : -cross ≤ normalCrossEnergy W₀ samples P := by
+      dsimp [normalCrossEnergy, cross, xs, ys]
+      rw [hzip]
+      have hneg :
+          (samples.map (fun sample =>
+            -frobeniusNorm (P * sample.1) * frobeniusNorm sample.2)).sum =
+              -(samples.map (fun sample =>
+                frobeniusNorm (P * sample.1) * frobeniusNorm sample.2)).sum := by
+        simpa only [neg_mul] using
+          list_sum_map_neg samples (fun sample =>
+            frobeniusNorm (P * sample.1) * frobeniusNorm sample.2)
+      have hsum := add_le_add h0'.1 hs'
+      rw [hneg] at hsum
+      linarith
+    exact (abs_le.mpr ⟨hlower, hupper⟩)
+  have hlist := list_cauchy_sq xs ys
+  have hcross_nonneg : 0 ≤ cross := by
+    have hP : 0 ≤ frobeniusNorm P := norm_nonneg _
+    have hW : 0 ≤ frobeniusNorm W₀ := norm_nonneg _
+    have list_norm_products : ∀ zs : List (Sample Source Target),
+        0 ≤ (List.zipWith (· * ·)
+          (zs.map (fun sample ↦ frobeniusNorm (P * sample.1)))
+          (zs.map (fun sample ↦ frobeniusNorm sample.2))).sum := by
+      intro zs
+      induction zs with
+      | nil => simp
+      | cons sample samples ih =>
+        simp only [List.map_cons, List.zipWith, List.sum_cons]
+        exact add_nonneg (mul_nonneg (norm_nonneg _) (norm_nonneg _)) ih
+    have hs := list_norm_products samples
+    dsimp [cross, xs, ys]
+    simpa only [List.zipWith, List.map_cons, List.sum_cons] using
+      add_nonneg (mul_nonneg hP hW) hs
+  have hcrosssq : normalCrossEnergy W₀ samples P ^ 2 ≤ cross ^ 2 := by
+    have hsquare := (sq_le_sq₀ (abs_nonneg _) hcross_nonneg).mpr hcross
+    simpa [sq_abs] using hsquare
+  have henergy :
+      (List.map (fun x => x ^ 2) xs).sum *
+          (List.map (fun y => y ^ 2) ys).sum =
+        normalFittedEnergy samples P * augmentedTargetEnergy W₀ samples := by
+    have hPmap :
+        samples.map (fun sample => frobeniusNorm (P * sample.1) ^ 2) =
+          samples.map (fun sample => frobeniusSq (P * sample.1)) := by
+      apply List.map_congr_left
+      intro sample hsample
+      exact frobeniusNorm_sq _
+    have hYmap :
+        samples.map (fun sample => frobeniusNorm sample.2 ^ 2) =
+          samples.map (fun sample => frobeniusSq sample.2) := by
+      apply List.map_congr_left
+      intro sample hsample
+      exact frobeniusNorm_sq _
+    simp only [xs, ys, List.map_cons, List.sum_cons, List.map_map,
+      Function.comp_apply, frobeniusNorm_sq]
+    change
+      (frobeniusSq P + (samples.map (fun sample => frobeniusNorm (P * sample.1) ^ 2)).sum) *
+          (frobeniusSq W₀ + (samples.map (fun sample => frobeniusNorm sample.2 ^ 2)).sum) =
+        normalFittedEnergy samples P * augmentedTargetEnergy W₀ samples
+    rw [hPmap, hYmap]
+    rfl
+  exact hcrosssq.trans (henergy ▸ hlist)
+
+theorem normal_solution_frobenius_norm_le_sqrt_augmented
+    (samples : List (Sample Source Target)) (W₀ P : Matrix Target Source ℂ)
+    (normal_equation : normalSolveEnergyEquation W₀ samples P) :
+    frobeniusNorm P ≤ Real.sqrt (augmentedTargetEnergy W₀ samples) := by
+  have augmented_nonneg : 0 ≤ augmentedTargetEnergy W₀ samples := by
+    exact add_nonneg (frobeniusSq_nonneg W₀)
+      (List.sum_nonneg fun value hvalue => by
+        obtain ⟨sample, hsample, rfl⟩ := List.mem_map.mp hvalue
+        exact frobeniusSq_nonneg _)
+  have hfit_nonneg : 0 ≤ normalFittedEnergy samples P := by
+    unfold normalFittedEnergy
+    exact add_nonneg (frobeniusSq_nonneg P) (List.sum_nonneg fun value hvalue ↦ by
+      obtain ⟨sample, hsample, rfl⟩ := List.mem_map.mp hvalue
+      exact frobeniusSq_nonneg _)
+  have hfit : normalFittedEnergy samples P ≤ augmentedTargetEnergy W₀ samples := by
+    have augmented_cauchy := normal_augmented_cauchy samples W₀ P
+    dsimp [normalSolveEnergyEquation] at normal_equation
+    rw [normal_equation] at augmented_cauchy
+    by_cases hzero : normalFittedEnergy samples P = 0
+    · rw [hzero]
+      exact augmented_nonneg
+    · have hpos : 0 < normalFittedEnergy samples P := lt_of_le_of_ne hfit_nonneg (Ne.symm hzero)
+      nlinarith
+  have hP : frobeniusSq P ≤ augmentedTargetEnergy W₀ samples := by
+    exact (le_add_of_nonneg_right (List.sum_nonneg fun value hvalue ↦ by
+      obtain ⟨sample, hsample, rfl⟩ := List.mem_map.mp hvalue
+      exact frobeniusSq_nonneg _)).trans hfit
+  rw [← frobeniusNorm_sq] at hP
+  have hsqrt : (Real.sqrt (augmentedTargetEnergy W₀ samples)) ^ 2 =
+      augmentedTargetEnergy W₀ samples := Real.sq_sqrt augmented_nonneg
+  nlinarith [norm_nonneg (matrixVector P), Real.sqrt_nonneg (augmentedTargetEnergy W₀ samples)]
+
 theorem applied_reference_frobenius_bound
     (M P : Matrix Target Source ℂ) (appliedBound referenceBound : ℝ)
     (M_bound : frobeniusSq M ≤ appliedBound ^ 2)
@@ -388,6 +785,14 @@ theorem normal_square_completion
 
 section Audit
 
+#print axioms realMatrixPairing_mul_outer_eq
+#print axioms normalSolveEnergyEquation_of_matrix_equation
+#print axioms unitPrior_data_separation
+#print axioms unitPriorEnergy_pos
+#print axioms normalProxyTarget_eq_current_mul_feature_add_covector
+#print axioms normalProxyTarget_residual_eq_scaled_covector
+#print axioms normalProxyCross_eq_updatedCross
+#print axioms normal_solution_frobenius_norm_le_sqrt_augmented
 #print axioms rankOne_update_residual_identity
 #print axioms normalResidual_preserved_of_gain_receipt
 #print axioms gram_increment

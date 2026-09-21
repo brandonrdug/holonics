@@ -276,6 +276,7 @@ impl<'c> NativeConstitutiveField<'c> {
             origin: op.origin.clone(),
             grain: op.grain,
             births: op.births.clone(),
+            declared_origins: op.declared_origins.clone(),
             sections: op.sections.clone(),
             returns: op.returns.clone(),
         };

@@ -94,7 +94,7 @@ fn phased_gather_and_transpose_match_exact_inner_product() {
         ExactWavePhaseTransport::identity(),
     ];
     let gathered = source.gather_phase_rows(&addresses, &phases, 2).unwrap();
-    let transposed = probe.scatter_phase_adjoint(&addresses, &phases, 2).unwrap();
+    let transposed = probe.scatter_phase_adjoint(&addresses, &phases, 4).unwrap();
     let left: Rat = (0..3)
         .map(|row| {
             dot(
@@ -112,6 +112,8 @@ fn phased_gather_and_transpose_match_exact_inner_product() {
         })
         .sum();
     assert_eq!(left, right);
+    assert!(transposed.row(2).unwrap().inspect().unwrap().center[0].is_zero());
+    assert!(transposed.row(3).unwrap().inspect().unwrap().center[0].is_zero());
 }
 
 #[test]
