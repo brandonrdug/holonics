@@ -130,6 +130,13 @@ The [helical generator consumer](../research/records/2026-09-20_NATIVE_INCIDENCE
 regularized reaction, contextual reuse and a new-source plural image. The normalized geometric
 word below still uses its separate supplied symbol presentation.
 
+[definition] The [next executable field contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
+fixes its remaining composition: local q/Delta material with independent participation drive,
+one global operative map/current, learned source/text/support boundary material, complete
+producing derivatives and separate generation/material commits. Its owned-packet table identifies
+existing methods and planned extensions; it supersedes earlier instructions to derive an
+unspecified source/condition conversion or reconstruct the returned helical caller.
+
 [established-bounded; source-inspected] The geometric source chart follows a separate consuming
 route through `GeometricFieldSpec::compile`, `native/field_session/geometric.rs` and
 `coupled_wave/body/field/geometric.rs`. Its grouped query/neighbor phase gathers, resident

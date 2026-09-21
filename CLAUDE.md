@@ -77,6 +77,13 @@ control; `HelicalMomentReuse` is a separate caller. The next encoder/decoder wor
 [existing Holonic Encoding construction](research/records/2026-09-11_HOLONIC_ENCODING_RETAINS_TRANSFORMATION_GRAIN_ACROSS_MODALITIES.md)
 and the [campaign correction](research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md#correction-the-nibble-control-is-not-holonic-encoding).
 
+[definition] The [executable field campaign](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
+fixes the next composition: standing q/incident Delta feed the reaction, participation supplies
+drive y, and one global D/b acts on their sum. Source/text/support maps are boundary material
+with stated priors and the same normal update. The contract contains the complete adjoint,
+publication, rest and source-episode packets; workers implement those choices rather than
+reopening the source/condition chart question.
+
 ## 2. Where the implementation lives
 
 | Operation | Source owner |

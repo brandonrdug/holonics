@@ -82,6 +82,14 @@ Source/contact applicability and productive encoding extend that body. This is h
 workshop becomes Athena's available conduct. Source signatures, a printed result or a smaller artifact alone do not
 establish that incorporation.
 
+[definition] The current field campaign is fixed by the
+[executable implementation contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign):
+incident-conditioned reaction, independent transported drive, one global current/internal branch,
+learned source/text/support boundary material, complete producing adjoint and atomic continuation.
+It names the actual episode consumer and source scopes. Existing encoding/receiving mathematics
+and the returned native/helical mechanisms supply this construction; their existence is not an
+unresolved planning question.
+
 ## Athena-alpha and the finite construction programme
 
 [established-bounded; source-inspected; computational-witness] The [representation audit](../research/records/2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md)

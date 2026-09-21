@@ -151,39 +151,37 @@ constituted reaction, held-boundary iteration and their complete fixed-operand a
 “normalized” refers to the participation weights summing to one. It does not name a new
 foundation or an operation still to be invented.
 
-[definition] The immediate implementation order is:
+[definition] The [executable field campaign](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
+is finalized at the mathematical/API level. Implement in this dependency order:
 
-1. **Specify and connect the reaction charts and continuing joint state (#17).** The existing
-   geometric call uses `y=Σ p_i U_i x_i` and `Φ(y,p)`; `from_native_field` uses source `x_r` and
-   incident differences `Δ_i=U_i x_i−x_r`. Derive the source/condition map and its relation to
-   producing M before substituting either feature chart. This mathematical join is not settled
-   by sharing `NativeCoupledBody` or matching widths. Then carry the full reflected joint rows
-   between stages and requests: `geometric_word` currently restricts to boundary components,
-   reuses its initial internal b, and returns a preview. Preserve source/condition enclosures
-   and the complete variation. The [source/condition construction](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-source-and-condition-construction)
-   owns this binding and its remaining choice.
-2. **Use the formed operation in that same body (#17/#16, #19 where D/incidence changes).**
-   Execute the inferred source-conditioned generator and receive its joint consequence through
-   the actual receiving map. A continuing invocation carries the field current/interior and
-   needed source family. Report the inferred function, factor or condition family and its use
-   on the requested new input, not only changed coefficients or successful persistence. Pure
-   solver requests use their supplied constraints and need no invented observation event.
-3. **Compile the repeated action being used (#18/#61, with the shared #48 owners where applicable).**
-   Use existing factor, mode, moment and recurrence representations for admitted portions of
-   that same generator; keep the required nonlinear/receiver remainder. The current source,
-   receiver and pending returns determine what must survive. Compression accompanies useful
-   inference/generation; it is not a later independent codec project or a universal inverse gate.
+1. **Global operative action and boundary material (#61/#18 within #17).** Extend the existing
+   source-map factors with resident D/D* actions and a residual-certified solve; provide staged
+   full-joint publication. In parallel, add E_in, R_text and the support receiver using the
+   existing normal law, explicit nonzero priors and diagonal one-hot source statistics. The field's
+   local width comes from geometry; the codec's alphabet sizes only the exterior material ports.
+2. **Compose the selected field law and its complete return (#17/#19).** Use the standing source
+   q and incident differences Delta in `Phi(q,Delta)`. Participation supplies the independent
+   drive `y=Σ p Uq`; incoming is `y+M Phi(q,Delta)`. Scatter through one global D/b and relax the
+   full joint state. The contract fixes every phase, Delta, M, D, b and boundary-material adjoint,
+   compatible material transport and the distinct legacy `Phi(y,p)` domain.
+3. **Close publication and application in the same session (#17/#16).** Generation commits the
+   relaxed endpoint once. A delayed return uses its producing maps and stages contemporary
+   material updates without recommitting an old current. Extend native rest, request/observe,
+   HnaStream and the existing exposure/workbench caller; retain source regions, actual joins,
+   original receiver and pending delivery. Source and response extents are receiving apertures,
+   not native clocks or alphabet-derived geometry.
+4. **Return actual episodes and reuse (#16/#18/#48).** Execute the existing recorded contextual,
+   mathematical and code episodes with their full admitted source and assessment. Use the existing
+   exact contextual/factor/mode and operative-program owners for applicable repeated actions;
+   retain and execute any necessary nonlinear remainder. Measure the constructed operation and
+   its generated consequence. The earlier helical/native returns and 78 checks are dependencies,
+   not substitute deliveries or a new test campaign to repeat.
 
-[established-bounded; source-inspected] The September 20 native source attachment supplies the
-returned dependencies at a selected exact-current receiving junction: incident source/condition restrictions,
-original-condition formation, an inferred helical bracket and its new-source condition-family
-image, reusable contextual section and factored preparation. See the
-[return](../../research/records/2026-09-20_NATIVE_INCIDENCE_FORMS_AND_REUSES_THE_HELICAL_GENERATOR.md).
-The next composition relates those source/condition/material charts and carries the full joint
-state in the existing geometric iteration. Athena's call from source inscriptions to the
-established passage representation and back through its receiver remains #17/#16; this is an
-unfinished application connection, not an absence of encoding foundations. Dense normal factor
-adaptation remains #18.
+[definition] Root owns the reaction/adjoint integration and final application. The first bounded
+Luna assignments are the global operative action/current transaction and the boundary normal
+material; they have disjoint owners in the contract's implementation table. Rest/application work
+follows their returned interfaces. Each worker receives those equations and paths through the
+existing worker brief. The plan ends in one integrated consumer, not independent prototypes.
 
 The mathematical workshop, field model and source/evaluation interfaces already exist. This
 order composes their actual owners and preserves their known results; it does not restart their
@@ -350,7 +348,7 @@ documents hold each statement's evidence, owners and findings.
 | Biological ecology (application deferred) | B0–B10; predictor/design/measured RBX1 comparisons; bounded conditioned response | Further application runs are deferred. Generic evaluation, interface and codec obligations remain at their actual shared owners and do not schedule another biology campaign. |
 | Exact device law | D1–D3; one engine coordinate instance cross-checked on the card | resident rational algebra at its consuming calls (#50); signed 128-bit words and radius with the engine's carrier refusal where consumed; per-region operators; base-pointer registry; common context ownership; D4 stays an intention |
 | Generalized transport and the Holonic Interaction chain | T1–T8 at their declared scopes; the Holonic Interaction unit with media and contact exchange; the two-media chain read at the elastic-network consumer; structural analytic width for that elastic specialization at every admitted extent | the multi-neck chain; faces derived from contact geometry; the time/entropy crossing (#5); general analytic pole factors (#35); a plural family generic in its coordinate address; a faithful Israel-junction instance (#23) |
-| Elementary helical geometry, identities and reuse | Shared screw generator, pair quadrance jet and formal local laws; bounded chart identities from the repaired atlas | The screw pair's caller into the existing moment compression and phase-closure owners, and the repeated-word compiler on the HNN side (#48–#49). Full ideal/graph/analytic claims retain their own open equations. |
+| Elementary helical geometry, identities and reuse | Shared screw generator, pair quadrance jet and formal local laws; bounded chart identities from the repaired atlas | Broader finite screw flows, changing physical receivers and the HNN action/decoder binding (#48–#49). The moment/phase caller and native bracket consumer are returned; full ideal/graph/analytic endpoints keep their stated scopes. |
 
 [definition] GitHub issues index these owners under the interaction-chain, resident-execution,
 complete-source-session and elementary-geometry/reuse delivery views. Scientific validation is a
@@ -374,54 +372,28 @@ consumer. Milestones are views of shared work; this section supplies the constru
    [field-session source map](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#field-session-source-map)
    names, per operation, the machinery to start from and the object that does not exist; the
    [owner-network record](../../research/records/2026-09-20_THE_FIELD_SESSION_JOIN_HAS_ITS_OWNER_NETWORK_AND_NAMED_ABSENCES.md)
-   retains the pre-port search and equations. The executable order is now:
-   - **Compose the returned ports into the geometric operation (#17).** #57 supplies section
-     participation/pullback; #58 supplies the bilinear condition covector and enclosure re-entry.
-     #59 supplies the exposure/session boundary, retained comparisons and saved source cursor.
-     Start at `prepare_rows`, `observe_rows`, `shared_request` and the founding chart. Bind
-     the admitted domain/incidence, phase connection and content-valued participation, then
-     whole-field refinement with both terms of its variation. Use `intrinsic_holonic_flow`
-     for the specified nonlinear phase/shared-cell recurrence, and `connected_holonic_field`
-     plus exact `NormalizedKernel` for their narrower differential/linear-solve controls.
-   - **Realize that same operation across the hardware cover (#61 within #17).** Derive its
-     actual read/write, boundary, lineage, obstruction and resource footprints before placing
-     independent cells/features. Generate gather → shared operator → scatter through the
-     existing partition/layout/launch owners. Current applied-condition/adjoint rows are serial;
-     normalized rows already have one block per row, with thread zero active. The whole path
-     needs measured placement, not a blanket one-lane diagnosis. Preserve dependency between
-     refinement steps and the law of shared material accumulation. Establishing the geometric
-     representation and its causal partition is part of this one join; a standalone speedup of
-     the old text-window chart is not a prerequisite campaign.
-   - **Carry real source episodes through the joined public session (#16/#59).** Preserve the
-     recorded request family and capture-event aliases, delayed comparisons and restart;
-     attach the declared contextual boundary. Development sources update the model and the
-     existing evaluation kit receives held-out families. Report source/receiver extents, actual
-     generated face, model update, continuation, lanes/service rounds, transfer, memory and
-     end-to-end cost against the retained matching baselines. Complete the `assessment.json`
-     consumer where the kit uses that result. Legacy unpaired rests retain their explicit limit.
-   - **Extend the law at the consuming pressure it exposes.** #19 supplies section-scale D
-     variation when the chosen update requires changing D; #18 supplies factored normal
-     statistics at the actual width. Fixed-D inference and current-material observation remain
-     valid declared operations. A producing-state gradient must retain its own forward operands;
-     an epoch number alone does not supply them.
-3. **Make reuse and realization part of that consuming operation (#48/#49).** The helical pair's
-   product-current bridge already has its owner in moment form:
-   `ObservableMomentReceiverHistoryCompression` with
-   `quadraticMoment_generatedWord_eq_transportMomentWord`. Give `relational_geometry::screw` its
-   caller there with the pair receiver, and its phase-closure reading through the existing
-   winding/landmark owners; expose the separator when `E_next T = U E` fails. The same owners
-   then meet the join's repeated refinement word, where `append_operation` presently re-evaluates
-   the whole programme. Resident exact elimination (#50, #12–#15) has no consumer on the HNN
-   path: the normal factor/solve is already resident and the path's exact calls are below the
-   certified crossover. It remains library work for the structural consumers and is not in this
-   order.
+   retains the pre-port search and equations. The executable order and exact operands are the
+   [finalized field campaign](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
+   above: global D/b action, source/receiving material, incident-conditioned reaction, complete
+   derivative/publication, then the actual recorded episode consumer. #57/#58 and the geometric
+   forward/adjoint are returned dependencies. The previous row receipt and pageable-transfer
+   repairs are retained hardware evidence; this campaign changes the global operator/state,
+   rather than reopening a blanket claim that every existing row path is serial.
+3. **Make reuse and realization part of that consuming operation (#48/#49).**
+   `HelicalMomentReuse` already binds the pair receiver and phase closure to the existing moment
+   compression; the native bracket consumer already reuses its contextual section and condition
+   family. Use those owners at actual matching field operations, with `E_next T=U E` and receiver
+   reconstruction or the retained remainder. The operative-map action and normal statistics in
+   the executable contract are the current HNN reuse work. General resident exact elimination
+   (#50, #12–#15) remains at its structural-library consumers; it is not a prerequisite for this
+   field's existing normal solve or boundary maps.
 
 [definition; agent-inferred] #17 owns the mathematical/consumer join, #61 its hardware
 realization, #59 the durable source boundary, and #16 the episode return. #57/#58 are completed
 operator dependencies, not new work queues. This division follows distinct owned operations
 and lets each issue close on its stated return without declaring the application complete.
-The helical compression caller (#48) remains independent shared-library work beside this join;
-its source/receiver law also supplies reuse for the field's repeated words. No full identity
+The returned helical compression caller (#48) supplies its source/receiver law to matching field
+operations; broader helical geometry keeps its independently stated scope. No full identity
 catalogue, complete device specialization or Millennium endpoint gates this return.
 
 [established-bounded; source-inspected] Wave 10's 0.220 s rank/kernel and 14.119 s rigidity figures

@@ -75,7 +75,7 @@ into an admissible coefficient change; the finite recomputation retains the mixe
 | Joint receiver and continuation | Existing prospective/current section and receiving projection owners | Provide joint generation over the constituted field, with read-only or committed ownership as requested. Streaming reads this section under its dependencies. |
 | Economical repeated action | Existing exact mode/observable reducers and resident factor/current owners | Bind a decoder and reduced action to the operator actually executed, including retained interior and pending producing comparisons. |
 
-[established-bounded; source-inspected] The current ignored CUDA boundary test manually feeds
+[historical; source-inspected] The earlier ignored CUDA boundary test manually fed
 field differences into a normal predictor, then attaches that predictor to a wave body. This
 is a field-learning application. It is not the direct engine assembly above. Promoting that
 test sequence into a public wrapper would preserve the same architectural substitution.
@@ -97,31 +97,23 @@ application representation limits are explicit in that return and the active bri
 
 ## Concrete engine-development increment
 
-[project-postulate] Continue the delivered operative-field-backed body through the
-[shared request/context and joint response application](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#next-consuming-application).
-The model's actual transport, local reaction, source/receiver maps and producing D/M update
-supply that application. Receiver/context refinements must identify the requested response they
-change and join its forward/adjoint. The active brief carries the exact implementation position.
+[definition] Execute the [finalized field campaign](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign).
+Its local reaction reads standing q and incident differences Delta; normalized participation
+supplies an independent drive y. One global operative D and internal b act on the flattened
+drive/reaction. Joint held relaxation, the complete E/R/M/D/b reverse calculation, and distinct
+generation/observation publications are specified at that contract.
 
-[definition] The returned model uses fixed admitted incidence, so its existing derivative
-has a precise domain. Extend source/context and receiver consumers together, retaining the
-existing contact-change ports and the actual derivative of each changed domain. This is an
-implementation aperture, not a claim that K is intrinsically fixed. Do not add universal symmetry, certainty, global convergence or
-Millennium-theorem admission conditions to ordinary training.
+[definition] The source E_in and text/support receivers are learned boundary material using the
+existing normal law. Actual source regions and recorded joins remain operative incidence; a
+codec basis is exterior. The field width, frames, material bindings and native state come from
+the model declaration. Initial E/R material, old-checkpoint handling, operator reuse, callback
+signatures/owned extensions and completion on recorded episodes are all specified. The
+[roadmap](plans/THE_ROADMAP.md) orders the packets and the state names the current edit.
 
-[definition] The first application measures an actual generated joint section against an
-external target section: supplied boundary/partial observations, learned internal material,
-and held-out compositions must be distinguishable. Numerical fields are the common source
-chart; image/acoustic/text codecs supply their actual restrictions and receivers. The task's
-learning law and output error—not a state hash or merely a changed coefficient—show what was
-learned. The first report must include the input, generated output and exact role of the
-supplied versus inferred material. Broad conversation exposure follows the returned model's
-demonstrated operation; another corpus-size increase cannot repair an unbound operator.
-
-[definition] For repeated refinement, derive `E_next T=U E` and `D_dec E=ρ` on the actual
-source family, or retain the exposed mode and its dynamic residual. Mode reduction develops
-beside useful model calls. An unfinished optimization does not block a correct first output;
-an expanded replay history must not silently become the permanent representation.
+[definition] The integrated consumer returns its actual source-qualified output, paired material
+update, next joint state and pending-rest continuation. The previous mathematical and numerical
+controls remain useful dependencies. A new isolated control does not replace that public Athena
+return, and a full unification of every mathematical endpoint is not a prerequisite.
 
 ## What the prior training already established
 

@@ -122,6 +122,15 @@ the separate helical moment compression. Use the existing
 and the [campaign correction](../research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md#correction-the-nibble-control-is-not-holonic-encoding)
 when continuing the actual encoder/passage/receiver composition.
 
+[definition; agent-inferred] The next field campaign is now specified in the
+[executable contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign):
+participation supplies drive y, the local reaction reads `Phi(q,Delta)`, and one global D/b
+scatters the result. Learned source/receiving boundary material connects the exterior codec to
+that field without making its alphabet the local current basis. Full joint relaxation,
+producing adjoints, residual-certified factor actions, atomic publication and actual episode
+consumption are fixed there. These are selected implementation decisions, not claims that the
+new composition has already been implemented by the legacy geometric caller.
+
 ## Research is construction material
 
 [project-postulate] Hodge's realization and harmonic/cycle laws, RH's source-qualified spectral

@@ -22,7 +22,10 @@ now hosts the shared consequence receivers as well as performance measurements. 
 owns their methodology; the roadmap and construction state retain construction order/position.
 The current geometric field/session and bounded helical/placement return is recorded in
 [the September 20 geometric field record](../research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md);
-its final real-source checkpoint comparison remains under validation.
+its final recorded checkpoint comparison passed at the stated control scope, and its held
+text result failed. The [executable field campaign](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
+now specifies the next actual consumer, including learned boundary material and the incident-mode
+support/text result read by the same episode evaluator.
 
 ## The common mathematical question
 

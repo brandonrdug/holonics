@@ -146,3 +146,14 @@ already-returned computation: the geometric loop and its adjoint exist. The unre
 `Φ(y,p)` versus `Φ(x_r,Δ)` and the continued full joint state; the loop currently reuses its
 initial b, restricts reflected rows to the boundary and returns a preview. The roadmap now names
 those operations and does not present the chart relation as a finalized implementation choice.
+
+[definition] Subsequent planning closure: the
+[executable field campaign](../../docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
+now selects the standing q/incident Delta reaction with independent drive y, one global D/b,
+learned E_in/text/support boundary material, residual-certified factor action and full joint
+publication/learning. It specifies material-chart reuse, priors, source regions, delayed returns
+and owned implementation packets through the actual episode consumer. The earlier unspecified
+mapping is resolved by separating drive from constitutive source, as the existing continuing
+boundary API already permits. A three-stage complex exterior directional calculation checked
+the complete source/internal, M and D adjoints with maximum absolute discrepancy 1.07e-11;
+this checks the derived plan equation, not new native execution or application quality.

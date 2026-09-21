@@ -1218,153 +1218,457 @@ remain the final codec; the present generator already advances before it is deco
 
 ### The source and condition construction
 
-[established-bounded; source-inspected] The exact native attachment is returned:
-`NativeFieldSession::from_native_field`, `field_session/incidence.rs` and `native_source.rs`
-derive the width from the actual field and construct `s=x_r`, `c_i=U_(r←i)x_i−x_r` from one
-pre-target resident packet. `form_native_reaction` binds the original source/condition to
-compatibility and normal formation; `condition_family_image` carries the returned family to
-another source. [The helical generator return](../../research/records/2026-09-20_NATIVE_INCIDENCE_FORMS_AND_REUSES_THE_HELICAL_GENERATOR.md) supplies the
-inferred relation and its native use. `found`/`prepare_geometric` remain the legacy symbol
-presentation. Its `geometric_word` already executes `y=Σ p_i U_i x_i`, `Φ(y,p)`, fixed-D
-reflection and held-boundary iteration, with the complete paired return. The unfinished relation
-is between that material/source chart and the new `Φ(x_r,Δ)`, where `Δ_i=U_i x_i−x_r`; sharing a
-body type does not define the conversion or license reusing M under a different meaning. That
-mapping remains to be derived. The current word also retains only boundary coordinates between
-stages, reuses the original internal b and returns a preview. Continuing execution needs its
-full joint rows and publication through the same owner.
+<a id="executable-field-campaign"></a>
 
-[definition] Holonic Encoding and receiving already have their [construction](../../research/records/2026-09-11_HOLONIC_ENCODING_RETAINS_TRANSFORMATION_GRAIN_ACROSS_MODALITIES.md),
-`ReceiverHistoryCompression`, `HolonicCultivationCharts.AutoencodingChart`, factor/receiver
-operations and concrete helical encoder/decoder. The unfinished Athena source/receiver call
-must apply these at its actual admitted transformation and receiving scope. It is not a request
-to invent encoding, delay it as a separate subsystem, or treat every native output as unencoded. Binary polarized faces remain legitimate source presentations;
-musical examples prescribe no computational unit names.
+[definition; agent-inferred] This is the selected implementation contract for the next campaign.
+The object is one continuing field with its source and receiving interfaces. The deliverable is
+its public Athena invocation on recorded source episodes, including generation, delayed learning,
+continuation and executable reuse. The existing geometric iteration, incident restriction,
+normal law, receiver family and helical constructions are implementation inputs. This section
+settles the reaction chart, state, boundary maps and transactions; the roadmap supplies order.
 
-[project-postulate] This section implements local restrictions of the whole causal situation
-specified above. Source-null contrasts diagnose a declared receiver's lost distinctions; they
-do not define context as a classification of text preparations. Compose available current,
-capacitance/storage, topology and interior-return owners before adding a new extraction or
-fitting stage. A whole-field diffusion product, an SSM trajectory and a joint future section
-are applicable output constructions through the same source/receiver contract.
+#### 1. Separate transported drive from the constitutive source
 
-[definition] Consume the returned fitted material through
-`eta=M_s a+M_h h+M_mix(h tensor a)`, with `a=(c-p,c,p)` and `v=c+eta`.
-At fixed h this is an affine source action with its retained numerical/material family.
-The existing neighborhood owns the compatibility relation, normal material and its applied-M
-graph together. Its wave/joint action reads the standing resident h and actual source restriction;
-normal observation formation uses h from the producing cut, including delayed returns, while
-condition contact changes contemporary standing. `found_features` supplies the feature width;
-the applied graph consumes those features through the existing bilinear/wave relation owner.
-The stored dyadic action and its normal-reference enclosure remain different readings.
-Current validation belongs in CONSTRUCTION_STATE and its linked cycle record.
+[definition; agent-inferred] At receiving site r, use the standing current q_r as the reaction
+source and its actual incident differences as the condition. Participation determines the incoming
+drive. The selected operator is
 
-[definition] Build the actual pre-return context exposure in the coupled/section-input
-attachment and the native local source owners. Reuse `ResidentGeneratorNeighborhood`,
-`ResidentContextualSection`, condition preimage/contact, normal material and current/field
-transport. `NativeCoupledBody::incorporate` already uses the returned dependent body; another
-package carrying the same handle does not add this source distinction.
+```text
+u_ri = U_(r←i) q_i,                  Δ_ri = u_ri − q_r,
+ell_ri = β Re⟨q_r,u_ri⟩,            p_r = softmax(ell_r),
+y_r = Σ_i p_ri u_ri,                f_r = Φ(q_r,Δ_r),
+eta_r = M_r f_r,                    a_r = y_r + eta_r.
+```
 
-[definition] For each admitted developmental comparison, preserve S (coarse source), C
-(available resident contextual state) and Y (the actual returned difference) at the same
-producing cut. The existing contextual factorization asks whether Y on ker S factors through
-C. Use the source-null contrast, not equal spelling, to identify missing conditions. If
-ker S intersect ker C contains a direction exposed by Y, return that actual contrast and
-refine the source/condition representation through admitted incidence or additional native
-state. Increasing a scalar condition dimension without such a relation is not the repair.
+[proved-derived] This is the existing separation enacted by
+`FieldReactionEnclosure::apply_joint_current` and `NativeFieldReactionPort::ContinuingBoundary`:
+the field's standing source produces the reaction, while an independently supplied drive enters
+with it. Here the drive is the already-implemented participation operator T[Ψ]. No conversion
+between p and Δ is asserted. `Φ(q,Δ)=q⊕Δ⊕(Δ⊗q)` remains the existing constitutive feature law.
 
-[definition] Scope the reused contextual owners correctly. The field-contrast constructor
-currently realizes one observed real ray with retained context expressions; it is not a
-general learned context space merely because it records an ambient width. The bilinear
-contextual-section owner can expose the declared condition chart. Compose independent
-contrasts and the required native restriction/formation map at that owner, and retire borrowed
-developmental source sections when their sufficient relation is formed. An exterior contextual
-inspection must not become a host semantic update or a per-observation context archive.
+[definition] Each local port chart records its current basis, oriented incoming arcs and the
+component restriction used for Δ. Identity self comparison may participate in p but contributes
+no Δ coordinate. Actual arc addresses determine these restrictions; missing contacts are not
+unknown zero-valued observations. Initialize one material owner per declared template port chart; every instance supplies its
+port isomorphism to that chart. A nonisomorphic site receives its own material owner. Share M
+and accumulate observations together only through those declared bindings; grouping equal-degree
+rows for execution does not itself license parameter sharing. Homogeneous material groups use the existing neighborhood and normal
+section owners; heterogeneous groups remain constituents of the same field, with explicit local
+source/condition restrictions. A site with only identity self-drive has p=1 and no nonzero
+incident condition; use the existing linear-material specialization there rather than inventing
+a constant contextual observation.
 
-[established-bounded; source-inspected] The existing restriction is concrete:
-`ResidentConstitutiveFibre::contextual_section(s)` constructs
-`D_s={(dc,dy) : (0,dc,s tensor dc,dy) in R}` in the source/condition/mixed/target relation.
-It retains vertical directions and the fixed source. Its `retain_condition_current` accepts
-an explicit current in that context chart. `ResidentGeneratorNeighborhood::prepare_consequence`
-already predicts using `prior_condition.current()` before receiving an observed target;
-only afterward does condition preimage/contact prepare the successor. In
-`read_wave_relation_in_chart(..., None)`, None reads the standing resident condition; it does
-not mean an unconditioned generator or a missing forecast argument.
+[definition] The former geometric `Φ(y,p)` is retained under its legacy chart tag. Its checkpoints
+remain readable and its tested operation remains callable. It is not relabeled as `Φ(q,Δ)`.
+Transfer existing native incident material when its source, condition, target, units and frames
+match. For unitary port maps P,Q and target map V, the feature map is
+`F=diag(P,Q,Q⊗P)` and `M'=V M F*`, `H'=F H F*`, `B'=V B F*`; the unit prior and target energy
+are preserved. A different feature law is a different material domain, not a reshape operation.
+The existing helical material retains its admitted mathematical interface; old alphabet-control
+weights supply a baseline at their original scope.
 
-[definition] The native attachment supplies resident maps `s=A x_pre`, `c=C x_pre`, with
-x_pre the participating source/preparation state before the target arrives. A and C are the
-declared source/context restrictions constructed from admitted incidence and developmental
-contrasts. Their rows, reference offsets and widths enter the existing current/section ports.
-At fixed s, contextual differences pass through D_s; a chosen lawful section may give
-`dy=L_s dc`, while the full fibre remains available. The needed binding is from those resident
-preparation carriers to the existing condition chart, not from the unknown target to c. An
-observation-derived `PreparedConditionContact::successor()` belongs to the returned body and
-later predictions. Passing it into that observation's own prior forecast would leak the target.
-Check the condition/current at the producing cut explicitly, including its chart reference.
+[counterexample] There is no general fixed linear conversion from the old features to the new
+ones: with u=(1,−1), q=0 and q=i both give y=0 and p=(1/2,1/2) for any fixed beta,
+while q and Delta=(1−q,−1−q) differ. A reaction eta=q therefore distinguishes preparations
+collapsed by the old local features. This settles
+why the new law needs its actual source port rather than a renamed old condition vector.
 
-[definition] Observations used to form the context map belong to development. Evaluation
-targets may not choose the source representation, contact graph, candidate material or
-decoder. During a source section's passage, context is computed from the available prefix/
-source state before its corresponding next-current target is supplied. The exterior driver
-mounts actual source parts and their relations; it does not implement a private learner.
-Intra-section sequencing is a declared transport, not a new native clock or parameter per
-character. Reply-to/part links constrain association but do not make two messages pointwise
-semantic pairs.
+#### 2. One global current and one internal branch
 
-### Compatibility, prediction and formation are different operands
+[definition; agent-inferred] Let the declared geometry have N receiving sites and local boundary
+width d complex coordinates. The global boundary is q∈C^(N d); the internal current is one
+b∈C^k in the operative contact-birth chart. Found the global field with N times the local junction
+population. `FieldModel` must distinguish local reaction width from global field width. Local
+reaction evaluation produces rows a_r; flatten them once and apply the one global D:
 
-[definition] A linear span of compatible observations describes possible relations; it is
-not automatically an empirical conditional predictor. Keep three roles explicit:
-the source/law fibre, a predictive vector or normalized measure for the requested task, and
-the final emitted receiver. In particular the full signed mass hyperplane is not a learned
-probability distribution. Repetition can alter statistical weight without creating a new
-independent constraint; a new conflicting observation need not assert that every linear
-combination is an equally supported target.
+```text
+A = I + D D*,       A v = 2(a + D b),
+w = v − a,          b_ref = D* v − b.
+```
 
-[definition] Compose existing normal sufficient statistics for a vector prediction and
-the native normalized-exponential/adjoint receiver where the task asks for a predictive
-distribution. The next-symbol task has an actual observed codec target, so its normalized
-prediction and cross-entropy comparison can be differentiated through the producing native
-material. Retain phase/oriented current and source ambiguity before that statistical reading.
-The normalized output score does not supply contact incidence or replace contextual transport.
-Use the already-derived Gibbs/KL, source-fibre aggregation and production-frame adjoint laws;
-do not introduce a host score, handwritten language rule or second loss-driven update engine.
+Do not append the same b independently to every site. `reflect_section`'s existing independent
+rows remain a batch/reference interface; they are not the continuing global state.
 
-[definition] An immutable fixed-condition relation remains valid for its producing cut.
-Construct subsequent contact from contemporary condition/material with the matching source
-map; do not mutate an old cut or reuse h=1 as a universal contextual law. Merely switching the
-session to its dependent variant is insufficient if the underlying source constraints still
-force that same condition.
+[definition] Preserve the existing held relaxation, extended to its full joint operand. At a
+request's producing cut, let `z_anchor=(q_anchor,b_pre)` with supplied source coordinates installed
+through their boundary map and free coordinates inherited from standing. H̄ holds only supplied
+boundary coordinates; its internal block is zero. For μ=2^(-relaxation_bits), execute
 
-### Local constituents and shape
+```text
+z_t = (q_t,b_t),
+z_(t+1) = H̄ z_anchor + (I−H̄)((1−μ) z_anchor + μ (w_t,b_ref_t)).
+```
 
-[definition] The current neighborhood requires homogeneous member source charts and the
-session selects a member. Use actual source/condition restriction and receiver maps to give
-local generators their appropriate domains. First bind a task-local family; generalize the
-existing member/port attachment when a required composition has different widths. Preserve
-the shared continuing ecology and immutable constituent material. The older heterogeneous
-digest/nominal-boundary apparatus is not substituted for this mathematical port relation.
+Thus b evolves in every stage. The anchor is fixed for that invocation; the next request starts
+from the committed endpoint and its own newly supplied boundary. Retain the full joint enclosure
+as canonical, with row restrictions as views. Rejoining independent row radii must not replace
+that common enclosure. The finite stage count is the declared integration aperture; output
+positions are not integration steps. Scattering's norm identity and the source/relaxation energy
+change are reported separately.
 
-[definition] Form or refine a constituent when an actual residual/condition contrast requires
-an independent generating direction; reuse it when the declared future factors through its
-existing modes. Existing leader, restriction/rebase, field/local-relation and mode owners
-supply the elementary constructions. Overlapping constituents retain their actual shared
-currents and joins. Neither a scalar loss threshold nor an authored semantic class determines
-universal morphology.
+[definition; agent-inferred] For a new geometric field, let B_U q collect the declared oriented
+arc differences `U_e q_from−q_to`, with one component per current channel. Found
+`D_0=B_U* Gamma`, where Gamma contains the model's supplied nonnegative contact amplitudes
+(default unit amplitude). If an interface supplies admittance g instead, Gamma uses its positive
+square-root enclosure, retaining that distinction. A supplied existing D keeps its actual material.
+Extend the existing constructor/rest origin to carry declared contact columns as well as observation-born
+columns; initialize their b to the declared current, zero for newly founded unexcited modes.
+Do not manufacture source observations to create these columns. The frame, contact identities,
+D representation and initial material belong to the model declaration. K/U and the birth chart
+are fixed during a producing word; changes between words require their existing source-qualified
+transport and retained pending chart, never index-based reassignment.
 
-[definition] **Delivered outcome:** a source-conditioned mathematical relation is inferred
-from actual supplied examples/constraints and used on new values and a new admitted composition.
-The same repaired source/condition path produces a short held-out contextual text continuation
-that can be inspected as text. These are the first product checks, not a claim that one finite
-case establishes general conversation.
+#### 3. Execute global reflection through its retained factors
 
-[definition] **Checks and disposition:** use the recorded fixed-condition collapse as the
-control; compare same visible input under distinct actual preparations, changed source
-presentations, new admitted inputs and unavailable conditions. Inspect full source/condition
-and predictive receiver, not only entropy, rank or state change. If new context is present but
-the target family still collapses, inspect the relation/objective assembly; if native predicted
-currents are useful but decoded text is wrong, inspect the existing receiver/codec mapping.
-Repair the identified owner before lengthening the exposure. Native context-section,
-neighborhood, normal/normalized and coupled-session tests cover only their changed claims.
+[definition; agent-inferred] Global reflection uses D and D* actions, not a mandatory dense
+(Nd)² covariance. Extend the current operative map/program owner with resident action forms:
+`apply_d`, `apply_d_adjoint`, and the composition `x+D(D*x)`. Preserve the incidence anchor and
+low-rank/source-overlap increments already represented by `OperativeMapProgram` and operative
+return factors. A sparse declared incidence anchor and these factors remain one map owner.
+The existing dense source factor is the small-width reference and an admitted cached factor,
+not the only executable global representation.
+
+[proved-derived] For A=I+DD*, A≥I. Obtain a certified L≥||D||² from the retained factors or tighter
+source geometry. Choose the dyadic omega=2^(-ceil(log2(1+L))). Resident iteration
+
+```text
+v_0 = 0,        r_n = rhs − (v_n + D(D* v_n)),
+v_(n+1) = v_n + omega r_n
+```
+
+has exact-arithmetic contraction at most 1−omega. It also has the independent certificate
+`||v−A^(-1)rhs||≤||rhs−Av||`. Use the outward residual, including operator/source and arithmetic
+uncertainty, to bound the returned reflection. The requested grain determines the solve tolerance;
+the mounted resource allowance bounds work. If rounding dominates, rebase/refine the existing
+representation and retry from its resident candidate. A refused carrier/work request leaves the
+live field unchanged and returns that concrete residual. The same action/certificate implements
+the implicit adjoint of the declared scattering equation, with its residual included in the
+covector enclosure. This does not claim an exact derivative of an unrolled rounded iteration;
+forward and reverse certify the stated S_D and its variation. This extends `source/reflection.rs`, its surface binder and existing reflection
+kernels; it does not create another solver or field subsystem.
+
+[definition] Compile and reuse the source-qualified factor/action and norm bound while D's
+identity is unchanged. New D invalidates only its derived execution cache; pending producers
+retain theirs. The current-factor and factored-moment owners compact actual repeated factor
+expressions with their decoder/residual. Native action reads factors directly; it does not
+reconstruct historical dense maps on each iteration. #61 owns placement/action realization;
+#18 owns sufficient-statistic and factor representation at this actual operation.
+
+#### 4. The source and receiving material maps
+
+[definition; agent-inferred] Keep `SymbolCurrentChart` as the exterior Unicode-scalar source
+basis and renderer. For m admitted codec faces, x=e_s∈C^m. Its ordinal is an address. The field's
+local width d comes from its declared junction/mode basis, never m or a Unicode bit count.
+The boundary material is
+
+```text
+E_in : C^m → C^d,                   q_given = E_in x,
+R_text : C^(d+1) → C^m,             logits_j = Re R_text [q_j;1],
+probabilities_j = softmax(logits_j).
+```
+
+E_in and R_text are learned constitutive maps within the same body/material transaction. They
+are not a second learning engine, and neither is the whole Holonic Encoding construction.
+Their source/receiver port maps carry the actual geometry frame; transport to the common codec
+frame precedes the receiving contraction. Input source order, part boundaries and verified
+reply/context incidence remain in the prepared section and its port bindings. The driver does
+not invent a semantic alignment between positions in a request and a response.
+
+[definition] Replace the flat context-string preparation with source regions carrying ordered
+codec cells, exposed part ports and the actual recorded joins. `prepare_source_regions` first
+binds each part to its declared source-region ports, then compiles its ordered intra-part and
+recorded parent/reply incidence into the input contact restrictions. These restrictions participate
+in the native gathers and operative boundary map; they are not a sidecar ignored by the operator.
+Do not connect two inscriptions merely because their buffers are adjacent. The model declaration
+provides the finite source/receiving interface ports; contact-mode identities belong to those
+physical/declared ports, not to a newly accumulated event archive. Rebinding an interface transports
+its current and producing maps explicitly. K and its source bindings are captured before the target
+and remain fixed within the word. Field aperture may be enlarged through an explicit field/chart
+construction before use; it is not enlarged by silently multiplying a glyph count into local width.
+
+[definition] Use a persisted material seed, independent of glyph values and source identifiers,
+to initialize distinct nonzero dyadic columns e_s of E_in. Choose their numerical precision so
+their squared norms are carried at the declared grain. Initialize receiving row s to
+`R_s=(2 e_s*,−||e_s||²)`. These are explicit untrained material priors, not discovered meanings.
+Store the constructed maps and the codec revision. Under a codec permutation P, transport
+`E_in'=E_in P*`, `R_text'=P R_text`, including the bias. No Hamming/ordinal geometry is supplied
+as a semantic source relation.
+
+[proved-derived] At q=e_t, the initial potential margin of t over s is
+`||e_t−e_s||²>0`. Thus the finite source chart has an initial receiving correspondence and the
+all-zero encoder/decoder gradient trap is avoided. Native score uncertainty retains its actual
+margin/fibre; the constructor must realize the given finite chart, not perturb symbols using
+their labels to break an arithmetic tie.
+
+[definition] Extend the normal owner with an explicit immutable coefficient prior:
+`H_0=I`, `B_0=W_0`, `C_0=||W_0||²_F`. Keep the existing `target_energy` as observed/proxy-target
+energy Q_data, initialized to zero. Total H/B include the prior; data checks use
+`H_data=H−H_0`, `B_data=B−B_0` and Q_data. The objective is
+`(tr(W H W*)−2 Re tr(B W*)+Q_data+C_0)/2`. Its initial value is
+`||W−W_0||²_F/2`. Prior energy is never reported as observed data, and old zero-mean-prior rests
+retain their current meaning. Kernel, objective, residual certificate and rest carry this prior
+explicitly; an unchanged legacy validator cannot be used on an unmarked new prior. Update the
+energy-based coefficient-reference bound too: the augmented normal source gives
+`||W_reference||_F <= sqrt(Q_data+C_0)` under the unit prior. Using only sqrt(Q_data) would give
+a false zero bound at a nonzero prior with no observations. Source/target uncertainty and the
+normal residual retain their separate contributions.
+
+[definition] E_in's one-hot feature Gram is diagonal, so store counts and cross-source columns
+in the existing normal representation (#18). R_text has small source width d+1 and exterior
+class rows. Receiver rows can share H only if they have the same admitted observation set.
+New class rows start with their own unit-prior statistic block; they do not inherit old rows'
+historical H with an invented zero target. Concatenate the blocks' applied potentials for one
+receiver/softmax. This is statistic storage, not a new semantic class hierarchy. Reuse normal
+applied-map/section/pullback operations and add the actual prior/diagonal/block rest variants.
+
+[definition] The receiving aperture is explicit. Read character potentials from all requested
+receiving ports after the joint generation. A support receiver, another normal material map
+from `[q_boundary;1]` at the declared response-boundary junction, has A_out+1 potentials for
+lengths 0…A_out. It selects the exposed prefix of the already generated section. Its target is
+the actual response extent. This is a boundary/support face, not a token-generation loop or an
+end-marker injected into the native current. The full generated section and its uncertainty
+remain available. Held source text is exhibited through its original known boundary; free text
+is produced solely by the native receiving map and the exterior scalar codec.
+
+[definition] Establish the initial finite codec from the pinned development material; evaluation
+targets do not choose it. Actual incoming inscriptions may extend its source/receiver declaration
+with newly seeded prior columns/rows before preparation, leaving native width unchanged. Pending
+returns retain their old codec/E/R cuts. A development target outside its old receiving domain
+is recorded as an unsupported old face, then admits a successor receiver from that actual new
+material; it is not scored as if the old prediction already contained that row. Its new receiving
+comparison is explicitly `R_retro ∘ T_producing` on the retained latent output. R_retro extends
+the frozen producing decoder by the newly admitted prior rows (with their frame transport), not
+by an arbitrary target-authored answer map. Its gradient belongs to this new receiving comparison.
+The original unsupported prediction remains recorded, and its field generation is not replayed.
+Evaluation targets never perform this admission.
+
+<a id="compatibility-prediction-and-formation-are-different-operands"></a>
+
+#### 5. One complete learning return
+
+[definition] A recorded agent response is observed conduct, not a gold answer. Its predictive
+comparison retains that scope. Later human returns and tool outcomes keep their actual links
+and constrain the corresponding later interaction; they are not converted into automatic scalar
+approval/reward labels. Actual usefulness is judged against the supplied request and its relevant
+outcomes through the existing evaluation receiver, separately from fitting historical conduct.
+
+[definition] For actual response length L≤A_out, use unit-weight cross-entropy on its supplied
+characters and the support face. The source reconstruction comparison `R_text[E_in x;1]` versus
+its known source face anchors the codec maps; it updates E_in/R_text and is reported separately
+from response usefulness. Its covector is not inserted into an unrelated field occurrence.
+Only actual target positions enter the response comparison. Target length and text do not enter
+the forward preparation, held mask or iteration aperture.
+
+[definition] Use descending covectors throughout: the normalized CE return is `target−p`, not
+`J_p(target−p)`. The latter is the squared-probability return. Receiver pullback is `R_q* g`;
+its material covector is `g [q;1]*`. Phase remains in these complex covectors even though the
+receiver potentials are real. Propagate the response covector through the final joint relaxation,
+then every producing global reflection and local operation in reverse order.
+
+[proved-derived] For joint output covectors (g_w,g_bref), let
+
+```text
+lambda = (I+D D*)^(-1)(g_w+D g_bref),
+g_a = 2 lambda − g_w,       g_b = 2 D*lambda − g_bref,
+G_D = lambda (b−b_ref)* + v (g_bref−D*lambda)*.
+```
+
+Accumulate the two outer-product factors of G_D over every stage; do not form a dense gradient
+or update D partway through the return. Use the existing unit-Frobenius contact metric:
+`delta D = sigma * sum_t G_D,t`, with sigma=2^(-step_bits) applied once. Stage its
+`DyadicDeposit` realization and retain the difference from the complete enclosed covector,
+as the existing contact-return owner does. “Unit-Frobenius” specifies the metric; it is not
+an instruction to clip or normalize every gradient to norm one. For the relaxation, send
+`mu (I−H̄)g` through reflection and accumulate
+`[H̄+(1−mu)(I−H̄)]g` at the anchor. This includes the internal coordinates.
+
+[proved-derived] The existing bilinear pullback gives `(g_q^Phi,g_Delta)` from `M* g_a`.
+Let `h_i=Re⟨g_a,u_i⟩`, `k=(diag(p)−p p*)h`. The remaining local return is
+
+```text
+g_q += g_q^Phi − Σ_i g_Delta_i + beta Σ_i k_i u_i,
+g_u_i = p_i g_a + beta k_i q + g_Delta_i,
+g_(neighbor i) += U_i* g_u_i.
+```
+
+Scatter these through actual incidence, including repeated endpoints. This retains both
+participation variation and the negative query arm of every incident difference. There is no
+extra condition-to-p pullback as in the legacy `Phi(y,p)` chart. Source anchor covectors finally
+return through E_in, with material covector `g_q x*`.
+
+[definition; agent-inferred] For M, E_in and the receivers, use the existing normal law with an
+explicit derived-covector staging operation. Given producing feature f and descending g, stage
+at contemporary W using target `W_now f + sigma g_producing` and the declared unit observation
+weight. This is a proximal training operand, not an externally measured local reaction:
+
+```text
+H_next = H_now + f f*,
+B_next = B_now + (W_now f + sigma g_producing) f*,
+W_next H_next = B_next.
+```
+
+The operands are map-specific: for M use `f=Phi(q,Delta)` and its descended reaction covector;
+for R_text use `f=[q_generated;1]` and its real CE covector; for support use its boundary feature
+and length CE covector; for E_in use `f=x=e_s` and the full returned anchor covector. E_in never
+receives the raw m-dimensional character CE vector. Its response covector has already traversed
+R and the whole field; reconstruction contributes its separate direct R pullback.
+
+[definition] Transport a delayed codec return by its recorded permutation/append injection J:
+old decoder covectors occupy the corresponding current rows; E features use `x_current=J x_old`.
+Update only the receiver rows admitted by that producing comparison. A newly added row is skipped,
+not fed a zero-covector proxy that would falsely accumulate confidence/history. A deliberate
+R_retro comparison explicitly admits its new rows. Current source/receiver frame maps transport
+features and dual covectors together. This is also why receiver statistic blocks have their own
+observation scopes.
+
+Retain the normal-reference and rounding residuals. Stage all occurrences of each shared material
+jointly before one publication. Actual supplied local `(s,c,eta)` constraints instead use their
+actual eta and `receive_reaction_observation_at`; compatibility formation uses the original c.
+Never deposit a CE-derived proxy into the exact compatibility relation as an observed fact.
+Natural-language replies supply an exterior receiving comparison, not individual internal eta
+observations. Pure structured solver requests may supply constraints directly without fabricating
+a prediction event.
+
+[definition] A local condition preimage is a derived family, not independently assignable values
+for globally shared neighbors. To install it, pull it back through the actual global restrictions:
+`{z' : A_r z'=s, C_r z' in F_c}`. Use existing affine preimage/condition-image/contact owners and
+the declared pairing, retaining free directions and obstruction. This source-qualified contact
+can affect a requested successor, never its own earlier forecast. Standalone mathematical
+receivers can return the full local family without committing a field change.
+
+#### 6. Publication, delayed returns and rest
+
+[definition] A generation transaction captures its geometry/layout, D/birth chart, local material,
+E/R/support receiver, source, anchor and masks. It evaluates the whole word and prepares the
+complete endpoint publication through `reflection_commit.rs`. Add a staged full-output commit
+because a relaxed endpoint is generally not a raw `NativeFieldReflection::output`. All numerical
+work, receiver formation and pending-handle allocation complete before the body publishes one
+new `(q,b)` and its output handle. Preview leaves field current and learned material unchanged;
+if requested, it may retain an immutable producing comparison. Retaining that receipt does not
+assert a physical/current commit or require a fabricated observation.
+
+[definition] A later observation reads the retained producing maps and state for its full
+covector. It stages updates to contemporary D/M/E/R and consumes the comparison once. It never
+commits the old generated current again. Refactor `apply_reflection_target`'s existing preparation
+into a prepared material return; combine all material successors before infallible publication.
+Do not sequence several fallible mutations and call that atomic. Preserve the contemporary q/b;
+changed constitutive material acts on the next invocation. Preserve the canonical joint image
+when the material stage allocates new internal storage: rebind its ownership witness only after
+proving zero current change, rather than repacking independent q/b marginals and losing their
+correlation. Transport old contact factors by their
+birth/frame map when that chart changes, retaining the original producer until its consumers end.
+
+[definition] A pending rest retains the producing source/map witness, birth/layout identity,
+anchor/masks, material and decoder revisions, and completed forward operands or an executable
+word over those immutable operands. Recompute only under that producing cut, never current M/D.
+Persist the current global joint state separately. The existing E/R-independent legacy payloads
+remain readable; a new version identifies the incident chart, global layout and boundary material.
+Release pending preparations, comparisons and derived caches after their final actual consumer.
+Completed episodes retain sufficient material/current/fibre, not a mandatory event replay archive.
+
+<a id="local-constituents-and-shape"></a>
+
+#### 7. Encoding and reuse are part of this invocation
+
+[definition] Source ports, local reactions, global scattering and receiving faces form one
+ported passage with its decoder and retained interior. E_in alone is an initial learned boundary
+chart. Native repeated-action reuse compiles the actual admitted operation, source/condition cut
+and receiver: fixed-source contextual sections, the shared normal statistics, operative-map
+factors, and the existing factor/mode/moment/recurrence owners. Mathematical operator handles
+from the existing workshop can enter at their declared native current ports; code printers and
+keyword dispatch do not replace that operation.
+
+[definition] Use `factor_receiver`/`ReceiverHistoryCompression` and the observable-moment/helical
+specializations when their actual operator and receiver satisfy `D_dec E=ρ`, `E_next T=U E`.
+The execution representation is a compiled applicable portion plus its still-needed native
+remainder. A failed descent retains the separating direction and executes that remainder; it
+does not stop the campaign or license an approximate equality claim. A current zero M is not
+a reason to discard source directions needed by future learning. Codecs, changing material,
+source boundaries and pending receiving cuts remain operands of that retained representation.
+
+#### 8. Owned implementation packets and public calls
+
+[definition] The following names describe the planned extensions, not claims that those new
+methods already exist. Preserve existing public/wire names and add a tagged incident-field
+layout; old point, text/control and wave methods retain their original contracts.
+
+| Packet | Owned implementation and source law | Concrete return / dependency |
+|---|---|---|
+| Global field action and current | Engine `field/junction/operative/{source.rs,map_source.rs,source/reflection.rs,source/reflection_commit.rs}`, their existing surface binders/kernels; add declared-contact origin, D/D* factor action, residual-certified solve and `prepare_joint_current_commit`/commit | One global current/source owner; full joint endpoint publication; used by the word below. The dense reflection remains its small exact/reference comparison. |
+| Local reaction and full word | HNA `coupled_wave/body/field{,/geometric,/formation}.rs`, `field_geometry.rs` and placement; add `GeometricFieldLayout` with global/local widths, contact projections and material bindings | The selected q/Delta reaction, independent drive y, full z recurrence and arbitrary joint-covector pullback. Existing point and legacy participation-chart methods remain distinct. |
+| Boundary material | Engine `field/material_transport/normal/direct{,.rs}` and normal layout/kernel/rest, HNA `field_session` boundary adapter; add nonzero prior, diagonal one-hot statistics and `prepare_covector_return` | E_in, R_text and support receiver use the same normal law and complete producing derivatives; no alphabet-dependent body width. Can be built alongside global field action. |
+| Atomic learning and rest | Engine `source/reflection_target.rs`, HNA field model/session rest and shared material owners; add `prepare_material_return`, composed commit, tagged geometric pending payload | Full-word D factors plus M/E/R proposals publish together on contemporary material. Original current is not recommitted; preview comparisons and changed receivers retain their actual scope. |
+| Athena source/receiver application | `field_session{,/geometric,/native_source}.rs`, `alpha/exposure.rs`, `examples/athena_exposure_field.rs`, workbench field-session dispatch and `HnaStream` | One public request → native generation → code/structured face → actual comparison → successor/reopen. The same data reader and evaluation kit consume this mode. |
+| In-operation reuse and assessment | Existing contextual/factor/normal/current-mode owners; `native_performance_benchmark/{episode,quality}.py` | Measured reused constituent plus native remainder, actual episode judgments and same-source restart. This closes the composition, not a separate demonstration campaign. |
+
+[definition] The model declaration supplies `geometry`, `local_roots`, source and receiving port
+bindings, material-group identities, beta/mu/stage aperture, grain and material seed. Local width
+is `local_complex=3*local_roots`. The actual native packet dimensions are
+`global_boundary_components=2*N*local_complex`, `internal_components=2*k`, and
+`joint_components=global_boundary_components+internal_components`; the existing `components()`
+APIs count real interleaved components. Codec revision
+and m determine only the boundary material's exterior dimensions. Existing aperture arguments
+select admitted source/receiver ports; they do not derive local width or a new topology from the
+spelling. `request`, `observe`, `checkpoint` and `HnaStream::pump_field` must dispatch this tagged
+mode through `NativeFieldSession`/`NativeCoupledBody`. The public incident mode is the default for
+the campaign; explicit legacy configuration remains available to reproduce its evidence.
+
+[definition] At each boundary return, expose the generated native section/support and rendered
+face, source/receiver/codec revisions, producing/current material cuts, comparison identity and
+uncertainty. A structured mathematical result may use its existing numerical/factor receiver and
+native current without traversing the text codec. The existing mathematical workshop supplies
+those operators; it is not rebuilt and no keyword-to-answer route is introduced.
+
+#### 9. Actual Athena caller and completion
+
+[definition] `athena_exposure_field`, `FieldSectionRequest::from_exposures`, `ExposureReader` and
+`HnaStream` remain the application owners. Add the declared incident-field mode to these callers,
+using E_in and receiving maps instead of alphabet-sized native channels. Use the complete held
+request, verified preceding context and requested response aperture; preserve masks, recorded
+reply/capture-event pairing and cursor semantics. A larger source than the declared aperture
+returns its exact extent and is rerun with an admitted source/receiver declaration; it is not
+silently trimmed or replaced by a smaller artificial task. A native target/update succeeds before
+its recorded source is acknowledged. A delivery failure retains the already-generated face.
+Extend the existing stream `field-request` value with the tagged incident mode, codec revision,
+source/receiver bindings, requested aperture and emitted support, text or structured face,
+producing/current cuts, comparison identity and native uncertainty/placement receipt.
+`quality.py episode` must read that mode's Unicode/support receiver directly while preserving the
+legacy nibble assessment branch for its recorded outputs. It must not apply the old two-symbols-
+per-byte check to the new field. The existing result identity and source/assessment separation
+continue to bind each judgment to the actual emitted artifact.
+
+[definition] Complete this campaign on the existing recorded development/evaluation episode
+consumer, including a contextual request, a mathematical/structured-operator request and a code
+request. Inspect actual returned content and source use, not merely symbol validity or material
+change. The executable return includes generated support/text or structured face, original and
+current material cuts, delayed update, resumed next request, time/memory/transfer and reused
+operation. Reuse the pinned exposure stream and already prepared source episodes. The September 20
+773–776 development cut is the paired-return/restart control; event 3406683 / source sequence
+36095 and the existing event-3398355 repository-backed episode remain full-source retrospective
+application cases, with their original assessment files outside input. The existing consequence
+kit supplies structured mathematical/code receiver checks. These controls do not by themselves
+close application usefulness: development uses the admitted development families, and the new
+responses must satisfy their actual source constraints. The helical inference and prior controls
+supply regression dependencies; another isolated demonstration cannot replace these callers.
+
+[definition] Formal ownership is explicit: extend
+`Computation/HolonicConstitutiveCirculation.lean` at its graph-projection/scattering law for the
+separate drive and whole-joint step; `Computation/HolonicAdjointNormalization.lean` for the
+participation/incident-difference composition; `Physics/AccumulatedNormalResponse.lean` for the
+nonzero prior, data-vs-prior energy and covector-prox normal identity; and
+`Computation/HolonicCultivationCharts.lean` for the finite boundary-map/decoder correspondence.
+`Foundation/Holon.lean::ofEvolution`, `ReceiverHistoryCompression` and
+`Physics/ReflectedBoundaryMemory.lean` supply generation, reuse and retained-interior statements.
+These are targeted continuations of existing owners; their hypotheses and new proof scope stay
+with the implementing packet, while Lean remains outside native inference.
+
+[definition] The decisive implementation checks are the complete directional return through
+E/R, p/Delta, M, global D and b; one internal branch across several rows; reflection residual
+against the small exact reference; generation/observation publication separation; producing-cut
+reopen and release; codec rechart/bootstrap; and the actual episode results. Existing unchanged
+receipts remain usable. Lean checks target the new drive/condition and global-joint composition
+lemmas at the existing Framework owners. No universal theorem, new rule checker or standalone
+encoding project precedes this implementation.
 
 ## 4. Holonic Encoding and compressed continuation
 

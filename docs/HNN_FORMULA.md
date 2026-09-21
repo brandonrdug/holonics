@@ -512,6 +512,38 @@ continuation remain actual consuming work. The
 and [source map](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#field-session-source-map)
 connect the implementation, residuals, source episodes and these remaining terms.
 
+### The selected incident-field composition
+
+[definition; agent-inferred] The [executable campaign contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
+selects the existing standing-source/incoming-drive distinction for the full field. At site r,
+
+```text
+u_ri=U_(r←i)q_i,       Delta_ri=u_ri−q_r,
+p_r=softmax(beta Re⟨q_r,u_ri⟩),     y_r=Σ_i p_ri u_ri,
+f_r=Phi(q_r,Delta_r),  a_r=y_r+M_r f_r.
+```
+
+Flatten a once; one global D scatters `(a,b)` to `(w,b_ref)`. There is one internal b in the
+actual contact chart, not a copy for each row. With fixed anchor `(q_anchor,b_pre)` and a mask
+Hbar on supplied boundary coordinates, the entire state evolves by
+`z_next=Hbar z_anchor+(I−Hbar)((1−mu)z_anchor+mu(w,b_ref))`.
+The legacy word above remains its implemented numerical control. Its M on `Phi(y,p)` is not
+reinterpreted as material on `Phi(q,Delta)`; the contract specifies admissible port recharting.
+
+[definition] E_in maps the exterior symbol source basis into the field's declared current basis;
+R_text and the support receiver read the generated field. They are trainable boundary material
+in the same normal/adjoint transaction. Alphabet size belongs to those exterior ports, not to
+local field width. The contract fixes their nonzero prior, initial finite-codec correspondence,
+source-region incidence, cross-entropy and material update. This boundary chart contributes to
+the ported passage; exact transformation compression still uses its actual generator/receiver
+and retained remainder through the existing owners.
+
+[proved-derived] In the local reverse, the condition contribution at the query is
+`−Σ_i g_Delta_i`, and at neighbor i it is `+g_Delta_i` before U_i*. Participation contributes
+both `p_i g_y` and the softmax-Jacobian score term. The global reflection returns one internal
+covector and two material outer-product factors per stage. The contract gives their full
+formulas and the anchor terms; all producing operands remain fixed until that return completes.
+
 ## 2. Transformer, convolution, SSM and diffusion operators
 
 ### One connected tensor computation

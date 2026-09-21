@@ -252,3 +252,8 @@ condition; the inferred two-direction condition fibre is transported to another 
 plural output. This develops use of the shared bracket without introducing another screw or
 contact definition. Orbit configurations, finite motion, closure and physical material still
 use their existing owners and hypotheses above.
+
+[definition] The [finalized field contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
+now carries this dependency into the selected q/Delta reaction, independent transported drive,
+global joint state and actual Athena receiver. It specifies matching port/material recharting;
+it does not replace this shared bracket with a newly authored operator or reinterpret its units.
