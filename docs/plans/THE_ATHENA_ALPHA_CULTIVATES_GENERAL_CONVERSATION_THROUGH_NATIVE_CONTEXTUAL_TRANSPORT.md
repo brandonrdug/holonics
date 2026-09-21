@@ -1230,15 +1230,72 @@ family; actual observations develop that relation; admitted future action determ
 standing. The incident implementation below remains useful constituted machinery. Its current
 text/support receiver is one application of the shared law.
 
-[established-bounded; source-inspected] Existing
+[definition] The computational object is the
+[helical pair interaction unit](../HOLON.md#the-helical-pair-interaction-unit): a
+`HolonicInteraction` over a `ScrewPair`, with the contact slip map derived from the pair jet.
+Generators with initial configurations are the field's sites, admitted pairs its arcs and their
+phases its context. The [design record](../../research/records/2026-09-21_THE_HELICAL_PAIR_INTERACTION_IS_THE_HNN_SITE_AND_PHASE_CARRIES_CONTEXT.md)
+holds the source audit behind this contract.
+
+[established-bounded; source-inspected] The returned incident field executes the zero-advance,
+unit-radius collapse of that unit. Its participation score is bilinear and its reaction
+already forms `Δ_i=U_i q_i−q_r`. Its geometry, `examples/support/linked_torus_field.rs`,
+assigns one `TorusLongitude` junction to each source cell on two rings joined at one junction.
+Site count, resident state, the support statistic and checkpoint size therefore grow with source
+length (76,599 sites in the development run). `IncidentEncoder` is a one-hot column per
+exterior symbol and `IncidentTextReceiver` a per-slot alphabet face with a length-class support
+face. `holonics-hna/src/` imports none of `screw`, `holonic_interaction`, `holonic_chain`,
+`standing`, `receiver_release` or `HelicalMomentReuse`. Existing
 `field_session/native_source.rs::{prepare_native,form_native_reaction,contextual_section,condition_family_image}`
 and `body/field/formation.rs` supply original-condition formation and a reusable compatibility
-family. `IncidentFieldModel::evaluate` instead applies its normal M directly throughout the
-q/Delta word. Both already infer/reuse generating material. The unconnected consumer is the
-compatibility family through this whole incident operation and its requested receiver, not
-an absent definition of generator or an absent source codec.
+family; `IncidentFieldModel::evaluate` applies its normal M directly through the q/Delta word.
+The global D/b action, normal law, complete producing return, atomic publication, frozen
+cuts, rest/remount and hardware receipts are returned machinery and carry over unchanged.
 
-[definition] Preserve the operands when composing those owners. With observed source o,
+[definition; agent-inferred] **Machine geometry.** A declared finite family of `SituatedScrew`
+sites with admitted pairs forms the machine; its size is a model choice independent of source
+and response length. `GeometricFieldSpec` is built from that family: junctions are generator
+sites, arcs are admitted pairs, and each arc's `ExactWavePhaseTransport` comes from the two
+generators' `RationalPhase`s. Several rates supply several grains concurrently. The ring
+layout remains the recorded binding of saved models and a legacy control.
+
+[definition; agent-inferred] **Source.** An ordered source passage enters through a boundary
+port whose chart is the existing encoder material. Occurrence k is received at the generators'
+phases after k admitted steps:
+
+```text
+m_g = Σ_k Ĝ_g(k)⁻¹ E(u_k)                              helical moment at site g, winding retained
+M_gh(δ) = Σ_k ⟨Ĝ_g(k)E(u_k) | Ĝ_h(k+δ)E(u_{k+δ})⟩      pair relation at relative offset δ
+stream action = (P S⁻¹)ⁿ Sⁿ                             steppedWord_eq_generator_power
+```
+
+`HelicalMomentReuse` and the quadratic moment condensation own the exact compression of these
+moments, their ordered words and ambient fibre; the pair relations at relative offsets are the
+source's menu, with an adjacent-pair merge as offset one. Each generator advances by its own
+declared or inferred rate, including zero. The exterior codec unit does not define a native
+clock. `IncidentPreparation` keeps cells, parts, reply joins and provenance and binds them by
+phase offset instead of `slot_rows`.
+
+[definition; agent-inferred] **Receiving.** A response position is a receiving phase,
+`y_j=ρ_R(Ĝ(j)q)`, read by the same receiving material at each phase. `response_port_start`
+becomes a phase offset with the same fixed binding in generation, comparison and rest. Response
+extent is a received termination face along the axial coordinate, not a material whose rows
+scale with the aperture. Participation uses the full pair receiver, periodic and axial parts
+together, and its covector returns through `PairQuadranceJet::pullback`. Joint whole-section
+refinement and the one global `q/b` run over the machine's sites; the producing return
+traverses the same `Ĝ` operands in reverse (`reflectedReturn`).
+
+[definition; agent-inferred] **Material and inference.** Learned material is the generators'
+rates and advances, initial configurations and relative phases, contact material `D_f`, the
+reaction/reflection `M/D` and the boundary charts `E/R`. The normal law is unchanged and its
+features include the pair jet `(Δ,Q,DQ)`. Which pairs are admitted and which rational rates close
+is inferred by closure over observed pairs (`closes_after`, `lifted_winding`, the identity
+atlas kernel, `GeneratorInference`, `menu_loop_closure`), with compatible configurations left
+plural. A generator with no participation at the present phase retains material,
+configuration, phase and winding under `standing.rs`; its re-engagement releases through
+`receiver_release.rs`.
+
+[definition] Preserve the operands when composing these owners. With observed source o,
 held boundary h, producing refinement law `F_Θ`, receiver R and requested face family Y,
 the compatible family satisfies
 
@@ -1257,24 +1314,32 @@ variation used to develop material or navigate constraints, not proof of a uniqu
 `form_native_reaction` accepts an observed pre-reflection reaction. A final receiving outcome
 must pass through the actual producing maps; it cannot be relabelled as that hidden target.
 
-[definition] #17 owns this join in `body/field/{formation,incident}.rs` and
-`field_session/{native_source,incident_application,mathematical_port}.rs`. Carry admitted
-source/condition sections to the public incident invocation, expose the resulting receiving
-family, and propagate actual comparisons through their producing operands. Retain a useful
-contextual generator/section at the operation that formed it and consume it from a changed
-source or receiver. Keep the current normal M/D reuse; do not replace it with a word archive.
-Bind an applicable compression owner with `D E=ρ` and `E_next T_a=U_a E`, including action
-domain/incident constraints. Where the nonlinear word does not close, execute and retain the
-remainder. `NativeSharedDriveMode`'s equal-drive legacy-current law and the fixed linear
-moment quotient do not automatically cover this incident current.
+[definition; agent-inferred] **Packets, in dependency order, on disjoint owner paths:**
 
-[definition] The returned evidence concerns the same generating relation under the relevant
-change of source, receiver or activation. A dormant interval preserves its admitted future
-capability; a requested reactivation or new receiving use consumes that retained material.
-Inspect the actual requested consequence and its complete residual, including unchanged
+| Packet | Owner paths | Return | Issue |
+|---|---|---|---|
+| 1. Pair contact | `holonic-engine/src/holonic_interaction.rs` with a helical submodule; `relational-geometry/src/screw.rs` consumed unchanged | `ContactFace`/`MediumContact`/`HolonicInteraction` declared from a `ScrewPair` and its jet with declared `D_f`, weight and `Clock`; exact tests mirror each `HelicalPairInteraction` theorem | #28, #48 |
+| 2. Serial chain | `holonic-engine/src/holonic_chain.rs` | Ordered `SituatedScrew` chain: finite motion product, recharted Jacobian columns, per-pair contacts, revolute/prismatic rows, a planar closure control | #27 |
+| 3. Machine geometry | `holonics-hna/src/native/field_geometry.rs`, `field_session/{incidence,incident_preparation,incident_application}.rs`, a machine spec beside `examples/support/linked_torus_field.rs` | Generator-family `GeometricFieldSpec`; phase-carried source moments; receiving phases; full pair-receiver participation with jet pullback; legacy layout preserved | #17 |
+| 4. Material and closure inference | `body/field/{formation,incident}.rs`, `field_session/native_source.rs`, `identity_atlas` and `GeneratorInference` consumers | Pair-jet features in the normal law; closure inference of rates, configurations and admitted pairs; plural families carried through the public invocation | #17, #49 |
+| 5. Standing and release | HNA binding of `standing.rs` and `receiver_release.rs` | A dormant generator retained through an inactive interval and re-engaged at a later phase with its future separator | #17 |
+| 6. Economy | `receiver_history_compression`, `hardware_cover`, `section_partition` | Moment accumulation as the compact source-span statistic; stepped words by generator power; resident state independent of source length; actual launch realization reported | #18, #61 |
+| 7. Episodes | `alpha/exposure.rs`, `examples/athena_exposure_field.rs` | Recorded Athena, mathematical and code episodes on the machine; a motor-chart control inferring chain phases for a requested receiving face, without a simulator | #16 |
+| 8. Formal | `formal/elementary-holonics/ElementaryHolonics/{Geometry,Transport,Foundation}` | The obligations listed in #62 | #62 |
+
+Packets 1, 2 and 8 are independent of 3; 3 consumes 1; 4–7 consume 3. Keep the current
+normal M/D reuse; do not replace it with a word archive. Bind an applicable compression
+owner with `D E=ρ` and `E_next T_a=U_a E`, including action domain/incident constraints.
+Where the nonlinear word does not close, execute and retain the remainder.
+`NativeSharedDriveMode`'s equal-drive legacy-current law and the fixed linear moment quotient
+do not automatically cover the refined incident current.
+
+[definition] The returned evidence is the same generating material consumed at a changed
+phase, source and receiver; resident state and cost that do not scale with source length; a
+dormant generator re-engaged; exact agreement of the jet pullback with rational differences;
+and the inspected episode consequences with their complete residual, including unchanged
 failure cases. Repeated character reproduction, another unchanged screw-bracket example or
-a policy reset cannot substitute for that return. #16 retains the concrete Athena episode
-assessment; #18/#61 address the measured representation/execution costs of this composition.
+a policy reset cannot substitute for that return.
 
 [definition] Robotics contributes observation/actuation units, partial state, held commands,
 physical/control clocks and reset/return semantics through the

@@ -23,6 +23,19 @@ retained standing, not continuous activation. Read `Foundation/Standing.lean`, t
 and the [source audit](research/records/2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md)
 when working on recall, relevance, homeostasis or action inference.
 
+[definition] **The computational object is the helical pair interaction**
+([definition](docs/HOLON.md#the-helical-pair-interaction-unit),
+[geometry](docs/HELICAL_GEOMETRY.md#the-pair-is-a-holonic-interaction-contact),
+[audit and packets](research/records/2026-09-21_THE_HELICAL_PAIR_INTERACTION_IS_THE_HNN_SITE_AND_PHASE_CARRIES_CONTEXT.md)):
+a `HolonicInteraction` over a `ScrewPair` whose contact slip map is the pair's relative velocity.
+HNN sites are generators with initial configurations, admitted pairs are arcs and the machine's
+phases carry context. A source passage enters as phase-carried helical moments, a response
+position is a receiving phase, and the machine's size is independent of source length. The
+rotor machine (material carried by a phase shift, reflected return through the producing
+operands), the Bombe (configuration inference by pairwise loop closure) and an articulated body
+(an ordered chain of `SituatedScrew`s) are instances. State a design in these operands before
+implementing it; a text, image, acoustic or motor chart is a boundary of this object.
+
 [definition] One Holon `|H⟩_F` carries situated incidence K, constitutive/learned material Θ,
 joint currents and internal modes, a frame F, and participating receivers. Circulating modes,
 interlinked toroidal domains, helical passages, contacts and recursive/preimage geometry belong
@@ -38,6 +51,9 @@ geometry supplies transport, comparison, variation and reuse; it is part of the 
 | Normal/factor inference | `W H=B` for the declared source/target statistics, prior and weights; preserve an unresolved null fibre |
 | Generation | Refine the joint field under source and receiving conditions, then emit its boundary face; the refinement coordinate is distinct from an output-token index |
 | Contact variation | `Q=⟨Δ\|Δ⟩`, with both sources' motion; the second variation includes geometric/prestress terms as well as a Gram term |
+| Pair contact | `J=[v_a\|−v_b]`, `DQ=2J*Δ`, `D²Q=2J*J+2diag(Δ·a_a,−Δ·a_b)`; `M_contact=Σw J*DJ`; zero power ⇔ `ṡv_a=ṫv_b`; a bilinear score is the polarized pair quadrance, so the unit-phase chart is the pair at zero advance and unit radii |
+| Phase carriage | `R_d=S⁻ᵈPSᵈ`; return `A⁻¹FA`; n occurrences compose to `(PS⁻¹)ⁿSⁿ`; a menu loop closes ⇔ the stage word fixes the boundary image; the helix is the winding-retaining lift of a torus chart |
+| Source and receiving phases | `m_g=Σ_k Ĝ_g(k)⁻¹E(u_k)`, pair relation `M_gh(δ)` at relative offset δ, `y_j=ρ_R(Ĝ(j)q)`; each generator advances by its own rate and the codec unit is not a native clock |
 | Continuing compression | `D E=ρ`, `E_next T_g=U_g E`; retain the separating direction or interior defect when the source does not descend |
 
 [project-postulate] The framework's ambition is frontier-level usefulness on consumer hardware.
@@ -71,8 +87,13 @@ fixes the implemented composition: standing q/incident Delta feed the reaction, 
 drive y, and one global D/b acts on their sum. Source/text/support maps are boundary material
 with stated priors and the same normal update. The contract contains the complete adjoint,
 publication, rest and source-episode packets. These are implemented constituents of the shared
-operation; the text/support chart is one application. Continue from those returns and the
-roadmap's current generator/receiving join, preserving the original target port and source fibre.
+operation; the text/support chart is one application. Its Athena geometry
+(`examples/support/linked_torus_field.rs`) assigns one ring junction per source cell with a
+one-hot encoder and per-slot faces, and `holonics-hna/src/` imports none of the screw,
+interaction, chain, standing or release owners; that layout is a control the generator machine
+replaces. Continue from those returns through the roadmap's packets: pair contact and serial
+chain, the generator-machine geometry, closure inference with standing/release, then economy
+and episodes, preserving the original target port and source fibre.
 
 [definition] `IncidentFieldOptions::response_port_start` fixes the receiving slots independently
 of input length; fresh sessions reserve the final receiving aperture. Generation, comparison
@@ -96,9 +117,9 @@ Paths in this table are relative to `crates/` unless stated otherwise. These are
 | Resident packets, kernels and launch | `holonic-engine/src/resident_section{,.rs}`; `kernels/exact_resident_section.cu`, `exact_packet_linear.cuh`; `holonic-mount/src/{cuda,launch_law,section_layout}.rs` |
 | Exact algebra / generator reduction | `holonic-engine/src/exact_linear{,.rs}`, `prime_image_algebra.rs`, `receiver_history_compression/`, `winding_inertia.rs`; host/reference and resident APIs have distinct scopes |
 | Retained availability and predictive release | `holonic-engine/src/{standing,receiver_release}.rs`, `exact_linear/{contextual,kernel_modes}.rs`; `field/internal_mode.rs` retains the equal-drive specialization and explicitly refuses incompatible operative currents; `Foundation/{Standing,CausalRelevance,ReceiverHistoryCompression}.lean` supplies future sufficiency |
-| Helical and geometric source | `relational-geometry/src/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs`; `receiver_history_compression/observable.rs::HelicalMomentReuse` binds finite pair actions to the existing moment decoder |
+| Helical and geometric source | `relational-geometry/src/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs`; `receiver_history_compression/observable.rs::HelicalMomentReuse` binds finite pair actions to the existing moment decoder. No Rust file yet joins `ScrewPair` to `HolonicInteraction`: the pair-derived `ContactFace` is #28/#48 and the serial `SituatedScrew` chain #27; `Transport/HelicalPairInteraction.lean` is their checked statement |
 | Framework facade | `holonics/src/lib.rs`: `geometry` and `structure` work without the default native feature; HNN implementation is `holonics-hna` |
-| Formal entry | `formal/elementary-holonics/ElementaryHolonics/Framework.lean`: Core, Geometry, Dynamics, Information, Physics, Computation; [formal guide](docs/FORMAL_FRAMEWORK.md) |
+| Formal entry | `formal/elementary-holonics/ElementaryHolonics/Framework.lean`: Core, Geometry, Dynamics, Information, Physics, Computation; [formal guide](docs/FORMAL_FRAMEWORK.md). Core imports `Foundation/{Standing,ReceiverRelease}`; Dynamics imports `Transport/{HolonicInteraction,HolonicChain,ContinuingTube,HelicalPairInteraction}`. A native packet that adds or changes a mathematical law lands with its Lean counterpart or names the obligation it leaves in #62 |
 | Application interfaces | `applications/holonics-workbench`; `applications/conversation-data`; [repository layout](docs/REPOSITORY.md) |
 
 [definition] **Native enclosure ABI:** a sealed section can store definite words for a centre

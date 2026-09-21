@@ -370,6 +370,15 @@ reaction observation; a final text, acoustic or motor consequence is not that hi
 The [native contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition)
 specifies the source/target-preserving join and future-action reuse.
 
+[established-bounded; source-inspected] This specialization is the
+[helical pair interaction](HOLON.md#the-helical-pair-interaction-unit) at zero advance and
+unit radii. Its Athena geometry places one `TorusLongitude` junction per source cell, its
+encoder is one column per exterior symbol and its receiver a per-slot face, so site count and
+the support statistic grow with source length. The contract's packets build the field from a
+fixed generator machine with phase-carried source moments, receiving phases, the full pair
+receiver and its jet pullback; the reaction, global D/b, normal law, producing return,
+publication and rest below are consumed unchanged.
+
 [established-bounded; source-inspected] The incident-field path now has a resident realization of
 the [executable field campaign](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
 boundary. The reaction consumes standing `q` and incident `Delta` through

@@ -2,6 +2,10 @@ import ElementaryHolonics.Framework.Core
 import ElementaryHolonics.Transport.WorldTube
 import ElementaryHolonics.Transport.WorldTubePotential
 import ElementaryHolonics.Transport.ChangingReceiver
+import ElementaryHolonics.Transport.ContinuingTube
+import ElementaryHolonics.Transport.HolonicInteraction
+import ElementaryHolonics.Transport.HolonicChain
+import ElementaryHolonics.Transport.HelicalPairInteraction
 import ElementaryHolonics.Mathematics.AffineOrbitDivisor
 import ElementaryHolonics.Mathematics.AnalyticNavigation
 import ElementaryHolonics.Mathematics.AnalyticReceiving

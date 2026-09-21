@@ -279,6 +279,7 @@ import ElementaryHolonics.Transport.JunctionLaw
 import ElementaryHolonics.Transport.JetStaircase
 import ElementaryHolonics.Transport.Neck
 import ElementaryHolonics.Transport.HolonicInteraction
+import ElementaryHolonics.Transport.HelicalPairInteraction
 import ElementaryHolonics.Transport.HolonicChain
 import ElementaryHolonics.Millennium.HolonicRankFourInteractionPlanes
 import ElementaryHolonics.Millennium.HolonicMaxwellPropagation

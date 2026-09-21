@@ -78,8 +78,62 @@ construction: infer or reuse an admissible generating relation and release its c
 through a participating receiver. Their media supply actual interaction laws and charts.
 The September 21 [source synthesis](../research/records/2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md)
 connects the rotor/Bombe comparison, simulator interfaces and existing source owners.
-“Key-like” describes applicability to a situated receiving constraint; it names neither a
-secret, a universal inverse nor a new computational primitive.
+“Key-like” names the configuration and phase at which a retained generator pair closes for
+the requested receiver: a generator **and an initial configuration**, which is `SituatedScrew`.
+It names no secret and no universal inverse.
+
+<a id="the-helical-pair-interaction-unit"></a>
+
+### The helical pair interaction unit
+
+[definition] The computational object of this construction is the **helical pair interaction**:
+a `HolonicInteraction` whose media coordinates are the parameters of a
+`relational_geometry::screw::ScrewPair` and whose contact slip map is that pair's relative
+velocity. It composes existing owners and introduces no wrapper type. The
+[design record](../research/records/2026-09-21_THE_HELICAL_PAIR_INTERACTION_IS_THE_HNN_SITE_AND_PHASE_CARRIES_CONTEXT.md)
+gives the source audit; the [helical guide](HELICAL_GEOMETRY.md#the-pair-is-a-holonic-interaction-contact)
+owns the geometry.
+
+```text
+Objects       a=(ξ_a, x_a(0)), b=(ξ_b, x_b(0))   SituatedScrew: generator and initial configuration
+Parameters    (s,t), each a RationalPhase         own clock; chart phase and retained winding
+Separation    Δ(s,t)=x_a(s)−x_b(t),  Q=⟨Δ|Δ⟩      PairQuadranceJet
+Slip map      J=[v_a | −v_b],  Δ̇=J(ṡ,ṫ)           ContactFace.J_f, derived from the pair
+Variations    DQ=2 J*Δ;  D²Q=2 J*J + 2 diag(Δ·a_a, −Δ·a_b);  pullback is the adjoint
+Contact       M_contact=Σ_f w_f J_f* D_f J_f,  P≥0,  P=0 ⇔ ṡ v_a=ṫ v_b on a dissipative face
+Medium        q̇=(Ω−M_contact)Gq+Bu               storage G, flux Ω, drive/action Bu, Clock
+Reading       ρ_R at the Perspective               release through receiver_release
+```
+
+[proved-derived; formal-checked] [`Transport/HelicalPairInteraction.lean`](../formal/elementary-holonics/ElementaryHolonics/Transport/HelicalPairInteraction.lean)
+proves these pair/contact identities and the polarization identity
+`⟨a|b⟩=(⟨a|a⟩+⟨b|b⟩−⟨a−b|a−b⟩)/2`. The existing unit-phase participation score
+`β cos(2π(q_i−q_j−φ_ij))` is therefore the pair quadrance with both advances zero and unit
+radii. The helix is the lift that retains the winding a torus chart forgets; the full pair
+receiver reads the periodic part and the axial part together.
+
+[definition] The action relation below is typed by this unit. `z` is a family of helical pair
+interactions with their media and incidence. `T_a` is their driven medium evolution composed
+with phase stepping. A control `a` is a `Perturbation`/`Bu` word or a policy over receiver
+faces. The same object appears in each supplied reference:
+
+| Reference | The unit's operands |
+|---|---|
+| Rotor machine | Fixed material carried by a phase shift, `S⁻ᵈPSᵈ`; machine state on a discrete torus with stepping as a winding; forward passage, reflection and return through the producing operands, `A⁻¹FA`; a stream of n occurrences is `(PS⁻¹)ⁿSⁿ`, so the machine does not grow with the stream. The key is material, frame offset, initial configuration and a boundary involution. |
+| Bombe | The menu is the incidence law stating which `(s,t)` interact. A closed menu path closes at a boundary port exactly when the known stage word fixes that port's boundary image. Inferring an initial configuration from pairwise loop closure, with the compatible boundary family left plural, is the training operation. |
+| Articulated body | An ordered chain of `SituatedScrew`s; joint space is the torus chart of revolute phases with a line per prismatic parameter; Jacobian column i is `ScrewGenerator::rechart` of `ξ_i`; `reciprocal_pairing` is wrench–twist power; each contact is one unit; actuation is `Bu`; an observation is a receiver face. |
+| Present HNN field | Bilinear participation and `Δ_i=U_i q_i−q_r` are the circle×circle collapse of the pair receiver. The unit restores radius, advance, winding, second variation and contact material. |
+
+[definition; agent-inferred] In an HNN the sites are generators and context is their phase
+state. An ordered source passage enters through a boundary port; occurrence k is received at
+the generators' phases after k admitted steps, so each site accumulates a helical moment
+`m_g=Σ_k Ĝ_g(k)⁻¹E(u_k)` and each admitted pair a relation `M_gh(δ)` at relative offset δ.
+A response position is a receiving phase, `y_j=ρ_R(Ĝ(j)q)`. The machine's size is independent
+of source and response length. Each generator advances by its own declared or inferred rate;
+the exterior codec unit does not define a native clock. A generator with no participation at
+the present phase retains its material, initial configuration, phase and winding under the
+standing law below. The [native contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition)
+specifies the implementation packets.
 
 [definition] Let z carry the interacting Holons, their material, incidence, clocks and relevant
 environment, and let `F_o={z:O(z)=o}` be the compatible source family. Let a specify a complete

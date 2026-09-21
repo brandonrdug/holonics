@@ -7,6 +7,18 @@ No simulator, training run or new native/formal implementation is claimed by thi
 The [Holon](../../docs/HOLON.md#situated-generator-inference-dormant-modes-and-action) owns the
 shared definition; the [roadmap](../../docs/plans/THE_ROADMAP.md) owns order.
 
+[definition] **Attached correction, September 21.** The
+[design record](2026-09-21_THE_HELICAL_PAIR_INTERACTION_IS_THE_HNN_SITE_AND_PHASE_CARRIES_CONTEXT.md)
+types this record's action relation by the helical pair interaction unit and audits the
+incident consumer against source. This record's standing, quantifier, pre-reflection, entropy,
+simulator-interface and Flash-correction content is retained. Its statements that the rotor
+conventions are "not generic helical periodicity laws", that neither the alphabet nor `n=26`
+is "an elementary Holonic grain", and that a "new named key/memory wrapper would not supply"
+the composition are superseded by the identifications there: fixed material carried by a
+phase shift, the reflected return through the producing operands, menu closure as
+configuration inference and the serial chain of situated screws. Its "precise consuming
+boundary" (a join between two HNA paths) is replaced by that record's packets.
+
 ## Direction and recovered source
 
 [project-postulate] Brandon's direct request joins key-like generator applicability, flux

@@ -38,7 +38,15 @@ Retained material can support dormant availability between active modes; its fut
 receiver descent determine what compression may discard. Recurrence and homeostasis refer to
 the constituted driven dynamics, with storage, flux and dissipation at their actual units.
 
-[definition] The current incident word below is an implemented specialization of this law.
+[definition] The operands of this model are those of the
+[helical pair interaction](HOLON.md#the-helical-pair-interaction-unit). `U_(F←G)` is the phase
+carriage of fixed material between two generators; the participation score is the pair
+receiver; `Δ_i=U_i q_i−q_r` is the pair separation; the reflected return `A⁻¹FA` traverses the
+producing operands; the local adjoint is the pair-jet pullback. A source passage enters as
+`m_g=Σ_k Ĝ_g(k)⁻¹E(u_k)` and a response position is the receiving phase `y_j=ρ_R(Ĝ(j)q)`.
+
+[definition] The current incident word below is an implemented specialization of this law: the
+pair at zero advance and unit radii, on a ring with one site per source cell.
 Its learned M/D already apply to new currents. `IncidentTextReceiver` reads one boundary;
 its character/support comparison is not the universal learning objective or the only possible
 consequence. The [composition boundary](HNN_COMPOSITION.md#implemented-incident-field-composition-boundary)

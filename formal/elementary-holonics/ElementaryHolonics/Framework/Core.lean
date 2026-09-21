@@ -7,6 +7,8 @@ import ElementaryHolonics.Foundation.CausalRelevance
 import ElementaryHolonics.Foundation.ReceiverQuotient
 import ElementaryHolonics.Foundation.TransportWord
 import ElementaryHolonics.Foundation.ReceiverHistoryCompression
+import ElementaryHolonics.Foundation.ReceiverRelease
+import ElementaryHolonics.Foundation.Standing
 
 /-!
 # Situated objects, receivers, and causal composition

@@ -62,6 +62,13 @@ period are separate claims. The [September 21 synthesis](../research/records/202
 connects these existing owners to rotor constraint inference, knot/game navigation and the
 [robotics interface contract](HARDWARE_AND_MODALITY_BOUNDARIES.md#robotics-and-simulation-boundary).
 
+[definition] The object these relations act on is the
+[helical pair interaction](HOLON.md#the-helical-pair-interaction-unit): a `HolonicInteraction`
+over a `ScrewPair` whose contact slip map is the pair's relative velocity. Generators with
+initial configurations are the sites, admitted pairs the arcs and their phases the context.
+A rotor machine, a Bombe menu and an articulated body are instances; a text, image, acoustic
+or motor chart is a boundary of it.
+
 [definition] These are compatible parts and declared specializations of the same construction.
 The [model formula](HNN_FORMULA.md) supplies the full hypotheses, source maps and variations.
 
@@ -111,6 +118,7 @@ their exterior decimal statistical readings keep those sources and receiving sco
 |---|---|---|
 | Toroidal domains, shared cells and phase connection | `analytic_field`, graded/simplicial and connection owners; `HolonicTorusKnots`; [intrinsic field](../research/experiments/intrinsic_holonic_flow/README.md) | `GeometricFieldSpec` validates existing analytic junctions/arcs and compiles their phase transport. `field_session/geometric.rs` executes the legacy geometric chart; tagged `IncidentField` uses the same declared geometry through the full incident body and preserves ordered source contacts. The supplied linked-torus boundary network has a narrower domain than the intrinsic volume/advection reference. |
 | Helical pair and contact variation | `relational_geometry::screw`; `Geometry/ScrewGeometry`; `identity_atlas::screw_gram_point` | `HelicalMomentReuse` binds situated finite pair actions and quadrance to the existing observable-moment compression. Lifted phase closure preserves extra turns; an ambient moment fibre retains its physical-configuration restrictions. |
+| **Helical pair interaction: the HNN site** | `ScrewPair`/`PairQuadranceJet` with `holonic_interaction::{ContactFace,Medium,HolonicInteraction}` and `holonic_chain`; [`Transport/HelicalPairInteraction.lean`](../formal/elementary-holonics/ElementaryHolonics/Transport/HelicalPairInteraction.lean) checks the slip-map/contact, phase-carried material, reflected-return and menu-closure laws | No Rust file joins these owners yet and `holonics-hna/src/` imports none of them. The incident field executes the pair's zero-advance, unit-radius collapse on a ring with one site per source cell. The [unit](HOLON.md#the-helical-pair-interaction-unit) and its [packets](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition) replace that layout with a fixed generator machine whose phases carry the source (#28/#48, #27, #17, #62). |
 | Normalized receiver and both input covectors | `field/receiver/normalized/phase.rs`, `normal/direct/section/composition.rs`, `resident/section/bilinear_features` | The geometric word calls the existing normalized receiver and pullback, both bilinear covectors, M transpose and fixed-D reflection. It returns through every refinement stage before one staged material update. |
 | Constitutive current and storage | `NativeConstitutiveField`, paired junction/source/reflection and normal material | `NativeCoupledBody` owns the operation; fixed-D scattering and its adjoint are existing mechanics. A friction/heat claim additionally supplies that material law. |
 | Source, generation, observed comparison and continuation | `holonics-hna/src/native/field_session.rs`, `incident_application/`, `incident_preparation.rs`, `shared.rs`, `geometric.rs`, `alpha/exposure.rs` | Public session and exposure driver, saved comparisons/cursor, Unicode source preparation, E/R/support boundary maps, full incident q/Delta/y/global-D/b return and rest. Recorded context is recovered from the verified prior source prefix across restart. Input provenance remains at the exterior boundary. |

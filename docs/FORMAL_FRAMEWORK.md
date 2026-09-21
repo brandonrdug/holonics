@@ -43,6 +43,32 @@ the proper-frame/axis Rust tests separate from the checked Lean bracket/translat
 It also reconnects the existing landmark, normalized-mode, inference and future-receiver
 compression owners; none is newly founded by this specialization.
 
+[proved-derived; formal-checked] `Framework.Dynamics` imports
+[`Transport/HelicalPairInteraction`](../formal/elementary-holonics/ElementaryHolonics/Transport/HelicalPairInteraction.lean),
+the formal statement of the [helical pair interaction unit](HOLON.md#the-helical-pair-interaction-unit).
+It joins `Geometry/ScrewGeometry` to `Transport/HolonicInteraction`: the pair's relative
+velocity is a contact slip map (`pairSlip_mulVec`, `pairSlip_transpose_mulVec`), the face power
+is the material read at that velocity with synchronized passage as its zero-power kernel
+(`pair_face_power`, `pair_face_power_eq_zero_iff`), the pair two-jet is separation, slip
+pullback, isotropic contact form and geometric term
+(`pairQuadranceTwoJet_eq_slip_contact_geometric`), and a bilinear participation score is a
+polarized pair quadrance (`bilinear_score_eq_polarized_quadrance`). In an arbitrary group it
+states phase-carried material and stepping (`phaseTransport_add`, `phaseTransport_add_period`,
+`steppedWord_eq_generator_power`), the reflected return (`reflectedReturn_involutive`,
+`reflectedReturn_no_fixed_point`) and boundary/menu closure (`boundary_conj_list_prod`,
+`boundary_involution_reciprocal`, `menu_loop_closure`). `Framework.Dynamics` also imports
+`Transport/{HolonicInteraction,HolonicChain,ContinuingTube}` and `Framework.Core` imports
+`Foundation/{ReceiverRelease,Standing}`, which the default target previously omitted.
+
+[open] #62 owns the formal counterparts still owed: proper-rotation recharting and axis
+extraction, the serial chain and its Jacobian columns, `RationalPhase` winding and closure, the
+stepped machine as a `TransportWord`/`ReceiverHistoryCompression` instance, the helical moment
+as a compressed source span, standing of a dormant generator, and the incident reaction's
+complex variation with pair-jet features. From the September 19 exact-algebra wave (`5bb2cdbe`)
+through `73ff9950`, 141 native source files changed against 7 Lean files. A
+native packet that adds or changes a mathematical law lands with its Lean counterpart under
+the matching entry point, or names the obligation it leaves in #62.
+
 [definition] The [Holon specification](HOLON.md) is the current elementary operational
 synopsis: situated interfaces and faces, composition, frame transport, constitutive response,
 variation, inference, generation and modal representation. `Foundation/Holon.lean` owns the

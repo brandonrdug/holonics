@@ -372,6 +372,19 @@ this direction does not select it as the required simulator or schedule its exec
 [generator/action law](HOLON.md#situated-generator-inference-dormant-modes-and-action) applies
 equally to communication, motor control and other receiving media.
 
+[definition] The native object behind this interface is the
+[serial chain of helical pair interactions](HELICAL_GEOMETRY.md#the-pair-is-a-holonic-interaction-contact).
+An articulation is an ordered family of `SituatedScrew`s: joint positions are their phases on
+the torus chart, with a line per prismatic parameter; joint velocities are the parameter
+rates; the Jacobian's columns are recharted generators; each link–link or link–object contact is
+a `ContactFace` whose slip map is the pair's relative velocity; position, velocity or effort
+commands are the `Perturbation`/`Bu` drive on the `Medium`; `reciprocal_pairing` is the
+wrench–twist power; control cadence and held commands are `Clock` material. A reduced-coordinate
+articulation solver uses this same spatial-vector algebra. The simulator's observation and
+action vectors below are exterior charts of that object, as a character is an exterior chart
+of a text port. Inferring joint phases and drives that produce a requested receiving face is
+the same configuration inference as the [Bombe menu closure](HOLON.md#the-helical-pair-interaction-unit).
+
 [established-bounded; source-inspected] The inspected Isaac Sim tree is the clean revision
 [`7c206f75bdadd9e05fc457f19863ca4c3f0cb693`](https://github.com/isaac-sim/IsaacSim/tree/7c206f75bdadd9e05fc457f19863ca4c3f0cb693).
 Its [policy extension](https://github.com/isaac-sim/IsaacSim/blob/7c206f75bdadd9e05fc457f19863ca4c3f0cb693/source/extensions/isaacsim.robot.policy.examples/docs/Overview.md)
@@ -401,10 +414,10 @@ as image/audio rendering, with the material and time law appropriate to the actu
 
 [established-bounded; source-inspected] `NativeFieldAction` in the engine's
 `field/junction/operative/source/action.rs` executes the source-qualified `D/D*` reflection.
-It is an algebraic dependency, not an actuator/controller adapter. Existing screw/contact,
-`receiver_release`, native source/condition formation and field adjoints supply other parts.
-An HNN-to-simulator binding still owes the declared observation/action charts and causal return
-above. Deployment of an external policy establishes neither that binding nor recurrent
+It is an algebraic dependency, not an actuator/controller adapter. The chain consumer (#27),
+the pair-derived contact face (#28), `receiver_release` and the field adjoints own the native
+side. An HNN-to-simulator binding still owes the declared observation/action charts and causal
+return above. Deployment of an external policy establishes neither that binding nor recurrent
 stability, training convergence or transfer to physical hardware. The
 [source synthesis](../research/records/2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md#simulator-source-and-training-expectations)
 links the inspected controller, cadence and contact implementations.

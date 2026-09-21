@@ -13,6 +13,7 @@ They are reading paths, not phases or an inventory of every file. The
 Read [HOLON](../../docs/HOLON.md), [HNN_FORMULA](../../docs/HNN_FORMULA.md) and the
 [field-session source map](../../docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#field-session-source-map).
 
+- [The helical pair interaction is the HNN site and phase carries context](2026-09-21_THE_HELICAL_PAIR_INTERACTION_IS_THE_HNN_SITE_AND_PHASE_CARRIES_CONTEXT.md): **the confirmed design object.** Source audit of the incident field against the screw/interaction/standing owners, the unit's equations, rotor/Bombe/articulated-body instances, the generator-machine geometry, the checked `Transport/HelicalPairInteraction` laws, the Lean audit and the campaign packets.
 - [The HNN formula joins the library to the model](2026-09-14_THE_HNN_FORMULA_JOINS_THE_LIBRARY_TO_THE_MODEL.md): the actual field/operator composition.
 - [Eros unifies faces, landmarks and the continuing machine](2026-09-15_EROS_UNIFIES_FACES_LANDMARKS_AND_THE_CONTINUING_MACHINE.md): the purpose and whole/part construction behind the model.
 - [The operating guides carry the machine and research into the consumer](2026-09-20_THE_OPERATING_GUIDES_CARRY_THE_MACHINE_AND_RESEARCH_INTO_THE_CONSUMER.md): consolidation, verified driver repairs and the finalized issue division.
@@ -31,6 +32,7 @@ Read the [shared generator/action law](../../docs/HOLON.md#situated-generator-in
 and [participating receiver](../../docs/RECEIVER_HOLARCHY.md). These are the starting route for
 communication, dormant availability, homeostasis, control and robotics as well as recall.
 
+- [The helical pair interaction is the HNN site and phase carries context](2026-09-21_THE_HELICAL_PAIR_INTERACTION_IS_THE_HNN_SITE_AND_PHASE_CARRIES_CONTEXT.md): **the confirmed design object.** Source audit of the incident field against the screw/interaction/standing owners, the unit's equations, rotor/Bombe/articulated-body instances, the generator-machine geometry, the checked `Transport/HelicalPairInteraction` laws, the Lean audit and the campaign packets.
 - [Prediction is prepared transport and release is boundary current](2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md): source families, admissible action inference, physical preparation and coupled flux/storage.
 - [Situated generators retain modes and release action](2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md): rotor/Bombe constraint inference, recurrent availability, exact simulator boundaries, Flash source corrections and the incident compatibility consumer.
 - [Rubik faces lift to torus intersections and navigation](2026-09-19_RUBIK_FACES_LIFT_TO_TORUS_INTERSECTIONS_AND_NAVIGATION_GRAPHS.md): actual move words, quotient faces and retained full-state fibres.
@@ -118,6 +120,7 @@ backward-heat threshold have different formal owners, normalization and open con
 Read [helical geometry](../../docs/HELICAL_GEOMETRY.md), [the Holon](../../docs/HOLON.md) and
 [the intrinsic geometric field](../experiments/intrinsic_holonic_flow/README.md).
 
+- [The helical pair interaction is the HNN site and phase carries context](2026-09-21_THE_HELICAL_PAIR_INTERACTION_IS_THE_HNN_SITE_AND_PHASE_CARRIES_CONTEXT.md): **the confirmed design object.** Source audit of the incident field against the screw/interaction/standing owners, the unit's equations, rotor/Bombe/articulated-body instances, the generator-machine geometry, the checked `Transport/HelicalPairInteraction` laws, the Lean audit and the campaign packets.
 - [Clocked torus currents continue through a retained fibre](2026-09-08_CLOCKED_TORUS_CURRENTS_CONTINUE_THROUGH_A_RETAINED_FIBRE.md): phase, clock and continuing current.
 - [The helical-pair question](2026-09-19_THE_TRIGONOMETRY_OF_A_HELICAL_PAIR_IS_TRIGONOMETRY_OVER_A_TWO_SIDED_ANGLE.md): original synthesis with its later elementary corrections.
 - [The geometric field refines and returns its complete paired current](2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md): the actual geometric field consumer and its situated-pair moment/phase reuse.

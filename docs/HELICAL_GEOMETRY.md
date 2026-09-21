@@ -12,8 +12,10 @@ The [roadmap](plans/THE_ROADMAP.md) schedules construction; this guide states th
 uses these helical objects as reusable action/material, including their inactive availability
 and later receiving use. Rotor-state transport and knot manipulation provide concrete source
 comparisons in the [September 21 synthesis](../research/records/2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md).
-A finite permutation is a discrete transport specialization, not a universal helix codec;
-homeostasis refers to the actual driven return/stability law. The existing
+A rotor is the finite specialization of this object: fixed material carried by a phase shift,
+with a discrete torus of states and stepping as a winding. An articulated body is an ordered
+chain of these objects. [The pair below is a Holonic Interaction contact](#the-pair-is-a-holonic-interaction-contact)
+states both. Homeostasis refers to the actual driven return/stability law. The existing
 [`Horizon.smith`](../formal/elementary-holonics/ElementaryHolonics/Millennium/Horizon.lean)
 and [`RatioPresentation.blockTransport`](../formal/elementary-holonics/ElementaryHolonics/Geometry/CrossRatio.lean)
 connect projective charting to ordered cascades, while
@@ -153,6 +155,68 @@ pullback `−J*D J q̇`. The existing contact/constitutive/adjoint owners consum
 Area, normal reaction, medium, clocks and units supply the physical realization; a linking number
 alone supplies none of them. This is how the helical object reaches the Holonic Interaction.
 
+<a id="the-pair-is-a-holonic-interaction-contact"></a>
+
+### The pair is a Holonic Interaction contact
+
+[definition] The slip map of a pair is its relative velocity on the two parameters,
+`J=[v_a | −v_b]` with `Δ̇=J(ṡ,ṫ)`. It is the `J_f` of a `holonic_interaction::ContactFace`;
+the face's `D_f`, weight and `Clock` remain declared material. A `HolonicInteraction` whose
+media coordinates are the pair parameters and whose faces take this slip map is the
+[helical pair interaction unit](HOLON.md#the-helical-pair-interaction-unit), the site of an HNN
+and the contact of an articulated body.
+
+[proved-derived; formal-checked] [`Transport/HelicalPairInteraction.lean`](../formal/elementary-holonics/ElementaryHolonics/Transport/HelicalPairInteraction.lean)
+proves, over ℚ at one configuration:
+
+```text
+pairSlip_mulVec                J(ṡ,ṫ)=ṡ v_a−ṫ v_b
+pairSlip_transpose_mulVec      J*Δ=(Δ·v_a, −Δ·v_b),  so DQ=2J*Δ
+pair_face_power                ⟨u,(w J*DJ)u⟩ = w⟨Ju, D Ju⟩
+pair_face_power_eq_zero_iff    on a dissipative face, zero power ⇔ ṡ v_a=ṫ v_b
+pairQuadranceTwoJet_eq_slip_contact_geometric
+                               Q₂ = ⟨Δ|Δ⟩ + 2(s,t)·J*Δ + ⟨(s,t),J*J(s,t)⟩ + (s²Δ·a_a − t²Δ·a_b)
+bilinear_score_eq_polarized_quadrance
+                               ⟨a|b⟩=(⟨a|a⟩+⟨b|b⟩−⟨a−b|a−b⟩)/2
+```
+
+The zero-power kernel is synchronized passage: meshing, rolling or co-moving contact. It is the
+incidence law between `s` and `t` read from material, and it does not identify the parameters.
+The second variation is the isotropic contact form of the same slip map plus each object's own
+`Δ·a` term. A bilinear participation score is the pair quadrance up to the two self-energies,
+so the unit-phase chart `β cos(2π(q_i−q_j−φ_ij))` is this pair with zero advance and unit radii.
+
+[definition] **Winding.** A torus chart reads a phase modulo its closure. The helix
+`x(s)=(r e^{i(as+φ)}, bs)` is the lift that retains the winding: two parameters one full turn
+apart agree on the circle and differ by `b·2π/a` along the axis. For a coaxial pair the
+quadrance is `|r_a e^{iα}−r_b e^{iβ}|²+(b_a s−b_b t+c)²`, the periodic and axial parts
+together; a general pair reads both through the same `Δ` with its axis offset and inclination.
+`RationalPhase` carries the chart phase and `extra_turns`; `lifted_winding` and `closes_after`
+decide closure. Order and distance along a source passage are read through the advance, not
+through a separate site per occurrence.
+
+[proved-derived; formal-checked] **Phase-carried material.** In any group, fixed material `P`
+carried by a phase shift `S` is `phaseTransport S P d=S⁻ᵈPSᵈ`. Stepping conjugates the carried
+material (`phaseTransport_add`); a closing shift gives the toroidal chart
+(`phaseTransport_add_period`); a stream of n occurrences composes to `(PS⁻¹)ⁿSⁿ`
+(`steppedWord_eq_generator_power`), one act-and-advance generator whose power is the stream.
+A forward passage with reflection returns through the producing operands, `A⁻¹FA`, involutive
+and fixed-point-free when the reflection is (`reflectedReturn_involutive`,
+`reflectedReturn_no_fixed_point`). A closed path of observed boundary relations under one
+unknown boundary map closes exactly when the known stage word fixes the boundary image
+(`menu_loop_closure`). These are the rotor and Bombe laws without an alphabet. The stepped
+machine's state evolution is retained; the fixed-state involution is not a claim about it.
+
+[definition] **Serial chain.** An articulated body is an ordered family of `SituatedScrew`s
+with parameters `θ_i`. Its configuration is the ordered product of the finite motions applied to
+the initial configuration; column i of its Jacobian is `ScrewGenerator::rechart` of `ξ_i` by the
+preceding motion; revolute, prismatic and screw joints are the zero-advance, zero-angular and
+general rows of the collapse table; joint space is the torus chart of the revolute phases with
+a line per prismatic parameter; `reciprocal_pairing` is wrench–twist power; each link–link or
+link–object contact is one pair interaction. Exact finite motions remain supplied `AffineMap3`
+actions with their `RationalPhase`; a general affine action is not identified with `exp(tξ)`.
+The native chain consumer is #27 and the face derivation #28; their formal counterparts are #62.
+
 ## Two-sided angles are an algebraic chart of this construction
 
 [definition] The record's two-sided algebra `A_k=ℝ[ι]/(ι²−k)` and the conic
@@ -240,12 +304,16 @@ function classes.
 
 ## Connection to HNN and scope of the returned construction
 
-[definition] The same pattern enters HNN as source-conditioned transport, shared local material,
-joint field variation, receiving restriction and an economical continuing representation. The
-helical geometry supplies explicit examples of the generator/contact/adjoint equations in
-[HNN_FORMULA](HNN_FORMULA.md), while its constant-generator closure identifies an exact reusable
-specialization. Changing material, noncommuting contacts and nonlinear refinement retain their
-existing source equations and residuals. A screw chart does not replace the whole HNN model.
+[definition] The [pair interaction](#the-pair-is-a-holonic-interaction-contact) is the HNN's
+site. Its generators and initial configurations are the field's junctions, its admitted pairs
+the arcs, its phases the context, its slip map and jet the participation/contact operands and
+its pullback the local adjoint of [HNN_FORMULA](HNN_FORMULA.md). The present incident field
+executes the zero-advance, unit-radius collapse of this pair on a per-source-cell ring; the
+[design record](../research/records/2026-09-21_THE_HELICAL_PAIR_INTERACTION_IS_THE_HNN_SITE_AND_PHASE_CARRIES_CONTEXT.md)
+records that audit and the [native contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition)
+the packets that replace it. The constant-generator closure is the exact reusable
+specialization; changing material, noncommuting contacts and nonlinear refinement retain their
+source equations and residuals through the same unit.
 
 [established-bounded; source-inspected] This increment returns the shared Euclidean generator,
 local pair differential, frame/degeneration controls and its Gram-chart consumer. It does not

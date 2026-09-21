@@ -31,6 +31,19 @@ and a part simultaneously. The geometry is how information is carried, compared,
 learned. Every value is a situated comparison; its source, orientation and receiving scope remain.
 The full theory-of-everything ambition and consumer-hardware usefulness guide the construction.
 
+[definition] **The computational object is the helical pair interaction**
+([definition](docs/HOLON.md#the-helical-pair-interaction-unit),
+[geometry](docs/HELICAL_GEOMETRY.md#the-pair-is-a-holonic-interaction-contact),
+[audit and packets](research/records/2026-09-21_THE_HELICAL_PAIR_INTERACTION_IS_THE_HNN_SITE_AND_PHASE_CARRIES_CONTEXT.md)):
+a `HolonicInteraction` over a `ScrewPair` whose contact slip map is the pair's relative velocity.
+HNN sites are generators with initial configurations, admitted pairs are arcs and the machine's
+phases carry context. A source passage enters as phase-carried helical moments, a response
+position is a receiving phase, and the machine's size is independent of source length. The
+rotor machine (material carried by a phase shift, reflected return through the producing
+operands), the Bombe (configuration inference by pairwise loop closure) and an articulated body
+(an ordered chain of `SituatedScrew`s) are instances. State a design in these operands before
+implementing it; a text, image, acoustic or motor chart is a boundary of this object.
+
 [definition] Independent commuting phases admit a toroidal chart. Linked/overlapping domains have
 actual common cells and an interaction law; overlap alone does not supply friction. A helical object
 has a generator **and an initial configuration**, with its own clock/parameter. A receiver is a
@@ -42,8 +55,11 @@ Transport        |H'⟩_(F') = Ĝ_(F'←F)|H⟩_F         Output   y = ρ_F b_H(
 Interaction      |source⟩ → [standing H_int, dynamic H_pert, contact/material law] → ⟨perspective|
 Helical source   ξ=(ω,v), V_ξ(x)=ω×x+v; two objects retain both generators and initial configurations
 Pair receiver    Δ=x_a(s)−x_b(t), Q=⟨Δ|Δ⟩; DQ and D²Q include both motions and geometric Δ·a terms
+Pair contact     J=[v_a|−v_b], DQ=2J*Δ, D²Q=2J*J+2diag(Δ·a_a,−Δ·a_b); M_contact=Σw J*DJ; P=0 ⇔ ṡv_a=ṫv_b
+Phase carriage   R_d=S⁻ᵈPSᵈ; return A⁻¹FA; n occurrences compose to (PS⁻¹)ⁿSⁿ; menu loop closes ⇔ stage word fixes S a
+Source/receiver  m_g=Σ_k Ĝ_g(k)⁻¹E(u_k), M_gh(δ) pair relation at offset δ; y_j=ρ_R(Ĝ(j)q); helix = winding-retaining lift
 Participation    T_F[Ψ]=Σ_G a_FG[Ψ] U_(F←G)[Ψ] Ψ_G over admitted contacts
-Phase chart      s_ij=β cos(2π(q_i−q_j−φ_ij)), a=softmax(s); this unit-phase restriction has a connection φ
+Phase chart      s_ij=β cos(2π(q_i−q_j−φ_ij)), a=softmax(s); the pair receiver at zero advance and unit radii, connection φ
 Variation        δT=Σ a δ(UΨ)+Σ δa UΨ, δa=(diag(a)−aa*)δs
 Local reaction   Φ(s,c)=s⊕c⊕(c⊗s), incoming=s+MΦ(s,c), out=S_D(incoming,b)
 Normal law       H=H₀+Σw f f*, B=B₀+Σw t f*, W H=B, with declared prior/weights/receiver
@@ -83,8 +99,12 @@ needed by continuation. Limited observations may retain a plural Preimage Fibre 
 inverse or an event archive.
 
 [established-bounded; source-inspected] `GeometricRegions` currently uses alphabet-derived
-channels, unit-current inputs/targets and per-slot basis decoding. It is a numerical application
-control; `HelicalMomentReuse` is a separate caller. The next encoder/decoder work follows the
+channels, unit-current inputs/targets and per-slot basis decoding. The incident Athena geometry
+(`examples/support/linked_torus_field.rs`) assigns one ring junction per source cell, with a
+one-hot encoder and per-slot faces, and `holonics-hna/src/` imports none of the screw,
+interaction, chain, standing or release owners. Both are numerical application controls that
+the generator machine replaces; `HelicalMomentReuse` is a separate caller. The next
+encoder/decoder work follows the
 [existing Holonic Encoding construction](research/records/2026-09-11_HOLONIC_ENCODING_RETAINS_TRANSFORMATION_GRAIN_ACROSS_MODALITIES.md)
 and the [campaign correction](research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md#correction-the-nibble-control-is-not-holonic-encoding).
 
@@ -93,8 +113,10 @@ records the implemented composition: standing q/incident Delta feed the reaction
 drive y, and one global D/b acts on their sum. Source/text/support maps are boundary material
 with stated priors and the same normal update. The contract contains the complete adjoint,
 publication, rest and source-episode packets. These are implemented constituents of the shared
-operation; the text/support chart is one application. Continue from those returns and the
-roadmap's current generator/receiving join, preserving the original target port and source fibre.
+operation; the text/support chart is one application. Continue from those returns through the
+roadmap's packets: pair contact and serial chain, the generator-machine geometry, closure
+inference with standing/release, then economy and episodes, preserving the original target
+port and source fibre.
 
 ## 2. Where the implementation lives
 
@@ -107,11 +129,11 @@ roadmap's current generator/receiving join, preserving the original target port 
 | Normalization and adjoints | `field/receiver/normalized{,.rs}`, `normalized/phase.rs`, `field/material_transport/normal/direct/section{,/composition}.rs`, `resident/section/bilinear_features.rs`; exact reference `exponentiated_ratio::transport::NormalizedKernel` |
 | Kernels and their Rust binders | `crates/holonic-engine/kernels/{exact_resident_section.cu,field_normalized_receiver.cuh,normal_applied_condition.cuh,section_bilinear_adjoint.cuh}`; `src/resident_section/` |
 | Hardware law | `hardware_cover`, `section_partition`; `crates/holonic-mount/src/{cuda,launch_law,section_layout}.rs` |
-| Exact geometry and helical pair | `crates/relational-geometry/src/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs`; `receiver_history_compression/observable.rs::HelicalMomentReuse` binds finite pair actions to the existing moment decoder |
+| Exact geometry and helical pair | `crates/relational-geometry/src/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs`; `receiver_history_compression/observable.rs::HelicalMomentReuse` binds finite pair actions to the existing moment decoder. No Rust file yet joins `ScrewPair` to `HolonicInteraction`: the pair-derived `ContactFace` is #28/#48 and the serial `SituatedScrew` chain #27; `Transport/HelicalPairInteraction.lean` is their checked statement |
 | Algebra and economical continuation | `exact_linear`, `prime_image_algebra`, `receiver_history_compression`, `winding_inertia`; resident bilinear/normal/word/mode owners at their separate call boundaries |
 | Retained availability and predictive release | `holonic-engine/src/{standing,receiver_release}.rs`, `exact_linear/{contextual,kernel_modes}.rs`; `field/internal_mode.rs` retains the equal-drive specialization and explicitly refuses incompatible operative currents; `Foundation/{Standing,CausalRelevance,ReceiverHistoryCompression}.lean` supplies future sufficiency |
 | Public framework | `crates/holonics/src/lib.rs`: `geometry` and `structure` without default native features; `holonics-hna` for HNN |
-| Lean | `formal/elementary-holonics/ElementaryHolonics/Framework.lean` and its Core/Geometry/Dynamics/Information/Physics/Computation entry points |
+| Lean | `formal/elementary-holonics/ElementaryHolonics/Framework.lean` and its Core/Geometry/Dynamics/Information/Physics/Computation entry points. Core imports `Foundation/{Standing,ReceiverRelease}`; Dynamics imports `Transport/{HolonicInteraction,HolonicChain,ContinuingTube,HelicalPairInteraction}`. #62 lists the formal counterparts owed by the current design |
 | Applications and evidence | `applications/holonics-workbench`, `applications/conversation-data`; `research/{records,experiments,papers,notebook}`; [layout](docs/REPOSITORY.md) |
 
 [definition] The implemented incident mode uses standing q and transported differences Delta
@@ -217,7 +239,9 @@ Check current device use before GPU tests; the file lock coordinates only proces
 Record command, tree, scope and result in [VERIFICATION_RECEIPTS](docs/VERIFICATION_RECEIPTS.tsv).
 Reuse unchanged receipts. The primary verifies the combined changed scope; a later isolated fix
 needs its own scope rather than a replay of every suite. Lean verifies mathematics outside native
-cultivation/inference. The normal Lake default is `ElementaryHolonics.Framework`, not the complete
+cultivation/inference. A native packet that adds or changes a mathematical law lands with its
+Lean counterpart under the matching `Framework` entry point, or names the obligation it leaves
+in #62; formal work is part of the packet, not a later pass. The normal Lake default is `ElementaryHolonics.Framework`, not the complete
 research umbrella. Timeouts remain incomplete evidence.
 
 [project-postulate] Claude delegates to at most **three Opus 5 workers** on disjoint owner paths,

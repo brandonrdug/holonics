@@ -72,6 +72,19 @@ clock, partial-state and reset semantics constrain the shared design now through
 Isaac Sim supplies inspected interface evidence; no simulator run or specific simulator
 selection is scheduled by this direction.
 
+[project-postulate] **September 21, confirmed design object: the helical pair interaction is
+the HNN site and phase carries context.** The [unit](../HOLON.md#the-helical-pair-interaction-unit)
+is a `HolonicInteraction` over a `ScrewPair` with its contact slip map derived from the pair
+jet. The rotor machine, the Bombe menu and an articulated body are instances of it. The
+returned incident field executes its zero-advance, unit-radius collapse on a ring with one
+site per source cell; the next campaign replaces that geometry with a fixed generator machine
+whose phases carry the source and whose receiving positions are phases. The
+[design record](../../research/records/2026-09-21_THE_HELICAL_PAIR_INTERACTION_IS_THE_HNN_SITE_AND_PHASE_CARRIES_CONTEXT.md)
+holds the source and formal audit;
+[`Transport/HelicalPairInteraction.lean`](../../formal/elementary-holonics/ElementaryHolonics/Transport/HelicalPairInteraction.lean)
+is its checked formal statement. Every native packet lands with its Lean counterpart or names
+the obligation it leaves in #62.
+
 [definition] The model is one continuing `(K,Θ,|H⟩)` with admitted incidence/transport K,
 constitutive and learned material Θ, and resident joint currents/interior modes. Receiving
 interfaces can themselves be active fields with storage, material and motion. Generation
@@ -112,7 +125,7 @@ begin where its inputs exist; it must not delay the first trainable model operat
 | Milestone | Construction and dependencies | Delivered result |
 |---|---|---|
 | **1. One trainable HNN model** | Attach the operative field to the existing public body; compose admitted transport, local learned reaction, joint generation and producing-material update. Bind one complete input/output section and its observed target. | A public invocation generates an actual joint section; a real comparison develops its generating material; held-out inputs use that material. Report the source, output, target, update law, error and execution cost. |
-| **2. Situated generator inference and changing contacts** | Compose the existing source/condition compatibility family with the incident word and participating receiver. Retain actual phase, source dependence, changing incidence and complete producing return. Infer applicable preparations/controls through that same relation. | Changed relevant surroundings or receiving conditions reuse the generating material and produce the corresponding consequence. Retained modes remain available through inactive intervals at their admitted future scope; unsupported directions retain their source/representation defect. |
+| **2. Helical pair interaction sites, phase-carried context and situated generator inference** | Join `ScrewPair` and `HolonicInteraction` in the engine; build the field from a fixed generator machine whose phases carry the source and whose receiving positions are phases; use the full pair receiver and its jet pullback; infer configurations, rates and admitted pairs by closure; bind standing and release. Retain changing incidence, the compatibility family and the complete producing return. | Changed phase, surroundings or receiving conditions reuse the same generating material and produce the corresponding consequence. Resident state does not scale with source length. A dormant generator re-engages at its admitted future scope; unsupported directions retain their source/representation defect. |
 | **3. Efficient continuation and durable learning** | Compile the repeated action actually encountered, retaining interior memory, joint fibres and pending comparisons. Bind native rest/remount to this complete body and application continuation. Work starts during milestones 1–2 where already lawful. | Repeated execution uses a reusable representation rather than growing a replay programme without bound. A saved model resumes generation and an outstanding observed return with the same declared consequences. Report time, transfers, memory and exact bit growth. |
 | **4. Useful Athena conversation, mathematics and code** | Bind prepared dialogue/source parts and whole-section text decoding to the trained body. Compose existing mathematical functions and structured tool requests through the same session. Follow tool results as actual observations. | Inspect held-out contextual replies, correction/continuation, explanation and working code/tool outputs through the public application. Publish successes and failures; nonempty strings and lower training loss do not substitute for these tasks. |
 | **5. Optical/acoustic, motor and mixed receiving tasks** | Bind the same generator/current operation to image, acoustic, articulated-control and mixed charts, with geometry, actuation, rate, partial observation and reconstruction boundaries. Those contracts inform milestones 1–3 already; concrete simulator execution belongs to its application increment. | Generated fields and action-conditioned receiving consequences reuse the same model/update mechanism. A physical case retains applied actuation and measured return, control cadence and reset provenance; a mixed-source task uses its actual cross-modal source relation. |
@@ -167,17 +180,21 @@ return under the public session. Focused native composition/restart checks pass.
 recorded development split generated and saved, and its linked response was learned after
 reopen. The uninterrupted endpoint is byte-identical to the resumed endpoint; full-source episode
 assessment has returned failures for both text requests. The fixed receiving-port repair and
-structured math/code case are returned. The remaining work is the shared source/condition-family
-and receiving-consequence composition,
-including useful contextual generation and compact normal/common-source representation. These
-returned components remain its implementation material.
+structured math/code case are returned. The remaining work is the helical pair interaction
+site, the phase-carried machine geometry and the shared source/condition-family and
+receiving-consequence composition on it, including useful contextual generation and compact
+moment/common-source representation. The audit of that field's geometry found one site per
+source cell on a ring, a one-hot encoder and per-slot faces; its measured generation time,
+resident peak and checkpoint size are consequences of that layout. These returned components
+remain the campaign's implementation material.
 
 [established-bounded; measured] Following the failed response through the actual learned maps
 found weak receiving margins, an under-resolved global solve after D changed, and repeated
 normal solve/validation work. The same record now carries the native material-step comparison,
 Chebyshev reflection and exact repeated-row reuse. Accurate replay of the controlled learned
 response improved from 18/388 to 187/388 observed characters; it remains incomplete. Continue
-from that corrected numerical operation through the situated generator/receiving composition.
+from that corrected numerical operation through the machine geometry and situated
+generator/receiving composition.
 Distinct admitted source families constrain reusable material and its requested consequence.
 A loosely enclosed candidate's apparently better text is not substituted for
 the accurate field result, and these controls do not close general contextual conversation.
@@ -201,19 +218,30 @@ has the following implementation position, in dependency order:
    HnaStream and the exposure/workbench caller retain source regions, actual joins,
    original receiver and pending delivery. Source and response extents are receiving apertures,
    not native clocks or alphabet-derived geometry.
-4. **Compose situated generator families and their receiving consequences (#17, then #16).**
-   The [concrete join](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition)
-   carries `native_source`/`formation` compatibility into the incident operation, preserving
-   `Delta_i=U_i q_i-q_r` and the actual target port. Consume the formed relation from a changed
-   source/receiver and retain the interior needed by admitted reactivation. A terminal face is
-   not a measured hidden reaction. Use existing exact/contextual/normal owners and their
-   resident counterparts where their domains match; retain nonlinear constraints otherwise.
-5. **Make that invocation economical and inspect its applications (#18/#61, #16/#48).**
-   Compact the actual normal source span with its prior complement, reuse producing field
-   actions and preserve common-source bounds. Bind applicable generator/receiver descent,
-   retaining and executing any nonlinear remainder. Inspect full contextual, mathematical
-   and code episodes at their actual receivers; robotics constrains the same section interfaces.
-   The returned helical/native examples and checks are dependencies, not a new campaign to repeat.
+4. **Join the pair to the interaction and chain (#28/#48, #27; formal #62).** Declare
+   `ContactFace`/`MediumContact`/`HolonicInteraction` from a `ScrewPair` and its jet, then the
+   ordered `SituatedScrew` chain with recharted Jacobian columns and per-pair contacts. Exact
+   tests mirror the `HelicalPairInteraction` theorems. `screw.rs` is consumed unchanged.
+5. **Build the machine geometry in HNA (#17).** A generator-family `GeometricFieldSpec`;
+   phase-carried source moments `m_g`, `M_gh(δ)`; receiving phases with a fixed phase-offset
+   port; full pair-receiver participation with the jet pullback; the legacy ring layout
+   preserved for saved models. Global D/b, the normal law, producing return, publication and
+   rest are consumed as returned.
+6. **Material, closure inference, standing and release (#17, #49).** Pair-jet features in the
+   normal law; closure inference of rates, configurations and admitted pairs with plural
+   families retained; `native_source`/`formation` compatibility carried through the public
+   invocation, preserving `Delta_i=U_i q_i-q_r` and the original target port; `standing.rs` and
+   `receiver_release.rs` bound to dormant generators. A terminal face is not a measured hidden
+   reaction.
+7. **Economy and episodes (#18/#61, #16).** Moment accumulation is the compact source-span
+   statistic; stepped words use the generator power; resident state is independent of source
+   length and the actual launch realization is reported. Inspect the recorded contextual,
+   mathematical and code episodes and a motor-chart chain control at their actual receivers.
+   The returned helical/native examples and checks are dependencies, not a campaign to repeat.
+
+The [packet table](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition)
+gives owner paths and returns. Items 4 and the formal work are independent of 5; 5 consumes 4;
+6–7 consume 5.
 
 [definition] Root owns the reaction/adjoint integration and final application. The bounded
 Luna assignments returned the global operative action/current transaction, boundary normal
@@ -385,8 +413,8 @@ documents hold each statement's evidence, owners and findings.
 | Receiver atlas | R1–R7 | per-eigenvalue refinement on `ExactHodgeSpectrum`; `MarkovTwoNSuffices` |
 | Biological ecology (application deferred) | B0–B10; predictor/design/measured RBX1 comparisons; bounded conditioned response | Further application runs are deferred. Generic evaluation, interface and codec obligations remain at their actual shared owners and do not schedule another biology campaign. |
 | Exact device law | D1–D3; one engine coordinate instance cross-checked on the card | resident rational algebra at its consuming calls (#50); signed 128-bit words and radius with the engine's carrier refusal where consumed; per-region operators; base-pointer registry; common context ownership; D4 stays an intention |
-| Generalized transport and the Holonic Interaction chain | T1–T8 at their declared scopes; the Holonic Interaction unit with media and contact exchange; the two-media chain read at the elastic-network consumer; structural analytic width for that elastic specialization at every admitted extent | the multi-neck chain; faces derived from contact geometry; the time/entropy crossing (#5); general analytic pole factors (#35); a plural family generic in its coordinate address; a faithful Israel-junction instance (#23) |
-| Elementary helical geometry, identities and reuse | Shared screw generator, pair quadrance jet and formal local laws; bounded chart identities from the repaired atlas | Broader finite screw flows, changing physical receivers and the HNN action/decoder binding (#48–#49). The moment/phase caller and native bracket consumer are returned; full ideal/graph/analytic endpoints keep their stated scopes. |
+| Generalized transport and the Holonic Interaction chain | T1–T8 at their declared scopes; the Holonic Interaction unit with media and contact exchange; the two-media chain read at the elastic-network consumer; structural analytic width for that elastic specialization at every admitted extent | the multi-neck chain and the serial `SituatedScrew` chain (#27); faces derived from the helical pair's slip map and measured contact geometry (#28); the time/entropy crossing (#5); general analytic pole factors (#35); a plural family generic in its coordinate address; a faithful Israel-junction instance (#23) |
+| Elementary helical geometry, identities and reuse | Shared screw generator, pair quadrance jet and formal local laws; the checked pair-to-contact, phase-carried transport, reflected-return and menu-closure laws (`Transport/HelicalPairInteraction`); bounded chart identities from the repaired atlas | The native pair-contact declaration and HNN machine geometry (#28/#48, #17), broader finite screw flows, changing physical receivers, the HNN action/decoder binding (#48–#49) and the formal counterparts in #62. The moment/phase caller and native bracket consumer are returned; full ideal/graph/analytic endpoints keep their stated scopes. |
 
 [definition] GitHub issues index these owners under the interaction-chain, resident-execution,
 complete-source-session and elementary-geometry/reuse delivery views. Scientific validation is a
@@ -399,6 +427,9 @@ consumer. Milestones are views of shared work; this section supplies the constru
    is two generators and two configurations, with frame transport, independent degenerations,
    contact geometry and the full variation. The new `relational_geometry::screw` consumes existing
    exact vector/affine owners; its forms are consumed by `identity_atlas::screw_gram_point`.
+   The pair's relative velocity is the contact slip map of `holonic_interaction::ContactFace`;
+   `Transport/HelicalPairInteraction.lean` proves that join and #28/#48 own its native
+   declaration, with the serial chain at #27.
    `Geometry/ScrewGeometry` joins the elementary formal entry point and existing quadratic-moment
    law. Keep the supplied/inferred distinction: the polynomial atlas infers chart identities;
    the generator, frame and material remain its declared source until their own formation law
@@ -427,8 +458,10 @@ consumer. Milestones are views of shared work; this section supplies the constru
    (#50, #12–#15) remains at its structural-library consumers; it is not a prerequisite for this
    field's existing normal solve or boundary maps.
 
-[definition; agent-inferred] #17 owns the shared generator/receiving join, #61 its hardware
-realization, #59 the durable source boundary, and #16 the episode return. #57/#58 are completed
+[definition; agent-inferred] #28/#48 own the pair-to-contact join and #27 the serial chain;
+#17 owns the machine geometry and the shared generator/receiving join, #61 its hardware
+realization, #18 its compact moment statistics, #59 the durable source boundary, #16 the episode
+return and #62 the formal counterparts. #57/#58 are completed
 operator dependencies, not new work queues. This division follows distinct owned operations
 and lets each issue close on its stated return without declaring the application complete.
 The robotics observation/action contract is a receiving requirement of this shared work,
