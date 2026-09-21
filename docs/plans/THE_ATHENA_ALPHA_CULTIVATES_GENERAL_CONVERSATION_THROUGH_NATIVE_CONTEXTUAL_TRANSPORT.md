@@ -1220,8 +1220,9 @@ remain the final codec; the present generator already advances before it is deco
 
 <a id="executable-field-campaign"></a>
 
-[definition; agent-inferred] This is the selected implementation contract for the next campaign.
-The object is one continuing field with its source and receiving interfaces. The deliverable is
+[definition; agent-inferred] This is the selected implementation contract for the current campaign.
+The [implementation return](../../research/records/2026-09-21_THE_INCIDENT_FIELD_JOINS_ITS_GENERATOR_RECEIVER_AND_FROZEN_RETURN.md)
+connects its returned owners and measured application scope. The object is one continuing field with its source and receiving interfaces. The deliverable is
 its public Athena invocation on recorded source episodes, including generation, delayed learning,
 continuation and executable reuse. The existing geometric iteration, incident restriction,
 normal law, receiver family and helical constructions are implementation inputs. This section
@@ -1385,6 +1386,14 @@ physical/declared ports, not to a newly accumulated event archive. Rebinding an 
 its current and producing maps explicitly. K and its source bindings are captured before the target
 and remain fixed within the word. Field aperture may be enlarged through an explicit field/chart
 construction before use; it is not enlarged by silently multiplying a glyph count into local width.
+
+[definition; agent-inferred] The incident text interface records `response_port_start` in its
+model declaration. Its receiving slots are that fixed start through start+A_out; source slots
+occupy the admitted prefix before it. A fresh default reserves the final A_out declared slots.
+Changing input length changes the held source population, not the receiving port identities.
+The same binding is consumed by generation, delayed comparison and pending reconstruction.
+Earlier saved incident models without this field retain their recorded source-relative binding;
+their learned material is not silently moved into the corrected chart.
 
 [definition] Use a persisted material seed, independent of glyph values and source identifiers,
 to initialize distinct nonzero dyadic columns e_s of E_in. Choose their numerical precision so
@@ -1588,17 +1597,18 @@ source boundaries and pending receiving cuts remain operands of that retained re
 
 #### 8. Owned implementation packets and public calls
 
-[definition] The following names describe the planned extensions, not claims that those new
-methods already exist. Preserve existing public/wire names and add a tagged incident-field
-layout; old point, text/control and wave methods retain their original contracts.
+[definition] The table names the implementing owners and public joins. IncidentField is the
+new tagged layout; old point, text/control and wave methods retain their original contracts.
+The implementation return and live state distinguish verified components from the remaining
+full application evidence.
 
 | Packet | Owned implementation and source law | Concrete return / dependency |
 |---|---|---|
-| Global field action and current | Engine `field/junction/operative/{source.rs,map_source.rs,source/reflection.rs,source/reflection_commit.rs}`, their existing surface binders/kernels; add declared-contact origin, D/D* factor action, residual-certified solve and `prepare_joint_current_commit`/commit | One global current/source owner; full joint endpoint publication; used by the word below. The dense reflection remains its small exact/reference comparison. |
-| Local reaction and full word | HNA `coupled_wave/body/field{,/geometric,/formation}.rs`, `field_geometry.rs` and placement; add `GeometricFieldLayout` with global/local widths, contact projections and material bindings | The selected q/Delta reaction, independent drive y, full z recurrence and arbitrary joint-covector pullback. Existing point and legacy participation-chart methods remain distinct. |
-| Boundary material | Engine `field/material_transport/normal/direct{,.rs}` and normal layout/kernel/rest, HNA `field_session` boundary adapter; add nonzero prior, diagonal one-hot statistics and `prepare_covector_return` | E_in, R_text and support receiver use the same normal law and complete producing derivatives; no alphabet-dependent body width. Can be built alongside global field action. |
-| Atomic learning and rest | Engine `source/reflection_target.rs`, HNA field model/session rest and shared material owners; add `prepare_material_return`, composed commit, tagged geometric pending payload | Full-word D factors plus M/E/R proposals publish together on contemporary material. Original current is not recommitted; preview comparisons and changed receivers retain their actual scope. |
-| Athena source/receiver application | `field_session{,/geometric,/native_source}.rs`, `alpha/exposure.rs`, `examples/athena_exposure_field.rs`, workbench field-session dispatch and `HnaStream` | One public request → native generation → code/structured face → actual comparison → successor/reopen. The same data reader and evaluation kit consume this mode. |
+| Global field action and current | Engine `field/junction/operative/{source.rs,map_source.rs,source/reflection.rs,source/reflection_commit.rs}`, their existing surface binders/kernels; `NativeFieldDeclaredIncidence`, `action_matrix_free_auto`, `prepare_joint_current_commit_from_action` and the existing commit owner | One global current/source owner; full joint endpoint publication; used by the word below. The dense reflection remains its small exact/reference comparison. |
+| Local reaction and full word | HNA `coupled_wave/body/field{,/geometric,/formation}.rs`, `field_geometry.rs` and placement; `IncidentFieldSpec` and `field/incident.rs` carry global/local widths, contact restrictions and explicit material bindings | The selected q/Delta reaction, independent drive y, full z recurrence and arbitrary joint-covector pullback. Existing point and legacy participation-chart methods remain distinct. |
+| Boundary material | Engine `field/material_transport/normal/direct{,.rs}` and normal layout/kernel/rest, HNA `field_session` boundary adapter; `NativeNormalPrior`, diagonal one-hot source columns, receiver cohorts and `stage_covector_return` | E_in, R_text and support receiver use the same normal law and complete producing derivatives; no alphabet-dependent body width. Can be built alongside global field action. |
+| Atomic learning and rest | Engine `source/reflection_target.rs`, HNA field model/session rest and shared material owners; `prepare_incident_material_return`, composed publication and tagged incident pending/rest payloads | Full-word D factors plus M/E/R proposals publish together on contemporary material. Original current is not recommitted; preview comparisons and changed receivers retain their actual scope. |
+| Athena source/receiver application | `field_session{,/geometric,/native_source}.rs`, `alpha/exposure.rs`, `examples/athena_exposure_field.rs`, workbench field-session dispatch, `field_session/mathematical_port.rs` and `HnaStream` | One public request → native generation → code/structured face → actual comparison → successor/reopen. The same data reader and evaluation kit consume this mode. |
 | In-operation reuse and assessment | Existing contextual/factor/normal/current-mode owners; `native_performance_benchmark/{episode,quality}.py` | Measured reused constituent plus native remainder, actual episode judgments and same-source restart. This closes the composition, not a separate demonstration campaign. |
 
 [definition] The model declaration supplies `geometry`, `local_roots`, source and receiving port

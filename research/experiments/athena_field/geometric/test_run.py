@@ -37,7 +37,7 @@ class PhaseReportTests(unittest.TestCase):
         split = report(declared=3, peeked=3, acknowledged=2, pending=[])
         errors = run.phase_errors(split, 'split', 3, require_pending=True)
         self.assertTrue(any('frames_acknowledged' in error for error in errors))
-        self.assertTrue(any('retained shared/geometric comparison' in error for error in errors))
+        self.assertTrue(any('retained comparison' in error for error in errors))
 
     def test_complete_split_resume_and_whole_reports_pass(self):
         split = report(declared=3, peeked=3, acknowledged=3, pending=[7])
@@ -47,6 +47,13 @@ class PhaseReportTests(unittest.TestCase):
         self.assertEqual(run.phase_errors(split, 'split', 3, require_pending=True), [])
         self.assertEqual(run.phase_errors(resumed, 'resume', 1), [])
         self.assertEqual(run.phase_errors(whole, 'whole', 4), [])
+
+    def test_incident_split_retains_the_same_native_and_exposure_comparison(self):
+        split = report(declared=3, peeked=3, acknowledged=3, pending=[7])
+        split['anatomy'].update(spec={'source_chart':'incident-field'}, pending=1, pending_comparisons=[7])
+        self.assertEqual(run.phase_errors(split, 'split', 3, require_pending=True), [])
+        split['anatomy']['pending_comparisons'] = [8]
+        self.assertTrue(run.phase_errors(split, 'split', 3, require_pending=True))
 
     def test_phase_failure_writes_private_diagnostic(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -63,6 +70,19 @@ class PhaseReportTests(unittest.TestCase):
             run.public_field_request([{'event': 'field-request', 'value': {}}])
         with self.assertRaises(ValueError):
             run.public_field_request([event, event])
+
+    def test_receiver_mode_comes_from_declared_metadata(self):
+        self.assertEqual(run.resolve_codec(None, {
+            'codec': 'unicode-scalars', 'source_chart': 'incident-field'}), 'unicode-scalars')
+        self.assertEqual(run.resolve_codec(None, {
+            'codec': 'unicode-scalars', 'source_chart': 'incident-field',
+            'response_aperture': 8, 'solve_steps': 32}), 'unicode-scalars')
+        self.assertEqual(run.resolve_codec('utf8-nibbles', {
+            'codec': 'utf8-nibbles', 'source_chart': 'geometric-regions'}), 'utf8-nibbles')
+        with self.assertRaises(ValueError):
+            run.resolve_codec(None, {'source_chart': 'unknown'})
+        with self.assertRaises(ValueError):
+            run.resolve_codec('unicode-scalars', {'source_chart': 'geometric-regions'})
 
 
 if __name__ == '__main__':

@@ -512,9 +512,9 @@ continuation remain actual consuming work. The
 and [source map](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#field-session-source-map)
 connect the implementation, residuals, source episodes and these remaining terms.
 
-### The selected incident-field composition
+### The implemented incident-field composition
 
-[definition; agent-inferred] The [executable campaign contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
+[established-bounded; source-inspected] The [executable campaign contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
 selects the existing standing-source/incoming-drive distinction for the full field. At site r,
 
 ```text
@@ -530,10 +530,11 @@ Hbar on supplied boundary coordinates, the entire state evolves by
 The legacy word above remains its implemented numerical control. Its M on `Phi(y,p)` is not
 reinterpreted as material on `Phi(q,Delta)`; the contract specifies admissible port recharting.
 
-[definition] E_in maps the exterior symbol source basis into the field's declared current basis;
+[established-bounded; source-inspected] E_in maps the exterior symbol source basis into the field's declared current basis;
 R_text and the support receiver read the generated field. They are trainable boundary material
 in the same normal/adjoint transaction. Alphabet size belongs to those exterior ports, not to
-local field width. The contract fixes their nonzero prior, initial finite-codec correspondence,
+local field width. The incident boundary owners fix the nonzero E_in/R_text priors, zero initial
+support map, initial finite-codec correspondence,
 source-region incidence, cross-entropy and material update. This boundary chart contributes to
 the ported passage; exact transformation compression still uses its actual generator/receiver
 and retained remainder through the existing owners.
@@ -543,6 +544,19 @@ and retained remainder through the existing owners.
 both `p_i g_y` and the softmax-Jacobian score term. The global reflection returns one internal
 covector and two material outer-product factors per stage. The contract gives their full
 formulas and the anchor terms; all producing operands remain fixed until that return completes.
+
+[established-bounded; source-inspected] `FieldSourceChart::IncidentField` now realizes this
+composition through `native/coupled_wave/body/field/incident.rs` and
+`native/field_session/incident_application/`. The source preparation keeps ordered cells and
+declared joins; the forward word retains q, Delta, y, one global D/b endpoint and the full held
+joint section. Its reverse carries the producing boundary and source covectors through E/R,
+support and the encoder before atomic publication. Normal maps and frozen producing views retain
+their own cuts through rest/remount. The same resident surface also exposes the scoped
+`FieldMathematicalRequest` port, so a retained workshop product can enter declared complex
+coordinates without a host numeric round-trip. The [September 21 campaign record](../research/records/2026-09-21_THE_INCIDENT_FIELD_JOINS_ITS_GENERATOR_RECEIVER_AND_FROZEN_RETURN.md)
+records focused controls, the full development/restart and structured-code returns, and the
+failed complete-source conversation cases. Source and receiving slots are declared separately;
+the receiving range remains fixed when the request length changes.
 
 ## 2. Transformer, convolution, SSM and diffusion operators
 

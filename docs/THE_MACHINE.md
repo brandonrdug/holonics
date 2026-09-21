@@ -86,16 +86,17 @@ Newman boundaries already have source owners in the
 
 | Source relation | Library or formal owner | Native/application connection |
 |---|---|---|
-| Toroidal domains, shared cells and phase connection | `analytic_field`, graded/simplicial and connection owners; `HolonicTorusKnots`; [intrinsic field](../research/experiments/intrinsic_holonic_flow/README.md) | `GeometricFieldSpec` validates existing analytic junctions/arcs and compiles their phase transport. `field_session/geometric.rs` executes that incidence through the public body. The supplied linked-torus boundary network has a narrower domain than the intrinsic volume/advection reference. |
+| Toroidal domains, shared cells and phase connection | `analytic_field`, graded/simplicial and connection owners; `HolonicTorusKnots`; [intrinsic field](../research/experiments/intrinsic_holonic_flow/README.md) | `GeometricFieldSpec` validates existing analytic junctions/arcs and compiles their phase transport. `field_session/geometric.rs` executes the legacy geometric chart; tagged `IncidentField` uses the same declared geometry through the full incident body and preserves ordered source contacts. The supplied linked-torus boundary network has a narrower domain than the intrinsic volume/advection reference. |
 | Helical pair and contact variation | `relational_geometry::screw`; `Geometry/ScrewGeometry`; `identity_atlas::screw_gram_point` | `HelicalMomentReuse` binds situated finite pair actions and quadrance to the existing observable-moment compression. Lifted phase closure preserves extra turns; an ambient moment fibre retains its physical-configuration restrictions. |
 | Normalized receiver and both input covectors | `field/receiver/normalized/phase.rs`, `normal/direct/section/composition.rs`, `resident/section/bilinear_features` | The geometric word calls the existing normalized receiver and pullback, both bilinear covectors, M transpose and fixed-D reflection. It returns through every refinement stage before one staged material update. |
 | Constitutive current and storage | `NativeConstitutiveField`, paired junction/source/reflection and normal material | `NativeCoupledBody` owns the operation; fixed-D scattering and its adjoint are existing mechanics. A friction/heat claim additionally supplies that material law. |
-| Source, generation, observed comparison and continuation | `holonics-hna/src/native/field_session.rs`, `shared.rs`, `geometric.rs`, `alpha/exposure.rs` | Public session and exposure driver, saved comparisons/cursor and codecs. Recorded context is recovered from the verified prior source prefix across restart. Input provenance remains at the exterior boundary. |
+| Source, generation, observed comparison and continuation | `holonics-hna/src/native/field_session.rs`, `incident_application/`, `incident_preparation.rs`, `shared.rs`, `geometric.rs`, `alpha/exposure.rs` | Public session and exposure driver, saved comparisons/cursor, Unicode source preparation, E/R/support boundary maps, full incident q/Delta/y/global-D/b return and rest. Recorded context is recovered from the verified prior source prefix across restart. Input provenance remains at the exterior boundary. |
+| Structured mathematical field port | `native/mathematical.rs`, `field_session/mathematical_port.rs`, `stream.rs` | One explicit batch creates the existing workshop on the field's resident surface, consumes retained products without host numeric readback, binds declared global complex coordinates, and enters the same incident current. Operator handles end with the batch; the field current and rest remain durable. |
 | Native preparation and generator formation | `field_session/incidence.rs` derives `s=x_r`, `c_i=U_(r←i)x_i−x_r` and factors their common restriction; `native_source.rs` attaches the actual field | `body/field/formation.rs` forms compatibility and normal material at the original c; `field_condition_image` carries its full preimage to another source. [Helical generator return](../research/records/2026-09-20_NATIVE_INCIDENCE_FORMS_AND_REUSES_THE_HELICAL_GENERATOR.md). |
 | Reuse at future receivers | `ObservableMomentReceiverHistoryCompression`, `ReceiverHistoryCompression`, `internal_mode`, `recurrent_condensation` | Bind a particular field/word/receiver to its encoder, decoder and induced operation; inspect the actual call rather than infer binding from the owner's existence. |
 | Physical placement | `hardware_cover`, `section_partition`, mount `section_layout` and `launch_law`; native packet kernels | Read footprints and boundary dependencies determine independent work; checked layout and launch enact it. |
 
-[established-bounded; source-inspected] The geometric session now binds complex sections,
+[established-bounded; source-inspected] The legacy geometric session binds complex sections,
 analytic incidence and phase comparison to a finite held-boundary refinement word. Geometry,
 β, the refinement extent, D and the exterior symbol chart are supplied; M develops through the
 whole word's paired return. This preview does not yet commit a continuing global phase field,
@@ -106,6 +107,19 @@ retain those exact boundaries.
 The [field-session source map](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#field-session-source-map)
 and [current position](../CONSTRUCTION_STATE.md) state the unclosed consuming operations.
 
+[established-bounded; source-inspected] The tagged `FieldSourceChart::IncidentField` now binds the
+same analytic geometry to the full incident word. It keeps standing q and incident differences
+`Delta_i=U_i q_i-q`, derives normalized participation drive y, applies one global D/b, and
+relaxes the complete joint boundary under the declared held mask. `incident.rs` retains sparse
+incidence columns, declared contacts, producing source/receiver sections and the paired
+reverse return; `incident_application/` owns E/R/support, source joins, frozen receiving material,
+codec growth and checkpoint/remount. The [September 21 return](../research/records/2026-09-21_THE_INCIDENT_FIELD_JOINS_ITS_GENERATOR_RECEIVER_AND_FROZEN_RETURN.md)
+records the implemented scope, focused controls and the still-running full evaluation evidence.
+Focused component checks and the full 76,599-site generation/reopen linked response have
+succeeded; resumed and uninterrupted checkpoints are byte-identical. Both complete-source
+text cases executed, exposed receiving-port/uncertainty defects that were repaired, and still
+failed their content requirements in the corrected fixed-port model.
+
 [definition] Co-present regions can execute together when their **complete** read/write,
 lineage, obstruction and resource effects commute. Shared immutable inputs with disjoint staged
 outputs are one sufficient pattern; overlapping mutable effects require their actual interchange
@@ -113,7 +127,7 @@ or reduction law. A launch then assigns the independent work to the hardware's d
 This applies the [hardware-cover method](HARDWARE_AND_MODALITY_BOUNDARIES.md), not a claim that
 co-presence itself implies commutation or that a lane is a Holon.
 
-[established-bounded; source-inspected] **Current encoding boundary:** `GeometricRegions`
+[established-bounded; source-inspected] **Legacy encoding boundary:** `GeometricRegions`
 derives its channel width, unit-current inputs, slot placement and observation targets from a
 supplied alphabet. The nibble example therefore shapes the application beyond final text
 serialization. Its text decoder selects basis coordinates and assembles bytes; it does not call
@@ -122,14 +136,14 @@ the separate helical moment compression. Use the existing
 and the [campaign correction](../research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md#correction-the-nibble-control-is-not-holonic-encoding)
 when continuing the actual encoder/passage/receiver composition.
 
-[definition; agent-inferred] The next field campaign is now specified in the
+[established-bounded; source-inspected] The current incident campaign is specified in the
 [executable contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign):
 participation supplies drive y, the local reaction reads `Phi(q,Delta)`, and one global D/b
 scatters the result. Learned source/receiving boundary material connects the exterior codec to
 that field without making its alphabet the local current basis. Full joint relaxation,
-producing adjoints, residual-certified factor actions, atomic publication and actual episode
-consumption are fixed there. These are selected implementation decisions, not claims that the
-new composition has already been implemented by the legacy geometric caller.
+producing adjoints, residual-certified factor actions, atomic publication and rest are implemented
+through the incident owners. The recorded mathematical/code consequence passed; both full-source
+conversation cases failed. Their actual outputs and costs are retained in the campaign record.
 
 ## Research is construction material
 

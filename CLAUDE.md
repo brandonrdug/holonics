@@ -89,9 +89,9 @@ reopening the source/condition chart question.
 | Operation | Source owner |
 |---|---|
 | Public model and move owner | `crates/holonics-hna/src/native.rs`; `native/coupled_wave/body/field.rs`, `field/section.rs`; `NativeCoupledBody` |
-| Session, region preparation and observed return | `crates/holonics-hna/src/native/field_session.rs`, `field_session/{incidence,native_source}.rs` attaches an actual field and derives pre-target source/incident contrasts; `{shared,geometric}.rs` retains the text/control callers; `body/field/{formation,geometric}.rs` owns formation/family transport and geometric refinement |
+| Session, region preparation and observed return | `crates/holonics-hna/src/native/field_session.rs`, `field_session/{incidence,native_source}.rs` attaches an actual field and derives pre-target source/incident contrasts; `{shared,geometric}.rs` retains the text/control callers; `body/field/{formation,geometric,incident}.rs` owns formation, geometric refinement and the complete incident q/Delta word; `field_session/mathematical_port.rs` joins scoped workshop products to the same field |
 | Real source and its comparison/cursor | `crates/holonics-hna/src/alpha/exposure.rs`, `examples/athena_exposure_field.rs`; [conversation data](docs/CONVERSATION_DATA.md) |
-| Constitutive field and paired source/current | `crates/holonic-engine/src/native_ecology/constitutive_fibre/field/`: source/reflection/target, material transport, receivers and internal modes |
+| Constitutive field and paired source/current | `crates/holonic-engine/src/native_ecology/constitutive_fibre/field/`: operative/source/{action,map_action,reflection_commit}.rs and operative/factor_return.rs own sparse D/D*, the full joint return and current publication; normal/direct owns E/R/support priors and material statistics |
 | Normalization and adjoints | `field/receiver/normalized{,.rs}`, `normalized/phase.rs`, `field/material_transport/normal/direct/section{,/composition}.rs`, `resident/section/bilinear_features.rs`; exact reference `exponentiated_ratio::transport::NormalizedKernel` |
 | Kernels and their Rust binders | `crates/holonic-engine/kernels/{exact_resident_section.cu,field_normalized_receiver.cuh,normal_applied_condition.cuh,section_bilinear_adjoint.cuh}`; `src/resident_section/` |
 | Hardware law | `hardware_cover`, `section_partition`; `crates/holonic-mount/src/{cuda,launch_law,section_layout}.rs` |
@@ -100,6 +100,19 @@ reopening the source/condition chart question.
 | Public framework | `crates/holonics/src/lib.rs`: `geometry` and `structure` without default native features; `holonics-hna` for HNN |
 | Lean | `formal/elementary-holonics/ElementaryHolonics/Framework.lean` and its Core/Geometry/Dynamics/Information/Physics/Computation entry points |
 | Applications and evidence | `applications/holonics-workbench`, `applications/conversation-data`; `research/{records,experiments,papers,notebook}`; [layout](docs/REPOSITORY.md) |
+
+[definition] The implemented incident mode uses standing q and transported differences Delta
+for Phi, with participation as the separate drive. Its global state contains one q and one b.
+Nonzero normal priors initialize both the applied W0 and H0/B0/C0; observed energy is Q_data.
+Source/receiver cohort statistics and frozen producing cuts remain attached through delayed
+returns. The [incident-field implementation return](research/records/2026-09-21_THE_INCIDENT_FIELD_JOINS_ITS_GENERATOR_RECEIVER_AND_FROZEN_RETURN.md)
+connects these calls and their measured scope; the live state tracks the full application.
+
+[definition] The incident text interface fixes `response_port_start` independently of request
+length, using the same receiving slots in generation, comparison and rest. Fresh sessions
+reserve the final receiving aperture. Native real-potential order determines nominal text and
+support selections, retaining each text row's own radius; normalized faces serve the paired
+comparison. Earlier saved source-relative layouts retain their recorded binding.
 
 [definition] **Enclosure ABI:** sealed low/high carrier words can encode a definite centre and
 an independently nonzero radius. Equality of those words is not a zero-radius test. Read the row

@@ -43,9 +43,9 @@ declarations and scope. A filename match supplies an entry point, not an impleme
 | Neck, transfer, pinhole, resolvent, static response | `Transport/HolonicChain.lean` ↔ `holonic_chain::{transfer_at,rank_reading}` → [conditioned response](plans/THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md#the-conditioned-structural-response-consumer) | Off-pole dynamic rank, a measured transfer and a singular static solve are distinct calls/claims |
 | Cycles, Hodge, invisible modes, spectral placement | [Tube source maps](plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md#the-governing-statements) → `HodgeFiniteDecomposition`, `ConductiveFluidReflection`, `hodge_receiver`, `holonic_interaction::SpectralReading` | A cochain map, metric and boundary connect these readings; a rigidity kernel alone is not a homology group |
 | Identity, annihilator, kernel discovery, collapse, compression | [Identity contract I1–I8](plans/THE_IDENTITIES_OF_A_CONFIGURATION_ARE_THE_KERNEL_OF_ITS_FACE_MAP.md#the-design) → `algebraic`, `exact_linear`, `rational_polynomial`, `matroid_chow`, `skein` | Certified sampled kernel → declared face-map kernel → lawful rewrite/decoder; `Border.lean` is degeneration evidence, not a Gröbner implementation |
-| Normalization, softmax, sigmoid, attention, participation `a_FG[Ψ]` and its variation | `Computation/{HolonicAdjointNormalization,AttentionModeCompression,NormalizationProjectionScope}` → `exponentiated_ratio{,/transport}`, resident `field/receiver/normalized.rs` (grouped p, q−p, `J_p(q−p)`) and `normalized/pullback.rs` (return through the producing M to both query arguments), `kernels/{field_normalized_receiver,field_material_pullback,exact_resident_adjoint}.cuh`; exact reference calculation in `examples/connected_holonic_field.rs` and its [experiment](../research/experiments/connected_holonic_field/README.md); [classical-learning rows](#classical-learning-reflection-and-recursive-compression) | `holonics-hna/src/native/coupled_wave/body/field/section.rs::prepare_rows` forms `s+M·Q(s⊗c)` with a constant condition c from `field_session/shared.rs`; the row-sectioned normalized receiver/pullback and bilinear condition adjoint now exist (#57/#58); they still need composition through this caller; the [field-session source map](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#field-session-source-map) names each port #17 builds |
-| Conversation source, exposure stream, episode, held-out evaluation | [Conversation data](CONVERSATION_DATA.md) → `holonics-hna/src/alpha/exposure.rs::ExposureReader` → `FieldSectionRequest::from_exposures` → `native/field_session{,/shared}.rs::{request,observe_source}`; [evaluation kit](ATHENA_EVALUATION.md) `native_performance_benchmark/{episode,quality}.py` | #16: the private refined exposure stream under `.local/datasets/` with its declared September 4 development/evaluation cut; the `Utf8Nibbles` shared-region chart keeps coefficient shape independent of source aperture. `athena_exposure_field` and `ExposureAperture` now carry held requests/free responses, retained comparisons, recorded-event pairing and a saved cursor. Broader contextual/geometric episodes remain; see the same source map |
-| Validated analytic geometry, phase incidence and geometric field/session | `ExactAnalyticFieldWaveLaw` over `CausalFieldStanding`, junctions, arcs and modes → `holonics-hna/src/native/field_geometry.rs::GeometricFieldSpec::compile` → `native/field_session/geometric.rs` and `coupled_wave/body/field/geometric.rs` | [Geometric field record](../research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md) and [geometric experiment](../research/experiments/athena_field/geometric/README.md): supplied linked-torus boundary/source chart, grouped phase gather/transpose, whole-field refinement and paired return. Placement evidence uses `SectionPartition` and the mounted cover; real-source checkpoint and split/whole validation remain bounded work in progress |
+| Normalization, softmax, sigmoid, attention, participation `a_FG[Ψ]` and its variation | `Computation/{HolonicAdjointNormalization,AttentionModeCompression,NormalizationProjectionScope}` → `exponentiated_ratio{,/transport}`, resident `field/receiver/normalized.rs` (grouped p, q−p, `J_p(q−p)`) and `normalized/pullback.rs` (return through the producing M to both query arguments), `kernels/{field_normalized_receiver,field_material_pullback,exact_resident_adjoint}.cuh`; exact reference calculation in `examples/connected_holonic_field.rs` and its [experiment](../research/experiments/connected_holonic_field/README.md); [classical-learning rows](#classical-learning-reflection-and-recursive-compression) | Legacy row sections retain `s+M·Q(s⊗c)` through `field/section.rs`; tagged `IncidentField` now composes q/Delta, normalized participation y, one global D/b and the full paired return through `body/field/incident.rs`. The [field-session source map](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#field-session-source-map) names the declared ports. |
+| Conversation source, exposure stream, episode, held-out evaluation | [Conversation data](CONVERSATION_DATA.md) → `holonics-hna/src/alpha/exposure.rs::ExposureReader` → `FieldSectionRequest::from_exposures` → `native/field_session{,/incident_preparation,incident_application}.rs::{request,observe_source,mathematical_request}`; [evaluation kit](ATHENA_EVALUATION.md) `native_performance_benchmark/{episode,quality}.py` | #16 and the incident source path retain held requests/free responses, ordered source joins, retained comparisons, recorded-event pairing and saved cursors. IncidentField uses Unicode scalar source preparation and E/R/support maps; the structured mathematical batch uses the same resident surface. Full source evaluation returned; both corrected text candidates failed their requests. |
+| Validated analytic geometry, phase incidence and field/session modes | `ExactAnalyticFieldWaveLaw` over `CausalFieldStanding`, junctions, arcs and modes → `holonics-hna/src/native/field_geometry.rs::GeometricFieldSpec::compile` → legacy `native/field_session/geometric.rs` plus tagged incident `coupled_wave/body/field/incident.rs` | [Geometric field record](../research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md) and [incident return](../research/records/2026-09-21_THE_INCIDENT_FIELD_JOINS_ITS_GENERATOR_RECEIVER_AND_FROZEN_RETURN.md): the legacy chart retains grouped phase refinement; IncidentField retains sparse declared incidence, ordered contacts, full q/Delta/y/global-D/b generation, reverse return and rest. |
 | Exact algebra, rebasing, hardware surface, resident section | [Exact algebra consumer](plans/THE_EXACT_DEVICE_LAW_IS_CONSTRUCTED.md#the-shared-exact-algebra-consumer) → `exact_linear`, `hardware_cover`, `launch_law`, `section_layout`, `section_layout_adoption` | Rigidity/chain and identity evaluation expose the algebra cost; the existing field-session device path remains its own consuming realization |
 
 [project-postulate] Maintain the routes a changed relation actually uses. Put detailed derivations
@@ -119,6 +119,15 @@ session payloads carry those witnesses and the existing stream cursor. The
 [field-session return](../research/experiments/athena_field/session/README.md) maps measured text,
 context, update, restart and cost scopes to those owners.
 
+[established-bounded; source-inspected] Tagged `FieldSourceChart::IncidentField` is the current
+full source path. `incident_preparation.rs` retains Unicode scalar cells, ordered parts, source
+contacts and the response aperture. `body/field/incident.rs` owns standing q, incident Delta,
+participation drive y, one global D/b, held joint relaxation and the complete reverse return.
+`incident_application/` owns E/R/support, seeded normal priors, frozen producing maps, codec
+cohorts and checkpoint/remount. The [September 21 incident record](../research/records/2026-09-21_THE_INCIDENT_FIELD_JOINS_ITS_GENERATOR_RECEIVER_AND_FROZEN_RETURN.md)
+records the bounded implementation, successful full development/restart and mathematical/code
+case, and the failed full-source text candidates.
+
 [established-bounded; source-inspected] `NativeFieldSession::from_native_field` now attaches an
 actual constituted field through `field_session/{incidence,native_source}.rs`. The source/condition
 are restrictions of one pre-target resident current packet at analytic incidence. The existing
@@ -130,12 +139,13 @@ The [helical generator consumer](../research/records/2026-09-20_NATIVE_INCIDENCE
 regularized reaction, contextual reuse and a new-source plural image. The normalized geometric
 word below still uses its separate supplied symbol presentation.
 
-[definition] The [next executable field contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
-fixes its remaining composition: local q/Delta material with independent participation drive,
-one global operative map/current, learned source/text/support boundary material, complete
-producing derivatives and separate generation/material commits. Its owned-packet table identifies
-existing methods and planned extensions; it supersedes earlier instructions to derive an
-unspecified source/condition conversion or reconstruct the returned helical caller.
+[established-bounded; source-inspected] The [executable field contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
+now has its incident composition in the named owners: local q/Delta material with independent
+participation drive, one global operative map/current, learned source/text/support boundary
+material, complete producing derivatives, separate generation/material commits and rest. The
+remaining application is useful source-conditioned generation on the existing episode consumer.
+Complete-source assessment has returned failures; the normal/support and shared-bound
+representations have named remaining work.
 
 [established-bounded; source-inspected] The geometric source chart follows a separate consuming
 route through `GeometricFieldSpec::compile`, `native/field_session/geometric.rs` and
@@ -144,6 +154,14 @@ bilinear/reaction/reflection, transposed scatters and held refinements form one 
 word. `native/field_geometry/placement.rs` certifies the logical encoded low/high row packet and
 row status with `SectionPartition` under the mounted `HardwareCover`; D/M are opaque shared source
 ports and normal fitting remains one joined reduction. See the [geometric experiment](../research/experiments/athena_field/geometric/README.md).
+
+[established-bounded; source-inspected] The mathematical workshop has a same-surface field port
+at `native/field_session/mathematical_port.rs`. `FieldMathematicalRequest` executes an explicit
+batch of existing `MathematicalRequest` operations, consumes a retained resident product through
+`with_resident_input`, validates declared global complex coordinates and enters the incident
+boundary. Handles end with the batch; no keyword routing, second learner or host numeric feedback
+is introduced. The code printer remains an exterior artifact while resident operator products
+serve the field current directly.
 
 [established-bounded; source-inspected] `ResidentHeldSection` in `normal/direct/held_section.rs`
 and `normal_held_section.cuh` implement the affine face `P given+(I-P)w`, retaining raw field
@@ -887,8 +905,10 @@ uses them to verify the [material context cotangent](../research/records/2026-09
 `PairedJunctionLinearization`, its full current adjoint and two contact-covector factors.
 The [producer return](../research/records/2026-09-08_AC1_THE_PAIRED_PRODUCER_RETURNS_ITS_CURRENT_AND_CONTACT_MORPHOLOGY.md)
 includes the exact/native controls and actual-model producer inspection. These are cold reference
-owners; the native joint current/morphology update and its changing-contact decoder remain open.
-These remain derivation/reference owners; the resident section below supplies the native port.
+owners. Native current/contact return now has its consuming implementation in
+`operative/source/{action,reflection_target,reflection_commit}.rs`, `operative/factor_return.rs`
+and the incident word. Their source-qualified factors and frozen cuts retain the decoder;
+this is distinct from the joint contact normal-inference operation described below.
 
 [established-bounded; source-inspected] `field/junction/operative.rs` owns borrowed native
 contact/current staging and retained return carriers; `surface_operative_contacts.rs` records its
@@ -905,7 +925,9 @@ operative current to `field/material_transport/contextual.rs` and `field_context
 with explicit source readings and per-return frame persistence. `joint_material_contact` in
 `junction/producer.rs` is the exact reference for the coupled target-width normal solve. The
 [source return](../research/records/2026-09-08_AC1_THE_MATERIAL_SOURCE_FOLLOWS_OPERATIVE_CURRENT_AND_THE_JOINT_CONTACT_HAS_ONE_NORMAL_SOLVE.md)
-retains native and actual-data checks; the endogenous joint producer remains open.
+retains native and actual-data checks. The particular `joint_material_contact` normal-inference
+operator still has a cold reference/test consumer; the full native scattering adjoint and
+material/current publication are implemented through the incident source/action owners.
 
 
 [established-bounded; source-inspected] `junction/operative.rs` retains recent immutable
@@ -1091,8 +1113,9 @@ at an actual source of `NativeConstitutiveField`, with both branches transported
 `section_field_source_frame`. `section_constitutive_differential` implements fixed differential
 faces of a whole affine fibre; the retired alpha text adapters exposed it as
 an explicit exterior receiver. The [89-test and actual-model return](../research/records/2026-09-07_AC1_THE_FIELD_RETURNS_A_RESIDENT_RELATION_FACE_AND_A_PLURAL_FIBRE_HAS_FIXED_RECEIVERS.md)
-keeps the historical source distinct from the contemporary relation cut. The contextual
-generator/formation attachment remains open.
+keeps the historical source distinct from the contemporary relation cut. The source/condition
+formation and condition-image attachment now has its public `native_source.rs` and
+`body/field/formation.rs` consumer, exercised by the helical-generator return linked above.
 
 [established-bounded; implemented-exact; formal-checked] `physical_constraint_grading.rs` adapts
 the exact contact incidence of `physical_constraint_complex.rs` into `algebraic.rs`'s

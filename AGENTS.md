@@ -56,11 +56,17 @@ Preimage Fibres may be implicit and plural. Retain what admitted future operatio
 than assuming a perfect inverse or a complete event archive.
 
 [definition] The [executable field campaign](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
-fixes the next composition: standing q/incident Delta feed the reaction, participation supplies
+fixes the implemented composition: standing q/incident Delta feed the reaction, participation supplies
 drive y, and one global D/b acts on their sum. Source/text/support maps are boundary material
 with stated priors and the same normal update. The contract contains the complete adjoint,
 publication, rest and source-episode packets; workers implement those choices rather than
 reopening the source/condition chart question.
+
+[definition] `IncidentFieldOptions::response_port_start` fixes the receiving slots independently
+of input length; fresh sessions reserve the final receiving aperture. Generation, comparison
+and rest use the same binding. Native potential ordering supplies text/support selection, with
+each text row's own radius. The [source guide](docs/CONVERSATION_DATA.md#incident-field-source-boundary)
+and current campaign record distinguish that receiving face from a broad normalized enclosure.
 
 ## Code map: start at the consuming call
 
@@ -70,9 +76,9 @@ Paths in this table are relative to `crates/` unless stated otherwise. These are
 | Work | Owning call / source to inspect |
 |---|---|
 | Public HNN model | `holonics-hna/src/native.rs`; `native/coupled_wave/body/field.rs` and `field/section.rs`; `NativeCoupledBody` is the move owner |
-| Field session and source rows | `holonics-hna/src/native/field_session.rs`, `field_session/{incidence,native_source}.rs` attaches an actual field and derives pre-target source/incident contrasts; `{shared,geometric}.rs` retains the text/control callers; `body/field/{formation,geometric}.rs` owns formation/family transport and geometric refinement |
+| Field session and source rows | `holonics-hna/src/native/field_session.rs`, `field_session/{incidence,native_source}.rs` attaches an actual field and derives pre-target source/incident contrasts; `field_session/mathematical_port.rs` is the scoped same-surface typed global-complex workshop port; `{shared,geometric}.rs` retains the text/control callers; `body/field/{formation,geometric,incident}.rs` owns formation, family transport, incident `Phi(q,Delta)` and geometric refinement |
 | Exposure, source/response relations and resume | `holonics-hna/src/alpha/exposure.rs`; `examples/athena_exposure_field.rs`; [conversation data](docs/CONVERSATION_DATA.md) |
-| Constitutive field, source and paired return | `holonic-engine/src/native_ecology/constitutive_fibre/field/`; source/reflection/target, material transport, internal modes and receiver |
+| Constitutive field, source and paired return | `holonic-engine/src/native_ecology/constitutive_fibre/field/`; `field/junction/operative/source/{action,map_action,reflection,reflection_commit,reflection_target}.rs` owns the source-qualified dense/reference and CSR+low-rank global action, full joint covector and staged material return; source/reflection/target, material transport, internal modes and receiver |
 | Normalized sections and pullback | `field/receiver/normalized{,.rs}` and `normalized/phase.rs` below that field; `holonic-engine/kernels/field_normalized_receiver.cuh`; exact reference `exponentiated_ratio::transport::NormalizedKernel` |
 | Bilinear source/condition and normal law | `resident/section/bilinear_features.rs`, `field/material_transport/normal/direct/section.rs`; `section_bilinear_adjoint.cuh`, `normal_applied_condition.cuh` |
 | Resident packets, kernels and launch | `holonic-engine/src/resident_section{,.rs}`; `kernels/exact_resident_section.cu`, `exact_packet_linear.cuh`; `holonic-mount/src/{cuda,launch_law,section_layout}.rs` |

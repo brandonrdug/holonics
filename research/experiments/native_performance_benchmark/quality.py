@@ -12,6 +12,7 @@ import argparse
 import hashlib
 from fractions import Fraction as Q
 import json
+import os
 from pathlib import Path
 import subprocess
 
@@ -21,6 +22,32 @@ ROOT = Path(__file__).resolve().parents[3]
 FIELD = ROOT / 'research/experiments/athena_field/pattern'
 SHARED = ROOT / 'research/experiments/athena_field/shared'
 MATH = ROOT / 'research/experiments/contextual_prediction_release'
+LEGACY_CODEC = 'utf8-nibbles'
+INCIDENT_CODEC = 'unicode-scalars'
+INCIDENT_SOURCE_CHART = 'incident-field'
+
+
+def resolve_codec(explicit, *metadata):
+    declared = []
+    for value in metadata:
+        if not isinstance(value, dict):
+            continue
+        if value.get('codec'):
+            declared.append(value['codec'])
+        chart = value.get('source_chart') or value.get('native_source_chart')
+        if chart == 'geometric-regions':
+            declared.append(LEGACY_CODEC)
+        elif chart == INCIDENT_SOURCE_CHART:
+            declared.append(INCIDENT_CODEC)
+    if explicit:
+        if explicit not in (LEGACY_CODEC, INCIDENT_CODEC):
+            raise ValueError(f'unsupported codec mode: {explicit}')
+        if declared and any(mode != explicit for mode in declared):
+            raise ValueError('explicit codec conflicts with declared episode/result metadata')
+        return explicit
+    if not declared or any(mode != declared[0] for mode in declared):
+        raise ValueError('episode receiver codec must be declared; byte shape is not a mode selector')
+    return declared[0]
 
 
 def load_lines(path):
@@ -237,7 +264,7 @@ def evaluate(mode, output, binary):
     return result
 
 
-def assess_episode(episode, generated, output):
+def assess_legacy_episode(episode, generated, output):
     """Receive one new native result beside the separate historical assessment, with no gold substitution."""
     source=json.loads((episode/'input.json').read_text())
     assessment=json.loads((episode/'assessment.json').read_text())
@@ -321,6 +348,134 @@ def assess_episode(episode, generated, output):
     return result
 
 
+def assess_incident_episode(episode, generated, output):
+    """Receive an IncidentField Unicode/support face without applying the nibble receiver."""
+    source = json.loads((episode / 'input.json').read_text())
+    assessment = json.loads((episode / 'assessment.json').read_text())
+    run = json.loads(generated.read_text())
+    generated_sha256 = hashlib.sha256(generated.read_bytes()).hexdigest()
+    request_id = source['request']['id']
+    if assessment.get('request_event') != request_id or run.get('request_event') != request_id:
+        raise ValueError('source, assessment and new run name different requests')
+    if source.get('candidate_or_later_return_included') is not False or assessment.get('assistant_is_gold') is not False:
+        raise ValueError('episode does not preserve its source/assessment boundary')
+    repository_material = source.get('repository_material', [])
+    if not isinstance(repository_material, list) or any(
+        not isinstance(item, dict) or not isinstance(item.get('text'), str)
+        for item in repository_material
+    ):
+        raise ValueError('incident episode must retain complete supplied repository material')
+    request_parts = source['request'].get('parts') or []
+    context = source.get('declared_context') or []
+    if any(not isinstance(part.get('text'), str) for part in request_parts):
+        raise ValueError('incident request parts must be complete text')
+    if any(any(not isinstance(part.get('text'), str) for part in event.get('parts', [])) for event in context):
+        raise ValueError('incident context parts must be complete text')
+    request_text = ''.join(part['text'] for part in request_parts)
+    value = run.get('native_value')
+    if run.get('schema') != 'holonics.incident-episode-run.v1' or run.get('material_update') is not False:
+        raise ValueError('incident episode result schema or material update flag is invalid')
+    if not isinstance(value, dict) or value.get('schema') != 'org.holonics.hna.field-section.v1':
+        raise ValueError('generated result does not carry a public incident field-section value')
+    if value.get('source_chart') != INCIDENT_SOURCE_CHART:
+        raise ValueError('generated result does not carry the incident-field source chart')
+    revision = value.get('codec_revision')
+    if (value.get('codec') != INCIDENT_CODEC or type(revision) is not int
+            or not 0 <= revision < 2**64):
+        raise ValueError('incident native value does not retain its Unicode codec revision')
+    context_characters = sum(len(part['text']) for event in context for part in event.get('parts', []))
+    repository_characters = sum(len(item['text']) for item in repository_material)
+    expected_context = context_characters + repository_characters
+    if (value.get('source_cells') != len(request_text) + expected_context
+            or value.get('context_cells') != expected_context):
+        raise ValueError('incident native source does not retain the complete request, context and repository material')
+    if value.get('material_update') is not False:
+        raise ValueError('incident native value must be material-read-only')
+    if run.get('response_only') is False:
+        raise ValueError('incident native text must be the response face only')
+    if not isinstance(value.get('text'), str):
+        raise ValueError('incident native value must expose response text')
+    response_aperture = run.get('response_symbols')
+    if not isinstance(response_aperture, int) or response_aperture <= 0:
+        raise ValueError('incident response aperture must be positive')
+    if value.get('response_aperture') != response_aperture:
+        raise ValueError('incident value response aperture disagrees with run metadata')
+    expected_total = len(request_text) + response_aperture
+    if run.get('output_symbols') != expected_total or value.get('output_symbols') != expected_total:
+        raise ValueError('incident output_symbols must retain request characters plus response aperture')
+    support = value.get('support')
+    support_selection = value.get('support_selection')
+    symbols = value.get('symbols')
+    selections = value.get('selections')
+    codec_symbols = value.get('codec_symbols')
+    if not isinstance(support, int) or not isinstance(support_selection, dict):
+        raise ValueError('incident native value must retain support and support selection receipts')
+    if support_selection.get('selected') != support:
+        raise ValueError('incident support selection disagrees with support extent')
+    if not isinstance(symbols, list) or not isinstance(selections, list) or not isinstance(codec_symbols, list):
+        raise ValueError('incident Unicode symbols/selections are malformed')
+    support_extent = support
+    if support_extent < 0 or support_extent > response_aperture:
+        raise ValueError('incident support exceeds the declared response aperture')
+    if len(value['text']) != len(symbols) or len(symbols) != support_extent:
+        raise ValueError('incident response text/symbol support extent disagrees')
+    if value['text'] != ''.join(symbols):
+        raise ValueError('incident response text disagrees with its Unicode symbols')
+    if len(selections) != response_aperture:
+        raise ValueError('incident selections must cover the complete response aperture')
+    if any(not isinstance(face, dict) or not isinstance(face.get('selected'), int)
+           for face in selections):
+        raise ValueError('incident selection receipts are malformed')
+    for symbol, face in zip(symbols, selections[:support_extent]):
+        selected = face['selected']
+        if selected < 0 or selected >= len(codec_symbols) or codec_symbols[selected] != symbol:
+            raise ValueError('incident support selection does not map through codec_symbols')
+    judgments = assessment.get('constraint_judgments', [])
+    for judgment in judgments:
+        if (judgment.get('status') not in ['satisfied', 'contradicted', 'unresolved']
+                or not judgment.get('source') or not judgment.get('evidence')
+                or judgment.get('generated_sha256') != generated_sha256):
+            raise ValueError('a source judgment requires status, source, evidence and this generated SHA-256')
+    result = {
+        'schema': 'holonics.episode-consequence.v1',
+        'request_event': request_id,
+        'source_scope': source['scope'],
+        'native_source_chart': value.get('source_chart'),
+        'generated_sha256': generated_sha256,
+        'supplied_request_characters': len(request_text),
+        'supplied_context_characters': context_characters,
+        'supplied_repository_characters': repository_characters,
+        'native_source_cells': value['source_cells'],
+        'codec_revision': revision,
+        'response_text': value['text'],
+        'support_extent': support_extent,
+        'response_aperture': response_aperture,
+        'output_symbols': expected_total,
+        'historical_assessment': {
+            'recorded_candidates': len(assessment.get('recorded_candidates', [])),
+            'later_observations': len(assessment.get('recorded_later_observations', [])),
+            'assistant_is_gold': False,
+            'later_observations_are_new_output_feedback': False,
+        },
+        'constraint_judgments': judgments,
+        'judgment_scope': 'identified review testimony; support/text checks do not assess conversation usefulness',
+        'material_update': False,
+    }
+    output.mkdir(parents=True, exist_ok=False, mode=0o700)
+    with os.fdopen(os.open(output / 'result.json', os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600), 'w') as file:
+        file.write(json.dumps(result, indent=2) + '\n')
+    return result
+
+
+def assess_episode(episode, generated, output, codec=None):
+    source = json.loads((episode / 'input.json').read_text())
+    run = json.loads(generated.read_text())
+    mode = resolve_codec(codec, source, run)
+    if mode == INCIDENT_CODEC:
+        return assess_incident_episode(episode, generated, output)
+    return assess_legacy_episode(episode, generated, output)
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('mode',choices=['recorded','run','episode'])
@@ -328,10 +483,12 @@ def main():
     parser.add_argument('--binary',type=Path,default=ROOT/'target/debug/holonics')
     parser.add_argument('--episode',type=Path,help='private input.json/assessment.json directory')
     parser.add_argument('--generated',type=Path,help='new native geometric episode result')
+    parser.add_argument('--codec', choices=[LEGACY_CODEC, INCIDENT_CODEC],
+                        help='explicit receiver mode; otherwise use declared episode/result metadata')
     args=parser.parse_args()
     if args.mode=='episode':
         if args.episode is None or args.generated is None:parser.error('episode mode requires --episode and --generated')
-        result=assess_episode(args.episode,args.generated,args.output.resolve())
+        result=assess_episode(args.episode,args.generated,args.output.resolve(),args.codec)
         print(json.dumps(result));return
     result=evaluate(args.mode,args.output.resolve(),args.binary.resolve())
     # Exit means the receiver ran; per-family failures remain visible, never a global AI verdict.

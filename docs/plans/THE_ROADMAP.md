@@ -144,30 +144,39 @@ of the machine. The source/condition, generator and receiving work below is one 
 operation. The [September 12–13 correction](../../research/records/2026-09-13_GENERATOR_MEANING_AND_CAMPAIGN_DRIFT_AUDIT.md)
 already distinguishes that work from code printing, generic cause/effect and repeated small assays.
 
-[definition] Encoding and receiving are established parts of Holonics. The remaining Athena
-connection is at `field_session/geometric.rs`: its source width/unit currents and target/readout
-still follow the supplied alphabet. `geometric_word` already computes normalized participation,
+[definition] Encoding and receiving are established parts of Holonics. The legacy Athena
+chart at `field_session/geometric.rs` derives source width/unit currents and target/readout
+from its supplied alphabet. `geometric_word` computes normalized participation,
 constituted reaction, held-boundary iteration and their complete fixed-operand adjoint. Here
 “normalized” refers to the participation weights summing to one. It does not name a new
 foundation or an operation still to be invented.
 
-[definition] The [executable field campaign](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
-is finalized at the mathematical/API level. Implement in this dependency order:
+[established-bounded; measured] The September 21 [incident-field implementation return](../../research/records/2026-09-21_THE_INCIDENT_FIELD_JOINS_ITS_GENERATOR_RECEIVER_AND_FROZEN_RETURN.md)
+now connects the specified word, sparse global action, source/receiving material and frozen
+return under the public session. Focused native composition/restart checks pass. The full-capacity
+recorded development split generated and saved, and its linked response was learned after
+reopen. The uninterrupted endpoint is byte-identical to the resumed endpoint; full-source episode
+assessment has returned failures for both text requests. The fixed receiving-port repair and
+structured math/code case are returned. The remaining work is useful contextual generation and
+its compact normal/common-source representation, not reimplementation of these components.
 
-1. **Global operative action and boundary material (#61/#18 within #17).** Extend the existing
-   source-map factors with resident D/D* actions and a residual-certified solve; provide staged
-   full-joint publication. In parallel, add E_in, R_text and the support receiver using the
-   existing normal law, explicit nonzero priors and diagonal one-hot source statistics. The field's
+[definition] The [executable field campaign](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
+has the following implementation position, in dependency order:
+
+1. **Implemented: global operative action and boundary material (#61/#18 within #17).** The existing
+   source-map factors now have resident D/D* actions and a residual-certified solve, with staged
+   full-joint publication. E_in, R_text and the support receiver use the
+   existing normal law, explicit E_in/R_text priors, zero initial support and diagonal one-hot source statistics. The field's
    local width comes from geometry; the codec's alphabet sizes only the exterior material ports.
-2. **Compose the selected field law and its complete return (#17/#19).** Use the standing source
+2. **Implemented: the selected field law and its complete return (#17/#19).** It uses the standing source
    q and incident differences Delta in `Phi(q,Delta)`. Participation supplies the independent
    drive `y=Σ p Uq`; incoming is `y+M Phi(q,Delta)`. Scatter through one global D/b and relax the
    full joint state. The contract fixes every phase, Delta, M, D, b and boundary-material adjoint,
    compatible material transport and the distinct legacy `Phi(y,p)` domain.
-3. **Close publication and application in the same session (#17/#16).** Generation commits the
+3. **Implemented: publication and application in the same session (#17/#16).** Generation commits the
    relaxed endpoint once. A delayed return uses its producing maps and stages contemporary
-   material updates without recommitting an old current. Extend native rest, request/observe,
-   HnaStream and the existing exposure/workbench caller; retain source regions, actual joins,
+   material updates without recommitting an old current. Native rest, request/observe,
+   HnaStream and the exposure/workbench caller retain source regions, actual joins,
    original receiver and pending delivery. Source and response extents are receiving apertures,
    not native clocks or alphabet-derived geometry.
 4. **Return actual episodes and reuse (#16/#18/#48).** Execute the existing recorded contextual,
@@ -177,10 +186,10 @@ is finalized at the mathematical/API level. Implement in this dependency order:
    its generated consequence. The earlier helical/native returns and 78 checks are dependencies,
    not substitute deliveries or a new test campaign to repeat.
 
-[definition] Root owns the reaction/adjoint integration and final application. The first bounded
-Luna assignments are the global operative action/current transaction and the boundary normal
-material; they have disjoint owners in the contract's implementation table. Rest/application work
-follows their returned interfaces. Each worker receives those equations and paths through the
+[definition] Root owns the reaction/adjoint integration and final application. The bounded
+Luna assignments returned the global operative action/current transaction, boundary normal
+material and formal/source connections at the owners in the contract's implementation table.
+Rest/application work consumes those interfaces. Each worker receives equations and paths through the
 existing worker brief. The plan ends in one integrated consumer, not independent prototypes.
 
 The mathematical workshop, field model and source/evaluation interfaces already exist. This

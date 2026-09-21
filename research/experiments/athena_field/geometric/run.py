@@ -15,6 +15,32 @@ import time
 
 ROOT = Path(__file__).resolve().parents[4]
 STREAM_EVENT_SCHEMA = 'org.holonics.hna.stream-event.v1'
+LEGACY_CODEC = 'utf8-nibbles'
+INCIDENT_CODEC = 'unicode-scalars'
+INCIDENT_SOURCE_CHART = 'incident-field'
+
+
+def resolve_codec(explicit, *metadata):
+    """Select a declared receiver mode; never infer it from byte-shaped payloads."""
+    declared = []
+    for value in metadata:
+        if not isinstance(value, dict):
+            continue
+        if value.get('codec'):
+            declared.append(value['codec'])
+        if value.get('source_chart') == 'geometric-regions':
+            declared.append(LEGACY_CODEC)
+        if value.get('source_chart') == INCIDENT_SOURCE_CHART:
+            declared.append(INCIDENT_CODEC)
+    if explicit:
+        if explicit not in (LEGACY_CODEC, INCIDENT_CODEC):
+            raise ValueError(f'unsupported codec mode: {explicit}')
+        if declared and any(mode != explicit for mode in declared):
+            raise ValueError('explicit codec conflicts with declared source/checkpoint metadata')
+        return explicit
+    if not declared or any(mode != declared[0] for mode in declared):
+        raise ValueError('receiver codec must be declared explicitly or in source metadata')
+    return declared[0]
 
 def private_json(path, value):
     with os.fdopen(os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600), 'w') as stream:
@@ -77,8 +103,10 @@ def phase_errors(report, phase, expected_frames, require_pending=False):
     anatomy = report.get('anatomy') or {}
     pending = anatomy.get('pending_comparisons') or []
     retained = anatomy.get('retained_shared') or []
-    if require_pending and (len(retained) != 1 or pending):
-        errors.append(f'{phase}: expected one retained shared/geometric comparison at the split boundary')
+    incident = (anatomy.get('spec') or {}).get('source_chart') == INCIDENT_SOURCE_CHART
+    invalid_pending = (pending != retained or anatomy.get('pending') != 1) if incident else bool(pending)
+    if require_pending and (len(retained) != 1 or invalid_pending):
+        errors.append(f'{phase}: expected one retained comparison at the split boundary, with its native word in incident mode')
     if require_pending and (report.get('generation_us') or {}).get('count') != 1:
         errors.append(f'{phase}: expected one actual generated request')
     if phase in ('resume', 'whole'):
@@ -121,14 +149,25 @@ def development(args):
     exposure = out/'exposure.jsonl'
     source = select_source(args.source, args.sequences, exposure)
     spec = json.loads(args.spec.read_text())
-    if spec['codec'] != 'utf8-nibbles' or spec['source_chart'] != 'geometric-regions':
-        raise ValueError('this episode profile declares the geometric UTF-8 nibble receiver')
-    # Independent exterior limits share the geometry's joint slot constraint, checked per request.
-    capacity = len(spec['geometry']['slot_junctions'])
-    spec['section_symbols'] = capacity//2*2
-    spec['context_symbols'] = capacity
+    codec = resolve_codec(args.codec, spec)
+    if codec == LEGACY_CODEC:
+        if spec.get('source_chart') != 'geometric-regions':
+            raise ValueError('UTF-8 nibble mode requires the geometric-regions source chart')
+        # Independent exterior limits share the geometry's joint slot constraint, checked per request.
+        capacity = len(spec['geometry']['slot_junctions'])
+        spec['section_symbols'] = capacity//2*2
+        spec['context_symbols'] = capacity
+    else:
+        if spec.get('source_chart') != INCIDENT_SOURCE_CHART:
+            raise ValueError('unicode-scalars mode requires the incident-field source chart')
+        incident = spec.get('incident', {})
+        for key in ('local_roots', 'material_seed', 'response_aperture', 'material_owners', 'solve_steps'):
+            if key not in incident:
+                raise ValueError(f'incident-field spec omits required {key}')
+        if incident['response_aperture'] != args.response_symbols:
+            raise ValueError('declared incident support aperture differs from the exposure aperture')
     spec_path = out/'spec.json'; private_json(spec_path, spec)
-    binary = ROOT/'target/debug/examples/athena_exposure_field'
+    binary = ROOT/'target'/args.profile/'examples/athena_exposure_field'
     options = ['--request-bytes',args.request_bytes,'--response-symbols',args.response_symbols,
                '--context-bytes',args.context_bytes,'--step-bits',args.step_bits]
     initial = ['--exposure',exposure,'--spec',spec_path]
@@ -152,7 +191,9 @@ def development(args):
     if resumed['outcomes'].get('paired-and-applied', 0) != whole['outcomes'].get('paired-and-applied', 0):
         fail_phase(out, 'comparison', whole, ['resume and uninterrupted paired-update counts differ'], len(args.sequences))
     hashes = {name: hashlib.sha256((out/name).read_bytes()).hexdigest() for name in ['resumed.session','whole.session']}
-    result = {'schema':'holonics.geometric-exposure-run.v1','source':source,
+    result = {'schema': ('holonics.incident-development-run.v1' if codec == INCIDENT_CODEC
+                         else 'holonics.geometric-exposure-run.v1'),
+              'codec': codec, 'source_chart': spec.get('source_chart'), 'source':source,
               'scope':'bounded real development source; fixed geometry/codec; recorded response is observed candidate',
               'aperture':{key:getattr(args,key) for key in ['request_bytes','response_symbols','context_bytes','step_bits']},
               'split':compact(split),'resumed':compact(resumed),'uninterrupted':compact(whole),
@@ -166,12 +207,45 @@ def evaluation(args):
     episode=json.loads(args.episode.read_text())
     text=''.join(part['text'] for part in episode['request']['parts'])
     context=[''.join(part['text'] for part in event['parts']) for event in episode['declared_context']]
+    spec_path = getattr(args, 'spec', None)
+    spec_metadata = json.loads(spec_path.read_text()) if spec_path else {}
+    codec = resolve_codec(args.codec, episode, spec_metadata)
+    if codec == INCIDENT_CODEC:
+        repository_material = episode.get('repository_material', [])
+        material_context = []
+        for item in repository_material:
+            if not isinstance(item, dict) or not isinstance(item.get('text'), str):
+                raise ValueError('incident repository material must retain complete text contents')
+            material_context.append(item['text'])
+        request = {
+            'text': text,
+            'context': context + material_context,
+            'output_symbols': len(text) + args.response_symbols,
+            'retain_comparison': False,
+            'commit': False,
+        }
+        wire={'schema':'org.holonics.hna.stream-request.v1','command':{'action':'field-request','request':request}}
+        admission={'schema':'org.holonics.hna.stream-request.v1',
+                   'command':{'action':'admit-field-source','texts':request['context']+[text]}}
+        events=invoke([ROOT/'target'/args.profile/'holonics','--format','jsonl','hna','field-session','--resume',args.checkpoint,
+                       '--input','-','--checkpoint',out/'after.session'],out/'process.json',
+                      json.dumps(admission)+'\n'+json.dumps(wire)+'\n')
+        value=public_field_request(events)
+        result={'schema':'holonics.incident-episode-run.v1','request_event':episode['request']['id'],
+                'codec':INCIDENT_CODEC,'source_chart':INCIDENT_SOURCE_CHART,
+                'held_request_characters':len(text),'response_symbols':args.response_symbols,
+                'output_symbols':len(text)+args.response_symbols,'material_update':False,
+                'response_only': True,
+                'native_value':value}
+        private_json(out/'result.json',result)
+        return {'request_event':result['request_event'],'output':str(out/'result.json'),'material_update':False,
+                'codec':INCIDENT_CODEC}
     parts=[f'{n:x}' for byte in text.encode() for n in [byte>>4,byte&15]]
     request={'partial':parts+[None]*args.response_symbols,
              'output_symbols':len(parts)+args.response_symbols,'context':context,'retain_comparison':False,'commit':False}
     # The stream request syntax is the public HNN codec, not a source-conditioned answer router.
     wire={'schema':'org.holonics.hna.stream-request.v1','command':{'action':'field-request','request':request}}
-    events=invoke([ROOT/'target/debug/holonics','--format','jsonl','hna','field-session','--resume',args.checkpoint,
+    events=invoke([ROOT/'target'/args.profile/'holonics','--format','jsonl','hna','field-session','--resume',args.checkpoint,
                    '--input','-','--checkpoint',out/'after.session'],out/'process.json',json.dumps(wire)+'\n')
     value=public_field_request(events)
     result={'schema':'holonics.geometric-episode-run.v1','request_event':episode['request']['id'],
@@ -186,8 +260,12 @@ def main():
     d.add_argument('--sequences',type=int,nargs='+',required=True);d.add_argument('--split',type=int,required=True)
     d.add_argument('--request-bytes',type=int,required=True);d.add_argument('--response-symbols',type=int,required=True)
     d.add_argument('--context-bytes',type=int,required=True);d.add_argument('--step-bits',type=int,required=True)
+    d.add_argument('--codec',choices=[LEGACY_CODEC, INCIDENT_CODEC])
     e=commands.add_parser('evaluation');e.add_argument('--episode',type=Path,required=True);e.add_argument('--checkpoint',type=Path,required=True)
-    e.add_argument('--response-symbols',type=int,required=True)
-    for command in [d,e]:command.add_argument('--output',type=Path,required=True)
+    e.add_argument('--spec',type=Path,help='declared source/checkpoint mode metadata')
+    e.add_argument('--response-symbols',type=int,required=True);e.add_argument('--codec',choices=[LEGACY_CODEC, INCIDENT_CODEC])
+    for command in [d,e]:
+        command.add_argument('--output',type=Path,required=True)
+        command.add_argument('--profile',choices=['debug','release'],default='debug',help='built native executable profile')
     a=p.parse_args();print(json.dumps(development(a) if a.mode=='development' else evaluation(a)))
 if __name__=='__main__':main()

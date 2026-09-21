@@ -346,8 +346,8 @@ in the Athena blueprint remains its own implementation packet.
 |---|---|---|
 | Situated occurrence | Actual source/target, local frame, conditions and lineage; co-presence alone is not contact | Formal `Holon`, `CausalNaturalHolon`, `AddressedPassage`; native `NativeFieldOccurrence`, emission/anchor and lineage owners |
 | Section and incidence | Local values/potentials over addressed carriers; links retain orientation and actual joins | `NativeCarrierChart`, `NativeFactorizedSection`, native spool sections and field contact population; resident sections are physical storage, not semantic identity |
-| Constitutive operation | Transport, interaction/aggregation and reaction using the target's prior standing | `FiniteLocalCurrentEcology`, `HolonicRecurrentEcology`; generic full-operator primitives and the separate constitutive-field law |
-| Return and plasticity | Actual comparison, producing factors, covector or other derived response, metric/constitutive update and its finite successor | `SituatedLearningReturn`, `GradientProposal`, `FactorizedLinearOverlay`; field material/contact returns and full-operator local/recurrent returns |
+| Constitutive operation | Transport, interaction/aggregation and reaction using the target's prior standing | `FiniteLocalCurrentEcology`, `HolonicRecurrentEcology`; generic full-operator primitives and the separate constitutive-field law; incident `Phi(q, Delta)` and participation owners in `holonics-hna/src/native/coupled_wave/body/field/` |
+| Return and plasticity | Actual comparison, producing factors, covector or other derived response, metric/constitutive update and its finite successor | `SituatedLearningReturn`, `GradientProposal`, `FactorizedLinearOverlay`; field material/contact returns and full-operator local/recurrent returns; source-owned full joint pullback and staged global material factors |
 | Receiver and compatible causes | Joint future section, declared measurement, retained Preimage Fibre and separating histories | `ReceiverTransformer`, `DynamicReceiverChart`, `CausalRelevance`, native current/fibre/material receivers |
 | Reuse and scale | Restriction, rebase, generator/decoder and the future consequences preserved | Leader jets, fractal restrictions, sheaf diffusion, spool incidence, source-map/current journals and receiver-history compression |
 | Realization and persistence | Device placement, exact codewords/series, residency, transfer, checkpoint and exterior presentation | `ResidentSurface`/passages, source/rest owners, `NativeSavedSession`, alpha checkpoint, tensor/ONNX intake/export charts |
@@ -356,6 +356,43 @@ in the Athena blueprint remains its own implementation packet.
 The successor includes changed state and morphology. A readout, borrowed producer or receiver
 view does not clone that owner. An older frozen-morphology chart remains a valid comparison
 without defining inference universally as frozen morphology.
+
+## Implemented incident-field composition boundary
+
+[established-bounded; source-inspected] The incident-field path now has a resident realization of
+the [executable field campaign](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
+boundary. The reaction consumes standing `q` and incident `Delta` through
+`Phi(q, Delta) = q ⊕ Delta ⊕ (Delta ⊗ q)`, while participation supplies `y`; the resulting
+drive `(a,b)` enters one source-owned `S_D`, followed by the full joint relaxation of `(q,b)`. The source action
+and full adjoint live in
+`holonic-engine/src/native_ecology/constitutive_fibre/field/junction/operative/source/`.
+The dense reflection remains the small/reference path. Declared large fields use a resident CSR
+incidence anchor plus low-rank factors for `D` and `D*`, with Richardson residuals and outward
+carriers retained on the device. That path does not allocate a boundary-square covariance.
+
+The complete joint pullback retains both boundary and internal covectors. Its material return
+keeps the two outer-product terms of `G_D` at every stage, scales one factor of each term once,
+and stages a contemporary `D` update separately from the canonical joint current. Publication
+uses a prepared endpoint and a residual receipt; failed preparation leaves the continuing field
+unchanged. Source-owned normal covectors, nonzero `E`/`R` priors and declared source/contact
+origins remain distinct from observation births. Frozen producing cuts, pending receiver words
+and cohort rest packets retain source identity through delayed comparison and restart.
+
+The measured scope is narrower than the construction boundary: exact rank-one dense and sparse
+adjoint/material/update tests and the current HNA full-word, encoder, pending-growth, restart
+and mathematical-product suites pass. The broader compatibility run and full recorded
+application case are tracked in the current construction state and verification receipts. These
+receipts establish the implemented paths and current checks; they do not establish general
+conversational usefulness.
+
+`NativeFieldSession::mathematical_request` in
+`crates/holonics-hna/src/native/field_session/mathematical_port.rs` is the scoped workshop
+port on the same resident surface. It addresses typed global complex coordinates, gathers and
+scatters source/receiver phases through resident sections, and returns a structured receiving face
+with `material_update: false` and optionally commits the generated joint current; it does not form a host numerical intermediate or install a
+second field. The incident application keeps source cells, context, response aperture, normal
+priors and material seeds in declared session state, while atomic encoder/receiver cohort
+publication and frozen pending rest preserve the delayed comparison boundary.
 
 ## Local standing is part of reaction
 

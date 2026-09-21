@@ -40,6 +40,66 @@ def write_episode(root, judgment_hash=None, candidate=False):
     return episode
 
 
+def write_incident_episode(root):
+    episode = root / 'incident-episode'
+    episode.mkdir()
+    (episode / 'input.json').write_text(json.dumps({
+        'schema': 'holonics.evaluation-episode-input.v1',
+        'scope': 'incident receiver test',
+        'candidate_or_later_return_included': False,
+        'request': {'id': 9, 'parts': [{'text': 'Ask'}]},
+        'declared_context': [{'id': 8, 'parts': [{'text': 'Prior context'}]}],
+        'repository_material': [{'commit': 'abc', 'path': 'README.md', 'text': 'material'}],
+    }) + '\n')
+    (episode / 'assessment.json').write_text(json.dumps({
+        'schema': 'holonics.evaluation-episode-assessment.v1',
+        'request_event': 9,
+        'assistant_is_gold': False,
+        'recorded_candidates': [],
+        'recorded_later_observations': [],
+        'constraint_judgments': [],
+    }) + '\n')
+    return episode
+
+
+def write_incident_generated(root, support_extent=2):
+    generated = root / 'incident-generated.json'
+    codec_symbols = ['a', 'é', 'λ']
+    symbols = ['é', 'λ'][:support_extent]
+    selections = [{'selected': codec_symbols.index(symbol), 'robust': True}
+                  for symbol in symbols]
+    selections.extend([{'selected': 0, 'robust': True}] * (4 - len(selections)))
+    value = {
+        'schema': 'org.holonics.hna.field-section.v1',
+        'source_chart': 'incident-field',
+        'codec': 'unicode-scalars',
+        'codec_symbols': codec_symbols,
+        'codec_revision': 0,
+        'source_cells': 24,
+        'context_cells': 21,
+        'text': ''.join(symbols),
+        'output_symbols': 7,
+        'symbols': symbols,
+        'support': support_extent,
+        'response_aperture': 4,
+        'selections': selections,
+        'support_selection': {'selected': support_extent, 'receipt': 'test'},
+        'material_update': False,
+    }
+    generated.write_text(json.dumps({
+        'schema': 'holonics.incident-episode-run.v1',
+        'request_event': 9,
+        'codec': 'unicode-scalars',
+        'source_chart': 'incident-field',
+        'held_request_characters': 3,
+        'response_symbols': 4,
+        'output_symbols': 7,
+        'material_update': False,
+        'native_value': value,
+    }) + '\n')
+    return generated
+
+
 def write_generated(root, free, response_symbols=4):
     generated = root / 'generated.json'
     output = [65] + list(free)
@@ -131,6 +191,48 @@ class EpisodeQualityTests(unittest.TestCase):
             episode = write_episode(root, judgment_hash='0' * 64)
             with self.assertRaises(ValueError):
                 quality.assess_episode(episode, generated, root / 'out')
+
+    def test_incident_field_uses_response_text_and_support_receipt(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            episode = write_incident_episode(root)
+            generated = write_incident_generated(root)
+            result = quality.assess_episode(episode, generated, root / 'out')
+            self.assertEqual(result['native_source_chart'], 'incident-field')
+            self.assertEqual(result['response_text'], 'éλ')
+            self.assertEqual(result['support_extent'], 2)
+            self.assertNotIn('repository_material_count', result)
+
+    def test_incident_support_must_fit_response_aperture(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            episode = write_incident_episode(root)
+            generated = write_incident_generated(root, support_extent=5)
+            with self.assertRaises(ValueError):
+                quality.assess_episode(episode, generated, root / 'out')
+
+    def test_incident_receiver_rejects_missing_repository_source(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            episode = write_incident_episode(root)
+            generated = write_incident_generated(root)
+            payload = json.loads(generated.read_text())
+            payload['native_value']['source_cells'] -= len('material')
+            payload['native_value']['context_cells'] -= len('material')
+            generated.write_text(json.dumps(payload) + '\n')
+            with self.assertRaisesRegex(ValueError, 'complete request, context and repository'):
+                quality.assess_episode(episode, generated, root / 'out')
+
+    def test_incident_mode_is_declared_and_does_not_guess_from_bytes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            episode = write_incident_episode(root)
+            generated = write_incident_generated(root)
+            payload = json.loads(generated.read_text())
+            payload['native_value']['output_bytes'] = [65, 66]
+            generated.write_text(json.dumps(payload) + '\n')
+            result = quality.assess_episode(episode, generated, root / 'out', 'unicode-scalars')
+            self.assertEqual(result['response_text'], 'éλ')
 
 
 if __name__ == '__main__':

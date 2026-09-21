@@ -162,3 +162,34 @@ pullback, corruption refusal and empty-history reopen. The
 12 tests, including a byte-for-byte legacy model fixture read whose inspected state matches
 the originally delivered JSON. The separately preserved field-to-predictor assay remains
 excluded at its recorded aperture failure; it is not this public field-model path.
+
+## Incident-field application path
+
+[established-bounded; source-inspected] The current application path extends the public field
+session with an incident source chart. `NativeFieldSession` and `HnaStream` prepare complete
+Unicode source cells from direct context/request parts, retain their declared joins, and bind
+the resulting source aperture to declared geometric ports through the public incident body.
+The local field width is `3*local_roots` complex coordinates. The exterior alphabet sizes the
+E/R source and receiving maps. `E_in` and `R_text` have linked nonzero material priors; the
+support map begins at zero and receives actual response extents through the same normal law; the legacy UTF-8 nibble chart remains a
+separate scope.
+
+[definition] A producing word keeps its source rows, encoder identity map, response receiver
+cut, support cut and field comparison identity. A later recorded response returns through the
+same full joint word and stages contemporary E/R/support material together. Recharts and new
+decoder cohorts carry explicit index maps and independent priors; an old comparison does not
+update a newly admitted row. Preview leaves the continuing current unchanged. Checkpoint and
+reopen retain the producing receiver snapshots so an intervening contemporary material update
+cannot change a delayed comparison.
+
+[established-bounded; measured] Focused native checks cover the public
+incident request/observe path, resident source/receiver bootstrap, delayed frozen receiver
+continuation, codec append/rechart and rest/reopen boundaries. The full pinned development
+cut at sequences 773–776 completed, including byte-identical resumed/uninterrupted endpoints.
+Both complete held-out sources (event 3406683 and repository-backed event 3398355) were run and
+inspected. The fixed-port model still produced incoherent responses. The same-field structured
+mathematical/code case returned and its emitted Rust executed correctly. The
+[September 21 record](../../records/2026-09-21_THE_INCIDENT_FIELD_JOINS_ITS_GENERATOR_RECEIVER_AND_FROZEN_RETURN.md)
+retains the port/selection repairs, exact scopes and measured costs. The existing
+`geometric/run.py --help` exposes the development/evaluation commands; `--profile release`
+selects the built release executable without changing the source or model law.

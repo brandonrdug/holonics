@@ -282,7 +282,7 @@ boundary; metadata cannot manufacture a native source handle. Recorded feedback 
 recorded partner; it must not be relabelled as a human response to alpha's newly generated output. The raw provider timestamp remains
 source testimony; the normalized UTC field is this exterior partition/ordering chart.
 
-[established-bounded; implemented-exact] Rust consumers use
+[established-bounded; source-inspected] Rust consumers use
 `holonics::hna::alpha::exposure::{ExposureReader, ExposureOccurrence, ExposureCursor}`. `peek`
 retains a frame until `acknowledge(sequence)`; the saved cursor continues to name the pending
 frame until acknowledgment. Resume verifies the immutable source-file pin, frame boundary and
@@ -304,7 +304,7 @@ target/debug/examples/alpha_exposure .local/artifacts/athena-alpha/ac0/NEW-curso
 records cold delivery only. AC3 must pair it atomically with the actual native successor before
 claiming resumable cultivation. File readback is not a native operation or a trained checkpoint.
 
-[established-bounded; implemented-exact] `NativeFieldSession` now carries that pairing.
+[established-bounded; source-inspected] `NativeFieldSession` now carries that pairing.
 `attach_exposure_cursor` holds one `ExposureCursor`, and the existing `checkpoint` publication
 writes it inside the same atomically published session file as the trained model, in a version-3
 field-session rest that keeps versions 1 and 2 readable. A frame is acknowledged only after its
@@ -319,7 +319,7 @@ occurrence — the family a frame records as its own `comparison-request` partne
 retained at its producing cut. It is an observed candidate, never gold, and the exterior cursor
 plus this pairing still establish delivery and use, not cultivated capability.
 
-[established-bounded; implemented-exact] `ExposureReader::recorded_context` now resolves the
+[established-bounded; source-inspected] `ExposureReader::recorded_context` now resolves the
 request's recorded parent chain through a lazily built index over the verified source prefix. The
 index retains source offsets, sequence/family coordinates and frame extents; it does not retain
 native state or message text. A frame is admitted only when its parent aliases resolve to one
@@ -343,3 +343,50 @@ contains the actual 184,572,827-byte private exposure: 36,920 families, 49,928 c
 remain, with 786 additional captured branch-input views retained in their families. The complete
 source/parts/relations comparison and process-separated cold-reader continuation passed, along
 with 32 data tests and nine Rust reader tests. No model cultivation or alpha capability is inferred.
+
+## Incident-field source boundary
+
+[established-bounded; source-inspected] The public incident-field session now consumes a complete
+Unicode source aperture through `NativeFieldSession`, `HnaStream` and the incident application
+adapter. Recorded source preparation keeps context parts, request parts, their ordered cells and
+actual prior/reply joins together; those joins become admitted field contacts only after the
+source packet is validated. The source aperture remains separate from the response aperture.
+The initial exterior Unicode chart comes from the pinned development material.
+The `admit-field-source` stream command admits new scalars from an actual incoming inscription
+before preparation; it does not incorporate evaluation targets. The native field width comes from the
+declared local geometry, while `E_in`, `R_text` and the support receiver are resident normal
+material maps. The UTF-8 nibble path remains a separate legacy assessment scope and is not used
+as the incident source chart.
+
+[definition] The model declaration fixes `response_port_start`; fresh sessions reserve the
+last `response_aperture` declared slots. Source cells occupy the prefix before that range, and
+input length does not move the receiver across former source cells. Generation, delayed return
+and pending reconstruction call the same binding helper. Saved incident models from before
+this field retain their recorded source-relative layout. Nominal output selection uses the
+existing real-potential ordering law and native basis receiver; each text row keeps its own
+uncertainty radius. A broad normalized enclosure's midpoint is not substituted for that order.
+
+[definition] A recorded response is received after the producing field word and comparison
+identity exist. Its covector returns through the response receiver, support receiver, full joint
+field word and source encoder before one staged material publication. A delayed return retains
+its original encoder/receiver cuts and source rows; a changed contemporary map cannot rewrite
+the earlier comparison. A new source or explicitly admitted development target extends the decoder with its own prior
+cohort. Ordinary old comparisons continue to update only their admitted rows.
+An explicitly admitted development target outside its producing codec creates an `R_retro`
+comparison: frozen old rows plus new prior rows receive the original generated field. The
+original unsupported forecast remains recorded. The same rule applies to codec permutation and append maps: stable source identities carry the
+explicit index transport, while current material remains a separate cut.
+
+[established-bounded; measured] The public path has focused native
+coverage for Unicode source rows, resident E/R/support bootstrap, incident-word preparation,
+delayed material return, frozen receiver rest and reopen, codec rechart/append, and invalid
+target refusal. These tests establish the source/receiver and rest boundaries only. They do not
+constitute a full conversation episode, a quality result or a general Athena capability claim.
+The private episode path over the pinned exposure stream has executed the
+September 20 development cut (source sequences 773–776, including sequence 776), the
+source sequence 36095 / event 3406683 case, and the unchanged-source repository-backed
+event 3398355 case as scoped retrospective inputs. Development/reopen succeeded and both complete
+sources were admitted, but the initial text candidates failed their requests. Their actual
+output exposed the moving-port error described above; the corrected fixed-port application is
+executed with the same sources and still failed their requested content. The [implementation return](../research/records/2026-09-21_THE_INCIDENT_FIELD_JOINS_ITS_GENERATOR_RECEIVER_AND_FROZEN_RETURN.md)
+retains the source sizes, output judgments and numerical scope.
