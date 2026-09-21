@@ -1348,6 +1348,15 @@ covector enclosure. This does not claim an exact derivative of an unrolled round
 forward and reverse certify the stated S_D and its variation. This extends `source/reflection.rs`, its surface binder and existing reflection
 kernels; it does not create another solver or field subsystem.
 
+[established-bounded; measured] Learning changed the certified D norm enough that a fixed
+Richardson count no longer resolved this reflection. The
+[same-material diagnosis and repair](../../research/records/2026-09-21_THE_INCIDENT_FIELD_JOINS_ITS_GENERATOR_RECEIVER_AND_FROZEN_RETURN.md#following-the-failed-response-through-its-actual-producing-material)
+now supplies the resident `IncidentFieldSolver::Chebyshev` proposal under the same final
+residual certificate. The solver and work count are persisted numerical choices. An existing
+saved word without the new choice keeps Richardson; a new choice requires completed/released
+comparisons and is captured by subsequent words, including their implicit pullbacks. These
+inner solve iterations do not become field-refinement ticks or output-symbol positions.
+
 [definition] Compile and reuse the source-qualified factor/action and norm bound while D's
 identity is unchanged. New D invalidates only its derived execution cache; pending producers
 retain theirs. The current-factor and factored-moment owners compact actual repeated factor

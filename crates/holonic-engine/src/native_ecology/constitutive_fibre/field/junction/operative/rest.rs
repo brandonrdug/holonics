@@ -47,6 +47,11 @@ pub(in super::super::super) struct OperativeReturnFrame {
     pub zero_internal_delta: bool,
     #[serde(default)]
     pub realization: NativeContactRealization,
+    #[serde(default, skip_serializing_if = "is_default_bound_kind")]
+    pub bound_kind: NativeOperativeBoundKind,
+}
+fn is_default_bound_kind(kind: &NativeOperativeBoundKind) -> bool {
+    *kind == NativeOperativeBoundKind::MatrixAndInternal
 }
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -94,8 +99,13 @@ pub(in super::super::super) struct OperativeHistoryRest {
 impl OperativeWire {
     fn contact_count_at(&self, cut: usize) -> usize {
         if self.declared_origins.is_empty() {
-            self.births.iter().filter(|birth| birth.receiving < cut).count()
-        } else { self.births.len() }
+            self.births
+                .iter()
+                .filter(|birth| birth.receiving < cut)
+                .count()
+        } else {
+            self.births.len()
+        }
     }
     fn frame(&self, i: usize) -> OperativeReturnFrame {
         self.return_frames
@@ -108,6 +118,7 @@ impl OperativeWire {
                 source_overlap: None,
                 zero_internal_delta: false,
                 realization: NativeContactRealization::EnclosedFlow,
+                bound_kind: NativeOperativeBoundKind::MatrixAndInternal,
                 contact_count: self.contact_count_at(self.activated_at),
             })
     }
@@ -346,10 +357,11 @@ impl OperativeRest {
         };
         let validate = |s: &[ResidentSectionRest; 5],
                         covariance: &Option<ResidentSectionRest>,
-                        k: usize, factored: bool|
+                        k: usize,
+                        factored: bool|
          -> Result<(), Error> {
             for (s, r, w) in [
-                (&s[0], if factored {1} else {k.max(1)}, 2 * d),
+                (&s[0], if factored { 1 } else { k.max(1) }, 2 * d),
                 (&s[1], k.max(1), 4),
                 (&s[2], 1, 4),
                 (&s[3], 1, 2 * d),
@@ -369,8 +381,18 @@ impl OperativeRest {
             }
             Ok(())
         };
-        validate(&self.current, &self.covariance[0], k, wire.factor_program.is_some())?;
-        validate(&self.initial, &self.covariance[1], initial, wire.initial_factor_program.is_some())?;
+        validate(
+            &self.current,
+            &self.covariance[0],
+            k,
+            wire.factor_program.is_some(),
+        )?;
+        validate(
+            &self.initial,
+            &self.covariance[1],
+            initial,
+            wire.initial_factor_program.is_some(),
+        )?;
         let validate_factor = |frame: &OperativeFactorProgramFrame,
                                values: &[ResidentSectionRest; 9],
                                expected_rows: usize|
@@ -434,10 +456,7 @@ impl OperativeRest {
         let mut cut = wire.activated_at;
         for (i, r) in self.returns.iter().enumerate() {
             let frame = wire.frame(i);
-            if frame.at_cut < cut
-                || frame.contact_count
-                    != wire.contact_count_at(frame.at_cut)
-            {
+            if frame.at_cut < cut || frame.contact_count != wire.contact_count_at(frame.at_cut) {
                 return Err(invalid("operative return population or order"));
             }
             cut = frame.at_cut;
@@ -445,6 +464,17 @@ impl OperativeRest {
             let factors = frame.factor_count.unwrap_or(initial);
             if factors > initial {
                 return Err(invalid("return factor domain"));
+            }
+            if frame.bound_kind == NativeOperativeBoundKind::FactorBalls
+                && (initial == 0
+                    || frame.realization != NativeContactRealization::DyadicDeposit
+                    || frame.factor_count != Some(initial)
+                    || !frame.zero_internal_delta
+                    || wire.factor_program.is_none()
+                    || frame.source_overlap.is_some()
+                    || frame.current_difference_source.is_some())
+            {
+                return Err(invalid("factor-ball bound interpretation"));
             }
             for (s, rows, w) in [
                 (&r[0], 2, 2 * d),
@@ -531,7 +561,9 @@ impl<'c> OperativeState<'c> {
                 .map(|r| OperativeReturnFrame {
                     at_cut: r.at_cut,
                     contact_count: r.contact_count,
-                    factor_count: (r.factor_count != r.contact_count).then_some(r.factor_count),
+                    factor_count: (r.bound_kind() == NativeOperativeBoundKind::FactorBalls
+                        || r.factor_count != r.contact_count)
+                        .then_some(r.factor_count),
                     current_difference_source: r.current_difference_source,
                     source_overlap: r.source_overlap.as_ref().map(|h| {
                         OperativeSourceOverlapFrame {
@@ -541,6 +573,7 @@ impl<'c> OperativeState<'c> {
                     }),
                     zero_internal_delta: r.b.is_none(),
                     realization: r.realization,
+                    bound_kind: r.bound_kind(),
                 })
                 .collect(),
         }
@@ -737,25 +770,26 @@ impl<'c> OperativeState<'c> {
             (None, None) => None,
             _ => return Err(invalid("factor program presence")),
         };
-        let initial_factor_program = match (wire.initial_factor_program.clone(), rest_initial_factor) {
-            (Some(frame), Some(values)) => Some(Rc::new(OperativeFactorProgram {
-                row_offsets: Rc::new(mount(values[0].clone())?),
-                columns: Rc::new(mount(values[1].clone())?),
-                values: Rc::new(mount(values[2].clone())?),
-                transpose_offsets: Rc::new(mount(values[3].clone())?),
-                transpose_rows: Rc::new(mount(values[4].clone())?),
-                transpose_values: Rc::new(mount(values[5].clone())?),
-                left: Rc::new(mount(values[6].clone())?),
-                right: Rc::new(mount(values[7].clone())?),
-                defects: Rc::new(mount(values[8].clone())?),
-                rows: frame.rows,
-                boundary_components: frame.boundary_components,
-                rank: frame.rank,
-                nonzeros: frame.nonzeros,
-            })),
-            (None, None) => None,
-            _ => return Err(invalid("initial factor program presence")),
-        };
+        let initial_factor_program =
+            match (wire.initial_factor_program.clone(), rest_initial_factor) {
+                (Some(frame), Some(values)) => Some(Rc::new(OperativeFactorProgram {
+                    row_offsets: Rc::new(mount(values[0].clone())?),
+                    columns: Rc::new(mount(values[1].clone())?),
+                    values: Rc::new(mount(values[2].clone())?),
+                    transpose_offsets: Rc::new(mount(values[3].clone())?),
+                    transpose_rows: Rc::new(mount(values[4].clone())?),
+                    transpose_values: Rc::new(mount(values[5].clone())?),
+                    left: Rc::new(mount(values[6].clone())?),
+                    right: Rc::new(mount(values[7].clone())?),
+                    defects: Rc::new(mount(values[8].clone())?),
+                    rows: frame.rows,
+                    boundary_components: frame.boundary_components,
+                    rank: frame.rank,
+                    nonzeros: frame.nonzeros,
+                })),
+                (None, None) => None,
+                _ => return Err(invalid("initial factor program presence")),
+            };
         let mut current_sections = sections(current, current_covariance)?;
         Rc::get_mut(&mut current_sections)
             .ok_or(Error::Uncertain)?
@@ -800,6 +834,7 @@ impl<'c> OperativeState<'c> {
                     factor_count: frame.factor_count.unwrap_or(frame.contact_count),
                     current_difference_source: frame.current_difference_source,
                     realization: frame.realization,
+                    bound_kind: frame.bound_kind,
                     origin: Rc::new(()),
                     ports: Rc::new(mount(ports)?),
                     currents: Rc::new(mount(currents)?),
@@ -822,6 +857,41 @@ impl<'c> OperativeState<'c> {
             returns,
             program,
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn return_bound_kind_is_explicit_and_legacy_frames_default_to_matrix() {
+        let legacy = OperativeReturnFrame {
+            at_cut: 3,
+            contact_count: 2,
+            factor_count: None,
+            current_difference_source: None,
+            source_overlap: None,
+            zero_internal_delta: false,
+            realization: NativeContactRealization::DyadicDeposit,
+            bound_kind: NativeOperativeBoundKind::MatrixAndInternal,
+        };
+        let mut wire = serde_json::to_value(&legacy).unwrap();
+        assert!(wire.get("bound_kind").is_none());
+        let restored: OperativeReturnFrame = serde_json::from_value(wire.take()).unwrap();
+        assert_eq!(
+            restored.bound_kind,
+            NativeOperativeBoundKind::MatrixAndInternal
+        );
+
+        let factored = OperativeReturnFrame {
+            bound_kind: NativeOperativeBoundKind::FactorBalls,
+            ..legacy
+        };
+        let wire = serde_json::to_value(&factored).unwrap();
+        assert!(wire.get("bound_kind").is_some());
+        let restored: OperativeReturnFrame = serde_json::from_value(wire).unwrap();
+        assert_eq!(restored.bound_kind, NativeOperativeBoundKind::FactorBalls);
     }
 }
 impl<'c> HeldOperative<'c> {

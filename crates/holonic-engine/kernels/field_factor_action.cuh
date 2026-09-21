@@ -4,6 +4,30 @@
 __device__ wide factor_grid(HistoryInteger value,uint32_t grain,wide *rounds,uint32_t *slot){
  return history_narrow(complete_divide(value,complete_power(grain,slot),rounds,slot),slot);
 }
+__device__ wide factor_positive_ratio(const HistoryInteger &numerator,const HistoryInteger &denominator,wide *rounds,uint32_t *slot){
+ if(numerator.overflow||denominator.overflow||denominator.negative||denominator.is_zero()){
+  atomicOr(slot,REFUSED_CARRIER);return 0;
+ }
+ bool remainder=false;HistoryInteger quotient=exact_divide_positive(numerator,denominator,&remainder);
+ if(remainder)*rounds=add_checked(*rounds,1,slot);
+ return history_narrow(quotient,slot);
+}
+__device__ wide factor_chebyshev_alpha0(uint32_t grain,uint32_t omega,uint32_t *slot){
+ wide rounds=0;HistoryInteger scale=complete_power(grain,slot),upper=complete_power(omega,slot)+history_integer(1);
+ return factor_positive_ratio(HistoryInteger(2)*scale,upper,&rounds,slot);
+}
+__device__ void factor_chebyshev_coefficients(
+ uint32_t step,uint32_t grain,uint32_t omega,wide previous_alpha,wide *alpha,wide *beta,uint32_t *slot
+){
+ wide rounds=0;HistoryInteger scale=complete_power(grain,slot),upper=complete_power(omega,slot),minus=upper-history_integer(1);
+ HistoryInteger denominator=step==1u?HistoryInteger(8):HistoryInteger(16);
+ HistoryInteger gamma_num=minus*minus*history_integer(previous_alpha);
+ wide gamma=factor_positive_ratio(gamma_num,denominator,&rounds,slot);
+ HistoryInteger d_minus=(upper+history_integer(1))*scale-HistoryInteger(2)*history_integer(gamma);
+ wide next_alpha=factor_positive_ratio(HistoryInteger(2)*scale*scale,d_minus,&rounds,slot);
+ wide next_beta=factor_grid(history_integer(gamma)*history_integer(next_alpha),grain,&rounds,slot);
+ *alpha=next_alpha;*beta=next_beta;
+}
 __device__ void factor_sealed(const int64_t *lo,const int64_t *hi,size_t words,uint32_t *slot){
  for(size_t i=0;i<words;++i)if(lo[i]!=hi[i])atomicOr(slot,REFUSED_MALFORMED);
 }
@@ -158,14 +182,15 @@ extern "C" __global__ void section_field_factor_action(
  const int64_t *values,const int64_t *values_hi,const int64_t *transpose_offsets,const int64_t *transpose_offsets_hi,const int64_t *transpose_rows,const int64_t *transpose_rows_hi,const int64_t *transpose_values,const int64_t *transpose_values_hi,const int64_t *left_wire,const int64_t *left_hi,
  const int64_t *right_wire,const int64_t *right_hi,const int64_t *defects,const int64_t *defects_hi,const int64_t *operator_bounds,const int64_t *operator_bounds_hi,const int64_t *map_bounds,const int64_t *map_bounds_hi,
  const int64_t *input,const int64_t *input_hi,uint32_t input_at,uint32_t d,uint32_t count,uint32_t nnz,uint32_t rank,
- uint32_t grain,uint32_t steps,uint32_t omega_bits,int64_t *work_wire,int64_t *out,int64_t *out_hi,int64_t *residual,int64_t *residual_hi,
+ uint32_t grain,uint32_t steps,uint32_t omega_bits,uint32_t solve_method,int64_t *work_wire,int64_t *out,int64_t *out_hi,int64_t *residual,int64_t *residual_hi,
  uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
 ){
  if(blockIdx.x||upstream_refused(census,lineage,lineage_count,slot))return;
  const uint32_t width=d+2u*count;
- if(!d||(d&1u)||!count||!steps||grain<1u||grain>120u||(omega_bits>120u&&omega_bits!=UINT32_MAX)||(input_at&1u)){if(!threadIdx.x)atomicOr(slot,REFUSED_MALFORMED);return;}
+ if(!d||(d&1u)||!count||!steps||grain<1u||grain>120u||(omega_bits>120u&&omega_bits!=UINT32_MAX)||(solve_method>1u)||(input_at&1u)){if(!threadIdx.x)atomicOr(slot,REFUSED_MALFORMED);return;}
  __shared__ uint32_t selected_omega;
  __shared__ wide map_error,norm,rhs_error,dual_error;
+ __shared__ wide cheb_alpha,cheb_beta;
  const wide *x=(const wide*)(input+input_at);
  if(!threadIdx.x){
   factor_sealed(input+input_at,input_hi+input_at,2u*((size_t)width+1u),slot);
@@ -183,15 +208,31 @@ extern "C" __global__ void section_field_factor_action(
  const wide *val=(const wide*)values,*tv=(const wide*)transpose_values,*left=(const wide*)left_wire,*right=(const wide*)right_wire;
  wide *work=(wide*)work_wire,*rhs=work,*v=rhs+d,*av=v+d,*dual=av+d,*res=dual+2u*count,*rounds=res+d,*scalars=rounds+d+2u*count+rank+1u;
  for(uint32_t i=threadIdx.x;i<d;i+=blockDim.x)v[i]=0;
+  if(solve_method==1u)for(uint32_t i=threadIdx.x;i<d;i+=blockDim.x)res[i]=0;
  __syncthreads();
  wide e=factor_apply(false,offsets,columns,val,transpose_offsets,transpose_rows,tv,left,right,x+d,d,count,rank,grain,rhs,rounds,scalars,true,slot);
  if(!threadIdx.x)rhs_error=product_checked(2,e,slot);
  for(uint32_t i=threadIdx.x;i<d;i+=blockDim.x)rhs[i]=product_checked(2,add_checked(x[i],rhs[i],slot),slot);
  __syncthreads();if(*slot)return;
  for(uint32_t step=0;step<steps;++step){
+  if(solve_method==1u&&!threadIdx.x){
+   if(step==0u){cheb_alpha=factor_chebyshev_alpha0(grain,selected_omega,slot);cheb_beta=0;}
+   else factor_chebyshev_coefficients(step,grain,selected_omega,cheb_alpha,&cheb_alpha,&cheb_beta,slot);
+  }
+  __syncthreads();if(*slot)return;
   factor_apply(true,offsets,columns,val,transpose_offsets,transpose_rows,tv,left,right,v,d,count,rank,grain,dual,rounds,scalars,false,slot);
   factor_apply(false,offsets,columns,val,transpose_offsets,transpose_rows,tv,left,right,dual,d,count,rank,grain,av,rounds,scalars,false,slot);
-  for(uint32_t i=threadIdx.x;i<d;i+=blockDim.x){wide omitted=0;HistoryInteger residual=history_integer(rhs[i])-history_integer(v[i])-history_integer(av[i]);v[i]=add_checked(v[i],factor_grid(residual,selected_omega,&omitted,slot),slot);}
+  for(uint32_t i=threadIdx.x;i<d;i+=blockDim.x){
+   HistoryInteger residual=history_integer(rhs[i])-history_integer(v[i])-history_integer(av[i]);wide omitted=0;
+   wide step_direction;
+   if(solve_method==1u){
+    wide first=factor_grid(history_integer(cheb_alpha)*residual,grain,&omitted,slot);
+    wide second=factor_grid(history_integer(cheb_beta)*history_integer(res[i]),grain,&omitted,slot);
+    step_direction=add_checked(first,second,slot);av[i]=step_direction;
+   }else step_direction=factor_grid(residual,selected_omega,&omitted,slot);
+   if(solve_method==0u)v[i]=add_checked(v[i],step_direction,slot);
+  }
+  __syncthreads();if(solve_method==1u){for(uint32_t i=threadIdx.x;i<d;i+=blockDim.x){res[i]=av[i];v[i]=add_checked(v[i],av[i],slot);}__syncthreads();}
   __syncthreads();if(*slot)return;
  }
  e=factor_apply(true,offsets,columns,val,transpose_offsets,transpose_rows,tv,left,right,v,d,count,rank,grain,dual,rounds,scalars,true,slot);

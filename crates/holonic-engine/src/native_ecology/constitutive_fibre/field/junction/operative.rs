@@ -6,7 +6,7 @@ use super::super::material_transport::wides;
 use super::*;
 mod deposit;
 mod response;
-pub use deposit::NativeContactDepositReading;
+pub use deposit::{NativeContactDepositBoundReading, NativeContactDepositReading};
 pub use response::{
     NativeFiniteMaterialResponse, NativeMaterialContactResponse,
     NativeMaterialContactResponseReading, NativeMaterialContactStepComparison,
@@ -24,6 +24,16 @@ pub enum NativeContactRealization {
     /// The unrounded-response defect stays in the journal; it is not uncertainty in this new
     /// coefficient. Existing map and internal-current uncertainty is preserved.
     DyadicDeposit,
+}
+
+/// Interpretation of the retained return bound. Legacy returns carry one matrix radius and
+/// one internal-current radius; sparse exact deposits retain the two factor-ball radii instead.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, serde::Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum NativeOperativeBoundKind {
+    #[default]
+    MatrixAndInternal,
+    FactorBalls,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
@@ -47,9 +57,9 @@ pub use propagation::{
 pub use source::{
     NativeFieldAction, NativeFieldActionFactorization, NativeFieldActionPullback,
     NativeFieldContactOrigin, NativeFieldCurrentSource, NativeFieldCurrentSourceRest,
-    NativeFieldDeclaredIncidence, NativeFieldGlobalMaterialCommit,
-    NativeFieldJointCurrentCommit, NativeFieldJointLayout, NativeFieldMatrixFreeAction,
-    NativeFieldReflection, NativeFieldReflectionSection, NativeFieldReflectionTarget,
+    NativeFieldDeclaredIncidence, NativeFieldGlobalMaterialCommit, NativeFieldJointCurrentCommit,
+    NativeFieldJointLayout, NativeFieldMatrixFreeAction, NativeFieldReflection,
+    NativeFieldReflectionSection, NativeFieldReflectionTarget,
 };
 
 pub(in super::super) struct OperativeSections<'c> {
@@ -90,6 +100,7 @@ pub(super) struct OperativeReturn<'c> {
     // Zero extension beyond the actual producing contact population.
     factor_count: usize,
     realization: NativeContactRealization,
+    bound_kind: NativeOperativeBoundKind,
     origin: Rc<()>,
     ports: Rc<ResidentSection<'c>>,
     currents: Rc<ResidentSection<'c>>,
@@ -99,6 +110,11 @@ pub(super) struct OperativeReturn<'c> {
     // None is the exact zero generator on contact_count entries, not missing current.
     b: Option<Rc<ResidentSection<'c>>>,
     bounds: Rc<ResidentSection<'c>>,
+}
+impl OperativeReturn<'_> {
+    pub(super) fn bound_kind(&self) -> NativeOperativeBoundKind {
+        self.bound_kind
+    }
 }
 pub struct NativeOperativeContactStaging<'f, 'c> {
     field: &'f NativeConstitutiveField<'c>,
@@ -786,6 +802,16 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
         currents: &Rc<ResidentSection<'c>>,
         image: Option<ResidentNormalEnclosureView<'_, 'c>>,
     ) -> Result<Self, Error> {
+        if returned.bound_kind == NativeOperativeBoundKind::FactorBalls
+            && (self.sections.factor_program.is_none()
+                || returned.realization != NativeContactRealization::DyadicDeposit
+                || returned.factor_count == 0
+                || returned.b.is_some()
+                || returned.source_overlap.is_some()
+                || returned.current_difference_source.is_some())
+        {
+            return Err(Error::Shape);
+        }
         if image.is_some()
             && (returned.factor_count != 0
                 || returned.b.is_none()

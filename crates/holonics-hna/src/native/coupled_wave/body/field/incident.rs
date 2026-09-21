@@ -6,14 +6,44 @@ mod tests;
 use super::*;
 use crate::native::field_geometry::GeometricFieldSpec;
 use holonic_engine::{
-    ExactWavePhaseTransport,
     native_ecology::constitutive_fibre::{
         NativePhaseParticipation, ResidentNormalEnclosureSection, ResidentNormalMaterial,
         ResidentNormalMaterialView,
     },
     resident_section::{Dyadic, SeriesAperture},
+    ExactWavePhaseTransport,
 };
 pub use rest::NativeIncidentModelRest;
+
+/// Numerical proposal for the same residual-certified global reflection. Persisting this
+/// choice keeps an older pending word's rounded producing operation unchanged.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum IncidentFieldSolver {
+    #[default]
+    Richardson,
+    Chebyshev,
+}
+impl IncidentFieldSolver {
+    pub(crate) fn is_richardson(&self) -> bool {
+        *self == Self::Richardson
+    }
+    fn action<'a, 'c>(
+        self,
+        source: &'a NativeFieldCurrentSource<'c>,
+        input: ResidentNormalEnclosureView<'a, 'c>,
+        steps: usize,
+    ) -> Result<
+        holonic_engine::native_ecology::constitutive_fibre::NativeFieldMatrixFreeAction<'a, 'c>,
+        NativeSessionError,
+    > {
+        match self {
+            Self::Richardson => source.action_matrix_free_auto(input, steps),
+            Self::Chebyshev => source.action_matrix_free_chebyshev(input, steps),
+        }
+        .map_err(invalid)
+    }
+}
 
 /// A declared local chart and material ownership on the existing geometric field.
 /// Equal degree does not imply shared material: sharing is supplied explicitly by this chart.
@@ -27,6 +57,8 @@ pub struct IncidentFieldSpec {
     pub material_owners: Vec<usize>,
     #[serde(default = "solve_steps")]
     pub solve_steps: usize,
+    #[serde(default, skip_serializing_if = "IncidentFieldSolver::is_richardson")]
+    pub solver: IncidentFieldSolver,
 }
 fn solve_steps() -> usize {
     256
@@ -226,6 +258,8 @@ pub(crate) struct IncidentWord<'c> {
     steps: Vec<IncidentStep<'c>>,
     output: ResidentNormalEnclosure<'c>,
     epoch: u64,
+    solver: IncidentFieldSolver,
+    solve_steps: usize,
 }
 /// A prepared complete joint section. Receiving faces and pending storage are prepared before
 /// this immutable word is committed to the continuing body.
@@ -415,6 +449,8 @@ impl<'c> IncidentFieldModel<'c> {
             steps,
             output,
             epoch: self.epoch,
+            solver: self.spec.solver,
+            solve_steps: self.spec.solve_steps,
         })
     }
 
@@ -482,7 +518,11 @@ impl<'c> IncidentFieldModel<'c> {
         commit: bool,
         retain: bool,
     ) -> Result<NativeIncidentGenerated<'c>, NativeSessionError> {
-        if generated.comparison.is_some() || generated.word.epoch != self.epoch {
+        if generated.comparison.is_some()
+            || generated.word.epoch != self.epoch
+            || generated.word.solver != self.spec.solver
+            || generated.word.solve_steps != self.spec.solve_steps
+        {
             return Err(invalid("stale or already retained incident generation"));
         }
         let next_id = if retain {
@@ -505,10 +545,11 @@ impl<'c> IncidentFieldModel<'c> {
                 .steps
                 .last()
                 .ok_or_else(|| invalid("empty incident word"))?;
-            let reflection = generated
-                .word
-                .source
-                .action_matrix_free_auto(last.input.view(), self.spec.solve_steps)?;
+            let reflection = generated.word.solver.action(
+                &generated.word.source,
+                last.input.view(),
+                generated.word.solve_steps,
+            )?;
             Some(self.field.prepare_joint_current_commit_from_action(
                 &reflection,
                 generated.word.output.view(),
@@ -630,7 +671,10 @@ impl<'c> IncidentFieldModel<'c> {
                         .view(),
                 )?
             };
-            let reflection = source.action_matrix_free_auto(input.view(), self.spec.solve_steps)?;
+            let reflection =
+                self.spec
+                    .solver
+                    .action(source, input.view(), self.spec.solve_steps)?;
             current = reflection
                 .output()
                 .as_section()?
@@ -670,9 +714,7 @@ impl<'c> IncidentFieldModel<'c> {
                 gradient.held_refinement(&zero_joint, &word.held, layout.relaxation_bits)?;
             let full = returned.row(0)?;
             // S_D is self-adjoint under the declared unit pairing. This includes g_b_ref.
-            let reflection = word
-                .source
-                .action_matrix_free_auto(full, self.spec.solve_steps)?;
+            let reflection = word.solver.action(&word.source, full, word.solve_steps)?;
             let incoming_covector = reflection.output();
             let ga = incoming_covector
                 .restrict(0..boundary)?
@@ -808,14 +850,14 @@ impl<'c> NativeCoupledBody<'c> {
                 .contacts
                 .iter()
                 .map(|(input, _)| {
-                    word.source
-                        .action_matrix_free_auto(input.view(), model.spec.solve_steps)
+                    word.solver
+                        .action(&word.source, input.view(), word.solve_steps)
                 })
                 .collect::<Result<Vec<_>, _>>()?;
             let pullbacks = actions
                 .iter()
                 .zip(&returned.contacts)
-                .map(|(action, (_, g))| action.pullback_full_auto(g.view(), model.spec.solve_steps))
+                .map(|(action, (_, g))| action.pullback_full_auto(g.view(), word.solve_steps))
                 .collect::<Result<Vec<_>, _>>()?;
             Some(model.field.prepare_global_action_material_return(
                 &pullbacks.iter().collect::<Vec<_>>(),
@@ -1032,6 +1074,53 @@ impl<'c> NativeCoupledBody<'c> {
                 model.layout.slot_rows.clone(),
             )),
             _ => Err(invalid("incident dimensions require their model chart")),
+        }
+    }
+    pub fn incident_solver(&self) -> Result<(IncidentFieldSolver, usize), NativeSessionError> {
+        match self.state()? {
+            BodyState::Incident(model) => Ok((model.spec.solver, model.spec.solve_steps)),
+            _ => Err(invalid("incident solver requires its model chart")),
+        }
+    }
+    /// Read the small, typed comparison-bound packets without expanding the retained
+    /// material factors into a boundary-by-contact matrix.
+    pub fn inspect_incident_material_return_bounds(&self) -> Result<Value, NativeSessionError> {
+        match self.state()? {
+            BodyState::Incident(model) => {
+                let count = model
+                    .field
+                    .operative_return_storage()
+                    .map_or(0, |s| s.returns);
+                let bounds = (0..count)
+                    .map(|at| model.field.inspect_contact_deposit_bound(at))
+                    .collect::<Result<Vec<_>, _>>()?;
+                Ok(json!(bounds))
+            }
+            _ => Err(invalid(
+                "incident material returns require their model chart",
+            )),
+        }
+    }
+    /// Change only the numerical solve on a model with no outstanding producing comparisons.
+    /// Material and continuing q/b are retained. New checkpoints record the selected proposal.
+    pub fn configure_incident_solver(
+        &mut self,
+        solver: IncidentFieldSolver,
+        steps: usize,
+    ) -> Result<(), NativeSessionError> {
+        if steps == 0 || steps > u32::MAX as usize {
+            return Err(invalid("incident solve resource aperture"));
+        }
+        match self.state_mut()? {
+            BodyState::Incident(model) if model.pending.is_empty() => {
+                model.spec.solver = solver;
+                model.spec.solve_steps = steps;
+                Ok(())
+            }
+            BodyState::Incident(_) => Err(invalid(
+                "retain the producing solver until pending comparisons return",
+            )),
+            _ => Err(invalid("incident solver requires its model chart")),
         }
     }
     pub fn incident_current_boundary(

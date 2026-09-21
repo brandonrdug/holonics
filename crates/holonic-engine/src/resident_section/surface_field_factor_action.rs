@@ -149,6 +149,7 @@ impl<'c> ResidentSurface<'c> {
         grain: u32,
         steps: usize,
         omega_bits: u32,
+        solve_method: u32,
         work: &ResidentSection<'c>,
         out: &ResidentSection<'c>,
         residual: &ResidentSection<'c>,
@@ -160,6 +161,9 @@ impl<'c> ResidentSurface<'c> {
         let nnz_wire = wire(nnz)?;
         let rank_wire = wire(rank)?;
         let steps_wire = wire(steps)?;
+        if solve_method > 1 {
+            return Err(fail());
+        }
         let input_offset_wire = wire(input.offset())?;
         let offsets_width = count
             .checked_add(1)
@@ -257,6 +261,7 @@ impl<'c> ResidentSurface<'c> {
             .u32(grain)
             .u32(steps_wire)
             .u32(omega_bits)
+            .u32(solve_method)
             .ptr(work.lo_device_ptr())
             .ptr(out.lo_device_ptr())
             .ptr(out.hi_device_ptr())

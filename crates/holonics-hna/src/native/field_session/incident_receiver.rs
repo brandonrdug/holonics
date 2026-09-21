@@ -5,15 +5,15 @@
 //! the forward or delayed comparison.
 
 use super::boundary::BoundaryMaterial;
-use super::{Result, invalid};
+use super::{invalid, Result};
 use holonic_engine::{
-    ExactWavePhaseTransport,
     native_ecology::constitutive_fibre::{
         NativeNormalPrior, NativeNormalizedFaceMeasure, NormalBasisSelection, NormalMaterialRest,
         NormalWaveBasisChart, ResidentConstitutiveSection, ResidentNormalEnclosureSection,
         ResidentNormalMaterial,
     },
     resident_section::{ResidentGrain, ResidentSectionRest, ResidentSurface, SeriesAperture},
+    ExactWavePhaseTransport,
 };
 use std::rc::Rc;
 
@@ -158,6 +158,21 @@ impl<'c> IncidentTextReceiver<'c> {
 
     pub fn codec_version(&self) -> u64 {
         self.codec_version
+    }
+
+    pub(super) fn inspect_text_materials(&self) -> Result<Vec<serde_json::Value>> {
+        std::iter::once(&self.text)
+            .chain(self.cohort_materials.iter())
+            .zip(&self.cohorts)
+            .map(|(material, cohort)| {
+                Ok(serde_json::json!({
+                    "cohort": cohort,
+                    "observations": material.observations(),
+                    "state": material.inspect().map_err(invalid)?,
+                    "prior": material.prior(),
+                }))
+            })
+            .collect()
     }
 
     pub fn material_observations(&self) -> (u64, u64, Vec<u64>) {

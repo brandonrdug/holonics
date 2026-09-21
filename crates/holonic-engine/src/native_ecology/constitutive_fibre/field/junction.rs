@@ -14,7 +14,8 @@ pub use operative::{
     NativeCausalContactPropagationReading,
 };
 pub use operative::{
-    NativeContactDepositReading, NativeContactRealization, NativeFieldCurrentSource,
+    NativeContactDepositBoundReading, NativeContactDepositReading, NativeContactRealization,
+    NativeOperativeBoundKind, NativeFieldCurrentSource,
     NativeFieldCurrentSourceRest, NativeFieldReflection, NativeFieldReflectionSection,
     NativeFieldReflectionTarget, NativeFiniteMaterialResponse, NativeMaterialContactResponse,
     NativeMaterialContactResponseReading, NativeMaterialContactStepComparison,

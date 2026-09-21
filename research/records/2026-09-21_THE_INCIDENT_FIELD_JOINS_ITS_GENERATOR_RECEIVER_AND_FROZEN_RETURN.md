@@ -259,6 +259,184 @@ an exact integer block reduction before their single grain division. This reduce
 without replacing the operator or discarding a direction. Performance comparisons must use the
 same input and distinguish release/debug cold work from device execution.
 
+## Following the failed response through its actual producing material
+
+[definition] These diagnostics use the existing difference/receiver construction. The
+[Compression tablet](../../docs/canon/TABLET_THE_COMPRESSION.md#7-what-this-tablet-refuses)
+states that a scalar loss is a receiver face of a residual, not the residual itself.
+Here an enclosure bound retains the difference between the delivered current and the family
+specified by the field operation at its supplied source. A target loss compares different
+operands through its own receiver. The
+[composition guide](../../docs/HNN_COMPOSITION.md)
+also retains the lifted complex logarithmic cross-entropy and its oriented phase defect.
+The real probability loss used in this text control does not replace that construction.
+
+[definition] Decimal losses, angles and ratios below are exterior observer calculations from
+the exact native receipts. They are not native coefficients or currents. The source, learned
+material, solver and returned packets use checked exact/rational/dyadic carriers. For example,
+the accelerated response's joint-current radius is the exact rational
+`121814186805117144625222295 / 79228162514264337593543950336`; its printed decimal is only a
+reading of that packet. The current source family, numerical enclosure and target comparison
+retain their different comparands and scopes.
+
+[project-postulate] The continuing objective remains
+[Holonic Encoding's formation and reuse of transformations](2026-09-11_HOLONIC_ENCODING_RETAINS_TRANSFORMATION_GRAIN_ACROSS_MODALITIES.md),
+including generator inference from partial observations and use under changed conditions and
+receivers. Font-rendered faces, acoustic partials and sampled waveforms exemplify receiving
+presentations of such generators; they do not prescribe new indivisible token classes.
+The [native helical/contextual construction](2026-09-20_NATIVE_INCIDENCE_FORMS_AND_REUSES_THE_HELICAL_GENERATOR.md)
+already forms and reuses a local law with an unresolved condition family. The incident body's
+learned M/D law also acts on changed sources. Replaying one response below diagnoses its return
+path; character agreement is not substituted for this broader reusable construction.
+
+[established-bounded; measured] Replaying the complete development source against its learned
+fixed-port model returned only **18/388** observed characters. This comparison concerns retention
+of the admitted observation, not correctness of that historical response. Cold inspection of
+the actual E/R normal states and frozen receiving operands found:
+
+* R_text moved **5.26%** in Frobenius norm from its initial map. Applying the initial map to the
+  learned response current reproduces **486/512** of the current nominal selections.
+* The average response cross-entropy was **3.80983**, against **3.82864** for a uniform 46-class
+  face. The stored normal solve retains a residual bound of approximately **3.18e-25**.
+* The response current has mean cosine **0.95395** with the observed characters' initial
+  source columns after subtracting the codec mean. The target pattern is present in its
+  directions, despite insufficient magnitude/margins at the lightly changed receiving map.
+* In the larger retrospective case, reconstructing all current receiver potentials reproduces
+  **512/512** native selections. **288/388** emitted classes belong to newly admitted, untrained
+  rows. Their initial biases explain why the weak-current face preferentially emits those
+  classes; this is not a failed Unicode rendering operation.
+
+[established-bounded; measured] Changing one admitted source character while retaining the
+same model/current changes the response current by norm **0.007293**, or **0.5804%** of its
+previous norm, and changes one nominal selection. Most of that difference lies in the final
+eight receiving rows, near the shared geometric junction. The first 388 rows change by norm
+**0.0006688**; their enclosing families overlap. The actual graph has directed source-to-response
+distances 75,521–76,032 for this short source, but undirected distances 2–513 through the torus
+closure. Neither local depth nor those distances alone describe the global inverse's coupling.
+
+[proved-derived] For an exact preceding normal solution W H=B, concatenate the actual frozen
+source/response features F and their descending covectors G. The implemented proxy target is
+Y=W F+sigma G, so
+`W_next-W=sigma G F* (H+F F*)^(-1)`. Source and response observations each enter once. This is
+the existing normal return, not a sign correction or a new optimizer. Its proxy decrease does
+not by itself establish a decrease after the complete nonlinear field is rerun.
+
+[established-bounded; measured] A further controlled observation of the same recorded response,
+using sigma=1/4 and **holding the continuing q/b fixed**, improved nominal character agreement
+from **18/388 to 295/388**. The response cross-entropy sum fell **1478.213 → 1401.381**; source
+reconstruction fell **2126.022 → 2094.376**, and support loss fell **6.209 → 5.438**. The combined
+value fell **3610.444 → 3501.195**. These are exterior measurements of the native real potentials.
+The resulting text is a recognizable, imperfect reproduction of that observation, not a useful
+response to either unrelated retrospective request or evidence of broad development.
+
+[established-bounded; measured] The same update exposed the next numerical failure. The
+certified operator norm grew from approximately **4.640 to 11.814**. Auto-selected Richardson
+omega changed from **1/32 to 1/256**, while the fixed budget remained 1,024 iterations. Its
+worst-case contraction changes from approximately **7.6e-15 to 0.0182**. The returned response
+radius grew **0.001181 → 40,158.295**, and all emitted selections lost robustness. Every text
+probability interval widened to [0,1], whose existing midpoint receiver has centre mass 23
+over 46 classes. This defeats further useful return through that coarse face. The operator's
+retained material error stayed approximately 5.8e-24; changing that error is not the explanation.
+
+[definition; agent-inferred] The numerical repair keeps `A=I+DD*` and the existing independent
+final residual certificate. `IncidentFieldSolver::Chebyshev` selects a resident semi-iteration
+over the certified spectrum [1,b], where b is the existing dyadic upper bound. With
+`d=(b+1)/2`, `c=(b-1)/2`, start `alpha_0=1/d`, `p_0=alpha_0 r_0`; subsequently use
+`gamma_k=c² alpha_(k-1)/2` for k=1 and `/4` thereafter,
+`alpha_k=1/(d-gamma_k)`, `beta_k=gamma_k alpha_k`,
+`p_k=alpha_k r_k+beta_k p_(k-1)`, and `v_(k+1)=v_k+p_k`.
+Its rounded candidate is certified against the actual D/D* action at the end. This changes
+the numerical proposal, not the field or learning law. Richardson remains the saved default;
+reconfiguration requires returned/released comparisons and invalidates an older unpublished
+proposal. Model and presentation rest retain and cross-check the selected solver.
+
+[definition; implemented-exact] Normal fitting also reuses identical complete B rows under
+their common H. It solves and certifies one exact representative, then returns its coefficients
+and residual to every matching row. Aggregate norms/residuals still count all rows. A later
+distinct B separates those rows again; there is no permanent identification of length classes.
+The 513-class support receiver has 512 equal non-target rows after its one-length observations.
+Its dense H/storage remains a separate representation cost under #18.
+
+The [cold material/comparison example](../../crates/holonics-hna/examples/athena_boundary_material.rs)
+and [experiment instructions](../experiments/athena_field/geometric/README.md) expose these
+operands through the existing session. Raw source, target and coefficient artifacts remain
+private. Actual native checks and the full learned-model numerical comparison accompany the
+repair below.
+
+[established-bounded; measured] The same learned E/R/material state, with Chebyshev-512,
+returns response radius **0.001538** and **252/388** robust emitted selections. Character
+agreement is **187/388**, with response cross-entropy sum **1457.132**. The earlier 295/388
+agreement belonged to the poorly converged Richardson evaluation; it is not the accurate
+field's result. The native accelerated evaluation still improves on the initial 18/388,
+while exposing the remaining learned-response defect. The before/after cold E/R states are
+exactly equal in this solver-only comparison. This source run used a GPU also occupied by
+another application, so its elapsed time is not a clean performance comparison.
+
+[established-bounded; measured] Complete learned-model remount finished in **99.483 seconds**
+after repeated exact cold `(W_row,B_row)` witnesses were reused. The previous attempt was
+interrupted before its application callback after more than **396 seconds**; that unfinished
+attempt is not a completed benchmark. Cold validation still checks the complete source geometry,
+coefficient norm, residual and family bound. A corruption test changes a formerly repeated
+coefficient row and its stored norm; the independent residual check rejects it.
+
+[established-bounded; native-checked] Eleven operative source checks, the native repeated-row
+fit/split check, 21 incident application/return checks and the cold repeated-row corruption
+check pass. The high-norm source fixture excites both the fast and slow directions of A;
+Chebyshev-512/1024 returns residual bounds below 1e-20 and the exact forward/full-pullback
+oracle, where Richardson-1024 retains a substantial slow-direction residual. Pending rest,
+legacy solver default, numerical reconfiguration and frozen comparison readouts are exercised.
+
+[established-bounded; measured] The next controlled observed return reached a carrier refusal
+before publication. The failing operation was `section_field_factor_delta_bound`, which
+collapsed two retained factor balls into the scalar matrix bound
+`rp*norm(C)+rc*norm(P)+rp*rc`. Its two radii and factor centres were representable, while the
+derived scalar could exceed the signed-128 carrier at grain 96. The preceding model remained
+unchanged. This is a representation failure of that receiving bound, not a new loss definition.
+
+[definition; implemented-exact] Sparse `DyadicDeposit` already means installing the exact
+finite factor products, while retaining their difference from the unrounded material return
+in the journal. That journal now explicitly distinguishes `FactorBalls` from the legacy
+`MatrixAndInternal` bound. It retains P, C, rp, rc and their producing relation without forcing
+the scalar collapse. Existing active map/current uncertainty is preserved. A cold receiver
+can derive a conservative matrix bound with arbitrary-precision rational arithmetic; the small
+bound inspector exposes the original factors' radii without expanding a boundary-by-contact
+matrix. Older dyadic journals keep their recorded matrix/internal interpretation.
+
+[established-bounded; native-checked] A sparse native regression uses exact factor radii
+`rp=rc=2^24` at grain 96. Their product exceeds the scalar carrier's range. `EnclosedFlow`
+refuses without publishing; the exact dyadic factor deposit succeeds with its reference
+families retained, and rest/remount preserves the explicit bound tag and values. The legacy
+tag remains legacy on reopen. All 34 operative source/material/rest checks and 21 incident
+application checks pass after this repair. Full-source retry is recorded separately; the
+small regression does not establish its outcome or conversational usefulness.
+
+[established-bounded; measured] The full-source retry completes that previously refused
+return, saves its successor, and generates again. A full cold remount returns exactly the same
+encoder/receiver coefficients, normal statistics, priors and typed material-reference bounds.
+The retained exact factor-radii product at
+the second stage exceeds `(2^127-1)/2^96`; the factors and reference families remain present in
+the saved journal. No wider floating-point representation or discarded defect is involved.
+The native phase receipts report 139,375,771 microseconds in the receiving return,
+314,089,164 in the field return and 4,333,206 in the encoder return. These costs still require
+compact normal statistics and reuse of already produced field actions.
+
+[established-bounded; measured] This continuation also exposes a learning-objective issue
+separate from the repaired representation. As exterior observer readings, source reconstruction
+cross-entropy decreases **2094.376 → 2061.331**, while response cross-entropy increases
+**1457.132 → 1463.758**; the combined source/response/support reading decreases
+**3557.426 → 3531.015**. Observed-character agreement falls **187/388 → 153/388**.
+At the retained old field features, the new receiver alone improves response cross-entropy to
+**1450.582**; reading the new field through the old receiver gives **1468.513**. Thus the
+receiving fit itself is not the source of that deterioration; the changed upstream field/E/M/D
+composition needs its own consequence comparison. This does not isolate those upstream owners
+from one another or establish that an auxiliary source objective is universally wrong.
+
+[definition] A decreasing aggregate scalar does not close the requested receiving consequence,
+and repeated character reproduction does not close reusable generator formation. Continue from
+the existing source/condition formation and receiving laws, retaining their directional residuals,
+partial families and changed-context consequences. The repaired numerical and journal paths are
+construction results; useful Athena conversation remains unachieved by this population.
+
 ## Source owners
 
 [definition] The source network for this return is:

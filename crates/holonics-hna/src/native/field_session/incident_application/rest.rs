@@ -149,6 +149,9 @@ impl IncidentPresentationRest {
             .incident
             .as_ref()
             .ok_or_else(|| invalid("incident material declaration"))?;
+        if body.incident_solver()? != (boundary_spec.solver, boundary_spec.solve_steps) {
+            return Err(invalid("incident presentation rest solver declaration"));
+        }
         let chart = spec.chart()?;
         let boundary = BoundaryMaterial::found(
             surface,

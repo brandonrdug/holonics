@@ -1,7 +1,7 @@
 use super::*;
 use crate::native::GeometricFieldSpec;
 use holonic_engine::{
-    ExactComplexWaveCurrent, native_ecology::constitutive_fibre::ResidentNormalEnclosureSection,
+    native_ecology::constitutive_fibre::ResidentNormalEnclosureSection, ExactComplexWaveCurrent,
 };
 use num_rational::BigRational as Rat;
 use std::path::PathBuf;
@@ -24,6 +24,7 @@ fn spec() -> FieldSessionSpec {
             response_port_start: None,
             material_owners: vec![],
             solve_steps: 128,
+            solver: crate::native::IncidentFieldSolver::Richardson,
         }),
         codec: FieldTextCodec::UnicodeScalars,
         fractional_bits: 24,
@@ -61,6 +62,58 @@ fn incident_response_port_helper_preserves_legacy_and_rejects_overlap() {
 }
 
 type SectionSnapshot = Vec<(Vec<ExactComplexWaveCurrent>, Rat)>;
+
+#[test]
+#[ignore = "requires CUDA; numerical solver selection persists with frozen pending words"]
+fn incident_solver_selection_survives_pending_rest_without_rebinding() {
+    use crate::native::IncidentFieldSolver;
+    let directory = tempfile::tempdir().unwrap();
+    let path = directory.path().join("chebyshev.session");
+    let spec = spec();
+    let json = serde_json::to_value(&spec).unwrap();
+    assert!(json["incident"].get("solver").is_none());
+    let legacy: FieldSessionSpec = serde_json::from_value(json).unwrap();
+    assert_eq!(
+        legacy.incident.unwrap().solver,
+        IncidentFieldSolver::Richardson
+    );
+    let (id, received) = with_field_session(&spec, |session| {
+        let anchor = session.body.incident_current_boundary()?;
+        let stale = session
+            .body
+            .prepare_incident_field(anchor.view(), &vec![false; anchor.view().components() / 2])?;
+        session.configure_incident_solver(IncidentFieldSolver::Chebyshev, 128)?;
+        assert!(session
+            .body
+            .publish_incident_field(stale, false, false)
+            .is_err());
+        let value = session.request(&request(true))?;
+        let id = value["comparison"].as_u64().unwrap();
+        let received = session.inspect_incident_comparison(id)?;
+        assert!(session
+            .configure_incident_solver(IncidentFieldSolver::Richardson, 128)
+            .is_err());
+        assert_eq!(session.inspect_incident_comparison(id)?, received);
+        session.checkpoint(&path, &HnaStreamState::default())?;
+        Ok((id, received))
+    })
+    .unwrap();
+    NativeFieldSavedSession::open(path)
+        .unwrap()
+        .with_session(|session, _| {
+            assert_eq!(
+                session.spec().incident.as_ref().unwrap().solver,
+                IncidentFieldSolver::Chebyshev
+            );
+            assert_eq!(session.inspect_incident_comparison(id)?, received);
+            session.observe(id, "ba", 3)?;
+            let current = session.inspect_current()?;
+            session.configure_incident_solver(IncidentFieldSolver::Richardson, 128)?;
+            assert_eq!(session.inspect_current()?, current);
+            Ok(())
+        })
+        .unwrap();
+}
 
 fn snapshot(section: &ResidentNormalEnclosureSection<'_>) -> SectionSnapshot {
     (0..section.rows())
@@ -107,16 +160,14 @@ fn public_incident_session_reopens_frozen_receiver_after_intervening_update() {
         let short = session.request(&short_request)?;
         assert_eq!(long["receiver_bindings"], short["receiver_bindings"]);
         for returned in [&long, &short] {
-            assert!(
-                returned["receiver_bindings"]
+            assert!(returned["receiver_bindings"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .all(|site| !returned["source_bindings"]
                     .as_array()
                     .unwrap()
-                    .iter()
-                    .all(|site| !returned["source_bindings"]
-                        .as_array()
-                        .unwrap()
-                        .contains(site))
-            );
+                    .contains(site)));
         }
         assert!(
             long["source_bindings"].as_array().unwrap().len()
@@ -143,13 +194,26 @@ fn public_incident_session_reopens_frozen_receiver_after_intervening_update() {
         let first_id = first["comparison"].as_u64().unwrap();
         let second_id = second["comparison"].as_u64().unwrap();
         let frozen_before_update = pending_snapshot(session, first_id);
+        let inspected_frozen = session.inspect_incident_comparison(first_id)?;
+        let material_before = session.inspect_incident_boundary_material()?;
         session.admit_incident_source_texts(&["λ".to_owned()])?;
         let retro = session
             .observe(second_id, "λa", 3)
             .expect("second material return");
         assert_eq!(retro["original_face_supports_target"], false);
         assert_eq!(pending_snapshot(session, first_id), frozen_before_update);
+        assert_eq!(
+            session.inspect_incident_comparison(first_id)?,
+            inspected_frozen
+        );
+        assert_ne!(
+            session.inspect_incident_boundary_material()?,
+            material_before
+        );
         let current = session.inspect_current()?;
+        session.inspect_incident_comparison(first_id)?;
+        session.inspect_incident_boundary_material()?;
+        assert_eq!(session.inspect_current()?, current);
         session
             .checkpoint(&path, &HnaStreamState::default())
             .expect("pending session checkpoint");
@@ -251,12 +315,10 @@ fn mathematical_product_and_code_share_the_field_native_ports() {
             session.body.epoch()
         );
         assert_eq!(value["operation_results"][1]["status"], "code-emitted");
-        assert!(
-            value["operation_results"][1]["source"]
-                .as_str()
-                .unwrap()
-                .contains("pub fn holonic_apply")
-        );
+        assert!(value["operation_results"][1]["source"]
+            .as_str()
+            .unwrap()
+            .contains("pub fn holonic_apply"));
         let current = session.body.incident_current_boundary()?.view().inspect()?;
         let expected = ExactComplexWaveCurrent::new(
             Rat::new((-7).into(), 64.into()),

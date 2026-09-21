@@ -124,7 +124,23 @@ __device__ void normal_fit_sources(int64_t *state,uint32_t m,uint32_t targets,ui
     }
     if(f)field_enclosed_factor(a,diag,f,grain,slot);
     __syncthreads();if(*slot)return;
+    // Rows with the same complete B wire have the same exact solve and residual.  Keep the
+    // representative index in row_norm while fitting; the existing row-norm slot is reused
+    // after fitting, so this adds no workspace or state words.  Compare the entire moment wire,
+    // including every signed moment carrier word, rather than a narrowed value.
+    const size_t b_row_words=(size_t)m*COMPLEX_MOMENT_WIRE_WORDS;
     for(uint32_t row=threadIdx.x;row<targets;row+=blockDim.x){
+        const int64_t *brow=B+(size_t)row*b_row_words;uint32_t representative=row;
+        for(uint32_t prior=0;prior<row;++prior){
+            const int64_t *candidate=B+(size_t)prior*b_row_words;bool same=true;
+            for(size_t word=0;word<b_row_words;++word)if(brow[word]!=candidate[word]){same=false;break;}
+            if(same){representative=prior;break;}
+        }
+        row_norm[row]=(wide)representative;
+    }
+    __syncthreads();
+    for(uint32_t row=threadIdx.x;row<targets;row+=blockDim.x){
+        if((uint32_t)row_norm[row]!=row)continue;
         wide *r=rhs+(size_t)row*d,*out=M+(size_t)row*d;bool nonzero=false;
         for(uint32_t j=0;j<d;++j)out[j]=0;
         for(uint32_t j=0;j<f;++j){
@@ -169,7 +185,20 @@ __device__ void normal_fit_sources(int64_t *state,uint32_t m,uint32_t targets,ui
             re=re-S*normal_read(b,slot);im=im-S*normal_read(b+MOMENT_WIRE_WORDS,slot);
             residual=residual+normal_abs(re)+normal_abs(im);
         }
-        operative_write_moment(residual,row_residual+MOMENT_WIRE_WORDS*row,row_residual+MOMENT_WIRE_WORDS*row,slot);row_norm[row]=norm;
+        operative_write_moment(residual,row_residual+MOMENT_WIRE_WORDS*row,row_residual+MOMENT_WIRE_WORDS*row,slot);
+        // rhs is dead after the solve.  Preserve the representative norm there while row_norm
+        // continues to carry the representative index for the duplicate-copy pass.
+        rhs[(size_t)row*d]=norm;
+    }
+    __syncthreads();if(*slot)return;
+    for(uint32_t row=threadIdx.x;row<targets;row+=blockDim.x){
+        uint32_t representative=(uint32_t)row_norm[row];
+        if(representative!=row){
+            for(uint32_t j=0;j<d;++j)M[(size_t)row*d+j]=M[(size_t)representative*d+j];
+            for(uint32_t j=0;j<MOMENT_WIRE_WORDS;++j)
+                row_residual[MOMENT_WIRE_WORDS*(size_t)row+j]=row_residual[MOMENT_WIRE_WORDS*(size_t)representative+j];
+        }
+        row_norm[row]=rhs[(size_t)representative*d];
     }
     __syncthreads();if(*slot)return;
     if(!threadIdx.x){

@@ -1,7 +1,7 @@
 //! Exterior session over one move-owned coupled normal wave.
-use super::NativeSessionError;
 use super::section_input::SymbolCurrentChart;
-use crate::{HnaStream, HnaStreamState, PublicationReceipt, publish_new};
+use super::NativeSessionError;
+use crate::{publish_new, HnaStream, HnaStreamState, PublicationReceipt};
 use holonic_engine::{
     codec_recovery::{Symbol, SymbolAlphabet},
     embedding_fiber::ResidentReadout,
@@ -12,7 +12,7 @@ use holonic_engine::{
     resident_section::ResidentSurface,
 };
 use serde::{Deserialize, Serialize};
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::{
     fs::File,
     io::{self, Read, Write},
@@ -20,8 +20,13 @@ use std::{
 };
 
 mod body;
-pub use body::{IncidentFieldSpec,NativeIncidentGenerated, NativeIncidentMaterialReturn,NativeIncidentModelRest,NativeFieldFormation,NativeFieldReactionPort,NativeCoupledBody,NativeFieldAttachRefusal,NativeFieldGeneratedSection,NativeFieldModelRest};
 pub use body::SavedCoupledBody;
+pub use body::{
+    IncidentFieldSolver, IncidentFieldSpec, NativeCoupledBody, NativeFieldAttachRefusal,
+    NativeFieldFormation, NativeFieldGeneratedSection, NativeFieldModelRest,
+    NativeFieldReactionPort, NativeIncidentGenerated, NativeIncidentMaterialReturn,
+    NativeIncidentModelRest,
+};
 
 const MAGIC: &[u8] = b"HNA-COUPLED-WAVE-SESSION\x01";
 const MAGIC_V2: &[u8] = b"HNA-COUPLED-WAVE-SESSION\x02";
@@ -182,8 +187,15 @@ impl<'c> NativeCoupledWaveSession<'c> {
     /// Return generated forecast text for a declared word of learned members from one joint.
     /// This is output to the caller; it does not advance the continuing body or re-enter that
     /// output as a new source. Those state contracts are separate from constructing the face.
-    pub fn predict_continuation(&mut self, word: &[usize], full_family: bool) -> Result<Value, NativeSessionError> {
-        let word = word.iter().map(|&member| (member, self.receiver)).collect::<Vec<_>>();
+    pub fn predict_continuation(
+        &mut self,
+        word: &[usize],
+        full_family: bool,
+    ) -> Result<Value, NativeSessionError> {
+        let word = word
+            .iter()
+            .map(|&member| (member, self.receiver))
+            .collect::<Vec<_>>();
         let epoch = self.wave.epoch();
         let scope = self.wave.scope();
         let chart = &self.chart;

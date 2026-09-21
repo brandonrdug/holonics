@@ -3,11 +3,11 @@
 //! dense m-by-m statistic or a numerical encoding of a symbol ordinal.
 use super::*;
 use holonic_engine::{
-    ExactWavePhaseTransport,
     native_ecology::constitutive_fibre::{
         BoundaryMaterialMaps, BoundaryMaterialSeed, NativeNormalPrior, NormalMaterialRest,
         ResidentNormalEnclosureSection, ResidentNormalMaterialView,
     },
+    ExactWavePhaseTransport,
 };
 use std::collections::BTreeSet;
 
@@ -84,6 +84,18 @@ impl<'c> IncidentEncoder<'c> {
 
     pub fn bind_seed(&mut self, seed: BoundaryMaterialSeed) {
         self.seed = Some(seed);
+    }
+    pub(super) fn inspect_columns(&self) -> Result<Vec<serde_json::Value>> {
+        self.columns
+            .iter()
+            .map(|column| {
+                Ok(json!({
+                    "observations": column.observations(),
+                    "state": column.inspect().map_err(invalid)?,
+                    "prior": column.prior(),
+                }))
+            })
+            .collect()
     }
     fn ones(&self, rows: usize) -> Result<ResidentNormalEnclosureSection<'c>> {
         if rows == 0 {

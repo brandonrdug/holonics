@@ -30,6 +30,7 @@ pub struct NativeFieldFactorAction<'a, 'c> {
     layout: NativeFieldJointLayout,
     steps: usize,
     omega_bits: u32,
+    solve_method: u32,
 }
 
 fn valid(
@@ -156,8 +157,6 @@ impl<'c> NativeConstitutiveField<'c> {
         self.junction.as_mut().unwrap().solver = NativeFieldJunctionSolver::Full;
         Ok(())
     }
-
-
 }
 
 impl<'c> NativeFieldCurrentSource<'c> {
@@ -180,7 +179,7 @@ impl<'c> NativeFieldCurrentSource<'c> {
         }
         let d = self.boundary_components();
         let count = self.births.len();
-        let (output, residual) = Self::prepare_factor_sections(self, input, steps, omega_bits)?;
+        let (output, residual) = Self::prepare_factor_sections(self, input, steps, omega_bits, 0)?;
         Ok(NativeFieldFactorAction {
             source: self,
             input,
@@ -196,6 +195,7 @@ impl<'c> NativeFieldCurrentSource<'c> {
             },
             steps,
             omega_bits,
+            solve_method: 0,
         })
     }
 
@@ -204,6 +204,7 @@ impl<'c> NativeFieldCurrentSource<'c> {
         input: ResidentNormalEnclosureView<'v, 'c>,
         steps: usize,
         omega_bits: u32,
+        solve_method: u32,
     ) -> Result<(Rc<ResidentSection<'c>>, Rc<ResidentSection<'c>>), Error> {
         let program = source
             ._producing
@@ -251,6 +252,7 @@ impl<'c> NativeFieldCurrentSource<'c> {
                 source.grain,
                 steps,
                 omega_bits,
+                solve_method,
                 &work,
                 &output,
                 &residual,
@@ -276,6 +278,7 @@ impl<'a, 'c> NativeFieldFactorAction<'a, 'c> {
         residual: Rc<ResidentSection<'c>>,
         steps: usize,
         omega_bits: u32,
+        solve_method: u32,
     ) -> Self {
         let d = source.boundary_components();
         Self {
@@ -293,6 +296,7 @@ impl<'a, 'c> NativeFieldFactorAction<'a, 'c> {
             },
             steps,
             omega_bits,
+            solve_method,
         }
     }
     pub fn pullback_full_auto(
@@ -315,6 +319,7 @@ impl<'a, 'c> NativeFieldFactorAction<'a, 'c> {
             covector,
             self.steps,
             self.omega_bits,
+            self.solve_method,
         )?;
         let d = self.layout.boundary_components;
         let count = self.layout.contact_count;

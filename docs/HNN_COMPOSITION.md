@@ -367,8 +367,9 @@ drive `(a,b)` enters one source-owned `S_D`, followed by the full joint relaxati
 and full adjoint live in
 `holonic-engine/src/native_ecology/constitutive_fibre/field/junction/operative/source/`.
 The dense reflection remains the small/reference path. Declared large fields use a resident CSR
-incidence anchor plus low-rank factors for `D` and `D*`, with Richardson residuals and outward
-carriers retained on the device. That path does not allocate a boundary-square covariance.
+incidence anchor plus low-rank factors for `D` and `D*`, with residual-certified Richardson or
+explicitly selected Chebyshev proposals and outward carriers retained on the device. The
+numerical method stays with its producing word. This path does not allocate a boundary-square covariance.
 
 The complete joint pullback retains both boundary and internal covectors. Its material return
 keeps the two outer-product terms of `G_D` at every stage, scales one factor of each term once,
@@ -377,6 +378,14 @@ uses a prepared endpoint and a residual receipt; failed preparation leaves the c
 unchanged. Source-owned normal covectors, nonzero `E`/`R` priors and declared source/contact
 origins remain distinct from observation births. Frozen producing cuts, pending receiver words
 and cohort rest packets retain source identity through delayed comparison and restart.
+
+Sparse exact dyadic material deposits retain their two factor balls under an explicit journal
+bound tag. Their reference discrepancy remains available without forcing it into a fixed-grain
+scalar matrix bound. Existing matrix/internal bounds keep their original interpretation. This
+follows the same distinction between a retained residual/source family and one receiving scalar;
+it does not introduce another loss or omit the comparison defect. The
+[full-source diagnosis](../research/records/2026-09-21_THE_INCIDENT_FIELD_JOINS_ITS_GENERATOR_RECEIVER_AND_FROZEN_RETURN.md#following-the-failed-response-through-its-actual-producing-material)
+records why that representation was needed and how the native return was checked.
 
 The measured scope is narrower than the construction boundary: exact rank-one dense and sparse
 adjoint/material/update tests and the current HNA full-word, encoder, pending-growth, restart

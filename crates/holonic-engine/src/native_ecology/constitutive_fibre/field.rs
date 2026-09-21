@@ -61,7 +61,8 @@ pub use internal_mode::{
 pub use junction::{
     CausalContactPropagation, CausalContactPropagationCotangent, CausalContactPropagationEnclosure,
     JointMaterialContactResponse, NativeCausalContactJoinReading, NativeCausalContactPropagation,
-    NativeCausalContactPropagationReading, NativeContactDepositReading, NativeContactRealization,
+    NativeCausalContactPropagationReading, NativeContactDepositBoundReading, NativeContactDepositReading,
+    NativeContactRealization, NativeOperativeBoundKind,
     NativeFieldCurrentBall, NativeFieldCurrentSource, NativeFieldCurrentSourceRest,
     NativeFieldEnclosedJunctionReading, NativeFieldExactJunctionReading,
     NativeFieldInternalCurrent, NativeFieldInternalCurrentBall, NativeFieldJunctionReading,

@@ -90,6 +90,7 @@ pub enum NativeFieldActionFactorization {
     ResidentDenseReference { boundary_squared_components: usize },
     ResidentRichardsonMatrixFree { steps: usize, omega_bits: u32 },
     ResidentFactorProgramMatrixFree { steps: usize, omega_bits: u32 },
+    ResidentFactorProgramChebyshevMatrixFree { steps: usize, omega_bits: u32 },
 }
 
 /// One source-qualified, residual-certified application of the global S_D action.
@@ -235,10 +236,21 @@ impl<'a, 'c> NativeFieldMatrixFreeAction<'a, 'c> {
         steps: usize,
         omega_bits: u32,
     ) -> Result<Self, Error> {
+        Self::prepare_with_method(source, input, steps, omega_bits, 0)
+    }
+
+    pub(super) fn prepare_with_method(
+        source: &'a NativeFieldCurrentSource<'c>,
+        input: ResidentNormalEnclosureView<'a, 'c>,
+        steps: usize,
+        omega_bits: u32,
+        solve_method: u32,
+    ) -> Result<Self, Error> {
         if input.components() != source.width
             || input.grain() != ResidentGrain(source.grain)
             || steps == 0
             || (omega_bits > 120 && omega_bits != u32::MAX)
+            || solve_method > 1
         {
             return Err(Error::Shape);
         }
@@ -247,8 +259,23 @@ impl<'a, 'c> NativeFieldMatrixFreeAction<'a, 'c> {
         let width = d.checked_add(2 * count).ok_or(Error::Shape)?;
         if source._producing.factor_program.is_some() {
             let (output, residual) = NativeFieldCurrentSource::prepare_factor_sections(
-                source, input, steps, omega_bits,
+                source,
+                input,
+                steps,
+                omega_bits,
+                solve_method,
             )?;
+            let factorization = if solve_method == 1 {
+                NativeFieldActionFactorization::ResidentFactorProgramChebyshevMatrixFree {
+                    steps,
+                    omega_bits,
+                }
+            } else {
+                NativeFieldActionFactorization::ResidentFactorProgramMatrixFree {
+                    steps,
+                    omega_bits,
+                }
+            };
             return Ok(Self {
                 source,
                 input,
@@ -263,12 +290,12 @@ impl<'a, 'c> NativeFieldMatrixFreeAction<'a, 'c> {
                     field_cut: source.field_cut(),
                     grain: source.grain,
                 },
-                factorization: NativeFieldActionFactorization::ResidentFactorProgramMatrixFree {
-                    steps,
-                    omega_bits,
-                },
+                factorization,
                 origins: source.contact_origins(),
             });
+        }
+        if solve_method != 0 {
+            return Err(Error::Shape);
         }
         let output = Rc::new(
             source
@@ -429,6 +456,10 @@ impl<'a, 'c> NativeFieldMatrixFreeAction<'a, 'c> {
             return Err(Error::Shape);
         }
         if self.source._producing.factor_program.is_some() {
+            let solve_method = matches!(
+                self.factorization,
+                NativeFieldActionFactorization::ResidentFactorProgramChebyshevMatrixFree { .. }
+            ) as u32;
             let factor = NativeFieldFactorAction::from_sections(
                 self.source,
                 self.input,
@@ -436,6 +467,7 @@ impl<'a, 'c> NativeFieldMatrixFreeAction<'a, 'c> {
                 Rc::clone(&self.residual),
                 steps,
                 omega_bits,
+                solve_method,
             );
             return factor.pullback_full_auto(covector);
         }
@@ -603,8 +635,10 @@ impl<'c> NativeConstitutiveField<'c> {
         let producing = Rc::clone(&op.sections);
         let source_grain = op.grain;
         let surface = self.relation.surface;
+        let factored_reference = realization == NativeContactRealization::DyadicDeposit
+            && source._producing.factor_program.is_some();
         let mut staged = self.stage_operative_contacts()?;
-        for pullback in pullbacks {
+        for (factor_stage, pullback) in pullbacks.iter().enumerate() {
             let (ports, currents, bounds) = if step_bits == 0 {
                 (
                     pullback.resident_ports(),
@@ -638,7 +672,11 @@ impl<'c> NativeConstitutiveField<'c> {
                 }
                 (ports, currents, bounds)
             };
-            let bounds = {
+            let bounds = if factored_reference {
+                // Exact deposits retain the factor-ball reference bound in the journal. The
+                // active D successor has zero coefficient uncertainty by this realization law.
+                bounds
+            } else {
                 let matrix_bound = Rc::new(surface.fresh_section(1, 4, ResidentGrain(0))?);
                 let mut pass = surface.begin_passage(&[vec![]])?;
                 {
@@ -657,9 +695,25 @@ impl<'c> NativeConstitutiveField<'c> {
                 pass.close(0, &matrix_bound, 64)?;
                 let receipt = pass.finish()?.launch()?;
                 if !receipt.obstruction.is_empty() {
+                    let reference = surface
+                        .detach_section(&bounds, 64)
+                        .map_err(Error::from)
+                        .and_then(|rest| wides(&rest.intervals).map_err(Error::from))
+                        .map(|values| {
+                            values
+                                .into_iter()
+                                .map(|value| {
+                                    relational_geometry::Rat::new(
+                                        value.into(),
+                                        num_bigint::BigInt::from(1) << source_grain,
+                                    )
+                                    .to_string()
+                                })
+                                .collect::<Vec<_>>()
+                        });
                     return Err(Error::Arithmetic(format!(
-                        "global material bound: {:?}",
-                        receipt.obstruction
+                        "global material bound at factor stage {factor_stage}, grain {source_grain}, factor radii {reference:?}: {:?}",
+                        receipt.obstruction,
                     )));
                 }
                 matrix_bound
@@ -669,6 +723,11 @@ impl<'c> NativeConstitutiveField<'c> {
                 contact_count: count,
                 factor_count: count,
                 realization,
+                bound_kind: if factored_reference {
+                    NativeOperativeBoundKind::FactorBalls
+                } else {
+                    NativeOperativeBoundKind::MatrixAndInternal
+                },
                 origin: Rc::clone(&staged.origin),
                 ports,
                 currents: Rc::clone(&currents),

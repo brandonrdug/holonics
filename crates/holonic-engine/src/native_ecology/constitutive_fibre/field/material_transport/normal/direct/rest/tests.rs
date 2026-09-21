@@ -54,6 +54,31 @@ fn complete_normal_material_roundtrip_and_next_observation() {
 }
 
 #[test]
+#[ignore = "requires CUDA; rest validation must not reuse a duplicate row's witness after its coefficient is corrupted"]
+fn duplicate_target_rest_witness_checks_coefficient_row_independently() {
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let mut model = ResidentNormalMaterial::found_features(&s, 1, 2, ResidentGrain(32)).unwrap();
+    let x = point(&s, &[1, 0]);
+    let y = point(&s, &[2, 1, 2, 1]);
+    model.receive(current(&x), current(&y)).unwrap();
+    let rest = model.rest().unwrap();
+    rest.validate().unwrap();
+
+    // Both target rows have the same complete B.  Corrupt only row 1's fitted W; a cache keyed
+    // by B alone could incorrectly reuse row 0's residual and admit this rest.
+    let mut corrupt = rest;
+    corrupt.state.intervals[4].0 += 1;
+    corrupt.state.intervals[4].1 += 1;
+    // Keep the stored coefficient 1-norm consistent so the rejection reaches the row residual
+    // witness rather than stopping at the independent coefficient-norm check.
+    let norm_at = 2 * (NormalLayout::for_sources(1, 2).unwrap().cross_values + 2);
+    corrupt.state.intervals[norm_at].0 += 1;
+    corrupt.state.intervals[norm_at].1 += 1;
+    assert!(corrupt.validate().is_err());
+}
+
+#[test]
 #[ignore = "requires CUDA; nonzero prior keeps C0 separate from exterior Q_data and preserves the exact normal reference"]
 fn nonzero_prior_rest_roundtrip_exposes_data_energy_and_exact_reference() {
     let readout = ResidentReadout::new().unwrap();

@@ -1,4 +1,39 @@
-# Analytic geometric field and bounded real-source experiment
+# Geometric sources and incident-field development
+
+The current `IncidentField` consumer uses the same analytic junction/arc sources with learned
+Unicode-scalar source/receiving material and one global boundary/internal field. Its construction,
+full-source failures and subsequent diagnosis are recorded in the
+[incident-field return](../../../records/2026-09-21_THE_INCIDENT_FIELD_JOINS_ITS_GENERATOR_RECEIVER_AND_FROZEN_RETURN.md).
+The `run.py` development/evaluation commands below accept `--codec unicode-scalars` with an
+incident spec/checkpoint, and `--profile release` selects the release executable. They retain
+complete source contents; a recorded response is admitted later as an observation.
+
+The public session can expose the actual learned E/R normal equations through
+`inspect_incident_boundary_material()`. For a retained comparison,
+`inspect_incident_comparison(id)` reads its frozen encoded source, text features, logits and
+normalized faces. These cold readouts do not replace resident generation or learning.
+
+```sh
+cargo build --release -p holonics-hna --example athena_boundary_material
+target/release/examples/athena_boundary_material /private/model.session /private/material.json
+```
+
+An optional third argument names a private JSON object with `request` (the public
+`FieldSectionRequest`), optional `observed` (an actual admitted response), and `step_bits`.
+In that mode the second argument is a new output directory. The example previews the complete
+source, retains its comparison, performs that observed material return once, and previews again
+with the same continuing current. It writes the frozen receivers and contemporary normal maps
+on both sides, plus a checkpoint after learning. `step_bits` sets sigma to `2^(-step_bits)`;
+zero therefore means a unit step. The request's current-commit setting is explicitly overridden
+to false for this material comparison. Native observation receipts include the time spent in
+the receiver, field and encoder returns. Omitting `observed` makes only the first preview;
+no learning return is performed. The optional `solver` object selects a recorded numerical
+proposal, for example `{"method":"chebyshev","steps":512}`, through the session's
+`configure_incident_solver` operation. It requires no outstanding comparisons. The example
+admits codec faces from the supplied source, preserves its complete contents, and writes a new
+checkpoint with the declared solver. Source/target text and material readouts stay private.
+
+## Earlier symbol-basis control
 
 
 The [campaign correction](../../../records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md#correction-the-nibble-control-is-not-holonic-encoding)

@@ -5,9 +5,9 @@ use super::incident_encoder::{IncidentEncoded, IncidentEncoder};
 use super::incident_receiver::{IncidentTextForward, IncidentTextReceiver};
 use super::*;
 use holonic_engine::{
-    ExactWavePhaseTransport,
     native_ecology::constitutive_fibre::{BoundaryMaterialSeed, ResidentNormalEnclosureSection},
     resident_section::SeriesAperture,
+    ExactWavePhaseTransport,
 };
 mod codec;
 mod rest;
@@ -82,6 +82,59 @@ fn section_face_receipt(section: &ResidentNormalEnclosureSection<'_>) -> Result<
 }
 
 impl<'c> NativeFieldSession<'c> {
+    /// Select the numerical proposal for subsequent incident words. Outstanding comparisons
+    /// retain their solver, so this change is admitted only after they have returned/released.
+    pub fn configure_incident_solver(
+        &mut self,
+        solver: super::super::IncidentFieldSolver,
+        steps: usize,
+    ) -> Result<()> {
+        if self.presentation.spec.incident.is_none() {
+            return Err(invalid("incident solver requires its model chart"));
+        }
+        self.body.configure_incident_solver(solver, steps)?;
+        let options = self.presentation.spec.incident.as_mut().unwrap();
+        options.solver = solver;
+        options.solve_steps = steps;
+        Ok(())
+    }
+    /// Cold readout of the actual source columns and text receiving maps, including their
+    /// normal statistics, prior and enclosure. This does not execute a field word or alter
+    /// material/current. The aperture-wide support matrix is not expanded by this readout.
+    pub fn inspect_incident_boundary_material(&self) -> Result<Value> {
+        let incident = self
+            .incident
+            .as_ref()
+            .ok_or_else(|| invalid("incident session state"))?;
+        Ok(json!({
+            "codec_symbols": self.presentation.spec.symbols,
+            "codec_revision": incident.receiver.codec_version(),
+            "encoder": incident.encoder.inspect_columns()?,
+            "text_receiver": incident.receiver.inspect_text_materials()?,
+            "material_return_bounds": self.body.inspect_incident_material_return_bounds()?,
+        }))
+    }
+
+    /// Read the frozen receiving operands of an outstanding incident comparison. These are
+    /// the produced features/potentials/faces, not a recomputation with contemporary material.
+    pub fn inspect_incident_comparison(&self, id: u64) -> Result<Value> {
+        let pending = self
+            .incident
+            .as_ref()
+            .and_then(|incident| incident.pending.get(&id))
+            .ok_or_else(|| invalid("missing incident comparison"))?;
+        let forward = &pending.received;
+        Ok(json!({
+            "comparison": id,
+            "encoded_source": section_face_receipt(&pending.encoded.rows)?,
+            "text_features": section_face_receipt(&forward.text_features)?,
+            "text_logits": section_face_receipt(&forward.text_logits)?,
+            "text_normalized": section_face_receipt(forward.text_face.participation())?,
+            "support_logits": section_face_receipt(&forward.support_logits)?,
+            "support_normalized": section_face_receipt(forward.support_face.participation())?,
+        }))
+    }
+
     pub(super) fn found_incident(
         surface: &'c ResidentSurface<'c>,
         spec: &FieldSessionSpec,
@@ -121,6 +174,7 @@ impl<'c> NativeFieldSession<'c> {
                 local_roots: options.local_roots,
                 material_owners: options.material_owners.clone(),
                 solve_steps: options.solve_steps,
+                solver: options.solver,
             },
             ResidentGrain(effective_spec.fractional_bits),
         )?;
@@ -289,6 +343,7 @@ impl<'c> NativeFieldSession<'c> {
             "material_cuts":{"encoder":encoder_material_cuts,"receiver":receiver_material_cuts,"producing_encoder":producing_encoder_cuts,"producing_receiver":producing_receiver_cuts},
             "producing_cut":{"epoch":generated.producing_epoch(),"field_cut":generated.producing_field_cut(),"material_observations":generated.producing_material_observations()},
             "operator_bounds":generated.operator_bounds()?,
+            "solver":self.presentation.spec.incident.as_ref().map(|o| json!({"method":o.solver,"steps":o.solve_steps})),
             "current_cut_before":current_cut_before,"pending_before":pending_before,
             "material_update":false,
             "source_cells":preparation.source_extent,"context_cells":preparation.context_extent,"source_contacts":contacts.len(),
@@ -331,6 +386,7 @@ impl<'c> NativeFieldSession<'c> {
         text: &str,
         step_bits: u32,
     ) -> Result<Value> {
+        let started = Instant::now();
         let incident = self
             .incident
             .as_mut()
@@ -380,6 +436,7 @@ impl<'c> NativeFieldSession<'c> {
                 step_bits,
             )
             .map_err(|error| invalid(format!("incident receiver comparison: {error}")))?;
+        let receiver_returned = Instant::now();
         let response_sites = incident_response_slots(
             &self.presentation.spec,
             &pending.preparation,
@@ -402,6 +459,7 @@ impl<'c> NativeFieldSession<'c> {
             .body
             .prepare_incident_material_return(id, full.row(0)?, step_bits)
             .map_err(|error| invalid(format!("incident field material return: {error}")))?;
+        let field_returned = Instant::now();
         let source_sites = &incident.slot_rows[..pending.preparation.source_extent];
         let anchor = field
             .anchor_covector()
@@ -420,6 +478,7 @@ impl<'c> NativeFieldSession<'c> {
             .encoder
             .prepare_return(&pending.encoded, &source_covector, step_bits)
             .map_err(|error| invalid(format!("incident encoder return: {error}")))?;
+        let encoder_returned = Instant::now();
         let boundary_return_receipt = section_face_receipt(&returned.boundary_covector)?;
         let text_return_receipt = returned
             .text_covector
@@ -451,6 +510,12 @@ impl<'c> NativeFieldSession<'c> {
             "native_receipt":{"device":self.surface.device_name(),"kernel_sha256":self.surface.ptx_sha256(),"census_before_publication":self.surface.census()},
             "material_cuts_before":{"encoder":encoder_cuts_before,"receiver":receiver_cuts_before}});
         let mut value = value;
+        value["native_receipt"]["stage_us"] = json!({
+            "receiver_return": receiver_returned.duration_since(started).as_micros(),
+            "field_return": field_returned.duration_since(receiver_returned).as_micros(),
+            "encoder_return": encoder_returned.duration_since(field_returned).as_micros(),
+            "receipt": encoder_returned.elapsed().as_micros(),
+        });
         value["producing_material_cuts"] =
             json!({"encoder":producing_encoder_cuts,"receiver":producing_receiver_cuts});
         self.body.publish_incident_material_return(field)?;

@@ -56,6 +56,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 response_port_start: None,
                 material_owners: owners,
                 solve_steps: 256,
+                solver: holonics_hna::native::IncidentFieldSolver::Richardson,
             }),
         )
     } else {

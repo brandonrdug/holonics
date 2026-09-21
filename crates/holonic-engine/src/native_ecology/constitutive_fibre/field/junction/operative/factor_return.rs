@@ -17,6 +17,12 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
         {
             return Err(Error::Shape);
         }
+        if returned.bound_kind() == NativeOperativeBoundKind::FactorBalls
+            && (returned.realization != NativeContactRealization::DyadicDeposit
+                || returned.b.is_some())
+        {
+            return Err(Error::Shape);
+        }
         let surface = self.field.relation.surface;
         let append = returned.factor_count != 0;
         let next_rank = old
@@ -43,6 +49,16 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
         } else {
             Rc::clone(&self.sections.b)
         };
+        let active_bounds = if returned.bound_kind() == NativeOperativeBoundKind::FactorBalls {
+            Rc::new(
+                surface.mount_section_rest(
+                    &ResidentSectionRest::found(1, 4, ResidentGrain(0), 64, vec![(0, 0); 4])
+                        .map_err(|_| Error::Shape)?,
+                )?,
+            )
+        } else {
+            Rc::clone(&returned.bounds)
+        };
         let bounds = Rc::new(surface.fresh_section(1, 4, ResidentGrain(0))?);
         let mut pass = surface.begin_passage(&[vec![]])?;
         {
@@ -51,7 +67,7 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
                 surface.record_field_factor_append(
                     &lane,
                     [&old.left, &old.right, &old.defects],
-                    [&returned.ports, currents, &returned.bounds],
+                    [&returned.ports, currents, &active_bounds],
                     old.rank,
                     d,
                     k,
@@ -67,7 +83,7 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
                 &self.sections.b,
                 &self.sections.bounds,
                 returned.b.as_deref(),
-                &returned.bounds,
+                &active_bounds,
                 image,
                 d,
                 k,

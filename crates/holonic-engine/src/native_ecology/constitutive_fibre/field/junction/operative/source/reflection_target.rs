@@ -217,6 +217,7 @@ impl<'c> NativeConstitutiveField<'c> {
             return Err(Error::ForeignOccurrence);
         }
         let update = Rc::new(OperativeReturn {
+            bound_kind: NativeOperativeBoundKind::MatrixAndInternal,
             at_cut: self.history.len(),
             contact_count: op.births.len(),
             factor_count: source.births.len(),

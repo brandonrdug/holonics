@@ -126,6 +126,7 @@ impl<'c> NativeConstitutiveField<'c> {
             )));
         }
         let returned = Rc::new(OperativeReturn {
+            bound_kind: NativeOperativeBoundKind::MatrixAndInternal,
             at_cut: self.history.len(),
             contact_count: k,
             factor_count: 0,
@@ -279,6 +280,7 @@ impl<'c> NativeConstitutiveField<'c> {
             )));
         }
         let returned = Rc::new(OperativeReturn {
+            bound_kind: NativeOperativeBoundKind::MatrixAndInternal,
             at_cut: self.history.len(),
             contact_count: k,
             factor_count: 0,

@@ -156,6 +156,7 @@ fn returned<'c>(
         db[2 * i + 1] = -s / 32;
     }
     Rc::new(OperativeReturn {
+        bound_kind: NativeOperativeBoundKind::MatrixAndInternal,
         source_overlap:None,
             current_difference_source: None,
         realization: NativeContactRealization::EnclosedFlow,

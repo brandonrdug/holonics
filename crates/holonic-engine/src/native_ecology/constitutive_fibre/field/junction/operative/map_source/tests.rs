@@ -74,6 +74,7 @@ fn combined<'c>(
         .obstruction
         .is_empty());
     Rc::new(OperativeReturn {
+        bound_kind: base.bound_kind,
         at_cut: base.at_cut,
         contact_count: base.contact_count,
         factor_count: base.factor_count,
@@ -314,6 +315,7 @@ fn source_map_program_keeps_actual_producers_across_returns_archive_and_restart(
         let mut changed = original.source_overlap.clone().unwrap();
         changed.source = 3;
         let bad = Rc::new(OperativeReturn {
+        bound_kind: original.bound_kind,
             at_cut: original.at_cut,
             contact_count: original.contact_count,
             factor_count: original.factor_count,

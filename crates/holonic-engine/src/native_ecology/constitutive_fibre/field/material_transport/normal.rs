@@ -3,6 +3,7 @@
 use super::*;
 use crate::native_ecology::constitutive_fibre::circulation::rest::point_section;
 use num_traits::{Signed, ToPrimitive, Zero};
+use std::collections::BTreeMap;
 
 mod layout;
 use layout::{MomentWire, NormalLayout, ReportBall, STATISTIC_SCALARS};
@@ -389,14 +390,23 @@ fn validate_numerical_witness_layout(
         })
         .collect::<Vec<_>>();
     let mut residual = BigInt::zero();
+    // The coefficient and complete B rows are the whole WH-B operand for one target row.
+    // Borrow both slices so repeated rows reuse only the exact residual value; keying on B
+    // alone would let a corrupted duplicate coefficient row inherit its neighbour's witness.
+    let mut residual_cache: BTreeMap<(&[i128], &[BigInt]), BigInt> = BTreeMap::new();
     for row in 0..t {
-        if matrix[2 * row * m..2 * (row + 1) * m]
+        let coefficient_row = &matrix[2 * row * m..2 * (row + 1) * m];
+        let b_row = &expected[hh + 2 * row * m..hh + 2 * (row + 1) * m];
+        if let Some(cached) = residual_cache.get(&(coefficient_row, b_row)) {
+            residual += cached;
+            continue;
+        }
+        if coefficient_row
             .iter()
             .all(|v| *v == 0)
-            && expected[hh + 2 * row * m..hh + 2 * (row + 1) * m]
-                .iter()
-                .all(Zero::is_zero)
+            && b_row.iter().all(Zero::is_zero)
         {
+            residual_cache.insert((coefficient_row, b_row), BigInt::zero());
             continue;
         }
         let mut real = vec![BigInt::zero(); m];
@@ -415,11 +425,15 @@ fn validate_numerical_witness_layout(
                 imaginary[j] += &ar * bi + &ai * br;
             }
         }
+        let mut row_residual = BigInt::zero();
         for j in 0..m {
-            real[j] -= &scale * &expected[hh + 2 * (row * m + j)];
-            imaginary[j] -= &scale * &expected[hh + 2 * (row * m + j) + 1];
-            residual += real[j].abs() + imaginary[j].abs();
+            real[j] -= &scale * &b_row[2 * j];
+            imaginary[j] -= &scale * &b_row[2 * j + 1];
+            row_residual += real[j].abs() + imaginary[j].abs();
         }
+        residual += &row_residual;
+        // Every duplicate contributes its multiplicity without retaining copied row data.
+        residual_cache.insert((coefficient_row, b_row), row_residual);
     }
     let ceil = |v: &BigInt| {
         let q = v / &square;

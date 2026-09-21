@@ -27,6 +27,7 @@ fn spec() -> IncidentFieldSpec {
         local_roots: 1,
         material_owners: vec![],
         solve_steps: 256,
+        solver: IncidentFieldSolver::Richardson,
     }
 }
 
@@ -103,12 +104,11 @@ fn make_anchor<'c>(
             let imaginary = (((at as i64) % 3) * 5 << 10) - shift;
             [(real, real), (imaginary, imaginary)]
         })
-        .chain(std::iter::once((65536,65536)))
+        .chain(std::iter::once((65536, 65536)))
         .collect();
     let raw = surface
         .mount_section_rest(
-            &ResidentSectionRest::found(1, components + 1, ResidentGrain(0), 64, values)
-                .unwrap(),
+            &ResidentSectionRest::found(1, components + 1, ResidentGrain(0), 64, values).unwrap(),
         )
         .unwrap();
     ResidentNormalEnclosureSection::from_points(
@@ -241,15 +241,14 @@ fn incident_full_word_pullback_returns_anchor_and_all_stage_operands() {
     assert_eq!(pull.contacts.len(), model.layout.steps);
     assert_eq!(pull.material.len(), model.materials.len());
     assert!(pull.material.iter().map(Vec::len).sum::<usize>() > 0);
-    assert!(
-        pull.anchor
-            .view()
-            .inspect()
-            .unwrap()
-            .center
-            .iter()
-            .any(|v| !v.is_zero())
-    );
+    assert!(pull
+        .anchor
+        .view()
+        .inspect()
+        .unwrap()
+        .center
+        .iter()
+        .any(|v| !v.is_zero()));
 
     // At beta=0 this two-stage word is a polynomial of degree at most four along a
     // source direction. Central Richardson cancels its cubic term exactly, so the only
@@ -287,9 +286,9 @@ fn incident_full_word_pullback_returns_anchor_and_all_stage_operands() {
             .sum::<num_rational::BigRational>()
     };
     let h = num_rational::BigRational::new(1.into(), 1024.into());
-    let two=num_rational::BigRational::from_integer(2.into());
-    let three=num_rational::BigRational::from_integer(3.into());
-    let four=num_rational::BigRational::from_integer(4.into());
+    let two = num_rational::BigRational::from_integer(2.into());
+    let three = num_rational::BigRational::from_integer(3.into());
+    let four = num_rational::BigRational::from_integer(4.into());
     let coarse = (pairing(&outputs[0].center) - pairing(&outputs[1].center)) / (&h * &two);
     let fine = (pairing(&outputs[2].center) - pairing(&outputs[3].center)) / &h;
     let derivative = (fine * &four - coarse) / &three;

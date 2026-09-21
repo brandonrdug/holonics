@@ -233,6 +233,64 @@ fn differing_returns_accumulate_geometry_and_keep_fit_distinct_from_solve_error(
 }
 
 #[test]
+#[ignore = "requires CUDA; duplicate exact target rows must share a fit while a later distinct row remains separate"]
+fn duplicate_target_rows_share_exact_fit_and_split_on_distinct_return() {
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let z = |r: i64, i: i64| {
+        ExactComplexWaveCurrent::new(Rat::new(r.into(), 8.into()), Rat::new(i.into(), 8.into()))
+    };
+    // Rows 0 and 1 begin with the same nonzero complex prior; row 2 is distinct.
+    let prior_rows = vec![vec![z(3, -5)], vec![z(3, -5)], vec![z(-2, 9)]];
+    let prior = NativeNormalPrior::from_coefficients(prior_rows.clone()).unwrap();
+    let mut body = ResidentNormalMaterial::found_features_with_prior(
+        &s,
+        1,
+        3,
+        ResidentGrain(u32::BITS),
+        prior,
+    )
+    .unwrap();
+    let mut singles: Vec<_> = prior_rows
+        .iter()
+        .map(|row| {
+            ResidentNormalMaterial::found_features_with_prior(
+                &s,
+                1,
+                1,
+                ResidentGrain(u32::BITS),
+                NativeNormalPrior::from_coefficients(vec![row.clone()]).unwrap(),
+            )
+            .unwrap()
+        })
+        .collect();
+    let x = point(&s, &[1, 0]);
+    let same = point(&s, &[2, 1, 2, 1, 2, 1]);
+    body.receive(current(&x), current(&same)).unwrap();
+    for (single, row) in singles.iter_mut().zip([[2_i64, 1], [2, 1], [2, 1]]) {
+        single.receive(current(&x), current(&point(&s, &row))).unwrap();
+    }
+    let first = body.inspect().unwrap();
+    for (row, single) in first.material.coefficients.iter().zip(singles.iter()) {
+        assert_eq!(row, &single.inspect().unwrap().material.coefficients[0]);
+    }
+    assert_eq!(first.material.coefficients[0], first.material.coefficients[1]);
+    assert_ne!(first.material.coefficients[1], first.material.coefficients[2]);
+    assert_eq!(first.normal_residual().unwrap()[0], first.normal_residual().unwrap()[1]);
+
+    let distinct = point(&s, &[2, 1, -3, 2, 2, 1]);
+    body.receive(current(&x), current(&distinct)).unwrap();
+    for (single, row) in singles.iter_mut().zip([[2_i64, 1], [-3, 2], [2, 1]]) {
+        single.receive(current(&x), current(&point(&s, &row))).unwrap();
+    }
+    let second = body.inspect().unwrap();
+    for (row, single) in second.material.coefficients.iter().zip(singles.iter()) {
+        assert_eq!(row, &single.inspect().unwrap().material.coefficients[0]);
+    }
+    assert_ne!(second.material.coefficients[0], second.material.coefficients[1]);
+}
+
+#[test]
 #[ignore = "requires CUDA; complex normal transport retains oriented cross-source phase and rational source family"]
 fn complex_cross_geometry_and_nondyadic_source_keep_their_complete_bounds() {
     let readout = ResidentReadout::new().unwrap();

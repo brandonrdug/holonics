@@ -82,6 +82,15 @@ Newman boundaries already have source owners in the
 [constraint-mode guide](CONSTRAINT_MODES_AND_RECEIVER_FACES.md) and
 [mathematics/native synthesis](MATHEMATICS_AND_NATIVE_CONDUCT.md#constraint-defined-modes-and-named-de-bruijn-boundaries).
 
+[definition] A numerical enclosure is another receiving construction over a retained difference.
+For the global solve, `r=rhs-(I+DD*)v` bounds deviation from the specified field equation;
+the returned ball `B(c,epsilon)` retains that realization/source family. A target loss compares
+the produced face with an observed or requested face. The [Compression tablet](canon/TABLET_THE_COMPRESSION.md#7-what-this-tablet-refuses)
+states that a scalar loss is one receiver's face of a residual, never the residual itself.
+The [composition guide](HNN_COMPOSITION.md#producing-comparison-and-architecture-laws) also
+retains lifted complex cross-entropy with an oriented phase defect. Exact native packets and
+their exterior decimal statistical readings keep those sources and receiving scopes explicit.
+
 ## How the geometry reaches the implementation
 
 | Source relation | Library or formal owner | Native/application connection |

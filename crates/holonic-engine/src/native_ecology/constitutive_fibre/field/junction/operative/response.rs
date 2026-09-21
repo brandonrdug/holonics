@@ -166,6 +166,7 @@ impl<'c> NativeConstitutiveField<'c> {
         // Extension by zero is retained as a generator, not allocated per later birth.
         // This constitutive response holds input current fixed, so its internal delta is zero.
         Ok(Rc::new(OperativeReturn {
+            bound_kind: NativeOperativeBoundKind::MatrixAndInternal,
             realization,
             at_cut: self.history.len(),
             contact_count: k,

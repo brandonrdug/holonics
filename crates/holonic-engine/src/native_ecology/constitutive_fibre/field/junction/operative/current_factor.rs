@@ -17,7 +17,7 @@ impl<'c> NativeConstitutiveField<'c> {
         &self,
         source: usize,
         count: usize,
-        source_map:Option<&Rc<ResidentSection<'c>>>,
+        source_map: Option<&Rc<ResidentSection<'c>>>,
     ) -> Result<(Rc<ResidentSection<'c>>, Rc<ResidentSection<'c>>, usize), Error> {
         let op = self
             .junction
@@ -43,9 +43,12 @@ impl<'c> NativeConstitutiveField<'c> {
             ))
         };
         let (after, after_count) = read(source)?;
-        let (before,before_count)=if let Some(word)=self.operative_source_propagation(source,source_map)? {
-            (Rc::clone(&word.word.current),word.word.count)
-        }else{self.operative_before_current(source)?};
+        let (before, before_count) =
+            if let Some(word) = self.operative_source_propagation(source, source_map)? {
+                (Rc::clone(&word.word.current), word.word.count)
+            } else {
+                self.operative_before_current(source)?
+            };
         if after_count != count || before_count > count {
             return Err(Error::Shape);
         }
@@ -58,11 +61,17 @@ impl<'c> NativeConstitutiveField<'c> {
         count: usize,
         factors: &Rc<ResidentSection<'c>>,
     ) -> Result<Option<Rc<ResidentSection<'c>>>, Error> {
-        self.condense_operative_current_factors_using(source,count,factors,None)
+        self.condense_operative_current_factors_using(source, count, factors, None)
     }
-    pub(super) fn condense_operative_current_factors_using(&self,source:usize,count:usize,
-        factors:&Rc<ResidentSection<'c>>,source_map:Option<&Rc<ResidentSection<'c>>>) -> Result<Option<Rc<ResidentSection<'c>>>,Error> {
-        let (before, after, before_count) = self.operative_current_boundary(source, count,source_map)?;
+    pub(super) fn condense_operative_current_factors_using(
+        &self,
+        source: usize,
+        count: usize,
+        factors: &Rc<ResidentSection<'c>>,
+        source_map: Option<&Rc<ResidentSection<'c>>>,
+    ) -> Result<Option<Rc<ResidentSection<'c>>>, Error> {
+        let (before, after, before_count) =
+            self.operative_current_boundary(source, count, source_map)?;
         self.transcode_operative_current_factors(
             &before,
             &after,
@@ -88,16 +97,20 @@ impl<'c> NativeConstitutiveField<'c> {
         returned: &OperativeReturn<'c>,
         limit: usize,
     ) -> Result<(Rc<ResidentSection<'c>>, usize), Error> {
-        self.resolve_operative_current_factor_prefix_using(returned,limit,None)
+        self.resolve_operative_current_factor_prefix_using(returned, limit, None)
     }
-    pub(super) fn resolve_operative_current_factor_prefix_using(&self,returned:&OperativeReturn<'c>,limit:usize,
-        source_map:Option<&Rc<ResidentSection<'c>>>) -> Result<(Rc<ResidentSection<'c>>,usize),Error> {
+    pub(super) fn resolve_operative_current_factor_prefix_using(
+        &self,
+        returned: &OperativeReturn<'c>,
+        limit: usize,
+        source_map: Option<&Rc<ResidentSection<'c>>>,
+    ) -> Result<(Rc<ResidentSection<'c>>, usize), Error> {
         let Some(source) = returned.current_difference_source else {
             return Ok((Rc::clone(&returned.currents), returned.factor_count));
         };
         let count = returned.factor_count.min(limit);
         let (before, after, before_count) =
-            self.operative_current_boundary(source, returned.factor_count,source_map)?;
+            self.operative_current_boundary(source, returned.factor_count, source_map)?;
         let factors = self.transcode_operative_current_factors(
             &before,
             &after,
@@ -181,6 +194,13 @@ impl<'c> NativeConstitutiveField<'c> {
         };
         let mut prepared = Vec::with_capacity(op.returns.len());
         for r in &op.returns {
+            if r.bound_kind == NativeOperativeBoundKind::FactorBalls {
+                // This source-difference decoder has a different error chart. Keep the
+                // original factors and their joint radii until that transport is supplied.
+                result.retained_materialized += 1;
+                prepared.push(Rc::clone(r));
+                continue;
+            }
             if r.current_difference_source.is_some() {
                 result.already_generated += 1;
                 prepared.push(Rc::clone(r));
@@ -211,11 +231,12 @@ impl<'c> NativeConstitutiveField<'c> {
                 contact_count: r.contact_count,
                 factor_count: r.factor_count,
                 realization: r.realization,
+                bound_kind: r.bound_kind,
                 origin: Rc::clone(&r.origin),
                 ports: Rc::clone(&r.ports),
                 currents,
                 current_difference_source: Some(source),
-                source_overlap:r.source_overlap.clone(),
+                source_overlap: r.source_overlap.clone(),
                 b: r.b.clone(),
                 bounds: Rc::clone(&r.bounds),
             }));

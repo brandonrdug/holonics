@@ -236,7 +236,17 @@ fn sparse_declared_rank_one_packet_matches_reference_and_rejects_bad_transpose()
         initial.radius < Rat::new(1.into(), 1000.into()),
         "{initial:?}"
     );
-    let pullback = action.pullback_full_auto(covector.row(0).unwrap(), 128).unwrap();
+    let chebyshev = source
+        .action_matrix_free_chebyshev(input.row(0).unwrap(), 128)
+        .unwrap();
+    assert!(matches!(
+        chebyshev.factorization(),
+        NativeFieldActionFactorization::ResidentFactorProgramChebyshevMatrixFree { .. }
+    ));
+    assert!(chebyshev.output().inspect().unwrap().contains(&expected));
+    let pullback = action
+        .pullback_full_auto(covector.row(0).unwrap(), 128)
+        .unwrap();
     let mut expected_input = vec![ExactComplexWaveCurrent::zero(); 4];
     expected_input[0] = ExactComplexWaveCurrent::new(Rat::new(8.into(), 17.into()), Rat::zero());
     expected_input[3] =
@@ -312,6 +322,346 @@ fn sparse_declared_rank_one_packet_matches_reference_and_rejects_bad_transpose()
     assert!(
         !malformed.has_operative_contacts(),
         "malformed transpose must not publish an operative map"
+    );
+}
+
+#[test]
+#[ignore = "requires CUDA; overwide sparse factor-ball bounds must refuse only the matrix-bound path"]
+fn sparse_factor_ball_bound_overwide_refuses_matrix_path_but_commits_dyadic_and_restores_tag() {
+    use crate::native_ecology::constitutive_fibre::{
+        ResidentConstitutiveSection, ResidentNormalEnclosureSection,
+    };
+    let ro = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&ro).unwrap();
+    let grain = ResidentGrain(96);
+    let scale = 1i128 << grain.0;
+    let packet = |rows: usize, width: usize, values: Vec<i128>| {
+        let intervals = values
+            .into_iter()
+            .flat_map(|value| [value as i64, (value >> 64) as i64].map(|word| (word, word)))
+            .collect();
+        surface
+            .mount_section_rest(
+                &ResidentSectionRest::found(rows, width, ResidentGrain(0), 64, intervals).unwrap(),
+            )
+            .unwrap()
+    };
+    let input = surface
+        .mount_section_rest(
+            &ResidentSectionRest::found(
+                1,
+                8,
+                ResidentGrain(0),
+                64,
+                [1, 0, 0, 0, 0, 0, 1, 0]
+                    .into_iter()
+                    .map(|value| (value, value))
+                    .collect(),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+    let covector = surface
+        .mount_section_rest(
+            &ResidentSectionRest::found(
+                1,
+                8,
+                ResidentGrain(0),
+                64,
+                [0, 0, 0, 0, 0, 0, 1, 0]
+                    .into_iter()
+                    .map(|value| (value, value))
+                    .collect(),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+    let input = ResidentNormalEnclosureSection::from_points(
+        ResidentConstitutiveSection::integers(&input).unwrap(),
+        grain,
+    )
+    .unwrap();
+    let covector = ResidentNormalEnclosureSection::from_points(
+        ResidentConstitutiveSection::integers(&covector).unwrap(),
+        grain,
+    )
+    .unwrap();
+    let incidence = NativeFieldDeclaredIncidence {
+        row_offsets: packet(1, 4, vec![0, 1]),
+        columns: packet(1, 2, vec![0]),
+        values: packet(1, 4, vec![scale / 4, 0]),
+        transpose_offsets: packet(1, 8, vec![0, 1, 1, 1]),
+        transpose_rows: packet(1, 2, vec![0]),
+        transpose_values: packet(1, 4, vec![scale / 4, 0]),
+        left: packet(1, 12, vec![0; 6]),
+        right: packet(1, 4, vec![0; 2]),
+        defects: packet(1, 2, vec![0]),
+        rows: 1,
+        boundary_components: 6,
+        rank: 0,
+        nonzeros: 1,
+    };
+    let mut field = NativeConstitutiveField::found_with_enclosed_junction(
+        &surface,
+        seed().into_iter().take(1).collect(),
+        grain,
+    )
+    .unwrap();
+    field
+        .register_declared_incidence(
+            incidence,
+            packet(1, 4, vec![0, 0]),
+            packet(1, 4, vec![0, 0]),
+            vec![NativeFieldContactOrigin::declared(0, 0, 0)],
+        )
+        .unwrap();
+    let source = field.read_current_source().unwrap();
+    let action = source
+        .action_matrix_free_auto(input.row(0).unwrap(), 128)
+        .unwrap();
+    let pullback = action
+        .pullback_full_auto(covector.row(0).unwrap(), 128)
+        .unwrap();
+
+    // These values are individually representable signed i128 words at grain 96, while their
+    // product is beyond the wide carrier used by the EnclosedFlow matrix-bound conversion.
+    let radius = 1i128 << 120;
+    let widened_bounds = packet(1, 4, vec![radius, radius]);
+    let incoming_rest = pullback.input_covector().to_owned().unwrap().rest().unwrap();
+    let residual_rest = action.residual().to_owned().unwrap().rest().unwrap();
+    let widened = NativeFieldActionPullback::from_factor(
+        &source,
+        std::rc::Rc::new(surface.mount_section_rest(&incoming_rest).unwrap()),
+        pullback.resident_ports(),
+        pullback.resident_currents(),
+        std::rc::Rc::new(widened_bounds),
+        std::rc::Rc::new(surface.mount_section_rest(&residual_rest).unwrap()),
+        action.layout(),
+    );
+    let before = source.enclosure().inspect().unwrap();
+    assert!(
+        field
+            .prepare_global_action_material_return(
+                &[&widened, &widened],
+                0,
+                NativeContactRealization::EnclosedFlow,
+            )
+            .is_err()
+    );
+    assert_eq!(
+        field
+            .read_current_source()
+            .unwrap()
+            .enclosure()
+            .inspect()
+            .unwrap(),
+        before
+    );
+    assert_eq!(field.operative_return_storage().unwrap().returns, 0);
+
+    let prepared = field
+        .prepare_global_action_material_return(
+            &[&widened, &widened],
+            0,
+            NativeContactRealization::DyadicDeposit,
+        )
+        .unwrap();
+    field
+        .commit_global_action_material_return(prepared)
+        .unwrap();
+    let expected_radius = Rat::new(BigInt::from(radius), BigInt::from(1u8) << grain.0);
+    let bound = field.inspect_contact_deposit_bound(0).unwrap();
+    assert_eq!(bound.bound_kind, NativeOperativeBoundKind::FactorBalls);
+    assert_eq!(bound.factor_port_radius, Some(expected_radius.clone()));
+    assert_eq!(bound.factor_current_radius, Some(expected_radius.clone()));
+
+    drop(widened);
+    drop(pullback);
+    drop(action);
+    drop(source);
+    let saved = field.rest(&[], &[]).unwrap();
+    drop(field);
+    let (restored, _, _) = NativeConstitutiveField::remount(&surface, saved).unwrap();
+    let restored_bound = restored.inspect_contact_deposit_bound(0).unwrap();
+    assert_eq!(
+        restored_bound.bound_kind,
+        NativeOperativeBoundKind::FactorBalls
+    );
+    assert_eq!(
+        restored_bound.factor_port_radius,
+        Some(expected_radius.clone())
+    );
+    assert_eq!(restored_bound.factor_current_radius, Some(expected_radius));
+
+    let (legacy_wire, legacy_rest, legacy_grain) = {
+        let op = restored
+            .junction
+            .as_ref()
+            .unwrap()
+            .operative
+            .as_ref()
+            .unwrap();
+        let mut wire = op.wire();
+        wire.return_frames[0].bound_kind = NativeOperativeBoundKind::MatrixAndInternal;
+        wire.return_frames[0].factor_count = None;
+        (wire, op.rest(&surface).unwrap(), op.grain)
+    };
+    legacy_rest
+        .validate(&legacy_wire, restored.nodes())
+        .unwrap();
+    let legacy = OperativeState::remount(&surface, legacy_wire, legacy_rest, legacy_grain).unwrap();
+    assert_eq!(
+        legacy.returns[0].bound_kind(),
+        NativeOperativeBoundKind::MatrixAndInternal
+    );
+}
+
+#[test]
+#[ignore = "requires CUDA; high-norm sparse Richardson/Chebyshev comparison and full pullback"]
+fn sparse_chebyshev_reduces_high_norm_residual_against_richardson() {
+    use crate::native_ecology::constitutive_fibre::{
+        ResidentConstitutiveSection, ResidentNormalEnclosureSection,
+    };
+    let ro = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&ro).unwrap();
+    let grain = ResidentGrain(96);
+    let scale = 1i128 << grain.0;
+    let packet = |rows: usize, width: usize, values: Vec<i128>| {
+        let intervals = values
+            .into_iter()
+            .flat_map(|value| [value as i64, (value >> 64) as i64].map(|word| (word, word)))
+            .collect();
+        surface
+            .mount_section_rest(
+                &ResidentSectionRest::found(rows, width, ResidentGrain(0), 64, intervals).unwrap(),
+            )
+            .unwrap()
+    };
+    let incidence = NativeFieldDeclaredIncidence {
+        row_offsets: packet(1, 4, vec![0, 1]),
+        columns: packet(1, 2, vec![0]),
+        values: packet(1, 4, vec![12 * scale, 0]),
+        transpose_offsets: packet(1, 8, vec![0, 1, 1, 1]),
+        transpose_rows: packet(1, 2, vec![0]),
+        transpose_values: packet(1, 4, vec![12 * scale, 0]),
+        left: packet(1, 12, vec![0; 6]),
+        right: packet(1, 4, vec![0; 2]),
+        defects: packet(1, 2, vec![0]),
+        rows: 1,
+        boundary_components: 6,
+        rank: 0,
+        nonzeros: 1,
+    };
+    let mut field = NativeConstitutiveField::found_with_enclosed_junction(
+        &surface,
+        seed().into_iter().take(1).collect(),
+        grain,
+    )
+    .unwrap();
+    field
+        .register_declared_incidence(
+            incidence,
+            packet(1, 4, vec![0, 0]),
+            packet(1, 4, vec![0, 0]),
+            vec![NativeFieldContactOrigin::declared(0, 0, 0)],
+        )
+        .unwrap();
+    let input = surface
+        .mount_section_rest(
+            &ResidentSectionRest::found(
+                1,
+                8,
+                ResidentGrain(0),
+                64,
+                [1, 0, 1, 0, 0, 0, 1, 0]
+                    .into_iter()
+                    .map(|value| (value, value))
+                    .collect(),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+    let covector = surface
+        .mount_section_rest(
+            &ResidentSectionRest::found(
+                1,
+                8,
+                ResidentGrain(0),
+                64,
+                [0, 0, 1, 0, 0, 0, 1, 0]
+                    .into_iter()
+                    .map(|value| (value, value))
+                    .collect(),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+    let input = ResidentNormalEnclosureSection::from_points(
+        ResidentConstitutiveSection::integers(&input).unwrap(),
+        grain,
+    )
+    .unwrap();
+    let covector = ResidentNormalEnclosureSection::from_points(
+        ResidentConstitutiveSection::integers(&covector).unwrap(),
+        grain,
+    )
+    .unwrap();
+    let source = field.read_current_source().unwrap();
+    let richardson = source
+        .action_matrix_free_auto(input.row(0).unwrap(), 1024)
+        .unwrap();
+    let chebyshev512 = source
+        .action_matrix_free_chebyshev(input.row(0).unwrap(), 512)
+        .unwrap();
+    let chebyshev1024 = source
+        .action_matrix_free_chebyshev(input.row(0).unwrap(), 1024)
+        .unwrap();
+    let residual_norm = |view: ResidentNormalEnclosureView<'_, '_>| {
+        view.inspect()
+            .unwrap()
+            .center
+            .iter()
+            .map(ExactComplexWaveCurrent::norm_square)
+            .sum::<Rat>()
+    };
+    let chebyshev512_residual = chebyshev512.residual().inspect().unwrap();
+    let chebyshev1024_residual = chebyshev1024.residual().inspect().unwrap();
+    let tight = Rat::new(1.into(), BigInt::from(10u32).pow(20));
+    assert!(residual_norm(richardson.residual()) > Rat::new(1.into(), 1_000_000.into()));
+    assert!(residual_norm(chebyshev512.residual()) < tight);
+    assert!(residual_norm(chebyshev1024.residual()) < tight);
+    assert!(chebyshev512_residual.radius < tight);
+    assert!(chebyshev1024_residual.radius < tight);
+    let one = Rat::from_integer(1.into());
+    let t = Rat::from_integer(12.into());
+    let denominator = one.clone() + t.clone() * t.clone();
+    let v = Rat::from_integer(2.into()) * (one.clone() + t.clone()) / denominator;
+    let expected = vec![
+        ExactComplexWaveCurrent::new(v.clone() - one.clone(), Rat::zero()),
+        ExactComplexWaveCurrent::new(one.clone(), Rat::zero()),
+        ExactComplexWaveCurrent::zero(),
+        ExactComplexWaveCurrent::new(t * v - one, Rat::zero()),
+    ];
+    assert!(
+        chebyshev1024
+            .output()
+            .inspect()
+            .unwrap()
+            .contains(&expected)
+    );
+    let pullback = chebyshev1024
+        .pullback_full_auto(covector.row(0).unwrap(), 1024)
+        .unwrap();
+    let mut expected_input = vec![ExactComplexWaveCurrent::zero(); 4];
+    expected_input[0] = ExactComplexWaveCurrent::new(Rat::new(24.into(), 145.into()), Rat::zero());
+    expected_input[1] = ExactComplexWaveCurrent::new(Rat::from_integer(1.into()), Rat::zero());
+    expected_input[3] = ExactComplexWaveCurrent::new(Rat::new(143.into(), 145.into()), Rat::zero());
+    assert!(
+        pullback
+            .input_covector()
+            .inspect()
+            .unwrap()
+            .contains(&expected_input)
     );
 }
 

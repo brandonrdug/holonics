@@ -15,7 +15,7 @@ mod native_source;
 mod shared;
 use super::mathematical::{MathematicalInputWire, MathematicalRequest, NativeMathematicalSession};
 use super::{NativeCoupledBody, NativeFieldReactionPort, NativeSessionError, SavedCoupledBody};
-use crate::{HnaStream, HnaStreamState, PublicationReceipt, publish_new};
+use crate::{publish_new, HnaStream, HnaStreamState, PublicationReceipt};
 use holonic_engine::{
     codec_recovery::{Symbol, SymbolAlphabet},
     embedding_fiber::ResidentReadout,
@@ -37,7 +37,7 @@ pub use incident_preparation::{
 pub use mathematical_port::FieldMathematicalRequest;
 pub use native_source::*;
 use serde::{Deserialize, Serialize};
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::{
     collections::BTreeMap,
     fs::File,
@@ -108,6 +108,11 @@ pub struct IncidentFieldOptions {
     pub material_owners: Vec<usize>,
     #[serde(default = "incident_solve_steps")]
     pub solve_steps: usize,
+    #[serde(
+        default,
+        skip_serializing_if = "super::IncidentFieldSolver::is_richardson"
+    )]
+    pub solver: super::IncidentFieldSolver,
 }
 fn incident_solve_steps() -> usize {
     256
@@ -1430,10 +1435,9 @@ mod tests {
             // b still refers to material from BEFORE the update just performed.
             s.checkpoint(&path, &HnaStreamState::default())?;
             let returned = s.observe(b["comparison"].as_u64().unwrap(), "c", 3)?;
-            assert!(
-                s.observe(b["comparison"].as_u64().unwrap(), "c", 3)
-                    .is_err()
-            );
+            assert!(s
+                .observe(b["comparison"].as_u64().unwrap(), "c", 3)
+                .is_err());
             Ok((returned["returned"].clone(), s.inspect_current()?))
         })
         .unwrap();
@@ -1521,11 +1525,9 @@ mod delivery_tests {
         line.push(b'\n');
         let epoch = with_field_session(&spec, |s| {
             let mut stream = HnaStream::new();
-            assert!(
-                stream
-                    .pump_field(s, &mut std::io::Cursor::new(&line), &mut Refuse)
-                    .is_err()
-            );
+            assert!(stream
+                .pump_field(s, &mut std::io::Cursor::new(&line), &mut Refuse)
+                .is_err());
             assert!(stream.state().output.is_some());
             assert_eq!(s.inspect()["pending"], 1);
             s.checkpoint(&path, stream.state())?;
@@ -1556,7 +1558,7 @@ mod delivery_tests {
 #[cfg(test)]
 mod exposure_tests {
     use super::*;
-    use crate::alpha::exposure::{EXPOSURE_SCHEMA, ExposureManifest, ExposureOccurrence};
+    use crate::alpha::exposure::{ExposureManifest, ExposureOccurrence, EXPOSURE_SCHEMA};
     fn manifest() -> ExposureManifest {
         serde_json::from_value(json!({"schema":EXPOSURE_SCHEMA,"kind":"manifest",
             "temporal_cut":"2026-09-04T00:00:00Z","temporal_cut_normalized":"2026-09-04T00:00:00.000000+00:00",
@@ -1926,10 +1928,9 @@ mod joint_region_tests {
             let b = s.request(&request(vec![None], "c"))?;
             s.observe(a["comparison"].as_u64().unwrap(), "ab", 1)?;
             s.checkpoint(&path, &HnaStreamState::default())?;
-            assert!(
-                s.observe(b["comparison"].as_u64().unwrap(), "cc", 1)
-                    .is_err()
-            );
+            assert!(s
+                .observe(b["comparison"].as_u64().unwrap(), "cc", 1)
+                .is_err());
             let returned = s.observe(b["comparison"].as_u64().unwrap(), "c", 1)?;
             Ok((returned["returned"].clone(), s.inspect_current()?))
         })
@@ -1957,12 +1958,10 @@ mod joint_region_tests {
             let after = s.inspect_current()?;
             assert_eq!(before["material"], after["material"]);
             assert_eq!(before["reaction"], after["reaction"]);
-            assert!(
-                comparison["returned"]["parameter_update"]
-                    .as_str()
-                    .unwrap()
-                    .starts_with("zero")
-            );
+            assert!(comparison["returned"]["parameter_update"]
+                .as_str()
+                .unwrap()
+                .starts_with("zero"));
             assert_ne!(
                 comparison["returned"]["held_difference"]["coordinates"][0]["difference"]["real"],
                 json!([[0, []], [1, [1]]])

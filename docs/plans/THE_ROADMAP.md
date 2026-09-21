@@ -160,6 +160,15 @@ assessment has returned failures for both text requests. The fixed receiving-por
 structured math/code case are returned. The remaining work is useful contextual generation and
 its compact normal/common-source representation, not reimplementation of these components.
 
+[established-bounded; measured] Following the failed response through the actual learned maps
+found weak receiving margins, an under-resolved global solve after D changed, and repeated
+normal solve/validation work. The same record now carries the native material-step comparison,
+Chebyshev reflection and exact repeated-row reuse. Accurate replay of the controlled learned
+response improved from 18/388 to 187/388 observed characters; it remains incomplete. Continue
+the finite learned return from that corrected numerical operation and develop distinct admitted
+source families. A loosely enclosed candidate's apparently better text is not substituted for
+the accurate field result, and these controls do not close general contextual conversation.
+
 [definition] The [executable field campaign](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
 has the following implementation position, in dependency order:
 

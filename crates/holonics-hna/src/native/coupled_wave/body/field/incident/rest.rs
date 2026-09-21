@@ -168,11 +168,20 @@ impl NativeIncidentModelRest {
             let grain = source.enclosure().grain();
             let anchor = Rc::new(ResidentNormalEnclosure::remount(surface, p.anchor, grain)?);
             if p.material.len() != model.layout.material_features.len()
-                || p.material.iter().zip(&model.layout.material_features).any(|(m,&features)|
-                    m.source_chart().complex_sources()!=Some(features) || m.targets()!=model.layout.width/2 || m.grain()!=grain) {
+                || p.material
+                    .iter()
+                    .zip(&model.layout.material_features)
+                    .any(|(m, &features)| {
+                        m.source_chart().complex_sources() != Some(features)
+                            || m.targets() != model.layout.width / 2
+                            || m.grain() != grain
+                    })
+            {
                 return Err(invalid("pending incident material chart"));
             }
-            let material = p.material.into_iter()
+            let material = p
+                .material
+                .into_iter()
                 .map(|m| m.remount(surface).map(|m| m.retained_view()))
                 .collect::<Result<Vec<_>, _>>()?;
             if h.held.len() != anchor.view().components() / 2
@@ -201,6 +210,8 @@ impl NativeIncidentModelRest {
                     steps,
                     output,
                     epoch: h.epoch,
+                    solver: model.spec.solver,
+                    solve_steps: model.spec.solve_steps,
                 }),
             );
         }

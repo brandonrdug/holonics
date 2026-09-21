@@ -222,6 +222,16 @@ impl<'c> NativeFieldCurrentSource<'c> {
     ) -> Result<NativeFieldMatrixFreeAction<'a, 'c>, Error> {
         NativeFieldMatrixFreeAction::prepare(self, input, steps, u32::MAX)
     }
+
+    /// Opt into the resident Chebyshev proposal for a sparse declared field. The legacy
+    /// Richardson action remains the default and keeps its existing numerical semantics.
+    pub fn action_matrix_free_chebyshev<'a>(
+        &'a self,
+        input: ResidentNormalEnclosureView<'a, 'c>,
+        steps: usize,
+    ) -> Result<NativeFieldMatrixFreeAction<'a, 'c>, Error> {
+        NativeFieldMatrixFreeAction::prepare_with_method(self, input, steps, u32::MAX, 1)
+    }
     pub fn same_owner(&self, other: &Self) -> bool {
         Rc::ptr_eq(&self.owner, &other.owner)
     }
