@@ -71,6 +71,99 @@ return. The first-arrival/fractal sets, entropy partitions and compression famil
 through those actual receiving operations. A physical drive or monitor instantiates the same
 interaction/encoding pattern with its own material laws.
 
+## Situated generator inference, dormant modes and action
+
+[project-postulate] Text, acoustic, optical, mathematical and motor conduct use this same
+construction: infer or reuse an admissible generating relation and release its consequence
+through a participating receiver. Their media supply actual interaction laws and charts.
+The September 21 [source synthesis](../research/records/2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md)
+connects the rotor/Bombe comparison, simulator interfaces and existing source owners.
+“Key-like” describes applicability to a situated receiving constraint; it names neither a
+secret, a universal inverse nor a new computational primitive.
+
+[definition] Let z carry the interacting Holons, their material, incidence, clocks and relevant
+environment, and let `F_o={z:O(z)=o}` be the compatible source family. Let a specify a complete
+preparation/control law over a declared interval: a prescribed action word or a causal policy
+from received observation histories to controls. `T_a` is the resulting admitted evolution,
+including later contacts and feedback when supplied. It may retain the trajectory when the
+receiver reads more than its endpoint. Its received consequence is
+
+```text
+Y_R(a,F_o) = { ρ_R(T_a z) : z ∈ F_o and a is admissible at z }.
+```
+
+Source observations, the requested consequence and the eventual observed consequence are
+different operands. Inference finds a compatible a or family of a under the requested receiving
+relation. Existential reachability, robust containment over the full source family and an
+expected consequence under a supplied measure have different quantifiers. Robust control uses
+one chosen law for every source retained, with its actions admissible along each resulting
+trajectory; a feedback law can choose different controls from different received histories.
+It cannot consult an unobserved source coordinate. The request supplies this scope;
+output has no universal certainty gate. A communication acts on the receiving Holon's state,
+so agreement of emitted strings alone does not establish agreement of receiving consequences.
+The [prepared-transport construction](../research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md)
+already supplies this action-inference relation and its physical release balance.
+
+[definition] A mode can be quiet at the current receiver and remain available to an admitted
+future interaction. **Standing** retains the generator/material, unresolved directions and
+source conditions needed for that future; recall constructs a present face from this standing
+and present context. `Foundation/Standing.lean::StandingLaw` requires every admitted future
+reading to factor through what is retained. Its `MemoryLaw` reconstructs a new occurrence,
+and its future separator distinguishes two currently equal faces. Neither a silent output nor
+an interval without activation proves extinction. The native normal material is already a
+reusable generating law; keeping a copy of its latest produced word is not what makes it one.
+
+[proved-derived] In a linear chart, a dormant direction v has `ρv=0` but may satisfy
+`ρ T_w v≠0` for an admitted later word w. It cannot be discarded by a representation promising
+that later reading. For example, `ρ(x,h)=x` and `T_u(x,h)=(x+u h,h)` give the same present face
+for `(0,1)` and `(0,-1)`, but different faces after `u=1`. This is the existing
+[future-agreement/standing law](../formal/elementary-holonics/ElementaryHolonics/Foundation/Standing.lean),
+with executable separators in `exact_linear/contextual.rs` and `kernel_modes.rs`.
+
+[definition] Continuing compression retains `D E=ρ` and `E_next T_a=U_a E` for its declared
+action and receiver family. For state-dependent actions it also retains their domain/incidence:
+a quotient that merges an enabled and a disabled action cannot decide applicability from the
+quotient alone. Preserve that domain as a receiving predicate or retain the distinguishing
+fibre. Closed generator words then reuse the compressed action; a failed square returns its
+interior or defect. A rational-linear closure or a fixed quadratic-moment closure does not
+silently cover a changing nonlinear field word.
+
+[definition] A functional mode's homeostasis concerns a declared recurring behavior, viable
+region or return section during its engagement. It may be stationary, cyclic or nonperiodically
+recurrent. Availability between engagements is a property of retained standing and its
+admitted reactivation; it does not require the same current to circulate continuously.
+Stability additionally concerns the response to perturbations under stated material and
+driving conditions. A single return, exact phase arithmetic or a conserved norm alone does
+not establish attraction, robustness or periodic closure.
+
+[proved-derived] The existing `holonic_interaction::Medium` gives a concrete flux law. With
+fixed real `G=Gᵀ`, `Ωᵀ=−Ω`, `M_contact⪰0`, supplied input B u and
+`q̇=(Ω−M_contact)Gq+B u`, the storage `V=½qᵀGq` obeys
+
+```text
+V̇ = −(Gq)ᵀ M_contact (Gq) + (Gq)ᵀ B u.
+```
+
+Changing G adds `½qᵀĠq`. For fixed positive definite G and zero input, nonincreasing V
+controls the state norm; attraction additionally requires the invariant undamped modes to
+be excluded. The library also admits indefinite G, where nonincreasing V alone does not
+supply that stability conclusion.
+A driven recurring mode can balance incoming work and dissipative/outgoing flux while
+its environment accumulates heat. Return of a selected face need not return the environment.
+The [physical interaction owners](HOLONIC_FLUID_CONSTRUCTION.md) retain the actual material
+and entropy balance; invertible rearrangement of a probability population alone preserves
+its Shannon entropy and supplies no heat-production law.
+
+[definition] Knot tying and untying use configuration, admissible motions, contacts, clock
+and material response together. Prime/unknot classes constrain topology; a closed nontrivial
+knot cannot become an unknot by ambient isotopy. An open rope can be untied through its ends,
+and physical release also depends on thickness, friction, load and actuation. The
+`holonic_interaction`, `edit_rigidity` and `holonic_chain` owners carry different parts of that
+calculation. Rubik generators similarly act on an admitted configuration fibre; a quotient
+reading does not determine the full state. Games with another actor retain that actor's
+choices in the action relation. Lattice, crystal and quasicrystal charts apply when their
+actual generators, incidence and periodic or aperiodic order are supplied.
+
 ## High-level Holonic Interactions
 
 [definition] These are the operations used to formulate the model. They are abstracted

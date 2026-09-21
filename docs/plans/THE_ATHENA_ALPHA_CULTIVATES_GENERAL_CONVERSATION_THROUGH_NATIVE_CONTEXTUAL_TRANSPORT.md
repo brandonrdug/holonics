@@ -1218,15 +1218,82 @@ remain the final codec; the present generator already advances before it is deco
 
 ### The source and condition construction
 
+<a id="situated-generator-and-receiving-composition"></a>
+
+#### Shared generator and receiving composition
+
+[project-postulate] The September 21 direction makes
+[situated generator/action inference](../HOLON.md#situated-generator-inference-dormant-modes-and-action)
+the consuming operation across communication, optics/acoustics, navigation and motor action.
+Known source and receiving constraints infer an admissible generating condition/control or
+family; actual observations develop that relation; admitted future action determines retained
+standing. The incident implementation below remains useful constituted machinery. Its current
+text/support receiver is one application of the shared law.
+
+[established-bounded; source-inspected] Existing
+`field_session/native_source.rs::{prepare_native,form_native_reaction,contextual_section,condition_family_image}`
+and `body/field/formation.rs` supply original-condition formation and a reusable compatibility
+family. `IncidentFieldModel::evaluate` instead applies its normal M directly throughout the
+q/Delta word. Both already infer/reuse generating material. The unconnected consumer is the
+compatibility family through this whole incident operation and its requested receiver, not
+an absent definition of generator or an absent source codec.
+
+[definition] Preserve the operands when composing those owners. With observed source o,
+held boundary h, producing refinement law `F_Θ`, receiver R and requested face family Y,
+the compatible family satisfies
+
+```text
+O(z_0)=o,  held(z_j)=h_j,
+c_j=Π_K(z_j),  z_(j+1)=F_Θ(z_j,c_j;h_j),  ρ_R(z_N) ∈ Y.
+```
+
+The indices name the finite producing word, not an event-archive requirement: its family may
+be carried implicitly by shared parameters, factors and an executable recurrence. Here `Π_K`
+includes the actual incident restrictions `c_i=U_i q_i−q_r` at each step; it does not grant
+independent variation to copies of the same source. A fixed-source local bilinear restriction
+is affine in c and can use the existing contextual preimage. A general whole-word inverse
+retains its nonlinear constraints and unresolved family. The producing adjoint is the local
+variation used to develop material or navigate constraints, not proof of a unique inverse.
+`form_native_reaction` accepts an observed pre-reflection reaction. A final receiving outcome
+must pass through the actual producing maps; it cannot be relabelled as that hidden target.
+
+[definition] #17 owns this join in `body/field/{formation,incident}.rs` and
+`field_session/{native_source,incident_application,mathematical_port}.rs`. Carry admitted
+source/condition sections to the public incident invocation, expose the resulting receiving
+family, and propagate actual comparisons through their producing operands. Retain a useful
+contextual generator/section at the operation that formed it and consume it from a changed
+source or receiver. Keep the current normal M/D reuse; do not replace it with a word archive.
+Bind an applicable compression owner with `D E=ρ` and `E_next T_a=U_a E`, including action
+domain/incident constraints. Where the nonlinear word does not close, execute and retain the
+remainder. `NativeSharedDriveMode`'s equal-drive legacy-current law and the fixed linear
+moment quotient do not automatically cover this incident current.
+
+[definition] The returned evidence concerns the same generating relation under the relevant
+change of source, receiver or activation. A dormant interval preserves its admitted future
+capability; a requested reactivation or new receiving use consumes that retained material.
+Inspect the actual requested consequence and its complete residual, including unchanged
+failure cases. Repeated character reproduction, another unchanged screw-bracket example or
+a policy reset cannot substitute for that return. #16 retains the concrete Athena episode
+assessment; #18/#61 address the measured representation/execution costs of this composition.
+
+[definition] Robotics contributes observation/actuation units, partial state, held commands,
+physical/control clocks and reset/return semantics through the
+[simulator boundary](../HARDWARE_AND_MODALITY_BOUNDARIES.md#robotics-and-simulation-boundary).
+These constrain the shared interface now. Simulator installation/execution and a particular
+RL learner are not prerequisites for this native composition.
+
+#### Returned incident specialization
+
 <a id="executable-field-campaign"></a>
 
-[definition; agent-inferred] This is the selected implementation contract for the current campaign.
+[definition; agent-inferred] This is the implemented incident-field specialization used by the current campaign.
 The [implementation return](../../research/records/2026-09-21_THE_INCIDENT_FIELD_JOINS_ITS_GENERATOR_RECEIVER_AND_FROZEN_RETURN.md)
 connects its returned owners and measured application scope. The object is one continuing field with its source and receiving interfaces. The deliverable is
-its public Athena invocation on recorded source episodes, including generation, delayed learning,
-continuation and executable reuse. The existing geometric iteration, incident restriction,
+its public invocation under the shared generator/receiving contract above, with recorded Athena
+episodes as application evidence, including generation, delayed learning, continuation and
+executable reuse. The existing geometric iteration, incident restriction,
 normal law, receiver family and helical constructions are implementation inputs. This section
-settles the reaction chart, state, boundary maps and transactions; the roadmap supplies order.
+records the reaction chart, state, boundary maps and transactions; the roadmap supplies order.
 
 #### 1. Separate transported drive from the constitutive source
 
@@ -1806,7 +1873,7 @@ encoded action or decoder mismatch and repair it rather than increasing exposure
 
 ## 6. Shared modality and physical applications
 
-[definition] Extend the same owner through actual optical/acoustic and other source/receiver
+[definition] Extend the same owner through actual optical/acoustic, motor and other source/receiver
 maps. Existing `mathematical_source`, optical hierarchy/formation, acoustic potential and
 world-tube owners retain their exact codec and physical scopes. A raster pixel, PCM sample or
 character is an exterior chart unit. It does not dictate intrinsic grain or local clock.
@@ -1815,7 +1882,8 @@ character is an exterior chart unit. It does not dictate intrinsic grain or loca
 actual image/audio/interaction product. Semantic association between modalities needs a supplied
 or recovered source relation. Simultaneity is not universal contact, and an intensity-only
 observation does not reveal every coherent phase. Retain compatible alternatives and actual
-source timing. Text need not pass through a protein or fluid simulator to use their shared laws.
+source timing. The [situated generator contract](../HOLON.md#situated-generator-inference-dormant-modes-and-action)
+defines the shared action inference; the medium supplies its interaction and receiving law.
 
 [definition] The Complex Parametron retains quadrature and incidence before phase/sign/intensity
 readout. `ConstitutiveWorldTube`/`FourTorusParametronCurrent` retain `(q,z,r,clock)` and their
@@ -1825,8 +1893,10 @@ merely to draw it on a torus.
 
 [definition] **Expected outcome:** inspectable modality products, demonstrated cross-modal
 conditional relations and lawful receiver reorientation. Physical claims additionally supply
-units, source/boundary laws, calibration and the actual force/current response. These applications
-can inform earlier phases without becoming prerequisites for the next useful text increment.
+units, source/boundary laws, calibration and the actual force/current response. Robotics and
+simulation are intended HNN capabilities; their [interface contract](../HARDWARE_AND_MODALITY_BOUNDARIES.md#robotics-and-simulation-boundary)
+informs current source/action/receiver design. A simulator run remains a later concrete application,
+while shared generative machinery is developed through the active consumer now.
 
 ## Historical crosswalk and preserved requirements
 

@@ -14,6 +14,13 @@ measurement, molecular configuration and a neural response are related construct
 
 ## The derived relevance principle
 
+[definition] The [situated generator/action construction](../HOLON.md#situated-generator-inference-dormant-modes-and-action)
+uses this principle for dormant modes and contextual recall. `Foundation/Standing.lean`
+retains the future-sufficient relation and reconstructs a face in the present context. A mode
+may cease contributing to one engaged function without losing the standing needed by another
+admitted future interaction. The [September 21 source synthesis](../../research/records/2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md)
+connects that existing law to constraint inference, recurrent flux and physical control.
+
 [definition] Fix a situated source space S, an admitted deterministic generator family T, and a
 receiver family R. The source state includes every condition needed to make those operations
 well-defined. Partial or changing-domain operations retain their admitted passages; they cannot
@@ -265,7 +272,7 @@ inferred from matching terminology.
 | Quantum mechanics | Finite occupation/Hubbard, evolution and polarized-crystal owners preserve amplitudes, operators and analyzer-before-intensity order. In a density-operator realization, `ρ↦UρU†` and `ρ↦tr(Eρ)` give transport and observable receivers; positivity, normalization, unitary/channel and measurement laws are part of that realization. A common intensity can conceal a phase difference that another analyzer reveals. |
 | Electromagnetism | `HolonicMaxwellPropagation` carries electric/magnetic sections, constitutive propagation and compatible receiver folds. Exterior field equations and charge/current sources use the Stokes structure with the appropriate metric/Hodge and units. |
 | Strong and weak interactions | `HolonicFourForceSectorCarrier` retains separate sector fibres and connections on shared incidence; `HolonicFieldTheoryPassage` retains source, exchange and charge/energy ledgers. Gauge representations, matter, action and physical coupling are supplied by the sector realization; the four names alone derive no force law. |
-| Circuitry and Smith charts | `Horizon.smith`, `HolonicMeasuredParametron` and `traversible_chain.rs` already supply the Cayley/Smith chart, measured difference ratios, phased two-component transport and reflected remainder. A matched load has zero reflected reading; the input/action is not therefore absent. Phase and impedance mismatch jointly determine later reception. |
+| Circuitry and Smith charts | [`Millennium/Horizon.lean::smith`](../../formal/elementary-holonics/ElementaryHolonics/Millennium/Horizon.lean) proves the normalized complex Cayley chart's disc/rim and pole-qualified composition laws; [`Geometry/CrossRatio.lean`](../../formal/elementary-holonics/ElementaryHolonics/Geometry/CrossRatio.lean) retains the undivided ordered pair; [`traversible_chain.rs`](../../crates/holonic-engine/src/traversible_chain.rs) supplies physical phased transport and reflected remainder. `HolonicMeasuredParametron` retains its measured difference ratios. A matched load has zero reflected reading; the input/action is not therefore absent. Phase and impedance mismatch jointly determine later reception. |
 | Nodes and anti-nodes | `StandingWave`, phase carriers and coupled modes retain destructive and constructive superposition with actual boundary conditions. A node is a zero of a specified field/receiver; another position, phase or interaction can see its components. The generator and boundary determine the mode population. |
 | Molecular and biological systems | Oriented sites, membrane crossings, `ConstitutiveModulation`, conformation response and finite quantum occupation provide the configuration/interaction carriers. Hydrogen bonds require direction, separation, electronic state and environmental conditions; their response changes the network that transmits later force and information. |
 | Microscopy and macroscopy | `BoundaryScalePassage`, changing receivers and the torus constitutive decoder carry resolved coordinates with the hidden contribution and its future coupling. A faithful coarse description is a receiver-specific construction, not an erasure of microscopic matter. |

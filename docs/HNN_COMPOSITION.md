@@ -359,6 +359,17 @@ without defining inference universally as frozen morphology.
 
 ## Implemented incident-field composition boundary
 
+[definition] The [shared action-inference contract](HOLON.md#situated-generator-inference-dormant-modes-and-action)
+governs this specialization. The current M/D are already reusable generating material; a frozen
+`IncidentWord` retains the producing computation for its paired return. The unconnected port is
+more specific: `field_session/native_source.rs` supplies `contextual_section` and
+`condition_family_image` through the generator neighborhood, while `IncidentFieldModel::evaluate`
+uses its normal material directly. Its incident consumer does not carry that compatibility
+family through the full nonlinear word. `form_native_reaction` accepts an actual pre-reflection
+reaction observation; a final text, acoustic or motor consequence is not that hidden operand.
+The [native contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition)
+specifies the source/target-preserving join and future-action reuse.
+
 [established-bounded; source-inspected] The incident-field path now has a resident realization of
 the [executable field campaign](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
 boundary. The reaction consumes standing `q` and incident `Delta` through

@@ -21,6 +21,14 @@ and carry the accumulated capability into the next implementation step.
 
 ## One sustained construction programme
 
+[project-postulate] The September 21 [situated generator/action contract](HOLON.md#situated-generator-inference-dormant-modes-and-action)
+governs Athena's text interface and HNN's optical, acoustic, mathematical and motor applications.
+Generate by inferring/reusing an applicable relation under the source and receiving conditions;
+retain dormant material needed by admitted future action. Robotics is an intended capability
+whose [interface requirements](HARDWARE_AND_MODALITY_BOUNDARIES.md#robotics-and-simulation-boundary)
+inform that shared design. The current text/support codec and character comparison remain one
+application chart, not a definition of learning or the measure of all constructive progress.
+
 [project-postulate] The [complete Athena plan](plans/THE_ROADMAP.md#athena-construction-order)
 now orders the trainable HNN model, contextual organization, efficient/durable continuation,
 conversation/code applications, broader modality receivers, product hardening and executable
@@ -82,11 +90,12 @@ Source/contact applicability and productive encoding extend that body. This is h
 workshop becomes Athena's available conduct. Source signatures, a printed result or a smaller artifact alone do not
 establish that incorporation.
 
-[definition] The current field campaign is fixed by the
+[definition] The returned incident-field specialization is recorded by the
 [executable implementation contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign):
 incident-conditioned reaction, independent transported drive, one global current/internal branch,
 learned source/text/support boundary material, complete producing adjoint and atomic continuation.
-It names the actual episode consumer and source scopes. Existing encoding/receiving mathematics
+The [current shared composition](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition)
+adds its compatibility/future-mode consumer while retaining actual episode assessment and source scopes. Existing encoding/receiving mathematics
 and the returned native/helical mechanisms supply this construction; their existence is not an
 unresolved planning question.
 

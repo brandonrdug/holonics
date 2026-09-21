@@ -616,6 +616,12 @@ derives the compatible argument orbit `x=φ⁻¹`, `x+x²=1`, `1−x=x²`, and
 These are distinct source families (analytic special functions, a quadratic character, and a
 finite-state generator); their shared algebra does not identify their zeros, spectra or constants.
 
+[definition] The September 21 [polylogarithm/quantum-dilogarithm source comparison](../research/records/2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md#polylogarithms-and-finite-quantum-dilogarithms)
+continues from these classical special values. It connects the supplied finite-group paper to
+existing character, winding and ordered-transport owners with its normalization and nonzero
+pentagon defect retained. It does not identify a classical `Li₂`, a finite fivefold matrix
+cycle, a quantum dilogarithm and a physical screw as one function or construction.
+
 [proved-derived; source-inspected] Two mathematically distinct boundaries carry the name
 de Bruijn and must be qualified. The Copson--de Bruijn coefficient `c_CD` is the least constant
 for the weighted tail receiver

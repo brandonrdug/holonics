@@ -12,6 +12,17 @@ the roadmap orders it. The machine, source guides and research supply the constr
 
 ## The mathematical object you are implementing
 
+[project-postulate] Begin generation work with the
+[situated generator/action relation](docs/HOLON.md#situated-generator-inference-dormant-modes-and-action):
+known source family, admitted controls/conditions, participating receiver and requested consequence.
+Text, image, acoustic and motor releases are applications of that relation. Robotics is an intended
+HNN capability; the [simulator boundary](docs/HARDWARE_AND_MODALITY_BOUNDARIES.md#robotics-and-simulation-boundary)
+constrains the shared design now without scheduling a simulator run. A mode's availability is
+retained standing, not continuous activation. Read `Foundation/Standing.lean`, the
+[prediction/release record](research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md)
+and the [source audit](research/records/2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md)
+when working on recall, relevance, homeostasis or action inference.
+
 [definition] One Holon `|H⟩_F` carries situated incidence K, constitutive/learned material Θ,
 joint currents and internal modes, a frame F, and participating receivers. Circulating modes,
 interlinked toroidal domains, helical passages, contacts and recursive/preimage geometry belong
@@ -59,8 +70,9 @@ than assuming a perfect inverse or a complete event archive.
 fixes the implemented composition: standing q/incident Delta feed the reaction, participation supplies
 drive y, and one global D/b acts on their sum. Source/text/support maps are boundary material
 with stated priors and the same normal update. The contract contains the complete adjoint,
-publication, rest and source-episode packets; workers implement those choices rather than
-reopening the source/condition chart question.
+publication, rest and source-episode packets. These are implemented constituents of the shared
+operation; the text/support chart is one application. Continue from those returns and the
+roadmap's current generator/receiving join, preserving the original target port and source fibre.
 
 [definition] `IncidentFieldOptions::response_port_start` fixes the receiving slots independently
 of input length; fresh sessions reserve the final receiving aperture. Generation, comparison
@@ -83,6 +95,7 @@ Paths in this table are relative to `crates/` unless stated otherwise. These are
 | Bilinear source/condition and normal law | `resident/section/bilinear_features.rs`, `field/material_transport/normal/direct/section.rs`; `section_bilinear_adjoint.cuh`, `normal_applied_condition.cuh` |
 | Resident packets, kernels and launch | `holonic-engine/src/resident_section{,.rs}`; `kernels/exact_resident_section.cu`, `exact_packet_linear.cuh`; `holonic-mount/src/{cuda,launch_law,section_layout}.rs` |
 | Exact algebra / generator reduction | `holonic-engine/src/exact_linear{,.rs}`, `prime_image_algebra.rs`, `receiver_history_compression/`, `winding_inertia.rs`; host/reference and resident APIs have distinct scopes |
+| Retained availability and predictive release | `holonic-engine/src/{standing,receiver_release}.rs`, `exact_linear/{contextual,kernel_modes}.rs`; `field/internal_mode.rs` retains the equal-drive specialization and explicitly refuses incompatible operative currents; `Foundation/{Standing,CausalRelevance,ReceiverHistoryCompression}.lean` supplies future sufficiency |
 | Helical and geometric source | `relational-geometry/src/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs`; `receiver_history_compression/observable.rs::HelicalMomentReuse` binds finite pair actions to the existing moment decoder |
 | Framework facade | `holonics/src/lib.rs`: `geometry` and `structure` work without the default native feature; HNN implementation is `holonics-hna` |
 | Formal entry | `formal/elementary-holonics/ElementaryHolonics/Framework.lean`: Core, Geometry, Dynamics, Information, Physics, Computation; [formal guide](docs/FORMAL_FRAMEWORK.md) |

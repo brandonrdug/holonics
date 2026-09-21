@@ -30,6 +30,20 @@ relations are part of this construction, not excluded by its software realizatio
 
 ## Reading the field architecture diagram
 
+[definition] The shared [generator/action contract](HOLON.md#situated-generator-inference-dormant-modes-and-action)
+also reads this model in the inverse direction: from the compatible source family and a
+receiving constraint, infer applicable conditions, generators or controls. A changing receiving
+Holon supplies part of that source, rather than being replaced by a desired output inscription.
+Retained material can support dormant availability between active modes; its future action and
+receiver descent determine what compression may discard. Recurrence and homeostasis refer to
+the constituted driven dynamics, with storage, flux and dissipation at their actual units.
+
+[definition] The current incident word below is an implemented specialization of this law.
+Its learned M/D already apply to new currents. `IncidentTextReceiver` reads one boundary;
+its character/support comparison is not the universal learning objective or the only possible
+consequence. The [composition boundary](HNN_COMPOSITION.md#implemented-incident-field-composition-boundary)
+identifies the unconnected compatibility/future-mode work without refounding the model.
+
 [definition] The [helical elementary realization](HELICAL_GEOMETRY.md) makes one geometric
 instance of the following operator relations explicit: source generators and initial points,
 frame transport, pair contact differential, its geometric second variation and a quadratic

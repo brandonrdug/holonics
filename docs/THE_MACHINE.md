@@ -48,6 +48,20 @@ faculties or a criterion postponed until conversational output succeeds.
 
 ## The operative equations
 
+[definition] [Situated generator inference](HOLON.md#situated-generator-inference-dormant-modes-and-action)
+asks which admitted preparation, condition or action produces a requested receiving consequence
+from the compatible source family. The receiver may be another active body. Communication,
+image/acoustic production, game navigation and motor release therefore use the same relation.
+An output codec does not determine its internal grain, source ontology or clock.
+
+[definition] A dormant mode retains material and the directions needed by admitted future
+contacts. `Foundation/Standing.lean` already formalizes memory as present reconstruction and
+separates present silence from future extinction. Recurrent functional stability is a property
+of the actual driven dynamics over its stated engagement; continuous activity and an exact
+period are separate claims. The [September 21 synthesis](../research/records/2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md)
+connects these existing owners to rotor constraint inference, knot/game navigation and the
+[robotics interface contract](HARDWARE_AND_MODALITY_BOUNDARIES.md#robotics-and-simulation-boundary).
+
 [definition] These are compatible parts and declared specializations of the same construction.
 The [model formula](HNN_FORMULA.md) supplies the full hypotheses, source maps and variations.
 
@@ -123,7 +137,7 @@ relaxes the complete joint boundary under the declared held mask. `incident.rs` 
 incidence columns, declared contacts, producing source/receiver sections and the paired
 reverse return; `incident_application/` owns E/R/support, source joins, frozen receiving material,
 codec growth and checkpoint/remount. The [September 21 return](../research/records/2026-09-21_THE_INCIDENT_FIELD_JOINS_ITS_GENERATOR_RECEIVER_AND_FROZEN_RETURN.md)
-records the implemented scope, focused controls and the still-running full evaluation evidence.
+records the implemented scope, focused controls and the completed full evaluation evidence.
 Focused component checks and the full 76,599-site generation/reopen linked response have
 succeeded; resumed and uninterrupted checkpoints are byte-identical. Both complete-source
 text cases executed, exposed receiving-port/uncertainty defects that were repaired, and still

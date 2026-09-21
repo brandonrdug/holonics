@@ -8,6 +8,19 @@ The [roadmap](plans/THE_ROADMAP.md) schedules construction; this guide states th
 
 ## The objects that must be kept together
 
+[definition] [Situated generator inference](HOLON.md#situated-generator-inference-dormant-modes-and-action)
+uses these helical objects as reusable action/material, including their inactive availability
+and later receiving use. Rotor-state transport and knot manipulation provide concrete source
+comparisons in the [September 21 synthesis](../research/records/2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md).
+A finite permutation is a discrete transport specialization, not a universal helix codec;
+homeostasis refers to the actual driven return/stability law. The existing
+[`Horizon.smith`](../formal/elementary-holonics/ElementaryHolonics/Millennium/Horizon.lean)
+and [`RatioPresentation.blockTransport`](../formal/elementary-holonics/ElementaryHolonics/Geometry/CrossRatio.lean)
+connect projective charting to ordered cascades, while
+[`traversible_chain`](../crates/holonic-engine/src/traversible_chain.rs) retains the physical
+port normalization and reflected remainder. These source maps make the Flash testimony's
+useful bilateral reading available without refounding the chart or merging distinct operands.
+
 [definition] In a declared oriented Euclidean frame F, a constant screw generator is
 `ξ = (ω,v)` and its action on a situated point is `V_ξ(x) = ω × x + v`. The continuing object is
 the generator **and an initial configuration**, with its parameter/clock and receiver:

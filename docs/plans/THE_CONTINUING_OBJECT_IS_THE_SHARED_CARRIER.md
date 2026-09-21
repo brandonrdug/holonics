@@ -33,8 +33,11 @@ The following scientific instances remain mathematical material, not a competing
 [project-postulate] Brandon's September 19 clarification makes this object the central shared
 construction. Protein structures provide complex scientific application objects; Athena is an
 intelligence application of the same machinery; notes and chords express its modal and receiving
-relations. Robotics remains an exploratory thought. These are purposes and instances of this
-carrier, not alternative definitions of it.
+relations. The September 21 direction makes robotics an intended HNN capability and its
+[observation/action contract](../HARDWARE_AND_MODALITY_BOUNDARIES.md#robotics-and-simulation-boundary)
+a current design input. The shared [situated generator law](../HOLON.md#situated-generator-inference-dormant-modes-and-action)
+retains dormant availability, admitted reactivation and the participating receiving consequence.
+These are purposes and instances of this carrier, not alternative definitions of it.
 
 [project-postulate] The later September 19 Codex discussion supplies the reason for this
 generality: a bounded Holon is simultaneously a whole and a participating part. The siphonophore

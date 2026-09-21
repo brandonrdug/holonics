@@ -13,6 +13,17 @@ explicit rather than relying on an assumption about which files a particular har
 
 ## 1. The object and its equations
 
+[project-postulate] Begin generation work with the
+[situated generator/action relation](docs/HOLON.md#situated-generator-inference-dormant-modes-and-action):
+known source family, admitted controls/conditions, participating receiver and requested consequence.
+Text, image, acoustic and motor releases are applications of that relation. Robotics is an intended
+HNN capability; the [simulator boundary](docs/HARDWARE_AND_MODALITY_BOUNDARIES.md#robotics-and-simulation-boundary)
+constrains the shared design now without scheduling a simulator run. A mode's availability is
+retained standing, not continuous activation. Read `Foundation/Standing.lean`, the
+[prediction/release record](research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md)
+and the [source audit](research/records/2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md)
+when working on recall, relevance, homeostasis or action inference.
+
 [project-postulate] HNN is one continuing geometric field: circulating phase modes, interlinked
 toroidal domains, helical passages, active contacts and participating receivers. A Holon `|H⟩_F`
 carries incidence K, material Θ, joint currents/modes and interior storage in frame F; it is a whole
@@ -78,11 +89,12 @@ control; `HelicalMomentReuse` is a separate caller. The next encoder/decoder wor
 and the [campaign correction](research/records/2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md#correction-the-nibble-control-is-not-holonic-encoding).
 
 [definition] The [executable field campaign](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
-fixes the next composition: standing q/incident Delta feed the reaction, participation supplies
+records the implemented composition: standing q/incident Delta feed the reaction, participation supplies
 drive y, and one global D/b acts on their sum. Source/text/support maps are boundary material
 with stated priors and the same normal update. The contract contains the complete adjoint,
-publication, rest and source-episode packets; workers implement those choices rather than
-reopening the source/condition chart question.
+publication, rest and source-episode packets. These are implemented constituents of the shared
+operation; the text/support chart is one application. Continue from those returns and the
+roadmap's current generator/receiving join, preserving the original target port and source fibre.
 
 ## 2. Where the implementation lives
 
@@ -97,6 +109,7 @@ reopening the source/condition chart question.
 | Hardware law | `hardware_cover`, `section_partition`; `crates/holonic-mount/src/{cuda,launch_law,section_layout}.rs` |
 | Exact geometry and helical pair | `crates/relational-geometry/src/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs`; `receiver_history_compression/observable.rs::HelicalMomentReuse` binds finite pair actions to the existing moment decoder |
 | Algebra and economical continuation | `exact_linear`, `prime_image_algebra`, `receiver_history_compression`, `winding_inertia`; resident bilinear/normal/word/mode owners at their separate call boundaries |
+| Retained availability and predictive release | `holonic-engine/src/{standing,receiver_release}.rs`, `exact_linear/{contextual,kernel_modes}.rs`; `field/internal_mode.rs` retains the equal-drive specialization and explicitly refuses incompatible operative currents; `Foundation/{Standing,CausalRelevance,ReceiverHistoryCompression}.lean` supplies future sufficiency |
 | Public framework | `crates/holonics/src/lib.rs`: `geometry` and `structure` without default native features; `holonics-hna` for HNN |
 | Lean | `formal/elementary-holonics/ElementaryHolonics/Framework.lean` and its Core/Geometry/Dynamics/Information/Physics/Computation entry points |
 | Applications and evidence | `applications/holonics-workbench`, `applications/conversation-data`; `research/{records,experiments,papers,notebook}`; [layout](docs/REPOSITORY.md) |

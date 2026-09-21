@@ -363,6 +363,52 @@ memory at declared boundaries; host replay may not determine the committed nativ
 an obstruction. It does not justify deleting current, widening a magic aperture, or replacing a
 failed exact operation with a float result.
 
+## Robotics and simulation boundary
+
+[project-postulate] Robotics and physical simulation are intended HNN capabilities under
+Brandon's September 21 direction. Their observation, actuation, clock and receiving contracts
+constrain the shared generator design now. Isaac Sim is a source-inspected interface baseline;
+this direction does not select it as the required simulator or schedule its execution. The
+[generator/action law](HOLON.md#situated-generator-inference-dormant-modes-and-action) applies
+equally to communication, motor control and other receiving media.
+
+[established-bounded; source-inspected] The inspected Isaac Sim tree is the clean revision
+[`7c206f75bdadd9e05fc457f19863ca4c3f0cb693`](https://github.com/isaac-sim/IsaacSim/tree/7c206f75bdadd9e05fc457f19863ca4c3f0cb693).
+Its [policy extension](https://github.com/isaac-sim/IsaacSim/blob/7c206f75bdadd9e05fc457f19863ca4c3f0cb693/source/extensions/isaacsim.robot.policy.examples/docs/Overview.md)
+deploys Isaac Lab exports. The IO descriptor fixes ordered observations/actions, joint names,
+supported `history_length`, scales, clips and offsets; arbitrary history metadata is not
+interpreted by that deployment path. Environment configuration supplies physics timing,
+actuation, limits and initial conditions. This is a deployment contract, not an inspected
+training implementation. A Holonic training source must preserve the corresponding task,
+environment, actual applied action and receiving consequence rather than learn isolated
+unqualified observation vectors.
+
+| Interface | Required retained information / existing external consumer |
+|---|---|
+| Source observation | Articulation/task state, source epoch, frame, units, contact validity and uncertainty; `IsaacLabPolicyController._build_observation` binds these to the declared observation chart, including previous-action feedback and history |
+| Action face | Position, velocity or effort and named controlled joints; `BoundPolicy.action` applies the trained chart's scale/offset/clip and the runner applies the resulting partial desired state |
+| Timing | `RobotPolicyRunner.step` performs inference on control ticks separated by declared decimation and holds the target between them; physics time, controller cadence, observation history, rendering and HNN refinement are distinct |
+| Reset | A teleport/default-state restore changes the source epoch; controller history/backend reset is explicit. Deliberately retained learned material can survive an episode reset, but the reset is not a physical return trajectory |
+| Receiving consequence | Observe the actual next state/contact/task face after the applied actuation. An invalid sensor reading is not zero force; prediction alone is not evidence that the simulated actuation occurred |
+
+[definition] Simulator floats remain exterior measurements or target-format projections.
+Importing a finite binary float as an exact rational preserves that stored reading, not the
+unknown physical value. A chart must separately retain calibration, quantization and model
+uncertainty where claimed. Native formation/refinement keeps exact rational/dyadic carriers and
+their source families; exterior conversion declares its residual. The actuator's units, bounds
+and held-command semantics belong to the receiving map. This is the same boundary discipline
+as image/audio rendering, with the material and time law appropriate to the actual interaction.
+
+[established-bounded; source-inspected] `NativeFieldAction` in the engine's
+`field/junction/operative/source/action.rs` executes the source-qualified `D/D*` reflection.
+It is an algebraic dependency, not an actuator/controller adapter. Existing screw/contact,
+`receiver_release`, native source/condition formation and field adjoints supply other parts.
+An HNN-to-simulator binding still owes the declared observation/action charts and causal return
+above. Deployment of an external policy establishes neither that binding nor recurrent
+stability, training convergence or transfer to physical hardware. The
+[source synthesis](../research/records/2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md#simulator-source-and-training-expectations)
+links the inspected controller, cadence and contact implementations.
+
 ## Audio and acoustics boundary
 
 [established-bounded; source-inspected] The exterior source owner

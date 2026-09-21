@@ -22,6 +22,19 @@ rules do not replace the physical reception or native HNN contracts.
 
 ## The object, the receiving operation and the displayed face
 
+[definition] The [situated generator/action law](HOLON.md#situated-generator-inference-dormant-modes-and-action)
+makes communication and motor release the same kind of receiving construction. Emitting a word,
+an acoustic field or a joint command creates a face; its effect on a participating receiver
+depends on that receiver's current, material, frame and available modes. Inferring an action
+from a desired effect retains those operands and any compatible alternatives. An observed
+response can develop the producing relation without being treated as a universally correct target.
+
+[definition] Relevance can make a retained mode participate again. Current silence establishes
+only the current face; the `Standing` and `CausalRelevance` owners quantify over future admitted
+transports and receivers. When the question concerns sustained or returning function, the
+receiver can read a trajectory, contact sequence or return section rather than one endpoint.
+Its clock and viability conditions remain explicit; a policy reset is not evidence of recurrence.
+
 [definition] A receiver is a role of a participating Holon H_R. In a declared contact C,
 
 ```text

@@ -31,7 +31,7 @@ retains this direction across subjects and handoffs.
 
 ## Sustained objective and construction rhythm
 
-[project-postulate] **Latest September 19 request, after Wave 10: return the active construction
+[project-postulate] **September 19 request, after Wave 10: return the active construction
 focus to the Holonics library and HNN/Athena.** Further protein/biology experiments are deferred;
 their existing shared operators and evidence are retained. Develop the helical pair as elementary
 geometry using the already established frame, generator, contact, landmark and compression laws.
@@ -59,8 +59,18 @@ does not exhaust the general object, and an Athena demonstration does not define
 | Continuing transport, necks and jets | Localized events and changing fields across grain and time | Predictive release, revision, recurrence and compression | T6/T8 using the existing T4/T7 and analytic/variation owners |
 | Exact realization and cost | Reference calculations and data comparisons at declared approximation | Resident execution, saved continuation and economical reuse | Shared exact operators and codecs with a stated realization equation |
 
-[project-postulate] Robotics/kinetics simulation is an exploratory application idea retained from
-the September 19 message. It has no active work item, simulator choice or delivery obligation.
+[project-postulate] **September 21: situated generator inference and predictive action govern
+all receiving applications.** Recover/retain an executable generating relation, infer an
+admissible condition or control for the requested consequence, and reuse it from changed
+contexts. Dormant availability belongs to standing and its admitted future actions; recurring
+function does not require continuous activation. The [Holon contract](../HOLON.md#situated-generator-inference-dormant-modes-and-action)
+and [source synthesis](../../research/records/2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md)
+join the existing memory, helical, compression, flux, knot and game constructions.
+Robotics and physical simulation are intended HNN capabilities. Their observation/actuation,
+clock, partial-state and reset semantics constrain the shared design now through the
+[simulator boundary](../HARDWARE_AND_MODALITY_BOUNDARIES.md#robotics-and-simulation-boundary).
+Isaac Sim supplies inspected interface evidence; no simulator run or specific simulator
+selection is scheduled by this direction.
 
 [definition] The model is one continuing `(K,Θ,|H⟩)` with admitted incidence/transport K,
 constitutive and learned material Θ, and resident joint currents/interior modes. Receiving
@@ -102,10 +112,10 @@ begin where its inputs exist; it must not delay the first trainable model operat
 | Milestone | Construction and dependencies | Delivered result |
 |---|---|---|
 | **1. One trainable HNN model** | Attach the operative field to the existing public body; compose admitted transport, local learned reaction, joint generation and producing-material update. Bind one complete input/output section and its observed target. | A public invocation generates an actual joint section; a real comparison develops its generating material; held-out inputs use that material. Report the source, output, target, update law, error and execution cost. |
-| **2. Contextual organization and changing contacts** | Extend that same model's source/receiver restrictions, active interface state and local constituent formation. Use actual phase, stored current and source conditions; carry changed incidence and newborn constraints through forward and adjoint. | The same presented surface under different relevant surroundings produces the corresponding different consequence. New combinations reuse learned constituents; an unsupported direction produces a source/representation diagnosis. |
+| **2. Situated generator inference and changing contacts** | Compose the existing source/condition compatibility family with the incident word and participating receiver. Retain actual phase, source dependence, changing incidence and complete producing return. Infer applicable preparations/controls through that same relation. | Changed relevant surroundings or receiving conditions reuse the generating material and produce the corresponding consequence. Retained modes remain available through inactive intervals at their admitted future scope; unsupported directions retain their source/representation defect. |
 | **3. Efficient continuation and durable learning** | Compile the repeated action actually encountered, retaining interior memory, joint fibres and pending comparisons. Bind native rest/remount to this complete body and application continuation. Work starts during milestones 1–2 where already lawful. | Repeated execution uses a reusable representation rather than growing a replay programme without bound. A saved model resumes generation and an outstanding observed return with the same declared consequences. Report time, transfers, memory and exact bit growth. |
 | **4. Useful Athena conversation, mathematics and code** | Bind prepared dialogue/source parts and whole-section text decoding to the trained body. Compose existing mathematical functions and structured tool requests through the same session. Follow tool results as actual observations. | Inspect held-out contextual replies, correction/continuation, explanation and working code/tool outputs through the public application. Publish successes and failures; nonempty strings and lower training loss do not substitute for these tasks. |
-| **5. Optical/acoustic and mixed receiving tasks** | Bind the same latent/current operation to image, acoustic and mixed source/receiver charts, with their geometry, rate and reconstruction boundaries. The generic section contract already exists from milestone 1. | Whole image/patch and acoustic-interval generation/reconstruction, plus a mixed-source task, reuse the same model/update mechanism. No separate learner or sample/token clock is introduced by the codec. |
+| **5. Optical/acoustic, motor and mixed receiving tasks** | Bind the same generator/current operation to image, acoustic, articulated-control and mixed charts, with geometry, actuation, rate, partial observation and reconstruction boundaries. Those contracts inform milestones 1–3 already; concrete simulator execution belongs to its application increment. | Generated fields and action-conditioned receiving consequences reuse the same model/update mechanism. A physical case retains applied actuation and measured return, control cadence and reset provenance; a mixed-source task uses its actual cross-modal source relation. |
 | **6. Product hardening and consumer-hardware scale** | Extend development data and admitted task breadth from diagnosed results. Tune resident execution, representation, precision and placement; finish interruption, recovery, corruption handling and application ergonomics. | A repeatably usable local Athena build with inspectable task quality, latency/memory measurements, durable learning, clear failure returns and reproducible construction/data settings. |
 | **7. Executable interoperability and other backends** | Lower the assembled operation into an actual target graph/runtime or supported backend. Preserve state, parameters, numeric conversion, clocks and receiver defects. Optional inherited material enters through the admitted Soulkiller path. | A target runtime executes the requested model/function with a scoped native comparison, or returns the precise unsupported conversion. Package round-trip and a custom ONNX payload alone do not establish this result. |
 
@@ -157,16 +167,19 @@ return under the public session. Focused native composition/restart checks pass.
 recorded development split generated and saved, and its linked response was learned after
 reopen. The uninterrupted endpoint is byte-identical to the resumed endpoint; full-source episode
 assessment has returned failures for both text requests. The fixed receiving-port repair and
-structured math/code case are returned. The remaining work is useful contextual generation and
-its compact normal/common-source representation, not reimplementation of these components.
+structured math/code case are returned. The remaining work is the shared source/condition-family
+and receiving-consequence composition,
+including useful contextual generation and compact normal/common-source representation. These
+returned components remain its implementation material.
 
 [established-bounded; measured] Following the failed response through the actual learned maps
 found weak receiving margins, an under-resolved global solve after D changed, and repeated
 normal solve/validation work. The same record now carries the native material-step comparison,
 Chebyshev reflection and exact repeated-row reuse. Accurate replay of the controlled learned
 response improved from 18/388 to 187/388 observed characters; it remains incomplete. Continue
-the finite learned return from that corrected numerical operation and develop distinct admitted
-source families. A loosely enclosed candidate's apparently better text is not substituted for
+from that corrected numerical operation through the situated generator/receiving composition.
+Distinct admitted source families constrain reusable material and its requested consequence.
+A loosely enclosed candidate's apparently better text is not substituted for
 the accurate field result, and these controls do not close general contextual conversation.
 
 [definition] The [executable field campaign](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
@@ -188,12 +201,19 @@ has the following implementation position, in dependency order:
    HnaStream and the exposure/workbench caller retain source regions, actual joins,
    original receiver and pending delivery. Source and response extents are receiving apertures,
    not native clocks or alphabet-derived geometry.
-4. **Return actual episodes and reuse (#16/#18/#48).** Execute the existing recorded contextual,
-   mathematical and code episodes with their full admitted source and assessment. Use the existing
-   exact contextual/factor/mode and operative-program owners for applicable repeated actions;
-   retain and execute any necessary nonlinear remainder. Measure the constructed operation and
-   its generated consequence. The earlier helical/native returns and 78 checks are dependencies,
-   not substitute deliveries or a new test campaign to repeat.
+4. **Compose situated generator families and their receiving consequences (#17, then #16).**
+   The [concrete join](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition)
+   carries `native_source`/`formation` compatibility into the incident operation, preserving
+   `Delta_i=U_i q_i-q_r` and the actual target port. Consume the formed relation from a changed
+   source/receiver and retain the interior needed by admitted reactivation. A terminal face is
+   not a measured hidden reaction. Use existing exact/contextual/normal owners and their
+   resident counterparts where their domains match; retain nonlinear constraints otherwise.
+5. **Make that invocation economical and inspect its applications (#18/#61, #16/#48).**
+   Compact the actual normal source span with its prior complement, reuse producing field
+   actions and preserve common-source bounds. Bind applicable generator/receiver descent,
+   retaining and executing any nonlinear remainder. Inspect full contextual, mathematical
+   and code episodes at their actual receivers; robotics constrains the same section interfaces.
+   The returned helical/native examples and checks are dependencies, not a new campaign to repeat.
 
 [definition] Root owns the reaction/adjoint integration and final application. The bounded
 Luna assignments returned the global operative action/current transaction, boundary normal
@@ -390,10 +410,11 @@ consumer. Milestones are views of shared work; this section supplies the constru
    [field-session source map](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#field-session-source-map)
    names, per operation, the machinery to start from and the object that does not exist; the
    [owner-network record](../../research/records/2026-09-20_THE_FIELD_SESSION_JOIN_HAS_ITS_OWNER_NETWORK_AND_NAMED_ABSENCES.md)
-   retains the pre-port search and equations. The executable order and exact operands are the
-   [finalized field campaign](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
-   above: global D/b action, source/receiving material, incident-conditioned reaction, complete
-   derivative/publication, then the actual recorded episode consumer. #57/#58 and the geometric
+   retains the pre-port search and equations. The
+   [shared generator/receiving composition](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition)
+   consumes the returned global D/b action, source/receiving material, incident reaction
+   and complete derivative/publication; it carries compatibility and future reuse into the
+   actual application consumer. #57/#58 and the geometric
    forward/adjoint are returned dependencies. The previous row receipt and pageable-transfer
    repairs are retained hardware evidence; this campaign changes the global operator/state,
    rather than reopening a blanket claim that every existing row path is serial.
@@ -406,12 +427,14 @@ consumer. Milestones are views of shared work; this section supplies the constru
    (#50, #12–#15) remains at its structural-library consumers; it is not a prerequisite for this
    field's existing normal solve or boundary maps.
 
-[definition; agent-inferred] #17 owns the mathematical/consumer join, #61 its hardware
+[definition; agent-inferred] #17 owns the shared generator/receiving join, #61 its hardware
 realization, #59 the durable source boundary, and #16 the episode return. #57/#58 are completed
 operator dependencies, not new work queues. This division follows distinct owned operations
 and lets each issue close on its stated return without declaring the application complete.
-The returned helical compression caller (#48) supplies its source/receiver law to matching field
-operations; broader helical geometry keeps its independently stated scope. No full identity
+The robotics observation/action contract is a receiving requirement of this shared work,
+not a separate learner or an immediate simulator task. The returned helical compression caller
+(#48) supplies its source/receiver law to matching field operations; broader helical geometry
+keeps its independently stated scope. No full identity
 catalogue, complete device specialization or Millennium endpoint gates this return.
 
 [established-bounded; source-inspected] Wave 10's 0.220 s rank/kernel and 14.119 s rigidity figures

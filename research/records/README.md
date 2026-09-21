@@ -25,6 +25,24 @@ Read [HOLON](../../docs/HOLON.md), [HNN_FORMULA](../../docs/HNN_FORMULA.md) and 
 Start in `holonics-hna::NativeCoupledBody`, `native/field_session` and the native constitutive
 field/source/current owners. The model's actual caller decides whether a helper is connected.
 
+## Situated modes, recall, predictive release and action
+
+Read the [shared generator/action law](../../docs/HOLON.md#situated-generator-inference-dormant-modes-and-action)
+and [participating receiver](../../docs/RECEIVER_HOLARCHY.md). These are the starting route for
+communication, dormant availability, homeostasis, control and robotics as well as recall.
+
+- [Prediction is prepared transport and release is boundary current](2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md): source families, admissible action inference, physical preparation and coupled flux/storage.
+- [Situated generators retain modes and release action](2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md): rotor/Bombe constraint inference, recurrent availability, exact simulator boundaries, Flash source corrections and the incident compatibility consumer.
+- [Rubik faces lift to torus intersections and navigation](2026-09-19_RUBIK_FACES_LIFT_TO_TORUS_INTERSECTIONS_AND_NAVIGATION_GRAPHS.md): actual move words, quotient faces and retained full-state fibres.
+
+`Foundation/Standing` and `CausalRelevance` retain future sufficiency and present reconstruction;
+`receiver_release`, exact contextual/kernel modes and native `field/internal_mode` give their
+specified realizations. The latter's equal-drive law does not cover every operative current.
+HNA `field_session/native_source` and `body/field/formation` already form and reuse condition
+families. Follow the [incident composition](../../docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition)
+for their full-field consumer and the [simulation boundary](../../docs/HARDWARE_AND_MODALITY_BOUNDARIES.md#robotics-and-simulation-boundary)
+for observation/actuation contracts.
+
 ## Polarized distinctions, pathways and compression/intelligence/navigation
 
 Read [binary state and oriented passage](../../docs/HOLONIC_NOTATION.md#arrows-signs-and-turns),
@@ -89,6 +107,7 @@ Read [constraint modes and active faces](../../docs/CONSTRAINT_MODES_AND_RECEIVE
 - [Landmarks and moduli](2026-08-20_LANDMARKS_AND_MODULI.md): period, modulus, doubling and branch relations.
 - [π and e have oriented constraint-generator faces](2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md): independent generators, phase lifts and certified receiving windows.
 - [The golden reciprocal joins Gamma, zeta and spoke gaps](2026-09-12_GOLDEN_RECIPROCAL_JOINS_GAMMA_ZETA_AND_SPOKE_GAPS.md): concrete shared relations and their distinct source families.
+- [Polylogarithms and finite quantum dilogarithms](2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md#polylogarithms-and-finite-quantum-dilogarithms): existing classical golden special values, the supplied real-quadratic paper, finite character composition and its nonzero pentagon defect; a source comparison, not a native binding claim.
 
 `LandmarksAndModuli`, `Farey`, `Polarity`, `PiIterationConstraint`, `MachinPhaseConstraint` and
 `winding_inertia` precede the new identity atlas. Copson's tail coefficient and the Newman
@@ -104,6 +123,7 @@ Read [helical geometry](../../docs/HELICAL_GEOMETRY.md), [the Holon](../../docs/
 - [The geometric field refines and returns its complete paired current](2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md): the actual geometric field consumer and its situated-pair moment/phase reuse.
 - [Rubik faces lift to torus intersections and navigation](2026-09-19_RUBIK_FACES_LIFT_TO_TORUS_INTERSECTIONS_AND_NAVIGATION_GRAPHS.md): a configuration as a receiver face with its source fibre and generators.
 - [Siphonophore holons and recursive entropic cycles](2026-09-19_SIPHONOPHORE_HOLONS_RESOLVE_ORGANISM_IDENTITY_THROUGH_RECURSIVE_ENTROPIC_CYCLES.md): whole/part identity and the physical conditions of the organ interpretation.
+- [A brief Flash session reports the bilateral screw correspondence](2026-09-21_A_BRIEF_FLASH_SESSION_REPORTS_THE_BILATERAL_SCREW_CORRESPONDENCE_AND_PROPOSES_EXACT_CASCADE_EXPERIMENTS.md): pattern-recognition testimony joining port/cascade, period/monodromy, Hodge/NS, arithmetic and group navigation. Read its attached source corrections: the claimed absence of `Horizon.smith` was false; proposed experiments do not set construction order.
 
 Start with exact frames/screws, `ScrewGeometry`, the existing torus/connection/simplicial owners,
 contact variation and the moment receiver. The last two records supply research context; they
@@ -118,6 +138,7 @@ Read [the fluid construction](../../docs/HOLONIC_FLUID_CONSTRUCTION.md),
 - [Changing constitution and receivers share one defect calculus](2026-09-08_CHANGING_CONSTITUTION_AND_RECEIVERS_SHARE_ONE_DEFECT_CALCULUS.md): actual mixed terms and transported residuals.
 - [Boundary flux couples active interiors](2026-09-08_BOUNDARY_FLUX_COUPLES_ACTIVE_INTERIORS_AND_TOLERANCE_IS_RECEIVER_RELATIVE.md): boundary, storage, relevance and tolerance.
 - [Swing, stress and interior feedback form the fluid construction](2026-09-14_SWING_STRESS_AND_INTERIOR_FEEDBACK_FORM_THE_FLUID_CONSTRUCTION.md): the constitutive/fluid and Hodge owners that the model can consume.
+- [A brief Flash session reports the bilateral screw correspondence](2026-09-21_A_BRIEF_FLASH_SESSION_REPORTS_THE_BILATERAL_SCREW_CORRESPONDENCE_AND_PROPOSES_EXACT_CASCADE_EXPERIMENTS.md): the same testimony read across the Hodge and fluid instances, including the pressure-elimination reading and the exact-experiment proposals.
 
 These connect `ChangingReceiver`, `ConstitutiveModulation`, Hodge decomposition/realization,
 actual Galerkin Euler/NS and native source reflection. A shared equation retains its source and
