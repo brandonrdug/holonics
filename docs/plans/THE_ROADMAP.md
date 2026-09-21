@@ -144,16 +144,24 @@ of the machine. The source/condition, generator and receiving work below is one 
 operation. The [September 12–13 correction](../../research/records/2026-09-13_GENERATOR_MEANING_AND_CAMPAIGN_DRIFT_AUDIT.md)
 already distinguishes that work from code printing, generic cause/effect and repeated small assays.
 
+[definition] Encoding and receiving are established parts of Holonics. The remaining Athena
+connection is at `field_session/geometric.rs`: its source width/unit currents and target/readout
+still follow the supplied alphabet. `geometric_word` already computes normalized participation,
+constituted reaction, held-boundary iteration and their complete fixed-operand adjoint. Here
+“normalized” refers to the participation weights summing to one. It does not name a new
+foundation or an operation still to be invented.
+
 [definition] The immediate implementation order is:
 
-1. **Source/condition in normalized whole-field refinement (#17).** Continue from
-   `NativeFieldSession::from_native_field` and the returned incident restriction. Compose that
-   preparation inside `body/field/geometric.rs::geometric_word` and its session caller, carrying
-   the continuing global current. Source/incident differences and normalized participation have
-   distinct charts; their actual dependence and complete covectors enter the same reaction word.
-   Preserve any enclosing source/condition families when refining beyond the exact point port.
-   The [source/condition construction](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-source-and-condition-construction)
-   and its native helical return supply the current owners and known residuals.
+1. **Specify and connect the reaction charts and continuing joint state (#17).** The existing
+   geometric call uses `y=Σ p_i U_i x_i` and `Φ(y,p)`; `from_native_field` uses source `x_r` and
+   incident differences `Δ_i=U_i x_i−x_r`. Derive the source/condition map and its relation to
+   producing M before substituting either feature chart. This mathematical join is not settled
+   by sharing `NativeCoupledBody` or matching widths. Then carry the full reflected joint rows
+   between stages and requests: `geometric_word` currently restricts to boundary components,
+   reuses its initial internal b, and returns a preview. Preserve source/condition enclosures
+   and the complete variation. The [source/condition construction](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-source-and-condition-construction)
+   owns this binding and its remaining choice.
 2. **Use the formed operation in that same body (#17/#16, #19 where D/incidence changes).**
    Execute the inferred source-conditioned generator and receive its joint consequence through
    the actual receiving map. A continuing invocation carries the field current/interior and
@@ -171,10 +179,11 @@ returned dependencies at a selected exact-current receiving junction: incident s
 original-condition formation, an inferred helical bracket and its new-source condition-family
 image, reusable contextual section and factored preparation. See the
 [return](../../research/records/2026-09-20_NATIVE_INCIDENCE_FORMS_AND_REUSES_THE_HELICAL_GENERATOR.md).
-The next composition applies those same owners inside the normalized whole-field word and its
-continuing global current. The word's participation p and incident differences c remain distinct
-operands with their own variations. Actual Athena source/receiver encoding and dense normal
-factor adaptation remain #17/#16 and #18 respectively.
+The next composition relates those source/condition/material charts and carries the full joint
+state in the existing geometric iteration. Athena's call from source inscriptions to the
+established passage representation and back through its receiver remains #17/#16; this is an
+unfinished application connection, not an absence of encoding foundations. Dense normal factor
+adaptation remains #18.
 
 The mathematical workshop, field model and source/evaluation interfaces already exist. This
 order composes their actual owners and preserves their known results; it does not restart their

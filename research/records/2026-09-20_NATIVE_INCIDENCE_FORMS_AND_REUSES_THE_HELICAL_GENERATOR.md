@@ -137,3 +137,12 @@ of incident differences. Source/receiver representation for actual Athena episod
 Encoding remains work in #17/#16. #18 still owns dense-statistic and validated-rest cost; #19 owns
 additional D/contact variation. This returned library inference is a dependency for those
 operations, not a report of general conversation or a new implementation of screw geometry.
+
+[definition] Clarification of the campaign summary: “source/receiver encoding remains open”
+was too broad. The encoding/receiving laws and concrete constructions cited above exist. The
+unfinished application is Athena's alphabet-derived `prepare_geometric` and basis readout, which
+do not consume the new formation path. “Normalized whole-field refinement” also concealed
+already-returned computation: the geometric loop and its adjoint exist. The unresolved joins are
+`Φ(y,p)` versus `Φ(x_r,Δ)` and the continued full joint state; the loop currently reuses its
+initial b, restricts reflected rows to the boundary and returns a preview. The roadmap now names
+those operations and does not present the chart relation as a finalized implementation choice.

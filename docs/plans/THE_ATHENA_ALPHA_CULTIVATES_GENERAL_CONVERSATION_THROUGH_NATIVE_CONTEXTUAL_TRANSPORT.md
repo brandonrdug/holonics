@@ -1225,9 +1225,19 @@ pre-target resident packet. `form_native_reaction` binds the original source/con
 compatibility and normal formation; `condition_family_image` carries the returned family to
 another source. [The helical generator return](../../research/records/2026-09-20_NATIVE_INCIDENCE_FORMS_AND_REUSES_THE_HELICAL_GENERATOR.md) supplies the
 inferred relation and its native use. `found`/`prepare_geometric` remain the legacy symbol
-presentation. The next join carries this native source/condition operation into the normalized
-whole-field word and its continuing global current. Its old participation-vector condition is
-not the incident-difference chart. Binary polarized faces remain legitimate source presentations;
+presentation. Its `geometric_word` already executes `y=Σ p_i U_i x_i`, `Φ(y,p)`, fixed-D
+reflection and held-boundary iteration, with the complete paired return. The unfinished relation
+is between that material/source chart and the new `Φ(x_r,Δ)`, where `Δ_i=U_i x_i−x_r`; sharing a
+body type does not define the conversion or license reusing M under a different meaning. That
+mapping remains to be derived. The current word also retains only boundary coordinates between
+stages, reuses the original internal b and returns a preview. Continuing execution needs its
+full joint rows and publication through the same owner.
+
+[definition] Holonic Encoding and receiving already have their [construction](../../research/records/2026-09-11_HOLONIC_ENCODING_RETAINS_TRANSFORMATION_GRAIN_ACROSS_MODALITIES.md),
+`ReceiverHistoryCompression`, `HolonicCultivationCharts.AutoencodingChart`, factor/receiver
+operations and concrete helical encoder/decoder. The unfinished Athena source/receiver call
+must apply these at its actual admitted transformation and receiving scope. It is not a request
+to invent encoding, delay it as a separate subsystem, or treat every native output as unencoded. Binary polarized faces remain legitimate source presentations;
 musical examples prescribe no computational unit names.
 
 [project-postulate] This section implements local restrictions of the whole causal situation
