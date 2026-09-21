@@ -922,6 +922,8 @@ retains its original execution. Current position is in the state, order in the r
 
 | Operation at the consuming call | Available owner / return | Remaining composition |
 |---|---|---|
+| Pre-target source and condition (#17) | `A/field_session/{incidence,native_source}.rs`; actual field width, analytic incoming phases, common factored restriction `s=x_r`, `c_i=U_i x_i−x_r` | The exact-current selected-junction attachment is returned. Connect it to normalized whole-field refinement and actual Athena source/receiver preparation |
+| Generator formation and condition-family continuation (#17/#16) | `A/coupled_wave/body/field/formation.rs`; `receive_reaction_observation_at`; `contextual_section` and `field_condition_image` | Exact inferred helical bracket, regularized joint field and reusable contextual section are [returned](../../research/records/2026-09-20_NATIVE_INCIDENCE_FORMS_AND_REUSES_THE_HELICAL_GENERATOR.md); dense normal factor adaptation remains #18 |
 | Participation `a_FG[Ψ]` (#17) | `A/field_geometry.rs` compiles validated analytic incidence/U; `C/field/receiver/normalized/phase.rs` consumes the existing normalized receiver for `s_j=β Re⟨q,U_j k_j⟩` | Broader source and participating-receiver formation through the same field; supplied U/geometry are explicit operands |
 | `δa·UΨ`, return to the condition (#17) | `A/coupled_wave/body/field/geometric.rs` retains query, transported neighbors, normalized report and reaction at each stage; both phase and bilinear covectors return through M* and fixed-D reflection | Changing geometry/U/D requires their additional variation; current fixed-operand derivative is implemented |
 | Source⊗condition and enclosure refinement (#17) | `C/field/material_transport/normal/direct/section/composition.rs`; `K/enclosure_composition.cuh`; `A/field_session/geometric.rs` | Finite whole-field held refinement is returned. A committed continuing global current and nonlinear word compression remain distinct work |
@@ -1216,13 +1218,17 @@ remain the final codec; the present generator already advances before it is deco
 
 ### The source and condition construction
 
-[definition] This is the next attachment in the current field session. `NativeFieldSession::found`
-and `prepare_geometric` currently let alphabet dimensions and flattened symbol positions choose
-the founding/preparation chart. The replacement derives that declaration and the restrictions
-below from the actual constituted field, participating source/receiver and pre-target resident
-state. The geometric/adjoint ports and the existing mathematical workshop are returned dependencies;
-the inferred generator must be consumed by the same continuing body. Binary polarized faces
-remain legitimate source presentations. Musical examples prescribe no computational unit names.
+[established-bounded; source-inspected] The exact native attachment is returned:
+`NativeFieldSession::from_native_field`, `field_session/incidence.rs` and `native_source.rs`
+derive the width from the actual field and construct `s=x_r`, `c_i=U_(r←i)x_i−x_r` from one
+pre-target resident packet. `form_native_reaction` binds the original source/condition to
+compatibility and normal formation; `condition_family_image` carries the returned family to
+another source. [The helical generator return](../../research/records/2026-09-20_NATIVE_INCIDENCE_FORMS_AND_REUSES_THE_HELICAL_GENERATOR.md) supplies the
+inferred relation and its native use. `found`/`prepare_geometric` remain the legacy symbol
+presentation. The next join carries this native source/condition operation into the normalized
+whole-field word and its continuing global current. Its old participation-vector condition is
+not the incident-difference chart. Binary polarized faces remain legitimate source presentations;
+musical examples prescribe no computational unit names.
 
 [project-postulate] This section implements local restrictions of the whole causal situation
 specified above. Source-null contrasts diagnose a declared receiver's lost distinctions; they
@@ -1274,7 +1280,7 @@ only afterward does condition preimage/contact prepare the successor. In
 `read_wave_relation_in_chart(..., None)`, None reads the standing resident condition; it does
 not mean an unconditioned generator or a missing forecast argument.
 
-[definition] The first attachment must supply resident maps `s=A x_pre`, `c=C x_pre`, with
+[definition] The native attachment supplies resident maps `s=A x_pre`, `c=C x_pre`, with
 x_pre the participating source/preparation state before the target arrives. A and C are the
 declared source/context restrictions constructed from admitted incidence and developmental
 contrasts. Their rows, reference offsets and widths enter the existing current/section ports.

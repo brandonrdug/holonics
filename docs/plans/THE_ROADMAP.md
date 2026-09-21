@@ -146,13 +146,14 @@ already distinguishes that work from code printing, generic cause/effect and rep
 
 [definition] The immediate implementation order is:
 
-1. **Source/condition attachment (#17).** Change `NativeFieldSession::found` and
-   `prepare_geometric` so the actual field, source and receiver determine the native model
-   declaration. Bind pre-target resident preparation through `s=A x_pre`, `c=C x_pre` to the
-   existing contextual-section, condition-preimage/contact and neighborhood formation owners.
-   The [existing construction](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-source-and-condition-construction)
-   specifies the source-null contrast and the inferred relation; accepting caller-authored maps
-   or choosing a larger alphabet does not complete it.
+1. **Source/condition in normalized whole-field refinement (#17).** Continue from
+   `NativeFieldSession::from_native_field` and the returned incident restriction. Compose that
+   preparation inside `body/field/geometric.rs::geometric_word` and its session caller, carrying
+   the continuing global current. Source/incident differences and normalized participation have
+   distinct charts; their actual dependence and complete covectors enter the same reaction word.
+   Preserve any enclosing source/condition families when refining beyond the exact point port.
+   The [source/condition construction](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-source-and-condition-construction)
+   and its native helical return supply the current owners and known residuals.
 2. **Use the formed operation in that same body (#17/#16, #19 where D/incidence changes).**
    Execute the inferred source-conditioned generator and receive its joint consequence through
    the actual receiving map. A continuing invocation carries the field current/interior and
@@ -164,6 +165,16 @@ already distinguishes that work from code printing, generic cause/effect and rep
    that same generator; keep the required nonlinear/receiver remainder. The current source,
    receiver and pending returns determine what must survive. Compression accompanies useful
    inference/generation; it is not a later independent codec project or a universal inverse gate.
+
+[established-bounded; source-inspected] The September 20 native source attachment supplies the
+returned dependencies at a selected exact-current receiving junction: incident source/condition restrictions,
+original-condition formation, an inferred helical bracket and its new-source condition-family
+image, reusable contextual section and factored preparation. See the
+[return](../../research/records/2026-09-20_NATIVE_INCIDENCE_FORMS_AND_REUSES_THE_HELICAL_GENERATOR.md).
+The next composition applies those same owners inside the normalized whole-field word and its
+continuing global current. The word's participation p and incident differences c remain distinct
+operands with their own variations. Actual Athena source/receiver encoding and dense normal
+factor adaptation remain #17/#16 and #18 respectively.
 
 The mathematical workshop, field model and source/evaluation interfaces already exist. This
 order composes their actual owners and preserves their known results; it does not restart their

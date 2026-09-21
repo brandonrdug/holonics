@@ -119,6 +119,17 @@ session payloads carry those witnesses and the existing stream cursor. The
 [field-session return](../research/experiments/athena_field/session/README.md) maps measured text,
 context, update, restart and cost scopes to those owners.
 
+[established-bounded; source-inspected] `NativeFieldSession::from_native_field` now attaches an
+actual constituted field through `field_session/{incidence,native_source}.rs`. The source/condition
+are restrictions of one pre-target resident current packet at analytic incidence. The existing
+rank factorization and resident bilinear map compile that common restriction. `body/field/formation.rs`
+uses the original c for both normal and compatibility formation, while condition contact returns
+the contemporary successor. `field_condition_image` transports the full retained condition fibre
+to another source; `NativeSourceSavedSession` carries pending preparations and the same field body.
+The [helical generator consumer](../research/records/2026-09-20_NATIVE_INCIDENCE_FORMS_AND_REUSES_THE_HELICAL_GENERATOR.md) exercises exact relation inference,
+regularized reaction, contextual reuse and a new-source plural image. The normalized geometric
+word below still uses its separate supplied symbol presentation.
+
 [established-bounded; source-inspected] The geometric source chart follows a separate consuming
 route through `GeometricFieldSpec::compile`, `native/field_session/geometric.rs` and
 `coupled_wave/body/field/geometric.rs`. Its grouped query/neighbor phase gathers, resident

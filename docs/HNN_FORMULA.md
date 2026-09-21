@@ -807,3 +807,20 @@ The existing public session then exposes this operation to the task's encoded re
 output. The blueprint specifies this integration; its completion is judged from the invoked
 model and actual generated product, with its accuracy and execution costs. Broad conversation
 development uses that model instead of replacing it with a fixed-field fitting experiment.
+
+## Native incident source and condition
+
+[definition; agent-inferred] The exact native session attaches an actual field and one analytic
+receiving junction. Its source restriction is `s=x_r`; each admitted condition component is
+`c_i=U_(r←i)x_i−x_r`, from the same pre-target preparation. Thus `x_i=U_(r←i)^−1(s+c_i)` on these
+participating ports. The existing exact factor/receiver owner compiles `[A;C]=D E`. This condition
+chart is distinct from the participation vector p in the geometric word above.
+
+[established-bounded; source-inspected] `NativeFieldSession::form_native_reaction` deposits
+`(Phi(s,c),y)` and the normal sufficient statistics at the original c. Condition-preimage contact
+independently returns contemporary standing and the retained family. Generation uses
+`S_D(s+M Phi(s,c),b)`; `condition_family_image` transports the complete inferred condition family
+through R at another s. [The helical consumer](../research/records/2026-09-20_NATIVE_INCIDENCE_FORMS_AND_REUSES_THE_HELICAL_GENERATOR.md) infers the existing
+screw bracket from its source constraints, reuses the source-null section, and retains the
+new-source ambiguity. The full normalized geometric word/Encoding attachment remains the next
+consumer; this exact point port does not replace an enclosing phase family with its centre.

@@ -56,30 +56,34 @@ impl<'c> NativeFieldSession<'c> {
         if request.partial.is_some() && !request.text.is_empty() {
             return Err(invalid("supply text or partial regions, not both"));
         }
-        let partial = match &request.partial {
-            Some(parts) => parts
-                .iter()
-                .map(|p| {
-                    p.as_ref()
-                        .map(|s| {
-                            self.chart.alphabet().symbol_of(s).ok_or_else(|| {
+        let partial =
+            match &request.partial {
+                Some(parts) => {
+                    parts
+                        .iter()
+                        .map(|p| {
+                            p.as_ref()
+                                .map(|s| {
+                                    self.presentation.chart.alphabet().symbol_of(s).ok_or_else(|| {
                                 invalid("partial region must name one declared codec symbol")
                             })
+                                })
+                                .transpose()
                         })
-                        .transpose()
-                })
-                .collect::<Result<Vec<_>>>()?,
-            None => self
-                .spec
-                .symbols_of(&self.chart, &request.text)?
-                .into_iter()
-                .map(Some)
-                .collect(),
-        };
+                        .collect::<Result<Vec<_>>>()?
+                }
+                None => self
+                    .presentation
+                    .spec
+                    .symbols_of(&self.presentation.chart, &request.text)?
+                    .into_iter()
+                    .map(Some)
+                    .collect(),
+            };
         let output_symbols = request.output_symbols.unwrap_or(partial.len());
         if output_symbols == 0
-            || output_symbols > self.spec.section_symbols
-            || partial.len() > self.spec.section_symbols
+            || output_symbols > self.presentation.spec.section_symbols
+            || partial.len() > self.presentation.spec.section_symbols
         {
             return Err(invalid(
                 "source/receiver exceeds its declared section aperture",
@@ -88,21 +92,26 @@ impl<'c> NativeFieldSession<'c> {
         let context = request
             .context
             .iter()
-            .map(|s| self.spec.symbols_of(&self.chart, s))
+            .map(|s| {
+                self.presentation
+                    .spec
+                    .symbols_of(&self.presentation.chart, s)
+            })
             .collect::<Result<Vec<_>>>()?
             .into_iter()
             .flatten()
             .collect::<Vec<_>>();
-        if context.len() > self.spec.context_symbols {
+        if context.len() > self.presentation.spec.context_symbols {
             return Err(invalid("context exceeds its declared source aperture"));
         }
         let prefix = context.len();
         let mut source = context.into_iter().map(Some).collect::<Vec<_>>();
         source.extend(partial.iter().copied());
         source.resize(prefix + partial.len().max(output_symbols), None);
-        let symbols = self.spec.symbols.len();
-        let local = 6 * self.spec.shared_extents()?.0;
+        let symbols = self.presentation.spec.symbols.len();
+        let local = 6 * self.presentation.spec.shared_extents()?.0;
         let center_slot = self
+            .presentation
             .spec
             .region_offsets
             .iter()
@@ -119,7 +128,9 @@ impl<'c> NativeFieldSession<'c> {
         let mut destinations = Vec::new();
         for i in 0..output_symbols {
             if let Some(Some(symbol)) = partial.get(i) {
-                given[2 * (i * symbols + self.chart.coordinates()[symbol.0 as usize])] = (1, 1);
+                given[2
+                    * (i * symbols + self.presentation.chart.coordinates()[symbol.0 as usize])] =
+                    (1, 1);
             }
             let fixed = request.partial.is_some() && partial.get(i).is_some_and(Option::is_some);
             held[i * symbols..(i + 1) * symbols].fill(fixed);
@@ -135,13 +146,14 @@ impl<'c> NativeFieldSession<'c> {
         ];
         for (row, destination) in destinations.iter().enumerate() {
             let origin = prefix + destination;
-            for (slot, offset) in self.spec.region_offsets.iter().enumerate() {
+            for (slot, offset) in self.presentation.spec.region_offsets.iter().enumerate() {
                 let at = origin.checked_add_signed(*offset);
                 let active = at.is_some_and(|at| at < source.len());
                 let observed = at.and_then(|at| source.get(at)).copied().flatten();
                 let start = row * local + 2 * slot * (symbols + 2);
                 if let Some(symbol) = observed {
-                    rows[start + 2 * self.chart.coordinates()[symbol.0 as usize]] = (1, 1);
+                    rows[start + 2 * self.presentation.chart.coordinates()[symbol.0 as usize]] =
+                        (1, 1);
                 }
                 let a = i64::from(active);
                 let o = i64::from(observed.is_some());
@@ -192,7 +204,7 @@ impl<'c> NativeFieldSession<'c> {
                 "a retained comparison requires at least one free receiving position",
             ));
         }
-        let grain = ResidentGrain(self.spec.fractional_bits);
+        let grain = ResidentGrain(self.presentation.spec.fractional_bits);
         let given =
             ResidentNormalInput::from(ResidentConstitutiveCurrent::integers(&prepared.given)?)
                 .enclosure(self.surface, grain)?;
@@ -213,16 +225,16 @@ impl<'c> NativeFieldSession<'c> {
                 given
             };
         let generation_us = generation.elapsed().as_micros();
-        let chart = self.chart.receiver(self.surface)?;
+        let chart = self.presentation.chart.receiver(self.surface)?;
         let selections = received
             .view()
             .read_basis_sections(&chart, prepared.output_symbols)?
             .selections()?;
         let symbols = selections
             .iter()
-            .map(|r| self.spec.symbols[r.selected].clone())
+            .map(|r| self.presentation.spec.symbols[r.selected].clone())
             .collect::<Vec<_>>();
-        let (text, bytes, decode_error) = match self.spec.codec {
+        let (text, bytes, decode_error) = match self.presentation.spec.codec {
             FieldTextCodec::Utf8Nibbles => {
                 let codes = selections
                     .iter()
@@ -245,11 +257,11 @@ impl<'c> NativeFieldSession<'c> {
             FieldTextCodec::WhitespaceWords => (Some(symbols.join(" ")), None, None),
         };
         let comparison = if request.retain_comparison {
-            let id = self.issued_shared;
-            self.issued_shared = id
+            let id = self.presentation.issued_shared;
+            self.presentation.issued_shared = id
                 .checked_add(1)
                 .ok_or_else(|| invalid("shared-source comparison identifiers exhausted"))?;
-            self.retained_shared.insert(
+            self.presentation.retained_shared.insert(
                 id,
                 RetainedSharedSource {
                     request: request.clone(),
@@ -268,7 +280,7 @@ impl<'c> NativeFieldSession<'c> {
             "text":text,"output_bytes":bytes,"decode_error":decode_error,"symbols":symbols,"selections":selections,
             "comparison":comparison,"committed":false,"producing_epoch":self.body.epoch(),
             "output_symbols":prepared.output_symbols,"generated_positions":prepared.destinations,
-            "source_chart":"shared-regions","local_complex":self.spec.shared_extents()?.0*3,
+            "source_chart":"shared-regions","local_complex":self.presentation.spec.shared_extents()?.0*3,
             "generation_us":generation_us,"elapsed_us":start.elapsed().as_micros(),
             "selection_bound":selections.first().map(|v|v.score_radius.clone())}),
         )
@@ -282,8 +294,10 @@ impl<'c> NativeFieldSession<'c> {
         text: &str,
         step_bits: u32,
     ) -> Result<Value> {
-        if self.spec.source_chart == FieldSourceChart::GeometricRegions { return self.observe_geometric_source(request,text,step_bits,true); }
-        if self.spec.source_chart != FieldSourceChart::SharedRegions {
+        if self.presentation.spec.source_chart == FieldSourceChart::GeometricRegions {
+            return self.observe_geometric_source(request, text, step_bits, true);
+        }
+        if self.presentation.spec.source_chart != FieldSourceChart::SharedRegions {
             return Err(invalid("observe-field-source requires shared-regions"));
         }
         let prepared = self.prepare_shared(request)?;
@@ -301,6 +315,7 @@ impl<'c> NativeFieldSession<'c> {
         step_bits: u32,
     ) -> Result<Value> {
         let retained = self
+            .presentation
             .retained_shared
             .get(&id)
             .ok_or_else(|| invalid("unknown retained shared-source comparison"))?
@@ -312,7 +327,7 @@ impl<'c> NativeFieldSession<'c> {
             ));
         }
         let mut returned = self.observe_prepared(&prepared, &retained.request, text, step_bits)?;
-        self.retained_shared.remove(&id);
+        self.presentation.retained_shared.remove(&id);
         returned["comparison"] = json!(id);
         returned["producing_epoch"] = json!(retained.producing_epoch);
         returned["applied_epoch"] = json!(self.body.epoch());
@@ -328,26 +343,29 @@ impl<'c> NativeFieldSession<'c> {
         step_bits: u32,
     ) -> Result<Value> {
         let start = Instant::now();
-        let target = self.spec.symbols_of(&self.chart, text)?;
+        let target = self
+            .presentation
+            .spec
+            .symbols_of(&self.presentation.chart, text)?;
         if target.len() != prepared.output_symbols {
             return Err(invalid(
                 "target does not match the requested receiving extent",
             ));
         }
         let held_disagreements=request.partial.as_ref().map(|parts|parts.iter().take(target.len()).enumerate()
-            .filter_map(|(i,value)|value.as_ref().and_then(|value|(self.chart.alphabet().symbol_of(value)!=Some(target[i]))
-                .then(||json!({"position":i,"given":value,"target":self.spec.symbols[target[i].0 as usize]})))).collect::<Vec<_>>()).unwrap_or_default();
+            .filter_map(|(i,value)|value.as_ref().and_then(|value|(self.presentation.chart.alphabet().symbol_of(value)!=Some(target[i]))
+                .then(||json!({"position":i,"given":value,"target":self.presentation.spec.symbols[target[i].0 as usize]})))).collect::<Vec<_>>()).unwrap_or_default();
         if prepared.destinations.is_empty() {
             return Ok(
                 json!({"scope":"shared-field-source-observation","rows":0,"parameter_update":"zero: all receiving positions supplied","held_disagreements":held_disagreements,"anatomy":self.inspect()}),
             );
         }
-        let local = 6 * self.spec.shared_extents()?.0;
+        let local = 6 * self.presentation.spec.shared_extents()?.0;
         let mut values = vec![(0i64, 0i64); local * prepared.destinations.len()];
         for (row, i) in prepared.destinations.iter().enumerate() {
             values[row * local
                 + prepared.center.start
-                + 2 * self.chart.coordinates()[target[*i].0 as usize]] = (1, 1);
+                + 2 * self.presentation.chart.coordinates()[target[*i].0 as usize]] = (1, 1);
         }
         let target = self
             .surface

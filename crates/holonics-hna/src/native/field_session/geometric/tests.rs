@@ -143,7 +143,7 @@ fn loss(field: &ResidentNormalEnclosureSection<'_>) -> Rat {
 fn geometric_word_paired_return_matches_a_directional_source_comparison() {
     with_field_session(&spec(), |s| {
         s.observe_source(&request(false), "aabb", 8)?;
-        let layout = s.spec.geometry.as_ref().unwrap().compile()?;
+        let layout = s.presentation.spec.geometry.as_ref().unwrap().compile()?;
         let held = vec![false; layout.rows * 3];
         let observed = vec![true; layout.rows * 3];
         let raw = s

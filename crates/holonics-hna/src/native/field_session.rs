@@ -1,9 +1,11 @@
-//! Whole-section text reception over the existing constituted-field model.
-//! Text segmentation and symbol exhibition are exterior codecs. The native model receives
-//! complete unit-basis sections and an ordered context tensor, and learns its own D/M action.
+//! Source-qualified sessions over one constituted-field model.
+//! Native incidence prepares resident currents directly; the retained text presentations
+//! supply their explicitly declared symbol charts.
 use super::section_input::SymbolCurrentChart;
-mod shared;
 mod geometric;
+mod incidence;
+mod native_source;
+mod shared;
 use super::{NativeCoupledBody, NativeFieldReactionPort, NativeSessionError, SavedCoupledBody};
 use crate::{HnaStream, HnaStreamState, PublicationReceipt, publish_new};
 use holonic_engine::{
@@ -16,6 +18,8 @@ use holonic_engine::{
     },
     resident_section::{ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface},
 };
+pub use incidence::{NativeFieldIncidence, NativeFieldIncidenceDeclaration, NativeFieldIncomingArc, NativeFieldOmittedSelfComparison, PreparedFieldIncidence};
+pub use native_source::*;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use std::{
@@ -229,12 +233,20 @@ impl FieldSectionRequest {
 }
 impl FieldSessionSpec {
     fn chart(&self) -> Result<SymbolCurrentChart> {
-        if self.source_chart != FieldSourceChart::GeometricRegions && self.geometry.is_some() { return Err(invalid("geometric standing requires the geometric source chart")); }
+        if self.source_chart != FieldSourceChart::GeometricRegions && self.geometry.is_some() {
+            return Err(invalid(
+                "geometric standing requires the geometric source chart",
+            ));
+        }
         if self.section_symbols == 0 || !(1..=120).contains(&self.fractional_bits) {
             return Err(invalid("field section extent/grain"));
         }
         if self.codec == FieldTextCodec::Utf8Nibbles
-            && (self.symbols.len() != 16 || !matches!(self.source_chart, FieldSourceChart::SharedRegions | FieldSourceChart::GeometricRegions))
+            && (self.symbols.len() != 16
+                || !matches!(
+                    self.source_chart,
+                    FieldSourceChart::SharedRegions | FieldSourceChart::GeometricRegions
+                ))
         {
             return Err(invalid(
                 "UTF-8 nibble codec requires sixteen declared symbols and shared-regions",
@@ -413,11 +425,16 @@ fn validate_exposure_pairing(
     Ok(())
 }
 
-pub struct NativeFieldSession<'c> {
+/// One body with a source presentation. Text remains the default API specialization.
+pub struct NativeFieldSession<'c, P = FieldTextPresentation> {
     surface: &'c ResidentSurface<'c>,
+    body: NativeCoupledBody<'c>,
+    presentation: P,
+}
+/// The existing text/control source and its receiving bookkeeping.
+pub struct FieldTextPresentation {
     spec: FieldSessionSpec,
     chart: SymbolCurrentChart,
-    body: NativeCoupledBody<'c>,
     compiled_geometry: Option<std::rc::Rc<super::field_geometry::CompiledFieldGeometry>>,
     pending_extents: BTreeMap<u64, usize>,
     retained_shared: BTreeMap<u64, RetainedSharedSource>,
@@ -494,41 +511,57 @@ impl<'c> NativeFieldSession<'c> {
         .map_err(|r| r.reason)?;
         Ok(Self {
             surface,
-            compiled_geometry: spec.geometry.as_ref().map(|g|g.compile().map(std::rc::Rc::new)).transpose()?,
-            spec: spec.clone(),
-            chart,
             body,
-            pending_extents: BTreeMap::new(),
-            retained_shared: BTreeMap::new(),
-            issued_shared: 0,
-            exposure: None,
+            presentation: FieldTextPresentation {
+                compiled_geometry: spec
+                    .geometry
+                    .as_ref()
+                    .map(|g| g.compile().map(std::rc::Rc::new))
+                    .transpose()?,
+                spec: spec.clone(),
+                chart,
+                pending_extents: BTreeMap::new(),
+                retained_shared: BTreeMap::new(),
+                issued_shared: 0,
+                exposure: None,
+            },
         })
     }
     fn mount_text(&self, text: &str) -> Result<ResidentSection<'c>> {
-        let symbols = self.spec.symbols_of(&self.chart, text)?;
-        if symbols.len() != self.spec.section_symbols {
+        let symbols = self
+            .presentation
+            .spec
+            .symbols_of(&self.presentation.chart, text)?;
+        if symbols.len() != self.presentation.spec.section_symbols {
             return Err(invalid(format!(
                 "requested section has {} symbols; this declared boundary has {}",
                 symbols.len(),
-                self.spec.section_symbols
+                self.presentation.spec.section_symbols
             )));
         }
-        self.chart
-            .mount_joint(self.surface, &symbols, 6 * self.spec.extents()?.0)
+        self.presentation.chart.mount_joint(
+            self.surface,
+            &symbols,
+            6 * self.presentation.spec.extents()?.0,
+        )
     }
     fn mount_context(&self, parts: &[String]) -> Result<ResidentSection<'c>> {
         let symbols = parts
             .iter()
-            .map(|s| self.spec.symbols_of(&self.chart, s))
+            .map(|s| {
+                self.presentation
+                    .spec
+                    .symbols_of(&self.presentation.chart, s)
+            })
             .collect::<Result<Vec<_>>>()?
             .into_iter()
             .flatten()
             .collect::<Vec<_>>();
-        if symbols.len() != self.spec.context_symbols {
+        if symbols.len() != self.presentation.spec.context_symbols {
             return Err(invalid(format!(
                 "context has {} symbols; declared context section has {}",
                 symbols.len(),
-                self.spec.context_symbols
+                self.presentation.spec.context_symbols
             )));
         }
         if symbols.is_empty() {
@@ -546,7 +579,7 @@ impl<'c> NativeFieldSession<'c> {
                 )
                 .map_err(invalid)?);
         }
-        let rows = self.chart.mount(self.surface, &symbols)?;
+        let rows = self.presentation.chart.mount(self.surface, &symbols)?;
         let rows = ResidentConstitutiveSection::integers(&rows)?;
         let mut tensor = rows.row(0)?.to_owned(self.surface)?;
         for at in 1..symbols.len() {
@@ -566,11 +599,11 @@ impl<'c> NativeFieldSession<'c> {
         Ok(tensor)
     }
     fn prepare_request(&self, request: &FieldSectionRequest) -> Result<PreparedFieldSection<'c>> {
-        if self.spec.source_chart == FieldSourceChart::TensorCondition {
+        if self.presentation.spec.source_chart == FieldSourceChart::TensorCondition {
             if request.partial.is_some()
                 || request
                     .output_symbols
-                    .is_some_and(|n| n != self.spec.section_symbols)
+                    .is_some_and(|n| n != self.presentation.spec.section_symbols)
             {
                 return Err(invalid(
                     "partial/variable regions require the joint-regions source chart",
@@ -580,7 +613,7 @@ impl<'c> NativeFieldSession<'c> {
                 input: self.mount_text(&request.text)?,
                 condition: self.mount_context(&request.context)?,
                 held: None,
-                output_symbols: self.spec.section_symbols,
+                output_symbols: self.presentation.spec.section_symbols,
                 observed: None,
             });
         }
@@ -593,7 +626,10 @@ impl<'c> NativeFieldSession<'c> {
                 .map(|p| match p {
                     None => Ok(None),
                     Some(text) => {
-                        let symbols = self.spec.symbols_of(&self.chart, text)?;
+                        let symbols = self
+                            .presentation
+                            .spec
+                            .symbols_of(&self.presentation.chart, text)?;
                         if symbols.len() != 1 {
                             return Err(invalid(
                                 "one partial region must name exactly one codec symbol",
@@ -604,16 +640,17 @@ impl<'c> NativeFieldSession<'c> {
                 })
                 .collect::<Result<Vec<_>>>()?,
             None => self
+                .presentation
                 .spec
-                .symbols_of(&self.chart, &request.text)?
+                .symbols_of(&self.presentation.chart, &request.text)?
                 .into_iter()
                 .map(Some)
                 .collect(),
         };
         let output_symbols = request.output_symbols.unwrap_or(partial.len());
         if output_symbols == 0
-            || output_symbols > self.spec.section_symbols
-            || partial.len() > self.spec.section_symbols
+            || output_symbols > self.presentation.spec.section_symbols
+            || partial.len() > self.presentation.spec.section_symbols
         {
             return Err(invalid(
                 "request or receiving region exceeds the declared field capacity",
@@ -622,30 +659,36 @@ impl<'c> NativeFieldSession<'c> {
         let context = request
             .context
             .iter()
-            .map(|s| self.spec.symbols_of(&self.chart, s))
+            .map(|s| {
+                self.presentation
+                    .spec
+                    .symbols_of(&self.presentation.chart, s)
+            })
             .collect::<Result<Vec<_>>>()?
             .into_iter()
             .flatten()
             .collect::<Vec<_>>();
-        if context.len() > self.spec.context_symbols {
+        if context.len() > self.presentation.spec.context_symbols {
             return Err(invalid(
                 "context exceeds the declared observed-region capacity",
             ));
         }
-        let (nodes, condition_complex, _) = self.spec.extents()?;
+        let (nodes, condition_complex, _) = self.presentation.spec.extents()?;
         let width = 6 * nodes;
-        let a = self.spec.symbols.len();
-        let regions = self.spec.section_symbols + self.spec.context_symbols;
+        let a = self.presentation.spec.symbols.len();
+        let regions =
+            self.presentation.spec.section_symbols + self.presentation.spec.context_symbols;
         let mut current = vec![(0i64, 0i64); width];
         let mut held = vec![true; width / 2];
         // Presence and observation are separate source maps. An inactive region, an
         // unobserved active region, and an observed numerical zero are distinct charts.
         let mut active = vec![false; regions];
         let mut observed = vec![false; regions];
-        for i in 0..self.spec.section_symbols {
+        for i in 0..self.presentation.spec.section_symbols {
             let value = partial.get(i).copied().flatten();
             if let Some(symbol) = value {
-                current[2 * (i * a + self.chart.coordinates()[symbol.0 as usize])] = (1, 1);
+                current[2 * (i * a + self.presentation.chart.coordinates()[symbol.0 as usize])] =
+                    (1, 1);
             }
             active[i] = i < output_symbols || i < partial.len();
             observed[i] = value.is_some();
@@ -655,8 +698,9 @@ impl<'c> NativeFieldSession<'c> {
             }
         }
         for (j, symbol) in context.iter().enumerate() {
-            let i = self.spec.section_symbols + j;
-            current[2 * (i * a + self.chart.coordinates()[symbol.0 as usize])] = (1, 1);
+            let i = self.presentation.spec.section_symbols + j;
+            current[2 * (i * a + self.presentation.chart.coordinates()[symbol.0 as usize])] =
+                (1, 1);
             active[i] = true;
             observed[i] = true;
         }
@@ -692,10 +736,10 @@ impl<'c> NativeFieldSession<'c> {
         })
     }
     pub fn request(&mut self, request: &FieldSectionRequest) -> Result<Value> {
-        if self.spec.source_chart == FieldSourceChart::GeometricRegions {
+        if self.presentation.spec.source_chart == FieldSourceChart::GeometricRegions {
             return self.geometric_request(request);
         }
-        if self.spec.source_chart == FieldSourceChart::SharedRegions {
+        if self.presentation.spec.source_chart == FieldSourceChart::SharedRegions {
             return self.shared_request(request);
         }
         if request.retain_comparison && !request.commit {
@@ -705,7 +749,7 @@ impl<'c> NativeFieldSession<'c> {
         }
         let start = Instant::now();
         let prepared = self.prepare_request(request)?;
-        let chart = self.chart.receiver(self.surface)?;
+        let chart = self.presentation.chart.receiver(self.surface)?;
         let generation = Instant::now();
         let input = ResidentConstitutiveCurrent::integers(&prepared.input)?;
         let condition = ResidentConstitutiveCurrent::rational(&prepared.condition)?;
@@ -724,13 +768,15 @@ impl<'c> NativeFieldSession<'c> {
             self.body.preview_field(input.into(), condition)?
         };
         if let Some(id) = produced.comparison_id() {
-            self.pending_extents.insert(id, prepared.output_symbols);
+            self.presentation
+                .pending_extents
+                .insert(id, prepared.output_symbols);
         }
         let generation_us = generation.elapsed().as_micros();
         let receive = || -> Result<_> {
             let selected = produced
                 .received_output()
-                .restrict(0..2 * prepared.output_symbols * self.spec.symbols.len())?;
+                .restrict(0..2 * prepared.output_symbols * self.presentation.spec.symbols.len())?;
             let face = selected
                 .view()
                 .read_basis_sections(&chart, prepared.output_symbols)?;
@@ -749,14 +795,15 @@ impl<'c> NativeFieldSession<'c> {
         let pieces = selections
             .iter()
             .map(|v| {
-                self.spec
+                self.presentation
+                    .spec
                     .symbols
                     .get(v.selected)
                     .cloned()
                     .ok_or_else(|| invalid("selected symbol outside codec"))
             })
             .collect::<Result<Vec<_>>>()?;
-        let text = pieces.join(match self.spec.codec {
+        let text = pieces.join(match self.presentation.spec.codec {
             FieldTextCodec::Utf8Nibbles => unreachable!(),
             FieldTextCodec::UnicodeScalars => "",
             FieldTextCodec::WhitespaceWords => " ",
@@ -770,28 +817,32 @@ impl<'c> NativeFieldSession<'c> {
         )
     }
     pub fn observe(&mut self, source: u64, text: &str, step_bits: u32) -> Result<Value> {
-        if self.spec.source_chart == FieldSourceChart::GeometricRegions {
+        if self.presentation.spec.source_chart == FieldSourceChart::GeometricRegions {
             return self.observe_retained_geometric(source, text, step_bits);
         }
-        if self.spec.source_chart == FieldSourceChart::SharedRegions {
+        if self.presentation.spec.source_chart == FieldSourceChart::SharedRegions {
             return self.observe_retained_source(source, text, step_bits);
         }
         let start = Instant::now();
-        let target = if self.spec.source_chart == FieldSourceChart::JointRegions {
+        let target = if self.presentation.spec.source_chart == FieldSourceChart::JointRegions {
             let expected = *self
+                .presentation
                 .pending_extents
                 .get(&source)
                 .ok_or_else(|| invalid("unknown field response extent"))?;
-            let symbols = self.spec.symbols_of(&self.chart, text)?;
+            let symbols = self
+                .presentation
+                .spec
+                .symbols_of(&self.presentation.chart, text)?;
             if symbols.len() != expected {
                 return Err(invalid(
                     "target does not match its producing response extent",
                 ));
             }
-            self.chart.mount_joint(
+            self.presentation.chart.mount_joint(
                 self.surface,
                 &symbols,
-                2 * self.spec.symbols.len() * expected,
+                2 * self.presentation.spec.symbols.len() * expected,
             )?
         } else {
             self.mount_text(text)?
@@ -801,37 +852,41 @@ impl<'c> NativeFieldSession<'c> {
             ResidentConstitutiveCurrent::integers(&target)?.into(),
             step_bits,
         )?;
-        self.pending_extents.remove(&source);
+        self.presentation.pending_extents.remove(&source);
         Ok(
             json!({"source":source,"target":text,"returned":returned,"elapsed_us":start.elapsed().as_micros(),"anatomy":self.inspect()}),
         )
     }
     pub fn release(&mut self, source: u64) -> Result<Value> {
-        if matches!(self.spec.source_chart, FieldSourceChart::SharedRegions | FieldSourceChart::GeometricRegions) {
-            self.retained_shared
+        if matches!(
+            self.presentation.spec.source_chart,
+            FieldSourceChart::SharedRegions | FieldSourceChart::GeometricRegions
+        ) {
+            self.presentation
+                .retained_shared
                 .remove(&source)
                 .ok_or_else(|| invalid("unknown retained shared-source comparison"))?;
             return Ok(json!({"released":source,"anatomy":self.inspect()}));
         }
         self.body.release(source)?;
-        self.pending_extents.remove(&source);
+        self.presentation.pending_extents.remove(&source);
         Ok(json!({"released":source,"anatomy":self.inspect()}))
     }
     pub fn inspect(&self) -> Value {
         json!({"kind":"constituted-field-session","epoch":self.body.epoch(),"pending":self.body.pending_coupled_predictions(),"pending_comparisons":self.body.pending_ids().ok(),
-        "retained_shared":self.retained_shared.keys().collect::<Vec<_>>(),"spec":self.spec,"census":self.surface.census()})
+        "retained_shared":self.presentation.retained_shared.keys().collect::<Vec<_>>(),"spec":self.presentation.spec,"census":self.surface.census()})
     }
     /// The cold exposure position this session's trained state has actually consumed. AC3: it
     /// is published inside the same atomic checkpoint file as the model, never beside it. The
     /// cursor still names a frame the reader has not acknowledged; that is the resumable case.
     pub fn attach_exposure_cursor(&mut self, cursor: crate::alpha::exposure::ExposureCursor) {
-        self.exposure = Some(cursor);
+        self.presentation.exposure = Some(cursor);
     }
     pub fn exposure_cursor(&self) -> Option<&crate::alpha::exposure::ExposureCursor> {
-        self.exposure.as_ref()
+        self.presentation.exposure.as_ref()
     }
     pub fn retained_shared_comparisons(&self) -> Vec<u64> {
-        self.retained_shared.keys().copied().collect()
+        self.presentation.retained_shared.keys().copied().collect()
     }
     pub fn attach_exposure_pairing(
         &mut self,
@@ -843,6 +898,7 @@ impl<'c> NativeFieldSession<'c> {
         request_events.sort_unstable();
         request_events.dedup();
         let retained = self
+            .presentation
             .retained_shared
             .get(&comparison)
             .ok_or_else(|| invalid("unknown retained shared-source comparison"))?;
@@ -866,15 +922,22 @@ impl<'c> NativeFieldSession<'c> {
                 .checked_sub(held)
                 .ok_or_else(|| invalid("retained exposure response extent"))?,
         };
-        validate_exposure_pairing(&pairing, retained, &self.spec, &self.chart)?;
-        self.retained_shared
+        validate_exposure_pairing(
+            &pairing,
+            retained,
+            &self.presentation.spec,
+            &self.presentation.chart,
+        )?;
+        self.presentation
+            .retained_shared
             .get_mut(&comparison)
             .unwrap()
             .exposure_pairing = Some(pairing);
         Ok(())
     }
     pub fn retained_exposure_pairings(&self) -> Vec<(u64, RetainedExposurePairing)> {
-        self.retained_shared
+        self.presentation
+            .retained_shared
             .iter()
             .filter_map(|(id, retained)| {
                 retained
@@ -885,7 +948,7 @@ impl<'c> NativeFieldSession<'c> {
             .collect()
     }
     pub fn spec(&self) -> &FieldSessionSpec {
-        &self.spec
+        &self.presentation.spec
     }
     pub fn inspect_current(&mut self) -> Result<Value> {
         self.body.inspect_current()
@@ -897,13 +960,13 @@ impl<'c> NativeFieldSession<'c> {
     ) -> Result<PublicationReceipt<()>> {
         let rest = self.body.rest()?;
         let saved = NativeFieldSavedSession {
-            spec: self.spec.clone(),
+            spec: self.presentation.spec.clone(),
             state: state.clone(),
             body: rest,
-            pending_extents: self.pending_extents.clone(),
-            retained_shared: self.retained_shared.clone(),
-            issued_shared: self.issued_shared,
-            exposure: self.exposure.clone(),
+            pending_extents: self.presentation.pending_extents.clone(),
+            retained_shared: self.presentation.retained_shared.clone(),
+            issued_shared: self.presentation.issued_shared,
+            exposure: self.presentation.exposure.clone(),
         };
         let mut bytes = Vec::new();
         saved.write(&mut bytes)?;
@@ -1027,7 +1090,10 @@ impl NativeFieldSavedSession {
                     != retained.output_symbols.checked_mul(spec.symbols.len())
                 || retained.held.iter().all(|fixed| *fixed)
         }) || (!retained_shared.is_empty()
-            && !matches!(spec.source_chart, FieldSourceChart::SharedRegions | FieldSourceChart::GeometricRegions))
+            && !matches!(
+                spec.source_chart,
+                FieldSourceChart::SharedRegions | FieldSourceChart::GeometricRegions
+            ))
         {
             return Err(invalid("retained shared-source comparison operands"));
         }
@@ -1080,21 +1146,28 @@ impl NativeFieldSavedSession {
         let chart = self.spec.chart()?;
         let mut session = NativeFieldSession {
             surface: &surface,
-            compiled_geometry: self.spec.geometry.as_ref().map(|g|g.compile().map(std::rc::Rc::new)).transpose()?,
-            spec: self.spec,
-            chart,
             body: self.body.remount(&surface)?,
-            pending_extents: self.pending_extents,
-            retained_shared: self.retained_shared,
-            issued_shared: self.issued_shared,
-            exposure: self.exposure,
+            presentation: FieldTextPresentation {
+                compiled_geometry: self
+                    .spec
+                    .geometry
+                    .as_ref()
+                    .map(|g| g.compile().map(std::rc::Rc::new))
+                    .transpose()?,
+                spec: self.spec,
+                chart,
+                pending_extents: self.pending_extents,
+                retained_shared: self.retained_shared,
+                issued_shared: self.issued_shared,
+                exposure: self.exposure,
+            },
         };
-        let (nodes, context, _) = session.spec.extents()?;
+        let (nodes, context, _) = session.presentation.spec.extents()?;
         if session.body.field_dimensions()?
             != (
                 6 * nodes,
                 2 * context,
-                ResidentGrain(session.spec.fractional_bits),
+                ResidentGrain(session.presentation.spec.fractional_bits),
                 NativeFieldReactionPort::IncomingBoundary,
             )
         {
@@ -1106,13 +1179,14 @@ impl NativeFieldSavedSession {
             // Only the legacy tensor-condition chart receives its whole declared section, so
             // only it can back-fill a missing extent. A variable-extent chart must refuse;
             // the shared chart's section capacity is a source aperture, not a response length.
-            if !session.pending_extents.contains_key(&id) {
-                if session.spec.source_chart != FieldSourceChart::TensorCondition {
+            if !session.presentation.pending_extents.contains_key(&id) {
+                if session.presentation.spec.source_chart != FieldSourceChart::TensorCondition {
                     return Err(invalid("missing pending field receiving extent"));
                 }
                 session
+                    .presentation
                     .pending_extents
-                    .insert(id, session.spec.section_symbols);
+                    .insert(id, session.presentation.spec.section_symbols);
             }
         }
         let mut stream = HnaStream::from_state(self.state).map_err(invalid)?;

@@ -12,7 +12,7 @@ use holonic_engine::{
     },
     resident_section::{ResidentSection, ResidentSurface},
 };
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::io::{Read, Write};
 
 fn invalid(message: impl ToString) -> NativeSessionError {
@@ -21,7 +21,11 @@ fn invalid(message: impl ToString) -> NativeSessionError {
 
 mod field;
 use field::FieldModel;
-pub use field::{NativeFieldReactionPort,NativeFieldAttachRefusal, NativeFieldGeneratedSection, NativeFieldModelRest};
+pub use field::formation::NativeFieldFormation;
+pub use field::{
+    NativeFieldAttachRefusal, NativeFieldGeneratedSection, NativeFieldModelRest,
+    NativeFieldReactionPort,
+};
 
 enum BodyState<'c> {
     Field(FieldModel<'c>),
@@ -41,11 +45,7 @@ impl<'c> NativeCoupledBody<'c> {
         incoming: ResidentConstitutiveCurrent<'_, 'c>,
     ) -> Result<(), NativeSessionError> {
         match self.state_mut()? {
-            BodyState::Field(_) => {
-                return Err(invalid(
-                    "field generation takes its explicit producing condition",
-                ))
-            }
+            BodyState::Field(field) => field.receive_condition(incoming),
 
             BodyState::Affine(w) => Ok(w.receive_condition(incoming)?),
             BodyState::Constitutive(b) => Ok(b.receive_condition(incoming)?),
@@ -200,7 +200,7 @@ impl<'c> NativeCoupledBody<'c> {
             BodyState::Field(_) => {
                 return Err(invalid(
                     "this wave operation requires a wave chart; use the field section operation",
-                ))
+                ));
             }
 
             BodyState::Affine(wave) => Ok(wave.read_basis_face(basis)?),
@@ -218,7 +218,7 @@ impl<'c> NativeCoupledBody<'c> {
             BodyState::Field(_) => {
                 return Err(invalid(
                     "this wave operation requires a wave chart; use the field section operation",
-                ))
+                ));
             }
 
             BodyState::Constitutive(body) => {
@@ -278,7 +278,7 @@ impl<'c> NativeCoupledBody<'c> {
             BodyState::Field(_) => {
                 return Err(invalid(
                     "this wave operation requires a wave chart; use the field section operation",
-                ))
+                ));
             }
 
             BodyState::Constitutive(body) => body
@@ -309,7 +309,7 @@ impl<'c> NativeCoupledBody<'c> {
             BodyState::Field(_) => {
                 return Err(invalid(
                     "this wave operation requires a wave chart; use the field section operation",
-                ))
+                ));
             }
 
             BodyState::Constitutive(body) => body
@@ -347,7 +347,7 @@ impl<'c> NativeCoupledBody<'c> {
             BodyState::Field(_) => {
                 return Err(invalid(
                     "this wave operation requires a wave chart; use the field section operation",
-                ))
+                ));
             }
 
             BodyState::Affine(wave) => {
@@ -441,7 +441,7 @@ impl<'c> NativeCoupledBody<'c> {
             BodyState::Field(_) => {
                 return Err(invalid(
                     "this wave operation requires a wave chart; use the field section operation",
-                ))
+                ));
             }
 
             BodyState::Affine(wave) => read(&wave.read_prospective_word(word)?),
@@ -469,7 +469,7 @@ impl<'c> NativeCoupledBody<'c> {
             BodyState::Field(_) => {
                 return Err(invalid(
                     "this wave operation requires a wave chart; use the field section operation",
-                ))
+                ));
             }
 
             BodyState::Affine(wave) => {
@@ -493,7 +493,7 @@ impl<'c> NativeCoupledBody<'c> {
             BodyState::Field(_) => {
                 return Err(invalid(
                     "this wave operation requires a wave chart; use the field section operation",
-                ))
+                ));
             }
 
             BodyState::Affine(wave) => {
@@ -552,7 +552,7 @@ impl<'c> NativeCoupledBody<'c> {
             BodyState::Field(_) => {
                 return Err(invalid(
                     "this wave operation requires a wave chart; use the field section operation",
-                ))
+                ));
             }
 
             BodyState::Affine(wave) => {

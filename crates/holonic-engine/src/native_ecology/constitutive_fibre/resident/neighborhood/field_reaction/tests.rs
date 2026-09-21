@@ -108,6 +108,15 @@ fn enclosed_forecast_uses_retained_material_and_commit_checks_freshness() {
         )
         .unwrap();
     assert_eq!(surface.census().section_read_outs, reads);
+    let producing_condition = surface
+        .read_out(
+            &receipt
+                .producing_condition()
+                .unwrap()
+                .to_owned(&surface)
+                .unwrap(),
+        )
+        .unwrap();
     assert_eq!(receipt.material_observations(), 1);
     let output = receipt.output_view().inspect().unwrap();
     assert_eq!(output.center.len(), 1);
@@ -169,6 +178,18 @@ fn enclosed_forecast_uses_retained_material_and_commit_checks_freshness() {
     body.commit_field_reaction(later).unwrap();
     assert_eq!(receipt.output_view().inspect().unwrap(), output);
     assert_eq!(
+        surface
+            .read_out(
+                &receipt
+                    .producing_condition()
+                    .unwrap()
+                    .to_owned(&surface)
+                    .unwrap()
+            )
+            .unwrap(),
+        producing_condition
+    );
+    assert_eq!(
         body.predictive_material(0).unwrap().unwrap().observations(),
         2
     );
@@ -199,4 +220,136 @@ fn enclosed_forecast_uses_retained_material_and_commit_checks_freshness() {
             .unwrap(),
         expected
     );
+}
+
+#[test]
+#[ignore = "requires CUDA; original producing c and contemporary standing use separate native paths"]
+fn reaction_observation_at_keeps_producing_condition_and_returns_family() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let initial = section(&surface, &[1, 0, 3, 0]);
+    let changed = section(&surface, &[0, 1, 11, 13]);
+    let source = section(&surface, &[0, 0]);
+    let target = section(&surface, &[1, 0]);
+    fn c<'a, 'c>(p: &'a ResidentSection<'c>) -> ResidentConstitutiveCurrent<'a, 'c> { ResidentConstitutiveCurrent::integers(p).unwrap() }
+    // At source zero, y=c_1 and c_2 is free. These are actual relation observations.
+    let law = || {
+        let mut law = ResidentConstitutiveFibre::found_bilinear_contact(&surface, 1, 2, 1).unwrap();
+        for (h, y) in [([1, 0, 0, 0], [1, 0]), ([0, 0, 1, 0], [0, 0])] {
+            let h = section(&surface, &h);
+            let y = section(&surface, &y);
+            law.advance_bilinear_contact(c(&source), c(&h), Some(c(&y)))
+                .unwrap();
+        }
+        law
+    };
+    let normal = ResidentNormalMaterial::found_features(&surface, 5, 1, ResidentGrain(16))
+        .unwrap()
+        .stage_bilinear_observation(c(&source), c(&initial), c(&target))
+        .unwrap();
+    let expected_normal = normal
+        .stage_bilinear_observation(c(&source), c(&initial), c(&target))
+        .unwrap()
+        .rest()
+        .unwrap();
+    let mut body = ResidentGeneratorNeighborhood::with_shared_condition(
+        vec![law()],
+        c(&initial),
+        ConditionContactMetric::UnitAdmittanceRealification,
+    )
+    .unwrap();
+    body.attach_normal_prediction(0, normal)
+        .unwrap_or_else(|(_, e)| panic!("{e:?}"));
+    let expected_prediction = body
+        .forecast_reaction_at_condition(0, c(&source), c(&initial))
+        .unwrap()
+        .inspect()
+        .unwrap();
+    let contemporary_prediction = body
+        .forecast_reaction_at_condition(0, c(&source), c(&changed))
+        .unwrap()
+        .inspect()
+        .unwrap();
+    assert_ne!(expected_prediction, contemporary_prediction);
+    let expected_formation = law()
+        .advance_bilinear_contact(c(&source), c(&initial), Some(c(&target)))
+        .unwrap()
+        .inspect()
+        .unwrap();
+    body.receive_condition(c(&changed)).unwrap();
+    let standing = surface
+        .read_out(&body.condition().to_owned(&surface).unwrap())
+        .unwrap();
+    let step = body
+        .receive_reaction_observation_at(0, c(&source), c(&initial), c(&target))
+        .unwrap();
+    assert_eq!(
+        surface
+            .read_out(&step.prior_condition.current().to_owned(&surface).unwrap())
+            .unwrap(),
+        standing
+    );
+    assert_eq!(step.prediction.inspect().unwrap(), expected_prediction);
+    assert_eq!(
+        step.formation.as_ref().unwrap().inspect().unwrap(),
+        expected_formation
+    );
+    assert!(
+        matches!(step.contact.as_ref().unwrap().family().inspect().unwrap(),
+        ConditionPreimageReading::Compatible { ref directions, .. } if !directions.is_empty())
+    );
+    assert_eq!(
+        body.predictive_material(0)
+            .unwrap()
+            .unwrap()
+            .rest()
+            .unwrap(),
+        expected_normal
+    );
+}
+
+#[test]
+#[ignore = "requires CUDA; malformed source/condition/target must not publish any native state"]
+fn reaction_observation_at_refusal_preserves_epoch_condition_and_material() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let initial = section(&surface, &[0, 1]);
+    let source = section(&surface, &[1, 0]);
+    let target = section(&surface, &[2, 3]);
+    let wrong_condition = section(&surface, &[0, 1, 2, 3]);
+    let wrong_target = section(&surface, &[2, 3, 4, 5]);
+    let law = ResidentConstitutiveFibre::found_bilinear_contact(&surface, 1, 1, 1).unwrap();
+    let mut body = ResidentGeneratorNeighborhood::with_shared_condition(
+        vec![law],
+        ResidentConstitutiveCurrent::integers(&initial).unwrap(),
+        ConditionContactMetric::UnitAdmittanceRealification,
+    )
+    .unwrap();
+    body.attach_normal_prediction(
+        0,
+        ResidentNormalMaterial::found_features(&surface, 3, 1, ResidentGrain(16)).unwrap(),
+    )
+    .unwrap_or_else(|(_, error)| panic!("{error:?}"));
+    let before = body.rest().unwrap();
+
+    assert!(
+        body.receive_reaction_observation_at(
+            0,
+            ResidentConstitutiveCurrent::integers(&source).unwrap(),
+            ResidentConstitutiveCurrent::integers(&wrong_condition).unwrap(),
+            ResidentConstitutiveCurrent::integers(&target).unwrap(),
+        )
+        .is_err()
+    );
+    assert_eq!(body.rest().unwrap(), before);
+    assert!(
+        body.receive_reaction_observation_at(
+            0,
+            ResidentConstitutiveCurrent::integers(&source).unwrap(),
+            ResidentConstitutiveCurrent::integers(&initial).unwrap(),
+            ResidentConstitutiveCurrent::integers(&wrong_target).unwrap(),
+        )
+        .is_err()
+    );
+    assert_eq!(body.rest().unwrap(), before);
 }

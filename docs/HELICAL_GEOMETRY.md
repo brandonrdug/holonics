@@ -239,3 +239,16 @@ local pair differential, frame/degeneration controls and its Gram-chart consumer
 claim a trained conversation return, a calibrated molecular force law, all curved-space motor
 actions, or a global closure of every nonlinear field. Those boundaries identify further
 mathematical terms, not a reason to reset the framework's already returned capabilities.
+
+## The bracket as an inferred native generator
+
+[established-bounded; computational-witness] The
+[helical field consumer](../research/records/2026-09-20_NATIVE_INCIDENCE_FORMS_AND_REUSES_THE_HELICAL_GENERATOR.md) uses `ScrewGenerator::bracket` to supply
+exact reference observations in a declared common frame. Native incidence constructs
+`s=xi`, `c=eta−xi`; the same field body forms their relation and normal material. The held pair
+returns the exact bracket `(-24,-22,7,47,52,6)` through its inferred contextual section, while the
+normal prediction retains its finite-prior residual. The original section is reused on another
+condition; the inferred two-direction condition fibre is transported to another source and yields
+plural output. This develops use of the shared bracket without introducing another screw or
+contact definition. Orbit configurations, finite motion, closure and physical material still
+use their existing owners and hypotheses above.

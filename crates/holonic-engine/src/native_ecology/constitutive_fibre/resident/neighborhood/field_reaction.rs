@@ -45,15 +45,24 @@ impl<'c> FieldReactionEnclosure<'c> {
     /// Apply the same producing reaction to the boundary of a joint current and leave
     /// its internal coordinates coupled to that boundary through one source enclosure.
     pub fn apply_joint_current(
-        &self, source: ResidentNormalEnclosureView<'_, 'c>, external: ResidentNormalEnclosureView<'_, 'c>,
+        &self,
+        source: ResidentNormalEnclosureView<'_, 'c>,
+        external: ResidentNormalEnclosureView<'_, 'c>,
     ) -> Result<ResidentNormalEnclosure<'c>, ConstitutiveFibreError> {
-        self.material.read_applied_bilinear_joint(source, self.source.view().components(),
-            self.producing_condition()?, external)
+        self.material.read_applied_bilinear_joint(
+            source,
+            self.source.view().components(),
+            self.producing_condition()?,
+            external,
+        )
     }
 
     /// The identity and local reaction act on the same retained incoming current.
-    pub fn incoming_with_reaction(&self) -> Result<ResidentNormalEnclosure<'c>, ConstitutiveFibreError> {
-        self.material.read_applied_bilinear_identity(self.source.view(), self.producing_condition()?)
+    pub fn incoming_with_reaction(
+        &self,
+    ) -> Result<ResidentNormalEnclosure<'c>, ConstitutiveFibreError> {
+        self.material
+            .read_applied_bilinear_identity(self.source.view(), self.producing_condition()?)
     }
 
     pub fn material_observations(&self) -> u64 {
@@ -62,6 +71,78 @@ impl<'c> FieldReactionEnclosure<'c> {
 }
 
 impl<'c> ResidentGeneratorNeighborhood<'c> {
+    /// Form an actual source/condition/target passage while keeping the supplied producing
+    /// condition separate from contemporary condition standing. Predictive and compatibility
+    /// formation both use `producing_condition`; contact formation receives the complete
+    /// preimage through the neighborhood's current standing. Preparation and publication remain
+    /// one atomic successor.
+    pub fn receive_reaction_observation_at<'i>(
+        &mut self,
+        member: usize,
+        source: ResidentConstitutiveCurrent<'i, 'c>,
+        producing_condition: ResidentConstitutiveCurrent<'i, 'c>,
+        observed: ResidentConstitutiveCurrent<'i, 'c>,
+    ) -> Result<GeneratorNeighborhoodStep<'i, 'c>, ConstitutiveFibreError>
+    where
+        'c: 'i,
+    {
+        if !self.usable {
+            return Err(ConstitutiveFibreError::Uncertain);
+        }
+        let next = self
+            .epoch
+            .checked_add(1)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let material = self
+            .laws
+            .get_mut(member)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let prior_condition = self.condition.standing();
+        let prediction = material
+            .action()
+            .read_bilinear(source, producing_condition)?;
+        let predictive = material.stage_prediction(source, producing_condition, observed)?;
+        let law = &mut material.law;
+        let family = law.read_condition_preimage(source, observed)?;
+        let proposed = self.condition.prepare_contact(&family)?;
+        if !self.condition.can_commit(&proposed) {
+            return Err(ConstitutiveFibreError::ForeignOccurrence);
+        }
+        self.usable = false;
+        let formation =
+            match law.prepare_bilinear_contact(source, producing_condition, Some(observed)) {
+                Ok(value) => value,
+                Err(error) => {
+                    self.usable = law.usable;
+                    return Err(error);
+                }
+            };
+        if !law.can_commit_formation(&formation) {
+            self.usable = true;
+            return Err(ConstitutiveFibreError::ForeignOccurrence);
+        }
+        self.usable = true;
+        let consequence = PreparedNeighborhoodConsequence {
+            owner: Rc::clone(&self.owner),
+            member,
+            predecessor_epoch: self.epoch,
+            successor_epoch: next,
+            prediction,
+            prior_condition,
+            condition: Some(proposed),
+            formation: Some(formation),
+            predictive,
+        };
+        if !self.can_commit_consequence(&consequence) {
+            return Err(ConstitutiveFibreError::ForeignOccurrence);
+        }
+        Ok(self.publish_advance(PreparedNeighborhoodAdvance {
+            source,
+            observed: Some(observed),
+            consequence,
+        }))
+    }
+
     /// Read one staged reaction at the supplied producing condition. The condition is an actual
     /// source operand; the neighborhood's contemporary condition is not substituted.
     pub fn forecast_reaction_at_condition(
@@ -93,12 +174,10 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
         let producing_condition_owned = producing_condition.to_owned(source.surface)?;
         let condition_view = ResidentConstitutiveCurrent::rational(&producing_condition_owned)?;
         let output = match material.material.source_chart() {
-            NormalSourceChart::Features { .. } => {
-                material
-                    .material
-                    .retained_view()
-                    .read_applied_bilinear(source_owned.view(), condition_view)?
-            }
+            NormalSourceChart::Features { .. } => material
+                .material
+                .retained_view()
+                .read_applied_bilinear(source_owned.view(), condition_view)?,
             NormalSourceChart::Wave { .. } => material
                 .material
                 .read_applied(source_owned.view())?
@@ -185,12 +264,26 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
         observed: &crate::native_ecology::constitutive_fibre::ResidentNormalEnclosureSection<'c>,
     ) -> Result<PreparedFieldReaction<'c>, ConstitutiveFibreError> {
         self.require_usable()?;
-        let after_epoch = self.epoch.checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
-        let prior = self.material(member)?.predictive.as_ref().ok_or(ConstitutiveFibreError::Shape)?;
-        let next = prior.material.stage_receive_enclosed_section(features, observed)?;
+        let after_epoch = self
+            .epoch
+            .checked_add(1)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let prior = self
+            .material(member)?
+            .predictive
+            .as_ref()
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let next = prior
+            .material
+            .stage_receive_enclosed_section(features, observed)?;
         let material = PredictiveMaterial::new(next, &prior.action)?;
-        Ok(PreparedFieldReaction { owner: Rc::clone(&self.owner), member,
-            before_epoch: self.epoch, after_epoch, material })
+        Ok(PreparedFieldReaction {
+            owner: Rc::clone(&self.owner),
+            member,
+            before_epoch: self.epoch,
+            after_epoch,
+            material,
+        })
     }
 
     pub fn can_commit_field_reaction(&self, prepared: &PreparedFieldReaction<'c>) -> bool {

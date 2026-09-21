@@ -19,6 +19,8 @@ Read [HOLON](../../docs/HOLON.md), [HNN_FORMULA](../../docs/HNN_FORMULA.md) and 
 - [The field-session join has its owner network](2026-09-20_THE_FIELD_SESSION_JOIN_HAS_ITS_OWNER_NETWORK_AND_NAMED_ABSENCES.md): the local source, variation, re-entry and exposure calls; use the live state for later returns.
 - [The geometric field refines and returns its complete paired current](2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md): validated analytic source arcs, the resident geometric word and paired return, row placement evidence, lifted helical phase and the bounded real-source experiment.
 
+- [Native incidence forms and reuses the helical generator](2026-09-20_NATIVE_INCIDENCE_FORMS_AND_REUSES_THE_HELICAL_GENERATOR.md): actual pre-target source/incident restrictions, original-condition formation, exact inferred screw bracket, reusable contextual section and transported unresolved condition family.
+
 Start in `holonics-hna::NativeCoupledBody`, `native/field_session` and the native constitutive
 field/source/current owners. The model's actual caller decides whether a helper is connected.
 

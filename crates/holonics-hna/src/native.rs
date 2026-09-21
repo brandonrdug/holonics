@@ -16,10 +16,10 @@ pub use mathematical::{with_mathematical_session, MathematicalRequest, NativeMat
 pub mod field_geometry;
 pub use field_geometry::GeometricFieldSpec;
 mod field_session;
-pub use field_session::{FieldTextCodec,FieldSourceChart,FieldSessionSpec,FieldSectionRequest,ExposureAperture,RetainedSharedSource,NativeFieldSession,NativeFieldSavedSession,with_field_session};
+pub use field_session::{NativeFieldIncidenceDeclaration, NativeFieldIncomingArc, NativeFieldOmittedSelfComparison,NativeFieldSourceAttachRefusal,FieldTextPresentation, NativeFieldSources, NativeFieldSourceSpec, NativeFieldIncidence, PreparedFieldIncidence, NativeSourceSavedSession,FieldTextCodec,FieldSourceChart,FieldSessionSpec,FieldSectionRequest,ExposureAperture,RetainedSharedSource,NativeFieldSession,NativeFieldSavedSession,with_field_session};
 mod normal_wave;
 mod coupled_wave;
-pub use coupled_wave::{NativeFieldReactionPort,SavedCoupledBody,NativeFieldAttachRefusal,NativeFieldGeneratedSection,NativeFieldModelRest,NativeCoupledBody,NativeCoupledWaveSession,NativeCoupledWaveSavedSession,NativeCoupledWaveAttachRefusal};
+pub use coupled_wave::{NativeFieldFormation,NativeFieldReactionPort,SavedCoupledBody,NativeFieldAttachRefusal,NativeFieldGeneratedSection,NativeFieldModelRest,NativeCoupledBody,NativeCoupledWaveSession,NativeCoupledWaveSavedSession,NativeCoupledWaveAttachRefusal};
 pub use normal_wave::{NativeWaveSession,NativeWaveSavedSession,NativeWaveAttachRefusal,
     NativeWaveSeedSpec, NATIVE_WAVE_SEED_SCHEMA, with_seeded_wave_session};
 

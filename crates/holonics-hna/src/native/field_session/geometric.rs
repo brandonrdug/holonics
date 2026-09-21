@@ -60,6 +60,7 @@ impl<'c> NativeFieldSession<'c> {
             return Err(invalid("supply text or partial regions, not both"));
         }
         let layout = self
+            .presentation
             .compiled_geometry
             .as_ref()
             .ok_or_else(|| invalid("geometric source"))?
@@ -70,7 +71,8 @@ impl<'c> NativeFieldSession<'c> {
                 .map(|p| {
                     p.as_ref()
                         .map(|s| {
-                            self.chart
+                            self.presentation
+                                .chart
                                 .alphabet()
                                 .symbol_of(s)
                                 .ok_or_else(|| invalid("geometric source codec symbol"))
@@ -79,28 +81,33 @@ impl<'c> NativeFieldSession<'c> {
                 })
                 .collect::<Result<Vec<_>>>()?,
             None => self
+                .presentation
                 .spec
-                .symbols_of(&self.chart, &request.text)?
+                .symbols_of(&self.presentation.chart, &request.text)?
                 .into_iter()
                 .map(Some)
                 .collect(),
         };
         let output_symbols = request.output_symbols.unwrap_or(parts.len());
         if output_symbols == 0
-            || output_symbols > self.spec.section_symbols
-            || parts.len() > self.spec.section_symbols
+            || output_symbols > self.presentation.spec.section_symbols
+            || parts.len() > self.presentation.spec.section_symbols
         {
             return Err(invalid("geometric source/receiving aperture"));
         }
         let context = request
             .context
             .iter()
-            .map(|s| self.spec.symbols_of(&self.chart, s))
+            .map(|s| {
+                self.presentation
+                    .spec
+                    .symbols_of(&self.presentation.chart, s)
+            })
             .collect::<Result<Vec<_>>>()?
             .into_iter()
             .flatten()
             .collect::<Vec<_>>();
-        if context.len() > self.spec.context_symbols {
+        if context.len() > self.presentation.spec.context_symbols {
             return Err(invalid("geometric context aperture"));
         }
         let width = self
@@ -114,10 +121,11 @@ impl<'c> NativeFieldSession<'c> {
             .ok_or_else(|| invalid("geometric source section"))?;
         let mut values = vec![(0i64, 0i64); n];
         let mut held = vec![false; n / 2];
-        let symbols = self.spec.symbols.len();
+        let symbols = self.presentation.spec.symbols.len();
         for (slot, symbol) in context.iter().enumerate() {
             let row = layout.slot_rows[slot];
-            values[row * width + 2 * self.chart.coordinates()[symbol.0 as usize]] = (1, 1);
+            values[row * width + 2 * self.presentation.chart.coordinates()[symbol.0 as usize]] =
+                (1, 1);
             held[row * (width / 2)..row * (width / 2) + symbols].fill(true);
         }
         let prefix = context.len();
@@ -140,7 +148,9 @@ impl<'c> NativeFieldSession<'c> {
         for (at, symbol) in parts.iter().enumerate() {
             let row = layout.slot_rows[prefix + at];
             if let Some(symbol) = symbol {
-                values[row * width + 2 * self.chart.coordinates()[symbol.0 as usize]] = (1, 1);
+                values
+                    [row * width + 2 * self.presentation.chart.coordinates()[symbol.0 as usize]] =
+                    (1, 1);
                 if request.partial.is_some() {
                     held[row * (width / 2)..row * (width / 2) + symbols].fill(true);
                     if at < output_symbols {
@@ -158,7 +168,7 @@ impl<'c> NativeFieldSession<'c> {
             .map_err(invalid)?;
         let seed = Rc::new(ResidentNormalEnclosureSection::from_points(
             ResidentConstitutiveSection::integers(&raw)?,
-            ResidentGrain(self.spec.fractional_bits),
+            ResidentGrain(self.presentation.spec.fractional_bits),
         )?);
         Ok(GeometricPreparation {
             layout,
@@ -202,19 +212,19 @@ impl<'c> NativeFieldSession<'c> {
         let rows = generated.gather_phase_rows(
             &prepared.receiving_rows,
             &vec![ExactWavePhaseTransport::identity(); prepared.output_symbols],
-            2 * self.spec.symbols.len(),
+            2 * self.presentation.spec.symbols.len(),
         )?;
-        let received = rows.flatten_components(0..2 * self.spec.symbols.len())?;
-        let chart = self.chart.receiver(self.surface)?;
+        let received = rows.flatten_components(0..2 * self.presentation.spec.symbols.len())?;
+        let chart = self.presentation.chart.receiver(self.surface)?;
         let selections = received
             .view()
             .read_basis_sections(&chart, prepared.output_symbols)?
             .selections()?;
         let symbols = selections
             .iter()
-            .map(|v| self.spec.symbols[v.selected].clone())
+            .map(|v| self.presentation.spec.symbols[v.selected].clone())
             .collect::<Vec<_>>();
-        let (text, bytes, decode_error) = match self.spec.codec {
+        let (text, bytes, decode_error) = match self.presentation.spec.codec {
             FieldTextCodec::Utf8Nibbles => {
                 let codes = selections
                     .iter()
@@ -237,11 +247,11 @@ impl<'c> NativeFieldSession<'c> {
             FieldTextCodec::WhitespaceWords => (Some(symbols.join(" ")), None, None),
         };
         let comparison = if request.retain_comparison {
-            let id = self.issued_shared;
+            let id = self.presentation.issued_shared;
             let next = id
                 .checked_add(1)
                 .ok_or_else(|| invalid("shared comparison identifiers exhausted"))?;
-            self.retained_shared.insert(
+            self.presentation.retained_shared.insert(
                 id,
                 RetainedSharedSource {
                     request: request.clone(),
@@ -251,7 +261,7 @@ impl<'c> NativeFieldSession<'c> {
                     exposure_pairing: None,
                 },
             );
-            self.issued_shared = next;
+            self.presentation.issued_shared = next;
             Some(id)
         } else {
             None
@@ -272,7 +282,10 @@ impl<'c> NativeFieldSession<'c> {
         commit: bool,
     ) -> Result<Value> {
         let prepared = self.prepare_geometric(request)?;
-        let target = self.spec.symbols_of(&self.chart, text)?;
+        let target = self
+            .presentation
+            .spec
+            .symbols_of(&self.presentation.chart, text)?;
         if target.len() != prepared.output_symbols {
             return Err(invalid("target does not match geometric receiving extent"));
         }
@@ -286,10 +299,11 @@ impl<'c> NativeFieldSession<'c> {
                 .ok_or_else(|| invalid("geometric target section"))?
         ];
         let mut observed = vec![false; values.len() / 2];
-        let symbols = self.spec.symbols.len();
+        let symbols = self.presentation.spec.symbols.len();
         for (at, symbol) in target.iter().enumerate() {
             let row = prepared.receiving_rows[at];
-            values[row * width + 2 * self.chart.coordinates()[symbol.0 as usize]] = (1, 1);
+            values[row * width + 2 * self.presentation.chart.coordinates()[symbol.0 as usize]] =
+                (1, 1);
             observed[row * (width / 2)..row * (width / 2) + symbols].fill(true);
         }
         let raw = self
@@ -307,7 +321,7 @@ impl<'c> NativeFieldSession<'c> {
             .map_err(invalid)?;
         let target_section = ResidentNormalEnclosureSection::from_points(
             ResidentConstitutiveSection::integers(&raw)?,
-            ResidentGrain(self.spec.fractional_bits),
+            ResidentGrain(self.presentation.spec.fractional_bits),
         )?;
         let (returned, covector) = self.body.observe_geometric_rows(
             &prepared.layout,
@@ -319,7 +333,7 @@ impl<'c> NativeFieldSession<'c> {
             commit,
         )?;
         let held_disagreements=request.partial.as_ref().map(|parts|parts.iter().take(target.len()).enumerate().filter_map(|(i,p)|p.as_ref().and_then(|value|
-            (self.chart.alphabet().symbol_of(value)!=Some(target[i])).then(||json!({"position":i,"given":value,"target":self.spec.symbols[target[i].0 as usize]})))).collect::<Vec<_>>()).unwrap_or_default();
+            (self.presentation.chart.alphabet().symbol_of(value)!=Some(target[i])).then(||json!({"position":i,"given":value,"target":self.presentation.spec.symbols[target[i].0 as usize]})))).collect::<Vec<_>>()).unwrap_or_default();
         let mut value = json!({"scope":"geometric-field-source-observation","returned":returned,"held_disagreements":held_disagreements,"anatomy":self.inspect()});
         if !commit {
             value["input_covector"] = json!(
@@ -337,6 +351,7 @@ impl<'c> NativeFieldSession<'c> {
         step_bits: u32,
     ) -> Result<Value> {
         let retained = self
+            .presentation
             .retained_shared
             .get(&id)
             .ok_or_else(|| invalid("unknown retained geometric comparison"))?
@@ -348,7 +363,7 @@ impl<'c> NativeFieldSession<'c> {
             return Err(invalid("retained geometric receiving chart mismatch"));
         }
         let mut value = self.observe_geometric_source(&retained.request, text, step_bits, true)?;
-        self.retained_shared.remove(&id);
+        self.presentation.retained_shared.remove(&id);
         value["comparison"] = json!(id);
         value["producing_epoch"] = json!(retained.producing_epoch);
         value["applied_epoch"] = json!(self.body.epoch());
@@ -361,7 +376,7 @@ impl<'c> NativeFieldSession<'c> {
         text: &str,
         step_bits: u32,
     ) -> Result<Value> {
-        if self.spec.source_chart != FieldSourceChart::GeometricRegions {
+        if self.presentation.spec.source_chart != FieldSourceChart::GeometricRegions {
             return Err(invalid("geometric source chart required"));
         }
         self.observe_geometric_source(request, text, step_bits, false)

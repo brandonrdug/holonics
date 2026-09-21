@@ -82,7 +82,7 @@ and the [campaign correction](research/records/2026-09-20_THE_GEOMETRIC_FIELD_RE
 | Operation | Source owner |
 |---|---|
 | Public model and move owner | `crates/holonics-hna/src/native.rs`; `native/coupled_wave/body/field.rs`, `field/section.rs`; `NativeCoupledBody` |
-| Session, region preparation and observed return | `crates/holonics-hna/src/native/field_session.rs`, `field_session/{shared,geometric}.rs`; `field_geometry.rs` compiles analytic incidence; `body/field/geometric.rs` composes phase participation, held refinement and its complete return |
+| Session, region preparation and observed return | `crates/holonics-hna/src/native/field_session.rs`, `field_session/{incidence,native_source}.rs` attaches an actual field and derives pre-target source/incident contrasts; `{shared,geometric}.rs` retains the text/control callers; `body/field/{formation,geometric}.rs` owns formation/family transport and geometric refinement |
 | Real source and its comparison/cursor | `crates/holonics-hna/src/alpha/exposure.rs`, `examples/athena_exposure_field.rs`; [conversation data](docs/CONVERSATION_DATA.md) |
 | Constitutive field and paired source/current | `crates/holonic-engine/src/native_ecology/constitutive_fibre/field/`: source/reflection/target, material transport, receivers and internal modes |
 | Normalization and adjoints | `field/receiver/normalized{,.rs}`, `normalized/phase.rs`, `field/material_transport/normal/direct/section{,/composition}.rs`, `resident/section/bilinear_features.rs`; exact reference `exponentiated_ratio::transport::NormalizedKernel` |

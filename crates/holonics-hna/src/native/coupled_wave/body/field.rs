@@ -1,13 +1,14 @@
 //! Direct model composition on the operative field. No wave surrogate or host semantic replay.
 use super::*;
-mod section;
+pub mod formation;
 mod geometric;
+mod section;
 use holonic_engine::native_ecology::constitutive_fibre::{
     ConstitutiveSourceChart, FieldReactionEnclosure, FieldReactionEnclosureRest,
     GeneratorNeighborhoodRest, NativeConstitutiveField, NativeFieldCurrentSource,
-    NativeFieldCurrentSourceRest, NativeFieldRest, ResidentGeneratorNeighborhood,
-    ResidentHeldSection, ResidentHeldSectionRest, ResidentNormalEnclosure,
-    ResidentNormalEnclosureView,
+    NativeFieldCurrentSourceRest, NativeFieldRest, ResidentConstitutiveCurrent,
+    ResidentContextualSection, ResidentGeneratorNeighborhood, ResidentHeldSection,
+    ResidentHeldSectionRest, ResidentNormalEnclosure, ResidentNormalEnclosureView,
 };
 use holonic_engine::resident_section::{ResidentGrain, ResidentSectionRest};
 use serde::{Deserialize, Serialize};
@@ -52,6 +53,12 @@ impl<'c> NativeFieldGeneratedSection<'c> {
     }
     pub fn joint_output(&self) -> ResidentNormalEnclosureView<'_, 'c> {
         self.producing.full_output.view()
+    }
+    /// Output of the learned local reaction at the producing source and condition. This is
+    /// distinct from the reflected field boundary and remains available for source-qualified
+    /// inspection by a continuing field consumer.
+    pub fn reaction_output(&self) -> ResidentNormalEnclosureView<'_, 'c> {
+        self.producing.reaction.output_view()
     }
     pub fn comparison_id(&self) -> Option<u64> {
         self.comparison
@@ -138,7 +145,7 @@ impl<'c> FieldModel<'c> {
                     field,
                     reaction,
                     reason,
-                })
+                });
             }
         };
         Ok(Self {
@@ -780,6 +787,18 @@ impl<'c> NativeCoupledBody<'c> {
         self.field_model()?
             .generate(input, condition, true, retain, None)
     }
+
+    /// Generate from the condition currently held by the field neighborhood. The point current
+    /// is snapshotted in resident material before the mutable field passage begins.
+    pub fn generate_field_standing(
+        &mut self,
+        input: ResidentNormalInput<'_, 'c>,
+        commit: bool,
+        retain: bool,
+    ) -> Result<NativeFieldGeneratedSection<'c>, NativeSessionError> {
+        self.field_model()?
+            .generate_standing(input, commit, retain, None)
+    }
     pub fn preview_field(
         &mut self,
         input: ResidentNormalInput<'_, 'c>,
@@ -799,6 +818,88 @@ impl<'c> NativeCoupledBody<'c> {
     ) -> Result<NativeFieldGeneratedSection<'c>, NativeSessionError> {
         self.field_model()?
             .generate(input, condition, commit, retain, Some(held))
+    }
+
+    /// Standing-condition counterpart to [`Self::generate_received_field`].
+    pub fn generate_received_field_standing(
+        &mut self,
+        input: ResidentNormalInput<'_, 'c>,
+        held: &[bool],
+        commit: bool,
+        retain: bool,
+    ) -> Result<NativeFieldGeneratedSection<'c>, NativeSessionError> {
+        self.field_model()?
+            .generate_standing(input, commit, retain, Some(held))
+    }
+
+    /// Read the actual condition current that the field neighborhood will use next.
+    pub fn field_standing_condition(
+        &self,
+    ) -> Result<ResidentConstitutiveCurrent<'_, 'c>, NativeSessionError> {
+        match self.state()? {
+            BodyState::Field(field) => field.standing_condition(),
+            _ => Err(invalid("operation requires constituted field body")),
+        }
+    }
+
+    /// Derive the fixed-source contextual relation at an exact resident source current.
+    pub fn field_contextual_section(
+        &self,
+        source: ResidentConstitutiveCurrent<'_, 'c>,
+    ) -> Result<ResidentContextualSection<'c>, NativeSessionError> {
+        match self.state()? {
+            BodyState::Field(field) => field.contextual_section(source),
+            _ => Err(invalid("operation requires constituted field body")),
+        }
+    }
+
+    /// Transport the latest retained condition fibre through this member at a new source.
+    /// Its joint image keeps the supported condition/output correlation and domain coverage.
+    pub fn field_condition_image(
+        &self,
+        source: ResidentConstitutiveCurrent<'_, 'c>,
+    ) -> Result<
+        holonic_engine::native_ecology::constitutive_fibre::ResidentConditionImage<'c>,
+        NativeSessionError,
+    > {
+        match self.state()? {
+            BodyState::Field(field) => {
+                let evidence = field
+                    .reaction
+                    .last_received_evidence()
+                    .ok_or_else(|| invalid("no received field condition family"))?;
+                Ok(field
+                    .reaction
+                    .generator(field.member)?
+                    .read_condition_image(source, &evidence.family)?)
+            }
+            _ => Err(invalid("operation requires constituted field body")),
+        }
+    }
+
+    /// Form one actual source/condition/target passage through the same neighborhood used by
+    /// field generation. The receipt separates the original producing condition from the
+    /// contemporary standing and retains the complete returned condition family.
+    pub fn form_field_reaction_at<'a>(
+        &mut self,
+        source: ResidentConstitutiveCurrent<'a, 'c>,
+        condition: ResidentConstitutiveCurrent<'a, 'c>,
+        target: ResidentConstitutiveCurrent<'a, 'c>,
+    ) -> Result<NativeFieldFormation<'a, 'c>, NativeSessionError>
+    where
+        'c: 'a,
+    {
+        self.field_model()?.form_reaction(source, condition, target)
+    }
+
+    /// The latest condition-family evidence published by the field neighborhood.
+    pub fn field_last_evidence(
+        &self,
+    ) -> Option<&holonic_engine::native_ecology::constitutive_fibre::NeighborhoodEvidence<'c>> {
+        match self.state.as_ref()? {
+            BodyState::Field(field) => field.last_evidence(),
+            BodyState::Affine(_) | BodyState::Constitutive(_) => None,
+        }
     }
     pub fn train_field_reaction(
         &mut self,

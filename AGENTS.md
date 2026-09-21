@@ -63,7 +63,7 @@ Paths in this table are relative to `crates/` unless stated otherwise. These are
 | Work | Owning call / source to inspect |
 |---|---|
 | Public HNN model | `holonics-hna/src/native.rs`; `native/coupled_wave/body/field.rs` and `field/section.rs`; `NativeCoupledBody` is the move owner |
-| Field session and source rows | `holonics-hna/src/native/field_session.rs`, `field_session/{shared,geometric}.rs`; `field_geometry.rs` compiles analytic incidence; `body/field/geometric.rs` composes phase participation, held refinement and its complete return |
+| Field session and source rows | `holonics-hna/src/native/field_session.rs`, `field_session/{incidence,native_source}.rs` attaches an actual field and derives pre-target source/incident contrasts; `{shared,geometric}.rs` retains the text/control callers; `body/field/{formation,geometric}.rs` owns formation/family transport and geometric refinement |
 | Exposure, source/response relations and resume | `holonics-hna/src/alpha/exposure.rs`; `examples/athena_exposure_field.rs`; [conversation data](docs/CONVERSATION_DATA.md) |
 | Constitutive field, source and paired return | `holonic-engine/src/native_ecology/constitutive_fibre/field/`; source/reflection/target, material transport, internal modes and receiver |
 | Normalized sections and pullback | `field/receiver/normalized{,.rs}` and `normalized/phase.rs` below that field; `holonic-engine/kernels/field_normalized_receiver.cuh`; exact reference `exponentiated_ratio::transport::NormalizedKernel` |
