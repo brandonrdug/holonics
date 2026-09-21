@@ -1,3 +1,4 @@
+use super::super::super::material_transport::wides;
 use super::*;
 mod action;
 mod map_action;
@@ -38,6 +39,64 @@ pub struct NativeFieldCurrentSource<'c> {
 }
 
 impl<'c> NativeFieldCurrentSource<'c> {
+    /// Cold source-qualified inspection of the certified resident D/factor bounds.
+    /// This reads only the existing small aggregate packets and never realizes D or D D*.
+    pub fn inspect_operator_bounds(&self) -> Result<serde_json::Value, Error> {
+        let read = |section: &ResidentSection<'c>| -> Result<Vec<i128>, Error> {
+            let rest = self
+                .surface
+                .detach_section(section, 64)
+                .map_err(Error::from)?;
+            wides(&rest.intervals).map_err(Error::from)
+        };
+        let moments = read(&self._producing.moment_bounds)?;
+        let bounds = read(&self._producing.bounds)?;
+        if moments.len() != 4 || bounds.len() != 2 || moments.iter().chain(&bounds).any(|v| *v < 0)
+        {
+            return Err(Error::Shape);
+        }
+        let grain = self.grain;
+        let rat = |value: i128| -> String {
+            relational_geometry::Rat::new(value.into(), num_bigint::BigInt::from(1u8) << grain)
+                .to_string()
+        };
+        let mut map_error = bounds[0];
+        let mut rank = 0usize;
+        let mut nonzeros = 0usize;
+        let mut rows = self.births.len();
+        let mut factor = false;
+        if let Some(program) = &self._producing.factor_program {
+            factor = true;
+            rank = program.rank;
+            nonzeros = program.nonzeros;
+            rows = program.rows;
+            let defects = read(&program.defects)?;
+            if defects.len() != rank.max(1) || defects.iter().any(|v| *v < 0) {
+                return Err(Error::Shape);
+            }
+            map_error = defects
+                .into_iter()
+                .take(rank)
+                .try_fold(map_error, |sum, value| {
+                    sum.checked_add(value).ok_or(Error::Shape)
+                })?;
+        }
+        Ok(serde_json::json!({
+            "representation": if factor { "csr-low-rank" } else { "dense-reference" },
+            "operator_center_norm_upper": rat(moments[2]),
+            "internal_norm_upper": rat(moments[3]),
+            "map_error_upper": rat(map_error),
+            "internal_radius": rat(bounds[1]),
+            "grain": grain,
+            "boundary_components": self.boundary_components(),
+            "internal_components": self.internal_components(),
+            "rows": rows,
+            "rank": rank,
+            "nonzeros": nonzeros,
+            "field_cut": self.cut,
+            "contact_count": self.births.len(),
+        }))
+    }
     /// The actual operative D columns in the order of births(), with their full
     /// Frobenius bound. Column identity follows the caused contact population.
     pub fn material(&self) -> Result<Option<ResidentNormalEnclosureView<'_, 'c>>, Error> {
@@ -45,7 +104,9 @@ impl<'c> NativeFieldCurrentSource<'c> {
             return Ok(None);
         }
         if self._producing.factor_program.is_some() {
-            return Err(invalid("dense material receiver requires explicit factor-program realization"));
+            return Err(invalid(
+                "dense material receiver requires explicit factor-program realization",
+            ));
         }
         let d = self.boundary_components();
         let count = self.births.len();
@@ -218,10 +279,11 @@ impl<'c> NativeConstitutiveField<'c> {
         if !self.relation.usable || self.pending.is_some() || origins.is_empty() {
             return Err(Error::Uncertain);
         }
-        if origins.iter().enumerate().any(|(column, origin)| {
-            !origin.is_declared()
-                || origin.column() != column
-        }) {
+        if origins
+            .iter()
+            .enumerate()
+            .any(|(column, origin)| !origin.is_declared() || origin.column() != column)
+        {
             return Err(Error::ForeignOccurrence);
         }
         let junction = self.junction.as_ref().ok_or(Error::Shape)?;
@@ -237,14 +299,13 @@ impl<'c> NativeConstitutiveField<'c> {
                 && section.grain() == ResidentGrain(0)
                 && std::ptr::eq(section.surface(), surface)
         };
-        if !valid(&map, count, 2 * d) || !valid(&b, count, 4) || !valid(&bounds, 1, 4)
-        {
+        if !valid(&map, count, 2 * d) || !valid(&b, count, 4) || !valid(&bounds, 1, 4) {
             return Err(Error::Shape);
         }
         let grain = match self.junction_representation() {
-            Some(NativeFieldJunctionRepresentation::EnclosedDyadic {
-                fractional_bits,
-            }) => fractional_bits,
+            Some(NativeFieldJunctionRepresentation::EnclosedDyadic { fractional_bits }) => {
+                fractional_bits
+            }
             _ => return Err(Error::Shape),
         };
         let mut staged = sections(surface, d, count)?;
@@ -316,7 +377,9 @@ impl<'c> NativeConstitutiveField<'c> {
             .is_some_and(|junction| junction.operative.is_none());
         let staged = self.stage_operative_contacts()?;
         if origins.iter().enumerate().any(|(column, origin)| {
-            !origin.is_declared() || origin.column() != column || origin.column() >= staged.births().len()
+            !origin.is_declared()
+                || origin.column() != column
+                || origin.column() >= staged.births().len()
         }) {
             return Err(Error::ForeignOccurrence);
         }

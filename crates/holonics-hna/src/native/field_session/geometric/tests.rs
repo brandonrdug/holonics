@@ -13,6 +13,7 @@ fn spec() -> FieldSessionSpec {
         region_offsets: vec![],
         source_chart: FieldSourceChart::GeometricRegions,
         geometry: Some(linked_torus_field::linked_torus_field_spec(1, 2, 1).unwrap()),
+        incident: None,
         codec: FieldTextCodec::UnicodeScalars,
         fractional_bits: 48,
     }
@@ -23,6 +24,7 @@ fn request(retain: bool) -> FieldSectionRequest {
         partial: Some(vec![Some("a".into()), None, Some("b".into()), None]),
         output_symbols: Some(4),
         context: vec!["c".into()],
+        incident_preparation: None,
         commit: false,
         retain_comparison: retain,
     }

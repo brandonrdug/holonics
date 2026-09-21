@@ -4,6 +4,7 @@
 //! selected from the atlas result after its normal/gluing checks. Arcs retain the analytic torus
 //! geometry and derive each finite phase step from its two endpoint phases.
 
+use super::GeometricFieldSpec;
 use holonic_engine::{
     AnalyticFieldArcId, AnalyticFieldJunctionId, AnalyticFieldJunctionOrigin, CausalFieldAtlasLaw,
     CausalFieldEvent, CausalFieldStanding, DimensionalWaveModeId, EventId, ExactAnalyticFieldArc,
@@ -12,13 +13,119 @@ use holonic_engine::{
     ExactUnitConicPhase, FieldOverlapOutcome, FieldRegionId, FieldSupportStanding, ImplicitCellId,
     OrientedFieldSample, SourceTorusOccurrence,
 };
-use super::GeometricFieldSpec;
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
 use relational_geometry::{Rat, RatVec3, integer, rational_circle};
 use std::collections::{BTreeMap, BTreeSet};
 
 pub const LINKED_TORUS_MODE: DimensionalWaveModeId = DimensionalWaveModeId(1);
+
+/// Incident-field aperture order for the linked rings. The legacy geometric chart keeps its
+/// historical order; this chart follows admitted arcs through the shared overlap:
+/// A[1..] → A[0]=B[0] → B[1..].
+pub fn linked_torus_incident_slot_junctions(
+    spec: &GeometricFieldSpec,
+) -> Result<Vec<AnalyticFieldJunctionId>, String> {
+    let mut germs = BTreeSet::new();
+    let mut overlap = None;
+    for junction in &spec.junctions {
+        match junction.origin {
+            AnalyticFieldJunctionOrigin::LocalSupport { germ } => {
+                germs.insert(germ);
+            }
+            AnalyticFieldJunctionOrigin::InteractingOverlap { .. } => {
+                overlap = Some(junction.id);
+            }
+        }
+    }
+    let germs = germs.into_iter().collect::<Vec<_>>();
+    if germs.len() != 2 {
+        return Err("linked torus incident aperture requires two local germs".to_owned());
+    }
+    let shared = overlap.ok_or_else(|| "linked torus shared overlap is absent".to_owned())?;
+    let mut first = Vec::new();
+    let mut second = Vec::new();
+    for junction in &spec.junctions {
+        match junction.origin {
+            AnalyticFieldJunctionOrigin::LocalSupport { germ } if germ == germs[0] => {
+                first.push(junction.id)
+            }
+            AnalyticFieldJunctionOrigin::LocalSupport { germ } if germ == germs[1] => {
+                second.push(junction.id)
+            }
+            _ => {}
+        }
+    }
+    if first.is_empty() || second.is_empty() {
+        return Err("linked torus incident aperture has an empty ring".to_owned());
+    }
+    Ok(first
+        .into_iter()
+        .chain(std::iter::once(shared))
+        .chain(second)
+        .collect())
+}
+
+/// Derive material owners from the declared source-origin and ordered incoming port chart.
+/// Local A and local B supports share material within their own germ only when their ordered
+/// arc roles agree; the glued overlap receives its own owner. Degree alone is never used as the
+/// grouping criterion.
+pub fn linked_torus_material_owners(spec: &GeometricFieldSpec) -> Result<Vec<usize>, String> {
+    let mut origin_by_id = BTreeMap::new();
+    for junction in &spec.junctions {
+        origin_by_id.insert(junction.id, origin_key(&junction.origin));
+    }
+    let mut incoming = BTreeMap::<AnalyticFieldJunctionId, Vec<String>>::new();
+    for arc in &spec.arcs {
+        let source = origin_by_id
+            .get(&arc.from)
+            .ok_or_else(|| "arc source is outside declared junctions".to_owned())?;
+        incoming.entry(arc.to).or_default().push(format!(
+            "{}:{}:{}",
+            arc.from == arc.to,
+            source,
+            arc.delay
+        ));
+    }
+    let mut signature_by_id = BTreeMap::<AnalyticFieldJunctionId, String>::new();
+    for junction in &spec.junctions {
+        let mut ports = incoming
+            .remove(&junction.id)
+            .ok_or_else(|| "junction has no incoming port chart".to_owned())?;
+        ports.sort();
+        signature_by_id.insert(
+            junction.id,
+            format!("{}|{}", origin_by_id[&junction.id], ports.join(",")),
+        );
+    }
+    let mut owners = BTreeMap::new();
+    let mut next = 0usize;
+    let mut result = Vec::with_capacity(spec.junctions.len());
+    for junction in &spec.junctions {
+        let key = signature_by_id
+            .get(&junction.id)
+            .ok_or_else(|| "junction material signature is missing".to_owned())?;
+        let owner = *owners.entry(key.clone()).or_insert_with(|| {
+            let owner = next;
+            next += 1;
+            owner
+        });
+        result.push(owner);
+    }
+    if result.is_empty() {
+        return Err("linked torus has no material owner sites".to_owned());
+    }
+    Ok(result)
+}
+
+fn origin_key(origin: &AnalyticFieldJunctionOrigin) -> String {
+    match origin {
+        AnalyticFieldJunctionOrigin::LocalSupport { germ } => format!("germ:{germ:?}"),
+        AnalyticFieldJunctionOrigin::InteractingOverlap { overlap } => {
+            format!("overlap:{overlap:?}")
+        }
+    }
+}
 
 /// Construct the validated geometric source used by the geometric field session.
 pub fn linked_torus_field_spec(
@@ -349,5 +456,24 @@ fn append_ring_arcs(
             modal_phase_step: BTreeMap::from([(LINKED_TORUS_MODE, step)]),
         });
         *next_arc += 1;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn incident_aperture_uses_the_shared_ring_path() {
+        let spec = linked_torus_field_spec(1, 1, 1).unwrap();
+        let slots = linked_torus_incident_slot_junctions(&spec).unwrap();
+        assert_eq!(slots.len(), spec.slot_junctions.len());
+        for pair in slots.windows(2) {
+            assert!(
+                spec.arcs
+                    .iter()
+                    .any(|arc| arc.from == pair[0] && arc.to == pair[1])
+            );
+        }
     }
 }

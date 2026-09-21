@@ -406,6 +406,7 @@ mod tests {
             region_offsets: vec![-1, 0, 1],
             source_chart: FieldSourceChart::SharedRegions,
             geometry: None,
+            incident: None,
             codec: FieldTextCodec::Utf8Nibbles,
             fractional_bits: 48,
         }
@@ -423,6 +424,7 @@ mod tests {
             partial: Some(parts),
             output_symbols: None,
             context: vec![],
+            incident_preparation: None,
             commit: false,
             retain_comparison: false,
         }
@@ -526,6 +528,7 @@ mod tests {
                 partial: Some(vec![Some("6".into()), Some("1".into())]),
                 output_symbols: None,
                 context: vec![],
+                incident_preparation: None,
                 commit: false,
                 retain_comparison: false,
             };

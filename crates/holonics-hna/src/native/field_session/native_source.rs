@@ -126,6 +126,7 @@ impl<'c> NativeFieldSession<'c, NativeFieldSources<'c>> {
         Ok(Self {
             surface,
             body,
+            incident: None,
             presentation: NativeFieldSources {
                 spec,
                 incidence,
@@ -452,6 +453,7 @@ impl NativeSourceSavedSession {
         Ok(NativeFieldSession {
             surface,
             body,
+            incident: None,
             presentation: NativeFieldSources {
                 spec: self.header.spec,
                 incidence,

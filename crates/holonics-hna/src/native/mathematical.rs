@@ -451,6 +451,27 @@ impl<'c> NativeMathematicalSession<'c> {
             next_predictor: 0,
         }
     }
+
+    /// Borrow a retained mathematical input on the same resident surface without
+    /// decoding it at the host boundary.  Product output and product-receiver
+    /// inputs retain their existing core-identity checks through `with_section`.
+    pub(crate) fn with_resident_input<R>(
+        &self,
+        input: &MathematicalInputWire,
+        consume: impl FnOnce(&ResidentSection<'c>) -> Result<R, NativeSessionError>,
+    ) -> Result<R, NativeSessionError> {
+        input.with_section(
+            self.surface,
+            &self.operators,
+            &self.products,
+            consume,
+        )
+    }
+
+    pub(crate) fn surface(&self) -> &'c ResidentSurface<'c> {
+        self.surface
+    }
+
     pub fn inspect(&self) -> Value {
         json!({"scope": "native-mathematical-application-session", "operators": self.operators.keys().collect::<Vec<_>>(),
             "retained_products": self.products.keys().collect::<Vec<_>>(),

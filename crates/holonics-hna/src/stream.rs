@@ -4,7 +4,7 @@
 use crate::{HnaOccurrence, HnaSession};
 use holonic_engine::native_ecology::holonic_intelligence::face_of_last_row;
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::{
     io::{self, BufRead, Write},
     path::{Path, PathBuf},
@@ -24,19 +24,64 @@ pub struct HnaStreamRequest {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "action", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum HnaStreamCommand {
-    MathematicalRequest { request: crate::native::MathematicalRequest },
-    FieldRequest { request: crate::native::FieldSectionRequest },
-    ObserveField { source: u64, text: String, step_bits: u32 },
-    ObserveFieldSource { request: crate::native::FieldSectionRequest, text: String, step_bits: u32 },
-    ReleaseFieldComparison { source: u64 },
-    ActuateText { text:String },
-    ProjectSymbol { #[serde(default)] full_emission:bool },
-    EmitSymbol { #[serde(default)] full_emission:bool, #[serde(default)] retain_comparison:bool },
-    ObserveSymbol { source:u64, text:String },
-    CompareSymbol {source:u64,text:String,#[serde(default)] coefficient_row:Option<usize>},
-    ReleaseSymbolComparison {source:u64},
-    ReceiveNextSymbol { text:String },
-    ReceiveNextSymbolDistribution { text:String, series_terms:u32 },
+    MathematicalRequest {
+        request: crate::native::MathematicalRequest,
+    },
+    AdmitFieldSource {
+        texts: Vec<String>,
+    },
+    FieldRequest {
+        request: crate::native::FieldSectionRequest,
+    },
+    FieldMathematical {
+        request: crate::native::FieldMathematicalRequest,
+    },
+    ObserveField {
+        source: u64,
+        text: String,
+        step_bits: u32,
+    },
+    ObserveFieldSource {
+        request: crate::native::FieldSectionRequest,
+        text: String,
+        step_bits: u32,
+    },
+    ReleaseFieldComparison {
+        source: u64,
+    },
+    ActuateText {
+        text: String,
+    },
+    ProjectSymbol {
+        #[serde(default)]
+        full_emission: bool,
+    },
+    EmitSymbol {
+        #[serde(default)]
+        full_emission: bool,
+        #[serde(default)]
+        retain_comparison: bool,
+    },
+    ObserveSymbol {
+        source: u64,
+        text: String,
+    },
+    CompareSymbol {
+        source: u64,
+        text: String,
+        #[serde(default)]
+        coefficient_row: Option<usize>,
+    },
+    ReleaseSymbolComparison {
+        source: u64,
+    },
+    ReceiveNextSymbol {
+        text: String,
+    },
+    ReceiveNextSymbolDistribution {
+        text: String,
+        series_terms: u32,
+    },
     ReceiveCurrent {
         current: crate::native::CurrentWire,
         #[serde(default)]
@@ -50,7 +95,11 @@ pub enum HnaStreamCommand {
         transport: crate::native::CurrentWire,
     },
     InspectRelation,
-    PredictContinuation { word: Vec<usize>, #[serde(default)] full_family: bool },
+    PredictContinuation {
+        word: Vec<usize>,
+        #[serde(default)]
+        full_family: bool,
+    },
     Advance {
         occurrence: HnaOccurrence,
         #[serde(default)]
@@ -211,7 +260,7 @@ impl HnaStream {
                         return Err(HnaStreamError::Output(io::Error::new(
                             io::ErrorKind::WriteZero,
                             "writer accepted no bytes",
-                        )))
+                        )));
                     }
                     Ok(n) => self.state.output_accepted += n,
                     Err(error) if error.kind() == io::ErrorKind::Interrupted => continue,
@@ -270,7 +319,7 @@ impl HnaStream {
             let request: HnaStreamRequest = match serde_json::from_slice(&self.state.input) {
                 Ok(request) => request,
                 Err(error) if error.is_eof() && !self.state.input.ends_with(b"\n") => {
-                    return Err(HnaStreamError::IncompleteInput)
+                    return Err(HnaStreamError::IncompleteInput);
                 }
                 Err(error) => {
                     self.state.input_complete = true;
@@ -295,6 +344,14 @@ impl HnaStream {
                 },
                 HnaStreamCommand::MathematicalRequest { request } => match target.mathematical_request(&request) {
                     Ok(value) => self.emit("mathematical-return", value)?,
+                    Err(error) => self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?,
+                },
+                HnaStreamCommand::AdmitFieldSource { texts } => match target.admit_field_source(&texts) {
+                    Ok(value) => self.emit("field-source-admitted", value)?,
+                    Err(error) => self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?,
+                },
+                HnaStreamCommand::FieldMathematical { request } => match target.field_mathematical(&request) {
+                    Ok(value) => self.emit("field-mathematical", value)?,
                     Err(error) => self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?,
                 },
                 HnaStreamCommand::FieldRequest { request } => match target.field_request(&request) {
@@ -435,21 +492,62 @@ impl Default for HnaStream {
 /// Only an exterior effect seam for I/O tests. Native current and learning are never callbacks
 /// supplied through the public stream protocol; actual adapters use HnaSession or NativeSession.
 trait StreamTarget {
-    fn field_request(&mut self, _: &crate::native::FieldSectionRequest) -> Result<Value, String> { Err("field session is not attached".into()) }
-    fn observe_field(&mut self, _: u64, _: &str, _: u32) -> Result<Value, String> { Err("field observation is not attached".into()) }
-    fn observe_field_source(&mut self, _: &crate::native::FieldSectionRequest, _: &str, _: u32) -> Result<Value, String> { Err("field source observation is not attached".into()) }
-    fn release_field_comparison(&mut self, _: u64) -> Result<Value, String> { Err("field comparison release is not attached".into()) }
-    fn receive_next_symbol_distribution(&mut self,_:&str,_:u32)->Result<Value,String>{Err("normalized next-current receiver unsupported by this session".into())}
-    fn mathematical_request(&mut self, _: &crate::native::MathematicalRequest) -> Result<Value, String> {
+    fn admit_field_source(&mut self, _: &[String]) -> Result<Value, String> {
+        Err("incident source declaration is not attached".into())
+    }
+    fn field_request(&mut self, _: &crate::native::FieldSectionRequest) -> Result<Value, String> {
+        Err("field session is not attached".into())
+    }
+    fn field_mathematical(
+        &mut self,
+        _: &crate::native::FieldMathematicalRequest,
+    ) -> Result<Value, String> {
+        Err("field mathematical session is not attached".into())
+    }
+    fn observe_field(&mut self, _: u64, _: &str, _: u32) -> Result<Value, String> {
+        Err("field observation is not attached".into())
+    }
+    fn observe_field_source(
+        &mut self,
+        _: &crate::native::FieldSectionRequest,
+        _: &str,
+        _: u32,
+    ) -> Result<Value, String> {
+        Err("field source observation is not attached".into())
+    }
+    fn release_field_comparison(&mut self, _: u64) -> Result<Value, String> {
+        Err("field comparison release is not attached".into())
+    }
+    fn receive_next_symbol_distribution(&mut self, _: &str, _: u32) -> Result<Value, String> {
+        Err("normalized next-current receiver unsupported by this session".into())
+    }
+    fn mathematical_request(
+        &mut self,
+        _: &crate::native::MathematicalRequest,
+    ) -> Result<Value, String> {
         Err("mathematical construction is not attached to this session".into())
     }
-    fn compare_symbol(&mut self,_:u64,_:&str,_:Option<usize>)->Result<Value,String>{Err("joint producing-family comparison unsupported by this model".into())}
-    fn release_symbol_comparison(&mut self,_:u64)->Result<Value,String>{Err("coupled comparison release unsupported by this model".into())}
-    fn receive_next_symbol(&mut self,_:&str)->Result<Value,String>{Err("actual next-symbol receiver unsupported by this model".into())}
-    fn project_symbol(&mut self,_:bool)->Result<Value,String>{Err("projected family receiver unsupported by this model".into())}
-    fn actuate_text(&mut self,_:&str)->Result<Value,String>{Err("text source chart unsupported by this model".into())}
-    fn emit_symbol(&mut self,_:bool,_:bool)->Result<Value,String>{Err("symbol receiver unsupported by this model".into())}
-    fn observe_symbol(&mut self,_:u64,_:&str)->Result<Value,String>{Err("symbol observation chart unsupported by this model".into())}
+    fn compare_symbol(&mut self, _: u64, _: &str, _: Option<usize>) -> Result<Value, String> {
+        Err("joint producing-family comparison unsupported by this model".into())
+    }
+    fn release_symbol_comparison(&mut self, _: u64) -> Result<Value, String> {
+        Err("coupled comparison release unsupported by this model".into())
+    }
+    fn receive_next_symbol(&mut self, _: &str) -> Result<Value, String> {
+        Err("actual next-symbol receiver unsupported by this model".into())
+    }
+    fn project_symbol(&mut self, _: bool) -> Result<Value, String> {
+        Err("projected family receiver unsupported by this model".into())
+    }
+    fn actuate_text(&mut self, _: &str) -> Result<Value, String> {
+        Err("text source chart unsupported by this model".into())
+    }
+    fn emit_symbol(&mut self, _: bool, _: bool) -> Result<Value, String> {
+        Err("symbol receiver unsupported by this model".into())
+    }
+    fn observe_symbol(&mut self, _: u64, _: &str) -> Result<Value, String> {
+        Err("symbol observation chart unsupported by this model".into())
+    }
     fn receive_current(
         &mut self,
         _: &crate::native::CurrentWire,
@@ -885,9 +983,14 @@ impl StreamTarget for crate::native::NativeMathematicalSession<'_> {
     fn advance_native(&mut self, _: &HnaOccurrence, _: bool) -> Result<Value, String> {
         Err("use the mathematical request's declared input ports".into())
     }
-    fn inspect(&self) -> Value { crate::native::NativeMathematicalSession::inspect(self) }
+    fn inspect(&self) -> Value {
+        crate::native::NativeMathematicalSession::inspect(self)
+    }
     fn checkpoint(&self, _: &Path, _: &HnaStreamState) -> Result<(), String> {
-        Err("mathematical session serialization is not attached; the live session remains owned".into())
+        Err(
+            "mathematical session serialization is not attached; the live session remains owned"
+                .into(),
+        )
     }
     fn supply_input_material(&mut self, _: &Path) -> Result<(), String> {
         Err("supply an explicit mathematical construction or input chart".into())
@@ -914,6 +1017,13 @@ impl StreamTarget for crate::native::NativeCoupledWaveSession<'_>{
 }
 
 impl StreamTarget for crate::native::NativeFieldSession<'_> {
+    fn admit_field_source(&mut self, texts: &[String]) -> Result<Value,String> {
+        self.admit_incident_source_texts(texts).map_err(|error|error.to_string())
+    }
+    fn field_mathematical(&mut self, request: &crate::native::FieldMathematicalRequest) -> Result<Value,String> {
+        self.mathematical_request(request).map_err(|error|error.to_string())
+    }
+
     fn observe_field_source(&mut self, request: &crate::native::FieldSectionRequest, text: &str, step_bits: u32) -> Result<Value, String> {
         self.observe_source(request, text, step_bits).map_err(|e|e.to_string())
     }
@@ -935,7 +1045,9 @@ impl StreamTarget for crate::native::NativeFieldSession<'_> {
         Err("use field-request with its declared source/context section".into())
     }
     fn checkpoint(&self, path: &Path, transport: &HnaStreamState) -> Result<(), String> {
-        self.checkpoint(path, transport).map(|_| ()).map_err(|e| e.to_string())
+        self.checkpoint(path, transport)
+            .map(|_| ())
+            .map_err(|e| e.to_string())
     }
     fn supply_input_material(&mut self, _: &Path) -> Result<(), String> {
         Err("field sessions use their declared FieldSessionSpec".into())

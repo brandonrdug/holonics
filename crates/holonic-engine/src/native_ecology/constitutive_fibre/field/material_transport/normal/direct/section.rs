@@ -1,3 +1,4 @@
+use super::enclosure::{decode_ball_words, decode_radius_word};
 use super::*;
 use crate::resident_section::SLOT_WORDS;
 use std::rc::Rc;
@@ -110,6 +111,50 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
 
     pub fn components(&self) -> usize {
         self.width
+    }
+
+    /// Inspect every row from one resident readout. Row views remain available for callers that
+    /// need one row, while telemetry and cold receipts use this batch path to avoid rereading the
+    /// entire section once per row.
+    pub fn inspect_rows(&self) -> Result<Vec<NativeFieldCurrentBall>, ConstitutiveFibreError> {
+        let stride = self
+            .width
+            .checked_add(1)
+            .and_then(|v| v.checked_mul(2))
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        if self.section.width() != stride || self.section.rows() != self.rows {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let words = self.surface.read_out(&self.section)?;
+        (0..self.rows)
+            .map(|row| {
+                let offset = row
+                    .checked_mul(stride)
+                    .ok_or(ConstitutiveFibreError::Shape)?;
+                decode_ball_words(&words, offset, self.width, self.grain)
+            })
+            .collect()
+    }
+
+    /// Inspect only the certified radius of every row from one resident readout.
+    pub fn inspect_radii(&self) -> Result<Vec<relational_geometry::Rat>, ConstitutiveFibreError> {
+        let stride = self
+            .width
+            .checked_add(1)
+            .and_then(|v| v.checked_mul(2))
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        if self.section.width() != stride || self.section.rows() != self.rows {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let words = self.surface.read_out(&self.section)?;
+        (0..self.rows)
+            .map(|row| {
+                let offset = row
+                    .checked_mul(stride)
+                    .ok_or(ConstitutiveFibreError::Shape)?;
+                decode_radius_word(&words, offset, self.width, self.grain)
+            })
+            .collect()
     }
 
     pub fn grain(&self) -> ResidentGrain {
@@ -1115,11 +1160,27 @@ mod covector_return_tests {
         let state = staged.inspect().unwrap();
         // f=1 and g=(1+i), sigma=1/2; H=2, B=(1+i)/2 and the normal reference
         // is (1+i)/4. The applied positive numerical proposal carries its actual defect.
-        assert_eq!(state.source_normal[0][0],ExactComplexWaveCurrent::new(Rat::from_integer(2.into()),Rat::zero()));
-        assert_eq!(state.cross_source[0][0],ExactComplexWaveCurrent::new(Rat::new(1.into(),2.into()),Rat::new(1.into(),2.into())));
-        let reference=ExactComplexWaveCurrent::new(Rat::new(1.into(),4.into()),Rat::new(1.into(),4.into()));
-        assert!(state.material.coefficients[0][0].subtract(&reference).norm_square()
-            <= &state.material.radius*&state.material.radius);
+        assert_eq!(
+            state.source_normal[0][0],
+            ExactComplexWaveCurrent::new(Rat::from_integer(2.into()), Rat::zero())
+        );
+        assert_eq!(
+            state.cross_source[0][0],
+            ExactComplexWaveCurrent::new(
+                Rat::new(1.into(), 2.into()),
+                Rat::new(1.into(), 2.into())
+            )
+        );
+        let reference = ExactComplexWaveCurrent::new(
+            Rat::new(1.into(), 4.into()),
+            Rat::new(1.into(), 4.into()),
+        );
+        assert!(
+            state.material.coefficients[0][0]
+                .subtract(&reference)
+                .norm_square()
+                <= &state.material.radius * &state.material.radius
+        );
     }
 }
 

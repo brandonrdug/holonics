@@ -2,6 +2,7 @@
 use super::*;
 pub mod formation;
 mod geometric;
+pub mod incident;
 mod section;
 use holonic_engine::native_ecology::constitutive_fibre::{
     ConstitutiveSourceChart, FieldReactionEnclosure, FieldReactionEnclosureRest,
@@ -898,7 +899,7 @@ impl<'c> NativeCoupledBody<'c> {
     ) -> Option<&holonic_engine::native_ecology::constitutive_fibre::NeighborhoodEvidence<'c>> {
         match self.state.as_ref()? {
             BodyState::Field(field) => field.last_evidence(),
-            BodyState::Affine(_) | BodyState::Constitutive(_) => None,
+            BodyState::Affine(_) | BodyState::Constitutive(_) | BodyState::Incident(_) => None,
         }
     }
     pub fn train_field_reaction(

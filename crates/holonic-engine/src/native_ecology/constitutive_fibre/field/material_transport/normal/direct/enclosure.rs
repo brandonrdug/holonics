@@ -104,24 +104,65 @@ impl ResidentNormalEnclosureView<'_, '_> {
     }
     pub fn inspect(&self) -> Result<NativeFieldCurrentBall, ConstitutiveFibreError> {
         let words = self.surface.read_out(self.section)?;
-        let v = wides(&words[self.offset..self.offset + 2 * (self.width + 1)])?;
-        let scale = BigInt::one() << self.grain.0;
-        if v[self.width] < 0 {
-            return Err(ConstitutiveFibreError::Uncertain);
-        }
-        Ok(NativeFieldCurrentBall {
-            center: v[..self.width]
-                .chunks_exact(2)
-                .map(|v| {
-                    ExactComplexWaveCurrent::new(
-                        Rat::new(v[0].into(), scale.clone()),
-                        Rat::new(v[1].into(), scale.clone()),
-                    )
-                })
-                .collect(),
-            radius: Rat::new(v[self.width].into(), scale),
-        })
+        decode_ball_words(&words, self.offset, self.width, self.grain)
     }
+}
+
+/// Decode one ball from an already-read resident section. Batch section inspection uses this
+/// helper so the carrier is transferred once while preserving the row decoder used by views.
+pub(super) fn decode_ball_words(
+    words: &[(i64, i64)],
+    offset: usize,
+    width: usize,
+    grain: ResidentGrain,
+) -> Result<NativeFieldCurrentBall, ConstitutiveFibreError> {
+    let word_width = width
+        .checked_add(1)
+        .and_then(|v| v.checked_mul(2))
+        .ok_or(ConstitutiveFibreError::Shape)?;
+    let end = offset
+        .checked_add(word_width)
+        .ok_or(ConstitutiveFibreError::Shape)?;
+    if end > words.len() {
+        return Err(ConstitutiveFibreError::Shape);
+    }
+    let v = wides(&words[offset..end])?;
+    let scale = BigInt::one() << grain.0;
+    if v[width] < 0 {
+        return Err(ConstitutiveFibreError::Uncertain);
+    }
+    Ok(NativeFieldCurrentBall {
+        center: v[..width]
+            .chunks_exact(2)
+            .map(|v| {
+                ExactComplexWaveCurrent::new(
+                    Rat::new(v[0].into(), scale.clone()),
+                    Rat::new(v[1].into(), scale.clone()),
+                )
+            })
+            .collect(),
+        radius: Rat::new(v[width].into(), scale),
+    })
+}
+
+pub(super) fn decode_radius_word(
+    words: &[(i64, i64)],
+    offset: usize,
+    width: usize,
+    grain: ResidentGrain,
+) -> Result<Rat, ConstitutiveFibreError> {
+    let radius = offset
+        .checked_add(width.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?)
+        .ok_or(ConstitutiveFibreError::Shape)?;
+    let end = radius.checked_add(2).ok_or(ConstitutiveFibreError::Shape)?;
+    if end > words.len() {
+        return Err(ConstitutiveFibreError::Shape);
+    }
+    let value = wides(&words[radius..end])?[0];
+    if value < 0 {
+        return Err(ConstitutiveFibreError::Uncertain);
+    }
+    Ok(Rat::new(value.into(), BigInt::one() << grain.0))
 }
 impl<'a, 'c> ResidentNormalEnclosureView<'a, 'c> {
     /// Read the exact point only when the entire declared ball has radius zero.
