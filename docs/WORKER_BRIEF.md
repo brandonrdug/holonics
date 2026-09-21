@@ -16,6 +16,9 @@ The primary supplies:
 
 - The requested object/consequence and how this subtask contributes to it.
 - Known operands, inferred unknown, equation, hypotheses and retained residual.
+- Which of the [six general objects](WINDING_CARRY_AND_PLACEMENT.md#8-using-the-picture-in-a-design)
+  the subtask touches (phase and carry, pair address, conserved faces, cell holonomy and retained
+  class, tube reading, continuation), stated in the helical pair interaction's operands.
 - Exact owning paths, existing formal/native owners and the consuming call.
 - Governing research records and applicable direct corrections, with useful content summarized.
 - Issues advanced, current source revision and relevant verification receipts.

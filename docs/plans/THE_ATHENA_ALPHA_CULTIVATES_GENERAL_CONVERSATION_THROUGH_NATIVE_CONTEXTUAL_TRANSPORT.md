@@ -1327,6 +1327,18 @@ must pass through the actual producing maps; it cannot be relabelled as that hid
 | 7. Episodes | `alpha/exposure.rs`, `examples/athena_exposure_field.rs` | Recorded Athena, mathematical and code episodes on the machine; a motor-chart control inferring chain phases for a requested receiving face, without a simulator | #16 |
 | 8. Formal | `formal/elementary-holonics/ElementaryHolonics/{Geometry,Transport,Foundation}` | The obligations listed in #62 | #62 |
 
+[definition] Each packet states the [winding guide's operands](../WINDING_CARRY_AND_PLACEMENT.md#8-using-the-picture-in-a-design)
+it touches. Packet 1 reports the pair face's locks through `winding::LockAddress`. Packet 3
+gives each generator a `RationalPhase` with its carry level (`Odometer`), each admitted pair its
+lock address and tolerance, each site a `SiteFactor`, and the incidence complex its cells, so
+participation, cell flux and the retained harmonic class are read from one complex. Packet 5
+realizes a dormant generator as a harmonic class read by a cycle receiver. Packet 6 advances
+phases by winding rather than by step and checks a compressed machine against Newton's
+identities between its transfer determinant and trace sequence. Packet 8 adds the carry tower
+joined to `IwasawaTower.padicTower`, the lock address joined to `Farey.cfProd`, the Foster pair
+identity as a pair quadrance, signature placement for the pair medium (#54) and the affine
+holonomy as a screw with its Burgers step.
+
 Packets 1, 2 and 8 are independent of 3; 3 consumes 1; 4–7 consume 3. Keep the current
 normal M/D reuse; do not replace it with a word archive. Bind an applicable compression
 owner with `D E=ρ` and `E_next T_a=U_a E`, including action domain/incident constraints.

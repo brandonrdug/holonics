@@ -85,6 +85,20 @@ holds the source and formal audit;
 is its checked formal statement. Every native packet lands with its Lean counterpart or names
 the obligation it leaves in #62.
 
+[project-postulate] **September 21: the unit's general objects are one picture and stay
+attached.** The [winding guide](../WINDING_CARRY_AND_PLACEMENT.md) states them with checked laws
+and owners: the helix as a circle with its carry cocycle, the pair's lock as the zero-power
+direction with a modular (Farey) address and mediant cost, the determinant, trace sequence and
+transfer determinant that phase carriage conserves with placement by signature, the holonomy a
+cell reads with the dormant mode as its harmonic class, the tube between cross-section charts
+read as a map or a pairing, and continuation through a tower. Their Lean owners are
+`Geometry/{PhaseCarry,PairResonance}` and `Transport/{GeneratorTraceFaces,CellHolonomy}`; the
+exact native owner is `relational_geometry::winding`. Primes, `ζ`, `Λ_DN`, elliptic curves, Hodge
+classes and Einstein's tensors are graded instances in the guide's §7. A design states the
+guide's §8 operands before implementation; the
+[record](../../research/records/2026-09-21_WINDING_CARRY_FACES_AND_PLACEMENT_GENERALIZE_THE_HELICAL_PAIR.md)
+holds the direction and source recovery.
+
 [definition] The model is one continuing `(K,Θ,|H⟩)` with admitted incidence/transport K,
 constitutive and learned material Θ, and resident joint currents/interior modes. Receiving
 interfaces can themselves be active fields with storage, material and motion. Generation
@@ -222,7 +236,10 @@ has the following implementation position, in dependency order:
    `ContactFace`/`MediumContact`/`HolonicInteraction` from a `ScrewPair` and its jet, then the
    ordered `SituatedScrew` chain with recharted Jacobian columns and per-pair contacts. Exact
    tests mirror the `HelicalPairInteraction` theorems. `screw.rs` is consumed unchanged.
-5. **Build the machine geometry in HNA (#17).** A generator-family `GeometricFieldSpec`;
+5. **Build the machine geometry in HNA (#17).** Each generator carries a `RationalPhase` with
+   its carry level (`winding::Odometer`), each admitted pair a `LockAddress` and tolerance, each
+   site a `SiteFactor`, and the incidence complex its cells, so participation, cell flux and
+   the retained harmonic class are read from one complex. A generator-family `GeometricFieldSpec`;
    phase-carried source moments `m_g`, `M_gh(δ)`; receiving phases with a fixed phase-offset
    port; full pair-receiver participation with the jet pullback; the legacy ring layout
    preserved for saved models. Global D/b, the normal law, producing return, publication and
@@ -231,10 +248,13 @@ has the following implementation position, in dependency order:
    normal law; closure inference of rates, configurations and admitted pairs with plural
    families retained; `native_source`/`formation` compatibility carried through the public
    invocation, preserving `Delta_i=U_i q_i-q_r` and the original target port; `standing.rs` and
-   `receiver_release.rs` bound to dormant generators. A terminal face is not a measured hidden
-   reaction.
+   `receiver_release.rs` bound to dormant generators, a dormant generator being a harmonic
+   class that a cycle receiver reads (`CellHolonomy.dormant_mode_is_locally_silent`). A terminal
+   face is not a measured hidden reaction.
 7. **Economy and episodes (#18/#61, #16).** Moment accumulation is the compact source-span
-   statistic; stepped words use the generator power; resident state is independent of source
+   statistic; stepped words use the generator power and phases advance by winding rather than
+   by step; a compressed machine is checked against Newton's identities between its transfer
+   determinant and trace sequence (`winding::Machine`); resident state is independent of source
    length and the actual launch realization is reported. Inspect the recorded contextual,
    mathematical and code episodes and a motor-chart chain control at their actual receivers.
    The returned helical/native examples and checks are dependencies, not a campaign to repeat.

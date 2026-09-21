@@ -217,6 +217,13 @@ link–object contact is one pair interaction. Exact finite motions remain suppl
 actions with their `RationalPhase`; a general affine action is not identified with `exp(tξ)`.
 The native chain consumer is #27 and the face derivation #28; their formal counterparts are #62.
 
+[definition] The [winding guide](WINDING_CARRY_AND_PLACEMENT.md) continues these laws: the
+carry cocycle behind the winding (`Geometry/PhaseCarry`), a lock as the zero-power direction with
+its Farey address and mediant cost (`Geometry/PairResonance`), the determinant, trace sequence
+and transfer determinant that phase carriage conserves (`Transport/GeneratorTraceFaces`), and
+the holonomy of a cell with the dormant mode as its harmonic class (`Transport/CellHolonomy`).
+`relational_geometry::winding` is their exact native owner.
+
 ## Two-sided angles are an algebraic chart of this construction
 
 [definition] The record's two-sided algebra `A_k=ℝ[ι]/(ι²−k)` and the conic

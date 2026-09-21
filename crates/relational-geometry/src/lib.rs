@@ -14,6 +14,7 @@ pub mod receiver_atlas;
 pub mod receiver_topology;
 pub mod scene;
 pub mod screw;
+pub mod winding;
 
 pub use decorated_path::*;
 pub use eta_atlas::*;
@@ -25,3 +26,4 @@ pub use receiver_atlas::*;
 pub use receiver_topology::*;
 pub use scene::*;
 pub use screw::*;
+pub use winding::*;

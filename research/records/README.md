@@ -14,6 +14,7 @@ Read [HOLON](../../docs/HOLON.md), [HNN_FORMULA](../../docs/HNN_FORMULA.md) and 
 [field-session source map](../../docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#field-session-source-map).
 
 - [The helical pair interaction is the HNN site and phase carries context](2026-09-21_THE_HELICAL_PAIR_INTERACTION_IS_THE_HNN_SITE_AND_PHASE_CARRIES_CONTEXT.md): **the confirmed design object.** Source audit of the incident field against the screw/interaction/standing owners, the unit's equations, rotor/Bombe/articulated-body instances, the generator-machine geometry, the checked `Transport/HelicalPairInteraction` laws, the Lean audit and the campaign packets.
+- [Winding, carry, faces and placement generalize the helical pair](2026-09-21_WINDING_CARRY_FACES_AND_PLACEMENT_GENERALIZE_THE_HELICAL_PAIR.md): the general objects behind the unit (carry cocycle, modular lock address, conserved trace faces, cell holonomy and dormant harmonic class, tube, continuation), their recovered `Millennium/`/`RH/` owners, four checked Lean modules, the `winding` Rust owner and the graded arithmetic instances. Definitions: [winding guide](../../docs/WINDING_CARRY_AND_PLACEMENT.md).
 - [The HNN formula joins the library to the model](2026-09-14_THE_HNN_FORMULA_JOINS_THE_LIBRARY_TO_THE_MODEL.md): the actual field/operator composition.
 - [Eros unifies faces, landmarks and the continuing machine](2026-09-15_EROS_UNIFIES_FACES_LANDMARKS_AND_THE_CONTINUING_MACHINE.md): the purpose and whole/part construction behind the model.
 - [The operating guides carry the machine and research into the consumer](2026-09-20_THE_OPERATING_GUIDES_CARRY_THE_MACHINE_AND_RESEARCH_INTO_THE_CONSUMER.md): consolidation, verified driver repairs and the finalized issue division.
@@ -106,6 +107,7 @@ An encoder's `E_next T=U E` and its decoder state the reuse being claimed.
 Read [constraint modes and active faces](../../docs/CONSTRAINT_MODES_AND_RECEIVER_FACES.md) and
 [the maintained constant/source distinction](../../docs/MATHEMATICS_AND_NATIVE_CONDUCT.md#constraint-defined-modes-and-named-de-bruijn-boundaries).
 
+- [Winding, carry, faces and placement generalize the helical pair](2026-09-21_WINDING_CARRY_FACES_AND_PLACEMENT_GENERALIZE_THE_HELICAL_PAIR.md): remainders as phases with their carry, locks and Farey addresses, `Λ_DN` pair dynamics, Frobenius as rotation–dilation, Hodge/cell holonomy, signature placement and the tube reading, with owners and grades.
 - [Landmarks and moduli](2026-08-20_LANDMARKS_AND_MODULI.md): period, modulus, doubling and branch relations.
 - [π and e have oriented constraint-generator faces](2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md): independent generators, phase lifts and certified receiving windows.
 - [The golden reciprocal joins Gamma, zeta and spoke gaps](2026-09-12_GOLDEN_RECIPROCAL_JOINS_GAMMA_ZETA_AND_SPOKE_GAPS.md): concrete shared relations and their distinct source families.
@@ -121,6 +123,7 @@ Read [helical geometry](../../docs/HELICAL_GEOMETRY.md), [the Holon](../../docs/
 [the intrinsic geometric field](../experiments/intrinsic_holonic_flow/README.md).
 
 - [The helical pair interaction is the HNN site and phase carries context](2026-09-21_THE_HELICAL_PAIR_INTERACTION_IS_THE_HNN_SITE_AND_PHASE_CARRIES_CONTEXT.md): **the confirmed design object.** Source audit of the incident field against the screw/interaction/standing owners, the unit's equations, rotor/Bombe/articulated-body instances, the generator-machine geometry, the checked `Transport/HelicalPairInteraction` laws, the Lean audit and the campaign packets.
+- [Winding, carry, faces and placement generalize the helical pair](2026-09-21_WINDING_CARRY_FACES_AND_PLACEMENT_GENERALIZE_THE_HELICAL_PAIR.md): the general objects behind the unit (carry cocycle, modular lock address, conserved trace faces, cell holonomy and dormant harmonic class, tube, continuation), their recovered `Millennium/`/`RH/` owners, four checked Lean modules, the `winding` Rust owner and the graded arithmetic instances. Definitions: [winding guide](../../docs/WINDING_CARRY_AND_PLACEMENT.md).
 - [Clocked torus currents continue through a retained fibre](2026-09-08_CLOCKED_TORUS_CURRENTS_CONTINUE_THROUGH_A_RETAINED_FIBRE.md): phase, clock and continuing current.
 - [The helical-pair question](2026-09-19_THE_TRIGONOMETRY_OF_A_HELICAL_PAIR_IS_TRIGONOMETRY_OVER_A_TWO_SIDED_ANGLE.md): original synthesis with its later elementary corrections.
 - [The geometric field refines and returns its complete paired current](2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md): the actual geometric field consumer and its situated-pair moment/phase reuse.
@@ -138,6 +141,7 @@ Read [the fluid construction](../../docs/HOLONIC_FLUID_CONSTRUCTION.md),
 [interior memory](../../docs/FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md) and
 [the formal framework](../../docs/FORMAL_FRAMEWORK.md).
 
+- [Winding, carry, faces and placement generalize the helical pair](2026-09-21_WINDING_CARRY_FACES_AND_PLACEMENT_GENERALIZE_THE_HELICAL_PAIR.md): remainders as phases with their carry, locks and Farey addresses, `Λ_DN` pair dynamics, Frobenius as rotation–dilation, Hodge/cell holonomy, signature placement and the tube reading, with owners and grades.
 - [Changing constitution and receivers share one defect calculus](2026-09-08_CHANGING_CONSTITUTION_AND_RECEIVERS_SHARE_ONE_DEFECT_CALCULUS.md): actual mixed terms and transported residuals.
 - [Boundary flux couples active interiors](2026-09-08_BOUNDARY_FLUX_COUPLES_ACTIVE_INTERIORS_AND_TOLERANCE_IS_RECEIVER_RELATIVE.md): boundary, storage, relevance and tolerance.
 - [Swing, stress and interior feedback form the fluid construction](2026-09-14_SWING_STRESS_AND_INTERIOR_FEEDBACK_FORM_THE_FLUID_CONSTRUCTION.md): the constitutive/fluid and Hodge owners that the model can consume.
@@ -152,6 +156,7 @@ hypotheses when its material or receiver changes.
 Read [mass/energy and causal transport](../../docs/MASS_ENERGY_AND_CAUSAL_TRANSPORT.md),
 [the formal framework](../../docs/FORMAL_FRAMEWORK.md) and [RH source transport](../../docs/RH_CENTERED_CURRENT_UPPER_BOUND.md).
 
+- [Winding, carry, faces and placement generalize the helical pair](2026-09-21_WINDING_CARRY_FACES_AND_PLACEMENT_GENERALIZE_THE_HELICAL_PAIR.md): remainders as phases with their carry, locks and Farey addresses, `Λ_DN` pair dynamics, Frobenius as rotation–dilation, Hodge/cell holonomy, signature placement and the tube reading, with owners and grades.
 - [Mass-energy and Maxwell bounds unify transport](2026-09-12_MASS_ENERGY_AND_MAXWELL_BOUNDS_UNIFY_TRANSPORT.md): units, source/receiver frames and the physical current.
 - [Compact fibres return charge and recover the physics](2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md): the existing compactification, gauge and matter-Hamiltonian chain.
 - [Mass, flux gaps and navigation return their source maps](2026-09-13_MASS_FLUX_GAPS_AND_OPTIMAL_NAVIGATION_RETURN_THEIR_SOURCE_MAPS.md): oriented source geometry and scoped navigation consequences.

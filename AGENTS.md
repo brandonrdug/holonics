@@ -36,6 +36,24 @@ operands), the Bombe (configuration inference by pairwise loop closure) and an a
 (an ordered chain of `SituatedScrew`s) are instances. State a design in these operands before
 implementing it; a text, image, acoustic or motor chart is a boundary of this object.
 
+[project-postulate] **One picture, kept attached during work**
+([winding guide](docs/WINDING_CARRY_AND_PLACEMENT.md),
+[record](research/records/2026-09-21_WINDING_CARRY_FACES_AND_PLACEMENT_GENERALIZE_THE_HELICAL_PAIR.md)).
+The pair unit continues into six general objects, and a design or worker brief states which it
+touches and keeps the rest attached: (1) **helix = circle + carry** — the carry is the cocycle
+gluing one level onto the next, the state retains the winding that carried material forgets;
+(2) **pair = torus with a modular address** — a lock is the zero-power direction, addressed by
+its Farey word, and a tolerance selects the mediant; (3) **generator = rotation × dilation** —
+phase carriage conserves determinant, trace sequence and transfer determinant, and placement is
+rotation after a common dilation, decided by signature; (4) **face = holonomy around a cell** —
+class functions are the gauge-free faces, an affine holonomy is a screw with its Burgers step,
+and a dormant mode is the harmonic class; (5) **tube = transfer between cross-section charts**,
+read as a map or as a pairing, with integration by reflection as its boundary elimination;
+(6) **continuing = a thread through a tower with deterministic lifting**, and compression of
+functionality keeps future-distinguishing classes and the carries between levels. Primes, `ζ`,
+`Λ_DN`, elliptic curves, Hodge classes, Einstein's tensors, rotor machines and articulated
+bodies are instances with graded scope; none owns a private version of these objects.
+
 [definition] One Holon `|H⟩_F` carries situated incidence K, constitutive/learned material Θ,
 joint currents and internal modes, a frame F, and participating receivers. Circulating modes,
 interlinked toroidal domains, helical passages, contacts and recursive/preimage geometry belong
@@ -53,6 +71,10 @@ geometry supplies transport, comparison, variation and reuse; it is part of the 
 | Contact variation | `Q=⟨Δ\|Δ⟩`, with both sources' motion; the second variation includes geometric/prestress terms as well as a Gram term |
 | Pair contact | `J=[v_a\|−v_b]`, `DQ=2J*Δ`, `D²Q=2J*J+2diag(Δ·a_a,−Δ·a_b)`; `M_contact=Σw J*DJ`; zero power ⇔ `ṡv_a=ṫv_b`; a bilinear score is the polarized pair quadrance, so the unit-phase chart is the pair at zero advance and unit radii |
 | Phase carriage | `R_d=S⁻ᵈPSᵈ`; return `A⁻¹FA`; n occurrences compose to `(PS⁻¹)ⁿSⁿ`; a menu loop closes ⇔ the stage word fixes the boundary image; the helix is the winding-retaining lift of a torus chart |
+| Carry | `x=phase+n·winding`; `winding(x+y)=winding x+winding y+carry`; the carry is a cocycle and is content (`ℤ/4≄ℤ/2×ℤ/2`); `Sⁿ=C ⇒ S^(d+nk)=S^d·C^k`; the odometer's upper level advances by the lower winding |
+| Lock and address | `q·v_a=p·v_b` ⇔ zero power; neighbours ⇔ `p'q−pq'=1`; the mediant is the cheapest lock between; an address is a word in ⟨step, inversion⟩ |
+| Trace faces and placement | `(S⁻ᵈPSᵈ)ᵏ=S⁻ᵈPᵏSᵈ`; `det`, `tr(Mᵏ)`, `det(1−T·M)` conserved; machine `∏(1−a_gT+q_gT²)`, `Σ tr(M_gᵏ)`; rotation ⇔ `a²<4q`; placement by signature |
+| Cell holonomy and dormant class | `H=g₀₁g₁₂g₂₀ ↦ k₀⁻¹Hk₀`; `d₁(A+d₀φ)=d₁A`; a harmonic mode is silent at nodes and cells, is not a potential and is retained by its class |
 | Source and receiving phases | `m_g=Σ_k Ĝ_g(k)⁻¹E(u_k)`, pair relation `M_gh(δ)` at relative offset δ, `y_j=ρ_R(Ĝ(j)q)`; each generator advances by its own rate and the codec unit is not a native clock |
 | Continuing compression | `D E=ρ`, `E_next T_g=U_g E`; retain the separating direction or interior defect when the source does not descend |
 
@@ -118,6 +140,7 @@ Paths in this table are relative to `crates/` unless stated otherwise. These are
 | Exact algebra / generator reduction | `holonic-engine/src/exact_linear{,.rs}`, `prime_image_algebra.rs`, `receiver_history_compression/`, `winding_inertia.rs`; host/reference and resident APIs have distinct scopes |
 | Retained availability and predictive release | `holonic-engine/src/{standing,receiver_release}.rs`, `exact_linear/{contextual,kernel_modes}.rs`; `field/internal_mode.rs` retains the equal-drive specialization and explicitly refuses incompatible operative currents; `Foundation/{Standing,CausalRelevance,ReceiverHistoryCompression}.lean` supplies future sufficiency |
 | Helical and geometric source | `relational-geometry/src/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs`; `receiver_history_compression/observable.rs::HelicalMomentReuse` binds finite pair actions to the existing moment decoder. No Rust file yet joins `ScrewPair` to `HolonicInteraction`: the pair-derived `ContactFace` is #28/#48 and the serial `SituatedScrew` chain #27; `Transport/HelicalPairInteraction.lean` is their checked statement |
+| Winding, carry, address, trace faces and cell holonomy | Lean `Geometry/{PhaseCarry,PairResonance}`, `Transport/{GeneratorTraceFaces,CellHolonomy}` over `Millennium/{Farey,LocalFactor,TraceSequence,HodgeIndex,PlaceLedger,WindingLedger}`, `RH/{FosterTanks,HeatFlowStackedSeam}`, `Foundation/{HodgeReceiver,IwasawaTower,FractalPacking}`; Rust `relational-geometry/src/winding.rs` (`Odometer`, `LockAddress`, `SiteFactor`, `Machine`, `triangle_holonomy`); [guide](docs/WINDING_CARRY_AND_PLACEMENT.md) §8 lists the operands a design states |
 | Framework facade | `holonics/src/lib.rs`: `geometry` and `structure` work without the default native feature; HNN implementation is `holonics-hna` |
 | Formal entry | `formal/elementary-holonics/ElementaryHolonics/Framework.lean`: Core, Geometry, Dynamics, Information, Physics, Computation; [formal guide](docs/FORMAL_FRAMEWORK.md). Core imports `Foundation/{Standing,ReceiverRelease}`; Dynamics imports `Transport/{HolonicInteraction,HolonicChain,ContinuingTube,HelicalPairInteraction}`. A native packet that adds or changes a mathematical law lands with its Lean counterpart or names the obligation it leaves in #62 |
 | Application interfaces | `applications/holonics-workbench`; `applications/conversation-data`; [repository layout](docs/REPOSITORY.md) |
@@ -154,6 +177,7 @@ founding/recent records, the governing mathematical guide, and the formal/native
 
 | Subject / familiar spelling | Existing source family |
 |---|---|
+| Winding, carry, staircases of remainders, locks and addresses, conserved faces, cell holonomy, dormant classes, placement, tubes, continuation | [winding guide](docs/WINDING_CARRY_AND_PLACEMENT.md) first; `PhaseCarry`, `PairResonance`, `GeneratorTraceFaces`, `CellHolonomy`; `Farey`, `LocalFactor`, `TraceSequence`, `HodgeIndex`, `HodgeDivisorExponentialPassage`, `PlaceLedger`, `WindingLedger`, `Crossings`, `FosterTanks`, `HeatFlowStackedSeam`, `HodgeReceiver`, `IwasawaTower`, `FractalPacking`; Rust `relational_geometry::winding` |
 | Landmarks, periods, moduli, π/e, golden mode | `LandmarksAndModuli`, `Farey`, `Polarity`, `PiIterationConstraint`, `MachinPhaseConstraint`, `winding_inertia`, exact analytic owners |
 | Generator inference, normalization, softmax/sigmoid, coding | `GeneratorInference`, `HolonicAdjointNormalization`, `NormalizedExponential`, `AttentionModeCompression`, `ReceiverCodeCost`, native normal and normalized receivers |
 | Holonic Compression, modes, retained interior | `ReceiverHistoryCompression`, `GeneratorModeQuotient`, `JointReceiverDescent`, `HolonicQuadraticMomentCondensation`, native factor/moment/word owners |

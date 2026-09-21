@@ -60,6 +60,21 @@ states phase-carried material and stepping (`phaseTransport_add`, `phaseTranspor
 `Transport/{HolonicInteraction,HolonicChain,ContinuingTube}` and `Framework.Core` imports
 `Foundation/{ReceiverRelease,Standing}`, which the default target previously omitted.
 
+[proved-derived; formal-checked] Four further modules state the general objects of the
+[winding guide](WINDING_CARRY_AND_PLACEMENT.md), 38 theorems on standard axioms:
+`Geometry/PhaseCarry` (winding additivity up to the carry, the carry cocycle, `ℤ/4≄ℤ/2×ℤ/2`, the
+odometer cascade, the central carry retained by the state) and `Geometry/PairResonance` (lock =
+zero-power direction, unimodular neighbours, mediant cost, conserved intersection, the diagonal
+winding of coprime circles) are imported by `Framework.Geometry`;
+`Transport/GeneratorTraceFaces` (determinant, trace sequence and transfer determinant conserved
+by phase carriage; the machine's product factor and summed trace sequence, over
+`Millennium/LocalFactor`) and `Transport/CellHolonomy` (gauge conjugation of a cell's holonomy,
+gauge-free class functions, cell flux, the dormant harmonic mode over `Foundation/HodgeReceiver`)
+are imported by `Framework.Dynamics`. The default target passes at 9,206 jobs. The research
+umbrella additionally imports `RH/ZeroPairLock`, which joins the pair face to `RH/FosterTanks`:
+the reflected pair `(σ,γ)`, `(1−σ,γ)` is locked exactly on the seam, and for `γ ≠ 0` exactly when
+the tank's inductance is a positive real.
+
 [open] #62 owns the formal counterparts still owed: proper-rotation recharting and axis
 extraction, the serial chain and its Jacobian columns, `RationalPhase` winding and closure, the
 stepped machine as a `TransportWord`/`ReceiverHistoryCompression` instance, the helical moment

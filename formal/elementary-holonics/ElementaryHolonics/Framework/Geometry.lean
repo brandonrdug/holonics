@@ -8,6 +8,8 @@ import ElementaryHolonics.Geometry.Gyrogroup
 import ElementaryHolonics.Geometry.SwingPotential
 import ElementaryHolonics.Geometry.ExteriorBoundary
 import ElementaryHolonics.Geometry.ScrewGeometry
+import ElementaryHolonics.Geometry.PhaseCarry
+import ElementaryHolonics.Geometry.PairResonance
 import ElementaryHolonics.Millennium.HolonicComposition
 import ElementaryHolonics.Millennium.HolonicConnectionCurvature
 import ElementaryHolonics.Millennium.Rigidity

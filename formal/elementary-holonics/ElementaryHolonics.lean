@@ -119,6 +119,7 @@ import ElementaryHolonics.RH.HeatFlowBinding
 import ElementaryHolonics.RH.HeatFlowStackedSeam
 import ElementaryHolonics.RH.XiCentre
 import ElementaryHolonics.RH.FosterTanks
+import ElementaryHolonics.RH.ZeroPairLock
 import ElementaryHolonics.RH.FosterCount
 import ElementaryHolonics.RH.FosterProduct
 import ElementaryHolonics.RH.FosterSplit
@@ -280,6 +281,10 @@ import ElementaryHolonics.Transport.JetStaircase
 import ElementaryHolonics.Transport.Neck
 import ElementaryHolonics.Transport.HolonicInteraction
 import ElementaryHolonics.Transport.HelicalPairInteraction
+import ElementaryHolonics.Transport.GeneratorTraceFaces
+import ElementaryHolonics.Transport.CellHolonomy
+import ElementaryHolonics.Geometry.PhaseCarry
+import ElementaryHolonics.Geometry.PairResonance
 import ElementaryHolonics.Transport.HolonicChain
 import ElementaryHolonics.Millennium.HolonicRankFourInteractionPlanes
 import ElementaryHolonics.Millennium.HolonicMaxwellPropagation

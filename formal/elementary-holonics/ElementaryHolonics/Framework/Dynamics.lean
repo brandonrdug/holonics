@@ -6,6 +6,8 @@ import ElementaryHolonics.Transport.ContinuingTube
 import ElementaryHolonics.Transport.HolonicInteraction
 import ElementaryHolonics.Transport.HolonicChain
 import ElementaryHolonics.Transport.HelicalPairInteraction
+import ElementaryHolonics.Transport.GeneratorTraceFaces
+import ElementaryHolonics.Transport.CellHolonomy
 import ElementaryHolonics.Mathematics.AffineOrbitDivisor
 import ElementaryHolonics.Mathematics.AnalyticNavigation
 import ElementaryHolonics.Mathematics.AnalyticReceiving

@@ -44,6 +44,24 @@ operands), the Bombe (configuration inference by pairwise loop closure) and an a
 (an ordered chain of `SituatedScrew`s) are instances. State a design in these operands before
 implementing it; a text, image, acoustic or motor chart is a boundary of this object.
 
+[project-postulate] **One picture, kept attached during work**
+([winding guide](docs/WINDING_CARRY_AND_PLACEMENT.md),
+[record](research/records/2026-09-21_WINDING_CARRY_FACES_AND_PLACEMENT_GENERALIZE_THE_HELICAL_PAIR.md)).
+The pair unit continues into six general objects, and a design or worker brief states which it
+touches and keeps the rest attached: (1) **helix = circle + carry** — the carry is the cocycle
+gluing one level onto the next, the state retains the winding that carried material forgets;
+(2) **pair = torus with a modular address** — a lock is the zero-power direction, addressed by
+its Farey word, and a tolerance selects the mediant; (3) **generator = rotation × dilation** —
+phase carriage conserves determinant, trace sequence and transfer determinant, and placement is
+rotation after a common dilation, decided by signature; (4) **face = holonomy around a cell** —
+class functions are the gauge-free faces, an affine holonomy is a screw with its Burgers step,
+and a dormant mode is the harmonic class; (5) **tube = transfer between cross-section charts**,
+read as a map or as a pairing, with integration by reflection as its boundary elimination;
+(6) **continuing = a thread through a tower with deterministic lifting**, and compression of
+functionality keeps future-distinguishing classes and the carries between levels. Primes, `ζ`,
+`Λ_DN`, elliptic curves, Hodge classes, Einstein's tensors, rotor machines and articulated
+bodies are instances with graded scope; none owns a private version of these objects.
+
 [definition] Independent commuting phases admit a toroidal chart. Linked/overlapping domains have
 actual common cells and an interaction law; overlap alone does not supply friction. A helical object
 has a generator **and an initial configuration**, with its own clock/parameter. A receiver is a
@@ -58,6 +76,10 @@ Pair receiver    Δ=x_a(s)−x_b(t), Q=⟨Δ|Δ⟩; DQ and D²Q include both mot
 Pair contact     J=[v_a|−v_b], DQ=2J*Δ, D²Q=2J*J+2diag(Δ·a_a,−Δ·a_b); M_contact=Σw J*DJ; P=0 ⇔ ṡv_a=ṫv_b
 Phase carriage   R_d=S⁻ᵈPSᵈ; return A⁻¹FA; n occurrences compose to (PS⁻¹)ⁿSⁿ; menu loop closes ⇔ stage word fixes S a
 Source/receiver  m_g=Σ_k Ĝ_g(k)⁻¹E(u_k), M_gh(δ) pair relation at offset δ; y_j=ρ_R(Ĝ(j)q); helix = winding-retaining lift
+Carry            x=phase+n·winding; winding(x+y)=winding x+winding y+carry; carry is a cocycle; Sⁿ=C ⇒ S^(d+nk)=S^d·C^k
+Lock and address q·v_a=p·v_b ⇔ zero power; neighbours ⇔ p'q−pq'=1; mediant is the cheapest lock between; word in ⟨step, inversion⟩
+Trace faces      (S⁻ᵈPSᵈ)ᵏ=S⁻ᵈPᵏSᵈ; det, tr(Mᵏ), det(1−T·M) conserved; machine: ∏(1−a_gT+q_gT²), Σ tr(M_gᵏ); rotation ⇔ a²<4q
+Cell holonomy    H=g₀₁g₁₂g₂₀ ↦ k₀⁻¹Hk₀; d₁(A+d₀φ)=d₁A; harmonic ⇒ silent at nodes and cells, not a potential, retained by its class
 Participation    T_F[Ψ]=Σ_G a_FG[Ψ] U_(F←G)[Ψ] Ψ_G over admitted contacts
 Phase chart      s_ij=β cos(2π(q_i−q_j−φ_ij)), a=softmax(s); the pair receiver at zero advance and unit radii, connection φ
 Variation        δT=Σ a δ(UΨ)+Σ δa UΨ, δa=(diag(a)−aa*)δs
@@ -130,6 +152,7 @@ port and source fibre.
 | Kernels and their Rust binders | `crates/holonic-engine/kernels/{exact_resident_section.cu,field_normalized_receiver.cuh,normal_applied_condition.cuh,section_bilinear_adjoint.cuh}`; `src/resident_section/` |
 | Hardware law | `hardware_cover`, `section_partition`; `crates/holonic-mount/src/{cuda,launch_law,section_layout}.rs` |
 | Exact geometry and helical pair | `crates/relational-geometry/src/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs`; `receiver_history_compression/observable.rs::HelicalMomentReuse` binds finite pair actions to the existing moment decoder. No Rust file yet joins `ScrewPair` to `HolonicInteraction`: the pair-derived `ContactFace` is #28/#48 and the serial `SituatedScrew` chain #27; `Transport/HelicalPairInteraction.lean` is their checked statement |
+| Winding, carry, address, trace faces and cell holonomy | Lean `Geometry/{PhaseCarry,PairResonance}`, `Transport/{GeneratorTraceFaces,CellHolonomy}` over the existing `Millennium/{Farey,LocalFactor,TraceSequence,HodgeIndex,PlaceLedger,WindingLedger}`, `RH/{FosterTanks,HeatFlowStackedSeam}`, `Foundation/{HodgeReceiver,IwasawaTower,FractalPacking}`; Rust `crates/relational-geometry/src/winding.rs` (`Odometer`, `LockAddress`, `SiteFactor`, `Machine`, `triangle_holonomy`) |
 | Algebra and economical continuation | `exact_linear`, `prime_image_algebra`, `receiver_history_compression`, `winding_inertia`; resident bilinear/normal/word/mode owners at their separate call boundaries |
 | Retained availability and predictive release | `holonic-engine/src/{standing,receiver_release}.rs`, `exact_linear/{contextual,kernel_modes}.rs`; `field/internal_mode.rs` retains the equal-drive specialization and explicitly refuses incompatible operative currents; `Foundation/{Standing,CausalRelevance,ReceiverHistoryCompression}.lean` supplies future sufficiency |
 | Public framework | `crates/holonics/src/lib.rs`: `geometry` and `structure` without default native features; `holonics-hna` for HNN |
@@ -178,6 +201,9 @@ a row are different realizations. Report the actual one, not only the word “re
 The maintained [research routes](research/records/README.md) link useful records directly to
 formal/native owners. Begin with the task's subject, not only a recently proposed algorithm.
 
+- **Winding/carry/placement:** the [winding guide](docs/WINDING_CARRY_AND_PLACEMENT.md) first;
+  then `PhaseCarry`, `PairResonance`, `GeneratorTraceFaces`, `CellHolonomy` and the
+  `Millennium/`/`RH/` owners it names. Use its §8 operand list when stating a design.
 - **Landmarks/phase/constants:** `LandmarksAndModuli`, `Farey`, `Polarity`, `PiIterationConstraint`,
   `MachinPhaseConstraint`, `winding_inertia`, exact analytic owners; qualify the distinct Copson
   and Newman source families.

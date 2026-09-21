@@ -69,6 +69,13 @@ initial configurations are the sites, admitted pairs the arcs and their phases t
 A rotor machine, a Bombe menu and an articulated body are instances; a text, image, acoustic
 or motor chart is a boundary of it.
 
+[definition] The unit continues into six general objects, stated with their checked laws and
+owners in the [winding guide](WINDING_CARRY_AND_PLACEMENT.md): the helix as a circle with its
+carry, the pair's modular lock address, the faces phase carriage conserves with placement by
+signature, the holonomy a cell reads with the dormant mode as its harmonic class, the tube
+between two cross-section charts, and continuation through a tower. Arithmetic, physical and
+learning applications are instances of these objects.
+
 [definition] These are compatible parts and declared specializations of the same construction.
 The [model formula](HNN_FORMULA.md) supplies the full hypotheses, source maps and variations.
 
@@ -118,6 +125,7 @@ their exterior decimal statistical readings keep those sources and receiving sco
 |---|---|---|
 | Toroidal domains, shared cells and phase connection | `analytic_field`, graded/simplicial and connection owners; `HolonicTorusKnots`; [intrinsic field](../research/experiments/intrinsic_holonic_flow/README.md) | `GeometricFieldSpec` validates existing analytic junctions/arcs and compiles their phase transport. `field_session/geometric.rs` executes the legacy geometric chart; tagged `IncidentField` uses the same declared geometry through the full incident body and preserves ordered source contacts. The supplied linked-torus boundary network has a narrower domain than the intrinsic volume/advection reference. |
 | Helical pair and contact variation | `relational_geometry::screw`; `Geometry/ScrewGeometry`; `identity_atlas::screw_gram_point` | `HelicalMomentReuse` binds situated finite pair actions and quadrance to the existing observable-moment compression. Lifted phase closure preserves extra turns; an ambient moment fibre retains its physical-configuration restrictions. |
+| Winding, carry, lock address, conserved trace faces, cell holonomy | Lean `Geometry/{PhaseCarry,PairResonance}`, `Transport/{GeneratorTraceFaces,CellHolonomy}`, joined to `Farey`, `LocalFactor`, `HodgeReceiver`, `IwasawaTower` | `relational_geometry::winding::{Odometer,LockAddress,SiteFactor,Machine,triangle_holonomy}`. The HNN machine geometry (#17) consumes them as each generator's carry level, each pair's address and tolerance, each site's factor and the incidence complex's cells. |
 | **Helical pair interaction: the HNN site** | `ScrewPair`/`PairQuadranceJet` with `holonic_interaction::{ContactFace,Medium,HolonicInteraction}` and `holonic_chain`; [`Transport/HelicalPairInteraction.lean`](../formal/elementary-holonics/ElementaryHolonics/Transport/HelicalPairInteraction.lean) checks the slip-map/contact, phase-carried material, reflected-return and menu-closure laws | No Rust file joins these owners yet and `holonics-hna/src/` imports none of them. The incident field executes the pair's zero-advance, unit-radius collapse on a ring with one site per source cell. The [unit](HOLON.md#the-helical-pair-interaction-unit) and its [packets](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition) replace that layout with a fixed generator machine whose phases carry the source (#28/#48, #27, #17, #62). |
 | Normalized receiver and both input covectors | `field/receiver/normalized/phase.rs`, `normal/direct/section/composition.rs`, `resident/section/bilinear_features` | The geometric word calls the existing normalized receiver and pullback, both bilinear covectors, M transpose and fixed-D reflection. It returns through every refinement stage before one staged material update. |
 | Constitutive current and storage | `NativeConstitutiveField`, paired junction/source/reflection and normal material | `NativeCoupledBody` owns the operation; fixed-D scattering and its adjoint are existing mechanics. A friction/heat claim additionally supplies that material law. |

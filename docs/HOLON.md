@@ -132,7 +132,9 @@ A response position is a receiving phase, `y_j=ρ_R(Ĝ(j)q)`. The machine's size
 of source and response length. Each generator advances by its own declared or inferred rate;
 the exterior codec unit does not define a native clock. A generator with no participation at
 the present phase retains its material, initial configuration, phase and winding under the
-standing law below. The [native contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition)
+standing law below. The [winding guide](WINDING_CARRY_AND_PLACEMENT.md) states the general
+objects this unit continues into (carry, lock address, conserved faces, cell holonomy and the
+dormant harmonic class, tube, continuation) with their checked laws. The [native contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition)
 specifies the implementation packets.
 
 [definition] Let z carry the interacting Holons, their material, incidence, clocks and relevant
