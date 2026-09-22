@@ -11,6 +11,46 @@ Read the machine, [CONSTRUCTION_STATE](CONSTRUCTION_STATE.md) and the complete
 Worker prompts name this guide and the specific machine/source material to read. Make that context
 explicit rather than relying on an assumption about which files a particular harness loaded.
 
+## The elementary objects — the only design vocabulary
+
+[project-postulate] Brandon, September 22: design, worker briefs, formal work and code state
+their operations **only** in the [elementary objects](docs/ELEMENTARY_OBJECTS.md), which own the
+definitions and existing Lean/Rust owners. A text, image, acoustic, motor or arithmetic
+application is a boundary chart of them. A noun that is not one of them, or a composition of
+them, is a design defect. The picture: a continuing field of chains of **complex parametrons**
+(annular rings that store, oscillate and lock) joined by **helical pair contacts** (which slip,
+dissipate and address); rings rotate and align, contacts converge and diverge action.
+
+| Object | Dual / law |
+|---|---|
+| Complex | oriented cells, `∂²=0` |
+| Holon `\|H⟩`: a continuing current/motion, already present as potential, never produced by a computation | coholon `⟨Ȟ\|`, `d=∂ᵀ`; face `⟨Ȟ\|H⟩`; Stokes `⟨dȞ,H⟩=⟨Ȟ,∂H⟩`; orientation exists only in the pairing |
+| Constitution `Θ`: the material law relating a coholon to the motion it excites (storage `C=BᵀM_C B`, flow `K=BᵀM_L B`, dissipation `D⪰0`) | modes `Kv=ω²Cv`; motion = exact ⊕ coexact (induced) ⊕ harmonic (dormant) |
+| Generator `Ĝ` with initial configuration and clock; helix = circle + carry; fractal family = words, restrictions, scale square, first arrival; a source word is its address | adjoint `Ĝ*` carries the learning covector; release at tolerance |
+| Pair contact: slip `J`, `Q=⟨Δ\|Δ⟩`, `DQ=2J*Δ`, Farey lock address | contact material `ΣwJ*DJ` |
+| Parametron: incidence, `C`, `L`, pump, half-turn sheets, Ising lock; a perceptron is its locked-sheet receiver face | storage↔flow exchange at `ω=1/√(LC)`; a section crossing is a clock tick |
+| Tube (longitudinal clocked span) and tower (transverse restriction; gluing unique/plural/obstructed); world tube; `Λ_DN` eliminates an interior | holonomy only on declared circuits |
+| Relatively complete region (globe): closed boundary, interior coupled to the exterior but not determined by it | completeness is only relative to a receiver family; the relative completeness theorem is owed (#62) |
+| Deposition: the only law changing a constitution, from covectors that actually reached that locus | retention is the constitution as a future-sufficient quotient, never a record of fluxes |
+| Ratio: typed comparison of two Holons/coholons/transports, carried as an undivided pair | `ℓ=log R` with winding branch; `R⁻¹dR`; its jet (velocity, acceleration, jerk, …); loss is `log Ĝ_(T←H)` |
+| Receipt: a field of readings over a partition, each region in its own frame and clock | no global scalar or global gradient; per-region variability over its own ticks, joined to interface flux |
+
+[definition] Retire these phrasings: "terrain" and bare "standing" for the constitution; "a
+current changes a later current's standing" as a definition of learning; a constitution
+"turning" a coholon "into" a Holon; a single scalar of progress; and any tape, journal or
+frozen cut as retention.
+
+[project-postulate] **Keys and navigation.** Every action is a key: an action expression and its
+antecedents induce a consequence as flux only when they fit a constitution (the lock). The
+Enigma/Bombe reading is literal: rotors are parametron rings whose stepping is winding with
+carry, fixed material and reflector return through the producing operands, the key is the
+generators' initial configuration, and the Bombe infers it by pairwise loop closure over the
+menu of contacts. Dormant modes wait for a fitting antecedent. **Learning is locating keys** —
+inferring configuration and gauge of relevant generators from loop-closure constraints, which is
+compression (pruning) and navigation (the route). Resonating drives an existing mode at its
+eigenfrequency (RIDE); emanating founds or drives off-resonance (FOUND). The inference is
+general; no cryptanalytic application is pursued.
+
 ## 1. The object and its equations
 
 [project-postulate] Begin generation work with the
@@ -27,8 +67,8 @@ ledger or frozen producing cut kept for replay. "A current changes the standing 
 meets" is a consequence of that law, not the definition of learning: do not derive a per-occurrence
 state chain, its adjoint tape, frozen cuts or a fold over an update list from it. The source
 passage enters as phase-carried moments `m_g=Σ_k Ĝ_g(τ_g(k))⁻¹E_g(u_k)` whose adjoint needs
-no tape; a comparison observed after an update is read through the contemporary standing and
-returns its residual. The [retention audit](research/records/2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md)
+no tape; a comparison observed after an update is read through the contemporary constitution
+and returns its residual. The [retention audit](research/records/2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md)
 names the objects this replaces. Read `Foundation/Standing.lean`, the
 [prediction/release record](research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md)
 and the [source audit](research/records/2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md)
