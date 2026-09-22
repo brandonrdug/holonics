@@ -19,7 +19,17 @@ known source family, admitted controls/conditions, participating receiver and re
 Text, image, acoustic and motor releases are applications of that relation. Robotics is an intended
 HNN capability; the [simulator boundary](docs/HARDWARE_AND_MODALITY_BOUNDARIES.md#robotics-and-simulation-boundary)
 constrains the shared design now without scheduling a simulator run. A mode's availability is
-retained standing, not continuous activation. Read `Foundation/Standing.lean`, the
+retained standing, not continuous activation.
+
+[definition] **Retention is a quotient sufficient for the admitted future**
+(`Foundation/Standing.lean`, `standing.rs`); it is never an event archive, tape, journal,
+ledger or frozen producing cut kept for replay. "A current changes the standing a later current
+meets" is a consequence of that law, not the definition of learning: do not derive a per-occurrence
+state chain, its adjoint tape, frozen cuts or a fold over an update list from it. The source
+passage enters as phase-carried moments `m_g=Σ_k Ĝ_g(τ_g(k))⁻¹E_g(u_k)` whose adjoint needs
+no tape; a comparison observed after an update is read through the contemporary standing and
+returns its residual. The [retention audit](research/records/2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md)
+names the objects this replaces. Read `Foundation/Standing.lean`, the
 [prediction/release record](research/records/2026-09-12_PREDICTION_IS_PREPARED_TRANSPORT_AND_RELEASE_IS_BOUNDARY_CURRENT.md)
 and the [source audit](research/records/2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md)
 when working on recall, relevance, homeostasis or action inference.
@@ -142,12 +152,16 @@ and the [campaign correction](research/records/2026-09-20_THE_GEOMETRIC_FIELD_RE
 
 [established-bounded; source-inspected] Public generator `observe` now develops positive
 pair amplitudes through `operative/source/action/contact_amplitude.rs`, reconstructing D/D*
-from a fixed template and current parameters. The current-only CSR path stores no completed
-update journal. Live comparison tapes remain temporary source-dependent work until observe
-or release; they are not compressed histories. `enclosure_propagation` selects joint-ball
-bounds for new generator declarations; absent fields replay the legacy numerical law. The
+from a fixed template and current parameters. The rank-0 source-only CSR path stores no
+completed update journal; the `returns` journal remains on other paths. Pending comparisons
+still retain a per-occurrence nonlinear tape (`incident/machine_episode.rs`); its removal in
+favour of the moment accumulation is the next return, per the
+[retention audit](research/records/2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md).
+`enclosure_propagation` selects joint-ball bounds for new generator declarations; absent
+fields replay the legacy numerical law. The
 [material return](research/records/2026-09-22_PAIR_MATERIAL_LEARNS_WITHOUT_A_COMPLETED_UPDATE_ARCHIVE.md)
-names the native/formal evidence and remaining geometry/closure/economy scope.
+names the native/formal evidence and remaining geometry/closure/economy scope;
+`Transport/ContactAmplitudeState.lean` is a fold tautology, not the standing binding owed in #17.
 
 [definition] The [executable field campaign](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
 records the implemented composition: standing q/incident Delta feed the reaction, participation supplies
@@ -181,8 +195,9 @@ port and source fibre.
 [definition] The implemented incident mode uses standing q and transported differences Delta
 for Phi, with participation as the separate drive. Its global state contains one q and one b.
 Nonzero normal priors initialize both the applied W0 and H0/B0/C0; observed energy is Q_data.
-Source/receiver cohort statistics and frozen producing cuts remain attached through delayed
-returns. The [incident-field implementation return](research/records/2026-09-21_THE_INCIDENT_FIELD_JOINS_ITS_GENERATOR_RECEIVER_AND_FROZEN_RETURN.md)
+A delayed comparison owns its producing operands (moment, phases, covector, material cut id),
+not a replayable frozen cut of earlier material; the implemented frozen-cut replay is retired
+with the tape. The [incident-field implementation return](research/records/2026-09-21_THE_INCIDENT_FIELD_JOINS_ITS_GENERATOR_RECEIVER_AND_FROZEN_RETURN.md)
 connects these calls and their measured scope; the live state tracks the full application.
 
 [definition] The incident text interface fixes `response_port_start` independently of request
@@ -329,8 +344,10 @@ states its law and remaining scope. Legacy slot/response semantics remain distin
 [definition] `field_session/generator_application.rs` now owns the public `GeneratorMachine`
 source/receiving session. `incident/{machine_source,machine_source_contacts,machine_episode}.rs`
 advances the fixed machine, injects original complex source currents and appends directed
-kind-specific contrasts to the incident condition. The complete source/condition tape returns
-to E/M and shared phase text/stop material. Codec growth and V5 rest preserve old producing
-cuts; old slot/session wires remain readable. [Return and scope](research/records/2026-09-21_ORDERED_SOURCE_AND_PHASE_RECEIVING_ENTER_THE_PUBLIC_GENERATOR_SESSION.md).
-Constrained geometry/contact inference is next; the tape is not claimed compressed or sufficient
-for every possible graph receiver.
+kind-specific contrasts to the incident condition. `machine_source.rs` (advance + inject) is
+the per-step form of the moment law and is kept. `machine_episode.rs` interposes the full
+nonlinear word between occurrences and retains every occurrence's word as a reverse tape,
+which rest serializes; that recurrence is the contamination named in the
+[retention audit](research/records/2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md)
+and is replaced by moment accumulation with one word on the joint field. Old slot/session
+wires remain readable. [Return and scope](research/records/2026-09-21_ORDERED_SOURCE_AND_PHASE_RECEIVING_ENTER_THE_PUBLIC_GENERATOR_SESSION.md).

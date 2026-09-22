@@ -1295,13 +1295,18 @@ word bound and carries the approximation's receiving error over its engagement h
 [definition; agent-inferred] **Ordered source and its statistic.** Known data are the ordered
 source cells `u_k`, part/reply/provenance relations, source charts `E_g`, clocks `τ_g`, held
 boundary, initial standing and the requested receiving scope. The receiving target never
-supplies a source condition. A source occurrence drives the same machine through its admitted
-helical transport and incident reaction; its streaming recurrence is
-`z_(k+1)=T_(u_k,δτ_k;Θ)(z_k)`. This ingestion recurrence is distinct from the finite joint
-refinement word. It retains enough continuation to develop the generating relation and
-receive changed conditions through the existing `NativeCoupledBody`.
+supplies a source condition. A source occurrence enters the same fixed machine through its
+admitted helical transport: the generator advances by its declared action and the encoded
+increment is injected, `q_k⁺ = U_step(q_k) + I E(u_k)` (`machine_source.rs`). Unrolled, that
+is the moment `m_g` below; the phase carries order and the state is O(generators). The
+nonlinear incident word acts **once** on the accumulated joint field,
+`(q,b)=F_Θ(q₀+I m, b₀; c)`, not once per occurrence. The earlier statement of a streaming
+recurrence `z_(k+1)=T_(u_k,δτ_k;Θ)(z_k)` with the full incident word between occurrences is
+retracted by the [retention audit](../../research/records/2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md):
+it turned "a current changes the standing a later current meets" into a state chain whose
+adjoint needs a tape, and that tape is the causal-history archive the standing law excludes.
 
-For a declared linear transported source chart, useful candidate statistics are
+The source statistic on the declared transported source chart is
 
 ```text
 m_g(n) = Σ_(0≤k<n) Ĝ_g(τ_g(k))⁻¹ E_g(u_k)
@@ -1332,10 +1337,9 @@ a includes source injection (u,δτ), refinement, changed receivers and admitted
 
 on the admitted domain, including order, clocks and incident restrictions. The statistic
 state includes the necessary clock, offset boundary buffers, provenance restrictions and
-retained remainder. In particular, its source-injection update must intertwine the source-driven
-`T_(u,δτ;Θ)`, not merely transport an already prepared moment. If a nonlinear incident/receiving
-operation does not factor, that recurrence remains executable and the moment certifies only
-its declared linear/bilinear subreceivers. Physical realizability remains a constraint on the moment fibre. The fixed-material
+retained remainder. Where a nonlinear receiving operation does not factor through the moment,
+retain the **separating direction or source-qualified remainder** in the moment fibre — not an
+executable replay of the source passage. Physical realizability remains a constraint on the moment fibre. The fixed-material
 identity `(P S⁻¹)ⁿ Sⁿ` compresses its **repeated P, uniform-step** word. Different input-dependent
 `P(u_k)` or nonuniform steps require their ordered product or a proved descended recurrence;
 an exponent containing only the source length cannot replace their source content.
@@ -1426,9 +1430,12 @@ an explicit boundary of its output. The
 states projection, adjoint, factor-error, unit and declared-material scopes. The
 [ordered source/session return](../../research/records/2026-09-21_ORDERED_SOURCE_AND_PHASE_RECEIVING_ENTER_THE_PUBLIC_GENERATOR_SESSION.md)
 now advances the machine, supplies current increments and kind-specific directed conditions,
-returns through the complete source tape and reads shared phase text/termination material.
-Codec growth and rest retain old producing cuts. Geometry is still declared: packet 4 must
-supply its constrained proposal, not silently publish an unconstrained global D update.
+and reads shared phase text/termination material. Its per-occurrence nonlinear episode tape and
+frozen-cut replay are the objects the
+[retention audit](../../research/records/2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md)
+retires: the source return is the transposed moment accumulation, and a delayed comparison
+owns its producing operands, not earlier material versions. Geometry is still declared: packet
+4 must supply its constrained proposal, not silently publish an unconstrained global D update.
 
 [definition; agent-inferred] **Constrained arc-amplitude publication.** The
 [rectangular factor return](../../research/records/2026-09-21_THE_PAIR_RESPONSE_RETURNS_ITS_RECTANGULAR_FACTOR_COTANGENT.md)
@@ -1466,9 +1473,10 @@ pure-CSR current commits also need no journal of already applied deltas: subsequ
 read their complete current factor and q/b, while an open comparison owns its own producing
 source. Historical fields with an actual occurrence decoder keep that distinct contract.
 Rest records the fixed template/current parameters and only outstanding comparisons.
-The source episode's reverse tape remains temporary working data for such comparisons; its
-reduction requires the declared source/receiver law and is not claimed by eliminating the
-completed-update journal. The [implemented return](../../research/records/2026-09-22_PAIR_MATERIAL_LEARNS_WITHOUT_A_COMPLETED_UPDATE_ARCHIVE.md)
+The source episode's reverse tape is not working data to be reduced later; it is the state
+chain the [retention audit](../../research/records/2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md)
+removes in favour of the moment, whose adjoint needs no tape. `Transport/ContactAmplitudeState.lean`
+is a fold tautology and does not discharge the standing binding of #17. The [implemented return](../../research/records/2026-09-22_PAIR_MATERIAL_LEARNS_WITHOUT_A_COMPLETED_UPDATE_ARCHIVE.md)
 is a session target comparison that changes pair amplitudes and the same-input pair action,
 with bounded completed-update storage and a reopened outstanding comparison.
 

@@ -13,6 +13,7 @@ They are reading paths, not phases or an inventory of every file. The
 Read [HOLON](../../docs/HOLON.md), [HNN_FORMULA](../../docs/HNN_FORMULA.md) and the
 [field-session source map](../../docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#field-session-source-map).
 
+- [Retention is a quotient, not a tape, and the source enters as phase-carried moments](2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md): **audit of the September 21–22 campaigns.** The canon's definition of retention, how "a current changes later standing" became a per-occurrence recurrence with a reverse tape, frozen-cut replay, journals and a fold tautology in Lean, the machine's moment law with its tape-free adjoint, and the removal the next campaign performs.
 - [The campaign is connected and the next return is published pair material](2026-09-22_THE_CAMPAIGN_IS_CONNECTED_AND_THE_NEXT_RETURN_IS_PUBLISHED_PAIR_MATERIAL.md): direct Claude/Codex intent, connected public consumers, remaining publication boundary, issue disposition and corrections to stale current-status clauses.
 - [The pair response returns its rectangular factor cotangent](2026-09-21_THE_PAIR_RESPONSE_RETURNS_ITS_RECTANGULAR_FACTOR_COTANGENT.md): source-qualified native amplitude derivatives through both q/b factor terms, retained coefficient uncertainty and HNN return; positive proposals and constrained publication remain next.
 - [Pair material learns without a completed-update archive](2026-09-22_PAIR_MATERIAL_LEARNS_WITHOUT_A_COMPLETED_UPDATE_ARCHIVE.md): positive template/current-amplitude publication, joint affine/pair enclosure bounds, legacy enclosure-wire defaults, and the distinction between durable current state and live pending source tapes.
@@ -45,7 +46,9 @@ communication, dormant availability, homeostasis, control and robotics as well a
 - [Situated generators retain modes and release action](2026-09-21_SITUATED_GENERATORS_RETAIN_MODES_AND_RELEASE_ACTION.md): rotor/Bombe constraint inference, recurrent availability, exact simulator boundaries, Flash source corrections and the incident compatibility consumer.
 - [Rubik faces lift to torus intersections and navigation](2026-09-19_RUBIK_FACES_LIFT_TO_TORUS_INTERSECTIONS_AND_NAVIGATION_GRAPHS.md): actual move words, quotient faces and retained full-state fibres.
 
-`Foundation/Standing` and `CausalRelevance` retain future sufficiency and present reconstruction;
+`Foundation/Standing` and `CausalRelevance` retain future sufficiency and present reconstruction —
+retention is a quotient sufficient for the admitted future, never an event archive (see the
+[retention audit](2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md));
 `receiver_release`, exact contextual/kernel modes and native `field/internal_mode` give their
 specified realizations. The latter's equal-drive law does not cover every operative current.
 HNA `field_session/native_source` and `body/field/formation` already form and reuse condition
