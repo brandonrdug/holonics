@@ -33,6 +33,15 @@ that fixed-material passivity does not see — the learned power `⟨e, L e⟩` 
    (`clipNeg`, spectral theorem over `ℝ`) gives `projectPassive L` with `⟨e, L' e⟩ ≤ 0` for every
    `e` (`projectPassive_passive`), fixing every already-passive `L` (`projectPassive_of_passive`);
    hence projecting each update restores the bound of item 2 (`projected_committed_energy_bound`).
+5. **The certified projection (exact over `ℚ`).** For a certified congruence `Pᵀ (sym L) P = diag d`
+   with `P P⁻¹ = 1`, removing `P⁻ᵀ diag(d₊) P⁻¹` gives `S' = P⁻ᵀ diag(min(d,0)) P⁻¹ ⪯ 0`
+   (`congruenceClip_eq`, `congruenceClip_nonpos`), equal to `S` when `S ⪯ 0` (`d_i = ⟨Pδ_i, S Pδ_i⟩`,
+   `congruence_diag`, `congruenceClip_of_nonpos`); the projected relation is passive, fixes passive
+   relations, and restores the committed-energy bound (`projectPassiveCongruence_passive`,
+   `projectPassiveCongruence_of_passive`, `certified_committed_energy_bound`). It is not the
+   eigen-clip: for `S = [[1,1],[1,0]]` with `P = [[1,−1],[0,1]]` the certified clip is `diag(0,−1)`,
+   whose removed part does not commute with `S`, while the eigen-clip does (`clipNeg_commute`,
+   `congruence_vs_eigen_witness`).
 -/
 
 noncomputable section
@@ -299,6 +308,174 @@ theorem projected_committed_energy_bound (x : ℕ → n → ℝ) (Q J R L : ℕ 
   committed_energy_bound x Q J R (fun k => projectPassive (L k)) ε h hh hQ hJ hR
     (fun k e => projectPassive_passive (L k) e) hstep hdep hε m
 
+/-- [proved-derived; formal-checked] The eigen-clip commutes with the matrix it clips (both are
+diagonal in the same orthonormal eigenbasis). -/
+theorem clipNeg_commute {S : Matrix n n ℝ} (hS : S.IsHermitian) : S * clipNeg hS = clipNeg hS * S := by
+  have hU : ((hS.eigenvectorUnitary : Matrix n n ℝ))ᵀ * (hS.eigenvectorUnitary : Matrix n n ℝ) = 1 := by
+    have := Unitary.coe_star_mul_self hS.eigenvectorUnitary
+    rwa [Matrix.star_eq_conjTranspose, Matrix.conjTranspose_eq_transpose_of_trivial] at this
+  have hSU := spectral_real hS
+  unfold clipNeg
+  generalize (hS.eigenvectorUnitary : Matrix n n ℝ) = U at hU hSU ⊢
+  generalize hS.eigenvalues = lam at hSU ⊢
+  subst hSU
+  simp only [Matrix.mul_assoc]
+  rw [← Matrix.mul_assoc Uᵀ U, hU, Matrix.one_mul, ← Matrix.mul_assoc Uᵀ U, hU, Matrix.one_mul,
+    ← Matrix.mul_assoc (diagonal lam), ← Matrix.mul_assoc (diagonal _),
+    Matrix.diagonal_mul_diagonal, Matrix.diagonal_mul_diagonal]
+  congr 3
+  funext i; ring
+
 end Projection
+
+/-! ## 5. The certified-congruence projection (exact over `ℚ`) -/
+
+section Congruence
+
+variable {𝕜 : Type*} [Field 𝕜] [LinearOrder 𝕜] [IsStrictOrderedRing 𝕜]
+variable {n : Type*} [Fintype n] [DecidableEq n]
+
+/-- [definition] **The congruence clip.** With a certified congruence `Pᵀ S P = diag d` and
+`P⁻¹ = Pinv`, remove `P⁻ᵀ diag(d₊) P⁻¹`. -/
+def congruenceClip (S Pinv : Matrix n n 𝕜) (d : n → 𝕜) : Matrix n n 𝕜 :=
+  S - Pinvᵀ * diagonal (fun i => max (d i) 0) * Pinv
+
+omit [LinearOrder 𝕜] [IsStrictOrderedRing 𝕜] [DecidableEq n] in
+theorem quad_congr (A D : Matrix n n 𝕜) (e : n → 𝕜) :
+    e ⬝ᵥ ((Aᵀ * D * A) *ᵥ e) = (A *ᵥ e) ⬝ᵥ (D *ᵥ (A *ᵥ e)) := by
+  rw [← mulVec_mulVec, ← mulVec_mulVec, dotProduct_mulVec, vecMul_transpose]
+
+omit [IsStrictOrderedRing 𝕜] in
+/-- [proved-derived; formal-checked] Under the congruence, `S = P⁻ᵀ diag(d) P⁻¹` and the clip is
+`P⁻ᵀ diag(min(d, 0)) P⁻¹`. -/
+theorem congruenceClip_eq {S P Pinv : Matrix n n 𝕜} {d : n → 𝕜} (hP : P * Pinv = 1)
+    (hD : Pᵀ * S * P = diagonal d) :
+    congruenceClip S Pinv d = Pinvᵀ * diagonal (fun i => min (d i) 0) * Pinv := by
+  have hS : S = Pinvᵀ * diagonal d * Pinv := by
+    rw [← hD]
+    have hT : Pinvᵀ * Pᵀ = 1 := by rw [← Matrix.transpose_mul, hP, Matrix.transpose_one]
+    simp only [Matrix.mul_assoc]
+    rw [hP, Matrix.mul_one, ← Matrix.mul_assoc, hT, Matrix.one_mul]
+  rw [congruenceClip]
+  conv_lhs => rw [hS]
+  rw [← Matrix.sub_mul, ← Matrix.mul_sub, Matrix.diagonal_sub]
+  congr 3
+  funext i
+  rcases le_total (d i) 0 with h | h
+  · rw [max_eq_right h, min_eq_left h, sub_zero]
+  · rw [max_eq_left h, min_eq_right h, sub_self]
+
+/-- [proved-derived; formal-checked] **The congruence clip is negative semidefinite.** -/
+theorem congruenceClip_nonpos {S P Pinv : Matrix n n 𝕜} {d : n → 𝕜} (hP : P * Pinv = 1)
+    (hD : Pᵀ * S * P = diagonal d) (e : n → 𝕜) :
+    e ⬝ᵥ (congruenceClip S Pinv d *ᵥ e) ≤ 0 := by
+  rw [congruenceClip_eq hP hD, quad_congr]
+  set y := Pinv *ᵥ e
+  simp only [dotProduct, mulVec_diagonal]
+  apply Finset.sum_nonpos
+  intro i _
+  have := min_le_right (d i) 0
+  nlinarith [mul_self_nonneg (y i)]
+
+omit [LinearOrder 𝕜] [IsStrictOrderedRing 𝕜] in
+/-- [proved-derived; formal-checked] A congruence reads its diagonal: `⟨P δ_i, S P δ_i⟩ = d_i`. -/
+theorem congruence_diag {S P : Matrix n n 𝕜} {d : n → 𝕜} (hD : Pᵀ * S * P = diagonal d) (i : n) :
+    (P *ᵥ Pi.single i 1) ⬝ᵥ (S *ᵥ (P *ᵥ Pi.single i 1)) = d i := by
+  rw [← quad_congr, hD]
+  simp
+
+omit [IsStrictOrderedRing 𝕜] in
+/-- [proved-derived; formal-checked] **The congruence clip fixes a negative semidefinite `S`**:
+each `d_i = ⟨P δ_i, S P δ_i⟩ ≤ 0`, so `d₊ = 0`. -/
+theorem congruenceClip_of_nonpos {S P Pinv : Matrix n n 𝕜} {d : n → 𝕜}
+    (hD : Pᵀ * S * P = diagonal d) (hneg : ∀ e, e ⬝ᵥ (S *ᵥ e) ≤ 0) :
+    congruenceClip S Pinv d = S := by
+  have hd : ∀ i, d i ≤ 0 := fun i => by
+    rw [← congruence_diag hD i]; exact hneg _
+  rw [congruenceClip]
+  have : (fun i => max (d i) 0) = fun _ => (0 : 𝕜) := funext fun i => max_eq_right (hd i)
+  rw [this, Matrix.diagonal_zero, Matrix.mul_zero, Matrix.zero_mul, sub_zero]
+
+/-- [definition] The symmetric part over a field of characteristic zero. -/
+def symPartK (L : Matrix n n 𝕜) : Matrix n n 𝕜 := (1 / 2 : 𝕜) • (L + Lᵀ)
+
+omit [DecidableEq n] in
+theorem quad_symPartK (L : Matrix n n 𝕜) (e : n → 𝕜) :
+    e ⬝ᵥ (symPartK L *ᵥ e) = e ⬝ᵥ (L *ᵥ e) := by
+  rw [symPartK, smul_mulVec, add_mulVec, dotProduct_smul, dotProduct_add, dotProduct_mulVec e Lᵀ,
+    ← mulVec_transpose, Matrix.transpose_transpose, dotProduct_comm (L *ᵥ e), smul_eq_mul]
+  ring
+
+/-- [definition] **The certified passive projection** of a learned relation: remove
+`P⁻ᵀ diag(d₊) P⁻¹` for a congruence `Pᵀ (sym L) P = diag d`; the skew part is kept. -/
+def projectPassiveCongruence (L Pinv : Matrix n n 𝕜) (d : n → 𝕜) : Matrix n n 𝕜 :=
+  L - Pinvᵀ * diagonal (fun i => max (d i) 0) * Pinv
+
+/-- [proved-derived; formal-checked] **The certified projection is passive.** -/
+theorem projectPassiveCongruence_passive {L P Pinv : Matrix n n 𝕜} {d : n → 𝕜}
+    (hP : P * Pinv = 1) (hD : Pᵀ * symPartK L * P = diagonal d) (e : n → 𝕜) :
+    e ⬝ᵥ (projectPassiveCongruence L Pinv d *ᵥ e) ≤ 0 := by
+  have h := congruenceClip_nonpos hP hD e
+  rw [congruenceClip, sub_mulVec, dotProduct_sub, quad_symPartK] at h
+  rw [projectPassiveCongruence, sub_mulVec, dotProduct_sub]
+  exact h
+
+/-- [proved-derived; formal-checked] It fixes an already passive relation. -/
+theorem projectPassiveCongruence_of_passive {L P Pinv : Matrix n n 𝕜} {d : n → 𝕜}
+    (hD : Pᵀ * symPartK L * P = diagonal d) (hL : ∀ e, e ⬝ᵥ (L *ᵥ e) ≤ 0) :
+    projectPassiveCongruence L Pinv d = L := by
+  have hd : ∀ i, d i ≤ 0 := fun i => by
+    rw [← congruence_diag hD i, quad_symPartK]; exact hL _
+  rw [projectPassiveCongruence]
+  have : (fun i => max (d i) 0) = fun _ => (0 : 𝕜) := funext fun i => max_eq_right (hd i)
+  rw [this, Matrix.diagonal_zero, Matrix.mul_zero, Matrix.zero_mul, sub_zero]
+
+/-- [proved-derived; formal-checked] **The committed-energy bound under the certified
+projection**, composing `committed_energy_bound`: whatever the raw learned updates `L_k`, with
+certified congruences `P_kᵀ (sym L_k) P_k = diag d_k`, the committed energy obeys
+`E_m ≤ ∏ (1 + ε_k) E_0`. -/
+theorem certified_committed_energy_bound [CharZero 𝕜] (x : ℕ → n → 𝕜)
+    (Q J R L P Pinv : ℕ → Matrix n n 𝕜) (d : ℕ → n → 𝕜) (ε : ℕ → 𝕜) (h : 𝕜) (hh : 0 ≤ h)
+    (hQ : ∀ k, (Q k)ᵀ = Q k) (hJ : ∀ k, (J k)ᵀ = -J k) (hR : ∀ k e, 0 ≤ e ⬝ᵥ (R k *ᵥ e))
+    (hP : ∀ k, P k * Pinv k = 1) (hD : ∀ k, (P k)ᵀ * symPartK (L k) * P k = diagonal (d k))
+    (hstep : ∀ k, x (k + 1) - x k = h • ((J k - R k + projectPassiveCongruence (L k) (Pinv k) (d k))
+      *ᵥ (Q k *ᵥ ((1 / 2 : 𝕜) • (x k + x (k + 1))))))
+    (hdep : ∀ k y, storageEnergy (Q (k + 1)) y ≤ (1 + ε k) * storageEnergy (Q k) y)
+    (hε : ∀ k, 0 ≤ 1 + ε k) (m : ℕ) :
+    storageEnergy (Q m) (x m) ≤
+      (∏ k ∈ Finset.range m, (1 + ε k)) * storageEnergy (Q 0) (x 0) :=
+  committed_energy_bound x Q J R (fun k => projectPassiveCongruence (L k) (Pinv k) (d k)) ε h hh
+    hQ hJ hR (fun k e => projectPassiveCongruence_passive (hP k) (hD k) e) hstep hdep hε m
+
+end Congruence
+
+/-! ### Witness: the certified clip is not the eigen-clip -/
+
+/-- [definition] `S = [[1, 1], [1, 0]]`, congruence `P = [[1, −1], [0, 1]]`, `Pᵀ S P = diag(1, −1)`. -/
+def wS : Matrix (Fin 2) (Fin 2) ℝ := !![1, 1; 1, 0]
+def wP : Matrix (Fin 2) (Fin 2) ℝ := !![1, -1; 0, 1]
+def wPinv : Matrix (Fin 2) (Fin 2) ℝ := !![1, 1; 0, 1]
+
+/-- [counterexample; formal-checked] **The certified clip differs from the eigen-clip.** With the
+non-orthogonal congruence `P`, the congruence clip is `diag(0, −1)`; the removed part
+`[[1,1],[1,1]]` does not commute with `S`, whereas the eigen-clip commutes with `S`
+(`clipNeg_commute`), so the two clips are different negative semidefinite matrices. -/
+theorem congruence_vs_eigen_witness (hS : wS.IsHermitian) :
+    wP * wPinv = 1 ∧ wPᵀ * wS * wP = diagonal ![1, -1] ∧
+      congruenceClip wS wPinv ![1, -1] = !![0, 0; 0, -1] ∧
+      congruenceClip wS wPinv ![1, -1] ≠ clipNeg hS := by
+  have h1 : wP * wPinv = 1 := by
+    ext i j; fin_cases i <;> fin_cases j <;> simp [wP, wPinv, Matrix.mul_apply, Fin.sum_univ_two]
+  have h2 : wPᵀ * wS * wP = diagonal ![1, -1] := by
+    ext i j; fin_cases i <;> fin_cases j <;>
+      simp [wP, wS, Matrix.mul_apply, Fin.sum_univ_two, diagonal]
+  have h3 : congruenceClip wS wPinv ![1, -1] = !![0, 0; 0, -1] := by
+    ext i j; fin_cases i <;> fin_cases j <;>
+      simp [congruenceClip, wS, wPinv, Matrix.mul_apply, Fin.sum_univ_two, diagonal]
+  refine ⟨h1, h2, h3, fun h => ?_⟩
+  have hc := clipNeg_commute hS
+  rw [← h, h3] at hc
+  have := congrFun (congrFun hc 0) 1
+  simp [wS, Matrix.mul_apply, Fin.sum_univ_two] at this
 
 end Soma.Holonics.HolonCore

@@ -118,4 +118,13 @@ open Soma.Holonics.HolonCore
 #print axioms projectPassive_passive
 #print axioms projectPassive_of_passive
 #print axioms projected_committed_energy_bound
+#print axioms clipNeg_commute
+#print axioms congruenceClip_eq
+#print axioms congruenceClip_nonpos
+#print axioms congruence_diag
+#print axioms congruenceClip_of_nonpos
+#print axioms projectPassiveCongruence_passive
+#print axioms projectPassiveCongruence_of_passive
+#print axioms certified_committed_energy_bound
+#print axioms congruence_vs_eigen_witness
 end Audit
