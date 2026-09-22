@@ -127,6 +127,7 @@ impl<'c> NativeFieldSession<'c, NativeFieldSources<'c>> {
             surface,
             body,
             incident: None,
+            generator: None,
             presentation: NativeFieldSources {
                 spec,
                 incidence,
@@ -454,6 +455,7 @@ impl NativeSourceSavedSession {
             surface,
             body,
             incident: None,
+            generator: None,
             presentation: NativeFieldSources {
                 spec: self.header.spec,
                 incidence,

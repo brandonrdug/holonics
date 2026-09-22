@@ -390,3 +390,12 @@ sources were admitted, but the initial text candidates failed their requests. Th
 output exposed the moving-port error described above; the corrected fixed-port application is
 executed with the same sources and still failed their requested content. The [implementation return](../research/records/2026-09-21_THE_INCIDENT_FIELD_JOINS_ITS_GENERATOR_RECEIVER_AND_FROZEN_RETURN.md)
 retains the source sizes, output judgments and numerical scope.
+
+[definition] The tagged `GeneratorMachine` session retains the same ordered Unicode source
+preparation and provenance but no longer scatters one source cell into one generator site.
+Its source clocks advance the fixed field, E supplies current increments at source-role sites,
+and directed part/join/parent/reply contrasts enter separate reaction-condition ports. The
+unreduced source/contact tape stays attached until its producing comparison returns. Its
+response is a tagged phase aperture with shared text and termination material; legacy
+`response_port_start` remains a slot address. The [source/session return](../research/records/2026-09-21_ORDERED_SOURCE_AND_PHASE_RECEIVING_ENTER_THE_PUBLIC_GENERATOR_SESSION.md)
+records the public consumer, codec growth, restart and remaining inference/economy work.

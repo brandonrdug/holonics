@@ -170,7 +170,10 @@ fn target(
     for part in parts {
         text.push_str(part.text.as_deref().ok_or("no-visible-text")?);
     }
-    if spec.source_chart == FieldSourceChart::IncidentField {
+    if matches!(
+        spec.source_chart,
+        FieldSourceChart::IncidentField | FieldSourceChart::GeneratorMachine
+    ) {
         if spec.codec != FieldTextCodec::UnicodeScalars {
             return Err("incident-codec-mismatch");
         }
@@ -315,7 +318,10 @@ fn walk(
                 let text = target(&spec, held.response_symbols, &held.request, &frame);
                 match text {
                     Ok(text) => {
-                        if spec.source_chart==FieldSourceChart::IncidentField {
+                        if matches!(
+                            spec.source_chart,
+                            FieldSourceChart::IncidentField | FieldSourceChart::GeneratorMachine
+                        ) {
                             // Class admission is an explicit development-source operation. A
                             // later comparison uses its frozen decoder or an explicit retro face.
                             session.admit_incident_development_occurrence(&frame)?;
@@ -391,11 +397,17 @@ fn walk(
             }
         };
         let context = context_owned.iter().collect::<Vec<_>>();
-        if spec.source_chart==FieldSourceChart::IncidentField && frame.development_parts().is_ok() {
-            let mut texts=Vec::new();
+        if matches!(
+            spec.source_chart,
+            FieldSourceChart::IncidentField | FieldSourceChart::GeneratorMachine
+        ) && frame.development_parts().is_ok()
+        {
+            let mut texts = Vec::new();
             for occurrence in context.iter().copied().chain(std::iter::once(&frame)) {
                 for part in occurrence.development_parts()? {
-                    if let Some(text)=&part.text {texts.push(text.clone());}
+                    if let Some(text) = &part.text {
+                        texts.push(text.clone());
+                    }
                 }
             }
             session.admit_incident_source_texts(&texts)?;
@@ -406,7 +418,10 @@ fn walk(
             &manifest,
             &frame,
             &context,
-            spec.source_chart==FieldSourceChart::IncidentField,
+            matches!(
+                spec.source_chart,
+                FieldSourceChart::IncidentField | FieldSourceChart::GeneratorMachine
+            ),
             true,
         );
         let request = match bridged {
@@ -551,7 +566,10 @@ fn spec_of(path: &Path) -> Result<FieldSessionSpec, Box<dyn std::error::Error>> 
     let spec: FieldSessionSpec = serde_json::from_reader(File::open(path)?)?;
     if !matches!(
         spec.source_chart,
-        FieldSourceChart::SharedRegions | FieldSourceChart::GeometricRegions | FieldSourceChart::IncidentField
+        FieldSourceChart::SharedRegions
+            | FieldSourceChart::GeometricRegions
+            | FieldSourceChart::IncidentField
+            | FieldSourceChart::GeneratorMachine
     ) {
         return Err(
             "this driver's held/free aperture requires the shared-regions source chart".into(),
@@ -652,6 +670,7 @@ mod tests {
             source_chart: FieldSourceChart::SharedRegions,
             geometry: None,
             incident: None,
+            generator: None,
             codec: FieldTextCodec::UnicodeScalars,
             fractional_bits: 1,
         };
@@ -725,6 +744,7 @@ mod tests {
             source_chart: FieldSourceChart::SharedRegions,
             geometry: None,
             incident: None,
+            generator: None,
             codec: FieldTextCodec::UnicodeScalars,
             fractional_bits: 48,
         }

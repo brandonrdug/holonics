@@ -14,6 +14,7 @@ fn spec() -> FieldSessionSpec {
         source_chart: FieldSourceChart::GeometricRegions,
         geometry: Some(linked_torus_field::linked_torus_field_spec(1, 2, 1).unwrap()),
         incident: None,
+        generator: None,
         codec: FieldTextCodec::UnicodeScalars,
         fractional_bits: 48,
     }

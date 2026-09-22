@@ -5,9 +5,9 @@ use super::incident_encoder::{IncidentEncoded, IncidentEncoder};
 use super::incident_receiver::{IncidentTextForward, IncidentTextReceiver};
 use super::*;
 use holonic_engine::{
+    ExactWavePhaseTransport,
     native_ecology::constitutive_fibre::{BoundaryMaterialSeed, ResidentNormalEnclosureSection},
     resident_section::SeriesAperture,
-    ExactWavePhaseTransport,
 };
 mod codec;
 mod rest;
@@ -39,6 +39,7 @@ pub(super) fn incident_response_slots(
     preparation: &IncidentPreparation,
     slot_rows: &[usize],
 ) -> Result<Vec<usize>> {
+    let aperture = spec.response_aperture()?;
     let options = spec
         .incident
         .as_ref()
@@ -47,9 +48,9 @@ pub(super) fn incident_response_slots(
         .response_port_start
         .unwrap_or(preparation.source_extent);
     let end = start
-        .checked_add(preparation.response_aperture)
+        .checked_add(aperture)
         .ok_or_else(|| invalid("incident response port extent"))?;
-    if preparation.response_aperture != options.response_aperture
+    if preparation.response_aperture != aperture
         || preparation.source_extent > start
         || end > spec.section_symbols
         || end > slot_rows.len()
@@ -89,6 +90,12 @@ impl<'c> NativeFieldSession<'c> {
         solver: super::super::IncidentFieldSolver,
         steps: usize,
     ) -> Result<()> {
+        if let Some(options) = self.presentation.spec.generator.as_mut() {
+            self.body.configure_incident_solver(solver, steps)?;
+            options.field.solver = solver;
+            options.field.solve_steps = steps;
+            return Ok(());
+        }
         if self.presentation.spec.incident.is_none() {
             return Err(invalid("incident solver requires its model chart"));
         }
@@ -205,6 +212,7 @@ impl<'c> NativeFieldSession<'c> {
         Ok(Self {
             surface,
             body,
+            generator: None,
             incident: Some(IncidentPresentation {
                 encoder,
                 receiver,

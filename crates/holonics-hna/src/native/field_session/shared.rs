@@ -407,6 +407,7 @@ mod tests {
             source_chart: FieldSourceChart::SharedRegions,
             geometry: None,
             incident: None,
+            generator: None,
             codec: FieldTextCodec::Utf8Nibbles,
             fractional_bits: 48,
         }

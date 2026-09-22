@@ -445,3 +445,17 @@ fn incident_quadrance_word_retains_complete_return_and_saved_chart() {
         }
     }
 }
+
+#[test]
+fn incident_model_wire_preserves_the_legacy_numeric_key_atlas() {
+    let legacy = spec();
+    let encoded = serde_json::to_string(&IncidentModelSpec::Legacy(legacy.clone())).unwrap();
+    assert_eq!(
+        serde_json::from_str::<IncidentFieldSpec>(&encoded).unwrap(),
+        legacy
+    );
+    assert_eq!(
+        serde_json::from_str::<IncidentModelSpec>(&encoded).unwrap(),
+        IncidentModelSpec::Legacy(legacy)
+    );
+}

@@ -152,7 +152,7 @@ impl<'c> NativeGeneratorPhaseReception<'c> {
     }
 }
 
-fn signed_affine_power(
+pub(super) fn signed_affine_power(
     action: &AffineMap3,
     exponent: i64,
 ) -> Result<AffineMap3, NativeSessionError> {
@@ -179,7 +179,7 @@ fn signed_affine_power(
     Ok(result)
 }
 
-fn receiving_current_map(
+pub(super) fn receiving_current_map(
     site: &CompiledGeneratorSite,
     exponent: i64,
 ) -> Result<AffineMap3, NativeSessionError> {

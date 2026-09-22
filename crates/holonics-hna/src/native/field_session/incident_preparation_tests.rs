@@ -11,6 +11,7 @@ fn spec() -> FieldSessionSpec {
         source_chart: FieldSourceChart::TensorCondition,
         geometry: None,
         incident: None,
+        generator: None,
         codec: FieldTextCodec::UnicodeScalars,
         fractional_bits: 48,
     }

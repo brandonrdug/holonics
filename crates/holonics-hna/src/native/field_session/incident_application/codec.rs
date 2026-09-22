@@ -8,11 +8,18 @@ use holonic_engine::{
 
 impl<'c> NativeFieldSession<'c> {
     pub fn admit_incident_source_texts(&mut self, texts: &[String]) -> Result<Value> {
+        if self.presentation.spec.source_chart
+            == crate::native::field_session::FieldSourceChart::GeneratorMachine
+        {
+            return self.admit_generator_source_texts(texts);
+        }
         let (new_labels, additions) =
             discover_unseen_scalars(&self.presentation.spec.symbols, texts);
         let new_chart = {
             if additions.is_empty() {
-                return Ok(json!({"admitted":[],"codec_version":self.incident.as_ref().ok_or_else(||invalid("incident session state"))?.receiver.codec_version()}));
+                return Ok(
+                    json!({"admitted":[],"codec_version":self.incident.as_ref().ok_or_else(||invalid("incident session state"))?.receiver.codec_version()}),
+                );
             }
             let alphabet = SymbolAlphabet::declared(
                 new_labels

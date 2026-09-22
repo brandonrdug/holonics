@@ -3,10 +3,13 @@
 //! supply their explicitly declared symbol charts.
 use super::section_input::SymbolCurrentChart;
 mod boundary;
+mod generator_application;
 mod geometric;
 mod incident_application;
 mod incident_encoder;
 mod incident_receiver;
+pub use generator_application::GeneratorSessionOptions;
+use generator_application::{GeneratorPresentation, GeneratorPresentationRest};
 use incident_application::{IncidentPresentation, IncidentPresentationRest};
 mod incidence;
 mod incident_preparation;
@@ -15,7 +18,7 @@ mod native_source;
 mod shared;
 use super::mathematical::{MathematicalInputWire, MathematicalRequest, NativeMathematicalSession};
 use super::{NativeCoupledBody, NativeFieldReactionPort, NativeSessionError, SavedCoupledBody};
-use crate::{publish_new, HnaStream, HnaStreamState, PublicationReceipt};
+use crate::{HnaStream, HnaStreamState, PublicationReceipt, publish_new};
 use holonic_engine::{
     codec_recovery::{Symbol, SymbolAlphabet},
     embedding_fiber::ResidentReadout,
@@ -37,7 +40,7 @@ pub use incident_preparation::{
 pub use mathematical_port::FieldMathematicalRequest;
 pub use native_source::*;
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::{
     collections::BTreeMap,
     fs::File,
@@ -72,6 +75,7 @@ pub enum FieldSourceChart {
     SharedRegions,
     GeometricRegions,
     IncidentField,
+    GeneratorMachine,
 }
 fn tensor_condition(chart: &FieldSourceChart) -> bool {
     *chart == FieldSourceChart::TensorCondition
@@ -91,6 +95,8 @@ pub struct FieldSessionSpec {
     pub geometry: Option<super::GeometricFieldSpec>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub incident: Option<IncidentFieldOptions>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub generator: Option<GeneratorSessionOptions>,
     #[serde(default)]
     pub codec: FieldTextCodec,
     #[serde(default = "grain")]
@@ -99,7 +105,10 @@ pub struct FieldSessionSpec {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct IncidentFieldOptions {
-    #[serde(default, skip_serializing_if = "super::IncidentParticipationChart::is_bilinear")]
+    #[serde(
+        default,
+        skip_serializing_if = "super::IncidentParticipationChart::is_bilinear"
+    )]
     pub participation: super::IncidentParticipationChart,
     pub local_roots: usize,
     pub material_seed: u64,
@@ -204,18 +213,21 @@ impl FieldSectionRequest {
     ) -> Result<Self> {
         let (held_cap, context_cap) = aperture.bounded(spec)?;
         let chart = spec.chart()?;
-        if spec.source_chart != FieldSourceChart::IncidentField
-            && request.shared_author_class().map_err(invalid)? != "human"
+        if !matches!(
+            spec.source_chart,
+            FieldSourceChart::IncidentField | FieldSourceChart::GeneratorMachine
+        ) && request.shared_author_class().map_err(invalid)? != "human"
         {
             return Err(invalid(
                 "legacy exposure request requires human-authored source material",
             ));
         }
-        let incident_preparation = (spec.source_chart == FieldSourceChart::IncidentField)
-            .then(|| {
-                IncidentPreparation::from_exposures(spec, aperture, manifest, request, context)
-            })
-            .transpose()?;
+        let incident_preparation = matches!(
+            spec.source_chart,
+            FieldSourceChart::IncidentField | FieldSourceChart::GeneratorMachine
+        )
+        .then(|| IncidentPreparation::from_exposures(spec, aperture, manifest, request, context))
+        .transpose()?;
         let text =
             |event: &crate::alpha::exposure::ExposureOccurrence, cap: usize| -> Result<String> {
                 event.validate(manifest).map_err(invalid)?;
@@ -286,7 +298,31 @@ impl FieldSectionRequest {
     }
 }
 impl FieldSessionSpec {
+    pub fn response_aperture(&self) -> Result<usize> {
+        match self.source_chart {
+            FieldSourceChart::IncidentField => self
+                .incident
+                .as_ref()
+                .map(|options| options.response_aperture)
+                .ok_or_else(|| invalid("incident material declaration")),
+            FieldSourceChart::GeneratorMachine => self
+                .generator
+                .as_ref()
+                .and_then(|options| options.receiver.aperture.checked_sub(1))
+                .filter(|n| *n > 0)
+                .ok_or_else(|| invalid("generator session declaration")),
+            _ => Err(invalid(
+                "response aperture requires an incident or generator chart",
+            )),
+        }
+    }
+
     fn chart(&self) -> Result<SymbolCurrentChart> {
+        if self.source_chart != FieldSourceChart::GeneratorMachine && self.generator.is_some() {
+            return Err(invalid(
+                "generator declaration requires its tagged source chart",
+            ));
+        }
         if !matches!(
             self.source_chart,
             FieldSourceChart::GeometricRegions | FieldSourceChart::IncidentField
@@ -320,9 +356,54 @@ impl FieldSessionSpec {
                     return Err(invalid("incident response port binding"));
                 }
             }
-        } else if self.incident.is_some() {
+        } else if self.source_chart == FieldSourceChart::GeneratorMachine {
+            let options = self
+                .generator
+                .as_ref()
+                .ok_or_else(|| invalid("generator source chart requires its declaration"))?;
+            if self.codec != FieldTextCodec::UnicodeScalars
+                || self.geometry.is_some()
+                || self.incident.is_some()
+                || options.receiver.aperture < 2
+            {
+                return Err(invalid(
+                    "generator chart requires Unicode, no legacy geometry/incident chart, and aperture >= 2",
+                ));
+            }
+            let machine = options.field.machine.compile().map_err(invalid)?;
+            options.source.validate_scope(&machine, 0, 1)?;
+            if options.field.source_condition_ports != options.source.contact_kinds.len()
+                || options
+                    .source
+                    .contact_kinds
+                    .iter()
+                    .collect::<std::collections::BTreeSet<_>>()
+                    .len()
+                    != options.source.contact_kinds.len()
+            {
+                return Err(invalid("generator source condition declaration"));
+            }
+            if options.receiver.ports.is_empty()
+                || options.receiver.receiver_id.is_empty()
+                || options.receiver.termination_receiver_id.is_empty()
+                || options.receiver.clock.duration
+                    <= num_rational::BigRational::from_integer(0.into())
+                || options.receiver.clock.lineage.is_empty()
+                || options.receiver.clock.unit.is_empty()
+                || options.receiver.ports.iter().any(|port| {
+                    !machine
+                        .sites()
+                        .iter()
+                        .any(|s| s.id() == port.site_id && s.is_receiver())
+                })
+            {
+                return Err(invalid(
+                    "generator receiver requires declared receiver ports and clock",
+                ));
+            }
+        } else if self.incident.is_some() || self.generator.is_some() {
             return Err(invalid(
-                "incident material declaration requires its tagged source chart",
+                "incident/generator material declaration requires its tagged source chart",
             ));
         }
         if self.codec == FieldTextCodec::Utf8Nibbles
@@ -367,9 +448,12 @@ impl FieldSessionSpec {
         Ok(SymbolCurrentChart::declared(alphabet))
     }
     fn extents(&self) -> Result<(usize, usize, usize)> {
-        if self.source_chart == FieldSourceChart::IncidentField {
+        if matches!(
+            self.source_chart,
+            FieldSourceChart::IncidentField | FieldSourceChart::GeneratorMachine
+        ) {
             return Err(invalid(
-                "incident charts use local width and the complete joint field, not legacy tensor extents",
+                "incident/generator charts use local machine width and not legacy tensor extents",
             ));
         }
         if self.source_chart == FieldSourceChart::GeometricRegions {
@@ -381,7 +465,8 @@ impl FieldSessionSpec {
         let regions = match self.source_chart {
             FieldSourceChart::SharedRegions
             | FieldSourceChart::GeometricRegions
-            | FieldSourceChart::IncidentField => unreachable!(),
+            | FieldSourceChart::IncidentField
+            | FieldSourceChart::GeneratorMachine => unreachable!(),
             FieldSourceChart::TensorCondition => self.section_symbols,
             FieldSourceChart::JointRegions => self
                 .section_symbols
@@ -398,7 +483,8 @@ impl FieldSessionSpec {
         let context = match self.source_chart {
             FieldSourceChart::SharedRegions
             | FieldSourceChart::GeometricRegions
-            | FieldSourceChart::IncidentField => unreachable!(),
+            | FieldSourceChart::IncidentField
+            | FieldSourceChart::GeneratorMachine => unreachable!(),
             FieldSourceChart::TensorCondition => self
                 .symbols
                 .len()
@@ -481,7 +567,10 @@ fn validate_exposure_pairing(
     {
         return Err(invalid("retained exposure pairing coordinates"));
     }
-    if spec.source_chart == FieldSourceChart::IncidentField {
+    if matches!(
+        spec.source_chart,
+        FieldSourceChart::IncidentField | FieldSourceChart::GeneratorMachine
+    ) {
         let prepared = IncidentPreparation::from_request(spec, &retained.request)?;
         let recorded = retained
             .request
@@ -492,6 +581,19 @@ fn validate_exposure_pairing(
             .take_while(|s| s.is_some())
             .map(|s| s.as_ref().unwrap().as_str())
             .collect::<String>();
+        let response_aperture = spec.response_aperture()?;
+        if spec.source_chart == FieldSourceChart::GeneratorMachine {
+            if recorded != pairing.request_text
+                || prepared.response_aperture != pairing.response_symbols
+                || response_aperture != pairing.response_symbols
+                || retained.output_symbols != prepared.request_extent + prepared.response_aperture
+            {
+                return Err(invalid(
+                    "generator retained exposure source/receiver mismatch",
+                ));
+            }
+            return Ok(());
+        }
         let options = spec
             .incident
             .as_ref()
@@ -520,6 +622,7 @@ fn validate_exposure_pairing(
         }
         if recorded != pairing.request_text
             || prepared.response_aperture != pairing.response_symbols
+            || response_aperture != pairing.response_symbols
             || retained.output_symbols != prepared.request_extent + prepared.response_aperture
             || retained.held != mask
         {
@@ -572,6 +675,7 @@ pub struct NativeFieldSession<'c, P = FieldTextPresentation> {
     body: NativeCoupledBody<'c>,
     presentation: P,
     incident: Option<IncidentPresentation<'c>>,
+    generator: Option<GeneratorPresentation<'c>>,
 }
 /// The existing text/control source and its receiving bookkeeping.
 pub struct FieldTextPresentation {
@@ -592,6 +696,9 @@ struct PreparedFieldSection<'c> {
 }
 impl<'c> NativeFieldSession<'c> {
     fn found(surface: &'c ResidentSurface<'c>, spec: &FieldSessionSpec) -> Result<Self> {
+        if spec.source_chart == FieldSourceChart::GeneratorMachine {
+            return Self::found_generator(surface, spec);
+        }
         if spec.source_chart == FieldSourceChart::IncidentField {
             return Self::found_incident(surface, spec);
         }
@@ -658,6 +765,7 @@ impl<'c> NativeFieldSession<'c> {
             surface,
             body,
             incident: None,
+            generator: None,
             presentation: FieldTextPresentation {
                 compiled_geometry: spec
                     .geometry
@@ -882,6 +990,9 @@ impl<'c> NativeFieldSession<'c> {
         })
     }
     pub fn request(&mut self, request: &FieldSectionRequest) -> Result<Value> {
+        if self.presentation.spec.source_chart == FieldSourceChart::GeneratorMachine {
+            return self.generator_request(request);
+        }
         if self.presentation.spec.source_chart == FieldSourceChart::IncidentField {
             return self.incident_request(request);
         }
@@ -966,6 +1077,9 @@ impl<'c> NativeFieldSession<'c> {
         )
     }
     pub fn observe(&mut self, source: u64, text: &str, step_bits: u32) -> Result<Value> {
+        if self.presentation.spec.source_chart == FieldSourceChart::GeneratorMachine {
+            return self.generator_observe(source, text, step_bits);
+        }
         if self.presentation.spec.source_chart == FieldSourceChart::IncidentField {
             return self.incident_observe(source, text, step_bits);
         }
@@ -1010,6 +1124,15 @@ impl<'c> NativeFieldSession<'c> {
         )
     }
     pub fn release(&mut self, source: u64) -> Result<Value> {
+        if let Some(generator) = &mut self.generator {
+            if !generator.pending.contains_key(&source) {
+                return Err(invalid("unknown generator comparison"));
+            }
+            self.body.release(source)?;
+            generator.pending.remove(&source);
+            self.presentation.retained_shared.remove(&source);
+            return Ok(json!({"released":source,"anatomy":self.inspect()}));
+        }
         if let Some(incident) = &mut self.incident {
             if !incident.pending.contains_key(&source) {
                 return Err(invalid("unknown incident comparison"));
@@ -1129,6 +1252,7 @@ impl<'c> NativeFieldSession<'c> {
             issued_shared: self.presentation.issued_shared,
             exposure: self.presentation.exposure.clone(),
             incident: self.incident.as_ref().map(|i| i.rest()).transpose()?,
+            generator: self.generator.as_ref().map(|g| g.rest()).transpose()?,
         };
         let mut bytes = Vec::new();
         saved.write(&mut bytes)?;
@@ -1141,6 +1265,7 @@ const REGIONS_MAGIC: &[u8] = b"HNA-FIELD-SESSION\x02";
 /// and 2 stay readable: their tuple headers simply carry neither.
 const SOURCE_MAGIC: &[u8] = b"HNA-FIELD-SESSION\x03";
 const INCIDENT_MAGIC: &[u8] = b"HNA-FIELD-SESSION\x04";
+const GENERATOR_MAGIC: &[u8] = b"HNA-FIELD-SESSION\x05";
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct FieldSessionHeader {
@@ -1155,6 +1280,8 @@ struct FieldSessionHeader {
     exposure: Option<crate::alpha::exposure::ExposureCursor>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     incident: Option<IncidentPresentationRest>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    generator: Option<GeneratorPresentationRest>,
 }
 pub struct NativeFieldSavedSession {
     spec: FieldSessionSpec,
@@ -1165,6 +1292,7 @@ pub struct NativeFieldSavedSession {
     issued_shared: u64,
     exposure: Option<crate::alpha::exposure::ExposureCursor>,
     incident: Option<IncidentPresentationRest>,
+    generator: Option<GeneratorPresentationRest>,
 }
 impl NativeFieldSavedSession {
     fn write(&self, out: &mut impl Write) -> Result<()> {
@@ -1176,10 +1304,13 @@ impl NativeFieldSavedSession {
             issued_shared: self.issued_shared,
             exposure: self.exposure.clone(),
             incident: self.incident.clone(),
+            generator: self.generator.clone(),
         })?;
         let mut body = Vec::new();
         self.body.write(&mut body)?;
-        out.write_all(if self.incident.is_some() {
+        out.write_all(if self.generator.is_some() {
+            GENERATOR_MAGIC
+        } else if self.incident.is_some() {
             INCIDENT_MAGIC
         } else {
             SOURCE_MAGIC
@@ -1200,7 +1331,8 @@ impl NativeFieldSavedSession {
         let mut magic = vec![0; MAGIC.len()];
         input.read_exact(&mut magic)?;
         let incident_wire = magic == INCIDENT_MAGIC;
-        let sources = magic == SOURCE_MAGIC || incident_wire;
+        let generator_wire = magic == GENERATOR_MAGIC;
+        let sources = magic == SOURCE_MAGIC || incident_wire || generator_wire;
         let regions = magic == REGIONS_MAGIC;
         if magic != MAGIC && !regions && !sources {
             return Err(invalid("unsupported field-session rest"));
@@ -1239,6 +1371,7 @@ impl NativeFieldSavedSession {
                 issued_shared: 0,
                 exposure: None,
                 incident: None,
+                generator: None,
             }
         };
         let FieldSessionHeader {
@@ -1249,9 +1382,15 @@ impl NativeFieldSavedSession {
             issued_shared,
             exposure,
             incident,
+            generator,
         } = header;
         let incident_mode = spec.source_chart == FieldSourceChart::IncidentField;
-        if incident_mode != incident_wire || incident_mode != incident.is_some() {
+        let generator_mode = spec.source_chart == FieldSourceChart::GeneratorMachine;
+        if incident_mode != incident_wire
+            || incident_mode != incident.is_some()
+            || generator_mode != generator_wire
+            || generator_mode != generator.is_some()
+        {
             return Err(invalid("incident session wire chart"));
         }
         let chart = spec.chart()?;
@@ -1259,6 +1398,7 @@ impl NativeFieldSavedSession {
         // A remounted wire re-checks its own operands. The rows themselves are rebuilt from the
         // retained request at application; only its declared extents can be checked here.
         if !incident_mode
+            && !generator_mode
             && (retained_shared.iter().any(|(id, retained)| {
                 *id >= issued_shared
                     || retained.request.commit
@@ -1291,7 +1431,19 @@ impl NativeFieldSavedSession {
         }
         let bytes = blob(&mut input)?;
         let body = SavedCoupledBody::read(&mut bytes.as_slice(), bytes.len() as u64)?;
-        let body_matches = if incident_mode {
+        let body_matches = if generator_mode {
+            matches!(body, SavedCoupledBody::Incident(_))
+                && Some(body.roots())
+                    == spec
+                        .generator
+                        .as_ref()
+                        .unwrap()
+                        .field
+                        .machine
+                        .sites()
+                        .len()
+                        .checked_mul(2)
+        } else if incident_mode {
             let geometry = spec
                 .geometry
                 .as_ref()
@@ -1323,6 +1475,7 @@ impl NativeFieldSavedSession {
             issued_shared,
             exposure,
             incident,
+            generator,
         })
     }
     pub fn exposure_cursor(&self) -> Option<&crate::alpha::exposure::ExposureCursor> {
@@ -1340,10 +1493,15 @@ impl NativeFieldSavedSession {
             .incident
             .map(|i| i.remount(&surface, &self.spec, &body))
             .transpose()?;
+        let generator = self
+            .generator
+            .map(|g| g.remount(&surface, &self.spec, &body))
+            .transpose()?;
         let mut session = NativeFieldSession {
             surface: &surface,
             body,
             incident,
+            generator,
             presentation: FieldTextPresentation {
                 compiled_geometry: self
                     .spec
@@ -1359,7 +1517,10 @@ impl NativeFieldSavedSession {
                 exposure: self.exposure,
             },
         };
-        if session.presentation.spec.source_chart != FieldSourceChart::IncidentField {
+        if !matches!(
+            session.presentation.spec.source_chart,
+            FieldSourceChart::IncidentField | FieldSourceChart::GeneratorMachine
+        ) {
             let (nodes, context, _) = session.presentation.spec.extents()?;
             if session.body.field_dimensions()?
                 != (
@@ -1418,6 +1579,7 @@ mod tests {
             source_chart: FieldSourceChart::TensorCondition,
             geometry: None,
             incident: None,
+            generator: None,
             codec: FieldTextCodec::UnicodeScalars,
             fractional_bits: 48,
         };
@@ -1437,9 +1599,10 @@ mod tests {
             // b still refers to material from BEFORE the update just performed.
             s.checkpoint(&path, &HnaStreamState::default())?;
             let returned = s.observe(b["comparison"].as_u64().unwrap(), "c", 3)?;
-            assert!(s
-                .observe(b["comparison"].as_u64().unwrap(), "c", 3)
-                .is_err());
+            assert!(
+                s.observe(b["comparison"].as_u64().unwrap(), "c", 3)
+                    .is_err()
+            );
             Ok((returned["returned"].clone(), s.inspect_current()?))
         })
         .unwrap();
@@ -1465,6 +1628,7 @@ mod tests {
             source_chart: FieldSourceChart::TensorCondition,
             geometry: None,
             incident: None,
+            generator: None,
             codec: FieldTextCodec::WhitespaceWords,
             fractional_bits: 48,
         };
@@ -1506,6 +1670,7 @@ mod delivery_tests {
             source_chart: FieldSourceChart::TensorCondition,
             geometry: None,
             incident: None,
+            generator: None,
             codec: FieldTextCodec::UnicodeScalars,
             fractional_bits: 48,
         };
@@ -1527,9 +1692,11 @@ mod delivery_tests {
         line.push(b'\n');
         let epoch = with_field_session(&spec, |s| {
             let mut stream = HnaStream::new();
-            assert!(stream
-                .pump_field(s, &mut std::io::Cursor::new(&line), &mut Refuse)
-                .is_err());
+            assert!(
+                stream
+                    .pump_field(s, &mut std::io::Cursor::new(&line), &mut Refuse)
+                    .is_err()
+            );
             assert!(stream.state().output.is_some());
             assert_eq!(s.inspect()["pending"], 1);
             s.checkpoint(&path, stream.state())?;
@@ -1560,7 +1727,7 @@ mod delivery_tests {
 #[cfg(test)]
 mod exposure_tests {
     use super::*;
-    use crate::alpha::exposure::{ExposureManifest, ExposureOccurrence, EXPOSURE_SCHEMA};
+    use crate::alpha::exposure::{EXPOSURE_SCHEMA, ExposureManifest, ExposureOccurrence};
     fn manifest() -> ExposureManifest {
         serde_json::from_value(json!({"schema":EXPOSURE_SCHEMA,"kind":"manifest",
             "temporal_cut":"2026-09-04T00:00:00Z","temporal_cut_normalized":"2026-09-04T00:00:00.000000+00:00",
@@ -1601,6 +1768,7 @@ mod exposure_tests {
             source_chart: FieldSourceChart::SharedRegions,
             geometry: None,
             incident: None,
+            generator: None,
             codec: FieldTextCodec::Utf8Nibbles,
             fractional_bits: 48,
         }
@@ -1875,6 +2043,7 @@ mod joint_region_tests {
             source_chart: FieldSourceChart::JointRegions,
             geometry: None,
             incident: None,
+            generator: None,
             codec: FieldTextCodec::UnicodeScalars,
             fractional_bits: 48,
         }
@@ -1930,9 +2099,10 @@ mod joint_region_tests {
             let b = s.request(&request(vec![None], "c"))?;
             s.observe(a["comparison"].as_u64().unwrap(), "ab", 1)?;
             s.checkpoint(&path, &HnaStreamState::default())?;
-            assert!(s
-                .observe(b["comparison"].as_u64().unwrap(), "cc", 1)
-                .is_err());
+            assert!(
+                s.observe(b["comparison"].as_u64().unwrap(), "cc", 1)
+                    .is_err()
+            );
             let returned = s.observe(b["comparison"].as_u64().unwrap(), "c", 1)?;
             Ok((returned["returned"].clone(), s.inspect_current()?))
         })
@@ -1960,10 +2130,12 @@ mod joint_region_tests {
             let after = s.inspect_current()?;
             assert_eq!(before["material"], after["material"]);
             assert_eq!(before["reaction"], after["reaction"]);
-            assert!(comparison["returned"]["parameter_update"]
-                .as_str()
-                .unwrap()
-                .starts_with("zero"));
+            assert!(
+                comparison["returned"]["parameter_update"]
+                    .as_str()
+                    .unwrap()
+                    .starts_with("zero")
+            );
             assert_ne!(
                 comparison["returned"]["held_difference"]["coordinates"][0]["difference"]["real"],
                 json!([[0, []], [1, [1]]])

@@ -111,6 +111,7 @@ fn machine() -> GeneratorMachineSpec {
 
 pub(super) fn spec() -> GeneratorIncidentFieldSpec {
     GeneratorIncidentFieldSpec {
+        source_condition_ports: 0,
         machine: machine(),
         self_comparison: true,
         beta_significand: 1,

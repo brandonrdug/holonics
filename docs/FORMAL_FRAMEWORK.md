@@ -861,3 +861,9 @@ and the six-real-coordinate encoding into native complex channels. Its image hyp
 explicit; arbitrary native imaginary channels are not original machine coordinates. The
 [native consumer record](../research/records/2026-09-21_THE_FIXED_GENERATOR_MACHINE_CONSUMES_ITS_AFFINE_CURRENT_CHART.md)
 connects these laws to the current/refinement implementation.
+
+[established-bounded; formal-proof] `Transport/GeneratorSourceEpisode.lean` adds the directed
+pooled-contrast adjoint, affine standing/tangent injection law, and finite reverse telescope
+with independent state/source/condition dimensions. Producing linearized maps and matching
+input lengths are explicit hypotheses. Dynamics imports it; the [public source consumer](../research/records/2026-09-21_ORDERED_SOURCE_AND_PHASE_RECEIVING_ENTER_THE_PUBLIC_GENERATOR_SESSION.md)
+uses the same incidence and source/condition return.

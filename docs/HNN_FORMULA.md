@@ -914,3 +914,18 @@ through R at another s. [The helical consumer](../research/records/2026-09-20_NA
 screw bracket from its source constraints, reuses the source-null section, and retains the
 new-source ambiguity. The full normalized geometric word/Encoding attachment remains the next
 consumer; this exact point port does not replace an enclosing phase family with its centre.
+
+## Ordered generator source and phase reception
+
+[definition] `FieldSourceChart::GeneratorMachine` now consumes the fixed generator body through
+`q_k⁺=U_step(q_k)+I E(u_k)` and `z_(k+1)=F_Θ(q_k⁺,b_k;c_k)`. Each source kind supplies the declared
+common-frame contrast `c_(k,kind,g)=Σ_(e:to(e)=k,kind(e)=kind)(E_g(u_k)−E_g(u_from(e)))`, appended
+to machine incident differences in `Φ`. Its reverse returns both the direct injection and the
+`+target/−source` condition covectors through all preceding words. E is a tangent increment;
+affine translation advances standing q only. Clock/action maps are supplied.
+
+[definition] One shared text map and one two-class stop map read the tagged phase rows. A text
+aperture A has A+1 phase rows, with the last allowing termination at length A. Normal parameters
+do not acquire a new block for each position. Geometry/contact response remain fixed while
+E/M/R and stop material develop. The [source/consumer record](../research/records/2026-09-21_ORDERED_SOURCE_AND_PHASE_RECEIVING_ENTER_THE_PUBLIC_GENERATOR_SESSION.md)
+states the retained source fibre, complete return, publication and native/formal evidence.

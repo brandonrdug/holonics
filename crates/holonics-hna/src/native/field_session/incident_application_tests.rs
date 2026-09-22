@@ -1,7 +1,7 @@
 use super::*;
 use crate::native::GeometricFieldSpec;
 use holonic_engine::{
-    native_ecology::constitutive_fibre::ResidentNormalEnclosureSection, ExactComplexWaveCurrent,
+    ExactComplexWaveCurrent, native_ecology::constitutive_fibre::ResidentNormalEnclosureSection,
 };
 use num_rational::BigRational as Rat;
 use std::path::PathBuf;
@@ -27,6 +27,7 @@ fn spec() -> FieldSessionSpec {
             solve_steps: 128,
             solver: crate::native::IncidentFieldSolver::Richardson,
         }),
+        generator: None,
         codec: FieldTextCodec::UnicodeScalars,
         fractional_bits: 24,
     }
@@ -84,16 +85,20 @@ fn incident_solver_selection_survives_pending_rest_without_rebinding() {
             .body
             .prepare_incident_field(anchor.view(), &vec![false; anchor.view().components() / 2])?;
         session.configure_incident_solver(IncidentFieldSolver::Chebyshev, 128)?;
-        assert!(session
-            .body
-            .publish_incident_field(stale, false, false)
-            .is_err());
+        assert!(
+            session
+                .body
+                .publish_incident_field(stale, false, false)
+                .is_err()
+        );
         let value = session.request(&request(true))?;
         let id = value["comparison"].as_u64().unwrap();
         let received = session.inspect_incident_comparison(id)?;
-        assert!(session
-            .configure_incident_solver(IncidentFieldSolver::Richardson, 128)
-            .is_err());
+        assert!(
+            session
+                .configure_incident_solver(IncidentFieldSolver::Richardson, 128)
+                .is_err()
+        );
         assert_eq!(session.inspect_incident_comparison(id)?, received);
         session.checkpoint(&path, &HnaStreamState::default())?;
         Ok((id, received))
@@ -161,14 +166,16 @@ fn public_incident_session_reopens_frozen_receiver_after_intervening_update() {
         let short = session.request(&short_request)?;
         assert_eq!(long["receiver_bindings"], short["receiver_bindings"]);
         for returned in [&long, &short] {
-            assert!(returned["receiver_bindings"]
-                .as_array()
-                .unwrap()
-                .iter()
-                .all(|site| !returned["source_bindings"]
+            assert!(
+                returned["receiver_bindings"]
                     .as_array()
                     .unwrap()
-                    .contains(site)));
+                    .iter()
+                    .all(|site| !returned["source_bindings"]
+                        .as_array()
+                        .unwrap()
+                        .contains(site))
+            );
         }
         assert!(
             long["source_bindings"].as_array().unwrap().len()
@@ -316,10 +323,12 @@ fn mathematical_product_and_code_share_the_field_native_ports() {
             session.body.epoch()
         );
         assert_eq!(value["operation_results"][1]["status"], "code-emitted");
-        assert!(value["operation_results"][1]["source"]
-            .as_str()
-            .unwrap()
-            .contains("pub fn holonic_apply"));
+        assert!(
+            value["operation_results"][1]["source"]
+                .as_str()
+                .unwrap()
+                .contains("pub fn holonic_apply")
+        );
         let current = session.body.incident_current_boundary()?.view().inspect()?;
         let expected = ExactComplexWaveCurrent::new(
             Rat::new((-7).into(), 64.into()),

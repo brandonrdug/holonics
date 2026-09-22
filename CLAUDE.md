@@ -306,7 +306,7 @@ covectors on the device; `IncidentParticipationChart::QuadranceCurrent` binds th
 same-current specialization into the existing HNN word and rest. Legacy bilinear mode remains
 the default. These are dependencies of the fixed generator/source/phase machine, whose actual
 configuration/current maps and phase reception now have a body consumer; ordered source/session
-binding remains the next operation.
+binding has returned through the public generator session.
 
 [definition] `NativeCoupledBody::found_generator_field` now consumes the fixed machine:
 `field_geometry/{machine,machine_factor}.rs` owns its validated declaration and exact contact
@@ -314,5 +314,14 @@ factor, `incident/{machine,machine_transport,machine_receiving}.rs` owns its res
 word and tagged phase boundary. Original complex-3 currents are encoded as six real-coded
 native complex channels; the explicit projection and its transpose preserve that image.
 Declared pair material remains fixed while reaction material develops. Ordered source/session
-binding is the next call; the [current-chart record](research/records/2026-09-21_THE_FIXED_GENERATOR_MACHINE_CONSUMES_ITS_AFFINE_CURRENT_CHART.md)
+binding now consumes that body; the [current-chart record](research/records/2026-09-21_THE_FIXED_GENERATOR_MACHINE_CONSUMES_ITS_AFFINE_CURRENT_CHART.md)
 states its law and remaining scope. Legacy slot/response semantics remain distinct.
+
+[definition] `field_session/generator_application.rs` now owns the public `GeneratorMachine`
+source/receiving session. `incident/{machine_source,machine_source_contacts,machine_episode}.rs`
+advances the fixed machine, injects original complex source currents and appends directed
+kind-specific contrasts to the incident condition. The complete source/condition tape returns
+to E/M and shared phase text/stop material. Codec growth and V5 rest preserve old producing
+cuts; old slot/session wires remain readable. [Return and scope](research/records/2026-09-21_ORDERED_SOURCE_AND_PHASE_RECEIVING_ENTER_THE_PUBLIC_GENERATOR_SESSION.md).
+Constrained geometry/contact inference is next; the tape is not claimed compressed or sufficient
+for every possible graph receiver.

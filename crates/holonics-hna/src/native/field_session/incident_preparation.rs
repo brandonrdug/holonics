@@ -5,7 +5,8 @@
 //! provenance witnesses for one preparation; they are not persistent native identities.
 
 use super::{
-    ExposureAperture, FieldSectionRequest, FieldSessionSpec, FieldTextCodec, Result, invalid,
+    ExposureAperture, FieldSectionRequest, FieldSessionSpec, FieldSourceChart, FieldTextCodec,
+    Result, invalid,
 };
 use crate::alpha::exposure::{
     ExposureAvailability, ExposureFamily, ExposureManifest, ExposureOccurrence,
@@ -148,7 +149,11 @@ impl IncidentPreparation {
                 spec.context_symbols
             )));
         }
-        if let Some(start) = spec
+        if spec.source_chart == FieldSourceChart::GeneratorMachine {
+            if self.response_aperture != spec.response_aperture()? {
+                return Err(invalid("generator response aperture"));
+            }
+        } else if let Some(start) = spec
             .incident
             .as_ref()
             .and_then(|options| options.response_port_start)
@@ -371,11 +376,7 @@ impl IncidentPreparation {
             .len()
             .checked_sub(context_extent)
             .ok_or_else(|| invalid("direct incident request extent"))?;
-        let response_aperture = spec
-            .incident
-            .as_ref()
-            .ok_or_else(|| invalid("incident preparation declaration"))?
-            .response_aperture;
+        let response_aperture = spec.response_aperture()?;
         let expected_output = request_extent
             .checked_add(response_aperture)
             .ok_or_else(|| invalid("direct incident output extent overflow"))?;

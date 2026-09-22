@@ -13,6 +13,8 @@ use relational_geometry::{AffineMap3, RatMat3};
 #[serde(deny_unknown_fields)]
 pub struct GeneratorIncidentFieldSpec {
     pub machine: GeneratorMachineSpec,
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub source_condition_ports: usize,
     pub self_comparison: bool,
     pub beta_significand: i64,
     pub beta_exponent: i32,
@@ -27,13 +29,97 @@ pub struct GeneratorIncidentFieldSpec {
     pub solver: IncidentFieldSolver,
 }
 
+fn is_zero(value: &usize) -> bool {
+    *value == 0
+}
+
 /// Untagged only to preserve the existing legacy rest spelling. The two source objects have
 /// distinct required fields and deny unknown fields; neither can silently decode as the other.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 #[serde(untagged)]
 pub(super) enum IncidentModelSpec {
     Legacy(IncidentFieldSpec),
     Generator(GeneratorIncidentFieldSpec),
+}
+impl<'de> Deserialize<'de> for IncidentModelSpec {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        // Decode each field with the original format's deserializer. Buffering an untagged
+        // enum loses JSON's numeric-map-key decoding used by the legacy geometric atlas.
+        #[derive(Deserialize)]
+        #[serde(deny_unknown_fields)]
+        struct Wire {
+            geometry: Option<GeometricFieldSpec>,
+            machine: Option<GeneratorMachineSpec>,
+            participation: Option<IncidentParticipationChart>,
+            local_roots: Option<usize>,
+            source_condition_ports: Option<usize>,
+            self_comparison: Option<bool>,
+            beta_significand: Option<i64>,
+            beta_exponent: Option<i32>,
+            series_terms: Option<u32>,
+            refinement_steps: Option<usize>,
+            relaxation_bits: Option<u32>,
+            #[serde(default)]
+            material_owners: Vec<usize>,
+            #[serde(default = "solve_steps")]
+            solve_steps: usize,
+            #[serde(default)]
+            solver: IncidentFieldSolver,
+        }
+        let w = Wire::deserialize(deserializer)?;
+        match (w.geometry, w.machine) {
+            (Some(geometry), None)
+                if w.source_condition_ports.is_none()
+                    && w.self_comparison.is_none()
+                    && w.beta_significand.is_none()
+                    && w.beta_exponent.is_none()
+                    && w.series_terms.is_none()
+                    && w.refinement_steps.is_none()
+                    && w.relaxation_bits.is_none() =>
+            {
+                Ok(Self::Legacy(IncidentFieldSpec {
+                    geometry,
+                    participation: w.participation.unwrap_or_default(),
+                    local_roots: w
+                        .local_roots
+                        .ok_or_else(|| serde::de::Error::missing_field("local_roots"))?,
+                    material_owners: w.material_owners,
+                    solve_steps: w.solve_steps,
+                    solver: w.solver,
+                }))
+            }
+            (None, Some(machine)) if w.participation.is_none() && w.local_roots.is_none() => {
+                Ok(Self::Generator(GeneratorIncidentFieldSpec {
+                    machine,
+                    source_condition_ports: w.source_condition_ports.unwrap_or_default(),
+                    self_comparison: w
+                        .self_comparison
+                        .ok_or_else(|| serde::de::Error::missing_field("self_comparison"))?,
+                    beta_significand: w
+                        .beta_significand
+                        .ok_or_else(|| serde::de::Error::missing_field("beta_significand"))?,
+                    beta_exponent: w
+                        .beta_exponent
+                        .ok_or_else(|| serde::de::Error::missing_field("beta_exponent"))?,
+                    series_terms: w
+                        .series_terms
+                        .ok_or_else(|| serde::de::Error::missing_field("series_terms"))?,
+                    refinement_steps: w
+                        .refinement_steps
+                        .ok_or_else(|| serde::de::Error::missing_field("refinement_steps"))?,
+                    relaxation_bits: w
+                        .relaxation_bits
+                        .ok_or_else(|| serde::de::Error::missing_field("relaxation_bits"))?,
+                    material_owners: w.material_owners,
+                    solve_steps: w.solve_steps,
+                    solver: w.solver,
+                }))
+            }
+            _ => Err(serde::de::Error::custom(
+                "incident model requires exactly one complete legacy or generator chart",
+            )),
+        }
+    }
 }
 impl IncidentModelSpec {
     pub(super) fn compile(&self) -> Result<IncidentLayout, NativeSessionError> {
@@ -130,7 +216,8 @@ impl GeneratorIncidentFieldSpec {
             let c = site
                 .differences
                 .len()
-                .checked_mul(6)
+                .checked_add(self.source_condition_ports)
+                .and_then(|n| n.checked_mul(6))
                 .ok_or_else(|| invalid("generator condition extent"))?;
             let f = c
                 .checked_mul(7)
@@ -159,6 +246,7 @@ impl GeneratorIncidentFieldSpec {
             sites,
             slot_rows,
             width: 12,
+            source_condition_ports: self.source_condition_ports,
             material_features: features,
             beta: Dyadic {
                 significand: self.beta_significand,
@@ -249,6 +337,17 @@ impl<'c> MachineGroupMaps<'c> {
 }
 
 impl<'c> NativeCoupledBody<'c> {
+    /// The immutable declaration of this body, for source/receiver and rest compatibility.
+    pub fn generator_field_spec(&self) -> Result<&GeneratorIncidentFieldSpec, NativeSessionError> {
+        match self.state()? {
+            BodyState::Incident(model) => match &model.spec {
+                IncidentModelSpec::Generator(spec) => Ok(spec),
+                _ => Err(invalid("body is not a generator machine")),
+            },
+            _ => Err(invalid("body is not a generator machine")),
+        }
+    }
+
     /// Found the same incident HNN on fixed generators and actual pair-derived contacts.
     /// This call consumes machine currents; exterior ordered-source and phase-receiver codecs
     /// are separate boundaries. It never allocates one site for each source symbol.

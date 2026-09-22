@@ -13,6 +13,8 @@ struct Header {
 }
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 struct PendingHeader {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    source_episode: Option<GeneratorEpisodeMeta>,
     id: u64,
     epoch: u64,
     held: Vec<bool>,
@@ -20,6 +22,7 @@ struct PendingHeader {
 }
 #[derive(Debug, PartialEq, Eq)]
 struct PendingRest {
+    encoded: Option<ResidentSectionRest>,
     source: NativeFieldCurrentSourceRest,
     anchor: ResidentSectionRest,
     output: ResidentSectionRest,
@@ -65,7 +68,18 @@ impl NativeIncidentModelRest {
         self.header.pending.iter().any(|p| p.id == id)
     }
     pub(crate) fn write(&self, out: &mut impl Write) -> Result<(), NativeSessionError> {
-        out.write_all(b"HNA-INCIDENT-FIELD\x01")?;
+        out.write_all(
+            if self
+                .header
+                .pending
+                .iter()
+                .any(|p| p.source_episode.is_some())
+            {
+                b"HNA-INCIDENT-FIELD\x02"
+            } else {
+                b"HNA-INCIDENT-FIELD\x01"
+            },
+        )?;
         blob(out, &serde_json::to_vec(&self.header).map_err(invalid)?)?;
         let mut data = Vec::new();
         self.field.write(&mut data)?;
@@ -86,6 +100,9 @@ impl NativeIncidentModelRest {
                 material.write(&mut data)?;
                 blob(out, &data)?;
             }
+            if let Some(encoded) = &pending.encoded {
+                blob(out, &encoded.canonical_bytes().map_err(invalid)?)?;
+            }
         }
         Ok(())
     }
@@ -93,10 +110,14 @@ impl NativeIncidentModelRest {
         let mut input = input.take(octets);
         let mut magic = [0; 19];
         input.read_exact(&mut magic)?;
-        if &magic != b"HNA-INCIDENT-FIELD\x01" {
+        let episodes = &magic == b"HNA-INCIDENT-FIELD\x02";
+        if &magic != b"HNA-INCIDENT-FIELD\x01" && !episodes {
             return Err(invalid("incident model rest version"));
         }
         let header: Header = serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
+        if header.pending.iter().any(|p| p.source_episode.is_some()) != episodes {
+            return Err(invalid("incident episode rest tag"));
+        }
         let layout = header.spec.compile()?;
         let data = read_blob(&mut input)?;
         let field = NativeFieldRest::read(&mut data.as_slice(), data.len() as u64)?;
@@ -106,17 +127,24 @@ impl NativeIncidentModelRest {
         };
         let material = read_material(&mut input)?;
         let mut pending = Vec::new();
-        for _ in &header.pending {
+        for pending_header in &header.pending {
             let data = read_blob(&mut input)?;
             let source =
                 NativeFieldCurrentSourceRest::read(&mut data.as_slice(), data.len() as u64)?;
             let anchor = ResidentSectionRest::read(&read_blob(&mut input)?).map_err(invalid)?;
             let output = ResidentSectionRest::read(&read_blob(&mut input)?).map_err(invalid)?;
+            let material = read_material(&mut input)?;
+            let encoded = if pending_header.source_episode.is_some() {
+                Some(ResidentSectionRest::read(&read_blob(&mut input)?).map_err(invalid)?)
+            } else {
+                None
+            };
             pending.push(PendingRest {
                 source,
                 anchor,
                 output,
-                material: read_material(&mut input)?,
+                material,
+                encoded,
             });
         }
         if input.limit() != 0 {
@@ -191,17 +219,42 @@ impl NativeIncidentModelRest {
             {
                 return Err(invalid("incident pending anchor mask"));
             }
-            let (steps, output) =
-                model.evaluate(&source, &material, &anchor, &h.held, &h.admitted)?;
-            let recorded = ResidentNormalEnclosure::remount(surface, p.output, grain)?;
-            if output.inspect()? != recorded.inspect()? {
-                return Err(invalid(
-                    "incident producing word does not reconstruct recorded endpoint",
-                ));
-            }
-            model.pending.insert(
-                h.id,
-                Rc::new(IncidentWord {
+            let word = if let Some(meta) = h.source_episode {
+                let encoded = Rc::new(ResidentNormalEnclosureSection::remount(
+                    surface,
+                    p.encoded
+                        .ok_or_else(|| invalid("missing generator source rows"))?,
+                    meta.rows,
+                    meta.components,
+                    grain,
+                )?);
+                let word = model.evaluate_generator_episode(
+                    &source,
+                    &material,
+                    encoded,
+                    meta.binding,
+                    meta.start,
+                    h.epoch,
+                    meta.contacts,
+                )?;
+                if word.anchor.inspect()? != anchor.inspect()?
+                    || word.held != h.held
+                    || word.admitted != h.admitted
+                {
+                    return Err(invalid(
+                        "generator source tape does not reconstruct its final anchor",
+                    ));
+                }
+                word
+            } else {
+                if p.encoded.is_some() {
+                    return Err(invalid("unbound generator source rows"));
+                }
+                let (steps, output) =
+                    model.evaluate(&source, &material, &anchor, &h.held, &h.admitted, None)?;
+                IncidentWord {
+                    source_episode: None,
+                    external_condition: None,
                     machine: model.layout.machine.clone(),
                     source,
                     material,
@@ -213,8 +266,15 @@ impl NativeIncidentModelRest {
                     epoch: h.epoch,
                     solver: model.spec.solver(),
                     solve_steps: model.spec.solve_steps(),
-                }),
-            );
+                }
+            };
+            let recorded = ResidentNormalEnclosure::remount(surface, p.output, grain)?;
+            if word.output.inspect()? != recorded.inspect()? {
+                return Err(invalid(
+                    "incident producing word does not reconstruct recorded endpoint",
+                ));
+            }
+            model.pending.insert(h.id, Rc::new(word));
         }
         Ok(model)
     }
@@ -231,6 +291,7 @@ impl IncidentFieldModel<'_> {
                 .pending
                 .iter()
                 .map(|(&id, p)| PendingHeader {
+                    source_episode: p.source_episode.as_ref().map(|t| t.meta.clone()),
                     id,
                     epoch: p.epoch,
                     held: p.held.clone(),
@@ -243,6 +304,11 @@ impl IncidentFieldModel<'_> {
             .values()
             .map(|p| {
                 Ok(PendingRest {
+                    encoded: p
+                        .source_episode
+                        .as_ref()
+                        .map(|t| t.encoded.rest())
+                        .transpose()?,
                     source: p.source.rest()?,
                     anchor: p.anchor.rest()?,
                     output: p.output.rest()?,

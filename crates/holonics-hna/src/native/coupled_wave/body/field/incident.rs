@@ -1,6 +1,12 @@
 //! Incident-conditioned finite word on one global constitutive field.
 mod machine;
+mod machine_episode;
 mod machine_receiving;
+mod machine_source;
+mod machine_source_contacts;
+use machine_episode::{GeneratorEpisodeMeta, GeneratorEpisodeTape};
+pub use machine_source::GeneratorSourceBinding;
+pub use machine_source_contacts::{GeneratorSourceContact, GeneratorSourceContactKind};
 mod machine_transport;
 pub use machine_receiving::{
     GeneratorPhasePort, GeneratorPhaseReceiverBinding, NativeGeneratorPhaseReception,
@@ -113,6 +119,7 @@ struct IncidentLayout {
     sites: Vec<IncidentSite>,
     slot_rows: Vec<usize>,
     width: usize,
+    source_condition_ports: usize,
     material_features: Vec<usize>,
     beta: Dyadic,
     participation: IncidentParticipationChart,
@@ -284,6 +291,7 @@ impl IncidentFieldSpec {
             sites,
             slot_rows: geometry.slot_rows,
             width,
+            source_condition_ports: 0,
             material_features: features,
             participation: self.participation,
             beta: Dyadic {
@@ -302,6 +310,7 @@ struct IncidentSiteStep<'c> {
     query: Rc<ResidentNormalEnclosureSection<'c>>,
     phase: IncidentParticipationForward<'c>,
     condition: Option<ResidentNormalEnclosureSection<'c>>,
+    external_condition: Option<ResidentNormalEnclosureSection<'c>>,
     machine_difference: Option<MachineValueTransport<'c>>,
     features: ResidentNormalEnclosureSection<'c>,
 }
@@ -355,6 +364,8 @@ struct IncidentStep<'c> {
     input: ResidentNormalEnclosure<'c>,
 }
 pub(crate) struct IncidentWord<'c> {
+    source_episode: Option<GeneratorEpisodeTape<'c>>,
+    external_condition: Option<Rc<ResidentNormalEnclosureSection<'c>>>,
     machine: Option<Rc<crate::native::field_geometry::machine::CompiledGeneratorMachine>>,
     source: NativeFieldCurrentSource<'c>,
     material: Vec<ResidentNormalMaterialView<'c>>,
@@ -374,6 +385,7 @@ pub struct NativeIncidentGenerated<'c> {
     comparison: Option<u64>,
 }
 pub struct NativeIncidentMaterialReturn<'c> {
+    source_covector: Option<ResidentNormalEnclosureSection<'c>>,
     comparison: u64,
     epoch: u64,
     next_epoch: u64,
@@ -385,6 +397,10 @@ pub struct NativeIncidentMaterialReturn<'c> {
     >,
 }
 impl<'c> NativeIncidentMaterialReturn<'c> {
+    /// Ordered original complex source rows returned through every ingestion/refinement stage.
+    pub fn source_covector(&self) -> Option<&ResidentNormalEnclosureSection<'c>> {
+        self.source_covector.as_ref()
+    }
     pub fn anchor_covector(&self) -> ResidentNormalEnclosureView<'_, 'c> {
         self.anchor.view()
     }
@@ -441,6 +457,8 @@ pub(crate) struct IncidentFieldModel<'c> {
 /// Producing covectors, before the normal law stages contemporary material successors.
 /// Contact operands retain every stage, including its internal-output covector.
 pub(super) struct IncidentPullback<'c> {
+    source_covector: Option<ResidentNormalEnclosureSection<'c>>,
+    external_covector: Option<ResidentNormalEnclosureSection<'c>>,
     anchor: ResidentNormalEnclosure<'c>,
     material: Vec<
         Vec<(
@@ -470,6 +488,36 @@ fn zero<'c>(
         surface, rows, width, grain,
     )?)
 }
+
+fn join_condition_columns<'c>(
+    left: Option<&ResidentNormalEnclosureSection<'c>>,
+    right: Option<&ResidentNormalEnclosureSection<'c>>,
+) -> Result<Option<ResidentNormalEnclosureSection<'c>>, NativeSessionError> {
+    match (left, right) {
+        (None, None) => Ok(None),
+        (Some(value), None) => Ok(Some(ResidentNormalEnclosureSection::concatenate_rows(&[
+            value,
+        ])?)),
+        (None, Some(value)) => Ok(Some(ResidentNormalEnclosureSection::concatenate_rows(&[
+            value,
+        ])?)),
+        (Some(left), Some(right)) => {
+            if left.rows() != right.rows() || left.grain() != right.grain() {
+                return Err(invalid("condition column join chart"));
+            }
+            let mut rows = Vec::with_capacity(left.rows());
+            for row in 0..left.rows() {
+                let joined = left.row(row)?.join(right.row(row)?)?;
+                rows.push(joined.view().as_section()?);
+            }
+            let refs = rows.iter().collect::<Vec<_>>();
+            Ok(Some(ResidentNormalEnclosureSection::concatenate_rows(
+                &refs,
+            )?))
+        }
+    }
+}
+
 impl<'c> IncidentFieldModel<'c> {
     pub(crate) fn new(
         field: NativeConstitutiveField<'c>,
@@ -556,8 +604,11 @@ impl<'c> IncidentFieldModel<'c> {
             .iter()
             .map(ResidentNormalMaterial::retained_view)
             .collect::<Vec<_>>();
-        let (steps, output) = self.evaluate(&source, &material, &anchor, &joint_held, &admitted)?;
+        let (steps, output) =
+            self.evaluate(&source, &material, &anchor, &joint_held, &admitted, None)?;
         Ok(IncidentWord {
+            source_episode: None,
+            external_condition: None,
             machine: self.layout.machine.clone(),
             source,
             material,
@@ -710,8 +761,37 @@ impl<'c> IncidentFieldModel<'c> {
         anchor: &ResidentNormalEnclosure<'c>,
         held: &[bool],
         admitted: &[Vec<bool>],
+        external: Option<&ResidentNormalEnclosureSection<'c>>,
     ) -> Result<(Vec<IncidentStep<'c>>, ResidentNormalEnclosure<'c>), NativeSessionError> {
         let layout = &self.layout;
+        let external_width = layout
+            .width
+            .checked_mul(layout.source_condition_ports)
+            .ok_or_else(|| invalid("incident external condition extent"))?;
+        let zero_external = if layout.source_condition_ports > 0 && external.is_none() {
+            Some(zero(
+                self.field.surface(),
+                layout.sites.len(),
+                external_width,
+                anchor.view().grain(),
+            )?)
+        } else {
+            None
+        };
+        let external = external.or(zero_external.as_ref());
+        if layout.source_condition_ports == 0 {
+            if external.is_some() {
+                return Err(invalid("external condition supplied to a zero-port field"));
+            }
+        } else {
+            let external = external.ok_or_else(|| invalid("missing external condition field"))?;
+            if external.rows() != layout.sites.len()
+                || external.components() != external_width
+                || external.grain() != anchor.view().grain()
+            {
+                return Err(invalid("external condition chart"));
+            }
+        }
         if admitted.len() != layout.sites.len()
             || admitted
                 .iter()
@@ -808,7 +888,7 @@ impl<'c> IncidentFieldModel<'c> {
                         )
                     })
                     .transpose()?;
-                let condition = if group.differences == 0 {
+                let current_condition = if group.differences == 0 {
                     None
                 } else {
                     let u = match &machine_difference {
@@ -835,6 +915,19 @@ impl<'c> IncidentFieldModel<'c> {
                     )?;
                     Some(delta.held_refinement(&zero_condition, &group.condition_held, 0)?)
                 };
+                let external_condition = if layout.source_condition_ports == 0 {
+                    None
+                } else {
+                    Some(
+                        external
+                            .ok_or_else(|| invalid("missing external condition field"))?
+                            .gather_phase_rows(&group.receivers, &phases(rows), external_width)?,
+                    )
+                };
+                let condition = join_condition_columns(
+                    current_condition.as_ref(),
+                    external_condition.as_ref(),
+                )?;
                 let features = match &condition {
                     Some(c) => query.bilinear_enclosed_features(c)?,
                     None => ResidentNormalEnclosureSection::concatenate_rows(&[&query])?,
@@ -853,6 +946,7 @@ impl<'c> IncidentFieldModel<'c> {
                     query,
                     phase,
                     condition,
+                    external_condition,
                     machine_difference,
                     features,
                 });
@@ -888,7 +982,7 @@ impl<'c> IncidentFieldModel<'c> {
         Ok((steps, current))
     }
 
-    fn pull_back(
+    fn pull_back_word(
         &self,
         word: &IncidentWord<'c>,
         output_covector: ResidentNormalEnclosureView<'_, 'c>,
@@ -906,6 +1000,20 @@ impl<'c> IncidentFieldModel<'c> {
         let mut material = (0..self.materials.len())
             .map(|_| Vec::new())
             .collect::<Vec<_>>();
+        let external_width = layout
+            .width
+            .checked_mul(layout.source_condition_ports)
+            .ok_or_else(|| invalid("incident external covector extent"))?;
+        let mut external_total = if layout.source_condition_ports == 0 {
+            None
+        } else {
+            Some(zero(
+                self.field.surface(),
+                layout.sites.len(),
+                external_width,
+                grain,
+            )?)
+        };
         let mut contacts = Vec::with_capacity(word.steps.len());
         for step in word.steps.iter().rev() {
             // The anchor includes b_pre. Its contribution is present at every stage.
@@ -937,13 +1045,44 @@ impl<'c> IncidentFieldModel<'c> {
                 let rows = group.receivers.len();
                 let g = ga.gather_phase_rows(&group.receivers, &phases(rows), layout.width)?;
                 let gf = word.material[group.material].pull_back_enclosed_section(&g)?;
-                let (gq, gdelta) = match &stage.condition {
+                let (gq, gcondition) = match &stage.condition {
                     Some(c) => {
                         let (q, c) = stage.query.bilinear_enclosed_pullback(c, &gf)?;
                         (q, Some(c))
                     }
                     None => (gf, None),
                 };
+                let current_width = group
+                    .differences
+                    .checked_mul(layout.width)
+                    .ok_or_else(|| invalid("incident current condition extent"))?;
+                let gdelta = if current_width == 0 {
+                    None
+                } else {
+                    Some(
+                        gcondition
+                            .as_ref()
+                            .ok_or_else(|| invalid("missing current condition covector"))?
+                            .restrict_components(0..current_width)?,
+                    )
+                };
+                if layout.source_condition_ports > 0 {
+                    let external = gcondition
+                        .as_ref()
+                        .ok_or_else(|| invalid("missing complete condition covector"))?
+                        .restrict_components(current_width..current_width + external_width)?;
+                    let scattered = external.scatter_phase_adjoint(
+                        &group.receivers,
+                        &phases(rows),
+                        layout.sites.len(),
+                    )?;
+                    external_total = Some(
+                        external_total
+                            .take()
+                            .ok_or_else(|| invalid("external covector accumulator"))?
+                            .sum_same_shape(&scattered)?,
+                    );
+                }
                 let mut query = match &stage.phase {
                     IncidentParticipationForward::Machine(p) => {
                         previous = previous.sum_same_shape(&p.pull_back(&g)?)?;
@@ -1011,6 +1150,8 @@ impl<'c> IncidentFieldModel<'c> {
             contacts.push((step.input.view().to_owned()?, full.to_owned()?));
         }
         Ok(IncidentPullback {
+            source_covector: None,
+            external_covector: external_total,
             anchor: self
                 .project_machine(anchor_gradient.sum_same_shape(&gradient)?)?
                 .row(0)?
@@ -1086,6 +1227,7 @@ impl<'c> NativeCoupledBody<'c> {
             )?)
         };
         Ok(NativeIncidentMaterialReturn {
+            source_covector: returned.source_covector,
             comparison: id,
             epoch: model.epoch,
             next_epoch,

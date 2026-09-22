@@ -671,3 +671,10 @@ include projection onto that image, with the same projection in the covector ret
 [native chart record](../research/records/2026-09-21_THE_FIXED_GENERATOR_MACHINE_CONSUMES_ITS_AFFINE_CURRENT_CHART.md)
 states the realization and factor-error laws. Fixed contact geometry remains declared through
 reaction-material publication; a generic unconstrained D update would leave that family.
+
+[definition] In the generator source episode, the same word receives the source contrast
+ports separately from the advanced/injected current. Its producing adjoint collects both
+returns through every occurrence; the source encoder receives their sum after the directed
+incidence adjoint. Field, E and receiver successors are prepared before publication. The
+[public source/phase return](../research/records/2026-09-21_ORDERED_SOURCE_AND_PHASE_RECEIVING_ENTER_THE_PUBLIC_GENERATOR_SESSION.md)
+records the law, class-specific pooled receiver and retained source fibre.

@@ -1,7 +1,7 @@
 //! Exterior session over one move-owned coupled normal wave.
-use super::section_input::SymbolCurrentChart;
 use super::NativeSessionError;
-use crate::{publish_new, HnaStream, HnaStreamState, PublicationReceipt};
+use super::section_input::SymbolCurrentChart;
+use crate::{HnaStream, HnaStreamState, PublicationReceipt, publish_new};
 use holonic_engine::{
     codec_recovery::{Symbol, SymbolAlphabet},
     embedding_fiber::ResidentReadout,
@@ -12,7 +12,7 @@ use holonic_engine::{
     resident_section::ResidentSurface,
 };
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::{
     fs::File,
     io::{self, Read, Write},
@@ -22,10 +22,12 @@ use std::{
 mod body;
 pub use body::SavedCoupledBody;
 pub use body::{
-    GeneratorPhasePort, GeneratorPhaseReceiverBinding, NativeGeneratorPhaseReception, GeneratorIncidentFieldSpec, IncidentFieldSolver, IncidentFieldSpec, IncidentParticipationChart, NativeCoupledBody, NativeFieldAttachRefusal,
-    NativeFieldFormation, NativeFieldGeneratedSection, NativeFieldModelRest,
-    NativeFieldReactionPort, NativeIncidentGenerated, NativeIncidentMaterialReturn,
-    NativeIncidentModelRest,
+    GeneratorIncidentFieldSpec, GeneratorPhasePort, GeneratorPhaseReceiverBinding,
+    GeneratorSourceBinding, GeneratorSourceContact, GeneratorSourceContactKind,
+    IncidentFieldSolver, IncidentFieldSpec, IncidentParticipationChart, NativeCoupledBody,
+    NativeFieldAttachRefusal, NativeFieldFormation, NativeFieldGeneratedSection,
+    NativeFieldModelRest, NativeFieldReactionPort, NativeGeneratorPhaseReception,
+    NativeIncidentGenerated, NativeIncidentMaterialReturn, NativeIncidentModelRest,
 };
 
 const MAGIC: &[u8] = b"HNA-COUPLED-WAVE-SESSION\x01";

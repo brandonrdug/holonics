@@ -84,6 +84,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         source_chart,
         geometry: Some(geometry),
         incident,
+        generator: None,
         codec,
         fractional_bits: 48,
     };

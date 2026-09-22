@@ -12,7 +12,7 @@ use holonic_engine::{
     },
     resident_section::{ResidentSection, ResidentSurface},
 };
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::io::{Read, Write};
 
 fn invalid(message: impl ToString) -> NativeSessionError {
@@ -20,13 +20,16 @@ fn invalid(message: impl ToString) -> NativeSessionError {
 }
 
 mod field;
+use field::FieldModel;
 pub use field::formation::NativeFieldFormation;
 use field::incident::IncidentFieldModel;
 pub use field::incident::{
-    GeneratorPhasePort, GeneratorPhaseReceiverBinding, NativeGeneratorPhaseReception, GeneratorIncidentFieldSpec, IncidentFieldSolver, IncidentFieldSpec, IncidentParticipationChart, NativeIncidentGenerated, NativeIncidentMaterialReturn,
+    GeneratorIncidentFieldSpec, GeneratorPhasePort, GeneratorPhaseReceiverBinding,
+    GeneratorSourceBinding, GeneratorSourceContact, GeneratorSourceContactKind,
+    IncidentFieldSolver, IncidentFieldSpec, IncidentParticipationChart,
+    NativeGeneratorPhaseReception, NativeIncidentGenerated, NativeIncidentMaterialReturn,
     NativeIncidentModelRest,
 };
-use field::FieldModel;
 pub use field::{
     NativeFieldAttachRefusal, NativeFieldGeneratedSection, NativeFieldModelRest,
     NativeFieldReactionPort,

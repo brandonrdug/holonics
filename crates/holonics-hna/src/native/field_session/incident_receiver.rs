@@ -4,16 +4,17 @@
 //! choices are obtained from the existing device readout; no host-side score selection enters
 //! the forward or delayed comparison.
 
+pub(super) mod phase;
 use super::boundary::BoundaryMaterial;
-use super::{invalid, Result};
+use super::{Result, invalid};
 use holonic_engine::{
+    ExactWavePhaseTransport,
     native_ecology::constitutive_fibre::{
         NativeNormalPrior, NativeNormalizedFaceMeasure, NormalBasisSelection, NormalMaterialRest,
         NormalWaveBasisChart, ResidentConstitutiveSection, ResidentNormalEnclosureSection,
         ResidentNormalMaterial,
     },
     resident_section::{ResidentGrain, ResidentSectionRest, ResidentSurface, SeriesAperture},
-    ExactWavePhaseTransport,
 };
 use std::rc::Rc;
 

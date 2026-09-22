@@ -12,32 +12,35 @@ use thiserror::Error;
 
 pub mod mathematical;
 pub mod section_input;
-pub use mathematical::{with_mathematical_session, MathematicalRequest, NativeMathematicalSession};
+pub use mathematical::{MathematicalRequest, NativeMathematicalSession, with_mathematical_session};
 pub mod field_geometry;
 pub use field_geometry::GeometricFieldSpec;
 mod field_session;
 pub use field_session::{
-    with_field_session, ExposureAperture, FieldMathematicalRequest, FieldSectionRequest,
-    FieldSessionSpec, FieldSourceChart, FieldTextCodec, IncidentContact, IncidentContactKind,
-    IncidentFieldOptions, IncidentPreparation, IncidentSourceCell, IncidentSourceOrigin,
-    IncidentSourcePart, IncidentSourceRegion, NativeFieldIncidence,
+    ExposureAperture, FieldMathematicalRequest, FieldSectionRequest, FieldSessionSpec,
+    FieldSourceChart, FieldTextCodec, GeneratorSessionOptions, IncidentContact,
+    IncidentContactKind, IncidentFieldOptions, IncidentPreparation, IncidentSourceCell,
+    IncidentSourceOrigin, IncidentSourcePart, IncidentSourceRegion, NativeFieldIncidence,
     NativeFieldIncidenceDeclaration, NativeFieldIncomingArc, NativeFieldOmittedSelfComparison,
     NativeFieldSavedSession, NativeFieldSession, NativeFieldSourceAttachRefusal,
     NativeFieldSourceSpec, NativeFieldSources, NativeSourceSavedSession, PreparedFieldIncidence,
-    RetainedSharedSource,
+    RetainedSharedSource, with_field_session,
 };
 mod coupled_wave;
 mod normal_wave;
 pub use coupled_wave::{
-    GeneratorPhasePort, GeneratorPhaseReceiverBinding, NativeGeneratorPhaseReception, GeneratorIncidentFieldSpec, IncidentFieldSolver, IncidentFieldSpec, IncidentParticipationChart, NativeCoupledBody, NativeCoupledWaveAttachRefusal,
-    NativeCoupledWaveSavedSession, NativeCoupledWaveSession, NativeFieldAttachRefusal,
-    NativeFieldFormation, NativeFieldGeneratedSection, NativeFieldModelRest,
-    NativeFieldReactionPort, NativeIncidentGenerated, NativeIncidentMaterialReturn,
-    NativeIncidentModelRest, SavedCoupledBody,
+    GeneratorIncidentFieldSpec, GeneratorPhasePort, GeneratorPhaseReceiverBinding,
+    GeneratorSourceBinding, GeneratorSourceContact, GeneratorSourceContactKind,
+    IncidentFieldSolver, IncidentFieldSpec, IncidentParticipationChart, NativeCoupledBody,
+    NativeCoupledWaveAttachRefusal, NativeCoupledWaveSavedSession, NativeCoupledWaveSession,
+    NativeFieldAttachRefusal, NativeFieldFormation, NativeFieldGeneratedSection,
+    NativeFieldModelRest, NativeFieldReactionPort, NativeGeneratorPhaseReception,
+    NativeIncidentGenerated, NativeIncidentMaterialReturn, NativeIncidentModelRest,
+    SavedCoupledBody,
 };
 pub use normal_wave::{
-    with_seeded_wave_session, NativeWaveAttachRefusal, NativeWaveSavedSession, NativeWaveSeedSpec,
-    NativeWaveSession, NATIVE_WAVE_SEED_SCHEMA,
+    NATIVE_WAVE_SEED_SCHEMA, NativeWaveAttachRefusal, NativeWaveSavedSession, NativeWaveSeedSpec,
+    NativeWaveSession, with_seeded_wave_session,
 };
 
 mod wire;
@@ -46,10 +49,10 @@ mod checkpoint;
 pub use checkpoint::NativeSavedSession;
 mod wave_control;
 pub use wave_control::{
-    resume_wave_control, run_wave_control, run_wave_control_with_options, PendingWaveReceive,
-    WaveApplication, WaveBoundary, WaveChange, WaveControlRun, WaveControlSpec, WaveCycle,
-    WaveInterruption, WaveIntervention, WaveRunOptions, WaveSavedApplication, WaveWorldSpec,
-    WAVE_CONTROL_SCHEMA,
+    PendingWaveReceive, WAVE_CONTROL_SCHEMA, WaveApplication, WaveBoundary, WaveChange,
+    WaveControlRun, WaveControlSpec, WaveCycle, WaveInterruption, WaveIntervention, WaveRunOptions,
+    WaveSavedApplication, WaveWorldSpec, resume_wave_control, run_wave_control,
+    run_wave_control_with_options,
 };
 
 #[derive(Debug, Error)]

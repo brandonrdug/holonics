@@ -224,4 +224,7 @@ spatial and value maps with their adjoints. Its current chart faithfully encodes
 coordinates of the original complex-3 current, projecting only the redundant native imaginary
 faces. Tagged reception reads the generated endpoint at the declared phases. The
 [construction record](../research/records/2026-09-21_THE_FIXED_GENERATOR_MACHINE_CONSUMES_ITS_AFFINE_CURRENT_CHART.md)
-keeps the fixed-material scope and the remaining ordered source/session join explicit.
+keeps the fixed-material scope explicit. The
+[public ordered source/session join](../research/records/2026-09-21_ORDERED_SOURCE_AND_PHASE_RECEIVING_ENTER_THE_PUBLIC_GENERATOR_SESSION.md)
+now consumes that body through actual source clocks, directed conditions, shared phase
+text/termination material and the complete frozen source return.

@@ -1423,9 +1423,12 @@ to the same global incident word through a certified sparse pair factor, separat
 spatial/value affine maps and six-coordinate realification. Producing phase reception is
 an explicit boundary of its output. The
 [current-chart record](../../research/records/2026-09-21_THE_FIXED_GENERATOR_MACHINE_CONSUMES_ITS_AFFINE_CURRENT_CHART.md)
-states projection, adjoint, factor-error, unit and declared-material scopes. The ordered
-source/session binding and shared text/termination law remain packet 3's next consuming work;
-its fixed geometry is not silently updated by an unconstrained global D proposal.
+states projection, adjoint, factor-error, unit and declared-material scopes. The
+[ordered source/session return](../../research/records/2026-09-21_ORDERED_SOURCE_AND_PHASE_RECEIVING_ENTER_THE_PUBLIC_GENERATOR_SESSION.md)
+now advances the machine, supplies current increments and kind-specific directed conditions,
+returns through the complete source tape and reads shared phase text/termination material.
+Codec growth and rest retain old producing cuts. Geometry is still declared: packet 4 must
+supply its constrained proposal, not silently publish an unconstrained global D update.
 
 [definition; agent-inferred] **Packets and dependencies.** Paths below are relative to `crates/`
 except the formal row. Ownership is split per dispatch; rows listing the same file are
