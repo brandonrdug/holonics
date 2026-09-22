@@ -11,6 +11,8 @@
 //! the layout and causal column origins alongside the output so a consumer cannot mistake a
 //! batch of local rows for the one continuing `(q,b)` state.
 use super::*;
+mod contact_scale;
+pub use contact_scale::NativeDeclaredFactorScaleGradient;
 
 /// Causal identity of one column of the producing D map. Observation-derived births and
 /// caller-declared contacts remain different tagged origins even when their addresses match.

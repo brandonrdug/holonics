@@ -15,18 +15,19 @@ pub use operative::{
 };
 pub use operative::{
     NativeContactDepositBoundReading, NativeContactDepositReading, NativeContactRealization,
-    NativeOperativeBoundKind, NativeFieldCurrentSource,
-    NativeFieldCurrentSourceRest, NativeFieldReflection, NativeFieldReflectionSection,
-    NativeFieldReflectionTarget, NativeFiniteMaterialResponse, NativeMaterialContactResponse,
-    NativeMaterialContactResponseReading, NativeMaterialContactStepComparison,
-    NativeMaterialResponseChart, NativeOperativeContactBirth, NativeOperativeContactReading,
-    NativeOperativeContactStaging, NativeOperativeCurrentFactorCondensation,
-    NativeOperativeReflectionReading, NativeOperativeReturnStorage, NativeRetainedMaterialRelation,
+    NativeFieldCurrentSource, NativeFieldCurrentSourceRest, NativeFieldReflection,
+    NativeFieldReflectionSection, NativeFieldReflectionTarget, NativeFiniteMaterialResponse,
+    NativeMaterialContactResponse, NativeMaterialContactResponseReading,
+    NativeMaterialContactStepComparison, NativeMaterialResponseChart, NativeOperativeBoundKind,
+    NativeOperativeContactBirth, NativeOperativeContactReading, NativeOperativeContactStaging,
+    NativeOperativeCurrentFactorCondensation, NativeOperativeReflectionReading,
+    NativeOperativeReturnStorage, NativeRetainedMaterialRelation,
 };
 pub use operative::{
-    NativeFieldAction, NativeFieldActionFactorization, NativeFieldActionPullback,
-    NativeFieldContactOrigin, NativeFieldDeclaredIncidence, NativeFieldGlobalMaterialCommit,
-    NativeFieldJointCurrentCommit, NativeFieldJointLayout, NativeFieldMatrixFreeAction,
+    NativeDeclaredFactorScaleGradient, NativeFieldAction, NativeFieldActionFactorization,
+    NativeFieldActionPullback, NativeFieldContactOrigin, NativeFieldDeclaredIncidence,
+    NativeFieldGlobalMaterialCommit, NativeFieldJointCurrentCommit, NativeFieldJointLayout,
+    NativeFieldMatrixFreeAction,
 };
 pub use producer::{
     CausalContactPropagation, CausalContactPropagationCotangent, CausalContactPropagationEnclosure,

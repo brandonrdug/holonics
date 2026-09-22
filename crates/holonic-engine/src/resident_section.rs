@@ -87,56 +87,60 @@ mod surface_wave_pullback;
 
 #[path = "resident_section/bilinear.rs"]
 mod bilinear;
-pub use bilinear::{ResidentBilinearMap, ResidentBilinearReturn, ResidentJointBilinearEvaluation, ResidentJointBilinearFibre};
+pub use bilinear::{
+    ResidentBilinearMap, ResidentBilinearReturn, ResidentJointBilinearEvaluation,
+    ResidentJointBilinearFibre,
+};
 
 #[path = "resident_section/geometry.rs"]
 mod geometry;
-#[path = "resident_section/surface_mount.rs"]
-mod surface_mount;
-#[path = "resident_section/surface_passage.rs"]
-mod surface_passage;
-mod surface_linear_material;
-mod surface_direct_normal;
-mod surface_normal_relation;
-mod surface_normal_section;
-mod surface_normal_enclosure_ports;
-mod surface_normal_applied_condition;
-mod surface_normal_wave;
-mod surface_normal_wave_basis_face;
-mod surface_normal_section_basis;
-mod surface_normal_wave_source;
-mod surface_normal_wave_family;
-mod surface_normal_family_receiver;
-mod surface_normal_coupled;
-mod surface_wave_relation;
-mod surface_wave_source;
-mod surface_material_support;
-mod surface_phase_participation;
-mod surface_pair_quadrance;
 mod surface_affine_geometry;
+mod surface_contact_scale;
+mod surface_direct_normal;
 mod surface_enclosure_composition;
-mod surface_incident;
-mod surface_global_field_action;
 mod surface_field_factor_action;
 mod surface_field_factor_material;
+mod surface_global_field_action;
+mod surface_incident;
+mod surface_linear_material;
+mod surface_material_support;
+#[path = "resident_section/surface_mount.rs"]
+mod surface_mount;
+mod surface_normal_applied_condition;
 mod surface_normal_applied_features;
+mod surface_normal_coupled;
+mod surface_normal_enclosure_ports;
+mod surface_normal_family_receiver;
+mod surface_normal_relation;
+mod surface_normal_section;
+mod surface_normal_section_basis;
+mod surface_normal_wave;
+mod surface_normal_wave_basis_face;
+mod surface_normal_wave_family;
+mod surface_normal_wave_source;
+mod surface_pair_quadrance;
+#[path = "resident_section/surface_passage.rs"]
+mod surface_passage;
+mod surface_phase_participation;
+mod surface_wave_relation;
+mod surface_wave_source;
 pub(crate) use surface_enclosure_composition::EnclosureComposition;
+mod surface_causal_contact_propagation;
 #[path = "resident_section/surface_condition.rs"]
 mod surface_condition;
+mod surface_context_section;
 #[path = "resident_section/surface_fibre_image.rs"]
 mod surface_fibre_image;
 mod surface_material_mode;
 mod surface_moment;
-mod surface_context_section;
 mod surface_operative_contacts;
 mod surface_operative_map_source;
-mod surface_causal_contact_propagation;
 pub(crate) use surface_causal_contact_propagation::CausalPropagationLayout;
-mod surface_operative_adjoint;
 #[path = "resident_section/surface_adjoint.rs"]
 mod surface_adjoint;
 #[path = "resident_section/surface_intervention.rs"]
 mod surface_intervention;
+mod surface_operative_adjoint;
 #[path = "resident_section/surface_shapes.rs"]
 mod surface_shapes;
 #[path = "resident_section/surface_tiled.rs"]
@@ -176,7 +180,7 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 92] = [
+pub const KERNELS: [&str; 93] = [
     "section_constitutive_rechart",
     "section_constitutive_circulation",
     "section_constitutive_fibre",
@@ -254,6 +258,7 @@ pub const KERNELS: [&str; 92] = [
     "section_affine_geometry_forward",
     "section_affine_geometry_adjoint",
     "section_realification",
+    "section_field_contact_scale_gradient",
     "section_pair_quadrance_logits",
     "section_pair_quadrance_adjoint",
     "section_phase_participation",
@@ -285,12 +290,12 @@ pub const KERNELS: [&str; 92] = [
     "section_normal_enclosure_zero",
 ];
 
+mod surface_bilinear_adjoint;
 #[path = "resident_section/surface_field_current_source.rs"]
 mod surface_field_current_source;
 mod surface_field_reflection_commit;
 mod surface_field_reflection_target;
 mod surface_normal_held_section;
-mod surface_bilinear_adjoint;
 
 /// `CUdevice_attribute` selectors from `cuda.h`, fixed by the foreign interface.
 const ATTRIBUTE_MAX_THREADS_PER_BLOCK: i32 = 1;
@@ -740,26 +745,38 @@ impl<'chart> ResidentSection<'chart> {
         // SAFETY: ManuallyDrop suppresses the section's destructor. Each owning buffer is
         // moved exactly once: lo into the endpoint, hi into its destructor. The surface and
         // dimensions are borrowed/Copy; census ownership is split with those two buffers.
-        let (words, upper) = unsafe {
-            (std::ptr::read(&section.lo), std::ptr::read(&section.hi))
-        };
+        let (words, upper) = unsafe { (std::ptr::read(&section.lo), std::ptr::read(&section.hi)) };
         let retained_octets = (words.len() * std::mem::size_of::<i64>()) as u64;
         drop(upper);
-        section.surface.released_octets(section.octets - retained_octets);
-        ResidentEndpoint { surface: section.surface, words, rows: section.rows, width: section.width }
+        section
+            .surface
+            .released_octets(section.octets - retained_octets);
+        ResidentEndpoint {
+            surface: section.surface,
+            words,
+            rows: section.rows,
+            width: section.width,
+        }
     }
 }
 
 impl ResidentEndpoint<'_> {
-    pub(crate) fn lo_device_ptr(&self) -> u64 { self.words.device_ptr() }
-    pub(crate) fn rows(&self) -> usize { self.rows }
-    pub(crate) fn width(&self) -> usize { self.width }
+    pub(crate) fn lo_device_ptr(&self) -> u64 {
+        self.words.device_ptr()
+    }
+    pub(crate) fn rows(&self) -> usize {
+        self.rows
+    }
+    pub(crate) fn width(&self) -> usize {
+        self.width
+    }
 }
 
 impl Drop for ResidentEndpoint<'_> {
     fn drop(&mut self) {
         let _ = self.surface.context.make_current();
-        self.surface.released_octets((self.words.len() * std::mem::size_of::<i64>()) as u64);
+        self.surface
+            .released_octets((self.words.len() * std::mem::size_of::<i64>()) as u64);
     }
 }
 
@@ -1562,15 +1579,15 @@ impl std::fmt::Display for OccurrenceRefusal {
             refusal_flag_names(self.flags).join("|")
         )?;
         if !self.origin || self.upstream_count != 0 {
-            write!(
-                f,
-                " from {} predecessor(s)",
-                self.upstream_count
-            )?;
+            write!(f, " from {} predecessor(s)", self.upstream_count)?;
             if let Some(first) = self.upstream_first {
                 write!(f, " first {first}")?;
             }
-            write!(f, " [{}]", refusal_flag_names(self.upstream_flags).join("|"))?;
+            write!(
+                f,
+                " [{}]",
+                refusal_flag_names(self.upstream_flags).join("|")
+            )?;
         }
         Ok(())
     }

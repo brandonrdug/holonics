@@ -55,11 +55,11 @@ pub use propagation::{
     NativeCausalContactPropagationReading,
 };
 pub use source::{
-    NativeFieldAction, NativeFieldActionFactorization, NativeFieldActionPullback,
-    NativeFieldContactOrigin, NativeFieldCurrentSource, NativeFieldCurrentSourceRest,
-    NativeFieldDeclaredIncidence, NativeFieldGlobalMaterialCommit, NativeFieldJointCurrentCommit,
-    NativeFieldJointLayout, NativeFieldMatrixFreeAction, NativeFieldReflection,
-    NativeFieldReflectionSection, NativeFieldReflectionTarget,
+    NativeDeclaredFactorScaleGradient, NativeFieldAction, NativeFieldActionFactorization,
+    NativeFieldActionPullback, NativeFieldContactOrigin, NativeFieldCurrentSource,
+    NativeFieldCurrentSourceRest, NativeFieldDeclaredIncidence, NativeFieldGlobalMaterialCommit,
+    NativeFieldJointCurrentCommit, NativeFieldJointLayout, NativeFieldMatrixFreeAction,
+    NativeFieldReflection, NativeFieldReflectionSection, NativeFieldReflectionTarget,
 };
 
 pub(in super::super) struct OperativeSections<'c> {

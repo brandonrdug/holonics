@@ -867,3 +867,8 @@ pooled-contrast adjoint, affine standing/tangent injection law, and finite rever
 with independent state/source/condition dimensions. Producing linearized maps and matching
 input lengths are explicit hypotheses. Dynamics imports it; the [public source consumer](../research/records/2026-09-21_ORDERED_SOURCE_AND_PHASE_RECEIVING_ENTER_THE_PUBLIC_GENERATOR_SESSION.md)
 uses the same incidence and source/condition return.
+
+[established-bounded; formal-proof] `Transport/ContactFactorScale.lean` proves rectangular
+amplitude variation and cotangent pairing, quadratic Gram scaling and the unchanged null kernel
+for nonzero amplitude. Its two-factor contraction matches the machine's real-coordinate
+parameter receiver. [Native return and scope](../research/records/2026-09-21_THE_PAIR_RESPONSE_RETURNS_ITS_RECTANGULAR_FACTOR_COTANGENT.md).

@@ -9,6 +9,7 @@ import ElementaryHolonics.Transport.HelicalPairInteraction
 import ElementaryHolonics.Transport.SerialScrewChain
 import ElementaryHolonics.Transport.GeneratorMachineCharts
 import ElementaryHolonics.Transport.GeneratorSourceEpisode
+import ElementaryHolonics.Transport.ContactFactorScale
 import ElementaryHolonics.Transport.GeneratorTraceFaces
 import ElementaryHolonics.Transport.CellHolonomy
 import ElementaryHolonics.Mathematics.AffineOrbitDivisor

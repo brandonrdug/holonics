@@ -7,9 +7,9 @@ mod reflection_commit;
 mod reflection_target;
 mod rest;
 pub use action::{
-    NativeFieldAction, NativeFieldActionFactorization, NativeFieldActionPullback,
-    NativeFieldContactOrigin, NativeFieldGlobalMaterialCommit, NativeFieldJointLayout,
-    NativeFieldMatrixFreeAction,
+    NativeDeclaredFactorScaleGradient, NativeFieldAction, NativeFieldActionFactorization,
+    NativeFieldActionPullback, NativeFieldContactOrigin, NativeFieldGlobalMaterialCommit,
+    NativeFieldJointLayout, NativeFieldMatrixFreeAction,
 };
 pub use map_action::{NativeFieldDeclaredIncidence, NativeFieldFactorAction};
 pub use reflection::{NativeFieldReflection, NativeFieldReflectionSection};

@@ -27,9 +27,10 @@ mod internal_current;
 mod internal_mode;
 mod junction;
 pub use junction::{
-    NativeFieldAction, NativeFieldActionFactorization, NativeFieldActionPullback,
-    NativeFieldContactOrigin, NativeFieldDeclaredIncidence, NativeFieldGlobalMaterialCommit,
-    NativeFieldJointCurrentCommit, NativeFieldJointLayout, NativeFieldMatrixFreeAction,
+    NativeDeclaredFactorScaleGradient, NativeFieldAction, NativeFieldActionFactorization,
+    NativeFieldActionPullback, NativeFieldContactOrigin, NativeFieldDeclaredIncidence,
+    NativeFieldGlobalMaterialCommit, NativeFieldJointCurrentCommit, NativeFieldJointLayout,
+    NativeFieldMatrixFreeAction,
 };
 mod material_transport;
 pub(crate) use material_transport::normal::{
@@ -61,15 +62,15 @@ pub use internal_mode::{
 pub use junction::{
     CausalContactPropagation, CausalContactPropagationCotangent, CausalContactPropagationEnclosure,
     JointMaterialContactResponse, NativeCausalContactJoinReading, NativeCausalContactPropagation,
-    NativeCausalContactPropagationReading, NativeContactDepositBoundReading, NativeContactDepositReading,
-    NativeContactRealization, NativeOperativeBoundKind,
-    NativeFieldCurrentBall, NativeFieldCurrentSource, NativeFieldCurrentSourceRest,
-    NativeFieldEnclosedJunctionReading, NativeFieldExactJunctionReading,
-    NativeFieldInternalCurrent, NativeFieldInternalCurrentBall, NativeFieldJunctionReading,
-    NativeFieldJunctionRepresentation, NativeFieldJunctionSolver, NativeFieldReflection,
-    NativeFieldReflectionSection, NativeFieldReflectionTarget, NativeFiniteMaterialResponse,
-    NativeMaterialContactResponse, NativeMaterialContactResponseReading,
-    NativeMaterialContactStepComparison, NativeMaterialResponseChart, NativeOperativeContactBirth,
+    NativeCausalContactPropagationReading, NativeContactDepositBoundReading,
+    NativeContactDepositReading, NativeContactRealization, NativeFieldCurrentBall,
+    NativeFieldCurrentSource, NativeFieldCurrentSourceRest, NativeFieldEnclosedJunctionReading,
+    NativeFieldExactJunctionReading, NativeFieldInternalCurrent, NativeFieldInternalCurrentBall,
+    NativeFieldJunctionReading, NativeFieldJunctionRepresentation, NativeFieldJunctionSolver,
+    NativeFieldReflection, NativeFieldReflectionSection, NativeFieldReflectionTarget,
+    NativeFiniteMaterialResponse, NativeMaterialContactResponse,
+    NativeMaterialContactResponseReading, NativeMaterialContactStepComparison,
+    NativeMaterialResponseChart, NativeOperativeBoundKind, NativeOperativeContactBirth,
     NativeOperativeContactReading, NativeOperativeContactStaging,
     NativeOperativeCurrentFactorCondensation, NativeOperativeReflectionReading,
     NativeOperativeReturnStorage, NativeRetainedMaterialRelation, PairedContactCotangent,
@@ -77,7 +78,6 @@ pub use junction::{
     joint_material_contact,
 };
 use junction::{PairedJunction, PendingJunction};
-pub use material_transport::{NativeAffineGeometry, NativeAffineGeometryAdjoint, NativeRealification, NativeRealificationAdjoint};
 pub use material_transport::ResidentNormalEnclosureSection;
 pub use material_transport::{
     CompiledCoupledJoint, ConstitutiveComparisonSection, ConstitutiveSourceFrame,
@@ -113,14 +113,18 @@ pub use material_transport::{
     ResidentNormalSectionReturn, ResidentNormalWave,
 };
 use material_transport::{MaterialTransport, PendingMaterialTransport};
+pub use material_transport::{
+    NativeAffineGeometry, NativeAffineGeometryAdjoint, NativeRealification,
+    NativeRealificationAdjoint,
+};
 pub use receiver::{
     NativeFieldDifferentialReading, NativeMaterialActuation, NativeMaterialPacketReading,
     NativeMaterialPullbackMetric, NativeMaterialSourcePullback,
     NativeMaterialSourcePullbackReading, NativeNormalizedFaceMeasure,
     NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn, NativeNormalizedSection,
     NativeNormalizedSectionPullback, NativeNormalizedSectionPullbackReading,
-    NativeNormalizedSectionRowReading, NativePacketQuadrature, NativePairParticipation, NativePairParticipationAdjoint, NativePhaseParticipation,
-    NativePhaseParticipationAdjoint,
+    NativeNormalizedSectionRowReading, NativePacketQuadrature, NativePairParticipation,
+    NativePairParticipationAdjoint, NativePhaseParticipation, NativePhaseParticipationAdjoint,
 };
 pub use resident_input::NativeFieldIncoming;
 pub use rest::NativeFieldRest;

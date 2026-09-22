@@ -269,6 +269,17 @@ fn generator_body_preserves_native_imaginary_modes_and_frozen_pair_contact() {
         .prepare_incident_material_return(comparison, restored_output.joint_output(), 4)
         .unwrap();
     assert!(returned.contact.is_none());
+    let scale = returned
+        .contact_scale_covector()
+        .expect("pair material derivative");
+    assert_eq!((scale.rows(), scale.components()), (1, 2));
+    assert!(
+        scale
+            .inspect_rows()
+            .unwrap()
+            .iter()
+            .all(|r| r.center[0].imaginary.is_zero())
+    );
     let direction_forward = pairing(&baseline_output.center, &delta_output);
     let direction_adjoint = pairing(
         &returned.anchor_covector().inspect().unwrap().center,

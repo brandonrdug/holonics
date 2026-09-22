@@ -385,6 +385,7 @@ pub struct NativeIncidentGenerated<'c> {
     comparison: Option<u64>,
 }
 pub struct NativeIncidentMaterialReturn<'c> {
+    contact_scale_covector: Option<ResidentNormalEnclosureSection<'c>>,
     source_covector: Option<ResidentNormalEnclosureSection<'c>>,
     comparison: u64,
     epoch: u64,
@@ -397,6 +398,12 @@ pub struct NativeIncidentMaterialReturn<'c> {
     >,
 }
 impl<'c> NativeIncidentMaterialReturn<'c> {
+    /// One real cotangent per declared pair arc, in declaration order, for the local
+    /// amplitude variation D_arc -> (1+t) D_arc at the producing cut. Geometry and
+    /// response are still fixed until a constrained proposal is explicitly published.
+    pub fn contact_scale_covector(&self) -> Option<&ResidentNormalEnclosureSection<'c>> {
+        self.contact_scale_covector.as_ref()
+    }
     /// Ordered original complex source rows returned through every ingestion/refinement stage.
     pub fn source_covector(&self) -> Option<&ResidentNormalEnclosureSection<'c>> {
         self.source_covector.as_ref()
@@ -1201,11 +1208,8 @@ impl<'c> NativeCoupledBody<'c> {
             )?;
             material.push(current.stage_covector_return(&features, &covectors, step_bits)?);
         }
-        // Fixed-machine geometry/contact material keeps its declared J C factor family.
-        // Its unconstrained global D return is not published into that family. Constrained
-        // geometry/material inference is a subsequent operation; the state adjoint is complete.
-        let contact = if word.source.internal_components() == 0 || model.layout.machine.is_some() {
-            None
+        let (contact, contact_scale_covector) = if word.source.internal_components() == 0 {
+            (None, None)
         } else {
             let actions = returned
                 .contacts
@@ -1220,13 +1224,34 @@ impl<'c> NativeCoupledBody<'c> {
                 .zip(&returned.contacts)
                 .map(|(action, (_, g))| action.pullback_full_auto(g.view(), word.solve_steps))
                 .collect::<Result<Vec<_>, _>>()?;
-            Some(model.field.prepare_global_action_material_return(
-                &pullbacks.iter().collect::<Vec<_>>(),
-                step_bits,
-                NativeContactRealization::DyadicDeposit,
-            )?)
+            if model.layout.machine.is_some() {
+                let mut scale: Option<ResidentNormalEnclosureSection<'c>> = None;
+                for pullback in &pullbacks {
+                    let gradient = word.source.declared_factor_scale_gradient(pullback, 3)?;
+                    scale =
+                        Some(match scale {
+                            Some(previous) => previous.sum_same_shape(gradient.gradient())?,
+                            None => ResidentNormalEnclosureSection::concatenate_rows(&[
+                                gradient.gradient()
+                            ])?,
+                        });
+                }
+                // The full parameter covector is returned; arbitrary D updates would leave
+                // the declared pair family, so publication remains a separate constrained step.
+                (None, scale)
+            } else {
+                (
+                    Some(model.field.prepare_global_action_material_return(
+                        &pullbacks.iter().collect::<Vec<_>>(),
+                        step_bits,
+                        NativeContactRealization::DyadicDeposit,
+                    )?),
+                    None,
+                )
+            }
         };
         Ok(NativeIncidentMaterialReturn {
+            contact_scale_covector,
             source_covector: returned.source_covector,
             comparison: id,
             epoch: model.epoch,
