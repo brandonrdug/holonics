@@ -255,14 +255,16 @@ has the following implementation position, in dependency order:
    and full link-contact forms. Their algebraic/finite Lean laws are checked. Broader finite
    screw flows and generic continuous chain differential proofs retain their stated scope.
 
-5. **Build the machine geometry and source/receiver binding (#17).** Declare the maps from
-   resident current to configuration and from geometric actions to current transport. Retain
-   actual phase/lift and closure witnesses; `RationalPhase` is a Cayley chart and finite
-   `Odometer` levels need closure. Add oriented cell incidence and the represented material
-   blocks. Bind source-driven helical recurrence, scoped phase moments and oriented pair
-   statistics with their source fibre. A tagged receiving-phase binding preserves old slot
-   semantics. The full pair score and its chart/feature pullback consume the existing global
-   D/b action, normal law, producing return, publication and rest.
+5. **Returned fixed machine and ordered source/receiver binding (#17).**
+   `GeneratorMachineSpec` and `found_generator_field` supply current/configuration and affine
+   transport maps, declared phase/lift/closure, site material faces and oriented cells. The
+   public generator session consumes ordered source recurrence and directed conditions, shared
+   phase text/termination receiving, complete source return and frozen rest. Generator count
+   is independent of source length. Pair geometry/response and finite clock actions remain
+   supplied; geometry/material inference is item 6. The source tape remains explicit. Scoped
+   moment/pair-statistic reduction and its source/receiver certificate are item 7, not a reason
+   to rebuild the returned source/receiving join. `RationalPhase` remains a Cayley chart and
+   finite `Odometer` levels still require closure.
 6. **Material, closure inference, standing and release (#17, #49).** Return all pair-feature,
    geometry, material and clock derivatives; normal fitting of W at supplied features does
    not itself fit nonlinear geometry. Closure constraints retain one jointly compatible
@@ -451,8 +453,8 @@ documents hold each statement's evidence, owners and findings.
 | Receiver atlas | R1–R7 | per-eigenvalue refinement on `ExactHodgeSpectrum`; `MarkovTwoNSuffices` |
 | Biological ecology (application deferred) | B0–B10; predictor/design/measured RBX1 comparisons; bounded conditioned response | Further application runs are deferred. Generic evaluation, interface and codec obligations remain at their actual shared owners and do not schedule another biology campaign. |
 | Exact device law | D1–D3; one engine coordinate instance cross-checked on the card | resident rational algebra at its consuming calls (#50); signed 128-bit words and radius with the engine's carrier refusal where consumed; per-region operators; base-pointer registry; common context ownership; D4 stays an intention |
-| Generalized transport and the Holonic Interaction chain | T1–T8 at their declared scopes; the Holonic Interaction unit with media and contact exchange; the two-media chain read at the elastic-network consumer; structural analytic width for that elastic specialization at every admitted extent | the multi-neck chain and the serial `SituatedScrew` chain (#27); faces derived from the helical pair's slip map and measured contact geometry (#28); the time/entropy crossing (#5); general analytic pole factors (#35); a plural family generic in its coordinate address; a faithful Israel-junction instance (#23) |
-| Elementary helical geometry, identities and reuse | Shared screw generator, pair quadrance jet and formal local laws; the checked pair-to-contact, phase-carried transport, reflected-return and menu-closure laws (`Transport/HelicalPairInteraction`); bounded chart identities from the repaired atlas | The native pair-contact declaration and HNN machine geometry (#28/#48, #17), broader finite screw flows, changing physical receivers, the HNN action/decoder binding (#48–#49) and the formal counterparts in #62. The moment/phase caller and native bracket consumer are returned; full ideal/graph/analytic endpoints keep their stated scopes. |
+| Generalized transport and the Holonic Interaction chain | T1–T8 at their declared scopes; the Holonic Interaction unit with media and contact exchange; the two-media chain read at the elastic-network consumer; structural analytic width for that elastic specialization at every admitted extent | multi-neck composition and wider finite screw flows beyond the returned Cayley/prismatic serial consumer (#27); the measured-contact route beyond the returned local pair-derived face (#28); the time/entropy crossing (#5); general analytic pole factors (#35); a plural family generic in its coordinate address; a faithful Israel-junction instance (#23) |
+| Elementary helical geometry, identities and reuse | Shared screw generator, pair quadrance jet and formal local laws; the checked pair-to-contact, phase-carried transport, reflected-return and menu-closure laws (`Transport/HelicalPairInteraction`); bounded chart identities from the repaired atlas | The local native pair contact, fixed HNN machine and public source/phase binding are returned. Constrained geometry/material inference and future standing (#17), broader finite screw flows and changing physical receivers (#48), source-qualified quotient/action descent (#18/#49), and the remaining formal counterparts in #62 stay open. The moment/phase caller and native bracket consumer are returned; full ideal/graph/analytic endpoints keep their stated scopes. |
 
 [definition] GitHub issues index these owners under the interaction-chain, resident-execution,
 complete-source-session and elementary-geometry/reuse delivery views. Scientific validation is a
@@ -466,8 +468,9 @@ consumer. Milestones are views of shared work; this section supplies the constru
    contact geometry and the full variation. The new `relational_geometry::screw` consumes existing
    exact vector/affine owners; its forms are consumed by `identity_atlas::screw_gram_point`.
    The pair's relative velocity is the contact slip map of `holonic_interaction::ContactFace`;
-   `Transport/HelicalPairInteraction.lean` proves that join and #28/#48 own its native
-   declaration, with the serial chain at #27.
+   `Transport/HelicalPairInteraction.lean` proves that join; `holonic_interaction/helical.rs`
+   returns its native declaration and `holonic_chain/serial.rs` its supported serial consumer.
+   #28/#48 and #27 retain their broader physical/finite-flow scopes.
    `Geometry/ScrewGeometry` joins the elementary formal entry point and existing quadratic-moment
    law. Keep the supplied/inferred distinction: the polynomial atlas infers chart identities;
    the generator, frame and material remain its declared source until their own formation law

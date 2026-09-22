@@ -386,8 +386,10 @@ publication and rest below are consumed unchanged.
 `IncidentParticipationChart::QuadranceCurrent` specializes it to `x=q`, `u=v=Uq_i`, so the
 neighbor's two covectors join before `U*`; legacy bilinear behavior is the default. Frozen
 comparisons retain their producing score through rest. The exact pair-contact and serial
-owners are returned dependencies; the actual generator-machine configuration/current and
-source/phase maps remain the next consuming construction.
+owners feed the fixed generator machine through `incident/machine.rs`. The ordered source
+and shared phase receiver are connected through `field_session/generator_application.rs`;
+their complete producing return is described below. Constrained contact/geometry publication
+and compatible source-family closure remain open.
 
 
 [established-bounded; source-inspected] The incident-field path now has a resident realization of
