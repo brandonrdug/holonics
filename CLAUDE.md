@@ -304,8 +304,8 @@ Lean counterpart under the matching `Framework` entry point, or names the obliga
 in #62; formal work is part of the packet, not a later pass. The normal Lake default is `ElementaryHolonics.Framework`, not the complete
 research umbrella. Timeouts remain incomplete evidence.
 
-[project-postulate] Claude delegates to at most **three Opus 5 workers** on disjoint owner paths,
-then **one Sonnet 5 reviewer that spawns nothing**; use fewer workers when the work does not split,
+[project-postulate] Claude delegates to at most **three Opus 5.5 workers** on disjoint owner paths,
+then **one Opus 5.5 reviewer that spawns nothing**; use fewer workers when the work does not split,
 and a sequential join when it consumes multiple returns. Every prompt supplies this guide, the
 machine/source material, exact paths, existing owners, equations, consumer and relevant receipts.
 [WORKER_BRIEF](docs/WORKER_BRIEF.md) has the concrete template. The primary inspects source and

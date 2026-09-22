@@ -32,8 +32,8 @@ representation before turning a comparison into a mathematical claim.
 
 ## Split by dependencies and owned paths
 
-[project-postulate] Codex uses Luna workers. Claude uses at most three Opus 5 constructing workers
-on disjoint paths, followed by one Sonnet 5 reviewer that spawns nothing. Use fewer when the work
+[project-postulate] Codex uses Luna workers. Claude uses at most three Opus 5.5 constructing workers
+on disjoint paths, followed by one Opus 5.5 reviewer that spawns nothing. Use fewer when the work
 does not split; make a join sequential when it consumes prior returns. A request to work without
 agents takes precedence. Root owns source inspection and integration of every returned change.
 
