@@ -1527,11 +1527,14 @@ RL learner are outside the next native composition.
 
 <a id="measured-return-in-bits"></a>
 
-[definition] **Every return on the machine is reported in bits, using the owners the
-framework already has.** Compression is intelligence is navigation; a coefficient change,
-matched string count, checkpoint size or enclosure radius answers only its own question. Per
-request/observe, with the exterior codec alphabet `A` and the model's normalized receiving
-face `p` (`Foundation/InformationReceiver`, native `receiver/normalized`):
+[definition] **The measured return, in bits.** These are exterior observer readings of a
+completed return — the same kind of reading as a timing or a byte count — taken from owners
+the framework already has. They are not a rule, a gate, a refusal or a loss: nothing in the
+machine reads them, nothing blocks on them, and the paired adjoint remains the learning law.
+They answer "what did this return compress, and along which word" where a coefficient
+change, matched string count, checkpoint size or enclosure radius answers only its own
+question. Per request/observe, with the exterior codec alphabet `A` and the model's
+normalized receiving face `p` (`Foundation/InformationReceiver`, native `receiver/normalized`):
 
 | Quantity | Definition | Owner |
 |---|---|---|
@@ -1542,8 +1545,7 @@ face `p` (`Foundation/InformationReceiver`, native `receiver/normalized`):
 | navigation | the generator word that reaches the receiving face: step count, lock-address depth (Farey word in `⟨step, inversion⟩`) and winding, versus the shortest admitted word; for a motor chart the screw-chain word in rad/m and wrench–twist power in W | `winding::LockAddress`, `SerialScrewChain` |
 | cost | `CostReceipt{bytes, decodeWork, updateWork, certificateWork, residual}` with provenance | `PresentationCost` |
 
-Units are stated with each number. A run that reports none of these has not measured
-learning. The six-cycle amplitude control (`ab`/`ba`, `\|A\|=2`, aperture 2) has `H_src=2`
+Units are stated with each number. The six-cycle amplitude control (`ab`/`ba`, `\|A\|=2`, aperture 2) has `H_src=2`
 bits per request and a target of `2·log₂2+log₂3≈3.58` bits; its `L_target|model` was not
 recorded, which is the defect this row repairs.
 
