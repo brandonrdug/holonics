@@ -1,9 +1,9 @@
 //! Resident source-cell contact contrasts for the fixed generator machine.
 //!
-//! Source cells and generator sites are distinct populations.  This owner keeps the complete
-//! ordered cell tape and directed contact kinds, while exposing only a declared pooled condition
-//! chart on the fixed source-role sites.  It does not infer a graph from first moments or turn a
-//! source cell into a machine site.
+//! Source cells and generator sites are distinct populations.  The directed contact kinds and
+//! declared ordered offsets enter as one pooled linear condition on the fixed source-role sites;
+//! its transpose needs only the declared relation, never the encoded rows.  It does not infer a
+//! graph from first moments or turn a source cell into a machine site.
 
 use super::*;
 use holonic_engine::native_ecology::constitutive_fibre::ResidentNormalEnclosureSection;
@@ -32,7 +32,9 @@ pub struct GeneratorSourceContact {
     pub kind: GeneratorSourceContactKind,
 }
 
-/// Resident pooled source-contact condition chart.
+/// Resident per-occurrence source-contact condition chart. The moment law consumes the pooled
+/// form below; this per-event chart remains the reference layout its tests pin.
+#[cfg_attr(not(test), allow(dead_code))]
 pub struct GeneratorSourceContacts<'c> {
     encoded_rows: usize,
     machine_sites: usize,
@@ -59,6 +61,7 @@ fn opposite_phases(count: usize) -> Vec<ExactWavePhaseTransport> {
     ]
 }
 
+#[cfg_attr(not(test), allow(dead_code))]
 impl<'c> GeneratorSourceContacts<'c> {
     /// Build the pooled contact condition chart. `condition_kinds` fixes the condition-port
     /// order; every declared kind must occur in the supplied contact tape. With no condition
@@ -321,6 +324,202 @@ impl<'c> GeneratorSourceContacts<'c> {
         }
         total.ok_or_else(|| invalid("source contact adjoint has no condition ports"))
     }
+}
+
+/// One declared condition port of the ordered source. A kind port pools the recorded directed
+/// contacts of that kind; an offset port pools the directed pairs `(k, k+δ)` of the passage.
+/// Both are linear in the encoded rows, so neither needs the rows to return its covector.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub(super) enum GeneratorSourcePort {
+    Kind(GeneratorSourceContactKind),
+    Offset(usize),
+}
+
+/// The declared condition ports: contact kinds first, then offsets, in their declared order.
+pub(super) fn source_ports(
+    kinds: &[GeneratorSourceContactKind],
+    offsets: &[usize],
+) -> Result<Vec<GeneratorSourcePort>> {
+    let ports = kinds
+        .iter()
+        .map(|kind| GeneratorSourcePort::Kind(*kind))
+        .chain(
+            offsets
+                .iter()
+                .map(|delta| GeneratorSourcePort::Offset(*delta)),
+        )
+        .collect::<Vec<_>>();
+    if ports.iter().collect::<BTreeSet<_>>().len() != ports.len()
+        || offsets.iter().any(|delta| *delta == 0)
+    {
+        return Err(invalid(
+            "source condition ports must be distinct nonzero offsets/kinds",
+        ));
+    }
+    Ok(ports)
+}
+
+fn validate_pooled(
+    rows: usize,
+    components: usize,
+    injection_indices: &[usize],
+    machine_sites: usize,
+    ports: &[GeneratorSourcePort],
+    contacts: &[GeneratorSourceContact],
+) -> Result<()> {
+    if rows == 0
+        || machine_sites == 0
+        || injection_indices.is_empty()
+        || injection_indices.len() > machine_sites
+        || injection_indices
+            .iter()
+            .any(|index| *index >= machine_sites)
+        || injection_indices.iter().collect::<BTreeSet<_>>().len() != injection_indices.len()
+        || components != injection_indices.len().checked_mul(6).unwrap_or(0)
+        || rows > u32::MAX as usize
+        || machine_sites.checked_mul(ports.len()).is_none()
+        || ports.len().checked_mul(12).is_none()
+    {
+        return Err(invalid("source condition chart extent"));
+    }
+    for contact in contacts {
+        if contact.from >= contact.to || contact.to >= rows {
+            return Err(invalid("source contact causal/order extent"));
+        }
+        if !ports.contains(&GeneratorSourcePort::Kind(contact.kind)) {
+            return Err(invalid("source contact kind is not a declared port"));
+        }
+    }
+    Ok(())
+}
+
+/// Directed pairs `(from, to)` of one port over a passage of `rows` cells.
+fn port_edges(
+    port: GeneratorSourcePort,
+    contacts: &[GeneratorSourceContact],
+    rows: usize,
+) -> (Vec<usize>, Vec<usize>) {
+    match port {
+        GeneratorSourcePort::Kind(kind) => contacts
+            .iter()
+            .filter(|contact| contact.kind == kind)
+            .map(|contact| (contact.from, contact.to))
+            .unzip(),
+        GeneratorSourcePort::Offset(delta) => (0..rows.saturating_sub(delta))
+            .map(|k| (k, k + delta))
+            .unzip(),
+    }
+}
+
+/// Pooled directed source condition, `c_p = Σ_(from→to ∈ p) (E(u_to) − E(u_from))`, placed on
+/// the fixed injection-site rows: `G × 12P`. Returns `None` for a field without condition ports.
+/// An offset port telescopes to the last δ cells minus the first δ cells under identity phases;
+/// that ordered linear reading separates `[a,b]` from `[b,a]` without any bilinear tensor.
+pub(super) fn pooled_source_condition<'c>(
+    encoded: &ResidentNormalEnclosureSection<'c>,
+    injection_indices: &[usize],
+    machine_sites: usize,
+    ports: &[GeneratorSourcePort],
+    contacts: &[GeneratorSourceContact],
+) -> Result<Option<ResidentNormalEnclosureSection<'c>>> {
+    if ports.is_empty() {
+        return if contacts.is_empty() {
+            Ok(None)
+        } else {
+            Err(invalid("source contacts require condition ports"))
+        };
+    }
+    let n = encoded.rows();
+    let width = encoded.components();
+    validate_pooled(n, width, injection_indices, machine_sites, ports, contacts)?;
+    let s = injection_indices.len();
+    let mut port_rows = Vec::with_capacity(ports.len());
+    for port in ports {
+        let (from, to) = port_edges(*port, contacts, n);
+        let pooled = if to.is_empty() {
+            ResidentNormalEnclosureSection::zeros(encoded.surface(), 1, width, encoded.grain())?
+        } else {
+            let target = encoded.gather_phase_rows(&to, &identity_phases(to.len()), width)?;
+            let source = encoded.gather_phase_rows(&from, &opposite_phases(from.len()), width)?;
+            target.sum_same_shape(&source)?.scatter_phase_adjoint(
+                &vec![0; to.len()],
+                &identity_phases(to.len()),
+                1,
+            )?
+        };
+        let site_rows = Rc::new(pooled.split_components(s)?).realify()?;
+        port_rows.push(site_rows.output().scatter_phase_adjoint(
+            injection_indices,
+            &identity_phases(s),
+            machine_sites,
+        )?);
+    }
+    let port_major =
+        ResidentNormalEnclosureSection::concatenate_rows(&port_rows.iter().collect::<Vec<_>>())?;
+    let p = ports.len();
+    let addresses = (0..machine_sites)
+        .flat_map(|site| (0..p).map(move |port| port * machine_sites + site))
+        .collect::<Vec<_>>();
+    let output = port_major
+        .gather_phase_rows(&addresses, &identity_phases(addresses.len()), 12)?
+        .pack_components(p)?;
+    if output.rows() != machine_sites || output.components() != 12 * p {
+        return Err(invalid("source condition output chart"));
+    }
+    Ok(Some(output))
+}
+
+/// Transpose of `pooled_source_condition`: the `G × 12P` condition covector returns to the
+/// `N × 6S` encoded chart. Each cell receives the port covector times its net directed
+/// multiplicity; no encoded value is read.
+pub(super) fn pull_back_pooled_source_condition<'c>(
+    covector: &ResidentNormalEnclosureSection<'c>,
+    rows: usize,
+    injection_indices: &[usize],
+    machine_sites: usize,
+    ports: &[GeneratorSourcePort],
+    contacts: &[GeneratorSourceContact],
+) -> Result<ResidentNormalEnclosureSection<'c>> {
+    let s = injection_indices.len();
+    let width = s
+        .checked_mul(6)
+        .ok_or_else(|| invalid("source condition adjoint width"))?;
+    validate_pooled(
+        rows,
+        width,
+        injection_indices,
+        machine_sites,
+        ports,
+        contacts,
+    )?;
+    let p = ports.len();
+    if p == 0 || covector.rows() != machine_sites || covector.components() != 12 * p {
+        return Err(invalid("source condition adjoint chart"));
+    }
+    let site_port = covector.split_components(p)?;
+    let mut total =
+        ResidentNormalEnclosureSection::zeros(covector.surface(), rows, width, covector.grain())?;
+    for (index, port) in ports.iter().enumerate() {
+        let (from, to) = port_edges(*port, contacts, rows);
+        if to.is_empty() {
+            continue;
+        }
+        let addresses = injection_indices
+            .iter()
+            .map(|site| site * p + index)
+            .collect::<Vec<_>>();
+        let site_rows = site_port.gather_phase_rows(&addresses, &identity_phases(s), 12)?;
+        let pooled = Rc::new(site_rows)
+            .decode_realification()?
+            .output()
+            .pack_components(s)?;
+        let edges =
+            pooled.gather_phase_rows(&vec![0; to.len()], &identity_phases(to.len()), width)?;
+        let target = edges.scatter_phase_adjoint(&to, &identity_phases(to.len()), rows)?;
+        let source = edges.scatter_phase_adjoint(&from, &opposite_phases(from.len()), rows)?;
+        total = total.sum_same_shape(&target)?.sum_same_shape(&source)?;
+    }
+    Ok(total)
 }
 
 #[cfg(test)]

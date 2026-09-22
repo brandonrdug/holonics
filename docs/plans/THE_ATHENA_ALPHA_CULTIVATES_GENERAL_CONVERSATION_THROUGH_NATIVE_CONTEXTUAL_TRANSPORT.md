@@ -1523,6 +1523,44 @@ RL learner are outside the next native composition.
 
 #### Returned incident specialization
 
+<a id="holonic-loss-is-the-logarithm-of-a-holon-ratio"></a>
+
+[definition] **Holonic loss is the logarithm of a Holon ratio.** Brandon, September 22: loss is
+the most abstract difference between Holons, and ratios of Holons carry its calculus; classical
+cross-entropy is insufficient. Operands, in the machine's objects:
+
+```text
+target        |T⟩_j : target cells through the same E_g and Ĝ_g(τ_g), received at phase j    (a moment, like the source)
+ratio         R_j = Ĝ_(T←H)                         the relative transport carrying the produced Holon to the target
+  face          ψ_T/ψ_H per class                     amplitude ratio on the normalized receiving face
+  block         A_H⁻¹ A_T                             material/covariance block
+  pair          g_H⁻¹ g_T ∈ SE(3)                     relative screw of produced and target configurations
+loss          ℓ_j = log R_j                         additive chart; exp/softmax is the chart transition (exponentiated_ratio)
+  face          log(ψ_T/ψ_H) = ½ log(q/p) + i(φ_T − φ_H + 2πn)   magnitude in bits after /ln2, phase with its winding branch n
+  pair          log(g_H⁻¹ g_T) = twist (ω rad, v m)
+calculus      dℓ = R⁻¹ dR                           logarithmic derivative (Maurer–Cartan form): the learning covector
+  face, real    reduces to p − e_t at the logits       the current cross-entropy covector, one component only
+  face, phase   −(2/ln2) p_i dφ_i                      returns through the phase receiver's clock/winding adjoint
+readings      E_p[ℓ] = lifted cross-entropy (KL bits, phase excess)      InformationDifference.liftedCrossEntropy_excess
+              tr log R = log det R                   conserved under frame carriage (GeneratorTraceFaces)
+              cell: log of the holonomy class of source→machine→receiver→target   CellHolonomy
+              ℓ_(n+1) − ℓ_n per observation; B_state per bit of ℓ reduced
+```
+
+A scalar is a limit reading of `R`: an expectation, trace, determinant, norm or rate. It is a
+valid measurement with units and is reported. The adjoint pulls back the full `R⁻¹dR`, and the
+retained state is the machine, not a scalar. A common rechart of both Holons cancels from `ℓ`
+(`liftedCrossEntropy_commonPhase`); conjugating the lift negates only the phase part.
+Dissipation `⟨Jv,DJv⟩` and stored energy are reported beside `ℓ` and joined only through a
+declared constitutive law.
+
+Required implementation: encode the target as a moment on the same machine; compute `ℓ_j` at
+each receiving phase with the machine's actual winding; pull back the complete logarithmic
+derivative, including its phase part through the phase receiver's clock/winding adjoint; report
+the readings above. Lean counterpart: the face and block logarithms, `E_p[log R]` as the lifted
+cross-entropy, the real part's logarithmic derivative equal to `p−e_t`, `tr log = log det` for the
+block, and invariance under a common rechart.
+
 <a id="executable-field-campaign"></a>
 
 <a id="measured-return-in-bits"></a>

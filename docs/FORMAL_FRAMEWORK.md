@@ -886,3 +886,16 @@ All three are imported by Dynamics. Native matrix-norm and integer-rounding corr
 nonlinear source descent and geometric/clock derivatives remain #62 obligations. The
 [amplitude consumer and scope](../research/records/2026-09-22_PAIR_MATERIAL_LEARNS_WITHOUT_A_COMPLETED_UPDATE_ARCHIVE.md)
 binds these laws to public observation, current state, and numerical tests.
+
+[proved-derived; formal-checked] `Transport/SourceMoment.lean`, imported by Dynamics, defines
+the source moment by its one-step law `moment (l ++ [u]) = U (moment l) + I (E u)` over a
+commutative ring and proves its content: the closed form `Σ_k U^(n−1−k) I E(u_k)`; the exact,
+tape-free position adjoint `g ∘ U^(n−1−k) ∘ I` (equal for all sources of one length); order
+separation `moment [a,b] = moment [b,a] ↔ (U − 1) I (E a − E b) = 0`, with the identity advance
+merging every permutation and a quarter-turn witness separating; the oriented δ=1 offset moment
+separating what the identity-advance moment merges; and the moment and the constant-size stream
+state `(moment, last, offset)` as `ReceiverHistoryCompression` instances for the append action
+with generator `U_u(x) = U x + I E u`. `Transport/ContactAmplitudeState.lean` is a generic
+fold/current-state identity, not the standing counterpart of the pair machine; that binding
+remains #17/#62. The [retention audit](../research/records/2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md)
+names the native tape these laws replace.

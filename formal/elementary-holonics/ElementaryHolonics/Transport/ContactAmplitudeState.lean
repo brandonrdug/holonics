@@ -4,12 +4,18 @@ import ElementaryHolonics.Transport.ContactFactorScale
 import Mathlib.Tactic
 
 /-!
-# Sufficient state for completed contact-amplitude updates
+# A generic fold/current-state identity
 
-Completed update sequences are identified by the full current state they produce. This is a
-state quotient, not a causal-history archive: the next deterministic action, receiver face and
-parameter update are functions of that state. Live producing comparisons are deliberately a
-separate operand and are not identified by this quotient.
+[definition] This module proves only that the result of a left fold over an update list is
+sufficient for that same fold's future: `Machine.run := List.foldl step`, and the
+`StandingLaw` instance takes the update list itself as its source type. Every theorem follows
+from the fold's definition. It contains no pair, phase, receiver or other Holonic operand.
+
+It is **not** the standing counterpart of the pair machine's contact material. That binding —
+a `StandingLaw` whose source is the machine's `(phase, winding, m, q, b)` chart and whose
+`retain` is the declared quotient, with the source-fibre separator as its defect — remains owed
+in #17/#62 (retention audit of 2026-09-22). The source-moment laws that carry content are in
+`Transport/SourceMoment.lean`.
 -/
 
 namespace Soma.Holonics.Transport.ContactAmplitudeState

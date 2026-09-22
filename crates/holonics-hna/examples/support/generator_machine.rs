@@ -151,6 +151,7 @@ fn source_binding(generators: usize) -> GeneratorSourceBinding {
             GeneratorSourceContactKind::RecordedParent,
             GeneratorSourceContactKind::RecordedReply,
         ],
+        offsets: vec![],
     }
 }
 

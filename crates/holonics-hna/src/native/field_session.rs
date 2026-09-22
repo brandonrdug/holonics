@@ -8,9 +8,14 @@ mod geometric;
 mod incident_application;
 mod incident_encoder;
 mod incident_receiver;
+mod measurement;
 pub use generator_application::GeneratorSessionOptions;
 use generator_application::{GeneratorPresentation, GeneratorPresentationRest};
 use incident_application::{IncidentPresentation, IncidentPresentationRest};
+pub use measurement::{
+    BitsReading, ExactBitCount, NativeReturnReading, NavigationReading, ReceivingRowReading,
+    SiteNavigation, SourceReading, StateReading, TargetReading,
+};
 mod incidence;
 mod incident_preparation;
 mod mathematical_port;
@@ -372,7 +377,8 @@ impl FieldSessionSpec {
             }
             let machine = options.field.machine.compile().map_err(invalid)?;
             options.source.validate_scope(&machine, 0, 1)?;
-            if options.field.source_condition_ports != options.source.contact_kinds.len()
+            if options.field.source_condition_ports
+                != options.source.contact_kinds.len() + options.source.offsets.len()
                 || options
                     .source
                     .contact_kinds

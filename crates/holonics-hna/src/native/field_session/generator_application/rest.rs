@@ -1,8 +1,9 @@
 //! Cold rest for the fixed generator source/phase presentation.
 //!
-//! The body owns the ordered source tape and its producing q/b stages.  This packet owns the
-//! E/R material cuts, encoded source rows needed to reconstruct ordinary pending records, and
-//! the tagged receiving binding used to rebuild each frozen producing face.
+//! The body owns each comparison's producing moment operands (accumulated field, pooled
+//! condition, binding and clock origin); it holds no source rows or per-occurrence state.
+//! This packet owns the E/R producing faces, the encoded rows the encoder return consumes, and
+//! the tagged receiving binding used to rebuild each producing receiving face.
 
 use super::super::incident_encoder::{IncidentEncoded, IncidentEncoder};
 use super::super::incident_receiver::{IncidentTextCohort, phase::GeneratorTextReceiver};

@@ -712,7 +712,7 @@ is the precise relationship to forward evaluation and backpropagation. The imple
 must include the induced change of contact transport as well as local coefficient changes.
 The existing operative material-response and causal-propagation owners contain those terms.
 
-[definition] A specified scalar objective supplies one output covector. With predicted
+[definition] The Holonic loss is `ℓ=log Ĝ_(T←H)`, the logarithm of the ratio of the produced and target Holons with its winding branch, and its covector is the logarithmic derivative `R⁻¹dR` ([contract](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#holonic-loss-is-the-logarithm-of-a-holon-ratio)). The classical codec specialization below is its real part on a normalized face. A specified scalar objective supplies one output covector. With predicted
 probability p and observed probability q, cross-entropy has `dℓ=(p-q)·ds` at softmax logits;
 `q-p` is its negative gradient. For half squared probability error the gradient is
 `J_p(p-q)`, and the descent return is `J_p(q-p)`. Scalar loss is a lawful comparison in this

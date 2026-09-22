@@ -20,6 +20,19 @@ HNN capability; the [simulator boundary](docs/HARDWARE_AND_MODALITY_BOUNDARIES.m
 constrains the shared design now without scheduling a simulator run. A mode's availability is
 retained standing, not continuous activation.
 
+[definition] **Loss is the logarithm of a ratio of Holons.** The comparison is between two
+Holons in one frame: the produced `|H⟩` and the target `|T⟩`, encoded through the same `E` and
+phase transport as the source. Their ratio is the relative transport `R=Ĝ_(T←H)`: an amplitude
+ratio `ψ_T/ψ_H` on a receiving face, `A_H⁻¹A_T` on a material block, `g_H⁻¹g_T` on a pair. The loss
+is `ℓ=log R` in the additive chart (softmax/exp is that chart transition, `exponentiated_ratio`),
+with the winding kept as the branch of the log: `log(ψ_T/ψ_H)=½log(q/p)+i(φ_T−φ_H+2πn)`. Its
+calculus is the logarithmic derivative `R⁻¹dR`, which is the learning covector; `p−q` is only
+its real, codec-chart part. Scalars such as `E_p[ℓ]` (lifted cross-entropy, i.e. KL bits plus
+phase excess), `tr log R=log det R`, a pair twist in rad/m or `dℓ/dn` in bits per observation are
+limit readings of the ratio with units. They are valid measurements. They are not the operand the
+adjoint pulls back, and they are not the retained state. Classical cross-entropy alone is
+insufficient. [Contract](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#holonic-loss-is-the-logarithm-of-a-holon-ratio).
+
 [definition] **Retention is a quotient sufficient for the admitted future**
 (`Foundation/Standing.lean`, `standing.rs`); it is never an event archive, tape, journal,
 ledger or frozen producing cut kept for replay. "A current changes the standing a later current

@@ -1,4 +1,7 @@
-//! Persist the executable word at its producing cut, never at contemporary material.
+//! Persist outstanding comparisons. A legacy word keeps its producing cut (`\x01`); a
+//! generator comparison keeps only its producing operands and binding (`\x03`) and is read
+//! through the contemporary field and material when observed. The retired `\x02` source tape
+//! is refused, not reinterpreted.
 use super::*;
 use holonic_engine::native_ecology::constitutive_fibre::NormalMaterialRest;
 
@@ -13,20 +16,32 @@ struct Header {
 }
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 struct PendingHeader {
+    /// Retired `\x02` per-occurrence source tape. Decoded only to refuse it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    source_episode: Option<GeneratorEpisodeMeta>,
+    source_episode: Option<serde_json::Value>,
+    /// `\x03` generator comparison: binding, clock origin, passage length and declared relation.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    source_moment: Option<GeneratorSourceMomentMeta>,
     id: u64,
     epoch: u64,
     held: Vec<bool>,
     admitted: Vec<Vec<bool>>,
 }
 #[derive(Debug, PartialEq, Eq)]
-struct PendingRest {
-    encoded: Option<ResidentSectionRest>,
-    source: NativeFieldCurrentSourceRest,
-    anchor: ResidentSectionRest,
-    output: ResidentSectionRest,
-    material: Vec<NormalMaterialRest>,
+enum PendingRest {
+    /// A legacy word at its producing cut.
+    Frozen {
+        source: NativeFieldCurrentSourceRest,
+        anchor: ResidentSectionRest,
+        output: ResidentSectionRest,
+        material: Vec<NormalMaterialRest>,
+    },
+    /// A generator comparison: its producing operands and no material or field cut.
+    Moment {
+        anchor: ResidentSectionRest,
+        output: ResidentSectionRest,
+        condition: Option<ResidentSectionRest>,
+    },
 }
 #[derive(Debug, PartialEq, Eq)]
 pub struct NativeIncidentModelRest {
@@ -73,9 +88,9 @@ impl NativeIncidentModelRest {
                 .header
                 .pending
                 .iter()
-                .any(|p| p.source_episode.is_some())
+                .any(|p| p.source_moment.is_some())
             {
-                b"HNA-INCIDENT-FIELD\x02"
+                b"HNA-INCIDENT-FIELD\x03"
             } else {
                 b"HNA-INCIDENT-FIELD\x01"
             },
@@ -90,18 +105,35 @@ impl NativeIncidentModelRest {
             blob(out, &data)?;
         }
         for pending in &self.pending {
-            let mut data = Vec::new();
-            pending.source.write(&mut data)?;
-            blob(out, &data)?;
-            blob(out, &pending.anchor.canonical_bytes().map_err(invalid)?)?;
-            blob(out, &pending.output.canonical_bytes().map_err(invalid)?)?;
-            for material in &pending.material {
-                let mut data = Vec::new();
-                material.write(&mut data)?;
-                blob(out, &data)?;
-            }
-            if let Some(encoded) = &pending.encoded {
-                blob(out, &encoded.canonical_bytes().map_err(invalid)?)?;
+            match pending {
+                PendingRest::Frozen {
+                    source,
+                    anchor,
+                    output,
+                    material,
+                } => {
+                    let mut data = Vec::new();
+                    source.write(&mut data)?;
+                    blob(out, &data)?;
+                    blob(out, &anchor.canonical_bytes().map_err(invalid)?)?;
+                    blob(out, &output.canonical_bytes().map_err(invalid)?)?;
+                    for material in material {
+                        let mut data = Vec::new();
+                        material.write(&mut data)?;
+                        blob(out, &data)?;
+                    }
+                }
+                PendingRest::Moment {
+                    anchor,
+                    output,
+                    condition,
+                } => {
+                    blob(out, &anchor.canonical_bytes().map_err(invalid)?)?;
+                    blob(out, &output.canonical_bytes().map_err(invalid)?)?;
+                    if let Some(condition) = condition {
+                        blob(out, &condition.canonical_bytes().map_err(invalid)?)?;
+                    }
+                }
             }
         }
         Ok(())
@@ -110,41 +142,56 @@ impl NativeIncidentModelRest {
         let mut input = input.take(octets);
         let mut magic = [0; 19];
         input.read_exact(&mut magic)?;
-        let episodes = &magic == b"HNA-INCIDENT-FIELD\x02";
-        if &magic != b"HNA-INCIDENT-FIELD\x01" && !episodes {
+        let moments = &magic == b"HNA-INCIDENT-FIELD\x03";
+        let tape = &magic == b"HNA-INCIDENT-FIELD\x02";
+        if &magic != b"HNA-INCIDENT-FIELD\x01" && !moments && !tape {
             return Err(invalid("incident model rest version"));
         }
         let header: Header = serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
-        if header.pending.iter().any(|p| p.source_episode.is_some()) != episodes {
-            return Err(invalid("incident episode rest tag"));
+        if tape || header.pending.iter().any(|p| p.source_episode.is_some()) {
+            return Err(invalid(
+                "incident rest \\x02 retains a per-occurrence generator source tape; that format is retired by the moment law and is not reinterpreted",
+            ));
+        }
+        if header.pending.iter().any(|p| p.source_moment.is_some()) != moments {
+            return Err(invalid("incident moment rest tag"));
         }
         let layout = header.spec.compile()?;
         let data = read_blob(&mut input)?;
         let field = NativeFieldRest::read(&mut data.as_slice(), data.len() as u64)?;
-        let mut read_material=|input:&mut std::io::Take<&mut _>|->Result<Vec<NormalMaterialRest>,NativeSessionError>{
+        let read_material=|input:&mut std::io::Take<&mut _>|->Result<Vec<NormalMaterialRest>,NativeSessionError>{
             (0..layout.material_features.len()).map(|_|{let data=read_blob(input)?;
                 Ok(NormalMaterialRest::read(&mut data.as_slice(),data.len() as u64)?)}).collect()
         };
         let material = read_material(&mut input)?;
         let mut pending = Vec::new();
         for pending_header in &header.pending {
+            if pending_header.source_moment.is_some() {
+                let anchor = ResidentSectionRest::read(&read_blob(&mut input)?).map_err(invalid)?;
+                let output = ResidentSectionRest::read(&read_blob(&mut input)?).map_err(invalid)?;
+                let condition = if layout.source_condition_ports > 0 {
+                    Some(ResidentSectionRest::read(&read_blob(&mut input)?).map_err(invalid)?)
+                } else {
+                    None
+                };
+                pending.push(PendingRest::Moment {
+                    anchor,
+                    output,
+                    condition,
+                });
+                continue;
+            }
             let data = read_blob(&mut input)?;
             let source =
                 NativeFieldCurrentSourceRest::read(&mut data.as_slice(), data.len() as u64)?;
             let anchor = ResidentSectionRest::read(&read_blob(&mut input)?).map_err(invalid)?;
             let output = ResidentSectionRest::read(&read_blob(&mut input)?).map_err(invalid)?;
             let material = read_material(&mut input)?;
-            let encoded = if pending_header.source_episode.is_some() {
-                Some(ResidentSectionRest::read(&read_blob(&mut input)?).map_err(invalid)?)
-            } else {
-                None
-            };
-            pending.push(PendingRest {
+            pending.push(PendingRest::Frozen {
                 source,
                 anchor,
                 output,
                 material,
-                encoded,
             });
         }
         if input.limit() != 0 {
@@ -192,89 +239,96 @@ impl NativeIncidentModelRest {
             {
                 return Err(invalid("incident pending chronology"));
             }
-            let source = model.field.remount_current_source(p.source)?;
-            let grain = source.enclosure().grain();
-            let anchor = Rc::new(ResidentNormalEnclosure::remount(surface, p.anchor, grain)?);
-            if p.material.len() != model.layout.material_features.len()
-                || p.material
-                    .iter()
-                    .zip(&model.layout.material_features)
-                    .any(|(m, &features)| {
-                        m.source_chart().complex_sources() != Some(features)
-                            || m.targets() != model.layout.width / 2
-                            || m.grain() != grain
-                    })
-            {
-                return Err(invalid("pending incident material chart"));
-            }
-            let material = p
-                .material
-                .into_iter()
-                .map(|m| m.remount(surface).map(|m| m.retained_view()))
-                .collect::<Result<Vec<_>, _>>()?;
-            if h.held.len() != anchor.view().components() / 2
-                || h.held[source.boundary_components() / 2..]
-                    .iter()
-                    .any(|v| *v)
-            {
-                return Err(invalid("incident pending anchor mask"));
-            }
-            let word = if let Some(meta) = h.source_episode {
-                let encoded = Rc::new(ResidentNormalEnclosureSection::remount(
-                    surface,
-                    p.encoded
-                        .ok_or_else(|| invalid("missing generator source rows"))?,
-                    meta.rows,
-                    meta.components,
-                    grain,
-                )?);
-                let word = model.evaluate_generator_episode(
-                    &source,
-                    &material,
-                    encoded,
-                    meta.binding,
-                    meta.start,
-                    h.epoch,
-                    meta.contacts,
-                )?;
-                if word.anchor.inspect()? != anchor.inspect()?
-                    || word.held != h.held
-                    || word.admitted != h.admitted
-                {
-                    return Err(invalid(
-                        "generator source tape does not reconstruct its final anchor",
-                    ));
+            let word = match (h.source_moment, p) {
+                (
+                    Some(meta),
+                    PendingRest::Moment {
+                        anchor,
+                        output,
+                        condition,
+                    },
+                ) => {
+                    // Contemporary field: the comparison is read through it when observed.
+                    let source = model.field.read_current_source()?;
+                    let grain = source.enclosure().grain();
+                    let anchor = Rc::new(ResidentNormalEnclosure::remount(surface, anchor, grain)?);
+                    let output = ResidentNormalEnclosure::remount(surface, output, grain)?;
+                    let condition = condition
+                        .map(|rest| {
+                            ResidentNormalEnclosureSection::remount(
+                                surface,
+                                rest,
+                                model.layout.sites.len(),
+                                model.layout.width * model.layout.source_condition_ports,
+                                grain,
+                            )
+                        })
+                        .transpose()?;
+                    model.remount_moment_comparison(
+                        meta, source, anchor, output, condition, h.held, h.admitted, h.epoch,
+                    )?
                 }
-                word
-            } else {
-                if p.encoded.is_some() {
-                    return Err(invalid("unbound generator source rows"));
+                (
+                    None,
+                    PendingRest::Frozen {
+                        source,
+                        anchor,
+                        output,
+                        material,
+                    },
+                ) => {
+                    let source = model.field.remount_current_source(source)?;
+                    let grain = source.enclosure().grain();
+                    let anchor = Rc::new(ResidentNormalEnclosure::remount(surface, anchor, grain)?);
+                    if material.len() != model.layout.material_features.len()
+                        || material.iter().zip(&model.layout.material_features).any(
+                            |(m, &features)| {
+                                m.source_chart().complex_sources() != Some(features)
+                                    || m.targets() != model.layout.width / 2
+                                    || m.grain() != grain
+                            },
+                        )
+                    {
+                        return Err(invalid("pending incident material chart"));
+                    }
+                    let material = material
+                        .into_iter()
+                        .map(|m| m.remount(surface).map(|m| m.retained_view()))
+                        .collect::<Result<Vec<_>, _>>()?;
+                    if h.held.len() != anchor.view().components() / 2
+                        || h.held[source.boundary_components() / 2..]
+                            .iter()
+                            .any(|v| *v)
+                    {
+                        return Err(invalid("incident pending anchor mask"));
+                    }
+                    let (steps, recomputed) =
+                        model.evaluate(&source, &material, &anchor, &h.held, &h.admitted, None)?;
+                    let recorded = ResidentNormalEnclosure::remount(surface, output, grain)?;
+                    if recomputed.inspect()? != recorded.inspect()? {
+                        return Err(invalid(
+                            "incident producing word does not reconstruct recorded endpoint",
+                        ));
+                    }
+                    IncidentWord {
+                        source_moment: None,
+                        external_condition: None,
+                        machine: model.layout.machine.clone(),
+                        source,
+                        material,
+                        anchor,
+                        held: h.held,
+                        admitted: h.admitted,
+                        steps,
+                        output: recomputed,
+                        epoch: h.epoch,
+                        solver: model.spec.solver(),
+                        solve_steps: model.spec.solve_steps(),
+                        enclosure_propagation: model.spec.enclosure_propagation(),
+                    }
                 }
-                let (steps, output) =
-                    model.evaluate(&source, &material, &anchor, &h.held, &h.admitted, None)?;
-                IncidentWord {
-                    source_episode: None,
-                    external_condition: None,
-                    machine: model.layout.machine.clone(),
-                    source,
-                    material,
-                    anchor,
-                    held: h.held,
-                    admitted: h.admitted,
-                    steps,
-                    output,
-                    epoch: h.epoch,
-                    solver: model.spec.solver(),
-                    solve_steps: model.spec.solve_steps(),
-                    enclosure_propagation: model.spec.enclosure_propagation(),
-                }
+                _ => return Err(invalid("incident pending rest kind")),
             };
-            let recorded = ResidentNormalEnclosure::remount(surface, p.output, grain)?;
-            if word.output.inspect()? != recorded.inspect()? {
-                return Err(invalid(
-                    "incident producing word does not reconstruct recorded endpoint",
-                ));
-            }
             model.pending.insert(h.id, Rc::new(word));
         }
         Ok(model)
@@ -292,7 +346,8 @@ impl IncidentFieldModel<'_> {
                 .pending
                 .iter()
                 .map(|(&id, p)| PendingHeader {
-                    source_episode: p.source_episode.as_ref().map(|t| t.meta.clone()),
+                    source_episode: None,
+                    source_moment: p.source_moment.as_ref().map(|m| m.meta.clone()),
                     id,
                     epoch: p.epoch,
                     held: p.held.clone(),
@@ -304,20 +359,27 @@ impl IncidentFieldModel<'_> {
             .pending
             .values()
             .map(|p| {
-                Ok(PendingRest {
-                    encoded: p
-                        .source_episode
-                        .as_ref()
-                        .map(|t| t.encoded.rest())
-                        .transpose()?,
-                    source: p.source.rest()?,
-                    anchor: p.anchor.rest()?,
-                    output: p.output.rest()?,
-                    material: p
-                        .material
-                        .iter()
-                        .map(|m| m.rest())
-                        .collect::<Result<Vec<_>, _>>()?,
+                Ok(if p.source_moment.is_some() {
+                    PendingRest::Moment {
+                        anchor: p.anchor.rest()?,
+                        output: p.output.rest()?,
+                        condition: p
+                            .external_condition
+                            .as_ref()
+                            .map(|c| c.rest())
+                            .transpose()?,
+                    }
+                } else {
+                    PendingRest::Frozen {
+                        source: p.source.rest()?,
+                        anchor: p.anchor.rest()?,
+                        output: p.output.rest()?,
+                        material: p
+                            .material
+                            .iter()
+                            .map(|m| m.rest())
+                            .collect::<Result<Vec<_>, _>>()?,
+                    }
                 })
             })
             .collect::<Result<Vec<_>, NativeSessionError>>()?;

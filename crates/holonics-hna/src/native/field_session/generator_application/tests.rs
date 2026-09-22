@@ -26,11 +26,12 @@ fn release_preview(session: &mut NativeFieldSession<'_>) -> Result<()> {
 }
 fn snapshot(session: &NativeFieldSession<'_>, id: u64) -> Value {
     let pending = &session.generator.as_ref().unwrap().pending[&id];
+    let (start, cells) = pending.source_clock();
     json!({"source":pending.encoded.rows.inspect_rows().unwrap(),
-        "phase":pending.phases.output().inspect_rows().unwrap(),
-        "text":pending.received.text_logits.inspect_rows().unwrap(),
-        "stop":pending.received.support_logits.inspect_rows().unwrap(),
-        "binding":pending.phases.binding(),"start":pending.start})
+        "phase":pending.response_phases().output().inspect_rows().unwrap(),
+        "text":pending.received().text_logits.inspect_rows().unwrap(),
+        "stop":pending.received().support_logits.inspect_rows().unwrap(),
+        "binding":pending.response_phases().binding(),"start":start,"cells":cells})
 }
 
 #[test]
@@ -70,8 +71,8 @@ fn generator_source_aperture_is_not_machine_population_or_legacy_slots() {
 }
 
 #[test]
-#[ignore = "requires CUDA; public ordered source, phase stop, codec growth and frozen restart"]
-fn generator_session_returns_the_ordered_source_and_reopens_its_frozen_comparison() {
+#[ignore = "requires CUDA; public ordered source moment, phase stop, codec growth and restart across an intervening update"]
+fn generator_session_returns_the_ordered_source_and_reopens_its_moment_comparison() {
     let directory = tempfile::tempdir().unwrap();
     let pending_path = directory.path().join("pending.hna");
     let direct_path = directory.path().join("direct.hna");

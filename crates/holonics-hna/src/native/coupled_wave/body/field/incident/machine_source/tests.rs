@@ -50,6 +50,7 @@ fn machine() -> CompiledGeneratorMachine {
 fn binding() -> GeneratorSourceBinding {
     GeneratorSourceBinding {
         contact_kinds: vec![],
+        offsets: vec![],
         source_id: "episode-1".into(),
         clock: ClockSpec {
             lineage: "episode".into(),

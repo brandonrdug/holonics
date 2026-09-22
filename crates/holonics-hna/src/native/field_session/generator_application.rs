@@ -36,6 +36,22 @@ pub(super) struct GeneratorPending<'c> {
     received: IncidentTextForward<'c>,
     start: u64,
 }
+/// Read-only producing operands of an outstanding generator comparison.
+#[cfg_attr(not(test), allow(dead_code))]
+impl<'c> GeneratorPending<'c> {
+    /// Receiving phases read from the generated boundary; its binding names the phase ports.
+    pub(super) fn response_phases(&self) -> &NativeGeneratorPhaseReception<'c> {
+        &self.phases
+    }
+    /// Text/stop faces produced at those phases.
+    pub(super) fn received(&self) -> &IncidentTextForward<'c> {
+        &self.received
+    }
+    /// First source clock event and passage length at which the request was read.
+    pub(super) fn source_clock(&self) -> (u64, usize) {
+        (self.start, self.encoded.rows.rows())
+    }
+}
 pub(super) struct GeneratorPresentation<'c> {
     encoder: IncidentEncoder<'c>,
     receiver: GeneratorTextReceiver<'c>,
@@ -171,9 +187,10 @@ impl<'c> NativeFieldSession<'c> {
             &encoded.rows,
         ])?);
         let contacts = source_contacts(&preparation);
-        let generated = self.body.prepare_generator_episode(
+        let generated = self.body.prepare_generator_episode_with_offsets(
             encoded_rows,
             options.source.clone(),
+            options.source.offsets.clone(),
             model.next_event,
             contacts,
         )?;
@@ -296,7 +313,7 @@ impl<'c> NativeFieldSession<'c> {
                 .prepare_incident_material_return(id, joint.view(), step_bits)?;
         let source_covector = field_return
             .source_covector()
-            .ok_or_else(|| invalid("generator source tape return absent"))?;
+            .ok_or_else(|| invalid("generator source moment return absent"))?;
         let encoder_return =
             model
                 .encoder

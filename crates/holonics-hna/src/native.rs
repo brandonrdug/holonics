@@ -17,6 +17,10 @@ pub mod field_geometry;
 pub use field_geometry::GeometricFieldSpec;
 mod field_session;
 pub use field_session::{
+    BitsReading, ExactBitCount, NativeReturnReading, NavigationReading, ReceivingRowReading,
+    SiteNavigation, SourceReading, StateReading, TargetReading,
+};
+pub use field_session::{
     ExposureAperture, FieldMathematicalRequest, FieldSectionRequest, FieldSessionSpec,
     FieldSourceChart, FieldTextCodec, GeneratorSessionOptions, IncidentContact,
     IncidentContactKind, IncidentFieldOptions, IncidentPreparation, IncidentSourceCell,

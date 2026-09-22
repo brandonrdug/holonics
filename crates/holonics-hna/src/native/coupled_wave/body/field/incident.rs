@@ -4,7 +4,7 @@ mod machine_episode;
 mod machine_receiving;
 mod machine_source;
 mod machine_source_contacts;
-use machine_episode::{GeneratorEpisodeMeta, GeneratorEpisodeTape};
+use machine_episode::{GeneratorSourceMoment, GeneratorSourceMomentMeta};
 pub use machine_source::GeneratorSourceBinding;
 pub use machine_source_contacts::{GeneratorSourceContact, GeneratorSourceContactKind};
 mod machine_transport;
@@ -364,7 +364,8 @@ struct IncidentStep<'c> {
     input: ResidentNormalEnclosure<'c>,
 }
 pub(crate) struct IncidentWord<'c> {
-    source_episode: Option<GeneratorEpisodeTape<'c>>,
+    /// Ordered-source declaration of a generator word; its accumulated field is `anchor`.
+    source_moment: Option<GeneratorSourceMoment>,
     external_condition: Option<Rc<ResidentNormalEnclosureSection<'c>>>,
     machine: Option<Rc<crate::native::field_geometry::machine::CompiledGeneratorMachine>>,
     source: NativeFieldCurrentSource<'c>,
@@ -624,7 +625,7 @@ impl<'c> IncidentFieldModel<'c> {
         let (steps, output) =
             self.evaluate(&source, &material, &anchor, &joint_held, &admitted, None)?;
         Ok(IncidentWord {
-            source_episode: None,
+            source_moment: None,
             external_condition: None,
             machine: self.layout.machine.clone(),
             source,
@@ -730,6 +731,11 @@ impl<'c> IncidentFieldModel<'c> {
         } else {
             self.generations
         };
+        let retained = if retain {
+            Some(self.retained_comparison(&generated.word)?)
+        } else {
+            None
+        };
         let staged = if commit {
             let last = generated
                 .word
@@ -751,10 +757,9 @@ impl<'c> IncidentFieldModel<'c> {
         if let Some(staged) = staged {
             self.field.commit_joint_current(staged)?;
         }
-        if retain {
+        if let Some(retained) = retained {
             generated.comparison = Some(self.next_comparison);
-            self.pending
-                .insert(self.next_comparison, Rc::clone(&generated.word));
+            self.pending.insert(self.next_comparison, retained);
         }
         self.next_comparison = next_id;
         self.generations = generations;
@@ -1206,12 +1211,13 @@ impl<'c> NativeCoupledBody<'c> {
         if step_bits > 120 {
             return Err(invalid("incident material return scale"));
         }
-        let word = Rc::clone(
+        let pending = Rc::clone(
             model
                 .pending
                 .get(&id)
                 .ok_or_else(|| invalid("unknown incident comparison"))?,
         );
+        let word = model.observed_word(&pending)?;
         let next_epoch = model
             .epoch
             .checked_add(1)

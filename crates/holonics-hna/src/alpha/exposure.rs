@@ -1054,5 +1054,114 @@ fn normalized_time(value: &str) -> bool {
     (1..=days).contains(&day)
 }
 
+/// Exterior code lengths of the exposure stream an observer has seen, in bits. These are
+/// observer readings like a timing or a byte count: nothing native reads them, and they never
+/// enter a field, a comparison or a learning covector. Symbols are exterior codec ordinals.
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct ExposureCodeLength {
+    symbols: u64,
+    order0: BTreeMap<usize, u64>,
+    contexts: BTreeMap<Option<usize>, u64>,
+    order1: BTreeMap<(Option<usize>, usize), u64>,
+    last: Option<usize>,
+}
+
+impl ExposureCodeLength {
+    /// Append symbols in the order the observer saw them. `context` is the order-1 context of
+    /// the first symbol; `None` keeps the stream's own previous symbol.
+    pub fn ingest(&mut self, symbols: &[usize], context: Option<Option<usize>>) {
+        let mut previous = context.unwrap_or(self.last);
+        for &symbol in symbols {
+            self.symbols += 1;
+            *self.order0.entry(symbol).or_default() += 1;
+            *self.contexts.entry(previous).or_default() += 1;
+            *self.order1.entry((previous, symbol)).or_default() += 1;
+            previous = Some(symbol);
+        }
+        if !symbols.is_empty() {
+            self.last = previous;
+        }
+    }
+
+    pub fn symbols(&self) -> u64 {
+        self.symbols
+    }
+
+    pub fn last(&self) -> Option<usize> {
+        self.last
+    }
+
+    /// Static order-0 empirical code length `Σ_s c_s log2(N/c_s)` of the stream so far, bits.
+    pub fn order0_bits(&self) -> f64 {
+        let n = self.symbols as f64;
+        self.order0
+            .values()
+            .map(|&c| c as f64 * (n / c as f64).log2())
+            .sum()
+    }
+
+    /// Static order-1 empirical code length `Σ_(x,s) c_(x,s) log2(c_x/c_(x,s))`, bits.
+    pub fn order1_bits(&self) -> f64 {
+        self.order1
+            .iter()
+            .map(|((context, _), &c)| c as f64 * (self.contexts[context] as f64 / c as f64).log2())
+            .sum()
+    }
+
+    /// Predictive code length of `symbols` under the counts seen before them, with add-one
+    /// (Laplace) smoothing over an alphabet of `alphabet` classes, bits: `(order0, order1)`.
+    /// Counts are not updated inside the target, as the producing face is fixed across it.
+    pub fn predictive_bits(
+        &self,
+        symbols: &[usize],
+        first_context: Option<usize>,
+        alphabet: usize,
+    ) -> (f64, f64) {
+        let a = alphabet.max(1) as f64;
+        let n = self.symbols as f64;
+        let mut previous = first_context;
+        let (mut zero, mut one) = (0.0, 0.0);
+        for &symbol in symbols {
+            let c0 = self.order0.get(&symbol).copied().unwrap_or(0) as f64;
+            zero -= ((c0 + 1.0) / (n + a)).log2();
+            let cx = self.contexts.get(&previous).copied().unwrap_or(0) as f64;
+            let c1 = self.order1.get(&(previous, symbol)).copied().unwrap_or(0) as f64;
+            one -= ((c1 + 1.0) / (cx + a)).log2();
+            previous = Some(symbol);
+        }
+        (zero, one)
+    }
+}
+
+/// The exterior request-side reading held by an observer until its comparison is observed.
+#[derive(Clone, Debug, Serialize)]
+pub struct ExteriorRequestMeasure {
+    pub source_cells: usize,
+    pub alphabet: usize,
+    pub source_bits: f64,
+    pub last_source_symbol: Option<usize>,
+    pub committed: bool,
+    pub source_clock_start: u64,
+    pub source_clock_end: u64,
+    pub request_seconds: f64,
+    pub request_launches: u64,
+    pub request_census: BTreeMap<String, i128>,
+    pub checkpoint_octets_before: u64,
+    pub checkpoint_octets_after: u64,
+}
+
+/// Exterior observer of an exposure run: the stream's empirical code lengths, the cumulative
+/// source code length and each outstanding request's measure. It is not session state and is
+/// never checkpointed; a resumed run starts a new observer.
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct ExteriorReturnObserver {
+    pub stream: ExposureCodeLength,
+    pub source_bits_total: f64,
+    pub source_cells_total: u64,
+    pub committed_source_steps: u64,
+    pub requests: BTreeMap<u64, ExteriorRequestMeasure>,
+    pub returns: u64,
+}
+
 #[cfg(test)]
 mod tests;

@@ -11,7 +11,9 @@
 //! material and is created with owner-only permissions. Reports never include its contents.
 use holonics_hna::{
     HnaStreamState,
-    alpha::exposure::{ExposureError, ExposureFamily, ExposureOccurrence, ExposureReader},
+    alpha::exposure::{
+        ExposureError, ExposureFamily, ExposureOccurrence, ExposureReader, ExteriorReturnObserver,
+    },
     native::{
         ExposureAperture, FieldSectionRequest, FieldSessionSpec, FieldSourceChart, FieldTextCodec,
         NativeFieldSavedSession, NativeFieldSession, with_field_session,
@@ -55,6 +57,8 @@ struct Options {
     step_bits: u32,
     report: Option<PathBuf>,
     private_diagnostic: Option<PathBuf>,
+    /// New JSONL file of exterior return readings (bits, octets, seconds; counts only).
+    readings: Option<PathBuf>,
 }
 
 fn options() -> Result<Options, String> {
@@ -70,6 +74,7 @@ fn options() -> Result<Options, String> {
     let mut step_bits = 1;
     let mut report = None;
     let mut private_diagnostic = None;
+    let mut readings = None;
     let value = |args: &mut dyn Iterator<Item = String>, name: &str| {
         args.next().ok_or_else(|| format!("missing {name}"))
     };
@@ -111,6 +116,7 @@ fn options() -> Result<Options, String> {
                     .map_err(|e| e.to_string())?
             }
             "--report" => report = Some(PathBuf::from(value(&mut args, "report path")?)),
+            "--readings" => readings = Some(PathBuf::from(value(&mut args, "readings path")?)),
             "--private-diagnostic" => {
                 private_diagnostic =
                     Some(PathBuf::from(value(&mut args, "private diagnostic path")?))
@@ -124,7 +130,7 @@ fn options() -> Result<Options, String> {
         checkpoint: checkpoint.ok_or(
             "usage: athena_exposure_field (--exposure WIRE --spec SPEC | --resume SESSION) \
              --checkpoint OUT --frames N --request-bytes N --response-symbols N \
-             [--context-bytes N] [--step-bits N] [--report PATH]",
+             [--context-bytes N] [--step-bits N] [--report PATH] [--readings PATH]",
         )?,
         spec,
         frames: frames.ok_or("a frame budget must be declared with --frames")?,
@@ -138,6 +144,7 @@ fn options() -> Result<Options, String> {
         step_bits,
         report,
         private_diagnostic,
+        readings,
     })
 }
 
@@ -240,6 +247,9 @@ struct Walk {
     context_index_scan_octets: u64,
     context_lookup_frames: u64,
     context_lookup_octets: u64,
+    /// Exterior observer of the generator chart's returns; never enters the session.
+    observer: ExteriorReturnObserver,
+    readings: Vec<Value>,
 }
 
 impl Walk {
@@ -327,7 +337,28 @@ fn walk(
                             session.admit_incident_development_occurrence(&frame)?;
                         }
                         let update_start = Instant::now();
-                        match session.observe(held.comparison, &text, options.step_bits) {
+                        let observed = if options.readings.is_some()
+                            && state.observer.requests.contains_key(&held.comparison)
+                        {
+                            session
+                                .read_return(
+                                    held.comparison,
+                                    &text,
+                                    options.step_bits,
+                                    &mut state.observer,
+                                )
+                                .map(|(value, reading)| {
+                                    // Counts, bits, octets and seconds only; no source text.
+                                    state.readings.push(json!({
+                                        "frame": state.frames,
+                                        "reading": reading,
+                                    }));
+                                    value
+                                })
+                        } else {
+                            session.observe(held.comparison, &text, options.step_bits)
+                        };
+                        match observed {
                             Ok(_) => {
                                 state.update_us.push(update_start.elapsed().as_micros());
                                 state.count("paired-and-applied");
@@ -468,7 +499,14 @@ fn walk(
             .filter_map(|p| p.text.clone())
             .collect::<String>();
         let start = Instant::now();
-        match session.request(&request) {
+        let requested = if options.readings.is_some()
+            && spec.source_chart == FieldSourceChart::GeneratorMachine
+        {
+            session.measured_request(&request, &mut state.observer)
+        } else {
+            session.request(&request)
+        };
+        match requested {
             Ok(value) => {
                 state.generation_us.push(
                     value["generation_us"]
@@ -549,7 +587,30 @@ fn report(options: &Options, state: &mut Walk, wall: u128, anatomy: Value) -> Va
         "wall_us":wall,
         "refusal_reasons":"declared driver labels; native refusal text is withheld because it can quote source material",
         "anatomy":anatomy,
+        "return_readings":{
+            "count":state.readings.len(),
+            "source_cells":state.observer.source_cells_total,
+            "source_bits":state.observer.source_bits_total,
+            "exposure_symbols":state.observer.stream.symbols(),
+            "exposure_order0_bits":state.observer.stream.order0_bits(),
+            "exposure_order1_bits":state.observer.stream.order1_bits(),
+            "committed_source_steps":state.observer.committed_source_steps,
+            "scope":"exterior observer readings; one JSONL row per observed return in --readings",
+        },
     })
+}
+
+fn publish_readings(options: &Options, state: &Walk) -> Result<(), Box<dyn std::error::Error>> {
+    let Some(path) = &options.readings else {
+        return Ok(());
+    };
+    let mut bytes = Vec::new();
+    for reading in &state.readings {
+        serde_json::to_writer(&mut bytes, reading)?;
+        bytes.push(b'\n');
+    }
+    holonics_hna::publish_new(path, |out| out.write_all(&bytes))?;
+    Ok(())
 }
 
 fn publish(options: &Options, value: &Value) -> Result<(), Box<dyn std::error::Error>> {
@@ -593,6 +654,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         context_index_scan_octets: 0,
         context_lookup_frames: 0,
         context_lookup_octets: 0,
+        observer: ExteriorReturnObserver::default(),
+        readings: Vec::new(),
     };
     let start = Instant::now();
     let anatomy = match (&options.resume, &options.exposure, &options.spec) {
@@ -627,6 +690,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         _ => return Err("supply --exposure with --spec, or --resume alone".into()),
     };
     let value = report(&options, &mut state, start.elapsed().as_micros(), anatomy);
+    publish_readings(&options, &state)?;
     publish(&options, &value)
 }
 
@@ -764,6 +828,7 @@ mod tests {
             step_bits: 1,
             report: None,
             private_diagnostic: None,
+            readings: None,
         }
     }
     fn counters() -> Walk {
@@ -780,6 +845,8 @@ mod tests {
             context_index_scan_octets: 0,
             context_lookup_frames: 0,
             context_lookup_octets: 0,
+            observer: ExteriorReturnObserver::default(),
+            readings: Vec::new(),
         }
     }
     fn app_error(error: Box<dyn std::error::Error>) -> holonics_hna::native::NativeSessionError {
