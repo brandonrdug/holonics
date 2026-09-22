@@ -262,6 +262,8 @@ pub use section::{
 };
 
 mod phase;
+mod pair;
+pub use pair::{NativePairParticipation, NativePairParticipationAdjoint};
 pub use phase::{NativePhaseParticipation, NativePhaseParticipationAdjoint};
 
 #[cfg(test)]

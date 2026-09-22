@@ -99,6 +99,8 @@ pub struct FieldSessionSpec {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct IncidentFieldOptions {
+    #[serde(default, skip_serializing_if = "super::IncidentParticipationChart::is_bilinear")]
+    pub participation: super::IncidentParticipationChart,
     pub local_roots: usize,
     pub material_seed: u64,
     pub response_aperture: usize,

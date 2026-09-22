@@ -59,6 +59,100 @@ theorem pairSlip_transpose_mulVec (va vb Δ : Vec) :
   fin_cases j <;>
     simp [pairSlip, Matrix.mulVec, dotProduct, Fin.sum_univ_succ] <;> ring
 
+/-! ## 1a. The fixed-generator feature and its complete return -/
+
+/-- [definition] The fixed-generator pair feature keeps the separating vector, its quadrance,
+and the quadrance differential as separate receiving coordinates. The generator and its
+configuration are fixed while this feature is read; their variations belong to a larger chart. -/
+structure PairFeature where
+  delta : Vec
+  quadrance : ℚ
+  gradient : Fin 2 → ℚ
+
+/-- The pair feature at one configuration. -/
+def pairFeatureAt (Δ va vb : Vec) : PairFeature where
+  delta := Δ
+  quadrance := Δ ⬝ᵥ Δ
+  gradient := 2 • ((pairSlip va vb)ᵀ *ᵥ Δ)
+
+/-- The full second variation of the fixed-generator quadrance feature. -/
+def pairQuadranceHessian (Δ va vb aa ab : Vec) : Matrix (Fin 2) (Fin 2) ℚ :=
+  !![2 * (va ⬝ᵥ va + Δ ⬝ᵥ aa), -2 * (va ⬝ᵥ vb);
+      -2 * (va ⬝ᵥ vb), 2 * (vb ⬝ᵥ vb - Δ ⬝ᵥ ab)]
+
+/-- The receiving covector returned through the complete fixed-generator feature map. -/
+def pairFeatureReturn (J : Matrix (Fin 3) (Fin 2) ℚ) (DQ : Fin 2 → ℚ)
+    (H : Matrix (Fin 2) (Fin 2) ℚ) (lambdaDelta : Vec) (lambdaQ : ℚ)
+    (lambdaDQ : Fin 2 → ℚ) : Fin 2 → ℚ :=
+  Jᵀ *ᵥ lambdaDelta + lambdaQ • DQ + Hᵀ *ᵥ lambdaDQ
+
+/-- [proved-derived; formal-checked] The complete fixed-generator adjoint is
+`Jᵀ λΔ + λQ DQ + Hᵀ λDQ`. It returns all three feature covectors, including the Hessian
+term that the scalar quadrance pullback alone cannot provide. -/
+theorem pairFeatureReturn_adjoint (J : Matrix (Fin 3) (Fin 2) ℚ) (DQ : Fin 2 → ℚ)
+    (H : Matrix (Fin 2) (Fin 2) ℚ) (lambdaDelta : Vec) (lambdaQ : ℚ)
+    (lambdaDQ : Fin 2 → ℚ)
+    (u : Fin 2 → ℚ) :
+    lambdaDelta ⬝ᵥ (J *ᵥ u) + lambdaQ * (DQ ⬝ᵥ u) + lambdaDQ ⬝ᵥ (H *ᵥ u)
+      = pairFeatureReturn J DQ H lambdaDelta lambdaQ lambdaDQ ⬝ᵥ u := by
+  have hJ : lambdaDelta ⬝ᵥ (J *ᵥ u) = (Jᵀ *ᵥ lambdaDelta) ⬝ᵥ u := by
+    rw [Matrix.dotProduct_mulVec]
+    rw [← Matrix.vecMul_transpose]
+    simp
+  have hH : lambdaDQ ⬝ᵥ (H *ᵥ u) = (Hᵀ *ᵥ lambdaDQ) ⬝ᵥ u := by
+    rw [Matrix.dotProduct_mulVec]
+    rw [← Matrix.vecMul_transpose]
+    simp
+  rw [hJ, hH]
+  simp [pairFeatureReturn]
+
+/-- [proved-derived; formal-checked] The pair's gradient is the slip adjoint of its separation.
+This is the `DQ = 2 Jᵀ Δ` input to the feature chart. -/
+theorem pairFeatureAt_gradient (Δ va vb : Vec) :
+    (pairFeatureAt Δ va vb).gradient = 2 • ((pairSlip va vb)ᵀ *ᵥ Δ) := rfl
+
+/-- [proved-derived; formal-checked] The full Hessian quadratic is the isotropic contact form
+plus both geometric/prestress acceleration terms. -/
+theorem pairQuadranceHessian_quad (Δ va vb aa ab : Vec) (s t : ℚ) :
+    quad (pairQuadranceHessian Δ va vb aa ab) ![s, t]
+      = 2 * (quad (faceForm 1 (pairSlip va vb) 1) ![s, t]
+        + s ^ 2 * (Δ ⬝ᵥ aa) - t ^ 2 * (Δ ⬝ᵥ ab)) := by
+  rw [quad_faceForm, pairSlip_mulVec]
+  simp [pairQuadranceHessian, quad, Matrix.mulVec, dotProduct,
+    Fin.sum_univ_two, Matrix.one_apply]
+  have hinner :
+      (∑ x : Fin 3, (s * va x - t * vb x) * (s * va x - t * vb x)) =
+        s ^ 2 * (∑ x : Fin 3, va x ^ 2)
+          - 2 * s * t * (∑ x : Fin 3, va x * vb x)
+          + t ^ 2 * (∑ x : Fin 3, vb x ^ 2) := by
+    calc
+      (∑ x : Fin 3, (s * va x - t * vb x) * (s * va x - t * vb x)) =
+          ∑ x : Fin 3, (s ^ 2 * va x ^ 2 - 2 * s * t * va x * vb x
+            + t ^ 2 * vb x ^ 2) := by
+              apply Finset.sum_congr rfl
+              intro x hx
+              ring
+      _ = _ := by
+        rw [Finset.sum_add_distrib, Finset.sum_sub_distrib]
+        have hcross :
+            (∑ x : Fin 3, 2 * s * t * va x * vb x) =
+              2 * s * t * (∑ x : Fin 3, va x * vb x) := by
+          calc
+            (∑ x : Fin 3, 2 * s * t * va x * vb x) =
+                ∑ x : Fin 3, (2 * s * t) * (va x * vb x) := by
+                  apply Finset.sum_congr rfl
+                  intro x hx
+                  ring
+            _ = _ := by rw [Finset.mul_sum]
+        have hA : s ^ 2 * (∑ x : Fin 3, va x ^ 2) =
+            ∑ x : Fin 3, s ^ 2 * va x ^ 2 := by rw [Finset.mul_sum]
+        have hB : t ^ 2 * (∑ x : Fin 3, vb x ^ 2) =
+            ∑ x : Fin 3, t ^ 2 * vb x ^ 2 := by rw [Finset.mul_sum]
+        rw [hcross]
+        rw [hA, hB]
+  rw [hinner]
+  ring
+
 /-! ## 2. The pair as a contact face -/
 
 /-- [proved-derived; formal-checked] **Pair contact power.** A contact face whose slip map is the
@@ -67,6 +161,70 @@ theorem pair_face_power (w : ℚ) (va vb : Vec) (D : Matrix (Fin 3) (Fin 3) ℚ)
     quad (faceForm w (pairSlip va vb) D) u
       = w * ((u 0 • va - u 1 • vb) ⬝ᵥ (D *ᵥ (u 0 • va - u 1 • vb))) := by
   rw [quad_faceForm, pairSlip_mulVec]
+
+/-! ## 2a. A pair-rate port into a resident medium -/
+
+/-- [definition] A resident medium's rate chart `C` embeds its coordinates into the two pair
+rates. The pair's spatial slip remains `J * C`; the charts are not identified. -/
+def pairRatePort {n : ℕ} (C : Matrix (Fin 2) (Fin n) ℚ) (va vb : Vec) :
+    Matrix (Fin 3) (Fin n) ℚ := pairSlip va vb * C
+
+/-- [proved-derived; formal-checked] Pulling a pair face through a rate port is matrix
+congruence: `face_form (J C) = Cᵀ face_form J C`. -/
+theorem faceForm_pairRatePort_congruence {n : ℕ} (w : ℚ)
+    (C : Matrix (Fin 2) (Fin n) ℚ) (va vb : Vec)
+    (D : Matrix (Fin 3) (Fin 3) ℚ) :
+    faceForm w (pairRatePort C va vb) D
+      = Cᵀ * faceForm w (pairSlip va vb) D * C := by
+  simp [pairRatePort, faceForm, Matrix.transpose_mul, Matrix.mul_assoc,
+    Matrix.smul_mul, Matrix.mul_smul]
+
+/-- [proved-derived; formal-checked] The port face reads the resident rate through the pair
+face. This retains the pair/material null kernel while changing only the declared rate chart. -/
+theorem pairRatePort_quad_eq_pair_quad {n : ℕ} (w : ℚ)
+    (C : Matrix (Fin 2) (Fin n) ℚ) (va vb : Vec)
+    (D : Matrix (Fin 3) (Fin 3) ℚ) (z : Fin n → ℚ) :
+    quad (faceForm w (pairRatePort C va vb) D) z
+      = quad (faceForm w (pairSlip va vb) D) (C *ᵥ z) := by
+  rw [quad_faceForm, quad_faceForm]
+  simp only [pairRatePort, Matrix.mulVec_mulVec]
+
+/-- [proved-derived; formal-checked] For a symmetric PSD material, a port motion has zero power
+exactly when the constitutive current sees its embedded pair slip. -/
+theorem pairRatePort_quad_eq_zero_iff_material_null {n : ℕ} {w : ℚ} (hw : 0 < w)
+    (C : Matrix (Fin 2) (Fin n) ℚ) (va vb : Vec)
+    (D : Matrix (Fin 3) (Fin 3) ℚ) (hDpsd : ∀ s : Vec, 0 ≤ quad D s)
+    (hDsymm : Dᵀ = D) (z : Fin n → ℚ) :
+    quad (faceForm w (pairRatePort C va vb) D) z = 0 ↔
+      D *ᵥ (pairRatePort C va vb *ᵥ z) = 0 := by
+  rw [quad_faceForm]
+  constructor
+  · intro h
+    apply psd_mulVec_eq_zero_of_quad_eq_zero hDpsd hDsymm
+    rcases mul_eq_zero.mp h with hw0 | hquad
+    · exact (hw.ne' hw0).elim
+    · exact hquad
+  · intro h
+    rw [h]
+    simp
+
+/-- [proved-derived; formal-checked] If the material has no null direction among attainable pair
+slips, the port's zero-power kernel is exactly the embedded pair zero-slip kernel. -/
+theorem pairRatePort_quad_eq_zero_iff_zero_slip {n : ℕ} {w : ℚ} (hw : 0 < w)
+    (C : Matrix (Fin 2) (Fin n) ℚ) (va vb : Vec)
+    (D : Matrix (Fin 3) (Fin 3) ℚ) (hDpsd : ∀ s : Vec, 0 ≤ quad D s)
+    (hDsymm : Dᵀ = D)
+    (hDnull : ∀ z : Fin n → ℚ, D *ᵥ (pairRatePort C va vb *ᵥ z) = 0 →
+      pairRatePort C va vb *ᵥ z = 0) (z : Fin n → ℚ) :
+    quad (faceForm w (pairRatePort C va vb) D) z = 0 ↔
+      pairRatePort C va vb *ᵥ z = 0 := by
+  rw [pairRatePort_quad_eq_zero_iff_material_null hw C va vb D hDpsd hDsymm]
+  constructor
+  · intro h
+    exact hDnull z h
+  · intro h
+    rw [h]
+    simp
 
 /-- [proved-derived; formal-checked] **Synchronized passage is the zero-power kernel.** On a
 positive-weight face whose quadratic null cone is trivial, a pair motion reads zero power exactly
@@ -151,6 +309,18 @@ theorem bilinear_score_eq_polarized_quadrance {k : ℕ} (a b : Fin k → ℚ) :
     a ⬝ᵥ b = (a ⬝ᵥ a + b ⬝ᵥ b - (a - b) ⬝ᵥ (a - b)) / 2 := by
   simp only [sub_dotProduct, dotProduct_sub]
   rw [dotProduct_comm b a]
+  ring
+
+/-- [definition] The first quadrance participation score on a shared receiving row. -/
+def pairScore {n : ℕ} (beta : ℚ) (Δ : Fin n → ℚ) : ℚ := -beta * (Δ ⬝ᵥ Δ) / 2
+
+/-- [proved-derived; formal-checked] The exact finite directional score return retains both the
+linear receiving covector and the quadratic geometric remainder. -/
+theorem pairScore_add_sub {n : ℕ} (beta : ℚ) (Δ d : Fin n → ℚ) (epsilon : ℚ) :
+    pairScore beta (Δ + epsilon • d) - pairScore beta Δ =
+      -epsilon * beta * (Δ ⬝ᵥ d) - (epsilon ^ 2 * beta / 2) * (d ⬝ᵥ d) := by
+  simp [pairScore, dotProduct_add, add_dotProduct, dotProduct_smul, smul_dotProduct]
+  rw [dotProduct_comm d Δ]
   ring
 
 /-! ## 3. Phase-carried material and the reflected return -/

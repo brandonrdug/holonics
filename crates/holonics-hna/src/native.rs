@@ -29,7 +29,7 @@ pub use field_session::{
 mod coupled_wave;
 mod normal_wave;
 pub use coupled_wave::{
-    IncidentFieldSolver, IncidentFieldSpec, NativeCoupledBody, NativeCoupledWaveAttachRefusal,
+    IncidentFieldSolver, IncidentFieldSpec, IncidentParticipationChart, NativeCoupledBody, NativeCoupledWaveAttachRefusal,
     NativeCoupledWaveSavedSession, NativeCoupledWaveSession, NativeFieldAttachRefusal,
     NativeFieldFormation, NativeFieldGeneratedSection, NativeFieldModelRest,
     NativeFieldReactionPort, NativeIncidentGenerated, NativeIncidentMaterialReturn,

@@ -1409,6 +1409,14 @@ belong to a supplied material block and unchanged frame carriage; learning can c
 material. The block-diagonal factor product and Newton identities check spectral faces;
 `D_R E_c=ρ_R` and the action square above certify functionality.
 
+[established-bounded; source-inspected] **First implementation return.**
+The [pair/serial and resident-score increment](../../research/records/2026-09-21_PAIR_CONTACT_SERIAL_KINEMATICS_AND_THE_RESIDENT_QUADRANCE_RETURN.md)
+returns packet 1's local adapter, packet 2's supported Cayley/prismatic kinematics and full link
+contact, and their finite/algebraic formal laws. `NativePairParticipation` now supplies the
+resident score/return required by packet 3; `QuadranceCurrent` consumes its explicit shared
+current chart in the old incident geometry. Generator-family geometry, source accumulation and
+phase receiving are still packet 3's consuming work, not discharged by that current chart.
+
 [definition; agent-inferred] **Packets and dependencies.** Paths below are relative to `crates/`
 except the formal row. Ownership is split per dispatch; rows listing the same file are
 sequential, not promises of disjoint edits.

@@ -118,7 +118,7 @@ pub use receiver::{
     NativeMaterialSourcePullbackReading, NativeNormalizedFaceMeasure,
     NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn, NativeNormalizedSection,
     NativeNormalizedSectionPullback, NativeNormalizedSectionPullbackReading,
-    NativeNormalizedSectionRowReading, NativePacketQuadrature, NativePhaseParticipation,
+    NativeNormalizedSectionRowReading, NativePacketQuadrature, NativePairParticipation, NativePairParticipationAdjoint, NativePhaseParticipation,
     NativePhaseParticipationAdjoint,
 };
 pub use resident_input::NativeFieldIncoming;

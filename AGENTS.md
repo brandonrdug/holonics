@@ -127,6 +127,14 @@ replaces. Continue from those returns through the roadmap's packets: pair contac
 chain, the generator-machine geometry, closure inference with standing/release, then economy
 and episodes, preserving the original target port and source fibre.
 
+[established-bounded; source-inspected] The [first campaign return](research/records/2026-09-21_PAIR_CONTACT_SERIAL_KINEMATICS_AND_THE_RESIDENT_QUADRANCE_RETURN.md)
+implements the exact pair-contact adapter and Cayley/prismatic serial chain with their formal
+laws. `NativePairParticipation` executes the quadrance score with separate geometry/value
+covectors on the device; `IncidentParticipationChart::QuadranceCurrent` binds the explicit
+same-current specialization into the existing HNN word and rest. Legacy bilinear mode remains
+the default. These are dependencies of the fixed generator/source/phase machine, whose actual
+configuration/current maps and source/receiving binding remain the next operation.
+
 [definition] `IncidentFieldOptions::response_port_start` fixes the receiving slots independently
 of input length; fresh sessions reserve the final receiving aperture. Generation, comparison
 and rest use the same binding. Native potential ordering supplies text/support selection, with
@@ -149,7 +157,7 @@ Paths in this table are relative to `crates/` unless stated otherwise. These are
 | Resident packets, kernels and launch | `holonic-engine/src/resident_section{,.rs}`; `kernels/exact_resident_section.cu`, `exact_packet_linear.cuh`; `holonic-mount/src/{cuda,launch_law,section_layout}.rs` |
 | Exact algebra / generator reduction | `holonic-engine/src/exact_linear{,.rs}`, `prime_image_algebra.rs`, `receiver_history_compression/`, `winding_inertia.rs`; host/reference and resident APIs have distinct scopes |
 | Retained availability and predictive release | `holonic-engine/src/{standing,receiver_release}.rs`, `exact_linear/{contextual,kernel_modes}.rs`; `field/internal_mode.rs` retains the equal-drive specialization and explicitly refuses incompatible operative currents; `Foundation/{Standing,CausalRelevance,ReceiverHistoryCompression}.lean` supplies future sufficiency |
-| Helical and geometric source | `relational-geometry/src/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs`; `receiver_history_compression/observable.rs::HelicalMomentReuse` binds finite pair actions to the existing moment decoder. No Rust file yet joins `ScrewPair` to `HolonicInteraction`: the pair-derived `ContactFace` is #28/#48 and the serial `SituatedScrew` chain #27; `Transport/HelicalPairInteraction.lean` is their checked statement |
+| Helical and geometric source | `relational-geometry/src/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs`; `receiver_history_compression/observable.rs::HelicalMomentReuse` binds finite pair actions to the existing moment decoder. `holonic_interaction/helical.rs` now joins `ScrewPair` to the checked `HolonicInteraction` with an explicit rate port; `holonic_chain/serial.rs` supplies exact Cayley/prismatic chains, contact rows and constrained target fibres. `Transport/{HelicalPairInteraction,SerialScrewChain}.lean` owns their checked algebra; the full HNN generator-machine binding remains #17 |
 | Winding, carry, address, trace faces and cell holonomy | Lean `Geometry/{PhaseCarry,PairResonance}`, `Transport/{GeneratorTraceFaces,CellHolonomy}` over `Millennium/{Farey,LocalFactor,TraceSequence,HodgeIndex,PlaceLedger,WindingLedger}`, `RH/{FosterTanks,HeatFlowStackedSeam}`, `Foundation/{HodgeReceiver,IwasawaTower,FractalPacking}`; Rust `relational-geometry/src/winding.rs` (`Odometer`, `LockAddress`, `SiteFactor`, `Machine`, `triangle_holonomy`); [guide](docs/WINDING_CARRY_AND_PLACEMENT.md) §8 lists the operands a design states |
 | Framework facade | `holonics/src/lib.rs`: `geometry` and `structure` work without the default native feature; HNN implementation is `holonics-hna` |
 | Formal entry | `formal/elementary-holonics/ElementaryHolonics/Framework.lean`: Core, Geometry, Dynamics, Information, Physics, Computation; [formal guide](docs/FORMAL_FRAMEWORK.md). Core imports `Foundation/{Standing,ReceiverRelease}`; Dynamics imports `Transport/{HolonicInteraction,HolonicChain,ContinuingTube,HelicalPairInteraction}`. A native packet that adds or changes a mathematical law lands with its Lean counterpart or names the obligation it leaves in #62 |

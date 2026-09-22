@@ -6,12 +6,12 @@ mod tests;
 use super::*;
 use crate::native::field_geometry::GeometricFieldSpec;
 use holonic_engine::{
+    ExactWavePhaseTransport,
     native_ecology::constitutive_fibre::{
-        NativePhaseParticipation, ResidentNormalEnclosureSection, ResidentNormalMaterial,
-        ResidentNormalMaterialView,
+        NativePairParticipation, NativePhaseParticipation, ResidentNormalEnclosureSection,
+        ResidentNormalMaterial, ResidentNormalMaterialView,
     },
     resident_section::{Dyadic, SeriesAperture},
-    ExactWavePhaseTransport,
 };
 pub use rest::NativeIncidentModelRest;
 
@@ -45,12 +45,36 @@ impl IncidentFieldSolver {
     }
 }
 
+/// The receiving chart used to compare current rows. The quadrance arm keeps varying
+/// self-energies and both geometric/value covectors. A full screw/configuration chart must
+/// additionally provide its maps; this arm does not label arbitrary currents as screw phases.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum IncidentParticipationChart {
+    #[default]
+    Bilinear,
+    /// Explicit same-source chart: score=-beta*|q-Uq_i|²/2, value=Uq_i.
+    /// Its neighbor receives the sum of geometric and value covectors. This is a current
+    /// specialization; a spatial generator chart additionally supplies its configuration maps.
+    QuadranceCurrent,
+}
+impl IncidentParticipationChart {
+    pub(crate) fn is_bilinear(&self) -> bool {
+        *self == Self::Bilinear
+    }
+}
+
 /// A declared local chart and material ownership on the existing geometric field.
 /// Equal degree does not imply shared material: sharing is supplied explicitly by this chart.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct IncidentFieldSpec {
     pub geometry: GeometricFieldSpec,
+    #[serde(
+        default,
+        skip_serializing_if = "IncidentParticipationChart::is_bilinear"
+    )]
+    pub participation: IncidentParticipationChart,
     pub local_roots: usize,
     /// One owner per geometric site, numbered contiguously. An empty list declares one per site.
     #[serde(default)]
@@ -77,6 +101,7 @@ struct IncidentLayout {
     width: usize,
     material_features: Vec<usize>,
     beta: Dyadic,
+    participation: IncidentParticipationChart,
     series: u32,
     steps: usize,
     relaxation_bits: u32,
@@ -145,6 +170,13 @@ impl IncidentLayout {
 }
 impl IncidentFieldSpec {
     fn compile(&self) -> Result<IncidentLayout, NativeSessionError> {
+        if self.participation == IncidentParticipationChart::QuadranceCurrent
+            && (self.geometry.beta_significand < 0 || self.geometry.beta_exponent == i32::MIN)
+        {
+            return Err(invalid(
+                "quadrance participation requires a nonnegative admitted scale",
+            ));
+        }
         if self.solve_steps == 0 || self.solve_steps > u32::MAX as usize {
             return Err(invalid("incident solve resource aperture"));
         }
@@ -227,6 +259,7 @@ impl IncidentFieldSpec {
             slot_rows: geometry.slot_rows,
             width,
             material_features: features,
+            participation: self.participation,
             beta: Dyadic {
                 significand: geometry.beta_significand,
                 exponent: geometry.beta_exponent,
@@ -241,10 +274,49 @@ impl IncidentFieldSpec {
 struct IncidentSiteStep<'c> {
     group: Rc<IncidentGroup>,
     query: Rc<ResidentNormalEnclosureSection<'c>>,
-    phase: NativePhaseParticipation<'c>,
+    phase: IncidentParticipationForward<'c>,
     condition: Option<ResidentNormalEnclosureSection<'c>>,
     features: ResidentNormalEnclosureSection<'c>,
 }
+enum IncidentParticipationForward<'c> {
+    Bilinear(NativePhaseParticipation<'c>),
+    Quadrance(NativePairParticipation<'c>),
+}
+impl<'c> IncidentParticipationForward<'c> {
+    fn output(&self) -> &ResidentNormalEnclosureSection<'c> {
+        match self {
+            Self::Bilinear(p) => p.output(),
+            Self::Quadrance(p) => p.output(),
+        }
+    }
+    #[cfg(test)]
+    fn transported_neighbors(&self) -> &ResidentNormalEnclosureSection<'c> {
+        match self {
+            Self::Bilinear(p) => p.transported_neighbors(),
+            Self::Quadrance(p) => p.values(),
+        }
+    }
+    fn pull_back(
+        &self,
+        gy: &ResidentNormalEnclosureSection<'c>,
+    ) -> Result<
+        (
+            ResidentNormalEnclosureSection<'c>,
+            ResidentNormalEnclosureSection<'c>,
+        ),
+        NativeSessionError,
+    > {
+        match self {
+            Self::Bilinear(p) => Ok(p.pull_back(gy, None)?.into_parts()),
+            Self::Quadrance(p) => {
+                let (query, neighbors, values) = p.pull_back(gy, None)?.into_parts();
+                // The serialized QuadranceCurrent chart declares one source in both roles.
+                Ok((query, neighbors.sum_same_shape(&values)?))
+            }
+        }
+    }
+}
+
 struct IncidentStep<'c> {
     sites: Vec<IncidentSiteStep<'c>>,
     input: ResidentNormalEnclosure<'c>,
@@ -605,12 +677,27 @@ impl<'c> IncidentFieldModel<'c> {
                     Rc::new(q.gather_phase_rows(&group.receivers, &phases(rows), layout.width)?);
                 let neighbors =
                     Rc::new(q.gather_phase_rows(&group.sources, &group.phases, layout.width)?);
-                let phase = query.clone().phase_participation(
-                    neighbors,
-                    group.neighbors,
-                    layout.beta,
-                    SeriesAperture(layout.series),
-                )?;
+                let phase = match layout.participation {
+                    IncidentParticipationChart::Bilinear => {
+                        IncidentParticipationForward::Bilinear(query.clone().phase_participation(
+                            neighbors,
+                            group.neighbors,
+                            layout.beta,
+                            SeriesAperture(layout.series),
+                        )?)
+                    }
+                    IncidentParticipationChart::QuadranceCurrent => {
+                        IncidentParticipationForward::Quadrance(
+                            query.clone().pair_quadrance_participation(
+                                Rc::clone(&neighbors),
+                                neighbors,
+                                group.neighbors,
+                                layout.beta,
+                                SeriesAperture(layout.series),
+                            )?,
+                        )
+                    }
+                };
                 let condition = if group.differences == 0 {
                     None
                 } else {
@@ -738,15 +825,13 @@ impl<'c> IncidentFieldModel<'c> {
                     }
                     None => (gf, None),
                 };
-                let phase = stage.phase.pull_back(&g, None)?;
-                let mut query = gq.sum_same_shape(phase.query())?;
-                previous = previous.sum_same_shape(
-                    &phase.transported_neighbors().scatter_phase_adjoint(
-                        &group.sources,
-                        &group.phases,
-                        layout.sites.len(),
-                    )?,
-                )?;
+                let (phase_query, phase_neighbors) = stage.phase.pull_back(&g)?;
+                let mut query = gq.sum_same_shape(&phase_query)?;
+                previous = previous.sum_same_shape(&phase_neighbors.scatter_phase_adjoint(
+                    &group.sources,
+                    &group.phases,
+                    layout.sites.len(),
+                )?)?;
                 if let Some(delta) = gdelta {
                     let zero_condition = zero(
                         self.field.surface(),

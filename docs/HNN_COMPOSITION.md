@@ -380,6 +380,16 @@ charts, receiving phases, the full pair
 receiver and its jet pullback; the reaction, global D/b, normal law, producing return,
 publication and rest below are consumed unchanged.
 
+[established-bounded; source-inspected] The first implementation increment now adds
+`NativePairParticipation`: separate geometric coordinates and transported values, score
+`−βQ/2`, the existing normalized receiver, and all geometric/value covectors. The serialized
+`IncidentParticipationChart::QuadranceCurrent` specializes it to `x=q`, `u=v=Uq_i`, so the
+neighbor's two covectors join before `U*`; legacy bilinear behavior is the default. Frozen
+comparisons retain their producing score through rest. The exact pair-contact and serial
+owners are returned dependencies; the actual generator-machine configuration/current and
+source/phase maps remain the next consuming construction.
+
+
 [established-bounded; source-inspected] The incident-field path now has a resident realization of
 the [executable field campaign](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#executable-field-campaign)
 boundary. The reaction consumes standing `q` and incident `Delta` through

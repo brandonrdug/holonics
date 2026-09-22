@@ -557,6 +557,16 @@ p_r=softmax(beta Re⟨q_r,u_ri⟩),     y_r=Σ_i p_ri u_ri,
 f_r=Phi(q_r,Delta_r),  a_r=y_r+M_r f_r.
 ```
 
+[established-bounded; implemented-exact] The default score above is tagged `Bilinear`.
+`IncidentParticipationChart::QuadranceCurrent` adds the declared current chart
+`s_i=−β||q_r−u_ri||²/2`. For `h=J_p(⟨g_y,u_i⟩+g_p[i])`, its return is
+`g_q=−βΣ_i h_i(q−u_i)` and `g_u[i]=p_i g_y+βh_i(q−u_i)`. Both source roles join before `U_i*`.
+The underlying `NativePairParticipation` supports separate geometry and value sections;
+the current specialization explicitly identifies their neighbor source. Its producing score
+choice survives rest and old specifications retain the default. The generic finite score
+remainder is checked in `HelicalPairInteraction.pairScore_add_sub`.
+[Construction and scope](../research/records/2026-09-21_PAIR_CONTACT_SERIAL_KINEMATICS_AND_THE_RESIDENT_QUADRANCE_RETURN.md).
+
 Flatten a once; one global D scatters `(a,b)` to `(w,b_ref)`. There is one internal b in the
 actual contact chart, not a copy for each row. With fixed anchor `(q_anchor,b_pre)` and a mask
 Hbar on supplied boundary coordinates, the entire state evolves by

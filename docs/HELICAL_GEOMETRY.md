@@ -242,6 +242,22 @@ and transfer determinant that phase carriage conserves (`Transport/GeneratorTrac
 the holonomy of a cell with harmonic standing relative to node/cell receivers (`Transport/CellHolonomy`).
 `relational_geometry::winding` is their exact native owner.
 
+[established-bounded; implemented-exact] **Returned Rust consumers.**
+`holonic_interaction/helical.rs::HelicalPairInteraction` constructs `J C` and the existing
+checked `ContactFace`/`MediumContact`/`HolonicInteraction` with an explicit medium-block split,
+PSD response, weight, units and clock. It exposes the full `(Δ,Q,DQ)` return and both kernels;
+`rank(D J C)=rank(J C)` checks definiteness on the attained slip image. The local wrapper uses
+unit storage and zero skew structure and retains that scope.
+
+`holonic_chain/serial.rs` now validates Cayley/prismatic finite charts against their
+unit-parameter generators and keeps clock rates separate. Its prefix is the local-joint product
+`base ∘ T₀ ∘ T₁…`, matched by `SerialScrewChain.serialFoldl_eq_configuration`. Link contacts
+form one full `J_chain* D J_chain` including cross-joint terms. Candidate closure evaluates the
+actual parameter family; the all-prismatic target preimage retains its nullspace, limits and
+endpoint equation. Broader finite screw flows and the generic continuous Jacobian proof remain
+explicit. The [return and receipts](../research/records/2026-09-21_PAIR_CONTACT_SERIAL_KINEMATICS_AND_THE_RESIDENT_QUADRANCE_RETURN.md)
+give the exact controls and native receiving connection.
+
 ## Two-sided angles are an algebraic chart of this construction
 
 [definition] The record's two-sided algebra `A_k=ℝ[ι]/(ι²−k)` and the conic

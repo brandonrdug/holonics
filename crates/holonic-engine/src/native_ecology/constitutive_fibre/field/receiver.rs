@@ -5,7 +5,7 @@ mod normalized;
 mod packet;
 pub use packet::{NativeMaterialActuation,NativeMaterialPacketReading,NativePacketQuadrature};
 pub use normalized::{
-    NativePhaseParticipation, NativePhaseParticipationAdjoint,NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn,
+    NativePairParticipation, NativePairParticipationAdjoint, NativePhaseParticipation, NativePhaseParticipationAdjoint,NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn,
     NativeMaterialPullbackMetric, NativeMaterialSourcePullback, NativeMaterialSourcePullbackReading,
     NativeNormalizedFaceMeasure, NativeNormalizedSection, NativeNormalizedSectionPullback,
     NativeNormalizedSectionPullbackReading, NativeNormalizedSectionRowReading};

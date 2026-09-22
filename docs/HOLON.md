@@ -89,7 +89,7 @@ It names no secret and no universal inverse.
 [definition] The computational object of this construction is the **helical pair interaction**:
 a `HolonicInteraction` whose declared rate ports carry the parameter rates of a
 `relational_geometry::screw::ScrewPair` and whose contact slip map is that pair's relative
-velocity. Its configuration, storage state and rate ports retain their explicit chart maps. It composes existing owners and introduces no wrapper type. The
+velocity. Its configuration, storage state and rate ports retain their explicit chart maps. The pair-contact adapter retains those existing owners and their declared rate-port map. The
 [design record](../research/records/2026-09-21_THE_HELICAL_PAIR_INTERACTION_IS_THE_HNN_SITE_AND_PHASE_CARRIES_CONTEXT.md)
 gives the source audit; the [helical guide](HELICAL_GEOMETRY.md#the-pair-is-a-holonic-interaction-contact)
 owns the geometry.
@@ -112,6 +112,13 @@ proves these pair/contact identities and the polarization identity
 `β cos(2π(q_i−q_j−φ_ij))` is therefore the pair quadrance with both advances zero and unit
 radii. The helix is the lift that retains the winding a torus chart forgets; the full pair
 receiver reads the periodic part and the axial part together.
+
+[established-bounded; implemented-exact] `holonic_interaction::helical::HelicalPairInteraction`
+now constructs the existing checked contact and interaction from the pair, its explicit rate
+port C, PSD material, positive weight, clock and frame/parameter units. Its local unit-storage,
+zero-skew specialization exposes both material-null and kinematic kernels. The
+[construction return](../research/records/2026-09-21_PAIR_CONTACT_SERIAL_KINEMATICS_AND_THE_RESIDENT_QUADRANCE_RETURN.md)
+records the full feature pullback, serial consumer and resident quadrance primitive.
 
 [definition] The action relation below is typed by this unit. `z` is a family of helical pair
 interactions with their media and incidence. `T_a` is their driven medium evolution composed

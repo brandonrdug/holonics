@@ -1711,6 +1711,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 #include "field_factor_material.cuh"
 #include "normal_applied_features.cuh"
 #include "phase_participation.cuh"
+#include "pair_quadrance.cuh"
 #include "normal_wave_source.cuh"
 #include "normal_wave_family.cuh"
 #include "normal_family_receiver.cuh"

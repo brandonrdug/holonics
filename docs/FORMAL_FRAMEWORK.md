@@ -85,6 +85,15 @@ statements keep harmonic standing relative to node/cell receivers and spectral f
 from the full future-action certificate. The [iteration record](../research/records/2026-09-21_THE_GENERATOR_MACHINE_RETAINS_ITS_SOURCE_AND_RECEIVING_LAWS.md)
 and [receipts](VERIFICATION_RECEIPTS.tsv) give their checked scope.
 
+[proved-derived; formal-checked] The [first implementation return](../research/records/2026-09-21_PAIR_CONTACT_SERIAL_KINEMATICS_AND_THE_RESIDENT_QUADRANCE_RETURN.md)
+adds `pairFeatureReturn_adjoint`, `pairQuadranceHessian_quad`, the rate-port congruence and
+PSD/null laws, and the finite quadrance score remainder. `Geometry/ScrewGeometry` adds
+translation-rechart composition. `Transport/SerialScrewChain`, imported by Dynamics, checks
+finite affine/Cayley/translation algebra and the local-joint product, including the native
+fold correspondence. General proper-rotation cross-product covariance and continuous chain
+Jacobian correspondence retain their #62 obligations. The integrated Framework check passes
+at 9,207 jobs; added statements use standard axioms only.
+
 [open] #62 owns the actual remaining joins: proper-rotation recharting/axis extraction;
 serial finite motions compatible with their generators and Jacobian; Cayley phase versus
 clock/lift and checked closure; source-indexed moment accumulation with decoder, ordered

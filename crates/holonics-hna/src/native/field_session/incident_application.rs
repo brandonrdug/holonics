@@ -170,6 +170,7 @@ impl<'c> NativeFieldSession<'c> {
         let body = NativeCoupledBody::found_incident_field(
             surface,
             super::super::IncidentFieldSpec {
+                participation: options.participation,
                 geometry: geometry.clone(),
                 local_roots: options.local_roots,
                 material_owners: options.material_owners.clone(),

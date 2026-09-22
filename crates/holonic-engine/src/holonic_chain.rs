@@ -2557,5 +2557,8 @@ fn identity_form(extent: usize) -> Result<SymmetricForm, ChainRefusal> {
     Ok(SymmetricForm::from_rows(rows)?)
 }
 
+/// Ordered articulated-body kinematics: finite rigid joint actions and their differential.
+pub mod serial;
+
 #[cfg(test)]
 mod tests;

@@ -18,6 +18,7 @@ fn spec() -> FieldSessionSpec {
         source_chart: FieldSourceChart::IncidentField,
         geometry: Some(linked_torus_field::linked_torus_field_spec(1, 2, 1).unwrap()),
         incident: Some(IncidentFieldOptions {
+            participation: Default::default(),
             local_roots: 1,
             material_seed: 0x91_22_7a,
             response_aperture: 2,

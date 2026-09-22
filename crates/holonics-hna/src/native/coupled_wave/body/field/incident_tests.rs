@@ -23,6 +23,7 @@ fn spec() -> IncidentFieldSpec {
     geometry.refinement_steps = 2;
     geometry.relaxation_bits = 2;
     IncidentFieldSpec {
+        participation: Default::default(),
         geometry,
         local_roots: 1,
         material_owners: vec![],
@@ -241,14 +242,15 @@ fn incident_full_word_pullback_returns_anchor_and_all_stage_operands() {
     assert_eq!(pull.contacts.len(), model.layout.steps);
     assert_eq!(pull.material.len(), model.materials.len());
     assert!(pull.material.iter().map(Vec::len).sum::<usize>() > 0);
-    assert!(pull
-        .anchor
-        .view()
-        .inspect()
-        .unwrap()
-        .center
-        .iter()
-        .any(|v| !v.is_zero()));
+    assert!(
+        pull.anchor
+            .view()
+            .inspect()
+            .unwrap()
+            .center
+            .iter()
+            .any(|v| !v.is_zero())
+    );
 
     // At beta=0 this two-stage word is a polynomial of degree at most four along a
     // source direction. Central Richardson cancels its cubic term exactly, so the only
@@ -358,4 +360,85 @@ fn incident_pending_restores_frozen_word_and_preview_is_nonmutating() {
             .unwrap(),
         output
     );
+}
+
+#[test]
+fn incident_participation_wire_preserves_legacy_and_tags_quadrance() {
+    let legacy = spec();
+    let wire = serde_json::to_value(&legacy).unwrap();
+    assert!(wire.get("participation").is_none());
+    let restored: IncidentFieldSpec = serde_json::from_value(wire).unwrap();
+    assert_eq!(restored.participation, IncidentParticipationChart::Bilinear);
+    let mut geometric = legacy;
+    geometric.participation = IncidentParticipationChart::QuadranceCurrent;
+    let wire = serde_json::to_value(&geometric).unwrap();
+    assert_eq!(wire["participation"], "quadrance-current");
+    assert_eq!(
+        serde_json::from_value::<IncidentFieldSpec>(wire).unwrap(),
+        geometric
+    );
+}
+
+#[test]
+#[ignore = "requires CUDA; quadrance consumer keeps both source returns and its producing chart through rest"]
+fn incident_quadrance_word_retains_complete_return_and_saved_chart() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let mut model = model(&surface);
+    model.spec.participation = IncidentParticipationChart::QuadranceCurrent;
+    model.layout.participation = IncidentParticipationChart::QuadranceCurrent;
+    model.spec.geometry.beta_significand = 1;
+    model.spec.geometry.beta_exponent = 0;
+    model.layout.beta = Dyadic::ONE;
+    model.spec.geometry.series_terms = 40;
+    model.layout.series = 40;
+    let source = model.field.read_current_source().unwrap();
+    let anchor = make_anchor(
+        &surface,
+        source.boundary_components(),
+        source.enclosure().grain(),
+        0,
+    );
+    let held = vec![false; anchor.view().components() / 2];
+    let prepared = model.prepare(anchor.view(), &held).unwrap();
+    assert!(
+        prepared
+            .word
+            .steps
+            .iter()
+            .flat_map(|s| &s.sites)
+            .all(|s| matches!(s.phase, IncidentParticipationForward::Quadrance(_)))
+    );
+    let back = model.pull_back(&prepared.word, prepared.word.output.view()).unwrap();
+    assert_eq!(back.contacts.len(), model.layout.steps);
+    assert!(
+        back.anchor
+            .inspect()
+            .unwrap()
+            .center
+            .iter()
+            .any(|x| !x.is_zero())
+    );
+    let generated = model.publish(prepared, false, true).unwrap();
+    let before = generated.joint_output().inspect().unwrap();
+    let restored = model.rest().unwrap().remount(&surface).unwrap();
+    assert_eq!(
+        restored.spec.participation,
+        IncidentParticipationChart::QuadranceCurrent
+    );
+    assert_eq!(restored.pending.len(), 1);
+    let word = Rc::clone(restored.pending.values().next().unwrap());
+    assert_eq!(word.output.inspect().unwrap(), before);
+    let restored_back = restored.pull_back(&word, word.output.view()).unwrap();
+    assert_eq!(
+        restored_back.anchor.inspect().unwrap(),
+        back.anchor.inspect().unwrap()
+    );
+    for (left, right) in restored_back.material.iter().zip(&back.material) {
+        assert_eq!(left.len(), right.len());
+        for ((lf, lg), (rf, rg)) in left.iter().zip(right) {
+            assert_eq!(lf.rest().unwrap(), rf.rest().unwrap());
+            assert_eq!(lg.rest().unwrap(), rg.rest().unwrap());
+        }
+    }
 }

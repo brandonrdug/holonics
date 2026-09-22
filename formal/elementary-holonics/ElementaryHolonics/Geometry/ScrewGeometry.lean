@@ -85,6 +85,23 @@ def translated (t : Vec) (ξ : Screw) : Screw where
   angular := ξ.angular
   linear := ξ.linear + t ⨯₃ ξ.angular
 
+/-- [definition] Rechart a screw through the finite translation `x ↦ x + t`. The angular
+component is unchanged and the linear component carries the translation arm. -/
+def translationRechart (t : Vec) (ξ : Screw) : Screw := translated t ξ
+
+/-- [proved-derived; formal-checked] Translation recharts compose in the same ordered direction
+as their affine actions. -/
+theorem translationRechart_add (s t : Vec) (ξ : Screw) :
+    translationRechart s (translationRechart t ξ) = translationRechart (s + t) ξ := by
+  cases ξ with
+  | mk ω v =>
+      have hlin : v + t ⨯₃ ω + s ⨯₃ ω = v + (s + t) ⨯₃ ω := by
+        funext i
+        fin_cases i <;> simp [cross_apply] <;> ring
+      change (Screw.mk ω (v + t ⨯₃ ω + s ⨯₃ ω)) =
+        Screw.mk ω (v + (s + t) ⨯₃ ω)
+      rw [hlin]
+
 theorem velocity_translation_covariance (t : Vec) (ξ : Screw) (x : Vec) :
     velocity (translated t ξ) (x + t) = velocity ξ x := by
   funext i

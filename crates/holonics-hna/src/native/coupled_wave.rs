@@ -22,7 +22,7 @@ use std::{
 mod body;
 pub use body::SavedCoupledBody;
 pub use body::{
-    IncidentFieldSolver, IncidentFieldSpec, NativeCoupledBody, NativeFieldAttachRefusal,
+    IncidentFieldSolver, IncidentFieldSpec, IncidentParticipationChart, NativeCoupledBody, NativeFieldAttachRefusal,
     NativeFieldFormation, NativeFieldGeneratedSection, NativeFieldModelRest,
     NativeFieldReactionPort, NativeIncidentGenerated, NativeIncidentMaterialReturn,
     NativeIncidentModelRest,

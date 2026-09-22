@@ -229,6 +229,10 @@ pub const SPECTRAL_COUNT_CEILING: usize = 24;
 /// this ceiling [`HolonicInteraction::conservative_core`] refuses by name rather than running.
 pub const CONSERVATIVE_CORE_CEILING: usize = 64;
 
+/// Exact adapter from a situated `ScrewPair` to this module's checked contact and interaction
+/// owners.  The adapter lives below this module so the pair remains the source of its slip map.
+pub mod helical;
+
 /// **The extent above which a form's passages are not named by winding.**
 ///
 /// [definition] [`crate::winding_inertia::winding_inertia`] isolates one algebraic root per

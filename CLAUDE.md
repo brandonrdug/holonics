@@ -161,7 +161,7 @@ port and source fibre.
 | Normalization and adjoints | `field/receiver/normalized{,.rs}`, `normalized/phase.rs`, `field/material_transport/normal/direct/section{,/composition}.rs`, `resident/section/bilinear_features.rs`; exact reference `exponentiated_ratio::transport::NormalizedKernel` |
 | Kernels and their Rust binders | `crates/holonic-engine/kernels/{exact_resident_section.cu,field_normalized_receiver.cuh,normal_applied_condition.cuh,section_bilinear_adjoint.cuh}`; `src/resident_section/` |
 | Hardware law | `hardware_cover`, `section_partition`; `crates/holonic-mount/src/{cuda,launch_law,section_layout}.rs` |
-| Exact geometry and helical pair | `crates/relational-geometry/src/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs`; `receiver_history_compression/observable.rs::HelicalMomentReuse` binds finite pair actions to the existing moment decoder. No Rust file yet joins `ScrewPair` to `HolonicInteraction`: the pair-derived `ContactFace` is #28/#48 and the serial `SituatedScrew` chain #27; `Transport/HelicalPairInteraction.lean` is their checked statement |
+| Exact geometry and helical pair | `crates/relational-geometry/src/{exact,model,screw,exact_analysis}.rs`; `holonic-engine/src/{identity_atlas,exact_contact,holonic_interaction,holonic_chain}.rs`; `receiver_history_compression/observable.rs::HelicalMomentReuse` binds finite pair actions to the existing moment decoder. `holonic_interaction/helical.rs` now joins `ScrewPair` to the checked `HolonicInteraction` with an explicit rate port; `holonic_chain/serial.rs` supplies exact Cayley/prismatic chains, contact rows and constrained target fibres. `Transport/{HelicalPairInteraction,SerialScrewChain}.lean` owns their checked algebra; the full HNN generator-machine binding remains #17 |
 | Winding, carry, address, trace faces and cell holonomy | Lean `Geometry/{PhaseCarry,PairResonance}`, `Transport/{GeneratorTraceFaces,CellHolonomy}` over the existing `Millennium/{Farey,LocalFactor,TraceSequence,HodgeIndex,PlaceLedger,WindingLedger}`, `RH/{FosterTanks,HeatFlowStackedSeam}`, `Foundation/{HodgeReceiver,IwasawaTower,FractalPacking}`; Rust `crates/relational-geometry/src/winding.rs` (`Odometer`, `LockAddress`, `SiteFactor`, `Machine`, `triangle_holonomy`) |
 | Algebra and economical continuation | `exact_linear`, `prime_image_algebra`, `receiver_history_compression`, `winding_inertia`; resident bilinear/normal/word/mode owners at their separate call boundaries |
 | Retained availability and predictive release | `holonic-engine/src/{standing,receiver_release}.rs`, `exact_linear/{contextual,kernel_modes}.rs`; `field/internal_mode.rs` retains the equal-drive specialization and explicitly refuses incompatible operative currents; `Foundation/{Standing,CausalRelevance,ReceiverHistoryCompression}.lean` supplies future sufficiency |
@@ -298,3 +298,11 @@ actual attribution rather than a hardcoded model name.
 run artifacts. Publish source and scoped evidence without raw private conversation or source
 paths. Dataset roles and provenance are exterior codec information, not native semantic IDs.
 The current application position and next action live only in CONSTRUCTION_STATE and the roadmap.
+
+[established-bounded; source-inspected] The [first campaign return](research/records/2026-09-21_PAIR_CONTACT_SERIAL_KINEMATICS_AND_THE_RESIDENT_QUADRANCE_RETURN.md)
+implements the exact pair-contact adapter and Cayley/prismatic serial chain with their formal
+laws. `NativePairParticipation` executes the quadrance score with separate geometry/value
+covectors on the device; `IncidentParticipationChart::QuadranceCurrent` binds the explicit
+same-current specialization into the existing HNN word and rest. Legacy bilinear mode remains
+the default. These are dependencies of the fixed generator/source/phase machine, whose actual
+configuration/current maps and source/receiving binding remain the next operation.

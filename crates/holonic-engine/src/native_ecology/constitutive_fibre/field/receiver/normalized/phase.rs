@@ -310,6 +310,15 @@ impl<'c> NativePhaseParticipation<'c> {
     }
 }
 impl<'c> NativePhaseParticipationAdjoint<'c> {
+    /// Move the two source covectors without allocating or copying resident packets.
+    pub fn into_parts(
+        self,
+    ) -> (
+        ResidentNormalEnclosureSection<'c>,
+        ResidentNormalEnclosureSection<'c>,
+    ) {
+        (self.source, self.neighbors)
+    }
     pub fn query(&self) -> &ResidentNormalEnclosureSection<'c> {
         &self.source
     }

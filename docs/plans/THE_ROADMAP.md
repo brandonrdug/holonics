@@ -130,11 +130,13 @@ now adds actual contextual text, producing-comparison and delivery restart. Broa
 conduct and economical representation continue through that consumer. Fitting another predictor
 to the field is a separate application.
 
-[project-postulate] The current September 21 pass finalizes designs and elementary formal
-contracts before the user initiates the implementation campaign. The
-[iteration record](../../research/records/2026-09-21_THE_GENERATOR_MACHINE_RETAINS_ITS_SOURCE_AND_RECEIVING_LAWS.md)
-resolves the source-moment, chart, phase, kernel, standing and invariant boundaries. The
-construction below is the agreed next order; this pass does not begin its native packets.
+[project-postulate] The September 21 design iteration is complete and the user has authorized
+the implementation campaign with Luna delegation. The
+[first construction return](../../research/records/2026-09-21_PAIR_CONTACT_SERIAL_KINEMATICS_AND_THE_RESIDENT_QUADRANCE_RETURN.md)
+lands pair-derived contact, the supported exact serial joint charts and their formal laws,
+plus the resident quadrance receiver in the existing HNN word. The next consuming operation
+is the fixed generator-machine geometry and source/phase receiver binding; its declaration
+and resident affine chart maps are in progress. The existing slot model remains its control.
 
 ## Athena construction order
 
@@ -238,11 +240,13 @@ has the following implementation position, in dependency order:
    HnaStream and the exposure/workbench caller retain source regions, actual joins,
    original receiver and pending delivery. Source and response extents are receiving apertures,
    not native clocks or alphabet-derived geometry.
-4. **Join the pair to the interaction and chain (#28/#48, #27; formal #62).** Derive
-   `J=[v_a|−v_b]` with its frame, units and rate-port embedding; retain the PSD material
-   kernel and the definite no-slip specialization. The serial kinematic chain declares finite
-   motions compatible with its generators and clocks; its contact integration consumes the
-   pair adapter. Existing `screw.rs` is the source, not a placeholder for a new screw theory.
+4. **Returned pair contact and supported serial charts (#28/#48, #27; formal #62).** The
+   pair adapter derives `J=[v_a|−v_b]` and its rate-port embedding, preserving material-null
+   and no-slip kernels. The serial consumer validates Cayley/prismatic finite motions and
+   returns ordered transforms, parameter/clock tangents, constrained prismatic target fibres
+   and full link-contact forms. Their algebraic/finite Lean laws are checked. Broader finite
+   screw flows and generic continuous chain differential proofs retain their stated scope.
+
 5. **Build the machine geometry and source/receiver binding (#17).** Declare the maps from
    resident current to configuration and from geometric actions to current transport. Retain
    actual phase/lift and closure witnesses; `RationalPhase` is a Cayley chart and finite

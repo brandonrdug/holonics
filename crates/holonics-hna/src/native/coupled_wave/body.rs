@@ -23,7 +23,7 @@ mod field;
 pub use field::formation::NativeFieldFormation;
 use field::incident::IncidentFieldModel;
 pub use field::incident::{
-    IncidentFieldSolver, IncidentFieldSpec, NativeIncidentGenerated, NativeIncidentMaterialReturn,
+    IncidentFieldSolver, IncidentFieldSpec, IncidentParticipationChart, NativeIncidentGenerated, NativeIncidentMaterialReturn,
     NativeIncidentModelRest,
 };
 use field::FieldModel;

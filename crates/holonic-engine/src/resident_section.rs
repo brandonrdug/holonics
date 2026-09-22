@@ -112,6 +112,7 @@ mod surface_wave_relation;
 mod surface_wave_source;
 mod surface_material_support;
 mod surface_phase_participation;
+mod surface_pair_quadrance;
 mod surface_enclosure_composition;
 mod surface_incident;
 mod surface_global_field_action;
@@ -174,7 +175,7 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 87] = [
+pub const KERNELS: [&str; 89] = [
     "section_constitutive_rechart",
     "section_constitutive_circulation",
     "section_constitutive_fibre",
@@ -249,6 +250,8 @@ pub const KERNELS: [&str; 87] = [
     "section_normal_enclosure_sum_section",
     "section_normal_enclosure_scatter_section",
     "section_normal_enclosure_restrict_section",
+    "section_pair_quadrance_logits",
+    "section_pair_quadrance_adjoint",
     "section_phase_participation",
     "section_phase_participation_weighted",
     "section_phase_participation_terms",
