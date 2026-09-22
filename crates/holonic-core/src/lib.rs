@@ -25,8 +25,14 @@
 //! `holonic-engine`, which re-exports every item at its existing path; behaviour, work receipts and
 //! wire formats are unchanged.
 //!
-//! The facet modules are empty in phase 2. Their types arrive in phase 3 and later, from the
-//! existing owners the plan's facet survey names.
+//! **The facets** (phase 3a): [`port`] (bonds, power, units), [`dirac`] (kernel-form Dirac
+//! structures, composition, interconnection, pushforward), [`complex`] (validated cell complexes,
+//! connection incidence and curvature), [`element`] (storage, certified resistance, source, active,
+//! pump), [`generator`] (transport, initial configuration, clock, phase lift), [`restriction`] (port
+//! maps, scale square, Kron), [`holon`] (the port Holon, the medium, the Holon and its state),
+//! [`law`] (`HolonLaw`, `EnergyBalance`, the exact reference motion), [`deposition`] (commit
+//! balance, deposit ledger, exact passive projection) and [`conformance`]. Everything computes over
+//! `Rat`; the engine consumers adopt them in the later phases.
 
 pub mod exact_linear;
 pub mod exact_value;
@@ -40,6 +46,7 @@ pub mod rebase_invariants;
 
 pub mod complex;
 pub mod conformance;
+pub mod deposition;
 pub mod dirac;
 pub mod element;
 pub mod generator;
