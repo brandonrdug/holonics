@@ -6,6 +6,7 @@ import ElementaryHolonics.Holon.Generator
 import ElementaryHolonics.Holon.Restriction
 import ElementaryHolonics.Holon.Law
 import ElementaryHolonics.Holon.Conformance
+import ElementaryHolonics.Holon.Deposition
 
 /-!
 # The Holon object
@@ -14,7 +15,8 @@ import ElementaryHolonics.Holon.Conformance
 is its law and ports — complex and connection (`Holon.Complex`), ports and power (`Holon.Port`),
 Dirac interconnection (`Holon.Dirac`), element relations and balances (`Holon.Element`),
 generators and clock jumps (`Holon.Generator`), restrictions (`Holon.Restriction`), the five laws
-(`Holon.Law`) and the existing owners as instances (`Holon.Conformance`). Namespace
+(`Holon.Law`), the existing owners as instances (`Holon.Conformance`) and deposition under
+learning (`Holon.Deposition`). Namespace
 `Soma.Holonics.HolonCore`. No axioms are added.
 -/
 
@@ -103,4 +105,17 @@ open Soma.Holonics.HolonCore
 #print axioms maxwell_balance
 #print axioms hat_casimir
 #print axioms navierStokes_balance
+#print axioms deposition_work
+#print axioms commit_balance
+#print axioms learned_rate_form
+#print axioms learned_energy_balance
+#print axioms energy_product_bound
+#print axioms committed_energy_bound
+#print axioms product_le_exp_sum
+#print axioms normal_law_divergence_witness
+#print axioms clipNeg_nonpos
+#print axioms clipNeg_of_nonpos
+#print axioms projectPassive_passive
+#print axioms projectPassive_of_passive
+#print axioms projected_committed_energy_bound
 end Audit
