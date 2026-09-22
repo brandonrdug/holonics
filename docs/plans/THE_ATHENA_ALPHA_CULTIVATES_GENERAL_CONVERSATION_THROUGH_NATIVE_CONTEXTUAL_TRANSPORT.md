@@ -1525,6 +1525,28 @@ RL learner are outside the next native composition.
 
 <a id="executable-field-campaign"></a>
 
+<a id="measured-return-in-bits"></a>
+
+[definition] **Every return on the machine is reported in bits, using the owners the
+framework already has.** Compression is intelligence is navigation; a coefficient change,
+matched string count, checkpoint size or enclosure radius answers only its own question. Per
+request/observe, with the exterior codec alphabet `A` and the model's normalized receiving
+face `p` (`Foundation/InformationReceiver`, native `receiver/normalized`):
+
+| Quantity | Definition | Owner |
+|---|---|---|
+| `H_src` | source code length seen so far: `Σ_k log₂\|A\|` or the actual exterior codec bits for `N` cells | codec |
+| `L_target\|model` | target code length under the model: `Σ_j −log₂ p_j(t_j)` plus the stop term; report the uniform baseline `log₂\|A\|` per position and the order-0/order-1 empirical baseline of the exposure stream; the gain is their difference, in bits and bits/position | `InformationReceiver.crossEntropy`; native `p−q` is its gradient |
+| `B_state` | exact bit length of the continuing chart — `rho`, `E`, `M`, `R`, `q`, `b`, phases/windings — countable because arithmetic is exact dyadic/rational; `B_pending` separately for outstanding comparisons | `PresentationCost.CostReceipt.bytes`, `winding_inertia` bit growth |
+| compression | `B_state / Σ H_src` over the exposure, **and** the future-exact test: the quotient's admitted receiving faces versus the full state's, as KL in bits at the declared receiver (`E_next T=U E` residual) | `ReceiverHistoryCompression`, `ReceiverCodeCost` |
+| navigation | the generator word that reaches the receiving face: step count, lock-address depth (Farey word in `⟨step, inversion⟩`) and winding, versus the shortest admitted word; for a motor chart the screw-chain word in rad/m and wrench–twist power in W | `winding::LockAddress`, `SerialScrewChain` |
+| cost | `CostReceipt{bytes, decodeWork, updateWork, certificateWork, residual}` with provenance | `PresentationCost` |
+
+Units are stated with each number. A run that reports none of these has not measured
+learning. The six-cycle amplitude control (`ab`/`ba`, `\|A\|=2`, aperture 2) has `H_src=2`
+bits per request and a target of `2·log₂2+log₂3≈3.58` bits; its `L_target|model` was not
+recorded, which is the defect this row repairs.
+
 [definition; agent-inferred] This is the implemented incident-field specialization used by the current campaign.
 The [implementation return](../../research/records/2026-09-21_THE_INCIDENT_FIELD_JOINS_ITS_GENERATOR_RECEIVER_AND_FROZEN_RETURN.md)
 connects its returned owners and measured application scope. The object is one continuing field with its source and receiving interfaces. The deliverable is
