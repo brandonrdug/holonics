@@ -285,7 +285,12 @@ impl<'c> NativeIncidentGenerated<'c> {
             source.grain(),
         )
         .map_err(invalid)?;
-        let transport = MachineValueTransport::new(source.clone(), &source_indices, coefficients)?;
+        let transport = MachineValueTransport::new_with_enclosure(
+            source.clone(),
+            &source_indices,
+            coefficients,
+            self.word.enclosure_propagation.clone(),
+        )?;
         let output = transport
             .output()
             .pack_components(binding.ports.len())

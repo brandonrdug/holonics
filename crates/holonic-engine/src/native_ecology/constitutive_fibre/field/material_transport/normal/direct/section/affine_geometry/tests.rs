@@ -356,3 +356,90 @@ fn gy_for_projection<'c>(
         AFFINE_GEOMETRY_COMPONENTS,
     )
 }
+
+#[test]
+#[ignore = "requires CUDA; a joint-ball affine identity and its transpose must not widen the source"]
+fn joint_affine_identity_preserves_the_whole_ball_radius() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let grain = ResidentGrain(96);
+    let unit = 1i128 << grain.0;
+    let r = unit / 128;
+    let source = Rc::new(balls_at_grain(
+        &surface,
+        &[(vec![unit, -unit, 2 * unit, 0, unit / 2, unit], r)],
+        6,
+        grain,
+    ));
+    let coefficients = ResidentNormalEnclosureSection::affine_coefficients(
+        &surface,
+        &[AffineMap3::identity()],
+        grain,
+    )
+    .unwrap();
+    let legacy = source
+        .clone()
+        .affine_geometry(&[0], coefficients.clone(), false)
+        .unwrap();
+    let joint = source
+        .clone()
+        .affine_geometry_with_enclosure(
+            &[0],
+            coefficients,
+            false,
+            NativeEnclosurePropagation::JointBall,
+        )
+        .unwrap();
+    let expected = source.row(0).unwrap().inspect().unwrap();
+    let returned = joint.output().row(0).unwrap().inspect().unwrap();
+    assert_eq!(returned, expected);
+    assert_eq!(
+        legacy.output().row(0).unwrap().inspect().unwrap().radius,
+        expected.radius.clone() * q(6, 1)
+    );
+    let pulled = joint.pull_back(&source).unwrap();
+    assert_eq!(pulled.source().row(0).unwrap().inspect().unwrap(), expected);
+}
+
+#[test]
+#[ignore = "requires CUDA; joint affine coefficient/input perturbations lie inside the returned ball"]
+fn joint_affine_ball_covers_simultaneous_map_and_source_variation() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let unit = 1i128 << 16;
+    let source = Rc::new(balls(
+        &surface,
+        &[(vec![unit, unit, -unit, 0, unit / 2, 0], unit / 16)],
+        6,
+    ));
+    let maps = Rc::new(balls(
+        &surface,
+        &[(
+            vec![unit, 0, 0, 0, unit, 0, 0, 0, unit, unit, 0, 0],
+            unit / 16,
+        )],
+        12,
+    ));
+    let joined = source
+        .affine_geometry_with_enclosure(&[0], maps, false, NativeEnclosurePropagation::JointBall)
+        .unwrap();
+    let y = joined.output().row(0).unwrap().inspect().unwrap();
+    // delta x=(1/16,0,...), delta R00=1/32, delta t0=1/32: the
+    // joint coefficient norm sqrt(2)/32 is below the declared 1/16 radius.
+    let actual = [
+        wave(33 * 17 + 16 * 33, 33 * 16, 32 * 16),
+        wave(-1, 0, 1),
+        wave(1, 0, 2),
+    ];
+    let error: Rat = y
+        .center
+        .iter()
+        .zip(actual)
+        .map(|(centre, actual)| {
+            let re = &centre.real - actual.real;
+            let im = &centre.imaginary - actual.imaginary;
+            &re * &re + &im * &im
+        })
+        .sum();
+    assert!(error <= &y.radius * &y.radius);
+}

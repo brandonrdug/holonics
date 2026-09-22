@@ -25,6 +25,10 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
         }
         let surface = self.field.relation.surface;
         let append = returned.factor_count != 0;
+        if append && old.amplitude_family.is_some() {
+            // A free operator delta is outside this declared positive pair family.
+            return Err(Error::Shape);
+        }
         let next_rank = old
             .rank
             .checked_add(if append { 2 } else { 0 })
@@ -101,6 +105,7 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
         }
         let program = if append {
             Rc::new(OperativeFactorProgram {
+                amplitude_family: None,
                 row_offsets: Rc::clone(&old.row_offsets),
                 columns: Rc::clone(&old.columns),
                 values: Rc::clone(&old.values),
@@ -128,8 +133,17 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
             factor_program: Some(program),
         });
         sections.refresh_factor_aggregate(surface, self.grain)?;
-        let mut returns = self.returns.clone();
-        returns.push(returned);
+        // A source-only pure-CSR field has no historical occurrence decoder. Its complete
+        // current factor programme and q/b are sufficient for subsequent operations;
+        // outstanding comparisons own their producing sections independently. Keeping these
+        // already applied deltas would duplicate that state as an ever-growing event archive.
+        let returns = if self.field.relation.source_only() && old.rank == 0 && !append {
+            Vec::new()
+        } else {
+            let mut returns = self.returns.clone();
+            returns.push(returned);
+            returns
+        };
         Ok(Self {
             field: self.field,
             origin: Rc::new(()),

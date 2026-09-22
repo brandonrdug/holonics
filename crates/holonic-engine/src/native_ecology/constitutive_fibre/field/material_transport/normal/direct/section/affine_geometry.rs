@@ -16,6 +16,16 @@ use std::rc::Rc;
 pub const AFFINE_GEOMETRY_COMPONENTS: usize = 6;
 pub const AFFINE_GEOMETRY_COEFFICIENTS: usize = 12;
 
+/// Numerical enclosure law. The legacy coordinate-interval reading remains available
+/// for exact reconstruction of older producing words; JointBall keeps the coupled metric.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum NativeEnclosurePropagation {
+    #[default]
+    ComponentIntervals,
+    JointBall,
+}
+
 pub struct NativeAffineGeometry<'c> {
     source: Rc<ResidentNormalEnclosureSection<'c>>,
     indices: ResidentSection<'c>,
@@ -23,6 +33,7 @@ pub struct NativeAffineGeometry<'c> {
     coefficients: Rc<ResidentNormalEnclosureSection<'c>>,
     output: Rc<ResidentNormalEnclosureSection<'c>>,
     project: bool,
+    enclosure: NativeEnclosurePropagation,
 }
 
 pub struct NativeAffineGeometryAdjoint<'c> {
@@ -242,6 +253,22 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
         coefficients: Rc<ResidentNormalEnclosureSection<'c>>,
         project: bool,
     ) -> Result<NativeAffineGeometry<'c>, ConstitutiveFibreError> {
+        self.affine_geometry_with_enclosure(
+            source_indices,
+            coefficients,
+            project,
+            NativeEnclosurePropagation::ComponentIntervals,
+        )
+    }
+
+    /// Affine transport with an explicit producing enclosure law.
+    pub fn affine_geometry_with_enclosure(
+        self: Rc<Self>,
+        source_indices: &[usize],
+        coefficients: Rc<ResidentNormalEnclosureSection<'c>>,
+        project: bool,
+        enclosure: NativeEnclosurePropagation,
+    ) -> Result<NativeAffineGeometry<'c>, ConstitutiveFibreError> {
         let surface = self.resident_section().surface();
         let grain = self.grain();
         let rows = source_indices.len();
@@ -291,6 +318,7 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
                 rows,
                 grain.0,
                 project,
+                enclosure == NativeEnclosurePropagation::JointBall,
                 &output,
                 &flags,
             )?;
@@ -318,6 +346,7 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
             coefficients,
             output,
             project,
+            enclosure,
         })
     }
 }
@@ -443,6 +472,7 @@ impl<'c> NativeAffineGeometry<'c> {
                 rows,
                 self.source.grain().0,
                 self.project,
+                self.enclosure == NativeEnclosurePropagation::JointBall,
                 &gathered,
                 &flags,
             )?;

@@ -10,6 +10,9 @@ import ElementaryHolonics.Transport.SerialScrewChain
 import ElementaryHolonics.Transport.GeneratorMachineCharts
 import ElementaryHolonics.Transport.GeneratorSourceEpisode
 import ElementaryHolonics.Transport.ContactFactorScale
+import ElementaryHolonics.Transport.ContactAmplitudeState
+import ElementaryHolonics.Transport.AffineJointBall
+import ElementaryHolonics.Transport.PairJointBall
 import ElementaryHolonics.Transport.GeneratorTraceFaces
 import ElementaryHolonics.Transport.CellHolonomy
 import ElementaryHolonics.Mathematics.AffineOrbitDivisor

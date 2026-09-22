@@ -123,6 +123,7 @@ impl<'c> ResidentSurface<'c> {
         rows: usize,
         grain: u32,
         project: bool,
+        joint: bool,
         output: &ResidentSection<'c>,
         flags: &ResidentSection<'c>,
     ) -> Result<(), ResidentRefusal> {
@@ -138,6 +139,7 @@ impl<'c> ResidentSurface<'c> {
             .u32(rows as u32)
             .u32(grain)
             .u32(u32::from(project))
+            .u32(u32::from(joint))
             .ptr(output.lo_device_ptr())
             .ptr(output.hi_device_ptr())
             .ptr(flags.lo_device_ptr())
@@ -164,6 +166,7 @@ impl<'c> ResidentSurface<'c> {
         rows: usize,
         grain: u32,
         project: bool,
+        joint: bool,
         output: &ResidentSection<'c>,
         flags: &ResidentSection<'c>,
     ) -> Result<(), ResidentRefusal> {
@@ -195,6 +198,7 @@ impl<'c> ResidentSurface<'c> {
             .u32(rows as u32)
             .u32(grain)
             .u32(u32::from(project))
+            .u32(u32::from(joint))
             .ptr(output.lo_device_ptr())
             .ptr(output.hi_device_ptr())
             .ptr(flags.lo_device_ptr())

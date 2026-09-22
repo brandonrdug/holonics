@@ -47,6 +47,7 @@ pub(crate) enum EnclosureComposition<'a, 'c> {
         sources: usize,
         targets: usize,
         grain: u32,
+        joint: bool,
     },
 }
 impl<'c> ResidentSurface<'c> {
@@ -251,6 +252,7 @@ impl<'c> ResidentSurface<'c> {
                 sources,
                 targets,
                 grain,
+                joint,
             } => {
                 let words = crate::native_ecology::constitutive_fibre::normal_feature_state_words(
                     sources, targets,
@@ -273,7 +275,8 @@ impl<'c> ResidentSurface<'c> {
                     .u32(rows as u32)
                     .u32(sources as u32)
                     .u32(targets as u32)
-                    .u32(grain);
+                    .u32(grain)
+                    .u32(u32::from(joint));
                 "section_normal_enclosed_adjoint"
             }
         };

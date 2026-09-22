@@ -116,6 +116,7 @@ impl<'c> NativeConstitutiveField<'c> {
         staged.b = Rc::new(b);
         staged.bounds = Rc::new(bounds);
         staged.factor_program = Some(Rc::new(OperativeFactorProgram {
+            amplitude_family: None,
             row_offsets: Rc::new(incidence.row_offsets),
             columns: Rc::new(incidence.columns),
             values: Rc::new(incidence.values),

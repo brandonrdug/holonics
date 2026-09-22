@@ -2,9 +2,12 @@ use super::enclosure::{decode_ball_words, decode_radius_word};
 use super::*;
 use crate::resident_section::SLOT_WORDS;
 use std::rc::Rc;
-mod composition;
 mod affine_geometry;
-pub use affine_geometry::{NativeAffineGeometry, NativeAffineGeometryAdjoint, NativeRealification, NativeRealificationAdjoint};
+mod composition;
+pub use affine_geometry::{
+    NativeAffineGeometry, NativeAffineGeometryAdjoint, NativeEnclosurePropagation,
+    NativeRealification, NativeRealificationAdjoint,
+};
 
 /// One resident enclosure per source row, produced by one applied normal-material passage.
 /// The complete section remains on the resident surface; row views borrow its packet and do not
@@ -197,7 +200,9 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
 
     /// Placement identity for composing another resident operation on this same surface.
     /// This does not read the current or expose its packet carrier.
-    pub fn surface(&self) -> &'c ResidentSurface<'c> { self.surface }
+    pub fn surface(&self) -> &'c ResidentSurface<'c> {
+        self.surface
+    }
 
     pub(crate) fn resident_section(&self) -> &ResidentSection<'c> {
         &self.section
@@ -411,6 +416,16 @@ impl<'c> ResidentNormalMaterialView<'c> {
         &self,
         features: &ResidentNormalEnclosureSection<'c>,
     ) -> Result<ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
+        self.read_applied_enclosed_section_with_enclosure(
+            features,
+            NativeEnclosurePropagation::ComponentIntervals,
+        )
+    }
+    pub fn read_applied_enclosed_section_with_enclosure(
+        &self,
+        features: &ResidentNormalEnclosureSection<'c>,
+        enclosure: NativeEnclosurePropagation,
+    ) -> Result<ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
         let source_complex = self
             .source_chart
             .complex_sources()
@@ -451,6 +466,7 @@ impl<'c> ResidentNormalMaterialView<'c> {
                 source_complex,
                 self.targets,
                 self.grain.0,
+                enclosure == NativeEnclosurePropagation::JointBall,
                 &output,
                 &work,
                 &flags,

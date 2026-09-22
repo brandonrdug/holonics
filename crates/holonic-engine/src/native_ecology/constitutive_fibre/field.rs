@@ -27,10 +27,10 @@ mod internal_current;
 mod internal_mode;
 mod junction;
 pub use junction::{
-    NativeDeclaredFactorScaleGradient, NativeFieldAction, NativeFieldActionFactorization,
-    NativeFieldActionPullback, NativeFieldContactOrigin, NativeFieldDeclaredIncidence,
-    NativeFieldGlobalMaterialCommit, NativeFieldJointCurrentCommit, NativeFieldJointLayout,
-    NativeFieldMatrixFreeAction,
+    NativeDeclaredAmplitudeCommit, NativeDeclaredFactorScaleGradient, NativeFieldAction,
+    NativeFieldActionFactorization, NativeFieldActionPullback, NativeFieldContactOrigin,
+    NativeFieldDeclaredIncidence, NativeFieldGlobalMaterialCommit, NativeFieldJointCurrentCommit,
+    NativeFieldJointLayout, NativeFieldMatrixFreeAction,
 };
 mod material_transport;
 pub(crate) use material_transport::normal::{
@@ -114,8 +114,8 @@ pub use material_transport::{
 };
 use material_transport::{MaterialTransport, PendingMaterialTransport};
 pub use material_transport::{
-    NativeAffineGeometry, NativeAffineGeometryAdjoint, NativeRealification,
-    NativeRealificationAdjoint,
+    NativeAffineGeometry, NativeAffineGeometryAdjoint, NativeEnclosurePropagation,
+    NativeRealification, NativeRealificationAdjoint,
 };
 pub use receiver::{
     NativeFieldDifferentialReading, NativeMaterialActuation, NativeMaterialPacketReading,

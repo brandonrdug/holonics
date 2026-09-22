@@ -80,24 +80,27 @@ __device__ void direct_normal_pack(
 // Parallel target rows, followed by their complete joint-radius bound.
 __device__ void direct_normal_predict_ball_sources(const int64_t *old,const wide *ball,
     uint32_t m,uint32_t targets,uint32_t grain,wide *out,int64_t *work,bool full_report,
-    bool reference,uint32_t *slot){
+    bool reference,uint32_t *slot,bool joint=false){
     const uint32_t d=NORMAL_QUADRATURES*m,R=2u*targets;
     // Read the old operator using the same contraction and certified family bound as the field.
     const wide *M=(const wide *)old;
     for(uint32_t row=threadIdx.x;row<targets;row+=blockDim.x){
         wide norm=0;
-        for(uint32_t j=0;j<d;++j)norm=add_checked(norm,ft_abs(M[(size_t)row*d+j],slot),slot);
+        if(joint)norm=complete_norm(M+(size_t)row*d,d,slot);
+        else for(uint32_t j=0;j<d;++j)norm=add_checked(norm,ft_abs(M[(size_t)row*d+j],slot),slot);
         ((wide *)work)[2u*row]=norm;
         ((wide *)work)[2u*row+1u]=linear_material_row(M,nullptr,ball,row,
             m,grain,out,slot);
     }
     __syncthreads();if(*slot)return;
     if(!threadIdx.x){
-        wide norm=0,remainder=0;
+        wide norm=0,remainder=0;HistoryInteger square;
         for(uint32_t row=0;row<targets;++row){
-            norm=add_checked(norm,((wide *)work)[2u*row],slot);
+            if(joint){HistoryInteger x=history_integer(((wide*)work)[2u*row]);square=square+x*x;}
+            else norm=add_checked(norm,((wide *)work)[2u*row],slot);
             remainder=add_checked(remainder,((wide *)work)[2u*row+1u],slot);
         }
+        if(joint)norm=history_norm_ceiling(square,slot);
         // Reference transport pays the retained coefficient defect. Applied transport uses
         // the stored operator as the law, while retaining source enclosure and rounding.
         wide error=reference?M[(size_t)R*m]:0;

@@ -95,6 +95,7 @@ pub use bilinear::{
 #[path = "resident_section/geometry.rs"]
 mod geometry;
 mod surface_affine_geometry;
+mod surface_contact_amplitude;
 mod surface_contact_scale;
 mod surface_direct_normal;
 mod surface_enclosure_composition;
@@ -180,7 +181,7 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 93] = [
+pub const KERNELS: [&str; 96] = [
     "section_constitutive_rechart",
     "section_constitutive_circulation",
     "section_constitutive_fibre",
@@ -259,6 +260,9 @@ pub const KERNELS: [&str; 93] = [
     "section_affine_geometry_adjoint",
     "section_realification",
     "section_field_contact_scale_gradient",
+    "section_field_contact_amplitude_proposal",
+    "section_field_contact_amplitude_rebuild",
+    "section_field_contact_amplitude_bounds",
     "section_pair_quadrance_logits",
     "section_pair_quadrance_adjoint",
     "section_phase_participation",

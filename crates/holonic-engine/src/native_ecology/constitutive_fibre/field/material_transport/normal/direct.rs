@@ -19,7 +19,10 @@ pub use enclosure::{ResidentNormalEnclosure, ResidentNormalEnclosureView, Reside
 pub use held_section::{ResidentHeldSection, ResidentHeldSectionRest};
 mod applied_relation;
 mod joined_source;
-pub use section::{NativeAffineGeometry, NativeAffineGeometryAdjoint, NativeRealification, NativeRealificationAdjoint};
+pub use section::{
+    NativeAffineGeometry, NativeAffineGeometryAdjoint, NativeEnclosurePropagation,
+    NativeRealification, NativeRealificationAdjoint,
+};
 mod section;
 pub use section::{ResidentNormalEnclosureSection, ResidentNormalSectionReturn};
 mod section_basis;

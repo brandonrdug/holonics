@@ -52,13 +52,14 @@ impl<'c> IncidentFieldModel<'c> {
         if count == 0 {
             return Err(invalid("empty generator source episode"));
         }
-        let maps = MachineSourceMaps::new(
+        let maps = MachineSourceMaps::new_with_enclosure(
             self.field.surface(),
             machine,
             &binding,
             start,
             count,
             encoded.grain(),
+            self.spec.enclosure_propagation(),
         )?;
         if binding.contact_kinds.len() != self.layout.source_condition_ports {
             return Err(invalid(
@@ -134,6 +135,7 @@ impl<'c> IncidentFieldModel<'c> {
                 epoch,
                 solver: self.spec.solver(),
                 solve_steps: self.spec.solve_steps(),
+                enclosure_propagation: self.spec.enclosure_propagation(),
             };
             if k + 1 == count {
                 word.source_episode = Some(GeneratorEpisodeTape {

@@ -62,6 +62,7 @@ impl<'c> ResidentSurface<'c> {
         source_complex: usize,
         targets: usize,
         grain: u32,
+        joint: bool,
         output: &ResidentSection<'c>,
         work: &ResidentSection<'c>,
         flags: &ResidentSection<'c>,
@@ -104,6 +105,7 @@ impl<'c> ResidentSurface<'c> {
             .u32(source_complex as u32)
             .u32(targets as u32)
             .u32(grain)
+            .u32(u32::from(joint))
             .ptr(output.lo.device_ptr())
             .ptr(output.hi.device_ptr())
             .ptr(work.lo.device_ptr())

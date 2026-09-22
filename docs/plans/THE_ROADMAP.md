@@ -142,9 +142,11 @@ complete fixed-word return; tagged phase reception reads its producing endpoint.
 [public source/session join](../../research/records/2026-09-21_ORDERED_SOURCE_AND_PHASE_RECEIVING_ENTER_THE_PUBLIC_GENERATOR_SESSION.md) now consumes ordered recurrence,
 directed source conditions and shared phase text/termination material, with the complete
 reverse tape and frozen restart. The [rectangular factor return](../../research/records/2026-09-21_THE_PAIR_RESPONSE_RETURNS_ITS_RECTANGULAR_FACTOR_COTANGENT.md)
-now supplies one arc-amplitude cotangent through every producing word. Packet 4 next consumes
-it in positive constrained proposals with retained producing cuts; source-tape economy and
-actual episode success remain later discriminating operations. The existing slot model remains its control.
+now supplies one arc-amplitude cotangent through every producing word. Packet 4 now
+[consumes it in positive pair-material publication](../../research/records/2026-09-22_PAIR_MATERIAL_LEARNS_WITHOUT_A_COMPLETED_UPDATE_ARCHIVE.md),
+rebuilding from the fixed template and current amplitudes without a completed-update journal.
+Configuration/clock inference and compatible closure remain within packet 4; standing,
+source-tape economy and actual episode success remain subsequent discriminating operations. The existing slot model remains its control.
 
 ## Athena construction order
 

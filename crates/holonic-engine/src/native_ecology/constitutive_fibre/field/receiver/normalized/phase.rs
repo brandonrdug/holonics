@@ -115,6 +115,7 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
                 neighbors_per_row,
                 components,
                 grain.0,
+                false,
                 &output,
                 &flags,
             )?;
@@ -222,6 +223,7 @@ impl<'c> NativePhaseParticipation<'c> {
                 self.neighbors_per_row,
                 self.components,
                 self.grain.0,
+                false,
                 &terms,
                 &flags,
             )?;

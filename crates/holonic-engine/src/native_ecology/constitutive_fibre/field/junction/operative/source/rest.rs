@@ -21,6 +21,8 @@ pub struct NativeFieldCurrentSourceRest {
     factor_rows: Option<usize>,
     factor_rank: Option<usize>,
     factor_nonzeros: Option<usize>,
+    amplitude_group_width: Option<usize>,
+    amplitude_family: Option<[ResidentSectionRest; 4]>,
     packed: ResidentSectionRest,
     report: ResidentSectionRest,
     producing: [ResidentSectionRest; 5],
@@ -54,7 +56,14 @@ impl NativeFieldCurrentSourceRest {
         point_section(&self.packed, 1, 2 * (self.width + 1))?;
         point_section(&self.report, 1, 12 * (d + 1))?;
         for (v, (rows, width)) in self.producing.iter().zip([
-            (if self.factor_program.is_some() {1} else {k.max(1)}, 2 * d),
+            (
+                if self.factor_program.is_some() {
+                    1
+                } else {
+                    k.max(1)
+                },
+                2 * d,
+            ),
             (k.max(1), 4),
             (1, 4),
             (1, 2 * d),
@@ -99,7 +108,9 @@ impl NativeFieldCurrentSourceRest {
                 return Err(invalid("factor metadata is required"));
             }
             let rows = self.factor_rows.unwrap_or(k);
-            if rows != k {return Err(invalid("factor contact population"));}
+            if rows != k {
+                return Err(invalid("factor contact population"));
+            }
             let rank = self.factor_rank.unwrap_or(left.rows);
             let nnz = self.factor_nonzeros.unwrap_or(columns.intervals.len() / 2);
             point_section(row_offsets, 1, 2 * (rows + 1))?;
@@ -111,6 +122,60 @@ impl NativeFieldCurrentSourceRest {
             point_section(left, rank.max(1), 2 * d)?;
             point_section(right, rank.max(1), 4 * rows)?;
             point_section(defects, rank.max(1), 2)?;
+            if let Some(group_width) = self.amplitude_group_width {
+                if group_width == 0 || k == 0 || k % group_width != 0 || rank != 0 {
+                    return Err(invalid("amplitude family grouping/rank"));
+                }
+                let family = self
+                    .amplitude_family
+                    .as_ref()
+                    .ok_or_else(|| invalid("amplitude family"))?;
+                point_section(&family[0], 1, 4 * nnz.max(1))?;
+                point_section(&family[1], 1, 4 * nnz.max(1))?;
+                point_section(&family[2], 1, 4)?;
+                point_section(&family[3], k / group_width, 6)?;
+                if wides(&family[2].intervals)?.iter().any(|v| *v < 0) {
+                    return Err(invalid("amplitude template radius"));
+                }
+                for row in wides(&family[3].intervals)?.chunks_exact(3) {
+                    if row[0] <= 0 || row[1] != 0 || row[2] != 0 {
+                        return Err(invalid("amplitude point row"));
+                    }
+                }
+                let frame = super::super::rest::OperativeFactorProgramFrame {
+                    rows,
+                    boundary_components: d,
+                    rank,
+                    nonzeros: nnz,
+                    group_width: Some(group_width),
+                };
+                super::super::rest::validate_amplitude_family_sections(
+                    &frame,
+                    family,
+                    &[
+                        row_offsets.clone(),
+                        columns.clone(),
+                        values.clone(),
+                        transpose_offsets.clone(),
+                        transpose_rows.clone(),
+                        transpose_values.clone(),
+                        left.clone(),
+                        right.clone(),
+                        defects.clone(),
+                    ],
+                    &self.producing[2],
+                    self.grain,
+                    k,
+                    d,
+                )?;
+            } else if self.amplitude_family.is_some() {
+                return Err(invalid("amplitude family metadata"));
+            }
+        }
+        if self.factor_program.is_none()
+            && (self.amplitude_group_width.is_some() || self.amplitude_family.is_some())
+        {
+            return Err(invalid("amplitude family without factor program"));
         }
         Ok(())
     }
@@ -130,6 +195,7 @@ impl NativeFieldCurrentSourceRest {
                 self.factor_rows,
                 self.factor_rank,
                 self.factor_nonzeros,
+                self.amplitude_group_width,
             ))
             .map_err(invalid)?,
         )?;
@@ -147,6 +213,11 @@ impl NativeFieldCurrentSourceRest {
                 blob(out, &point_bytes(value)?)?;
             }
         }
+        if let Some(family) = &self.amplitude_family {
+            for value in family {
+                blob(out, &point_bytes(value)?)?;
+            }
+        }
         Ok(())
     }
     pub fn read(input: &mut impl Read, octets: u64) -> Result<Self, Error> {
@@ -158,7 +229,7 @@ impl NativeFieldCurrentSourceRest {
         }
         let metadata = read_blob(&mut input)?;
         let values: Vec<serde_json::Value> = serde_json::from_slice(&metadata).map_err(invalid)?;
-        if values.len() < 4 || values.len() > 10 {
+        if values.len() < 4 || values.len() > 11 {
             return Err(invalid("source witness metadata"));
         }
         let cut = serde_json::from_value(values[0].clone()).map_err(invalid)?;
@@ -183,20 +254,34 @@ impl NativeFieldCurrentSourceRest {
         };
         let factor_rows: Option<usize> = if values.len() >= 8 {
             serde_json::from_value(values[7].clone()).map_err(invalid)?
-        } else {None};
+        } else {
+            None
+        };
         let factor_rank: Option<usize> = if values.len() >= 9 {
             serde_json::from_value(values[8].clone()).map_err(invalid)?
-        } else {None};
+        } else {
+            None
+        };
         let factor_nonzeros: Option<usize> = if values.len() >= 10 {
             serde_json::from_value(values[9].clone()).map_err(invalid)?
-        } else {None};
+        } else {
+            None
+        };
+        let amplitude_group_width: Option<usize> = if values.len() >= 11 {
+            serde_json::from_value(values[10].clone()).map_err(invalid)?
+        } else {
+            None
+        };
         let mut sections = Vec::new();
         let base_sections = if legacy_dense || dense_covariance {
             8
         } else {
             7
         };
-        for _ in 0..(base_sections + usize::from(factor_program) * 9) {
+        for _ in 0..(base_sections
+            + usize::from(factor_program) * 9
+            + usize::from(amplitude_group_width.is_some()) * 4)
+        {
             sections.push(read_point(&read_blob(&mut input)?)?);
         }
         if input.limit() != 0 {
@@ -246,6 +331,15 @@ impl NativeFieldCurrentSourceRest {
         } else {
             None
         };
+        let family_base = base_sections + usize::from(factor_program.is_some()) * 9;
+        let amplitude_family = amplitude_group_width.map(|_| {
+            [
+                sections[family_base].clone(),
+                sections[family_base + 1].clone(),
+                sections[family_base + 2].clone(),
+                sections[family_base + 3].clone(),
+            ]
+        });
         let rest = Self {
             cut,
             grain,
@@ -257,6 +351,8 @@ impl NativeFieldCurrentSourceRest {
             factor_rows,
             factor_rank,
             factor_nonzeros,
+            amplitude_group_width,
+            amplitude_family,
             packed,
             report,
             producing,
@@ -289,6 +385,24 @@ impl NativeFieldCurrentSource<'_> {
                 ])
             })
             .transpose()?;
+        let amplitude_group_width = p
+            .factor_program
+            .as_ref()
+            .and_then(|program| program.amplitude_family.as_ref().map(|f| f.group_width));
+        let amplitude_family = p
+            .factor_program
+            .as_ref()
+            .and_then(|program| program.amplitude_family.as_ref())
+            .map(|f| {
+                Ok::<_, Error>([
+                    self.surface.detach_section(&f.template_values, 64)?,
+                    self.surface
+                        .detach_section(&f.template_transpose_values, 64)?,
+                    self.surface.detach_section(&f.template_bounds, 64)?,
+                    self.surface.detach_section(&f.amplitudes, 64)?,
+                ])
+            })
+            .transpose()?;
         let rest = NativeFieldCurrentSourceRest {
             cut: self.cut,
             grain: self.grain,
@@ -309,6 +423,8 @@ impl NativeFieldCurrentSource<'_> {
             factor_rows: p.factor_program.as_ref().map(|program| program.rows),
             factor_rank: p.factor_program.as_ref().map(|program| program.rank),
             factor_nonzeros: p.factor_program.as_ref().map(|program| program.nonzeros),
+            amplitude_group_width,
+            amplitude_family,
         };
         rest.validate()?;
         Ok(rest)
@@ -342,6 +458,7 @@ impl<'c> NativeConstitutiveField<'c> {
         let [map, b, bounds, aggregate, moment_bounds] = &rest.producing;
         let covariance = rest.dense_covariance;
         let factor_program = rest.factor_program;
+        let amplitude_family = rest.amplitude_family;
         let contact_count = rest.births.len();
         let producing = Rc::new(OperativeSections {
             map: Rc::new(mount(map)?),
@@ -383,6 +500,26 @@ impl<'c> NativeConstitutiveField<'c> {
                             left: Rc::new(mount(&left)?),
                             right: Rc::new(mount(&right)?),
                             defects: Rc::new(mount(&defects)?),
+                            amplitude_family: amplitude_family
+                                .map(
+                                    |[
+                                        template_values,
+                                        template_transpose_values,
+                                        template_bounds,
+                                        amplitudes,
+                                    ]| {
+                                        Ok::<_, Error>(Rc::new(DeclaredAmplitudeFamily {
+                                            group_width: rest.amplitude_group_width.unwrap_or(1),
+                                            template_values: Rc::new(mount(&template_values)?),
+                                            template_transpose_values: Rc::new(mount(
+                                                &template_transpose_values,
+                                            )?),
+                                            template_bounds: Rc::new(mount(&template_bounds)?),
+                                            amplitudes: Rc::new(mount(&amplitudes)?),
+                                        }))
+                                    },
+                                )
+                                .transpose()?,
                             rows: rest.factor_rows.unwrap_or(contact_count),
                             boundary_components: 6 * self.nodes(),
                             rank: rest.factor_rank.unwrap_or(left.rows),

@@ -46,6 +46,7 @@ impl<'c> ResidentSurface<'c> {
         dimensions: usize,
         grain: u32,
         beta: Dyadic,
+        joint: bool,
         logits: &ResidentSection<'c>,
         flags: &ResidentSection<'c>,
     ) -> Result<(), ResidentRefusal> {
@@ -74,6 +75,7 @@ impl<'c> ResidentSurface<'c> {
             .u32(grain)
             .i64(beta.significand)
             .i32(beta.exponent)
+            .u32(u32::from(joint))
             .ptr(logits.lo.device_ptr())
             .ptr(logits.hi.device_ptr())
             .ptr(flags.lo.device_ptr())
@@ -107,6 +109,7 @@ impl<'c> ResidentSurface<'c> {
         components: usize,
         grain: u32,
         beta: Dyadic,
+        joint: bool,
         dq: &ResidentSection<'c>,
         du: &ResidentSection<'c>,
         dv: &ResidentSection<'c>,
@@ -149,6 +152,7 @@ impl<'c> ResidentSurface<'c> {
             .u32(grain)
             .i64(beta.significand)
             .i32(beta.exponent)
+            .u32(u32::from(joint))
             .ptr(dq.lo.device_ptr())
             .ptr(dq.hi.device_ptr())
             .ptr(du.lo.device_ptr())

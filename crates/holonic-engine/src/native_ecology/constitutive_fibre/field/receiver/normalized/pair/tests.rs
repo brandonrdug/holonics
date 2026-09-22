@@ -48,7 +48,12 @@ fn pair_chart_and_value_covectors_are_distinct_and_complete() {
     let device = ResidentReadout::new().unwrap();
     let surface = ResidentSurface::on(&device).unwrap();
     let u = 1i128 << 16;
-    for radius in [0, u / 256] {
+    for (radius, enclosure) in [
+        (0, NativeEnclosurePropagation::ComponentIntervals),
+        (u / 256, NativeEnclosurePropagation::ComponentIntervals),
+        (0, NativeEnclosurePropagation::JointBall),
+        (u / 256, NativeEnclosurePropagation::JointBall),
+    ] {
         let query = Rc::new(balls(&surface, &[(vec![0, 0, 5 * u, 0], radius)], 4));
         let neighbors = Rc::new(balls(
             &surface,
@@ -64,7 +69,14 @@ fn pair_chart_and_value_covectors_are_distinct_and_complete() {
             2,
         ));
         let pair = query
-            .pair_quadrance_participation(neighbors, values, 2, Dyadic::ONE, SeriesAperture(40))
+            .pair_quadrance_participation_with_enclosure(
+                neighbors,
+                values,
+                2,
+                Dyadic::ONE,
+                SeriesAperture(40),
+                enclosure,
+            )
             .unwrap();
         assert!(
             pair.output()
@@ -154,4 +166,96 @@ fn axial_quadrance_is_not_a_bilinear_unit_phase_score() {
     // Only the second neighbor carries axial offset, and its value is lower.
     assert!(query.center[2].real.clone() + query.radius.clone() < Rat::zero());
     assert!(query.center[0].real.clone().abs() <= query.radius);
+}
+
+#[test]
+#[ignore = "requires CUDA; simplex mixing transports a common value ball without coordinate inflation"]
+fn joint_pair_simplex_transports_a_common_ball_once() {
+    let device = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&device).unwrap();
+    let u = 1i128 << 16;
+    let query = Rc::new(balls(&surface, &[(vec![0, 0], u / 8)], 2));
+    let neighbors = Rc::new(balls(
+        &surface,
+        &[(vec![-u, 0], u / 8), (vec![u, 0], u / 8)],
+        2,
+    ));
+    let values = Rc::new(balls(
+        &surface,
+        &[
+            (vec![u, 2 * u, -u, 0], u / 16),
+            (vec![u, 2 * u, -u, 0], u / 16),
+        ],
+        4,
+    ));
+    let expected = values.row(0).unwrap().inspect().unwrap();
+    let joint = query
+        .pair_quadrance_participation_with_enclosure(
+            neighbors,
+            values,
+            2,
+            Dyadic::ONE,
+            SeriesAperture(40),
+            NativeEnclosurePropagation::JointBall,
+        )
+        .unwrap();
+    assert_eq!(joint.output().row(0).unwrap().inspect().unwrap(), expected);
+    // The different uncertain geometry can only change simplex weights, not this ball.
+    assert!(
+        joint
+            .participation()
+            .row(0)
+            .unwrap()
+            .inspect()
+            .unwrap()
+            .radius
+            > Rat::from_integer(0.into())
+    );
+}
+
+#[test]
+#[ignore = "requires CUDA; common receiver terms are a null direction of the normalized geometric return"]
+fn joint_pair_constant_values_have_zero_geometric_return() {
+    let device = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&device).unwrap();
+    let u = 1i128 << 16;
+    for count in [1, 2] {
+        let query = Rc::new(balls(&surface, &[(vec![0, 0], u / 8)], 2));
+        let neighbors = Rc::new(balls(&surface, &vec![(vec![u, 0], u / 8); count], 2));
+        let values = Rc::new(balls(&surface, &vec![(vec![u, 2 * u, -u, 0], 0); count], 4));
+        let joint = query
+            .pair_quadrance_participation_with_enclosure(
+                neighbors,
+                values,
+                count,
+                Dyadic::ONE,
+                SeriesAperture(40),
+                NativeEnclosurePropagation::JointBall,
+            )
+            .unwrap();
+        let gy = balls(&surface, &[(vec![2 * u, u, -u, u], u / 16)], 4);
+        let returned = joint.pull_back(&gy, None).unwrap();
+        for reading in returned
+            .query()
+            .inspect_rows()
+            .unwrap()
+            .into_iter()
+            .chain(returned.neighbors().inspect_rows().unwrap())
+        {
+            assert_eq!(reading.radius, Rat::from_integer(0.into()));
+            assert!(
+                reading
+                    .center
+                    .iter()
+                    .all(|z| z.real == Rat::from_integer(0.into())
+                        && z.imaginary == Rat::from_integer(0.into()))
+            );
+        }
+        if count == 1 {
+            assert_eq!(
+                returned.values().row(0).unwrap().inspect().unwrap(),
+                gy.row(0).unwrap().inspect().unwrap()
+            );
+        }
+    }
 }

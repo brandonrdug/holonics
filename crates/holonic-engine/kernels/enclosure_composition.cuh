@@ -201,7 +201,7 @@ extern "C" __global__ void section_enclosure_bilinear_adjoint(
 }
 extern "C" __global__ void section_normal_enclosed_adjoint(
  const int64_t *state,const int64_t *state_hi,const int64_t *covector,const int64_t *covector_hi,
- uint32_t rows,uint32_t sources,uint32_t targets,uint32_t grain,
+ uint32_t rows,uint32_t sources,uint32_t targets,uint32_t grain,uint32_t joint,
  int64_t *out,int64_t *oh,int64_t *flags,
  uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
  if(threadIdx.x)return;uint32_t row=blockIdx.x;if(row>=rows)return;
@@ -211,8 +211,13 @@ extern "C" __global__ void section_normal_enclosed_adjoint(
  const int64_t *gw=covector+2u*((size_t)t+1u)*row;
  if(*status||!ec_ball(gw,covector_hi+2u*((size_t)t+1u)*row,t,status))return;
  const wide *M=(const wide*)state,*g=(const wide*)gw;wide *y=(wide*)(out+2u*((size_t)d+1u)*row);
- wide S=(wide)((uwide)1<<grain),round=0;MomentInteger norm;
- for(size_t j=0;j<matrix;++j)norm=norm+normal_abs(normal_wide(M[j]));
+ wide S=(wide)((uwide)1<<grain),round=0;MomentInteger norm;HistoryInteger square;
+ if(joint>1u){atomicOr(status,REFUSED_MALFORMED);return;}
+ for(size_t j=0;j<matrix;++j){
+  if(joint){HistoryInteger v=history_integer(M[j]);square=square+v*v;}
+  else norm=norm+normal_abs(normal_wide(M[j]));
+ }
+ if(joint)norm=normal_wide(history_norm_ceiling(square,status));
  for(uint32_t i=0;i<d;i+=2u){MomentInteger re,im;
   for(uint32_t j=0;j<targets;++j)normal_product(re,im,normal_wide(g[2u*j]),normal_wide(g[2u*j+1u]),normal_wide(M[(size_t)j*d+i]),normal_wide(M[(size_t)j*d+i+1u]),true);
   bool rr=false,ri=false;y[i]=normal_grid(exact_divide_positive(re,normal_wide(S),&rr),0,false,status);

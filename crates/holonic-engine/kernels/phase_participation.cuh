@@ -41,9 +41,65 @@ extern "C" __global__ void section_phase_participation(
  }
  out[pw-1u]=radius;ec_seal((int64_t*)out,(int64_t*)oh,(uint32_t)pw-1u,status);
 }
+// The existing normalized receiver supplies a REAL simplex.  Anchor its centre
+// calculation to one value so a common translation is transported exactly. The
+// value-ball contribution is max r_i, independent of the number of coordinates.
+__device__ void phase_joint_weighted(
+ const int64_t *neighbors,const int64_t *neighbors_hi,const wide *p,
+ uint32_t n,uint32_t d,uint32_t grain,wide *y,wide *yh,uint32_t *status){
+ const size_t stride=2u*((size_t)d+1u);const wide *base=(const wide*)neighbors;
+ if(!ec_ball(neighbors,neighbors_hi,d,status))return;
+ wide largest=0;HistoryInteger contrast_square;
+ const wide unit=((wide)1)<<grain;
+ for(uint32_t k=0;k<d;++k)y[k]=yh[k]=base[k];
+ for(uint32_t j=0;j<n;++j){
+  size_t at=stride*j;if(!ec_ball(neighbors+at,neighbors_hi+at,d,status))return;
+  const wide *v=(const wide*)(neighbors+at);
+  if(p[2u*j]<0 || p[2u*j]>unit || p[2u*j+1u]){atomicOr(status,REFUSED_MALFORMED);return;}
+  if(v[d]>largest)largest=v[d];
+  if(!j)continue;
+  for(uint32_t k=0;k<d;++k){
+   wide delta=sub_checked(v[k],base[k],status);
+   HistoryInteger value=history_integer(delta);contrast_square=contrast_square+value*value;
+   MaterialInterval term=mp_mul(mp_point(p[2u*j]),mp_point(delta),grain,status);
+   y[k]=add_checked(y[k],term.lo,status);yh[k]=add_checked(yh[k],term.hi,status);
+  }
+ }
+ phase_pack(y,yh,y,d,status);
+ wide weight_error=ft_ceil_product(p[2u*n],history_norm_ceiling(contrast_square,status),grain,status);
+ y[d]=add_checked(y[d],add_checked(weight_error,largest,status),status);
+}
+// J_p annihilates the common term <g,v_0>.  Removing it BEFORE enclosing
+// the score covector avoids inventing uncertainty in that constant direction.
+__device__ void phase_joint_terms(
+ const int64_t *neighbors,const int64_t *neighbors_hi,const wide *g,const wide *gp,
+ uint32_t n,uint32_t d,uint32_t grain,wide *out,uint32_t *status){
+ const size_t stride=2u*((size_t)d+1u);const wide *base=(const wide*)neighbors;
+ if(!ec_ball(neighbors,neighbors_hi,d,status))return;
+ if(n==1u){out[0]=out[1]=out[2]=0;return;}
+ wide gnorm=complete_norm(g,d,status);HistoryInteger error_square;
+ for(uint32_t j=0;j<n;++j){
+  const size_t at=stride*j;if(!ec_ball(neighbors+at,neighbors_hi+at,d,status))return;
+  const wide *v=(const wide*)(neighbors+at);
+  MaterialInterval dot=mp_point(gp?sub_checked(gp[2u*j],gp[0],status):0);
+  HistoryInteger delta_square;
+  if(j)for(uint32_t k=0;k<d;++k){
+   wide delta=sub_checked(v[k],base[k],status);HistoryInteger value=history_integer(delta);
+   delta_square=delta_square+value*value;
+   dot=mp_add(dot,mp_mul(mp_point(g[k]),mp_point(delta),grain,status),status);
+  }
+  wide delta_radius=j?add_checked(v[d],base[d],status):0;
+  wide source_error=add_checked(ft_ceil_product(gnorm,delta_radius,grain,status),
+   ft_ceil_product(g[d],add_checked(history_norm_ceiling(delta_square,status),delta_radius,status),grain,status),status);
+  wide round=add_checked(sub_checked(dot.hi,dot.lo,status),1,status)>>1;
+  out[2u*j]=add_checked(dot.lo,round,status);out[2u*j+1u]=0;
+  HistoryInteger e=history_integer(add_checked(source_error,round,status));error_square=error_square+e*e;
+ }
+ out[2u*n]=add_checked(history_norm_ceiling(error_square,status),gp?gp[2u*n]:0,status);
+}
 extern "C" __global__ void section_phase_participation_weighted(
  const int64_t *neighbors,const int64_t *neighbors_hi,const int64_t *participation,const int64_t *participation_hi,
- uint32_t rows,uint32_t neighbors_per_row,uint32_t components,uint32_t grain,
+ uint32_t rows,uint32_t neighbors_per_row,uint32_t components,uint32_t grain,uint32_t joint,
  int64_t *output,int64_t *output_hi,int64_t *flags,
  uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
  if(threadIdx.x)return;uint32_t row=blockIdx.x;if(row>=rows)return;
@@ -52,6 +108,12 @@ extern "C" __global__ void section_phase_participation_weighted(
  const int64_t *pp=participation+2u*pw*row,*ph=participation_hi+2u*pw*row;
  if(!ec_ball(pp,ph,(uint32_t)pw-1u,status))return;const wide *p=(const wide*)pp;
  wide *y=(wide*)output+w*row,*yh=(wide*)output_hi+w*row;
+ if(joint){
+  if(joint!=1u){atomicOr(status,REFUSED_MALFORMED);return;}
+  size_t first=2u*w*(size_t)row*neighbors_per_row;
+  phase_joint_weighted(neighbors+first,neighbors_hi+first,p,neighbors_per_row,components,grain,y,yh,status);
+  ec_seal((int64_t*)y,(int64_t*)yh,components,status);return;
+ }
  for(uint32_t d=0;d<components;++d){y[d]=0;yh[d]=0;}
  for(uint32_t j=0;j<neighbors_per_row;++j){
   size_t at=((size_t)row*neighbors_per_row+j)*2u*w;
@@ -63,7 +125,7 @@ extern "C" __global__ void section_phase_participation_weighted(
 }
 extern "C" __global__ void section_phase_participation_terms(
  const int64_t *neighbors,const int64_t *neighbors_hi,const int64_t *gy,const int64_t *gy_hi,const int64_t *gp,const int64_t *gp_hi,
- uint32_t rows,uint32_t neighbors_per_row,uint32_t components,uint32_t grain,
+ uint32_t rows,uint32_t neighbors_per_row,uint32_t components,uint32_t grain,uint32_t joint,
  int64_t *terms,int64_t *terms_hi,int64_t *flags,
  uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
  if(threadIdx.x)return;uint32_t row=blockIdx.x;if(row>=rows)return;
@@ -73,6 +135,12 @@ extern "C" __global__ void section_phase_participation_terms(
  if(gp&&!ec_ball(gp+2u*pw*row,gp_hi+2u*pw*row,(uint32_t)pw-1u,status))return;
  const wide *g=(const wide*)gy+w*row,*gc=gp?(const wide*)gp+pw*row:nullptr;
  wide *r=(wide*)terms+pw*row,*rh=(wide*)terms_hi+pw*row;wide radius=0;
+ if(joint){
+  if(joint!=1u){atomicOr(status,REFUSED_MALFORMED);return;}
+  size_t first=2u*w*(size_t)row*neighbors_per_row;
+  phase_joint_terms(neighbors+first,neighbors_hi+first,g,gc,neighbors_per_row,components,grain,r,status);
+  ec_seal((int64_t*)r,(int64_t*)rh,(uint32_t)pw-1u,status);return;
+ }
  for(uint32_t j=0;j<neighbors_per_row;++j){
   const size_t at=((size_t)row*neighbors_per_row+j)*2u*w;
   if(!ec_ball(neighbors+at,neighbors_hi+at,components,status))return;const wide *u=(const wide*)(neighbors+at);

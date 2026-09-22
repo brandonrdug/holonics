@@ -377,6 +377,8 @@ pub(crate) struct IncidentWord<'c> {
     epoch: u64,
     solver: IncidentFieldSolver,
     solve_steps: usize,
+    enclosure_propagation:
+        holonic_engine::native_ecology::constitutive_fibre::NativeEnclosurePropagation,
 }
 /// A prepared complete joint section. Receiving faces and pending storage are prepared before
 /// this immutable word is committed to the continuing body.
@@ -385,7 +387,9 @@ pub struct NativeIncidentGenerated<'c> {
     comparison: Option<u64>,
 }
 pub struct NativeIncidentMaterialReturn<'c> {
-    contact_scale_covector: Option<ResidentNormalEnclosureSection<'c>>,
+    contact_amplitude: Option<
+        holonic_engine::native_ecology::constitutive_fibre::NativeDeclaredAmplitudeCommit<'c>,
+    >,
     source_covector: Option<ResidentNormalEnclosureSection<'c>>,
     comparison: u64,
     epoch: u64,
@@ -398,11 +402,17 @@ pub struct NativeIncidentMaterialReturn<'c> {
     >,
 }
 impl<'c> NativeIncidentMaterialReturn<'c> {
-    /// One real cotangent per declared pair arc, in declaration order, for the local
-    /// amplitude variation D_arc -> (1+t) D_arc at the producing cut. Geometry and
-    /// response are still fixed until a constrained proposal is explicitly published.
+    /// One relative-amplitude cotangent per pair arc, using the old producing field
+    /// variation and the contemporary pair basis. Publication installs its positive proposal.
     pub fn contact_scale_covector(&self) -> Option<&ResidentNormalEnclosureSection<'c>> {
-        self.contact_scale_covector.as_ref()
+        self.contact_amplitude.as_ref().map(|p| p.gradient())
+    }
+    pub fn contact_amplitude_proposal(
+        &self,
+    ) -> Option<
+        &holonic_engine::native_ecology::constitutive_fibre::NativeDeclaredAmplitudeCommit<'c>,
+    > {
+        self.contact_amplitude.as_ref()
     }
     /// Ordered original complex source rows returned through every ingestion/refinement stage.
     pub fn source_covector(&self) -> Option<&ResidentNormalEnclosureSection<'c>> {
@@ -627,6 +637,7 @@ impl<'c> IncidentFieldModel<'c> {
             epoch: self.epoch,
             solver: self.spec.solver(),
             solve_steps: self.spec.solve_steps(),
+            enclosure_propagation: self.spec.enclosure_propagation(),
         })
     }
 
@@ -663,8 +674,10 @@ impl<'c> IncidentFieldModel<'c> {
             json!({"scope":"incident-field-joint","epoch":self.epoch,"generations":self.generations,
             "joint":source.enclosure().inspect()?,"boundary_components":source.boundary_components(),
             "internal_components":source.internal_components(),"sites":self.layout.sites.len(),
+            "operator":source.inspect_operator_bounds()?,
+            "operative_storage":self.field.operative_return_storage(),
             "chart": if self.layout.machine.is_some() {"fixed-generator-machine"} else {"legacy-slot-field"},
-            "contact_material": if self.layout.machine.is_some() {"declared-pair-factor"} else {"unconstrained-global-return"}}),
+            "contact_material": if self.layout.machine.is_some() {"positive-pair-amplitude-family"} else {"unconstrained-global-return"}}),
         )
     }
     pub(crate) fn inspect_material(&self, member: usize) -> Result<Value, NativeSessionError> {
@@ -823,6 +836,7 @@ impl<'c> IncidentFieldModel<'c> {
                             machine,
                             group,
                             anchor.view().grain(),
+                            self.spec.enclosure_propagation(),
                         )
                     })
                     .transpose()
@@ -844,7 +858,7 @@ impl<'c> IncidentFieldModel<'c> {
                 let query =
                     Rc::new(q.gather_phase_rows(&group.receivers, &phases(rows), layout.width)?);
                 let phase = if let Some(maps) = maps {
-                    IncidentParticipationForward::Machine(MachineParticipation::new(
+                    IncidentParticipationForward::Machine(MachineParticipation::new_with_enclosure(
                         q.clone(),
                         &group.receivers,
                         &group.sources,
@@ -853,6 +867,7 @@ impl<'c> IncidentFieldModel<'c> {
                         maps.values.clone(),
                         layout.beta,
                         SeriesAperture(layout.series),
+                        maps.enclosure.clone(),
                     )?)
                 } else {
                     let neighbors = Rc::new(q.gather_phase_rows(
@@ -888,10 +903,11 @@ impl<'c> IncidentFieldModel<'c> {
                     .as_ref()
                     .and_then(|m| m.differences.as_ref())
                     .map(|coefficients| {
-                        MachineValueTransport::new(
+                        MachineValueTransport::new_with_enclosure(
                             q.clone(),
                             &group.difference_sources,
                             coefficients.clone(),
+                            self.spec.enclosure_propagation(),
                         )
                     })
                     .transpose()?;
@@ -939,7 +955,11 @@ impl<'c> IncidentFieldModel<'c> {
                     Some(c) => query.bilinear_enclosed_features(c)?,
                     None => ResidentNormalEnclosureSection::concatenate_rows(&[&query])?,
                 };
-                let reaction = material[group.material].read_applied_enclosed_section(&features)?;
+                let reaction = material[group.material]
+                    .read_applied_enclosed_section_with_enclosure(
+                        &features,
+                        self.spec.enclosure_propagation(),
+                    )?;
                 let scattered = phase
                     .output()
                     .sum_same_shape(&reaction)?
@@ -1051,7 +1071,10 @@ impl<'c> IncidentFieldModel<'c> {
                 let group = &stage.group;
                 let rows = group.receivers.len();
                 let g = ga.gather_phase_rows(&group.receivers, &phases(rows), layout.width)?;
-                let gf = word.material[group.material].pull_back_enclosed_section(&g)?;
+                let gf = word.material[group.material].pull_back_enclosed_section_with_enclosure(
+                    &g,
+                    word.enclosure_propagation.clone(),
+                )?;
                 let (gq, gcondition) = match &stage.condition {
                     Some(c) => {
                         let (q, c) = stage.query.bilinear_enclosed_pullback(c, &gf)?;
@@ -1208,7 +1231,7 @@ impl<'c> NativeCoupledBody<'c> {
             )?;
             material.push(current.stage_covector_return(&features, &covectors, step_bits)?);
         }
-        let (contact, contact_scale_covector) = if word.source.internal_components() == 0 {
+        let (contact, contact_amplitude) = if word.source.internal_components() == 0 {
             (None, None)
         } else {
             let actions = returned
@@ -1225,20 +1248,12 @@ impl<'c> NativeCoupledBody<'c> {
                 .map(|(action, (_, g))| action.pullback_full_auto(g.view(), word.solve_steps))
                 .collect::<Result<Vec<_>, _>>()?;
             if model.layout.machine.is_some() {
-                let mut scale: Option<ResidentNormalEnclosureSection<'c>> = None;
-                for pullback in &pullbacks {
-                    let gradient = word.source.declared_factor_scale_gradient(pullback, 3)?;
-                    scale =
-                        Some(match scale {
-                            Some(previous) => previous.sum_same_shape(gradient.gradient())?,
-                            None => ResidentNormalEnclosureSection::concatenate_rows(&[
-                                gradient.gradient()
-                            ])?,
-                        });
-                }
-                // The full parameter covector is returned; arbitrary D updates would leave
-                // the declared pair family, so publication remains a separate constrained step.
-                (None, scale)
+                let proposal = model.field.prepare_declared_contact_amplitude_return(
+                    &pullbacks.iter().collect::<Vec<_>>(),
+                    3,
+                    step_bits,
+                )?;
+                (None, Some(proposal))
             } else {
                 (
                     Some(model.field.prepare_global_action_material_return(
@@ -1251,7 +1266,7 @@ impl<'c> NativeCoupledBody<'c> {
             }
         };
         Ok(NativeIncidentMaterialReturn {
-            contact_scale_covector,
+            contact_amplitude,
             source_covector: returned.source_covector,
             comparison: id,
             epoch: model.epoch,
@@ -1275,6 +1290,11 @@ impl<'c> NativeCoupledBody<'c> {
         }
         if let Some(contact) = prepared.contact {
             model.field.commit_global_action_material_return(contact)?;
+        }
+        if let Some(contact) = prepared.contact_amplitude {
+            model
+                .field
+                .commit_declared_contact_amplitude_return(contact)?;
         }
         model.materials = prepared.material;
         model.epoch = prepared.next_epoch;

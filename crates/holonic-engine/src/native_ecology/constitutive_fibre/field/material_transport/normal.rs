@@ -401,11 +401,7 @@ fn validate_numerical_witness_layout(
             residual += cached;
             continue;
         }
-        if coefficient_row
-            .iter()
-            .all(|v| *v == 0)
-            && b_row.iter().all(Zero::is_zero)
-        {
+        if coefficient_row.iter().all(|v| *v == 0) && b_row.iter().all(Zero::is_zero) {
             residual_cache.insert((coefficient_row, b_row), BigInt::zero());
             continue;
         }
@@ -951,7 +947,6 @@ pub(super) fn expose_data_energy(
 }
 
 mod direct;
-pub use direct::{NativeAffineGeometry, NativeAffineGeometryAdjoint, NativeRealification, NativeRealificationAdjoint};
 pub use direct::{
     BoundaryMaterialMaps, BoundaryMaterialSeed, CompiledCoupledJoint,
     ConstitutiveComparisonSection, ConstitutiveSourceFrame, ConstitutiveSourceRefusal,
@@ -976,4 +971,8 @@ pub use direct::{
     ResidentNormalEnclosure, ResidentNormalEnclosureSection, ResidentNormalEnclosureView,
     ResidentNormalInput, ResidentNormalMaterial, ResidentNormalMaterialView, ResidentNormalReturn,
     ResidentNormalSectionReturn, ResidentNormalWave,
+};
+pub use direct::{
+    NativeAffineGeometry, NativeAffineGeometryAdjoint, NativeEnclosurePropagation,
+    NativeRealification, NativeRealificationAdjoint,
 };

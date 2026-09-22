@@ -12,6 +12,7 @@ use super::*;
 use crate::native::field_geometry::machine::{
     CompiledGeneratorMachine, CompiledGeneratorSite, CurrentAffineMap,
 };
+use holonic_engine::native_ecology::constitutive_fibre::NativeEnclosurePropagation;
 use holonic_engine::native_ecology::constitutive_fibre::ResidentNormalEnclosureSection;
 use num_traits::Signed;
 use relational_geometry::AffineMap3;
@@ -136,6 +137,7 @@ pub struct MachineSourceMaps<'c> {
     count: usize,
     cursor: Cell<usize>,
     witnesses: Vec<GeneratorSourceClockWitness>,
+    enclosure: NativeEnclosurePropagation,
 }
 
 /// The forward source step and its producing map, retained for the reverse source covector.
@@ -156,6 +158,25 @@ impl<'c> MachineSourceMaps<'c> {
         start: u64,
         count: usize,
         grain: ResidentGrain,
+    ) -> Result<Self> {
+        Self::new_with_enclosure(
+            surface,
+            machine,
+            binding,
+            start,
+            count,
+            grain,
+            NativeEnclosurePropagation::ComponentIntervals,
+        )
+    }
+    pub fn new_with_enclosure(
+        surface: &'c ResidentSurface<'c>,
+        machine: &CompiledGeneratorMachine,
+        binding: &GeneratorSourceBinding,
+        start: u64,
+        count: usize,
+        grain: ResidentGrain,
+        enclosure: NativeEnclosurePropagation,
     ) -> Result<Self> {
         let witnesses = binding.validate_scope(machine, start, count)?;
         if machine.sites().is_empty() || count == 0 || !(1..=120).contains(&grain.0) {
@@ -212,6 +233,7 @@ impl<'c> MachineSourceMaps<'c> {
             count,
             cursor: Cell::new(0),
             witnesses,
+            enclosure,
         })
     }
 
@@ -271,10 +293,11 @@ impl<'c> MachineSourceMaps<'c> {
                 .split_rows(self.machine_sites, 12)
                 .map_err(invalid)?,
         );
-        let advance = MachineValueTransport::new(
+        let advance = MachineValueTransport::new_with_enclosure(
             q_section,
             &(0..self.machine_sites).collect::<Vec<_>>(),
             self.coefficients.clone(),
+            self.enclosure.clone(),
         )?;
         let source_rows = encoded_step
             .split_components(self.injection_count)

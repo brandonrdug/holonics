@@ -874,5 +874,15 @@ for nonzero amplitude. Its two-factor contraction matches the machine's real-coo
 parameter receiver. The relative-basis law rebases an old comparison's amplitude covector;
 a scalar counterexample separates old and contemporary bases. A gradient-ball bound proves
 positivity of the proposed relative step, and amplitude composition retains the pair template.
-These latter laws constrain the next publication owner; they do not assert a native update
-or finite-step objective improvement. [Native return and scope](../research/records/2026-09-21_THE_PAIR_RESPONSE_RETURNS_ITS_RECTANGULAR_FACTOR_COTANGENT.md).
+These laws constrain the implemented positive-amplitude publication owner; they do not
+assert finite-step objective improvement. [Native return and scope](../research/records/2026-09-21_THE_PAIR_RESPONSE_RETURNS_ITS_RECTANGULAR_FACTOR_COTANGENT.md).
+
+[proved-derived; formal-checked] `Transport/ContactAmplitudeState.lean` instantiates
+`StandingLaw` for completed update sequences mapped to their complete current state, proving
+the fold/transport correspondence and equality of declared future consequences. Pending
+comparison operands remain separate. `Transport/{AffineJointBall,PairJointBall}.lean` proves
+conditional affine/adjoint, projection, simplex and perturbation bounds for joint enclosures.
+All three are imported by Dynamics. Native matrix-norm and integer-rounding correspondence,
+nonlinear source descent and geometric/clock derivatives remain #62 obligations. The
+[amplitude consumer and scope](../research/records/2026-09-22_PAIR_MATERIAL_LEARNS_WITHOUT_A_COMPLETED_UPDATE_ARCHIVE.md)
+binds these laws to public observation, current state, and numerical tests.

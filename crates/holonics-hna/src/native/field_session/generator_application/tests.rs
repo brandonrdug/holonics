@@ -50,6 +50,20 @@ fn generator_source_aperture_is_not_machine_population_or_legacy_slots() {
     assert_eq!(wire["source_chart"], "generator-machine");
     assert_eq!(wire["generator"]["receiver"]["kind"], "generator-phases");
     assert_eq!(
+        wire["generator"]["field"]["enclosure_propagation"],
+        "joint-ball"
+    );
+    let mut older = wire.clone();
+    older["generator"]["field"]
+        .as_object_mut()
+        .unwrap()
+        .remove("enclosure_propagation");
+    let older: FieldSessionSpec = serde_json::from_value(older).unwrap();
+    assert_eq!(
+        older.generator.unwrap().field.enclosure_propagation,
+        crate::native::NativeEnclosurePropagation::ComponentIntervals
+    );
+    assert_eq!(
         serde_json::from_value::<FieldSessionSpec>(wire).unwrap(),
         short
     );
@@ -115,4 +129,87 @@ fn generator_session_returns_the_ordered_source_and_reopens_its_frozen_compariso
         std::fs::read(direct_path).unwrap(),
         std::fs::read(resumed_path).unwrap()
     );
+}
+
+#[test]
+#[ignore = "requires CUDA; observed targets change pair amplitudes without completed-event storage growth"]
+fn generator_session_learns_pair_response_without_accumulating_completed_returns() {
+    super::super::with_field_session(
+        &generator_machine::generator_session_spec(2, 6, 2).unwrap(),
+        |session| {
+            let mut amplitudes = Vec::new();
+            let mut before_change = None;
+            for step in 0..6 {
+                let entering = session.inspect_current()?;
+                eprintln!(
+                    "step {step}: radius {}, operator {}",
+                    entering["joint"]["radius"], entering["operator"]
+                );
+                let generated = session
+                    .request(&request(if step % 2 == 0 { "ab" } else { "ba" }, true))
+                    .map_err(|error| {
+                        invalid(format!(
+                            "request step {step}: {error}; entering joint {}",
+                            entering["joint"]
+                        ))
+                    })?;
+                eprintln!("step {step}: generated {}, target {}", generated["text"], if step % 2 == 0 { "ba" } else { "ab" });
+                let id = generated["comparison"].as_u64().unwrap();
+                let probe_before = if step == 5 {
+                    let probe = session.request(&request("ab", false))?;
+                    let probe_id = probe["comparison"].as_u64().unwrap();
+                    let phase = snapshot(session, probe_id)["phase"].as_array().unwrap().iter().map(|row| row["center"].clone()).collect::<Vec<_>>();
+                    session.release(probe_id)?;
+                    Some(phase)
+                } else { None };
+                let before = session.inspect_current()?;
+                session
+                    .observe(id, if step % 2 == 0 { "ba" } else { "ab" }, 8)
+                    .map_err(|error| invalid(format!("observe step {step}: {error}")))?;
+                let after = session.inspect_current()?;
+                assert_eq!(
+                    before["joint"], after["joint"],
+                    "learning must not replay or recommit source current"
+                );
+                assert_eq!(after["operative_storage"]["returns"], 0);
+                assert_eq!(session.body.pending_coupled_predictions(), 0);
+                assert!(session.generator.as_ref().unwrap().pending.is_empty());
+                assert!(session.retained_shared_comparisons().is_empty());
+                let rho = after["operator"]["declared_amplitudes"]
+                    .as_array()
+                    .expect("pair amplitudes")
+                    .clone();
+                assert!(!rho.is_empty());
+                if before["operator"]["declared_amplitudes"]
+                    != after["operator"]["declared_amplitudes"]
+                {
+                    before_change = Some((
+                        before["operator"]["declared_amplitudes"].clone(),
+                        after["operator"]["declared_amplitudes"].clone(),
+                    ));
+                }
+                amplitudes.push(rho);
+                if let Some(phase_before) = probe_before {
+                    let probe = session.request(&request("ab", false))?;
+                    let probe_id = probe["comparison"].as_u64().unwrap();
+                    assert_ne!(snapshot(session, probe_id)["phase"].as_array().unwrap().iter().map(|row| row["center"].clone()).collect::<Vec<_>>(), phase_before,
+                        "published material must change later generation at the same source and clock");
+                    eprintln!("post-update same-source probe text: {}", probe["text"]);
+                    session.release(probe_id)?;
+                }
+            }
+            assert!(
+                amplitudes.windows(2).any(|w| w[0] != w[1]),
+                "observed targets must change pair response after boundary material develops"
+            );
+            let radius: relational_geometry::Rat = serde_json::from_value(session.inspect_current()?["joint"]["radius"].clone()).unwrap();
+            eprintln!("final joint radius: {radius}");
+            eprintln!(
+                "observed pair amplitude change: {:?}",
+                before_change.unwrap()
+            );
+            Ok(())
+        },
+    )
+    .unwrap();
 }

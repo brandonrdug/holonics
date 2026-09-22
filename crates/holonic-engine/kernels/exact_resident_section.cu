@@ -1714,6 +1714,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 #include "pair_quadrance.cuh"
 #include "affine_geometry.cuh"
 #include "field_contact_scale.cuh"
+#include "field_contact_amplitude.cuh"
 #include "normal_wave_source.cuh"
 #include "normal_wave_family.cuh"
 #include "normal_family_receiver.cuh"

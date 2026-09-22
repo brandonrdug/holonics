@@ -266,6 +266,7 @@ impl NativeIncidentModelRest {
                     epoch: h.epoch,
                     solver: model.spec.solver(),
                     solve_steps: model.spec.solve_steps(),
+                    enclosure_propagation: model.spec.enclosure_propagation(),
                 }
             };
             let recorded = ResidentNormalEnclosure::remount(surface, p.output, grain)?;

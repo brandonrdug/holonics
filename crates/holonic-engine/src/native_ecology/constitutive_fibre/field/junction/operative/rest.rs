@@ -1,6 +1,10 @@
 use super::*;
 use crate::native_ecology::constitutive_fibre::circulation::rest::point_section;
+use num_bigint::BigInt;
+use num_integer::Integer;
+use num_traits::Zero;
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -22,6 +26,9 @@ pub(in super::super::super) struct OperativeFactorProgramFrame {
     pub boundary_components: usize,
     pub rank: usize,
     pub nonzeros: usize,
+    /// Presence marks the bounded current-amplitude family extension.  Old frames omit it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub group_width: Option<usize>,
 }
 #[derive(Debug, PartialEq, Eq)]
 pub(in super::super::super) struct OperativeMapProgramRest {
@@ -78,12 +85,196 @@ pub(in super::super::super) struct OperativeWire {
 fn legacy_dense_covariance() -> bool {
     true
 }
+
+/// Cold validation for the bounded positive pair family.  This deliberately reads only detached
+/// words; it is also used by outstanding source witnesses, whose producing CSR remains fixed.
+pub(super) fn validate_amplitude_family_sections(
+    frame: &OperativeFactorProgramFrame,
+    family: &[ResidentSectionRest; 4],
+    factor: &[ResidentSectionRest; 9],
+    current_bounds: &ResidentSectionRest,
+    grain: u32,
+    rows: usize,
+    boundary_components: usize,
+) -> Result<(), Error> {
+    let group_width = frame
+        .group_width
+        .ok_or_else(|| invalid("amplitude family metadata"))?;
+    if !(1..=120).contains(&grain)
+        || group_width == 0
+        || rows == 0
+        || rows % group_width != 0
+        || frame.rank != 0
+        || frame.boundary_components != boundary_components
+    {
+        return Err(invalid("amplitude family grouping/rank"));
+    }
+    let nnz = frame.nonzeros;
+    if boundary_components == 0 || boundary_components % 2 != 0 || frame.rows != rows {
+        return Err(invalid("amplitude family dimensions"));
+    }
+    let sparse = nnz.max(1).checked_mul(2).ok_or(Error::Shape)?;
+    let coefficients = sparse.checked_mul(2).ok_or(Error::Shape)?;
+    point_section(
+        &factor[0],
+        1,
+        rows.checked_add(1)
+            .and_then(|n| n.checked_mul(2))
+            .ok_or(Error::Shape)?,
+    )?;
+    point_section(&factor[1], 1, sparse)?;
+    point_section(&factor[2], 1, coefficients)?;
+    point_section(
+        &factor[3],
+        1,
+        (boundary_components / 2)
+            .checked_add(1)
+            .and_then(|n| n.checked_mul(2))
+            .ok_or(Error::Shape)?,
+    )?;
+    point_section(&factor[4], 1, sparse)?;
+    point_section(&factor[5], 1, coefficients)?;
+    point_section(&family[0], 1, coefficients)?;
+    point_section(&family[1], 1, coefficients)?;
+    point_section(&family[2], 1, 4)?;
+    point_section(&family[3], rows / group_width, 6)?;
+    point_section(current_bounds, 1, 4)?;
+    let rho = wides(&family[3].intervals)?;
+    for row in rho.chunks_exact(3) {
+        if row[0] <= 0 || row[1] != 0 || row[2] != 0 {
+            return Err(invalid("amplitude point row"));
+        }
+    }
+    let template_bound = wides(&family[2].intervals)?;
+    let current_bound = wides(&current_bounds.intervals)?;
+    if template_bound.iter().any(|x| *x < 0) || current_bound.iter().any(|x| *x < 0) {
+        return Err(invalid("amplitude template/current radius"));
+    }
+    let offsets = wides(&factor[0].intervals)?;
+    let columns = wides(&factor[1].intervals)?;
+    let template = wides(&family[0].intervals)?;
+    let current = wides(&factor[2].intervals)?;
+    let toffsets = wides(&factor[3].intervals)?;
+    let trows = wides(&factor[4].intervals)?;
+    let ttemplate = wides(&family[1].intervals)?;
+    let tcurrent = wides(&factor[5].intervals)?;
+    if nnz == 0
+        && columns
+            .iter()
+            .chain(&template)
+            .chain(&current)
+            .chain(&trows)
+            .chain(&ttemplate)
+            .chain(&tcurrent)
+            .any(|v| *v != 0)
+    {
+        return Err(invalid("empty amplitude template packet"));
+    }
+    if offsets.first().copied() != Some(0) || toffsets.first().copied() != Some(0) {
+        return Err(invalid("amplitude CSR origin"));
+    }
+    if offsets.len() != rows + 1
+        || columns.len() != nnz.max(1)
+        || template.len() != 2 * nnz.max(1)
+        || current.len() != 2 * nnz.max(1)
+        || toffsets.len() != boundary_components / 2 + 1
+        || trows.len() != nnz.max(1)
+        || ttemplate.len() != 2 * nnz.max(1)
+        || offsets.windows(2).any(|w| w[0] < 0 || w[1] < w[0])
+        || offsets.last().copied() != Some(nnz as i128)
+        || toffsets.windows(2).any(|w| w[0] < 0 || w[1] < w[0])
+        || toffsets.last().copied() != Some(nnz as i128)
+    {
+        return Err(invalid("amplitude CSR extent"));
+    }
+    let scale = BigInt::from(1) << grain;
+    let mut transpose: BTreeMap<(usize, usize), Vec<(i128, i128)>> = BTreeMap::new();
+    let mut direct: BTreeMap<(usize, usize), Vec<(i128, i128)>> = BTreeMap::new();
+    let mut max_rho = BigInt::from(0);
+    let mut inexact = 0i128;
+    for row in 0..rows {
+        let lo = usize::try_from(offsets[row]).map_err(|_| invalid("amplitude CSR offset"))?;
+        let hi = usize::try_from(offsets[row + 1]).map_err(|_| invalid("amplitude CSR offset"))?;
+        if hi > nnz {
+            return Err(invalid("amplitude CSR offset"));
+        }
+        let r = BigInt::from(rho[3 * (row / group_width)]);
+        if r > max_rho {
+            max_rho = r.clone();
+        }
+        for j in lo..hi {
+            let c = usize::try_from(columns[j]).map_err(|_| invalid("amplitude CSR column"))?;
+            if c % 2 != 0 || c >= boundary_components {
+                return Err(invalid("amplitude CSR column address"));
+            }
+            let pair = (template[2 * j], template[2 * j + 1]);
+            direct.entry((row, c / 2)).or_default().push(pair);
+            let mut expected = [0i128; 2];
+            for axis in 0..2 {
+                let product = &r * BigInt::from(if axis == 0 { pair.0 } else { pair.1 });
+                let q = product.div_floor(&scale);
+                let rem = &product - (&q * &scale);
+                if !rem.is_zero() {
+                    inexact = inexact.checked_add(1).ok_or(Error::Shape)?;
+                }
+                expected[axis] =
+                    i128::try_from(q).map_err(|_| invalid("amplitude coefficient overflow"))?;
+                if current[2 * j + axis] != expected[axis] {
+                    return Err(invalid("amplitude current/template mismatch"));
+                }
+            }
+        }
+    }
+    for component in 0..boundary_components / 2 {
+        let lo = usize::try_from(toffsets[component])
+            .map_err(|_| invalid("amplitude transpose offset"))?;
+        let hi = usize::try_from(toffsets[component + 1])
+            .map_err(|_| invalid("amplitude transpose offset"))?;
+        if hi > nnz {
+            return Err(invalid("amplitude transpose offset"));
+        }
+        for j in lo..hi {
+            let row = usize::try_from(trows[j]).map_err(|_| invalid("amplitude transpose row"))?;
+            if row >= rows {
+                return Err(invalid("amplitude transpose row"));
+            }
+            let r = BigInt::from(rho[3 * (row / group_width)]);
+            for axis in 0..2 {
+                let expected = (&r * BigInt::from(ttemplate[2 * j + axis])).div_floor(&scale);
+                if expected != BigInt::from(tcurrent[2 * j + axis]) {
+                    return Err(invalid("amplitude transpose current/template mismatch"));
+                }
+            }
+            transpose
+                .entry((row, component))
+                .or_default()
+                .push((ttemplate[2 * j], ttemplate[2 * j + 1]));
+        }
+    }
+    for values in direct.values_mut() {
+        values.sort_unstable();
+    }
+    for values in transpose.values_mut() {
+        values.sort_unstable();
+    }
+    if direct != transpose {
+        return Err(invalid("amplitude CSR/transpose template mismatch"));
+    }
+    let expected_radius =
+        (&max_rho * BigInt::from(template_bound[0])).div_ceil(&scale) + BigInt::from(inexact);
+    if BigInt::from(current_bound[0]) < expected_radius {
+        return Err(invalid("amplitude current bound"));
+    }
+    Ok(())
+}
 #[derive(Debug, PartialEq, Eq)]
 pub(in super::super::super) struct OperativeRest {
     pub current: [ResidentSectionRest; 5],
     pub initial: [ResidentSectionRest; 5],
     pub covariance: [Option<ResidentSectionRest>; 2],
     pub factor_program: [Option<[ResidentSectionRest; 9]>; 2],
+    /// Fixed templates plus the current positive amplitudes; no update history is retained.
+    pub amplitude_family: [Option<[ResidentSectionRest; 4]>; 2],
     pub returns: Vec<[ResidentSectionRest; 4]>,
     pub source_overlaps: Vec<Option<[ResidentSectionRest; 2]>>,
     pub program: Option<OperativeMapProgramRest>,
@@ -257,6 +448,16 @@ impl OperativeRest {
                 ])
             })
             .transpose()?;
+        let mut read_family = |frame: Option<&OperativeFactorProgramFrame>| {
+            frame
+                .and_then(|f| f.group_width.map(|_| ()))
+                .map(|_| Ok::<_, Error>([section()?, section()?, section()?, section()?]))
+                .transpose()
+        };
+        let amplitude_family = [
+            read_family(wire.factor_program.as_ref())?,
+            read_family(wire.initial_factor_program.as_ref())?,
+        ];
         let program = wire
             .map_program
             .as_ref()
@@ -289,6 +490,7 @@ impl OperativeRest {
             initial,
             covariance: [current_covariance, initial_covariance],
             factor_program: [factor_program, initial_factor_program],
+            amplitude_family,
             returns,
             source_overlaps,
             program,
@@ -321,6 +523,13 @@ impl OperativeRest {
         for factor_program in &self.factor_program {
             if let Some(factor_program) = factor_program {
                 for value in factor_program {
+                    section(value)?;
+                }
+            }
+        }
+        for family in &self.amplitude_family {
+            if let Some(family) = family {
+                for value in family {
                     section(value)?;
                 }
             }
@@ -415,6 +624,48 @@ impl OperativeRest {
             (Some(frame), Some(values)) => validate_factor(frame, values, k)?,
             (None, None) => {}
             _ => return Err(invalid("factor program presence")),
+        }
+        let validate_family_shape = |frame: &OperativeFactorProgramFrame,
+                                     values: &[ResidentSectionRest; 4],
+                                     expected_rows: usize|
+         -> Result<(), Error> {
+            let group_width = frame
+                .group_width
+                .ok_or_else(|| invalid("amplitude family metadata"))?;
+            if group_width == 0
+                || expected_rows == 0
+                || expected_rows % group_width != 0
+                || frame.rank != 0
+            {
+                return Err(invalid("amplitude family grouping/rank"));
+            }
+            point_section(&values[0], 1, 4 * frame.nonzeros.max(1))?;
+            point_section(&values[1], 1, 4 * frame.nonzeros.max(1))?;
+            point_section(&values[2], 1, 4)?;
+            point_section(&values[3], expected_rows / group_width, 6)?;
+            let a = wides(&values[3].intervals)?;
+            if a.chunks_exact(3)
+                .any(|r| r[0] <= 0 || r[1] != 0 || r[2] != 0)
+                || wides(&values[2].intervals)?.iter().any(|v| *v < 0)
+            {
+                return Err(invalid("amplitude family point/bound"));
+            }
+            Ok(())
+        };
+        for (frame, family, rows) in [
+            (&wire.factor_program, &self.amplitude_family[0], k),
+            (
+                &wire.initial_factor_program,
+                &self.amplitude_family[1],
+                initial,
+            ),
+        ] {
+            match (frame, family) {
+                (Some(frame), Some(values)) => validate_family_shape(frame, values, rows)?,
+                (Some(frame), None) if frame.group_width.is_none() => {}
+                (None, None) => {}
+                _ => return Err(invalid("amplitude family presence")),
+            }
         }
         match (&wire.initial_factor_program, &self.factor_program[1]) {
             (Some(frame), Some(values)) => validate_factor(frame, values, initial)?,
@@ -539,6 +790,7 @@ impl<'c> OperativeState<'c> {
                     boundary_components: program.boundary_components,
                     rank: program.rank,
                     nonzeros: program.nonzeros,
+                    group_width: program.amplitude_family.as_ref().map(|f| f.group_width),
                 }
             }),
             initial_factor_program: self.initial.factor_program.as_ref().map(|program| {
@@ -547,6 +799,7 @@ impl<'c> OperativeState<'c> {
                     boundary_components: program.boundary_components,
                     rank: program.rank,
                     nonzeros: program.nonzeros,
+                    group_width: program.amplitude_family.as_ref().map(|f| f.group_width),
                 }
             }),
             returns: self.returns.len(),
@@ -636,6 +889,19 @@ impl<'c> OperativeState<'c> {
                 ])
             })
             .transpose()?;
+        let family = |program: Option<&Rc<OperativeFactorProgram<'c>>>| {
+            program
+                .and_then(|p| p.amplitude_family.as_ref())
+                .map(|f| {
+                    Ok::<_, Error>([
+                        read(&f.template_values)?,
+                        read(&f.template_transpose_values)?,
+                        read(&f.template_bounds)?,
+                        read(&f.amplitudes)?,
+                    ])
+                })
+                .transpose()
+        };
         Ok(OperativeRest {
             program: self
                 .program
@@ -661,6 +927,10 @@ impl<'c> OperativeState<'c> {
             initial,
             covariance: [None, None],
             factor_program: [factor_program, initial_factor_program],
+            amplitude_family: [
+                family(self.sections.factor_program.as_ref())?,
+                family(self.initial.factor_program.as_ref())?,
+            ],
             returns: self
                 .returns
                 .iter()
@@ -696,7 +966,43 @@ impl<'c> OperativeState<'c> {
             source_overlaps: rest_source_overlaps,
             program: rest_program,
             factor_program: [rest_current_factor, rest_initial_factor],
+            amplitude_family: [rest_current_family, rest_initial_family],
         } = rest;
+        if let (Some(frame), Some(family)) =
+            (wire.factor_program.as_ref(), rest_current_family.as_ref())
+        {
+            if frame.group_width.is_some() {
+                validate_amplitude_family_sections(
+                    frame,
+                    family,
+                    rest_current_factor
+                        .as_ref()
+                        .ok_or_else(|| invalid("factor family"))?,
+                    &current[2],
+                    grain,
+                    frame.rows,
+                    frame.boundary_components,
+                )?;
+            }
+        }
+        if let (Some(frame), Some(family)) = (
+            wire.initial_factor_program.as_ref(),
+            rest_initial_family.as_ref(),
+        ) {
+            if frame.group_width.is_some() {
+                validate_amplitude_family_sections(
+                    frame,
+                    family,
+                    rest_initial_factor
+                        .as_ref()
+                        .ok_or_else(|| invalid("initial factor family"))?,
+                    &initial[2],
+                    grain,
+                    frame.rows,
+                    frame.boundary_components,
+                )?;
+            }
+        }
         let sections = |s: [ResidentSectionRest; 5],
                         covariance: Option<ResidentSectionRest>|
          -> Result<Rc<OperativeSections<'c>>, Error> {
@@ -736,6 +1042,56 @@ impl<'c> OperativeState<'c> {
             (None, None) => None,
             _ => return Err(invalid("map program presence")),
         };
+        let current_family = match (
+            wire.factor_program.as_ref().and_then(|f| f.group_width),
+            rest_current_family,
+        ) {
+            (
+                Some(group_width),
+                Some(
+                    [
+                        template_values,
+                        template_transpose_values,
+                        template_bounds,
+                        amplitudes,
+                    ],
+                ),
+            ) => Some(Rc::new(DeclaredAmplitudeFamily {
+                group_width,
+                template_values: Rc::new(mount(template_values)?),
+                template_transpose_values: Rc::new(mount(template_transpose_values)?),
+                template_bounds: Rc::new(mount(template_bounds)?),
+                amplitudes: Rc::new(mount(amplitudes)?),
+            })),
+            (None, None) => None,
+            _ => return Err(invalid("amplitude family presence")),
+        };
+        let initial_family = match (
+            wire.initial_factor_program
+                .as_ref()
+                .and_then(|f| f.group_width),
+            rest_initial_family,
+        ) {
+            (
+                Some(group_width),
+                Some(
+                    [
+                        template_values,
+                        template_transpose_values,
+                        template_bounds,
+                        amplitudes,
+                    ],
+                ),
+            ) => Some(Rc::new(DeclaredAmplitudeFamily {
+                group_width,
+                template_values: Rc::new(mount(template_values)?),
+                template_transpose_values: Rc::new(mount(template_transpose_values)?),
+                template_bounds: Rc::new(mount(template_bounds)?),
+                amplitudes: Rc::new(mount(amplitudes)?),
+            })),
+            (None, None) => None,
+            _ => return Err(invalid("initial amplitude family presence")),
+        };
         let factor_program = match (wire.factor_program.clone(), rest_current_factor) {
             (
                 Some(frame),
@@ -766,6 +1122,7 @@ impl<'c> OperativeState<'c> {
                 boundary_components: frame.boundary_components,
                 rank: frame.rank,
                 nonzeros: frame.nonzeros,
+                amplitude_family: current_family,
             })),
             (None, None) => None,
             _ => return Err(invalid("factor program presence")),
@@ -786,6 +1143,7 @@ impl<'c> OperativeState<'c> {
                     boundary_components: frame.boundary_components,
                     rank: frame.rank,
                     nonzeros: frame.nonzeros,
+                    amplitude_family: initial_family,
                 })),
                 (None, None) => None,
                 _ => return Err(invalid("initial factor program presence")),

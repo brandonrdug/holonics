@@ -52,6 +52,7 @@ fn main() {
     println!("cargo:rerun-if-changed=kernels/pair_quadrance.cuh");
     println!("cargo:rerun-if-changed=kernels/affine_geometry.cuh");
     println!("cargo:rerun-if-changed=kernels/field_contact_scale.cuh");
+    println!("cargo:rerun-if-changed=kernels/field_contact_amplitude.cuh");
     println!("cargo:rerun-if-changed=kernels/coupled_joint_compile.cuh");
     println!("cargo:rerun-if-changed=kernels/coupled_constitutive_family.cuh");
     println!("cargo:rerun-if-changed=kernels/exact_packet_linear.cuh");

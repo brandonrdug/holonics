@@ -15,7 +15,10 @@ use crate::native::{
         PhaseSpec,
     },
 };
-use holonic_engine::{ExactRatMatrix, inertia::SymmetricForm};
+use holonic_engine::{
+    ExactRatMatrix, inertia::SymmetricForm,
+    native_ecology::constitutive_fibre::NativeEnclosurePropagation,
+};
 use num_bigint::BigInt;
 use num_traits::Zero;
 use relational_geometry::{AffineMap3, Rat, RatMat3, RatVec3, cayley_rotation_z};
@@ -192,6 +195,7 @@ pub fn generator_session_spec(
         material_owners: Vec::new(),
         solve_steps: 128,
         solver: IncidentFieldSolver::Richardson,
+        enclosure_propagation: NativeEnclosurePropagation::JointBall,
     };
     let options = GeneratorSessionOptions {
         field,

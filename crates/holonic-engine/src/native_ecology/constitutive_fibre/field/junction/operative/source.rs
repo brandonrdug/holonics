@@ -7,9 +7,9 @@ mod reflection_commit;
 mod reflection_target;
 mod rest;
 pub use action::{
-    NativeDeclaredFactorScaleGradient, NativeFieldAction, NativeFieldActionFactorization,
-    NativeFieldActionPullback, NativeFieldContactOrigin, NativeFieldGlobalMaterialCommit,
-    NativeFieldJointLayout, NativeFieldMatrixFreeAction,
+    NativeDeclaredAmplitudeCommit, NativeDeclaredFactorScaleGradient, NativeFieldAction,
+    NativeFieldActionFactorization, NativeFieldActionPullback, NativeFieldContactOrigin,
+    NativeFieldGlobalMaterialCommit, NativeFieldJointLayout, NativeFieldMatrixFreeAction,
 };
 pub use map_action::{NativeFieldDeclaredIncidence, NativeFieldFactorAction};
 pub use reflection::{NativeFieldReflection, NativeFieldReflectionSection};
@@ -94,6 +94,7 @@ impl<'c> NativeFieldCurrentSource<'c> {
             "rank": rank,
             "nonzeros": nonzeros,
             "field_cut": self.cut,
+            "declared_amplitudes": self.inspect_declared_amplitudes()?.map(|values| values.into_iter().map(|v|v.to_string()).collect::<Vec<_>>()),
             "contact_count": self.births.len(),
         }))
     }

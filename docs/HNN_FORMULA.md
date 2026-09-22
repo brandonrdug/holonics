@@ -926,6 +926,14 @@ affine translation advances standing q only. Clock/action maps are supplied.
 
 [definition] One shared text map and one two-class stop map read the tagged phase rows. A text
 aperture A has A+1 phase rows, with the last allowing termination at length A. Normal parameters
-do not acquire a new block for each position. Geometry/contact response remain fixed while
-E/M/R and stop material develop. The [source/consumer record](../research/records/2026-09-21_ORDERED_SOURCE_AND_PHASE_RECEIVING_ENTER_THE_PUBLIC_GENERATOR_SESSION.md)
+do not acquire a new block for each position. Geometry and clocks remain supplied; positive pair response now develops together with
+E/M/R and stop material. The [source/consumer record](../research/records/2026-09-21_ORDERED_SOURCE_AND_PHASE_RECEIVING_ENTER_THE_PUBLIC_GENERATOR_SESSION.md)
 states the retained source fibre, complete return, publication and native/formal evidence.
+
+[definition] Pair material uses `D_a = rho_a B_a`, with one fixed rectangular template and
+positive current rho. Public observation contracts the old full q/b cotangent against the
+current relative basis, chooses a bounded dyadic step, and rebuilds the sparse factor from
+the selected point amplitudes. Completed updates add no history operand. The
+[material return](../research/records/2026-09-22_PAIR_MATERIAL_LEARNS_WITHOUT_A_COMPLETED_UPDATE_ARCHIVE.md)
+distinguishes the active point law, reference proposal error, numerical enclosure and live
+comparison cost. It does not assert finite-step objective improvement.

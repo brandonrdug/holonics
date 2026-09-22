@@ -15,7 +15,8 @@ use holonic_engine::{
     embedding_fiber::ResidentReadout,
     inertia::SymmetricForm,
     native_ecology::constitutive_fibre::{
-        ResidentConstitutiveSection, ResidentNormalEnclosure, ResidentNormalEnclosureSection,
+        NativeEnclosurePropagation, ResidentConstitutiveSection, ResidentNormalEnclosure,
+        ResidentNormalEnclosureSection,
     },
     resident_section::{ResidentGrain, ResidentSectionRest, ResidentSurface},
 };
@@ -122,6 +123,7 @@ pub(super) fn spec() -> GeneratorIncidentFieldSpec {
         material_owners: vec![],
         solve_steps: 128,
         solver: IncidentFieldSolver::Richardson,
+        enclosure_propagation: NativeEnclosurePropagation::ComponentIntervals,
     }
 }
 

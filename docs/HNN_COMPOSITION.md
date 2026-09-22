@@ -388,8 +388,10 @@ neighbor's two covectors join before `U*`; legacy bilinear behavior is the defau
 comparisons retain their producing score through rest. The exact pair-contact and serial
 owners feed the fixed generator machine through `incident/machine.rs`. The ordered source
 and shared phase receiver are connected through `field_session/generator_application.rs`;
-their complete producing return is described below. Constrained contact/geometry publication
-and compatible source-family closure remain open.
+their complete producing return is described below. Positive contact-amplitude publication now consumes that return; configuration/clock
+inference and compatible source-family closure remain open. The
+[amplitude construction](../research/records/2026-09-22_PAIR_MATERIAL_LEARNS_WITHOUT_A_COMPLETED_UPDATE_ARCHIVE.md)
+uses the fixed template and current positive parameters, with no completed-update archive.
 
 
 [established-bounded; source-inspected] The incident-field path now has a resident realization of

@@ -1,18 +1,95 @@
 use super::*;
 
 #[test]
+#[ignore = "requires CUDA; joint enclosure bounds retain the Frobenius operator radius"]
+fn joint_normal_applied_forward_and_adjoint_keep_one_ball_radius() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let grain = ResidentGrain(64);
+    let prior = NativeNormalPrior::from_coefficients(vec![vec![
+        ExactComplexWaveCurrent::new(
+            Rat::new(1.into(), 2.into()),
+            Rat::zero()
+        );
+        4
+    ]])
+    .unwrap();
+    let material =
+        ResidentNormalMaterial::found_features_with_prior(&surface, 4, 1, grain, prior).unwrap();
+    let ball = |width: usize, radius: i128| {
+        let mut values = vec![(0, 0); 2 * width];
+        values.extend([
+            (radius as i64, radius as i64),
+            ((radius >> 64) as i64, (radius >> 64) as i64),
+        ]);
+        surface
+            .mount_section_rest(
+                &ResidentSectionRest::found(1, 2 * (width + 1), ResidentGrain(0), 64, values)
+                    .unwrap(),
+            )
+            .unwrap()
+    };
+    let features =
+        ResidentNormalEnclosureSection::from_resident(&surface, ball(8, 1i128 << 60), 1, 8, grain)
+            .unwrap();
+    let legacy = material
+        .retained_view()
+        .read_applied_enclosed_section(&features)
+        .unwrap()
+        .row(0)
+        .unwrap()
+        .inspect()
+        .unwrap();
+    let joint = material
+        .retained_view()
+        .read_applied_enclosed_section_with_enclosure(
+            &features,
+            NativeEnclosurePropagation::JointBall,
+        )
+        .unwrap()
+        .row(0)
+        .unwrap()
+        .inspect()
+        .unwrap();
+    assert_eq!(legacy.radius, Rat::new(1.into(), 8.into()));
+    assert_eq!(joint.radius, Rat::new(1.into(), 16.into()));
+    let gy =
+        ResidentNormalEnclosureSection::from_resident(&surface, ball(2, 1i128 << 60), 1, 2, grain)
+            .unwrap();
+    let pulled = material
+        .retained_view()
+        .pull_back_enclosed_section_with_enclosure(&gy, NativeEnclosurePropagation::JointBall)
+        .unwrap()
+        .row(0)
+        .unwrap()
+        .inspect()
+        .unwrap();
+    assert_eq!(pulled.center.len(), 4);
+    assert_eq!(pulled.radius, Rat::new(1.into(), 16.into()));
+}
+
+#[test]
 #[ignore = "requires CUDA; homogeneous feature is one at the packet grain, not one carrier unit"]
 fn homogeneous_feature_retains_the_declared_unit_and_radius() {
-    let readout=ResidentReadout::new().unwrap();
-    let surface=ResidentSurface::on(&readout).unwrap();
-    let raw=surface.mount_section_rest(&ResidentSectionRest::found(1,2,ResidentGrain(0),64,vec![(3,3),(-2,-2)]).unwrap()).unwrap();
-    let source=ResidentNormalEnclosureSection::from_points(ResidentConstitutiveSection::integers(&raw).unwrap(),ResidentGrain(16)).unwrap();
-    let expanded=source.append_homogeneous().unwrap();
-    let before=source.row(0).unwrap().inspect().unwrap();
-    let after=expanded.row(0).unwrap().inspect().unwrap();
-    assert_eq!(after.center[0],before.center[0]);
-    assert_eq!(after.center[1],ExactComplexWaveCurrent::one());
-    assert_eq!(after.radius,before.radius);
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let raw = surface
+        .mount_section_rest(
+            &ResidentSectionRest::found(1, 2, ResidentGrain(0), 64, vec![(3, 3), (-2, -2)])
+                .unwrap(),
+        )
+        .unwrap();
+    let source = ResidentNormalEnclosureSection::from_points(
+        ResidentConstitutiveSection::integers(&raw).unwrap(),
+        ResidentGrain(16),
+    )
+    .unwrap();
+    let expanded = source.append_homogeneous().unwrap();
+    let before = source.row(0).unwrap().inspect().unwrap();
+    let after = expanded.row(0).unwrap().inspect().unwrap();
+    assert_eq!(after.center[0], before.center[0]);
+    assert_eq!(after.center[1], ExactComplexWaveCurrent::one());
+    assert_eq!(after.radius, before.radius);
 }
 use crate::embedding_fiber::ResidentReadout;
 
@@ -74,14 +151,16 @@ fn section_integrates_once_and_preserves_the_common_producing_operators() {
             .forward;
         assert_eq!(single.center, field[row].center);
         assert_eq!(single.radius, field[row].radius);
-        assert!(returned
-            .before(row)
-            .unwrap()
-            .inspect()
-            .unwrap()
-            .center
-            .iter()
-            .all(|v| v.norm_square().is_zero()));
+        assert!(
+            returned
+                .before(row)
+                .unwrap()
+                .inspect()
+                .unwrap()
+                .center
+                .iter()
+                .all(|v| v.norm_square().is_zero())
+        );
     }
     assert!(returned.forward(x.rows()).is_err());
     assert!(x.row(x.rows()).is_err());
@@ -117,12 +196,13 @@ fn a_late_section_refusal_preserves_every_old_moment() {
         .unwrap();
     let mut body = ResidentNormalMaterial::found(&s, 1, 1, ResidentGrain(u32::BITS)).unwrap();
     let before = body.state_wire().unwrap();
-    assert!(body
-        .receive_section(
+    assert!(
+        body.receive_section(
             ResidentConstitutiveSection::integers(&source).unwrap(),
             ResidentConstitutiveSection::integers(&bad).unwrap()
         )
-        .is_err());
+        .is_err()
+    );
     assert_eq!(body.state_wire().unwrap(), before);
     assert_eq!(body.observations(), 0);
     let good = points(&s, 2, 2, &[1, 0, 0, 1]);
@@ -293,7 +373,8 @@ fn enclosed_condition_rows_agree_row_by_row_and_re_enter_as_the_next_source() {
     let rest = normal.rest().unwrap();
     let mut state = wides(&rest.state().intervals).unwrap();
     state[..6].copy_from_slice(&[0, scale, 2 * scale, 0, scale, -scale]);
-    let view = ResidentNormalMaterialView { prior: None,
+    let view = ResidentNormalMaterialView {
+        prior: None,
         surface: &s,
         state: Rc::new(wide_words(&s, &state)),
         source_chart: NormalSourceChart::Features { source_complex: 3 },
@@ -326,10 +407,7 @@ fn enclosed_condition_rows_agree_row_by_row_and_re_enter_as_the_next_source() {
         ExactComplexWaveCurrent::new(Rat::from_integer(re.into()), Rat::from_integer(im.into()))
     };
     // y = i·s + 2·h + (1-i)·h·s, then the identity path x + y on the shared source.
-    let expected = [
-        (value(4, 3), value(5, 3)),
-        (value(2, -1), value(2, -3)),
-    ];
+    let expected = [(value(4, 3), value(5, 3)), (value(2, -1), value(2, -3))];
     for (row, (reacted, incame)) in expected.iter().enumerate() {
         let single = view
             .read_applied_bilinear(source.row(row).unwrap(), condition_points.row(row).unwrap())
@@ -368,7 +446,15 @@ fn enclosed_condition_rows_agree_row_by_row_and_re_enter_as_the_next_source() {
     let thirds = points(&s, 2, 3, &[1, 0, 3, 0, -2, 1]);
     let thirds_points = ResidentConstitutiveSection::rationals(&thirds).unwrap();
     let thirds_source = ResidentNormalEnclosureSection::from_points(thirds_points, grain).unwrap();
-    assert!(!thirds_source.row(0).unwrap().inspect().unwrap().radius.is_zero());
+    assert!(
+        !thirds_source
+            .row(0)
+            .unwrap()
+            .inspect()
+            .unwrap()
+            .radius
+            .is_zero()
+    );
     let enclosed = view
         .read_applied_bilinear_enclosed_section(&thirds_source, condition_points, false)
         .unwrap();
@@ -409,32 +495,37 @@ fn enclosed_condition_rows_agree_row_by_row_and_re_enter_as_the_next_source() {
     );
     // Shape, parity and chart refusals. None of them silently restricts or pads an operand.
     let single_row = points(&s, 1, 3, &[1, 1, 1]);
-    assert!(view
-        .read_applied_bilinear_enclosed_section(
+    assert!(
+        view.read_applied_bilinear_enclosed_section(
             &source,
             ResidentConstitutiveSection::rationals(&single_row).unwrap(),
             false
         )
-        .is_err());
+        .is_err()
+    );
     let odd = points(&s, 2, 2, &[1, 1, 1, 1]);
-    assert!(view
-        .read_applied_bilinear_enclosed_section(
+    assert!(
+        view.read_applied_bilinear_enclosed_section(
             &source,
             ResidentConstitutiveSection::rationals(&odd).unwrap(),
             false
         )
-        .is_err());
+        .is_err()
+    );
     let wide_source = points(&s, 2, 5, &[1, 0, 0, 0, 1, 0, 0, 1, 0, 1]);
     let wide_source = ResidentNormalEnclosureSection::from_points(
         ResidentConstitutiveSection::rationals(&wide_source).unwrap(),
         grain,
     )
     .unwrap();
-    assert!(view
-        .read_applied_bilinear_enclosed_section(&wide_source, condition_points, false)
-        .is_err());
-    let coarse = ResidentNormalEnclosureSection::from_points(source_points, ResidentGrain(20)).unwrap();
-    assert!(view
-        .read_applied_bilinear_enclosed_section(&coarse, condition_points, false)
-        .is_err());
+    assert!(
+        view.read_applied_bilinear_enclosed_section(&wide_source, condition_points, false)
+            .is_err()
+    );
+    let coarse =
+        ResidentNormalEnclosureSection::from_points(source_points, ResidentGrain(20)).unwrap();
+    assert!(
+        view.read_applied_bilinear_enclosed_section(&coarse, condition_points, false)
+            .is_err()
+    );
 }

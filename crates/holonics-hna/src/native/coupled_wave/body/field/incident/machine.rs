@@ -4,6 +4,7 @@ use crate::native::field_geometry::{
     machine::{CompiledGeneratorMachine, GeneratorMachineSpec},
     machine_factor::MachineFactor,
 };
+use holonic_engine::native_ecology::constitutive_fibre::NativeEnclosurePropagation;
 use relational_geometry::{AffineMap3, RatMat3};
 
 /// A fixed machine and its finite resident refinement. Each original complex-3 current is
@@ -27,10 +28,15 @@ pub struct GeneratorIncidentFieldSpec {
     pub solve_steps: usize,
     #[serde(default, skip_serializing_if = "IncidentFieldSolver::is_richardson")]
     pub solver: IncidentFieldSolver,
+    #[serde(default, skip_serializing_if = "is_component_intervals")]
+    pub enclosure_propagation: NativeEnclosurePropagation,
 }
 
 fn is_zero(value: &usize) -> bool {
     *value == 0
+}
+fn is_component_intervals(value: &NativeEnclosurePropagation) -> bool {
+    *value == NativeEnclosurePropagation::ComponentIntervals
 }
 
 /// Untagged only to preserve the existing legacy rest spelling. The two source objects have
@@ -65,6 +71,8 @@ impl<'de> Deserialize<'de> for IncidentModelSpec {
             solve_steps: usize,
             #[serde(default)]
             solver: IncidentFieldSolver,
+            #[serde(default)]
+            enclosure_propagation: NativeEnclosurePropagation,
         }
         let w = Wire::deserialize(deserializer)?;
         match (w.geometry, w.machine) {
@@ -75,7 +83,9 @@ impl<'de> Deserialize<'de> for IncidentModelSpec {
                     && w.beta_exponent.is_none()
                     && w.series_terms.is_none()
                     && w.refinement_steps.is_none()
-                    && w.relaxation_bits.is_none() =>
+                    && w.relaxation_bits.is_none()
+                    && w.enclosure_propagation
+                        == NativeEnclosurePropagation::ComponentIntervals =>
             {
                 Ok(Self::Legacy(IncidentFieldSpec {
                     geometry,
@@ -113,6 +123,7 @@ impl<'de> Deserialize<'de> for IncidentModelSpec {
                     material_owners: w.material_owners,
                     solve_steps: w.solve_steps,
                     solver: w.solver,
+                    enclosure_propagation: w.enclosure_propagation,
                 }))
             }
             _ => Err(serde::de::Error::custom(
@@ -150,6 +161,12 @@ impl IncidentModelSpec {
                 s.solver = solver;
                 s.solve_steps = steps;
             }
+        }
+    }
+    pub(super) fn enclosure_propagation(&self) -> NativeEnclosurePropagation {
+        match self {
+            Self::Legacy(_) => NativeEnclosurePropagation::ComponentIntervals,
+            Self::Generator(s) => s.enclosure_propagation.clone(),
         }
     }
 }
@@ -267,6 +284,7 @@ pub(super) struct MachineGroupMaps<'c> {
     pub neighbors: Rc<ResidentNormalEnclosureSection<'c>>,
     pub values: Rc<ResidentNormalEnclosureSection<'c>>,
     pub differences: Option<Rc<ResidentNormalEnclosureSection<'c>>>,
+    pub enclosure: NativeEnclosurePropagation,
 }
 impl<'c> MachineGroupMaps<'c> {
     pub(super) fn new(
@@ -274,6 +292,7 @@ impl<'c> MachineGroupMaps<'c> {
         machine: &CompiledGeneratorMachine,
         group: &IncidentGroup,
         grain: ResidentGrain,
+        enclosure: NativeEnclosurePropagation,
     ) -> Result<Self, NativeSessionError> {
         let spatial = |site: usize| AffineMap3 {
             linear: RatMat3::identity(),
@@ -332,6 +351,7 @@ impl<'c> MachineGroupMaps<'c> {
             } else {
                 Some(mount(&differences)?)
             },
+            enclosure,
         })
     }
 }

@@ -118,4 +118,4 @@ impl<'c> NativeFieldCurrentSource<'c> {
 }
 
 #[cfg(test)]
-mod tests;
+pub(super) mod tests;

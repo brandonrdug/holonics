@@ -13,7 +13,7 @@
 
 use super::*;
 use holonic_engine::native_ecology::constitutive_fibre::{
-    NativeAffineGeometry, NativePairParticipation, NativeRealification,
+    NativeAffineGeometry, NativeEnclosurePropagation, NativePairParticipation, NativeRealification,
     ResidentNormalEnclosureSection,
 };
 use holonic_engine::resident_section::{Dyadic, SeriesAperture};
@@ -49,6 +49,19 @@ impl<'c> MachineValueTransport<'c> {
         source_indices: &[usize],
         coefficients: SectionRc<'c>,
     ) -> Result<Self, NativeSessionError> {
+        Self::new_with_enclosure(
+            source,
+            source_indices,
+            coefficients,
+            NativeEnclosurePropagation::ComponentIntervals,
+        )
+    }
+    pub fn new_with_enclosure(
+        source: SectionRc<'c>,
+        source_indices: &[usize],
+        coefficients: SectionRc<'c>,
+        enclosure: NativeEnclosurePropagation,
+    ) -> Result<Self, NativeSessionError> {
         if source.components() != MACHINE_REALIFIED_COMPONENTS {
             return Err(machine_error("machine value source must have width 12"));
         }
@@ -61,7 +74,7 @@ impl<'c> MachineValueTransport<'c> {
         }
         let affine = decoded
             .output_handle()
-            .affine_geometry(source_indices, coefficients, false)
+            .affine_geometry_with_enclosure(source_indices, coefficients, false, enclosure.clone())
             .map_err(machine_error)?;
         let realified = affine.output_handle().realify().map_err(machine_error)?;
         Ok(Self {
@@ -122,6 +135,29 @@ impl<'c> MachineParticipation<'c> {
         beta: Dyadic,
         terms: SeriesAperture,
     ) -> Result<Self, NativeSessionError> {
+        Self::new_with_enclosure(
+            source,
+            receiver_indices,
+            source_indices,
+            query_coefficients,
+            neighbor_coefficients,
+            value_coefficients,
+            beta,
+            terms,
+            NativeEnclosurePropagation::ComponentIntervals,
+        )
+    }
+    pub fn new_with_enclosure(
+        source: SectionRc<'c>,
+        receiver_indices: &[usize],
+        source_indices: &[usize],
+        query_coefficients: SectionRc<'c>,
+        neighbor_coefficients: SectionRc<'c>,
+        value_coefficients: SectionRc<'c>,
+        beta: Dyadic,
+        terms: SeriesAperture,
+        enclosure: NativeEnclosurePropagation,
+    ) -> Result<Self, NativeSessionError> {
         if source.components() != MACHINE_REALIFIED_COMPONENTS {
             return Err(machine_error(
                 "machine participation source must have width 12",
@@ -145,15 +181,30 @@ impl<'c> MachineParticipation<'c> {
         }
         let query_geometry = decoded
             .output_handle()
-            .affine_geometry(receiver_indices, query_coefficients, true)
+            .affine_geometry_with_enclosure(
+                receiver_indices,
+                query_coefficients,
+                true,
+                enclosure.clone(),
+            )
             .map_err(machine_error)?;
         let neighbor_geometry = decoded
             .output_handle()
-            .affine_geometry(source_indices, neighbor_coefficients, true)
+            .affine_geometry_with_enclosure(
+                source_indices,
+                neighbor_coefficients,
+                true,
+                enclosure.clone(),
+            )
             .map_err(machine_error)?;
         let value_geometry = decoded
             .output_handle()
-            .affine_geometry(source_indices, value_coefficients, false)
+            .affine_geometry_with_enclosure(
+                source_indices,
+                value_coefficients,
+                false,
+                enclosure.clone(),
+            )
             .map_err(machine_error)?;
         let value_realified = value_geometry
             .output_handle()
@@ -161,12 +212,13 @@ impl<'c> MachineParticipation<'c> {
             .map_err(machine_error)?;
         let participation = query_geometry
             .output_handle()
-            .pair_quadrance_participation(
+            .pair_quadrance_participation_with_enclosure(
                 neighbor_geometry.output_handle(),
                 value_realified.output_handle(),
                 neighbors_per_row,
                 beta,
                 terms,
+                enclosure,
             )
             .map_err(machine_error)?;
         Ok(Self {

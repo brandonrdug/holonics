@@ -24,10 +24,10 @@ pub use operative::{
     NativeOperativeReturnStorage, NativeRetainedMaterialRelation,
 };
 pub use operative::{
-    NativeDeclaredFactorScaleGradient, NativeFieldAction, NativeFieldActionFactorization,
-    NativeFieldActionPullback, NativeFieldContactOrigin, NativeFieldDeclaredIncidence,
-    NativeFieldGlobalMaterialCommit, NativeFieldJointCurrentCommit, NativeFieldJointLayout,
-    NativeFieldMatrixFreeAction,
+    NativeDeclaredAmplitudeCommit, NativeDeclaredFactorScaleGradient, NativeFieldAction,
+    NativeFieldActionFactorization, NativeFieldActionPullback, NativeFieldContactOrigin,
+    NativeFieldDeclaredIncidence, NativeFieldGlobalMaterialCommit, NativeFieldJointCurrentCommit,
+    NativeFieldJointLayout, NativeFieldMatrixFreeAction,
 };
 pub use producer::{
     CausalContactPropagation, CausalContactPropagationCotangent, CausalContactPropagationEnclosure,

@@ -343,3 +343,6 @@ impl NativeSession<'_> {
 
 #[cfg(test)]
 mod tests;
+
+/// Numerical enclosure law carried by generator geometry and its saved comparisons.
+pub use holonic_engine::native_ecology::constitutive_fibre::NativeEnclosurePropagation;

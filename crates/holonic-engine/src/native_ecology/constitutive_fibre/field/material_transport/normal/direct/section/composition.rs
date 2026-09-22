@@ -363,6 +363,16 @@ impl<'c> ResidentNormalMaterialView<'c> {
         &self,
         covector: &ResidentNormalEnclosureSection<'c>,
     ) -> Result<ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
+        self.pull_back_enclosed_section_with_enclosure(
+            covector,
+            NativeEnclosurePropagation::ComponentIntervals,
+        )
+    }
+    pub fn pull_back_enclosed_section_with_enclosure(
+        &self,
+        covector: &ResidentNormalEnclosureSection<'c>,
+        enclosure: NativeEnclosurePropagation,
+    ) -> Result<ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
         if self.grain != covector.grain
             || !std::ptr::eq(self.surface, covector.surface)
             || covector.width != 2 * self.targets
@@ -384,6 +394,7 @@ impl<'c> ResidentNormalMaterialView<'c> {
                 sources,
                 targets: self.targets,
                 grain: self.grain.0,
+                joint: enclosure == NativeEnclosurePropagation::JointBall,
             },
             &[&out],
         )?;

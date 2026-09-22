@@ -25,13 +25,40 @@ __device__ void affine_pack(wide *lo, wide *hi, uint32_t d, uint32_t *status) {
     lo[d] = radius;
 }
 
+// A bound on the real 3x3 operator and its complexification.  For a permutation
+// or identity it is exactly one; duplicating real/imaginary charts does not change it.
+__device__ wide affine_operator_bound(const wide *m, uint32_t *status) {
+    wide row_max=0,column_max=0;
+    for(uint32_t i=0;i<3u;++i){
+        wide r=0,c=0;
+        for(uint32_t j=0;j<3u;++j){
+            r=add_checked(r,ft_abs(m[3u*i+j],status),status);
+            c=add_checked(c,ft_abs(m[3u*j+i],status),status);
+        }
+        if(r>row_max)row_max=r;
+        if(c>column_max)column_max=c;
+    }
+    return history_norm_ceiling(history_integer(row_max)*history_integer(column_max),status);
+}
+__device__ wide affine_joint_radius(const wide *m,const wide *x,uint32_t grain,
+                                    bool project,bool bias,uint32_t *status){
+    wide radius=ft_ceil_product(affine_operator_bound(m,status),x[6],grain,status);
+    if(m[12]){
+        wide projected[6]={x[0],0,x[2],0,x[4],0};
+        wide size=add_checked(complete_norm(project?projected:x,6u,status),x[6],status);
+        if(bias)size=add_checked(size,((wide)1)<<grain,status);
+        radius=add_checked(radius,ft_ceil_product(m[12],size,grain,status),status);
+    }
+    return radius;
+}
+
 // `indices` is an exact width-one section.  `maps` is an enclosure section with
 // twelve coefficients per row: R00..R22,b0..b2.
 extern "C" __global__ void section_affine_geometry_forward(
     const int64_t *source, const int64_t *source_hi,
     const int64_t *indices, const int64_t *indices_hi,
     const int64_t *maps, const int64_t *maps_hi,
-    uint32_t input_rows, uint32_t rows, uint32_t grain, uint32_t project,
+    uint32_t input_rows, uint32_t rows, uint32_t grain, uint32_t project, uint32_t joint,
     int64_t *out, int64_t *out_hi, int64_t *flags,
     uint32_t *slot, const uint32_t *census, const uint32_t *lineage,
     uint32_t lineage_count) {
@@ -40,6 +67,7 @@ extern "C" __global__ void section_affine_geometry_forward(
     if (row >= rows) return;
     uint32_t *status = ec_status(flags, row);
     if (upstream_refused(census, lineage, lineage_count, status)) return;
+    if(joint>1u || grain<1u || grain>120u){atomicOr(status,REFUSED_MALFORMED);return;}
 
     const int64_t *index = indices + row;
     const int64_t *index_hi = indices_hi + row;
@@ -66,16 +94,16 @@ extern "C" __global__ void section_affine_geometry_forward(
     }
 
     for (uint32_t i = 0; i < 3u; ++i) {
-        MaterialInterval real = affine_ball(m, 12u, 9u + i, status);
+        MaterialInterval real = joint ? mp_point(m[9u+i]) : affine_ball(m, 12u, 9u + i, status);
         MaterialInterval imag = mp_point(0);
         for (uint32_t j = 0; j < 3u; ++j) {
-            MaterialInterval coefficient = affine_ball(m, 12u, 3u * i + j, status);
+            MaterialInterval coefficient = joint ? mp_point(m[3u*i+j]) : affine_ball(m, 12u, 3u * i + j, status);
             real = mp_add(real,
-                          mp_mul(coefficient, affine_ball(x, 6u, 2u * j, status),
+                          mp_mul(coefficient, joint ? mp_point(x[2u*j]) : affine_ball(x, 6u, 2u * j, status),
                                  grain, status),
                           status);
             imag = mp_add(imag,
-                          mp_mul(coefficient, affine_ball(x, 6u, 2u * j + 1u, status),
+                          mp_mul(coefficient, joint ? mp_point(x[2u*j+1u]) : affine_ball(x, 6u, 2u * j + 1u, status),
                                  grain, status),
                           status);
         }
@@ -90,6 +118,7 @@ extern "C" __global__ void section_affine_geometry_forward(
         }
     }
     affine_pack(y, yh, 6u, status);
+    if(joint)y[6]=add_checked(y[6],affine_joint_radius(m,x,grain,project,true,status),status);
     ec_seal((int64_t *)y, (int64_t *)(out_hi + source_stride * row), 6u, status);
 }
 
@@ -100,7 +129,7 @@ extern "C" __global__ void section_affine_geometry_forward(
 extern "C" __global__ void section_affine_geometry_adjoint(
     const int64_t *maps, const int64_t *maps_hi,
     const int64_t *gy, const int64_t *gy_hi,
-    uint32_t rows, uint32_t grain, uint32_t project,
+    uint32_t rows, uint32_t grain, uint32_t project, uint32_t joint,
     int64_t *out, int64_t *out_hi, int64_t *flags,
     uint32_t *slot, const uint32_t *census, const uint32_t *lineage,
     uint32_t lineage_count) {
@@ -109,6 +138,7 @@ extern "C" __global__ void section_affine_geometry_adjoint(
     if (row >= rows) return;
     uint32_t *status = ec_status(flags, row);
     if (upstream_refused(census, lineage, lineage_count, status)) return;
+    if(joint>1u || grain<1u || grain>120u){atomicOr(status,REFUSED_MALFORMED);return;}
 
     const size_t map_stride = 2u * (12u + 1u);
     const size_t chart_stride = 2u * (6u + 1u);
@@ -131,15 +161,15 @@ extern "C" __global__ void section_affine_geometry_adjoint(
         MaterialInterval real = mp_point(0);
         MaterialInterval imag = mp_point(0);
         for (uint32_t i = 0; i < 3u; ++i) {
-            MaterialInterval coefficient = affine_ball(m, 12u, 3u * i + j, status);
+            MaterialInterval coefficient = joint ? mp_point(m[3u*i+j]) : affine_ball(m, 12u, 3u * i + j, status);
             real = mp_add(real,
-                          mp_mul(coefficient, affine_ball(g, 6u, 2u * i, status),
+                          mp_mul(coefficient, joint ? mp_point(g[2u*i]) : affine_ball(g, 6u, 2u * i, status),
                                  grain, status),
                           status);
             if (!project) {
                 imag = mp_add(imag,
                               mp_mul(coefficient,
-                                     affine_ball(g, 6u, 2u * i + 1u, status),
+                                     joint ? mp_point(g[2u*i+1u]) : affine_ball(g, 6u, 2u * i + 1u, status),
                                      grain, status),
                               status);
             }
@@ -155,6 +185,7 @@ extern "C" __global__ void section_affine_geometry_adjoint(
         }
     }
     affine_pack(y, yh, 6u, status);
+    if(joint)y[6]=add_checked(y[6],affine_joint_radius(m,g,grain,project,false,status),status);
     ec_seal((int64_t *)y, (int64_t *)(out_hi + chart_stride * row), 6u, status);
 }
 

@@ -55,11 +55,12 @@ pub use propagation::{
     NativeCausalContactPropagationReading,
 };
 pub use source::{
-    NativeDeclaredFactorScaleGradient, NativeFieldAction, NativeFieldActionFactorization,
-    NativeFieldActionPullback, NativeFieldContactOrigin, NativeFieldCurrentSource,
-    NativeFieldCurrentSourceRest, NativeFieldDeclaredIncidence, NativeFieldGlobalMaterialCommit,
-    NativeFieldJointCurrentCommit, NativeFieldJointLayout, NativeFieldMatrixFreeAction,
-    NativeFieldReflection, NativeFieldReflectionSection, NativeFieldReflectionTarget,
+    NativeDeclaredAmplitudeCommit, NativeDeclaredFactorScaleGradient, NativeFieldAction,
+    NativeFieldActionFactorization, NativeFieldActionPullback, NativeFieldContactOrigin,
+    NativeFieldCurrentSource, NativeFieldCurrentSourceRest, NativeFieldDeclaredIncidence,
+    NativeFieldGlobalMaterialCommit, NativeFieldJointCurrentCommit, NativeFieldJointLayout,
+    NativeFieldMatrixFreeAction, NativeFieldReflection, NativeFieldReflectionSection,
+    NativeFieldReflectionTarget,
 };
 
 pub(in super::super) struct OperativeSections<'c> {
@@ -74,6 +75,9 @@ pub(in super::super) struct OperativeSections<'c> {
 }
 /// Resident sparse-incidence plus low-rank material program for the declared D operator.
 pub(in super::super) struct OperativeFactorProgram<'c> {
+    /// Fixed pair template and current positive amplitudes, sufficient for the next update.
+    /// No sequence of completed material returns is needed by this declared family.
+    pub amplitude_family: Option<Rc<DeclaredAmplitudeFamily<'c>>>,
     pub row_offsets: Rc<ResidentSection<'c>>,
     pub columns: Rc<ResidentSection<'c>>,
     pub values: Rc<ResidentSection<'c>>,
@@ -87,6 +91,14 @@ pub(in super::super) struct OperativeFactorProgram<'c> {
     pub boundary_components: usize,
     pub rank: usize,
     pub nonzeros: usize,
+}
+pub(in super::super) struct DeclaredAmplitudeFamily<'c> {
+    pub group_width: usize,
+    pub template_values: Rc<ResidentSection<'c>>,
+    pub template_transpose_values: Rc<ResidentSection<'c>>,
+    pub template_bounds: Rc<ResidentSection<'c>>,
+    /// Positive exact point rows (rho, 0, 0), with three signed-128 values per row.
+    pub amplitudes: Rc<ResidentSection<'c>>,
 }
 pub(in super::super) struct DenseCovariance<'c> {
     pub(in super::super) matrix: ResidentSection<'c>,

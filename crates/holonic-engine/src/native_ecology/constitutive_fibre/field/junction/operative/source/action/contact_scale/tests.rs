@@ -15,7 +15,7 @@ use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
 use relational_geometry::Rat;
 
-fn packet<'c>(
+pub(in super::super) fn packet<'c>(
     surface: &'c ResidentSurface<'c>,
     rows: usize,
     width: usize,
@@ -32,7 +32,7 @@ fn packet<'c>(
         .unwrap()
 }
 
-fn current<'c>(
+pub(in super::super) fn current<'c>(
     surface: &'c ResidentSurface<'c>,
     values: &[i64],
     grain: ResidentGrain,
@@ -56,7 +56,7 @@ fn current<'c>(
     .unwrap()
 }
 
-fn declared_field<'c>(
+pub(in super::super) fn declared_field<'c>(
     surface: &'c ResidentSurface<'c>,
     grain: ResidentGrain,
     zero_last: bool,

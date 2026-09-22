@@ -14,6 +14,7 @@ pub struct NativePairParticipation<'c> {
     output: ResidentNormalEnclosureSection<'c>,
     count: usize,
     beta: Dyadic,
+    enclosure: NativeEnclosurePropagation,
 }
 
 /// Covectors in each producing chart. A shared query/value source joins these after its own
@@ -32,6 +33,24 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
         neighbors_per_row: usize,
         beta: Dyadic,
         terms: SeriesAperture,
+    ) -> Result<NativePairParticipation<'c>, ConstitutiveFibreError> {
+        self.pair_quadrance_participation_with_enclosure(
+            neighbors,
+            values,
+            neighbors_per_row,
+            beta,
+            terms,
+            NativeEnclosurePropagation::ComponentIntervals,
+        )
+    }
+    pub fn pair_quadrance_participation_with_enclosure(
+        self: Rc<Self>,
+        neighbors: Rc<Self>,
+        values: Rc<Self>,
+        neighbors_per_row: usize,
+        beta: Dyadic,
+        terms: SeriesAperture,
+        enclosure: NativeEnclosurePropagation,
     ) -> Result<NativePairParticipation<'c>, ConstitutiveFibreError> {
         let rows = self.rows();
         let n = neighbors_per_row;
@@ -80,6 +99,7 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
                 dimensions,
                 grain.0,
                 beta,
+                enclosure == NativeEnclosurePropagation::JointBall,
                 &logits,
                 &flags,
             )?;
@@ -112,6 +132,7 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
                 n,
                 components,
                 grain.0,
+                enclosure == NativeEnclosurePropagation::JointBall,
                 &output,
                 &flags,
             )?;
@@ -134,6 +155,7 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
             output: Self::from_resident(surface, output, rows, components, grain)?,
             count: n,
             beta,
+            enclosure,
         })
     }
 }
@@ -185,6 +207,7 @@ impl<'c> NativePairParticipation<'c> {
                 n,
                 components,
                 grain.0,
+                self.enclosure == NativeEnclosurePropagation::JointBall,
                 &terms,
                 &flags,
             )?;
@@ -221,6 +244,7 @@ impl<'c> NativePairParticipation<'c> {
                 components,
                 grain.0,
                 self.beta,
+                self.enclosure == NativeEnclosurePropagation::JointBall,
                 &dq,
                 &du,
                 &dv,
