@@ -39,16 +39,18 @@ dual: a potential or receiver, with coboundary `d=∂ᵀ`. Their pairing is the 
 ```text
 face      ⟨Ȟ|H⟩
 Stokes    ⟨dȞ, H⟩ = ⟨Ȟ, ∂H⟩                                  ExteriorBoundary.stokes_pairing
-drop      ⟨φ, ∂H⟩ = φ(target) − φ(source)                     returnsBoundary ∘ stokes (join owed, #62)
+drop      ⟨φ, ∂H⟩ = φ(target) − φ(source)                     Objects/Pairing.face_is_potential_drop
 gauge     classes mod d and mod ∂ pair: H_k × Hᵏ → R          CellHolonomy.cell_flux_is_gauge_free, HodgeReceiver
-orient    flipping a cell negates both sides; the pairing is unchanged
+orient    flipping a cell negates both sides; the pairing is unchanged      Objects/Pairing (joint reorientation)
+classes   one bilinear class pairing, read by the harmonic representative  Objects/Pairing.classPairing
 ```
 
 Chain/cochain, vector/covector, ket/bra, current/potential, kernel/cokernel (the two-term case) and
 cycle/cocycle/coboundary (the classes) are all this one pairing. A Holon alone is **unoriented
 potential**; it becomes oriented relative to a frame when a coholon over a relatively complete
-region (object 7) is paired with it. A loop along which the pairing's sign has holonomy is
-non-orientable (`JunctionLaw.no_consistent_orientation_on_a_reversing_loop`).
+region (object 7) is paired with it. A cycle whose joint signs multiply to −1 admits no orientation,
+and one whose product is +1 does (`Objects/Pairing.no_orientation_of_reversing_cycle`,
+`orientation_of_preserving_cycle`; the older `JunctionLaw` statement is vacuous, #62).
 
 ### 2. Constitution
 
@@ -57,11 +59,14 @@ coholon to the motion of a Holon it excites. It does not create the Holon: it st
 motion a given potential drives and at what cost. It has two kinds, which exchange:
 
 ```text
-storage (electric, capacitive)   C = Bᵀ M_C B        energy ½⟨φ, Cφ⟩       standing
-flow    (magnetic, inductive)    K = Bᵀ M_L B        energy ½⟨j, L j⟩      emanation
-modes   K v = ω² C v                                                       CoupledIncidence.IsGeneralizedMode
-dissipation  D ⪰ 0,  power ⟨Jv, D Jv⟩                                      HelicalPairInteraction
+capacitive   C = Bᵀ M_C B        energy ½⟨ẋ, C ẋ⟩ in the node-flux chart
+inductive    K = Bᵀ M_L B        (M_L inverse-inductive/stiffness) energy ½⟨x, K x⟩
+modes        K v = ω² C v        the two energies exchange along a mode      CoupledIncidence.IsGeneralizedMode
+dissipation  D ⪰ 0,  power ⟨Jv, D Jv⟩                                         HelicalPairInteraction
 ```
+
+Which of the two exchanging energies is read as storage (standing) and which as flow (emanation) is
+a chart choice; the exchange itself is chart-free (`Objects/Parametron.modeEnergy_conserved`).
 
 A Holon's motion decomposes into exact (potential-driven) ⊕ coexact (induced; Faraday emf is not an
 exact drop, `HolonicDiscreteInduction.emf_ne_exactDrop_of_fluxDifference_ne_zero`) ⊕ harmonic
@@ -100,8 +105,11 @@ exactly the Ising pairing `−w σ_iσ_j`. A **perceptron is one receiver face o
 population**: fixed couplings, locked sheets, threshold readout. Storage and flow exchange at
 `ω=1/√(LC)`; a section crossing of the ring is a clock tick. Owners: `Physics/PhaseCarrier`,
 `Physics/CoupledIncidence`, `HolonicMeasuredParametron`, the torus realizations,
-`cuda_refine/complex_parametron.rs`. Open: pump/Floquet locking dynamics; the tick-as-clock join to
-`ClockedPantographicSwing`.
+`cuda_refine/complex_parametron.rs`. Joined in `Objects/Parametron`: the LC and generalized-mode
+energy exchange, the ring's owner crossings as `RationalClockPassage` ticks (`d ≥ 2`), and the
+threshold unit as the energy-minimizing locked sheet with a witness that equal perceptron outputs
+carry different phase energy and quadrature. Open: pump/Floquet locking dynamics; the continuous
+crossing of `A cos(ωt+φ)` equal to the micro-step ring.
 
 ### 6. Tube and tower
 
@@ -120,21 +128,35 @@ Dirichlet-to-Neumann map `Λ_DN`. Owners: `ContinuingTube`, `ContinuingTower`, `
 `β : interior → boundary data` (its `Λ_DN`, Schur complement or outward restriction) is **relatively
 complete** for a declared exterior receiver family `R` when:
 
-1. **coupled** — the boundary flux depends on the interior state (`β` is not constant along the
-   interior dynamics);
+1. **coupled** — the boundary datum depends on the interior state; coupling through a conserved
+   charge counts (Birkhoff, Gauss), so `β` may be constant along the interior motion;
 2. **not determined** — the interior dynamics are not a function of the boundary history: the
    fibre of `β` over every admitted exterior future is nontrivial and carries nontrivial internal
    evolution (lawful silence with motion, `WorldTube.IsLawfulSilence`);
-3. **closed** — `∂Ω` bounds (a globe), rather than opening onto longitudinal ends (a tube).
+3. **closed** — `∂Ω` is the boundary of the interior (a globe), rather than opening onto
+   longitudinal ends (a tube); a cycle that bounds nothing does not qualify.
+
+The interior motion in clause 2 must persist: a fibre that contracts or is quenched to a fixed
+point is not motion (a decaying interior fails).
 
 Completeness is always relative to `R`; no object is complete absolutely. Only a relatively complete
 region can be identified as one structure with complex dynamics, and only over such a region does a
 coholon orient a Holon (object 1). Instances: Birkhoff's theorem (the vacuum exterior of a spherically
 symmetric body depends on its mass alone while the interior may move — coupled through `M`, not
-determined by it); Gauss/ADM mass read on a bounding sphere; the band-limited **relevance theorem**
-(`NavierStokesBandLimitedRelevance`: nothing feeds the far tail but frontier currents) as the same
-split in a spectral chart. A cold lattice with no interior motion fails (2); a ferrimagnetic rod
+determined by it); Gauss/ADM mass read on a bounding sphere. The band-limited **relevance theorem**
+(`NavierStokesBandLimitedRelevance`) is *not* an instance at a band-limited instant: there the band
+and the far tail are decoupled, so clause 1 fails; the join needs a persistent frontier current
+into a declared exterior shell (open). A cold lattice with no interior motion fails (2); a ferrimagnetic rod
 that transports spin along its length is a tube, failing (3).
+
+[proved-derived; formal-checked] `Objects/RelativeCompleteness` states the three clauses — coupling
+over admitted states, non-determination with persistent (exactly recurrent) motion in the fibre, and
+a membrane bounding the region's interior chain — and proves the linear criterion: coupled ⇔ `C≠0`;
+not determined ⇔ some `u ∈ ⋂ₖ ker(CAᵏ)` with `Au≠0` and `(1+A)ⁿu=u`. Witnesses: a quarter-turn
+globe read through a conserved charge (Birkhoff type) is complete; a cold lattice, a quenched or
+decaying (Ricci-type) interior, a fully observable interior, an open tube and a hollow loop each fail;
+refining the receiver removes completeness. Open: approximate recurrence for quasi-periodic
+interiors, the join of `β` to the membrane's faces, and the Λ_DN join.
 
 [open] The **relative completeness theorem** is to be derived by pairing the Einstein lifts
 (`HolonicCurvedArcEinstein`, `Ricci`, `HolonicFieldTheoryPassage`, `CurvatureAndGap`) with the
@@ -153,9 +175,12 @@ actually arrived at a locus changes that locus's constitution:
 ```
 
 The normal law `H += w |f⟩⟨f|` is one instance; `HolonicWorldReturnDeposit` proves that a route
-deposits only at its ends. Standing — retention — is the constitution itself as a quotient
-sufficient for the admitted future (`Standing.standingLaw_exists_iff_future_factors`), never a
-record of the fluxes that shaped it. One law covers both of Brandon's physical pictures:
+deposits only at its ends. `Objects/Deposition` proves locality, the Joule/Tellegen ledger, that a
+deposit bends the next current split (1/3 → 5/16 on two parallel edges), that the constitution is a
+sufficient retention for every solver while the last flux is not, and that the constitution is
+**not minimal**: `(1,1)` and `(2,2)` have identical futures. Retention is therefore the
+future-sufficient **quotient of the constitution** (`Standing.standingLaw_exists_iff_future_factors`),
+never a record of the fluxes that shaped it. One law covers both of Brandon's physical pictures:
 
 ```text
 flux from constitution    j = ⋆_Θ dφ,  ∂j = σ                               JunctionLaw, HodgeReceiver
@@ -186,6 +211,11 @@ projective     Schwarzian (second-order invariant of the cross-ratio) [standard]
 
 **Loss is the ratio of the produced and target Holons**: `ℓ=log Ĝ_(T←H)`, with the lifted complex
 cross-entropy (`InformationDifference`) as its face reading and `R⁻¹dR` as the learning covector.
+`Objects/Ratio` proves: `exp ℓ_i = z^T_i/z^H_i` with `ℓ_i` in the ratio's lift fibre (a `2πiℤ`-torsor);
+the lifted cross-entropy excess `= (2/ln2) Σ T_i ℓ_i`; the logit derivative of its real part
+`= (H_j−T_j)/ln2 = (2/ln2) Σ T_i Re(R_i⁻¹∂_jR_i)`; the winding shift of the imaginary part; the
+log-derivative product law as a gauge transform; and the second-order jet with its lattice form.
+Open: the phase part of the covector, continuous-lift existence, the Schwarzian, a matrix log.
 
 ### 10. Receipt
 
@@ -246,4 +276,5 @@ lower bound is Ω(N), and base-10 log-space extraction is open.
 Kelvin circulation a holonomy pairing, the Lamb term the cross-current. Hodge classes: which harmonic
 coholon classes are realized by actual Holon cycles. Spectral placement: `FosterTanks` reads zeros as
 LC tanks and `ZeroPairLock` gives lock ⇔ `σ=½` ⇔ positive Foster inductance — a parametron
-condition. The relevance theorem is relative completeness in the spectral chart.
+condition. Whether the relevance theorem yields relative completeness in the spectral chart is open:
+it needs a persistent frontier current (see §7).

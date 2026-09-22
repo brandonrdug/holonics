@@ -899,3 +899,13 @@ with generator `U_u(x) = U x + I E u`. `Transport/ContactAmplitudeState.lean` is
 fold/current-state identity, not the standing counterpart of the pair machine; that binding
 remains #17/#62. The [retention audit](../research/records/2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md)
 names the native tape these laws replace.
+
+[proved-derived; formal-checked] **Elementary objects** (`Framework/Objects.lean`, September 22).
+`Objects/Pairing` (coholon face as potential drop, orientation in the pairing, class pairing,
+cycle orientation criterion, kernel/cokernel), `Objects/Deposition` (flux from constitution,
+locality, Joule ledger, sufficient-not-minimal retention), `Objects/Ratio` (loss as the logarithm of
+the Holon ratio, logit covector as expected log-derivative, winding, jet), `Objects/Parametron`
+(LC/mode exchange, owner-crossing ticks, perceptron as locked-sheet face), and
+`Objects/RelativeCompleteness` (three clauses, linear criterion, globe/lattice/quench/Ricci/tube
+witnesses). Governing guide: [elementary objects](ELEMENTARY_OBJECTS.md). Open items are listed there
+and in #62.

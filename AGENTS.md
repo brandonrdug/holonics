@@ -14,7 +14,8 @@ the roadmap orders it. The machine, source guides and research supply the constr
 
 [project-postulate] Brandon, September 22: design, worker briefs, formal work and code state
 their operations **only** in the [elementary objects](docs/ELEMENTARY_OBJECTS.md), which own the
-definitions and existing Lean/Rust owners. A text, image, acoustic, motor or arithmetic
+definitions and existing Lean/Rust owners; `ElementaryHolonics.Framework.Objects` imports them
+and the proved joins in `Objects/{Pairing,Deposition,Ratio,Parametron,RelativeCompleteness}`. A text, image, acoustic, motor or arithmetic
 application is a boundary chart of them. A noun that is not one of them, or a composition of
 them, is a design defect. The picture: a continuing field of chains of **complex parametrons**
 (annular rings that store, oscillate and lock) joined by **helical pair contacts** (which slip,
@@ -24,13 +25,13 @@ dissipate and address); rings rotate and align, contacts converge and diverge ac
 |---|---|
 | Complex | oriented cells, `∂²=0` |
 | Holon `\|H⟩`: a continuing current/motion, already present as potential, never produced by a computation | coholon `⟨Ȟ\|`, `d=∂ᵀ`; face `⟨Ȟ\|H⟩`; Stokes `⟨dȞ,H⟩=⟨Ȟ,∂H⟩`; orientation exists only in the pairing |
-| Constitution `Θ`: the material law relating a coholon to the motion it excites (storage `C=BᵀM_C B`, flow `K=BᵀM_L B`, dissipation `D⪰0`) | modes `Kv=ω²Cv`; motion = exact ⊕ coexact (induced) ⊕ harmonic (dormant) |
+| Constitution `Θ`: the material law relating a coholon to the motion it excites (capacitive `C=BᵀM_C B`, inverse-inductive `K=BᵀM_L B`, dissipation `D⪰0`) | modes `Kv=ω²Cv`, the two energies exchanging; motion = exact ⊕ coexact (induced) ⊕ harmonic (dormant) |
 | Generator `Ĝ` with initial configuration and clock; helix = circle + carry; fractal family = words, restrictions, scale square, first arrival; a source word is its address | adjoint `Ĝ*` carries the learning covector; release at tolerance |
 | Pair contact: slip `J`, `Q=⟨Δ\|Δ⟩`, `DQ=2J*Δ`, Farey lock address | contact material `ΣwJ*DJ` |
 | Parametron: incidence, `C`, `L`, pump, half-turn sheets, Ising lock; a perceptron is its locked-sheet receiver face | storage↔flow exchange at `ω=1/√(LC)`; a section crossing is a clock tick |
 | Tube (longitudinal clocked span) and tower (transverse restriction; gluing unique/plural/obstructed); world tube; `Λ_DN` eliminates an interior | holonomy only on declared circuits |
-| Relatively complete region (globe): closed boundary, interior coupled to the exterior but not determined by it | completeness is only relative to a receiver family; the relative completeness theorem is owed (#62) |
-| Deposition: the only law changing a constitution, from covectors that actually reached that locus | retention is the constitution as a future-sufficient quotient, never a record of fluxes |
+| Relatively complete region (globe): a boundary that bounds the interior, interior coupled to the exterior (conserved charges count) but not determined by it, with persistent interior motion | completeness is only relative to a receiver family; the full theorem is owed (#62) |
+| Deposition: the only law changing a constitution, from covectors that actually reached that locus | retention is the future-sufficient quotient of the constitution (the constitution suffices but is not minimal), never a record of fluxes |
 | Ratio: typed comparison of two Holons/coholons/transports, carried as an undivided pair | `ℓ=log R` with winding branch; `R⁻¹dR`; its jet (velocity, acceleration, jerk, …); loss is `log Ĝ_(T←H)` |
 | Receipt: a field of readings over a partition, each region in its own frame and clock | no global scalar or global gradient; per-region variability over its own ticks, joined to interface flux |
 

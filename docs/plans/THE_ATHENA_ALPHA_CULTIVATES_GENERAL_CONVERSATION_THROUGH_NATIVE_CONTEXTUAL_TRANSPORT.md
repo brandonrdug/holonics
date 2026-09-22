@@ -1218,6 +1218,43 @@ remain the final codec; the present generator already advances before it is deco
 
 ### The source and condition construction
 
+<a id="the-machine-in-the-elementary-objects"></a>
+
+## The machine in the elementary objects
+
+[project-postulate] Governing statement of the HNN machine in the
+[elementary objects](../ELEMENTARY_OBJECTS.md), September 22. Where the sections below use older
+vocabulary, this section fixes their reading; their equations remain valid at their stated scope.
+
+| Object | In the machine | Implemented | Owed |
+|---|---|---|---|
+| Complex | rings (sites), contacts (admitted pair arcs), cells (closed menu loops) | `field_geometry/machine.rs` sites, arcs, cells | — |
+| Ring = complex parametron | each generator is a ring: phase carrier with winding/carry (its helix), storage `C_g`, flow `L_g`, mode `ω_g`, optional pump; its **initial configuration is its key** | phase/lift/clock and affine current charts only | storage/flow/mode per ring, pump; tick as clock (`Objects/Parametron`) |
+| Contact = helical pair | slip `J`, `Q`, `DQ`, dissipation `D`, amplitude `ρ_a`, Farey lock address | `holonic_interaction/helical.rs`, `machine_factor.rs`, positive `ρ_a` | lock-address inference |
+| Holon (source) | a source passage enters at boundary ports; its moment is its **address** under the rings' generator powers | closed-form accumulation, tape-free adjoint (`machine_episode.rs`, `SourceMoment`) | phase-weighted condition/offset ports (A3); per-ring clocks in `SourceMoment` |
+| Coholon (receiver) | receiving phases read the joint field; a face is a pairing | tagged phase receiver | complex receiving potential (Im currently zero) |
+| Ratio = loss | `ℓ_j=log Ĝ_(T←H)` at each receiving phase, target Holon through the same maps, winding as branch; covector `R⁻¹dR`; its jet as the reading of progress | `p−q` real part only | complex face, phase covector, jet readings (`Objects/Ratio`) |
+| Deposition | each ring's and contact's constitution (`C`, `L`, `D`, `ρ_a`, reaction `M`, `E/R`) changes only from covectors that reached it | normal law, `ρ_a` publication | locality by region; reaction `M` factorization |
+| Retention | the constitution as a future-sufficient quotient (`Objects/Deposition.constitutionStanding`) | body pending state fixed in N | session pending fixed (A1); one-cut comparison (A2) |
+| Relative completeness | the machine's ring interior relative to its receiving boundary; a dormant ring is interior motion in the fibre of the receiver | — | receiver-family choice; `Objects/RelativeCompleteness` criterion on the machine's linear chart |
+| Tube / tower | multi-rate rings give grains glued by carry; the source/response are longitudinal spans | — | `grain_tower`/`continuing_tower` binding |
+| Receipt | per-ring/per-region fields over their own ticks: variability, interface flux, bits, work | exterior bit readings (global) | per-region fields in local clocks; energy/erasure axes |
+| Keys / navigation | learning locates ring configurations and contact gauges by loop closure over the menu (Bombe) | — | packet 4: configuration/clock inference |
+
+[definition] **Campaign order in these objects.**
+
+1. **Ratio and one cut** (was campaign 2): complex receiving potential; target Holon through the
+   same accumulation; `ℓ=log R` with winding branch and `R⁻¹dR` into the adjoint, including the
+   phase part; one-cut delayed comparison; session pending fixed (A1/A2); phase-weighted
+   condition/offset ports (A3–A6); one face for selection, comparison and readings (B1/B2);
+   receipts as per-ring fields over local ticks.
+2. **Rings gain storage and flow**: each generator becomes a complex parametron with `C_g`, `L_g`
+   and its mode; the contact remains the dissipative link; the tick of each ring is its clock;
+   the reaction material `M` is factored through the bilinear product cores and mode quotient.
+3. **Keys**: configuration and clock inference by loop closure over the menu, Farey lock
+   addresses, dormant rings bound through standing/release; multi-rate towers.
+4. **Motor chart**: `SerialScrewChain` words as source and receiver on the same machine.
+
 <a id="situated-generator-and-receiving-composition"></a>
 
 #### Shared generator and receiving composition

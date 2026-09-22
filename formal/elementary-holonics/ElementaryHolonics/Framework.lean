@@ -4,6 +4,7 @@ import ElementaryHolonics.Framework.Dynamics
 import ElementaryHolonics.Framework.Information
 import ElementaryHolonics.Framework.Physics
 import ElementaryHolonics.Framework.Computation
+import ElementaryHolonics.Framework.Objects
 
 /-!
 # Holonics as a reusable mathematical framework
