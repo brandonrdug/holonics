@@ -864,6 +864,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "holonic-core"
+version = "0.1.0"
+dependencies = [
+ "num-bigint",
+ "num-traits",
+ "relational-geometry",
+ "serde",
+ "thiserror 2.0.19",
+]
+
+[[package]]
 name = "holonic-engine"
 version = "0.1.0"
 dependencies = [
@@ -904,6 +915,7 @@ dependencies = [
 name = "holonics"
 version = "0.1.0"
 dependencies = [
+ "holonic-core",
  "holonic-engine",
  "holonic-structure",
  "holonics-hna",

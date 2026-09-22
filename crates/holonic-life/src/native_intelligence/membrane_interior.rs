@@ -10,8 +10,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use holonic_engine::{
     cuda_refine::{CudaRefineExecutor, ResidentMembraneInteriorWord},
     CausalCellId, CausalChain, CellularRestriction, ComparativeMultiplicity, EventId,
-    ExactCellularSheaf, ExactComplexWaveCurrent, ExactLinearMap, ExactRatMatrix,
-    GradedCausalComplex,
+    ExactCellularSheaf, ExactComplexWaveCurrent, ExactRatMatrix, GradedCausalComplex,
+    SheafLinearMap,
 };
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
@@ -448,7 +448,7 @@ impl MorphologyDerivedInterior {
                 restrictions.push(CellularRestriction {
                     lower: factor_cells[&factor],
                     upper,
-                    map: ExactLinearMap::new(rank, rank, entries).map_err(display_sheaf)?,
+                    map: ExactRatMatrix::declared(rank, rank, entries).map_err(display_sheaf)?,
                 });
             }
             constitutive_cells.push(ConstitutiveCellAddress {

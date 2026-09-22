@@ -22,8 +22,8 @@ use thiserror::Error;
 
 use crate::{
     CausalAlgebraicError, CausalCellId, CausalChain, CellularRestriction, ComparativeMultiplicity,
-    EventId, EventSuccessor, ExactCellularSheaf, ExactEventLaw, ExactLinearMap,
-    GradedCausalComplex, PrimeValuation, SheafDiffusionError,
+    EventId, EventSuccessor, ExactCellularSheaf, ExactEventLaw, ExactRatMatrix,
+    GradedCausalComplex, PrimeValuation, SheafDiffusionError, SheafLinearMap,
 };
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -1855,9 +1855,9 @@ pub fn residue_transport_sheaf(
                             right: support[1],
                         })?
                 };
-                ExactLinearMap::new(1, 1, vec![vec![Rat::from_integer(BigInt::from(hand))]])?
+                ExactRatMatrix::declared(1, 1, vec![vec![Rat::from_integer(BigInt::from(hand))]])?
             } else {
-                ExactLinearMap::zero(rows, columns)
+                ExactRatMatrix::zero(rows, columns).map_err(SheafDiffusionError::from)?
             };
             restrictions.push(CellularRestriction {
                 lower,

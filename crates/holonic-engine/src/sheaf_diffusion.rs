@@ -14,17 +14,16 @@
 //! retained as a reusable certificate.  No tolerance, random walk, display
 //! adjacency, or floating-point convergence criterion enters the law.
 //!
-//! # Two carriers, and which one owns what
+//! # One carrier
 //!
-//! `ExactLinearMap` below is this law's own **typed and serialized** carrier: it names its source
-//! and target coordinates, it is what a certificate is written in, and it stays. What does not
-//! stay is the private dense algebra that sat underneath it. Until 2026-08-15 this module carried
-//! its own `invert_exact`, which built the inverse **one column at a time** — `O(n^4)` — through a
-//! `solve_exact` that shared 26 lines verbatim with `diffusion`'s (32 lines against 36; the rest
-//! is a squareness guard, the error variant, and two rebindings). Both are gone: the inverse runs
-//! through `exact_linear::ExactRatMatrix`, whose multiplication certificate is in force, and the
-//! duplicated forward solve had no caller but that inverse. `then`, `plus` and `apply` route
-//! through the same carrier, so this module contains no dense elimination or product of its own.
+//! Every linear map this law holds — a restriction, a coboundary, a Hodge operator and each map
+//! of a certificate — is `exact_linear::ExactRatMatrix`. Until 2026-08-15 this module carried its
+//! own `invert_exact`, which built the inverse **one column at a time** — `O(n^4)` — through a
+//! `solve_exact` that shared 26 lines verbatim with `diffusion`'s; both went then. Until
+//! September 22 it also carried a second storage type, `ExactLinearMap`, whose operations already
+//! routed through the shared carrier; it is now a name for that carrier. What stays this law's own
+//! is its refusal vocabulary ([`SheafLinearMap`]) and its serialized row shape
+//! ([`linear_map_rows`]), which every wire written before the replacement still reads.
 //!
 //! The `inverse_residual` this module has always computed and retained is untouched, and it is
 //! worth being exact about why it is not redundant: `compile_certificate` already refused a
@@ -46,17 +45,36 @@ use crate::{
     CausalAlgebraicError, CausalCellId, EventSuccessor, ExactEventLaw, GradedCausalComplex,
 };
 
-/// A finite exact linear map.  Rows are target coordinates and columns are
-/// source coordinates.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ExactLinearMap {
-    rows: usize,
-    columns: usize,
-    entries: Vec<Vec<Rat>>,
+/// **The sheaf law's linear map is the shared exact carrier.**
+///
+/// [definition] A finite exact linear map, rows the target coordinates and columns the source
+/// coordinates. Until September 22 this was a second carrier with its own `Vec<Vec<Rat>>`
+/// storage; it is now [`ExactRatMatrix`] itself, so a restriction, a coboundary and a certificate
+/// operator are the same object every other exact owner reads. The name is kept for its callers.
+/// The law's own refusal vocabulary lives on [`SheafLinearMap`], and its serialized
+/// `{rows, columns, entries: [[Rat]]}` shape on [`linear_map_rows`].
+pub type ExactLinearMap = ExactRatMatrix;
+
+/// **Composition and sum in the sheaf law's own refusal vocabulary.**
+///
+/// The dimension refusals are raised before the carrier is reached, so a caller sees
+/// `LinearCompositionDimension`/`LinearAdditionDimension`/`MalformedLinearMap` and never a
+/// foreign shape error.
+pub trait SheafLinearMap: Sized {
+    /// A map of the declared shape; a ragged or misshapen population is `MalformedLinearMap`.
+    fn declared(
+        rows: usize,
+        columns: usize,
+        entries: Vec<Vec<Rat>>,
+    ) -> Result<Self, SheafDiffusionError>;
+    /// Compose `self: A -> B` followed by `next: B -> C`.
+    fn then(&self, next: &Self) -> Result<Self, SheafDiffusionError>;
+    /// The sum of two maps of one shape.
+    fn plus(&self, other: &Self) -> Result<Self, SheafDiffusionError>;
 }
 
-impl ExactLinearMap {
-    pub fn new(
+impl SheafLinearMap for ExactRatMatrix {
+    fn declared(
         rows: usize,
         columns: usize,
         entries: Vec<Vec<Rat>>,
@@ -67,117 +85,109 @@ impl ExactLinearMap {
                 expected_columns: columns,
             });
         }
-        Ok(Self {
-            rows,
-            columns,
-            entries,
+        Ok(ExactRatMatrix::shaped(rows, columns, entries)?)
+    }
+
+    fn then(&self, next: &Self) -> Result<Self, SheafDiffusionError> {
+        if self.rows() != next.columns() {
+            return Err(SheafDiffusionError::LinearCompositionDimension {
+                first_rows: self.rows(),
+                next_columns: next.columns(),
+            });
+        }
+        Ok(next.multiply(self)?)
+    }
+
+    fn plus(&self, other: &Self) -> Result<Self, SheafDiffusionError> {
+        if self.rows() != other.rows() || self.columns() != other.columns() {
+            return Err(SheafDiffusionError::LinearAdditionDimension);
+        }
+        Ok(self.add(other)?)
+    }
+}
+
+/// **The serialized presentation of a sheaf-law linear map: `{rows, columns, entries: [[Rat]]}`.**
+///
+/// [definition] The wire this law has always written, kept unchanged now that the value is an
+/// [`ExactRatMatrix`] (whose own serde shape is flat). A field of that type carries
+/// `#[serde(with = "linear_map_rows")]`; a restriction table carries
+/// `#[serde(with = "linear_map_rows::by_incidence")]`. A misshapen row population refuses at
+/// deserialization, where the previous carrier admitted it and refused on first validation.
+pub mod linear_map_rows {
+    use std::collections::BTreeMap;
+
+    use relational_geometry::Rat;
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+
+    use crate::CausalCellId;
+    use crate::exact_linear::ExactRatMatrix;
+
+    #[derive(Serialize)]
+    struct RowsRef {
+        rows: usize,
+        columns: usize,
+        entries: Vec<Vec<Rat>>,
+    }
+
+    #[derive(Deserialize)]
+    struct Rows {
+        rows: usize,
+        columns: usize,
+        entries: Vec<Vec<Rat>>,
+    }
+
+    fn presented(map: &ExactRatMatrix) -> RowsRef {
+        RowsRef {
+            rows: map.rows(),
+            columns: map.columns(),
+            entries: map.to_rows(),
+        }
+    }
+
+    fn admitted<E: serde::de::Error>(rows: Rows) -> Result<ExactRatMatrix, E> {
+        ExactRatMatrix::shaped(rows.rows, rows.columns, rows.entries).map_err(|_| {
+            E::custom(format!(
+                "linear map entries do not have the declared {} by {} shape",
+                rows.rows, rows.columns
+            ))
         })
     }
 
-    pub fn zero(rows: usize, columns: usize) -> Self {
-        Self {
-            rows,
-            columns,
-            entries: vec![vec![Rat::zero(); columns]; rows],
+    pub fn serialize<S: Serializer>(
+        map: &ExactRatMatrix,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error> {
+        presented(map).serialize(serializer)
+    }
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<ExactRatMatrix, D::Error> {
+        admitted(Rows::deserialize(deserializer)?)
+    }
+
+    /// The same presentation for a restriction table keyed by its incidence.
+    pub mod by_incidence {
+        use super::*;
+
+        pub fn serialize<S: Serializer>(
+            maps: &BTreeMap<(CausalCellId, CausalCellId), ExactRatMatrix>,
+            serializer: S,
+        ) -> Result<S::Ok, S::Error> {
+            maps.iter()
+                .map(|(key, map)| (*key, presented(map)))
+                .collect::<BTreeMap<_, _>>()
+                .serialize(serializer)
         }
-    }
 
-    pub fn identity(extent: usize) -> Self {
-        let mut result = Self::zero(extent, extent);
-        for diagonal in 0..extent {
-            result.entries[diagonal][diagonal] = Rat::one();
+        pub fn deserialize<'de, D: Deserializer<'de>>(
+            deserializer: D,
+        ) -> Result<BTreeMap<(CausalCellId, CausalCellId), ExactRatMatrix>, D::Error> {
+            BTreeMap::<(CausalCellId, CausalCellId), Rows>::deserialize(deserializer)?
+                .into_iter()
+                .map(|(key, rows)| Ok((key, admitted(rows)?)))
+                .collect()
         }
-        result
-    }
-
-    pub fn rows(&self) -> usize {
-        self.rows
-    }
-
-    pub fn columns(&self) -> usize {
-        self.columns
-    }
-
-    pub fn entries(&self) -> &[Vec<Rat>] {
-        &self.entries
-    }
-
-    /// This map's entries presented to the shared exact carrier, against the shape this map
-    /// **declares** rather than one inferred from its rows. A map with no rows still has a
-    /// column count and a zero-dimensional stalk is lawful, so inference would lose it.
-    fn carrier(&self) -> Result<ExactRatMatrix, SheafDiffusionError> {
-        Ok(ExactRatMatrix::shaped(
-            self.rows,
-            self.columns,
-            self.entries.clone(),
-        )?)
-    }
-
-    fn from_carrier(carrier: &ExactRatMatrix) -> Self {
-        Self {
-            rows: carrier.rows(),
-            columns: carrier.columns(),
-            entries: carrier.to_rows(),
-        }
-    }
-
-    pub fn transpose(&self) -> Self {
-        let mut entries = vec![vec![Rat::zero(); self.rows]; self.columns];
-        for (row, values) in self.entries.iter().enumerate() {
-            for (column, value) in values.iter().enumerate() {
-                entries[column][row] = value.clone();
-            }
-        }
-        Self {
-            rows: self.columns,
-            columns: self.rows,
-            entries,
-        }
-    }
-
-    /// Compose `self: A -> B` followed by `next: B -> C`.
-    ///
-    /// The dimension refusal is this law's own and is raised before the carrier is reached, so a
-    /// caller sees `LinearCompositionDimension` and never a foreign shape error.
-    pub fn then(&self, next: &Self) -> Result<Self, SheafDiffusionError> {
-        if self.rows != next.columns {
-            return Err(SheafDiffusionError::LinearCompositionDimension {
-                first_rows: self.rows,
-                next_columns: next.columns,
-            });
-        }
-        Ok(Self::from_carrier(
-            &next.carrier()?.multiply(&self.carrier()?)?,
-        ))
-    }
-
-    pub fn plus(&self, other: &Self) -> Result<Self, SheafDiffusionError> {
-        if self.rows != other.rows || self.columns != other.columns {
-            return Err(SheafDiffusionError::LinearAdditionDimension);
-        }
-        Ok(Self::from_carrier(&self.carrier()?.add(&other.carrier()?)?))
-    }
-
-    pub fn apply(&self, source: &[Rat]) -> Result<Vec<Rat>, SheafDiffusionError> {
-        if source.len() != self.columns {
-            return Err(SheafDiffusionError::LinearApplicationDimension {
-                expected: self.columns,
-                supplied: source.len(),
-            });
-        }
-        Ok(self.carrier()?.apply(source)?)
-    }
-
-    fn validate(&self) -> Result<(), SheafDiffusionError> {
-        if self.entries.len() != self.rows
-            || self.entries.iter().any(|row| row.len() != self.columns)
-        {
-            return Err(SheafDiffusionError::MalformedLinearMap {
-                expected_rows: self.rows,
-                expected_columns: self.columns,
-            });
-        }
-        Ok(())
     }
 }
 
@@ -185,7 +195,8 @@ impl ExactLinearMap {
 pub struct CellularRestriction {
     pub lower: CausalCellId,
     pub upper: CausalCellId,
-    pub map: ExactLinearMap,
+    #[serde(with = "linear_map_rows")]
+    pub map: ExactRatMatrix,
 }
 
 /// A finite-dimensional rational cellular sheaf on one exact causal complex.
@@ -197,7 +208,8 @@ pub struct ExactCellularSheaf {
     pub schema: String,
     complex: GradedCausalComplex,
     stalk_dimensions: BTreeMap<CausalCellId, usize>,
-    restrictions: BTreeMap<(CausalCellId, CausalCellId), ExactLinearMap>,
+    #[serde(with = "linear_map_rows::by_incidence")]
+    restrictions: BTreeMap<(CausalCellId, CausalCellId), ExactRatMatrix>,
 }
 
 impl ExactCellularSheaf {
@@ -241,7 +253,7 @@ impl ExactCellularSheaf {
             .ok_or(SheafDiffusionError::MissingStalk(cell))
     }
 
-    pub fn restrictions(&self) -> &BTreeMap<(CausalCellId, CausalCellId), ExactLinearMap> {
+    pub fn restrictions(&self) -> &BTreeMap<(CausalCellId, CausalCellId), ExactRatMatrix> {
         &self.restrictions
     }
 
@@ -249,7 +261,7 @@ impl ExactCellularSheaf {
         &self,
         lower: CausalCellId,
         upper: CausalCellId,
-    ) -> Result<&ExactLinearMap, SheafDiffusionError> {
+    ) -> Result<&ExactRatMatrix, SheafDiffusionError> {
         self.restrictions
             .get(&(lower, upper))
             .ok_or(SheafDiffusionError::MissingRestriction { lower, upper })
@@ -271,7 +283,7 @@ impl ExactCellularSheaf {
     }
 
     /// The exact cellular coboundary `delta_grade`.
-    pub fn coboundary(&self, grade: u32) -> Result<ExactLinearMap, SheafDiffusionError> {
+    pub fn coboundary(&self, grade: u32) -> Result<ExactRatMatrix, SheafDiffusionError> {
         let source = self.coordinates(grade);
         let target = self.coordinates(grade.saturating_add(1));
         let source_offsets = coordinate_offsets(&source);
@@ -291,28 +303,28 @@ impl ExactCellularSheaf {
                 };
                 let restriction = self.restriction(*lower, *upper)?;
                 let incidence = Rat::from_integer(coefficient.difference());
-                for row in 0..restriction.rows {
-                    for column in 0..restriction.columns {
+                for row in 0..restriction.rows() {
+                    for column in 0..restriction.columns() {
                         entries[target_offset + row][source_offset + column] +=
-                            &incidence * &restriction.entries[row][column];
+                            &incidence * restriction.get(row, column)?;
                     }
                 }
             }
         }
-        ExactLinearMap::new(target.len(), source.len(), entries)
+        ExactRatMatrix::declared(target.len(), source.len(), entries)
     }
 
     /// The exact Hodge operator
     /// `Delta_k = delta_(k-1) delta_(k-1)^T + delta_k^T delta_k`.
-    pub fn hodge_laplacian(&self, grade: u32) -> Result<ExactLinearMap, SheafDiffusionError> {
+    pub fn hodge_laplacian(&self, grade: u32) -> Result<ExactRatMatrix, SheafDiffusionError> {
         let extent = self.coordinates(grade).len();
         let upper = self.coboundary(grade)?;
-        let upper_term = upper.then(&upper.transpose())?;
+        let upper_term = upper.then(&upper.transpose()?)?;
         let lower_term = if grade == 0 {
-            ExactLinearMap::zero(extent, extent)
+            ExactRatMatrix::zero(extent, extent)?
         } else {
             let lower = self.coboundary(grade - 1)?;
-            lower.transpose().then(&lower)?
+            lower.transpose()?.then(&lower)?
         };
         lower_term.plus(&upper_term)
     }
@@ -357,17 +369,16 @@ impl ExactCellularSheaf {
             });
         }
         for ((lower, upper), map) in &self.restrictions {
-            map.validate()?;
             let expected_rows = self.stalk_dimensions[upper];
             let expected_columns = self.stalk_dimensions[lower];
-            if map.rows != expected_rows || map.columns != expected_columns {
+            if map.rows() != expected_rows || map.columns() != expected_columns {
                 return Err(SheafDiffusionError::RestrictionDimension {
                     lower: *lower,
                     upper: *upper,
                     expected_rows,
                     expected_columns,
-                    supplied_rows: map.rows,
-                    supplied_columns: map.columns,
+                    supplied_rows: map.rows(),
+                    supplied_columns: map.columns(),
                 });
             }
         }
@@ -378,12 +389,7 @@ impl ExactCellularSheaf {
                 let first = self.coboundary(grade)?;
                 let second = self.coboundary(grade.saturating_add(1))?;
                 let squared = first.then(&second)?;
-                if squared
-                    .entries
-                    .iter()
-                    .flatten()
-                    .any(|value| !value.is_zero())
-                {
+                if squared.entries().iter().any(|value| !value.is_zero()) {
                     return Err(SheafDiffusionError::CoboundarySquaredNonzero { grade });
                 }
             }
@@ -405,7 +411,7 @@ impl ExactCellularSheaf {
         for source in sources {
             let mut composites = BTreeMap::from([(
                 source,
-                ExactLinearMap::identity(self.stalk_dimensions[&source]),
+                ExactRatMatrix::identity(self.stalk_dimensions[&source])?,
             )]);
             let mut reachable = vec![source];
             let mut cursor = 0;
@@ -568,12 +574,18 @@ pub struct SheafDiffusionCertificate {
     pub grade: u32,
     pub coordinates: Vec<SheafCoordinate>,
     pub capacities: Vec<Rat>,
-    pub coboundary_below: ExactLinearMap,
-    pub coboundary_above: ExactLinearMap,
-    pub hodge_laplacian: ExactLinearMap,
-    pub operator: ExactLinearMap,
-    pub inverse: ExactLinearMap,
-    pub inverse_residual: ExactLinearMap,
+    #[serde(with = "linear_map_rows")]
+    pub coboundary_below: ExactRatMatrix,
+    #[serde(with = "linear_map_rows")]
+    pub coboundary_above: ExactRatMatrix,
+    #[serde(with = "linear_map_rows")]
+    pub hodge_laplacian: ExactRatMatrix,
+    #[serde(with = "linear_map_rows")]
+    pub operator: ExactRatMatrix,
+    #[serde(with = "linear_map_rows")]
+    pub inverse: ExactRatMatrix,
+    #[serde(with = "linear_map_rows")]
+    pub inverse_residual: ExactRatMatrix,
     pub harmonic_dimension: usize,
 }
 
@@ -905,38 +917,33 @@ impl ExactSheafDiffusionLaw {
         let coordinates = self.sheaf.coordinates(self.grade);
         let capacities = self.flattened_capacities();
         let coboundary_below = if self.grade == 0 {
-            ExactLinearMap::zero(coordinates.len(), 0)
+            ExactRatMatrix::zero(coordinates.len(), 0)?
         } else {
             self.sheaf.coboundary(self.grade - 1)?
         };
         let coboundary_above = self.sheaf.coboundary(self.grade)?;
         let hodge_laplacian = self.sheaf.hodge_laplacian(self.grade)?;
         let mut operator = hodge_laplacian
-            .entries
+            .to_rows()
             .iter()
             .map(|row| row.iter().map(|value| interval * value).collect::<Vec<_>>())
             .collect::<Vec<_>>();
         for (ordinal, capacity) in capacities.iter().enumerate() {
             operator[ordinal][ordinal] += capacity;
         }
-        let operator = ExactLinearMap::new(coordinates.len(), coordinates.len(), operator)?;
-        let inverse = ExactLinearMap::new(
-            coordinates.len(),
-            coordinates.len(),
-            invert_exact(operator.entries.clone())?,
-        )?;
+        let operator = ExactRatMatrix::declared(coordinates.len(), coordinates.len(), operator)?;
+        let inverse = operator.inverse()?;
         let inverse_residual = inverse
             .then(&operator)?
-            .plus(&scaled_identity(coordinates.len(), -Rat::one()))?;
+            .plus(&scaled_identity(coordinates.len(), -Rat::one())?)?;
         if inverse_residual
-            .entries
+            .entries()
             .iter()
-            .flatten()
             .any(|value| !value.is_zero())
         {
             return Err(SheafDiffusionError::TransferCertificateFailure);
         }
-        let harmonic_dimension = coordinates.len() - exact_rank(hodge_laplacian.entries.clone());
+        let harmonic_dimension = coordinates.len() - exact_rank(hodge_laplacian.to_rows());
         Ok(SheafDiffusionCertificate {
             schema: "holonic-engine.sheaf-diffusion-certificate.v1".to_owned(),
             grade: self.grade,
@@ -1009,12 +1016,8 @@ fn validate_capacities(
     Ok(())
 }
 
-fn scaled_identity(extent: usize, scale: Rat) -> ExactLinearMap {
-    let mut result = ExactLinearMap::zero(extent, extent);
-    for diagonal in 0..extent {
-        result.entries[diagonal][diagonal] = scale.clone();
-    }
-    result
+fn scaled_identity(extent: usize, scale: Rat) -> Result<ExactRatMatrix, SheafDiffusionError> {
+    Ok(ExactRatMatrix::identity(extent)?.scaled(&scale))
 }
 
 /// Every refusal the shared exact carrier raises, named in this law's own vocabulary, so no
@@ -1044,13 +1047,6 @@ impl From<ExactLinearError> for SheafDiffusionError {
 ///
 /// The declared extent is passed rather than inferred: a grade with no coordinates is a lawful
 /// `0 x 0` operator, and `Vec<Vec<Rat>>` carries no column count when it has no rows.
-fn invert_exact(matrix: Vec<Vec<Rat>>) -> Result<Vec<Vec<Rat>>, SheafDiffusionError> {
-    let extent = matrix.len();
-    Ok(ExactRatMatrix::shaped(extent, extent, matrix)?
-        .inverse()?
-        .to_rows())
-}
-
 fn exact_rank(mut matrix: Vec<Vec<Rat>>) -> usize {
     let rows = matrix.len();
     let columns = matrix.first().map_or(0, Vec::len);
@@ -1262,12 +1258,12 @@ mod tests {
                 CellularRestriction {
                     lower: left,
                     upper: edge,
-                    map: ExactLinearMap::identity(1),
+                    map: ExactRatMatrix::identity(1).unwrap(),
                 },
                 CellularRestriction {
                     lower: right,
                     upper: edge,
-                    map: ExactLinearMap::identity(1),
+                    map: ExactRatMatrix::identity(1).unwrap(),
                 },
             ],
         )
@@ -1447,11 +1443,82 @@ mod tests {
         assert_eq!(energy.implicit_step_defect, integer(2) / integer(9));
         assert!(energy.exact_residual.is_zero());
         let mut other_operator = receipt.clone();
-        other_operator.certificate.hodge_laplacian.entries[0][0] = integer(0);
+        let laplacian = &other_operator.certificate.hodge_laplacian;
+        let (extent, mut rows) = (laplacian.rows(), laplacian.to_rows());
+        rows[0][0] = integer(0);
+        other_operator.certificate.hodge_laplacian =
+            ExactRatMatrix::declared(extent, extent, rows).unwrap();
         assert_eq!(
             law.energy_balance(&other_operator, &event),
             Err(SheafDiffusionError::TransferCertificateFailure)
         );
+    }
+
+    /// **The replaced carrier's wire is unchanged.** A restriction and a certificate map serialize
+    /// exactly as the retired `ExactRatMatrix { rows, columns, entries: Vec<Vec<Rat>> }` did, and
+    /// that wire deserializes back to the same `ExactRatMatrix`; a misshapen row population
+    /// refuses at deserialization.
+    #[test]
+    fn the_linear_map_wire_keeps_its_row_shape() {
+        #[derive(Serialize)]
+        struct RetiredMap {
+            rows: usize,
+            columns: usize,
+            entries: Vec<Vec<Rat>>,
+        }
+        #[derive(Serialize)]
+        struct RetiredRestriction {
+            lower: CausalCellId,
+            upper: CausalCellId,
+            map: RetiredMap,
+        }
+        let entries = vec![vec![integer(1), Rat::new(2.into(), 3.into())]];
+        let restriction = CellularRestriction {
+            lower: CausalCellId(1),
+            upper: CausalCellId(2),
+            map: ExactRatMatrix::declared(1, 2, entries.clone()).unwrap(),
+        };
+        let written = serde_json::to_string(&restriction).unwrap();
+        let retired = serde_json::to_string(&RetiredRestriction {
+            lower: CausalCellId(1),
+            upper: CausalCellId(2),
+            map: RetiredMap {
+                rows: 1,
+                columns: 2,
+                entries,
+            },
+        })
+        .unwrap();
+        assert_eq!(written, retired);
+        let read: CellularRestriction = serde_json::from_str(&retired).unwrap();
+        assert_eq!(read, restriction);
+
+        let (complex, left, right, edge) = interval_complex();
+        let sheaf = ExactCellularSheaf::new(
+            complex,
+            BTreeMap::from([(left, 1), (right, 1), (edge, 1)]),
+            [
+                CellularRestriction {
+                    lower: left,
+                    upper: edge,
+                    map: ExactRatMatrix::identity(1).unwrap(),
+                },
+                CellularRestriction {
+                    lower: right,
+                    upper: edge,
+                    map: ExactRatMatrix::identity(1).unwrap(),
+                },
+            ],
+        )
+        .unwrap();
+        // The restriction table is keyed by an incidence pair, which JSON cannot key; RON can.
+        let wire = ron::to_string(&sheaf).unwrap();
+        assert_eq!(wire.matches("entries:[[").count(), 2, "{wire}");
+        let read: ExactCellularSheaf = ron::from_str(&wire).unwrap();
+        assert_eq!(read, sheaf);
+
+        let ragged = retired.replacen("\"columns\":2", "\"columns\":3", 1);
+        assert!(serde_json::from_str::<CellularRestriction>(&ragged).is_err());
     }
 
     #[test]
@@ -1464,12 +1531,14 @@ mod tests {
                 CellularRestriction {
                     lower: left,
                     upper: edge,
-                    map: ExactLinearMap::new(1, 2, vec![vec![integer(1), integer(0)]]).unwrap(),
+                    map: ExactRatMatrix::declared(1, 2, vec![vec![integer(1), integer(0)]])
+                        .unwrap(),
                 },
                 CellularRestriction {
                     lower: right,
                     upper: edge,
-                    map: ExactLinearMap::new(1, 2, vec![vec![integer(0), integer(1)]]).unwrap(),
+                    map: ExactRatMatrix::declared(1, 2, vec![vec![integer(0), integer(1)]])
+                        .unwrap(),
                 },
             ],
         )
@@ -1543,7 +1612,7 @@ mod tests {
                 restrictions.push(CellularRestriction {
                     lower,
                     upper: *upper,
-                    map: ExactLinearMap::new(1, 1, vec![vec![scale]]).unwrap(),
+                    map: ExactRatMatrix::declared(1, 1, vec![vec![scale]]).unwrap(),
                 });
             }
         }

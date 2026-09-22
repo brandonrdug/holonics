@@ -20,7 +20,7 @@ use crate::physical_constraint_complex::{
     ResidueMaterial,
 };
 use crate::rebase_invariants::{PivotRule, invariants_agree, rebase_invariants};
-use crate::sheaf_diffusion::{CellularRestriction, ExactCellularSheaf, ExactLinearMap};
+use crate::sheaf_diffusion::{CellularRestriction, ExactCellularSheaf};
 
 fn rat(numerator: i64, denominator: i64) -> Rat {
     Rat::new(BigInt::from(numerator), BigInt::from(denominator))
@@ -178,7 +178,7 @@ fn constant_sheaf(graded: &GradedCausalComplex) -> ExactCellularSheaf {
             restrictions.push(CellularRestriction {
                 lower,
                 upper: cell.id,
-                map: ExactLinearMap::identity(1),
+                map: ExactRatMatrix::identity(1).expect("a unit stalk"),
             });
         }
     }
@@ -187,9 +187,8 @@ fn constant_sheaf(graded: &GradedCausalComplex) -> ExactCellularSheaf {
     )
 }
 
-fn carrier(map: &ExactLinearMap) -> ExactRatMatrix {
-    ExactRatMatrix::shaped(map.rows(), map.columns(), map.entries().to_vec())
-        .expect("the declared shape is the map's own")
+fn carrier(map: &ExactRatMatrix) -> ExactRatMatrix {
+    map.clone()
 }
 
 /// The dimension of `ker Delta_k`, read from the exact rank and never from a tolerance.

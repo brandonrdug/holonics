@@ -853,8 +853,6 @@ impl HodgeOperator {
             .coboundary(grade)
             .map_err(|error| HodgeError::CellularSheaf(error.to_string()))?;
         let mine = self.coboundary(grade)?;
-        let theirs =
-            ExactRatMatrix::shaped(theirs.rows(), theirs.columns(), theirs.entries().to_vec())?;
         Ok(theirs == mine)
     }
 }
@@ -867,7 +865,7 @@ impl HodgeOperator {
 fn rank_one_sheaf(
     complex: &GradedCausalComplex,
 ) -> Result<crate::sheaf_diffusion::ExactCellularSheaf, HodgeError> {
-    use crate::sheaf_diffusion::{CellularRestriction, ExactCellularSheaf, ExactLinearMap};
+    use crate::sheaf_diffusion::{CellularRestriction, ExactCellularSheaf};
     let stalks = complex.cells().keys().map(|cell| (*cell, 1_usize)).collect();
     let mut restrictions = Vec::new();
     for (upper, body) in complex.cells() {
@@ -875,7 +873,7 @@ fn rank_one_sheaf(
             restrictions.push(CellularRestriction {
                 lower,
                 upper: *upper,
-                map: ExactLinearMap::identity(1),
+                map: ExactRatMatrix::identity(1)?,
             });
         }
     }

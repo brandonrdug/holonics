@@ -344,12 +344,7 @@ fn the_coboundary_and_the_unit_laplacian_agree_with_the_cellular_sheaf_owner() {
         let theirs = sheaf.hodge_laplacian(grade).expect("the sheaf Laplacian");
         let mine = operator.laplacian(grade).expect("this module's Laplacian");
         assert_eq!(theirs.rows(), mine.rows(), "grade {grade}");
-        assert_eq!(
-            ExactRatMatrix::shaped(theirs.rows(), theirs.columns(), theirs.entries().to_vec())
-                .expect("the shapes agree"),
-            mine,
-            "grade {grade}"
-        );
+        assert_eq!(theirs, mine, "grade {grade}");
     }
 
     // The comparison is refused under a relative reading, which the sheaf owner does not carry.

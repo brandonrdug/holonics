@@ -5,6 +5,10 @@
 //! feature, independently of the desktop device runtime. They do not encompass every
 //! mathematical construction in the repository; further executable owners live in `engine`.
 //!
+//! [`core`] is the Holon core (`holonic-core`): the foundational object every native owner
+//! implements, mirroring the Lean `ElementaryHolonics/Holon/` foundation. It is available without
+//! `native` and is reached qualified, never glob-re-exported.
+//!
 //! The default `native` feature preserves the existing `hna`, `soulkiller` and `interop`
 //! interfaces and exposes their `engine` owner. The HNN API contains several explicitly scoped
 //! realizations. `hna::alpha` retains the source-qualified exterior exposure reader; the
@@ -12,6 +16,7 @@
 //! Package containers are distinct from standard executable
 //! model graphs; see docs/INTEROPERABILITY.md.
 
+pub use holonic_core as core;
 pub use holonic_structure as structure;
 pub use relational_geometry as geometry;
 

@@ -34,9 +34,9 @@ use thiserror::Error;
 
 use crate::{
     CausalAlgebraicError, CausalCellId, CausalChain, ComparativeMultiplicity, EventId,
-    EventSuccessor, ExactCellularSheaf, ExactEventLaw, ExactLinearMap, ExactSheafCochain,
+    EventSuccessor, ExactCellularSheaf, ExactEventLaw, ExactRatMatrix, ExactSheafCochain,
     ExactSheafDiffusionLaw, GradedCausalComplex, SheafDiffusionError, SheafDiffusionEvent,
-    SheafDiffusionReceipt, SheafDiffusionStanding,
+    SheafDiffusionReceipt, SheafDiffusionStanding, SheafLinearMap, linear_map_rows,
 };
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
@@ -115,8 +115,10 @@ pub struct CausalConnectionTransport {
     pub carrier: CausalCellId,
     pub source: CausalCellId,
     pub target: CausalCellId,
-    pub forward: ExactLinearMap,
-    pub reverse: ExactLinearMap,
+    #[serde(with = "linear_map_rows")]
+    pub forward: ExactRatMatrix,
+    #[serde(with = "linear_map_rows")]
+    pub reverse: ExactRatMatrix,
     pub founded_by: EventId,
 }
 
@@ -132,7 +134,8 @@ pub struct CausalHolonomyGenerator {
     pub source: CausalCellId,
     pub loop_boundary: CausalChain,
     pub ordered_steps: Vec<CausalTransportStep>,
-    pub transport: ExactLinearMap,
+    #[serde(with = "linear_map_rows")]
+    pub transport: ExactRatMatrix,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -256,8 +259,8 @@ pub enum CausalBodyDeed {
         carrier: CausalCellReference,
         source: CausalCellReference,
         target: CausalCellReference,
-        forward: ExactLinearMap,
-        reverse: ExactLinearMap,
+        forward: ExactRatMatrix,
+        reverse: ExactRatMatrix,
     },
     FoundReceiver {
         receiver: ReceiverId,
@@ -751,8 +754,8 @@ impl CausalBodyStanding {
         carrier: CausalCellId,
         source: CausalCellId,
         target: CausalCellId,
-        forward: ExactLinearMap,
-        reverse: ExactLinearMap,
+        forward: ExactRatMatrix,
+        reverse: ExactRatMatrix,
     ) -> Result<(), CausalBodyError> {
         if self.connections.contains_key(&carrier) {
             return Err(CausalBodyError::DuplicateConnection(carrier));
@@ -780,7 +783,8 @@ impl CausalBodyStanding {
         {
             return Err(CausalBodyError::NonreversibleConnectionDimension(carrier));
         }
-        let identity = ExactLinearMap::identity(forward.rows());
+        let identity =
+            ExactRatMatrix::identity(forward.rows()).map_err(SheafDiffusionError::from)?;
         if forward.then(&reverse)? != identity || reverse.then(&forward)? != identity {
             return Err(CausalBodyError::ConnectionNotExactlyReversible(carrier));
         }
@@ -1321,7 +1325,8 @@ impl CausalBodyStanding {
                     supplied_target: connection.target,
                 });
             }
-            let identity = ExactLinearMap::identity(connection.forward.rows());
+            let identity = ExactRatMatrix::identity(connection.forward.rows())
+                .map_err(SheafDiffusionError::from)?;
             if connection.forward.then(&connection.reverse)? != identity
                 || connection.reverse.then(&connection.forward)? != identity
             {
@@ -1918,15 +1923,15 @@ mod tests {
 
     #[test]
     fn loop_holonomy_is_path_ordered_and_not_a_drawn_cycle() {
-        let scale_two = ExactLinearMap::new(1, 1, vec![vec![integer(2)]]).unwrap();
+        let scale_two = ExactRatMatrix::declared(1, 1, vec![vec![integer(2)]]).unwrap();
         let scale_half =
-            ExactLinearMap::new(1, 1, vec![vec![Rat::new(1.into(), 2.into())]]).unwrap();
-        let scale_three = ExactLinearMap::new(1, 1, vec![vec![integer(3)]]).unwrap();
+            ExactRatMatrix::declared(1, 1, vec![vec![Rat::new(1.into(), 2.into())]]).unwrap();
+        let scale_three = ExactRatMatrix::declared(1, 1, vec![vec![integer(3)]]).unwrap();
         let scale_third =
-            ExactLinearMap::new(1, 1, vec![vec![Rat::new(1.into(), 3.into())]]).unwrap();
-        let scale_five = ExactLinearMap::new(1, 1, vec![vec![integer(5)]]).unwrap();
+            ExactRatMatrix::declared(1, 1, vec![vec![Rat::new(1.into(), 3.into())]]).unwrap();
+        let scale_five = ExactRatMatrix::declared(1, 1, vec![vec![integer(5)]]).unwrap();
         let scale_fifth =
-            ExactLinearMap::new(1, 1, vec![vec![Rat::new(1.into(), 5.into())]]).unwrap();
+            ExactRatMatrix::declared(1, 1, vec![vec![Rat::new(1.into(), 5.into())]]).unwrap();
         let mut event = triangle_event(EventId(1), false);
         event.deeds.extend([
             CausalBodyDeed::Connect {
@@ -1961,7 +1966,7 @@ mod tests {
             .unwrap();
         assert_eq!(
             generator.transport,
-            ExactLinearMap::new(1, 1, vec![vec![integer(30)]]).unwrap()
+            ExactRatMatrix::declared(1, 1, vec![vec![integer(30)]]).unwrap()
         );
     }
 
@@ -1993,12 +1998,12 @@ mod tests {
                 CellularRestriction {
                     lower: left,
                     upper: edge,
-                    map: ExactLinearMap::identity(1),
+                    map: ExactRatMatrix::identity(1).unwrap(),
                 },
                 CellularRestriction {
                     lower: right,
                     upper: edge,
-                    map: ExactLinearMap::identity(1),
+                    map: ExactRatMatrix::identity(1).unwrap(),
                 },
             ],
         )

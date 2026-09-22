@@ -440,7 +440,8 @@ fn every_correspondence_table_cites_a_declared_lean_name() {
     );
 }
 
-/// **Every inline `Foundation/…lean::Name` citation in the engine's sources names a declaration.**
+/// **Every inline `Foundation/…lean::Name` citation in the engine's and the Holon core's sources
+/// names a declaration.**
 ///
 /// This is the scan that catches a citation outside a correspondence table — the form most of this
 /// library's prose uses.
@@ -454,6 +455,16 @@ fn every_inline_lean_citation_names_a_declared_lean_name() {
         "only {} engine sources were found under {}",
         sources.len(),
         root.display()
+    );
+    // The Holon core mirrors `ElementaryHolonics/Holon/` facet by facet and cites it in every
+    // module header, so its sources are read by the same scan.
+    let core = repository_root().join("crates/holonic-core/src");
+    let engine_sources = sources.len();
+    collect_rust_sources(&core, &mut sources);
+    assert!(
+        sources.len() > engine_sources,
+        "no Holon core sources were found under {}",
+        core.display()
     );
 
     let mut cache: std::collections::BTreeMap<String, Option<BTreeSet<String>>> =
@@ -507,14 +518,23 @@ fn collect_rust_sources(directory: &Path, into: &mut Vec<PathBuf>) {
     }
 }
 
-/// Every `Foundation/<File>.lean::<Name>` or `Transport/<File>.lean::<Name>` citation in a source.
+/// Every `Foundation/`, `Transport/`, `Physics/`, `Geometry/` or `Holon/` `<File>.lean::<Name>`
+/// citation in a source.
 fn inline_citations(source: &str) -> Vec<(String, String)> {
     let mut found = Vec::new();
     // `Geometry/` joined the scan when `identity_atlas` paired with
     // `Geometry/TwoSidedIdentityAtlas.lean`; a directory absent from this list is a hole in the
     // check, not an exemption, and `jet_staircase`'s `Geometry/SixSphereMonodromy.lean::M0` was
     // already being carried unchecked.
-    for prefix in ["Foundation/", "Transport/", "Physics/", "Geometry/"] {
+    //
+    // `Holon/` joined when `holonic-core` began citing the Holon foundation.
+    for prefix in [
+        "Foundation/",
+        "Transport/",
+        "Physics/",
+        "Geometry/",
+        "Holon/",
+    ] {
         let mut rest = source;
         while let Some(at) = rest.find(prefix) {
             let tail = &rest[at..];
