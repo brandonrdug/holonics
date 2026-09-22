@@ -871,4 +871,8 @@ uses the same incidence and source/condition return.
 [established-bounded; formal-proof] `Transport/ContactFactorScale.lean` proves rectangular
 amplitude variation and cotangent pairing, quadratic Gram scaling and the unchanged null kernel
 for nonzero amplitude. Its two-factor contraction matches the machine's real-coordinate
-parameter receiver. [Native return and scope](../research/records/2026-09-21_THE_PAIR_RESPONSE_RETURNS_ITS_RECTANGULAR_FACTOR_COTANGENT.md).
+parameter receiver. The relative-basis law rebases an old comparison's amplitude covector;
+a scalar counterexample separates old and contemporary bases. A gradient-ball bound proves
+positivity of the proposed relative step, and amplitude composition retains the pair template.
+These latter laws constrain the next publication owner; they do not assert a native update
+or finite-step objective improvement. [Native return and scope](../research/records/2026-09-21_THE_PAIR_RESPONSE_RETURNS_ITS_RECTANGULAR_FACTOR_COTANGENT.md).

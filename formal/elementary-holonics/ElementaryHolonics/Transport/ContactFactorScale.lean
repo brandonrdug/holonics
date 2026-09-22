@@ -41,6 +41,29 @@ theorem amplitude_directional_pairing {m n : Type*} [Fintype m] [Fintype n]
   intro j hj
   ring
 
+theorem amplitude_pairing (rho : ℚ) (G B : Mat m n)
+    [Fintype m] [Fintype n] :
+    frobeniusPairing G (amplitude rho B) = rho * frobeniusPairing G B := by
+  simp [frobeniusPairing, amplitude, dotProduct, Finset.mul_sum]
+  apply Finset.sum_congr rfl
+  intro i hi
+  apply Finset.sum_congr rfl
+  intro j hj
+  ring
+
+theorem relative_amplitude_pairing {rhoOld rhoNow : ℚ} (hOld : rhoOld ≠ 0)
+    (G B : Mat m n) [Fintype m] [Fintype n] :
+    frobeniusPairing G (amplitude rhoNow B) =
+      (rhoNow / rhoOld) * frobeniusPairing G (amplitude rhoOld B) := by
+  rw [amplitude_pairing, amplitude_pairing]
+  field_simp [hOld]
+
+theorem relative_cotangent_counterexample :
+    ∃ (G B : Mat (Fin 1) (Fin 1)),
+      frobeniusPairing G (amplitude 2 B) ≠ frobeniusPairing G (amplitude 1 B) := by
+  refine ⟨!![1], !![1], ?_⟩
+  norm_num [frobeniusPairing, amplitude, dotProduct, Fin.sum_univ_succ]
+
 theorem gram_scale {m n : Type*} [Fintype m] [Fintype n]
     (rho : ℚ) (B : Mat m n) :
     gram (amplitude rho B) = rho ^ 2 • gram B := by
@@ -76,6 +99,28 @@ theorem nonzero_amplitude_null_kernel {m n : Type*} [Fintype n]
   · intro h
     rw [h]
     simp
+
+theorem constrained_positive_proposal
+    {eta radius g gHat : ℚ}
+    (hEta : 0 ≤ eta) (_hRadius : 0 ≤ radius)
+    (hError : |g - gHat| ≤ radius)
+    (hBound : eta * (|gHat| + radius) ≤ 1 / 2) :
+    1 / 2 ≤ 1 + eta * g := by
+  have hDiff : -radius ≤ g - gHat := (abs_le.mp hError).1
+  have hHat : -|gHat| ≤ gHat := neg_abs_le gHat
+  have hLower : -(|gHat| + radius) ≤ g := by
+    linarith
+  have hScaled := mul_le_mul_of_nonneg_left hLower hEta
+  nlinarith
+
+theorem positive_amplitude_proposal {rho alpha : ℚ}
+    (hRho : 0 < rho) (hAlpha : 0 < alpha) : 0 < alpha * rho := by
+  exact mul_pos hAlpha hRho
+
+theorem amplitude_scale_composition (alpha rho : ℚ) (B : Mat m n) :
+    amplitude alpha (amplitude rho B) = amplitude (alpha * rho) B := by
+  ext i j
+  simp [amplitude, smul_eq_mul, mul_assoc, mul_comm, mul_left_comm]
 
 theorem factor_cotangent_pairing
     {m n k0 k1 : Type*}

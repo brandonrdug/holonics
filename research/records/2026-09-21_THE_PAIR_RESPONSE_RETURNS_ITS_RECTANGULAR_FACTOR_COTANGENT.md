@@ -88,3 +88,34 @@ with its coefficient error. Direct CSR scaling needs an explicit causal/rest rec
 pair-derived low-rank update can use signed factors—the positivity of a step size does not
 forbid a negative matrix increment—but needs a retained parameter and a compaction law.
 Neither route licenses an arbitrary operator delta or an unrecorded reset of the initial map.
+
+## Delayed comparison and the next positive proposal
+
+[definition] An old comparison's relative-amplitude cotangent is tied to its producing basis.
+For one unchanged pair template B, write `D_old=rho_old B`, `D_now=rho_now B`. The retained
+G_old gives `g_old=<G_old,D_old>` and `g_now=<G_old,D_now>`, hence
+`g_now=(rho_now/rho_old)g_old` for nonzero rho_old. Simply applying g_old as the contemporary
+relative cotangent loses that basis change. For the scalar template and covector both equal
+to one, rho_old=1 and rho_now=2 already distinguish the two values. The native API can
+contract the old pullback directly against a contemporary pure-CSR source at the same owner.
+The public HNN currently asks for the producing basis, as its getter documents.
+
+[definition; agent-inferred] The next publication design is now specified in the
+[machine contract](../../docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition).
+It uses an accepted dyadic relative step, with a certified alpha lower bound of 1/2,
+and scales the CSR and transpose together. In exact arithmetic,
+`eta (|g_centre|+r_g)<=1/2` certifies `1+eta g>=1/2` throughout the gradient ball. Native
+rounding adds its own error. The positive amplitude preserves the template's null kernel;
+the factor approximation retains `r_next<=max|alpha|r_now+r_round`. The old gradient/source,
+accepted step and amplitude product belong to the causal/rest receipt. These laws make
+the next implementation reviewable; they do not constitute a published material update or
+a finite-step improvement guarantee.
+
+[established-bounded; formal-proof] The September 22 continuation adds
+`amplitude_pairing`, `relative_amplitude_pairing`, `relative_cotangent_counterexample`,
+`constrained_positive_proposal`, `positive_amplitude_proposal` and
+`amplitude_scale_composition` in the same `ContactFactorScale` owner. Its focused source,
+object and axiom checks pass with standard axioms only; the integrated Framework also passes
+at 9,210 jobs. The gradient-ball bound is an exact
+rational statement; coefficient projection and staged native publication retain the separate
+obligations above.

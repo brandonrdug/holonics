@@ -1430,6 +1430,34 @@ returns through the complete source tape and reads shared phase text/termination
 Codec growth and rest retain old producing cuts. Geometry is still declared: packet 4 must
 supply its constrained proposal, not silently publish an unconstrained global D update.
 
+[definition; agent-inferred] **Constrained arc-amplitude publication.** The
+[rectangular factor return](../../research/records/2026-09-21_THE_PAIR_RESPONSE_RETURNS_ITS_RECTANGULAR_FACTOR_COTANGENT.md)
+supplies the first parameter derivative. Write an arc's rectangular coupling as
+`D_a(rho_a)=rho_a B_a`, with fixed pair template B_a and positive rho_a. For an old comparison,
+keep its producing cotangent G_old, but contract against the contemporary amplitude basis
+when proposing a relative update: `g_now=Re<G_old,D_a(rho_now)>`. Equivalently,
+`g_now=(rho_now/rho_old) g_old` when rho_old is nonzero and both cuts have the same template.
+The implemented gradient API accepts distinct source-qualified producing and basis cuts;
+the current HNN getter still reports the producing relative basis. Geometry changes require
+their own chart derivative and cannot use this scalar rebase identity.
+
+A first admitted proposal uses `alpha_a=1+eta_a g_now,a`, `rho_next,a=alpha_a rho_now,a`.
+Choose a dyadic eta no larger than the requested step, halving until its outward scalar
+enclosure has lower endpoint at least 1/2. The exact sufficient condition is
+`eta (|g_centre|+r_g) <= 1/2`; native projection must also pay its rounding error in that
+enclosure. This is a positivity and family certificate, not a claim of objective decrease
+for a finite step. Retain the accepted step and gradient/reference enclosure in the proposal.
+
+The publication owner scales the CSR rows and corresponding transpose entries by the same
+arc alpha, preserving topology and the three structural columns per pair. For exact selected
+alpha, its coefficient-family error obeys `r_next <= max_a |alpha_a| r_now + r_round`.
+Retain the original pair template and amplitude product, or a rebased representation with its
+explicit residual; independently rounding the amplitude ledger and matrix does not prove
+they still represent the same family. Stage refreshed operator bounds and current moments
+before the existing atomic field publication. q/b, old producing sources, pending comparisons
+and the initial map's causal meaning survive. Rest must recover the parameter/cut receipt as
+well as the CSR coefficients. These proposal and publication operations remain to be implemented.
+
 [definition; agent-inferred] **Packets and dependencies.** Paths below are relative to `crates/`
 except the formal row. Ownership is split per dispatch; rows listing the same file are
 sequential, not promises of disjoint edits.
