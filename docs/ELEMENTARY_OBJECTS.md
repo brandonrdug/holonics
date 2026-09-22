@@ -17,6 +17,36 @@ between them. Every other object below is a part, a dual, a comparison or a cont
 picture. Neither half reduces to the other: the ring is the reactive (second-order, storing) cell,
 the contact is the dissipative (first-order, addressing) cell.
 
+<a id="the-holon-as-one-object"></a>
+
+## The Holon as one object
+
+[definition; agent-inferred] The objects below are facets of one object
+([refinement record](../research/records/2026-09-22_THE_HOLON_IS_AN_INTERCONNECTED_PORT_OBJECT_ON_A_COMPLEX.md),
+from the [proposal](../research/records/2026-09-22_PROPOSAL_THE_HOLON_AS_A_RECURSIVE_GENERATOR_FLUX_OBSERVER_OBJECT.md)).
+A **Holon** is the law and its ports, not its state:
+
+```text
+H = (K, ∂_A;  Π;  𝒟;  𝓔;  G;  π)
+K, ∂_A   oriented complex, connection-valued incidence d_A (d_A² = F_A, curvature a cell face)
+Π        ports: flow f and effort e per interface cell, ⟨e,f⟩ = power (entropy rate × temperature for information)
+𝒟        interconnection (Dirac) structure, 𝒟 = 𝒟^⊥; power neutral: ⟨e,f⟩ = 0 on 𝒟 (Tellegen, Stokes)
+𝓔        element relations = constitution: storage E_Θ (C, K), resistive (contacts, M ⪰ 0 where passive),
+         sources, active/learned relations with their power, pumps
+G        generators: initial configuration (the key), clock, phase lift θ̃ = θ + 2πn; supply U_e and skew transport
+π        restrictions to coarser grains; the scale square or a typed defect
+motion   flows/efforts in 𝒟 satisfying 𝓔;  d/dτ E_Θ = −dissipation + port power + active power + ⟨∂_Θ E, Θ̇⟩
+```
+
+A state is a point on a Holon; a trajectory is one of its admitted motions. Receivers are Holons
+joined at ports; a passive coholon is the zero-storage limit that reads an effort. Interconnecting
+Holons through their ports yields a Holon, which is the recursion. Passivity is a proved property,
+never assumed: learned or nonlocal relations enter with their actual power term. Linear SSMs,
+diffusion, Maxwell (Stokes–Dirac on the de Rham complex) and Euler/Navier–Stokes (Lie–Poisson plus
+viscous resistance) are specializations; the occurrence Holon of `Foundation/Holon.lean` is its event
+chart. The foundation campaign formalizes this in Lean and makes it the Rust core that every native
+owner implements.
+
 ## The objects
 
 Each object comes with its dual. A reading is always a pairing of the two, and orientation exists
@@ -215,7 +245,11 @@ cross-entropy (`InformationDifference`) as its face reading and `R⁻¹dR` as th
 the lifted cross-entropy excess `= (2/ln2) Σ T_i ℓ_i`; the logit derivative of its real part
 `= (H_j−T_j)/ln2 = (2/ln2) Σ T_i Re(R_i⁻¹∂_jR_i)`; the winding shift of the imaginary part; the
 log-derivative product law as a gauge transform; and the second-order jet with its lattice form.
-Open: the phase part of the covector, continuous-lift existence, the Schwarzian, a matrix log.
+`Objects/RatioPhase` and `Objects/RatioBlock` add the phase covector, continuous-lift existence, `det(exp A)=exp(tr A)` with
+`tr log R` in the determinant's lift fibre, and the Schwarzian's Möbius invariance. **Descent reads the magnitude:** the
+real part (KL) is already a nonnegative cost; the imaginary part is an oriented displacement, so learning descends
+`½Σ_c q_c Δ_c²`, `Δ_c = φ^T_c − φ^H_c + 2πn` (winding-aware), and the signed phase excess is reported, not descended
+(ruling of September 22 after a signed push produced a −17,534-bit excess).
 
 ### 10. Receipt
 

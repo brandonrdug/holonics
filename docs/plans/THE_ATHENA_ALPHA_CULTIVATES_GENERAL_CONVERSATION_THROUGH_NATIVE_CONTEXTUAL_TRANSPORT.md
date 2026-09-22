@@ -1595,6 +1595,11 @@ readings      E_p[ℓ] = lifted cross-entropy (KL bits, phase excess)      Infor
               ℓ_(n+1) − ℓ_n per observation; B_state per bit of ℓ reduced
 ```
 
+[definition] **Descent reads the magnitude of `ℓ`.** `Re ℓ` is KL, a nonnegative cost. `Im ℓ` is an oriented
+displacement; its cost is `½Σ_c q_c Δ_c²` with `Δ_c=φ^T_c−φ^H_c+2πn`. The phase covector is therefore the
+target-weighted phase gap, which vanishes at alignment and reverses with the gap. The signed phase excess
+is a reading only.
+
 A scalar is a limit reading of `R`: an expectation, trace, determinant, norm or rate. It is a
 valid measurement with units and is reported. The adjoint pulls back the full `R⁻¹dR`, and the
 retained state is the machine, not a scalar. A common rechart of both Holons cancels from `ℓ`

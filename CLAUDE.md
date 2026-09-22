@@ -22,6 +22,15 @@ them, is a design defect. The picture: a continuing field of chains of **complex
 (annular rings that store, oscillate and lock) joined by **helical pair contacts** (which slip,
 dissipate and address); rings rotate and align, contacts converge and diverge action.
 
+[definition] **The Holon as one object** ([guide](docs/ELEMENTARY_OBJECTS.md#the-holon-as-one-object)): the
+law and its ports, not its state — `H=(K,∂_A; Π; 𝒟; 𝓔; G; π)`: complex with connection-valued
+incidence, ports carrying flow/effort pairs whose pairing is power, a power-neutral interconnection
+(Dirac) structure, element relations (the constitution: storage, resistive contacts, sources,
+active/learned relations with their power, pumps), generators with keys/clocks/phase lifts, and
+scale restrictions. Receivers are Holons joined at ports; interconnected Holons form a Holon.
+Passivity is proved, never assumed. The table below lists its facets. The Lean foundation and the
+Rust core implement this object, and every native owner implements or charts it.
+
 | Object | Dual / law |
 |---|---|
 | Complex | oriented cells, `∂²=0` |
