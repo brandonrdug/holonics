@@ -1255,6 +1255,17 @@ vocabulary, this section fixes their reading; their equations remain valid at th
    addresses, dormant rings bound through standing/release; multi-rate towers.
 4. **Motor chart**: `SerialScrewChain` words as source and receiver on the same machine.
 
+[definition] **Every owed formal item has a campaign** (formal work lands with its consumer):
+
+| Owed item | Campaign |
+|---|---|
+| phase part of the loss covector; continuous-lift existence; block ratio `log det = tr log` / matrix log; Schwarzian | 1 (ratio) |
+| exact minimal retention quotient; `β` joined to membrane faces; `Λ_DN`/Schur join; `JunctionLaw` reversing-loop replacement | 1 (one cut, receiver boundary) |
+| `SourceMoment`: per-ring clocks, `Ĝ⁻¹` form, general offsets, `StandingLaw` statement, `CausalChord` transfer, `FractalPacking` address link | 1 (source Holon) |
+| pump/Floquet locking; continuous crossing equal to the micro-step ring | 2 (rings) |
+| approximate recurrence; the full relative completeness theorem (Einstein lifts × complex Euler/NS); relevance-theorem join | 3 (keys, dormant rings) |
+| receipt energy/erasure axes | 1 (receipts) |
+
 <a id="situated-generator-and-receiving-composition"></a>
 
 #### Shared generator and receiving composition
