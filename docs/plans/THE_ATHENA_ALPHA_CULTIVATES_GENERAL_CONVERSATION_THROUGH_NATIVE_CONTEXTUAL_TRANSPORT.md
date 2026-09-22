@@ -1554,6 +1554,23 @@ retained state is the machine, not a scalar. A common rechart of both Holons can
 Dissipation `⟨Jv,DJv⟩` and stored energy are reported beside `ℓ` and joined only through a
 declared constitutive law.
 
+**Existing owners this construction composes (survey of September 22).** The ratio's primary
+carrier is the undivided numerator–denominator pair (`Geometry/CrossRatio.lean`); division is
+one chart and requires a unit denominator, otherwise `R` is returned as a lift fibre
+(`Foundation/TransportLift.lean`). A zero produced amplitude or coherent cancellation lies
+outside the logarithmic chart and uses `surprisal::cross_entropy_fiber`'s supported/partial/
+unsupported split. The branch is the deleted winding (`Millennium/Turn.lean`,
+`Geometry/PhaseCarry.lean` carry cocycle, `RH/Winding.lean` argument principle). `R⁻¹dR` is the
+pure-gauge term `g∂g⁻¹` of `Millennium/HolonicGaugeCovariance.lean`, discretely
+`Transport/CellHolonomy.lean`. The phase part of a two-Holon comparison is the antisymmetric
+cross-current `Im(conj z_T·z_H)` (`Millennium/HolonicEntropyHeatCurrent.lean`,
+`HolonicEntropyActionInduction.lean`). Coherent class amplitudes add before the logarithm (the
+September 12 complex receiver). The native face is an extension of
+`normalized_section_return`/`NativeNormalizedFaceMeasure` and of `phase_participation`, whose
+imaginary slot is currently written as zero; exact references are `NormalizedKernel`,
+`complex_log_point` and `ComplexJet2::logarithmic_current`. An information rate is not a
+projective Swing (`SituatedInformationRate`); the loss ratio is not identified with a cross-ratio.
+
 Required implementation: encode the target as a moment on the same machine; compute `ℓ_j` at
 each receiving phase with the machine's actual winding; pull back the complete logarithmic
 derivative, including its phase part through the phase receiver's clock/winding adjoint; report

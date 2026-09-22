@@ -602,7 +602,7 @@ the Transformer paper's outward-normal sign and constant-input normalization dom
 `z_i=√q_i exp(iθ_i)`. Its excess over the source self-reading is
 `D_KL,₂(p||q) - (2i/ln 2) Σ_i p_i(θ_i-φ_i)`: real code excess and oriented mean phase defect.
 Coherent class currents add before this logarithmic receiver, retaining interference and
-its possible zero. This explicit finite-sum derivation is not yet a separate Lean owner.
+its possible zero. `Physics/InformationDifference.lean` owns `liftedCrossEntropy` and its excess/conjugate/common-phase laws; the winding-shift identity and its identification as the logarithm of an amplitude ratio remain #62 obligations.
 
 [definition] The [equational/world-tube review](../research/records/2026-09-10_EQUATIONAL_LAWS_AND_WORLD_TUBES_MAKE_ATHENAS_NEXT_PASSAGE_EXPLICIT.md)
 connects ETP's congruence/implication/countermodel method with the existing future-stable receiver

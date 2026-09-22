@@ -156,8 +156,9 @@ inverse or an event archive.
 [established-bounded; source-inspected] `GeometricRegions` currently uses alphabet-derived
 channels, unit-current inputs/targets and per-slot basis decoding. The incident Athena geometry
 (`examples/support/linked_torus_field.rs`) assigns one ring junction per source cell, with a
-one-hot encoder and per-slot faces, and `holonics-hna/src/` imports none of the screw,
-interaction, chain, standing or release owners. Both are numerical application controls that
+one-hot encoder and per-slot faces. `holonics-hna` now imports the screw/pair-interaction owners
+(`field_geometry/machine.rs`); chain, standing, release, `exponentiated_ratio`,
+`receiver_history_compression`, `kernel_modes` and `HelicalMomentReuse` are still unconsumed. Both are numerical application controls that
 the generator machine replaces; `HelicalMomentReuse` is a separate caller. The next
 encoder/decoder work follows the
 [existing Holonic Encoding construction](research/records/2026-09-11_HOLONIC_ENCODING_RETAINS_TRANSFORMATION_GRAIN_ACROSS_MODALITIES.md)
