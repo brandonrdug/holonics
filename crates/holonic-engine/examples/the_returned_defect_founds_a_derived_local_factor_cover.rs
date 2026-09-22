@@ -627,6 +627,7 @@ fn code_closure() -> String {
         include_str!("the_returned_defect_founds_a_derived_local_factor_cover.rs"),
         include_str!("../src/derived_factor_cover.rs"),
         include_str!("../src/exact_linear.rs"),
+        include_str!("../../holonic-core/src/exact_linear.rs"),
         include_str!("../src/resident_law.rs"),
         include_str!("../src/resident_section.rs"),
         include_str!("../kernels/exact_resident_section.cu"),

@@ -10,6 +10,9 @@ desktop-x11 = ["dep:x11rb"]
 
 [dependencies]
 holonic-structure = { workspace = true }
+# The Holon core owns the exact base (`ExactRatMatrix`, `inertia`, `exact_value`, …); every moved
+# item is re-exported at its existing engine path.
+holonic-core = { workspace = true }
 # The CUDA Driver API boundary. `mount -> body, soma-abi` only (measured with `cargo metadata`,
 # 2026-08-18), so this edge closes no cycle: the engine's resident owner reaches the card through
 # the one census `crates/holonic-mount` owns rather than declaring a second `#[link(name = "cuda")]` regime.

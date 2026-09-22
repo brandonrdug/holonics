@@ -1,0 +1,11 @@
+[package]
+name = "holonic-words"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# The exact machine-word rings of the section layout, host-only: no CUDA, no driver. `soma-abi`
+# supplies the device modulus arithmetic itself, so the device-equality property is one piece of
+# code. `crates/holonic-mount` re-exports every item at its old path.
+[dependencies]
+soma-abi = { path = "../holonic-abi" }

@@ -17,6 +17,8 @@ path = "src/lib.rs"
 [dependencies]
 body = { path = "../holonic-body" }
 soma-abi = { path = "../holonic-abi" }
+# The exact word rings (`ExactRing`, `ModularWords`, …), host-only, re-exported at their old paths.
+holonic-words = { path = "../holonic-words" }
 
 [[bin]]
 name = "mount-smoke"

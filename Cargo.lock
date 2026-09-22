@@ -867,10 +867,12 @@ dependencies = [
 name = "holonic-core"
 version = "0.1.0"
 dependencies = [
+ "holonic-words",
  "num-bigint",
  "num-traits",
  "relational-geometry",
  "serde",
+ "serde_json",
  "thiserror 2.0.19",
 ]
 
@@ -879,6 +881,7 @@ name = "holonic-engine"
 version = "0.1.0"
 dependencies = [
  "claxon",
+ "holonic-core",
  "holonic-structure",
  "hound",
  "image",
@@ -909,6 +912,13 @@ name = "holonic-structure"
 version = "0.1.0"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "holonic-words"
+version = "0.1.0"
+dependencies = [
+ "soma-abi",
 ]
 
 [[package]]
@@ -1290,6 +1300,7 @@ name = "mount"
 version = "0.1.0"
 dependencies = [
  "body",
+ "holonic-words",
  "soma-abi",
 ]
 

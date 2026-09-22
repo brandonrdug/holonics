@@ -7,9 +7,15 @@ license.workspace = true
 # The Holon core: the foundational object every native owner implements
 # (docs/plans/THE_HOLON_CORE_FOUNDS_THE_NATIVE_MACHINERY.md). It builds without CUDA and without
 # `holonic-mount`; the resident device realization is a chart compiled from it elsewhere.
+# `holonic-words` carries the exact machine-word rings without the driver.
 [dependencies]
+# The exact word rings (`ModularWords` is the device's own add/mul, through `soma-abi`), host-only.
+holonic-words = { workspace = true }
 num-bigint = { workspace = true }
 num-traits = { workspace = true }
 relational-geometry = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
+
+[dev-dependencies]
+serde_json = "1"
