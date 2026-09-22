@@ -215,3 +215,13 @@ nonlinear phase/shared-cell construction in
 scopes. Use the former for its checked differential and solve; use the latter for the stated
 geometric/phase recurrence. Their supplied parameters and results do not by themselves constitute
 a trained HNN. The task is their applicable composition through the actual model and receiver.
+
+[definition] The fixed generator instance is now constructed by
+`NativeCoupledBody::found_generator_field`: `field_geometry/machine.rs` validates generators,
+frames, clocks, lifts and admitted cells; `machine_factor.rs` lowers each actual pair form into
+its certified sparse contact factor; `incident/machine_transport.rs` supplies separate affine
+spatial and value maps with their adjoints. Its current chart faithfully encodes all six real
+coordinates of the original complex-3 current, projecting only the redundant native imaginary
+faces. Tagged reception reads the generated endpoint at the declared phases. The
+[construction record](../research/records/2026-09-21_THE_FIXED_GENERATOR_MACHINE_CONSUMES_ITS_AFFINE_CURRENT_CHART.md)
+keeps the fixed-material scope and the remaining ordered source/session join explicit.

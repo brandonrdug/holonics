@@ -1,5 +1,16 @@
 //! Incident-conditioned finite word on one global constitutive field.
+mod machine;
+mod machine_receiving;
+mod machine_transport;
+pub use machine_receiving::{
+    GeneratorPhasePort, GeneratorPhaseReceiverBinding, NativeGeneratorPhaseReception,
+};
 mod rest;
+pub use machine::GeneratorIncidentFieldSpec;
+use machine::{IncidentModelSpec, MachineGroupMaps};
+use machine_transport::{MachineParticipation, MachineValueTransport};
+#[cfg(test)]
+mod machine_tests;
 #[cfg(test)]
 #[path = "incident_tests.rs"]
 mod tests;
@@ -93,9 +104,12 @@ struct IncidentSite {
     phases: Vec<ExactWavePhaseTransport>,
     differences: Vec<usize>,
     material: usize,
+    /// Machine admitted-arc index per port; None is a self comparison.
+    machine_arcs: Vec<Option<usize>>,
 }
 #[derive(Clone)]
 struct IncidentLayout {
+    machine: Option<Rc<crate::native::field_geometry::machine::CompiledGeneratorMachine>>,
     sites: Vec<IncidentSite>,
     slot_rows: Vec<usize>,
     width: usize,
@@ -117,6 +131,8 @@ struct IncidentGroup {
     difference_phases: Vec<ExactWavePhaseTransport>,
     query_repeats: Vec<usize>,
     condition_held: Vec<bool>,
+    machine_arcs: Vec<Option<usize>>,
+    difference_arcs: Vec<Option<usize>>,
 }
 impl IncidentLayout {
     fn groups(&self, admitted: &[Vec<bool>]) -> Vec<Rc<IncidentGroup>> {
@@ -145,6 +161,8 @@ impl IncidentLayout {
                     difference_phases: vec![],
                     query_repeats: vec![],
                     condition_held: vec![],
+                    machine_arcs: vec![],
+                    difference_arcs: vec![],
                 };
                 for (row, &r) in group.receivers.iter().enumerate() {
                     let site = &self.sites[r];
@@ -152,11 +170,17 @@ impl IncidentLayout {
                         if admitted[r][port] {
                             group.sources.push(source);
                             group.phases.push(site.phases[port].clone());
+                            if !site.machine_arcs.is_empty() {
+                                group.machine_arcs.push(site.machine_arcs[port]);
+                            }
                         }
                     }
                     for &port in &site.differences {
                         group.difference_sources.push(site.sources[port]);
                         group.difference_phases.push(site.phases[port].clone());
+                        if !site.machine_arcs.is_empty() {
+                            group.difference_arcs.push(site.machine_arcs[port]);
+                        }
                         group.query_repeats.push(row);
                         group
                             .condition_held
@@ -213,6 +237,7 @@ impl IncidentFieldSpec {
                     phases,
                     differences,
                     material: owners[row],
+                    machine_arcs: vec![],
                 });
             }
         }
@@ -255,6 +280,7 @@ impl IncidentFieldSpec {
             return Err(invalid("incident material owners must be contiguous"));
         }
         Ok(IncidentLayout {
+            machine: None,
             sites,
             slot_rows: geometry.slot_rows,
             width,
@@ -276,17 +302,20 @@ struct IncidentSiteStep<'c> {
     query: Rc<ResidentNormalEnclosureSection<'c>>,
     phase: IncidentParticipationForward<'c>,
     condition: Option<ResidentNormalEnclosureSection<'c>>,
+    machine_difference: Option<MachineValueTransport<'c>>,
     features: ResidentNormalEnclosureSection<'c>,
 }
 enum IncidentParticipationForward<'c> {
     Bilinear(NativePhaseParticipation<'c>),
     Quadrance(NativePairParticipation<'c>),
+    Machine(MachineParticipation<'c>),
 }
 impl<'c> IncidentParticipationForward<'c> {
     fn output(&self) -> &ResidentNormalEnclosureSection<'c> {
         match self {
             Self::Bilinear(p) => p.output(),
             Self::Quadrance(p) => p.output(),
+            Self::Machine(p) => p.output(),
         }
     }
     #[cfg(test)]
@@ -294,6 +323,7 @@ impl<'c> IncidentParticipationForward<'c> {
         match self {
             Self::Bilinear(p) => p.transported_neighbors(),
             Self::Quadrance(p) => p.values(),
+            Self::Machine(p) => p.values(),
         }
     }
     fn pull_back(
@@ -307,6 +337,9 @@ impl<'c> IncidentParticipationForward<'c> {
         NativeSessionError,
     > {
         match self {
+            Self::Machine(_) => Err(invalid(
+                "machine participation returns through its distinct charts",
+            )),
             Self::Bilinear(p) => Ok(p.pull_back(gy, None)?.into_parts()),
             Self::Quadrance(p) => {
                 let (query, neighbors, values) = p.pull_back(gy, None)?.into_parts();
@@ -322,6 +355,7 @@ struct IncidentStep<'c> {
     input: ResidentNormalEnclosure<'c>,
 }
 pub(crate) struct IncidentWord<'c> {
+    machine: Option<Rc<crate::native::field_geometry::machine::CompiledGeneratorMachine>>,
     source: NativeFieldCurrentSource<'c>,
     material: Vec<ResidentNormalMaterialView<'c>>,
     anchor: Rc<ResidentNormalEnclosure<'c>>,
@@ -395,7 +429,7 @@ impl<'c> NativeIncidentGenerated<'c> {
 }
 pub(crate) struct IncidentFieldModel<'c> {
     field: NativeConstitutiveField<'c>,
-    spec: IncidentFieldSpec,
+    spec: IncidentModelSpec,
     layout: IncidentLayout,
     materials: Vec<ResidentNormalMaterial<'c>>,
     epoch: u64,
@@ -441,12 +475,18 @@ impl<'c> IncidentFieldModel<'c> {
         field: NativeConstitutiveField<'c>,
         spec: IncidentFieldSpec,
     ) -> Result<Self, NativeSessionError> {
+        Self::new_model(field, IncidentModelSpec::Legacy(spec))
+    }
+    fn new_model(
+        field: NativeConstitutiveField<'c>,
+        spec: IncidentModelSpec,
+    ) -> Result<Self, NativeSessionError> {
         let layout = spec.compile()?;
         Self::with_layout(field, spec, layout)
     }
     fn with_layout(
         mut field: NativeConstitutiveField<'c>,
-        spec: IncidentFieldSpec,
+        spec: IncidentModelSpec,
         layout: IncidentLayout,
     ) -> Result<Self, NativeSessionError> {
         field.enable_operative_contacts()?;
@@ -494,7 +534,7 @@ impl<'c> IncidentFieldModel<'c> {
         {
             return Err(invalid("incident source anchor chart"));
         }
-        let anchor = Rc::new(if source.internal_components() == 0 {
+        let anchor = if source.internal_components() == 0 {
             prepared_boundary.to_owned()?
         } else {
             prepared_boundary.join(
@@ -503,7 +543,12 @@ impl<'c> IncidentFieldModel<'c> {
                     .restrict(boundary..boundary + source.internal_components())?
                     .view(),
             )?
-        });
+        };
+        let anchor = Rc::new(
+            self.project_machine(anchor.view().as_section()?)?
+                .row(0)?
+                .to_owned()?,
+        );
         let mut joint_held = held.to_vec();
         joint_held.resize((boundary + source.internal_components()) / 2, false);
         let material = self
@@ -513,6 +558,7 @@ impl<'c> IncidentFieldModel<'c> {
             .collect::<Vec<_>>();
         let (steps, output) = self.evaluate(&source, &material, &anchor, &joint_held, &admitted)?;
         Ok(IncidentWord {
+            machine: self.layout.machine.clone(),
             source,
             material,
             anchor,
@@ -521,8 +567,8 @@ impl<'c> IncidentFieldModel<'c> {
             steps,
             output,
             epoch: self.epoch,
-            solver: self.spec.solver,
-            solve_steps: self.spec.solve_steps,
+            solver: self.spec.solver(),
+            solve_steps: self.spec.solve_steps(),
         })
     }
 
@@ -558,7 +604,9 @@ impl<'c> IncidentFieldModel<'c> {
         Ok(
             json!({"scope":"incident-field-joint","epoch":self.epoch,"generations":self.generations,
             "joint":source.enclosure().inspect()?,"boundary_components":source.boundary_components(),
-            "internal_components":source.internal_components(),"sites":self.layout.sites.len()}),
+            "internal_components":source.internal_components(),"sites":self.layout.sites.len(),
+            "chart": if self.layout.machine.is_some() {"fixed-generator-machine"} else {"legacy-slot-field"},
+            "contact_material": if self.layout.machine.is_some() {"declared-pair-factor"} else {"unconstrained-global-return"}}),
         )
     }
     pub(crate) fn inspect_material(&self, member: usize) -> Result<Value, NativeSessionError> {
@@ -592,8 +640,8 @@ impl<'c> IncidentFieldModel<'c> {
     ) -> Result<NativeIncidentGenerated<'c>, NativeSessionError> {
         if generated.comparison.is_some()
             || generated.word.epoch != self.epoch
-            || generated.word.solver != self.spec.solver
-            || generated.word.solve_steps != self.spec.solve_steps
+            || generated.word.solver != self.spec.solver()
+            || generated.word.solve_steps != self.spec.solve_steps()
         {
             return Err(invalid("stale or already retained incident generation"));
         }
@@ -641,6 +689,20 @@ impl<'c> IncidentFieldModel<'c> {
         self.generations = generations;
         Ok(generated)
     }
+    /// Projection onto the declared real-coded source image. Its transpose is itself.
+    fn project_machine(
+        &self,
+        section: ResidentNormalEnclosureSection<'c>,
+    ) -> Result<ResidentNormalEnclosureSection<'c>, NativeSessionError> {
+        if self.layout.machine.is_none() {
+            return Ok(section);
+        }
+        let projected = Rc::new(section).project_real()?;
+        Ok(ResidentNormalEnclosureSection::concatenate_rows(&[
+            projected.output(),
+        ])?)
+    }
+
     fn evaluate(
         &self,
         source: &NativeFieldCurrentSource<'c>,
@@ -662,50 +724,101 @@ impl<'c> IncidentFieldModel<'c> {
         let mut current = anchor.view().to_owned()?;
         let anchor_section = anchor.view().as_section()?;
         let groups = layout.groups(admitted);
+        let maps = groups
+            .iter()
+            .map(|group| {
+                layout
+                    .machine
+                    .as_ref()
+                    .map(|machine| {
+                        MachineGroupMaps::new(
+                            self.field.surface(),
+                            machine,
+                            group,
+                            anchor.view().grain(),
+                        )
+                    })
+                    .transpose()
+            })
+            .collect::<Result<Vec<_>, _>>()?;
         let mut steps = Vec::with_capacity(layout.steps);
         for _ in 0..layout.steps {
-            let q = current
-                .view()
-                .restrict(0..boundary)?
-                .view()
-                .split_rows(layout.sites.len(), layout.width)?;
+            let q = Rc::new(
+                current
+                    .view()
+                    .restrict(0..boundary)?
+                    .view()
+                    .split_rows(layout.sites.len(), layout.width)?,
+            );
             let mut sites = Vec::with_capacity(groups.len());
             let mut incoming: Option<ResidentNormalEnclosureSection<'c>> = None;
-            for group in &groups {
+            for (group, maps) in groups.iter().zip(&maps) {
                 let rows = group.receivers.len();
                 let query =
                     Rc::new(q.gather_phase_rows(&group.receivers, &phases(rows), layout.width)?);
-                let neighbors =
-                    Rc::new(q.gather_phase_rows(&group.sources, &group.phases, layout.width)?);
-                let phase = match layout.participation {
-                    IncidentParticipationChart::Bilinear => {
-                        IncidentParticipationForward::Bilinear(query.clone().phase_participation(
-                            neighbors,
-                            group.neighbors,
-                            layout.beta,
-                            SeriesAperture(layout.series),
-                        )?)
-                    }
-                    IncidentParticipationChart::QuadranceCurrent => {
-                        IncidentParticipationForward::Quadrance(
-                            query.clone().pair_quadrance_participation(
-                                Rc::clone(&neighbors),
-                                neighbors,
-                                group.neighbors,
-                                layout.beta,
-                                SeriesAperture(layout.series),
-                            )?,
-                        )
+                let phase = if let Some(maps) = maps {
+                    IncidentParticipationForward::Machine(MachineParticipation::new(
+                        q.clone(),
+                        &group.receivers,
+                        &group.sources,
+                        maps.query.clone(),
+                        maps.neighbors.clone(),
+                        maps.values.clone(),
+                        layout.beta,
+                        SeriesAperture(layout.series),
+                    )?)
+                } else {
+                    let neighbors = Rc::new(q.gather_phase_rows(
+                        &group.sources,
+                        &group.phases,
+                        layout.width,
+                    )?);
+                    match layout.participation {
+                        IncidentParticipationChart::Bilinear => {
+                            IncidentParticipationForward::Bilinear(
+                                query.clone().phase_participation(
+                                    neighbors,
+                                    group.neighbors,
+                                    layout.beta,
+                                    SeriesAperture(layout.series),
+                                )?,
+                            )
+                        }
+                        IncidentParticipationChart::QuadranceCurrent => {
+                            IncidentParticipationForward::Quadrance(
+                                query.clone().pair_quadrance_participation(
+                                    Rc::clone(&neighbors),
+                                    neighbors,
+                                    group.neighbors,
+                                    layout.beta,
+                                    SeriesAperture(layout.series),
+                                )?,
+                            )
+                        }
                     }
                 };
+                let machine_difference = maps
+                    .as_ref()
+                    .and_then(|m| m.differences.as_ref())
+                    .map(|coefficients| {
+                        MachineValueTransport::new(
+                            q.clone(),
+                            &group.difference_sources,
+                            coefficients.clone(),
+                        )
+                    })
+                    .transpose()?;
                 let condition = if group.differences == 0 {
                     None
                 } else {
-                    let u = q.gather_phase_rows(
-                        &group.difference_sources,
-                        &group.difference_phases,
-                        layout.width,
-                    )?;
+                    let u = match &machine_difference {
+                        Some(m) => ResidentNormalEnclosureSection::concatenate_rows(&[m.output()])?,
+                        None => q.gather_phase_rows(
+                            &group.difference_sources,
+                            &group.difference_phases,
+                            layout.width,
+                        )?,
+                    };
                     let neg_q = query.gather_phase_rows(
                         &group.query_repeats,
                         &vec![opposite(); group.query_repeats.len()],
@@ -740,11 +853,14 @@ impl<'c> IncidentFieldModel<'c> {
                     query,
                     phase,
                     condition,
+                    machine_difference,
                     features,
                 });
             }
-            let a = incoming
-                .ok_or_else(|| invalid("incident field has no material group"))?
+            let a = self
+                .project_machine(
+                    incoming.ok_or_else(|| invalid("incident field has no material group"))?,
+                )?
                 .pack_components(layout.sites.len())?
                 .row(0)?
                 .to_owned()?;
@@ -760,11 +876,10 @@ impl<'c> IncidentFieldModel<'c> {
             };
             let reflection =
                 self.spec
-                    .solver
-                    .action(source, input.view(), self.spec.solve_steps)?;
-            current = reflection
-                .output()
-                .as_section()?
+                    .solver()
+                    .action(source, input.view(), self.spec.solve_steps())?;
+            current = self
+                .project_machine(reflection.output().as_section()?)?
                 .held_refinement(&anchor_section, held, layout.relaxation_bits)?
                 .row(0)?
                 .to_owned()?;
@@ -797,12 +912,16 @@ impl<'c> IncidentFieldModel<'c> {
             let anchor_part =
                 zero_joint.held_refinement(&gradient, &word.held, layout.relaxation_bits)?;
             anchor_gradient = anchor_gradient.sum_same_shape(&anchor_part)?;
-            let returned =
-                gradient.held_refinement(&zero_joint, &word.held, layout.relaxation_bits)?;
+            let returned = self.project_machine(gradient.held_refinement(
+                &zero_joint,
+                &word.held,
+                layout.relaxation_bits,
+            )?)?;
             let full = returned.row(0)?;
             // S_D is self-adjoint under the declared unit pairing. This includes g_b_ref.
             let reflection = word.solver.action(&word.source, full, word.solve_steps)?;
-            let incoming_covector = reflection.output();
+            let incoming_projected = self.project_machine(reflection.output().as_section()?)?;
+            let incoming_covector = incoming_projected.row(0)?;
             let ga = incoming_covector
                 .restrict(0..boundary)?
                 .view()
@@ -825,13 +944,22 @@ impl<'c> IncidentFieldModel<'c> {
                     }
                     None => (gf, None),
                 };
-                let (phase_query, phase_neighbors) = stage.phase.pull_back(&g)?;
-                let mut query = gq.sum_same_shape(&phase_query)?;
-                previous = previous.sum_same_shape(&phase_neighbors.scatter_phase_adjoint(
-                    &group.sources,
-                    &group.phases,
-                    layout.sites.len(),
-                )?)?;
+                let mut query = match &stage.phase {
+                    IncidentParticipationForward::Machine(p) => {
+                        previous = previous.sum_same_shape(&p.pull_back(&g)?)?;
+                        gq
+                    }
+                    _ => {
+                        let (phase_query, phase_neighbors) = stage.phase.pull_back(&g)?;
+                        previous =
+                            previous.sum_same_shape(&phase_neighbors.scatter_phase_adjoint(
+                                &group.sources,
+                                &group.phases,
+                                layout.sites.len(),
+                            )?)?;
+                        gq.sum_same_shape(&phase_query)?
+                    }
+                };
                 if let Some(delta) = gdelta {
                     let zero_condition = zero(
                         self.field.surface(),
@@ -847,11 +975,15 @@ impl<'c> IncidentFieldModel<'c> {
                         &vec![opposite(); parts.rows()],
                         rows,
                     )?)?;
-                    previous = previous.sum_same_shape(&parts.scatter_phase_adjoint(
-                        &group.difference_sources,
-                        &group.difference_phases,
-                        layout.sites.len(),
-                    )?)?;
+                    let difference_return = match &stage.machine_difference {
+                        Some(m) => m.pull_back(&parts)?,
+                        None => parts.scatter_phase_adjoint(
+                            &group.difference_sources,
+                            &group.difference_phases,
+                            layout.sites.len(),
+                        )?,
+                    };
+                    previous = previous.sum_same_shape(&difference_return)?;
                 }
                 previous = previous.sum_same_shape(&query.scatter_phase_adjoint(
                     &group.receivers,
@@ -879,8 +1011,8 @@ impl<'c> IncidentFieldModel<'c> {
             contacts.push((step.input.view().to_owned()?, full.to_owned()?));
         }
         Ok(IncidentPullback {
-            anchor: anchor_gradient
-                .sum_same_shape(&gradient)?
+            anchor: self
+                .project_machine(anchor_gradient.sum_same_shape(&gradient)?)?
                 .row(0)?
                 .to_owned()?,
             material,
@@ -928,7 +1060,10 @@ impl<'c> NativeCoupledBody<'c> {
             )?;
             material.push(current.stage_covector_return(&features, &covectors, step_bits)?);
         }
-        let contact = if word.source.internal_components() == 0 {
+        // Fixed-machine geometry/contact material keeps its declared J C factor family.
+        // Its unconstrained global D return is not published into that family. Constrained
+        // geometry/material inference is a subsequent operation; the state adjoint is complete.
+        let contact = if word.source.internal_components() == 0 || model.layout.machine.is_some() {
             None
         } else {
             let actions = returned
@@ -1144,7 +1279,9 @@ impl<'c> NativeCoupledBody<'c> {
         }
         Ok(Self {
             state: Some(BodyState::Incident(IncidentFieldModel::with_layout(
-                field, spec, layout,
+                field,
+                IncidentModelSpec::Legacy(spec),
+                layout,
             )?)),
         })
     }
@@ -1163,7 +1300,7 @@ impl<'c> NativeCoupledBody<'c> {
     }
     pub fn incident_solver(&self) -> Result<(IncidentFieldSolver, usize), NativeSessionError> {
         match self.state()? {
-            BodyState::Incident(model) => Ok((model.spec.solver, model.spec.solve_steps)),
+            BodyState::Incident(model) => Ok((model.spec.solver(), model.spec.solve_steps())),
             _ => Err(invalid("incident solver requires its model chart")),
         }
     }
@@ -1198,8 +1335,7 @@ impl<'c> NativeCoupledBody<'c> {
         }
         match self.state_mut()? {
             BodyState::Incident(model) if model.pending.is_empty() => {
-                model.spec.solver = solver;
-                model.spec.solve_steps = steps;
+                model.spec.set_solver(solver, steps);
                 Ok(())
             }
             BodyState::Incident(_) => Err(invalid(
@@ -1252,6 +1388,11 @@ impl<'c> NativeCoupledBody<'c> {
                 "incident source restriction requires its model chart",
             ));
         };
+        if model.layout.machine.is_some() {
+            return Err(invalid(
+                "source-cell contact restrictions do not identify generator arcs; use the machine source/phase boundary",
+            ));
+        }
         let sources = source_sites
             .iter()
             .copied()

@@ -77,6 +77,7 @@ pub use junction::{
     joint_material_contact,
 };
 use junction::{PairedJunction, PendingJunction};
+pub use material_transport::{NativeAffineGeometry, NativeAffineGeometryAdjoint, NativeRealification, NativeRealificationAdjoint};
 pub use material_transport::ResidentNormalEnclosureSection;
 pub use material_transport::{
     CompiledCoupledJoint, ConstitutiveComparisonSection, ConstitutiveSourceFrame,

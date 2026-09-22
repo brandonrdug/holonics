@@ -853,3 +853,11 @@ factorization and generator descent are mathematical theorems at declared scope.
 prediction or intelligence guarantee requires its own statement and assumptions. The practical
 return here is a navigable formal framework, shared operators and explicit comparisons that can
 continue growing across subjects.
+
+[established-bounded; formal-proof] `Transport/GeneratorMachineCharts.lean`, imported by
+Framework Dynamics, checks the fixed machine's rational affine spatial realization,
+changing-anchor composition, geometry/value adjoints, projection, affine normalized mixtures
+and the six-real-coordinate encoding into native complex channels. Its image hypothesis is
+explicit; arbitrary native imaginary channels are not original machine coordinates. The
+[native consumer record](../research/records/2026-09-21_THE_FIXED_GENERATOR_MACHINE_CONSUMES_ITS_AFFINE_CURRENT_CHART.md)
+connects these laws to the current/refinement implementation.

@@ -663,3 +663,11 @@ defines finite construction returns; [the roadmap](plans/THE_ROADMAP.md) orders 
 [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) states the current position. The product ambition
 persists across those returns and does not turn each local research question into a requirement
 to complete general intelligence.
+
+[definition] The fixed-generator instance in `incident/machine.rs` supplies the existing word
+with the declared pair factor and separate affine spatial/value maps. Each original complex-3
+current uses six real-coded native complex channels; the source, reaction and refined endpoint
+include projection onto that image, with the same projection in the covector return. The
+[native chart record](../research/records/2026-09-21_THE_FIXED_GENERATOR_MACHINE_CONSUMES_ITS_AFFINE_CURRENT_CHART.md)
+states the realization and factor-error laws. Fixed contact geometry remains declared through
+reaction-material publication; a generic unconstrained D update would leave that family.

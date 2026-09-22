@@ -385,12 +385,15 @@ fn incident_quadrance_word_retains_complete_return_and_saved_chart() {
     let readout = ResidentReadout::new().unwrap();
     let surface = ResidentSurface::on(&readout).unwrap();
     let mut model = model(&surface);
-    model.spec.participation = IncidentParticipationChart::QuadranceCurrent;
+    let IncidentModelSpec::Legacy(spec) = &mut model.spec else {
+        panic!("legacy test model")
+    };
+    spec.participation = IncidentParticipationChart::QuadranceCurrent;
     model.layout.participation = IncidentParticipationChart::QuadranceCurrent;
-    model.spec.geometry.beta_significand = 1;
-    model.spec.geometry.beta_exponent = 0;
+    spec.geometry.beta_significand = 1;
+    spec.geometry.beta_exponent = 0;
     model.layout.beta = Dyadic::ONE;
-    model.spec.geometry.series_terms = 40;
+    spec.geometry.series_terms = 40;
     model.layout.series = 40;
     let source = model.field.read_current_source().unwrap();
     let anchor = make_anchor(
@@ -409,7 +412,9 @@ fn incident_quadrance_word_retains_complete_return_and_saved_chart() {
             .flat_map(|s| &s.sites)
             .all(|s| matches!(s.phase, IncidentParticipationForward::Quadrance(_)))
     );
-    let back = model.pull_back(&prepared.word, prepared.word.output.view()).unwrap();
+    let back = model
+        .pull_back(&prepared.word, prepared.word.output.view())
+        .unwrap();
     assert_eq!(back.contacts.len(), model.layout.steps);
     assert!(
         back.anchor
@@ -422,10 +427,8 @@ fn incident_quadrance_word_retains_complete_return_and_saved_chart() {
     let generated = model.publish(prepared, false, true).unwrap();
     let before = generated.joint_output().inspect().unwrap();
     let restored = model.rest().unwrap().remount(&surface).unwrap();
-    assert_eq!(
-        restored.spec.participation,
-        IncidentParticipationChart::QuadranceCurrent
-    );
+    assert!(matches!(&restored.spec, IncidentModelSpec::Legacy(s)
+        if s.participation == IncidentParticipationChart::QuadranceCurrent));
     assert_eq!(restored.pending.len(), 1);
     let word = Rc::clone(restored.pending.values().next().unwrap());
     assert_eq!(word.output.inspect().unwrap(), before);

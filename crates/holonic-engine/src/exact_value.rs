@@ -879,7 +879,11 @@ impl TryFrom<SturmIsolationCertificateWire> for SturmIsolationCertificate {
     type Error = ExactValueError;
 
     fn try_from(wire: SturmIsolationCertificateWire) -> Result<Self, Self::Error> {
-        if wire.variations_at_lower.checked_sub(wire.variations_at_upper) != Some(1) {
+        if wire
+            .variations_at_lower
+            .checked_sub(wire.variations_at_upper)
+            != Some(1)
+        {
             return Err(ExactValueError::NonIsolatingCertificate {
                 variations_at_lower: wire.variations_at_lower,
                 variations_at_upper: wire.variations_at_upper,
@@ -1171,10 +1175,10 @@ impl AlgebraicRoot {
             upper += &unit;
         }
         if !lower.is_positive() {
-            lower = &unit / Rat::from_integer(BigInt::from(2));
-            if polynomial.evaluate(&lower).is_zero() {
-                lower /= Rat::from_integer(BigInt::from(2));
-            }
+            // A positive root below one grid cell is still bracketed by zero. Replacing
+            // zero with half a cell can cross the root and destroy the certificate.
+            // The constant coefficient is nonzero, so zero is not a polynomial root.
+            lower = Rat::zero();
         }
         Self::isolate(polynomial, ExactInterval::new(lower, upper)?)
     }
@@ -2674,8 +2678,7 @@ pub mod ieee754 {
 mod emit_side_mouth_tests {
     use super::Rat;
     use super::ieee754::{
-        BinaryFloatDatum, BinaryFloatSpecies, decode_bfloat16_bits, round_into,
-        round_into_bfloat16,
+        BinaryFloatDatum, BinaryFloatSpecies, decode_bfloat16_bits, round_into, round_into_bfloat16,
     };
     use num_bigint::BigInt;
     use num_traits::Zero;
@@ -2885,12 +2888,8 @@ mod tests {
     #[test]
     fn an_empty_or_untrimmed_polynomial_wire_is_refused_and_the_degree_is_total() {
         // The wire the constructor produces remounts unchanged.
-        let lawful = IntegerPolynomial::new(vec![
-            -BigInt::from(2),
-            BigInt::zero(),
-            BigInt::one(),
-        ])
-        .expect("nonzero");
+        let lawful = IntegerPolynomial::new(vec![-BigInt::from(2), BigInt::zero(), BigInt::one()])
+            .expect("nonzero");
         let wire = serde_json::to_string(&lawful).expect("serialized");
         assert_eq!(
             serde_json::from_str::<IntegerPolynomial>(&wire).expect("lawful wire"),
@@ -2931,7 +2930,10 @@ mod tests {
             emptied.check_declared_size(),
             Err(ExactValueError::ZeroPolynomial)
         );
-        assert_eq!(SturmChain::of(&emptied), Err(ExactValueError::ZeroPolynomial));
+        assert_eq!(
+            SturmChain::of(&emptied),
+            Err(ExactValueError::ZeroPolynomial)
+        );
     }
 
     /// **A remounted polynomial passes the declared-size gate the constructor's callers pass.**
@@ -2940,8 +2942,8 @@ mod tests {
         let mut tall = vec![BigInt::zero(); STURM_DEGREE_CEILING + 2];
         tall[0] = -BigInt::one();
         tall[STURM_DEGREE_CEILING + 1] = BigInt::one();
-        let hostile = serde_json::to_string(&IntegerPolynomial { coefficients: tall })
-            .expect("serialized");
+        let hostile =
+            serde_json::to_string(&IntegerPolynomial { coefficients: tall }).expect("serialized");
         assert!(
             serde_json::from_str::<IntegerPolynomial>(&hostile)
                 .err()
@@ -2992,8 +2994,8 @@ mod tests {
     #[test]
     fn a_forged_algebraic_root_wire_is_refused_and_a_lawful_one_round_trips() {
         // Lawful: sqrt(2), isolated by this owner's own certificate, remounts unchanged.
-        let lawful = AlgebraicRoot::square_root(&Rat::from_integer(BigInt::from(2)), 16)
-            .expect("isolated");
+        let lawful =
+            AlgebraicRoot::square_root(&Rat::from_integer(BigInt::from(2)), 16).expect("isolated");
         let wire = serde_json::to_string(&lawful).expect("serialized");
         assert_eq!(
             serde_json::from_str::<AlgebraicRoot>(&wire).expect("a lawful wire"),
@@ -3019,7 +3021,9 @@ mod tests {
         let refusal = serde_json::from_str::<AlgebraicRoot>(&forged)
             .expect_err("a polynomial with no real root cannot isolate one");
         assert!(
-            refusal.to_string().contains("roots rather than exactly one"),
+            refusal
+                .to_string()
+                .contains("roots rather than exactly one"),
             "the forged wire was refused for the wrong reason: {refusal}"
         );
 
@@ -4015,14 +4019,17 @@ mod sturm_chain_tests {
                     if lower >= upper {
                         continue;
                     }
-                    let (Some(low_reading), Some(high_reading)) = (low_reading, high_reading) else {
+                    let (Some(low_reading), Some(high_reading)) = (low_reading, high_reading)
+                    else {
                         continue;
                     };
-                    let interval =
-                        ExactInterval::new(lower.clone(), upper.clone()).expect("ordered endpoints");
+                    let interval = ExactInterval::new(lower.clone(), upper.clone())
+                        .expect("ordered endpoints");
                     let reference = low_reading - high_reading;
                     assert_eq!(
-                        chain.distinct_root_count(&interval).expect("the count returns"),
+                        chain
+                            .distinct_root_count(&interval)
+                            .expect("the count returns"),
                         reference,
                         "the count of {coefficients:?} on [{lower}, {upper}] differs"
                     );
@@ -4132,5 +4139,15 @@ mod sturm_chain_tests {
                 );
             }
         }
+    }
+    #[test]
+    fn degree_two_roots_below_the_grid_keep_a_valid_zero_endpoint() {
+        let tiny = Rat::new(BigInt::one(), BigInt::one() << 160usize);
+        let root = AlgebraicRoot::square_root(&tiny, 16).unwrap();
+        let exact = Rat::new(BigInt::one(), BigInt::one() << 80usize);
+        assert_eq!(root.isolating_interval.lower, Rat::zero());
+        assert!(root.isolating_interval.upper > exact);
+        let inverse = AlgebraicRoot::reciprocal_square_root(&tiny.recip(), 16).unwrap();
+        assert_eq!(root.isolating_interval, inverse.isolating_interval);
     }
 }

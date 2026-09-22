@@ -1417,6 +1417,16 @@ resident score/return required by packet 3; `QuadranceCurrent` consumes its expl
 current chart in the old incident geometry. Generator-family geometry, source accumulation and
 phase receiving are still packet 3's consuming work, not discharged by that current chart.
 
+[definition] **Fixed-machine consuming return.**
+`NativeCoupledBody::found_generator_field` now connects validated `GeneratorMachineSpec`
+to the same global incident word through a certified sparse pair factor, separate resident
+spatial/value affine maps and six-coordinate realification. Producing phase reception is
+an explicit boundary of its output. The
+[current-chart record](../../research/records/2026-09-21_THE_FIXED_GENERATOR_MACHINE_CONSUMES_ITS_AFFINE_CURRENT_CHART.md)
+states projection, adjoint, factor-error, unit and declared-material scopes. The ordered
+source/session binding and shared text/termination law remain packet 3's next consuming work;
+its fixed geometry is not silently updated by an unconstrained global D proposal.
+
 [definition; agent-inferred] **Packets and dependencies.** Paths below are relative to `crates/`
 except the formal row. Ownership is split per dispatch; rows listing the same file are
 sequential, not promises of disjoint edits.

@@ -2,6 +2,8 @@
 //! Supports, shared junctions, phase arcs and their source events are validated by
 //! ExactAnalyticFieldWaveLaw; this adapter supplies no alternative torus/contact definition.
 mod placement;
+pub mod machine;
+pub mod machine_factor;
 use super::NativeSessionError;
 use holonic_engine::{
     AnalyticFieldJunctionId, CausalFieldStanding, DimensionalWaveModeId, ExactAnalyticFieldArc,

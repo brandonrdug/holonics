@@ -3,6 +3,8 @@ use super::*;
 use crate::resident_section::SLOT_WORDS;
 use std::rc::Rc;
 mod composition;
+mod affine_geometry;
+pub use affine_geometry::{NativeAffineGeometry, NativeAffineGeometryAdjoint, NativeRealification, NativeRealificationAdjoint};
 
 /// One resident enclosure per source row, produced by one applied normal-material passage.
 /// The complete section remains on the resident surface; row views borrow its packet and do not
@@ -192,6 +194,10 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
         let section = surface.mount_section_rest(&rest)?;
         Self::from_resident(surface, section, rows, width, grain)
     }
+
+    /// Placement identity for composing another resident operation on this same surface.
+    /// This does not read the current or expose its packet carrier.
+    pub fn surface(&self) -> &'c ResidentSurface<'c> { self.surface }
 
     pub(crate) fn resident_section(&self) -> &ResidentSection<'c> {
         &self.section

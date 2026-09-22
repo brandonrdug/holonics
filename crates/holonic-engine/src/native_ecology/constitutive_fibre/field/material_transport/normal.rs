@@ -951,6 +951,7 @@ pub(super) fn expose_data_energy(
 }
 
 mod direct;
+pub use direct::{NativeAffineGeometry, NativeAffineGeometryAdjoint, NativeRealification, NativeRealificationAdjoint};
 pub use direct::{
     BoundaryMaterialMaps, BoundaryMaterialSeed, CompiledCoupledJoint,
     ConstitutiveComparisonSection, ConstitutiveSourceFrame, ConstitutiveSourceRefusal,

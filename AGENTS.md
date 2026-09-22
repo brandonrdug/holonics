@@ -121,8 +121,8 @@ with stated priors and the same normal update. The contract contains the complet
 publication, rest and source-episode packets. These are implemented constituents of the shared
 operation; the text/support chart is one application. Its Athena geometry
 (`examples/support/linked_torus_field.rs`) assigns one ring junction per source cell with a
-one-hot encoder and per-slot faces, and `holonics-hna/src/` imports none of the screw,
-interaction, chain, standing or release owners; that layout is a control the generator machine
+one-hot encoder and per-slot faces. That legacy caller does not consume the new pair-derived
+machine; its layout is a control the generator machine
 replaces. Continue from those returns through the roadmap's packets: pair contact and serial
 chain, the generator-machine geometry, closure inference with standing/release, then economy
 and episodes, preserving the original target port and source fibre.
@@ -133,7 +133,8 @@ laws. `NativePairParticipation` executes the quadrance score with separate geome
 covectors on the device; `IncidentParticipationChart::QuadranceCurrent` binds the explicit
 same-current specialization into the existing HNN word and rest. Legacy bilinear mode remains
 the default. These are dependencies of the fixed generator/source/phase machine, whose actual
-configuration/current maps and source/receiving binding remain the next operation.
+configuration/current maps and phase reception now have a body consumer; ordered source/session
+binding remains the next operation.
 
 [definition] `IncidentFieldOptions::response_port_start` fixes the receiving slots independently
 of input length; fresh sessions reserve the final receiving aperture. Generation, comparison
@@ -290,3 +291,12 @@ Publish source, scoped results and necessary design provenance without raw priva
 machine-specific source paths. [AGENT_PROTOCOL](docs/AGENT_PROTOCOL.md) locates Codex/Claude logs
 and their message codecs; direct messages govern, generated summaries and tool outputs do not.
 The [document law](docs/canon/THE_DOCUMENT_LAW.md) owns documentation placement and continuity.
+
+[definition] `NativeCoupledBody::found_generator_field` now consumes the fixed machine:
+`field_geometry/{machine,machine_factor}.rs` owns its validated declaration and exact contact
+factor, `incident/{machine,machine_transport,machine_receiving}.rs` owns its resident affine
+word and tagged phase boundary. Original complex-3 currents are encoded as six real-coded
+native complex channels; the explicit projection and its transpose preserve that image.
+Declared pair material remains fixed while reaction material develops. Ordered source/session
+binding is the next call; the [current-chart record](research/records/2026-09-21_THE_FIXED_GENERATOR_MACHINE_CONSUMES_ITS_AFFINE_CURRENT_CHART.md)
+states its law and remaining scope. Legacy slot/response semantics remain distinct.

@@ -135,8 +135,12 @@ the implementation campaign with Luna delegation. The
 [first construction return](../../research/records/2026-09-21_PAIR_CONTACT_SERIAL_KINEMATICS_AND_THE_RESIDENT_QUADRANCE_RETURN.md)
 lands pair-derived contact, the supported exact serial joint charts and their formal laws,
 plus the resident quadrance receiver in the existing HNN word. The next consuming operation
-is the fixed generator-machine geometry and source/phase receiver binding; its declaration
-and resident affine chart maps are in progress. The existing slot model remains its control.
+is the generator-machine source/session binding. The
+[fixed-machine body](../../research/records/2026-09-21_THE_FIXED_GENERATOR_MACHINE_CONSUMES_ITS_AFFINE_CURRENT_CHART.md)
+now consumes certified pair factors, distinct resident affine score/value maps and their
+complete fixed-word return; tagged phase reception reads its producing endpoint. Ordered
+source recurrence, shared text/termination material and its durable reverse tape remain
+packet 3's application join. The existing slot model remains its control.
 
 ## Athena construction order
 

@@ -4,7 +4,7 @@ use holonic_engine::native_ecology::constitutive_fibre::NormalMaterialRest;
 
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 struct Header {
-    spec: IncidentFieldSpec,
+    spec: IncidentModelSpec,
     epoch: u64,
     generations: u64,
     observations: u64,
@@ -134,7 +134,7 @@ impl NativeIncidentModelRest {
         surface: &'c ResidentSurface<'c>,
     ) -> Result<IncidentFieldModel<'c>, NativeSessionError> {
         let (field, _, _) = NativeConstitutiveField::remount(surface, self.field)?;
-        let mut model = IncidentFieldModel::new(field, self.header.spec)?;
+        let mut model = IncidentFieldModel::new_model(field, self.header.spec)?;
         model.materials = self
             .material
             .into_iter()
@@ -202,6 +202,7 @@ impl NativeIncidentModelRest {
             model.pending.insert(
                 h.id,
                 Rc::new(IncidentWord {
+                    machine: model.layout.machine.clone(),
                     source,
                     material,
                     anchor,
@@ -210,8 +211,8 @@ impl NativeIncidentModelRest {
                     steps,
                     output,
                     epoch: h.epoch,
-                    solver: model.spec.solver,
-                    solve_steps: model.spec.solve_steps,
+                    solver: model.spec.solver(),
+                    solve_steps: model.spec.solve_steps(),
                 }),
             );
         }
