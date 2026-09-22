@@ -311,6 +311,139 @@ impl<'c> NativePhaseParticipation<'c> {
         })
     }
 }
+impl<'c> NativePhaseParticipation<'c> {
+    /// The phase face of the complex pair potential `s_j = beta <q|u_j>`:
+    /// `phi_j = Im s_j / 2 = (beta/2) sum (q_re u_im - q_im u_re)`. The magnitude face
+    /// `p = softmax(Re s)` and the weighted output are unchanged and do not read it; this is
+    /// read from the producing operands on request, so the participation passage itself carries
+    /// no second softmax and no extra work. Returned as a ball of the logits chart: `phi` in each
+    /// real slot, exactly zero in each imaginary one.
+    ///
+    /// No consumer yet: owed to campaign 2 (rings), where the participation's phase face joins
+    /// each ring's storage/flow mode.
+    pub fn phase(&self) -> Result<ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
+        let phase = self.surface.fresh_section(
+            self.rows,
+            (2 * self.neighbors_per_row + 1) * 2,
+            ResidentGrain(0),
+        )?;
+        let flags = self
+            .surface
+            .fresh_section(self.rows, SLOT_WORDS / 2, ResidentGrain(0))?;
+        let mut pass = self.surface.begin_passage(&[vec![]])?;
+        {
+            let lane = pass.open(0, &[])?;
+            self.surface.record_phase_participation_phase(
+                &lane,
+                self.query.resident_section(),
+                self.neighbors.resident_section(),
+                self.rows,
+                self.neighbors_per_row,
+                self.components,
+                self.grain.0,
+                self.beta,
+                &phase,
+                &flags,
+            )?;
+            self.surface
+                .collect_phase_status(&lane, &flags, self.rows)?;
+        }
+        pass.close(0, &phase, 64)?;
+        let receipt = pass.finish()?.launch()?;
+        if !receipt.obstruction.is_empty() {
+            return Err(ConstitutiveFibreError::Arithmetic(format!(
+                "phase face: {:?}",
+                receipt.obstruction
+            )));
+        }
+        ResidentNormalEnclosureSection::from_resident(
+            self.surface,
+            phase,
+            self.rows,
+            2 * self.neighbors_per_row,
+            self.grain,
+        )
+    }
+
+    /// The adjoint of the phase face for a covector `g_phi` on it (real slot per neighbour):
+    /// `dq_re += (beta/2) sum_j g_j u_j,im`, `dq_im -= (beta/2) sum_j g_j u_j,re`,
+    /// `du_j,re -= (beta/2) g_j q_im`, `du_j,im += (beta/2) g_j q_re`. The two faces read
+    /// disjoint slots of `s`, so these terms add to `pull_back`'s magnitude adjoint.
+    ///
+    /// No consumer yet: owed to campaign 2 (rings), with `phase`.
+    pub fn pull_back_phase(
+        &self,
+        gphi: &ResidentNormalEnclosureSection<'c>,
+    ) -> Result<NativePhaseParticipationAdjoint<'c>, ConstitutiveFibreError> {
+        if gphi.rows() != self.rows
+            || gphi.components() != 2 * self.neighbors_per_row
+            || gphi.grain() != self.grain
+            || !std::ptr::eq(gphi.resident_section().surface(), self.surface)
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let source =
+            self.surface
+                .fresh_section(self.rows, (self.components + 1) * 2, ResidentGrain(0))?;
+        let returned = self.surface.fresh_section(
+            self.rows * self.neighbors_per_row,
+            (self.components + 1) * 2,
+            ResidentGrain(0),
+        )?;
+        let flags = self
+            .surface
+            .fresh_section(self.rows, SLOT_WORDS / 2, ResidentGrain(0))?;
+        let mut pass = self.surface.begin_passage(&[vec![]])?;
+        {
+            let lane = pass.open(0, &[])?;
+            self.surface.record_phase_participation_phase_adjoint(
+                &lane,
+                self.query.resident_section(),
+                self.neighbors.resident_section(),
+                gphi.resident_section(),
+                self.rows,
+                self.neighbors_per_row,
+                self.components,
+                self.grain.0,
+                self.beta,
+                &source,
+                &returned,
+                &flags,
+            )?;
+            self.surface
+                .collect_phase_status(&lane, &flags, self.rows)?;
+        }
+        pass.close(0, &source, 64)?;
+        let receipt = pass.finish()?.launch()?;
+        if !receipt.obstruction.is_empty() {
+            return Err(ConstitutiveFibreError::Arithmetic(format!(
+                "phase face adjoint: {:?}",
+                receipt.obstruction
+            )));
+        }
+        Ok(NativePhaseParticipationAdjoint {
+            source: ResidentNormalEnclosureSection::from_resident(
+                self.surface,
+                source,
+                self.rows,
+                self.components,
+                self.grain,
+            )?,
+            neighbors: ResidentNormalEnclosureSection::from_resident(
+                self.surface,
+                returned,
+                self.rows * self.neighbors_per_row,
+                self.components,
+                self.grain,
+            )?,
+            rows: self.rows,
+            neighbors_per_row: self.neighbors_per_row,
+            components: self.components,
+            beta: self.beta,
+            grain: self.grain,
+        })
+    }
+}
 impl<'c> NativePhaseParticipationAdjoint<'c> {
     /// Move the two source covectors without allocating or copying resident packets.
     pub fn into_parts(
@@ -470,6 +603,64 @@ mod gpu_tests {
             ]));
             assert!(u.radius > Rat::zero());
         }
+    }
+
+    #[test]
+    #[ignore = "requires CUDA; the complex pair potential's phase face and its adjoint"]
+    fn native_phase_face_is_half_the_imaginary_potential_and_returns_its_adjoint() {
+        let readout = ResidentReadout::new().unwrap();
+        let surface = ResidentSurface::on(&readout).unwrap();
+        let unit = 1i128 << 12;
+        // q = (1 + 0i, 0 + 1i); u_0 = (0 + 1i, 0 + 0i), u_1 = (1 + 0i, 1 + 0i).
+        // Im<q|u_0> = 1*1 - 0*0 + 0*0 - 1*0 = 1; Im<q|u_1> = 1*0 - 0*1 + 0*0 - 1*1 = -1.
+        let q = Rc::new(balls(&surface, &[(vec![unit, 0, 0, unit], 0)], 4));
+        let u = Rc::new(balls(
+            &surface,
+            &[(vec![0, unit, 0, 0], 0), (vec![unit, 0, unit, 0], 0)],
+            4,
+        ));
+        let phase = q
+            .phase_participation(u, 2, Dyadic::ONE, SeriesAperture(32))
+            .unwrap();
+        let face = phase.phase().unwrap().row(0).unwrap().inspect().unwrap();
+        assert_eq!(face.center[0].real, Rat::new(1.into(), 2.into()));
+        assert_eq!(face.center[1].real, Rat::new((-1).into(), 2.into()));
+        assert!(face.center.iter().all(|c| c.imaginary == Rat::zero()));
+        assert_eq!(face.radius, Rat::zero());
+        // The participation itself still reads Re s only (equal real scores 0 and 1).
+        let p = phase.normalized().read_participation().unwrap();
+        assert!(p[0][1].lower > p[0][0].upper);
+        // Adjoint of phi_0 alone: dq = (1/2)(u_0,im ; -u_0,re) per pair, du_0 = (1/2)(-q_im ; q_re).
+        let g = balls(&surface, &[(vec![unit, 0, 0, 0], 0)], 4);
+        let returned = phase.pull_back_phase(&g).unwrap();
+        let dq = returned.query().row(0).unwrap().inspect().unwrap();
+        assert_eq!(
+            dq.center,
+            vec![
+                ExactComplexWaveCurrent::new(Rat::new(1.into(), 2.into()), Rat::zero()),
+                ExactComplexWaveCurrent::zero(),
+            ]
+        );
+        let du0 = returned
+            .transported_neighbors()
+            .row(0)
+            .unwrap()
+            .inspect()
+            .unwrap();
+        assert_eq!(
+            du0.center,
+            vec![
+                ExactComplexWaveCurrent::new(Rat::zero(), Rat::new(1.into(), 2.into())),
+                ExactComplexWaveCurrent::new(Rat::new((-1).into(), 2.into()), Rat::zero()),
+            ]
+        );
+        let du1 = returned
+            .transported_neighbors()
+            .row(1)
+            .unwrap()
+            .inspect()
+            .unwrap();
+        assert!(du1.center.iter().all(|c| c.is_zero()));
     }
 
     #[test]

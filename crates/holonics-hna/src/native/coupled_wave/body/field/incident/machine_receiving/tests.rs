@@ -95,7 +95,6 @@ fn receiving_uses_generated_endpoint_and_returns_full_machine_boundary() {
     };
     sites[1].phase.period = None;
     let step = sites[1].phase.step.clone();
-    let initial = sites[1].initial.clone();
     spec.machine = crate::native::field_geometry::machine::GeneratorMachineSpec::declare(
         spec.machine.frame(),
         spec.machine.units().clone(),
@@ -147,7 +146,9 @@ fn receiving_uses_generated_endpoint_and_returns_full_machine_boundary() {
     let mut returned_im = RatVec3::zero();
     for (j, row) in endpoint.iter().enumerate() {
         let action = signed_affine_power(&step, (j + 1) as i64).unwrap();
-        let re = action.apply(&initial.add(&qre)).subtract(&initial);
+        // Chart law: the current advances by the linear part only; the affine translation
+        // (and the initial configuration) act on configuration, not on the current.
+        let re = action.linear.apply(&qre);
         let im = action.linear.apply(&qim);
         assert!(row.contains(&native(&re, &im)));
         returned_re = returned_re.add(&action.linear.transpose().apply(&vector(&row.center, 0)));

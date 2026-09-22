@@ -10,7 +10,7 @@
 //! is written. The producing operand rows stay the caller's; this face retains no occurrence
 //! lineage, because a section row is an address in an exterior chart, not a field occurrence.
 use super::*;
-use crate::resident_section::SLOT_WORDS;
+use crate::resident_section::{ResidentSectionRest, SLOT_WORDS};
 
 /// The measure a declared group is normalized under. The exponential face reads the real
 /// potentials of the row; the packet face reads a complete complex amplitude carrier and
@@ -56,6 +56,12 @@ pub struct NativeNormalizedSection<'c> {
     participation: ResidentNormalEnclosureSection<'c>,
     difference: Option<ResidentNormalEnclosureSection<'c>>,
     potential: Option<ResidentNormalEnclosureSection<'c>>,
+    /// `phi = Im s / 2` of the produced potentials, present on a ratio return.
+    phase: Option<ResidentNormalEnclosureSection<'c>>,
+    /// `phi^T = Im s^T / 2` of the target Holon's potentials, present on a ratio return.
+    target_phase: Option<ResidentNormalEnclosureSection<'c>>,
+    /// `(q - p) + i (1/2) q Delta`, the ratio's comparison covector on the produced potentials.
+    ratio: Option<ResidentNormalEnclosureSection<'c>>,
     rows: usize,
     nodes: usize,
     group_width: usize,
@@ -171,6 +177,150 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
         self.normalized_section(Some(observed), group_width, terms, measure)
     }
 
+    /// The phase face of a complex receiving potential, `phi_c = Im s_c / 2`, row by row. The
+    /// amplitude is `psi_c = exp(s_c / 2) / sqrt(Z)` with `Z = sum_c exp(Re s_c)` real, so the
+    /// magnitude face is `p = softmax(Re s)` and the phase face carries no normalization. The
+    /// returned ball holds `phi` in each real slot and exactly zero in each imaginary one.
+    pub fn receiving_phase(&self) -> Result<Self, ConstitutiveFibreError> {
+        if self.rows() == 0
+            || self.components() == 0
+            || self.components() % 2 != 0
+            || !(1..=120).contains(&self.grain().0)
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let rows = self.rows();
+        let nodes = self.components() / 2;
+        let words = nodes
+            .checked_mul(2)
+            .and_then(|n| n.checked_add(1))
+            .and_then(|n| n.checked_mul(2))
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let surface = self.resident_section().surface();
+        let phase = surface.fresh_section(rows, words, ResidentGrain(0))?;
+        let flags = surface.fresh_section(rows, SLOT_WORDS / 2, ResidentGrain(0))?;
+        let mut passage = surface.begin_passage(&[vec![]])?;
+        {
+            let lane = passage.open(0, &[])?;
+            surface.record_rows_normalized_phase(
+                &lane,
+                self.resident_section(),
+                rows,
+                nodes,
+                self.grain().0,
+                &phase,
+                &flags,
+            )?;
+            surface.collect_phase_status(&lane, &flags, rows)?;
+        }
+        passage.close(0, &phase, 64)?;
+        let receipt = passage.finish()?.launch()?;
+        if !receipt.obstruction.is_empty() {
+            return Err(ConstitutiveFibreError::Arithmetic(format!(
+                "receiving phase: {:?}",
+                receipt.obstruction
+            )));
+        }
+        Self::from_resident(surface, phase, rows, self.components(), self.grain())
+    }
+
+    /// The Holon ratio at every row: the produced potentials `s` (this section) against the
+    /// observed packet `observed` and the target Holon's potentials `target` read through the same
+    /// receiver, with the machine's winding `branch_turns[row]` at each receiving phase. The one
+    /// magnitude face is `p = softmax(Re s)`; the phase faces are `phi = Im s / 2`. Besides
+    /// everything `normalized_section_return` returns, the section carries `phase()`,
+    /// `target_phase()` and `ratio_covector()`:
+    ///
+    /// ```text
+    /// l_c     = (1/2) log(q_c / p_c) + i Delta_c,   Delta_c = phi^T_c - phi^H_c + 2 pi n
+    /// Re      -dKL/dRe s_c                         = q_c - p_c
+    /// Im      -d/dIm s_c [(1/2) sum_c q_c Delta_c^2] = (1/2) q_c Delta_c
+    /// ```
+    ///
+    /// `Im l` is an oriented displacement, not a cost: the comparison descends its magnitude,
+    /// weighted by the observed face. The covector is `(q - p) + i (1/2) q Delta`; it vanishes on
+    /// agreeing phases and on unsupported classes. `2 pi n` is carried as an outward enclosure.
+    pub fn normalized_ratio_return(
+        &self,
+        observed: &Self,
+        target: &Self,
+        branch_turns: &[i64],
+        group_width: usize,
+        terms: SeriesAperture,
+    ) -> Result<NativeNormalizedSection<'c>, ConstitutiveFibreError> {
+        if target.rows() != self.rows()
+            || target.components() != self.components()
+            || target.grain() != self.grain()
+            || branch_turns.len() != self.rows()
+            || !std::ptr::eq(
+                target.resident_section().surface(),
+                self.resident_section().surface(),
+            )
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let mut section = self.normalized_section_return(
+            observed,
+            group_width,
+            terms,
+            NativeNormalizedFaceMeasure::PacketModulus,
+        )?;
+        let surface = section.surface;
+        let branch = surface.mount_section_rest(
+            &ResidentSectionRest::found(
+                section.rows,
+                6,
+                ResidentGrain(0),
+                64,
+                branch_words(branch_turns, self.grain().0)?,
+            )
+            .map_err(ConstitutiveFibreError::Arithmetic)?,
+        )?;
+        let words = section
+            .nodes
+            .checked_mul(2)
+            .and_then(|n| n.checked_add(1))
+            .and_then(|n| n.checked_mul(2))
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let ratio = surface.fresh_section(section.rows, words, ResidentGrain(0))?;
+        let flags = surface.fresh_section(section.rows, SLOT_WORDS / 2, ResidentGrain(0))?;
+        let mut passage = surface.begin_passage(&[vec![]])?;
+        {
+            let lane = passage.open(0, &[])?;
+            surface.record_rows_ratio_covector(
+                &lane,
+                &section.report,
+                self.resident_section(),
+                target.resident_section(),
+                &branch,
+                section.rows,
+                section.nodes,
+                section.grain.0,
+                &ratio,
+                &flags,
+            )?;
+            surface.collect_phase_status(&lane, &flags, section.rows)?;
+        }
+        passage.close(0, &ratio, 64)?;
+        let receipt = passage.finish()?.launch()?;
+        if !receipt.obstruction.is_empty() {
+            return Err(ConstitutiveFibreError::Arithmetic(format!(
+                "ratio covector: {:?}",
+                receipt.obstruction
+            )));
+        }
+        section.ratio = Some(Self::from_resident(
+            surface,
+            ratio,
+            section.rows,
+            self.components(),
+            self.grain(),
+        )?);
+        section.phase = Some(self.receiving_phase()?);
+        section.target_phase = Some(target.receiving_phase()?);
+        Ok(section)
+    }
+
     fn normalized_section(
         &self,
         observed: Option<&Self>,
@@ -234,6 +384,9 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
             participation: ball(participation)?,
             difference: observed.is_some().then(|| ball(difference)).transpose()?,
             potential: observed.is_some().then(|| ball(potential)).transpose()?,
+            phase: None,
+            target_phase: None,
+            ratio: None,
             rows: chart.rows,
             nodes: chart.nodes,
             group_width,
@@ -298,6 +451,53 @@ impl<'c> NativeNormalizedSection<'c> {
         &self,
     ) -> Result<&ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
         self.potential.as_ref().ok_or(ConstitutiveFibreError::Shape)
+    }
+
+    /// `phi = Im s / 2` of the produced potentials. Present on a ratio return.
+    pub fn phase(&self) -> Result<&ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
+        self.phase.as_ref().ok_or(ConstitutiveFibreError::Shape)
+    }
+
+    /// `phi^T = Im s^T / 2` of the target Holon. Present on a ratio return.
+    pub fn target_phase(
+        &self,
+    ) -> Result<&ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
+        self.target_phase
+            .as_ref()
+            .ok_or(ConstitutiveFibreError::Shape)
+    }
+
+    /// `(q - p) + i (1/2) q Delta`: the ratio's comparison covector on the produced potentials,
+    /// in the operand chart. Present on a ratio return.
+    pub fn ratio_covector(
+        &self,
+    ) -> Result<&ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
+        self.ratio.as_ref().ok_or(ConstitutiveFibreError::Shape)
+    }
+
+    /// Explicit cold inspection of the phase face: one interval per coordinate and row.
+    pub fn read_phase(&self) -> Result<Vec<Vec<ExactInterval>>, ConstitutiveFibreError> {
+        Self::read_phase_ball(self.phase()?)
+    }
+
+    /// Cold inspection of any phase ball returned by `receiving_phase`: each real slot's centre
+    /// with the row radius as its outward half width.
+    pub fn read_phase_ball(
+        phase: &ResidentNormalEnclosureSection<'_>,
+    ) -> Result<Vec<Vec<ExactInterval>>, ConstitutiveFibreError> {
+        phase
+            .inspect_rows()?
+            .into_iter()
+            .map(|row| {
+                row.center
+                    .iter()
+                    .map(|value| {
+                        ExactInterval::new(&value.real - &row.radius, &value.real + &row.radius)
+                            .map_err(|e| ConstitutiveFibreError::Arithmetic(e.to_string()))
+                    })
+                    .collect()
+            })
+            .collect()
     }
 
     fn rows_of_report(
@@ -490,6 +690,39 @@ impl<'c> NativeNormalizedSectionPullback<'c> {
             })
             .collect()
     }
+}
+
+/// Per-row balls `(2 pi n, 0; r)` at `grain`: the outward enclosure of the branch, exact zero
+/// when `n = 0`.
+fn branch_words(turns: &[i64], grain: u32) -> Result<Vec<(i64, i64)>, ConstitutiveFibreError> {
+    use num_traits::ToPrimitive;
+    let pi = relational_geometry::exact_analysis::pi_interval(grain + 16);
+    let scale = Rat::from_integer(num_bigint::BigInt::one() << grain);
+    let mut words = Vec::with_capacity(6 * turns.len());
+    for &n in turns {
+        let (centre, half) = if n == 0 {
+            (0i128, 0i128)
+        } else {
+            let two_n = Rat::from_integer((2 * i128::from(n)).into());
+            let (a, b) = if n > 0 {
+                (&two_n * &pi.lower, &two_n * &pi.upper)
+            } else {
+                (&two_n * &pi.upper, &two_n * &pi.lower)
+            };
+            let lo = (a * &scale).floor().to_integer().to_i128();
+            let hi = (b * &scale).ceil().to_integer().to_i128();
+            let (Some(lo), Some(hi)) = (lo, hi) else {
+                return Err(ConstitutiveFibreError::Shape);
+            };
+            let half = (hi - lo + 1) >> 1;
+            (lo + half, half)
+        };
+        for value in [centre, 0, half] {
+            words.push((value as i64, value as i64));
+            words.push(((value >> 64) as i64, (value >> 64) as i64));
+        }
+    }
+    Ok(words)
 }
 
 #[cfg(test)]

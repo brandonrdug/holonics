@@ -187,24 +187,6 @@ impl<'c> IncidentTextReceiver<'c> {
         )
     }
 
-    /// Prepare a new decoder cohort from the persisted boundary seed. Existing R_text statistics
-    /// remain untouched; the new block starts with its own nonzero prior.
-    pub fn prepare_text_cohort_from_seed(
-        &self,
-        surface: &'c ResidentSurface<'c>,
-        class_count: usize,
-        codec_version: u64,
-    ) -> Result<IncidentTextCohortSuccessor<'c>> {
-        let maps = self
-            .boundary
-            .spec()
-            .material_seed
-            .initial_maps(class_count, self.boundary.spec().local_complex)
-            .map_err(invalid)?;
-        let prior = NativeNormalPrior::from_coefficients(maps.decoder).map_err(invalid)?;
-        self.prepare_text_cohort_with_prior(surface, class_count, codec_version, prior)
-    }
-
     /// Admit a decoder cohort from the E-derived matching columns supplied by the encoder.
     /// This is the path used for codec append/rechart; it does not derive a fresh seed from class
     /// positions and therefore preserves the E/R bootstrap correspondence.
@@ -293,22 +275,6 @@ impl<'c> IncidentTextReceiver<'c> {
             *current = cohort;
         }
         self.support = successor.support;
-    }
-
-    /// Rebind frozen/live receiver rests to one resident surface without recomputing from the
-    /// current material. The boundary chart remains the caller's source-qualified declaration.
-    pub fn remount(
-        surface: &'c ResidentSurface<'c>,
-        boundary: BoundaryMaterial<'c>,
-        text: NormalMaterialRest,
-        support: NormalMaterialRest,
-    ) -> Result<Self> {
-        let cohort = IncidentTextCohort {
-            class_start: 0,
-            class_count: text.targets(),
-            codec_version: 0,
-        };
-        Self::remount_with_cohorts(surface, boundary, text, support, vec![cohort], vec![], 0)
     }
 
     pub fn remount_with_cohorts(
@@ -642,12 +608,6 @@ impl<'c> IncidentTextReceiver<'c> {
             );
         }
         Ok(selections)
-    }
-
-    /// Select the support length through its own resident scalar chart. Its class count is
-    /// `A_out+1`, independent of the text codec alphabet.
-    pub fn select_support(&self, forward: &IncidentTextForward<'c>) -> Result<usize> {
-        Ok(self.select_support_receipt(forward)?.selected)
     }
 
     pub fn select_support_receipt(

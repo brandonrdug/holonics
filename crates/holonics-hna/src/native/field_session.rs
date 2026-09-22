@@ -1136,7 +1136,7 @@ impl<'c> NativeFieldSession<'c> {
             }
             self.body.release(source)?;
             generator.pending.remove(&source);
-            self.presentation.retained_shared.remove(&source);
+            generator.readings.forget(source);
             return Ok(json!({"released":source,"anatomy":self.inspect()}));
         }
         if let Some(incident) = &mut self.incident {
@@ -1164,7 +1164,7 @@ impl<'c> NativeFieldSession<'c> {
     }
     pub fn inspect(&self) -> Value {
         json!({"kind":"constituted-field-session","epoch":self.body.epoch(),"pending":self.body.pending_coupled_predictions(),"pending_comparisons":self.body.pending_ids().ok(),
-        "retained_shared":self.presentation.retained_shared.keys().collect::<Vec<_>>(),"spec":self.presentation.spec,"census":self.surface.census()})
+        "retained_shared":self.retained_shared_comparisons(),"spec":self.presentation.spec,"census":self.surface.census()})
     }
     /// The cold exposure position this session's trained state has actually consumed. AC3: it
     /// is published inside the same atomic checkpoint file as the model, never beside it. The
@@ -1175,8 +1175,19 @@ impl<'c> NativeFieldSession<'c> {
     pub fn exposure_cursor(&self) -> Option<&crate::alpha::exposure::ExposureCursor> {
         self.presentation.exposure.as_ref()
     }
+    /// Outstanding retained comparisons: the shared-source map, and on the generator chart the
+    /// generator's own fixed-size pending records.
     pub fn retained_shared_comparisons(&self) -> Vec<u64> {
-        self.presentation.retained_shared.keys().copied().collect()
+        let mut ids = self
+            .presentation
+            .retained_shared
+            .keys()
+            .copied()
+            .collect::<Vec<_>>();
+        if let Some(generator) = &self.generator {
+            ids.extend(generator.pending.keys().copied());
+        }
+        ids
     }
     pub fn attach_exposure_pairing(
         &mut self,
@@ -1187,6 +1198,31 @@ impl<'c> NativeFieldSession<'c> {
     ) -> Result<()> {
         request_events.sort_unstable();
         request_events.dedup();
+        if let Some(generator) = self.generator.as_mut() {
+            let pending = generator
+                .pending
+                .get_mut(&comparison)
+                .ok_or_else(|| invalid("unknown retained generator comparison"))?;
+            if pending.record.exposure_pairing.is_some() {
+                return Err(invalid("retained exposure pairing is already attached"));
+            }
+            let pairing = RetainedExposurePairing {
+                family,
+                request_events,
+                request_text,
+                response_symbols: pending
+                    .record
+                    .output_symbols
+                    .checked_sub(pending.record.held_parts)
+                    .ok_or_else(|| invalid("retained exposure response extent"))?,
+            };
+            pending
+                .record
+                .validate_pairing(&pairing, &self.presentation.spec)?;
+            pending.record.exposure_pairing =
+                Some(generator_application::GeneratorExposureDigest::of(&pairing));
+            return Ok(());
+        }
         let retained = self
             .presentation
             .retained_shared
@@ -1225,7 +1261,14 @@ impl<'c> NativeFieldSession<'c> {
             .exposure_pairing = Some(pairing);
         Ok(())
     }
+    /// Retained exposure pairings with their text and events. On the generator chart the
+    /// session keeps only digests (fixed size); the driver owns the text/events and re-confirms
+    /// them with `confirm_exposure_pairing`, so this returns none there. See
+    /// `retained_generator_exposures`.
     pub fn retained_exposure_pairings(&self) -> Vec<(u64, RetainedExposurePairing)> {
+        if self.generator.is_some() {
+            return Vec::new();
+        }
         self.presentation
             .retained_shared
             .iter()
@@ -1236,6 +1279,55 @@ impl<'c> NativeFieldSession<'c> {
                     .map(|pairing| (*id, pairing))
             })
             .collect()
+    }
+    /// Generator comparisons carrying an exterior exposure pairing: id, family and response
+    /// extent. The request text and events are the driver's; confirm them before reuse.
+    pub fn retained_generator_exposures(
+        &self,
+    ) -> Vec<(u64, crate::alpha::exposure::ExposureFamily, usize)> {
+        self.generator
+            .as_ref()
+            .map(|generator| {
+                generator
+                    .pending
+                    .iter()
+                    .filter_map(|(id, pending)| {
+                        pending
+                            .record
+                            .exposure_pairing
+                            .as_ref()
+                            .map(|p| (*id, p.family.clone(), p.response_symbols))
+                    })
+                    .collect()
+            })
+            .unwrap_or_default()
+    }
+    /// Confirm a driver-held generator exposure pairing against the comparison's digests.
+    pub fn confirm_exposure_pairing(
+        &self,
+        comparison: u64,
+        family: crate::alpha::exposure::ExposureFamily,
+        mut request_events: Vec<u64>,
+        request_text: String,
+    ) -> Result<RetainedExposurePairing> {
+        request_events.sort_unstable();
+        request_events.dedup();
+        let digest = self
+            .generator
+            .as_ref()
+            .and_then(|g| g.pending.get(&comparison))
+            .and_then(|p| p.record.exposure_pairing.as_ref())
+            .ok_or_else(|| invalid("no retained generator exposure pairing"))?;
+        let pairing = RetainedExposurePairing {
+            family,
+            request_events,
+            request_text,
+            response_symbols: digest.response_symbols,
+        };
+        if !digest.confirms(&pairing) {
+            return Err(invalid("exposure pairing differs from the retained digests"));
+        }
+        Ok(pairing)
     }
     pub fn spec(&self) -> &FieldSessionSpec {
         &self.presentation.spec
@@ -1421,6 +1513,13 @@ impl NativeFieldSavedSession {
                 )))
         {
             return Err(invalid("retained shared-source comparison operands"));
+        }
+        if generator_mode && !retained_shared.is_empty() {
+            return Err(invalid(
+                "generator checkpoint carries full retained requests (the pre-moment wire); \
+                 generator comparisons now keep a fixed-size record in their pending rest. \
+                 Observe or release them with the build that wrote this checkpoint",
+            ));
         }
         for retained in retained_shared.values() {
             if let Some(pairing) = &retained.exposure_pairing {

@@ -298,12 +298,15 @@ impl<'c> MachineGroupMaps<'c> {
             linear: RatMat3::identity(),
             translation: machine.sites()[site].screw().initial().clone(),
         };
+        // Chart law: participation values and differences are currents (tangents), so they
+        // are carried by the arc's linear part only; its bias is a configuration displacement.
+        // Queries and neighbours are configurations and keep their affine maps.
         let value_map = |arc: Option<usize>| -> AffineMap3 {
             arc.map(|i| {
                 let u = machine.arcs()[i].current_action();
                 AffineMap3 {
                     linear: u.linear.clone(),
-                    translation: u.bias.clone(),
+                    translation: relational_geometry::RatVec3::zero(),
                 }
             })
             .unwrap_or_else(AffineMap3::identity)

@@ -15,7 +15,7 @@ use crate::native::field_geometry::machine::{
 use holonic_engine::native_ecology::constitutive_fibre::NativeEnclosurePropagation;
 use holonic_engine::native_ecology::constitutive_fibre::ResidentNormalEnclosureSection;
 use num_traits::Signed;
-use relational_geometry::AffineMap3;
+use relational_geometry::{AffineMap3, RatMat3};
 use serde::{Deserialize, Serialize};
 use std::cell::Cell;
 use std::rc::Rc;
@@ -141,12 +141,14 @@ pub struct MachineSourceMaps<'c> {
     cursor: Cell<usize>,
     witnesses: Vec<GeneratorSourceClockWitness>,
     enclosure: NativeEnclosurePropagation,
-    /// The exact per-site step `U_g`, retained for its closed-form powers.
+    /// The exact per-site configuration step `U_g = (L_g, τ_g)`, retained for its closed-form
+    /// powers. Currents use `L_g` only.
     step_maps: Vec<AffineMap3>,
+    powers: std::cell::OnceCell<MomentPowers>,
 }
 
 /// The forward source step and its producing map. This is the per-step form of the moment;
-/// `MachineSourceMaps::accumulate` is its closed form and is what the incident word consumes.
+/// `MachineSourceMaps::{moment, anchor}` is its closed form and is what the incident word consumes.
 #[cfg_attr(not(test), allow(dead_code))]
 pub struct GeneratorInjection<'c> {
     output: ResidentNormalEnclosure<'c>,
@@ -227,8 +229,18 @@ impl<'c> MachineSourceMaps<'c> {
                 translation: map.bias,
             })
             .collect::<Vec<_>>();
+        // Chart separation: the affine step acts on the site's configuration; the resident
+        // current q is a tangent and advances by the linear part `L` only. The per-step current
+        // coefficients therefore carry no translation.
+        let current_steps = affine_maps
+            .iter()
+            .map(|map| AffineMap3 {
+                linear: map.linear.clone(),
+                translation: relational_geometry::RatVec3::zero(),
+            })
+            .collect::<Vec<_>>();
         let coefficients =
-            ResidentNormalEnclosureSection::affine_coefficients(surface, &affine_maps, grain)
+            ResidentNormalEnclosureSection::affine_coefficients(surface, &current_steps, grain)
                 .map_err(invalid)?;
         let step_maps = affine_maps;
         Ok(Self {
@@ -243,6 +255,7 @@ impl<'c> MachineSourceMaps<'c> {
             witnesses,
             enclosure,
             step_maps,
+            powers: std::cell::OnceCell::new(),
         })
     }
 
@@ -347,113 +360,188 @@ impl<'c> MachineSourceMaps<'c> {
     }
 }
 
-/// The closed form of `count` source steps: `q_N = U^N q₀ + Σ_k L^(N−1−k) I E(u_k)`, with `L`
-/// the linear part of each site's affine step. Every cell and the standing pass through one
-/// exact composite map, so an enclosure widens once per row rather than once per occurrence.
-pub struct GeneratorMomentTransport<'c> {
-    standing: MachineValueTransport<'c>,
-    increments: MachineValueTransport<'c>,
-    output: ResidentNormalEnclosure<'c>,
-    addresses: Vec<usize>,
-    injection_count: usize,
-    machine_sites: usize,
-    boundary_components: usize,
+/// Exact composite phases of one passage of `N` cells.
+/// - `standing[g] = (L_g^N, 0)`: the current chart. The resident standing current is a tangent
+///   and is carried by the linear part only; this is what the anchor `L^N q₀ + m` reads.
+/// - `configuration[g] = U_g^N = (L_g, τ_g)^N`: the configuration chart, where the affine
+///   translation acts (the site's configuration after `N` steps; pair geometry
+///   `Δ = x_a − x_b` reads configurations, never the current).
+/// - `injection[i][j] = L_s^j`, `j < N`, only for injection sites.
+/// Powers are formed by repeated squaring (`O(log N)`) or once per injection site, and reused.
+pub(super) struct MomentPowers {
+    standing: Vec<AffineMap3>,
+    #[cfg_attr(not(test), allow(dead_code))]
+    configuration: Vec<AffineMap3>,
+    injection: Vec<Vec<RatMat3>>,
+}
+
+impl MomentPowers {
+    pub(super) fn standing(&self) -> &[AffineMap3] {
+        &self.standing
+    }
+    #[cfg_attr(not(test), allow(dead_code))]
+    pub(super) fn configuration(&self) -> &[AffineMap3] {
+        &self.configuration
+    }
+    /// `L_s^exponent` for injection position `i`.
+    pub(super) fn injection(&self, i: usize, exponent: usize) -> Option<&RatMat3> {
+        self.injection.get(i)?.get(exponent)
+    }
+}
+
+/// The distinct symbols of a passage, sorted.
+pub(super) fn present_symbols(symbols: &[usize]) -> Vec<usize> {
+    let mut present = symbols.to_vec();
+    present.sort_unstable();
+    present.dedup();
+    present
+}
+
+pub(super) fn zero_matrix() -> RatMat3 {
+    RatMat3::from_i64([[0; 3]; 3])
+}
+
+/// `left ± right`, entrywise.
+pub(super) fn add_matrix(left: &RatMat3, right: &RatMat3, subtract: bool) -> RatMat3 {
+    RatMat3::new(std::array::from_fn(|r| {
+        std::array::from_fn(|c| {
+            if subtract {
+                &left.rows[r][c] - &right.rows[r][c]
+            } else {
+                &left.rows[r][c] + &right.rows[r][c]
+            }
+        })
+    }))
+}
+
+pub(super) fn moment_powers(
+    step_maps: &[AffineMap3],
+    injection_indices: &[usize],
+    count: usize,
+) -> Result<MomentPowers> {
+    let exponent = i64::try_from(count).map_err(invalid)?;
+    let configuration = step_maps
+        .iter()
+        .map(|step| super::machine_receiving::signed_affine_power(step, exponent))
+        .collect::<Result<Vec<_>>>()?;
+    let standing = configuration
+        .iter()
+        .map(|power| AffineMap3 {
+            linear: power.linear.clone(),
+            translation: relational_geometry::RatVec3::zero(),
+        })
+        .collect::<Vec<_>>();
+    let mut injection = Vec::new();
+    injection
+        .try_reserve_exact(injection_indices.len())
+        .map_err(|_| invalid("generator moment power allocation"))?;
+    for &site in injection_indices {
+        let step = step_maps
+            .get(site)
+            .ok_or_else(|| invalid("generator moment injection site"))?;
+        let mut powers = Vec::new();
+        powers
+            .try_reserve_exact(count)
+            .map_err(|_| invalid("generator moment power allocation"))?;
+        let mut power = RatMat3::identity();
+        for _ in 0..count {
+            let next = step.linear.multiply(&power);
+            powers.push(std::mem::replace(&mut power, next));
+        }
+        injection.push(powers);
+    }
+    Ok(MomentPowers {
+        standing,
+        configuration,
+        injection,
+    })
 }
 
 impl<'c> MachineSourceMaps<'c> {
-    /// Exact composite coefficients: `U_g^N` for the standing (affine) and `L_s^(N−1−k)` for
-    /// cell `k` at injection site `s` (linear; each increment enters after its own step).
-    fn power_coefficients(
-        &self,
-        surface: &'c ResidentSurface<'c>,
-        grain: ResidentGrain,
-    ) -> Result<(
-        Rc<ResidentNormalEnclosureSection<'c>>,
-        Rc<ResidentNormalEnclosureSection<'c>>,
-    )> {
-        let n = self.count;
-        let mut powers = Vec::new();
-        powers
-            .try_reserve_exact(self.machine_sites)
-            .map_err(|_| invalid("generator moment power allocation"))?;
-        for step in &self.step_maps {
-            let mut site = Vec::new();
-            site.try_reserve_exact(n + 1)
-                .map_err(|_| invalid("generator moment power allocation"))?;
-            site.push(AffineMap3::identity());
-            for j in 0..n {
-                let next = site[j].followed_by(step);
-                site.push(next);
-            }
-            powers.push(site);
+    pub(super) fn powers(&self) -> Result<&MomentPowers> {
+        if let Some(powers) = self.powers.get() {
+            return Ok(powers);
         }
-        let standing = powers
-            .iter()
-            .map(|site| site[n].clone())
-            .collect::<Vec<_>>();
-        let rows = n
-            .checked_mul(self.injection_count)
-            .ok_or_else(|| invalid("generator moment row extent"))?;
-        let mut increments = Vec::new();
-        increments
-            .try_reserve_exact(rows)
-            .map_err(|_| invalid("generator moment coefficient allocation"))?;
-        for k in 0..n {
-            for &site in &self.injection_indices {
-                increments.push(AffineMap3 {
-                    linear: powers[site][n - 1 - k].linear.clone(),
-                    translation: relational_geometry::RatVec3::zero(),
-                });
-            }
-        }
-        Ok((
-            ResidentNormalEnclosureSection::affine_coefficients(surface, &standing, grain)
-                .map_err(invalid)?,
-            ResidentNormalEnclosureSection::affine_coefficients(surface, &increments, grain)
-                .map_err(invalid)?,
-        ))
+        let powers = moment_powers(&self.step_maps, &self.injection_indices, self.count)?;
+        Ok(self.powers.get_or_init(|| powers))
+    }
+    pub(super) fn injection_indices(&self) -> &[usize] {
+        &self.injection_indices
+    }
+    pub(super) fn enclosure(&self) -> &NativeEnclosurePropagation {
+        &self.enclosure
+    }
+    pub(super) fn surface(&self) -> &'c ResidentSurface<'c> {
+        self.coefficients.surface()
+    }
+    fn boundary_components(&self) -> Result<usize> {
+        self.machine_sites
+            .checked_mul(12)
+            .ok_or_else(|| invalid("generator source boundary extent"))
     }
 
-    /// Accumulate the whole ordered passage in closed form from `previous_joint`.
-    pub fn accumulate(
+    /// Linear coefficient rows `L_(s_i)^e` for the supplied `(injection position i, e)` pairs.
+    pub(super) fn phase_coefficients(
         &self,
-        previous_joint: ResidentNormalEnclosureView<'_, 'c>,
+        rows: &[(usize, usize)],
+        grain: ResidentGrain,
+    ) -> Result<Rc<ResidentNormalEnclosureSection<'c>>> {
+        let powers = self.powers()?;
+        let mut maps = Vec::new();
+        maps.try_reserve_exact(rows.len())
+            .map_err(|_| invalid("generator moment coefficient allocation"))?;
+        for &(i, exponent) in rows {
+            maps.push(AffineMap3 {
+                linear: powers
+                    .injection(i, exponent)
+                    .ok_or_else(|| invalid("generator moment phase exponent"))?
+                    .clone(),
+                translation: relational_geometry::RatVec3::zero(),
+            });
+        }
+        ResidentNormalEnclosureSection::affine_coefficients(self.surface(), &maps, grain)
+            .map_err(invalid)
+    }
+
+    fn standing_coefficients(
+        &self,
+        grain: ResidentGrain,
+    ) -> Result<Rc<ResidentNormalEnclosureSection<'c>>> {
+        ResidentNormalEnclosureSection::affine_coefficients(
+            self.surface(),
+            self.powers()?.standing(),
+            grain,
+        )
+        .map_err(invalid)
+    }
+
+    /// `(i, N−1−k)` for cell `k` at injection position `i`, cell-major.
+    fn cell_rows(&self) -> Vec<(usize, usize)> {
+        let n = self.count;
+        (0..n)
+            .flat_map(|k| (0..self.injection_count).map(move |i| (i, n - 1 - k)))
+            .collect()
+    }
+    fn cell_addresses(&self) -> Vec<usize> {
+        (0..self.count)
+            .flat_map(|_| self.injection_indices.iter().copied())
+            .collect()
+    }
+
+    /// The source moment `m = Σ_k L^(N−1−k) I E(u_k)` on the machine boundary (`12G`
+    /// components). It reads each cell once and is independent of the standing it meets.
+    pub fn moment(
+        &self,
         encoded: &ResidentNormalEnclosureSection<'c>,
-    ) -> Result<GeneratorMomentTransport<'c>> {
-        let boundary_components = self
-            .machine_sites
-            .checked_mul(12)
-            .ok_or_else(|| invalid("generator source boundary extent"))?;
+    ) -> Result<ResidentNormalEnclosure<'c>> {
         let width = self
             .injection_count
             .checked_mul(6)
             .ok_or_else(|| invalid("generator source injection width"))?;
-        if previous_joint.components() < boundary_components
-            || encoded.rows() != self.count
-            || encoded.components() != width
-            || encoded.grain() != previous_joint.grain()
-        {
+        if encoded.rows() != self.count || encoded.components() != width {
             return Err(invalid("generator source moment chart"));
         }
-        let surface = encoded.surface();
-        let (standing_coefficients, increment_coefficients) =
-            self.power_coefficients(surface, encoded.grain())?;
-        let previous = previous_joint.to_owned().map_err(invalid)?;
-        let q = previous
-            .view()
-            .restrict(0..boundary_components)
-            .map_err(invalid)?;
-        let q_section = Rc::new(
-            q.view()
-                .split_rows(self.machine_sites, 12)
-                .map_err(invalid)?,
-        );
-        let standing = MachineValueTransport::new_with_enclosure(
-            q_section,
-            &(0..self.machine_sites).collect::<Vec<_>>(),
-            standing_coefficients,
-            self.enclosure.clone(),
-        )?;
+        let coefficients = self.phase_coefficients(&self.cell_rows(), encoded.grain())?;
         let cells = Rc::new(
             encoded
                 .split_components(self.injection_count)
@@ -465,102 +553,313 @@ impl<'c> MachineSourceMaps<'c> {
         let increments = MachineValueTransport::new_with_enclosure(
             cells.output_handle(),
             &(0..rows).collect::<Vec<_>>(),
-            increment_coefficients,
+            coefficients,
             self.enclosure.clone(),
         )?;
-        let addresses = (0..self.count)
-            .flat_map(|_| self.injection_indices.iter().copied())
-            .collect::<Vec<_>>();
-        let moment = increments
+        Ok(increments
             .output()
             .scatter_phase_adjoint(
-                &addresses,
+                &self.cell_addresses(),
                 &vec![ExactWavePhaseTransport::identity(); rows],
                 self.machine_sites,
             )
-            .map_err(invalid)?;
-        let qsum = standing
-            .output()
-            .sum_same_shape(&moment)
             .map_err(invalid)?
             .pack_components(self.machine_sites)
             .map_err(invalid)?
             .row(0)
             .map_err(invalid)?
             .to_owned()
-            .map_err(invalid)?;
-        let output = if previous_joint.components() == boundary_components {
-            qsum
-        } else {
-            let b = previous
-                .view()
-                .restrict(boundary_components..previous_joint.components())
-                .map_err(invalid)?;
-            qsum.view().join(b.view()).map_err(invalid)?
-        };
-        Ok(GeneratorMomentTransport {
-            standing,
-            increments,
-            output,
-            addresses,
-            injection_count: self.injection_count,
-            machine_sites: self.machine_sites,
-            boundary_components,
-        })
+            .map_err(invalid)?)
     }
 
-    /// The transpose of `accumulate` without its forward operands. The affine and
-    /// realification adjoints read only coefficients and the covector, so the transport is
-    /// taken at zero operands and no source row or intermediate state is needed.
-    pub fn transposed_moment(
+    /// Per-symbol phase-weighted sums `C_(a,i) = Σ_(k: u_k = a) L_(s_i)^(N−1−k)`, kept only for
+    /// the symbols present in the passage: returns the sorted present symbols `a_j` and the sums
+    /// indexed `j·S + i`. With them `m = Σ_j C_(a_j,·) I E(a_j)` for any encoder table `E`:
+    /// storage is `O(distinct symbols × S)`, fixed in `N`, and a later table reads through them.
+    pub fn symbol_moment_sums(
         &self,
-        joint_components: usize,
+        symbols: &[usize],
+        alphabet: usize,
+    ) -> Result<(Vec<usize>, Vec<RatMat3>)> {
+        if symbols.len() != self.count || alphabet == 0 || symbols.iter().any(|a| *a >= alphabet) {
+            return Err(invalid("generator symbol passage"));
+        }
+        let present = present_symbols(symbols);
+        let s = self.injection_count;
+        let rows = present
+            .len()
+            .checked_mul(s)
+            .ok_or_else(|| invalid("generator symbol sum extent"))?;
+        let mut sums = Vec::new();
+        sums.try_reserve_exact(rows)
+            .map_err(|_| invalid("generator symbol sum allocation"))?;
+        sums.resize(rows, zero_matrix());
+        let powers = self.powers()?;
+        let n = self.count;
+        for (k, &a) in symbols.iter().enumerate() {
+            let j = present
+                .binary_search(&a)
+                .map_err(|_| invalid("generator symbol presence"))?;
+            for i in 0..s {
+                let power = powers
+                    .injection(i, n - 1 - k)
+                    .ok_or_else(|| invalid("generator moment phase exponent"))?;
+                sums[j * s + i] = add_matrix(&sums[j * s + i], power, false);
+            }
+        }
+        Ok((present, sums))
+    }
+
+    /// Mount phase-weighted sums as linear coefficient rows at `grain`.
+    pub(super) fn mount_symbol_sums(
+        &self,
+        sums: &[RatMat3],
         grain: ResidentGrain,
-    ) -> Result<GeneratorMomentTransport<'c>> {
-        let surface = self.coefficients.surface();
-        let joint = ResidentNormalEnclosureSection::zeros(surface, 1, joint_components, grain)
+    ) -> Result<Rc<ResidentNormalEnclosureSection<'c>>> {
+        let maps = sums
+            .iter()
+            .map(|linear| AffineMap3 {
+                linear: linear.clone(),
+                translation: relational_geometry::RatVec3::zero(),
+            })
+            .collect::<Vec<_>>();
+        ResidentNormalEnclosureSection::affine_coefficients(self.surface(), &maps, grain)
+            .map_err(invalid)
+    }
+
+    /// Rows `(p, a_j, i)` in sum order `(p·J + j)·S + i` over the present symbols `a_j`.
+    fn symbol_rows(&self, present: &[usize], ports: usize) -> Vec<(usize, usize, usize)> {
+        let s = self.injection_count;
+        (0..ports)
+            .flat_map(|p| {
+                present
+                    .iter()
+                    .flat_map(move |&a| (0..s).map(move |i| (p, a, i)))
+            })
+            .collect()
+    }
+
+    /// `Σ_(a,i) K_(p,a,i) I E(a)|_i` at site `s_i`, port `p`: the `G × 12P` field of `ports`
+    /// blocks of mounted sums (`p`-major rows `(p, a, i)`) read through the table `E`
+    /// (`|A| × 6S`).
+    pub(super) fn carry_symbol_table(
+        &self,
+        table: &ResidentNormalEnclosureSection<'c>,
+        sums: &Rc<ResidentNormalEnclosureSection<'c>>,
+        ports: usize,
+        present: &[usize],
+    ) -> Result<ResidentNormalEnclosureSection<'c>> {
+        let s = self.injection_count;
+        let rows = self.symbol_rows(present, ports);
+        if ports == 0
+            || present.iter().any(|a| *a >= table.rows())
+            || table.components() != s * 6
+            || sums.rows() != rows.len()
+            || !std::ptr::eq(table.surface(), self.surface())
+        {
+            return Err(invalid("generator symbol table chart"));
+        }
+        let cells = Rc::new(table.split_components(s).map_err(invalid)?)
+            .realify()
+            .map_err(invalid)?;
+        let carried = MachineValueTransport::new_with_enclosure(
+            cells.output_handle(),
+            &rows.iter().map(|&(_, a, i)| a * s + i).collect::<Vec<_>>(),
+            Rc::clone(sums),
+            self.enclosure.clone(),
+        )?;
+        let addresses = rows
+            .iter()
+            .map(|&(p, _, i)| self.injection_indices[i] * ports + p)
+            .collect::<Vec<_>>();
+        carried
+            .output()
+            .scatter_phase_adjoint(
+                &addresses,
+                &vec![ExactWavePhaseTransport::identity(); addresses.len()],
+                self.machine_sites * ports,
+            )
+            .map_err(invalid)?
+            .pack_components(ports)
+            .map_err(invalid)
+    }
+
+    /// Transpose of `carry_symbol_table`: a `G × 12P` covector returns to the table chart
+    /// `|A| × 6S` as `Σ_p K_(p,a,i)ᵀ g_(p, s_i)`. Coefficients only; no table value is read.
+    pub(super) fn pull_back_symbol_table(
+        &self,
+        covector: &ResidentNormalEnclosureSection<'c>,
+        sums: &Rc<ResidentNormalEnclosureSection<'c>>,
+        ports: usize,
+        present: &[usize],
+        alphabet: usize,
+    ) -> Result<ResidentNormalEnclosureSection<'c>> {
+        let s = self.injection_count;
+        let rows = self.symbol_rows(present, ports);
+        if ports == 0
+            || present.iter().any(|a| *a >= alphabet)
+            || covector.rows() != self.machine_sites
+            || covector.components() != 12 * ports
+            || sums.rows() != rows.len()
+        {
+            return Err(invalid("generator symbol table adjoint chart"));
+        }
+        let grain = covector.grain();
+        let site_port = covector.split_components(ports).map_err(invalid)?;
+        let addresses = rows
+            .iter()
+            .map(|&(p, _, i)| self.injection_indices[i] * ports + p)
+            .collect::<Vec<_>>();
+        let gathered = site_port
+            .gather_phase_rows(
+                &addresses,
+                &vec![ExactWavePhaseTransport::identity(); addresses.len()],
+                12,
+            )
+            .map_err(invalid)?;
+        let zero = Rc::new(
+            ResidentNormalEnclosureSection::zeros(self.surface(), alphabet * s, 12, grain)
+                .map_err(invalid)?,
+        );
+        let carried = MachineValueTransport::new_with_enclosure(
+            zero,
+            &rows.iter().map(|&(_, a, i)| a * s + i).collect::<Vec<_>>(),
+            Rc::clone(sums),
+            self.enclosure.clone(),
+        )?;
+        Ok(Rc::new(carried.pull_back(&gathered)?)
+            .decode_realification()
+            .map_err(invalid)?
+            .output()
+            .pack_components(s)
+            .map_err(invalid)?)
+    }
+
+    /// `m = Σ_a C_(a,·) I E(a)` on the machine boundary, from mounted symbol sums.
+    pub fn symbol_moment(
+        &self,
+        table: &ResidentNormalEnclosureSection<'c>,
+        sums: &Rc<ResidentNormalEnclosureSection<'c>>,
+        present: &[usize],
+    ) -> Result<ResidentNormalEnclosure<'c>> {
+        Ok(self
+            .carry_symbol_table(table, sums, 1, present)?
+            .pack_components(self.machine_sites)
+            .map_err(invalid)?
+            .row(0)
+            .map_err(invalid)?
+            .to_owned()
+            .map_err(invalid)?)
+    }
+
+    /// `g_E(a)|_i = C_(a,i)ᵀ g_q(s_i)`: the moment's encoder covector, `|A| × 6S`.
+    pub fn pull_back_symbol_moment(
+        &self,
+        full_anchor_gradient: ResidentNormalEnclosureView<'_, 'c>,
+        sums: &Rc<ResidentNormalEnclosureSection<'c>>,
+        present: &[usize],
+        alphabet: usize,
+    ) -> Result<ResidentNormalEnclosureSection<'c>> {
+        let boundary = self.boundary_components()?;
+        if full_anchor_gradient.components() < boundary {
+            return Err(invalid("generator source moment adjoint chart"));
+        }
+        let q_gradient = full_anchor_gradient
+            .restrict(0..boundary)
+            .map_err(invalid)?
+            .view()
+            .split_rows(self.machine_sites, 12)
+            .map_err(invalid)?;
+        self.pull_back_symbol_table(&q_gradient, sums, 1, present, alphabet)
+    }
+
+    /// The accumulated field `(L^N q + m) ⊕ b` at the supplied joint cut. A delayed reading
+    /// passes the contemporary `(q, b)` and the retained `m`; nothing of an earlier standing enters.
+    pub fn anchor(
+        &self,
+        joint: ResidentNormalEnclosureView<'_, 'c>,
+        moment: ResidentNormalEnclosureView<'_, 'c>,
+    ) -> Result<ResidentNormalEnclosure<'c>> {
+        let boundary = self.boundary_components()?;
+        if joint.components() < boundary
+            || moment.components() != boundary
+            || moment.grain() != joint.grain()
+        {
+            return Err(invalid("generator source anchor chart"));
+        }
+        let q = joint.restrict(0..boundary).map_err(invalid)?;
+        let q_section = Rc::new(
+            q.view()
+                .split_rows(self.machine_sites, 12)
+                .map_err(invalid)?,
+        );
+        let standing = MachineValueTransport::new_with_enclosure(
+            q_section,
+            &(0..self.machine_sites).collect::<Vec<_>>(),
+            self.standing_coefficients(joint.grain())?,
+            self.enclosure.clone(),
+        )?;
+        let standing = standing
+            .output()
+            .pack_components(self.machine_sites)
             .map_err(invalid)?
             .row(0)
             .map_err(invalid)?
             .to_owned()
             .map_err(invalid)?;
-        let width = self
-            .injection_count
-            .checked_mul(6)
-            .ok_or_else(|| invalid("generator source injection width"))?;
-        let encoded = ResidentNormalEnclosureSection::zeros(surface, self.count, width, grain)
+        let q = standing.view().sum_same_shape(moment).map_err(invalid)?;
+        if joint.components() == boundary {
+            return Ok(q);
+        }
+        let b = joint
+            .restrict(boundary..joint.components())
             .map_err(invalid)?;
-        self.accumulate(joint.view(), &encoded)
-    }
-}
-
-impl<'c> GeneratorMomentTransport<'c> {
-    pub fn into_output(self) -> ResidentNormalEnclosure<'c> {
-        self.output
+        q.view().join(b.view()).map_err(invalid)
     }
 
-    /// `(U^N)* g` for the standing and `I* (L^(N−1−k))* g` for every cell `k`: one covector per
-    /// occurrence, returned as the `N × 6S` encoded chart.
-    pub fn pull_back(
+    #[cfg_attr(not(test), allow(dead_code))]
+    /// Closed form of `N` source steps: `q_N = L^N q₀ + Σ_k L^(N−1−k) I E(u_k)`, `b` unchanged.
+    pub fn accumulate(
+        &self,
+        previous_joint: ResidentNormalEnclosureView<'_, 'c>,
+        encoded: &ResidentNormalEnclosureSection<'c>,
+    ) -> Result<ResidentNormalEnclosure<'c>> {
+        if encoded.grain() != previous_joint.grain() {
+            return Err(invalid("generator source moment chart"));
+        }
+        let moment = self.moment(encoded)?;
+        self.anchor(previous_joint, moment.view())
+    }
+
+    /// `(L^N)* g_q ⊕ g_b`: the standing term's adjoint, delivered to the `q₀` it was read at.
+    pub fn pull_back_standing(
         &self,
         full_anchor_gradient: ResidentNormalEnclosureView<'_, 'c>,
-    ) -> Result<(
-        ResidentNormalEnclosure<'c>,
-        ResidentNormalEnclosureSection<'c>,
-    )> {
-        if full_anchor_gradient.components() != self.output.view().components() {
+    ) -> Result<ResidentNormalEnclosure<'c>> {
+        let boundary = self.boundary_components()?;
+        if full_anchor_gradient.components() < boundary {
             return Err(invalid("generator source moment adjoint chart"));
         }
-        let q_gradient = Rc::new(
-            full_anchor_gradient
-                .restrict(0..self.boundary_components)
-                .map_err(invalid)?
-                .view()
-                .split_rows(self.machine_sites, 12)
+        let grain = full_anchor_gradient.grain();
+        let q_gradient = full_anchor_gradient
+            .restrict(0..boundary)
+            .map_err(invalid)?
+            .view()
+            .split_rows(self.machine_sites, 12)
+            .map_err(invalid)?;
+        // The affine and realification adjoints read only coefficients, so the transport is
+        // taken at zero operands.
+        let zero = Rc::new(
+            ResidentNormalEnclosureSection::zeros(self.surface(), self.machine_sites, 12, grain)
                 .map_err(invalid)?,
         );
-        let previous_q = self
-            .standing
+        let standing = MachineValueTransport::new_with_enclosure(
+            zero,
+            &(0..self.machine_sites).collect::<Vec<_>>(),
+            self.standing_coefficients(grain)?,
+            self.enclosure.clone(),
+        )?;
+        let previous = standing
             .pull_back(&q_gradient)?
             .pack_components(self.machine_sites)
             .map_err(invalid)?
@@ -568,29 +867,58 @@ impl<'c> GeneratorMomentTransport<'c> {
             .map_err(invalid)?
             .to_owned()
             .map_err(invalid)?;
+        if full_anchor_gradient.components() == boundary {
+            return Ok(previous);
+        }
+        let b = full_anchor_gradient
+            .restrict(boundary..full_anchor_gradient.components())
+            .map_err(invalid)?;
+        previous.view().join(b.view()).map_err(invalid)
+    }
+
+    /// `g_k = I* (L^(N−1−k))* g_q` for every cell: one covector per occurrence, returned as the
+    /// `N × 6S` encoded chart from the coefficients alone. No source row or state is read.
+    pub fn pull_back_moment(
+        &self,
+        full_anchor_gradient: ResidentNormalEnclosureView<'_, 'c>,
+    ) -> Result<ResidentNormalEnclosureSection<'c>> {
+        let boundary = self.boundary_components()?;
+        if full_anchor_gradient.components() < boundary {
+            return Err(invalid("generator source moment adjoint chart"));
+        }
+        let grain = full_anchor_gradient.grain();
+        let q_gradient = full_anchor_gradient
+            .restrict(0..boundary)
+            .map_err(invalid)?
+            .view()
+            .split_rows(self.machine_sites, 12)
+            .map_err(invalid)?;
+        let addresses = self.cell_addresses();
+        let rows = addresses.len();
         let cells = q_gradient
             .gather_phase_rows(
-                &self.addresses,
-                &vec![ExactWavePhaseTransport::identity(); self.addresses.len()],
+                &addresses,
+                &vec![ExactWavePhaseTransport::identity(); rows],
                 12,
             )
             .map_err(invalid)?;
-        let cells = self.increments.pull_back(&cells)?;
-        let encoded = Rc::new(cells)
+        let zero = Rc::new(
+            ResidentNormalEnclosureSection::zeros(self.surface(), rows, 12, grain)
+                .map_err(invalid)?,
+        );
+        let increments = MachineValueTransport::new_with_enclosure(
+            zero,
+            &(0..rows).collect::<Vec<_>>(),
+            self.phase_coefficients(&self.cell_rows(), grain)?,
+            self.enclosure.clone(),
+        )?;
+        let cells = increments.pull_back(&cells)?;
+        Ok(Rc::new(cells)
             .decode_realification()
             .map_err(invalid)?
             .output()
             .pack_components(self.injection_count)
-            .map_err(invalid)?;
-        let previous = if full_anchor_gradient.components() == self.boundary_components {
-            previous_q
-        } else {
-            let b = full_anchor_gradient
-                .restrict(self.boundary_components..full_anchor_gradient.components())
-                .map_err(invalid)?;
-            previous_q.view().join(b.view()).map_err(invalid)?
-        };
-        Ok((previous, encoded))
+            .map_err(invalid)?)
     }
 }
 

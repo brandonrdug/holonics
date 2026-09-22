@@ -56,7 +56,7 @@ obstruction is returned, never repaired.
 characteristic, and `each_junction_costs_one_euler` is its consequence: a surface assembled from
 `n` pieces of `χ = −1` has `χ = −n`. Orientability is the extra `ℤ/2`:
 `walkHolonomy_telescopes` proves that a consistent sign assignment forces holonomy `1` on every
-closed dual walk, `no_consistent_orientation_on_a_reversing_loop` exhibits the obstruction, and
+closed dual walk, the obstruction is `Objects/Orientation.reversing_closed_walk_has_no_orientation`, and
 `orientation_reversing_iff_odd` is the determinant `(−1)^k` of a circuit of `k` reflections. The
 tube-level form of the same obstruction is
 `Transport/ContinuingTube.lean::flipCircuit_carries_no_invariant_end`: no invariant end, hence no
@@ -462,7 +462,10 @@ theorem closed_walk_holonomy_one (sign : Face → ℤ) (unit : ∀ f, sign f * s
     walkHolonomy sign (first :: rest) = 1 := by
   rw [walkHolonomy_telescopes sign unit first rest, closed, unit first]
 
-/-- [counterexample; formal-checked] **And a reversing loop admits no consistent assignment.** A
+/-- [historical; formal-checked] Vacuous as stated: `sign () * sign () = −1` is refuted by the unit
+clause alone and carries no loop datum (`Objects/Orientation.junction_hypothesis_is_refuted_by_unit_alone`).
+The content is `Objects/Orientation.reversing_closed_walk_has_no_orientation`; this is its one-face case
+(`junction_statement_from_cycle`). Original heading: **And a reversing loop admits no consistent assignment.** A
 dual edge whose required relation is `−1` between a face and itself — the Möbius seam — has no
 sign. Non-orientability is exhibited by the closed path, never counted. The tube-level form of the
 same obstruction is `Transport/ContinuingTube.lean::flipCircuit_carries_no_invariant_end`. -/

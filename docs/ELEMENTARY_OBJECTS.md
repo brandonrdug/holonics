@@ -44,8 +44,9 @@ Holons through their ports yields a Holon, which is the recursion. Passivity is 
 never assumed: learned or nonlocal relations enter with their actual power term. Linear SSMs,
 diffusion, Maxwell (Stokes–Dirac on the de Rham complex) and Euler/Navier–Stokes (Lie–Poisson plus
 viscous resistance) are specializations; the occurrence Holon of `Foundation/Holon.lean` is its event
-chart. The foundation campaign formalizes this in Lean and makes it the Rust core that every native
-owner implements.
+chart. The Lean foundation is `ElementaryHolonics.Framework.HolonObject` (`Holon/{Port,Dirac,Complex,Element,
+Generator,Restriction,Law,Conformance}`); the Rust core (`holonic-core`) mirrors it and every native owner
+implements it.
 
 ## The objects
 

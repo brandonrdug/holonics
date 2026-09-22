@@ -4,7 +4,9 @@ mod machine_episode;
 mod machine_receiving;
 mod machine_source;
 mod machine_source_contacts;
-use machine_episode::{GeneratorSourceMoment, GeneratorSourceMomentMeta};
+use machine_episode::{GeneratorMomentComparison, GeneratorSourceMoment, RetainedComparison};
+#[allow(unused_imports)] // named by session consumers through the body's methods
+pub use machine_episode::{GeneratorMomentHolon, GeneratorSourceMomentMeta};
 pub use machine_source::GeneratorSourceBinding;
 pub use machine_source_contacts::{GeneratorSourceContact, GeneratorSourceContactKind};
 mod machine_transport;
@@ -364,8 +366,9 @@ struct IncidentStep<'c> {
     input: ResidentNormalEnclosure<'c>,
 }
 pub(crate) struct IncidentWord<'c> {
-    /// Ordered-source declaration of a generator word; its accumulated field is `anchor`.
-    source_moment: Option<GeneratorSourceMoment>,
+    /// Ordered-source Holon of a generator word (declaration and moment `m`); the anchor is
+    /// `P((L^N q₀ + m) ⊕ b₀)` at the cut this word was evaluated at.
+    source_moment: Option<GeneratorSourceMoment<'c>>,
     external_condition: Option<Rc<ResidentNormalEnclosureSection<'c>>>,
     machine: Option<Rc<crate::native::field_geometry::machine::CompiledGeneratorMachine>>,
     source: NativeFieldCurrentSource<'c>,
@@ -392,6 +395,9 @@ pub struct NativeIncidentMaterialReturn<'c> {
         holonic_engine::native_ecology::constitutive_fibre::NativeDeclaredAmplitudeCommit<'c>,
     >,
     source_covector: Option<ResidentNormalEnclosureSection<'c>>,
+    symbol_covector: Option<ResidentNormalEnclosureSection<'c>>,
+    moment_covector: Option<ResidentNormalEnclosure<'c>>,
+    condition_covector: Option<ResidentNormalEnclosureSection<'c>>,
     comparison: u64,
     epoch: u64,
     next_epoch: u64,
@@ -421,6 +427,20 @@ impl<'c> NativeIncidentMaterialReturn<'c> {
     }
     pub fn anchor_covector(&self) -> ResidentNormalEnclosureView<'_, 'c> {
         self.anchor.view()
+    }
+    /// Symbol passage: the encoder-table covector `|A| × 6S`,
+    /// `g_E(a)|_i = C_(a,i)ᵀ g_m(s_i) + Σ_p D_(p,a,i)ᵀ g_(c,p)(s_i)`.
+    pub fn symbol_covector(&self) -> Option<&ResidentNormalEnclosureSection<'c>> {
+        self.symbol_covector.as_ref()
+    }
+    /// Generator word: `g_m`, the covector at the accumulated anchor `L^N q₀ + m` (joint
+    /// chart), before the standing adjoint `(L^N)*`. It is the covector of the moment `m`.
+    pub fn moment_covector(&self) -> Option<ResidentNormalEnclosureView<'_, 'c>> {
+        self.moment_covector.as_ref().map(|m| m.view())
+    }
+    /// Generator word with condition ports: `g_c`, `G × 12P` (site rows, port blocks).
+    pub fn condition_covector(&self) -> Option<&ResidentNormalEnclosureSection<'c>> {
+        self.condition_covector.as_ref()
     }
 }
 impl<'c> NativeIncidentGenerated<'c> {
@@ -470,12 +490,130 @@ pub(crate) struct IncidentFieldModel<'c> {
     generations: u64,
     observations: u64,
     next_comparison: u64,
+    /// Legacy comparisons at their frozen producing cut.
     pending: BTreeMap<u64, Rc<IncidentWord<'c>>>,
+    /// Generator comparisons: the source Holon's moment and condition, read at the
+    /// contemporary constitution when observed. Fixed in the passage length.
+    moments: BTreeMap<u64, Rc<GeneratorMomentComparison<'c>>>,
+    /// Declared residual of the commits' rebases to their dyadic centres.
+    rebase: IncidentRebaseResidual,
+    /// Test control only: publish the whole solve enclosure, as before the rebase law.
+    #[cfg(test)]
+    rebase_off: bool,
+}
+
+/// The residual family of committed-current rebases, fixed size. Commit `j` publishes the
+/// dyadic centre `c_j` of its solve enclosure `B(c_j, r_j)` (which contains the exact solve
+/// `x_j` of that commit's word, read at the published previous centre) and drops `r_j`, so
+/// `‖c_j − x_j‖ ≤ r_j` in the enclosure's norm. Recorded: the count, the last, the running
+/// maximum and the running sum of the dropped radii `r_j`, each exact as `n / 2^grain`.
+/// Nothing claims `c_j = x_j`, and the sum is only the sum of dropped radii: it is not a
+/// trajectory bound. The distance of the published centre from the exact unrebased
+/// trajectory is `R_(i+1) ≤ K_i R_i + r_i` (`Objects/CommitRebase`: `Σ_i K^(n−1−i) r_i`), with
+/// `K_i` a Lipschitz bound of commit `i`'s full incident word in `q₀`. No such bound is exposed
+/// (`inspect_operator_bounds` bounds only the contact operator `D`, not the word with its
+/// participation, reaction, projection and held relaxation), so that trajectory bound is owed.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct IncidentRebaseResidual {
+    pub commits: u64,
+    pub grain: u32,
+    /// Scaled integers, decimal: the radius value is `n / 2^grain`.
+    pub last: String,
+    pub max: String,
+    pub sum: String,
+}
+
+impl IncidentRebaseResidual {
+    fn is_empty(&self) -> bool {
+        self.commits == 0
+    }
+    /// The propagated trajectory bound `R_(i+1) = K_i R_i + r_i` needs a Lipschitz bound `K_i`
+    /// of the full incident word, which the field does not expose. Always `None` for now.
+    pub fn trajectory_bound(&self) -> Option<relational_geometry::Rat> {
+        None
+    }
+    fn scaled(value: &str) -> Result<num_bigint::BigInt, NativeSessionError> {
+        if value.is_empty() {
+            return Ok(num_bigint::BigInt::from(0u8));
+        }
+        value
+            .parse::<num_bigint::BigInt>()
+            .map_err(|_| invalid("rebase residual word"))
+    }
+    fn record(&mut self, radius: u128, grain: ResidentGrain) -> Result<(), NativeSessionError> {
+        let grain = u32::from(grain.0);
+        if self.commits != 0 && self.grain != grain {
+            return Err(invalid("rebase residual grain changed"));
+        }
+        let radius = num_bigint::BigInt::from(radius);
+        let max = Self::scaled(&self.max)?.max(radius.clone());
+        let sum = Self::scaled(&self.sum)? + &radius;
+        self.commits = self
+            .commits
+            .checked_add(1)
+            .ok_or_else(|| invalid("rebase residual count"))?;
+        self.grain = grain;
+        self.last = radius.to_string();
+        self.max = max.to_string();
+        self.sum = sum.to_string();
+        Ok(())
+    }
+    fn value(&self, word: &str) -> Result<relational_geometry::Rat, NativeSessionError> {
+        Ok(relational_geometry::Rat::new(
+            Self::scaled(word)?,
+            num_bigint::BigInt::from(1u8) << self.grain,
+        ))
+    }
+    /// `r` of the last commit.
+    pub fn last_radius(&self) -> Result<relational_geometry::Rat, NativeSessionError> {
+        self.value(&self.last)
+    }
+    /// `max_j r_j`.
+    pub fn max_radius(&self) -> Result<relational_geometry::Rat, NativeSessionError> {
+        self.value(&self.max)
+    }
+    /// `Σ_j r_j`: the sum of the dropped radii. Not a trajectory bound (see the type docs).
+    pub fn sum_radius(&self) -> Result<relational_geometry::Rat, NativeSessionError> {
+        self.value(&self.sum)
+    }
+}
+
+/// Rebase a committed joint current to its dyadic centre at its grain: the same centre words
+/// with a zero radius, and the dropped radius as the scaled integer `r·2^grain`. The rewrite is
+/// on the sealed rest words (one row, host staged at the commit boundary).
+fn rebase_to_centre<'c>(
+    surface: &'c ResidentSurface<'c>,
+    output: &ResidentNormalEnclosure<'c>,
+) -> Result<(ResidentNormalEnclosure<'c>, u128), NativeSessionError> {
+    let grain = output.view().grain();
+    let mut rest = output.rest()?;
+    let n = rest.intervals.len();
+    if rest.rows != 1 || n < 2 || n != rest.width {
+        return Err(invalid("rebase joint current chart"));
+    }
+    let (low, high) = (rest.intervals[n - 2], rest.intervals[n - 1]);
+    if low.0 != low.1 || high.0 != high.1 {
+        return Err(invalid("rebase requires a sealed radius word"));
+    }
+    let radius = (((high.0 as u64 as u128) << 64) | low.0 as u64 as u128) as i128;
+    if radius < 0 {
+        return Err(invalid("rebase radius sign"));
+    }
+    rest.intervals[n - 2] = (0, 0);
+    rest.intervals[n - 1] = (0, 0);
+    Ok((
+        ResidentNormalEnclosure::remount(surface, rest, grain)?,
+        radius as u128,
+    ))
 }
 /// Producing covectors, before the normal law stages contemporary material successors.
 /// Contact operands retain every stage, including its internal-output covector.
 pub(super) struct IncidentPullback<'c> {
     source_covector: Option<ResidentNormalEnclosureSection<'c>>,
+    symbol_covector: Option<ResidentNormalEnclosureSection<'c>>,
+    moment_covector: Option<ResidentNormalEnclosure<'c>>,
+    condition_covector: Option<ResidentNormalEnclosureSection<'c>>,
     external_covector: Option<ResidentNormalEnclosureSection<'c>>,
     anchor: ResidentNormalEnclosure<'c>,
     material: Vec<
@@ -584,6 +722,10 @@ impl<'c> IncidentFieldModel<'c> {
             observations: 0,
             next_comparison: 0,
             pending: BTreeMap::new(),
+            moments: BTreeMap::new(),
+            rebase: IncidentRebaseResidual::default(),
+            #[cfg(test)]
+            rebase_off: false,
         })
     }
     fn word(
@@ -658,15 +800,25 @@ impl<'c> IncidentFieldModel<'c> {
         Some(self.observations)
     }
     pub(crate) fn pending(&self) -> usize {
-        self.pending.len()
+        self.pending.len() + self.moments.len()
     }
     pub(crate) fn pending_ids(&self) -> Vec<u64> {
-        self.pending.keys().copied().collect()
+        let mut ids = self
+            .pending
+            .keys()
+            .chain(self.moments.keys())
+            .copied()
+            .collect::<Vec<_>>();
+        ids.sort_unstable();
+        ids
+    }
+    fn is_pending(&self, id: u64) -> bool {
+        self.pending.contains_key(&id) || self.moments.contains_key(&id)
     }
     pub(crate) fn release(&mut self, id: u64) -> Result<(), NativeSessionError> {
-        self.pending
-            .remove(&id)
-            .ok_or_else(|| invalid("unknown incident producing comparison"))?;
+        if self.pending.remove(&id).is_none() && self.moments.remove(&id).is_none() {
+            return Err(invalid("unknown incident producing comparison"));
+        }
         Ok(())
     }
     pub(crate) fn inspect(&mut self) -> Result<Value, NativeSessionError> {
@@ -677,6 +829,7 @@ impl<'c> IncidentFieldModel<'c> {
             "internal_components":source.internal_components(),"sites":self.layout.sites.len(),
             "operator":source.inspect_operator_bounds()?,
             "operative_storage":self.field.operative_return_storage(),
+            "rebase_residual":&self.rebase,
             "chart": if self.layout.machine.is_some() {"fixed-generator-machine"} else {"legacy-slot-field"},
             "contact_material": if self.layout.machine.is_some() {"positive-pair-amplitude-family"} else {"unconstrained-global-return"}}),
         )
@@ -747,19 +900,39 @@ impl<'c> IncidentFieldModel<'c> {
                 last.input.view(),
                 generated.word.solve_steps,
             )?;
-            Some(self.field.prepare_joint_current_commit_from_action(
-                &reflection,
-                generated.word.output.view(),
-            )?)
+            // Rebase: the published joint current is the solve enclosure's dyadic centre;
+            // its dropped radius is the declared residual of this commit.
+            let (centre, radius) = rebase_to_centre(self.field.surface(), &generated.word.output)?;
+            #[cfg(test)]
+            let centre = if self.rebase_off {
+                generated.word.output.view().to_owned()?
+            } else {
+                centre
+            };
+            let mut rebase = self.rebase.clone();
+            rebase.record(radius, generated.word.output.view().grain())?;
+            Some((
+                self.field
+                    .prepare_joint_current_commit_from_action(&reflection, centre.view())?,
+                rebase,
+            ))
         } else {
             None
         };
-        if let Some(staged) = staged {
+        if let Some((staged, rebase)) = staged {
             self.field.commit_joint_current(staged)?;
+            self.rebase = rebase;
         }
         if let Some(retained) = retained {
             generated.comparison = Some(self.next_comparison);
-            self.pending.insert(self.next_comparison, retained);
+            match retained {
+                RetainedComparison::Word(word) => {
+                    self.pending.insert(self.next_comparison, word);
+                }
+                RetainedComparison::Moment(moment) => {
+                    self.moments.insert(self.next_comparison, moment);
+                }
+            }
         }
         self.next_comparison = next_id;
         self.generations = generations;
@@ -1186,6 +1359,9 @@ impl<'c> IncidentFieldModel<'c> {
         }
         Ok(IncidentPullback {
             source_covector: None,
+            symbol_covector: None,
+            moment_covector: None,
+            condition_covector: None,
             external_covector: external_total,
             anchor: self
                 .project_machine(anchor_gradient.sum_same_shape(&gradient)?)?
@@ -1198,11 +1374,34 @@ impl<'c> IncidentFieldModel<'c> {
 }
 
 impl<'c> NativeCoupledBody<'c> {
+    /// Prepare the material return of a retained comparison. A legacy word returns through its
+    /// frozen producing cut; a generator comparison is read at the contemporary constitution
+    /// and must not have pooled directed contacts (use `prepare_generator_material_return`).
     pub fn prepare_incident_material_return(
         &mut self,
         id: u64,
         output_covector: ResidentNormalEnclosureView<'_, 'c>,
         step_bits: u32,
+    ) -> Result<NativeIncidentMaterialReturn<'c>, NativeSessionError> {
+        let BodyState::Incident(model) = self.state_mut()? else {
+            return Err(invalid("incident return requires its model chart"));
+        };
+        let word = match model.pending.get(&id) {
+            Some(word) => Rc::clone(word),
+            None => Rc::new(model.contemporary_comparison_word(id, None)?),
+        };
+        self.prepare_incident_material_return_at(id, &word, output_covector, step_bits, &[])
+    }
+
+    /// The material return of comparison `id` pulled back through `word`, which is either its
+    /// frozen legacy word or its contemporary generator word.
+    fn prepare_incident_material_return_at(
+        &mut self,
+        id: u64,
+        word: &IncidentWord<'c>,
+        output_covector: ResidentNormalEnclosureView<'_, 'c>,
+        step_bits: u32,
+        contacts: &[GeneratorSourceContact],
     ) -> Result<NativeIncidentMaterialReturn<'c>, NativeSessionError> {
         use holonic_engine::native_ecology::constitutive_fibre::NativeContactRealization;
         let BodyState::Incident(model) = self.state_mut()? else {
@@ -1211,13 +1410,9 @@ impl<'c> NativeCoupledBody<'c> {
         if step_bits > 120 {
             return Err(invalid("incident material return scale"));
         }
-        let pending = Rc::clone(
-            model
-                .pending
-                .get(&id)
-                .ok_or_else(|| invalid("unknown incident comparison"))?,
-        );
-        let word = model.observed_word(&pending)?;
+        if !model.is_pending(id) {
+            return Err(invalid("unknown incident comparison"));
+        }
         let next_epoch = model
             .epoch
             .checked_add(1)
@@ -1226,7 +1421,7 @@ impl<'c> NativeCoupledBody<'c> {
             .observations
             .checked_add(1)
             .ok_or_else(|| invalid("incident observation count exhausted"))?;
-        let returned = model.pull_back(&word, output_covector)?;
+        let returned = model.pull_back_with_contacts(word, output_covector, contacts)?;
         let mut material = Vec::with_capacity(model.materials.len());
         for (current, rows) in model.materials.iter().zip(&returned.material) {
             let features = ResidentNormalEnclosureSection::concatenate_rows(
@@ -1274,6 +1469,9 @@ impl<'c> NativeCoupledBody<'c> {
         Ok(NativeIncidentMaterialReturn {
             contact_amplitude,
             source_covector: returned.source_covector,
+            symbol_covector: returned.symbol_covector,
+            moment_covector: returned.moment_covector,
+            condition_covector: returned.condition_covector,
             comparison: id,
             epoch: model.epoch,
             next_epoch,
@@ -1284,6 +1482,13 @@ impl<'c> NativeCoupledBody<'c> {
         })
     }
     /// Publish prepared material only. The continuing q/b endpoint remains the latest generation.
+    /// The declared residual family of committed-current rebases.
+    pub fn incident_rebase_residual(&self) -> Result<IncidentRebaseResidual, NativeSessionError> {
+        match self.state()? {
+            BodyState::Incident(model) => Ok(model.rebase.clone()),
+            _ => Err(invalid("incident rebase residual requires its model chart")),
+        }
+    }
     pub fn publish_incident_material_return(
         &mut self,
         prepared: NativeIncidentMaterialReturn<'c>,
@@ -1291,7 +1496,7 @@ impl<'c> NativeCoupledBody<'c> {
         let BodyState::Incident(model) = self.state_mut()? else {
             return Err(invalid("incident return requires its model chart"));
         };
-        if prepared.epoch != model.epoch || !model.pending.contains_key(&prepared.comparison) {
+        if prepared.epoch != model.epoch || !model.is_pending(prepared.comparison) {
             return Err(invalid("stale incident material publication"));
         }
         if let Some(contact) = prepared.contact {
@@ -1306,6 +1511,7 @@ impl<'c> NativeCoupledBody<'c> {
         model.epoch = prepared.next_epoch;
         model.observations = prepared.observations;
         model.pending.remove(&prepared.comparison);
+        model.moments.remove(&prepared.comparison);
         Ok(())
     }
     /// Found the declared incidence action D=B_U* with unit contact amplitudes. This creates
@@ -1555,6 +1761,9 @@ impl<'c> NativeCoupledBody<'c> {
         id: u64,
     ) -> Result<NativeIncidentGenerated<'c>, NativeSessionError> {
         match self.state()? {
+            BodyState::Incident(model) if model.moments.contains_key(&id) => Err(invalid(
+                "a generator moment comparison keeps no producing word; read it with contemporary_incident_comparison",
+            )),
             BodyState::Incident(model) => Ok(NativeIncidentGenerated {
                 word: Rc::clone(
                     model

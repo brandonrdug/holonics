@@ -3,11 +3,11 @@
 //! dense m-by-m statistic or a numerical encoding of a symbol ordinal.
 use super::*;
 use holonic_engine::{
+    ExactWavePhaseTransport,
     native_ecology::constitutive_fibre::{
         BoundaryMaterialMaps, BoundaryMaterialSeed, NativeNormalPrior, NormalMaterialRest,
         ResidentNormalEnclosureSection, ResidentNormalMaterialView,
     },
-    ExactWavePhaseTransport,
 };
 use std::collections::BTreeSet;
 
@@ -164,6 +164,72 @@ impl<'c> IncidentEncoder<'c> {
                 .collect(),
         })
     }
+    /// The encoder table `|A| × 2d`: row `a` is `E(a)`, the current column of codec identity
+    /// `a`, for identities `0..alphabet`. A symbol passage indexes these rows.
+    pub fn table(&self, alphabet: usize) -> Result<ResidentNormalEnclosureSection<'c>> {
+        Ok(self.encode(&(0..alphabet).collect::<Vec<_>>())?.rows)
+    }
+
+    /// The encoder return of a symbol passage from its per-symbol covector `g_a = Σ_(k:u_k=a) g_k`
+    /// (`|A| × 2d`) and its occurrence counts. Each column is one normal observation per
+    /// occurrence with feature 1, so its update reads only `Σ g` and `k_a`: the occurrence rows
+    /// are staged as `g_a` followed by `k_a − 1` zero covectors, which carries the same `H += k_a`
+    /// and `B += k_a W + 2^-step Σ g` (up to the per-row rounding of the step scale). Those
+    /// `k_a − 1` zero rows are transient at observe (`O(k_a)` resident rows, freed with the
+    /// staging) and never retained. One row per symbol would need a weighted normal observation
+    /// (`H += k f f*`), which the normal-material owner does not expose; a feature `√k_a` is not
+    /// dyadic.
+    pub fn prepare_pooled_return(
+        &self,
+        counts: &[usize],
+        symbol_covector: &ResidentNormalEnclosureSection<'c>,
+        step_bits: u32,
+    ) -> Result<IncidentEncoderUpdate<'c>> {
+        if symbol_covector.rows() != counts.len()
+            || symbol_covector.components() != 2 * self.width
+            || symbol_covector.grain() != self.grain
+            || step_bits > 120
+        {
+            return Err(invalid("encoder symbol covector chart"));
+        }
+        let mut columns = Vec::new();
+        for (symbol, &count) in counts.iter().enumerate() {
+            if count == 0 {
+                continue;
+            }
+            let position = *self
+                .positions
+                .get(&symbol)
+                .ok_or_else(|| invalid("encoder producing codec requires explicit rechart"))?;
+            let current = self
+                .columns
+                .get(position)
+                .ok_or_else(|| invalid("encoder producing codec requires explicit rechart"))?;
+            let row = symbol_covector.gather_phase_rows(
+                &[symbol],
+                &[ExactWavePhaseTransport::identity()],
+                2 * self.width,
+            )?;
+            let g = if count == 1 {
+                row
+            } else {
+                let zero = ResidentNormalEnclosureSection::zeros(
+                    self.surface,
+                    count - 1,
+                    2 * self.width,
+                    self.grain,
+                )?;
+                ResidentNormalEnclosureSection::concatenate_rows(&[&row, &zero])?
+            };
+            let feature = self.ones(count)?;
+            columns.push((
+                position,
+                current.stage_covector_return(&feature, &g, step_bits)?,
+            ));
+        }
+        Ok(IncidentEncoderUpdate { columns })
+    }
+
     /// `anchor_covector` has d native complex coordinates per actual source cell. It is the
     /// return through the producing field/receiver, never an exterior class probability vector.
     pub fn prepare_return(
@@ -172,7 +238,20 @@ impl<'c> IncidentEncoder<'c> {
         anchor_covector: &ResidentNormalEnclosureSection<'c>,
         step_bits: u32,
     ) -> Result<IncidentEncoderUpdate<'c>> {
-        if anchor_covector.rows() != producing.symbols.len()
+        self.prepare_symbol_return(&producing.symbols, anchor_covector, step_bits)
+    }
+
+    /// The same return from the passage's codec identities alone. Each symbol's column is one
+    /// normal observation per occurrence with feature 1, so its update reads only the per-symbol
+    /// sum of the returned covectors and the occurrence count; no encoded row or producing
+    /// column copy is read. The column is updated at its contemporary material.
+    pub fn prepare_symbol_return(
+        &self,
+        symbols: &[usize],
+        anchor_covector: &ResidentNormalEnclosureSection<'c>,
+        step_bits: u32,
+    ) -> Result<IncidentEncoderUpdate<'c>> {
+        if anchor_covector.rows() != symbols.len()
             || anchor_covector.components() != 2 * self.width
             || anchor_covector.grain() != self.grain
             || step_bits > 120
@@ -180,7 +259,7 @@ impl<'c> IncidentEncoder<'c> {
             return Err(invalid("encoder native anchor covector chart"));
         }
         let mut occurrences: BTreeMap<usize, Vec<usize>> = BTreeMap::new();
-        for (row, &symbol) in producing.symbols.iter().enumerate() {
+        for (row, &symbol) in symbols.iter().enumerate() {
             occurrences.entry(symbol).or_default().push(row);
         }
         let mut columns = Vec::with_capacity(occurrences.len());
@@ -236,9 +315,6 @@ impl<'c> IncidentEncoder<'c> {
             *position = old_to_new[*position];
         }
         Ok(IncidentCodecPermutation { old_to_new })
-    }
-    pub fn permute(&mut self, old_to_new: &[usize]) -> Result<IncidentCodecPermutation> {
-        self.rechart(old_to_new.to_vec())
     }
     /// Admit source-only material for new stable identities.  Existing columns
     /// and their normal statistics are untouched; no historical zero target is
@@ -369,34 +445,6 @@ impl<'c> IncidentEncoder<'c> {
             identities[position] = identity;
         }
         Ok((rests, identities))
-    }
-    pub fn remount(
-        surface: &'c ResidentSurface<'c>,
-        rests: Vec<NormalMaterialRest>,
-    ) -> Result<Self> {
-        let count = rests.len();
-        let first = rests.first().ok_or_else(|| invalid("empty encoder rest"))?;
-        let width = first.targets();
-        let grain = first.grain();
-        if rests.iter().any(|r| {
-            r.source_chart().complex_sources() != Some(1)
-                || r.targets() != width
-                || r.grain() != grain
-        }) {
-            return Err(invalid("encoder diagonal normal rest chart"));
-        }
-        let columns = rests
-            .into_iter()
-            .map(|r| r.remount(surface))
-            .collect::<std::result::Result<_, _>>()?;
-        Ok(Self {
-            surface,
-            columns,
-            width,
-            grain,
-            positions: (0..count).enumerate().map(|(p, id)| (id, p)).collect(),
-            seed: None,
-        })
     }
     pub fn remount_with_identities(
         surface: &'c ResidentSurface<'c>,

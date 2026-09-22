@@ -1,4 +1,5 @@
 use super::*;
+use holonic_engine::native_ecology::constitutive_fibre::ResidentNormalEnclosureSection;
 #[path = "../../../../examples/support/generator_machine.rs"]
 mod generator_machine;
 
@@ -24,14 +25,12 @@ fn release_preview(session: &mut NativeFieldSession<'_>) -> Result<()> {
     assert_eq!(session.generator.as_ref().unwrap().next_event, clock);
     Ok(())
 }
-fn snapshot(session: &NativeFieldSession<'_>, id: u64) -> Value {
-    let pending = &session.generator.as_ref().unwrap().pending[&id];
-    let (start, cells) = pending.source_clock();
-    json!({"source":pending.encoded.rows.inspect_rows().unwrap(),
-        "phase":pending.response_phases().output().inspect_rows().unwrap(),
-        "text":pending.received().text_logits.inspect_rows().unwrap(),
-        "stop":pending.received().support_logits.inspect_rows().unwrap(),
-        "binding":pending.response_phases().binding(),"start":start,"cells":cells})
+/// The contemporary reading of an outstanding comparison without its clock origin, which only
+/// names witnesses: two comparisons of the same passage read at one cut must agree on it.
+fn snapshot(session: &mut NativeFieldSession<'_>, id: u64) -> Value {
+    let mut reading = session.generator_contemporary_reading(id).unwrap();
+    reading.as_object_mut().unwrap().remove("start");
+    reading
 }
 
 #[test]
@@ -71,17 +70,17 @@ fn generator_source_aperture_is_not_machine_population_or_legacy_slots() {
 }
 
 #[test]
-#[ignore = "requires CUDA; public ordered source moment, phase stop, codec growth and restart across an intervening update"]
+#[ignore = "requires CUDA; public ordered source moment, one-cut delayed reading, codec growth and restart"]
 fn generator_session_returns_the_ordered_source_and_reopens_its_moment_comparison() {
     let directory = tempfile::tempdir().unwrap();
     let pending_path = directory.path().join("pending.hna");
     let direct_path = directory.path().join("direct.hna");
     let resumed_path = directory.path().join("resumed.hna");
     let spec = generator_machine::generator_session_spec(2, 6, 2).unwrap();
-    let (id, frozen) = super::super::with_field_session(&spec, |session| {
+    let mut first = request("b", false);
+    first.context = vec!["a".into()];
+    let (id, contemporary) = super::super::with_field_session(&spec, |session| {
         let initial = session.inspect_current()?;
-        let mut first = request("b", false);
-        first.context = vec!["a".into()];
         let result = session.request(&first)?;
         assert_eq!(result["field_sites"], 2);
         assert_eq!(result["source_cells"], 2);
@@ -90,12 +89,30 @@ fn generator_session_returns_the_ordered_source_and_reopens_its_moment_compariso
         assert_eq!(session.inspect_current()?, initial);
         assert_eq!(session.generator.as_ref().unwrap().next_event, 0);
         let id = result["comparison"].as_u64().unwrap();
-        let frozen = snapshot(session, id);
+        let pending = &session.generator.as_ref().unwrap().pending[&id];
+        assert_eq!(pending.source_clock(), (0, 2));
+        // Fixed in N: the alphabet binding only (occurrences of each admitted codec identity).
+        assert_eq!(pending.symbol_counts().iter().sum::<usize>(), 2);
+        assert_eq!(
+            pending.pending_relation_words(),
+            session.presentation.spec.symbols.len()
+        );
+        let produced = snapshot(session, id);
         session.admit_incident_source_texts(&["c".into()])?;
+        // The intervening passage shares a symbol with the held one: its encoder column develops
+        // too, and the held comparison is read through the contemporary encoder table.
         let second = session.request(&request("ba", true))?;
         assert_eq!(session.generator.as_ref().unwrap().next_event, 2);
         session.observe(second["comparison"].as_u64().unwrap(), "a", 8)?;
-        assert_eq!(snapshot(session, id), frozen);
+        // One cut: after an intervening update the outstanding comparison is read at the
+        // contemporary constitution, not at its producing cut ...
+        let contemporary = snapshot(session, id);
+        assert_ne!(contemporary["text"], produced["text"]);
+        // ... and equals a fresh reading of the same passage at that same cut.
+        let fresh = session.request(&first)?;
+        let fresh_id = fresh["comparison"].as_u64().unwrap();
+        assert_eq!(snapshot(session, fresh_id), contemporary);
+        session.release(fresh_id)?;
         let material = session
             .generator
             .as_ref()
@@ -108,10 +125,11 @@ fn generator_session_returns_the_ordered_source_and_reopens_its_moment_compariso
         session.checkpoint(&pending_path, &HnaStreamState::default())?;
         let returned = session.observe(id, "c", 8)?;
         assert_eq!(returned["material_update"], true);
+        assert_eq!(returned["comparison_cut"], "contemporary");
         assert_eq!(session.body.pending_coupled_predictions(), 0);
         release_preview(session)?;
         session.checkpoint(&direct_path, &HnaStreamState::default())?;
-        Ok((id, frozen))
+        Ok((id, contemporary))
     })
     .unwrap();
     let bytes = std::fs::read(&pending_path).unwrap();
@@ -119,7 +137,7 @@ fn generator_session_returns_the_ordered_source_and_reopens_its_moment_compariso
     NativeFieldSavedSession::open(&pending_path)
         .unwrap()
         .with_session(|session, _| {
-            assert_eq!(snapshot(session, id), frozen);
+            assert_eq!(snapshot(session, id), contemporary);
             session.observe(id, "c", 8)?;
             release_preview(session)?;
             session.checkpoint(&resumed_path, &HnaStreamState::default())?;
@@ -130,6 +148,93 @@ fn generator_session_returns_the_ordered_source_and_reopens_its_moment_compariso
         std::fs::read(direct_path).unwrap(),
         std::fs::read(resumed_path).unwrap()
     );
+}
+
+/// A delayed observe and an immediate observe of the same passage at the same cut publish the
+/// same continuing state: the delayed comparison is read, compared and pulled back at the
+/// contemporary constitution, with nothing of its producing cut.
+#[test]
+#[ignore = "requires CUDA; delayed observe equals an immediate observe at one cut"]
+fn generator_delayed_observe_is_one_cut_equal_to_an_immediate_observe() {
+    let spec = generator_machine::generator_session_spec(2, 6, 2).unwrap();
+    let state = |session: &mut NativeFieldSession<'_>| -> Result<Value> {
+        let current = session.inspect_current()?;
+        let rest = session.generator.as_ref().unwrap().rest()?;
+        Ok(
+            json!({"joint":current["joint"],"operator":current["operator"],
+            "encoder":rest.encoder_material,"text":rest.receiver_text,
+            "stop":rest.receiver_support}),
+        )
+    };
+    // The intervening passage shares both symbols with the held one: the encoder columns the
+    // held passage enters through change before it is observed, and the delayed comparison
+    // reads them (and q₀, M, ρ, R) at the contemporary cut.
+    let delayed = super::super::with_field_session(&spec, |session| {
+        let held = session.request(&request("ab", false))?["comparison"]
+            .as_u64()
+            .unwrap();
+        let update = session.request(&request("ba", true))?["comparison"]
+            .as_u64()
+            .unwrap();
+        session.observe(update, "ab", 8)?;
+        session.observe(held, "ba", 8)?;
+        state(session)
+    })
+    .unwrap();
+    let immediate = super::super::with_field_session(&spec, |session| {
+        let update = session.request(&request("ba", true))?["comparison"]
+            .as_u64()
+            .unwrap();
+        session.observe(update, "ab", 8)?;
+        let held = session.request(&request("ab", false))?["comparison"]
+            .as_u64()
+            .unwrap();
+        session.observe(held, "ba", 8)?;
+        state(session)
+    })
+    .unwrap();
+    for key in ["joint", "operator", "encoder", "text", "stop"] {
+        assert_eq!(delayed[key], immediate[key], "{key}");
+    }
+}
+
+#[test]
+fn generator_pending_rest_refuses_the_pre_moment_wire() {
+    let spec = generator_machine::generator_session_spec(2, 6, 2).unwrap();
+    let current = rest::GeneratorPendingRest {
+        id: 3,
+        receiver_binding: spec.generator.as_ref().unwrap().receiver.clone(),
+        start: 0,
+        cells: 2,
+        symbol_counts: vec![1, 1],
+        record: GeneratorRetainedRecord {
+            request_extent: 2,
+            response_aperture: 2,
+            output_symbols: 4,
+            producing_epoch: 0,
+            held_parts: 0,
+            held_text_sha256: held_text_digest(""),
+            exposure_pairing: None,
+        },
+    };
+    let wire = serde_json::to_value(&current).unwrap();
+    assert_eq!(
+        serde_json::from_value::<rest::GeneratorPendingRest>(wire.clone()).unwrap(),
+        current
+    );
+    for field in [
+        "encoded_rows",
+        "frozen_text",
+        "encoded_producing_material",
+        "preparation",
+    ] {
+        let mut old = wire.clone();
+        old[field] = json!([1, 2, 3]);
+        let error = serde_json::from_value::<rest::GeneratorPendingRest>(old)
+            .unwrap_err()
+            .to_string();
+        assert!(error.contains("pre-moment wire"), "{field}: {error}");
+    }
 }
 
 #[test]
@@ -212,5 +317,109 @@ fn generator_session_learns_pair_response_without_accumulating_completed_returns
             Ok(())
         },
     )
+    .unwrap();
+}
+
+/// The session's pending comparison is fixed in the passage length: its rest (clock, length,
+/// receiving binding, alphabet binding) and the body's retained source Holon (per-symbol sums).
+#[test]
+#[ignore = "requires CUDA; prints pending octets against passage length"]
+fn generator_pending_is_fixed_in_the_passage_length() {
+    let spec = generator_machine::generator_session_spec(2, 128, 2).unwrap();
+    super::super::with_field_session(&spec, |session| {
+        let mut sizes = Vec::new();
+        for n in [2usize, 8, 32, 128] {
+            let text = "ab".repeat(n / 2);
+            let id = session.request(&request(&text, false))?["comparison"]
+                .as_u64()
+                .unwrap();
+            let rest = session.generator.as_ref().unwrap().rest()?;
+            let pending = rest.pending.iter().find(|p| p.id == id).unwrap();
+            let session_octets = serde_json::to_vec(pending)?.len();
+            let body = session.body.generator_comparison_census(id)?;
+            assert!(session.presentation.retained_shared.is_empty());
+            // End to end: the whole public checkpoint with the comparison held, minus after its
+            // release (the request did not commit, so q/b and material are unchanged).
+            let directory = tempfile::tempdir()?;
+            let held_path = directory.path().join("held.hna");
+            let released_path = directory.path().join("released.hna");
+            session.checkpoint(&held_path, &HnaStreamState::default())?;
+            session.release(id)?;
+            session.checkpoint(&released_path, &HnaStreamState::default())?;
+            let checkpoint_octets = std::fs::metadata(&held_path)?.len() as i64
+                - std::fs::metadata(&released_path)?.len() as i64;
+            eprintln!(
+                "PENDING-VS-N {}",
+                json!({"cells":n,"session_octets":session_octets,"body":body,
+                    "checkpoint_octets":checkpoint_octets})
+            );
+            sizes.push((session_octets, body["octets"].as_u64().unwrap()));
+        }
+        assert!(sizes.windows(2).all(|w| w[0].1 == w[1].1), "{sizes:?}");
+        // The session rest varies only in the decimal width of `cells`/counts.
+        assert!(
+            sizes.iter().all(|s| s.0.abs_diff(sizes[0].0) <= 8),
+            "{sizes:?}"
+        );
+        Ok(())
+    })
+    .unwrap();
+}
+
+/// Silent-source control: a passage whose encoder table is zero adds no moment and no
+/// condition, so each commit publishes the incident word acting on the standing current alone.
+/// Reports the committed current's energy per commit and the ratio to the previous commit.
+#[test]
+#[ignore = "requires CUDA; prints the committed current's energy under a silent source"]
+fn generator_silent_source_commit_energy() {
+    let spec = generator_machine::generator_session_spec(2, 6, 2).unwrap();
+    super::super::with_field_session(&spec, |session| {
+        // Seed a nonzero standing with one ordinary committed passage, then go silent.
+        session.request(&FieldSectionRequest {
+            retain_comparison: false,
+            ..request("ab", true)
+        })?;
+        let options = spec.generator.as_ref().unwrap().clone();
+        let sites = options.field.machine.sites().len();
+        let alphabet = session.presentation.spec.symbols.len();
+        let width = options.source.injection_sites.len() * 6;
+        let mut previous: Option<f64> = None;
+        for commit in 0..40u64 {
+            let table = Rc::new(
+                ResidentNormalEnclosureSection::zeros(
+                    session.surface,
+                    alphabet,
+                    width,
+                    ResidentGrain(spec.fractional_bits),
+                )
+                .map_err(invalid)?,
+            );
+            let start = session.generator.as_ref().unwrap().next_event;
+            let generated = session.body.prepare_generator_symbol_episode(
+                table,
+                &[0, 1],
+                options.source.clone(),
+                start,
+                Vec::new(),
+            )?;
+            session
+                .body
+                .publish_incident_field(generated, true, false)?;
+            session.generator.as_mut().unwrap().next_event += 2;
+            let current = session.body.inspect_current()?;
+            let energies = super::super::measurement::site_energies(&current["joint"], sites);
+            let total = energies.iter().flatten().sum::<f64>();
+            let radius: relational_geometry::Rat =
+                serde_json::from_value(current["joint"]["radius"].clone()).unwrap();
+            eprintln!(
+                "SILENT {}",
+                json!({"commit":commit,"energy":total,"sites":energies,
+                    "ratio":previous.map(|p| total / p),"radius":radius.to_string(),
+                    "rebase":current.get("rebase_residual")})
+            );
+            previous = Some(total);
+        }
+        Ok(())
+    })
     .unwrap();
 }

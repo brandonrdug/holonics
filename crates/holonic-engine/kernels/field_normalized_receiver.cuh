@@ -330,3 +330,92 @@ extern "C" __global__ __launch_bounds__(512) void section_rows_normalized_pullba
     for(size_t j=0;j<20u*(size_t)nodes;++j)report_hi[report_at+j]=report_lo[report_at+j];
     for(size_t j=0;j<stride;++j)potential_hi[at+j]=potential[at+j];
 }
+
+// ---------------------------------------------------------------------------------------------
+// the complex receiving potential: its phase face and the ratio's logarithmic covector
+// ---------------------------------------------------------------------------------------------
+//
+// A potential row s is complex. Its amplitude is psi_c = exp(s_c/2)/sqrt(Z), Z = sum exp(Re s),
+// so the magnitude face is p = softmax(Re s) (the normalized receiver above, unchanged) and the
+// phase face is phi_c = Im s_c / 2 exactly: Z is real and carries no phase. Neither kernel runs a
+// second softmax; both read the face report or the potential ball the receiver already owns.
+
+__device__ wide normalized_floor_half(wide x){return x>>1;}
+__device__ wide normalized_ceil_half(wide x){return (x>>1)+(x&1);}
+
+// phi = Im s / 2, returned as an enclosure operand of the same chart: phi in the real slot,
+// exactly zero in the imaginary one, the row radius the sum of the outward half widths.
+extern "C" __global__ __launch_bounds__(512) void section_rows_normalized_phase(
+    const int64_t *potential,const int64_t *potential_hi,uint32_t rows,uint32_t nodes,uint32_t grain,
+    int64_t *phase,int64_t *phase_hi,int64_t *flags,
+    uint32_t *global_slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
+) {
+    if(threadIdx.x)return;uint32_t row=blockIdx.x;if(row>=rows)return;uint32_t *slot=(uint32_t *)(flags+(SLOT_WORDS/2u)*(size_t)row);for(uint32_t i=0;i<SLOT_WORDS;++i)slot[i]=0;
+    if(upstream_refused(census,lineage,lineage_count,slot))return;(void)global_slot;
+    if(!nodes||grain<1||grain>120){atomicOr(slot,REFUSED_MALFORMED);return;}
+    const size_t stride=2u*(2u*(size_t)nodes+1u),at=(size_t)row*stride;
+    if(!normalized_row_is_point(potential,potential_hi,at,stride,slot))return;
+    const wide *s=(const wide *)(potential+at);wide *out=(wide *)(phase+at);
+    const wide r=s[2u*nodes];if(r<0){atomicOr(slot,REFUSED_MALFORMED);return;}
+    wide radius=0;
+    for(uint32_t c=0;c<nodes;++c){
+        wide lo=normalized_floor_half(sub_checked(s[2u*c+1u],r,slot));
+        wide hi=normalized_ceil_half(add_checked(s[2u*c+1u],r,slot));
+        wide half=add_checked(sub_checked(hi,lo,slot),1,slot)>>1;
+        out[2u*c]=add_checked(lo,half,slot);out[2u*c+1u]=0;radius=add_checked(radius,half,slot);
+    }
+    out[2u*nodes]=radius;
+    if(*slot)return;
+    for(size_t j=0;j<stride;++j)phase_hi[at+j]=phase[at+j];
+}
+
+// The comparison of the Holon ratio on the produced potentials, read from a compared face report
+// (p at [0,1], q at [2,3], q-p at [4,5]), the produced and target potential balls and a per-row
+// branch ball (2 pi n_j in its real slot). With
+//   l_c = (1/2)log(q_c/p_c) + i Delta_c,   Delta_c = phi^T_c - phi^H_c + 2 pi n_j,  phi = Im s / 2,
+// Im l is an oriented displacement, not a cost; the comparison descends the magnitude:
+//   real part:  -dKL/dRe s_c = q_c - p_c                                   (the existing covector)
+//   phase part: -d/dIm s_c [ (1/2) sum q Delta^2 ] = (1/2) q_c Delta_c      (dphi^H/dIm s = 1/2)
+// The real slot carries q-p and the imaginary slot (1/2) q Delta. It vanishes when the target and
+// produced phases agree on the branch, reverses with the gap, and is zero on unsupported classes.
+extern "C" __global__ __launch_bounds__(512) void section_rows_ratio_covector(
+    const int64_t *report,const int64_t *produced,const int64_t *produced_hi,
+    const int64_t *target,const int64_t *target_hi,const int64_t *branch,const int64_t *branch_hi,
+    uint32_t rows,uint32_t nodes,uint32_t grain,
+    int64_t *covector,int64_t *covector_hi,int64_t *flags,
+    uint32_t *global_slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
+) {
+    if(threadIdx.x)return;uint32_t row=blockIdx.x;if(row>=rows)return;uint32_t *slot=(uint32_t *)(flags+(SLOT_WORDS/2u)*(size_t)row);for(uint32_t i=0;i<SLOT_WORDS;++i)slot[i]=0;
+    if(upstream_refused(census,lineage,lineage_count,slot))return;(void)global_slot;
+    if(!nodes||grain<1||grain>120){atomicOr(slot,REFUSED_MALFORMED);return;}
+    const size_t stride=2u*(2u*(size_t)nodes+1u),at=(size_t)row*stride,report_at=(size_t)row*20u*(size_t)nodes;
+    const size_t branch_stride=6u,branch_at=(size_t)row*branch_stride;
+    if(!normalized_row_is_point(produced,produced_hi,at,stride,slot)
+       ||!normalized_row_is_point(target,target_hi,at,stride,slot)
+       ||!normalized_row_is_point(branch,branch_hi,branch_at,branch_stride,slot))return;
+    const wide *o=(const wide *)(report+report_at),unit=(wide)1<<grain;wide *out=(wide *)(covector+at);
+    const wide *h=(const wide *)(produced+at),*t=(const wide *)(target+at),*b=(const wide *)(branch+branch_at);
+    const wide rh=h[2u*nodes],rt=t[2u*nodes],rb=b[2];
+    if(rh<0||rt<0||rb<0){atomicOr(slot,REFUSED_MALFORMED);return;}
+    const wide branch_lo=sub_checked(b[0],rb,slot),branch_hi_value=add_checked(b[0],rb,slot);
+    wide radius=0;
+    for(uint32_t c=0;c<nodes;++c){
+        const wide *v=o+10u*c;
+        if(v[2]<0||v[3]>unit||v[3]<v[2]||v[5]<v[4]){atomicOr(slot,REFUSED_MALFORMED);return;}
+        const wide h_lo=normalized_floor_half(sub_checked(h[2u*c+1u],rh,slot));
+        const wide h_hi=normalized_ceil_half(add_checked(h[2u*c+1u],rh,slot));
+        const wide t_lo=normalized_floor_half(sub_checked(t[2u*c+1u],rt,slot));
+        const wide t_hi=normalized_ceil_half(add_checked(t[2u*c+1u],rt,slot));
+        const wide gap_lo=add_checked(sub_checked(t_lo,h_hi,slot),branch_lo,slot);
+        const wide gap_hi=add_checked(sub_checked(t_hi,h_lo,slot),branch_hi_value,slot);
+        wide phase_lo,phase_hi;normalized_interval_product(v[2],v[3],gap_lo,gap_hi,grain,&phase_lo,&phase_hi,slot);
+        phase_lo=normalized_floor_half(phase_lo);phase_hi=normalized_ceil_half(phase_hi);
+        wide real_half=add_checked(sub_checked(v[5],v[4],slot),1,slot)>>1;
+        wide imag_half=add_checked(sub_checked(phase_hi,phase_lo,slot),1,slot)>>1;
+        out[2u*c]=add_checked(v[4],real_half,slot);out[2u*c+1u]=add_checked(phase_lo,imag_half,slot);
+        radius=add_checked(radius,add_checked(real_half,imag_half,slot),slot);
+    }
+    out[2u*nodes]=radius;
+    if(*slot)return;
+    for(size_t j=0;j<stride;++j)covector_hi[at+j]=covector[at+j];
+}

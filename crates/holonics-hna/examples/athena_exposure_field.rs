@@ -225,7 +225,10 @@ fn target(
     })
 }
 
-#[derive(Clone)]
+/// The driver's own record of a held request. On the generator chart the session keeps only
+/// digests of it; the driver persists these (private sidecar beside its checkpoint) and the
+/// session confirms them on resume.
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
 struct Pending {
     family: ExposureFamily,
     request_events: Vec<u64>,
@@ -250,6 +253,43 @@ struct Walk {
     /// Exterior observer of the generator chart's returns; never enters the session.
     observer: ExteriorReturnObserver,
     readings: Vec<Value>,
+    /// Held requests at the end of the walk (the driver's own pairing state), and those read
+    /// back from the resumed checkpoint's sidecar.
+    held: Vec<Pending>,
+    resumed: Vec<Pending>,
+}
+
+/// The driver's private pairing sidecar of a checkpoint: request text and events it owns.
+fn pairing_sidecar(checkpoint: &Path) -> PathBuf {
+    let mut path = checkpoint.as_os_str().to_owned();
+    path.push(".pairings.json");
+    PathBuf::from(path)
+}
+
+fn write_pairing_sidecar(
+    checkpoint: &Path,
+    held: &[Pending],
+) -> Result<(), Box<dyn std::error::Error>> {
+    let bytes = serde_json::to_vec(held)?;
+    let mut create = std::fs::OpenOptions::new();
+    create.write(true).create(true).truncate(true);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        create.mode(0o600);
+    }
+    create
+        .open(pairing_sidecar(checkpoint))?
+        .write_all(&bytes)?;
+    Ok(())
+}
+
+fn read_pairing_sidecar(checkpoint: &Path) -> Result<Vec<Pending>, Box<dyn std::error::Error>> {
+    match std::fs::read(pairing_sidecar(checkpoint)) {
+        Ok(bytes) => Ok(serde_json::from_slice(&bytes)?),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(Vec::new()),
+        Err(error) => Err(error.into()),
+    }
 }
 
 impl Walk {
@@ -289,6 +329,37 @@ fn walk(
             response_symbols: pairing.response_symbols,
         })
         .collect();
+    // Generator chart: the session holds digests only; confirm the driver's own records.
+    for (comparison, family, response_symbols) in session.retained_generator_exposures() {
+        let Some(held) = state
+            .resumed
+            .iter()
+            .find(|held| held.comparison == comparison)
+            .cloned()
+        else {
+            // No driver record can pair this comparison: release it rather than hold it forever.
+            session.release(comparison)?;
+            state.released_on_open += 1;
+            state.count("unpaired-request-released");
+            continue;
+        };
+        let confirmed = session.confirm_exposure_pairing(
+            comparison,
+            family,
+            held.request_events.clone(),
+            held.request.clone(),
+        )?;
+        if confirmed.response_symbols != response_symbols {
+            return Err("confirmed generator pairing response extent".into());
+        }
+        pending.push(Pending {
+            family: confirmed.family,
+            request_events: confirmed.request_events,
+            comparison,
+            request: confirmed.request_text,
+            response_symbols,
+        });
+    }
     session.attach_exposure_cursor(reader.cursor());
     while state.frames < options.frames {
         let Some(frame) = reader.peek()? else { break };
@@ -561,6 +632,7 @@ fn walk(
     state.context_lookup_octets = context_stats.lookup_octets;
     // Outstanding retained comparisons remain in the session rest and are retried by a later
     // process; dropping them would detach the source cursor from its producing cut.
+    state.held = pending;
     Ok(())
 }
 
@@ -656,10 +728,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         context_lookup_octets: 0,
         observer: ExteriorReturnObserver::default(),
         readings: Vec::new(),
+        held: Vec::new(),
+        resumed: Vec::new(),
     };
     let start = Instant::now();
     let anatomy = match (&options.resume, &options.exposure, &options.spec) {
         (Some(session), None, None) => {
+            state.resumed = read_pairing_sidecar(session)?;
             let saved = NativeFieldSavedSession::open(session)?;
             let cursor = saved
                 .exposure_cursor()
@@ -673,6 +748,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     holonics_hna::native::NativeSessionError::Application(error.to_string())
                 })?;
                 session.checkpoint(&options.checkpoint, &HnaStreamState::default())?;
+                write_pairing_sidecar(&options.checkpoint, &state.held).map_err(|error| {
+                    holonics_hna::native::NativeSessionError::Application(error.to_string())
+                })?;
                 Ok(session.inspect())
             })?
         }
@@ -684,6 +762,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     holonics_hna::native::NativeSessionError::Application(error.to_string())
                 })?;
                 session.checkpoint(&options.checkpoint, &HnaStreamState::default())?;
+                write_pairing_sidecar(&options.checkpoint, &state.held).map_err(|error| {
+                    holonics_hna::native::NativeSessionError::Application(error.to_string())
+                })?;
                 Ok(session.inspect())
             })?
         }
@@ -847,6 +928,8 @@ mod tests {
             context_lookup_octets: 0,
             observer: ExteriorReturnObserver::default(),
             readings: Vec::new(),
+            held: Vec::new(),
+            resumed: Vec::new(),
         }
     }
     fn app_error(error: Box<dyn std::error::Error>) -> holonics_hna::native::NativeSessionError {

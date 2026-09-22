@@ -113,3 +113,78 @@ fn source_maps_mount_one_fixed_step_row_per_site() {
     assert_eq!(maps.source_count(), 3);
     assert_eq!(maps.next_event(), 0);
 }
+
+/// Host-exact law: the composite powers reproduce `N` stepped injections exactly,
+/// `L^N q₀ + Σ_k L^(N−1−k) E_k = (… (L q₀ + E_0) …)`, under a nonidentity rotation with a
+/// translation-bearing step. The current is a tangent: the translation acts only on the
+/// configuration chart `U^N`.
+#[test]
+fn moment_powers_equal_repeated_steps_exactly() {
+    use relational_geometry::cayley_rotation_z;
+    let step = AffineMap3 {
+        linear: cayley_rotation_z(&(r(1) / r(2))),
+        translation: RatVec3::new(r(1) / r(16), r(-3), r(1) / r(5)),
+    };
+    let still = AffineMap3 {
+        linear: cayley_rotation_z(&(r(1) / r(3))),
+        translation: RatVec3::zero(),
+    };
+    let n = 11usize;
+    let cells = (0..n as i64)
+        .map(|k| RatVec3::new(r(k % 5 + 1), r(2 - k % 3), r(k % 7) / r(4)))
+        .collect::<Vec<_>>();
+    let q0 = RatVec3::new(r(7), r(-2), r(3) / r(8));
+    let powers = moment_powers(&[still.clone(), step.clone()], &[1], n).unwrap();
+    let mut stepped = q0.clone();
+    for cell in &cells {
+        stepped = step.linear.apply(&stepped).add(cell);
+    }
+    let mut closed = powers.standing()[1].apply(&q0);
+    for (k, cell) in cells.iter().enumerate() {
+        closed = closed.add(&powers.injection(0, n - 1 - k).unwrap().apply(cell));
+    }
+    assert_eq!(stepped, closed);
+    // Powers exist only for injection sites; the standing covers every site.
+    assert!(powers.injection(1, 0).is_none());
+    assert_eq!(powers.standing().len(), 2);
+    assert_eq!(
+        powers.configuration()[0],
+        super::super::machine_receiving::signed_affine_power(&still, n as i64).unwrap()
+    );
+    // Chart separation: the standing current carries no translation, the configuration does.
+    assert_eq!(powers.standing()[1].translation, RatVec3::zero());
+    assert_eq!(
+        powers.configuration()[1],
+        super::super::machine_receiving::signed_affine_power(&step, n as i64).unwrap()
+    );
+    assert_eq!(
+        powers.standing()[1].linear,
+        powers.configuration()[1].linear
+    );
+    // With no source, the standing current keeps its norm under the rotating step however
+    // many steps are taken, while the configuration moves with the translation.
+    let norm = |v: &RatVec3| &v.x * &v.x + &v.y * &v.y + &v.z * &v.z;
+    let lifted = moment_powers(&[step.clone()], &[0], 128).unwrap();
+    assert_eq!(norm(&lifted.standing()[0].apply(&q0)), norm(&q0));
+    assert_ne!(norm(&lifted.configuration()[0].apply(&q0)), norm(&q0));
+    // A permutation of the passage changes the moment under the rotating phase.
+    let permuted = [0usize, 2, 1, 3]
+        .iter()
+        .map(|&k| cells[k].clone())
+        .collect::<Vec<_>>();
+    let moment = |cells: &[RatVec3]| {
+        let powers = moment_powers(&[step.clone()], &[0], cells.len()).unwrap();
+        cells
+            .iter()
+            .enumerate()
+            .fold(RatVec3::zero(), |acc, (k, cell)| {
+                acc.add(
+                    &powers
+                        .injection(0, cells.len() - 1 - k)
+                        .unwrap()
+                        .apply(cell),
+                )
+            })
+    };
+    assert_ne!(moment(&cells[..4]), moment(&permuted));
+}

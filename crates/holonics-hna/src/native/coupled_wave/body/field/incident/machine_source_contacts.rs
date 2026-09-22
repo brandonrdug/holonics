@@ -1,10 +1,14 @@
 //! Resident source-cell contact contrasts for the fixed generator machine.
 //!
 //! Source cells and generator sites are distinct populations.  The directed contact kinds and
-//! declared ordered offsets enter as one pooled linear condition on the fixed source-role sites;
-//! its transpose needs only the declared relation, never the encoded rows.  It does not infer a
+//! declared ordered offsets enter as one phase-weighted linear condition on the fixed source-role
+//! sites: each directed difference is carried by the machine phase at its receiving cell, with
+//! the same composite powers as the source moment.  Its transpose needs only the declared
+//! relation and those coefficients, never the encoded rows.  It does not infer a
 //! graph from first moments or turn a source cell into a machine site.
 
+use super::machine_source::MachineSourceMaps;
+use super::machine_transport::MachineValueTransport;
 use super::*;
 use holonic_engine::native_ecology::constitutive_fibre::ResidentNormalEnclosureSection;
 use serde::{Deserialize, Serialize};
@@ -359,7 +363,7 @@ pub(super) fn source_ports(
     Ok(ports)
 }
 
-fn validate_pooled(
+pub(super) fn validate_pooled(
     rows: usize,
     components: usize,
     injection_indices: &[usize],
@@ -393,6 +397,18 @@ fn validate_pooled(
     Ok(())
 }
 
+/// Number of directed contacts pooled into each declared kind port, in declared kind order.
+/// This fixed-size count is what a retained comparison keeps of the per-edge relation.
+pub(super) fn contact_counts(
+    kinds: &[GeneratorSourceContactKind],
+    contacts: &[GeneratorSourceContact],
+) -> Vec<usize> {
+    kinds
+        .iter()
+        .map(|kind| contacts.iter().filter(|c| c.kind == *kind).count())
+        .collect()
+}
+
 /// Directed pairs `(from, to)` of one port over a passage of `rows` cells.
 fn port_edges(
     port: GeneratorSourcePort,
@@ -411,14 +427,89 @@ fn port_edges(
     }
 }
 
-/// Pooled directed source condition, `c_p = Σ_(from→to ∈ p) (E(u_to) − E(u_from))`, placed on
-/// the fixed injection-site rows: `G × 12P`. Returns `None` for a field without condition ports.
-/// An offset port telescopes to the last δ cells minus the first δ cells under identity phases;
-/// that ordered linear reading separates `[a,b]` from `[b,a]` without any bilinear tensor.
-pub(super) fn pooled_source_condition<'c>(
+/// `(injection position i, N−1−to)` for every edge, edge-major: the phase at each edge's cell.
+fn edge_phase_rows(to: &[usize], rows: usize, sites: usize) -> Vec<(usize, usize)> {
+    to.iter()
+        .flat_map(|&t| (0..sites).map(move |i| (i, rows - 1 - t)))
+        .collect()
+}
+
+/// Per-port, per-symbol phase-weighted sums of the directed condition over the present
+/// symbols `a_j` of the passage (sorted, as returned by `symbol_moment_sums`), rows
+/// `(p·J + j)·S + i`:
+///
+/// `D_(p,a,i) = Σ_((from→to) ∈ p, u_to = a) L_(s_i)^(N−1−to) − Σ_((from→to) ∈ p, u_from = a) L_(s_i)^(N−1−to)`.
+///
+/// Because `c_p` is linear in the encoder table, `c_p = Σ_a D_(p,a,·) I E(a)` exactly: one
+/// `|A|×S` operator per port suffices, fixed in `N`; no symbol-pair sum is needed. Its
+/// transpose to the table is `Σ_p D_(p,a,i)ᵀ g_(p, s_i)`.
+pub(super) fn port_symbol_sums(
+    maps: &MachineSourceMaps<'_>,
+    symbols: &[usize],
+    present: &[usize],
+    alphabet: usize,
+    ports: &[GeneratorSourcePort],
+    contacts: &[GeneratorSourceContact],
+) -> Result<Vec<relational_geometry::RatMat3>> {
+    use super::machine_source::{add_matrix, zero_matrix};
+    let n = symbols.len();
+    let s = maps.injection_indices().len();
+    if n != maps.source_count() || alphabet == 0 || symbols.iter().any(|a| *a >= alphabet) {
+        return Err(invalid("generator symbol passage"));
+    }
+    validate_pooled(
+        n,
+        s * 6,
+        maps.injection_indices(),
+        maps.site_count(),
+        ports,
+        contacts,
+    )?;
+    let symbols = symbols
+        .iter()
+        .map(|a| present.binary_search(a))
+        .collect::<std::result::Result<Vec<_>, _>>()
+        .map_err(|_| invalid("generator symbol presence"))?;
+    let alphabet = present.len();
+    let rows = ports
+        .len()
+        .checked_mul(alphabet)
+        .and_then(|r| r.checked_mul(s))
+        .ok_or_else(|| invalid("source condition symbol sum extent"))?;
+    let mut sums = Vec::new();
+    sums.try_reserve_exact(rows)
+        .map_err(|_| invalid("source condition symbol sum allocation"))?;
+    sums.resize(rows, zero_matrix());
+    let powers = maps.powers()?;
+    for (p, port) in ports.iter().enumerate() {
+        let (from, to) = port_edges(*port, contacts, n);
+        for (&f, &t) in from.iter().zip(&to) {
+            for i in 0..s {
+                let power = powers
+                    .injection(i, n - 1 - t)
+                    .ok_or_else(|| invalid("generator moment phase exponent"))?;
+                let target = (p * alphabet + symbols[t]) * s + i;
+                sums[target] = add_matrix(&sums[target], power, false);
+                let source = (p * alphabet + symbols[f]) * s + i;
+                sums[source] = add_matrix(&sums[source], power, true);
+            }
+        }
+    }
+    Ok(sums)
+}
+
+/// Phase-weighted directed source condition on the fixed injection-site rows, `G × 12P`:
+///
+/// `c_p = Σ_((from→to) ∈ p) L^(N−1−to) I (E(u_to) − E(u_from))`,
+///
+/// each directed difference carried by the phase at its receiving cell. An offset port `δ`
+/// has the edges `(k, k+δ)`, `k < N−δ`, so `c_δ = Σ_k L^(N−1−k−δ) I (E(u_(k+δ)) − E(u_k))`.
+/// Under a nonidentity phase its two sums carry different phases and do not telescope; only
+/// under the identity phase does it reduce to the last `δ` cells minus the first `δ`. Returns
+/// `None` for a field without condition ports.
+pub(super) fn phase_weighted_source_condition<'c>(
+    maps: &MachineSourceMaps<'c>,
     encoded: &ResidentNormalEnclosureSection<'c>,
-    injection_indices: &[usize],
-    machine_sites: usize,
     ports: &[GeneratorSourcePort],
     contacts: &[GeneratorSourceContact],
 ) -> Result<Option<ResidentNormalEnclosureSection<'c>>> {
@@ -431,26 +522,42 @@ pub(super) fn pooled_source_condition<'c>(
     }
     let n = encoded.rows();
     let width = encoded.components();
+    let injection_indices = maps.injection_indices();
+    let machine_sites = maps.site_count();
+    if n != maps.source_count() {
+        return Err(invalid("source condition passage length"));
+    }
     validate_pooled(n, width, injection_indices, machine_sites, ports, contacts)?;
     let s = injection_indices.len();
     let mut port_rows = Vec::with_capacity(ports.len());
     for port in ports {
         let (from, to) = port_edges(*port, contacts, n);
-        let pooled = if to.is_empty() {
-            ResidentNormalEnclosureSection::zeros(encoded.surface(), 1, width, encoded.grain())?
-        } else {
-            let target = encoded.gather_phase_rows(&to, &identity_phases(to.len()), width)?;
-            let source = encoded.gather_phase_rows(&from, &opposite_phases(from.len()), width)?;
-            target.sum_same_shape(&source)?.scatter_phase_adjoint(
-                &vec![0; to.len()],
-                &identity_phases(to.len()),
-                1,
-            )?
-        };
-        let site_rows = Rc::new(pooled.split_components(s)?).realify()?;
-        port_rows.push(site_rows.output().scatter_phase_adjoint(
-            injection_indices,
-            &identity_phases(s),
+        if to.is_empty() {
+            port_rows.push(ResidentNormalEnclosureSection::zeros(
+                encoded.surface(),
+                machine_sites,
+                12,
+                encoded.grain(),
+            )?);
+            continue;
+        }
+        let target = encoded.gather_phase_rows(&to, &identity_phases(to.len()), width)?;
+        let source = encoded.gather_phase_rows(&from, &opposite_phases(from.len()), width)?;
+        let cells = Rc::new(target.sum_same_shape(&source)?.split_components(s)?).realify()?;
+        let rows = cells.output().rows();
+        let carried = MachineValueTransport::new_with_enclosure(
+            cells.output_handle(),
+            &(0..rows).collect::<Vec<_>>(),
+            maps.phase_coefficients(&edge_phase_rows(&to, n, s), encoded.grain())?,
+            maps.enclosure().clone(),
+        )?;
+        let addresses = to
+            .iter()
+            .flat_map(|_| injection_indices.iter().copied())
+            .collect::<Vec<_>>();
+        port_rows.push(carried.output().scatter_phase_adjoint(
+            &addresses,
+            &identity_phases(rows),
             machine_sites,
         )?);
     }
@@ -469,17 +576,18 @@ pub(super) fn pooled_source_condition<'c>(
     Ok(Some(output))
 }
 
-/// Transpose of `pooled_source_condition`: the `G × 12P` condition covector returns to the
-/// `N × 6S` encoded chart. Each cell receives the port covector times its net directed
-/// multiplicity; no encoded value is read.
-pub(super) fn pull_back_pooled_source_condition<'c>(
+/// Transpose of `phase_weighted_source_condition`: the `G × 12P` condition covector returns to
+/// the `N × 6S` encoded chart. Edge `(from→to)` of port `p` receives `(L^(N−1−to))ᵀ g_p` at
+/// `to` and its negative at `from`; no encoded value is read.
+pub(super) fn pull_back_phase_weighted_source_condition<'c>(
+    maps: &MachineSourceMaps<'c>,
     covector: &ResidentNormalEnclosureSection<'c>,
-    rows: usize,
-    injection_indices: &[usize],
-    machine_sites: usize,
     ports: &[GeneratorSourcePort],
     contacts: &[GeneratorSourceContact],
 ) -> Result<ResidentNormalEnclosureSection<'c>> {
+    let rows = maps.source_count();
+    let injection_indices = maps.injection_indices();
+    let machine_sites = maps.site_count();
     let s = injection_indices.len();
     let width = s
         .checked_mul(6)
@@ -496,25 +604,37 @@ pub(super) fn pull_back_pooled_source_condition<'c>(
     if p == 0 || covector.rows() != machine_sites || covector.components() != 12 * p {
         return Err(invalid("source condition adjoint chart"));
     }
+    let grain = covector.grain();
     let site_port = covector.split_components(p)?;
-    let mut total =
-        ResidentNormalEnclosureSection::zeros(covector.surface(), rows, width, covector.grain())?;
+    let mut total = ResidentNormalEnclosureSection::zeros(covector.surface(), rows, width, grain)?;
     for (index, port) in ports.iter().enumerate() {
         let (from, to) = port_edges(*port, contacts, rows);
         if to.is_empty() {
             continue;
         }
-        let addresses = injection_indices
+        let addresses = to
             .iter()
-            .map(|site| site * p + index)
+            .flat_map(|_| injection_indices.iter().map(|site| site * p + index))
             .collect::<Vec<_>>();
-        let site_rows = site_port.gather_phase_rows(&addresses, &identity_phases(s), 12)?;
-        let pooled = Rc::new(site_rows)
+        let edge_rows = addresses.len();
+        let gathered = site_port.gather_phase_rows(&addresses, &identity_phases(edge_rows), 12)?;
+        // The affine and realification adjoints read only coefficients.
+        let zero = Rc::new(ResidentNormalEnclosureSection::zeros(
+            covector.surface(),
+            edge_rows,
+            12,
+            grain,
+        )?);
+        let carried = MachineValueTransport::new_with_enclosure(
+            zero,
+            &(0..edge_rows).collect::<Vec<_>>(),
+            maps.phase_coefficients(&edge_phase_rows(&to, rows, s), grain)?,
+            maps.enclosure().clone(),
+        )?;
+        let edges = Rc::new(carried.pull_back(&gathered)?)
             .decode_realification()?
             .output()
             .pack_components(s)?;
-        let edges =
-            pooled.gather_phase_rows(&vec![0; to.len()], &identity_phases(to.len()), width)?;
         let target = edges.scatter_phase_adjoint(&to, &identity_phases(to.len()), rows)?;
         let source = edges.scatter_phase_adjoint(&from, &opposite_phases(from.len()), rows)?;
         total = total.sum_same_shape(&target)?.sum_same_shape(&source)?;

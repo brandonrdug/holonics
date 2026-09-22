@@ -1,33 +1,39 @@
-//! Exterior observer readings of a completed generator request/observe, in bits.
+//! Exterior observer readings of a completed generator request/observe.
 //!
 //! These are readings of the same kind as a timing or a byte count. Nothing in the machine reads
-//! them, nothing blocks on them, and they are not a loss, a threshold or a gate: the paired
-//! adjoint remains the learning law. Floating point is used only here, on host copies of exact
-//! readouts, and never enters a resident section.
+//! them, nothing blocks on them, and they are not a gate: the paired adjoint remains the learning
+//! law. Floating point is used only here, on host copies of exact readouts, and never enters a
+//! resident section. A receipt is a field of readings over the machine's parts, not one scalar.
 //!
-//! * `H_src`: `N log2|A|` for the admitted exterior codec alphabet, plus the order-0/order-1
-//!   empirical code length of the exposure stream the observer has seen.
-//! * `L_target|model`: `Σ_j −log2 p_j(t_j)` plus the stop/continue term, where `p` is the
-//!   producing receiver's normalized exponential face (`NativeNormalizedSection::read_participation`
-//!   of the forward `text_face`/`support_face`; the delayed comparison's prediction is the same
-//!   normalized exponential of the same real potentials), read through the pending comparison's
-//!   read-only `received()` accessor.
-//! * `B_state`: reduced numerator/denominator bit lengths of the continuing exact carriers
-//!   (pair amplitudes, joint q/b, reaction material M, source map E, text map R, stop map).
-//! * `B_pending`: checkpoint octets with the comparison held minus without it, from the public
-//!   `checkpoint`.
-//! * navigation: machine steps per site and exact winding where a closure witness exists.
-//! * a `CostReceipt` (`holonic_engine::presentation_cost`) with provenance per coordinate.
-use super::boundary::BoundaryMaterial;
-use super::incident_receiver::phase::GeneratorTextReceiver;
+//! * The ratio `l_j = log(psi^T/psi^H)` at each receiving phase, on the one magnitude face
+//!   `p = softmax(Re s)` the comparison is formed on (the same face selection orders by and the
+//!   same object that returns the covector): its code-length part `Re (2/ln2) l = -log2 p(t)`
+//!   (KL bits against the observed one-hot face) and its phase part
+//!   `Im (2/ln2) l = (2/ln2)(phi^T - phi^H)` on the ratio's own lift (branch `n = 0`; both
+//!   phases are read through the same ring, so its winding cancels and is reported only as a
+//!   ring reading); the supported/partial/unsupported split of
+//!   `surprisal::cross_entropy_fiber` where a produced probability enclosure reaches zero; and
+//!   the observation jet `l_(n+1) - l_n`.
+//! * `H_src`: `N log2|A|` plus the order-0/order-1 empirical code length of the exposure stream.
+//! * `B_state`: reduced numerator/denominator bit lengths of the continuing exact carriers.
+//! * `B_pending`: the outstanding comparison's own rest octets (the session's declared relation
+//!   and the body's source-Holon operands), not a checkpoint difference that would include the
+//!   committed `q/b`.
+//! * Per ring (site): its declared phase exponent, ticks, winding, and the variability of its
+//!   current energy increments per tick over its own observations; per contact (arc): its pair
+//!   amplitude and the current contrast across it.
+//! * Work and erasure: kernel launches, and the Landauer erasure of the observe's collapse
+//!   (`landauer::erasure_of` over the encoder's per-symbol pooling). No power meter is read, so
+//!   no energy is reported.
+use super::generator_application::GeneratorObserveCut;
 use super::*;
 use crate::alpha::exposure::{ExteriorRequestMeasure, ExteriorReturnObserver};
 use holonic_engine::ExactInterval;
 use holonic_engine::native_ecology::constitutive_fibre::{
-    BoundaryMaterialSeed, NormalMaterialRest,
+    NativeNormalizedSection, NormalMaterialRest, ResidentNormalEnclosureSection,
 };
 use holonic_engine::presentation_cost::{CostReceipt, Counted};
-use holonic_engine::resident_section::{SeriesAperture, TransferCensus};
+use holonic_engine::resident_section::TransferCensus;
 use num_bigint::BigInt;
 use num_traits::{Signed, ToPrimitive, Zero};
 use relational_geometry::Rat;
@@ -36,8 +42,10 @@ use std::io::Cursor;
 #[cfg(test)]
 mod tests;
 
-/// A bit length read from an exact face interval: the centre and the enclosing interval. An
-/// endpoint whose probability bound reaches zero has no finite upper code length (`None`).
+/// A bit length read from an exact face interval: the centre and the enclosing interval. The
+/// probability enclosure is first clamped to `[0, 1]` (a face is a simplex section; an outward
+/// enclosure may overhang it), so every bound is a nonnegative code length. An endpoint whose
+/// probability bound reaches zero has no finite upper code length (`None`).
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct BitsReading {
     pub centre_bits: f64,
@@ -47,9 +55,10 @@ pub struct BitsReading {
 
 impl BitsReading {
     fn of(probability: &ExactInterval) -> Self {
-        let lower = probability.lower.to_f64().unwrap_or(0.0);
-        let upper = probability.upper.to_f64().unwrap_or(0.0);
-        let bits = |p: f64| (p > 0.0).then(|| -p.log2());
+        let clamp = |p: f64| p.clamp(0.0, 1.0);
+        let lower = clamp(probability.lower.to_f64().unwrap_or(0.0));
+        let upper = clamp(probability.upper.to_f64().unwrap_or(0.0));
+        let bits = |p: f64| (p > 0.0).then(|| (-p.log2()).max(0.0));
         Self {
             centre_bits: bits(0.5 * (lower + upper)).unwrap_or(f64::INFINITY),
             lower_bits: bits(upper),
@@ -72,15 +81,51 @@ impl BitsReading {
     }
 }
 
+/// `surprisal::cross_entropy_fiber`'s split, read on the produced face: a class whose certified
+/// probability enclosure reaches zero is outside the logarithmic chart and is not smoothed.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum RatioSupport {
+    Supported,
+    Partial,
+    Unsupported,
+}
+
+/// The ratio `l = log(psi^T/psi^H)` at one receiving phase and one face, read at the observed
+/// class `t`. `kl` is `Re (2/ln2) l = -log2 p_t`; the phase part is
+/// `Im (2/ln2) l = (2/ln2)(phi^T_t - phi^H_t)` on the ratio's own lift (branch 0). The receiving
+/// ring's absolute winding at this phase is reported beside it as `ring_winding`; it cancels
+/// from the ratio (zero, `ring_winding_witness = false`, without a closure witness).
+#[derive(Clone, Debug, Serialize)]
+pub struct RatioRowReading {
+    pub row: usize,
+    /// `text` or `stop`.
+    pub face: &'static str,
+    pub class: usize,
+    pub support: RatioSupport,
+    pub kl: BitsReading,
+    /// `phi^H_t = Im s_t / 2` (radians), centre and outward half width.
+    pub produced_phase: Option<(f64, f64)>,
+    /// `phi^T_t` of the target Holon through the same maps (radians).
+    pub target_phase: Option<(f64, f64)>,
+    pub ring_winding: i64,
+    pub ring_winding_witness: bool,
+    /// `(2/ln2)(phi^T - phi^H + 2 pi n)`, centre, bits: the signed, oriented displacement.
+    pub phase_excess_bits: Option<f64>,
+    /// `(2/ln2) (1/2) q_t Delta_t^2` (centre): the phase quantity the comparison descends, on
+    /// the same `2/ln2` scale (its argument is in rad^2).
+    pub phase_descent_bits: Option<f64>,
+}
+
 #[derive(Clone, Debug, Serialize)]
 pub struct ReceivingRowReading {
     pub row: usize,
     /// Observed text class at this row, if the target reaches it.
     pub target_class: Option<usize>,
-    pub text: Option<BitsReading>,
+    pub text: Option<RatioRowReading>,
     /// `1` = continue, `0` = stop; the class the comparison observes at this row.
     pub stop_class: usize,
-    pub stop: BitsReading,
+    pub stop: RatioRowReading,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -98,26 +143,39 @@ pub struct SourceReading {
 
 #[derive(Clone, Debug, Serialize)]
 pub struct TargetReading {
+    /// How the target Holon was read (`word`, `moment` or `none`).
+    pub target_holon: &'static str,
     pub text_positions: usize,
     pub receiving_rows: usize,
     pub face: &'static str,
-    /// The target reached a class admitted after production; the explicit retro face was read.
-    pub retro_face: bool,
     pub text: BitsReading,
     pub stop: BitsReading,
+    /// `Re E_T[(2/ln2) l]` summed over receiving phases: the lifted cross-entropy excess's
+    /// code-length face, i.e. `Σ_j −log2 p_j(t_j)` plus the stop term.
     pub model: BitsReading,
-    /// Rows whose observed-class probability enclosure reaches zero (no finite upper code
-    /// length). When nonzero the centre reading is the midpoint of a broad enclosure, not a
-    /// resolved face value; the interval is the reading.
+    /// `Im E_T[(2/ln2) l]` summed over receiving phases (centre), bits: signed displacement;
+    /// `None` for an empty target passage (no target Holon).
+    pub phase_excess_bits: Option<f64>,
+    /// `(2/ln2) (1/2) Σ q Δ²` summed over receiving phases (centre): the descended quantity.
+    pub phase_descent_bits: Option<f64>,
+    /// The fibre split over every observed row.
+    pub support: RatioSupport,
+    pub unsupported_rows: Vec<usize>,
+    /// Code length over the supported rows only (centre), bits.
+    pub supported_bits: f64,
+    /// Rows whose observed-class probability enclosure reaches zero.
     pub rows_unbounded: usize,
     pub rows: Vec<ReceivingRowReading>,
+    /// The observation jet: this observation's `Re` and `Im` totals minus the previous
+    /// observation's, bits per observation (`None` on the first).
+    pub model_bits_per_observation: Option<f64>,
+    pub phase_excess_bits_per_observation: Option<f64>,
     pub baseline_uniform_text_bits: f64,
     pub baseline_order0_text_bits: f64,
     pub baseline_order1_text_bits: f64,
     /// One bit per receiving row: the uniform two-class stop/continue face.
     pub baseline_stop_bits: f64,
-    /// `log2(A_out+1)`: a uniform length over the admitted response lengths (not the chart the
-    /// stop receiver uses; reported for comparison with the plan's length convention).
+    /// `log2(A_out+1)`: a uniform length over the admitted response lengths.
     pub baseline_length_uniform_bits: f64,
     /// `baseline_text + baseline_stop − model` (centre), bits.
     pub gain_uniform_bits: f64,
@@ -209,23 +267,42 @@ pub struct StateReading {
     pub components: BTreeMap<&'static str, ExactBitCount>,
     pub state_bits: u128,
     pub checkpoint_octets: u64,
-    /// Checkpoint octets after the request minus before it: the held comparison (`B_pending`).
-    pub pending_octets: i128,
+    /// The outstanding comparison's own operands at request time: the session's pending rest
+    /// (declared relation) plus the body's source-Holon rest octets. Committed `q/b` is not in it.
+    pub pending_octets: u64,
+    pub pending_session_octets: u64,
+    pub pending_body_octets: u64,
+    pub pending_body_sections: u64,
+    /// Host words the session holds for the comparison beyond its clock: `|A|`, fixed in `N`.
+    pub pending_relation_words: usize,
     /// Checkpoint octets after observe minus before it.
     pub observe_octets: i128,
+    /// The body's commit rebase residual after the observe: commits, grain, and the exact
+    /// dropped radius `last`/`max`/`sum` as scaled integers (value `n / 2^grain`), with their
+    /// real readings. Exterior; the machine does not read it.
+    pub rebase_residual: Value,
 }
 
+/// One ring (machine site) over its own ticks.
 #[derive(Clone, Debug, Serialize)]
 pub struct SiteNavigation {
     pub site: String,
     pub source: bool,
     pub receiver: bool,
-    /// Machine step actions applied at this site by committed source occurrences so far.
+    /// Source ticks this ring has taken by committed occurrences so far (its own clock).
+    pub ticks: u64,
+    /// Step actions applied at this ring by committed source occurrences so far.
     pub committed_source_steps: u64,
-    /// Step actions this request's source applied at this site.
+    /// Step actions this request's source applied at this ring.
     pub request_source_steps: u64,
-    /// Receiving phase rows read at this site by this request.
+    /// Receiving phase rows read at this ring by this request.
     pub receiving_steps: u64,
+    /// Declared action exponent reached by the committed ticks: origin + ticks * step.
+    pub phase_exponent: i64,
+    /// Exponent increment per tick; the declared action is uniform, so its tick-interval
+    /// variability is exactly zero.
+    pub tick_increment_exponent: i64,
+    pub tick_increment_variance: f64,
     pub cayley_parameter: String,
     pub closure_period: Option<usize>,
     /// Full turns completed by the committed steps, when a closure witness exists.
@@ -233,6 +310,26 @@ pub struct SiteNavigation {
     /// Depth of the Farey lock address of lifted turns per period, when a closure exists.
     pub lock_address_depth: Option<String>,
     pub turn: &'static str,
+    /// `|q_g|²` of this ring's boundary current (centre), in the current chart's squared units.
+    pub current_energy: Option<f64>,
+    /// Change of `current_energy` since this ring's previous reading, per tick taken since.
+    pub energy_increment_per_tick: Option<f64>,
+    /// Variance of those per-tick increments over this ring's recorded observations.
+    pub energy_increment_variance: Option<f64>,
+    pub recorded_observations: usize,
+}
+
+/// One pair contact (arc) at the reading's cut.
+#[derive(Clone, Debug, Serialize)]
+pub struct ContactReading {
+    pub arc: String,
+    pub source: String,
+    pub receiver: String,
+    /// Declared positive pair amplitude `rho_a`, when the operator reports it per arc.
+    pub amplitude: Option<f64>,
+    /// `|q_a − q_b|²` of the two rings' boundary currents in the common current chart (centre):
+    /// the contrast the contact's slip acts on. Not a transported flux; no pair map is applied.
+    pub interface_contrast: Option<f64>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -240,6 +337,19 @@ pub struct NavigationReading {
     pub request_source_steps: usize,
     pub committed_source_steps: u64,
     pub sites: Vec<SiteNavigation>,
+    pub contacts: Vec<ContactReading>,
+}
+
+/// Work and erasure axes of the observe.
+#[derive(Clone, Debug, Serialize)]
+pub struct WorkReading {
+    pub request_launches: u64,
+    pub observe_launches: u64,
+    /// `landauer::erasure_of` over the encoder's per-symbol pooled occurrence counts: the bits
+    /// needed to name an occurrence within its pooled block, which the return does not keep.
+    pub erasure_bits: u64,
+    pub erasing_blocks: usize,
+    pub energy: &'static str,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -252,14 +362,49 @@ pub struct NativeReturnReading {
     /// `B_state / Σ H_src` over the observer's run.
     pub state_bits_per_source_bit: f64,
     pub navigation: NavigationReading,
+    pub work: WorkReading,
     pub cost: CostReceipt,
     pub request_seconds: f64,
+    /// Observe wall time (the target Holon is part of the comparison, so it is included).
     pub observe_seconds: f64,
     pub request_census: BTreeMap<String, i128>,
     pub observe_census: BTreeMap<String, i128>,
 }
 
-fn census_difference(before: &TransferCensus, after: &TransferCensus) -> BTreeMap<String, i128> {
+/// Exterior memory of the observer across observations of one session. Never checkpointed,
+/// never read by the machine.
+#[derive(Clone, Debug, Default)]
+pub(super) struct GeneratorReadingMemory {
+    /// Pending operand octets measured at request time, by comparison.
+    pending: BTreeMap<u64, (u64, u64, u64, usize)>,
+    /// Previous observation's (model bits, phase excess bits).
+    previous: Option<(f64, Option<f64>)>,
+    /// Per ring: its running summary over its own ticks, fixed size.
+    rings: BTreeMap<String, RingSummary>,
+}
+
+/// Welford's running summary of one ring's per-tick energy increments: the last reading and its
+/// tick, and (count, mean, M2) of the increments. Fixed size; no increment is stored.
+#[derive(Clone, Copy, Debug)]
+struct RingSummary {
+    energy: f64,
+    ticks: u64,
+    count: u64,
+    mean: f64,
+    m2: f64,
+}
+
+impl GeneratorReadingMemory {
+    /// Drop what the observer recorded for a comparison that was released unobserved.
+    pub(super) fn forget(&mut self, comparison: u64) {
+        self.pending.remove(&comparison);
+    }
+}
+
+pub(super) fn census_difference(
+    before: &TransferCensus,
+    after: &TransferCensus,
+) -> BTreeMap<String, i128> {
     let (Ok(Value::Object(before)), Ok(Value::Object(after))) =
         (serde_json::to_value(before), serde_json::to_value(after))
     else {
@@ -282,8 +427,61 @@ fn launches(census: &BTreeMap<String, i128>) -> u64 {
         .sum()
 }
 
-fn read_material(bytes: &[u8]) -> Result<NormalMaterialRest> {
-    NormalMaterialRest::read(&mut Cursor::new(bytes), bytes.len() as u64).map_err(invalid)
+fn centre_and_half(value: &ExactInterval) -> (f64, f64) {
+    let lower = value.lower.to_f64().unwrap_or(f64::NAN);
+    let upper = value.upper.to_f64().unwrap_or(f64::NAN);
+    (0.5 * (lower + upper), 0.5 * (upper - lower))
+}
+
+fn support_of(probability: &ExactInterval) -> RatioSupport {
+    if probability.lower > Rat::zero() {
+        RatioSupport::Supported
+    } else if probability.upper > Rat::zero() {
+        RatioSupport::Partial
+    } else {
+        RatioSupport::Unsupported
+    }
+}
+
+/// The ratio reading at one row/class from host copies of the comparison's face.
+#[allow(clippy::too_many_arguments)]
+fn ratio_row(
+    row: usize,
+    face: &'static str,
+    class: usize,
+    produced: &[Vec<ExactInterval>],
+    produced_phase: Option<&[Vec<ExactInterval>]>,
+    target_phase: Option<&[Vec<ExactInterval>]>,
+    branch: (i64, bool),
+) -> Result<RatioRowReading> {
+    let probability = produced
+        .get(row)
+        .and_then(|face| face.get(class))
+        .ok_or_else(|| invalid("receiving face row/class"))?;
+    let phase_h = produced_phase
+        .and_then(|p| p.get(row))
+        .and_then(|r| r.get(class))
+        .map(centre_and_half);
+    let phase_t = target_phase
+        .and_then(|p| p.get(row))
+        .and_then(|r| r.get(class))
+        .map(centre_and_half);
+    let gap = phase_h.zip(phase_t).map(|((h, _), (t, _))| t - h);
+    let excess = gap.map(|gap| 2.0 / std::f64::consts::LN_2 * gap);
+    let descent = gap.map(|gap| 2.0 / std::f64::consts::LN_2 * 0.5 * gap * gap);
+    Ok(RatioRowReading {
+        row,
+        face,
+        class,
+        support: support_of(probability),
+        kl: BitsReading::of(probability),
+        produced_phase: phase_h,
+        target_phase: phase_t,
+        ring_winding: branch.0,
+        ring_winding_witness: branch.1,
+        phase_excess_bits: excess,
+        phase_descent_bits: descent,
+    })
 }
 
 impl<'c> NativeFieldSession<'c> {
@@ -296,12 +494,42 @@ impl<'c> NativeFieldSession<'c> {
             .ok_or_else(|| invalid("return readings are declared for the generator session"))
     }
 
-    /// Octets of the existing public checkpoint of this session at this moment.
+    /// Octets of the existing public checkpoint of this session at this moment. Always taken
+    /// outside a timing or census window.
     fn checkpoint_octets(&self) -> Result<u64> {
         let directory = tempfile::tempdir()?;
         let path = directory.path().join("reading.hna");
         self.checkpoint(&path, &HnaStreamState::default())?;
         Ok(std::fs::metadata(&path)?.len())
+    }
+
+    /// The outstanding comparison's own operands: session pending rest octets, the body's
+    /// retained source-Holon octets and sections, and the relation's host words.
+    fn pending_operand_octets(&self, id: u64) -> Result<(u64, u64, u64, usize)> {
+        let generator = self
+            .generator
+            .as_ref()
+            .ok_or_else(|| invalid("generator presentation"))?;
+        let rest = generator.rest()?;
+        let session = rest
+            .pending
+            .iter()
+            .find(|pending| pending.id == id)
+            .map(|pending| serde_json::to_vec(pending).map(|bytes| bytes.len() as u64))
+            .transpose()?
+            .ok_or_else(|| invalid("pending generator rest"))?;
+        let census = self.body.generator_comparison_census(id)?;
+        let words = generator
+            .pending
+            .get(&id)
+            .map(|pending| pending.pending_relation_words())
+            .unwrap_or(0);
+        Ok((
+            session,
+            census["octets"].as_u64().unwrap_or(0),
+            census["sections"].as_u64().unwrap_or(0),
+            words,
+        ))
     }
 
     /// Issue a generator request and take its exterior request-side reading.
@@ -334,6 +562,10 @@ impl<'c> NativeFieldSession<'c> {
         }
         observer.stream.ingest(&symbols, None);
         if let Some(id) = value["comparison"].as_u64() {
+            let pending = self.pending_operand_octets(id)?;
+            if let Some(generator) = self.generator.as_mut() {
+                generator.readings.pending.insert(id, pending);
+            }
             observer.requests.insert(
                 id,
                 ExteriorRequestMeasure {
@@ -355,8 +587,8 @@ impl<'c> NativeFieldSession<'c> {
         Ok(value)
     }
 
-    /// Read the producing face of a held comparison, observe it, and take the full exterior
-    /// return reading. The observe is the ordinary public observe; the reading does not alter it.
+    /// Observe a held comparison and take the full exterior return reading at the observe's
+    /// one cut: the ratio is read on the same face object that returns the covector.
     pub fn read_return(
         &mut self,
         comparison: u64,
@@ -369,125 +601,75 @@ impl<'c> NativeFieldSession<'c> {
             .requests
             .remove(&comparison)
             .ok_or_else(|| invalid("comparison was not issued through measured_request"))?;
-        let target = self
-            .presentation
-            .spec
-            .symbols_of(&self.presentation.chart, text)?
-            .into_iter()
-            .map(|symbol| symbol.0 as usize)
-            .collect::<Vec<_>>();
-        let (text_faces, stop_faces, face_classes, retro_face) =
-            self.producing_faces(comparison, &target, &options)?;
         let before_octets = self.checkpoint_octets()?;
         let before = self.surface.census();
         let started = Instant::now();
-        let value = self.observe(comparison, text, step_bits)?;
-        let observe_seconds = started.elapsed().as_secs_f64();
+        let (value, cut) = self.generator_observe_cut(comparison, text, step_bits, true)?;
+        let elapsed = started.elapsed().as_secs_f64();
         let observe_census = census_difference(&before, &self.surface.census());
+        let cut = cut.ok_or_else(|| invalid("observe reading operands"))?;
         let checkpoint_octets = self.checkpoint_octets()?;
+        let observe_seconds = elapsed;
 
-        // L_target|model on the producing face.
-        let mut rows = Vec::with_capacity(target.len() + 1);
-        let (mut text_bits, mut stop_bits) = (BitsReading::zero(), BitsReading::zero());
-        for row in 0..=target.len() {
-            let text_reading = target
-                .get(row)
-                .map(|&class| {
-                    text_faces
-                        .get(row)
-                        .and_then(|face| face.get(class))
-                        .map(BitsReading::of)
-                        .ok_or_else(|| invalid("receiving text face row/class"))
-                })
-                .transpose()?;
-            if let Some(reading) = &text_reading {
-                text_bits.add(reading);
-            }
-            let stop_class = usize::from(row != target.len());
-            let stop = stop_faces
-                .get(row)
-                .and_then(|face| face.get(stop_class))
-                .map(BitsReading::of)
-                .ok_or_else(|| invalid("receiving stop face row"))?;
-            stop_bits.add(&stop);
-            rows.push(ReceivingRowReading {
-                row,
-                target_class: target.get(row).copied(),
-                text: text_reading,
-                stop_class,
-                stop,
-            });
-        }
-        let mut model = text_bits.clone();
-        model.add(&stop_bits);
-        let receiving_rows = target.len() + 1;
-        let alphabet = self.presentation.spec.symbols.len();
-        let uniform = target.len() as f64 * (face_classes as f64).log2();
-        let (order0, order1) =
-            observer
-                .stream
-                .predictive_bits(&target, requested.last_source_symbol, alphabet);
-        let stop_baseline = receiving_rows as f64;
-        let gain = |baseline: f64| baseline + stop_baseline - model.centre_bits;
-        let per_row = |bits: f64| bits / receiving_rows as f64;
-        let target_reading = TargetReading {
-            text_positions: target.len(),
-            receiving_rows,
-            face: "producing receiver normalized exponential face (read_participation)",
-            retro_face,
-            text: text_bits,
-            stop: stop_bits,
-            model: model.clone(),
-            rows_unbounded: rows
-                .iter()
-                .filter(|row| {
-                    row.stop.upper_bits.is_none()
-                        || row
-                            .text
-                            .as_ref()
-                            .is_some_and(|text| text.upper_bits.is_none())
-                })
-                .count(),
-            rows,
-            baseline_uniform_text_bits: uniform,
-            baseline_order0_text_bits: order0,
-            baseline_order1_text_bits: order1,
-            baseline_stop_bits: stop_baseline,
-            baseline_length_uniform_bits: (options.receiver.aperture as f64).log2(),
-            gain_uniform_bits: gain(uniform),
-            gain_order0_bits: gain(order0),
-            gain_order1_bits: gain(order1),
-            gain_uniform_bits_per_row: per_row(gain(uniform)),
-            gain_order0_bits_per_row: per_row(gain(order0)),
-            gain_order1_bits_per_row: per_row(gain(order1)),
-        };
+        let target_reading = self.ratio_reading(&cut, &options, &requested, observer)?;
         // The observed target joins the exterior stream after its baseline was read.
         observer
             .stream
-            .ingest(&target, Some(requested.last_source_symbol));
+            .ingest(&cut.target, Some(requested.last_source_symbol));
         observer.returns += 1;
 
         let components = self.state_bits()?;
         let state_bits = components.values().map(|count| count.bits).sum::<u128>();
+        let (session_octets, body_octets, body_sections, relation_words) = self
+            .generator
+            .as_mut()
+            .and_then(|g| g.readings.pending.remove(&comparison))
+            .unwrap_or_default();
         let state = StateReading {
             components,
             state_bits,
             checkpoint_octets,
-            pending_octets: i128::from(requested.checkpoint_octets_after)
-                - i128::from(requested.checkpoint_octets_before),
+            pending_octets: session_octets + body_octets,
+            pending_session_octets: session_octets,
+            pending_body_octets: body_octets,
+            pending_body_sections: body_sections,
+            pending_relation_words: relation_words,
             observe_octets: i128::from(checkpoint_octets) - i128::from(before_octets),
+            rebase_residual: {
+                let mut residual = serde_json::to_value(self.body.incident_rebase_residual()?)?;
+                let grain = residual["grain"].as_u64().unwrap_or(0) as u32;
+                for key in ["last", "max", "sum"] {
+                    let value = residual[key]
+                        .as_str()
+                        .and_then(|text| text.parse::<BigInt>().ok())
+                        .map(|n| Rat::new(n, BigInt::from(1u8) << grain));
+                    residual[format!("{key}_value")] = json!(value.as_ref().map(|v| v.to_string()));
+                    residual[format!("{key}_f64")] = json!(value.and_then(|v| v.to_f64()));
+                }
+                residual
+            },
         };
-        let navigation = navigation(&options, &requested, observer.committed_source_steps)?;
+        let navigation = self.navigation(&options, &requested, observer.committed_source_steps)?;
+        let (erased, erasing) = holonic_engine::landauer::erasure_of(&cut.pooled_symbol_counts);
+        let observe_launches = launches(&observe_census);
+        let work = WorkReading {
+            request_launches: requested.request_launches,
+            observe_launches,
+            erasure_bits: erased.to_u64().unwrap_or(u64::MAX),
+            erasing_blocks: erasing.len(),
+            energy: "unmeasured: no power reading is taken on this surface",
+        };
+        let model = &target_reading.model;
         let residual = if model.centre_bits.is_finite() {
             Counted::derived(
                 model.centre_bits.ceil().max(0.0) as u64,
-                "ceil of the observed target's code length Σ−log2 p under the producing face \
-                 (centre); the bits the continuing chart did not carry for this target",
+                "ceil of the observed target's code length Re E_T[(2/ln2) log R] on the \
+                 comparison face (centre); the bits the continuing chart did not carry",
             )
         } else {
             Counted::derived(
                 0u64,
-                "undefined: a producing probability centre was zero; see target.model",
+                "undefined: a produced probability centre was zero; see target.support",
             )
         };
         let cost = CostReceipt {
@@ -501,7 +683,7 @@ impl<'c> NativeFieldSession<'c> {
                 "ResidentSurface census: captured + direct kernel launches during request",
             ),
             update_work: Counted::measured(
-                launches(&observe_census),
+                observe_launches,
                 "ResidentSurface census: captured + direct kernel launches during observe",
             ),
             certificate_work: Counted::derived(
@@ -521,7 +703,7 @@ impl<'c> NativeFieldSession<'c> {
             exposure_order1_bits: observer.stream.order1_bits(),
         };
         let reading = NativeReturnReading {
-            scope: "exterior observer reading; not read by the machine, not a loss or gate",
+            scope: "exterior observer reading; not read by the machine, not a gate",
             comparison,
             state_bits_per_source_bit: if observer.source_bits_total > 0.0 {
                 state.state_bits as f64 / observer.source_bits_total
@@ -532,6 +714,7 @@ impl<'c> NativeFieldSession<'c> {
             target: target_reading,
             state,
             navigation,
+            work,
             cost,
             request_seconds: requested.request_seconds,
             observe_seconds,
@@ -541,79 +724,174 @@ impl<'c> NativeFieldSession<'c> {
         Ok((value, reading))
     }
 
-    /// Read the producing text/stop faces of a held comparison through its read-only pending
-    /// accessor. A target class admitted after production is read through the explicit retro
-    /// face of the contemporary receiver, rebuilt from the public rest exactly as a reopened
-    /// checkpoint rebuilds it. Returns (text rows × classes, stop rows × 2, text classes, retro).
-    #[allow(clippy::type_complexity)]
-    fn producing_faces(
-        &self,
-        comparison: u64,
-        target: &[usize],
+    /// The ratio at every receiving phase from host copies of the observe's comparison faces.
+    fn ratio_reading(
+        &mut self,
+        cut: &GeneratorObserveCut<'c>,
         options: &GeneratorSessionOptions,
-    ) -> Result<(
-        Vec<Vec<ExactInterval>>,
-        Vec<Vec<ExactInterval>>,
-        usize,
-        bool,
-    )> {
-        let spec = &self.presentation.spec;
-        let generator = self
-            .generator
-            .as_ref()
-            .ok_or_else(|| invalid("generator presentation"))?;
-        let producing = generator
-            .pending
-            .get(&comparison)
-            .ok_or_else(|| invalid("unknown generator comparison"))?
-            .received();
-        let old_classes = producing
-            .text_cohorts
-            .iter()
-            .map(|cohort| cohort.class_count)
-            .sum::<usize>();
-        let terms = SeriesAperture(options.field.series_terms);
-        let retro = target.iter().any(|class| *class >= old_classes);
-        let retro_forward = if retro {
-            let rest = generator.rest()?;
-            let boundary = BoundaryMaterial::found(
-                self.surface,
-                spec.chart()?,
-                options.receiver.ports.len() * 6,
-                1,
-                ResidentGrain(spec.fractional_bits),
-                BoundaryMaterialSeed::new(options.material_seed, spec.fractional_bits),
-            )?;
-            let current = GeneratorTextReceiver::remount_with_cohorts(
-                self.surface,
-                boundary,
-                read_material(&rest.receiver_text)?,
-                read_material(&rest.receiver_support)?,
-                rest.receiver_cohorts.clone(),
-                rest.receiver_cohort_material
-                    .iter()
-                    .map(|bytes| read_material(bytes))
-                    .collect::<Result<Vec<_>>>()?,
-                rest.receiver_cohorts
-                    .last()
-                    .map_or(0, |cohort| cohort.codec_version),
-            )?;
-            Some(current.retro_forward(producing, terms)?)
-        } else {
-            None
+        requested: &ExteriorRequestMeasure,
+        observer: &ExteriorReturnObserver,
+    ) -> Result<TargetReading> {
+        let target = &cut.target;
+        let _ = &cut.faces.classes;
+        let read_face = |face: &NativeNormalizedSection<'c>| -> Result<(Vec<Vec<ExactInterval>>, Vec<Vec<ExactInterval>>)> {
+            let rows = face.inspect().map_err(invalid)?;
+            Ok((
+                rows.into_iter().map(|row| row.prediction).collect(),
+                face.read_phase().map_err(invalid)?,
+            ))
         };
-        let received = retro_forward.as_ref().unwrap_or(producing);
-        let classes = received
-            .text_cohorts
+        let read_ball = |ball: &ResidentNormalEnclosureSection<'c>| {
+            NativeNormalizedSection::read_phase_ball(ball).map_err(invalid)
+        };
+        let text = cut.faces.text.as_ref().map(read_face).transpose()?;
+        let (stop_p, stop_phase) = read_face(&cut.faces.stop)?;
+        // An empty target passage has no target Holon: its stop rows compare agreeing phases.
+        let target_phase = (!target.is_empty())
+            .then(|| {
+                Ok::<_, NativeSessionError>((
+                    cut.faces
+                        .text
+                        .as_ref()
+                        .map(|face| read_ball(face.target_phase().map_err(invalid)?))
+                        .transpose()?
+                        .unwrap_or_default(),
+                    read_ball(cut.faces.stop.target_phase().map_err(invalid)?)?,
+                ))
+            })
+            .transpose()?;
+        let mut rows = Vec::with_capacity(target.len() + 1);
+        let (mut text_bits, mut stop_bits) = (BitsReading::zero(), BitsReading::zero());
+        let mut phase_total = target_phase.as_ref().map(|_| 0.0f64);
+        let mut descent_total = target_phase.as_ref().map(|_| 0.0f64);
+        let mut unsupported_rows = Vec::new();
+        let mut supported_bits = 0.0;
+        for row in 0..=target.len() {
+            let branch = super::generator_application::receiving_branch(options, row)?;
+            let text_reading = target
+                .get(row)
+                .map(|&class| {
+                    let (p, phase) = text
+                        .as_ref()
+                        .ok_or_else(|| invalid("text comparison face"))?;
+                    ratio_row(
+                        row,
+                        "text",
+                        class,
+                        p,
+                        Some(phase),
+                        target_phase.as_ref().map(|(t, _)| t.as_slice()),
+                        branch,
+                    )
+                })
+                .transpose()?;
+            let stop_class = usize::from(row != target.len());
+            let stop = ratio_row(
+                row,
+                "stop",
+                stop_class,
+                &stop_p,
+                Some(&stop_phase),
+                target_phase.as_ref().map(|(_, s)| s.as_slice()),
+                branch,
+            )?;
+            for reading in text_reading.iter().chain([&stop]) {
+                if reading.face == "text" {
+                    text_bits.add(&reading.kl);
+                } else {
+                    stop_bits.add(&reading.kl);
+                }
+                if reading.support == RatioSupport::Supported {
+                    supported_bits += reading.kl.centre_bits;
+                } else if !unsupported_rows.contains(&row) {
+                    unsupported_rows.push(row);
+                }
+                phase_total = phase_total
+                    .zip(reading.phase_excess_bits)
+                    .map(|(a, b)| a + b);
+                descent_total = descent_total
+                    .zip(reading.phase_descent_bits)
+                    .map(|(a, b)| a + b);
+            }
+            rows.push(ReceivingRowReading {
+                row,
+                target_class: target.get(row).copied(),
+                text: text_reading,
+                stop_class,
+                stop,
+            });
+        }
+        let mut model = text_bits.clone();
+        model.add(&stop_bits);
+        let receiving_rows = target.len() + 1;
+        let alphabet = self.presentation.spec.symbols.len();
+        let uniform = target.len() as f64 * (cut.faces.classes as f64).log2();
+        let (order0, order1) =
+            observer
+                .stream
+                .predictive_bits(target, requested.last_source_symbol, alphabet);
+        let stop_baseline = receiving_rows as f64;
+        let gain = |baseline: f64| baseline + stop_baseline - model.centre_bits;
+        let per_row = |bits: f64| bits / receiving_rows as f64;
+        let memory = &mut self
+            .generator
+            .as_mut()
+            .ok_or_else(|| invalid("generator presentation"))?
+            .readings;
+        let (model_jet, phase_jet) = match memory.previous {
+            Some((model_bits, phase_bits)) => (
+                Some(model.centre_bits - model_bits),
+                phase_total.zip(phase_bits).map(|(a, b)| a - b),
+            ),
+            None => (None, None),
+        };
+        memory.previous = Some((model.centre_bits, phase_total));
+        let rows_unbounded = rows
             .iter()
-            .map(|cohort| cohort.class_count)
-            .sum::<usize>();
-        let text = received.text_face.read_participation().map_err(invalid)?;
-        let stop = received
-            .support_face
-            .read_participation()
-            .map_err(invalid)?;
-        Ok((text, stop, classes, retro))
+            .filter(|row| {
+                row.stop.kl.upper_bits.is_none()
+                    || row
+                        .text
+                        .as_ref()
+                        .is_some_and(|text| text.kl.upper_bits.is_none())
+            })
+            .count();
+        let support = if unsupported_rows.is_empty() {
+            RatioSupport::Supported
+        } else if unsupported_rows.len() == receiving_rows {
+            RatioSupport::Unsupported
+        } else {
+            RatioSupport::Partial
+        };
+        Ok(TargetReading {
+            target_holon: cut.target_holon,
+            text_positions: target.len(),
+            receiving_rows,
+            face: "comparison magnitude face p = softmax(Re s) with phase Im s / 2 (ratio return)",
+            text: text_bits,
+            stop: stop_bits,
+            model: model.clone(),
+            phase_excess_bits: phase_total,
+            phase_descent_bits: descent_total,
+            support,
+            unsupported_rows,
+            supported_bits,
+            rows_unbounded,
+            rows,
+            model_bits_per_observation: model_jet,
+            phase_excess_bits_per_observation: phase_jet,
+            baseline_uniform_text_bits: uniform,
+            baseline_order0_text_bits: order0,
+            baseline_order1_text_bits: order1,
+            baseline_stop_bits: stop_baseline,
+            baseline_length_uniform_bits: (options.receiver.aperture as f64).log2(),
+            gain_uniform_bits: gain(uniform),
+            gain_order0_bits: gain(order0),
+            gain_order1_bits: gain(order1),
+            gain_uniform_bits_per_row: per_row(gain(uniform)),
+            gain_order0_bits_per_row: per_row(gain(order0)),
+            gain_order1_bits_per_row: per_row(gain(order1)),
+        })
     }
 
     /// Exact carrier bit lengths of the continuing chart, by owner.
@@ -652,41 +930,109 @@ impl<'c> NativeFieldSession<'c> {
         components.insert("stop", stop);
         Ok(components)
     }
-}
 
-fn navigation(
-    options: &GeneratorSessionOptions,
-    requested: &ExteriorRequestMeasure,
-    committed_source_steps: u64,
-) -> Result<NavigationReading> {
-    let machine = options.field.machine.compile().map_err(invalid)?;
-    let step_exponent = |ports: &[crate::native::GeneratorPhasePort], site: &str| {
-        ports
-            .iter()
-            .filter(|port| port.site_id == site)
-            .map(|port| port.step_exponent.unsigned_abs())
-            .sum::<u64>()
-    };
-    let receiving_rows = options.receiver.aperture as u64;
-    let sites = machine
-        .sites()
-        .iter()
-        .map(|site| {
+    /// Per-ring and per-contact fields at the current cut, with this observer's ring memory.
+    fn navigation(
+        &mut self,
+        options: &GeneratorSessionOptions,
+        requested: &ExteriorRequestMeasure,
+        committed_source_steps: u64,
+    ) -> Result<NavigationReading> {
+        let machine = options.field.machine.compile().map_err(invalid)?;
+        let current = self.body.inspect_current()?;
+        let energies = site_energies(&current["joint"], machine.sites().len());
+        let amplitudes = current["operator"]["declared_amplitudes"]
+            .as_array()
+            .map(|items| {
+                items
+                    .iter()
+                    .map(|item| {
+                        serde_json::from_value::<Rat>(item.clone())
+                            .ok()
+                            .or_else(|| item.as_str().and_then(parse_rat))
+                            .and_then(|rat| rat.to_f64())
+                    })
+                    .collect::<Vec<_>>()
+            })
+            .unwrap_or_default();
+        let port = |ports: &[crate::native::GeneratorPhasePort], site: &str| {
+            ports.iter().find(|port| port.site_id == site).cloned()
+        };
+        let step_exponent = |ports: &[crate::native::GeneratorPhasePort], site: &str| {
+            ports
+                .iter()
+                .filter(|port| port.site_id == site)
+                .map(|port| port.step_exponent.unsigned_abs())
+                .sum::<u64>()
+        };
+        let receiving_rows = options.receiver.aperture as u64;
+        let memory = &mut self
+            .generator
+            .as_mut()
+            .ok_or_else(|| invalid("generator presentation"))?
+            .readings;
+        let mut sites = Vec::with_capacity(machine.sites().len());
+        for (index, site) in machine.sites().iter().enumerate() {
             let source_exponent = step_exponent(&options.source.clocks, site.id());
             let committed = committed_source_steps * source_exponent;
+            let clock = port(&options.source.clocks, site.id());
+            let step = clock.as_ref().map_or(0, |p| p.step_exponent);
+            let origin =
+                site.phase_origin_exponent() + clock.as_ref().map_or(0, |p| p.origin_exponent);
+            let phase_exponent = i64::try_from(committed_source_steps)
+                .ok()
+                .and_then(|ticks| step.checked_mul(ticks))
+                .and_then(|value| value.checked_add(origin))
+                .unwrap_or(i64::MAX);
             let phase = site.phase();
+            let energy = energies.get(index).copied().flatten();
+            let (increment, variance, recorded) = match energy {
+                Some(energy) => {
+                    let entry = memory
+                        .rings
+                        .entry(site.id().to_owned())
+                        .or_insert(RingSummary {
+                            energy,
+                            ticks: committed_source_steps,
+                            count: 0,
+                            mean: 0.0,
+                            m2: 0.0,
+                        });
+                    let ticks = committed_source_steps.saturating_sub(entry.ticks);
+                    let increment = (ticks > 0).then(|| (energy - entry.energy) / ticks as f64);
+                    if let Some(value) = increment {
+                        entry.count += 1;
+                        let delta = value - entry.mean;
+                        entry.mean += delta / entry.count as f64;
+                        entry.m2 += delta * (value - entry.mean);
+                    }
+                    entry.energy = energy;
+                    entry.ticks = committed_source_steps;
+                    let variance = (entry.count > 1).then(|| entry.m2 / entry.count as f64);
+                    (increment, variance, entry.count as usize)
+                }
+                None => (None, None, 0),
+            };
             let mut reading = SiteNavigation {
                 site: site.id().to_owned(),
                 source: site.is_source(),
                 receiver: site.is_receiver(),
+                ticks: committed_source_steps,
                 committed_source_steps: committed,
                 request_source_steps: requested.source_cells as u64 * source_exponent,
                 receiving_steps: receiving_rows * step_exponent(&options.receiver.ports, site.id()),
+                phase_exponent,
+                tick_increment_exponent: step,
+                tick_increment_variance: 0.0,
                 cayley_parameter: phase.parameter().to_string(),
                 closure_period: site.closure(),
                 committed_windings: None,
                 lock_address_depth: None,
                 turn: "not a rational turn: no closure witness for this Cayley step",
+                current_energy: energy,
+                energy_increment_per_tick: increment,
+                energy_increment_variance: variance,
+                recorded_observations: recorded,
             };
             if let Some(period) = site.closure() {
                 if let Ok(winding) = phase.lifted_winding(period) {
@@ -704,12 +1050,73 @@ fn navigation(
                     }
                 }
             }
-            reading
+            sites.push(reading);
+        }
+        let centres = site_centres(&current["joint"], machine.sites().len());
+        let contacts = machine
+            .arcs()
+            .iter()
+            .enumerate()
+            .map(|(index, arc)| ContactReading {
+                arc: arc.id().to_owned(),
+                source: arc.source().to_owned(),
+                receiver: arc.receiver().to_owned(),
+                amplitude: (amplitudes.len() == machine.arcs().len())
+                    .then(|| amplitudes[index])
+                    .flatten(),
+                interface_contrast: centres
+                    .get(arc.source_index())
+                    .zip(centres.get(arc.receiver_index()))
+                    .and_then(|(a, b)| {
+                        (a.len() == b.len() && !a.is_empty())
+                            .then(|| a.iter().zip(b).map(|(x, y)| (x - y).powi(2)).sum())
+                    }),
+            })
+            .collect();
+        Ok(NavigationReading {
+            request_source_steps: requested.source_cells,
+            committed_source_steps,
+            sites,
+            contacts,
         })
-        .collect();
-    Ok(NavigationReading {
-        request_source_steps: requested.source_cells,
-        committed_source_steps,
-        sites,
-    })
+    }
+}
+
+/// Real coordinates of each ring's boundary current centre (12 per site), from the joint
+/// readout `{"center": [{"real", "imaginary"}, ...]}`; empty when the readout differs.
+pub(super) fn site_centres(joint: &Value, sites: usize) -> Vec<Vec<f64>> {
+    let Some(center) = joint["center"].as_array() else {
+        return Vec::new();
+    };
+    let values = center
+        .iter()
+        .flat_map(|z| {
+            ["real", "imaginary"].map(|part| {
+                serde_json::from_value::<Rat>(z[part].clone())
+                    .ok()
+                    .and_then(|rat| rat.to_f64())
+            })
+        })
+        .collect::<Option<Vec<f64>>>();
+    let Some(values) = values else {
+        return Vec::new();
+    };
+    if values.len() < 12 * sites {
+        return Vec::new();
+    }
+    values[..12 * sites]
+        .chunks_exact(12)
+        .map(<[f64]>::to_vec)
+        .collect()
+}
+
+pub(super) fn site_energies(joint: &Value, sites: usize) -> Vec<Option<f64>> {
+    let centres = site_centres(joint, sites);
+    (0..sites)
+        .map(|site| {
+            centres
+                .get(site)
+                .map(|values| values.iter().map(|v| v * v).sum())
+        })
+        .collect()
 }

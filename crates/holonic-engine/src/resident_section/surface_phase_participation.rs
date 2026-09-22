@@ -356,4 +356,140 @@ impl<'c> ResidentSurface<'c> {
             "phase-adjoint",
         )
     }
+
+    /// `phi_j = (beta/2) Im <q|u_j>`: the phase face of the complex pair potential.
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_phase_participation_phase(
+        &self,
+        lane: &Lane<'_, 'c>,
+        query: &ResidentSection<'c>,
+        neighbors: &ResidentSection<'c>,
+        rows: usize,
+        n: usize,
+        components: usize,
+        grain: u32,
+        beta: Dyadic,
+        phase: &ResidentSection<'c>,
+        flags: &ResidentSection<'c>,
+    ) -> Result<(), ResidentRefusal> {
+        if components % 2 != 0 || beta.exponent == i32::MIN {
+            return Err(Self::operative_error());
+        }
+        self.phase_shapes(
+            rows,
+            n,
+            grain,
+            &[
+                (query, rows, components),
+                (
+                    neighbors,
+                    rows.checked_mul(n).ok_or_else(Self::operative_error)?,
+                    components,
+                ),
+                (
+                    phase,
+                    rows,
+                    n.checked_mul(2).ok_or_else(Self::operative_error)?,
+                ),
+            ],
+            flags,
+        )?;
+        let mut p = Params::new();
+        p.ptr(query.lo.device_ptr())
+            .ptr(query.hi.device_ptr())
+            .ptr(neighbors.lo.device_ptr())
+            .ptr(neighbors.hi.device_ptr())
+            .u32(rows as u32)
+            .u32(n as u32)
+            .u32(components as u32)
+            .u32(grain)
+            .i64(beta.significand)
+            .i32(beta.exponent)
+            .ptr(phase.lo.device_ptr())
+            .ptr(phase.hi.device_ptr())
+            .ptr(flags.lo.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_phase_participation_phase",
+            rows,
+            self.declaration.warp_size.max(1),
+            0,
+            &mut p,
+            "phase-face",
+        )
+    }
+    /// The adjoint of the phase face for a covector on it; additive to the magnitude adjoint.
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_phase_participation_phase_adjoint(
+        &self,
+        lane: &Lane<'_, 'c>,
+        query: &ResidentSection<'c>,
+        neighbors: &ResidentSection<'c>,
+        gphi: &ResidentSection<'c>,
+        rows: usize,
+        n: usize,
+        components: usize,
+        grain: u32,
+        beta: Dyadic,
+        source: &ResidentSection<'c>,
+        returned: &ResidentSection<'c>,
+        flags: &ResidentSection<'c>,
+    ) -> Result<(), ResidentRefusal> {
+        if components % 2 != 0 || beta.exponent == i32::MIN {
+            return Err(Self::operative_error());
+        }
+        let many = rows.checked_mul(n).ok_or_else(Self::operative_error)?;
+        self.phase_shapes(
+            rows,
+            n,
+            grain,
+            &[
+                (query, rows, components),
+                (neighbors, many, components),
+                (
+                    gphi,
+                    rows,
+                    n.checked_mul(2).ok_or_else(Self::operative_error)?,
+                ),
+                (source, rows, components),
+                (returned, many, components),
+            ],
+            flags,
+        )?;
+        let mut p = Params::new();
+        p.ptr(query.lo.device_ptr())
+            .ptr(query.hi.device_ptr())
+            .ptr(neighbors.lo.device_ptr())
+            .ptr(neighbors.hi.device_ptr())
+            .ptr(gphi.lo.device_ptr())
+            .ptr(gphi.hi.device_ptr())
+            .u32(rows as u32)
+            .u32(n as u32)
+            .u32(components as u32)
+            .u32(grain)
+            .i64(beta.significand)
+            .i32(beta.exponent)
+            .ptr(source.lo.device_ptr())
+            .ptr(source.hi.device_ptr())
+            .ptr(returned.lo.device_ptr())
+            .ptr(returned.hi.device_ptr())
+            .ptr(flags.lo.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_phase_participation_phase_adjoint",
+            rows,
+            self.declaration.warp_size.max(1),
+            0,
+            &mut p,
+            "phase-face-adjoint",
+        )
+    }
 }

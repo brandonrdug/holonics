@@ -180,3 +180,75 @@ extern "C" __global__ void section_phase_participation_adjoint(
  }
  phase_pack(dq,dqh,dq,components,status);ec_seal((int64_t*)dq,(int64_t*)dqh,components,status);
 }
+// The complex pair potential s_j = beta <q|u_j> has Re s_j = the bilinear score above and
+// Im s_j = beta sum_d (q_re u_im - q_im u_re) over the (re,im) pairs of the real-coded chart.
+// Its phase face is phi_j = Im s_j / 2; the magnitude face p = softmax(Re s) is unchanged, so the
+// participation and its weighted output do not read phi. Returned as a ball of the logits chart:
+// phi in the real slot, exactly zero in the imaginary one.
+__device__ MaterialInterval phase_imaginary_score(const wide *q,const wide *u,uint32_t components,uint32_t grain,uint32_t *status){
+ MaterialInterval im={0,0};
+ for(uint32_t d=0;d+1u<components;d+=2u){
+  im=mp_add(im,mp_mul(phase_coordinate(q,components,d,status),phase_coordinate(u,components,d+1u,status),grain,status),status);
+  im=mp_add(im,mp_neg(mp_mul(phase_coordinate(q,components,d+1u,status),phase_coordinate(u,components,d,status),grain,status),status),status);
+ }
+ return im;
+}
+extern "C" __global__ void section_phase_participation_phase(
+ const int64_t *query,const int64_t *query_hi,const int64_t *neighbors,const int64_t *neighbors_hi,
+ uint32_t rows,uint32_t neighbors_per_row,uint32_t components,uint32_t grain,int64_t beta_m,int32_t beta_e,
+ int64_t *phase,int64_t *phase_hi,int64_t *flags,
+ uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+ if(threadIdx.x)return;uint32_t row=blockIdx.x;if(row>=rows)return;
+ uint32_t *status=ec_status(flags,row);if(upstream_refused(census,lineage,lineage_count,status))return;
+ if(components%2u){atomicOr(status,REFUSED_MALFORMED);return;}
+ const size_t w=(size_t)components+1u,pw=2u*(size_t)neighbors_per_row+1u;
+ const int64_t *qw=query+2u*w*row,*qh=query_hi+2u*w*row;
+ if(!ec_ball(qw,qh,components,status))return;const wide *q=(const wide*)qw;
+ wide *out=(wide*)phase+pw*row,*oh=(wide*)phase_hi+pw*row;wide radius=0;
+ for(uint32_t j=0;j<neighbors_per_row;++j){
+  const size_t at=((size_t)row*neighbors_per_row+j)*2u*w;
+  if(!ec_ball(neighbors+at,neighbors_hi+at,components,status))return;
+  const wide *u=(const wide*)(neighbors+at);
+  // beta/2: the phase is half the imaginary potential.
+  MaterialInterval value=phase_scale(phase_imaginary_score(q,u,components,grain,status),beta_m,beta_e-1,status);
+  wide r=add_checked(sub_checked(value.hi,value.lo,status),1,status)>>1;
+  out[2u*j]=add_checked(value.lo,r,status);out[2u*j+1u]=0;radius=add_checked(radius,r,status);
+ }
+ out[pw-1u]=radius;ec_seal((int64_t*)out,(int64_t*)oh,(uint32_t)pw-1u,status);
+}
+// The adjoint of phi_j = (beta/2) Im <q|u_j> for a covector g on the phase face (real slot g_j):
+//   dq_re += (beta/2) sum_j g_j u_j,im    dq_im -= (beta/2) sum_j g_j u_j,re
+//   du_j,re -= (beta/2) g_j q_im          du_j,im += (beta/2) g_j q_re
+// These terms add to the magnitude face's own adjoint; the two faces read disjoint slots of s.
+extern "C" __global__ void section_phase_participation_phase_adjoint(
+ const int64_t *query,const int64_t *query_hi,const int64_t *neighbors,const int64_t *neighbors_hi,
+ const int64_t *gphi,const int64_t *gphi_hi,
+ uint32_t rows,uint32_t neighbors_per_row,uint32_t components,uint32_t grain,int64_t beta_m,int32_t beta_e,
+ int64_t *source,int64_t *source_hi,int64_t *returned,int64_t *returned_hi,int64_t *flags,
+ uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+ if(threadIdx.x)return;uint32_t row=blockIdx.x;if(row>=rows)return;
+ uint32_t *status=ec_status(flags,row);if(upstream_refused(census,lineage,lineage_count,status))return;
+ if(components%2u){atomicOr(status,REFUSED_MALFORMED);return;}
+ const size_t w=(size_t)components+1u,pw=2u*(size_t)neighbors_per_row+1u;
+ if(!ec_ball(query+2u*w*row,query_hi+2u*w*row,components,status)||!ec_ball(gphi+2u*pw*row,gphi_hi+2u*pw*row,(uint32_t)pw-1u,status))return;
+ const wide *q=(const wide*)query+w*row,*g=(const wide*)gphi+pw*row;
+ wide *dq=(wide*)source+w*row,*dqh=(wide*)source_hi+w*row;
+ for(uint32_t d=0;d<components;++d){dq[d]=0;dqh[d]=0;}
+ for(uint32_t j=0;j<neighbors_per_row;++j){
+  const size_t at=((size_t)row*neighbors_per_row+j)*2u*w;
+  if(!ec_ball(neighbors+at,neighbors_hi+at,components,status))return;const wide *u=(const wide*)(neighbors+at);
+  const MaterialInterval b=phase_scale(phase_coordinate(g,(uint32_t)pw-1u,2u*j,status),beta_m,beta_e-1,status);
+  wide *du=(wide*)(returned+at),*duh=(wide*)(returned_hi+at);
+  for(uint32_t d=0;d+1u<components;d+=2u){
+   const MaterialInterval qre=mp_mul(b,phase_coordinate(u,components,d+1u,status),grain,status);
+   const MaterialInterval qim=mp_neg(mp_mul(b,phase_coordinate(u,components,d,status),grain,status),status);
+   dq[d]=add_checked(dq[d],qre.lo,status);dqh[d]=add_checked(dqh[d],qre.hi,status);
+   dq[d+1u]=add_checked(dq[d+1u],qim.lo,status);dqh[d+1u]=add_checked(dqh[d+1u],qim.hi,status);
+   const MaterialInterval ure=mp_neg(mp_mul(b,phase_coordinate(q,components,d+1u,status),grain,status),status);
+   const MaterialInterval uim=mp_mul(b,phase_coordinate(q,components,d,status),grain,status);
+   du[d]=ure.lo;duh[d]=ure.hi;du[d+1u]=uim.lo;duh[d+1u]=uim.hi;
+  }
+  phase_pack(du,duh,du,components,status);ec_seal((int64_t*)du,(int64_t*)duh,components,status);
+ }
+ phase_pack(dq,dqh,dq,components,status);ec_seal((int64_t*)dq,(int64_t*)dqh,components,status);
+}

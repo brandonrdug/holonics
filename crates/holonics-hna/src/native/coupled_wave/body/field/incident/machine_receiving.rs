@@ -179,7 +179,25 @@ pub(super) fn signed_affine_power(
     Ok(result)
 }
 
+/// The receiving phase's action on the resident current. Chart law: a current is a tangent, so
+/// it advances by the linear part `L^j` of the site's affine action; the affine translation acts
+/// on the site's configuration only and is not applied to the current.
 pub(super) fn receiving_current_map(
+    site: &CompiledGeneratorSite,
+    exponent: i64,
+) -> Result<AffineMap3, NativeSessionError> {
+    let action = signed_affine_power(site.phase_action(), exponent)?;
+    Ok(AffineMap3 {
+        linear: action.linear,
+        translation: relational_geometry::RatVec3::zero(),
+    })
+}
+
+/// The same receiving phase acting on the site's configuration `x₀`, expressed as the
+/// displacement map `x ↦ L^j x + (L^j x₀ + τ_j − x₀)` about the initial configuration. This is a
+/// configuration chart, never applied to a current.
+#[allow(dead_code)]
+pub(super) fn receiving_configuration_map(
     site: &CompiledGeneratorSite,
     exponent: i64,
 ) -> Result<AffineMap3, NativeSessionError> {

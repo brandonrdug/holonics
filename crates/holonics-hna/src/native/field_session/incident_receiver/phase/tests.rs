@@ -8,6 +8,7 @@ use holonic_engine::{
     },
     resident_section::{ResidentGrain, ResidentSectionRest, ResidentSurface, SeriesAperture},
 };
+use num_traits::{Signed, Zero};
 
 fn boundary<'c>(surface: &'c ResidentSurface<'c>) -> BoundaryMaterial<'c> {
     BoundaryMaterial::found(
@@ -47,6 +48,32 @@ fn phase_rows<'c>(
     .unwrap()
 }
 
+fn phase_rows_shifted<'c>(
+    surface: &'c ResidentSurface<'c>,
+    rows: usize,
+) -> ResidentNormalEnclosureSection<'c> {
+    let scale = 1_i64 << 16;
+    let values = (0..rows)
+        .flat_map(|row| {
+            [
+                (((row as i64) + 3) * scale, ((row as i64) + 3) * scale),
+                (-scale, -scale),
+                (2 * scale, 2 * scale),
+            ]
+        })
+        .collect();
+    let raw = surface
+        .mount_section_rest(
+            &ResidentSectionRest::found(rows, 3, ResidentGrain(0), 64, values).unwrap(),
+        )
+        .unwrap();
+    ResidentNormalEnclosureSection::from_points(
+        ResidentConstitutiveSection::rationals(&raw).unwrap(),
+        ResidentGrain(16),
+    )
+    .unwrap()
+}
+
 #[test]
 #[ignore = "requires CUDA; phase rows share one support normal chart and return packed boundary covectors"]
 fn phase_receiver_uses_aperture_rows_with_one_shared_support_parameter_chart() {
@@ -55,6 +82,10 @@ fn phase_receiver_uses_aperture_rows_with_one_shared_support_parameter_chart() {
     let mut receiver = GeneratorTextReceiver::found(&surface, boundary(&surface)).unwrap();
     let phases = phase_rows(&surface, 3);
     let forward = receiver.forward(&phases, SeriesAperture(16)).unwrap();
+    // A target Holon read through the same receiver at shifted phase rows.
+    let target = receiver
+        .forward(&phase_rows_shifted(&surface, 3), SeriesAperture(16))
+        .unwrap();
     assert_eq!(forward.text_features.rows(), 3);
     assert_eq!(forward.support_features.rows(), 3);
     assert_eq!(forward.text_logits.rows(), 3);
@@ -67,8 +98,16 @@ fn phase_receiver_uses_aperture_rows_with_one_shared_support_parameter_chart() {
     assert!(stop <= 2);
 
     let frozen_before = receiver
-        .compare(&forward, &[0, 1], SeriesAperture(16), 4)
+        .compare(
+            &forward,
+            Some(&target),
+            &[0, 1],
+            &[0, 0, 0],
+            SeriesAperture(16),
+            4,
+        )
         .unwrap()
+        .0
         .boundary_covector
         .inspect_rows()
         .unwrap();
@@ -78,16 +117,41 @@ fn phase_receiver_uses_aperture_rows_with_one_shared_support_parameter_chart() {
     assert_eq!(more.support_features.rows(), 5);
     assert_eq!(receiver.inner().support_material().source_complex(), 2);
     assert_eq!(receiver.inner().support_material().targets(), 2);
-    let empty = receiver
-        .compare(&forward, &[], SeriesAperture(16), 4)
+    let (empty, empty_faces) = receiver
+        .compare(&forward, None, &[], &[0, 0, 0], SeriesAperture(16), 4)
         .unwrap();
+    assert!(empty_faces.text.is_none());
+    assert_eq!(empty_faces.stop.rows(), 1);
     assert!(empty.text_covector.is_none());
     assert!(empty.successor.text.is_none());
     receiver.publish(empty.successor);
 
-    let returned = receiver
-        .compare(&forward, &[0, 1], SeriesAperture(16), 4)
+    let (returned, faces) = receiver
+        .compare(
+            &forward,
+            Some(&target),
+            &[0, 1],
+            &[0, 0, 0],
+            SeriesAperture(16),
+            4,
+        )
         .unwrap();
+    // The ratio covector: real slot q - p, imaginary slot (1/2) q Delta at the target class,
+    // zero on the unsupported class; the target Holon's phases differ from the produced ones.
+    let text = faces.text.as_ref().unwrap();
+    assert_eq!(faces.classes, 2);
+    let covector = text.ratio_covector().unwrap().inspect_rows().unwrap();
+    assert!(
+        covector
+            .iter()
+            .enumerate()
+            .any(|(row, c)| !c.center[[0usize, 1][row]].imaginary.is_zero())
+    );
+    for (row, class) in [0usize, 1].into_iter().enumerate() {
+        assert!(covector[row].center[1 - class].imaginary.abs() <= covector[row].radius);
+    }
+    assert_eq!(text.read_phase().unwrap().len(), 2);
+    assert_eq!(faces.stop.rows(), 3);
     assert!(
         returned
             .text_covector

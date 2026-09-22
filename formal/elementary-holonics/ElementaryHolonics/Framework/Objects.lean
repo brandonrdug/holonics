@@ -15,6 +15,14 @@ import ElementaryHolonics.Objects.Deposition
 import ElementaryHolonics.Objects.Ratio
 import ElementaryHolonics.Objects.Parametron
 import ElementaryHolonics.Objects.RelativeCompleteness
+import ElementaryHolonics.Objects.RatioPhase
+import ElementaryHolonics.Objects.RatioBlock
+import ElementaryHolonics.Objects.Retention
+import ElementaryHolonics.Objects.Membrane
+import ElementaryHolonics.Objects.Orientation
+import ElementaryHolonics.Objects.SourceHolon
+import ElementaryHolonics.Objects.SourcePorts
+import ElementaryHolonics.Objects.CommitRebase
 
 /-!
 # The elementary Holonic objects

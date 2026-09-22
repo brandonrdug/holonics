@@ -1,17 +1,17 @@
 //! Cold rest for the fixed generator source/phase presentation.
 //!
-//! The body owns each comparison's producing moment operands (accumulated field, pooled
-//! condition, binding and clock origin); it holds no source rows or per-occurrence state.
-//! This packet owns the E/R producing faces, the encoded rows the encoder return consumes, and
-//! the tagged receiving binding used to rebuild each producing receiving face.
+//! The body owns each comparison's source Holon (per-symbol phase-weighted sums and their
+//! declaration, fixed in the passage length). This packet owns the current E/R material and,
+//! per outstanding comparison, only its clock origin, passage length, receiving binding and
+//! alphabet binding (occurrences per codec identity, `|A|` words). No encoded rows, per-cell
+//! symbols, per-edge contacts, producing material copies or frozen receiver faces are written:
+//! an outstanding comparison is read at the contemporary constitution when it is observed.
 
-use super::super::incident_encoder::{IncidentEncoded, IncidentEncoder};
+use super::super::incident_encoder::IncidentEncoder;
 use super::super::incident_receiver::{IncidentTextCohort, phase::GeneratorTextReceiver};
 use super::*;
-use crate::native::{GeneratorPhaseReceiverBinding, NativeGeneratorPhaseReception};
-use holonic_engine::native_ecology::constitutive_fibre::{
-    NormalMaterialRest, ResidentNormalEnclosureSection,
-};
+use crate::native::GeneratorPhaseReceiverBinding;
+use holonic_engine::native_ecology::constitutive_fibre::NormalMaterialRest;
 use holonic_engine::resident_section::ResidentGrain;
 use serde::{Deserialize, Serialize};
 use std::io::Cursor;
@@ -26,35 +26,85 @@ fn read_material(bytes: &[u8]) -> Result<NormalMaterialRest> {
     NormalMaterialRest::read(&mut Cursor::new(bytes), bytes.len() as u64).map_err(invalid)
 }
 
-fn section_bytes(section: &ResidentNormalEnclosureSection<'_>) -> Result<Vec<u8>> {
-    section
-        .rest()
-        .map_err(invalid)?
-        .canonical_bytes()
-        .map_err(invalid)
-}
-
-fn read_section(bytes: &[u8]) -> Result<holonic_engine::resident_section::ResidentSectionRest> {
-    holonic_engine::resident_section::ResidentSectionRest::read(bytes).map_err(invalid)
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
+/// One outstanding comparison at rest: fixed in the passage length, not a producing cut.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct GeneratorPendingRest {
     pub id: u64,
-    pub preparation: IncidentPreparation,
-    pub encoded_symbols: Vec<usize>,
-    pub encoded_rows: Vec<u8>,
-    pub encoded_row_count: usize,
-    pub encoded_width: usize,
-    pub grain_bits: u32,
-    pub encoded_producing_material: Vec<Vec<u8>>,
-    pub frozen_text: Vec<u8>,
-    pub frozen_support: Vec<u8>,
-    pub frozen_cohorts: Vec<IncidentTextCohort>,
-    pub frozen_cohort_material: Vec<Vec<u8>>,
     pub receiver_binding: GeneratorPhaseReceiverBinding,
     pub start: u64,
+    pub cells: usize,
+    /// Occurrences per codec identity `0..|A|` at request time.
+    pub symbol_counts: Vec<usize>,
+    /// The presentation's fixed-size request record and exterior exposure pairing.
+    pub record: super::GeneratorRetainedRecord,
+}
+
+/// The pre-moment wire kept encoded rows, a frozen encoder copy and frozen receiver faces (and
+/// the per-cell preparation) for every outstanding comparison. Those are producing cuts and
+/// `O(N)` relations, not the fixed pending operands; a rest that carries them is refused with its
+/// reason rather than silently reinterpreted.
+impl<'de> Deserialize<'de> for GeneratorPendingRest {
+    fn deserialize<D: serde::Deserializer<'de>>(
+        deserializer: D,
+    ) -> std::result::Result<Self, D::Error> {
+        use serde::de::IgnoredAny;
+        #[derive(Deserialize)]
+        #[serde(deny_unknown_fields)]
+        struct Wire {
+            id: u64,
+            receiver_binding: GeneratorPhaseReceiverBinding,
+            start: u64,
+            cells: Option<usize>,
+            symbol_counts: Option<Vec<usize>>,
+            record: Option<super::GeneratorRetainedRecord>,
+            preparation: Option<IgnoredAny>,
+            encoded_symbols: Option<IgnoredAny>,
+            encoded_rows: Option<IgnoredAny>,
+            encoded_row_count: Option<IgnoredAny>,
+            encoded_width: Option<IgnoredAny>,
+            grain_bits: Option<IgnoredAny>,
+            encoded_producing_material: Option<IgnoredAny>,
+            frozen_text: Option<IgnoredAny>,
+            frozen_support: Option<IgnoredAny>,
+            frozen_cohorts: Option<IgnoredAny>,
+            frozen_cohort_material: Option<IgnoredAny>,
+        }
+        let wire = Wire::deserialize(deserializer)?;
+        if wire.encoded_rows.is_some()
+            || wire.encoded_producing_material.is_some()
+            || wire.frozen_text.is_some()
+            || wire.frozen_support.is_some()
+            || wire.frozen_cohort_material.is_some()
+            || wire.encoded_symbols.is_some()
+            || wire.encoded_row_count.is_some()
+            || wire.encoded_width.is_some()
+            || wire.grain_bits.is_some()
+            || wire.frozen_cohorts.is_some()
+            || wire.preparation.is_some()
+        {
+            return Err(serde::de::Error::custom(
+                "generator pending rest carries encoded source rows or frozen receiver faces \
+                 (the pre-moment wire); an outstanding comparison is now read at the \
+                 contemporary constitution and keeps no producing cut. Observe or release it \
+                 with the build that wrote this checkpoint, then save again",
+            ));
+        }
+        let (Some(cells), Some(symbol_counts), Some(record)) =
+            (wire.cells, wire.symbol_counts, wire.record)
+        else {
+            return Err(serde::de::Error::custom(
+                "generator pending rest lacks its passage length, alphabet binding or request record",
+            ));
+        };
+        Ok(Self {
+            id: wire.id,
+            receiver_binding: wire.receiver_binding,
+            start: wire.start,
+            cells,
+            symbol_counts,
+            record,
+        })
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -77,41 +127,15 @@ impl<'c> GeneratorPresentation<'c> {
         let pending = self
             .pending
             .iter()
-            .map(|(&id, pending)| {
-                Ok(GeneratorPendingRest {
-                    id,
-                    preparation: pending.preparation.clone(),
-                    encoded_symbols: pending.encoded.symbols.clone(),
-                    encoded_rows: section_bytes(&pending.encoded.rows)?,
-                    encoded_row_count: pending.encoded.rows.rows(),
-                    encoded_width: pending.encoded.rows.components(),
-                    grain_bits: pending.encoded.rows.grain().0,
-                    encoded_producing_material: pending
-                        .encoded
-                        .producing
-                        .iter()
-                        .map(|material| {
-                            material
-                                .rest()
-                                .map_err(invalid)
-                                .and_then(|rest| material_bytes(&rest))
-                        })
-                        .collect::<Result<Vec<_>>>()?,
-                    frozen_text: material_bytes(&receiver.producing_text_rest(&pending.received)?)?,
-                    frozen_support: material_bytes(
-                        &receiver.producing_support_rest(&pending.received)?,
-                    )?,
-                    frozen_cohorts: pending.received.text_cohorts.clone(),
-                    frozen_cohort_material: receiver
-                        .producing_text_cohort_rests(&pending.received)?
-                        .iter()
-                        .map(material_bytes)
-                        .collect::<Result<Vec<_>>>()?,
-                    receiver_binding: pending.phases.binding().clone(),
-                    start: pending.start,
-                })
+            .map(|(&id, pending)| GeneratorPendingRest {
+                id,
+                receiver_binding: self.receiver_binding.clone(),
+                start: pending.start,
+                cells: pending.cells,
+                symbol_counts: pending.symbol_counts.clone(),
+                record: pending.record.clone(),
             })
-            .collect::<Result<Vec<_>>>()?;
+            .collect::<Vec<_>>();
         Ok(GeneratorPresentationRest {
             encoder_material: encoder_material
                 .iter()
@@ -204,99 +228,48 @@ impl GeneratorPresentationRest {
             receiver,
             pending: std::collections::BTreeMap::new(),
             next_event: self.next_event,
+            receiver_binding: options.receiver.clone(),
+            readings: Default::default(),
         };
         for pending in self.pending {
-            pending.preparation.validate(spec)?;
+            let rows = pending.cells;
             if pending.receiver_binding != options.receiver
-                || pending.encoded_row_count != pending.preparation.source_extent
-                || pending.encoded_width != source_width
-                || pending.grain_bits != grain.0
-                || pending.encoded_symbols
-                    != pending
-                        .preparation
-                        .source_cells
-                        .iter()
-                        .map(|cell| cell.symbol_index)
-                        .collect::<Vec<_>>()
                 || pending.start > presentation.next_event
-                || pending
-                    .start
-                    .checked_add(pending.encoded_row_count as u64)
-                    .is_none()
+                || pending.start.checked_add(rows as u64).is_none()
+                || pending.symbol_counts.iter().sum::<usize>() != rows
+                || pending.symbol_counts.len() > spec.symbols.len()
+                || pending.record.output_symbols
+                    != pending.record.request_extent + pending.record.response_aperture
+                || pending.record.response_aperture != spec.response_aperture()?
+                || pending.record.request_extent > rows
             {
                 return Err(invalid("generator pending source/receiver chart"));
             }
-            let generated = body.incident_comparison(pending.id)?;
-            if generated.generator_source_binding()
-                != Some((
-                    &options.source,
-                    pending.start,
-                    pending.encoded_row_count,
-                    pending.encoded_width,
-                ))
-                || generated.generator_source_contacts()
-                    != Some(source_contacts(&pending.preparation).as_slice())
+            let declared = body.generator_comparison_declaration(pending.id)?;
+            if declared.binding != options.source
+                || declared.start != pending.start
+                || declared.rows != rows
+                || declared.components != source_width
+                || declared.alphabet != Some(pending.symbol_counts.len())
             {
                 return Err(invalid("generator pending body/source binding mismatch"));
             }
-            let phases: NativeGeneratorPhaseReception<'c> =
-                generated.receive_generator_phases(pending.receiver_binding.clone())?;
-            let old_class_count = pending
-                .frozen_cohorts
-                .iter()
-                .map(|cohort| cohort.class_count)
-                .sum::<usize>();
-            let frozen_boundary = super::receiver_boundary(surface, spec, Some(old_class_count))?;
-            let frozen_receiver = GeneratorTextReceiver::remount_with_cohorts(
-                surface,
-                frozen_boundary,
-                read_material(&pending.frozen_text)?,
-                read_material(&pending.frozen_support)?,
-                pending.frozen_cohorts.clone(),
-                pending
-                    .frozen_cohort_material
-                    .iter()
-                    .map(|bytes| read_material(bytes))
-                    .collect::<Result<Vec<_>>>()?,
-                pending
-                    .frozen_cohorts
-                    .last()
-                    .map_or(0, |cohort| cohort.codec_version),
-            )?;
-            let received = frozen_receiver.forward(
-                phases.output(),
-                holonic_engine::resident_section::SeriesAperture(options.field.series_terms),
-            )?;
-            let encoded_rows = ResidentNormalEnclosureSection::remount(
-                surface,
-                read_section(&pending.encoded_rows)?,
-                pending.encoded_row_count,
-                pending.encoded_width,
-                ResidentGrain(pending.grain_bits),
-            )?;
-            let producing = pending
-                .encoded_producing_material
-                .iter()
-                .map(|bytes| {
-                    read_material(bytes)?
-                        .remount(surface)
-                        .map_err(invalid)
-                        .map(|material| material.retained_view())
-                })
-                .collect::<Result<Vec<_>>>()?;
-            let encoded = IncidentEncoded {
-                rows: encoded_rows,
-                symbols: pending.encoded_symbols,
-                producing,
-            };
+            if let Some(pairing) = &pending.record.exposure_pairing {
+                if pairing.family.provider.is_empty()
+                    || pairing.family.record_group.is_empty()
+                    || pairing.response_symbols != pending.record.response_aperture
+                    || pairing.request_text_sha256 != pending.record.held_text_sha256
+                {
+                    return Err(invalid("generator retained exposure digest"));
+                }
+            }
             presentation.pending.insert(
                 pending.id,
                 GeneratorPending {
-                    preparation: pending.preparation,
-                    encoded,
-                    phases,
-                    received,
                     start: pending.start,
+                    cells: pending.cells,
+                    symbol_counts: pending.symbol_counts,
+                    record: pending.record,
                 },
             );
         }

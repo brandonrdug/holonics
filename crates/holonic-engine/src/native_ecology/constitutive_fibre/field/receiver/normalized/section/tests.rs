@@ -119,21 +119,34 @@ fn rat(value: i64) -> Rat {
 }
 
 fn matrix(rows: &[&[i64]]) -> ExactRatMatrix {
-    ExactRatMatrix::new(rows.iter().map(|r| r.iter().copied().map(rat).collect()).collect()).unwrap()
+    ExactRatMatrix::new(
+        rows.iter()
+            .map(|r| r.iter().copied().map(rat).collect())
+            .collect(),
+    )
+    .unwrap()
 }
 
 /// The values whose normalized transport is the face itself: `a I = a`.
 fn identity(n: usize) -> ExactRatMatrix {
     ExactRatMatrix::new(
         (0..n)
-            .map(|i| (0..n).map(|j| if i == j { Rat::one() } else { Rat::zero() }).collect())
+            .map(|i| {
+                (0..n)
+                    .map(|j| if i == j { Rat::one() } else { Rat::zero() })
+                    .collect()
+            })
             .collect(),
     )
     .unwrap()
 }
 
 fn pairing(a: &ExactRatMatrix, b: &ExactRatMatrix) -> Rat {
-    a.entries().iter().zip(b.entries()).map(|(a, b)| a * b).sum()
+    a.entries()
+        .iter()
+        .zip(b.entries())
+        .map(|(a, b)| a * b)
+        .sum()
 }
 
 #[test]
@@ -143,9 +156,27 @@ fn row_sectioned_receiver_agrees_with_the_single_row_owner() {
     let surface = ResidentSurface::on(&readout).unwrap();
     // Four complex coordinates a row, two declared groups of two.
     let predicted: Vec<(Vec<i128>, i128)> = vec![
-        (vec![0, 3 * UNIT, UNIT, -2 * UNIT, 5 * UNIT, 0, -UNIT, UNIT], 0),
-        (vec![2 * UNIT, 0, 2 * UNIT, UNIT, -4 * UNIT, 7 * UNIT, 0, 0], 0),
-        (vec![-3 * UNIT, UNIT, 6 * UNIT, 0, UNIT, -UNIT, 2 * UNIT, 3 * UNIT], 0),
+        (
+            vec![0, 3 * UNIT, UNIT, -2 * UNIT, 5 * UNIT, 0, -UNIT, UNIT],
+            0,
+        ),
+        (
+            vec![2 * UNIT, 0, 2 * UNIT, UNIT, -4 * UNIT, 7 * UNIT, 0, 0],
+            0,
+        ),
+        (
+            vec![
+                -3 * UNIT,
+                UNIT,
+                6 * UNIT,
+                0,
+                UNIT,
+                -UNIT,
+                2 * UNIT,
+                3 * UNIT,
+            ],
+            0,
+        ),
     ];
     let observed: Vec<(Vec<i128>, i128)> = vec![
         (vec![UNIT, 0, 0, 0, 2 * UNIT, UNIT, 3 * UNIT, 0], 0),
@@ -204,9 +235,16 @@ fn row_sectioned_receiver_agrees_with_the_single_row_owner() {
     for (row, reading) in rows.iter().enumerate() {
         let at = 9 * row;
         for (j, p) in reading.prediction.iter().enumerate() {
-            let centre = Rat::new(operand[at + 2 * j].into(), num_bigint::BigInt::one() << GRAIN);
+            let centre = Rat::new(
+                operand[at + 2 * j].into(),
+                num_bigint::BigInt::one() << GRAIN,
+            );
             let radius = Rat::new(operand[at + 8].into(), num_bigint::BigInt::one() << GRAIN);
-            assert_eq!(operand[at + 2 * j + 1], 0, "imaginary coordinate is exactly zero");
+            assert_eq!(
+                operand[at + 2 * j + 1],
+                0,
+                "imaginary coordinate is exactly zero"
+            );
             assert!(&centre - &radius <= p.lower && p.upper <= &centre + &radius);
         }
     }
@@ -225,7 +263,11 @@ fn row_sectioned_face_and_pullback_agree_with_the_normalized_kernel() {
     let amplitudes = vec![UNIT, 0, 2 * UNIT, 0, 3 * UNIT, 0, UNIT, UNIT];
     let section = balls(&surface, &[(amplitudes.clone(), 0), (amplitudes, 0)], 8);
     let face = section
-        .normalized_participation(4, SeriesAperture(32), NativeNormalizedFaceMeasure::PacketModulus)
+        .normalized_participation(
+            4,
+            SeriesAperture(32),
+            NativeNormalizedFaceMeasure::PacketModulus,
+        )
         .unwrap();
     assert!(!face.compared());
     assert!(face.inspect().is_err(), "no comparison face was taken");
@@ -233,7 +275,10 @@ fn row_sectioned_face_and_pullback_agree_with_the_normalized_kernel() {
     let exact = kernel.probabilities().unwrap();
     for row in face.read_participation().unwrap() {
         for (j, value) in row.iter().enumerate() {
-            assert_eq!(value, &ExactInterval::point(exact.get(0, j).unwrap().clone()));
+            assert_eq!(
+                value,
+                &ExactInterval::point(exact.get(0, j).unwrap().clone())
+            );
         }
     }
     // The covector on the normalized face, returned to the pre-normalization potentials.
@@ -287,7 +332,11 @@ fn row_sectioned_face_and_pullback_agree_with_the_normalized_kernel() {
         for j in 0..4 {
             assert_eq!(operand[9 * row + 2 * j + 1], 0);
         }
-        assert_eq!(operand[9 * row + 8], 0, "an exact covector returns an exact covector");
+        assert_eq!(
+            operand[9 * row + 8],
+            0,
+            "an exact covector returns an exact covector"
+        );
     }
 }
 
@@ -297,8 +346,14 @@ fn row_sectioned_face_keeps_its_gauge_and_its_radii() {
     let readout = ResidentReadout::new().unwrap();
     let surface = ResidentSurface::on(&readout).unwrap();
     let base = vec![
-        (vec![0, 3 * UNIT, UNIT, -2 * UNIT, 5 * UNIT, 0, -UNIT, UNIT], 0),
-        (vec![2 * UNIT, 0, 2 * UNIT, UNIT, -4 * UNIT, 7 * UNIT, 0, 0], 0),
+        (
+            vec![0, 3 * UNIT, UNIT, -2 * UNIT, 5 * UNIT, 0, -UNIT, UNIT],
+            0,
+        ),
+        (
+            vec![2 * UNIT, 0, 2 * UNIT, UNIT, -4 * UNIT, 7 * UNIT, 0, 0],
+            0,
+        ),
     ];
     // A common additive shift of each declared group, different per group and per row.
     let shifts: [[i128; 2]; 2] = [[11 * UNIT, -4 * UNIT], [-9 * UNIT, 6 * UNIT]];
@@ -309,7 +364,13 @@ fn row_sectioned_face_keeps_its_gauge_and_its_radii() {
             let moved = values
                 .iter()
                 .enumerate()
-                .map(|(k, v)| if k % 2 == 0 { v + shifts[row][k / 4] } else { *v })
+                .map(|(k, v)| {
+                    if k % 2 == 0 {
+                        v + shifts[row][k / 4]
+                    } else {
+                        *v
+                    }
+                })
                 .collect();
             (moved, *radius)
         })
@@ -332,11 +393,17 @@ fn row_sectioned_face_keeps_its_gauge_and_its_radii() {
         .unwrap();
     for row in open.read_participation().unwrap() {
         for value in row {
-            assert!(value.lower < value.upper, "the open ball is not sealed to a point");
+            assert!(
+                value.lower < value.upper,
+                "the open ball is not sealed to a point"
+            );
         }
     }
     let operand = read_wides(&surface, open.participation().resident_section());
-    assert!(operand[4] > 0, "a retained source radius returns a retained radius");
+    assert!(
+        operand[4] > 0,
+        "a retained source radius returns a retained radius"
+    );
 }
 
 #[test]
@@ -352,11 +419,24 @@ fn row_sectioned_receiver_refuses_malformed_declarations() {
             .normalized_participation(group_width, terms, measure)
             .is_err()
     };
-    assert!(malformed(0, SeriesAperture(32)), "an empty group is not a declaration");
-    assert!(malformed(2, SeriesAperture(32)), "2 does not divide 3 coordinates");
+    assert!(
+        malformed(0, SeriesAperture(32)),
+        "an empty group is not a declaration"
+    );
+    assert!(
+        malformed(2, SeriesAperture(32)),
+        "2 does not divide 3 coordinates"
+    );
     assert!(malformed(3, SeriesAperture(0)), "an empty series aperture");
-    assert!(malformed(3, SeriesAperture(u32::MAX)), "an unbounded series aperture");
-    assert!(section.normalized_participation(3, SeriesAperture(32), measure).is_ok());
+    assert!(
+        malformed(3, SeriesAperture(u32::MAX)),
+        "an unbounded series aperture"
+    );
+    assert!(
+        section
+            .normalized_participation(3, SeriesAperture(32), measure)
+            .is_ok()
+    );
     // A comparison operand must present the same rows, coordinates and grain.
     let wider = balls(&surface, &[(vec![UNIT, 0, 0, UNIT, 2 * UNIT, 0], 0)], 6);
     assert!(
@@ -377,6 +457,147 @@ fn row_sectioned_receiver_refuses_malformed_declarations() {
     assert!(face.pull_back(&narrow).is_err());
     assert!(face.pull_back(&wider).is_err());
     assert!(face.pull_back(&section).is_ok());
-    assert!(face.returned_difference().is_err(), "no comparison face was taken");
+    assert!(
+        face.returned_difference().is_err(),
+        "no comparison face was taken"
+    );
     assert!(face.potential_return().is_err());
+}
+
+#[test]
+#[ignore = "requires CUDA; the complex receiving potential's ratio return, exact on a common face"]
+fn ratio_return_carries_the_phase_face_and_the_gap_weighted_covector() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    // One group of four classes with a common real potential, so p = 1/4 exactly (the only
+    // exact exponential control), and distinct imaginary potentials: Im s = (2, -1, 6, 0).
+    let produced = balls(
+        &surface,
+        &[(
+            vec![UNIT, 2 * UNIT, UNIT, -UNIT, UNIT, 6 * UNIT, UNIT, 0],
+            0,
+        )],
+        8,
+    );
+    // The observed packet: the one-hot target class 2.
+    let observed = balls(&surface, &[(vec![0, 0, 0, 0, UNIT, 0, 0, 0], 0)], 8);
+    // Target Holon potentials: Im s^T_2 = 4, so phi^T_2 = 2 against phi^H_2 = 3.
+    let target_at = |im2: i128| {
+        balls(
+            &surface,
+            &[(vec![0, 5 * UNIT, 0, 0, 0, im2, 0, -3 * UNIT], 0)],
+            8,
+        )
+    };
+    let target = target_at(4 * UNIT);
+    let face = produced
+        .normalized_ratio_return(&observed, &target, &[0], 4, SeriesAperture(32))
+        .unwrap();
+    let quarter = Rat::new(1.into(), 4.into());
+    let half = Rat::new(1.into(), 2.into());
+    let reading = face.inspect().unwrap().remove(0);
+    for (c, p) in reading.prediction.iter().enumerate() {
+        assert_eq!(p, &ExactInterval::point(quarter.clone()), "class {c}");
+    }
+    // phi = Im s / 2, exactly, for both Holons.
+    let phase = face.read_phase().unwrap().remove(0);
+    let expected_phase = [rat(1), Rat::new((-1).into(), 2.into()), rat(3), Rat::zero()];
+    for (c, value) in phase.iter().enumerate() {
+        assert_eq!(
+            value,
+            &ExactInterval::point(expected_phase[c].clone()),
+            "phase {c}"
+        );
+    }
+    let target_phase = NativeNormalizedSection::read_phase_ball(face.target_phase().unwrap())
+        .unwrap()
+        .remove(0);
+    assert_eq!(target_phase[2], ExactInterval::point(rat(2)));
+    // Exact reference: Re slot q - p; Im slot (1/2) q Delta with Delta_2 = 2 - 3 = -1; zero on
+    // the unsupported classes whatever their phase gap.
+    let covector = |face: &NativeNormalizedSection<'_>| {
+        face.ratio_covector()
+            .unwrap()
+            .row(0)
+            .unwrap()
+            .inspect()
+            .unwrap()
+    };
+    let value = covector(&face);
+    assert_eq!(value.radius, Rat::zero());
+    for (c, v) in value.center.iter().enumerate() {
+        let q = if c == 2 { Rat::one() } else { Rat::zero() };
+        assert_eq!(v.real, &q - &quarter, "real covector of class {c}");
+        let phase_part = if c == 2 { -half.clone() } else { Rat::zero() };
+        assert_eq!(v.imaginary, phase_part, "phase covector of class {c}");
+    }
+    let difference = face
+        .returned_difference()
+        .unwrap()
+        .row(0)
+        .unwrap()
+        .inspect()
+        .unwrap();
+    for (a, b) in value.center.iter().zip(&difference.center) {
+        assert_eq!(a.real, b.real);
+    }
+    // Agreeing phases: the phase covector vanishes.
+    let agree = produced
+        .normalized_ratio_return(&observed, &target_at(6 * UNIT), &[0], 4, SeriesAperture(32))
+        .unwrap();
+    assert!(
+        covector(&agree)
+            .center
+            .iter()
+            .all(|v| v.imaginary.is_zero())
+    );
+    // The gap reverses: phi^T_2 = 4 gives Delta_2 = +1 and the covector +1/2.
+    let reversed = produced
+        .normalized_ratio_return(&observed, &target_at(8 * UNIT), &[0], 4, SeriesAperture(32))
+        .unwrap();
+    assert_eq!(covector(&reversed).center[2].imaginary, half);
+    // A winding branch n = 1 adds 2 pi to the gap: (1/2)(2 pi - 1), enclosed outward.
+    let wound = produced
+        .normalized_ratio_return(&observed, &target, &[1], 4, SeriesAperture(32))
+        .unwrap();
+    let wound = covector(&wound);
+    let pi = relational_geometry::exact_analysis::pi_interval(GRAIN + 16);
+    let lower = (&pi.lower * rat(2) - Rat::one()) * &half;
+    let upper = (&pi.upper * rat(2) - Rat::one()) * &half;
+    let centre = &wound.center[2].imaginary;
+    assert!(centre - &wound.radius <= lower && upper <= centre + &wound.radius);
+    assert!(wound.radius > Rat::zero() && wound.radius < Rat::new(1.into(), (1u64 << 40).into()));
+    // Exact reference for the magnitude part: the principal log of the real amplitude ratio 2.
+    let config = relational_geometry::exact_analysis::ExactSeriesConfig::default();
+    let log_ratio =
+        relational_geometry::exact_analysis::complex_log_point(&rat(2), &Rat::zero(), &config)
+            .unwrap();
+    let half_log_q_over_p = relational_geometry::exact_analysis::complex_log_point(
+        &(Rat::one() / &quarter),
+        &Rat::zero(),
+        &config,
+    )
+    .unwrap()
+    .re
+    .scale(&half);
+    assert!(
+        log_ratio.re.lower <= half_log_q_over_p.upper
+            && half_log_q_over_p.lower <= log_ratio.re.upper
+    );
+    // An open produced ball returns an open phase and an open covector radius.
+    let open = balls(&surface, &[(vec![0; 8], 1i128 << 60)], 8)
+        .normalized_ratio_return(&observed, &target, &[0], 4, SeriesAperture(32))
+        .unwrap();
+    assert!(
+        open.read_phase().unwrap()[0]
+            .iter()
+            .all(|v| v.lower < v.upper)
+    );
+    assert!(covector(&open).radius > Rat::zero());
+    // Shapes: the target and branch declare the same rows.
+    assert!(
+        produced
+            .normalized_ratio_return(&observed, &target, &[0, 0], 4, SeriesAperture(32))
+            .is_err()
+    );
 }

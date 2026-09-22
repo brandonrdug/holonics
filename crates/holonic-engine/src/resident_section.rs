@@ -123,6 +123,7 @@ mod surface_pair_quadrance;
 #[path = "resident_section/surface_passage.rs"]
 mod surface_passage;
 mod surface_phase_participation;
+mod surface_normalized_ratio;
 mod surface_wave_relation;
 mod surface_wave_source;
 pub(crate) use surface_enclosure_composition::EnclosureComposition;
