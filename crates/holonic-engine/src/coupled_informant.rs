@@ -24,6 +24,10 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::world::{
+    EventQuotient, EventRefusal, EventStanding, RefusalKind, event_refusal_from,
+    event_standing_wire,
+};
 use crate::{
     AtmosphericInverseResolution, CpuExecutionError, CpuExecutionReceipt, CpuExecutor, EventId,
     EventSuccessor, ExactDifferenceVector, ExactEventLaw, LogicalResourceReceipt, ReceiverGradeId,
@@ -113,15 +117,19 @@ impl CoupledPhaseChart {
         chord_reference: SpectralBandId,
     ) -> Result<Self, CoupledInformantError> {
         if optical_arity == 0 || bands.is_empty() {
-            return Err(CoupledInformantError::MalformedPhaseChart);
+            return Err(CoupledInformantError::Law(
+                CoupledInformantRefusal::MalformedPhaseChart,
+            ));
         }
         let distinct = bands.iter().copied().collect::<BTreeSet<_>>();
         if distinct.len() != bands.len() {
-            return Err(CoupledInformantError::MalformedPhaseChart);
+            return Err(CoupledInformantError::Law(
+                CoupledInformantRefusal::MalformedPhaseChart,
+            ));
         }
         if !distinct.contains(&chord_reference) {
-            return Err(CoupledInformantError::ChordReferenceOutsideDeclaredBands(
-                chord_reference,
+            return Err(CoupledInformantError::Law(
+                CoupledInformantRefusal::ChordReferenceOutsideDeclaredBands(chord_reference),
             ));
         }
         Ok(Self {
@@ -147,15 +155,19 @@ impl CoupledPhaseChart {
             let arity = relation.difference.0.len();
             match optical_arity {
                 Some(declared) if declared != arity => {
-                    return Err(CoupledInformantError::MaterialOpticalArityDisagrees {
-                        declared,
-                        supplied: arity,
-                    });
+                    return Err(CoupledInformantError::Law(
+                        CoupledInformantRefusal::MaterialOpticalArityDisagrees {
+                            declared,
+                            supplied: arity,
+                        },
+                    ));
                 }
                 _ => optical_arity = Some(arity),
             }
         }
-        let optical_arity = optical_arity.ok_or(CoupledInformantError::MalformedPhaseChart)?;
+        let optical_arity = optical_arity.ok_or(CoupledInformantError::Law(
+            CoupledInformantRefusal::MalformedPhaseChart,
+        ))?;
         let selections = resolution
             .contact_selections
             .iter()
@@ -172,9 +184,12 @@ impl CoupledPhaseChart {
             .collect::<BTreeMap<_, _>>();
         let mut common: Option<BTreeSet<SpectralBandId>> = None;
         for occurrence in &resolution.spectral_occurrences {
-            let selected = selections
-                .get(&occurrence.testimony)
-                .ok_or(CoupledInformantError::MalformedResolution)?;
+            let selected =
+                selections
+                    .get(&occurrence.testimony)
+                    .ok_or(CoupledInformantError::Law(
+                        CoupledInformantRefusal::MalformedResolution,
+                    ))?;
             for contact in &occurrence.contacts {
                 if !selected.contains(&contact.scan) {
                     continue;
@@ -193,7 +208,9 @@ impl CoupledPhaseChart {
         }
         let bands = common.unwrap_or_default();
         if bands.is_empty() {
-            return Err(CoupledInformantError::MaterialDeclaresNoSpectralBand);
+            return Err(CoupledInformantError::Law(
+                CoupledInformantRefusal::MaterialDeclaresNoSpectralBand,
+            ));
         }
         Self::new(
             optical_arity,
@@ -270,7 +287,9 @@ impl CoupledPhaseVector {
 
     fn validate(&self, chart: &CoupledPhaseChart) -> Result<(), CoupledInformantError> {
         if self.0.len() != chart.extent() || self.0.iter().any(Signed::is_negative) {
-            return Err(CoupledInformantError::MalformedPhaseVector);
+            return Err(CoupledInformantError::Law(
+                CoupledInformantRefusal::MalformedPhaseVector,
+            ));
         }
         Ok(())
     }
@@ -344,7 +363,9 @@ impl CoupledInformantMorphology {
                 .values()
                 .any(|multiplicity| *multiplicity == 0)
         {
-            return Err(CoupledInformantError::MalformedMorphology);
+            return Err(CoupledInformantError::Law(
+                CoupledInformantRefusal::MalformedMorphology,
+            ));
         }
         for vector in self
             .positive_maxima
@@ -467,33 +488,105 @@ pub struct CoupledInformantWork {
     pub cpu_joins: u64,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct CoupledInformantStanding {
-    pub schema: String,
+/// [definition] **The coupled-informant quotient** (plan phase 16): the morphology, predictions and grades.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CoupledInformantQuotient {
     pub morphology: CoupledInformantMorphology,
     pub predictions: BTreeMap<CoupledInformantPredictionId, Arc<CoupledInformantPrediction>>,
     pub grades: BTreeMap<CoupledInformantGradeId, Arc<CoupledInformantGrade>>,
     pub admitted_grades: BTreeSet<CoupledInformantGradeId>,
+    next_prediction: u64,
+    next_grade: u64,
+}
+
+/// The standing: the shared event scaffold around [`CoupledInformantQuotient`].
+pub type CoupledInformantStanding = EventStanding<CoupledInformantQuotient>;
+
+impl EventQuotient for CoupledInformantQuotient {
+    type Refusal = CoupledInformantRefusal;
+}
+
+#[derive(Serialize)]
+#[serde(rename = "CoupledInformantStanding")]
+struct CoupledInformantStandingWrite<'a> {
+    schema: &'a String,
+    morphology: &'a CoupledInformantMorphology,
+    predictions: &'a BTreeMap<CoupledInformantPredictionId, Arc<CoupledInformantPrediction>>,
+    grades: &'a BTreeMap<CoupledInformantGradeId, Arc<CoupledInformantGrade>>,
+    admitted_grades: &'a BTreeSet<CoupledInformantGradeId>,
+    used_events: &'a BTreeSet<EventId>,
+    next_prediction: &'a u64,
+    next_grade: &'a u64,
+}
+
+impl<'a> From<&'a CoupledInformantStanding> for CoupledInformantStandingWrite<'a> {
+    fn from(standing: &'a CoupledInformantStanding) -> Self {
+        Self {
+            schema: &standing.schema,
+            morphology: &standing.morphology,
+            predictions: &standing.predictions,
+            grades: &standing.grades,
+            admitted_grades: &standing.admitted_grades,
+            used_events: &standing.used_events,
+            next_prediction: &standing.next_prediction,
+            next_grade: &standing.next_grade,
+        }
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(rename = "CoupledInformantStanding")]
+struct CoupledInformantStandingRead {
+    schema: String,
+    morphology: CoupledInformantMorphology,
+    predictions: BTreeMap<CoupledInformantPredictionId, Arc<CoupledInformantPrediction>>,
+    grades: BTreeMap<CoupledInformantGradeId, Arc<CoupledInformantGrade>>,
+    admitted_grades: BTreeSet<CoupledInformantGradeId>,
     used_events: BTreeSet<EventId>,
     next_prediction: u64,
     next_grade: u64,
 }
+
+impl From<CoupledInformantStandingRead> for CoupledInformantStanding {
+    fn from(read: CoupledInformantStandingRead) -> Self {
+        EventStanding::from_parts(
+            read.schema,
+            read.used_events,
+            CoupledInformantQuotient {
+                morphology: read.morphology,
+                predictions: read.predictions,
+                grades: read.grades,
+                admitted_grades: read.admitted_grades,
+                next_prediction: read.next_prediction,
+                next_grade: read.next_grade,
+            },
+        )
+    }
+}
+
+event_standing_wire!(
+    CoupledInformantQuotient,
+    CoupledInformantStandingWrite,
+    CoupledInformantStandingRead
+);
 
 impl CoupledInformantStanding {
     /// An empty standing on a declared comparison membrane. `Default` is deliberately absent; the
     /// caller declares the chart or reads it off the material with
     /// [`CoupledPhaseChart::from_resolution`].
     pub fn new(chart: CoupledPhaseChart) -> Self {
-        Self {
-            schema: STANDING_SCHEMA.to_owned(),
-            morphology: CoupledInformantMorphology::new(chart),
-            predictions: BTreeMap::new(),
-            grades: BTreeMap::new(),
-            admitted_grades: BTreeSet::new(),
-            used_events: BTreeSet::new(),
-            next_prediction: 1,
-            next_grade: 1,
-        }
+        EventStanding::from_parts(
+            STANDING_SCHEMA.to_owned(),
+            BTreeSet::new(),
+            CoupledInformantQuotient {
+                morphology: CoupledInformantMorphology::new(chart),
+                predictions: BTreeMap::new(),
+                grades: BTreeMap::new(),
+                admitted_grades: BTreeSet::new(),
+                next_prediction: 1,
+                next_grade: 1,
+            },
+        )
     }
 
     /// The chart this body is conditioned under. Every retained phase vector is indexed by it.
@@ -502,9 +595,7 @@ impl CoupledInformantStanding {
     }
 
     pub fn validate(&self) -> Result<(), CoupledInformantError> {
-        if self.schema != STANDING_SCHEMA {
-            return Err(CoupledInformantError::MalformedStanding);
-        }
+        self.check_schema(STANDING_SCHEMA)?;
         self.morphology.validate()?;
         if self
             .admitted_grades
@@ -627,111 +718,114 @@ impl ExactEventLaw for CoupledInformantLaw {
     ) -> Result<EventSuccessor<Self::Standing, Self::Radiation>, Self::Error> {
         standing_before.validate()?;
         let event_id = event.event();
-        if standing_before.used_events.contains(&event_id) {
-            return Err(CoupledInformantError::RepeatedEvent(event_id));
-        }
+        standing_before.refuse_repeated(event_id)?;
         let mut standing_after = standing_before.clone();
         let mut work = CoupledInformantWork::default();
-        let (kind, prediction, grade, laws) = match event {
-            CoupledInformantEvent::Generate {
-                chronology,
-                source_grade_precondition,
-                resolution,
-                ..
-            } => {
-                let id = CoupledInformantPredictionId(standing_after.next_prediction);
-                standing_after.next_prediction = standing_after
-                    .next_prediction
-                    .checked_add(1)
-                    .ok_or(CoupledInformantError::CarrierOverflow)?;
-                let (body, generated_work) = generate_prediction(
-                    id,
-                    event_id,
-                    *chronology,
-                    *source_grade_precondition,
+        let (kind, prediction, grade, laws) =
+            match event {
+                CoupledInformantEvent::Generate {
+                    chronology,
+                    source_grade_precondition,
                     resolution,
-                    &standing_after.morphology,
-                    &self.cpu,
-                )?;
-                work = generated_work;
-                let body = Arc::new(body);
-                standing_after.predictions.insert(id, Arc::clone(&body));
-                (
-                    CoupledInformantRadiationKind::PredictionGenerated,
-                    Some(body),
-                    None,
-                    &[
-                        "restrict-sparse-source-horizon",
-                        "collocate-native-receiver-sections",
-                        "emit-plural-phase-branches",
-                    ][..],
-                )
-            }
-            CoupledInformantEvent::GradeReturnedPartition {
-                prediction,
-                returned,
-                ..
-            } => {
-                let prediction_body = standing_after
-                    .predictions
-                    .get(prediction)
-                    .cloned()
-                    .ok_or(CoupledInformantError::MissingPrediction(*prediction))?;
-                if standing_after
-                    .grades
-                    .values()
-                    .any(|grade| grade.prediction == *prediction)
-                {
-                    return Err(CoupledInformantError::PredictionAlreadyGraded(*prediction));
+                    ..
+                } => {
+                    let id = CoupledInformantPredictionId(standing_after.next_prediction);
+                    standing_after.next_prediction = standing_after
+                        .next_prediction
+                        .checked_add(1)
+                        .ok_or(CoupledInformantError::CarrierOverflow)?;
+                    let (body, generated_work) = generate_prediction(
+                        id,
+                        event_id,
+                        *chronology,
+                        *source_grade_precondition,
+                        resolution,
+                        &standing_after.morphology,
+                        &self.cpu,
+                    )?;
+                    work = generated_work;
+                    let body = Arc::new(body);
+                    standing_after.predictions.insert(id, Arc::clone(&body));
+                    (
+                        CoupledInformantRadiationKind::PredictionGenerated,
+                        Some(body),
+                        None,
+                        &[
+                            "restrict-sparse-source-horizon",
+                            "collocate-native-receiver-sections",
+                            "emit-plural-phase-branches",
+                        ][..],
+                    )
                 }
-                let id = CoupledInformantGradeId(standing_after.next_grade);
-                standing_after.next_grade = standing_after
-                    .next_grade
-                    .checked_add(1)
-                    .ok_or(CoupledInformantError::CarrierOverflow)?;
-                let body = Arc::new(grade_prediction(id, event_id, &prediction_body, returned)?);
-                standing_after.grades.insert(id, Arc::clone(&body));
-                (
-                    CoupledInformantRadiationKind::ReturnGraded,
-                    None,
-                    Some(body),
-                    &["receive-later-partition", "grade-before-admission"][..],
-                )
-            }
-            CoupledInformantEvent::AdmitGradedReturn { grade, .. } => {
-                let grade_body = standing_after
-                    .grades
-                    .get(grade)
-                    .cloned()
-                    .ok_or(CoupledInformantError::MissingGrade(*grade))?;
-                if standing_after.admitted_grades.contains(grade) {
-                    return Err(CoupledInformantError::GradeAlreadyAdmitted(*grade));
+                CoupledInformantEvent::GradeReturnedPartition {
+                    prediction,
+                    returned,
+                    ..
+                } => {
+                    let prediction_body =
+                        standing_after.predictions.get(prediction).cloned().ok_or(
+                            CoupledInformantError::Law(CoupledInformantRefusal::MissingPrediction(
+                                *prediction,
+                            )),
+                        )?;
+                    if standing_after
+                        .grades
+                        .values()
+                        .any(|grade| grade.prediction == *prediction)
+                    {
+                        return Err(CoupledInformantError::Law(
+                            CoupledInformantRefusal::PredictionAlreadyGraded(*prediction),
+                        ));
+                    }
+                    let id = CoupledInformantGradeId(standing_after.next_grade);
+                    standing_after.next_grade = standing_after
+                        .next_grade
+                        .checked_add(1)
+                        .ok_or(CoupledInformantError::CarrierOverflow)?;
+                    let body =
+                        Arc::new(grade_prediction(id, event_id, &prediction_body, returned)?);
+                    standing_after.grades.insert(id, Arc::clone(&body));
+                    (
+                        CoupledInformantRadiationKind::ReturnGraded,
+                        None,
+                        Some(body),
+                        &["receive-later-partition", "grade-before-admission"][..],
+                    )
                 }
-                let prediction = standing_after
-                    .predictions
-                    .get(&grade_body.prediction)
-                    .cloned()
-                    .ok_or(CoupledInformantError::MissingPrediction(
-                        grade_body.prediction,
-                    ))?;
-                condition_morphology(
-                    &mut standing_after.morphology,
-                    event_id,
-                    &prediction,
-                    &grade_body.returned,
-                )?;
-                standing_after.admitted_grades.insert(*grade);
-                (
-                    CoupledInformantRadiationKind::GradedReturnAdmitted,
-                    None,
-                    None,
-                    &[
-                        "admit-returned-difference",
-                        "reform-intermediate-morphology",
-                    ][..],
-                )
-            }
-        };
+                CoupledInformantEvent::AdmitGradedReturn { grade, .. } => {
+                    let grade_body = standing_after.grades.get(grade).cloned().ok_or(
+                        CoupledInformantError::Law(CoupledInformantRefusal::MissingGrade(*grade)),
+                    )?;
+                    if standing_after.admitted_grades.contains(grade) {
+                        return Err(CoupledInformantError::Law(
+                            CoupledInformantRefusal::GradeAlreadyAdmitted(*grade),
+                        ));
+                    }
+                    let prediction = standing_after
+                        .predictions
+                        .get(&grade_body.prediction)
+                        .cloned()
+                        .ok_or(CoupledInformantError::Law(
+                            CoupledInformantRefusal::MissingPrediction(grade_body.prediction),
+                        ))?;
+                    condition_morphology(
+                        &mut standing_after.morphology,
+                        event_id,
+                        &prediction,
+                        &grade_body.returned,
+                    )?;
+                    standing_after.admitted_grades.insert(*grade);
+                    (
+                        CoupledInformantRadiationKind::GradedReturnAdmitted,
+                        None,
+                        None,
+                        &[
+                            "admit-returned-difference",
+                            "reform-intermediate-morphology",
+                        ][..],
+                    )
+                }
+            };
         standing_after.used_events.insert(event_id);
         standing_after.validate()?;
         Ok(EventSuccessor {
@@ -784,7 +878,9 @@ fn generate_prediction(
     let phases = Arc::new(index_occurrence_phases(resolution, &chart)?);
     let morphology = Arc::new(morphology.clone());
     if resolution.spectral_occurrences.is_empty() {
-        return Err(CoupledInformantError::EmptyResolution);
+        return Err(CoupledInformantError::Law(
+            CoupledInformantRefusal::EmptyResolution,
+        ));
     }
     // Atmospheric resolutions retain only forced source relations in their
     // lifted carrier.  The complete sparse horizon therefore travels with
@@ -792,7 +888,9 @@ fn generate_prediction(
     let prior = &resolution.source_prediction;
     let source_prediction = prior.id;
     if prior.id != resolution.prediction {
-        return Err(CoupledInformantError::IncompatibleResolution);
+        return Err(CoupledInformantError::Law(
+            CoupledInformantRefusal::IncompatibleResolution,
+        ));
     }
     let relation_inputs = candidate_relation_inputs(resolution, &chart)?;
     let optical_horizon_relations = relation_inputs
@@ -953,7 +1051,9 @@ fn candidate_relation_inputs(
     for occurrence in &resolution.spectral_occurrences {
         let selected = selections
             .get(&occurrence.testimony)
-            .ok_or(CoupledInformantError::MalformedResolution)?;
+            .ok_or(CoupledInformantError::Law(
+                CoupledInformantRefusal::MalformedResolution,
+            ))?;
         for contact in &occurrence.contacts {
             if selected.contains(&contact.scan)
                 && chart.bands().iter().all(|band| {
@@ -978,10 +1078,14 @@ fn candidate_relation_inputs(
             let members = ordered_members([pair[0].1, pair[1].1]);
             let left = occurrences
                 .get(&members[0])
-                .ok_or(CoupledInformantError::MalformedResolution)?;
+                .ok_or(CoupledInformantError::Law(
+                    CoupledInformantRefusal::MalformedResolution,
+                ))?;
             let right = occurrences
                 .get(&members[1])
-                .ok_or(CoupledInformantError::MalformedResolution)?;
+                .ok_or(CoupledInformantError::Law(
+                    CoupledInformantRefusal::MalformedResolution,
+                ))?;
             // A spectral local star founds its own optical difference out of the exact scalars a
             // `SpectralReceiverOccurrence` carries. Its arity is that carrier's, not a level: it is
             // four because the occurrence has four scalar coordinates. Where the declared chart
@@ -994,15 +1098,19 @@ fn candidate_relation_inputs(
                 absolute_difference(&left.radiant_energy, &right.radiant_energy),
             ]);
             if difference.0.len() != chart.optical_arity() {
-                return Err(CoupledInformantError::SpectralStarOpticalArity {
-                    declared: chart.optical_arity(),
-                    supplied: difference.0.len(),
-                });
+                return Err(CoupledInformantError::Law(
+                    CoupledInformantRefusal::SpectralStarOpticalArity {
+                        declared: chart.optical_arity(),
+                        supplied: difference.0.len(),
+                    },
+                ));
             }
             match candidates.get_mut(&members) {
                 Some(existing) => {
                     if existing.difference != difference {
-                        return Err(CoupledInformantError::IncompatibleSourceCharts);
+                        return Err(CoupledInformantError::Law(
+                            CoupledInformantRefusal::IncompatibleSourceCharts,
+                        ));
                     }
                     existing.origin = CoupledRelationOrigin::OpticalAndSpectral;
                 }
@@ -1070,7 +1178,9 @@ fn index_occurrence_phases(
     for occurrence in &resolution.spectral_occurrences {
         let selected = selections
             .get(&occurrence.testimony)
-            .ok_or(CoupledInformantError::MalformedResolution)?;
+            .ok_or(CoupledInformantError::Law(
+                CoupledInformantRefusal::MalformedResolution,
+            ))?;
         let selected = selected
             .selected_scans
             .iter()
@@ -1147,10 +1257,12 @@ fn coupled_phase_vector(
     right: &OccurrencePhase,
 ) -> Result<CoupledPhaseVector, CoupledInformantError> {
     if optical.len() != chart.optical_arity() {
-        return Err(CoupledInformantError::IncompatibleOpticalDifference {
-            declared: chart.optical_arity(),
-            supplied: optical.len(),
-        });
+        return Err(CoupledInformantError::Law(
+            CoupledInformantRefusal::IncompatibleOpticalDifference {
+                declared: chart.optical_arity(),
+                supplied: optical.len(),
+            },
+        ));
     }
     let mut values = optical.to_vec();
     values.extend(
@@ -1230,7 +1342,9 @@ fn grade_prediction(
         .iter()
         .any(|testimony| !cells.contains_key(testimony))
     {
-        return Err(CoupledInformantError::IncompleteReturnedPopulation);
+        return Err(CoupledInformantError::Law(
+            CoupledInformantRefusal::IncompleteReturnedPopulation,
+        ));
     }
     let mut counts = CoupledInformantGradeCounts::default();
     let mut obstructions = Vec::new();
@@ -1309,10 +1423,14 @@ fn condition_morphology(
     for relation in &prediction.relations {
         let left_cell = cells
             .get(&relation.members[0])
-            .ok_or(CoupledInformantError::IncompleteReturnedPopulation)?;
+            .ok_or(CoupledInformantError::Law(
+                CoupledInformantRefusal::IncompleteReturnedPopulation,
+            ))?;
         let right_cell = cells
             .get(&relation.members[1])
-            .ok_or(CoupledInformantError::IncompleteReturnedPopulation)?;
+            .ok_or(CoupledInformantError::Law(
+                CoupledInformantRefusal::IncompleteReturnedPopulation,
+            ))?;
         let together = left_cell == right_cell;
         for branch in &relation.branches {
             if together {
@@ -1354,7 +1472,9 @@ fn returned_cell_index(
     for cell in &returned.cells {
         for testimony in &cell.members {
             if cells.insert(*testimony, cell.id).is_some() {
-                return Err(CoupledInformantError::OverlappingReturnedCells(*testimony));
+                return Err(CoupledInformantError::Law(
+                    CoupledInformantRefusal::OverlappingReturnedCells(*testimony),
+                ));
             }
         }
     }
@@ -1449,7 +1569,9 @@ fn accumulate_cpu(
 fn map_cpu_error(error: CpuExecutionError<CoupledInformantError>) -> CoupledInformantError {
     match error {
         CpuExecutionError::Operation(error) => error,
-        CpuExecutionError::WorkerPanicked => CoupledInformantError::PhysicalWorkerPanicked,
+        CpuExecutionError::WorkerPanicked => {
+            CoupledInformantError::Law(CoupledInformantRefusal::PhysicalWorkerPanicked)
+        }
     }
 }
 
@@ -1464,9 +1586,7 @@ fn checked_increment(value: u64) -> Result<u64, CoupledInformantError> {
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum CoupledInformantError {
-    #[error("coupled-informant standing is malformed")]
-    MalformedStanding,
+pub enum CoupledInformantRefusal {
     #[error("coupled-informant morphology is malformed")]
     MalformedMorphology,
     #[error("a coupled phase vector is malformed")]
@@ -1497,8 +1617,6 @@ pub enum CoupledInformantError {
     IncompatibleOpticalDifference { declared: usize, supplied: usize },
     #[error("optical and spectral receiver charts disagree on a shared occurrence pair")]
     IncompatibleSourceCharts,
-    #[error("coupled-informant event {0:?} has already entered standing")]
-    RepeatedEvent(EventId),
     #[error("coupled-informant prediction {0:?} is absent")]
     MissingPrediction(CoupledInformantPredictionId),
     #[error("coupled-informant prediction {0:?} has already been graded")]
@@ -1511,13 +1629,20 @@ pub enum CoupledInformantError {
     OverlappingReturnedCells(ReceiverTestimonyId),
     #[error("the returned partition omits a predicted testimony")]
     IncompleteReturnedPopulation,
-    #[error("a coupled-informant carrier overflowed")]
-    CarrierOverflow,
     #[error("a coupled-informant CPU worker panicked")]
     PhysicalWorkerPanicked,
     #[error(transparent)]
     Diagram(#[from] crate::DiagramError),
 }
+
+impl RefusalKind for CoupledInformantRefusal {
+    const LAW: &'static str = "coupled-informant";
+}
+
+/// The coupled-informant law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type CoupledInformantError = EventRefusal<CoupledInformantRefusal>;
+
+event_refusal_from!(CoupledInformantRefusal: crate::DiagramError);
 
 #[cfg(test)]
 mod tests {
@@ -1646,7 +1771,9 @@ mod tests {
             foreign.positive_maxima = vec![level(1, &relampago_chart_of_other_extent(chart))];
             assert_eq!(
                 foreign.validate(),
-                Err(CoupledInformantError::MalformedPhaseVector),
+                Err(CoupledInformantError::Law(
+                    CoupledInformantRefusal::MalformedPhaseVector
+                )),
                 "a vector of another chart's extent is refused by name"
             );
         }
@@ -1677,8 +1804,8 @@ mod tests {
     fn a_chart_refuses_a_reference_it_does_not_read_and_a_repeated_band() {
         assert_eq!(
             CoupledPhaseChart::new(4, vec![SpectralBandId(8)], SpectralBandId(13)),
-            Err(CoupledInformantError::ChordReferenceOutsideDeclaredBands(
-                SpectralBandId(13)
+            Err(CoupledInformantError::Law(
+                CoupledInformantRefusal::ChordReferenceOutsideDeclaredBands(SpectralBandId(13))
             ))
         );
         assert_eq!(
@@ -1687,15 +1814,21 @@ mod tests {
                 vec![SpectralBandId(8), SpectralBandId(8)],
                 SpectralBandId(8)
             ),
-            Err(CoupledInformantError::MalformedPhaseChart)
+            Err(CoupledInformantError::Law(
+                CoupledInformantRefusal::MalformedPhaseChart
+            ))
         );
         assert_eq!(
             CoupledPhaseChart::new(0, vec![SpectralBandId(8)], SpectralBandId(8)),
-            Err(CoupledInformantError::MalformedPhaseChart)
+            Err(CoupledInformantError::Law(
+                CoupledInformantRefusal::MalformedPhaseChart
+            ))
         );
         assert_eq!(
             CoupledPhaseChart::new(4, Vec::new(), SpectralBandId(8)),
-            Err(CoupledInformantError::MalformedPhaseChart)
+            Err(CoupledInformantError::Law(
+                CoupledInformantRefusal::MalformedPhaseChart
+            ))
         );
     }
 }

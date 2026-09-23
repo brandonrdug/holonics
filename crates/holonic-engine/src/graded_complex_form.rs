@@ -633,7 +633,9 @@ mod tests {
         assert!(
             matches!(
                 refusal,
-                GradedComplexFormError::Refused(CausalAlgebraicError::BoundaryGrade { .. })
+                GradedComplexFormError::Refused(CausalAlgebraicError::Law(
+                    crate::CausalAlgebraicRefusal::BoundaryGrade { .. }
+                ))
             ),
             "expected the founder's own grade refusal, got {refusal}"
         );

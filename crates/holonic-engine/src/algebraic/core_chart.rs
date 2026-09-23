@@ -163,7 +163,12 @@ impl CoreCellChart {
                 Some((found, at)) if found == degree => {
                     vector[at] += Rat::from_integer(coefficient.difference());
                 }
-                _ => return Err(CausalAlgebraicError::MissingCausalCell(*cell).into()),
+                _ => {
+                    return Err(CausalAlgebraicError::Law(
+                        crate::CausalAlgebraicRefusal::MissingCausalCell(*cell),
+                    )
+                    .into());
+                }
             }
         }
         Ok(vector)
@@ -234,7 +239,9 @@ impl GradedCausalComplex {
                 ids.push(graded.found_cell(
                     format!("{name}[{degree}:{index}]"),
                     events.clone(),
-                    u32::try_from(degree).map_err(|_| CausalAlgebraicError::ArithmeticOverflow)?,
+                    u32::try_from(degree).map_err(|_| {
+                        CausalAlgebraicError::Law(crate::CausalAlgebraicRefusal::ArithmeticOverflow)
+                    })?,
                     boundary,
                 )?);
             }

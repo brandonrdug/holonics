@@ -11,7 +11,11 @@ use std::collections::{BTreeMap, BTreeSet};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::{CausalDiagram, EventId, EventSuccessor, ExactEventLaw, LogicalResourceReceipt};
+use crate::world::{EventQuotient, event_standing_wire};
+use crate::world::{EventRefusal, RefusalKind, event_refusal_from};
+use crate::{
+    CausalDiagram, EventId, EventStanding, EventSuccessor, ExactEventLaw, LogicalResourceReceipt,
+};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct BitLineageId(pub u64);
@@ -41,7 +45,7 @@ impl BitQuery {
     fn validate(self) -> Result<(), BitCausalError> {
         let mask = bit_mask(self.width)?;
         if self.state > mask || self.input > mask {
-            return Err(BitCausalError::MalformedQuery(self));
+            return Err(BitCausalError::Law(BitCausalRefusal::MalformedQuery(self)));
         }
         Ok(())
     }
@@ -68,10 +72,10 @@ impl BitResponse {
     fn validate(self, width: u8) -> Result<(), BitCausalError> {
         let mask = bit_mask(width)?;
         if self.next_state > mask || self.output > mask {
-            return Err(BitCausalError::MalformedResponse {
+            return Err(BitCausalError::Law(BitCausalRefusal::MalformedResponse {
                 width,
                 response: self,
-            });
+            }));
         }
         Ok(())
     }
@@ -263,7 +267,9 @@ impl BitTransducerProgram {
             || self.immediate > maximum_mask
             || (self.immediate == 0 && self.immediate_law != BitImmediateLaw::Xor)
         {
-            return Err(BitCausalError::MalformedProgram(self));
+            return Err(BitCausalError::Law(BitCausalRefusal::MalformedProgram(
+                self,
+            )));
         }
         Ok(())
     }
@@ -302,6 +308,9 @@ pub struct BitExhaustiveTestimony {
     pub responses: Vec<BitResponse>,
 }
 
+/// A retired standing record: the testimony archive old rests carried beside the compatible
+/// family. It is read only to decode such a rest (reduced to [`BitCausalQuotient::testimony_events`]);
+/// each event's testimony is returned in its [`BitCausalRadiation`] instead.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum BitCausalHistoryEntry {
     ReceiverFounded { event: EventId, width: u8 },
@@ -310,11 +319,11 @@ pub enum BitCausalHistoryEntry {
 }
 
 impl BitCausalHistoryEntry {
-    fn event(&self) -> EventId {
+    fn testimony_event(&self) -> Option<EventId> {
         match self {
-            Self::ReceiverFounded { event, .. } => *event,
-            Self::Testimony(testimony) => testimony.event,
-            Self::ExhaustiveTestimony(testimony) => testimony.event,
+            Self::ReceiverFounded { .. } => None,
+            Self::Testimony(testimony) => Some(testimony.event),
+            Self::ExhaustiveTestimony(testimony) => Some(testimony.event),
         }
     }
 }
@@ -354,18 +363,112 @@ pub struct BitSemanticCertificate {
     pub testimony_events: BTreeSet<EventId>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct BitCausalStanding {
-    pub schema: String,
+const BIT_CAUSAL_STANDING_SCHEMA: &str = "holonic-engine.bit-causal-standing.v1";
+
+/// [definition] **The bit-causal quotient**: what the law's future reads (plan phase 16). The
+/// compatible family is the retained fibre of every admitted testimony; the production query and
+/// verification width are functions of it; `testimony_events` is the one occurrence statistic
+/// the certificate names. The testimony itself is returned per event in [`BitCausalRadiation`]
+/// and is not retained.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct BitCausalQuotient {
     pub maximum_width: u8,
     pub initial_width: u8,
     receiver_widths: BTreeSet<u8>,
     candidates: Vec<BitTransducerProgram>,
+    testimony_events: BTreeSet<EventId>,
+    next_query: Option<BitQuery>,
+    certified_widths: BTreeSet<u8>,
+    verification_width: Option<u8>,
+}
+
+/// The bit-causal standing: the shared event scaffold around [`BitCausalQuotient`].
+pub type BitCausalStanding = EventStanding<BitCausalQuotient>;
+
+#[derive(Serialize)]
+#[serde(rename = "BitCausalStanding")]
+struct BitCausalStandingWrite<'a> {
+    schema: &'a String,
+    maximum_width: u8,
+    initial_width: u8,
+    receiver_widths: &'a BTreeSet<u8>,
+    candidates: &'a Vec<BitTransducerProgram>,
+    testimony_events: &'a BTreeSet<EventId>,
+    used_events: &'a BTreeSet<EventId>,
+    next_query: Option<BitQuery>,
+    certified_widths: &'a BTreeSet<u8>,
+    verification_width: Option<u8>,
+}
+
+impl<'a> From<&'a BitCausalStanding> for BitCausalStandingWrite<'a> {
+    fn from(standing: &'a BitCausalStanding) -> Self {
+        Self {
+            schema: &standing.schema,
+            maximum_width: standing.maximum_width,
+            initial_width: standing.initial_width,
+            receiver_widths: &standing.receiver_widths,
+            candidates: &standing.candidates,
+            testimony_events: &standing.testimony_events,
+            used_events: &standing.used_events,
+            next_query: standing.next_query,
+            certified_widths: &standing.certified_widths,
+            verification_width: standing.verification_width,
+        }
+    }
+}
+
+/// Reads the current rest and the retired one, whose `history` reduces to its testimony events.
+#[derive(Deserialize)]
+#[serde(rename = "BitCausalStanding")]
+struct BitCausalStandingRead {
+    schema: String,
+    maximum_width: u8,
+    initial_width: u8,
+    receiver_widths: BTreeSet<u8>,
+    candidates: Vec<BitTransducerProgram>,
+    #[serde(default)]
     history: Vec<BitCausalHistoryEntry>,
+    #[serde(default)]
+    testimony_events: BTreeSet<EventId>,
     used_events: BTreeSet<EventId>,
     next_query: Option<BitQuery>,
     certified_widths: BTreeSet<u8>,
     verification_width: Option<u8>,
+}
+
+impl From<BitCausalStandingRead> for BitCausalStanding {
+    fn from(read: BitCausalStandingRead) -> Self {
+        let mut testimony_events = read.testimony_events;
+        testimony_events.extend(
+            read.history
+                .iter()
+                .filter_map(BitCausalHistoryEntry::testimony_event),
+        );
+        EventStanding::from_parts(
+            read.schema,
+            read.used_events,
+            BitCausalQuotient {
+                maximum_width: read.maximum_width,
+                initial_width: read.initial_width,
+                receiver_widths: read.receiver_widths,
+                candidates: read.candidates,
+                testimony_events,
+                next_query: read.next_query,
+                certified_widths: read.certified_widths,
+                verification_width: read.verification_width,
+            },
+        )
+    }
+}
+
+event_standing_wire!(
+    BitCausalQuotient,
+    BitCausalStandingWrite,
+    BitCausalStandingRead
+);
+
+impl EventQuotient for BitCausalQuotient {
+    type Refusal = BitCausalRefusal;
 }
 
 /// One receiver-relative answer section of a read-only code problem.
@@ -381,7 +484,7 @@ pub struct BitReferenceResponseFiber {
 /// A non-mutating view of the contemporary version fiber at one supplied problem.
 ///
 /// A reference does not become testimony merely because the machine can inspect it. This receipt
-/// is therefore absent from [`BitCausalStanding::history`], does not remove candidates, and cannot
+/// is therefore absent from [`BitCausalQuotient::testimony_events`], does not remove candidates, and cannot
 /// certify the opaque source. The caller may later return an observed response through
 /// [`BitCausalEvent`]; that later caused occurrence is conditioning.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -411,18 +514,19 @@ impl BitCausalStanding {
         let (next_query, _) = select_distinguishing_query(&candidates, &receiver_widths)?;
         let verification_width =
             next_verification_width(next_query, &receiver_widths, &BTreeSet::new());
-        let standing = Self {
-            schema: "holonic-engine.bit-causal-standing.v1".to_owned(),
-            maximum_width,
-            initial_width,
-            receiver_widths,
-            candidates,
-            history: Vec::new(),
-            used_events: BTreeSet::new(),
-            next_query,
-            certified_widths: BTreeSet::new(),
-            verification_width,
-        };
+        let standing = EventStanding::founded(
+            BIT_CAUSAL_STANDING_SCHEMA,
+            BitCausalQuotient {
+                maximum_width,
+                initial_width,
+                receiver_widths,
+                candidates,
+                testimony_events: BTreeSet::new(),
+                next_query,
+                certified_widths: BTreeSet::new(),
+                verification_width,
+            },
+        );
         standing.validate_incremental()?;
         Ok(standing)
     }
@@ -435,8 +539,9 @@ impl BitCausalStanding {
         &self.candidates
     }
 
-    pub fn history(&self) -> &[BitCausalHistoryEntry] {
-        &self.history
+    /// The occurrences whose testimony (single or exhaustive) conditioned the family.
+    pub fn testimony_events(&self) -> &BTreeSet<EventId> {
+        &self.testimony_events
     }
 
     pub fn next_query(&self) -> Option<BitQuery> {
@@ -460,10 +565,12 @@ impl BitCausalStanding {
     ) -> Result<BitReferenceInspection, BitCausalError> {
         query.validate()?;
         if query.width > self.maximum_width {
-            return Err(BitCausalError::ReferenceExceedsDeclaredWidth {
-                maximum: self.maximum_width,
-                received: query.width,
-            });
+            return Err(BitCausalError::Law(
+                BitCausalRefusal::ReferenceExceedsDeclaredWidth {
+                    maximum: self.maximum_width,
+                    received: query.width,
+                },
+            ));
         }
         let mut sections = BTreeMap::<BitResponse, Vec<BitTransducerProgram>>::new();
         for program in &self.candidates {
@@ -477,7 +584,7 @@ impl BitCausalStanding {
             .map(|(response, programs)| BitReferenceResponseFiber { response, programs })
             .collect::<Vec<_>>();
         let standing_history_events =
-            u64::try_from(self.history.len()).map_err(|_| BitCausalError::CarrierOverflow)?;
+            u64::try_from(self.used_events.len()).map_err(|_| BitCausalError::CarrierOverflow)?;
         let standing_candidate_population =
             u64::try_from(self.candidates.len()).map_err(|_| BitCausalError::CarrierOverflow)?;
         Ok(BitReferenceInspection {
@@ -507,66 +614,46 @@ impl BitCausalStanding {
                 .iter()
                 .map(|width| 1_u64 << (2 * width))
                 .sum(),
-            testimony_events: self
-                .history
-                .iter()
-                .filter_map(|entry| match entry {
-                    BitCausalHistoryEntry::Testimony(testimony) => Some(testimony.event),
-                    BitCausalHistoryEntry::ExhaustiveTestimony(testimony) => Some(testimony.event),
-                    BitCausalHistoryEntry::ReceiverFounded { .. } => None,
-                })
-                .collect(),
+            testimony_events: self.testimony_events.clone(),
         })
     }
 
-    pub fn testimonies(&self) -> impl Iterator<Item = &BitTestimony> {
-        self.history.iter().filter_map(|entry| match entry {
-            BitCausalHistoryEntry::Testimony(testimony) => Some(testimony),
-            BitCausalHistoryEntry::ReceiverFounded { .. }
-            | BitCausalHistoryEntry::ExhaustiveTestimony(_) => None,
-        })
-    }
-
-    pub fn exhaustive_testimonies(&self) -> impl Iterator<Item = &BitExhaustiveTestimony> {
-        self.history.iter().filter_map(|entry| match entry {
-            BitCausalHistoryEntry::ExhaustiveTestimony(testimony) => Some(testimony),
-            BitCausalHistoryEntry::ReceiverFounded { .. } | BitCausalHistoryEntry::Testimony(_) => {
-                None
-            }
-        })
-    }
-
+    /// Validate the quotient and re-derive its production frontier.
+    ///
+    /// [definition] The standing retains no testimony archive, so there is no replay: the
+    /// compatible family is checked to lie in the declared ecology, and the query and
+    /// verification width are recomputed from it. Every admitted occurrence either founded one
+    /// receiver width or testified, so `used = testimony + (widths − 1)`.
     pub fn validate(&self) -> Result<(), BitCausalError> {
         self.validate_incremental()?;
-        self.validate_complete_replay()
-    }
-
-    /// Validate the carried recurrence without reconstructing its entire
-    /// ancestry.
-    ///
-    /// The transition law only ever obtains a successor by filtering the
-    /// predecessor's complete family. Rebuilding the original ecology after
-    /// every occurrence would discard that lawful recurrence and dominate the
-    /// search cost. `validate` remains the independent full replay authority.
-    fn validate_incremental(&self) -> Result<(), BitCausalError> {
-        if self.schema != "holonic-engine.bit-causal-standing.v1" {
+        let ecology = enumerate_program_ecology(self.maximum_width)?
+            .into_iter()
+            .collect::<BTreeSet<_>>();
+        if self
+            .candidates
+            .iter()
+            .any(|candidate| !ecology.contains(candidate))
+            || select_distinguishing_query(&self.candidates, &self.receiver_widths)?.0
+                != self.next_query
+        {
             return Err(BitCausalError::MalformedStanding);
         }
+        Ok(())
+    }
+
+    /// Validate the carried quotient without re-deriving its search.
+    fn validate_incremental(&self) -> Result<(), BitCausalError> {
+        self.check_schema(BIT_CAUSAL_STANDING_SCHEMA)?;
         validate_width_range(self.maximum_width, self.initial_width)?;
         if !self.receiver_widths.contains(&self.initial_width)
             || self
                 .receiver_widths
                 .iter()
                 .any(|width| *width == 0 || *width > self.maximum_width)
+            || !self.testimony_events.is_subset(&self.used_events)
+            || self.used_events.len()
+                != self.testimony_events.len() + self.receiver_widths.len() - 1
         {
-            return Err(BitCausalError::MalformedStanding);
-        }
-        let history_events = self
-            .history
-            .iter()
-            .map(BitCausalHistoryEntry::event)
-            .collect::<BTreeSet<_>>();
-        if history_events.len() != self.history.len() || history_events != self.used_events {
             return Err(BitCausalError::MalformedStanding);
         }
         if self.candidates.is_empty()
@@ -585,126 +672,6 @@ impl BitCausalStanding {
                     &self.receiver_widths,
                     &self.certified_widths,
                 )
-        {
-            return Err(BitCausalError::MalformedStanding);
-        }
-        let mut contemporary_widths = BTreeSet::from([self.initial_width]);
-        for entry in &self.history {
-            match entry {
-                BitCausalHistoryEntry::ReceiverFounded { width, .. } => {
-                    if *width
-                        <= *contemporary_widths
-                            .last()
-                            .ok_or(BitCausalError::MalformedStanding)?
-                        || *width > self.maximum_width
-                    {
-                        return Err(BitCausalError::MalformedStanding);
-                    }
-                    contemporary_widths.insert(*width);
-                }
-                BitCausalHistoryEntry::Testimony(testimony) => {
-                    validate_testimony(&contemporary_widths, testimony.query, testimony.response)?;
-                }
-                BitCausalHistoryEntry::ExhaustiveTestimony(testimony) => {
-                    if !contemporary_widths.contains(&testimony.width) {
-                        return Err(BitCausalError::MalformedStanding);
-                    }
-                    validate_exhaustive_testimony(testimony)?;
-                }
-            }
-        }
-        if contemporary_widths != self.receiver_widths {
-            return Err(BitCausalError::MalformedStanding);
-        }
-        for candidate in &self.candidates {
-            for entry in &self.history {
-                match entry {
-                    BitCausalHistoryEntry::Testimony(testimony) => {
-                        if candidate.evaluate(testimony.query)? != testimony.response {
-                            return Err(BitCausalError::MalformedStanding);
-                        }
-                    }
-                    BitCausalHistoryEntry::ExhaustiveTestimony(testimony) => {
-                        if !candidate_matches_exhaustive(
-                            *candidate,
-                            testimony.width,
-                            &testimony.responses,
-                        )?
-                        .0
-                        {
-                            return Err(BitCausalError::MalformedStanding);
-                        }
-                    }
-                    BitCausalHistoryEntry::ReceiverFounded { .. } => {}
-                }
-            }
-        }
-        Ok(())
-    }
-
-    fn validate_complete_replay(&self) -> Result<(), BitCausalError> {
-        let mut receiver_widths = BTreeSet::from([self.initial_width]);
-        let mut certified_widths = BTreeSet::new();
-        let mut candidates = enumerate_program_ecology(self.maximum_width)?;
-        let (mut next_query, _) = select_distinguishing_query(&candidates, &receiver_widths)?;
-        let mut verification_width =
-            next_verification_width(next_query, &receiver_widths, &certified_widths);
-        for entry in &self.history {
-            match entry {
-                BitCausalHistoryEntry::ReceiverFounded { width, .. } => {
-                    if *width
-                        <= *receiver_widths
-                            .last()
-                            .ok_or(BitCausalError::MalformedStanding)?
-                        || *width > self.maximum_width
-                    {
-                        return Err(BitCausalError::MalformedStanding);
-                    }
-                    receiver_widths.insert(*width);
-                }
-                BitCausalHistoryEntry::Testimony(testimony) => {
-                    testimony.query.validate()?;
-                    testimony.response.validate(testimony.query.width)?;
-                    if !receiver_widths.contains(&testimony.query.width) {
-                        return Err(BitCausalError::MalformedStanding);
-                    }
-                    if matches!(testimony.source, BitTestimonySource::ReturnedReceiver(_))
-                        && next_query != Some(testimony.query)
-                    {
-                        return Err(BitCausalError::MalformedStanding);
-                    }
-                    candidates =
-                        filter_candidates(&candidates, testimony.query, testimony.response)?.0;
-                    if candidates.is_empty() {
-                        return Err(BitCausalError::MalformedStanding);
-                    }
-                }
-                BitCausalHistoryEntry::ExhaustiveTestimony(testimony) => {
-                    if verification_width != Some(testimony.width) {
-                        return Err(BitCausalError::MalformedStanding);
-                    }
-                    validate_exhaustive_testimony(testimony)?;
-                    candidates = filter_candidates_exhaustively(
-                        &candidates,
-                        testimony.width,
-                        &testimony.responses,
-                    )?
-                    .0;
-                    if candidates.is_empty() {
-                        return Err(BitCausalError::MalformedStanding);
-                    }
-                    certified_widths.insert(testimony.width);
-                }
-            }
-            next_query = select_distinguishing_query(&candidates, &receiver_widths)?.0;
-            verification_width =
-                next_verification_width(next_query, &receiver_widths, &certified_widths);
-        }
-        if receiver_widths != self.receiver_widths
-            || candidates != self.candidates
-            || next_query != self.next_query
-            || certified_widths != self.certified_widths
-            || verification_width != self.verification_width
         {
             return Err(BitCausalError::MalformedStanding);
         }
@@ -798,9 +765,7 @@ impl ExactEventLaw for BitCausalLaw {
             return Err(BitCausalError::LawStandingMismatch);
         }
         let event_id = event.event();
-        if standing_before.used_events.contains(&event_id) {
-            return Err(BitCausalError::RepeatedEvent(event_id));
-        }
+        standing_before.refuse_repeated(event_id)?;
 
         let mut standing_after = standing_before.clone();
         let candidates_before = u64::try_from(standing_before.candidates.len())
@@ -826,33 +791,29 @@ impl ExactEventLaw for BitCausalLaw {
                 let (candidates, work) =
                     filter_candidates(&standing_after.candidates, *query, *response)?;
                 if candidates.is_empty() {
-                    return Err(BitCausalError::TestimonyObstructsEcology(*event));
+                    return Err(BitCausalError::Law(
+                        BitCausalRefusal::TestimonyObstructsEcology(*event),
+                    ));
                 }
                 standing_after.candidates = candidates;
-                standing_after
-                    .history
-                    .push(BitCausalHistoryEntry::Testimony(testimony.clone()));
+                standing_after.testimony_events.insert(testimony.event);
                 received_testimony = Some(testimony);
                 search_work.add_assign(&work)?;
             }
-            BitCausalEvent::FoundReceiver { event, width } => {
+            BitCausalEvent::FoundReceiver { event: _, width } => {
                 let largest = *standing_after
                     .receiver_widths
                     .last()
                     .ok_or(BitCausalError::MalformedStanding)?;
                 if *width <= largest || *width > self.maximum_width {
-                    return Err(BitCausalError::ReceiverDoesNotExtend {
-                        present: largest,
-                        requested: *width,
-                    });
+                    return Err(BitCausalError::Law(
+                        BitCausalRefusal::ReceiverDoesNotExtend {
+                            present: largest,
+                            requested: *width,
+                        },
+                    ));
                 }
                 standing_after.receiver_widths.insert(*width);
-                standing_after
-                    .history
-                    .push(BitCausalHistoryEntry::ReceiverFounded {
-                        event: *event,
-                        width: *width,
-                    });
                 founded_receiver = Some(*width);
             }
             BitCausalEvent::ReturnObservation {
@@ -863,10 +824,12 @@ impl ExactEventLaw for BitCausalLaw {
             } => {
                 validate_testimony(&standing_after.receiver_widths, *query, *response)?;
                 if standing_after.next_query != Some(*query) {
-                    return Err(BitCausalError::UnexpectedReturnedQuery {
-                        expected: standing_after.next_query,
-                        received: *query,
-                    });
+                    return Err(BitCausalError::Law(
+                        BitCausalRefusal::UnexpectedReturnedQuery {
+                            expected: standing_after.next_query,
+                            received: *query,
+                        },
+                    ));
                 }
                 let testimony = BitTestimony {
                     event: *event,
@@ -877,12 +840,12 @@ impl ExactEventLaw for BitCausalLaw {
                 let (candidates, work) =
                     filter_candidates(&standing_after.candidates, *query, *response)?;
                 if candidates.is_empty() {
-                    return Err(BitCausalError::TestimonyObstructsEcology(*event));
+                    return Err(BitCausalError::Law(
+                        BitCausalRefusal::TestimonyObstructsEcology(*event),
+                    ));
                 }
                 standing_after.candidates = candidates;
-                standing_after
-                    .history
-                    .push(BitCausalHistoryEntry::Testimony(testimony.clone()));
+                standing_after.testimony_events.insert(testimony.event);
                 received_testimony = Some(testimony);
                 search_work.add_assign(&work)?;
             }
@@ -893,10 +856,12 @@ impl ExactEventLaw for BitCausalLaw {
                 responses,
             } => {
                 if standing_after.verification_width != Some(*width) {
-                    return Err(BitCausalError::UnexpectedVerificationWidth {
-                        expected: standing_after.verification_width,
-                        received: *width,
-                    });
+                    return Err(BitCausalError::Law(
+                        BitCausalRefusal::UnexpectedVerificationWidth {
+                            expected: standing_after.verification_width,
+                            received: *width,
+                        },
+                    ));
                 }
                 let testimony = BitExhaustiveTestimony {
                     event: *event,
@@ -908,15 +873,13 @@ impl ExactEventLaw for BitCausalLaw {
                 let (candidates, work) =
                     filter_candidates_exhaustively(&standing_after.candidates, *width, responses)?;
                 if candidates.is_empty() {
-                    return Err(BitCausalError::TestimonyObstructsEcology(*event));
+                    return Err(BitCausalError::Law(
+                        BitCausalRefusal::TestimonyObstructsEcology(*event),
+                    ));
                 }
                 standing_after.candidates = candidates;
                 standing_after.certified_widths.insert(*width);
-                standing_after
-                    .history
-                    .push(BitCausalHistoryEntry::ExhaustiveTestimony(
-                        testimony.clone(),
-                    ));
+                standing_after.testimony_events.insert(testimony.event);
                 received_exhaustive_testimony = Some(testimony);
                 search_work.add_assign(&work)?;
             }
@@ -962,7 +925,7 @@ impl ExactEventLaw for BitCausalLaw {
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum BitCausalError {
+pub enum BitCausalRefusal {
     #[error("bit receiver widths must satisfy 1 <= initial <= maximum <= 8")]
     InvalidWidthRange,
     #[error("bit query {0:?} is malformed")]
@@ -971,12 +934,8 @@ pub enum BitCausalError {
     MalformedResponse { width: u8, response: BitResponse },
     #[error("bit transducer program {0:?} is malformed")]
     MalformedProgram(BitTransducerProgram),
-    #[error("bit-causal law and standing disagree")]
-    LawStandingMismatch,
     #[error("reference receiver width {received} exceeds the declared maximum width {maximum}")]
     ReferenceExceedsDeclaredWidth { maximum: u8, received: u8 },
-    #[error("bit-causal occurrence {0:?} was already used")]
-    RepeatedEvent(EventId),
     #[error("receiver width {requested} does not extend present width {present}")]
     ReceiverDoesNotExtend { present: u8, requested: u8 },
     #[error("testimony references receiver width {0}, which is not active")]
@@ -1000,10 +959,6 @@ pub enum BitCausalError {
     },
     #[error("testimony occurrence {0:?} obstructs every admitted program")]
     TestimonyObstructsEcology(EventId),
-    #[error("the bit-causal standing is malformed")]
-    MalformedStanding,
-    #[error("the finite bit ecology exceeded an exact carrier")]
-    CarrierOverflow,
     #[error("native bit-machine realization is unavailable on this platform")]
     NativeRealizationUnavailable,
     #[error("native bit-machine memory allocation failed")]
@@ -1014,20 +969,29 @@ pub enum BitCausalError {
     Diagram(#[from] crate::DiagramError),
 }
 
+impl RefusalKind for BitCausalRefusal {
+    const LAW: &'static str = "bit-causal";
+}
+
+/// The bit-causal law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type BitCausalError = EventRefusal<BitCausalRefusal>;
+
+event_refusal_from!(BitCausalRefusal: crate::DiagramError);
+
 fn validate_width_range(maximum_width: u8, initial_width: u8) -> Result<(), BitCausalError> {
     if maximum_width == 0
         || maximum_width > 8
         || initial_width == 0
         || initial_width > maximum_width
     {
-        return Err(BitCausalError::InvalidWidthRange);
+        return Err(BitCausalError::Law(BitCausalRefusal::InvalidWidthRange));
     }
     Ok(())
 }
 
 fn bit_mask(width: u8) -> Result<u8, BitCausalError> {
     if width == 0 || width > 8 {
-        return Err(BitCausalError::InvalidWidthRange);
+        return Err(BitCausalError::Law(BitCausalRefusal::InvalidWidthRange));
     }
     Ok(if width == 8 {
         u8::MAX
@@ -1087,7 +1051,9 @@ fn validate_testimony(
     query.validate()?;
     response.validate(query.width)?;
     if !receiver_widths.contains(&query.width) {
-        return Err(BitCausalError::MissingReceiverWidth(query.width));
+        return Err(BitCausalError::Law(BitCausalRefusal::MissingReceiverWidth(
+            query.width,
+        )));
     }
     Ok(())
 }
@@ -1126,11 +1092,13 @@ fn validate_exhaustive_responses(
     let expected = 1_u64 << (2 * width);
     let received = u64::try_from(responses.len()).map_err(|_| BitCausalError::CarrierOverflow)?;
     if received != expected {
-        return Err(BitCausalError::MalformedExhaustiveTestimony {
-            width,
-            expected,
-            received,
-        });
+        return Err(BitCausalError::Law(
+            BitCausalRefusal::MalformedExhaustiveTestimony {
+                width,
+                expected,
+                received,
+            },
+        ));
     }
     for response in responses {
         response.validate(width)?;
@@ -1423,7 +1391,9 @@ pub fn compile_x86_64_bit_program(
 pub fn compile_x86_64_bit_program(
     _program: BitTransducerProgram,
 ) -> Result<X86BitProgramImage, BitCausalError> {
-    Err(BitCausalError::NativeRealizationUnavailable)
+    Err(BitCausalError::Law(
+        BitCausalRefusal::NativeRealizationUnavailable,
+    ))
 }
 
 #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
@@ -1431,7 +1401,7 @@ mod native_x86 {
     use std::ffi::{c_int, c_void};
     use std::ptr;
 
-    use super::{BitCausalError, BitQuery, BitResponse, X86BitProgramImage};
+    use super::{BitCausalError, BitCausalRefusal, BitQuery, BitResponse, X86BitProgramImage};
 
     const PROT_READ: c_int = 0x1;
     const PROT_WRITE: c_int = 0x2;
@@ -1460,7 +1430,9 @@ mod native_x86 {
     impl ExecutableX86BitProgram {
         pub fn new(image: &X86BitProgramImage) -> Result<Self, BitCausalError> {
             if image.code.is_empty() {
-                return Err(BitCausalError::NativeAllocationFailed);
+                return Err(BitCausalError::Law(
+                    BitCausalRefusal::NativeAllocationFailed,
+                ));
             }
             // SAFETY: The requested anonymous mapping is checked against the
             // platform failure sentinel before any write. The mapping is
@@ -1476,7 +1448,9 @@ mod native_x86 {
                 )
             };
             if allocation as isize == -1 {
-                return Err(BitCausalError::NativeAllocationFailed);
+                return Err(BitCausalError::Law(
+                    BitCausalRefusal::NativeAllocationFailed,
+                ));
             }
             // SAFETY: `allocation` names at least `image.code.len()` writable
             // bytes and the source slice is valid and non-overlapping.
@@ -1494,7 +1468,9 @@ mod native_x86 {
                 unsafe {
                     munmap(allocation, image.code.len());
                 }
-                return Err(BitCausalError::NativeProtectionFailed);
+                return Err(BitCausalError::Law(
+                    BitCausalRefusal::NativeProtectionFailed,
+                ));
             }
             Ok(Self {
                 allocation,
@@ -1504,7 +1480,9 @@ mod native_x86 {
 
         pub fn execute(&self, query: BitQuery) -> Result<BitResponse, BitCausalError> {
             if query.width != 8 {
-                return Err(BitCausalError::NativeRealizationUnavailable);
+                return Err(BitCausalError::Law(
+                    BitCausalRefusal::NativeRealizationUnavailable,
+                ));
             }
             let packed = u16::from(query.state) | u16::from(query.input) << 8;
             // SAFETY: The allocation contains code emitted by the closed
@@ -1538,11 +1516,15 @@ pub struct ExecutableX86BitProgram;
 #[cfg(not(all(target_os = "linux", target_arch = "x86_64")))]
 impl ExecutableX86BitProgram {
     pub fn new(_image: &X86BitProgramImage) -> Result<Self, BitCausalError> {
-        Err(BitCausalError::NativeRealizationUnavailable)
+        Err(BitCausalError::Law(
+            BitCausalRefusal::NativeRealizationUnavailable,
+        ))
     }
 
     pub fn execute(&self, _query: BitQuery) -> Result<BitResponse, BitCausalError> {
-        Err(BitCausalError::NativeRealizationUnavailable)
+        Err(BitCausalError::Law(
+            BitCausalRefusal::NativeRealizationUnavailable,
+        ))
     }
 }
 
@@ -1650,6 +1632,85 @@ mod tests {
         world.standing().validate().unwrap();
     }
 
+    /// Phase 16: an old rest carried the testimony archive in the standing. It still decodes, to
+    /// the history-free quotient the law now keeps; a new rest omits the archive; and the decoded
+    /// standing's future (every later radiation and the certificate) is the native one's.
+    #[test]
+    fn a_retired_history_rest_decodes_to_the_quotient_and_its_future_is_unchanged() {
+        let maximum_width = 2;
+        let target = target_program(maximum_width);
+        let law = BitCausalLaw::new(maximum_width, 1).unwrap();
+        let mut world = CausalWorld::new(
+            law.clone(),
+            BitCausalStanding::new(maximum_width, 1).unwrap(),
+        );
+        let landmark = BitQuery::new(1, 1, 0).unwrap();
+        let mut legacy_history = Vec::new();
+        let landmark_event = BitCausalEvent::InheritLandmark {
+            event: EventId(7),
+            lineage: BitLineageId(3),
+            query: landmark,
+            response: target.evaluate(landmark).unwrap(),
+        };
+        let receipt = world.receive(&landmark_event).unwrap();
+        legacy_history.push(BitCausalHistoryEntry::Testimony(
+            receipt.radiation[0].received_testimony.clone().unwrap(),
+        ));
+        world
+            .receive(&BitCausalEvent::FoundReceiver {
+                event: EventId(8),
+                width: 2,
+            })
+            .unwrap();
+        legacy_history.push(BitCausalHistoryEntry::ReceiverFounded {
+            event: EventId(8),
+            width: 2,
+        });
+        let query = world.standing().next_query().unwrap();
+        let receipt = world
+            .receive(&BitCausalEvent::ReturnObservation {
+                event: EventId(9),
+                receiver: BitLineageId(1),
+                query,
+                response: target.evaluate(query).unwrap(),
+            })
+            .unwrap();
+        legacy_history.push(BitCausalHistoryEntry::Testimony(
+            receipt.radiation[0].received_testimony.clone().unwrap(),
+        ));
+
+        let mut legacy = serde_json::to_value(world.standing()).unwrap();
+        let object = legacy.as_object_mut().unwrap();
+        object.remove("testimony_events");
+        object.insert(
+            "history".to_owned(),
+            serde_json::to_value(&legacy_history).unwrap(),
+        );
+        let decoded: BitCausalStanding = serde_json::from_value(legacy).unwrap();
+        assert_eq!(&decoded, world.standing());
+        assert_eq!(
+            decoded.testimony_events(),
+            &BTreeSet::from([EventId(7), EventId(9)])
+        );
+        decoded.validate().unwrap();
+        let rest = serde_json::to_value(&decoded).unwrap();
+        assert!(rest.get("history").is_none());
+        let reread: BitCausalStanding = serde_json::from_value(rest).unwrap();
+        assert_eq!(reread, decoded);
+
+        let mut remounted = CausalWorld::new(law, decoded);
+        let mut native_event = 100;
+        let mut remounted_event = 100;
+        return_until_complete(&mut world, target, &mut native_event);
+        return_until_complete(&mut remounted, target, &mut remounted_event);
+        assert_eq!(native_event, remounted_event);
+        assert_eq!(world.standing(), remounted.standing());
+        assert_eq!(
+            world.standing().certificate(),
+            remounted.standing().certificate()
+        );
+    }
+
     #[test]
     fn a_returned_observation_cannot_replace_the_production_query() {
         let law = BitCausalLaw::new(3, 1).unwrap();
@@ -1665,7 +1726,9 @@ mod tests {
                 query: wrong,
                 response: target.evaluate(wrong).unwrap(),
             }),
-            Err(BitCausalError::UnexpectedReturnedQuery { .. })
+            Err(BitCausalError::Law(
+                BitCausalRefusal::UnexpectedReturnedQuery { .. }
+            ))
         ));
         assert_eq!(world.standing(), &before);
     }
@@ -1678,7 +1741,7 @@ mod tests {
         let target = target_program(3);
         let query = BitQuery::new(1, 0, 0).unwrap();
         let before = world.standing().candidates().len();
-        world
+        let receipt = world
             .receive(&BitCausalEvent::InheritLandmark {
                 event: EventId(100),
                 lineage: BitLineageId(9),
@@ -1687,10 +1750,19 @@ mod tests {
             })
             .unwrap();
         assert!(world.standing().candidates().len() < before);
+        // The testimony is returned by its event; the standing keeps only its occurrence.
         assert!(matches!(
-            world.standing().testimonies().next().unwrap().source,
+            receipt.radiation[0]
+                .received_testimony
+                .as_ref()
+                .unwrap()
+                .source,
             BitTestimonySource::ImportedLandmark(BitLineageId(9))
         ));
+        assert_eq!(
+            world.standing().testimony_events(),
+            &BTreeSet::from([EventId(100)])
+        );
     }
 
     #[test]
@@ -1735,7 +1807,7 @@ mod tests {
             })
             .unwrap();
         let after = world.standing().inspect_reference(reference).unwrap();
-        assert_eq!(world.standing().history().len(), 1);
+        assert_eq!(world.standing().testimony_events().len(), 1);
         assert!(after.standing_candidate_population < before.standing_candidate_population);
         assert!(after.standing_candidate_population > 1);
         assert_eq!(
@@ -1777,11 +1849,13 @@ mod tests {
                 width: 1,
                 responses: vec![target.evaluate(BitQuery::new(1, 0, 0).unwrap()).unwrap()],
             }),
-            Err(BitCausalError::MalformedExhaustiveTestimony {
-                width: 1,
-                expected: 4,
-                received: 1,
-            })
+            Err(BitCausalError::Law(
+                BitCausalRefusal::MalformedExhaustiveTestimony {
+                    width: 1,
+                    expected: 4,
+                    received: 1,
+                }
+            ))
         );
         assert_eq!(world.standing(), &before);
     }

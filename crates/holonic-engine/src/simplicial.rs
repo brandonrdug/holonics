@@ -13,6 +13,7 @@ use relational_geometry::{FrameId, Rat, RatVec2};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::world::{EventRefusal, RefusalKind, event_refusal_from};
 use crate::{
     ConicCellId, ConicChart, EventId, EventSuccessor, ExactEventLaw, HomogeneousConic,
     NativeConicPopulation,
@@ -856,9 +857,9 @@ impl AffineHingeForm {
         let mut value = self.constant.clone();
         for (hinge, coefficient) in &self.terms {
             value += coefficient
-                * parameters
-                    .get(hinge)
-                    .ok_or(HingeWorldError::MissingParameter(*hinge))?;
+                * parameters.get(hinge).ok_or(HingeWorldError::Law(
+                    HingeWorldRefusal::MissingParameter(*hinge),
+                ))?;
         }
         Ok(value)
     }
@@ -1039,11 +1040,13 @@ impl HingeWorldLaw {
         &self,
         step: HingeTransitionStep,
     ) -> Result<ProjectiveTurn, HingeWorldError> {
-        let relation = self
-            .transports
-            .relations
-            .get(&step.relation)
-            .ok_or(HingeWorldError::MissingTransport(step.relation))?;
+        let relation =
+            self.transports
+                .relations
+                .get(&step.relation)
+                .ok_or(HingeWorldError::Law(HingeWorldRefusal::MissingTransport(
+                    step.relation,
+                )))?;
         Ok(match step.direction {
             HingeTransitionDirection::Along => relation.turn.clone(),
             HingeTransitionDirection::Against => relation.turn.inverse(),
@@ -1124,7 +1127,9 @@ impl HingeWorldLaw {
                 .flat_map(|coefficient| coefficient.terms.keys())
             {
                 if !complex.hinges.contains_key(hinge) {
-                    return Err(HingeWorldError::MissingHinge(*hinge));
+                    return Err(HingeWorldError::Law(HingeWorldRefusal::MissingHinge(
+                        *hinge,
+                    )));
                 }
             }
             let ordinal = u64::try_from(offset + 1).expect("family count fits u64");
@@ -1164,12 +1169,16 @@ impl HingeWorldLaw {
     ) -> Result<HingeWorldStanding, HingeWorldError> {
         for hinge in self.complex.hinges.keys() {
             if !parameters.contains_key(hinge) {
-                return Err(HingeWorldError::MissingParameter(*hinge));
+                return Err(HingeWorldError::Law(HingeWorldRefusal::MissingParameter(
+                    *hinge,
+                )));
             }
         }
         for hinge in parameters.keys() {
             if !self.complex.hinges.contains_key(hinge) {
-                return Err(HingeWorldError::MissingHinge(*hinge));
+                return Err(HingeWorldError::Law(HingeWorldRefusal::MissingHinge(
+                    *hinge,
+                )));
             }
         }
         let mut conics = NativeConicPopulation::default();
@@ -1212,12 +1221,16 @@ impl HingeWorldLaw {
         let mut changed_hinges = Vec::new();
         for (hinge, parameter) in assignments {
             if !standing_before.complex.hinges.contains_key(hinge) {
-                return Err(HingeWorldError::MissingHinge(*hinge));
+                return Err(HingeWorldError::Law(HingeWorldRefusal::MissingHinge(
+                    *hinge,
+                )));
             }
             let previous = standing_after
                 .parameters
                 .get_mut(hinge)
-                .ok_or(HingeWorldError::MissingParameter(*hinge))?;
+                .ok_or(HingeWorldError::Law(HingeWorldRefusal::MissingParameter(
+                    *hinge,
+                )))?;
             if previous != parameter {
                 *previous = parameter.clone();
                 changed_hinges.push(*hinge);
@@ -1233,11 +1246,14 @@ impl HingeWorldLaw {
         let mut changed_conics = Vec::new();
         for family in self.conic_families.values() {
             let form = family.form(&standing_after.parameters)?;
-            let previous = standing_after
-                .conics
-                .cells
-                .get(&family.cell)
-                .ok_or(HingeWorldError::MissingConic(family.cell))?;
+            let previous =
+                standing_after
+                    .conics
+                    .cells
+                    .get(&family.cell)
+                    .ok_or(HingeWorldError::Law(HingeWorldRefusal::MissingConic(
+                        family.cell,
+                    )))?;
             if previous.form != form {
                 standing_after
                     .conics
@@ -1266,7 +1282,9 @@ impl HingeWorldLaw {
         event: &HingeEvent,
     ) -> Result<(HingeWorldStanding, HingeRadiation), HingeWorldError> {
         if !standing_before.complex.hinges.contains_key(&event.pivot) {
-            return Err(HingeWorldError::MissingHinge(event.pivot));
+            return Err(HingeWorldError::Law(HingeWorldRefusal::MissingHinge(
+                event.pivot,
+            )));
         }
         let initial = HingeTransportCandidate {
             hinge: event.pivot,
@@ -1446,10 +1464,13 @@ impl HingeWorldLaw {
         let mut standing_after = standing_before.clone();
         let mut changed_hinges = Vec::new();
         for (hinge, parameter) in assignments {
-            let previous = standing_after
-                .parameters
-                .get_mut(&hinge)
-                .ok_or(HingeWorldError::MissingParameter(hinge))?;
+            let previous =
+                standing_after
+                    .parameters
+                    .get_mut(&hinge)
+                    .ok_or(HingeWorldError::Law(HingeWorldRefusal::MissingParameter(
+                        hinge,
+                    )))?;
             if *previous != parameter {
                 *previous = parameter;
                 changed_hinges.push(hinge);
@@ -1465,11 +1486,14 @@ impl HingeWorldLaw {
         let mut changed_conics = Vec::new();
         for family in self.conic_families.values() {
             let form = family.form(&standing_after.parameters)?;
-            let previous = standing_after
-                .conics
-                .cells
-                .get(&family.cell)
-                .ok_or(HingeWorldError::MissingConic(family.cell))?;
+            let previous =
+                standing_after
+                    .conics
+                    .cells
+                    .get(&family.cell)
+                    .ok_or(HingeWorldError::Law(HingeWorldRefusal::MissingConic(
+                        family.cell,
+                    )))?;
             if previous.form != form {
                 standing_after
                     .conics
@@ -1560,7 +1584,7 @@ pub enum SimplicialError {
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum HingeWorldError {
+pub enum HingeWorldRefusal {
     #[error("hinge {0:?} is absent")]
     MissingHinge(HingeId),
     #[error("hinge transport {0:?} is absent")]
@@ -1574,6 +1598,15 @@ pub enum HingeWorldError {
     #[error(transparent)]
     Conic(#[from] crate::ConicError),
 }
+
+impl RefusalKind for HingeWorldRefusal {
+    const LAW: &'static str = "simplicial";
+}
+
+/// The simplicial law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type HingeWorldError = EventRefusal<HingeWorldRefusal>;
+
+event_refusal_from!(HingeWorldRefusal: SimplicialError, crate::ConicError);
 
 #[cfg(test)]
 mod tests {

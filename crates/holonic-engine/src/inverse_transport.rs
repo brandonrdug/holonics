@@ -34,9 +34,11 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use crate::world::{EventQuotient, event_standing_wire};
+use crate::world::{EventRefusal, RefusalKind, event_refusal_from};
 use crate::{
     CurrentBranchId, CurrentNodeId, DiffusionBranch, DiffusionComplex, DiffusionError,
-    DiffusionNode, EventId, EventSuccessor, ExactEventLaw,
+    DiffusionNode, EventId, EventStanding, EventSuccessor, ExactEventLaw,
 };
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
@@ -51,7 +53,9 @@ pub struct PotentialTransportEdge {
 impl PotentialTransportEdge {
     fn new(left: u32, right: u32) -> Result<Self, InverseTransportError> {
         if left >= right {
-            return Err(InverseTransportError::MalformedPotentialEdge { left, right });
+            return Err(InverseTransportError::Law(
+                InverseTransportRefusal::MalformedPotentialEdge { left, right },
+            ));
         }
         Ok(Self { left, right })
     }
@@ -79,10 +83,12 @@ impl TransportQuery {
         if query.imposed_potential.len() != query.receiver.len()
             || query.imposed_potential.len() < 2
         {
-            return Err(InverseTransportError::MalformedQueryDimension {
-                potentials: query.imposed_potential.len(),
-                receiver: query.receiver.len(),
-            });
+            return Err(InverseTransportError::Law(
+                InverseTransportRefusal::MalformedQueryDimension {
+                    potentials: query.imposed_potential.len(),
+                    receiver: query.receiver.len(),
+                },
+            ));
         }
         query.validate(query.imposed_potential.len())?;
         Ok(query)
@@ -97,10 +103,12 @@ impl TransportQuery {
         let right =
             usize::try_from(edge.right).map_err(|_| InverseTransportError::CarrierOverflow)?;
         if right >= extent {
-            return Err(InverseTransportError::MalformedPotentialEdge {
-                left: edge.left,
-                right: edge.right,
-            });
+            return Err(InverseTransportError::Law(
+                InverseTransportRefusal::MalformedPotentialEdge {
+                    left: edge.left,
+                    right: edge.right,
+                },
+            ));
         }
         let mut imposed_potential = vec![Rat::zero(); extent];
         let mut receiver = vec![Rat::zero(); extent];
@@ -111,16 +119,22 @@ impl TransportQuery {
 
     fn validate(&self, extent: usize) -> Result<(), InverseTransportError> {
         if self.imposed_potential.len() != extent || self.receiver.len() != extent {
-            return Err(InverseTransportError::MalformedQueryDimension {
-                potentials: self.imposed_potential.len(),
-                receiver: self.receiver.len(),
-            });
+            return Err(InverseTransportError::Law(
+                InverseTransportRefusal::MalformedQueryDimension {
+                    potentials: self.imposed_potential.len(),
+                    receiver: self.receiver.len(),
+                },
+            ));
         }
         if self.imposed_potential.iter().all(Zero::is_zero) {
-            return Err(InverseTransportError::ZeroPotentialQuery);
+            return Err(InverseTransportError::Law(
+                InverseTransportRefusal::ZeroPotentialQuery,
+            ));
         }
         if self.receiver.iter().all(Zero::is_zero) {
-            return Err(InverseTransportError::ZeroReceiverQuery);
+            return Err(InverseTransportError::Law(
+                InverseTransportRefusal::ZeroReceiverQuery,
+            ));
         }
         Ok(())
     }
@@ -230,7 +244,9 @@ impl ExactAffinePrediction {
 impl ExactAffineVersionFiber {
     pub fn new(variable_count: usize) -> Result<Self, InverseTransportError> {
         if variable_count == 0 {
-            return Err(InverseTransportError::EmptyAffineFiber);
+            return Err(InverseTransportError::Law(
+                InverseTransportRefusal::EmptyAffineFiber,
+            ));
         }
         Ok(Self {
             schema: "holonic-engine.exact-affine-version-fiber.v1".to_owned(),
@@ -285,10 +301,12 @@ impl ExactAffineVersionFiber {
         offset: Rat,
     ) -> Result<ExactAffinePrediction, InverseTransportError> {
         if linear_form.len() != self.variable_count {
-            return Err(InverseTransportError::AffineCoordinateDimension {
-                expected: self.variable_count,
-                supplied: linear_form.len(),
-            });
+            return Err(InverseTransportError::Law(
+                InverseTransportRefusal::AffineCoordinateDimension {
+                    expected: self.variable_count,
+                    supplied: linear_form.len(),
+                },
+            ));
         }
         let mut residual = linear_form.to_vec();
         let mut constant = offset;
@@ -320,10 +338,12 @@ impl ExactAffineVersionFiber {
         coordinate: usize,
     ) -> Result<Option<Rat>, InverseTransportError> {
         if coordinate >= self.variable_count {
-            return Err(InverseTransportError::AffineCoordinateOutOfRange {
-                coordinate,
-                variables: self.variable_count,
-            });
+            return Err(InverseTransportError::Law(
+                InverseTransportRefusal::AffineCoordinateOutOfRange {
+                    coordinate,
+                    variables: self.variable_count,
+                },
+            ));
         }
         let mut form = vec![Rat::zero(); self.variable_count];
         form[coordinate] = Rat::one();
@@ -347,10 +367,12 @@ impl ExactAffineVersionFiber {
         response: Rat,
     ) -> Result<AffineAdmissionWork, InverseTransportError> {
         if coefficients.len() != self.variable_count {
-            return Err(InverseTransportError::AffineCoordinateDimension {
-                expected: self.variable_count,
-                supplied: coefficients.len(),
-            });
+            return Err(InverseTransportError::Law(
+                InverseTransportRefusal::AffineCoordinateDimension {
+                    expected: self.variable_count,
+                    supplied: coefficients.len(),
+                },
+            ));
         }
         let rank_before = self.rank();
         let mut coefficients = coefficients;
@@ -397,7 +419,9 @@ impl ExactAffineVersionFiber {
                 combination: lineage,
                 response,
             });
-            return Err(InverseTransportError::AffineFiberObstructed);
+            return Err(InverseTransportError::Law(
+                InverseTransportRefusal::AffineFiberObstructed,
+            ));
         };
 
         let divisor = coefficients[pivot].clone();
@@ -447,7 +471,9 @@ impl ExactAffineVersionFiber {
             || self.variable_count == 0
             || self.rows.len() > self.variable_count
         {
-            return Err(InverseTransportError::MalformedAffineFiber);
+            return Err(InverseTransportError::Law(
+                InverseTransportRefusal::MalformedAffineFiber,
+            ));
         }
         for (ordinal, row) in self.rows.iter().enumerate() {
             if row.coefficients.len() != self.variable_count
@@ -458,11 +484,15 @@ impl ExactAffineVersionFiber {
                     .any(|value| !value.is_zero())
                 || ordinal > 0 && self.rows[ordinal - 1].pivot >= row.pivot
             {
-                return Err(InverseTransportError::MalformedAffineFiber);
+                return Err(InverseTransportError::Law(
+                    InverseTransportRefusal::MalformedAffineFiber,
+                ));
             }
             for other in &self.rows {
                 if other.pivot != row.pivot && !other.coefficients[row.pivot].is_zero() {
-                    return Err(InverseTransportError::MalformedAffineFiber);
+                    return Err(InverseTransportError::Law(
+                        InverseTransportRefusal::MalformedAffineFiber,
+                    ));
                 }
             }
         }
@@ -490,21 +520,6 @@ pub struct CompleteTransportOperatorTestimony {
     pub receiver: TransportLineageId,
     /// Row-major response to every `(receiver basis, potential basis)` pair.
     pub responses: Vec<Rat>,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub enum InverseTransportHistoryEntry {
-    Testimony(TransportTestimony),
-    CompleteOperator(CompleteTransportOperatorTestimony),
-}
-
-impl InverseTransportHistoryEntry {
-    fn event(&self) -> EventId {
-        match self {
-            Self::Testimony(testimony) => testimony.event,
-            Self::CompleteOperator(testimony) => testimony.event,
-        }
-    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -558,17 +573,21 @@ impl InverseTransportCertificate {
         let extent =
             usize::try_from(self.extent).map_err(|_| InverseTransportError::CarrierOverflow)?;
         if source.len() != extent {
-            return Err(InverseTransportError::PropagationDimension {
-                expected: extent,
-                supplied: source.len(),
-            });
+            return Err(InverseTransportError::Law(
+                InverseTransportRefusal::PropagationDimension {
+                    expected: extent,
+                    supplied: source.len(),
+                },
+            ));
         }
         let content_after = matrix_vector(&self.transfer_operator, &source)?;
         let total_source = sum(&source);
         let total_after = sum(&content_after);
         let conservation_residual = &total_after - &total_source;
         if !conservation_residual.is_zero() {
-            return Err(InverseTransportError::ReconstructedConservationFailure);
+            return Err(InverseTransportError::Law(
+                InverseTransportRefusal::ReconstructedConservationFailure,
+            ));
         }
         Ok(TransportPropagationReceipt {
             schema: "holonic-engine.transport-propagation-receipt.v1".to_owned(),
@@ -581,18 +600,98 @@ impl InverseTransportCertificate {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct InverseTransportStanding {
-    pub schema: String,
+const INVERSE_TRANSPORT_STANDING_SCHEMA: &str = "holonic-engine.inverse-transport-standing.v1";
+
+/// [definition] **The inverse-transport quotient** (plan phase 16): the exact affine version
+/// fibre of every admitted testimony (its reduced constraints are the sufficient statistic of the
+/// testimony), the production query and the certificate. Each testimony is returned in its
+/// [`InverseTransportRadiation`]; the certificate's testimony events are the admitted
+/// occurrences, so no testimony archive is retained.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct InverseTransportQuotient {
     pub extent: u32,
     pub interval: Rat,
     edge_order: Vec<PotentialTransportEdge>,
     version_fiber: ExactAffineVersionFiber,
-    history: Vec<InverseTransportHistoryEntry>,
+    next_query: Option<TransportQuery>,
+    verification_required: bool,
+    certificate: Option<InverseTransportCertificate>,
+}
+
+/// The InverseTransport standing: the shared event scaffold around [`InverseTransportQuotient`].
+pub type InverseTransportStanding = EventStanding<InverseTransportQuotient>;
+
+#[derive(Serialize)]
+#[serde(rename = "InverseTransportStanding")]
+struct InverseTransportStandingWrite<'a> {
+    schema: &'a String,
+    extent: &'a u32,
+    interval: &'a Rat,
+    edge_order: &'a Vec<PotentialTransportEdge>,
+    version_fiber: &'a ExactAffineVersionFiber,
+    used_events: &'a BTreeSet<EventId>,
+    next_query: &'a Option<TransportQuery>,
+    verification_required: &'a bool,
+    certificate: &'a Option<InverseTransportCertificate>,
+}
+
+impl<'a> From<&'a InverseTransportStanding> for InverseTransportStandingWrite<'a> {
+    fn from(standing: &'a InverseTransportStanding) -> Self {
+        Self {
+            schema: &standing.schema,
+            extent: &standing.extent,
+            interval: &standing.interval,
+            edge_order: &standing.edge_order,
+            version_fiber: &standing.version_fiber,
+            used_events: &standing.used_events,
+            next_query: &standing.next_query,
+            verification_required: &standing.verification_required,
+            certificate: &standing.certificate,
+        }
+    }
+}
+
+/// Reads the current rest and the retired one (whose archive fields are dropped).
+#[derive(Deserialize)]
+#[serde(rename = "InverseTransportStanding")]
+struct InverseTransportStandingRead {
+    schema: String,
+    extent: u32,
+    interval: Rat,
+    edge_order: Vec<PotentialTransportEdge>,
+    version_fiber: ExactAffineVersionFiber,
     used_events: BTreeSet<EventId>,
     next_query: Option<TransportQuery>,
     verification_required: bool,
     certificate: Option<InverseTransportCertificate>,
+}
+
+impl From<InverseTransportStandingRead> for InverseTransportStanding {
+    fn from(read: InverseTransportStandingRead) -> Self {
+        EventStanding::from_parts(
+            read.schema,
+            read.used_events,
+            InverseTransportQuotient {
+                extent: read.extent,
+                interval: read.interval,
+                edge_order: read.edge_order,
+                version_fiber: read.version_fiber,
+                next_query: read.next_query,
+                verification_required: read.verification_required,
+                certificate: read.certificate,
+            },
+        )
+    }
+}
+
+event_standing_wire!(
+    InverseTransportQuotient,
+    InverseTransportStandingWrite,
+    InverseTransportStandingRead
+);
+
+impl EventQuotient for InverseTransportQuotient {
+    type Refusal = InverseTransportRefusal;
 }
 
 impl InverseTransportStanding {
@@ -601,18 +700,18 @@ impl InverseTransportStanding {
         let edge_order = canonical_edges(extent)?;
         let version_fiber = ExactAffineVersionFiber::new(edge_order.len())?;
         let (next_query, _) = select_next_query(extent_usize, &edge_order, &version_fiber)?;
-        let standing = Self {
-            schema: "holonic-engine.inverse-transport-standing.v1".to_owned(),
-            extent,
-            interval,
-            edge_order,
-            version_fiber,
-            history: Vec::new(),
-            used_events: BTreeSet::new(),
-            next_query,
-            verification_required: false,
-            certificate: None,
-        };
+        let standing = EventStanding::founded(
+            INVERSE_TRANSPORT_STANDING_SCHEMA,
+            InverseTransportQuotient {
+                extent,
+                interval,
+                edge_order,
+                version_fiber,
+                next_query,
+                verification_required: false,
+                certificate: None,
+            },
+        );
         standing.validate_incremental()?;
         Ok(standing)
     }
@@ -623,10 +722,6 @@ impl InverseTransportStanding {
 
     pub fn version_fiber(&self) -> &ExactAffineVersionFiber {
         &self.version_fiber
-    }
-
-    pub fn history(&self) -> &[InverseTransportHistoryEntry] {
-        &self.history
     }
 
     pub fn next_query(&self) -> Option<&TransportQuery> {
@@ -669,52 +764,26 @@ impl InverseTransportStanding {
         self.certificate.is_some()
     }
 
+    /// Validate the quotient.
+    ///
+    /// [definition] The standing retains no testimony archive, so there is no replay: the edge
+    /// order, the version fibre, the passive-sign constraint, the production query (re-derived
+    /// from the fibre) and the certificate's presence are checked. The fibre is the sufficient
+    /// statistic of every admitted testimony.
     pub fn validate(&self) -> Result<(), InverseTransportError> {
-        self.validate_incremental()?;
-        self.validate_complete_replay()
+        self.validate_incremental()
     }
 
     fn validate_incremental(&self) -> Result<(), InverseTransportError> {
         let extent = validate_extent_and_interval(self.extent, &self.interval)?;
-        if self.schema != "holonic-engine.inverse-transport-standing.v1"
-            || self.edge_order != canonical_edges(self.extent)?
+        self.check_schema(INVERSE_TRANSPORT_STANDING_SCHEMA)?;
+        if self.edge_order != canonical_edges(self.extent)?
             || self.version_fiber.variable_count() != self.edge_order.len()
+            || self.certificate.is_some() && self.used_events.is_empty()
         {
             return Err(InverseTransportError::MalformedStanding);
         }
         self.version_fiber.validate()?;
-        let history_events = self
-            .history
-            .iter()
-            .map(InverseTransportHistoryEntry::event)
-            .collect::<BTreeSet<_>>();
-        if history_events.len() != self.history.len() || history_events != self.used_events {
-            return Err(InverseTransportError::MalformedStanding);
-        }
-        let complete_entries = self
-            .history
-            .iter()
-            .filter(|entry| matches!(entry, InverseTransportHistoryEntry::CompleteOperator(_)))
-            .count();
-        if complete_entries > 1
-            || complete_entries == 1
-                && !matches!(
-                    self.history.last(),
-                    Some(InverseTransportHistoryEntry::CompleteOperator(_))
-                )
-        {
-            return Err(InverseTransportError::MalformedStanding);
-        }
-        for entry in &self.history {
-            match entry {
-                InverseTransportHistoryEntry::Testimony(testimony) => {
-                    testimony.query.validate(extent)?;
-                }
-                InverseTransportHistoryEntry::CompleteOperator(testimony) => {
-                    validate_complete_basis(extent, &testimony.responses)?;
-                }
-            }
-        }
         ensure_no_determined_negative_conductance(&self.edge_order, &self.version_fiber)?;
         let expected_query = if self.certificate.is_none() {
             select_next_query(extent, &self.edge_order, &self.version_fiber)?.0
@@ -722,49 +791,8 @@ impl InverseTransportStanding {
             None
         };
         let expected_verification = expected_query.is_none() && self.certificate.is_none();
-        if self.next_query != expected_query
-            || self.verification_required != expected_verification
-            || self.certificate.is_some() != (complete_entries == 1)
+        if self.next_query != expected_query || self.verification_required != expected_verification
         {
-            return Err(InverseTransportError::MalformedStanding);
-        }
-        Ok(())
-    }
-
-    fn validate_complete_replay(&self) -> Result<(), InverseTransportError> {
-        let law = InverseTransportLaw::new(self.extent, self.interval.clone())?;
-        let mut replayed = Self::new(self.extent, self.interval.clone())?;
-        for entry in &self.history {
-            let event = match entry {
-                InverseTransportHistoryEntry::Testimony(testimony) => match testimony.source {
-                    TransportTestimonySource::ImportedLandmark(lineage) => {
-                        InverseTransportEvent::InheritLandmark {
-                            event: testimony.event,
-                            lineage,
-                            query: testimony.query.clone(),
-                            response: testimony.response.clone(),
-                        }
-                    }
-                    TransportTestimonySource::ReturnedReceiver(receiver) => {
-                        InverseTransportEvent::ReturnObservation {
-                            event: testimony.event,
-                            receiver,
-                            query: testimony.query.clone(),
-                            response: testimony.response.clone(),
-                        }
-                    }
-                },
-                InverseTransportHistoryEntry::CompleteOperator(testimony) => {
-                    InverseTransportEvent::ReturnCompleteOperator {
-                        event: testimony.event,
-                        receiver: testimony.receiver,
-                        responses: testimony.responses.clone(),
-                    }
-                }
-            };
-            replayed = law.enact(&replayed, &event)?.standing_after;
-        }
-        if replayed != *self {
             return Err(InverseTransportError::MalformedStanding);
         }
         Ok(())
@@ -866,12 +894,12 @@ impl ExactEventLaw for InverseTransportLaw {
             return Err(InverseTransportError::LawStandingMismatch);
         }
         if standing_before.is_complete() {
-            return Err(InverseTransportError::EcologyAlreadyCertified);
+            return Err(InverseTransportError::Law(
+                InverseTransportRefusal::EcologyAlreadyCertified,
+            ));
         }
         let event_id = event.event();
-        if standing_before.used_events.contains(&event_id) {
-            return Err(InverseTransportError::RepeatedEvent(event_id));
-        }
+        standing_before.refuse_repeated(event_id)?;
 
         let extent =
             usize::try_from(self.extent).map_err(|_| InverseTransportError::CarrierOverflow)?;
@@ -904,10 +932,12 @@ impl ExactEventLaw for InverseTransportLaw {
                 response,
             } => {
                 if standing_before.next_query.as_ref() != Some(query) {
-                    return Err(InverseTransportError::UnexpectedReturnedQuery {
-                        expected: standing_before.next_query.clone(),
-                        received: query.clone(),
-                    });
+                    return Err(InverseTransportError::Law(
+                        InverseTransportRefusal::UnexpectedReturnedQuery {
+                            expected: standing_before.next_query.clone(),
+                            received: query.clone(),
+                        },
+                    ));
                 }
                 let testimony = TransportTestimony {
                     event: *event,
@@ -924,7 +954,9 @@ impl ExactEventLaw for InverseTransportLaw {
                 responses,
             } => {
                 if !standing_before.verification_required {
-                    return Err(InverseTransportError::CompleteOperatorNotRequested);
+                    return Err(InverseTransportError::Law(
+                        InverseTransportRefusal::CompleteOperatorNotRequested,
+                    ));
                 }
                 validate_complete_basis(extent, responses)?;
                 let testimony = CompleteTransportOperatorTestimony {
@@ -932,28 +964,23 @@ impl ExactEventLaw for InverseTransportLaw {
                     receiver: *receiver,
                     responses: responses.clone(),
                 };
-                let solution = standing_after
-                    .version_fiber
-                    .unique_solution()?
-                    .ok_or(InverseTransportError::IncompleteAffineFiber)?;
+                let solution = standing_after.version_fiber.unique_solution()?.ok_or(
+                    InverseTransportError::Law(InverseTransportRefusal::IncompleteAffineFiber),
+                )?;
                 let certificate = build_certificate(
                     self.extent,
                     &self.interval,
                     &standing_after.edge_order,
                     &solution,
                     &testimony,
+                    // Every admitted occurrence, this one included, testified.
                     standing_after
-                        .history
+                        .used_events
                         .iter()
-                        .map(InverseTransportHistoryEntry::event)
+                        .copied()
                         .chain(std::iter::once(*event))
                         .collect(),
                 )?;
-                standing_after
-                    .history
-                    .push(InverseTransportHistoryEntry::CompleteOperator(
-                        testimony.clone(),
-                    ));
                 standing_after.certificate = Some(certificate);
                 received_complete_operator = Some(testimony);
             }
@@ -1019,8 +1046,10 @@ fn admit_testimony(
         .version_fiber
         .admit(coefficients, response)
         .map_err(|error| {
-            if error == InverseTransportError::AffineFiberObstructed {
-                InverseTransportError::TestimonyObstructsFiber(testimony.event)
+            if error == InverseTransportError::Law(InverseTransportRefusal::AffineFiberObstructed) {
+                InverseTransportError::Law(InverseTransportRefusal::TestimonyObstructsFiber(
+                    testimony.event,
+                ))
             } else {
                 error
             }
@@ -1030,10 +1059,11 @@ fn admit_testimony(
         .checked_add(admission.exact_row_eliminations)
         .ok_or(InverseTransportError::CarrierOverflow)?;
     ensure_no_determined_negative_conductance(&standing.edge_order, &standing.version_fiber)
-        .map_err(|_| InverseTransportError::TestimonyObstructsPassiveEcology(testimony.event))?;
-    standing
-        .history
-        .push(InverseTransportHistoryEntry::Testimony(testimony.clone()));
+        .map_err(|_| {
+            InverseTransportError::Law(InverseTransportRefusal::TestimonyObstructsPassiveEcology(
+                testimony.event,
+            ))
+        })?;
     Ok(())
 }
 
@@ -1068,7 +1098,9 @@ fn ensure_no_determined_negative_conductance(
             .coordinate_value(ordinal)?
             .is_some_and(|value| value.is_negative())
         {
-            return Err(InverseTransportError::NegativeDeterminedConductance(*edge));
+            return Err(InverseTransportError::Law(
+                InverseTransportRefusal::NegativeDeterminedConductance(*edge),
+            ));
         }
     }
     Ok(())
@@ -1114,14 +1146,18 @@ fn build_certificate(
     let extent_usize =
         usize::try_from(extent).map_err(|_| InverseTransportError::CarrierOverflow)?;
     if solution.len() != edge_order.len() {
-        return Err(InverseTransportError::IncompleteAffineFiber);
+        return Err(InverseTransportError::Law(
+            InverseTransportRefusal::IncompleteAffineFiber,
+        ));
     }
     if let Some((edge, _)) = edge_order
         .iter()
         .zip(solution)
         .find(|(_, conductance)| conductance.is_negative())
     {
-        return Err(InverseTransportError::NegativeDeterminedConductance(*edge));
+        return Err(InverseTransportError::Law(
+            InverseTransportRefusal::NegativeDeterminedConductance(*edge),
+        ));
     }
 
     let mut laplacian = zero_matrix(extent_usize, extent_usize);
@@ -1154,7 +1190,9 @@ fn build_certificate(
         for (column, expected) in values.iter().enumerate() {
             let received = &complete.responses[row * extent_usize + column];
             if received != expected {
-                return Err(InverseTransportError::CompleteOperatorMismatch { row, column });
+                return Err(InverseTransportError::Law(
+                    InverseTransportRefusal::CompleteOperatorMismatch { row, column },
+                ));
             }
         }
     }
@@ -1169,7 +1207,9 @@ fn build_certificate(
         .flatten()
         .any(|value| !value.is_zero())
     {
-        return Err(InverseTransportError::InverseCertificateFailure);
+        return Err(InverseTransportError::Law(
+            InverseTransportRefusal::InverseCertificateFailure,
+        ));
     }
 
     let nodes = (0..extent_usize)
@@ -1274,10 +1314,14 @@ fn validate_extent_and_interval(
     interval: &Rat,
 ) -> Result<usize, InverseTransportError> {
     if extent < 2 {
-        return Err(InverseTransportError::InvalidExtent(extent));
+        return Err(InverseTransportError::Law(
+            InverseTransportRefusal::InvalidExtent(extent),
+        ));
     }
     if !interval.is_positive() {
-        return Err(InverseTransportError::NonpositiveTransportInterval);
+        return Err(InverseTransportError::Law(
+            InverseTransportRefusal::NonpositiveTransportInterval,
+        ));
     }
     usize::try_from(extent).map_err(|_| InverseTransportError::CarrierOverflow)
 }
@@ -1297,10 +1341,12 @@ fn validate_complete_basis(extent: usize, responses: &[Rat]) -> Result<(), Inver
         .checked_mul(extent)
         .ok_or(InverseTransportError::CarrierOverflow)?;
     if responses.len() != expected {
-        return Err(InverseTransportError::MalformedCompleteOperator {
-            expected,
-            supplied: responses.len(),
-        });
+        return Err(InverseTransportError::Law(
+            InverseTransportRefusal::MalformedCompleteOperator {
+                expected,
+                supplied: responses.len(),
+            },
+        ));
     }
     Ok(())
 }
@@ -1317,18 +1363,20 @@ impl From<ExactLinearError> for InverseTransportError {
     fn from(error: ExactLinearError) -> Self {
         match error {
             ExactLinearError::SingularMatrix => {
-                InverseTransportError::SingularReconstructedOperator
+                InverseTransportError::Law(InverseTransportRefusal::SingularReconstructedOperator)
             }
             ExactLinearError::InverseCertificateFailure
             | ExactLinearError::RankFactorizationCertificateFailure => {
-                InverseTransportError::InverseCertificateFailure
+                InverseTransportError::Law(InverseTransportRefusal::InverseCertificateFailure)
             }
             ExactLinearError::RaggedMatrix
             | ExactLinearError::NonsquareMatrix
             | ExactLinearError::AddressOutside
             | ExactLinearError::ExtentOverflow
             | ExactLinearError::ShapeMismatch
-            | ExactLinearError::DifferentProductCores => InverseTransportError::MalformedMatrix,
+            | ExactLinearError::DifferentProductCores => {
+                InverseTransportError::Law(InverseTransportRefusal::MalformedMatrix)
+            }
         }
     }
 }
@@ -1383,10 +1431,12 @@ fn invert_exact(matrix: Vec<Vec<Rat>>) -> Result<Vec<Vec<Rat>>, InverseTransport
 
 fn dot(left: &[Rat], right: &[Rat]) -> Result<Rat, InverseTransportError> {
     if left.len() != right.len() {
-        return Err(InverseTransportError::VectorDimension {
-            left: left.len(),
-            right: right.len(),
-        });
+        return Err(InverseTransportError::Law(
+            InverseTransportRefusal::VectorDimension {
+                left: left.len(),
+                right: right.len(),
+            },
+        ));
     }
     Ok(left
         .iter()
@@ -1399,7 +1449,7 @@ fn sum(values: &[Rat]) -> Rat {
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum InverseTransportError {
+pub enum InverseTransportRefusal {
     #[error("an inverse transport ecology requires at least two nodes, received {0}")]
     InvalidExtent(u32),
     #[error("an inverse transport ecology requires a positive exact event interval")]
@@ -1424,10 +1474,6 @@ pub enum InverseTransportError {
     AffineFiberObstructed,
     #[error("the exact affine version fiber is malformed")]
     MalformedAffineFiber,
-    #[error("inverse transport law and standing disagree")]
-    LawStandingMismatch,
-    #[error("inverse transport occurrence {0:?} was already used")]
-    RepeatedEvent(EventId),
     #[error("the inverse transport ecology is already certified")]
     EcologyAlreadyCertified,
     #[error("returned query {received:?} does not match production query {expected:?}")]
@@ -1461,13 +1507,18 @@ pub enum InverseTransportError {
     VectorDimension { left: usize, right: usize },
     #[error("an exact transport matrix is malformed")]
     MalformedMatrix,
-    #[error("the inverse transport standing is malformed")]
-    MalformedStanding,
-    #[error("an inverse transport exact carrier overflowed")]
-    CarrierOverflow,
     #[error(transparent)]
     Diffusion(#[from] DiffusionError),
 }
+
+impl RefusalKind for InverseTransportRefusal {
+    const LAW: &'static str = "inverse transport";
+}
+
+/// The inverse transport law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type InverseTransportError = EventRefusal<InverseTransportRefusal>;
+
+event_refusal_from!(InverseTransportRefusal: DiffusionError);
 
 #[cfg(test)]
 mod tests {
@@ -1619,6 +1670,81 @@ mod tests {
         assert_eq!(certificate.affine_rank, 15);
     }
 
+    /// Phase 16: the version fibre is the sufficient statistic of the testimony. An old rest's
+    /// testimony archive is dropped on decode, and the decoded standing's future (every receipt
+    /// and the certificate, whose testimony events are the admitted occurrences) is unchanged.
+    #[test]
+    fn a_retired_testimony_archive_decodes_and_the_future_is_unchanged() {
+        /// The retired standing record, exactly as old rests wrote it.
+        #[derive(Serialize)]
+        enum InverseTransportHistoryEntry {
+            Testimony(TransportTestimony),
+        }
+
+        let law = InverseTransportLaw::new(4, integer(1)).unwrap();
+        let mut world = CausalWorld::new(
+            law.clone(),
+            InverseTransportStanding::new(4, integer(1)).unwrap(),
+        );
+        let mut archive = Vec::new();
+        for event in 1..=3_u64 {
+            let query = world.standing().next_query().cloned().unwrap();
+            let receipt = world
+                .receive(&InverseTransportEvent::ReturnObservation {
+                    event: EventId(event),
+                    receiver: TransportLineageId(1),
+                    response: hidden_response(&query),
+                    query,
+                })
+                .unwrap();
+            archive.push(InverseTransportHistoryEntry::Testimony(
+                receipt.radiation[0].received_testimony.clone().unwrap(),
+            ));
+        }
+        let rest = ron::to_string(world.standing()).unwrap();
+        assert_eq!(rest.matches("used_events:").count(), 1);
+        let legacy = rest.replace(
+            "used_events:",
+            &format!("history:{},used_events:", ron::to_string(&archive).unwrap()),
+        );
+        let decoded: InverseTransportStanding = ron::from_str(&legacy).unwrap();
+        assert_eq!(&decoded, world.standing());
+        decoded.validate().unwrap();
+        assert!(!ron::to_string(&decoded).unwrap().contains("history:"));
+
+        let mut remounted = CausalWorld::from_rest(law, decoded, world.next_ordinal()).unwrap();
+        let mut event = 4_u64;
+        loop {
+            let next = if let Some(query) = world.standing().next_query().cloned() {
+                InverseTransportEvent::ReturnObservation {
+                    event: EventId(event),
+                    receiver: TransportLineageId(1),
+                    response: hidden_response(&query),
+                    query,
+                }
+            } else if world.standing().verification_required() {
+                InverseTransportEvent::ReturnCompleteOperator {
+                    event: EventId(event),
+                    receiver: TransportLineageId(1),
+                    responses: complete_operator(4),
+                }
+            } else {
+                break;
+            };
+            assert_eq!(
+                world.receive(&next).unwrap(),
+                remounted.receive(&next).unwrap()
+            );
+            event += 1;
+        }
+        let certificate = remounted.standing().certificate().unwrap();
+        assert_eq!(
+            &certificate.testimony_events,
+            remounted.standing().used_events()
+        );
+        assert_eq!(world.standing(), remounted.standing());
+    }
+
     #[test]
     fn returned_query_is_owned_by_production_and_refusal_is_atomic() {
         let law = InverseTransportLaw::new(3, integer(1)).unwrap();
@@ -1636,7 +1762,9 @@ mod tests {
                 query: wrong,
                 response: integer(0),
             }),
-            Err(InverseTransportError::UnexpectedReturnedQuery { .. })
+            Err(InverseTransportError::Law(
+                InverseTransportRefusal::UnexpectedReturnedQuery { .. }
+            ))
         ));
         assert_eq!(world.standing(), &standing);
     }
@@ -1652,7 +1780,9 @@ mod tests {
                 receiver: TransportLineageId(1),
                 responses: vec![Rat::zero(); 9],
             }),
-            Err(InverseTransportError::CompleteOperatorNotRequested)
+            Err(InverseTransportError::Law(
+                InverseTransportRefusal::CompleteOperatorNotRequested
+            ))
         );
         let mut next_event = 2;
         return_until_verification(&mut world, &mut next_event);
@@ -1665,7 +1795,9 @@ mod tests {
                 receiver: TransportLineageId(1),
                 responses: malformed,
             }),
-            Err(InverseTransportError::CompleteOperatorMismatch { .. })
+            Err(InverseTransportError::Law(
+                InverseTransportRefusal::CompleteOperatorMismatch { .. }
+            ))
         ));
         assert_eq!(world.standing(), &before);
     }
@@ -1683,8 +1815,8 @@ mod tests {
                 query,
                 response: integer(1),
             }),
-            Err(InverseTransportError::TestimonyObstructsPassiveEcology(
-                EventId(1)
+            Err(InverseTransportError::Law(
+                InverseTransportRefusal::TestimonyObstructsPassiveEcology(EventId(1))
             ))
         );
         assert_eq!(world.standing(), &standing);

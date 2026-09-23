@@ -35,10 +35,12 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use crate::world::{EventQuotient, event_standing_wire};
+use crate::world::{EventRefusal, RefusalKind, event_refusal_from};
 use crate::{
-    AffineAdmissionWork, EventId, EventSuccessor, ExactAffinePrediction, ExactAffineVersionFiber,
-    ExactEventLaw, InverseTransportError, PotentialTransportEdge, TransportLineageId,
-    TransportQuery,
+    AffineAdmissionWork, EventId, EventStanding, EventSuccessor, ExactAffinePrediction,
+    ExactAffineVersionFiber, ExactEventLaw, InverseTransportError, PotentialTransportEdge,
+    TransportLineageId, TransportQuery,
 };
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
@@ -63,7 +65,9 @@ impl ParameterizedTransportQuery {
         receiver: Vec<Rat>,
     ) -> Result<Self, GenerativeTransportError> {
         if !interval.is_positive() {
-            return Err(GenerativeTransportError::NonpositiveInterval);
+            return Err(GenerativeTransportError::Law(
+                GenerativeTransportRefusal::NonpositiveInterval,
+            ));
         }
         let query = TransportQuery::new(imposed_potential, receiver)?;
         Ok(Self {
@@ -80,11 +84,13 @@ impl ParameterizedTransportQuery {
         column: usize,
     ) -> Result<Self, GenerativeTransportError> {
         if row >= extent || column >= extent {
-            return Err(GenerativeTransportError::OperatorCoordinateOutOfRange {
-                row,
-                column,
-                extent,
-            });
+            return Err(GenerativeTransportError::Law(
+                GenerativeTransportRefusal::OperatorCoordinateOutOfRange {
+                    row,
+                    column,
+                    extent,
+                },
+            ));
         }
         let mut imposed_potential = vec![Rat::zero(); extent];
         let mut receiver = vec![Rat::zero(); extent];
@@ -95,20 +101,28 @@ impl ParameterizedTransportQuery {
 
     fn validate(&self, extent: usize) -> Result<(), GenerativeTransportError> {
         if !self.interval.is_positive() {
-            return Err(GenerativeTransportError::NonpositiveInterval);
+            return Err(GenerativeTransportError::Law(
+                GenerativeTransportRefusal::NonpositiveInterval,
+            ));
         }
         if self.imposed_potential.len() != extent || self.receiver.len() != extent {
-            return Err(GenerativeTransportError::QueryDimension {
-                expected: extent,
-                potentials: self.imposed_potential.len(),
-                receiver: self.receiver.len(),
-            });
+            return Err(GenerativeTransportError::Law(
+                GenerativeTransportRefusal::QueryDimension {
+                    expected: extent,
+                    potentials: self.imposed_potential.len(),
+                    receiver: self.receiver.len(),
+                },
+            ));
         }
         if self.imposed_potential.iter().all(Zero::is_zero) {
-            return Err(GenerativeTransportError::ZeroPotentialQuery);
+            return Err(GenerativeTransportError::Law(
+                GenerativeTransportRefusal::ZeroPotentialQuery,
+            ));
         }
         if self.receiver.iter().all(Zero::is_zero) {
-            return Err(GenerativeTransportError::ZeroReceiverQuery);
+            return Err(GenerativeTransportError::Law(
+                GenerativeTransportRefusal::ZeroReceiverQuery,
+            ));
         }
         Ok(())
     }
@@ -212,7 +226,9 @@ impl ParameterizedTransportFamily {
             || self.variables != parameterized_variables(self.extent)?
             || self.fiber.variable_count() != self.variables.len()
         {
-            return Err(GenerativeTransportError::MalformedFamily);
+            return Err(GenerativeTransportError::Law(
+                GenerativeTransportRefusal::MalformedFamily,
+            ));
         }
         self.fiber.validate()?;
         Ok(())
@@ -272,7 +288,9 @@ impl ParameterizedTransportModel {
         let extent_usize =
             usize::try_from(extent).map_err(|_| GenerativeTransportError::CarrierOverflow)?;
         if solution.len() != variables.len() {
-            return Err(GenerativeTransportError::MalformedGeneratedModel);
+            return Err(GenerativeTransportError::Law(
+                GenerativeTransportRefusal::MalformedGeneratedModel,
+            ));
         }
         let edge_order = canonical_edges(extent)?;
         let mut capacities = vec![Rat::zero(); extent_usize];
@@ -302,7 +320,9 @@ impl ParameterizedTransportModel {
             .enumerate()
             .find(|(_, capacity)| !capacity.is_positive())
         {
-            return Err(GenerativeTransportError::NonpositiveGeneratedCapacity { node });
+            return Err(GenerativeTransportError::Law(
+                GenerativeTransportRefusal::NonpositiveGeneratedCapacity { node },
+            ));
         }
         let edges = edge_order
             .into_iter()
@@ -355,7 +375,9 @@ impl ParameterizedTransportModel {
         interval: &Rat,
     ) -> Result<Vec<Vec<Rat>>, GenerativeTransportError> {
         if !interval.is_positive() {
-            return Err(GenerativeTransportError::NonpositiveInterval);
+            return Err(GenerativeTransportError::Law(
+                GenerativeTransportRefusal::NonpositiveInterval,
+            ));
         }
         self.validate()?;
         let extent =
@@ -408,10 +430,12 @@ impl ParameterizedTransportModel {
         let extent =
             usize::try_from(self.extent).map_err(|_| GenerativeTransportError::CarrierOverflow)?;
         if right_hand.len() != extent {
-            return Err(GenerativeTransportError::PropagationDimension {
-                expected: extent,
-                supplied: right_hand.len(),
-            });
+            return Err(GenerativeTransportError::Law(
+                GenerativeTransportRefusal::PropagationDimension {
+                    expected: extent,
+                    supplied: right_hand.len(),
+                },
+            ));
         }
         let operator = self.event_operator(&interval)?;
         let inverse = invert_exact(operator.clone())?;
@@ -424,7 +448,9 @@ impl ParameterizedTransportModel {
         let operator_residual =
             vector_subtract(&matrix_vector(&operator, &potential)?, &right_hand)?;
         if operator_residual.iter().any(|value| !value.is_zero()) {
-            return Err(GenerativeTransportError::OperatorResidualNonzero);
+            return Err(GenerativeTransportError::Law(
+                GenerativeTransportRefusal::OperatorResidualNonzero,
+            ));
         }
         let total_right_hand = sum(&right_hand);
         let total_content_after = sum(&content_after);
@@ -457,7 +483,9 @@ impl ParameterizedTransportModel {
             || self.edges.iter().map(|edge| edge.edge).collect::<Vec<_>>()
                 != canonical_edges(self.extent)?
         {
-            return Err(GenerativeTransportError::MalformedGeneratedModel);
+            return Err(GenerativeTransportError::Law(
+                GenerativeTransportRefusal::MalformedGeneratedModel,
+            ));
         }
         Ok(())
     }
@@ -511,53 +539,80 @@ pub enum GenerativeTransportPhase {
     Certified,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub enum CompleteOperatorRole {
-    InitialGrammar,
-    PredictionGrade,
-}
+const GENERATIVE_TRANSPORT_STANDING_SCHEMA: &str =
+    "holonic-engine.generative-transport-standing.v1";
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ParametricCompleteOperatorTestimony {
-    pub event: EventId,
-    pub receiver: TransportLineageId,
-    pub role: CompleteOperatorRole,
-    pub interval: Rat,
-    pub responses: Vec<Rat>,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ParametricTransportTestimony {
-    pub event: EventId,
-    pub receiver: TransportLineageId,
-    pub query: ParameterizedTransportQuery,
-    pub response: Rat,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub enum GenerativeTransportHistoryEntry {
-    CompleteOperator(ParametricCompleteOperatorTestimony),
-    Observation(ParametricTransportTestimony),
-}
-
-impl GenerativeTransportHistoryEntry {
-    fn event(&self) -> EventId {
-        match self {
-            Self::CompleteOperator(testimony) => testimony.event,
-            Self::Observation(testimony) => testimony.event,
-        }
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct GenerativeTransportStanding {
-    pub schema: String,
+/// [definition] **The generative-transport quotient** (plan phase 16): the declared intervals,
+/// the phase, the parameter family (the exact affine fibre of every returned coordinate), the
+/// generated model and the grade. The returned operators and observations are the events
+/// themselves; the certificate's testimony events are the admitted occurrences, so no testimony
+/// archive is retained.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct GenerativeTransportQuotient {
     pub extent: u32,
     pub initial_interval: Rat,
     pub discrimination_interval: Rat,
     pub prediction_interval: Rat,
     pub phase: GenerativeTransportPhase,
-    history: Vec<GenerativeTransportHistoryEntry>,
+    obstruction: Option<TransportModelObstruction>,
+    family: Option<ParameterizedTransportFamily>,
+    next_query: Option<ParameterizedTransportQuery>,
+    generated_model: Option<ParameterizedTransportModel>,
+    prediction_obstruction: Option<TransportPredictionGradeObstruction>,
+    certificate: Option<GenerativeTransportCertificate>,
+}
+
+/// The GenerativeTransport standing: the shared event scaffold around [`GenerativeTransportQuotient`].
+pub type GenerativeTransportStanding = EventStanding<GenerativeTransportQuotient>;
+
+#[derive(Serialize)]
+#[serde(rename = "GenerativeTransportStanding")]
+struct GenerativeTransportStandingWrite<'a> {
+    schema: &'a String,
+    extent: &'a u32,
+    initial_interval: &'a Rat,
+    discrimination_interval: &'a Rat,
+    prediction_interval: &'a Rat,
+    phase: &'a GenerativeTransportPhase,
+    used_events: &'a BTreeSet<EventId>,
+    obstruction: &'a Option<TransportModelObstruction>,
+    family: &'a Option<ParameterizedTransportFamily>,
+    next_query: &'a Option<ParameterizedTransportQuery>,
+    generated_model: &'a Option<ParameterizedTransportModel>,
+    prediction_obstruction: &'a Option<TransportPredictionGradeObstruction>,
+    certificate: &'a Option<GenerativeTransportCertificate>,
+}
+
+impl<'a> From<&'a GenerativeTransportStanding> for GenerativeTransportStandingWrite<'a> {
+    fn from(standing: &'a GenerativeTransportStanding) -> Self {
+        Self {
+            schema: &standing.schema,
+            extent: &standing.extent,
+            initial_interval: &standing.initial_interval,
+            discrimination_interval: &standing.discrimination_interval,
+            prediction_interval: &standing.prediction_interval,
+            phase: &standing.phase,
+            used_events: &standing.used_events,
+            obstruction: &standing.obstruction,
+            family: &standing.family,
+            next_query: &standing.next_query,
+            generated_model: &standing.generated_model,
+            prediction_obstruction: &standing.prediction_obstruction,
+            certificate: &standing.certificate,
+        }
+    }
+}
+
+/// Reads the current rest and the retired one (whose archive fields are dropped).
+#[derive(Deserialize)]
+#[serde(rename = "GenerativeTransportStanding")]
+struct GenerativeTransportStandingRead {
+    schema: String,
+    extent: u32,
+    initial_interval: Rat,
+    discrimination_interval: Rat,
+    prediction_interval: Rat,
+    phase: GenerativeTransportPhase,
     used_events: BTreeSet<EventId>,
     obstruction: Option<TransportModelObstruction>,
     family: Option<ParameterizedTransportFamily>,
@@ -567,36 +622,66 @@ pub struct GenerativeTransportStanding {
     certificate: Option<GenerativeTransportCertificate>,
 }
 
+impl From<GenerativeTransportStandingRead> for GenerativeTransportStanding {
+    fn from(read: GenerativeTransportStandingRead) -> Self {
+        EventStanding::from_parts(
+            read.schema,
+            read.used_events,
+            GenerativeTransportQuotient {
+                extent: read.extent,
+                initial_interval: read.initial_interval,
+                discrimination_interval: read.discrimination_interval,
+                prediction_interval: read.prediction_interval,
+                phase: read.phase,
+                obstruction: read.obstruction,
+                family: read.family,
+                next_query: read.next_query,
+                generated_model: read.generated_model,
+                prediction_obstruction: read.prediction_obstruction,
+                certificate: read.certificate,
+            },
+        )
+    }
+}
+
+event_standing_wire!(
+    GenerativeTransportQuotient,
+    GenerativeTransportStandingWrite,
+    GenerativeTransportStandingRead
+);
+
+impl EventQuotient for GenerativeTransportQuotient {
+    type Refusal = GenerativeTransportRefusal;
+}
+
 impl GenerativeTransportStanding {
     pub fn new(extent: u32, initial_interval: Rat) -> Result<Self, GenerativeTransportError> {
         validate_extent(extent)?;
         if !initial_interval.is_positive() {
-            return Err(GenerativeTransportError::NonpositiveInterval);
+            return Err(GenerativeTransportError::Law(
+                GenerativeTransportRefusal::NonpositiveInterval,
+            ));
         }
         let discrimination_interval = &initial_interval + Rat::one();
         let prediction_interval = &discrimination_interval + Rat::one();
-        let standing = Self {
-            schema: "holonic-engine.generative-transport-standing.v1".to_owned(),
-            extent,
-            initial_interval,
-            discrimination_interval,
-            prediction_interval,
-            phase: GenerativeTransportPhase::AwaitingInitialOperator,
-            history: Vec::new(),
-            used_events: BTreeSet::new(),
-            obstruction: None,
-            family: None,
-            next_query: None,
-            generated_model: None,
-            prediction_obstruction: None,
-            certificate: None,
-        };
+        let standing = EventStanding::founded(
+            GENERATIVE_TRANSPORT_STANDING_SCHEMA,
+            GenerativeTransportQuotient {
+                extent,
+                initial_interval,
+                discrimination_interval,
+                prediction_interval,
+                phase: GenerativeTransportPhase::AwaitingInitialOperator,
+                obstruction: None,
+                family: None,
+                next_query: None,
+                generated_model: None,
+                prediction_obstruction: None,
+                certificate: None,
+            },
+        );
         standing.validate_incremental()?;
         Ok(standing)
-    }
-
-    pub fn history(&self) -> &[GenerativeTransportHistoryEntry] {
-        &self.history
     }
 
     pub fn obstruction(&self) -> Option<&TransportModelObstruction> {
@@ -641,7 +726,9 @@ impl GenerativeTransportStanding {
             return family.predict(query);
         }
         let Some(model) = &self.generated_model else {
-            return Err(GenerativeTransportError::PredictionFamilyAbsent);
+            return Err(GenerativeTransportError::Law(
+                GenerativeTransportRefusal::PredictionFamilyAbsent,
+            ));
         };
         let value = model.clamped_response(query)?;
         Ok(ParameterizedTransportPrediction {
@@ -657,25 +744,21 @@ impl GenerativeTransportStanding {
         })
     }
 
+    /// Validate the quotient.
+    ///
+    /// [definition] The standing retains no testimony archive, so there is no replay: the
+    /// declared intervals, the phase's required parts, the family and model, and the production
+    /// query (re-derived from the family) are checked.
     pub fn validate(&self) -> Result<(), GenerativeTransportError> {
-        self.validate_incremental()?;
-        self.validate_complete_replay()
+        self.validate_incremental()
     }
 
     fn validate_incremental(&self) -> Result<(), GenerativeTransportError> {
         let extent = validate_extent(self.extent)?;
-        if self.schema != "holonic-engine.generative-transport-standing.v1"
-            || self.discrimination_interval != &self.initial_interval + Rat::one()
+        self.check_schema(GENERATIVE_TRANSPORT_STANDING_SCHEMA)?;
+        if self.discrimination_interval != &self.initial_interval + Rat::one()
             || self.prediction_interval != &self.discrimination_interval + Rat::one()
         {
-            return Err(GenerativeTransportError::MalformedStanding);
-        }
-        let history_events = self
-            .history
-            .iter()
-            .map(GenerativeTransportHistoryEntry::event)
-            .collect::<BTreeSet<_>>();
-        if history_events.len() != self.history.len() || history_events != self.used_events {
             return Err(GenerativeTransportError::MalformedStanding);
         }
         if let Some(family) = &self.family {
@@ -689,7 +772,7 @@ impl GenerativeTransportStanding {
         }
         match self.phase {
             GenerativeTransportPhase::AwaitingInitialOperator => {
-                if !self.history.is_empty()
+                if !self.used_events.is_empty()
                     || self.obstruction.is_some()
                     || self.family.is_some()
                     || self.next_query.is_some()
@@ -746,36 +829,6 @@ impl GenerativeTransportStanding {
                     return Err(GenerativeTransportError::MalformedStanding);
                 }
             }
-        }
-        Ok(())
-    }
-
-    fn validate_complete_replay(&self) -> Result<(), GenerativeTransportError> {
-        let law = GenerativeTransportLaw::new(self.extent, self.initial_interval.clone())?;
-        let mut replayed = Self::new(self.extent, self.initial_interval.clone())?;
-        for entry in &self.history {
-            let event = match entry {
-                GenerativeTransportHistoryEntry::CompleteOperator(testimony) => {
-                    GenerativeTransportEvent::ReturnCompleteOperator {
-                        event: testimony.event,
-                        receiver: testimony.receiver,
-                        interval: testimony.interval.clone(),
-                        responses: testimony.responses.clone(),
-                    }
-                }
-                GenerativeTransportHistoryEntry::Observation(testimony) => {
-                    GenerativeTransportEvent::ReturnObservation {
-                        event: testimony.event,
-                        receiver: testimony.receiver,
-                        query: testimony.query.clone(),
-                        response: testimony.response.clone(),
-                    }
-                }
-            };
-            replayed = law.enact(&replayed, &event)?.standing_after;
-        }
-        if replayed != *self {
-            return Err(GenerativeTransportError::MalformedStanding);
         }
         Ok(())
     }
@@ -837,7 +890,9 @@ impl GenerativeTransportLaw {
     pub fn new(extent: u32, initial_interval: Rat) -> Result<Self, GenerativeTransportError> {
         validate_extent(extent)?;
         if !initial_interval.is_positive() {
-            return Err(GenerativeTransportError::NonpositiveInterval);
+            return Err(GenerativeTransportError::Law(
+                GenerativeTransportRefusal::NonpositiveInterval,
+            ));
         }
         Ok(Self {
             extent,
@@ -867,12 +922,12 @@ impl ExactEventLaw for GenerativeTransportLaw {
             standing_before.phase,
             GenerativeTransportPhase::Certified | GenerativeTransportPhase::PredictionObstructed
         ) {
-            return Err(GenerativeTransportError::TerminalStanding);
+            return Err(GenerativeTransportError::Law(
+                GenerativeTransportRefusal::TerminalStanding,
+            ));
         }
         let event_id = event.event();
-        if standing_before.used_events.contains(&event_id) {
-            return Err(GenerativeTransportError::RepeatedEvent(event_id));
-        }
+        standing_before.refuse_repeated(event_id)?;
 
         let extent =
             usize::try_from(self.extent).map_err(|_| GenerativeTransportError::CarrierOverflow)?;
@@ -882,28 +937,20 @@ impl ExactEventLaw for GenerativeTransportLaw {
         match event {
             GenerativeTransportEvent::ReturnCompleteOperator {
                 event,
-                receiver,
+                receiver: _,
                 interval,
                 responses,
             } => match standing_before.phase {
                 GenerativeTransportPhase::AwaitingInitialOperator => {
                     if interval != &standing_before.initial_interval {
-                        return Err(GenerativeTransportError::UnexpectedCompleteInterval {
-                            expected: Box::new(standing_before.initial_interval.clone()),
-                            received: Box::new(interval.clone()),
-                        });
+                        return Err(GenerativeTransportError::Law(
+                            GenerativeTransportRefusal::UnexpectedCompleteInterval {
+                                expected: Box::new(standing_before.initial_interval.clone()),
+                                received: Box::new(interval.clone()),
+                            },
+                        ));
                     }
                     let operator = operator_from_responses(extent, responses)?;
-                    let testimony = ParametricCompleteOperatorTestimony {
-                        event: *event,
-                        receiver: *receiver,
-                        role: CompleteOperatorRole::InitialGrammar,
-                        interval: interval.clone(),
-                        responses: responses.clone(),
-                    };
-                    standing_after
-                        .history
-                        .push(GenerativeTransportHistoryEntry::CompleteOperator(testimony));
                     if is_unit_passive_operator(&operator, interval)? {
                         let model =
                             model_from_unit_passive_operator(self.extent, interval, &operator)?;
@@ -941,10 +988,12 @@ impl ExactEventLaw for GenerativeTransportLaw {
                 }
                 GenerativeTransportPhase::AwaitingPredictionGrade => {
                     if interval != &standing_before.prediction_interval {
-                        return Err(GenerativeTransportError::UnexpectedCompleteInterval {
-                            expected: Box::new(standing_before.prediction_interval.clone()),
-                            received: Box::new(interval.clone()),
-                        });
+                        return Err(GenerativeTransportError::Law(
+                            GenerativeTransportRefusal::UnexpectedCompleteInterval {
+                                expected: Box::new(standing_before.prediction_interval.clone()),
+                                received: Box::new(interval.clone()),
+                            },
+                        ));
                     }
                     let returned_operator = operator_from_responses(extent, responses)?;
                     let model = standing_before
@@ -965,16 +1014,6 @@ impl ExactEventLaw for GenerativeTransportLaw {
                                 })
                         })
                         .collect::<Vec<_>>();
-                    let testimony = ParametricCompleteOperatorTestimony {
-                        event: *event,
-                        receiver: *receiver,
-                        role: CompleteOperatorRole::PredictionGrade,
-                        interval: interval.clone(),
-                        responses: responses.clone(),
-                    };
-                    standing_after
-                        .history
-                        .push(GenerativeTransportHistoryEntry::CompleteOperator(testimony));
                     if differing_entries.is_empty() {
                         let inverse = invert_exact(predicted_operator.clone())?;
                         let inverse_residual = matrix_subtract(
@@ -986,7 +1025,9 @@ impl ExactEventLaw for GenerativeTransportLaw {
                             .flatten()
                             .any(|value| !value.is_zero())
                         {
-                            return Err(GenerativeTransportError::InverseResidualNonzero);
+                            return Err(GenerativeTransportError::Law(
+                                GenerativeTransportRefusal::InverseResidualNonzero,
+                            ));
                         }
                         standing_after.certificate = Some(GenerativeTransportCertificate {
                             schema: "holonic-engine.generative-transport-certificate.v1".to_owned(),
@@ -999,10 +1040,12 @@ impl ExactEventLaw for GenerativeTransportLaw {
                             predicted_operator,
                             returned_operator,
                             inverse_residual,
+                            // Every admitted occurrence, this one included, testified.
                             testimony_events: standing_after
-                                .history
+                                .used_events
                                 .iter()
-                                .map(GenerativeTransportHistoryEntry::event)
+                                .copied()
+                                .chain(std::iter::once(*event))
                                 .collect(),
                         });
                         standing_after.phase = GenerativeTransportPhase::Certified;
@@ -1024,23 +1067,29 @@ impl ExactEventLaw for GenerativeTransportLaw {
                 GenerativeTransportPhase::ResolvingExtension
                 | GenerativeTransportPhase::PredictionObstructed
                 | GenerativeTransportPhase::Certified => {
-                    return Err(GenerativeTransportError::CompleteOperatorNotRequested);
+                    return Err(GenerativeTransportError::Law(
+                        GenerativeTransportRefusal::CompleteOperatorNotRequested,
+                    ));
                 }
             },
             GenerativeTransportEvent::ReturnObservation {
-                event,
-                receiver,
+                event: _,
+                receiver: _,
                 query,
                 response,
             } => {
                 if standing_before.phase != GenerativeTransportPhase::ResolvingExtension {
-                    return Err(GenerativeTransportError::ObservationNotRequested);
+                    return Err(GenerativeTransportError::Law(
+                        GenerativeTransportRefusal::ObservationNotRequested,
+                    ));
                 }
                 if standing_before.next_query.as_ref() != Some(query) {
-                    return Err(GenerativeTransportError::UnexpectedReturnedQuery {
-                        expected: Box::new(standing_before.next_query.clone()),
-                        received: Box::new(query.clone()),
-                    });
+                    return Err(GenerativeTransportError::Law(
+                        GenerativeTransportRefusal::UnexpectedReturnedQuery {
+                            expected: Box::new(standing_before.next_query.clone()),
+                            received: Box::new(query.clone()),
+                        },
+                    ));
                 }
                 let family = standing_after
                     .family
@@ -1048,16 +1097,6 @@ impl ExactEventLaw for GenerativeTransportLaw {
                     .ok_or(GenerativeTransportError::MalformedStanding)?;
                 let admission = family.admit(query, response.clone())?;
                 work.exact_row_eliminations = admission.exact_row_eliminations;
-                standing_after
-                    .history
-                    .push(GenerativeTransportHistoryEntry::Observation(
-                        ParametricTransportTestimony {
-                            event: *event,
-                            receiver: *receiver,
-                            query: query.clone(),
-                            response: response.clone(),
-                        },
-                    ));
                 if let Some(model) = family.unique_model()? {
                     standing_after.generated_model = Some(model);
                     standing_after.next_query = None;
@@ -1191,7 +1230,9 @@ fn is_unit_passive_operator(
     interval: &Rat,
 ) -> Result<bool, GenerativeTransportError> {
     if !interval.is_positive() {
-        return Err(GenerativeTransportError::NonpositiveInterval);
+        return Err(GenerativeTransportError::Law(
+            GenerativeTransportRefusal::NonpositiveInterval,
+        ));
     }
     validate_square(operator)?;
     for (row, values) in operator.iter().enumerate() {
@@ -1220,7 +1261,9 @@ fn model_from_unit_passive_operator(
         != usize::try_from(extent).map_err(|_| GenerativeTransportError::CarrierOverflow)?
         || !is_unit_passive_operator(operator, interval)?
     {
-        return Err(GenerativeTransportError::MalformedGeneratedModel);
+        return Err(GenerativeTransportError::Law(
+            GenerativeTransportRefusal::MalformedGeneratedModel,
+        ));
     }
     let variables = parameterized_variables(extent)?;
     let edges = canonical_edges(extent)?;
@@ -1293,10 +1336,12 @@ fn operator_from_responses(
         .checked_mul(extent)
         .ok_or(GenerativeTransportError::CarrierOverflow)?;
     if responses.len() != expected {
-        return Err(GenerativeTransportError::MalformedCompleteOperator {
-            expected,
-            supplied: responses.len(),
-        });
+        return Err(GenerativeTransportError::Law(
+            GenerativeTransportRefusal::MalformedCompleteOperator {
+                expected,
+                supplied: responses.len(),
+            },
+        ));
     }
     Ok(responses
         .chunks_exact(extent)
@@ -1322,12 +1367,16 @@ fn edge_ordinal(
     canonical_edges(extent)?
         .iter()
         .position(|present| *present == edge)
-        .ok_or(GenerativeTransportError::MalformedGeneratedEdge(edge))
+        .ok_or(GenerativeTransportError::Law(
+            GenerativeTransportRefusal::MalformedGeneratedEdge(edge),
+        ))
 }
 
 fn validate_extent(extent: u32) -> Result<usize, GenerativeTransportError> {
     if extent < 2 {
-        return Err(GenerativeTransportError::InvalidExtent(extent));
+        return Err(GenerativeTransportError::Law(
+            GenerativeTransportRefusal::InvalidExtent(extent),
+        ));
     }
     usize::try_from(extent).map_err(|_| GenerativeTransportError::CarrierOverflow)
 }
@@ -1335,7 +1384,9 @@ fn validate_extent(extent: u32) -> Result<usize, GenerativeTransportError> {
 fn validate_square(matrix: &[Vec<Rat>]) -> Result<usize, GenerativeTransportError> {
     let extent = matrix.len();
     if extent < 2 || matrix.iter().any(|row| row.len() != extent) {
-        return Err(GenerativeTransportError::MalformedMatrix);
+        return Err(GenerativeTransportError::Law(
+            GenerativeTransportRefusal::MalformedMatrix,
+        ));
     }
     Ok(extent)
 }
@@ -1348,17 +1399,21 @@ fn zero_matrix(rows: usize, columns: usize) -> Vec<Vec<Rat>> {
 impl From<ExactLinearError> for GenerativeTransportError {
     fn from(error: ExactLinearError) -> Self {
         match error {
-            ExactLinearError::SingularMatrix => GenerativeTransportError::SingularGeneratedOperator,
+            ExactLinearError::SingularMatrix => {
+                GenerativeTransportError::Law(GenerativeTransportRefusal::SingularGeneratedOperator)
+            }
             ExactLinearError::InverseCertificateFailure
             | ExactLinearError::RankFactorizationCertificateFailure => {
-                GenerativeTransportError::InverseResidualNonzero
+                GenerativeTransportError::Law(GenerativeTransportRefusal::InverseResidualNonzero)
             }
             ExactLinearError::ExtentOverflow => GenerativeTransportError::CarrierOverflow,
             ExactLinearError::RaggedMatrix
             | ExactLinearError::NonsquareMatrix
             | ExactLinearError::AddressOutside
             | ExactLinearError::ShapeMismatch
-            | ExactLinearError::DifferentProductCores => GenerativeTransportError::MalformedMatrix,
+            | ExactLinearError::DifferentProductCores => {
+                GenerativeTransportError::Law(GenerativeTransportRefusal::MalformedMatrix)
+            }
         }
     }
 }
@@ -1415,10 +1470,12 @@ fn matrix_subtract(
 
 fn vector_subtract(left: &[Rat], right: &[Rat]) -> Result<Vec<Rat>, GenerativeTransportError> {
     if left.len() != right.len() {
-        return Err(GenerativeTransportError::VectorDimension {
-            left: left.len(),
-            right: right.len(),
-        });
+        return Err(GenerativeTransportError::Law(
+            GenerativeTransportRefusal::VectorDimension {
+                left: left.len(),
+                right: right.len(),
+            },
+        ));
     }
     Ok(left
         .iter()
@@ -1439,10 +1496,12 @@ fn invert_exact(matrix: Vec<Vec<Rat>>) -> Result<Vec<Vec<Rat>>, GenerativeTransp
 
 fn dot(left: &[Rat], right: &[Rat]) -> Result<Rat, GenerativeTransportError> {
     if left.len() != right.len() {
-        return Err(GenerativeTransportError::VectorDimension {
-            left: left.len(),
-            right: right.len(),
-        });
+        return Err(GenerativeTransportError::Law(
+            GenerativeTransportRefusal::VectorDimension {
+                left: left.len(),
+                right: right.len(),
+            },
+        ));
     }
     Ok(left
         .iter()
@@ -1455,7 +1514,7 @@ fn sum(values: &[Rat]) -> Rat {
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum GenerativeTransportError {
+pub enum GenerativeTransportRefusal {
     #[error("a generative transport ecology requires at least two nodes, received {0}")]
     InvalidExtent(u32),
     #[error("a generative transport event interval must be positive")]
@@ -1492,10 +1551,6 @@ pub enum GenerativeTransportError {
     PropagationDimension { expected: usize, supplied: usize },
     #[error("the generated propagation operator residual is nonzero")]
     OperatorResidualNonzero,
-    #[error("generative transport law and standing disagree")]
-    LawStandingMismatch,
-    #[error("generative transport occurrence {0:?} was already used")]
-    RepeatedEvent(EventId),
     #[error("the generative transport standing is terminal")]
     TerminalStanding,
     #[error("complete operator interval {received} does not match requested interval {expected}")]
@@ -1522,13 +1577,18 @@ pub enum GenerativeTransportError {
     SingularGeneratedOperator,
     #[error("the generated operator inverse residual is nonzero")]
     InverseResidualNonzero,
-    #[error("the generative transport standing is malformed")]
-    MalformedStanding,
-    #[error("a generative transport exact carrier overflowed")]
-    CarrierOverflow,
     #[error(transparent)]
     InverseTransport(#[from] InverseTransportError),
 }
+
+impl RefusalKind for GenerativeTransportRefusal {
+    const LAW: &'static str = "generative transport";
+}
+
+/// The generative transport law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type GenerativeTransportError = EventRefusal<GenerativeTransportRefusal>;
+
+event_refusal_from!(GenerativeTransportRefusal: InverseTransportError);
 
 #[cfg(test)]
 mod tests {
@@ -1678,6 +1738,93 @@ mod tests {
         assert!(world.standing().certificate().is_some());
     }
 
+    /// Phase 16: the parameter family is the sufficient statistic of the returned coordinates.
+    /// An old rest's testimony archive is dropped on decode; the decoded standing grades and
+    /// certifies exactly as the native one, with the admitted occurrences as testimony events.
+    #[test]
+    fn a_retired_testimony_archive_decodes_and_the_certificate_is_unchanged() {
+        /// The retired standing records, exactly as old rests wrote them.
+        #[derive(Serialize)]
+        enum CompleteOperatorRole {
+            InitialGrammar,
+        }
+        #[derive(Serialize)]
+        struct ParametricCompleteOperatorTestimony {
+            event: EventId,
+            receiver: TransportLineageId,
+            role: CompleteOperatorRole,
+            interval: Rat,
+            responses: Vec<Rat>,
+        }
+        #[derive(Serialize)]
+        struct ParametricTransportTestimony {
+            event: EventId,
+            receiver: TransportLineageId,
+            query: ParameterizedTransportQuery,
+            response: Rat,
+        }
+        #[derive(Serialize)]
+        enum GenerativeTransportHistoryEntry {
+            CompleteOperator(ParametricCompleteOperatorTestimony),
+            Observation(ParametricTransportTestimony),
+        }
+
+        let law = GenerativeTransportLaw::new(4, integer(1)).unwrap();
+        let mut world = CausalWorld::new(
+            law.clone(),
+            GenerativeTransportStanding::new(4, integer(1)).unwrap(),
+        );
+        let mut event = 1;
+        cause_model(&mut world, &mut event);
+        let mut archive = vec![GenerativeTransportHistoryEntry::CompleteOperator(
+            ParametricCompleteOperatorTestimony {
+                event: EventId(1),
+                receiver: TransportLineageId(1),
+                role: CompleteOperatorRole::InitialGrammar,
+                interval: integer(1),
+                responses: flatten(&hidden_operator(&integer(1))),
+            },
+        )];
+        // The observation archive is not recoverable from the quotient; its shape is what an
+        // old rest carried, and its content is dropped on decode.
+        archive.push(GenerativeTransportHistoryEntry::Observation(
+            ParametricTransportTestimony {
+                event: EventId(2),
+                receiver: TransportLineageId(1),
+                query: ParameterizedTransportQuery::basis(4, integer(2), 0, 0).unwrap(),
+                response: integer(0),
+            },
+        ));
+        let rest = ron::to_string(world.standing()).unwrap();
+        assert_eq!(rest.matches("used_events:").count(), 1);
+        let legacy = rest.replace(
+            "used_events:",
+            &format!("history:{},used_events:", ron::to_string(&archive).unwrap()),
+        );
+        let decoded: GenerativeTransportStanding = ron::from_str(&legacy).unwrap();
+        assert_eq!(&decoded, world.standing());
+        decoded.validate().unwrap();
+        assert!(!ron::to_string(&decoded).unwrap().contains("history:"));
+
+        let mut remounted = CausalWorld::from_rest(law, decoded, world.next_ordinal()).unwrap();
+        let grade = GenerativeTransportEvent::ReturnCompleteOperator {
+            event: EventId(event),
+            receiver: TransportLineageId(1),
+            interval: integer(3),
+            responses: flatten(&hidden_operator(&integer(3))),
+        };
+        assert_eq!(
+            world.receive(&grade).unwrap(),
+            remounted.receive(&grade).unwrap()
+        );
+        let certificate = remounted.standing().certificate().unwrap();
+        assert_eq!(
+            &certificate.testimony_events,
+            remounted.standing().used_events()
+        );
+        assert_eq!(world.standing(), remounted.standing());
+    }
+
     #[test]
     fn prediction_failure_is_retained_as_a_caused_obstruction() {
         let law = GenerativeTransportLaw::new(4, integer(1)).unwrap();
@@ -1733,7 +1880,9 @@ mod tests {
                 query: wrong,
                 response: integer(0),
             }),
-            Err(GenerativeTransportError::UnexpectedReturnedQuery { .. })
+            Err(GenerativeTransportError::Law(
+                GenerativeTransportRefusal::UnexpectedReturnedQuery { .. }
+            ))
         ));
         assert_eq!(world.standing(), &before);
     }

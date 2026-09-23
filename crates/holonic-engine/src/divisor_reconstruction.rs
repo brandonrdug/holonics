@@ -22,8 +22,11 @@ use std::collections::{BTreeMap, BTreeSet};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::world::{EventQuotient, event_standing_wire};
+use crate::world::{EventRefusal, RefusalKind, event_refusal_from};
 use crate::{
-    ArithmeticFiberError, ArithmeticFiberStanding, EventId, EventSuccessor, ExactEventLaw,
+    ArithmeticFiberError, ArithmeticFiberStanding, EventId, EventStanding, EventSuccessor,
+    ExactEventLaw,
 };
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
@@ -97,7 +100,9 @@ impl DivisorContactQuery {
                 (DivisorContactQueryPurpose::FacetDiscrimination, length) if length < 3
             )
         {
-            return Err(DivisorReconstructionError::MalformedQuery(self.clone()));
+            return Err(DivisorReconstructionError::Law(
+                DivisorReconstructionRefusal::MalformedQuery(self.clone()),
+            ));
         }
         Ok(())
     }
@@ -208,8 +213,8 @@ impl DivisorReconstructionCertificate {
                 .iter()
                 .any(|member| !self.occurrence_memberships.contains_key(member))
         {
-            return Err(DivisorReconstructionError::MalformedContactSection(
-                members.to_vec(),
+            return Err(DivisorReconstructionError::Law(
+                DivisorReconstructionRefusal::MalformedContactSection(members.to_vec()),
             ));
         }
         Ok(self
@@ -249,10 +254,14 @@ impl DivisorReconstructionCertificate {
             || self.chronology.is_empty()
             || self.chronology.windows(2).any(|pair| pair[0] >= pair[1])
         {
-            return Err(DivisorReconstructionError::MalformedCertificate);
+            return Err(DivisorReconstructionError::Law(
+                DivisorReconstructionRefusal::MalformedCertificate,
+            ));
         }
         if !self.generator_boundary_squared_zero() {
-            return Err(DivisorReconstructionError::MalformedCertificate);
+            return Err(DivisorReconstructionError::Law(
+                DivisorReconstructionRefusal::MalformedCertificate,
+            ));
         }
         let supports = self
             .generator_supports
@@ -275,18 +284,24 @@ impl DivisorReconstructionCertificate {
                     .any(|(right_index, right)| left_index != right_index && is_subset(left, right))
             })
         {
-            return Err(DivisorReconstructionError::MalformedCertificate);
+            return Err(DivisorReconstructionError::Law(
+                DivisorReconstructionRefusal::MalformedCertificate,
+            ));
         }
         for (index, support) in self.generator_supports.iter().enumerate() {
             let expected =
                 u64::try_from(index).map_err(|_| DivisorReconstructionError::CarrierOverflow)?;
             if support.generator != LatentGeneratorId(expected) {
-                return Err(DivisorReconstructionError::MalformedCertificate);
+                return Err(DivisorReconstructionError::Law(
+                    DivisorReconstructionRefusal::MalformedCertificate,
+                ));
             }
         }
         let expected = build_certificate(self.receiver, &self.chronology, supports)?;
         if &expected != self {
-            return Err(DivisorReconstructionError::MalformedCertificate);
+            return Err(DivisorReconstructionError::Law(
+                DivisorReconstructionRefusal::MalformedCertificate,
+            ));
         }
         Ok(())
     }
@@ -338,14 +353,88 @@ impl DivisorReconstructionWork {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct DivisorReconstructionStanding {
-    pub schema: String,
+const DIVISOR_RECONSTRUCTION_STANDING_SCHEMA: &str =
+    "holonic-engine.divisor-reconstruction-standing.v1";
+
+/// [definition] **The divisor-reconstruction quotient** (plan phase 16): the founded receiver and
+/// its chronology, the returned contact responses keyed by section (the sufficient statistic of
+/// every contact testimony: the law's future reads only which sections were answered and how),
+/// the support frontier, the version fibre and the certificate or obstruction. Each testimony is
+/// returned in its [`DivisorReconstructionRadiation`] and is not retained.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DivisorReconstructionQuotient {
     receiver: Option<DivisorReceiverId>,
     doctrine: Option<DivisorReconstructionDoctrine>,
     chronology: Vec<ContactOccurrenceId>,
     founding_event: Option<EventId>,
-    history: Vec<DivisorContactTestimony>,
+    pair_responses: BTreeMap<Vec<ContactOccurrenceId>, bool>,
+    higher_responses: BTreeMap<Vec<ContactOccurrenceId>, bool>,
+    confirmed_supports: BTreeSet<Vec<ContactOccurrenceId>>,
+    unresolved_supports: BTreeSet<Vec<ContactOccurrenceId>>,
+    facet_search_started: bool,
+    next_query: Option<DivisorContactQuery>,
+    version_fiber: Option<DivisorContactVersionFiber>,
+    certificate: Option<DivisorReconstructionCertificate>,
+    obstruction: Option<PrivateGeneratorWitnessObstruction>,
+    work: DivisorReconstructionWork,
+}
+
+/// The DivisorReconstruction standing: the shared event scaffold around [`DivisorReconstructionQuotient`].
+pub type DivisorReconstructionStanding = EventStanding<DivisorReconstructionQuotient>;
+
+#[derive(Serialize)]
+#[serde(rename = "DivisorReconstructionStanding")]
+struct DivisorReconstructionStandingWrite<'a> {
+    schema: &'a String,
+    receiver: &'a Option<DivisorReceiverId>,
+    doctrine: &'a Option<DivisorReconstructionDoctrine>,
+    chronology: &'a Vec<ContactOccurrenceId>,
+    founding_event: &'a Option<EventId>,
+    pair_responses: &'a BTreeMap<Vec<ContactOccurrenceId>, bool>,
+    higher_responses: &'a BTreeMap<Vec<ContactOccurrenceId>, bool>,
+    confirmed_supports: &'a BTreeSet<Vec<ContactOccurrenceId>>,
+    unresolved_supports: &'a BTreeSet<Vec<ContactOccurrenceId>>,
+    facet_search_started: &'a bool,
+    next_query: &'a Option<DivisorContactQuery>,
+    version_fiber: &'a Option<DivisorContactVersionFiber>,
+    certificate: &'a Option<DivisorReconstructionCertificate>,
+    obstruction: &'a Option<PrivateGeneratorWitnessObstruction>,
+    work: &'a DivisorReconstructionWork,
+    used_events: &'a BTreeSet<EventId>,
+}
+
+impl<'a> From<&'a DivisorReconstructionStanding> for DivisorReconstructionStandingWrite<'a> {
+    fn from(standing: &'a DivisorReconstructionStanding) -> Self {
+        Self {
+            schema: &standing.schema,
+            receiver: &standing.receiver,
+            doctrine: &standing.doctrine,
+            chronology: &standing.chronology,
+            founding_event: &standing.founding_event,
+            pair_responses: &standing.pair_responses,
+            higher_responses: &standing.higher_responses,
+            confirmed_supports: &standing.confirmed_supports,
+            unresolved_supports: &standing.unresolved_supports,
+            facet_search_started: &standing.facet_search_started,
+            next_query: &standing.next_query,
+            version_fiber: &standing.version_fiber,
+            certificate: &standing.certificate,
+            obstruction: &standing.obstruction,
+            work: &standing.work,
+            used_events: &standing.used_events,
+        }
+    }
+}
+
+/// Reads the current rest and the retired one (whose archive fields are dropped).
+#[derive(Deserialize)]
+#[serde(rename = "DivisorReconstructionStanding")]
+struct DivisorReconstructionStandingRead {
+    schema: String,
+    receiver: Option<DivisorReceiverId>,
+    doctrine: Option<DivisorReconstructionDoctrine>,
+    chronology: Vec<ContactOccurrenceId>,
+    founding_event: Option<EventId>,
     pair_responses: BTreeMap<Vec<ContactOccurrenceId>, bool>,
     higher_responses: BTreeMap<Vec<ContactOccurrenceId>, bool>,
     confirmed_supports: BTreeSet<Vec<ContactOccurrenceId>>,
@@ -359,27 +448,62 @@ pub struct DivisorReconstructionStanding {
     used_events: BTreeSet<EventId>,
 }
 
+impl From<DivisorReconstructionStandingRead> for DivisorReconstructionStanding {
+    fn from(read: DivisorReconstructionStandingRead) -> Self {
+        EventStanding::from_parts(
+            read.schema,
+            read.used_events,
+            DivisorReconstructionQuotient {
+                receiver: read.receiver,
+                doctrine: read.doctrine,
+                chronology: read.chronology,
+                founding_event: read.founding_event,
+                pair_responses: read.pair_responses,
+                higher_responses: read.higher_responses,
+                confirmed_supports: read.confirmed_supports,
+                unresolved_supports: read.unresolved_supports,
+                facet_search_started: read.facet_search_started,
+                next_query: read.next_query,
+                version_fiber: read.version_fiber,
+                certificate: read.certificate,
+                obstruction: read.obstruction,
+                work: read.work,
+            },
+        )
+    }
+}
+
+event_standing_wire!(
+    DivisorReconstructionQuotient,
+    DivisorReconstructionStandingWrite,
+    DivisorReconstructionStandingRead
+);
+
+impl EventQuotient for DivisorReconstructionQuotient {
+    type Refusal = DivisorReconstructionRefusal;
+}
+
 impl Default for DivisorReconstructionStanding {
     fn default() -> Self {
-        Self {
-            schema: "holonic-engine.divisor-reconstruction-standing.v1".to_owned(),
-            receiver: None,
-            doctrine: None,
-            chronology: Vec::new(),
-            founding_event: None,
-            history: Vec::new(),
-            pair_responses: BTreeMap::new(),
-            higher_responses: BTreeMap::new(),
-            confirmed_supports: BTreeSet::new(),
-            unresolved_supports: BTreeSet::new(),
-            facet_search_started: false,
-            next_query: None,
-            version_fiber: None,
-            certificate: None,
-            obstruction: None,
-            work: DivisorReconstructionWork::default(),
-            used_events: BTreeSet::new(),
-        }
+        EventStanding::founded(
+            DIVISOR_RECONSTRUCTION_STANDING_SCHEMA,
+            DivisorReconstructionQuotient {
+                receiver: None,
+                doctrine: None,
+                chronology: Vec::new(),
+                founding_event: None,
+                pair_responses: BTreeMap::new(),
+                higher_responses: BTreeMap::new(),
+                confirmed_supports: BTreeSet::new(),
+                unresolved_supports: BTreeSet::new(),
+                facet_search_started: false,
+                next_query: None,
+                version_fiber: None,
+                certificate: None,
+                obstruction: None,
+                work: DivisorReconstructionWork::default(),
+            },
+        )
     }
 }
 
@@ -396,8 +520,9 @@ impl DivisorReconstructionStanding {
         &self.chronology
     }
 
-    pub fn history(&self) -> &[DivisorContactTestimony] {
-        &self.history
+    /// The number of contact sections returned (pairwise and higher order).
+    pub fn explicit_contact_returns(&self) -> usize {
+        self.pair_responses.len() + self.higher_responses.len()
     }
 
     pub fn next_query(&self) -> Option<&DivisorContactQuery> {
@@ -434,11 +559,30 @@ impl DivisorReconstructionStanding {
         let doctrine = self
             .doctrine
             .ok_or(DivisorReconstructionError::MalformedStanding)?;
+        // [definition] The returned responses are an oracle for the production queries: replaying
+        // the founding and answering each query from them rebuilds the whole quotient without a
+        // testimony archive. The occurrence identities of the returns are not replayed.
         let mut replay = Self::default();
         replay.apply_founding(founding_event, receiver, doctrine, self.chronology.clone())?;
-        for testimony in &self.history {
-            replay.apply_testimony(testimony.clone())?;
+        let mut synthetic = 0_u64;
+        while let Some(query) = replay.next_query.clone() {
+            let responses = match query.purpose {
+                DivisorContactQueryPurpose::PairwiseSkeleton => &self.pair_responses,
+                DivisorContactQueryPurpose::FacetDiscrimination => &self.higher_responses,
+            };
+            let Some(common_generator) = responses.get(&query.members).copied() else {
+                break;
+            };
+            while replay.used_events.contains(&EventId(synthetic)) {
+                synthetic += 1;
+            }
+            replay.apply_testimony(DivisorContactTestimony {
+                event: EventId(synthetic),
+                query,
+                common_generator,
+            })?;
         }
+        replay.used_events = self.used_events.clone();
         if replay != *self {
             return Err(DivisorReconstructionError::MalformedStanding);
         }
@@ -446,9 +590,7 @@ impl DivisorReconstructionStanding {
     }
 
     fn validate_incremental(&self) -> Result<(), DivisorReconstructionError> {
-        if self.schema != "holonic-engine.divisor-reconstruction-standing.v1" {
-            return Err(DivisorReconstructionError::MalformedStanding);
-        }
+        self.check_schema(DIVISOR_RECONSTRUCTION_STANDING_SCHEMA)?;
         let Some(receiver) = self.receiver else {
             return if self == &Self::default() {
                 Ok(())
@@ -465,37 +607,20 @@ impl DivisorReconstructionStanding {
         {
             return Err(DivisorReconstructionError::MalformedStanding);
         }
-        let mut history_pairs = BTreeMap::new();
-        let mut history_higher = BTreeMap::new();
-        let mut events = BTreeSet::from([self
+        let founding_event = self
             .founding_event
-            .ok_or(DivisorReconstructionError::MalformedStanding)?]);
-        for testimony in &self.history {
-            testimony.query.validate()?;
-            if testimony.query.receiver != receiver
-                || testimony
-                    .query
-                    .members
-                    .iter()
-                    .any(|member| self.chronology.binary_search(member).is_err())
-                || !events.insert(testimony.event)
-            {
-                return Err(DivisorReconstructionError::MalformedStanding);
-            }
-            let target = match testimony.query.purpose {
-                DivisorContactQueryPurpose::PairwiseSkeleton => &mut history_pairs,
-                DivisorContactQueryPurpose::FacetDiscrimination => &mut history_higher,
-            };
-            if target
-                .insert(testimony.query.members.clone(), testimony.common_generator)
-                .is_some()
-            {
-                return Err(DivisorReconstructionError::MalformedStanding);
-            }
+            .ok_or(DivisorReconstructionError::MalformedStanding)?;
+        if self
+            .higher_responses
+            .keys()
+            .flatten()
+            .any(|member| self.chronology.binary_search(member).is_err())
+        {
+            return Err(DivisorReconstructionError::MalformedStanding);
         }
-        if history_pairs != self.pair_responses
-            || history_higher != self.higher_responses
-            || events != self.used_events
+        // Every admitted occurrence founded the receiver or returned one contact section.
+        if !self.used_events.contains(&founding_event)
+            || self.used_events.len() != 1 + self.explicit_contact_returns()
             || self.work.pairwise_returns
                 != u64::try_from(self.pair_responses.len())
                     .map_err(|_| DivisorReconstructionError::CarrierOverflow)?
@@ -634,10 +759,14 @@ impl DivisorReconstructionStanding {
         chronology: Vec<ContactOccurrenceId>,
     ) -> Result<(), DivisorReconstructionError> {
         if self.receiver.is_some() {
-            return Err(DivisorReconstructionError::ReceiverAlreadyFounded);
+            return Err(DivisorReconstructionError::Law(
+                DivisorReconstructionRefusal::ReceiverAlreadyFounded,
+            ));
         }
         if chronology.is_empty() || chronology.windows(2).any(|pair| pair[0] >= pair[1]) {
-            return Err(DivisorReconstructionError::MalformedChronology);
+            return Err(DivisorReconstructionError::Law(
+                DivisorReconstructionRefusal::MalformedChronology,
+            ));
         }
         self.receiver = Some(receiver);
         self.doctrine = Some(doctrine);
@@ -657,10 +786,12 @@ impl DivisorReconstructionStanding {
         }
         testimony.query.validate()?;
         if self.next_query.as_ref() != Some(&testimony.query) {
-            return Err(DivisorReconstructionError::UnexpectedReturnedQuery {
-                expected: self.next_query.clone(),
-                received: testimony.query,
-            });
+            return Err(DivisorReconstructionError::Law(
+                DivisorReconstructionRefusal::UnexpectedReturnedQuery {
+                    expected: self.next_query.clone(),
+                    received: testimony.query,
+                },
+            ));
         }
         let members = testimony.query.members.clone();
         match testimony.query.purpose {
@@ -670,7 +801,9 @@ impl DivisorReconstructionStanding {
                     .insert(members, testimony.common_generator)
                     .is_some()
                 {
-                    return Err(DivisorReconstructionError::RepeatedContactSection);
+                    return Err(DivisorReconstructionError::Law(
+                        DivisorReconstructionRefusal::RepeatedContactSection,
+                    ));
                 }
                 self.work.pairwise_returns = self
                     .work
@@ -685,7 +818,9 @@ impl DivisorReconstructionStanding {
                         .insert(members.clone(), testimony.common_generator)
                         .is_some()
                 {
-                    return Err(DivisorReconstructionError::RepeatedContactSection);
+                    return Err(DivisorReconstructionError::Law(
+                        DivisorReconstructionRefusal::RepeatedContactSection,
+                    ));
                 }
                 self.work.higher_order_returns = self
                     .work
@@ -725,35 +860,35 @@ impl DivisorReconstructionStanding {
             }
         }
         self.used_events.insert(testimony.event);
-        self.history.push(testimony);
         self.settle()?;
         Ok(())
     }
 
     fn settle(&mut self) -> Result<(), DivisorReconstructionError> {
-        let receiver = self
+        let this: &mut DivisorReconstructionQuotient = self;
+        let receiver = this
             .receiver
             .ok_or(DivisorReconstructionError::MalformedStanding)?;
-        let doctrine = self
+        let doctrine = this
             .doctrine
             .ok_or(DivisorReconstructionError::MalformedStanding)?;
-        if let Some(pair) = first_missing_pair(&self.chronology, &self.pair_responses) {
-            self.next_query = Some(DivisorContactQuery::new(
+        if let Some(pair) = first_missing_pair(&this.chronology, &this.pair_responses) {
+            this.next_query = Some(DivisorContactQuery::new(
                 receiver,
                 pair,
                 DivisorContactQueryPurpose::PairwiseSkeleton,
             )?);
-            self.refresh_derived()?;
+            this.refresh_derived()?;
             return Ok(());
         }
 
-        if !self.facet_search_started {
+        if !this.facet_search_started {
             match doctrine {
                 DivisorReconstructionDoctrine::CompleteContactComplex => {
                     let (cliques, search_nodes) =
-                        maximal_pairwise_cliques(&self.chronology, &self.pair_responses)?;
-                    self.unresolved_supports = cliques;
-                    self.work.maximal_clique_search_nodes = self
+                        maximal_pairwise_cliques(&this.chronology, &this.pair_responses)?;
+                    this.unresolved_supports = cliques;
+                    this.work.maximal_clique_search_nodes = this
                         .work
                         .maximal_clique_search_nodes
                         .checked_add(search_nodes)
@@ -761,31 +896,31 @@ impl DivisorReconstructionStanding {
                 }
                 DivisorReconstructionDoctrine::PrivateWitnessedGeneratorFacets => {
                     let (candidates, checks) =
-                        private_witness_candidates(&self.chronology, &self.pair_responses)?;
-                    self.unresolved_supports = candidates;
-                    self.work.witness_neighborhood_checks = self
+                        private_witness_candidates(&this.chronology, &this.pair_responses)?;
+                    this.unresolved_supports = candidates;
+                    this.work.witness_neighborhood_checks = this
                         .work
                         .witness_neighborhood_checks
                         .checked_add(checks)
                         .ok_or(DivisorReconstructionError::CarrierOverflow)?;
                 }
             }
-            self.facet_search_started = true;
+            this.facet_search_started = true;
         }
 
         loop {
             match doctrine {
                 DivisorReconstructionDoctrine::CompleteContactComplex => {
-                    normalize_antichain(&mut self.unresolved_supports, &self.confirmed_supports);
+                    normalize_antichain(&mut this.unresolved_supports, &this.confirmed_supports);
                 }
                 DivisorReconstructionDoctrine::PrivateWitnessedGeneratorFacets => {
                     normalize_witness_candidates(
-                        &mut self.unresolved_supports,
-                        &self.confirmed_supports,
+                        &mut this.unresolved_supports,
+                        &this.confirmed_supports,
                     );
                 }
             }
-            let atomic = self
+            let atomic = this
                 .unresolved_supports
                 .iter()
                 .filter(|support| support.len() <= 2)
@@ -795,9 +930,9 @@ impl DivisorReconstructionStanding {
                 break;
             }
             for support in atomic {
-                self.unresolved_supports.remove(&support);
-                self.confirmed_supports.insert(support);
-                self.work.implicit_atomic_facets = self
+                this.unresolved_supports.remove(&support);
+                this.confirmed_supports.insert(support);
+                this.work.implicit_atomic_facets = this
                     .work
                     .implicit_atomic_facets
                     .checked_add(1)
@@ -805,37 +940,37 @@ impl DivisorReconstructionStanding {
             }
         }
 
-        if let Some(candidate) = next_facet_candidate(&self.unresolved_supports) {
-            self.next_query = Some(DivisorContactQuery::new(
+        if let Some(candidate) = next_facet_candidate(&this.unresolved_supports) {
+            this.next_query = Some(DivisorContactQuery::new(
                 receiver,
                 candidate,
                 DivisorContactQueryPurpose::FacetDiscrimination,
             )?);
-            self.certificate = None;
-            self.obstruction = None;
+            this.certificate = None;
+            this.obstruction = None;
         } else {
-            self.next_query = None;
+            this.next_query = None;
             match doctrine {
                 DivisorReconstructionDoctrine::CompleteContactComplex => {
-                    self.obstruction = None;
-                    self.certificate = Some(build_certificate(
+                    this.obstruction = None;
+                    this.certificate = Some(build_certificate(
                         receiver,
-                        &self.chronology,
-                        self.confirmed_supports.iter().cloned().collect(),
+                        &this.chronology,
+                        this.confirmed_supports.iter().cloned().collect(),
                     )?);
                 }
                 DivisorReconstructionDoctrine::PrivateWitnessedGeneratorFacets => {
-                    self.obstruction = private_witness_obstruction(
+                    this.obstruction = private_witness_obstruction(
                         receiver,
-                        &self.chronology,
-                        &self.pair_responses,
-                        &self.confirmed_supports,
+                        &this.chronology,
+                        &this.pair_responses,
+                        &this.confirmed_supports,
                     );
-                    self.certificate = if self.obstruction.is_none() {
+                    this.certificate = if this.obstruction.is_none() {
                         Some(build_certificate(
                             receiver,
-                            &self.chronology,
-                            self.confirmed_supports.iter().cloned().collect(),
+                            &this.chronology,
+                            this.confirmed_supports.iter().cloned().collect(),
                         )?)
                     } else {
                         None
@@ -843,10 +978,12 @@ impl DivisorReconstructionStanding {
                 }
             }
         }
-        self.refresh_derived()?;
+        this.refresh_derived()?;
         Ok(())
     }
+}
 
+impl DivisorReconstructionQuotient {
     fn refresh_derived(&mut self) -> Result<(), DivisorReconstructionError> {
         self.version_fiber = Some(derive_version_fiber(self)?);
         Ok(())
@@ -854,7 +991,7 @@ impl DivisorReconstructionStanding {
 }
 
 fn derive_version_fiber(
-    standing: &DivisorReconstructionStanding,
+    standing: &DivisorReconstructionQuotient,
 ) -> Result<DivisorContactVersionFiber, DivisorReconstructionError> {
     let receiver = standing
         .receiver
@@ -1161,7 +1298,9 @@ fn build_certificate(
     supports.sort();
     supports.dedup();
     if supports.is_empty() {
-        return Err(DivisorReconstructionError::UncoveredOccurrence);
+        return Err(DivisorReconstructionError::Law(
+            DivisorReconstructionRefusal::UncoveredOccurrence,
+        ));
     }
     let generator_supports = supports
         .iter()
@@ -1184,7 +1323,9 @@ fn build_certificate(
         for occurrence in &support.occurrences {
             occurrence_memberships
                 .get_mut(occurrence)
-                .ok_or(DivisorReconstructionError::MalformedCertificate)?
+                .ok_or(DivisorReconstructionError::Law(
+                    DivisorReconstructionRefusal::MalformedCertificate,
+                ))?
                 .push(support.generator);
         }
     }
@@ -1192,7 +1333,9 @@ fn build_certificate(
         .values()
         .any(|memberships| memberships.is_empty())
     {
-        return Err(DivisorReconstructionError::UncoveredOccurrence);
+        return Err(DivisorReconstructionError::Law(
+            DivisorReconstructionRefusal::UncoveredOccurrence,
+        ));
     }
 
     let mut cell_witnesses = BTreeMap::<Vec<LatentGeneratorId>, Vec<ContactOccurrenceId>>::new();
@@ -1374,7 +1517,8 @@ impl ExactEventLaw for DivisorReconstructionLaw {
         // incremental validator checks the complete carried recurrence and
         // query frontier without replaying every already-returned pair.
         // `DivisorReconstructionStanding::validate` remains the independent
-        // full-history authority used at grading and persistence boundaries.
+        // replay authority (from the retained responses) used at grading and
+        // persistence boundaries.
         standing_before.validate_incremental()?;
         if standing_before
             .doctrine
@@ -1383,9 +1527,7 @@ impl ExactEventLaw for DivisorReconstructionLaw {
             return Err(DivisorReconstructionError::LawStandingMismatch);
         }
         let event_id = event.event();
-        if standing_before.used_events.contains(&event_id) {
-            return Err(DivisorReconstructionError::RepeatedEvent(event_id));
-        }
+        standing_before.refuse_repeated(event_id)?;
         let mut standing_after = standing_before.clone();
         let mut founded_receiver = None;
         let mut received_testimony = None;
@@ -1410,10 +1552,12 @@ impl ExactEventLaw for DivisorReconstructionLaw {
                 common_generator,
             } => {
                 if query.receiver != *receiver {
-                    return Err(DivisorReconstructionError::ReceiverMismatch {
-                        expected: query.receiver,
-                        received: *receiver,
-                    });
+                    return Err(DivisorReconstructionError::Law(
+                        DivisorReconstructionRefusal::ReceiverMismatch {
+                            expected: query.receiver,
+                            received: *receiver,
+                        },
+                    ));
                 }
                 let testimony = DivisorContactTestimony {
                     event: *event,
@@ -1505,7 +1649,9 @@ impl<'a> ArithmeticDivisorMembrane<'a> {
     ) -> Result<Self, DivisorReconstructionError> {
         arithmetic.validate()?;
         if arithmetic.occurrences().is_empty() {
-            return Err(DivisorReconstructionError::EmptyArithmeticMembrane);
+            return Err(DivisorReconstructionError::Law(
+                DivisorReconstructionRefusal::EmptyArithmeticMembrane,
+            ));
         }
         let mut chronology = Vec::with_capacity(arithmetic.occurrences().len());
         let mut occurrence_values = BTreeMap::new();
@@ -1539,10 +1685,12 @@ impl<'a> ArithmeticDivisorMembrane<'a> {
     pub fn answer(&self, query: &DivisorContactQuery) -> Result<bool, DivisorReconstructionError> {
         query.validate()?;
         if query.receiver != self.receiver {
-            return Err(DivisorReconstructionError::ReceiverMismatch {
-                expected: self.receiver,
-                received: query.receiver,
-            });
+            return Err(DivisorReconstructionError::Law(
+                DivisorReconstructionRefusal::ReceiverMismatch {
+                    expected: self.receiver,
+                    received: query.receiver,
+                },
+            ));
         }
         self.common_generator(&query.members)
     }
@@ -1570,11 +1718,15 @@ impl<'a> ArithmeticDivisorMembrane<'a> {
         if reconstruction.receiver != Some(self.receiver)
             || reconstruction.chronology != self.chronology
         {
-            return Err(DivisorReconstructionError::GradingReceiverMismatch);
+            return Err(DivisorReconstructionError::Law(
+                DivisorReconstructionRefusal::GradingReceiverMismatch,
+            ));
         }
         let certificate = reconstruction
             .certificate()
-            .ok_or(DivisorReconstructionError::ReconstructionStillOpen)?;
+            .ok_or(DivisorReconstructionError::Law(
+                DivisorReconstructionRefusal::ReconstructionStillOpen,
+            ))?;
         let mut expected_supports = BTreeMap::<u64, Vec<ContactOccurrenceId>>::new();
         for prime in self.arithmetic.prime_cells().keys() {
             expected_supports.insert(*prime, Vec::new());
@@ -1584,7 +1736,9 @@ impl<'a> ArithmeticDivisorMembrane<'a> {
             for valuation in &received.valuation {
                 expected_supports
                     .get_mut(&valuation.prime)
-                    .ok_or(DivisorReconstructionError::MalformedArithmeticMembrane)?
+                    .ok_or(DivisorReconstructionError::Law(
+                        DivisorReconstructionRefusal::MalformedArithmeticMembrane,
+                    ))?
                     .push(*occurrence);
             }
         }
@@ -1603,7 +1757,9 @@ impl<'a> ArithmeticDivisorMembrane<'a> {
                     .find_map(|(prime, expected)| {
                         (expected == &support.occurrences).then_some(*prime)
                     })
-                    .ok_or(DivisorReconstructionError::MalformedArithmeticMembrane)?;
+                    .ok_or(DivisorReconstructionError::Law(
+                        DivisorReconstructionRefusal::MalformedArithmeticMembrane,
+                    ))?;
                 correspondence.push(GradedGeneratorCorrespondence {
                     latent_generator: support.generator,
                     grading_prime: prime,
@@ -1638,9 +1794,10 @@ impl<'a> ArithmeticDivisorMembrane<'a> {
             support_ecology_exact && received_generator_cells == expected_generator_cells;
 
         let explicit = reconstruction
-            .history
-            .iter()
-            .map(|testimony| testimony.query.members.clone())
+            .pair_responses
+            .keys()
+            .chain(reconstruction.higher_responses.keys())
+            .cloned()
             .collect::<BTreeSet<_>>();
         let mut heldout_contact_sections = 0_u64;
         let mut heldout_false_positives = 0_u64;
@@ -1677,7 +1834,7 @@ impl<'a> ArithmeticDivisorMembrane<'a> {
             generator_complex_exact,
             generator_boundary_squared_zero: certificate.generator_boundary_squared_zero(),
             correspondence,
-            explicit_contact_returns: u64::try_from(reconstruction.history.len())
+            explicit_contact_returns: u64::try_from(reconstruction.explicit_contact_returns())
                 .map_err(|_| DivisorReconstructionError::CarrierOverflow)?,
             explicit_higher_order_returns: reconstruction.work.higher_order_returns,
             heldout_contact_sections,
@@ -1695,14 +1852,16 @@ impl<'a> ArithmeticDivisorMembrane<'a> {
         members: &[ContactOccurrenceId],
     ) -> Result<bool, DivisorReconstructionError> {
         if members.is_empty() || members.windows(2).any(|pair| pair[0] >= pair[1]) {
-            return Err(DivisorReconstructionError::MalformedContactSection(
-                members.to_vec(),
+            return Err(DivisorReconstructionError::Law(
+                DivisorReconstructionRefusal::MalformedContactSection(members.to_vec()),
             ));
         }
         let mut common = None::<BTreeSet<u64>>;
         for member in members {
             let value = self.occurrence_values.get(member).copied().ok_or_else(|| {
-                DivisorReconstructionError::MalformedContactSection(members.to_vec())
+                DivisorReconstructionError::Law(
+                    DivisorReconstructionRefusal::MalformedContactSection(members.to_vec()),
+                )
             })?;
             let support = self.arithmetic.occurrences()[&value]
                 .squarefree_support
@@ -1722,15 +1881,11 @@ impl<'a> ArithmeticDivisorMembrane<'a> {
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum DivisorReconstructionError {
-    #[error("the divisor-reconstruction law and standing doctrines disagree")]
-    LawStandingMismatch,
+pub enum DivisorReconstructionRefusal {
     #[error("the occurrence receiver is already founded")]
     ReceiverAlreadyFounded,
     #[error("an occurrence receiver requires a nonempty strictly ordered chronology")]
     MalformedChronology,
-    #[error("divisor reconstruction occurrence {0:?} was already used")]
-    RepeatedEvent(EventId),
     #[error("divisor contact query {0:?} is malformed")]
     MalformedQuery(DivisorContactQuery),
     #[error("contact section {0:?} is malformed for this receiver")]
@@ -1749,12 +1904,8 @@ pub enum DivisorReconstructionError {
     RepeatedContactSection,
     #[error("the reconstructed latent ecology leaves an occurrence uncovered")]
     UncoveredOccurrence,
-    #[error("the divisor-reconstruction standing is malformed")]
-    MalformedStanding,
     #[error("the divisor-reconstruction certificate is malformed")]
     MalformedCertificate,
-    #[error("finite divisor reconstruction exceeded an exact carrier")]
-    CarrierOverflow,
     #[error("an arithmetic contact membrane requires at least one arithmetic occurrence")]
     EmptyArithmeticMembrane,
     #[error("the arithmetic contact membrane is malformed")]
@@ -1766,6 +1917,15 @@ pub enum DivisorReconstructionError {
     #[error(transparent)]
     Arithmetic(#[from] ArithmeticFiberError),
 }
+
+impl RefusalKind for DivisorReconstructionRefusal {
+    const LAW: &'static str = "divisor-reconstruction";
+}
+
+/// The divisor-reconstruction law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type DivisorReconstructionError = EventRefusal<DivisorReconstructionRefusal>;
+
+event_refusal_from!(DivisorReconstructionRefusal: ArithmeticFiberError);
 
 #[cfg(test)]
 mod tests {
@@ -1874,6 +2034,96 @@ mod tests {
             BTreeMap::from([(0, 3), (1, 3)])
         );
         standing.validate().unwrap();
+    }
+
+    /// Phase 16: the returned responses are the sufficient statistic of the contact testimony.
+    /// An old rest's testimony archive is dropped on decode, the replay from the responses
+    /// rebuilds the quotient, and a partial rest continues to the same certificate.
+    #[test]
+    fn a_retired_testimony_archive_decodes_and_the_responses_replay_the_quotient() {
+        let receiver = DivisorReceiverId(1);
+        let chronology = vec![
+            ContactOccurrenceId(10),
+            ContactOccurrenceId(20),
+            ContactOccurrenceId(30),
+        ];
+        let true_supports = [
+            vec![chronology[0], chronology[1]],
+            vec![chronology[0], chronology[2]],
+            vec![chronology[1], chronology[2]],
+        ];
+        let answer = |query: &DivisorContactQuery| {
+            true_supports
+                .iter()
+                .any(|support| is_subset(&query.members, support))
+        };
+        let mut world = CausalWorld::new(
+            DivisorReconstructionLaw::default(),
+            DivisorReconstructionStanding::default(),
+        );
+        world
+            .receive(&DivisorReconstructionEvent::FoundOccurrenceReceiver {
+                event: EventId(1),
+                receiver,
+                chronology: chronology.clone(),
+            })
+            .unwrap();
+        let mut archive = Vec::new();
+        for event in 2..4_u64 {
+            let query = world.standing().next_query().cloned().unwrap();
+            let common_generator = answer(&query);
+            let receipt = world
+                .receive(&DivisorReconstructionEvent::ReturnContact {
+                    event: EventId(event),
+                    receiver,
+                    query,
+                    common_generator,
+                })
+                .unwrap();
+            archive.push(receipt.radiation[0].received_testimony.clone().unwrap());
+        }
+        world.standing().validate().unwrap();
+        assert_eq!(world.standing().explicit_contact_returns(), 2);
+
+        // Contact responses are keyed by sections, so the rest is RON.
+        let rest = ron::to_string(world.standing()).unwrap();
+        assert_eq!(rest.matches("pair_responses:").count(), 1);
+        let legacy = rest.replace(
+            "pair_responses:",
+            &format!(
+                "history:{},pair_responses:",
+                ron::to_string(&archive).unwrap()
+            ),
+        );
+        let decoded: DivisorReconstructionStanding = ron::from_str(&legacy).unwrap();
+        assert_eq!(&decoded, world.standing());
+        decoded.validate().unwrap();
+        assert!(!ron::to_string(&decoded).unwrap().contains("history:"));
+
+        let mut remounted = CausalWorld::from_rest(
+            DivisorReconstructionLaw::default(),
+            decoded,
+            world.next_ordinal(),
+        )
+        .unwrap();
+        assert_eq!(remounted.state().commit, world.state().commit);
+        let mut event = 4_u64;
+        while let Some(query) = world.standing().next_query().cloned() {
+            let common_generator = answer(&query);
+            let event_value = DivisorReconstructionEvent::ReturnContact {
+                event: EventId(event),
+                receiver,
+                query,
+                common_generator,
+            };
+            let native = world.receive(&event_value).unwrap();
+            let continued = remounted.receive(&event_value).unwrap();
+            assert_eq!(native, continued);
+            event += 1;
+        }
+        assert_eq!(world.standing(), remounted.standing());
+        assert!(remounted.standing().certificate().is_some());
+        remounted.standing().validate().unwrap();
     }
 
     #[test]
@@ -1989,7 +2239,9 @@ mod tests {
                 query: wrong,
                 common_generator: false,
             }),
-            Err(DivisorReconstructionError::UnexpectedReturnedQuery { .. })
+            Err(DivisorReconstructionError::Law(
+                DivisorReconstructionRefusal::UnexpectedReturnedQuery { .. }
+            ))
         ));
         assert_eq!(world.standing(), &before);
         world
@@ -2023,8 +2275,9 @@ mod tests {
             .pop();
         assert!(matches!(
             forged_certificate.validate(),
-            Err(DivisorReconstructionError::MalformedCertificate)
-                | Err(DivisorReconstructionError::MalformedStanding)
+            Err(DivisorReconstructionError::Law(
+                DivisorReconstructionRefusal::MalformedCertificate
+            )) | Err(DivisorReconstructionError::MalformedStanding)
         ));
     }
 }

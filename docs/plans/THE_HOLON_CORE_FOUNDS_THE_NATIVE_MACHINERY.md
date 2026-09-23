@@ -636,3 +636,112 @@ interaction words are read from a foreign per-layer table at the host
 and the extracted operator has no core chart (no `HolonLaw` reference motion or `ElementRelation`
 with its declared power, as phase 9 gave the normal constitution), so its passivity/power balance
 is not stated.
+
+### Phase 16 disposition: the event-law scaffolding
+
+[established-bounded; source-inspected, measured] Scope: the 26 engine `impl ExactEventLaw`
+modules (27 laws; `analytic_field` has two) and `world.rs`. Each law's mathematics is unchanged;
+only its scaffolding moved onto the Holon objects.
+
+**The bridge** (`holonic-engine/src/world.rs`, `world/scaffold.rs`; core `holon.rs`). Core
+`HolonState<C = Vec<Rat>>` is now generic in its configuration (`at`, `committed`); the existing
+`HolonState` is the default. `CausalWorld<L>` holds a `HolonState<L::Standing>`: the standing is
+the configuration and `commit` counts committed events (`next_ordinal = commit + 1`,
+`CausalWorld::state`, `from_state`; `from_rest` unchanged). `EventSuccessor::port_flow` names the
+radiation as the flow returned at the external ports (the event is the effort supplied there).
+`EventRefusal<K>` is one refusal family per law: the four shared refusals (`RepeatedEvent(EventId)`,
+`MalformedStanding`, `LawStandingMismatch`, `CarrierOverflow`) and `Law(K)` with the law's own kinds;
+`RefusalKind::LAW` names the law in the shared messages; `event_refusal_from!` routes a kind's
+`#[from]` sources (no blanket `From<K>`, so a shared refusal converts by identity). `EventStanding<S>`
+is the repeated standing shape — schema, admitted occurrences, the law's quotient `S` (reached by
+`Deref`) — with `refuse_repeated`/`check_schema` typed by `EventQuotient::Refusal`, and
+`event_standing_wire!` owning each adopter's rest: a borrowed write record with the old struct name
+and field order (minus archives) and an owned read record that accepts the retired archive fields.
+
+| Module | Refusal family (`XError = EventRefusal<XRefusal>`; shared variants found) | Standing |
+|---|---|---|
+| `bit_causal` | `BitCausalRefusal`; all four | `EventStanding<BitCausalQuotient>` |
+| `causal_state_grammar` | `CausalStateGrammarRefusal`; repeated, malformed, overflow | `EventStanding<CausalStateGrammarQuotient>` |
+| `organizational_grammar` | `OrganizationalGrammarRefusal`; repeated, malformed, overflow | `EventStanding<OrganizationalGrammarQuotient>` |
+| `generative_transport` | `GenerativeTransportRefusal`; all four | `EventStanding<GenerativeTransportQuotient>` |
+| `inverse_transport` | `InverseTransportRefusal`; all four | `EventStanding<InverseTransportQuotient>` |
+| `wave_propagation` | `WavePropagationRefusal`; repeated (was payload-free; now carries the event), malformed, overflow | `EventStanding<WavePropagationQuotient>` |
+| `divisor_reconstruction` | `DivisorReconstructionRefusal`; all four | `EventStanding<DivisorReconstructionQuotient>` |
+| `causal_traversal` | `CausalTraversalRefusal`; repeated, malformed, overflow | `EventStanding<ExactCausalTraversalQuotient>` (the pending frontier is a work schedule; kept) |
+| `observation_ecology` | `ObservationEcologyRefusal`; repeated, malformed, overflow | `EventStanding<ObservationEcologyQuotient>` |
+| `atmospheric_inverse` | `AtmosphericInverseRefusal`; repeated, malformed, overflow | `EventStanding<AtmosphericInverseQuotient>` |
+| `arithmetic_fiber` | `ArithmeticFiberRefusal`; repeated, overflow | `EventStanding<ArithmeticFiberQuotient>` |
+| `prime_ecology` | `PrimeEcologyRefusal`; overflow | `EventStanding<PrimeEcologyQuotient>` |
+| `receiver_phase_atlas` | `ReceiverPhaseAtlasRefusal`; repeated, malformed, overflow | `EventStanding<ReceiverPhaseAtlasQuotient>` |
+| `arithmetic_monodromy` | `ArithmeticMonodromyRefusal`; all four | `EventStanding<ArithmeticMonodromyQuotient>` |
+| `field_atlas` | `FieldAtlasRefusal`; repeated, malformed, overflow | `EventStanding<CausalFieldQuotient>` |
+| `coupled_informant` | `CoupledInformantRefusal`; repeated, malformed, overflow | `EventStanding<CoupledInformantQuotient>` |
+| `causal_body` | `CausalBodyRefusal`; none (shared variants available) | `EventStanding<CausalBodyQuotient>` |
+| `dimensional_wave` | `DimensionalWaveRefusal`; repeated, malformed, overflow | `EventStanding<ExactDimensionalWaveQuotient>` |
+| `analytic_field` (two laws) | `AnalyticFieldRefusal`; overflow | advection: `EventStanding<ExactAnalyticAdvectionQuotient>`; field wave reuses the dimensional-wave standing |
+| `arithmetic_phase` | `PrimePhaseRefusal`; overflow | kept (`value, phase, receivers, next_receiver`: no schema/occurrence set) |
+| `local_star`, `physical`, `simplicial` | `LocalStarRefusal`, `PhysicalLawRefusal`, `HingeWorldRefusal`; none | kept (hinge/kinematic standings: no occurrence set) |
+| `algebraic` | `CausalAlgebraicRefusal`; none | kept (`CausalAlgebraicPresentation`: no occurrence set) |
+| `holonic_complex` | `HolonicComplexRefusal`; malformed, overflow | kept (nests the receiver-phase standing, which carries the occurrence set) |
+| `sheaf_diffusion` | `SheafDiffusionRefusal`; none | kept (`schema, content`) |
+
+[established-bounded; source-inspected, implemented-exact] **Retention.** Every archive below was
+written by the law and read, if at all, only as a statistic; the standing now keeps the statistic.
+
+| Archive | Read by the law's future? | Kept instead | Old rest |
+|---|---|---|---|
+| `bit_causal` `history: Vec<BitCausalHistoryEntry>` | certificate `testimony_events`; inspection `standing_history_events` (= admitted count); validation replay | `testimony_events: BTreeSet<EventId>`; the compatible family is the testimony's fibre; `validate` re-derives the query from the family and checks `used = testimony + widths − 1` | decodes; archive reduced to its testimony events (`BitCausalHistoryEntry` kept as the read record) |
+| `causal_state_grammar` `history` | certificate `predictions_graded` (count of emitted predictions) | `emanated_predictions: u64` | decodes; archive reduced to the prediction count |
+| `organizational_grammar` `history` | certificate `source_testimony_events` = every admitted observation | nothing new (= `used_events`) | decodes; dropped |
+| `generative_transport` `history` | certificate `testimony_events`; `AwaitingInitialOperator` emptiness; validation replay | `used_events ∪ {event}`; the parameter family is the returned coordinates' fibre | decodes; dropped |
+| `inverse_transport` `history` | certificate `testimony_events`; complete-operator count (= certificate present); validation replay | `used_events ∪ {event}`; the affine version fibre is the testimony's sufficient statistic | decodes; dropped |
+| `wave_propagation` `history` | no | nothing | decodes; dropped |
+| `wave_propagation` `pending: PendingWavePrediction { generation (frozen mode predictions), source }` | yes: the return grades the prediction | the producing operands `{interaction, source}`; the return regenerates the prediction through the contemporary modes (retention law: a delayed comparison is read through the contemporary constitution) | decodes (untagged read: the frozen record's interaction is kept, its predictions dropped) |
+| `divisor_reconstruction` `history: Vec<DivisorContactTestimony>` | grade `explicit_contact_returns` and the explicit-section set; validation replay | the response maps (`pair_responses`, `higher_responses`) are the sufficient statistic; `validate` replays the founding answering each production query from them (the responses are an oracle) | decodes; dropped |
+| `causal_traversal` `pending` frontier | yes (scheduled fronts) | kept: a work schedule, not an archive | unchanged |
+
+Semantic change, stated: a wave prediction returned after an intervening `Condition` on the same
+interaction is now graded by the contemporary modes, not the modes at generation. No existing
+caller does this (unit tests, `speech_room_information_flow` and
+`receiver_emission_information_flow` all return with no intervening conditioning), and
+`a_retired_frozen_pending_record_decodes_to_its_operands_and_grades_unchanged` checks the graded
+residuals equal the generation receipt's predictions when none intervenes. The testimony audit is
+the radiation of each event (`received_testimony`, `received_exhaustive_testimony`,
+`emitted_prediction`, `WaveGenerationReceipt`); the `causal_state_grammar_experiment` trace is now
+written from the events and their radiation.
+
+Retired public types (8): `OrganizationalGrammarHistoryEntry`, `GenerativeTransportHistoryEntry`,
+`ParametricCompleteOperatorTestimony`, `ParametricTransportTestimony`, `CompleteOperatorRole`,
+`InverseTransportHistoryEntry`, `WavePropagationHistoryEntry`, `WaveGenerationRecord`. Retired
+accessors: `history()` (7 standings), `BitCausalStanding::{testimonies, exhaustive_testimonies}`
+(the testimony is in the radiation). New accessors: `BitCausalStanding::testimony_events`,
+`CausalStateGrammarStanding::emanated_predictions`,
+`DivisorReconstructionStanding::explicit_contact_returns`, `EventStanding::{used_events, quotient}`.
+Before/after over the 26 modules: 761 → 753 public structs/enums (26 error enums became their law's
+refusal kinds; 19 standing structs became quotient structs), 2 → 47 aliases (26 `XError`, 19
+`XStanding`), 57,977 → 61,777 lines (the explicit `XError::Law(XRefusal::…)` sites after rustfmt,
+the wire records and the equality tests); plus `world/scaffold.rs` (294 lines).
+
+Equality evidence: engine lib tests of the 26 modules, `world` (incl. scaffold) and the five
+consumer modules (338 pass; the CUDA `observation_ecology` card test passes on the device); new tests
+`a_retired_history_rest_decodes_to_the_quotient_and_its_future_is_unchanged` (bit),
+`the_emitted_prediction_count_is_the_archive_statistic_and_old_rests_decode` (causal state),
+`a_retired_history_rest_decodes_and_its_certificate_is_unchanged` (organizational),
+`a_retired_testimony_archive_decodes_and_the_certificate_is_unchanged` (generative),
+`a_retired_testimony_archive_decodes_and_the_future_is_unchanged` (inverse),
+`a_retired_frozen_pending_record_decodes_to_its_operands_and_grades_unchanged` (wave),
+`a_retired_testimony_archive_decodes_and_the_responses_replay_the_quotient` (divisor),
+`the_world_is_a_core_point_whose_commit_counts_committed_events` (world); and a cross-tree dump
+(`.local/p16/`): the `bit_black_box_reconstruction`, `inverse_transport_reconstruction`,
+`generative_transport_prediction`, `causal_state_grammar_experiment` and
+`divisor_receiver_reconstruction` drivers run on the base tree `4dff57c8` and on this change at
+`5b7c89ab`: every transition receipt (1,454 across the five) and, for all but the causal-state
+driver, the digest of every successor standing (archives and the two new statistics removed)
+byte-equal event by event, stdout equal; the repository `causal_state_grammar_experiment` trace,
+now written from each event and its radiation, is byte-equal to the base trace written from the
+retired archive (1,013 rows).
+
+Owed: `ExactEventLaw` itself still returns the law's standing type rather than a `HolonLaw`
+advance (no energy balance is declared for the event laws); the kept standings without an
+occurrence set (`arithmetic_phase`, `local_star`, `physical`, `simplicial`, `algebraic`,
+`holonic_complex`, `sheaf_diffusion`) and the one `HolonRest` codec named in the programme table.

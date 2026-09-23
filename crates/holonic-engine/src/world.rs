@@ -1,11 +1,35 @@
 //! Atomic causal succession for an exact world law.
+//!
+//! [definition] **The event chart of motion** (plan phase 16,
+//! `docs/plans/THE_HOLON_CORE_FOUNDS_THE_NATIVE_MACHINERY.md`). An [`ExactEventLaw`] is the
+//! Holon's motion charted by discrete occurrences: its standing is the configuration of a core
+//! [`HolonState`], and the world's commit counts the events committed to it
+//! ([`CausalWorld::state`]). An event is the effort a receiver supplies at the Holon's external
+//! ports; the radiation of a successor is the flow the Holon returns at those ports. Every law's
+//! refusals are one family [`EventRefusal<K>`]: the refusals every law shares (a repeated
+//! occurrence, a malformed standing, a law/standing mismatch, a carrier overflow) and the law's
+//! own kinds `K`. [`EventStanding<S>`] is the standing shape the laws repeat: a schema, the
+//! admitted occurrences and the law's own quotient `S`.
+//!
+//! [definition] Retention law (`Foundation/Standing.lean::StandingLaw`,
+//! `Foundation/Standing.lean::standingLaw_exists_iff_future_factors`): a standing retains only
+//! what the law's future reads. An audit of the admitted testimony is returned per event in the
+//! radiation and is not kept in the standing; a history-free standing reached by two histories is
+//! one standing (`Foundation/Standing.lean::two_histories_leave_one_standing`).
 
 use std::fmt;
 
 use holonic_structure::CausalMembrane;
 use serde::{Deserialize, Serialize};
 
+pub use holonic_core::holon::HolonState;
+
 use crate::{LogicalResourceReceipt, PhysicalResourceReceipt};
+
+mod scaffold;
+
+pub use scaffold::{AdmittedEvents, EventQuotient, EventRefusal, EventStanding, RefusalKind};
+pub(crate) use scaffold::{event_refusal_from, event_standing_wire};
 
 pub trait ExactEventLaw {
     type Standing: Clone + PartialEq + Eq;
@@ -23,12 +47,21 @@ pub trait ExactEventLaw {
     ) -> Result<EventSuccessor<Self::Standing, Self::Radiation>, Self::Error>;
 }
 
+/// A complete successor: the next configuration and the flow the event returns at the Holon's
+/// external ports (`radiation`).
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct EventSuccessor<S, R> {
     pub standing_after: S,
     pub radiation: Vec<R>,
     pub logical_resources: Option<LogicalResourceReceipt>,
     pub physical_resources: Option<PhysicalResourceReceipt>,
+}
+
+impl<S, R> EventSuccessor<S, R> {
+    /// The external-port flow of this successor.
+    pub fn port_flow(&self) -> &[R] {
+        &self.radiation
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -83,28 +116,33 @@ impl fmt::Display for CausalWorldRestError {
 
 impl std::error::Error for CausalWorldRestError {}
 
+/// A law and its current point: the standing is the configuration of a core [`HolonState`] whose
+/// commit is the number of events committed; the next transition ordinal is `commit + 1`.
 #[derive(Clone, Debug)]
 pub struct CausalWorld<L: ExactEventLaw> {
     law: L,
-    standing: L::Standing,
-    next_ordinal: u64,
+    state: HolonState<L::Standing>,
 }
 
 impl<L: ExactEventLaw> CausalWorld<L> {
     pub fn new(law: L, standing: L::Standing) -> Self {
         Self {
             law,
-            standing,
-            next_ordinal: 1,
+            state: HolonState::at(standing, 0),
         }
     }
 
     pub fn standing(&self) -> &L::Standing {
-        &self.standing
+        &self.state.configuration
     }
 
-    pub const fn next_ordinal(&self) -> u64 {
-        self.next_ordinal
+    /// The current point on the Holon: the standing and the committed-event count.
+    pub fn state(&self) -> &HolonState<L::Standing> {
+        &self.state
+    }
+
+    pub fn next_ordinal(&self) -> u64 {
+        self.state.commit + 1
     }
 
     /// Remount a separately persisted typed standing and its exact transition horizon.
@@ -120,11 +158,15 @@ impl<L: ExactEventLaw> CausalWorld<L> {
         if next_ordinal == 0 {
             return Err(CausalWorldRestError::ZeroNextOrdinal);
         }
-        Ok(Self {
+        Ok(Self::from_state(
             law,
-            standing,
-            next_ordinal,
-        })
+            HolonState::at(standing, next_ordinal - 1),
+        ))
+    }
+
+    /// Remount a world at a core point: its standing and committed-event count.
+    pub fn from_state(law: L, state: HolonState<L::Standing>) -> Self {
+        Self { law, state }
     }
 
     /// Borrow the exact transition law which owns this world's succession.
@@ -139,10 +181,9 @@ impl<L: ExactEventLaw> CausalWorld<L> {
         &mut self,
         event: &L::Event,
     ) -> Result<TransitionReceipt<L::Radiation>, L::Error> {
-        let successor = self.law.enact(&self.standing, event)?;
-        self.standing = successor.standing_after;
-        let ordinal = self.next_ordinal;
-        self.next_ordinal += 1;
+        let successor = self.law.enact(&self.state.configuration, event)?;
+        let ordinal = self.next_ordinal();
+        self.state = HolonState::at(successor.standing_after, ordinal);
         Ok(TransitionReceipt {
             schema: "holonic-engine.transition-receipt.v1".to_owned(),
             ordinal,
@@ -168,17 +209,21 @@ impl<L: ExactEventLaw> CausalWorld<L> {
         ) -> Result<X, CrossError>,
     ) -> Result<(TransitionReceipt<L::Radiation>, X), ThroughTransitionError<L::Error, CrossError>>
     {
-        let ordinal = self.next_ordinal;
-        let next_ordinal = ordinal
+        let ordinal = self
+            .state
+            .commit
+            .checked_add(1)
+            .ok_or(ThroughTransitionError::OrdinalExtent)?;
+        ordinal
             .checked_add(1)
             .ok_or(ThroughTransitionError::OrdinalExtent)?;
         let successor = self
             .law
-            .enact(&self.standing, event)
+            .enact(&self.state.configuration, event)
             .map_err(ThroughTransitionError::Law)?;
-        let crossed = cross(&self.standing, &successor).map_err(ThroughTransitionError::Cross)?;
-        self.standing = successor.standing_after;
-        self.next_ordinal = next_ordinal;
+        let crossed =
+            cross(&self.state.configuration, &successor).map_err(ThroughTransitionError::Cross)?;
+        self.state = HolonState::at(successor.standing_after, ordinal);
         Ok((
             TransitionReceipt {
                 schema: "holonic-engine.transition-receipt.v1".to_owned(),
@@ -270,6 +315,21 @@ mod tests {
         assert_eq!(refusal, Err(ThroughTransitionError::Cross("cross refused")));
         assert_eq!(*world.standing(), 3);
         assert_eq!(world.receive(&1).unwrap().ordinal, 1);
+    }
+
+    #[test]
+    fn the_world_is_a_core_point_whose_commit_counts_committed_events() {
+        let mut world = CausalWorld::new(AddUnlessNegative, 3);
+        assert_eq!(world.state(), &HolonState::at(3, 0));
+        let receipt = world.receive(&4).unwrap();
+        assert_eq!(receipt.ordinal, 1);
+        assert_eq!(world.state(), &HolonState::at(7, 1));
+        assert!(world.receive(&-1).is_err());
+        assert_eq!(world.state().commit, 1);
+        let remounted = CausalWorld::from_state(AddUnlessNegative, world.state().clone());
+        assert_eq!(remounted.next_ordinal(), 2);
+        let successor = AddUnlessNegative.enact(&7, &1).unwrap();
+        assert_eq!(successor.port_flow(), &[1]);
     }
 
     #[test]

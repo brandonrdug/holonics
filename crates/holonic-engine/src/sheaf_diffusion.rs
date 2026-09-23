@@ -41,6 +41,7 @@ use thiserror::Error;
 
 use crate::diffusion::DiffusionEnergyBalance;
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
+use crate::world::{EventRefusal, RefusalKind, event_refusal_from};
 use crate::{
     CausalAlgebraicError, CausalCellId, EventSuccessor, ExactEventLaw, GradedCausalComplex,
 };
@@ -84,27 +85,33 @@ impl SheafLinearMap for ExactRatMatrix {
         entries: Vec<Vec<Rat>>,
     ) -> Result<Self, SheafDiffusionError> {
         if entries.len() != rows || entries.iter().any(|row| row.len() != columns) {
-            return Err(SheafDiffusionError::MalformedLinearMap {
-                expected_rows: rows,
-                expected_columns: columns,
-            });
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::MalformedLinearMap {
+                    expected_rows: rows,
+                    expected_columns: columns,
+                },
+            ));
         }
         Ok(ExactRatMatrix::shaped(rows, columns, entries)?)
     }
 
     fn then(&self, next: &Self) -> Result<Self, SheafDiffusionError> {
         if self.rows() != next.columns() {
-            return Err(SheafDiffusionError::LinearCompositionDimension {
-                first_rows: self.rows(),
-                next_columns: next.columns(),
-            });
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::LinearCompositionDimension {
+                    first_rows: self.rows(),
+                    next_columns: next.columns(),
+                },
+            ));
         }
         Ok(next.multiply(self)?)
     }
 
     fn plus(&self, other: &Self) -> Result<Self, SheafDiffusionError> {
         if self.rows() != other.rows() || self.columns() != other.columns() {
-            return Err(SheafDiffusionError::LinearAdditionDimension);
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::LinearAdditionDimension,
+            ));
         }
         Ok(self.add(other)?)
     }
@@ -238,10 +245,12 @@ impl ExactCellularSheaf {
         for restriction in restrictions {
             let key = (restriction.lower, restriction.upper);
             if indexed.insert(key, restriction.map).is_some() {
-                return Err(SheafDiffusionError::DuplicateRestriction {
-                    lower: key.0,
-                    upper: key.1,
-                });
+                return Err(SheafDiffusionError::Law(
+                    SheafDiffusionRefusal::DuplicateRestriction {
+                        lower: key.0,
+                        upper: key.1,
+                    },
+                ));
             }
         }
         let sheaf = Self {
@@ -266,7 +275,9 @@ impl ExactCellularSheaf {
         self.stalk_dimensions
             .get(&cell)
             .copied()
-            .ok_or(SheafDiffusionError::MissingStalk(cell))
+            .ok_or(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::MissingStalk(cell),
+            ))
     }
 
     pub fn restrictions(&self) -> &BTreeMap<(CausalCellId, CausalCellId), ExactRatMatrix> {
@@ -280,7 +291,9 @@ impl ExactCellularSheaf {
     ) -> Result<&ExactRatMatrix, SheafDiffusionError> {
         self.restrictions
             .get(&(lower, upper))
-            .ok_or(SheafDiffusionError::MissingRestriction { lower, upper })
+            .ok_or(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::MissingRestriction { lower, upper },
+            ))
     }
 
     pub fn coordinates(&self, grade: u32) -> Vec<SheafCoordinate> {
@@ -359,10 +372,14 @@ impl ExactCellularSheaf {
             .copied()
             .collect::<BTreeSet<_>>();
         if let Some(cell) = cells.difference(&stalks).next() {
-            return Err(SheafDiffusionError::MissingStalk(*cell));
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::MissingStalk(*cell),
+            ));
         }
         if let Some(cell) = stalks.difference(&cells).next() {
-            return Err(SheafDiffusionError::UnknownStalk(*cell));
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::UnknownStalk(*cell),
+            ));
         }
 
         let mut expected = BTreeSet::new();
@@ -373,29 +390,35 @@ impl ExactCellularSheaf {
         }
         let supplied = self.restrictions.keys().copied().collect::<BTreeSet<_>>();
         if let Some((lower, upper)) = expected.difference(&supplied).next() {
-            return Err(SheafDiffusionError::MissingRestriction {
-                lower: *lower,
-                upper: *upper,
-            });
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::MissingRestriction {
+                    lower: *lower,
+                    upper: *upper,
+                },
+            ));
         }
         if let Some((lower, upper)) = supplied.difference(&expected).next() {
-            return Err(SheafDiffusionError::NonincidentRestriction {
-                lower: *lower,
-                upper: *upper,
-            });
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::NonincidentRestriction {
+                    lower: *lower,
+                    upper: *upper,
+                },
+            ));
         }
         for ((lower, upper), map) in &self.restrictions {
             let expected_rows = self.stalk_dimensions[upper];
             let expected_columns = self.stalk_dimensions[lower];
             if map.rows() != expected_rows || map.columns() != expected_columns {
-                return Err(SheafDiffusionError::RestrictionDimension {
-                    lower: *lower,
-                    upper: *upper,
-                    expected_rows,
-                    expected_columns,
-                    supplied_rows: map.rows(),
-                    supplied_columns: map.columns(),
-                });
+                return Err(SheafDiffusionError::Law(
+                    SheafDiffusionRefusal::RestrictionDimension {
+                        lower: *lower,
+                        upper: *upper,
+                        expected_rows,
+                        expected_columns,
+                        supplied_rows: map.rows(),
+                        supplied_columns: map.columns(),
+                    },
+                ));
             }
         }
 
@@ -406,7 +429,9 @@ impl ExactCellularSheaf {
                 let second = self.coboundary(grade.saturating_add(1))?;
                 let squared = first.then(&second)?;
                 if squared.entries().iter().any(|value| !value.is_zero()) {
-                    return Err(SheafDiffusionError::CoboundarySquaredNonzero { grade });
+                    return Err(SheafDiffusionError::Law(
+                        SheafDiffusionRefusal::CoboundarySquaredNonzero { grade },
+                    ));
                 }
             }
         }
@@ -439,10 +464,12 @@ impl ExactCellularSheaf {
                     let candidate = inherited.then(self.restriction(lower, *upper)?)?;
                     if let Some(existing) = composites.get(upper) {
                         if existing != &candidate {
-                            return Err(SheafDiffusionError::PathDependentRestriction {
-                                origin: source,
-                                target: *upper,
-                            });
+                            return Err(SheafDiffusionError::Law(
+                                SheafDiffusionRefusal::PathDependentRestriction {
+                                    origin: source,
+                                    target: *upper,
+                                },
+                            ));
                         }
                     } else {
                         composites.insert(*upper, candidate);
@@ -514,22 +541,28 @@ impl ExactSheafCochain {
             .collect::<BTreeSet<_>>();
         let supplied = self.values.keys().copied().collect::<BTreeSet<_>>();
         if let Some(cell) = expected.difference(&supplied).next() {
-            return Err(SheafDiffusionError::MissingCochainCell(*cell));
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::MissingCochainCell(*cell),
+            ));
         }
         if let Some(cell) = supplied.difference(&expected).next() {
-            return Err(SheafDiffusionError::WrongGradeCochainCell {
-                cell: *cell,
-                grade: self.grade,
-            });
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::WrongGradeCochainCell {
+                    cell: *cell,
+                    grade: self.grade,
+                },
+            ));
         }
         for (cell, values) in &self.values {
             let expected = sheaf.stalk_dimensions[cell];
             if values.len() != expected {
-                return Err(SheafDiffusionError::CochainDimension {
-                    cell: *cell,
-                    expected,
-                    supplied: values.len(),
-                });
+                return Err(SheafDiffusionError::Law(
+                    SheafDiffusionRefusal::CochainDimension {
+                        cell: *cell,
+                        expected,
+                        supplied: values.len(),
+                    },
+                ));
             }
         }
         Ok(())
@@ -551,10 +584,12 @@ impl ExactSheafCochain {
     ) -> Result<Self, SheafDiffusionError> {
         let coordinates = sheaf.coordinates(grade);
         if values.len() != coordinates.len() {
-            return Err(SheafDiffusionError::FlatCochainDimension {
-                expected: coordinates.len(),
-                supplied: values.len(),
-            });
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::FlatCochainDimension {
+                    expected: coordinates.len(),
+                    supplied: values.len(),
+                },
+            ));
         }
         let mut by_cell = sheaf
             .complex
@@ -671,10 +706,12 @@ impl ExactSheafDiffusionLaw {
         content: ExactSheafCochain,
     ) -> Result<SheafDiffusionStanding, SheafDiffusionError> {
         if content.grade != self.grade {
-            return Err(SheafDiffusionError::LawGradeMismatch {
-                expected: self.grade,
-                supplied: content.grade,
-            });
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::LawGradeMismatch {
+                    expected: self.grade,
+                    supplied: content.grade,
+                },
+            ));
         }
         content.validate(&self.sheaf)?;
         Ok(SheafDiffusionStanding {
@@ -689,13 +726,17 @@ impl ExactSheafDiffusionLaw {
         event: &SheafDiffusionEvent,
     ) -> Result<(SheafDiffusionStanding, SheafDiffusionReceipt), SheafDiffusionError> {
         if !event.interval.is_positive() {
-            return Err(SheafDiffusionError::NonpositiveInterval);
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::NonpositiveInterval,
+            ));
         }
         if standing.content.grade != self.grade {
-            return Err(SheafDiffusionError::LawGradeMismatch {
-                expected: self.grade,
-                supplied: standing.content.grade,
-            });
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::LawGradeMismatch {
+                    expected: self.grade,
+                    supplied: standing.content.grade,
+                },
+            ));
         }
         standing.content.validate(&self.sheaf)?;
         let source = self.validate_and_flatten_source(&event.source)?;
@@ -716,7 +757,9 @@ impl ExactSheafDiffusionLaw {
         let potential_after = certificate.inverse.apply(&right)?;
         let operator_check = certificate.operator.apply(&potential_after)?;
         if operator_check != right {
-            return Err(SheafDiffusionError::SolveResidualNonzero);
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::SolveResidualNonzero,
+            ));
         }
         let content_after = potential_after
             .iter()
@@ -735,7 +778,9 @@ impl ExactSheafDiffusionLaw {
             })
             .collect::<Vec<_>>();
         if balance.iter().any(|value| !value.is_zero()) {
-            return Err(SheafDiffusionError::BalanceResidualNonzero);
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::BalanceResidualNonzero,
+            ));
         }
 
         let compatibility_before = certificate.coboundary_above.apply(&potential_before)?;
@@ -744,7 +789,9 @@ impl ExactSheafDiffusionLaw {
         let stored_energy_after = diagonal_energy(&potential_after, &capacities);
         let energy_departed = &stored_energy_before - &stored_energy_after;
         if source.iter().all(Zero::is_zero) && energy_departed.is_negative() {
-            return Err(SheafDiffusionError::EnergyIncreased);
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::EnergyIncreased,
+            ));
         }
         let compatibility_energy_before = euclidean_energy(&compatibility_before);
         let compatibility_energy_after = euclidean_energy(&compatibility_after);
@@ -788,7 +835,9 @@ impl ExactSheafDiffusionLaw {
         };
         let energy = self.energy_balance(&receipt, event)?;
         if !energy.exact_residual.is_zero() {
-            return Err(SheafDiffusionError::SolveResidualNonzero);
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::SolveResidualNonzero,
+            ));
         }
         Ok((standing_after, receipt))
     }
@@ -805,24 +854,32 @@ impl ExactSheafDiffusionLaw {
         event: &SheafDiffusionEvent,
     ) -> Result<DiffusionEnergyBalance, SheafDiffusionError> {
         if !event.interval.is_positive() || !receipt.interval.is_positive() {
-            return Err(SheafDiffusionError::NonpositiveInterval);
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::NonpositiveInterval,
+            ));
         }
         if event.interval != receipt.interval {
-            return Err(SheafDiffusionError::SolveResidualNonzero);
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::SolveResidualNonzero,
+            ));
         }
         for potential in [&receipt.potential_before, &receipt.potential_after] {
             if potential.grade != self.grade {
-                return Err(SheafDiffusionError::LawGradeMismatch {
-                    expected: self.grade,
-                    supplied: potential.grade,
-                });
+                return Err(SheafDiffusionError::Law(
+                    SheafDiffusionRefusal::LawGradeMismatch {
+                        expected: self.grade,
+                        supplied: potential.grade,
+                    },
+                ));
             }
         }
         // Equal dimensions do not identify a sheaf's restriction maps or Hodge action.
         // Reuse this law's cached certificate to bind the receiving calculation to its source.
         let (expected, _) = self.certificate(&event.interval)?;
         if receipt.certificate != expected {
-            return Err(SheafDiffusionError::TransferCertificateFailure);
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::TransferCertificateFailure,
+            ));
         }
         let source = self.validate_and_flatten_source(&event.source)?;
         let before = receipt.potential_before.flattened(&self.sheaf)?;
@@ -872,21 +929,27 @@ impl ExactSheafDiffusionLaw {
                 .complex
                 .cells()
                 .get(cell)
-                .ok_or(SheafDiffusionError::UnknownSourceCell(*cell))?;
+                .ok_or(SheafDiffusionError::Law(
+                    SheafDiffusionRefusal::UnknownSourceCell(*cell),
+                ))?;
             if body.grade != self.grade {
-                return Err(SheafDiffusionError::WrongGradeSourceCell {
-                    cell: *cell,
-                    expected: self.grade,
-                    supplied: body.grade,
-                });
+                return Err(SheafDiffusionError::Law(
+                    SheafDiffusionRefusal::WrongGradeSourceCell {
+                        cell: *cell,
+                        expected: self.grade,
+                        supplied: body.grade,
+                    },
+                ));
             }
             let expected = self.sheaf.stalk_dimensions[cell];
             if values.len() != expected {
-                return Err(SheafDiffusionError::SourceDimension {
-                    cell: *cell,
-                    expected,
-                    supplied: values.len(),
-                });
+                return Err(SheafDiffusionError::Law(
+                    SheafDiffusionRefusal::SourceDimension {
+                        cell: *cell,
+                        expected,
+                        supplied: values.len(),
+                    },
+                ));
             }
         }
         Ok(self
@@ -908,7 +971,7 @@ impl ExactSheafDiffusionLaw {
         if let Some(certificate) = self
             .atlas
             .read()
-            .map_err(|_| SheafDiffusionError::TransferAtlasPoisoned)?
+            .map_err(|_| SheafDiffusionError::Law(SheafDiffusionRefusal::TransferAtlasPoisoned))?
             .get(interval)
             .cloned()
         {
@@ -918,7 +981,7 @@ impl ExactSheafDiffusionLaw {
         let mut atlas = self
             .atlas
             .write()
-            .map_err(|_| SheafDiffusionError::TransferAtlasPoisoned)?;
+            .map_err(|_| SheafDiffusionError::Law(SheafDiffusionRefusal::TransferAtlasPoisoned))?;
         if let Some(certificate) = atlas.get(interval) {
             return Ok((certificate.clone(), true));
         }
@@ -957,7 +1020,9 @@ impl ExactSheafDiffusionLaw {
             .iter()
             .any(|value| !value.is_zero())
         {
-            return Err(SheafDiffusionError::TransferCertificateFailure);
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::TransferCertificateFailure,
+            ));
         }
         let harmonic_dimension = coordinates.len() - exact_rank(hodge_laplacian.to_rows());
         Ok(SheafDiffusionCertificate {
@@ -1011,22 +1076,30 @@ fn validate_capacities(
         .collect::<BTreeSet<_>>();
     let supplied = capacities.keys().copied().collect::<BTreeSet<_>>();
     if let Some(cell) = expected.difference(&supplied).next() {
-        return Err(SheafDiffusionError::MissingCapacity(*cell));
+        return Err(SheafDiffusionError::Law(
+            SheafDiffusionRefusal::MissingCapacity(*cell),
+        ));
     }
     if let Some(cell) = supplied.difference(&expected).next() {
-        return Err(SheafDiffusionError::WrongGradeCapacity { cell: *cell, grade });
+        return Err(SheafDiffusionError::Law(
+            SheafDiffusionRefusal::WrongGradeCapacity { cell: *cell, grade },
+        ));
     }
     for (cell, values) in capacities {
         let expected = sheaf.stalk_dimensions[cell];
         if values.len() != expected {
-            return Err(SheafDiffusionError::CapacityDimension {
-                cell: *cell,
-                expected,
-                supplied: values.len(),
-            });
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::CapacityDimension {
+                    cell: *cell,
+                    expected,
+                    supplied: values.len(),
+                },
+            ));
         }
         if values.iter().any(|value| !value.is_positive()) {
-            return Err(SheafDiffusionError::NonpositiveCapacity(*cell));
+            return Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::NonpositiveCapacity(*cell),
+            ));
         }
     }
     Ok(())
@@ -1041,17 +1114,21 @@ fn scaled_identity(extent: usize, scale: Rat) -> Result<ExactRatMatrix, SheafDif
 impl From<ExactLinearError> for SheafDiffusionError {
     fn from(error: ExactLinearError) -> Self {
         match error {
-            ExactLinearError::SingularMatrix => SheafDiffusionError::SingularLaw,
+            ExactLinearError::SingularMatrix => {
+                SheafDiffusionError::Law(SheafDiffusionRefusal::SingularLaw)
+            }
             ExactLinearError::InverseCertificateFailure
             | ExactLinearError::RankFactorizationCertificateFailure => {
-                SheafDiffusionError::TransferCertificateFailure
+                SheafDiffusionError::Law(SheafDiffusionRefusal::TransferCertificateFailure)
             }
             ExactLinearError::RaggedMatrix
             | ExactLinearError::NonsquareMatrix
             | ExactLinearError::AddressOutside
             | ExactLinearError::ExtentOverflow
             | ExactLinearError::ShapeMismatch
-            | ExactLinearError::DifferentProductCores => SheafDiffusionError::NonsquareOperator,
+            | ExactLinearError::DifferentProductCores => {
+                SheafDiffusionError::Law(SheafDiffusionRefusal::NonsquareOperator)
+            }
         }
     }
 }
@@ -1112,7 +1189,7 @@ fn euclidean_energy(values: &[Rat]) -> Rat {
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum SheafDiffusionError {
+pub enum SheafDiffusionRefusal {
     #[error(
         "linear map entries do not have the declared {expected_rows} by {expected_columns} shape"
     )]
@@ -1233,6 +1310,15 @@ pub enum SheafDiffusionError {
     Holon(Box<holonic_core::holon::HolonError>),
 }
 
+impl RefusalKind for SheafDiffusionRefusal {
+    const LAW: &'static str = "sheaf-diffusion";
+}
+
+/// The sheaf-diffusion law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type SheafDiffusionError = EventRefusal<SheafDiffusionRefusal>;
+
+event_refusal_from!(SheafDiffusionRefusal: CausalAlgebraicError);
+
 #[cfg(test)]
 mod tests {
     use std::collections::BTreeSet;
@@ -1322,12 +1408,14 @@ mod tests {
         assert_eq!(after.content.values[&right], vec![integer(1) / integer(3)]);
         assert_eq!(receipt.compatibility_after.values.len(), 1);
         assert_eq!(receipt.certificate.harmonic_dimension, 1);
-        assert!(receipt
-            .balance_residual
-            .values
-            .values()
-            .flatten()
-            .all(Zero::is_zero));
+        assert!(
+            receipt
+                .balance_residual
+                .values
+                .values()
+                .flatten()
+                .all(Zero::is_zero)
+        );
         let energy = law
             .energy_balance(
                 &receipt,
@@ -1469,7 +1557,9 @@ mod tests {
             ExactRatMatrix::declared(extent, extent, rows).unwrap();
         assert_eq!(
             law.energy_balance(&other_operator, &event),
-            Err(SheafDiffusionError::TransferCertificateFailure)
+            Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::TransferCertificateFailure
+            ))
         );
     }
 
@@ -1571,13 +1661,15 @@ mod tests {
             ]),
         )
         .unwrap();
-        assert!(sheaf
-            .coboundary(0)
-            .unwrap()
-            .apply(&compatible.flattened(&sheaf).unwrap())
-            .unwrap()
-            .iter()
-            .all(Zero::is_zero));
+        assert!(
+            sheaf
+                .coboundary(0)
+                .unwrap()
+                .apply(&compatible.flattened(&sheaf).unwrap())
+                .unwrap()
+                .iter()
+                .all(Zero::is_zero)
+        );
         let law = ExactSheafDiffusionLaw::new(
             sheaf.clone(),
             0,
@@ -1637,7 +1729,9 @@ mod tests {
         }
         assert!(matches!(
             ExactCellularSheaf::new(complex, dimensions, restrictions),
-            Err(SheafDiffusionError::PathDependentRestriction { .. })
+            Err(SheafDiffusionError::Law(
+                SheafDiffusionRefusal::PathDependentRestriction { .. }
+            ))
         ));
     }
 }

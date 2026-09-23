@@ -21,8 +21,10 @@ use num_traits::Zero;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::world::{EventQuotient, event_standing_wire};
+use crate::world::{EventRefusal, RefusalKind, event_refusal_from};
 use crate::{
-    EventId, EventSuccessor, ExactEventLaw, OrganizationalConfiguration,
+    EventId, EventStanding, EventSuccessor, ExactEventLaw, OrganizationalConfiguration,
     OrganizationalConstraintId, OrganizationalEcologySpec, OrganizationalGrammarCertificate,
     OrganizationalGrammarError, OrganizationalGrammarEvent, OrganizationalGrammarLaw,
     OrganizationalGrammarPhase, OrganizationalGrammarRadiation, OrganizationalGrammarStanding,
@@ -107,7 +109,9 @@ impl CausalStateGrammarSpec {
             || self.maximum_suffix_depth == 0
             || self.grade_depth == 0
         {
-            return Err(CausalStateGrammarError::MalformedSpec);
+            return Err(CausalStateGrammarError::Law(
+                CausalStateGrammarRefusal::MalformedSpec,
+            ));
         }
         let action_ids = self
             .actions
@@ -121,7 +125,9 @@ impl CausalStateGrammarSpec {
             .collect::<BTreeSet<_>>();
         if action_ids.len() != self.actions.len() || observable_ids.len() != self.observables.len()
         {
-            return Err(CausalStateGrammarError::MalformedSpec);
+            return Err(CausalStateGrammarError::Law(
+                CausalStateGrammarRefusal::MalformedSpec,
+            ));
         }
         self.organizational_ecology.reference_configuration()?;
         bounded_words(self)?;
@@ -211,7 +217,9 @@ impl CausalStateObservation {
             || self.values.keys().copied().collect::<BTreeSet<_>>() != spec.observable_ids()
             || !self.population.is_subset(&spec.site_ids())
         {
-            return Err(CausalStateGrammarError::MalformedObservation);
+            return Err(CausalStateGrammarError::Law(
+                CausalStateGrammarRefusal::MalformedObservation,
+            ));
         }
         Ok(())
     }
@@ -239,7 +247,9 @@ impl CausalContinuationTrace {
         spec: &CausalStateGrammarSpec,
     ) -> Result<(), CausalStateGrammarError> {
         if self.schema != CAUSAL_TRACE_SCHEMA || self.observations.len() != query.word.len() + 1 {
-            return Err(CausalStateGrammarError::MalformedTrace);
+            return Err(CausalStateGrammarError::Law(
+                CausalStateGrammarRefusal::MalformedTrace,
+            ));
         }
         for observation in &self.observations {
             observation.validate(spec)?;
@@ -317,6 +327,10 @@ impl CausalStateGrammarEvent {
     }
 }
 
+/// A retired standing record: the testimony/prediction archive old rests carried. It is read only
+/// to decode such a rest (reduced to [`CausalStateGrammarQuotient`]'s emitted-prediction count);
+/// each event's testimony is the event itself and each emitted prediction is returned in
+/// [`CausalStateGrammarRadiation::emitted_prediction`].
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum CausalStateGrammarHistoryEntry {
     SourceContinuation(CausalContinuationTestimony),
@@ -380,7 +394,9 @@ impl CausalStateModel {
         self.states
             .iter()
             .find(|state| state.id == id)
-            .ok_or(CausalStateGrammarError::UnknownLearnedState(id))
+            .ok_or(CausalStateGrammarError::Law(
+                CausalStateGrammarRefusal::UnknownLearnedState(id),
+            ))
     }
 
     pub fn transition(
@@ -392,10 +408,12 @@ impl CausalStateModel {
             .iter()
             .find(|transition| transition.source == source && transition.action == action)
             .map(|transition| transition.target)
-            .ok_or(CausalStateGrammarError::MissingLearnedTransition {
-                state: source,
-                action,
-            })
+            .ok_or(CausalStateGrammarError::Law(
+                CausalStateGrammarRefusal::MissingLearnedTransition {
+                    state: source,
+                    action,
+                },
+            ))
     }
 
     pub fn state_after(
@@ -619,9 +637,13 @@ pub enum CausalStateGrammarPhase {
     Certified,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct CausalStateGrammarStanding {
-    pub schema: String,
+/// [definition] **The causal-state quotient** (plan phase 16): the observation table, the
+/// candidate model and its pending grade, the obstructions and the per-state organizational
+/// standings. The returned testimony is the event itself and each emitted prediction is returned
+/// in the radiation; the one archive statistic the certificate reads is the number of emitted
+/// predictions (`predictions_graded`).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CausalStateGrammarQuotient {
     pub spec: CausalStateGrammarSpec,
     pub phase: CausalStateGrammarPhase,
     next_query: Option<CausalStateGrammarQuery>,
@@ -629,8 +651,7 @@ pub struct CausalStateGrammarStanding {
     suffix_basis: BTreeSet<CausalActionWord>,
     observations: BTreeMap<CausalActionWord, ObservationCell>,
     queried_words: BTreeSet<CausalActionWord>,
-    used_events: BTreeSet<EventId>,
-    history: Vec<CausalStateGrammarHistoryEntry>,
+    emanated_predictions: u64,
     model_revision: u64,
     candidate_model: Option<CausalStateModel>,
     pending_prediction: Option<CausalStatePrediction>,
@@ -643,37 +664,166 @@ pub struct CausalStateGrammarStanding {
     certificate: Option<DynamicGrammarCertificate>,
 }
 
+/// The causal-state standing: the shared event scaffold around [`CausalStateGrammarQuotient`].
+pub type CausalStateGrammarStanding = EventStanding<CausalStateGrammarQuotient>;
+
+#[derive(Serialize)]
+#[serde(rename = "CausalStateGrammarStanding")]
+struct CausalStateGrammarStandingWrite<'a> {
+    schema: &'a String,
+    spec: &'a CausalStateGrammarSpec,
+    phase: &'a CausalStateGrammarPhase,
+    next_query: &'a Option<CausalStateGrammarQuery>,
+    access_basis: &'a BTreeSet<CausalActionWord>,
+    suffix_basis: &'a BTreeSet<CausalActionWord>,
+    observations: &'a BTreeMap<CausalActionWord, ObservationCell>,
+    queried_words: &'a BTreeSet<CausalActionWord>,
+    used_events: &'a BTreeSet<EventId>,
+    emanated_predictions: &'a u64,
+    model_revision: &'a u64,
+    candidate_model: &'a Option<CausalStateModel>,
+    pending_prediction: &'a Option<CausalStatePrediction>,
+    prediction_obstructions: &'a Vec<CausalPredictionObstruction>,
+    determinism_obstruction: &'a Option<CausalDeterminismObstruction>,
+    depth_obstruction: &'a Option<CausalDepthObstruction>,
+    state_organizations: &'a BTreeMap<LearnedCausalStateId, OrganizationalGrammarStanding>,
+    latest_organizational_radiation: &'a Option<OrganizationalGrammarRadiation>,
+    obstructed_organization_state: &'a Option<LearnedCausalStateId>,
+    certificate: &'a Option<DynamicGrammarCertificate>,
+}
+
+impl<'a> From<&'a CausalStateGrammarStanding> for CausalStateGrammarStandingWrite<'a> {
+    fn from(standing: &'a CausalStateGrammarStanding) -> Self {
+        Self {
+            schema: &standing.schema,
+            spec: &standing.spec,
+            phase: &standing.phase,
+            next_query: &standing.next_query,
+            access_basis: &standing.access_basis,
+            suffix_basis: &standing.suffix_basis,
+            observations: &standing.observations,
+            queried_words: &standing.queried_words,
+            used_events: &standing.used_events,
+            emanated_predictions: &standing.emanated_predictions,
+            model_revision: &standing.model_revision,
+            candidate_model: &standing.candidate_model,
+            pending_prediction: &standing.pending_prediction,
+            prediction_obstructions: &standing.prediction_obstructions,
+            determinism_obstruction: &standing.determinism_obstruction,
+            depth_obstruction: &standing.depth_obstruction,
+            state_organizations: &standing.state_organizations,
+            latest_organizational_radiation: &standing.latest_organizational_radiation,
+            obstructed_organization_state: &standing.obstructed_organization_state,
+            certificate: &standing.certificate,
+        }
+    }
+}
+
+/// Reads the current rest and the retired one, whose `history` reduces to its prediction count.
+#[derive(Deserialize)]
+#[serde(rename = "CausalStateGrammarStanding")]
+struct CausalStateGrammarStandingRead {
+    schema: String,
+    spec: CausalStateGrammarSpec,
+    phase: CausalStateGrammarPhase,
+    next_query: Option<CausalStateGrammarQuery>,
+    access_basis: BTreeSet<CausalActionWord>,
+    suffix_basis: BTreeSet<CausalActionWord>,
+    observations: BTreeMap<CausalActionWord, ObservationCell>,
+    queried_words: BTreeSet<CausalActionWord>,
+    used_events: BTreeSet<EventId>,
+    #[serde(default)]
+    history: Vec<CausalStateGrammarHistoryEntry>,
+    #[serde(default)]
+    emanated_predictions: u64,
+    model_revision: u64,
+    candidate_model: Option<CausalStateModel>,
+    pending_prediction: Option<CausalStatePrediction>,
+    prediction_obstructions: Vec<CausalPredictionObstruction>,
+    determinism_obstruction: Option<CausalDeterminismObstruction>,
+    depth_obstruction: Option<CausalDepthObstruction>,
+    state_organizations: BTreeMap<LearnedCausalStateId, OrganizationalGrammarStanding>,
+    latest_organizational_radiation: Option<OrganizationalGrammarRadiation>,
+    obstructed_organization_state: Option<LearnedCausalStateId>,
+    certificate: Option<DynamicGrammarCertificate>,
+}
+
+impl From<CausalStateGrammarStandingRead> for CausalStateGrammarStanding {
+    fn from(read: CausalStateGrammarStandingRead) -> Self {
+        let archived = read
+            .history
+            .iter()
+            .filter(|entry| matches!(entry, CausalStateGrammarHistoryEntry::EmanatedPrediction(_)))
+            .count() as u64;
+        EventStanding::from_parts(
+            read.schema,
+            read.used_events,
+            CausalStateGrammarQuotient {
+                spec: read.spec,
+                phase: read.phase,
+                next_query: read.next_query,
+                access_basis: read.access_basis,
+                suffix_basis: read.suffix_basis,
+                observations: read.observations,
+                queried_words: read.queried_words,
+                emanated_predictions: read.emanated_predictions + archived,
+                model_revision: read.model_revision,
+                candidate_model: read.candidate_model,
+                pending_prediction: read.pending_prediction,
+                prediction_obstructions: read.prediction_obstructions,
+                determinism_obstruction: read.determinism_obstruction,
+                depth_obstruction: read.depth_obstruction,
+                state_organizations: read.state_organizations,
+                latest_organizational_radiation: read.latest_organizational_radiation,
+                obstructed_organization_state: read.obstructed_organization_state,
+                certificate: read.certificate,
+            },
+        )
+    }
+}
+
+event_standing_wire!(
+    CausalStateGrammarQuotient,
+    CausalStateGrammarStandingWrite,
+    CausalStateGrammarStandingRead
+);
+
+impl EventQuotient for CausalStateGrammarQuotient {
+    type Refusal = CausalStateGrammarRefusal;
+}
+
 impl CausalStateGrammarStanding {
     pub fn new(spec: CausalStateGrammarSpec) -> Result<Self, CausalStateGrammarError> {
         spec.validate()?;
         let empty = CausalActionWord::empty();
-        let mut standing = Self {
-            schema: CAUSAL_STATE_STANDING_SCHEMA.to_owned(),
-            spec,
-            phase: CausalStateGrammarPhase::LearningCausalQuotient,
-            next_query: Some(CausalStateGrammarQuery::Continuation(
-                CausalContinuationQuery::new(
-                    empty.clone(),
-                    CausalContinuationPurpose::CompleteObservationTable,
-                ),
-            )),
-            access_basis: BTreeSet::from([empty.clone()]),
-            suffix_basis: BTreeSet::from([empty]),
-            observations: BTreeMap::new(),
-            queried_words: BTreeSet::new(),
-            used_events: BTreeSet::new(),
-            history: Vec::new(),
-            model_revision: 0,
-            candidate_model: None,
-            pending_prediction: None,
-            prediction_obstructions: Vec::new(),
-            determinism_obstruction: None,
-            depth_obstruction: None,
-            state_organizations: BTreeMap::new(),
-            latest_organizational_radiation: None,
-            obstructed_organization_state: None,
-            certificate: None,
-        };
+        let mut standing = EventStanding::founded(
+            CAUSAL_STATE_STANDING_SCHEMA,
+            CausalStateGrammarQuotient {
+                spec,
+                phase: CausalStateGrammarPhase::LearningCausalQuotient,
+                next_query: Some(CausalStateGrammarQuery::Continuation(
+                    CausalContinuationQuery::new(
+                        empty.clone(),
+                        CausalContinuationPurpose::CompleteObservationTable,
+                    ),
+                )),
+                access_basis: BTreeSet::from([empty.clone()]),
+                suffix_basis: BTreeSet::from([empty]),
+                observations: BTreeMap::new(),
+                queried_words: BTreeSet::new(),
+                emanated_predictions: 0,
+                model_revision: 0,
+                candidate_model: None,
+                pending_prediction: None,
+                prediction_obstructions: Vec::new(),
+                determinism_obstruction: None,
+                depth_obstruction: None,
+                state_organizations: BTreeMap::new(),
+                latest_organizational_radiation: None,
+                obstructed_organization_state: None,
+                certificate: None,
+            },
+        );
         standing.validate_incremental()?;
         Ok(standing)
     }
@@ -682,8 +832,9 @@ impl CausalStateGrammarStanding {
         self.next_query.as_ref()
     }
 
-    pub fn history(&self) -> &[CausalStateGrammarHistoryEntry] {
-        &self.history
+    /// The number of predictions this standing has emitted for grading.
+    pub fn emanated_predictions(&self) -> u64 {
+        self.emanated_predictions
     }
 
     pub fn candidate_model(&self) -> Option<&CausalStateModel> {
@@ -714,9 +865,7 @@ impl CausalStateGrammarStanding {
 
     fn validate_incremental(&mut self) -> Result<(), CausalStateGrammarError> {
         self.spec.validate()?;
-        if self.schema != CAUSAL_STATE_STANDING_SCHEMA {
-            return Err(CausalStateGrammarError::MalformedStanding);
-        }
+        self.check_schema(CAUSAL_STATE_STANDING_SCHEMA)?;
         match self.phase {
             CausalStateGrammarPhase::LearningCausalQuotient => {
                 if !matches!(
@@ -825,13 +974,13 @@ impl ExactEventLaw for CausalStateGrammarLaw {
         let mut validated = standing_before.clone();
         validated.validate_incremental()?;
         let event_id = event.event();
-        if standing_before.used_events.contains(&event_id) {
-            return Err(CausalStateGrammarError::RepeatedEvent(event_id));
-        }
+        standing_before.refuse_repeated(event_id)?;
         let expected = standing_before
             .next_query
             .as_ref()
-            .ok_or(CausalStateGrammarError::ReturnNotRequested)?;
+            .ok_or(CausalStateGrammarError::Law(
+                CausalStateGrammarRefusal::ReturnNotRequested,
+            ))?;
         let mut standing_after = standing_before.clone();
         standing_after.next_query = None;
         standing_after.latest_organizational_radiation = None;
@@ -843,22 +992,21 @@ impl ExactEventLaw for CausalStateGrammarLaw {
         match event {
             CausalStateGrammarEvent::ReturnContinuation(testimony) => {
                 let CausalStateGrammarQuery::Continuation(expected_query) = expected else {
-                    return Err(CausalStateGrammarError::UnexpectedReturnSpecies);
+                    return Err(CausalStateGrammarError::Law(
+                        CausalStateGrammarRefusal::UnexpectedReturnSpecies,
+                    ));
                 };
                 if testimony.query != *expected_query {
-                    return Err(CausalStateGrammarError::UnexpectedContinuationQuery {
-                        expected: Box::new(expected_query.clone()),
-                        received: Box::new(testimony.query.clone()),
-                    });
+                    return Err(CausalStateGrammarError::Law(
+                        CausalStateGrammarRefusal::UnexpectedContinuationQuery {
+                            expected: Box::new(expected_query.clone()),
+                            received: Box::new(testimony.query.clone()),
+                        },
+                    ));
                 }
                 testimony
                     .trace
                     .validate(&testimony.query, &standing_after.spec)?;
-                standing_after
-                    .history
-                    .push(CausalStateGrammarHistoryEntry::SourceContinuation(
-                        testimony.clone(),
-                    ));
                 let deterministic = admit_trace(&mut standing_after, testimony, &mut work)?;
                 if deterministic {
                     match standing_before.phase {
@@ -874,23 +1022,31 @@ impl ExactEventLaw for CausalStateGrammarLaw {
                             }
                         }
                         _ => {
-                            return Err(CausalStateGrammarError::UnexpectedReturnSpecies);
+                            return Err(CausalStateGrammarError::Law(
+                                CausalStateGrammarRefusal::UnexpectedReturnSpecies,
+                            ));
                         }
                     }
                 }
             }
             CausalStateGrammarEvent::ReturnStateOrganization(testimony) => {
                 let CausalStateGrammarQuery::StateOrganization(expected_query) = expected else {
-                    return Err(CausalStateGrammarError::UnexpectedReturnSpecies);
+                    return Err(CausalStateGrammarError::Law(
+                        CausalStateGrammarRefusal::UnexpectedReturnSpecies,
+                    ));
                 };
                 if testimony.query != *expected_query {
-                    return Err(CausalStateGrammarError::UnexpectedStateOrganizationQuery {
-                        expected: Box::new(expected_query.clone()),
-                        received: Box::new(testimony.query.clone()),
-                    });
+                    return Err(CausalStateGrammarError::Law(
+                        CausalStateGrammarRefusal::UnexpectedStateOrganizationQuery {
+                            expected: Box::new(expected_query.clone()),
+                            received: Box::new(testimony.query.clone()),
+                        },
+                    ));
                 }
                 if standing_before.phase != CausalStateGrammarPhase::LearningStateOrganizations {
-                    return Err(CausalStateGrammarError::UnexpectedReturnSpecies);
+                    return Err(CausalStateGrammarError::Law(
+                        CausalStateGrammarRefusal::UnexpectedReturnSpecies,
+                    ));
                 }
                 testimony.access_trace.validate(
                     &CausalContinuationQuery::new(
@@ -906,16 +1062,15 @@ impl ExactEventLaw for CausalStateGrammarLaw {
                 if model.state_after(&testimony.query.access_word)? != testimony.query.state
                     || model.predict_trace(&testimony.query.access_word)? != testimony.access_trace
                 {
-                    return Err(CausalStateGrammarError::StateAccessReturnMismatch);
+                    return Err(CausalStateGrammarError::Law(
+                        CausalStateGrammarRefusal::StateAccessReturnMismatch,
+                    ));
                 }
-                standing_after.history.push(
-                    CausalStateGrammarHistoryEntry::SourceStateOrganization(testimony.clone()),
-                );
                 let organization = standing_after
                     .state_organizations
                     .get(&testimony.query.state)
-                    .ok_or(CausalStateGrammarError::UnknownLearnedState(
-                        testimony.query.state,
+                    .ok_or(CausalStateGrammarError::Law(
+                        CausalStateGrammarRefusal::UnknownLearnedState(testimony.query.state),
                     ))?;
                 let successor = OrganizationalGrammarLaw.enact(
                     organization,
@@ -980,7 +1135,9 @@ fn admit_trace(
             .trace
             .observations
             .get(ordinal)
-            .ok_or(CausalStateGrammarError::MalformedTrace)?
+            .ok_or(CausalStateGrammarError::Law(
+                CausalStateGrammarRefusal::MalformedTrace,
+            ))?
             .clone();
         if let Some(cell) = standing.observations.get_mut(&prefix) {
             if cell.observation != observation {
@@ -1032,7 +1189,9 @@ fn grade_returned_prediction(
             .iter()
             .zip(&testimony.trace.observations)
             .position(|(predicted, returned)| predicted != returned)
-            .ok_or(CausalStateGrammarError::MalformedTrace)?;
+            .ok_or(CausalStateGrammarError::Law(
+                CausalStateGrammarRefusal::MalformedTrace,
+            ))?;
         let first_differing_prefix = CausalActionWord {
             actions: testimony.query.word.actions[..first_differing_ordinal].to_vec(),
         };
@@ -1179,11 +1338,10 @@ fn advance_causal_learning(
                 query: query.clone(),
                 caused_by_events: model.testimony_events.clone(),
             };
-            standing
-                .history
-                .push(CausalStateGrammarHistoryEntry::EmanatedPrediction(
-                    prediction.clone(),
-                ));
+            standing.emanated_predictions = standing
+                .emanated_predictions
+                .checked_add(1)
+                .ok_or(CausalStateGrammarError::CarrierOverflow)?;
             standing.pending_prediction = Some(prediction);
             standing.phase = CausalStateGrammarPhase::GradingCausalPrediction;
             standing.next_query = Some(CausalStateGrammarQuery::Continuation(query));
@@ -1236,7 +1394,9 @@ fn observation_row(
         let observation = standing
             .observations
             .get(&word)
-            .ok_or(CausalStateGrammarError::IncompleteObservationTable)?
+            .ok_or(CausalStateGrammarError::Law(
+                CausalStateGrammarRefusal::IncompleteObservationTable,
+            ))?
             .observation
             .clone();
         cells.insert(suffix.clone(), observation);
@@ -1308,7 +1468,9 @@ fn first_consistency_refinement(
                         left_extension_row.cells.get(*suffix)
                             != right_extension_row.cells.get(*suffix)
                     })
-                    .ok_or(CausalStateGrammarError::MalformedObservationTable)?;
+                    .ok_or(CausalStateGrammarError::Law(
+                        CausalStateGrammarRefusal::MalformedObservationTable,
+                    ))?;
                 let mut actions = vec![action];
                 actions.extend(suffix.actions.iter().copied());
                 return Ok(Some(CausalActionWord { actions }));
@@ -1339,7 +1501,9 @@ fn build_causal_model(
         let observation = standing
             .observations
             .get(representative)
-            .ok_or(CausalStateGrammarError::IncompleteObservationTable)?
+            .ok_or(CausalStateGrammarError::Law(
+                CausalStateGrammarRefusal::IncompleteObservationTable,
+            ))?
             .observation
             .clone();
         states.push(LearnedCausalState {
@@ -1358,7 +1522,9 @@ fn build_causal_model(
     let initial_row = observation_row(standing, &CausalActionWord::empty())?;
     let initial_state = *state_for_row
         .get(&initial_row)
-        .ok_or(CausalStateGrammarError::MalformedObservationTable)?;
+        .ok_or(CausalStateGrammarError::Law(
+            CausalStateGrammarRefusal::MalformedObservationTable,
+        ))?;
     let mut transitions = Vec::new();
     for state in &states {
         for action in standing.spec.action_ids() {
@@ -1366,7 +1532,9 @@ fn build_causal_model(
             let target_row = observation_row(standing, &extension)?;
             let target = *state_for_row
                 .get(&target_row)
-                .ok_or(CausalStateGrammarError::ObservationTableNotClosed)?;
+                .ok_or(CausalStateGrammarError::Law(
+                    CausalStateGrammarRefusal::ObservationTableNotClosed,
+                ))?;
             transitions.push(CausalStateTransition {
                 source: state.id,
                 action,
@@ -1391,22 +1559,22 @@ fn build_causal_model(
             )
             .into_iter()
             .next()
-            .ok_or(CausalStateGrammarError::StatesLackSeparation)?;
+            .ok_or(CausalStateGrammarError::Law(
+                CausalStateGrammarRefusal::StatesLackSeparation,
+            ))?;
             separations.push(CausalStateSeparationWitness {
                 left: left.id,
                 right: right.id,
-                left_return: left
-                    .row
-                    .cells
-                    .get(&suffix)
-                    .cloned()
-                    .ok_or(CausalStateGrammarError::MalformedObservationTable)?,
-                right_return: right
-                    .row
-                    .cells
-                    .get(&suffix)
-                    .cloned()
-                    .ok_or(CausalStateGrammarError::MalformedObservationTable)?,
+                left_return: left.row.cells.get(&suffix).cloned().ok_or(
+                    CausalStateGrammarError::Law(
+                        CausalStateGrammarRefusal::MalformedObservationTable,
+                    ),
+                )?,
+                right_return: right.row.cells.get(&suffix).cloned().ok_or(
+                    CausalStateGrammarError::Law(
+                        CausalStateGrammarRefusal::MalformedObservationTable,
+                    ),
+                )?,
                 distinguishing_suffix: suffix,
             });
         }
@@ -1442,7 +1610,9 @@ fn actual_trace(
                 .observations
                 .get(&prefix)
                 .map(|cell| cell.observation.clone())
-                .ok_or(CausalStateGrammarError::IncompleteObservationTable)
+                .ok_or(CausalStateGrammarError::Law(
+                    CausalStateGrammarRefusal::IncompleteObservationTable,
+                ))
         })
         .collect::<Result<Vec<_>, _>>()?;
     Ok(CausalContinuationTrace::new(observations))
@@ -1503,15 +1673,19 @@ fn schedule_state_organization(
     standing: &mut CausalStateGrammarStanding,
     work: &mut CausalStateGrammarWork,
 ) -> Result<(), CausalStateGrammarError> {
+    let (used_events, standing) = standing.split_mut();
     let model = standing
         .candidate_model
         .as_ref()
         .ok_or(CausalStateGrammarError::MalformedStanding)?;
     for state in &model.states {
-        let organization = standing
-            .state_organizations
-            .get(&state.id)
-            .ok_or(CausalStateGrammarError::UnknownLearnedState(state.id))?;
+        let organization =
+            standing
+                .state_organizations
+                .get(&state.id)
+                .ok_or(CausalStateGrammarError::Law(
+                    CausalStateGrammarRefusal::UnknownLearnedState(state.id),
+                ))?;
         if organization.phase == OrganizationalGrammarPhase::TemporalObstruction {
             standing.phase = CausalStateGrammarPhase::OrganizationObstructed;
             standing.next_query = None;
@@ -1534,7 +1708,7 @@ fn schedule_state_organization(
             return Err(CausalStateGrammarError::MalformedStanding);
         }
     }
-    let certificate = compile_dynamic_certificate(standing, work)?;
+    let certificate = compile_dynamic_certificate(standing, used_events, work)?;
     standing.certificate = Some(certificate);
     standing.next_query = None;
     standing.phase = CausalStateGrammarPhase::Certified;
@@ -1542,7 +1716,8 @@ fn schedule_state_organization(
 }
 
 fn compile_dynamic_certificate(
-    standing: &CausalStateGrammarStanding,
+    standing: &CausalStateGrammarQuotient,
+    used_events: &BTreeSet<EventId>,
     work: &mut CausalStateGrammarWork,
 ) -> Result<DynamicGrammarCertificate, CausalStateGrammarError> {
     let model = standing
@@ -1556,7 +1731,9 @@ fn compile_dynamic_certificate(
             .state_organizations
             .get(&state.id)
             .and_then(OrganizationalGrammarStanding::certificate)
-            .ok_or(CausalStateGrammarError::IncompleteStateOrganization)?
+            .ok_or(CausalStateGrammarError::Law(
+                CausalStateGrammarRefusal::IncompleteStateOrganization,
+            ))?
             .clone();
         organizational_fibers.push(CausalStateOrganizationalFiber {
             state: state.id,
@@ -1691,14 +1868,7 @@ fn compile_dynamic_certificate(
         .collect();
     let graded_words = u64::try_from(bounded_words(&standing.spec)?.len())
         .map_err(|_| CausalStateGrammarError::CarrierOverflow)?;
-    let predictions_graded = u64::try_from(
-        standing
-            .history
-            .iter()
-            .filter(|entry| matches!(entry, CausalStateGrammarHistoryEntry::EmanatedPrediction(_)))
-            .count(),
-    )
-    .map_err(|_| CausalStateGrammarError::CarrierOverflow)?;
+    let predictions_graded = standing.emanated_predictions;
     Ok(DynamicGrammarCertificate {
         schema: DYNAMIC_GRAMMAR_CERTIFICATE_SCHEMA.to_owned(),
         causal_model: model,
@@ -1710,7 +1880,7 @@ fn compile_dynamic_certificate(
         transports,
         separations,
         cycles,
-        source_testimony_events: standing.used_events.clone(),
+        source_testimony_events: used_events.clone(),
         bounded_region_complete: true,
     })
 }
@@ -1798,9 +1968,11 @@ fn bounded_words(
             for action in spec.action_ids() {
                 next.push(prefix.appended(action));
                 if words.len() + next.len() > MAX_BOUNDED_WORDS {
-                    return Err(CausalStateGrammarError::BoundedLanguageExceedsCarrier {
-                        maximum: MAX_BOUNDED_WORDS,
-                    });
+                    return Err(CausalStateGrammarError::Law(
+                        CausalStateGrammarRefusal::BoundedLanguageExceedsCarrier {
+                            maximum: MAX_BOUNDED_WORDS,
+                        },
+                    ));
                 }
             }
         }
@@ -1811,11 +1983,9 @@ fn bounded_words(
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum CausalStateGrammarError {
+pub enum CausalStateGrammarRefusal {
     #[error("the causal-state grammar specification is malformed")]
     MalformedSpec,
-    #[error("the causal-state standing is malformed")]
-    MalformedStanding,
     #[error("the returned causal observation is malformed")]
     MalformedObservation,
     #[error("the returned continuation trace is malformed")]
@@ -1828,8 +1998,6 @@ pub enum CausalStateGrammarError {
     ObservationTableNotClosed,
     #[error("two learned states lack an exact distinguishing continuation")]
     StatesLackSeparation,
-    #[error("event {0:?} was already admitted")]
-    RepeatedEvent(EventId),
     #[error("no causal-state return was requested")]
     ReturnNotRequested,
     #[error("the returned event species does not match production's query")]
@@ -1857,11 +2025,18 @@ pub enum CausalStateGrammarError {
     IncompleteStateOrganization,
     #[error("the declared bounded word language exceeds the exact carrier maximum {maximum}")]
     BoundedLanguageExceedsCarrier { maximum: usize },
-    #[error("an exact carrier conversion overflowed")]
-    CarrierOverflow,
     #[error(transparent)]
     Organizational(#[from] OrganizationalGrammarError),
 }
+
+impl RefusalKind for CausalStateGrammarRefusal {
+    const LAW: &'static str = "causal-state";
+}
+
+/// The causal-state law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type CausalStateGrammarError = EventRefusal<CausalStateGrammarRefusal>;
+
+event_refusal_from!(CausalStateGrammarRefusal: OrganizationalGrammarError);
 
 #[cfg(test)]
 mod tests {
@@ -2173,9 +2348,11 @@ mod tests {
         ));
         assert!(matches!(
             result,
-            Err(CausalStateGrammarError::UnexpectedContinuationQuery { .. })
+            Err(CausalStateGrammarError::Law(
+                CausalStateGrammarRefusal::UnexpectedContinuationQuery { .. }
+            ))
         ));
-        assert!(machine.standing().history().is_empty());
+        assert!(machine.standing().used_events().is_empty());
     }
 
     #[test]
@@ -2261,6 +2438,40 @@ mod tests {
         );
         assert!(machine.standing().depth_obstruction().is_some());
         assert!(machine.standing().certificate().is_none());
+    }
+
+    /// Phase 16: the certificate's `predictions_graded` is the count of predictions the
+    /// radiation returned, and an old rest's archive decodes to that count.
+    #[test]
+    fn the_emitted_prediction_count_is_the_archive_statistic_and_old_rests_decode() {
+        let (machine, radiation) = run_hidden_charge_experiment();
+        let emitted = radiation
+            .iter()
+            .filter(|receipt| receipt.emitted_prediction.is_some())
+            .count() as u64;
+        assert_eq!(machine.standing().emanated_predictions(), emitted);
+        assert_eq!(
+            machine.standing().certificate().unwrap().predictions_graded,
+            emitted
+        );
+
+        // The observation table is keyed by action words, so the rest is RON (as the examples
+        // persist it); the retired field carried the archive where the count now stands.
+        let history = radiation
+            .iter()
+            .filter_map(|receipt| receipt.emitted_prediction.clone())
+            .map(CausalStateGrammarHistoryEntry::EmanatedPrediction)
+            .collect::<Vec<_>>();
+        let rest = ron::to_string(machine.standing()).unwrap();
+        let count = format!("emanated_predictions:{emitted},");
+        assert_eq!(rest.matches(&count).count(), 1);
+        let legacy = rest.replace(
+            &count,
+            &format!("history:{},", ron::to_string(&history).unwrap()),
+        );
+        let decoded: CausalStateGrammarStanding = ron::from_str(&legacy).unwrap();
+        assert_eq!(&decoded, machine.standing());
+        assert!(!ron::to_string(&decoded).unwrap().contains("history:"));
     }
 
     #[test]

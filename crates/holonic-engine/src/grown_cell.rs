@@ -2452,7 +2452,10 @@ mod tests {
             )
             .expect_err("a face off by one on one weight is not a cycle");
         assert!(
-            matches!(refusal, CausalAlgebraicError::BoundarySquaredNonzero(_)),
+            matches!(
+                refusal,
+                CausalAlgebraicError::Law(crate::CausalAlgebraicRefusal::BoundarySquaredNonzero(_))
+            ),
             "{refusal:?}"
         );
     }

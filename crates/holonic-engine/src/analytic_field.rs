@@ -26,6 +26,10 @@ use relational_geometry::{Rat, RatVec3, ReceiverId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::world::{
+    EventQuotient, EventRefusal, EventStanding, RefusalKind, event_refusal_from,
+    event_standing_wire,
+};
 use crate::{
     CausalChain, CausalFieldStanding, CoordinateCarrierId, CoordinateCarrierKind, CoordinateGermId,
     DimensionalAxis, DimensionalAxisId, DimensionalWaveCarrierDoctrine, DimensionalWaveError,
@@ -61,7 +65,7 @@ impl ExactUnitConicPhase {
     pub fn new(cosine: Rat, sine: Rat) -> Result<Self, AnalyticFieldError> {
         let result = Self { cosine, sine };
         if !result.is_unit() {
-            return Err(AnalyticFieldError::NonunitPhase);
+            return Err(AnalyticFieldError::Law(AnalyticFieldRefusal::NonunitPhase));
         }
         Ok(result)
     }
@@ -116,12 +120,16 @@ impl ExactAnalyticFieldJunction {
                 .germs
                 .get(&germ)
                 .map(|body| body.last_event)
-                .ok_or(AnalyticFieldError::UnknownFieldGerm(germ)),
+                .ok_or(AnalyticFieldError::Law(
+                    AnalyticFieldRefusal::UnknownFieldGerm(germ),
+                )),
             AnalyticFieldJunctionOrigin::InteractingOverlap { overlap } => field
                 .overlaps
                 .get(&overlap)
                 .map(|body| body.event)
-                .ok_or(AnalyticFieldError::UnknownFieldOverlap(overlap)),
+                .ok_or(AnalyticFieldError::Law(
+                    AnalyticFieldRefusal::UnknownFieldOverlap(overlap),
+                )),
         }
     }
 
@@ -132,10 +140,9 @@ impl ExactAnalyticFieldJunction {
         match self.origin {
             AnalyticFieldJunctionOrigin::LocalSupport { germ } => Ok(BTreeSet::from([germ])),
             AnalyticFieldJunctionOrigin::InteractingOverlap { overlap } => {
-                let overlap = field
-                    .overlaps
-                    .get(&overlap)
-                    .ok_or(AnalyticFieldError::UnknownFieldOverlap(overlap))?;
+                let overlap = field.overlaps.get(&overlap).ok_or(AnalyticFieldError::Law(
+                    AnalyticFieldRefusal::UnknownFieldOverlap(overlap),
+                ))?;
                 Ok(overlap.germs.into_iter().collect())
             }
         }
@@ -194,7 +201,9 @@ impl ExactAnalyticOrbitGeometry {
         let germ = field
             .germs
             .get(&self.germ())
-            .ok_or(AnalyticFieldError::UnknownFieldGerm(self.germ()))?;
+            .ok_or(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::UnknownFieldGerm(self.germ()),
+            ))?;
         match self {
             Self::QuadricConic {
                 center,
@@ -244,7 +253,9 @@ impl ExactAnalyticOrbitGeometry {
         let germ = field
             .germs
             .get(&self.germ())
-            .ok_or(AnalyticFieldError::UnknownFieldGerm(self.germ()))?;
+            .ok_or(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::UnknownFieldGerm(self.germ()),
+            ))?;
         match self {
             Self::QuadricConic {
                 cosine_axis,
@@ -282,9 +293,13 @@ impl ExactAnalyticOrbitGeometry {
         let germ = field
             .germs
             .get(&self.germ())
-            .ok_or(AnalyticFieldError::UnknownFieldGerm(self.germ()))?;
+            .ok_or(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::UnknownFieldGerm(self.germ()),
+            ))?;
         if !field.active_germs().contains(&self.germ()) {
-            return Err(AnalyticFieldError::InactiveFieldGerm(self.germ()));
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::InactiveFieldGerm(self.germ()),
+            ));
         }
         match self {
             Self::QuadricConic {
@@ -298,7 +313,9 @@ impl ExactAnalyticOrbitGeometry {
                     || sine_axis == &RatVec3::zero()
                     || cosine_axis.cross(sine_axis) == RatVec3::zero()
                 {
-                    return Err(AnalyticFieldError::DegenerateAnalyticOrbit);
+                    return Err(AnalyticFieldError::Law(
+                        AnalyticFieldRefusal::DegenerateAnalyticOrbit,
+                    ));
                 }
                 let gradient = quadric.gradient(center);
                 let cosine_quadratic = quadric.restrict_ray(center, cosine_axis)[2].clone();
@@ -311,14 +328,18 @@ impl ExactAnalyticOrbitGeometry {
                     || cosine_quadratic != sine_quadratic
                     || quadric.evaluate(center) != -cosine_quadratic
                 {
-                    return Err(AnalyticFieldError::OrbitLeavesSupport(self.germ()));
+                    return Err(AnalyticFieldError::Law(
+                        AnalyticFieldRefusal::OrbitLeavesSupport(self.germ()),
+                    ));
                 }
             }
             Self::TorusLongitude { frame, .. } | Self::TorusMeridian { frame, .. } => {
                 let torus = require_torus(&germ.support)?;
                 validate_torus_frame(frame, torus)?;
                 if torus.major_radius <= torus.minor_radius {
-                    return Err(AnalyticFieldError::NonregularTorusCycle(self.germ()));
+                    return Err(AnalyticFieldError::Law(
+                        AnalyticFieldRefusal::NonregularTorusCycle(self.germ()),
+                    ));
                 }
             }
         }
@@ -343,12 +364,18 @@ impl ExactAnalyticOrbitGeometry {
                 let gradient = germ
                     .support
                     .gradient(&point)
-                    .ok_or(AnalyticFieldError::UnresolvedSupport(self.germ()))?;
+                    .ok_or(AnalyticFieldError::Law(
+                        AnalyticFieldRefusal::UnresolvedSupport(self.germ()),
+                    ))?;
                 if tangent == RatVec3::zero() || !gradient.dot(&tangent).is_zero() {
-                    return Err(AnalyticFieldError::OrbitLeavesSupport(self.germ()));
+                    return Err(AnalyticFieldError::Law(
+                        AnalyticFieldRefusal::OrbitLeavesSupport(self.germ()),
+                    ));
                 }
             } else {
-                return Err(AnalyticFieldError::OrbitLeavesSupport(self.germ()));
+                return Err(AnalyticFieldError::Law(
+                    AnalyticFieldRefusal::OrbitLeavesSupport(self.germ()),
+                ));
             }
         }
         Ok(())
@@ -417,12 +444,17 @@ impl ExactAnalyticFieldWaveLaw {
         arcs: Vec<ExactAnalyticFieldArc>,
         modes: Vec<ExactAnalyticFieldMode>,
     ) -> Result<Self, AnalyticFieldError> {
-        let junctions = index_unique(junctions, |junction| junction.id)
-            .ok_or(AnalyticFieldError::DuplicateJunction)?;
-        let arcs = index_unique(arcs, |arc| arc.id).ok_or(AnalyticFieldError::DuplicateArc)?;
-        let modes = index_unique(modes, |mode| mode.id).ok_or(AnalyticFieldError::DuplicateMode)?;
+        let junctions = index_unique(junctions, |junction| junction.id).ok_or(
+            AnalyticFieldError::Law(AnalyticFieldRefusal::DuplicateJunction),
+        )?;
+        let arcs = index_unique(arcs, |arc| arc.id)
+            .ok_or(AnalyticFieldError::Law(AnalyticFieldRefusal::DuplicateArc))?;
+        let modes = index_unique(modes, |mode| mode.id)
+            .ok_or(AnalyticFieldError::Law(AnalyticFieldRefusal::DuplicateMode))?;
         if junctions.is_empty() || arcs.is_empty() || modes.is_empty() {
-            return Err(AnalyticFieldError::EmptyAnalyticWorld);
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::EmptyAnalyticWorld,
+            ));
         }
         validate_junctions(&field, &junctions)?;
         validate_modes_and_arcs(&field, &junctions, &arcs, &modes)?;
@@ -480,17 +512,20 @@ impl ExactAnalyticFieldWaveLaw {
         hand: ExactRefractionHand,
     ) -> Result<ExactAnalyticInterfaceOpticsReceipt, AnalyticFieldError> {
         if incident_arc == transmitted_arc {
-            return Err(AnalyticFieldError::MalformedInterfaceInteraction);
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::MalformedInterfaceInteraction,
+            ));
         }
         let interface = exact_interface_receipt(&self.field, overlap)?;
-        let incident = self
-            .arcs
-            .get(&incident_arc)
-            .ok_or(AnalyticFieldError::UnknownArc(incident_arc))?;
+        let incident = self.arcs.get(&incident_arc).ok_or(AnalyticFieldError::Law(
+            AnalyticFieldRefusal::UnknownArc(incident_arc),
+        ))?;
         let transmitted = self
             .arcs
             .get(&transmitted_arc)
-            .ok_or(AnalyticFieldError::UnknownArc(transmitted_arc))?;
+            .ok_or(AnalyticFieldError::Law(AnalyticFieldRefusal::UnknownArc(
+                transmitted_arc,
+            )))?;
         let incident_germ = incident.geometry.germ();
         let transmitted_germ = transmitted.geometry.germ();
         let pair = BTreeSet::from(interface.germs);
@@ -500,7 +535,9 @@ impl ExactAnalyticFieldWaveLaw {
             .find(|junction| {
                 junction.origin == AnalyticFieldJunctionOrigin::InteractingOverlap { overlap }
             })
-            .ok_or(AnalyticFieldError::MalformedInterfaceInteraction)?;
+            .ok_or(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::MalformedInterfaceInteraction,
+            ))?;
         let incident_reaches = incident.from == junction.id || incident.to == junction.id;
         let transmitted_reaches = transmitted.from == junction.id || transmitted.to == junction.id;
         if !incident_reaches
@@ -508,34 +545,45 @@ impl ExactAnalyticFieldWaveLaw {
             || incident_germ == transmitted_germ
             || pair != BTreeSet::from([incident_germ, transmitted_germ])
         {
-            return Err(AnalyticFieldError::MalformedInterfaceInteraction);
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::MalformedInterfaceInteraction,
+            ));
         }
-        let mode_body = self
-            .modes
-            .get(&mode)
-            .ok_or(AnalyticFieldError::UnknownMode(mode))?;
+        let mode_body = self.modes.get(&mode).ok_or(AnalyticFieldError::Law(
+            AnalyticFieldRefusal::UnknownMode(mode),
+        ))?;
         let incident_wave_number_square = mode_body
             .wave_number_square
             .get(&incident_germ)
             .cloned()
-            .ok_or(AnalyticFieldError::MalformedMode(mode))?;
+            .ok_or(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::MalformedMode(mode),
+            ))?;
         let transmitted_wave_number_square = mode_body
             .wave_number_square
             .get(&transmitted_germ)
             .cloned()
-            .ok_or(AnalyticFieldError::MalformedMode(mode))?;
+            .ok_or(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::MalformedMode(mode),
+            ))?;
         let incident_admittance = mode_body
             .interface_admittance
             .get(&incident_germ)
             .cloned()
-            .ok_or(AnalyticFieldError::MalformedMode(mode))?;
+            .ok_or(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::MalformedMode(mode),
+            ))?;
         let transmitted_admittance = mode_body
             .interface_admittance
             .get(&transmitted_germ)
             .cloned()
-            .ok_or(AnalyticFieldError::MalformedMode(mode))?;
+            .ok_or(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::MalformedMode(mode),
+            ))?;
         if !incident.modal_phase_step.contains_key(&mode) {
-            return Err(AnalyticFieldError::IncidentModeNotAdmitted);
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::IncidentModeNotAdmitted,
+            ));
         }
         let incident_normal = interface.gradients[if interface.germs[0] == incident_germ {
             0
@@ -554,7 +602,9 @@ impl ExactAnalyticFieldWaveLaw {
         let amplitude = match &refraction.transmitted_regime {
             ExactRefractionRegime::Propagating { .. } => {
                 if !transmitted_is_admitted {
-                    return Err(AnalyticFieldError::PropagatingModeNotAdmitted);
+                    return Err(AnalyticFieldError::Law(
+                        AnalyticFieldRefusal::PropagatingModeNotAdmitted,
+                    ));
                 }
                 ExactAnalyticInterfaceAmplitudeFiber::Traveling(
                     exact_scalar_interface_coefficients(
@@ -565,7 +615,9 @@ impl ExactAnalyticFieldWaveLaw {
             }
             ExactRefractionRegime::Grazing => {
                 if transmitted_is_admitted {
-                    return Err(AnalyticFieldError::NonpropagatingModeAdmitted);
+                    return Err(AnalyticFieldError::Law(
+                        AnalyticFieldRefusal::NonpropagatingModeAdmitted,
+                    ));
                 }
                 ExactAnalyticInterfaceAmplitudeFiber::GrazingOpen {
                     incident_admittance,
@@ -574,7 +626,9 @@ impl ExactAnalyticFieldWaveLaw {
             }
             ExactRefractionRegime::Evanescent { .. } => {
                 if transmitted_is_admitted {
-                    return Err(AnalyticFieldError::NonpropagatingModeAdmitted);
+                    return Err(AnalyticFieldError::Law(
+                        AnalyticFieldRefusal::NonpropagatingModeAdmitted,
+                    ));
                 }
                 ExactAnalyticInterfaceAmplitudeFiber::EvanescentOpen {
                     incident_admittance,
@@ -598,29 +652,35 @@ impl ExactAnalyticFieldWaveLaw {
         mode: DimensionalWaveModeId,
     ) -> Result<ExactAnalyticCycleHolonomyReceipt, AnalyticFieldError> {
         if arcs.is_empty() || !self.modes.contains_key(&mode) {
-            return Err(AnalyticFieldError::OpenAnalyticCycle);
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::OpenAnalyticCycle,
+            ));
         }
-        let bodies = arcs
-            .iter()
-            .map(|arc| {
-                self.arcs
-                    .get(arc)
-                    .ok_or(AnalyticFieldError::UnknownArc(*arc))
-            })
-            .collect::<Result<Vec<_>, _>>()?;
+        let bodies =
+            arcs.iter()
+                .map(|arc| {
+                    self.arcs.get(arc).ok_or(AnalyticFieldError::Law(
+                        AnalyticFieldRefusal::UnknownArc(*arc),
+                    ))
+                })
+                .collect::<Result<Vec<_>, _>>()?;
         if bodies
             .iter()
             .enumerate()
             .any(|(ordinal, body)| body.to != bodies[(ordinal + 1) % bodies.len()].from)
         {
-            return Err(AnalyticFieldError::OpenAnalyticCycle);
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::OpenAnalyticCycle,
+            ));
         }
         let mut phase_transport = ExactWavePhaseTransport::identity();
         for body in &bodies {
             let step = body
                 .modal_phase_step
                 .get(&mode)
-                .ok_or(AnalyticFieldError::MissingArcMode { arc: body.id, mode })?
+                .ok_or(AnalyticFieldError::Law(
+                    AnalyticFieldRefusal::MissingArcMode { arc: body.id, mode },
+                ))?
                 .pow(body.delay);
             phase_transport = phase_transport.compose(&step);
         }
@@ -662,17 +722,21 @@ impl ExactAnalyticFieldWaveLaw {
             ),
         >::new();
         for body in intrinsic {
-            let arc_id = self
-                .carrier_to_arc
-                .get(&body.carrier)
-                .copied()
-                .ok_or(AnalyticFieldError::MalformedCompiledWorld)?;
+            let arc_id =
+                self.carrier_to_arc
+                    .get(&body.carrier)
+                    .copied()
+                    .ok_or(AnalyticFieldError::Law(
+                        AnalyticFieldRefusal::MalformedCompiledWorld,
+                    ))?;
             let arc = &self.arcs[&arc_id];
-            let from_junction = self
-                .germ_to_junction
-                .get(&body.from)
-                .copied()
-                .ok_or(AnalyticFieldError::MalformedCompiledWorld)?;
+            let from_junction =
+                self.germ_to_junction
+                    .get(&body.from)
+                    .copied()
+                    .ok_or(AnalyticFieldError::Law(
+                        AnalyticFieldRefusal::MalformedCompiledWorld,
+                    ))?;
             let forward = from_junction == arc.from;
             let (phase, tangent, current) = self.local_section_state(
                 arc,
@@ -685,9 +749,13 @@ impl ExactAnalyticFieldWaveLaw {
             let gradient = self.field.germs[&arc.geometry.germ()]
                 .support
                 .gradient(&point)
-                .ok_or(AnalyticFieldError::UnresolvedSupport(arc.geometry.germ()))?;
+                .ok_or(AnalyticFieldError::Law(
+                    AnalyticFieldRefusal::UnresolvedSupport(arc.geometry.germ()),
+                ))?;
             if !gradient.dot(&tangent).is_zero() {
-                return Err(AnalyticFieldError::OrbitLeavesSupport(arc.geometry.germ()));
+                return Err(AnalyticFieldError::Law(
+                    AnalyticFieldRefusal::OrbitLeavesSupport(arc.geometry.germ()),
+                ));
             }
             let section = ExactAnalyticTravelingSection {
                 mode: body.mode,
@@ -746,7 +814,9 @@ impl ExactAnalyticFieldWaveLaw {
         let phase_step = arc
             .modal_phase_step
             .get(&mode)
-            .ok_or(AnalyticFieldError::MissingArcMode { arc: arc.id, mode })?;
+            .ok_or(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::MissingArcMode { arc: arc.id, mode },
+            ))?;
         let total_phase = phase_step.pow(arc.delay);
         let end_phase = arc.end_phase();
         if forward {
@@ -779,9 +849,13 @@ impl ExactAnalyticFieldWaveLaw {
                     .junction_to_germ
                     .get(&impulse.junction)
                     .copied()
-                    .ok_or(AnalyticFieldError::UnknownJunction(impulse.junction))?;
+                    .ok_or(AnalyticFieldError::Law(
+                        AnalyticFieldRefusal::UnknownJunction(impulse.junction),
+                    ))?;
                 if !self.modes.contains_key(&impulse.mode) {
-                    return Err(AnalyticFieldError::UnknownMode(impulse.mode));
+                    return Err(AnalyticFieldError::Law(AnalyticFieldRefusal::UnknownMode(
+                        impulse.mode,
+                    )));
                 }
                 Ok(DimensionalWaveImpulse {
                     source_event: impulse.source_event,
@@ -805,11 +879,9 @@ impl ExactAnalyticFieldWaveLaw {
             .scatters
             .iter()
             .map(|scatter| {
-                let junction = self
-                    .germ_to_junction
-                    .get(&scatter.germ)
-                    .copied()
-                    .ok_or(AnalyticFieldError::MalformedCompiledWorld)?;
+                let junction = self.germ_to_junction.get(&scatter.germ).copied().ok_or(
+                    AnalyticFieldError::Law(AnalyticFieldRefusal::MalformedCompiledWorld),
+                )?;
                 let arrivals = scatter
                     .arrivals
                     .iter()
@@ -818,7 +890,9 @@ impl ExactAnalyticFieldWaveLaw {
                             .get(&arrival.carrier)
                             .copied()
                             .map(|arc| (arc, arrival.current.clone()))
-                            .ok_or(AnalyticFieldError::MalformedCompiledWorld)
+                            .ok_or(AnalyticFieldError::Law(
+                                AnalyticFieldRefusal::MalformedCompiledWorld,
+                            ))
                     })
                     .collect::<Result<Vec<_>, _>>()?;
                 let departures = scatter
@@ -829,7 +903,9 @@ impl ExactAnalyticFieldWaveLaw {
                             .get(&departure.carrier)
                             .copied()
                             .map(|arc| (arc, departure.current.clone()))
-                            .ok_or(AnalyticFieldError::MalformedCompiledWorld)
+                            .ok_or(AnalyticFieldError::Law(
+                                AnalyticFieldRefusal::MalformedCompiledWorld,
+                            ))
                     })
                     .collect::<Result<Vec<_>, _>>()?;
                 Ok(ExactAnalyticInterfaceScatterReceipt {
@@ -970,25 +1046,36 @@ pub fn exact_interface_receipt(
     let overlap = field
         .overlaps
         .get(&overlap_id)
-        .ok_or(AnalyticFieldError::UnknownFieldOverlap(overlap_id))?;
+        .ok_or(AnalyticFieldError::Law(
+            AnalyticFieldRefusal::UnknownFieldOverlap(overlap_id),
+        ))?;
     if overlap.outcome != FieldOverlapOutcome::Glued {
-        return Err(AnalyticFieldError::OpenFieldOverlap(overlap_id));
+        return Err(AnalyticFieldError::Law(
+            AnalyticFieldRefusal::OpenFieldOverlap(overlap_id),
+        ));
     }
-    let observation = field
-        .observations
-        .get(&overlap.observation)
-        .ok_or(AnalyticFieldError::MalformedFieldStanding)?;
+    let observation =
+        field
+            .observations
+            .get(&overlap.observation)
+            .ok_or(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::MalformedFieldStanding,
+            ))?;
     let gradients = overlap.germs.map(|germ| {
         field.germs[&germ]
             .support
             .gradient(&observation.point)
-            .ok_or(AnalyticFieldError::UnresolvedSupport(germ))
+            .ok_or(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::UnresolvedSupport(germ),
+            ))
     });
     let [left, right] = gradients;
     let left = left?;
     let right = right?;
     if left == RatVec3::zero() || right == RatVec3::zero() {
-        return Err(AnalyticFieldError::SingularInterface(overlap_id));
+        return Err(AnalyticFieldError::Law(
+            AnalyticFieldRefusal::SingularInterface(overlap_id),
+        ));
     }
     let cross = left.cross(&right);
     let relation = if cross == RatVec3::zero() {
@@ -1054,7 +1141,9 @@ pub fn exact_refraction_fiber(
         || !incident_wave_number_square.is_positive()
         || !transmitted_wave_number_square.is_positive()
     {
-        return Err(AnalyticFieldError::MalformedRefractionDoctrine);
+        return Err(AnalyticFieldError::Law(
+            AnalyticFieldRefusal::MalformedRefractionDoctrine,
+        ));
     }
     let normal_square = interface_normal.dot(&interface_normal);
     let normal_coefficient = incident_covector.dot(&interface_normal) / &normal_square;
@@ -1065,7 +1154,9 @@ pub fn exact_refraction_fiber(
     let incident_dispersion_residual =
         incident_covector.dot(&incident_covector) - incident_wave_number_square;
     if !incident_dispersion_residual.is_zero() {
-        return Err(AnalyticFieldError::IncidentDispersionFailure);
+        return Err(AnalyticFieldError::Law(
+            AnalyticFieldRefusal::IncidentDispersionFailure,
+        ));
     }
     let normal_numerator =
         transmitted_wave_number_square - tangential_covector.dot(&tangential_covector);
@@ -1271,11 +1362,15 @@ pub fn exact_stratified_stack(
     hand: ExactRefractionHand,
 ) -> Result<ExactStratifiedStackReading, AnalyticFieldError> {
     if layers.len() < 2 {
-        return Err(AnalyticFieldError::MalformedRefractionDoctrine);
+        return Err(AnalyticFieldError::Law(
+            AnalyticFieldRefusal::MalformedRefractionDoctrine,
+        ));
     }
     for layer in layers {
         if !layer.admittance.is_positive() {
-            return Err(AnalyticFieldError::NonpositiveAdmittance);
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::NonpositiveAdmittance,
+            ));
         }
     }
 
@@ -1361,7 +1456,9 @@ pub fn exact_scalar_interface_coefficients(
     transmitted_admittance: Rat,
 ) -> Result<ExactScalarInterfaceCoefficients, AnalyticFieldError> {
     if !incident_admittance.is_positive() || !transmitted_admittance.is_positive() {
-        return Err(AnalyticFieldError::NonpositiveAdmittance);
+        return Err(AnalyticFieldError::Law(
+            AnalyticFieldRefusal::NonpositiveAdmittance,
+        ));
     }
     let total = &incident_admittance + &transmitted_admittance;
     let reflection = (&incident_admittance - &transmitted_admittance) / &total;
@@ -1429,13 +1526,67 @@ pub struct ExactAnalyticAdvectionLaw {
     probes: Vec<ExactAnalyticCirculationProbe>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ExactAnalyticAdvectionStanding {
-    pub schema: String,
+/// [definition] **The analytic-advection quotient** (plan phase 16): the tick and the arc values.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ExactAnalyticAdvectionQuotient {
     pub tick: u64,
     pub values: BTreeMap<AnalyticFieldArcId, Rat>,
+}
+
+/// The standing: the shared event scaffold around [`ExactAnalyticAdvectionQuotient`].
+pub type ExactAnalyticAdvectionStanding = EventStanding<ExactAnalyticAdvectionQuotient>;
+
+impl EventQuotient for ExactAnalyticAdvectionQuotient {
+    type Refusal = AnalyticFieldRefusal;
+}
+
+#[derive(Serialize)]
+#[serde(rename = "ExactAnalyticAdvectionStanding")]
+struct ExactAnalyticAdvectionStandingWrite<'a> {
+    schema: &'a String,
+    tick: &'a u64,
+    values: &'a BTreeMap<AnalyticFieldArcId, Rat>,
+    used_events: &'a BTreeSet<EventId>,
+}
+
+impl<'a> From<&'a ExactAnalyticAdvectionStanding> for ExactAnalyticAdvectionStandingWrite<'a> {
+    fn from(standing: &'a ExactAnalyticAdvectionStanding) -> Self {
+        Self {
+            schema: &standing.schema,
+            tick: &standing.tick,
+            values: &standing.values,
+            used_events: &standing.used_events,
+        }
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(rename = "ExactAnalyticAdvectionStanding")]
+struct ExactAnalyticAdvectionStandingRead {
+    schema: String,
+    tick: u64,
+    values: BTreeMap<AnalyticFieldArcId, Rat>,
     used_events: BTreeSet<EventId>,
 }
+
+impl From<ExactAnalyticAdvectionStandingRead> for ExactAnalyticAdvectionStanding {
+    fn from(read: ExactAnalyticAdvectionStandingRead) -> Self {
+        EventStanding::from_parts(
+            read.schema,
+            read.used_events,
+            ExactAnalyticAdvectionQuotient {
+                tick: read.tick,
+                values: read.values,
+            },
+        )
+    }
+}
+
+event_standing_wire!(
+    ExactAnalyticAdvectionQuotient,
+    ExactAnalyticAdvectionStandingWrite,
+    ExactAnalyticAdvectionStandingRead
+);
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ExactAnalyticAdvectionEvent {
@@ -1476,20 +1627,23 @@ impl ExactAnalyticAdvectionLaw {
         probes: Vec<ExactAnalyticCirculationProbe>,
     ) -> Result<Self, AnalyticFieldError> {
         if capacities.keys().any(|arc| !field.arcs.contains_key(arc)) {
-            return Err(AnalyticFieldError::AdvectionPopulationMismatch);
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::AdvectionPopulationMismatch,
+            ));
         }
         for probe in &probes {
             let mut boundary = BTreeMap::<AnalyticFieldJunctionId, Rat>::new();
             for (arc_id, coefficient) in &probe.coefficients {
-                let arc = field
-                    .arcs
-                    .get(arc_id)
-                    .ok_or(AnalyticFieldError::MalformedCirculationProbe(probe.id))?;
+                let arc = field.arcs.get(arc_id).ok_or(AnalyticFieldError::Law(
+                    AnalyticFieldRefusal::MalformedCirculationProbe(probe.id),
+                ))?;
                 *boundary.entry(arc.from).or_default() -= coefficient;
                 *boundary.entry(arc.to).or_default() += coefficient;
             }
             if boundary.values().any(|coefficient| !coefficient.is_zero()) {
-                return Err(AnalyticFieldError::CirculationProbeNotClosed(probe.id));
+                return Err(AnalyticFieldError::Law(
+                    AnalyticFieldRefusal::CirculationProbeNotClosed(probe.id),
+                ));
             }
         }
         Self::new(capacities, generator, interval, probes)
@@ -1505,7 +1659,9 @@ impl ExactAnalyticAdvectionLaw {
             || capacities.values().any(|capacity| !capacity.is_positive())
             || !interval.is_positive()
         {
-            return Err(AnalyticFieldError::MalformedAdvectionDoctrine);
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::MalformedAdvectionDoctrine,
+            ));
         }
         let arcs = capacities.keys().copied().collect::<Vec<_>>();
         let capacities = arcs
@@ -1514,7 +1670,9 @@ impl ExactAnalyticAdvectionLaw {
             .collect::<Vec<_>>();
         let extent = arcs.len();
         if generator.rows() != extent || generator.columns() != extent {
-            return Err(AnalyticFieldError::MalformedAdvectionDoctrine);
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::MalformedAdvectionDoctrine,
+            ));
         }
         let omega = ExactRatMatrix::from_diagonal(capacities.clone())?;
         let skew_residual = generator
@@ -1522,11 +1680,15 @@ impl ExactAnalyticAdvectionLaw {
             .multiply(&omega)?
             .add(&omega.multiply(&generator)?)?;
         if skew_residual.entries().iter().any(|value| !value.is_zero()) {
-            return Err(AnalyticFieldError::AdvectionNotCapacitySkew);
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::AdvectionNotCapacitySkew,
+            ));
         }
         let ones = vec![Rat::one(); extent];
         if generator.apply(&ones)?.iter().any(|value| !value.is_zero()) {
-            return Err(AnalyticFieldError::AdvectionNotDivergenceFree);
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::AdvectionNotDivergenceFree,
+            ));
         }
         let half_interval = interval / Rat::from_integer(2.into());
         let identity = ExactRatMatrix::identity(extent)?;
@@ -1538,7 +1700,9 @@ impl ExactAnalyticAdvectionLaw {
         if update.transpose()?.multiply(&omega)?.multiply(&update)? != omega
             || update.apply(&ones)? != ones
         {
-            return Err(AnalyticFieldError::AdvectionCertificateFailure);
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::AdvectionCertificateFailure,
+            ));
         }
         let arc_ordinals = arcs
             .iter()
@@ -1552,7 +1716,9 @@ impl ExactAnalyticAdvectionLaw {
                     .keys()
                     .any(|arc| !arc_ordinals.contains_key(arc))
             {
-                return Err(AnalyticFieldError::MalformedCirculationProbe(probe.id));
+                return Err(AnalyticFieldError::Law(
+                    AnalyticFieldRefusal::MalformedCirculationProbe(probe.id),
+                ));
             }
             let mut row = vec![Rat::zero(); extent];
             for (arc, coefficient) in &probe.coefficients {
@@ -1560,7 +1726,9 @@ impl ExactAnalyticAdvectionLaw {
             }
             let transported = ExactRatMatrix::new(vec![row.clone()])?.multiply(&update)?;
             if transported.row(0)? != row {
-                return Err(AnalyticFieldError::NoninvariantCirculationProbe(probe.id));
+                return Err(AnalyticFieldError::Law(
+                    AnalyticFieldRefusal::NoninvariantCirculationProbe(probe.id),
+                ));
             }
         }
         Ok(Self {
@@ -1592,14 +1760,18 @@ impl ExactAnalyticAdvectionLaw {
         if values.keys().copied().collect::<BTreeSet<_>>()
             != self.arcs.iter().copied().collect::<BTreeSet<_>>()
         {
-            return Err(AnalyticFieldError::AdvectionPopulationMismatch);
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::AdvectionPopulationMismatch,
+            ));
         }
-        Ok(ExactAnalyticAdvectionStanding {
-            schema: ADVECTION_STANDING_SCHEMA.to_owned(),
-            tick: 0,
-            values,
-            used_events: BTreeSet::new(),
-        })
+        Ok(EventStanding::from_parts(
+            ADVECTION_STANDING_SCHEMA.to_owned(),
+            BTreeSet::new(),
+            ExactAnalyticAdvectionQuotient {
+                tick: 0,
+                values: values,
+            },
+        ))
     }
 
     fn ordered_values(
@@ -1608,7 +1780,9 @@ impl ExactAnalyticAdvectionLaw {
     ) -> Result<Vec<Rat>, AnalyticFieldError> {
         if standing.schema != ADVECTION_STANDING_SCHEMA || standing.values.len() != self.arcs.len()
         {
-            return Err(AnalyticFieldError::MalformedAdvectionStanding);
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::MalformedAdvectionStanding,
+            ));
         }
         self.arcs
             .iter()
@@ -1617,7 +1791,9 @@ impl ExactAnalyticAdvectionLaw {
                     .values
                     .get(arc)
                     .cloned()
-                    .ok_or(AnalyticFieldError::AdvectionPopulationMismatch)
+                    .ok_or(AnalyticFieldError::Law(
+                        AnalyticFieldRefusal::AdvectionPopulationMismatch,
+                    ))
             })
             .collect()
     }
@@ -1667,7 +1843,9 @@ impl ExactEventLaw for ExactAnalyticAdvectionLaw {
         event: &Self::Event,
     ) -> Result<EventSuccessor<Self::Standing, Self::Radiation>, Self::Error> {
         if standing_before.used_events.contains(&event.event) {
-            return Err(AnalyticFieldError::RepeatedAdvectionEvent(event.event));
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::RepeatedAdvectionEvent(event.event),
+            ));
         }
         let before = self.ordered_values(standing_before)?;
         let after = self.update.apply(&before)?;
@@ -1697,7 +1875,9 @@ impl ExactEventLaw for ExactAnalyticAdvectionLaw {
                 .iter()
                 .any(|circulation| !circulation.residual.is_zero())
         {
-            return Err(AnalyticFieldError::AdvectionCertificateFailure);
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::AdvectionCertificateFailure,
+            ));
         }
         let mut standing_after = standing_before.clone();
         standing_after.tick = standing_after
@@ -1748,40 +1928,53 @@ fn validate_junctions(
     let active = field.active_germs();
     for junction in junctions.values() {
         if junction.name.is_empty() {
-            return Err(AnalyticFieldError::MalformedJunction(junction.id));
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::MalformedJunction(junction.id),
+            ));
         }
         let germs = junction.germs(field)?;
         if germs.iter().any(|germ| !active.contains(germ)) {
-            return Err(AnalyticFieldError::InactiveJunction(junction.id));
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::InactiveJunction(junction.id),
+            ));
         }
         if let AnalyticFieldJunctionOrigin::InteractingOverlap { overlap } = junction.origin {
-            let body = field
-                .overlaps
-                .get(&overlap)
-                .ok_or(AnalyticFieldError::UnknownFieldOverlap(overlap))?;
+            let body = field.overlaps.get(&overlap).ok_or(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::UnknownFieldOverlap(overlap),
+            ))?;
             if body.outcome != FieldOverlapOutcome::Glued {
-                return Err(AnalyticFieldError::OpenFieldOverlap(overlap));
+                return Err(AnalyticFieldError::Law(
+                    AnalyticFieldRefusal::OpenFieldOverlap(overlap),
+                ));
             }
             let point = &field
                 .observations
                 .get(&body.observation)
-                .ok_or(AnalyticFieldError::MalformedFieldStanding)?
+                .ok_or(AnalyticFieldError::Law(
+                    AnalyticFieldRefusal::MalformedFieldStanding,
+                ))?
                 .point;
             if point != &junction.point {
-                return Err(AnalyticFieldError::JunctionPointMismatch(junction.id));
+                return Err(AnalyticFieldError::Law(
+                    AnalyticFieldRefusal::JunctionPointMismatch(junction.id),
+                ));
             }
         }
         for germ in germs {
             let support = &field
                 .germs
                 .get(&germ)
-                .ok_or(AnalyticFieldError::UnknownFieldGerm(germ))?
+                .ok_or(AnalyticFieldError::Law(
+                    AnalyticFieldRefusal::UnknownFieldGerm(germ),
+                ))?
                 .support;
             if !support_evaluate(support, &junction.point)?.is_zero() {
-                return Err(AnalyticFieldError::JunctionLeavesSupport {
-                    junction: junction.id,
-                    germ,
-                });
+                return Err(AnalyticFieldError::Law(
+                    AnalyticFieldRefusal::JunctionLeavesSupport {
+                        junction: junction.id,
+                        germ,
+                    },
+                ));
             }
         }
     }
@@ -1824,7 +2017,9 @@ fn validate_modes_and_arcs(
                 .values()
                 .any(|value| !value.is_positive())
         {
-            return Err(AnalyticFieldError::MalformedMode(mode.id));
+            return Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::MalformedMode(mode.id),
+            ));
         }
     }
     for arc in arcs.values() {
@@ -1846,14 +2041,16 @@ fn validate_modes_and_arcs(
                 !arc.modal_phase_step.contains_key(mode) || !admittance.is_positive()
             })
         {
-            return Err(AnalyticFieldError::MalformedArc(arc.id));
+            return Err(AnalyticFieldError::Law(AnalyticFieldRefusal::MalformedArc(
+                arc.id,
+            )));
         }
-        let from = junctions
-            .get(&arc.from)
-            .ok_or(AnalyticFieldError::UnknownJunction(arc.from))?;
-        let to = junctions
-            .get(&arc.to)
-            .ok_or(AnalyticFieldError::UnknownJunction(arc.to))?;
+        let from = junctions.get(&arc.from).ok_or(AnalyticFieldError::Law(
+            AnalyticFieldRefusal::UnknownJunction(arc.from),
+        ))?;
+        let to = junctions.get(&arc.to).ok_or(AnalyticFieldError::Law(
+            AnalyticFieldRefusal::UnknownJunction(arc.to),
+        ))?;
         arc.geometry.validate(field)?;
         let germ = arc.geometry.germ();
         // **The two admittance declarations must agree, and until 2026-08-14 nothing compared them.**
@@ -1869,32 +2066,37 @@ fn validate_modes_and_arcs(
         // joining them. That is the seam between the interface law and the chain that composes it,
         // and a disagreement there makes the composition unsound without making either side wrong.
         for (mode_id, arc_admittance) in &arc.modal_admittance {
-            let mode = modes
-                .get(mode_id)
-                .ok_or(AnalyticFieldError::UnknownMode(*mode_id))?;
-            let mode_admittance = mode
-                .interface_admittance
-                .get(&germ)
-                .ok_or(AnalyticFieldError::MalformedMode(*mode_id))?;
+            let mode = modes.get(mode_id).ok_or(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::UnknownMode(*mode_id),
+            ))?;
+            let mode_admittance =
+                mode.interface_admittance
+                    .get(&germ)
+                    .ok_or(AnalyticFieldError::Law(
+                        AnalyticFieldRefusal::MalformedMode(*mode_id),
+                    ))?;
             if arc_admittance != mode_admittance {
-                return Err(AnalyticFieldError::AdmittanceDeclarationsDisagree {
-                    arc: arc.id,
-                    mode: *mode_id,
-                    germ,
-                });
+                return Err(AnalyticFieldError::Law(
+                    AnalyticFieldRefusal::AdmittanceDeclarationsDisagree {
+                        arc: arc.id,
+                        mode: *mode_id,
+                        germ,
+                    },
+                ));
             }
         }
-        let body = field
-            .germs
-            .get(&germ)
-            .ok_or(AnalyticFieldError::UnknownFieldGerm(germ))?;
+        let body = field.germs.get(&germ).ok_or(AnalyticFieldError::Law(
+            AnalyticFieldRefusal::UnknownFieldGerm(germ),
+        ))?;
         if !body.lineage.contains(&arc.source_event)
             || !from.germs(field)?.contains(&germ)
             || !to.germs(field)?.contains(&germ)
             || arc.geometry.point(field, &arc.start_phase)? != from.point
             || arc.geometry.point(field, &arc.end_phase())? != to.point
         {
-            return Err(AnalyticFieldError::MalformedArc(arc.id));
+            return Err(AnalyticFieldError::Law(AnalyticFieldRefusal::MalformedArc(
+                arc.id,
+            )));
         }
     }
     Ok(())
@@ -2058,9 +2260,9 @@ fn support_evaluate(
             ..
         } => Ok(quadric.evaluate(point)),
         FieldSupportStanding::Torus(torus) => Ok(torus.evaluate(point)),
-        FieldSupportStanding::Quadric { resolved: None, .. } => {
-            Err(AnalyticFieldError::UnresolvedImplicitSupport)
-        }
+        FieldSupportStanding::Quadric { resolved: None, .. } => Err(AnalyticFieldError::Law(
+            AnalyticFieldRefusal::UnresolvedImplicitSupport,
+        )),
     }
 }
 
@@ -2073,17 +2275,21 @@ fn require_quadric(
             coorientation: Some(_),
             ..
         } => Ok(quadric),
-        FieldSupportStanding::Quadric { resolved: None, .. } => {
-            Err(AnalyticFieldError::UnresolvedImplicitSupport)
-        }
-        _ => Err(AnalyticFieldError::SupportSpeciesMismatch),
+        FieldSupportStanding::Quadric { resolved: None, .. } => Err(AnalyticFieldError::Law(
+            AnalyticFieldRefusal::UnresolvedImplicitSupport,
+        )),
+        _ => Err(AnalyticFieldError::Law(
+            AnalyticFieldRefusal::SupportSpeciesMismatch,
+        )),
     }
 }
 
 fn require_torus(support: &FieldSupportStanding) -> Result<&crate::ExactTorus, AnalyticFieldError> {
     match support {
         FieldSupportStanding::Torus(torus) => Ok(torus),
-        _ => Err(AnalyticFieldError::SupportSpeciesMismatch),
+        _ => Err(AnalyticFieldError::Law(
+            AnalyticFieldRefusal::SupportSpeciesMismatch,
+        )),
     }
 }
 
@@ -2102,7 +2308,9 @@ fn validate_torus_frame(
         || frame.axial.cross(&torus.axis) != RatVec3::zero()
         || frame.axial.dot(&torus.axis).is_negative()
     {
-        return Err(AnalyticFieldError::MalformedTorusFrame(torus.id));
+        return Err(AnalyticFieldError::Law(
+            AnalyticFieldRefusal::MalformedTorusFrame(torus.id),
+        ));
     }
     Ok(())
 }
@@ -2128,7 +2336,7 @@ fn index_unique<K: Ord, V>(values: Vec<V>, key: impl Fn(&V) -> K) -> Option<BTre
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum AnalyticFieldError {
+pub enum AnalyticFieldRefusal {
     #[error("an exact analytic field world requires junctions, arcs, and modes")]
     EmptyAnalyticWorld,
     #[error("an exact unit-conic phase must satisfy c²+s²=1")]
@@ -2243,8 +2451,6 @@ pub enum AnalyticFieldError {
     MalformedAdvectionStanding,
     #[error("analytic advection event {0:?} already occurred")]
     RepeatedAdvectionEvent(EventId),
-    #[error("an exact analytic field carrier overflowed")]
-    CarrierOverflow,
     #[error(transparent)]
     Wave(#[from] DimensionalWaveError),
     #[error(transparent)]
@@ -2254,6 +2460,15 @@ pub enum AnalyticFieldError {
     #[error(transparent)]
     Linear(#[from] crate::ExactLinearError),
 }
+
+impl RefusalKind for AnalyticFieldRefusal {
+    const LAW: &'static str = "analytic-field";
+}
+
+/// The analytic-field law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type AnalyticFieldError = EventRefusal<AnalyticFieldRefusal>;
+
+event_refusal_from!(AnalyticFieldRefusal: DimensionalWaveError, crate::DimensionalReceiverError, crate::CausalAlgebraicError, crate::ExactLinearError);
 
 #[cfg(test)]
 mod tests {
@@ -2499,7 +2714,9 @@ mod tests {
                 &[layer(25, 1), layer(41, 2)],
                 ExactRefractionHand::AlongNormal
             ),
-            Err(AnalyticFieldError::IncidentDispersionFailure)
+            Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::IncidentDispersionFailure
+            ))
         ));
         assert!(matches!(
             exact_stratified_stack(
@@ -2508,7 +2725,9 @@ mod tests {
                 &[layer(25, 1), layer(41, 0)],
                 ExactRefractionHand::AlongNormal
             ),
-            Err(AnalyticFieldError::NonpositiveAdmittance)
+            Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::NonpositiveAdmittance
+            ))
         ));
         assert!(matches!(
             exact_stratified_stack(
@@ -2517,7 +2736,9 @@ mod tests {
                 &[layer(25, 1)],
                 ExactRefractionHand::AlongNormal
             ),
-            Err(AnalyticFieldError::MalformedRefractionDoctrine)
+            Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::MalformedRefractionDoctrine
+            ))
         ));
     }
 
@@ -2750,11 +2971,13 @@ mod tests {
 
         // Disagreeing: the same material, two numbers. Refused by name, naming all three.
         match build(integer(5)) {
-            Err(AnalyticFieldError::AdmittanceDeclarationsDisagree {
-                arc,
-                mode: named,
-                germ,
-            }) => {
+            Err(AnalyticFieldError::Law(
+                AnalyticFieldRefusal::AdmittanceDeclarationsDisagree {
+                    arc,
+                    mode: named,
+                    germ,
+                },
+            )) => {
                 assert_eq!(arc, AnalyticFieldArcId(1));
                 assert_eq!(named, mode);
                 assert_eq!(germ, first_germ);

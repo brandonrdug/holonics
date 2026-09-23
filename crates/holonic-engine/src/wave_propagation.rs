@@ -24,9 +24,11 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::world::{EventQuotient, event_standing_wire};
+use crate::world::{EventRefusal, RefusalKind, event_refusal_from};
 use crate::{
     AffineAdmissionWork, CpuExecutionError, CpuExecutionReceipt, CpuExecutor, EventId,
-    EventSuccessor, ExactAffinePrediction, ExactAffineVersionFiber, ExactEventLaw,
+    EventStanding, EventSuccessor, ExactAffinePrediction, ExactAffineVersionFiber, ExactEventLaw,
     InverseTransportError, LogicalResourceReceipt,
 };
 
@@ -84,14 +86,20 @@ impl WavePropagationSpec {
         let mut indexed_receivers = BTreeMap::new();
         for receiver in receivers {
             if receiver.channels == 0 || receiver.name.is_empty() {
-                return Err(WavePropagationError::MalformedSpec);
+                return Err(WavePropagationError::Law(
+                    WavePropagationRefusal::MalformedSpec,
+                ));
             }
             if indexed_receivers.insert(receiver.id, receiver).is_some() {
-                return Err(WavePropagationError::DuplicateReceiver);
+                return Err(WavePropagationError::Law(
+                    WavePropagationRefusal::DuplicateReceiver,
+                ));
             }
         }
         if indexed_receivers.is_empty() {
-            return Err(WavePropagationError::MalformedSpec);
+            return Err(WavePropagationError::Law(
+                WavePropagationRefusal::MalformedSpec,
+            ));
         }
         let mut indexed_interactions = BTreeMap::new();
         for interaction in interactions {
@@ -99,17 +107,23 @@ impl WavePropagationSpec {
                 || !indexed_receivers.contains_key(&interaction.source)
                 || !indexed_receivers.contains_key(&interaction.target)
             {
-                return Err(WavePropagationError::MalformedSpec);
+                return Err(WavePropagationError::Law(
+                    WavePropagationRefusal::MalformedSpec,
+                ));
             }
             if indexed_interactions
                 .insert(interaction.id, interaction)
                 .is_some()
             {
-                return Err(WavePropagationError::DuplicateInteraction);
+                return Err(WavePropagationError::Law(
+                    WavePropagationRefusal::DuplicateInteraction,
+                ));
             }
         }
         if indexed_interactions.is_empty() {
-            return Err(WavePropagationError::MalformedSpec);
+            return Err(WavePropagationError::Law(
+                WavePropagationRefusal::MalformedSpec,
+            ));
         }
         Ok(Self {
             schema: SPEC_SCHEMA.to_owned(),
@@ -128,7 +142,9 @@ impl WavePropagationSpec {
 
     fn validate(&self) -> Result<(), WavePropagationError> {
         if self.schema != SPEC_SCHEMA {
-            return Err(WavePropagationError::MalformedSpec);
+            return Err(WavePropagationError::Law(
+                WavePropagationRefusal::MalformedSpec,
+            ));
         }
         let reconstructed = Self::new(
             self.receivers.values().cloned(),
@@ -137,7 +153,9 @@ impl WavePropagationSpec {
         if reconstructed.receivers != self.receivers
             || reconstructed.interactions != self.interactions
         {
-            return Err(WavePropagationError::MalformedSpec);
+            return Err(WavePropagationError::Law(
+                WavePropagationRefusal::MalformedSpec,
+            ));
         }
         Ok(())
     }
@@ -167,11 +185,15 @@ impl ExactWaveSection {
         samples: Vec<Vec<Rat>>,
     ) -> Result<Self, WavePropagationError> {
         if !step.is_positive() || samples.is_empty() {
-            return Err(WavePropagationError::MalformedSection);
+            return Err(WavePropagationError::Law(
+                WavePropagationRefusal::MalformedSection,
+            ));
         }
         let channels = samples[0].len();
         if channels == 0 || samples.iter().any(|sample| sample.len() != channels) {
-            return Err(WavePropagationError::MalformedSection);
+            return Err(WavePropagationError::Law(
+                WavePropagationRefusal::MalformedSection,
+            ));
         }
         Ok(Self {
             schema: SECTION_SCHEMA.to_owned(),
@@ -204,7 +226,9 @@ impl ExactWaveSection {
                 .iter()
                 .any(|sample| sample.len() != self.channel_count())
         {
-            return Err(WavePropagationError::MalformedSection);
+            return Err(WavePropagationError::Law(
+                WavePropagationRefusal::MalformedSection,
+            ));
         }
         Ok(())
     }
@@ -233,7 +257,9 @@ impl ExactCausalKernelFiber {
         target_channels: usize,
     ) -> Result<Self, WavePropagationError> {
         if support == 0 || source_channels == 0 || target_channels == 0 {
-            return Err(WavePropagationError::MalformedKernelFiber);
+            return Err(WavePropagationError::Law(
+                WavePropagationRefusal::MalformedKernelFiber,
+            ));
         }
         let variable_count = support
             .checked_mul(source_channels)
@@ -292,7 +318,9 @@ impl ExactCausalKernelFiber {
         if self.coordinates != reconstructed.coordinates
             || self.fiber.variable_count() != self.coordinates.len()
         {
-            return Err(WavePropagationError::MalformedKernelFiber);
+            return Err(WavePropagationError::Law(
+                WavePropagationRefusal::MalformedKernelFiber,
+            ));
         }
         self.fiber.validate()?;
         Ok(())
@@ -311,7 +339,9 @@ impl ExactCausalKernelFiber {
         let support =
             usize::try_from(self.support).map_err(|_| WavePropagationError::CarrierOverflow)?;
         if source.channel_count() != source_channels || target_channel >= target_channels {
-            return Err(WavePropagationError::KernelDimension);
+            return Err(WavePropagationError::Law(
+                WavePropagationRefusal::KernelDimension,
+            ));
         }
         let mut coefficients = vec![Rat::zero(); self.coordinates.len()];
         for delay in 0..support {
@@ -350,7 +380,9 @@ impl ExactCausalKernelFiber {
                 != usize::try_from(self.target_channels)
                     .map_err(|_| WavePropagationError::CarrierOverflow)?
         {
-            return Err(WavePropagationError::KernelDimension);
+            return Err(WavePropagationError::Law(
+                WavePropagationRefusal::KernelDimension,
+            ));
         }
         let rank_before = self.rank();
         let mut equations = 0_u64;
@@ -546,21 +578,6 @@ pub struct WaveGenerationReceipt {
     pub execution: CpuExecutionReceipt,
 }
 
-/// Logical generation testimony retained in standing.
-///
-/// Physical worker counts belong only to the emitted receipt; retaining them
-/// here would make the world depend on its executor.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct WaveGenerationRecord {
-    pub schema: String,
-    pub event: EventId,
-    pub prediction: WavePredictionId,
-    pub interaction: WaveInteractionId,
-    pub source_lineage: WaveLineageId,
-    pub mode_predictions: Vec<WaveModePrediction>,
-    pub open_interaction: bool,
-}
-
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct WaveResidualComponent {
     pub first_sample: usize,
@@ -636,17 +653,55 @@ impl WavePropagationEvent {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub enum WavePropagationHistoryEntry {
-    Conditioned(WaveConditioningReceipt),
-    Generated(WaveGenerationRecord),
-    Returned(WaveReturnReceipt),
+/// [definition] **A pending prediction retains its producing operands** (plan phase 16): the
+/// interaction and the source section. The prediction itself was returned in the generation's
+/// [`WaveGenerationReceipt`]; the return grades the source through the contemporary interaction
+/// modes (retention law: a delayed comparison is read through the contemporary constitution and
+/// returns its residual), so no frozen prediction is retained.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct PendingWavePrediction {
+    pub interaction: WaveInteractionId,
+    pub source: ExactWaveSection,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct PendingWavePrediction {
-    pub generation: WaveGenerationRecord,
-    pub source: ExactWaveSection,
+/// Reads the current pending operands and the retired frozen generation record, whose
+/// interaction is kept and whose frozen predictions are dropped.
+#[derive(Deserialize)]
+#[serde(untagged)]
+enum PendingWavePredictionRead {
+    Operands {
+        interaction: WaveInteractionId,
+        source: ExactWaveSection,
+    },
+    Retired {
+        generation: RetiredWaveGeneration,
+        source: ExactWaveSection,
+    },
+}
+
+#[derive(Deserialize)]
+struct RetiredWaveGeneration {
+    interaction: WaveInteractionId,
+}
+
+impl<'de> Deserialize<'de> for PendingWavePrediction {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        Ok(
+            match PendingWavePredictionRead::deserialize(deserializer)? {
+                PendingWavePredictionRead::Operands {
+                    interaction,
+                    source,
+                } => Self {
+                    interaction,
+                    source,
+                },
+                PendingWavePredictionRead::Retired { generation, source } => Self {
+                    interaction: generation.interaction,
+                    source,
+                },
+            },
+        )
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -656,52 +711,113 @@ pub struct WaveInteractionStanding {
     pub obstructions: Vec<WaveModeObstruction>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct WavePropagationStanding {
-    pub schema: String,
+/// [definition] **The wave-propagation quotient** (plan phase 16): the conditioned modes of every
+/// interaction (each mode's exact kernel fibre is the sufficient statistic of its conditioning
+/// returns), the producing operands of each pending prediction and the identity counters. Every
+/// conditioning, generation and return receipt is the radiation of its event and is not retained.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct WavePropagationQuotient {
     pub interactions: BTreeMap<WaveInteractionId, WaveInteractionStanding>,
     pub pending: BTreeMap<WavePredictionId, PendingWavePrediction>,
-    pub history: Vec<WavePropagationHistoryEntry>,
+    next_mode: u64,
+    next_prediction: u64,
+}
+
+/// The WavePropagation standing: the shared event scaffold around [`WavePropagationQuotient`].
+pub type WavePropagationStanding = EventStanding<WavePropagationQuotient>;
+
+#[derive(Serialize)]
+#[serde(rename = "WavePropagationStanding")]
+struct WavePropagationStandingWrite<'a> {
+    schema: &'a String,
+    interactions: &'a BTreeMap<WaveInteractionId, WaveInteractionStanding>,
+    pending: &'a BTreeMap<WavePredictionId, PendingWavePrediction>,
+    used_events: &'a BTreeSet<EventId>,
+    next_mode: &'a u64,
+    next_prediction: &'a u64,
+}
+
+impl<'a> From<&'a WavePropagationStanding> for WavePropagationStandingWrite<'a> {
+    fn from(standing: &'a WavePropagationStanding) -> Self {
+        Self {
+            schema: &standing.schema,
+            interactions: &standing.interactions,
+            pending: &standing.pending,
+            used_events: &standing.used_events,
+            next_mode: &standing.next_mode,
+            next_prediction: &standing.next_prediction,
+        }
+    }
+}
+
+/// Reads the current rest and the retired one (whose archive fields are dropped).
+#[derive(Deserialize)]
+#[serde(rename = "WavePropagationStanding")]
+struct WavePropagationStandingRead {
+    schema: String,
+    interactions: BTreeMap<WaveInteractionId, WaveInteractionStanding>,
+    pending: BTreeMap<WavePredictionId, PendingWavePrediction>,
     used_events: BTreeSet<EventId>,
     next_mode: u64,
     next_prediction: u64,
 }
 
+impl From<WavePropagationStandingRead> for WavePropagationStanding {
+    fn from(read: WavePropagationStandingRead) -> Self {
+        EventStanding::from_parts(
+            read.schema,
+            read.used_events,
+            WavePropagationQuotient {
+                interactions: read.interactions,
+                pending: read.pending,
+                next_mode: read.next_mode,
+                next_prediction: read.next_prediction,
+            },
+        )
+    }
+}
+
+event_standing_wire!(
+    WavePropagationQuotient,
+    WavePropagationStandingWrite,
+    WavePropagationStandingRead
+);
+
+impl EventQuotient for WavePropagationQuotient {
+    type Refusal = WavePropagationRefusal;
+}
+
 impl WavePropagationStanding {
     pub fn new(spec: &WavePropagationSpec) -> Self {
-        Self {
-            schema: STANDING_SCHEMA.to_owned(),
-            interactions: spec
-                .interactions
-                .keys()
-                .copied()
-                .map(|interaction| {
-                    (
-                        interaction,
-                        WaveInteractionStanding {
+        EventStanding::founded(
+            STANDING_SCHEMA,
+            WavePropagationQuotient {
+                interactions: spec
+                    .interactions
+                    .keys()
+                    .copied()
+                    .map(|interaction| {
+                        (
                             interaction,
-                            modes: Vec::new(),
-                            obstructions: Vec::new(),
-                        },
-                    )
-                })
-                .collect(),
-            pending: BTreeMap::new(),
-            history: Vec::new(),
-            used_events: BTreeSet::new(),
-            next_mode: 1,
-            next_prediction: 1,
-        }
+                            WaveInteractionStanding {
+                                interaction,
+                                modes: Vec::new(),
+                                obstructions: Vec::new(),
+                            },
+                        )
+                    })
+                    .collect(),
+                pending: BTreeMap::new(),
+                next_mode: 1,
+                next_prediction: 1,
+            },
+        )
     }
 
     pub fn modes(&self, interaction: WaveInteractionId) -> Option<&[WaveTransportMode]> {
         self.interactions
             .get(&interaction)
             .map(|standing| standing.modes.as_slice())
-    }
-
-    pub fn history(&self) -> &[WavePropagationHistoryEntry] {
-        &self.history
     }
 }
 
@@ -732,18 +848,18 @@ impl ExactWavePropagationLaw {
         &self,
         standing: &WavePropagationStanding,
     ) -> Result<(), WavePropagationError> {
-        if standing.schema != STANDING_SCHEMA
-            || standing
+        standing.check_schema(STANDING_SCHEMA)?;
+        if standing
+            .interactions
+            .keys()
+            .copied()
+            .collect::<BTreeSet<_>>()
+            != self
+                .spec
                 .interactions
                 .keys()
                 .copied()
                 .collect::<BTreeSet<_>>()
-                != self
-                    .spec
-                    .interactions
-                    .keys()
-                    .copied()
-                    .collect::<BTreeSet<_>>()
         {
             return Err(WavePropagationError::MalformedStanding);
         }
@@ -760,11 +876,8 @@ impl ExactWavePropagationLaw {
             }
         }
         for (prediction, pending) in &standing.pending {
-            if pending.generation.prediction != *prediction
-                || !self
-                    .spec
-                    .interactions
-                    .contains_key(&pending.generation.interaction)
+            if prediction.0 >= standing.next_prediction
+                || !self.spec.interactions.contains_key(&pending.interaction)
             {
                 return Err(WavePropagationError::MalformedStanding);
             }
@@ -778,20 +891,26 @@ impl ExactWavePropagationLaw {
         source: &ExactWaveSection,
         target: &ExactWaveSection,
     ) -> Result<&WaveInteractionSpec, WavePropagationError> {
-        let interaction = self
-            .spec
-            .interactions
-            .get(&interaction)
-            .ok_or(WavePropagationError::UnknownInteraction)?;
+        let interaction =
+            self.spec
+                .interactions
+                .get(&interaction)
+                .ok_or(WavePropagationError::Law(
+                    WavePropagationRefusal::UnknownInteraction,
+                ))?;
         let source_receiver = &self.spec.receivers[&interaction.source];
         let target_receiver = &self.spec.receivers[&interaction.target];
         source.validate(source_receiver)?;
         target.validate(target_receiver)?;
         if source.origin != target.origin || source.step != target.step {
-            return Err(WavePropagationError::ReceiverChartMismatch);
+            return Err(WavePropagationError::Law(
+                WavePropagationRefusal::ReceiverChartMismatch,
+            ));
         }
         if target.sample_count() < source.sample_count() {
-            return Err(WavePropagationError::NoncausalReturnedExtent);
+            return Err(WavePropagationError::Law(
+                WavePropagationRefusal::NoncausalReturnedExtent,
+            ));
         }
         Ok(interaction)
     }
@@ -801,6 +920,7 @@ impl ExactWavePropagationLaw {
         standing: &mut WavePropagationStanding,
         event: &WaveConditioningEvent,
     ) -> Result<WaveConditioningReceipt, WavePropagationError> {
+        let standing: &mut WavePropagationQuotient = standing;
         let interaction =
             self.validate_pair(event.interaction, &event.source, &event.target_return)?;
         let returned_support = event
@@ -812,10 +932,13 @@ impl ExactWavePropagationLaw {
         let source_channels = event.source.channel_count();
         let target_channels = event.target_return.channel_count();
 
-        let body = standing
-            .interactions
-            .get_mut(&interaction.id)
-            .ok_or(WavePropagationError::UnknownInteraction)?;
+        let body =
+            standing
+                .interactions
+                .get_mut(&interaction.id)
+                .ok_or(WavePropagationError::Law(
+                    WavePropagationRefusal::UnknownInteraction,
+                ))?;
         let mut conditioned_modes = Vec::new();
         let mut obstructions = Vec::new();
 
@@ -855,9 +978,11 @@ impl ExactWavePropagationLaw {
                         resolved: mode.kernel.is_resolved(),
                     });
                 }
-                Err(WavePropagationError::AffineFiber(
-                    InverseTransportError::AffineFiberObstructed,
-                )) => {
+                Err(WavePropagationError::Law(WavePropagationRefusal::AffineFiber(
+                    InverseTransportError::Law(
+                        crate::InverseTransportRefusal::AffineFiberObstructed,
+                    ),
+                ))) => {
                     obstructions.push(WaveModeObstruction {
                         event: event.event,
                         interaction: interaction.id,
@@ -915,23 +1040,26 @@ impl ExactWavePropagationLaw {
         })
     }
 
-    fn generate(
+    /// Every contemporary mode's prediction of the interaction's target from one source section.
+    fn predict_modes(
         &self,
-        standing: &mut WavePropagationStanding,
-        event: &WaveGenerationEvent,
-    ) -> Result<WaveGenerationReceipt, WavePropagationError> {
-        let interaction = self
-            .spec
-            .interactions
-            .get(&event.interaction)
-            .ok_or(WavePropagationError::UnknownInteraction)?;
-        event
-            .source
-            .validate(&self.spec.receivers[&interaction.source])?;
+        standing: &WavePropagationStanding,
+        interaction_id: WaveInteractionId,
+        source: &ExactWaveSection,
+    ) -> Result<(Vec<WaveModePrediction>, CpuExecutionReceipt), WavePropagationError> {
+        let interaction =
+            self.spec
+                .interactions
+                .get(&interaction_id)
+                .ok_or(WavePropagationError::Law(
+                    WavePropagationRefusal::UnknownInteraction,
+                ))?;
         let modes = standing
             .interactions
-            .get(&event.interaction)
-            .ok_or(WavePropagationError::UnknownInteraction)?
+            .get(&interaction_id)
+            .ok_or(WavePropagationError::Law(
+                WavePropagationRefusal::UnknownInteraction,
+            ))?
             .modes
             .clone();
 
@@ -941,8 +1069,7 @@ impl ExactWavePropagationLaw {
         let mode_inputs = modes
             .iter()
             .map(|mode| {
-                let output_samples = event
-                    .source
+                let output_samples = source
                     .sample_count()
                     .checked_add(
                         usize::try_from(mode.kernel.support)
@@ -966,7 +1093,7 @@ impl ExactWavePropagationLaw {
                     .iter()
                     .map(|(output_ordinal, target_channel)| {
                         let coefficients = mode.kernel.coefficient_form(
-                            &event.source,
+                            source,
                             *output_ordinal,
                             *target_channel,
                         )?;
@@ -989,13 +1116,34 @@ impl ExactWavePropagationLaw {
                 Ok(WaveModePrediction {
                     mode: mode.id,
                     target,
-                    origin: event.source.origin.clone(),
-                    step: event.source.step.clone(),
+                    origin: source.origin.clone(),
+                    step: source.step.clone(),
                     samples,
                     determined,
                 })
             })
             .map_err(map_cpu_error)?;
+
+        Ok((mode_predictions, execution))
+    }
+
+    fn generate(
+        &self,
+        standing: &mut WavePropagationStanding,
+        event: &WaveGenerationEvent,
+    ) -> Result<WaveGenerationReceipt, WavePropagationError> {
+        let interaction =
+            self.spec
+                .interactions
+                .get(&event.interaction)
+                .ok_or(WavePropagationError::Law(
+                    WavePropagationRefusal::UnknownInteraction,
+                ))?;
+        event
+            .source
+            .validate(&self.spec.receivers[&interaction.source])?;
+        let (mode_predictions, execution) =
+            self.predict_modes(standing, event.interaction, &event.source)?;
 
         let prediction = WavePredictionId(standing.next_prediction);
         standing.next_prediction = standing
@@ -1012,19 +1160,10 @@ impl ExactWavePropagationLaw {
             mode_predictions,
             execution,
         };
-        let record = WaveGenerationRecord {
-            schema: receipt.schema.clone(),
-            event: receipt.event,
-            prediction: receipt.prediction,
-            interaction: receipt.interaction,
-            source_lineage: receipt.source_lineage,
-            mode_predictions: receipt.mode_predictions.clone(),
-            open_interaction: receipt.open_interaction,
-        };
         standing.pending.insert(
             prediction,
             PendingWavePrediction {
-                generation: record,
+                interaction: event.interaction,
                 source: event.source.clone(),
             },
         );
@@ -1036,21 +1175,29 @@ impl ExactWavePropagationLaw {
         standing: &mut WavePropagationStanding,
         event: &WavePredictionReturnEvent,
     ) -> Result<WaveReturnReceipt, WavePropagationError> {
-        let pending = standing
-            .pending
-            .remove(&event.prediction)
-            .ok_or(WavePropagationError::UnknownPrediction)?;
-        let interaction = self
-            .spec
-            .interactions
-            .get(&pending.generation.interaction)
-            .ok_or(WavePropagationError::UnknownInteraction)?;
+        let pending =
+            standing
+                .pending
+                .remove(&event.prediction)
+                .ok_or(WavePropagationError::Law(
+                    WavePropagationRefusal::UnknownPrediction,
+                ))?;
+        let interaction =
+            self.spec
+                .interactions
+                .get(&pending.interaction)
+                .ok_or(WavePropagationError::Law(
+                    WavePropagationRefusal::UnknownInteraction,
+                ))?;
         event
             .target_return
             .validate(&self.spec.receivers[&interaction.target])?;
+        // The retained operands are read through the contemporary modes.
+        let (mode_predictions, _) =
+            self.predict_modes(standing, pending.interaction, &pending.source)?;
 
         let mut grades = Vec::new();
-        for prediction in &pending.generation.mode_predictions {
+        for prediction in &mode_predictions {
             let chart_departure = prediction.origin != event.target_return.origin
                 || prediction.step != event.target_return.step;
             let extent_departure = prediction.samples.len() != event.target_return.sample_count();
@@ -1081,7 +1228,7 @@ impl ExactWavePropagationLaw {
                 standing,
                 &WaveConditioningEvent {
                     event: event.event,
-                    interaction: pending.generation.interaction,
+                    interaction: pending.interaction,
                     source: pending.source,
                     target_return: event.target_return.clone(),
                 },
@@ -1175,9 +1322,7 @@ impl ExactEventLaw for ExactWavePropagationLaw {
         event: &Self::Event,
     ) -> Result<EventSuccessor<Self::Standing, Self::Radiation>, Self::Error> {
         self.validate_standing(standing_before)?;
-        if standing_before.used_events.contains(&event.event()) {
-            return Err(WavePropagationError::RepeatedEvent);
-        }
+        standing_before.refuse_repeated(event.event())?;
         let mut standing_after = standing_before.clone();
         standing_after.used_events.insert(event.event());
         let radiation = match event {
@@ -1194,29 +1339,6 @@ impl ExactEventLaw for ExactWavePropagationLaw {
                 WavePropagationRadiation::Returned(receipt)
             }
         };
-        match &radiation {
-            WavePropagationRadiation::Conditioned(receipt) => standing_after
-                .history
-                .push(WavePropagationHistoryEntry::Conditioned(receipt.clone())),
-            WavePropagationRadiation::Generated(receipt) => {
-                standing_after
-                    .history
-                    .push(WavePropagationHistoryEntry::Generated(
-                        WaveGenerationRecord {
-                            schema: receipt.schema.clone(),
-                            event: receipt.event,
-                            prediction: receipt.prediction,
-                            interaction: receipt.interaction,
-                            source_lineage: receipt.source_lineage,
-                            mode_predictions: receipt.mode_predictions.clone(),
-                            open_interaction: receipt.open_interaction,
-                        },
-                    ))
-            }
-            WavePropagationRadiation::Returned(receipt) => standing_after
-                .history
-                .push(WavePropagationHistoryEntry::Returned(receipt.clone())),
-        }
         self.validate_standing(&standing_after)?;
         let logical_resources = Self::logical_resources(&radiation);
         Ok(EventSuccessor {
@@ -1280,24 +1402,22 @@ fn residual_components(
 fn map_cpu_error(error: CpuExecutionError<WavePropagationError>) -> WavePropagationError {
     match error {
         CpuExecutionError::Operation(error) => error,
-        CpuExecutionError::WorkerPanicked => WavePropagationError::WorkerPanicked,
+        CpuExecutionError::WorkerPanicked => {
+            WavePropagationError::Law(WavePropagationRefusal::WorkerPanicked)
+        }
     }
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum WavePropagationError {
+pub enum WavePropagationRefusal {
     #[error("the wave propagation specification is malformed")]
     MalformedSpec,
     #[error("a receiver was declared twice")]
     DuplicateReceiver,
     #[error("an interaction was declared twice")]
     DuplicateInteraction,
-    #[error("an event occurrence was supplied twice")]
-    RepeatedEvent,
     #[error("the exact wave section is malformed")]
     MalformedSection,
-    #[error("the wave propagation standing is malformed")]
-    MalformedStanding,
     #[error("the exact causal kernel fiber is malformed")]
     MalformedKernelFiber,
     #[error("the interaction is absent")]
@@ -1312,11 +1432,18 @@ pub enum WavePropagationError {
     KernelDimension,
     #[error("one exact physical worker panicked")]
     WorkerPanicked,
-    #[error("a finite carrier extent overflowed")]
-    CarrierOverflow,
     #[error(transparent)]
     AffineFiber(#[from] InverseTransportError),
 }
+
+impl RefusalKind for WavePropagationRefusal {
+    const LAW: &'static str = "wave propagation";
+}
+
+/// The wave propagation law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type WavePropagationError = EventRefusal<WavePropagationRefusal>;
+
+event_refusal_from!(WavePropagationRefusal: InverseTransportError);
 
 #[cfg(test)]
 mod tests {
@@ -1436,6 +1563,101 @@ mod tests {
         };
         assert!(returned.grades[0].exact);
         assert!(returned.grades[0].residual_components.is_empty());
+    }
+
+    /// Phase 16: a pending prediction retains its producing operands. An old rest's frozen
+    /// generation record decodes to them; the return grade read through the contemporary modes
+    /// equals the grade of the generation receipt's predictions when no conditioning intervened;
+    /// and new rests carry neither the frozen predictions nor a history.
+    #[test]
+    fn a_retired_frozen_pending_record_decodes_to_its_operands_and_grades_unchanged() {
+        let law = law(CpuExecutor::serial());
+        let mut world = CausalWorld::new(law.clone(), law.initial_standing());
+        let source = [1, 2, 3];
+        world
+            .receive(&WavePropagationEvent::Condition(WaveConditioningEvent {
+                event: EventId(1),
+                interaction: WaveInteractionId(1),
+                source: mono(WaveReceiverId(1), 1, &source),
+                target_return: mono(WaveReceiverId(2), 2, &convolve(&source, &[2, -1])),
+            }))
+            .unwrap();
+        let held = mono(WaveReceiverId(1), 3, &[3, 1]);
+        let generation = world
+            .receive(&WavePropagationEvent::Generate(WaveGenerationEvent {
+                event: EventId(2),
+                interaction: WaveInteractionId(1),
+                source: held.clone(),
+            }))
+            .unwrap();
+        let WavePropagationRadiation::Generated(generation) = &generation.radiation[0] else {
+            panic!("generation receipt");
+        };
+        assert_eq!(
+            world.standing().pending[&generation.prediction],
+            PendingWavePrediction {
+                interaction: WaveInteractionId(1),
+                source: held.clone(),
+            }
+        );
+
+        let mut legacy = serde_json::to_value(world.standing()).unwrap();
+        let object = legacy.as_object_mut().unwrap();
+        let pending = object["pending"].as_object_mut().unwrap();
+        let (key, entry) = pending.iter_mut().next().unwrap();
+        assert_eq!(key, &generation.prediction.0.to_string());
+        *entry = serde_json::json!({
+            "generation": {
+                "schema": generation.schema,
+                "event": generation.event,
+                "prediction": generation.prediction,
+                "interaction": generation.interaction,
+                "source_lineage": generation.source_lineage,
+                "mode_predictions": generation.mode_predictions,
+                "open_interaction": generation.open_interaction,
+            },
+            "source": held,
+        });
+        object.insert("history".to_owned(), serde_json::json!([]));
+        let decoded: WavePropagationStanding = serde_json::from_value(legacy).unwrap();
+        assert_eq!(&decoded, world.standing());
+        let rest = serde_json::to_value(&decoded).unwrap();
+        assert!(rest.get("history").is_none());
+        assert!(
+            rest["pending"][generation.prediction.0.to_string()]
+                .get("generation")
+                .is_none()
+        );
+
+        let target = mono(WaveReceiverId(2), 4, &[6, -1, -1]);
+        let mut remounted = CausalWorld::new(law.clone(), decoded);
+        let returned = remounted
+            .receive(&WavePropagationEvent::Return(WavePredictionReturnEvent {
+                event: EventId(3),
+                prediction: generation.prediction,
+                target_return: target.clone(),
+                condition_after_grade: false,
+            }))
+            .unwrap();
+        let WavePropagationRadiation::Returned(returned) = &returned.radiation[0] else {
+            panic!("return receipt");
+        };
+        // The frozen reading: grade the generation receipt's own predictions.
+        let frozen = generation
+            .mode_predictions
+            .iter()
+            .map(|prediction| residual_components(prediction, &target).unwrap())
+            .collect::<Vec<_>>();
+        assert_eq!(
+            returned
+                .grades
+                .iter()
+                .map(|grade| grade.residual_components.clone())
+                .collect::<Vec<_>>(),
+            frozen
+        );
+        assert!(returned.grades[0].exact);
+        assert!(remounted.standing().pending.is_empty());
     }
 
     #[test]
@@ -1593,8 +1815,8 @@ mod tests {
                 }),
             )
             .unwrap_err(),
-            WavePropagationError::ReceiverChartMismatch
+            WavePropagationError::Law(WavePropagationRefusal::ReceiverChartMismatch)
         );
-        assert!(standing.history.is_empty());
+        assert!(standing.used_events().is_empty());
     }
 }

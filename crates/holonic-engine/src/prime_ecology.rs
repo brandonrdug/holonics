@@ -22,6 +22,10 @@ use num_traits::{One, Signed, ToPrimitive, Zero};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::world::{
+    EventQuotient, EventRefusal, EventStanding, RefusalKind, event_refusal_from,
+    event_standing_wire,
+};
 use crate::{
     ArithmeticFiberError, ArithmeticFiberEvent, ArithmeticFiberLaw, ArithmeticFiberRadiation,
     ArithmeticFiberStanding, CausalAlgebraicError, CausalCellId, CausalChain,
@@ -114,7 +118,9 @@ impl IntegerPolynomialProbe {
 
     pub fn cyclotomic(id: PolynomialProbeId, order: u32) -> Result<Self, PrimeEcologyError> {
         if order == 0 {
-            return Err(PrimeEcologyError::ZeroCyclotomicOrder);
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::ZeroCyclotomicOrder,
+            ));
         }
         let coefficients = cyclotomic_coefficients(order)?;
         let probe = Self {
@@ -139,12 +145,16 @@ impl IntegerPolynomialProbe {
             || self.coefficients.last() != Some(&BigInt::one())
             || self.coefficients.last().is_some_and(Zero::is_zero)
         {
-            return Err(PrimeEcologyError::MalformedPolynomialProbe(self.id));
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::MalformedPolynomialProbe(self.id),
+            ));
         }
         if let PolynomialProbeFamily::Cyclotomic { order } = self.family
             && (order == 0 || self.coefficients != cyclotomic_coefficients(order)?)
         {
-            return Err(PrimeEcologyError::MalformedPolynomialProbe(self.id));
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::MalformedPolynomialProbe(self.id),
+            ));
         }
         Ok(())
     }
@@ -181,7 +191,9 @@ fn cyclotomic_coefficients(order: u32) -> Result<Vec<BigInt>, PrimeEcologyError>
     }
 
     if order == 0 {
-        return Err(PrimeEcologyError::ZeroCyclotomicOrder);
+        return Err(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::ZeroCyclotomicOrder,
+        ));
     }
     receive(order, &mut BTreeMap::new())
 }
@@ -192,19 +204,22 @@ fn exact_integer_polynomial_quotient(
 ) -> Result<Vec<BigInt>, PrimeEcologyError> {
     let denominator = trim_integer_polynomial(denominator.to_vec());
     if denominator.is_empty() || denominator.last() != Some(&BigInt::one()) {
-        return Err(PrimeEcologyError::NonexactCyclotomicDivision);
+        return Err(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::NonexactCyclotomicDivision,
+        ));
     }
     let mut remainder = trim_integer_polynomial(numerator);
     if remainder.len() < denominator.len() {
-        return Err(PrimeEcologyError::NonexactCyclotomicDivision);
+        return Err(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::NonexactCyclotomicDivision,
+        ));
     }
     let mut quotient = vec![BigInt::zero(); remainder.len() - denominator.len() + 1];
     while remainder.len() >= denominator.len() && !remainder.iter().all(Zero::is_zero) {
         let shift = remainder.len() - denominator.len();
-        let coefficient = remainder
-            .last()
-            .cloned()
-            .ok_or(PrimeEcologyError::NonexactCyclotomicDivision)?;
+        let coefficient = remainder.last().cloned().ok_or(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::NonexactCyclotomicDivision,
+        ))?;
         quotient[shift] += &coefficient;
         for (index, divisor) in denominator.iter().enumerate() {
             remainder[index + shift] -= &coefficient * divisor;
@@ -212,7 +227,9 @@ fn exact_integer_polynomial_quotient(
         remainder = trim_integer_polynomial(remainder);
     }
     if !remainder.iter().all(Zero::is_zero) {
-        return Err(PrimeEcologyError::NonexactCyclotomicDivision);
+        return Err(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::NonexactCyclotomicDivision,
+        ));
     }
     Ok(trim_integer_polynomial(quotient))
 }
@@ -227,7 +244,9 @@ pub struct PrimePolynomial {
 impl PrimePolynomial {
     fn new(prime: u64, coefficients: Vec<u64>) -> Result<Self, PrimeEcologyError> {
         if prime < 2 {
-            return Err(PrimeEcologyError::InvalidPrimeModulus(prime));
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::InvalidPrimeModulus(prime),
+            ));
         }
         let coefficients = trim_prime_polynomial(
             coefficients
@@ -283,7 +302,9 @@ impl PrimePolynomial {
             || self.coefficients.iter().any(|value| *value >= self.prime)
             || (self.coefficients.len() > 1 && self.leading() == 0)
         {
-            return Err(PrimeEcologyError::MalformedPrimePolynomial);
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::MalformedPrimePolynomial,
+            ));
         }
         Ok(())
     }
@@ -381,13 +402,15 @@ fn poly_div_rem(
 ) -> Result<(PrimePolynomial, PrimePolynomial), PrimeEcologyError> {
     same_modulus(numerator, denominator)?;
     if denominator.is_zero() {
-        return Err(PrimeEcologyError::PolynomialDivisionByZero);
+        return Err(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::PolynomialDivisionByZero,
+        ));
     }
     let mut remainder = numerator.clone();
     let numerator_degree = numerator.degree().unwrap_or(0);
-    let denominator_degree = denominator
-        .degree()
-        .ok_or(PrimeEcologyError::PolynomialDivisionByZero)?;
+    let denominator_degree = denominator.degree().ok_or(PrimeEcologyError::Law(
+        PrimeEcologyRefusal::PolynomialDivisionByZero,
+    ))?;
     if numerator.is_zero() || numerator_degree < denominator_degree {
         return Ok((PrimePolynomial::zero(numerator.prime), remainder));
     }
@@ -398,9 +421,9 @@ fn poly_div_rem(
             .degree()
             .is_some_and(|degree| degree >= denominator_degree)
     {
-        let remainder_degree = remainder
-            .degree()
-            .ok_or(PrimeEcologyError::MalformedPrimePolynomial)?;
+        let remainder_degree = remainder.degree().ok_or(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::MalformedPrimePolynomial,
+        ))?;
         let shift = remainder_degree - denominator_degree;
         let coefficient = mul_mod(remainder.leading(), inverse_leading, numerator.prime);
         quotient[shift] = add_mod(quotient[shift], coefficient, numerator.prime);
@@ -479,7 +502,9 @@ fn poly_pow_mod(
 ) -> Result<PrimePolynomial, PrimeEcologyError> {
     same_modulus(base, modulus)?;
     if modulus.is_zero() {
-        return Err(PrimeEcologyError::PolynomialDivisionByZero);
+        return Err(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::PolynomialDivisionByZero,
+        ));
     }
     let mut result = PrimePolynomial::one(base.prime);
     let (_, mut power) = poly_div_rem(base, modulus)?;
@@ -499,10 +524,12 @@ fn poly_pow_mod(
 
 fn same_modulus(left: &PrimePolynomial, right: &PrimePolynomial) -> Result<(), PrimeEcologyError> {
     if left.prime != right.prime {
-        Err(PrimeEcologyError::PolynomialModulusMismatch {
-            left: left.prime,
-            right: right.prime,
-        })
+        Err(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::PolynomialModulusMismatch {
+                left: left.prime,
+                right: right.prime,
+            },
+        ))
     } else {
         Ok(())
     }
@@ -562,7 +589,9 @@ impl ExactPrimeMatrix {
                 .iter()
                 .any(|row| row.len() != dimension || row.iter().any(|entry| *entry >= self.prime))
         {
-            return Err(PrimeEcologyError::MalformedPrimeMatrix);
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::MalformedPrimeMatrix,
+            ));
         }
         Ok(())
     }
@@ -571,7 +600,9 @@ impl ExactPrimeMatrix {
         self.validate()?;
         right.validate()?;
         if self.prime != right.prime || self.dimension() != right.dimension() {
-            return Err(PrimeEcologyError::PrimeMatrixMismatch);
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::PrimeMatrixMismatch,
+            ));
         }
         let dimension = self.dimension();
         let mut entries = vec![vec![0; dimension]; dimension];
@@ -643,19 +674,23 @@ impl PolynomialPrimeFiber {
             || self.derivative_gcd.prime != self.prime
             || self.factors.is_empty()
         {
-            return Err(PrimeEcologyError::MalformedPolynomialFiber {
-                prime: self.prime,
-                probe: self.probe,
-            });
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::MalformedPolynomialFiber {
+                    prime: self.prime,
+                    probe: self.probe,
+                },
+            ));
         }
         self.reduced.validate()?;
         self.derivative_gcd.validate()?;
         if self.lineage.kind != CausalMaterialKind::Enacted || self.lineage.source_events.len() != 2
         {
-            return Err(PrimeEcologyError::MalformedPolynomialFiber {
-                prime: self.prime,
-                probe: self.probe,
-            });
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::MalformedPolynomialFiber {
+                    prime: self.prime,
+                    probe: self.probe,
+                },
+            ));
         }
         let mut product = PrimePolynomial::one(self.prime);
         let mut previous = None;
@@ -668,32 +703,32 @@ impl PolynomialPrimeFiber {
                 || factor.multiplicity == 0
                 || factor.frobenius.prime != self.prime
                 || factor.frobenius.dimension()
-                    != factor
-                        .polynomial
-                        .degree()
-                        .ok_or(PrimeEcologyError::MalformedPrimePolynomial)?
+                    != factor.polynomial.degree().ok_or(PrimeEcologyError::Law(
+                        PrimeEcologyRefusal::MalformedPrimePolynomial,
+                    ))?
             {
-                return Err(PrimeEcologyError::MalformedPolynomialFiber {
-                    prime: self.prime,
-                    probe: self.probe,
-                });
+                return Err(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::MalformedPolynomialFiber {
+                        prime: self.prime,
+                        probe: self.probe,
+                    },
+                ));
             }
             if previous
                 .as_ref()
                 .is_some_and(|polynomial: &PrimePolynomial| polynomial >= &factor.polynomial)
             {
-                return Err(PrimeEcologyError::MalformedPolynomialFiber {
-                    prime: self.prime,
-                    probe: self.probe,
-                });
+                return Err(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::MalformedPolynomialFiber {
+                        prime: self.prime,
+                        probe: self.probe,
+                    },
+                ));
             }
             previous = Some(factor.polynomial.clone());
-            let degree = u32::try_from(
-                factor
-                    .polynomial
-                    .degree()
-                    .ok_or(PrimeEcologyError::MalformedPrimePolynomial)?,
-            )
+            let degree = u32::try_from(factor.polynomial.degree().ok_or(
+                PrimeEcologyError::Law(PrimeEcologyRefusal::MalformedPrimePolynomial),
+            )?)
             .map_err(|_| PrimeEcologyError::CarrierOverflow)?;
             let mut irreducibility_work = PolynomialFactorizationWork::default();
             let factor_derivative = poly_derivative(&factor.polynomial)?;
@@ -706,11 +741,15 @@ impl PolynomialPrimeFiber {
                 || (degree > 1
                     && berlekamp_basis(&factor.polynomial, &mut irreducibility_work)?.len() != 1)
             {
-                return Err(PrimeEcologyError::ReducibleReportedFactor);
+                return Err(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::ReducibleReportedFactor,
+                ));
             }
             let (expected_frobenius, expected_order) = frobenius_matrix(&factor.polynomial)?;
             if factor.frobenius != expected_frobenius || factor.frobenius_order != expected_order {
-                return Err(PrimeEcologyError::FrobeniusOrderFailure);
+                return Err(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::FrobeniusOrderFailure,
+                ));
             }
             if degree == 1 {
                 roots = roots
@@ -719,7 +758,9 @@ impl PolynomialPrimeFiber {
             }
             let computed_order = matrix_order(&factor.frobenius, degree)?;
             if factor.frobenius_order != computed_order {
-                return Err(PrimeEcologyError::FrobeniusOrderFailure);
+                return Err(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::FrobeniusOrderFailure,
+                ));
             }
             *grouped
                 .entry((degree, factor.frobenius_order, factor.multiplicity))
@@ -729,14 +770,14 @@ impl PolynomialPrimeFiber {
             }
         }
         if product != self.reduced {
-            return Err(PrimeEcologyError::PolynomialFactorizationResidual);
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::PolynomialFactorizationResidual,
+            ));
         }
         let expected_signature = PolynomialFiberSignature {
-            degree: u32::try_from(
-                self.reduced
-                    .degree()
-                    .ok_or(PrimeEcologyError::MalformedPrimePolynomial)?,
-            )
+            degree: u32::try_from(self.reduced.degree().ok_or(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::MalformedPrimePolynomial,
+            ))?)
             .map_err(|_| PrimeEcologyError::CarrierOverflow)?,
             distinct_root_count: roots,
             separable: self.derivative_gcd.degree() == Some(0),
@@ -753,10 +794,12 @@ impl PolynomialPrimeFiber {
                 .collect(),
         };
         if self.signature != expected_signature {
-            return Err(PrimeEcologyError::MalformedPolynomialFiber {
-                prime: self.prime,
-                probe: self.probe,
-            });
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::MalformedPolynomialFiber {
+                    prime: self.prime,
+                    probe: self.probe,
+                },
+            ));
         }
         Ok(())
     }
@@ -772,17 +815,21 @@ fn matrix_order(matrix: &ExactPrimeMatrix, maximum: u32) -> Result<u32, PrimeEco
             return Ok(order);
         }
     }
-    Err(PrimeEcologyError::FrobeniusOrderFailure)
+    Err(PrimeEcologyError::Law(
+        PrimeEcologyRefusal::FrobeniusOrderFailure,
+    ))
 }
 
 fn frobenius_matrix(
     factor: &PrimePolynomial,
 ) -> Result<(ExactPrimeMatrix, u32), PrimeEcologyError> {
-    let degree = factor
-        .degree()
-        .ok_or(PrimeEcologyError::MalformedPrimePolynomial)?;
+    let degree = factor.degree().ok_or(PrimeEcologyError::Law(
+        PrimeEcologyRefusal::MalformedPrimePolynomial,
+    ))?;
     if degree == 0 {
-        return Err(PrimeEcologyError::MalformedPrimePolynomial);
+        return Err(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::MalformedPrimePolynomial,
+        ));
     }
     let x = PrimePolynomial::x(factor.prime);
     let mut entries = vec![vec![0; degree]; degree];
@@ -817,7 +864,9 @@ fn nullspace_mod_prime(
     let rows = matrix.len();
     let columns = matrix[0].len();
     if matrix.iter().any(|row| row.len() != columns) {
-        return Err(PrimeEcologyError::MalformedPrimeMatrix);
+        return Err(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::MalformedPrimeMatrix,
+        ));
     }
     let mut pivot_columns = Vec::new();
     let mut pivot_row = 0_usize;
@@ -880,9 +929,9 @@ fn berlekamp_basis(
     polynomial: &PrimePolynomial,
     work: &mut PolynomialFactorizationWork,
 ) -> Result<Vec<PrimePolynomial>, PrimeEcologyError> {
-    let degree = polynomial
-        .degree()
-        .ok_or(PrimeEcologyError::MalformedPrimePolynomial)?;
+    let degree = polynomial.degree().ok_or(PrimeEcologyError::Law(
+        PrimeEcologyRefusal::MalformedPrimePolynomial,
+    ))?;
     let x = PrimePolynomial::x(polynomial.prime);
     let mut matrix = vec![vec![0; degree]; degree];
     for (column, basis_power) in (0_u128..).take(degree).enumerate() {
@@ -935,12 +984,16 @@ fn berlekamp_split(
             }
             let (quotient, remainder) = poly_div_rem(polynomial, &divisor)?;
             if !remainder.is_zero() {
-                return Err(PrimeEcologyError::PolynomialFactorizationResidual);
+                return Err(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::PolynomialFactorizationResidual,
+                ));
             }
             return Ok((poly_monic(&divisor)?, poly_monic(&quotient)?));
         }
     }
-    Err(PrimeEcologyError::BerlekampSplitFailure)
+    Err(PrimeEcologyError::Law(
+        PrimeEcologyRefusal::BerlekampSplitFailure,
+    ))
 }
 
 fn factor_monic(
@@ -949,9 +1002,9 @@ fn factor_monic(
     work: &mut PolynomialFactorizationWork,
 ) -> Result<(), PrimeEcologyError> {
     let polynomial = poly_monic(polynomial)?;
-    let degree = polynomial
-        .degree()
-        .ok_or(PrimeEcologyError::MalformedPrimePolynomial)?;
+    let degree = polynomial.degree().ok_or(PrimeEcologyError::Law(
+        PrimeEcologyRefusal::MalformedPrimePolynomial,
+    ))?;
     if degree == 0 {
         return Ok(());
     }
@@ -970,7 +1023,9 @@ fn factor_monic(
             .enumerate()
             .any(|(degree, coefficient)| degree % prime_stride != 0 && *coefficient != 0)
         {
-            return Err(PrimeEcologyError::PerfectPowerExtractionFailure);
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::PerfectPowerExtractionFailure,
+            ));
         }
         let root = PrimePolynomial::new(
             polynomial.prime,
@@ -999,7 +1054,9 @@ fn factor_monic(
     if repeated_degree > 0 && repeated_degree < degree {
         let (quotient, remainder) = poly_div_rem(&polynomial, &repeated)?;
         if !remainder.is_zero() {
-            return Err(PrimeEcologyError::PolynomialFactorizationResidual);
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::PolynomialFactorizationResidual,
+            ));
         }
         factor_monic(&repeated, population, work)?;
         factor_monic(&quotient, population, work)?;
@@ -1029,11 +1086,13 @@ fn factor_prime_polynomial(
     reduced: &PrimePolynomial,
 ) -> Result<FactoredPrimePolynomial, PrimeEcologyError> {
     reduced.validate()?;
-    let degree = reduced
-        .degree()
-        .ok_or(PrimeEcologyError::MalformedPrimePolynomial)?;
+    let degree = reduced.degree().ok_or(PrimeEcologyError::Law(
+        PrimeEcologyRefusal::MalformedPrimePolynomial,
+    ))?;
     if degree == 0 || reduced.leading() != 1 {
-        return Err(PrimeEcologyError::MalformedPrimePolynomial);
+        return Err(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::MalformedPrimePolynomial,
+        ));
     }
     let derivative = poly_derivative(reduced)?;
     let mut work = PolynomialFactorizationWork::default();
@@ -1044,11 +1103,9 @@ fn factor_prime_polynomial(
     let mut grouped = BTreeMap::<(u32, u32, u32), u32>::new();
     let mut roots = 0_u32;
     for (polynomial, multiplicity) in population {
-        let factor_degree = u32::try_from(
-            polynomial
-                .degree()
-                .ok_or(PrimeEcologyError::MalformedPrimePolynomial)?,
-        )
+        let factor_degree = u32::try_from(polynomial.degree().ok_or(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::MalformedPrimePolynomial,
+        ))?)
         .map_err(|_| PrimeEcologyError::CarrierOverflow)?;
         let (frobenius, frobenius_order) = frobenius_matrix(&polynomial)?;
         if factor_degree == 1 {
@@ -1101,7 +1158,9 @@ fn receive_polynomial_fiber(
     let prime_event = standing
         .occurrences()
         .get(&prime)
-        .ok_or(PrimeEcologyError::MissingPrimeOccurrence(prime))?
+        .ok_or(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::MissingPrimeOccurrence(prime),
+        ))?
         .event;
     derive_polynomial_fiber(prime, prime_cell, prime_event, probe_event, probe)
 }
@@ -1116,10 +1175,12 @@ fn derive_polynomial_fiber(
     probe.validate()?;
     let reduced = reduce_integer_polynomial(prime, &probe.coefficients)?;
     if reduced.degree() != Some(probe.degree()) || reduced.leading() != 1 {
-        return Err(PrimeEcologyError::ProbeDegreeCollapsed {
-            prime,
-            probe: probe.id,
-        });
+        return Err(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::ProbeDegreeCollapsed {
+                prime,
+                probe: probe.id,
+            },
+        ));
     }
     let factored = factor_prime_polynomial(&reduced)?;
     let fiber = PolynomialPrimeFiber {
@@ -1199,7 +1260,9 @@ impl MonicPolynomialTorsor {
                 .iter()
                 .any(|coefficient| coefficient.is_negative() || coefficient >= &self.modulus)
         {
-            return Err(PrimeEcologyError::MalformedPolynomialTorsor);
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::MalformedPolynomialTorsor,
+            ));
         }
         Ok(())
     }
@@ -1270,7 +1333,9 @@ impl HornFillerBranch {
             .insert(self.missing_prime, self.missing_stratum.clone())
             .is_some()
         {
-            return Err(PrimeEcologyError::MalformedHornFillerSpace(self.id.space));
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::MalformedHornFillerSpace(self.id.space),
+            ));
         }
         Ok(MonicPolynomialConstraintFamily {
             degree: self.degree,
@@ -1290,11 +1355,13 @@ impl HornFillerBranch {
 
     pub fn torsors(&self, limit: u64) -> Result<Vec<MonicPolynomialTorsor>, PrimeEcologyError> {
         if self.torsor_count() > limit {
-            return Err(PrimeEcologyError::HornTorsorInspectionSpaceExceeded {
-                branch: self.id,
-                sections: self.torsor_count(),
-                limit,
-            });
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::HornTorsorInspectionSpaceExceeded {
+                    branch: self.id,
+                    sections: self.torsor_count(),
+                    limit,
+                },
+            ));
         }
         let family = self.constraint_family()?;
         let mut selections = vec![family.fixed_sections.clone()];
@@ -1303,25 +1370,31 @@ impl HornFillerBranch {
             if u64::try_from(sections.len()).map_err(|_| PrimeEcologyError::CarrierOverflow)?
                 != stratum.section_count
             {
-                return Err(PrimeEcologyError::MalformedHornFillerSpace(self.id.space));
+                return Err(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::MalformedHornFillerSpace(self.id.space),
+                ));
             }
             let next_len = selections
                 .len()
                 .checked_mul(sections.len())
                 .ok_or(PrimeEcologyError::CarrierOverflow)?;
             if u64::try_from(next_len).map_err(|_| PrimeEcologyError::CarrierOverflow)? > limit {
-                return Err(PrimeEcologyError::HornTorsorInspectionSpaceExceeded {
-                    branch: self.id,
-                    sections: self.torsor_count(),
-                    limit,
-                });
+                return Err(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::HornTorsorInspectionSpaceExceeded {
+                        branch: self.id,
+                        sections: self.torsor_count(),
+                        limit,
+                    },
+                ));
             }
             let mut expanded = Vec::with_capacity(next_len);
             for selected in selections {
                 for section in &sections {
                     let mut child = selected.clone();
                     if child.insert(*prime, section.clone()).is_some() {
-                        return Err(PrimeEcologyError::MalformedHornFillerSpace(self.id.space));
+                        return Err(PrimeEcologyError::Law(
+                            PrimeEcologyRefusal::MalformedHornFillerSpace(self.id.space),
+                        ));
                     }
                     expanded.push(child);
                 }
@@ -1339,7 +1412,9 @@ impl HornFillerBranch {
             != self.torsor_count()
             || torsors.iter().any(|torsor| torsor.modulus != self.modulus)
         {
-            return Err(PrimeEcologyError::MalformedHornFillerSpace(self.id.space));
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::MalformedHornFillerSpace(self.id.space),
+            ));
         }
         Ok(torsors)
     }
@@ -1500,11 +1575,67 @@ pub struct PrimeEcologyGeometryReceipt {
     pub open_horns: BTreeSet<Vec<u64>>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct PrimeEcologyStanding {
-    pub schema: String,
+/// [definition] **The prime-ecology quotient** (plan phase 16): the arithmetic standing, probes, fibres, filler spaces, features, phase cells and horns.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PrimeEcologyQuotient {
     pub max_phase_grade: u32,
     pub max_horn_local_sections: u64,
+    arithmetic: ArithmeticFiberStanding,
+    probes: BTreeMap<PolynomialProbeId, InheritedPolynomialProbe>,
+    fibers: BTreeMap<(u64, PolynomialProbeId), PolynomialPrimeFiber>,
+    filler_spaces: BTreeMap<HornFillerSpaceId, HornFillerSpace>,
+    prime_features: BTreeMap<u64, BTreeSet<PrimePhaseFeature>>,
+    phase_cells: BTreeMap<Vec<u64>, PrimePhaseCell>,
+    horns: BTreeMap<Vec<u64>, PotentialPrimeHorn>,
+}
+
+/// The standing: the shared event scaffold around [`PrimeEcologyQuotient`].
+pub type PrimeEcologyStanding = EventStanding<PrimeEcologyQuotient>;
+
+impl EventQuotient for PrimeEcologyQuotient {
+    type Refusal = PrimeEcologyRefusal;
+}
+
+#[derive(Serialize)]
+#[serde(rename = "PrimeEcologyStanding")]
+struct PrimeEcologyStandingWrite<'a> {
+    schema: &'a String,
+    max_phase_grade: &'a u32,
+    max_horn_local_sections: &'a u64,
+    arithmetic: &'a ArithmeticFiberStanding,
+    probes: &'a BTreeMap<PolynomialProbeId, InheritedPolynomialProbe>,
+    fibers: &'a BTreeMap<(u64, PolynomialProbeId), PolynomialPrimeFiber>,
+    filler_spaces: &'a BTreeMap<HornFillerSpaceId, HornFillerSpace>,
+    prime_features: &'a BTreeMap<u64, BTreeSet<PrimePhaseFeature>>,
+    phase_cells: &'a BTreeMap<Vec<u64>, PrimePhaseCell>,
+    horns: &'a BTreeMap<Vec<u64>, PotentialPrimeHorn>,
+    used_events: &'a BTreeSet<EventId>,
+}
+
+impl<'a> From<&'a PrimeEcologyStanding> for PrimeEcologyStandingWrite<'a> {
+    fn from(standing: &'a PrimeEcologyStanding) -> Self {
+        Self {
+            schema: &standing.schema,
+            max_phase_grade: &standing.max_phase_grade,
+            max_horn_local_sections: &standing.max_horn_local_sections,
+            arithmetic: &standing.arithmetic,
+            probes: &standing.probes,
+            fibers: &standing.fibers,
+            filler_spaces: &standing.filler_spaces,
+            prime_features: &standing.prime_features,
+            phase_cells: &standing.phase_cells,
+            horns: &standing.horns,
+            used_events: &standing.used_events,
+        }
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(rename = "PrimeEcologyStanding")]
+struct PrimeEcologyStandingRead {
+    schema: String,
+    max_phase_grade: u32,
+    max_horn_local_sections: u64,
     arithmetic: ArithmeticFiberStanding,
     probes: BTreeMap<PolynomialProbeId, InheritedPolynomialProbe>,
     fibers: BTreeMap<(u64, PolynomialProbeId), PolynomialPrimeFiber>,
@@ -1515,30 +1646,60 @@ pub struct PrimeEcologyStanding {
     used_events: BTreeSet<EventId>,
 }
 
+impl From<PrimeEcologyStandingRead> for PrimeEcologyStanding {
+    fn from(read: PrimeEcologyStandingRead) -> Self {
+        EventStanding::from_parts(
+            read.schema,
+            read.used_events,
+            PrimeEcologyQuotient {
+                max_phase_grade: read.max_phase_grade,
+                max_horn_local_sections: read.max_horn_local_sections,
+                arithmetic: read.arithmetic,
+                probes: read.probes,
+                fibers: read.fibers,
+                filler_spaces: read.filler_spaces,
+                prime_features: read.prime_features,
+                phase_cells: read.phase_cells,
+                horns: read.horns,
+            },
+        )
+    }
+}
+
+event_standing_wire!(
+    PrimeEcologyQuotient,
+    PrimeEcologyStandingWrite,
+    PrimeEcologyStandingRead
+);
+
 impl PrimeEcologyStanding {
     pub fn with_horn_local_section_limit(
         max_phase_grade: u32,
         max_horn_local_sections: u64,
     ) -> Result<Self, PrimeEcologyError> {
         if max_phase_grade == 0 {
-            return Err(PrimeEcologyError::ZeroPhaseGrade);
+            return Err(PrimeEcologyError::Law(PrimeEcologyRefusal::ZeroPhaseGrade));
         }
         if max_horn_local_sections == 0 {
-            return Err(PrimeEcologyError::ZeroHornLocalSectionLimit);
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::ZeroHornLocalSectionLimit,
+            ));
         }
-        Ok(Self {
-            schema: "holonic-engine.prime-ecology-standing.v3".to_owned(),
-            max_phase_grade,
-            max_horn_local_sections,
-            arithmetic: ArithmeticFiberStanding::default(),
-            probes: BTreeMap::new(),
-            fibers: BTreeMap::new(),
-            filler_spaces: BTreeMap::new(),
-            prime_features: BTreeMap::new(),
-            phase_cells: BTreeMap::new(),
-            horns: BTreeMap::new(),
-            used_events: BTreeSet::new(),
-        })
+        Ok(EventStanding::from_parts(
+            "holonic-engine.prime-ecology-standing.v3".to_owned(),
+            BTreeSet::new(),
+            PrimeEcologyQuotient {
+                max_phase_grade: max_phase_grade,
+                max_horn_local_sections: max_horn_local_sections,
+                arithmetic: ArithmeticFiberStanding::default(),
+                probes: BTreeMap::new(),
+                fibers: BTreeMap::new(),
+                filler_spaces: BTreeMap::new(),
+                prime_features: BTreeMap::new(),
+                phase_cells: BTreeMap::new(),
+                horns: BTreeMap::new(),
+            },
+        ))
     }
 
     pub fn arithmetic(&self) -> &ArithmeticFiberStanding {
@@ -1650,7 +1811,9 @@ impl PrimeEcologyStanding {
         let canonical = self
             .fibers
             .get(&(prime, probe))
-            .ok_or(PrimeEcologyError::MissingPolynomialFiber { prime, probe })?;
+            .ok_or(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::MissingPolynomialFiber { prime, probe },
+            ))?;
         let supplied_reduction = reduce_integer_polynomial(prime, &supplied_coefficients)?;
         let same_reduction = supplied_reduction == canonical.reduced;
         // A coefficient-wise equal reduction is the same receiver polynomial,
@@ -1682,22 +1845,30 @@ impl PrimeEcologyStanding {
     ) -> Result<HornFillerRefinementReceipt, PrimeEcologyError> {
         self.validate()?;
         if !self.arithmetic.prime_cells().contains_key(&prime) {
-            return Err(PrimeEcologyError::MissingRefinementPrime(prime));
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::MissingRefinementPrime(prime),
+            ));
         }
         let space = self
             .filler_spaces
             .get(&branch.space)
-            .ok_or(PrimeEcologyError::MissingHornFillerSpace(branch.space))?;
+            .ok_or(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::MissingHornFillerSpace(branch.space),
+            ))?;
         let branch_standing = space
             .branches
             .iter()
             .find(|candidate| candidate.id == branch)
-            .ok_or(PrimeEcologyError::MissingHornFillerBranch(branch))?;
+            .ok_or(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::MissingHornFillerBranch(branch),
+            ))?;
         if space.support.contains(&prime) {
-            return Err(PrimeEcologyError::RefinementPrimeAlreadyInSupport {
-                space: space.id,
-                prime,
-            });
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::RefinementPrimeAlreadyInSupport {
+                    space: space.id,
+                    prime,
+                },
+            ));
         }
         let local_population = enumerate_monic_polynomial_population(
             prime,
@@ -1750,7 +1921,9 @@ impl PrimeEcologyStanding {
             || self.max_phase_grade == 0
             || self.max_horn_local_sections == 0
         {
-            return Err(PrimeEcologyError::MalformedPrimeEcologyStanding);
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::MalformedPrimeEcologyStanding,
+            ));
         }
         self.arithmetic.validate()?;
 
@@ -1779,7 +1952,9 @@ impl PrimeEcologyStanding {
                 .collect::<BTreeSet<_>>()
                 != self.used_events
         {
-            return Err(PrimeEcologyError::EcologyEventMismatch);
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::EcologyEventMismatch,
+            ));
         }
         for (id, inherited) in &self.probes {
             inherited.probe.validate()?;
@@ -1787,7 +1962,9 @@ impl PrimeEcologyStanding {
                 || inherited.lineage.kind != CausalMaterialKind::Inherited
                 || inherited.lineage.source_events != BTreeSet::from([inherited.inherited_at])
             {
-                return Err(PrimeEcologyError::MalformedInheritedProbe(*id));
+                return Err(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::MalformedInheritedProbe(*id),
+                ));
             }
         }
 
@@ -1798,7 +1975,9 @@ impl PrimeEcologyStanding {
             .flat_map(|prime| self.probes.keys().map(move |probe| (*prime, *probe)))
             .collect::<BTreeSet<_>>();
         if self.fibers.keys().copied().collect::<BTreeSet<_>>() != expected_fiber_keys {
-            return Err(PrimeEcologyError::FiberPopulationMismatch);
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::FiberPopulationMismatch,
+            ));
         }
         for ((prime, probe), fiber) in &self.fibers {
             fiber.validate()?;
@@ -1819,15 +1998,19 @@ impl PrimeEcologyStanding {
                     != BTreeSet::from([prime_event, inherited.inherited_at])
                 || fiber != &expected
             {
-                return Err(PrimeEcologyError::MalformedPolynomialFiber {
-                    prime: *prime,
-                    probe: *probe,
-                });
+                return Err(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::MalformedPolynomialFiber {
+                        prime: *prime,
+                        probe: *probe,
+                    },
+                ));
             }
         }
         for (id, space) in &self.filler_spaces {
             if *id != space.id {
-                return Err(PrimeEcologyError::MalformedHornFillerSpace(*id));
+                return Err(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::MalformedHornFillerSpace(*id),
+                ));
             }
             validate_horn_filler_space(self, space)?;
         }
@@ -1837,11 +2020,15 @@ impl PrimeEcologyStanding {
             expected_features.entry(*prime).or_default();
         }
         if self.prime_features != expected_features {
-            return Err(PrimeEcologyError::PrimeFeatureMismatch);
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::PrimeFeatureMismatch,
+            ));
         }
         for prime in self.arithmetic.prime_cells().keys() {
             if !self.prime_features.contains_key(prime) {
-                return Err(PrimeEcologyError::PrimeFeatureMismatch);
+                return Err(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::PrimeFeatureMismatch,
+                ));
             }
         }
 
@@ -1854,15 +2041,21 @@ impl PrimeEcologyStanding {
                 || expected_grade > self.max_phase_grade
                 || cell.lineage.kind != CausalMaterialKind::Induced
             {
-                return Err(PrimeEcologyError::MalformedPhaseCell(support.clone()));
+                return Err(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::MalformedPhaseCell(support.clone()),
+                ));
             }
             let witnesses = common_features(support, &self.prime_features)?;
             if witnesses.is_empty() || witnesses != cell.witness_features {
-                return Err(PrimeEcologyError::MalformedPhaseCell(support.clone()));
+                return Err(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::MalformedPhaseCell(support.clone()),
+                ));
             }
             let witness_events = feature_events(&witnesses, &self.probes, &self.filler_spaces)?;
             if witness_events != cell.witness_events {
-                return Err(PrimeEcologyError::MalformedPhaseCell(support.clone()));
+                return Err(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::MalformedPhaseCell(support.clone()),
+                ));
             }
             let expected_boundary = phase_boundary(support, &self.arithmetic, &self.phase_cells)?.0;
             let body = self.arithmetic.incidence().cell(cell.cell)?;
@@ -1870,7 +2063,9 @@ impl PrimeEcologyStanding {
                 || body.boundary != expected_boundary
                 || body.source_events != cell.lineage.source_events
             {
-                return Err(PrimeEcologyError::MalformedPhaseCell(support.clone()));
+                return Err(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::MalformedPhaseCell(support.clone()),
+                ));
             }
         }
 
@@ -1882,23 +2077,31 @@ impl PrimeEcologyStanding {
                         .map_err(|_| PrimeEcologyError::CarrierOverflow)?
                 || horn.lineage.kind != CausalMaterialKind::Proposed
             {
-                return Err(PrimeEcologyError::MalformedPrimeHorn(support.clone()));
+                return Err(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::MalformedPrimeHorn(support.clone()),
+                ));
             }
             let (_, boundary_cells) = phase_boundary(support, &self.arithmetic, &self.phase_cells)?;
             if boundary_cells != horn.boundary_cells {
-                return Err(PrimeEcologyError::MalformedPrimeHorn(support.clone()));
+                return Err(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::MalformedPrimeHorn(support.clone()),
+                ));
             }
             match horn.status {
                 PrimeHornStatus::Open => {
                     if !common_features(support, &self.prime_features)?.is_empty()
                         || self.phase_cells.contains_key(support)
                     {
-                        return Err(PrimeEcologyError::MalformedPrimeHorn(support.clone()));
+                        return Err(PrimeEcologyError::Law(
+                            PrimeEcologyRefusal::MalformedPrimeHorn(support.clone()),
+                        ));
                     }
                 }
                 PrimeHornStatus::Filled { cell, .. } => {
                     if self.phase_cells.get(support).map(|phase| phase.cell) != Some(cell) {
-                        return Err(PrimeEcologyError::MalformedPrimeHorn(support.clone()));
+                        return Err(PrimeEcologyError::Law(
+                            PrimeEcologyRefusal::MalformedPrimeHorn(support.clone()),
+                        ));
                     }
                 }
             }
@@ -1924,7 +2127,9 @@ impl PrimeEcologyStanding {
                 let witnesses = common_features(&support, &self.prime_features)?;
                 if !witnesses.is_empty() {
                     if !self.phase_cells.contains_key(&support) {
-                        return Err(PrimeEcologyError::MissingPhaseCell(support));
+                        return Err(PrimeEcologyError::Law(
+                            PrimeEcologyRefusal::MissingPhaseCell(support),
+                        ));
                     }
                 } else if boundary_complete(&support, &self.phase_cells)
                     && self
@@ -1932,7 +2137,9 @@ impl PrimeEcologyStanding {
                         .get(&support)
                         .is_none_or(|horn| horn.status != PrimeHornStatus::Open)
                 {
-                    return Err(PrimeEcologyError::MissingPrimeHorn(support));
+                    return Err(PrimeEcologyError::Law(
+                        PrimeEcologyRefusal::MissingPrimeHorn(support),
+                    ));
                 }
             }
         }
@@ -2289,7 +2496,9 @@ mod tests {
                 event: EventId(205),
                 support: support.clone(),
             }),
-            Err(PrimeEcologyError::PrimeHornNotOpen(support.clone()))
+            Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::PrimeHornNotOpen(support.clone())
+            ))
         );
         assert_eq!(world.standing(), &closed);
 
@@ -2302,8 +2511,8 @@ mod tests {
             .section_count += 1;
         assert_eq!(
             malformed.validate(),
-            Err(PrimeEcologyError::MalformedHornFillerSpace(
-                HornFillerSpaceId(204)
+            Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::MalformedHornFillerSpace(HornFillerSpaceId(204))
             ))
         );
     }
@@ -2599,8 +2808,8 @@ mod tests {
                 event: EventId(104),
                 probe,
             }),
-            Err(PrimeEcologyError::RepeatedPolynomialProbe(
-                PolynomialProbeId(3)
+            Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::RepeatedPolynomialProbe(PolynomialProbeId(3))
             ))
         );
         assert_eq!(world.standing(), &before);
@@ -2630,19 +2839,21 @@ mod tests {
                 event: EventId(103),
                 support: vec![2, 3, 5],
             }),
-            Err(PrimeEcologyError::HornLocalSectionSpaceExceeded {
-                prime: 5,
-                degree: 4,
-                sections: BigInt::from(625),
-                limit: 100,
-            })
+            Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::HornLocalSectionSpaceExceeded {
+                    prime: 5,
+                    degree: 4,
+                    sections: BigInt::from(625),
+                    limit: 100,
+                }
+            ))
         );
         assert_eq!(world.standing(), &before);
     }
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum PrimeEcologyError {
+pub enum PrimeEcologyRefusal {
     #[error("prime ecology requires at least grade-one phase relations")]
     ZeroPhaseGrade,
     #[error("horn continuation requires a positive local-section limit")]
@@ -2655,8 +2866,6 @@ pub enum PrimeEcologyError {
     HornLocalSectionLimitMismatch { law: u64, standing: u64 },
     #[error("source occurrence {0:?} was already used by this prime ecology")]
     RepeatedEcologyEvent(EventId),
-    #[error("finite prime ecology exceeded an exact carrier")]
-    CarrierOverflow,
     #[error("cyclotomic order must be positive")]
     ZeroCyclotomicOrder,
     #[error("cyclotomic polynomial division was not exact")]
@@ -2776,6 +2985,15 @@ pub enum PrimeEcologyError {
     Algebraic(#[from] CausalAlgebraicError),
 }
 
+impl RefusalKind for PrimeEcologyRefusal {
+    const LAW: &'static str = "prime-ecology";
+}
+
+/// The prime-ecology law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type PrimeEcologyError = EventRefusal<PrimeEcologyRefusal>;
+
+event_refusal_from!(PrimeEcologyRefusal: ArithmeticFiberError, CausalAlgebraicError);
+
 fn collect_prime_features(
     fibers: &BTreeMap<(u64, PolynomialProbeId), PolynomialPrimeFiber>,
     filler_spaces: &BTreeMap<HornFillerSpaceId, HornFillerSpace>,
@@ -2812,11 +3030,13 @@ fn common_features(
     let mut common = prime_features
         .get(&support[0])
         .cloned()
-        .ok_or(PrimeEcologyError::MissingPrimeFeatures(support[0]))?;
+        .ok_or(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::MissingPrimeFeatures(support[0]),
+        ))?;
     for prime in &support[1..] {
-        let received = prime_features
-            .get(prime)
-            .ok_or(PrimeEcologyError::MissingPrimeFeatures(*prime))?;
+        let received = prime_features.get(prime).ok_or(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::MissingPrimeFeatures(*prime),
+        ))?;
         common = common.intersection(received).cloned().collect();
         if common.is_empty() {
             break;
@@ -2838,20 +3058,28 @@ fn feature_events(
                     probes
                         .get(probe)
                         .map(|inherited| inherited.inherited_at)
-                        .ok_or(PrimeEcologyError::MissingPolynomialProbe(*probe))?,
+                        .ok_or(PrimeEcologyError::Law(
+                            PrimeEcologyRefusal::MissingPolynomialProbe(*probe),
+                        ))?,
                 );
             }
             PrimePhaseSource::HornFillerBranch(branch) => {
                 let space = filler_spaces
                     .get(&branch.space)
-                    .ok_or(PrimeEcologyError::MissingHornFillerSpace(branch.space))?;
+                    .ok_or(PrimeEcologyError::Law(
+                        PrimeEcologyRefusal::MissingHornFillerSpace(branch.space),
+                    ))?;
                 let actual = space
                     .branches
                     .iter()
                     .find(|candidate| candidate.id == *branch)
-                    .ok_or(PrimeEcologyError::MissingHornFillerBranch(*branch))?;
+                    .ok_or(PrimeEcologyError::Law(
+                        PrimeEcologyRefusal::MissingHornFillerBranch(*branch),
+                    ))?;
                 if actual.is_obstructed() {
-                    return Err(PrimeEcologyError::ObstructedHornFillerWitness(*branch));
+                    return Err(PrimeEcologyError::Law(
+                        PrimeEcologyRefusal::ObstructedHornFillerWitness(*branch),
+                    ));
                 }
                 events.extend(space.lineage.source_events.iter().copied());
             }
@@ -2890,12 +3118,14 @@ fn irreducible_polynomial_counts(
         let exponent = u32::try_from(degree).map_err(|_| PrimeEcologyError::CarrierOverflow)?;
         let all_monic = BigInt::from(prime).pow(exponent);
         if all_monic > BigInt::from(limit) {
-            return Err(PrimeEcologyError::HornLocalSectionSpaceExceeded {
-                prime,
-                degree: maximum_degree,
-                sections: BigInt::from(prime).pow(maximum_degree),
-                limit,
-            });
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::HornLocalSectionSpaceExceeded {
+                    prime,
+                    degree: maximum_degree,
+                    sections: BigInt::from(prime).pow(maximum_degree),
+                    limit,
+                },
+            ));
         }
         let all_monic = all_monic
             .to_u64()
@@ -2915,7 +3145,9 @@ fn irreducible_polynomial_counts(
             .ok_or(PrimeEcologyError::CarrierOverflow)?;
         let divisor = u64::try_from(degree).map_err(|_| PrimeEcologyError::CarrierOverflow)?;
         if !numerator.is_multiple_of(divisor) {
-            return Err(PrimeEcologyError::PolynomialFactorizationResidual);
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::PolynomialFactorizationResidual,
+            ));
         }
         counts[degree] = numerator / divisor;
     }
@@ -2930,12 +3162,14 @@ fn count_monic_polynomials_with_phase(
 ) -> Result<u64, PrimeEcologyError> {
     let ambient = BigInt::from(prime).pow(total_degree);
     if ambient > BigInt::from(limit) {
-        return Err(PrimeEcologyError::HornLocalSectionSpaceExceeded {
-            prime,
-            degree: total_degree,
-            sections: ambient,
-            limit,
-        });
+        return Err(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::HornLocalSectionSpaceExceeded {
+                prime,
+                degree: total_degree,
+                sections: ambient,
+                limit,
+            },
+        ));
     }
     if phase.degree == 0
         || phase.frobenius_order != phase.degree
@@ -3041,16 +3275,20 @@ fn enumerate_monic_polynomial_population(
     limit: u64,
 ) -> Result<Vec<(PrimePolynomial, PolynomialFiberSignature)>, PrimeEcologyError> {
     if degree == 0 {
-        return Err(PrimeEcologyError::MalformedPrimePolynomial);
+        return Err(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::MalformedPrimePolynomial,
+        ));
     }
     let section_count = BigInt::from(prime).pow(degree);
     if section_count > BigInt::from(limit) {
-        return Err(PrimeEcologyError::HornLocalSectionSpaceExceeded {
-            prime,
-            degree,
-            sections: section_count,
-            limit,
-        });
+        return Err(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::HornLocalSectionSpaceExceeded {
+                prime,
+                degree,
+                sections: section_count,
+                limit,
+            },
+        ));
     }
     let section_count = section_count
         .to_u64()
@@ -3086,14 +3324,16 @@ fn glue_local_polynomial_sections(
     for coefficient in 0..degree {
         let mut congruence = None;
         for prime in support {
-            let polynomial = local_sections
-                .get(prime)
-                .ok_or_else(|| PrimeEcologyError::MalformedPrimeSupport(support.to_vec()))?;
+            let polynomial = local_sections.get(prime).ok_or_else(|| {
+                PrimeEcologyError::Law(PrimeEcologyRefusal::MalformedPrimeSupport(support.to_vec()))
+            })?;
             if polynomial.prime != *prime
                 || polynomial.degree() != Some(degree)
                 || polynomial.leading() != 1
             {
-                return Err(PrimeEcologyError::MalformedPrimePolynomial);
+                return Err(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::MalformedPrimePolynomial,
+                ));
             }
             let local =
                 ExactCongruence::new(polynomial.coefficients[coefficient], BigInt::from(*prime))?;
@@ -3102,11 +3342,14 @@ fn glue_local_polynomial_sections(
                 Some(received) => chinese_remainder_pair(received, local)?.combined,
             });
         }
-        let received =
-            congruence.ok_or_else(|| PrimeEcologyError::MalformedPrimeSupport(support.to_vec()))?;
+        let received = congruence.ok_or_else(|| {
+            PrimeEcologyError::Law(PrimeEcologyRefusal::MalformedPrimeSupport(support.to_vec()))
+        })?;
         if let Some(expected) = &modulus {
             if expected != &received.modulus {
-                return Err(PrimeEcologyError::MalformedPolynomialTorsor);
+                return Err(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::MalformedPolynomialTorsor,
+                ));
             }
         } else {
             modulus = Some(received.modulus.clone());
@@ -3114,8 +3357,9 @@ fn glue_local_polynomial_sections(
         coefficient_residues.push(received.residue);
     }
     let torsor = MonicPolynomialTorsor {
-        modulus: modulus
-            .ok_or_else(|| PrimeEcologyError::MalformedPrimeSupport(support.to_vec()))?,
+        modulus: modulus.ok_or_else(|| {
+            PrimeEcologyError::Law(PrimeEcologyRefusal::MalformedPrimeSupport(support.to_vec()))
+        })?,
         coefficient_residues,
     };
     torsor.validate()?;
@@ -3136,13 +3380,17 @@ fn boundary_feature_snapshot(
                 .prime_features
                 .get(&face[0])
                 .cloned()
-                .ok_or(PrimeEcologyError::MissingPrimeFeatures(face[0]))?
+                .ok_or(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::MissingPrimeFeatures(face[0]),
+                ))?
         } else {
             standing
                 .phase_cells
                 .get(&face)
                 .map(|cell| cell.witness_features.clone())
-                .ok_or_else(|| PrimeEcologyError::MissingPhaseFace(face.clone()))?
+                .ok_or_else(|| {
+                    PrimeEcologyError::Law(PrimeEcologyRefusal::MissingPhaseFace(face.clone()))
+                })?
         };
         snapshot.insert(face, features);
     }
@@ -3157,10 +3405,9 @@ fn derive_horn_filler_space_from_snapshot(
     limit: u64,
 ) -> Result<HornFillerSpace, PrimeEcologyError> {
     validate_support(support)?;
-    let horn = standing
-        .horns
-        .get(support)
-        .ok_or_else(|| PrimeEcologyError::MissingPrimeHorn(support.to_vec()))?;
+    let horn = standing.horns.get(support).ok_or_else(|| {
+        PrimeEcologyError::Law(PrimeEcologyRefusal::MissingPrimeHorn(support.to_vec()))
+    })?;
     let id = HornFillerSpaceId(caused_at.0);
     let mut source_events = horn.lineage.source_events.clone();
     source_events.insert(caused_at);
@@ -3174,14 +3421,18 @@ fn derive_horn_filler_space_from_snapshot(
         })
         .collect::<BTreeSet<_>>();
     if boundary_features.keys().cloned().collect::<BTreeSet<_>>() != expected_faces {
-        return Err(PrimeEcologyError::MalformedHornFillerSpace(id));
+        return Err(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::MalformedHornFillerSpace(id),
+        ));
     }
 
     for (source_face, features) in &boundary_features {
         if source_face.len() + 1 != support.len()
             || source_face.iter().any(|prime| !support.contains(prime))
         {
-            return Err(PrimeEcologyError::MalformedHornFillerSpace(id));
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::MalformedHornFillerSpace(id),
+            ));
         }
         let missing_primes = support
             .iter()
@@ -3189,48 +3440,58 @@ fn derive_horn_filler_space_from_snapshot(
             .filter(|prime| !source_face.contains(prime))
             .collect::<Vec<_>>();
         if missing_primes.len() != 1 {
-            return Err(PrimeEcologyError::MalformedHornFillerSpace(id));
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::MalformedHornFillerSpace(id),
+            ));
         }
         let missing_prime = missing_primes[0];
         for source_feature in features {
             let (degree, fixed_sections, carried_strata) = match &source_feature.source {
                 PrimePhaseSource::InheritedProbe(probe_id) => {
                     let probe_id = *probe_id;
-                    let inherited = standing
-                        .probes
-                        .get(&probe_id)
-                        .ok_or(PrimeEcologyError::MissingPolynomialProbe(probe_id))?;
+                    let inherited =
+                        standing
+                            .probes
+                            .get(&probe_id)
+                            .ok_or(PrimeEcologyError::Law(
+                                PrimeEcologyRefusal::MissingPolynomialProbe(probe_id),
+                            ))?;
                     let degree = u32::try_from(inherited.probe.degree())
                         .map_err(|_| PrimeEcologyError::CarrierOverflow)?;
                     let mut fixed_sections = BTreeMap::<u64, PrimePolynomial>::new();
                     for prime in source_face {
                         let fiber = standing.fibers.get(&(*prime, probe_id)).ok_or(
-                            PrimeEcologyError::MissingPolynomialFiber {
+                            PrimeEcologyError::Law(PrimeEcologyRefusal::MissingPolynomialFiber {
                                 prime: *prime,
                                 probe: probe_id,
-                            },
+                            }),
                         )?;
                         if !fiber
                             .signature
                             .factor_phases
                             .contains(&source_feature.factor_phase)
                         {
-                            return Err(PrimeEcologyError::MalformedHornFillerSpace(id));
+                            return Err(PrimeEcologyError::Law(
+                                PrimeEcologyRefusal::MalformedHornFillerSpace(id),
+                            ));
                         }
                         fixed_sections.insert(*prime, fiber.reduced.clone());
                     }
                     (degree, fixed_sections, BTreeMap::new())
                 }
                 PrimePhaseSource::HornFillerBranch(parent_id) => {
-                    let parent_space = standing
-                        .filler_spaces
-                        .get(&parent_id.space)
-                        .ok_or(PrimeEcologyError::MissingHornFillerSpace(parent_id.space))?;
+                    let parent_space = standing.filler_spaces.get(&parent_id.space).ok_or(
+                        PrimeEcologyError::Law(PrimeEcologyRefusal::MissingHornFillerSpace(
+                            parent_id.space,
+                        )),
+                    )?;
                     let parent = parent_space
                         .branches
                         .iter()
                         .find(|candidate| candidate.id == *parent_id)
-                        .ok_or(PrimeEcologyError::MissingHornFillerBranch(*parent_id))?;
+                        .ok_or(PrimeEcologyError::Law(
+                            PrimeEcologyRefusal::MissingHornFillerBranch(*parent_id),
+                        ))?;
                     // A parent family may recur only from the complete face on
                     // which it was caused. Reusing it from a proper subface
                     // would silently quotient away one or more prior
@@ -3241,7 +3502,9 @@ fn derive_horn_filler_space_from_snapshot(
                     if parent.is_obstructed()
                         || parent.source_feature.factor_phase != source_feature.factor_phase
                     {
-                        return Err(PrimeEcologyError::MalformedHornFillerSpace(id));
+                        return Err(PrimeEcologyError::Law(
+                            PrimeEcologyRefusal::MalformedHornFillerSpace(id),
+                        ));
                     }
                     let family = parent.constraint_family()?;
                     let constraint_support = family
@@ -3256,7 +3519,9 @@ fn derive_horn_filler_space_from_snapshot(
                                 || stratum.required_phase != source_feature.factor_phase
                         })
                     {
-                        return Err(PrimeEcologyError::MalformedHornFillerSpace(id));
+                        return Err(PrimeEcologyError::Law(
+                            PrimeEcologyRefusal::MalformedHornFillerSpace(id),
+                        ));
                     }
                     (family.degree, family.fixed_sections, family.local_strata)
                 }
@@ -3331,7 +3596,9 @@ fn validate_horn_filler_space(
         || space.id != HornFillerSpaceId(space.caused_at.0)
         || space.lineage.kind != CausalMaterialKind::Induced
     {
-        return Err(PrimeEcologyError::MalformedHornFillerSpace(space.id));
+        return Err(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::MalformedHornFillerSpace(space.id),
+        ));
     }
     let contemporary = boundary_feature_snapshot(standing, &space.support)?;
     if space.boundary_features.iter().any(|(face, features)| {
@@ -3339,7 +3606,9 @@ fn validate_horn_filler_space(
             .get(face)
             .is_none_or(|received| !features.is_subset(received))
     }) {
-        return Err(PrimeEcologyError::MalformedHornFillerSpace(space.id));
+        return Err(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::MalformedHornFillerSpace(space.id),
+        ));
     }
     let expected = derive_horn_filler_space_from_snapshot(
         standing,
@@ -3349,7 +3618,9 @@ fn validate_horn_filler_space(
         standing.max_horn_local_sections,
     )?;
     if &expected != space {
-        return Err(PrimeEcologyError::MalformedHornFillerSpace(space.id));
+        return Err(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::MalformedHornFillerSpace(space.id),
+        ));
     }
     if space.realised_branches().next().is_some()
         && standing
@@ -3357,14 +3628,18 @@ fn validate_horn_filler_space(
             .get(&space.support)
             .is_none_or(|horn| !matches!(horn.status, PrimeHornStatus::Filled { .. }))
     {
-        return Err(PrimeEcologyError::MalformedHornFillerSpace(space.id));
+        return Err(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::MalformedHornFillerSpace(space.id),
+        ));
     }
     Ok(())
 }
 
 fn validate_support(support: &[u64]) -> Result<(), PrimeEcologyError> {
     if support.len() < 2 || support.windows(2).any(|pair| pair[0] >= pair[1]) {
-        return Err(PrimeEcologyError::MalformedPrimeSupport(support.to_vec()));
+        return Err(PrimeEcologyError::Law(
+            PrimeEcologyRefusal::MalformedPrimeSupport(support.to_vec()),
+        ));
     }
     Ok(())
 }
@@ -3395,7 +3670,9 @@ fn phase_boundary(
             phase_cells
                 .get(&face)
                 .map(|phase| phase.cell)
-                .ok_or(PrimeEcologyError::MissingPhaseFace(face))?
+                .ok_or(PrimeEcologyError::Law(
+                    PrimeEcologyRefusal::MissingPhaseFace(face),
+                ))?
         };
         cells.push(cell);
         boundary.add_term(
@@ -3551,10 +3828,12 @@ impl PrimeEcologyLaw {
         max_horn_local_sections: u64,
     ) -> Result<Self, PrimeEcologyError> {
         if max_phase_grade == 0 {
-            return Err(PrimeEcologyError::ZeroPhaseGrade);
+            return Err(PrimeEcologyError::Law(PrimeEcologyRefusal::ZeroPhaseGrade));
         }
         if max_horn_local_sections == 0 {
-            return Err(PrimeEcologyError::ZeroHornLocalSectionLimit);
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::ZeroHornLocalSectionLimit,
+            ));
         }
         Ok(Self {
             max_phase_grade,
@@ -3584,31 +3863,40 @@ impl ExactEventLaw for PrimeEcologyLaw {
     ) -> Result<EventSuccessor<Self::Standing, Self::Radiation>, Self::Error> {
         standing_before.validate()?;
         if standing_before.max_phase_grade != self.max_phase_grade {
-            return Err(PrimeEcologyError::PhaseGradeMismatch {
-                law: self.max_phase_grade,
-                standing: standing_before.max_phase_grade,
-            });
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::PhaseGradeMismatch {
+                    law: self.max_phase_grade,
+                    standing: standing_before.max_phase_grade,
+                },
+            ));
         }
         if standing_before.max_horn_local_sections != self.max_horn_local_sections {
-            return Err(PrimeEcologyError::HornLocalSectionLimitMismatch {
-                law: self.max_horn_local_sections,
-                standing: standing_before.max_horn_local_sections,
-            });
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::HornLocalSectionLimitMismatch {
+                    law: self.max_horn_local_sections,
+                    standing: standing_before.max_horn_local_sections,
+                },
+            ));
         }
         let event_id = event.event_id();
         if standing_before.used_events.contains(&event_id) {
-            return Err(PrimeEcologyError::RepeatedEcologyEvent(event_id));
+            return Err(PrimeEcologyError::Law(
+                PrimeEcologyRefusal::RepeatedEcologyEvent(event_id),
+            ));
         }
         let mut standing_after = standing_before.clone();
         let mut radiation = match event {
             PrimeEcologyEvent::AdmitInteger(arithmetic_event) => {
                 let successor =
                     ArithmeticFiberLaw.enact(&standing_after.arithmetic, arithmetic_event)?;
-                let arithmetic_radiation = successor
-                    .radiation
-                    .into_iter()
-                    .next()
-                    .ok_or(PrimeEcologyError::MissingArithmeticRadiation)?;
+                let arithmetic_radiation =
+                    successor
+                        .radiation
+                        .into_iter()
+                        .next()
+                        .ok_or(PrimeEcologyError::Law(
+                            PrimeEcologyRefusal::MissingArithmeticRadiation,
+                        ))?;
                 standing_after.arithmetic = successor.standing_after;
                 let mut radiation = PrimeEcologyRadiation::integer(
                     event_id,
@@ -3616,6 +3904,7 @@ impl ExactEventLaw for PrimeEcologyLaw {
                     arithmetic_radiation.clone(),
                 );
                 if let Some(founded) = &arithmetic_radiation.founded_prime {
+                    let standing_after: &mut PrimeEcologyQuotient = &mut standing_after;
                     for inherited in standing_after.probes.values() {
                         let fiber = receive_polynomial_fiber(
                             &standing_after.arithmetic,
@@ -3639,7 +3928,9 @@ impl ExactEventLaw for PrimeEcologyLaw {
             PrimeEcologyEvent::InheritPolynomial { event, probe } => {
                 probe.validate()?;
                 if standing_after.probes.contains_key(&probe.id) {
-                    return Err(PrimeEcologyError::RepeatedPolynomialProbe(probe.id));
+                    return Err(PrimeEcologyError::Law(
+                        PrimeEcologyRefusal::RepeatedPolynomialProbe(probe.id),
+                    ));
                 }
                 let inherited = InheritedPolynomialProbe {
                     probe: probe.clone(),
@@ -3670,12 +3961,13 @@ impl ExactEventLaw for PrimeEcologyLaw {
             }
             PrimeEcologyEvent::ResolveHorn { event, support } => {
                 validate_support(support)?;
-                let horn = standing_after
-                    .horns
-                    .get(support)
-                    .ok_or_else(|| PrimeEcologyError::MissingPrimeHorn(support.clone()))?;
+                let horn = standing_after.horns.get(support).ok_or_else(|| {
+                    PrimeEcologyError::Law(PrimeEcologyRefusal::MissingPrimeHorn(support.clone()))
+                })?;
                 if horn.status != PrimeHornStatus::Open {
-                    return Err(PrimeEcologyError::PrimeHornNotOpen(support.clone()));
+                    return Err(PrimeEcologyError::Law(
+                        PrimeEcologyRefusal::PrimeHornNotOpen(support.clone()),
+                    ));
                 }
                 let filler_space = derive_horn_filler_space(
                     &standing_after,
@@ -3688,7 +3980,9 @@ impl ExactEventLaw for PrimeEcologyLaw {
                     .insert(filler_space.id, filler_space.clone())
                     .is_some()
                 {
-                    return Err(PrimeEcologyError::RepeatedHornFillerSpace(filler_space.id));
+                    return Err(PrimeEcologyError::Law(
+                        PrimeEcologyRefusal::RepeatedHornFillerSpace(filler_space.id),
+                    ));
                 }
                 let mut radiation = PrimeEcologyRadiation::horn(*event, filler_space);
                 standing_after.reconcile_phase_topology(*event, &mut radiation)?;
@@ -3718,7 +4012,7 @@ impl ExactEventLaw for PrimeEcologyLaw {
     }
 }
 
-impl PrimeEcologyStanding {
+impl PrimeEcologyQuotient {
     fn reconcile_phase_topology(
         &mut self,
         event: EventId,
@@ -3796,7 +4090,9 @@ impl PrimeEcologyStanding {
                         self.arithmetic
                             .occurrences()
                             .get(prime)
-                            .ok_or(PrimeEcologyError::MissingPrimeOccurrence(*prime))?
+                            .ok_or(PrimeEcologyError::Law(
+                                PrimeEcologyRefusal::MissingPrimeOccurrence(*prime),
+                            ))?
                             .event,
                     );
                 }

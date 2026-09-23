@@ -60,6 +60,10 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::world::{
+    EventQuotient, EventRefusal, EventStanding, RefusalKind, event_refusal_from,
+    event_standing_wire,
+};
 use crate::{
     ArithmeticFiberEvent, CausalMaterialKind, EventId, EventSuccessor, ExactEventLaw,
     IntegerPolynomialProbe, PolynomialFiberSignature, PolynomialPrimeFiber, PolynomialProbeId,
@@ -125,7 +129,9 @@ impl IntegralQuinticProblem {
             || self.coefficients.len() < LEAST_DEGREE_WITH_A_DISCRIMINANT + 1
             || self.coefficients[self.degree()].is_zero()
         {
-            return Err(ArithmeticMonodromyError::MalformedQuintic(self.id));
+            return Err(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::MalformedQuintic(self.id),
+            ));
         }
         Ok(())
     }
@@ -196,14 +202,14 @@ impl NormalizedQuintic {
             || self.discriminant != monic_polynomial_discriminant(&self.coefficients)?
             || self.discriminant_square_root != rational_integer_square_root(&self.discriminant)
         {
-            return Err(ArithmeticMonodromyError::MalformedNormalization(
-                inherited.id,
+            return Err(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::MalformedNormalization(inherited.id),
             ));
         }
         let expected = inherited.normalize()?;
         if *self != expected {
-            return Err(ArithmeticMonodromyError::MalformedNormalization(
-                inherited.id,
+            return Err(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::MalformedNormalization(inherited.id),
             ));
         }
         Ok(())
@@ -555,7 +561,9 @@ impl ExactEulerReceiverStanding {
         opened_at: EventId,
     ) -> Result<Self, ArithmeticMonodromyError> {
         if sigma <= 1 {
-            return Err(ArithmeticMonodromyError::InvalidEulerSigma(sigma));
+            return Err(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::InvalidEulerSigma(sigma),
+            ));
         }
         Ok(Self {
             schema: "holonic-engine.exact-quintic-euler-receiver-standing.v1".to_owned(),
@@ -574,18 +582,22 @@ impl ExactEulerReceiverStanding {
         section: &QuinticPrimeSection,
     ) -> Result<EulerTransportDelta, ArithmeticMonodromyError> {
         if section.problem != self.problem {
-            return Err(ArithmeticMonodromyError::ReceiverProblemMismatch {
-                receiver: self.id,
-                problem: section.problem,
-            });
+            return Err(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::ReceiverProblemMismatch {
+                    receiver: self.id,
+                    problem: section.problem,
+                },
+            ));
         }
         if self.local_sections.contains_key(&section.prime)
             || self.open_places.contains_key(&section.prime)
         {
-            return Err(ArithmeticMonodromyError::RepeatedPrimeTransport {
-                receiver: self.id,
-                prime: section.prime,
-            });
+            return Err(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::RepeatedPrimeTransport {
+                    receiver: self.id,
+                    prime: section.prime,
+                },
+            ));
         }
         let local_section = if let Some((cycle_type, denominator)) = section
             .cycle_type
@@ -624,14 +636,18 @@ impl ExactEulerReceiverStanding {
             || self.problem != problem.problem.id
             || self.sigma <= 1
         {
-            return Err(ArithmeticMonodromyError::MalformedEulerReceiver(self.id));
+            return Err(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::MalformedEulerReceiver(self.id),
+            ));
         }
         let mut expected = Self::new(self.id, self.problem, self.sigma, self.opened_at)?;
         for section in problem.prime_sections.values() {
             expected.receive(section)?;
         }
         if *self != expected {
-            return Err(ArithmeticMonodromyError::MalformedEulerReceiver(self.id));
+            return Err(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::MalformedEulerReceiver(self.id),
+            ));
         }
         Ok(())
     }
@@ -669,16 +685,20 @@ impl QuinticProblemStanding {
         fiber: &PolynomialPrimeFiber,
     ) -> Result<(QuinticPrimeSection, GaloisTransportDelta), ArithmeticMonodromyError> {
         if fiber.probe != self.normalized.probe.id {
-            return Err(ArithmeticMonodromyError::FiberProbeMismatch {
-                problem: self.problem.id,
-                probe: fiber.probe,
-            });
+            return Err(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::FiberProbeMismatch {
+                    problem: self.problem.id,
+                    probe: fiber.probe,
+                },
+            ));
         }
         if self.prime_sections.contains_key(&fiber.prime) {
-            return Err(ArithmeticMonodromyError::RepeatedPrimeSection {
-                problem: self.problem.id,
-                prime: fiber.prime,
-            });
+            return Err(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::RepeatedPrimeSection {
+                    problem: self.problem.id,
+                    prime: fiber.prime,
+                },
+            ));
         }
         let section = derive_prime_section(self.problem.id, self.normalized.degree(), fiber)?;
         let before_candidates = self.galois.transitive_candidates.clone();
@@ -699,18 +719,20 @@ impl QuinticProblemStanding {
 
     fn validate(&self, ecology: &PrimeEcologyStanding) -> Result<(), ArithmeticMonodromyError> {
         if self.schema != "holonic-engine.quintic-problem-standing.v1" {
-            return Err(ArithmeticMonodromyError::MalformedProblemStanding(
-                self.problem.id,
+            return Err(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::MalformedProblemStanding(self.problem.id),
             ));
         }
         self.problem.validate()?;
         self.normalized.validate(&self.problem)?;
         let inherited = ecology.probes().get(&self.normalized.probe.id).ok_or(
-            ArithmeticMonodromyError::MissingPrimeProbe(self.normalized.probe.id),
+            ArithmeticMonodromyError::Law(ArithmeticMonodromyRefusal::MissingPrimeProbe(
+                self.normalized.probe.id,
+            )),
         )?;
         if inherited.probe != self.normalized.probe || inherited.inherited_at != self.inherited_at {
-            return Err(ArithmeticMonodromyError::MalformedProblemStanding(
-                self.problem.id,
+            return Err(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::MalformedProblemStanding(self.problem.id),
             ));
         }
         let mut expected = Self::new(self.problem.clone(), self.inherited_at)?;
@@ -720,54 +742,126 @@ impl QuinticProblemStanding {
             .filter(|((_, probe), _)| *probe == self.normalized.probe.id)
         {
             if *probe != self.normalized.probe.id {
-                return Err(ArithmeticMonodromyError::FiberProbeMismatch {
-                    problem: self.problem.id,
-                    probe: *probe,
-                });
+                return Err(ArithmeticMonodromyError::Law(
+                    ArithmeticMonodromyRefusal::FiberProbeMismatch {
+                        problem: self.problem.id,
+                        probe: *probe,
+                    },
+                ));
             }
             expected.receive(fiber)?;
         }
         if *self != expected {
-            return Err(ArithmeticMonodromyError::MalformedProblemStanding(
-                self.problem.id,
+            return Err(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::MalformedProblemStanding(self.problem.id),
             ));
         }
         Ok(())
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ArithmeticMonodromyStanding {
-    pub schema: String,
+/// [definition] **The arithmetic-monodromy quotient** (plan phase 16): the prime ecology, problems, Euler receivers and their incidence.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ArithmeticMonodromyQuotient {
     pub max_phase_grade: u32,
     pub max_horn_local_sections: u64,
     prime_ecology: PrimeEcologyStanding,
     problems: BTreeMap<QuinticProblemId, QuinticProblemStanding>,
     euler_receivers: BTreeMap<EulerReceiverId, ExactEulerReceiverStanding>,
-    /// Production propagation incidence. Validation and inspection may scan standing; a new
-    /// prime section reaches only the receivers already incident to its problem.
+    receiver_incidence: BTreeMap<QuinticProblemId, BTreeSet<EulerReceiverId>>,
+}
+
+/// The standing: the shared event scaffold around [`ArithmeticMonodromyQuotient`].
+pub type ArithmeticMonodromyStanding = EventStanding<ArithmeticMonodromyQuotient>;
+
+impl EventQuotient for ArithmeticMonodromyQuotient {
+    type Refusal = ArithmeticMonodromyRefusal;
+}
+
+#[derive(Serialize)]
+#[serde(rename = "ArithmeticMonodromyStanding")]
+struct ArithmeticMonodromyStandingWrite<'a> {
+    schema: &'a String,
+    max_phase_grade: &'a u32,
+    max_horn_local_sections: &'a u64,
+    prime_ecology: &'a PrimeEcologyStanding,
+    problems: &'a BTreeMap<QuinticProblemId, QuinticProblemStanding>,
+    euler_receivers: &'a BTreeMap<EulerReceiverId, ExactEulerReceiverStanding>,
+    receiver_incidence: &'a BTreeMap<QuinticProblemId, BTreeSet<EulerReceiverId>>,
+    used_events: &'a BTreeSet<EventId>,
+}
+
+impl<'a> From<&'a ArithmeticMonodromyStanding> for ArithmeticMonodromyStandingWrite<'a> {
+    fn from(standing: &'a ArithmeticMonodromyStanding) -> Self {
+        Self {
+            schema: &standing.schema,
+            max_phase_grade: &standing.max_phase_grade,
+            max_horn_local_sections: &standing.max_horn_local_sections,
+            prime_ecology: &standing.prime_ecology,
+            problems: &standing.problems,
+            euler_receivers: &standing.euler_receivers,
+            receiver_incidence: &standing.receiver_incidence,
+            used_events: &standing.used_events,
+        }
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(rename = "ArithmeticMonodromyStanding")]
+struct ArithmeticMonodromyStandingRead {
+    schema: String,
+    max_phase_grade: u32,
+    max_horn_local_sections: u64,
+    prime_ecology: PrimeEcologyStanding,
+    problems: BTreeMap<QuinticProblemId, QuinticProblemStanding>,
+    euler_receivers: BTreeMap<EulerReceiverId, ExactEulerReceiverStanding>,
     receiver_incidence: BTreeMap<QuinticProblemId, BTreeSet<EulerReceiverId>>,
     used_events: BTreeSet<EventId>,
 }
+
+impl From<ArithmeticMonodromyStandingRead> for ArithmeticMonodromyStanding {
+    fn from(read: ArithmeticMonodromyStandingRead) -> Self {
+        EventStanding::from_parts(
+            read.schema,
+            read.used_events,
+            ArithmeticMonodromyQuotient {
+                max_phase_grade: read.max_phase_grade,
+                max_horn_local_sections: read.max_horn_local_sections,
+                prime_ecology: read.prime_ecology,
+                problems: read.problems,
+                euler_receivers: read.euler_receivers,
+                receiver_incidence: read.receiver_incidence,
+            },
+        )
+    }
+}
+
+event_standing_wire!(
+    ArithmeticMonodromyQuotient,
+    ArithmeticMonodromyStandingWrite,
+    ArithmeticMonodromyStandingRead
+);
 
 impl ArithmeticMonodromyStanding {
     pub fn with_horn_local_section_limit(
         max_phase_grade: u32,
         max_horn_local_sections: u64,
     ) -> Result<Self, ArithmeticMonodromyError> {
-        Ok(Self {
-            schema: "holonic-engine.arithmetic-monodromy-standing.v1".to_owned(),
-            max_phase_grade,
-            max_horn_local_sections,
-            prime_ecology: PrimeEcologyStanding::with_horn_local_section_limit(
-                max_phase_grade,
-                max_horn_local_sections,
-            )?,
-            problems: BTreeMap::new(),
-            euler_receivers: BTreeMap::new(),
-            receiver_incidence: BTreeMap::new(),
-            used_events: BTreeSet::new(),
-        })
+        Ok(EventStanding::from_parts(
+            "holonic-engine.arithmetic-monodromy-standing.v1".to_owned(),
+            BTreeSet::new(),
+            ArithmeticMonodromyQuotient {
+                max_phase_grade: max_phase_grade,
+                max_horn_local_sections: max_horn_local_sections,
+                prime_ecology: PrimeEcologyStanding::with_horn_local_section_limit(
+                    max_phase_grade,
+                    max_horn_local_sections,
+                )?,
+                problems: BTreeMap::new(),
+                euler_receivers: BTreeMap::new(),
+                receiver_incidence: BTreeMap::new(),
+            },
+        ))
     }
 
     pub fn prime_ecology(&self) -> &PrimeEcologyStanding {
@@ -807,7 +901,9 @@ impl ArithmeticMonodromyStanding {
         let standing = self
             .problems
             .get(&problem)
-            .ok_or(ArithmeticMonodromyError::MissingProblem(problem))?;
+            .ok_or(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::MissingProblem(problem),
+            ))?;
         let prime_charts = standing
             .prime_sections
             .values()
@@ -871,16 +967,20 @@ impl ArithmeticMonodromyStanding {
             .collect::<BTreeSet<_>>()
             != expected_probe_ids
         {
-            return Err(ArithmeticMonodromyError::ProblemProbePopulationMismatch);
+            return Err(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::ProblemProbePopulationMismatch,
+            ));
         }
         for problem in self.problems.values() {
             problem.validate(&self.prime_ecology)?;
         }
         for receiver in self.euler_receivers.values() {
-            let problem = self
-                .problems
-                .get(&receiver.problem)
-                .ok_or(ArithmeticMonodromyError::MissingProblem(receiver.problem))?;
+            let problem =
+                self.problems
+                    .get(&receiver.problem)
+                    .ok_or(ArithmeticMonodromyError::Law(
+                        ArithmeticMonodromyRefusal::MissingProblem(receiver.problem),
+                    ))?;
             receiver.validate(problem)?;
         }
         let expected_receiver_incidence = self.euler_receivers.values().fold(
@@ -894,7 +994,9 @@ impl ArithmeticMonodromyStanding {
             },
         );
         if self.receiver_incidence != expected_receiver_incidence {
-            return Err(ArithmeticMonodromyError::ReceiverIncidenceMismatch);
+            return Err(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::ReceiverIncidenceMismatch,
+            ));
         }
         let arithmetic_events = self
             .prime_ecology
@@ -912,7 +1014,9 @@ impl ArithmeticMonodromyStanding {
             .chain(receiver_events)
             .collect::<BTreeSet<_>>();
         if self.used_events != expected_events {
-            return Err(ArithmeticMonodromyError::EventPopulationMismatch);
+            return Err(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::EventPopulationMismatch,
+            ));
         }
         Ok(())
     }
@@ -1034,9 +1138,7 @@ impl ExactEventLaw for ArithmeticMonodromyLaw {
             return Err(ArithmeticMonodromyError::LawStandingMismatch);
         }
         let event_id = event.event_id();
-        if standing_before.used_events.contains(&event_id) {
-            return Err(ArithmeticMonodromyError::RepeatedEvent(event_id));
-        }
+        standing_before.refuse_repeated(event_id)?;
         let mut standing_after = standing_before.clone();
         let mut radiation = ArithmeticMonodromyRadiation::empty(event_id);
 
@@ -1046,11 +1148,14 @@ impl ExactEventLaw for ArithmeticMonodromyLaw {
                     &standing_after.prime_ecology,
                     &PrimeEcologyEvent::AdmitInteger(arithmetic_event.clone()),
                 )?;
-                let prime_radiation = successor
-                    .radiation
-                    .into_iter()
-                    .next()
-                    .ok_or(ArithmeticMonodromyError::MissingPrimeRadiation)?;
+                let prime_radiation =
+                    successor
+                        .radiation
+                        .into_iter()
+                        .next()
+                        .ok_or(ArithmeticMonodromyError::Law(
+                            ArithmeticMonodromyRefusal::MissingPrimeRadiation,
+                        ))?;
                 standing_after.prime_ecology = successor.standing_after;
                 transport_emitted_fibers(
                     &mut standing_after,
@@ -1062,7 +1167,9 @@ impl ExactEventLaw for ArithmeticMonodromyLaw {
             ArithmeticMonodromyEvent::InheritQuintic { event, problem } => {
                 problem.validate()?;
                 if standing_after.problems.contains_key(&problem.id) {
-                    return Err(ArithmeticMonodromyError::RepeatedProblem(problem.id));
+                    return Err(ArithmeticMonodromyError::Law(
+                        ArithmeticMonodromyRefusal::RepeatedProblem(problem.id),
+                    ));
                 }
                 let mut problem_standing = QuinticProblemStanding::new(problem.clone(), *event)?;
                 let successor = self.prime_law()?.enact(
@@ -1072,11 +1179,14 @@ impl ExactEventLaw for ArithmeticMonodromyLaw {
                         probe: problem_standing.normalized.probe.clone(),
                     },
                 )?;
-                let prime_radiation = successor
-                    .radiation
-                    .into_iter()
-                    .next()
-                    .ok_or(ArithmeticMonodromyError::MissingPrimeRadiation)?;
+                let prime_radiation =
+                    successor
+                        .radiation
+                        .into_iter()
+                        .next()
+                        .ok_or(ArithmeticMonodromyError::Law(
+                            ArithmeticMonodromyRefusal::MissingPrimeRadiation,
+                        ))?;
                 standing_after.prime_ecology = successor.standing_after;
                 for fiber in &prime_radiation.enacted_fibers {
                     let (section, delta) = problem_standing.receive(fiber)?;
@@ -1095,12 +1205,17 @@ impl ExactEventLaw for ArithmeticMonodromyLaw {
                 sigma,
             } => {
                 if standing_after.euler_receivers.contains_key(id) {
-                    return Err(ArithmeticMonodromyError::RepeatedEulerReceiver(*id));
+                    return Err(ArithmeticMonodromyError::Law(
+                        ArithmeticMonodromyRefusal::RepeatedEulerReceiver(*id),
+                    ));
                 }
-                let problem_standing = standing_after
-                    .problems
-                    .get(problem)
-                    .ok_or(ArithmeticMonodromyError::MissingProblem(*problem))?;
+                let problem_standing =
+                    standing_after
+                        .problems
+                        .get(problem)
+                        .ok_or(ArithmeticMonodromyError::Law(
+                            ArithmeticMonodromyRefusal::MissingProblem(*problem),
+                        ))?;
                 let mut receiver = ExactEulerReceiverStanding::new(*id, *problem, *sigma, *event)?;
                 for section in problem_standing.prime_sections.values() {
                     radiation.euler_deltas.push(receiver.receive(section)?);
@@ -1133,10 +1248,13 @@ fn transport_emitted_fibers(
 ) -> Result<(), ArithmeticMonodromyError> {
     for fiber in fibers {
         let problem_id = QuinticProblemId(fiber.probe.0);
-        let problem = standing
-            .problems
-            .get_mut(&problem_id)
-            .ok_or(ArithmeticMonodromyError::MissingProblem(problem_id))?;
+        let problem =
+            standing
+                .problems
+                .get_mut(&problem_id)
+                .ok_or(ArithmeticMonodromyError::Law(
+                    ArithmeticMonodromyRefusal::MissingProblem(problem_id),
+                ))?;
         let (section, galois_delta) = problem.receive(fiber)?;
         let incident_receivers = standing
             .receiver_incidence
@@ -1144,10 +1262,11 @@ fn transport_emitted_fibers(
             .cloned()
             .unwrap_or_default();
         for receiver_id in incident_receivers {
-            let receiver = standing
-                .euler_receivers
-                .get_mut(&receiver_id)
-                .ok_or(ArithmeticMonodromyError::ReceiverIncidenceMismatch)?;
+            let receiver = standing.euler_receivers.get_mut(&receiver_id).ok_or(
+                ArithmeticMonodromyError::Law(
+                    ArithmeticMonodromyRefusal::ReceiverIncidenceMismatch,
+                ),
+            )?;
             radiation.euler_deltas.push(receiver.receive(&section)?);
         }
         radiation.transported_sections.push(section);
@@ -1164,18 +1283,22 @@ fn derive_prime_section(
     fiber.validate()?;
     let expected = u32::try_from(degree).map_err(|_| ArithmeticMonodromyError::CarrierOverflow)?;
     if fiber.signature.degree != expected {
-        return Err(ArithmeticMonodromyError::FiberDegreeMismatch {
-            problem,
-            prime: fiber.prime,
-            degree: fiber.signature.degree,
-            expected,
-        });
+        return Err(ArithmeticMonodromyError::Law(
+            ArithmeticMonodromyRefusal::FiberDegreeMismatch {
+                problem,
+                prime: fiber.prime,
+                degree: fiber.signature.degree,
+                expected,
+            },
+        ));
     }
     if fiber.lineage.kind != CausalMaterialKind::Enacted {
-        return Err(ArithmeticMonodromyError::UncausedPrimeFiber {
-            problem,
-            prime: fiber.prime,
-        });
+        return Err(ArithmeticMonodromyError::Law(
+            ArithmeticMonodromyRefusal::UncausedPrimeFiber {
+                problem,
+                prime: fiber.prime,
+            },
+        ));
     }
     let cycle_type = fiber
         .signature
@@ -1184,10 +1307,12 @@ fn derive_prime_section(
             let mut cycles = Vec::new();
             for factor in &fiber.factors {
                 if factor.multiplicity != 1 {
-                    return Err(ArithmeticMonodromyError::RepeatedFactorAtSeparablePlace {
-                        problem,
-                        prime: fiber.prime,
-                    });
+                    return Err(ArithmeticMonodromyError::Law(
+                        ArithmeticMonodromyRefusal::RepeatedFactorAtSeparablePlace {
+                            problem,
+                            prime: fiber.prime,
+                        },
+                    ));
                 }
                 let degree = u32::try_from(
                     factor
@@ -1204,10 +1329,12 @@ fn derive_prime_section(
                     .ok_or(ArithmeticMonodromyError::CarrierOverflow)
             })?;
             if total != expected {
-                return Err(ArithmeticMonodromyError::InvalidCycleType {
-                    prime: fiber.prime,
-                    cycle_type: cycles,
-                });
+                return Err(ArithmeticMonodromyError::Law(
+                    ArithmeticMonodromyRefusal::InvalidCycleType {
+                        prime: fiber.prime,
+                        cycle_type: cycles,
+                    },
+                ));
             }
             Ok(cycles)
         })
@@ -1355,7 +1482,9 @@ fn transport_section_into_galois(
             QuinticIrreducibility::CertifiedByPrime { .. }
         ) && galois.transitive_candidates.is_empty()
         {
-            return Err(ArithmeticMonodromyError::TransitiveCatalogueContradiction);
+            return Err(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::TransitiveCatalogueContradiction,
+            ));
         }
     }
     galois.solvability = derive_solvability_constraint(galois);
@@ -1369,10 +1498,12 @@ fn formal_euler_denominator(
     let mut result = vec![BigInt::one()];
     for degree in cycle_type {
         if *degree == 0 {
-            return Err(ArithmeticMonodromyError::InvalidCycleType {
-                prime: 0,
-                cycle_type: cycle_type.to_vec(),
-            });
+            return Err(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::InvalidCycleType {
+                    prime: 0,
+                    cycle_type: cycle_type.to_vec(),
+                },
+            ));
         }
         let degree =
             usize::try_from(*degree).map_err(|_| ArithmeticMonodromyError::CarrierOverflow)?;
@@ -1382,7 +1513,9 @@ fn formal_euler_denominator(
         result = multiply_integer_polynomials(&result, &factor);
     }
     if result.len() != degree + 1 || result[0] != BigInt::one() {
-        return Err(ArithmeticMonodromyError::MalformedEulerDenominator);
+        return Err(ArithmeticMonodromyError::Law(
+            ArithmeticMonodromyRefusal::MalformedEulerDenominator,
+        ));
     }
     Ok(result)
 }
@@ -1393,7 +1526,9 @@ fn evaluate_euler_local_factor(
     cycle_type: &[u32],
 ) -> Result<Rat, ArithmeticMonodromyError> {
     if prime < 2 || sigma <= 1 {
-        return Err(ArithmeticMonodromyError::InvalidEulerEvaluation { prime, sigma });
+        return Err(ArithmeticMonodromyError::Law(
+            ArithmeticMonodromyRefusal::InvalidEulerEvaluation { prime, sigma },
+        ));
     }
     let mut result = Rat::one();
     for degree in cycle_type {
@@ -1510,7 +1645,9 @@ fn quintic_group_catalogue()
             != usize::try_from(group.order())
                 .map_err(|_| ArithmeticMonodromyError::CarrierOverflow)?
         {
-            return Err(ArithmeticMonodromyError::InvalidGroupCatalogue(group));
+            return Err(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::InvalidGroupCatalogue(group),
+            ));
         }
         let cycle_types = elements.iter().map(permutation_cycle_type).collect();
         let all_even = elements.iter().all(permutation_is_even);
@@ -1536,7 +1673,9 @@ fn generated_permutation_group(
     let extent = generators
         .first()
         .map(Vec::len)
-        .ok_or(ArithmeticMonodromyError::InvalidPermutationGroup)?;
+        .ok_or(ArithmeticMonodromyError::Law(
+            ArithmeticMonodromyRefusal::InvalidPermutationGroup,
+        ))?;
     for generator in generators {
         validate_permutation(generator, extent)?;
     }
@@ -1555,7 +1694,9 @@ fn generated_permutation_group(
             let next = compose_permutations(&current, generator);
             if elements.insert(next.clone()) {
                 if elements.len() > symmetric_order {
-                    return Err(ArithmeticMonodromyError::InvalidPermutationGroup);
+                    return Err(ArithmeticMonodromyError::Law(
+                        ArithmeticMonodromyRefusal::InvalidPermutationGroup,
+                    ));
                 }
                 frontier.push_back(next);
             }
@@ -1574,7 +1715,9 @@ fn validate_permutation(
     if permutation.len() != extent
         || permutation.iter().copied().collect::<BTreeSet<_>>() != expected
     {
-        return Err(ArithmeticMonodromyError::InvalidPermutationGroup);
+        return Err(ArithmeticMonodromyError::Law(
+            ArithmeticMonodromyRefusal::InvalidPermutationGroup,
+        ));
     }
     Ok(())
 }
@@ -1615,7 +1758,9 @@ fn monic_polynomial_discriminant(
     coefficients: &[BigInt],
 ) -> Result<BigInt, ArithmeticMonodromyError> {
     if coefficients.len() < 2 || coefficients.last() != Some(&BigInt::one()) {
-        return Err(ArithmeticMonodromyError::MalformedDiscriminantPolynomial);
+        return Err(ArithmeticMonodromyError::Law(
+            ArithmeticMonodromyRefusal::MalformedDiscriminantPolynomial,
+        ));
     }
     let degree = coefficients.len() - 1;
     let derivative = coefficients
@@ -1643,15 +1788,22 @@ fn polynomial_resultant(
     let left_degree = left_low_first
         .len()
         .checked_sub(1)
-        .ok_or(ArithmeticMonodromyError::MalformedDiscriminantPolynomial)?;
-    let right_degree = right_low_first
-        .len()
-        .checked_sub(1)
-        .ok_or(ArithmeticMonodromyError::MalformedDiscriminantPolynomial)?;
+        .ok_or(ArithmeticMonodromyError::Law(
+            ArithmeticMonodromyRefusal::MalformedDiscriminantPolynomial,
+        ))?;
+    let right_degree =
+        right_low_first
+            .len()
+            .checked_sub(1)
+            .ok_or(ArithmeticMonodromyError::Law(
+                ArithmeticMonodromyRefusal::MalformedDiscriminantPolynomial,
+            ))?;
     if left_low_first.last().is_none_or(Zero::is_zero)
         || right_low_first.last().is_none_or(Zero::is_zero)
     {
-        return Err(ArithmeticMonodromyError::MalformedDiscriminantPolynomial);
+        return Err(ArithmeticMonodromyError::Law(
+            ArithmeticMonodromyRefusal::MalformedDiscriminantPolynomial,
+        ));
     }
     let size = left_degree
         .checked_add(right_degree)
@@ -1675,7 +1827,9 @@ fn polynomial_resultant(
 fn bareiss_determinant(mut matrix: Vec<Vec<BigInt>>) -> Result<BigInt, ArithmeticMonodromyError> {
     let size = matrix.len();
     if size == 0 || matrix.iter().any(|row| row.len() != size) {
-        return Err(ArithmeticMonodromyError::MalformedDeterminant);
+        return Err(ArithmeticMonodromyError::Law(
+            ArithmeticMonodromyRefusal::MalformedDeterminant,
+        ));
     }
     if size == 1 {
         return Ok(matrix[0][0].clone());
@@ -1698,7 +1852,9 @@ fn bareiss_determinant(mut matrix: Vec<Vec<BigInt>>) -> Result<BigInt, Arithmeti
                     - &matrix[row][pivot_index] * &matrix[pivot_index][column];
                 let quotient = &numerator / &previous_pivot;
                 if &quotient * &previous_pivot != numerator {
-                    return Err(ArithmeticMonodromyError::NonExactBareissDivision);
+                    return Err(ArithmeticMonodromyError::Law(
+                        ArithmeticMonodromyRefusal::NonExactBareissDivision,
+                    ));
                 }
                 matrix[row][column] = quotient;
             }
@@ -1846,7 +2002,7 @@ pub struct ArithmeticMonodromyAtlasReceipt {
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum ArithmeticMonodromyError {
+pub enum ArithmeticMonodromyRefusal {
     #[error(transparent)]
     PrimeEcology(#[from] PrimeEcologyError),
     #[error("integral quintic {0:?} is malformed")]
@@ -1855,12 +2011,6 @@ pub enum ArithmeticMonodromyError {
     MalformedNormalization(QuinticProblemId),
     #[error("quintic problem standing {0:?} is malformed")]
     MalformedProblemStanding(QuinticProblemId),
-    #[error("arithmetic-monodromy standing is malformed")]
-    MalformedStanding,
-    #[error("the law and standing declarations differ")]
-    LawStandingMismatch,
-    #[error("event {0:?} has already crossed this arithmetic-monodromy world")]
-    RepeatedEvent(EventId),
     #[error("quintic problem {0:?} is already present")]
     RepeatedProblem(QuinticProblemId),
     #[error("quintic problem {0:?} is absent")]
@@ -1939,9 +2089,16 @@ pub enum ArithmeticMonodromyError {
     MalformedDeterminant,
     #[error("Bareiss elimination encountered a non-exact division")]
     NonExactBareissDivision,
-    #[error("an exact carrier overflowed its declared machine index")]
-    CarrierOverflow,
 }
+
+impl RefusalKind for ArithmeticMonodromyRefusal {
+    const LAW: &'static str = "arithmetic-monodromy";
+}
+
+/// The arithmetic-monodromy law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type ArithmeticMonodromyError = EventRefusal<ArithmeticMonodromyRefusal>;
+
+event_refusal_from!(ArithmeticMonodromyRefusal: PrimeEcologyError);
 
 #[cfg(test)]
 mod tests {

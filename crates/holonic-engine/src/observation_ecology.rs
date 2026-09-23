@@ -26,6 +26,10 @@ use relational_geometry::{Rat, ReceiverId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::world::{
+    EventQuotient, EventRefusal, EventStanding, RefusalKind, event_refusal_from,
+    event_standing_wire,
+};
 use crate::{
     CpuExecutionError, CpuExecutionMode, CpuExecutionReceipt, CpuExecutor, EquivalenceClosure,
     EventId, EventSuccessor, ExactEventLaw, ExactModeSignature, ExistingReceiverBatch,
@@ -113,7 +117,9 @@ impl ReceiverCoordinateFamily {
             || self.relation_coordinates.is_empty()
             || self.stratum_coordinates.is_empty()
         {
-            return Err(ObservationEcologyError::MalformedCoordinateFamily(self.id));
+            return Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::MalformedCoordinateFamily(self.id),
+            ));
         }
         let extent = self.coordinates.len();
         let mut all_selected = BTreeSet::new();
@@ -125,7 +131,9 @@ impl ReceiverCoordinateFamily {
             let coordinate = usize::try_from(*coordinate)
                 .map_err(|_| ObservationEcologyError::CarrierOverflow)?;
             if coordinate >= extent || !all_selected.insert(coordinate) {
-                return Err(ObservationEcologyError::MalformedCoordinateFamily(self.id));
+                return Err(ObservationEcologyError::Law(
+                    ObservationEcologyRefusal::MalformedCoordinateFamily(self.id),
+                ));
             }
         }
         Ok(())
@@ -185,18 +193,22 @@ impl ReceiverAffineChart {
             || self.basis.len() != self.offset.len()
             || self.basis.iter().any(|row| row.len() != raw_extent)
         {
-            return Err(ObservationEcologyError::MalformedChart(self.id));
+            return Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::MalformedChart(self.id),
+            ));
         }
         Ok(())
     }
 
     pub fn receive(&self, raw: &[i64]) -> Result<Vec<Rat>, ObservationEcologyError> {
         if raw.len() != self.raw_coordinates.len() {
-            return Err(ObservationEcologyError::RawCoordinateDimension {
-                chart: self.id,
-                expected: self.raw_coordinates.len(),
-                received: raw.len(),
-            });
+            return Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::RawCoordinateDimension {
+                    chart: self.id,
+                    expected: self.raw_coordinates.len(),
+                    received: raw.len(),
+                },
+            ));
         }
         Ok(self
             .basis
@@ -218,16 +230,20 @@ impl ReceiverAffineChart {
         coordinate: usize,
     ) -> Result<Rat, ObservationEcologyError> {
         if raw.len() != self.raw_coordinates.len() {
-            return Err(ObservationEcologyError::RawCoordinateDimension {
-                chart: self.id,
-                expected: self.raw_coordinates.len(),
-                received: raw.len(),
-            });
+            return Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::RawCoordinateDimension {
+                    chart: self.id,
+                    expected: self.raw_coordinates.len(),
+                    received: raw.len(),
+                },
+            ));
         }
         let row = self
             .basis
             .get(coordinate)
-            .ok_or(ObservationEcologyError::MalformedChart(self.id))?;
+            .ok_or(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::MalformedChart(self.id),
+            ))?;
         Ok(row.iter().zip(raw).fold(
             self.offset[coordinate].clone(),
             |value, (coefficient, raw)| value + coefficient * Rat::from_integer(BigInt::from(*raw)),
@@ -244,7 +260,9 @@ pub fn exact_rational_from_f32_bits(bits: u32) -> Result<Rat, ObservationEcology
     let exponent = (bits >> 23) & 0xff;
     let fraction = bits & 0x7f_ffff;
     if exponent == 0xff {
-        return Err(ObservationEcologyError::NonfiniteReportedValue);
+        return Err(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::NonfiniteReportedValue,
+        ));
     }
     if exponent == 0 && fraction == 0 {
         return Ok(Rat::zero());
@@ -266,7 +284,9 @@ pub fn exact_rational_from_f64_bits(bits: u64) -> Result<Rat, ObservationEcology
     let exponent = (bits >> 52) & 0x7ff;
     let fraction = bits & 0x000f_ffff_ffff_ffff;
     if exponent == 0x7ff {
-        return Err(ObservationEcologyError::NonfiniteReportedValue);
+        return Err(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::NonfiniteReportedValue,
+        ));
     }
     if exponent == 0 && fraction == 0 {
         return Ok(Rat::zero());
@@ -445,10 +465,12 @@ impl LearnedPartitionRelation {
             || !is_maximal_front(&self.positive_maxima)
             || !is_minimal_front(&self.negative_minima)
         {
-            return Err(ObservationEcologyError::MalformedLearnedRelation {
-                family: self.family,
-                algorithm: self.algorithm,
-            });
+            return Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::MalformedLearnedRelation {
+                    family: self.family,
+                    algorithm: self.algorithm,
+                },
+            ));
         }
         Ok(())
     }
@@ -610,9 +632,9 @@ pub struct AdmittedReceiverPartition {
     pub partition: Arc<ReturnedReceiverPartition>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ObservationEcologyStanding {
-    pub schema: String,
+/// [definition] **The observation-ecology quotient** (plan phase 16): the receiver families, charts, testimonies, relations, predictions, grades and quotients the law reads.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ObservationEcologyQuotient {
     pub families: BTreeMap<ReceiverCoordinateFamilyId, ReceiverCoordinateFamily>,
     pub charts: BTreeMap<ReceiverChartId, ReceiverAffineChart>,
     pub testimonies: Arc<BTreeMap<ReceiverTestimonyId, ReceiverTestimonyStanding>>,
@@ -624,31 +646,133 @@ pub struct ObservationEcologyStanding {
     pub admitted_grades: BTreeSet<ReceiverGradeId>,
     pub receiver_quotients: BTreeMap<ReceiverGrainQuotientId, ReceiverGrainQuotient>,
     pub receiver_quotient_by_target: BTreeMap<ReceiverTestimonyId, ReceiverGrainQuotientId>,
+    next_prediction: u64,
+    next_grade: u64,
+    next_receiver_quotient: u64,
+}
+
+/// The standing: the shared event scaffold around [`ObservationEcologyQuotient`].
+pub type ObservationEcologyStanding = EventStanding<ObservationEcologyQuotient>;
+
+impl EventQuotient for ObservationEcologyQuotient {
+    type Refusal = ObservationEcologyRefusal;
+}
+
+#[derive(Serialize)]
+#[serde(rename = "ObservationEcologyStanding")]
+struct ObservationEcologyStandingWrite<'a> {
+    schema: &'a String,
+    families: &'a BTreeMap<ReceiverCoordinateFamilyId, ReceiverCoordinateFamily>,
+    charts: &'a BTreeMap<ReceiverChartId, ReceiverAffineChart>,
+    testimonies: &'a Arc<BTreeMap<ReceiverTestimonyId, ReceiverTestimonyStanding>>,
+    relations:
+        &'a BTreeMap<(ReceiverCoordinateFamilyId, ReturnedAlgorithmId), LearnedPartitionRelation>,
+    predictions: &'a Arc<BTreeMap<ReceiverPredictionId, Arc<ReceiverRelationPrediction>>>,
+    grades: &'a Arc<BTreeMap<ReceiverGradeId, Arc<ReceiverRelationGrade>>>,
+    admitted_partitions: &'a Arc<Vec<AdmittedReceiverPartition>>,
+    admitted_grades: &'a BTreeSet<ReceiverGradeId>,
+    receiver_quotients: &'a BTreeMap<ReceiverGrainQuotientId, ReceiverGrainQuotient>,
+    receiver_quotient_by_target: &'a BTreeMap<ReceiverTestimonyId, ReceiverGrainQuotientId>,
+    used_events: &'a BTreeSet<EventId>,
+    next_prediction: &'a u64,
+    next_grade: &'a u64,
+    next_receiver_quotient: &'a u64,
+}
+
+impl<'a> From<&'a ObservationEcologyStanding> for ObservationEcologyStandingWrite<'a> {
+    fn from(standing: &'a ObservationEcologyStanding) -> Self {
+        Self {
+            schema: &standing.schema,
+            families: &standing.families,
+            charts: &standing.charts,
+            testimonies: &standing.testimonies,
+            relations: &standing.relations,
+            predictions: &standing.predictions,
+            grades: &standing.grades,
+            admitted_partitions: &standing.admitted_partitions,
+            admitted_grades: &standing.admitted_grades,
+            receiver_quotients: &standing.receiver_quotients,
+            receiver_quotient_by_target: &standing.receiver_quotient_by_target,
+            used_events: &standing.used_events,
+            next_prediction: &standing.next_prediction,
+            next_grade: &standing.next_grade,
+            next_receiver_quotient: &standing.next_receiver_quotient,
+        }
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(rename = "ObservationEcologyStanding")]
+struct ObservationEcologyStandingRead {
+    schema: String,
+    families: BTreeMap<ReceiverCoordinateFamilyId, ReceiverCoordinateFamily>,
+    charts: BTreeMap<ReceiverChartId, ReceiverAffineChart>,
+    testimonies: Arc<BTreeMap<ReceiverTestimonyId, ReceiverTestimonyStanding>>,
+    relations:
+        BTreeMap<(ReceiverCoordinateFamilyId, ReturnedAlgorithmId), LearnedPartitionRelation>,
+    predictions: Arc<BTreeMap<ReceiverPredictionId, Arc<ReceiverRelationPrediction>>>,
+    grades: Arc<BTreeMap<ReceiverGradeId, Arc<ReceiverRelationGrade>>>,
+    admitted_partitions: Arc<Vec<AdmittedReceiverPartition>>,
+    admitted_grades: BTreeSet<ReceiverGradeId>,
+    receiver_quotients: BTreeMap<ReceiverGrainQuotientId, ReceiverGrainQuotient>,
+    receiver_quotient_by_target: BTreeMap<ReceiverTestimonyId, ReceiverGrainQuotientId>,
     used_events: BTreeSet<EventId>,
     next_prediction: u64,
     next_grade: u64,
     next_receiver_quotient: u64,
 }
 
+impl From<ObservationEcologyStandingRead> for ObservationEcologyStanding {
+    fn from(read: ObservationEcologyStandingRead) -> Self {
+        EventStanding::from_parts(
+            read.schema,
+            read.used_events,
+            ObservationEcologyQuotient {
+                families: read.families,
+                charts: read.charts,
+                testimonies: read.testimonies,
+                relations: read.relations,
+                predictions: read.predictions,
+                grades: read.grades,
+                admitted_partitions: read.admitted_partitions,
+                admitted_grades: read.admitted_grades,
+                receiver_quotients: read.receiver_quotients,
+                receiver_quotient_by_target: read.receiver_quotient_by_target,
+                next_prediction: read.next_prediction,
+                next_grade: read.next_grade,
+                next_receiver_quotient: read.next_receiver_quotient,
+            },
+        )
+    }
+}
+
+event_standing_wire!(
+    ObservationEcologyQuotient,
+    ObservationEcologyStandingWrite,
+    ObservationEcologyStandingRead
+);
+
 impl Default for ObservationEcologyStanding {
     fn default() -> Self {
-        Self {
-            schema: STANDING_SCHEMA.to_owned(),
-            families: BTreeMap::new(),
-            charts: BTreeMap::new(),
-            testimonies: Arc::new(BTreeMap::new()),
-            relations: BTreeMap::new(),
-            predictions: Arc::new(BTreeMap::new()),
-            grades: Arc::new(BTreeMap::new()),
-            admitted_partitions: Arc::new(Vec::new()),
-            admitted_grades: BTreeSet::new(),
-            receiver_quotients: BTreeMap::new(),
-            receiver_quotient_by_target: BTreeMap::new(),
-            used_events: BTreeSet::new(),
-            next_prediction: 1,
-            next_grade: 1,
-            next_receiver_quotient: 1,
-        }
+        EventStanding::from_parts(
+            STANDING_SCHEMA.to_owned(),
+            BTreeSet::new(),
+            ObservationEcologyQuotient {
+                families: BTreeMap::new(),
+                charts: BTreeMap::new(),
+                testimonies: Arc::new(BTreeMap::new()),
+                relations: BTreeMap::new(),
+                predictions: Arc::new(BTreeMap::new()),
+                grades: Arc::new(BTreeMap::new()),
+                admitted_partitions: Arc::new(Vec::new()),
+                admitted_grades: BTreeSet::new(),
+                receiver_quotients: BTreeMap::new(),
+                receiver_quotient_by_target: BTreeMap::new(),
+                next_prediction: 1,
+                next_grade: 1,
+                next_receiver_quotient: 1,
+            },
+        )
     }
 }
 
@@ -941,9 +1065,9 @@ impl CudaRelationRuntime {
         if self.executor.is_none() {
             self.executor = Some(CudaExactRelationExecutor::new()?);
         }
-        self.executor
-            .as_mut()
-            .ok_or(ObservationEcologyError::CudaRelationExecutorUnavailable)
+        self.executor.as_mut().ok_or(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::CudaRelationExecutorUnavailable,
+        ))
     }
 
     fn finish_mode_use<T: PartialEq>(
@@ -957,19 +1081,25 @@ impl CudaRelationRuntime {
     ) -> Result<(T, CudaRelationReceipt, CudaModeUse), ObservationEcologyError> {
         let compared_relations;
         if already_admitted {
-            let witness = self
-                .admissions
-                .admission(&realization)
-                .ok_or(ObservationEcologyError::CudaModeRegistryInvariant)?;
+            let witness =
+                self.admissions
+                    .admission(&realization)
+                    .ok_or(ObservationEcologyError::Law(
+                        ObservationEcologyRefusal::CudaModeRegistryInvariant,
+                    ))?;
             if witness.device != receipt.device || witness.kernel_sha256 != receipt.kernel_sha256 {
-                return Err(ObservationEcologyError::CudaKernelChanged);
+                return Err(ObservationEcologyError::Law(
+                    ObservationEcologyRefusal::CudaKernelChanged,
+                ));
             }
             let _prior_witness_extent = witness.compared_relations;
             compared_relations = 0;
         } else {
             let cpu_result = cpu_witness()?;
             if cpu_result != result {
-                return Err(ObservationEcologyError::CudaRelationParity);
+                return Err(ObservationEcologyError::Law(
+                    ObservationEcologyRefusal::CudaRelationParity,
+                ));
             }
             compared_relations = compared_relations_if_admitted;
             self.admissions
@@ -981,7 +1111,11 @@ impl CudaRelationRuntime {
                         compared_relations,
                     },
                 )
-                .map_err(|_| ObservationEcologyError::CudaModeRegistryInvariant)?;
+                .map_err(|_| {
+                    ObservationEcologyError::Law(
+                        ObservationEcologyRefusal::CudaModeRegistryInvariant,
+                    )
+                })?;
         }
         let resident_modes = u64::try_from(self.admissions.len())
             .map_err(|_| ObservationEcologyError::CarrierOverflow)?;
@@ -1058,10 +1192,12 @@ impl ObservationEcologyLaw {
         let runtime = self
             .cuda_runtime
             .as_ref()
-            .ok_or(ObservationEcologyError::CudaRelationExecutorUnavailable)?;
-        let mut runtime = runtime
-            .lock()
-            .map_err(|_| ObservationEcologyError::CudaRelationRuntimePoisoned)?;
+            .ok_or(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::CudaRelationExecutorUnavailable,
+            ))?;
+        let mut runtime = runtime.lock().map_err(|_| {
+            ObservationEcologyError::Law(ObservationEcologyRefusal::CudaRelationRuntimePoisoned)
+        })?;
         operation(&mut runtime)
     }
 }
@@ -1099,7 +1235,9 @@ where
         .execute_indexed(inputs, operation)
         .map_err(|error| match error {
             CpuExecutionError::Operation(error) => error,
-            CpuExecutionError::WorkerPanicked => ObservationEcologyError::PhysicalWorkerPanicked,
+            CpuExecutionError::WorkerPanicked => {
+                ObservationEcologyError::Law(ObservationEcologyRefusal::PhysicalWorkerPanicked)
+            }
         })?;
     accumulate_cpu_receipt(work, &receipt)?;
     Ok(outputs)
@@ -1181,14 +1319,18 @@ fn accumulate_cuda_receipt(
         .ok_or(ObservationEcologyError::CarrierOverflow)?;
     match &work.cuda_device {
         Some(device) if device != &receipt.device => {
-            return Err(ObservationEcologyError::CudaDeviceChanged);
+            return Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::CudaDeviceChanged,
+            ));
         }
         None => work.cuda_device = Some(receipt.device.clone()),
         _ => {}
     }
     match &work.cuda_kernel_sha256 {
         Some(kernel) if kernel != &receipt.kernel_sha256 => {
-            return Err(ObservationEcologyError::CudaKernelChanged);
+            return Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::CudaKernelChanged,
+            ));
         }
         None => work.cuda_kernel_sha256 = Some(receipt.kernel_sha256.clone()),
         _ => {}
@@ -1231,15 +1373,15 @@ impl ExactEventLaw for ObservationEcologyLaw {
         let mut work = ObservationEcologyWork::default();
         validate_standing_with_executor(standing_before, &self.cpu, &mut work)?;
         let event_id = event.event();
-        if standing_before.used_events.contains(&event_id) {
-            return Err(ObservationEcologyError::RepeatedEvent(event_id));
-        }
+        standing_before.refuse_repeated(event_id)?;
         let mut standing_after = standing_before.clone();
         let (kind, prediction, grade) = match event {
             ObservationEcologyEvent::DeclareFamily { family, .. } => {
                 family.validate()?;
                 if standing_after.families.contains_key(&family.id) {
-                    return Err(ObservationEcologyError::RepeatedCoordinateFamily(family.id));
+                    return Err(ObservationEcologyError::Law(
+                        ObservationEcologyRefusal::RepeatedCoordinateFamily(family.id),
+                    ));
                 }
                 standing_after.families.insert(family.id, family.clone());
                 (ObservationEcologyRadiationKind::FamilyDeclared, None, None)
@@ -1247,7 +1389,9 @@ impl ExactEventLaw for ObservationEcologyLaw {
             ObservationEcologyEvent::DeclareChart { chart, .. } => {
                 validate_chart(&standing_after, chart)?;
                 if standing_after.charts.contains_key(&chart.id) {
-                    return Err(ObservationEcologyError::RepeatedChart(chart.id));
+                    return Err(ObservationEcologyError::Law(
+                        ObservationEcologyRefusal::RepeatedChart(chart.id),
+                    ));
                 }
                 standing_after.charts.insert(chart.id, chart.clone());
                 (ObservationEcologyRadiationKind::ChartDeclared, None, None)
@@ -1403,27 +1547,29 @@ impl ExactEventLaw for ObservationEcologyLaw {
                 returned,
                 ..
             } => {
-                let prediction_body = standing_after
-                    .predictions
-                    .get(prediction)
-                    .cloned()
-                    .ok_or(ObservationEcologyError::MissingPrediction(*prediction))?;
+                let prediction_body = standing_after.predictions.get(prediction).cloned().ok_or(
+                    ObservationEcologyError::Law(ObservationEcologyRefusal::MissingPrediction(
+                        *prediction,
+                    )),
+                )?;
                 if standing_after
                     .grades
                     .values()
                     .any(|grade| grade.prediction == *prediction)
                 {
-                    return Err(ObservationEcologyError::PredictionAlreadyGraded(
-                        *prediction,
+                    return Err(ObservationEcologyError::Law(
+                        ObservationEcologyRefusal::PredictionAlreadyGraded(*prediction),
                     ));
                 }
                 let batch = batch_from_prediction(&standing_after, &prediction_body)?;
                 validate_partition(&batch, returned)?;
                 if returned.algorithm != prediction_body.algorithm {
-                    return Err(ObservationEcologyError::ReturnedAlgorithmMismatch {
-                        expected: prediction_body.algorithm,
-                        received: returned.algorithm,
-                    });
+                    return Err(ObservationEcologyError::Law(
+                        ObservationEcologyRefusal::ReturnedAlgorithmMismatch {
+                            expected: prediction_body.algorithm,
+                            received: returned.algorithm,
+                        },
+                    ));
                 }
                 let grade_id = ReceiverGradeId(standing_after.next_grade);
                 standing_after.next_grade = standing_after
@@ -1448,20 +1594,20 @@ impl ExactEventLaw for ObservationEcologyLaw {
                 )
             }
             ObservationEcologyEvent::AdmitGradedReturn { grade, .. } => {
-                let grade_body = standing_after
-                    .grades
-                    .get(grade)
-                    .cloned()
-                    .ok_or(ObservationEcologyError::MissingGrade(*grade))?;
+                let grade_body = standing_after.grades.get(grade).cloned().ok_or(
+                    ObservationEcologyError::Law(ObservationEcologyRefusal::MissingGrade(*grade)),
+                )?;
                 if standing_after.admitted_grades.contains(grade) {
-                    return Err(ObservationEcologyError::GradeAlreadyAdmitted(*grade));
+                    return Err(ObservationEcologyError::Law(
+                        ObservationEcologyRefusal::GradeAlreadyAdmitted(*grade),
+                    ));
                 }
                 let prediction = standing_after
                     .predictions
                     .get(&grade_body.prediction)
                     .cloned()
-                    .ok_or(ObservationEcologyError::MissingPrediction(
-                        grade_body.prediction,
+                    .ok_or(ObservationEcologyError::Law(
+                        ObservationEcologyRefusal::MissingPrediction(grade_body.prediction),
                     ))?;
                 let batch = batch_from_prediction(&standing_after, &prediction)?;
                 condition_relation(
@@ -1514,15 +1660,20 @@ fn validate_chart(
     chart: &ReceiverAffineChart,
 ) -> Result<(), ObservationEcologyError> {
     chart.validate_shape()?;
-    let family = standing.families.get(&chart.family).ok_or(
-        ObservationEcologyError::MissingCoordinateFamily(chart.family),
-    )?;
+    let family = standing
+        .families
+        .get(&chart.family)
+        .ok_or(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::MissingCoordinateFamily(chart.family),
+        ))?;
     if chart.offset.len() != family.coordinates.len() {
-        return Err(ObservationEcologyError::ChartFamilyDimension {
-            chart: chart.id,
-            chart_dimension: chart.offset.len(),
-            family_dimension: family.coordinates.len(),
-        });
+        return Err(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::ChartFamilyDimension {
+                chart: chart.id,
+                chart_dimension: chart.offset.len(),
+                family_dimension: family.coordinates.len(),
+            },
+        ));
     }
     Ok(())
 }
@@ -1552,7 +1703,9 @@ fn pack_aperture_validation(
         let row = chart
             .basis
             .get(coordinate)
-            .ok_or(ObservationEcologyError::MalformedChart(chart.id))?;
+            .ok_or(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::MalformedChart(chart.id),
+            ))?;
         let nonzero = row
             .iter()
             .enumerate()
@@ -1616,11 +1769,16 @@ fn validate_new_batch(
     work: &mut ObservationEcologyWork,
 ) -> Result<(), ObservationEcologyError> {
     if batch.source.is_empty() {
-        return Err(ObservationEcologyError::EmptyBatchSource);
+        return Err(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::EmptyBatchSource,
+        ));
     }
-    let family = standing.families.get(&batch.family).ok_or(
-        ObservationEcologyError::MissingCoordinateFamily(batch.family),
-    )?;
+    let family = standing
+        .families
+        .get(&batch.family)
+        .ok_or(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::MissingCoordinateFamily(batch.family),
+        ))?;
     let mut aperture_coordinates = BTreeSet::new();
     for interval in &batch.aperture {
         let coordinate = usize::try_from(interval.coordinate)
@@ -1629,13 +1787,17 @@ fn validate_new_batch(
             || interval.lower > interval.upper
             || !aperture_coordinates.insert(coordinate)
         {
-            return Err(ObservationEcologyError::MalformedReceiverAperture);
+            return Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::MalformedReceiverAperture,
+            ));
         }
     }
     let mut ids = BTreeSet::new();
     for occurrence in &batch.occurrences {
         if !ids.insert(occurrence.id) || standing.testimonies.contains_key(&occurrence.id) {
-            return Err(ObservationEcologyError::RepeatedTestimony(occurrence.id));
+            return Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::RepeatedTestimony(occurrence.id),
+            ));
         }
     }
     let packed_apertures = if law.exact_cuda_relations {
@@ -1649,7 +1811,9 @@ fn validate_new_batch(
                 let chart = standing
                     .charts
                     .get(&chart_id)
-                    .ok_or(ObservationEcologyError::MissingChart(chart_id))?;
+                    .ok_or(ObservationEcologyError::Law(
+                        ObservationEcologyRefusal::MissingChart(chart_id),
+                    ))?;
                 Ok((chart_id, pack_aperture_validation(chart, &batch.aperture)?))
             })
             .collect::<Result<BTreeMap<_, _>, ObservationEcologyError>>()?
@@ -1660,14 +1824,16 @@ fn validate_new_batch(
         let chart = standing
             .charts
             .get(&occurrence.chart)
-            .ok_or(ObservationEcologyError::MissingChart(occurrence.chart))?;
+            .ok_or(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::MissingChart(occurrence.chart),
+            ))?;
         if chart.family != batch.family
             || chart.receiver != occurrence.receiver
             || chart.offset.len() != family.coordinates.len()
             || occurrence.raw.len() != chart.raw_coordinates.len()
         {
-            return Err(ObservationEcologyError::OccurrenceChartMismatch(
-                occurrence.id,
+            return Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::OccurrenceChartMismatch(occurrence.id),
             ));
         }
         match packed_apertures.get(&chart.id) {
@@ -1676,14 +1842,14 @@ fn validate_new_batch(
                     occurrence.raw[interval.raw_coordinate] < interval.lower
                         || occurrence.raw[interval.raw_coordinate] > interval.upper
                 }) {
-                    return Err(ObservationEcologyError::TestimonyOutsideAperture(
-                        occurrence.id,
+                    return Err(ObservationEcologyError::Law(
+                        ObservationEcologyRefusal::TestimonyOutsideAperture(occurrence.id),
                     ));
                 }
             }
             Some(PackedApertureValidation::Impossible) => {
-                return Err(ObservationEcologyError::TestimonyOutsideAperture(
-                    occurrence.id,
+                return Err(ObservationEcologyError::Law(
+                    ObservationEcologyRefusal::TestimonyOutsideAperture(occurrence.id),
                 ));
             }
             Some(PackedApertureValidation::General) | None => {
@@ -1692,8 +1858,8 @@ fn validate_new_batch(
                         .map_err(|_| ObservationEcologyError::CarrierOverflow)?;
                     let received = chart.receive_coordinate(&occurrence.raw, coordinate)?;
                     if received < interval.lower || received > interval.upper {
-                        return Err(ObservationEcologyError::TestimonyOutsideAperture(
-                            occurrence.id,
+                        return Err(ObservationEcologyError::Law(
+                            ObservationEcologyRefusal::TestimonyOutsideAperture(occurrence.id),
                         ));
                     }
                 }
@@ -1717,11 +1883,15 @@ fn validate_partition(
     let mut membership = BTreeMap::<ReceiverTestimonyId, usize>::new();
     for cell in &returned.cells {
         if !cell_ids.insert(cell.id) || cell.members.is_empty() {
-            return Err(ObservationEcologyError::MalformedReturnedPartition);
+            return Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::MalformedReturnedPartition,
+            ));
         }
         for member in &cell.members {
             if !supplied.contains(member) {
-                return Err(ObservationEcologyError::PartitionForeignTestimony(*member));
+                return Err(ObservationEcologyError::Law(
+                    ObservationEcologyRefusal::PartitionForeignTestimony(*member),
+                ));
             }
             *membership.entry(*member).or_default() += 1;
         }
@@ -1730,7 +1900,9 @@ fn validate_partition(
         && (membership.len() != supplied.len()
             || membership.values().any(|multiplicity| *multiplicity != 1))
     {
-        return Err(ObservationEcologyError::IncompleteExclusivePartition);
+        return Err(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::IncompleteExclusivePartition,
+        ));
     }
     Ok(())
 }
@@ -1753,7 +1925,9 @@ fn insert_batch(
             )
             .is_some()
         {
-            return Err(ObservationEcologyError::RepeatedTestimony(occurrence.id));
+            return Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::RepeatedTestimony(occurrence.id),
+            ));
         }
     }
     Ok(())
@@ -1771,19 +1945,21 @@ fn return_partition_as_receivers(
         .iter()
         .find(|partition| partition.event == partition_event)
         .cloned()
-        .ok_or(ObservationEcologyError::MissingAdmittedPartition(
-            partition_event,
+        .ok_or(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::MissingAdmittedPartition(partition_event),
         ))?;
     if lower.partition.coverage != ReturnedCellCoverage::CompleteExclusive {
-        return Err(ObservationEcologyError::NonexclusiveReceiverReturn);
+        return Err(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::NonexclusiveReceiverReturn,
+        ));
     }
     if upper_batch.chronology < lower.chronology {
-        return Err(
-            ObservationEcologyError::ReceiverReturnChronologyRegression {
+        return Err(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::ReceiverReturnChronologyRegression {
                 lower: lower.chronology,
                 upper: upper_batch.chronology,
             },
-        );
+        ));
     }
     let lower_cells = lower
         .partition
@@ -1809,17 +1985,23 @@ fn return_partition_as_receivers(
             .collect::<BTreeSet<_>>()
             != upper_occurrences.keys().copied().collect()
     {
-        return Err(ObservationEcologyError::IncompleteReceiverReturn);
+        return Err(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::IncompleteReceiverReturn,
+        ));
     }
     for relation in returns {
         let upper = upper_occurrences
             .get(&relation.target)
-            .ok_or(ObservationEcologyError::IncompleteReceiverReturn)?;
+            .ok_or(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::IncompleteReceiverReturn,
+            ))?;
         if upper.source_identity != relation.source_cell.0 {
-            return Err(ObservationEcologyError::ReceiverReturnIdentityMismatch {
-                cell: relation.source_cell,
-                testimony: relation.target,
-            });
+            return Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::ReceiverReturnIdentityMismatch {
+                    cell: relation.source_cell,
+                    testimony: relation.target,
+                },
+            ));
         }
         if standing.receiver_quotients.values().any(|quotient| {
             quotient.source
@@ -1831,7 +2013,9 @@ fn return_partition_as_receivers(
             .receiver_quotient_by_target
             .contains_key(&relation.target)
         {
-            return Err(ObservationEcologyError::RepeatedReceiverReturn);
+            return Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::RepeatedReceiverReturn,
+            ));
         }
     }
     insert_batch(
@@ -1875,11 +2059,16 @@ fn materialize_existing_batch(
     work: &mut ObservationEcologyWork,
 ) -> Result<ReceiverBatch, ObservationEcologyError> {
     if batch.source.is_empty() {
-        return Err(ObservationEcologyError::EmptyBatchSource);
+        return Err(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::EmptyBatchSource,
+        ));
     }
-    let family = standing.families.get(&batch.family).ok_or(
-        ObservationEcologyError::MissingCoordinateFamily(batch.family),
-    )?;
+    let family = standing
+        .families
+        .get(&batch.family)
+        .ok_or(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::MissingCoordinateFamily(batch.family),
+        ))?;
     let mut aperture_coordinates = BTreeSet::new();
     for interval in &batch.aperture {
         let coordinate = usize::try_from(interval.coordinate)
@@ -1888,63 +2077,80 @@ fn materialize_existing_batch(
             || interval.lower > interval.upper
             || !aperture_coordinates.insert(coordinate)
         {
-            return Err(ObservationEcologyError::MalformedReceiverAperture);
+            return Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::MalformedReceiverAperture,
+            ));
         }
     }
     let mut unique = BTreeSet::new();
-    let occurrences = batch
-        .occurrences
-        .iter()
-        .map(|id| {
-            if !unique.insert(*id) {
-                return Err(ObservationEcologyError::RepeatedTestimony(*id));
-            }
-            let quotient_id = standing
-                .receiver_quotient_by_target
-                .get(id)
-                .ok_or(ObservationEcologyError::TestimonyIsNotReceiverReturn(*id))?;
-            let quotient = standing
-                .receiver_quotients
-                .get(quotient_id)
-                .ok_or(ObservationEcologyError::MalformedStanding)?;
-            if quotient.target_family != batch.family
-                || quotient.target_chronology != batch.chronology
-            {
-                return Err(ObservationEcologyError::ReceiverReturnChronologyMismatch {
-                    testimony: *id,
-                    expected: quotient.target_chronology,
-                    received: batch.chronology,
-                });
-            }
-            let body = standing
-                .testimonies
-                .get(id)
-                .ok_or(ObservationEcologyError::MissingTestimony(*id))?;
-            if !testimony_is_admitted(standing, &body.disposition) {
-                return Err(ObservationEcologyError::TestimonyIsNotAdmitted(*id));
-            }
-            let chart = standing
-                .charts
-                .get(&body.occurrence.chart)
-                .ok_or(ObservationEcologyError::MissingChart(body.occurrence.chart))?;
-            if chart.family != batch.family {
-                return Err(ObservationEcologyError::OccurrenceChartMismatch(*id));
-            }
-            Ok(body.occurrence.clone())
-        })
-        .collect::<Result<Vec<_>, _>>()?;
+    let occurrences =
+        batch
+            .occurrences
+            .iter()
+            .map(|id| {
+                if !unique.insert(*id) {
+                    return Err(ObservationEcologyError::Law(
+                        ObservationEcologyRefusal::RepeatedTestimony(*id),
+                    ));
+                }
+                let quotient_id = standing.receiver_quotient_by_target.get(id).ok_or(
+                    ObservationEcologyError::Law(
+                        ObservationEcologyRefusal::TestimonyIsNotReceiverReturn(*id),
+                    ),
+                )?;
+                let quotient = standing
+                    .receiver_quotients
+                    .get(quotient_id)
+                    .ok_or(ObservationEcologyError::MalformedStanding)?;
+                if quotient.target_family != batch.family
+                    || quotient.target_chronology != batch.chronology
+                {
+                    return Err(ObservationEcologyError::Law(
+                        ObservationEcologyRefusal::ReceiverReturnChronologyMismatch {
+                            testimony: *id,
+                            expected: quotient.target_chronology,
+                            received: batch.chronology,
+                        },
+                    ));
+                }
+                let body = standing
+                    .testimonies
+                    .get(id)
+                    .ok_or(ObservationEcologyError::Law(
+                        ObservationEcologyRefusal::MissingTestimony(*id),
+                    ))?;
+                if !testimony_is_admitted(standing, &body.disposition) {
+                    return Err(ObservationEcologyError::Law(
+                        ObservationEcologyRefusal::TestimonyIsNotAdmitted(*id),
+                    ));
+                }
+                let chart = standing.charts.get(&body.occurrence.chart).ok_or(
+                    ObservationEcologyError::Law(ObservationEcologyRefusal::MissingChart(
+                        body.occurrence.chart,
+                    )),
+                )?;
+                if chart.family != batch.family {
+                    return Err(ObservationEcologyError::Law(
+                        ObservationEcologyRefusal::OccurrenceChartMismatch(*id),
+                    ));
+                }
+                Ok(body.occurrence.clone())
+            })
+            .collect::<Result<Vec<_>, _>>()?;
     execute_cpu_indexed(executor, &occurrences, work, |_index, occurrence| {
         let chart = standing
             .charts
             .get(&occurrence.chart)
-            .ok_or(ObservationEcologyError::MissingChart(occurrence.chart))?;
+            .ok_or(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::MissingChart(occurrence.chart),
+            ))?;
         for interval in &batch.aperture {
             let coordinate = usize::try_from(interval.coordinate)
                 .map_err(|_| ObservationEcologyError::CarrierOverflow)?;
             let received = chart.receive_coordinate(&occurrence.raw, coordinate)?;
             if received < interval.lower || received > interval.upper {
-                return Err(ObservationEcologyError::TestimonyOutsideAperture(
-                    occurrence.id,
+                return Err(ObservationEcologyError::Law(
+                    ObservationEcologyRefusal::TestimonyOutsideAperture(occurrence.id),
                 ));
             }
         }
@@ -1982,16 +2188,21 @@ fn decoded_batch(
 ) -> Result<BTreeMap<ReceiverTestimonyId, Vec<Rat>>, ObservationEcologyError> {
     let received =
         execute_cpu_indexed(executor, &batch.occurrences, work, |_index, occurrence| {
-            let chart = standing
-                .charts
-                .get(&occurrence.chart)
-                .ok_or(ObservationEcologyError::MissingChart(occurrence.chart))?;
+            let chart =
+                standing
+                    .charts
+                    .get(&occurrence.chart)
+                    .ok_or(ObservationEcologyError::Law(
+                        ObservationEcologyRefusal::MissingChart(occurrence.chart),
+                    ))?;
             Ok((occurrence.id, chart.receive(&occurrence.raw)?))
         })?;
     let mut decoded = BTreeMap::new();
     for (id, coordinates) in received {
         if decoded.insert(id, coordinates).is_some() {
-            return Err(ObservationEcologyError::RepeatedTestimony(id));
+            return Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::RepeatedTestimony(id),
+            ));
         }
     }
     Ok(decoded)
@@ -2051,11 +2262,13 @@ fn cell_span(
                 .get(member)
                 .and_then(|coordinates| coordinates.get(coordinate))
                 .cloned()
-                .ok_or(ObservationEcologyError::MissingTestimony(*member))
+                .ok_or(ObservationEcologyError::Law(
+                    ObservationEcologyRefusal::MissingTestimony(*member),
+                ))
         });
-        let first = values
-            .next()
-            .ok_or(ObservationEcologyError::MalformedReturnedPartition)??;
+        let first = values.next().ok_or(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::MalformedReturnedPartition,
+        ))??;
         let mut minimum = first.clone();
         let mut maximum = first;
         for value in values {
@@ -2072,13 +2285,17 @@ fn exclusive_membership(
     returned: &ReturnedReceiverPartition,
 ) -> Result<BTreeMap<ReceiverTestimonyId, ReturnedCellId>, ObservationEcologyError> {
     if returned.coverage != ReturnedCellCoverage::CompleteExclusive {
-        return Err(ObservationEcologyError::NonexclusiveRelationTraining);
+        return Err(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::NonexclusiveRelationTraining,
+        ));
     }
     let mut membership = BTreeMap::new();
     for cell in &returned.cells {
         for member in &cell.members {
             if membership.insert(*member, cell.id).is_some() {
-                return Err(ObservationEcologyError::IncompleteExclusivePartition);
+                return Err(ObservationEcologyError::Law(
+                    ObservationEcologyRefusal::IncompleteExclusivePartition,
+                ));
             }
         }
     }
@@ -2094,7 +2311,9 @@ fn strata(
     for occurrence in &batch.occurrences {
         let coordinates = decoded
             .get(&occurrence.id)
-            .ok_or(ObservationEcologyError::MissingTestimony(occurrence.id))?;
+            .ok_or(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::MissingTestimony(occurrence.id),
+            ))?;
         strata
             .entry(coordinates_at(coordinates, &family.stratum_coordinates)?)
             .or_default()
@@ -2139,12 +2358,16 @@ fn pack_observation_stratum(
     let Some(first) = members.first() else {
         return Ok(None);
     };
-    let first_occurrence = occurrences
-        .get(first)
-        .ok_or(ObservationEcologyError::MissingTestimony(*first))?;
-    let chart = standing.charts.get(&first_occurrence.chart).ok_or(
-        ObservationEcologyError::MissingChart(first_occurrence.chart),
-    )?;
+    let first_occurrence = occurrences.get(first).ok_or(ObservationEcologyError::Law(
+        ObservationEcologyRefusal::MissingTestimony(*first),
+    ))?;
+    let chart =
+        standing
+            .charts
+            .get(&first_occurrence.chart)
+            .ok_or(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::MissingChart(first_occurrence.chart),
+            ))?;
     if members.iter().any(|member| {
         occurrences
             .get(member)
@@ -2161,7 +2384,9 @@ fn pack_observation_stratum(
         let row = chart
             .basis
             .get(coordinate)
-            .ok_or(ObservationEcologyError::MalformedChart(chart.id))?;
+            .ok_or(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::MalformedChart(chart.id),
+            ))?;
         let nonzero = row
             .iter()
             .enumerate()
@@ -2181,16 +2406,16 @@ fn pack_observation_stratum(
             .ok_or(ObservationEcologyError::CarrierOverflow)?,
     );
     for member in members {
-        let occurrence = occurrences
-            .get(member)
-            .ok_or(ObservationEcologyError::MissingTestimony(*member))?;
+        let occurrence = occurrences.get(member).ok_or(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::MissingTestimony(*member),
+        ))?;
         for raw_coordinate in &raw_coordinates {
             points.push(*occurrence.raw.get(*raw_coordinate).ok_or(
-                ObservationEcologyError::RawCoordinateDimension {
+                ObservationEcologyError::Law(ObservationEcologyRefusal::RawCoordinateDimension {
                     chart: chart.id,
                     expected: chart.raw_coordinates.len(),
                     received: occurrence.raw.len(),
-                },
+                }),
             )?);
         }
     }
@@ -2244,7 +2469,9 @@ fn packed_strata(
         let chart = standing
             .charts
             .get(&occurrence.chart)
-            .ok_or(ObservationEcologyError::MissingChart(occurrence.chart))?;
+            .ok_or(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::MissingChart(occurrence.chart),
+            ))?;
         let key = family
             .stratum_coordinates
             .iter()
@@ -2260,8 +2487,11 @@ fn packed_strata(
         .into_values()
         .map(|mut members| {
             members.sort();
-            pack_observation_stratum(&members, &occurrences, standing, family, relation)?
-                .ok_or(ObservationEcologyError::CudaRelationChartNotPackable)
+            pack_observation_stratum(&members, &occurrences, standing, family, relation)?.ok_or(
+                ObservationEcologyError::Law(
+                    ObservationEcologyRefusal::CudaRelationChartNotPackable,
+                ),
+            )
         })
         .collect()
 }
@@ -2269,7 +2499,9 @@ fn packed_strata(
 #[cfg(target_os = "linux")]
 fn raw_floor_threshold(value: &Rat, scale: &Rat) -> Result<u64, ObservationEcologyError> {
     if value.is_negative() || scale <= &Rat::zero() {
-        return Err(ObservationEcologyError::MalformedPackedRelation);
+        return Err(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::MalformedPackedRelation,
+        ));
     }
     let quotient = value / scale;
     let maximum = Rat::from_integer(BigInt::from(u64::MAX));
@@ -2279,13 +2511,17 @@ fn raw_floor_threshold(value: &Rat, scale: &Rat) -> Result<u64, ObservationEcolo
     quotient
         .to_integer()
         .to_u64()
-        .ok_or(ObservationEcologyError::MalformedPackedRelation)
+        .ok_or(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::MalformedPackedRelation,
+        ))
 }
 
 #[cfg(target_os = "linux")]
 fn raw_ceiling_threshold(value: &Rat, scale: &Rat) -> Result<Option<u64>, ObservationEcologyError> {
     if value.is_negative() || scale <= &Rat::zero() {
-        return Err(ObservationEcologyError::MalformedPackedRelation);
+        return Err(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::MalformedPackedRelation,
+        ));
     }
     let quotient = value / scale;
     let maximum = Rat::from_integer(BigInt::from(u64::MAX));
@@ -2298,11 +2534,9 @@ fn raw_ceiling_threshold(value: &Rat, scale: &Rat) -> Result<Option<u64>, Observ
     } else {
         floor + BigInt::from(1_u8)
     };
-    Ok(Some(
-        ceiling
-            .to_u64()
-            .ok_or(ObservationEcologyError::MalformedPackedRelation)?,
-    ))
+    Ok(Some(ceiling.to_u64().ok_or(
+        ObservationEcologyError::Law(ObservationEcologyRefusal::MalformedPackedRelation),
+    )?))
 }
 
 #[cfg(target_os = "linux")]
@@ -2368,7 +2602,9 @@ fn state_from_wire(state: u8) -> Result<ReceiverRelationState, ObservationEcolog
         1 => Ok(ReceiverRelationState::ForcedApart),
         2 => Ok(ReceiverRelationState::Open),
         3 => Ok(ReceiverRelationState::Conflicted),
-        _ => Err(ObservationEcologyError::MalformedCudaRelationState(state)),
+        _ => Err(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::MalformedCudaRelationState(state),
+        )),
     }
 }
 
@@ -2380,13 +2616,20 @@ fn condition_relation(
     executor: &CpuExecutor,
     work: &mut ObservationEcologyWork,
 ) -> Result<(), ObservationEcologyError> {
-    let family = standing.families.get(&batch.family).cloned().ok_or(
-        ObservationEcologyError::MissingCoordinateFamily(batch.family),
-    )?;
+    let family =
+        standing
+            .families
+            .get(&batch.family)
+            .cloned()
+            .ok_or(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::MissingCoordinateFamily(batch.family),
+            ))?;
     let decoded = decoded_batch(standing, batch, executor, work)?;
     let membership = exclusive_membership(returned)?;
     if membership.len() != batch.occurrences.len() {
-        return Err(ObservationEcologyError::IncompleteExclusivePartition);
+        return Err(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::IncompleteExclusivePartition,
+        ));
     }
     let strata = strata(batch, &family, &decoded)?;
     let stratum_by_member = strata
@@ -2403,11 +2646,15 @@ fn condition_relation(
                     stratum_by_member
                         .get(member)
                         .cloned()
-                        .ok_or(ObservationEcologyError::MissingTestimony(*member))
+                        .ok_or(ObservationEcologyError::Law(
+                            ObservationEcologyRefusal::MissingTestimony(*member),
+                        ))
                 })
                 .collect::<Result<BTreeSet<_>, _>>()?;
             if cell_strata.len() != 1 {
-                return Err(ObservationEcologyError::ReturnedCellCrossesStrata(cell.id));
+                return Err(ObservationEcologyError::Law(
+                    ObservationEcologyRefusal::ReturnedCellCrossesStrata(cell.id),
+                ));
             }
             cell_span(&cell.members, &decoded, &family.relation_coordinates)
         })?;
@@ -2498,17 +2745,22 @@ fn emit_prediction(
     law: &ObservationEcologyLaw,
     work: &mut ObservationEcologyWork,
 ) -> Result<ReceiverRelationPrediction, ObservationEcologyError> {
-    let family = standing.families.get(&batch.family).ok_or(
-        ObservationEcologyError::MissingCoordinateFamily(batch.family),
-    )?;
+    let family = standing
+        .families
+        .get(&batch.family)
+        .ok_or(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::MissingCoordinateFamily(batch.family),
+        ))?;
     let relation = standing
         .relations
         .get(&(batch.family, algorithm))
         .cloned()
-        .ok_or(ObservationEcologyError::MissingLearnedRelation {
-            family: batch.family,
-            algorithm,
-        })?;
+        .ok_or(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::MissingLearnedRelation {
+                family: batch.family,
+                algorithm,
+            },
+        ))?;
     #[cfg(target_os = "linux")]
     if law.exact_cuda_relations {
         match emit_packed_prediction(
@@ -2523,7 +2775,9 @@ fn emit_prediction(
             work,
         ) {
             Ok(prediction) => return Ok(prediction),
-            Err(ObservationEcologyError::CudaRelationChartNotPackable) => {}
+            Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::CudaRelationChartNotPackable,
+            )) => {}
             Err(error) => return Err(error),
         }
     }
@@ -2812,7 +3066,9 @@ fn batch_from_prediction(
                     .testimonies
                     .get(id)
                     .map(|body| body.occurrence.clone())
-                    .ok_or(ObservationEcologyError::MissingTestimony(*id))
+                    .ok_or(ObservationEcologyError::Law(
+                        ObservationEcologyRefusal::MissingTestimony(*id),
+                    ))
             })
             .collect::<Result<Vec<_>, _>>()?,
     })
@@ -2828,9 +3084,12 @@ fn grade_return(
     law: &ObservationEcologyLaw,
     work: &mut ObservationEcologyWork,
 ) -> Result<ReceiverRelationGrade, ObservationEcologyError> {
-    let family = standing.families.get(&batch.family).ok_or(
-        ObservationEcologyError::MissingCoordinateFamily(batch.family),
-    )?;
+    let family = standing
+        .families
+        .get(&batch.family)
+        .ok_or(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::MissingCoordinateFamily(batch.family),
+        ))?;
     let membership = exclusive_membership(returned)?;
     let mut counts = ReceiverRelationGradeCounts::default();
     let mut obstructions = BTreeSet::new();
@@ -2848,10 +3107,11 @@ fn grade_return(
                             .members
                             .iter()
                             .map(|member| {
-                                membership
-                                    .get(member)
-                                    .map(|cell| cell.0)
-                                    .ok_or(ObservationEcologyError::MalformedReturnedPartition)
+                                membership.get(member).map(|cell| cell.0).ok_or(
+                                    ObservationEcologyError::Law(
+                                        ObservationEcologyRefusal::MalformedReturnedPartition,
+                                    ),
+                                )
                             })
                             .collect::<Result<Vec<_>, _>>()?;
                         let mode = cuda_relation_mode(batch.family, prediction.algorithm, stratum);
@@ -2878,7 +3138,9 @@ fn grade_return(
                 }
                 complete
             }
-            Err(ObservationEcologyError::CudaRelationChartNotPackable) => {
+            Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::CudaRelationChartNotPackable,
+            )) => {
                 let decoded = decoded_batch(standing, batch, &law.cpu, work)?;
                 let strata = strata(batch, family, &decoded)?;
                 work.cpu_relation_fallbacks = work
@@ -2917,7 +3179,9 @@ fn grade_return(
     };
     #[cfg(not(target_os = "linux"))]
     let results = if law.exact_cuda_relations {
-        return Err(ObservationEcologyError::CudaRelationExecutorUnavailable);
+        return Err(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::CudaRelationExecutorUnavailable,
+        ));
     } else {
         let decoded = decoded_batch(standing, batch, &law.cpu, work)?;
         let strata = strata(batch, family, &decoded)?;
@@ -3000,7 +3264,9 @@ fn grade_stratum(
                 .count(),
         )?
     {
-        return Err(ObservationEcologyError::MalformedReturnedPartition);
+        return Err(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::MalformedReturnedPartition,
+        ));
     }
     Ok(GradeStratumResult {
         counts,
@@ -3125,7 +3391,9 @@ fn grade_from_cuda_sparse(
         .ok_or(ObservationEcologyError::CarrierOverflow)?
         != pair_count
     {
-        return Err(ObservationEcologyError::CudaRelationParity);
+        return Err(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::CudaRelationParity,
+        ));
     }
     let expected_obstructions = counts
         .returned_together_forced_apart
@@ -3137,7 +3405,9 @@ fn grade_from_cuda_sparse(
         != u64::try_from(sparse.obstructions.len())
             .map_err(|_| ObservationEcologyError::CarrierOverflow)?
     {
-        return Err(ObservationEcologyError::CudaRelationParity);
+        return Err(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::CudaRelationParity,
+        ));
     }
     let mut obstructions = BTreeSet::new();
     for obstruction in &sparse.obstructions {
@@ -3146,14 +3416,18 @@ fn grade_from_cuda_sparse(
         let right = usize::try_from(obstruction.pair.right)
             .map_err(|_| ObservationEcologyError::CarrierOverflow)?;
         if left >= right || right >= packed.members.len() {
-            return Err(ObservationEcologyError::CudaRelationParity);
+            return Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::CudaRelationParity,
+            ));
         }
         if !obstructions.insert(ReceiverRelationObstruction {
             kind: obstruction_kind_from_wire(obstruction.kind)?,
             members: ordered_pair(packed.members[left], packed.members[right]),
             difference: packed_difference(packed, left, right)?,
         }) {
-            return Err(ObservationEcologyError::CudaRelationParity);
+            return Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::CudaRelationParity,
+            ));
         }
     }
     Ok(GradeStratumResult {
@@ -3210,8 +3484,8 @@ fn obstruction_kind_from_wire(
         1 => Ok(ReceiverRelationObstructionKind::ReturnedTogetherButOpen),
         2 => Ok(ReceiverRelationObstructionKind::ReturnedApartButForcedTogether),
         3 => Ok(ReceiverRelationObstructionKind::ConflictedLineage),
-        _ => Err(ObservationEcologyError::MalformedCudaRelationObstruction(
-            kind,
+        _ => Err(ObservationEcologyError::Law(
+            ObservationEcologyRefusal::MalformedCudaRelationObstruction(kind),
         )),
     }
 }
@@ -3341,9 +3615,7 @@ fn validate_standing_with_executor(
     executor: &CpuExecutor,
     work: &mut ObservationEcologyWork,
 ) -> Result<(), ObservationEcologyError> {
-    if standing.schema != STANDING_SCHEMA {
-        return Err(ObservationEcologyError::MalformedStanding);
-    }
+    standing.check_schema(STANDING_SCHEMA)?;
     for (id, family) in &standing.families {
         if id != &family.id {
             return Err(ObservationEcologyError::MalformedStanding);
@@ -3570,7 +3842,7 @@ fn physical_resources(
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum ObservationEcologyError {
+pub enum ObservationEcologyRefusal {
     #[error("receiver coordinate family {0:?} is absent")]
     MissingCoordinateFamily(ReceiverCoordinateFamilyId),
     #[error("receiver coordinate family {0:?} is malformed")]
@@ -3675,8 +3947,6 @@ pub enum ObservationEcologyError {
     MissingGrade(ReceiverGradeId),
     #[error("receiver relation grade {0:?} has already entered training standing")]
     GradeAlreadyAdmitted(ReceiverGradeId),
-    #[error("event {0:?} was repeated")]
-    RepeatedEvent(EventId),
     #[error("one physical CPU worker failed before returning its exact local section")]
     PhysicalWorkerPanicked,
     #[error("the explicitly requested exact CUDA relation executor is not yet admissible")]
@@ -3704,15 +3974,20 @@ pub enum ObservationEcologyError {
     MalformedCudaRelationState(u8),
     #[error("CUDA returned unknown relation-obstruction code {0}")]
     MalformedCudaRelationObstruction(u8),
-    #[error("observation ecology standing is malformed")]
-    MalformedStanding,
     #[error(transparent)]
     Mode(#[from] crate::ModeError),
     #[error(transparent)]
     ReceiverEcology(#[from] ReceiverEcologyError),
-    #[error("an observation ecology carrier overflowed")]
-    CarrierOverflow,
 }
+
+impl RefusalKind for ObservationEcologyRefusal {
+    const LAW: &'static str = "observation-ecology";
+}
+
+/// The observation-ecology law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type ObservationEcologyError = EventRefusal<ObservationEcologyRefusal>;
+
+event_refusal_from!(ObservationEcologyRefusal: crate::CudaRelationError, crate::ModeError, ReceiverEcologyError);
 
 #[cfg(test)]
 mod tests {
@@ -3826,7 +4101,9 @@ mod tests {
         );
         assert_eq!(
             exact_rational_from_f64_bits(0x7ff0_0000_0000_0000),
-            Err(ObservationEcologyError::NonfiniteReportedValue)
+            Err(ObservationEcologyError::Law(
+                ObservationEcologyRefusal::NonfiniteReportedValue
+            ))
         );
     }
 
@@ -4248,7 +4525,12 @@ mod tests {
                     ],
                 })
                 .unwrap_err(),
-            ObservationEcologyError::ReceiverReturnChronologyRegression { lower: 1, upper: 0 }
+            ObservationEcologyError::Law(
+                ObservationEcologyRefusal::ReceiverReturnChronologyRegression {
+                    lower: 1,
+                    upper: 0
+                }
+            )
         );
         world
             .receive(&ObservationEcologyEvent::ReturnPartitionAsReceivers {
@@ -4284,11 +4566,13 @@ mod tests {
                     },
                 })
                 .unwrap_err(),
-            ObservationEcologyError::ReceiverReturnChronologyMismatch {
-                testimony: ReceiverTestimonyId(100),
-                expected: 1,
-                received: 2,
-            }
+            ObservationEcologyError::Law(
+                ObservationEcologyRefusal::ReceiverReturnChronologyMismatch {
+                    testimony: ReceiverTestimonyId(100),
+                    expected: 1,
+                    received: 2,
+                }
+            )
         );
         world
             .receive(&ObservationEcologyEvent::ConditionExistingReceiverBatch {

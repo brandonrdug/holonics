@@ -58,7 +58,9 @@ impl ExactSheafDiffusionLaw {
     /// **This law as a `HolonLaw` at a declared interval**: its words are this law's own events.
     pub fn holon_law(&self, interval: Rat) -> Result<SheafDiffusionHolonLaw, SheafDiffusionError> {
         if !interval.is_positive() {
-            return Err(SheafDiffusionError::NonpositiveInterval);
+            return Err(SheafDiffusionError::Law(
+                crate::SheafDiffusionRefusal::NonpositiveInterval,
+            ));
         }
         Ok(SheafDiffusionHolonLaw {
             reference: ReferenceHolon::new(self.holon()?, interval, Scheme::BackwardEuler)?,
@@ -156,7 +158,7 @@ impl HolonLaw for SheafDiffusionHolonLaw {
 
 impl From<HolonError> for SheafDiffusionError {
     fn from(error: HolonError) -> Self {
-        Self::Holon(Box::new(error))
+        Self::Law(crate::SheafDiffusionRefusal::Holon(Box::new(error)))
     }
 }
 

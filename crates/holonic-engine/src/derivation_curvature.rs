@@ -1620,7 +1620,9 @@ impl DerivationCurvatureBody {
             .spatial
             .edges
             .get(&edge)
-            .ok_or(LocalStarError::MissingSpatialEdge(edge))?
+            .ok_or(LocalStarError::Law(
+                crate::LocalStarRefusal::MissingSpatialEdge(edge),
+            ))?
             .vector
             .clone();
         let orthogonal =

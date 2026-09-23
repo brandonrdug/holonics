@@ -25,6 +25,10 @@ use relational_geometry::{Rat, ReceiverId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::world::{
+    EventQuotient, EventRefusal, EventStanding, RefusalKind, event_refusal_from,
+    event_standing_wire,
+};
 use crate::{
     CpuExecutionError, CpuExecutionReceipt, CpuExecutor, EventId, EventSuccessor, ExactEventLaw,
     ExactInterval, ExactValueError, LogicalResourceReceipt, ReceiverPredictionId,
@@ -124,7 +128,9 @@ impl AtmosphericProfile {
 
     fn validate(&self) -> Result<(), AtmosphericInverseError> {
         if self.schema != PROFILE_SCHEMA || self.source.is_empty() || self.levels.len() < 2 {
-            return Err(AtmosphericInverseError::MalformedProfile(self.id));
+            return Err(AtmosphericInverseError::Law(
+                AtmosphericInverseRefusal::MalformedProfile(self.id),
+            ));
         }
         let complete = self
             .levels
@@ -145,7 +151,9 @@ impl AtmosphericProfile {
                 .windows(2)
                 .any(|pair| pair[0].0 >= pair[1].0 || pair[0].1 <= pair[1].1)
         {
-            return Err(AtmosphericInverseError::MalformedProfile(self.id));
+            return Err(AtmosphericInverseError::Law(
+                AtmosphericInverseRefusal::MalformedProfile(self.id),
+            ));
         }
         Ok(())
     }
@@ -261,10 +269,14 @@ pub struct OpaqueThermalChordDoctrine {
 impl OpaqueThermalChordDoctrine {
     pub fn validate(&self) -> Result<(), AtmosphericInverseError> {
         if !self.specific_gas_constant.is_positive() {
-            return Err(AtmosphericInverseError::NonpositiveGasConstant);
+            return Err(AtmosphericInverseError::Law(
+                AtmosphericInverseRefusal::NonpositiveGasConstant,
+            ));
         }
         if self.logarithm_terms == 0 {
-            return Err(AtmosphericInverseError::ZeroLogarithmTerms);
+            return Err(AtmosphericInverseError::Law(
+                AtmosphericInverseRefusal::ZeroLogarithmTerms,
+            ));
         }
         Ok(())
     }
@@ -463,28 +475,96 @@ pub struct AtmosphericAltitudeGrade {
     pub obstructions: Vec<AtmosphericAltitudeObstruction>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct AtmosphericInverseStanding {
-    pub schema: String,
+/// [definition] **The atmospheric-inverse quotient** (plan phase 16): the profiles, resolutions and grades the law reads.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct AtmosphericInverseQuotient {
     pub profiles: BTreeMap<AtmosphericProfileId, AtmosphericProfile>,
     pub resolutions: BTreeMap<AtmosphericResolutionId, Arc<AtmosphericInverseResolution>>,
     pub grades: BTreeMap<AtmosphericGradeId, Arc<AtmosphericAltitudeGrade>>,
+    next_resolution: u64,
+    next_grade: u64,
+}
+
+/// The standing: the shared event scaffold around [`AtmosphericInverseQuotient`].
+pub type AtmosphericInverseStanding = EventStanding<AtmosphericInverseQuotient>;
+
+impl EventQuotient for AtmosphericInverseQuotient {
+    type Refusal = AtmosphericInverseRefusal;
+}
+
+#[derive(Serialize)]
+#[serde(rename = "AtmosphericInverseStanding")]
+struct AtmosphericInverseStandingWrite<'a> {
+    schema: &'a String,
+    profiles: &'a BTreeMap<AtmosphericProfileId, AtmosphericProfile>,
+    resolutions: &'a BTreeMap<AtmosphericResolutionId, Arc<AtmosphericInverseResolution>>,
+    grades: &'a BTreeMap<AtmosphericGradeId, Arc<AtmosphericAltitudeGrade>>,
+    used_events: &'a BTreeSet<EventId>,
+    next_resolution: &'a u64,
+    next_grade: &'a u64,
+}
+
+impl<'a> From<&'a AtmosphericInverseStanding> for AtmosphericInverseStandingWrite<'a> {
+    fn from(standing: &'a AtmosphericInverseStanding) -> Self {
+        Self {
+            schema: &standing.schema,
+            profiles: &standing.profiles,
+            resolutions: &standing.resolutions,
+            grades: &standing.grades,
+            used_events: &standing.used_events,
+            next_resolution: &standing.next_resolution,
+            next_grade: &standing.next_grade,
+        }
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(rename = "AtmosphericInverseStanding")]
+struct AtmosphericInverseStandingRead {
+    schema: String,
+    profiles: BTreeMap<AtmosphericProfileId, AtmosphericProfile>,
+    resolutions: BTreeMap<AtmosphericResolutionId, Arc<AtmosphericInverseResolution>>,
+    grades: BTreeMap<AtmosphericGradeId, Arc<AtmosphericAltitudeGrade>>,
     used_events: BTreeSet<EventId>,
     next_resolution: u64,
     next_grade: u64,
 }
 
+impl From<AtmosphericInverseStandingRead> for AtmosphericInverseStanding {
+    fn from(read: AtmosphericInverseStandingRead) -> Self {
+        EventStanding::from_parts(
+            read.schema,
+            read.used_events,
+            AtmosphericInverseQuotient {
+                profiles: read.profiles,
+                resolutions: read.resolutions,
+                grades: read.grades,
+                next_resolution: read.next_resolution,
+                next_grade: read.next_grade,
+            },
+        )
+    }
+}
+
+event_standing_wire!(
+    AtmosphericInverseQuotient,
+    AtmosphericInverseStandingWrite,
+    AtmosphericInverseStandingRead
+);
+
 impl Default for AtmosphericInverseStanding {
     fn default() -> Self {
-        Self {
-            schema: STANDING_SCHEMA.to_owned(),
-            profiles: BTreeMap::new(),
-            resolutions: BTreeMap::new(),
-            grades: BTreeMap::new(),
-            used_events: BTreeSet::new(),
-            next_resolution: 1,
-            next_grade: 1,
-        }
+        EventStanding::from_parts(
+            STANDING_SCHEMA.to_owned(),
+            BTreeSet::new(),
+            AtmosphericInverseQuotient {
+                profiles: BTreeMap::new(),
+                resolutions: BTreeMap::new(),
+                grades: BTreeMap::new(),
+                next_resolution: 1,
+                next_grade: 1,
+            },
+        )
     }
 }
 
@@ -587,93 +667,98 @@ impl ExactEventLaw for AtmosphericInverseLaw {
     ) -> Result<EventSuccessor<Self::Standing, Self::Radiation>, Self::Error> {
         validate_standing(standing_before)?;
         let event_id = event.event();
-        if standing_before.used_events.contains(&event_id) {
-            return Err(AtmosphericInverseError::RepeatedEvent(event_id));
-        }
+        standing_before.refuse_repeated(event_id)?;
         let mut standing_after = standing_before.clone();
         let mut work = AtmosphericInverseWork::default();
-        let (kind, resolution, grade, logical) = match event {
-            AtmosphericInverseEvent::ReceiveProfile { profile, .. } => {
-                profile.validate()?;
-                if standing_after.profiles.contains_key(&profile.id) {
-                    return Err(AtmosphericInverseError::RepeatedProfile(profile.id));
+        let (kind, resolution, grade, logical) =
+            match event {
+                AtmosphericInverseEvent::ReceiveProfile { profile, .. } => {
+                    profile.validate()?;
+                    if standing_after.profiles.contains_key(&profile.id) {
+                        return Err(AtmosphericInverseError::Law(
+                            AtmosphericInverseRefusal::RepeatedProfile(profile.id),
+                        ));
+                    }
+                    standing_after
+                        .profiles
+                        .insert(profile.id, profile.as_ref().clone());
+                    (
+                        AtmosphericInverseRadiationKind::ProfileReceived,
+                        None,
+                        None,
+                        logical_receipt(&["receive-atmospheric-profile"])?,
+                    )
                 }
-                standing_after
-                    .profiles
-                    .insert(profile.id, profile.as_ref().clone());
-                (
-                    AtmosphericInverseRadiationKind::ProfileReceived,
-                    None,
-                    None,
-                    logical_receipt(&["receive-atmospheric-profile"])?,
-                )
-            }
-            AtmosphericInverseEvent::ResolvePrediction {
-                profile,
-                prediction,
-                occurrences,
-                doctrine,
-                ..
-            } => {
-                let profile_body = standing_after
-                    .profiles
-                    .get(profile)
-                    .ok_or(AtmosphericInverseError::MissingProfile(*profile))?;
-                let id = AtmosphericResolutionId(standing_after.next_resolution);
-                standing_after.next_resolution = standing_after
-                    .next_resolution
-                    .checked_add(1)
-                    .ok_or(AtmosphericInverseError::CarrierOverflow)?;
-                let resolved = Arc::new(resolve_prediction(
-                    id,
-                    event_id,
-                    profile_body,
+                AtmosphericInverseEvent::ResolvePrediction {
+                    profile,
                     prediction,
                     occurrences,
                     doctrine,
-                    &self.cpu,
-                )?);
-                work = resolved.work.clone();
-                standing_after.resolutions.insert(id, resolved.clone());
-                (
-                    AtmosphericInverseRadiationKind::PredictionResolved,
-                    Some(resolved),
-                    None,
-                    logical_receipt(&[
-                        "select-receiver-contact",
-                        "restrict-vertical-profile",
-                        "lift-generated-relation",
-                    ])?,
-                )
-            }
-            AtmosphericInverseEvent::GradeAltitudeReturn {
-                resolution,
-                receiver,
-                source,
-                landmarks,
-                ..
-            } => {
-                let resolved = standing_after
-                    .resolutions
-                    .get(resolution)
-                    .ok_or(AtmosphericInverseError::MissingResolution(*resolution))?;
-                let id = AtmosphericGradeId(standing_after.next_grade);
-                standing_after.next_grade = standing_after
-                    .next_grade
-                    .checked_add(1)
-                    .ok_or(AtmosphericInverseError::CarrierOverflow)?;
-                let graded = Arc::new(grade_altitude_return(
-                    id, event_id, resolved, *receiver, source, landmarks,
-                )?);
-                standing_after.grades.insert(id, graded.clone());
-                (
-                    AtmosphericInverseRadiationKind::AltitudeReturnGraded,
-                    None,
-                    Some(graded),
-                    logical_receipt(&["receive-altitude-return", "grade-before-admission"])?,
-                )
-            }
-        };
+                    ..
+                } => {
+                    let standing_after: &mut AtmosphericInverseQuotient = &mut standing_after;
+                    let profile_body = standing_after.profiles.get(profile).ok_or(
+                        AtmosphericInverseError::Law(AtmosphericInverseRefusal::MissingProfile(
+                            *profile,
+                        )),
+                    )?;
+                    let id = AtmosphericResolutionId(standing_after.next_resolution);
+                    standing_after.next_resolution = standing_after
+                        .next_resolution
+                        .checked_add(1)
+                        .ok_or(AtmosphericInverseError::CarrierOverflow)?;
+                    let resolved = Arc::new(resolve_prediction(
+                        id,
+                        event_id,
+                        profile_body,
+                        prediction,
+                        occurrences,
+                        doctrine,
+                        &self.cpu,
+                    )?);
+                    work = resolved.work.clone();
+                    standing_after.resolutions.insert(id, resolved.clone());
+                    (
+                        AtmosphericInverseRadiationKind::PredictionResolved,
+                        Some(resolved),
+                        None,
+                        logical_receipt(&[
+                            "select-receiver-contact",
+                            "restrict-vertical-profile",
+                            "lift-generated-relation",
+                        ])?,
+                    )
+                }
+                AtmosphericInverseEvent::GradeAltitudeReturn {
+                    resolution,
+                    receiver,
+                    source,
+                    landmarks,
+                    ..
+                } => {
+                    let standing_after: &mut AtmosphericInverseQuotient = &mut standing_after;
+                    let resolved = standing_after.resolutions.get(resolution).ok_or(
+                        AtmosphericInverseError::Law(AtmosphericInverseRefusal::MissingResolution(
+                            *resolution,
+                        )),
+                    )?;
+                    let id = AtmosphericGradeId(standing_after.next_grade);
+                    standing_after.next_grade = standing_after
+                        .next_grade
+                        .checked_add(1)
+                        .ok_or(AtmosphericInverseError::CarrierOverflow)?;
+                    let graded = Arc::new(grade_altitude_return(
+                        id, event_id, resolved, *receiver, source, landmarks,
+                    )?);
+                    standing_after.grades.insert(id, graded.clone());
+                    (
+                        AtmosphericInverseRadiationKind::AltitudeReturnGraded,
+                        None,
+                        Some(graded),
+                        logical_receipt(&["receive-altitude-return", "grade-before-admission"])?,
+                    )
+                }
+            };
         standing_after.used_events.insert(event_id);
         validate_standing(&standing_after)?;
         Ok(EventSuccessor {
@@ -712,7 +797,9 @@ fn resolve_prediction(
         .copied()
         .collect::<BTreeSet<_>>();
     if occurrence_ids.len() != occurrences.len() || occurrence_ids != predicted_ids {
-        return Err(AtmosphericInverseError::IncompatiblePredictionPopulation);
+        return Err(AtmosphericInverseError::Law(
+            AtmosphericInverseRefusal::IncompatiblePredictionPopulation,
+        ));
     }
     if let Some(occurrence) = occurrences.iter().find(|occurrence| {
         occurrence.contacts.iter().any(|contact| {
@@ -730,8 +817,8 @@ fn resolve_prediction(
                         .collect::<BTreeSet<_>>()
         })
     }) {
-        return Err(AtmosphericInverseError::MalformedSpectralOccurrence(
-            occurrence.testimony,
+        return Err(AtmosphericInverseError::Law(
+            AtmosphericInverseRefusal::MalformedSpectralOccurrence(occurrence.testimony),
         ));
     }
     let layers = profile.complete_layers(doctrine)?;
@@ -1051,16 +1138,20 @@ fn grade_altitude_return(
     landmarks: &[AltitudeReceiverLandmark],
 ) -> Result<AtmosphericAltitudeGrade, AtmosphericInverseError> {
     if source.is_empty() {
-        return Err(AtmosphericInverseError::EmptyAltitudeReturnSource);
+        return Err(AtmosphericInverseError::Law(
+            AtmosphericInverseRefusal::EmptyAltitudeReturnSource,
+        ));
     }
     let mut indexed = BTreeMap::new();
     for landmark in landmarks {
         if landmark.receiver != receiver {
-            return Err(AtmosphericInverseError::MixedAltitudeReturnReceivers);
+            return Err(AtmosphericInverseError::Law(
+                AtmosphericInverseRefusal::MixedAltitudeReturnReceivers,
+            ));
         }
         if indexed.insert(landmark.testimony, landmark).is_some() {
-            return Err(AtmosphericInverseError::RepeatedAltitudeLandmark(
-                landmark.testimony,
+            return Err(AtmosphericInverseError::Law(
+                AtmosphericInverseRefusal::RepeatedAltitudeLandmark(landmark.testimony),
             ));
         }
     }
@@ -1073,7 +1164,9 @@ fn grade_altitude_return(
         .keys()
         .find(|testimony| !predicted.contains(testimony))
     {
-        return Err(AtmosphericInverseError::UnknownAltitudeLandmark(*testimony));
+        return Err(AtmosphericInverseError::Law(
+            AtmosphericInverseRefusal::UnknownAltitudeLandmark(*testimony),
+        ));
     }
     let fibers = resolution.vertical_fibers.iter().fold(
         BTreeMap::<ReceiverTestimonyId, Vec<ExactInterval>>::new(),
@@ -1192,7 +1285,9 @@ fn hydrostatic_chord(
         || !lower_temperature.is_positive()
         || !upper_temperature.is_positive()
     {
-        return Err(AtmosphericInverseError::MalformedHydrostaticLayer);
+        return Err(AtmosphericInverseError::Law(
+            AtmosphericInverseRefusal::MalformedHydrostaticLayer,
+        ));
     }
     let pressure_log_ratio =
         exact_positive_log_ratio(lower_pressure, upper_pressure, logarithm_terms)?;
@@ -1201,7 +1296,9 @@ fn hydrostatic_chord(
         * (Rat::one() / lower_temperature + Rat::one() / upper_temperature)
         / two;
     if !inverse_temperature_chord.is_positive() {
-        return Err(AtmosphericInverseError::MalformedHydrostaticLayer);
+        return Err(AtmosphericInverseError::Law(
+            AtmosphericInverseRefusal::MalformedHydrostaticLayer,
+        ));
     }
     let acceleration_over_gas_constant =
         divide_positive_interval(&pressure_log_ratio, &inverse_temperature_chord)?;
@@ -1233,10 +1330,14 @@ pub fn exact_positive_log_ratio(
     terms: u32,
 ) -> Result<ExactInterval, AtmosphericInverseError> {
     if !numerator.is_positive() || !denominator.is_positive() {
-        return Err(AtmosphericInverseError::NonpositiveLogarithmArgument);
+        return Err(AtmosphericInverseError::Law(
+            AtmosphericInverseRefusal::NonpositiveLogarithmArgument,
+        ));
     }
     if terms == 0 {
-        return Err(AtmosphericInverseError::ZeroLogarithmTerms);
+        return Err(AtmosphericInverseError::Law(
+            AtmosphericInverseRefusal::ZeroLogarithmTerms,
+        ));
     }
     if numerator == denominator {
         return Ok(ExactInterval::point(Rat::zero()));
@@ -1284,7 +1385,9 @@ fn divide_positive_interval(
     divisor: &Rat,
 ) -> Result<ExactInterval, AtmosphericInverseError> {
     if !divisor.is_positive() {
-        return Err(AtmosphericInverseError::NonpositiveIntervalDivisor);
+        return Err(AtmosphericInverseError::Law(
+            AtmosphericInverseRefusal::NonpositiveIntervalDivisor,
+        ));
     }
     Ok(ExactInterval::new(
         &interval.lower / divisor,
@@ -1341,7 +1444,9 @@ fn accumulate_cpu(
 fn map_cpu_error(error: CpuExecutionError<AtmosphericInverseError>) -> AtmosphericInverseError {
     match error {
         CpuExecutionError::Operation(error) => error,
-        CpuExecutionError::WorkerPanicked => AtmosphericInverseError::PhysicalWorkerPanicked,
+        CpuExecutionError::WorkerPanicked => {
+            AtmosphericInverseError::Law(AtmosphericInverseRefusal::PhysicalWorkerPanicked)
+        }
     }
 }
 
@@ -1354,7 +1459,7 @@ fn u64_to_usize(value: u64) -> Result<usize, AtmosphericInverseError> {
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum AtmosphericInverseError {
+pub enum AtmosphericInverseRefusal {
     #[error("atmospheric profile {0:?} is malformed")]
     MalformedProfile(AtmosphericProfileId),
     #[error("atmospheric profile {0:?} has already entered standing")]
@@ -1363,10 +1468,6 @@ pub enum AtmosphericInverseError {
     MissingProfile(AtmosphericProfileId),
     #[error("atmospheric resolution {0:?} is absent")]
     MissingResolution(AtmosphericResolutionId),
-    #[error("atmospheric inverse event {0:?} has already entered standing")]
-    RepeatedEvent(EventId),
-    #[error("the atmospheric inverse standing is malformed")]
-    MalformedStanding,
     #[error("the generated prediction and spectral receiver population differ")]
     IncompatiblePredictionPopulation,
     #[error("spectral occurrence {0:?} is malformed")]
@@ -1389,8 +1490,6 @@ pub enum AtmosphericInverseError {
     RepeatedAltitudeLandmark(ReceiverTestimonyId),
     #[error("altitude testimony {0:?} was not part of the prior prediction")]
     UnknownAltitudeLandmark(ReceiverTestimonyId),
-    #[error("an atmospheric inverse carrier overflowed")]
-    CarrierOverflow,
     #[error("an atmospheric inverse CPU worker panicked")]
     PhysicalWorkerPanicked,
     #[error(transparent)]
@@ -1398,6 +1497,15 @@ pub enum AtmosphericInverseError {
     #[error(transparent)]
     Diagram(#[from] crate::DiagramError),
 }
+
+impl RefusalKind for AtmosphericInverseRefusal {
+    const LAW: &'static str = "atmospheric inverse";
+}
+
+/// The atmospheric inverse law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type AtmosphericInverseError = EventRefusal<AtmosphericInverseRefusal>;
+
+event_refusal_from!(AtmosphericInverseRefusal: ExactValueError, crate::DiagramError);
 
 #[cfg(test)]
 mod tests {

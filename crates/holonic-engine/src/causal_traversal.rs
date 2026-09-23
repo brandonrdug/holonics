@@ -19,6 +19,10 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::world::{
+    EventQuotient, EventRefusal, EventStanding, RefusalKind, event_refusal_from,
+    event_standing_wire,
+};
 use crate::{
     CausalBodyStanding, CausalCellId, EventId, EventSuccessor, ExactEventLaw, ExactLinearError,
     ExactRatMatrix,
@@ -144,15 +148,78 @@ pub struct ExactTraversalScheduledFront {
     pub awake: bool,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ExactCausalTraversalStanding {
-    pub schema: String,
+/// [definition] **The causal-traversal quotient** (plan phase 16): the admitted sites, the
+/// pending frontier (a work schedule the law's future reads; kept) and the chronology horizon.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ExactCausalTraversalQuotient {
     pub sites: BTreeMap<CausalCellId, ExactReactiveTraversalState>,
+    pending: BTreeMap<ExactTraversalFrontAddress, ExactTraversalScheduledFront>,
+    last_event_chronology: Option<u64>,
+    last_receiver_horizon: Option<u64>,
+}
+
+/// The standing: the shared event scaffold around [`ExactCausalTraversalQuotient`].
+pub type ExactCausalTraversalStanding = EventStanding<ExactCausalTraversalQuotient>;
+
+impl EventQuotient for ExactCausalTraversalQuotient {
+    type Refusal = CausalTraversalRefusal;
+}
+
+#[derive(Serialize)]
+#[serde(rename = "ExactCausalTraversalStanding")]
+struct ExactCausalTraversalStandingWrite<'a> {
+    schema: &'a String,
+    sites: &'a BTreeMap<CausalCellId, ExactReactiveTraversalState>,
+    pending: &'a BTreeMap<ExactTraversalFrontAddress, ExactTraversalScheduledFront>,
+    used_events: &'a BTreeSet<EventId>,
+    last_event_chronology: &'a Option<u64>,
+    last_receiver_horizon: &'a Option<u64>,
+}
+
+impl<'a> From<&'a ExactCausalTraversalStanding> for ExactCausalTraversalStandingWrite<'a> {
+    fn from(standing: &'a ExactCausalTraversalStanding) -> Self {
+        Self {
+            schema: &standing.schema,
+            sites: &standing.sites,
+            pending: &standing.pending,
+            used_events: &standing.used_events,
+            last_event_chronology: &standing.last_event_chronology,
+            last_receiver_horizon: &standing.last_receiver_horizon,
+        }
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(rename = "ExactCausalTraversalStanding")]
+struct ExactCausalTraversalStandingRead {
+    schema: String,
+    sites: BTreeMap<CausalCellId, ExactReactiveTraversalState>,
     pending: BTreeMap<ExactTraversalFrontAddress, ExactTraversalScheduledFront>,
     used_events: BTreeSet<EventId>,
     last_event_chronology: Option<u64>,
     last_receiver_horizon: Option<u64>,
 }
+
+impl From<ExactCausalTraversalStandingRead> for ExactCausalTraversalStanding {
+    fn from(read: ExactCausalTraversalStandingRead) -> Self {
+        EventStanding::from_parts(
+            read.schema,
+            read.used_events,
+            ExactCausalTraversalQuotient {
+                sites: read.sites,
+                pending: read.pending,
+                last_event_chronology: read.last_event_chronology,
+                last_receiver_horizon: read.last_receiver_horizon,
+            },
+        )
+    }
+}
+
+event_standing_wire!(
+    ExactCausalTraversalQuotient,
+    ExactCausalTraversalStandingWrite,
+    ExactCausalTraversalStandingRead
+);
 
 impl ExactCausalTraversalStanding {
     pub fn pending_frontier(
@@ -262,7 +329,9 @@ impl ExactCausalTraversalLaw {
         passages: Vec<ExactCausalTraversalPassage>,
     ) -> Result<Self, CausalTraversalError> {
         if species.is_empty() || interactions.is_empty() {
-            return Err(CausalTraversalError::EmptyTraversalWorld);
+            return Err(CausalTraversalError::Law(
+                CausalTraversalRefusal::EmptyTraversalWorld,
+            ));
         }
         let mut species_ids = BTreeSet::new();
         let mut travel_extent = 0_usize;
@@ -272,7 +341,9 @@ impl ExactCausalTraversalLaw {
                 || body.unit.trim().is_empty()
                 || !species_ids.insert(body.id)
             {
-                return Err(CausalTraversalError::MalformedSpecies(body.id));
+                return Err(CausalTraversalError::Law(
+                    CausalTraversalRefusal::MalformedSpecies(body.id),
+                ));
             }
             travel_extent = travel_extent
                 .checked_add(body.extent)
@@ -282,14 +353,18 @@ impl ExactCausalTraversalLaw {
         for interaction in interactions {
             let cell = interaction.cell;
             if interaction_index.insert(cell, interaction).is_some() {
-                return Err(CausalTraversalError::DuplicateInteraction(cell));
+                return Err(CausalTraversalError::Law(
+                    CausalTraversalRefusal::DuplicateInteraction(cell),
+                ));
             }
         }
         let mut passage_index = BTreeMap::new();
         let mut outgoing = BTreeMap::<CausalCellId, Vec<CausalTraversalPassageId>>::new();
         for passage in passages {
             if passage_index.contains_key(&passage.id) {
-                return Err(CausalTraversalError::DuplicatePassage(passage.id));
+                return Err(CausalTraversalError::Law(
+                    CausalTraversalRefusal::DuplicatePassage(passage.id),
+                ));
             }
             validate_passage(&body, travel_extent, &interaction_index, &passage)?;
             outgoing.entry(passage.from).or_default().push(passage.id);
@@ -347,14 +422,16 @@ impl ExactCausalTraversalLaw {
                 },
             );
         }
-        ExactCausalTraversalStanding {
-            schema: STANDING_SCHEMA.to_owned(),
-            sites,
-            pending: BTreeMap::new(),
-            used_events: BTreeSet::new(),
-            last_event_chronology: None,
-            last_receiver_horizon: None,
-        }
+        EventStanding::from_parts(
+            STANDING_SCHEMA.to_owned(),
+            BTreeSet::new(),
+            ExactCausalTraversalQuotient {
+                sites: sites,
+                pending: BTreeMap::new(),
+                last_event_chronology: None,
+                last_receiver_horizon: None,
+            },
+        )
     }
 
     pub fn validate_standing(
@@ -412,20 +489,22 @@ impl ExactCausalTraversalLaw {
         CausalTraversalError,
     > {
         self.validate_standing(standing_before)?;
-        if standing_before.used_events.contains(&event.event) {
-            return Err(CausalTraversalError::RepeatedEvent(event.event));
-        }
+        standing_before.refuse_repeated(event.event)?;
         if standing_before
             .last_event_chronology
             .is_some_and(|chronology| event.event_chronology <= chronology)
         {
-            return Err(CausalTraversalError::NonincreasingEventChronology);
+            return Err(CausalTraversalError::Law(
+                CausalTraversalRefusal::NonincreasingEventChronology,
+            ));
         }
         if standing_before
             .last_receiver_horizon
             .is_some_and(|horizon| event.receiver_horizon <= horizon)
         {
-            return Err(CausalTraversalError::NonincreasingReceiverHorizon);
+            return Err(CausalTraversalError::Law(
+                CausalTraversalRefusal::NonincreasingReceiverHorizon,
+            ));
         }
 
         let previous_receiver_horizon = standing_before.last_receiver_horizon;
@@ -438,7 +517,9 @@ impl ExactCausalTraversalLaw {
                 || impulse.causes.is_empty()
                 || !self.interactions.contains_key(&impulse.site)
             {
-                return Err(CausalTraversalError::MalformedImpulse);
+                return Err(CausalTraversalError::Law(
+                    CausalTraversalRefusal::MalformedImpulse,
+                ));
             }
             schedule_front(
                 &mut standing.pending,
@@ -465,10 +546,12 @@ impl ExactCausalTraversalLaw {
                 .pending
                 .remove(&address)
                 .ok_or(CausalTraversalError::MalformedStanding)?;
-            let interaction = self
-                .interactions
-                .get(&address.site)
-                .ok_or(CausalTraversalError::UnknownInteraction(address.site))?;
+            let interaction =
+                self.interactions
+                    .get(&address.site)
+                    .ok_or(CausalTraversalError::Law(
+                        CausalTraversalRefusal::UnknownInteraction(address.site),
+                    ))?;
             let state_before = standing
                 .sites
                 .get(&address.site)
@@ -572,13 +655,18 @@ impl ExactCausalTraversalLaw {
             let passage = self
                 .passages
                 .get(passage_id)
-                .ok_or(CausalTraversalError::UnknownPassage(*passage_id))?;
+                .ok_or(CausalTraversalError::Law(
+                    CausalTraversalRefusal::UnknownPassage(*passage_id),
+                ))?;
             let transported = passage.transport.apply(local_current)?;
             let passage_balances = passage_balance_receipts(passage, local_current, &transported)?;
-            let arrival_chronology = address
-                .chronology
-                .checked_add(passage.delay)
-                .ok_or(CausalTraversalError::ChronologyOverflow)?;
+            let arrival_chronology =
+                address
+                    .chronology
+                    .checked_add(passage.delay)
+                    .ok_or(CausalTraversalError::Law(
+                        CausalTraversalRefusal::ChronologyOverflow,
+                    ))?;
             departures.push(ExactTraversalDeparture {
                 passage: *passage_id,
                 target: passage.to,
@@ -655,35 +743,40 @@ fn validate_passage(
         || !body.active_cells().contains(&passage.from)
         || !body.active_cells().contains(&passage.to)
     {
-        return Err(CausalTraversalError::MalformedPassage(passage.id));
+        return Err(CausalTraversalError::Law(
+            CausalTraversalRefusal::MalformedPassage(passage.id),
+        ));
     }
     let carrier = body.incidence.cell(passage.carrier)?;
     let support = carrier.boundary.support();
     if !support.contains(&passage.from) || !support.contains(&passage.to) {
-        return Err(CausalTraversalError::PassageLeavesSourceBoundary(
-            passage.id,
+        return Err(CausalTraversalError::Law(
+            CausalTraversalRefusal::PassageLeavesSourceBoundary(passage.id),
         ));
     }
-    passage
-        .transport
-        .inverse()
-        .map_err(|_| CausalTraversalError::NoninvertiblePassage(passage.id))?;
+    passage.transport.inverse().map_err(|_| {
+        CausalTraversalError::Law(CausalTraversalRefusal::NoninvertiblePassage(passage.id))
+    })?;
     for balance in &passage.linear_balances {
         if balance.input_covector.len() != travel_extent
             || balance.output_covector.len() != travel_extent
         {
-            return Err(CausalTraversalError::MalformedPassageLinearBalance {
-                passage: passage.id,
-                name: balance.name.clone(),
-            });
+            return Err(CausalTraversalError::Law(
+                CausalTraversalRefusal::MalformedPassageLinearBalance {
+                    passage: passage.id,
+                    name: balance.name.clone(),
+                },
+            ));
         }
         if covector_times_matrix(&balance.output_covector, &passage.transport)?
             != balance.input_covector
         {
-            return Err(CausalTraversalError::UnbalancedPassage {
-                passage: passage.id,
-                name: balance.name.clone(),
-            });
+            return Err(CausalTraversalError::Law(
+                CausalTraversalRefusal::UnbalancedPassage {
+                    passage: passage.id,
+                    name: balance.name.clone(),
+                },
+            ));
         }
     }
     for balance in &passage.quadratic_balances {
@@ -695,10 +788,12 @@ fn validate_passage(
             || balance.output_form.transpose()? != balance.output_form
             || quadratic_pullback(&passage.transport, &balance.output_form)? != balance.input_form
         {
-            return Err(CausalTraversalError::UnbalancedPassage {
-                passage: passage.id,
-                name: balance.name.clone(),
-            });
+            return Err(CausalTraversalError::Law(
+                CausalTraversalRefusal::UnbalancedPassage {
+                    passage: passage.id,
+                    name: balance.name.clone(),
+                },
+            ));
         }
     }
     Ok(())
@@ -712,7 +807,9 @@ fn validate_interaction(
     if interaction.morphology_operators.len() != interaction.morphology_extent
         || (interaction.linear_balances.is_empty() && interaction.quadratic_balances.is_empty())
     {
-        return Err(CausalTraversalError::MalformedInteraction(interaction.cell));
+        return Err(CausalTraversalError::Law(
+            CausalTraversalRefusal::MalformedInteraction(interaction.cell),
+        ));
     }
     let input_extent = travel_extent
         .checked_add(interaction.storage_extent)
@@ -735,32 +832,40 @@ fn validate_interaction(
             .iter()
             .any(|operator| operator.rows() != output_extent || operator.columns() != input_extent)
     {
-        return Err(CausalTraversalError::MalformedInteraction(interaction.cell));
+        return Err(CausalTraversalError::Law(
+            CausalTraversalRefusal::MalformedInteraction(interaction.cell),
+        ));
     }
 
     for balance in &interaction.linear_balances {
         if balance.input_covector.len() != input_extent
             || balance.output_covector.len() != output_extent
         {
-            return Err(CausalTraversalError::MalformedLinearBalance {
-                cell: interaction.cell,
-                name: balance.name.clone(),
-            });
+            return Err(CausalTraversalError::Law(
+                CausalTraversalRefusal::MalformedLinearBalance {
+                    cell: interaction.cell,
+                    name: balance.name.clone(),
+                },
+            ));
         }
         let base_pullback =
             covector_times_matrix(&balance.output_covector, &interaction.base_operator)?;
         if base_pullback != balance.input_covector {
-            return Err(CausalTraversalError::UnbalancedLinearFamily {
-                cell: interaction.cell,
-                name: balance.name.clone(),
-            });
+            return Err(CausalTraversalError::Law(
+                CausalTraversalRefusal::UnbalancedLinearFamily {
+                    cell: interaction.cell,
+                    name: balance.name.clone(),
+                },
+            ));
         }
         for operator in &interaction.morphology_operators {
             if !vector_is_zero(&covector_times_matrix(&balance.output_covector, operator)?) {
-                return Err(CausalTraversalError::UnbalancedLinearFamily {
-                    cell: interaction.cell,
-                    name: balance.name.clone(),
-                });
+                return Err(CausalTraversalError::Law(
+                    CausalTraversalRefusal::UnbalancedLinearFamily {
+                        cell: interaction.cell,
+                        name: balance.name.clone(),
+                    },
+                ));
             }
         }
     }
@@ -784,17 +889,21 @@ fn validate_quadratic_balance(
         || balance.input_form.transpose()? != balance.input_form
         || balance.output_form.transpose()? != balance.output_form
     {
-        return Err(CausalTraversalError::MalformedQuadraticBalance {
-            cell: interaction.cell,
-            name: balance.name.clone(),
-        });
+        return Err(CausalTraversalError::Law(
+            CausalTraversalRefusal::MalformedQuadraticBalance {
+                cell: interaction.cell,
+                name: balance.name.clone(),
+            },
+        ));
     }
     let base_pullback = quadratic_pullback(&interaction.base_operator, &balance.output_form)?;
     if base_pullback != balance.input_form {
-        return Err(CausalTraversalError::UnbalancedQuadraticFamily {
-            cell: interaction.cell,
-            name: balance.name.clone(),
-        });
+        return Err(CausalTraversalError::Law(
+            CausalTraversalRefusal::UnbalancedQuadraticFamily {
+                cell: interaction.cell,
+                name: balance.name.clone(),
+            },
+        ));
     }
     for (left_ordinal, left) in interaction.morphology_operators.iter().enumerate() {
         let linear_left =
@@ -802,19 +911,23 @@ fn validate_quadratic_balance(
         let linear_right =
             mixed_quadratic_pullback(left, &interaction.base_operator, &balance.output_form)?;
         if !matrix_is_zero(&linear_left.add(&linear_right)?) {
-            return Err(CausalTraversalError::UnbalancedQuadraticFamily {
-                cell: interaction.cell,
-                name: balance.name.clone(),
-            });
+            return Err(CausalTraversalError::Law(
+                CausalTraversalRefusal::UnbalancedQuadraticFamily {
+                    cell: interaction.cell,
+                    name: balance.name.clone(),
+                },
+            ));
         }
         for right in &interaction.morphology_operators[left_ordinal..] {
             let quadratic_left = mixed_quadratic_pullback(left, right, &balance.output_form)?;
             let quadratic_right = mixed_quadratic_pullback(right, left, &balance.output_form)?;
             if !matrix_is_zero(&quadratic_left.add(&quadratic_right)?) {
-                return Err(CausalTraversalError::UnbalancedQuadraticFamily {
-                    cell: interaction.cell,
-                    name: balance.name.clone(),
-                });
+                return Err(CausalTraversalError::Law(
+                    CausalTraversalRefusal::UnbalancedQuadraticFamily {
+                        cell: interaction.cell,
+                        name: balance.name.clone(),
+                    },
+                ));
             }
         }
     }
@@ -851,10 +964,12 @@ fn balance_receipts(
         let after = dot(&balance.output_covector, output)?;
         let residual = &after - &before;
         if !residual.is_zero() {
-            return Err(CausalTraversalError::RuntimeBalanceFailure {
-                cell: interaction.cell,
-                name: balance.name.clone(),
-            });
+            return Err(CausalTraversalError::Law(
+                CausalTraversalRefusal::RuntimeBalanceFailure {
+                    cell: interaction.cell,
+                    name: balance.name.clone(),
+                },
+            ));
         }
         receipts.push(ExactTraversalBalanceReceipt {
             name: balance.name.clone(),
@@ -869,10 +984,12 @@ fn balance_receipts(
         let after = quadratic_value(&balance.output_form, output)?;
         let residual = &after - &before;
         if !residual.is_zero() {
-            return Err(CausalTraversalError::RuntimeBalanceFailure {
-                cell: interaction.cell,
-                name: balance.name.clone(),
-            });
+            return Err(CausalTraversalError::Law(
+                CausalTraversalRefusal::RuntimeBalanceFailure {
+                    cell: interaction.cell,
+                    name: balance.name.clone(),
+                },
+            ));
         }
         receipts.push(ExactTraversalBalanceReceipt {
             name: balance.name.clone(),
@@ -897,10 +1014,12 @@ fn passage_balance_receipts(
         let after = dot(&balance.output_covector, output)?;
         let residual = &after - &before;
         if !residual.is_zero() {
-            return Err(CausalTraversalError::PassageRuntimeBalanceFailure {
-                passage: passage.id,
-                name: balance.name.clone(),
-            });
+            return Err(CausalTraversalError::Law(
+                CausalTraversalRefusal::PassageRuntimeBalanceFailure {
+                    passage: passage.id,
+                    name: balance.name.clone(),
+                },
+            ));
         }
         receipts.push(ExactTraversalBalanceReceipt {
             name: balance.name.clone(),
@@ -915,10 +1034,12 @@ fn passage_balance_receipts(
         let after = quadratic_value(&balance.output_form, output)?;
         let residual = &after - &before;
         if !residual.is_zero() {
-            return Err(CausalTraversalError::PassageRuntimeBalanceFailure {
-                passage: passage.id,
-                name: balance.name.clone(),
-            });
+            return Err(CausalTraversalError::Law(
+                CausalTraversalRefusal::PassageRuntimeBalanceFailure {
+                    passage: passage.id,
+                    name: balance.name.clone(),
+                },
+            ));
         }
         receipts.push(ExactTraversalBalanceReceipt {
             name: balance.name.clone(),
@@ -973,9 +1094,9 @@ fn covector_times_matrix(
     matrix: &ExactRatMatrix,
 ) -> Result<Vec<Rat>, CausalTraversalError> {
     if covector.len() != matrix.rows() {
-        return Err(CausalTraversalError::Linear(
+        return Err(CausalTraversalError::Law(CausalTraversalRefusal::Linear(
             ExactLinearError::ShapeMismatch,
-        ));
+        )));
     }
     let mut result = vec![Rat::zero(); matrix.columns()];
     for (row, coefficient) in covector.iter().enumerate() {
@@ -1011,9 +1132,9 @@ fn quadratic_value(form: &ExactRatMatrix, vector: &[Rat]) -> Result<Rat, CausalT
 
 fn dot(left: &[Rat], right: &[Rat]) -> Result<Rat, CausalTraversalError> {
     if left.len() != right.len() {
-        return Err(CausalTraversalError::Linear(
+        return Err(CausalTraversalError::Law(CausalTraversalRefusal::Linear(
             ExactLinearError::ShapeMismatch,
-        ));
+        )));
     }
     let mut result = Rat::zero();
     for (left, right) in left.iter().zip(right) {
@@ -1031,7 +1152,7 @@ fn matrix_is_zero(matrix: &ExactRatMatrix) -> bool {
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum CausalTraversalError {
+pub enum CausalTraversalRefusal {
     #[error(transparent)]
     Algebraic(#[from] crate::CausalAlgebraicError),
     #[error(transparent)]
@@ -1081,10 +1202,6 @@ pub enum CausalTraversalError {
     UnbalancedQuadraticFamily { cell: CausalCellId, name: String },
     #[error("runtime balance {name:?} at {cell:?} failed after exact construction")]
     RuntimeBalanceFailure { cell: CausalCellId, name: String },
-    #[error("the exact causal traversal standing is malformed")]
-    MalformedStanding,
-    #[error("causal traversal event {0:?} already occurred")]
-    RepeatedEvent(EventId),
     #[error("causal traversal event chronology did not increase")]
     NonincreasingEventChronology,
     #[error("causal traversal receiver horizon did not increase")]
@@ -1093,9 +1210,16 @@ pub enum CausalTraversalError {
     MalformedImpulse,
     #[error("causal traversal chronology overflowed")]
     ChronologyOverflow,
-    #[error("a causal traversal carrier extent overflowed")]
-    CarrierOverflow,
 }
+
+impl RefusalKind for CausalTraversalRefusal {
+    const LAW: &'static str = "exact causal traversal";
+}
+
+/// The exact causal traversal law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type CausalTraversalError = EventRefusal<CausalTraversalRefusal>;
+
+event_refusal_from!(CausalTraversalRefusal: crate::CausalAlgebraicError, ExactLinearError);
 
 #[cfg(test)]
 mod tests {
@@ -1390,7 +1514,9 @@ mod tests {
         );
         assert!(matches!(
             result,
-            Err(CausalTraversalError::UnbalancedLinearFamily { .. })
+            Err(CausalTraversalError::Law(
+                CausalTraversalRefusal::UnbalancedLinearFamily { .. }
+            ))
         ));
     }
 
@@ -1493,7 +1619,9 @@ mod tests {
         );
         assert!(matches!(
             result,
-            Err(CausalTraversalError::UnbalancedPassage { .. })
+            Err(CausalTraversalError::Law(
+                CausalTraversalRefusal::UnbalancedPassage { .. }
+            ))
         ));
     }
 
@@ -1524,8 +1652,8 @@ mod tests {
         );
         assert!(matches!(
             result,
-            Err(CausalTraversalError::MalformedSpecies(
-                CausalTraversalSpeciesId(1)
+            Err(CausalTraversalError::Law(
+                CausalTraversalRefusal::MalformedSpecies(CausalTraversalSpeciesId(1))
             ))
         ));
     }

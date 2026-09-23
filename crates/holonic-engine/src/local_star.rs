@@ -18,6 +18,7 @@ use serde::{Deserialize, Deserializer, Serialize};
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 use thiserror::Error;
 
+use crate::world::{EventRefusal, RefusalKind, event_refusal_from};
 use crate::{
     ActionBalanceReceipt, CpuExecutionError, CpuExecutionReceipt, CpuExecutor, Edge, EventId,
     EventSuccessor, ExactEventLaw, FaceId, HingeId, HingeRadiation, HingeTrajectory,
@@ -348,7 +349,9 @@ impl LocalSpatialStanding {
     ) -> Result<Self, LocalStarError> {
         for vertex in complex.vertices.keys() {
             if !positions.contains_key(vertex) {
-                return Err(LocalStarError::MissingVertexPosition(*vertex));
+                return Err(LocalStarError::Law(
+                    LocalStarRefusal::MissingVertexPosition(*vertex),
+                ));
             }
         }
         let edges = complex
@@ -416,11 +419,15 @@ impl LocalSpatialStanding {
         for edge in self.edges.keys().copied() {
             adjacency
                 .get_mut(&edge.lower)
-                .ok_or(LocalStarError::MissingVertexPosition(edge.lower))?
+                .ok_or(LocalStarError::Law(
+                    LocalStarRefusal::MissingVertexPosition(edge.lower),
+                ))?
                 .push((edge.upper, edge));
             adjacency
                 .get_mut(&edge.upper)
-                .ok_or(LocalStarError::MissingVertexPosition(edge.upper))?
+                .ok_or(LocalStarError::Law(
+                    LocalStarRefusal::MissingVertexPosition(edge.upper),
+                ))?
                 .push((edge.lower, edge));
         }
         for neighbours in adjacency.values_mut() {
@@ -443,10 +450,9 @@ impl LocalSpatialStanding {
                     if positions.contains_key(neighbour) {
                         continue;
                     }
-                    let state = self
-                        .edges
-                        .get(edge)
-                        .ok_or(LocalStarError::MissingSpatialEdge(*edge))?;
+                    let state = self.edges.get(edge).ok_or(LocalStarError::Law(
+                        LocalStarRefusal::MissingSpatialEdge(*edge),
+                    ))?;
                     let carried = if previous {
                         state.previous_vector.clone()
                     } else {
@@ -480,7 +486,9 @@ impl LocalSpatialStanding {
                         let vector = self
                             .edges
                             .get(&edge)
-                            .ok_or(LocalStarError::MissingSpatialEdge(edge))?
+                            .ok_or(LocalStarError::Law(LocalStarRefusal::MissingSpatialEdge(
+                                edge,
+                            )))?
                             .vector
                             .clone();
                         Ok::<_, LocalStarError>(
@@ -527,11 +535,9 @@ impl LocalSpatialStanding {
                     VertexFieldState {
                         previous_position: previous[&vertex].clone(),
                         position: current[&vertex].clone(),
-                        capacity: self
-                            .capacities
-                            .get(&vertex)
-                            .cloned()
-                            .ok_or(LocalStarError::MissingVertexPosition(vertex))?,
+                        capacity: self.capacities.get(&vertex).cloned().ok_or(
+                            LocalStarError::Law(LocalStarRefusal::MissingVertexPosition(vertex)),
+                        )?,
                     },
                 ))
             })
@@ -546,7 +552,9 @@ impl LocalSpatialStanding {
         self.realize_current(complex)?
             .0
             .remove(&vertex)
-            .ok_or(LocalStarError::MissingVertexPosition(vertex))
+            .ok_or(LocalStarError::Law(
+                LocalStarRefusal::MissingVertexPosition(vertex),
+            ))
     }
 
     pub fn relative_vector(
@@ -579,7 +587,9 @@ impl LocalSpatialStanding {
                 .iter()
                 .copied()
                 .find(|root| reached.contains(root))
-                .ok_or(LocalStarError::MissingVertexPosition(vertex))
+                .ok_or(LocalStarError::Law(
+                    LocalStarRefusal::MissingVertexPosition(vertex),
+                ))
         };
         if component_root(from)? != component_root(to)? {
             return Ok(None);
@@ -777,10 +787,14 @@ fn apply_receiver_traversal_step(
             repetitions,
         } => {
             if repetitions.is_zero() {
-                return Err(LocalStarError::EmptyReceiverTraversalRun);
+                return Err(LocalStarError::Law(
+                    LocalStarRefusal::EmptyReceiverTraversalRun,
+                ));
             }
             if matches!(generator.as_ref(), ReceiverTraversalStep::Repeat { .. }) {
-                return Err(LocalStarError::NestedReceiverTraversalRun);
+                return Err(LocalStarError::Law(
+                    LocalStarRefusal::NestedReceiverTraversalRun,
+                ));
             }
             (generator.as_ref(), repetitions.clone())
         }
@@ -905,17 +919,18 @@ impl LocalStarStanding {
         &self,
         receiver: ReceiverId,
     ) -> Result<ReceiverAcceptanceCover, LocalStarError> {
-        let body = self
-            .receivers
-            .get(&receiver)
-            .ok_or(LocalStarError::MissingReceiverBody(receiver))?;
+        let body = self.receivers.get(&receiver).ok_or(LocalStarError::Law(
+            LocalStarRefusal::MissingReceiverBody(receiver),
+        ))?;
         let complex = &self.kinematic.complex;
         let topology = complex.vertex_star_link(body.anchor)?;
         let direction = |vertex| -> Result<RatVec3, LocalStarError> {
             self.spatial
                 .relative_vector(complex, body.anchor, vertex)?
                 .map(|relative| relative.subtract(&body.local_offset))
-                .ok_or(LocalStarError::ReceiverDirectionOutsideComponent { receiver, vertex })
+                .ok_or(LocalStarError::Law(
+                    LocalStarRefusal::ReceiverDirectionOutsideComponent { receiver, vertex },
+                ))
         };
         let organs = complex
             .oriented_vertex_link_cells(body.anchor)?
@@ -961,20 +976,21 @@ impl LocalStarStanding {
             })
             .collect::<Result<Vec<_>, LocalStarError>>()?;
 
-        let port = complex
-            .hinges
-            .get(&body.port)
-            .ok_or(LocalStarError::MissingHinge(body.port))?;
+        let port = complex.hinges.get(&body.port).ok_or(LocalStarError::Law(
+            LocalStarRefusal::MissingHinge(body.port),
+        ))?;
         let distal = if port.edge.lower == body.anchor {
             port.edge.upper
         } else if port.edge.upper == body.anchor {
             port.edge.lower
         } else {
-            return Err(LocalStarError::ReceiverPortMissesAnchor {
-                receiver,
-                hinge: body.port,
-                anchor: body.anchor,
-            });
+            return Err(LocalStarError::Law(
+                LocalStarRefusal::ReceiverPortMissesAnchor {
+                    receiver,
+                    hinge: body.port,
+                    anchor: body.anchor,
+                },
+            ));
         };
         let port_hand = if body.anchor == port.edge.lower {
             1
@@ -1007,10 +1023,12 @@ impl LocalStarStanding {
             || horizontal == RatVec3::zero()
             || vertical == RatVec3::zero()
         {
-            return Err(LocalStarError::CollapsedReceiverPortSection {
-                receiver,
-                hinge: body.port,
-            });
+            return Err(LocalStarError::Law(
+                LocalStarRefusal::CollapsedReceiverPortSection {
+                    receiver,
+                    hinge: body.port,
+                },
+            ));
         }
         Ok(ReceiverAcceptanceCover {
             event: self.event,
@@ -1035,16 +1053,15 @@ impl LocalStarStanding {
         &self,
         receiver: ReceiverId,
     ) -> Result<ReceiverTraversalChart, LocalStarError> {
-        let body = self
-            .receivers
-            .get(&receiver)
-            .ok_or(LocalStarError::MissingReceiverBody(receiver))?;
+        let body = self.receivers.get(&receiver).ok_or(LocalStarError::Law(
+            LocalStarRefusal::MissingReceiverBody(receiver),
+        ))?;
         Ok(ReceiverTraversalChart {
             event: self.event,
             receiver,
-            position: self
-                .receiver_position(receiver)
-                .ok_or(LocalStarError::MissingReceiverBody(receiver))?,
+            position: self.receiver_position(receiver).ok_or(LocalStarError::Law(
+                LocalStarRefusal::MissingReceiverBody(receiver),
+            ))?,
             orientation: body.orientation.clone(),
             acceptance: self.receiver_acceptance_cover(receiver)?,
         })
@@ -1058,13 +1075,12 @@ impl LocalStarStanding {
         frame: FrameId,
         receiver: ReceiverId,
     ) -> Result<ReceiverFaceSpec, LocalStarError> {
-        let body = self
-            .receivers
-            .get(&receiver)
-            .ok_or(LocalStarError::MissingReceiverBody(receiver))?;
-        let position = self
-            .receiver_position(receiver)
-            .ok_or(LocalStarError::MissingReceiverBody(receiver))?;
+        let body = self.receivers.get(&receiver).ok_or(LocalStarError::Law(
+            LocalStarRefusal::MissingReceiverBody(receiver),
+        ))?;
+        let position = self.receiver_position(receiver).ok_or(LocalStarError::Law(
+            LocalStarRefusal::MissingReceiverBody(receiver),
+        ))?;
         let acceptance = self.receiver_acceptance_cover(receiver)?;
         let horizontal_square = acceptance
             .port_section
@@ -1075,10 +1091,12 @@ impl LocalStarStanding {
             .vertical
             .dot(&acceptance.port_section.vertical);
         if horizontal_square.is_zero() || vertical_square.is_zero() {
-            return Err(LocalStarError::CollapsedReceiverPortSection {
-                receiver,
-                hinge: body.port,
-            });
+            return Err(LocalStarError::Law(
+                LocalStarRefusal::CollapsedReceiverPortSection {
+                    receiver,
+                    hinge: body.port,
+                },
+            ));
         }
         let mut receiver_body = Receiver::new(
             receiver,
@@ -1387,27 +1405,33 @@ impl LocalStarLaw {
     ) -> Result<Self, LocalStarError> {
         for hinge in kinematic.complex.hinges.keys() {
             if !materials.contains_key(hinge) {
-                return Err(LocalStarError::MissingMaterial(*hinge));
+                return Err(LocalStarError::Law(LocalStarRefusal::MissingMaterial(
+                    *hinge,
+                )));
             }
         }
         for hinge in materials.keys() {
             if !kinematic.complex.hinges.contains_key(hinge) {
-                return Err(LocalStarError::MissingHinge(*hinge));
+                return Err(LocalStarError::Law(LocalStarRefusal::MissingHinge(*hinge)));
             }
         }
         for (offset, transport) in transports.iter_mut().enumerate() {
             if !matches!(transport.hand, -1..=1) {
-                return Err(LocalStarError::InvalidTransportHand(transport.hand));
+                return Err(LocalStarError::Law(LocalStarRefusal::InvalidTransportHand(
+                    transport.hand,
+                )));
             }
             if transport.source == transport.target
                 || !kinematic
                     .complex
                     .hinges_share_face(transport.source, transport.target)?
             {
-                return Err(LocalStarError::NonlocalCurrentTransport {
-                    from_hinge: transport.source,
-                    to_hinge: transport.target,
-                });
+                return Err(LocalStarError::Law(
+                    LocalStarRefusal::NonlocalCurrentTransport {
+                        from_hinge: transport.source,
+                        to_hinge: transport.target,
+                    },
+                ));
             }
             transport.id = u64::try_from(offset + 1).expect("transport count fits u64");
         }
@@ -1429,11 +1453,13 @@ impl LocalStarLaw {
         receiver_foundings: Vec<ReceiverFounding>,
     ) -> Result<LocalStarStanding, LocalStarError> {
         for (hinge, parameter) in &kinematic.parameters {
-            let trajectory = trajectories
-                .get(hinge)
-                .ok_or(LocalStarError::MissingTrajectory(*hinge))?;
+            let trajectory = trajectories.get(hinge).ok_or(LocalStarError::Law(
+                LocalStarRefusal::MissingTrajectory(*hinge),
+            ))?;
             if &trajectory.current != parameter {
-                return Err(LocalStarError::TrajectoryStandingMismatch(*hinge));
+                return Err(LocalStarError::Law(
+                    LocalStarRefusal::TrajectoryStandingMismatch(*hinge),
+                ));
             }
         }
         let spatial = LocalSpatialStanding::from_positions(&kinematic.complex, &positions)?;
@@ -1469,16 +1495,15 @@ impl LocalStarLaw {
                 .find_map(|hinge| kinematic.complex.hinges.get(hinge))
                 .map(|hinge| hinge.edge.lower)
                 .or_else(|| kinematic.complex.vertices.keys().next().copied())
-                .ok_or(LocalStarError::EmptySpatialComplex)?;
+                .ok_or(LocalStarError::Law(LocalStarRefusal::EmptySpatialComplex))?;
             let translation = local_positions[&anchor].subtract(&positions[&anchor]);
-            let conic =
-                kinematic
-                    .conics
-                    .cells
-                    .get_mut(&family.cell)
-                    .ok_or(LocalStarError::Kinematic(HingeWorldError::MissingConic(
-                        family.cell,
-                    )))?;
+            let conic = kinematic
+                .conics
+                .cells
+                .get_mut(&family.cell)
+                .ok_or(LocalStarError::Law(LocalStarRefusal::Kinematic(
+                    HingeWorldError::Law(crate::HingeWorldRefusal::MissingConic(family.cell)),
+                )))?;
             conic.chart.origin = conic.chart.origin.add(&translation);
         }
         let mut receivers = BTreeMap::new();
@@ -1486,7 +1511,7 @@ impl LocalStarLaw {
             let mut body = self.found_receiver(&founding, &kinematic.complex, &spatial)?;
             body.physical_phase = self.receiver_physical_phase(&body, &trajectories, &[])?;
             if receivers.insert(body.receiver, body).is_some() {
-                return Err(LocalStarError::DuplicateReceiverBody);
+                return Err(LocalStarError::Law(LocalStarRefusal::DuplicateReceiverBody));
             }
         }
         let faces = self.face_fields(&kinematic.complex, &kinematic.parameters, None)?;
@@ -1516,36 +1541,46 @@ impl LocalStarLaw {
         spatial: &LocalSpatialStanding,
     ) -> Result<ReceiverBodyState, LocalStarError> {
         if !spatial.capacities.contains_key(&founding.anchor) {
-            return Err(LocalStarError::MissingVertexPosition(founding.anchor));
+            return Err(LocalStarError::Law(
+                LocalStarRefusal::MissingVertexPosition(founding.anchor),
+            ));
         }
         if !complex.hinges.contains_key(&founding.port) {
-            return Err(LocalStarError::MissingHinge(founding.port));
+            return Err(LocalStarError::Law(LocalStarRefusal::MissingHinge(
+                founding.port,
+            )));
         }
         let topology = complex.vertex_star_link(founding.anchor)?;
         if !topology.star_hinges.contains(&founding.port) {
-            return Err(LocalStarError::ReceiverPortOutsideStar {
-                receiver: founding.receiver,
-                hinge: founding.port,
-                anchor: founding.anchor,
-            });
+            return Err(LocalStarError::Law(
+                LocalStarRefusal::ReceiverPortOutsideStar {
+                    receiver: founding.receiver,
+                    hinge: founding.port,
+                    anchor: founding.anchor,
+                },
+            ));
         }
         let port_edge = complex.hinges[&founding.port].edge;
         if port_edge.lower != founding.anchor && port_edge.upper != founding.anchor {
-            return Err(LocalStarError::ReceiverPortMissesAnchor {
-                receiver: founding.receiver,
-                hinge: founding.port,
-                anchor: founding.anchor,
-            });
+            return Err(LocalStarError::Law(
+                LocalStarRefusal::ReceiverPortMissesAnchor {
+                    receiver: founding.receiver,
+                    hinge: founding.port,
+                    anchor: founding.anchor,
+                },
+            ));
         }
         let mut couplings = founding.couplings.clone();
         couplings.sort_by_key(|coupling| coupling.hinge);
         for coupling in &couplings {
             if !topology.star_hinges.contains(&coupling.hinge) {
-                return Err(LocalStarError::ReceiverCouplingOutsideStar {
-                    receiver: founding.receiver,
-                    hinge: coupling.hinge,
-                    anchor: founding.anchor,
-                });
+                return Err(LocalStarError::Law(
+                    LocalStarRefusal::ReceiverCouplingOutsideStar {
+                        receiver: founding.receiver,
+                        hinge: coupling.hinge,
+                        anchor: founding.anchor,
+                    },
+                ));
             }
         }
         Ok(ReceiverBodyState {
@@ -1577,13 +1612,12 @@ impl LocalStarLaw {
         let mut momentum = Rat::zero();
         let mut impulse = Rat::zero();
         for hinge in coupled {
-            let trajectory = trajectories
-                .get(&hinge)
-                .ok_or(LocalStarError::MissingTrajectory(hinge))?;
-            let material = self
-                .materials
-                .get(&hinge)
-                .ok_or(LocalStarError::MissingMaterial(hinge))?;
+            let trajectory = trajectories.get(&hinge).ok_or(LocalStarError::Law(
+                LocalStarRefusal::MissingTrajectory(hinge),
+            ))?;
+            let material = self.materials.get(&hinge).ok_or(LocalStarError::Law(
+                LocalStarRefusal::MissingMaterial(hinge),
+            ))?;
             coordinate += &trajectory.current;
             momentum += &material.action.inertia * (&trajectory.current - &trajectory.previous);
             if let Some(balance) = balances.iter().find(|balance| balance.hinge == hinge) {
@@ -1612,12 +1646,12 @@ impl LocalStarLaw {
                     face.boundary()
                         .into_iter()
                         .try_fold(Rat::zero(), |sum, (edge, hand)| {
-                            let hinge = edge_hinges
-                                .get(&edge)
-                                .ok_or(LocalStarError::MissingBoundaryHinge(edge))?;
-                            let parameter = parameters
-                                .get(hinge)
-                                .ok_or(LocalStarError::MissingTrajectory(*hinge))?;
+                            let hinge = edge_hinges.get(&edge).ok_or(LocalStarError::Law(
+                                LocalStarRefusal::MissingBoundaryHinge(edge),
+                            ))?;
+                            let parameter = parameters.get(hinge).ok_or(LocalStarError::Law(
+                                LocalStarRefusal::MissingTrajectory(*hinge),
+                            ))?;
                             Ok::<_, LocalStarError>(
                                 sum + Rat::from_integer(i64::from(hand).into()) * parameter,
                             )
@@ -1648,12 +1682,14 @@ impl LocalStarLaw {
             .complex
             .hinges
             .get(&hinge)
-            .ok_or(LocalStarError::MissingHinge(hinge))?;
+            .ok_or(LocalStarError::Law(LocalStarRefusal::MissingHinge(hinge)))?;
         hinge.cofaces.iter().try_fold(Rat::zero(), |sum, coface| {
             let stress = &standing
                 .faces
                 .get(&coface.face)
-                .ok_or(LocalStarError::MissingFaceState(coface.face))?
+                .ok_or(LocalStarError::Law(LocalStarRefusal::MissingFaceState(
+                    coface.face,
+                )))?
                 .stress;
             Ok(sum + Rat::from_integer(i64::from(coface.hand).into()) * stress)
         })
@@ -1665,14 +1701,15 @@ impl LocalStarLaw {
         hinge: HingeId,
         constituents: &[LocalCurrentConstituent],
     ) -> Result<LocalSolve, LocalStarError> {
-        let material = self
-            .materials
-            .get(&hinge)
-            .ok_or(LocalStarError::MissingMaterial(hinge))?;
+        let material = self.materials.get(&hinge).ok_or(LocalStarError::Law(
+            LocalStarRefusal::MissingMaterial(hinge),
+        ))?;
         let trajectory = standing
             .trajectories
             .get(&hinge)
-            .ok_or(LocalStarError::MissingTrajectory(hinge))?;
+            .ok_or(LocalStarError::Law(LocalStarRefusal::MissingTrajectory(
+                hinge,
+            )))?;
         let entered = constituents
             .iter()
             .fold(Rat::zero(), |sum, current| sum + &current.amount);
@@ -1900,7 +1937,9 @@ impl LocalStarLaw {
     ) -> Result<LocalTopologyChange, LocalStarError> {
         let LocalTopologyDeed::AdmitFlip(candidate) = deed;
         if !standing_before.rewrite_openings.contains(candidate) {
-            return Err(LocalStarError::RewriteOpeningAbsent(candidate.hinge));
+            return Err(LocalStarError::Law(LocalStarRefusal::RewriteOpeningAbsent(
+                candidate.hinge,
+            )));
         }
         if self.kinematic.conic_families.values().any(|family| {
             family
@@ -1908,8 +1947,8 @@ impl LocalStarLaw {
                 .iter()
                 .any(|coefficient| coefficient.terms.contains_key(&candidate.hinge))
         }) {
-            return Err(LocalStarError::TopologyRewriteTouchesAnchoredConic(
-                candidate.hinge,
+            return Err(LocalStarError::Law(
+                LocalStarRefusal::TopologyRewriteTouchesAnchoredConic(candidate.hinge),
             ));
         }
 
@@ -1923,46 +1962,54 @@ impl LocalStarLaw {
         let mut after_complex = before_complex.clone();
         let flip = after_complex.flip_hinge(event, candidate.hinge, candidate.proposed_diagonal)?;
         if flip.held_boundary != candidate.held_boundary {
-            return Err(LocalStarError::StaleRewriteOpening(candidate.hinge));
+            return Err(LocalStarError::Law(LocalStarRefusal::StaleRewriteOpening(
+                candidate.hinge,
+            )));
         }
         for relation in self.kinematic.transports.relations.values() {
             if !after_complex.hinges_share_face(relation.source, relation.target)? {
-                return Err(
-                    LocalStarError::TopologyRewriteInvalidatesProjectiveTransport {
+                return Err(LocalStarError::Law(
+                    LocalStarRefusal::TopologyRewriteInvalidatesProjectiveTransport {
                         relation: relation.id,
                         from_hinge: relation.source,
                         to_hinge: relation.target,
                     },
-                );
+                ));
             }
         }
         for body in standing_before.receivers.values() {
             let topology = after_complex.vertex_star_link(body.anchor)?;
             if !topology.star_hinges.contains(&body.port) {
-                return Err(LocalStarError::ReceiverPortOutsideStar {
-                    receiver: body.receiver,
-                    hinge: body.port,
-                    anchor: body.anchor,
-                });
+                return Err(LocalStarError::Law(
+                    LocalStarRefusal::ReceiverPortOutsideStar {
+                        receiver: body.receiver,
+                        hinge: body.port,
+                        anchor: body.anchor,
+                    },
+                ));
             }
             let port_edge = after_complex.hinges[&body.port].edge;
             if port_edge.lower != body.anchor && port_edge.upper != body.anchor {
-                return Err(LocalStarError::ReceiverPortMissesAnchor {
-                    receiver: body.receiver,
-                    hinge: body.port,
-                    anchor: body.anchor,
-                });
+                return Err(LocalStarError::Law(
+                    LocalStarRefusal::ReceiverPortMissesAnchor {
+                        receiver: body.receiver,
+                        hinge: body.port,
+                        anchor: body.anchor,
+                    },
+                ));
             }
             if let Some(coupling) = body
                 .couplings
                 .iter()
                 .find(|coupling| !topology.star_hinges.contains(&coupling.hinge))
             {
-                return Err(LocalStarError::ReceiverCouplingOutsideStar {
-                    receiver: body.receiver,
-                    hinge: coupling.hinge,
-                    anchor: body.anchor,
-                });
+                return Err(LocalStarError::Law(
+                    LocalStarRefusal::ReceiverCouplingOutsideStar {
+                        receiver: body.receiver,
+                        hinge: coupling.hinge,
+                        anchor: body.anchor,
+                    },
+                ));
             }
         }
 
@@ -2029,7 +2076,7 @@ impl LocalStarLaw {
         let mut incoming = standing_before.open_currents.clone();
         for (hinge, current) in &event.source_currents {
             if !standing_before.kinematic.complex.hinges.contains_key(hinge) {
-                return Err(LocalStarError::MissingHinge(*hinge));
+                return Err(LocalStarError::Law(LocalStarRefusal::MissingHinge(*hinge)));
             }
             if !current.is_zero() {
                 incoming.push(LocalCurrentConstituent {
@@ -2047,17 +2094,23 @@ impl LocalStarLaw {
         let mut admitted_traversal_charts = BTreeMap::new();
         for deed in &event.receiver_deeds {
             if !receiver_deed_sources.insert(deed.receiver) {
-                return Err(LocalStarError::DuplicateReceiverBoundaryDeed(deed.receiver));
+                return Err(LocalStarError::Law(
+                    LocalStarRefusal::DuplicateReceiverBoundaryDeed(deed.receiver),
+                ));
             }
             let body = standing_before
                 .receivers
                 .get(&deed.receiver)
-                .ok_or(LocalStarError::MissingReceiverBody(deed.receiver))?;
+                .ok_or(LocalStarError::Law(LocalStarRefusal::MissingReceiverBody(
+                    deed.receiver,
+                )))?;
             if deed.traversal.source_chart.receiver != deed.receiver {
-                return Err(LocalStarError::MisaddressedReceiverTraversal {
-                    deed: deed.receiver,
-                    chart: deed.traversal.source_chart.receiver,
-                });
+                return Err(LocalStarError::Law(
+                    LocalStarRefusal::MisaddressedReceiverTraversal {
+                        deed: deed.receiver,
+                        chart: deed.traversal.source_chart.receiver,
+                    },
+                ));
             }
             let contemporary = standing_before.receiver_traversal_chart(deed.receiver)?;
             let identity_carried = deed.traversal.source_chart.event != contemporary.event;
@@ -2067,11 +2120,13 @@ impl LocalStarLaw {
                     .source_chart
                     .carries_by_identity(&contemporary)
             {
-                return Err(LocalStarError::StaleReceiverTraversalChart {
-                    receiver: deed.receiver,
-                    supplied: deed.traversal.source_chart.event,
-                    contemporary: contemporary.event,
-                });
+                return Err(LocalStarError::Law(
+                    LocalStarRefusal::StaleReceiverTraversalChart {
+                        receiver: deed.receiver,
+                        supplied: deed.traversal.source_chart.event,
+                        contemporary: contemporary.event,
+                    },
+                ));
             }
             admitted_traversal_charts.insert(deed.receiver, (contemporary, identity_carried));
             if !deed.port_current.is_zero() {
@@ -2096,12 +2151,14 @@ impl LocalStarLaw {
         }
         let active = incoming_by_hinge.keys().copied().collect::<Vec<_>>();
         if event.topology_deeds.len() > 1 {
-            return Err(LocalStarError::MultipleTopologyDeeds);
+            return Err(LocalStarError::Law(LocalStarRefusal::MultipleTopologyDeeds));
         }
         if !event.topology_deeds.is_empty()
             && (!active.is_empty() || !event.receiver_population.is_empty())
         {
-            return Err(LocalStarError::TopologyDeedHasCopresentStructuralChange);
+            return Err(LocalStarError::Law(
+                LocalStarRefusal::TopologyDeedHasCopresentStructuralChange,
+            ));
         }
         let (solves, cpu_execution) = self
             .executor
@@ -2109,7 +2166,9 @@ impl LocalStarLaw {
                 self.solve_member(standing_before, *hinge, &incoming_by_hinge[hinge])
             })
             .map_err(|error| match error {
-                CpuExecutionError::WorkerPanicked => LocalStarError::CpuWorkerPanicked,
+                CpuExecutionError::WorkerPanicked => {
+                    LocalStarError::Law(LocalStarRefusal::CpuWorkerPanicked)
+                }
                 CpuExecutionError::Operation(error) => error,
             })?;
 
@@ -2201,7 +2260,9 @@ impl LocalStarLaw {
         let position_before = |receiver: ReceiverId| {
             standing_before
                 .receiver_position(receiver)
-                .ok_or(LocalStarError::MissingReceiverBody(receiver))
+                .ok_or(LocalStarError::Law(LocalStarRefusal::MissingReceiverBody(
+                    receiver,
+                )))
         };
         let mut receivers = standing_before.receivers.clone();
         for body in receivers.values_mut() {
@@ -2212,7 +2273,9 @@ impl LocalStarLaw {
         for deed in &event.receiver_deeds {
             let body = receivers
                 .get_mut(&deed.receiver)
-                .ok_or(LocalStarError::MissingReceiverBody(deed.receiver))?;
+                .ok_or(LocalStarError::Law(LocalStarRefusal::MissingReceiverBody(
+                    deed.receiver,
+                )))?;
             let (chart, identity_carried) = admitted_traversal_charts
                 .get(&deed.receiver)
                 .expect("every receiver deed was chart-validated");
@@ -2270,7 +2333,9 @@ impl LocalStarLaw {
                 | ReceiverPopulationDeed::Reanchor { receiver, .. } => *receiver,
             };
             if !population_receivers.insert(receiver) {
-                return Err(LocalStarError::DuplicateReceiverPopulationDeed(receiver));
+                return Err(LocalStarError::Law(
+                    LocalStarRefusal::DuplicateReceiverPopulationDeed(receiver),
+                ));
             }
         }
         let mut receiver_population = Vec::new();
@@ -2278,7 +2343,7 @@ impl LocalStarLaw {
             match deed {
                 ReceiverPopulationDeed::Found(founding) => {
                     if receivers.contains_key(&founding.receiver) {
-                        return Err(LocalStarError::DuplicateReceiverBody);
+                        return Err(LocalStarError::Law(LocalStarRefusal::DuplicateReceiverBody));
                     }
                     let body = self.found_receiver(founding, &kinematic.complex, &spatial)?;
                     let topology = kinematic.complex.vertex_star_link(body.anchor)?;
@@ -2291,50 +2356,58 @@ impl LocalStarLaw {
                     receivers.insert(body.receiver, body);
                 }
                 ReceiverPopulationDeed::Depart { receiver } => {
-                    receivers
-                        .remove(receiver)
-                        .ok_or(LocalStarError::MissingReceiverBody(*receiver))?;
+                    receivers.remove(receiver).ok_or(LocalStarError::Law(
+                        LocalStarRefusal::MissingReceiverBody(*receiver),
+                    ))?;
                     receiver_population.push(ReceiverPopulationChange::Departed {
                         receiver: *receiver,
                     });
                 }
                 ReceiverPopulationDeed::Reanchor { receiver, anchor } => {
                     if !spatial.capacities.contains_key(anchor) {
-                        return Err(LocalStarError::MissingVertexPosition(*anchor));
+                        return Err(LocalStarError::Law(
+                            LocalStarRefusal::MissingVertexPosition(*anchor),
+                        ));
                     }
-                    let body = receivers
-                        .get_mut(receiver)
-                        .ok_or(LocalStarError::MissingReceiverBody(*receiver))?;
+                    let body = receivers.get_mut(receiver).ok_or(LocalStarError::Law(
+                        LocalStarRefusal::MissingReceiverBody(*receiver),
+                    ))?;
                     let previous_anchor = body.anchor;
                     let position = spatial
                         .position(&kinematic.complex, body.anchor)?
                         .add(&body.local_offset);
                     let topology = kinematic.complex.vertex_star_link(*anchor)?;
                     if !topology.star_hinges.contains(&body.port) {
-                        return Err(LocalStarError::ReceiverPortOutsideStar {
-                            receiver: *receiver,
-                            hinge: body.port,
-                            anchor: *anchor,
-                        });
+                        return Err(LocalStarError::Law(
+                            LocalStarRefusal::ReceiverPortOutsideStar {
+                                receiver: *receiver,
+                                hinge: body.port,
+                                anchor: *anchor,
+                            },
+                        ));
                     }
                     let port_edge = kinematic.complex.hinges[&body.port].edge;
                     if port_edge.lower != *anchor && port_edge.upper != *anchor {
-                        return Err(LocalStarError::ReceiverPortMissesAnchor {
-                            receiver: *receiver,
-                            hinge: body.port,
-                            anchor: *anchor,
-                        });
+                        return Err(LocalStarError::Law(
+                            LocalStarRefusal::ReceiverPortMissesAnchor {
+                                receiver: *receiver,
+                                hinge: body.port,
+                                anchor: *anchor,
+                            },
+                        ));
                     }
                     if let Some(coupling) = body
                         .couplings
                         .iter()
                         .find(|coupling| !topology.star_hinges.contains(&coupling.hinge))
                     {
-                        return Err(LocalStarError::ReceiverCouplingOutsideStar {
-                            receiver: *receiver,
-                            hinge: coupling.hinge,
-                            anchor: *anchor,
-                        });
+                        return Err(LocalStarError::Law(
+                            LocalStarRefusal::ReceiverCouplingOutsideStar {
+                                receiver: *receiver,
+                                hinge: coupling.hinge,
+                                anchor: *anchor,
+                            },
+                        ));
                     }
                     let local_offset =
                         position.subtract(&spatial.position(&kinematic.complex, *anchor)?);
@@ -2566,7 +2639,7 @@ impl ExactEventLaw for LocalStarLaw {
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum LocalStarError {
+pub enum LocalStarRefusal {
     #[error("hinge {0:?} is absent from the local-star world")]
     MissingHinge(HingeId),
     #[error("hinge {0:?} has no local constitutive material")]
@@ -2669,6 +2742,15 @@ pub enum LocalStarError {
     #[error(transparent)]
     Kinematic(#[from] HingeWorldError),
 }
+
+impl RefusalKind for LocalStarRefusal {
+    const LAW: &'static str = "local-star";
+}
+
+/// The local-star law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type LocalStarError = EventRefusal<LocalStarRefusal>;
+
+event_refusal_from!(LocalStarRefusal: SimplicialError, HingeWorldError);
 
 #[cfg(test)]
 mod tests {
@@ -3265,10 +3347,12 @@ mod tests {
                     topology_deeds: Vec::new(),
                 },
             ),
-            Err(LocalStarError::StaleReceiverTraversalChart {
-                receiver: ReceiverId(1),
-                ..
-            })
+            Err(LocalStarError::Law(
+                LocalStarRefusal::StaleReceiverTraversalChart {
+                    receiver: ReceiverId(1),
+                    ..
+                }
+            ))
         ));
     }
 

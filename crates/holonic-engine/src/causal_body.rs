@@ -32,6 +32,10 @@ use relational_geometry::{
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::world::{
+    EventQuotient, EventRefusal, EventStanding, RefusalKind, event_refusal_from,
+    event_standing_wire,
+};
 use crate::{
     CausalAlgebraicError, CausalCellId, CausalChain, ComparativeMultiplicity, EventId,
     EventSuccessor, ExactCellularSheaf, ExactEventLaw, ExactRatMatrix, ExactSheafCochain,
@@ -158,10 +162,75 @@ pub struct CausalBodyFieldStanding {
     pub last_changed_by: EventId,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct CausalBodyStanding {
-    pub schema: String,
+/// [definition] **The causal-body quotient** (plan phase 16): the incidence, active cells, openings, connections, receivers and fields.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CausalBodyQuotient {
     pub incidence: GradedCausalComplex,
+    active_cells: BTreeSet<CausalCellId>,
+    active_by_grade: BTreeMap<u32, BTreeSet<CausalCellId>>,
+    cofaces: BTreeMap<CausalCellId, BTreeSet<CausalCellId>>,
+    openings: BTreeMap<CausalOpeningId, CausalBoundaryOpening>,
+    opening_keys: BTreeMap<Vec<(CausalCellId, BigInt)>, CausalOpeningId>,
+    connections: BTreeMap<CausalCellId, CausalConnectionTransport>,
+    holonomy_generators: BTreeMap<CausalCellId, CausalHolonomyGenerator>,
+    receivers: BTreeMap<ReceiverId, CausalBodyReceiverStanding>,
+    fields: BTreeMap<CausalFieldId, CausalBodyFieldStanding>,
+    last_chronology: Option<u64>,
+    next_opening: u64,
+}
+
+/// The standing: the shared event scaffold around [`CausalBodyQuotient`].
+pub type CausalBodyStanding = EventStanding<CausalBodyQuotient>;
+
+impl EventQuotient for CausalBodyQuotient {
+    type Refusal = CausalBodyRefusal;
+}
+
+#[derive(Serialize)]
+#[serde(rename = "CausalBodyStanding")]
+struct CausalBodyStandingWrite<'a> {
+    schema: &'a String,
+    incidence: &'a GradedCausalComplex,
+    active_cells: &'a BTreeSet<CausalCellId>,
+    active_by_grade: &'a BTreeMap<u32, BTreeSet<CausalCellId>>,
+    cofaces: &'a BTreeMap<CausalCellId, BTreeSet<CausalCellId>>,
+    openings: &'a BTreeMap<CausalOpeningId, CausalBoundaryOpening>,
+    opening_keys: &'a BTreeMap<Vec<(CausalCellId, BigInt)>, CausalOpeningId>,
+    connections: &'a BTreeMap<CausalCellId, CausalConnectionTransport>,
+    holonomy_generators: &'a BTreeMap<CausalCellId, CausalHolonomyGenerator>,
+    receivers: &'a BTreeMap<ReceiverId, CausalBodyReceiverStanding>,
+    fields: &'a BTreeMap<CausalFieldId, CausalBodyFieldStanding>,
+    used_events: &'a BTreeSet<EventId>,
+    last_chronology: &'a Option<u64>,
+    next_opening: &'a u64,
+}
+
+impl<'a> From<&'a CausalBodyStanding> for CausalBodyStandingWrite<'a> {
+    fn from(standing: &'a CausalBodyStanding) -> Self {
+        Self {
+            schema: &standing.schema,
+            incidence: &standing.incidence,
+            active_cells: &standing.active_cells,
+            active_by_grade: &standing.active_by_grade,
+            cofaces: &standing.cofaces,
+            openings: &standing.openings,
+            opening_keys: &standing.opening_keys,
+            connections: &standing.connections,
+            holonomy_generators: &standing.holonomy_generators,
+            receivers: &standing.receivers,
+            fields: &standing.fields,
+            used_events: &standing.used_events,
+            last_chronology: &standing.last_chronology,
+            next_opening: &standing.next_opening,
+        }
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(rename = "CausalBodyStanding")]
+struct CausalBodyStandingRead {
+    schema: String,
+    incidence: GradedCausalComplex,
     active_cells: BTreeSet<CausalCellId>,
     active_by_grade: BTreeMap<u32, BTreeSet<CausalCellId>>,
     cofaces: BTreeMap<CausalCellId, BTreeSet<CausalCellId>>,
@@ -176,24 +245,55 @@ pub struct CausalBodyStanding {
     next_opening: u64,
 }
 
+impl From<CausalBodyStandingRead> for CausalBodyStanding {
+    fn from(read: CausalBodyStandingRead) -> Self {
+        EventStanding::from_parts(
+            read.schema,
+            read.used_events,
+            CausalBodyQuotient {
+                incidence: read.incidence,
+                active_cells: read.active_cells,
+                active_by_grade: read.active_by_grade,
+                cofaces: read.cofaces,
+                openings: read.openings,
+                opening_keys: read.opening_keys,
+                connections: read.connections,
+                holonomy_generators: read.holonomy_generators,
+                receivers: read.receivers,
+                fields: read.fields,
+                last_chronology: read.last_chronology,
+                next_opening: read.next_opening,
+            },
+        )
+    }
+}
+
+event_standing_wire!(
+    CausalBodyQuotient,
+    CausalBodyStandingWrite,
+    CausalBodyStandingRead
+);
+
 impl Default for CausalBodyStanding {
     fn default() -> Self {
-        Self {
-            schema: "holonic-engine.causal-body-standing.v1".to_owned(),
-            incidence: GradedCausalComplex::default(),
-            active_cells: BTreeSet::new(),
-            active_by_grade: BTreeMap::new(),
-            cofaces: BTreeMap::new(),
-            openings: BTreeMap::new(),
-            opening_keys: BTreeMap::new(),
-            connections: BTreeMap::new(),
-            holonomy_generators: BTreeMap::new(),
-            receivers: BTreeMap::new(),
-            fields: BTreeMap::new(),
-            used_events: BTreeSet::new(),
-            last_chronology: None,
-            next_opening: 1,
-        }
+        EventStanding::from_parts(
+            "holonic-engine.causal-body-standing.v1".to_owned(),
+            BTreeSet::new(),
+            CausalBodyQuotient {
+                incidence: GradedCausalComplex::default(),
+                active_cells: BTreeSet::new(),
+                active_by_grade: BTreeMap::new(),
+                cofaces: BTreeMap::new(),
+                openings: BTreeMap::new(),
+                opening_keys: BTreeMap::new(),
+                connections: BTreeMap::new(),
+                holonomy_generators: BTreeMap::new(),
+                receivers: BTreeMap::new(),
+                fields: BTreeMap::new(),
+                last_chronology: None,
+                next_opening: 1,
+            },
+        )
     }
 }
 
@@ -397,16 +497,20 @@ impl ExactEventLaw for ExactCausalBodyLaw {
     ) -> Result<EventSuccessor<Self::Standing, Self::Radiation>, Self::Error> {
         standing_before.validate()?;
         if standing_before.used_events.contains(&event.event) {
-            return Err(CausalBodyError::DuplicateEvent(event.event));
+            return Err(CausalBodyError::Law(CausalBodyRefusal::DuplicateEvent(
+                event.event,
+            )));
         }
         if standing_before
             .last_chronology
             .is_some_and(|chronology| event.chronology <= chronology)
         {
-            return Err(CausalBodyError::NonincreasingChronology {
-                previous: standing_before.last_chronology.expect("checked"),
-                supplied: event.chronology,
-            });
+            return Err(CausalBodyError::Law(
+                CausalBodyRefusal::NonincreasingChronology {
+                    previous: standing_before.last_chronology.expect("checked"),
+                    supplied: event.chronology,
+                },
+            ));
         }
 
         let mut standing = standing_before.clone();
@@ -432,7 +536,9 @@ impl ExactEventLaw for ExactCausalBodyLaw {
                     boundary,
                 } => {
                     if event_cells.contains_key(local) {
-                        return Err(CausalBodyError::DuplicateEventCell(*local));
+                        return Err(CausalBodyError::Law(CausalBodyRefusal::DuplicateEventCell(
+                            *local,
+                        )));
                     }
                     let boundary = resolve_boundary(&standing, &event_cells, boundary)?;
                     let cell = standing.incidence.found_cell(
@@ -478,7 +584,9 @@ impl ExactEventLaw for ExactCausalBodyLaw {
                     upper_horizon,
                 } => {
                     if standing.receivers.contains_key(receiver) {
-                        return Err(CausalBodyError::DuplicateReceiver(*receiver));
+                        return Err(CausalBodyError::Law(CausalBodyRefusal::DuplicateReceiver(
+                            *receiver,
+                        )));
                     }
                     let anchor = resolve_cell(&standing, &event_cells, *anchor)?;
                     standing.receivers.insert(
@@ -502,7 +610,9 @@ impl ExactEventLaw for ExactCausalBodyLaw {
                     let body = standing
                         .receivers
                         .get_mut(receiver)
-                        .ok_or(CausalBodyError::MissingReceiver(*receiver))?;
+                        .ok_or(CausalBodyError::Law(CausalBodyRefusal::MissingReceiver(
+                            *receiver,
+                        )))?;
                     body.anchor = anchor;
                     body.upper_horizon = *upper_horizon;
                 }
@@ -512,16 +622,21 @@ impl ExactEventLaw for ExactCausalBodyLaw {
                     measure,
                 } => {
                     if !standing.receivers.contains_key(receiver) {
-                        return Err(CausalBodyError::MissingReceiver(*receiver));
+                        return Err(CausalBodyError::Law(CausalBodyRefusal::MissingReceiver(
+                            *receiver,
+                        )));
                     }
                     if measure.filled_population.is_zero() && measure.unfilled_population.is_zero()
                     {
-                        return Err(CausalBodyError::EmptyOpeningMeasure);
+                        return Err(CausalBodyError::Law(CausalBodyRefusal::EmptyOpeningMeasure));
                     }
-                    let opening = standing
-                        .openings
-                        .get_mut(opening)
-                        .ok_or(CausalBodyError::MissingOpening(*opening))?;
+                    let opening =
+                        standing
+                            .openings
+                            .get_mut(opening)
+                            .ok_or(CausalBodyError::Law(CausalBodyRefusal::MissingOpening(
+                                *opening,
+                            )))?;
                     opening.receiver_measures.insert(*receiver, measure.clone());
                     opening.last_changed_by = event.event;
                 }
@@ -601,25 +716,29 @@ impl CausalBodyStanding {
         let mut by_segment = BTreeMap::new();
         for binding in bindings {
             if by_segment.insert(binding.segment, binding).is_some() {
-                return Err(CausalBodyError::DuplicateProjectionBinding(binding.segment));
+                return Err(CausalBodyError::Law(
+                    CausalBodyRefusal::DuplicateProjectionBinding(binding.segment),
+                ));
             }
             if !self.active_cells.contains(&binding.carrier)
                 || !self.active_cells.contains(&binding.from)
                 || !self.active_cells.contains(&binding.to)
             {
-                return Err(CausalBodyError::ProjectionBindingOutsideActiveBody(
-                    binding.carrier,
+                return Err(CausalBodyError::Law(
+                    CausalBodyRefusal::ProjectionBindingOutsideActiveBody(binding.carrier),
                 ));
             }
             let endpoints = oriented_edge(&self.incidence, binding.carrier)?;
             if endpoints != (binding.from, binding.to) {
-                return Err(CausalBodyError::ProjectionBindingEndpointMismatch {
-                    carrier: binding.carrier,
-                    expected_from: endpoints.0,
-                    expected_to: endpoints.1,
-                    supplied_from: binding.from,
-                    supplied_to: binding.to,
-                });
+                return Err(CausalBodyError::Law(
+                    CausalBodyRefusal::ProjectionBindingEndpointMismatch {
+                        carrier: binding.carrier,
+                        expected_from: endpoints.0,
+                        expected_to: endpoints.1,
+                        supplied_from: binding.from,
+                        supplied_to: binding.to,
+                    },
+                ));
             }
         }
         let expected_segments = operator
@@ -629,7 +748,9 @@ impl CausalBodyStanding {
             .collect::<BTreeSet<_>>();
         let supplied_segments = by_segment.keys().copied().collect::<BTreeSet<_>>();
         if expected_segments != supplied_segments {
-            return Err(CausalBodyError::ProjectionBindingDomainMismatch);
+            return Err(CausalBodyError::Law(
+                CausalBodyRefusal::ProjectionBindingDomainMismatch,
+            ));
         }
 
         let mut source_vertices = BTreeMap::<SourceVertexId, CausalCellId>::new();
@@ -674,10 +795,9 @@ impl CausalBodyStanding {
                             source_adjacent,
                         });
                     if row.source_adjacent != source_adjacent {
-                        return Err(CausalBodyError::ProjectionAdjacencyInconsistent {
-                            first,
-                            second,
-                        });
+                        return Err(CausalBodyError::Law(
+                            CausalBodyRefusal::ProjectionAdjacencyInconsistent { first, second },
+                        ));
                     }
                     if first_parameter {
                         row.first_source_parameters
@@ -728,12 +848,18 @@ impl CausalBodyStanding {
             receivers,
         })
     }
+}
 
+/// The body's own motions act on its quotient; the scaffold's admitted occurrences are not read.
+impl CausalBodyQuotient {
     fn activate_new_cell(&mut self, cell: CausalCellId) -> Result<(), CausalBodyError> {
         let body = self.incidence.cell(cell)?;
         for boundary in body.boundary.support() {
             if !self.active_cells.contains(&boundary) {
-                return Err(CausalBodyError::InactiveBoundary { cell, boundary });
+                return Err(CausalBodyError::Law(CausalBodyRefusal::InactiveBoundary {
+                    cell,
+                    boundary,
+                }));
             }
         }
         self.active_cells.insert(cell);
@@ -758,35 +884,45 @@ impl CausalBodyStanding {
         reverse: ExactRatMatrix,
     ) -> Result<(), CausalBodyError> {
         if self.connections.contains_key(&carrier) {
-            return Err(CausalBodyError::DuplicateConnection(carrier));
+            return Err(CausalBodyError::Law(
+                CausalBodyRefusal::DuplicateConnection(carrier),
+            ));
         }
         if !self.active_cells.contains(&carrier)
             || !self.active_cells.contains(&source)
             || !self.active_cells.contains(&target)
         {
-            return Err(CausalBodyError::ConnectionOutsideActiveBody(carrier));
+            return Err(CausalBodyError::Law(
+                CausalBodyRefusal::ConnectionOutsideActiveBody(carrier),
+            ));
         }
         let (actual_source, actual_target) = oriented_edge(&self.incidence, carrier)?;
         if (actual_source, actual_target) != (source, target) {
-            return Err(CausalBodyError::ConnectionEndpointMismatch {
-                carrier,
-                expected_source: actual_source,
-                expected_target: actual_target,
-                supplied_source: source,
-                supplied_target: target,
-            });
+            return Err(CausalBodyError::Law(
+                CausalBodyRefusal::ConnectionEndpointMismatch {
+                    carrier,
+                    expected_source: actual_source,
+                    expected_target: actual_target,
+                    supplied_source: source,
+                    supplied_target: target,
+                },
+            ));
         }
         if forward.rows() == 0
             || forward.rows() != forward.columns()
             || reverse.rows() != reverse.columns()
             || forward.rows() != reverse.rows()
         {
-            return Err(CausalBodyError::NonreversibleConnectionDimension(carrier));
+            return Err(CausalBodyError::Law(
+                CausalBodyRefusal::NonreversibleConnectionDimension(carrier),
+            ));
         }
         let identity =
             ExactRatMatrix::identity(forward.rows()).map_err(SheafDiffusionError::from)?;
         if forward.then(&reverse)? != identity || reverse.then(&forward)? != identity {
-            return Err(CausalBodyError::ConnectionNotExactlyReversible(carrier));
+            return Err(CausalBodyError::Law(
+                CausalBodyRefusal::ConnectionNotExactlyReversible(carrier),
+            ));
         }
         self.connections.insert(
             carrier,
@@ -810,22 +946,30 @@ impl CausalBodyStanding {
     ) -> Result<CausalOpeningId, CausalBodyError> {
         boundary.validate()?;
         if boundary.is_zero() {
-            return Err(CausalBodyError::EmptyOpeningBoundary);
+            return Err(CausalBodyError::Law(
+                CausalBodyRefusal::EmptyOpeningBoundary,
+            ));
         }
         if !boundary.support().is_subset(&self.active_cells) {
-            return Err(CausalBodyError::OpeningOutsideActiveBody);
+            return Err(CausalBodyError::Law(
+                CausalBodyRefusal::OpeningOutsideActiveBody,
+            ));
         }
         if !self
             .incidence
             .boundary_of_chain(&boundary)?
             .difference_is_zero()
         {
-            return Err(CausalBodyError::OpeningBoundaryNotClosed);
+            return Err(CausalBodyError::Law(
+                CausalBodyRefusal::OpeningBoundaryNotClosed,
+            ));
         }
-        let boundary_grade = self
-            .incidence
-            .homogeneous_grade(&boundary)?
-            .ok_or(CausalBodyError::EmptyOpeningBoundary)?;
+        let boundary_grade =
+            self.incidence
+                .homogeneous_grade(&boundary)?
+                .ok_or(CausalBodyError::Law(
+                    CausalBodyRefusal::EmptyOpeningBoundary,
+                ))?;
         let key = canonical_chain_key(&boundary);
         if let Some(existing) = self.opening_keys.get(&key) {
             return Ok(*existing);
@@ -876,7 +1020,9 @@ impl CausalBodyStanding {
         for cell in requested {
             self.incidence.cell(*cell)?;
             if !self.active_cells.contains(cell) {
-                return Err(CausalBodyError::DepartedCellNotActive(*cell));
+                return Err(CausalBodyError::Law(
+                    CausalBodyRefusal::DepartedCellNotActive(*cell),
+                ));
             }
         }
         let mut departing = requested.clone();
@@ -997,9 +1143,9 @@ impl CausalBodyStanding {
                 ));
                 continue;
             };
-            let path = index
-                .path(target, source)
-                .ok_or(CausalBodyError::BrokenFundamentalForest(edge))?;
+            let path = index.path(target, source).ok_or(CausalBodyError::Law(
+                CausalBodyRefusal::BrokenFundamentalForest(edge),
+            ))?;
             let mut cycle = CausalChain::single(edge, ComparativeMultiplicity::positive(1_u8));
             for (_, carrier, hand) in path {
                 let coefficient = match hand {
@@ -1013,7 +1159,9 @@ impl CausalBodyStanding {
                 .boundary_of_chain(&cycle)?
                 .difference_is_zero()
             {
-                return Err(CausalBodyError::FundamentalCycleNotClosed(edge));
+                return Err(CausalBodyError::Law(
+                    CausalBodyRefusal::FundamentalCycleNotClosed(edge),
+                ));
             }
             result.push((edge, canonical_chain(&cycle)));
         }
@@ -1052,9 +1200,12 @@ impl CausalBodyStanding {
         let mut generators = BTreeMap::new();
         for chord in chords {
             let connection = &self.connections[&chord];
-            let path = index
-                .path(connection.target, connection.source)
-                .ok_or(CausalBodyError::BrokenFundamentalForest(connection.carrier))?;
+            let path =
+                index
+                    .path(connection.target, connection.source)
+                    .ok_or(CausalBodyError::Law(
+                        CausalBodyRefusal::BrokenFundamentalForest(connection.carrier),
+                    ))?;
             let mut ordered_steps = vec![CausalTransportStep {
                 carrier: connection.carrier,
                 hand: CausalTransportHand::Forward,
@@ -1069,10 +1220,10 @@ impl CausalBodyStanding {
                     CausalTransportHand::Reverse => &step_connection.reverse,
                 };
                 transport = transport.then(map).map_err(|_| {
-                    CausalBodyError::IncompatibleConnectionComponent {
+                    CausalBodyError::Law(CausalBodyRefusal::IncompatibleConnectionComponent {
                         chord: connection.carrier,
                         carrier,
-                    }
+                    })
                 })?;
                 let coefficient = match hand {
                     CausalTransportHand::Forward => ComparativeMultiplicity::positive(1_u8),
@@ -1086,8 +1237,8 @@ impl CausalBodyStanding {
                 .boundary_of_chain(&loop_boundary)?
                 .difference_is_zero()
             {
-                return Err(CausalBodyError::FundamentalCycleNotClosed(
-                    connection.carrier,
+                return Err(CausalBodyError::Law(
+                    CausalBodyRefusal::FundamentalCycleNotClosed(connection.carrier),
                 ));
             }
             generators.insert(
@@ -1148,7 +1299,7 @@ impl CausalBodyStanding {
         let anchor_grade = self.incidence.cell(anchor)?.grade;
         let maximum_grade = anchor_grade
             .checked_add(upper_horizon)
-            .ok_or(CausalBodyError::ArithmeticOverflow)?;
+            .ok_or(CausalBodyError::Law(CausalBodyRefusal::ArithmeticOverflow))?;
         let mut reached = BTreeSet::from([anchor]);
         let mut frontier = vec![anchor];
         while let Some(cell) = frontier.pop() {
@@ -1181,7 +1332,9 @@ impl CausalBodyStanding {
         self.validate_sheaf_source(&sheaf)?;
         let previous = self.fields.get(&field).cloned();
         if previous.as_ref().is_some_and(|body| body.grade != grade) {
-            return Err(CausalBodyError::FieldGradeChanged(field));
+            return Err(CausalBodyError::Law(CausalBodyRefusal::FieldGradeChanged(
+                field,
+            )));
         }
         let mut values = BTreeMap::new();
         let mut carried = BTreeSet::new();
@@ -1201,15 +1354,17 @@ impl CausalBodyStanding {
                 continue;
             }
             expected_entering.insert(*cell);
-            let supplied = entering_content
-                .get(cell)
-                .ok_or(CausalBodyError::MissingEnteringFieldContent { field, cell: *cell })?;
+            let supplied = entering_content.get(cell).ok_or(CausalBodyError::Law(
+                CausalBodyRefusal::MissingEnteringFieldContent { field, cell: *cell },
+            ))?;
             values.insert(*cell, supplied.clone());
             entered.insert(*cell);
         }
         let supplied_entering = entering_content.keys().copied().collect::<BTreeSet<_>>();
         if supplied_entering != expected_entering {
-            return Err(CausalBodyError::FieldEnteringDomainMismatch(field));
+            return Err(CausalBodyError::Law(
+                CausalBodyRefusal::FieldEnteringDomainMismatch(field),
+            ));
         }
         let content = ExactSheafCochain::new(&sheaf, grade, values)?;
         let law = ExactSheafDiffusionLaw::new(sheaf.clone(), grade, capacities.clone())?;
@@ -1252,7 +1407,7 @@ impl CausalBodyStanding {
             .fields
             .get(&field)
             .cloned()
-            .ok_or(CausalBodyError::MissingField(field))?;
+            .ok_or(CausalBodyError::Law(CausalBodyRefusal::MissingField(field)))?;
         let law =
             ExactSheafDiffusionLaw::new(body.sheaf.clone(), body.grade, body.capacities.clone())?;
         let (diffusion, receipt) = law.enact(
@@ -1272,19 +1427,25 @@ impl CausalBodyStanding {
         sheaf.validate()?;
         for (cell, sheaf_body) in sheaf.complex().cells() {
             if !self.active_cells.contains(cell) {
-                return Err(CausalBodyError::FieldOutsideActiveBody(*cell));
+                return Err(CausalBodyError::Law(
+                    CausalBodyRefusal::FieldOutsideActiveBody(*cell),
+                ));
             }
             if self.incidence.cell(*cell)? != sheaf_body {
-                return Err(CausalBodyError::FieldSourceCellMismatch(*cell));
+                return Err(CausalBodyError::Law(
+                    CausalBodyRefusal::FieldSourceCellMismatch(*cell),
+                ));
             }
         }
         Ok(())
     }
+}
 
+impl CausalBodyStanding {
     pub fn validate(&self) -> Result<(), CausalBodyError> {
         self.incidence.validate()?;
         if !self.incidence.is_closed_support(&self.active_cells)? {
-            return Err(CausalBodyError::ActiveBodyNotClosed);
+            return Err(CausalBodyError::Law(CausalBodyRefusal::ActiveBodyNotClosed));
         }
         let all_cells = self
             .incidence
@@ -1293,44 +1454,56 @@ impl CausalBodyStanding {
             .copied()
             .collect::<BTreeSet<_>>();
         if !self.active_cells.is_subset(&all_cells) {
-            return Err(CausalBodyError::ActiveBodyContainsUnknownCell);
+            return Err(CausalBodyError::Law(
+                CausalBodyRefusal::ActiveBodyContainsUnknownCell,
+            ));
         }
         let mut indexed_active = BTreeSet::new();
         for (grade, cells) in &self.active_by_grade {
             for cell in cells {
                 if self.incidence.cell(*cell)?.grade != *grade {
-                    return Err(CausalBodyError::GradeIndexMismatch(*cell));
+                    return Err(CausalBodyError::Law(CausalBodyRefusal::GradeIndexMismatch(
+                        *cell,
+                    )));
                 }
                 indexed_active.insert(*cell);
             }
         }
         if indexed_active != self.active_cells {
-            return Err(CausalBodyError::ActiveGradeIndexMismatch);
+            return Err(CausalBodyError::Law(
+                CausalBodyRefusal::ActiveGradeIndexMismatch,
+            ));
         }
         let expected_cofaces = build_cofaces(&self.incidence);
         if expected_cofaces != self.cofaces {
-            return Err(CausalBodyError::CofaceIndexMismatch);
+            return Err(CausalBodyError::Law(CausalBodyRefusal::CofaceIndexMismatch));
         }
         for (carrier, connection) in &self.connections {
             if carrier != &connection.carrier {
-                return Err(CausalBodyError::ConnectionIdentityMismatch(*carrier));
+                return Err(CausalBodyError::Law(
+                    CausalBodyRefusal::ConnectionIdentityMismatch(*carrier),
+                ));
             }
             let (source, target) = oriented_edge(&self.incidence, *carrier)?;
             if (source, target) != (connection.source, connection.target) {
-                return Err(CausalBodyError::ConnectionEndpointMismatch {
-                    carrier: *carrier,
-                    expected_source: source,
-                    expected_target: target,
-                    supplied_source: connection.source,
-                    supplied_target: connection.target,
-                });
+                return Err(CausalBodyError::Law(
+                    CausalBodyRefusal::ConnectionEndpointMismatch {
+                        carrier: *carrier,
+                        expected_source: source,
+                        expected_target: target,
+                        supplied_source: connection.source,
+                        supplied_target: connection.target,
+                    },
+                ));
             }
             let identity = ExactRatMatrix::identity(connection.forward.rows())
                 .map_err(SheafDiffusionError::from)?;
             if connection.forward.then(&connection.reverse)? != identity
                 || connection.reverse.then(&connection.forward)? != identity
             {
-                return Err(CausalBodyError::ConnectionNotExactlyReversible(*carrier));
+                return Err(CausalBodyError::Law(
+                    CausalBodyRefusal::ConnectionNotExactlyReversible(*carrier),
+                ));
             }
         }
         for field in self.fields.values() {
@@ -1340,7 +1513,9 @@ impl CausalBodyStanding {
         for receiver in self.receivers.values() {
             let expected = self.receiver_section(receiver.anchor, receiver.upper_horizon)?;
             if expected != receiver.local_section {
-                return Err(CausalBodyError::ReceiverSectionStale(receiver.receiver));
+                return Err(CausalBodyError::Law(
+                    CausalBodyRefusal::ReceiverSectionStale(receiver.receiver),
+                ));
             }
         }
         if self
@@ -1349,7 +1524,9 @@ impl CausalBodyStanding {
             .next_back()
             .is_some_and(|id| id.0 >= self.next_opening)
         {
-            return Err(CausalBodyError::InvalidNextOpeningIdentity);
+            return Err(CausalBodyError::Law(
+                CausalBodyRefusal::InvalidNextOpeningIdentity,
+            ));
         }
         Ok(())
     }
@@ -1365,10 +1542,9 @@ fn resolve_cell(
             standing.incidence.cell(cell)?;
             Ok(cell)
         }
-        CausalCellReference::Event(local) => event_cells
-            .get(&local)
-            .copied()
-            .ok_or(CausalBodyError::ForwardEventCellReference(local)),
+        CausalCellReference::Event(local) => event_cells.get(&local).copied().ok_or(
+            CausalBodyError::Law(CausalBodyRefusal::ForwardEventCellReference(local)),
+        ),
     }
 }
 
@@ -1391,13 +1567,17 @@ fn oriented_edge(
 ) -> Result<(CausalCellId, CausalCellId), CausalBodyError> {
     let body = complex.cell(edge)?;
     if body.grade != 1 || body.boundary.coefficients().len() != 2 {
-        return Err(CausalBodyError::CarrierIsNotOrientedEdge(edge));
+        return Err(CausalBodyError::Law(
+            CausalBodyRefusal::CarrierIsNotOrientedEdge(edge),
+        ));
     }
     let mut source = None;
     let mut target = None;
     for (cell, coefficient) in body.boundary.coefficients() {
         if !coefficient.is_unit_orientation() {
-            return Err(CausalBodyError::CarrierIsNotOrientedEdge(edge));
+            return Err(CausalBodyError::Law(
+                CausalBodyRefusal::CarrierIsNotOrientedEdge(edge),
+            ));
         }
         if coefficient.difference() == BigInt::from(-1) {
             source = Some(*cell);
@@ -1407,7 +1587,9 @@ fn oriented_edge(
     }
     match (source, target) {
         (Some(source), Some(target)) => Ok((source, target)),
-        _ => Err(CausalBodyError::CarrierIsNotOrientedEdge(edge)),
+        _ => Err(CausalBodyError::Law(
+            CausalBodyRefusal::CarrierIsNotOrientedEdge(edge),
+        )),
     }
 }
 
@@ -1437,7 +1619,7 @@ fn matching_active_coface(
     opening: &CausalBoundaryOpening,
 ) -> Result<Option<CausalCellId>, CausalBodyError> {
     let Some(fill_grade) = opening.boundary_grade.checked_add(1) else {
-        return Err(CausalBodyError::ArithmeticOverflow);
+        return Err(CausalBodyError::Law(CausalBodyRefusal::ArithmeticOverflow));
     };
     let key = canonical_chain_key(&opening.boundary);
     for cell in active_by_grade
@@ -1488,11 +1670,13 @@ fn bind_source_vertex(
     if let Some(existing) = bindings.insert(source, causal)
         && existing != causal
     {
-        return Err(CausalBodyError::ProjectionSourceVertexInconsistent {
-            source_vertex: source,
-            first: existing,
-            second: causal,
-        });
+        return Err(CausalBodyError::Law(
+            CausalBodyRefusal::ProjectionSourceVertexInconsistent {
+                source_vertex: source,
+                first: existing,
+                second: causal,
+            },
+        ));
     }
     Ok(())
 }
@@ -1638,7 +1822,7 @@ fn opposite_hand(hand: CausalTransportHand) -> CausalTransportHand {
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum CausalBodyError {
+pub enum CausalBodyRefusal {
     #[error("event {0:?} already entered this causal body")]
     DuplicateEvent(EventId),
     #[error("event chronology must increase beyond {previous}, received {supplied}")]
@@ -1764,6 +1948,15 @@ pub enum CausalBodyError {
     #[error(transparent)]
     Sheaf(#[from] SheafDiffusionError),
 }
+
+impl RefusalKind for CausalBodyRefusal {
+    const LAW: &'static str = "causal-body";
+}
+
+/// The causal-body law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type CausalBodyError = EventRefusal<CausalBodyRefusal>;
+
+event_refusal_from!(CausalBodyRefusal: CausalAlgebraicError, SheafDiffusionError);
 
 #[cfg(test)]
 mod tests {

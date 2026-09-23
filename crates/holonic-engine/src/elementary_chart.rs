@@ -421,7 +421,9 @@ pub fn read_elementary_chart(
         let response = coefficient.coefficient(monomial);
         match fiber.admit(row, response) {
             Ok(_) => {}
-            Err(InverseTransportError::AffineFiberObstructed) => {
+            Err(InverseTransportError::Law(
+                crate::InverseTransportRefusal::AffineFiberObstructed,
+            )) => {
                 obstruction = fiber.obstruction().cloned();
                 break;
             }

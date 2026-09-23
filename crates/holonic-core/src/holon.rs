@@ -680,10 +680,38 @@ impl Holon {
 
 /// [definition] **A point on a Holon**: its storage configuration and the commit index (the
 /// material's clock). Only the current point is retained.
+///
+/// [definition; agent-inferred] The configuration defaults to the exact storage coordinates
+/// `Vec<Rat>` of the reference motion. An event chart of motion (engine `world::ExactEventLaw`)
+/// uses the same point with its law's typed standing as the configuration and the number of
+/// committed events as the commit (plan phase 16): the standing is the retained quotient, so the
+/// state carries no event archive in either chart.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct HolonState {
-    pub configuration: Vec<Rat>,
+pub struct HolonState<C = Vec<Rat>> {
+    pub configuration: C,
     pub commit: u64,
+}
+
+impl<C> HolonState<C> {
+    /// A point at a declared commit.
+    pub fn at(configuration: C, commit: u64) -> Self {
+        Self {
+            configuration,
+            commit,
+        }
+    }
+
+    /// The successor point: the next configuration one commit later. When the commit clock would
+    /// overflow, the configuration is returned untouched as the refusal.
+    pub fn committed(&self, configuration: C) -> Result<Self, C> {
+        match self.commit.checked_add(1) {
+            Some(commit) => Ok(Self {
+                configuration,
+                commit,
+            }),
+            None => Err(configuration),
+        }
+    }
 }
 
 impl HolonState {
@@ -703,6 +731,15 @@ impl HolonState {
 mod tests {
     use super::*;
     use crate::scalar::{int, integer_matrix, ints, rat};
+
+    #[test]
+    fn a_point_on_any_chart_commits_one_step_at_a_time() {
+        let point = HolonState::at("standing", 4);
+        let next = point.committed("successor").unwrap();
+        assert_eq!(next, HolonState::at("successor", 5));
+        assert_eq!(HolonState::at((), u64::MAX).committed(()), Err(()));
+        assert!(HolonState::new(ints(&[0, 0])).is_rest());
+    }
 
     fn one_medium(g: i64) -> PortHolon {
         PortHolon::medium(

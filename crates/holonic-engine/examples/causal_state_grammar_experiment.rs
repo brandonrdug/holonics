@@ -6,7 +6,7 @@ use std::path::PathBuf;
 use holonic_engine::{
     CausalActionId, CausalActionSpec, CausalActionWord, CausalContinuationTestimony,
     CausalContinuationTrace, CausalObservableId, CausalObservableSpec, CausalStateGrammarEvent,
-    CausalStateGrammarHistoryEntry, CausalStateGrammarLaw, CausalStateGrammarQuery,
+    CausalStateGrammarLaw, CausalStateGrammarQuery, CausalStateGrammarRadiation,
     CausalStateGrammarSpec, CausalStateGrammarStanding, CausalStateObservation, CausalWorld,
     DynamicSeparationKind, EventId, OrganizationalConstraintId, OrganizationalConstraintSpec,
     OrganizationalEcologySpec, OrganizationalLineageId, OrganizationalQuery, OrganizationalSiteId,
@@ -278,6 +278,7 @@ fn main() {
     let mut machine = CausalWorld::new(CausalStateGrammarLaw, standing);
     let mut next_event = 1_u64;
     let mut guard = 0_usize;
+    let mut tsv = String::from("kind\tevent_or_state\tword_or_action\treceipt\n");
     while let Some(query) = machine.standing().next_query().cloned() {
         let event = match query {
             CausalStateGrammarQuery::Continuation(query) => {
@@ -299,9 +300,12 @@ fn main() {
                 })
             }
         };
-        machine
+        let receipt = machine
             .receive(&event)
             .expect("the exact return is admitted");
+        // Each event's testimony and emitted prediction are its own receipt; the standing keeps
+        // only the causal-state quotient (plan phase 16).
+        write_trace_rows(&mut tsv, &event, &receipt.radiation);
         next_event += 1;
         guard += 1;
         assert!(guard < 5_000, "the bounded experiment must reach rest");
@@ -315,46 +319,6 @@ fn main() {
     for separation in &certificate.separations {
         for kind in &separation.kinds {
             *separation_counts.entry(*kind).or_default() += 1;
-        }
-    }
-
-    let mut tsv = String::from("kind\tevent_or_state\tword_or_action\treceipt\n");
-    for entry in machine.standing().history() {
-        match entry {
-            CausalStateGrammarHistoryEntry::SourceContinuation(testimony) => {
-                writeln!(
-                    tsv,
-                    "continuation\t{}\t{}\t{}",
-                    testimony.event.0,
-                    word_text(&testimony.query.word),
-                    trace_text(&testimony.trace)
-                )
-                .expect("TSV write");
-            }
-            CausalStateGrammarHistoryEntry::EmanatedPrediction(prediction) => {
-                writeln!(
-                    tsv,
-                    "prediction\t{}\t{}\t{}",
-                    prediction.query.word.len(),
-                    word_text(&prediction.query.word),
-                    trace_text(&prediction.predicted_trace)
-                )
-                .expect("TSV write");
-            }
-            CausalStateGrammarHistoryEntry::SourceStateOrganization(testimony) => {
-                let values = testimony
-                    .values
-                    .iter()
-                    .map(|(constraint, value)| format!("{}={value}", constraint.0))
-                    .collect::<Vec<_>>()
-                    .join(",");
-                writeln!(
-                    tsv,
-                    "organization\t{}\t{}\t{}",
-                    testimony.event.0, testimony.query.state.0, values
-                )
-                .expect("TSV write");
-            }
         }
     }
 
@@ -391,4 +355,50 @@ fn main() {
         );
     }
     println!("trace={}", trace_path.display());
+}
+
+fn write_trace_rows(
+    tsv: &mut String,
+    event: &CausalStateGrammarEvent,
+    radiation: &[CausalStateGrammarRadiation],
+) {
+    match event {
+        CausalStateGrammarEvent::ReturnContinuation(testimony) => {
+            writeln!(
+                tsv,
+                "continuation\t{}\t{}\t{}",
+                testimony.event.0,
+                word_text(&testimony.query.word),
+                trace_text(&testimony.trace)
+            )
+            .expect("TSV write");
+        }
+        CausalStateGrammarEvent::ReturnStateOrganization(testimony) => {
+            let values = testimony
+                .values
+                .iter()
+                .map(|(constraint, value)| format!("{}={value}", constraint.0))
+                .collect::<Vec<_>>()
+                .join(",");
+            writeln!(
+                tsv,
+                "organization\t{}\t{}\t{}",
+                testimony.event.0, testimony.query.state.0, values
+            )
+            .expect("TSV write");
+        }
+    }
+    for prediction in radiation
+        .iter()
+        .filter_map(|receipt| receipt.emitted_prediction.as_ref())
+    {
+        writeln!(
+            tsv,
+            "prediction\t{}\t{}\t{}",
+            prediction.query.word.len(),
+            word_text(&prediction.query.word),
+            trace_text(&prediction.predicted_trace)
+        )
+        .expect("TSV write");
+    }
 }

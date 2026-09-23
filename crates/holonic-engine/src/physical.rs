@@ -12,6 +12,7 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::world::{EventRefusal, RefusalKind, event_refusal_from};
 use crate::{
     EventId, EventSuccessor, ExactEventLaw, HingeEvent, HingeId, HingeRadiation, HingeWorldError,
     HingeWorldLaw, HingeWorldStanding,
@@ -47,7 +48,7 @@ impl QuadraticHingeAction {
         units: HingeUnitSystem,
     ) -> Result<Self, PhysicalLawError> {
         if inertia.is_zero() {
-            return Err(PhysicalLawError::ZeroInertia);
+            return Err(PhysicalLawError::Law(PhysicalLawRefusal::ZeroInertia));
         }
         Ok(Self {
             inertia,
@@ -205,12 +206,16 @@ impl VariationalHingeLaw {
     ) -> Result<Self, PhysicalLawError> {
         for hinge in kinematic.complex.hinges.keys() {
             if !actions.contains_key(hinge) {
-                return Err(PhysicalLawError::MissingAction(*hinge));
+                return Err(PhysicalLawError::Law(PhysicalLawRefusal::MissingAction(
+                    *hinge,
+                )));
             }
         }
         for hinge in actions.keys() {
             if !kinematic.complex.hinges.contains_key(hinge) {
-                return Err(PhysicalLawError::MissingHinge(*hinge));
+                return Err(PhysicalLawError::Law(PhysicalLawRefusal::MissingHinge(
+                    *hinge,
+                )));
             }
         }
         Ok(Self { kinematic, actions })
@@ -222,15 +227,17 @@ impl VariationalHingeLaw {
         trajectories: BTreeMap<HingeId, HingeTrajectory>,
     ) -> Result<PhysicalHingeStanding, PhysicalLawError> {
         for (hinge, parameter) in &kinematic.parameters {
-            let trajectory = trajectories
-                .get(hinge)
-                .ok_or(PhysicalLawError::MissingTrajectory(*hinge))?;
+            let trajectory = trajectories.get(hinge).ok_or(PhysicalLawError::Law(
+                PhysicalLawRefusal::MissingTrajectory(*hinge),
+            ))?;
             if &trajectory.current != parameter {
-                return Err(PhysicalLawError::TrajectoryStandingMismatch {
-                    hinge: *hinge,
-                    trajectory: Box::new(trajectory.current.clone()),
-                    standing: Box::new(parameter.clone()),
-                });
+                return Err(PhysicalLawError::Law(
+                    PhysicalLawRefusal::TrajectoryStandingMismatch {
+                        hinge: *hinge,
+                        trajectory: Box::new(trajectory.current.clone()),
+                        standing: Box::new(parameter.clone()),
+                    },
+                ));
             }
         }
         Ok(PhysicalHingeStanding {
@@ -252,14 +259,16 @@ impl ExactEventLaw for VariationalHingeLaw {
         standing_before: &Self::Standing,
         event: &Self::Event,
     ) -> Result<EventSuccessor<Self::Standing, Self::Radiation>, Self::Error> {
-        let action = self
-            .actions
-            .get(&event.pivot)
-            .ok_or(PhysicalLawError::MissingAction(event.pivot))?;
-        let trajectory = standing_before
-            .trajectories
-            .get(&event.pivot)
-            .ok_or(PhysicalLawError::MissingTrajectory(event.pivot))?;
+        let action = self.actions.get(&event.pivot).ok_or(PhysicalLawError::Law(
+            PhysicalLawRefusal::MissingAction(event.pivot),
+        ))?;
+        let trajectory =
+            standing_before
+                .trajectories
+                .get(&event.pivot)
+                .ok_or(PhysicalLawError::Law(
+                    PhysicalLawRefusal::MissingTrajectory(event.pivot),
+                ))?;
 
         // This is the exact discrete Euler--Lagrange update for
         //
@@ -290,20 +299,29 @@ impl ExactEventLaw for VariationalHingeLaw {
             trajectories: standing_before.trajectories.clone(),
         };
         for changed in &kinematic_successor.radiation[0].changed_hinges {
-            let previous_coordinate = standing_before
-                .kinematic
-                .parameters
-                .get(changed)
-                .ok_or(PhysicalLawError::MissingTrajectory(*changed))?;
-            let current_coordinate = standing_after
-                .kinematic
-                .parameters
-                .get(changed)
-                .ok_or(PhysicalLawError::MissingTrajectory(*changed))?;
-            let carried = standing_after
-                .trajectories
-                .get_mut(changed)
-                .ok_or(PhysicalLawError::MissingTrajectory(*changed))?;
+            let previous_coordinate =
+                standing_before
+                    .kinematic
+                    .parameters
+                    .get(changed)
+                    .ok_or(PhysicalLawError::Law(
+                        PhysicalLawRefusal::MissingTrajectory(*changed),
+                    ))?;
+            let current_coordinate =
+                standing_after
+                    .kinematic
+                    .parameters
+                    .get(changed)
+                    .ok_or(PhysicalLawError::Law(
+                        PhysicalLawRefusal::MissingTrajectory(*changed),
+                    ))?;
+            let carried =
+                standing_after
+                    .trajectories
+                    .get_mut(changed)
+                    .ok_or(PhysicalLawError::Law(
+                        PhysicalLawRefusal::MissingTrajectory(*changed),
+                    ))?;
             carried.previous = previous_coordinate.clone();
             carried.current = current_coordinate.clone();
         }
@@ -312,10 +330,13 @@ impl ExactEventLaw for VariationalHingeLaw {
         // projected hinge coordinate returns unchanged. Otherwise a turning
         // point is collapsed into false rest and the next variational event
         // loses its incoming boundary current.
-        let pivot_carried = standing_after
-            .trajectories
-            .get_mut(&event.pivot)
-            .ok_or(PhysicalLawError::MissingTrajectory(event.pivot))?;
+        let pivot_carried =
+            standing_after
+                .trajectories
+                .get_mut(&event.pivot)
+                .ok_or(PhysicalLawError::Law(
+                    PhysicalLawRefusal::MissingTrajectory(event.pivot),
+                ))?;
         pivot_carried.previous = trajectory.current.clone();
         pivot_carried.current = coordinate_after.clone();
         let free_momentum_invariant = (internal_impulse.is_zero()
@@ -347,7 +368,7 @@ impl ExactEventLaw for VariationalHingeLaw {
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum PhysicalLawError {
+pub enum PhysicalLawRefusal {
     #[error("a quadratic hinge action requires nonzero inertia")]
     ZeroInertia,
     #[error("hinge {0:?} is absent from the physical world")]
@@ -373,6 +394,15 @@ pub enum PhysicalLawError {
     #[error(transparent)]
     Kinematic(#[from] HingeWorldError),
 }
+
+impl RefusalKind for PhysicalLawRefusal {
+    const LAW: &'static str = "physical";
+}
+
+/// The physical law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type PhysicalLawError = EventRefusal<PhysicalLawRefusal>;
+
+event_refusal_from!(PhysicalLawRefusal: HingeWorldError);
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct CurrentNodeId(pub u64);
@@ -441,7 +471,9 @@ impl DiscreteCurrentComplex {
             if incident.iter().any(|branch| branch.unit != unit)
                 || source.is_some_and(|source| source.unit != unit)
             {
-                return Err(PhysicalLawError::IncommensurateCurrentUnit(*node));
+                return Err(PhysicalLawError::Law(
+                    PhysicalLawRefusal::IncommensurateCurrentUnit(*node),
+                ));
             }
             let boundary_current = incident.iter().fold(Rat::zero(), |sum, branch| {
                 if branch.target == *node {
@@ -522,15 +554,16 @@ pub fn potential_cycle(
     unit: impl Into<String>,
 ) -> Result<ClosedPotentialCycle, PhysicalLawError> {
     if nodes.len() < 2 {
-        return Err(PhysicalLawError::ShortPotentialWord);
+        return Err(PhysicalLawError::Law(
+            PhysicalLawRefusal::ShortPotentialWord,
+        ));
     }
     let values = nodes
         .iter()
         .map(|node| {
-            potentials
-                .get(node)
-                .cloned()
-                .ok_or(PhysicalLawError::MissingPotential(*node))
+            potentials.get(node).cloned().ok_or(PhysicalLawError::Law(
+                PhysicalLawRefusal::MissingPotential(*node),
+            ))
         })
         .collect::<Result<Vec<_>, _>>()?;
     let directed_drops = values
@@ -610,7 +643,7 @@ impl DiscreteActionStress {
         deformation_unit: impl Into<String>,
     ) -> Result<Self, PhysicalLawError> {
         if deformation.is_zero() {
-            return Err(PhysicalLawError::ZeroDeformation);
+            return Err(PhysicalLawError::Law(PhysicalLawRefusal::ZeroDeformation));
         }
         let stress = (&action_after - &action_before) / &deformation;
         let orientation = if stress.is_positive() {

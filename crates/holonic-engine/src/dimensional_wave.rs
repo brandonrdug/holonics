@@ -32,6 +32,10 @@ use relational_geometry::{Rat, ReceiverId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::world::{
+    EventQuotient, EventRefusal, EventStanding, RefusalKind, event_refusal_from,
+    event_standing_wire,
+};
 use crate::{
     CoordinateCarrierId, CoordinateGermId, DimensionalAxisId, DimensionalCarrierDisposition,
     DimensionalGermDisposition, DimensionalSliceReceipt, EventId, EventSuccessor,
@@ -224,7 +228,9 @@ pub struct ExactReceiverPrimaryDoctrine {
 impl ExactReceiverPrimaryDoctrine {
     pub fn new(aperture: Rat, support_response: Rat) -> Result<Self, DimensionalWaveError> {
         if !aperture.is_positive() || support_response.is_negative() {
-            return Err(DimensionalWaveError::MalformedReceiverPrimaryDoctrine);
+            return Err(DimensionalWaveError::Law(
+                DimensionalWaveRefusal::MalformedReceiverPrimaryDoctrine,
+            ));
         }
         Ok(Self {
             aperture,
@@ -292,7 +298,9 @@ impl ExactWavePhaseTransport {
     pub fn new(cosine: Rat, sine: Rat) -> Result<Self, DimensionalWaveError> {
         let transport = Self { cosine, sine };
         if !transport.is_unit() {
-            return Err(DimensionalWaveError::NonunitDeclaredPhaseTransport);
+            return Err(DimensionalWaveError::Law(
+                DimensionalWaveRefusal::NonunitDeclaredPhaseTransport,
+            ));
         }
         Ok(transport)
     }
@@ -428,9 +436,9 @@ pub struct DimensionalWaveEvent {
 /// `active_slots` is the production traversal surface.  The dense arrays give
 /// every compiled port a stable address, but no transition scans those
 /// addresses to discover work.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ExactDimensionalWaveStanding {
-    pub schema: String,
+/// [definition] **The dimensional-wave quotient** (plan phase 16): the tick, energy, ring cursor, arrivals and active slots.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ExactDimensionalWaveQuotient {
     pub tick: u64,
     pub energy: Rat,
     ring_cursor: usize,
@@ -438,8 +446,82 @@ pub struct ExactDimensionalWaveStanding {
     arrival_values: Vec<ExactComplexWaveCurrent>,
     listed: Vec<bool>,
     active_slots: Vec<Vec<DimensionalWavePortId>>,
+}
+
+/// The standing: the shared event scaffold around [`ExactDimensionalWaveQuotient`].
+pub type ExactDimensionalWaveStanding = EventStanding<ExactDimensionalWaveQuotient>;
+
+impl EventQuotient for ExactDimensionalWaveQuotient {
+    type Refusal = DimensionalWaveRefusal;
+}
+
+#[derive(Serialize)]
+#[serde(rename = "ExactDimensionalWaveStanding")]
+struct ExactDimensionalWaveStandingWrite<'a> {
+    schema: &'a String,
+    tick: &'a u64,
+    energy: &'a Rat,
+    ring_cursor: &'a usize,
+    port_count: &'a usize,
+    arrival_values: &'a Vec<ExactComplexWaveCurrent>,
+    listed: &'a Vec<bool>,
+    active_slots: &'a Vec<Vec<DimensionalWavePortId>>,
+    used_events: &'a BTreeSet<EventId>,
+}
+
+impl<'a> From<&'a ExactDimensionalWaveStanding> for ExactDimensionalWaveStandingWrite<'a> {
+    fn from(standing: &'a ExactDimensionalWaveStanding) -> Self {
+        Self {
+            schema: &standing.schema,
+            tick: &standing.tick,
+            energy: &standing.energy,
+            ring_cursor: &standing.ring_cursor,
+            port_count: &standing.port_count,
+            arrival_values: &standing.arrival_values,
+            listed: &standing.listed,
+            active_slots: &standing.active_slots,
+            used_events: &standing.used_events,
+        }
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(rename = "ExactDimensionalWaveStanding")]
+struct ExactDimensionalWaveStandingRead {
+    schema: String,
+    tick: u64,
+    energy: Rat,
+    ring_cursor: usize,
+    port_count: usize,
+    arrival_values: Vec<ExactComplexWaveCurrent>,
+    listed: Vec<bool>,
+    active_slots: Vec<Vec<DimensionalWavePortId>>,
     used_events: BTreeSet<EventId>,
 }
+
+impl From<ExactDimensionalWaveStandingRead> for ExactDimensionalWaveStanding {
+    fn from(read: ExactDimensionalWaveStandingRead) -> Self {
+        EventStanding::from_parts(
+            read.schema,
+            read.used_events,
+            ExactDimensionalWaveQuotient {
+                tick: read.tick,
+                energy: read.energy,
+                ring_cursor: read.ring_cursor,
+                port_count: read.port_count,
+                arrival_values: read.arrival_values,
+                listed: read.listed,
+                active_slots: read.active_slots,
+            },
+        )
+    }
+}
+
+event_standing_wire!(
+    ExactDimensionalWaveQuotient,
+    ExactDimensionalWaveStandingWrite,
+    ExactDimensionalWaveStandingRead
+);
 
 impl ExactDimensionalWaveStanding {
     pub fn active_arrival_count(&self) -> usize {
@@ -655,17 +737,19 @@ impl ExactDimensionalWaveLaw {
 
     pub fn initial_standing(&self) -> ExactDimensionalWaveStanding {
         let extent = self.topology.ring_extent * self.topology.ports.len();
-        ExactDimensionalWaveStanding {
-            schema: STANDING_SCHEMA.to_owned(),
-            tick: 0,
-            energy: Rat::zero(),
-            ring_cursor: 0,
-            port_count: self.topology.ports.len(),
-            arrival_values: vec![ExactComplexWaveCurrent::zero(); extent],
-            listed: vec![false; extent],
-            active_slots: vec![Vec::new(); self.topology.ring_extent],
-            used_events: BTreeSet::new(),
-        }
+        EventStanding::from_parts(
+            STANDING_SCHEMA.to_owned(),
+            BTreeSet::new(),
+            ExactDimensionalWaveQuotient {
+                tick: 0,
+                energy: Rat::zero(),
+                ring_cursor: 0,
+                port_count: self.topology.ports.len(),
+                arrival_values: vec![ExactComplexWaveCurrent::zero(); extent],
+                listed: vec![false; extent],
+                active_slots: vec![Vec::new(); self.topology.ring_extent],
+            },
+        )
     }
 
     pub fn intrinsic_sections(
@@ -746,7 +830,9 @@ impl ExactDimensionalWaveLaw {
             return Err(DimensionalWaveError::MalformedStanding);
         }
         if standing.energy != self.standing_energy(standing) {
-            return Err(DimensionalWaveError::EnergyStandingMismatch);
+            return Err(DimensionalWaveError::Law(
+                DimensionalWaveRefusal::EnergyStandingMismatch,
+            ));
         }
         Ok(())
     }
@@ -834,18 +920,27 @@ impl ExactDimensionalWaveLaw {
             let source_port = &self.topology.ports
                 [port_ordinal(target_port.opposite, self.topology.ports.len())?];
             let energy = intrinsic.energy;
-            let carrier_disposition = receiver
-                .carriers
-                .get(&target_port.carrier)
-                .ok_or(DimensionalWaveError::ReceiverSourceMismatch)?;
-            let from_disposition = receiver
-                .germs
-                .get(&source_port.at)
-                .ok_or(DimensionalWaveError::ReceiverSourceMismatch)?;
-            let to_disposition = receiver
-                .germs
-                .get(&target_port.at)
-                .ok_or(DimensionalWaveError::ReceiverSourceMismatch)?;
+            let carrier_disposition =
+                receiver
+                    .carriers
+                    .get(&target_port.carrier)
+                    .ok_or(DimensionalWaveError::Law(
+                        DimensionalWaveRefusal::ReceiverSourceMismatch,
+                    ))?;
+            let from_disposition =
+                receiver
+                    .germs
+                    .get(&source_port.at)
+                    .ok_or(DimensionalWaveError::Law(
+                        DimensionalWaveRefusal::ReceiverSourceMismatch,
+                    ))?;
+            let to_disposition =
+                receiver
+                    .germs
+                    .get(&target_port.at)
+                    .ok_or(DimensionalWaveError::Law(
+                        DimensionalWaveRefusal::ReceiverSourceMismatch,
+                    ))?;
             let disposition = match (
                 &carrier_disposition.disposition,
                 &from_disposition.disposition,
@@ -890,7 +985,9 @@ impl ExactDimensionalWaveLaw {
             };
             let measure = measures
                 .get_mut(&target_port.mode)
-                .ok_or(DimensionalWaveError::MalformedTopology)?;
+                .ok_or(DimensionalWaveError::Law(
+                    DimensionalWaveRefusal::MalformedTopology,
+                ))?;
             measure.traveling_sections += 1;
             measure.energy += &energy;
             if let DimensionalWaveSectionDisposition::Visible(visible) = &disposition {
@@ -935,9 +1032,7 @@ impl ExactDimensionalWaveLaw {
         event: &DimensionalWaveEvent,
     ) -> Result<(ExactDimensionalWaveStanding, DimensionalWaveReceipt), DimensionalWaveError> {
         self.validate_standing_shape(standing_before)?;
-        if standing_before.used_events.contains(&event.event) {
-            return Err(DimensionalWaveError::RepeatedEvent(event.event));
-        }
+        standing_before.refuse_repeated(event.event)?;
         let mut standing = standing_before.clone();
         standing.used_events.insert(event.event);
         let tick_before = standing.tick;
@@ -1060,7 +1155,9 @@ impl ExactDimensionalWaveLaw {
                 let transported_current =
                     local_current.rotate(&port.transport_cosine, &port.transport_sine);
                 if transported_current.norm_square() != local_current.norm_square() {
-                    return Err(DimensionalWaveError::NonunitPhaseTransport(port.id));
+                    return Err(DimensionalWaveError::Law(
+                        DimensionalWaveRefusal::NonunitPhaseTransport(port.id),
+                    ));
                 }
                 let target_ordinal = port_ordinal(port.opposite, self.topology.ports.len())?;
                 let target = &self.topology.ports[target_ordinal];
@@ -1096,10 +1193,12 @@ impl ExactDimensionalWaveLaw {
                 Rat::zero()
             };
             if !passive_residual.is_zero() {
-                return Err(DimensionalWaveError::PassiveEnergyFailure {
-                    mode: junction.mode,
-                    germ: junction.germ,
-                });
+                return Err(DimensionalWaveError::Law(
+                    DimensionalWaveRefusal::PassiveEnergyFailure {
+                        mode: junction.mode,
+                        germ: junction.germ,
+                    },
+                ));
             }
             let source_work = &energy_departed - &energy_entered;
             total_source_work += &source_work;
@@ -1138,7 +1237,9 @@ impl ExactDimensionalWaveLaw {
         standing.ring_cursor = (cursor + 1) % self.topology.ring_extent;
         standing.energy = &energy_before + &total_source_work;
         if standing.energy.is_negative() {
-            return Err(DimensionalWaveError::GlobalEnergyFailure);
+            return Err(DimensionalWaveError::Law(
+                DimensionalWaveRefusal::GlobalEnergyFailure,
+            ));
         }
         // Two frames, differenced. `standing.energy` is bookkeeping — the running total the event
         // path maintains; `standing_energy` reads the field itself. Until 2026-08-09 this line read
@@ -1147,7 +1248,9 @@ impl ExactDimensionalWaveLaw {
         // consume the field could ever fire.
         let exact_energy_residual = &standing.energy - &self.standing_energy(&standing);
         if !exact_energy_residual.is_zero() {
-            return Err(DimensionalWaveError::GlobalEnergyFailure);
+            return Err(DimensionalWaveError::Law(
+                DimensionalWaveRefusal::GlobalEnergyFailure,
+            ));
         }
         let receipt = DimensionalWaveReceipt {
             schema: RECEIPT_SCHEMA.to_owned(),
@@ -1255,7 +1358,9 @@ fn schedule_arrival(
         .and_then(|base| base.checked_add(port))
         .ok_or(DimensionalWaveError::CarrierOverflow)?;
     if !standing.arrival_values[address].is_zero() {
-        return Err(DimensionalWaveError::DuplicateArrival);
+        return Err(DimensionalWaveError::Law(
+            DimensionalWaveRefusal::DuplicateArrival,
+        ));
     }
     standing.arrival_values[address] = current.clone();
     if !standing.listed[address] {
@@ -1277,11 +1382,15 @@ fn validate_impulses(
                 .junction_by_mode_germ
                 .contains_key(&(impulse.mode, impulse.germ))
         {
-            return Err(DimensionalWaveError::MalformedImpulse);
+            return Err(DimensionalWaveError::Law(
+                DimensionalWaveRefusal::MalformedImpulse,
+            ));
         }
         let germ = &law.source.germs()[&impulse.germ];
         if !germ.source_events.contains(&impulse.source_event) {
-            return Err(DimensionalWaveError::ImpulseLineageMismatch);
+            return Err(DimensionalWaveError::Law(
+                DimensionalWaveRefusal::ImpulseLineageMismatch,
+            ));
         }
     }
     Ok(())
@@ -1292,7 +1401,7 @@ fn validate_modes(
     modes: &[DimensionalWaveMode],
 ) -> Result<(), DimensionalWaveError> {
     if modes.is_empty() {
-        return Err(DimensionalWaveError::NoModes);
+        return Err(DimensionalWaveError::Law(DimensionalWaveRefusal::NoModes));
     }
     let mut ids = BTreeSet::new();
     let mut axes = BTreeSet::new();
@@ -1305,7 +1414,9 @@ fn validate_modes(
             || !axes.insert((mode.real_axis, mode.imaginary_axis))
             || !pair_exists
         {
-            return Err(DimensionalWaveError::MalformedMode(mode.id));
+            return Err(DimensionalWaveError::Law(
+                DimensionalWaveRefusal::MalformedMode(mode.id),
+            ));
         }
     }
     Ok(())
@@ -1317,7 +1428,9 @@ fn validate_doctrines(
     doctrines: &[DimensionalWaveCarrierDoctrine],
 ) -> Result<(), DimensionalWaveError> {
     if doctrines.is_empty() {
-        return Err(DimensionalWaveError::NoCarrierDoctrine);
+        return Err(DimensionalWaveError::Law(
+            DimensionalWaveRefusal::NoCarrierDoctrine,
+        ));
     }
     let mut carriers = BTreeSet::new();
     for doctrine in doctrines {
@@ -1326,8 +1439,8 @@ fn validate_doctrines(
             || !source.carriers().contains_key(&doctrine.carrier)
             || !carriers.insert(doctrine.carrier)
         {
-            return Err(DimensionalWaveError::MalformedCarrierDoctrine(
-                doctrine.carrier,
+            return Err(DimensionalWaveError::Law(
+                DimensionalWaveRefusal::MalformedCarrierDoctrine(doctrine.carrier),
             ));
         }
     }
@@ -1338,7 +1451,9 @@ fn validate_doctrines(
             .iter()
             .any(|mode| !mode_ids.contains(mode))
     }) {
-        return Err(DimensionalWaveError::MalformedModalAdmission);
+        return Err(DimensionalWaveError::Law(
+            DimensionalWaveRefusal::MalformedModalAdmission,
+        ));
     }
     if doctrines.iter().any(|doctrine| {
         doctrine.phase_transport.iter().any(|(mode, transport)| {
@@ -1347,7 +1462,9 @@ fn validate_doctrines(
                 || !transport.is_unit()
         })
     }) {
-        return Err(DimensionalWaveError::NonunitDeclaredPhaseTransport);
+        return Err(DimensionalWaveError::Law(
+            DimensionalWaveRefusal::NonunitDeclaredPhaseTransport,
+        ));
     }
     if doctrines.iter().any(|doctrine| {
         doctrine.modal_admittance.iter().any(|(mode, admittance)| {
@@ -1356,7 +1473,9 @@ fn validate_doctrines(
                 || !admittance.is_positive()
         })
     }) {
-        return Err(DimensionalWaveError::MalformedModalAdmittance);
+        return Err(DimensionalWaveError::Law(
+            DimensionalWaveRefusal::MalformedModalAdmittance,
+        ));
     }
     Ok(())
 }
@@ -1410,10 +1529,12 @@ fn compile_topology(
                 }
             };
             if !transport.is_unit() {
-                return Err(DimensionalWaveError::MalformedPhaseTransport {
-                    mode: mode.id,
-                    carrier: doctrine.carrier,
-                });
+                return Err(DimensionalWaveError::Law(
+                    DimensionalWaveRefusal::MalformedPhaseTransport {
+                        mode: mode.id,
+                        carrier: doctrine.carrier,
+                    },
+                ));
             }
             let forward = DimensionalWavePortId(
                 u64::try_from(pending.len()).map_err(|_| DimensionalWaveError::CarrierOverflow)?,
@@ -1451,7 +1572,9 @@ fn compile_topology(
         }
     }
     if pending.is_empty() {
-        return Err(DimensionalWaveError::NoModalCarriers);
+        return Err(DimensionalWaveError::Law(
+            DimensionalWaveRefusal::NoModalCarriers,
+        ));
     }
 
     let mut junction_by_mode_germ = BTreeMap::new();
@@ -1486,7 +1609,9 @@ fn compile_topology(
             .insert((port.mode, port.carrier, port.at), port.id)
             .is_some()
         {
-            return Err(DimensionalWaveError::MalformedTopology);
+            return Err(DimensionalWaveError::Law(
+                DimensionalWaveRefusal::MalformedTopology,
+            ));
         }
         ports.push(CompiledWavePort {
             id: port.id,
@@ -1505,19 +1630,25 @@ fn compile_topology(
     for junction in &mut junctions {
         junction.ports.sort();
         if junction.ports.is_empty() || !junction.total_admittance.is_positive() {
-            return Err(DimensionalWaveError::MalformedTopology);
+            return Err(DimensionalWaveError::Law(
+                DimensionalWaveRefusal::MalformedTopology,
+            ));
         }
     }
     for mode in modes {
         if !junctions.iter().any(|junction| junction.mode == mode.id) {
-            return Err(DimensionalWaveError::ModeHasNoCarrier(mode.id));
+            return Err(DimensionalWaveError::Law(
+                DimensionalWaveRefusal::ModeHasNoCarrier(mode.id),
+            ));
         }
     }
     let maximum_delay = doctrines
         .iter()
         .map(|doctrine| doctrine.delay)
         .max()
-        .ok_or(DimensionalWaveError::NoCarrierDoctrine)?;
+        .ok_or(DimensionalWaveError::Law(
+            DimensionalWaveRefusal::NoCarrierDoctrine,
+        ))?;
     let ring_extent = usize::try_from(
         maximum_delay
             .checked_add(1)
@@ -1542,7 +1673,7 @@ fn port_ordinal(port: DimensionalWavePortId, extent: usize) -> Result<usize, Dim
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum DimensionalWaveError {
+pub enum DimensionalWaveRefusal {
     #[error(transparent)]
     Receiver(#[from] crate::DimensionalReceiverError),
     #[error("an exact dimensional wave requires at least one phase mode")]
@@ -1572,12 +1703,8 @@ pub enum DimensionalWaveError {
     NonunitPhaseTransport(DimensionalWavePortId),
     #[error("the compiled dimensional wave topology is malformed")]
     MalformedTopology,
-    #[error("the exact dimensional wave standing is malformed")]
-    MalformedStanding,
     #[error("retained dimensional wave energy disagrees with its traveling population")]
     EnergyStandingMismatch,
-    #[error("dimensional wave event {0:?} already occurred")]
-    RepeatedEvent(EventId),
     #[error("a dimensional wave impulse is malformed")]
     MalformedImpulse,
     #[error("a dimensional wave impulse is not caused by its local germ")]
@@ -1597,9 +1724,16 @@ pub enum DimensionalWaveError {
         "the exact receiver-primary doctrine requires positive aperture and nonnegative support response"
     )]
     MalformedReceiverPrimaryDoctrine,
-    #[error("an exact dimensional wave carrier overflowed")]
-    CarrierOverflow,
 }
+
+impl RefusalKind for DimensionalWaveRefusal {
+    const LAW: &'static str = "exact dimensional wave";
+}
+
+/// The exact dimensional wave law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type DimensionalWaveError = EventRefusal<DimensionalWaveRefusal>;
+
+event_refusal_from!(DimensionalWaveRefusal: crate::DimensionalReceiverError);
 
 #[cfg(test)]
 mod tests {

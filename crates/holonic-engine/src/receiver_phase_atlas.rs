@@ -16,6 +16,10 @@ use relational_geometry::{Rat, ReceiverId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::world::{
+    EventQuotient, EventRefusal, EventStanding, RefusalKind, event_refusal_from,
+    event_standing_wire,
+};
 use crate::{
     ConicClass, ConicError, EventId, EventSuccessor, ExactEventLaw, ExactRgb, HomogeneousConic,
     ImageCarrierError, ImageExtent, ImageSectionId, LogicalResourceReceipt, RayFamily,
@@ -331,22 +335,14 @@ pub struct ReceiverPhaseSection {
     pub cycles: BTreeSet<ReceiverPhaseCycleId>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ReceiverPhaseAtlasStanding {
-    pub schema: String,
+/// [definition] **The receiver-phase quotient** (plan phase 16): the sections, germs, connections, cycles and germ populations.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReceiverPhaseAtlasQuotient {
     pub sections: BTreeMap<ReceiverPhaseSectionId, ReceiverPhaseSection>,
     pub germs: BTreeMap<ReceiverPhaseGermId, ReceiverPhaseGerm>,
     pub connections: BTreeMap<ReceiverPhaseConnectionId, ReceiverPhaseConnection>,
     pub cycles: BTreeMap<ReceiverPhaseCycleId, ReceiverPhaseCycle>,
-    /// Every germ that took each passage, **named**, not counted.
-    ///
-    /// `CLAUDE.md` §2b: *"A count of signs is a state reading. Name the windings instead."* This was
-    /// `u64` until 2026-08-08 — a tally standing beside the population it summarised, which nothing
-    /// checked and which no reader could resolve back to a germ. The count is now a reading
-    /// ([`ReceiverPhaseAtlasStanding::germ_population_count`]) and the addresses are the data, in
-    /// the same shape `RayCrossings` uses for its crossing indices.
     pub germ_populations: BTreeMap<ReceiverPhaseGermSignature, BTreeSet<ReceiverPhaseGermId>>,
-    pub used_events: BTreeSet<EventId>,
     pub last_chronology: Option<u64>,
     next_section: u64,
     next_germ: u64,
@@ -354,22 +350,111 @@ pub struct ReceiverPhaseAtlasStanding {
     next_cycle: u64,
 }
 
+/// The standing: the shared event scaffold around [`ReceiverPhaseAtlasQuotient`].
+pub type ReceiverPhaseAtlasStanding = EventStanding<ReceiverPhaseAtlasQuotient>;
+
+impl EventQuotient for ReceiverPhaseAtlasQuotient {
+    type Refusal = ReceiverPhaseAtlasRefusal;
+}
+
+#[derive(Serialize)]
+#[serde(rename = "ReceiverPhaseAtlasStanding")]
+struct ReceiverPhaseAtlasStandingWrite<'a> {
+    schema: &'a String,
+    sections: &'a BTreeMap<ReceiverPhaseSectionId, ReceiverPhaseSection>,
+    germs: &'a BTreeMap<ReceiverPhaseGermId, ReceiverPhaseGerm>,
+    connections: &'a BTreeMap<ReceiverPhaseConnectionId, ReceiverPhaseConnection>,
+    cycles: &'a BTreeMap<ReceiverPhaseCycleId, ReceiverPhaseCycle>,
+    germ_populations: &'a BTreeMap<ReceiverPhaseGermSignature, BTreeSet<ReceiverPhaseGermId>>,
+    used_events: &'a BTreeSet<EventId>,
+    last_chronology: &'a Option<u64>,
+    next_section: &'a u64,
+    next_germ: &'a u64,
+    next_connection: &'a u64,
+    next_cycle: &'a u64,
+}
+
+impl<'a> From<&'a ReceiverPhaseAtlasStanding> for ReceiverPhaseAtlasStandingWrite<'a> {
+    fn from(standing: &'a ReceiverPhaseAtlasStanding) -> Self {
+        Self {
+            schema: &standing.schema,
+            sections: &standing.sections,
+            germs: &standing.germs,
+            connections: &standing.connections,
+            cycles: &standing.cycles,
+            germ_populations: &standing.germ_populations,
+            used_events: &standing.used_events,
+            last_chronology: &standing.last_chronology,
+            next_section: &standing.next_section,
+            next_germ: &standing.next_germ,
+            next_connection: &standing.next_connection,
+            next_cycle: &standing.next_cycle,
+        }
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(rename = "ReceiverPhaseAtlasStanding")]
+struct ReceiverPhaseAtlasStandingRead {
+    schema: String,
+    sections: BTreeMap<ReceiverPhaseSectionId, ReceiverPhaseSection>,
+    germs: BTreeMap<ReceiverPhaseGermId, ReceiverPhaseGerm>,
+    connections: BTreeMap<ReceiverPhaseConnectionId, ReceiverPhaseConnection>,
+    cycles: BTreeMap<ReceiverPhaseCycleId, ReceiverPhaseCycle>,
+    germ_populations: BTreeMap<ReceiverPhaseGermSignature, BTreeSet<ReceiverPhaseGermId>>,
+    used_events: BTreeSet<EventId>,
+    last_chronology: Option<u64>,
+    next_section: u64,
+    next_germ: u64,
+    next_connection: u64,
+    next_cycle: u64,
+}
+
+impl From<ReceiverPhaseAtlasStandingRead> for ReceiverPhaseAtlasStanding {
+    fn from(read: ReceiverPhaseAtlasStandingRead) -> Self {
+        EventStanding::from_parts(
+            read.schema,
+            read.used_events,
+            ReceiverPhaseAtlasQuotient {
+                sections: read.sections,
+                germs: read.germs,
+                connections: read.connections,
+                cycles: read.cycles,
+                germ_populations: read.germ_populations,
+                last_chronology: read.last_chronology,
+                next_section: read.next_section,
+                next_germ: read.next_germ,
+                next_connection: read.next_connection,
+                next_cycle: read.next_cycle,
+            },
+        )
+    }
+}
+
+event_standing_wire!(
+    ReceiverPhaseAtlasQuotient,
+    ReceiverPhaseAtlasStandingWrite,
+    ReceiverPhaseAtlasStandingRead
+);
+
 impl Default for ReceiverPhaseAtlasStanding {
     fn default() -> Self {
-        Self {
-            schema: "holonic-engine.receiver-phase-atlas-standing.v1".to_owned(),
-            sections: BTreeMap::new(),
-            germs: BTreeMap::new(),
-            connections: BTreeMap::new(),
-            cycles: BTreeMap::new(),
-            germ_populations: BTreeMap::new(),
-            used_events: BTreeSet::new(),
-            last_chronology: None,
-            next_section: 1,
-            next_germ: 1,
-            next_connection: 1,
-            next_cycle: 1,
-        }
+        EventStanding::from_parts(
+            "holonic-engine.receiver-phase-atlas-standing.v1".to_owned(),
+            BTreeSet::new(),
+            ReceiverPhaseAtlasQuotient {
+                sections: BTreeMap::new(),
+                germs: BTreeMap::new(),
+                connections: BTreeMap::new(),
+                cycles: BTreeMap::new(),
+                germ_populations: BTreeMap::new(),
+                last_chronology: None,
+                next_section: 1,
+                next_germ: 1,
+                next_connection: 1,
+                next_cycle: 1,
+            },
+        )
     }
 }
 
@@ -520,12 +605,18 @@ fn validate_standing(standing: &ReceiverPhaseAtlasStanding) -> Result<(), Receiv
     let mut addressed = 0_usize;
     for (signature, population) in &standing.germ_populations {
         if population.is_empty() {
-            return Err(ReceiverPhaseAtlasError::EmptyGermPassage);
+            return Err(ReceiverPhaseAtlasError::Law(
+                ReceiverPhaseAtlasRefusal::EmptyGermPassage,
+            ));
         }
         for germ in population {
             match standing.germs.get(germ) {
                 Some(body) if body.signature == *signature => {}
-                _ => return Err(ReceiverPhaseAtlasError::GermPassageMismatch(*germ)),
+                _ => {
+                    return Err(ReceiverPhaseAtlasError::Law(
+                        ReceiverPhaseAtlasRefusal::GermPassageMismatch(*germ),
+                    ));
+                }
             }
         }
         addressed += population.len();
@@ -546,11 +637,13 @@ fn validate_standing(standing: &ReceiverPhaseAtlasStanding) -> Result<(), Receiv
             || germ.level_sets.len() != section.channels.get()
             || usize::from(germ.dominant_coordinate) >= section.channels.get()
         {
-            return Err(ReceiverPhaseAtlasError::GermChannelPopulationDisagreement {
-                germ: germ.id,
-                declared: section.channels.get(),
-                caused: germ.jet.channel_population(),
-            });
+            return Err(ReceiverPhaseAtlasError::Law(
+                ReceiverPhaseAtlasRefusal::GermChannelPopulationDisagreement {
+                    germ: germ.id,
+                    declared: section.channels.get(),
+                    caused: germ.jet.channel_population(),
+                },
+            ));
         }
     }
     Ok(())
@@ -561,18 +654,20 @@ fn validate_event(
     event: &ReceiverPhaseAtlasEvent,
 ) -> Result<(), ReceiverPhaseAtlasError> {
     if event.sections.is_empty() {
-        return Err(ReceiverPhaseAtlasError::EmptyEvent);
+        return Err(ReceiverPhaseAtlasError::Law(
+            ReceiverPhaseAtlasRefusal::EmptyEvent,
+        ));
     }
-    if standing.used_events.contains(&event.event) {
-        return Err(ReceiverPhaseAtlasError::RepeatedEvent(event.event));
-    }
+    standing.refuse_repeated(event.event)?;
     if let Some(previous) = standing.last_chronology
         && event.chronology <= previous
     {
-        return Err(ReceiverPhaseAtlasError::NoncausalChronology {
-            previous,
-            supplied: event.chronology,
-        });
+        return Err(ReceiverPhaseAtlasError::Law(
+            ReceiverPhaseAtlasRefusal::NoncausalChronology {
+                previous,
+                supplied: event.chronology,
+            },
+        ));
     }
     let mut receivers = BTreeSet::new();
     for section in &event.sections {
@@ -581,10 +676,14 @@ fn validate_event(
             || section.extent.height == 0
             || section.samples.len() != section.extent.sample_count()?
         {
-            return Err(ReceiverPhaseAtlasError::MalformedSection);
+            return Err(ReceiverPhaseAtlasError::Law(
+                ReceiverPhaseAtlasRefusal::MalformedSection,
+            ));
         }
         if !receivers.insert(section.receiver) {
-            return Err(ReceiverPhaseAtlasError::DuplicateReceiver(section.receiver));
+            return Err(ReceiverPhaseAtlasError::Law(
+                ReceiverPhaseAtlasRefusal::DuplicateReceiver(section.receiver),
+            ));
         }
         // A channel is addressed downstream by a `u8` — [`ReceiverPhaseGerm::dominant_coordinate`],
         // [`ReceiverPhaseGermSignature::dominant_coordinate`], and
@@ -594,13 +693,13 @@ fn validate_event(
         // it at the mouth instead. The bound is the **carrier's**, read off `u8::MAX`; it is not a
         // level this organ chose, and lifting it means widening the coordinate carrier.
         if section.channels.get() > COORDINATE_CARRIER_POPULATION {
-            return Err(
-                ReceiverPhaseAtlasError::ChannelPopulationExceedsCoordinateCarrier {
+            return Err(ReceiverPhaseAtlasError::Law(
+                ReceiverPhaseAtlasRefusal::ChannelPopulationExceedsCoordinateCarrier {
                     receiver: section.receiver,
                     declared: section.channels.get(),
                     carrier: COORDINATE_CARRIER_POPULATION,
                 },
-            );
+            ));
         }
         // The receiver declared its channel population; the material must meet it exactly. A
         // shorter sample is not padded and a longer one is not truncated, because either would be
@@ -610,12 +709,14 @@ fn validate_event(
                 continue;
             };
             if sample.population() != section.channels.get() {
-                return Err(ReceiverPhaseAtlasError::ChannelPopulationDisagreement {
-                    receiver: section.receiver,
-                    declared: section.channels.get(),
-                    supplied: sample.population(),
-                    sample: usize_to_u64(ordinal)?,
-                });
+                return Err(ReceiverPhaseAtlasError::Law(
+                    ReceiverPhaseAtlasRefusal::ChannelPopulationDisagreement {
+                        receiver: section.receiver,
+                        declared: section.channels.get(),
+                        supplied: sample.population(),
+                        sample: usize_to_u64(ordinal)?,
+                    },
+                ));
             }
         }
     }
@@ -779,7 +880,9 @@ fn extract_germs(
             // across the larger region.
             let horizon = *persistence_radii
                 .last()
-                .ok_or(ReceiverPhaseAtlasError::MalformedSection)?;
+                .ok_or(ReceiverPhaseAtlasError::Law(
+                    ReceiverPhaseAtlasRefusal::MalformedSection,
+                ))?;
             let support_step =
                 usize::try_from(horizon).map_err(|_| ReceiverPhaseAtlasError::CarrierOverflow)?;
             let Some((jet, _, dominant_coordinate, level_sets)) =
@@ -790,7 +893,9 @@ fn extract_germs(
             let dominant = usize::from(dominant_coordinate);
             let conic = level_sets[dominant]
                 .as_ref()
-                .ok_or(ReceiverPhaseAtlasError::MalformedJet)?;
+                .ok_or(ReceiverPhaseAtlasError::Law(
+                    ReceiverPhaseAtlasRefusal::MalformedJet,
+                ))?;
             let gradient = &jet.gradients[dominant];
             let hessian = &jet.hessians[dominant];
             let trace = &hessian[0][0] + &hessian[1][1];
@@ -1236,7 +1341,9 @@ fn phase_frame(normal: &[Rat; 2]) -> [[Rat; 2]; 2] {
 fn matrix_inverse(matrix: &[[Rat; 2]; 2]) -> Result<[[Rat; 2]; 2], ReceiverPhaseAtlasError> {
     let determinant = &matrix[0][0] * &matrix[1][1] - &matrix[0][1] * &matrix[1][0];
     if determinant.is_zero() {
-        return Err(ReceiverPhaseAtlasError::SingularPhaseFrame);
+        return Err(ReceiverPhaseAtlasError::Law(
+            ReceiverPhaseAtlasRefusal::SingularPhaseFrame,
+        ));
     }
     Ok([
         [&matrix[1][1] / &determinant, -&matrix[0][1] / &determinant],
@@ -1273,7 +1380,7 @@ fn usize_to_u64(value: usize) -> Result<u64, ReceiverPhaseAtlasError> {
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum ReceiverPhaseAtlasError {
+pub enum ReceiverPhaseAtlasRefusal {
     #[error("a receiver-phase event must contain at least one section")]
     EmptyEvent,
     #[error(
@@ -1282,8 +1389,6 @@ pub enum ReceiverPhaseAtlasError {
     EmptyGermPassage,
     #[error("germ {0:?} is filed under a passage that is not the one it carries")]
     GermPassageMismatch(ReceiverPhaseGermId),
-    #[error("receiver-phase event {0:?} has already entered standing")]
-    RepeatedEvent(EventId),
     #[error("receiver-phase chronology {supplied} does not follow {previous}")]
     NoncausalChronology { previous: u64, supplied: u64 },
     #[error("receiver {0:?} occurs more than once in one receiver-phase event")]
@@ -1315,12 +1420,8 @@ pub enum ReceiverPhaseAtlasError {
     MalformedSection,
     #[error("a receiver-phase jet is malformed")]
     MalformedJet,
-    #[error("the receiver-phase standing is malformed")]
-    MalformedStanding,
     #[error("a receiver-phase connection frame is singular")]
     SingularPhaseFrame,
-    #[error("a receiver-phase carrier overflowed")]
-    CarrierOverflow,
     #[error(transparent)]
     Conic(#[from] ConicError),
     #[error(transparent)]
@@ -1328,6 +1429,15 @@ pub enum ReceiverPhaseAtlasError {
     #[error(transparent)]
     Receiver(#[from] ReceiverError),
 }
+
+impl RefusalKind for ReceiverPhaseAtlasRefusal {
+    const LAW: &'static str = "receiver-phase";
+}
+
+/// The receiver-phase law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type ReceiverPhaseAtlasError = EventRefusal<ReceiverPhaseAtlasRefusal>;
+
+event_refusal_from!(ReceiverPhaseAtlasRefusal: ConicError, ImageCarrierError, ReceiverError);
 
 #[cfg(test)]
 mod tests {
@@ -1573,12 +1683,14 @@ mod tests {
                     chronology: 1,
                     sections: vec![section],
                 }),
-                Err(ReceiverPhaseAtlasError::ChannelPopulationDisagreement {
-                    receiver: ReceiverId(1),
-                    declared: 3,
-                    supplied,
-                    sample: 7,
-                })
+                Err(ReceiverPhaseAtlasError::Law(
+                    ReceiverPhaseAtlasRefusal::ChannelPopulationDisagreement {
+                        receiver: ReceiverId(1),
+                        declared: 3,
+                        supplied,
+                        sample: 7,
+                    }
+                ))
             );
         }
 
@@ -1612,13 +1724,13 @@ mod tests {
             if !admitted {
                 assert_eq!(
                     returned,
-                    Err(
-                        ReceiverPhaseAtlasError::ChannelPopulationExceedsCoordinateCarrier {
+                    Err(ReceiverPhaseAtlasError::Law(
+                        ReceiverPhaseAtlasRefusal::ChannelPopulationExceedsCoordinateCarrier {
                             receiver: ReceiverId(1),
                             declared,
                             carrier: COORDINATE_CARRIER_POPULATION,
                         }
-                    )
+                    ))
                 );
             }
         }
@@ -1638,11 +1750,13 @@ mod tests {
             .push(Rat::zero());
         assert_eq!(
             widened.validate(),
-            Err(ReceiverPhaseAtlasError::GermChannelPopulationDisagreement {
-                germ: id,
-                declared: 3,
-                caused: 4,
-            })
+            Err(ReceiverPhaseAtlasError::Law(
+                ReceiverPhaseAtlasRefusal::GermChannelPopulationDisagreement {
+                    germ: id,
+                    declared: 3,
+                    caused: 4,
+                }
+            ))
         );
     }
 
@@ -1796,7 +1910,7 @@ mod tests {
             .insert(absent);
         assert!(matches!(
             corrupt.validate(),
-            Err(ReceiverPhaseAtlasError::GermPassageMismatch(germ)) if germ == absent
+            Err(ReceiverPhaseAtlasError::Law(ReceiverPhaseAtlasRefusal::GermPassageMismatch(germ))) if germ == absent
         ));
 
         let mut emptied = standing.clone();
@@ -1807,7 +1921,9 @@ mod tests {
             .clear();
         assert!(matches!(
             emptied.validate(),
-            Err(ReceiverPhaseAtlasError::EmptyGermPassage)
+            Err(ReceiverPhaseAtlasError::Law(
+                ReceiverPhaseAtlasRefusal::EmptyGermPassage
+            ))
         ));
         assert!(
             standing.validate().is_ok(),

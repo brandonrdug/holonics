@@ -10,6 +10,7 @@ use num_traits::One;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::world::{EventRefusal, RefusalKind};
 use crate::{EventId, EventSuccessor, ExactEventLaw};
 use relational_geometry::ReceiverId;
 
@@ -157,10 +158,10 @@ impl ExactEventLaw for PrimePhaseLaw {
             .checked_add(1)
             .ok_or(PrimePhaseError::CarrierOverflow)?;
         if event.value != expected {
-            return Err(PrimePhaseError::NonSuccessor {
+            return Err(PrimePhaseError::Law(PrimePhaseRefusal::NonSuccessor {
                 expected,
                 supplied: event.value,
-            });
+            }));
         }
         let read = read_prime_phase(event.value)?;
         let boundary = prime_phase_boundary(event.value)?;
@@ -205,18 +206,25 @@ impl ExactEventLaw for PrimePhaseLaw {
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum PrimePhaseError {
+pub enum PrimePhaseRefusal {
     #[error("prime-square phases begin at 2²=4, got {0}")]
     BelowFirstPhase(u64),
-    #[error("the requested exact u64 prime-square boundary exceeds the carrier")]
-    CarrierOverflow,
     #[error("integer succession expected {expected}, but the source supplied {supplied}")]
     NonSuccessor { expected: u64, supplied: u64 },
 }
 
+impl RefusalKind for PrimePhaseRefusal {
+    const LAW: &'static str = "arithmetic-phase";
+}
+
+/// The arithmetic-phase law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type PrimePhaseError = EventRefusal<PrimePhaseRefusal>;
+
 pub fn prime_square_phase(value: u64) -> Result<PrimeSquarePhase, PrimePhaseError> {
     if value < 4 {
-        return Err(PrimePhaseError::BelowFirstPhase(value));
+        return Err(PrimePhaseError::Law(PrimePhaseRefusal::BelowFirstPhase(
+            value,
+        )));
     }
     let mut primes = vec![2_u64];
     let mut candidate = 3_u64;

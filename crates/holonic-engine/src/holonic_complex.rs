@@ -23,6 +23,7 @@ use num_traits::Zero;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::world::{EventRefusal, RefusalKind, event_refusal_from};
 use crate::{
     CausalAlgebraicError, CausalCellId, CausalChain, ComparativeMultiplicity, EventId,
     EventSuccessor, ExactEventLaw, GradedCausalComplex, LogicalResourceReceipt,
@@ -202,9 +203,9 @@ impl ReceiverHolonicComplexStanding {
         &self,
         grain: ReceiverGrainId,
     ) -> Result<&ReceiverGrainComplex, HolonicComplexError> {
-        self.grains
-            .get(&grain)
-            .ok_or(HolonicComplexError::MissingGrain(grain))
+        self.grains.get(&grain).ok_or(HolonicComplexError::Law(
+            HolonicComplexRefusal::MissingGrain(grain),
+        ))
     }
 
     pub fn validate(&self) -> Result<(), HolonicComplexError> {
@@ -219,10 +220,12 @@ impl ReceiverHolonicComplexStanding {
         name: String,
     ) -> Result<HolonicQuotientId, HolonicComplexError> {
         if target_grain <= source_apex.grain {
-            return Err(HolonicComplexError::NoncoarseningQuotient {
-                source_grain: source_apex.grain,
-                target_grain,
-            });
+            return Err(HolonicComplexError::Law(
+                HolonicComplexRefusal::NoncoarseningQuotient {
+                    source_grain: source_apex.grain,
+                    target_grain,
+                },
+            ));
         }
         let source_closed_hull = self
             .grain(source_apex.grain)?
@@ -345,7 +348,9 @@ impl ExactEventLaw for ReceiverHolonicComplexLaw {
         let phase_radiation = phase_successor
             .radiation
             .first()
-            .ok_or(HolonicComplexError::MissingPhaseRadiation)?
+            .ok_or(HolonicComplexError::Law(
+                HolonicComplexRefusal::MissingPhaseRadiation,
+            ))?
             .clone();
         standing_after.phase_atlas = phase_successor.standing_after;
 
@@ -456,12 +461,16 @@ fn lift_phase_connections(
             .phase_germ_cells
             .get(&connection.source)
             .copied()
-            .ok_or(HolonicComplexError::MissingPhaseGermCell(connection.source))?;
+            .ok_or(HolonicComplexError::Law(
+                HolonicComplexRefusal::MissingPhaseGermCell(connection.source),
+            ))?;
         let target = standing
             .phase_germ_cells
             .get(&connection.target)
             .copied()
-            .ok_or(HolonicComplexError::MissingPhaseGermCell(connection.target))?;
+            .ok_or(HolonicComplexError::Law(
+                HolonicComplexRefusal::MissingPhaseGermCell(connection.target),
+            ))?;
         if source.grain != grain_id || target.grain != grain_id {
             return Err(HolonicComplexError::MalformedStanding);
         }
@@ -471,7 +480,9 @@ fn lift_phase_connections(
         let grain = standing
             .grains
             .get_mut(&grain_id)
-            .ok_or(HolonicComplexError::MissingGrain(grain_id))?;
+            .ok_or(HolonicComplexError::Law(
+                HolonicComplexRefusal::MissingGrain(grain_id),
+            ))?;
         let cell = grain.incidence.found_cell(
             format!("phase-transport-{}", connection.id.0),
             BTreeSet::from([event]),
@@ -516,7 +527,9 @@ fn lift_phase_cycles(
                 .phase_connection_cells
                 .get(&connection)
                 .copied()
-                .ok_or(HolonicComplexError::MissingPhaseConnectionCell(connection))?;
+                .ok_or(HolonicComplexError::Law(
+                    HolonicComplexRefusal::MissingPhaseConnectionCell(connection),
+                ))?;
             if address.grain != grain_id {
                 return Err(HolonicComplexError::MalformedStanding);
             }
@@ -525,7 +538,9 @@ fn lift_phase_cycles(
         let grain = standing
             .grains
             .get_mut(&grain_id)
-            .ok_or(HolonicComplexError::MissingGrain(grain_id))?;
+            .ok_or(HolonicComplexError::Law(
+                HolonicComplexRefusal::MissingGrain(grain_id),
+            ))?;
         let cell = grain.incidence.found_cell(
             format!("phase-closure-{}", cycle.id.0),
             BTreeSet::from([event]),
@@ -552,11 +567,14 @@ fn promote_phase_cycles(
 ) -> Result<Vec<HolonicQuotientId>, HolonicComplexError> {
     let mut caused = Vec::new();
     for cycle in cycles {
-        let source_apex = standing
-            .phase_cycle_cells
-            .get(&cycle)
-            .copied()
-            .ok_or(HolonicComplexError::MissingPhaseCycleCell(cycle))?;
+        let source_apex =
+            standing
+                .phase_cycle_cells
+                .get(&cycle)
+                .copied()
+                .ok_or(HolonicComplexError::Law(
+                    HolonicComplexRefusal::MissingPhaseCycleCell(cycle),
+                ))?;
         let quotient = standing.promote_closed_hull(
             source_apex,
             ReceiverGrainId(
@@ -585,7 +603,9 @@ fn assemble_actual_overlaps(
         let quotient = standing
             .quotients
             .get(quotient_id)
-            .ok_or(HolonicComplexError::MissingQuotient(*quotient_id))?;
+            .ok_or(HolonicComplexError::Law(
+                HolonicComplexRefusal::MissingQuotient(*quotient_id),
+            ))?;
         for lower_cell in &quotient.source_closed_hull {
             memberships
                 .entry(HolonicCellAddress {
@@ -643,7 +663,9 @@ fn causal_layers(
                 .quotients
                 .get(id)
                 .map(|quotient| quotient.target)
-                .ok_or(HolonicComplexError::MissingQuotient(*id))
+                .ok_or(HolonicComplexError::Law(
+                    HolonicComplexRefusal::MissingQuotient(*id),
+                ))
         })
         .collect::<Result<Vec<_>, _>>()?;
     let candidates = [
@@ -952,7 +974,7 @@ fn validate_phase_maps(
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum HolonicComplexError {
+pub enum HolonicComplexRefusal {
     #[error("receiver grain {0:?} is absent")]
     MissingGrain(ReceiverGrainId),
     #[error("phase germ {0:?} has no receiver-complex cell")]
@@ -972,15 +994,20 @@ pub enum HolonicComplexError {
         source_grain: ReceiverGrainId,
         target_grain: ReceiverGrainId,
     },
-    #[error("the receiver holonic complex standing is malformed")]
-    MalformedStanding,
-    #[error("a receiver holonic complex carrier overflowed")]
-    CarrierOverflow,
     #[error(transparent)]
     Algebraic(#[from] CausalAlgebraicError),
     #[error(transparent)]
     Phase(#[from] ReceiverPhaseAtlasError),
 }
+
+impl RefusalKind for HolonicComplexRefusal {
+    const LAW: &'static str = "receiver holonic complex";
+}
+
+/// The receiver holonic complex law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type HolonicComplexError = EventRefusal<HolonicComplexRefusal>;
+
+event_refusal_from!(HolonicComplexRefusal: CausalAlgebraicError, ReceiverPhaseAtlasError);
 
 #[cfg(test)]
 mod tests {

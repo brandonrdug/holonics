@@ -823,7 +823,7 @@ fn enact_wave_current(
     fs::write(output.join("interface_scattering.tsv"), interface_trace)?;
     Ok(WaveSummary {
         ticks: standing.tick,
-        final_energy: standing.energy,
+        final_energy: standing.energy.clone(),
         peak_sections,
         peak_contacts,
     })

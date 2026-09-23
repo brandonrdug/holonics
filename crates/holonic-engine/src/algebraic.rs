@@ -18,6 +18,7 @@
 use std::cmp::min;
 use std::collections::{BTreeMap, BTreeSet};
 
+use crate::world::{EventRefusal, RefusalKind, event_refusal_from};
 use num_bigint::{BigInt, BigUint, Sign};
 use num_traits::{One, Zero};
 use relational_geometry::{Rat, ReceiverId};
@@ -85,7 +86,9 @@ impl ComparativeMultiplicity {
         match hand {
             1 => Ok(Self::positive(count)),
             -1 => Ok(Self::negative(count)),
-            _ => Err(CausalAlgebraicError::InvalidOrientationHand(hand)),
+            _ => Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::InvalidOrientationHand(hand),
+            )),
         }
     }
 
@@ -256,7 +259,9 @@ impl CausalChain {
     pub fn validate(&self) -> Result<(), CausalAlgebraicError> {
         for coefficient in self.coefficients.values() {
             if coefficient.is_zero() {
-                return Err(CausalAlgebraicError::StoredZeroCoefficient);
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::StoredZeroCoefficient,
+                ));
             }
         }
         Ok(())
@@ -298,9 +303,9 @@ impl GradedCausalComplex {
     }
 
     pub fn cell(&self, id: CausalCellId) -> Result<&CausalCell, CausalAlgebraicError> {
-        self.cells
-            .get(&id)
-            .ok_or(CausalAlgebraicError::MissingCausalCell(id))
+        self.cells.get(&id).ok_or(CausalAlgebraicError::Law(
+            CausalAlgebraicRefusal::MissingCausalCell(id),
+        ))
     }
 
     pub fn dimension(&self) -> Option<u32> {
@@ -323,25 +328,33 @@ impl GradedCausalComplex {
         boundary: CausalChain,
     ) -> Result<CausalCellId, CausalAlgebraicError> {
         if source_events.is_empty() {
-            return Err(CausalAlgebraicError::UncausedCell);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::UncausedCell,
+            ));
         }
         boundary.validate()?;
         if grade == 0 && !boundary.is_zero() {
-            return Err(CausalAlgebraicError::VertexHasBoundary);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::VertexHasBoundary,
+            ));
         }
         for boundary_cell in boundary.support() {
             let cell = self.cell(boundary_cell)?;
             if cell.grade.checked_add(1) != Some(grade) {
-                return Err(CausalAlgebraicError::BoundaryGrade {
-                    cell: boundary_cell,
-                    boundary_grade: cell.grade,
-                    carrier_grade: grade,
-                });
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::BoundaryGrade {
+                        cell: boundary_cell,
+                        boundary_grade: cell.grade,
+                        carrier_grade: grade,
+                    },
+                ));
             }
         }
         let squared = self.boundary_of_chain(&boundary)?;
         if !squared.difference_is_zero() {
-            return Err(CausalAlgebraicError::BoundarySquaredNonzero(squared));
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::BoundarySquaredNonzero(squared),
+            ));
         }
 
         let id = CausalCellId(self.next_cell);
@@ -384,7 +397,11 @@ impl GradedCausalComplex {
             match grade {
                 None => grade = Some(candidate),
                 Some(existing) if existing == candidate => {}
-                Some(_) => return Err(CausalAlgebraicError::MixedChainGrades),
+                Some(_) => {
+                    return Err(CausalAlgebraicError::Law(
+                        CausalAlgebraicRefusal::MixedChainGrades,
+                    ));
+                }
             }
         }
         Ok(grade)
@@ -422,31 +439,41 @@ impl GradedCausalComplex {
     pub fn validate(&self) -> Result<(), CausalAlgebraicError> {
         for (id, cell) in &self.cells {
             if *id != cell.id {
-                return Err(CausalAlgebraicError::CausalCellIdentityMismatch {
-                    key: *id,
-                    body: cell.id,
-                });
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::CausalCellIdentityMismatch {
+                        key: *id,
+                        body: cell.id,
+                    },
+                ));
             }
             if cell.source_events.is_empty() {
-                return Err(CausalAlgebraicError::UncausedCell);
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::UncausedCell,
+                ));
             }
             cell.boundary.validate()?;
             if cell.grade == 0 && !cell.boundary.is_zero() {
-                return Err(CausalAlgebraicError::VertexHasBoundary);
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::VertexHasBoundary,
+                ));
             }
             for boundary_cell in cell.boundary.support() {
                 let boundary = self.cell(boundary_cell)?;
                 if boundary.grade.checked_add(1) != Some(cell.grade) {
-                    return Err(CausalAlgebraicError::BoundaryGrade {
-                        cell: boundary_cell,
-                        boundary_grade: boundary.grade,
-                        carrier_grade: cell.grade,
-                    });
+                    return Err(CausalAlgebraicError::Law(
+                        CausalAlgebraicRefusal::BoundaryGrade {
+                            cell: boundary_cell,
+                            boundary_grade: boundary.grade,
+                            carrier_grade: cell.grade,
+                        },
+                    ));
                 }
             }
             let squared = self.boundary_of_chain(&cell.boundary)?;
             if !squared.difference_is_zero() {
-                return Err(CausalAlgebraicError::BoundarySquaredNonzero(squared));
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::BoundarySquaredNonzero(squared),
+                ));
             }
         }
         if self
@@ -455,7 +482,9 @@ impl GradedCausalComplex {
             .next_back()
             .is_some_and(|id| id.0 >= self.next_cell)
         {
-            return Err(CausalAlgebraicError::InvalidNextCellIdentity);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::InvalidNextCellIdentity,
+            ));
         }
         Ok(())
     }
@@ -506,7 +535,9 @@ impl GradedCausalComplex {
         let name = name.into();
         let vertex_names = vertex_names.into_iter().map(Into::into).collect::<Vec<_>>();
         if vertex_names.is_empty() {
-            return Err(CausalAlgebraicError::EmptySimplex);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::EmptySimplex,
+            ));
         }
         let mut candidate = self.clone();
         let receipt = candidate.found_simplex_inner(name, source_event, vertex_names)?;
@@ -551,8 +582,9 @@ impl GradedCausalComplex {
                 let cell = self.found_cell(
                     format!("{name}[{labels}]"),
                     source_events.clone(),
-                    u32::try_from(size - 1)
-                        .map_err(|_| CausalAlgebraicError::ArithmeticOverflow)?,
+                    u32::try_from(size - 1).map_err(|_| {
+                        CausalAlgebraicError::Law(CausalAlgebraicRefusal::ArithmeticOverflow)
+                    })?,
                     boundary,
                 )?;
                 cells_by_vertices.insert(vertices, cell);
@@ -566,8 +598,9 @@ impl GradedCausalComplex {
         Ok(SimplexIncidenceReceipt {
             schema: "holonic-engine.simplex-incidence-receipt.v1".to_owned(),
             name,
-            dimension: u32::try_from(vertex_names.len() - 1)
-                .map_err(|_| CausalAlgebraicError::ArithmeticOverflow)?,
+            dimension: u32::try_from(vertex_names.len() - 1).map_err(|_| {
+                CausalAlgebraicError::Law(CausalAlgebraicRefusal::ArithmeticOverflow)
+            })?,
             vertices,
             cells_by_vertices,
             apex,
@@ -624,35 +657,47 @@ impl SimplicialIncidenceReceipt {
     pub fn realize(source: &SimplicialComplex) -> Result<Self, CausalAlgebraicError> {
         for (id, vertex) in &source.vertices {
             if *id != vertex.id {
-                return Err(CausalAlgebraicError::SimplicialVertexIdentityMismatch);
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::SimplicialVertexIdentityMismatch,
+                ));
             }
         }
         for (id, face) in &source.faces {
             if *id != face.id {
-                return Err(CausalAlgebraicError::SimplicialFaceIdentityMismatch);
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::SimplicialFaceIdentityMismatch,
+                ));
             }
             if face.vertices[0] == face.vertices[1]
                 || face.vertices[1] == face.vertices[2]
                 || face.vertices[2] == face.vertices[0]
             {
-                return Err(CausalAlgebraicError::CollapsedMigratedFace(face.id));
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::CollapsedMigratedFace(face.id),
+                ));
             }
             for vertex in face.vertices {
                 if !source.vertices.contains_key(&vertex) {
-                    return Err(CausalAlgebraicError::MigratedFaceMissingVertex {
-                        face: face.id,
-                        vertex,
-                    });
+                    return Err(CausalAlgebraicError::Law(
+                        CausalAlgebraicRefusal::MigratedFaceMissingVertex {
+                            face: face.id,
+                            vertex,
+                        },
+                    ));
                 }
             }
         }
         for (id, hinge) in &source.hinges {
             if *id != hinge.id {
-                return Err(CausalAlgebraicError::SimplicialHingeIdentityMismatch);
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::SimplicialHingeIdentityMismatch,
+                ));
             }
             let expected = source.edge_cofaces(hinge.edge);
             if expected.as_slice() != hinge.cofaces {
-                return Err(CausalAlgebraicError::InvalidMigratedHinge(hinge.id));
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::InvalidMigratedHinge(hinge.id),
+                ));
             }
         }
 
@@ -805,15 +850,21 @@ impl AlgebraMonomial {
         for (generator, exponent) in &self.exponents {
             let weight = generators
                 .get(generator)
-                .ok_or(CausalAlgebraicError::MissingAlgebraGenerator(*generator))?
+                .ok_or(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::MissingAlgebraGenerator(*generator),
+                ))?
                 .weight;
             degree = degree
                 .checked_add(
                     weight
                         .checked_mul(*exponent)
-                        .ok_or(CausalAlgebraicError::ArithmeticOverflow)?,
+                        .ok_or(CausalAlgebraicError::Law(
+                            CausalAlgebraicRefusal::ArithmeticOverflow,
+                        ))?,
                 )
-                .ok_or(CausalAlgebraicError::ArithmeticOverflow)?;
+                .ok_or(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::ArithmeticOverflow,
+                ))?;
         }
         Ok(degree)
     }
@@ -824,9 +875,9 @@ impl AlgebraMonomial {
     ) -> Result<Rat, CausalAlgebraicError> {
         let mut result = Rat::one();
         for (generator, exponent) in &self.exponents {
-            let value = point
-                .get(generator)
-                .ok_or(CausalAlgebraicError::MissingGeneratorValue(*generator))?;
+            let value = point.get(generator).ok_or(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::MissingGeneratorValue(*generator),
+            ))?;
             for _ in 0..*exponent {
                 result *= value;
             }
@@ -876,7 +927,11 @@ impl HomogeneousPolynomial {
             match degree {
                 None => degree = Some(candidate),
                 Some(existing) if existing == candidate => {}
-                Some(_) => return Err(CausalAlgebraicError::InhomogeneousRelation),
+                Some(_) => {
+                    return Err(CausalAlgebraicError::Law(
+                        CausalAlgebraicRefusal::InhomogeneousRelation,
+                    ));
+                }
             }
         }
         Ok(degree)
@@ -909,13 +964,19 @@ impl HomogeneousPolynomial {
         generators: &BTreeMap<AlgebraGeneratorId, AlgebraGenerator>,
     ) -> Result<u32, CausalAlgebraicError> {
         if self.is_zero() {
-            return Err(CausalAlgebraicError::ZeroAlgebraRelation);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::ZeroAlgebraRelation,
+            ));
         }
         let degree = self
             .homogeneous_degree(generators)?
-            .ok_or(CausalAlgebraicError::ZeroAlgebraRelation)?;
+            .ok_or(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::ZeroAlgebraRelation,
+            ))?;
         if degree == 0 {
-            return Err(CausalAlgebraicError::ConstantAlgebraRelation);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::ConstantAlgebraRelation,
+            ));
         }
         Ok(degree)
     }
@@ -972,10 +1033,14 @@ impl GradedAlgebraPresentation {
         source_events: BTreeSet<EventId>,
     ) -> Result<AlgebraGeneratorId, CausalAlgebraicError> {
         if weight == 0 {
-            return Err(CausalAlgebraicError::ZeroGeneratorWeight);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::ZeroGeneratorWeight,
+            ));
         }
         if source_events.is_empty() {
-            return Err(CausalAlgebraicError::UncausedAlgebraMember);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::UncausedAlgebraMember,
+            ));
         }
         let id = AlgebraGeneratorId(self.next_generator);
         self.next_generator += 1;
@@ -998,7 +1063,9 @@ impl GradedAlgebraPresentation {
         polynomial: HomogeneousPolynomial,
     ) -> Result<AlgebraRelationId, CausalAlgebraicError> {
         if source_events.is_empty() {
-            return Err(CausalAlgebraicError::UncausedAlgebraMember);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::UncausedAlgebraMember,
+            ));
         }
         let degree = polynomial.validate(&self.generators)?;
         let id = AlgebraRelationId(self.next_relation);
@@ -1022,7 +1089,9 @@ impl GradedAlgebraPresentation {
     ) -> Result<BTreeMap<AlgebraRelationId, Rat>, CausalAlgebraicError> {
         for generator in self.generators.keys() {
             if !point.contains_key(generator) {
-                return Err(CausalAlgebraicError::MissingGeneratorValue(*generator));
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::MissingGeneratorValue(*generator),
+                ));
             }
         }
         self.relations
@@ -1087,24 +1156,36 @@ impl GradedAlgebraPresentation {
     pub fn validate(&self) -> Result<(), CausalAlgebraicError> {
         for (id, generator) in &self.generators {
             if *id != generator.id {
-                return Err(CausalAlgebraicError::AlgebraGeneratorIdentityMismatch);
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::AlgebraGeneratorIdentityMismatch,
+                ));
             }
             if generator.weight == 0 {
-                return Err(CausalAlgebraicError::ZeroGeneratorWeight);
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::ZeroGeneratorWeight,
+                ));
             }
             if generator.source_events.is_empty() {
-                return Err(CausalAlgebraicError::UncausedAlgebraMember);
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::UncausedAlgebraMember,
+                ));
             }
         }
         for (id, relation) in &self.relations {
             if *id != relation.id {
-                return Err(CausalAlgebraicError::AlgebraRelationIdentityMismatch);
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::AlgebraRelationIdentityMismatch,
+                ));
             }
             if relation.source_events.is_empty() {
-                return Err(CausalAlgebraicError::UncausedAlgebraMember);
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::UncausedAlgebraMember,
+                ));
             }
             if relation.polynomial.validate(&self.generators)? != relation.degree {
-                return Err(CausalAlgebraicError::RelationDegreeMismatch);
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::RelationDegreeMismatch,
+                ));
             }
         }
         if self
@@ -1118,7 +1199,9 @@ impl GradedAlgebraPresentation {
                 .next_back()
                 .is_some_and(|id| id.0 >= self.next_relation)
         {
-            return Err(CausalAlgebraicError::InvalidNextAlgebraIdentity);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::InvalidNextAlgebraIdentity,
+            ));
         }
         Ok(())
     }
@@ -1231,7 +1314,9 @@ impl ConicAlgebraReceipt {
         for (monomial, coefficient) in monomials.into_iter().zip(coefficients) {
             let cleared = coefficient * Rat::from_integer(clearing_factor.clone());
             if !cleared.denom().is_one() {
-                return Err(CausalAlgebraicError::FailedToClearDenominators);
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::FailedToClearDenominators,
+                ));
             }
             polynomial.add_term(
                 monomial,
@@ -1363,19 +1448,21 @@ impl CausalAlgebraicPresentation {
     ) -> Result<&LocalCoordinateAlgebra, CausalAlgebraicError> {
         self.local_algebras
             .get(&id)
-            .ok_or(CausalAlgebraicError::MissingLocalAlgebra(id))
+            .ok_or(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::MissingLocalAlgebra(id),
+            ))
     }
 
     pub fn region(&self, id: CausalRegionId) -> Result<&CausalRegion, CausalAlgebraicError> {
-        self.regions
-            .get(&id)
-            .ok_or(CausalAlgebraicError::MissingCausalRegion(id))
+        self.regions.get(&id).ok_or(CausalAlgebraicError::Law(
+            CausalAlgebraicRefusal::MissingCausalRegion(id),
+        ))
     }
 
     pub fn end(&self, id: CausalEndId) -> Result<&CausalEnd, CausalAlgebraicError> {
-        self.ends
-            .get(&id)
-            .ok_or(CausalAlgebraicError::MissingCausalEnd(id))
+        self.ends.get(&id).ok_or(CausalAlgebraicError::Law(
+            CausalAlgebraicRefusal::MissingCausalEnd(id),
+        ))
     }
 
     pub fn add_local_algebra(
@@ -1416,10 +1503,14 @@ impl CausalAlgebraicPresentation {
     ) -> Result<CausalRegionId, CausalAlgebraicError> {
         self.require_event(source_event)?;
         if support.is_empty() {
-            return Err(CausalAlgebraicError::EmptyCausalRegion);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::EmptyCausalRegion,
+            ));
         }
         if !self.incidence.is_closed_support(&support)? {
-            return Err(CausalAlgebraicError::RegionSupportNotClosed);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::RegionSupportNotClosed,
+            ));
         }
         for algebra in &local_algebras {
             self.local_algebra(*algebra)?;
@@ -1451,7 +1542,9 @@ impl CausalAlgebraicPresentation {
         section.validate()?;
         let region_body = self.region(region)?;
         if !section.support().is_subset(&region_body.support) {
-            return Err(CausalAlgebraicError::SectionOutsideRegion);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::SectionOutsideRegion,
+            ));
         }
         self.incidence.homogeneous_grade(&section)?;
         let id = CausalEndId(self.next_end);
@@ -1480,19 +1573,27 @@ impl CausalAlgebraicPresentation {
         let incoming = self.end(query.incoming)?;
         let outgoing = self.end(query.outgoing)?;
         if incoming.region != query.region || outgoing.region != query.region {
-            return Err(CausalAlgebraicError::EndRegionMismatch);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::EndRegionMismatch,
+            ));
         }
         if incoming.hand != CausalEndHand::Incoming || outgoing.hand != CausalEndHand::Outgoing {
-            return Err(CausalAlgebraicError::OpposedEndHandMismatch);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::OpposedEndHandMismatch,
+            ));
         }
         if !query.boundary.support().is_subset(&region.support) {
-            return Err(CausalAlgebraicError::SectionOutsideRegion);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::SectionOutsideRegion,
+            ));
         }
         let boundary_grade = self.incidence.homogeneous_grade(&query.boundary)?;
         let incoming_grade = self.incidence.homogeneous_grade(&incoming.section)?;
         let outgoing_grade = self.incidence.homogeneous_grade(&outgoing.section)?;
         if boundary_grade != incoming_grade || boundary_grade != outgoing_grade {
-            return Err(CausalAlgebraicError::RelativeBoundaryGradeMismatch);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::RelativeBoundaryGradeMismatch,
+            ));
         }
         let residual = query
             .boundary
@@ -1518,7 +1619,9 @@ impl CausalAlgebraicPresentation {
         }
         for (id, algebra) in &self.local_algebras {
             if *id != algebra.id {
-                return Err(CausalAlgebraicError::LocalAlgebraIdentityMismatch);
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::LocalAlgebraIdentityMismatch,
+                ));
             }
             self.require_event(algebra.source_event)?;
             algebra.presentation.validate()?;
@@ -1526,14 +1629,20 @@ impl CausalAlgebraicPresentation {
         }
         for (id, region) in &self.regions {
             if *id != region.id {
-                return Err(CausalAlgebraicError::CausalRegionIdentityMismatch);
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::CausalRegionIdentityMismatch,
+                ));
             }
             self.require_event(region.source_event)?;
             if region.support.is_empty() {
-                return Err(CausalAlgebraicError::EmptyCausalRegion);
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::EmptyCausalRegion,
+                ));
             }
             if !self.incidence.is_closed_support(&region.support)? {
-                return Err(CausalAlgebraicError::RegionSupportNotClosed);
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::RegionSupportNotClosed,
+                ));
             }
             for algebra in &region.local_algebras {
                 self.local_algebra(*algebra)?;
@@ -1541,12 +1650,16 @@ impl CausalAlgebraicPresentation {
         }
         for (id, end) in &self.ends {
             if *id != end.id {
-                return Err(CausalAlgebraicError::CausalEndIdentityMismatch);
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::CausalEndIdentityMismatch,
+                ));
             }
             self.require_event(end.source_event)?;
             let region = self.region(end.region)?;
             if !end.section.support().is_subset(&region.support) {
-                return Err(CausalAlgebraicError::SectionOutsideRegion);
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::SectionOutsideRegion,
+                ));
             }
             self.incidence.homogeneous_grade(&end.section)?;
         }
@@ -1566,14 +1679,18 @@ impl CausalAlgebraicPresentation {
                 .next_back()
                 .is_some_and(|id| id.0 >= self.next_end)
         {
-            return Err(CausalAlgebraicError::InvalidNextPresentationIdentity);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::InvalidNextPresentationIdentity,
+            ));
         }
         Ok(())
     }
 
     fn require_event(&self, event: EventId) -> Result<(), CausalAlgebraicError> {
         if !self.evolution.occurrences.contains_key(&event) {
-            return Err(CausalAlgebraicError::MissingSourceOccurrence(event));
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::MissingSourceOccurrence(event),
+            ));
         }
         Ok(())
     }
@@ -1663,14 +1780,15 @@ impl CausalSectionMorphism {
     ) -> Result<CausalChain, CausalAlgebraicError> {
         source.homogeneous_grade(chain)?;
         if !chain.support().is_subset(&self.source_support) {
-            return Err(CausalAlgebraicError::ChainOutsideReceiverSection);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::ChainOutsideReceiverSection,
+            ));
         }
         let mut result = CausalChain::default();
         for (cell, coefficient) in chain.coefficients() {
-            let image = self
-                .images
-                .get(cell)
-                .ok_or(CausalAlgebraicError::MissingMorphismImage(*cell))?;
+            let image = self.images.get(cell).ok_or(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::MissingMorphismImage(*cell),
+            ))?;
             result = result.plus(&image.scaled(coefficient));
         }
         Ok(result)
@@ -1684,30 +1802,38 @@ impl CausalSectionMorphism {
         source.validate()?;
         target.validate()?;
         if !source.is_closed_support(&self.source_support)? {
-            return Err(CausalAlgebraicError::ReceiverSectionNotClosed);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::ReceiverSectionNotClosed,
+            ));
         }
         if self.images.keys().copied().collect::<BTreeSet<_>>() != self.source_support {
-            return Err(CausalAlgebraicError::MorphismImageDomainMismatch);
+            return Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::MorphismImageDomainMismatch,
+            ));
         }
         for source_cell in &self.source_support {
             let body = source.cell(*source_cell)?;
             let image = &self.images[source_cell];
             let image_grade = target.homogeneous_grade(image)?;
             if !image.is_zero() && image_grade != Some(body.grade) {
-                return Err(CausalAlgebraicError::MorphismGradeMismatch {
-                    source_cell: *source_cell,
-                    source_grade: body.grade,
-                    image_grade,
-                });
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::MorphismGradeMismatch {
+                        source_cell: *source_cell,
+                        source_grade: body.grade,
+                        image_grade,
+                    },
+                ));
             }
             let boundary_of_image = target.boundary_of_chain(image)?;
             let image_of_boundary = self.map_chain(source, &body.boundary)?;
             if boundary_of_image != image_of_boundary {
-                return Err(CausalAlgebraicError::MorphismBoundaryMismatch {
-                    source_cell: *source_cell,
-                    boundary_of_image,
-                    image_of_boundary,
-                });
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::MorphismBoundaryMismatch {
+                        source_cell: *source_cell,
+                        boundary_of_image,
+                        image_of_boundary,
+                    },
+                ));
             }
         }
         Ok(())
@@ -1817,15 +1943,21 @@ impl SimplicialConicAlgebraicReceipt {
         conics.validate_sources(&evolution)?;
         for conic in conics.cells.keys() {
             if !bindings.contains_key(conic) {
-                return Err(CausalAlgebraicError::MissingConicFaceBinding(*conic));
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::MissingConicFaceBinding(*conic),
+                ));
             }
         }
         for (conic, face) in bindings {
             if !conics.cells.contains_key(conic) {
-                return Err(CausalAlgebraicError::UnknownBoundConic(*conic));
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::UnknownBoundConic(*conic),
+                ));
             }
             if !simplicial.faces.contains_key(face) {
-                return Err(CausalAlgebraicError::UnknownBoundFace(*face));
+                return Err(CausalAlgebraicError::Law(
+                    CausalAlgebraicRefusal::UnknownBoundFace(*face),
+                ));
             }
         }
 
@@ -2003,7 +2135,7 @@ impl ExactEventLaw for CausalAlgebraicLaw {
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum CausalAlgebraicError {
+pub enum CausalAlgebraicRefusal {
     #[error("orientation hand must be +1 or -1, received {0}")]
     InvalidOrientationHand(i8),
     #[error("a zero chain coefficient was stored explicitly")]
@@ -2137,6 +2269,15 @@ pub enum CausalAlgebraicError {
     Conic(#[from] ConicError),
 }
 
+impl RefusalKind for CausalAlgebraicRefusal {
+    const LAW: &'static str = "algebraic";
+}
+
+/// The algebraic law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type CausalAlgebraicError = EventRefusal<CausalAlgebraicRefusal>;
+
+event_refusal_from!(CausalAlgebraicRefusal: EvolutionError, ConicError);
+
 #[cfg(test)]
 mod tests {
     use relational_geometry::{FrameId, RatVec3};
@@ -2246,7 +2387,9 @@ mod tests {
                     ),
                 )]),
             ),
-            Err(CausalAlgebraicError::ReceiverSectionNotClosed)
+            Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::ReceiverSectionNotClosed
+            ))
         );
     }
 
@@ -2498,7 +2641,9 @@ mod tests {
         });
         assert!(matches!(
             result,
-            Err(CausalAlgebraicError::BoundarySquaredNonzero(_))
+            Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::BoundarySquaredNonzero(_)
+            ))
         ));
         assert_eq!(world.standing(), &before);
     }
@@ -2538,7 +2683,9 @@ mod tests {
                 &conics,
                 &BTreeMap::new(),
             ),
-            Err(CausalAlgebraicError::MissingConicFaceBinding(conic))
+            Err(CausalAlgebraicError::Law(
+                CausalAlgebraicRefusal::MissingConicFaceBinding(conic)
+            ))
         );
         let receipt = SimplicialConicAlgebraicReceipt::realize(
             evolution,

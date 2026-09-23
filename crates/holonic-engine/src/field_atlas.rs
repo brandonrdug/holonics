@@ -24,6 +24,10 @@ use relational_geometry::{Rat, RatVec3, ReceiverId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::world::{
+    EventQuotient, EventRefusal, EventStanding, RefusalKind, event_refusal_from,
+    event_standing_wire,
+};
 use crate::{
     CausalDiagram, DiagramError, EventId, EventSuccessor, ExactAffineVersionFiber, ExactEventLaw,
     ExactQuadric3, ExactRaster, ExactTorus, ImageExtent, ImplicitCellId, ImplicitError,
@@ -101,10 +105,10 @@ pub struct FieldChart {
 impl FieldChart {
     pub fn new(axes: Vec<FieldChartAxis>) -> Result<Self, FieldAtlasError> {
         if axes.is_empty() {
-            return Err(FieldAtlasError::EmptyChart);
+            return Err(FieldAtlasError::Law(FieldAtlasRefusal::EmptyChart));
         }
         if axes.iter().copied().collect::<BTreeSet<_>>().len() != axes.len() {
-            return Err(FieldAtlasError::RepeatedChartAxis);
+            return Err(FieldAtlasError::Law(FieldAtlasRefusal::RepeatedChartAxis));
         }
         Ok(Self { axes })
     }
@@ -226,10 +230,12 @@ pub struct ExactAffinePhaseLaw {
 impl ExactAffinePhaseLaw {
     pub fn new(chart: FieldChart, coefficients: Vec<Rat>) -> Result<Self, FieldAtlasError> {
         if coefficients.len() != chart.affine_coefficient_count() {
-            return Err(FieldAtlasError::PhaseLawCoefficientPopulation {
-                required: chart.affine_coefficient_count(),
-                supplied: coefficients.len(),
-            });
+            return Err(FieldAtlasError::Law(
+                FieldAtlasRefusal::PhaseLawCoefficientPopulation {
+                    required: chart.affine_coefficient_count(),
+                    supplied: coefficients.len(),
+                },
+            ));
         }
         Ok(Self {
             chart,
@@ -503,18 +509,12 @@ pub struct FieldOverlap {
     pub outcome: FieldOverlapOutcome,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct CausalFieldStanding {
-    pub schema: String,
-    pub used_events: BTreeSet<EventId>,
+/// [definition] **The causal-field quotient** (plan phase 16): the germs, regions, charts, observations, arrows, overlaps and images.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CausalFieldQuotient {
     pub last_chronology: Option<u64>,
     pub germs: BTreeMap<FieldGermId, CausalFieldGerm>,
-    /// Every contemporary alternative per local region. Departed predecessors
-    /// remain in `germs` as causal history, not current support.
     pub active_regions: BTreeMap<FieldRegionId, BTreeSet<FieldGermId>>,
-    /// The caller's declared chart per region. An absent region is read in the
-    /// ambient chart.
-    #[serde(default)]
     pub region_charts: BTreeMap<FieldRegionId, FieldChart>,
     pub observations: BTreeMap<FieldObservationId, FieldObservation>,
     pub arrows: BTreeMap<FieldArrowId, FieldCausalArrow>,
@@ -530,28 +530,143 @@ pub struct CausalFieldStanding {
     next_implicit: u64,
 }
 
+/// The standing: the shared event scaffold around [`CausalFieldQuotient`].
+pub type CausalFieldStanding = EventStanding<CausalFieldQuotient>;
+
+impl EventQuotient for CausalFieldQuotient {
+    type Refusal = FieldAtlasRefusal;
+}
+
+#[derive(Serialize)]
+#[serde(rename = "CausalFieldStanding")]
+struct CausalFieldStandingWrite<'a> {
+    schema: &'a String,
+    used_events: &'a BTreeSet<EventId>,
+    last_chronology: &'a Option<u64>,
+    germs: &'a BTreeMap<FieldGermId, CausalFieldGerm>,
+    active_regions: &'a BTreeMap<FieldRegionId, BTreeSet<FieldGermId>>,
+    #[serde(default)]
+    region_charts: &'a BTreeMap<FieldRegionId, FieldChart>,
+    observations: &'a BTreeMap<FieldObservationId, FieldObservation>,
+    arrows: &'a BTreeMap<FieldArrowId, FieldCausalArrow>,
+    overlaps: &'a BTreeMap<FieldOverlapId, FieldOverlap>,
+    images: &'a BTreeMap<ImageSectionId, ReceiverImageSection>,
+    image_differences: &'a Vec<ReceiverImageDifference>,
+    latest_images: &'a BTreeMap<ReceiverId, ImageSectionId>,
+    next_germ: &'a u64,
+    next_observation: &'a u64,
+    next_arrow: &'a u64,
+    next_overlap: &'a u64,
+    next_image: &'a u64,
+    next_implicit: &'a u64,
+}
+
+impl<'a> From<&'a CausalFieldStanding> for CausalFieldStandingWrite<'a> {
+    fn from(standing: &'a CausalFieldStanding) -> Self {
+        Self {
+            schema: &standing.schema,
+            used_events: &standing.used_events,
+            last_chronology: &standing.last_chronology,
+            germs: &standing.germs,
+            active_regions: &standing.active_regions,
+            region_charts: &standing.region_charts,
+            observations: &standing.observations,
+            arrows: &standing.arrows,
+            overlaps: &standing.overlaps,
+            images: &standing.images,
+            image_differences: &standing.image_differences,
+            latest_images: &standing.latest_images,
+            next_germ: &standing.next_germ,
+            next_observation: &standing.next_observation,
+            next_arrow: &standing.next_arrow,
+            next_overlap: &standing.next_overlap,
+            next_image: &standing.next_image,
+            next_implicit: &standing.next_implicit,
+        }
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(rename = "CausalFieldStanding")]
+struct CausalFieldStandingRead {
+    schema: String,
+    used_events: BTreeSet<EventId>,
+    last_chronology: Option<u64>,
+    germs: BTreeMap<FieldGermId, CausalFieldGerm>,
+    active_regions: BTreeMap<FieldRegionId, BTreeSet<FieldGermId>>,
+    #[serde(default)]
+    region_charts: BTreeMap<FieldRegionId, FieldChart>,
+    observations: BTreeMap<FieldObservationId, FieldObservation>,
+    arrows: BTreeMap<FieldArrowId, FieldCausalArrow>,
+    overlaps: BTreeMap<FieldOverlapId, FieldOverlap>,
+    images: BTreeMap<ImageSectionId, ReceiverImageSection>,
+    image_differences: Vec<ReceiverImageDifference>,
+    latest_images: BTreeMap<ReceiverId, ImageSectionId>,
+    next_germ: u64,
+    next_observation: u64,
+    next_arrow: u64,
+    next_overlap: u64,
+    next_image: u64,
+    next_implicit: u64,
+}
+
+impl From<CausalFieldStandingRead> for CausalFieldStanding {
+    fn from(read: CausalFieldStandingRead) -> Self {
+        EventStanding::from_parts(
+            read.schema,
+            read.used_events,
+            CausalFieldQuotient {
+                last_chronology: read.last_chronology,
+                germs: read.germs,
+                active_regions: read.active_regions,
+                region_charts: read.region_charts,
+                observations: read.observations,
+                arrows: read.arrows,
+                overlaps: read.overlaps,
+                images: read.images,
+                image_differences: read.image_differences,
+                latest_images: read.latest_images,
+                next_germ: read.next_germ,
+                next_observation: read.next_observation,
+                next_arrow: read.next_arrow,
+                next_overlap: read.next_overlap,
+                next_image: read.next_image,
+                next_implicit: read.next_implicit,
+            },
+        )
+    }
+}
+
+event_standing_wire!(
+    CausalFieldQuotient,
+    CausalFieldStandingWrite,
+    CausalFieldStandingRead
+);
+
 impl Default for CausalFieldStanding {
     fn default() -> Self {
-        Self {
-            schema: "holonic-engine.causal-field-standing.v1".to_owned(),
-            used_events: BTreeSet::new(),
-            last_chronology: None,
-            germs: BTreeMap::new(),
-            active_regions: BTreeMap::new(),
-            region_charts: BTreeMap::new(),
-            observations: BTreeMap::new(),
-            arrows: BTreeMap::new(),
-            overlaps: BTreeMap::new(),
-            images: BTreeMap::new(),
-            image_differences: Vec::new(),
-            latest_images: BTreeMap::new(),
-            next_germ: 1,
-            next_observation: 1,
-            next_arrow: 1,
-            next_overlap: 1,
-            next_image: 1,
-            next_implicit: 1,
-        }
+        EventStanding::from_parts(
+            "holonic-engine.causal-field-standing.v1".to_owned(),
+            BTreeSet::new(),
+            CausalFieldQuotient {
+                last_chronology: None,
+                germs: BTreeMap::new(),
+                active_regions: BTreeMap::new(),
+                region_charts: BTreeMap::new(),
+                observations: BTreeMap::new(),
+                arrows: BTreeMap::new(),
+                overlaps: BTreeMap::new(),
+                images: BTreeMap::new(),
+                image_differences: Vec::new(),
+                latest_images: BTreeMap::new(),
+                next_germ: 1,
+                next_observation: 1,
+                next_arrow: 1,
+                next_overlap: 1,
+                next_image: 1,
+                next_implicit: 1,
+            },
+        )
     }
 }
 
@@ -567,7 +682,9 @@ impl CausalFieldStanding {
         chart: FieldChart,
     ) -> Result<(), FieldAtlasError> {
         if self.germs.values().any(|germ| germ.region == region) {
-            return Err(FieldAtlasError::RegionChartAfterFounding(region));
+            return Err(FieldAtlasError::Law(
+                FieldAtlasRefusal::RegionChartAfterFounding(region),
+            ));
         }
         self.region_charts.insert(region, chart);
         Ok(())
@@ -603,7 +720,7 @@ impl CausalFieldStanding {
         future: bool,
     ) -> Result<BTreeSet<FieldGermId>, FieldAtlasError> {
         if !self.germs.contains_key(&root) {
-            return Err(FieldAtlasError::UnknownGerm(root));
+            return Err(FieldAtlasError::Law(FieldAtlasRefusal::UnknownGerm(root)));
         }
         let mut result = BTreeSet::from([root]);
         let mut frontier = VecDeque::from([root]);
@@ -625,7 +742,10 @@ impl CausalFieldStanding {
         }
         Ok(result)
     }
+}
 
+/// Identity allocation acts on the quotient's counters.
+impl CausalFieldQuotient {
     fn allocate_germ(&mut self) -> Result<FieldGermId, FieldAtlasError> {
         let id = FieldGermId(self.next_germ);
         self.next_germ = self
@@ -859,18 +979,18 @@ fn validate_event(
 ) -> Result<(), FieldAtlasError> {
     if event.images.is_empty() && event.oriented_samples.is_empty() && event.source_tori.is_empty()
     {
-        return Err(FieldAtlasError::EmptyEvent);
+        return Err(FieldAtlasError::Law(FieldAtlasRefusal::EmptyEvent));
     }
-    if standing.used_events.contains(&event.event) {
-        return Err(FieldAtlasError::RepeatedEvent(event.event));
-    }
+    standing.refuse_repeated(event.event)?;
     if let Some(previous) = standing.last_chronology
         && event.chronology <= previous
     {
-        return Err(FieldAtlasError::NoncausalChronology {
-            previous,
-            supplied: event.chronology,
-        });
+        return Err(FieldAtlasError::Law(
+            FieldAtlasRefusal::NoncausalChronology {
+                previous,
+                supplied: event.chronology,
+            },
+        ));
     }
     let image_receivers = event
         .images
@@ -878,17 +998,19 @@ fn validate_event(
         .map(|image| image.receiver)
         .collect::<BTreeSet<_>>();
     if image_receivers.len() != event.images.len() {
-        return Err(FieldAtlasError::DuplicateImageReceiver);
+        return Err(FieldAtlasError::Law(
+            FieldAtlasRefusal::DuplicateImageReceiver,
+        ));
     }
     for image in &event.images {
         image.rays.validate()?;
     }
     for sample in &event.oriented_samples {
         if sample.regions.is_empty() {
-            return Err(FieldAtlasError::EmptySampleRegion);
+            return Err(FieldAtlasError::Law(FieldAtlasRefusal::EmptySampleRegion));
         }
         if sample.normal == RatVec3::zero() {
-            return Err(FieldAtlasError::ZeroSampleNormal);
+            return Err(FieldAtlasError::Law(FieldAtlasRefusal::ZeroSampleNormal));
         }
     }
     Ok(())
@@ -899,6 +1021,7 @@ fn admit_image(
     event: &CausalFieldEvent,
     occurrence: &ReceiverImageOccurrence,
 ) -> Result<ReceiverImageSection, FieldAtlasError> {
+    let standing: &mut CausalFieldQuotient = standing;
     let id = standing.allocate_image()?;
     let section = ReceiverImageSection {
         id,
@@ -938,11 +1061,15 @@ fn compare_images(
                 let before = previous
                     .raster
                     .sample(column, row)
-                    .ok_or(FieldAtlasError::MalformedImageSection)?;
+                    .ok_or(FieldAtlasError::Law(
+                        FieldAtlasRefusal::MalformedImageSection,
+                    ))?;
                 let after = current
                     .raster
                     .sample(column, row)
-                    .ok_or(FieldAtlasError::MalformedImageSection)?;
+                    .ok_or(FieldAtlasError::Law(
+                        FieldAtlasRefusal::MalformedImageSection,
+                    ))?;
                 let channels = std::array::from_fn(|channel| {
                     i16::from(after.channels()[channel]) - i16::from(before.channels()[channel])
                 });
@@ -973,36 +1100,42 @@ fn admit_source_torus(
     if occurrence.torus.source_event > occurrence.torus.last_event
         || occurrence.torus.last_event > event.event
     {
-        return Err(FieldAtlasError::SourceTorusChronology {
-            source_event: occurrence.torus.source_event,
-            last_event: occurrence.torus.last_event,
-            event: event.event,
-        });
+        return Err(FieldAtlasError::Law(
+            FieldAtlasRefusal::SourceTorusChronology {
+                source_event: occurrence.torus.source_event,
+                last_event: occurrence.torus.last_event,
+                event: event.event,
+            },
+        ));
     }
     if standing
         .germs
         .values()
         .any(|germ| germ.support.implicit_id() == occurrence.torus.id)
     {
-        return Err(FieldAtlasError::DuplicateImplicitIdentity(
-            occurrence.torus.id,
+        return Err(FieldAtlasError::Law(
+            FieldAtlasRefusal::DuplicateImplicitIdentity(occurrence.torus.id),
         ));
     }
     let chart = standing.region_chart(occurrence.region);
     if !chart.is_ambient() {
         // `ExactTorus` carries an ambient center and axis, so a source torus
         // cannot be read in a proper sub-chart of the sample carrier.
-        return Err(FieldAtlasError::SourceTorusOutsideAmbientChart {
-            region: occurrence.region,
-            chart,
-        });
+        return Err(FieldAtlasError::Law(
+            FieldAtlasRefusal::SourceTorusOutsideAmbientChart {
+                region: occurrence.region,
+                chart,
+            },
+        ));
     }
     if let Some(law) = occurrence.phases.values().find(|law| *law.chart() != chart) {
-        return Err(FieldAtlasError::PhaseLawChartMismatch {
-            region: occurrence.region,
-            declared: chart,
-            supplied: law.chart().clone(),
-        });
+        return Err(FieldAtlasError::Law(
+            FieldAtlasRefusal::PhaseLawChartMismatch {
+                region: occurrence.region,
+                declared: chart,
+                supplied: law.chart().clone(),
+            },
+        ));
     }
     let id = standing.allocate_germ()?;
     let mut torus = occurrence.torus.clone();
@@ -1171,18 +1304,24 @@ fn complete_sample_phase(
         .get(&contact.receiver)
         .copied()
         .or_else(|| standing.latest_images.get(&contact.receiver).copied())
-        .ok_or(FieldAtlasError::MissingContactImage(contact.receiver))?;
+        .ok_or(FieldAtlasError::Law(
+            FieldAtlasRefusal::MissingContactImage(contact.receiver),
+        ))?;
     let section = standing
         .images
         .get(&section_id)
         .ok_or(FieldAtlasError::MalformedStanding)?;
-    let sample_rgb = section.raster.sample(contact.column, contact.row).ok_or(
-        FieldAtlasError::ImageContactOutsideAperture {
-            receiver: contact.receiver,
-            column: contact.column,
-            row: contact.row,
-        },
-    )?;
+    let sample_rgb =
+        section
+            .raster
+            .sample(contact.column, contact.row)
+            .ok_or(FieldAtlasError::Law(
+                FieldAtlasRefusal::ImageContactOutsideAperture {
+                    receiver: contact.receiver,
+                    column: contact.column,
+                    row: contact.row,
+                },
+            ))?;
     for (coordinate, value) in sample_rgb.channels().into_iter().enumerate() {
         let channel = FieldPhaseChannel::ReceiverCoordinate {
             receiver: contact.receiver,
@@ -1192,7 +1331,9 @@ fn complete_sample_phase(
         if let Some(existing) = phase.insert(channel, value.clone())
             && existing != value
         {
-            return Err(FieldAtlasError::ConflictingContactPhase(channel));
+            return Err(FieldAtlasError::Law(
+                FieldAtlasRefusal::ConflictingContactPhase(channel),
+            ));
         }
     }
     Ok(phase)
@@ -1226,7 +1367,7 @@ fn new_quadric_germ(
         phases: BTreeMap::new(),
     };
     let admitted = admit_sample_to_germ(germ, observation, &standing.observations)?
-        .map_err(|_| FieldAtlasError::FreshGermObstructed)?;
+        .map_err(|_| FieldAtlasError::Law(FieldAtlasRefusal::FreshGermObstructed))?;
     standing.germs.insert(id, admitted);
     Ok(id)
 }
@@ -1277,7 +1418,7 @@ fn emanate_germ(
             .collect(),
     };
     let admitted = admit_sample_to_germ(germ, observation, &standing.observations)?
-        .map_err(|_| FieldAtlasError::FreshGermObstructed)?;
+        .map_err(|_| FieldAtlasError::Law(FieldAtlasRefusal::FreshGermObstructed))?;
     standing.germs.insert(id, admitted);
     Ok(id)
 }
@@ -1403,7 +1544,9 @@ fn admit_sample_to_germ(
             Ok(_) => {
                 phase.law = resolve_phase_law(&chart, &phase.fiber)?;
             }
-            Err(InverseTransportError::AffineFiberObstructed) => {
+            Err(InverseTransportError::Law(
+                crate::InverseTransportRefusal::AffineFiberObstructed,
+            )) => {
                 obstruction.phase_channels.insert(*channel);
             }
             Err(error) => return Err(error.into()),
@@ -1545,9 +1688,11 @@ fn chart_tangent_basis(
     let pivot = coordinates
         .iter()
         .position(|coordinate| !coordinate.is_zero())
-        .ok_or(FieldAtlasError::SampleNormalOutsideChart {
-            chart: chart.clone(),
-        })?;
+        .ok_or(FieldAtlasError::Law(
+            FieldAtlasRefusal::SampleNormalOutsideChart {
+                chart: chart.clone(),
+            },
+        ))?;
     let mut tangents = Vec::new();
     for index in 0..coordinates.len() {
         if index == pivot {
@@ -1589,7 +1734,9 @@ fn lift_quadric_to_ambient(
         let slot = ambient_monomials
             .iter()
             .position(|ambient_monomial| *ambient_monomial == monomial)
-            .ok_or(FieldAtlasError::MalformedQuadricFiber)?;
+            .ok_or(FieldAtlasError::Law(
+                FieldAtlasRefusal::MalformedQuadricFiber,
+            ))?;
         lifted[slot] = coefficient;
     }
     Ok(lifted)
@@ -1612,7 +1759,9 @@ fn resolve_quadric(
         .collect::<BTreeSet<_>>();
     let free = (0..chart.quadric_coefficient_count())
         .find(|coordinate| !pivots.contains(coordinate))
-        .ok_or(FieldAtlasError::MalformedQuadricFiber)?;
+        .ok_or(FieldAtlasError::Law(
+            FieldAtlasRefusal::MalformedQuadricFiber,
+        ))?;
     let mut coefficients = vec![Rat::zero(); chart.quadric_coefficient_count()];
     coefficients[free] = Rat::one();
     for row in fiber.rows() {
@@ -1620,7 +1769,7 @@ fn resolve_quadric(
     }
     let lifted = lift_quadric_to_ambient(chart, coefficients)?
         .try_into()
-        .map_err(|_| FieldAtlasError::MalformedQuadricFiber)?;
+        .map_err(|_| FieldAtlasError::Law(FieldAtlasRefusal::MalformedQuadricFiber))?;
     let mut quadric = ExactQuadric3::new(implicit, source_event, lifted)?;
     quadric.last_event = last_event;
     Ok(Some(quadric))
@@ -1637,7 +1786,7 @@ fn resolve_phase_law(
     fiber: &ExactAffineVersionFiber,
 ) -> Result<Option<ExactAffinePhaseLaw>, FieldAtlasError> {
     if fiber.variable_count() != chart.affine_coefficient_count() {
-        return Err(FieldAtlasError::MalformedPhaseFiber);
+        return Err(FieldAtlasError::Law(FieldAtlasRefusal::MalformedPhaseFiber));
     }
     let Some(solution) = fiber.unique_solution()? else {
         return Ok(None);
@@ -1796,7 +1945,7 @@ pub struct CausalFieldAtlasMount {
 impl CausalFieldAtlasMount {
     pub fn new(page_germs: usize) -> Result<Self, FieldAtlasError> {
         if page_germs == 0 {
-            return Err(FieldAtlasError::ZeroResidentPage);
+            return Err(FieldAtlasError::Law(FieldAtlasRefusal::ZeroResidentPage));
         }
         Ok(Self { page_germs })
     }
@@ -1808,7 +1957,7 @@ impl CausalFieldAtlasMount {
     ) -> Result<FieldReceiverReceipt, FieldAtlasError> {
         validate_standing(standing)?;
         if query.ray.direction == RatVec3::zero() {
-            return Err(FieldAtlasError::ZeroQueryDirection);
+            return Err(FieldAtlasError::Law(FieldAtlasRefusal::ZeroQueryDirection));
         }
         let active = standing.active_germs().into_iter().collect::<Vec<_>>();
         let mut fibers = Vec::new();
@@ -1919,9 +2068,9 @@ pub fn project_germ_phase(
     let mut gradients = std::array::from_fn(|_| RatVec3::zero());
     for coordinate in 0..3 {
         for (channel, weight) in &basis.coordinates[coordinate] {
-            let law = laws
-                .get(channel)
-                .ok_or(FieldAtlasError::OpenPhaseChannel(*channel))?;
+            let law = laws.get(channel).ok_or(FieldAtlasError::Law(
+                FieldAtlasRefusal::OpenPhaseChannel(*channel),
+            ))?;
             values[coordinate] += weight * law.evaluate(point);
             gradients[coordinate] = gradients[coordinate].add(&law.gradient().scale(weight));
         }
@@ -1938,11 +2087,9 @@ fn usize_to_u64(value: usize) -> Result<u64, FieldAtlasError> {
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum FieldAtlasError {
+pub enum FieldAtlasRefusal {
     #[error("a causal-field event must contain at least one occurrence")]
     EmptyEvent,
-    #[error("causal-field event {0:?} has already entered standing")]
-    RepeatedEvent(EventId),
     #[error("causal-field chronology {supplied} does not follow {previous}")]
     NoncausalChronology { previous: u64, supplied: u64 },
     #[error("one event supplied more than one image section for the same receiver")]
@@ -1976,8 +2123,6 @@ pub enum FieldAtlasError {
     },
     #[error("an affine phase law in this chart requires {required} coefficients, not {supplied}")]
     PhaseLawCoefficientPopulation { required: usize, supplied: usize },
-    #[error("the causal-field standing is malformed")]
-    MalformedStanding,
     #[error("an image section is malformed")]
     MalformedImageSection,
     #[error("receiver {0:?} has no image section for the declared sample contact")]
@@ -2014,8 +2159,6 @@ pub enum FieldAtlasError {
     ZeroQueryDirection,
     #[error("phase channel {0:?} remains open at this receiver query")]
     OpenPhaseChannel(FieldPhaseChannel),
-    #[error("an exact field carrier overflowed")]
-    CarrierOverflow,
     #[error(transparent)]
     Diagram(#[from] DiagramError),
     #[error(transparent)]
@@ -2025,6 +2168,15 @@ pub enum FieldAtlasError {
     #[error(transparent)]
     Inverse(#[from] InverseTransportError),
 }
+
+impl RefusalKind for FieldAtlasRefusal {
+    const LAW: &'static str = "causal-field";
+}
+
+/// The causal-field law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type FieldAtlasError = EventRefusal<FieldAtlasRefusal>;
+
+event_refusal_from!(FieldAtlasRefusal: DiagramError, ReceiverError, ImplicitError, InverseTransportError);
 
 #[cfg(test)]
 mod tests {
@@ -2136,11 +2288,11 @@ mod tests {
     fn a_declared_chart_refuses_an_empty_or_repeated_coordinate_list() {
         assert_eq!(
             FieldChart::new(Vec::new()),
-            Err(FieldAtlasError::EmptyChart)
+            Err(FieldAtlasError::Law(FieldAtlasRefusal::EmptyChart))
         );
         assert_eq!(
             FieldChart::new(vec![FieldChartAxis::X, FieldChartAxis::X]),
-            Err(FieldAtlasError::RepeatedChartAxis)
+            Err(FieldAtlasError::Law(FieldAtlasRefusal::RepeatedChartAxis))
         );
     }
 
@@ -2294,7 +2446,9 @@ mod tests {
         refused.oriented_samples = vec![sample(RatVec3::from_i64(0, 0, 1))];
         assert_eq!(
             law.enact(&standing, &refused),
-            Err(FieldAtlasError::SampleNormalOutsideChart { chart })
+            Err(FieldAtlasError::Law(
+                FieldAtlasRefusal::SampleNormalOutsideChart { chart }
+            ))
         );
 
         let mut admitted = empty_event(1, 1);
@@ -2320,7 +2474,9 @@ mod tests {
                 region,
                 FieldChart::new(vec![FieldChartAxis::X, FieldChartAxis::Y]).unwrap()
             ),
-            Err(FieldAtlasError::RegionChartAfterFounding(region))
+            Err(FieldAtlasError::Law(
+                FieldAtlasRefusal::RegionChartAfterFounding(region)
+            ))
         );
         assert!(
             standing
@@ -2346,10 +2502,12 @@ mod tests {
                 plane.clone(),
                 vec![integer(1), integer(2), integer(3), integer(4)]
             ),
-            Err(FieldAtlasError::PhaseLawCoefficientPopulation {
-                required: 3,
-                supplied: 4
-            })
+            Err(FieldAtlasError::Law(
+                FieldAtlasRefusal::PhaseLawCoefficientPopulation {
+                    required: 3,
+                    supplied: 4
+                }
+            ))
         );
 
         // A source torus is an ambient carrier, so a phase law read in a
@@ -2390,11 +2548,13 @@ mod tests {
                     .unwrap()
                 )
             ),
-            Err(FieldAtlasError::PhaseLawChartMismatch {
-                region,
-                declared: FieldChart::ambient(),
-                supplied: plane,
-            })
+            Err(FieldAtlasError::Law(
+                FieldAtlasRefusal::PhaseLawChartMismatch {
+                    region,
+                    declared: FieldChart::ambient(),
+                    supplied: plane,
+                }
+            ))
         );
         assert!(
             law.enact(&standing, &occurrence(phase_law())).is_ok(),
@@ -2427,7 +2587,9 @@ mod tests {
         });
         assert_eq!(
             law.enact(&standing, &event),
-            Err(FieldAtlasError::SourceTorusOutsideAmbientChart { region, chart })
+            Err(FieldAtlasError::Law(
+                FieldAtlasRefusal::SourceTorusOutsideAmbientChart { region, chart }
+            ))
         );
     }
 
@@ -2891,7 +3053,7 @@ mod tests {
         });
         assert_eq!(
             law.enact(&standing, &event),
-            Err(FieldAtlasError::ZeroSampleNormal)
+            Err(FieldAtlasError::Law(FieldAtlasRefusal::ZeroSampleNormal))
         );
         assert_eq!(standing, law.initial_standing());
     }

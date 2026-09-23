@@ -2000,7 +2000,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             });
             let receipt = match received {
                 Ok(receipt) => receipt,
-                Err(error @ LocalStarError::StaleReceiverTraversalChart { .. }) => {
+                Err(
+                    error @ LocalStarError::Law(
+                        holonic_engine::LocalStarRefusal::StaleReceiverTraversalChart { .. },
+                    ),
+                ) => {
                     eprintln!(
                         "input-refused source-receiver={} error={error}",
                         action.source.0

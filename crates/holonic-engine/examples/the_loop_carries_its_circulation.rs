@@ -440,7 +440,7 @@ fn main() {
         "a closed loop is refused as a fixed probe, and the one admitted probe is not closed",
         matches!(
             probe_refusal.as_ref().err(),
-            Some(AnalyticFieldError::NoninvariantCirculationProbe(_))
+            Some(AnalyticFieldError::Law(holonic_engine::AnalyticFieldRefusal::NoninvariantCirculationProbe(_)))
         ) && is_left_fixed
             && matches!(admitted_but_open, Err(KelvinError::LoopNotClosed)),
         format!(

@@ -474,7 +474,9 @@ fn the_refusals() {
     );
     assert!(matches!(
         refused,
-        Err(FieldAtlasError::SampleNormalOutsideChart { .. })
+        Err(FieldAtlasError::Law(
+            holonic_engine::FieldAtlasRefusal::SampleNormalOutsideChart { .. }
+        ))
     ));
     assert!(admitted.is_ok());
 

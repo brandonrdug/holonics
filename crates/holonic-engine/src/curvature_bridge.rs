@@ -1928,7 +1928,12 @@ mod tests {
             response_projecting_to(vector, &rat(9, 4))
         });
         assert!(
-            matches!(refusal, Err(LocalStarError::MissingBoundaryHinge(_))),
+            matches!(
+                refusal,
+                Err(LocalStarError::Law(
+                    crate::LocalStarRefusal::MissingBoundaryHinge(_)
+                ))
+            ),
             "expected a boundary-hinge refusal, got {refusal:?}"
         );
 
@@ -1978,7 +1983,12 @@ mod tests {
             response_projecting_to(vector, &integer(1))
         });
         assert!(
-            matches!(refusal, Err(LocalStarError::MissingBoundaryHinge(_))),
+            matches!(
+                refusal,
+                Err(LocalStarError::Law(
+                    crate::LocalStarRefusal::MissingBoundaryHinge(_)
+                ))
+            ),
             "expected a boundary-hinge refusal, got {refusal:?}"
         );
     }

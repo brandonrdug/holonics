@@ -207,7 +207,13 @@ fn channel_refusal() -> Result<(), Box<dyn Error>> {
             sections: vec![section],
         });
         match returned {
-            Err(error @ ReceiverPhaseAtlasError::ChannelPopulationDisagreement { .. }) => {
+            Err(
+                error @ ReceiverPhaseAtlasError::Law(
+                    holonic_engine::ReceiverPhaseAtlasRefusal::ChannelPopulationDisagreement {
+                        ..
+                    },
+                ),
+            ) => {
                 println!("  {supplied}-channel sample into a 3-channel receiver -> {error}");
             }
             other => return Err(format!("the refusal did not fire: {other:?}").into()),

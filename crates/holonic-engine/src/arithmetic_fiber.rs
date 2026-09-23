@@ -20,6 +20,10 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use crate::world::{
+    EventQuotient, EventRefusal, EventStanding, RefusalKind, event_refusal_from,
+    event_standing_wire,
+};
 use crate::{
     CausalAlgebraicError, CausalCellId, CausalChain, CellularRestriction, ComparativeMultiplicity,
     EventId, EventSuccessor, ExactCellularSheaf, ExactEventLaw, ExactRatMatrix,
@@ -276,10 +280,60 @@ pub struct ArithmeticOccurrence {
     pub support_cell: CausalCellId,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ArithmeticFiberStanding {
-    pub schema: String,
+/// [definition] **The arithmetic-fiber quotient** (plan phase 16): the value, its incidence, cells, occurrences, recognitions and prime-power current.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ArithmeticFiberQuotient {
     pub value: u64,
+    incidence: GradedCausalComplex,
+    prime_cells: BTreeMap<u64, CausalCellId>,
+    squarefree_cells: BTreeMap<Vec<u64>, CausalCellId>,
+    occurrences: BTreeMap<u64, ArithmeticOccurrence>,
+    recognitions: BTreeMap<u64, PrimeRecognitionTrace>,
+    prime_power_current: PrimePowerCurrent,
+}
+
+/// The standing: the shared event scaffold around [`ArithmeticFiberQuotient`].
+pub type ArithmeticFiberStanding = EventStanding<ArithmeticFiberQuotient>;
+
+impl EventQuotient for ArithmeticFiberQuotient {
+    type Refusal = ArithmeticFiberRefusal;
+}
+
+#[derive(Serialize)]
+#[serde(rename = "ArithmeticFiberStanding")]
+struct ArithmeticFiberStandingWrite<'a> {
+    schema: &'a String,
+    value: &'a u64,
+    incidence: &'a GradedCausalComplex,
+    prime_cells: &'a BTreeMap<u64, CausalCellId>,
+    squarefree_cells: &'a BTreeMap<Vec<u64>, CausalCellId>,
+    occurrences: &'a BTreeMap<u64, ArithmeticOccurrence>,
+    recognitions: &'a BTreeMap<u64, PrimeRecognitionTrace>,
+    prime_power_current: &'a PrimePowerCurrent,
+    used_events: &'a BTreeSet<EventId>,
+}
+
+impl<'a> From<&'a ArithmeticFiberStanding> for ArithmeticFiberStandingWrite<'a> {
+    fn from(standing: &'a ArithmeticFiberStanding) -> Self {
+        Self {
+            schema: &standing.schema,
+            value: &standing.value,
+            incidence: &standing.incidence,
+            prime_cells: &standing.prime_cells,
+            squarefree_cells: &standing.squarefree_cells,
+            occurrences: &standing.occurrences,
+            recognitions: &standing.recognitions,
+            prime_power_current: &standing.prime_power_current,
+            used_events: &standing.used_events,
+        }
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(rename = "ArithmeticFiberStanding")]
+struct ArithmeticFiberStandingRead {
+    schema: String,
+    value: u64,
     incidence: GradedCausalComplex,
     prime_cells: BTreeMap<u64, CausalCellId>,
     squarefree_cells: BTreeMap<Vec<u64>, CausalCellId>,
@@ -289,19 +343,45 @@ pub struct ArithmeticFiberStanding {
     used_events: BTreeSet<EventId>,
 }
 
+impl From<ArithmeticFiberStandingRead> for ArithmeticFiberStanding {
+    fn from(read: ArithmeticFiberStandingRead) -> Self {
+        EventStanding::from_parts(
+            read.schema,
+            read.used_events,
+            ArithmeticFiberQuotient {
+                value: read.value,
+                incidence: read.incidence,
+                prime_cells: read.prime_cells,
+                squarefree_cells: read.squarefree_cells,
+                occurrences: read.occurrences,
+                recognitions: read.recognitions,
+                prime_power_current: read.prime_power_current,
+            },
+        )
+    }
+}
+
+event_standing_wire!(
+    ArithmeticFiberQuotient,
+    ArithmeticFiberStandingWrite,
+    ArithmeticFiberStandingRead
+);
+
 impl Default for ArithmeticFiberStanding {
     fn default() -> Self {
-        Self {
-            schema: "holonic-engine.arithmetic-fiber-standing.v2".to_owned(),
-            value: 1,
-            incidence: GradedCausalComplex::default(),
-            prime_cells: BTreeMap::new(),
-            squarefree_cells: BTreeMap::new(),
-            occurrences: BTreeMap::new(),
-            recognitions: BTreeMap::new(),
-            prime_power_current: PrimePowerCurrent::default(),
-            used_events: BTreeSet::new(),
-        }
+        EventStanding::from_parts(
+            "holonic-engine.arithmetic-fiber-standing.v2".to_owned(),
+            BTreeSet::new(),
+            ArithmeticFiberQuotient {
+                value: 1,
+                incidence: GradedCausalComplex::default(),
+                prime_cells: BTreeMap::new(),
+                squarefree_cells: BTreeMap::new(),
+                occurrences: BTreeMap::new(),
+                recognitions: BTreeMap::new(),
+                prime_power_current: PrimePowerCurrent::default(),
+            },
+        )
     }
 }
 
@@ -350,7 +430,9 @@ impl ArithmeticFiberStanding {
     ) -> Result<ExactZetaReceiverMeasure, ArithmeticFiberError> {
         self.validate()?;
         if sigma <= 1 {
-            return Err(ArithmeticFiberError::InvalidZetaSigma(sigma));
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::InvalidZetaSigma(sigma),
+            ));
         }
         let mut valuation_fibers = Vec::with_capacity(selected_primes.len());
         let mut coprime_cell_mass = Rat::one();
@@ -382,7 +464,9 @@ impl ArithmeticFiberStanding {
         self.prime_cells
             .get(&prime)
             .copied()
-            .ok_or(ArithmeticFiberError::UnfoundedPrime(prime))
+            .ok_or(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::UnfoundedPrime(prime),
+            ))
     }
 
     pub fn quadratic_fiber(
@@ -400,10 +484,14 @@ impl ArithmeticFiberStanding {
         right: u64,
     ) -> Result<PairedQuadraticFiber, ArithmeticFiberError> {
         if left == right {
-            return Err(ArithmeticFiberError::RepeatedReciprocityPrime(left));
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::RepeatedReciprocityPrime(left),
+            ));
         }
         if left == 2 || right == 2 {
-            return Err(ArithmeticFiberError::EvenReciprocityPrime);
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::EvenReciprocityPrime,
+            ));
         }
         let (lower, upper) = if left < right {
             (left, right)
@@ -414,10 +502,12 @@ impl ArithmeticFiberStanding {
         let upper_receives_lower = self.quadratic_fiber(upper, BigInt::from(lower))?;
         let observed_hand = lower_receives_upper.character * upper_receives_lower.character;
         if !matches!(observed_hand, -1 | 1) {
-            return Err(ArithmeticFiberError::DegenerateReciprocityFiber {
-                left: lower,
-                right: upper,
-            });
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::DegenerateReciprocityFiber {
+                    left: lower,
+                    right: upper,
+                },
+            ));
         }
         Ok(PairedQuadraticFiber {
             schema: "holonic-engine.paired-quadratic-fiber.v1".to_owned(),
@@ -432,10 +522,14 @@ impl ArithmeticFiberStanding {
     pub fn validate(&self) -> Result<(), ArithmeticFiberError> {
         self.incidence.validate()?;
         if self.schema != "holonic-engine.arithmetic-fiber-standing.v2" {
-            return Err(ArithmeticFiberError::MalformedArithmeticStanding);
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::MalformedArithmeticStanding,
+            ));
         }
         if self.value == 0 {
-            return Err(ArithmeticFiberError::InvalidStandingValue);
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::InvalidStandingValue,
+            ));
         }
         let expected_values = if self.value < 2 {
             BTreeSet::new()
@@ -444,7 +538,9 @@ impl ArithmeticFiberStanding {
         };
         let supplied_values = self.occurrences.keys().copied().collect::<BTreeSet<_>>();
         if expected_values != supplied_values {
-            return Err(ArithmeticFiberError::OccurrenceChronologyMismatch);
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::OccurrenceChronologyMismatch,
+            ));
         }
         let occurrence_events = self
             .occurrences
@@ -454,22 +550,32 @@ impl ArithmeticFiberStanding {
         if occurrence_events.len() != self.occurrences.len()
             || occurrence_events != self.used_events
         {
-            return Err(ArithmeticFiberError::OccurrenceEventMismatch);
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::OccurrenceEventMismatch,
+            ));
         }
         if self.recognitions.keys().copied().collect::<BTreeSet<_>>() != expected_values {
-            return Err(ArithmeticFiberError::RecognitionChronologyMismatch);
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::RecognitionChronologyMismatch,
+            ));
         }
 
         for (prime, cell) in &self.prime_cells {
             if *prime < 2 {
-                return Err(ArithmeticFiberError::InvalidPrimeIdentity(*prime));
+                return Err(ArithmeticFiberError::Law(
+                    ArithmeticFiberRefusal::InvalidPrimeIdentity(*prime),
+                ));
             }
             if self.squarefree_cells.get(&vec![*prime]) != Some(cell) {
-                return Err(ArithmeticFiberError::PrimeCellMismatch(*prime));
+                return Err(ArithmeticFiberError::Law(
+                    ArithmeticFiberRefusal::PrimeCellMismatch(*prime),
+                ));
             }
             let body = self.incidence.cell(*cell)?;
             if body.grade != 0 || !body.boundary.is_zero() {
-                return Err(ArithmeticFiberError::PrimeCellMismatch(*prime));
+                return Err(ArithmeticFiberError::Law(
+                    ArithmeticFiberRefusal::PrimeCellMismatch(*prime),
+                ));
             }
             for earlier in self
                 .prime_cells
@@ -477,7 +583,9 @@ impl ArithmeticFiberStanding {
                 .take_while(|earlier| *earlier < prime)
             {
                 if earlier <= &(prime / earlier) && prime.is_multiple_of(*earlier) {
-                    return Err(ArithmeticFiberError::InvalidPrimeIdentity(*prime));
+                    return Err(ArithmeticFiberError::Law(
+                        ArithmeticFiberRefusal::InvalidPrimeIdentity(*prime),
+                    ));
                 }
             }
         }
@@ -489,24 +597,26 @@ impl ArithmeticFiberStanding {
                     .iter()
                     .any(|prime| !self.prime_cells.contains_key(prime))
             {
-                return Err(ArithmeticFiberError::MalformedSquarefreeSupport(
-                    support.clone(),
+                return Err(ArithmeticFiberError::Law(
+                    ArithmeticFiberRefusal::MalformedSquarefreeSupport(support.clone()),
                 ));
             }
             let grade = u32::try_from(support.len() - 1)
                 .map_err(|_| ArithmeticFiberError::CarrierOverflow)?;
             let body = self.incidence.cell(*cell)?;
             if body.grade != grade {
-                return Err(ArithmeticFiberError::SquarefreeGradeMismatch {
-                    support: support.clone(),
-                    expected: grade,
-                    supplied: body.grade,
-                });
+                return Err(ArithmeticFiberError::Law(
+                    ArithmeticFiberRefusal::SquarefreeGradeMismatch {
+                        support: support.clone(),
+                        expected: grade,
+                        supplied: body.grade,
+                    },
+                ));
             }
             let expected_boundary = squarefree_boundary(support, &self.squarefree_cells)?;
             if body.boundary != expected_boundary {
-                return Err(ArithmeticFiberError::SquarefreeBoundaryMismatch(
-                    support.clone(),
+                return Err(ArithmeticFiberError::Law(
+                    ArithmeticFiberRefusal::SquarefreeBoundaryMismatch(support.clone()),
                 ));
             }
             let squarefree_product = support.iter().try_fold(1_u64, |product, prime| {
@@ -514,16 +624,17 @@ impl ArithmeticFiberStanding {
                     .checked_mul(*prime)
                     .ok_or(ArithmeticFiberError::CarrierOverflow)
             })?;
-            let founding = self
-                .occurrences
-                .get(&squarefree_product)
-                .ok_or_else(|| ArithmeticFiberError::SquarefreeFoundingMismatch(support.clone()))?;
+            let founding = self.occurrences.get(&squarefree_product).ok_or_else(|| {
+                ArithmeticFiberError::Law(ArithmeticFiberRefusal::SquarefreeFoundingMismatch(
+                    support.clone(),
+                ))
+            })?;
             if founding.squarefree_support != *support
                 || founding.support_cell != *cell
                 || body.source_events != BTreeSet::from([founding.event])
             {
-                return Err(ArithmeticFiberError::SquarefreeFoundingMismatch(
-                    support.clone(),
+                return Err(ArithmeticFiberError::Law(
+                    ArithmeticFiberRefusal::SquarefreeFoundingMismatch(support.clone()),
                 ));
             }
         }
@@ -537,7 +648,9 @@ impl ArithmeticFiberStanding {
                     .iter()
                     .any(|valuation| valuation.exponent == 0)
             {
-                return Err(ArithmeticFiberError::MalformedOccurrence(*value));
+                return Err(ArithmeticFiberError::Law(
+                    ArithmeticFiberRefusal::MalformedOccurrence(*value),
+                ));
             }
             let support = occurrence
                 .valuation
@@ -548,12 +661,16 @@ impl ArithmeticFiberStanding {
                 || support.windows(2).any(|pair| pair[0] >= pair[1])
                 || self.squarefree_cells.get(&support) != Some(&occurrence.support_cell)
             {
-                return Err(ArithmeticFiberError::MalformedOccurrence(*value));
+                return Err(ArithmeticFiberError::Law(
+                    ArithmeticFiberRefusal::MalformedOccurrence(*value),
+                ));
             }
             let mut product = 1_u64;
             for valuation in &occurrence.valuation {
                 if !self.prime_cells.contains_key(&valuation.prime) {
-                    return Err(ArithmeticFiberError::MalformedOccurrence(*value));
+                    return Err(ArithmeticFiberError::Law(
+                        ArithmeticFiberRefusal::MalformedOccurrence(*value),
+                    ));
                 }
                 for _ in 0..valuation.exponent {
                     product = product
@@ -562,12 +679,16 @@ impl ArithmeticFiberStanding {
                 }
             }
             if product != *value {
-                return Err(ArithmeticFiberError::MalformedOccurrence(*value));
+                return Err(ArithmeticFiberError::Law(
+                    ArithmeticFiberRefusal::MalformedOccurrence(*value),
+                ));
             }
             let probes = prime_horizon_probes(*value, &self.prime_cells);
             let expected_recognition = derive_prime_recognition(*value, &probes)?;
             if self.recognitions.get(value) != Some(&expected_recognition) {
-                return Err(ArithmeticFiberError::MalformedPrimeRecognition(*value));
+                return Err(ArithmeticFiberError::Law(
+                    ArithmeticFiberRefusal::MalformedPrimeRecognition(*value),
+                ));
             }
             match &expected_recognition.closure {
                 PrimeRecognitionClosure::Composite { witness } => {
@@ -575,7 +696,9 @@ impl ArithmeticFiberStanding {
                         || (occurrence.valuation.len() == 1
                             && occurrence.valuation[0].prime == *value)
                     {
-                        return Err(ArithmeticFiberError::MalformedPrimeRecognition(*value));
+                        return Err(ArithmeticFiberError::Law(
+                            ArithmeticFiberRefusal::MalformedPrimeRecognition(*value),
+                        ));
                     }
                 }
                 PrimeRecognitionClosure::Irreducible { .. } => {
@@ -585,7 +708,9 @@ impl ArithmeticFiberStanding {
                             exponent: 1,
                         }]
                     {
-                        return Err(ArithmeticFiberError::MalformedPrimeRecognition(*value));
+                        return Err(ArithmeticFiberError::Law(
+                            ArithmeticFiberRefusal::MalformedPrimeRecognition(*value),
+                        ));
                     }
                 }
             }
@@ -596,7 +721,9 @@ impl ArithmeticFiberStanding {
             expected_current.advance(occurrence)?;
         }
         if self.prime_power_current != expected_current {
-            return Err(ArithmeticFiberError::MalformedPrimePowerCurrent);
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::MalformedPrimePowerCurrent,
+            ));
         }
         Ok(())
     }
@@ -610,14 +737,14 @@ impl ArithmeticFiberStanding {
             .checked_add(1)
             .ok_or(ArithmeticFiberError::CarrierOverflow)?;
         if event.value != expected {
-            return Err(ArithmeticFiberError::NonSuccessor {
-                expected,
-                supplied: event.value,
-            });
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::NonSuccessor {
+                    expected,
+                    supplied: event.value,
+                },
+            ));
         }
-        if self.used_events.contains(&event.event) {
-            return Err(ArithmeticFiberError::RepeatedEvent(event.event));
-        }
+        self.refuse_repeated(event.event)?;
 
         let probes = prime_horizon_probes(event.value, &self.prime_cells);
         let recognition = derive_prime_recognition(event.value, &probes)?;
@@ -627,8 +754,8 @@ impl ArithmeticFiberStanding {
 
         if recognition.is_irreducible() {
             if residual != event.value {
-                return Err(ArithmeticFiberError::PrimeFoundingContradiction(
-                    event.value,
+                return Err(ArithmeticFiberError::Law(
+                    ArithmeticFiberRefusal::PrimeFoundingContradiction(event.value),
                 ));
             }
             let cell = self.incidence.found_cell(
@@ -659,13 +786,15 @@ impl ArithmeticFiberStanding {
             });
         } else {
             if residual == event.value {
-                return Err(ArithmeticFiberError::PrimeFoundingContradiction(
-                    event.value,
+                return Err(ArithmeticFiberError::Law(
+                    ArithmeticFiberRefusal::PrimeFoundingContradiction(event.value),
                 ));
             }
             if residual > 1 {
                 if !self.prime_cells.contains_key(&residual) {
-                    return Err(ArithmeticFiberError::UnfoundedResidualPrime(residual));
+                    return Err(ArithmeticFiberError::Law(
+                        ArithmeticFiberRefusal::UnfoundedResidualPrime(residual),
+                    ));
                 }
                 valuation.push(PrimeValuation {
                     prime: residual,
@@ -679,7 +808,9 @@ impl ArithmeticFiberStanding {
             .map(|factor| factor.prime)
             .collect::<Vec<_>>();
         if support.is_empty() {
-            return Err(ArithmeticFiberError::MalformedOccurrence(event.value));
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::MalformedOccurrence(event.value),
+            ));
         }
 
         for size in 2..=support.len() {
@@ -811,7 +942,9 @@ fn derive_prime_recognition(
                 .checked_mul(probe.quotient)
                 .ok_or(ArithmeticFiberError::CarrierOverflow)?;
             if exact_product != candidate {
-                return Err(ArithmeticFiberError::MalformedPrimeRecognition(candidate));
+                return Err(ArithmeticFiberError::Law(
+                    ArithmeticFiberRefusal::MalformedPrimeRecognition(candidate),
+                ));
             }
             let witness = PrimeFactorWitness {
                 prime_axis: probe.prime_axis,
@@ -935,10 +1068,9 @@ fn squarefree_boundary(
     for removed in 0..support.len() {
         let mut face = support.to_vec();
         face.remove(removed);
-        let cell = cells
-            .get(&face)
-            .copied()
-            .ok_or_else(|| ArithmeticFiberError::MissingSquarefreeFace(face.clone()))?;
+        let cell = cells.get(&face).copied().ok_or_else(|| {
+            ArithmeticFiberError::Law(ArithmeticFiberRefusal::MissingSquarefreeFace(face.clone()))
+        })?;
         boundary.add_term(
             cell,
             ComparativeMultiplicity::from_hand(if removed % 2 == 0 { 1 } else { -1 }, 1_u8)?,
@@ -1022,7 +1154,9 @@ pub struct QuadraticFiberIsomorphism {
 impl QuadraticPrimeFiber {
     pub fn validate(&self) -> Result<(), ArithmeticFiberError> {
         if self.prime < 3 || self.prime.is_multiple_of(2) {
-            return Err(ArithmeticFiberError::EvenQuadraticPrime);
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::EvenQuadraticPrime,
+            ));
         }
         let expected_residue = normalized_mod(&self.radicand, &BigInt::from(self.prime))
             .to_u64()
@@ -1033,13 +1167,17 @@ impl QuadraticPrimeFiber {
                 *root >= self.prime || mul_mod(*root, *root, self.prime) != self.residue
             })
         {
-            return Err(ArithmeticFiberError::QuadraticRootFailure);
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::QuadraticRootFailure,
+            ));
         }
         if i8::try_from(self.roots.len()).map_err(|_| ArithmeticFiberError::CarrierOverflow)? - 1
             != self.character
             || !matches!(self.character, -1..=1)
         {
-            return Err(ArithmeticFiberError::QuadraticRootCountFailure);
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::QuadraticRootCountFailure,
+            ));
         }
         Ok(())
     }
@@ -1053,7 +1191,9 @@ impl QuadraticPrimeFiber {
         self.validate()?;
         let scale = scale % self.prime;
         if scale == 0 {
-            return Err(ArithmeticFiberError::NonunitQuadraticScale);
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::NonunitQuadraticScale,
+            ));
         }
         let inverse_scale = pow_mod(scale, self.prime - 2, self.prime);
         let target_radicand = &self.radicand * BigInt::from(scale) * BigInt::from(scale);
@@ -1097,7 +1237,9 @@ impl QuadraticPrimeFiber {
                 .iter()
                 .any(|residual| *residual != 0)
         {
-            return Err(ArithmeticFiberError::QuadraticIsomorphismFailure);
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::QuadraticIsomorphismFailure,
+            ));
         }
         Ok(QuadraticFiberIsomorphism {
             schema: "holonic-engine.quadratic-fiber-isomorphism.v1".to_owned(),
@@ -1120,7 +1262,9 @@ fn quadratic_prime_fiber(
     radicand: BigInt,
 ) -> Result<QuadraticPrimeFiber, ArithmeticFiberError> {
     if prime == 2 {
-        return Err(ArithmeticFiberError::EvenQuadraticPrime);
+        return Err(ArithmeticFiberError::Law(
+            ArithmeticFiberRefusal::EvenQuadraticPrime,
+        ));
     }
     let modulus = BigInt::from(prime);
     let residue = normalized_mod(&radicand, &modulus)
@@ -1140,11 +1284,13 @@ fn quadratic_prime_fiber(
             roots.dedup();
             (roots, 1)
         } else {
-            return Err(ArithmeticFiberError::InvalidQuadraticCharacter {
-                prime,
-                residue,
-                witness: legendre,
-            });
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::InvalidQuadraticCharacter {
+                    prime,
+                    residue,
+                    witness: legendre,
+                },
+            ));
         }
     };
     roots.sort_unstable();
@@ -1152,12 +1298,16 @@ fn quadratic_prime_fiber(
         .iter()
         .any(|root| mul_mod(*root, *root, prime) != residue)
     {
-        return Err(ArithmeticFiberError::QuadraticRootFailure);
+        return Err(ArithmeticFiberError::Law(
+            ArithmeticFiberRefusal::QuadraticRootFailure,
+        ));
     }
     if i8::try_from(roots.len()).map_err(|_| ArithmeticFiberError::CarrierOverflow)? - 1
         != character
     {
-        return Err(ArithmeticFiberError::QuadraticRootCountFailure);
+        return Err(ArithmeticFiberError::Law(
+            ArithmeticFiberRefusal::QuadraticRootCountFailure,
+        ));
     }
     Ok(QuadraticPrimeFiber {
         schema: "holonic-engine.quadratic-prime-fiber.v1".to_owned(),
@@ -1207,7 +1357,9 @@ fn tonelli_shanks(residue: u64, prime: u64) -> Result<u64, ArithmeticFiberError>
     }
     let nonresidue = (2..prime)
         .find(|candidate| pow_mod(*candidate, (prime - 1) / 2, prime) == prime - 1)
-        .ok_or(ArithmeticFiberError::MissingQuadraticNonresidue(prime))?;
+        .ok_or(ArithmeticFiberError::Law(
+            ArithmeticFiberRefusal::MissingQuadraticNonresidue(prime),
+        ))?;
     let mut coefficient = pow_mod(nonresidue, odd, prime);
     let mut root = pow_mod(residue, odd.div_ceil(2), prime);
     let mut remainder = pow_mod(residue, odd, prime);
@@ -1220,7 +1372,9 @@ fn tonelli_shanks(residue: u64, prime: u64) -> Result<u64, ArithmeticFiberError>
             index += 1;
         }
         if index >= remaining_power {
-            return Err(ArithmeticFiberError::TonelliFailure { prime, residue });
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::TonelliFailure { prime, residue },
+            ));
         }
         let exponent = 1_u64
             .checked_shl(remaining_power - index - 1)
@@ -1271,7 +1425,9 @@ fn lift_quadratic_root(
     root: impl Into<BigInt>,
 ) -> Result<QuadraticHenselStep, ArithmeticFiberError> {
     if prime < 2 || exponent_before == 0 {
-        return Err(ArithmeticFiberError::InvalidHenselBase);
+        return Err(ArithmeticFiberError::Law(
+            ArithmeticFiberRefusal::InvalidHenselBase,
+        ));
     }
     let radicand = radicand.into();
     let modulus_before = BigInt::from(prime).pow(exponent_before);
@@ -1279,9 +1435,11 @@ fn lift_quadratic_root(
     let root_before = normalized_mod(&root.into(), &modulus_before);
     let function = &root_before * &root_before - &radicand;
     if !normalized_mod(&function, &modulus_before).is_zero() {
-        return Err(ArithmeticFiberError::NotQuadraticRoot {
-            modulus: modulus_before,
-        });
+        return Err(ArithmeticFiberError::Law(
+            ArithmeticFiberRefusal::NotQuadraticRoot {
+                modulus: modulus_before,
+            },
+        ));
     }
     let prime_modulus = BigInt::from(prime);
     let derivative_mod_prime = normalized_mod(&(&root_before * 2), &prime_modulus)
@@ -1311,7 +1469,9 @@ fn lift_quadratic_root(
         let lifted = &root_before + &modulus_before * digit;
         let exact_residual = normalized_mod(&(&lifted * &lifted - &radicand), &modulus_after);
         if !exact_residual.is_zero() {
-            return Err(ArithmeticFiberError::HenselResidualFailure);
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::HenselResidualFailure,
+            ));
         }
         QuadraticHenselBranch::Unique {
             digit,
@@ -1371,7 +1531,9 @@ impl QuadraticPrimeFiber {
     ) -> Result<QuadraticHenselTower, ArithmeticFiberError> {
         self.validate()?;
         if target_exponent == 0 {
-            return Err(ArithmeticFiberError::InvalidHenselBase);
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::InvalidHenselBase,
+            ));
         }
         let mut paths = Vec::new();
         for root in &self.roots {
@@ -1425,7 +1587,9 @@ impl ExactCongruence {
     ) -> Result<Self, ArithmeticFiberError> {
         let modulus = modulus.into();
         if !modulus.is_positive() {
-            return Err(ArithmeticFiberError::NonpositiveModulus);
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::NonpositiveModulus,
+            ));
         }
         Ok(Self {
             residue: normalized_mod(&residue.into(), &modulus),
@@ -1454,12 +1618,16 @@ pub fn chinese_remainder_pair(
     let (gcd, bezout_left, bezout_right) =
         extended_gcd(left.modulus.clone(), right.modulus.clone());
     if gcd != BigInt::one() {
-        return Err(ArithmeticFiberError::NoncoprimeModuli(gcd));
+        return Err(ArithmeticFiberError::Law(
+            ArithmeticFiberRefusal::NoncoprimeModuli(gcd),
+        ));
     }
     let bezout_residual =
         &bezout_left * &left.modulus + &bezout_right * &right.modulus - BigInt::one();
     if !bezout_residual.is_zero() {
-        return Err(ArithmeticFiberError::BezoutFailure);
+        return Err(ArithmeticFiberError::Law(
+            ArithmeticFiberRefusal::BezoutFailure,
+        ));
     }
     let correction = normalized_mod(
         &((&right.residue - &left.residue) * &bezout_left),
@@ -1471,7 +1639,9 @@ pub fn chinese_remainder_pair(
     let left_residual = normalized_mod(&(&combined.residue - &left.residue), &left.modulus);
     let right_residual = normalized_mod(&(&combined.residue - &right.residue), &right.modulus);
     if !left_residual.is_zero() || !right_residual.is_zero() {
-        return Err(ArithmeticFiberError::ChineseRemainderFailure);
+        return Err(ArithmeticFiberError::Law(
+            ArithmeticFiberRefusal::ChineseRemainderFailure,
+        ));
     }
     Ok(ChineseRemainderReceipt {
         schema: "holonic-engine.chinese-remainder-receipt.v1".to_owned(),
@@ -1543,10 +1713,12 @@ impl PairedQuadraticFiber {
                 != self.lower_receives_upper.character * self.upper_receives_lower.character
             || !matches!(self.observed_hand, -1 | 1)
         {
-            return Err(ArithmeticFiberError::MalformedPairedFiber {
-                left: self.lower_prime,
-                right: self.upper_prime,
-            });
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::MalformedPairedFiber {
+                    left: self.lower_prime,
+                    right: self.upper_prime,
+                },
+            ));
         }
         Ok(())
     }
@@ -1559,10 +1731,12 @@ impl PairedQuadraticFiber {
         if standing.prime_cell(self.lower_prime)? != self.lower_receives_upper.prime_cell
             || standing.prime_cell(self.upper_prime)? != self.upper_receives_lower.prime_cell
         {
-            return Err(ArithmeticFiberError::PairedFiberSourceMismatch {
-                left: self.lower_prime,
-                right: self.upper_prime,
-            });
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::PairedFiberSourceMismatch {
+                    left: self.lower_prime,
+                    right: self.upper_prime,
+                },
+            ));
         }
         Ok(())
     }
@@ -1611,7 +1785,9 @@ impl ResidueTransportLaw {
                 .any(|pair| pair.lower > pair.upper || pair.upper >= self.modulus)
             || output_hands != BTreeSet::from([-1, 1])
         {
-            return Err(ArithmeticFiberError::MalformedResidueTransport);
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::MalformedResidueTransport,
+            ));
         }
         Ok(())
     }
@@ -1647,10 +1823,14 @@ pub fn discover_residue_transport(
 ) -> Result<ResidueTransportLaw, ArithmeticFiberError> {
     standing.validate()?;
     if evidence.is_empty() {
-        return Err(ArithmeticFiberError::EmptyTransportEvidence);
+        return Err(ArithmeticFiberError::Law(
+            ArithmeticFiberRefusal::EmptyTransportEvidence,
+        ));
     }
     if grammar_bound < 2 {
-        return Err(ArithmeticFiberError::InvalidGrammarBound(grammar_bound));
+        return Err(ArithmeticFiberError::Law(
+            ArithmeticFiberRefusal::InvalidGrammarBound(grammar_bound),
+        ));
     }
     for modulus in 2..=grammar_bound {
         let mut hands = BTreeMap::new();
@@ -1680,7 +1860,9 @@ pub fn discover_residue_transport(
             });
         }
     }
-    Err(ArithmeticFiberError::NoResidueTransport { grammar_bound })
+    Err(ArithmeticFiberError::Law(
+        ArithmeticFiberRefusal::NoResidueTransport { grammar_bound },
+    ))
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -1728,7 +1910,9 @@ pub fn calibrate_quadratic_transport(
 ) -> Result<ReciprocityCalibrationReceipt, ArithmeticFiberError> {
     standing.validate()?;
     if training_prime_ceiling >= heldout_prime_ceiling || heldout_prime_ceiling > standing.value {
-        return Err(ArithmeticFiberError::InvalidCalibrationBoundary);
+        return Err(ArithmeticFiberError::Law(
+            ArithmeticFiberRefusal::InvalidCalibrationBoundary,
+        ));
     }
     let primes = standing
         .prime_cells
@@ -1781,24 +1965,30 @@ pub fn residue_transport_sheaf(
     standing.validate()?;
     transport.validate()?;
     if selected_primes.is_empty() || selected_primes.contains(&2) {
-        return Err(ArithmeticFiberError::InvalidSheafPrimeSelection);
+        return Err(ArithmeticFiberError::Law(
+            ArithmeticFiberRefusal::InvalidSheafPrimeSelection,
+        ));
     }
     for prime in selected_primes {
         standing.prime_cell(*prime)?;
     }
     for pair in combinations(&selected_primes.iter().copied().collect::<Vec<_>>(), 2) {
         if !standing.squarefree_cells.contains_key(&pair) {
-            return Err(ArithmeticFiberError::MissingMultiplicativePair(pair));
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::MissingMultiplicativePair(pair),
+            ));
         }
         if transport
             .receive(pair[0], pair[1])?
             .predicted_hand
             .is_none()
         {
-            return Err(ArithmeticFiberError::OpenResidueTransport {
-                left: pair[0],
-                right: pair[1],
-            });
+            return Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::OpenResidueTransport {
+                    left: pair[0],
+                    right: pair[1],
+                },
+            ));
         }
     }
 
@@ -1850,10 +2040,12 @@ pub fn residue_transport_sheaf(
                     transport
                         .receive(support[0], support[1])?
                         .predicted_hand
-                        .ok_or(ArithmeticFiberError::OpenResidueTransport {
-                            left: support[0],
-                            right: support[1],
-                        })?
+                        .ok_or(ArithmeticFiberError::Law(
+                            ArithmeticFiberRefusal::OpenResidueTransport {
+                                left: support[0],
+                                right: support[1],
+                            },
+                        ))?
                 };
                 ExactRatMatrix::declared(1, 1, vec![vec![Rat::from_integer(BigInt::from(hand))]])?
             } else {
@@ -1896,10 +2088,13 @@ pub fn residue_triangle_obstructions(
         ];
         let mut pair_hands = [0_i8; 3];
         for (ordinal, (left, right)) in pairs.into_iter().enumerate() {
-            pair_hands[ordinal] = transport
-                .receive(left, right)?
-                .predicted_hand
-                .ok_or(ArithmeticFiberError::OpenResidueTransport { left, right })?;
+            pair_hands[ordinal] =
+                transport
+                    .receive(left, right)?
+                    .predicted_hand
+                    .ok_or(ArithmeticFiberError::Law(
+                        ArithmeticFiberRefusal::OpenResidueTransport { left, right },
+                    ))?;
         }
         let cycle_holonomy = pair_hands.iter().product();
         receipts.push(ResidueTriangleObstruction {
@@ -1913,13 +2108,9 @@ pub fn residue_triangle_obstructions(
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum ArithmeticFiberError {
+pub enum ArithmeticFiberRefusal {
     #[error("arithmetic succession expected {expected}, but source supplied {supplied}")]
     NonSuccessor { expected: u64, supplied: u64 },
-    #[error("source occurrence {0:?} was already used by this arithmetic world")]
-    RepeatedEvent(EventId),
-    #[error("finite arithmetic exceeded its exact u64 carrier")]
-    CarrierOverflow,
     #[error("the arithmetic standing has an unknown or malformed schema")]
     MalformedArithmeticStanding,
     #[error("an arithmetic standing value must be at least one")]
@@ -2029,6 +2220,15 @@ pub enum ArithmeticFiberError {
     #[error(transparent)]
     Sheaf(#[from] SheafDiffusionError),
 }
+
+impl RefusalKind for ArithmeticFiberRefusal {
+    const LAW: &'static str = "arithmetic-fiber";
+}
+
+/// The arithmetic-fiber law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type ArithmeticFiberError = EventRefusal<ArithmeticFiberRefusal>;
+
+event_refusal_from!(ArithmeticFiberRefusal: CausalAlgebraicError, SheafDiffusionError);
 
 #[cfg(test)]
 mod tests {
@@ -2215,7 +2415,9 @@ mod tests {
         );
         assert_eq!(
             standing.zeta_receiver_measure(1, &BTreeSet::from([2])),
-            Err(ArithmeticFiberError::InvalidZetaSigma(1))
+            Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::InvalidZetaSigma(1)
+            ))
         );
     }
 
@@ -2231,7 +2433,9 @@ mod tests {
             .distinguishing_probe_lower_bound = 1;
         assert_eq!(
             forged_recognition.validate(),
-            Err(ArithmeticFiberError::MalformedPrimeRecognition(25))
+            Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::MalformedPrimeRecognition(25)
+            ))
         );
 
         let mut forged_current = standing;
@@ -2241,7 +2445,9 @@ mod tests {
             .insert(2, 99);
         assert_eq!(
             forged_current.validate(),
-            Err(ArithmeticFiberError::MalformedPrimePowerCurrent)
+            Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::MalformedPrimePowerCurrent
+            ))
         );
     }
 
@@ -2260,10 +2466,12 @@ mod tests {
                 event: EventId(2),
                 value: 4,
             }),
-            Err(ArithmeticFiberError::NonSuccessor {
-                expected: 3,
-                supplied: 4,
-            })
+            Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::NonSuccessor {
+                    expected: 3,
+                    supplied: 4,
+                }
+            ))
         );
         assert_eq!(world.standing(), &before);
 
@@ -2272,7 +2480,9 @@ mod tests {
         forged.observed_hand = -forged.observed_hand;
         assert!(matches!(
             discover_residue_transport(&standing, &[forged], 8),
-            Err(ArithmeticFiberError::MalformedPairedFiber { left: 3, right: 5 })
+            Err(ArithmeticFiberError::Law(
+                ArithmeticFiberRefusal::MalformedPairedFiber { left: 3, right: 5 }
+            ))
         ));
     }
 

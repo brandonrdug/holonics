@@ -21,7 +21,9 @@ use num_traits::Zero;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::{EventId, EventSuccessor, ExactEventLaw};
+use crate::world::{EventQuotient, event_standing_wire};
+use crate::world::{EventRefusal, RefusalKind};
+use crate::{EventId, EventStanding, EventSuccessor, ExactEventLaw};
 
 #[cfg(test)]
 use num_bigint::BigInt;
@@ -112,13 +114,17 @@ impl OrganizationalEcologySpec {
 
     fn validate(&self) -> Result<(), OrganizationalGrammarError> {
         if self.schema != ORGANIZATIONAL_SPEC_SCHEMA || self.sites.is_empty() {
-            return Err(OrganizationalGrammarError::MalformedEcology);
+            return Err(OrganizationalGrammarError::Law(
+                OrganizationalGrammarRefusal::MalformedEcology,
+            ));
         }
         let mut sites = BTreeSet::new();
         let mut variants = BTreeSet::new();
         for site in &self.sites {
             if !sites.insert(site.id) || site.variants.is_empty() {
-                return Err(OrganizationalGrammarError::MalformedEcology);
+                return Err(OrganizationalGrammarError::Law(
+                    OrganizationalGrammarRefusal::MalformedEcology,
+                ));
             }
             let local_variants = site
                 .variants
@@ -134,7 +140,9 @@ impl OrganizationalEcologySpec {
                     .reference_variant
                     .is_some_and(|variant| !local_variants.contains(&variant))
             {
-                return Err(OrganizationalGrammarError::MalformedEcology);
+                return Err(OrganizationalGrammarError::Law(
+                    OrganizationalGrammarRefusal::MalformedEcology,
+                ));
             }
         }
         let mut constraints = BTreeSet::new();
@@ -149,7 +157,9 @@ impl OrganizationalEcologySpec {
                     .any(|constraint| constraint.receiver == *site)
             })
         {
-            return Err(OrganizationalGrammarError::MalformedEcology);
+            return Err(OrganizationalGrammarError::Law(
+                OrganizationalGrammarRefusal::MalformedEcology,
+            ));
         }
         configuration_count(self)?;
         Ok(())
@@ -184,23 +194,29 @@ impl OrganizationalConfiguration {
 
     fn validate(&self, spec: &OrganizationalEcologySpec) -> Result<(), OrganizationalGrammarError> {
         if self.selections.len() != spec.sites.len() {
-            return Err(OrganizationalGrammarError::MalformedConfiguration);
+            return Err(OrganizationalGrammarError::Law(
+                OrganizationalGrammarRefusal::MalformedConfiguration,
+            ));
         }
         for site in &spec.sites {
-            let selection = self
-                .selections
-                .get(&site.id)
-                .ok_or(OrganizationalGrammarError::MalformedConfiguration)?;
+            let selection =
+                self.selections
+                    .get(&site.id)
+                    .ok_or(OrganizationalGrammarError::Law(
+                        OrganizationalGrammarRefusal::MalformedConfiguration,
+                    ))?;
             if let Some(variant) = selection
                 && !site
                     .variants
                     .iter()
                     .any(|candidate| candidate.id == *variant)
             {
-                return Err(OrganizationalGrammarError::VariantOutsideSite {
-                    site: site.id,
-                    variant: *variant,
-                });
+                return Err(OrganizationalGrammarError::Law(
+                    OrganizationalGrammarRefusal::VariantOutsideSite {
+                        site: site.id,
+                        variant: *variant,
+                    },
+                ));
             }
         }
         Ok(())
@@ -250,12 +266,6 @@ pub struct OrganizationalObservation {
     pub receiver: OrganizationalLineageId,
     pub query: OrganizationalQuery,
     pub values: BTreeMap<OrganizationalConstraintId, OrganizationalValue>,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub enum OrganizationalGrammarHistoryEntry {
-    SourceObservation(OrganizationalObservation),
-    EmanatedLineagePrediction(LineagePrediction),
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
@@ -505,9 +515,12 @@ struct PendingLineageHoldout {
     configuration: OrganizationalConfiguration,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct OrganizationalGrammarStanding {
-    pub schema: String,
+/// [definition] **The organizational quotient** (plan phase 16): the observed configurations
+/// with their values, the traversal queue, the recurrence witness and the obstructions. The
+/// source events the certificate names are exactly the admitted occurrences, so no observation
+/// archive is retained.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct OrganizationalGrammarQuotient {
     pub spec: OrganizationalEcologySpec,
     pub phase: OrganizationalGrammarPhase,
     next_query: Option<OrganizationalQuery>,
@@ -522,8 +535,6 @@ pub struct OrganizationalGrammarStanding {
             BTreeMap<OrganizationalConstraintId, OrganizationalValue>,
         ),
     >,
-    used_events: BTreeSet<EventId>,
-    history: Vec<OrganizationalGrammarHistoryEntry>,
     recurrence_obstruction: Option<RecurrenceObstruction>,
     intervention_obstructions: Vec<InterventionObstruction>,
     lineage_prediction: Option<LineagePrediction>,
@@ -531,39 +542,149 @@ pub struct OrganizationalGrammarStanding {
     certificate: Option<OrganizationalGrammarCertificate>,
 }
 
+/// The OrganizationalGrammar standing: the shared event scaffold around [`OrganizationalGrammarQuotient`].
+pub type OrganizationalGrammarStanding = EventStanding<OrganizationalGrammarQuotient>;
+
+#[derive(Serialize)]
+#[serde(rename = "OrganizationalGrammarStanding")]
+struct OrganizationalGrammarStandingWrite<'a> {
+    schema: &'a String,
+    spec: &'a OrganizationalEcologySpec,
+    phase: &'a OrganizationalGrammarPhase,
+    next_query: &'a Option<OrganizationalQuery>,
+    query_queue: &'a VecDeque<OrganizationalConfiguration>,
+    pending_holdout: &'a Option<PendingLineageHoldout>,
+    first_recurrence: &'a Option<OrganizationalObservation>,
+    reference_values: &'a Option<BTreeMap<OrganizationalConstraintId, OrganizationalValue>>,
+    observations: &'a BTreeMap<
+        OrganizationalConfiguration,
+        (
+            EventId,
+            BTreeMap<OrganizationalConstraintId, OrganizationalValue>,
+        ),
+    >,
+    used_events: &'a BTreeSet<EventId>,
+    recurrence_obstruction: &'a Option<RecurrenceObstruction>,
+    intervention_obstructions: &'a Vec<InterventionObstruction>,
+    lineage_prediction: &'a Option<LineagePrediction>,
+    lineage_prediction_obstruction: &'a Option<LineagePredictionObstruction>,
+    certificate: &'a Option<OrganizationalGrammarCertificate>,
+}
+
+impl<'a> From<&'a OrganizationalGrammarStanding> for OrganizationalGrammarStandingWrite<'a> {
+    fn from(standing: &'a OrganizationalGrammarStanding) -> Self {
+        Self {
+            schema: &standing.schema,
+            spec: &standing.spec,
+            phase: &standing.phase,
+            next_query: &standing.next_query,
+            query_queue: &standing.query_queue,
+            pending_holdout: &standing.pending_holdout,
+            first_recurrence: &standing.first_recurrence,
+            reference_values: &standing.reference_values,
+            observations: &standing.observations,
+            used_events: &standing.used_events,
+            recurrence_obstruction: &standing.recurrence_obstruction,
+            intervention_obstructions: &standing.intervention_obstructions,
+            lineage_prediction: &standing.lineage_prediction,
+            lineage_prediction_obstruction: &standing.lineage_prediction_obstruction,
+            certificate: &standing.certificate,
+        }
+    }
+}
+
+/// Reads the current rest and the retired one (whose archive fields are dropped).
+#[derive(Deserialize)]
+#[serde(rename = "OrganizationalGrammarStanding")]
+struct OrganizationalGrammarStandingRead {
+    schema: String,
+    spec: OrganizationalEcologySpec,
+    phase: OrganizationalGrammarPhase,
+    next_query: Option<OrganizationalQuery>,
+    query_queue: VecDeque<OrganizationalConfiguration>,
+    pending_holdout: Option<PendingLineageHoldout>,
+    first_recurrence: Option<OrganizationalObservation>,
+    reference_values: Option<BTreeMap<OrganizationalConstraintId, OrganizationalValue>>,
+    observations: BTreeMap<
+        OrganizationalConfiguration,
+        (
+            EventId,
+            BTreeMap<OrganizationalConstraintId, OrganizationalValue>,
+        ),
+    >,
+    used_events: BTreeSet<EventId>,
+    recurrence_obstruction: Option<RecurrenceObstruction>,
+    intervention_obstructions: Vec<InterventionObstruction>,
+    lineage_prediction: Option<LineagePrediction>,
+    lineage_prediction_obstruction: Option<LineagePredictionObstruction>,
+    certificate: Option<OrganizationalGrammarCertificate>,
+}
+
+impl From<OrganizationalGrammarStandingRead> for OrganizationalGrammarStanding {
+    fn from(read: OrganizationalGrammarStandingRead) -> Self {
+        EventStanding::from_parts(
+            read.schema,
+            read.used_events,
+            OrganizationalGrammarQuotient {
+                spec: read.spec,
+                phase: read.phase,
+                next_query: read.next_query,
+                query_queue: read.query_queue,
+                pending_holdout: read.pending_holdout,
+                first_recurrence: read.first_recurrence,
+                reference_values: read.reference_values,
+                observations: read.observations,
+                recurrence_obstruction: read.recurrence_obstruction,
+                intervention_obstructions: read.intervention_obstructions,
+                lineage_prediction: read.lineage_prediction,
+                lineage_prediction_obstruction: read.lineage_prediction_obstruction,
+                certificate: read.certificate,
+            },
+        )
+    }
+}
+
+event_standing_wire!(
+    OrganizationalGrammarQuotient,
+    OrganizationalGrammarStandingWrite,
+    OrganizationalGrammarStandingRead
+);
+
+impl EventQuotient for OrganizationalGrammarQuotient {
+    type Refusal = OrganizationalGrammarRefusal;
+}
+
 impl OrganizationalGrammarStanding {
     pub fn new(spec: OrganizationalEcologySpec) -> Result<Self, OrganizationalGrammarError> {
         spec.validate()?;
         let reference = spec.reference_configuration()?;
-        Ok(Self {
-            schema: ORGANIZATIONAL_GRAMMAR_SCHEMA.to_owned(),
-            spec,
-            phase: OrganizationalGrammarPhase::AwaitingFirstRecurrenceWitness,
-            next_query: Some(OrganizationalQuery::new(
-                reference,
-                OrganizationalQueryPurpose::EstablishRecurrence(RecurrenceWitnessOrdinal::First),
-            )),
-            query_queue: VecDeque::new(),
-            pending_holdout: None,
-            first_recurrence: None,
-            reference_values: None,
-            observations: BTreeMap::new(),
-            used_events: BTreeSet::new(),
-            history: Vec::new(),
-            recurrence_obstruction: None,
-            intervention_obstructions: Vec::new(),
-            lineage_prediction: None,
-            lineage_prediction_obstruction: None,
-            certificate: None,
-        })
+        Ok(EventStanding::founded(
+            ORGANIZATIONAL_GRAMMAR_SCHEMA,
+            OrganizationalGrammarQuotient {
+                spec,
+                phase: OrganizationalGrammarPhase::AwaitingFirstRecurrenceWitness,
+                next_query: Some(OrganizationalQuery::new(
+                    reference,
+                    OrganizationalQueryPurpose::EstablishRecurrence(
+                        RecurrenceWitnessOrdinal::First,
+                    ),
+                )),
+                query_queue: VecDeque::new(),
+                pending_holdout: None,
+                first_recurrence: None,
+                reference_values: None,
+                observations: BTreeMap::new(),
+                recurrence_obstruction: None,
+                intervention_obstructions: Vec::new(),
+                lineage_prediction: None,
+                lineage_prediction_obstruction: None,
+                certificate: None,
+            },
+        ))
     }
 
     pub fn next_query(&self) -> Option<&OrganizationalQuery> {
         self.next_query.as_ref()
-    }
-
-    pub fn history(&self) -> &[OrganizationalGrammarHistoryEntry] {
-        &self.history
     }
 
     pub fn recurrence_obstruction(&self) -> Option<&RecurrenceObstruction> {
@@ -610,9 +731,7 @@ impl OrganizationalGrammarStanding {
 
     fn validate_incremental(&self) -> Result<(), OrganizationalGrammarError> {
         self.spec.validate()?;
-        if self.schema != ORGANIZATIONAL_GRAMMAR_SCHEMA {
-            return Err(OrganizationalGrammarError::MalformedStanding);
-        }
+        self.check_schema(ORGANIZATIONAL_GRAMMAR_SCHEMA)?;
         match self.phase {
             OrganizationalGrammarPhase::AwaitingFirstRecurrenceWitness => {
                 if !matches!(
@@ -724,19 +843,22 @@ impl ExactEventLaw for OrganizationalGrammarLaw {
     ) -> Result<EventSuccessor<Self::Standing, Self::Radiation>, Self::Error> {
         standing_before.validate_incremental()?;
         let event_id = event.event();
-        if standing_before.used_events.contains(&event_id) {
-            return Err(OrganizationalGrammarError::RepeatedEvent(event_id));
-        }
-        let expected = standing_before
-            .next_query
-            .as_ref()
-            .ok_or(OrganizationalGrammarError::ObservationNotRequested)?;
+        standing_before.refuse_repeated(event_id)?;
+        let expected =
+            standing_before
+                .next_query
+                .as_ref()
+                .ok_or(OrganizationalGrammarError::Law(
+                    OrganizationalGrammarRefusal::ObservationNotRequested,
+                ))?;
         let OrganizationalGrammarEvent::ReturnObservation(observation) = event;
         if observation.query != *expected {
-            return Err(OrganizationalGrammarError::UnexpectedReturnedQuery {
-                expected: Box::new(expected.clone()),
-                received: Box::new(observation.query.clone()),
-            });
+            return Err(OrganizationalGrammarError::Law(
+                OrganizationalGrammarRefusal::UnexpectedReturnedQuery {
+                    expected: Box::new(expected.clone()),
+                    received: Box::new(observation.query.clone()),
+                },
+            ));
         }
         observation
             .query
@@ -747,11 +869,6 @@ impl ExactEventLaw for OrganizationalGrammarLaw {
         let mut standing_after = standing_before.clone();
         standing_after.next_query = None;
         standing_after.used_events.insert(event_id);
-        standing_after
-            .history
-            .push(OrganizationalGrammarHistoryEntry::SourceObservation(
-                observation.clone(),
-            ));
         let mut work = OrganizationalGrammarWork::default();
         let prior_prediction = standing_after.lineage_prediction.clone();
 
@@ -839,7 +956,9 @@ impl ExactEventLaw for OrganizationalGrammarLaw {
             }
             OrganizationalGrammarPhase::TemporalObstruction
             | OrganizationalGrammarPhase::Certified => {
-                return Err(OrganizationalGrammarError::ObservationNotRequested);
+                return Err(OrganizationalGrammarError::Law(
+                    OrganizationalGrammarRefusal::ObservationNotRequested,
+                ));
             }
         }
 
@@ -885,7 +1004,9 @@ fn validate_values(
         .collect::<BTreeSet<_>>();
     let returned = values.keys().copied().collect::<BTreeSet<_>>();
     if expected != returned {
-        return Err(OrganizationalGrammarError::MalformedObservation);
+        return Err(OrganizationalGrammarError::Law(
+            OrganizationalGrammarRefusal::MalformedObservation,
+        ));
     }
     Ok(())
 }
@@ -929,10 +1050,12 @@ fn admit_fiber_observation(
         standing.observations.get(&observation.query.configuration)
     {
         if prior_values != &observation.values {
-            return Err(OrganizationalGrammarError::ConflictingObservation {
-                first: *prior_event,
-                second: observation.event,
-            });
+            return Err(OrganizationalGrammarError::Law(
+                OrganizationalGrammarRefusal::ConflictingObservation {
+                    first: *prior_event,
+                    second: observation.event,
+                },
+            ));
         }
     } else {
         standing.observations.insert(
@@ -1031,9 +1154,6 @@ fn schedule_after_traversal(
     }
     if let Some(holdout) = standing.pending_holdout.take() {
         if let Some(prediction) = derive_lineage_prediction(standing, &holdout)? {
-            standing.history.push(
-                OrganizationalGrammarHistoryEntry::EmanatedLineagePrediction(prediction.clone()),
-            );
             standing.next_query = Some(prediction.query.clone());
             standing.lineage_prediction = Some(prediction);
             standing.phase = OrganizationalGrammarPhase::AwaitingLineagePredictionGrade;
@@ -1121,7 +1241,9 @@ fn certify_complete_fiber(
 ) -> Result<(), OrganizationalGrammarError> {
     let fiber = standing.grammar_fiber()?;
     if !fiber.is_complete() {
-        return Err(OrganizationalGrammarError::IncompleteFiber);
+        return Err(OrganizationalGrammarError::Law(
+            OrganizationalGrammarRefusal::IncompleteFiber,
+        ));
     }
     let certificate = compile_certificate(standing, work)?;
     standing.certificate = Some(certificate);
@@ -1136,23 +1258,17 @@ fn compile_certificate(
 ) -> Result<OrganizationalGrammarCertificate, OrganizationalGrammarError> {
     let spec = &standing.spec;
     let configurations = configuration_traversal(spec)?;
-    let source_events = standing
-        .history
-        .iter()
-        .filter_map(|entry| match entry {
-            OrganizationalGrammarHistoryEntry::SourceObservation(observation) => {
-                Some(observation.event)
-            }
-            OrganizationalGrammarHistoryEntry::EmanatedLineagePrediction(_) => None,
-        })
-        .collect::<BTreeSet<_>>();
+    // Every admitted occurrence is one source observation.
+    let source_events = standing.used_events.clone();
     let all_off = OrganizationalConfiguration {
         selections: spec.sites.iter().map(|site| (site.id, None)).collect(),
     };
     let all_off_values = standing
         .observations
         .get(&all_off)
-        .ok_or(OrganizationalGrammarError::IncompleteFiber)?
+        .ok_or(OrganizationalGrammarError::Law(
+            OrganizationalGrammarRefusal::IncompleteFiber,
+        ))?
         .1
         .clone();
     let mut constraint_grammars = Vec::new();
@@ -1190,10 +1306,9 @@ fn compile_certificate(
         constraint_grammars.push(ConstraintGrammar {
             constraint: constraint.id,
             receiver: constraint.receiver,
-            source_constant: all_off_values
-                .get(&constraint.id)
-                .cloned()
-                .ok_or(OrganizationalGrammarError::MalformedObservation)?,
+            source_constant: all_off_values.get(&constraint.id).cloned().ok_or(
+                OrganizationalGrammarError::Law(OrganizationalGrammarRefusal::MalformedObservation),
+            )?,
             interaction_terms,
         });
     }
@@ -1201,17 +1316,23 @@ fn compile_certificate(
         let returned = &standing
             .observations
             .get(configuration)
-            .ok_or(OrganizationalGrammarError::IncompleteFiber)?
+            .ok_or(OrganizationalGrammarError::Law(
+                OrganizationalGrammarRefusal::IncompleteFiber,
+            ))?
             .1;
         for grammar in &constraint_grammars {
             if grammar.evaluate(configuration)
                 != *returned
                     .get(&grammar.constraint)
-                    .ok_or(OrganizationalGrammarError::MalformedObservation)?
+                    .ok_or(OrganizationalGrammarError::Law(
+                        OrganizationalGrammarRefusal::MalformedObservation,
+                    ))?
             {
-                return Err(OrganizationalGrammarError::PolynomialResidualNonzero {
-                    constraint: grammar.constraint,
-                });
+                return Err(OrganizationalGrammarError::Law(
+                    OrganizationalGrammarRefusal::PolynomialResidualNonzero {
+                        constraint: grammar.constraint,
+                    },
+                ));
             }
         }
     }
@@ -1305,7 +1426,9 @@ fn mobius_coefficient(
             .observations
             .get(&configuration)
             .and_then(|(_, values)| values.get(&constraint))
-            .ok_or(OrganizationalGrammarError::IncompleteFiber)?;
+            .ok_or(OrganizationalGrammarError::Law(
+                OrganizationalGrammarRefusal::IncompleteFiber,
+            ))?;
         if (assignments.len() - subset.len()) % 2 == 0 {
             coefficient += value;
             additions += 1;
@@ -1630,11 +1753,15 @@ fn derive_lineage_repairs(
                     let (left_event, left_values) = standing
                         .observations
                         .get(&left_configuration)
-                        .ok_or(OrganizationalGrammarError::IncompleteFiber)?;
+                        .ok_or(OrganizationalGrammarError::Law(
+                            OrganizationalGrammarRefusal::IncompleteFiber,
+                        ))?;
                     let (right_event, right_values) = standing
                         .observations
                         .get(&right_configuration)
-                        .ok_or(OrganizationalGrammarError::IncompleteFiber)?;
+                        .ok_or(OrganizationalGrammarError::Law(
+                            OrganizationalGrammarRefusal::IncompleteFiber,
+                        ))?;
                     caused_by_events.insert(*left_event);
                     caused_by_events.insert(*right_event);
                     contexts_compared += 1;
@@ -1642,10 +1769,11 @@ fn derive_lineage_repairs(
                         equivalent = false;
                         break;
                     }
-                    let (_, off_values) = standing
-                        .observations
-                        .get(&context)
-                        .ok_or(OrganizationalGrammarError::IncompleteFiber)?;
+                    let (_, off_values) = standing.observations.get(&context).ok_or(
+                        OrganizationalGrammarError::Law(
+                            OrganizationalGrammarRefusal::IncompleteFiber,
+                        ),
+                    )?;
                     affected_constraints.extend(differing_constraints(off_values, left_values));
                 }
                 if equivalent && !affected_constraints.is_empty() {
@@ -1693,12 +1821,12 @@ fn configuration_count(
             .checked_mul(site.variants.len() + 1)
             .ok_or(OrganizationalGrammarError::CarrierOverflow)?;
         if count > MAX_EXACT_CONFIGURATION_VERTICES {
-            return Err(
-                OrganizationalGrammarError::ConfigurationSpaceExceedsExactCarrier {
+            return Err(OrganizationalGrammarError::Law(
+                OrganizationalGrammarRefusal::ConfigurationSpaceExceedsExactCarrier {
                     vertices: count,
                     maximum: MAX_EXACT_CONFIGURATION_VERTICES,
                 },
-            );
+            ));
         }
     }
     Ok(count)
@@ -1715,7 +1843,9 @@ fn configuration_traversal(
         .collect::<Vec<_>>();
     let digits = reflected_mixed_radix(&radices);
     if digits.len() != count {
-        return Err(OrganizationalGrammarError::MalformedTraversal);
+        return Err(OrganizationalGrammarError::Law(
+            OrganizationalGrammarRefusal::MalformedTraversal,
+        ));
     }
     let mut configurations = digits
         .into_iter()
@@ -1740,7 +1870,9 @@ fn configuration_traversal(
     let reference_ordinal = configurations
         .iter()
         .position(|configuration| configuration == &reference)
-        .ok_or(OrganizationalGrammarError::MalformedTraversal)?;
+        .ok_or(OrganizationalGrammarError::Law(
+            OrganizationalGrammarRefusal::MalformedTraversal,
+        ))?;
     configurations.rotate_left(reference_ordinal);
     for configuration in &configurations {
         configuration.validate(spec)?;
@@ -1749,7 +1881,9 @@ fn configuration_traversal(
         .windows(2)
         .any(|pair| pair[0].changed_sites(&pair[1]).len() != 1)
     {
-        return Err(OrganizationalGrammarError::MalformedTraversal);
+        return Err(OrganizationalGrammarError::Law(
+            OrganizationalGrammarRefusal::MalformedTraversal,
+        ));
     }
     Ok(configurations)
 }
@@ -1781,11 +1915,9 @@ fn reflected_mixed_radix(radices: &[usize]) -> Vec<Vec<usize>> {
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum OrganizationalGrammarError {
+pub enum OrganizationalGrammarRefusal {
     #[error("the organizational ecology declaration is malformed")]
     MalformedEcology,
-    #[error("the organizational standing is malformed")]
-    MalformedStanding,
     #[error("the returned organizational observation is malformed")]
     MalformedObservation,
     #[error("the organizational configuration is malformed")]
@@ -1801,8 +1933,6 @@ pub enum OrganizationalGrammarError {
         site: OrganizationalSiteId,
         variant: OrganizationalVariantId,
     },
-    #[error("event {0:?} was already admitted")]
-    RepeatedEvent(EventId),
     #[error("no organizational observation was requested")]
     ObservationNotRequested,
     #[error("the receiver returned a query other than production requested")]
@@ -1822,9 +1952,14 @@ pub enum OrganizationalGrammarError {
         "the exact configuration space has {vertices} vertices, exceeding this carrier's {maximum}"
     )]
     ConfigurationSpaceExceedsExactCarrier { vertices: usize, maximum: usize },
-    #[error("an organizational carrier conversion overflowed")]
-    CarrierOverflow,
 }
+
+impl RefusalKind for OrganizationalGrammarRefusal {
+    const LAW: &'static str = "organizational";
+}
+
+/// The organizational law's refusal family (plan phase 16): the shared event refusals and its own kinds.
+pub type OrganizationalGrammarError = EventRefusal<OrganizationalGrammarRefusal>;
 
 #[cfg(test)]
 mod tests {
@@ -2129,6 +2264,51 @@ mod tests {
                 && term.coefficient == value(2)
         }));
         assert!(certificate.finite_region_complete);
+    }
+
+    /// Phase 16: the certificate's source events are the admitted occurrences, an old rest's
+    /// observation archive is dropped on decode, and the decoded standing's future is unchanged.
+    #[test]
+    fn a_retired_history_rest_decodes_and_its_certificate_is_unchanged() {
+        let standing = OrganizationalGrammarStanding::new(coupled_resource_spec()).unwrap();
+        let mut world = CausalWorld::new(OrganizationalGrammarLaw, standing);
+        let first = world.standing().next_query().unwrap().clone();
+        let values = coupled_resource_membrane(&first);
+        let observation = OrganizationalObservation {
+            event: EventId(1_000),
+            receiver: OrganizationalLineageId(900),
+            query: first,
+            values,
+        };
+        world
+            .receive(&OrganizationalGrammarEvent::ReturnObservation(
+                observation.clone(),
+            ))
+            .unwrap();
+        let mut legacy = serde_json::to_value(world.standing()).unwrap();
+        legacy.as_object_mut().unwrap().insert(
+            "history".to_owned(),
+            serde_json::json!([{ "SourceObservation": observation }]),
+        );
+        let decoded: OrganizationalGrammarStanding = serde_json::from_value(legacy).unwrap();
+        assert_eq!(&decoded, world.standing());
+        assert!(
+            serde_json::to_value(&decoded)
+                .unwrap()
+                .get("history")
+                .is_none()
+        );
+
+        let mut remounted = CausalWorld::new(OrganizationalGrammarLaw, decoded);
+        let native = return_all_requested(&mut world);
+        let continued = return_all_requested(&mut remounted);
+        assert_eq!(native, continued);
+        let certificate = world.standing().certificate().unwrap();
+        assert_eq!(
+            &certificate.source_testimony_events,
+            world.standing().used_events()
+        );
+        assert_eq!(Some(certificate), remounted.standing().certificate());
     }
 
     #[test]
