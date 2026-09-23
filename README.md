@@ -51,13 +51,14 @@ laws and HNN**, organized by elementary object rather than acting as a facade:
 
 | Library | Responsibility |
 |---|---|
-| `holonic-words` | Small portable exact word and section ABI shared by host and device |
-| `holonics` | Ratio/remainder, geometric transport and pair/tube charts, the Holon law and its operators, proposed receiver-relative Holarchy, equation extraction, and an internal HNN with a complex-parametron implementation chart |
-| `holonics-cuda` | CUDA implementation of the HNN execution port |
+| `holonics` | Ratio/remainder, geometric transport and pair/tube charts, the Holon law and its operators, receivers and receipts, the Holarchy returned by interconnection, equation extraction, and the backend-neutral HNN law and execution port |
+| `holonics-cuda` | CUDA realization: driver, sections, kernels and the resident HNN field |
 | `holonics-apple` (later) | Apple silicon implementation on Brandon's separate branch |
 
-That is three maintained Rust libraries now and four after Apple. The main library builds and
-runs its host/reference HNN without CUDA; a caller supplies a device executor when needed.
+That is two maintained Rust libraries now and three after Apple. A small `no_std`
+`holonic-words` crate remains only if a Rust device kernel still consumes it. The main library
+builds without CUDA; its HNN host reference is built after the move, one method at a time
+against the CUDA return.
 Its physical instances must carry fluid stress/pressure, wave propagation, spacetime
 stress-energy, heat/entropy currents and the active receiver law with their stated hypotheses;
 pair slip and pumps alone do not supply those equations.

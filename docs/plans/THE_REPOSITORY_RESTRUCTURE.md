@@ -5,11 +5,88 @@ census and paused-phase handoff; Codex's Rust/Lean dependency review and Brandon
 direction refine the target below. **Governs** the [consolidation programme](THE_HOLON_CORE_FOUNDS_THE_NATIVE_MACHINERY.md#consolidation-programme-phases-916)
 and its [overgrowth census](THE_HOLON_CORE_FOUNDS_THE_NATIVE_MACHINERY.md#overgrowth-census-and-retirement-programme-september-23):
 retirement comes first, then consolidation of what remains, then the crate and Lean layout below.
+Finalized by Claude's review of the Codex iteration (September 23): §0 states the decisions, and the
+body sections are edited to agree with it.
 
 [project-postulate] Brandon's rulings (September 22–23): the elementary objects are the only design
 vocabulary; the Holon is the foundational object of the Lean mathematics and the Rust machinery; the
 repository is Brandon's personal research programme with Brandon, Claude and Codex as its only workers;
 consolidation includes deletion, and git history is the archive; names must say what a thing is.
+
+## 0. Final decisions
+
+[project-postulate; source-inspected] These settle the questions the Codex iteration left open.
+Each is backed by a measurement at `d3b8b509`.
+
+1. **Lean holds the mathematics; Rust holds what runs.** An unconsumed Rust module is deleted. If
+   it carries a law that no Lean owner or guide states, that law moves there first, or it gets a
+   #62 obligation. A checked Lean theorem is kept unless it duplicates another or wraps a
+   superseded name. A record is kept if a guide, plan, issue or owner cites it, or if it is the
+   only statement of a result. Otherwise it is folded into its guide as one line with a revision
+   link, or into [RETRACTIONS](../RETRACTIONS.md) if the attempt failed, and then deleted. Git
+   history is the archive.
+2. **No forwarding modules, path aliases or feature-gated compatibility layers.** Every Rust
+   caller is in this repository, so a move updates its callers in the same commit.
+   `holonics::hna`, `holonics::structure` and similar paths are not kept. Old wire decoders are
+   kept only for a saved artifact Brandon names in the census (candidates:
+   `.local/artifacts/{athena-alpha,hnp3,hnp4,ske4}`). With none named, R4 removes them all.
+3. **The HNN is device-resident today, so its move and its backend-neutral port are separate
+   steps.** Of 219 `native_ecology` files, 106 launch kernels or hold resident sections. So do 35 of
+   93 `holonics-hna` files. No host reference implementation of the HNN field exists, and the engine's
+   `build.rs` runs `nvcc`. The resident HNN therefore moves **as it is** into `holonics-cuda::hnn`.
+   Main `holonics::hnn` owns the backend-neutral part: the field law, source moments, adjoint
+   contracts, the execution-port trait and, over time, a host reference. The port and host
+   reference are then built method by method (campaign K2 in §4). Neither blocks the restructure.
+   `holonics-apple` implements the same port later.
+4. **Crate count: `holonics` and `holonics-cuda` now, `holonics-apple` later.** `holonic-words` is
+   kept as a separate `no_std` crate only if a Rust device kernel consumes it. Today only
+   `accelerators/cuda-kernel` (Rust compiled for nvptx) does, and its launches
+   (`SOMA_PTX`, `register_launch`, `live_event_launch`) are consumed by `holonic-life`'s Soma
+   lineage and one engine file. The HNN uses the 83 C++ kernels in `holonic-engine/kernels/`.
+   If R2 retires the Soma lineage, the word rings (`ExactRing`, `CheckedIntegers`, `ModularWords`)
+   fold into `holonics::ratio`, since residue arithmetic is ratio arithmetic. Host/device parity
+   then stays what it is for the `.cu` kernels: device tests against the host arithmetic.
+   `accelerators/rust-gpu` (Vulkan, already ruled out for production) retires.
+5. **Minimal features.** Each feature combination compiles its own copy of the crate. On
+   September 23 the engine had 39 incremental directories (150 GB). Main `holonics` has no
+   feature that changes its dependency graph. The engine's default `desktop-x11` feature retires
+   with `platform_x11`, which has no consumer.
+6. **Reception is one module.** Brandon's reading is that to receive is to measure and compare.
+   So `receiver/` owns `ReceiverRole`, the joint `interact`/`receive` return, `Receipt` and
+   `Ratio::between`. `ratio/` below it owns the arithmetic of comparison ("one per two"):
+   presentation, division with remainder, residue/modulo, partial inversion with its nonunit
+   fibre, lift/winding and jets. Rust impl blocks cross modules, so `Ratio<L,R>` is defined in
+   `ratio/` and constructed from receipts in `receiver/`. This replaces the separate
+   `holon/receiver` and `receipt/` of the Codex draft. Lean mirrors it as `Holonics.Receiver`.
+7. **A Holarchy is what `interconnect` returns.**
+   `Holon::interconnect(parts, joins) -> Result<Holarchy, GluingDefect>`. `Holarchy::whole()` is
+   the joined Holon, and the constituents, incidence and gluing are retained. `view`, `count` and
+   `refine` follow §3.1. A recursively generated family carries its constituent generator. This
+   ties the new object to an existing operation rather than adding a parallel constructor.
+8. **No empty modules.** `physics/`, `holarchy/` and `receiver/` are created by the commit that
+   lands their first implementation with a consumer. The existing `diffusion` receipt and
+   interaction owners move into them then. The design tables in §3 are the contract, not a
+   scaffold to create ahead of time.
+9. **The restructure and new construction are separate.** The restructure moves and retires
+   existing code with its current behavior, verified by existing suites. New objects and laws
+   (complete interconnect, active receive, Holarchy, physics instances, the information port, the
+   HNN host reference) are construction campaigns on the new layout, each with its own issue. The
+   Codex draft ordered the physics construction ahead of the HNN and CUDA migration, which would
+   have left the tree half-moved behind open research.
+10. **The Lean foundation is cut at a few measured edges.** The present `Framework` closure
+    (188k lines) contains 292 Millennium files (119k lines) and 52 RH files (13k lines). They enter
+    through few edges:
+    - `Framework.Core` imports five small Millennium modules that are foundation objects filed by
+      history: `Gluing`, `HolonicDirectedPassage`, `Receiver`, `ReceiverHistory`, `Separation`.
+    - `Objects/Ratio` imports `Millennium/HolonicGaugeCovariance` (128 lines). Its one import,
+      `HolonicConnectionVariation`, pulls 45k lines across 105 files.
+    - `Holon/MomentStorage` imports `Millennium/HolonicQuadraticMomentCondensation` (472 lines).
+      Its import `HolonicGranularBoundaryRadiation` pulls 48k lines across 111 files.
+    - `Framework.Physics` reaches 345 research files.
+
+    Moving the declarations these edges actually use into `Holonics` owners removes most of the
+    research from the foundation. R3 does this before the path move. It measures the remaining
+    closure and records it.
 
 ## 1. Why the tree looks like this
 
@@ -130,34 +207,30 @@ the cut.
 ### 3.1 Rust: the main `holonics` library owns the construction
 
 The main package must be a **substantive library**, not the present 52-line facade. It owns the
-Holon law, exact geometry and algebra, elementary operations and the backend-neutral HNN. A
-separate HNN package would force the foundational package to depend on its implementation to
-keep `holonics::hna`, closing the dependency cycle. Keep HNN as an internal module until an
-actual post-retirement build/profile result justifies a public-path migration.
+Holon law, exact geometry and algebra, elementary operations and the backend-neutral HNN law.
+The resident HNN realization belongs to the backend (§0.3). A separate `holonics-hnn` package
+is not needed: the law sits in main, and each realization sits in its backend.
 
-The target is three maintained libraries on this branch, four when Brandon adds Apple:
+The target is two maintained libraries on this branch, three when Brandon adds Apple, plus
+`holonic-words` only under §0.4:
 
 | Package | Internal ownership | Existing sources to sort at R0 |
 |---|---|---|
-| `holonic-words` | Small portable exact word ring and packet/section ABI shared by host and device, with a `no_std` arithmetic kernel compiled from one source. It owns the layout and refusal words both sides must agree on. No driver or HNN dependency. | `holonic-words` plus the shared `soma-abi::section_layout_cuda` law and validated layout definitions. Its present dependency on `soma-abi`/`body` must be reversed or retired. |
-| `holonics` | Main library: typed ratio/remainder/inversion and jets; geometric frames, exterior cells, pair and tube/tower charts; the one Holon law with active receiving, composition, restriction and deposition; a proposed receiver-relative `Holarchy`; fluid, wave, spacetime and thermal constitutive instances; equation extraction as a Holon boundary; and internal HNN whose complex-parametron chart is a physical implementation. No CUDA dependency. | `holonic-core`, `relational-geometry`, live `holonic-structure`, source-neutral and HNN parts of `holonic-engine`, `holonics-hna`, live `holonic-life`. |
-| `holonics-cuda` | CUDA implementation of declared Holonics/HNN operations: driver, allocation, launch/section layout, resident kernels, checked receipts and transfer completion. It depends on `holonics` and `holonic-words` and implements the HNN execution port; it does not redefine the material or loss law. | `holonic-mount`, device ABI owners, engine `cuda_refine`, `resident_section`, `kernels/`, `hardware_cover`, `section_partition`. |
+| `holonic-words` (conditional, §0.4) | A `no_std` exact word ring and section ABI, compiled once for the host and once by a Rust device kernel. It exists only while such a kernel consumes it. Otherwise it folds into `holonics::ratio`. | `holonic-words` and the live part of `soma-abi::section_layout_cuda`. Its present dependency on `soma-abi`/`body` is reversed or retired with the Soma lineage. |
+| `holonics` | Main library: typed ratio/remainder/inversion and jets; geometric frames, exterior cells, pair and tube/tower charts; the one Holon law with active receiving, composition, restriction and deposition; a proposed receiver-relative `Holarchy`; fluid, wave, spacetime and thermal constitutive instances; equation extraction as a Holon boundary; and the backend-neutral HNN: field law, source moments, adjoint contracts, execution-port trait and host reference, the last built in K2. The complex-parametron chart is an HNN physical chart. No CUDA dependency and no `nvcc`. | `holonic-core`, `relational-geometry`, live `holonic-structure`, the source-neutral parts of `holonic-engine` (extraction included), and the law/declaration parts of `holonics-hna` and live `holonic-life`. |
+| `holonics-cuda` | CUDA realization: driver, allocation, transfer completion, section layout and partition, hardware cover, the `.cu` kernels and their `build.rs`, and `hnn/`, the resident HNN field moved as it is (§0.3). It depends on `holonics` and implements the HNN execution port as K2 defines it. It does not redefine the material or loss law. | `holonic-mount`, engine `cuda_refine`, `resident_section`, `kernels/`, `hardware_cover`, `section_partition`, the resident `native_ecology/**` and `embedding_fiber`, the resident `holonics-hna` `native/**`, and the device files of `holonic_intelligence`. |
 | `holonics-apple` (later) | Apple silicon implementation behind the same typed execution port, with its own kernels and placement. Create it only on Brandon's Mac branch after its actual implementation is ready. | No Linux-branch move. |
 
-The dependency direction is `holonic-words → holonics → holonics-cuda` (and later
+The dependency direction is `(holonic-words →) holonics → holonics-cuda` (and later
 `holonics-apple`); arrows mean *may be used by*. Applications select a backend and depend on
 `holonics` plus that backend. The current workbench remains an application package while R0
 checks its deployment boundary; the 2–4 ceiling above counts maintained reusable libraries,
 not a CLI's separate Cargo binary target. The main library's default build must work without
-a CUDA SDK, driver or linker symbol. HNN is a feature/module inside it, with an exact host
-reference. A CUDA caller passes `CudaExecutor` through the HNN execution port rather than
-making `holonics` import the CUDA package. `holonics::hna` can remain a compatibility module
-for the established API and wire names while its implementation is organized under `hnn`.
-Device-specific constructors migrate to the backend package where necessary; name each
-consumer and saved artifact before removing a path.
-Initially keep `hnn` in the main package's default features to preserve public HNN imports;
-`--no-default-features` is the lean source-neutral Holon build. No `cuda` feature on main may
-introduce an edge back to `holonics-cuda`; applications select that dependency explicitly.
+a CUDA SDK, driver or linker symbol. `hnn` is a module of it, not a feature (§0.5). A CUDA
+caller passes the backend's executor through the HNN execution port rather than making
+`holonics` import the CUDA package. Until K2 defines that port method by method, applications
+call the resident HNN in `holonics-cuda::hnn` directly. There is no `holonics::hna` module:
+callers move to the new paths in the moving commit (§0.2).
 
 The internal source tree follows an **operator dependency**, not a catalogue of independent
 substances. The conceptual order is ratio/remainder and partial inversion → geometric
@@ -169,22 +242,31 @@ all Holons.
 
 ```text
 crates/holonics/src/
-  lib.rs                 Holon and deliberate qualified public operations
-  ratio/                 presentations, division/remainder, residue, partial inverse, lift, jet
-  geometry/              complex/exterior/metric, frame/connection, carry, pair and tube charts
-  holon/                 law, ports/Dirac, receiver, elements, generators, restrictions, joins
-  receipt/               framed, clocked fields of received faces over declared partitions
-  holarchy/              proposed compound Holon, receiver/grain views and gluing
-  physics/               fluid, wave, spacetime, heat/entropy instances of Holon law
-  extraction/            foreign equations as Holon element/generator relations
-  hnn/                   field, source moments, receiver, adjoint, session, parametron instance
+  lib.rs       Holon and deliberate qualified public operations
+  ratio/       one per two: presentation, division/remainder, residue/modulo, partial inverse
+               with its nonunit fibre, lift/winding, jet; word rings if words folds in (§0.4)
+  geometry/    complex/exterior/metric, frame/connection, clock, carry/phase, pair and tube/tower charts
+  holon/       law, state, ports/Dirac, elements, generators, restrictions, interconnect,
+               contact, continue, deposition/retention
+  receiver/    ReceiverRole, interact/receive -> InteractionReturn, Receipt, Ratio::between
+  holarchy/    Holarchy returned by interconnect: whole, constituents, gluing, view/count/refine
+  physics/     fluid, wave, thermal, spacetime, information (each created with its first implementation)
+  extraction/  foreign equations as Holon element/generator relations
+  hnn/         field law, source moments, adjoint contracts, execution port, host reference (K2)
+
+crates/holonics-cuda/src/
+  driver/      context, module, stream, allocation, transfer completion (from holonic-mount)
+  section/     resident sections, SLOT_WORDS, section partition, hardware cover
+  hnn/         the resident HNN field and session, moved as it is
+  extraction/  device parts of equation extraction, if kept
+kernels/       .cu/.cuh sources and build.rs
 ```
 
 There is **no public `exact` object/module**. Integer/rational/algebraic/matrix carriers live
 privately beside the operators that use them; exact source descriptions and certified
-remainders are the default mathematical contract. `holonic-words` is a small implementation
-ABI because host and device must compile the same exact word law, not a second mathematical
-foundation. A dyadic `0.5` and `1/2` can have the same exact numerical face; the ratio object
+remainders are the default mathematical contract. `holonic-words`, while it exists, is a small
+implementation ABI that host and device compile from the same source. It is not a second
+mathematical foundation. A dyadic `0.5` and `1/2` can have the same exact numerical face; the ratio object
 also retains the comparands, units, source, possible winding and chosen presentation when a
 future operation needs them.
 
@@ -196,12 +278,11 @@ future operation needs them.
 | `Geometry::transport`, `screw_pair`, `tube`, `restrict` | Carry frame, connection, incidence, phase and clock. A pair chart supplies two motions and their relative jet; a tube chart supplies longitudinal transfer and transverse restriction with an explicit gluing defect. | Rust `relational_geometry::screw`, `winding`, core `restriction::{tube,tower}`; Lean `PhaseCarry`, `PairResonance`, `ContinuingTube`, `ContinuingTower`. |
 | `Holon::interconnect`, `contact`, `continue`, `receive` | Interconnect at ports with internal-power cancellation; bind pair geometry to contact material; carry one Holon through a tube. `receive` joins a source and receiving Holon and returns both changed participants, a typed face and its local receipt; receiver state/material/frame/clock are operands. | `Holon::interconnect` and `PortHolon::interconnect` exist. Full Rust joining of pumps, named ports, complexes and restrictions is still refused or omitted; Lean `Holon/{Dirac,Law}` proves scoped port joins. `Transport/ChangingReceiver` owns the moving-receiver term. |
 | `Holon::restrict`, `depose`, `pullback` | Restrict across grain with a commuting square or typed defect; only arrived covectors change the constitution; the adjoint returns through the full producing operands. | Core restriction/deposition and HNN adjoints exist at distinct scopes; their unified consuming call is owed. |
-| `Holarchy::assemble`, `view`, `count`, `refine` | Assemble a witnessed plurality as one Holon where its join closes. `view(receiver,grain,clock)` returns situated constituent faces, interface flux and unresolved classes. `count` requires a finite discrete receiver partition; otherwise return a typed unresolved reading. | New proposed owner. Existing Holon composition, receiver atlas, tower and future-sufficient quotient provide its ingredients; no current Rust `Holarchy` type has this contract. |
+| `Holon::interconnect -> Holarchy`; `Holarchy::whole`, `view`, `count`, `refine` | `interconnect` returns the Holarchy, which retains its constituents and gluing (§0.7); `whole()` is the joined Holon. `view(receiver,grain,clock)` returns situated constituent faces, interface flux and unresolved classes. `count` requires a finite discrete receiver partition; otherwise return a typed unresolved reading. | New proposed owner. Existing Holon composition, receiver atlas, tower and future-sufficient quotient provide its ingredients; no current Rust `Holarchy` type has this contract. |
 | `Holon::fluid_flux`, `stress_energy`, `observer_current`, `entropy_balance`; wave `propagate`, `interfere` | A physical specialization carries mass/momentum/energy, stress traction, heat/entropy currents and the actual constitutive and metric/clock law. A spacetime receiver contracts the whole stress-energy tensor; waves join coherent amplitudes before an intensity face is read. | Fluid guide, `EinsteinFluidDynamics`, `ObserverBoundaryCurrent`, `PortEnergyHeat`, finite `FluidReceiverClosure`, `NavierStokesLambCurrentCell`, phase/scattering owners. Pair slip and pumps are only declared specializations; a general native fluid/wave/Einstein realization remains owed. |
 
 The root exports the central `Holon` type and qualified operations, not a flat engine-wide
-glob. `holonics::geometry`, `holonics::structure` and `holonics::hna` stay as audited
-forwarding paths while callers migrate. The ratio and geometry operations are reusable by
+glob. Callers move in the same commit as the code they call (§0.2). The ratio and geometry operations are reusable by
 Holon methods; they do not each create a rival Holon. HNN assembles those methods into its
 continuing field and treats the complex parametron as a concrete storage/pump/lock chart.
 Application codecs remain receiver boundaries. Exact module names and method signatures
@@ -225,8 +306,8 @@ A `Receipt` carries the source and receiver identities, region/interface, transp
 clock/tick, typed face and unresolved fibre. `Ratio::between` compares two such faces after
 their declared common transport, retaining both operands and any winding. A moving receiver
 contributes its own variation (`D_Rρ·X_R` in addition to `D_Sρ·X_S` and explicit clock change).
-This places `holon::receiver`, `ratio` and `receipt` on one API surface without reducing a
-receiver to a scalar ratio.
+The `receiver/` module (§0.6) holds these on one API surface without reducing a receiver to a
+scalar ratio.
 
 The notation must be derived from these same typed objects: `|H⟩_F` presents a Holon in a
 frame; `⟨r|` is a participating receiving port; `⟨r|H⟩` is the returned face; `Ĝ_(F'←F)`
@@ -240,8 +321,10 @@ The HNN execution port is defined at its surviving consuming call, including the
 field, complete geometry/feature pullback, material return, source order, receiving phase and
 receipt. The host/reference implementation and CUDA implementation must return the same typed
 relation at their stated precision. The present graph does **not** satisfy this cut: engine
-imports `mount`; HNA imports engine and life; `holonic-words` imports `soma-abi`. Sever those
-edges, preserve the shared arithmetic implementation, then move code. A module with a distinct
+imports `mount` and runs `nvcc`; HNA imports engine and life; `holonic-words` imports `soma-abi`;
+and the HNN field has no host reference (§0.3). M1 therefore moves the resident HNN into
+`holonics-cuda` with its current behavior. K2 then extracts the port and host reference one
+method at a time, each against the CUDA return. A module with a distinct
 mathematical consumer survives in its object owner; unconsumed legacy scaffolding retires.
 
 A separate `holonics-hnn` package is a measured fallback, not the default design. If the
@@ -271,7 +354,7 @@ Refine that root by **operator**, coupled to the Rust calls above:
 | `Holonics.Ratio` | `Objects/{Ratio,RatioPhase,RatioBlock}` already prove undivided presentations, nonunit/zero lift fibres, logarithmic derivative, matrix/projective ratio and jets. Bring the general quotient/remainder/carry and partial-inversion interface from `Geometry/PhaseCarry` and the Euclidean/Farey laws into one import surface; keep source-specific analytic remainders with their source. |
 | `Holonics.Geometry` | Oriented complex, frame/connection, phase lift, screw pair, tube/tower charts. Reuse `Geometry/{PhaseCarry,PairResonance}`, `Transport/{HelicalPairInteraction,ContinuingTube}`, `Foundation/ContinuingTower` and Hodge/exterior owners. Keep geometric kinematics distinct from a Holon's material contact law. |
 | `Holonics.Holon` | Join the occurrence/interface/receiver operations in `Foundation/Holon` with the port/material/interconnection law in `Holon/{Port,Dirac,Element,Generator,Restriction,Law}`. Prove the full joined complex, pumps, clocks and restrictions under stated hypotheses; the current port theorem and native method have narrower scope. |
-| `Holonics.Holon.Receiver` and `Holonics.Receipt` | A receiver is a participating Holon, with its own state and clock. Reuse `Foundation/Receiver`, `Transport/ChangingReceiver`, `Objects/Pairing` and `Foundation/Holon.mapReceiver`; prove the joint received return and moving-receiver variation before deriving typed ratio/receipt readings. The receipt retains frame, interface and unresolved fibre. |
+| `Holonics.Receiver` (§0.6) | A receiver is a participating Holon, with its own state and clock. Reuse `Foundation/Receiver`, `Transport/ChangingReceiver`, `Objects/Pairing` and `Foundation/Holon.mapReceiver`; prove the joint received return and moving-receiver variation before deriving typed ratio/receipt readings. The receipt retains frame, interface and unresolved fibre. |
 | `Holonics.Holarchy` (proposed) | Define a Holon with a witnessed plural decomposition and receiver/grain-indexed views. Prove interconnection closure where supplied, internal-port cancellation, compatible refinement and conditional count laws; exhibit two receivers with different counts of the same continuing whole. Retain overlap/gluing defects and preimage fibres. |
 | `Holonics.Physics` (instances) | Fluid, wave, spacetime and thermal laws specialize Holon incidence, transport and element relations. Keep mass/momentum/energy and stress traction, pressure constraint/Hodge projection, complex-bilinear and conducting-fluid signs, heat/entropy flux and relaxation, phase superposition, propagation and boundary energy. Join `EinsteinFluidDynamics` and `ObserverBoundaryCurrent` under their stated field/Bianchi/metric hypotheses; preserve the abstract-versus-physical realization boundary. Use the finite checked owners and name continuum/discretization obligations. |
 | `Holonics.HNN` | Formal specializations of the same Holon operators: coupled field, source moments, complete variation, deposition return and complex-parametron storage/pump/lock chart. It imports the object owners; the physical parametron is not a foundation import. |
@@ -295,7 +378,8 @@ the same physical flux on a joined face under its trace hypotheses. Holarchy com
 must preserve that shared-face law; its area, volume or number is a reading of the generated
 and restricted geometry, never a fixed field in the collection struct.
 
-Generate the import closures before classifying files. Keep `Holon/`, `Objects/` and the
+Generate the import closures before classifying files. §0.10 lists the measured edges through
+which research enters the present foundation. Cut those first. Keep `Holon/`, `Objects/` and the
 Framework's actual transitive owners together; sort `Geometry/`, `Transport/`, `Foundation/`,
 `Physics/`, `Computation/`, `Algorithm/`, `Mathematics/`, `Millennium/` and `RH/` by dependency and
 consuming theorem, not by folder name. Preserve the current `Soma.Holonics.*` declaration namespace
@@ -316,9 +400,10 @@ must catch every remaining `formal/elementary-holonics` and `ElementaryHolonics`
 - `docs/`: the guides (`THE_MACHINE`, `ELEMENTARY_OBJECTS`, `HOLON`, `HNN_FORMULA`, notation, winding,
   helical geometry, development) and `plans/` (roadmap, this plan, the consolidation plan). Guides whose
   subject is retired are deleted; their live definitions move into `ELEMENTARY_OBJECTS`.
-- `research/records/`: keep records that carry a distinct derivation, measurement, failed attempt
-  or live provenance, including direct-message evidence, even when no current source imports them.
-  Fold genuinely duplicate summaries into their guide. `research/papers/rendered` and
+- `research/records/`: apply §0.1. A record stays if a guide, plan, issue or owner cites it, or
+  if it is the only statement of a result. Otherwise it is folded into its guide as one line with a
+  revision link, or into `RETRACTIONS` if the attempt failed, and deleted. Brandon's direct
+  messages stay where a kept record or guide cites them. `research/papers/rendered` and
   `experiments/` need an artifact/source census; generated copies may be regenerated from kept
   sources only when that regeneration has been checked.
 - `archive/`: delete from the tree (git history keeps it); CLAUDE.md/AGENTS.md cite revisions instead.
@@ -337,8 +422,8 @@ Holon ratio with its winding. A CUDA kernel's sealed-word/radius distinction, co
 properties silently supplied by a new crate name. Lean proves named laws at their scope and
 does not enter the runtime.
 
-Before retiring an old package, verify a source-neutral `holonics` build without its HNN
-feature, a host/reference HNN build, CUDA owner tests on the available card, an all-target
+Before retiring an old package, verify a `holonics` build without CUDA, CUDA owner tests
+(including the resident HNN suites) on the available card, an all-target
 public/workbench check, both Lean library targets and the changed source-to-Lean citation/link
 scan. Inspect a saved
 session through the new public path when one is named as retained. Record the specific commands
@@ -478,8 +563,8 @@ thermodynamic and spacetime returns share the original interface/current and the
 first-law balance.
 
 The Lean package mirrors the method contracts, not every Rust struct: `Holonics.Holon` owns
-law/state/active receiver and complete interconnection; `Holonics.Ratio` and `Receipt` own the
-comparative reading; `Holonics.Holarchy` owns receiver/grain decomposition; and
+law/state and complete interconnection; `Holonics.Receiver` owns the active receiver, receipt
+and comparative reading over `Holonics.Ratio`; `Holonics.Holarchy` owns receiver/grain decomposition; and
 `Holonics.Physics.{Fluid,Wave,Spacetime,Thermal,Information}` imports those owners. Move a generic
 checked operator from `Millennium/` or `Physics/` when its hypotheses and target interface
 are retained; keep source-specific NS, ξ and gravity claims in `HolonicsResearch`. Pair each
@@ -488,45 +573,67 @@ statement or a named #62 obligation. A diagram/notation renderer reads this type
 graph: ket = presented Holon, bra = active receiving role, bracket = receipt face, arrow =
 frame/clock transport, loop = declared circuit. It never stores a second topology.
 
-After R0 and retirement, migrate in dependency order: (1) complete Holon port/complex/clock
-joining and active receiver return; (2) ratio/receipt/Holarchy consumers; (3) finite fluid,
-wave and thermal cell returns on the polygon/cube controls; (4) stress-energy source map and
-moving-observer return; (5) information-to-material port across independent clocks; (6) HNN
-and CUDA consumers of the same contracts. Each step carries the actual current caller,
-wire compatibility and source-qualified verification; no package rename substitutes for it.
+These classes are built by the construction campaigns K1–K4 in §4, after the restructure
+lands. They are not steps of the move (§0.9). Each carries its actual caller and
+source-qualified verification; no package rename substitutes for it.
 
 ## 4. Order of work
 
-1. **R0 census (first, nothing retired before it).** Record the exact HEAD, dirty files,
-   worktrees/branches, build outputs and saved artifacts. Preserve the current uncommitted
-   Lean/research work and paused WIP branches. Produce `docs/plans/THE_REPOSITORY_CENSUS.md` with
-   one table per Rust owner/example, Lean import closure/standalone theorem, document/record and
-   issue: path, elementary object or application, direct and transitive consumers, public/wire
-   use, distinct result or superseding owner, disposition (**keep and own** / **fold** /
-   **retire**), target and verification. Static references are leads, not proof of liveness or
-   deadness. Verify proposed removal in grouped, reviewable cuts with all-target builds and
-   owner tests; use Lean import closures plus named theorem/citation consumers. Show the census
-   and concrete cuts to Brandon without making the inventory an indefinite approval gate.
-2. **R1–R3 retirement passes** in the order engine/examples, life/soma crates, Lean research.
-   For each cut, check the surviving workspace and actual consumers; for Lean, build both
-   maintained libraries and the relevant research target after it exists. Until the move, build
-   the existing `ElementaryHolonics.Framework` target and affected research modules. Keep
-   theorem/record evidence not captured by an import count. See the consolidation plan's census.
-3. **R4 compatibility debt:** remove aliases and legacy decoders not needed by a named saved artifact.
-   Saved Athena coupled models from September 11 already fail to load; old sessions under
-   `.local/campaign-2026-09-20` are superseded checkpoints.
-4. **Finish the paused consolidation** (phases 11, 12a, 12b on their WIP branches; phase 14) on what
-   remains. Rebase them after R1–R3.
-5. **Layout moves (§3):** sever dependency cycles, establish backend-neutral HNN and CPU-only
-   main-library checks, then move/rename packages in mechanical commits. Move Lean paths and roots
-   separately from declaration-namespace edits. Keep the old `hna` and wire identifiers as
-   described in §3.1 while their live consumers are migrated. Use §3.7's class/method cut as
-   the migration and verification order: physics and receivers are main-library instances,
-   while device crates implement their declared operations.
-6. **Documents (§3.3)** and the GitHub issue reset (§5).
-7. **Update CLAUDE.md and AGENTS.md** owner tables, `CONSTRUCTION_STATE.md`, the roadmap,
-   `docs/REPOSITORY.md`, root README and mathematical/operator owner links to the verified new
-   paths. During migration, operator guides label present paths and planned owners separately.
+**The restructure** moves and retires existing code with its current behavior, verified by the
+existing suites (§0.9):
+
+1. **R0 census (first; nothing retired before it).** Create the tracking issues (§5). Record the
+   exact HEAD, dirty files, worktrees/branches, build outputs and saved artifacts. Commit or
+   account for the uncommitted Lean/research work and the paused WIP branches. Produce
+   `docs/plans/THE_REPOSITORY_CENSUS.md` with one table per area:
+   - Rust owners and examples;
+   - Lean files outside the foundation;
+   - documents and records;
+   - issues.
+
+   Each table's columns are: path, lines, elementary object or application, consumers
+   (build-confirmed), superseding owner, disposition (**keep** / **fold** / **retire**, applying
+   §0.1), target (§3) and verification. Brandon reviews the **keep** column and names any saved
+   artifact whose wire must stay readable (§0.2). The census is not an indefinite approval gate.
+2. **R1: Rust with no consumer.** Retire engine modules and examples first; their laws move to
+   Lean or a guide first, as §0.1 requires.
+3. **R2: the Soma/`life` lineage and unconsumed crates.** Covers `holonic-body`, `-membrane`,
+   `-surface`, `-circulation-abi`, `-language`, `holonics-workspace`, the dead parts of
+   `holonic-life`, and `accelerators/` per §0.4. Decide `holonic-words` here.
+4. **R3: the Lean foundation cut.** Cut the §0.10 edges, curate the `Holonics` root and retire
+   duplicate or wrapper theorems. Build `ElementaryHolonics.Framework` and the affected research
+   modules.
+5. **R4: compatibility debt.** Remove aliases and legacy decoders, keeping only those Brandon
+   named in R0.
+6. **C: finish the paused consolidation.** Rebase phases 11, 12a and 12b (WIP branches) onto the
+   reduced tree, then do phase 14.
+7. **M1: the Rust cut.**
+   - Create `holonics-cuda` and move the driver, sections, kernels and the resident HNN into it as
+     they are (§0.3).
+   - Merge `holonic-core`, `relational-geometry`, live `holonic-structure`, the source-neutral
+     engine and extraction into the substantive `holonics`.
+   - Update every caller in the same commits (§0.2).
+   - Verify: `holonics` builds without CUDA, `holonics-cuda` owner tests pass on the card, and
+     the workbench/all-target check passes.
+   - Clean the old `target/`.
+8. **M2: the Lean move.** Move paths to `lean/` (`Holonics` and `HolonicsResearch`) and build both
+   targets. Rename `Soma.Holonics` to `Holonics` as a separate mechanical commit.
+9. **D: documents.** Revise the README in full, then the guides, the §5 issue reset,
+   `CONSTRUCTION_STATE.md`, the roadmap, `docs/REPOSITORY.md`, and the CLAUDE.md/AGENTS.md owner
+   tables, all to the verified paths.
+
+**Construction campaigns** run on the new layout, each with its own issue:
+
+- **K1:** complete `interconnect -> Holarchy` (joined complex, named ports, pumps with a declared
+  joint clock, restrictions, or a typed defect), and the joint `interact`/`receive` return (§3.7).
+- **K2:** the HNN execution port and host reference, one method at a time against the resident
+  CUDA return. This is the precondition for `holonics-apple`.
+- **K3:** finite physics cells. §3.5's tests cover polygon/cube reflection and join, wave
+  interference and propagation, the Euler/NS control volume and thermal exchange.
+- **K4:** the stress-energy source map and moving observer, the information-to-material port, and
+  independent clock axes (§3.6).
+- **The machine** resumes after M1: GitHub #17, #16, #18 and #61, source-port growth of ring g0,
+  and the model-versus-uniform gap.
 
 Build hygiene starts now: use one shared scratch target directory and
 `CARGO_PROFILE_DEV_DEBUG=line-tables-only`; inspect each target/cache's owner before reclaiming
@@ -544,9 +651,12 @@ before a targeted or post-split `cargo clean` reclaims the space.
   close or fold: the protein/structure issues (#11, #38, #44, #46, #51, #52, #53) after the biology
   pivot away; device issues (#12–#15, #50) fold into one device-realization issue after §3.1; Lean
   obligations fold into #62 and its successors.
-- **Track the restructure.** Keep one parent issue and separately testable cuts where their
-  owner and return differ: census/retirement, paused consolidation, Rust dependency cut,
-  Lean-library move, and docs/consumer migration. Link them from this plan when created.
+- **Track the restructure.** Create these at the start of R0 and link them here:
+  - a parent issue, *Repository restructure*;
+  - one child issue for each of R0, R1–R2, R3, R4, C, M1, M2 and D;
+  - one issue each for K1–K4.
+
+  Each closing comment gives the commit, the verification receipt and any remaining scope.
 - **Practice from now on.** Every campaign cites its issue in the plan and in commit messages
   (`Refs #n`/`Closes #n`); a closing comment gives the commit, the verification receipt and any
   remaining scope; labels follow §2's objects (`holon`, `generator`, `pair-contact`, `parametron`,

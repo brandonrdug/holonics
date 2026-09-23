@@ -7,11 +7,11 @@ compatibility.
 
 [project-postulate] This table records the **current** public paths. The
 [repository restructure](plans/THE_REPOSITORY_RESTRUCTURE.md#31-rust-the-main-holonics-library-owns-the-construction)
-turns this package into the substantive owner of the Holon law/geometry and an internal
-backend-neutral HNN. `holonic-words` supplies shared exact device words; `holonics-cuda` and
-later `holonics-apple` implement its execution port. Existing `hna` API paths and wire
-identifiers are audited at their consuming calls during migration; target package names are
-not yet importable.
+turns this package into the substantive owner of the Holon law/geometry and the
+backend-neutral HNN law and port; `holonics-cuda` receives the resident HNN and later
+`holonics-apple` implements the same port. `hna` paths are replaced, not forwarded, when their
+callers move; wire decoders stay only for saved artifacts Brandon names. Target package names
+are not yet importable.
 
 [definition] The [HNN composition guide](HNN_COMPOSITION.md) describes the model's semantic
 assembly, with its [governing model formula](HNN_FORMULA.md). The dependency split below improves library

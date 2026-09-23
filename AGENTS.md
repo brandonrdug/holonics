@@ -15,11 +15,12 @@ the roadmap orders it. The machine, source guides and research supply the constr
 [project-postulate] Brandon's September 23 intervention is governed by
 [THE_REPOSITORY_RESTRUCTURE](docs/plans/THE_REPOSITORY_RESTRUCTURE.md). The source paths in this
 guide are **current owners**, not claims that the target layout has landed. The substantive
-main `holonics` library will own the Holon, exact geometry, elementary operations and its
-backend-neutral `hnn` module. `holonic-words` owns the small shared exact word/section ABI;
-`holonics-cuda` implements the device execution port, and Brandon's later `holonics-apple`
-package implements its Apple counterpart. Dependency direction is words → main → backends;
-main builds with a host/reference HNN and without CUDA. Lean becomes one Lake package with
+main `holonics` library will own the Holon, exact geometry, elementary operations and the backend-neutral `hnn` law
+and execution port. `holonics-cuda` receives the device-resident HNN as it is and implements the
+port; `holonics-apple` (later, on Brandon's branch) implements it for Apple silicon. `holonic-words`
+stays a separate `no_std` crate only while a Rust device kernel consumes it; otherwise its rings fold
+into `holonics::ratio`. Main builds without CUDA; its HNN host reference is construction campaign
+K2, not a precondition of the move. Lean becomes one Lake package with
 `Holonics` and dependent `HolonicsResearch`; the current `ElementaryHolonics` paths and
 `Soma.Holonics` declaration namespace stay factual until their distinct migrations land.
 The proposed internal operator order is ratio/remainder/inversion, geometric transport,
@@ -29,11 +30,15 @@ The main library's fluid, wave, Einstein/stress-energy and thermal instances ret
 constitutive equations, clocks, heat/entropy balances and participating receiver. Cross-entropy
 acts physically only through a stated material/port return; its scalar face is not that law.
 
-[definition] A moved operator retains its typed source and receiver, forward law, full variation,
-material/clock/frame hypotheses, wire face and actual consuming call. R0 accounts for the dirty
-research tree and paused worktrees before retirement. Low reference count alone does not retire
-a theorem, saved artifact or public path. Update the owner map and consumer together after the
-specific move is verified; do not write a target path as if it were already implemented.
+[definition] Each moved operator retains its typed source and receiver, forward law, complete
+variation, material/clock/frame hypotheses and consuming call. Account for the uncommitted
+research and paused worktrees in R0 before retirement. **Lean holds the mathematics; Rust holds
+what runs:** unconsumed Rust is deleted after any law it alone states moves to Lean or a guide;
+checked Lean theorems stay unless duplicate or wrappers. A move updates its in-repo callers in
+the same commit, with no forwarding modules or aliases; a legacy wire decoder stays only for a
+saved artifact Brandon names. The restructure moves existing behavior; new objects (Holarchy,
+active receive, physics instances, HNN host reference) are separate construction campaigns
+(plan §0, §4). Do not present target names as existing code.
 
 ## The elementary objects — the only design vocabulary
 
