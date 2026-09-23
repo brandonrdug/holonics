@@ -84,7 +84,7 @@ Each is backed by a measurement at `d3b8b509`.
    HNN host reference) are construction campaigns on the new layout, each with its own issue. The
    Codex draft ordered the physics construction ahead of the HNN and CUDA migration, which would
    have left the tree half-moved behind open research.
-10. **The Lean foundation is cut at a few measured edges.** The present `Framework` closure
+10. **The Lean foundation is cut at a few measured edges.** The R0 `Framework` closure
     (188k lines) contains 292 Millennium files (119k lines) and 52 RH files (13k lines). They enter
     through few edges:
     - `Framework.Core` reaches five small Millennium modules **transitively** through its
@@ -99,6 +99,10 @@ Each is backed by a measurement at `d3b8b509`.
     Moving the declarations these edges actually use into `Holonics` owners removes most of the
     research from the foundation. R3 does this before the path move. It measures the remaining
     closure and records it.
+    The first five Core ingress cuts have now moved their generic declarations to Foundation:
+    a source-import traversal from `Framework.Core` reaches 26 in-package modules and no
+    `Millennium` or `RH` module. The full `Framework` facade still has the distinct Ratio and
+    MomentStorage research ingress listed above; those cuts remain R3 work.
 
 ## 1. Why the tree looks like this
 
