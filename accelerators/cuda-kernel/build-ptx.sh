@@ -10,7 +10,7 @@
 #
 # Run manually from this directory. NOT wired into the workspace build — the workspace compiles
 # without the nvptx target present because the .ptx artifact is committed alongside, exactly as
-# kernel/soma.spv is the Vulkan boundary artifact and mount_smoke_kernel.ptx is the smoke boundary.
+# mount_smoke_kernel.ptx is the separate smoke boundary.
 #
 # `body` reaches a native u64 divide on some paths, so build-std carries compiler_builtins as well
 # as core (the smoke kernel needed only core). Both lower to PTX; ptxas is the final judge.

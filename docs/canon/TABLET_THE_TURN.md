@@ -515,7 +515,7 @@ The absences, each with the search that shows it:
   and `joint_decorated_path_atlas.rs`. **Nothing converts a crossing into a `Substitution`**, which is
   the one adapter that would make the skein relation act on the object skein relations are for.
 - **No string.** `string theory`, `worldsheet` and `brane` return zero across `crates/` and `soma/`.
-  `crates/holonic-surface` is a wgpu card boundary, not a surface in the mathematical sense.
+  The former `crates/holonic-surface` was a wgpu card boundary, not a surface in the mathematical sense; its unconsumed Vulkan realization was retired in R2.
 
 **Re-measured 2026-08-15.** `git grep -inw "writhe\|reidemeister" -- crates soma`,
 `git grep -in "jones\|alexander\|string theory\|worldsheet" -- crates soma` and

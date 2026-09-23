@@ -13,7 +13,7 @@ use std::time::Instant;
 use mount::{Context, Device, DeviceBuffer, Dim3, Module, FOLD_CONSTANT};
 
 /// The PTX payload, built by mount-smoke-kernel/build-ptx.sh and committed as the boundary
-/// artifact (exactly as kernel/soma.spv is the Vulkan boundary). The workspace compiles without
+/// artifact. The workspace compiles without
 /// the nvptx target present because this file already exists on disk.
 const PTX: &[u8] = include_bytes!("../../../../accelerators/cuda-smoke/mount_smoke_kernel.ptx");
 

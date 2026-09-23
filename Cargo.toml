@@ -12,9 +12,8 @@
 # declared codec/apparatus roles. `crates/holonic-language` is the reflective
 # runtime. `crates/holonic-life` is the membrane where the ecologies live.
 #
-# Excluded on purpose: the rust-gpu kernel and the nvptx mount kernel each pin
-# their own nightly and publish a committed boundary artifact, so the host
-# workspace never needs those targets.
+# Excluded on purpose: the nvptx mount kernel pins its own nightly and publishes a
+# committed boundary artifact, so the host workspace never needs that target.
 [workspace]
 resolver = "2"
 members = [
@@ -32,19 +31,14 @@ members = [
   "crates/holonic-abi",
   "crates/holonic-circulation-abi",
   "crates/holonic-membrane",
-  "crates/holonic-surface",
   "crates/holonic-life",
   "crates/holonic-mount",
   "applications/derivation-atlas",
   "applications/holon-plate",
 ]
-# The rust-gpu kernel and the nvptx mount kernel each pin their own nightly.
-# Their compiled artifacts -- accelerators/rust-gpu/soma.spv and the mount PTX -- are
-# committed boundary objects that soma-surface and mount include directly, so
-# the host workspace carries the artifact without carrying the toolchain.
+# The nvptx mount kernel pins its own nightly. Its committed PTX is included by mount,
+# so the host workspace carries that boundary artifact without carrying the toolchain.
 exclude = [
-  "accelerators/rust-gpu",
-  "accelerators/rust-gpu/builder",
   "accelerators/cuda-smoke",
   "accelerators/cuda-kernel",
 ]

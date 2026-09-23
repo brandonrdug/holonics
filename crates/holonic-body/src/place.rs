@@ -49,7 +49,7 @@ pub fn spiral(place: Place, n: u32) -> Place {
 fn band(c: Cog, axis: i64) -> i64 {
     let m = c.mag as i64;
     let tz = axis.trailing_zeros();
-    let sh = if tz >= 2 { tz - 2 } else { 0 }; // `saturating_sub(2)` explicit — the rust-gpu kernel has no saturating intrinsic
+    let sh = if tz >= 2 { tz - 2 } else { 0 }; // Historical form: the retired rust-gpu target had no saturating intrinsic
     let turn = ((c.turn & 3) as i64) << sh; // the soul, into the high band
     let rk = match c.rank.face() {
         Some(r) => r,    // the climb — the composition's own coordinate

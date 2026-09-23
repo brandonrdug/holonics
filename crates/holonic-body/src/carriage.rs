@@ -170,7 +170,7 @@ impl ValidatedSpan {
 }
 
 /// Checked boundary extent arithmetic spelled without Rust's `checked_*` intrinsics, which the
-/// pinned rust-gpu backend cannot lower. Failure rejects the invocation before body mutation.
+/// pinned rust-gpu backend cannot lower. This compatibility constraint is historical; failure rejects the invocation before body mutation.
 #[inline(never)]
 pub fn checked_extent_add(left: usize, right: usize) -> Option<usize> {
     if right > usize::MAX - left {
@@ -1855,7 +1855,7 @@ impl<S: WordSeam, const FOUNDED: bool, const REGISTERED: bool> FeltLineage<S, FO
     fn required_carrier_depth(&self) -> Option<usize> {
         (manifold::continuation_is_afferent(self.continuation_phase)
             && self.continuation_depth >= self.depth)
-            // `saturating_add(1)` explicit — the rust-gpu kernel has no saturating intrinsic
+            // Historical form: the retired rust-gpu target had no saturating intrinsic
             // (`place.rs:52` is the same excision, same reason). `usize::MAX` is the only
             // spelling that stays correct across the seam: `usize` is 32-bit on
             // `spirv-unknown-vulkan1.2` and 64-bit on the cpu, and a literal would pin one.
@@ -2360,7 +2360,7 @@ struct LayoutProof {
 }
 
 /// Form every extent before any body word can change. This function has scalar inputs only and is
-/// deliberately kept outside the pointer-heavy stroke so rust-gpu does not structurally nest the
+/// historically kept outside the pointer-heavy stroke so rust-gpu would not structurally nest the
 /// whole lineage law beneath each checked arithmetic branch.
 #[allow(clippy::too_many_arguments)]
 #[inline(never)]

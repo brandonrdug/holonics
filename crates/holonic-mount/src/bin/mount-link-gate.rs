@@ -21,8 +21,8 @@ use body::medium::{integrate, RegionalForm, FORM_WORDS};
 use body::num::{Cog, Rung};
 use mount::{Context, Device, DeviceBuffer, Dim3, Module, Result};
 
-/// The committed PTX boundary artifact, built by soma-kernel-cuda/build-ptx.sh (like kernel/soma.spv
-/// is the Vulkan boundary and mount_smoke_kernel.ptx is the smoke boundary).
+/// The committed PTX boundary artifact, built by soma-kernel-cuda/build-ptx.sh;
+/// mount_smoke_kernel.ptx is the separate smoke boundary.
 const PTX: &[u8] = include_bytes!("../../../../accelerators/cuda-kernel/soma_kernel_cuda.ptx");
 
 /// The staged configuration. 65,536 places · 3 co-present OWN planes — the same shape/scale as the

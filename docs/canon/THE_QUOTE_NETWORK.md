@@ -1247,11 +1247,11 @@ an `ExactReceiverPhaseJet` over `ExactRaster` / `ExactRgb` with `BigInt` and `Ra
 `DEFAULT_INPUT` is `/tmp/codex-clipboard-T9jMYB.png`, **which no longer exists** — the example is
 one file path away from running.
 
-The engine itself: `crates/relational-geometry` (7,946 lines, `projection.rs` 1,613,
-`exact_analysis.rs` 1,399) plus `crates/holonic-surface` (wgpu 27, `accelerators/rust-gpu/soma.spv`) plus
-`crates/holonic-engine/src/{conic,simplicial,physical,wave_propagation,presentation,display}.rs` and
-`examples/desktop_receiver.rs` (3,130 lines). `archive/plans/legacy/REALIZATION_AND_HARDWARE.md` carries the
-hardware doctrine.
+This older inventory grouped `crates/relational-geometry` (7,946 lines, `projection.rs` 1,613,
+`exact_analysis.rs` 1,399), the now-retired `crates/holonic-surface` Vulkan card apparatus, and
+`crates/holonic-engine/src/{conic,simplicial,physical,wave_propagation,presentation,display}.rs` with
+`examples/desktop_receiver.rs` (3,130 lines). It was a historical code map, not a dependency boundary.
+`archive/plans/legacy/REALIZATION_AND_HARDWARE.md` carries the hardware doctrine.
 
 **The ontology he asked for — RAM, clock speeds, and storage as one thing under different
 temporariness — was never derived.** The nearest deposit is

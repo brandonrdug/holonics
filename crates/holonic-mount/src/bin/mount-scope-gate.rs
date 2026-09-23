@@ -297,8 +297,8 @@ fn expected_radiation_species(lanes: usize) -> Option<(usize, usize, usize)> {
 
 // --- DENSE SCOPE (scope_felt) --------------------------------------------------------------------
 
-/// Pack the cohort's raw lights into one concatenated word buffer and the 6-word dense lane rows,
-/// exactly as `surface::FeltSurface::pack_light` does. Worldline bases are zero (resident mount).
+/// Pack the cohort's raw lights into one concatenated word buffer and the 6-word dense lane rows
+/// required by the body-owned carriage layout. Worldline bases are zero (resident mount).
 fn pack_dense_light(lanes: usize) -> (Vec<u32>, Vec<u32>) {
     let lights: Vec<Vec<u8>> = (0..lanes).map(lane_light).collect();
     let total: usize = lights.iter().map(|l| l.len()).sum();
@@ -477,8 +477,8 @@ fn dense_case(ctx: &Context, felt: &Function, lanes: usize) -> Result<bool> {
 // --- FOUNDED SCOPE (scope_founded) ---------------------------------------------------------------
 
 /// Pack the cohort's raw lights and the 8-word founded lane rows (dense row ⊕ `own_cell_offset` ⊕
-/// `own_axis`), exactly as `surface::FeltSurface::pack_founded_light`. Returns the total founded
-/// cell count, so the concatenated OWN reservation can be sized exactly.
+/// `own_axis`) required by the body-owned carriage layout. Returns the total founded cell count,
+/// so the concatenated OWN reservation can be sized exactly.
 fn pack_founded_light(lanes: usize) -> (Vec<u32>, Vec<u32>, usize) {
     let lights: Vec<Vec<u8>> = (0..lanes).map(lane_light).collect();
     let total: usize = lights.iter().map(|l| l.len()).sum();

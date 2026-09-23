@@ -1,11 +1,11 @@
 # soma-kernel-cuda — the PTX payload for the configuration fold, founded LINK, chart, lineage
 # scope, and CUDA-only event-born REGISTER entry families. NOT a workspace member; built manually
 # for nvptx64-nvidia-cuda on the pinned nightly (see build-ptx.sh). It is a boundary artifact, as
-# kernel/soma.spv is the Vulkan boundary and mount_smoke_kernel.ptx is the smoke boundary.
+# mount_smoke_kernel.ptx is the separate smoke boundary.
 #
-# It DEPENDS ON `body` (no_std, zero-dep) so the law types are the SAME CODE the SPIR-V card and the
-# host reference compile — only the entry shells are re-expressed (%ctaid/%ntid/%tid global indexing
-# and core::sync::atomic in place of spirv-std's GlobalInvocationId and atomic intrinsics). The law
+# It DEPENDS ON `body` (no_std, zero-dep) so the host reference and CUDA kernel share the same law
+# types — only the entry shells are re-expressed (%ctaid/%ntid/%tid global indexing
+# and core::sync::atomic in place of device-specific indexing and atomic intrinsics). The law
 # arithmetic (RegionalForm, medium::grain/cog/arm functions, num) is NOT transliterated.
 # Empty [workspace] table detaches this from the soma workspace: it builds only for nvptx, own nightly.
 [workspace]

@@ -363,7 +363,7 @@ Owns: "Exact reflective runtime beneath learnable surface codecs … defines no 
 
 ## C. Cargo workspace (`/home/b/Workspaces/holonics/Cargo.toml`)
 
-Header (`:1-13`): "`body` is pure law: no_std, zero dependencies. `crates/holonic-structure` is the substrate … `relational-geometry` and `holonic-engine` are the exact receiver-relative geometry, float-free over BigRational with Sturm-certified algebraic roots. `holonic-language` is the reflective runtime. `crates/holonic-life` is the membrane where the ecologies live." Resolver 2, edition 2024. Excluded (own nightlies, committed artifacts): `accelerators/rust-gpu`, `accelerators/rust-gpu/builder`, `accelerators/cuda-smoke`, `accelerators/cuda-kernel`.
+Header (`:1-13`): "`body` is pure law: no_std, zero dependencies. `crates/holonic-structure` is the substrate … `relational-geometry` and `holonic-engine` are the exact receiver-relative geometry, float-free over BigRational with Sturm-certified algebraic roots. `holonic-language` is the reflective runtime. `crates/holonic-life` is the membrane where the ecologies live." Resolver 2, edition 2024. Historical exclusion at report time (own nightlies, committed artifacts): `accelerators/rust-gpu`, `accelerators/rust-gpu/builder`; the Vulkan surface was retired in R2. Current device-only targets: `accelerators/cuda-smoke`, `accelerators/cuda-kernel`.
 
 | Member | First doc comment |
 |---|---|
@@ -375,7 +375,7 @@ Header (`:1-13`): "`body` is pure law: no_std, zero dependencies. `crates/holoni
 | `crates/holonic-body` | `#![no_std]` "the law and the organs — one module per organ" (`src/lib.rs:3`) |
 | `crates/holonic-abi` | Substrate-neutral word records at Soma's execution membrane |
 | `crates/holonic-membrane` | The live, organ-neutral execution membrane |
-| `crates/holonic-surface` | the M4 felt-series card boundary; `FeltSurface` |
+| `crates/holonic-surface` | historical M4 felt-series card boundary (`FeltSurface`); retired in R2 after caller audit |
 | `crates/holonic-life` | Production library surface for the continuing Soma bodies |
 | `crates/holonic-mount` | CUDA Driver API boundary scaffolding for the headless production mount |
 | `applications/record-index` | (no crate doc; modules `model, render, scan, sha256`) |

@@ -5,7 +5,6 @@
 #
 # Run manually from this directory. NOT wired into the workspace build — the workspace
 # compiles without the nvptx target present because the .ptx artifact is committed alongside,
-# exactly as kernel/soma.spv is the Vulkan boundary artifact.
 set -euo pipefail
 cd "$(dirname "$0")"
 

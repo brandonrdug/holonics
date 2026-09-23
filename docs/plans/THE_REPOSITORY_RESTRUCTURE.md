@@ -54,7 +54,7 @@ Each is backed by a measurement at `d3b8b509`.
    arithmetic is ratio arithmetic. If a Rust device kernel still needs shared `no_std` source,
    retain only that small arithmetic carrier until the backend cut can consume it directly.
    Host/device parity for the `.cu` kernels remains tested against host arithmetic.
-   `accelerators/rust-gpu` (Vulkan, already ruled out for production) retires.
+   `accelerators/rust-gpu` (Vulkan, already ruled out for production) retired with its unconsumed `holonic-surface` host crate and SPIR-V artifact in R2. The 2026-08-09 stale-artifact record is historical evidence; its then-current recommendation not to remove the path is superseded by this September 23 disposition.
 5. **Minimal features.** Each feature combination compiles its own copy of the crate. On
    September 23 the engine had 39 incremental directories (150 GB). Main `holonics` has no
    feature that changes its dependency graph. R1 re-charts both type-level X11 callers before
@@ -620,7 +620,8 @@ existing suites (§0.9):
    Lean or a guide first, as §0.1 requires.
 3. **R2: the Soma/`life` lineage and unconsumed crates.** Covers `holonic-body`, `-membrane`,
    `-surface`, `-circulation-abi`, `-language`, `holonics-workspace`, the dead parts of
-   `holonic-life`, and `accelerators/` per §0.4. Decide `holonic-words` here.
+   `holonic-life`, and `accelerators/` per §0.4. The isolated Vulkan surface cut is complete;
+   continue with the remaining consumers and decide `holonic-words` here.
 4. **R3: the Lean foundation cut.** Cut the §0.10 edges, curate the `Holonics` root and retire
    duplicate or wrapper theorems. Build `ElementaryHolonics.Framework` and the affected research
    modules.
