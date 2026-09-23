@@ -60,7 +60,7 @@ current owner from target owner throughout the migration.
 
 | Former location | Current location |
 |---|---|
-| `soma/{body,abi,circulation-abi,membrane,surface,mount,life}` | Corresponding `crates/holonic-*` libraries |
+| `soma/{body,abi,membrane,surface,mount,life}` | Corresponding `crates/holonic-*` libraries |
 | `applications/athena-alpha` | `crates/holonics-hna` |
 | `applications/holonics-application` | `crates/holonics-workspace` |
 | `soma/kernel`, device-only mount children | `accelerators/` |

@@ -1,8 +1,8 @@
 //! HNA application interfaces over the current native recurrent operator.
 //!
 //! The typed run API uses one full-operator session. Earlier alpha/circulation adapters keep their
-//! distinct artifact scopes and wire names. Native laws remain owned by `holonic-engine`, `life`,
-//! and `holonics-circulation-abi`; this crate does not supply a second learning mechanism.
+//! distinct artifact scopes and wire names. Native laws remain owned by `holonic-engine` and `life`.
+//! This crate does not supply a second learning mechanism.
 
 pub mod alpha;
 mod apertures;

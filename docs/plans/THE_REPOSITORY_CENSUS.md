@@ -172,6 +172,20 @@ live through `holonic-life` and needs the caller disposition before retirement. 
 compile time by `holonic-mount` library/tests/gates and loaded as bytes by the engine's
 section-layout test and `life` callers. Removing `life` alone cannot retire the kernel, mount
 consumer or host words. The plan §0.4 now names those distinct edges.
+
+The R2 provenance check retired `holonics-circulation-abi`: it is `publish = false`, has no
+configured install/build consumer, C header or foreign-language caller in tracked source, and no
+`libholonics_circulation_abi*` artifact or exported-symbol/schema reference was found in the
+filename-level `.local` artifact scan. The HNA `alpha_matrix` had one ABI-specific equality check:
+`Open` + `Conduct` returned the same complete boundary as direct
+`NativeCirculationSession::conduct` for the same package, configuration and request, then `Close`
+released the process handle. The HNA integration also directly tests the lifecycle, remount,
+commit, decline and diffusion paths; those laws and tests remain with `life`, `holonic-engine` and
+Lean. The adapter's JSON schema, opaque handle registry, refusal mapping and C buffer ownership
+were transport apparatus, not a distinct mathematical law. No positive external consumer evidence
+was found in the repository, local artifacts, or GitHub releases/packages; unrecorded user-local
+dynamic loading cannot be ruled out.
+
 The unconsumed wgpu `holonic-surface` crate and its orphan rust-gpu SPIR-V source, builder and
 artifact have been retired in R2 after a source/manifest scan found no external caller. The
 M4/M5 measured claims remain in dated research records; old SLEEP readers and fixtures do not

@@ -1501,7 +1501,7 @@ They are not all composed into AC1's general conversation path.
 
 | Relation | Lean owner | Rust owner | ABI/application owner | Status and exact open fibre |
 |---|---|---|---|---|
-| Historical session, commit, snapshot/remount, and diffusive boundary | `Computation/HolonicCirculationSession.lean` remains a specialized fixed-inference/later-cultivation object | `native_intelligence/{circulation_session,morphology_commit,circulation_diffusion,scaffold_cultivation,morphology_package}.rs` over `diffusion.rs` | `crates/holonic-circulation-abi`; `crates/holonics-hna` | **exact-bounded persistence/API apparatus; counterexample as HNN lifecycle:** commit/decline and later exterior return do not define inference, generation, or learning; HNA0 replaces them with one successor recurrence |
+| Historical session, commit, snapshot/remount, and diffusive boundary | `Computation/HolonicCirculationSession.lean` remains a specialized fixed-inference/later-cultivation object | `native_intelligence/{circulation_session,morphology_commit,circulation_diffusion,scaffold_cultivation,morphology_package}.rs` over `diffusion.rs` | `crates/holonics-hna` application/session API; the versioned circulation ABI was retired in R2 | **exact-bounded persistence/lifecycle:** commit/decline and later exterior return do not define inference, generation, or learning; HNA0 replaces them with one successor recurrence. Diffusion balance remains in `holonic-engine::diffusion`; no mathematical law moved from the retired ABI. |
 
 ## Deprecated R0Q correspondence retained as standing
 

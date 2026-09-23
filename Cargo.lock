@@ -623,25 +623,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "holonics-circulation-abi"
-version = "0.1.0"
-dependencies = [
- "holonic-engine",
- "life",
- "num-rational",
- "num-traits",
- "serde",
- "serde_json",
- "thiserror",
-]
-
-[[package]]
 name = "holonics-hna"
 version = "0.1.0"
 dependencies = [
  "holonic-core",
  "holonic-engine",
- "holonics-circulation-abi",
  "life",
  "num-bigint",
  "num-rational",

@@ -29,7 +29,6 @@ members = [
   "crates/holonic-engine",
   "crates/holonic-body",
   "crates/holonic-abi",
-  "crates/holonic-circulation-abi",
   "crates/holonic-membrane",
   "crates/holonic-life",
   "crates/holonic-mount",

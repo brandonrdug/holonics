@@ -8,14 +8,9 @@ use holonic_engine::{
     native_spool::fixture,
     EventId,
 };
-use holonics_circulation_abi::{
-    dispatch_bytes, AbiCommand, AbiDisposition, AbiEnvelope, AbiResponse,
-    HOLONICS_CIRCULATION_ABI_SCHEMA,
-};
 use life::native_intelligence::{
-    NativeCirculationConfiguration, NativeCirculationEvent, NativeCirculationSession,
-    NativeDiffusionIngress, NativeDiffusionStanding, NativeMorphologyArtifact, NativeWorldFace,
-    NativeWorldStage,
+    NativeCirculationConfiguration, NativeCirculationEvent, NativeDiffusionIngress,
+    NativeDiffusionStanding, NativeWorldFace, NativeWorldStage,
 };
 use num_rational::BigRational as Rat;
 use num_traits::{One, Zero};
@@ -50,18 +45,6 @@ fn request(application: &AthenaAlphaApplication, occurrence: EventId) -> NativeI
     )
 }
 
-fn dispatch(request_id: u64, command: AbiCommand) -> AbiResponse {
-    let envelope = AbiEnvelope {
-        schema: HOLONICS_CIRCULATION_ABI_SCHEMA.to_owned(),
-        request_id,
-        command,
-    };
-    serde_json::from_slice(&dispatch_bytes(
-        &serde_json::to_vec(&envelope).expect("request wire"),
-    ))
-    .expect("response wire")
-}
-
 #[test]
 fn exact_alpha_matrix_returns_the_complete_dynamic_lifecycle() {
     let application = application();
@@ -71,7 +54,7 @@ fn exact_alpha_matrix_returns_the_complete_dynamic_lifecycle() {
     // 1--3. One package boundary, plural ingress, and exact actual-successor lineage.
     let first_request = request(&application, EventId(1));
     let first = application
-        .conduct(first_request.clone())
+        .conduct(first_request)
         .expect("first boundary");
     assert_eq!(first.actual_successors.len(), 1);
     assert_eq!(first.actual_successors[0].address.occurrence, EventId(2));
@@ -241,49 +224,7 @@ fn exact_alpha_matrix_returns_the_complete_dynamic_lifecycle() {
         generation_one
     );
 
-    // 10--11. Direct and ABI conduct agree at the complete configuration.
-    let direct = NativeCirculationSession::mount(
-        NativeMorphologyArtifact::read(&base_snapshot.package_wire).expect("direct package"),
-        base_snapshot.configuration.clone(),
-    )
-    .expect("direct session");
-    let direct_boundary = direct
-        .conduct(first_request.clone())
-        .expect("direct boundary");
-    let AbiDisposition::Opened { handle, .. } = dispatch(
-        1,
-        AbiCommand::Open {
-            package_wire: base_snapshot.package_wire,
-            configuration: base_snapshot.configuration,
-        },
-    )
-    .disposition
-    else {
-        panic!("ABI open");
-    };
-    let AbiDisposition::Boundary { boundary } = dispatch(
-        2,
-        AbiCommand::Conduct {
-            handle,
-            request: first_request,
-        },
-    )
-    .disposition
-    else {
-        panic!("ABI boundary");
-    };
-    assert_eq!(boundary, direct_boundary);
-    assert!(!boundary.configuration.ingress_aperture.is_empty());
-    assert!(!boundary.configuration.continuation_receiver.is_empty());
-    assert!(!boundary.configuration.world_return_law.is_empty());
-    assert!(!boundary.configuration.emission_codec.is_empty());
-    assert!(!boundary.configuration.apparatus.is_empty());
-    assert!(matches!(
-        dispatch(3, AbiCommand::Close { handle }).disposition,
-        AbiDisposition::Closed { .. }
-    ));
-
-    // 12. Structural grades are attached to caused returns, not an expected surface. The declared
+    // 10. Structural grades are attached to caused returns, not an expected surface. The declared
     // body's shared generator is active at states 0 and 1, so the admitted face family reaches
     // states 0, 1 and 4; the detached winding over states 2 and 3 stays outside the cone.
     assert_eq!(commit.causal_cone.len(), 3);
