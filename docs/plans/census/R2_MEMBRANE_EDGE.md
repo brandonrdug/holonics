@@ -1,6 +1,6 @@
 # R2 membrane owner and caller audit
 
-Source-backed R2 owner map, 2026-09-23. The initial audit followed `.agents/bin/prior-art 'membrane|SparseStanding|LiveCurrentMachine|live current|standing storage'`; its results are navigation evidence, so dispositions below are grounded in the owners and callers listed here. The ERST plate removal is recorded below; the later ERST Cargo gates are recorded below and in docs/VERIFICATION_RECEIPTS.tsv.
+Source-backed R2 owner map, 2026-09-23. The initial audit followed `.agents/bin/prior-art 'membrane|SparseStanding|LiveCurrentMachine|live current|standing storage'`; its matches are navigation evidence, so dispositions below rest on named owners and callers. The ERST plate cut passed its focused and workspace gates, recorded in `docs/VERIFICATION_RECEIPTS.tsv`. The later replay-wrapper cut moved sparse and ranked witnesses to live body/membrane owners; its own Cargo gates are recorded when run.
 
 ## Decision
 
@@ -19,7 +19,8 @@ Source-backed R2 owner map, 2026-09-23. The initial audit followed `.agents/bin/
 | `src/support_family.rs`: `LiveSupportFamily`, `LiveSupportSection`; re-exported in `src/lib.rs:61` but module itself private | Factorized support/lineage representation used by live constituents; execution representation rather than independent physical law | `live_constituent.rs` imports and stores these families. Move with constituent. |
 | `src/live_carrier.rs`, `src/growing_carrier.rs`: `LiveCarrierSnapshot`, `GrowingCarrier`; re-exported in `src/lib.rs:33,37` | Exact growing carrier and native rest chart implementing the body storage seam; not a generic Holon law | Live-current inputs/results use them (`live_current.rs:1895-1915`, `:2234-2245`); CUDA executor constructs snapshots (`live_current_cuda/executor.rs:1514`). Move only the pieces required by live runtime, updating imports. |
 | `src/growing_ranked.rs`, `src/growing_sparse.rs`: `GrowingRankedOwn`, `RankedOwnCell`, `GrowingSparseOwn`; re-exported in `src/lib.rs:34-35` | Storage adapters over `body::manifold::{RankedOwnStorage,SparseOwnStorage}` | `live_carrier` tests use `GrowingSparseOwn`; CUDA executor uses `RankedOwnCell` (`executor.rs:1477`). Move the used adapters/types alongside the runtime and retain only if post-move production callers remain. |
-| `src/ranked_surface.rs`, `src/sparse_surface.rs`: `RankedFeltSurface`, `SparseFeltSurface` and related errors; re-exported in `src/lib.rs:58-60` | Felt/deed surface application charts, separate from the production standing surface | Search found their uses only among membrane modules/tests (`ranked_surface.rs:100,142-143` and their own implementations); no life or plate production caller appeared in the audited call search. **UNRESOLVED** pending full build-confirmed caller census: do not classify as retire solely from static search. If no external consumer is found, retire with their private substrate-only adapters; otherwise move the actual caller with the owner. |
+| `src/ranked_surface.rs`, `src/sparse_surface.rs`: `RankedFeltSurface`, `SparseFeltSurface` and related errors; formerly re-exported in `src/lib.rs:58-60` | Retired: unconsumed replay wrappers over body-owned ranked/sparse OWN state; not the live standing surface | Source search found no consumer beyond the two modules' own tests; no life or plate caller. Removed both wrappers and their exports. Preserved discriminating sparse transition evidence in `holonic-body/src/manifold/tests_carrier.rs`; sparse wrapper hand/deed-extent guards remain documented boundary transaction history, not a body transition law. `SparseStandingSurface`/`live_current` stay. |
+| `crates/holonic-surface` wgpu implementation | Separate device surface API and crate; no edge to the replay wrappers or live `live_current` | The membrane wrappers use CPU `Vec`/body OWN state and dense parity fixtures. `holonic-surface` is a separate workspace member and its current workspace caller search returns none. Its future retirement/move is a separate R2 cut; do not treat this membrane deletion as removing or replacing the wgpu owner. |
 | `holonic-structure/src/membrane.rs`: `CausalMembrane` trait (`:7-22`), re-exported by membrane `src/lib.rs:36` | Duplicate re-export, not membrane-owned implementation | `AgenticLanguageEcology` implements the trait (`holonic-life/src/agentic_language/ecology.rs:1686`); its documentation references the method at `:767`. Change the import to `holonic-structure` (or merged `holonics`) when removing the re-export. |
 
 The manifest edges are explicit: `crates/holonic-life/Cargo.toml:23` and `applications/holon-plate/Cargo.toml:21`. The source search found no additional Cargo manifest consumers of `soma-membrane` beyond those two and the crate itself (archive excluded from live workspace).
@@ -56,4 +57,17 @@ For the ERST plate cut, the focused live-current and zero-action tests, the comp
 3. Check `holon-plate` with all targets after ERST removal; generic plate tests and CLI tests must still pass for the retained schemas.
 4. Verify the relocated Rust APIs retain the declared rest-image encode/decode version and round-trip behavior for current runtime callers; verify no ERST schema/deed reader remains in `holon-plate`.
 5. If formal declarations/imports change, build the affected Lean owner and its framework/research consumer. The audit does not call for deleting any checked Lean theorem merely because its runtime chart moves.
-6. Resolve the felt-surface rows only after inspecting all Rust callers and workspace target membership; until then leave their disposition explicitly unresolved.
+6. Confirm the wrapper source scan has no live names after the R2 cut, and retain `SparseOwnState` transition tests plus the documented wrapper transaction guards. Keep `SparseStandingSurface` and `live_current` covered by the app and all-target checks; do not infer that their “surface” name makes them the retired replay API.
+
+The sparse transition test scope is one accepted `(position, FeltTerm)` deposited into one
+current-local OWN REGISTER, before any integration into receiver standing. A zero resultant with
+either winding arm nonzero stays occupied; release requires both resultant coordinates and both
+arms to be zero. A release can narrow only when occupancy and all live founders lie in the exact
+zero section of the narrower gauge. Sparse storage reserves at most the admitted deed count and
+stores/visits only the live prefix, rather than allocating the receiver's `axis × axis` chart.
+The removed wrapper additionally checked `FeltEmission::hand_is_exact` and the admitted deed
+extent before calling body state; those checks leave state untouched on refusal. They are wrapper
+transaction boundaries (source: accepted emission stream; receiver: disposable replay chart), not
+properties the body-level `(position, FeltTerm)` API can express. Preserve them here as historical
+contract evidence. The body test does not claim a runtime refusal path for malformed wrapper
+emissions.

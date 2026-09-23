@@ -1480,8 +1480,10 @@ Data as standing mass whose relevance changes even when its face does not:
 >
 > — 2026-07-21 11:14, `CX 2026/07/19`
 
-**Where this lives now.** `crates/holonic-membrane/src/{sparse_standing,ranked_surface,recovery,live_carrier}.rs`
+**Where this lives now.** `crates/holonic-membrane/src/{sparse_standing,recovery,live_carrier}.rs`
 and `crates/holonic-mount/src/bin/mount-register-remount-gate.rs` (775 lines) carry rest and remount.
+The unconsumed `ranked_surface` replay wrapper is retired in the R2 cut; the ranked OWN transition
+law remains body-owned in `crates/holonic-body/src/manifold.rs::RankedOwnState`.
 `[framing]` The identification he actually made — *founded tensors are the cache, and that is what
 weight files have always been* — makes rest/remount and memoization one operation. **No document
 states that identification, and no owner is named as the cache.** It is the design he offered

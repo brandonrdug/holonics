@@ -396,6 +396,7 @@ impl RankedOwnStorage for GrowingRankedOwn {
 mod tests {
     use super::*;
     use body::channel::WindingQuantum;
+    use body::manifold::{RankedOwnState, SparseOwnCell, SparseOwnState};
     use body::medium::FeltTerm;
     use body::num::Cog;
     use body::soul::Chi;
@@ -408,6 +409,73 @@ mod tests {
             },
             winding: WindingQuantum::None,
         })
+    }
+
+    #[test]
+    fn ranked_and_sparse_own_states_agree_after_each_deed() {
+        let p0 = (Cog::lit(0), Cog::lit(0));
+        let p1 = (Cog::lit(1), Cog::lit(0));
+        let p2 = (Cog::lit(0), Cog::lit(1));
+        let p3 = (Cog::lit(1), Cog::lit(1));
+        let deeds = [
+            (p0, 3, 5),
+            (p1, 7, 11),
+            (p2, 13, 17),
+            (p3, 19, 23),
+            (p0, -3, -5),
+            (p1, -7, -11),
+            (p2, -13, -17),
+            (p3, -19, -23),
+            (p3, 29, 31),
+        ];
+        let mut ranked_storage = GrowingRankedOwn::new();
+        let mut ranked = RankedOwnState::preflight(&mut ranked_storage).unwrap();
+        let mut sparse_cells = [SparseOwnCell::EMPTY; 9];
+        let mut sparse = SparseOwnState::preflight(&mut sparse_cells[..]).unwrap();
+
+        for (position, same, other) in deeds {
+            let term = FeltTerm {
+                chi: Chi {
+                    same: Cog::lit(same),
+                    other: Cog::lit(other),
+                },
+                winding: WindingQuantum::None,
+            };
+            ranked
+                .deposit_term(&mut ranked_storage, position, term)
+                .unwrap();
+            sparse
+                .deposit_term(&mut sparse_cells[..], position, term)
+                .unwrap();
+
+            let axis = 1u32 << ranked.rank();
+            assert_eq!(axis, sparse.axis());
+            let ranked_occupancy = match ranked_storage.occupancy_words() {
+                [] => 0,
+                [word] => *word,
+                words => panic!("test population should fit one occupancy word: {words:?}"),
+            };
+            assert_eq!(ranked_occupancy, sparse.occupancy());
+            assert_eq!(ranked.breath(), sparse.breath());
+            let ranked_cells: Vec<_> = ranked_storage
+                .cells()
+                .iter()
+                .map(|cell| {
+                    (
+                        cell.address().try_flat_grip().unwrap(),
+                        cell.founder(),
+                        cell.form(),
+                    )
+                })
+                .collect();
+            let sparse_cells: Vec<_> = sparse
+                .cells(&sparse_cells[..])
+                .unwrap()
+                .iter()
+                .map(|cell| (cell.grip(), cell.position(), cell.form()))
+                .collect();
+            assert_eq!(ranked_cells, sparse_cells);
+        }
     }
 
     #[test]

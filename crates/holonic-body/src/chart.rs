@@ -60,9 +60,10 @@ impl Register {
     /// **This comment said "annihilation" until 2026-08-08 and the rename matters.** `§CV` separates
     /// three mechanisms that had been sharing one name: *loss* is oriented fiber information a
     /// declared outgoing presentation does not transport; *annihilation* is opposed contributions
-    /// composing to an actual zero **in one fiber**, which leaves the fiber occupied and is
-    /// `crates/holonic-membrane/src/sparse_surface.rs`'s law; *departure* is a constituent no longer factoring
-    /// into the continuing relation, which is this. Reading the second for the third would free a
+    /// composing to an actual zero **in one fiber**, which leaves the fiber occupied; the current
+    /// sparse REGISTER realization is `manifold::SparseOwnState::deposit_term`. *Departure* is a
+    /// constituent no longer factoring into the continuing relation, which is this. Reading the
+    /// second for the third would free a
     /// slot on every opposed pair and delete exactly the population `CLAUDE.md` §2b says to name.
     /// The record is
     /// `research/records/2026-08-08_ANNIHILATION_IS_RELEASE_DEPARTURE_IS_THE_VACANCY.md`. The returned Boolean is the borrow: the decrement whose transition walks OUT of

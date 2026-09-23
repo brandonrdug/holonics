@@ -1,4 +1,6 @@
 use super::*;
+use crate::num::Rung;
+use crate::soul::Chi;
 fn regions(axis: i64) -> (std::vec::Vec<u32>, std::vec::Vec<u32>) {
     let n = (axis * axis) as usize * FORM_WORDS;
     (std::vec![0u32; n], std::vec![0u32; n])
@@ -196,6 +198,168 @@ fn live_sparse_own_is_the_dense_register_without_the_axis_square() {
     assert_eq!(sparse_reservation.len(), maximum);
 }
 
+/// The current-local sparse OWN transition keeps a zero resultant occupied while either winding
+/// arm still stands, and releases/narrows only when the complete form is zero.  The receiver is
+/// one current-local REGISTER chart; no standing surface or later current participates.
+#[test]
+fn sparse_own_state_distinguishes_zero_resultant_from_full_release() {
+    let position = (Cog::lit(37), Cog::lit(41));
+    let term = |same: i64, other: i64, winding| FeltTerm {
+        chi: Chi {
+            same: Cog::lit(same),
+            other: Cog::lit(other),
+        },
+        winding,
+    };
+
+    let mut cells = [SparseOwnCell::EMPTY; 2];
+    let mut state = SparseOwnState::preflight(&mut cells[..]).unwrap();
+    state
+        .deposit_term(
+            &mut cells[..],
+            position,
+            term(3, 4, WindingQuantum::ThisWay),
+        )
+        .unwrap();
+    state
+        .deposit_term(
+            &mut cells[..],
+            position,
+            term(-3, -4, WindingQuantum::ThatWay),
+        )
+        .unwrap();
+
+    assert_eq!(state.occupancy(), 1);
+    assert_eq!(state.breath(), (0, 0));
+    let [cell] = state.cells(&cells[..]).unwrap() else {
+        panic!("the opposed arms remain in one occupied receiver cell")
+    };
+    assert_eq!(cell.form().resultant(), (Cog::ZERO, Cog::ZERO));
+    let (this_way, that_way) = cell.form().fiber();
+    assert_ne!(this_way, Rung::ZERO);
+    assert_ne!(that_way, Rung::ZERO);
+
+    // In a fresh chart, an exact opposite ride has no winding arms to retain. It releases the
+    // occupied cell and retires the now-empty register digit back to rank zero.
+    let mut cells = [SparseOwnCell::EMPTY; 2];
+    let mut state = SparseOwnState::preflight(&mut cells[..]).unwrap();
+    state
+        .deposit_term(&mut cells[..], position, term(3, 4, WindingQuantum::None))
+        .unwrap();
+    assert_eq!((state.axis(), state.occupancy()), (2, 1));
+    state
+        .deposit_term(&mut cells[..], position, term(-3, -4, WindingQuantum::None))
+        .unwrap();
+    assert_eq!((state.axis(), state.occupancy()), (1, 0));
+    assert_eq!(state.breath(), (1, 1));
+    assert!(state.cells(&cells[..]).unwrap().is_empty());
+}
+
+/// A live founder outside the retiring digit's exact zero section blocks narrowing. The later
+/// release that removes that same founder re-runs the test and retires both now-empty digits.
+/// Source is one sequence of accepted current-local terms; receiver is that sequence's OWN
+/// REGISTER, with no standing integration between deposits.
+#[test]
+fn sparse_own_state_retries_narrowing_after_the_off_section_founder_releases() {
+    let find = |tag: &[u8], want: &dyn Fn(Place) -> bool| -> Place {
+        let mut salt = 0u32;
+        while salt < 65_536 {
+            let mut bytes = std::vec::Vec::from(tag);
+            bytes.extend_from_slice(&salt.to_le_bytes());
+            let position = wind(&bytes);
+            if want(position) {
+                return position;
+            }
+            salt += 1;
+        }
+        panic!("the deterministic banding witness must exist")
+    };
+    let p1 = find(b"cascade p1 ", &|position| {
+        place::ground(position, 4)
+            == crate::chart::zero_extend_grip(place::ground(position, 2), 2, 4)
+    });
+    let p1_grip = place::ground(p1, 2);
+    let p1_extended = crate::chart::zero_extend_grip(p1_grip, 2, 4);
+    let p2 = find(b"cascade p2 ", &|position| {
+        place::ground(position, 2) != p1_grip
+            && crate::chart::zero_extended_source(place::ground(position, 4), 2, 4).is_none()
+    });
+    let p3 = find(b"cascade p3 ", &|position| {
+        place::ground(position, 4) != p1_extended
+            && crate::chart::zero_extended_source(place::ground(position, 4), 2, 4).is_some()
+    });
+    let terms = [
+        (p1, 3, 4),
+        (p2, 3, 4),
+        (p3, 3, 4),
+        (p1, -3, -4),
+        (p3, -3, -4),
+        (p2, -3, -4),
+    ];
+    let mut cells = [SparseOwnCell::EMPTY; 6];
+    let mut state = SparseOwnState::preflight(&mut cells[..]).unwrap();
+    for (ordinal, (position, same, other)) in terms.into_iter().enumerate() {
+        state
+            .deposit_term(
+                &mut cells[..],
+                position,
+                FeltTerm {
+                    chi: Chi {
+                        same: Cog::lit(same),
+                        other: Cog::lit(other),
+                    },
+                    winding: WindingQuantum::None,
+                },
+            )
+            .unwrap();
+        match ordinal {
+            4 => assert_eq!(
+                (state.axis(), state.occupancy(), state.breath()),
+                (4, 1, (2, 0)),
+                "the off-section founder holds the wide gauge"
+            ),
+            5 => assert_eq!(
+                (state.axis(), state.occupancy(), state.breath()),
+                (1, 0, (3, 2)),
+                "removing the barrier retries and cascades both available narrowings"
+            ),
+            _ => {}
+        }
+    }
+}
+
+/// The sparse REGISTER reservation is bounded by admitted deeds and stores only live cells; the
+/// body transition iterates the live prefix, not every address in the receiver's axis-square.
+#[test]
+fn sparse_own_state_storage_tracks_deeds_not_the_axis_square() {
+    const DEEDS: usize = 96;
+    let mut cells = [SparseOwnCell::EMPTY; DEEDS];
+    let mut state = SparseOwnState::preflight(&mut cells[..]).unwrap();
+    for n in 0..DEEDS {
+        state
+            .deposit_term(
+                &mut cells[..],
+                (Cog::lit((n * 17 + 1) as i64), Cog::lit((n * 29 + 3) as i64)),
+                FeltTerm {
+                    chi: Chi {
+                        same: Cog::lit((n + 1) as i64),
+                        other: Cog::lit((n * 2 + 1) as i64),
+                    },
+                    winding: WindingQuantum::None,
+                },
+            )
+            .unwrap();
+    }
+    let live = state.cells(&cells[..]).unwrap();
+    assert_eq!(live.len() as u64, state.occupancy());
+    assert_eq!(
+        cells.len(),
+        DEEDS,
+        "reservation is the admitted deed extent"
+    );
+    assert!((state.axis() as usize).pow(2) > cells.len());
+}
+
 /// ★ THE CARRIER THICKENS (`FORMULA §XVIII`, ratified 2026-07-09): completions at depth k are
 /// arrivals at depth k+1 — on real material the carrier stands ABOVE the word grain (enclosures
 /// standing at depth ≥ 1), deterministically; each
@@ -373,7 +537,7 @@ fn the_dark_tread_is_over_time() {
     let mut carrier = std::vec![0u32; 8 * ENCLOSURE_WORDS];
     let mut body = ContinuingBody::over(&standing, &mut wells, AXIS, b"  ", Q, &mut carrier);
     let dark_cell = body.place(b"  "); // wind(b"  ") = one dead bit — the frame's own place (the anchor)
-                                       // §1 a long silence then a resolving edge: N dark atoms, one bright.
+    // §1 a long silence then a resolving edge: N dark atoms, one bright.
     const N: usize = 10_000;
     let k_before = body.channel();
     for _ in 0..N {

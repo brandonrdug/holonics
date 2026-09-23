@@ -24,9 +24,7 @@ pub mod growing_sparse;
 pub mod live_carrier;
 pub mod live_constituent;
 pub mod live_current;
-pub mod ranked_surface;
 pub mod sparse_standing;
-pub mod sparse_surface;
 mod support_family;
 
 pub use chart_address::{ChartAddress, ChartAddressError};
@@ -55,7 +53,5 @@ pub use live_current::{
     RegionalRelationArc, RegionalRelationCell, RegionalRelationRadiation, RegionalSupportSection,
     LIVE_CURRENT_REST_LAYOUT_VERSION,
 };
-pub use ranked_surface::{RankedFeltSurface, RankedSurfaceError};
 pub use sparse_standing::{SparseStandingError, SparseStandingSurface, StandingCell};
-pub use sparse_surface::{SparseFeltCell, SparseFeltSurface, SparseSurfaceError};
 pub use support_family::{LiveSupportFamily, LiveSupportSection, SupportFamilyError};
