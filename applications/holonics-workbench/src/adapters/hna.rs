@@ -1,7 +1,7 @@
 //! Consumer application adapters; the native session owns training/inference recurrence.
 use std::path::Path;
 
-use holonics::hna::{
+use holonics_hna::{
     inspect_native_restricted_rest,
     native::{
         resume_wave_control, run_wave_control, run_wave_control_with_options, WaveControlSpec,
@@ -21,11 +21,11 @@ fn owner(error: impl std::fmt::Display) -> WorkbenchError {
 
 pub fn execute(command: HnaCommand) -> Result<AdapterReturn, WorkbenchError> {
     match command {
-        HnaCommand::Session { .. } => Err(owner("streaming HNA sessions require the process stream entry point or holonics::hna::HnaStream, not a batch response collector")),
-        HnaCommand::NativeSession { .. } => Err(owner("native streaming sessions require the process stream entry point or holonics::hna::HnaStream, not a batch response collector")),
-        HnaCommand::MathematicalSession { .. } => Err(owner("mathematical streaming sessions require the process stream entry point or holonics::hna::HnaStream, not a batch response collector")),
-        HnaCommand::WaveSession { .. } | HnaCommand::CoupledWaveSession { .. } => Err(owner("wave streaming sessions require the process stream entry point or holonics::hna::HnaStream, not a batch response collector")),
-        HnaCommand::FieldSession { .. } => Err(owner("field streaming sessions require the process stream entry point or holonics::hna::HnaStream, not a batch response collector")),
+        HnaCommand::Session { .. } => Err(owner("streaming HNA sessions require the process stream entry point or holonics_hna::HnaStream, not a batch response collector")),
+        HnaCommand::NativeSession { .. } => Err(owner("native streaming sessions require the process stream entry point or holonics_hna::HnaStream, not a batch response collector")),
+        HnaCommand::MathematicalSession { .. } => Err(owner("mathematical streaming sessions require the process stream entry point or holonics_hna::HnaStream, not a batch response collector")),
+        HnaCommand::WaveSession { .. } | HnaCommand::CoupledWaveSession { .. } => Err(owner("wave streaming sessions require the process stream entry point or holonics_hna::HnaStream, not a batch response collector")),
+        HnaCommand::FieldSession { .. } => Err(owner("field streaming sessions require the process stream entry point or holonics_hna::HnaStream, not a batch response collector")),
         HnaCommand::WaveControl {
             source,
             resume,

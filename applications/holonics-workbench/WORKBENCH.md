@@ -8,7 +8,7 @@ and target-execution distinctions. This application composes those owners, not a
 
 | Family | Implementation and scope |
 |---|---|
-| `holonics hna` | [established-bounded; implemented-exact] `run`, `inspect`, `infer` and `train` use the public `holonics::hna` seam over the full resident native operator or restricted SKE material. Ordered occurrences share one continuing session. |
+| `holonics hna` | [established-bounded; implemented-exact] `run`, `inspect`, `infer` and `train` use the direct `holonics-hna` package (`holonics_hna` crate) over the full resident native operator or restricted SKE material. Ordered occurrences share one continuing session. |
 | `holonics workspace` | [established-bounded; implemented-exact] Explicit-root persistent workspaces over the earlier snapshot/circulation artifact family. Their staged-return/commit protocol does not define HNN recurrence. |
 | `holonics diagnostic` | [established-bounded; implemented-exact] Bounded owner inspection and probes, including exterior model configuration/index/ONNX charts. These are not production quality claims. |
 

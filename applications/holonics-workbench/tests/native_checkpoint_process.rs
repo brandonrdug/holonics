@@ -1,6 +1,6 @@
 //! Actual process-boundary controls. These test the public native CLI, not a CPU learner.
-use holonics::hna::native::{CurrentWire, NativeSavedSession};
-use holonics::hna::{HnaStreamCommand, HnaStreamRequest, HNA_STREAM_REQUEST_SCHEMA};
+use holonics_hna::native::{CurrentWire, NativeSavedSession};
+use holonics_hna::{HnaStreamCommand, HnaStreamRequest, HNA_STREAM_REQUEST_SCHEMA};
 use std::{
     fs,
     io::{BufRead, BufReader, Write},

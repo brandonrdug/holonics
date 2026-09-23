@@ -7,8 +7,7 @@ lineage and admitted receiver domain.
 Automata label HNN-based solvers and their traversal constructions; Hephaestus is a utility
 product label. Eros names union, composition and formation throughout HNN recurrence. The
 [expanded architecture](HNN_COMPOSITION.md#the-architecture-as-explicit-passages) shows these roles
-and their actual maps. The current public Rust entry point is `holonics::hna`;
-the application implementations are in [holonics-hna](../crates/holonics-hna/README.md).
+and their actual maps. The current HNN Rust package is [`holonics-hna`](../crates/holonics-hna/README.md); Rust imports its crate as `holonics_hna`.
 
 [project-postulate] The [shared evaluation method](ATHENA_EVALUATION.md) retains stable
 source/unknown/receiver questions across model changes. Mathematical solvers, field completion,
@@ -336,7 +335,7 @@ incidence changes remain distinct. The [rechart return](../research/records/2026
 states its admitted gauge family and full-state/open-fibre controls.
 
 [established-bounded; measured] NCF3 exposes that same owner through
-`holonics::hna::native::NativeSession`, `hna native-session` and the independent `hna wave-control`
+`holonics_hna::native::NativeSession`, `hna native-session` and the independent `hna wave-control`
 application. The [native interface guide](NATIVE_HNA.md) gives exact-current schemas, source/frame
 semantics, recipes and measured application scope. Existing `HnaStream` delivery is reused.
 
@@ -484,7 +483,7 @@ exposes the actual family/history records, and `anatomy` reports the model's hel
 status. No tokenizer is reopened or old text re-encoded inside these calls.
 
 ```rust
-use holonics::hna::{HnaModel, HnaSessionError};
+use holonics_hna::{HnaModel, HnaSessionError};
 
 fn continue_model() -> Result<(), HnaSessionError> {
     let model = HnaModel::from_checkpoint("checkpoint.hna", None)?;

@@ -1,9 +1,8 @@
 # Holonics as a Rust library
 
-[definition] `crates/holonics` is the public entry point. It exposes existing implementation
-owners; it supplies no second event model, numeric system or learner. The package is currently
-used as a path dependency (`publish = false`). HNN application and wire names retain `hna` for
-compatibility.
+[definition] `crates/holonics` is the framework entry point (`publish = false`). Its core,
+structure and geometry paths are still re-exports awaiting their M1 source moves. HNN application
+and wire identifiers retain `hna`; the workbench imports their implementation packages directly.
 
 [project-postulate] This table records the **current** public paths. The
 [repository restructure](plans/THE_REPOSITORY_RESTRUCTURE.md#31-rust-the-main-holonics-library-owns-the-construction)
@@ -20,19 +19,16 @@ general model architecture.
 
 | Public path | Owner and scope |
 |---|---|
-| `holonics::structure` | `holonic-structure`: typed relational carriers, incidence, lineage and atomic membranes; `no_std` with allocation |
-| `holonics::geometry` | `relational-geometry`: exact expressions, frames, receiver maps, projection fibres and crossings |
-| `holonics::engine` | `holonic-engine`: further mathematical constructions, constitutive fields, resident execution and exterior device/codec owners |
-| `holonics::hna` | `holonics-hna`: separately scoped native sessions, experimental conversation apparatus and earlier inherited-operator adapters |
-| `holonics::{soulkiller,interop}` | Existing dismantling and package interfaces; their individual domain and artifact contracts apply |
+| `holonics::core` | Temporary re-export of `holonic-core`; M1 will move the Holon law and exact foundation into this crate |
+| `holonics::structure` | Temporary re-export of `holonic-structure`; M1 will move its surviving structural carriers into this crate |
+| `holonics::geometry` | Temporary re-export of `relational-geometry`; M1 will move exact frames and receiver maps into this crate |
+| `holonic-engine` | Current direct owner of engine mathematics, constitutive fields and resident execution; resident execution moves to `holonics-cuda` |
+| `holonics-hna` | Current direct owner of HNN sessions and application adapters; its backend-neutral HNN law moves into `holonics`, resident execution to CUDA |
 
-[definition] The default `native` feature includes the admitted application APIs and desktop runtime. Disabling it leaves `structure` and `geometry` available
-without the engine, HNN, lifecycle or CUDA dependencies:
-
-```toml
-[dependencies]
-holonics = { path = "/path/to/holonics/crates/holonics", default-features = false }
-```
+[definition] The M1 façade cut removed `holonics`’ `native` feature and its direct dependencies on
+`holonics-hna`, `holonic-engine` and `life`. The workbench already declared those crates directly
+and now imports them by their package crate names. `holonics` therefore builds without pulling in
+the CUDA-bound engine through its own manifest.
 
 ```rust
 use holonics::geometry::{ExactExpr, integer, rat};
@@ -44,11 +40,10 @@ assert_eq!(two * half, integer(1));
 let unevaluated = ExactExpr::symbol("source_parameter");
 ```
 
-[established-bounded; process-audit] Both the reduced dependency configuration and default
-native configuration pass `cargo check` on the desktop. This establishes the dependency split,
-not execution of the default backend on a Mac. Many advanced mathematical modules still live
-inside the CUDA-bound engine. Porting them or the runtime requires their actual dependency
-boundaries, not a claim that all formal Holonics is already available in a portable Rust crate.
+[definition; M1 transition] The engine and HNN remain direct packages for current consumers; no
+`holonics::engine`, `holonics::hna`, `holonics::soulkiller` or `holonics::interop` forwarding path
+remains. Main still re-exports `core`, `structure` and `geometry` pending their owner moves. Advanced
+mathematical modules and the resident HNN have not yet moved into their target owners.
 
 ## Productive local generator construction
 
@@ -58,7 +53,8 @@ to the application body. `respond_to_material_observation` is a direct field upd
 field-to-normal-predictor test is a different application and does not discharge this join.
 
 [definition] Import `ResidentConstitutiveFibre`, `ResidentConstitutiveCurrent` and
-`ConstitutiveFibreRest` through `holonics::engine::native_ecology::constitutive_fibre`.
+`ConstitutiveFibreRest` through `holonic_engine::native_ecology::constitutive_fibre` until their
+engine owner moves.
 The existing resident relation owns observation-founded formation and later current transport.
 Its rest carries learned basis, source chart and chronology, without an occurrence archive.
 The [native guide](NATIVE_HNA.md) states the point/family and whole-model boundaries.
@@ -145,14 +141,14 @@ the [formula](HNN_FORMULA.md), not a proposal for another `holonics-ml` wrapper 
 
 | Mathematical contract | Existing library implementation | Actual model connection |
 |---|---|---|
-| Exact linear maps, preimages and factorization | `holonics::engine::exact_linear`, including `ExactRatMatrix::factor_receiver` | `NativeMathematicalSession` constructs resident linear/bilinear operators and parameter families. Its operator/product/predictor maps are application storage, not one assembled field model. |
+| Exact linear maps, preimages and factorization | `holonic_engine::exact_linear` (while the source owner remains in `holonic-core`), including `ExactRatMatrix::factor_receiver` | `NativeMathematicalSession` constructs resident linear/bilinear operators and parameter families. Its operator/product/predictor maps are application storage, not one assembled field model. |
 | Normalized attention, weighted mode summaries and descended actions | `exact_linear::KernelModeReduction` and `KernelModeSummary`; formal `AttentionModeCompression`, `GeneratorModeQuotient` | The reducer's callers are its example and unit tests. It uses `ExactRatMatrix`/`Rat` on the host. Native consumption requires lowering the derived operators and current columns through existing resident owners; do not run a host semantic replay loop. |
 | Normalized vector-current transport and learning differential | `exponentiated_ratio::NormalizedKernel::{apply,differential,pullback,fit_step}` | Exact log-rational kernel chart; binary sigmoid and complete value/potential returns. `connected_holonic_field` composes it into the reference field that drives the synopsis. It is exterior CPU execution. |
 | Native multihead block and normalized field return | Earlier `operative_atlas` / `ExtractedOperatorSession`; active `NativeConstitutiveField::normalized_material_return` | The earlier graph has Q/K/V, phase, multihead contact, residual/gated reaction and adjoints. The active field has grouped exponential and material/current pullbacks; width two is a binary normalization. These are actual mechanisms with different consumers, not absent theory. |
 | Incidence, field current and boundary/interior scattering | `native_ecology::constitutive_fibre::NativeConstitutiveField`, operative field kernels | `NativeCoupledBody::from_field` now executes this field directly with local reaction. The earlier coupled boundary test remains a separate field-to-predictor application. |
 | Material differential and adjoint | `field/junction/operative/response.rs`, `propagation.rs` and their resident kernels | The field target adapter reuses the native paired adjoint on the retained producing D/current; `observe_field` publishes its contact response with the local reaction material. |
 | Normal equations and condition/preimage inference | `ResidentNormalMaterial`, `ResidentConditionCurrent`, `ResidentGeneratorNeighborhood` | Normal material is attached to the neighborhood and consumed by coupled generation. Keep that actual learning law available; its fixed features do not prescribe every HNN operator. |
-| Joint generation and dependent parameter families | `holonics::hna::native::NativeCoupledBody` over the field-backed, normal-wave or dependent representations | `generate_field` produces the joint field section; `observe_field` uses its original source/material; `SavedCoupledBody` persists local trained state. `NativeFieldSession` binds whole text and partial regions through the shared stream. JointRegions puts context into x and supplies activity/observation maps; `generate_received_field` holds given coordinates at the affine receiver. Target masks precede the full paired adjoint. Producing D/M, receiver/extent and failed-output delivery reopen. Content-dependent refinement and economical larger sources extend this explicit chart. |
+| Joint generation and dependent parameter families | `holonics_hna::native::NativeCoupledBody` over the field-backed, normal-wave or dependent representations | `generate_field` produces the joint field section; `observe_field` uses its original source/material; `SavedCoupledBody` persists local trained state. `NativeFieldSession` binds whole text and partial regions through the shared stream. JointRegions puts context into x and supplies activity/observation maps; `generate_received_field` holds given coordinates at the affine receiver. Target masks precede the full paired adjoint. Producing D/M, receiver/extent and failed-output delivery reopen. Content-dependent refinement and economical larger sources extend this explicit chart. |
 | Spatial/temporal modal closure and boundary memory | `receiver_history_compression`, `exact_linear`, operative current factors; formal `ReflectedBoundaryMemory` | Reuse factor/recurrence algorithms for the actual model action. The dependent coupled implementation still evaluates its retained programme. A fixed-linear compiler is available but does not itself compile changing material. |
 
 [project-postulate] Library design follows these mathematical operations. A reusable owner

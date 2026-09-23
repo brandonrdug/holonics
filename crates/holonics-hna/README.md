@@ -1,7 +1,7 @@
 # HNN application interfaces
 
-[definition] Use the public framework through `holonics::hna`; this crate owns its application
-adapters. [The machine](../../docs/THE_MACHINE.md) and [research routes](../../research/records/README.md)
+[definition] Import the `holonics-hna` package as `holonics_hna`; this crate owns the HNN application
+adapters until their M1 moves land. [The machine](../../docs/THE_MACHINE.md) and [research routes](../../research/records/README.md)
 connect its geometry and existing mathematical owners. The [native guide](../../docs/NATIVE_HNA.md) documents the ground-up phase body;
 the [Athena guide](../../docs/ATHENA.md) retains the inherited-operator interface and artifact scopes.
 

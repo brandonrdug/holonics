@@ -27,7 +27,7 @@ does not automatically persist after Eros develops the returned material.
    a separate cold witness and explicit insufficiency.
 
 [definition] The public boundary is
-`holonics::soulkiller::dismantle(input) -> { native, exterior, insufficiency }`.
+`holonic_engine::soulkiller::dismantle(input) -> { native, exterior, insufficiency }`.
 It consumes an admitted input. Reading a file or recovering the resident operator alone is not
 the completed excitation-founded return. The original training corpus is unnecessary only for
 the transport family actually recovered/exposed; unexcited capability remains explicit.

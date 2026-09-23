@@ -89,7 +89,8 @@ owes its developmental successor law. Apple execution is a device-realization qu
 in [hardware boundaries](HARDWARE_AND_MODALITY_BOUNDARIES.md), distinct from either package storage
 or standard-model export.
 
-[definition] The public namespace `holonics::interop` exposes tensor/configuration/ONNX intake;
-`holonics::interop::packages` exposes the existing package export/import owners. It does not present a stub portable-model compiler
-as an implemented conversion. [Soulkiller](SOULKILLER.md) and [Athena](ATHENA.md) state the
+[definition] The former `holonics::interop` facade has been removed. Tensor/configuration/ONNX
+intake is owned by `holonic_engine::foreign_map` and the native-intelligence charts; package
+import/export operations remain in `life::native_intelligence`. Neither path presents a stub
+portable-model compiler as an implemented conversion. [Soulkiller](SOULKILLER.md) and [Athena](ATHENA.md) state the
 corresponding inbound and native-run contracts.

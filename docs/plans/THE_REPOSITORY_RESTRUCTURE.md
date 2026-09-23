@@ -678,6 +678,11 @@ existing suites (§0.9):
    - Verify: `holonics` builds without CUDA, `holonics-cuda` owner tests pass on the card, and
      the workbench/all-target check passes.
    - Clean the old `target/`.
+
+   **M1 dependency prerequisite (landed in the facade cut):** `holonics` no longer depends on HNA, engine or life,
+   and it no longer forwards their `hna`, `engine`, `soulkiller` or `interop` surfaces. The workbench
+   selects the direct HNA and engine packages. `core`, `structure` and `geometry` remain re-export
+   boundaries until their source owners move; they are not yet represented as internal Holonics code.
 8. **M2: the Lean move.** Move paths to `lean/` (`Holonics` and `HolonicsResearch`) and build both
    targets. Rename `Soma.Holonics` to `Holonics` as a separate mechanical commit.
 9. **D: documents (the restructure's closing acceptance).** All to the verified paths:

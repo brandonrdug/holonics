@@ -1,52 +1,16 @@
 //! Public Holonics framework entry point. Implementations retain their existing owners.
 //!
-//! [`structure`] exposes causal/relational carriers and [`geometry`] exposes exact frames,
-//! receiver maps and projection fibres. These are available without the default `native`
-//! feature, independently of the desktop device runtime. They do not encompass every
-//! mathematical construction in the repository; further executable owners live in `engine`.
+//! [`structure`], [`geometry`] and [`core`] currently re-export their existing package owners.
+//! These three paths are remaining M1 forwarding boundaries; their implementations have not yet
+//! moved into this crate. Geometry and structural carriers do not require a CUDA SDK or device
+//! runtime. They do not encompass every mathematical construction in the repository.
 //!
-//! [`core`] is the Holon core (`holonic-core`): the foundational object every native owner
-//! implements, mirroring the Lean `ElementaryHolonics/Holon/` foundation. It is available without
-//! `native` and is reached qualified, never glob-re-exported.
-//!
-//! The default `native` feature preserves the existing `hna`, `soulkiller` and `interop`
-//! interfaces and exposes their `engine` owner. The HNN API contains several explicitly scoped
-//! realizations. `hna::alpha` retains the source-qualified exterior exposure reader; the
-//! byte-field cultivation adapters are archived. Current HNN construction uses `hna::native`.
-//! Package containers are distinct from standard executable
+//! The current HNN implementation remains in the direct `holonics-hna` and `holonic-engine`
+//! packages while M1 moves their backend-neutral laws into this crate and their resident execution
+//! into `holonics-cuda`. Those packages are application-selected dependencies, not re-exported
+//! compatibility paths from `holonics`. Package containers are distinct from standard executable
 //! model graphs; see docs/INTEROPERABILITY.md.
 
 pub use holonic_core as core;
 pub use holonic_structure as structure;
 pub use relational_geometry as geometry;
-
-#[cfg(feature = "native")]
-pub use holonic_engine as engine;
-#[cfg(feature = "native")]
-pub use holonics_hna as hna;
-
-#[cfg(feature = "native")]
-pub mod soulkiller {
-    pub use holonic_engine::native_ecology::holonic_intelligence::{
-        NativeConeRestrictedEcology, NativeFamilyInsufficiency, ResidentExcitationDismantling,
-    };
-    pub use holonic_engine::soulkiller::{
-        SoulkillerDismantlingInput, SoulkillerDismantlingReturn, dismantle,
-    };
-}
-
-#[cfg(feature = "native")]
-pub mod interop {
-    pub use holonic_engine::foreign_map::{ForeignContainer, manifest_safetensors};
-    pub use holonic_engine::native_ecology::holonic_intelligence::{
-        ForeignConfigurationChart, ForeignOnnxChart, ShardedWeightIndexChart,
-    };
-
-    /// Reversible Holonics package containers, not standard executable graph compilation.
-    pub mod packages {
-        pub use life::native_intelligence::{
-            ExportCodecKind, ExportPurpose, MorphologyExportRequest, MorphologyExportReturn,
-            NativeMorphologyArtifact, export_morphology, import_exact_export,
-        };
-    }
-}

@@ -63,9 +63,9 @@ step control. No looping animation or screen-normal direction supplies a physica
 ## Interface audit and refinements
 
 [established-bounded; source-inspected] The audit followed the public facade and actual owners:
-`holonics::structure`, `holonics::geometry`, `holonics::engine::exact_linear`,
+`holonics::structure`, `holonics::geometry`, `holonic_engine::exact_linear`,
 `exponentiated_ratio`, `diffusion`, `sheaf_diffusion`, native constitutive fields and the
-`holonics::hna::native` sessions. The following table names the operations behind the drawing.
+`holonics_hna::native` sessions. The following table names the operations behind the drawing.
 
 | Diagram operation | Actual interface and implementation consequence |
 |---|---|

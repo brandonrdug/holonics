@@ -1,13 +1,13 @@
 # Native HNN owners and construction boundary
 
 [definition] The public framework exposes native mathematical owners through
-`holonics::engine::native_ecology::constitutive_fibre`. The [construction blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
+`holonic_engine::native_ecology::constitutive_fibre`. The [construction blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 now composes productive generator material through those owners. Text/audio/visual measurements
 remain exterior charts; the retired byte-cultivation driver is not the native learning API.
 
 ## Constituted field model
 
-[established-bounded; measured] `holonics::hna::native::NativeCoupledBody::from_field` now
+[established-bounded; measured] `holonics_hna::native::NativeCoupledBody::from_field` now
 moves a constituted field and its local reaction into one model. `preview_field` reads a whole
 section; `generate_field` commits that same evaluated field and optionally retains its producing
 comparison. `observe_field` returns an actual target through the paired adjoint into D and the
@@ -49,7 +49,7 @@ still validate the full geometry and numerical witness.
 ## Learned local law
 
 [established-bounded; implemented-exact] The [caller-controlled mathematical session](../research/records/2026-09-12_CALLER_CONTROLLED_NATIVE_MATHEMATICS_RETURNS_FACTORS_AND_PARAMETER_FAMILIES.md)
-now exposes the shared exact/resident owners through `holonics::hna::native::mathematical`
+now exposes the shared exact/resident owners through `holonics_hna::native::mathematical`
 and the existing JSONL stream. Run a supplied request file with:
 
 ```sh
@@ -438,7 +438,7 @@ for distinct images, and retains older reads. The `conversation_wave actuate` mo
 these fields without fitting them. The source envelope includes realization/reference error;
 it is not semantic confidence. See the [source return](../research/records/2026-09-10_SOURCE_PASSAGES_ACT_THROUGH_UNION_AND_PASSIVE_REFLECTION.md).
 
-[established-bounded; source-inspected] `holonics::hna::alpha::exposure` remains the source-qualified
+[established-bounded; source-inspected] `holonics_hna::alpha::exposure` remains the source-qualified
 conversation reader. It retains available material, captured views, actual parent relations and
 delivery cursor. The `alpha_exposure` example inspects that source boundary. It is not a learner
 and supplies neither semantic identity nor a native topology. See [conversation data](CONVERSATION_DATA.md).
@@ -458,7 +458,7 @@ Their whole-ecology rests can retain historical sources and capabilities. Those 
 not be relabeled compact learned generators. Shared-drive/internal-current receivers, rechart,
 paired/enclosed reflection, material returns and their exact controls retain their source scopes.
 
-[definition] The existing `holonics::hna::native::{NativeModelSpec, with_native_session,
+[definition] The existing `holonics_hna::native::{NativeModelSpec, with_native_session,
 NativeSession}` and `NativeSavedSession` expose the earlier phase ecology and linear source
 handles. `run_wave_control` / `resume_wave_control` retain their independent exterior system and
 process-continuation scope. These interfaces remain callable; they do not resume the removed

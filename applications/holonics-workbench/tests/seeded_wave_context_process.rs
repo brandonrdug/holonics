@@ -1,4 +1,4 @@
-use holonics::hna::{HnaStreamCommand, HnaStreamRequest, HNA_STREAM_REQUEST_SCHEMA};
+use holonics_hna::{HnaStreamCommand, HnaStreamRequest, HNA_STREAM_REQUEST_SCHEMA};
 use serde_json::Value;
 use std::process::{Command, Output};
 use tempfile::tempdir;

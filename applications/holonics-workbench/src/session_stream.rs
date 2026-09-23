@@ -1,7 +1,7 @@
 //! The process boundary for the continuing HNA stream. It deliberately bypasses the batch
 //! Workbench response collector so responses are flushed while the native owner remains live.
 use crate::HnaCommand;
-use holonics::hna::{
+use holonics_hna::{
     native::{
         with_native_session, NativeModelSpec, NativeSavedSession, NativeSessionAnatomy,
         with_mathematical_session, NativeSessionError, NativeWaveSavedSession, NativeCoupledWaveSavedSession,
@@ -73,7 +73,7 @@ pub fn run_field_session_stream(command: HnaCommand) -> Result<FieldHnaStreamPro
     if let Some(parent) = checkpoint.parent().filter(|p| !p.as_os_str().is_empty()) { fs::create_dir_all(parent).map_err(|e| NativeSessionError::Application(format!("cannot create field checkpoint directory {:?}: {e}", parent)))?; }
     let mut input: Box<dyn BufRead> = if input.as_os_str() == "-" { Box::new(io::stdin().lock()) } else { Box::new(BufReader::new(File::open(&input).map_err(|e| NativeSessionError::Application(format!("cannot read field input {:?}: {e}", input)))?)) };
     let mut output = io::stdout().lock();
-    fn finish(session: &NativeFieldSession<'_>, stream: &HnaStream, pump: Result<HnaStreamDisposition, holonics::hna::HnaStreamError>, checkpoint: &PathBuf) -> FieldHnaStreamProcessReceipt {
+    fn finish(session: &NativeFieldSession<'_>, stream: &HnaStream, pump: Result<HnaStreamDisposition, holonics_hna::HnaStreamError>, checkpoint: &PathBuf) -> FieldHnaStreamProcessReceipt {
         let (disposition, stream_error) = match pump { Ok(v) => (Some(v), None), Err(e) => (None, Some(e.to_string())) };
         let saved = session.checkpoint(checkpoint, stream.state());
         let (checkpoint_octets, checkpoint_error) = match saved { Ok(r) => (Some(r.bytes), None), Err(e) => (None, Some(e.to_string())) };
@@ -185,9 +185,9 @@ pub fn run_native_session_stream(
     let mut output = io::stdout().lock();
 
     fn finish_native_stream(
-        session: &mut holonics::hna::native::NativeSession<'_>,
+        session: &mut holonics_hna::native::NativeSession<'_>,
         stream: &HnaStream,
-        pump: Result<HnaStreamDisposition, holonics::hna::HnaStreamError>,
+        pump: Result<HnaStreamDisposition, holonics_hna::HnaStreamError>,
         checkpoint: &PathBuf,
     ) -> NativeHnaStreamProcessReceipt {
         let (disposition, stream_error) = match pump {
@@ -277,9 +277,9 @@ pub fn run_wave_session_stream(
     let mut output = io::stdout().lock();
 
     fn finish_wave_stream(
-        session: &mut holonics::hna::native::NativeWaveSession<'_>,
+        session: &mut holonics_hna::native::NativeWaveSession<'_>,
         stream: &HnaStream,
-        pump: Result<HnaStreamDisposition, holonics::hna::HnaStreamError>,
+        pump: Result<HnaStreamDisposition, holonics_hna::HnaStreamError>,
         checkpoint: &PathBuf,
         before: u64,
     ) -> WaveHnaStreamProcessReceipt {
@@ -311,8 +311,8 @@ pub fn run_wave_session_stream(
         let bytes = fs::read(&source).map_err(|error| {
             NativeSessionError::Application(format!("cannot read wave seed {:?}: {error}", source))
         })?;
-        let spec: holonics::hna::native::NativeWaveSeedSpec = serde_json::from_slice(&bytes)?;
-        return holonics::hna::native::with_seeded_wave_session(&spec, |session| {
+        let spec: holonics_hna::native::NativeWaveSeedSpec = serde_json::from_slice(&bytes)?;
+        return holonics_hna::native::with_seeded_wave_session(&spec, |session| {
             let mut stream = HnaStream::new();
             stream.open_new_connection();
             let before = session.wave().epoch();
@@ -379,9 +379,9 @@ pub fn run_coupled_wave_session_stream(
     let mut output = io::stdout().lock();
 
     fn finish_wave_stream(
-        session: &mut holonics::hna::native::NativeCoupledWaveSession<'_>,
+        session: &mut holonics_hna::native::NativeCoupledWaveSession<'_>,
         stream: &HnaStream,
-        pump: Result<HnaStreamDisposition, holonics::hna::HnaStreamError>,
+        pump: Result<HnaStreamDisposition, holonics_hna::HnaStreamError>,
         checkpoint: &PathBuf,
         before: u64,
     ) -> WaveHnaStreamProcessReceipt {
@@ -413,7 +413,7 @@ pub fn run_coupled_wave_session_stream(
         if member.is_some()||receiver.is_some(){return Err(NativeSessionError::Application("resume uses its stored member and receiver chart".into()));}
         NativeCoupledWaveSavedSession::read(&source)?
     }else{
-        use holonics::engine::native_ecology::constitutive_fibre::WaveSourceReceiver;
+        use holonic_engine::native_ecology::constitutive_fibre::WaveSourceReceiver;
         let receiver=match receiver.as_deref().unwrap_or("direct"){
             "direct"=>WaveSourceReceiver::Direct,"unit-real-sum"=>WaveSourceReceiver::UnitRealSum,
             _=>return Err(NativeSessionError::Application("unsupported coupled source receiver".into())),

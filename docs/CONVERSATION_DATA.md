@@ -283,7 +283,7 @@ recorded partner; it must not be relabelled as a human response to alpha's newly
 source testimony; the normalized UTC field is this exterior partition/ordering chart.
 
 [established-bounded; source-inspected] Rust consumers use
-`holonics::hna::alpha::exposure::{ExposureReader, ExposureOccurrence, ExposureCursor}`. `peek`
+`holonics_hna::alpha::exposure::{ExposureReader, ExposureOccurrence, ExposureCursor}`. `peek`
 retains a frame until `acknowledge(sequence)`; the saved cursor continues to name the pending
 frame until acknowledgment. Resume verifies the immutable source-file pin, frame boundary and
 sequence. Invalid frames do not advance the retained cursor. The reader checks source extents,

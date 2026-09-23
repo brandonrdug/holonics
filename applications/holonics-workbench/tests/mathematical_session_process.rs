@@ -1,4 +1,4 @@
-use holonics::hna::{
+use holonics_hna::{
     native::{
         mathematical::{BilinearConstructionWire, BilinearTargetWire},
         MathematicalRequest, RationalWire,

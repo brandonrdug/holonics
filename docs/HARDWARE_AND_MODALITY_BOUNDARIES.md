@@ -195,9 +195,9 @@ for an in-body coefficient query is distinct from portable standalone unfolding.
 execution or general backend parity is established by the desktop return.
 
 [established-bounded; source-inspected] The public framework exposes structural carriers and
-exact geometry with default features disabled; this excludes the desktop runtime dependency.
-It is not a portable build of all engine mathematics. The default native application enters
-through [`holonics::hna`](../crates/holonics/src/lib.rs). Its native session is exposed by
+exact geometry without a feature-gated runtime dependency. It is not a portable build of all
+engine mathematics. The HNN application imports [`holonics_hna`](../crates/holonics-hna/src/lib.rs)
+directly. Its native session is exposed by
 [`with_native_session`](NATIVE_HNA.md), while the earlier inherited operator retains a
 separate adapter and artifact scope. Neither public adapter founds a second engine.
 
