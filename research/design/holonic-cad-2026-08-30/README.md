@@ -2,6 +2,10 @@
 
 [definition] Everything here is design testimony under `archive/plans/THE_PRESENTATION_ORGAN.md`. It schedules nothing, asserts no engine capability, and is not canon. CONS1 / the UAR freeze are untouched. Files are exported verbatim from the Claude session scratchpad (session `deaf7379`), with the published artifact URLs recorded so the online copies can be compared.
 
+The `model_surface.rs` references in this dated prototype describe the Rust owner as it stood when
+the export was made. That unconsumed module was retired during R1 on 2026-09-23; the surviving
+mathematics and the implementation caveats are in `docs/canon/TABLET_THE_REALIZER.md`.
+
 ## The two artifacts
 
 | artifact | URL | latest label | export |

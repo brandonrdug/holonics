@@ -817,6 +817,12 @@ deleting what is superseded, unconsumed or outdated. Git history is the archive.
 | `research/` | 290,470 |
 | `docs/` | 39,095 |
 
+The `model_surface` row above is only the historical `c9012f17` inventory. R1 later confirmed
+no in-repo consumer beyond the module's own tests, transferred its exact readout scope to
+[`TABLET_THE_REALIZER.md`](../canon/TABLET_THE_REALIZER.md#143-the-holomorphic-half-is-owned-and-it-is-aperture-complete-by-a-theorem),
+and retired the Rust prototype. Its former implementation gaps are documented there; the old
+line count does not describe a current owner.
+
 Engine consumer census: a module counts as consumed if some file outside it references
 `crate|super|holonic_engine::<module>`. Multi-line `use` lists and re-exports through `holonics` or
 `holonics-hna` can hide a consumer, so confirm each zero with a build before deleting.

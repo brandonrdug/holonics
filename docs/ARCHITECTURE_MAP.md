@@ -1603,7 +1603,9 @@ complex source/current/incidence and return vector faces. The exact exterior com
 projection, depth clipping, field level traces, primary response and retained mark/source data;
 Typst and SVG paint that packet. Existing `relational-geometry::{projection,receiver_atlas}`,
 `holonic-engine::{dimensional_wave,display}` and the CAD rendering sources remain their distinct
-native/design owners. This adds no GPU semantic renderer or live proof assistant to HNN operation.
+native/design owners. The unconsumed Rust `model_surface` prototype was retired in R1; its exact
+readout and receiver-scope mathematics remain in [the realizer guide](canon/TABLET_THE_REALIZER.md#143-the-holomorphic-half-is-owned-and-it-is-aperture-complete-by-a-theorem).
+This adds no GPU semantic renderer or live proof assistant to HNN operation.
 The [receiver review](../research/records/2026-09-10_RECEIVER_ENGRAVING_RETAINS_COMPLEX_CURRENT_AND_SUPERSEDES_THE_PAINTED_ATLAS.md)
 records source methods, C³/GR examples and exact checks.
 

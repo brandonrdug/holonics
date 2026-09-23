@@ -699,7 +699,10 @@ exactly as `archive/plans/legacy/THE_GROWN_CIRCUIT.md` claimed.
 
 **The rendering half is built.** `crates/holonic-engine/src/certified_face.rs` and
 `presentation_gauge.rs` refuse a decimal expansion reaching an emitted document at runtime;
-`model_surface.rs` reads a turn in quarter-turns and refuses to name a phase at the origin.
+At the time of this 2026-07-23 observation, the then-existing `model_surface.rs` prototype read a
+turn in quarter-turns and refused to name a phase at the origin. R1 retired that unconsumed Rust
+module on 2026-09-23; see `docs/canon/TABLET_THE_REALIZER.md` for the surviving mathematical scope
+and the prototype's implementation caveats.
 
 **What is still absent, and this part of the row stands.** *"Relativistic calculus of information
 topology"* appears nowhere. The **triangular hinge-like simplicial complex** he names as prior art is

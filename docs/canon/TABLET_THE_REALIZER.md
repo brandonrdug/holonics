@@ -101,10 +101,49 @@ holomorphic organ:
   four-point organ tests the *folded* response and exhibits a violating fixture rather than asserting
   the aperture.
 
-`ExactReading` in `model_surface.rs:54` is the same discipline at the presentation boundary:
+The now-retired Rust `model_surface` prototype used the same discipline at a presentation boundary:
 `RealPart`, `ImaginaryPart`, `SquaredModulus`, `HarmonicReal`, `Quadrant` — `Abs` and `Arg` refused
-because `sqrt` and `atan2` are transcendental, and `quadrant_of` returns `None` at the origin because
-inventing a phase there would manufacture one.
+because `sqrt` and `atan2` are transcendental, and its quadrant reading returned `None` at the
+origin because inventing a phase there would manufacture one. Its input was an ordered population of rational
+complex stations `z = x + iy`; a declared reading is a receiver map on that source, not a change to
+the source object. The exact scalar maps are `x`, `y`, `x²+y²`, and `x²−y²`; the quadrant is the
+integer sign-pair class on the punctured plane, with axis points assigned to the quadrant they open
+into. In particular, `HarmonicReal(z)=Re(z²)` doubles
+phase and is distinct from the phase-quotient reading `|z|²=z z̄`.
+
+This describes the prototype's intended mathematics, not a currently executable Rust API. Its
+implementation had three scope defects: `integer_decade` capped its search at exponents ±512 and
+therefore violated the full nonzero-rational decade law outside that range; `certified_crossings`
+counted equality at the left station but not at the right, making endpoint handling asymmetric;
+and `read_model` recorded `phase_reading` and `stations` without enacting either option. The Rust
+module and its tests were retired in R1. The equations and receiver-scope distinctions below remain
+the design contract; they are not claims that this Rust implementation is available.
+
+This gives the exact, scoped bridge to `holonic_body::arrow::Arrow`. For its already-related pair
+`(aim,cross)`, put `z=aim+i·cross`. Then `HarmonicReal(z)=aim²−cross²`, the negative of the
+indefinite form `cross²−aim²` tested by `Arrow::founds`; hence founding is exactly
+`HarmonicReal≤0`. Away from the pair horizon, the sign reads the causal class: negative is
+transport-dominant, zero balanced, and positive storage-dominant. At the horizon `(aim,cross)=(0,0)`
+the scalar is also zero, so the scalar alone cannot distinguish `Unread` from the cone wall; the
+receiver must retain and inspect the original pair. This is a relation between the exact scalar
+readout and the pair-level Arrow readout, not a Rust dependency or a Lean theorem.
+
+The ordered-turn readout is similarly limited to its declared polygonal walk: adjacent station
+quadrants and the exact cross product determine quarter-turn increments; an origin station is
+unreadable, and an antipodal edge through the origin is reported ambiguous rather than assigned a
+direction. This discrete walk reading is not by itself a general winding theorem for an arbitrary
+continuous path. Mesh readings compare the declared exact scalar at consecutive stations with a
+declared level; the intended crossing record carries the bracketing values, with equality at a
+station treated as a crossing. The retired implementation counted a left-endpoint equality but
+not a right-endpoint equality, so that convention was not realized symmetrically; a station where
+the reading is undefined contributes no crossing. Two further receiver charts are exact on
+their stated domain: reciprocal is undefined at zero, and the integer decade is the unique `k` with
+`10^k≤|v|<10^(k+1)` for nonzero rational `v`. A max-norm square exclusion is exactly decidable over
+`ℚ`; it is a declared region aperture, not Euclidean radial exclusion. The option record names the
+receiver's value, phase, scaling, mesh, region, and station choices so an artifact retains its
+reading scope. An implementation must actually apply every recorded option and must preserve the
+full declared domain of any exact reading; recording an option or bounding an integer search does
+not establish either law.
 
 ### 14.4 What is measurably absent
 
@@ -208,10 +247,12 @@ by the rendering organ on itself.
   carries integer extents and device counts; `platform_x11.rs` validates a complete batch, blits all
   runs and flushes once, and *"never owns receiver geometry, crossing formation, physical law, or
   chronology."*
-- **A phase colour wheel is replaced by a stronger object, not approximated.** `model_surface.rs`
-  refuses `Arg` and returns the **winding number** instead, certified by `eta_boundary_winding` from
-  sign-of-cross-product ray crossings with no angle anywhere. A winding number over a closed boundary
-  *counts the zeros inside, exactly*; a sampled phase field shows where a zero probably is.
+- **A phase colour wheel is replaced by a stronger object, not approximated.** The retired
+  `model_surface` prototype refused `Arg` and returned a discrete turn reading for an ordered
+  station walk. Certified boundary winding is supplied by `eta_boundary_winding` from exact
+  sign-of-cross-product ray crossings, with no angle. Under that boundary certificate's hypotheses,
+  winding counts zeros inside; the prototype's station walk alone was not a general continuous-path
+  winding theorem.
 
 ```text
 source geometry  ->  receiver map     ->  transport         ->  returned residual
@@ -242,7 +283,8 @@ The historical command was
 `grep -n "<svg" crates/holonic-engine/examples/generative_transport_prediction.rs crates/holonic-engine/examples/inverse_transport_reconstruction.rs`;
 it returned `:215` and `:291` in the August 15 tree — both then hand-wrote the element — and
 `grep -c "certified_face\|presentation_gauge" crates/holonic-engine/examples/grown_circuit_schedules.rs`
-returns 0. The rendering organ's only consumers remain `src/model_surface.rs` and
-`examples/certified_presentation_workbench.rs`.
+returns 0. The former `model_surface` module had no Rust caller beyond its own tests and is retired;
+`examples/certified_presentation_workbench.rs` remains the rendering workbench consumer of the
+certified face and presentation gauge owners.
 
 ---

@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-08
 **Truth status:** `established-bounded`
-**Evidence:** `implemented-exact` — `crates/holonic-engine/src/model_surface.rs` (16 controls) and three
+**Evidence at the time:** `implemented-exact` — `crates/holonic-engine/src/model_surface.rs` (16 controls) and three
 drivers: `crates/relational-geometry/examples/certified_eta_winding_figure.rs`,
 `crates/holonic-engine/examples/leader_quadrature_figure.rs`,
 `crates/holonic-engine/examples/graded_complex_integer_invariants.rs`.
@@ -18,6 +18,14 @@ DRIVERS, NO EXISTING FILE EDITED / RUN — 50 CERTIFIED WINDINGS, 9 LEADER RUNS,
 SEARCH / WINDING ATLAS INDEPENDENTLY AGREES WITH THE FIRST TEN KNOWN ZETA ORDINATES / SMITH NORMAL
 FORM INDEPENDENTLY REPRODUCED / ZERO FLOATS / NO p,q BIGRADING CLAIMED OR IMPLIED / NO ROADMAP ROW
 CLOSED
+
+**Current Rust status (2026-09-23):** the unconsumed `holonic-engine::model_surface` prototype and
+its module-local tests were retired during R1. Its intended rational readout laws and Arrow
+correspondence are retained in `docs/canon/TABLET_THE_REALIZER.md`; they are not a current Rust API.
+The prototype did not enact its recorded `phase_reading` or `stations` options, its decade search
+was capped at ±512, and its mesh endpoint equality handling was asymmetric. The mathematical laws
+in this record remain scoped design results, not evidence that those implementation behaviors met
+their full domains.
 
 ---
 

@@ -45,13 +45,12 @@ pub enum Aim {
 /// sign is a causal character. Formal names, for the record and never as the label: timelike, null,
 /// spacelike.
 ///
-/// **THE FORM HAS AN EXACT RATIONAL OWNER OUTSIDE THIS CRATE.** `holonic-engine`'s
-/// `model_surface::ExactReading::HarmonicReal` computes `re² − im²`, which for `z = aim + i·cross`
-/// is `Re(z²) = aim² − cross²` — this form with the hand reversed — so `founds()` is
-/// `HarmonicReal ≤ 0` and the three classes below are its three signs. `crates/holonic-body` has zero
-/// dependencies and does not import it; the correspondence is carried by `model_surface`'s test
-/// `the_harmonic_real_is_the_arrows_founding_form`, which re-derives `(aim, cross)` from this
-/// module's own four declared points over `Rat`.
+/// In the rational complex chart `z = aim + i·cross`, the scalar `Re(z²) = aim² − cross²` is the
+/// negative of the form tested by `founds()`. Thus founding is equivalent to `Re(z²) ≤ 0`; away
+/// from the horizon, its sign determines the three classes below. At the horizon, the scalar zero
+/// cannot distinguish `Unread` from the balanced cone wall, so `causal_class()` also reads the
+/// original pair. The exact readout correspondence is documented in `TABLET_THE_REALIZER.md`; this
+/// crate computes its classification directly and has no dependency on an engine presentation API.
 ///
 /// **The causal class is `sense()` composed with squaring** — squaring doubles the phase, which is
 /// why this wall sits at a quarter turn while the scalar's sign flips at a half.

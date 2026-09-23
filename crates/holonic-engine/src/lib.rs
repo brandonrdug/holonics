@@ -385,7 +385,6 @@ pub mod mode;
 pub mod name_elaboration;
 // The declared-option modeling surface. Reached explicitly, like the other presentation membranes:
 // an option is a receiver coordinate and every call site must name it as one.
-pub mod model_surface;
 pub mod observation_ecology;
 pub mod organizational_grammar;
 pub mod parcel;
