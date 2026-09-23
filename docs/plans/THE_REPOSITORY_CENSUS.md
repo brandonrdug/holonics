@@ -184,7 +184,8 @@ commit, decline and diffusion paths; those laws and tests remain with `life`, `h
 Lean. The adapter's JSON schema, opaque handle registry, refusal mapping and C buffer ownership
 were transport apparatus, not a distinct mathematical law. No positive external consumer evidence
 was found in the repository, local artifacts, or GitHub releases/packages; unrecorded user-local
-dynamic loading cannot be ruled out.
+dynamic loading cannot be ruled out. The surviving HNA `alpha_matrix` integration test and the
+locked workspace all-target check passed after the ABI edge was removed.
 
 The unconsumed wgpu `holonic-surface` crate and its orphan rust-gpu SPIR-V source, builder and
 artifact have been retired in R2 after a source/manifest scan found no external caller. The
