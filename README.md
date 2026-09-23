@@ -52,7 +52,7 @@ laws and HNN**, organized by elementary object rather than acting as a facade:
 | Library | Responsibility |
 |---|---|
 | `holonic-words` | Small portable exact word and section ABI shared by host and device |
-| `holonics` | Holon/port law, exact geometry, pair, parametron, tube, deposition, ratio, receipt, equation extraction and an internal backend-neutral `hnn` module |
+| `holonics` | Ratio/remainder, geometric transport and pair/tube charts, the Holon law and its operators, proposed receiver-relative Holarchy, equation extraction, and an internal HNN with a complex-parametron implementation chart |
 | `holonics-cuda` | CUDA implementation of the HNN execution port |
 | `holonics-apple` (later) | Apple silicon implementation on Brandon's separate branch |
 

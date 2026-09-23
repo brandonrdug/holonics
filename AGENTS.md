@@ -22,6 +22,9 @@ package implements its Apple counterpart. Dependency direction is words → main
 main builds with a host/reference HNN and without CUDA. Lean becomes one Lake package with
 `Holonics` and dependent `HolonicsResearch`; the current `ElementaryHolonics` paths and
 `Soma.Holonics` declaration namespace stay factual until their distinct migrations land.
+The proposed internal operator order is ratio/remainder/inversion, geometric transport,
+the Holon law and its pair/tube operations, receiver-relative Holarchy, then HNN;
+the complex parametron is an HNN physical chart, not a prerequisite of every Holon.
 
 [definition] A moved operator retains its typed source and receiver, forward law, full variation,
 material/clock/frame hypotheses, wire face and actual consuming call. R0 accounts for the dirty

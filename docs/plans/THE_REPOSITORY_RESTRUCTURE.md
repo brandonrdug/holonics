@@ -72,7 +72,7 @@ sources; §3 gives the target layout.
 | Constitution (element relations) | storage `C`, `K`, resistive `D⪰0`, sources, active relations with power, pumps; modes `Kv=ω²Cv` | `Holon/Element`, `Holon/MomentStorage` | `holonic-core::element`; normal law `NormalConstitution`; moment storage |
 | Generator | initial configuration (key), clock, phase lift; helix = circle + carry; fractal family = words, restrictions, scale square, first arrival | `Geometry/PhaseCarry`, `Holon/Generator`, `Foundation/FractalPacking` | `holonic-core::generator`; `relational-geometry::winding` |
 | Helical pair contact | slip `J`, `Q=⟨Δ|Δ⟩`, `DQ=2J*Δ`, Farey lock address; contact material `ΣwJ*DJ` | `Transport/HelicalPairInteraction`, `Geometry/PairResonance`, `Millennium/Farey` | `holonic_interaction`, `holonic_chain`, `relational-geometry::screw` |
-| Parametron | LC storage↔flow at `ω=1/√(LC)`, pump, half-turn Ising lock; perceptron = locked-sheet face | `Objects/Parametron` | `cuda_refine::complex_parametron` (device); no host owner yet |
+| Complex parametron (HNN physical instance) | LC storage↔flow at `ω=1/√(LC)`, pump, half-turn Ising lock; perceptron = locked-sheet face | `Objects/Parametron` | `cuda_refine::complex_parametron` (device); no host owner yet |
 | Tube, tower | longitudinal clocked span; transverse restriction with unique/plural/obstructed gluing; `Λ_DN` | `Transport/ContinuingTube`, `Foundation/IwasawaTower` | `holonic-core::restriction::{tube,tower,fibre,descent}` |
 | Relative completeness (globe) | boundary bounds interior; coupled by conserved charges, not determined; persistent motion | `Objects/RelativeCompleteness` (full theorem owed, #62) | none |
 | Deposition and retention | the only law changing a constitution; retention = future-sufficient quotient, never a tape | `Objects/{Deposition,Retention}`, `Foundation/Standing`, `Holon/Deposition` | `holonic-core::deposition`, `standing` |
@@ -140,7 +140,7 @@ The target is three maintained libraries on this branch, four when Brandon adds 
 | Package | Internal ownership | Existing sources to sort at R0 |
 |---|---|---|
 | `holonic-words` | Small portable exact word ring and packet/section ABI shared by host and device, with a `no_std` arithmetic kernel compiled from one source. It owns the layout and refusal words both sides must agree on. No driver or HNN dependency. | `holonic-words` plus the shared `soma-abi::section_layout_cuda` law and validated layout definitions. Its present dependency on `soma-abi`/`body` must be reversed or retired. |
-| `holonics` | Main library: the Holon and its facets, exact/geometry support, pair contact, parametron, tube/tower, deposition/retention, ratio/receipt, equation extraction as a Holon boundary, and an internal `hnn` module with a host/reference executor. No CUDA dependency. | `holonic-core`, `relational-geometry`, live `holonic-structure`, source-neutral and HNN parts of `holonic-engine`, `holonics-hna`, live `holonic-life`. |
+| `holonics` | Main library: typed ratio/remainder/inversion and their jets; geometric frames, pair and tube/tower charts; the one Holon law with composition, reception, restriction and deposition operators; a proposed receiver-relative `Holarchy` construction; equation extraction as a Holon boundary; and internal HNN whose complex-parametron chart is a physical implementation. No CUDA dependency. | `holonic-core`, `relational-geometry`, live `holonic-structure`, source-neutral and HNN parts of `holonic-engine`, `holonics-hna`, live `holonic-life`. |
 | `holonics-cuda` | CUDA implementation of declared Holonics/HNN operations: driver, allocation, launch/section layout, resident kernels, checked receipts and transfer completion. It depends on `holonics` and `holonic-words` and implements the HNN execution port; it does not redefine the material or loss law. | `holonic-mount`, device ABI owners, engine `cuda_refine`, `resident_section`, `kernels/`, `hardware_cover`, `section_partition`. |
 | `holonics-apple` (later) | Apple silicon implementation behind the same typed execution port, with its own kernels and placement. Create it only on Brandon's Mac branch after its actual implementation is ready. | No Linux-branch move. |
 
@@ -159,40 +159,61 @@ Initially keep `hnn` in the main package's default features to preserve public H
 `--no-default-features` is the lean source-neutral Holon build. No `cuda` feature on main may
 introduce an edge back to `holonics-cuda`; applications select that dependency explicitly.
 
-The internal source tree is organized by the elementary objects and their actual compositions:
+The internal source tree follows an **operator dependency**, not a catalogue of independent
+substances. The conceptual order is ratio/remainder and partial inversion → geometric
+transport/phase/carry → the Holon law → its pair and tube operations → compound Holarchies and
+HNN realizations. This is not a literal import order: pair contact requires participating
+Holons, while the geometric `ScrewPair` chart can be constructed before their material is
+known. A parametron is a pumped LC Holon instance used by HNN, not a prerequisite for defining
+all Holons.
 
 ```text
 crates/holonics/src/
-  lib.rs                 public typed entry; feature declarations and narrow re-exports
-  holon/                 one Holon law: complex, ports/Dirac, elements, generators, restriction
-  geometry/              exact frames, screw, phase carry, lock address, cell holonomy
-  pair/                  helical contact, slip, quadrance and material return
-  parametron/            LC storage, pump, sheets and locks (host law)
-  tube/                  longitudinal transfer, tower restrictions and gluing
-  deposition/            reached covectors, constitution change and retention quotient
-  ratio/                 typed comparison, log branch and jets
-  receipt/               per-region framed/clocked readings
-  exact/                 rational, algebraic and word-backed implementation carriers
+  lib.rs                 Holon and deliberate qualified public operations
+  ratio/                 presentations, division/remainder, residue, partial inverse, lift, jet
+  geometry/              complex/frame/connection, phase carry, screw pair, tube/tower charts
+  holon/                 law, ports/Dirac, elements, generators, restrictions, composition
+  holarchy/              proposed compound Holon, receiver/grain views and gluing
   extraction/            foreign equations as Holon element/generator relations
-  hnn/                   field, source moments, generator inference, receiver, adjoint, session
+  hnn/                   field, source moments, receiver, adjoint, session, parametron instance
 ```
 
-`holon` is the one definition of the port object; `pair`, `parametron`, `tube`, `deposition`,
-`ratio` and `receipt` are its elementary laws and compositions, not duplicate root Holons.
-`exact` is supporting representation, not a competing ontology. `hnn` assembles those laws
-into the continuing field; it does not copy their definitions. Most submodules should be
-private until an actual caller needs a public contract. Application codecs (text, image,
-motor) remain boundary charts at their consumers. The current engine's blanket public modules
-and glob exports are not copied into this tree.
+There is **no public `exact` object/module**. Integer/rational/algebraic/matrix carriers live
+privately beside the operators that use them; exact source descriptions and certified
+remainders are the default mathematical contract. `holonic-words` is a small implementation
+ABI because host and device must compile the same exact word law, not a second mathematical
+foundation. A dyadic `0.5` and `1/2` can have the same exact numerical face; the ratio object
+also retains the comparands, units, source, possible winding and chosen presentation when a
+future operation needs them.
 
-The root exports only the central `Holon` type and deliberate qualified modules. A caller
-uses `holonics::pair`, `holonics::ratio` or `holonics::hnn`, not a flat engine-wide glob.
-Preserve `holonics::geometry`, `holonics::structure` and `holonics::hna` as audited forwarding
-paths while their real consumers migrate; each forwarding path has a removal decision tied
-to a named caller or saved wire. In Lean, the public `Holonics` root imports the corresponding
-object owners and a curated HNN specialization; `HolonicsResearch` imports that root. Exact
-module/file names are settled against the existing proof import graph, not invented by copying
-the Rust directory tree.
+| Planned operation | Law and return | Current foothold / missing join |
+|---|---|---|
+| `Ratio::present`, `compare`, `compose`, `invert` | Carry the typed numerator/denominator pair; compare by cross multiplication where valid. Inversion has an explicit nonunit/zero fibre, not an invented reciprocal. | Lean `Objects/{Ratio,RatioBlock}`; Rust `RatioFace` and scoped `RatioFamily`. A general typed owner is owed. |
+| `div_rem`, `residue`, `lift`, `jet` | `a=bq+r` with divisor, quotient and remainder retained; modulo is the selected residue face, winding/carry the lift. Logarithmic and higher jets retain domain and branch. | Lean `Geometry/PhaseCarry`, `Millennium/Farey`, `Objects/Ratio`; Rust `winding::{Odometer,LockAddress}`. These laws are present but dispersed. |
+| `Generator::evaluate_with_remainder` | A series, recurrence or analytic source returns its exact/certified value **and its own tail or truncation defect**. This is not Euclidean remainder, although both refuse to erase what the finite reading omits. | η atlas and `RH/LogDerivativeRemainder` have source-specific realizations; a shared source/receiver port is owed where HNN or mathematical navigation consumes it. |
+| `Geometry::transport`, `screw_pair`, `tube`, `restrict` | Carry frame, connection, incidence, phase and clock. A pair chart supplies two motions and their relative jet; a tube chart supplies longitudinal transfer and transverse restriction with an explicit gluing defect. | Rust `relational_geometry::screw`, `winding`, core `restriction::{tube,tower}`; Lean `PhaseCarry`, `PairResonance`, `ContinuingTube`, `ContinuingTower`. |
+| `Holon::interconnect`, `contact`, `continue`, `receive` | Interconnect at ports with internal-power cancellation; bind pair geometry to contact material; carry one Holon through a tube; a receiver is another joined Holon. Return the composite law, face and unresolved fibre where appropriate. | `Holon::interconnect` and `PortHolon::interconnect` exist. Full Rust joining of pumps, named ports, complexes and restrictions is still refused or omitted; Lean `Holon/{Dirac,Law}` proves scoped port joins. |
+| `Holon::restrict`, `depose`, `pullback` | Restrict across grain with a commuting square or typed defect; only arrived covectors change the constitution; the adjoint returns through the full producing operands. | Core restriction/deposition and HNN adjoints exist at distinct scopes; their unified consuming call is owed. |
+| `Holarchy::assemble`, `view`, `count`, `refine` | Assemble a witnessed plurality as one Holon where its join closes. `view(receiver,grain,clock)` returns situated constituent faces, interface flux and unresolved classes. `count` requires a finite discrete receiver partition; otherwise return a typed unresolved reading. | New proposed owner. Existing Holon composition, receiver atlas, tower and future-sufficient quotient provide its ingredients; no current Rust `Holarchy` type has this contract. |
+
+The root exports the central `Holon` type and qualified operations, not a flat engine-wide
+glob. `holonics::geometry`, `holonics::structure` and `holonics::hna` stay as audited
+forwarding paths while callers migrate. The ratio and geometry operations are reusable by
+Holon methods; they do not each create a rival Holon. HNN assembles those methods into its
+continuing field and treats the complex parametron as a concrete storage/pump/lock chart.
+Application codecs remain receiver boundaries. Exact module names and method signatures
+follow the surviving consuming calls; this table states their required behavior.
+
+A **Holarchy** is a Holon with a declared, continuing decomposition relation, not a `Vec<Holon>`
+or an absolute atom count. Its constituent family and incidence may be implicit or recursively
+generated. A constructor requires a plural participation witness at some declared context and
+returns a gluing obstruction instead of asserting that every family closes. One receiver can
+read the compound as one face; another can separate continents, islands or molecules at its
+own grain. Quantities such as number, mass or category are methods of the receiving relation,
+with units, partition/overlap conditions and clock; they are not immutable fields of the
+Holarchy. Under a certified finite disjoint refinement, counts have a stated relation; with
+overlap, changed receivers or non-finite fibres, that relation requires a correction or remains
+unresolved. The whole itself may receive, act, and compose with other Holarchies.
 
 The HNN execution port is defined at its surviving consuming call, including the forward
 field, complete geometry/feature pullback, material return, source order, receiving phase and
@@ -216,10 +237,40 @@ depending on `Holonics`). `Holonics` must not import `HolonicsResearch`. A stand
 theorem is a consumer in its own right; absence from the HNN build is not a deletion reason.
 The present `ElementaryHolonics.lean` umbrella imports almost all of Millennium and RH; replace
 it with curated roots rather than renaming that umbrella and calling it the foundation.
-The public root presents `Holon`, pair contact, parametron, tube/tower, deposition/retention,
-ratio/receipt and their geometry in the same object order as the Rust main library. HNN
-theorems are a dependent specialization **inside** `Holonics`; `HolonicsResearch` contains
+The public root presents ratio/remainder, geometry, the Holon law and its pair/tube/contact,
+deposition/retention and receiving operations, followed by the proposed Holarchy and HNN.
+The complex parametron is an HNN physical instance of those operations. HNN theorems are a
+dependent specialization **inside** `Holonics`; `HolonicsResearch` contains
 independent mathematical instances and cannot become an alternate foundation.
+
+Refine that root by **operator**, coupled to the Rust calls above:
+
+| Lean target owner | Current checked sources and next obligation |
+|---|---|
+| `Holonics.Ratio` | `Objects/{Ratio,RatioPhase,RatioBlock}` already prove undivided presentations, nonunit/zero lift fibres, logarithmic derivative, matrix/projective ratio and jets. Bring the general quotient/remainder/carry and partial-inversion interface from `Geometry/PhaseCarry` and the Euclidean/Farey laws into one import surface; keep source-specific analytic remainders with their source. |
+| `Holonics.Geometry` | Oriented complex, frame/connection, phase lift, screw pair, tube/tower charts. Reuse `Geometry/{PhaseCarry,PairResonance}`, `Transport/{HelicalPairInteraction,ContinuingTube}`, `Foundation/ContinuingTower` and Hodge/exterior owners. Keep geometric kinematics distinct from a Holon's material contact law. |
+| `Holonics.Holon` | Join the occurrence/interface/receiver operations in `Foundation/Holon` with the port/material/interconnection law in `Holon/{Port,Dirac,Element,Generator,Restriction,Law}`. Prove the full joined complex, pumps, clocks and restrictions under stated hypotheses; the current port theorem and native method have narrower scope. |
+| `Holonics.Holarchy` (proposed) | Define a Holon with a witnessed plural decomposition and receiver/grain-indexed views. Prove interconnection closure where supplied, internal-port cancellation, compatible refinement and conditional count laws; exhibit two receivers with different counts of the same continuing whole. Retain overlap/gluing defects and preimage fibres. |
+| `Holonics.HNN` | Formal specializations of the same Holon operators: coupled field, source moments, complete variation, deposition return and complex-parametron storage/pump/lock chart. It imports the object owners; the physical parametron is not a foundation import. |
+
+The September 23 Millennium work supplies concrete tests of this placement. `Computation/CertifiedWindingRoute`
+has receiver-count additivity over zero-free shared cuts and a compatible shrinking route;
+`Computation/IntersectionNavigation` returns an affine solution fibre or unreachable
+obstruction; `RH/PrimePhasePartition` proves a finite common-denominator sign law on one
+source-weighted phase population. A general checked operation belongs in the public Lean
+owner when its hypotheses are sound; it then gives Rust a typed port and a concrete first
+consumer, whether an HNN call or a mathematical application. The η/ξ source, off-line Weil sign and global
+RH conclusion remain research instances or open claims. `Foundation/HodgeReceiver` shows a
+harmonic class count can be stable while a preferred representative changes with its metric;
+`Foundation/IwasawaTower` shows a quotient level's cardinality and retained kernel depend on
+the selected restriction. A Holarchy's count therefore has receiver/grain hypotheses and may
+still possess conditional invariants.
+The September 22 exterior-current construction adds two direct controls:
+`FractalPacking.sibling_total_width` is a receiver law induced by addressed children, while
+`Millennium/NavierStokesLambCurrentCell.smoothSolutionOn_twoCell_sharedFace_gluing` cancels
+the same physical flux on a joined face under its trace hypotheses. Holarchy composition
+must preserve that shared-face law; its area, volume or number is a reading of the generated
+and restricted geometry, never a fixed field in the collection struct.
 
 Generate the import closures before classifying files. Keep `Holon/`, `Objects/` and the
 Framework's actual transitive owners together; sort `Geometry/`, `Transport/`, `Foundation/`,
