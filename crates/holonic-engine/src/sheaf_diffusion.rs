@@ -45,6 +45,10 @@ use crate::{
     CausalAlgebraicError, CausalCellId, EventSuccessor, ExactEventLaw, GradedCausalComplex,
 };
 
+// The sheaf law as a core Holon and a `HolonLaw` (plan phase 3).
+mod holon;
+pub use holon::SheafDiffusionHolonLaw;
+
 /// **The sheaf law's linear map is the shared exact carrier.**
 ///
 /// [definition] A finite exact linear map, rows the target coordinates and columns the source
@@ -1212,6 +1216,9 @@ pub enum SheafDiffusionError {
     EnergyIncreased,
     #[error(transparent)]
     Algebraic(#[from] CausalAlgebraicError),
+    /// The Holon core refused (a Dirac, resistance or step certificate).
+    #[error(transparent)]
+    Holon(Box<holonic_core::holon::HolonError>),
 }
 
 #[cfg(test)]

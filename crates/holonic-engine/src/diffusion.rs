@@ -42,6 +42,11 @@ use thiserror::Error;
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::{CurrentBranchId, CurrentNodeId};
 
+// The complex as a core Holon and the law as a `HolonLaw` (plan phase 3).
+mod holon;
+pub use holon::DiffusionHolonLaw;
+pub(crate) use holon::{diffusion_holon, event_bond};
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DiffusionNode {
     pub node: CurrentNodeId,
@@ -868,6 +873,13 @@ pub enum DiffusionError {
     EnergyBalanceFailure,
     #[error("a closed source-free diffusion event increased stored energy")]
     EnergyIncreased,
+    /// The Holon core refused (a Dirac, resistance or step certificate). Boxed: the core's
+    /// refusals carry exact witnesses.
+    #[error(transparent)]
+    Holon(Box<holonic_core::holon::HolonError>),
+    /// A core energy balance carried a term a diffusion event does not owe.
+    #[error("a diffusion event balance carries no {term}")]
+    NotADiffusionBalance { term: &'static str },
 }
 
 #[cfg(test)]

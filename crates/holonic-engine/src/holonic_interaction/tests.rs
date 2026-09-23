@@ -1372,3 +1372,286 @@ fn a_body_that_does_not_carry_its_faces_disagrees_at_a_declared_probe() {
     // move at all: that difference is what `constructed_signature`'s second clause refuses.
     assert_ne!(&through_the_body * int(2), through_the_body);
 }
+
+// =============================================================================================
+// the interaction as a core Holon (plan phase 3)
+// =============================================================================================
+
+mod core_holon {
+    use holonic_core::conformance::{
+        check_exact_advance, check_interaction, check_restriction, check_run, check_tellegen,
+    };
+    use holonic_core::holon::{HolonError, HolonState};
+    use holonic_core::law::{HolonLaw, Scheme};
+    use holonic_core::restriction::PortMap;
+
+    use super::*;
+
+    fn dissipative_chain() -> HolonicInteraction {
+        two_medium_chain().modulated().expect("the modulated unit")
+    }
+
+    /// `Holon/Conformance.lean::medium_admits` and `ssm_port_output`: the core Holon admits the
+    /// interaction's own port-Hamiltonian motion `q̇ = (Ω − M)Gq + Bu`, and its point balance is
+    /// the storage-rate reading's and the contact form's, number for number.
+    #[test]
+    fn the_interaction_holon_admits_its_own_motion_and_the_readings_are_its_balance() {
+        for unit in [two_medium_chain(), dissipative_chain()] {
+            let holon = unit.holon().expect("a core Holon");
+            check_tellegen(holon.port_holon().dirac()).expect("a Dirac structure");
+            assert_eq!(holon.ports().expect("named ports").len(), 4 + 1 + 1);
+            let q = vector(&[1, -2, 3, 1]);
+            let effort = form_matrix(&unit.joint_storage().unwrap())
+                .unwrap()
+                .apply(&q)
+                .unwrap();
+            let point = unit.power_balance_at(&q, &vector(&[2])).expect("admitted");
+            assert!(point.residual().is_zero());
+            assert_eq!(
+                point.dissipated,
+                unit.joint_dissipation().unwrap().power(&effort).unwrap()
+            );
+
+            // The storage-rate reading at `u = 0` is the core point balance.
+            let rest = unit.power_balance_at(&q, &vector(&[0])).expect("admitted");
+            let reading = unit.storage_rate().unwrap();
+            let balance = reading.energy_balance_at(&q).unwrap();
+            assert!(balance.is_exact());
+            assert_eq!(balance.stored_change, rest.storage_rate);
+            assert_eq!(balance.stored_change, reading.rate_at(&q).unwrap() / int(2));
+            assert_eq!(balance.dissipated, rest.dissipated);
+        }
+    }
+
+    /// `ClockedEnergy` is the core resistive dissipation over its clock: `⟨δq, Mδq⟩/h = h⟨v, Rv⟩`.
+    #[test]
+    fn the_clocked_energy_is_the_core_resistive_dissipation_over_its_clock() {
+        let dissipation = definite_contact();
+        let resistive = dissipation.resistive_relation().unwrap();
+        let edit = vector(&[1, -3]);
+        for duration in [int(1), rat(1, 2), int(3)] {
+            let clock =
+                Clock::declared("test|clock", duration.clone(), "declared-energy-unit").unwrap();
+            let energy = dissipation.clocked_energy(&edit, &clock).unwrap();
+            let balance = energy.energy_balance();
+            assert!(balance.is_exact());
+            assert_eq!(&balance.dissipated, energy.energy());
+            let velocity: Vec<Rat> = edit.iter().map(|value| value / &duration).collect();
+            assert_eq!(
+                balance.dissipated,
+                &duration * resistive.dissipation(&velocity).unwrap()
+            );
+        }
+    }
+
+    /// The exact law: one midpoint word is `q⁺ − q = h((Ω − M)G q̄ + B u)`, and the generic core
+    /// conformance checks pass against it.
+    #[test]
+    fn the_interaction_law_passes_the_core_conformance_checks() {
+        let unit = dissipative_chain();
+        let step = rat(1, 2);
+        let law = unit.law(step.clone(), Scheme::Midpoint).unwrap();
+        let state = HolonState::new(vector(&[1, 0, -1, 2]));
+        let input = vector(&[3]);
+        let advance = check_exact_advance(&law, &state, &input).unwrap();
+        let midpoint: Vec<Rat> = state
+            .configuration
+            .iter()
+            .zip(&advance.state.configuration)
+            .map(|(a, b)| (a + b) / int(2))
+            .collect();
+        let rate: Vec<Rat> = unit
+            .generator()
+            .unwrap()
+            .apply(&midpoint)
+            .unwrap()
+            .iter()
+            .zip(unit.excitation().unwrap().apply(&input).unwrap())
+            .map(|(a, b)| a + b)
+            .collect();
+        for ((after, before), rate) in advance
+            .state
+            .configuration
+            .iter()
+            .zip(&state.configuration)
+            .zip(&rate)
+        {
+            assert_eq!((after - before) / &step, *rate);
+        }
+        assert!(advance.balance.dissipated > Rat::zero());
+
+        let (_, total) = check_run(&law, &state, &input, 3).unwrap();
+        assert!(total.is_exact());
+        let (joined, _) = check_interaction(
+            &law,
+            &law,
+            &[(0, 0)],
+            &state.configuration,
+            &vector(&[0, 1, 0, 0]),
+            &[],
+        )
+        .unwrap();
+        assert_eq!(joined.holon().port_holon().counts().storage, 8);
+        let ports = law.holon().port_holon().counts().total();
+        let identity = PortMap::new(ExactRatMatrix::identity(ports).unwrap());
+        let flow: Vec<Rat> = (0..ports as i64).map(int).collect();
+        check_restriction(&law, &identity, &flow, &flow).unwrap();
+    }
+
+    /// The standing perspective is a passive coholon: its reader draws zero power and reads
+    /// `C_R q` through the storage effort.
+    #[test]
+    fn the_perspective_is_a_passive_coholons_reading() {
+        let unit = dissipative_chain();
+        let law = unit.law(int(1), Scheme::Midpoint).unwrap();
+        let state = HolonState::new(vector(&[2, -1, 5, 3]));
+        let reading = law
+            .receive(&state, &unit.perspective_reader().unwrap())
+            .unwrap();
+        assert!(reading.power.is_zero());
+        assert_eq!(
+            reading.value,
+            unit.readout().unwrap().apply(&state.configuration).unwrap()
+        );
+    }
+
+    fn participating_unit() -> HolonicInteraction {
+        let body = ReceiverBody::declared(
+            "test|participating|body",
+            form(&[&[1, 0], &[0, 2]]),
+            matrix(&[&[0, 1], &[-1, 0]]),
+        )
+        .unwrap();
+        let coupling = Coupling::declared(
+            "test|participating|coupling",
+            Carrier::Medium(0),
+            Carrier::Perspective,
+            matrix(&[&[0, 1], &[2, 0]]),
+        )
+        .unwrap();
+        let medium = Medium::declared(
+            "test|participating|medium",
+            form(&[&[1, 0], &[0, 1]]),
+            matrix(&[&[0, 1], &[-1, 0]]),
+            vec![
+                ContactFace::declared(
+                    "test|participating|face",
+                    matrix(&[&[1, -1]]),
+                    form(&[&[1]]),
+                    int(1),
+                )
+                .unwrap(),
+            ],
+        )
+        .unwrap();
+        HolonicInteraction::declared(
+            "test|participating",
+            SourceCurrent::declared(
+                "test|participating|source",
+                Carrier::Medium(0),
+                matrix(&[&[0], &[1]]),
+                vec!["drive".to_owned()],
+            )
+            .unwrap(),
+            vec![medium],
+            Vec::new(),
+            vec![coupling],
+            None,
+            Perspective::participating(
+                "test|participating|perspective",
+                matrix(&[&[1, 0]]),
+                vec!["receiver-displacement".to_owned()],
+                body,
+            )
+            .unwrap(),
+        )
+        .unwrap()
+    }
+
+    /// The participating receiver is its own Holon joined at gyrating link ports, and the joined
+    /// Holon is the interaction's: the same Dirac subspace, storage and resistance.
+    #[test]
+    fn the_participating_receiver_is_a_holon_joined_at_its_link_ports() {
+        let unit = participating_unit();
+        let whole = unit.holon().unwrap();
+        let receiver = unit
+            .receiver_holon()
+            .unwrap()
+            .expect("a participating body");
+        check_tellegen(receiver.port_holon().dirac()).unwrap();
+        let joined = unit.joined_holon().unwrap();
+        assert!(
+            joined
+                .port_holon()
+                .dirac()
+                .same_subspace(whole.port_holon().dirac())
+        );
+        assert_eq!(joined.port_holon().counts(), whole.port_holon().counts());
+        assert_eq!(joined.port_holon().storage(), whole.port_holon().storage());
+        assert_eq!(
+            joined.port_holon().resistance(),
+            whole.port_holon().resistance()
+        );
+
+        // A standing perspective has no body to join.
+        assert!(matches!(
+            two_medium_chain().joined_holon(),
+            Err(InteractionRefusal::Holon(HolonError::Unsupported { .. }))
+        ));
+    }
+
+    /// `Holon/Deposition.lean::commit_balance`: a storage perturbation commits as deposition work
+    /// and the balance closes exactly; a face perturbation deposits nothing.
+    #[test]
+    fn a_perturbation_commits_its_storage_change_as_deposition_work() {
+        let unit = HolonicInteraction::declared(
+            "test|perturbed",
+            SourceCurrent::declared(
+                "test|perturbed|source",
+                Carrier::Medium(0),
+                matrix(&[&[1], &[0]]),
+                vec!["drive".to_owned()],
+            )
+            .unwrap(),
+            vec![oscillator("test|perturbed|medium", 1)],
+            Vec::new(),
+            Vec::new(),
+            Some(Perturbation::Storage {
+                medium: 0,
+                storage: form(&[&[9, 0], &[0, 1]]),
+            }),
+            Perspective::standing(
+                "test|perturbed|perspective",
+                Carrier::Medium(0),
+                matrix(&[&[1, 0]]),
+                vec!["displacement".to_owned()],
+            )
+            .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(
+            unit.perturbation_deposition_work(&vector(&[1, 5])).unwrap(),
+            int(4)
+        );
+        let state = HolonState::new(vector(&[1, 2]));
+        let (advance, next) = unit
+            .perturbed_commit(rat(1, 3), Scheme::Midpoint, &state, &vector(&[1]))
+            .unwrap();
+        assert!(advance.balance.is_exact());
+        assert_eq!(
+            advance.balance.deposition_work,
+            unit.perturbation_deposition_work(&advance.state.configuration)
+                .unwrap()
+        );
+        assert_eq!(
+            next.holon().port_holon().storage(),
+            &unit.modulated().unwrap().joint_storage().unwrap()
+        );
+        assert!(
+            two_medium_chain()
+                .perturbation_deposition_work(&vector(&[1, 2, 3, 4]))
+                .unwrap()
+                .is_zero()
+        );
+    }
+}

@@ -68,7 +68,10 @@ pub struct EnergyBalance {
 }
 
 impl EnergyBalance {
-    fn closed(
+    /// The balance of the declared terms, with the residual computed rather than supplied:
+    /// `residual = stored_change − (−dissipated + port + active + deposition_work +
+    /// discretization_defect)`. Engine readings that already carry these terms convert through it.
+    pub fn closed(
         stored_change: Rat,
         dissipated: Rat,
         port: Rat,

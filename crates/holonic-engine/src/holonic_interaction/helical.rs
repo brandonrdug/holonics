@@ -11,7 +11,16 @@
 //!
 //! The pair rate, the medium state and the resident current remain distinct charts.  In
 //! particular, `C z` is not silently identified with a physical configuration velocity.
+//!
+//! [proved-derived; implemented-exact] **The pair contact is a core resistive element on relative
+//! slip** (`Holon/Conformance.lean::pairContact_resistive`): the flow is the slip `f = J_pair C v`
+//! and the effort the traction `e = −w D f`. Its power `⟨e, f⟩ = −w⟨f, D f⟩` is minus the
+//! assembled contact form at `v`, and [`HelicalPairInteraction::contact_element`] certifies `w D`
+//! passive through the core. The whole pair unit is the core Holon of its interaction
+//! ([`HolonicInteraction::holon`]).
 
+use holonic_core::element::ResistiveRelation;
+use holonic_core::port::Bond;
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
 use relational_geometry::{PairQuadranceJet, Rat, ScrewPair};
@@ -71,6 +80,9 @@ pub enum HelicalRefusal {
     },
     #[error("a medium block has zero width")]
     EmptyMediumBlock,
+    /// The Holon core refused the contact element.
+    #[error(transparent)]
+    Holon(#[from] holonic_core::holon::HolonError),
 }
 
 /// A covector over the full fixed-generator pair feature `(Delta,Q,DQ)`.
@@ -358,6 +370,48 @@ impl HelicalPairInteraction {
     /// The assembled medium form is exactly `CᵀJᵀDJC`.
     pub fn contact_dissipation(&self) -> Result<ContactDissipation, HelicalRefusal> {
         Ok(self.interaction.joint_dissipation()?)
+    }
+
+    /// **The pair contact as the core resistive relation** `R = w D` on the three slip
+    /// coordinates, certified passive (`Holon/Element.lean::PortHolon.passive`).
+    pub fn contact_element(&self) -> Result<ResistiveRelation, HelicalRefusal> {
+        let face = self.pair_face();
+        let response = face.response();
+        let resistance = ExactRatMatrix::shaped(
+            3,
+            3,
+            (0..3)
+                .map(|row| {
+                    (0..3)
+                        .map(|column| face.weight() * response.at(row, column))
+                        .collect()
+                })
+                .collect(),
+        )?;
+        Ok(ResistiveRelation::new(resistance)?)
+    }
+
+    /// **The contact bond at a medium motion** `v`: flow the slip `f = J_pair C v`, effort the
+    /// traction `e = −w D f` (`Holon/Conformance.lean::pairContact_resistive`). Its power is
+    /// `−⟨v, M_contact v⟩`.
+    pub fn contact_bond(&self, motion: &[Rat]) -> Result<Bond, HelicalRefusal> {
+        let element = self.contact_element()?;
+        let slip = self.pair_face().slip_of(motion)?;
+        let traction = element
+            .resistance()
+            .apply(&slip)?
+            .into_iter()
+            .map(|value| -value)
+            .collect();
+        Ok(Bond::new(slip, traction)?)
+    }
+
+    fn pair_face(&self) -> &ContactFace {
+        self.interaction
+            .contacts()
+            .first()
+            .expect("the pair interaction declares exactly one contact")
+            .face()
     }
 
     /// The kinematic no-slip kernel of `J_pair C` in the medium chart.

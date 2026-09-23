@@ -311,6 +311,50 @@ impl Dimension {
             .collect()
     }
 
+    /// **This dimension as a core port dimension** (`holonic_core::port::Dimension`, integer
+    /// exponents over named bases). The core carries `Z^k` words, so a rational exponent this
+    /// carrier admits is refused by name rather than rounded, and an exponent beyond `i64` is
+    /// outside the core's carrier.
+    pub fn to_core(&self) -> Result<holonic_core::port::Dimension, QuantityError> {
+        let mut core = holonic_core::port::Dimension::dimensionless();
+        for (symbol, exponent) in self.base.symbols.iter().zip(&self.exponents) {
+            if !exponent.is_integer() {
+                return Err(QuantityError::NonIntegralCoreExponent {
+                    symbol: symbol.clone(),
+                    exponent: format_rat(exponent),
+                });
+            }
+            let exponent = exponent
+                .to_integer()
+                .to_i64()
+                .ok_or(QuantityError::ExponentOutsideCarrier)?;
+            core = core.times(&holonic_core::port::Dimension::power_of(symbol, exponent));
+        }
+        Ok(core)
+    }
+
+    /// **A core port dimension over a declared base.** Every core base must be a symbol of
+    /// `base`; one that is not would be dropped, so the round trip is checked and refuses.
+    pub fn from_core(
+        base: &BaseUnits,
+        core: &holonic_core::port::Dimension,
+    ) -> Result<Self, QuantityError> {
+        let dimension = Self {
+            base: base.clone(),
+            exponents: base
+                .symbols
+                .iter()
+                .map(|symbol| Rat::from_integer(BigInt::from(core.exponent(symbol))))
+                .collect(),
+        };
+        if dimension.to_core()? != *core {
+            return Err(QuantityError::CoreDimensionOutsideBase {
+                declared: base.symbols.join(", "),
+            });
+        }
+        Ok(dimension)
+    }
+
     pub fn render(&self) -> String {
         let mut terms: Vec<String> = Vec::new();
         for (symbol, exponent) in self.base.symbols.iter().zip(&self.exponents) {
@@ -408,6 +452,20 @@ impl Quantity {
 
     pub fn is_zero(&self) -> bool {
         self.value.is_zero()
+    }
+
+    /// The magnitude with its dimension as a core port dimension ([`Dimension::to_core`]).
+    pub fn to_core(&self) -> Result<(Rat, holonic_core::port::Dimension), QuantityError> {
+        Ok((self.value.clone(), self.dimension.to_core()?))
+    }
+
+    /// A magnitude of a core port dimension over a declared base ([`Dimension::from_core`]).
+    pub fn from_core(
+        value: Rat,
+        base: &BaseUnits,
+        core: &holonic_core::port::Dimension,
+    ) -> Result<Self, QuantityError> {
+        Ok(Self::new(value, Dimension::from_core(base, core)?))
     }
 
     /// Refuses on mismatched dimension, naming both. This is the type check, not a convention.
@@ -1192,6 +1250,12 @@ pub fn exact_rational_power(value: &Rat, exponent: &Rat) -> Result<Rat, Quantity
 
 #[derive(Clone, Debug, PartialEq, Eq, Error)]
 pub enum QuantityError {
+    #[error(
+        "the exponent {exponent} of `{symbol}` is not an integer; a core port dimension is a Z^k word"
+    )]
+    NonIntegralCoreExponent { symbol: String, exponent: String },
+    #[error("the core dimension names a base outside the declaration ({declared})")]
+    CoreDimensionOutsideBase { declared: String },
     #[error("a base must be declared before any dimension exists")]
     NoBaseUnits,
     #[error("a base unit symbol cannot be empty")]

@@ -1228,3 +1228,70 @@ fn every_declared_unit_carries_its_product_law() {
         assert_eq!(units.source().base(), units.base());
     }
 }
+
+/// The Tellegen ledger is a view of the core energy balance with the same numbers, and the core's
+/// Kirchhoff Tellegen (`Holon/Dirac.lean::tellegen`) returns the same pair at the metric-weighted
+/// flux.
+#[test]
+fn the_tellegen_ledger_is_a_core_energy_balance_with_the_same_numbers() {
+    let network = two_loop_network();
+    let injection = vec![Rat::one(), Rat::zero(), -Rat::one(), Rat::zero()];
+    let solution = network.solve(&injection).expect("the solve returns");
+    let receipt = network
+        .power_ledger(&solution.potentials)
+        .expect("the ledger returns");
+    let balance = receipt.energy_balance().expect("one power dimension");
+    assert!(balance.is_exact());
+    assert!(balance.stored_change.is_zero());
+    assert_eq!(&balance.dissipated, receipt.dissipated.parts().0);
+    assert_eq!(&balance.port, receipt.delivered.parts().0);
+    assert_eq!(&balance.residual, receipt.residual.parts().0);
+
+    let operator = network.operator();
+    let weighted_flux = operator
+        .metric_matrix(1)
+        .unwrap()
+        .apply(&solution.drops)
+        .unwrap();
+    let (drops_against_flux, potential_against_source) = holonic_core::dirac::tellegen(
+        &operator.coboundary(0).unwrap(),
+        &solution.potentials,
+        &weighted_flux,
+    )
+    .unwrap();
+    assert_eq!(&drops_against_flux, receipt.dissipated.parts().0);
+    assert_eq!(&potential_against_source, receipt.delivered.parts().0);
+}
+
+/// `JointUnits ↔ PortUnits`: the declared joint is one core port, flow the flux and effort the
+/// potential, and it round-trips; a rational exponent the core cannot carry is refused by name.
+#[test]
+fn a_declared_joint_is_one_core_port_and_round_trips() {
+    for units in [
+        JointUnits::electrical().unwrap(),
+        JointUnits::electrostatic().unwrap(),
+        JointUnits::newtonian_sheet().unwrap(),
+    ] {
+        let port = units.port_units().expect("a core port");
+        assert_eq!(port.flow(), &units.flux().to_core().unwrap());
+        assert_eq!(port.effort(), &units.potential().to_core().unwrap());
+        assert_eq!(port.power(), &units.power().to_core().unwrap());
+        let back = JointUnits::from_port_units(units.lineage(), units.base().clone(), &port)
+            .expect("the port reads back");
+        assert_eq!(back, units);
+    }
+    let base = BaseUnits::declare(["V", "A"]).unwrap();
+    let half = base.unit("V").unwrap().powed(&rat(1, 2));
+    assert!(matches!(
+        half.to_core(),
+        Err(QuantityError::NonIntegralCoreExponent { .. })
+    ));
+    let outside = holonic_core::port::Dimension::base("W");
+    assert!(matches!(
+        crate::quantity::Dimension::from_core(&base, &outside),
+        Err(QuantityError::CoreDimensionOutsideBase { .. })
+    ));
+    let quantity = Quantity::new(rat(3, 2), base.unit("A").unwrap());
+    let (value, core) = quantity.to_core().unwrap();
+    assert_eq!(Quantity::from_core(value, &base, &core).unwrap(), quantity);
+}

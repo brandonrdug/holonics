@@ -2193,3 +2193,30 @@ fn the_aperture_chart_of_a_chain_is_the_downstream_block() {
     assert_eq!(chain.schema(), HOLONIC_CHAIN_SCHEMA);
     assert!(chain.poles(PoleReading::Named).is_ok());
 }
+
+/// **The five-station balance is a view of the core energy balance**, and the same point read
+/// through the core Holon (`Holon/Element.lean::PortHolon.power_balance`) returns its numbers.
+#[test]
+fn the_power_stations_are_the_core_point_balance_with_the_same_numbers() {
+    let state = vec![int(2), int(-1), int(3), int(1)];
+    for chain in [dissipative_chain(&[1, 0, 0]), skew_chain(&[1, 0, 0])] {
+        let stations = chain
+            .power_stations(&state, &[int(5)])
+            .expect("the stations read");
+        let balance = stations.energy_balance();
+        assert!(balance.is_exact());
+        assert_eq!(balance.residual, -stations.transport_residual().clone());
+        assert_eq!(&balance.stored_change, stations.storage_rate_total());
+        assert_eq!(&balance.dissipated, stations.dissipated());
+        assert_eq!(&balance.port, stations.injected());
+
+        let point = chain
+            .interaction()
+            .power_balance_at(&state, &[int(5)])
+            .expect("the core admits the point");
+        assert!(point.residual().is_zero());
+        assert_eq!(&point.storage_rate, stations.storage_rate_total());
+        assert_eq!(&point.dissipated, stations.dissipated());
+        assert_eq!(&point.port, stations.injected());
+    }
+}

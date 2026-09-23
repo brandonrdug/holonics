@@ -329,6 +329,36 @@ impl JointUnits {
         &self.power
     }
 
+    /// **The declared joint as one core port** (`Holon/Port.lean::power`): flow the flux, effort
+    /// the potential, power their product, each through [`Dimension::to_core`]. The core refuses a
+    /// power that is not flow times effort, which this declaration already re-derived.
+    pub fn port_units(&self) -> Result<holonic_core::port::PortUnits, JunctionRefusal> {
+        holonic_core::port::PortUnits::declared(
+            self.flux.to_core()?,
+            self.potential.to_core()?,
+            self.power.to_core()?,
+        )
+        .map_err(|_| {
+            JunctionRefusal::Quantity(QuantityError::DimensionMismatch {
+                operation: "a joint's power read as flux times potential",
+                left: self.power.render(),
+                right: self.flux.render(),
+            })
+        })
+    }
+
+    /// **A joint from a core port**: potential the port's effort, flux and source its flow,
+    /// each through [`Dimension::from_core`] over the declared base.
+    pub fn from_port_units(
+        lineage: impl Into<String>,
+        base: BaseUnits,
+        units: &holonic_core::port::PortUnits,
+    ) -> Result<Self, JunctionRefusal> {
+        let potential = Dimension::from_core(&base, units.effort())?;
+        let flux = Dimension::from_core(&base, units.flow())?;
+        Self::declare(lineage, base, potential, flux.clone(), flux)
+    }
+
     /// A source reading with its declared dimension attached.
     pub fn source_quantity(&self, value: Rat) -> Quantity {
         Quantity::new(value, self.source.clone())
@@ -1180,6 +1210,39 @@ impl TellegenReceipt {
     /// Whether the two sides agree exactly.
     pub fn balances(&self) -> bool {
         self.residual.is_zero()
+    }
+
+    /// **The Tellegen ledger as a view of the core energy balance.** A static junction stores
+    /// nothing: `stored_change = 0`, `dissipated = ⟪d v, f⟫` (the branch power), `port = ⟪v, σ⟫`
+    /// (the power the source delivers), and the core residual `0 − (−dissipated + port)` is this
+    /// receipt's own `dissipated − delivered`, number for number. The magnitudes are read in the
+    /// declared power unit; a receipt whose three quantities do not share one dimension is refused.
+    /// Tellegen on the Kirchhoff structure is `Holon/Dirac.lean::tellegen`; the tests assert the
+    /// core's `holonic_core::dirac::tellegen` returns the same pair at the metric-weighted flux.
+    pub fn energy_balance(&self) -> Result<holonic_core::law::EnergyBalance, JunctionRefusal> {
+        let (dissipated, unit) = self.dissipated.parts();
+        let (delivered, delivered_unit) = self.delivered.parts();
+        let (_, residual_unit) = self.residual.parts();
+        for other in [delivered_unit, residual_unit] {
+            if other != unit {
+                return Err(JunctionRefusal::Quantity(
+                    QuantityError::DimensionMismatch {
+                        operation: "a Tellegen ledger read as one energy balance",
+                        left: unit.render(),
+                        right: other.render(),
+                    },
+                ));
+            }
+        }
+        let zero = Rat::zero();
+        Ok(holonic_core::law::EnergyBalance::closed(
+            zero.clone(),
+            dissipated.clone(),
+            delivered.clone(),
+            zero.clone(),
+            zero.clone(),
+            zero,
+        ))
     }
 }
 

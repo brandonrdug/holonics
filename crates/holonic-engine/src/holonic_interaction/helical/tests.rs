@@ -165,3 +165,43 @@ fn material_null_is_checked_on_attainable_slips() {
         blind.no_slip_kernel().unwrap()
     );
 }
+
+/// `Holon/Conformance.lean::pairContact_resistive`: the pair contact is a core resistive element on
+/// relative slip, its bond power is minus the existing contact form, and the pair unit is a core
+/// Holon whose words close exactly.
+#[test]
+fn the_pair_contact_is_a_core_resistive_element_on_relative_slip() {
+    use holonic_core::conformance::{check_exact_advance, check_tellegen};
+    use holonic_core::holon::HolonState;
+    use holonic_core::law::Scheme;
+
+    let adapter = adapter();
+    let element = adapter.contact_element().unwrap();
+    assert_eq!(element.inertia().negative, 0);
+    for motion in [[int(2), int(3)], [int(-1), int(4)], [int(0), int(0)]] {
+        let bond = adapter.contact_bond(&motion).unwrap();
+        let contact_form = adapter
+            .contact_dissipation()
+            .unwrap()
+            .power(&motion)
+            .unwrap();
+        assert_eq!(bond.power(), -contact_form.clone());
+        assert_eq!(element.dissipation(bond.flow()).unwrap(), contact_form);
+        assert_eq!(
+            bond.flow(),
+            adapter.effective_slip().apply(&motion).unwrap()
+        );
+    }
+
+    let holon = adapter.interaction().holon().unwrap();
+    check_tellegen(holon.port_holon().dirac()).unwrap();
+    assert_eq!(holon.port_holon().counts().resistive, 3);
+    assert_eq!(holon.port_holon().resistance(), &element);
+    let law = adapter
+        .interaction()
+        .law(Rat::new(1.into(), 2.into()), Scheme::Midpoint)
+        .unwrap();
+    let advance =
+        check_exact_advance(&law, &HolonState::new(vec![int(1), int(-2)]), &[int(1)]).unwrap();
+    assert!(advance.balance.dissipated > Rat::zero());
+}

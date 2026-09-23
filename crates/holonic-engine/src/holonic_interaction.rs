@@ -132,6 +132,16 @@
 //! response term **and a returned later consequence** — and names the others it also satisfies
 //! rather than hiding them.
 //!
+//! # The interaction is a core Holon
+//!
+//! [definition] [`holon`] builds the core `holonic_core::holon::Holon` from these parts — media and
+//! couplings as storage with the skew Dirac part, contact faces as resistive ports on their slips,
+//! the source as external ports, the perspective as a passive coholon's reader, a participating
+//! receiver as a joined Holon and a perturbation as deposition work — and its
+//! [`HolonicInteractionLaw`] advances through the core reference motion. The storage-rate, clocked
+//! and power-station readings are views of the core `EnergyBalance` there and in
+//! `crate::holonic_chain`.
+//!
 //! # Nothing here is approximate
 //!
 //! [implemented-exact] Every carried and deciding value is an exact `Rat`. No `f32`, `f64` or
@@ -232,6 +242,10 @@ pub const CONSERVATIVE_CORE_CEILING: usize = 64;
 /// Exact adapter from a situated `ScrewPair` to this module's checked contact and interaction
 /// owners.  The adapter lives below this module so the pair remains the source of its slip map.
 pub mod helical;
+// The interaction as a core Holon, its exact law, and the power readings as views of the core
+// energy balance (plan phase 3).
+pub mod holon;
+pub use holon::HolonicInteractionLaw;
 
 /// **The extent above which a form's passages are not named by winding.**
 ///
@@ -383,6 +397,9 @@ pub enum InteractionRefusal {
     /// caller can distinguish a prime budget, reconstruction, cover, or extent refusal.
     #[error(transparent)]
     PrimeImage(#[from] crate::prime_image_algebra::PrimeImageRefusal),
+    /// The Holon core refused (a Dirac, resistance or step certificate).
+    #[error(transparent)]
+    Holon(#[from] holonic_core::holon::HolonError),
 }
 
 fn bounded(
