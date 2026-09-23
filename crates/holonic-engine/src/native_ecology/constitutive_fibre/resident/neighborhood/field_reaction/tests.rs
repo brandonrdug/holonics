@@ -54,7 +54,7 @@ fn enclosed_forecast_uses_retained_material_and_commit_checks_freshness() {
         0,
         ResidentNormalMaterial::found_features(&surface, 5, 1, ResidentGrain(16)).unwrap(),
     )
-    .map_err(|(_, error)| error)
+    .map_err(|refusal| refusal.reason)
     .unwrap();
 
     let scale = 1_i128 << 16;
@@ -259,7 +259,7 @@ fn reaction_observation_at_keeps_producing_condition_and_returns_family() {
     )
     .unwrap();
     body.attach_normal_prediction(0, normal)
-        .unwrap_or_else(|(_, e)| panic!("{e:?}"));
+        .unwrap_or_else(|r| panic!("{:?}", r.reason));
     let expected_prediction = body
         .forecast_reaction_at_condition(0, c(&source), c(&initial))
         .unwrap()
@@ -329,7 +329,7 @@ fn reaction_observation_at_refusal_preserves_epoch_condition_and_material() {
         0,
         ResidentNormalMaterial::found_features(&surface, 3, 1, ResidentGrain(16)).unwrap(),
     )
-    .unwrap_or_else(|(_, error)| panic!("{error:?}"));
+    .unwrap_or_else(|refusal| panic!("{:?}", refusal.reason));
     let before = body.rest().unwrap();
 
     assert!(

@@ -595,9 +595,11 @@ fn coupled_plural_source_contact_preserves_its_fibre_and_source_union() {
     let x = point(&s, &[1, 0, 1, 0, 0, 0]);
     let step = wave.actuate_contact_source(&contact, current(&x)).unwrap();
     let incoming = step.applied_relation().source_contact().unwrap();
+    // The prediction is the step's reading; the map retains only operand, row and reaction.
     assert!(matches!(
-        incoming
-            .arrival_family()
+        step.predictions()
+            .next()
+            .unwrap()
             .inspect()
             .unwrap()
             .predecessor_reading,
@@ -644,7 +646,7 @@ fn coupled_plural_source_contact_preserves_its_fibre_and_source_union() {
     compare_source_images(&acted);
     let contact = acted.applied_relation().source_contact().unwrap();
     assert!(
-        matches!(contact.prediction().inspect().unwrap().predecessor_reading,ConstitutiveReading::OutsideDomain{source_remainder} if source_remainder.iter().any(|v|*v!=r(0)))
+        matches!(acted.predictions().next().unwrap().inspect().unwrap().predecessor_reading,ConstitutiveReading::OutsideDomain{source_remainder} if source_remainder.iter().any(|v|*v!=r(0)))
     );
     assert_eq!(contact.inspect_reaction().unwrap().status,crate::native_ecology::constitutive_fibre::ConditionContactStatus::OutsideRepresentedRelation);
     assert_eq!(face(absent.current()), vec![r(2), r(0), r(3), r(1)]);

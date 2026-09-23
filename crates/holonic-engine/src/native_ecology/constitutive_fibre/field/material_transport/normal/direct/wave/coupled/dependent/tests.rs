@@ -618,7 +618,7 @@ fn dependent_observation_keeps_parameter_material_and_separate_wave_clocks() {
     let mut second=law(&s,false);
     second.advance_bilinear_contact(current(&point(&s,&[0;6])),current(&h),Some(current(&point(&s,&[1,0])))).unwrap();
     let mut local=ResidentGeneratorNeighborhood::with_shared_condition(vec![compatible,second],current(&h),ConditionContactMetric::UnitAdmittanceRealification).unwrap();
-    for member in 0..2 {local.attach_normal_prediction(member,ResidentNormalMaterial::found_features(&s,7,1,grain).unwrap()).unwrap_or_else(|(_,e)|panic!("{e}"));}
+    for member in 0..2 {local.attach_normal_prediction(member,ResidentNormalMaterial::found_features(&s,7,1,grain).unwrap()).unwrap_or_else(|r| panic!("{:?}", r.reason));}
     let values=[1i128,0,2,0,1].into_iter().flat_map(|x|{let v=x<<grain.0;[v as i64,(v>>64) as i64]}).map(|v|(v,v)).collect::<Vec<_>>();
     let ball=s.mount_section_rest(&ResidentSectionRest::found(1,values.len(),ResidentGrain(0),64,values).unwrap()).unwrap();
     let seed=ResidentNormalEnclosureView{surface:&s,section:&ball,offset:0,width:4,grain};

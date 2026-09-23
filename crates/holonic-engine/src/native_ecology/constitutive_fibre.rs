@@ -32,7 +32,8 @@ pub use law_rest::ConstitutiveFibreRest;
 pub use resident::{
     AffineContactReading, ConditionContactMetric, ConditionContactReading, ConditionContactStatus,
     ConditionCoverage, ConditionCurrentRest, ConditionImageReading, ConditionPreimageReading,
-    ConditionPreimageRest, ConstitutiveDifferentialReading, ConstitutiveImageReading,
+    ConditionPreimageRest, ConstitutiveAffineFibre, ConstitutiveDifferentialReading,
+    ConstitutiveImageReading, ConstitutiveRelation, ParticularDirections, same_affine_fibre,
     ConstitutiveImageReceiver, ConstitutiveReturnRest, ContextualSectionOrigin,
     FieldReactionEnclosure, FieldReactionEnclosureRest, GeneratorNeighborhoodRest,
     GeneratorNeighborhoodStep, NeighborhoodEvidence, NeighborhoodEvidenceRest,
@@ -40,9 +41,11 @@ pub use resident::{
     ResidentBilinearFeatures, ResidentConditionContact, ResidentConditionCurrent,
     ResidentConditionImage, ResidentConditionPreimage, ResidentConditionStanding,
     ResidentConstitutiveCurrent, ResidentConstitutiveImage, ResidentConstitutiveRefinement,
-    ResidentConstitutiveReturn, ResidentConstitutiveSection, ResidentContextualSection,
+    ResidentConstitutiveReturn, ResidentConstitutiveSection, ResidentContactReaction,
+    ResidentContextualSection,
     ResidentDifferenceSection, ResidentGeneratorNeighborhood, ResidentSourcePairs,
-    ResidentWavePullback, ResidentWaveRelation, ResidentWaveSourceContact, WaveSourceReceiver,
+    ResidentWavePullback, ResidentWaveRelation, ResidentWaveSourceContact, ResidentWaveSourcePassage,
+    WaveSourceReceiver,
 };
 
 /// Declared local source law, bound at founding rather than inferred from an array's width.

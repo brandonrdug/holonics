@@ -2,25 +2,12 @@
 //! compatible affine receiver family. This creates a reaction; it does not identify a cause.
 use super::*;
 
-#[derive(Debug, PartialEq, Eq, Serialize)]
-pub struct AffineContactReading {
-    pub relation_cut: u64,
-    pub metric: ConditionContactMetric,
-    pub status: ConditionContactStatus,
-    pub predecessor: Vec<Rat>,
-    pub successor: Vec<Rat>,
-    pub incoming_normal: Vec<Rat>,
-    pub returned_normal: Vec<Rat>,
-    pub difference: Vec<Rat>,
-}
-
 /// A declared contact of actual standing with the complete incoming family. Its point
 /// successor is a realized reaction under this law, never a claim that the family is unique.
 /// Borrowing the original family prevents this receiver from hiding that source fibre.
 pub struct ResidentAffineContact<'a, 'c> {
     family: &'a ResidentConstitutiveReturn<'c>,
-    section: ResidentSection<'c>,
-    metric: ConditionContactMetric,
+    reaction: ResidentContactReaction<'c>,
 }
 /// Immutable target-vertical geometry compiled from one producing local law. This is
 /// derived standing, not another learner. Every use checks the complete incoming directions.
@@ -62,7 +49,7 @@ impl<'c> ResidentConstitutiveReturn<'c> {
         {let lane=passage.open(0,&[])?;s.record_prepared_condition_contact(&lane,actual,&self.report,self.source_width,&geometry.directions,&geometry.graph,&section)?;}
         passage.close(0,&section,64)?;let receipt=passage.finish()?.launch()?;
         if !receipt.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("prepared affine contact: {:?}",receipt.obstruction)));}
-        Ok(ResidentAffineContact{family:self,section,metric})
+        Ok(ResidentAffineContact{family:self,reaction:ResidentContactReaction::new(s,Rc::new(section),geometry.width,metric)})
     }
     /// For F=a+V and actual h, react by h'=P_V h+(I-P_V)a. The realified metric is
     /// declared by the caller. This is a new contact operation, not a point cast of F.
@@ -74,8 +61,12 @@ impl<'c> ResidentConstitutiveReturn<'c> {
         let section = affine_contact_section(self.surface, actual, self)?;
         Ok(ResidentAffineContact {
             family: self,
-            section,
-            metric,
+            reaction: ResidentContactReaction::new(
+                self.surface,
+                Rc::new(section),
+                self.target_width,
+                metric,
+            ),
         })
     }
 }
@@ -84,77 +75,39 @@ impl<'a, 'c> ResidentAffineContact<'a, 'c> {
         self.family
     }
     pub fn metric(&self) -> ConditionContactMetric {
-        self.metric
+        self.reaction.metric()
     }
-    fn view(&self, block: usize, guarded: bool) -> ResidentConstitutiveCurrent<'_, 'c> {
-        let c = self.family.target_width;
-        ResidentConstitutiveCurrent {
-            section: &self.section,
-            offset: block * c,
-            width: c,
-            denominator: Some(5 * c),
-            disposition: guarded.then_some(5 * c + 1),
-        }
+    /// The one contact reaction this read produced.
+    pub fn reaction(&self) -> &ResidentContactReaction<'c> {
+        &self.reaction
     }
     pub fn predecessor(&self) -> ResidentConstitutiveCurrent<'_, 'c> {
-        self.view(0, false)
+        self.reaction.block(block::PREDECESSOR, false)
     }
     /// Consumers check the contact disposition on device; an empty family supplies no reaction.
     /// Actual standing after this contact, including the unchanged prior when F is empty.
     /// This carries no assertion of compatibility; family() and inspect() retain that distinction.
     pub fn actual_successor(&self) -> ResidentConstitutiveCurrent<'_, 'c> {
-        self.view(1, false)
+        self.reaction.block(block::SUCCESSOR, false)
     }
     pub fn successor(&self) -> ResidentConstitutiveCurrent<'_, 'c> {
-        self.view(1, true)
+        self.reaction.block(block::SUCCESSOR, true)
     }
     pub fn incoming_normal(&self) -> ResidentConstitutiveCurrent<'_, 'c> {
-        self.view(2, true)
+        self.reaction.block(block::INCOMING_NORMAL, true)
     }
     pub fn returned_normal(&self) -> ResidentConstitutiveCurrent<'_, 'c> {
-        self.view(3, true)
+        self.reaction.block(block::RETURNED_NORMAL, true)
     }
     pub fn difference(&self) -> ResidentConstitutiveCurrent<'_, 'c> {
-        self.view(4, true)
+        self.reaction.block(block::DIFFERENCE, true)
     }
     pub fn inspect(&self) -> Result<AffineContactReading, ConstitutiveFibreError> {
-        read_affine_contact(self.family, &self.section, self.metric)
+        self.reaction.inspect(self.family.occurrence, None)
     }
-    pub(crate) fn into_section(self) -> ResidentSection<'c> {
-        self.section
+    pub(crate) fn into_reaction(self) -> ResidentContactReaction<'c> {
+        self.reaction
     }
-}
-
-pub(in super::super) fn read_affine_contact(
-    family: &ResidentConstitutiveReturn<'_>,
-    section: &ResidentSection<'_>,
-    metric: ConditionContactMetric,
-) -> Result<AffineContactReading, ConstitutiveFibreError> {
-    let words = family.surface.read_out(section)?;
-    let c = family.target_width;
-    if words.len() != 5 * c + 2 || words[5 * c].0 <= 0 || words.iter().any(|(lo, hi)| lo != hi) {
-        return Err(ConstitutiveFibreError::Uncertain);
-    }
-    let row = |at: usize| {
-        words[at..at + c]
-            .iter()
-            .map(|v| Rat::new(v.0.into(), words[5 * c].0.into()))
-            .collect()
-    };
-    Ok(AffineContactReading {
-        relation_cut: family.occurrence,
-        metric: metric,
-        status: match words[5 * c + 1].0 {
-            0 => ConditionContactStatus::Compatible,
-            1 => ConditionContactStatus::OutsideRepresentedRelation,
-            _ => return Err(ConstitutiveFibreError::Uncertain),
-        },
-        predecessor: row(0),
-        successor: row(c),
-        incoming_normal: row(2 * c),
-        returned_normal: row(3 * c),
-        difference: row(4 * c),
-    })
 }
 
 pub(super) fn affine_contact_section<'c>(

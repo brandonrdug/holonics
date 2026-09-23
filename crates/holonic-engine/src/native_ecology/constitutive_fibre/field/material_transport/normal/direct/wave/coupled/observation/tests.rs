@@ -31,7 +31,7 @@ fn world<'c>(
     .unwrap();
     local
         .attach_normal_prediction(0, material)
-        .unwrap_or_else(|(_, e)| panic!("{e}"));
+        .unwrap_or_else(|r| panic!("{:?}", r.reason));
     body(s).with_neighborhood(local).unwrap()
 }
 fn restored<'c>(

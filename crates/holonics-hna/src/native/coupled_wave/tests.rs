@@ -54,7 +54,7 @@ fn numerical_predictive_body<'c>(s: &'c ResidentSurface<'c>) -> NativeCoupledBod
     let h=point(s,&[1,0]);
     let mut neighborhood=ResidentGeneratorNeighborhood::with_shared_condition(vec![law],current(&h),
         ConditionContactMetric::UnitAdmittanceRealification).unwrap();
-    neighborhood.attach_normal_prediction(0,normal).unwrap_or_else(|(_,e)|panic!("{e:?}"));
+    neighborhood.attach_normal_prediction(0,normal).unwrap_or_else(|r| panic!("{:?}", r.reason));
     let p=point(s,&[1,0]);let c=point(s,&[2,1]);
     let wave=ResidentNormalMaterial::found(s,1,1,ResidentGrain(8)).unwrap()
         .into_applied_difference_wave(current(&p),current(&c)).unwrap()

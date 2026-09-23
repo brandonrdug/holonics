@@ -1,67 +1,59 @@
 //! An incoming point passage meets its complete learned arrival family before acting on
 //! the held family. The reaction is an explicit constitutive operation, not a point cast.
-use super::super::condition_contact::AffineContactReading;
+//!
+//! [definition] Retention (plan phase 11): a source map retains what its future reads — the
+//! source operand (read again when a continuing family is rebound at remount), its field row and
+//! the contact reaction whose successor generates the map. The producing law's prediction and
+//! arrival family at the map's cut are readings of that passage, returned by
+//! [`ResidentWaveRelation::read_source_passage`]; they are no longer anchored on the map.
+use super::super::condition_contact::{AffineContactReading, ResidentContactReaction, block};
 use super::*;
 
 pub struct ResidentWaveSourceContact<'c> {
     pub(super) source: ResidentSection<'c>,
-    pub(super) prediction: Rc<ResidentConstitutiveReturn<'c>>,
-    pub(super) arrival: ResidentConstitutiveReturn<'c>,
-    pub(super) reaction: ResidentSection<'c>,
+    pub(super) reaction: ResidentContactReaction<'c>,
+    pub(super) relation_cut: u64,
+    pub(super) source_row: Option<usize>,
 }
+
+/// The readings of one source passage: the relation it founds, and the producing law's
+/// prediction and whole arrival family at the relation's cut.
+pub struct ResidentWaveSourcePassage<'c> {
+    pub relation: ResidentWaveRelation<'c>,
+    pub prediction: ResidentConstitutiveReturn<'c>,
+    pub arrival: ResidentConstitutiveReturn<'c>,
+}
+
 impl<'c> ResidentWaveSourceContact<'c> {
     pub fn source_row(&self) -> Option<usize> {
-        self.arrival.source_occurrence
+        self.source_row
     }
     pub fn source(&self) -> ResidentConstitutiveCurrent<'_, 'c> {
         ResidentConstitutiveCurrent::rational(&self.source).expect("admitted source snapshot")
     }
-    pub fn prediction(&self) -> &ResidentConstitutiveReturn<'c> {
-        &self.prediction
-    }
-    pub(crate) fn retained_prediction(&self) -> Rc<ResidentConstitutiveReturn<'c>> {
-        Rc::clone(&self.prediction)
-    }
-    pub fn arrival_family(&self) -> &ResidentConstitutiveReturn<'c> {
-        &self.arrival
-    }
-    fn current(&self, block: usize) -> ResidentConstitutiveCurrent<'_, 'c> {
-        let w = self.arrival.target_width;
-        ResidentConstitutiveCurrent {
-            section: &self.reaction,
-            offset: block * w,
-            width: w,
-            denominator: Some(5 * w),
-            disposition: None,
-        }
+    /// The one contact reaction of the offered joint with its arrival family.
+    pub fn reaction(&self) -> &ResidentContactReaction<'c> {
+        &self.reaction
     }
     pub fn offered_joint(&self) -> ResidentConstitutiveCurrent<'_, 'c> {
-        self.current(0)
+        self.reaction.block(block::PREDECESSOR, false)
     }
     pub fn reacted_joint(&self) -> ResidentConstitutiveCurrent<'_, 'c> {
-        self.current(1)
+        self.reaction.block(block::SUCCESSOR, false)
     }
     pub fn returned_normal(&self) -> ResidentConstitutiveCurrent<'_, 'c> {
-        self.current(3)
+        self.reaction.block(block::RETURNED_NORMAL, false)
     }
     pub fn difference(&self) -> ResidentConstitutiveCurrent<'_, 'c> {
-        self.current(4)
+        self.reaction.block(block::DIFFERENCE, false)
     }
     pub fn inspect_reaction(&self) -> Result<AffineContactReading, ConstitutiveFibreError> {
-        super::super::condition_contact::read_affine_contact(
-            &self.arrival,
-            &self.reaction,
-            ConditionContactMetric::UnitAdmittanceRealification,
-        )
+        self.reaction.inspect(self.relation_cut, None)
     }
 }
 impl<'c> ResidentWaveRelation<'c> {
     pub(crate) fn with_source_row(mut self, row: usize) -> Self {
-        let source = self.source.as_mut().expect("source passage");
-        source.arrival.qualify_field_source(row);
-        Rc::get_mut(&mut source.prediction)
-            .expect("unpublished source prediction")
-            .qualify_field_source(row);
+        self.source.as_mut().expect("source passage").source_row = Some(row);
         self
     }
     pub fn source_contact(&self) -> Option<&ResidentWaveSourceContact<'c>> {
@@ -75,28 +67,40 @@ impl<'c> ResidentWaveRelation<'c> {
         law: &ResidentConstitutiveFibre<'c>,
         source: ResidentConstitutiveCurrent<'_, 'c>,
     ) -> Result<Self, ConstitutiveFibreError> {
+        Ok(self.read_source_passage(law, source)?.relation)
+    }
+    /// The same passage with its readings: the law's prediction at the fixed condition and the
+    /// arrival family the offered joint met. Both are read at this relation's producing cut.
+    pub fn read_source_passage(
+        &self,
+        law: &ResidentConstitutiveFibre<'c>,
+        source: ResidentConstitutiveCurrent<'_, 'c>,
+    ) -> Result<ResidentWaveSourcePassage<'c>, ConstitutiveFibreError> {
         if !Rc::ptr_eq(&self.producing_owner, &law.basis_owner)
             || self.relation_cut != law.occurrences
         {
             return Err(ConstitutiveFibreError::ForeignOccurrence);
         }
         if self.source_geometry.get().is_none() {
-            let geometry = super::super::condition_contact::ResidentWaveSourceGeometry::compile(law)?;
-            self.source_geometry.set(geometry).map_err(|_|ConstitutiveFibreError::ForeignOccurrence)?;
+            let geometry =
+                super::super::condition_contact::ResidentWaveSourceGeometry::compile(law)?;
+            self.source_geometry
+                .set(geometry)
+                .map_err(|_| ConstitutiveFibreError::ForeignOccurrence)?;
         }
         let prediction = law.read_bilinear(source, self.fixed_condition())?;
-        self.source_contact_from_prediction(source, prediction)
-    }
-    fn source_contact_from_prediction(
-        &self,
-        source: ResidentConstitutiveCurrent<'_, 'c>,
-        prediction: ResidentConstitutiveReturn<'c>,
-    ) -> Result<Self, ConstitutiveFibreError> {
         let s = self.surface;
         let n = self.roots;
-        let source = prepare_source_contact(s, n, self.receiver, source, prediction, self.source_geometry.get())?;
-        let basis = source_basis(s, n, &source.reaction)?;
-        Ok(Self {
+        let (contact, arrival) = prepare_source_contact(
+            s,
+            n,
+            self.receiver,
+            source,
+            &prediction,
+            self.source_geometry.get(),
+        )?;
+        let basis = source_basis(s, n, contact.reaction.section())?;
+        let relation = Self {
             surface: s,
             basis,
             fixed: Rc::clone(&self.fixed),
@@ -105,20 +109,33 @@ impl<'c> ResidentWaveRelation<'c> {
             relation_cut: self.relation_cut,
             producing_owner: Rc::clone(&self.producing_owner),
             receiver: self.receiver,
-            source: Some(source),
+            source: Some(contact),
             observation: None,
             source_geometry: Rc::clone(&self.source_geometry),
+        };
+        Ok(ResidentWaveSourcePassage {
+            relation,
+            prediction,
+            arrival,
         })
     }
 }
+/// The offered joint of `source` meets the arrival family of `prediction`; returns the retained
+/// contact and the arrival family as a reading.
 pub(super) fn prepare_source_contact<'c>(
     s: &'c ResidentSurface<'c>,
     n: usize,
     receiver: WaveSourceReceiver,
     source: ResidentConstitutiveCurrent<'_, 'c>,
-    prediction: ResidentConstitutiveReturn<'c>,
+    prediction: &ResidentConstitutiveReturn<'c>,
     geometry: Option<&super::super::condition_contact::ResidentWaveSourceGeometry<'c>>,
-) -> Result<ResidentWaveSourceContact<'c>, ConstitutiveFibreError> {
+) -> Result<
+    (
+        ResidentWaveSourceContact<'c>,
+        ResidentConstitutiveReturn<'c>,
+    ),
+    ConstitutiveFibreError,
+> {
     let r = 2 * n;
     let w = 2 * r;
     if source.width != 3 * r || prediction.target_width != r {
@@ -161,19 +178,23 @@ pub(super) fn prepare_source_contact<'c>(
     let offered = ResidentConstitutiveCurrent::rational(&offered)?;
     let metric = ConditionContactMetric::UnitAdmittanceRealification;
     let reaction = if let Some(geometry) = geometry {
-        arrival.read_contact_with_geometry(offered,metric,geometry)?
+        arrival.read_contact_with_geometry(offered, metric, geometry)?
     } else {
-        arrival.read_contact(offered,metric)?
-    }.into_section();
+        arrival.read_contact(offered, metric)?
+    }
+    .into_reaction();
     if let Some(row) = prediction.source_occurrence {
         arrival.qualify_field_source(row);
     }
-    Ok(ResidentWaveSourceContact {
-        source: snapshot,
-        prediction: Rc::new(prediction),
+    Ok((
+        ResidentWaveSourceContact {
+            source: snapshot,
+            reaction,
+            relation_cut: prediction.occurrence,
+            source_row: prediction.source_occurrence,
+        },
         arrival,
-        reaction,
-    })
+    ))
 }
 pub(super) fn source_basis<'c>(
     s: &'c ResidentSurface<'c>,

@@ -10,13 +10,14 @@ const MAGIC_V1: &[u8] = b"HOLONIC-WAVE-RELATION\x01";
 const MAGIC_V2: &[u8] = b"HOLONIC-WAVE-RELATION\x02";
 const MAGIC_V3: &[u8] = b"HOLONIC-WAVE-RELATION\x03";
 const MAGIC_V4: &[u8] = b"HOLONIC-WAVE-RELATION\x04";
+/// A source map retaining only its operand, row and reaction (plan phase 11). v3 source maps,
+/// which also anchored the producing prediction and arrival family, still decode.
+const MAGIC_V5: &[u8] = b"HOLONIC-WAVE-RELATION\x05";
 const END: &[u8] = b"HOLONIC-WAVE-RELATION-END\x01";
 fn false_flag(value: &bool) -> bool {
     !*value
 }
-fn invalid(e: impl ToString) -> ConstitutiveFibreError {
-    ConstitutiveFibreError::Rest(e.to_string())
-}
+use super::super::rest_refusal as invalid;
 
 fn validate_unit_real_sum(
     basis: &ResidentSectionRest,
@@ -94,7 +95,7 @@ fn row_span_contains(
     }
     Ok(residual.into_iter().all(|value| value.is_zero()))
 }
-#[derive(Serialize, serde::Deserialize, Debug, PartialEq, Eq)]
+#[derive(Clone, Serialize, serde::Deserialize, Debug, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 struct Header {
     roots: usize,
@@ -106,13 +107,22 @@ struct Header {
     source: bool,
     #[serde(default, skip_serializing_if = "false_flag")]
     observation: bool,
+    /// The field row of a v5 source map (a v3 map carried it on its anchored arrival).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    source_row: Option<usize>,
 }
 #[derive(Debug, PartialEq, Eq)]
 struct SourceContactRest {
     source: ResidentSectionRest,
+    reaction: ResidentSectionRest,
+    /// The producing prediction and arrival family a v3 wire anchored on the map. They are
+    /// validated and checked against the reaction at remount, then dropped.
+    legacy: Option<LegacySourceAnchors>,
+}
+#[derive(Debug, PartialEq, Eq)]
+struct LegacySourceAnchors {
     prediction: ConstitutiveReturnRest,
     arrival: ConstitutiveReturnRest,
-    reaction: ResidentSectionRest,
 }
 
 fn validate_observation(
@@ -163,50 +173,24 @@ fn validate_source_contact(
     receiver: WaveSourceReceiver,
     cut: u64,
     conditions: usize,
+    source_row: Option<usize>,
 ) -> Result<(), ConstitutiveFibreError> {
     let r = n.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?;
     let w = r.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?;
     point_section(&source.source, 1, 3 * r + 1)?;
-    source.prediction.validate()?;
-    let f = (3 * n)
-        .checked_mul(conditions)
-        .and_then(|v| {
-            v.checked_add(3 * n)?
-                .checked_add(conditions)?
-                .checked_mul(2)
-        })
-        .ok_or(ConstitutiveFibreError::Shape)?;
-    if source.prediction.source_width() != f
-        || source.prediction.target_width() != r
-        || source.prediction.occurrence() != cut
-        || source.prediction.source_chart()
-            != (ConstitutiveSourceChart::BilinearContact {
-                source_complex: 3 * n,
-                condition_complex: conditions,
-            })
-    {
-        return Err(invalid("source prediction does not carry its local chart"));
-    }
-    source.arrival.validate()?;
-    if source.arrival.source_width() != 2
-        || source.arrival.target_width() != w
-        || source.arrival.source_chart() != ConstitutiveSourceChart::Linear
-        || source.arrival.occurrence() != cut
-        || source.arrival.outside_domain() != source.prediction.outside_domain()
-        || source.arrival.field_source() != source.prediction.field_source()
-    {
-        return Err(invalid("source contact arrival has the wrong linear chart"));
-    }
     point_section(&source.reaction, 1, 5 * w + 2)?;
     let a = &source.source.intervals;
     let h = &source.reaction.intervals;
     let sd = BigInt::from(a[3 * r].0);
     let hd = BigInt::from(h[5 * w].0);
-    if sd <= BigInt::zero()
-        || hd <= BigInt::zero()
-        || h[5 * w + 1].0 != i64::from(source.arrival.outside_domain())
-    {
+    if sd <= BigInt::zero() || hd <= BigInt::zero() || !(0..=1).contains(&h[5 * w + 1].0) {
         return Err(invalid("source reaction is not admitted"));
+    }
+    if let Some(legacy) = &source.legacy {
+        validate_legacy_anchors(legacy, n, receiver, cut, conditions, h[5 * w + 1].0)?;
+        if legacy.arrival.field_source() != source_row {
+            return Err(invalid("source contact arrival has the wrong linear chart"));
+        }
     }
     for i in 0..r {
         if BigInt::from(a[i].0) != BigInt::from(a[r + i].0) - BigInt::from(a[2 * r + i].0)
@@ -216,8 +200,25 @@ fn validate_source_contact(
             return Err(invalid("source reaction loses its actual offered joint"));
         }
     }
+    // The contact law on the retained words: h' − h = n_in − n_ret and the exchange is lossless
+    // (`Holon/AffineContact.lean::contact_difference`, `contact_lossless`).
+    let block = |k: usize| &h[k * w..(k + 1) * w];
+    let square = |k: usize| -> BigInt { block(k).iter().map(|v| BigInt::from(v.0).pow(2)).sum() };
+    let difference_holds = (0..w).all(|j| {
+        let d = BigInt::from(h[4 * w + j].0);
+        BigInt::from(h[w + j].0) - BigInt::from(h[j].0) == d
+            && BigInt::from(h[2 * w + j].0) - BigInt::from(h[3 * w + j].0) == d
+    });
+    let lawful = if h[5 * w + 1].0 == 0 {
+        difference_holds && square(0) + square(2) == square(1) + square(3)
+    } else {
+        // An empty arrival family leaves the offered joint unchanged.
+        block(0) == block(1)
+    };
+    if !lawful {
+        return Err(invalid("source reaction breaks the lossless contact law"));
+    }
     if receiver == WaveSourceReceiver::UnitRealSum {
-        source.prediction.validate_zero_real_sum()?;
         for start in [r, 2 * r] {
             let sum: BigInt = (0..n).map(|i| BigInt::from(a[start + 2 * i].0)).sum();
             if sum != sd {
@@ -226,6 +227,53 @@ fn validate_source_contact(
                 ));
             }
         }
+    }
+    Ok(())
+}
+
+fn validate_legacy_anchors(
+    legacy: &LegacySourceAnchors,
+    n: usize,
+    receiver: WaveSourceReceiver,
+    cut: u64,
+    conditions: usize,
+    outside: i64,
+) -> Result<(), ConstitutiveFibreError> {
+    let r = n.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?;
+    let w = r.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?;
+    legacy.prediction.validate()?;
+    let f = (3 * n)
+        .checked_mul(conditions)
+        .and_then(|v| {
+            v.checked_add(3 * n)?
+                .checked_add(conditions)?
+                .checked_mul(2)
+        })
+        .ok_or(ConstitutiveFibreError::Shape)?;
+    if legacy.prediction.source_width() != f
+        || legacy.prediction.target_width() != r
+        || legacy.prediction.occurrence() != cut
+        || legacy.prediction.source_chart()
+            != (ConstitutiveSourceChart::BilinearContact {
+                source_complex: 3 * n,
+                condition_complex: conditions,
+            })
+    {
+        return Err(invalid("source prediction does not carry its local chart"));
+    }
+    legacy.arrival.validate()?;
+    if legacy.arrival.source_width() != 2
+        || legacy.arrival.target_width() != w
+        || legacy.arrival.source_chart() != ConstitutiveSourceChart::Linear
+        || legacy.arrival.occurrence() != cut
+        || legacy.arrival.outside_domain() != legacy.prediction.outside_domain()
+        || legacy.arrival.field_source() != legacy.prediction.field_source()
+        || outside != i64::from(legacy.arrival.outside_domain())
+    {
+        return Err(invalid("source contact arrival has the wrong linear chart"));
+    }
+    if receiver == WaveSourceReceiver::UnitRealSum {
+        legacy.prediction.validate_zero_real_sum()?;
     }
     Ok(())
 }
@@ -311,8 +359,9 @@ impl NormalWaveRelationRest {
                 self.header.receiver,
                 self.header.cut,
                 self.header.conditions,
+                self.header.source_row,
             )?;
-        } else if self.source.is_some() {
+        } else if self.source.is_some() || self.header.source_row.is_some() {
             return Err(invalid("wave relation source evidence is not declared"));
         }
         if let Some(observed) = &self.observation {
@@ -322,24 +371,32 @@ impl NormalWaveRelationRest {
     }
     pub fn write(&self, out: &mut impl Write) -> Result<(), ConstitutiveFibreError> {
         self.validate()?;
+        // A decoded v3 map is written again as v3 (its anchors are still present); every map
+        // this crate produces is v5.
+        let legacy = self.source.as_ref().and_then(|v| v.legacy.as_ref());
         out.write_all(if self.observation.is_some() {
             MAGIC_V4
-        } else if self.source.is_some() {
+        } else if legacy.is_some() {
             MAGIC_V3
+        } else if self.source.is_some() {
+            MAGIC_V5
         } else {
             MAGIC_V2
         })
         .map_err(invalid)?;
-        blob(out, &serde_json::to_vec(&self.header).map_err(invalid)?)?;
+        let mut header = self.header.clone();
+        if legacy.is_some() {
+            header.source_row = None;
+        }
+        blob(out, &serde_json::to_vec(&header).map_err(invalid)?)?;
         blob(out, &point_bytes(&self.basis)?)?;
         blob(out, &point_bytes(&self.fixed)?)?;
         if let Some(source) = &self.source {
             blob(out, &point_bytes(&source.source)?)?;
-            blob(
-                out,
-                &serde_json::to_vec(&source.prediction).map_err(invalid)?,
-            )?;
-            blob(out, &serde_json::to_vec(&source.arrival).map_err(invalid)?)?;
+            if let Some(legacy) = legacy {
+                blob(out, &serde_json::to_vec(&legacy.prediction).map_err(invalid)?)?;
+                blob(out, &serde_json::to_vec(&legacy.arrival).map_err(invalid)?)?;
+            }
             blob(out, &point_bytes(&source.reaction)?)?;
         }
         if let Some(observed) = &self.observation {
@@ -351,10 +408,14 @@ impl NormalWaveRelationRest {
         let mut input = input.take(octets);
         let mut magic = vec![0u8; MAGIC_V1.len()];
         input.read_exact(&mut magic).map_err(invalid)?;
-        if magic != MAGIC_V1 && magic != MAGIC_V2 && magic != MAGIC_V3 && magic != MAGIC_V4 {
+        if ![MAGIC_V1, MAGIC_V2, MAGIC_V3, MAGIC_V4, MAGIC_V5].contains(&magic.as_slice()) {
             return Err(invalid("wave relation magic is absent"));
         }
-        let header: Header = serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
+        let mut header: Header =
+            serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
+        if magic != MAGIC_V5 && header.source_row.is_some() {
+            return Err(invalid("only a v5 source map declares its field row"));
+        }
         if magic == MAGIC_V1 && (header.receiver != WaveSourceReceiver::Direct || header.source) {
             return Err(invalid(
                 "legacy wave relation declares an unknown receiver chart",
@@ -362,19 +423,30 @@ impl NormalWaveRelationRest {
         }
         let basis = read_point(&read_blob(&mut input)?)?;
         let fixed = read_point(&read_blob(&mut input)?)?;
-        let source = if magic == MAGIC_V3 {
+        let source = if magic == MAGIC_V3 || magic == MAGIC_V5 {
             if !header.source {
-                return Err(invalid("v3 wave relation omits its source evidence"));
+                return Err(invalid("source wave relation omits its source evidence"));
             }
+            let source = read_point(&read_blob(&mut input)?)?;
+            let legacy = if magic == MAGIC_V3 {
+                let legacy = LegacySourceAnchors {
+                    prediction: serde_json::from_slice(&read_blob(&mut input)?)
+                        .map_err(invalid)?,
+                    arrival: serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?,
+                };
+                header.source_row = legacy.arrival.field_source();
+                Some(legacy)
+            } else {
+                None
+            };
             Some(SourceContactRest {
-                source: read_point(&read_blob(&mut input)?)?,
-                prediction: serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?,
-                arrival: serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?,
+                source,
                 reaction: read_point(&read_blob(&mut input)?)?,
+                legacy,
             })
         } else {
             if header.source {
-                return Err(invalid("source evidence requires wave relation wire v3"));
+                return Err(invalid("source evidence requires wave relation wire v3 or v5"));
             }
             None
         };
@@ -409,22 +481,39 @@ impl NormalWaveRelationRest {
         self.validate()?;
         let source = if let Some(source) = self.source {
             let snapshot = s.mount_section_rest(&source.source)?;
-            let contact = super::source::prepare_source_contact(
-                s,
-                self.header.roots,
-                self.header.receiver,
-                ResidentConstitutiveCurrent::rational(&snapshot)?,
-                source.prediction.remount(s)?,
-                None,
-            )?;
-            if contact.arrival.rest()? != source.arrival
-                || s.detach_section(&contact.reaction, 64)? != source.reaction
-            {
-                return Err(invalid(
-                    "source reaction does not follow its complete prediction",
-                ));
-            }
-            let basis = super::source::source_basis(s, self.header.roots, &contact.reaction)?;
+            let contact = if let Some(legacy) = source.legacy {
+                // A v3 map: its anchored prediction must still produce the retained reaction.
+                let (contact, arrival) = super::source::prepare_source_contact(
+                    s,
+                    self.header.roots,
+                    self.header.receiver,
+                    ResidentConstitutiveCurrent::rational(&snapshot)?,
+                    &legacy.prediction.remount(s)?,
+                    None,
+                )?;
+                if arrival.rest()? != legacy.arrival
+                    || s.detach_section(contact.reaction.section(), 64)? != source.reaction
+                {
+                    return Err(invalid(
+                        "source reaction does not follow its complete prediction",
+                    ));
+                }
+                contact
+            } else {
+                super::source::ResidentWaveSourceContact {
+                    reaction: super::super::condition_contact::ResidentContactReaction::new(
+                        s,
+                        Rc::new(s.mount_section_rest(&source.reaction)?),
+                        4 * self.header.roots,
+                        ConditionContactMetric::UnitAdmittanceRealification,
+                    ),
+                    source: snapshot,
+                    relation_cut: self.header.cut,
+                    source_row: self.header.source_row,
+                }
+            };
+            let basis =
+                super::source::source_basis(s, self.header.roots, contact.reaction.section())?;
             if s.detach_section(&basis, 64)? != self.basis {
                 return Err(invalid("source map does not follow its actual reaction"));
             }
@@ -474,6 +563,7 @@ impl ResidentWaveRelation<'_> {
                 receiver: self.receiver,
                 source: self.source.is_some(),
                 observation: self.observation.is_some(),
+                source_row: self.source.as_ref().and_then(|v| v.source_row),
             },
             basis: self.surface.detach_section(&self.basis, 64)?,
             fixed: self.surface.detach_section(&self.fixed, 64)?,
@@ -484,9 +574,10 @@ impl ResidentWaveRelation<'_> {
                     |source| -> Result<SourceContactRest, ConstitutiveFibreError> {
                         Ok(SourceContactRest {
                             source: self.surface.detach_section(&source.source, 64)?,
-                            prediction: source.prediction.rest()?,
-                            arrival: source.arrival.rest()?,
-                            reaction: self.surface.detach_section(&source.reaction, 64)?,
+                            reaction: self
+                                .surface
+                                .detach_section(source.reaction.section(), 64)?,
+                            legacy: None,
                         })
                     },
                 )
@@ -527,6 +618,7 @@ mod tests {
                 receiver: WaveSourceReceiver::UnitRealSum,
                 source: false,
                 observation: false,
+                source_row: None,
             },
             source: None,
             observation: None,
@@ -602,6 +694,118 @@ mod tests {
             }
         }
     }
+    /// A v3 source map, which anchored the producing prediction and arrival family on the map,
+    /// still decodes: its anchors are checked against the reaction at remount and dropped, and
+    /// the remounted map is the v5 map of the same passage word for word.
+    #[test]
+    #[ignore = "requires CUDA; a legacy anchored source map decodes into the anchor-free map"]
+    fn legacy_anchored_source_map_decodes_into_the_same_map() {
+        use crate::embedding_fiber::ResidentReadout;
+        let ro = ResidentReadout::new().unwrap();
+        let surface = ResidentSurface::on(&ro).unwrap();
+        let point = |v: &[i64]| {
+            surface
+                .mount_section_rest(
+                    &ResidentSectionRest::found(
+                        1,
+                        v.len(),
+                        ResidentGrain(0),
+                        64,
+                        v.iter().map(|v| (*v, *v)).collect(),
+                    )
+                    .unwrap(),
+                )
+                .unwrap()
+        };
+        let mut local =
+            ResidentConstitutiveFibre::found_bilinear_contact(&surface, 3, 1, 1).unwrap();
+        let source = point(&[0, 0, 1, 0, 1, 0]);
+        let h = point(&[1, 0]);
+        for y in [[2, 0], [2, 1]] {
+            let y = point(&y);
+            local
+                .advance_bilinear_contact(
+                    ResidentConstitutiveCurrent::integers(&source).unwrap(),
+                    ResidentConstitutiveCurrent::integers(&h).unwrap(),
+                    Some(ResidentConstitutiveCurrent::integers(&y).unwrap()),
+                )
+                .unwrap();
+        }
+        let relation = local
+            .read_wave_relation(ResidentConstitutiveCurrent::integers(&h).unwrap(), 1)
+            .unwrap();
+        let passage = relation
+            .read_source_passage(
+                &local,
+                ResidentConstitutiveCurrent::integers(&source).unwrap(),
+            )
+            .unwrap();
+        let map = passage.relation.with_source_row(4);
+        let mut prediction = passage.prediction;
+        prediction.qualify_field_source(4);
+        let mut arrival = passage.arrival;
+        arrival.qualify_field_source(4);
+        let current = map.rest().unwrap();
+        assert!(current.source.as_ref().unwrap().legacy.is_none());
+        assert_eq!(current.header.source_row, Some(4));
+        let mut v5 = Vec::new();
+        current.write(&mut v5).unwrap();
+        assert!(v5.starts_with(MAGIC_V5));
+        // The same passage as the pre-phase-11 wire wrote it.
+        let mut legacy = NormalWaveRelationRest {
+            header: current.header.clone(),
+            basis: current.basis.clone(),
+            fixed: current.fixed.clone(),
+            source: Some(SourceContactRest {
+                source: current.source.as_ref().unwrap().source.clone(),
+                reaction: current.source.as_ref().unwrap().reaction.clone(),
+                legacy: Some(LegacySourceAnchors {
+                    prediction: prediction.rest().unwrap(),
+                    arrival: arrival.rest().unwrap(),
+                }),
+            }),
+            observation: None,
+        };
+        legacy.validate().unwrap();
+        let mut v3 = Vec::new();
+        legacy.write(&mut v3).unwrap();
+        assert!(v3.starts_with(MAGIC_V3));
+        let decoded = NormalWaveRelationRest::read(&mut v3.as_slice(), v3.len() as u64).unwrap();
+        assert_eq!(decoded, legacy);
+        let remounted = decoded.remount(&surface).unwrap();
+        assert_eq!(remounted.rest().unwrap(), current);
+        assert_eq!(remounted.source_contact().unwrap().source_row(), Some(4));
+        assert_eq!(
+            remounted.source_contact().unwrap().inspect_reaction().unwrap(),
+            map.source_contact().unwrap().inspect_reaction().unwrap()
+        );
+        let resumed = NormalWaveRelationRest::read(&mut v5.as_slice(), v5.len() as u64)
+            .unwrap()
+            .remount(&surface)
+            .unwrap();
+        assert_eq!(resumed.rest().unwrap(), current);
+        assert!(map.source_contact().unwrap().inspect_reaction().unwrap().is_lossless_exchange());
+        // A v3 anchor that does not produce the retained reaction is refused at remount.
+        let other = point(&[0, 0, 2, 0, 1, 0]);
+        let mut foreign = local
+            .read_bilinear(
+                ResidentConstitutiveCurrent::integers(&other).unwrap(),
+                ResidentConstitutiveCurrent::integers(&h).unwrap(),
+            )
+            .unwrap();
+        foreign.qualify_field_source(4);
+        legacy.source.as_mut().unwrap().legacy.as_mut().unwrap().prediction =
+            foreign.rest().unwrap();
+        assert!(legacy.validate().is_err() || legacy.remount(&surface).is_err());
+        // A v5 reaction that breaks the lossless contact law is refused at decode.
+        let mut broken = NormalWaveRelationRest::read(&mut v5.as_slice(), v5.len() as u64).unwrap();
+        let w = 4;
+        let normal = &mut broken.source.as_mut().unwrap().reaction.intervals[3 * w];
+        *normal = (normal.0 + 1, normal.1 + 1);
+        assert!(
+            matches!(broken.validate(), Err(ConstitutiveFibreError::Rest(m)) if m.contains("lossless"))
+        );
+    }
     #[test]
     #[ignore = "requires CUDA; rest must recover complete source reactions, not only matching endpoints"]
     fn source_rest_rejects_changed_returned_normal() {
@@ -646,7 +850,11 @@ mod tests {
         let mut rest = map.rest().unwrap();
         let wire = rest.source.as_mut().unwrap();
         wire.reaction.intervals[12] = (2, 2);
-        rest.validate().unwrap();
+        // Phase 11: a changed returned normal breaks the lossless contact law on the retained
+        // words, so the wire is refused at decode, before any remount.
+        assert!(
+            matches!(rest.validate(), Err(ConstitutiveFibreError::Rest(m)) if m.contains("lossless"))
+        );
         assert!(rest.remount(&surface).is_err());
     }
 }

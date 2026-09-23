@@ -7,9 +7,10 @@ use super::*;
 pub enum ConstitutiveImageReceiver<'a, 'c> {
     Linear(&'a ResidentConstitutiveFibre<'c>),
     ContextChange(&'a ResidentContextualSection<'c>),
-    WaveConditional(&'a ResidentWaveRelation<'c>),
-    WaveSourceContact(&'a ResidentWaveRelation<'c>),
-    WaveObservation(&'a ResidentWaveRelation<'c>),
+    /// One wave relation. Its kind (conditional, source contact, observed next) is read from the
+    /// relation itself (`source_contact`, `observed_next`); phase 11 merged the three variants
+    /// that repeated it (`WaveConditional`, `WaveSourceContact`, `WaveObservation`).
+    Wave(&'a ResidentWaveRelation<'c>),
     /// The immutable factors of a joint wave word.  Keeping the actual relations here makes
     /// the receiver a producing receipt rather than an inferred list of equal-shaped maps.
     WaveWord(Vec<Rc<ResidentWaveRelation<'c>>>),
@@ -296,13 +297,7 @@ impl<'c> ResidentWaveRelation<'c> {
             self.width(),
             self.relation_cut,
             source,
-            if self.observed_next().is_some() {
-                ConstitutiveImageReceiver::WaveObservation(self)
-            } else if self.source_contact().is_some() {
-                ConstitutiveImageReceiver::WaveSourceContact(self)
-            } else {
-                ConstitutiveImageReceiver::WaveConditional(self)
-            },
+            ConstitutiveImageReceiver::Wave(self),
         )
     }
 }
@@ -353,7 +348,7 @@ impl<'c> ResidentConstitutiveReturn<'c> {
             if !result.obstruction.is_empty() { return Err(ConstitutiveFibreError::Arithmetic(
                 format!("joint word lift: {}", result.obstruction))); }
             let next = image(s, &lifted, width, next_width, map.relation_cut, &joint,
-                ConstitutiveImageReceiver::WaveConditional(map))?.into_output().0;
+                ConstitutiveImageReceiver::Wave(map))?.into_output().0;
             joint = next;
         }
         // Homogenize with the original lambda=1 coordinate. This yields the exact

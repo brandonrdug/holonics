@@ -12,6 +12,14 @@ pub use section::{
 };
 mod return_rest;
 pub use return_rest::ConstitutiveReturnRest;
+/// The one refusal of every resident rest codec (formerly a local `error`/`invalid` per rest).
+pub(super) fn rest_refusal(reason: impl std::fmt::Display) -> ConstitutiveFibreError {
+    ConstitutiveFibreError::Rest(reason.to_string())
+}
+mod relation;
+pub use relation::{
+    ConstitutiveAffineFibre, ConstitutiveRelation, ParticularDirections, same_affine_fibre,
+};
 
 /// A member-law successor whose basis was formed in fresh resident material.  The predecessor
 /// identity is checked again when the neighborhood publishes its joint successor.
@@ -164,6 +172,8 @@ pub struct ResidentConstitutiveReturn<'chart> {
 }
 
 impl<'chart> ResidentConstitutiveReturn<'chart> {
+    /// The one allocator of a relation's return: a fibre report over `source_width` source and
+    /// `target_width` target coordinates at relation cut `occurrence`.
     pub(super) fn allocate(
         surface: &'chart ResidentSurface<'chart>,
         source_width: usize,
@@ -188,7 +198,7 @@ impl<'chart> ResidentConstitutiveReturn<'chart> {
             source_chart,
         })
     }
-    pub(super) fn qualify_field_source(&mut self, source_occurrence: usize) {
+    pub(crate) fn qualify_field_source(&mut self, source_occurrence: usize) {
         self.source_occurrence = Some(source_occurrence);
     }
     pub(crate) fn source_width(&self) -> usize {
@@ -402,23 +412,13 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
         &self,
         occurrence: u64,
     ) -> Result<ResidentConstitutiveReturn<'chart>, ConstitutiveFibreError> {
-        let width = self.source_width + self.target_width;
-        let report_width = self
-            .target_width
-            .checked_mul(self.target_width)
-            .and_then(|n| n.checked_add(width + 4))
-            .ok_or(ConstitutiveFibreError::Shape)?;
-        Ok(ResidentConstitutiveReturn {
-            surface: self.surface,
-            report: self
-                .surface
-                .fresh_section(1, report_width, ResidentGrain(0))?,
-            source_width: self.source_width,
-            target_width: self.target_width,
+        ResidentConstitutiveReturn::allocate(
+            self.surface,
+            self.source_width,
+            self.target_width,
             occurrence,
-            source_occurrence: None,
-            source_chart: self.source_chart,
-        })
+            self.source_chart,
+        )
     }
     /// Enact the existing relation law on resident rational operands. The receiving section is
     /// an actual observation, not a desired answer. Its absence reads the current local domain.
@@ -444,16 +444,14 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
         self.advance_contact(source, Some(condition), receiving)
     }
 
-    fn advance_contact(
-        &mut self,
+    /// The declared source law admits these operands: a linear source, or a source and a
+    /// condition in the bilinear contact's complex widths. One check for reads and advances.
+    pub(super) fn admits_source(
+        &self,
         source: ResidentConstitutiveCurrent<'_, 'chart>,
         condition: Option<ResidentConstitutiveCurrent<'_, 'chart>>,
-        receiving: Option<ResidentConstitutiveCurrent<'_, 'chart>>,
-    ) -> Result<ResidentConstitutiveReturn<'chart>, ConstitutiveFibreError> {
-        if self.source_only || !self.usable {
-            return Err(ConstitutiveFibreError::Uncertain);
-        }
-        let valid_source = match (self.source_chart, condition) {
+    ) -> bool {
+        match (self.source_chart, condition) {
             (ConstitutiveSourceChart::Linear, None) => source.width == self.source_width,
             (
                 ConstitutiveSourceChart::BilinearContact {
@@ -463,8 +461,21 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
                 Some(c),
             ) => source.width == 2 * source_complex && c.width == 2 * condition_complex,
             _ => false,
-        };
-        if !valid_source || receiving.is_some_and(|v| v.width != self.target_width) {
+        }
+    }
+
+    fn advance_contact(
+        &mut self,
+        source: ResidentConstitutiveCurrent<'_, 'chart>,
+        condition: Option<ResidentConstitutiveCurrent<'_, 'chart>>,
+        receiving: Option<ResidentConstitutiveCurrent<'_, 'chart>>,
+    ) -> Result<ResidentConstitutiveReturn<'chart>, ConstitutiveFibreError> {
+        if self.source_only || !self.usable {
+            return Err(ConstitutiveFibreError::Uncertain);
+        }
+        if !self.admits_source(source, condition)
+            || receiving.is_some_and(|v| v.width != self.target_width)
+        {
             return Err(ConstitutiveFibreError::Shape);
         }
         let next = self
@@ -573,11 +584,12 @@ pub use condition_contact::{
     AffineContactReading, ConditionContactMetric, ConditionContactReading, ConditionContactStatus,
     ConditionCurrentRest, PreparedConditionContact, ResidentAffineContact,
     ResidentConditionContact, ResidentConditionCurrent, ResidentConditionStanding,
+    ResidentContactReaction,
 };
 pub use context_section::{ContextualSectionOrigin, ResidentContextualSection};
 
 mod wave_relation;
 pub use wave_relation::{
     NormalWaveRelationRest, ResidentWavePullback, ResidentWaveRelation, ResidentWaveSourceContact,
-    WaveSourceReceiver,
+    ResidentWaveSourcePassage, WaveSourceReceiver,
 };

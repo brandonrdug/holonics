@@ -102,7 +102,8 @@ impl<'a, 'c> NormalCoupledStep<'a, 'c> {
     pub fn source_pairs(&self) -> Option<&ResidentSourcePairs<'a, 'c>> {
         self.source.as_ref()
     }
-    /// A field actuation: the internal source predictions, in field order.
+    /// A source actuation: the producing law's source predictions, in field order (one for a
+    /// point source). They are this step's readings; the source maps do not retain them.
     pub fn predictions(
         &self,
     ) -> impl Iterator<Item = &crate::native_ecology::constitutive_fibre::ResidentConstitutiveReturn<'c>>
@@ -292,12 +293,30 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         contact: &NormalCoupledContact<'c>,
         source: ResidentConstitutiveCurrent<'_, 'c>,
     ) -> Result<NormalWaveFamily<'c>, ConstitutiveFibreError> {
+        Ok(self.read_source_passage(contact, source)?.0)
+    }
+    /// The source passage with the producing law's prediction at the relation's cut (a reading
+    /// of this passage, not retained on its map).
+    fn read_source_passage(
+        &self,
+        contact: &NormalCoupledContact<'c>,
+        source: ResidentConstitutiveCurrent<'_, 'c>,
+    ) -> Result<
+        (
+            NormalWaveFamily<'c>,
+            crate::native_ecology::constitutive_fibre::ResidentConstitutiveReturn<'c>,
+        ),
+        ConstitutiveFibreError,
+    > {
         self.check_contact(contact)?;
-        let map = contact
+        let passage = contact
             .binding
             .relation
-            .read_source_contact(self.neighborhood().action(contact.member())?, source)?;
-        contact.binding.source.read_through(Rc::new(map))
+            .read_source_passage(self.neighborhood().action(contact.member())?, source)?;
+        Ok((
+            contact.binding.source.read_through(Rc::new(passage.relation))?,
+            passage.prediction,
+        ))
     }
     pub fn actuate_contact_source<'a>(
         &mut self,
@@ -315,13 +334,16 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         {
             return Err(ConstitutiveFibreError::ForeignOccurrence);
         }
-        let successor = Rc::new(self.read_source_contact(contact, source)?);
+        let (successor, prediction) = self.read_source_passage(contact, source)?;
+        let successor = Rc::new(successor);
         // The checked source graph is total and copies the anchor. The current family is
         // already admitted, so its image retains support without a new nearest-point solve.
         self.continuation
             .neighborhood
             .publish_wave_read(contact.binding.neighborhood_epoch);
-        Ok(self.publish_coupled(contact, next, successor))
+        let mut step = self.publish_coupled(contact, next, successor);
+        step.predictions = vec![Rc::new(prediction)];
+        Ok(step)
     }
     /// Stage the complete supplied field in order, then publish one source occurrence. Local
     /// learned material/condition are read at the admitted cut throughout this unpaired input.
@@ -367,18 +389,14 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         let retain_factors = !self.continuation.pending.is_empty();
         for row in 0..pairs.source().rows() {
             let (next, prediction, map) = (|| {
-                let map = contact
-                    .binding
-                    .relation
-                    .read_source_contact(
-                        self.neighborhood().action(contact.member())?,
-                        pairs.source().row(row)?,
-                    )?
-                    .with_source_row(row);
-                let prediction = map
-                    .source_contact()
-                    .expect("source map")
-                    .retained_prediction();
+                let passage_readings = contact.binding.relation.read_source_passage(
+                    self.neighborhood().action(contact.member())?,
+                    pairs.source().row(row)?,
+                )?;
+                let map = passage_readings.relation.with_source_row(row);
+                let mut prediction = passage_readings.prediction;
+                prediction.qualify_field_source(row);
+                let prediction = Rc::new(prediction);
                 let map = Rc::new(map);
                 Ok::<_, ConstitutiveFibreError>((
                     successor.read_through_at(Rc::clone(&map), passage)?,
@@ -480,7 +498,7 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
                 received.obstruction
             )));
         }
-        let prepared = self.continuation.neighborhood.prepare_advance(
+        let prepared = self.continuation.neighborhood.prepare_consequence(
             contact.member(),
             source,
             Some(observed_difference),
@@ -493,10 +511,14 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         )?;
         let successor = Rc::new(self.current().read_through(Rc::new(relation))?);
         successor.read_receiver()?.require_supported()?;
-        if !self.neighborhood().can_commit_advance(&prepared) {
+        if !self.neighborhood().can_commit_consequence(&prepared) {
             return Err(ConstitutiveFibreError::ForeignOccurrence);
         }
-        let neighborhood = self.continuation.neighborhood.publish_advance(prepared);
+        let neighborhood = self.continuation.neighborhood.publish_consequence(
+            prepared,
+            source,
+            Some(observed_difference),
+        );
         let mut step = self.publish_coupled(contact, next, successor);
         step.neighborhood = Some(neighborhood);
         Ok(step)

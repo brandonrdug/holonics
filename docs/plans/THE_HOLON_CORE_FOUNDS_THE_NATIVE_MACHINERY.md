@@ -515,6 +515,111 @@ declaration, not an occurrence archive; kept. (4) The situated ingress receiver
 circulation as the declared dual receiver; whether it should be re-read from the contemporary
 constitution is the phase-12 frozen-receiver question and is left to it.
 
+### Phase 11 disposition: the resident constitutive views are one relation
+
+[established-bounded; source-inspected, measured] Scope: `holonic-engine/src/native_ecology/
+constitutive_fibre/resident{,.rs}/**` and its callers (engine `material_transport/normal/direct/
+wave/coupled{,/comparison/constitutive,/**/tests}.rs`; hna `examples/athena_field.rs`,
+`field_session{,/native_source}.rs`, `coupled_wave/tests{,/boundary}.rs` — the hna and coupled
+edits are the minimal compile fixes of the refusal change). Before: 35 files, 9,546 lines, 58
+struct/enum definitions (43 public), no aliases. After: 37 files, 10,275 lines, 62 definitions (44
+public; two are test-only wire witnesses) and 3 compatibility aliases. The growth is the host
+relation object, the contact law and their equality tests (≈420 lines of tests and facet
+documentation); the duplicated views, decoders and the second consequence law are deleted. No
+kernel, device layout or `SLOT_WORDS` receipt changed; one new wave-relation wire version (v5)
+was added and v1–v4 still decode.
+
+**The one object.** The resident constitutive fibre carries one linear relation
+`R = span{(x_i, y_i)} ⊂ S × T` (`Computation/HolonicConstitutiveFibre.lean::pairedCurrentSubmodule`).
+Every view returns the **fibre of R over a source**, `R_s = {t | (s,t) ∈ R}`: empty outside the
+source projection, else the translate of the vertical fibre `R_0` through any member
+(`vertical_fibre_iff_zero_source_difference`). `ConstitutiveRelation` (`resident/relation.rs`) is
+the exact host reading of the device relation (`ResidentConstitutiveFibre::relation()`, as
+`NormalConstitution` reads `ResidentNormalMaterial`); `ConstitutiveReading::fibre()` and
+`ConditionPreimageReading::fibre()` return the core restriction fibre
+`holonic_core::restriction::AffineFibre` (`Holon/Restriction.lean::affineFibre_mem`), and a plural
+reading keeps the whole fibre. It is not the phase-9 normal law: `W H = B` is a storage element on
+coefficients, while this is the exact relation of received pairs. Where the phase-9 object is the
+same object — the predictive material of each neighborhood member — it is used directly
+(`PredictiveMaterial.material: ResidentNormalMaterial`, its applied action read from it).
+
+**The contact is one element law.** An actual current `h` meeting an affine family `a + V`
+through the declared unit admittance returns `h' = P h + (a − P a)`, `n_in = a − P a`,
+`n_ret = h − P h`, with `h' − h = n_in − n_ret` and the lossless exchange
+`‖h‖² + ‖n_in‖² = ‖h'‖² + ‖n_ret‖²`; a current already in the family is unchanged. Lean:
+`Holon/AffineContact.lean` (`contact_difference`, `contact_lossless`, `contact_normal`,
+`contact_mem_family`, `contact_fixes_family`, `contact_idempotent`, `oblique_contact_witness`),
+imported in `Framework/HolonObject.lean`. Its one resident section and decoder is
+`ResidentContactReaction`; `AffineContactReading::is_lossless_exchange` reads the law, and the
+wave-relation rest checks it on the retained words.
+
+**Retention.** A wave source map anchored, beside its generating reaction, the producing law's
+prediction (`Rc`) and whole arrival family at the map's cut; every retained transport word and
+every v3 rest carried both. Nothing future read them: the map's basis is `source_basis(reaction)`,
+the coupled remount rebinds the last map from its **source operand** against the contemporary
+neighborhood, and the step's predictions are returned at the passage. They are retired: a source
+map retains its source operand, field row and reaction; `read_source_passage` returns the
+prediction and arrival as readings (`ResidentWaveSourcePassage`), and `NormalCoupledStep::predictions`
+now also carries the point-source prediction. Wave rest v5 writes the anchor-free map (row in the
+header, contact law and offered joint checked on decode); a v3 map still decodes, its anchors are
+validated and checked to produce the retained reaction at remount, then dropped
+(`legacy_anchored_source_map_decodes_into_the_same_map`: the remounted v3 map equals the v5 map
+word for word). The chart's anchor coordinates (the family's original `z0`, carried through every
+map) are the phase-9 anchored affine family's restriction coordinates and a device layout; they are
+kept. The observed-next snapshot is the operand the coupled remount re-reads; kept.
+`StandingLaw` is not applied here: the retained data is the map's own generator and operand, not a
+linear quotient of a state, and sufficiency is witnessed by the v3→v5 equality.
+
+| Former type / member | Facet | Disposition |
+|---|---|---|
+| `ResidentConstitutiveFibre` | device chart of R | kept; `relation()` its host reading; one `admits_source` check for reads and advances |
+| new: `ConstitutiveRelation`, `ConstitutiveAffineFibre` (= core `AffineFibre<ParticularDirections>`), `same_affine_fibre` | host reading of R; its fibres | new |
+| `ConstitutiveReading`, `ConstitutiveFibreReturn`, `ConditionPreimageReading` | the fibre over a source | kept as codec faces; `fibre()` to the core fibre |
+| `ResidentConstitutiveReturn`, `ConstitutiveReturnRest` | the fibre report and its wire | kept; one allocator (`allocate`; the method form delegates; the preimage's hand-built copy deleted) |
+| `ResidentConstitutiveCurrent`, `ResidentConstitutiveSection`, `ResidentDifferenceSection`, `ResidentSourcePairs`, `ResidentBilinearFeatures` | port charts and derived source sections | kept: distinct device charts (comparison triples, source pairs, bilinear features with their adjoint) |
+| `ConstitutiveDifferentialReading`, `PreparedConstitutiveFormation` | receiver reading; staged deposition | kept |
+| `AffineContactReading`, `ConditionContactReading` | the contact reading | **merged**: one struct, `contact: Option<u64>` omitted when absent; `ConditionContactReading` alias; both former JSON faces byte-identical |
+| new: `ResidentContactReaction` | the contact element's one section | new; `ResidentAffineContact`, `ResidentConditionContact`, `ResidentWaveSourceContact` hold it; their three block-view copies and two decoders deleted |
+| `ResidentConditionCurrent`, `ResidentConditionStanding` | the retained condition (successor block of its latest reaction) | **merged**: `ResidentConditionStanding` alias; a clone is the standing a producing passage reads |
+| `PreparedConditionContact`, `ConditionCurrentRest`, `ConditionContactMetric`, `ConditionContactStatus` | staged contact; rest (current only); metric; status | kept |
+| `ResidentConditionPreimage`, `ConditionPreimageRest` | fibre of the derived condition relation; compact rest | kept |
+| `ResidentConditionImage`, `ResidentConstitutiveImage`, `ResidentConstitutiveRefinement`, `ConditionImageReading`, `ConstitutiveImageReading`, `ConditionCoverage` | two images over one `AffineImageData` | kept: distinct kernels (bilinear condition image, linear fibre image) and public field names read by hna `mathematical` |
+| `ConstitutiveImageReceiver::{WaveConditional, WaveSourceContact, WaveObservation}` | producing receiver | **merged** into `Wave`: the kind is read from the relation |
+| `ResidentContextualSection`, `ContextualSectionOrigin` | source-null derived section | kept (its field-contrast reference/endpoint are operands of its absolute reading) |
+| `ResidentGeneratorNeighborhood`, `GeneratorNeighborhoodStep`, `GeneratorNeighborhoodRest` | the neighborhood, its one return and one rest | kept (rest v1/v2 unchanged) |
+| `GeneratorMaterial`, `PredictiveMaterial` | compatibility law beside `ResidentNormalMaterial` and its applied action | kept; phase 9's object used directly |
+| `PreparedNeighborhoodAdvance` | staged consequence plus borrowed operands | **merged** into `PreparedNeighborhoodConsequence`; `publish_consequence` takes the operands; `prepare_advance`, `can_commit_advance`, `read_consequence_wave_relation` deleted |
+| `receive_reaction_observation_at` (its own copy of the consequence law) | the consequence law | **merged**: one `prepare_consequence_with` at `ConsequenceCondition::{Contemporary, Producing}` |
+| `ResidentNeighborhoodAlternative` | dependent-family stage | kept |
+| `NeighborhoodEvidence`, `NeighborhoodEvidenceRest` | latest received condition fibre (one entry, replaced) | kept: hna `field_condition_image` reads it |
+| `attach_normal_prediction` refusal `(material, error)` | refusal | now the one `NormalRefusal<ResidentNormalMaterial>` |
+| `FieldReactionEnclosure{,Rest}`, `PreparedFieldReaction` | producing reaction receipt | kept, **not retired**: it retains the producing normal material, the frozen cut of hna `FieldProducingSection` (phase 12) |
+| `ResidentWaveRelation`, `ResidentWavePullback`, `WaveSourceReceiver`, `ResidentWaveSourceGeometry` | derived wave map, pullback, receiver chart, geometry cache | kept |
+| `ResidentWaveSourceContact` | source map | anchors retired (above); new `ResidentWaveSourcePassage` returns them |
+| `NormalWaveRelationRest` | map wire | v5 added; v1–v4 decode; `LegacySourceAnchors` is the v3 decoder's record |
+| per-rest `error`/`invalid` helpers (three) | rest refusal | one `rest_refusal` |
+
+Equality evidence: host `resident::relation` (fibre = translate of the vertical fibre; readings
+as core fibres), `resident::condition_contact::reaction` (both former JSON faces byte-identical;
+the lossless law on the device witness `h = (7,4)`), `wave_relation::rest` (unchanged wire tests);
+device `resident::relation::every_resident_reading_is_the_fibre_of_the_one_relation` (every unique,
+plural and outside reading of two fixtures equals the core fibre of the detached relation, number
+for number for unique readings), `wave_relation::rest::legacy_anchored_source_map_decodes_into_the_same_map`,
+and every existing device test of `constitutive_fibre::resident`, `material_transport::normal` and the
+hna coupled-wave, normal-wave, mathematical and native-source suites unchanged in its assertions
+(the contact numbers, balances and statuses read through the one reaction), except three: the two
+coupled tests that read the retired anchors now read the step's prediction, and
+`source_rest_rejects_changed_returned_normal` now sees the changed returned normal refused at decode
+by the contact law (it was refused at remount by the anchored prediction).
+
+**Not done, with reasons.** (1) The frozen producing material in `FieldReactionEnclosure` and the
+coupled continuation's retained transport word are phase-12 retention debt (hna field session). (2)
+`ConditionImageReading`/`ConstitutiveImageReading` could be one reading with renamed fields; their
+field names are public API of hna `mathematical`, so they stay two faces of one decoder. (3)
+`NormalWaveRelationRest` keeps its name (wire and public API) although the relation is not the normal
+law. (4) The contact law is checked on the host and on retained wave words; a device receipt of the
+balance (a sixth block) would change the reaction layout and is not added.
+
 ### Phase 15 disposition: the extracted operator is one Holon
 
 [established-bounded; source-inspected, implemented-exact, measured] **Subject: equation

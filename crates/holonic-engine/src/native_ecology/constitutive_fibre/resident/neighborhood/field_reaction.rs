@@ -86,61 +86,17 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
     where
         'c: 'i,
     {
-        if !self.usable {
-            return Err(ConstitutiveFibreError::Uncertain);
-        }
-        let next = self
-            .epoch
-            .checked_add(1)
-            .ok_or(ConstitutiveFibreError::Shape)?;
-        let material = self
-            .laws
-            .get_mut(member)
-            .ok_or(ConstitutiveFibreError::Shape)?;
-        let prior_condition = self.condition.standing();
-        let prediction = material
-            .action()
-            .read_bilinear(source, producing_condition)?;
-        let predictive = material.stage_prediction(source, producing_condition, observed)?;
-        let law = &mut material.law;
-        let family = law.read_condition_preimage(source, observed)?;
-        let proposed = self.condition.prepare_contact(&family)?;
-        if !self.condition.can_commit(&proposed) {
-            return Err(ConstitutiveFibreError::ForeignOccurrence);
-        }
-        self.usable = false;
-        let formation =
-            match law.prepare_bilinear_contact(source, producing_condition, Some(observed)) {
-                Ok(value) => value,
-                Err(error) => {
-                    self.usable = law.usable;
-                    return Err(error);
-                }
-            };
-        if !law.can_commit_formation(&formation) {
-            self.usable = true;
-            return Err(ConstitutiveFibreError::ForeignOccurrence);
-        }
-        self.usable = true;
-        let consequence = PreparedNeighborhoodConsequence {
-            owner: Rc::clone(&self.owner),
+        let consequence = self.prepare_consequence_with(
             member,
-            predecessor_epoch: self.epoch,
-            successor_epoch: next,
-            prediction,
-            prior_condition,
-            condition: Some(proposed),
-            formation: Some(formation),
-            predictive,
-        };
+            source,
+            Some(observed),
+            Some(producing_condition),
+            ConsequenceCondition::Producing,
+        )?;
         if !self.can_commit_consequence(&consequence) {
             return Err(ConstitutiveFibreError::ForeignOccurrence);
         }
-        Ok(self.publish_advance(PreparedNeighborhoodAdvance {
-            source,
-            observed: Some(observed),
-            consequence,
-        }))
+        Ok(self.publish_consequence(consequence, source, Some(observed)))
     }
 
     /// Read one staged reaction at the supplied producing condition. The condition is an actual

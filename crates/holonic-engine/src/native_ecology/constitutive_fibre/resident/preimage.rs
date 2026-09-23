@@ -142,25 +142,17 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
                 available,
             });
         }
-        let report_width = conditions
-            .checked_mul(conditions)
-            .and_then(|n| n.checked_add(width + 4))
-            .ok_or(ConstitutiveFibreError::Shape)?;
         let constraint = self.surface.fresh_section(width, width, ResidentGrain(0))?;
         let rhs = self
             .surface
             .fresh_section(1, residual_width + 1, ResidentGrain(0))?;
-        let returned = ResidentConstitutiveReturn {
-            surface: self.surface,
-            report: self
-                .surface
-                .fresh_section(1, report_width, ResidentGrain(0))?,
-            source_width: residual_width,
-            target_width: conditions,
-            occurrence: self.occurrences,
-            source_occurrence: None,
-            source_chart: self.source_chart,
-        };
+        let returned = ResidentConstitutiveReturn::allocate(
+            self.surface,
+            residual_width,
+            conditions,
+            self.occurrences,
+            self.source_chart,
+        )?;
         let mut passage = self.surface.begin_passage(&[vec![]])?;
         {
             let lane = passage.open(0, &[])?;

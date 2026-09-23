@@ -22,18 +22,7 @@ impl<'c> ResidentConstitutiveFibre<'c> {
         if !self.usable {
             return Err(ConstitutiveFibreError::Uncertain);
         }
-        let valid = match (self.source_chart, condition) {
-            (ConstitutiveSourceChart::Linear, None) => source.width == self.source_width,
-            (
-                ConstitutiveSourceChart::BilinearContact {
-                    source_complex,
-                    condition_complex,
-                },
-                Some(c),
-            ) => source.width == 2 * source_complex && c.width == 2 * condition_complex,
-            _ => false,
-        };
-        if !valid {
+        if !self.admits_source(source, condition) {
             return Err(ConstitutiveFibreError::Shape);
         }
         let returned = self.allocate_current_return(self.occurrences)?;

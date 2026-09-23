@@ -160,7 +160,7 @@ impl<'w, 'j, 'c> CoupledConstitutiveFamily<'w, 'j, 'c> {
             Some(ResidentConstitutiveCurrent::rational(&difference)?),
             Some(c.relation().fixed_condition()),
         )?;
-        let relation = Rc::new(self.wave.neighborhood().read_consequence_wave_relation(
+        let relation = Rc::new(self.wave.neighborhood().read_wave_relation_in_chart(
             c.member(),
             n,
             c.relation().source_receiver(),

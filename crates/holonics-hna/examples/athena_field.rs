@@ -110,7 +110,7 @@ fn main() -> Result<()> {
     )?;
     neighborhood
         .attach_normal_prediction(0, material)
-        .map_err(|(_, e)| e)?;
+        .map_err(|r| r.reason)?;
     let mut body = NativeCoupledBody::from_field(field, neighborhood, 0).map_err(|r| r.reason)?;
     let setup_us = start.elapsed().as_micros();
     let before = evaluation(&mut body, &surface)?;

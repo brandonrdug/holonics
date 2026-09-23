@@ -5,10 +5,12 @@ use super::*;
 use std::rc::Rc;
 
 mod affine;
-use affine::affine_contact_section;
+mod reaction;
+pub use affine::ResidentAffineContact;
 pub(crate) use affine::ResidentWaveSourceGeometry;
-pub(super) use affine::read_affine_contact;
-pub use affine::{AffineContactReading, ResidentAffineContact};
+use affine::affine_contact_section;
+pub(crate) use reaction::block;
+pub use reaction::{AffineContactReading, ConditionContactReading, ResidentContactReaction};
 
 /// Equal unit admittance for each real/imaginary coordinate in the bound local chart.
 /// Orthogonal chart changes preserve this law. General recharting owes the transported metric.
@@ -23,89 +25,26 @@ pub enum ConditionContactStatus {
     OutsideRepresentedRelation,
 }
 
-#[derive(Debug, PartialEq, Eq, Serialize)]
-pub struct ConditionContactReading {
-    pub contact: u64,
-    pub relation_cut: u64,
-    pub metric: ConditionContactMetric,
-    pub status: ConditionContactStatus,
-    pub predecessor: Vec<Rat>,
-    pub successor: Vec<Rat>,
-    pub incoming_normal: Vec<Rat>,
-    pub returned_normal: Vec<Rat>,
-    pub difference: Vec<Rat>,
-}
-
-/// One move owner for the actual retained condition current. Immutable passage receipts may
-/// share its current section; they cannot move or develop this owner. No live ecology is cloned.
+/// One move owner for the actual retained condition current: the successor block of its latest
+/// contact reaction. Immutable passage receipts may share its reaction section; they cannot move
+/// or develop this owner. A clone is the retained standing a producing passage reads (formerly
+/// the separate `ResidentConditionStanding`, whose fields and reads were this type's).
+#[derive(Clone)]
 pub struct ResidentConditionCurrent<'chart> {
-    surface: &'chart ResidentSurface<'chart>,
-    section: Rc<ResidentSection<'chart>>,
+    reaction: ResidentContactReaction<'chart>,
     source_chart: ConstitutiveSourceChart,
-    metric: ConditionContactMetric,
-    width: usize,
     contacts: u64,
 }
+
+/// Compatibility name: the standing a producing passage reads is a clone of the current.
+pub type ResidentConditionStanding<'chart> = ResidentConditionCurrent<'chart>;
 
 /// Complete local contact return, including the original compatible-condition evidence.
 /// It does not recursively retain every previous current or assert the successor is the cause.
 pub struct ResidentConditionContact<'chart> {
-    section: Rc<ResidentSection<'chart>>,
+    reaction: ResidentContactReaction<'chart>,
     family: ResidentConditionPreimage<'chart>,
-    metric: ConditionContactMetric,
     contact: u64,
-    width: usize,
-}
-
-/// Immutable actual standing used by a producing passage. Sharing its resident section does
-/// not create another move owner or retain a chain of earlier states.
-#[derive(Clone)]
-pub struct ResidentConditionStanding<'chart> {
-    surface: &'chart ResidentSurface<'chart>,
-    section: Rc<ResidentSection<'chart>>,
-    width: usize,
-    source_chart: ConstitutiveSourceChart,
-    metric: ConditionContactMetric,
-    contacts: u64,
-}
-impl<'chart> ResidentConditionStanding<'chart> {
-    /// Receive an explicitly supplied actual condition through the existing
-    /// exact current constructor. This is an input, not an inferred cause.
-    pub(crate) fn with_current(&self,incoming:ResidentConstitutiveCurrent<'_, 'chart>)
-        ->Result<Self,ConstitutiveFibreError>{
-        self.with_current_count(incoming,1)
-    }
-    pub(crate) fn with_current_count(&self,incoming:ResidentConstitutiveCurrent<'_, 'chart>,inputs:u64)
-        ->Result<Self,ConstitutiveFibreError>{
-        if inputs==0{return Err(ConstitutiveFibreError::Shape);}
-        let count=self.contacts.checked_add(inputs).ok_or(ConstitutiveFibreError::Shape)?;
-        let mut next=ResidentConditionCurrent::found(self.surface,self.source_chart,self.width,incoming,self.metric)?;
-        next.contacts=count;Ok(next.standing())
-    }
-    pub(crate) fn prepare_contact(&self,family:&ResidentConditionPreimage<'chart>)
-        ->Result<PreparedConditionContact<'chart>,ConstitutiveFibreError>{
-        let f=&family.inner.returned;
-        if family.source_chart()!=self.source_chart||f.target_width!=self.width||!std::ptr::eq(self.surface,f.surface){
-            return Err(ConstitutiveFibreError::Shape);
-        }
-        let next=self.contacts.checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
-        let section=Rc::new(affine_contact_section(self.surface,self.current(),f)?);
-        Ok(PreparedConditionContact{predecessor:Rc::clone(&self.section),returned:ResidentConditionContact{
-            section,family:ResidentConditionPreimage{inner:Rc::clone(&family.inner)},
-            metric:self.metric,contact:next,width:self.width}})
-    }
-    pub fn current(&self) -> ResidentConstitutiveCurrent<'_, 'chart> {
-        current_view(&self.section, self.width, self.width)
-    }
-    pub fn source_chart(&self) -> ConstitutiveSourceChart {
-        self.source_chart
-    }
-    pub fn metric(&self) -> ConditionContactMetric {
-        self.metric
-    }
-    pub fn contacts(&self) -> u64 {
-        self.contacts
-    }
 }
 
 pub struct PreparedConditionContact<'chart> {
@@ -113,10 +52,12 @@ pub struct PreparedConditionContact<'chart> {
     returned: ResidentConditionContact<'chart>,
 }
 impl<'chart> PreparedConditionContact<'chart> {
-    pub fn standing(&self)->ResidentConditionStanding<'chart>{
-        ResidentConditionStanding{surface:self.returned.family.inner.returned.surface,
-            section:Rc::clone(&self.returned.section),width:self.returned.width,
-            source_chart:self.returned.family.source_chart(),metric:self.returned.metric,contacts:self.returned.contact}
+    pub fn standing(&self) -> ResidentConditionStanding<'chart> {
+        ResidentConditionCurrent {
+            reaction: self.returned.reaction.clone(),
+            source_chart: self.returned.family.source_chart(),
+            contacts: self.returned.contact,
+        }
     }
     pub fn successor(&self) -> ResidentConstitutiveCurrent<'_, 'chart> {
         self.returned.successor()
@@ -131,20 +72,6 @@ impl<'chart> PreparedConditionContact<'chart> {
 
 mod rest;
 pub use rest::ConditionCurrentRest;
-
-fn current_view<'a, 'c>(
-    section: &'a ResidentSection<'c>,
-    c: usize,
-    at: usize,
-) -> ResidentConstitutiveCurrent<'a, 'c> {
-    ResidentConstitutiveCurrent {
-        section,
-        offset: at,
-        width: c,
-        denominator: Some(5 * c),
-        disposition: None,
-    }
-}
 
 impl<'chart> ResidentConstitutiveFibre<'chart> {
     /// Retain an explicitly supplied actual current in this action's condition chart. This
@@ -198,40 +125,83 @@ impl<'chart> ResidentConditionCurrent<'chart> {
             )));
         }
         Ok(ResidentConditionCurrent {
-            surface,
-            section: Rc::new(section),
+            reaction: ResidentContactReaction::new(surface, Rc::new(section), c, metric),
             source_chart,
-            metric,
-            width: c,
             contacts: 0,
         })
     }
-}
-
-impl<'chart> ResidentConditionCurrent<'chart> {
-    pub fn standing(&self) -> ResidentConditionStanding<'chart> {
-        ResidentConditionStanding {
-            surface:self.surface,
-            section: Rc::clone(&self.section),
-            width: self.width,
-            source_chart: self.source_chart,
-            metric: self.metric,
-            contacts: self.contacts,
+    pub(super) fn from_reaction(
+        reaction: ResidentContactReaction<'chart>,
+        source_chart: ConstitutiveSourceChart,
+        contacts: u64,
+    ) -> Self {
+        Self {
+            reaction,
+            source_chart,
+            contacts,
         }
     }
-    pub fn current(&self) -> ResidentConstitutiveCurrent<'_, 'chart> {
-        current_view(&self.section, self.width, self.width)
+    pub(super) fn reaction(&self) -> &ResidentContactReaction<'chart> {
+        &self.reaction
     }
-    pub fn receive_current(&mut self,incoming:ResidentConstitutiveCurrent<'_, 'chart>)
-        ->Result<ResidentConditionStanding<'chart>,ConstitutiveFibreError>{
-        let prior=self.standing();let next=prior.with_current(incoming)?;
-        self.section=next.section;self.contacts=next.contacts;Ok(prior)
+
+    /// The retained standing a producing passage reads: a clone sharing the reaction section.
+    pub fn standing(&self) -> ResidentConditionStanding<'chart> {
+        self.clone()
+    }
+    /// The actual current: the successor block of the latest reaction.
+    pub fn current(&self) -> ResidentConstitutiveCurrent<'_, 'chart> {
+        self.reaction.block(block::SUCCESSOR, false)
+    }
+    pub fn source_chart(&self) -> ConstitutiveSourceChart {
+        self.source_chart
+    }
+    pub fn metric(&self) -> ConditionContactMetric {
+        self.reaction.metric()
     }
     pub fn contacts(&self) -> u64 {
         self.contacts
     }
-    pub fn metric(&self) -> ConditionContactMetric {
-        self.metric
+
+    /// Receive an explicitly supplied actual condition through the existing exact current
+    /// constructor. This is an input, not an inferred cause. The standing it replaces is
+    /// returned for a producing passage that still reads it.
+    pub fn receive_current(
+        &mut self,
+        incoming: ResidentConstitutiveCurrent<'_, 'chart>,
+    ) -> Result<ResidentConditionStanding<'chart>, ConstitutiveFibreError> {
+        let next = self.with_current(incoming)?;
+        Ok(std::mem::replace(self, next))
+    }
+    /// A successor standing founded on an explicitly supplied current. `with_current_count`
+    /// counts `inputs` received currents at once.
+    pub(crate) fn with_current(
+        &self,
+        incoming: ResidentConstitutiveCurrent<'_, 'chart>,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        self.with_current_count(incoming, 1)
+    }
+    pub(crate) fn with_current_count(
+        &self,
+        incoming: ResidentConstitutiveCurrent<'_, 'chart>,
+        inputs: u64,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        if inputs == 0 {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let count = self
+            .contacts
+            .checked_add(inputs)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let mut next = Self::found(
+            self.reaction.surface(),
+            self.source_chart,
+            self.reaction.width(),
+            incoming,
+            self.reaction.metric(),
+        )?;
+        next.contacts = count;
+        Ok(next)
     }
 
     /// For nonempty F=a+V, return h'=P_V h+(I-P_V)a with the complete incoming/returned
@@ -253,7 +223,34 @@ impl<'chart> ResidentConditionCurrent<'chart> {
         &self,
         family: &ResidentConditionPreimage<'chart>,
     ) -> Result<PreparedConditionContact<'chart>, ConstitutiveFibreError> {
-        self.standing().prepare_contact(family)
+        let f = &family.inner.returned;
+        let surface = self.reaction.surface();
+        if family.source_chart() != self.source_chart
+            || f.target_width != self.reaction.width()
+            || !std::ptr::eq(surface, f.surface)
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let next = self
+            .contacts
+            .checked_add(1)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let section = Rc::new(affine_contact_section(surface, self.current(), f)?);
+        Ok(PreparedConditionContact {
+            predecessor: Rc::clone(self.reaction.section()),
+            returned: ResidentConditionContact {
+                reaction: ResidentContactReaction::new(
+                    surface,
+                    section,
+                    self.reaction.width(),
+                    self.reaction.metric(),
+                ),
+                family: ResidentConditionPreimage {
+                    inner: Rc::clone(&family.inner),
+                },
+                contact: next,
+            },
+        })
     }
 
     pub fn commit_contact(
@@ -267,11 +264,12 @@ impl<'chart> ResidentConditionCurrent<'chart> {
     }
 
     pub(super) fn can_commit(&self, prepared: &PreparedConditionContact<'chart>) -> bool {
-        Rc::ptr_eq(&self.section, &prepared.predecessor)
-            && self.contacts.checked_add(1) == Some(prepared.returned.contact)
-            && self.source_chart == prepared.returned.family.source_chart()
-            && self.width == prepared.returned.width
-            && self.metric == prepared.returned.metric
+        let returned = &prepared.returned;
+        self.reaction.same_section(&prepared.predecessor)
+            && self.contacts.checked_add(1) == Some(returned.contact)
+            && self.source_chart == returned.family.source_chart()
+            && self.reaction.width() == returned.reaction.width()
+            && self.reaction.metric() == returned.reaction.metric()
     }
 
     /// The neighborhood preflights this predicate under exclusive ownership before its only
@@ -281,7 +279,7 @@ impl<'chart> ResidentConditionCurrent<'chart> {
         prepared: PreparedConditionContact<'chart>,
     ) -> ResidentConditionContact<'chart> {
         debug_assert!(self.can_commit(&prepared));
-        self.section = Rc::clone(&prepared.returned.section);
+        self.reaction = prepared.returned.reaction.clone();
         self.contacts = prepared.returned.contact;
         prepared.returned
     }
@@ -291,46 +289,25 @@ impl<'chart> ResidentConditionContact<'chart> {
     pub fn family(&self) -> &ResidentConditionPreimage<'chart> {
         &self.family
     }
+    /// The contact reaction this return published.
+    pub fn reaction(&self) -> &ResidentContactReaction<'chart> {
+        &self.reaction
+    }
     pub fn successor(&self) -> ResidentConstitutiveCurrent<'_, 'chart> {
-        current_view(&self.section, self.width, self.width)
+        self.reaction.block(block::SUCCESSOR, false)
     }
     pub fn incoming_normal(&self) -> ResidentConstitutiveCurrent<'_, 'chart> {
-        current_view(&self.section, self.width, 2 * self.width)
+        self.reaction.block(block::INCOMING_NORMAL, false)
     }
     pub fn returned_normal(&self) -> ResidentConstitutiveCurrent<'_, 'chart> {
-        current_view(&self.section, self.width, 3 * self.width)
+        self.reaction.block(block::RETURNED_NORMAL, false)
     }
     pub fn difference(&self) -> ResidentConstitutiveCurrent<'_, 'chart> {
-        current_view(&self.section, self.width, 4 * self.width)
+        self.reaction.block(block::DIFFERENCE, false)
     }
     pub fn inspect(&self) -> Result<ConditionContactReading, ConstitutiveFibreError> {
-        let words = self.family.inner.returned.surface.read_out(&self.section)?;
-        let c = self.width;
-        let den = words[5 * c].0;
-        if den <= 0 || words.iter().any(|(lo, hi)| lo != hi) {
-            return Err(ConstitutiveFibreError::Uncertain);
-        }
-        let row = |at: usize| {
-            words[at..at + c]
-                .iter()
-                .map(|(v, _)| Rat::new((*v).into(), den.into()))
-                .collect()
-        };
-        Ok(ConditionContactReading {
-            contact: self.contact,
-            relation_cut: self.family.relation_cut(),
-            metric: self.metric,
-            status: match words[5 * c + 1].0 {
-                0 => ConditionContactStatus::Compatible,
-                1 => ConditionContactStatus::OutsideRepresentedRelation,
-                _ => return Err(ConstitutiveFibreError::Uncertain),
-            },
-            predecessor: row(0),
-            successor: row(c),
-            incoming_normal: row(2 * c),
-            returned_normal: row(3 * c),
-            difference: row(4 * c),
-        })
+        self.reaction
+            .inspect(self.family.relation_cut(), Some(self.contact))
     }
 }
 

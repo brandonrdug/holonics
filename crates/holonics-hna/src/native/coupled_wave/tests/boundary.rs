@@ -100,7 +100,7 @@ fn field_interiors_form_and_feed_the_coupled_prediction() {
     .unwrap();
     neighborhood
         .attach_normal_prediction(0, material)
-        .unwrap_or_else(|(_, e)| panic!("{e}"));
+        .unwrap_or_else(|r| panic!("{:?}", r.reason));
     let pair = previous.enclosure().join(now.enclosure()).unwrap();
     let wave = ResidentNormalMaterial::found(&s, n, n, grain)
         .unwrap()
@@ -257,7 +257,7 @@ fn changing_operative_material_conditions_the_same_hnn_source(){
     let count=pairs.len() as u64;let fit=std::time::Instant::now();material.receive_many(&pairs).unwrap();let fit_us=fit.elapsed().as_micros();
     let h=old.material().unwrap().unwrap().read_exact_point().unwrap();let law=material.read_applied_bilinear_relation(3*n,k).unwrap();
     let mut local=ResidentGeneratorNeighborhood::with_shared_condition(vec![law],ResidentConstitutiveCurrent::rational(&h).unwrap(),ConditionContactMetric::UnitAdmittanceRealification).unwrap();
-    local.attach_normal_prediction(0,material).unwrap_or_else(|(_,e)|panic!("{e}"));
+    local.attach_normal_prediction(0,material).unwrap_or_else(|r| panic!("{:?}", r.reason));
     let input=old.enclosure();let pair=zero.view().join(input).unwrap();
     let wave=ResidentNormalMaterial::found(&s,n,n,grain).unwrap().into_joint_difference_wave(pair.view()).unwrap().with_neighborhood(local).unwrap();
     let mut body=NativeCoupledBody::from_wave(wave);let held=body.inspect_current().unwrap();let epoch=body.epoch();

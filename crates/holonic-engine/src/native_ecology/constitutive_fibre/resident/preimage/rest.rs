@@ -141,9 +141,7 @@ impl ConditionPreimageRest {
         })
     }
 }
-fn error(e: impl std::fmt::Display) -> ConstitutiveFibreError {
-    ConstitutiveFibreError::Rest(e.to_string())
-}
+use super::super::rest_refusal as error;
 impl ResidentConditionPreimage<'_> {
     pub fn rest(&self) -> Result<ConditionPreimageRest, ConstitutiveFibreError> {
         let f = &self.inner.returned;

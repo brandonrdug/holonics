@@ -77,20 +77,18 @@ impl ConditionCurrentRest {
             &ResidentSectionRest::found(1, values.len(), ResidentGrain(0), 64, values)
                 .map_err(|_| ConstitutiveFibreError::Shape)?,
         )?;
-        Ok(ResidentConditionCurrent {
-            surface,
-            section: Rc::new(section),
-            source_chart: self.source_chart,
-            metric: self.metric,
-            width: c,
-            contacts: self.contacts,
-        })
+        Ok(ResidentConditionCurrent::from_reaction(
+            ResidentContactReaction::new(surface, Rc::new(section), c, self.metric),
+            self.source_chart,
+            self.contacts,
+        ))
     }
 }
 impl ResidentConditionCurrent<'_> {
     pub fn rest(&self) -> Result<ConditionCurrentRest, ConstitutiveFibreError> {
-        let data = self.surface.read_out(&self.section)?;
-        let c = self.width;
+        let reaction = self.reaction();
+        let data = reaction.surface().read_out(reaction.section())?;
+        let c = reaction.width();
         if data.iter().any(|(a, b)| a != b) || data[5 * c].0 <= 0 {
             return Err(ConstitutiveFibreError::Uncertain);
         }
@@ -98,9 +96,9 @@ impl ResidentConditionCurrent<'_> {
         words.push(data[5 * c].0);
         let value = ConditionCurrentRest {
             schema: "holonics.condition-current.v1".into(),
-            source_chart: self.source_chart,
-            metric: self.metric,
-            contacts: self.contacts,
+            source_chart: self.source_chart(),
+            metric: self.metric(),
+            contacts: self.contacts(),
             words,
         };
         value.validate()?;

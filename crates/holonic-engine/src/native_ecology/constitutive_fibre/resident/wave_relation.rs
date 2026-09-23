@@ -5,7 +5,7 @@ mod observation;
 mod pullback;
 pub use pullback::ResidentWavePullback;
 pub use rest::NormalWaveRelationRest;
-pub use source::ResidentWaveSourceContact;
+pub use source::{ResidentWaveSourceContact, ResidentWaveSourcePassage};
 
 /// The receiver chart in which the local law was founded. UnitRealSum is a mean-offset
 /// section for a maximum/softmax receiver; actual source offsets stay in the lifted state.

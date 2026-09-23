@@ -327,9 +327,7 @@ impl GeneratorNeighborhoodRest {
         })
     }
 }
-fn error(e: impl std::fmt::Display) -> ConstitutiveFibreError {
-    ConstitutiveFibreError::Rest(e.to_string())
-}
+use super::super::rest_refusal as error;
 impl ResidentGeneratorNeighborhood<'_> {
     pub fn rest(&self) -> Result<GeneratorNeighborhoodRest, ConstitutiveFibreError> {
         if !self.usable {

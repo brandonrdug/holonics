@@ -56,7 +56,7 @@ fn normal_prediction_forms_from_native_condition_and_preserves_its_moments() {
     .unwrap();
     let normal = ResidentNormalMaterial::found_features(&s, 5, 1, ResidentGrain(16)).unwrap();
     body.attach_normal_prediction(0, normal)
-        .unwrap_or_else(|(_, e)| panic!("{e:?}"));
+        .unwrap_or_else(|r| panic!("{:?}", r.reason));
     let source = points(&s, &[1, 0]);
     let fresh = points(&s, &[2, 3]);
     let observed = points(&s, &[3, 4]);
@@ -409,22 +409,22 @@ fn staged_neighborhood_discard_and_stale_publication_keep_the_predecessor() {
     let prior = value(&body.read(0, current(&x)).unwrap());
     let reads = s.census().section_read_outs;
     let prepared = body
-        .prepare_advance(0, current(&x), Some(current(&y)))
+        .prepare_consequence(0, current(&x), Some(current(&y)))
         .unwrap();
-    assert!(body.can_commit_advance(&prepared));
+    assert!(body.can_commit_consequence(&prepared));
     assert_eq!(s.census().section_read_outs, reads);
     assert_eq!(body.rest().unwrap(), before);
     assert_eq!(value(&body.read(0, current(&x)).unwrap()), prior);
     drop(prepared);
     assert_eq!(body.rest().unwrap(), before);
     let stale = body
-        .prepare_advance(0, current(&x), Some(current(&y)))
+        .prepare_consequence(0, current(&x), Some(current(&y)))
         .unwrap();
     let committed = body
-        .prepare_advance(0, current(&x), Some(current(&y)))
+        .prepare_consequence(0, current(&x), Some(current(&y)))
         .unwrap();
-    body.publish_advance(committed);
-    assert!(!body.can_commit_advance(&stale));
+    body.publish_consequence(committed, current(&x), Some(current(&y)));
+    assert!(!body.can_commit_consequence(&stale));
     let after = body.rest().unwrap();
     assert_ne!(after, before);
     drop(stale);
@@ -448,9 +448,9 @@ fn staged_neighborhood_read_only_proposal_is_owner_qualified() {
     };
     let mut a = make();
     let b = make();
-    let pending = a.prepare_advance(0, current(&x), None).unwrap();
-    assert!(a.can_commit_advance(&pending));
-    assert!(!b.can_commit_advance(&pending));
+    let pending = a.prepare_consequence(0, current(&x), None).unwrap();
+    assert!(a.can_commit_consequence(&pending));
+    assert!(!b.can_commit_consequence(&pending));
     a.advance(0, current(&x), None).unwrap();
-    assert!(!a.can_commit_advance(&pending));
+    assert!(!a.can_commit_consequence(&pending));
 }

@@ -9,6 +9,7 @@ import ElementaryHolonics.Holon.Conformance
 import ElementaryHolonics.Holon.Deposition
 import ElementaryHolonics.Holon.Reaction
 import ElementaryHolonics.Holon.Cayley
+import ElementaryHolonics.Holon.AffineContact
 import ElementaryHolonics.Holon.MomentStorage
 
 /-!
@@ -19,8 +20,9 @@ is its law and ports — complex and connection (`Holon.Complex`), ports and pow
 Dirac interconnection (`Holon.Dirac`), element relations and balances (`Holon.Element`),
 generators and clock jumps (`Holon.Generator`), restrictions (`Holon.Restriction`), the five laws
 (`Holon.Law`), the existing owners as instances (`Holon.Conformance`) deposition under
-learning (`Holon.Deposition`) the workless reaction (`Holon.Reaction`) and its implicit
-Cayley step (`Holon.Cayley`). Namespace
+learning (`Holon.Deposition`) the workless reaction (`Holon.Reaction`), its implicit
+Cayley step (`Holon.Cayley`) and the lossless unit-admittance contact of a current with an affine
+family of the constitutive relation (`Holon.AffineContact`). Namespace
 `Soma.Holonics.HolonCore`. No axioms are added.
 -/
 
@@ -164,4 +166,10 @@ open Soma.Holonics.HolonCore
 #print axioms drive_balance
 #print axioms device_radius
 #print axioms adjoint_radius
+#print axioms contact_difference
+#print axioms contact_lossless
+#print axioms contact_normal
+#print axioms contact_fixes_family
+#print axioms contact_idempotent
+#print axioms oblique_contact_witness
 end Audit

@@ -759,7 +759,7 @@ impl<'c> NativeFieldSession<'c> {
         )?;
         reaction
             .attach_normal_prediction(0, material)
-            .map_err(|(_, e)| e)?;
+            .map_err(|r| r.reason)?;
         let body = NativeCoupledBody::from_field_with_reaction_port(
             field,
             reaction,

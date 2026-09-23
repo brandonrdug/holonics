@@ -35,26 +35,26 @@ fn source_geometry_reuse_preserves_full_contact_and_rejects_changed_directions()
         let source = point(&s, &source);
         let reads = s.census().section_read_outs;
         let cached = relation
-            .read_source_contact(&law, current(&source))
+            .read_source_passage(&law, current(&source))
             .unwrap();
-        let plain = prepare_source_contact(
+        let (plain, plain_arrival) = prepare_source_contact(
             &s,
             1,
             WaveSourceReceiver::Direct,
             current(&source),
-            law.read_bilinear(current(&source), current(&h)).unwrap(),
+            &law.read_bilinear(current(&source), current(&h)).unwrap(),
             None,
         )
         .unwrap();
         assert_eq!(s.census().section_read_outs, reads);
-        let cached = cached.source_contact().unwrap();
         assert_eq!(
-            cached.arrival_family().rest().unwrap(),
-            plain.arrival_family().rest().unwrap()
+            cached.arrival.rest().unwrap(),
+            plain_arrival.rest().unwrap()
         );
+        let cached = cached.relation.source_contact().unwrap();
         assert_eq!(
-            s.detach_section(&cached.reaction, 64).unwrap(),
-            s.detach_section(&plain.reaction, 64).unwrap()
+            s.detach_section(cached.reaction.section(), 64).unwrap(),
+            s.detach_section(plain.reaction.section(), 64).unwrap()
         );
         assert!(relation.source_geometry.get().is_some());
     }
@@ -65,27 +65,27 @@ fn source_geometry_reuse_preserves_full_contact_and_rejects_changed_directions()
     assert!(relation.read_source_contact(&law, current(&a)).is_err());
     assert_eq!(law.rest().unwrap(), material);
     let new_relation = law.read_wave_relation(current(&h), 1).unwrap();
-    let new_map = new_relation.read_source_contact(&law, current(&a)).unwrap();
-    let contact = new_map.source_contact().unwrap();
-    assert!(contact
-        .arrival_family()
+    let new_passage = new_relation.read_source_passage(&law, current(&a)).unwrap();
+    let contact = new_passage.relation.source_contact().unwrap();
+    assert!(new_passage
+        .arrival
         .read_contact_with_geometry(
             contact.offered_joint(),
             ConditionContactMetric::UnitAdmittanceRealification,
             relation.source_geometry.get().unwrap()
         )
         .is_err());
-    let plain = prepare_source_contact(
+    let (plain, _) = prepare_source_contact(
         &s,
         1,
         WaveSourceReceiver::Direct,
         current(&a),
-        law.read_bilinear(current(&a), current(&h)).unwrap(),
+        &law.read_bilinear(current(&a), current(&h)).unwrap(),
         None,
     )
     .unwrap();
     assert_eq!(
-        s.detach_section(&contact.reaction, 64).unwrap(),
-        s.detach_section(&plain.reaction, 64).unwrap()
+        s.detach_section(contact.reaction.section(), 64).unwrap(),
+        s.detach_section(plain.reaction.section(), 64).unwrap()
     );
 }
