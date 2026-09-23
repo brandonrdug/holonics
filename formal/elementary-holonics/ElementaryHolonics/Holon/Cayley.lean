@@ -27,6 +27,18 @@ incident word is therefore an implicit-midpoint (Cayley) step.
    state contained (`recentre_contains`); along device steps with `‖L_k‖ ≤ K_k` and
    `‖L_k c_k − c_(k+1)‖ ≤ r_(k+1) − K_k r_k`, containment propagates (`device_containment`,
    composing `ball_image`).
+6. **The device Cayley step (Phase 8a)**, in any real inner-product space (the realified form).
+   The key lemma: for passive `K` (`⟪v, Kv⟫ ≤ 0`), `δ − e = ½K(δ + e) + f` gives
+   `‖δ‖ ≤ ‖e‖ + ‖f‖` (`key_contraction`). Hence `‖(I − ½K)⁻¹‖ ≤ 1` (`resolvent_bound`),
+   `‖(I − ½K)⁻¹(I + ½K)‖ ≤ 1` (`cayley_contraction`) and invertibility in finite dimension
+   (`cayley_bijective`); the norm bounds are stated on vectors, which is the operator-norm
+   statement. For `K(c) = K_s + Σ c_r A_r` with skew `A_r`, `⟪v, K(c)v⟫ = ⟪v, K_s v⟫`
+   (`inner_devK`); the drive balance `½‖y‖² − ½‖p‖² = ⟪x̄, K_s x̄⟫ + ⟪x̄, W_c c⟫`
+   (`drive_balance`); the solve radius `‖y − y₀‖ ≤ r_p + r_c(F_A X + F_c) + ‖ρ‖` for a centre
+   solve with residual `ρ` (`device_radius`); and the adjoint radius
+   `‖u − u₀‖ ≤ r_g + ½ r_c F_A ‖g‖` for `u = (I − ½K)^(−†) g` (`adjoint_radius`; drive covector
+   `2u − g`, `driveCovector`). `c` carries the sup norm; `F_A` bounds `Σ‖A_r‖` in operator norm,
+   which any Frobenius bound implies.
 -/
 
 noncomputable section
@@ -305,5 +317,206 @@ theorem device_containment (L : ℕ → E →L[ℝ] E) (K r : ℕ → ℝ) (x c 
       exact recentre_contains (ball_image (L k) (hL k) ih) (hdev k)
 
 end Containment
+
+/-! ## 6. The device Cayley step (Phase 8a) in a real inner-product space -/
+
+section Device
+
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+
+/-- [proved-derived; formal-checked] **The key contraction.** For a passive `K`
+(`⟪v, K v⟫ ≤ 0`), `δ − e = ½ K(δ + e) + f` implies `‖δ‖ ≤ ‖e‖ + ‖f‖`. -/
+theorem key_contraction (K : E →L[ℝ] E) (hK : ∀ v, inner ℝ v (K v) ≤ 0) {δ e f : E}
+    (h : δ - e = (1 / 2 : ℝ) • K (δ + e) + f) : ‖δ‖ ≤ ‖e‖ + ‖f‖ := by
+  have h1 : inner ℝ (δ + e) (δ - e) = ‖δ‖ ^ 2 - ‖e‖ ^ 2 := by
+    rw [inner_add_left, inner_sub_right, inner_sub_right, real_inner_self_eq_norm_sq,
+      real_inner_self_eq_norm_sq, real_inner_comm δ e]
+    ring
+  have h2 : inner ℝ (δ + e) (δ - e) ≤ ‖δ + e‖ * ‖f‖ := by
+    rw [h, inner_add_right, inner_smul_right]
+    have := hK (δ + e)
+    have := real_inner_le_norm (δ + e) f
+    nlinarith
+  have h3 : ‖δ + e‖ ≤ ‖δ‖ + ‖e‖ := norm_add_le _ _
+  have hf := norm_nonneg f
+  have hd := norm_nonneg δ
+  have he := norm_nonneg e
+  by_contra hc
+  push Not at hc
+  nlinarith [mul_le_mul_of_nonneg_right h3 hf]
+
+/-- [proved-derived; formal-checked] **`‖(I − ½K)⁻¹‖ ≤ 1`**: `(I − ½K) y = f` implies `‖y‖ ≤ ‖f‖`. -/
+theorem resolvent_bound (K : E →L[ℝ] E) (hK : ∀ v, inner ℝ v (K v) ≤ 0) {y f : E}
+    (h : y - (1 / 2 : ℝ) • K y = f) : ‖y‖ ≤ ‖f‖ := by
+  have := key_contraction K hK (δ := y) (e := 0) (f := f) (by rw [← h]; simp)
+  simpa using this
+
+/-- [proved-derived; formal-checked] **`‖(I − ½K)⁻¹(I + ½K)‖ ≤ 1`**: the Cayley step of a passive
+`K` does not increase the norm. -/
+theorem cayley_contraction (K : E →L[ℝ] E) (hK : ∀ v, inner ℝ v (K v) ≤ 0) {y p : E}
+    (h : y - (1 / 2 : ℝ) • K y = p + (1 / 2 : ℝ) • K p) : ‖y‖ ≤ ‖p‖ := by
+  have := key_contraction K hK (δ := y) (e := p) (f := 0) (by
+    rw [map_add, smul_add, add_zero]
+    calc y - p = (y - (1 / 2 : ℝ) • K y) + (1 / 2 : ℝ) • K y - p := by abel
+      _ = (p + (1 / 2 : ℝ) • K p) + (1 / 2 : ℝ) • K y - p := by rw [h]
+      _ = _ := by abel)
+  simpa using this
+
+/-- [proved-derived; formal-checked] In finite dimension `I − ½K` is invertible for passive `K`. -/
+theorem cayley_bijective [FiniteDimensional ℝ E] (K : E →L[ℝ] E)
+    (hK : ∀ v, inner ℝ v (K v) ≤ 0) :
+    Function.Bijective ((LinearMap.id : E →ₗ[ℝ] E) - (1 / 2 : ℝ) • (K : E →ₗ[ℝ] E)) := by
+  have hinj : Function.Injective ((LinearMap.id : E →ₗ[ℝ] E) - (1 / 2 : ℝ) • (K : E →ₗ[ℝ] E)) := by
+    rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
+    intro y hy
+    have := resolvent_bound K hK (y := y) (f := 0) (by simpa using hy)
+    simpa using this
+  exact ⟨hinj, LinearMap.injective_iff_surjective.mp hinj⟩
+
+variable {ι : Type*} [Fintype ι]
+
+/-- [definition] The device reaction `K(c) = K_s + Σ_r c_r A_r`. -/
+def devK (Ks : E →L[ℝ] E) (A : ι → E →L[ℝ] E) (c : ι → ℝ) : E →L[ℝ] E :=
+  Ks + ∑ r, c r • A r
+
+omit [Fintype ι] in
+theorem inner_sum_skew (A : ι → E →L[ℝ] E) (hA : ∀ r v, inner ℝ v (A r v) = 0) (c : ι → ℝ)
+    (s : Finset ι) (v : E) : inner ℝ v ((∑ r ∈ s, c r • A r) v) = 0 := by
+  rw [_root_.sum_apply, inner_sum]
+  exact Finset.sum_eq_zero fun r _ => by
+    rw [_root_.smul_apply, inner_smul_right, hA, mul_zero]
+
+/-- [proved-derived; formal-checked] The skew modulation does no work:
+`⟪v, K(c) v⟫ = ⟪v, K_s v⟫`, so `K(c)` is passive whenever `K_s` is. -/
+theorem inner_devK (Ks : E →L[ℝ] E) (A : ι → E →L[ℝ] E) (hA : ∀ r v, inner ℝ v (A r v) = 0)
+    (c : ι → ℝ) (v : E) : inner ℝ v (devK Ks A c v) = inner ℝ v (Ks v) := by
+  rw [devK, _root_.add_apply, inner_add_right, inner_sum_skew A hA c, add_zero]
+
+/-- [proved-derived; formal-checked] **The drive balance.** If `y − p = K(c) x̄ + w` with
+`x̄ = ½(p + y)` (the Cayley solve `(I − ½K)y = (I + ½K)p + w`), then
+`½‖y‖² − ½‖p‖² = ⟪x̄, K_s x̄⟫ + ⟪x̄, w⟫`, i.e. `−⟪x̄, R x̄⟫ + ⟪x̄, W_c c⟫` with `R = −K_s`. -/
+theorem drive_balance (Ks : E →L[ℝ] E) (A : ι → E →L[ℝ] E) (hA : ∀ r v, inner ℝ v (A r v) = 0)
+    (c : ι → ℝ) {y p w : E}
+    (h : y - p = devK Ks A c ((1 / 2 : ℝ) • (p + y)) + w) :
+    (1 / 2 : ℝ) * ‖y‖ ^ 2 - (1 / 2 : ℝ) * ‖p‖ ^ 2 =
+      inner ℝ ((1 / 2 : ℝ) • (p + y)) (Ks ((1 / 2 : ℝ) • (p + y))) +
+        inner ℝ ((1 / 2 : ℝ) • (p + y)) w := by
+  have hl : inner ℝ ((1 / 2 : ℝ) • (p + y)) (y - p) =
+      (1 / 2 : ℝ) * ‖y‖ ^ 2 - (1 / 2 : ℝ) * ‖p‖ ^ 2 := by
+    rw [inner_smul_left, inner_add_left, inner_sub_right, inner_sub_right,
+      real_inner_self_eq_norm_sq, real_inner_self_eq_norm_sq, real_inner_comm p y]
+    simp; ring
+  rw [← hl, h, inner_add_right, inner_devK Ks A hA]
+
+/-- [proved-derived; formal-checked] **The radius composition of the device solve.** Exact solve
+`y − p = K(c) x̄ + W c` (`x̄ = ½(p + y)`), centre solve `y₀ − p₀ = K(c₀) x̄₀ + W c₀ + ρ` with
+residual `ρ`; `K_s` passive, `A_r` skew, `‖p − p₀‖ ≤ r_p`, `‖c − c₀‖ ≤ r_c` (sup norm),
+`Σ‖A_r‖ ≤ F_A`, `‖x̄‖ ≤ X`, `‖W‖ ≤ F_c`. Then `‖y − y₀‖ ≤ r_p + r_c (F_A X + F_c) + ‖ρ‖`. -/
+theorem device_radius (Ks : E →L[ℝ] E) (hKs : ∀ v, inner ℝ v (Ks v) ≤ 0) (A : ι → E →L[ℝ] E)
+    (hA : ∀ r v, inner ℝ v (A r v) = 0) (W : (ι → ℝ) →L[ℝ] E) {c c₀ : ι → ℝ} {y p y₀ p₀ ρ : E}
+    {rp rc FA X Fc : ℝ}
+    (hexact : y - p = devK Ks A c ((1 / 2 : ℝ) • (p + y)) + W c)
+    (hcentre : y₀ - p₀ = devK Ks A c₀ ((1 / 2 : ℝ) • (p₀ + y₀)) + W c₀ + ρ)
+    (hp : ‖p - p₀‖ ≤ rp) (hc : ‖c - c₀‖ ≤ rc) (hFA : ∑ r, ‖A r‖ ≤ FA)
+    (hX : ‖(1 / 2 : ℝ) • (p + y)‖ ≤ X) (hW : ‖W‖ ≤ Fc) :
+    ‖y - y₀‖ ≤ rp + rc * (FA * X + Fc) + ‖ρ‖ := by
+  set xb := (1 / 2 : ℝ) • (p + y)
+  set K₀ := devK Ks A c₀
+  have hK₀ : ∀ v, inner ℝ v (K₀ v) ≤ 0 := fun v => by rw [inner_devK Ks A hA]; exact hKs v
+  have hΔ : devK Ks A c - K₀ = ∑ r, (c r - c₀ r) • A r := by
+    simp only [K₀, devK, add_sub_add_left_eq_sub, ← Finset.sum_sub_distrib, sub_smul]
+  set f := (devK Ks A c - K₀) xb + W (c - c₀) - ρ
+  have hid : (y - y₀) - (p - p₀) = (1 / 2 : ℝ) • K₀ ((y - y₀) + (p - p₀)) + f := by
+    have hsplit : devK Ks A c xb = K₀ xb + (devK Ks A c - K₀) xb := by
+      rw [_root_.sub_apply]; abel
+    have hx : xb - (1 / 2 : ℝ) • (p₀ + y₀) = (1 / 2 : ℝ) • ((y - y₀) + (p - p₀)) := by
+      simp only [xb, ← smul_sub]; congr 1; abel
+    calc (y - y₀) - (p - p₀) = (y - p) - (y₀ - p₀) := by abel
+      _ = K₀ (xb - (1 / 2 : ℝ) • (p₀ + y₀)) + (devK Ks A c - K₀) xb + W (c - c₀) - ρ := by
+          rw [hexact, hcentre, hsplit, map_sub, map_sub]; abel
+      _ = _ := by rw [hx, map_smul]; simp only [f]; abel
+  have hkey := key_contraction K₀ hK₀ hid
+  have hrc : 0 ≤ rc := le_trans (norm_nonneg _) hc
+  have hXn : 0 ≤ X := le_trans (norm_nonneg _) hX
+  have hΔbound : ‖(devK Ks A c - K₀) xb‖ ≤ rc * FA * X := by
+    rw [hΔ]
+    calc ‖(∑ r, (c r - c₀ r) • A r) xb‖ ≤ ‖∑ r, (c r - c₀ r) • A r‖ * ‖xb‖ :=
+          ContinuousLinearMap.le_opNorm _ _
+      _ ≤ (∑ r, rc * ‖A r‖) * X := by
+          apply mul_le_mul _ hX (norm_nonneg _) (Finset.sum_nonneg fun r _ =>
+            mul_nonneg hrc (norm_nonneg _))
+          refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun r _ => ?_)
+          rw [norm_smul]
+          apply mul_le_mul_of_nonneg_right _ (norm_nonneg _)
+          have := norm_le_pi_norm (c - c₀) r
+          simp only [Pi.sub_apply] at this
+          linarith
+      _ ≤ rc * FA * X := by
+          rw [← Finset.mul_sum]
+          have := mul_le_mul_of_nonneg_left hFA hrc
+          nlinarith
+  have hWbound : ‖W (c - c₀)‖ ≤ Fc * rc :=
+    (W.le_opNorm _).trans (mul_le_mul hW hc (norm_nonneg _) (le_trans (norm_nonneg _) hW))
+  have hf : ‖f‖ ≤ rc * FA * X + Fc * rc + ‖ρ‖ := by
+    calc ‖f‖ ≤ ‖(devK Ks A c - K₀) xb + W (c - c₀)‖ + ‖ρ‖ := norm_sub_le _ _
+      _ ≤ ‖(devK Ks A c - K₀) xb‖ + ‖W (c - c₀)‖ + ‖ρ‖ := by
+          gcongr; exact norm_add_le _ _
+      _ ≤ _ := by linarith
+  linarith
+
+/-- [definition] The drive covector `2u − g` of the adjoint solve. -/
+def driveCovector (u g : E) : E := (2 : ℝ) • u - g
+
+/-- [proved-derived; formal-checked] **The adjoint radius.** In a finite-dimensional real
+inner-product space, with `u − ½K(c)† u = g` (so `u = (I − ½K)^(−†) g`) and the centre
+`u₀ − ½K(c₀)† u₀ = g₀`, `K_s` passive and `A_r` skew, `‖g − g₀‖ ≤ r_g`, `‖c − c₀‖ ≤ r_c`,
+`Σ‖A_r‖ ≤ F_A`: `‖u − u₀‖ ≤ r_g + ½ r_c F_A ‖g‖`. -/
+theorem adjoint_radius [FiniteDimensional ℝ E] (Ks : E →L[ℝ] E)
+    (hKs : ∀ v, inner ℝ v (Ks v) ≤ 0) (A : ι → E →L[ℝ] E) (hA : ∀ r v, inner ℝ v (A r v) = 0)
+    {c c₀ : ι → ℝ} {u u₀ g g₀ : E} {rg rc FA : ℝ}
+    (hu : u - (1 / 2 : ℝ) • (ContinuousLinearMap.adjoint (devK Ks A c)) u = g)
+    (hu₀ : u₀ - (1 / 2 : ℝ) • (ContinuousLinearMap.adjoint (devK Ks A c₀)) u₀ = g₀)
+    (hg : ‖g - g₀‖ ≤ rg) (hc : ‖c - c₀‖ ≤ rc) (hFA : ∑ r, ‖A r‖ ≤ FA) :
+    ‖u - u₀‖ ≤ rg + (1 / 2) * rc * FA * ‖g‖ := by
+  have hadjpass : ∀ c' : ι → ℝ, ∀ v,
+      inner ℝ v ((ContinuousLinearMap.adjoint (devK Ks A c')) v) ≤ 0 := by
+    intro c' v
+    rw [ContinuousLinearMap.adjoint_inner_right, real_inner_comm, inner_devK Ks A hA]
+    exact hKs v
+  have hunorm : ‖u‖ ≤ ‖g‖ := resolvent_bound _ (hadjpass c) hu
+  have hrc : 0 ≤ rc := le_trans (norm_nonneg _) hc
+  have hΔ : ‖devK Ks A c - devK Ks A c₀‖ ≤ rc * FA := by
+    simp only [devK, add_sub_add_left_eq_sub, ← Finset.sum_sub_distrib, ← sub_smul]
+    refine (norm_sum_le _ _).trans ?_
+    calc ∑ r, ‖(c r - c₀ r) • A r‖ ≤ ∑ r, rc * ‖A r‖ := Finset.sum_le_sum fun r _ => by
+          rw [norm_smul]
+          apply mul_le_mul_of_nonneg_right _ (norm_nonneg _)
+          have := norm_le_pi_norm (c - c₀) r
+          simp only [Pi.sub_apply] at this
+          linarith
+      _ ≤ rc * FA := by rw [← Finset.mul_sum]; exact mul_le_mul_of_nonneg_left hFA hrc
+  set K₀' := ContinuousLinearMap.adjoint (devK Ks A c₀)
+  set ΔK' := ContinuousLinearMap.adjoint (devK Ks A c - devK Ks A c₀)
+  have hid : (u - u₀) - 0 = (1 / 2 : ℝ) • K₀' ((u - u₀) + 0) + ((g - g₀) + (1 / 2 : ℝ) • ΔK' u) := by
+    have hsplit : ContinuousLinearMap.adjoint (devK Ks A c) = K₀' + ΔK' := by
+      simp only [K₀', ΔK', map_sub]; abel
+    rw [hsplit, _root_.add_apply, smul_add] at hu
+    rw [← hu, ← hu₀, add_zero, sub_zero, map_sub, smul_sub]
+    abel
+  have hkey := key_contraction K₀' (hadjpass c₀) hid
+  have hΔu : ‖ΔK' u‖ ≤ rc * FA * ‖g‖ := by
+    calc ‖ΔK' u‖ ≤ ‖ΔK'‖ * ‖u‖ := ContinuousLinearMap.le_opNorm _ _
+      _ = ‖devK Ks A c - devK Ks A c₀‖ * ‖u‖ := by
+          rw [ContinuousLinearMap.adjoint.norm_map]
+      _ ≤ rc * FA * ‖g‖ := mul_le_mul hΔ hunorm (norm_nonneg _)
+          (le_trans (norm_nonneg _) hΔ)
+  simp only [norm_zero, zero_add] at hkey
+  calc ‖u - u₀‖ ≤ ‖(g - g₀) + (1 / 2 : ℝ) • ΔK' u‖ := hkey
+    _ ≤ ‖g - g₀‖ + (1 / 2) * ‖ΔK' u‖ := by
+        refine (norm_add_le _ _).trans ?_
+        rw [norm_smul]; norm_num
+    _ ≤ rg + (1 / 2) * rc * FA * ‖g‖ := by nlinarith
+
+end Device
 
 end Soma.Holonics.HolonCore

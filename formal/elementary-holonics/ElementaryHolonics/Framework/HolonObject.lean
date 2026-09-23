@@ -155,4 +155,12 @@ open Soma.Holonics.HolonCore
 #print axioms shifted_committed_energy_bound
 #print axioms recentre_contains
 #print axioms device_containment
+#print axioms key_contraction
+#print axioms resolvent_bound
+#print axioms cayley_contraction
+#print axioms cayley_bijective
+#print axioms inner_devK
+#print axioms drive_balance
+#print axioms device_radius
+#print axioms adjoint_radius
 end Audit
