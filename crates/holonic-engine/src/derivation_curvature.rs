@@ -385,9 +385,13 @@ pub const UNIT_RESPONSE: i64 = 1;
 // -------------------------------------------------------------------------------------------------
 
 /// What a 0-cell of the circuit stands for.
+///
+/// Renamed from `SiteKind` (kept as an alias) so it does not collide with
+/// `relational_geometry::winding::SiteKind`, the rotation/hyperbolic reading of a generator
+/// site's trace face. The serde name and variant spellings are unchanged.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case")]
-pub enum SiteKind {
+#[serde(rename = "SiteKind", rename_all = "kebab-case")]
+pub enum CurvatureSiteKind {
     /// A passage vertex: one declaration the deposit carried or the conditioned body emitted.
     Passage,
     /// A recruited identifier.
@@ -396,6 +400,9 @@ pub enum SiteKind {
     Statement,
 }
 
+/// The former name of [`CurvatureSiteKind`].
+pub type SiteKind = CurvatureSiteKind;
+
 /// One 0-cell of the circuit, as a site of the layout.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct LayoutSite {
@@ -403,7 +410,7 @@ pub struct LayoutSite {
     pub cell: CausalCellId,
     /// The cell's own name: a declaration name, a recruited identifier, or `|- <statement>`.
     pub name: String,
-    pub kind: SiteKind,
+    pub kind: CurvatureSiteKind,
     /// Every passage that founded this cell, by name, in population order.
     pub passages: Vec<String>,
     /// Whether every passage that founded this cell was emitted rather than deposited.
@@ -487,11 +494,11 @@ impl DerivationLayout {
         for cell in complex.cells().values().filter(|cell| cell.grade == 0) {
             let vertex = VertexId(sites.len() as u64 + 1);
             let kind = if passage_keys.contains(&cell.name) {
-                SiteKind::Passage
+                CurvatureSiteKind::Passage
             } else if statement_keys.contains(&cell.name) {
-                SiteKind::Statement
+                CurvatureSiteKind::Statement
             } else {
-                SiteKind::Symbol
+                CurvatureSiteKind::Symbol
             };
             let (passages, derived_only) = named(cell.id);
             site_of_cell.insert(cell.id, vertex);
@@ -619,7 +626,7 @@ impl DerivationLayout {
     }
 
     /// The sites of one kind, in population order.
-    pub fn of_kind(&self, kind: SiteKind) -> Vec<&LayoutSite> {
+    pub fn of_kind(&self, kind: CurvatureSiteKind) -> Vec<&LayoutSite> {
         self.sites
             .values()
             .filter(|site| site.kind == kind)
@@ -789,7 +796,7 @@ pub struct NamedDeficit {
     pub vertex: VertexId,
     pub cell: CausalCellId,
     pub name: String,
-    pub kind: SiteKind,
+    pub kind: CurvatureSiteKind,
     pub derived_only: bool,
     /// The derivation's own coordination: how many 1-cells of the circuit meet this site.
     pub coordination: usize,
@@ -900,7 +907,7 @@ impl FrameAgreement {
 pub struct MovedDeficit {
     pub vertex: VertexId,
     pub name: String,
-    pub kind: SiteKind,
+    pub kind: CurvatureSiteKind,
     pub before: Rat,
     pub after: Rat,
     pub passages: Vec<String>,
@@ -969,7 +976,7 @@ impl NamedFlowStep {
 pub struct DisplacedSite {
     pub vertex: VertexId,
     pub name: String,
-    pub kind: SiteKind,
+    pub kind: CurvatureSiteKind,
     pub passages: Vec<String>,
     /// The position `local_star`'s event law returns from the standing as founded.
     pub without_consumption: RatVec3,
@@ -1563,7 +1570,7 @@ impl DerivationCurvatureBody {
                         .vertices
                         .get(vertex)
                         .map_or_else(|| format!("{vertex:?}"), |found| found.name.clone()),
-                    SiteKind::Symbol,
+                    CurvatureSiteKind::Symbol,
                     Vec::new(),
                 ),
             };
@@ -1780,13 +1787,19 @@ mod tests {
         assert_eq!(layout.incidences().len(), 4);
 
         let alpha = named(&layout, "alpha");
-        assert_eq!(layout.site(alpha).expect("carried").kind, SiteKind::Passage);
+        assert_eq!(
+            layout.site(alpha).expect("carried").kind,
+            CurvatureSiteKind::Passage
+        );
         assert_eq!(
             layout.site(alpha).expect("carried").passages,
             vec!["alpha".to_owned()]
         );
         let carry = named(&layout, "carryOne");
-        assert_eq!(layout.site(carry).expect("carried").kind, SiteKind::Symbol);
+        assert_eq!(
+            layout.site(carry).expect("carried").kind,
+            CurvatureSiteKind::Symbol
+        );
         // A symbol both declarations recruit is founded by both, and the deficit that lands on it
         // must say so rather than name one.
         assert_eq!(
@@ -2061,7 +2074,7 @@ mod tests {
         assert_eq!(centre.combinatorial_charge, 3);
         for leaf in deficits
             .iter()
-            .filter(|named| named.kind == SiteKind::Symbol)
+            .filter(|named| named.kind == CurvatureSiteKind::Symbol)
         {
             assert_eq!(leaf.coordination, 1);
             assert_eq!(leaf.deficit, integer(5));
@@ -2194,7 +2207,7 @@ mod tests {
         assert_eq!(centre.deficit, integer(-6));
         for leaf in deficits
             .iter()
-            .filter(|named| named.kind == SiteKind::Symbol)
+            .filter(|named| named.kind == CurvatureSiteKind::Symbol)
         {
             assert_eq!(leaf.deficit, integer(2));
         }

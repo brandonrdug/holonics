@@ -200,6 +200,13 @@ fn one() -> Rat {
 /// which checks the extent, the generator count, the squareness of every map and the agreement of
 /// the declared names with the declared maps. There is no `Default` and no `Deserialize`, so a
 /// wire cannot mint a family whose names and maps disagree.
+///
+/// [definition; agent-inferred] **The linear-map chart of a generator family.** Each member is
+/// the finite exact linear passage a generator induces on this carrier, not the generator itself:
+/// a core `holonic_core::generator::Generator` (transport, initial configuration, clock, phase
+/// lift) enters here only through its induced map, e.g. one Cayley tick of a `Transport::Linear`
+/// is the member `(I − hA/2)⁻¹(I + hA/2)`. The initial configuration, clock and winding are not
+/// retained by this chart; standing sufficiency is read over the passages alone.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct GeneratorFamily {
     lineage: String,

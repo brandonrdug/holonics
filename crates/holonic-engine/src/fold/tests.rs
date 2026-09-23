@@ -1835,3 +1835,19 @@ fn no_float_token_occurs_in_this_owners_sources() {
         assert!(scanned > 200, "{name}: the scan covered only {scanned} lines");
     }
 }
+
+/// **The fold complex is a chart of the core complex (plan phase 4).** One core cell per vertex,
+/// edge and triangle; the core rational Betti numbers are the Smith-normal-form Betti vector of
+/// the existing owner, before and after the annulus cut.
+#[test]
+fn the_fold_complex_is_the_core_complex_with_the_same_betti_numbers() {
+    let complex = annulus();
+    let chart = complex.core_chart().expect("the chart stands");
+    let core = chart.complex();
+    assert_eq!(core.cells(0), complex.vertex_count());
+    assert_eq!(core.cells(1), complex.edges().len());
+    assert_eq!(core.cells(2), complex.triangles().len());
+    let rational: Vec<usize> = (0..=2).map(|k| core.betti(k).unwrap()).collect();
+    assert_eq!(Ok(rational), complex.betti());
+    assert!(core.kirchhoff().expect("Dirac").tellegen().unwrap() > 0);
+}

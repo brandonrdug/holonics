@@ -1839,3 +1839,83 @@ fn the_hodge_receiver_measures_the_m5_spectra() {
         "the designed structure's spectral gap is strictly above both predictions'"
     );
 }
+
+// ---------------------------------------------------------------------------------------------
+// the operator as the core complex and its metric storage (plan phase 4)
+// ---------------------------------------------------------------------------------------------
+
+/// **The operator's `d`, weighted adjoint and Laplacian are the core complex's under the metric
+/// storage.** On the free condition the operator's chart is the graded complex's own chart; its
+/// `d_k` is the core coboundary, its `δ_k` the core `codifferential(k, W_k, W_(k+1))` and its
+/// `Δ_k` the core `hodge_laplacian`, entry for entry. The Kirchhoff structure of the chart's `d₀`
+/// is Dirac and passes Tellegen (`Holon/Dirac.lean::tellegen`). On a relative condition the chart
+/// is the relative complex, whose Betti numbers are the relative Hodge reading's.
+#[test]
+fn the_operator_is_the_core_complex_with_its_metric_as_storage() {
+    let founded = found(4, &[(0, 1), (0, 2), (1, 2), (2, 3)], &[[0, 1, 2]]);
+    let metric = MetricDeclaration::per_grade(
+        "vertices two, edges three halves, faces five",
+        [(0, integer(2)), (1, ratio(3, 2)), (2, integer(5))],
+    );
+    let operator = operator_of(&founded, &metric, &BoundaryCondition::Free);
+    let chart = operator.core_chart().expect("the chart stands");
+    assert_eq!(
+        &chart,
+        &founded
+            .complex
+            .core_chart()
+            .expect("the complex's own chart"),
+        "the free operator's chart is its complex's"
+    );
+    let core = chart.complex();
+    let storages = operator.metric_storages().expect("every grade's storage");
+    assert_eq!(storages.len(), 3);
+    for grade in 0..=2_u32 {
+        let k = grade as usize;
+        assert_eq!(chart.cells(k), operator.cells(grade));
+        if grade < 2 {
+            assert_eq!(
+                core.coboundary(k).unwrap().expect("d_k"),
+                operator.coboundary(grade).unwrap()
+            );
+            assert_eq!(
+                core.codifferential(k, &storages[k], &storages[k + 1])
+                    .unwrap(),
+                operator.codifferential(grade).unwrap()
+            );
+        }
+        assert_eq!(
+            core.hodge_laplacian(k, &storages).unwrap(),
+            operator.laplacian(grade).unwrap()
+        );
+        assert_eq!(
+            core.betti(k).unwrap(),
+            hodge_reading(&operator, grade).unwrap().betti
+        );
+    }
+    let kirchhoff = core.kirchhoff().expect("the Kirchhoff structure is Dirac");
+    assert!(kirchhoff.tellegen().expect("Tellegen on the structure") > 0);
+    let sheaf = rank_one_sheaf(&founded.complex).expect("the rank-one sheaf");
+    assert_eq!(&sheaf.core_chart().expect("the sheaf's base chart"), &chart);
+    for k in 0..2 {
+        assert_eq!(
+            sheaf.coboundary(k as u32).expect("the sheaf coboundary"),
+            core.coboundary(k).unwrap().expect("d_k"),
+            "the rank-one sheaf coboundary is the core d"
+        );
+    }
+
+    let held = BoundaryCondition::VanishingOn {
+        lineage: "the last occurrence is held at zero".to_owned(),
+        cells: BTreeSet::from([founded.vertices[3]]),
+    };
+    let relative = operator_of(&founded, &metric, &held);
+    let relative_chart = relative.core_chart().expect("the relative chart");
+    assert_eq!(relative_chart.cells(0).len(), 3);
+    for grade in 0..=2_u32 {
+        assert_eq!(
+            relative_chart.complex().betti(grade as usize).unwrap(),
+            hodge_reading(&relative, grade).unwrap().betti
+        );
+    }
+}

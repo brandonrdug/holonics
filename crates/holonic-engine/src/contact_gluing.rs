@@ -140,6 +140,17 @@ pub struct ContactComplex {
 }
 
 impl ContactComplex {
+    /// [definition] **The incidence as the core complex `K`** (plan phase 4): the word's cover as a one-dimensional core complex (offsets and unit steps); the occurrences
+    /// are subcomplexes named on the engine side.
+    /// The chart reads the carried [`crate::GradedCausalComplex`] through
+    /// [`crate::GradedCausalComplex::core_chart`]; this type's other fields stay on the engine
+    /// presentation.
+    pub fn core_chart(
+        &self,
+    ) -> Result<crate::algebraic::CoreCellChart, crate::algebraic::CoreChartRefusal> {
+        self.complex.core_chart()
+    }
+
     /// The cells of every occurrence of one stem, together with their endpoints — a subcomplex,
     /// which is what `read_cover` requires and refuses without.
     pub fn section(&self, stem: &str) -> Result<BTreeSet<CausalCellId>, ContactGluingRefusal> {

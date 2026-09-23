@@ -470,6 +470,37 @@ impl DiscreteCurrentComplex {
     }
 }
 
+// The current complex as the core complex `K` (plan phase 4).
+impl DiscreteCurrentComplex {
+    /// [definition] **The current complex as the core graph complex**: its nodes and oriented
+    /// branches, `∂₁` with `−1` at each source and `+1` at each target. [`Self::conservation`]'s
+    /// `boundary_current` (incoming minus outgoing) is exactly `∂₁ J` of the branch currents in the
+    /// chart's order (tested). A branch whose endpoint is not a declared node is refused, and so is
+    /// a self-loop: `conservation` reads it once as incoming at its node, while its core boundary
+    /// cancels, so the two would disagree and the chart does not paper over that.
+    pub fn graph_chart(
+        &self,
+    ) -> Result<
+        crate::algebraic::GraphChart<CurrentNodeId, CurrentBranchId>,
+        crate::algebraic::CoreChartRefusal,
+    > {
+        for (at, branch) in self.branches.values().enumerate() {
+            if branch.source == branch.target {
+                return Err(crate::algebraic::CoreChartRefusal::NotACoreCell {
+                    edge: at,
+                    reason: "a self-loop is read once as incoming by the conservation receipt",
+                });
+            }
+        }
+        crate::algebraic::GraphChart::new(
+            self.nodes.iter().copied(),
+            self.branches
+                .values()
+                .map(|branch| (branch.id, branch.source, branch.target)),
+        )
+    }
+}
+
 /// KVL as an exact boundary-of-boundary relation.  Potentials are declared
 /// at nodes; each branch drop is target minus source.  A completed closed word
 /// telescopes to zero, while an unfinished word carries its endpoint
@@ -800,6 +831,68 @@ mod tests {
         assert!(cycle.closed);
         assert!(cycle.loop_sum.is_zero());
         assert!(cycle.exact_residual.is_zero());
+    }
+
+    /// **The conservation receipt is the core boundary** (plan phase 4): `boundary_current` is
+    /// `∂₁ J` on the chart, the closed potential word is the Stokes pairing `⟨d₀ φ, z⟩ = ⟨φ, ∂₁ z⟩ = 0`
+    /// on the cycle `z`, and a self-loop is refused by name.
+    #[test]
+    fn the_current_complex_is_the_core_graph_and_conservation_is_its_boundary() {
+        let (first, second, third) = (CurrentNodeId(1), CurrentNodeId(2), CurrentNodeId(3));
+        let branch = |id, source, target, current: i64| OrientedCurrentBranch {
+            id: CurrentBranchId(id),
+            source,
+            target,
+            current: integer(current),
+            unit: "ampere".to_owned(),
+        };
+        let mut complex = DiscreteCurrentComplex {
+            schema: "test".to_owned(),
+            nodes: BTreeSet::from([first, second, third]),
+            branches: [
+                branch(1, first, second, 3),
+                branch(2, second, third, -2),
+                branch(3, third, first, 5),
+            ]
+            .into_iter()
+            .map(|branch| (branch.id, branch))
+            .collect(),
+            sources: BTreeMap::new(),
+        };
+        let chart = complex.graph_chart().unwrap();
+        let currents: Vec<Rat> = chart
+            .edges()
+            .iter()
+            .map(|id| complex.branches[id].current.clone())
+            .collect();
+        let boundary = chart
+            .complex()
+            .boundary(1)
+            .unwrap()
+            .apply(&currents)
+            .unwrap();
+        let receipt = complex.conservation().unwrap();
+        for (at, node) in chart.vertices().iter().enumerate() {
+            let balance = receipt.balances.iter().find(|b| b.node == *node).unwrap();
+            assert_eq!(boundary[at], balance.boundary_current);
+        }
+        let potential = vec![integer(2), integer(5), integer(-1)];
+        let cycle = vec![integer(1), integer(1), integer(1)];
+        let (drops_against_cycle, potential_against_boundary) = holonic_core::dirac::tellegen(
+            &chart.complex().incidence().unwrap(),
+            &potential,
+            &cycle,
+        )
+        .unwrap();
+        assert!(drops_against_cycle.is_zero() && potential_against_boundary.is_zero());
+
+        complex
+            .branches
+            .insert(CurrentBranchId(4), branch(4, second, second, 1));
+        assert!(matches!(
+            complex.graph_chart(),
+            Err(crate::algebraic::CoreChartRefusal::NotACoreCell { edge: 3, .. })
+        ));
     }
 
     #[test]

@@ -984,3 +984,37 @@ fn dropping_both_edge_maps_cannot_change_the_complex_seen_by_rigidity() {
     // Hodge would still see this edge in `complex`, while rigidity formerly read just the map.
     assert!(matches!(member.validate_structure(), Err(ConstraintGradingError::MemberInvariant(_))));
 }
+
+/// **Each member of the constraint family is a core complex (plan phase 4)**, the two bounds being
+/// two complexes, not one: the refusing member's core chart carries the presented incidence and the
+/// admitting member's carries the founded open cells in addition.
+#[test]
+fn each_family_member_is_its_own_core_complex() {
+    let family = graded_constraint_family(&presentation()).expect("the family");
+    let refusing = family.refusing.core_chart().expect("the refusing chart");
+    let admitting = family.admitting.core_chart().expect("the admitting chart");
+    assert_eq!(
+        refusing.complex().cells(0),
+        admitting.complex().cells(0),
+        "the open class adds no vertex"
+    );
+    assert!(
+        admitting.complex().cells(1) > refusing.complex().cells(1),
+        "the admitting bound founds the open 1-cells"
+    );
+    for (member, chart) in [
+        (&family.refusing, &refusing),
+        (&family.admitting, &admitting),
+    ] {
+        let invariants = crate::rebase_invariants::rebase_invariants(
+            &member.complex,
+            crate::rebase_invariants::PivotRule::SmallestMagnitude,
+        )
+        .expect("the Smith owner");
+        let rational: Vec<usize> = (0..=chart.complex().dimension())
+            .map(|k| chart.complex().betti(k).unwrap())
+            .collect();
+        let smith = invariants.betti_vector();
+        assert_eq!(&rational[..], &smith[..rational.len()]);
+    }
+}

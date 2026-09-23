@@ -217,6 +217,18 @@ pub struct ExactCellularSheaf {
 }
 
 impl ExactCellularSheaf {
+    /// [definition] **The incidence as the core complex `K`** (plan phase 4): the sheaf's base complex. With every stalk of rank one and every restriction the identity
+    /// the sheaf coboundary is this complex's `d`; higher stalks are a matrix-valued incidence the
+    /// scalar core connection does not carry.
+    /// The chart reads the carried [`crate::GradedCausalComplex`] through
+    /// [`crate::GradedCausalComplex::core_chart`]; this type's other fields stay on the engine
+    /// presentation.
+    pub fn core_chart(
+        &self,
+    ) -> Result<crate::algebraic::CoreCellChart, crate::algebraic::CoreChartRefusal> {
+        self.complex.core_chart()
+    }
+
     pub fn new(
         complex: GradedCausalComplex,
         stalk_dimensions: BTreeMap<CausalCellId, usize>,

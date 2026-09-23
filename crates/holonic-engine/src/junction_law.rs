@@ -1539,6 +1539,25 @@ impl ResistiveNetwork {
         let drops = self.operator.coboundary(0)?.apply(&potential)?;
         tellegen(&self.operator, 0, &potential, &drops, &self.units)
     }
+
+    /// [definition] **The network as the core complex** (plan phase 4): its operator's chart, one
+    /// 0-cell per node and one 1-cell per branch in declaration order, `d₀` the branch drop map.
+    /// The circuit is this complex with two element relations: the conductance
+    /// ([`Self::conductance_relation`]) and the free nodal injection port.
+    pub fn core_chart(&self) -> Result<crate::algebraic::CoreCellChart, JunctionRefusal> {
+        Ok(self.operator.core_chart()?)
+    }
+
+    /// [definition] **Ohm's law as the core resistive element** `e_R = −G f_R` on the branch drops
+    /// `f_R = d₀ v`, certified passive by its inertia (`G` is diagonal and strictly positive). Its
+    /// dissipation `⟨u, G u⟩` is the Tellegen ledger's dissipated power at those drops.
+    pub fn conductance_relation(
+        &self,
+    ) -> Result<holonic_core::element::ResistiveRelation, JunctionRefusal> {
+        let conductance = ExactRatMatrix::from_diagonal(self.conductances.clone())?;
+        holonic_core::element::ResistiveRelation::new(conductance)
+            .map_err(|error| JunctionRefusal::Hodge(HodgeError::Core(Box::new(error.into()))))
+    }
 }
 
 /// The complete affine solution of the nodal equation.

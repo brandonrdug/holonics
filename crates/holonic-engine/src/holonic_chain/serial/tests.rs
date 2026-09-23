@@ -339,3 +339,34 @@ fn cayley_secant_remainder_matches_the_instantaneous_serial_column() {
         chain.spatial_jacobian().unwrap()[0].velocity(&chain.endpoint().translation)
     );
 }
+
+/// The joint clock is a derived affine chart of the one core clock: `origin + rate · h · ticks`,
+/// inverted by `origin_on`, and at rest it reads the origin.
+#[test]
+fn joint_clock_is_a_derived_chart_of_the_core_clock() {
+    let mut clock = CoreClock::ring(rat(1, 4), 3).unwrap();
+    let rest = JointClock::on_clock(&clock, rat(1, 2), rat(2, 1));
+    assert_eq!(rest, JointClock::new(rat(1, 2), rat(2, 1)));
+    clock.advance(&7u32.into());
+    let read = JointClock::on_clock(&clock, rat(1, 2), rat(2, 1));
+    // elapsed = 7/4, so the coordinate is 1/2 + 2·7/4 = 4.
+    assert_eq!(read.coordinate(), &rat(4, 1));
+    assert_eq!(read.origin_on(&clock), rat(1, 2));
+    assert_eq!(
+        JointClock::on_clock(&clock, read.origin_on(&clock), read.rate().clone()),
+        read
+    );
+    // The motion's own joint clock is this chart at rest.
+    let motion = JointMotion::prismatic(RatVec3::from_i64(1, 0, 0), rat(3, 1), rat(5, 1));
+    let JointMotion::Prismatic { clock: joint, .. } = &motion else {
+        unreachable!()
+    };
+    assert_eq!(
+        joint,
+        &JointClock::on_clock(
+            &CoreClock::unwound(rat(1, 1)).unwrap(),
+            rat(3, 1),
+            rat(5, 1)
+        )
+    );
+}

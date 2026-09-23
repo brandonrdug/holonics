@@ -124,6 +124,25 @@ impl<S, E> ExactConfigurationComplex<S, E> {
         })
     }
 
+    /// [definition] **The configuration graph as the core complex `K`** (plan phase 4): one 0-cell
+    /// per configuration cell and one 1-cell per adjacency, oriented `left → right` (the
+    /// canonical order `new` already imposes), edges identified by their adjacency index. The
+    /// measures and crossing actions are this complex's element data and stay here.
+    pub fn graph_chart(
+        &self,
+    ) -> Result<
+        crate::algebraic::GraphChart<ConfigurationCellId, usize>,
+        crate::algebraic::CoreChartRefusal,
+    > {
+        crate::algebraic::GraphChart::new(
+            self.cells.keys().copied(),
+            self.adjacency
+                .iter()
+                .enumerate()
+                .map(|(at, edge)| (at, edge.left, edge.right)),
+        )
+    }
+
     pub fn total_measure(&self) -> Rat {
         self.cells
             .values()

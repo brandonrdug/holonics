@@ -262,6 +262,17 @@ pub struct GradedConstraintComplex {
 }
 
 impl GradedConstraintComplex {
+    /// [definition] **The incidence as the core complex `K`** (plan phase 4): one member of the constraint family. A presented `PhysicalConstraintComplex` with open
+    /// contacts is a family of core complexes, one per resolution, never one.
+    /// The chart reads the carried [`crate::GradedCausalComplex`] through
+    /// [`crate::GradedCausalComplex::core_chart`]; this type's other fields stay on the engine
+    /// presentation.
+    pub fn core_chart(
+        &self,
+    ) -> Result<crate::algebraic::CoreCellChart, crate::algebraic::CoreChartRefusal> {
+        self.complex.core_chart()
+    }
+
     /// Validate the structural coherence needed by downstream Hodge/rigidity consumers.
     ///
     /// This checks the remounted report's own algebraic carrier and maps; it does not claim to

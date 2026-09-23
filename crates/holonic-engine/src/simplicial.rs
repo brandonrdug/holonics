@@ -18,6 +18,9 @@ use crate::{
     NativeConicPopulation,
 };
 
+// The complex as the core complex and the dilation transports as the core connection (plan phase 4).
+mod core_connection;
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct VertexId(pub u64);
 

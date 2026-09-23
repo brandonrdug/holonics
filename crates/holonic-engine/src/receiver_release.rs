@@ -190,13 +190,22 @@ impl fmt::Display for GeneratorSource {
 }
 
 /// One generator of an exact zonotope: a column of exact rationals with the source it came from.
+///
+/// Renamed from `Generator` (kept as an alias) so it does not collide with the core
+/// `holonic_core::generator::Generator` (transport, initial configuration, clock, phase lift); a
+/// zonotope column is a direction of an exact set, not a clocked transport. The serde name and
+/// shape are unchanged.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Generator {
+#[serde(rename = "Generator")]
+pub struct ZonotopeGenerator {
     /// Where the unresolved direction came from.
     pub source: GeneratorSource,
     /// The column itself, of the zonotope's dimension.
     pub column: Vec<Rat>,
 }
+
+/// The former name of [`ZonotopeGenerator`].
+pub type Generator = ZonotopeGenerator;
 
 /// **An exact zonotope** `{ c + G e : e ∈ [−1, 1]^k }` over `Q`.
 ///
@@ -208,7 +217,7 @@ pub struct Generator {
 pub struct ExactZonotope {
     dimension: usize,
     center: Vec<Rat>,
-    generators: Vec<Generator>,
+    generators: Vec<ZonotopeGenerator>,
 }
 
 /// The wire an [`ExactZonotope`] deserializes from. It carries no invariant, and
@@ -218,7 +227,7 @@ pub struct ExactZonotope {
 #[derive(Deserialize)]
 struct ExactZonotopeWire {
     center: Vec<Rat>,
-    generators: Vec<Generator>,
+    generators: Vec<ZonotopeGenerator>,
 }
 
 impl TryFrom<ExactZonotopeWire> for ExactZonotope {
@@ -263,7 +272,7 @@ impl ExactZonotope {
             }
             let mut column = vec![Rat::zero(); dimension];
             column[coordinate] = half_width.clone();
-            generators.push(Generator {
+            generators.push(ZonotopeGenerator {
                 source: GeneratorSource::CompatibleState { coordinate },
                 column,
             });
@@ -277,7 +286,10 @@ impl ExactZonotope {
 
     /// A zonotope from a declared centre and declared generators, each checked against the
     /// dimension and the ceiling.
-    pub fn declared(center: Vec<Rat>, generators: Vec<Generator>) -> Result<Self, WidthRefusal> {
+    pub fn declared(
+        center: Vec<Rat>,
+        generators: Vec<ZonotopeGenerator>,
+    ) -> Result<Self, WidthRefusal> {
         let dimension = center.len();
         if dimension == 0 {
             return Err(WidthRefusal::EmptyDimension);
@@ -314,7 +326,7 @@ impl ExactZonotope {
     }
 
     /// The exact generators, in declaration order.
-    pub fn generators(&self) -> &[Generator] {
+    pub fn generators(&self) -> &[ZonotopeGenerator] {
         &self.generators
     }
 
@@ -329,7 +341,7 @@ impl ExactZonotope {
         let center = map.apply(&self.center)?;
         let mut generators = Vec::with_capacity(self.generators.len());
         for generator in &self.generators {
-            generators.push(Generator {
+            generators.push(ZonotopeGenerator {
                 source: generator.source,
                 column: map.apply(&generator.column)?,
             });
@@ -541,7 +553,7 @@ pub fn horizon_image(
                 .generators
                 .into_iter()
                 .enumerate()
-                .map(|(port, generator)| Generator {
+                .map(|(port, generator)| ZonotopeGenerator {
                     source: GeneratorSource::AdmittedInput { step, port },
                     column: generator.column,
                 })

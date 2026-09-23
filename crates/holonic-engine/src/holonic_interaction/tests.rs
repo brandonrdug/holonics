@@ -1655,3 +1655,58 @@ mod core_holon {
         );
     }
 }
+
+// ---------------------------------------------------------------------------------------------
+// one clock: the declaration over the core clock
+// ---------------------------------------------------------------------------------------------
+
+/// The declared clock is the core clock with lineage and unit attached; its wire is byte-identical
+/// to the former derived `{lineage, duration, unit}` shape, and a ticked core clock is refused.
+#[test]
+fn the_declared_clock_is_the_core_clock_with_an_unchanged_wire() {
+    #[derive(serde::Serialize)]
+    #[serde(rename = "Clock")]
+    struct FormerClock {
+        lineage: String,
+        duration: Rat,
+        unit: String,
+    }
+    let clock = Clock::declared("test|clock|wire", rat(3, 7), "declared-energy-unit").unwrap();
+    let former = FormerClock {
+        lineage: "test|clock|wire".to_owned(),
+        duration: rat(3, 7),
+        unit: "declared-energy-unit".to_owned(),
+    };
+    assert_eq!(
+        serde_json::to_vec(&clock).unwrap(),
+        serde_json::to_vec(&former).unwrap()
+    );
+    assert_eq!(
+        serde_json::to_vec_pretty(&clock).unwrap(),
+        serde_json::to_vec_pretty(&former).unwrap()
+    );
+    // The core chart: step h, no ring, at rest.
+    assert_eq!(clock.core().step(), &rat(3, 7));
+    assert!(clock.core().radices().is_empty() && clock.core().is_at_rest());
+    assert_eq!(
+        Clock::from_core(
+            "test|clock|wire",
+            clock.core().clone(),
+            "declared-energy-unit"
+        )
+        .unwrap(),
+        clock
+    );
+    let ring = clock.on_ring(vec![5u32.into()]).unwrap();
+    assert_eq!(ring.step(), clock.duration());
+    assert!(matches!(
+        Clock::from_core("test|clock|wire", ring, "unit"),
+        Err(InteractionRefusal::ClockNotDeclarable { levels: 1, .. })
+    ));
+    let mut ticked = clock.core().clone();
+    ticked.advance(&2u32.into());
+    assert!(matches!(
+        Clock::from_core("test|clock|wire", ticked, "unit"),
+        Err(InteractionRefusal::ClockNotDeclarable { levels: 0, .. })
+    ));
+}

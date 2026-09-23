@@ -950,6 +950,7 @@ dependencies = [
 name = "holonics-hna"
 version = "0.1.0"
 dependencies = [
+ "holonic-core",
  "holonic-engine",
  "holonics-circulation-abi",
  "life",

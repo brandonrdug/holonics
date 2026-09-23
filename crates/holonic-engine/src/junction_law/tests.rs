@@ -1295,3 +1295,40 @@ fn a_declared_joint_is_one_core_port_and_round_trips() {
     let (value, core) = quantity.to_core().unwrap();
     assert_eq!(Quantity::from_core(value, &base, &core).unwrap(), quantity);
 }
+
+/// **The network is the core complex with a certified resistive element (plan phase 4).** The
+/// chart's `d₀` is the operator's; the Kirchhoff structure of the chart is Dirac and passes Tellegen
+/// on its basis; `junction_law::tellegen` equals `holonic_core::dirac::tellegen` on the chart's
+/// incidence at the solved potential and the Ohmic flux; the conductance relation's dissipation is
+/// the ledger's dissipated power.
+#[test]
+fn the_network_is_the_core_complex_and_its_ledger_is_core_tellegen() {
+    let network = two_loop_network();
+    let chart = network.core_chart().expect("the chart stands");
+    let core = chart.complex();
+    let incidence = core.incidence().expect("d₀");
+    assert_eq!(incidence, network.operator().coboundary(0).unwrap());
+    assert_eq!(chart.cells(0), network.nodes());
+    assert_eq!((core.betti(0).unwrap(), core.betti(1).unwrap()), (1, 2));
+    let kirchhoff = core.kirchhoff().expect("Dirac");
+    assert!(kirchhoff.tellegen().expect("isotropic") > 0);
+
+    let injection = vec![Rat::one(), Rat::zero(), -Rat::one(), Rat::zero()];
+    let solution = network.solve(&injection).expect("the solve returns");
+    let receipt = network
+        .power_ledger(&solution.potentials)
+        .expect("the ledger returns");
+    let (drops_against_flux, potential_against_source) =
+        holonic_core::dirac::tellegen(&incidence, &solution.potentials, &solution.currents)
+            .unwrap();
+    assert_eq!(&drops_against_flux, receipt.dissipated.parts().0);
+    assert_eq!(&potential_against_source, receipt.delivered.parts().0);
+    assert_eq!(drops_against_flux, potential_against_source);
+
+    let ohm = network.conductance_relation().expect("passive");
+    assert_eq!(ohm.inertia().negative, 0);
+    assert_eq!(
+        &ohm.dissipation(&solution.drops).unwrap(),
+        receipt.dissipated.parts().0
+    );
+}

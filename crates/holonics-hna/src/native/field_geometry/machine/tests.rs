@@ -280,3 +280,228 @@ fn malformed_rate_carrier_is_rejected_on_deserialize() {
     let result = serde_json::from_value::<GeneratorMachineSpec>(value);
     assert!(result.is_err());
 }
+
+// ---------------------------------------------------------------------------------------------
+// one clock and one generator
+// ---------------------------------------------------------------------------------------------
+
+fn rational(numerator: i64, denominator: i64) -> Rat {
+    Rat::new(BigInt::from(numerator), BigInt::from(denominator))
+}
+
+/// A quarter turn about the z axis through the pivot `(1, 2, 0)`: period 4, `R + I` invertible.
+fn quarter_turn_site(id: &str) -> GeneratorSiteSpec {
+    let mut value = site(id, RatVec3::from_i64(3, -1, 5));
+    value.phase = PhaseSpec {
+        parameter: r(1),
+        extra_turns: 2,
+        origin_exponent: 0,
+        step: AffineMap3::rotation_about(
+            &RatVec3::from_i64(1, 2, 0),
+            RatMat3::from_i64([[0, -1, 0], [1, 0, 0], [0, 0, 1]]),
+        ),
+        period: Some(4),
+    };
+    value.clock.duration = rational(1, 3);
+    value
+}
+
+fn compiled_site(spec: GeneratorSiteSpec) -> CompiledGeneratorSite {
+    GeneratorMachineSpec::declare("world", units(), vec![spec], vec![], vec![])
+        .expect("declared site")
+        .compile()
+        .expect("compiled site")
+        .sites()[0]
+        .clone()
+}
+
+fn point(values: &[Rat]) -> RatVec3 {
+    RatVec3::new(values[0].clone(), values[1].clone(), values[2].clone())
+}
+
+/// The wire form is byte-identical to the former derive and converts losslessly to and from the
+/// declared engine clock and the unwound core clock at rest; a ring or reading is refused.
+#[test]
+fn clock_spec_is_the_lossless_wire_of_the_one_clock() {
+    #[derive(Serialize)]
+    struct FormerClockSpec {
+        lineage: String,
+        duration: Rat,
+        unit: String,
+    }
+    let spec = ClockSpec {
+        lineage: "site|clock".into(),
+        duration: rational(5, 7),
+        unit: "s".into(),
+    };
+    let former = FormerClockSpec {
+        lineage: "site|clock".into(),
+        duration: rational(5, 7),
+        unit: "s".into(),
+    };
+    assert_eq!(
+        serde_json::to_vec(&spec).unwrap(),
+        serde_json::to_vec(&former).unwrap()
+    );
+    let clock = Clock::try_from(&spec).expect("declared clock");
+    // The engine clock's wire is the spec's wire, byte for byte.
+    assert_eq!(
+        serde_json::to_vec(&clock).unwrap(),
+        serde_json::to_vec(&spec).unwrap()
+    );
+    assert_eq!(ClockSpec::from(&clock), spec);
+    let core = spec.core_clock().expect("core clock");
+    assert_eq!(core.step(), &spec.duration);
+    assert!(core.radices().is_empty() && core.is_at_rest());
+    assert_eq!(
+        ClockSpec::from_core("site|clock", core.clone(), "s").expect("wire of core"),
+        spec
+    );
+    let ring = clock.on_ring(vec![BigUint::from(3u32)]).expect("ring");
+    assert!(matches!(
+        ClockSpec::from_core("site|clock", ring, "s"),
+        Err(MachineError::Clock(
+            InteractionRefusal::ClockNotDeclarable { levels: 1, .. }
+        ))
+    ));
+    let mut ticked = core;
+    ticked.advance(&BigUint::one());
+    assert!(ClockSpec::from_core("site|clock", ticked, "s").is_err());
+    // Deserialization still refuses an unknown field.
+    let mut value = serde_json::to_value(&spec).unwrap();
+    value["ring"] = serde_json::json!(3);
+    assert!(serde_json::from_value::<ClockSpec>(value).is_err());
+}
+
+/// The whole machine wire is unchanged by carrying its clocks through the core clock: a
+/// serialize/deserialize/serialize cycle is byte-identical, and each compiled clock's wire is
+/// its declared spec.
+#[test]
+fn machine_wire_is_byte_identical_through_the_core_clock() {
+    let spec = declaration();
+    let first = serde_json::to_vec(&spec).unwrap();
+    let decoded: GeneratorMachineSpec = serde_json::from_slice(&first).unwrap();
+    assert_eq!(serde_json::to_vec(&decoded).unwrap(), first);
+    let compiled = spec.compile().unwrap();
+    for (declared, site) in spec.sites().iter().zip(compiled.sites()) {
+        assert_eq!(ClockSpec::from_clock(site.clock()), declared.clock);
+        assert_eq!(
+            serde_json::to_vec(site.clock()).unwrap(),
+            serde_json::to_vec(&declared.clock).unwrap()
+        );
+    }
+    for (declared, arc) in spec.arcs().iter().zip(compiled.arcs()) {
+        assert_eq!(
+            ClockSpec::from_clock(arc.interaction().clock()),
+            declared.clock
+        );
+    }
+}
+
+/// The core generator's Cayley tick is the site's phase action exactly, its advance reaches the
+/// phase action's power, and its clock/lift readings are the odometer's carries on the closure
+/// ring.
+#[test]
+fn core_generator_ticks_as_the_phase_action_and_counts_closure_windings() {
+    let site = compiled_site(quarter_turn_site("q"));
+    let generator = site.core_generator().expect("core generator");
+    // The key is the situated screw's initial point; clock step h; lift = declared phase.
+    assert_eq!(point(generator.initial()), *site.screw().initial());
+    assert_eq!(generator.clock().step(), site.clock().duration());
+    assert_eq!(generator.clock().radices(), &[BigUint::from(4u32)]);
+    assert_eq!(generator.lift().phase(), site.phase());
+    assert_eq!(generator.lift().winding(), &BigInt::from(2));
+    // A is skew: the tick is a rotation (Cayley of a skew generator).
+    let (a, _) = generator.transport().affine_parts().unwrap();
+    for row in 0..3 {
+        for column in 0..3 {
+            let entry = |i: usize, j: usize| a.entries()[i * 3 + j].clone();
+            assert_eq!(entry(row, column), -entry(column, row));
+        }
+    }
+    // tick == phase action on several configurations.
+    for probe in [
+        RatVec3::from_i64(3, -1, 5),
+        RatVec3::from_i64(0, 0, 0),
+        RatVec3::new(rational(1, 2), rational(-7, 3), rational(2, 9)),
+    ] {
+        let ticked = generator
+            .tick(&[probe.x.clone(), probe.y.clone(), probe.z.clone()])
+            .expect("tick");
+        assert_eq!(point(&ticked), site.phase_action().apply(&probe));
+    }
+    // advance(k) == T^k(key); jumps and lift winding are the odometer's carries.
+    let key = site.screw().initial().clone();
+    let mut stepwise = generator.clone();
+    let mut configuration = generator.initial().to_vec();
+    let mut jumps = BigUint::from(0u32);
+    for k in 1u64..=11 {
+        let step = stepwise.advance(&configuration, 1).expect("one tick");
+        configuration = step.configuration;
+        jumps += step.jumps;
+        let power = affine_power(site.phase_action(), k as usize);
+        assert_eq!(point(&configuration), power.apply(&key));
+        let odometer =
+            relational_geometry::Odometer::from_value(vec![BigUint::from(4u32)], &BigUint::from(k))
+                .unwrap();
+        assert_eq!(stepwise.clock().phase(), odometer.digits());
+        assert_eq!(stepwise.clock().winding(), odometer.overflow_winding());
+        assert_eq!(&jumps, odometer.overflow_winding());
+        assert_eq!(
+            stepwise.lift().winding(),
+            &(BigInt::from(2) + BigInt::from(k / 4))
+        );
+        // Closure: the reached configuration is the power of the phase at the chart residue.
+        let residue = affine_power(site.phase_action(), (k % 4) as usize);
+        assert_eq!(point(&configuration), residue.apply(&key));
+    }
+    // A single advance of 11 ticks agrees with the stepwise one.
+    let mut at_once = generator.clone();
+    let reached = at_once.advance(generator.initial(), 11).expect("advance");
+    assert_eq!(reached.configuration, configuration);
+    assert_eq!(reached.jumps, BigUint::from(2u32));
+    assert_eq!(at_once, stepwise);
+    // The chart phase is unchanged by the counted jumps (lossless).
+    assert_eq!(at_once.lift().chart(), site.phase().chart());
+}
+
+/// Period 1 is the unwound clock (every tick closes); the identity action has the zero generator.
+#[test]
+fn identity_site_is_an_unwound_zero_generator() {
+    let site = compiled_site(site("a", RatVec3::from_i64(1, 2, 3)));
+    let mut generator = site.core_generator().expect("core generator");
+    assert!(generator.clock().radices().is_empty());
+    let start = generator.initial().to_vec();
+    let reached = generator.advance(&start, 5).unwrap();
+    assert_eq!(reached.configuration, start);
+    assert_eq!(reached.jumps, BigUint::from(5u32));
+    assert_eq!(generator.lift().winding(), &BigInt::from(5));
+    // The declared screw chart keeps the same key, clock and lift.
+    let screw = site.declared_screw_generator().expect("screw generator");
+    assert_eq!(screw.situated_screw().as_ref(), Some(site.screw()));
+    assert_eq!(screw.clock(), site.core_generator().unwrap().clock());
+    assert_eq!(screw.lift(), &site.phase_lift());
+}
+
+/// No closure witness, no ring: the generator is refused rather than claiming jumps. A half turn
+/// has no rational Cayley generator.
+#[test]
+fn core_generator_refuses_an_unwitnessed_ring_and_a_half_turn() {
+    let mut open = site("a", RatVec3::zero());
+    open.phase.step.translation = RatVec3::from_i64(1, 0, 0);
+    open.phase.period = None;
+    assert!(matches!(
+        compiled_site(open).core_generator(),
+        Err(MachineError::NoClosureWitness(id)) if id == "a"
+    ));
+    let mut half = site("h", RatVec3::zero());
+    half.phase.step = AffineMap3 {
+        linear: RatMat3::from_i64([[-1, 0, 0], [0, -1, 0], [0, 0, 1]]),
+        translation: RatVec3::zero(),
+    };
+    half.phase.period = Some(2);
+    assert!(matches!(
+        compiled_site(half).core_generator(),
+        Err(MachineError::HalfTurnPhaseAction(id)) if id == "h"
+    ));
+}

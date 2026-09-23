@@ -257,6 +257,13 @@ pub const WINDING_EXTENT_CEILING: usize = 16;
 /// Every way this module declines to answer. A refusal is a return; nothing here panics.
 #[derive(Debug, Error)]
 pub enum InteractionRefusal {
+    /// A core clock with a ring or a tick reading was offered as a declaration, whose wire carries
+    /// only the step: accepting it would lose the ring or the reading.
+    #[error(
+        "a declared clock is an unwound clock at rest; this core clock has {levels} ring levels \
+         and has taken {ticks} ticks"
+    )]
+    ClockNotDeclarable { levels: usize, ticks: String },
     /// A declared size exceeded its ceiling. Nothing was allocated.
     #[error("{what} declares {declared}, above the ceiling {ceiling}")]
     DeclarationAboveCeiling {
@@ -508,11 +515,42 @@ fn pairing(
 /// [definition] `⟨δq, M δq⟩` is a number of unknown dimension; `⟨δq, M δq⟩ / h` is an energy only
 /// once `h` is named and its unit is carried. There is no default clock: a caller who wants one
 /// declares it, and a non-positive duration is refused by name.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+///
+/// [definition; agent-inferred] **One clock.** The clock itself is the core
+/// [`holonic_core::generator::Clock`]; this type is that clock with its lineage and unit tag
+/// attached. A declaration claims no ring, so its core chart is the unwound clock
+/// ([`holonic_core::generator::Clock::unwound`], step `h`, every tick one counted passage); a ring
+/// is a separate closure claim, supplied through [`Self::on_ring`]. The wire shape is unchanged:
+/// `{"lineage", "duration", "unit"}`, `Serialize` only, with `duration` the core step `h`.
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Clock {
     lineage: String,
-    duration: Rat,
+    clock: CoreClock,
     unit: String,
+}
+
+/// The core clock this declaration carries.
+pub use holonic_core::generator::Clock as CoreClock;
+
+impl Serialize for Clock {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        #[derive(Serialize)]
+        #[serde(rename = "Clock")]
+        struct Wire<'a> {
+            lineage: &'a str,
+            duration: &'a Rat,
+            unit: &'a str,
+        }
+        Wire {
+            lineage: &self.lineage,
+            duration: self.clock.step(),
+            unit: &self.unit,
+        }
+        .serialize(serializer)
+    }
 }
 
 impl Clock {
@@ -529,9 +567,36 @@ impl Clock {
                 value: duration.to_string(),
             });
         }
+        // The core clock refuses only a nonpositive step, which was refused above.
+        let clock = CoreClock::unwound(duration.clone()).map_err(|_| {
+            InteractionRefusal::NotStrictlyPositive {
+                what: "a declared clock duration",
+                value: duration.to_string(),
+            }
+        })?;
         Ok(Self {
             lineage: lineage.into(),
-            duration,
+            clock,
+            unit: unit.into(),
+        })
+    }
+
+    /// Attach a lineage and unit to an **unwound core clock at rest**. A ring or a tick reading is
+    /// refused: the declaration's wire carries only the step, so accepting either would lose it.
+    pub fn from_core(
+        lineage: impl Into<String>,
+        clock: CoreClock,
+        unit: impl Into<String>,
+    ) -> Result<Self, InteractionRefusal> {
+        if !clock.radices().is_empty() || !clock.is_at_rest() {
+            return Err(InteractionRefusal::ClockNotDeclarable {
+                levels: clock.radices().len(),
+                ticks: clock.ticks().to_string(),
+            });
+        }
+        Ok(Self {
+            lineage: lineage.into(),
+            clock,
             unit: unit.into(),
         })
     }
@@ -540,13 +605,32 @@ impl Clock {
         &self.lineage
     }
 
+    /// The declared step `h` (the core clock's step).
     pub fn duration(&self) -> &Rat {
-        &self.duration
+        self.clock.step()
     }
 
     /// The declared unit of the energy this clock produces. Carried, never parsed into a number.
     pub fn unit(&self) -> &str {
         &self.unit
+    }
+
+    /// The core clock.
+    pub fn core(&self) -> &CoreClock {
+        &self.clock
+    }
+
+    pub fn into_core(self) -> CoreClock {
+        self.clock
+    }
+
+    /// The same step on a declared ring (`radices`, each `≥ 2`; the last level's overflow is the
+    /// jump count). The ring is a closure claim the caller supplies; it is never inferred.
+    pub fn on_ring(
+        &self,
+        radices: Vec<num_bigint::BigUint>,
+    ) -> Result<CoreClock, holonic_core::holon::HolonError> {
+        CoreClock::new(self.clock.step().clone(), radices)
     }
 }
 

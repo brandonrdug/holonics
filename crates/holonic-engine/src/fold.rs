@@ -1485,6 +1485,17 @@ impl CellComplex {
         Ok(complex)
     }
 
+    /// [definition] **The complex as the core complex `K`** (plan phase 4): its realization
+    /// [`Self::graded`] read through [`GradedCausalComplex::core_chart`], one core cell per vertex,
+    /// edge and triangle with the same orientation. This type keeps its wire (`lineage`, `vertices`,
+    /// `edges`, `triangles`); the rational Betti numbers of the core complex are the free ranks of
+    /// [`Self::betti`] (tested).
+    pub fn core_chart(&self) -> Result<crate::algebraic::CoreCellChart, FoldRefusal> {
+        self.graded()?
+            .core_chart()
+            .map_err(|refusal| FoldRefusal::Core(Box::new(refusal)))
+    }
+
     /// **The Betti vector, through the existing Smith-normal-form owner.**
     pub fn betti(&self) -> Result<Vec<usize>, FoldRefusal> {
         let graded = self.graded()?;
@@ -3254,6 +3265,9 @@ pub enum FoldRefusal {
     ExactValue(#[from] ExactValueError),
     #[error("the causal incidence refused: {0}")]
     Algebraic(#[from] CausalAlgebraicError),
+    /// The core complex refused the chart (plan phase 4).
+    #[error("the core complex refused the chart: {0}")]
+    Core(Box<crate::algebraic::CoreChartRefusal>),
     #[error("the physical constraint complex refused: {0}")]
     Constraint(#[from] crate::physical_constraint_complex::ConstraintError),
     #[error("the typed-unit carrier refused: {0}")]

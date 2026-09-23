@@ -1608,16 +1608,22 @@ pub fn plural_rethreading(
 // T4 (d) — the edit torque
 // -------------------------------------------------------------------------------------------
 
-/// **The admitted generator family**: the edit directions the revision process may take, as the
-/// columns of the generator matrix.
+/// **The admitted edit-direction family**: the edit directions the revision process may take, as
+/// the columns of the generator matrix. Renamed from `GeneratorFamily` (kept as an alias) so the
+/// name does not collide with the linear-map family `standing::GeneratorFamily` or the core
+/// `holonic_core::generator::Generator`; the serde name is unchanged.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
-pub struct GeneratorFamily {
+#[serde(rename = "GeneratorFamily")]
+pub struct EditDirectionFamily {
     name: String,
     dimension: usize,
     generators: Vec<EditDirection>,
 }
 
-impl GeneratorFamily {
+/// The former name of [`EditDirectionFamily`].
+pub type GeneratorFamily = EditDirectionFamily;
+
+impl EditDirectionFamily {
     /// Declare a family. **An empty family is refused by name**: a torque read over no generator is
     /// not a torque reading.
     pub fn declared(
@@ -1784,7 +1790,7 @@ pub struct EditTorque {
 /// `stationary_iff_torque_zero`, `metric_adjoint_pairs_the_residual_with_the_generators`.
 pub fn edit_torque(
     receivers: &KeptReceiverJacobian,
-    generators: &GeneratorFamily,
+    generators: &EditDirectionFamily,
     residual: &ReceiverResidual,
     edit_metric: &ExactMetric,
     receiver_metric: &ExactMetric,
@@ -1905,7 +1911,7 @@ pub struct ExactDescent {
 /// Lean counterparts: `torque_nonzero_has_nonzero_image`, `the_exact_descent_step`.
 pub fn descent_step(
     receivers: &KeptReceiverJacobian,
-    generators: &GeneratorFamily,
+    generators: &EditDirectionFamily,
     residual: &ReceiverResidual,
     edit_metric: &ExactMetric,
     receiver_metric: &ExactMetric,

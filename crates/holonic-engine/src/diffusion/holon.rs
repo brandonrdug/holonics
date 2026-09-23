@@ -33,9 +33,10 @@ use holonic_core::port::Bond;
 use num_traits::{One, Signed, Zero};
 
 use super::{
-    CurrentNodeId, DiffusionEnergyBalance, DiffusionError, DiffusionEvent, ExactDiffusionLaw,
-    ExactRatMatrix,
+    CurrentBranchId, CurrentNodeId, DiffusionComplex, DiffusionEnergyBalance, DiffusionError,
+    DiffusionEvent, ExactDiffusionLaw, ExactRatMatrix,
 };
+use crate::algebraic::{CoreChartRefusal, GraphChart};
 
 /// [definition] **A diffusion-shaped port Holon**: storage `diag(1/c)` on the coordinates, resistive
 /// ports with the drop map `slip` (`f_R = slip · e_S`) and resistance `R`, and one external port per
@@ -170,31 +171,15 @@ impl ExactDiffusionLaw {
         self.complex.nodes.keys().copied().collect()
     }
 
-    /// The oriented drop map `d` (branches × nodes, `+1` at the source, `−1` at the target) and the
-    /// conductances, in the complex's branch order.
+    /// The oriented drop map (branches × nodes, `+1` at the source, `−1` at the target) and the
+    /// conductances, in the complex's branch order. The drop map is `−d₀` of the complex's core
+    /// chart ([`DiffusionComplex::graph_chart`]): the endpoint drop `φ(s) − φ(t)` is the negated
+    /// coboundary, read from the one incidence owner rather than rebuilt here.
     fn drop_map(&self) -> Result<(ExactRatMatrix, ExactRatMatrix), DiffusionError> {
-        let nodes = self.holon_nodes();
-        let branches: Vec<_> = self.complex.branches.values().collect();
-        let mut rows = vec![vec![Rat::zero(); nodes.len()]; branches.len()];
-        for (row, branch) in branches.iter().enumerate() {
-            let source = nodes
-                .binary_search(&branch.source)
-                .map_err(|_| DiffusionError::MissingNode(branch.source))?;
-            let target = nodes
-                .binary_search(&branch.target)
-                .map_err(|_| DiffusionError::MissingNode(branch.target))?;
-            rows[row][source] = Rat::one();
-            rows[row][target] = -Rat::one();
-        }
-        let slip = ExactRatMatrix::shaped(branches.len(), nodes.len(), rows)?;
-        let mut conductance = vec![vec![Rat::zero(); branches.len()]; branches.len()];
-        for (at, branch) in branches.iter().enumerate() {
-            conductance[at][at] = branch.conductance.clone();
-        }
-        Ok((
-            slip,
-            ExactRatMatrix::shaped(branches.len(), branches.len(), conductance)?,
-        ))
+        let chart = self.complex.graph_chart()?;
+        let slip = chart.complex().incidence()?.scaled(&-Rat::one());
+        let conductance = self.complex.conductance_relation()?.resistance().clone();
+        Ok((slip, conductance))
     }
 
     /// **This complex as a core Holon** (see the module header): storage `C⁻¹` on the node contents
@@ -336,6 +321,59 @@ impl From<HolonError> for DiffusionError {
     }
 }
 
+impl From<CoreChartRefusal> for DiffusionError {
+    /// A core refusal keeps its witness; a chart refusal of a validated complex (an endpoint outside
+    /// the nodes, a repeated identity) says the complex is malformed.
+    fn from(refusal: CoreChartRefusal) -> Self {
+        match refusal {
+            CoreChartRefusal::Holon(error) => Self::Holon(error),
+            _ => Self::MalformedComplex,
+        }
+    }
+}
+
+// The complex as the core complex `K` with its two element relations (plan phase 4).
+impl DiffusionComplex {
+    /// [definition] **The complex as the core graph complex**: one 0-cell per node and one 1-cell per
+    /// branch, in identity order, `∂₁` with `−1` at each branch's source and `+1` at its target
+    /// (`holonic_core::complex::CellComplex::graph`). A diffusion complex is this incidence with two
+    /// element relations: the capacities ([`Self::capacity_storage`]) and the conductances
+    /// ([`Self::conductance_relation`]).
+    pub fn graph_chart(
+        &self,
+    ) -> Result<GraphChart<CurrentNodeId, CurrentBranchId>, CoreChartRefusal> {
+        GraphChart::new(
+            self.nodes.keys().copied(),
+            self.branches
+                .values()
+                .map(|branch| (branch.branch, branch.source, branch.target)),
+        )
+    }
+
+    /// [definition] **The capacities as core storage** `C⁻¹` on the node contents, so the storage
+    /// effort is the potential `φ = n / c`.
+    pub fn capacity_storage(&self) -> SymmetricForm {
+        SymmetricForm::from_diagonal(
+            self.nodes
+                .values()
+                .map(|node| Rat::one() / &node.capacity)
+                .collect(),
+        )
+    }
+
+    /// [definition] **The conductances as the core resistive element** `R = diag(conductance)` on
+    /// the branch drops, certified passive (every conductance is nonnegative).
+    pub fn conductance_relation(&self) -> Result<ResistiveRelation, CoreChartRefusal> {
+        let conductance = ExactRatMatrix::from_diagonal(
+            self.branches
+                .values()
+                .map(|branch| branch.conductance.clone())
+                .collect(),
+        )?;
+        Ok(ResistiveRelation::new(conductance)?)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::collections::BTreeMap;
@@ -390,6 +428,78 @@ mod tests {
         )
         .unwrap();
         ExactDiffusionLaw::new(complex).unwrap()
+    }
+
+    /// **The complex is the core graph complex with its two elements (plan phase 4).** The drop map
+    /// is `−d₀` of the chart, the Holon's storage is the capacity storage, and the event's node
+    /// balances are the core boundary `∂₁` of its integrated branch transfers, number for number.
+    #[test]
+    fn the_diffusion_complex_is_the_core_graph_with_capacity_and_conductance() {
+        let law = three_nodes();
+        let chart = law.complex.graph_chart().unwrap();
+        let incidence = chart.complex().incidence().unwrap();
+        let (slip, conductance) = law.drop_map().unwrap();
+        assert_eq!(slip, incidence.scaled(&-Rat::one()));
+        assert_eq!(
+            &conductance,
+            law.complex.conductance_relation().unwrap().resistance()
+        );
+        let holon = law.holon().unwrap();
+        assert_eq!(
+            holon.port_holon().storage(),
+            &law.complex.capacity_storage()
+        );
+        assert_eq!(
+            (
+                chart.complex().betti(0).unwrap(),
+                chart.complex().betti(1).unwrap()
+            ),
+            (1, 1)
+        );
+
+        let standing = law
+            .initial_standing(BTreeMap::from([
+                (CurrentNodeId(1), integer(4)),
+                (CurrentNodeId(2), integer(0)),
+                (CurrentNodeId(3), integer(-1)),
+            ]))
+            .unwrap();
+        let (_, receipt) = law
+            .enact(
+                &standing,
+                &DiffusionEvent {
+                    interval: integer(1),
+                    source: BTreeMap::from([(CurrentNodeId(2), integer(1))]),
+                },
+            )
+            .unwrap();
+        let transferred: Vec<Rat> = chart
+            .edges()
+            .iter()
+            .map(|branch| {
+                receipt
+                    .currents
+                    .iter()
+                    .find(|current| current.branch == *branch)
+                    .unwrap()
+                    .transferred
+                    .clone()
+            })
+            .collect();
+        let boundary = chart
+            .complex()
+            .boundary(1)
+            .unwrap()
+            .apply(&transferred)
+            .unwrap();
+        for (at, node) in chart.vertices().iter().enumerate() {
+            let balance = receipt
+                .balances
+                .iter()
+                .find(|balance| balance.node == *node)
+                .unwrap();
+            assert_eq!(boundary[at], balance.boundary_transfer);
+        }
     }
 
     /// The existing two-node witness (`two_node_diffusion_transports_and_conserves_exactly`), read

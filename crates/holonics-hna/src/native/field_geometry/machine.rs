@@ -5,15 +5,18 @@
 //! directed contacts, while source and response lengths remain external costs.  All geometry is
 //! carried by the existing exact screw, affine, winding and helical-interaction owners.
 
+use holonic_core::generator::{Generator, PhaseLift, Transport};
+use holonic_core::holon::HolonError;
 use holonic_engine::{
     exact_linear::{ExactLinearError, ExactRatMatrix},
     holonic_interaction::{
-        Clock, InteractionRefusal,
+        Clock, CoreClock, InteractionRefusal,
         helical::{HelicalPairInteraction, HelicalRefusal, PairUnits},
     },
     inertia::{SymmetricForm, inertia},
 };
-use num_traits::Signed;
+use num_bigint::{BigInt, BigUint};
+use num_traits::{One, Signed};
 use relational_geometry::{
     AffineMap3, PairFiniteMotion, Rat, RatMat3, RatVec3, RationalPhase, ScrewError, ScrewGenerator,
     ScrewPair, SiteFactor, SituatedScrew, triangle_holonomy,
@@ -88,6 +91,13 @@ pub struct PhaseSpec {
     pub period: Option<usize>,
 }
 
+/// [definition; agent-inferred] **The wire form of the one clock.** The clock is the core
+/// `holonic_core::generator::Clock`; its declaration (lineage, step `h`, unit) is the engine
+/// [`Clock`], and this is that declaration's `deny_unknown_fields` wire. The conversions are
+/// lossless: [`Self::compile`] and [`Self::from_clock`] are mutually inverse on declared clocks,
+/// and [`Self::core_clock`]/[`Self::from_core`] are mutually inverse on unwound core clocks at
+/// rest (the only core clocks this wire can carry; a ring or tick reading is refused, never
+/// dropped). A ring is a separate closure claim ([`CompiledGeneratorSite::core_clock`]).
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ClockSpec {
@@ -97,7 +107,8 @@ pub struct ClockSpec {
 }
 
 impl ClockSpec {
-    fn compile(&self) -> Result<Clock, MachineError> {
+    /// The declared clock this wire names; refuses empty labels and a nonpositive duration.
+    pub fn compile(&self) -> Result<Clock, MachineError> {
         if self.lineage.is_empty() || self.unit.is_empty() {
             return Err(MachineError::EmptyLabel {
                 what: "clock lineage/unit",
@@ -108,6 +119,45 @@ impl ClockSpec {
             self.duration.clone(),
             self.unit.clone(),
         )?)
+    }
+
+    /// The wire of a declared clock.
+    pub fn from_clock(clock: &Clock) -> Self {
+        Self {
+            lineage: clock.lineage().to_owned(),
+            duration: clock.duration().clone(),
+            unit: clock.unit().to_owned(),
+        }
+    }
+
+    /// The core clock: step `h = duration`, unwound, at rest.
+    pub fn core_clock(&self) -> Result<CoreClock, MachineError> {
+        Ok(self.compile()?.into_core())
+    }
+
+    /// The wire of an unwound core clock at rest, with its lineage and unit.
+    pub fn from_core(
+        lineage: impl Into<String>,
+        clock: CoreClock,
+        unit: impl Into<String>,
+    ) -> Result<Self, MachineError> {
+        let spec = Self::from_clock(&Clock::from_core(lineage, clock, unit)?);
+        spec.compile()?;
+        Ok(spec)
+    }
+}
+
+impl From<&Clock> for ClockSpec {
+    fn from(clock: &Clock) -> Self {
+        Self::from_clock(clock)
+    }
+}
+
+impl TryFrom<&ClockSpec> for Clock {
+    type Error = MachineError;
+
+    fn try_from(spec: &ClockSpec) -> Result<Self, Self::Error> {
+        spec.compile()
     }
 }
 
@@ -593,6 +643,91 @@ impl CompiledGeneratorSite {
     pub fn closure(&self) -> Option<usize> {
         self.closure
     }
+
+    /// [definition; agent-inferred] **The site's core clock on its closure ring.** Step `h` is the
+    /// declared duration; the ring is the supplied closure witness `period` (the phase action
+    /// satisfies `Tᵖ = id`), so one jump is one completed period and the odometer's overflow
+    /// counts `⌊ticks / p⌋`. Period 1 is the unwound clock (every tick closes). Without a closure
+    /// witness no ring is inferred and the clock is refused: a jump count would claim closure.
+    pub fn core_clock(&self) -> Result<CoreClock, MachineError> {
+        let period = self
+            .closure
+            .ok_or_else(|| MachineError::NoClosureWitness(self.id.clone()))?;
+        let radices = if period == 1 {
+            Vec::new()
+        } else {
+            vec![BigUint::from(period)]
+        };
+        Ok(self.clock.on_ring(radices)?)
+    }
+
+    /// The site's lifted phase: the declared Cayley phase with its declared extra turns as the
+    /// initial winding.
+    pub fn phase_lift(&self) -> PhaseLift {
+        PhaseLift::new(self.phase.clone(), BigInt::from(self.phase.extra_turns()))
+    }
+
+    /// [definition; agent-inferred] **The site as a core generator** `(Transport, key, Clock,
+    /// PhaseLift)`. The transport is the affine flow `ẋ = A x + b` whose Cayley tick at the
+    /// declared step `h` *is* the site's phase action `x ↦ R x + t` exactly: with
+    /// `K = (R − I)(R + I)⁻¹`, `A = 2K/h` (skew, as `R` is special orthogonal) and
+    /// `b = (I − K) t / h`, the tick `(I − hA/2) x⁺ = (I + hA/2) x + h b` gives
+    /// `x⁺ = (I − K)⁻¹(I + K) x + t = R x + t`. The key is the situated screw's initial point; the
+    /// clock is [`Self::core_clock`] and the lift [`Self::phase_lift`]. Refuses a half-turn phase
+    /// action (`R + I` singular: no rational Cayley generator) and a site without a closure
+    /// witness. The declared screw generator is a separate chart ([`Self::declared_screw_generator`]);
+    /// the [`PhaseCorrespondence`] residual still states that no relation between the two is
+    /// certified.
+    pub fn core_generator(&self) -> Result<Generator, MachineError> {
+        let clock = self.core_clock()?;
+        let (linear, translation) = cayley_generator(&self.phase_action, clock.step())
+            .ok_or_else(|| MachineError::HalfTurnPhaseAction(self.id.clone()))?;
+        let initial = self.screw.initial();
+        Ok(Generator::new(
+            Transport::Affine {
+                linear,
+                translation,
+            },
+            vec![initial.x.clone(), initial.y.clone(), initial.z.clone()],
+            clock,
+            self.phase_lift(),
+        )?)
+    }
+
+    /// The declared situated screw `ω × x + v` as a core generator on the same clock and lift.
+    /// Its Cayley tick is the screw's implicit-midpoint step at `h`; it equals the phase action
+    /// only where the caller has certified that correspondence.
+    pub fn declared_screw_generator(&self) -> Result<Generator, MachineError> {
+        Ok(Generator::screw(
+            &self.screw,
+            self.core_clock()?,
+            self.phase_lift(),
+        )?)
+    }
+}
+
+/// The rational Cayley generator of a finite affine action at step `h`: `(A, b)` with
+/// `A = (2/h)(R − I)(R + I)⁻¹` and `b = (I − K) t / h`, `K = hA/2`. `None` when `R + I` is
+/// singular.
+fn cayley_generator(action: &AffineMap3, step: &Rat) -> Option<(ExactRatMatrix, Vec<Rat>)> {
+    let identity = RatMat3::identity();
+    let r = &action.linear;
+    let entrywise = |left: &RatMat3, right: &RatMat3, sign: &Rat| {
+        RatMat3::new(std::array::from_fn(|row| {
+            std::array::from_fn(|column| &left.rows[row][column] + sign * &right.rows[row][column])
+        }))
+    };
+    let one = Rat::one();
+    let minus_one = -Rat::one();
+    let sum_inverse = entrywise(r, &identity, &one).inverse()?;
+    let k = entrywise(r, &identity, &minus_one).multiply(&sum_inverse);
+    let linear = k.scale(&(Rat::from_integer(2.into()) / step));
+    let b = entrywise(&identity, &k, &minus_one)
+        .apply(&action.translation)
+        .scale(&(Rat::one() / step));
+    let rows = linear.rows.iter().map(|row| row.to_vec()).collect();
+    let linear = ExactRatMatrix::shaped(3, 3, rows).ok()?;
+    Some((linear, vec![b.x, b.y, b.z]))
 }
 
 /// The exact scope of the phase/action bridge.  Neither arm certifies a relation between the
@@ -783,6 +918,12 @@ pub enum MachineError {
     },
     #[error("current chart residual remains on arc {0}")]
     ChartResidual(String),
+    #[error("site {0} supplies no closure witness, so its clock has no ring")]
+    NoClosureWitness(String),
+    #[error("site {0} has a half-turn phase action, which has no rational Cayley generator")]
+    HalfTurnPhaseAction(String),
+    #[error(transparent)]
+    Holon(#[from] HolonError),
     #[error(transparent)]
     Clock(#[from] InteractionRefusal),
     #[error(transparent)]

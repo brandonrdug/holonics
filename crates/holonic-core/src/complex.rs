@@ -10,8 +10,16 @@
 //! (`Holon/Complex.lean::connectionIncidence_isDirac`), and a flat connection is exactly closed
 //! (`Holon/Complex.lean::exact_closed_iff_flat`).
 //!
-//! [definition; agent-inferred] The complex is constructed from boundary matrices here; the engine
-//! adapter from `GradedCausalComplex`/`HodgeOperator` arrives with plan phase 4.
+//! [definition; agent-inferred] The complex is constructed from boundary matrices here, or from an
+//! oriented graph ([`CellComplex::graph`]). The engine charts (plan phase 4) read
+//! `GradedCausalComplex`, `HodgeOperator` and the graph-shaped engine complexes into this type; the
+//! engine keeps its own wire formats and identities, and this type carries only the incidence.
+//!
+//! [definition] **A declared metric is storage.** A Hodge metric `W_k` on each degree is a positive
+//! definite storage form (`crate::element::ElementRelation::Storage`); the codifferential is its
+//! metric adjoint `δ_k = W_k⁻¹ d_kᵀ W_(k+1)` ([`CellComplex::codifferential`]) and the Hodge
+//! operator `Δ_k = d_(k−1) δ_(k−1) + δ_k d_k` ([`CellComplex::hodge_laplacian`]). A metric with a
+//! negative or zero direction is refused by its inertia.
 //!
 //! | Lean | Rust |
 //! |---|---|
@@ -29,7 +37,8 @@ use serde::Serialize;
 use crate::dirac::DiracStructure;
 use crate::exact_linear::ExactRatMatrix;
 use crate::holon::HolonError;
-use crate::scalar::{at, is_zero, matrix};
+use crate::inertia::{SymmetricForm, inertia};
+use crate::scalar::{at, form_matrix, is_zero, matrix};
 
 /// [definition] **An oriented cell complex**: cell counts per degree and boundary matrices
 /// `∂_(k+1) : C_(k+1) → C_k` (`cells[k] × cells[k+1]`), with `∂_k ∂_(k+1) = 0` checked.
@@ -142,6 +151,144 @@ impl CellComplex {
         }
         ConnectionIncidence::new(vertices, source, target, transports)
     }
+
+    /// [definition] **An oriented graph as a one-dimensional complex**: `∂₁` has `−1` at each edge's
+    /// source and `+1` at its target, so `d₀ = ∂₁ᵀ` reads `(d₀ φ)_e = φ(t e) − φ(s e)`. A self-loop
+    /// is a lawful cell whose boundary column is zero (its two attachments cancel).
+    pub fn graph(vertices: usize, source: &[usize], target: &[usize]) -> Result<Self, HolonError> {
+        if target.len() != source.len() {
+            return Err(HolonError::Shape {
+                what: "edge targets",
+                expected: source.len(),
+                found: target.len(),
+            });
+        }
+        let edges = source.len();
+        for edge in 0..edges {
+            if source[edge] >= vertices || target[edge] >= vertices {
+                return Err(HolonError::NotAGraphEdge { edge });
+            }
+        }
+        let boundary = matrix(vertices, edges, |vertex, edge| {
+            let mut entry = Rat::zero();
+            if vertex == target[edge] {
+                entry += Rat::one();
+            }
+            if vertex == source[edge] {
+                entry -= Rat::one();
+            }
+            entry
+        })?;
+        Self::new(vec![vertices, edges], vec![boundary])
+    }
+
+    /// Check a declared metric of one degree: its extent is the cell count and it is positive
+    /// definite (a lawful storage form); a negative direction is refused with its inertia, a zero
+    /// direction as singular.
+    fn check_metric(&self, degree: usize, metric: &SymmetricForm) -> Result<(), HolonError> {
+        if metric.extent() != self.cells(degree) {
+            return Err(HolonError::Shape {
+                what: "metric extent (cells of its degree)",
+                expected: self.cells(degree),
+                found: metric.extent(),
+            });
+        }
+        if metric.extent() == 0 {
+            return Ok(());
+        }
+        let reading = inertia(metric);
+        if reading.negative > 0 {
+            return Err(HolonError::NotPassive { inertia: reading });
+        }
+        if reading.zero > 0 {
+            return Err(HolonError::Singular {
+                what: "a declared cell metric",
+            });
+        }
+        Ok(())
+    }
+
+    /// [definition] **The codifferential** `δ_k = W_k⁻¹ d_kᵀ W_(k+1) : C^(k+1) → C^k`, the metric
+    /// adjoint of `d_k` under the storage forms `domain = W_k` and `codomain = W_(k+1)`:
+    /// `⟨d_k x, y⟩_(W_(k+1)) = ⟨x, δ_k y⟩_(W_k)`. The zero map of the declared shape when either
+    /// degree is empty.
+    pub fn codifferential(
+        &self,
+        degree: usize,
+        domain: &SymmetricForm,
+        codomain: &SymmetricForm,
+    ) -> Result<ExactRatMatrix, HolonError> {
+        self.check_metric(degree, domain)?;
+        self.check_metric(degree + 1, codomain)?;
+        let (lower, upper) = (self.cells(degree), self.cells(degree + 1));
+        if lower == 0 || upper == 0 {
+            return Ok(ExactRatMatrix::zero(lower, upper)?);
+        }
+        let coboundary = self.coboundary(degree)?.ok_or(HolonError::Shape {
+            what: "complex dimension for a codifferential",
+            expected: degree + 1,
+            found: self.dimension(),
+        })?;
+        Ok(coboundary.metric_adjoint(&form_matrix(domain), &form_matrix(codomain))?)
+    }
+
+    /// [definition] **The Hodge operator** `Δ_k = d_(k−1) δ_(k−1) + δ_k d_k` under one declared
+    /// metric per degree (`metrics[k] = W_k`, one per degree `0..=dimension`).
+    pub fn hodge_laplacian(
+        &self,
+        degree: usize,
+        metrics: &[SymmetricForm],
+    ) -> Result<ExactRatMatrix, HolonError> {
+        if metrics.len() != self.cells.len() {
+            return Err(HolonError::Shape {
+                what: "metrics (one per degree)",
+                expected: self.cells.len(),
+                found: metrics.len(),
+            });
+        }
+        if degree > self.dimension() {
+            return Err(HolonError::Shape {
+                what: "Hodge degree",
+                expected: self.dimension(),
+                found: degree,
+            });
+        }
+        let extent = self.cells(degree);
+        let up = match self.coboundary(degree)? {
+            Some(coboundary) => self
+                .codifferential(degree, &metrics[degree], &metrics[degree + 1])?
+                .multiply(&coboundary)?,
+            None => ExactRatMatrix::zero(extent, extent)?,
+        };
+        let down = match degree.checked_sub(1) {
+            Some(lower) => self.coboundary(lower)?.map_or_else(
+                || Ok(ExactRatMatrix::zero(extent, extent)?),
+                |coboundary| -> Result<ExactRatMatrix, HolonError> {
+                    Ok(coboundary.multiply(&self.codifferential(
+                        lower,
+                        &metrics[lower],
+                        &metrics[degree],
+                    )?)?)
+                },
+            )?,
+            None => ExactRatMatrix::zero(extent, extent)?,
+        };
+        Ok(down.add(&up)?)
+    }
+
+    /// [proved-standard] **The rational Betti number** `b_k = n_k − rank ∂_k − rank ∂_(k+1)`, the
+    /// free rank of `H_k` over `ℚ` (torsion is not seen by a rational reading).
+    pub fn betti(&self, degree: usize) -> Result<usize, HolonError> {
+        let rank = |matrix: Option<&ExactRatMatrix>| -> Result<usize, HolonError> {
+            Ok(match matrix {
+                Some(matrix) if matrix.rows() > 0 && matrix.columns() > 0 => matrix.rank()?,
+                _ => 0,
+            })
+        };
+        let incoming = rank(self.boundary(degree))?;
+        let outgoing = rank(self.boundary(degree + 1))?;
+        Ok(self.cells(degree) - incoming - outgoing)
+    }
 }
 
 /// [definition] **A graph with edge transports** `g_e ≠ 0`
@@ -201,6 +348,27 @@ impl ConnectionIncidence {
 
     pub fn vertices(&self) -> usize {
         self.vertices
+    }
+
+    /// Each edge's source vertex.
+    pub fn sources(&self) -> &[usize] {
+        &self.source
+    }
+
+    /// Each edge's target vertex.
+    pub fn targets(&self) -> &[usize] {
+        &self.target
+    }
+
+    /// Each edge's transport `g_e`.
+    pub fn transports(&self) -> &[Rat] {
+        &self.transport
+    }
+
+    /// The underlying one-dimensional complex ([`CellComplex::graph`]); at the trivial connection
+    /// its incidence is [`Self::matrix`].
+    pub fn cell_complex(&self) -> Result<CellComplex, HolonError> {
+        CellComplex::graph(self.vertices, &self.source, &self.target)
     }
 
     /// `d_A` as an `edges × vertices` matrix: `(d_A φ)_e = g_e φ(t e) − φ(s e)`.
@@ -352,6 +520,66 @@ mod tests {
         assert_eq!(reading, int(-2));
         assert_eq!(reading, side);
         assert_eq!(seam.curvature(&[0], 0), Err(HolonError::NotAClosedWalk));
+    }
+
+    /// A graph complex is the flat connection's incidence, and its Betti numbers are the
+    /// components and the independent loops.
+    #[test]
+    fn a_graph_is_a_one_complex_whose_incidence_is_the_flat_connection() {
+        let graph = CellComplex::graph(3, &[0, 1, 2], &[1, 2, 0]).unwrap();
+        let flat = ConnectionIncidence::flat(3, vec![0, 1, 2], vec![1, 2, 0]).unwrap();
+        assert_eq!(graph.incidence().unwrap(), flat.matrix().unwrap());
+        assert_eq!(flat.cell_complex().unwrap(), graph);
+        assert_eq!((graph.betti(0).unwrap(), graph.betti(1).unwrap()), (1, 1));
+        let filled = triangle_complex();
+        assert_eq!(
+            (0..=2)
+                .map(|k| filled.betti(k).unwrap())
+                .collect::<Vec<_>>(),
+            vec![1, 0, 0]
+        );
+        assert_eq!(
+            CellComplex::graph(2, &[0], &[2]),
+            Err(HolonError::NotAGraphEdge { edge: 0 })
+        );
+    }
+
+    /// The codifferential is the metric adjoint of `d` under positive storage forms, the unit
+    /// Hodge operator on the filled triangle is `3·1` at degree 1, and a metric with a negative or
+    /// zero direction is refused.
+    #[test]
+    fn the_codifferential_is_the_storage_adjoint_and_an_indefinite_metric_is_refused() {
+        let complex = triangle_complex();
+        let w0 = SymmetricForm::from_diagonal(ints(&[1, 2, 3]));
+        let w1 = SymmetricForm::from_diagonal(ints(&[5, 1, 2]));
+        let delta = complex.codifferential(0, &w0, &w1).unwrap();
+        let d0 = complex.coboundary(0).unwrap().unwrap();
+        let (x, y) = (ints(&[1, -2, 4]), ints(&[3, 1, -1]));
+        let left = crate::scalar::dot(&d0.apply(&x).unwrap(), &form_matrix(&w1).apply(&y).unwrap());
+        let right = crate::scalar::dot(
+            &form_matrix(&w0).apply(&x).unwrap(),
+            &delta.apply(&y).unwrap(),
+        );
+        assert_eq!(left, right);
+
+        let unit = |n: usize| SymmetricForm::from_diagonal(vec![Rat::one(); n]);
+        let metrics = vec![unit(3), unit(3), unit(1)];
+        let laplacian = complex.hodge_laplacian(1, &metrics).unwrap();
+        assert_eq!(
+            laplacian,
+            ExactRatMatrix::identity(3).unwrap().scaled(&int(3))
+        );
+
+        let indefinite = SymmetricForm::from_diagonal(ints(&[1, -1, 1]));
+        assert!(matches!(
+            complex.codifferential(0, &indefinite, &w1),
+            Err(HolonError::NotPassive { .. })
+        ));
+        let degenerate = SymmetricForm::from_diagonal(ints(&[1, 0, 1]));
+        assert!(matches!(
+            complex.codifferential(0, &w0, &degenerate),
+            Err(HolonError::Singular { .. })
+        ));
     }
 
     /// `Holon/Complex.lean::walkRead_connection`: telescoping along an open walk.

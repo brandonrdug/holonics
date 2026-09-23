@@ -114,6 +114,17 @@ impl Default for ReceiverGrainComplex {
 }
 
 impl ReceiverGrainComplex {
+    /// [definition] **The incidence as the core complex `K`** (plan phase 4): the receiver grain's incidence; the cell witnesses (phase germs, transports, closures,
+    /// quotients) stay on the engine side as the cells' provenance.
+    /// The chart reads the carried [`crate::GradedCausalComplex`] through
+    /// [`crate::GradedCausalComplex::core_chart`]; this type's other fields stay on the engine
+    /// presentation.
+    pub fn core_chart(
+        &self,
+    ) -> Result<crate::algebraic::CoreCellChart, crate::algebraic::CoreChartRefusal> {
+        self.incidence.core_chart()
+    }
+
     /// Sparse exact coboundary of one basis cochain.  It is the transpose of
     /// the stored oriented boundary incidence and therefore does not allocate
     /// a dense matrix over a large receiver ecology.

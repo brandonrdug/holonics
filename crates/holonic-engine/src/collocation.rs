@@ -796,6 +796,17 @@ pub struct CoPresentationComplex {
 }
 
 impl CoPresentationComplex {
+    /// [definition] **The incidence as the core complex `K`** (plan phase 4): the co-presentation incidence inside its aperture; what fell outside the aperture is not
+    /// in the core complex.
+    /// The chart reads the carried [`crate::GradedCausalComplex`] through
+    /// [`crate::GradedCausalComplex::core_chart`]; this type's other fields stay on the engine
+    /// presentation.
+    pub fn core_chart(
+        &self,
+    ) -> Result<crate::algebraic::CoreCellChart, crate::algebraic::CoreChartRefusal> {
+        self.complex.core_chart()
+    }
+
     pub fn complex(&self) -> &GradedCausalComplex {
         &self.complex
     }

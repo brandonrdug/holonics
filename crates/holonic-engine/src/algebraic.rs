@@ -24,6 +24,10 @@ use relational_geometry::{Rat, ReceiverId};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+// The complex as the core complex `K` (plan phase 4).
+mod core_chart;
+pub use core_chart::{CoreCellChart, CoreChartRefusal, GraphChart};
+
 use crate::{
     ConicCellId, ConicError, Edge, EventId, EventSuccessor, EvolutionError, EvolutionShape,
     ExactEventLaw, FaceId, HingeId, HomogeneousConic, NativeConicPopulation, SimplicialComplex,

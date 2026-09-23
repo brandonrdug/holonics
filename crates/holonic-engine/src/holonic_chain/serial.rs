@@ -11,7 +11,7 @@
 //! transpose in the declared Euclidean pairing.
 
 use crate::exact_linear::ExactRatMatrix;
-use crate::holonic_interaction::{ContactFace, InteractionRefusal};
+use crate::holonic_interaction::{ContactFace, CoreClock, InteractionRefusal};
 use crate::inertia::SymmetricForm;
 use num_traits::One;
 use relational_geometry::{
@@ -42,6 +42,14 @@ pub const CLOSURE_CANDIDATE_CEILING: usize = 4096;
 /// A joint-local clock.  Its coordinate is the chart parameter, while `rate` is its derivative
 /// with respect to the declared physical/model clock.  It is intentionally separate from source
 /// occurrence and from the chain's refinement coordinate.
+///
+/// [definition; agent-inferred] **A derived chart of the one clock.** The clock is the core
+/// [`CoreClock`] (step `h`, tick odometer); a joint clock is the affine chart
+/// `coordinate = origin + rate · elapsed`, `elapsed = h · ticks` ([`CoreClock::elapsed`]), read at
+/// one clock reading. [`Self::on_clock`] forms it and [`Self::origin_on`] inverts it, so
+/// `JointClock::on_clock(c, JointClock::origin_on(j, c), j.rate()) == j` for every reading `c`.
+/// For a revolute joint the coordinate is the Cayley half-angle parameter, so a constant
+/// `rate` is a constant parameter rate, not a constant turn rate.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct JointClock {
     coordinate: Rat,
@@ -51,6 +59,18 @@ pub struct JointClock {
 impl JointClock {
     pub fn new(coordinate: Rat, rate: Rat) -> Self {
         Self { coordinate, rate }
+    }
+
+    /// The joint chart at the core clock's reading: `origin + rate · elapsed`.
+    pub fn on_clock(clock: &CoreClock, origin: Rat, rate: Rat) -> Self {
+        let coordinate = origin + &rate * clock.elapsed();
+        Self { coordinate, rate }
+    }
+
+    /// The chart origin (the coordinate at the clock's rest) given the clock reading this joint
+    /// clock was read at: `coordinate − rate · elapsed`.
+    pub fn origin_on(&self, clock: &CoreClock) -> Rat {
+        &self.coordinate - &self.rate * clock.elapsed()
     }
 
     pub fn coordinate(&self) -> &Rat {

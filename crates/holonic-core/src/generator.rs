@@ -63,8 +63,42 @@ impl Clock {
         Self::new(step, vec![BigUint::from(period)])
     }
 
+    /// [definition] **An unwound clock**: step `h` and no ring level. Its odometer has no phase
+    /// digit, so every tick is one counted passage and the winding is the tick count itself. It
+    /// is the core chart of a declared duration clock, which claims no closure; a ring (a period)
+    /// is a separate claim supplied through [`Self::new`] or [`Self::ring`].
+    pub fn unwound(step: Rat) -> Result<Self, HolonError> {
+        Self::new(step, Vec::new())
+    }
+
     pub fn step(&self) -> &Rat {
         &self.step
+    }
+
+    /// The ring levels (empty for an unwound clock).
+    pub fn radices(&self) -> &[BigUint] {
+        self.ticks.radices()
+    }
+
+    /// The tick odometer itself.
+    pub fn odometer(&self) -> &Odometer {
+        &self.ticks
+    }
+
+    /// The ticks taken since rest: the odometer's value `Σ digits·radices + winding·Π radices`
+    /// (`Geometry/PhaseCarry.lean::value_digits`).
+    pub fn ticks(&self) -> BigUint {
+        self.ticks.value()
+    }
+
+    /// The elapsed declared duration `h · ticks`.
+    pub fn elapsed(&self) -> Rat {
+        &self.step * Rat::from_integer(BigInt::from(self.ticks()))
+    }
+
+    /// Whether no tick has been taken.
+    pub fn is_at_rest(&self) -> bool {
+        self.ticks().is_zero()
     }
 
     /// The tick digits (the chart of the clock phase).
@@ -412,6 +446,24 @@ mod tests {
                 assert_eq!(first + second, winding(&n, &(a + b).into()).unwrap());
             }
         }
+    }
+
+    /// The unwound clock counts every tick as a passage; a ring's ticks are the odometer's value
+    /// (`Geometry/PhaseCarry.lean::value_digits`) and the elapsed duration is `h · ticks`.
+    #[test]
+    fn the_clock_reads_its_ticks_and_elapsed_duration() {
+        let mut unwound = Clock::unwound(rat(2, 3)).unwrap();
+        assert!(unwound.radices().is_empty() && unwound.is_at_rest());
+        assert_eq!(unwound.advance(&BigUint::from(4u32)), BigUint::from(4u32));
+        assert_eq!(unwound.ticks(), BigUint::from(4u32));
+        assert_eq!(unwound.elapsed(), rat(8, 3));
+        let mut ring = Clock::ring(rat(1, 5), 3).unwrap();
+        assert_eq!(ring.advance(&BigUint::from(7u32)), BigUint::from(2u32));
+        assert_eq!(ring.phase(), &[BigUint::from(1u32)]);
+        assert_eq!(ring.ticks(), BigUint::from(7u32));
+        assert_eq!(ring.elapsed(), rat(7, 5));
+        assert_eq!(ring.odometer().levels(), 1);
+        assert!(Clock::unwound(Rat::zero()).is_err());
     }
 
     /// A skew (rotation) generator's Cayley tick preserves `|x|²` exactly, and the screw carries

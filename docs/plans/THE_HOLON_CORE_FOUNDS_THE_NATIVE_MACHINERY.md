@@ -79,6 +79,61 @@ keeps its API and delegates to the chart.
    remaining history structures retire under the retention law; unconsumed body states are charted or
    retired after a consumer audit.
 
+### Phase 4 disposition: every `*Complex` type against the core complex
+
+[established-bounded; source-inspected] The workspace declares 27 `pub struct *Complex` types outside
+`holonic-core` (three further matches are source text inside `holonic-life/driver-sources/*.json`).
+Each is (a) a thin view over the core `CellComplex` (a chart method, the engine wire unchanged),
+(b) a documented chart reached through another owner, or (c) a different object. Engine charts go
+through `algebraic::{CoreCellChart, GraphChart, CoreChartRefusal}`
+(`crates/holonic-engine/src/algebraic/core_chart.rs`): a `GradedCausalComplex` is read by the group
+completion of its coefficients (`TryFrom<&GradedCausalComplex> for CellComplex`, and back through
+`GradedCausalComplex::from_core` for integral boundaries); graph-shaped complexes through
+`CellComplex::graph`. The core complex is `Serialize`-only, so a chart is always rebuilt from the
+engine value through the core constructor, which re-certifies `∂∘∂ = 0`.
+
+| Type | Owner | Disposition |
+|---|---|---|
+| `GradedCausalComplex` | `holonic-engine/src/algebraic.rs` | (a) `core_chart`, `TryFrom`, `from_core`; the engine's source presentation (caused, named cells; paired occurrence counts) |
+| `SimplicialComplex` | `simplicial.rs` | (b) `core_chart` through `SimplicialIncidenceReceipt::realize` |
+| `DiffusionComplex` | `diffusion.rs` | (a) `graph_chart` + `capacity_storage` (storage `C⁻¹`) + `conductance_relation` (resistive); the law's drop map is `−d₀` of the chart (duplicate incidence builder removed) |
+| `DiscreteCurrentComplex` | `physical.rs` | (a) `graph_chart`; `conservation` is `∂₁ J`; a self-loop is refused (the receipt reads it once) |
+| `GradedConstraintComplex` | `physical_constraint_grading.rs` | (a) `core_chart` of one family member |
+| `PhysicalConstraintComplex` | `physical_constraint_complex.rs` | (b) a *family* of core complexes (one per open-contact resolution) through `graded_constraint_member`/`_family`; its vertex/edge/face tables are the material presentation |
+| `CellComplex` (fold) | `fold.rs` | (a) `core_chart` through `graded`; kept as the vertex/edge/triangle presentation with its wire (the same role as the core type, not aliasable without breaking `CellComplexWire`) |
+| `ContactComplex` | `contact_gluing.rs` | (a) `core_chart`; occurrences are named subcomplexes |
+| `ReceiverGrainComplex` | `holonic_complex.rs` | (a) `core_chart`; cell witnesses are provenance |
+| `CoPresentationComplex` | `collocation.rs` | (a) `core_chart` inside the aperture |
+| `GrownComplex` | `grown_cell.rs` | (b) `complex.core_chart()` on its public field; growth censuses are provenance |
+| `ExactConfigurationComplex` | `basin.rs` | (a) `graph_chart` (adjacency oriented `left → right`); measures and actions are element data |
+| `SeparationComplex` | `token_invariance.rs` | (c) a longest-common-prefix order over window classes; no boundary |
+| `SessionFactorComplex` | `native_ecology/factor_complex.rs` | (c) a device morphology session word, not incidence |
+| `AddressedFactoredIntegralReceiverComplex` | `receiver_history_compression/factored_forms.rs` | (c) a pool of receiver functionals |
+| `PortedOperationComplex` | `ported_operation.rs` | (c) an `EvolutionShape` event diagram: an event chart |
+| `MoveComplex` | `move_species.rs` | (c) move records and their arrival DAG: an occurrence chart |
+| `RatComplex` | `relational-geometry/src/exact_analysis/complex.rs` | (c) a complex *number* (`re`, `im`) |
+| `EventComplex` | `holonic-body/src/incidence.rs` | (c) the borrowed event complex: the occurrence Holon's event chart (`Foundation/Holon.lean`) |
+| `IncidenceComplex` | `holonic-life/src/incidence_production.rs` | (c) source-native material occurrence incidence with causal dependencies; an event chart |
+| `ConsequenceComplex` | `holonic-life/src/holonic_training.rs` | (c) an acyclic route DAG of consequence boundaries |
+| `TotalCaseComplex` | `holonic-life/examples/m6/case.rs` | (c) a case-cover receipt |
+| `EditComplex` | `holonic-life/src/reconstruction_fiber/edit.rs` | (c) the minimal edit-path DAG |
+| `NativeCultivatedPotentialComplex` | `holonic-life/src/native_intelligence/cultivated.rs` | (c) a direct-sum potential current receipt |
+| `NativeProsePotentialComplex` | `holonic-life/src/native_intelligence/perspective_emanation.rs` | (c) a native section/contact receipt |
+| `NativeAcousticPotentialComplex` | `holonic-life/src/native_intelligence/membrane_acoustic/potential_formation.rs` | (c) a native port/current receipt |
+| `NativeMathematicalComplex` | `holonic-life/src/mathematical_particle/production_aperture/native_consequence_types.rs` | (c) lists of operation/constraint/geometry cells as a receipt |
+
+The mixed incidence/constitution types that are not named `*Complex`: `HodgeOperator` is (b)
+`core_chart` + `metric_storage` (the declared metric as positive storage), with its `d`, `δ` and `Δ`
+equal entry for entry to `CellComplex::{coboundary, codifferential, hodge_laplacian}`;
+`ResistiveNetwork` is (a) `core_chart` + `conductance_relation`, and `junction_law::tellegen` equals
+`holonic_core::dirac::tellegen` on the chart; `Interface` is (c) a declared side split of flux cells
+over an operator (a port partition, not a complex); `ExactCellularSheaf` exposes its base
+`core_chart`, its rank-one coboundary is the core `d`, and higher stalks are a matrix-valued
+incidence; `HingeTransportNetwork::core_connection` is the core `ConnectionIncidence` for scalar
+dilation turns, whose curvature face equals the hinge world's cycle-return displacement, and refuses
+a general `PGL(2,ℚ)` turn. Owed: a matrix-valued core connection (projective turns, affine cell
+transports and higher sheaf stalks), for which the scalar determinant line is the present reading.
+
 Constraints: rest/wire compatibility for `SavedCoupledBody`, `NativeIncidentModelRest`,
 `CoupledConstitutiveRest`, the complex schema string and custom deserializers; interaction types stay
 `Serialize`-only so no wire mints an unchecked object; no device layout change during consolidation;

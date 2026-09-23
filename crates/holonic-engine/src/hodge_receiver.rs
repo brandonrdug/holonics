@@ -115,6 +115,15 @@
 //! whose two bounds have **equal Betti numbers** — the open contact is invisible to homology and
 //! visible to the spectrum. That is the separation this receiver exists for.
 //!
+//! # The core complex and its storage
+//!
+//! [definition] The operator is a chart of the Holon core (plan phase 4):
+//! [`HodgeOperator::core_chart`] is its active complex as `holonic_core::complex::CellComplex`
+//! and [`HodgeOperator::metric_storage`] its declared metric as core storage `W_k`. The core
+//! `CellComplex::{coboundary, codifferential, hodge_laplacian}` under that storage return this
+//! operator's `d_k`, `δ_k` and `Δ_k` entry for entry (tested); this module keeps its own
+//! computation because it validates at every reading and carries the relative condition.
+//!
 //! # Formal owner
 //!
 //! `formal/elementary-holonics/ElementaryHolonics/Foundation/HodgeReceiver.lean`, namespace
@@ -148,7 +157,9 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::algebraic::{CausalAlgebraicError, CausalCellId, GradedCausalComplex};
+use crate::algebraic::{
+    CausalAlgebraicError, CausalCellId, CoreCellChart, CoreChartRefusal, GradedCausalComplex,
+};
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::exact_value::{AlgebraicRoot, ExactInterval, ExactValueError, IntegerPolynomial, SturmChain};
 use crate::lattice_gauge::{LatticeGaugeRefusal, characteristic_polynomial};
@@ -854,6 +865,62 @@ impl HodgeOperator {
             .map_err(|error| HodgeError::CellularSheaf(error.to_string()))?;
         let mine = self.coboundary(grade)?;
         Ok(theirs == mine)
+    }
+}
+
+// -------------------------------------------------------------------------------------------
+// the operator as the core complex and its metric storage (plan phase 4)
+// -------------------------------------------------------------------------------------------
+
+impl HodgeOperator {
+    /// [definition] **The active complex as the core complex `K`**: the active cells of each grade
+    /// `0..=dimension` in this operator's coordinate order, with `∂_(k+1) = d_kᵀ` read from the
+    /// operator's own incidence. The core constructor re-certifies `∂∘∂ = 0`. On a free condition
+    /// this is [`GradedCausalComplex::core_chart`] of the complex the operator was founded on; on a
+    /// relative condition it is the relative complex `C(K, L)`.
+    pub fn core_chart(&self) -> Result<CoreCellChart, HodgeError> {
+        self.validate()?;
+        let top = self.dimension.map_or(0, |grade| grade as usize);
+        let cells = (0..=top)
+            .map(|grade| self.cells(grade as u32).to_vec())
+            .collect();
+        CoreCellChart::from_incidence(cells, |cell| {
+            self.incidence
+                .get(&cell)
+                .map(|faces| {
+                    faces
+                        .iter()
+                        .map(|(face, value)| (*face, Rat::from_integer(value.clone())))
+                        .collect()
+                })
+                .unwrap_or_default()
+        })
+        .map_err(|refusal| HodgeError::Core(Box::new(refusal)))
+    }
+
+    /// [definition] **The declared metric of one grade as core storage**: the positive diagonal form
+    /// `W_k`, an `ElementRelation::Storage` on the grade's cochains. The codifferential is its
+    /// metric adjoint, `holonic_core::complex::CellComplex::codifferential(k, W_k, W_(k+1))`,
+    /// equal entry for entry to [`Self::codifferential`] (tested).
+    pub fn metric_storage(
+        &self,
+        grade: u32,
+    ) -> Result<holonic_core::inertia::SymmetricForm, HodgeError> {
+        let diagonal = self
+            .cells(grade)
+            .iter()
+            .map(|cell| self.metric.weight(*cell).cloned())
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(holonic_core::inertia::SymmetricForm::from_diagonal(
+            diagonal,
+        ))
+    }
+
+    /// The metric storage of every grade `0..=dimension`, the argument of
+    /// `CellComplex::hodge_laplacian`.
+    pub fn metric_storages(&self) -> Result<Vec<holonic_core::inertia::SymmetricForm>, HodgeError> {
+        let top = self.dimension.map_or(0, |grade| grade);
+        (0..=top).map(|grade| self.metric_storage(grade)).collect()
     }
 }
 
@@ -2737,6 +2804,10 @@ pub enum HodgeError {
     Grading(#[from] ConstraintGradingError),
     #[error("the cellular sheaf refused: {0}")]
     CellularSheaf(String),
+    /// The core complex refused the chart (plan phase 4). Boxed: the core's refusals carry exact
+    /// witnesses.
+    #[error("the core complex refused the chart: {0}")]
+    Core(Box<CoreChartRefusal>),
     #[error(
         "the metric {lineage:?} declares a weight that is not positive (cell {cell:?}, grade {grade:?}); a metric is positive definite or it is not a metric"
     )]

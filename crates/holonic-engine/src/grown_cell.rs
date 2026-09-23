@@ -1417,6 +1417,10 @@ pub struct Arc {
 }
 
 /// The complex a growth founded, with the populations named.
+///
+/// [definition] Its incidence is a chart of the core complex `K` (plan phase 4):
+/// `grown.complex.core_chart()` ([`GradedCausalComplex::core_chart`]); the aperture, nets, arcs and
+/// face censuses are the growth's provenance and stay here.
 #[derive(Clone, Debug)]
 pub struct GrownComplex {
     pub complex: GradedCausalComplex,
