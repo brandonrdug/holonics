@@ -191,21 +191,21 @@ removed. The propagation construction remains in the broad umbrella and in its
 cosmological and four-force imports remain direct research entries of the current facade pending
 the curated-root migration; their source files and standalone consumers remain intact.
 
-After the source cuts, the static source-import closure of `Framework.Physics` falls from 476
-modules / 170,559 lines (279 Millennium, 64 RH) to 475 / 169,920 (277 Millennium, 64 RH). This
-small net change reflects overlapping paths to the research modules. `Physics.InformationDifference`
+Against the Ratio parent, the Physics source cut reduced the static source-import closure of
+`Framework.Physics` from 476 modules / 170,559 lines (279 Millennium, 64 RH) to 475 / 169,920
+(277 Millennium, 64 RH). This small net change reflects overlapping research paths.
+`Physics.InformationDifference`
 falls from 129 / 47,269 to 3 / 538 lines; `Objects.Ratio` falls from 136 / 49,827 to 16 / 4,340;
 and `Framework.Objects` falls from 208 / 81,459 to 110 / 41,755. These are source-import counts,
 not Lake artifact measurements. The full `Framework.Physics` research closure still needs
 declaration-level curation; dropping imports alone must not be reported as a research-free Holonics
 root.
 
-For a stacked-source projection, overlaying the two Lean files changed by
-`codex/restructure-r3-dynamics-curation` onto this Physics worktree gives `Framework.Physics` 408
-modules / 153,769 lines (274 Millennium, zero RH) and full `Framework` 474 / 172,792 (280
-Millennium, zero RH). This is an in-memory source-import projection before Git rebase and combined
-Lake verification; recount after integration. The legacy `ElementaryHolonics` umbrella remains a
-broad source/research closure.
+After stacking on `codex/restructure-r3-dynamics-curation`, a fresh source-import traversal gives
+`Framework.Physics` 408 modules / 153,769 lines (274 Millennium, zero RH) and full `Framework`
+474 / 172,792 (280 Millennium, zero RH). The complete `ElementaryHolonics` research umbrella
+retains 1,387 source modules, including both new owners. These source counts do not substitute for
+the combined Lake gate recorded in the verification receipt.
 
 Direct importers after the cut: `HolonicMembraneActionTransport` remains in
 `ElementaryHolonics.lean` and `HolonicMembraneActionInformationDifference`;
@@ -231,6 +231,6 @@ the main root no longer re-exports its research owner.
 
 The remaining direct Physics owners whose own imports cross into research are recorded above by
 path and family; importantly, their counts overlap and must not be summed as unique removals. In
-the post-cut source graph the full Physics facade still reaches 277 Millennium and 64 RH modules.
+the stacked source graph the full Physics facade still reaches 274 Millennium modules.
 The target root must split those mixed declarations, not blindly remove the Physics modules or
 re-export all their source dependencies.
