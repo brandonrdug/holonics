@@ -79,6 +79,12 @@ The [ninth cohort](census/RECORDS_NINTH_R0.tsv) (September 1–3) adds 60 **keep
 Across 540 audited records: 476 keep, 57 fold only after owner transfer, seven unresolved.
 The cohort includes distinct shell/analysis proofs, HNA negative controls and staged releases;
 DB0 retains its unique de Bruijn source and owner map even though later records prove some steps.
+The [tenth and final cohort](census/RECORDS_TENTH_R0.tsv) (September 3–20) adds 33 **keep**
+and two **fold** candidates. All 575 zero-inbound Markdown records in the captured R0 scan
+now have a source-reviewed claim disposition: 509 keep, 59 fold only after named owner transfer,
+seven unresolved. The final two folds are HNP receipt README summaries; their measured JSON
+receipts remain. This completes the record review queue, not the archive/document or Rust/Lean
+census gates.
 
 The document table records paths, line counts, live incoming source count and a conservative
 working disposition. Its scan recognizes Markdown links and explicit path strings in common
