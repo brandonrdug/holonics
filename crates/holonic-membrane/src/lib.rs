@@ -31,7 +31,6 @@ pub use chart_address::{ChartAddress, ChartAddressError};
 pub use growing_carrier::GrowingCarrier;
 pub use growing_ranked::{GrowingRankedOwn, RankedOwnCell};
 pub use growing_sparse::GrowingSparseOwn;
-pub use holonic_structure::CausalMembrane;
 pub use live_carrier::{LiveCarrierError, LiveCarrierSnapshot};
 pub use live_constituent::{
     BoundaryBehavior, CompressionCertificate, FormedPin, InterfaceCapability,
