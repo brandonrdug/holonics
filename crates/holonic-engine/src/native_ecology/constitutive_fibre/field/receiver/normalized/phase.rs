@@ -477,6 +477,45 @@ impl<'c> NativePhaseParticipationAdjoint<'c> {
     }
 }
 
+impl NativePhaseParticipation<'_> {
+    /// **This participation as a receiver element** (plan phase 7): it reads the query and the
+    /// transported neighbours at zero flow and injects the drive `y = Σ a U Ψ` into the field. It is
+    /// an exterior drive whose delivered power `⟨e_D, y⟩` enters the field's balance
+    /// (`Holon/Law.lean::exterior_drive_balance`); its sign is the consumer's, never assumed.
+    pub fn receiver_element(&self) -> ActiveReceiver {
+        let query = self.rows * self.components;
+        ActiveReceiver::declared(
+            "phase participation",
+            query + query * self.neighbors_per_row,
+            ReceiverPower::ExteriorDrive {
+                drive_ports: real_coordinates(&self.output),
+            },
+        )
+    }
+
+    /// `⟨e_D, y⟩` enclosed over the returned drive balls at a declared real-coded drive effort:
+    /// the host-side active term this receiver contributes to the field's `EnergyBalance`.
+    pub fn delivered_power(
+        &self,
+        drive_effort: &[Rat],
+    ) -> Result<ExactInterval, ConstitutiveFibreError> {
+        delivered_power_enclosure(&self.output, drive_effort)
+    }
+}
+
+impl NativePhaseParticipationAdjoint<'_> {
+    /// **This adjoint as a receiver element** (plan phase 7): the covector return onto the
+    /// producing query and transported neighbours, a power-preserving pullback
+    /// (`Holon/Law.lean::pullback_law`).
+    pub fn receiver_element(&self) -> ActiveReceiver {
+        ActiveReceiver::declared(
+            "phase participation adjoint",
+            real_coordinates(&self.source) + real_coordinates(&self.neighbors),
+            ReceiverPower::Pullback,
+        )
+    }
+}
+
 #[cfg(test)]
 mod gpu_tests {
     use super::*;
@@ -543,6 +582,64 @@ mod gpu_tests {
         assert_eq!(result.neighbors_per_row(), 2);
         assert_eq!(result.participation().rows(), 1);
         assert!(result.output().row(0).unwrap().inspect().unwrap().radius > Rat::zero());
+    }
+
+    /// **Plan phase 7: the phase participation is an exterior-drive receiver element** and its
+    /// normalized face a zero-power reading; the declarations leave every resident return unchanged.
+    #[test]
+    #[ignore = "requires CUDA; the receiver declaration leaves the resident phase return unchanged"]
+    fn phase_receiver_element_declares_its_drive_without_changing_the_return() {
+        use holonic_core::law::receiver::ReceiverPower;
+        let readout = ResidentReadout::new().unwrap();
+        let surface = ResidentSurface::on(&readout).unwrap();
+        let unit = 1i128 << 12;
+        let query = Rc::new(balls(&surface, &[(vec![unit, 0, 0, 0], unit / 16)], 4));
+        let neighbors = Rc::new(balls(
+            &surface,
+            &[
+                (vec![unit, 0, 0, 0], unit / 16),
+                (vec![0, unit, 0, 0], unit / 16),
+            ],
+            4,
+        ));
+        let result = query
+            .phase_participation(neighbors, 2, Dyadic::ONE, SeriesAperture(32))
+            .unwrap();
+        let read = |result: &NativePhaseParticipation<'_>| {
+            (
+                result.logits().inspect_rows().unwrap(),
+                result.participation().inspect_rows().unwrap(),
+                result.output().inspect_rows().unwrap(),
+            )
+        };
+        let before = read(&result);
+        let element = result.receiver_element();
+        assert_eq!(element.read_ports(), 4 + 8);
+        assert_eq!(
+            element.power(),
+            &ReceiverPower::ExteriorDrive { drive_ports: 4 }
+        );
+        let face = result.normalized().receiver_element();
+        assert_eq!(face.power(), &ReceiverPower::Reading);
+        assert!(face.is_passive());
+        assert_eq!(
+            face.read_ports(),
+            result.normalized().rows() * result.normalized().nodes()
+        );
+        let effort: Vec<Rat> = [1, 0, -1, 2]
+            .into_iter()
+            .map(|v: i64| Rat::from_integer(v.into()))
+            .collect();
+        let delivered = result.delivered_power(&effort).unwrap();
+        let y = &before.2[0];
+        let centre = &y.center[0].real - &y.center[1].real
+            + Rat::from_integer(2.into()) * &y.center[1].imaginary;
+        assert!(delivered.lower <= centre && centre <= delivered.upper);
+        assert_eq!(
+            &delivered.upper - &delivered.lower,
+            Rat::from_integer(8.into()) * &y.radius
+        );
+        assert_eq!(read(&result), before);
     }
 
     #[test]

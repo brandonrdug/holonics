@@ -302,5 +302,46 @@ impl<'c> NativePairParticipationAdjoint<'c> {
     }
 }
 
+impl NativePairParticipation<'_> {
+    /// **This participation as a receiver element** (plan phase 7): it reads the query and
+    /// neighbour geometry at zero flow (`s = −βQ/2`, `a = softmax s`) and injects the drive
+    /// `y = Σ a_i v_i` of the separately typed value current. It is an exterior drive whose
+    /// delivered power `⟨e_D, y⟩` enters the field's balance
+    /// (`Holon/Law.lean::exterior_drive_balance`); its sign is the consumer's, never assumed.
+    pub fn receiver_element(&self) -> ActiveReceiver {
+        ActiveReceiver::declared(
+            "pair participation",
+            real_coordinates(&self.query) + real_coordinates(&self.neighbors),
+            ReceiverPower::ExteriorDrive {
+                drive_ports: real_coordinates(&self.output),
+            },
+        )
+    }
+
+    /// `⟨e_D, y⟩` enclosed over the returned drive balls at a declared real-coded drive effort:
+    /// the host-side active term this receiver contributes to the field's `EnergyBalance`.
+    pub fn delivered_power(
+        &self,
+        drive_effort: &[Rat],
+    ) -> Result<ExactInterval, ConstitutiveFibreError> {
+        delivered_power_enclosure(&self.output, drive_effort)
+    }
+}
+
+impl NativePairParticipationAdjoint<'_> {
+    /// **This adjoint as a receiver element** (plan phase 7): the covector return onto the
+    /// producing query, neighbour and value charts, a power-preserving pullback
+    /// (`Holon/Law.lean::pullback_law`).
+    pub fn receiver_element(&self) -> ActiveReceiver {
+        ActiveReceiver::declared(
+            "pair participation adjoint",
+            real_coordinates(&self.query)
+                + real_coordinates(&self.neighbors)
+                + real_coordinates(&self.values),
+            ReceiverPower::Pullback,
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests;

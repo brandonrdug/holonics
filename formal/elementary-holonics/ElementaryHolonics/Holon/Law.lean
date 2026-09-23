@@ -15,8 +15,14 @@ import ElementaryHolonics.Holon.Restriction
   sides (`PortHolon.mem_interconnect`).
 * **receive** — the passive coholon (zero flow, every effort) is Dirac
   (`passiveCoholon_isDirac`) and reads an effort by a linear functional with zero power
-  (`passive_reading`); an active receiver joined through an interface conductance `G` satisfies
-  `P_(H→R) + P_(R→H) = −D_Σ`, `D_Σ = ⟨Δ, GΔ⟩ ≥ 0` when `G` is passive (`active_receiver_law`).
+  (`passive_reading`); any reading of its bond, linear or not, draws zero power
+  (`coholon_reading_power`); an active receiver joined through an interface conductance `G`
+  satisfies `P_(H→R) + P_(R→H) = −D_Σ`, `D_Σ = ⟨Δ, GΔ⟩ ≥ 0` when `G` is passive
+  (`active_receiver_law`). As elements (plan phase 7): an exterior drive closes its own balance
+  (`exterior_drive_balance`), a learned relation delivers its declared power
+  (`learned_receiver_balance`), and the normalized face's Jacobian `J_p = diag p − p pᵀ` is
+  symmetric (`softmaxJacobian_transpose`), so its covector return preserves power
+  (`softmax_pullback_power`); its rows vanish on the simplex (`softmaxJacobian_mulVec_one`).
 * **advance** — the implicit midpoint step has zero balance residual (`advance_law`).
 * **restrict** — `kron_exact` and `scale_square_pow` (in `Holon.Restriction`).
 * **pullback** — a port map moves efforts by its transpose and preserves power (`pullback_law`).
@@ -197,6 +203,71 @@ theorem active_receiver_law (G : Matrix τ τ 𝕜) (hG : ∀ v, 0 ≤ v ⬝ᵥ 
   ring
 
 end Receive
+
+/-! ## 2b. receivers as elements: a reading, a drive, a learned relation and a pullback -/
+
+section ReceiverElements
+
+variable {𝕜 : Type*} [Field 𝕜] {τ δ α ι : Type*} [Fintype τ] [Fintype δ] [Fintype α]
+  [Fintype ι]
+
+/-- [proved-derived; formal-checked] **Any reading of a coholon bond draws zero power.** Whatever
+function `r` of the effort a receiver computes — linear or not (a normalized face) — the bond it
+stands on is in the passive coholon, so its power is `0`, and its value depends on the effort alone:
+two coholon bonds with one effort read alike. -/
+theorem coholon_reading_power {X : Type*} (r : (τ → 𝕜) → X) (b : Bond 𝕜 τ)
+    (hb : b ∈ passiveCoholon 𝕜 τ) :
+    power b = 0 ∧ ∀ b' ∈ passiveCoholon 𝕜 τ, b'.2 = b.2 → r b'.2 = r b.2 := by
+  have h : b.1 = 0 := hb
+  exact ⟨by simp [power, h], fun _ _ he => by rw [he]⟩
+
+/-- [proved-derived; formal-checked] **The exterior drive balance.** A receiver that reads at zero
+flow (`(0, e_in)`) and injects a current `y` against the Holon's drive effort `e_D` (its bond
+`(−y, e_D)`) stores nothing; with the exterior supply `⟨e_D, y⟩` declared as its active power, its
+own balance closes exactly: `port + active = 0`. The Holon receives `⟨e_D, y⟩`. -/
+theorem exterior_drive_balance (eIn : τ → 𝕜) (y eD : δ → 𝕜) :
+    power ((0, eIn) : Bond 𝕜 τ) + power ((-y, eD) : Bond 𝕜 δ) + eD ⬝ᵥ y = 0 := by
+  simp [power]
+
+/-- [proved-derived; formal-checked] **A learned receiver's balance.** A learned relation
+`e_A = L f_A` delivers its declared power `⟨f_A, L f_A⟩` through the bond `(−f_A, L f_A)`, and its
+own balance closes. -/
+theorem learned_receiver_balance (L : Matrix α α 𝕜) (f : α → 𝕜) :
+    power ((-f, L *ᵥ f) : Bond 𝕜 α) + f ⬝ᵥ (L *ᵥ f) = 0 := by
+  simp [power, dotProduct_comm]
+
+/-- [definition] **The normalized face's Jacobian** `J_p = diag p − p pᵀ`. -/
+def softmaxJacobian [DecidableEq ι] (p : ι → 𝕜) : Matrix ι ι 𝕜 :=
+  Matrix.diagonal p - Matrix.vecMulVec p p
+
+omit [Fintype ι] in
+/-- [proved-derived; formal-checked] `J_p` is symmetric, so the normalized receiver's covector
+return `J_p g` is its own transpose's pullback. -/
+theorem softmaxJacobian_transpose [DecidableEq ι] (p : ι → 𝕜) :
+    (softmaxJacobian p)ᵀ = softmaxJacobian p := by
+  ext i j
+  simp only [softmaxJacobian, Matrix.transpose_apply, Matrix.sub_apply, Matrix.diagonal_apply,
+    Matrix.vecMulVec_apply]
+  by_cases h : i = j
+  · subst h; rfl
+  · rw [if_neg h, if_neg (Ne.symm h), mul_comm]
+
+/-- [proved-derived; formal-checked] **The normalized pullback preserves power**: `pullback_law`
+at `P = J_p` with `J_pᵀ = J_p`. -/
+theorem softmax_pullback_power [DecidableEq ι] (p g d : ι → 𝕜) :
+    g ⬝ᵥ (softmaxJacobian p *ᵥ d) = (softmaxJacobian p *ᵥ g) ⬝ᵥ d := by
+  conv_rhs => rw [← softmaxJacobian_transpose p]
+  exact power_pushforward _ d g
+
+/-- [proved-derived; formal-checked] On the simplex the rows of `J_p` sum to zero: a uniform shift
+of the potentials does not move the normalized face. -/
+theorem softmaxJacobian_mulVec_one [DecidableEq ι] (p : ι → 𝕜) (h : ∑ i, p i = 1) :
+    softmaxJacobian p *ᵥ (fun _ => 1) = 0 := by
+  ext i
+  simp [softmaxJacobian, Matrix.mulVec, dotProduct, Matrix.vecMulVec_apply,
+    Matrix.diagonal_apply, ← Finset.mul_sum, h]
+
+end ReceiverElements
 
 /-! ## 3. advance, restrict and pullback, as the statements the core implements -/
 

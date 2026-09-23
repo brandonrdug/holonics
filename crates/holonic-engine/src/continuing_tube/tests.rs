@@ -11,12 +11,15 @@ use num_traits::{One, Zero};
 use relational_geometry::Rat;
 
 use super::*;
+use crate::continuing_tower::Tower;
 use crate::continuing_tower::{
     HalvingMigration, ResidualMigration, ResidueTower, ReversePassageReceipt, SwapMigration,
     TwoChartTower, TwoCharts, check_reverse_passage,
 };
 use crate::grain_tower::GrainPair;
 use crate::physical_constraint_complex::ContactClass;
+use crate::receiver_release::{DiameterNorm, Horizon};
+use crate::relation_ladder::Rung;
 
 fn rational(value: i64) -> Rat {
     Rat::from_integer(num_bigint::BigInt::from(value))

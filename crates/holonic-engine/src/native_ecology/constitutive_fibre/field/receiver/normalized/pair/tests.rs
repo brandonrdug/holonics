@@ -259,3 +259,70 @@ fn joint_pair_constant_values_have_zero_geometric_return() {
         }
     }
 }
+
+/// **Plan phase 7: the pair participation is an exterior-drive receiver element.** The declaration
+/// reads only carried extents: the logits, participation and drive are the same before and after
+/// it and the delivered-power enclosure, and the enclosure is the exact `⟨e_D, y⟩` bound of the
+/// returned ball (`Holon/Law.lean::exterior_drive_balance`).
+#[test]
+#[ignore = "requires CUDA; the receiver declaration leaves the resident pair return unchanged"]
+fn pair_receiver_element_declares_its_drive_without_changing_the_return() {
+    use holonic_core::law::receiver::ReceiverPower;
+    let device = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&device).unwrap();
+    let u = 1i128 << 16;
+    let query = Rc::new(balls(&surface, &[(vec![0, 0], u / 8)], 2));
+    let neighbors = Rc::new(balls(
+        &surface,
+        &[(vec![-u, 0], u / 8), (vec![u, 0], u / 8)],
+        2,
+    ));
+    let values = Rc::new(balls(
+        &surface,
+        &[
+            (vec![u, 2 * u, -u, 0], u / 16),
+            (vec![u, 2 * u, -u, 0], u / 16),
+        ],
+        4,
+    ));
+    let pair = query
+        .pair_quadrance_participation_with_enclosure(
+            neighbors,
+            values,
+            2,
+            Dyadic::ONE,
+            SeriesAperture(40),
+            NativeEnclosurePropagation::JointBall,
+        )
+        .unwrap();
+    let read = |pair: &NativePairParticipation<'_>| {
+        (
+            pair.logits().inspect_rows().unwrap(),
+            pair.participation().inspect_rows().unwrap(),
+            pair.output().inspect_rows().unwrap(),
+        )
+    };
+    let before = read(&pair);
+    let element = pair.receiver_element();
+    assert_eq!(element.read_ports(), 2 + 4);
+    assert_eq!(
+        element.power(),
+        &ReceiverPower::ExteriorDrive { drive_ports: 4 }
+    );
+    assert!(!element.is_passive());
+    let one = Rat::from_integer(1.into());
+    let zero = Rat::zero();
+    let delivered = pair
+        .delivered_power(&[one.clone(), zero.clone(), zero, one])
+        .unwrap();
+    // y is the common value ball (1, 2, −1, 0) with radius 1/16; ⟨e_D, centre⟩ = 1, ‖e_D‖₁ r = 1/8.
+    assert_eq!(delivered.lower, Rat::new(7.into(), 8.into()));
+    assert_eq!(delivered.upper, Rat::new(9.into(), 8.into()));
+    assert!(pair.delivered_power(&[Rat::zero()]).is_err());
+    assert_eq!(read(&pair), before);
+    let gy = balls(&surface, &[(vec![u, 0, 0, 0], 0)], 4);
+    let back = pair.pull_back(&gy, None).unwrap();
+    let adjoint = back.receiver_element();
+    assert_eq!(adjoint.power(), &ReceiverPower::Pullback);
+    assert_eq!(adjoint.read_ports(), 2 + 4 + 8);
+}

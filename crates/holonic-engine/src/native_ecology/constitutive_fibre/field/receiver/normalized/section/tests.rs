@@ -292,6 +292,14 @@ fn row_sectioned_face_and_pullback_agree_with_the_normalized_kernel() {
         8,
     );
     let returned = face.pull_back(&covector).unwrap();
+    // Plan phase 7: the face is a zero-power reading and its return a pullback on the same ports.
+    use holonic_core::law::receiver::ReceiverPower;
+    assert_eq!(face.receiver_element().power(), &ReceiverPower::Reading);
+    assert_eq!(returned.receiver_element().power(), &ReceiverPower::Pullback);
+    assert_eq!(
+        returned.receiver_element().read_ports(),
+        face.receiver_element().read_ports()
+    );
     let (ds, _) = kernel
         .pullback(&identity(4), &matrix(&[&covector_values]))
         .unwrap();

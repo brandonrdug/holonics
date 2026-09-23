@@ -225,95 +225,10 @@ pub enum LadderRefusal {
 // The typed scale
 // -------------------------------------------------------------------------------------------
 
-/// The rungs as data, so that "which relation was established" is a value and not a word.
-///
-/// Lean counterpart: `Foundation/RelationLadder.lean::Rung`.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum Rung {
-    /// Rung 1: `x = y`, strict occurrence identity inside one situated type.
-    Identity,
-    /// Rung 3: a symmetry of the situation carrying one occurrence to the other.
-    Isomorphism,
-    /// Rung 5: equal potential over the declared `(G, R)`.
-    EqualPotential,
-    /// Rung 4: equal under every declared receiver, now.
-    ReceiverEqual,
-    /// Rung 6: a declared reading inside a declared tolerance.
-    WithinTolerance,
-    /// Rung 2: an addressed passage carries one occurrence to the other.
-    Continuation,
-    /// Nothing on this ladder was established. The honest bottom, not a claim.
-    NoRelation,
-}
-
-impl Rung {
-    /// Every rung, in the order the Lean `inductive` declares them.
-    pub const ALL: [Rung; 7] = [
-        Rung::Identity,
-        Rung::Isomorphism,
-        Rung::EqualPotential,
-        Rung::ReceiverEqual,
-        Rung::WithinTolerance,
-        Rung::Continuation,
-        Rung::NoRelation,
-    ];
-
-    /// Everything this rung entails, itself included.
-    ///
-    /// Lean counterpart: `Foundation/RelationLadder.lean::Rung.entailed`.
-    pub fn entailed(self) -> &'static [Rung] {
-        match self {
-            Rung::Identity => &[
-                Rung::Identity,
-                Rung::Isomorphism,
-                Rung::EqualPotential,
-                Rung::ReceiverEqual,
-                Rung::WithinTolerance,
-                Rung::Continuation,
-                Rung::NoRelation,
-            ],
-            Rung::Isomorphism => &[
-                Rung::Isomorphism,
-                Rung::EqualPotential,
-                Rung::ReceiverEqual,
-                Rung::WithinTolerance,
-                Rung::Continuation,
-                Rung::NoRelation,
-            ],
-            Rung::EqualPotential => &[
-                Rung::EqualPotential,
-                Rung::ReceiverEqual,
-                Rung::WithinTolerance,
-                Rung::NoRelation,
-            ],
-            Rung::ReceiverEqual => &[Rung::ReceiverEqual, Rung::WithinTolerance, Rung::NoRelation],
-            Rung::WithinTolerance => &[Rung::WithinTolerance, Rung::NoRelation],
-            Rung::Continuation => &[Rung::Continuation, Rung::NoRelation],
-            Rung::NoRelation => &[Rung::NoRelation],
-        }
-    }
-
-    /// Whether every pair standing in this relation also stands in `other`.
-    ///
-    /// Lean counterpart: `Foundation/RelationLadder.lean::Rung.entails`.
-    pub fn entails(self, other: Rung) -> bool {
-        self.entailed().contains(&other)
-    }
-}
-
-/// The greatest common lower bound of two rungs. Total: incomparable rungs meet at
-/// [`Rung::NoRelation`].
-///
-/// Lean counterpart: `Foundation/RelationLadder.lean::rungMeet`.
-pub fn rung_meet(left: Rung, right: Rung) -> Rung {
-    if left.entails(right) {
-        right
-    } else if right.entails(left) {
-        left
-    } else {
-        Rung::NoRelation
-    }
-}
+/// [definition] **The scale moved to the core** (plan phase 7): [`Rung`] and [`rung_meet`] are the
+/// relation a receiver establishes, and the core tube's defect profile reads it, so they live in
+/// `holonic_core::law::receiver` and are re-exported here at their existing paths.
+pub use holonic_core::law::receiver::{Rung, rung_meet};
 
 // -------------------------------------------------------------------------------------------
 // The declared situation

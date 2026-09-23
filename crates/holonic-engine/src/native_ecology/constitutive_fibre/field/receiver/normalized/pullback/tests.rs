@@ -184,6 +184,18 @@ fn check_pullback(source_kind:NativeMaterialTransportSource){
             };
             assert_eq!(field.census().section_read_outs, before.section_read_outs);
             let result = resident.inspect().unwrap();
+            // Plan phase 7: a power-preserving pullback onto every returned coordinate.
+            let element = resident.receiver_element();
+            assert_eq!(
+                element.power(),
+                &holonic_core::law::receiver::ReceiverPower::Pullback
+            );
+            assert_eq!(
+                element.read_ports(),
+                result.visible_source.len()
+                    + result.outgoing_current.len()
+                    + result.internal_current.len()
+            );
             assert_eq!(result.source.occurrence, 3);
             assert_eq!(result.receiving.occurrence, receiving);
             let intervals: Vec<ExactInterval> = match metric {

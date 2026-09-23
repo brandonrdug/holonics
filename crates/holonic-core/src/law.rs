@@ -34,6 +34,11 @@
 //! | `passive_reading`, `passiveCoholon` | [`HolonLaw::receive`] |
 //! | `active_receiver_law` | [`active_receiver`] |
 //! | `pullback_law` | [`HolonLaw::pullback`] |
+//!
+//! [definition] **Receivers** (plan phase 7) are Holons at ports: the passive coholon, the active
+//! receiver with its declared power, and the receiver face they are charted by, in [`receiver`].
+
+pub mod receiver;
 
 use num_traits::{One, Zero};
 use relational_geometry::Rat;
@@ -100,6 +105,20 @@ impl EnergyBalance {
     pub fn word_change(&self) -> Rat {
         -&self.dissipated + &self.port + &self.active + &self.discretization_defect
     }
+
+    /// **Join an active receiver's delivered power** ([`receiver::ReceiverExchange::delivered`]):
+    /// the power becomes part of the active term and the residual is recomputed, so a balance that
+    /// did not yet count a joined receiver closes exactly when it does.
+    pub fn joined_active(&self, delivered: &Rat) -> Self {
+        Self::closed(
+            self.stored_change.clone(),
+            self.dissipated.clone(),
+            self.port.clone(),
+            &self.active + delivered,
+            self.deposition_work.clone(),
+            self.discretization_defect.clone(),
+        )
+    }
 }
 
 /// [definition] The discrete stepping scheme.
@@ -150,14 +169,7 @@ pub trait HolonLaw {
     ) -> Result<PassiveReading, HolonError> {
         let storage = self.holon().storage_at(state.commit);
         let effort = form_matrix(storage).apply(&state.configuration)?;
-        let coholon = Bond::new(crate::scalar::zeros(effort.len()), effort.clone())?;
-        if !DiracStructure::passive_coholon(effort.len())?.contains(&coholon)? {
-            return Err(HolonError::NotAdmitted);
-        }
-        Ok(PassiveReading {
-            value: reader.apply(&effort)?,
-            power: coholon.power(),
-        })
+        receiver::PassiveCoholon::new("receive", reader.clone()).read(&effort)
     }
 
     /// **restrict**: the pushforward of the interconnection along a port map

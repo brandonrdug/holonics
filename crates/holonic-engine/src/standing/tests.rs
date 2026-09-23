@@ -1212,3 +1212,23 @@ fn a_word_naming_an_absent_generator_is_refused() {
         "got {refusal:?}"
     );
 }
+
+/// **Plan phase 7: the standing's reading is the passive coholon** (`Holon/Law.lean::passive_reading`).
+/// Its face, its `Reading` face and the core coholon's value agree entry for entry, and the
+/// coholon draws zero power.
+#[test]
+fn the_receiver_reading_is_the_passive_coholon() {
+    for reading in [medium_reading(), state_reading()] {
+        let coholon = reading.passive_coholon();
+        assert_eq!(coholon.receiver(), reading.receiver());
+        for x in [state(&[(1, 2), (-3, 1)]), state(&[(0, 1), (7, 5)])] {
+            let passive = coholon.read(&x).expect("a coholon reading");
+            assert!(passive.power.is_zero());
+            assert_eq!(reading.face(&x).expect("a face"), passive.value);
+            assert_eq!(
+                Reading::read(&reading, &x).expect("a reading"),
+                ExactFace::Vector(passive.value)
+            );
+        }
+    }
+}

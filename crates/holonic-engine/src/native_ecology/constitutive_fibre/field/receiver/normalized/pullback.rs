@@ -297,6 +297,20 @@ impl<'chart> NativeConstitutiveField<'chart> {
     }
 }
 
+impl NativeMaterialSourcePullback<'_> {
+    /// **This partial adjoint as a receiver element** (plan phase 7): the declared metric's
+    /// covector returned through the producing material and query onto the `10 · nodes` visible and
+    /// outgoing coordinates and `2 · contacts` internal ones, a power-preserving pullback
+    /// (`Holon/Law.lean::pullback_law`). No current is committed.
+    pub fn receiver_element(&self) -> ActiveReceiver {
+        ActiveReceiver::declared(
+            "material source pullback",
+            10 * self.nodes + 2 * self.contacts,
+            ReceiverPower::Pullback,
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests;
 

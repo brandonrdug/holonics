@@ -725,5 +725,33 @@ fn branch_words(turns: &[i64], grain: u32) -> Result<Vec<(i64, i64)>, Constituti
     Ok(words)
 }
 
+impl NativeNormalizedSection<'_> {
+    /// **This face as a receiver element** (plan phase 7): `p = softmax(Re s)` per group is a
+    /// nonlinear reading of the `rows × nodes` real potentials at zero flow, drawing no power
+    /// (`Holon/Law.lean::coholon_reading_power`). The face is returned in its source chart for a
+    /// consumer; a consumer that drives the field with it declares that drive.
+    pub fn receiver_element(&self) -> ActiveReceiver {
+        ActiveReceiver::declared(
+            "normalized section face",
+            self.rows * self.nodes,
+            ReceiverPower::Reading,
+        )
+    }
+}
+
+impl NativeNormalizedSectionPullback<'_> {
+    /// **This covector return as a receiver element** (plan phase 7): `J_p g` with
+    /// `J_p = diag p − p pᵀ` symmetric (`Holon/Law.lean::softmaxJacobian_transpose`) is a pullback
+    /// onto the `rows × nodes` real potentials, which preserves power
+    /// (`Holon/Law.lean::softmax_pullback_power`).
+    pub fn receiver_element(&self) -> ActiveReceiver {
+        ActiveReceiver::declared(
+            "normalized section pullback",
+            self.rows * self.nodes,
+            ReceiverPower::Pullback,
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests;

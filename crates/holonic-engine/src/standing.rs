@@ -134,6 +134,7 @@ use relational_geometry::Rat;
 use serde::Serialize;
 use thiserror::Error;
 
+use holonic_core::law::receiver::PassiveCoholon;
 use holonic_core::restriction::{FactorDescent, LinearRestriction, factor_descent_over};
 
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
@@ -598,6 +599,16 @@ impl ReceiverReading {
             });
         }
         Self::declared(self.receiver.clone(), self.matrix.multiply(passage)?)
+    }
+}
+
+impl ReceiverReading {
+    /// **This reading as the core passive coholon** (plan phase 7, `Holon/Law.lean::passive_reading`):
+    /// the same name and reader; the coholon reads the state as the effort under the unit storage
+    /// chart, so [`Self::face`] and the coholon's value are equal entry for entry, at zero power.
+    /// This type is `receiver_release::LinearReading` with validated extents.
+    pub fn passive_coholon(&self) -> PassiveCoholon {
+        PassiveCoholon::new(self.receiver.clone(), self.matrix.clone())
     }
 }
 

@@ -250,6 +250,79 @@ impl<'chart> NativeConstitutiveField<'chart> {
     }
 }
 
+// ---------------------------------------------------------------------------------------------
+// Plan phase 7: the normalized and pair receivers as core receiver elements
+// ---------------------------------------------------------------------------------------------
+//
+// [definition] Each resident receiver here is a Holon at ports with its declared power term
+// (`holonic_core::law::receiver`, `Holon/Law.lean`): the normalized face and the comparison return
+// are readings at zero flow (`coholon_reading_power`) — `p = softmax(Re s)` is a nonlinear reading,
+// not a current; the phase and pair participations inject the drive `y` into the field and are
+// exterior drives whose delivered power `⟨e_D, y⟩` the field's balance counts
+// (`exterior_drive_balance`, `EnergyBalance::joined_active`); every covector return (the normalized
+// pullback `J_p g` with `J_p` symmetric, the participation adjoints and the material source
+// pullback) is a pullback that preserves power (`pullback_law`, `softmaxJacobian_transpose`). The
+// declarations are host-side and read only extents already carried; no kernel, launch or returned
+// value changes. Ports count real-coded coordinates.
+
+use holonic_core::law::receiver::{ActiveReceiver, ReceiverPower};
+
+/// Real-coded coordinates of one resident enclosure section: `rows × components`.
+fn real_coordinates(section: &ResidentNormalEnclosureSection<'_>) -> usize {
+    section.rows() * section.components()
+}
+
+/// **The power a drive current delivers, enclosed** (plan phase 7): `⟨e_D, y⟩` over the drive's
+/// returned balls against a declared real-coded drive effort `e_D`. Per row the centre pairs
+/// exactly and the ball contributes at most `‖e_D‖₂ r ≤ ‖e_D‖₁ r` (Cauchy–Schwarz), so the exact
+/// delivered power of every current in the returned balls lies in the returned interval. This reads
+/// the drive back; it launches nothing.
+fn delivered_power_enclosure(
+    output: &ResidentNormalEnclosureSection<'_>,
+    drive_effort: &[Rat],
+) -> Result<ExactInterval, ConstitutiveFibreError> {
+    let components = output.components();
+    if drive_effort.len() != real_coordinates(output) {
+        return Err(ConstitutiveFibreError::Shape);
+    }
+    let mut centre = Rat::zero();
+    let mut spread = Rat::zero();
+    for (ball, effort) in output
+        .inspect_rows()?
+        .iter()
+        .zip(drive_effort.chunks_exact(components.max(1)))
+    {
+        if 2 * ball.center.len() != components {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        for (current, pair) in ball.center.iter().zip(effort.chunks_exact(2)) {
+            centre += &current.real * &pair[0] + &current.imaginary * &pair[1];
+        }
+        let l1: Rat = effort
+            .iter()
+            .map(|e| if e < &Rat::zero() { -e } else { e.clone() })
+            .sum();
+        spread += l1 * &ball.radius;
+    }
+    ExactInterval::new(&centre - &spread, &centre + &spread)
+        .map_err(|e| ConstitutiveFibreError::Arithmetic(e.to_string()))
+}
+
+impl<Provenance: Clone, Chart: Clone, Origin>
+    NativeNormalizedMaterialReturn<'_, Provenance, Chart, Origin>
+{
+    /// **This comparison as a receiver element**: a reading of the prediction's `nodes` real
+    /// potentials at zero flow. Its `q − p` and `J_p(q − p)` are covectors returned to the caller,
+    /// not currents delivered into the field.
+    pub fn receiver_element(&self) -> ActiveReceiver {
+        ActiveReceiver::declared(
+            "normalized material return",
+            self.nodes,
+            ReceiverPower::Reading,
+        )
+    }
+}
+
 mod pullback;
 pub use pullback::{
     NativeMaterialPullbackMetric, NativeMaterialSourcePullback, NativeMaterialSourcePullbackReading,

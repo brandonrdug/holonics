@@ -4,8 +4,9 @@
 //! ([`crate::restriction`]): the two-axis commuting square of a stationed tower, its circuit
 //! holonomy and the wormhole receipt. It moved here from
 //! `crates/holonic-engine/src/continuing_tube.rs`, which re-exports every item at its old path and
-//! keeps the layers that read a tube through an engine receiver (the grain and presentation tubes,
-//! the two-axis horizon, the defect profile and the route plan).
+//! keeps only the tubes over engine material (the grain and presentation tubes). The two-axis
+//! horizon, the defect profile and the route plan read a tube through the core receiver faces
+//! (`crate::law::receiver`) and followed in plan phase 7 as [`horizon`].
 //!
 //! [definition] **One square defect.** The per-face [`SquareDefect`] returned here is the
 //! pointwise chart of the operator [`crate::restriction::SquareDefect`] `π A_fine − A_coarse π`:
@@ -72,6 +73,8 @@
 //! ([`DECLARED_FACE_CEILING`]) and the circuit word ([`DECLARED_CIRCUIT_CEILING`]). Exceeding one
 //! is a typed refusal, never a panic and never a silent truncation. Every receipt names exactly
 //! what was checked; the receipt is the scope of the claim and is not a proof of the law.
+
+pub mod horizon;
 
 use std::fmt::{self, Debug};
 

@@ -74,7 +74,8 @@ keeps its API and delegates to the chart.
 6. **Restriction** — tower/tube types move to `core::restriction`; grain/coarsening towers and
    `StandingLaw` become instances.
 7. **Receivers** — `Reading` is the passive coholon; `Perspective`/`ReceiverBody` active receivers;
-   normalized/pair receivers are active elements with their power term.
+   normalized/pair receivers are active elements with their power term (landed; see the phase-7
+   disposition below).
 8. **Device chart and retention** — `ResidentHolonChart`; `NativeCoupledBody` delegates; the
    remaining history structures retire under the retention law; unconsumed body states are charted or
    retired after a consumer audit.
@@ -156,6 +157,44 @@ restriction residual), `CoarseningTower::descent` (first break = `CoarserDoesNot
 Schur/Dirichlet-to-Neumann owner, `diffusion::compile_diffusion_transfer`, now reads `L_II⁻¹` and
 `Λ_DN` off `KronReduction`; `causal_reflection.rs` is Kramers–Kronig (dispersive/absorptive
 reflection), not an interior elimination, and has no Kron reading.
+
+### Phase 7 disposition: receivers as Holons at ports
+
+[established-bounded; source-inspected, implemented-exact] The core receivers live in
+`holonic_core::law::receiver` (`crates/holonic-core/src/law/receiver.rs`; Lean `Holon/Law.lean`
+§2–2b). **Passive coholon:** `PassiveCoholon` (a named linear reader `C` on the passive-coholon
+Dirac structure) reads `C e` at zero power (`passive_reading`); `coholon_bond` is the bond any
+reading, linear or not, stands on (`coholon_reading_power`); `HolonLaw::receive` delegates to it.
+`receiver_release::{Reading, LinearReading}` and `standing::ReceiverReading` are this object:
+each converts (`passive_coholon()`) with equality tests of the value, and the passive coholon is
+itself a `Reading` and a tube `FaceReading` on effort-vector faces. **Active receiver:**
+`ActiveReceiver` with `ReceiverPower { Reading | Learned(ActiveRelation) | ExteriorDrive |
+Pullback }`; its `ReceiverExchange` closes its own balance exactly (`exterior_drive_balance`,
+`learned_receiver_balance`, `pullback_law`) and the delivered power joins a Holon's
+`EnergyBalance` through `EnergyBalance::joined_active`. `Perspective`/`ReceiverBody` remain the
+phase-3b joined Holons. The native normalized, phase and pair receivers and their adjoints
+(`field/receiver/normalized{,/section,/phase,/pair,/pullback}.rs`) declare
+`receiver_element()`: the normalized face is a nonlinear reading at zero power, its covector
+return a pullback through the symmetric `J_p = diag p − p pᵀ` (`softmaxJacobian_transpose`,
+`softmax_pullback_power`), and the phase/pair participations exterior drives whose delivered
+power `⟨e_D, y⟩` is enclosed host-side from the returned balls (`delivered_power`); no kernel,
+launch or value changed. **Receiver face:** `ExactFace`, `DiameterNorm`, `ReceiverWidth`,
+`WidthWitness`, `width_over_readings`, `Horizon`, `WidthRefusal` (with its claims) and the
+relation ladder's `Rung`/`rung_meet` moved to the core and are re-exported at their engine paths;
+wires are unchanged, and the engine's enclosure width is built through the validating
+`ReceiverWidth::declared`. **Tube layers:** with those faces in the core, the two-axis horizon,
+defect profile, cross-rank passage and route plan moved to
+`holonic_core::restriction::tube::horizon` (re-exported by `continuing_tube`); the engine keeps
+only the tubes over engine material — `GrainReadingTube` (over `grain_tower`),
+`PresentationTube` (over `physical_constraint_complex`) and `GrainContactCount` — because their
+sections are engine presentations, not because of a receiver dependency. The disposition of all
+361 receiver-named public types is [its own table](THE_HOLON_CORE_RECEIVER_DISPOSITION.md): 19
+passive coholon, 9 active receiver Holon, 158 receiver face, 175 different object; one genuine
+duplicate (an orphan uncompiled copy of `ResidentIntervalPotentialReceiver`) was removed, and
+the `LinearReading`/`ReceiverReading` pair is one object kept under both public names. Owed: the
+power declarations of the remaining name-inferred active receivers (`IncidentTextReceiver`,
+`GeneratorTextReceiver`, `NormalWaveFamilyReceiver`), and a consumer that feeds a participation's
+enclosed delivered power into the resident field's balance (phase 8's chart).
 
 Constraints: rest/wire compatibility for `SavedCoupledBody`, `NativeIncidentModelRest`,
 `CoupledConstitutiveRest`, the complex schema string and custom deserializers; interaction types stay
