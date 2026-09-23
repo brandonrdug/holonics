@@ -272,7 +272,6 @@ pub mod field_atlas;
 /// `formal/elementary-holonics/ElementaryHolonics/Transport/Fold.lean`.
 pub mod fold;
 pub mod foreign_map;
-pub mod generative_transport;
 pub mod gluing;
 pub mod landauer;
 // The canonical octet form of a `GradedCausalComplex`, so a rebase-invariants reading can be
@@ -652,7 +651,6 @@ pub use exact_linear::*;
 pub use exact_value::*;
 pub use executor::*;
 pub use field_atlas::*;
-pub use generative_transport::*;
 pub use graph_receiver::*;
 #[cfg(target_os = "linux")]
 pub use hardware_cover::*;

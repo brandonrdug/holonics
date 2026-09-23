@@ -75,9 +75,11 @@ rule, not a language it was never told.
   clamped-potential responses `rᵀ(I + τL)φ`. Affine dimension `15 → 0`; eight conductances recovered
   as exact rationals `2,1,3,1,1,2,1,4`; cycle rank 3; **held-out aggregate exact**. The law
   **requests its own missing edges** and admits a topology only on a complete operator-basis return.
-- **`generative_transport_prediction`** — a richer family `A(τ) = M + τ(S + K + R)`. Obstruction
-  `[DiagonalStandingOrReaction, SkewPairTransport]`; affine dims `[4,3,2,1,0]`; **prediction at
-  τ = 5, an interval never used for fitting, exact.** It selects its own second-interval queries.
+- **Historical bounded instrument `generative_transport_prediction` (Rust realization retired in
+  R1)** — the July research record reports a richer family `A(τ) = M + τ(S + K + R)`, obstruction
+  `[DiagonalStandingOrReaction, SkewPairTransport]`, affine dims `[4,3,2,1,0]`, and an exact
+  prediction at `τ = 5`, held out from fitting and then used for grading. The instrument selected
+  its own second-interval queries; see the bounded source record and current operator guide.
 
 **This is the operation Brandon names as *fitting discrete expressions to statistical models and
 treating them like pivots*, and it is the strongest group in the repository.**

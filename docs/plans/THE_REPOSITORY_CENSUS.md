@@ -136,10 +136,11 @@ their callers/target owners. The old module-token metric missed type-level and r
 API use. No deletion follows from the historical zero count.
 The next eight have seven **keep** decisions for the same source-backed reason
 (`receiver_phase_atlas`, `coupled_informant`, `wave_propagation`, `atmospheric_inverse`,
-`causal_traversal`, `holonic_complex`, `physical`). `generative_transport` is a **fold**
-candidate with only a standalone prediction example as executable consumer, but its exact
-enrichment/prediction/return law must first be stated in `HNN_FORMULA` or assigned a formal
-obligation. Its module and example cannot yet be deleted.
+`causal_traversal`, `holonic_complex`, `physical`). `generative_transport` has since been
+retired in R1 with its sole standalone prediction example and public re-export. Its bounded
+time-affine family law now has a concise entry in `HNN_FORMULA`, a formal kernel theorem in
+`Transport/GenerativeTransport.lean`, and source evidence in the July 27 research record. No
+general algorithm theorem was added.
 The third eight add four **keep** (`graph_receiver`, `dimensional_receiver`,
 `arithmetic_dimensional`, `receiver_ecology`), two **unresolved** (`arithmetic_phase` has an
 uncopied prime-square/affine-orbit law; `returned_conduct` still has a `life` runtime caller),
@@ -167,7 +168,7 @@ consumer or host words. The plan §0.4 now names those distinct edges.
 | Step | Candidate and source evidence | Required check before retirement |
 |---|---|---|
 | R1 | `crates/holonic-engine/src/platform_x11.rs`: `x11rb` implementation use is confined there and `lib.rs` gates its export behind default `desktop-x11`. **Type-level callers exist:** `examples/arithmetic_dimensional_receiver.rs` and `examples/desktop_receiver.rs` construct `X11Platform`. The governing plan §0.5 retires the feature, but the first static module-token scan missed these callers. | Decide each example's mathematical/saved-output disposition, then remove or rechart its X11 use in the same cut as the module, feature and dependency. Run targeted engine and all-target checks. The cut is not yet licensed by an absence-of-consumers claim. |
-| R1 | `generative_transport.rs` has one standalone prediction example; current source carries an exact `A(τ)=M+τ(S+K+R)` enrichment and prediction/grade-before-return law without an exact Lean counterpart. | Preserve that law in `HNN_FORMULA` or a named #62 proposition, verify its source/receiver scope, then retire the module and example together if no other caller remains. An isolated zero-token census is insufficient. |
+| R1 complete (#65) | `generative_transport.rs` had one standalone prediction example and no other Rust consumer. Its bounded exact family/prediction law was transferred to `HNN_FORMULA`, a kernel theorem to `Transport/GenerativeTransport.lean`, and its single implicit receiver scope to the July 27 research record. | Retired the module, example and root exports together. Focused engine, Lean and workspace all-target gates passed; no general algorithm theorem is claimed. |
 | R1 complete (#65) | `acoustic_receiver.rs` had no external Rust caller/example and maps its resonator/Cayley/causality/energy laws to checked `Foundation/AcousticReceiver.lean`; its WAV/export and ceilings are historical boundary behavior. | Retired its Rust module/tests, root declaration and citation row; retained the formal law, dated measurements and distinct native Athena acoustic chart. Focused engine, Lean, all-target and citation gates passed. |
 | R1 complete (#65) | `artifact_release.rs` had no external Rust caller/example; its checked T3 mathematics, including the formerly Rust-only product enclosure specialization and numeric policy distinction, now resides in `Transport/ArtifactRelease.lean` and the T3 guide. | Retired the Rust module/tests, root export and `lean_citations` row. Focused engine, Lean, all-target and citation gates passed; the distinct live `edit_rigidity` chart remains. |
 | R3 | `Framework.Core` reaches five historically filed Millennium owners **transitively** through Standing/RelationLadder/ContinuingTower and CausalRelevance/JointReceiverDescent. The [declaration-level edge audit](census/LEAN_CORE_R3_EDGES.md) names each consumer and research remainder. `Objects.Ratio → HolonicGaugeCovariance → HolonicConnectionVariation` and `Holon.MomentStorage → HolonicQuadraticMomentCondensation → HolonicGranularBoundaryRadiation` are the other large ingress paths. | Extract only the declarations the foundation consumes, retain unique research theorems and update their source importers in the same cut. Focused Core, Ratio and MomentStorage builds pass before the edit; build the affected targets again afterward. |

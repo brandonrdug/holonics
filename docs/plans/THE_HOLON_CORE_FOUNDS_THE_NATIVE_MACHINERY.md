@@ -639,6 +639,11 @@ is not stated.
 
 ### Phase 16 disposition: the event-law scaffolding
 
+This phase's tables below record the September 23 phase-16 source state. The generative-transport
+Rust module and its experiment were retired in R1 after the bounded law moved to
+`docs/HNN_FORMULA.md` and `Transport/GenerativeTransport.lean`; the July research record retains
+the full construction evidence and receiver-scope qualification.
+
 [established-bounded; source-inspected, measured] Scope: the 26 engine `impl ExactEventLaw`
 modules (27 laws; `analytic_field` has two) and `world.rs`. Each law's mathematics is unchanged;
 only its scaffolding moved onto the Holon objects.

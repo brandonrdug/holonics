@@ -7,14 +7,15 @@
 //! use dense elimination; a continuing law should retain the resulting
 //! operator or factorization rather than solve it again on every event.
 //!
-//! # The four laws that bypassed this carrier, and what the bypass cost
+//! # Historical bypasses and what they cost
 //!
-//! The paragraph above named its consumers on the day it was written and none of them arrived.
-//! Measured 2026-08-15: `diffusion`, `sheaf_diffusion`, `inverse_transport` and
-//! `generative_transport` — the exact modules named — each carried a private `invert_exact`,
-//! and `inverse_transport`'s and `generative_transport`'s twenty-eight-line bodies differed
-//! by **one line**, the error variant. Two things were lost by re-invention rather than by
-//! decision:
+//! The paragraph above originally named consumers before they arrived.
+//! Measured 2026-08-15: `diffusion`, `sheaf_diffusion`, `inverse_transport` and the subsequently
+//! retired bounded `generative_transport` realization each carried a private `invert_exact`;
+//! `inverse_transport`'s and the retired sibling's twenty-eight-line bodies differed by **one
+//! line**, the error variant. The latter construction is retained in the bounded
+//! [transport record](../../../research/records/2026-07-27_THE_OBSTRUCTION_CAUSES_THE_FAMILY_THE_OPEN_FIBER_PREDICTS_BEFORE_IT_CLOSES.md).
+//! Two things were lost by re-invention rather than by decision:
 //!
 //! - **`inverse` verifies itself; none of the four functions did, and their callers each wrote
 //!   the check again.** This is the sharper half and it is worth stating exactly, because the
@@ -22,10 +23,9 @@
 //!   of the six call sites re-derived an identity residual by hand *downstream* of the
 //!   operation, in five different vocabularies (`TransferCertificateFailure` twice,
 //!   `InverseCertificateFailure`, `InverseResidualNonzero`). **The exception is the one that
-//!   matters**: `generative_transport::propagate` checks only `A x - b` for the single
-//!   right-hand side it happened to solve, which verifies the inverse against one vector rather
-//!   than against the identity. Moving the check inside the operation makes it unconditional —
-//!   a caller cannot forget it, and cannot substitute a weaker one.
+//!   matters**: the retired generative transport propagation checked only `A x - b` for its
+//!   supplied right-hand side, not the inverse against the identity. The shared operation makes
+//!   the identity check unconditional — a caller cannot forget it or substitute a weaker one.
 //!
 //!   What the certificate guards is the *elimination*, not the material: over `Rat` a completed
 //!   Gauss–Jordan is exact, so it cannot fire while the elimination is correct. That is what it

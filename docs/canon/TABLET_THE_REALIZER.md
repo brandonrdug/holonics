@@ -223,18 +223,24 @@ grown circuit)       palette              pullback pipeline     fibers outside t
 
 ### 15.4 What is not done
 
+**Status update, September 23:** `generative_transport_prediction.rs` was a bounded historical
+instrument and has been retired with its source module. The SVG measurement below records the
+August 15 checkout; it is not a current-consumer list. The remaining inverse reconstruction and
+synchronized-grid examples still hand-write their SVG preambles.
+
 The responsible owner exists and the applications have not all been moved onto it:
-`crates/holonic-engine/examples/generative_transport_prediction.rs` and
-`inverse_transport_reconstruction.rs` still hand-write an `<svg>` preamble with a hardcoded position
-array and an inline palette, which `archive/plans/CONTAMINATION_BANS.md` convicts as an
+`inverse_transport_reconstruction.rs` and `eros_synchronized_grid_ecology.rs` still hand-write an
+`<svg>` preamble with a hardcoded position array and an inline palette, which
+`archive/plans/CONTAMINATION_BANS.md` convicts as an
 application-owned codec. And there is no owner joining §15 to §13: the grown circuit Brandon names in
 the ruling above is rendered by `examples/grown_circuit_schedules.rs` as text and invariants, never
 through `certified_face` and `presentation_gauge`. **The rendering organ has never been pointed at
 the object it was commissioned for.**
 
 **Re-measured 2026-08-15, and it HOLDS.**
-`grep -n "<svg" crates/holonic-engine/examples/generative_transport_prediction.rs crates/holonic-engine/examples/inverse_transport_reconstruction.rs`
-returns `:215` and `:291` — both still hand-write the element — and
+The historical command was
+`grep -n "<svg" crates/holonic-engine/examples/generative_transport_prediction.rs crates/holonic-engine/examples/inverse_transport_reconstruction.rs`;
+it returned `:215` and `:291` in the August 15 tree — both then hand-wrote the element — and
 `grep -c "certified_face\|presentation_gauge" crates/holonic-engine/examples/grown_circuit_schedules.rs`
 returns 0. The rendering organ's only consumers remain `src/model_surface.rs` and
 `examples/certified_presentation_workbench.rs`.

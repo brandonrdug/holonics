@@ -17,10 +17,10 @@
 //!
 //! The dense exact algebra is `exact_linear::ExactRatMatrix`. It was this module's own until
 //! 2026-08-15, and the 33-line elimination body of its private `invert_exact` differed from
-//! `generative_transport`'s by exactly one line — the error variant it named on a singular
-//! pivot. Neither function checked the inverse it returned; both callers did, separately. The
-//! carrier now checks inside the operation, and its refusals are renamed into this module's own
-//! vocabulary below so no foreign error variant reaches a caller.
+//! the retired `generative_transport` sibling's by exactly one line — the error variant it
+//! named on a singular pivot. Neither historical function checked the inverse it returned; both
+//! callers did, separately. The carrier now checks inside the operation, and its refusals are
+//! renamed into this module's own vocabulary below so no foreign error variant reaches a caller.
 //!
 //! The `inverse_residual` this module computes and retains is untouched. It is not made
 //! redundant: it travels in the admission receipt for a later reader, where the carrier refuses
@@ -1422,8 +1422,8 @@ fn matrix_subtract(
 
 /// The exact inverse, **with the shared carrier's multiplication certificate in force**.
 ///
-/// This was 33 lines of private Gauss-Jordan differing from `generative_transport`'s
-/// by one line, and it left the verification to its caller. The rationals are the same.
+/// This was 33 lines of private Gauss-Jordan differing from the retired `generative_transport`
+/// sibling's by one line, and it left the verification to its caller. The rationals are the same.
 fn invert_exact(matrix: Vec<Vec<Rat>>) -> Result<Vec<Vec<Rat>>, InverseTransportError> {
     let extent = matrix.len();
     Ok(carrier(&matrix, extent)?.inverse()?.to_rows())

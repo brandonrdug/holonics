@@ -26,10 +26,10 @@
 //!
 //! ## Why this is a library owner and not another example
 //!
-//! Three examples currently hand-write an `<svg>` preamble into a `String`
-//! (`generative_transport_prediction.rs:207`, `inverse_transport_reconstruction.rs:281`,
-//! `eros_synchronized_grid_ecology.rs:1357`), each with its own hardcoded position array and
-//! inline hex palette. `archive/plans/CONTAMINATION_BANS.md` convicts exactly that: an
+//! Two current examples hand-write an `<svg>` preamble into a `String`
+//! (`inverse_transport_reconstruction.rs:281`, `eros_synchronized_grid_ecology.rs:1357`), each
+//! with its own hardcoded position array and inline hex palette.
+//! `archive/plans/CONTAMINATION_BANS.md` convicts exactly that: an
 //! application-owned codec "duplicates standing and makes the application a hidden world".
 //! This module is the responsible owner; applications compose it.
 
