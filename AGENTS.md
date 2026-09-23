@@ -38,7 +38,10 @@ checked Lean theorems stay unless duplicate or wrappers. A move updates its in-r
 the same commit, with no forwarding modules or aliases; every old save-format reader goes
 (an old save is a superseded prototype). The restructure moves existing behavior; new objects (Holarchy,
 active receive, physics instances, HNN host reference) are separate construction campaigns
-(plan §0, §4). Do not present target names as existing code.
+(plan §0, §4). Do not present target names as existing code. The restructure is tracked in
+GitHub #63 (steps #64–#71, construction #72–#76). Every campaign cites its issue in its plan
+and commits (`Refs #n`/`Closes #n`), and closes it with the commit, verification receipt and
+remaining scope.
 
 ## The elementary objects — the only design vocabulary
 

@@ -583,7 +583,7 @@ source-qualified verification; no package rename substitutes for it.
 **The restructure** moves and retires existing code with its current behavior, verified by the
 existing suites (§0.9):
 
-1. **R0 census (first; nothing retired before it).** Create the tracking issues (§5). Record the
+1. **R0 census (first; nothing retired before it).** Record the
    exact HEAD, dirty files, worktrees/branches, build outputs and saved artifacts. Commit or
    account for the uncommitted Lean/research work and the paused WIP branches. Produce
    `docs/plans/THE_REPOSITORY_CENSUS.md` with one table per area:
@@ -644,8 +644,12 @@ existing suites (§0.9):
   interference and propagation, the Euler/NS control volume and thermal exchange.
 - **K4:** the stress-energy source map and moving observer, the information-to-material port, and
   independent clock axes (§3.6).
+- **K5 (#76):** the device-realization debts in `holonics-cuda` (formerly #12–#15 and #50).
 - **The machine** resumes after M1: GitHub #17, #16, #18 and #61, source-port growth of ring g0,
   and the model-versus-uniform gap.
+
+Issue map: parent #63; R0 #64, R1–R2 #65, R3 #66, R4 #67, C #68, M1 #69, M2 #70, D #71;
+K1 #72, K2 #73, K3 #74, K4 #75, K5 #76.
 
 Build hygiene starts now: use one shared scratch target directory and
 `CARGO_PROFILE_DEV_DEBUG=line-tables-only`; inspect each target/cache's owner before reclaiming
@@ -658,17 +662,23 @@ before a targeted or post-split `cargo clean` reclaims the space.
 
 ## 5. GitHub issues
 
-- **Reset.** For each of the 45 open issues: keep (maps to an object in §2 and a live owner), fold
-  into another issue, or close with a one-line reason and the superseding commit/record. Candidates to
-  close or fold: the protein/structure issues (#11, #38, #44, #46, #51, #52, #53) after the biology
-  pivot away; device issues (#12–#15, #50) fold into one device-realization issue after §3.1; Lean
-  obligations fold into #62 and its successors.
-- **Track the restructure.** Create these at the start of R0 and link them here:
-  - a parent issue, *Repository restructure*;
-  - one child issue for each of R0, R1–R2, R3, R4, C, M1, M2 and D;
-  - one issue each for K1–K4.
+- **Reset (done, September 23).** The open issues were triaged against §2:
+  - **Closed as not planned**, since the protein/structure application was dropped: #53, #52,
+    #51, #46, #44, #38, #11, #10, #9 and #29. The retired artifact owner's #6 is also closed.
+  - **Folded:** #12–#15 and #50 into K5 (#76); #54, #34 and #33 into #62; #49 into #48; #39 into
+    #27.
+  - **Kept and relabelled by object:** #62, #61, #48, #40, #35, #32, #31, #30, #28, #27, #26,
+    #24, #23, #22, #21, #20, #18, #17, #16 and #5.
 
-  Each closing comment gives the commit, the verification receipt and any remaining scope.
+  The labels now follow the objects (`holon`, `ratio`, `generator`, `pair-contact`, `tube`,
+  `deposition`, `receiver`, `holarchy`, `physics`, `hnn`, `device`, `extraction`,
+  `research-math`, `restructure`) beside the kind and evidence labels. The retired
+  `interaction`/`realization`/`variation`/`codec`/`construction`/`join` labels and the GitHub
+  defaults are deleted.
+- **Tracking (created).** The parent is #63.
+  - Restructure steps: R0 #64, R1–R2 #65, R3 #66, R4 #67, C #68, M1 #69, M2 #70, D #71.
+  - Construction: K1 #72, K2 #73, K3 #74, K4 #75, K5 #76.
+  - The machine resumes after M1: #17, #16, #18, #61.
 - **Practice from now on.** Every campaign cites its issue in the plan and in commit messages
   (`Refs #n`/`Closes #n`); a closing comment gives the commit, the verification receipt and any
   remaining scope; labels follow §2's objects (`holon`, `generator`, `pair-contact`, `parametron`,
