@@ -53,6 +53,11 @@ The [fourth cohort](census/RECORDS_FOURTH_R0.tsv) (July 28–August 14) adds 53 
 five **fold** and two **unresolved**. One fold explicitly retains a July 28 falsification:
 the five-image and 200-image prediction outputs were byte-identical. Across 240 audited
 zero-inbound records: 183 keep, 51 fold only after their named owner transfer, six unresolved.
+The [fifth cohort](census/RECORDS_FIFTH_R0.tsv) (August 14–21) adds 58 **keep** and two
+**fold**: unexecuted Lean-audit and pre-restructure rebase plans whose current owners are
+the R3 census and restructure/roadmap. Across 300 audited records: 241 keep, 53 fold only
+after owner transfer, six unresolved. Corrected interpretations did not erase unique
+checked theorems, experiments or their falsifiers.
 
 The document table records paths, line counts, live incoming source count and a conservative
 working disposition. Its scan recognizes Markdown links and explicit path strings in common
