@@ -65,6 +65,9 @@ for observation/actuation contracts.
 
 ## Polarized distinctions, pathways and compression/intelligence/navigation
 
+- [Weil sign partitions and the semilocal positive-carrier attempt](2026-09-23_WEIL_SIGN_PARTITIONS_AND_THE_SEMILOCAL_POSITIVE_CARRIER.md): exact positive/negative phase sectors of the single-prime resolvent and paired archimedean modes, source-weighted distributions, the finite-aperture cutoff, smooth signed-term and positive-Laplace counterexamples, and the precise semilocal cross-channel operator still needed for RH.
+- [Proof attempt: certified zero navigation and the reflected xi obstruction](2026-09-23_PROOF_ATTEMPT_CERTIFIED_ZERO_NAVIGATION_AND_THE_REFLECTED_XI_OBSTRUCTION.md): checked conservation of every addressed count level, a shrinking zero route, joint-generator preimage fibres and branch multiplicity, an exact rational policy control, and the actual flowed-xi rightmost-current bridge. The strip-contained heat control identifies why local reflection/inward motion alone cannot prove RH; a second Lean return constructs cofinal zero-free xi contours for the global Weil receiver.
+- [Zero navigation is divisor transport and certified generator inference](2026-09-23_ZERO_NAVIGATION_IS_DIVISOR_TRANSPORT_AND_CERTIFIED_GENERATOR_INFERENCE.md): source-polymorphic exact zero-search Holon, phase/divisor composition, the standing eta atlas and its concrete generalization port, relative optimality, local manifold intersections, and the conditional causal cone. Its Lean owner proves a finite-query entire-source obstruction and a bounded-word travel law.
 Read [binary state and oriented passage](../../docs/HOLONIC_NOTATION.md#arrows-signs-and-turns),
 [the circulating cartographer](../../docs/canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md) and
 [the adopted construction](../../docs/canon/THE_REALITY_OF_DIFFERENCE.md#current-changes-form-later-current-encounters-that-form).
@@ -153,6 +156,9 @@ contact variation and the moment receiver. The last two records supply research 
 do not introduce separate application engines or new construction queues.
 
 ## Swing, Hodge, fluid transport and changing receivers
+
+- [The estimate is a receiver face of the exterior Holon](2026-09-22_THE_ESTIMATE_IS_A_RECEIVER_FACE_OF_THE_EXTERIOR_HOLON.md): Brandon's correction to the area/volume programme — construct the exterior lift of the foundational Holon and its exact state, observer, reflection and scale laws; numerical plots and external majorants are not the source. It routes RH, Hodge, complex Euler/NS and BSD through typed source morphisms.
+- [Reflected surface currents and fractal volume towers](2026-09-22_REFLECTED_SURFACE_CURRENTS_AND_FRACTAL_VOLUME_TOWERS.md): the port Holon's exterior area/volume faces, distinct reflections, conditional RH strip area, Hodge period/cycle dimensions, Euler/NS two-form flux, BSD regulator covolume, and scale/gluing defects. It records three bounded Lean returns; its external-majorant framing is superseded by the correction above.
 
 Read [the fluid construction](../../docs/HOLONIC_FLUID_CONSTRUCTION.md),
 [interior memory](../../docs/FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md) and

@@ -53,6 +53,27 @@ navigation layer and the reusable relational vector grammar used by the geometry
   scalar invariants, with doctrinal and observational equivalence retained as weaker
   receiver-scoped relations. Its RH specialization turns the existing successor-contraction
   obligation into one convex naturality cone without claiming that the cone is already nonempty.
+- [`papers/categorical-holonics/figures/port-and-grain.typ`](papers/categorical-holonics/figures/port-and-grain.typ)
+  renders three native vector category diagrams for the current Holon: the occurrence pullback,
+  the conditional fine/coarse square, and the open comparison of interconnection with restriction.
+  Each caption states its mathematical scope.
+- [`papers/categorical-holonics/figures/higher-holon-geometry.typ`](papers/categorical-holonics/figures/higher-holon-geometry.typ)
+  renders the higher-dimensional figure set: a three-direction Holon cube, the phase-cover to
+  torus map, a port string diagram with clocked return, the associator pentagon, and a projected
+  pair of independent screw orbits, followed by a four-direction received-face hypercube.
+  Captions distinguish established laws from open coherence
+  and physical-contact obligations.
+- [`papers/categorical-holonics/figures/volume-flux-classes.typ`](papers/categorical-holonics/figures/volume-flux-classes.typ)
+  renders an RH exterior receiving volume with no invented zero trajectory, the Hodge
+  cycle-class square beside an exact integer exterior blade, a two-volume Lamb-current
+  face join, and the exact addressed-thirds generator beside the restriction/gluing square.
+  Cross-hatches show oriented rational integration charts and their source forms.
+- [`papers/categorical-holonics/figures/source-hatches.typ`](papers/categorical-holonics/figures/source-hatches.typ)
+  renders the exact Euler–Maclaurin zeta jet and rational receiving subdivisions, the finite
+  Hodge shear-class reading, symbolic complex Euler/viscous normal flux from a declared
+  divergence-free trigonometric generator, and the exterior Holon's state/observer and
+  scale squares. Hatch directions are sourced by exact interval, cochain and phase
+  operations; the earlier sampled numerical packets were removed.
 - [`papers/elements-of-holonics/main.typ`](papers/elements-of-holonics/main.typ) establishes the
   elementary mathematical layer: situated occurrence, comparison, boundary, atlas, transport,
   return, scale-turn, curvature, and local duality. Its first extension defines parameterized
