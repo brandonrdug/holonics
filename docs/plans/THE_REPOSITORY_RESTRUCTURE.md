@@ -416,7 +416,10 @@ must catch every remaining `formal/elementary-holonics` and `ElementaryHolonics`
   messages stay where a kept record or guide cites them. `research/papers/rendered` and
   `experiments/` need an artifact/source census; generated copies may be regenerated from kept
   sources only when that regeneration has been checked.
-- `archive/`: delete from the tree (git history keeps it); CLAUDE.md/AGENTS.md cite revisions instead.
+- `archive/`: delete from the tree only after its live citations and executable source-data
+  consumers move or receive immutable revision replacements. R0 found equation-atlas JSON
+  fixtures consumed by Rust examples and a tooling script used as source data; Git history
+  alone cannot satisfy those current calls. CLAUDE.md/AGENTS.md cite revisions after the move.
 - Laboratory: stays frozen outside this repository; cite it by revision; import nothing further.
 
 ### 3.4 Operator contracts and acceptance

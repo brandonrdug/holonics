@@ -33,7 +33,7 @@ of the categorical paper's current `main.typ`. `.opencode/` contains local sessi
 |---|---|---|
 | Rust owners, examples, applications and accelerators | [Rust R0](census/RUST_R0.tsv): 1,825 tracked Rust/CUDA source paths; [Soma/R2 owner audit](census/SOMA_R0.tsv) | Current static caller signals and historical cohorts are leads. Module references and in-repo callers must be checked through re-exports and target builds. |
 | Lean modules and foundation import closure | [Lean R0](census/LEAN_R0.tsv): 1,399 package modules plus three top-level roots | Import count cannot retire a distinct theorem or source-specific research result. Focused Core, Ratio and MomentStorage targets pass at the captured worktree. |
-| Documents, records and archive | [Docs R0](census/DOCS_R0.tsv), [Archive R0](census/ARCHIVE_R0.tsv), [archived plans](census/ARCHIVE_PLANS_R0.tsv) | Static live inbound links only. An uncited record may be the sole statement of a result; an archive citation needs a revision replacement before removal. |
+| Documents, records and archive | [Docs R0](census/DOCS_R0.tsv), [Archive R0](census/ARCHIVE_R0.tsv), [archived plans](census/ARCHIVE_PLANS_R0.tsv), [small archive trees](census/ARCHIVE_SMALL_R0.tsv) | Static live inbound links only. An uncited record may be the sole statement of a result; an archive citation needs a revision replacement before removal. |
 | Issues | [Issue R0 table](census/ISSUES_R0.tsv): 76 issues (34 open, 42 closed) | Claude completed the issue reset at `925b94b8`; §5 of the restructure plan lists the object/retirement dispositions and #63–#76 tracking. Historical closed issues outside that map keep their issue-body context. |
 
 The first claim-level record audit is [RECORDS_EARLY_R0.tsv](census/RECORDS_EARLY_R0.tsv):
@@ -49,6 +49,10 @@ receipts caused two provisional fold decisions to become keep decisions. Across 
 The [third cohort](census/RECORDS_THIRD_R0.tsv) (July 21–27) adds 52 **keep** and eight
 **fold**, after checking two cited archived experiment receipts. Across the 180 audited
 zero-inbound records: 130 keep, 46 fold only after their named owner transfer, four unresolved.
+The [fourth cohort](census/RECORDS_FOURTH_R0.tsv) (July 28–August 14) adds 53 **keep**,
+five **fold** and two **unresolved**. One fold explicitly retains a July 28 falsification:
+the five-image and 200-image prediction outputs were byte-identical. Across 240 audited
+zero-inbound records: 183 keep, 51 fold only after their named owner transfer, six unresolved.
 
 The document table records paths, line counts, live incoming source count and a conservative
 working disposition. Its scan recognizes Markdown links and explicit path strings in common
@@ -78,6 +82,12 @@ contracts, eight duplicate historical schedules and 63 unresolved plans pending 
 The first fold candidate, `legacy/REALIZATION_AND_HARDWARE.md`, requires its decoded parity,
 boundary/lineage, resource and rest/remount admission clauses in the current device and
 hardware guides before its historical citation is replaced. No archived plan was removed.
+The [five smaller archive-tree audit](census/ARCHIVE_SMALL_R0.tsv) covers 68 files and
+33 inbound sources. It found live equation-atlas JSON fixtures consumed by Rust examples,
+a tooling script used as source data, and unique measured/experiment receipts. None of those
+can be removed merely because they live under `archive/`. The first narrow fold candidate is
+`archive/tooling/README.md`: replace its one `tools/README.md` link with the current repository
+guide and an immutable revision coordinate, then retire only that README.
 
 The first eight historical “zero-reference” engine modules were inspected at current source:
 `mode`, `observation_ecology`, `prime_ecology`, `local_star`, `field_atlas`,
