@@ -1,7 +1,7 @@
 import ElementaryHolonics.Computation.HolonicNeuralEcology
 import ElementaryHolonics.Computation.NativeMorphologyVariant
 import ElementaryHolonics.Computation.HolonicIntelligenceLifecycle
-import ElementaryHolonics.Millennium.ReceiverHistory
+import ElementaryHolonics.Foundation.CompleteReceiverHistory
 import Mathlib.Tactic
 
 /-!

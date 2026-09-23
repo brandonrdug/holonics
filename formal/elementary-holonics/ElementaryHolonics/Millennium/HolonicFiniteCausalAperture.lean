@@ -1,7 +1,7 @@
 import ElementaryHolonics.Foundation.CoordinateSubsetReceiver
 import ElementaryHolonics.Foundation.OrderedWordChain
 import ElementaryHolonics.Millennium.Aperture
-import ElementaryHolonics.Millennium.ReceiverHistory
+import ElementaryHolonics.Foundation.CompleteReceiverHistory
 import Mathlib.Data.Fintype.Powerset
 import Mathlib.Tactic
 

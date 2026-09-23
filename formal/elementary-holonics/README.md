@@ -38,7 +38,10 @@ diagram through admitted parameter changes.
 
 [definition] `Foundation/TransportWord.lean` keeps ordered generators;
 `Foundation/ReceiverHistoryCompression.lean` extends receiver factorization through every
-admitted finite word. Commutation can make an endpoint insensitive to order. It does not erase
+admitted finite word; `Foundation/CompleteReceiverHistory.lean` adds completeness, identifying quotient
+equality with equality of all declared receiver/history faces and returning a separating history when
+quotients differ. Its declarations retain the historical `Soma.Holonics.Millennium.ReceiverHistory`
+namespace. Commutation can make an endpoint insensitive to order. It does not erase
 the carrying occurrences. Neither a number nor a theorem's printed name is a holon's identity.
 
 [definition] `Transport/WorldTube.lean`, `Physics/PhaseCarrier.lean` and

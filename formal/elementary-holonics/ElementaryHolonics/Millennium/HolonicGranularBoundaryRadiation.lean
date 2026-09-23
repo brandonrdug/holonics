@@ -1,4 +1,4 @@
-import ElementaryHolonics.Millennium.ReceiverHistory
+import ElementaryHolonics.Foundation.CompleteReceiverHistory
 import ElementaryHolonics.Millennium.HolonicPortResolvedBoundaryTransport
 import ElementaryHolonics.Millennium.HolonicTorusEntropyParametronEquivalence
 import ElementaryHolonics.Foundation.BoundaryScalePassage

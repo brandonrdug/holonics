@@ -735,9 +735,12 @@ a new numerical policy, an extra certainty condition or another engine.
 [proved-derived; formal-checked] The factored `ReceiverHistoryCompression` requires the local
 square `q T_i = U_i q`. `quotientCommutesWithEveryOrderedWord` extends it to every finite ordered
 word, and `allSuccessorHistories` supplies exact receiver factorization. A single future receiver
-that separates two collapsed states refutes the proposed compression. This establishes an
-unbounded family of finite continuations without enumerating them or claiming infinite-time
-analytic convergence.
+that separates two collapsed states refutes the proposed compression. The complete-quotient
+extension in [`Foundation/CompleteReceiverHistory.lean`](../formal/elementary-holonics/ElementaryHolonics/Foundation/CompleteReceiverHistory.lean)
+equates quotient equality with equality of all declared receiver/history faces and constructs a
+separating receiver/history witness when quotient states differ. This establishes an unbounded
+family of finite continuations without enumerating them or claiming infinite-time analytic
+convergence.
 
 [definition] This is the common scale question for molecular substructures, neural assemblies,
 fluid cells and astronomical regions. A shape receiver may omit a mode that a later interaction

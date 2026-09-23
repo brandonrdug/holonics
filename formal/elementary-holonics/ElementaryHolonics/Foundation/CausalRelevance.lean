@@ -1,5 +1,5 @@
 import ElementaryHolonics.Foundation.JointReceiverDescent
-import ElementaryHolonics.Millennium.ReceiverHistory
+import ElementaryHolonics.Foundation.CompleteReceiverHistory
 import ElementaryHolonics.Millennium.Separation
 
 /-!
