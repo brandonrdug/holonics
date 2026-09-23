@@ -318,9 +318,9 @@ return (`pullback(id, v)`) reads the forward response, the fit and the updated r
 contemporary constitution and transport. `delayed_return_is_one_cut_equal_to_an_immediate_return`
 proves a delayed return equals the return at the same cut number for number and that its source
 response is `P φ` of the contemporary `P = B H⁻¹` (9/10 in the witness; the retired producing cut
-read 1). Pending sources rest as v11; v5/v6 rests carrying frozen producing cuts still decode, and a
-remount regenerates each source joint once and drops the cut
-(`legacy_frozen_cut_pending_rest_decodes_into_the_one_cut_wave`). Owner-capability handles are
+read 1). Pending sources rest as v11; version 5's frozen producing-cut decoder is retired.
+Version 6 remains the current no-pending Applied-transport rest, while versions 7–10 remain
+coupled forms. Owner-capability handles are
 retired: pending returns are addressed by epoch in the plain and coupled waves.
 
 | Former type | Disposition |

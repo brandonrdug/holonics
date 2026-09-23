@@ -15,16 +15,6 @@ struct Header {
 
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
-struct PendingHeader {
-    steps: u64,
-    epoch: u64,
-    seed_kind: NormalWaveSeedKind,
-    seed_epochs: [Option<u64>; 2],
-    pending: Vec<u64>,
-}
-
-#[derive(serde::Serialize, serde::Deserialize)]
-#[serde(deny_unknown_fields)]
 struct TransportHeader {
     steps: u64,
     epoch: u64,
@@ -35,14 +25,11 @@ struct TransportHeader {
 }
 
 /// One pending prediction at rest. [definition] The one-cut law retains only the prediction's
-/// source joint (`Joint`, wave rest v11). A legacy v5/v6 rest carried a whole frozen producing
-/// cut (constitution, seed and word); it still decodes as `LegacyCut`, and a remount reads that
-/// cut once to regenerate the source joint and then drops it, so no producing constitution
-/// survives into the live Holon. A legacy rest re-written without a remount keeps its bytes.
+/// source joint (`Joint`, wave rest v11). Version 5's frozen producing-cut payload is retired;
+/// version 6 remains the current no-pending transport-scope format.
 #[derive(Debug, PartialEq, Eq)]
 pub(super) enum PendingSource {
     Joint(ResidentSectionRest),
-    LegacyCut(Box<NormalWaveRest>),
 }
 
 /// The one rest of the normal wave Holon: constitution, typed seed and word, the pending
@@ -115,24 +102,10 @@ impl NormalWaveRest {
         out.write_all(MAGIC).map_err(invalid)?;
         let base = self.epoch - self.steps;
         let canonical = [base.checked_sub(1), Some(base)];
-        let needs_transport = self.transport == NormalWaveTransport::Applied
-            || self.pending.values().any(|source| {
-                matches!(source, PendingSource::LegacyCut(r) if r.transport == NormalWaveTransport::Applied)
-            });
-        let legacy = self
-            .pending
-            .values()
-            .filter(|p| matches!(p, PendingSource::LegacyCut(_)))
-            .count();
-        if legacy != 0 && legacy != self.pending.len() {
-            return Err(invalid("mixed one-cut and legacy pending wave sources"));
-        }
-        let version = if !self.pending.is_empty() && legacy == 0 {
+        let version = if !self.pending.is_empty() {
             11
-        } else if needs_transport {
+        } else if self.transport == NormalWaveTransport::Applied {
             6
-        } else if !self.pending.is_empty() {
-            5
         } else if self.seed_epochs != canonical {
             4
         } else {
@@ -152,18 +125,6 @@ impl NormalWaveRest {
                     seed_kind: self.seed_kind,
                     seed_epochs: self.seed_epochs,
                     transport: self.transport,
-                    pending: self.pending.keys().copied().collect(),
-                })
-                .map_err(invalid)?,
-            )?;
-        } else if version == 5 {
-            blob(
-                out,
-                &serde_json::to_vec(&PendingHeader {
-                    steps: self.steps,
-                    epoch: self.epoch,
-                    seed_kind: self.seed_kind,
-                    seed_epochs: self.seed_epochs,
                     pending: self.pending.keys().copied().collect(),
                 })
                 .map_err(invalid)?,
@@ -194,7 +155,6 @@ impl NormalWaveRest {
             let mut bytes = Vec::new();
             match source {
                 PendingSource::Joint(joint) => bytes = point_bytes(joint)?,
-                PendingSource::LegacyCut(cut) => cut.write(&mut bytes)?,
             }
             blob(out, &bytes)?;
         }
@@ -234,7 +194,7 @@ impl NormalWaveRest {
             bank.coupled = Some(Box::new(data));
             return Ok(bank);
         }
-        if !(1..=6).contains(&version[0]) && version[0] != 11 {
+        if !(1..=4).contains(&version[0]) && version[0] != 6 && version[0] != 11 {
             return Err(invalid("normal wave version"));
         }
         let one_cut = version[0] == 11;
@@ -250,19 +210,6 @@ impl NormalWaveRest {
                 },
                 h.pending,
                 h.transport,
-            )
-        } else if version[0] == 5 {
-            let h: PendingHeader =
-                serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
-            (
-                Header {
-                    steps: h.steps,
-                    epoch: h.epoch,
-                    seed_kind: h.seed_kind,
-                    seed_epochs: h.seed_epochs,
-                },
-                h.pending,
-                NormalWaveTransport::NormalReference,
             )
         } else if version[0] == 4 {
             let h: Header = serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
@@ -302,6 +249,14 @@ impl NormalWaveRest {
         };
         if !allow_pending && !pending_ids.is_empty() {
             return Err(invalid("nested pending wave"));
+        }
+        if version[0] == 6 && !pending_ids.is_empty() {
+            return Err(invalid(
+                "applied transport wave cannot contain pending sources",
+            ));
+        }
+        if version[0] == 6 && transport != NormalWaveTransport::Applied {
+            return Err(invalid("applied transport wave requires applied scope"));
         }
         let Header {
             steps,
@@ -378,25 +333,7 @@ impl NormalWaveRest {
                 pending.insert(id, PendingSource::Joint(joint));
                 continue;
             }
-            if source_bytes.get(MAGIC.len()) == Some(&5) {
-                return Err(invalid("nested pending wave"));
-            }
-            let source = Self::read_inner(
-                &mut source_bytes.as_slice(),
-                source_bytes.len() as u64,
-                false,
-                false,
-            )?;
-            if !source.pending.is_empty()
-                || source.epoch.checked_add(1) != Some(id)
-                || source.material.roots() != material.roots()
-                || source.material.targets() != material.targets()
-                || source.material.grain() != material.grain()
-                || source.material.observations() > material.observations()
-            {
-                return Err(invalid("pending wave source"));
-            }
-            pending.insert(id, PendingSource::LegacyCut(Box::new(source)));
+            return Err(invalid("legacy pending wave source"));
         }
         if input.limit() != 0 {
             return Err(ConstitutiveFibreError::Shape);
@@ -480,14 +417,8 @@ impl NormalWaveRest {
             progress(body.steps());
         }
         for (id, source) in self.pending {
-            let joint = match source {
-                PendingSource::Joint(joint) => Rc::new(surface.mount_section_rest(&joint)?),
-                // Cold decode of a legacy frozen cut: regenerate its source joint once, then
-                // drop the producing constitution (one-cut law).
-                PendingSource::LegacyCut(cut) => {
-                    Rc::clone(&cut.remount_with_progress(surface, progress)?.joint)
-                }
-            };
+            let PendingSource::Joint(joint) = source;
+            let joint = Rc::new(surface.mount_section_rest(&joint)?);
             body.pending.insert(id, joint);
         }
         Ok(body)
@@ -548,64 +479,37 @@ impl NormalWaveFibre<'_> {
 }
 
 #[cfg(test)]
-mod legacy_tests {
-    use super::super::comparison_tests::{current, point, witness};
+mod format_tests {
     use super::*;
-    use crate::embedding_fiber::ResidentReadout;
 
-    /// A v5 rest (pending entries carry whole frozen producing cuts) still decodes; its
-    /// re-write keeps its bytes; a remount regenerates each source joint once and drops the
-    /// producing constitution, after which the wave is the live one-cut wave: the same pullback
-    /// and the same (v11) rest.
     #[test]
-    #[ignore = "requires CUDA; legacy frozen-cut pending rests decode into the one-cut wave"]
-    fn legacy_frozen_cut_pending_rest_decodes_into_the_one_cut_wave() {
-        let readout = ResidentReadout::new().unwrap();
-        let s = ResidentSurface::on(&readout).unwrap();
-        let mut body = witness(&s);
-        let mut cut = Vec::new();
-        body.rest().unwrap().write(&mut cut).unwrap();
-        let (id, _) = body.predict().unwrap();
-        let live = body.rest().unwrap();
-        let mut modern = Vec::new();
-        live.write(&mut modern).unwrap();
-        assert_eq!(modern[MAGIC.len()], 11);
-        // The legacy encoding of the same state: v5 header, material, seed, frozen cut.
-        let mut legacy = Vec::new();
-        legacy.extend_from_slice(MAGIC);
-        legacy.push(5);
-        blob(
-            &mut legacy,
-            &serde_json::to_vec(&PendingHeader {
-                steps: live.steps,
-                epoch: live.epoch,
-                seed_kind: live.seed_kind,
-                seed_epochs: live.seed_epochs,
-                pending: vec![id],
-            })
-            .unwrap(),
-        )
-        .unwrap();
-        let mut material = Vec::new();
-        live.material.write(&mut material).unwrap();
-        blob(&mut legacy, &material).unwrap();
-        blob(&mut legacy, &point_bytes(&live.seed).unwrap()).unwrap();
-        legacy.extend_from_slice(&id.to_le_bytes());
-        blob(&mut legacy, &cut).unwrap();
-        let decoded = NormalWaveRest::read(&mut legacy.as_slice(), legacy.len() as u64).unwrap();
-        assert!(matches!(decoded.pending[&id], PendingSource::LegacyCut(_)));
-        let mut again = Vec::new();
-        decoded.write(&mut again).unwrap();
-        assert_eq!(again, legacy, "an unremounted legacy rest keeps its bytes");
-        let mut remounted = decoded.remount(&s, |_| {}).unwrap();
-        assert_eq!(remounted.rest().unwrap(), live);
-        let observed = point(&s, &[3, 0]);
-        let a = body.pullback(id, current(&observed)).unwrap().inspect().unwrap();
-        let b = remounted.pullback(id, current(&observed)).unwrap().inspect().unwrap();
-        assert_eq!(
-            serde_json::to_value(a).unwrap(),
-            serde_json::to_value(b).unwrap()
-        );
-        assert_eq!(body.rest().unwrap(), remounted.rest().unwrap());
+    fn retired_v5_pending_cut_format_is_rejected() {
+        let mut bytes = MAGIC.to_vec();
+        bytes.push(5);
+        assert!(matches!(
+            NormalWaveRest::read(&mut bytes.as_slice(), bytes.len() as u64),
+            Err(ConstitutiveFibreError::Rest(reason))
+                if reason == "normal material: normal wave version"
+        ));
+    }
+
+    #[test]
+    fn current_v6_applied_transport_rejects_pending_cut_payloads() {
+        let mut bytes = MAGIC.to_vec();
+        bytes.push(6);
+        let header = TransportHeader {
+            steps: 0,
+            epoch: 0,
+            seed_kind: NormalWaveSeedKind::ExactPair,
+            seed_epochs: [None, Some(0)],
+            transport: NormalWaveTransport::Applied,
+            pending: vec![1],
+        };
+        blob(&mut bytes, &serde_json::to_vec(&header).unwrap()).unwrap();
+        assert!(matches!(
+            NormalWaveRest::read(&mut bytes.as_slice(), bytes.len() as u64),
+            Err(ConstitutiveFibreError::Rest(reason))
+                if reason == "normal material: applied transport wave cannot contain pending sources"
+        ));
     }
 }

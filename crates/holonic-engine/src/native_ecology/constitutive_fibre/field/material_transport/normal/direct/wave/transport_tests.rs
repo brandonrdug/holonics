@@ -117,6 +117,16 @@ fn applied_transport_retains_reference_without_reinjecting_it() {
     let mut applied = witness(&s);
     applied.set_transport(NormalWaveTransport::Applied).unwrap();
     let before = applied.rest().unwrap();
+    let mut wire = Vec::new();
+    before.write(&mut wire).unwrap();
+    assert_eq!(wire[b"HOLONIC-NORMAL-WAVE".len()], 6);
+    let restored = NormalWaveRest::read(&mut wire.as_slice(), wire.len() as u64).unwrap();
+    assert_eq!(restored.transport(), NormalWaveTransport::Applied);
+    assert_eq!(restored.pending_count(), 0);
+    assert_eq!(
+        restored.remount(&s, |_| {}).unwrap().rest().unwrap(),
+        before
+    );
     let source = applied.current().snapshot();
     let reads = s.census().section_read_outs;
     let reference = applied.reference_next().unwrap();

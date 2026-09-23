@@ -677,15 +677,17 @@ exterior source/chart/cursor I/O.
 `receive_prediction`: an addressed return keeps the actual producing joint/material while
 incrementing contemporary material and preserving current occurrence identity. The shared
 `normal_wave_receive.cuh` helper has separate producing/contemporary inputs for this comparison;
-ordinary next-current reception keeps its original ABI. `wave/rest.rs` v5 stores active producing
-cuts, rejects malformed lineage and reconstructs their source words across process exit. Completed
-or released handles leave the active population; legacy normal-only rests remain supported.
+ordinary next-current reception keeps its original ABI. The retired `wave/rest.rs` v5 format
+stored active producing cuts, rejected malformed lineage and reconstructed their source words
+across process exit. Pending sources now use v11's source-joint form. Completed or released handles
+leave the active population; normal-only rest forms v1–4 remain readable.
 
 [definition] `NormalWaveTransport` distinguishes the stored-M applied word from the wider
 normal-reference family. Source and numerical-rounding bounds remain in both; the M/P comparison
 is not reinjected into the applied source. `wave/reference.rs` reads one reference continuation
-without creating a current occurrence. Rest v6 records the scope, including mixed pending cuts;
-scope changes rebase the complete held enclosure without narrowing it. `field_normal_material.cuh`
+without creating a current occurrence. Rest v6 records Applied transport scope with no pending
+sources; v5's frozen-cut decoder is retired, and pending Joint sources use v11. Scope changes
+rebase the complete held enclosure without narrowing it. `field_normal_material.cuh`
 now also caps its reference-operator error by the unit-prior target-energy law in
 `Physics/AccumulatedNormalResponse.lean`, using the existing exact integer norm owner. The fitted
 coefficients and moments are unchanged; cold validation accepts legacy and tightened certificates.
