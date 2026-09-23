@@ -777,4 +777,147 @@ namespace Audit
 
 end Audit
 
+/-! ## Independent coordinate families: the exact enclosure specialization -/
+
+/-- An independent product family, indexed by every declared coordinate. -/
+def ProductFamily {n : ℕ} (A : Fin n → Finset ℕ) : Finset (∀ i : Fin n, i ∈ Finset.univ → ℕ) :=
+  Finset.univ.pi A
+
+def ProductRestriction {n : ℕ} (A C : Fin n → Finset ℕ) : Fin n → Finset ℕ :=
+  fun i => A i ∩ C i
+
+theorem product_family_cardinality {n : ℕ} (A : Fin n → Finset ℕ) :
+    (ProductFamily A).card = ∏ i : Fin n, (A i).card := by
+  simp [ProductFamily, Finset.card_pi]
+
+theorem product_family_nonempty_iff {n : ℕ} (A : Fin n → Finset ℕ) :
+    (ProductFamily A).Nonempty ↔ ∀ i : Fin n, (A i).Nonempty := by
+  simp [ProductFamily, Finset.pi_nonempty]
+
+theorem product_restriction_is_coordinate_intersection {n : ℕ}
+    (A C : Fin n → Finset ℕ) :
+    ProductFamily (ProductRestriction A C) =
+      (ProductFamily A).filter (fun x => ∀ i : Fin n, x i (Finset.mem_univ i) ∈ C i) := by
+  classical
+  ext x
+  simp only [ProductFamily, ProductRestriction, Finset.mem_pi, Finset.mem_filter, Finset.mem_inter]
+  constructor
+  · intro h
+    constructor
+    · intro i hi
+      exact (h i hi).1
+    · intro i
+      exact (h i (Finset.mem_univ i)).2
+  · rintro ⟨ha, hc⟩ i hi
+    exact ⟨ha i hi, hc i⟩
+
+/-- Agreement on a product region is T3 `Releasable` specialized to product members. -/
+def ProductReleasable {n : ℕ} (A : Fin n → Finset ℕ) (B : Region n) : Prop :=
+  ∀ x ∈ ProductFamily A, ∀ y ∈ ProductFamily A, ∀ i ∈ B,
+    x i (Finset.mem_univ i) = y i (Finset.mem_univ i)
+
+def productArtifact {n : ℕ} (x : ∀ i : Fin n, i ∈ Finset.univ → ℕ) : Artifact n :=
+  fun i => x i (Finset.mem_univ i)
+
+def productArtifacts {n : ℕ} (A : Fin n → Finset ℕ) : Finset (Artifact n) :=
+  (ProductFamily A).image productArtifact
+
+theorem productArtifact_injective {n : ℕ} : Function.Injective (@productArtifact n) := by
+  intro x y h
+  funext i
+  funext hi
+  have hxi : x i hi = x i (Finset.mem_univ i) := by congr 1
+  have hyi : y i hi = y i (Finset.mem_univ i) := by congr 1
+  have hval : x i (Finset.mem_univ i) = y i (Finset.mem_univ i) := by
+    simpa [productArtifact] using congrFun h i
+  rw [hxi, hyi, hval]
+
+theorem product_artifacts_cardinality {n : ℕ} (A : Fin n → Finset ℕ) :
+    (productArtifacts A).card = ∏ i : Fin n, (A i).card := by
+  rw [productArtifacts, Finset.card_image_of_injective (ProductFamily A) productArtifact_injective,
+    product_family_cardinality]
+
+theorem product_releasable_iff_T3_releasable {n : ℕ} (A : Fin n → Finset ℕ)
+    (B : Region n) : ProductReleasable A B ↔ Releasable (productArtifacts A) B := by
+  constructor
+  · intro h a ha b hb i hi
+    obtain ⟨x, hx, rfl⟩ := Finset.mem_image.mp ha
+    obtain ⟨y, hy, rfl⟩ := Finset.mem_image.mp hb
+    exact h x hx y hy i hi
+  · intro h x hx y hy i hi
+    exact h (productArtifact x) (Finset.mem_image.mpr ⟨x, hx, rfl⟩)
+      (productArtifact y) (Finset.mem_image.mpr ⟨y, hy, rfl⟩) i hi
+
+theorem product_releasable_of_singleton_coordinates {n : ℕ} (A : Fin n → Finset ℕ)
+    (B : Region n) (hs : ∀ i ∈ B, (A i).card = 1) : ProductReleasable A B := by
+  intro x hx y hy i hi
+  have hxmem := (Finset.mem_pi.mp hx) i (Finset.mem_univ i)
+  have hymem := (Finset.mem_pi.mp hy) i (Finset.mem_univ i)
+  obtain ⟨a, ha⟩ := Finset.card_eq_one.mp (hs i hi)
+  rw [ha] at hxmem hymem
+  simp only [Finset.mem_singleton] at hxmem hymem
+  exact hxmem.trans hymem.symm
+
+/-- A nonempty product releases exactly its singleton coordinate factors. -/
+theorem product_releasable_iff_singleton_coordinates {n : ℕ} (A : Fin n → Finset ℕ)
+    (B : Region n) (hn : (ProductFamily A).Nonempty) :
+    ProductReleasable A B ↔ ∀ i ∈ B, (A i).card = 1 := by
+  constructor
+  · intro h i hi
+    have hAi : (A i).Nonempty := (Finset.pi_nonempty.mp hn) i (Finset.mem_univ i)
+    have xmem := (Finset.mem_pi.mp (Classical.choose_spec hn)) i (Finset.mem_univ i)
+    let x₀ := Classical.choose hn
+    let a := x₀ i (Finset.mem_univ i)
+    have ha : a ∈ A i := by simpa [a, x₀] using xmem
+    by_contra hnot
+    have hpos : 0 < (A i).card := Finset.card_pos.mpr hAi
+    have hcard : 1 < (A i).card := by omega
+    obtain ⟨b, hb, hba⟩ : ∃ b ∈ A i, b ≠ a := by
+      by_contra! h
+      have : A i = {a} := Finset.eq_singleton_iff_unique_mem.mpr ⟨ha, h⟩
+      simp [this] at hcard
+    let x := Classical.choose hn
+    have hx : x ∈ ProductFamily A := Classical.choose_spec hn
+    let y : (j : Fin n) → j ∈ Finset.univ → ℕ := Function.update x i (fun _ => b)
+    have hy : y ∈ ProductFamily A := by
+      apply Finset.mem_pi.mpr
+      intro j hj
+      by_cases e : j = i
+      · subst j
+        simpa [y] using hb
+      · have hfun : Function.update x i (fun _ => b) j = x j :=
+          Function.update_of_ne e (fun _ => b) x
+        have hyval : y j hj = x j hj := congrFun hfun hj
+        rw [hyval]
+        exact (Finset.mem_pi.mp hx) j hj
+    have hxy := h x hx y hy i hi
+    have hval : y i (Finset.mem_univ i) = b := by simp [y]
+    have hbase : x i (Finset.mem_univ i) = a := rfl
+    rw [hbase, hval] at hxy
+    exact hba hxy.symm
+  · exact product_releasable_of_singleton_coordinates A B
+
+theorem product_restriction_empty_of_empty_factor {n : ℕ} (A C : Fin n → Finset ℕ)
+    (i : Fin n) (h : A i ∩ C i = ∅) :
+    ProductFamily (ProductRestriction A C) = ∅ := by
+  classical
+  ext x
+  simp only [ProductFamily, ProductRestriction, Finset.mem_pi]
+  constructor
+  · intro hx
+    have hi := hx i (Finset.mem_univ i)
+    rw [h] at hi
+    simp at hi
+  · intro hx
+    simp at hx
+
+#print axioms product_family_cardinality
+#print axioms product_artifacts_cardinality
+#print axioms productArtifact_injective
+#print axioms product_family_nonempty_iff
+#print axioms product_restriction_is_coordinate_intersection
+#print axioms product_restriction_empty_of_empty_factor
+#print axioms product_releasable_iff_T3_releasable
+#print axioms product_releasable_iff_singleton_coordinates
+
 end Soma.Holonics.Transport.ArtifactRelease

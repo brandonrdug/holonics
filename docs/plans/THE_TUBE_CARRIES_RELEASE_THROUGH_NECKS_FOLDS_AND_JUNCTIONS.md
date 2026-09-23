@@ -357,6 +357,33 @@ depends only on `propext`, `Classical.choice` and `Quot.sound` — four on none 
 `sorryAx`. The Rust owner is the executable equivalent with 82 tests, exact `u32` token codes,
 `BigInt` windings, `BigUint` cardinalities and `BigRational` widths, and no float anywhere.
 
+[proved-derived; formal-checked] **Independent coordinate specialization.** `ProductFamily A` is the
+finite product of the admitted finite coordinate sets `A_i`. Its cardinality is exactly
+`∏_i |A_i|`; a coordinatewise restriction by `C_i` is the product of `A_i ∩ C_i`, and the
+result is the empty family when any intersection is empty. For a nonempty product family, a
+region `B` is released exactly when each `A_i` for `i ∈ B` is a singleton. This is the law of the
+Rust `EnclosedFamily` owner, whose set-per-coordinate representation computes the same product
+without materializing its members. `product_family_cardinality`, `product_artifacts_cardinality`, `product_family_nonempty_iff`,
+`product_restriction_is_coordinate_intersection` and `product_restriction_empty_of_empty_factor`
+formalize its cardinality, existence and restriction returns; `productArtifact_injective` shows
+that mapping the product family into the existing `Artifact` type preserves that cardinality.
+`product_releasable_iff_T3_releasable`
+connects the product assignment family to the existing `Artifact`/`Releasable` receiver owner;
+`product_releasable_iff_singleton_coordinates` states that a nonempty product releases region `B`
+exactly when every factor on `B` is singleton. The Lean family is a mathematical finite-product
+extension: Rust currently refuses zero-position artifacts and empty admitted factors, so those
+cases have no executable `EnclosedFamily` result (although the formal restriction theorem returns
+an empty family when an intersection factor is empty).
+
+This specialization assumes coordinate independence. A coupled constraint such as role agreement
+can cut out a non-product subset; retain its relation in an enumerated family or return a typed
+nonrepresentability/refusal. The existing Rust owner refuses such constraints rather than
+approximating them. Its `POSITION_CEILING = 1024`, `ALPHABET_CEILING = 2^16`, `FAMILY_CEILING = 4096`,
+`SWING_BRANCH_CEILING = 64`, `EDIT_WORD_CEILING = CIRCUIT_CEILING = 256`,
+`STEP_WORK_CEILING = 2^22`, `ROUTE_HISTORY_CEILING = 1024`,
+`CONSTRAINT_RULE_CEILING = 256` and `SUPPORT_PROBE_CEILING = 1024` bound this implementation's
+declared inputs and execution; these are numeric ceilings, not hypotheses of the finite product law.
+
 [established-bounded] Four findings from building it, each changing the item as the paragraph above
 first stated it. **(1) Over a family, an edit supported off a released region cannot change its face
 at all, so a reopening is always an *emptying*.** The plan wrote "a revision loop is a nontrivial
