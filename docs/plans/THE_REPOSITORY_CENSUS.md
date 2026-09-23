@@ -58,6 +58,11 @@ The [fifth cohort](census/RECORDS_FIFTH_R0.tsv) (August 14–21) adds 58 **keep*
 the R3 census and restructure/roadmap. Across 300 audited records: 241 keep, 53 fold only
 after owner transfer, six unresolved. Corrected interpretations did not erase unique
 checked theorems, experiments or their falsifiers.
+The [sixth cohort](census/RECORDS_SIXTH_R0.tsv) (August 21–23) adds 57 **keep**
+and three **fold** candidates: two superseded research schedules and one umbrella
+inference definition. Across 360 audited records: 298 keep, 56 fold only after
+owner transfer, six unresolved. The GeneralHalving theorem and distinct formal
+owners cited by those schedules remain in their Lean sources.
 
 The document table records paths, line counts, live incoming source count and a conservative
 working disposition. Its scan recognizes Markdown links and explicit path strings in common
