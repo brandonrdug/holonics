@@ -29,7 +29,6 @@ impl FactoredConstitutiveSpine {
             root_constitutive: section.constitutive.clone(),
             effective_incidence: section.incidence.clone(),
             history_weights: vec![BigUint::one()],
-            reconstruction_fibre: Vec::new(),
         })
     }
 
@@ -63,6 +62,16 @@ impl FactoredConstitutiveSpine {
         &self,
         generators: &[Vec<u32>],
     ) -> Result<Self, FactoredMomentError> {
+        Ok(self.transport_with_quotient(generators)?.0)
+    }
+
+    /// [`Self::transport_direct_sum`] together with the passage's candidate-to-target boundary
+    /// map. The map is returned as a reading of this passage; the successor spine does not retain
+    /// it (its history weights are the retained quotient).
+    pub fn transport_with_quotient(
+        &self,
+        generators: &[Vec<u32>],
+    ) -> Result<(Self, FactoredHistoryQuotientPassage), FactoredMomentError> {
         self.validate()?;
         let factors = self.factor_population as usize;
         if generators.is_empty()
@@ -112,8 +121,7 @@ impl FactoredConstitutiveSpine {
         }
         let history_population =
             u32::try_from(distinct_blocks.len()).map_err(|_| FactoredMomentError::Shape)?;
-        let mut reconstruction_fibre = self.reconstruction_fibre.clone();
-        reconstruction_fibre.push(FactoredHistoryQuotientPassage {
+        let passage = FactoredHistoryQuotientPassage {
             source_history_population: self.history_population,
             generator_population: u32::try_from(generators.len())
                 .map_err(|_| FactoredMomentError::Shape)?,
@@ -121,7 +129,7 @@ impl FactoredConstitutiveSpine {
                 .map_err(|_| FactoredMomentError::Shape)?,
             target_history_population: history_population,
             candidate_to_target,
-        });
+        };
         let returned = Self {
             schema: self.schema.clone(),
             factor_population: self.factor_population,
@@ -132,10 +140,9 @@ impl FactoredConstitutiveSpine {
                 distinct_blocks.into_iter().flatten().collect(),
             )?,
             history_weights,
-            reconstruction_fibre,
         };
         returned.validate()?;
-        Ok(returned)
+        Ok((returned, passage))
     }
 
     /// Reconstruct the complete moment through the addressed direct sum of the root constitutive

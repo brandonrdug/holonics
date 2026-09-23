@@ -667,28 +667,22 @@ impl ResidentFactoredConstitutiveSpine {
 }
 
 impl ResidentTransportedConstitutiveSpine {
+    /// Validate a compact/refactor passage, which carries its own effective incidence.
     pub(super) fn validate_layout(&self, factors: u32) -> Result<(), CudaRefineError> {
-        self.effective_incidence.validate_layout()?;
-        if self.root_rank == 0
-            || self.history_population == 0
-            || self.effective_incidence.columns != factors
-            || self.effective_incidence.rows
-                != self
-                    .root_rank
-                    .checked_mul(self.history_population)
-                    .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?
-            || self.history_weight_limb_count == 0
-            || self.maximal_history_weight.is_zero()
-            || self.history_weights.pointer == 0
-        {
+        let effective_incidence = self
+            .effective_incidence
+            .as_ref()
+            .ok_or(CudaRefineError::MembraneInteriorWordShape)?;
+        effective_incidence.validate_layout()?;
+        if effective_incidence.columns != factors {
             return Err(CudaRefineError::MembraneInteriorWordShape);
         }
-        Ok(())
+        self.validate_weights(effective_incidence.rows)
     }
-}
 
-impl ResidentTransportedFactoredHistory {
-    pub(super) fn validate_layout(&self, effective_rows: u32) -> Result<(), CudaRefineError> {
+    /// Validate the history weights against the effective incidence rows they address (a direct
+    /// rooted continuation's rows are the transport's own).
+    pub(super) fn validate_weights(&self, effective_rows: u32) -> Result<(), CudaRefineError> {
         if self.root_rank == 0
             || self.history_population == 0
             || effective_rows

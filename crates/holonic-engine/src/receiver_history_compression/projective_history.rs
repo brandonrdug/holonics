@@ -1,5 +1,5 @@
 use super::compression::exact_biguint_gcd;
-use super::factored_forms::exact_bigint_gcd;
+use super::factored_forms::{exact_bigint_gcd, exact_bigint_lcm};
 use super::*;
 /// One primitive nonzero projective current ray on the native factor population.  The ray is a
 /// hot coordinate of the quadratic moment; its removed positive scale is carried separately and
@@ -589,15 +589,6 @@ impl RationalFactoredForm {
             ),
         )?;
         Ok((Rat::new(signed_divisor, common_denominator), form))
-    }
-}
-
-fn exact_bigint_lcm(left: BigInt, right: BigInt) -> BigInt {
-    if left.is_zero() || right.is_zero() {
-        BigInt::ZERO
-    } else {
-        let divisor = exact_bigint_gcd(left.clone().abs(), right.clone().abs());
-        (left / divisor * right).abs()
     }
 }
 

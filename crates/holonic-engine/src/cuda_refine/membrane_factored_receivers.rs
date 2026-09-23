@@ -412,6 +412,10 @@ impl super::ResidentMembraneInteriorWord {
                 (Some(source_spine), Some(transported_spine)) => {
                     source_spine.validate_layout(source.factor_population)?;
                     transported_spine.validate_layout(transport.factor_population)?;
+                    let transported_incidence = transported_spine
+                        .effective_incidence
+                        .as_ref()
+                        .ok_or(CudaRefineError::MembraneInteriorWordShape)?;
                     let presented_histories = source_spine
                         .history_population
                         .checked_mul(transport.generator_population)
@@ -423,15 +427,14 @@ impl super::ResidentMembraneInteriorWord {
                         return Err(CudaRefineError::MembraneInteriorWordShape);
                     }
                     (
-                        transported_spine.effective_incidence.rows as usize,
+                        transported_incidence.rows as usize,
                         source_spine.root_rank as usize,
                         transported_spine.history_population as usize,
                         transported_spine.history_weight_limb_count as usize,
                         transported_spine.maximal_history_weight.clone(),
-                        transported_spine.effective_incidence.numerator_limb_count as usize,
+                        transported_incidence.numerator_limb_count as usize,
                         source_spine.root_constitutive.numerator_limb_count as usize,
-                        transported_spine
-                            .effective_incidence
+                        transported_incidence
                             .maximal_numerator
                             .to_biguint()
                             .ok_or(CudaRefineError::MembraneInteriorWordShape)?,
@@ -441,8 +444,8 @@ impl super::ResidentMembraneInteriorWord {
                             .to_biguint()
                             .ok_or(CudaRefineError::MembraneInteriorWordShape)?,
                         source_spine.root_constitutive.common_denominator.clone(),
-                        transported_spine.effective_incidence.signs.pointer,
-                        transported_spine.effective_incidence.limbs.pointer,
+                        transported_incidence.signs.pointer,
+                        transported_incidence.limbs.pointer,
                         source_spine.root_constitutive.numerator_signs.pointer,
                         source_spine.root_constitutive.numerator_limbs.pointer,
                         transported_spine.history_weights.pointer,
@@ -454,7 +457,7 @@ impl super::ResidentMembraneInteriorWord {
                         .productive_history
                         .as_ref()
                         .ok_or(CudaRefineError::MembraneInteriorWordShape)?;
-                    history.validate_layout(transport.transported_row_population)?;
+                    history.validate_weights(transport.transported_row_population)?;
                     if transport.transported_row_population
                         != history
                             .root_rank

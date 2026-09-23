@@ -180,7 +180,6 @@ impl super::ResidentMembraneInteriorWord {
                 history_weight_limb_count,
                 maximal_history_weight,
                 history_weights,
-                reconstruction_fibre,
             ) = match (source_spine, transported_spine) {
                 (Some(spine), Some(transported)) => {
                     spine.validate_layout(source_factors)?;
@@ -203,16 +202,17 @@ impl super::ResidentMembraneInteriorWord {
                         quotient_passage,
                         ..
                     } = transported;
-                    let mut reconstruction_fibre = spine.reconstruction_fibre;
-                    if let Some(passage) = quotient_passage {
-                        if passage.source_history_population != spine.history_population
+                    let effective_incidence =
+                        effective_incidence.ok_or(CudaRefineError::MembraneInteriorWordShape)?;
+                    // The passage lineage is checked and released: the successor spine's history
+                    // weights are the retained quotient (plan phase 13).
+                    if let Some(passage) = quotient_passage
+                        && (passage.source_history_population != spine.history_population
                             || passage.generator_population != transport.generator_population
                             || passage.presented_history_population != presented_histories
-                            || passage.target_history_population != history_population
-                        {
-                            return Err(CudaRefineError::MembraneInteriorWordShape);
-                        }
-                        reconstruction_fibre.push(passage);
+                            || passage.target_history_population != history_population)
+                    {
+                        return Err(CudaRefineError::MembraneInteriorWordShape);
                     }
                     (
                         spine.root_rank,
@@ -222,7 +222,6 @@ impl super::ResidentMembraneInteriorWord {
                         history_weight_limb_count,
                         maximal_history_weight,
                         history_weights,
-                        reconstruction_fibre,
                     )
                 }
                 (None, None) => {
@@ -258,7 +257,6 @@ impl super::ResidentMembraneInteriorWord {
                         1,
                         BigUint::one(),
                         Buffer::of(&vec![1_u32; transport.generator_population as usize])?,
-                        Vec::new(),
                     )
                 }
                 _ => return Err(CudaRefineError::MembraneInteriorWordShape),
@@ -271,7 +269,6 @@ impl super::ResidentMembraneInteriorWord {
                 history_weight_limb_count,
                 maximal_history_weight,
                 history_weights,
-                reconstruction_fibre,
             };
             spine.validate_layout(source_factors)?;
             (candidate, spine)
@@ -522,7 +519,7 @@ impl super::ResidentMembraneInteriorWord {
                 .productive_history
                 .take()
                 .ok_or(CudaRefineError::MembraneInteriorWordShape)?;
-            productive_history.validate_layout(transport.transported_row_population)?;
+            productive_history.validate_weights(transport.transported_row_population)?;
             target_generation = transport.target_generation;
             let presented_history_population = source_spine
                 .history_population
@@ -539,16 +536,13 @@ impl super::ResidentMembraneInteriorWord {
             {
                 return Err(CudaRefineError::MembraneInteriorWordShape);
             }
-            let mut reconstruction_fibre = source_spine.reconstruction_fibre;
-            if let Some(passage) = productive_history.quotient_passage {
-                if passage.source_history_population != source_spine.history_population
+            if let Some(passage) = &productive_history.quotient_passage
+                && (passage.source_history_population != source_spine.history_population
                     || passage.generator_population != transport.generator_population
                     || passage.presented_history_population != presented_history_population
-                    || passage.target_history_population != productive_history.history_population
-                {
-                    return Err(CudaRefineError::MembraneInteriorWordShape);
-                }
-                reconstruction_fibre.push(passage);
+                    || passage.target_history_population != productive_history.history_population)
+            {
+                return Err(CudaRefineError::MembraneInteriorWordShape);
             }
             let entries = (transport.transported_row_population as usize)
                 .checked_mul(transport.factor_population as usize)
@@ -580,7 +574,6 @@ impl super::ResidentMembraneInteriorWord {
                 history_weight_limb_count: productive_history.history_weight_limb_count,
                 maximal_history_weight: productive_history.maximal_history_weight,
                 history_weights: productive_history.history_weights,
-                reconstruction_fibre,
             };
             target_spine.validate_layout(source.factor_population)?;
             let target = ResidentFactoredMomentState {

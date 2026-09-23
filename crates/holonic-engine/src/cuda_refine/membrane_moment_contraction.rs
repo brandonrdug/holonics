@@ -33,12 +33,6 @@ pub(super) fn launch(
         .quadratic_action
         .as_ref()
         .ok_or(CudaRefineError::MembraneInteriorWordShape)?;
-    let octets = |population: usize, limbs: usize| {
-        population
-            .checked_mul(limbs)
-            .and_then(|words| words.checked_mul(std::mem::size_of::<u32>()))
-            .ok_or(CudaRefineError::MembraneInteriorWordShape)
-    };
 
     let axis_count = plan.axis_count;
     let compatibility_limb_count = plan.compatibility_limb_count;
@@ -359,24 +353,7 @@ pub(super) fn launch(
         let observer_work = response_population
             .checked_mul(axis_count)
             .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?;
-        let membrane_moment_workspace::MomentCompletedTargetObserverBuffers {
-            face_current,
-            face_relational_real_sign,
-            face_relational_real_limbs,
-            face_relational_imaginary_sign,
-            face_relational_imaginary_limbs,
-            relational_dot_real_sign,
-            relational_dot_real_limbs,
-            relational_dot_imaginary_sign,
-            relational_dot_imaginary_limbs,
-            target_norm_limbs,
-            relational_norm_limbs,
-            norm_product_limbs,
-            first_scratch,
-            second_scratch,
-            third_scratch,
-            obstruction,
-        } = membrane_moment_workspace::allocate_completed_target_observer(
+        let observer = membrane_moment_workspace::allocate_completed_target_observer(
             response_population,
             face_factor_population,
             face_current_limb_count,
@@ -405,12 +382,14 @@ pub(super) fn launch(
             *target_relational_imaginary_limbs_pointer;
         let mut candidate_selected_slots_pointer = aperture.candidate_selected_slots.pointer;
         let mut candidate_to_target_pointer = aperture.candidate_to_target.pointer;
-        let mut face_current_pointer = face_current.pointer;
-        let mut face_relational_real_sign_pointer = face_relational_real_sign.pointer;
-        let mut face_relational_real_limbs_pointer = face_relational_real_limbs.pointer;
-        let mut face_relational_imaginary_sign_pointer = face_relational_imaginary_sign.pointer;
-        let mut face_relational_imaginary_limbs_pointer = face_relational_imaginary_limbs.pointer;
-        let mut observer_obstruction_pointer = obstruction.pointer;
+        let mut face_current_pointer = observer.face_current.pointer;
+        let mut face_relational_real_sign_pointer = observer.face_relational_real_sign.pointer;
+        let mut face_relational_real_limbs_pointer = observer.face_relational_real_limbs.pointer;
+        let mut face_relational_imaginary_sign_pointer =
+            observer.face_relational_imaginary_sign.pointer;
+        let mut face_relational_imaginary_limbs_pointer =
+            observer.face_relational_imaginary_limbs.pointer;
+        let mut observer_obstruction_pointer = observer.obstruction.pointer;
         let mut target_count_wire = context_count as u32;
         let mut selected_slot_count_wire = aperture.selected_slot_count as u32;
         let mut candidate_count_wire = aperture.candidate_count as u32;
@@ -477,15 +456,17 @@ pub(super) fn launch(
         let mut source_class_factor_offset_pointer =
             quadratic_action.source_class_factor_offsets.pointer;
         let mut source_class_factor_pointer = quadratic_action.source_class_factors.pointer;
-        let mut relational_dot_real_sign_pointer = relational_dot_real_sign.pointer;
-        let mut relational_dot_real_limbs_pointer = relational_dot_real_limbs.pointer;
-        let mut relational_dot_imaginary_sign_pointer = relational_dot_imaginary_sign.pointer;
-        let mut relational_dot_imaginary_limbs_pointer = relational_dot_imaginary_limbs.pointer;
-        let mut target_norm_pointer = target_norm_limbs.pointer;
-        let mut relational_norm_pointer = relational_norm_limbs.pointer;
-        let mut first_scratch_pointer = first_scratch.pointer;
-        let mut second_scratch_pointer = second_scratch.pointer;
-        let mut third_scratch_pointer = third_scratch.pointer;
+        let mut relational_dot_real_sign_pointer = observer.relational_dot_real_sign.pointer;
+        let mut relational_dot_real_limbs_pointer = observer.relational_dot_real_limbs.pointer;
+        let mut relational_dot_imaginary_sign_pointer =
+            observer.relational_dot_imaginary_sign.pointer;
+        let mut relational_dot_imaginary_limbs_pointer =
+            observer.relational_dot_imaginary_limbs.pointer;
+        let mut target_norm_pointer = observer.target_norm_limbs.pointer;
+        let mut relational_norm_pointer = observer.relational_norm_limbs.pointer;
+        let mut first_scratch_pointer = observer.first_scratch.pointer;
+        let mut second_scratch_pointer = observer.second_scratch.pointer;
+        let mut third_scratch_pointer = observer.third_scratch.pointer;
         let mut axis_count_wire = axis_count as u32;
         let mut observer_limb_count_wire = observer_limb_count as u32;
         let mut direct_arguments: [*mut c_void; 47] = [
@@ -555,46 +536,7 @@ pub(super) fn launch(
             },
             "cuLaunchKernel(contract_membrane_completed_target_observer)",
         )?;
-        let resident_working_octets = [
-            octets(face_factor_population, face_current_limb_count)?,
-            octets(face_factor_population, face_relational_limb_count)?
-                .checked_mul(2)
-                .and_then(|octets| octets.checked_add(face_factor_population * 2))
-                .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?,
-            octets(response_population, observer_limb_count)?
-                .checked_mul(7)
-                .and_then(|octets| octets.checked_add(response_population * 2))
-                .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?,
-            octets(observer_work, observer_limb_count)?
-                .checked_mul(3)
-                .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?,
-            std::mem::size_of::<u32>(),
-        ]
-        .into_iter()
-        .try_fold(0_u64, |sum, octets| {
-            sum.checked_add(u64::try_from(octets).ok()?)
-        })
-        .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?;
-        completed_target_observer_workspace = Some(ResidentCompletedTargetObserverWorkspace {
-            face_current,
-            face_relational_real_sign,
-            face_relational_real_limbs,
-            face_relational_imaginary_sign,
-            face_relational_imaginary_limbs,
-            relational_dot_real_sign,
-            relational_dot_real_limbs,
-            relational_dot_imaginary_sign,
-            relational_dot_imaginary_limbs,
-            target_norm_limbs,
-            relational_norm_limbs,
-            norm_product_limbs,
-            first_scratch,
-            second_scratch,
-            third_scratch,
-            limb_count: observer_limb_count,
-            obstruction,
-            resident_working_octets,
-        });
+        completed_target_observer_workspace = Some(observer);
     } else if materialize_moment_field {
         driver(
             unsafe {

@@ -424,3 +424,93 @@ wire against the old derive), `cross_chart` (the reopening separator equals the 
 life `situated_difference` (every returned fibre is the preimage of its covector and keeps the old
 wire), `causal_section` (each section separator is the collapsed pair mapped through the naming
 chart), `membrane_interior`, `recurrence`.
+
+### Phase 13 disposition: the device quadratic moment is one storage element
+
+[established-bounded; source-inspected, measured] Scope: `holonic-engine/src/cuda_refine/
+membrane_*.rs` (33 files), `cuda_refine/complex_parametron.rs` (the moment's layout validators),
+`cuda_refine/tests/factored_moment.rs`, `factored_moment{,/**}`, `receiver_history_compression{,/**}`
+and `kernels/refine_shell/membrane_*.cuh`. Before: 35,591 Rust lines, 162 type definitions (101
+public); 7,467 kernel lines. After: 35,880 Rust lines (the growth is the storage facet, its
+equality tests and facet documentation), 161 type definitions (102 public: two duplicate
+wrappers deleted, one core-facing trait added); kernels byte-identical. No device layout, kernel
+argument, `SLOT_WORDS` receipt or wire field of an existing format changed.
+
+**The object.** `C = Σ_s w_s f_s f_sᵀ` on the native factor ports. Every host chart —
+`FactoredMomentSection` (`Bᵀ H B`), `FactoredConstitutiveSpine` (`Eᵀ(⊕_h μ_h H_root)E`),
+`SparseQuadraticMomentSection` (upper pair coefficients) — implements
+`factored_moment::QuadraticMomentStorage`: it supplies `moment()` and receives from the core
+`storage_form()`, `element()` (`ElementRelation::Storage`), `stored_energy(x) = ½⟨x, C x⟩`,
+`is_passive()` (exact inertia) and `deposition_work(successor, x)` (core
+`element::deposition_work`). `weighted_family_moment` is the defining law. Lean:
+`Holon/MomentStorage.lean` (`quadraticMoment_symm`, `storageEnergy_quadraticMoment`:
+`storageEnergy C x = ½ Σ w ⟨f, x⟩²`, `storageEnergy_quadraticMoment_nonneg`), over the existing
+`Millennium/HolonicQuadraticMomentCondensation.lean::quadraticMoment`. The resident card is the
+same element in its limb layout (the `Resident*` state below); the device suite reads its staged
+target back and checks it against `weighted_family_moment` of the transported family.
+
+**Retention.** The rooted spine accumulated one candidate-to-target boundary map per passage —
+host `FactoredConstitutiveSpine.reconstruction_fibre: Vec<FactoredHistoryQuotientPassage>` and, on
+the card, `ResidentFactoredConstitutiveSpine.reconstruction_fibre: Vec<…>` each holding a device
+buffer — an occurrence archive that grew with every passage and that nothing read. Both are
+retired: the history weights `μ_h` are the retained quotient (sufficient for every later moment
+and receiver). `transport_with_quotient` returns the passage's map as a reading; on the card the
+map is released at the synchronization that closes its condensation, and only its four lineage
+counts cross to completion, where they are still checked. A spine wire carrying the old field
+decodes (`a_spine_wire_carrying_the_retired_passage_archive_still_decodes`). Receiver-history
+compression frames are the quotient itself and are kept unchanged.
+
+| Type (owner) | Facet | Disposition / reason |
+|---|---|---|
+| `FactoredMomentSection`, `FactoredConstitutiveSpine`, `SparseQuadraticMomentSection` | storage element (three charts) | kept; implement `QuadraticMomentStorage`; equality test `every_moment_chart_is_one_storage_element_of_the_weighted_family` (same `C` before/after a plural passage, energy `½ Σ w⟨f,x⟩²`, cross-chart deposition work, `D C D` conditioning) |
+| `FactoredConstitutiveSpine.reconstruction_fibre` | retention debt | **retired** (occurrence archive); old wire decodes |
+| `FactoredHistoryQuotientPassage` | reading | kept as the per-passage reading returned by `transport_with_quotient`, never retained |
+| `WeightedIntegralCurrent`, `AddressedDiagonalCurrentStep`, `SymmetricFactorPair`, `SparseQuadraticMomentAction` | source chart, generator action | kept: the source rank-one presentation, the diagonal chronology chart and the fixed generator-closed pair carrier (the pump's clocked action) |
+| `FactoredMomentFoundation`, `SparseQuadraticMomentFoundation` | restriction fibre | kept: one-time founding return whose `reconstruction_fibre`/`source_to_image` is the preimage fibre of the many-to-one moment map (phase 10), not a per-occurrence archive |
+| `FactoredMomentPassage` | passage reading | kept (source section, plural boundary map, target) |
+| `SparseQuadraticPairReceiverTerm`, `SparseQuadraticPairReceiverFrame` | receiver face | kept |
+| `FactoredMomentError` | the host refusal | kept; the one refusal of the exact charts (core storage errors map into it) |
+| `ResidentFactoredMomentState`, `ResidentSparseQuadraticMomentState`, `ResidentFactoredCurrentState` | device storage chart | kept: three device charts of the same element (image `Bᵀ H B`, pair carrier, rank-one current), each with its own kernels |
+| `ResidentFactoredConstitutiveSpine` | device storage chart | kept; per-passage device archive **retired** |
+| `ResidentTransportedConstitutiveSpine`, `ResidentTransportedFactoredHistory` | device transport of the spine | **merged**: one owner with `effective_incidence: Option<…>` (`None` for a direct rooted continuation, whose incidence is the transport's own buffers); one `validate_weights` |
+| `ResidentFactoredHistoryQuotientPassage` | lineage reading | kept as four counts; its dead device buffer released at the passage's synchronization |
+| `ResidentCompletedTargetObserverWorkspace`, `MomentCompletedTargetObserverBuffers` | receiver workspace | **merged**: the allocator returns the workspace itself (octet accounting moved with it) |
+| `ResidentExactRationalMatrix`, `ResidentIntegralMatrix` | device matrix charts | kept: distinct limb layouts (with/without the denominator axis) read by distinct kernels |
+| `ResidentTransportedFactoredMomentIncidence`, `ResidentFactoredMomentRankAtlas`, `…CoordinateAtlas`, `…Candidate`, `…ReceiverState` | restriction/descent on the card | kept: the staged exact descent (transport → finite-chart rank → CRT coordinates → two squares → receiver), each stage owning distinct device work released at admission; not an archive (each is consumed once) |
+| `ResidentSparseQuadraticConditionedCurrent`, `ResidentSparseQuadraticNativeBoundary`, `ResidentSparseQuadraticReceiverMount`, `ResidentSparseQuadraticBoundaryConditionerMount`, `SparsePairActionIngress` | pair-carrier deposition and receivers | kept (see NOT DONE: shared coefficient body) |
+| `ResidentSparseRelationalCurrentAtlasMount`, `…CurrentState`, `…GeneratorTransport`, `…ConditionedCurrent`, `…BoundaryReceiver`, `ResidentFactorizedRelationalWorkspace` | the signed relational current (a separate receiver of the same field) | kept: the Complex-Parametron current is a distinct law (signed, complex, not a storage element); see NOT DONE |
+| `ResidentQuadraticActionMount`, `ResidentBoundaryRestrictionAtlasMount`, `ResidentObservableIntegralFormMount`, `ResidentAddressedFactoredReceiverMount`, `ResidentFactoredReceiverHistoryMount` | invariant mounts (generator action, restriction atlas, receiver frames, the operation complex) | kept; the one mount per invariant owner |
+| `ResidentReceiverHistoryCompressionMount` | the quotient | kept (receiver-history compression is the retained quotient) |
+| `ResidentCompletedTargetObservationAperture` | restriction fibre of one occurrence | kept: consumed by the next receiver of that occurrence |
+| `MomentFrontAdmission`, `MomentFrontPlan`, `MomentResidentContextState`, `MomentFrontWorkspace`, `MomentFrontExecution`, `MomentContractionLaunch`, `BoundaryCompletionPlan`, `BoundaryCompletionWorkspace`, `BoundaryIntervalStage`, `BoundaryReturnState`, `BoundarySupportPhaseReceipt` + six aperture aliases | one front's staged execution | kept: builder stages of one launch word (admission → plan → workspace → execution), no retained state |
+| `ResidentCurrentAddress`, `ResidentFactoredMomentAddress`, `ResidentFactoredMoment{Transport,Rank,Coordinate,Descent,Receiver}Address`, `…TransportOccurrence` | occurrence addresses | kept: continuation testimony of the one live occurrence (generation-addressed, never a list) |
+| `Resident*Return`, `Resident*Receipt` (22 types in `membrane_types.rs`) | readings | kept: each is one passage's reading plus apparatus testimony (launches, octets, synchronizations); several are serialized inside holonic-life rests (`source_neutral_rest/wire.rs`), so their wire stays (see NOT DONE) |
+| `ResidentBoundaryChainSupport`, `ResidentQuadraticMomentRestriction{,Source}`, `ResidentBoundaryRestriction{Atlas,Front}`, `ResidentQuadraticMomentFront`, `ResidentSparseRelationalCurrentAtlas` | exterior ports and restriction incidence | kept (boundary codec of the element) |
+| `CudaRefineError` | the device refusal | kept: one refusal for the whole card |
+| `receiver_history_compression` (`ReceiverHistoryCompression`, `PartialReceiverHistoryCompression`, `GeneratorSquare`, `PartialGeneratorSquare`, `ReconstructionFibre`, frames `ObservableIntegralFormFrame`, `FactoredIntegralReceiverHistoryFrame`, `FactoredRationalReceiverHistoryFrame`, `MembraneFactoredIntegralReceiverHistory`, projective sections/passages, sparse forms and functionals, helical moment reuse) | the quotient and its receiver forms | kept: the compression frames are the retained quotient; `PartialReceiverHistoryCompression` is the open-exterior law (partial generator squares), not a duplicate; `ProjectiveCurrentSection.reconstruction_fibre` is replaced (not accumulated) per passage |
+| duplicated `exact_bigint_gcd`/`exact_bigint_lcm` (`factored_moment/{section,passage}.rs`, `projective_history.rs`) | helpers | **merged** into `receiver_history_compression::factored_forms` |
+
+Equality evidence: host `factored_moment::` (new storage and legacy-wire tests, the migrated
+descent test asserting the returned passage map), `receiver_history_compression::`; device
+`cuda_refine::tests::factored_moment::` baseline versus after at the same counts, with two added
+assertions: the device-staged descent target is the storage element of the transported weighted
+family (and passive), and after three resident spine passages (two compact, one rooted) the card's
+history weights equal the host spine's quotient; `cuda_refine::tests::cuda_apparatus::` unchanged.
+
+**Not done, with reasons.** (1) The signed relational current and the pair-coefficient section each
+appear in two or three device wrappers (standing, generator-transported, conditioned) with the
+same body (`state_present/states/…sign/limbs/bound`, resp. `state_ids/coefficients/limb bound`);
+extracting one body per object is a host-only refactor, but the conditioned/completion path
+(`membrane_{returned_restriction,sparse_completion,generated_condition}.rs`) is reached only from
+holonic-life `source_neutral_rest` examples whose private rests are not present in this checkout,
+so no device equality run covers it; owed with that fixture. (2) The apparatus testimony block
+(device, context, launches, synchronizations, octet counters, `*_reuploaded`, `cpu_semantic_replay`)
+repeats across the `Resident*Return` readings; one `ResidentPassageCost` flattened into each would
+keep JSON but not field access, and holonic-life serializes and compares these returns
+(`SourceNeutralResidentRadiationSection::same_native_receiver_consequence`), so it is owed with the
+phase-14 life migration. (3) `ResidentAddressedFactoredReceiverMount.reconstruction_fibre` (the
+host copy of the primitive receiver frame beside its device realization) is a mount-time receiver
+declaration, not an occurrence archive; kept. (4) The situated ingress receiver
+`ResidentSparseQuadraticMomentState.situated_receiver_coefficients` is carried across the
+circulation as the declared dual receiver; whether it should be re-read from the contemporary
+constitution is the phase-12 frozen-receiver question and is left to it.

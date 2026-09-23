@@ -376,6 +376,51 @@ fn factored_moment_foundation_and_factor_leg_transport_remain_resident() {
             );
         }
     }
+    // Plan phase 13: the founding image and the device-staged target are the storage element of
+    // the weighted family and of its transport `Σ_g Σ_s w_s (T_g f_s)(T_g f_s)ᵀ`.
+    {
+        use crate::factored_moment::{
+            QuadraticMomentStorage, WeightedIntegralCurrent, weighted_family_moment,
+        };
+        let family = contexts
+            .iter()
+            .map(|context| WeightedIntegralCurrent {
+                weight: context.quadratic_weight.clone(),
+                entries: context.factor_current.clone(),
+            })
+            .collect::<Vec<_>>();
+        let transported_family = generators
+            .iter()
+            .flat_map(|generator| {
+                family.iter().map(|source| {
+                    let mut target = std::collections::BTreeMap::<u32, BigUint>::new();
+                    for (factor, coefficient) in &source.entries {
+                        *target.entry(generator[*factor as usize]).or_default() += coefficient;
+                    }
+                    WeightedIntegralCurrent {
+                        weight: source.weight.clone(),
+                        entries: target.into_iter().collect(),
+                    }
+                })
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(
+            returned
+                .foundation
+                .section
+                .moment()
+                .expect("founding storage"),
+            weighted_family_moment(3, &family).expect("family moment")
+        );
+        assert_eq!(
+            descent_return
+                .target
+                .moment()
+                .expect("device target storage"),
+            weighted_family_moment(3, &transported_family).expect("transported moment")
+        );
+        assert!(descent_return.target.is_passive().expect("inertia"));
+    }
     assert_eq!(transported.transported_incidence, expected);
     assert_eq!(transported.source_address, returned.target_address);
     assert_eq!(transported.occurrences.len(), 4);
@@ -865,6 +910,32 @@ fn addressed_functional_pairs_contract_through_the_admitted_image() {
         .expect("the descended rooted history remains resident");
     assert_eq!(spine.history_population, 2);
     assert!(spine.maximal_history_weight >= BigUint::from(4_u32));
+
+    // Plan phase 13: the resident spine retains only its history weights (the per-passage
+    // candidate maps are no longer archived on the card), and they are exactly the host rooted
+    // spine's quotient after the same three passages.
+    let limb_count = spine.history_weight_limb_count as usize;
+    let mut device_limbs = vec![0_u32; spine.history_population as usize * limb_count];
+    spine
+        .history_weights
+        .read(&mut device_limbs)
+        .expect("the resident history weights read back");
+    let mut device_weights = device_limbs
+        .chunks(limb_count)
+        .map(|limbs| BigUint::new(limbs.to_vec()))
+        .collect::<Vec<_>>();
+    let mut host =
+        crate::factored_moment::FactoredConstitutiveSpine::found(&foundation.foundation.section)
+            .expect("the host rooted spine founds");
+    for _ in 0..3 {
+        host = host
+            .transport_direct_sum(&generators)
+            .expect("the host rooted passage returns");
+    }
+    let mut host_weights = host.history_weights.clone();
+    device_weights.sort();
+    host_weights.sort();
+    assert_eq!(device_weights, host_weights);
 }
 
 #[test]

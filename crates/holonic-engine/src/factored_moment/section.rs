@@ -9,6 +9,7 @@ use thiserror::Error;
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 use super::*;
+use crate::receiver_history_compression::{exact_bigint_gcd, exact_bigint_lcm};
 
 /// Refactor a direct sum through an intrinsic row image. The selected rows remain integral;
 /// `source_to_image` carries every transported row into that basis, and the constitutive form is
@@ -98,26 +99,6 @@ impl IntegralFactorSpanFounder {
         self.basis.push(integral);
         self.pivots.push(pivot);
         Ok(true)
-    }
-}
-
-fn exact_bigint_gcd(mut left: BigInt, mut right: BigInt) -> BigInt {
-    left = left.abs();
-    right = right.abs();
-    while !right.is_zero() {
-        let remainder = left % &right;
-        left = right;
-        right = remainder;
-    }
-    left
-}
-
-fn exact_bigint_lcm(left: BigInt, right: BigInt) -> BigInt {
-    if left.is_zero() || right.is_zero() {
-        BigInt::ZERO
-    } else {
-        let divisor = exact_bigint_gcd(left.clone(), right.clone());
-        (left / divisor * right).abs()
     }
 }
 

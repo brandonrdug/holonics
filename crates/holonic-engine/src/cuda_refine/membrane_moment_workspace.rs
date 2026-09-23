@@ -105,25 +105,6 @@ pub(super) struct MomentFrontWorkspace {
     pub(super) factorized_relational_workspace: Option<ResidentFactorizedRelationalWorkspace>,
 }
 
-pub(super) struct MomentCompletedTargetObserverBuffers {
-    pub(super) face_current: Buffer,
-    pub(super) face_relational_real_sign: Buffer,
-    pub(super) face_relational_real_limbs: Buffer,
-    pub(super) face_relational_imaginary_sign: Buffer,
-    pub(super) face_relational_imaginary_limbs: Buffer,
-    pub(super) relational_dot_real_sign: Buffer,
-    pub(super) relational_dot_real_limbs: Buffer,
-    pub(super) relational_dot_imaginary_sign: Buffer,
-    pub(super) relational_dot_imaginary_limbs: Buffer,
-    pub(super) target_norm_limbs: Buffer,
-    pub(super) relational_norm_limbs: Buffer,
-    pub(super) norm_product_limbs: Buffer,
-    pub(super) first_scratch: Buffer,
-    pub(super) second_scratch: Buffer,
-    pub(super) third_scratch: Buffer,
-    pub(super) obstruction: Buffer,
-}
-
 pub(super) fn allocate(
     word: &ResidentMembraneInteriorWord,
     plan: &MomentFrontPlan<'_>,
@@ -636,7 +617,7 @@ pub(super) fn allocate_completed_target_observer(
     face_relational_limb_count: usize,
     observer_limb_count: usize,
     observer_work: usize,
-) -> Result<MomentCompletedTargetObserverBuffers, CudaRefineError> {
+) -> Result<ResidentCompletedTargetObserverWorkspace, CudaRefineError> {
     let face_current = Buffer::alloc(buffer_octets(
         face_factor_population,
         face_current_limb_count,
@@ -668,7 +649,27 @@ pub(super) fn allocate_completed_target_observer(
     let third_scratch = Buffer::alloc(buffer_octets(observer_work, observer_limb_count)?)?;
     let obstruction = Buffer::alloc(std::mem::size_of::<u32>())?;
     obstruction.fill(0, std::mem::size_of::<u32>())?;
-    Ok(MomentCompletedTargetObserverBuffers {
+    let resident_working_octets = [
+        buffer_octets(face_factor_population, face_current_limb_count)?,
+        buffer_octets(face_factor_population, face_relational_limb_count)?
+            .checked_mul(2)
+            .and_then(|octets| octets.checked_add(face_factor_population * 2))
+            .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?,
+        buffer_octets(response_population, observer_limb_count)?
+            .checked_mul(7)
+            .and_then(|octets| octets.checked_add(response_population * 2))
+            .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?,
+        buffer_octets(observer_work, observer_limb_count)?
+            .checked_mul(3)
+            .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?,
+        std::mem::size_of::<u32>(),
+    ]
+    .into_iter()
+    .try_fold(0_u64, |sum, octets| {
+        sum.checked_add(u64::try_from(octets).ok()?)
+    })
+    .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?;
+    Ok(ResidentCompletedTargetObserverWorkspace {
         face_current,
         face_relational_real_sign,
         face_relational_real_limbs,
@@ -684,6 +685,8 @@ pub(super) fn allocate_completed_target_observer(
         first_scratch,
         second_scratch,
         third_scratch,
+        limb_count: observer_limb_count,
         obstruction,
+        resident_working_octets,
     })
 }

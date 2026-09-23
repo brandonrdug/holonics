@@ -253,7 +253,8 @@ impl ResidentMembraneInteriorWord {
         .checked_add(
             constitutive_spine
                 .as_ref()
-                .map(|spine| spine.effective_incidence.resident_octets)
+                .and_then(|spine| spine.effective_incidence.as_ref())
+                .map(|incidence| incidence.resident_octets)
                 .unwrap_or(0),
         )
         .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?;
@@ -376,7 +377,14 @@ impl ResidentMembraneInteriorWord {
         identity.update(source_address.generation.to_le_bytes());
         identity.update(target_generation.to_le_bytes());
         identity.update(generator_count.to_le_bytes());
-        identity.update(transported.effective_incidence.rows.to_le_bytes());
+        identity.update(
+            transported
+                .effective_incidence
+                .as_ref()
+                .ok_or(CudaRefineError::MembraneInteriorWordShape)?
+                .rows
+                .to_le_bytes(),
+        );
         identity.update(self.factors.to_le_bytes());
         for target in generator_targets {
             identity.update(target.to_le_bytes());
@@ -386,20 +394,15 @@ impl ResidentMembraneInteriorWord {
             .iter()
             .map(|octet| format!("{octet:02x}"))
             .collect::<String>();
-        let resident_octets = transported
+        let mut transported = transported;
+        let effective_incidence = transported
             .effective_incidence
+            .take()
+            .ok_or(CudaRefineError::MembraneInteriorWordShape)?;
+        let resident_octets = effective_incidence
             .resident_octets
             .checked_add(2 * std::mem::size_of::<u32>() as u64)
             .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?;
-        let ResidentTransportedConstitutiveSpine {
-            root_rank,
-            history_population,
-            effective_incidence,
-            history_weight_limb_count,
-            maximal_history_weight,
-            history_weights,
-            quotient_passage,
-        } = transported;
         let ResidentIntegralMatrix {
             rows,
             columns,
@@ -427,14 +430,9 @@ impl ResidentMembraneInteriorWord {
             productive_admitted,
             productive_receiver: None,
             constitutive_spine: None,
-            productive_history: Some(ResidentTransportedFactoredHistory {
-                root_rank,
-                history_population,
-                history_weight_limb_count,
-                maximal_history_weight,
-                history_weights,
-                quotient_passage,
-            }),
+            // The incidence moved into the transport's primary buffers above; the spine keeps
+            // its weights and lineage as the direct rooted continuation.
+            productive_history: Some(transported),
             rank_atlas: None,
             sparse_conditioned: None,
             sparse_native_boundary: None,

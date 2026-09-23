@@ -175,11 +175,16 @@ pub struct FactoredConstitutiveSpine {
     pub effective_incidence: ExactRatMatrix,
     /// Exact ordered-history multiplicity carried by each distinct incidence block.  Equal
     /// realizations are one productive block but never lose the population which reached it.
+    /// These multiplicities are the whole retained history: the spine is the quotient sufficient
+    /// for every later moment and receiver (plan phase 13). The earlier per-passage
+    /// `reconstruction_fibre` list was an occurrence archive nothing read; a wire carrying it still
+    /// decodes (the field is ignored), and each passage's boundary map is returned by
+    /// [`FactoredConstitutiveSpine::transport_with_quotient`] instead of being retained.
     pub history_weights: Vec<BigUint>,
-    /// Complete candidate-history boundary maps retained by each exact action descent.
-    pub reconstruction_fibre: Vec<FactoredHistoryQuotientPassage>,
 }
 
+/// The candidate-history to condensed-history boundary map of one plural spine passage: a reading
+/// returned with that passage, never retained by the spine.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct FactoredHistoryQuotientPassage {
     pub source_history_population: u32,

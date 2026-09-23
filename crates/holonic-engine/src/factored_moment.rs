@@ -12,6 +12,9 @@
 //! coordinate passage derives the next image population and pulls `H` through the same map.
 //! Cross-moment Gram charts and matrix inverses are construction certificates, not hot-section
 //! anatomy. Source presentations remain a separate reconstruction fibre.
+//!
+//! Every chart here is one core storage element relation `½⟨x, C x⟩` ([`QuadraticMomentStorage`]);
+//! the resident card realizes the same object in `cuda_refine::membrane_*` (plan phase 13).
 
 mod types;
 pub use types::*;
@@ -21,6 +24,8 @@ mod passage;
 mod section;
 mod sparse;
 mod spine;
+mod storage;
+pub use storage::{QuadraticMomentStorage, weighted_family_moment};
 
 #[cfg(test)]
 #[path = "factored_moment/tests.rs"]

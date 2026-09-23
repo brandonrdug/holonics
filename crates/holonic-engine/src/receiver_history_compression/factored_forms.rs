@@ -126,6 +126,8 @@ impl SparseIntegralBilinearForm {
     }
 }
 
+/// The nonnegative greatest common divisor. The one exact integer gcd of the moment owners
+/// (`factored_moment`, `receiver_history_compression`).
 pub(crate) fn exact_bigint_gcd(mut left: BigInt, mut right: BigInt) -> BigInt {
     while !right.is_zero() {
         let remainder = left % &right;
@@ -133,6 +135,16 @@ pub(crate) fn exact_bigint_gcd(mut left: BigInt, mut right: BigInt) -> BigInt {
         right = remainder;
     }
     left.abs()
+}
+
+/// The nonnegative least common multiple; zero when either argument is zero.
+pub(crate) fn exact_bigint_lcm(left: BigInt, right: BigInt) -> BigInt {
+    if left.is_zero() || right.is_zero() {
+        BigInt::ZERO
+    } else {
+        let divisor = exact_bigint_gcd(left.clone(), right.clone());
+        (left / divisor * right).abs()
+    }
 }
 
 /// One exact factor through the primitive integral form frame.  `None` is the zero receiver;

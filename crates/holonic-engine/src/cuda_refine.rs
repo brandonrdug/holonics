@@ -142,8 +142,7 @@ use membrane_state::{
     ResidentSparseRelationalBoundaryReceiver, ResidentSparseRelationalConditionedCurrent,
     ResidentSparseRelationalCurrentAtlasMount, ResidentSparseRelationalCurrentState,
     ResidentSparseRelationalGeneratorTransport, ResidentTransportedConstitutiveSpine,
-    ResidentTransportedFactoredHistory, ResidentTransportedFactoredMomentIncidence,
-    SparsePairActionIngress,
+    ResidentTransportedFactoredMomentIncidence, SparsePairActionIngress,
 };
 pub use membrane_types::{
     ResidentAddressedCurrentPassageReturn, ResidentAddressedFactoredReceiverFrameReturn,

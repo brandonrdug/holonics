@@ -627,10 +627,13 @@ impl ResidentMembraneInteriorWord {
             )
             .map_err(|_| CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?,
         };
+        // The condensation kernel's candidate-to-target map completed at the synchronization
+        // above; it is device work of this passage and is released here rather than retained.
+        drop(candidate_to_target);
         let returned = ResidentTransportedConstitutiveSpine {
             root_rank,
             history_population: target_history_population,
-            effective_incidence,
+            effective_incidence: Some(effective_incidence),
             history_weight_limb_count: target_weight_limb_count as u32,
             maximal_history_weight: target_weight_bound,
             history_weights: target_weights,
@@ -639,7 +642,6 @@ impl ResidentMembraneInteriorWord {
                 generator_population: generator_count,
                 presented_history_population: candidate_history_population,
                 target_history_population,
-                candidate_to_target,
             }),
         };
         returned.validate_layout(self.factors)?;

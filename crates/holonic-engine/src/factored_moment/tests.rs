@@ -380,18 +380,16 @@ fn equal_complete_history_blocks_descend_with_multiplicity_and_reconstruction_fi
         .section
         .transport_direct_sum(&generators)
         .expect("compact direct sum");
-    let descended = FactoredConstitutiveSpine::found(&foundation.section)
+    let (descended, passage) = FactoredConstitutiveSpine::found(&foundation.section)
         .expect("root")
-        .transport_direct_sum(&generators)
+        .transport_with_quotient(&generators)
         .expect("exact history descent");
 
     assert_eq!(descended.history_population, 1);
     assert_eq!(descended.history_weights, vec![BigUint::from(2_u32)]);
-    assert_eq!(descended.reconstruction_fibre.len(), 1);
-    assert_eq!(
-        descended.reconstruction_fibre[0].candidate_to_target,
-        vec![0, 0]
-    );
+    assert_eq!(passage.candidate_to_target, vec![0, 0]);
+    assert_eq!(passage.presented_history_population, 2);
+    assert_eq!(passage.target_history_population, 1);
     assert!(
         descended
             .agrees_with(&compact.target)
@@ -524,4 +522,184 @@ fn section_admission_rejects_false_basis_and_constitutive_certificates() {
         dependent.validate_admitted(),
         Err(FactoredMomentError::Linear(_))
     ));
+}
+
+fn transported_weighted_family(
+    family: &[WeightedIntegralCurrent],
+    generators: &[Vec<u32>],
+) -> Vec<WeightedIntegralCurrent> {
+    generators
+        .iter()
+        .flat_map(|generator| {
+            family.iter().map(|source| {
+                let mut target = std::collections::BTreeMap::<u32, BigUint>::new();
+                for (factor, coefficient) in &source.entries {
+                    *target.entry(generator[*factor as usize]).or_default() += coefficient;
+                }
+                WeightedIntegralCurrent {
+                    weight: source.weight.clone(),
+                    entries: target.into_iter().collect(),
+                }
+            })
+        })
+        .collect()
+}
+
+fn rats(values: &[i64]) -> Vec<Rat> {
+    values
+        .iter()
+        .map(|value| Rat::from_integer(BigInt::from(*value)))
+        .collect()
+}
+
+/// Plan phase 13: the compact image chart, the rooted spine and the fixed pair carrier are one
+/// storage element `½⟨x, C x⟩` with `C = Σ w f fᵀ`, before and after a plural generator passage.
+#[test]
+fn every_moment_chart_is_one_storage_element_of_the_weighted_family() {
+    let family = vec![
+        current(2, &[(0, 1), (1, 2), (2, 3)]),
+        current(3, &[(0, 2), (1, 1), (2, 1)]),
+    ];
+    let generators = vec![vec![1, 2, 0], vec![0, 0, 2]];
+    let direct = weighted_family_moment(3, &family).expect("direct moment");
+
+    let compact = FactoredMomentSection::found(3, family.clone()).expect("compact foundation");
+    let spine = FactoredConstitutiveSpine::found(&compact.section).expect("root spine");
+    let sparse = SparseQuadraticMomentFoundation::found(3, family.clone(), generators.clone())
+        .expect("sparse foundation");
+    assert_eq!(compact.section.moment().expect("compact moment"), direct);
+    assert_eq!(spine.moment().expect("spine moment"), direct);
+    assert_eq!(sparse.section.moment().expect("pair moment"), direct);
+
+    let transported_family = transported_weighted_family(&family, &generators);
+    let transported = weighted_family_moment(3, &transported_family).expect("transported moment");
+    let compact_next = compact
+        .section
+        .transport_direct_sum(&generators)
+        .expect("compact passage")
+        .target;
+    let spine_next = spine
+        .transport_direct_sum(&generators)
+        .expect("spine passage");
+    let sparse_next = sparse
+        .section
+        .transport_direct_sum(&sparse.action)
+        .expect("pair passage");
+    assert_eq!(compact_next.moment().expect("compact"), transported);
+    assert_eq!(spine_next.moment().expect("spine"), transported);
+    assert_eq!(sparse_next.moment().expect("pair"), transported);
+
+    let x = rats(&[1, -2, 3]);
+    for (chart, source) in [
+        (&compact.section as &dyn QuadraticMomentStorage, &family),
+        (&spine as &dyn QuadraticMomentStorage, &family),
+        (&sparse.section as &dyn QuadraticMomentStorage, &family),
+        (
+            &compact_next as &dyn QuadraticMomentStorage,
+            &transported_family,
+        ),
+        (
+            &spine_next as &dyn QuadraticMomentStorage,
+            &transported_family,
+        ),
+        (
+            &sparse_next as &dyn QuadraticMomentStorage,
+            &transported_family,
+        ),
+    ] {
+        assert!(matches!(
+            chart.element().expect("element"),
+            holonic_core::element::ElementRelation::Storage { .. }
+        ));
+        assert!(chart.is_passive().expect("inertia"));
+        // ½ Σ w ⟨f, x⟩²: the energy of the rank-one family itself.
+        let expected = source
+            .iter()
+            .map(|current| {
+                let pairing = current
+                    .entries
+                    .iter()
+                    .map(|(factor, coefficient)| {
+                        Rat::from_integer(BigInt::from(coefficient.clone())) * &x[*factor as usize]
+                    })
+                    .fold(Rat::zero(), |sum, term| sum + term);
+                Rat::from_integer(BigInt::from(current.weight.clone())) * &pairing * &pairing
+            })
+            .fold(Rat::zero(), |sum, term| sum + term)
+            * Rat::new(BigInt::one(), BigInt::from(2));
+        assert_eq!(chart.stored_energy(&x).expect("energy"), expected);
+    }
+
+    let work = compact
+        .section
+        .deposition_work(&compact_next, &x)
+        .expect("deposition work");
+    assert_eq!(
+        work,
+        compact_next.stored_energy(&x).expect("after")
+            - compact.section.stored_energy(&x).expect("before")
+    );
+    assert_eq!(
+        spine
+            .deposition_work(&sparse_next, &x)
+            .expect("cross-chart work"),
+        work
+    );
+
+    // A returned diagonal restriction changes the pair storage to `D C D` at the same generation.
+    let restriction = vec![(0, BigUint::from(2_u32)), (2, BigUint::from(1_u32))];
+    let conditioned = sparse_next
+        .condition_by_diagonal_restriction(&restriction)
+        .expect("conditioned");
+    let diagonal = ExactRatMatrix::new(
+        (0..3)
+            .map(|row| {
+                (0..3)
+                    .map(|column| {
+                        if row != column {
+                            Rat::zero()
+                        } else {
+                            restriction
+                                .iter()
+                                .find(|(factor, _)| *factor as usize == row)
+                                .map(|(_, value)| Rat::from_integer(BigInt::from(value.clone())))
+                                .unwrap_or_else(Rat::zero)
+                        }
+                    })
+                    .collect()
+            })
+            .collect(),
+    )
+    .expect("diagonal");
+    assert_eq!(
+        conditioned.moment().expect("conditioned moment"),
+        diagonal
+            .multiply(&transported)
+            .and_then(|held| held.multiply(&diagonal))
+            .expect("D C D")
+    );
+}
+
+/// Plan phase 13: the retired per-passage archive of the rooted spine still decodes (the field is
+/// ignored) into the same quotient.
+#[test]
+fn a_spine_wire_carrying_the_retired_passage_archive_still_decodes() {
+    let foundation = FactoredMomentSection::found(
+        3,
+        vec![current(2, &[(0, 1), (1, 2)]), current(3, &[(1, 1), (2, 1)])],
+    )
+    .expect("foundation");
+    let generators = vec![vec![1, 2, 0], vec![1, 2, 0]];
+    let (spine, passage) = FactoredConstitutiveSpine::found(&foundation.section)
+        .expect("root")
+        .transport_with_quotient(&generators)
+        .expect("passage");
+    let mut wire = serde_json::to_value(&spine).expect("wire");
+    assert!(wire.get("reconstruction_fibre").is_none());
+    wire.as_object_mut().expect("object").insert(
+        "reconstruction_fibre".to_owned(),
+        serde_json::to_value(vec![passage]).expect("legacy archive"),
+    );
+    let decoded: FactoredConstitutiveSpine = serde_json::from_value(wire).expect("legacy decode");
+    assert_eq!(decoded, spine);
 }

@@ -9,26 +9,8 @@ use thiserror::Error;
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 use super::*;
+use crate::receiver_history_compression::exact_bigint_lcm;
 
-fn exact_bigint_gcd(mut left: BigInt, mut right: BigInt) -> BigInt {
-    left = left.abs();
-    right = right.abs();
-    while !right.is_zero() {
-        let remainder = left % &right;
-        left = right;
-        right = remainder;
-    }
-    left
-}
-
-fn exact_bigint_lcm(left: BigInt, right: BigInt) -> BigInt {
-    if left.is_zero() || right.is_zero() {
-        BigInt::ZERO
-    } else {
-        let divisor = exact_bigint_gcd(left.clone(), right.clone());
-        (left / divisor * right).abs()
-    }
-}
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::receiver_history_compression::{
     AddressedFactoredIntegralReceiverComplex, FactoredIntegralReceiverForm,

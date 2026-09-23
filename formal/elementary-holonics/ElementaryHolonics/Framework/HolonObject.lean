@@ -9,6 +9,7 @@ import ElementaryHolonics.Holon.Conformance
 import ElementaryHolonics.Holon.Deposition
 import ElementaryHolonics.Holon.Reaction
 import ElementaryHolonics.Holon.Cayley
+import ElementaryHolonics.Holon.MomentStorage
 
 /-!
 # The Holon object

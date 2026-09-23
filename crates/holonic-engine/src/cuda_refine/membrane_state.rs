@@ -133,6 +133,8 @@ pub(super) struct ResidentCompletedTargetObservationAperture {
 
 /// Occurrence-local realization of the sparse pushforward from committed target sites to one
 /// receiver face per local `(port,generator)` incidence.  No target-by-face rectangle is stored.
+/// Allocated whole by `membrane_moment_workspace::allocate_completed_target_observer` (plan phase
+/// 13 retired the duplicate `MomentCompletedTargetObserverBuffers` staging struct).
 pub(super) struct ResidentCompletedTargetObserverWorkspace {
     /// Raw pointers into these buffers remain arguments of queued observer kernels; ownership here
     /// is their CUDA lifetime boundary even when Rust never reads the buffers again.
@@ -312,7 +314,9 @@ pub(super) struct ResidentIntegralMatrix {
 
 /// Rooted productive presentation `E^T (direct_sum H_root) E`.  Its history and root-coordinate
 /// addresses are not identified with the compact target-image coordinates even when both return
-/// the same complete moment.
+/// the same complete moment. The history weights are the whole retained history (plan phase 13):
+/// the per-passage candidate maps it formerly accumulated on the card were an occurrence archive
+/// no later passage read, and are no longer retained.
 pub(super) struct ResidentFactoredConstitutiveSpine {
     pub(super) root_rank: u32,
     pub(super) history_population: u32,
@@ -321,45 +325,32 @@ pub(super) struct ResidentFactoredConstitutiveSpine {
     pub(super) history_weight_limb_count: u32,
     pub(super) maximal_history_weight: BigUint,
     pub(super) history_weights: Buffer,
-    pub(super) reconstruction_fibre: Vec<ResidentFactoredHistoryQuotientPassage>,
 }
 
-/// The next addressed incidence of the rooted spine while the compact target chart is still an
-/// admission candidate.
+/// The next addressed incidence and history weights of the rooted spine while its passage is
+/// still an admission candidate. A standard compact/refactor passage carries its own
+/// `effective_incidence`; a direct rooted continuation (`productive_history`) already owns its
+/// productive incidence in `ResidentTransportedFactoredMomentIncidence::{signs,limbs}` and
+/// carries `None` here. (Plan phase 13 merged the former `ResidentTransportedFactoredHistory`,
+/// the same object without the duplicated incidence, into this one owner.)
 pub(super) struct ResidentTransportedConstitutiveSpine {
     pub(super) root_rank: u32,
     pub(super) history_population: u32,
-    pub(super) effective_incidence: ResidentIntegralMatrix,
+    pub(super) effective_incidence: Option<ResidentIntegralMatrix>,
     pub(super) history_weight_limb_count: u32,
     pub(super) maximal_history_weight: BigUint,
     pub(super) history_weights: Buffer,
     pub(super) quotient_passage: Option<ResidentFactoredHistoryQuotientPassage>,
 }
 
-/// Weight and reconstruction testimony accompanying a rooted incidence carried in the primary
-/// transport buffers.  Standard compact/refactor passages need a second incidence and therefore
-/// use [`ResidentTransportedConstitutiveSpine`]; direct rooted continuation already owns its
-/// productive incidence in `ResidentTransportedFactoredMomentIncidence::{signs,limbs}` and keeps
-/// only this non-duplicated continuation fibre beside it.
-pub(super) struct ResidentTransportedFactoredHistory {
-    pub(super) root_rank: u32,
-    pub(super) history_population: u32,
-    pub(super) history_weight_limb_count: u32,
-    pub(super) maximal_history_weight: BigUint,
-    pub(super) history_weights: Buffer,
-    pub(super) quotient_passage: Option<ResidentFactoredHistoryQuotientPassage>,
-}
-
-/// Complete candidate-history to condensed-history boundary map for one plural passage.  It is
-/// reconstruction testimony and never selects a productive receiver.
+/// The lineage counts of one plural spine passage, checked against the source spine when the
+/// passage completes. The candidate-to-target map itself is device work of the condensation
+/// kernel and is released at the synchronization that closes the passage.
 pub(super) struct ResidentFactoredHistoryQuotientPassage {
     pub(super) source_history_population: u32,
     pub(super) generator_population: u32,
     pub(super) presented_history_population: u32,
     pub(super) target_history_population: u32,
-    /// Retains the complete candidate fibre on the card beside the productive quotient.
-    #[allow(dead_code)]
-    pub(super) candidate_to_target: Buffer,
 }
 
 /// The native quadratic image occurrence.  The addressed source-current family is deliberately
@@ -398,7 +389,8 @@ pub(super) struct ResidentTransportedFactoredMomentIncidence {
     pub(super) productive_admitted: Buffer,
     pub(super) productive_receiver: Option<ResidentFactoredMomentReceiverState>,
     pub(super) constitutive_spine: Option<ResidentTransportedConstitutiveSpine>,
-    pub(super) productive_history: Option<ResidentTransportedFactoredHistory>,
+    /// A direct rooted continuation's weights; its incidence is `signs`/`limbs` above.
+    pub(super) productive_history: Option<ResidentTransportedConstitutiveSpine>,
     pub(super) rank_atlas: Option<ResidentFactoredMomentRankAtlas>,
     /// Returned membrane action queued after the current boundary receivers.  The unconditioned
     /// `limbs` stay alive until the terminal synchronization because those earlier launches read
