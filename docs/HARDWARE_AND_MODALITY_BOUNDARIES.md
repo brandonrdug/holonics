@@ -236,6 +236,17 @@ change: situated occurrence and caused incidence; local receiver charts; oriente
 relative phase; Preimage Fibres; lineage and obstruction; move ownership;
 atomic successor formation; and checkpoint chronology.
 
+[implementation policy] A renderer may partition one declared receiver face into terminal tiles
+to schedule work. A tile boundary is an apparatus partition: it does not create a source event,
+chronology step, wavefront, or separately publishable successor. Preserve receiver, source event,
+generation, and tile address on each result; accept results only for the receiver's current
+generation, and publish only after the complete declared face has been assembled. Checking
+freshness when a worker dequeues a tile is insufficient: a newer generation can arrive while the
+older tile is being realized. This is a presentation transaction rule derived from atomic
+successor formation, not a new Holonic law. The retired CPU tile presenter checked freshness only
+at dequeue, returned each tile completion directly, and had no complete-face assembly or commit
+barrier; it did not implement this policy.
+
 [definition] Counts, launch time, energy, transfer bytes, occupancy, memory pressure, and device
 name are receiver/apparatus measurements. They can qualify a hardware realization, but they do
 not identify a holon, choose a route, establish context, or replace the returned difference.

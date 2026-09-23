@@ -356,7 +356,6 @@ mod lean_citations;
 // Plan phase 10: the engine's reconstruction fibres and separators, read against the core
 // restriction fibre they became, wire for wire. Test-only.
 pub mod lean_development;
-pub mod live_presentation;
 #[cfg(test)]
 mod restriction_fibre_instances;
 // The material loop and its circulation -- Kelvin's theorem as a carried loop rather than a fixed
@@ -648,7 +647,6 @@ pub use image::*;
 pub use implicit::*;
 pub use interaction::*;
 pub use inverse_transport::*;
-pub use live_presentation::*;
 pub use local_star::*;
 pub use mode::*;
 pub use observation_ecology::*;

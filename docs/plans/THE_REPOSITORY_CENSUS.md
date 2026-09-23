@@ -153,6 +153,15 @@ release criterion now have checked Lean owners, while Rust work ceilings remain 
 implementation evidence; the distinct live `edit_rigidity` chart remains. Focused engine,
 Lean-owner, workspace all-target and Lean-citation checks passed for both cuts.
 
+The independent R1 live-presentation review found no crate, example, or test caller for
+`live_presentation.rs`; its root module/re-export and inline reachability test were its only Rust
+references. The `LiveCpuPresenter` checked generation freshness only when dequeuing a tile, then
+could return a stale completion after a newer generation arrived. It exposed each tile completion
+directly and had no complete-face assembly or publication barrier, despite its atomic-face module
+comment. The transferable tile scheduling constraint is now in the hardware guide, explicitly as
+implementation policy. The prototype and inline test are retired; this does not claim an atomic
+whole-face implementation or a missing Lean theorem.
+
 The [R2 owner audit](census/SOMA_R0.tsv) changes two earlier assumptions. `holonics-workspace`
 has a live workbench application caller, and `holonic-language`'s generic reflective
 continuation law lacks a clearly equivalent Lean owner; move that law before retiring its
@@ -175,6 +184,7 @@ consumer or host words. The plan §0.4 now names those distinct edges.
 | R1 complete (#65) | `device.rs` had no Rust caller beyond its inline tests and root exports. Its generic CPU-only three-task parity experiment had no resident HNN consumer or distinct Lean law. | Retired the module and exports. The hardware guide retains its exact ordered-result/cardinality admission criterion and explicitly limits that evidence; focused engine and combined all-target gates passed. |
 | R1 complete (#65) | `parameter.rs` had no exact-symbol Rust consumer beyond inline tests and root exports. Its copy, retention, departure and return-at-event-closure conditions are now stated in the elementary-object contract as conditions on Holon relations, with `StandingLaw` owning future sufficiency. | Retired the standalone carrier and exports; ID/schema/map/error policy remains historical implementation evidence. The workspace all-target gate passed. |
 | R1 complete (#65) | `model_surface.rs` had no Rust consumer beyond its own tests; `holonic-body::arrow` carried only an explanatory comment. Its rational reading and Arrow relation are retained in [the realizer guide](../canon/TABLET_THE_REALIZER.md#143-the-holomorphic-half-is-owned-and-it-is-aperture-complete-by-a-theorem), with the prototype's finite-decade and asymmetric-crossing limits named. | Retired the module/tests and root export; Arrow computes its classification directly. No current Rust API or Lean theorem is claimed; the workspace all-target gate passed. |
+| R1 cut (#65) | `live_presentation.rs` had no crate/example/test caller beyond its root module/re-export and inline reachability test. Its tile worker checked freshness only at dequeue, returned individual completions, and never assembled/committed a complete face; `ReceiverCouplingSet` was unused directed-graph reachability. | Retired the Rust module, inline test and root exports. The hardware guide retains tile partition and whole-face publication as an implementation policy that the prototype did not enforce; the all-target gate remains to be recorded. |
 | R3 | `Framework.Core` reaches five historically filed Millennium owners **transitively** through Standing/RelationLadder/ContinuingTower and CausalRelevance/JointReceiverDescent. The [declaration-level edge audit](census/LEAN_CORE_R3_EDGES.md) names each consumer and research remainder. `Objects.Ratio → HolonicGaugeCovariance → HolonicConnectionVariation` and `Holon.MomentStorage → HolonicQuadraticMomentCondensation → HolonicGranularBoundaryRadiation` are the other large ingress paths. | Extract only the declarations the foundation consumes, retain unique research theorems and update their source importers in the same cut. Focused Core, Ratio and MomentStorage builds pass before the edit; build the affected targets again afterward. |
 
 The candidate rows do not authorize the next cut before the remaining area dispositions and
