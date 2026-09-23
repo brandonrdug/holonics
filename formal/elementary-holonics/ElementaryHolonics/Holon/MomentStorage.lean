@@ -1,5 +1,5 @@
 import ElementaryHolonics.Holon.Element
-import ElementaryHolonics.Millennium.HolonicQuadraticMomentCondensation
+import ElementaryHolonics.Holon.QuadraticMoment
 
 /-!
 # Holon.MomentStorage: the quadratic moment is one storage element

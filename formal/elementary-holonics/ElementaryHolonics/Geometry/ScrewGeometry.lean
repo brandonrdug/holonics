@@ -1,6 +1,6 @@
 import Mathlib.LinearAlgebra.CrossProduct
 import Mathlib.Tactic
-import ElementaryHolonics.Millennium.HolonicQuadraticMomentCondensation
+import ElementaryHolonics.Holon.QuadraticMoment
 
 /-!
 # Local screw generators and pair-distance jets

@@ -11,7 +11,7 @@ import ElementaryHolonics.Transport.GaussianRebase
 import ElementaryHolonics.Computation.HolonicAdjointNormalization
 import ElementaryHolonics.Foundation.CompleteReceiverHistory
 import ElementaryHolonics.Millennium.PhysicalRealization
-import ElementaryHolonics.Millennium.HolonicQuadraticMomentCondensation
+import ElementaryHolonics.Holon.QuadraticMoment
 import ElementaryHolonics.Millennium.HolonicEntropyActionInduction
 
 /-!
