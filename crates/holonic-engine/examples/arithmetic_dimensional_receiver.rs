@@ -1,11 +1,11 @@
-//! Interactive exact dimensional receiver over the production counting ecology.
+//! Exact dimensional receiver over the production counting ecology.
 //!
 //! This is a display conductor, not a second arithmetic or wave law.
 //! Consecutive integer occurrences first condition `ArithmeticFiberLaw`; the
 //! resulting exact standing mounts through `ArithmeticDimensionalMount`.
 //! Prime-power occurrences then cause simultaneous finite-place currents in
-//! `ExactDimensionalWaveLaw`. X11 receives only exact dimensional and wave
-//! slice receipts.
+//! `ExactDimensionalWaveLaw`. A finite control word is replayed through the
+//! deterministic memory membrane; exact receipts do not depend on a window.
 
 use std::collections::BTreeMap;
 use std::error::Error;
@@ -23,8 +23,8 @@ use holonic_engine::{
     DimensionalReceiverRequest, DimensionalSliceReceipt, DimensionalWaveEvent,
     DimensionalWaveSectionDisposition, DimensionalWaveSliceReceipt, DisplayFace, EventId,
     ExactDimensionalWaveLaw, ExactReceiverPhasePopulation, ExactReceiverPrimaryDoctrine,
-    ExactSliceConstraint, ExactSliceCovector, PlatformMembrane, RawPlatformInput, Rgb8,
-    VisibleDimensionalWaveSection, X11Platform, encode_ppm, exact_residue_conic_phase,
+    ExactSliceConstraint, ExactSliceCovector, MemoryPlatform, PlatformMembrane, RawPlatformInput,
+    Rgb8, VisibleDimensionalWaveSection, encode_ppm, exact_residue_conic_phase,
 };
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
@@ -362,11 +362,18 @@ fn main() -> Result<(), Box<dyn Error>> {
         .and_then(|event| event.checked_add(1))
         .ok_or("wave event identity overflow")?;
     let mut propagation = PropagationClock::new(next_wave_event);
-    let mut platform = X11Platform::new(
-        width,
-        height,
-        "Holonic counting ecology — exact propagating dimensional receiver",
-    )?;
+    // The executable example runs a finite deterministic control word. The
+    // monitor and its saved exact receipts remain boundary outputs; no window
+    // system is part of the arithmetic or traveling-current construction.
+    let mut platform = MemoryPlatform::new(width, height)?;
+    for physical_code in [39, 57, 43] {
+        platform.supply(RawPlatformInput::Key {
+            physical_code,
+            pressed: true,
+            repeat: false,
+        });
+    }
+    platform.supply(RawPlatformInput::CloseRequested);
     platform.present(&face)?;
     loop {
         while let Some(input) = platform.next_input()? {

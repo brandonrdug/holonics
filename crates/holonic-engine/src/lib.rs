@@ -419,8 +419,6 @@ pub mod physical_occurrence;
 pub mod physicochemical_receiver;
 pub mod placement;
 pub mod platform;
-#[cfg(all(target_os = "linux", feature = "desktop-x11"))]
-pub mod platform_x11;
 pub mod presentation;
 // C5: cost as a receipt with provenance, and the receiver-relative Pareto frontier of
 // presentations. Paired with `Foundation/PresentationCost.lean`.
@@ -659,8 +657,6 @@ pub use organizational_grammar::*;
 pub use phase_current::*;
 pub use physical::*;
 pub use platform::*;
-#[cfg(all(target_os = "linux", feature = "desktop-x11"))]
-pub use platform_x11::*;
 pub use presentation::*;
 pub use prime_ecology::*;
 pub use quintic_chart::*;

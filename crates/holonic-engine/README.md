@@ -633,10 +633,9 @@ not a universal physical spectrum.
 
 `PlatformMembrane` carries raw integer input, complete terminal `DisplayFace`
 values, and atomic batches of changed row-run `DisplayPatch` values.
-`MemoryPlatform` is the deterministic reference membrane. The X11 membrane
-validates a complete batch before changing its retained face, blits all runs,
-then flushes once. A native window adapter may implement the same boundary
-without becoming geometry or physics authority.
+`MemoryPlatform` is the deterministic reference membrane. A native window
+adapter may implement the same boundary without becoming geometry or physics
+authority; platform transport stays outside this crate.
 
 ## Examples
 
@@ -647,9 +646,10 @@ without becoming geometry or physics authority.
 - `divisor_receiver_reconstruction` reconstructs unlabeled prime-generator
   supports and the dual squarefree complex from opaque contact, with either
   the private-witnessed or unrestricted doctrine.
-- `desktop_receiver` presents two embodied receiver faces of one propagating
-  octahedral local-star ecology through a native-resolution X11 membrane,
-  sparse tube deltas, and chart-addressed traversal words.
+- `desktop_receiver` runs one scripted receiver traversal through a
+  heterogeneous octahedral local-star ecology, sparse tube deltas, and
+  chart-addressed traversal words. Its TSV remains the exact integration
+  receipt; the display/input membrane is `MemoryPlatform`.
 - `whole_receiver_holonic_complex` forms a whole-image analytical phase
   ecology, exact grade-zero/one/two incidence, coarser quotient points, and
   actual higher overlap cells without an authored crop or fixed germ count.

@@ -14,7 +14,7 @@ use holonic_engine::{
     CpuExecutor, CudaApertureExecutor, CudaApertureReceipt, DisplayFace, DisplayPatch, Edge,
     EventId, FaceId, HingeId, HingeTrajectory, HingeTransportNetwork, HingeUnitSystem,
     HingeWorldLaw, LocalCurrentTransport, LocalStarError, LocalStarEvent, LocalStarLaw,
-    LocalStarMaterial, LocalStarRadiation, LocalStarStanding, PlatformMembrane,
+    LocalStarMaterial, LocalStarRadiation, LocalStarStanding, MemoryPlatform, PlatformMembrane,
     PluralReceiverAssembly, PresentationAddress, PresentationBoundary, QuadraticHingeAction,
     RawPlatformInput, RayFamily, ReceiverApertureTrace, ReceiverBoundaryDeed,
     ReceiverFaceFormationCause, ReceiverFaceFormationReceipt, ReceiverFaceSpec, ReceiverFounding,
@@ -22,12 +22,11 @@ use holonic_engine::{
     ReceiverSourceSelection, ReceiverStandingRelation, ReceiverTraversalOccurrence,
     ReceiverTraversalStep, Rgb8, SimplicialComplex, TerminalMatrixSpec, TerminalTubeAtlas,
     TerminalTubePlan, TerminalTubeRadiation, TerminalTubeReceipt, VertexId, VertexStarLink,
-    X11Platform, assemble_support_presentation_with_cpu, classify_presentation_address,
+    assemble_support_presentation_with_cpu, classify_presentation_address,
 };
 #[cfg(test)]
 use holonic_engine::{
-    ApertureExecutionBackend, ContinuousPresentation, MemoryPlatform,
-    assemble_presentation_with_cpu,
+    ApertureExecutionBackend, ContinuousPresentation, assemble_presentation_with_cpu,
 };
 use num_bigint::BigUint;
 use num_traits::{ToPrimitive, Zero};
@@ -1764,14 +1763,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let initial_tube_radiation = tube_atlas.commit(initial_tube_plan, initial_traces)?;
     let mut display = compose_display(&specification, &tube_atlas, &phases)?;
     let mut refused_presentation = None::<DisplayFace>;
-    let mut platform = X11Platform::new(
-        specification.width,
-        specification.height,
-        "Holonic receiver — exact causal phase transport",
-    )?;
+    // Run one reproducible source-to-receiver traversal through the memory
+    // boundary. The physical law, sparse tube return and trace remain live;
+    // the window system is only a presentation adapter.
+    let mut platform = MemoryPlatform::new(specification.width, specification.height)?;
+    platform.supply(RawPlatformInput::Key {
+        physical_code: 114,
+        pressed: true,
+        repeat: false,
+    });
     platform.present(&display)?;
     println!(
-        "live window={}x{} aperture={}x{} backend={} arithmetic={} intermediate-bits={} cpu-parity={} wall-ns={} CPU-workers={} assembly-workers={} physics-workers={} source-projected={} source-reused={} source-rebased={} primitives={} local-relations={} presentation-relations={} traced-addresses={} support-queries={} tube-founded={} tube-rebased={} tube-retained={} tube-delta-addresses={} linear-workers={} causal-layers={} active-stars={} pending-frontier={} propagation-boundary={:?} hinges-changed={} faces-changed={} conics-changed={} trace={} — each supplied event closes its locally parallel causal front to exact rest, return, or open cyclic support; receiver bodies move in the field; drag transports; arrows precess; W/S or wheel supply depth current; Esc closes",
+        "scripted receiver={}x{} aperture={}x{} backend={} arithmetic={} intermediate-bits={} cpu-parity={} wall-ns={} CPU-workers={} assembly-workers={} physics-workers={} source-projected={} source-reused={} source-rebased={} primitives={} local-relations={} presentation-relations={} traced-addresses={} support-queries={} tube-founded={} tube-rebased={} tube-retained={} tube-delta-addresses={} linear-workers={} causal-layers={} active-stars={} pending-frontier={} propagation-boundary={:?} hinges-changed={} faces-changed={} conics-changed={} trace={} — one fixed Y traversal closes its locally parallel causal front to exact rest, return, or open cyclic support",
         display.width,
         display.height,
         specification.width,
@@ -2138,11 +2141,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         tube_radiation.receipt.changed_addresses,
                         render.trace_workers_used,
                     );
+                    // This executable is a deterministic integration receipt.
+                    // One accepted passage preserves the composition without
+                    // keeping an OS event loop in the engine crate.
+                    return Ok(());
                 }
                 Err(error) => {
                     eprintln!(
                         "presentation-refused event={event} error={error}; physical and receiver standing remain exact and the last valid presentation remains"
                     );
+                    return Err(error);
                 }
             }
         }

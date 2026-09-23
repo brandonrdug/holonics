@@ -57,10 +57,11 @@ Each is backed by a measurement at `d3b8b509`.
    `accelerators/rust-gpu` (Vulkan, already ruled out for production) retires.
 5. **Minimal features.** Each feature combination compiles its own copy of the crate. On
    September 23 the engine had 39 incremental directories (150 GB). Main `holonics` has no
-   feature that changes its dependency graph. The engine's default `desktop-x11` feature retires
-   with `platform_x11` and its two Cargo example callers (`arithmetic_dimensional_receiver`,
-   `desktop_receiver`), whose exact keep/retire disposition is required in R1. The earlier
-   module-token scan missed these type-level `X11Platform` consumers.
+   feature that changes its dependency graph. R1 re-charts both type-level X11 callers before
+   retiring `platform_x11`, the default `desktop-x11` feature and `x11rb`: the arithmetic receiver
+   keeps exact headless snapshots and a scripted receiver/wave passage; `desktop_receiver` keeps
+   one scripted local-star traversal and its TSV measurement receipt through `MemoryPlatform`.
+   The earlier module-token scan missed these type-level consumers.
 6. **Reception is one module.** Brandon's reading is that to receive is to measure and compare.
    So `receiver/` owns `ReceiverRole`, the joint `interact`/`receive` return, `Receipt` and
    `Ratio::between`. `ratio/` below it owns the arithmetic of comparison ("one per two"):
