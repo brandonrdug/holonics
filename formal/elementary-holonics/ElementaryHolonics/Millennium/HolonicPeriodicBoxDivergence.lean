@@ -1,4 +1,4 @@
-import ElementaryHolonics.Millennium.HolonicConnectionCurvature
+import ElementaryHolonics.Geometry.ConnectionCalculus
 import Mathlib.MeasureTheory.Integral.DivergenceTheorem
 
 /-!

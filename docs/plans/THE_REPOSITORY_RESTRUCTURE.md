@@ -97,9 +97,17 @@ Each is backed by a measurement at `d3b8b509`.
       `Geometry/ConnectionCalculus`; the research curvature-covariance theorem remains in
       `Millennium/HolonicGaugeCovariance`, which imports its curvature owner directly. This source
       cut removes that direct research import path. It does not by itself remove the overlapping
-      source closure: `Objects/Ratio` still reaches 47,269 lines through its separate
-      `Physics/InformationDifference` import in the current source graph. Measure the actual Lake
-      closure after all §0.10 cuts; do not credit this one edge with deleting those shared modules.
+      source closure: before Physics #105, `Objects/Ratio` reached 47,269 lines through its separate
+      `Physics/InformationDifference` import. That research edge has since been cut; the stacked
+      Physics/Dynamics source graph now reaches 16 modules / 4,340 lines from `Objects/Ratio` and
+      three modules / 538 lines from `Physics/InformationDifference`. Keep the earlier 47,269-line
+      figure historical, and measure Lake artifacts separately from the source graph.
+    - `Framework.Geometry` also imported `Millennium/HolonicConnectionCurvature`, re-exporting its
+      four-force carrier closure. The facade consumes no curvature declaration. It now imports
+      `Geometry/ConnectionCalculus` directly; the periodic-box research theorem also imports that
+      owner directly because it uses only the generic base chart. Curvature, Bianchi, gauge
+      covariance and variation remain in their research owners, whose actual consumers still import
+      them. The source closure and exact importers are recorded in `LEAN_CORE_R3_EDGES.md`.
     - At R0, `Holon/MomentStorage` imported `Millennium/HolonicQuadraticMomentCondensation`,
       whose `HolonicGranularBoundaryRadiation` import pulled 48k lines across 111 files. The
       generic quadratic moment and receiver contraction now live in `Holon/QuadraticMoment`;
