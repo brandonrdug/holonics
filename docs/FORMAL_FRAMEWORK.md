@@ -324,6 +324,13 @@ the canonical history quotient, and proves that unequal quotient faces have a se
 receiver. The nonlinear control distinguishes a presently hidden component from one that remains
 hidden through the whole admitted generator family.
 
+[definition] The generic receiver-family carrier and its induced collapse are owned by
+[`Foundation/ReceiverFamily.lean`](../formal/elementary-holonics/ElementaryHolonics/Foundation/ReceiverFamily.lean).
+`Foundation/CausalRelevance` imports this minimal owner directly; the names remain in
+`Soma.Holonics.Millennium.Separation` until the declaration-namespace migration. The research
+module [`Millennium/Separation.lean`](../formal/elementary-holonics/ElementaryHolonics/Millennium/Separation.lean)
+imports that owner and keeps its distinct algebraic, polynomial, and receiver-separation results.
+
 [definition] Loss belongs to the same framework. `Foundation/ComparisonLoss` reads an existing
 addressed comparison cell through a declared gauge, with both comparands and the signed
 difference retained. General entropy and probability receivers now live in

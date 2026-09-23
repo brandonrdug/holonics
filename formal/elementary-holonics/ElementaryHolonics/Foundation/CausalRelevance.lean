@@ -1,6 +1,6 @@
 import ElementaryHolonics.Foundation.JointReceiverDescent
 import ElementaryHolonics.Foundation.CompleteReceiverHistory
-import ElementaryHolonics.Millennium.Separation
+import ElementaryHolonics.Foundation.ReceiverFamily
 
 /-!
 # Generator-invariant receiver relevance

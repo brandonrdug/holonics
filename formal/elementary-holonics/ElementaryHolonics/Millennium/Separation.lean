@@ -5,6 +5,7 @@ import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Analysis.Calculus.MeanValue
 import Mathlib.Data.ZMod.Basic
 import Mathlib.Analysis.SpecialFunctions.Exp
+import ElementaryHolonics.Foundation.ReceiverFamily
 
 /-!
 # Separation: the difference is the object, and the collapse is exhibited
@@ -144,12 +145,6 @@ end Blade
 
 section Receiver
 variable {X Y : Type*}
-
-/-- A **receiver family**: a set of readings of `X`. -/
-abbrev ReceiverFamily (X Y : Type*) := Set (X → Y)
-
-/-- The **collapse** a receiver family induces: the pairs it cannot tell apart. -/
-def collapseOf (F : ReceiverFamily X Y) (a b : X) : Prop := ∀ f ∈ F, f a = f b
 
 /-- The readings that **respect** a declared relation — the ones blind to it. -/
 def respecting (r : X → X → Prop) : ReceiverFamily X Y := {f | ∀ a b, r a b → f a = f b}
