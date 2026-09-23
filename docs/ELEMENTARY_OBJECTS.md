@@ -156,6 +156,18 @@ collapse to a multiset). Recursive description and branch/address information ar
 compression operands. A generator runs until its receiver face is within tolerance
 (`ReceiverRelease.Releasable`, `Standing.Extinct`); then it is released and a new one is founded.
 
+[established-bounded; source-inspected] The source-neutral continuation contract is a chart of
+Generator and Receiver operations, not a new elementary object. A running continuation receives a
+registered face under its current codec; each codec records the face that caused its mounting. A
+receiver may return an advance, rest or a reflection request. A reflection snapshots the current
+codec and instruction. A returned revision resumes
+that same continuation at the same instruction only when the new codec names the reflected codec
+as a parent; unchanged resumption keeps the codec and instruction. The environment returned by
+the executor remains with the continuation throughout. `Transport/ReflectiveContinuation.lean`
+states these transitions and success laws. The Rust chart is
+`holonic-language::ReflectiveRuntime`; its executor-specific semantics, atlas limits and remount
+validation are outside this formal contract.
+
 ### 4. Pair contact
 
 [definition] The **helical pair contact** joins two generators with configurations:

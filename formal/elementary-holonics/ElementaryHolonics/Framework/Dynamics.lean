@@ -12,6 +12,7 @@ import ElementaryHolonics.Transport.GeneratorSourceEpisode
 import ElementaryHolonics.Transport.ContactFactorScale
 import ElementaryHolonics.Transport.ContactAmplitudeState
 import ElementaryHolonics.Transport.SourceMoment
+import ElementaryHolonics.Transport.ReflectiveContinuation
 import ElementaryHolonics.Transport.AffineJointBall
 import ElementaryHolonics.Transport.PairJointBall
 import ElementaryHolonics.Transport.GeneratorTraceFaces
