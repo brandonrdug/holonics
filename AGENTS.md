@@ -299,6 +299,11 @@ recorded scope. Use [Soulkiller](docs/SOULKILLER.md), [Athena](docs/ATHENA.md),
 [architecture](docs/ARCHITECTURE.md) and [interoperability](docs/INTEROPERABILITY.md) for those interfaces.
 Preserve existing `hna` API/wire identifiers and historical names.
 
+[definition] "Soulkiller" is a name only (borrowed from a game); it determines no mathematics.
+Its subject is **equation extraction**: reading a foreign realization's operators and coefficients
+as element relations, interconnection and generators of a Holon, so the extracted equations are
+native objects. Name types and designs after the extracted-equation facet they carry.
+
 [established-bounded; source-inspected] `GeometricRegions` currently uses alphabet-derived
 channels, unit-current inputs/targets and per-slot basis decoding. It is a numerical application
 control; `HelicalMomentReuse` is a separate caller. The next encoder/decoder work follows the

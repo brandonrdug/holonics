@@ -330,6 +330,11 @@ prior to further inherited-model production; Soulkiller's admitted material reta
 scope. [Architecture](docs/ARCHITECTURE.md), [Soulkiller](docs/SOULKILLER.md), [Athena](docs/ATHENA.md)
 and [interoperability](docs/INTEROPERABILITY.md) define those interfaces. Keep existing API/wire names.
 
+[definition] "Soulkiller" is a name only (borrowed from a game); it determines no mathematics.
+Its subject is **equation extraction**: reading a foreign realization's operators and coefficients
+as element relations, interconnection and generators of a Holon, so the extracted equations are
+native objects. Name types and designs after the extracted-equation facet they carry.
+
 ## 4. Work, verify and document the return
 
 [project-postulate] Resolve routine choices from the mathematics, annotate inferred choices with

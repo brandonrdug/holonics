@@ -1,5 +1,9 @@
 # Soulkiller: pretrained-model dismantling
 
+[definition] The name is a label only (borrowed from a game) and determines no mathematics. The
+subject is **equation extraction**: a foreign realization's operators and coefficients are read as
+the element relations, interconnection and generators of a native Holon.
+
 [definition] Soulkiller is an independent apparatus for extracting reusable native structure
 from a foreign realization under a declared family of exposures. Its output is material Eros
 can compose into Athena. It is broader in purpose than model-file conversion or one Transformer
