@@ -41,17 +41,22 @@ Each is backed by a measurement at `d3b8b509`.
    `holonics-apple` implements the same port later.
 4. **Crate count: `holonics` and `holonics-cuda` now, `holonics-apple` later.** `holonic-words` is
    kept as a separate `no_std` crate only if a Rust device kernel consumes it. Today only
-   `accelerators/cuda-kernel` (Rust compiled for nvptx) does, and its launches
-   (`SOMA_PTX`, `register_launch`, `live_event_launch`) are consumed by `holonic-life`'s Soma
-   lineage and one engine file. The HNN uses the 83 C++ kernels in `holonic-engine/kernels/`.
-   If R2 retires the Soma lineage, the word rings (`ExactRing`, `CheckedIntegers`, `ModularWords`)
-   fold into `holonics::ratio`, since residue arithmetic is ratio arithmetic. Host/device parity
+   `accelerators/cuda-kernel` (Rust compiled for nvptx) does, but its PTX is embedded by
+   `holonic-mount` library/tests/gates, loaded by engine `section_layout_adoption` tests and
+   used by `holonic-life`'s Soma CUDA lineage. Its launch owners (`SOMA_PTX`,
+   `register_launch`, `live_event_launch`) cannot be retired by removing `life` alone. The
+   HNN uses the 83 C++ kernels in `holonic-engine/kernels/`.
+   After R2 resolves the Soma lineage **and** the surviving mount/engine PTX and host callers,
+   the word rings (`ExactRing`, `CheckedIntegers`, `ModularWords`) can fold into
+   `holonics::ratio`, since residue arithmetic is ratio arithmetic. Host/device parity
    then stays what it is for the `.cu` kernels: device tests against the host arithmetic.
    `accelerators/rust-gpu` (Vulkan, already ruled out for production) retires.
 5. **Minimal features.** Each feature combination compiles its own copy of the crate. On
    September 23 the engine had 39 incremental directories (150 GB). Main `holonics` has no
    feature that changes its dependency graph. The engine's default `desktop-x11` feature retires
-   with `platform_x11`, which has no consumer.
+   with `platform_x11` and its two Cargo example callers (`arithmetic_dimensional_receiver`,
+   `desktop_receiver`), whose exact keep/retire disposition is required in R1. The earlier
+   module-token scan missed these type-level `X11Platform` consumers.
 6. **Reception is one module.** Brandon's reading is that to receive is to measure and compare.
    So `receiver/` owns `ReceiverRole`, the joint `interact`/`receive` return, `Receipt` and
    `Ratio::between`. `ratio/` below it owns the arithmetic of comparison ("one per two"):
@@ -77,8 +82,9 @@ Each is backed by a measurement at `d3b8b509`.
 10. **The Lean foundation is cut at a few measured edges.** The present `Framework` closure
     (188k lines) contains 292 Millennium files (119k lines) and 52 RH files (13k lines). They enter
     through few edges:
-    - `Framework.Core` imports five small Millennium modules that are foundation objects filed by
-      history: `Gluing`, `HolonicDirectedPassage`, `Receiver`, `ReceiverHistory`, `Separation`.
+    - `Framework.Core` reaches five small Millennium modules **transitively** through its
+      Foundation imports; they are foundation objects filed by history: `Gluing`,
+      `HolonicDirectedPassage`, `Receiver`, `ReceiverHistory`, `Separation`.
     - `Objects/Ratio` imports `Millennium/HolonicGaugeCovariance` (128 lines). Its one import,
       `HolonicConnectionVariation`, pulls 45k lines across 105 files.
     - `Holon/MomentStorage` imports `Millennium/HolonicQuadraticMomentCondensation` (472 lines).
@@ -134,6 +140,9 @@ These are the `c9012f17` snapshot, not a current deletion verdict. In particular
 `holonic-life` source is about 161k lines; the 314k above includes its then-current examples.
 Recompute counts and dependency edges at R0. A low reference count does not prove that a theorem,
 public API, saved wire or application boundary is disposable.
+The current R0 source audit already found actual type-level callers or distinct unported laws
+for the first eight of those historical “zero-reference” engine modules. The 41/40 figures
+are a search queue, never a retirement list; see [THE_REPOSITORY_CENSUS](THE_REPOSITORY_CENSUS.md).
 
 ## 2. What is essential: the restructure is organized around these
 

@@ -1,0 +1,77 @@
+issue	title	state	labels	disposition	target_or_parent	verification
+#1	Holonic Interaction unit: media, contact exchange and the derived modal response	CLOSED	lean,rust	closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#2	Jet staircase (T8): finite jet ladder, exact difference↔jet passage and encoding by repeated integration	CLOSED	tube,lean,rust	closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#3	Neck station (T6): the pinhole where flux converges and diverges between media	CLOSED	tube,lean,rust	closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#4	Join: one executable source–medium–neck–medium–receiver chain read at a real consumer	CLOSED	tube,receiver,lean,rust	closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#5	Cross the time and entropy axes along an oriented chain	OPEN	tube,open-math,physics	keep_open	object_or_consumer_in_issue_body	gh issue list all at 925b94b8+R0
+#6	Plural family generic in its coordinate address	CLOSED	tube,lean,rust	retire_closed	dropped_application_or_artifact	gh issue list all at 925b94b8+R0
+#7	Wave 8 tracker: Holonic Interaction unit, staircase and neck, join, review	CLOSED	workflow	closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#8	Run the installed predictors against an M5 design and compare with the reference structure	CLOSED	receiver,measurement,found-by-execution	closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#9	Compute evaluation returns from the declared source and receiver family	CLOSED	receiver,measurement,rust	retire_closed	dropped_application_or_artifact	gh issue list all at 925b94b8+R0
+#10	Interface coupling in composed constitutive receiver laws	CLOSED	receiver,lean,rust	retire_closed	dropped_application_or_artifact	gh issue list all at 925b94b8+R0
+#11	Second structural instance beyond the M5 RBX1 readings	CLOSED	receiver,measurement,found-by-execution	retire_closed	dropped_application_or_artifact	gh issue list all at 925b94b8+R0
+#12	Second device ring of signed 128-bit words with the engine's carrier refusal	CLOSED	rust,cuda	folded_closed	#76	gh issue list all at 925b94b8+R0
+#13	Device arm for the accumulating enclosure radius (`AccumulationLaw::IntegerAdd`)	CLOSED	cuda	folded_closed	#76	gh issue list all at 925b94b8+R0
+#14	Per-region operator family and base-pointer registry	CLOSED	rust,cuda	folded_closed	#76	gh issue list all at 925b94b8+R0
+#15	Common context ownership for module, stream and buffer handles	CLOSED	defect,rust,cuda,found-by-review	folded_closed	#76	gh issue list all at 925b94b8+R0
+#16	Carry a complete source episode through the unified field session	OPEN	receiver,measurement,hnn	keep_open	object_or_consumer_in_issue_body	gh issue list all at 925b94b8+R0
+#17	Build the HNN on helical pair interaction sites: generator-machine geometry, closure inference and receiving consequences	OPEN	rust,cuda,pair-contact,generator,hnn	keep_open	object_or_consumer_in_issue_body	gh issue list all at 925b94b8+R0
+#18	Represent boundary and field normal material with priors and compact statistics	OPEN	measurement,deposition,hnn	keep_open	object_or_consumer_in_issue_body	gh issue list all at 925b94b8+R0
+#19	Return whole-field contact gradients and publish material changes atomically	CLOSED		closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#20	Per-eigenvalue refinement owner on `ExactHodgeSpectrum`	OPEN	receiver,lean,rust,research-math	keep_open	object_or_consumer_in_issue_body	gh issue list all at 925b94b8+R0
+#21	`MarkovTwoNSuffices`	OPEN	receiver,lean,open-math,research-math	keep_open	object_or_consumer_in_issue_body	gh issue list all at 925b94b8+R0
+#22	Weierstrass division for the power-series form of `Λ/(ω_n)`	OPEN	tube,lean,open-math,research-math	keep_open	object_or_consumer_in_issue_body	gh issue list all at 925b94b8+R0
+#23	Israel junction instance on the existing Lorentzian and Einstein-fluid foundations	OPEN	lean,open-math,physics	keep_open	object_or_consumer_in_issue_body	gh issue list all at 925b94b8+R0
+#24	Moving-metric term `G_dot` in the rate form	OPEN	receiver,lean,rust,physics	keep_open	object_or_consumer_in_issue_body	gh issue list all at 925b94b8+R0
+#25	Navigate active relations from formal law through native call to consumer	CLOSED	workflow,docs	closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#26	Find tests that assert sentences about what the tree lacks	OPEN	defect,claim-correction,workflow,rust,restructure	keep_open	object_or_consumer_in_issue_body	gh issue list all at 925b94b8+R0
+#27	Serial composition: multi-neck chains and the ordered chain of situated screws	OPEN	tube,receiver,lean,rust,pair-contact	keep_open	object_or_consumer_in_issue_body	gh issue list all at 925b94b8+R0
+#28	Contact faces from the helical pair's slip map and from measured contact geometry	OPEN	rust,pair-contact	keep_open	object_or_consumer_in_issue_body	gh issue list all at 925b94b8+R0
+#29	Edit torque at the clocked contact metric, with its residual expansion	CLOSED	rust	retire_closed	dropped_application_or_artifact	gh issue list all at 925b94b8+R0
+#30	Connect the port-Hamiltonian medium to the covariant storage–flux closure `L_A = d_A† W d_A + C`	OPEN	tube,lean,open-math,holon,physics	keep_open	object_or_consumer_in_issue_body	gh issue list all at 925b94b8+R0
+#31	Elastic exchange, surface storage and radiation terms of the contact balance	OPEN	receiver,open-math,pair-contact,physics	keep_open	object_or_consumer_in_issue_body	gh issue list all at 925b94b8+R0
+#32	Source maps for the interpreted necks: pinching analyticity strip, p-adic neck, vortex interaction, whip	OPEN	tube,open-math,research-math	keep_open	object_or_consumer_in_issue_body	gh issue list all at 925b94b8+R0
+#33	Lift the difference↔jet change of basis at an arbitrary rational step into Lean	CLOSED	tube,lean	folded_closed	#62	gh issue list all at 925b94b8+R0
+#34	Lean lift of the unconditional neck rank bound (Fiedler–Markham nullity theorem)	CLOSED	lean,found-by-review	folded_closed	#62	gh issue list all at 925b94b8+R0
+#35	Analytic width for irreducible pole factors of degree above two	OPEN	receiver,rust,open-math,ratio	keep_open	object_or_consumer_in_issue_body	gh issue list all at 925b94b8+R0
+#36	Analytic width of a chain above 24 coordinates through the neck's `r` channels	CLOSED	receiver,rust,found-by-execution	closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#37	Incremental cut ranks for the hinge scan	CLOSED	measurement,rust,found-by-execution	closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#38	Decide whether an interior section minimum is a conformational hinge or a packing artefact	CLOSED	receiver,measurement	retire_closed	dropped_application_or_artifact	gh issue list all at 925b94b8+R0
+#39	Chain readings not yet taken: receiver width from the aperture, the `H_pert`-modulated chain, linking and pinch growth	CLOSED	receiver,rust	folded_closed	#27	gh issue list all at 925b94b8+R0
+#40	Sweep validated types that derive `Deserialize` without re-entering their constructor	OPEN	defect,rust,found-by-review,restructure	keep_open	object_or_consumer_in_issue_body	gh issue list all at 925b94b8+R0
+#41	Wave 8 agent-inferred decisions, for retroactive review	CLOSED	tube,agent-inferred	closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#42	Bounded spectral licence for indefinite storage, and the on-axis count as the invariant subspace in ker(MG)	CLOSED	receiver,lean,rust,agent-inferred	closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#43	A predictor's seed variance is of the order of its separation from the reference at the contact receiver	CLOSED	receiver,measurement,found-by-execution	closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#44	Core receivers agree across predictors while the N-terminal arm separates every presentation	CLOSED	receiver,measurement,found-by-execution	retire_closed	dropped_application_or_artifact	gh issue list all at 925b94b8+R0
+#45	The exact chain reading cannot reach a whole complex: resolvent ceiling at 32 residues, 11–40 s at 36 coordinates	CLOSED	measurement,rust,found-by-execution	closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#46	boltz 2.2.1 reports an MSA-server 404 as a tar format error	CLOSED	workflow,found-by-execution	retire_closed	dropped_application_or_artifact	gh issue list all at 925b94b8+R0
+#47	Wave 9 tracker: theorem-backed chain reading with structural spectral licences ‖ measured-structure, zinc and seed-population comparison	CLOSED	workflow	closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#48	Elementary helical pairs: generators, independent collapses, contact variation and continuing reuse	OPEN	tube,receiver,agent-inferred,open-math,pair-contact,generator	keep_open	object_or_consumer_in_issue_body	gh issue list all at 925b94b8+R0
+#49	Identity atlas, first instance: exact kernel discovery of the two-sided-angle and helical-pair identities (T0–T2)	CLOSED	tube,receiver,lean,rust,agent-inferred	folded_closed	#48	gh issue list all at 925b94b8+R0
+#50	Resident exact algebra: connect the certified host return to its device consumers	CLOSED	rust,cuda,found-by-execution	folded_closed	#76	gh issue list all at 925b94b8+R0
+#51	A rigidity class stable under sampling, so a receiver family folds into a held-out count	CLOSED	receiver,measurement,found-by-execution	retire_closed	dropped_application_or_artifact	gh issue list all at 925b94b8+R0
+#52	`physical_intake::mmcif` refuses every deposited and every ion-bearing mmCIF: a HETATM row carries no `label_seq_id`	CLOSED	defect,rust,found-by-execution	retire_closed	dropped_application_or_artifact	gh issue list all at 925b94b8+R0
+#53	The M5 design is the outlier against measured RBX1: farther than every predicted population, at the contact receiver and at the chain's minimal section	CLOSED	receiver,measurement,found-by-execution	retire_closed	dropped_application_or_artifact	gh issue list all at 925b94b8+R0
+#54	Lean lifts owed by the structural spectral licences: real spectrum of a symmetrizable generator, the Pontryagin bound, the on-axis dimension over ℂ	CLOSED	receiver,lean,open-math	folded_closed	#62	gh issue list all at 925b94b8+R0
+#55	Conditioned RBX1 elastic response with declared forcing, null fibre and measured residual	CLOSED	receiver,measurement,agent-inferred	closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#56	Wave 10 tracker: certified exact algebra ‖ conditioned RBX1 response ‖ identity atlas first instance	CLOSED	workflow	closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#57	Row-sectioned normalized receiver and pullback over region rows	CLOSED	receiver,rust,cuda	closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#58	Condition covector port: adjoint of the bilinear source, enclosure-source section form and section re-entry	CLOSED	rust,cuda	closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#59	Carry the recorded exposure context through field-session restart	CLOSED	receiver,measurement,rust	closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#60	Wave 11 tracker: participation ports ‖ condition ports ‖ session and source	CLOSED	workflow	closed_other_needs_historical_context	git_or_issue_history	gh issue list all at 925b94b8+R0
+#61	Execute the global HNN contact action and joint state on the hardware cover	OPEN	rust,cuda,found-by-execution,hnn,device	keep_open	object_or_consumer_in_issue_body	gh issue list all at 925b94b8+R0
+#62	Formal counterparts of the helical pair interaction, serial chain and phase-carried machine	OPEN	lean,holon,pair-contact	keep_open	object_or_consumer_in_issue_body	gh issue list all at 925b94b8+R0
+#63	Repository restructure (September 23)	OPEN	restructure	keep_parent	THE_REPOSITORY_RESTRUCTURE	gh issue list all at 925b94b8+R0
+#64	R0: Repository census	OPEN	workflow,restructure	keep_tracking	#63	gh issue list all at 925b94b8+R0
+#65	R1–R2: Retire unconsumed Rust and the Soma lineage	OPEN	rust,restructure	keep_tracking	#63	gh issue list all at 925b94b8+R0
+#66	R3: Cut the Lean foundation from the research closure	OPEN	lean,restructure	keep_tracking	#63	gh issue list all at 925b94b8+R0
+#67	R4: Remove compatibility aliases, forwarding paths and legacy decoders	OPEN	rust,restructure	keep_tracking	#63	gh issue list all at 925b94b8+R0
+#68	C: Finish paused consolidation phases 11, 12a, 12b and 14	OPEN	rust,hnn,restructure	keep_tracking	#63	gh issue list all at 925b94b8+R0
+#69	M1: Rust cut — substantive holonics and holonics-cuda	OPEN	rust,cuda,device,restructure	keep_tracking	#63	gh issue list all at 925b94b8+R0
+#70	M2: Move Lean to lean/ as Holonics and HolonicsResearch	OPEN	lean,restructure	keep_tracking	#63	gh issue list all at 925b94b8+R0
+#71	D: Operator contracts, guides and full README rewrite	OPEN	docs,restructure	keep_tracking	#63	gh issue list all at 925b94b8+R0
+#72	K1: Complete interconnect → Holarchy and joint reception	OPEN	receiver,lean,rust,holon,holarchy	keep_tracking	#63	gh issue list all at 925b94b8+R0
+#73	K2: HNN execution port and host reference	OPEN	rust,hnn,device	keep_tracking	#63	gh issue list all at 925b94b8+R0
+#74	K3: Finite physics cells — polygons, polyhedra, waves, control volumes, thermal exchange	OPEN	lean,rust,physics	keep_tracking	#63	gh issue list all at 925b94b8+R0
+#75	K4: Stress-energy source map, observer current, information-to-material port and clock axes	OPEN	lean,rust,physics	keep_tracking	#63	gh issue list all at 925b94b8+R0
+#76	K5: Device realization debts in holonics-cuda	OPEN	rust,cuda,device	keep_tracking	#63	gh issue list all at 925b94b8+R0
