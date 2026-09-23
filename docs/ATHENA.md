@@ -374,7 +374,7 @@ adjoint. New atoms join after the return succeeds. Three-cycle/two-return CUDA e
 exact local pullback controls stand at the [September 4 repair scope](../research/records/2026-09-04_THE_AUDIT_REPAIRS_THE_RECURRENT_ADJOINT_AND_RECONCILES_THE_OPERATING_CONTRACT.md).
 
 [established-bounded; measured] The native session now also exposes
-`NativeFullOperatorSession::found_with_passage_return`: ordinary non-prefix material operates
+`ExtractedOperatorSession::found_with_passage_return`: ordinary non-prefix material operates
 the same body, and actual joined-output changes return through their retained local reactions.
 New factors publish when the cycle closes. Three native-model occurrences, the zero-partner
 discriminator and exact withdrawal/restoration returned in

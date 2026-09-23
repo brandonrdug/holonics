@@ -16,7 +16,8 @@ use crate::resident_section::{
 };
 
 use super::{
-    NativeOperatorResidence, NativeOperatorResidenceError, NativeTensorOrdinal,
+    ExtractedOperatorRefusal, NativeOperatorResidence, NativeOperatorResidenceError,
+    NativeTensorOrdinal,
     operative_return::{
         DepositMaterial, NativeMorphologyDeposit, NativeReturnAperture, OverlayAtom,
         deposit_from_material,
@@ -30,21 +31,9 @@ pub struct NativeAdjointContraction<'chart> {
     pub tiles: usize,
 }
 
-#[derive(Debug, thiserror::Error)]
-pub enum NativeAdjointError {
-    #[error("operator residence: {0}")]
-    Residence(#[from] NativeOperatorResidenceError),
-    #[error("resident apparatus: {0}")]
-    Resident(#[from] ResidentRefusal),
-    #[error("the differential does not match the cross-section: {0}")]
-    Shape(String),
-    #[error("resident adjoint returned obstruction flags {flags:#x}")]
-    Obstruction { flags: u32 },
-}
-
-fn bound_of(reading: &PassageReading) -> Result<u32, NativeAdjointError> {
+fn bound_of(reading: &PassageReading) -> Result<u32, ExtractedOperatorRefusal> {
     if !reading.obstruction.is_empty() {
-        return Err(NativeAdjointError::Obstruction {
+        return Err(ExtractedOperatorRefusal::AdjointObstruction {
             flags: reading.obstruction.joined_flags(),
         });
     }
@@ -65,7 +54,7 @@ pub fn adjoint_contract<'chart>(
     population: NativeTensorOrdinal,
     differential: &ResidentSection<'chart>,
     differential_octaves: u32,
-) -> Result<NativeAdjointContraction<'chart>, NativeAdjointError> {
+) -> Result<NativeAdjointContraction<'chart>, ExtractedOperatorRefusal> {
     let descriptor = residence
         .populations()
         .get(population.0 as usize)
@@ -73,7 +62,7 @@ pub fn adjoint_contract<'chart>(
     let (total_rows, inner) = (descriptor.rows, descriptor.dim);
     let map_exponent = descriptor.frame.exponent;
     if differential.width() != total_rows || differential.rows() == 0 {
-        return Err(NativeAdjointError::Shape(format!(
+        return Err(ExtractedOperatorRefusal::AdjointShape(format!(
             "differential is {} x {} over a cross-section of {} rows",
             differential.rows(),
             differential.width(),
@@ -82,13 +71,13 @@ pub fn adjoint_contract<'chart>(
     }
     let capacity = residence.aligned_row_capacity(population)?;
     if capacity == 0 {
-        return Err(NativeAdjointError::Shape("the alignment pool admits no rows".to_owned()));
+        return Err(ExtractedOperatorRefusal::AdjointShape("the alignment pool admits no rows".to_owned()));
     }
     let tiles = total_rows.div_ceil(capacity);
     let tile_slots = u32::try_from(tiles.next_power_of_two())
-        .map_err(|_| NativeAdjointError::Shape("too many tiles".to_owned()))?;
+        .map_err(|_| ExtractedOperatorRefusal::AdjointShape("too many tiles".to_owned()))?;
     if tile_slots > 16 {
-        return Err(NativeAdjointError::Shape(format!(
+        return Err(ExtractedOperatorRefusal::AdjointShape(format!(
             "{tiles} tiles exceed the sixteen-slot partial standing"
         )));
     }
@@ -98,7 +87,7 @@ pub fn adjoint_contract<'chart>(
     let rows = differential.rows();
     let grain = differential.grain();
     let standing = surface.retain_partials(rows, inner, splits)?;
-    let result = (|| -> Result<NativeAdjointContraction<'chart>, NativeAdjointError> {
+    let result = (|| -> Result<NativeAdjointContraction<'chart>, ExtractedOperatorRefusal> {
     surface.zero_partials(&standing)?;
     let ceil_log2 = |n: usize| n.max(1).next_power_of_two().ilog2();
     let mut admitted_node_octaves = differential_octaves + ceil_log2(total_rows) + 1;
@@ -182,7 +171,7 @@ fn adjoint_factor<'chart>(
     map: &MountedReadout<'chart>,
     differential: &ResidentSection<'chart>,
     differential_octaves: u32,
-) -> Result<NativeAdjointContraction<'chart>, NativeAdjointError> {
+) -> Result<NativeAdjointContraction<'chart>, ExtractedOperatorRefusal> {
     let splits = 16;
     let needed = differential_octaves + map.entry_octaves()
         + map.rows().max(1).next_power_of_two().ilog2() + 1;
@@ -191,7 +180,7 @@ fn adjoint_factor<'chart>(
     )?;
     let section = surface.fresh_section(differential.rows(), map.dim(), differential.grain())?;
     let standing = surface.retain_partials(differential.rows(), map.dim(), splits)?;
-    let result: Result<NativeAdjointContraction<'chart>, NativeAdjointError> = (|| {
+    let result: Result<NativeAdjointContraction<'chart>, ExtractedOperatorRefusal> = (|| {
         surface.zero_partials(&standing)?;
         let mut builder = surface.begin_passage(&[vec![], vec![0]])?;
         {
@@ -222,7 +211,7 @@ pub(super) fn adjoint_contract_with_overlays<'chart>(
     differential: &ResidentSection<'chart>,
     differential_octaves: u32,
     atoms: &[OverlayAtom<'chart>],
-) -> Result<NativeAdjointContraction<'chart>, NativeAdjointError> {
+) -> Result<NativeAdjointContraction<'chart>, ExtractedOperatorRefusal> {
     let base = adjoint_contract(residence, population, differential, differential_octaves)?;
     add_overlay_adjoints(residence.surface(), base, differential, differential_octaves, atoms)
 }
@@ -233,7 +222,7 @@ pub(super) fn add_overlay_adjoints<'chart>(
     differential: &ResidentSection<'chart>,
     differential_octaves: u32,
     atoms: &[OverlayAtom<'chart>],
-) -> Result<NativeAdjointContraction<'chart>, NativeAdjointError> {
+) -> Result<NativeAdjointContraction<'chart>, ExtractedOperatorRefusal> {
     for atom in atoms {
         let (u, v) = atom.readouts(surface);
         let junction = adjoint_factor(surface, &u, differential, differential_octaves)?;

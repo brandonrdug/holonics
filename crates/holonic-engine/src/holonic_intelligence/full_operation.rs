@@ -1,4 +1,5 @@
-//! One mathematical operation advances the complete resident operator ecology.
+//! The graph session of the extracted operator ([`super::extracted_operator`]): one mathematical
+//! operation advances the complete resident operator ecology.
 //!
 //! This owner begins at the first operation of the full HNA1 graph.  It consumes ordinary row
 //! addresses at the occurrence port, gathers those coefficient rows without leaving the device,
@@ -15,13 +16,14 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use serde::{Deserialize, Serialize};
-use thiserror::Error;
 
 use crate::resident_section::{
     Positions, ResidentGrain, ResidentRefusal, ResidentSection, TransferCensus,
 };
 
 use super::{
+    ExtractedOperatorAdvance, ExtractedOperatorEmission, ExtractedOperatorOccurrence,
+    ExtractedOperatorRefusal, ExtractedOperatorStep, ExtractedOperatorTrace, GraphTraceChart,
     NativeCarrierOrdinal, NativeFullOperatorEcology, NativeMorphologyDeposit,
     NativeOperationPrimitive, NativeOperatorNode, NativeOperatorResidence,
     NativeOperatorResidenceError, NativeReturnAperture, NativeTensorOrdinal,
@@ -37,59 +39,12 @@ use super::{
 
 pub const NATIVE_FULL_OPERATION_STEP_SCHEMA: &str = "holonic-engine.native-full-operation-step.v1";
 
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct NativeFullOperationOccurrence {
-    pub ordinal: u64,
-    pub row_addresses: Vec<u32>,
-}
-
-/// An emission: the terminal face carries its intervals, read once at the declared receiver; an
-/// intermediate operation's emission names its carrier and carries no words, because no section
-/// crosses to the host between two operations.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
-pub struct NativeFullOperationEmission {
-    pub generation: u64,
-    pub operation: u32,
-    pub carrier: NativeCarrierOrdinal,
-    pub rows: usize,
-    pub width: usize,
-    pub grain: u32,
-    pub intervals: Vec<(i64, i64)>,
-    /// Exact receiver projection; the complete source section stays with the native successor.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub projection: Option<NativeEmissionProjection>,
-}
-
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 #[serde(tag="kind",rename_all="kebab-case")]
 pub enum NativeEmissionProjection { LastRow {source_rows:usize,row:usize} }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum NativeEmissionReadout { Complete, LastRow }
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
-pub struct NativeFullOperationTrace {
-    pub schema: String,
-    pub predecessor_generation: u64,
-    pub successor_generation: u64,
-    pub occurrence: u64,
-    pub row_addresses: Vec<u32>,
-    pub operation: NativeOperatorNode,
-    pub successor_projection: NativeSuccessorProjection,
-    pub morphology_transition: NativeMorphologyTransition,
-    /// The total rank of the factorized overlay the ecology carries at this operation.
-    pub morphology_overlay_rank: usize,
-    /// The a-priori octave bound the operation was admitted under.
-    pub admitted_octaves: u32,
-    /// The measured octave bound of the successor carrier, from the segment's census.
-    pub successor_bound_octaves: u32,
-    /// None is a freshly enacted numerical passage; Some retains its exact prior computation
-    /// while this trace's native occurrence, chronology and local return are new.
-    pub numerical_origin: Option<super::NativeNumericalOrigin>,
-    pub resident_coefficient_octets: u64,
-    pub census_before: TransferCensus,
-    pub census_after: TransferCensus,
-}
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "kebab-case")]
@@ -128,9 +83,10 @@ pub(super) struct RunStep {
     pub(super) census_after: TransferCensus,
 }
 
-/// The move-owned contemporary ecology.  The coefficient morphology is one borrowed resident
-/// standing; every produced carrier and the chronology belong to this successor line alone.
-pub struct NativeFullOperatorSession<'residence, 'chart> {
+/// The graph session of the extracted operator: the move-owned contemporary ecology. The
+/// coefficient morphology is one borrowed resident standing (the constitution); every produced
+/// carrier and the chronology belong to this successor line alone.
+pub struct ExtractedOperatorSession<'residence, 'chart> {
     pub(super) ecology: &'residence NativeFullOperatorEcology,
     pub(super) residence: &'residence mut NativeOperatorResidence<'chart>,
     pub(super) carriers: BTreeMap<NativeCarrierOrdinal, ContemporaryCarrier<'chart>>,
@@ -141,20 +97,23 @@ pub struct NativeFullOperatorSession<'residence, 'chart> {
     pub(super) positions: Option<Positions<'chart>>,
     pub(super) row_population: Option<usize>,
     pub(super) cycle_complete: bool,
-    /// Carriers produced in one layer (or the prologue) and consumed in another: retained through
-    /// the cycle as the checkpoints the return replays each layer from.
+    /// Carriers produced in one layer (or the prologue) and consumed in another: retained within
+    /// the cycle as the checkpoints the return replays each layer from. A cycle boundary releases
+    /// them (dissection keeps them for its probes of the same cycle).
     pub(super) cross_layer: BTreeSet<NativeCarrierOrdinal>,
     pub(super) checkpoints: BTreeMap<NativeCarrierOrdinal, ContemporaryCarrier<'chart>>,
-    /// The complete emitted face of the last cycle, retained by the successor until the next
-    /// occurrence enters.
+    /// The complete emitted face of the last cycle, held for its receiver (`carrier_intervals`)
+    /// until the next occurrence enters. The return never reads it: it reads the contemporary
+    /// constitution at `previous_context`.
     pub(super) terminal_carrier: Option<TiledCarrier<'chart>>,
     /// The reacted carrier of the tied boundary (`tanh`) and the carrier presented to the tied
-    /// contraction, retained for the return.
+    /// contraction, held only under dissection, whose probes read the same cycle.
     pub(super) terminal_reacted: Option<TiledCarrier<'chart>>,
     /// The tied contraction's own output at the receiver row, read to the host under dissection.
     pub(super) terminal_contracted: Option<Vec<(i64, i64)>>,
     pub(super) terminal_presented: Option<ContemporaryCarrier<'chart>>,
-    /// The row addresses of the last cycle: the line the emitted face continued.
+    /// The row addresses of the last cycle: the line the emitted face continued, and the only
+    /// material a continuing return retains across the cycle boundary.
     pub(super) previous_context: Option<Vec<u32>>,
     /// The factorized overlay atoms deposited on each cross-section, keyed by its coefficient
     /// population, in deposit order.
@@ -174,29 +133,16 @@ pub struct NativeFullOperatorSession<'residence, 'chart> {
     pub(super) terminal_seal: bool,
 }
 
-pub struct NativeFullOperationStep<'residence, 'chart> {
-    pub emission: NativeFullOperationEmission,
-    pub trace: NativeFullOperationTrace,
-    pub successor: NativeFullOperatorSession<'residence, 'chart>,
-}
-
-pub struct NativeFullTerminalBranch<'residence, 'chart> {
-    pub emissions: Vec<NativeFullOperationEmission>,
-    pub traces: Vec<NativeFullOperationTrace>,
-    pub successor: NativeFullOperatorSession<'residence, 'chart>,
-}
-
-pub struct NativeFullCycle<'residence, 'chart> {
-    pub final_emission: NativeFullOperationEmission,
-    pub traces: Vec<NativeFullOperationTrace>,
-    pub passage_returns: Vec<NativePassageReturn>,
-    pub successor: NativeFullOperatorSession<'residence, 'chart>,
+/// One whole recurrence of the graph: its output, and the successor that stays with the caller.
+pub struct ExtractedOperatorCycle<'residence, 'chart> {
+    pub output: ExtractedCycleOutput,
+    pub successor: ExtractedOperatorSession<'residence, 'chart>,
 }
 
 /// Output of a recurrence whose unique session owner stays with the caller, including on error.
-pub struct NativeFullCycleOutput {
-    pub final_emission: NativeFullOperationEmission,
-    pub traces: Vec<NativeFullOperationTrace>,
+pub struct ExtractedCycleOutput {
+    pub final_emission: ExtractedOperatorEmission,
+    pub traces: Vec<ExtractedOperatorTrace<GraphTraceChart>>,
     pub passage_returns: Vec<NativePassageReturn>,
 }
 
@@ -216,11 +162,11 @@ pub struct NativeCycleInterruption {
     pub reason: String,
 }
 
-impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
+impl<'residence, 'chart> ExtractedOperatorSession<'residence, 'chart> {
     pub fn found(
         ecology: &'residence NativeFullOperatorEcology,
         residence: &'residence mut NativeOperatorResidence<'chart>,
-    ) -> Result<Self, NativeFullOperationError> {
+    ) -> Result<Self, ExtractedOperatorRefusal> {
         Self::found_with(ecology, residence, None)
     }
 
@@ -230,7 +176,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         ecology: &'residence NativeFullOperatorEcology,
         residence: &'residence mut NativeOperatorResidence<'chart>,
         aperture: NativeReturnAperture,
-    ) -> Result<Self, NativeFullOperationError> {
+    ) -> Result<Self, ExtractedOperatorRefusal> {
         Self::found_with(ecology, residence, Some(aperture))
     }
 
@@ -238,7 +184,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         ecology: &'residence NativeFullOperatorEcology,
         residence: &'residence mut NativeOperatorResidence<'chart>,
         aperture: Option<NativeReturnAperture>,
-    ) -> Result<Self, NativeFullOperationError> {
+    ) -> Result<Self, ExtractedOperatorRefusal> {
         ecology.validate()?;
         let mut producer: BTreeMap<NativeCarrierOrdinal, Option<u16>> = BTreeMap::new();
         for operation in &ecology.operations {
@@ -262,14 +208,14 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                 let coefficient = *operation
                     .coefficients
                     .first()
-                    .ok_or(NativeFullOperationError::Operation)?;
+                    .ok_or(ExtractedOperatorRefusal::Operation)?;
                 let scale = projected_scale(scale)?;
                 let frame = residence.population_frame(coefficient)?.exponent;
                 let exact = frame
                     .checked_add(scale.exponent)
-                    .ok_or(NativeFullOperationError::Grain)?;
+                    .ok_or(ExtractedOperatorRefusal::Grain)?;
                 grain =
-                    grain.max(u32::try_from(-exact).map_err(|_| NativeFullOperationError::Grain)?);
+                    grain.max(u32::try_from(-exact).map_err(|_| ExtractedOperatorRefusal::Grain)?);
             }
         }
         Ok(Self {
@@ -327,7 +273,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     }
 
     /// The current mounted input-workspace aperture, not a semantic maximum word length.
-    pub fn lookup_input_capacity(&self) -> Result<usize, NativeFullOperationError> {
+    pub fn lookup_input_capacity(&self) -> Result<usize, ExtractedOperatorRefusal> {
         let mut capacity = self.residence.receipt().addressed_occurrence_rows;
         for operation in &self.ecology.operations {
             if matches!(operation.primitive, NativeOperationPrimitive::Lookup { .. }) {
@@ -353,9 +299,9 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     /// Acquisition between ordinary operations preserves the same move owner and every held
     /// carrier/overlay. Old addressed words keep their numerical standing; a newly addressed
     /// row reopens dependencies when its ordinary occurrence enters.
-    pub fn extend_input_rows(&mut self, additions: &[super::NativeInputRowExtension]) -> Result<(),NativeFullOperationError> {
-        if self.interruption.is_some() { return Err(NativeFullOperationError::Interrupted); }
-        if !self.cycle_complete && self.operation_at != 0 { return Err(NativeFullOperationError::Occurrence); }
+    pub fn extend_input_rows(&mut self, additions: &[super::NativeInputRowExtension]) -> Result<(),ExtractedOperatorRefusal> {
+        if self.interruption.is_some() { return Err(ExtractedOperatorRefusal::Interrupted); }
+        if !self.cycle_complete && self.operation_at != 0 { return Err(ExtractedOperatorRefusal::Occurrence); }
         self.residence.extend_input_rows(self.ecology,additions,self.grain.0)
     }
 
@@ -363,9 +309,9 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         self.cycle_complete
     }
 
-    pub fn accepts_occurrence(&self, occurrence: &NativeFullOperationOccurrence) -> bool {
+    pub fn accepts_occurrence(&self, occurrence: &ExtractedOperatorOccurrence) -> bool {
         if self.interruption.is_some() { return false; }
-        if occurrence.ordinal != self.generation {
+        if occurrence.ordinal != self.generation || !occurrence.interaction_words.is_empty() {
             return false;
         }
         let at = if self.cycle_complete {
@@ -408,25 +354,24 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         self.interruption.as_ref()
     }
 
-    /// The return: if `entering` continues the last cycle's line, the retained emitted face meets
-    /// the address that followed each of its rows and the deposit joins the overlay. Any other
-    /// occurrence has no comparison and changes no morphology.
+    /// The return: if `entering` continues the last cycle's line, the contemporary constitution
+    /// is read at that line — its forward and terminal boundary re-enacted from the retained
+    /// occurrence alone — and the face meets the address that followed each of its rows; the
+    /// deposit joins the overlay. Any other occurrence has no comparison and changes no
+    /// morphology. Retention law: the session keeps the occurrence (`previous_context`), never a
+    /// previous cycle's terminal cut, reacted carrier or checkpoints; the constitution cannot have
+    /// changed since (only a return deposits), so the reading is the one that was emitted.
     fn return_on_continuation(
         &mut self,
         entering: &[u32],
-    ) -> Result<NativeMorphologyTransition, NativeFullOperationError> {
+    ) -> Result<NativeMorphologyTransition, ExtractedOperatorRefusal> {
         let Some(aperture) = self.aperture else {
             return Ok(NativeMorphologyTransition::Unchanged);
         };
-        let (Some(previous), Some(emission), Some(reacted), Some(presented)) = (
-            self.previous_context.as_deref(),
-            self.terminal_carrier.as_ref(),
-            self.terminal_reacted.as_ref(),
-            self.terminal_presented.as_ref(),
-        ) else {
+        let Some(previous) = self.previous_context.clone() else {
             return Ok(NativeMorphologyTransition::Unchanged);
         };
-        let Some(next) = continuation_next_occurrences(previous, entering) else {
+        let Some(next) = continuation_next_occurrences(&previous, entering) else {
             return Ok(NativeMorphologyTransition::Unchanged);
         };
         let tied = self
@@ -436,7 +381,8 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             .checked_sub(5)
             .and_then(|at| self.ecology.operations.get(at))
             .and_then(|operation| operation.coefficients.first().copied())
-            .ok_or(NativeFullOperationError::Operation)?;
+            .ok_or(ExtractedOperatorRefusal::Operation)?;
+        let (emission, reacted, presented) = self.contemporary_terminal(&previous)?;
         let surface = self.residence.surface();
         let (atom, mut deposit, differential) = enact_return(
             surface,
@@ -454,11 +400,8 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         )?;
         deposit.population = tied.0;
         // The receiver has consumed these terminal sections; the return now owns its
-        // differential and staged atom. Their old device storage is not part of the pullback.
-        self.terminal_carrier = None;
-        self.terminal_reacted = None;
-        self.terminal_presented = None;
-        self.terminal_contracted = None;
+        // differential and staged atom. Their device storage is not part of the pullback.
+        drop((emission, reacted, presented));
         let (adjoint, mut deposits) = self.adjoint_return(differential, ReturnDeed::Cultivate(aperture))?;
         deposits.entry(tied).or_default().push(atom);
         if let Some(reuse) = &mut self.forward_reuse { reuse.morphology_changed(deposits.keys().copied()); }
@@ -472,8 +415,39 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         })
     }
 
+    /// Read the contemporary constitution at a retained occurrence: enact the forward to the
+    /// terminal boundary (keeping the cross-layer checkpoints the adjoint replays from) and the
+    /// terminal boundary itself, returning the emitted face, the reacted carrier and the carrier
+    /// presented to the tied contraction. Recomputation inside one return: no chronology,
+    /// generation, trace or progress advances.
+    fn contemporary_terminal(
+        &mut self,
+        rows: &[u32],
+    ) -> Result<(TiledCarrier<'chart>, TiledCarrier<'chart>, ContemporaryCarrier<'chart>), ExtractedOperatorRefusal> {
+        self.terminal_carrier = None;
+        self.carriers.clear();
+        self.checkpoints.clear();
+        self.positions = None;
+        self.row_population = None;
+        let terminal_start = self.ecology.operations.len().saturating_sub(5);
+        let progress = self.progress.take();
+        let forward = self.enact_run(0, terminal_start, rows, &BTreeMap::new(), false, true);
+        self.progress = progress;
+        forward?;
+        let operations = self.terminal_operations()?;
+        let mut run = self.enact_terminal(&operations, None, [false, false, true, false, true])?;
+        let presented = self
+            .carriers
+            .remove(&operations[0].inputs[0])
+            .ok_or(ExtractedOperatorRefusal::Carrier)?;
+        self.carriers.clear();
+        let emitted = run.carriers[4].take().ok_or(ExtractedOperatorRefusal::Operation)?;
+        let reacted = run.carriers[2].take().ok_or(ExtractedOperatorRefusal::Operation)?;
+        Ok((emitted, reacted, presented))
+    }
+
     /// Clear the previous cycle's standing when a new occurrence enters at operation zero.
-    fn enter_cycle(&mut self, entering: &[u32]) -> Result<NativeMorphologyTransition, NativeFullOperationError> {
+    fn enter_cycle(&mut self, entering: &[u32]) -> Result<NativeMorphologyTransition, ExtractedOperatorRefusal> {
         let transition = self.return_on_continuation(entering)?;
         // Exact equality of this exterior occurrence chart permits reusing its numerical
         // realization; it does not identify the two native occurrences or skip their chronology.
@@ -509,7 +483,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         withdrawals: &BTreeMap<u32, SegmentWithdrawal<'_, 'chart>>,
         retain_all: bool,
         checkpoint: bool,
-    ) -> Result<Vec<RunStep>, NativeFullOperationError> {
+    ) -> Result<Vec<RunStep>, ExtractedOperatorRefusal> {
         let mut steps = Vec::with_capacity(to.saturating_sub(from));
         if from >= to {
             return Ok(steps);
@@ -580,7 +554,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                     }
                 };
                 if outcomes.is_empty() {
-                    return Err(NativeFullOperationError::Operation);
+                    return Err(ExtractedOperatorRefusal::Operation);
                 }
                 cursor += outcomes.len();
                 for (at, (outcome, operation)) in outcomes.into_iter().zip(run).enumerate() {
@@ -654,26 +628,28 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     fn trace_of(
         &self,
         step: &RunStep,
-        occurrence: &NativeFullOperationOccurrence,
+        occurrence: &ExtractedOperatorOccurrence,
         morphology_transition: NativeMorphologyTransition,
         successor_generation: u64,
-    ) -> NativeFullOperationTrace {
-        NativeFullOperationTrace {
+    ) -> ExtractedOperatorTrace<GraphTraceChart> {
+        ExtractedOperatorTrace {
             schema: NATIVE_FULL_OPERATION_STEP_SCHEMA.to_owned(),
             predecessor_generation: successor_generation - 1,
             successor_generation,
             occurrence: occurrence.ordinal,
-            row_addresses: occurrence.row_addresses.clone(),
-            operation: step.operation.clone(),
-            successor_projection: step.projection.clone(),
-            morphology_transition,
-            morphology_overlay_rank: self.morphology_overlay_rank(),
-            admitted_octaves: step.admitted_octaves,
             successor_bound_octaves: step.bound_octaves,
-            numerical_origin: step.numerical_origin.clone(),
             resident_coefficient_octets: self.residence.receipt().raw_coefficient_octets,
             census_before: step.census_before.clone(),
             census_after: step.census_after.clone(),
+            chart: GraphTraceChart {
+                row_addresses: occurrence.row_addresses.clone(),
+                operation: step.operation.clone(),
+                successor_projection: step.projection.clone(),
+                morphology_transition,
+                morphology_overlay_rank: self.morphology_overlay_rank(),
+                admitted_octaves: step.admitted_octaves,
+                numerical_origin: step.numerical_origin.clone(),
+            },
         }
     }
 
@@ -682,19 +658,19 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     /// not cross to the host.  The cycle owner (`advance_cycle`) runs whole segments.
     pub fn advance(
         mut self,
-        occurrence: NativeFullOperationOccurrence,
-    ) -> Result<NativeFullOperationStep<'residence, 'chart>, NativeFullOperationError> {
-        if self.interruption.is_some() { return Err(NativeFullOperationError::Interrupted); }
+        occurrence: ExtractedOperatorOccurrence,
+    ) -> Result<ExtractedOperatorStep<Self>, ExtractedOperatorRefusal> {
+        if self.interruption.is_some() { return Err(ExtractedOperatorRefusal::Interrupted); }
         if self.passage_cultivation.is_some() {
-            return Err(NativeFullOperationError::Contact("this chart advances complete cycles, not exposed primitive steps"));
+            return Err(ExtractedOperatorRefusal::Contact("this chart advances complete cycles, not exposed primitive steps"));
         }
-        if occurrence.ordinal != self.generation {
-            return Err(NativeFullOperationError::Occurrence);
+        if occurrence.ordinal != self.generation || !occurrence.interaction_words.is_empty() {
+            return Err(ExtractedOperatorRefusal::Occurrence);
         }
         let mut morphology_transition = NativeMorphologyTransition::Unchanged;
         if self.cycle_complete {
             if self.operation_at != 0 || occurrence.row_addresses.is_empty() {
-                return Err(NativeFullOperationError::Occurrence);
+                return Err(ExtractedOperatorRefusal::Occurrence);
             }
             morphology_transition = self.enter_cycle(&occurrence.row_addresses)?;
         }
@@ -704,16 +680,16 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             .operations
             .get(at)
             .cloned()
-            .ok_or(NativeFullOperationError::Operation)?;
+            .ok_or(ExtractedOperatorRefusal::Operation)?;
         if matches!(operation.primitive, NativeOperationPrimitive::Lookup { .. }) {
             self.previous_context = Some(occurrence.row_addresses.clone());
         }
         let steps = self.enact_run(at, at + 1, &occurrence.row_addresses, &BTreeMap::new(), false, true)?;
-        let step = steps.into_iter().next().ok_or(NativeFullOperationError::Operation)?;
+        let step = steps.into_iter().next().ok_or(ExtractedOperatorRefusal::Operation)?;
         let successor_generation = self
             .generation
             .checked_add(1)
-            .ok_or(NativeFullOperationError::Generation)?;
+            .ok_or(ExtractedOperatorRefusal::Generation)?;
         self.chronology.push(self.generation);
         self.operation_at += 1;
         if self.operation_at == self.ecology.operations.len() {
@@ -724,8 +700,8 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         let carrier = self
             .carriers
             .get(&operation.output)
-            .ok_or(NativeFullOperationError::Carrier)?;
-        let emission = NativeFullOperationEmission {
+            .ok_or(ExtractedOperatorRefusal::Carrier)?;
+        let emission = ExtractedOperatorEmission {
             generation: successor_generation,
             operation: operation.ordinal,
             carrier: operation.output,
@@ -736,7 +712,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             projection: None,
         };
         let trace = self.trace_of(&step, &occurrence, morphology_transition, successor_generation);
-        Ok(NativeFullOperationStep {
+        Ok(ExtractedOperatorStep {
             emission,
             trace,
             successor: self,
@@ -750,27 +726,26 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     pub fn advance_cycle(
         mut self,
         row_addresses: &[u32],
-    ) -> Result<NativeFullCycle<'residence, 'chart>, NativeFullOperationError> {
+    ) -> Result<ExtractedOperatorCycle<'residence, 'chart>, ExtractedOperatorRefusal> {
         let output = self.advance_cycle_retained(row_addresses)?;
-        Ok(NativeFullCycle { final_emission: output.final_emission, traces: output.traces,
-            passage_returns: output.passage_returns, successor: self })
+        Ok(ExtractedOperatorCycle { output, successor: self })
     }
 
     /// The production ownership boundary: a refusal cannot drop the caller's ecology. Invalid
     /// input refuses before mutation. A later failure preserves the actual installed carriers and
     /// staged differences, with an explicit interruption that prevents a silent retry/replay.
-    pub fn advance_cycle_retained(&mut self, row_addresses: &[u32]) -> Result<NativeFullCycleOutput, NativeFullOperationError> {
+    pub fn advance_cycle_retained(&mut self, row_addresses: &[u32]) -> Result<ExtractedCycleOutput, ExtractedOperatorRefusal> {
         self.advance_cycle_readout_retained(row_addresses,NativeEmissionReadout::Complete)
     }
 
     /// The readout changes only the exterior receiver, never the complete resident successor.
     pub fn advance_cycle_readout_retained(&mut self,row_addresses:&[u32],readout:NativeEmissionReadout)
-        -> Result<NativeFullCycleOutput,NativeFullOperationError> {
-        if self.interruption.is_some() { return Err(NativeFullOperationError::Interrupted); }
+        -> Result<ExtractedCycleOutput,ExtractedOperatorRefusal> {
+        if self.interruption.is_some() { return Err(ExtractedOperatorRefusal::Interrupted); }
         if row_addresses.is_empty() || (self.operation_at != 0 && !self.cycle_complete) {
-            return Err(NativeFullOperationError::Occurrence);
+            return Err(ExtractedOperatorRefusal::Occurrence);
         }
-        self.generation.checked_add(self.ecology.operations.len() as u64).ok_or(NativeFullOperationError::Generation)?;
+        self.generation.checked_add(self.ecology.operations.len() as u64).ok_or(ExtractedOperatorRefusal::Generation)?;
         self.progress = Some(NativeCycleProgress { occurrence: self.generation, row_addresses: row_addresses.to_vec(),
             installed_through: None, returned_through: None, at_terminal: false });
         let result = self.advance_cycle_inner(row_addresses,readout);
@@ -782,24 +757,21 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         result
     }
 
-    fn advance_cycle_inner(&mut self, row_addresses: &[u32],readout:NativeEmissionReadout) -> Result<NativeFullCycleOutput, NativeFullOperationError> {
+    fn advance_cycle_inner(&mut self, row_addresses: &[u32],readout:NativeEmissionReadout) -> Result<ExtractedCycleOutput, ExtractedOperatorRefusal> {
         let mut morphology_transition = NativeMorphologyTransition::Unchanged;
         if self.cycle_complete {
             morphology_transition = self.enter_cycle(row_addresses)?;
         }
         let terminal_start = self.ecology.operations.len().saturating_sub(5);
         self.previous_context = Some(row_addresses.to_vec());
-        let occurrence = NativeFullOperationOccurrence {
-            ordinal: self.generation,
-            row_addresses: row_addresses.to_vec(),
-        };
+        let occurrence = ExtractedOperatorOccurrence::addressed(self.generation, row_addresses.to_vec());
         let steps = self.enact_run(0, terminal_start, row_addresses, &BTreeMap::new(), false, true)?;
         let mut traces = Vec::with_capacity(self.ecology.operations.len());
         for step in &steps {
             let successor_generation = self
                 .generation
                 .checked_add(1)
-                .ok_or(NativeFullOperationError::Generation)?;
+                .ok_or(ExtractedOperatorRefusal::Generation)?;
             let transition = std::mem::replace(&mut morphology_transition, NativeMorphologyTransition::Unchanged);
             traces.push(self.trace_of(step, &occurrence, transition, successor_generation));
             self.chronology.push(self.generation);
@@ -808,28 +780,25 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         }
         let ordinal = self.generation;
         if let Some(progress) = &mut self.progress { progress.at_terminal = true; }
-        let (mut emissions, mut terminal_traces) = self.advance_terminal_readout_retained(NativeFullOperationOccurrence {
-            ordinal,
-            row_addresses: Vec::new(),
-        },readout)?;
+        let (mut emissions, mut terminal_traces) = self.advance_terminal_readout_retained(ExtractedOperatorOccurrence::internal(ordinal),readout)?;
         traces.append(&mut terminal_traces);
         let final_emission = emissions.pop()
-            .ok_or(NativeFullOperationError::Operation)?;
-        Ok(NativeFullCycleOutput {
+            .ok_or(ExtractedOperatorRefusal::Operation)?;
+        Ok(ExtractedCycleOutput {
             final_emission,
             traces,
             passage_returns: self.publish_passage_returns(),
         })
     }
 
-    pub(super) fn ensure_row_population(&mut self, rows: usize) -> Result<(), NativeFullOperationError> {
+    pub(super) fn ensure_row_population(&mut self, rows: usize) -> Result<(), ExtractedOperatorRefusal> {
         match self.row_population {
             Some(held) if held == rows => Ok(()),
-            Some(_) => Err(NativeFullOperationError::Occurrence),
+            Some(_) => Err(ExtractedOperatorRefusal::Occurrence),
             None => {
                 let positions = (0..rows)
                     .map(|position| {
-                        u32::try_from(position).map_err(|_| NativeFullOperationError::Operation)
+                        u32::try_from(position).map_err(|_| ExtractedOperatorRefusal::Operation)
                     })
                     .collect::<Result<Vec<_>, _>>()?;
                 self.positions = Some(self.residence.surface().mount_positions(&positions)?);
@@ -843,11 +812,11 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     pub fn carrier_intervals(
         &self,
         carrier: NativeCarrierOrdinal,
-    ) -> Result<Vec<(i64, i64)>, NativeFullOperationError> {
+    ) -> Result<Vec<(i64, i64)>, ExtractedOperatorRefusal> {
         if let Some(held) = self.carriers.get(&carrier) {
             let intervals = self.residence.surface().read_out(&held.section)?;
             if intervals.is_empty() || held.bound_octaves == 0 {
-                return Err(NativeFullOperationError::Carrier);
+                return Err(ExtractedOperatorRefusal::Carrier);
             }
             return Ok(intervals);
         }
@@ -855,7 +824,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             .terminal_carrier
             .as_ref()
             .filter(|held| held.carrier == carrier)
-            .ok_or(NativeFullOperationError::Carrier)?;
+            .ok_or(ExtractedOperatorRefusal::Carrier)?;
         let tiles = held
             .sections
             .iter()
@@ -865,45 +834,35 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     }
 }
 
-#[derive(Debug, Error)]
-pub enum NativeFullOperationError {
-    #[error("the native session is interrupted; its held state must not be silently replayed")]
-    Interrupted,
-    #[error("native contact: {0}")]
-    Contact(&'static str),
-    #[error("operator ecology: {0}")]
-    Ecology(#[from] super::NativeFullOperatorError),
-    #[error("operator residence: {0}")]
-    Residence(#[from] NativeOperatorResidenceError),
-    #[error("resident apparatus: {0}")]
-    Resident(#[from] ResidentRefusal),
-    #[error("the occurrence does not join the contemporary ecology")]
-    Occurrence,
-    #[error("the current operation disagrees with the complete ecology")]
-    Operation,
-    #[error("operation {operation} is not yet enacted by the full-session owner")]
-    PrimitiveOpen { operation: u32 },
-    #[error("the lookup's exact common grain is outside the resident carrier")]
-    Grain,
-    #[error("resident operation {operation} returned obstruction flags {flags:#x}")]
-    ResidentObstruction { operation: u32, flags: u32 },
-    #[error("the ecology generation overflowed")]
-    Generation,
-    #[error("the requested contemporary carrier is absent")]
-    Carrier,
-    #[error("the declared successor projection did not return a point carrier")]
-    Projection,
-    #[error("the local morphology current is malformed or does not enter this operation")]
-    Morphology,
-    #[error("the return through the body refused: {0}")]
-    Adjoint(String),
+impl ExtractedOperatorAdvance for ExtractedOperatorSession<'_, '_> {
+    type Operation = u32;
+    type TraceChart = GraphTraceChart;
+
+    fn generation(&self) -> u64 {
+        self.generation
+    }
+
+    fn operation_at(&self) -> usize {
+        self.operation_at
+    }
+
+    fn chronology(&self) -> &[u64] {
+        &self.chronology
+    }
+
+    fn advance_occurrence(
+        self,
+        occurrence: ExtractedOperatorOccurrence,
+    ) -> Result<ExtractedOperatorStep<Self>, ExtractedOperatorRefusal> {
+        self.advance(occurrence)
+    }
 }
 
-pub(super) fn allocation_refusal(error: &NativeFullOperationError) -> bool {
+pub(super) fn allocation_refusal(error: &ExtractedOperatorRefusal) -> bool {
     matches!(error,
-        NativeFullOperationError::Resident(ResidentRefusal::MemoryAperture { .. })
-        | NativeFullOperationError::Resident(ResidentRefusal::Driver { code: 2, .. })
-        | NativeFullOperationError::Residence(NativeOperatorResidenceError::Allocation {
+        ExtractedOperatorRefusal::Resident(ResidentRefusal::MemoryAperture { .. })
+        | ExtractedOperatorRefusal::Resident(ResidentRefusal::Driver { code: 2, .. })
+        | ExtractedOperatorRefusal::Residence(NativeOperatorResidenceError::Allocation {
             source: ResidentRefusal::Driver { code: 2, .. }, .. }))
 }
 

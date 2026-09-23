@@ -9,7 +9,7 @@ use holonics_hna::AthenaTokenApplication;
 use holonic_engine::{
     embedding_fiber::ResidentReadout,
     native_ecology::holonic_intelligence::{
-        NativeFullOperatorSession, NativeOperatorResidence, dismantle_full_native_operator,
+        ExtractedOperatorSession, NativeOperatorResidence, dismantle_full_native_operator,
         mount_operator_surface,
     },
 };
@@ -25,7 +25,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let surface = mount_operator_surface(&readout)?;
     let mut residence = NativeOperatorResidence::mount(&surface, &returned.native, &returned.exterior)?;
     let cycles: usize = args.get(2).and_then(|s| s.parse().ok()).unwrap_or(1);
-    let mut session = NativeFullOperatorSession::found(&returned.native, &mut residence)?;
+    let mut session = ExtractedOperatorSession::found(&returned.native, &mut residence)?;
     // Earlier cycles of the same line: the census below is the last cycle's alone.
     for _ in 1..cycles {
         let earlier = session.advance_cycle(&addresses)?;
@@ -40,11 +40,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // After the cycle: the terminal face has crossed to the host, once.
     let after = cycle.successor.census();
     let last = &after;
-    let face = application.render(&cycle.final_emission)?;
+    let face = application.render(&cycle.output.final_emission)?;
     let receipt = serde_json::json!({
         "material": material,
         "addresses": addresses.len(),
-        "operations": cycle.traces.len(),
+        "operations": cycle.output.traces.len(),
         "cycle_milliseconds": elapsed,
         "face": face.rendered,
         "deed_launches": last.deed_launches - first.deed_launches,

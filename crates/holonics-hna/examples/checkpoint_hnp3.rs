@@ -3,7 +3,7 @@
 use holonic_engine::{
     embedding_fiber::ResidentReadout,
     native_ecology::holonic_intelligence::{
-        mount_operator_surface, NativeConeRestrictedEcology, NativeFullOperatorSession,
+        mount_operator_surface, NativeConeRestrictedEcology, ExtractedOperatorSession,
         NativeOperatorResidence, NativeReturnAperture,
     },
 };
@@ -70,7 +70,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let surface = mount_operator_surface(&readout)?;
             let mut intake = base.intake(dependency.class)?;
             let mut residence = NativeOperatorResidence::mount_from_intake(&surface, &base.ecology, &mut intake)?;
-            let mut session = NativeFullOperatorSession::found_with_passage_return(&base.ecology,
+            let mut session = ExtractedOperatorSession::found_with_passage_return(&base.ecology,
                 &mut residence, NativeReturnAperture { learning_shift: 16, series_terms: 14 })?;
             eprintln!("HNP3: native development at {:?}", started.elapsed());
             for occurrence in &occurrences { session.advance_cycle_retained(occurrence)?; }
@@ -117,7 +117,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let surface = mount_operator_surface(&readout)?;
             let mut intake = base.intake(dependency.class)?;
             let mut residence = NativeOperatorResidence::mount_from_intake(&surface, &base.ecology, &mut intake)?;
-            let mut session = NativeFullOperatorSession::remount_rest(&base.ecology, &mut residence, &state)?;
+            let mut session = ExtractedOperatorSession::remount_rest(&base.ecology, &mut residence, &state)?;
             eprintln!("HNP3: remounted at {:?}; comparing complete held state", started.elapsed());
             assert!(session.detach_rest()? == state, "complete state changed across remount");
             drop(state);

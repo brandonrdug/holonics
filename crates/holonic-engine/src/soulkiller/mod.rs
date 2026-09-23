@@ -5,7 +5,9 @@
 //! cultivation continuation, or callable route back into a closed exterior session.
 
 mod boundary;
-pub use boundary::{SoulkillerDismantlingInput, SoulkillerDismantlingReturn, dismantle};
+pub use boundary::{
+    ExtractionReturn, SoulkillerDismantlingInput, SoulkillerDismantlingReturn, dismantle,
+};
 
 /// Exterior terminal-potential testimony used during dismantling.
 pub mod foreign_potential_rest;

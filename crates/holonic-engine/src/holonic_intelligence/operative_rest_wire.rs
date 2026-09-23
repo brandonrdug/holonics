@@ -1,5 +1,12 @@
-//! Streaming exterior chart for native session state. Arrays are integer codewords, not JSON
-//! number populations. Frame lengths are caller-declared resource boundaries, not semantic IDs.
+//! Streaming exterior chart for the one rest of the extracted operator. Arrays are integer
+//! codewords, not JSON number populations. Frame lengths are caller-declared resource boundaries,
+//! not semantic IDs.
+//!
+//! The frame layout is unchanged since `HNA-SESSION-REST\x01`. Three positions once carried a
+//! previous cycle's terminal material (the reacted tiles, the dissection's tied row and the
+//! presented carrier); the writer now declares them absent, and the reader decodes a present one
+//! structurally and releases it (retention law: the continuing return reads the contemporary
+//! constitution instead).
 
 use super::*;
 use crate::resident_section::ResidentSectionRest;
@@ -17,10 +24,10 @@ const CHUNK: usize = 64 * 1024;
 #[path = "operative_rest_wire_tests.rs"]
 mod tests;
 
-type Error = NativeSessionRestError;
+type Error = ExtractedOperatorRefusal;
 
 fn malformed(message: &str) -> Error {
-    Error::Malformed(message.into())
+    Error::Rest(message.into())
 }
 fn number(out: &mut impl Write, value: usize) -> Result<(), Error> {
     out.write_all(
@@ -123,10 +130,10 @@ fn read_words(input: &mut Take<impl Read>) -> Result<Vec<i64>, Error> {
     Ok(values)
 }
 fn section(out: &mut impl Write, value: &ResidentSectionRest) -> Result<(), Error> {
-    blob(out, &value.canonical_bytes().map_err(Error::Malformed)?)
+    blob(out, &value.canonical_bytes().map_err(Error::Rest)?)
 }
 fn read_section(input: &mut Take<impl Read>) -> Result<ResidentSectionRest, Error> {
-    ResidentSectionRest::read(&read_blob(input)?).map_err(Error::Malformed)
+    ResidentSectionRest::read(&read_blob(input)?).map_err(Error::Rest)
 }
 fn sections(
     out: &mut impl Write,
@@ -243,7 +250,7 @@ fn read_tiled(input: &mut Take<impl Read>) -> Result<Option<NativeTiledRest>, Er
     }))
 }
 
-impl NativeFullSessionRest {
+impl ExtractedOperatorRest {
     pub fn write_to(&self, out: &mut impl Write) -> Result<(), Error> {
         self.validate()?;
         out.write_all(MAGIC)?;
@@ -251,19 +258,10 @@ impl NativeFullSessionRest {
         sections(out, &self.carriers)?;
         sections(out, &self.checkpoints)?;
         tiled(out, &self.terminal_carrier)?;
-        tiled(out, &self.terminal_reacted)?;
-        flag(out, self.terminal_contracted.is_some())?;
-        if let Some(pairs) = &self.terminal_contracted {
-            number(out, pairs.len())?;
-            for (lo, hi) in pairs {
-                out.write_all(&lo.to_le_bytes())?;
-                out.write_all(&hi.to_le_bytes())?;
-            }
-        }
-        flag(out, self.terminal_presented.is_some())?;
-        if let Some(value) = &self.terminal_presented {
-            section(out, value)?;
-        }
+        // Retired positions: reacted tiles, tied row, presented carrier.
+        tiled(out, &None)?;
+        flag(out, false)?;
+        flag(out, false)?;
         overlays(out, &self.overlay)?;
         flag(out, self.passage.is_some())?;
         if let Some(passage) = &self.passage {
@@ -299,26 +297,22 @@ impl NativeFullSessionRest {
         let carriers = read_sections(&mut input)?;
         let checkpoints = read_sections(&mut input)?;
         let terminal_carrier = read_tiled(&mut input)?;
-        let terminal_reacted = read_tiled(&mut input)?;
-        let terminal_contracted = if read_flag(&mut input)? {
-            let n = count(&mut input, 16)?;
-            let mut pairs = Vec::new();
-            for _ in 0..n {
-                let mut lo = [0; 8];
-                let mut hi = [0; 8];
-                input.read_exact(&mut lo)?;
-                input.read_exact(&mut hi)?;
-                pairs.push((i64::from_le_bytes(lo), i64::from_le_bytes(hi)));
+        // Retired positions of an older wire: decoded structurally, then released.
+        if let Some(reacted) = read_tiled(&mut input)? {
+            if reacted.sections.is_empty() || reacted.sections.iter().any(|s| s.rows != reacted.rows) {
+                return Err(malformed("tiled terminal"));
             }
-            Some(pairs)
-        } else {
-            None
-        };
-        let terminal_presented = if read_flag(&mut input)? {
-            Some(read_section(&mut input)?)
-        } else {
-            None
-        };
+        }
+        if read_flag(&mut input)? {
+            let n = count(&mut input, 16)?;
+            for _ in 0..n {
+                let mut pair = [0; 16];
+                input.read_exact(&mut pair)?;
+            }
+        }
+        if read_flag(&mut input)? {
+            read_section(&mut input)?;
+        }
         let overlay = read_overlays(&mut input)?;
         let passage = if read_flag(&mut input)? {
             Some(NativePassageRest {
@@ -358,9 +352,6 @@ impl NativeFullSessionRest {
             carriers,
             checkpoints,
             terminal_carrier,
-            terminal_reacted,
-            terminal_contracted,
-            terminal_presented,
             overlay,
             passage,
             reuse,

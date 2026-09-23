@@ -17,7 +17,7 @@ use holonic_engine::{
     embedding_fiber::ResidentReadout,
     native_ecology::holonic_intelligence::{
         NativeConeRestriction, NativeConeReturn, NativeConeVerdict, NativeDissectionAperture,
-        NativeFullOperatorSession, NativeOperatorResidence, NativeWithdrawnFace,
+        ExtractedOperatorSession, NativeOperatorResidence, NativeWithdrawnFace,
         dismantle_full_native_operator, mount_operator_surface,
     },
 };
@@ -107,7 +107,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let surface = mount_operator_surface(&readout)?;
     let mut residence =
         NativeOperatorResidence::mount(&surface, &returned.native, &returned.exterior)?;
-    let session = NativeFullOperatorSession::found_for_dissection(
+    let session = ExtractedOperatorSession::found_for_dissection(
         &returned.native,
         &mut residence,
         NativeDissectionAperture { series_terms: 14 },
@@ -116,7 +116,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     eprintln!("stage: cycle on {} addresses", addresses.len());
     let cycle = session.advance_cycle(&addresses)?;
     let first_cycle_milliseconds = cycle_started.elapsed().as_millis();
-    let face = application.render(&cycle.final_emission)?;
+    let face = application.render(&cycle.output.final_emission)?;
     let mut session = cycle.successor;
     eprintln!("stage: excite");
     let excitation = session.excite()?;

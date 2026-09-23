@@ -9,9 +9,9 @@ use holonic_engine::{
     embedding_fiber::ResidentReadout,
     native_ecology::holonic_intelligence::{
         mount_operator_surface, NativeConeRestrictedEcology, NativeCycleInterruption,
-        NativeForwardReuseCensus, NativeFullCycleOutput, NativeFullOperationError,
-        NativeFullOperatorSession, NativeFullSessionRest, NativeInputExtendedIntake,
-        NativeInputRowExtension, NativeOperatorResidence, NativeSessionRestError,
+        NativeForwardReuseCensus, ExtractedCycleOutput, ExtractedOperatorRefusal,
+        ExtractedOperatorSession, ExtractedOperatorRest, NativeInputExtendedIntake,
+        NativeInputRowExtension, NativeOperatorResidence,
     },
 };
 use serde::Serialize;
@@ -27,10 +27,9 @@ pub enum HnaSessionError {
     Admission(String),
     #[error("input sections absent at native populations: {rows:?}")]
     MissingInput { rows: BTreeMap<u32, Vec<u32>> },
+    /// The extracted operator's one refusal family: advance, return and rest.
     #[error("native operation: {0}")]
-    Native(#[from] NativeFullOperationError),
-    #[error("native rest: {0}")]
-    Rest(#[from] NativeSessionRestError),
+    Native(#[from] ExtractedOperatorRefusal),
     #[error("checkpoint: {0}")]
     Checkpoint(#[from] CheckpointError),
     #[error("stream: {0}")]
@@ -42,7 +41,7 @@ pub enum HnaSessionError {
 pub struct HnaModel {
     material: NativeConeRestrictedEcology,
     dependency: HnaBaseDependency,
-    initial: Option<NativeFullSessionRest>,
+    initial: Option<ExtractedOperatorRest>,
     aperture: Option<HnaCultivationAperture>,
     transport: Option<crate::HnaStreamState>,
     input_material: Vec<NativeInputRowExtension>,
@@ -255,12 +254,12 @@ impl HnaModel {
         )
         .map_err(|e| HnaSessionError::Base(e.to_string()))?;
         let native = match &self.initial {
-            Some(state) => NativeFullOperatorSession::remount_rest(
+            Some(state) => ExtractedOperatorSession::remount_rest(
                 &self.material.ecology,
                 &mut residence,
                 state,
             )?,
-            None => NativeFullOperatorSession::found_with_passage_return(
+            None => ExtractedOperatorSession::found_with_passage_return(
                 &self.material.ecology,
                 &mut residence,
                 self.aperture
@@ -283,7 +282,7 @@ impl HnaModel {
 }
 
 pub struct HnaSession<'residence, 'chart> {
-    native: NativeFullOperatorSession<'residence, 'chart>,
+    native: ExtractedOperatorSession<'residence, 'chart>,
     material: &'residence NativeConeRestrictedEcology,
     dependency: HnaBaseDependency,
     additional_input_codewords: u64,
@@ -300,7 +299,7 @@ pub struct HnaNativeAdmission {
 
 pub struct HnaNativeCycle {
     pub admission: HnaNativeAdmission,
-    pub output: NativeFullCycleOutput,
+    pub output: ExtractedCycleOutput,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -487,7 +486,7 @@ impl HnaSession<'_, '_> {
     pub fn advance(
         &mut self,
         occurrence: &HnaOccurrence,
-    ) -> Result<NativeFullCycleOutput, HnaSessionError> {
+    ) -> Result<ExtractedCycleOutput, HnaSessionError> {
         let admitted = self
             .material
             .admit(&occurrence.row_addresses, &occurrence.history)

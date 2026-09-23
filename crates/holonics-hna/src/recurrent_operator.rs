@@ -8,7 +8,7 @@ use std::{fs::File, path::Path};
 use holonic_engine::{
     embedding_fiber::{AlignedMaterial, MountedReadout, ResidentReadout, ScorePopulation},
     foreign_map::{ForeignContainer, ForeignMapError, manifest_safetensors},
-    native_ecology::holonic_intelligence::{NativeFullOperationEmission, NativeOperatorEmission},
+    native_ecology::holonic_intelligence::{ExtractedOperatorEmission, NativeOperatorKind},
 };
 use serde::Serialize;
 use thiserror::Error;
@@ -150,7 +150,7 @@ impl AthenaTextOccurrenceApplication {
     pub fn render_token(
         &self,
         vocabulary: &AthenaVocabularyFace<'_>,
-        emission: &NativeOperatorEmission,
+        emission: &ExtractedOperatorEmission<NativeOperatorKind>,
     ) -> Result<AthenaRenderedTokenFace, AthenaRecurrentApplicationError> {
         if emission.rows != 1
             || emission.width != self.carrier_extent
@@ -205,7 +205,7 @@ impl AthenaTextOccurrenceApplication {
     /// matrix, candidate family, or source lookup.
     pub fn render_full_emission(
         &self,
-        emission: &NativeFullOperationEmission,
+        emission: &ExtractedOperatorEmission,
     ) -> Result<AthenaRenderedTokenFace, AthenaRecurrentApplicationError> {
         render_complete_emission(&self.tokenizer, emission)
     }
@@ -227,7 +227,7 @@ impl AthenaTokenApplication {
 
     pub fn render(
         &self,
-        emission: &NativeFullOperationEmission,
+        emission: &ExtractedOperatorEmission,
     ) -> Result<AthenaRenderedTokenFace, AthenaRecurrentApplicationError> {
         render_complete_emission(&self.tokenizer, emission)
     }
@@ -273,7 +273,7 @@ impl AthenaTokenApplication {
 
 fn render_complete_emission(
     tokenizer: &Tokenizer,
-    emission: &NativeFullOperationEmission,
+    emission: &ExtractedOperatorEmission,
 ) -> Result<AthenaRenderedTokenFace, AthenaRecurrentApplicationError> {
     let vocabulary = tokenizer.get_vocab_size(true);
     if emission.rows == 0

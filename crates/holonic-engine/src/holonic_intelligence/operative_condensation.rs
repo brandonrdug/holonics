@@ -49,7 +49,7 @@ use std::{
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
-use crate::soulkiller::{SoulkillerDismantlingInput, SoulkillerDismantlingReturn};
+use crate::soulkiller::{ExtractionReturn, SoulkillerDismantlingInput};
 
 use super::{
     NativeCoefficientIntake, NativeExposure, NativeExposureFace, NativeFullOperatorColdWitness,
@@ -115,6 +115,24 @@ pub struct NativeCollapsedPair {
     pub lens_face: u32,
     pub full_faces: (u32, u32),
     pub separating_word: Vec<u32>,
+}
+
+impl NativeCollapsedPair {
+    /// The core [`Separation`](holonic_core::restriction::Separation) (plan phases 10, 15): the
+    /// lens restriction merges the two occurrences at `exposure` (both read `lens_face`); the
+    /// extracted operator separates them, witnessed by the exposure, the lens face and the
+    /// shortest separating history, with its two full faces as the readings. The record keeps
+    /// its own wire.
+    pub fn separation(
+        &self,
+    ) -> holonic_core::restriction::Separation<usize, (NativeExposure, u32, Vec<u32>), u32> {
+        holonic_core::restriction::Separation::new(
+            self.left,
+            self.right,
+            (self.exposure.clone(), self.lens_face, self.separating_word.clone()),
+            self.full_faces,
+        )
+    }
 }
 
 /// The enclosure the terminal reactions propagate to the face's coordinates under one exposure,
@@ -255,6 +273,27 @@ pub struct NativeClassEcology {
     pub cone_founding: NativeConeFounding,
 }
 
+impl NativeClassEcology {
+    /// The class as the core [`PreimageFibre`](holonic_core::restriction::PreimageFibre)
+    /// (plan phases 10, 15): the signature quotient's image and every occurrence it merges there,
+    /// with the addresses each entered by. The class body refuses every occurrence outside it
+    /// (`NativeConeRestrictedEcology::admit`); the retained occurrences are this fibre, a quotient
+    /// class of the declared family, not an archive of cycles.
+    pub fn preimage_fibre(
+        &self,
+    ) -> holonic_core::restriction::PreimageFibre<NativeSignature, Vec<NativeRetainedOccurrence>> {
+        holonic_core::restriction::PreimageFibre::new(self.signature.clone(), self.fibre.clone())
+    }
+
+    /// The remainder's collapsed pairs as core separations of the lens restriction, on the body's
+    /// domain.
+    pub fn separations(
+        &self,
+    ) -> Vec<holonic_core::restriction::Separation<usize, (NativeExposure, u32, Vec<u32>), u32>> {
+        self.remainder.collapsed.iter().map(NativeCollapsedPair::separation).collect()
+    }
+}
+
 /// How a class cone was founded and what it is sound under.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -374,7 +413,7 @@ impl SoulkillerDismantlingInput for ResidentExcitationDismantling {
     fn dismantle(
         self,
     ) -> Result<
-        SoulkillerDismantlingReturn<Self::Productive, Self::ColdWitness, Self::Insufficiency>,
+        ExtractionReturn<Self::Productive, Self::ColdWitness, Self::Insufficiency>,
         Self::Error,
     > {
         let quotient = NativeSignatureQuotient::found(&self.faces)?;
@@ -538,7 +577,7 @@ impl SoulkillerDismantlingInput for ResidentExcitationDismantling {
             retained_occurrences: self.fibre.iter().map(|r| r.addresses.clone()).collect(),
             cause: None,
         };
-        Ok(SoulkillerDismantlingReturn {
+        Ok(ExtractionReturn {
             native: productive,
             exterior: NativeExcitationColdWitness {
                 source: witness,
@@ -1249,5 +1288,62 @@ mod tests {
         let mut bytes = Vec::new();
         append_coefficient_octets(&mut bytes, &words);
         assert_eq!(bytes, words.iter().flat_map(|word| word.to_le_bytes()).collect::<Vec<_>>());
+    }
+
+    #[test]
+    fn collapsed_pairs_and_class_fibres_are_the_core_descent_objects() {
+        let exposure = |history: Vec<u32>| NativeExposure { receiver: "terminal-face".into(), history };
+        // Occurrences 0 and 1 share the lens face 5 at the short exposure; the full operator reads
+        // 7 and 8 there. Occurrence 2 differs under the lens.
+        let lens_faces = vec![
+            (0, exposure(vec![1]), 5, 7),
+            (1, exposure(vec![1]), 5, 8),
+            (2, exposure(vec![1]), 6, 7),
+            (0, exposure(vec![1, 2]), 3, 3),
+            (1, exposure(vec![1, 2]), 3, 4),
+        ];
+        let collapsed = NativeClassRemainder::collapsed_pairs(&lens_faces);
+        assert_eq!(collapsed.len(), 2);
+        for pair in &collapsed {
+            let separation = pair.separation();
+            assert_eq!(separation.pair(), (pair.left, pair.right));
+            assert_eq!(separation.readings(), &pair.full_faces);
+            assert_ne!(separation.readings().0, separation.readings().1, "separated");
+            let (witness_exposure, lens_face, word) = separation.witness();
+            assert_eq!((witness_exposure, *lens_face, word), (&pair.exposure, pair.lens_face, &pair.separating_word));
+            // Merged by the lens: both members read the same lens face at the exposure.
+            for member in [pair.left, pair.right] {
+                assert!(lens_faces.iter().any(|(o, e, lens, _)| *o == member && e == &pair.exposure && *lens == pair.lens_face));
+            }
+        }
+        assert_eq!(collapsed[0].separating_word, vec![1], "the shortest separating history");
+        let fibre = vec![
+            NativeRetainedOccurrence { occurrence: 0, addresses: vec![4, 5] },
+            NativeRetainedOccurrence { occurrence: 1, addresses: vec![6] },
+        ];
+        let class = NativeClassEcology {
+            ordinal: 0,
+            signature: NativeSignature { faces: vec![(exposure(vec![1]), 5)] },
+            fibre: fibre.clone(),
+            cone: BTreeMap::new(),
+            cone_population: 0,
+            response: vec![],
+            remainder: NativeClassRemainder {
+                domain_faces: vec![],
+                collapsed: collapsed.clone(),
+                descent_failures: vec![],
+                propagated: vec![],
+                residual_files: vec![],
+                species: NativeClassRemainder::species_of(&collapsed, 0),
+                lens_faces: vec![],
+                lens_collapsed: vec![],
+            },
+            cone_founding: NativeConeFounding::FoundedBySingletons,
+        };
+        let preimage = class.preimage_fibre();
+        assert_eq!(preimage.native, class.signature);
+        assert_eq!(preimage.members, fibre);
+        assert_eq!(class.separations().len(), 2);
+        assert_eq!(class.remainder.species, Some(NativeRemainderSpecies::Compression));
     }
 }

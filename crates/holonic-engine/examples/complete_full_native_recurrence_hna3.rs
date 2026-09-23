@@ -3,7 +3,7 @@ use std::path::Path;
 use holonic_engine::{
     embedding_fiber::ResidentReadout,
     native_ecology::holonic_intelligence::{
-        NativeFullOperationOccurrence, NativeFullOperatorSession, NativeOperationPrimitive,
+        ExtractedOperatorOccurrence, ExtractedOperatorSession, NativeOperationPrimitive,
         NativeOperatorResidence, dismantle_full_native_operator, mount_operator_surface,
     },
 };
@@ -39,7 +39,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let surface = mount_operator_surface(&readout)?;
     let mut residence =
         NativeOperatorResidence::mount(&surface, &returned.native, &returned.exterior)?;
-    let mut session = NativeFullOperatorSession::found(&returned.native, &mut residence)?;
+    let mut session = ExtractedOperatorSession::found(&returned.native, &mut residence)?;
     for at in 0..terminal_start {
         let row_addresses = if matches!(
             returned.native.operations[at].primitive,
@@ -50,16 +50,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Vec::new()
         };
         session = session
-            .advance(NativeFullOperationOccurrence {
-                ordinal: at as u64,
+            .advance(ExtractedOperatorOccurrence::addressed(
+                at as u64,
                 row_addresses,
-            })?
+            ))?
             .successor;
     }
-    let terminal = session.advance_terminal(NativeFullOperationOccurrence {
-        ordinal: terminal_start as u64,
-        row_addresses: Vec::new(),
-    })?;
+    let terminal =
+        session.advance_terminal(ExtractedOperatorOccurrence::internal(terminal_start as u64))?;
     let final_emission = terminal.emissions.last().ok_or("no final emission")?;
     let successor_face = terminal
         .successor
@@ -84,10 +82,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let final_emission_width = final_emission.width;
     let final_emission_nonempty = !final_emission.intervals.is_empty();
     let final_emission_equals_successor_carrier = successor_face == final_emission.intervals;
-    let second = terminal.successor.advance(NativeFullOperationOccurrence {
-        ordinal: first_cycle_generation,
-        row_addresses: vec![18_740],
-    })?;
+    let second = terminal
+        .successor
+        .advance(ExtractedOperatorOccurrence::addressed(
+            first_cycle_generation,
+            vec![18_740],
+        ))?;
     println!(
         "{}",
         serde_json::to_string_pretty(&Receipt {
@@ -102,7 +102,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             final_emission_nonempty,
             final_emission_equals_successor_carrier,
             terminal_trace_joins_exactly,
-            second_cycle_first_operation: second.trace.operation.ordinal,
+            second_cycle_first_operation: second.trace.chart.operation.ordinal,
             second_cycle_generation: second.successor.generation(),
             second_cycle_used_returned_successor: second.trace.predecessor_generation
                 == first_cycle_generation

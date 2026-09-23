@@ -3,7 +3,7 @@ use std::path::Path;
 use holonic_engine::{
     embedding_fiber::ResidentReadout,
     native_ecology::holonic_intelligence::{
-        NativeFullOperationOccurrence, NativeFullOperatorSession, NativeOperationPrimitive,
+        ExtractedOperatorOccurrence, ExtractedOperatorSession, NativeOperationPrimitive,
         NativeOperatorResidence, dismantle_full_native_operator, mount_operator_surface,
     },
 };
@@ -37,7 +37,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let surface = mount_operator_surface(&readout)?;
     let mut residence =
         NativeOperatorResidence::mount(&surface, &returned.native, &returned.exterior)?;
-    let mut session = NativeFullOperatorSession::found(&returned.native, &mut residence)?;
+    let mut session = ExtractedOperatorSession::found(&returned.native, &mut residence)?;
     let mut last_rows = 0;
     let mut last_width = 0;
     let mut last_nonempty = false;
@@ -51,10 +51,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Vec::new()
         };
         let step = session
-            .advance(NativeFullOperationOccurrence {
-                ordinal: at as u64,
-                row_addresses: addresses,
-            })
+            .advance(ExtractedOperatorOccurrence::addressed(at as u64, addresses))
             .map_err(|error| {
                 format!(
                     "operation {at} {:?}: {error}",

@@ -4,7 +4,7 @@ use holonics_hna::AthenaTokenApplication;
 use holonic_engine::{
     embedding_fiber::ResidentReadout,
     native_ecology::holonic_intelligence::{
-        NativeFullOperationOccurrence, NativeFullOperatorSession, NativeOperatorResidence,
+        ExtractedOperatorOccurrence, ExtractedOperatorSession, NativeOperatorResidence,
         dismantle_full_native_operator, mount_operator_surface,
     },
 };
@@ -48,30 +48,30 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let surface = mount_operator_surface(&readout)?;
     let mut residence =
         NativeOperatorResidence::mount(&surface, &returned.native, &returned.exterior)?;
-    let session = NativeFullOperatorSession::found(&returned.native, &mut residence)?;
+    let session = ExtractedOperatorSession::found(&returned.native, &mut residence)?;
     let first = session.advance_cycle(&prompt_tokens)?;
-    let first_face = application.render(&first.final_emission)?;
-    let first_emission_width = first.final_emission.width;
+    let first_face = application.render(&first.output.final_emission)?;
+    let first_emission_width = first.output.final_emission.width;
     let first_generation = first.successor.generation();
     let predecessor_occurrence_rejected =
         !first
             .successor
-            .accepts_occurrence(&NativeFullOperationOccurrence {
-                ordinal: first_generation - 1,
-                row_addresses: vec![first_face.selected],
-            });
+            .accepts_occurrence(&ExtractedOperatorOccurrence::addressed(
+                first_generation - 1,
+                vec![first_face.selected],
+            ));
     let independently_rebuilt_generation_rejected =
         !first
             .successor
-            .accepts_occurrence(&NativeFullOperationOccurrence {
-                ordinal: 0,
-                row_addresses: vec![first_face.selected],
-            });
+            .accepts_occurrence(&ExtractedOperatorOccurrence::addressed(
+                0,
+                vec![first_face.selected],
+            ));
     let mut second_context = prompt_tokens.clone();
     second_context.push(first_face.selected);
     let first_successor_generation = first.successor.generation();
     let second = first.successor.advance_cycle(&second_context)?;
-    let second_face = application.render(&second.final_emission)?;
+    let second_face = application.render(&second.output.final_emission)?;
     let vocabulary = 262_144usize;
     println!(
         "{}",
@@ -89,7 +89,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             operation_population_per_cycle: returned.native.operations.len(),
             both_cycles_complete: second.successor.cycle_complete(),
             second_cycle_consumed_first_successor: second
-                .traces
+                .output.traces
                 .first()
                 .is_some_and(|trace| trace.predecessor_generation >= first_successor_generation)
                 && second.successor.generation()
@@ -98,7 +98,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             independently_rebuilt_generation_rejected,
             application_opened_no_coefficient_container: true,
             final_faces_are_native_vocabulary_faces: first_emission_width == vocabulary
-                && second.final_emission.width == vocabulary
+                && second.output.final_emission.width == vocabulary
                 && first_face.score_population == vocabulary
                 && second_face.score_population == vocabulary,
         })?

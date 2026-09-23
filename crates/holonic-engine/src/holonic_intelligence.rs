@@ -18,6 +18,8 @@ mod foreign_json;
 mod foreign_multimodal;
 #[path = "holonic_intelligence/foreign_onnx.rs"]
 mod foreign_onnx;
+#[path = "holonic_intelligence/extracted_operator.rs"]
+mod extracted_operator;
 #[path = "holonic_intelligence/full_operation.rs"]
 mod full_operation;
 #[path = "holonic_intelligence/operative_passage_return.rs"]
@@ -70,6 +72,9 @@ mod rested;
 mod source_neutral;
 #[path = "holonic_intelligence/weight.rs"]
 mod weight;
+#[cfg(test)]
+#[path = "holonic_intelligence/extraction_equality_tests.rs"]
+mod extraction_equality_tests;
 
 pub use circulation::*;
 pub use contact_chart::*;
@@ -78,6 +83,7 @@ pub use dimensions::*;
 pub use foreign_json::*;
 pub use foreign_multimodal::*;
 pub use foreign_onnx::*;
+pub use extracted_operator::*;
 pub use full_operation::*;
 pub use operative_passage_return::*;
 pub use lifecycle::*;

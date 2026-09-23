@@ -4,7 +4,7 @@ use holonics_hna::AthenaTokenApplication;
 use holonic_engine::{
     embedding_fiber::ResidentReadout,
     native_ecology::holonic_intelligence::{
-        NativeFullOperatorSession, NativeOperatorResidence, dismantle_full_native_operator,
+        ExtractedOperatorSession, NativeOperatorResidence, dismantle_full_native_operator,
         mount_operator_surface,
     },
 };
@@ -49,7 +49,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let surface = mount_operator_surface(&readout)?;
     let mut residence =
         NativeOperatorResidence::mount(&surface, &returned.native, &returned.exterior)?;
-    let mut session = NativeFullOperatorSession::found(&returned.native, &mut residence)?;
+    let mut session = ExtractedOperatorSession::found(&returned.native, &mut residence)?;
     let operation_population = returned.native.operations.len();
     let mut faces = Vec::new();
     for (kind, material) in [
@@ -63,7 +63,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let occurrences = application.encode(material)?;
         let predecessor_generation = session.generation();
         let cycle = session.advance_cycle(&occurrences)?;
-        let face = application.render(&cycle.final_emission)?;
+        let face = application.render(&cycle.output.final_emission)?;
         let successor_generation = cycle.successor.generation();
         faces.push(ApplicationFace {
             application: kind,

@@ -225,6 +225,133 @@ impl NativeOperatorMorphology {
         self.norm_gain.iter().try_for_each(|value| value.validate())
     }
 
+    /// [definition] **The branch as an instance of the one constitution chart.** The six-node
+    /// branch is the extracted operator restricted to one layer's interaction: carriers `c0` (the
+    /// entered carrier, which re-enters) and `c1` (the occurrence-entered interaction), then the
+    /// output `c(k+2)` of operation `k` — `contract(P0)`, `gelu·tanh`, the Hadamard product with
+    /// `c1`, `contract(P1)`, the gained RMS rebase `(P2)`, and the re-entry sum with `c0` — over
+    /// the populations `P0 = input [interaction × carrier]`, `P1 = output [carrier ×
+    /// interaction]`, `P2 = gain [carrier]`. The ecology schema requires one layer topology; the
+    /// branch declares its single layer with no causal contact, so its attention topology is
+    /// vacuous. The chart is what the one rest carries; the coefficients stay in the morphology.
+    pub fn constitution_chart(
+        &self,
+    ) -> Result<super::NativeFullOperatorEcology, NativeOperatorMorphologyError> {
+        use super::{
+            NATIVE_FULL_OPERATOR_ECOLOGY_SCHEMA, NativeAttentionTopology, NativeCarrierAxis,
+            NativeCarrierChart, NativeCarrierOrdinal, NativeCoefficientPopulation,
+            NativeKvStanding, NativeLayerTopology, NativeOperationPrimitive, NativeOperatorNode,
+            NativeTensorOrdinal,
+        };
+        self.validate()?;
+        let (carrier, interaction) = (self.carrier_extent, self.interaction_extent);
+        let population = |ordinal: u32, shape: Vec<usize>| NativeCoefficientPopulation {
+            ordinal: NativeTensorOrdinal(ordinal),
+            coefficient_population: shape.iter().map(|extent| *extent as u64).product(),
+            shape,
+        };
+        let widths = [
+            carrier,
+            interaction,
+            interaction,
+            interaction,
+            interaction,
+            carrier,
+            carrier,
+            carrier,
+        ];
+        let operations = self
+            .operations
+            .iter()
+            .enumerate()
+            .map(|(at, kind)| {
+                let output = NativeCarrierOrdinal(at as u32 + 2);
+                let previous = NativeCarrierOrdinal(at as u32 + 1);
+                let (primitive, inputs, coefficients) = match kind {
+                    NativeOperatorKind::Contract { matrix } => {
+                        let population = if matrix == "operator/input-cross-section" {
+                            0
+                        } else {
+                            1
+                        };
+                        let input = if at == 0 {
+                            NativeCarrierOrdinal(0)
+                        } else {
+                            previous
+                        };
+                        (
+                            NativeOperationPrimitive::Contract,
+                            vec![input],
+                            vec![NativeTensorOrdinal(population)],
+                        )
+                    }
+                    NativeOperatorKind::GeluTanh => {
+                        (NativeOperationPrimitive::GeluTanh, vec![previous], vec![])
+                    }
+                    NativeOperatorKind::HadamardOccurrence => (
+                        NativeOperationPrimitive::Hadamard,
+                        vec![previous, NativeCarrierOrdinal(1)],
+                        vec![],
+                    ),
+                    NativeOperatorKind::RmsNorm {
+                        gain_population,
+                        epsilon,
+                    } => (
+                        NativeOperationPrimitive::RmsRebase {
+                            group: *gain_population,
+                            epsilon: epsilon.clone(),
+                            has_gain: true,
+                        },
+                        vec![previous],
+                        vec![NativeTensorOrdinal(2)],
+                    ),
+                    NativeOperatorKind::Reentry => (
+                        NativeOperationPrimitive::Add,
+                        vec![NativeCarrierOrdinal(0), previous],
+                        vec![],
+                    ),
+                };
+                NativeOperatorNode {
+                    ordinal: at as u32,
+                    layer: Some(0),
+                    primitive,
+                    inputs,
+                    output,
+                    coefficients,
+                }
+            })
+            .collect::<Vec<_>>();
+        Ok(super::NativeFullOperatorEcology {
+            schema: NATIVE_FULL_OPERATOR_ECOLOGY_SCHEMA.to_owned(),
+            shared_carrier_extent: carrier,
+            coefficient_populations: vec![
+                population(0, vec![interaction, carrier]),
+                population(1, vec![carrier, interaction]),
+                population(2, vec![carrier]),
+            ],
+            carriers: widths
+                .iter()
+                .enumerate()
+                .map(|(at, width)| NativeCarrierChart {
+                    ordinal: NativeCarrierOrdinal(at as u32),
+                    axes: vec![
+                        NativeCarrierAxis::Occurrence,
+                        NativeCarrierAxis::Fixed(*width),
+                    ],
+                })
+                .collect(),
+            layers: vec![NativeLayerTopology {
+                ordinal: 0,
+                attention: NativeAttentionTopology::Local,
+                kv_standing: NativeKvStanding::Own,
+                first_operation: 0,
+                operation_population: operations.len() as u32,
+            }],
+            operations,
+            coefficient_obstructions: vec![],
+        })
+    }
+
     pub fn epsilon(&self) -> &Rat {
         match self.operations.get(4) {
             Some(NativeOperatorKind::RmsNorm { epsilon, .. }) => epsilon,
@@ -256,12 +383,13 @@ pub struct NativeOperatorInsufficiency {
     pub open: Vec<String>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
-pub struct NativeOperatorDismantlingReturn {
-    pub native: NativeOperatorMorphology,
-    pub exterior: NativeOperatorColdWitness,
-    pub insufficiency: NativeOperatorInsufficiency,
-}
+/// The extraction of one layer's interaction branch (plan phase 15): the branch morphology, its
+/// cold witness and the insufficiency of the rest of the source graph.
+pub type NativeOperatorDismantlingReturn = crate::soulkiller::ExtractionReturn<
+    NativeOperatorMorphology,
+    NativeOperatorColdWitness,
+    NativeOperatorInsufficiency,
+>;
 
 #[derive(Debug, Error)]
 pub enum NativeOperatorMorphologyError {
@@ -449,6 +577,78 @@ mod tests {
                 .expect("wire")
                 .windows(b"cold/name".len())
                 .any(|window| window == b"cold/name")
+        );
+    }
+
+    #[test]
+    fn the_branch_is_an_instance_of_the_one_constitution_chart() {
+        let coefficient = |word: u16| NativeDyadicCoefficient::from_bfloat16(word).unwrap();
+        let matrix = |address: &str, rows: usize, columns: usize| NativeDyadicMatrix {
+            address: address.into(),
+            rows,
+            columns,
+            coefficients: vec![coefficient(0x3f80); rows * columns],
+        };
+        let morphology = NativeOperatorMorphology {
+            schema: NATIVE_OPERATOR_MORPHOLOGY_SCHEMA.into(),
+            carrier_extent: 4,
+            interaction_extent: 2,
+            matrices: vec![
+                matrix("operator/input-cross-section", 2, 4),
+                matrix("operator/output-cross-section", 4, 2),
+            ],
+            norm_gain: vec![coefficient(0x3f80); 4],
+            operations: vec![
+                NativeOperatorKind::Contract {
+                    matrix: "operator/input-cross-section".into(),
+                },
+                NativeOperatorKind::GeluTanh,
+                NativeOperatorKind::HadamardOccurrence,
+                NativeOperatorKind::Contract {
+                    matrix: "operator/output-cross-section".into(),
+                },
+                NativeOperatorKind::RmsNorm {
+                    gain_population: 4,
+                    epsilon: Rat::new(1.into(), 1_000_000.into()),
+                },
+                NativeOperatorKind::Reentry,
+            ],
+            open_exterior: vec![],
+        };
+        let chart = morphology.constitution_chart().unwrap();
+        chart.validate().unwrap();
+        let width = |carrier: &super::super::NativeCarrierOrdinal| match chart.carriers
+            [carrier.0 as usize]
+            .axes[1]
+        {
+            super::super::NativeCarrierAxis::Fixed(width) => width,
+            _ => unreachable!(),
+        };
+        for node in &chart.operations {
+            match &node.primitive {
+                super::super::NativeOperationPrimitive::Contract => {
+                    let shape =
+                        &chart.coefficient_populations[node.coefficients[0].0 as usize].shape;
+                    assert_eq!(
+                        width(&node.inputs[0]),
+                        shape[1],
+                        "contraction input is the population's dim"
+                    );
+                    assert_eq!(width(&node.output), shape[0]);
+                }
+                super::super::NativeOperationPrimitive::Hadamard
+                | super::super::NativeOperationPrimitive::Add => {
+                    assert_eq!(width(&node.inputs[0]), width(&node.inputs[1]));
+                    assert_eq!(width(&node.inputs[0]), width(&node.output));
+                }
+                _ => assert_eq!(width(&node.inputs[0]), width(&node.output)),
+            }
+        }
+        // The re-entry sums the entered carrier c0 with the rebased branch output.
+        assert_eq!(chart.operations[5].inputs[0].0, 0);
+        assert_eq!(
+            chart.operations[2].inputs[1].0, 1,
+            "the occurrence-entered interaction"
         );
     }
 }

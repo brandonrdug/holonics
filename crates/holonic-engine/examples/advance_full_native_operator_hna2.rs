@@ -3,7 +3,7 @@ use std::path::Path;
 use holonic_engine::{
     embedding_fiber::ResidentReadout,
     native_ecology::holonic_intelligence::{
-        NativeFullOperationOccurrence, NativeFullOperatorSession, NativeOperatorResidence,
+        ExtractedOperatorOccurrence, ExtractedOperatorSession, NativeOperatorResidence,
         dismantle_full_native_operator, mount_operator_surface,
     },
 };
@@ -39,26 +39,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let surface = mount_operator_surface(&readout)?;
     let mut residence =
         NativeOperatorResidence::mount(&surface, &returned.native, &returned.exterior)?;
-    let session = NativeFullOperatorSession::found(&returned.native, &mut residence)?;
-    let first = session.advance(NativeFullOperationOccurrence {
-        ordinal: 0,
-        row_addresses: vec![818, 18_740],
-    })?;
+    let session = ExtractedOperatorSession::found(&returned.native, &mut residence)?;
+    let first = session.advance(ExtractedOperatorOccurrence::addressed(0, vec![818, 18_740]))?;
     let distinct_occurrences_return_distinct_native_carriers = first.emission.intervals
         [..first.emission.width]
         != first.emission.intervals[first.emission.width..];
-    let second = first.successor.advance(NativeFullOperationOccurrence {
-        ordinal: 1,
-        row_addresses: vec![818, 18_740],
-    })?;
-    let reshaped = second.successor.advance(NativeFullOperationOccurrence {
-        ordinal: 2,
-        row_addresses: Vec::new(),
-    })?;
-    let step = reshaped.successor.advance(NativeFullOperationOccurrence {
-        ordinal: 3,
-        row_addresses: Vec::new(),
-    })?;
+    let second = first
+        .successor
+        .advance(ExtractedOperatorOccurrence::addressed(1, vec![818, 18_740]))?;
+    let reshaped = second
+        .successor
+        .advance(ExtractedOperatorOccurrence::internal(2))?;
+    let step = reshaped
+        .successor
+        .advance(ExtractedOperatorOccurrence::internal(3))?;
     let trace = serde_json::to_vec(&step.trace)?;
     let carries = |needle: &[u8]| trace.windows(needle.len()).any(|window| window == needle);
     let point_interval_population = step

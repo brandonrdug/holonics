@@ -627,7 +627,7 @@ not seven new engines. Head indices label parallel charts; layer indices label c
 Neither index determines a physical level or a text-generation clock. The general HNN
 incidence and current/material equations in §1 decide which maps and subdivisions apply.
 The earlier native `operative_atlas` actually composes Q/K/V, RoPE, masked multihead contact,
-output contraction, residuals and gated reaction through `NativeFullOperatorSession`.
+output contraction, residuals and gated reaction through `ExtractedOperatorSession`.
 The active constitutive field's normalized receiver and contact adjoints are separate owners;
 the presence of the earlier graph does not connect that graph to this field automatically.
 

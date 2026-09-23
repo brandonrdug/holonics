@@ -118,6 +118,33 @@ pub struct NativeSeparation {
     pub right_face: u32,
 }
 
+impl NativeSignatureClass {
+    /// The class as the core [`PreimageFibre`](holonic_core::restriction::PreimageFibre) of the
+    /// signature quotient (plan phase 15): the signature and every occurrence it merges.
+    pub fn preimage_fibre(
+        &self,
+    ) -> holonic_core::restriction::PreimageFibre<NativeSignature, Vec<usize>> {
+        holonic_core::restriction::PreimageFibre::new(
+            self.signature.clone(),
+            self.occurrences.clone(),
+        )
+    }
+}
+
+impl NativeSeparation {
+    /// The core [`Separation`](holonic_core::restriction::Separation) (plan phase 15): the two
+    /// occurrences the coarser exposure family merged, witnessed by the declared exposure that
+    /// separates them, with their two faces there as the readings.
+    pub fn separation(&self) -> holonic_core::restriction::Separation<usize, NativeExposure, u32> {
+        holonic_core::restriction::Separation::new(
+            self.left,
+            self.right,
+            self.exposure.clone(),
+            (self.left_face, self.right_face),
+        )
+    }
+}
+
 /// The signature quotient of a declared family with its extent and insufficiency.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeSignatureQuotient {
@@ -382,6 +409,23 @@ mod tests {
         assert_eq!(quotient.separations[0].right, 1);
         assert_eq!(quotient.extent_population, 4);
         assert_eq!(quotient.insufficiency_population, 0);
+        // The separation is the core descent defect: merged at the empty history, separated at [5].
+        let separation = quotient.separations[0].separation();
+        assert_eq!(separation.pair(), (0, 1));
+        assert_eq!(separation.witness().history, vec![5]);
+        assert_eq!(separation.readings(), &(5, 6));
+        // Every class is the core preimage fibre of its signature; the fibres partition the family.
+        let mut members: Vec<usize> = quotient
+            .classes
+            .iter()
+            .flat_map(|class| {
+                let fibre = class.preimage_fibre();
+                assert_eq!(fibre.native, class.signature);
+                fibre.members
+            })
+            .collect();
+        members.sort_unstable();
+        assert_eq!(members, vec![0, 1, 2]);
         // Without the separating history the two are one class with the union cone.
         let coarse: Vec<NativeExposureFace> = faces
             .into_iter()

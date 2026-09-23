@@ -1,20 +1,29 @@
-//! Resident recurrence over one source-neutral operator morphology.
+//! The branch session: the extracted per-layer interaction branch, advanced one operation at a
+//! time on its host-entered carriers ([`super::extracted_operator`]).
 //!
 //! Every mathematical operation is one step. Its resident carrier is moved into the next step;
-//! no exterior verdict, candidate, commit, or reconstructed predecessor sits between them.
+//! no exterior verdict, candidate, commit, or reconstructed predecessor sits between them. The
+//! branch rests in the one rest ([`ExtractedOperatorRest`]) on its constitution chart
+//! (`NativeOperatorMorphology::constitution_chart`); its legacy JSON wire still decodes.
 
-use serde::{Deserialize, Serialize};
-use thiserror::Error;
+use std::collections::BTreeMap;
+
+use serde::Deserialize;
 
 use crate::{
     embedding_fiber::{MountedReadout, ResidentReadout},
     resident_section::{
-        Dyadic, ResidentGrain, ResidentRefusal, ResidentSection, ResidentSectionRest,
-        ResidentSurface, SeriesAperture, TransferCensus,
+        Dyadic, ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface,
+        SeriesAperture,
     },
 };
 
-use super::{NativeOperatorKind, NativeOperatorMorphology, NativeOperatorMorphologyError};
+use super::{
+    BranchTraceChart, ExtractedOperatorAdvance, ExtractedOperatorBranch, ExtractedOperatorEmission,
+    ExtractedOperatorOccurrence, ExtractedOperatorRefusal, ExtractedOperatorRest,
+    ExtractedOperatorRestHeader, ExtractedOperatorStep, ExtractedOperatorTrace,
+    NATIVE_SESSION_REST_SCHEMA, NativeCarrierOrdinal, NativeOperatorKind, NativeOperatorMorphology,
+};
 
 pub const NATIVE_OPERATOR_STEP_SCHEMA: &str = "holonic-engine.native-operator-step.v1";
 pub const NATIVE_OPERATOR_SESSION_REST_SCHEMA: &str =
@@ -37,7 +46,7 @@ impl<'morphology, 'chart> ResidentOperatorMorphology<'morphology, 'chart> {
     pub fn mount(
         surface: &'chart ResidentSurface<'chart>,
         morphology: &'morphology NativeOperatorMorphology,
-    ) -> Result<Self, NativeOperatorExecutionError> {
+    ) -> Result<Self, ExtractedOperatorRefusal> {
         morphology.validate()?;
         let readout = surface.readout();
         let input = readout.mount_bfloat16(
@@ -80,9 +89,9 @@ impl<'morphology, 'chart> ResidentOperatorMorphology<'morphology, 'chart> {
     pub fn finest_initial_grain(
         &self,
         carrier_words: &[u16],
-    ) -> Result<ResidentGrain, NativeOperatorExecutionError> {
+    ) -> Result<ResidentGrain, ExtractedOperatorRefusal> {
         if carrier_words.len() != self.morphology.carrier_extent {
-            return Err(NativeOperatorExecutionError::CarrierExtent);
+            return Err(ExtractedOperatorRefusal::CarrierExtent);
         }
         let section_word_octaves = i64::BITS - 1;
         (0..=ResidentSurface::carrier_octaves().min(section_word_octaves))
@@ -121,17 +130,17 @@ impl<'morphology, 'chart> ResidentOperatorMorphology<'morphology, 'chart> {
                     .ok()
                     .map(|_| grain)
             })
-            .ok_or(NativeOperatorExecutionError::NoAdmittedGrain)
+            .ok_or(ExtractedOperatorRefusal::NoAdmittedGrain)
     }
 
     pub fn mount_initial<'resident>(
         &'resident self,
         carrier_words: &[u16],
         grain: ResidentGrain,
-    ) -> Result<NativeOperatorSession<'resident, 'morphology, 'chart>, NativeOperatorExecutionError>
+    ) -> Result<ExtractedBranchSession<'resident, 'morphology, 'chart>, ExtractedOperatorRefusal>
     {
         if carrier_words.len() != self.morphology.carrier_extent {
-            return Err(NativeOperatorExecutionError::CarrierExtent);
+            return Err(ExtractedOperatorRefusal::CarrierExtent);
         }
         let shape = self.surface.shape_enter(
             1,
@@ -153,12 +162,12 @@ impl<'morphology, 'chart> ResidentOperatorMorphology<'morphology, 'chart> {
         builder.close(0, &carrier, shape.needed)?;
         let reading = builder.finish()?.launch()?;
         let bound = exact_bound(&reading).map_err(|flags| {
-            NativeOperatorExecutionError::ResidentObstruction {
-                operation: "enter".to_owned(),
+            ExtractedOperatorRefusal::ResidentObstruction {
+                operation: u32::MAX,
                 flags,
             }
         })?;
-        Ok(NativeOperatorSession {
+        Ok(ExtractedBranchSession {
             resident: self,
             carrier,
             carrier_bound: bound,
@@ -168,75 +177,26 @@ impl<'morphology, 'chart> ResidentOperatorMorphology<'morphology, 'chart> {
             chronology: Vec::new(),
         })
     }
-
-    pub fn remount_session<'resident>(
-        &'resident self,
-        rest: &NativeOperatorSessionRest,
-    ) -> Result<NativeOperatorSession<'resident, 'morphology, 'chart>, NativeOperatorExecutionError>
-    {
-        rest.validate(self.morphology.operations.len())?;
-        let carrier_rest = ResidentSectionRest::read(&rest.carrier_wire)
-            .map_err(NativeOperatorExecutionError::Rest)?;
-        let carrier = self.surface.mount_section_rest(&carrier_rest)?;
-        let retained_reentry = rest
-            .retained_reentry_wire
-            .as_deref()
-            .map(ResidentSectionRest::read)
-            .transpose()
-            .map_err(NativeOperatorExecutionError::Rest)?
-            .as_ref()
-            .map(|retained| self.surface.mount_section_rest(retained))
-            .transpose()?
-            .zip(rest.retained_reentry_bound);
-        Ok(NativeOperatorSession {
-            resident: self,
-            carrier,
-            carrier_bound: rest.carrier_bound,
-            retained_reentry,
-            operation_at: rest.operation_at,
-            generation: rest.generation,
-            chronology: rest.chronology.clone(),
-        })
-    }
 }
 
-/// One ordinary occurrence. Only Hadamard contact consumes an additional carrier population.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct NativeOperatorOccurrence {
-    pub ordinal: u64,
-    pub interaction_words: Vec<u16>,
+/// The legacy JSON wire of a branch session rest (`holonic-engine.native-operator-session-rest.v1`).
+/// It is decoded into the one rest, [`ExtractedOperatorRest`], and never written.
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct BranchRestWire {
+    schema: String,
+    carrier_wire: Vec<u8>,
+    retained_reentry_wire: Option<Vec<u8>>,
+    retained_reentry_bound: Option<u32>,
+    carrier_bound: u32,
+    operation_at: usize,
+    generation: u64,
+    chronology: Vec<u64>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
-pub struct NativeOperatorEmission {
-    pub generation: u64,
-    pub operation: NativeOperatorKind,
-    pub rows: usize,
-    pub width: usize,
-    pub grain: u32,
-    pub intervals: Vec<(i64, i64)>,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
-pub struct NativeOperatorTrace {
-    pub schema: String,
-    pub predecessor_generation: u64,
-    pub successor_generation: u64,
-    pub occurrence: u64,
-    pub chronology: Vec<u64>,
-    pub operation: NativeOperatorKind,
-    pub predecessor_width: usize,
-    pub successor_width: usize,
-    pub resident_coefficient_octets: usize,
-    pub passage_slot_population: usize,
-    pub refusal_population: usize,
-    pub successor_bound_octaves: u32,
-    pub census_before: TransferCensus,
-    pub census_after: TransferCensus,
-}
-
-/// The move-owned contemporary ecology. Coefficients remain resident; the carrier itself advances.
-pub struct NativeOperatorSession<'resident, 'morphology, 'chart> {
+/// The branch session: the per-layer interaction branch advanced one operation at a time on its
+/// host-entered carriers. Coefficients remain resident; the carrier itself advances.
+pub struct ExtractedBranchSession<'resident, 'morphology, 'chart> {
     resident: &'resident ResidentOperatorMorphology<'morphology, 'chart>,
     carrier: ResidentSection<'chart>,
     carrier_bound: u32,
@@ -246,71 +206,168 @@ pub struct NativeOperatorSession<'resident, 'morphology, 'chart> {
     chronology: Vec<u64>,
 }
 
-pub struct NativeOperatorStep<'resident, 'morphology, 'chart> {
-    pub emission: NativeOperatorEmission,
-    pub trace: NativeOperatorTrace,
-    pub successor: NativeOperatorSession<'resident, 'morphology, 'chart>,
+/// The branch's two entered carriers precede the outputs of its operations in the chart:
+/// `c0` the entered (and re-entering) carrier, `c1` the occurrence-entered interaction.
+const BRANCH_ENTERED: u32 = 2;
+
+fn branch_output(operation: usize) -> NativeCarrierOrdinal {
+    NativeCarrierOrdinal(BRANCH_ENTERED + operation as u32)
 }
 
-pub struct NativeOperatorBranch<'resident, 'morphology, 'chart> {
-    pub emissions: Vec<NativeOperatorEmission>,
-    pub traces: Vec<NativeOperatorTrace>,
-    pub successor: NativeOperatorSession<'resident, 'morphology, 'chart>,
+/// Where the branch's current carrier sits in the constitution chart: the entered carrier before
+/// any operation, else the output of the last enacted operation.
+fn branch_current(operation_at: usize, generation: u64, operations: usize) -> NativeCarrierOrdinal {
+    if generation == 0 {
+        NativeCarrierOrdinal(0)
+    } else {
+        branch_output((operation_at + operations - 1) % operations)
+    }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct NativeOperatorSessionRest {
-    pub schema: String,
-    pub carrier_wire: Vec<u8>,
-    pub retained_reentry_wire: Option<Vec<u8>>,
-    pub retained_reentry_bound: Option<u32>,
-    pub carrier_bound: u32,
-    pub operation_at: usize,
-    pub generation: u64,
-    pub chronology: Vec<u64>,
-}
-
-impl NativeOperatorSessionRest {
-    pub fn validate(
-        &self,
-        operation_population: usize,
-    ) -> Result<(), NativeOperatorExecutionError> {
-        let carrier = ResidentSectionRest::read(&self.carrier_wire)
-            .map_err(NativeOperatorExecutionError::Rest)?;
-        if self.schema != NATIVE_OPERATOR_SESSION_REST_SCHEMA
-            || operation_population == 0
-            || self.operation_at >= operation_population
-            || self.chronology.len() as u64 != self.generation
-            || self.operation_at != self.generation as usize % operation_population
-            || carrier.bound_octaves != self.carrier_bound
-            || self.retained_reentry_wire.is_some() != self.retained_reentry_bound.is_some()
+impl<'morphology, 'chart> ResidentOperatorMorphology<'morphology, 'chart> {
+    /// Remount a branch session from the one rest. The rest's constitution chart must be this
+    /// morphology's own chart; the branch holds no overlay, terminal face or apparatus.
+    pub fn remount_session<'resident>(
+        &'resident self,
+        rest: &ExtractedOperatorRest,
+    ) -> Result<ExtractedBranchSession<'resident, 'morphology, 'chart>, ExtractedOperatorRefusal>
+    {
+        rest.validate()?;
+        let operations = self.morphology.operations.len();
+        let header = &rest.header;
+        let current = branch_current(header.operation_at, header.generation, operations);
+        let malformed =
+            || ExtractedOperatorRefusal::Rest("the branch session rest is malformed".into());
+        if header.ecology != self.morphology.constitution_chart()?
+            || header.operation_at >= operations
+            || header.operation_at != header.generation as usize % operations
+            || header.row_population.is_some()
+            || header.previous_context.is_some()
+            || header.aperture.is_some()
+            || header.progress.is_some()
+            || !rest.checkpoints.is_empty()
+            || rest.terminal_carrier.is_some()
+            || !rest.overlay.is_empty()
+            || rest.passage.is_some()
+            || rest.reuse.is_some()
+            || rest.carriers.keys().any(|at| *at != current && at.0 != 0)
         {
-            return Err(NativeOperatorExecutionError::Rest(
+            return Err(malformed());
+        }
+        let held = rest.carriers.get(&current).ok_or_else(malformed)?;
+        if held.grain.0 != header.grain {
+            return Err(malformed());
+        }
+        let carrier = self.surface.mount_section_rest(held)?;
+        let retained_reentry = match rest.carriers.get(&NativeCarrierOrdinal(0)) {
+            Some(retained) if current.0 != 0 => Some((
+                self.surface.mount_section_rest(retained)?,
+                retained.bound_octaves,
+            )),
+            _ => None,
+        };
+        Ok(ExtractedBranchSession {
+            resident: self,
+            carrier,
+            carrier_bound: held.bound_octaves,
+            retained_reentry,
+            operation_at: header.operation_at,
+            generation: header.generation,
+            chronology: header.chronology.clone(),
+        })
+    }
+
+    /// Decode the legacy JSON wire of a branch session rest into the one rest, on this
+    /// morphology's constitution chart. The wire's own checks are kept.
+    pub fn read_legacy_rest(
+        &self,
+        bytes: &[u8],
+    ) -> Result<ExtractedOperatorRest, ExtractedOperatorRefusal> {
+        let wire: BranchRestWire = serde_json::from_slice(bytes)
+            .map_err(|error| ExtractedOperatorRefusal::Rest(error.to_string()))?;
+        let operations = self.morphology.operations.len();
+        let carrier = ResidentSectionRest::read(&wire.carrier_wire)
+            .map_err(ExtractedOperatorRefusal::Rest)?;
+        let retained = wire
+            .retained_reentry_wire
+            .as_deref()
+            .map(ResidentSectionRest::read)
+            .transpose()
+            .map_err(ExtractedOperatorRefusal::Rest)?;
+        if wire.schema != NATIVE_OPERATOR_SESSION_REST_SCHEMA
+            || operations == 0
+            || wire.operation_at >= operations
+            || wire.chronology.len() as u64 != wire.generation
+            || wire.operation_at != wire.generation as usize % operations
+            || carrier.bound_octaves != wire.carrier_bound
+            || retained.is_some() != wire.retained_reentry_bound.is_some()
+            || retained
+                .as_ref()
+                .zip(wire.retained_reentry_bound)
+                .is_some_and(|(section, bound)| section.bound_octaves != bound)
+        {
+            return Err(ExtractedOperatorRefusal::Rest(
                 "the recurrent session rest is malformed".to_owned(),
             ));
         }
-        if let Some(wire) = &self.retained_reentry_wire {
-            ResidentSectionRest::read(wire).map_err(NativeOperatorExecutionError::Rest)?;
+        let current = branch_current(wire.operation_at, wire.generation, operations);
+        let grain = carrier.grain.0;
+        let mut carriers = BTreeMap::from([(current, carrier)]);
+        if let Some(retained) = retained {
+            if current.0 == 0 {
+                return Err(ExtractedOperatorRefusal::Rest(
+                    "the entered carrier cannot also be retained".to_owned(),
+                ));
+            }
+            carriers.insert(NativeCarrierOrdinal(0), retained);
         }
-        Ok(())
-    }
-
-    pub fn canonical_bytes(&self) -> Result<Vec<u8>, NativeOperatorExecutionError> {
-        self.validate(6)?;
-        serde_json::to_vec(self)
-            .map_err(|error| NativeOperatorExecutionError::Rest(error.to_string()))
-    }
-
-    pub fn read(bytes: &[u8]) -> Result<Self, NativeOperatorExecutionError> {
-        let rest: Self = serde_json::from_slice(bytes)
-            .map_err(|error| NativeOperatorExecutionError::Rest(error.to_string()))?;
-        rest.validate(6)?;
+        let rest = branch_rest(
+            self.morphology.constitution_chart()?,
+            wire.operation_at,
+            wire.generation,
+            wire.chronology,
+            grain,
+            carriers,
+        );
+        rest.validate()?;
         Ok(rest)
     }
 }
 
-impl<'resident, 'morphology, 'chart> NativeOperatorSession<'resident, 'morphology, 'chart> {
+fn branch_rest(
+    ecology: super::NativeFullOperatorEcology,
+    operation_at: usize,
+    generation: u64,
+    chronology: Vec<u64>,
+    grain: u32,
+    carriers: BTreeMap<NativeCarrierOrdinal, ResidentSectionRest>,
+) -> ExtractedOperatorRest {
+    ExtractedOperatorRest {
+        header: ExtractedOperatorRestHeader {
+            schema: NATIVE_SESSION_REST_SCHEMA.into(),
+            ecology,
+            operation_at,
+            generation,
+            chronology,
+            grain,
+            row_population: None,
+            cycle_complete: generation > 0 && operation_at == 0,
+            previous_context: None,
+            aperture: None,
+            terminal_seal: true,
+            progress: None,
+            interruption: None,
+        },
+        carriers,
+        checkpoints: BTreeMap::new(),
+        terminal_carrier: None,
+        overlay: BTreeMap::new(),
+        passage: None,
+        reuse: None,
+    }
+}
+
+impl<'resident, 'morphology, 'chart> ExtractedBranchSession<'resident, 'morphology, 'chart> {
     pub fn generation(&self) -> u64 {
         self.generation
     }
@@ -323,38 +380,31 @@ impl<'resident, 'morphology, 'chart> NativeOperatorSession<'resident, 'morpholog
         self.operation_at
     }
 
-    pub fn rest(&self) -> Result<NativeOperatorSessionRest, NativeOperatorExecutionError> {
-        let carrier_wire = self
-            .resident
-            .surface
-            .detach_section(&self.carrier, self.carrier_bound)?
-            .canonical_bytes()
-            .map_err(NativeOperatorExecutionError::Rest)?;
-        let retained_reentry_wire = self
-            .retained_reentry
-            .as_ref()
-            .map(|(section, bound)| {
-                self.resident
-                    .surface
-                    .detach_section(section, *bound)?
-                    .canonical_bytes()
-                    .map_err(|error| ResidentRefusal::Declaration {
-                        operation: "operator-rest",
-                        what: error,
-                    })
-            })
-            .transpose()?;
-        let rest = NativeOperatorSessionRest {
-            schema: NATIVE_OPERATOR_SESSION_REST_SCHEMA.to_owned(),
-            carrier_wire,
-            retained_reentry_wire,
-            retained_reentry_bound: self.retained_reentry.as_ref().map(|(_, bound)| *bound),
-            carrier_bound: self.carrier_bound,
-            operation_at: self.operation_at,
-            generation: self.generation,
-            chronology: self.chronology.clone(),
-        };
-        rest.validate(self.resident.morphology.operations.len())?;
+    /// The one rest: the current carrier at its place in the constitution chart and, inside the
+    /// word, the retained re-entry carrier at the entered carrier's place.
+    pub fn rest(&self) -> Result<ExtractedOperatorRest, ExtractedOperatorRefusal> {
+        let surface = self.resident.surface;
+        let operations = self.resident.morphology.operations.len();
+        let current = branch_current(self.operation_at, self.generation, operations);
+        let mut carriers = BTreeMap::from([(
+            current,
+            surface.detach_section(&self.carrier, self.carrier_bound)?,
+        )]);
+        if let Some((section, bound)) = &self.retained_reentry {
+            carriers.insert(
+                NativeCarrierOrdinal(0),
+                surface.detach_section(section, *bound)?,
+            );
+        }
+        let rest = branch_rest(
+            self.resident.morphology.constitution_chart()?,
+            self.operation_at,
+            self.generation,
+            self.chronology.clone(),
+            self.carrier.grain().0,
+            carriers,
+        );
+        rest.validate()?;
         Ok(rest)
     }
 
@@ -363,29 +413,25 @@ impl<'resident, 'morphology, 'chart> NativeOperatorSession<'resident, 'morpholog
     pub fn advance_branch(
         mut self,
         interaction_words: &[u16],
-    ) -> Result<NativeOperatorBranch<'resident, 'morphology, 'chart>, NativeOperatorExecutionError>
-    {
+    ) -> Result<ExtractedOperatorBranch<Self>, ExtractedOperatorRefusal> {
         let extent = self.resident.morphology.operations.len();
         let mut emissions = Vec::with_capacity(extent);
         let mut traces = Vec::with_capacity(extent);
         for _ in 0..extent {
-            let occurrence = NativeOperatorOccurrence {
-                ordinal: self.generation,
-                interaction_words: if matches!(
-                    self.resident.morphology.operations[self.operation_at],
-                    NativeOperatorKind::HadamardOccurrence
-                ) {
-                    interaction_words.to_vec()
-                } else {
-                    Vec::new()
-                },
+            let occurrence = if matches!(
+                self.resident.morphology.operations[self.operation_at],
+                NativeOperatorKind::HadamardOccurrence
+            ) {
+                ExtractedOperatorOccurrence::entered(self.generation, interaction_words.to_vec())
+            } else {
+                ExtractedOperatorOccurrence::internal(self.generation)
             };
             let step = self.advance(occurrence)?;
             emissions.push(step.emission);
             traces.push(step.trace);
             self = step.successor;
         }
-        Ok(NativeOperatorBranch {
+        Ok(ExtractedOperatorBranch {
             emissions,
             traces,
             successor: self,
@@ -394,22 +440,21 @@ impl<'resident, 'morphology, 'chart> NativeOperatorSession<'resident, 'morpholog
 
     pub fn advance(
         self,
-        occurrence: NativeOperatorOccurrence,
-    ) -> Result<NativeOperatorStep<'resident, 'morphology, 'chart>, NativeOperatorExecutionError>
-    {
-        if occurrence.ordinal != self.generation {
-            return Err(NativeOperatorExecutionError::Occurrence);
+        occurrence: ExtractedOperatorOccurrence,
+    ) -> Result<ExtractedOperatorStep<Self>, ExtractedOperatorRefusal> {
+        if occurrence.ordinal != self.generation || !occurrence.row_addresses.is_empty() {
+            return Err(ExtractedOperatorRefusal::Occurrence);
         }
         let morphology = self.resident.morphology;
+        let operation_at = self.operation_at;
         let operation = morphology
             .operations
             .get(self.operation_at)
             .cloned()
-            .ok_or(NativeOperatorExecutionError::Operation)?;
+            .ok_or(ExtractedOperatorRefusal::Operation)?;
         let surface = self.resident.surface;
         let predecessor_width = self.carrier.width();
         let grain = self.carrier.grain();
-
         let (successor_carrier, reading, retained_reentry) = match &operation {
             NativeOperatorKind::Contract { matrix } if matrix == "operator/input-cross-section" => {
                 require_empty(&occurrence)?;
@@ -455,7 +500,7 @@ impl<'resident, 'morphology, 'chart> NativeOperatorSession<'resident, 'morpholog
             }
             NativeOperatorKind::HadamardOccurrence => {
                 if occurrence.interaction_words.len() != predecessor_width {
-                    return Err(NativeOperatorExecutionError::InteractionExtent);
+                    return Err(ExtractedOperatorRefusal::InteractionExtent);
                 }
                 let interaction_shape = surface.shape_enter(
                     1,
@@ -507,7 +552,7 @@ impl<'resident, 'morphology, 'chart> NativeOperatorSession<'resident, 'morpholog
             } => {
                 require_empty(&occurrence)?;
                 if *gain_population != predecessor_width {
-                    return Err(NativeOperatorExecutionError::Operation);
+                    return Err(ExtractedOperatorRefusal::Operation);
                 }
                 let shape = surface.shape_rms_rebase(
                     1,
@@ -536,7 +581,7 @@ impl<'resident, 'morphology, 'chart> NativeOperatorSession<'resident, 'morpholog
                 require_empty(&occurrence)?;
                 let (retained, retained_bound) = self
                     .retained_reentry
-                    .ok_or(NativeOperatorExecutionError::MissingReentry)?;
+                    .ok_or(ExtractedOperatorRefusal::MissingReentry)?;
                 let shape = surface.shape_re_entry(
                     1,
                     predecessor_width,
@@ -551,11 +596,11 @@ impl<'resident, 'morphology, 'chart> NativeOperatorSession<'resident, 'morpholog
                 let reading = builder.finish()?.launch()?;
                 (out, reading, None)
             }
-            _ => return Err(NativeOperatorExecutionError::Operation),
+            _ => return Err(ExtractedOperatorRefusal::Operation),
         };
         let successor_bound = exact_bound(&reading).map_err(|flags| {
-            NativeOperatorExecutionError::ResidentObstruction {
-                operation: format!("{operation:?}"),
+            ExtractedOperatorRefusal::ResidentObstruction {
+                operation: operation_at as u32,
                 flags,
             }
         })?;
@@ -563,37 +608,41 @@ impl<'resident, 'morphology, 'chart> NativeOperatorSession<'resident, 'morpholog
         let successor_generation = self
             .generation
             .checked_add(1)
-            .ok_or(NativeOperatorExecutionError::Generation)?;
+            .ok_or(ExtractedOperatorRefusal::Generation)?;
         let mut chronology = self.chronology;
         chronology.push(occurrence.ordinal);
         let next_operation = (self.operation_at + 1) % morphology.operations.len();
         let successor_width = successor_carrier.width();
-        Ok(NativeOperatorStep {
-            emission: NativeOperatorEmission {
+        Ok(ExtractedOperatorStep {
+            emission: ExtractedOperatorEmission {
                 generation: successor_generation,
                 operation: operation.clone(),
+                carrier: branch_output(operation_at),
                 rows: successor_carrier.rows(),
                 width: successor_width,
                 grain: grain.0,
                 intervals,
+                projection: None,
             },
-            trace: NativeOperatorTrace {
+            trace: ExtractedOperatorTrace {
                 schema: NATIVE_OPERATOR_STEP_SCHEMA.to_owned(),
                 predecessor_generation: self.generation,
                 successor_generation,
                 occurrence: occurrence.ordinal,
-                chronology: chronology.clone(),
-                operation,
-                predecessor_width,
-                successor_width,
-                resident_coefficient_octets: self.resident.resident_coefficient_octets(),
-                passage_slot_population: reading.slots.len(),
-                refusal_population: reading.obstruction.refusals.len(),
                 successor_bound_octaves: successor_bound,
+                resident_coefficient_octets: self.resident.resident_coefficient_octets() as u64,
                 census_before: reading.census_before,
                 census_after: reading.census_after,
+                chart: BranchTraceChart {
+                    chronology: chronology.clone(),
+                    operation,
+                    predecessor_width,
+                    successor_width,
+                    passage_slot_population: reading.slots.len(),
+                    refusal_population: reading.obstruction.refusals.len(),
+                },
             },
-            successor: NativeOperatorSession {
+            successor: ExtractedBranchSession {
                 resident: self.resident,
                 carrier: successor_carrier,
                 carrier_bound: successor_bound,
@@ -606,13 +655,35 @@ impl<'resident, 'morphology, 'chart> NativeOperatorSession<'resident, 'morpholog
     }
 }
 
-fn require_empty(
-    occurrence: &NativeOperatorOccurrence,
-) -> Result<(), NativeOperatorExecutionError> {
+impl ExtractedOperatorAdvance for ExtractedBranchSession<'_, '_, '_> {
+    type Operation = NativeOperatorKind;
+    type TraceChart = BranchTraceChart;
+
+    fn generation(&self) -> u64 {
+        self.generation
+    }
+
+    fn operation_at(&self) -> usize {
+        self.operation_at
+    }
+
+    fn chronology(&self) -> &[u64] {
+        &self.chronology
+    }
+
+    fn advance_occurrence(
+        self,
+        occurrence: ExtractedOperatorOccurrence,
+    ) -> Result<ExtractedOperatorStep<Self>, ExtractedOperatorRefusal> {
+        self.advance(occurrence)
+    }
+}
+
+fn require_empty(occurrence: &ExtractedOperatorOccurrence) -> Result<(), ExtractedOperatorRefusal> {
     if occurrence.interaction_words.is_empty() {
         Ok(())
     } else {
-        Err(NativeOperatorExecutionError::InteractionExtent)
+        Err(ExtractedOperatorRefusal::InteractionExtent)
     }
 }
 
@@ -627,43 +698,8 @@ fn exact_bound(reading: &crate::resident_section::PassageReading) -> Result<u32,
         .unwrap_or(1))
 }
 
-#[derive(Debug, Error)]
-pub enum NativeOperatorExecutionError {
-    #[error(transparent)]
-    Morphology(#[from] NativeOperatorMorphologyError),
-    #[error(transparent)]
-    Resident(#[from] ResidentRefusal),
-    #[error("the carrier occurrence has the wrong extent")]
-    CarrierExtent,
-    #[error("the interaction occurrence has the wrong extent for this operation")]
-    InteractionExtent,
-    #[error("the operation occurrence does not join the current ecology")]
-    Occurrence,
-    #[error("the resident operation word and the morphology disagree")]
-    Operation,
-    #[error("the resident operation {operation} returned obstruction flags {flags:#x}")]
-    ResidentObstruction { operation: String, flags: u32 },
-    #[error("the residual re-entry standing is absent")]
-    MissingReentry,
-    #[error("the ecology generation overflowed")]
-    Generation,
-    #[error("no exact resident grain admits the initial carrier")]
-    NoAdmittedGrain,
-    #[error("recurrent session rest: {0}")]
-    Rest(String),
-}
-
-impl From<crate::embedding_fiber::FiberError> for NativeOperatorExecutionError {
-    fn from(error: crate::embedding_fiber::FiberError) -> Self {
-        Self::Resident(ResidentRefusal::Declaration {
-            operation: "operator-mount",
-            what: error.to_string(),
-        })
-    }
-}
-
 pub fn mount_operator_surface(
     readout: &ResidentReadout,
-) -> Result<ResidentSurface<'_>, NativeOperatorExecutionError> {
+) -> Result<ResidentSurface<'_>, ExtractedOperatorRefusal> {
     Ok(ResidentSurface::on(readout)?)
 }

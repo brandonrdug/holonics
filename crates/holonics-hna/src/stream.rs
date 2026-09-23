@@ -651,7 +651,7 @@ impl StreamTarget for HnaSession<'_, '_> {
 }
 
 fn cycle_value(
-    cycle: holonic_engine::native_ecology::holonic_intelligence::NativeFullCycleOutput,
+    cycle: holonic_engine::native_ecology::holonic_intelligence::ExtractedCycleOutput,
     full: bool,
     anatomy: crate::HnaSessionAnatomy,
 ) -> Value {

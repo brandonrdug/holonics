@@ -514,3 +514,125 @@ declaration, not an occurrence archive; kept. (4) The situated ingress receiver
 `ResidentSparseQuadraticMomentState.situated_receiver_coefficients` is carried across the
 circulation as the declared dual receiver; whether it should be re-read from the contemporary
 constitution is the phase-12 frozen-receiver question and is left to it.
+
+### Phase 15 disposition: the extracted operator is one Holon
+
+[established-bounded; source-inspected, implemented-exact, measured] **Subject: equation
+extraction.** "Soulkiller" is only a label (Brandon, September 23); the subject is reading a
+foreign model's computational graph as native equations on the Holon: the operator graph's
+carrier incidence is the interconnection 𝒟 (`NativeFullOperatorEcology::{carriers, operations}`,
+each `NativeOperatorNode` a bond from its input to its output carriers), its coefficient
+populations are the element relations 𝓔 (`NativeCoefficientPopulation`; resident as
+`NativeOperatorResidence`), and the operation word is the transport law, advanced one occurrence
+at a time. Owner: `holonic-engine/src/holonic_intelligence/extracted_operator.rs`.
+
+Scope: `holonic_intelligence/{operative_*,full_operation,circulation}.rs` (20 files) and their
+callers (`holonics-hna` `hna.rs`, `session.rs`, `checkpoint.rs`, `stream.rs`,
+`recurrent_operator.rs`; 12 hna and 4 engine examples; `soulkiller/boundary.rs`). Before (tree
+4dff57c8): 142 public types (198 with private), 14,365 lines, 11 refusal enums, two session
+ladders. After: 136 public types (199), 14,975 lines (the growth is the facet documentation, the
+branch's constitution chart, the legacy-rest decoder and in-file tests; the new device equality
+file `extraction_equality_tests.rs`, 724 lines, is separate), 8 refusal enums, one ladder: 21
+public types deleted, 15 added, 2 structs made aliases.
+
+**Facets.** *Advance*: one occurrence `ExtractedOperatorOccurrence` (the source port: resident
+row addresses for a lookup, host-entered words for an occurrence-entered product, or nothing),
+one step `ExtractedOperatorStep<S>` and one word `ExtractedOperatorBranch<S>` over the trait
+`ExtractedOperatorAdvance`, one emission `ExtractedOperatorEmission<O>` (the operation labelled in
+its executor's chart) and one trace `ExtractedOperatorTrace<C>` (common passage testimony; the
+executor's chart `GraphTraceChart`/`BranchTraceChart` flattened into the same record). Two
+executors realize it: `ExtractedOperatorSession` (the graph: fused sealed segments, tiled
+terminal) and `ExtractedBranchSession` (the six-node per-layer branch, one unsealed passage per
+operation on host-entered carriers). *Constitution*: the branch's morphology is an instance of
+the one chart (`NativeOperatorMorphology::constitution_chart`: `c0` entered carrier, `c1` entered
+interaction, `c(k+2)` the output of operation `k`; `P0`/`P1` the two cross-sections, `P2` the gain).
+*Rest*: one rest `ExtractedOperatorRest` for both executors; the branch rests on its constitution
+chart, and its legacy JSON wire (`native-operator-session-rest.v1`) decodes through
+`ResidentOperatorMorphology::read_legacy_rest`. *Refusal*: one `ExtractedOperatorRefusal` for
+advance, pullback, residence and rest; constitution refusals (`NativeFullOperatorError`,
+`NativeOperatorMorphologyError`, `NativeOperatorResidenceError`) enter as its sources. *Descent*:
+the lens and signature quotients read onto the phase-10 core types (`separation()`,
+`preimage_fibre()`). *Extraction return*: both extractors return the three-lane
+`soulkiller::ExtractionReturn<native, exterior, insufficiency>` (`SoulkillerDismantlingReturn` is
+its alias for existing callers).
+
+**Retention (one cut).** The continuing return (`found_with_return`) no longer retains the
+previous cycle's terminal face, reacted tiles, presented carrier or cross-layer checkpoints across
+the cycle boundary. At a continuing occurrence it reads the contemporary constitution at the
+retained occurrence (`previous_context`): `contemporary_terminal` re-enacts the forward and the
+tiled terminal from those rows, then the return and the within-cycle checkpoint replay of the
+adjoint run as before. Only a return deposits, so the constitution read is the one that emitted.
+The wire keeps its layout: the three retired positions are written absent and an older wire's
+material there is decoded and released (as are an older cycle boundary's checkpoints). Dissection
+keeps the terminal material, because its probes read the same cycle. The measured cost is one
+extra forward per continuing return (census only; every number is equal, below).
+
+| Former type | Facet (operator / coefficients / transport / receiver face) | Disposition |
+|---|---|---|
+| `NativeOperatorOccurrence`, `NativeFullOperationOccurrence` | transport: the source-port occurrence | deleted → `ExtractedOperatorOccurrence` (`addressed`, `entered`, `internal`); each executor refuses the port it lacks |
+| `NativeOperatorEmission`, `NativeFullOperationEmission` | receiver face of one operation | deleted → `ExtractedOperatorEmission<NativeOperatorKind>` / `<u32>`; the branch emission gains its chart carrier `c(k+2)` |
+| `NativeOperatorTrace`, `NativeFullOperationTrace` | transport testimony | deleted → `ExtractedOperatorTrace<BranchTraceChart>` / `<GraphTraceChart>` (same JSON keys and values; field access `trace.chart.*`) |
+| `NativeOperatorStep`, `NativeFullOperationStep` | transport: one operation | deleted → `ExtractedOperatorStep<S>` |
+| `NativeOperatorBranch`, `NativeFullTerminalBranch` | transport: a run of the word | deleted → `ExtractedOperatorBranch<S>` |
+| `NativeFullCycle`, `NativeFullCycleOutput` | transport: one recurrence | `ExtractedOperatorCycle { output, successor }` (no duplicated field set), `ExtractedCycleOutput` |
+| `NativeFullOperatorSession`, `NativeOperatorSession` | the two executors | renamed `ExtractedOperatorSession`, `ExtractedBranchSession`; both implement `ExtractedOperatorAdvance` |
+| `NativeOperatorExecutionError`, `NativeFullOperationError`, `NativeSessionRestError`, `NativeAdjointError` | refusal | deleted → `ExtractedOperatorRefusal` (variants and messages kept; the rest's `resident rest:`/`native operation:` wrappers become the shared variants, and the branch's obstruction names its operation ordinal) |
+| `NativeFullSessionRest`, `NativeSessionRestHeader` | rest | renamed `ExtractedOperatorRest`, `ExtractedOperatorRestHeader`; `terminal_reacted`, `terminal_contracted`, `terminal_presented` retired (wire positions kept) |
+| `NativeOperatorSessionRest` | rest | absorbed: the branch rests as `ExtractedOperatorRest`; its JSON wire decodes (private `BranchRestWire`) |
+| `NativeOverlayRest` | coefficients: a deposited factor `u·v` | moved into the rest module; kept |
+| `NativeTiledRest`, `NativePassageRest`, `NativeNumericalRest`, `NativeForwardReuseRest` | rest components | kept |
+| `NativeFullOperatorDismantlingReturn`, `NativeOperatorDismantlingReturn` | extraction return | aliases of `ExtractionReturn<_, _, _>` (graph: insufficiency `()`) |
+| `NativeFullOperatorEcology` | operator + coefficient populations: the constitution chart | kept; the branch charts onto it |
+| `NativeTensorOrdinal`, `NativeCarrierOrdinal`, `NativeCarrierAxis`, `NativeCarrierChart`, `NativeCoefficientPopulation`, `NativeOperatorNode`, `NativeOperationPrimitive`, `NativeScaleConstraint`, `NativeCausalReach`, `NativeLayerTopology`, `NativeKvStanding`, `NativeCoefficientObstruction{,Kind}` | the complex, element relations and operator law of the chart | kept |
+| `NativeAttentionTopology`, `NativeJoinedPassage`, `NativePassageReturn`, `NativePassageWithdrawal` | interaction: declared contact topology; additive junction of two arrivals and its local return | kept |
+| `NativeOperatorMorphology`, `NativeOperatorKind`, `NativeDyadicMatrix`, `NativeDyadicCoefficient` | operator + exact dyadic coefficients of the branch | kept; `constitution_chart()` |
+| `NativeOperatorResidence`, `ResidentNativeOperatorPopulation`, `NativeOperatorResidenceReceipt`, `NativeOperatorDecoderCensus`, `NativeAlignedOperatorTile`, `NativeCoefficientIntake`, `ResidentOperatorMorphology` | the resident constitution (graph; branch whole-matrix readouts) | kept (one residence for both executors owed) |
+| `NativeFullOperatorColdWitness`, `NativeOperatorColdPopulation`, `NativeOperatorColdWitness`, `NativeOperatorInsufficiency` | extraction cold/insufficiency lanes | kept |
+| `NativeFullOperatorError`, `NativeOperatorMorphologyError`, `NativeOperatorResidenceError` | constitution refusals | kept as sources of the one refusal |
+| `NativeMorphologyTransition`, `NativeSuccessorProjection`, `NativeCycleProgress`, `NativeCycleInterruption` | trace readings; the move owner's held progress | kept |
+| `NativeReturnAperture`, `NativeMorphologyDeposit` | deposition (the only change of the constitution) | kept |
+| `NativeAdjointContraction`, `NativeAdjointReturnTrace`, `NativeAdjointOperationSupport`, `NativeLookupReach`, `NativeDifferentialSupport` | one-cut pullback and its testimony | kept |
+| `NativeForwardReuseCensus`, `NativeNumericalOrigin` | numerical reuse | kept: memoized contemporary readings, invalidated by every constitution change (not an archive) |
+| `NativeEmissionProjection`, `NativeEmissionReadout`, `NativeReceiverFace` | receiver face | kept |
+| `NativeDissectionAperture`, `NativeSiteSupport{,Summary}`, `NativeExcitationTrace`, `NativeSiteSelection`, `NativeWithdrawnFace`, `NativeMagnitudeControl`, `NativeConeVerdict`, `NativeConeProbe`, `NativeConeBoundary`, `NativeConeReturn`, `NativeRoleSpan`, `NativeRole`, `NativeRoleGrain`, `NativeSiteContributions`, `NativeRoleOrder`, `NativeRoleError` | the dissection receiver (excitation, founded cones, roles) | kept; its terminal material is within one exposure |
+| `NativeConeRestriction`, `NativeRestriction`, `NativeRestrictedCrossSection`, `NativeRestrictedIntake`, `NativeInputRowExtension`, `NativeInputExtendedIntake` | coefficient row restrictions | distinct: site masks and row subsets of coefficient words, not a core port map |
+| `NativeCollapsedPair` | descent defect of the lens | kept wire; `separation()` = core `Separation<usize, (exposure, lens face, word), u32>` |
+| `NativeClassEcology`, `NativeRetainedOccurrence` | descent: a signature class | kept; `preimage_fibre()` = core `PreimageFibre<NativeSignature, Vec<NativeRetainedOccurrence>>`, `separations()`; the retained occurrences are the class fibre (a quotient class, not a cross-cycle archive) |
+| `NativeSeparation`, `NativeSignatureClass` | descent of the signature quotient | kept; `separation()`, `preimage_fibre()` |
+| `NativeSignature`, `NativeSignatureQuotient`, `NativeExposure`, `NativeExposureFace`, `NativeSiteBitmask`, `NativeIdentificationError`, `NativeClassRemainder`, `NativeTerminalRemainder`, `NativeRemainderSpecies`, `NativeReceiverResponse`, `NativeConeFounding`, `NativeConeRestrictedEcology`, `NativeFoundedClassCone`, `NativeFoundedCones`, `NativeExposureTestimony`, `NativeExcitationColdWitness`, `NativeInsufficiencyCause`, `NativeFamilyInsufficiency`, `ResidentExcitationDismantling`, `NativeCondensationError` | the cone-restricted extraction and its lanes | kept |
+| `NativeInferenceAddress`, `NativeInferenceRequest`, `NativeFutureFace`, `NativeEmissionSection`, `NativeEmissionAddress`, `NativeInferenceLineage`, `NativeFutureReconstruction`, `ExteriorReturnAperture`, `ExteriorReturnOccurrence`, `NativeInferenceCirculation`, `ExteriorEmissionCodec`, `Utf8InspectionCodec`, `BinaryEmissionCodec`, `NativeInferenceError` (`circulation.rs`) | receiver face of the spool circulation | distinct object (the spool transport scaffold's plural future section); kept for life, workspace and circulation-ABI callers |
+
+**Equality evidence** (`extraction_equality_tests.rs`, device, one at a time under the GPU lock).
+Each scenario reduces its emissions, traces, deposits, adjoint testimony and rests to one
+canonical JSON reading whose SHA-256 was recorded on 4dff57c8 and is asserted unchanged: the plain
+cycle with rest/remount (`acdaff48…`), the single-operation ladder with the terminal branch
+(`12782b38…`), the joined-passage cultivation with numerical reuse and its rest (`12162e2f…`), the
+dissection (read face, excitation, withdrawals; `86dae268…`), the branch chart (two branches,
+rest inside and at the end of the word; `9467616b…`), and the continuing return over five cycles
+with a rest (`faefec41…`, census excluded). Two recorded legacy wires are fixtures: the branch's
+JSON rest decodes to the same one rest and continues to the same numbers (`079f5c14…`), and the
+continuing-return rest that still carries the reacted/presented carriers and checkpoints decodes,
+releases them and continues to the recorded deposits and faces (`9ba14d0c…`). Host:
+`extracted_operator` (occurrence ports, flattened trace keys), `operative_rest_wire_tests` (an
+older frame with the retired positions decodes; the current frame keeps the layout),
+`operative_morphology` (the branch chart validates and every bond agrees in width),
+`operative_condensation` and `operative_identification` (collapsed pairs, separations and classes
+as core descent objects).
+
+No new mathematical law: the return applies the retention law already formalized
+(`Foundation/Standing.lean`), and the chart and the three-lane return are data; #62 is not
+extended.
+
+**Owed (not done).** One executor: the branch still runs its own per-operation unsealed passages
+on host-entered carriers; the graph executor has no host-entry primitive or unsealed per-operation
+mode, so running the branch through it would change the enclosures (a device-layout change this
+phase does not make). One residence (`ResidentOperatorMorphology` beside `NativeOperatorResidence`).
+Equation extraction still owed where the graph is carried as an opaque payload rather than as
+equations: the GELU/tanh constants and series apertures are fixed in the executor rather than
+extracted with the operator; the terminal receiver boundary is located positionally (the last
+five operations, `operations.len() − 5`), not by a declared receiver bond; the branch's
+interaction words are read from a foreign per-layer table at the host
+(`AthenaTextOccurrenceApplication::occurrence_carriers`), not a declared population of the chart;
+and the extracted operator has no core chart (no `HolonLaw` reference motion or `ElementRelation`
+with its declared power, as phase 9 gave the normal constitution), so its passivity/power balance
+is not stated.

@@ -596,8 +596,8 @@ impl<'chart> NativeOperatorResidence<'chart> {
     /// operation boundary calls this; a refused acquisition retains all standing allocations.
     pub(crate) fn extend_input_rows(&mut self, ecology: &NativeFullOperatorEcology,
         additions: &[super::NativeInputRowExtension], grain: u32)
-        -> Result<(), super::NativeFullOperationError> {
-        use super::NativeFullOperationError as Error;
+        -> Result<(), super::ExtractedOperatorRefusal> {
+        use super::ExtractedOperatorRefusal as Error;
         if self.slot_in_use.get() || additions.is_empty() { return Err(Error::Operation); }
         let mut addresses_by_population: BTreeMap<NativeTensorOrdinal, std::collections::BTreeSet<u32>> = BTreeMap::new();
         let mut added_octets = 0u64;

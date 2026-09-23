@@ -329,11 +329,10 @@ pub struct NativeFullOperatorColdWitness {
     pub populations: Vec<NativeOperatorColdPopulation>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct NativeFullOperatorDismantlingReturn {
-    pub native: NativeFullOperatorEcology,
-    pub exterior: NativeFullOperatorColdWitness,
-}
+/// The extraction of a complete foreign operator graph: the constitution chart (`native`) and its
+/// cold witness; the graph extractor declares no insufficiency lane (plan phase 15).
+pub type NativeFullOperatorDismantlingReturn =
+    crate::soulkiller::ExtractionReturn<NativeFullOperatorEcology, NativeFullOperatorColdWitness, ()>;
 
 #[derive(Debug, Error)]
 pub enum NativeFullOperatorError {
@@ -1076,6 +1075,7 @@ pub fn dismantle_full_native_operator(
             payload_base: container.payload_base(),
             populations: cold,
         },
+        insufficiency: (),
     })
 }
 

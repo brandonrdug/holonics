@@ -44,8 +44,8 @@ use holonic_engine::{
     native_ecology::holonic_intelligence::{
         NativeClassRemainder, NativeCollapsedPair, NativeConeFounding, NativeConeRestrictedEcology,
         NativeDissectionAperture, NativeExposure, NativeExposureFace, NativeExposureTestimony,
-        NativeFoundedClassCone, NativeFoundedCones, NativeFullOperationError,
-        NativeFullOperatorDismantlingReturn, NativeFullOperatorEcology, NativeFullOperatorSession,
+        NativeFoundedClassCone, NativeFoundedCones, ExtractedOperatorRefusal,
+        NativeFullOperatorDismantlingReturn, NativeFullOperatorEcology, ExtractedOperatorSession,
         NativeOperatorResidence, NativeRetainedOccurrence, NativeRoleGrain, NativeRoleOrder,
         NativeSignatureQuotient, NativeSiteBitmask, NativeSiteContributions,
         NativeSiteSelection, NativeTensorOrdinal, NativeTerminalRemainder, NativeWithdrawnFace,
@@ -123,12 +123,12 @@ fn widths_histogram(intervals: &[(i64, i64)]) -> Vec<(u64, usize)> {
 /// The face under a withdrawal, or the apparatus's refusal of that withdrawal (an exact carrier
 /// could not hold the operator under it): no face is returned and the withdrawal founds nothing.
 fn face_or_refusal(
-    session: &mut NativeFullOperatorSession<'_, '_>,
+    session: &mut ExtractedOperatorSession<'_, '_>,
     selection: &NativeSiteSelection,
 ) -> Result<Result<NativeWithdrawnFace, (u32, u32)>, Error> {
     match session.face_under_withdrawals(selection) {
         Ok(face) => Ok(Ok(face)),
-        Err(NativeFullOperationError::ResidentObstruction { operation, flags }) => Ok(Err((operation, flags))),
+        Err(ExtractedOperatorRefusal::ResidentObstruction { operation, flags }) => Ok(Err((operation, flags))),
         Err(error) => Err(error.into()),
     }
 }
@@ -139,14 +139,14 @@ fn faced_session<'r, 'c>(
     ecology: &'r NativeFullOperatorEcology,
     residence: &'r mut NativeOperatorResidence<'c>,
     addresses: &[u32],
-) -> Result<(NativeFullOperatorSession<'r, 'c>, u32, String), Error> {
-    let session = NativeFullOperatorSession::found_for_dissection(
+) -> Result<(ExtractedOperatorSession<'r, 'c>, u32, String), Error> {
+    let session = ExtractedOperatorSession::found_for_dissection(
         ecology,
         residence,
         NativeDissectionAperture { series_terms: 14 },
     )?;
     let cycle = session.advance_cycle(addresses)?;
-    let rendered = application.render(&cycle.final_emission)?;
+    let rendered = application.render(&cycle.output.final_emission)?;
     let mut session = cycle.successor;
     let face = session.read_face()?;
     if face.selected != rendered.selected {
@@ -172,7 +172,7 @@ fn exposure_on(application: &AthenaTokenApplication, returned: &NativeFullOperat
     let (addresses, history_addresses) = exposure_addresses(application, occurrence, history)?;
     let roles = declared_roles(&returned.native, GRAIN)?;
     let (face, face_rendered, exact_digest, engine_face_agrees, contributions, cycle_milliseconds, excitation_milliseconds) = {
-        let session = NativeFullOperatorSession::found_for_dissection(
+        let session = ExtractedOperatorSession::found_for_dissection(
             &returned.native,
             residence,
             NativeDissectionAperture { series_terms: 14 },
@@ -181,7 +181,7 @@ fn exposure_on(application: &AthenaTokenApplication, returned: &NativeFullOperat
         let cycle_started = std::time::Instant::now();
         let cycle = session.advance_cycle(&addresses)?;
         let cycle_milliseconds = cycle_started.elapsed().as_millis();
-        let rendered = application.render(&cycle.final_emission)?;
+        let rendered = application.render(&cycle.output.final_emission)?;
         let mut session = cycle.successor;
         eprintln!("stage: excite");
         let excitation = session.excite()?;
@@ -201,9 +201,9 @@ fn exposure_on(application: &AthenaTokenApplication, returned: &NativeFullOperat
     // The propagated remainder: the same cycle with the terminal read unsealed at the receiver.
     eprintln!("stage: remainder");
     let remainder = {
-        let session = NativeFullOperatorSession::found(&returned.native, residence)?.with_terminal_remainder();
+        let session = ExtractedOperatorSession::found(&returned.native, residence)?.with_terminal_remainder();
         let cycle = session.advance_cycle(&addresses)?;
-        let emission = &cycle.final_emission;
+        let emission = &cycle.output.final_emission;
         let last = &emission.intervals[(emission.rows - 1) * emission.width..];
         let rendered = application.render(emission)?;
         if rendered.selected != face {
@@ -593,7 +593,7 @@ fn extend_mode(args: &[String]) -> Result<(), Error> {
         let kept: BTreeSet<u32> = cone.roles.iter().copied().collect();
         let complement: Vec<u32> = order.order.iter().copied().filter(|r| !kept.contains(r)).collect();
         let mut probes = Vec::new();
-        let mut probe = |session: &mut NativeFullOperatorSession<'_, '_>, restored: &[u32]| -> Result<(bool, Option<(u32, u32)>), Error> {
+        let mut probe = |session: &mut ExtractedOperatorSession<'_, '_>, restored: &[u32]| -> Result<(bool, Option<(u32, u32)>), Error> {
             let restored_set: BTreeSet<u32> = restored.iter().copied().collect();
             let selection = selection_of_roles(&roles, &sizes, complement.iter().copied().filter(|r| !restored_set.contains(r)));
             let outcome = face_or_refusal(session, &selection)?;
@@ -1192,11 +1192,11 @@ fn body_mode(args: &[String]) -> Result<(), Error> {
         NativeOperatorResidence::mount_from_intake(&surface, &restricted.ecology, &mut intake)?
     };
     let mount_seconds = mount_started.elapsed().as_secs_f64();
-    let session = NativeFullOperatorSession::found(&restricted.ecology, &mut residence)?;
+    let session = ExtractedOperatorSession::found(&restricted.ecology, &mut residence)?;
     let cycle_started = std::time::Instant::now();
     let cycle = session.advance_cycle(&addresses)?;
     let cycle_milliseconds = cycle_started.elapsed().as_millis();
-    let rendered = application.render(&cycle.final_emission)?;
+    let rendered = application.render(&cycle.output.final_emission)?;
     let receipt = BodyReceipt {
         class: class_ordinal,
         occurrence,
@@ -1385,9 +1385,9 @@ fn bodies_mode(args: &[String]) -> Result<(), Error> {
                     continue;
                 }
                 let expected = class.response.iter().find(|r| r.exposure.history == history_addresses).map(|r| r.face).ok_or("no response")?;
-                let session = NativeFullOperatorSession::found(&restricted.ecology, &mut residence)?;
+                let session = ExtractedOperatorSession::found(&restricted.ecology, &mut residence)?;
                 let cycle = session.advance_cycle(&addresses)?;
-                let rendered = application.render(&cycle.final_emission)?;
+                let rendered = application.render(&cycle.output.final_emission)?;
                 let agrees = rendered.selected == expected;
                 eprintln!("body class {} {}: expected {expected} returned {} {:?} agrees {agrees}", class.ordinal, exposure_name(occurrence, history), rendered.selected, rendered.rendered);
                 step(&format!("body class {} {}", class.ordinal, exposure_name(occurrence, history)));
@@ -1457,9 +1457,9 @@ fn compare_mode(args: &[String]) -> Result<(), Error> {
             let mut intake = restricted.intake(which)?;
             NativeOperatorResidence::mount_from_intake(&surface, &restricted.ecology, &mut intake)?
         };
-        let session = NativeFullOperatorSession::found(&restricted.ecology, &mut residence)?;
+        let session = ExtractedOperatorSession::found(&restricted.ecology, &mut residence)?;
         let cycle = session.advance_cycle(&addresses)?;
-        let rendered = application.render(&cycle.final_emission)?;
+        let rendered = application.render(&cycle.output.final_emission)?;
         faces.insert(label.into(), rendered.selected.into());
     }
     for (k, v) in &faces {

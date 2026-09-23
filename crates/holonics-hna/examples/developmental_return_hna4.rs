@@ -12,7 +12,7 @@ use holonics_hna::AthenaTokenApplication;
 use holonic_engine::{
     embedding_fiber::ResidentReadout,
     native_ecology::holonic_intelligence::{
-        NativeFullOperatorSession, NativeMorphologyDeposit, NativeMorphologyTransition,
+        ExtractedOperatorSession, NativeMorphologyDeposit, NativeMorphologyTransition,
         NativeOperatorResidence, NativeReturnAperture, dismantle_full_native_operator,
         mount_operator_surface,
     },
@@ -80,12 +80,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         NativeOperatorResidence::mount(&surface, &returned.native, &returned.exterior)?;
     let session = match aperture {
         Some(aperture) => {
-            NativeFullOperatorSession::found_with_return(&returned.native, &mut residence, aperture)?
+            ExtractedOperatorSession::found_with_return(&returned.native, &mut residence, aperture)?
         }
-        None => NativeFullOperatorSession::found(&returned.native, &mut residence)?,
+        None => ExtractedOperatorSession::found(&returned.native, &mut residence)?,
     };
     let first = session.advance_cycle(&context)?;
-    let face = application.render(&first.final_emission)?;
+    let face = application.render(&first.output.final_emission)?;
     let first_face = Face {
         selected: face.selected,
         rendered: face.rendered,
@@ -94,18 +94,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         generation: first.successor.generation(),
     };
     let second = first.successor.advance_cycle(&entering)?;
-    let (second_transition_changed, deposit) = match &second.traces[0].morphology_transition {
+    let (second_transition_changed, deposit) = match &second.output.traces[0].chart.morphology_transition {
         NativeMorphologyTransition::Changed { deposit, .. } => (true, Some(deposit.clone())),
         NativeMorphologyTransition::Unchanged => (false, None),
     };
     let overlay_rank_carried_by_terminal_operations = second
-        .traces
+        .output.traces
         .iter()
         .rev()
         .take(5)
-        .map(|trace| trace.morphology_overlay_rank)
+        .map(|trace| trace.chart.morphology_overlay_rank)
         .collect();
-    let face = application.render(&second.final_emission)?;
+    let face = application.render(&second.output.final_emission)?;
     let second_face = Face {
         selected: face.selected,
         rendered: face.rendered,
@@ -125,7 +125,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             deposit,
             overlay_rank_carried_by_terminal_operations,
             second_face,
-            second_emission_digest: digest(&second.final_emission.intervals),
+            second_emission_digest: digest(&second.output.final_emission.intervals),
             driver_supplied_no_morphology_field: true,
         })?
     );

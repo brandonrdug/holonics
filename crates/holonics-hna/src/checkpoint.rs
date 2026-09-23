@@ -11,7 +11,7 @@ use sha2::{Digest, Sha256};
 use thiserror::Error;
 
 use holonic_engine::native_ecology::holonic_intelligence::{
-    NativeFullSessionRest, NativeSessionRestError,
+    ExtractedOperatorRest, ExtractedOperatorRefusal,
 };
 
 use crate::publication::{publish_new, PublicationError, PublicationReceipt};
@@ -81,7 +81,7 @@ pub enum CheckpointError {
     #[error("checkpoint checksum mismatch")]
     Checksum,
     #[error("native session rest: {0}")]
-    Rest(#[from] NativeSessionRestError),
+    Rest(#[from] ExtractedOperatorRefusal),
     #[error("checkpoint JSON: {0}")]
     Json(#[from] serde_json::Error),
 }
@@ -94,7 +94,7 @@ pub struct HnaCheckpointReceipt {
 
 pub struct HnaSavedSession {
     pub dependency: HnaBaseDependency,
-    pub state: NativeFullSessionRest,
+    pub state: ExtractedOperatorRest,
     pub transport: Option<crate::HnaStreamState>,
 }
 
@@ -173,7 +173,7 @@ impl HnaBaseDependency {
 pub fn save_checkpoint_new(
     path: impl AsRef<Path>,
     dependency: &HnaBaseDependency,
-    state: &NativeFullSessionRest,
+    state: &ExtractedOperatorRest,
 ) -> Result<HnaCheckpointReceipt, CheckpointError> {
     save_checkpoint(path.as_ref(), dependency, state, None)
 }
@@ -181,7 +181,7 @@ pub fn save_checkpoint_new(
 pub fn save_stream_checkpoint_new(
     path: impl AsRef<Path>,
     dependency: &HnaBaseDependency,
-    state: &NativeFullSessionRest,
+    state: &ExtractedOperatorRest,
     transport: &crate::HnaStreamState,
 ) -> Result<HnaCheckpointReceipt, CheckpointError> {
     transport
@@ -193,7 +193,7 @@ pub fn save_stream_checkpoint_new(
 fn save_checkpoint(
     path: &Path,
     dependency: &HnaBaseDependency,
-    state: &NativeFullSessionRest,
+    state: &ExtractedOperatorRest,
     transport: Option<&crate::HnaStreamState>,
 ) -> Result<HnaCheckpointReceipt, CheckpointError> {
     let metadata = serde_json::to_vec(dependency)?;
@@ -237,7 +237,7 @@ fn save_checkpoint(
 
 pub fn read_checkpoint(
     path: impl AsRef<Path>,
-) -> Result<(HnaBaseDependency, NativeFullSessionRest), CheckpointError> {
+) -> Result<(HnaBaseDependency, ExtractedOperatorRest), CheckpointError> {
     let saved = read_session_checkpoint(path)?;
     if saved.transport.is_some() {
         return Err(CheckpointError::Malformed(
@@ -300,7 +300,7 @@ pub(crate) fn read_session_checkpoint_file(
         return Err(CheckpointError::Malformed("native state extent".into()));
     }
     let mut input = io::BufReader::new(file.take(extent));
-    let state = NativeFullSessionRest::read_from(&mut input, extent)?;
+    let state = ExtractedOperatorRest::read_from(&mut input, extent)?;
     Ok(HnaSavedSession {
         dependency,
         state,

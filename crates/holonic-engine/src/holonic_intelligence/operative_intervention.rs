@@ -32,7 +32,7 @@ use serde::Serialize;
 use crate::resident_section::{ResidentSection, SeriesAperture};
 
 use super::{
-    NativeFullOperationError, NativeFullOperatorEcology, NativeFullOperatorSession,
+    ExtractedOperatorRefusal, NativeFullOperatorEcology, ExtractedOperatorSession,
     NativeOperationPrimitive, NativeOperatorNode, NativeOperatorResidence, NativeTensorOrdinal,
     operative_backward::ReturnDeed,
     operative_return::{ReturnMaterial, ReturnedDifferential, receiver_differential},
@@ -436,14 +436,14 @@ pub fn magnitude_control(cone: &[bool], magnitudes: &[u64]) -> NativeMagnitudeCo
     }
 }
 
-impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
+impl<'residence, 'chart> ExtractedOperatorSession<'residence, 'chart> {
     /// Found the ecology for dissection: the terminal carriers are retained for excitation and no
     /// return deposits.
     pub fn found_for_dissection(
         ecology: &'residence NativeFullOperatorEcology,
         residence: &'residence mut NativeOperatorResidence<'chart>,
         aperture: NativeDissectionAperture,
-    ) -> Result<Self, NativeFullOperationError> {
+    ) -> Result<Self, ExtractedOperatorRefusal> {
         let mut session = Self::found(ecology, residence)?;
         session.dissection = Some(DissectionStanding::found(aperture));
         Ok(session)
@@ -480,7 +480,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     }
 
     /// The last row of a tiled carrier, stitched.
-    pub(super) fn tiled_last_row(&self, carrier: &TiledCarrier<'chart>) -> Result<Vec<(i64, i64)>, NativeFullOperationError> {
+    pub(super) fn tiled_last_row(&self, carrier: &TiledCarrier<'chart>) -> Result<Vec<(i64, i64)>, ExtractedOperatorRefusal> {
         let surface = self.residence.surface();
         let mut row = Vec::with_capacity(carrier.width);
         for section in &carrier.sections {
@@ -494,34 +494,34 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     /// Excite the completed cycle at its own selected face: the differential of that face's
     /// normalized exponential probability at the last row returns through every reaction without
     /// depositing, and the excitation is read per site at every contraction population.
-    pub fn excite(&mut self) -> Result<NativeExcitationTrace, NativeFullOperationError> {
+    pub fn excite(&mut self) -> Result<NativeExcitationTrace, ExtractedOperatorRefusal> {
         let started = std::time::Instant::now();
         let aperture = self
             .dissection
             .as_ref()
-            .ok_or(NativeFullOperationError::Occurrence)?
+            .ok_or(ExtractedOperatorRefusal::Occurrence)?
             .aperture;
         if !self.cycle_complete {
-            return Err(NativeFullOperationError::Occurrence);
+            return Err(ExtractedOperatorRefusal::Occurrence);
         }
         let (rows, width, face) = {
-            let emission = self.terminal_carrier.as_ref().ok_or(NativeFullOperationError::Occurrence)?;
+            let emission = self.terminal_carrier.as_ref().ok_or(ExtractedOperatorRefusal::Occurrence)?;
             let last_row = self.tiled_last_row(emission)?;
             let face = face_of_last_row(&last_row, 1, emission.width)
-                .ok_or(NativeFullOperationError::Operation)?;
+                .ok_or(ExtractedOperatorRefusal::Operation)?;
             (emission.rows, emission.width, face)
         };
         let tied_output = self
             .terminal_contracted
             .clone()
-            .ok_or(NativeFullOperationError::Occurrence)?;
+            .ok_or(ExtractedOperatorRefusal::Occurrence)?;
         let differential = {
             let (Some(emission), Some(reacted), Some(presented)) = (
                 self.terminal_carrier.as_ref(),
                 self.terminal_reacted.as_ref(),
                 self.terminal_presented.as_ref(),
             ) else {
-                return Err(NativeFullOperationError::Occurrence);
+                return Err(ExtractedOperatorRefusal::Occurrence);
             };
             let next = vec![face.selected; rows];
             let surface = self.residence.surface();
@@ -600,7 +600,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         operation: &NativeOperatorNode,
         dy: &ResidentSection<'chart>,
         tied_output: Option<&[(i64, i64)]>,
-    ) -> Result<(), NativeFullOperationError> {
+    ) -> Result<(), ExtractedOperatorRefusal> {
         let surface = self.residence.surface();
         let intervals = surface.read_out(dy)?;
         let (rows, width) = (dy.rows(), dy.width());
@@ -610,13 +610,13 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                 let output = self
                     .carriers
                     .get(&operation.output)
-                    .ok_or(NativeFullOperationError::Carrier)?;
+                    .ok_or(ExtractedOperatorRefusal::Carrier)?;
                 let forward = surface.read_out(&output.section)?;
                 read_sites(&intervals, rows, width, &forward, output.section.rows())
             }
         };
         if magnitudes.len() != width {
-            return Err(NativeFullOperationError::Adjoint(format!(
+            return Err(ExtractedOperatorRefusal::Adjoint(format!(
                 "the forward output of operation {} does not carry the differential's {} sites",
                 operation.ordinal, width
             )));
@@ -625,7 +625,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         let standing = self
             .dissection
             .as_mut()
-            .ok_or(NativeFullOperationError::Occurrence)?;
+            .ok_or(ExtractedOperatorRefusal::Occurrence)?;
         standing.supports.insert(
             population,
             NativeSiteSupport {
@@ -649,30 +649,30 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     pub fn face_under_withdrawals(
         &mut self,
         selection: &NativeSiteSelection,
-    ) -> Result<NativeWithdrawnFace, NativeFullOperationError> {
+    ) -> Result<NativeWithdrawnFace, ExtractedOperatorRefusal> {
         let started = std::time::Instant::now();
         let original = self
             .dissection
             .as_ref()
             .and_then(|standing| standing.face.clone())
-            .ok_or(NativeFullOperationError::Occurrence)?;
+            .ok_or(ExtractedOperatorRefusal::Occurrence)?;
         if !self.cycle_complete {
-            return Err(NativeFullOperationError::Occurrence);
+            return Err(ExtractedOperatorRefusal::Occurrence);
         }
         let rows = self
             .previous_context
             .clone()
-            .ok_or(NativeFullOperationError::Occurrence)?;
+            .ok_or(ExtractedOperatorRefusal::Occurrence)?;
         let operations = self.ecology.operations.len();
         let terminal_start = operations
             .checked_sub(5)
-            .ok_or(NativeFullOperationError::Operation)?;
+            .ok_or(ExtractedOperatorRefusal::Operation)?;
         let first_layer_operation = self
             .ecology
             .operations
             .iter()
             .position(|operation| operation.layer.is_some())
-            .ok_or(NativeFullOperationError::Operation)?;
+            .ok_or(ExtractedOperatorRefusal::Operation)?;
         // Every contraction touched, by index; the earliest decides where the replay starts.
         let mut targets: BTreeMap<usize, NativeTensorOrdinal> = BTreeMap::new();
         let mut populations_withdrawn = 0usize;
@@ -688,10 +688,10 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                 .coefficient_populations
                 .get(population.0 as usize)
                 .and_then(|descriptor| descriptor.shape.first().copied())
-                .ok_or(NativeFullOperationError::Operation)?;
+                .ok_or(ExtractedOperatorRefusal::Operation)?;
             if let Some(withdrawn) = selection.withdrawn_of(population) {
                 if withdrawn.len() != sites {
-                    return Err(NativeFullOperationError::Operation);
+                    return Err(ExtractedOperatorRefusal::Operation);
                 }
                 if selection.touches(population) {
                     targets.insert(index, population);
@@ -710,7 +710,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                     .operations
                     .iter()
                     .position(|operation| operation.layer == Some(layer))
-                    .ok_or(NativeFullOperationError::Operation)?,
+                    .ok_or(ExtractedOperatorRefusal::Operation)?,
                 None if earliest < first_layer_operation => 0,
                 None => self
                     .ecology
@@ -720,7 +720,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                     .position(|(index, operation)| {
                         index >= first_layer_operation && operation.layer.is_none()
                     })
-                    .ok_or(NativeFullOperationError::Operation)?,
+                    .ok_or(ExtractedOperatorRefusal::Operation)?,
             }
         };
         self.carriers.clear();
@@ -786,7 +786,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         &mut self,
         population: NativeTensorOrdinal,
         withdrawn: &[bool],
-    ) -> Result<NativeWithdrawnFace, NativeFullOperationError> {
+    ) -> Result<NativeWithdrawnFace, ExtractedOperatorRefusal> {
         self.face_under_withdrawals(&NativeSiteSelection::single(population, withdrawn))
     }
 
@@ -795,11 +795,11 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     pub fn cone_controls(
         &mut self,
         population: NativeTensorOrdinal,
-    ) -> Result<NativeConeVerdict, NativeFullOperationError> {
+    ) -> Result<NativeConeVerdict, ExtractedOperatorRefusal> {
         let support = self
             .site_support(population)
             .cloned()
-            .ok_or(NativeFullOperationError::Operation)?;
+            .ok_or(ExtractedOperatorRefusal::Operation)?;
         let complement: Vec<bool> = support.support.iter().map(|site| !site).collect();
         let outside_withdrawn = self.face_under_withdrawal(population, &complement)?;
         let inside_withdrawn = self.face_under_withdrawal(population, &support.support)?;
@@ -823,16 +823,16 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
 
     /// Read the completed cycle's face into the dissection standing without a return: what a
     /// probe under a withdrawal compares against.  The supports are cleared.
-    pub fn read_face(&mut self) -> Result<NativeReceiverFace, NativeFullOperationError> {
+    pub fn read_face(&mut self) -> Result<NativeReceiverFace, ExtractedOperatorRefusal> {
         if !self.cycle_complete {
-            return Err(NativeFullOperationError::Occurrence);
+            return Err(ExtractedOperatorRefusal::Occurrence);
         }
         let face = {
-            let emission = self.terminal_carrier.as_ref().ok_or(NativeFullOperationError::Occurrence)?;
+            let emission = self.terminal_carrier.as_ref().ok_or(ExtractedOperatorRefusal::Occurrence)?;
             let last_row = self.tiled_last_row(emission)?;
-            face_of_last_row(&last_row, 1, emission.width).ok_or(NativeFullOperationError::Operation)?
+            face_of_last_row(&last_row, 1, emission.width).ok_or(ExtractedOperatorRefusal::Operation)?
         };
-        let standing = self.dissection.as_mut().ok_or(NativeFullOperationError::Occurrence)?;
+        let standing = self.dissection.as_mut().ok_or(ExtractedOperatorRefusal::Occurrence)?;
         standing.clear();
         standing.face = Some(face.clone());
         Ok(face)
@@ -868,12 +868,12 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
 
     /// The cone by joint intervention along the excitation's own order: every site of every
     /// contraction population ordered by its first-order contribution.
-    pub fn cone_by_intervention(&mut self) -> Result<NativeConeReturn, NativeFullOperationError> {
+    pub fn cone_by_intervention(&mut self) -> Result<NativeConeReturn, ExtractedOperatorRefusal> {
         let (sizes, mut order) = {
             let standing = self
                 .dissection
                 .as_ref()
-                .ok_or(NativeFullOperationError::Occurrence)?;
+                .ok_or(ExtractedOperatorRefusal::Occurrence)?;
             let mut sizes: BTreeMap<NativeTensorOrdinal, usize> = BTreeMap::new();
             let mut order: Vec<(u128, u32, u32)> = Vec::new();
             for (population, support) in &standing.supports {
@@ -904,12 +904,12 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         order: &[(NativeTensorOrdinal, u32)],
         sizes: &BTreeMap<NativeTensorOrdinal, usize>,
         fixed: Option<&NativeSiteSelection>,
-    ) -> Result<NativeConeReturn, NativeFullOperationError> {
+    ) -> Result<NativeConeReturn, ExtractedOperatorRefusal> {
         let started = std::time::Instant::now();
         let face = self
             .excited_face()
             .cloned()
-            .ok_or(NativeFullOperationError::Occurrence)?;
+            .ok_or(ExtractedOperatorRefusal::Occurrence)?;
         let total = order.len();
         let selection_of = |from: usize, to: usize| {
             let mut selection = NativeSiteSelection::founded(sizes);
@@ -922,7 +922,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             selection
         };
         let mut probes: Vec<NativeConeProbe> = Vec::new();
-        let mut probe = |this: &mut Self, withdrawn: usize| -> Result<bool, NativeFullOperationError> {
+        let mut probe = |this: &mut Self, withdrawn: usize| -> Result<bool, ExtractedOperatorRefusal> {
             let returned = this.face_under_withdrawals(&selection_of(0, withdrawn))?;
             probes.push(NativeConeProbe {
                 withdrawn,
@@ -1029,15 +1029,15 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         &mut self,
         boundary: &[NativeOperatorNode],
         tied_withdrawal: Option<&SegmentWithdrawal<'_, 'chart>>,
-    ) -> Result<NativeReceiverFace, NativeFullOperationError> {
+    ) -> Result<NativeReceiverFace, ExtractedOperatorRefusal> {
         let run = self.enact_terminal(boundary, tied_withdrawal, [false, false, false, false, true])?;
         let emitted = run
             .carriers
             .last()
             .and_then(Option::as_ref)
-            .ok_or(NativeFullOperationError::Operation)?;
+            .ok_or(ExtractedOperatorRefusal::Operation)?;
         let last_row = self.tiled_last_row(emitted)?;
-        face_of_last_row(&last_row, 1, emitted.width).ok_or(NativeFullOperationError::Operation)
+        face_of_last_row(&last_row, 1, emitted.width).ok_or(ExtractedOperatorRefusal::Operation)
     }
 }
 

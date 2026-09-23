@@ -4,7 +4,7 @@ use holonic_engine::{
     embedding_fiber::ResidentReadout,
     foreign_map::manifest_safetensors,
     native_ecology::holonic_intelligence::{
-        NativeOperatorOccurrence, ResidentOperatorMorphology, dismantle_native_operator,
+        ExtractedOperatorOccurrence, ResidentOperatorMorphology, dismantle_native_operator,
         mount_operator_surface,
     },
 };
@@ -69,10 +69,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         } else {
             Vec::new()
         };
-        let step = session.advance(NativeOperatorOccurrence {
-            ordinal,
-            interaction_words,
-        })?;
+        let step = session.advance(ExtractedOperatorOccurrence::entered(ordinal, interaction_words))?;
         joined &= step.trace.predecessor_generation == ordinal;
         first_emission = step.emission.intervals.clone();
         first_trace = Some(step.trace.clone());
@@ -87,10 +84,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         } else {
             Vec::new()
         };
-        let step = session.advance(NativeOperatorOccurrence {
-            ordinal,
-            interaction_words,
-        })?;
+        let step = session.advance(ExtractedOperatorOccurrence::entered(ordinal, interaction_words))?;
         joined &= step.trace.predecessor_generation == ordinal;
         second_emission = step.emission.intervals.clone();
         session = step.successor;
@@ -104,10 +98,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         } else {
             Vec::new()
         };
-        let step = comparison.advance(NativeOperatorOccurrence {
-            ordinal,
-            interaction_words,
-        })?;
+        let step = comparison.advance(ExtractedOperatorOccurrence::entered(ordinal, interaction_words))?;
         comparison_emission = step.emission.intervals.clone();
         comparison = step.successor;
     }
@@ -126,8 +117,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             first_generation,
             second_generation: session.generation(),
             chronology: session.chronology().to_vec(),
-            passage_slots: first_trace.passage_slot_population,
-            refusals: first_trace.refusal_population,
+            passage_slots: first_trace.chart.passage_slot_population,
+            refusals: first_trace.chart.refusal_population,
             first_emission_differs_from_second_source: differs,
             second_step_consumed_first_successor: joined && first_generation == 6,
             first_emission_population: first_emission.len(),

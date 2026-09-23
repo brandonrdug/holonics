@@ -26,7 +26,7 @@ use holonic_engine::{
     embedding_fiber::ResidentReadout,
     native_ecology::holonic_intelligence::{
         declared_roles, mount_operator_surface, NativeConeRestrictedEcology, NativeExposure,
-        NativeExposureFace, NativeFullOperatorSession, NativeOperatorResidence, NativeRoleGrain,
+        NativeExposureFace, ExtractedOperatorSession, NativeOperatorResidence, NativeRoleGrain,
         NativeTerminalRemainder,
     },
 };
@@ -212,7 +212,7 @@ fn deed(args: &[String]) -> Result<(), Error> {
         }
     }
     // One continuing session over the family: every cycle advances the same successor line.
-    let mut session = NativeFullOperatorSession::found(&restricted.ecology, &mut residence)?;
+    let mut session = ExtractedOperatorSession::found(&restricted.ecology, &mut residence)?;
     let composed_resident_octets = session.census().resident_octets_now;
     let mut cycle_milliseconds = Vec::new();
     let mut launches_per_cycle = Vec::new();
@@ -228,7 +228,7 @@ fn deed(args: &[String]) -> Result<(), Error> {
             let cycle = session.advance_cycle(&r.addresses)?;
             let elapsed = started.elapsed().as_millis();
             let after = cycle.successor.census();
-            let rendered = application.render(&cycle.final_emission)?;
+            let rendered = application.render(&cycle.output.final_emission)?;
             session = cycle.successor;
             session_generations.push((predecessor, session.generation()));
             cycle_milliseconds.push(elapsed);
@@ -260,10 +260,10 @@ fn deed(args: &[String]) -> Result<(), Error> {
     for occurrence in 0..FAMILY.len() {
         for history in 0..HISTORIES.len() {
             let r = &full[&(occurrence, history)];
-            let unsealed = NativeFullOperatorSession::found(&restricted.ecology, &mut residence)?
+            let unsealed = ExtractedOperatorSession::found(&restricted.ecology, &mut residence)?
                 .with_terminal_remainder();
             let cycle_unsealed = unsealed.advance_cycle(&r.addresses)?;
-            let emission = &cycle_unsealed.final_emission;
+            let emission = &cycle_unsealed.output.final_emission;
             let last = &emission.intervals[(emission.rows - 1) * emission.width..];
             let composed_widths: Vec<u32> = last.iter().map(|(lo, hi)| (hi - lo) as u32).collect();
             let file = format!(
@@ -367,7 +367,7 @@ fn deed(args: &[String]) -> Result<(), Error> {
         rest_sha256,
         decoder: DeclaredDecoder {
             mount: "holonic_engine::native_ecology::holonic_intelligence::NativeOperatorResidence::mount_from_intake over NativeConeRestrictedEcology::intake(None)".to_owned(),
-            recurrence: "NativeFullOperatorSession::advance_cycle, one continuing session (the segment session under the 2026-08-18 contract)".to_owned(),
+            recurrence: "ExtractedOperatorSession::advance_cycle, one continuing session (the segment session under the 2026-08-18 contract)".to_owned(),
             receiver: "the selected face at the terminal position, read once".to_owned(),
             mount_seconds_milli,
             cycle_milliseconds: cycle_milliseconds.clone(),

@@ -10,13 +10,13 @@ use crate::{
     resident_section::{Dyadic, DyadicEnclosure},
 };
 
-use super::{NativeFullOperationError, NativeScaleConstraint};
+use super::{ExtractedOperatorRefusal, NativeScaleConstraint};
 
-pub(super) fn binary64_projection(value: &Rat) -> Result<Dyadic, NativeFullOperationError> {
+pub(super) fn binary64_projection(value: &Rat) -> Result<Dyadic, ExtractedOperatorRefusal> {
     let (datum, _) = round_into(value, BinaryFloatSpecies::Binary64)
-        .map_err(|_| NativeFullOperationError::Operation)?;
+        .map_err(|_| ExtractedOperatorRefusal::Operation)?;
     let magnitude =
-        i64::try_from(&datum.significand).map_err(|_| NativeFullOperationError::Operation)?;
+        i64::try_from(&datum.significand).map_err(|_| ExtractedOperatorRefusal::Operation)?;
     Ok(Dyadic {
         significand: if datum.negative {
             -magnitude
@@ -29,14 +29,14 @@ pub(super) fn binary64_projection(value: &Rat) -> Result<Dyadic, NativeFullOpera
 
 pub(super) fn scale_enclosure(
     constraint: &NativeScaleConstraint,
-) -> Result<DyadicEnclosure, NativeFullOperationError> {
+) -> Result<DyadicEnclosure, ExtractedOperatorRefusal> {
     let interval = match constraint {
         NativeScaleConstraint::ReciprocalSquareRootOf(value) if *value > 0 => {
             AlgebraicRoot::nth_root(&Rat::from_integer(BigInt::from(*value)), 2, 64)
-                .map_err(|_| NativeFullOperationError::Operation)?
+                .map_err(|_| ExtractedOperatorRefusal::Operation)?
                 .enclosure()
                 .reciprocal()
-                .map_err(|_| NativeFullOperationError::Operation)?
+                .map_err(|_| ExtractedOperatorRefusal::Operation)?
         }
         NativeScaleConstraint::Rational {
             numerator,
@@ -45,28 +45,28 @@ pub(super) fn scale_enclosure(
             BigInt::from(*numerator),
             BigInt::from(*denominator),
         )),
-        _ => return Err(NativeFullOperationError::Operation),
+        _ => return Err(ExtractedOperatorRefusal::Operation),
     };
     finest_enclosure(&interval)
 }
 
-pub(super) fn finest_enclosure(interval: &ExactInterval) -> Result<DyadicEnclosure, NativeFullOperationError> {
+pub(super) fn finest_enclosure(interval: &ExactInterval) -> Result<DyadicEnclosure, ExtractedOperatorRefusal> {
     for grain in (0..=60).rev() {
         if let Ok(enclosure) = DyadicEnclosure::of_interval(&interval, grain) {
             return Ok(enclosure);
         }
     }
-    Err(NativeFullOperationError::Operation)
+    Err(ExtractedOperatorRefusal::Operation)
 }
 
-pub(super) fn projected_scale(constraint: &NativeScaleConstraint) -> Result<Dyadic, NativeFullOperationError> {
+pub(super) fn projected_scale(constraint: &NativeScaleConstraint) -> Result<Dyadic, ExtractedOperatorRefusal> {
     let NativeScaleConstraint::Bfloat16NearestSquareRootOf(value) = constraint else {
-        return Err(NativeFullOperationError::Operation);
+        return Err(ExtractedOperatorRefusal::Operation);
     };
     nearest_bfloat16_square_root(*value)
 }
 
-fn nearest_bfloat16_square_root(value: u32) -> Result<Dyadic, NativeFullOperationError> {
+fn nearest_bfloat16_square_root(value: u32) -> Result<Dyadic, ExtractedOperatorRefusal> {
     if value == 0 {
         return Ok(Dyadic {
             significand: 0,
@@ -79,7 +79,7 @@ fn nearest_bfloat16_square_root(value: u32) -> Result<Dyadic, NativeFullOperatio
     while low_word + 1 < high_word {
         let middle = low_word + (high_word - low_word) / 2;
         let middle_value = decode_bfloat16_bits(middle)
-            .map_err(|_| NativeFullOperationError::Operation)?
+            .map_err(|_| ExtractedOperatorRefusal::Operation)?
             .value();
         if &middle_value * &middle_value <= target {
             low_word = middle;
@@ -88,10 +88,10 @@ fn nearest_bfloat16_square_root(value: u32) -> Result<Dyadic, NativeFullOperatio
         }
     }
     let low = decode_bfloat16_bits(low_word)
-        .map_err(|_| NativeFullOperationError::Operation)?
+        .map_err(|_| ExtractedOperatorRefusal::Operation)?
         .value();
     let high = decode_bfloat16_bits(high_word)
-        .map_err(|_| NativeFullOperationError::Operation)?
+        .map_err(|_| ExtractedOperatorRefusal::Operation)?
         .value();
     let midpoint = (&low + &high) / Rat::from_integer(BigInt::from(2));
     let word = if &midpoint * &midpoint < target {
@@ -101,15 +101,15 @@ fn nearest_bfloat16_square_root(value: u32) -> Result<Dyadic, NativeFullOperatio
     } else {
         high_word
     };
-    Dyadic::of_bfloat16_bits(word).map_err(NativeFullOperationError::Resident)
+    Dyadic::of_bfloat16_bits(word).map_err(ExtractedOperatorRefusal::Resident)
 }
 
 pub(super) fn operation_bound(
     operation: u32,
     reading: &crate::resident_section::PassageReading,
-) -> Result<u32, NativeFullOperationError> {
+) -> Result<u32, ExtractedOperatorRefusal> {
     exact_bound(reading)
-        .map_err(|flags| NativeFullOperationError::ResidentObstruction { operation, flags })
+        .map_err(|flags| ExtractedOperatorRefusal::ResidentObstruction { operation, flags })
 }
 
 fn exact_bound(reading: &crate::resident_section::PassageReading) -> Result<u32, u32> {

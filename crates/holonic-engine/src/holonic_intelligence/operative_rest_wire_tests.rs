@@ -87,8 +87,8 @@ fn overlay() -> NativeOverlayRest {
     }
 }
 
-fn base_rest() -> NativeFullSessionRest {
-    let header = NativeSessionRestHeader {
+fn base_rest() -> ExtractedOperatorRest {
+    let header = ExtractedOperatorRestHeader {
         schema: NATIVE_SESSION_REST_SCHEMA.to_owned(),
         ecology: ecology(),
         operation_at: 0,
@@ -110,21 +110,11 @@ fn base_rest() -> NativeFullSessionRest {
         grain: 0,
         sections: vec![section()],
     };
-    let tiled_reacted = NativeTiledRest {
-        carrier: NativeCarrierOrdinal(5),
-        rows: 1,
-        width: 1,
-        grain: 0,
-        sections: vec![section()],
-    };
-    NativeFullSessionRest {
+    ExtractedOperatorRest {
         header,
         carriers: [(NativeCarrierOrdinal(0), section())].into_iter().collect(),
         checkpoints: BTreeMap::new(),
         terminal_carrier: Some(tiled),
-        terminal_reacted: Some(tiled_reacted),
-        terminal_contracted: Some(vec![(1, 1)]),
-        terminal_presented: Some(section()),
         overlay: [(NativeTensorOrdinal(0), vec![overlay()])]
             .into_iter()
             .collect(),
@@ -133,7 +123,7 @@ fn base_rest() -> NativeFullSessionRest {
     }
 }
 
-fn encoded(rest: &NativeFullSessionRest) -> Vec<u8> {
+fn encoded(rest: &ExtractedOperatorRest) -> Vec<u8> {
     let mut bytes = Vec::new();
     rest.write_to(&mut bytes).unwrap();
     bytes
@@ -156,7 +146,7 @@ fn roundtrip_preserves_sections_terminal_and_exact_overlay_words() {
     let rest = base_rest();
     let bytes = encoded(&rest);
     let decoded =
-        NativeFullSessionRest::read_from(&mut Cursor::new(bytes.clone()), bytes.len() as u64)
+        ExtractedOperatorRest::read_from(&mut Cursor::new(bytes.clone()), bytes.len() as u64)
             .unwrap();
     assert_eq!(decoded, rest);
     assert!(bytes.windows(8).any(|window| window == 7i64.to_le_bytes()));
@@ -171,12 +161,12 @@ fn fragmented_read_roundtrips_and_every_truncation_refuses() {
         width: 1,
     };
     assert_eq!(
-        NativeFullSessionRest::read_from(&mut fragmented, bytes.len() as u64).unwrap(),
+        ExtractedOperatorRest::read_from(&mut fragmented, bytes.len() as u64).unwrap(),
         rest
     );
     for length in 0..bytes.len() {
         assert!(
-            NativeFullSessionRest::read_from(
+            ExtractedOperatorRest::read_from(
                 &mut Cursor::new(bytes[..length].to_vec()),
                 length as u64
             )
@@ -193,13 +183,13 @@ fn trailing_bytes_and_hostile_length_refuse() {
     let mut trailing = bytes.clone();
     trailing.push(0);
     assert!(
-        NativeFullSessionRest::read_from(&mut Cursor::new(trailing), (bytes.len() + 1) as u64)
+        ExtractedOperatorRest::read_from(&mut Cursor::new(trailing), (bytes.len() + 1) as u64)
             .is_err()
     );
     let magic = b"HNA-SESSION-REST\x01".len();
     let mut hostile = bytes;
     hostile[magic..magic + 8].copy_from_slice(&u64::MAX.to_le_bytes());
-    assert!(NativeFullSessionRest::read_from(&mut Cursor::new(hostile), magic as u64 + 8).is_err());
+    assert!(ExtractedOperatorRest::read_from(&mut Cursor::new(hostile), magic as u64 + 8).is_err());
 }
 
 #[test]
@@ -234,7 +224,7 @@ fn pending_interrupted_state_roundtrips() {
         .map(|i| i.progress.clone());
     let bytes = encoded(&rest);
     assert_eq!(
-        NativeFullSessionRest::read_from(&mut Cursor::new(bytes.clone()), bytes.len() as u64)
+        ExtractedOperatorRest::read_from(&mut Cursor::new(bytes.clone()), bytes.len() as u64)
             .unwrap(),
         rest
     );
@@ -251,4 +241,68 @@ fn malformed_operator_extents_and_missing_ports_refuse_before_device_access() {
     let mut rest = base_rest();
     rest.header.ecology.operations[1].inputs.clear();
     assert!(rest.validate().is_err());
+}
+
+/// The frame as the writer laid it out before the retention law retired the previous-cycle
+/// terminal material: the reacted tiles, the dissection's tied row and the presented carrier.
+fn legacy_encoded(rest: &ExtractedOperatorRest) -> Vec<u8> {
+    let mut out = Vec::new();
+    out.extend_from_slice(MAGIC);
+    json(&mut out, &rest.header).unwrap();
+    sections(&mut out, &rest.carriers).unwrap();
+    sections(&mut out, &rest.checkpoints).unwrap();
+    tiled(&mut out, &rest.terminal_carrier).unwrap();
+    let reacted = NativeTiledRest {
+        carrier: NativeCarrierOrdinal(5),
+        rows: 1,
+        width: 1,
+        grain: 0,
+        sections: vec![section()],
+    };
+    tiled(&mut out, &Some(reacted)).unwrap();
+    flag(&mut out, true).unwrap();
+    number(&mut out, 1).unwrap();
+    out.extend_from_slice(&1i64.to_le_bytes());
+    out.extend_from_slice(&1i64.to_le_bytes());
+    flag(&mut out, true).unwrap();
+    super::section(&mut out, &section()).unwrap();
+    overlays(&mut out, &rest.overlay).unwrap();
+    flag(&mut out, false).unwrap();
+    flag(&mut out, false).unwrap();
+    out.extend_from_slice(END);
+    out
+}
+
+#[test]
+fn an_older_wire_with_previous_cycle_terminal_material_decodes_and_releases_it() {
+    let rest = base_rest();
+    let legacy = legacy_encoded(&rest);
+    let decoded =
+        ExtractedOperatorRest::read_from(&mut Cursor::new(legacy.clone()), legacy.len() as u64)
+            .unwrap();
+    assert_eq!(decoded, rest, "the retired positions are read and released");
+    let current = encoded(&rest);
+    assert!(current.len() < legacy.len());
+    // The current frame keeps the old layout, declaring the retired positions absent.
+    let mut out = Vec::new();
+    out.extend_from_slice(MAGIC);
+    json(&mut out, &rest.header).unwrap();
+    sections(&mut out, &rest.carriers).unwrap();
+    sections(&mut out, &rest.checkpoints).unwrap();
+    tiled(&mut out, &rest.terminal_carrier).unwrap();
+    tiled(&mut out, &None).unwrap();
+    flag(&mut out, false).unwrap();
+    flag(&mut out, false).unwrap();
+    overlays(&mut out, &rest.overlay).unwrap();
+    flag(&mut out, false).unwrap();
+    flag(&mut out, false).unwrap();
+    out.extend_from_slice(END);
+    assert_eq!(current, out);
+    let mut hostile = legacy;
+    let at = hostile.len() - END.len() - 3;
+    hostile.truncate(at);
+    assert!(
+        ExtractedOperatorRest::read_from(&mut Cursor::new(hostile.clone()), hostile.len() as u64)
+            .is_err()
+    );
 }

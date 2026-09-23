@@ -10,7 +10,7 @@ use holonics_hna::AthenaTokenApplication;
 use holonic_engine::{
     embedding_fiber::ResidentReadout,
     native_ecology::holonic_intelligence::{
-        NativeFullOperatorSession, NativeMorphologyTransition,
+        ExtractedOperatorSession, NativeMorphologyTransition,
         NativeOperatorResidence, NativeReturnAperture, dismantle_full_native_operator,
         mount_operator_surface,
     },
@@ -122,25 +122,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         NativeOperatorResidence::mount(&surface, &returned.native, &returned.exterior)?;
     let session = match aperture {
         Some(aperture) => {
-            NativeFullOperatorSession::found_with_return(&returned.native, &mut residence, aperture)?
+            ExtractedOperatorSession::found_with_return(&returned.native, &mut residence, aperture)?
         }
-        None => NativeFullOperatorSession::found(&returned.native, &mut residence)?,
+        None => ExtractedOperatorSession::found(&returned.native, &mut residence)?,
     };
     step("first cycle");
     let started = std::time::Instant::now();
     let first = session.advance_cycle(&context)?;
     let first_cycle_milliseconds = started.elapsed().as_millis();
-    let face = application.render(&first.final_emission)?;
+    let face = application.render(&first.output.final_emission)?;
     let session = first.successor;
     step("first return and second cycle");
     let started = std::time::Instant::now();
     let second = session.advance_cycle(&entering)?;
     let second_cycle_milliseconds = started.elapsed().as_millis();
-    let (changed, adjoint) = match &second.traces[0].morphology_transition {
+    let (changed, adjoint) = match &second.output.traces[0].chart.morphology_transition {
         NativeMorphologyTransition::Changed { adjoint, .. } => (true, Some(adjoint.clone())),
         NativeMorphologyTransition::Unchanged => (false, None),
     };
-    let second_face = application.render(&second.final_emission)?;
+    let second_face = application.render(&second.output.final_emission)?;
     let mut supports_by_layer: Vec<LayerSupport> = Vec::new();
     if let Some(adjoint) = &adjoint {
         for support in &adjoint.supports {
@@ -159,7 +159,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     }
-    let second_emission_digest = digest(&second.final_emission.intervals);
+    let second_emission_digest = digest(&second.output.final_emission.intervals);
     let overlay_rank_after = second.successor.morphology_overlay_rank();
     let repeated_return = if mode == "repeat" {
         let predecessor_generation = second.successor.generation();
@@ -168,7 +168,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         step("second return through retained overlays and third cycle");
         let started = std::time::Instant::now();
         let third = second.successor.advance_cycle(&next)?;
-        let NativeMorphologyTransition::Changed { adjoint, .. } = &third.traces[0].morphology_transition else {
+        let NativeMorphologyTransition::Changed { adjoint, .. } = &third.output.traces[0].chart.morphology_transition else {
             return Err("the second continuation did not return a morphology change".into());
         };
         let after = third.successor.morphology_overlay_rank();
@@ -187,7 +187,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             operations_returned: adjoint.operations_returned,
             cross_sections_deposited,
             cycle_milliseconds: started.elapsed().as_millis(),
-            emission_digest: digest(&third.final_emission.intervals),
+            emission_digest: digest(&third.output.final_emission.intervals),
         })
     } else { None };
     let receipt = Receipt {

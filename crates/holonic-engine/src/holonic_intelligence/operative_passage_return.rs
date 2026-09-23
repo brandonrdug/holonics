@@ -18,8 +18,8 @@ use super::{
         deposit_from_material, enact_identity_admittance_contact, native_section_difference,
         scale_contact_differential, DepositMaterial, OverlayAtom,
     },
-    NativeCarrierOrdinal, NativeFullCycle, NativeFullOperationError, NativeFullOperatorEcology,
-    NativeFullOperatorSession, NativeMorphologyDeposit, NativeOperationPrimitive,
+    NativeCarrierOrdinal, ExtractedOperatorCycle, ExtractedOperatorRefusal, NativeFullOperatorEcology,
+    ExtractedOperatorSession, NativeMorphologyDeposit, NativeOperationPrimitive,
     NativeOperatorNode, NativeOperatorResidence, NativeReturnAperture, NativeTensorOrdinal,
 };
 
@@ -144,7 +144,7 @@ fn bindings_of(operations: &[NativeOperatorNode]) -> BTreeMap<u32, Vec<NativeJoi
 
 impl NativeFullOperatorEcology {
     /// Preflight the model's own contact graph before loading its coefficient payload.
-    pub fn joined_passages(&self) -> Result<Vec<NativeJoinedPassage>, NativeFullOperationError> {
+    pub fn joined_passages(&self) -> Result<Vec<NativeJoinedPassage>, ExtractedOperatorRefusal> {
         self.validate()?;
         Ok(bindings_of(&self.operations)
             .into_values()
@@ -154,15 +154,15 @@ impl NativeFullOperatorEcology {
 }
 
 impl<'chart> PassageCultivation<'chart> {
-    pub(super) fn check_rest_ownership(&self) -> Result<(), super::NativeSessionRestError> {
+    pub(super) fn check_rest_ownership(&self) -> Result<(), super::ExtractedOperatorRefusal> {
         if Rc::strong_count(&self.origin) != 1 {
-            return Err(super::NativeSessionRestError::Unsupported("an external withdrawal still owns part of this passage lineage"));
+            return Err(super::ExtractedOperatorRefusal::Unsupported("an external withdrawal still owns part of this passage lineage"));
         }
         Ok(())
     }
 
     pub(super) fn detach_rest(&self, surface: &crate::resident_section::ResidentSurface<'chart>)
-        -> Result<super::NativePassageRest, super::NativeSessionRestError> {
+        -> Result<super::NativePassageRest, super::ExtractedOperatorRefusal> {
         self.check_rest_ownership()?;
         Ok(super::NativePassageRest { aperture: self.aperture,
             pending: super::operative_rest::detach_overlays(surface, &self.pending)?, returns: self.returns.clone() })
@@ -170,12 +170,12 @@ impl<'chart> PassageCultivation<'chart> {
 
     pub(super) fn remount_rest(ecology: &NativeFullOperatorEcology,
         surface: &'chart crate::resident_section::ResidentSurface<'chart>, rest: &super::NativePassageRest,
-    ) -> Result<Self, super::NativeSessionRestError> {
+    ) -> Result<Self, super::ExtractedOperatorRefusal> {
         let mut passage = Self::found(ecology, rest.aperture);
         for returned in &rest.returns {
             if !passage.bindings.get(&returned.contact.joining_operation)
                 .is_some_and(|contacts| contacts.contains(&returned.contact)) {
-                return Err(super::NativeSessionRestError::Malformed("pending return does not join the actual graph".into()));
+                return Err(super::ExtractedOperatorRefusal::Rest("pending return does not join the actual graph".into()));
             }
         }
         passage.pending = super::operative_rest::mount_overlays(surface, &rest.pending)?;
@@ -233,18 +233,18 @@ impl<'chart> PassageCultivation<'chart> {
     }
 }
 
-impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
+impl<'residence, 'chart> ExtractedOperatorSession<'residence, 'chart> {
     /// Found the declared observed joined-passage developmental chart. It uses the same cycle owner
     /// as the prefix chart, but does not install the prefix's different comparison rule as well.
     pub fn found_with_passage_return(
         ecology: &'residence NativeFullOperatorEcology,
         residence: &'residence mut NativeOperatorResidence<'chart>,
         aperture: NativeReturnAperture,
-    ) -> Result<Self, NativeFullOperationError> {
+    ) -> Result<Self, ExtractedOperatorRefusal> {
         ecology.validate()?;
         let cultivation = PassageCultivation::found(ecology, aperture);
         if cultivation.bindings.is_empty() {
-            return Err(NativeFullOperationError::Contact(
+            return Err(ExtractedOperatorRefusal::Contact(
                 "the body has no admitted additive contact",
             ));
         }
@@ -265,34 +265,33 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     pub fn observe_passage_cycle(
         mut self,
         rows: &[u32],
-    ) -> Result<NativeFullCycle<'residence, 'chart>, NativeFullOperationError> {
+    ) -> Result<ExtractedOperatorCycle<'residence, 'chart>, ExtractedOperatorRefusal> {
         let output=self.observe_passage_cycle_retained(rows)?;
-        Ok(NativeFullCycle {final_emission:output.final_emission,traces:output.traces,
-            passage_returns:output.passage_returns,successor:self})
+        Ok(ExtractedOperatorCycle { output, successor: self })
     }
 
     /// Borrowed attribution receiver: even a refused observation retains the same native owner
     /// and restores the local-return chart. It is never the default productive operation.
     pub fn observe_passage_cycle_retained(&mut self,rows:&[u32])
-        -> Result<super::NativeFullCycleOutput,NativeFullOperationError> {
+        -> Result<super::ExtractedCycleOutput,ExtractedOperatorRefusal> {
         self.observe_passage_readout_retained(rows,super::NativeEmissionReadout::Complete)
     }
 
     pub fn observe_passage_readout_retained(&mut self,rows:&[u32],readout:super::NativeEmissionReadout)
-        -> Result<super::NativeFullCycleOutput,NativeFullOperationError> {
+        -> Result<super::ExtractedCycleOutput,ExtractedOperatorRefusal> {
         if !self.cycle_complete && self.operation_at != 0 {
-            return Err(NativeFullOperationError::Contact(
+            return Err(ExtractedOperatorRefusal::Contact(
                 "an observation requires an operation boundary",
             ));
         }
         let chart = self
             .passage_cultivation
             .as_ref()
-            .ok_or(NativeFullOperationError::Contact(
+            .ok_or(ExtractedOperatorRefusal::Contact(
                 "this session has no joined-passage chart",
             ))?;
         if !chart.pending.is_empty() || !chart.returns.is_empty() {
-            return Err(NativeFullOperationError::Contact(
+            return Err(ExtractedOperatorRefusal::Contact(
                 "an unclosed local return is not an observation boundary",
             ));
         }
@@ -306,15 +305,15 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     /// operation may learn again; restoration refuses if new factors now occupy this difference.
     pub fn withdraw_passage_changes(
         &mut self,
-    ) -> Result<NativePassageWithdrawal<'chart>, NativeFullOperationError> {
+    ) -> Result<NativePassageWithdrawal<'chart>, ExtractedOperatorRefusal> {
         let chart = self
             .passage_cultivation
             .as_ref()
-            .ok_or(NativeFullOperationError::Contact(
+            .ok_or(ExtractedOperatorRefusal::Contact(
                 "this session has no joined-passage chart",
             ))?;
         if !self.cycle_complete || !chart.pending.is_empty() || !chart.returns.is_empty() {
-            return Err(NativeFullOperationError::Contact(
+            return Err(ExtractedOperatorRefusal::Contact(
                 "withdrawal requires a completed operation",
             ));
         }
@@ -329,7 +328,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     pub fn restore_passage_changes(
         &mut self,
         withdrawal: NativePassageWithdrawal<'chart>,
-    ) -> Result<(), (NativeFullOperationError, NativePassageWithdrawal<'chart>)> {
+    ) -> Result<(), (ExtractedOperatorRefusal, NativePassageWithdrawal<'chart>)> {
         let compatible = self.passage_cultivation.as_ref().is_some_and(|chart| {
             Rc::ptr_eq(&chart.origin, &withdrawal.origin)
                 && chart.pending.is_empty()
@@ -337,7 +336,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         });
         if !self.cycle_complete || !compatible || !self.overlay.is_empty() {
             return Err((
-                NativeFullOperationError::Contact(
+                ExtractedOperatorRefusal::Contact(
                     "the withdrawal does not rejoin this unmodified native base",
                 ),
                 withdrawal,
@@ -351,7 +350,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     pub(super) fn return_joined_passage(
         &mut self,
         operation: u32,
-    ) -> Result<(), NativeFullOperationError> {
+    ) -> Result<(), ExtractedOperatorRefusal> {
         let Some(cultivation) = self.passage_cultivation.as_ref() else {
             return Ok(());
         };
@@ -374,12 +373,12 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             // These borrows can only resolve sections owned by this cycle/checkpoint population.
             // No public API accepts a manufactured SectionContactMaterial or an ordinal-only join.
             let source = carrier_of(&self.carriers, &self.checkpoints, &contact.presented).ok_or(
-                NativeFullOperationError::Contact("the presented carrier was not retained"),
+                ExtractedOperatorRefusal::Contact("the presented carrier was not retained"),
             )?;
             let transported = carrier_of(&self.carriers, &self.checkpoints, &contact.transported)
-                .ok_or(NativeFullOperationError::Carrier)?;
+                .ok_or(ExtractedOperatorRefusal::Carrier)?;
             let arrived = carrier_of(&self.carriers, &self.checkpoints, &contact.arrived)
-                .ok_or(NativeFullOperationError::Carrier)?;
+                .ok_or(ExtractedOperatorRefusal::Carrier)?;
             let returned = if contact.reaction_path.is_empty() {
                 enact_identity_admittance_contact(
                     self.residence.surface(),
@@ -430,7 +429,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                             let reaction = self.ecology.operations[*at as usize].clone();
                             let dy = adjoint
                                 .remove(&reaction.output)
-                                .ok_or(NativeFullOperationError::Carrier)?;
+                                .ok_or(ExtractedOperatorRefusal::Carrier)?;
                             self.return_through(
                                 &reaction,
                                 dy,
@@ -444,15 +443,15 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                             self.ecology.operations[contact.transport_operation as usize].output;
                         let dy = adjoint
                             .remove(&endpoint)
-                            .ok_or(NativeFullOperationError::Carrier)?;
+                            .ok_or(ExtractedOperatorRefusal::Carrier)?;
                         if !adjoint.is_empty() || !unexpected.is_empty() {
-                            return Err(NativeFullOperationError::Contact(
+                            return Err(ExtractedOperatorRefusal::Contact(
                                 "the declared unary return escaped its local word",
                             ));
                         }
                         let source =
                             carrier_of(&self.carriers, &self.checkpoints, &contact.presented)
-                                .ok_or(NativeFullOperationError::Carrier)?;
+                                .ok_or(ExtractedOperatorRefusal::Carrier)?;
                         Some(deposit_from_material(
                             self.residence.surface(),
                             DepositMaterial {

@@ -15,7 +15,7 @@ use holonics_hna::AthenaTokenApplication;
 use holonic_engine::{
     embedding_fiber::ResidentReadout,
     native_ecology::holonic_intelligence::{
-        NativeDissectionAperture, NativeExposure, NativeExposureFace, NativeFullOperatorSession,
+        NativeDissectionAperture, NativeExposure, NativeExposureFace, ExtractedOperatorSession,
         NativeOperatorResidence, NativeSignatureQuotient, NativeSiteBitmask,
         dismantle_full_native_operator, mount_operator_surface,
     },
@@ -96,14 +96,14 @@ fn exposure(args: &[String]) -> Result<(), Box<dyn std::error::Error>> {
     let surface = mount_operator_surface(&readout)?;
     let mut residence =
         NativeOperatorResidence::mount(&surface, &returned.native, &returned.exterior)?;
-    let session = NativeFullOperatorSession::found_for_dissection(
+    let session = ExtractedOperatorSession::found_for_dissection(
         &returned.native,
         &mut residence,
         NativeDissectionAperture { series_terms: 14 },
     )?;
     eprintln!("stage: cycle on {} addresses", addresses.len());
     let cycle = session.advance_cycle(&addresses)?;
-    let face = application.render(&cycle.final_emission)?;
+    let face = application.render(&cycle.output.final_emission)?;
     let mut session = cycle.successor;
     eprintln!("stage: excite");
     let excitation = session.excite()?;

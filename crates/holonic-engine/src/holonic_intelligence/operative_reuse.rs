@@ -139,7 +139,7 @@ pub(super) struct NativeForwardReuse<'chart> {
 
 impl<'chart> NativeForwardReuse<'chart> {
     pub(super) fn detach_rest(&self, surface: &crate::resident_section::ResidentSurface<'chart>)
-        -> Result<super::NativeForwardReuseRest, super::NativeSessionRestError> {
+        -> Result<super::NativeForwardReuseRest, super::ExtractedOperatorRefusal> {
         Ok(super::NativeForwardReuseRest { census: self.census(),
             numerical: self.numerical.iter().map(|(ordinal, n)| (*ordinal, super::NativeNumericalRest {
                 admitted: n.admitted, projection: n.projection.clone(), origin: n.origin.clone() })).collect(),
@@ -148,11 +148,11 @@ impl<'chart> NativeForwardReuse<'chart> {
 
     pub(super) fn remount_rest(ecology: &NativeFullOperatorEcology,
         surface: &'chart crate::resident_section::ResidentSurface<'chart>, rest: &super::NativeForwardReuseRest,
-    ) -> Result<Self, super::NativeSessionRestError> {
+    ) -> Result<Self, super::ExtractedOperatorRefusal> {
         let mut reuse = Self::found(ecology);
         let outputs: BTreeSet<_> = reuse.index.segments.iter().flat_map(|s| s.outputs.iter().copied()).collect();
         if rest.numerical.keys().any(|key| !outputs.contains(key)) {
-            return Err(super::NativeSessionRestError::Malformed("reuse names a non-forward output".into()));
+            return Err(super::ExtractedOperatorRefusal::Rest("reuse names a non-forward output".into()));
         }
         reuse.numerical = rest.numerical.iter().map(|(ordinal, n)| (*ordinal, NumericalReturn {
             admitted: n.admitted, projection: n.projection.clone(), origin: n.origin.clone() })).collect();
@@ -162,7 +162,7 @@ impl<'chart> NativeForwardReuse<'chart> {
             || rest.census.indexed_operations != reuse.census.indexed_operations
             || rest.census.indexed_segments != reuse.census.indexed_segments
             || rest.census.indexed_dependencies != reuse.census.indexed_dependencies {
-            return Err(super::NativeSessionRestError::Malformed("reuse representation receipt differs".into()));
+            return Err(super::ExtractedOperatorRefusal::Rest("reuse representation receipt differs".into()));
         }
         reuse.census = rest.census.clone();
         Ok(reuse)

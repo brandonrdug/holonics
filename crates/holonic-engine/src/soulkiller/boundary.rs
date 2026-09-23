@@ -11,15 +11,26 @@ use crate::native_ecology::holonic_intelligence::{
     DismantlingBoundaryReturn, IntoDismantlingBoundaryReturn,
 };
 
-#[derive(Debug, PartialEq, Eq)]
-pub struct SoulkillerDismantlingReturn<Productive, ColdWitness, Insufficiency> {
+/// [definition] **The return of equation extraction**, in three lanes: `native`, the extracted
+/// operators and coefficients as a native constitution and transport law (a spool complex, the
+/// operator graph `NativeFullOperatorEcology`, the per-layer branch `NativeOperatorMorphology`, or
+/// a cone-restricted ecology); `exterior`, the cold witness locating the foreign source; and
+/// `insufficiency`, what the extraction did not reach (`()` when the extractor declares none).
+/// "Soulkiller" is only the historical label of this boundary (plan phase 15); the name decides
+/// no mathematics.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ExtractionReturn<Productive, ColdWitness, Insufficiency> {
     pub native: Productive,
     pub exterior: ColdWitness,
     pub insufficiency: Insufficiency,
 }
 
+/// The boundary's historical name for [`ExtractionReturn`], kept for its callers.
+pub type SoulkillerDismantlingReturn<Productive, ColdWitness, Insufficiency> =
+    ExtractionReturn<Productive, ColdWitness, Insufficiency>;
+
 impl<Productive, ColdWitness, Insufficiency> DismantlingBoundaryReturn
-    for SoulkillerDismantlingReturn<Productive, ColdWitness, Insufficiency>
+    for ExtractionReturn<Productive, ColdWitness, Insufficiency>
 {
     type Productive = Productive;
     type ColdWitness = ColdWitness;
@@ -39,7 +50,7 @@ impl<Productive, ColdWitness, Insufficiency> DismantlingBoundaryReturn
 }
 
 impl<Productive, ColdWitness, Insufficiency> IntoDismantlingBoundaryReturn
-    for SoulkillerDismantlingReturn<Productive, ColdWitness, Insufficiency>
+    for ExtractionReturn<Productive, ColdWitness, Insufficiency>
 {
     fn into_lanes(self) -> (Self::Productive, Self::ColdWitness, Self::Insufficiency) {
         (self.native, self.exterior, self.insufficiency)

@@ -9,7 +9,7 @@ use std::path::{Path, PathBuf};
 use holonic_engine::{
     embedding_fiber::ResidentReadout,
     native_ecology::holonic_intelligence::{
-        NativeFullOperationError, NativeFullOperatorEcology, NativeFullOperatorSession,
+        ExtractedOperatorRefusal, ExtractedOperatorSession, NativeFullOperatorEcology,
         NativeMorphologyTransition, NativeOperatorResidence, NativeReturnAperture,
         dismantle_full_native_operator, face_of_last_row,
     },
@@ -162,7 +162,7 @@ pub enum HnaError {
     #[error("source: {0}")]
     Source(String),
     #[error("native operator: {0}")]
-    Operator(#[from] NativeFullOperationError),
+    Operator(#[from] ExtractedOperatorRefusal),
     #[error("resident apparatus: {0}")]
     Resident(String),
     #[error("receiver face was not emitted")]
@@ -267,9 +267,9 @@ fn run_mounted(
 ) -> Result<HnaRunReceipt, HnaError> {
     let mut session = match request.cultivation {
         Some(aperture) => {
-            NativeFullOperatorSession::found_with_return(ecology, residence, aperture.into())?
+            ExtractedOperatorSession::found_with_return(ecology, residence, aperture.into())?
         }
-        None => NativeFullOperatorSession::found(ecology, residence)?,
+        None => ExtractedOperatorSession::found(ecology, residence)?,
     };
     let mut cycles = Vec::with_capacity(request.occurrences.len());
     for (ordinal, occurrence) in request.occurrences.iter().enumerate() {
@@ -277,13 +277,14 @@ fn run_mounted(
         let predecessor_overlay_rank = session.morphology_overlay_rank();
         let addresses = occurrence_addresses(occurrence);
         let cycle = session.advance_cycle(&addresses)?;
-        let emission = &cycle.final_emission;
+        let emission = &cycle.output.final_emission;
         let selected_face = face_of_last_row(&emission.intervals, emission.rows, emission.width)
             .ok_or(HnaError::Face)?;
         let morphology_transition = cycle
+            .output
             .traces
             .iter()
-            .find_map(|trace| match &trace.morphology_transition {
+            .find_map(|trace| match &trace.chart.morphology_transition {
                 NativeMorphologyTransition::Unchanged => None,
                 changed => Some(changed.clone()),
             })

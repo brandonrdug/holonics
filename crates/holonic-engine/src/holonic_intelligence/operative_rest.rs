@@ -1,27 +1,37 @@
-//! Exterior rest of the complete native session. This codec never runs inside a recurrence.
-//! The coefficient base is an explicit separate dependency; this state is not source-independent.
+//! **The one rest of the extracted operator.** An exterior chart of a session's state, never a
+//! cloned live owner; this codec never runs inside a recurrence. Both executors rest here: the
+//! graph session (`ExtractedOperatorSession`) and the branch session (`ExtractedBranchSession`,
+//! whose morphology is the six-node instance of the same constitution chart). The coefficient
+//! base is an explicit separate dependency; this state is not source-independent.
+//!
+//! [definition] Retention law (`CLAUDE.md`, `Foundation/Standing.lean`): a rest carries the
+//! quotient the admitted future needs — the operation position and chronology, the contemporary
+//! carriers of an unfinished word with their within-cycle checkpoints, the receiver's emitted face,
+//! the deposited overlay (the constitution's change), a pending passage return and the numerical
+//! reuse standing. It never carries a previous cycle's terminal cut: the continuing return reads
+//! the contemporary constitution at `previous_context`. Older wires that still carry the reacted
+//! and presented terminal carriers or the dissection's tied row decode; those fields are read and
+//! released, never remounted.
 
 use super::{
     full_operation::ContemporaryCarrier, operative_passage_return::PassageCultivation,
     operative_return::OverlayAtom, operative_reuse::NativeForwardReuse,
-    operative_terminal::TiledCarrier, NativeCarrierOrdinal, NativeCycleInterruption,
-    NativeCycleProgress, NativeForwardReuseCensus, NativeFullOperationError,
-    NativeFullOperatorEcology, NativeFullOperatorSession, NativeNumericalOrigin,
-    NativeOperatorResidence, NativeOverlayRest, NativePassageReturn, NativeReturnAperture,
-    NativeSuccessorProjection, NativeTensorOrdinal,
+    operative_terminal::TiledCarrier, ExtractedOperatorRefusal, ExtractedOperatorSession,
+    NativeCarrierOrdinal, NativeCycleInterruption, NativeCycleProgress, NativeForwardReuseCensus,
+    NativeFullOperatorEcology, NativeNumericalOrigin, NativeOperatorResidence,
+    NativePassageReturn, NativeReturnAperture, NativeSuccessorProjection, NativeTensorOrdinal,
 };
 use crate::resident_section::{
     ResidentGrain, ResidentRefusal, ResidentSectionRest, ResidentSurface,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
-use thiserror::Error;
 
 pub const NATIVE_SESSION_REST_SCHEMA: &str = "holonic-engine.native-full-session-rest.v1";
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct NativeSessionRestHeader {
+pub struct ExtractedOperatorRestHeader {
     pub schema: String,
     /// Operator/incidence chart only. Equality of this header does not identify base codewords.
     pub ecology: NativeFullOperatorEcology,
@@ -68,42 +78,59 @@ pub struct NativeForwardReuseRest {
     pub standing: BTreeMap<NativeCarrierOrdinal, ResidentSectionRest>,
 }
 
-/// A serialized chart, not a cloned live owner. Remount requires the exact declared base and
-/// its admitted restrictions; the public artifact layer is responsible for pinning those bytes.
+/// The rest of one deposited overlay atom `u · v` — the constitution's change on one coefficient
+/// population, not another running ecology. The two arrays are the actual sealed integer factors,
+/// with their distinct dyadic exponents.
 #[derive(Debug, PartialEq, Eq)]
-pub struct NativeFullSessionRest {
-    pub header: NativeSessionRestHeader,
+pub struct NativeOverlayRest {
+    pub rows: usize,
+    pub width: usize,
+    pub rank: usize,
+    pub u: Vec<i64>,
+    pub v: Vec<i64>,
+    pub u_exponent: i32,
+    pub v_exponent: i32,
+    pub u_octaves: u32,
+    pub v_octaves: u32,
+}
+
+impl NativeOverlayRest {
+    pub fn validate(&self) -> Result<(), ResidentRefusal> {
+        let bound = |words: &[i64], octaves: u32| octaves <= 64 && words.iter().all(|word|
+            64 - word.unsigned_abs().leading_zeros() <= octaves);
+        if self.rows == 0 || self.width == 0 || self.rank == 0
+            || self.rows.checked_mul(self.rank) != Some(self.u.len())
+            || self.rank.checked_mul(self.width) != Some(self.v.len())
+            || !bound(&self.u, self.u_octaves) || !bound(&self.v, self.v_octaves) {
+            return Err(ResidentRefusal::Declaration { operation: "native-overlay-rest",
+                what: "factor shapes or declared octave bounds do not reconstruct the held atom".into() });
+        }
+        Ok(())
+    }
+}
+
+/// **The one rest.** A serialized chart, not a cloned live owner. Remount requires the exact
+/// declared base and its admitted restrictions; the public artifact layer is responsible for
+/// pinning those bytes.
+#[derive(Debug, PartialEq, Eq)]
+pub struct ExtractedOperatorRest {
+    pub header: ExtractedOperatorRestHeader,
+    /// The contemporary carriers of the unfinished word (the branch: its current carrier and,
+    /// inside the word, the retained re-entry carrier at `c0`).
     pub carriers: BTreeMap<NativeCarrierOrdinal, ResidentSectionRest>,
+    /// Cross-layer checkpoints of the unfinished cycle; empty at a cycle boundary.
     pub checkpoints: BTreeMap<NativeCarrierOrdinal, ResidentSectionRest>,
+    /// The emitted face held for its receiver.
     pub terminal_carrier: Option<NativeTiledRest>,
-    pub terminal_reacted: Option<NativeTiledRest>,
-    pub terminal_contracted: Option<Vec<(i64, i64)>>,
-    pub terminal_presented: Option<ResidentSectionRest>,
     pub overlay: BTreeMap<NativeTensorOrdinal, Vec<NativeOverlayRest>>,
     pub passage: Option<NativePassageRest>,
     pub reuse: Option<NativeForwardReuseRest>,
 }
 
-#[derive(Debug, Error)]
-pub enum NativeSessionRestError {
-    #[error("native session rest: {0}")]
-    Malformed(String),
-    #[error("this session rest boundary is not supported: {0}")]
-    Unsupported(&'static str),
-    #[error("resident rest: {0}")]
-    Resident(#[from] ResidentRefusal),
-    #[error("native operation: {0}")]
-    Operation(#[from] NativeFullOperationError),
-    #[error("rest I/O: {0}")]
-    Io(#[from] std::io::Error),
-    #[error("rest header: {0}")]
-    Json(#[from] serde_json::Error),
-}
-
 pub(super) fn detach_carriers(
     surface: &ResidentSurface<'_>,
     carriers: &BTreeMap<NativeCarrierOrdinal, ContemporaryCarrier<'_>>,
-) -> Result<BTreeMap<NativeCarrierOrdinal, ResidentSectionRest>, NativeSessionRestError> {
+) -> Result<BTreeMap<NativeCarrierOrdinal, ResidentSectionRest>, ExtractedOperatorRefusal> {
     carriers
         .iter()
         .map(|(ordinal, carrier)| {
@@ -118,7 +145,7 @@ pub(super) fn detach_carriers(
 pub(super) fn mount_carriers<'chart>(
     surface: &'chart ResidentSurface<'chart>,
     rest: &BTreeMap<NativeCarrierOrdinal, ResidentSectionRest>,
-) -> Result<BTreeMap<NativeCarrierOrdinal, ContemporaryCarrier<'chart>>, NativeSessionRestError> {
+) -> Result<BTreeMap<NativeCarrierOrdinal, ContemporaryCarrier<'chart>>, ExtractedOperatorRefusal> {
     rest.iter()
         .map(|(ordinal, section)| {
             Ok((
@@ -135,7 +162,7 @@ pub(super) fn mount_carriers<'chart>(
 pub(super) fn detach_overlays(
     surface: &ResidentSurface<'_>,
     overlays: &BTreeMap<NativeTensorOrdinal, Vec<OverlayAtom<'_>>>,
-) -> Result<BTreeMap<NativeTensorOrdinal, Vec<NativeOverlayRest>>, NativeSessionRestError> {
+) -> Result<BTreeMap<NativeTensorOrdinal, Vec<NativeOverlayRest>>, ExtractedOperatorRefusal> {
     overlays
         .iter()
         .map(|(population, atoms)| {
@@ -153,7 +180,7 @@ pub(super) fn detach_overlays(
 pub(super) fn mount_overlays<'chart>(
     surface: &'chart ResidentSurface<'chart>,
     rest: &BTreeMap<NativeTensorOrdinal, Vec<NativeOverlayRest>>,
-) -> Result<BTreeMap<NativeTensorOrdinal, Vec<OverlayAtom<'chart>>>, NativeSessionRestError> {
+) -> Result<BTreeMap<NativeTensorOrdinal, Vec<OverlayAtom<'chart>>>, ExtractedOperatorRefusal> {
     rest.iter()
         .map(|(population, atoms)| {
             Ok((
@@ -170,9 +197,9 @@ pub(super) fn mount_overlays<'chart>(
 fn detach_tiled(
     surface: &ResidentSurface<'_>,
     tiled: &TiledCarrier<'_>,
-) -> Result<NativeTiledRest, NativeSessionRestError> {
+) -> Result<NativeTiledRest, ExtractedOperatorRefusal> {
     if tiled.sections.len() != tiled.bounds.len() {
-        return Err(NativeSessionRestError::Malformed("tiled bounds".into()));
+        return Err(ExtractedOperatorRefusal::Rest("tiled bounds".into()));
     }
     Ok(NativeTiledRest {
         carrier: tiled.carrier,
@@ -191,7 +218,7 @@ fn detach_tiled(
 fn mount_tiled<'chart>(
     surface: &'chart ResidentSurface<'chart>,
     rest: &NativeTiledRest,
-) -> Result<TiledCarrier<'chart>, NativeSessionRestError> {
+) -> Result<TiledCarrier<'chart>, ExtractedOperatorRefusal> {
     Ok(TiledCarrier {
         carrier: rest.carrier,
         rows: rest.rows,
@@ -206,20 +233,20 @@ fn mount_tiled<'chart>(
     })
 }
 
-impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
+impl<'residence, 'chart> ExtractedOperatorSession<'residence, 'chart> {
     /// Detach state at an explicit checkpoint boundary while retaining the unique live owner.
     /// A failed writer need not consume this owner. Dissection/held external withdrawals refuse
     /// rather than silently omitting their independently owned material.
-    pub fn detach_rest(&self) -> Result<NativeFullSessionRest, NativeSessionRestError> {
+    pub fn detach_rest(&self) -> Result<ExtractedOperatorRest, ExtractedOperatorRefusal> {
         if self.dissection.is_some() {
-            return Err(NativeSessionRestError::Unsupported("dissection apparatus"));
+            return Err(ExtractedOperatorRefusal::Unsupported("dissection apparatus"));
         }
         if let Some(passage) = &self.passage_cultivation {
             passage.check_rest_ownership()?;
         }
         let surface = self.residence.surface();
-        let rest = NativeFullSessionRest {
-            header: NativeSessionRestHeader {
+        let rest = ExtractedOperatorRest {
+            header: ExtractedOperatorRestHeader {
                 schema: NATIVE_SESSION_REST_SCHEMA.into(),
                 ecology: self.ecology.clone(),
                 operation_at: self.operation_at,
@@ -240,17 +267,6 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                 .terminal_carrier
                 .as_ref()
                 .map(|t| detach_tiled(surface, t))
-                .transpose()?,
-            terminal_reacted: self
-                .terminal_reacted
-                .as_ref()
-                .map(|t| detach_tiled(surface, t))
-                .transpose()?,
-            terminal_contracted: self.terminal_contracted.clone(),
-            terminal_presented: self
-                .terminal_presented
-                .as_ref()
-                .map(|c| surface.detach_section(&c.section, c.bound_octaves))
                 .transpose()?,
             overlay: detach_overlays(surface, &self.overlay)?,
             passage: self
@@ -273,11 +289,11 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     pub fn remount_rest(
         ecology: &'residence NativeFullOperatorEcology,
         residence: &'residence mut NativeOperatorResidence<'chart>,
-        rest: &NativeFullSessionRest,
-    ) -> Result<Self, NativeSessionRestError> {
+        rest: &ExtractedOperatorRest,
+    ) -> Result<Self, ExtractedOperatorRefusal> {
         rest.validate()?;
         if ecology != &rest.header.ecology {
-            return Err(NativeSessionRestError::Malformed(
+            return Err(ExtractedOperatorRefusal::Rest(
                 "operator base chart differs".into(),
             ));
         }
@@ -286,33 +302,21 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             None => Self::found(ecology, residence)?,
         };
         if session.grain.0 != rest.header.grain {
-            return Err(NativeSessionRestError::Malformed(
+            return Err(ExtractedOperatorRefusal::Rest(
                 "base grain differs".into(),
             ));
         }
         let surface = session.residence.surface();
         session.carriers = mount_carriers(surface, &rest.carriers)?;
-        session.checkpoints = mount_carriers(surface, &rest.checkpoints)?;
+        // A cycle boundary holds no checkpoints; an older wire's previous-cycle checkpoints are
+        // released here rather than remounted as an archive of the last cycle.
+        if !rest.header.cycle_complete || rest.header.interruption.is_some() {
+            session.checkpoints = mount_carriers(surface, &rest.checkpoints)?;
+        }
         session.terminal_carrier = rest
             .terminal_carrier
             .as_ref()
             .map(|t| mount_tiled(surface, t))
-            .transpose()?;
-        session.terminal_reacted = rest
-            .terminal_reacted
-            .as_ref()
-            .map(|t| mount_tiled(surface, t))
-            .transpose()?;
-        session.terminal_contracted = rest.terminal_contracted.clone();
-        session.terminal_presented = rest
-            .terminal_presented
-            .as_ref()
-            .map(|s| {
-                Ok::<_, NativeSessionRestError>(ContemporaryCarrier {
-                    section: surface.mount_section_rest(s)?,
-                    bound_octaves: s.bound_octaves,
-                })
-            })
             .transpose()?;
         session.overlay = mount_overlays(surface, &rest.overlay)?;
         session.passage_cultivation = rest
@@ -340,12 +344,12 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     }
 }
 
-impl NativeFullSessionRest {
-    pub fn validate(&self) -> Result<(), NativeSessionRestError> {
+impl ExtractedOperatorRest {
+    pub fn validate(&self) -> Result<(), ExtractedOperatorRefusal> {
         self.header
             .ecology
             .validate()
-            .map_err(NativeFullOperationError::from)?;
+            .map_err(ExtractedOperatorRefusal::from)?;
         if self.header.schema != NATIVE_SESSION_REST_SCHEMA
             || self.header.generation != self.header.chronology.len() as u64
             || self
@@ -365,19 +369,19 @@ impl NativeFullSessionRest {
             || (self.header.aperture.is_some() && self.passage.is_some())
             || (self.reuse.is_some() && self.passage.is_none())
         {
-            return Err(NativeSessionRestError::Malformed(
+            return Err(ExtractedOperatorRefusal::Rest(
                 "session header or profile".into(),
             ));
         }
-        let section = |s: &ResidentSectionRest| -> Result<(), NativeSessionRestError> {
-            s.validate().map_err(NativeSessionRestError::Malformed)?;
+        let section = |s: &ResidentSectionRest| -> Result<(), ExtractedOperatorRefusal> {
+            s.validate().map_err(ExtractedOperatorRefusal::Rest)?;
             if s.bound_octaves > 64
                 || s.intervals.iter().any(|(lo, hi)| {
                     64 - lo.unsigned_abs().leading_zeros() > s.bound_octaves
                         || 64 - hi.unsigned_abs().leading_zeros() > s.bound_octaves
                 })
             {
-                return Err(NativeSessionRestError::Malformed(
+                return Err(ExtractedOperatorRefusal::Rest(
                     "section octave declaration".into(),
                 ));
             }
@@ -386,15 +390,12 @@ impl NativeFullSessionRest {
         for map in [&self.carriers, &self.checkpoints] {
             for (ordinal, held) in map {
                 if ordinal.0 as usize >= self.header.ecology.carriers.len() {
-                    return Err(NativeSessionRestError::Malformed("carrier address".into()));
+                    return Err(ExtractedOperatorRefusal::Rest("carrier address".into()));
                 }
                 section(held)?;
             }
         }
-        for tiled in [&self.terminal_carrier, &self.terminal_reacted]
-            .into_iter()
-            .flatten()
-        {
+        if let Some(tiled) = &self.terminal_carrier {
             let width = tiled
                 .sections
                 .iter()
@@ -407,22 +408,19 @@ impl NativeFullSessionRest {
                     .iter()
                     .any(|s| s.rows != tiled.rows || s.grain.0 != tiled.grain)
             {
-                return Err(NativeSessionRestError::Malformed("tiled terminal".into()));
+                return Err(ExtractedOperatorRefusal::Rest("tiled terminal".into()));
             }
             for held in &tiled.sections {
                 section(held)?;
             }
         }
-        if let Some(held) = &self.terminal_presented {
-            section(held)?;
-        }
-        let overlays = |map: &BTreeMap<NativeTensorOrdinal, Vec<NativeOverlayRest>>| -> Result<(), NativeSessionRestError> {
+        let overlays = |map: &BTreeMap<NativeTensorOrdinal, Vec<NativeOverlayRest>>| -> Result<(), ExtractedOperatorRefusal> {
             for (population, atoms) in map {
                 let shape = self.header.ecology.coefficient_populations.get(population.0 as usize)
-                    .ok_or_else(|| NativeSessionRestError::Malformed("overlay population".into()))?;
+                    .ok_or_else(|| ExtractedOperatorRefusal::Rest("overlay population".into()))?;
                 for atom in atoms {
                     atom.validate()?;
-                    if shape.shape.as_slice() != [atom.rows, atom.width] { return Err(NativeSessionRestError::Malformed("overlay shape differs from its base".into())); }
+                    if shape.shape.as_slice() != [atom.rows, atom.width] { return Err(ExtractedOperatorRefusal::Rest("overlay shape differs from its base".into())); }
                 }
             }
             Ok(())
@@ -435,7 +433,7 @@ impl NativeFullSessionRest {
             for (ordinal, held) in &reuse.standing {
                 section(held)?;
                 if !reuse.numerical.contains_key(ordinal) {
-                    return Err(NativeSessionRestError::Malformed(
+                    return Err(ExtractedOperatorRefusal::Rest(
                         "retained numerical source absent".into(),
                     ));
                 }
@@ -447,12 +445,12 @@ impl NativeFullSessionRest {
                     .operations
                     .get(numerical.origin.operation as usize)
                     .ok_or_else(|| {
-                        NativeSessionRestError::Malformed("numerical origin operation".into())
+                        ExtractedOperatorRefusal::Rest("numerical origin operation".into())
                     })?;
                 if operation.output != *ordinal
                     || numerical.origin.occurrence > self.header.generation
                 {
-                    return Err(NativeSessionRestError::Malformed(
+                    return Err(ExtractedOperatorRefusal::Rest(
                         "numerical origin boundary".into(),
                     ));
                 }
@@ -597,7 +595,7 @@ mod native_tests {
         let surface = mount_operator_surface(&readout).unwrap();
         let mut residence =
             NativeOperatorResidence::mount_from_intake(&surface, &ecology, &mut intake).unwrap();
-        let mut session = NativeFullOperatorSession::found_with_passage_return(
+        let mut session = ExtractedOperatorSession::found_with_passage_return(
             &ecology,
             &mut residence,
             NativeReturnAperture {
@@ -619,7 +617,7 @@ mod native_tests {
         );
         assert!(matches!(
             session.advance_cycle_retained(&[0]),
-            Err(NativeFullOperationError::Interrupted)
+            Err(ExtractedOperatorRefusal::Interrupted)
         ));
         assert!(
             session.detach_rest().unwrap() == state,
@@ -628,15 +626,15 @@ mod native_tests {
         let mut bytes = Vec::new();
         state.write_to(&mut bytes).unwrap();
         let decoded =
-            NativeFullSessionRest::read_from(&mut &bytes[..], bytes.len() as u64).unwrap();
+            ExtractedOperatorRest::read_from(&mut &bytes[..], bytes.len() as u64).unwrap();
         assert_eq!(decoded, state);
         drop(session);
         let mut resumed =
-            NativeFullOperatorSession::remount_rest(&ecology, &mut residence, &decoded).unwrap();
+            ExtractedOperatorSession::remount_rest(&ecology, &mut residence, &decoded).unwrap();
         assert!(resumed.detach_rest().unwrap() == decoded);
         assert!(matches!(
             resumed.advance_cycle_retained(&[0]),
-            Err(NativeFullOperationError::Interrupted)
+            Err(ExtractedOperatorRefusal::Interrupted)
         ));
     }
 
@@ -663,11 +661,11 @@ mod native_tests {
         let readout=ResidentReadout::new().unwrap();
         let surface=mount_operator_surface(&readout).unwrap();
         let mut residence=NativeOperatorResidence::mount_from_intake(&surface,&graph,&mut Input).unwrap();
-        let mut session=NativeFullOperatorSession::found(&graph,&mut residence).unwrap();
+        let mut session=ExtractedOperatorSession::found(&graph,&mut residence).unwrap();
         let old=session.advance_cycle_retained(&[0]).unwrap().final_emission.intervals;
         let held=session.detach_rest().unwrap();
         let finer=NativeInputRowExtension {population:0,rows:3,dim:2,addresses:vec![1],words:vec![1,1]};
-        assert!(matches!(session.extend_input_rows(&[finer]),Err(NativeFullOperationError::Grain)));
+        assert!(matches!(session.extend_input_rows(&[finer]),Err(ExtractedOperatorRefusal::Grain)));
         assert_eq!(session.missing_input_rows(&[1])[&0],vec![1]);
         assert_eq!(session.detach_rest().unwrap(),held);
         let added=NativeInputRowExtension {population:0,rows:3,dim:2,addresses:vec![1],words:vec![0x3f00,0x3f00]};

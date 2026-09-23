@@ -22,7 +22,7 @@ use crate::resident_section::{
 };
 
 use super::{
-    NativeCarrierAxis, NativeCarrierOrdinal, NativeCausalReach, NativeFullOperationError,
+    NativeCarrierAxis, NativeCarrierOrdinal, NativeCausalReach, ExtractedOperatorRefusal,
     NativeFullOperatorEcology, NativeOperationPrimitive, NativeOperatorNode,
     NativeOperatorResidence, NativeScaleConstraint, NativeSuccessorProjection,
     NativeTensorOrdinal,
@@ -184,14 +184,14 @@ fn projection_of(slot: &SlotReading) -> NativeSuccessorProjection {
 pub(super) fn enact_segment<'chart>(
     site: &SegmentSite<'_, 'chart>,
     operations: &[NativeOperatorNode],
-) -> Result<(Vec<SegmentOutcome<'chart>>, PassageReading), NativeFullOperationError> {
+) -> Result<(Vec<SegmentOutcome<'chart>>, PassageReading), ExtractedOperatorRefusal> {
     let surface = site.residence.surface();
     let grain = site.grain;
     // The slot: at most one aligned tile per segment, founded before the capture.
     let mut tile = None;
     let mut planned: Vec<Planned<'chart>> = Vec::with_capacity(operations.len());
     // Inputs resolved in order: an in-segment producer's planned output, else a carried section.
-    let resolved = |planned: &Vec<Planned<'chart>>, input: &NativeCarrierOrdinal| -> Result<(usize, usize, u32, ResidentGrain, Option<usize>), NativeFullOperationError> {
+    let resolved = |planned: &Vec<Planned<'chart>>, input: &NativeCarrierOrdinal| -> Result<(usize, usize, u32, ResidentGrain, Option<usize>), ExtractedOperatorRefusal> {
         if let Some(at) = operations[..planned.len()]
             .iter()
             .rposition(|earlier| earlier.output == *input)
@@ -200,7 +200,7 @@ pub(super) fn enact_segment<'chart>(
             return Ok((p.out.rows(), p.out.width(), p.value_octaves, p.out.grain(), Some(at)));
         }
         let carried = carrier_of(site.carriers, site.checkpoints, input)
-            .ok_or(NativeFullOperationError::Carrier)?;
+            .ok_or(ExtractedOperatorRefusal::Carrier)?;
         Ok((carried.section.rows(), carried.section.width(), carried.bound_octaves, carried.section.grain(), None))
     };
     for operation in operations {
@@ -208,36 +208,36 @@ pub(super) fn enact_segment<'chart>(
             .ecology
             .carriers
             .get(operation.output.0 as usize)
-            .ok_or(NativeFullOperationError::Operation)?;
-        let plan = (|| -> Result<Planned<'chart>, NativeFullOperationError> { Ok(match &operation.primitive {
+            .ok_or(ExtractedOperatorRefusal::Operation)?;
+        let plan = (|| -> Result<Planned<'chart>, ExtractedOperatorRefusal> { Ok(match &operation.primitive {
             NativeOperationPrimitive::Lookup { scale } => {
                 if site.row_addresses.is_empty() || operation.coefficients.len() != 1 {
-                    return Err(NativeFullOperationError::Occurrence);
+                    return Err(ExtractedOperatorRefusal::Occurrence);
                 }
                 let coefficient = operation.coefficients[0];
                 let population = site
                     .ecology
                     .coefficient_populations
                     .get(coefficient.0 as usize)
-                    .ok_or(NativeFullOperationError::Operation)?;
+                    .ok_or(ExtractedOperatorRefusal::Operation)?;
                 let [_, width] = population.shape.as_slice() else {
-                    return Err(NativeFullOperationError::Operation);
+                    return Err(ExtractedOperatorRefusal::Operation);
                 };
                 if output_axes.axes != [NativeCarrierAxis::Occurrence, NativeCarrierAxis::Fixed(*width)] {
-                    return Err(NativeFullOperationError::Operation);
+                    return Err(ExtractedOperatorRefusal::Operation);
                 }
                 let scale = projected_scale(scale)?;
                 let selection = site.residence.gather_rows(coefficient, site.row_addresses)?;
                 if selection.width != *width || selection.rows != site.row_addresses.len() {
-                    return Err(NativeFullOperationError::Operation);
+                    return Err(ExtractedOperatorRefusal::Operation);
                 }
                 let exact_frame = selection
                     .frame
                     .exponent
                     .checked_add(scale.exponent)
-                    .ok_or(NativeFullOperationError::Grain)?;
+                    .ok_or(ExtractedOperatorRefusal::Grain)?;
                 if exact_frame + (grain.0 as i32) < 0 {
-                    return Err(NativeFullOperationError::Grain);
+                    return Err(ExtractedOperatorRefusal::Grain);
                 }
                 let shape = surface.shape_enter_resident_bfloat16(
                     selection.rows,
@@ -273,14 +273,14 @@ pub(super) fn enact_segment<'chart>(
             }
             NativeOperationPrimitive::Select { axis, at } => {
                 if *axis != 1 {
-                    return Err(NativeFullOperationError::Operation);
+                    return Err(ExtractedOperatorRefusal::Operation);
                 }
                 let span = match output_axes.axes.last() {
                     Some(NativeCarrierAxis::Fixed(span)) => *span,
-                    _ => return Err(NativeFullOperationError::Operation),
+                    _ => return Err(ExtractedOperatorRefusal::Operation),
                 };
                 let (rows, width, octaves, g, _) = resolved(&planned, &operation.inputs[0])?;
-                let from = at.checked_mul(span).ok_or(NativeFullOperationError::Operation)?;
+                let from = at.checked_mul(span).ok_or(ExtractedOperatorRefusal::Operation)?;
                 let shape = surface.shape_select_columns(rows, width, from, span, octaves)?;
                 Planned {
                     out: surface.fresh_section(rows, span, g)?,
@@ -293,7 +293,7 @@ pub(super) fn enact_segment<'chart>(
             }
             NativeOperationPrimitive::Contract => {
                 if operation.inputs.len() != 1 || operation.coefficients.len() != 1 || tile.is_some() {
-                    return Err(NativeFullOperationError::Operation);
+                    return Err(ExtractedOperatorRefusal::Operation);
                 }
                 let (rows, width, octaves, g, _) = resolved(&planned, &operation.inputs[0])?;
                 let coefficient = operation.coefficients[0];
@@ -301,16 +301,16 @@ pub(super) fn enact_segment<'chart>(
                     .ecology
                     .coefficient_populations
                     .get(coefficient.0 as usize)
-                    .ok_or(NativeFullOperationError::Operation)?;
+                    .ok_or(ExtractedOperatorRefusal::Operation)?;
                 let [population_rows, dim] = population.shape.as_slice() else {
-                    return Err(NativeFullOperationError::Operation);
+                    return Err(ExtractedOperatorRefusal::Operation);
                 };
                 if width != *dim {
-                    return Err(NativeFullOperationError::Operation);
+                    return Err(ExtractedOperatorRefusal::Operation);
                 }
                 let (first_row, out_rows) = match site.tile_window {
                     Some((first_row, rows)) if first_row + rows <= *population_rows => (first_row, rows),
-                    Some(_) => return Err(NativeFullOperationError::Operation),
+                    Some(_) => return Err(ExtractedOperatorRefusal::Operation),
                     None => (0usize, *population_rows),
                 };
                 let out_rows = &out_rows;
@@ -320,7 +320,7 @@ pub(super) fn enact_segment<'chart>(
                 let input_section = match resolved(&planned, &operation.inputs[0])?.4 {
                     Some(at) => &planned[at].out,
                     None => &carrier_of(site.carriers, site.checkpoints, &operation.inputs[0])
-                        .ok_or(NativeFullOperationError::Carrier)?
+                        .ok_or(ExtractedOperatorRefusal::Carrier)?
                         .section,
                 };
                 let mut overlay_tiles = Vec::with_capacity(atoms.len());
@@ -369,7 +369,7 @@ pub(super) fn enact_segment<'chart>(
                 let (rows, width, octaves, g, _) = resolved(&planned, &operation.inputs[0])?;
                 let gain_value = if *has_gain {
                     if tile.is_some() {
-                        return Err(NativeFullOperationError::Operation);
+                        return Err(ExtractedOperatorRefusal::Operation);
                     }
                     tile = Some(site.residence.align_tile(operation.coefficients[0], 0, 1)?);
                     let readout = &tile.as_ref().expect("aligned").mounted.readout;
@@ -395,7 +395,7 @@ pub(super) fn enact_segment<'chart>(
                 Planned {
                     out: surface.fresh_section(rows, width, g)?,
                     needed: shape.needed,
-                    value_octaves: u32::try_from(value.max(1)).map_err(|_| NativeFullOperationError::Grain)?,
+                    value_octaves: u32::try_from(value.max(1)).map_err(|_| ExtractedOperatorRefusal::Grain)?,
                     widens: true,
                     material: Material::Rms {
                         group: *group,
@@ -438,7 +438,7 @@ pub(super) fn enact_segment<'chart>(
                 let (rows, width, a, g, _) = resolved(&planned, &operation.inputs[0])?;
                 let (rows_b, width_b, b, g_b, _) = resolved(&planned, &operation.inputs[1])?;
                 if rows != rows_b || width != width_b || g != g_b {
-                    return Err(NativeFullOperationError::Operation);
+                    return Err(ExtractedOperatorRefusal::Operation);
                 }
                 let additive = matches!(operation.primitive, NativeOperationPrimitive::Add);
                 let (shape, value_octaves) = if additive {
@@ -474,7 +474,7 @@ pub(super) fn enact_segment<'chart>(
             }
             NativeOperationPrimitive::Scale { .. } => {
                 if tile.is_some() || operation.coefficients.len() != 1 {
-                    return Err(NativeFullOperationError::Operation);
+                    return Err(ExtractedOperatorRefusal::Operation);
                 }
                 let (rows, width, octaves, g, _) = resolved(&planned, &operation.inputs[0])?;
                 tile = Some(site.residence.align_tile(operation.coefficients[0], 0, 1)?);
@@ -484,7 +484,7 @@ pub(super) fn enact_segment<'chart>(
                 Planned {
                     out: surface.fresh_section(rows, width, g)?,
                     needed: shape.needed,
-                    value_octaves: u32::try_from(value.max(1)).map_err(|_| NativeFullOperationError::Grain)?,
+                    value_octaves: u32::try_from(value.max(1)).map_err(|_| ExtractedOperatorRefusal::Grain)?,
                     widens: true,
                     material: Material::CoefficientScale,
                     withdrawn: None,
@@ -497,10 +497,10 @@ pub(super) fn enact_segment<'chart>(
             } => {
                 let (rows, width, octaves, g, _) = resolved(&planned, &operation.inputs[0])?;
                 if width % head_width != 0 {
-                    return Err(NativeFullOperationError::Operation);
+                    return Err(ExtractedOperatorRefusal::Operation);
                 }
                 let heads = width / head_width;
-                let positions = site.positions.ok_or(NativeFullOperationError::Occurrence)?;
+                let positions = site.positions.ok_or(ExtractedOperatorRefusal::Occurrence)?;
                 let bands = site.residence.chronology(*theta, *head_width, *rotated_width)?;
                 let shape = surface.shape_chronology(
                     rows,
@@ -510,7 +510,7 @@ pub(super) fn enact_segment<'chart>(
                     octaves,
                     bands,
                     positions,
-                    u32::try_from(rows.saturating_sub(1)).map_err(|_| NativeFullOperationError::Operation)?,
+                    u32::try_from(rows.saturating_sub(1)).map_err(|_| ExtractedOperatorRefusal::Operation)?,
                 )?;
                 Planned {
                     out: surface.fresh_section(rows, width, g)?,
@@ -537,12 +537,12 @@ pub(super) fn enact_segment<'chart>(
                 let (rows_k, k_width, k_oct, g_k, _) = resolved(&planned, &operation.inputs[1])?;
                 let (rows_v, v_width, v_oct, g_v, _) = resolved(&planned, &operation.inputs[2])?;
                 if rows != rows_k || rows != rows_v || g != g_k || g != g_v {
-                    return Err(NativeFullOperationError::Operation);
+                    return Err(ExtractedOperatorRefusal::Operation);
                 }
                 let window = match reach {
                     NativeCausalReach::Window(window) if *window > 0 => *window,
                     NativeCausalReach::Complete => rows,
-                    _ => return Err(NativeFullOperationError::Operation),
+                    _ => return Err(ExtractedOperatorRefusal::Operation),
                 };
                 let terms = SeriesAperture(*series_terms);
                 let shape = surface.shape_contact(
@@ -571,7 +571,7 @@ pub(super) fn enact_segment<'chart>(
             // A carrier obligation the a-priori bounds cannot meet closes the segment before this
             // operation: it is enacted at the head of the next passage on the measured bounds of
             // this one's census.  At the head of a segment the refusal is the law's own.
-            Err(NativeFullOperationError::Resident(ResidentRefusal::CarrierRange { .. }))
+            Err(ExtractedOperatorRefusal::Resident(ResidentRefusal::CarrierRange { .. }))
                 if !planned.is_empty() =>
             {
                 break;
@@ -632,12 +632,12 @@ pub(super) fn enact_segment<'chart>(
     let mut builder = surface.begin_passage(&lineage)?;
     for (at, plan) in planned.iter().enumerate() {
         let operation = &operations[at];
-        let input_section = |i: usize| -> Result<&ResidentSection<'chart>, NativeFullOperationError> {
+        let input_section = |i: usize| -> Result<&ResidentSection<'chart>, ExtractedOperatorRefusal> {
             let input = &operation.inputs[i];
             match operations[..at].iter().rposition(|earlier| earlier.output == *input) {
                 Some(p) => Ok(&planned[p].out_or_withdrawn()),
                 None => Ok(&carrier_of(site.carriers, site.checkpoints, input)
-                    .ok_or(NativeFullOperationError::Carrier)?
+                    .ok_or(ExtractedOperatorRefusal::Carrier)?
                     .section),
             }
         };
@@ -654,7 +654,7 @@ pub(super) fn enact_segment<'chart>(
                     surface.record_select_columns(&lane, input_section(0)?, *from, *span, &plan.out)?
                 }
                 Material::Contract { .. } => {
-                    let readout = &tile.as_ref().ok_or(NativeFullOperationError::Operation)?.mounted.readout;
+                    let readout = &tile.as_ref().ok_or(ExtractedOperatorRefusal::Operation)?.mounted.readout;
                     surface.record_contract(&lane, input_section(0)?, readout, &plan.out)?
                 }
                 Material::Rms {
@@ -664,7 +664,7 @@ pub(super) fn enact_segment<'chart>(
                     shape,
                 } => {
                     let readout = if *has_gain {
-                        Some(&tile.as_ref().ok_or(NativeFullOperationError::Operation)?.mounted.readout)
+                        Some(&tile.as_ref().ok_or(ExtractedOperatorRefusal::Operation)?.mounted.readout)
                     } else {
                         None
                     };
@@ -680,7 +680,7 @@ pub(super) fn enact_segment<'chart>(
                 Material::Add => surface.record_re_entry(&lane, input_section(0)?, input_section(1)?, &plan.out)?,
                 Material::Scale { by } => surface.record_scale(&lane, input_section(0)?, *by, &plan.out)?,
                 Material::CoefficientScale => {
-                    let readout = &tile.as_ref().ok_or(NativeFullOperationError::Operation)?.mounted.readout;
+                    let readout = &tile.as_ref().ok_or(ExtractedOperatorRefusal::Operation)?.mounted.readout;
                     surface.record_scale_by_aligned(&lane, input_section(0)?, readout, &plan.out)?
                 }
                 Material::Chronology {
@@ -689,7 +689,7 @@ pub(super) fn enact_segment<'chart>(
                     theta,
                     rotated_width,
                 } => {
-                    let positions = site.positions.ok_or(NativeFullOperationError::Occurrence)?;
+                    let positions = site.positions.ok_or(ExtractedOperatorRefusal::Occurrence)?;
                     let bands = site.residence.chronology(*theta, *head_width, *rotated_width)?;
                     surface.record_chronology(&lane, input_section(0)?, *heads, *head_width, bands, positions, &plan.out)?
                 }
@@ -746,7 +746,7 @@ pub(super) fn enact_segment<'chart>(
             let withdrawal = site
                 .withdrawals
                 .get(&operation.ordinal)
-                .ok_or(NativeFullOperationError::Operation)?;
+                .ok_or(ExtractedOperatorRefusal::Operation)?;
             let index = tail + 1;
             let shape = surface.shape_withdraw_sites(withdrawn.rows(), withdrawn.width(), plan.needed)?;
             {
@@ -758,7 +758,7 @@ pub(super) fn enact_segment<'chart>(
     }
     let reading = builder.finish()?.launch()?;
     if !reading.obstruction.is_empty() {
-        return Err(NativeFullOperationError::ResidentObstruction {
+        return Err(ExtractedOperatorRefusal::ResidentObstruction {
             operation: operations[0].ordinal,
             flags: reading.obstruction.joined_flags(),
         });
@@ -766,8 +766,8 @@ pub(super) fn enact_segment<'chart>(
     let _ = census_before;
     let mut outcomes = Vec::with_capacity(planned.len());
     for (at, plan) in planned.into_iter().enumerate() {
-        let op_slot = reading.slots.get(base[at]).ok_or(NativeFullOperationError::Operation)?;
-        let last_slot = reading.slots.get(last[at]).ok_or(NativeFullOperationError::Operation)?;
+        let op_slot = reading.slots.get(base[at]).ok_or(ExtractedOperatorRefusal::Operation)?;
+        let last_slot = reading.slots.get(last[at]).ok_or(ExtractedOperatorRefusal::Operation)?;
         let projection = projection_of(op_slot);
         let bound_octaves = slot_bound(last_slot);
         let Planned {

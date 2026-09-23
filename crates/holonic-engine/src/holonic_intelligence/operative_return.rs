@@ -19,6 +19,8 @@
 use mount::DeviceBuffer;
 use serde::{Deserialize, Serialize};
 
+use super::NativeOverlayRest;
+
 use crate::{
     embedding_fiber::MountedReadout,
     resident_section::{
@@ -67,36 +69,6 @@ pub(super) struct OverlayAtom<'chart> {
     v_exponent: i32,
     u_octaves: u32,
     v_octaves: u32,
-}
-
-/// Exterior rest of a factorized native morphology atom, not another running ecology.
-/// The two arrays are the actual sealed integer factors, with their distinct dyadic exponents.
-#[derive(Debug, PartialEq, Eq)]
-pub struct NativeOverlayRest {
-    pub rows: usize,
-    pub width: usize,
-    pub rank: usize,
-    pub u: Vec<i64>,
-    pub v: Vec<i64>,
-    pub u_exponent: i32,
-    pub v_exponent: i32,
-    pub u_octaves: u32,
-    pub v_octaves: u32,
-}
-
-impl NativeOverlayRest {
-    pub fn validate(&self) -> Result<(), ResidentRefusal> {
-        let bound = |words: &[i64], octaves: u32| octaves <= 64 && words.iter().all(|word|
-            64 - word.unsigned_abs().leading_zeros() <= octaves);
-        if self.rows == 0 || self.width == 0 || self.rank == 0
-            || self.rows.checked_mul(self.rank) != Some(self.u.len())
-            || self.rank.checked_mul(self.width) != Some(self.v.len())
-            || !bound(&self.u, self.u_octaves) || !bound(&self.v, self.v_octaves) {
-            return Err(ResidentRefusal::Declaration { operation: "native-overlay-rest",
-                what: "factor shapes or declared octave bounds do not reconstruct the held atom".into() });
-        }
-        Ok(())
-    }
 }
 
 impl<'chart> OverlayAtom<'chart> {

@@ -3,7 +3,7 @@
 use holonic_engine::{
     embedding_fiber::ResidentReadout,
     native_ecology::holonic_intelligence::{
-        mount_operator_surface, NativeConeRestrictedEcology, NativeFullOperatorSession,
+        mount_operator_surface, NativeConeRestrictedEcology, ExtractedOperatorSession,
         NativeOperatorResidence, NativeReturnAperture,
     },
 };
@@ -116,7 +116,7 @@ fn run(restricted: &NativeConeRestrictedEcology, rest: &str, shift: u32,
     let residence_receipt = residence.receipt().clone();
     let mount_millis = started.elapsed().as_millis();
     eprintln!("HNP1: resident mount complete at {:?}", started.elapsed());
-    let mut session = NativeFullOperatorSession::found_with_passage_return(
+    let mut session = ExtractedOperatorSession::found_with_passage_return(
         &restricted.ecology,
         &mut residence,
         NativeReturnAperture {
@@ -128,7 +128,7 @@ fn run(restricted: &NativeConeRestrictedEcology, rest: &str, shift: u32,
     let contact_population = session.joined_passage_population();
     eprintln!("HNP1: baseline receiver over {contact_population} derived contacts");
     let baseline = session.observe_passage_cycle(&occurrences[0])?;
-    let baseline_face = baseline.final_emission.intervals;
+    let baseline_face = baseline.output.final_emission.intervals;
     session = baseline.successor;
     let mut cycles = Vec::new();
     let mut semantic_cycles = Vec::new();
@@ -141,20 +141,20 @@ fn run(restricted: &NativeConeRestrictedEcology, rest: &str, shift: u32,
         let cycle = session.advance_cycle(occurrence)?;
         let elapsed_millis = cycle_started.elapsed().as_millis();
         let after = cycle.successor.census();
-        let lineage_valid = cycle.traces.iter().all(|trace| trace.numerical_origin.as_ref().is_none_or(|origin|
-            origin.occurrence < trace.occurrence && origin.operation == trace.operation.ordinal));
+        let lineage_valid = cycle.output.traces.iter().all(|trace| trace.chart.numerical_origin.as_ref().is_none_or(|origin|
+            origin.occurrence < trace.occurrence && origin.operation == trace.chart.operation.ordinal));
         if !lineage_valid { return Err("a reused numerical passage lost its prior occurrence/operation address".into()); }
-        let first_reuse = cycle.traces.iter().find_map(|trace| trace.numerical_origin.as_ref().map(|origin|
+        let first_reuse = cycle.output.traces.iter().find_map(|trace| trace.chart.numerical_origin.as_ref().map(|origin|
             json!({"new_native_occurrence":trace.occurrence,"retained_computation":origin})));
-        semantic_cycles.push(json!({"emission":cycle.final_emission,
+        semantic_cycles.push(json!({"emission":cycle.output.final_emission,
             "generation":cycle.successor.generation(), "rank":cycle.successor.morphology_overlay_rank(),
-            "contacts":cycle.passage_returns}));
+            "contacts":cycle.output.passage_returns}));
         cycles.push(json!({
             "ordinal": at, "before_rank": before_rank,
             "after_rank": cycle.successor.morphology_overlay_rank(),
             "successor_generation": cycle.successor.generation(),
             "section_read_outs": after.section_read_outs - before.section_read_outs,
-            "contacts": cycle.passage_returns,
+            "contacts": cycle.output.passage_returns,
             "elapsed_millis":elapsed_millis,"census_before":before,"census_after":after,
             "reuse_before":reuse_before,"reuse_after":cycle.successor.forward_reuse_census(),
             "prior_numerical_lineage_valid":lineage_valid,"first_reuse":first_reuse,
@@ -163,7 +163,7 @@ fn run(restricted: &NativeConeRestrictedEcology, rest: &str, shift: u32,
     }
     eprintln!("HNP1: cultivated receiver");
     let trained = session.observe_passage_cycle(&occurrences[0])?;
-    let trained_face = trained.final_emission.intervals;
+    let trained_face = trained.output.final_emission.intervals;
     session = trained.successor;
     let separator = baseline_face.iter().zip(&trained_face).enumerate()
         .find(|(_, (before, after))| before != after)
@@ -172,14 +172,14 @@ fn run(restricted: &NativeConeRestrictedEcology, rest: &str, shift: u32,
     let delta = session.withdraw_passage_changes()?;
     let withdrawn_rank = delta.factor_rank();
     let ablated = session.observe_passage_cycle(&occurrences[0])?;
-    let ablation_equal = ablated.final_emission.intervals == baseline_face;
+    let ablation_equal = ablated.output.final_emission.intervals == baseline_face;
     session = ablated.successor;
     session
         .restore_passage_changes(delta)
         .map_err(|(error, _held)| error)?;
     eprintln!("HNP1: restoration receiver");
     let restored = session.observe_passage_cycle(&occurrences[0])?;
-    let restoration_equal = restored.final_emission.intervals == trained_face;
+    let restoration_equal = restored.output.final_emission.intervals == trained_face;
     let final_generation = restored.successor.generation();
     let final_rank = restored.successor.morphology_overlay_rank();
     let final_chronology = restored.successor.chronology().to_vec();

@@ -33,7 +33,7 @@ struct Receipt {
 }
 
 fn complete_branch<'resident, 'morphology, 'chart>(
-    session: holonic_engine::native_ecology::holonic_intelligence::NativeOperatorSession<
+    session: holonic_engine::native_ecology::holonic_intelligence::ExtractedBranchSession<
         'resident,
         'morphology,
         'chart,
@@ -41,12 +41,14 @@ fn complete_branch<'resident, 'morphology, 'chart>(
     interaction: &[u16],
 ) -> Result<
     (
-        holonic_engine::native_ecology::holonic_intelligence::NativeOperatorSession<
+        holonic_engine::native_ecology::holonic_intelligence::ExtractedBranchSession<
             'resident,
             'morphology,
             'chart,
         >,
-        holonic_engine::native_ecology::holonic_intelligence::NativeOperatorEmission,
+        holonic_engine::native_ecology::holonic_intelligence::ExtractedOperatorEmission<
+            holonic_engine::native_ecology::holonic_intelligence::NativeOperatorKind,
+        >,
     ),
     Box<dyn std::error::Error>,
 > {
@@ -85,12 +87,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (session, first_native) = complete_branch(session, &interaction)?;
     let first = application.render_token(&vocabulary, &first_native)?;
 
+    // The branch rests in the one rest of the extracted operator, on its constitution chart.
     let successor_rest = session.rest()?;
-    let successor_wire = successor_rest.canonical_bytes()?;
-    let read_rest = holonic_engine::native_ecology::holonic_intelligence::NativeOperatorSessionRest::read(
-        &successor_wire,
-    )?;
-    let successor_rest_roundtrip_exact = read_rest.canonical_bytes()? == successor_wire;
+    let mut successor_wire = Vec::new();
+    successor_rest.write_to(&mut successor_wire)?;
+    let read_rest =
+        holonic_engine::native_ecology::holonic_intelligence::ExtractedOperatorRest::read_from(
+            &mut &successor_wire[..],
+            successor_wire.len() as u64,
+        )?;
+    let mut reread_wire = Vec::new();
+    read_rest.write_to(&mut reread_wire)?;
+    let successor_rest_roundtrip_exact = reread_wire == successor_wire;
     let session = resident.remount_session(&read_rest)?;
     let remounted_successor_generation = session.generation();
     let (_, second_interaction) = application.occurrence_carriers(first.selected)?;
