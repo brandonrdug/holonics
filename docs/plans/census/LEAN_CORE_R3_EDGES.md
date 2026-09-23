@@ -107,9 +107,27 @@ Foundation-to-research edge. `Transport/WorldTube` continues to import the resea
 it consumes `AddressedPassage`; `Framework.Dynamics` remains a broader subject facade and retains
 its direct import. A source import traversal confirms there is no remaining `Millennium` or `RH`
 path from `Framework.Core` through `HolonicDirectedPassage`. The separate Core path through `Millennium.Receiver` was cut by the stacked Receiver slice;
-full Framework research ingress through Ratio and MomentStorage remains for later measured cuts. The cached serial verification
+full Framework research ingress through Ratio and other subject facades remains for later measured cuts. The cached serial verification
 passed: the new owner (130 jobs), ContinuingTower (8,715), retained directed-current research
 (3,066), WorldTube (3,156), ContinuingTube (8,732), Framework.Dynamics (8,965), Framework.Core
 (8,739), and full `ElementaryHolonics` root (10,106). The owner audits the successor theorem at
 `Classical.choice` and the Boolean loop witness at `propext`; see the receipt in
 `docs/VERIFICATION_RECEIPTS.tsv`.
+
+## Quadratic-moment owner return
+
+`Holon/QuadraticMoment.lean` now owns the finite weighted second moment, bilinear contraction,
+support enumeration and their exact equality. `Holon/MomentStorage` and
+`Geometry/ScrewGeometry` import this generic owner directly; `Framework/Information` uses it
+instead of the research condensation file. The latter retains its distinct equal-moment and
+receiver-sufficiency theorems and imports the generic owner. Historical declaration names and
+namespace remain stable pending M2. This cut removes a research import from two object owners;
+it does not claim that the full Framework is research-free, since other subject facades still
+import independent research modules.
+
+On the source cut, focused Lake builds passed for `Holon.MomentStorage` (3,110 jobs),
+`Geometry.ScrewGeometry` (3,009), `Framework.Information` (8,860), and the retained research
+module (1,226); the full `ElementaryHolonics` root passed (10,106). A source-import traversal
+measured the `MomentStorage` closure dropping from 137 modules / 49,263 lines to seven modules /
+1,527 lines, and `ScrewGeometry` from 132 / 48,000 to two / 264. The full Framework closure
+drops only from 543 / 190,674 to 541 / 189,682 because separate imports still reach research.
