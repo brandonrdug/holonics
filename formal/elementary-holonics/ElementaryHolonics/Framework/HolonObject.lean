@@ -8,6 +8,7 @@ import ElementaryHolonics.Holon.Law
 import ElementaryHolonics.Holon.Conformance
 import ElementaryHolonics.Holon.Deposition
 import ElementaryHolonics.Holon.Reaction
+import ElementaryHolonics.Holon.Cayley
 
 /-!
 # The Holon object
@@ -17,7 +18,8 @@ is its law and ports — complex and connection (`Holon.Complex`), ports and pow
 Dirac interconnection (`Holon.Dirac`), element relations and balances (`Holon.Element`),
 generators and clock jumps (`Holon.Generator`), restrictions (`Holon.Restriction`), the five laws
 (`Holon.Law`), the existing owners as instances (`Holon.Conformance`) deposition under
-learning (`Holon.Deposition`) and the workless reaction (`Holon.Reaction`). Namespace
+learning (`Holon.Deposition`) the workless reaction (`Holon.Reaction`) and its implicit
+Cayley step (`Holon.Cayley`). Namespace
 `Soma.Holonics.HolonCore`. No axioms are added.
 -/
 
@@ -141,4 +143,16 @@ open Soma.Holonics.HolonCore
 #print axioms skewPart_idem
 #print axioms skewPart_orthogonal
 #print axioms runaway_witness
+#print axioms cayley_denominator_det
+#print axioms cayley_isometry_rel
+#print axioms cayley_isometry
+#print axioms cayley_isometry_real
+#print axioms midpoint_reaction_balance
+#print axioms explicit_step_growth
+#print axioms explicit_growth_witness
+#print axioms rayleigh_le
+#print axioms shift_passive_iff
+#print axioms shifted_committed_energy_bound
+#print axioms recentre_contains
+#print axioms device_containment
 end Audit
