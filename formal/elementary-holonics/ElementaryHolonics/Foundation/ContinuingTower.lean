@@ -2,7 +2,7 @@ import ElementaryHolonics.Foundation.Holon
 import ElementaryHolonics.Foundation.Receiver
 import ElementaryHolonics.Foundation.SectionResidual
 import ElementaryHolonics.Foundation.ReceiverHistoryCompression
-import ElementaryHolonics.Millennium.Gluing
+import ElementaryHolonics.Foundation.GluingPassage
 import ElementaryHolonics.Millennium.HolonicDirectedPassage
 
 /-!
@@ -37,7 +37,8 @@ it realizes; the correspondence is bidirectional and is the deliverable.
   joined by `Tower.compatible_of_adjacent` (adjacent compatibility already implies compatibility at
   every gap) and `Tower.nonempty_compatibleSection_of_surjectiveAdjacent`, which *calls*
   `SuccessorWitnessSystem.nonempty_coherentSection` instead of reproving it.
-* `Millennium/Gluing.lean:32-110`'s `GluingPassage` owns the *obstruction population*.
+* `Foundation/GluingPassage.lean` owns the generic `GluingPassage` and its *obstruction
+  population*; `Millennium/Gluing.lean` keeps additive and named research passages.
   `Tower.gluingPassage` presents a tower at one chart as that passage, and
   `Tower.carried_iff_observationFibre` identifies its `Carried` predicate with inhabitation of the
   `ObservationFibre`. `Tower.obstruction_nonempty_iff` is therefore the tower's obstruction read
@@ -302,7 +303,7 @@ theorem nonempty_compatibleSection_of_surjectiveAdjacent (T : Tower.{0, v} ℕ)
 
 /-! ## C1 — the join to `GluingPassage` -/
 
-/-- [definition] A tower read at one chart as the gluing passage of `Millennium/Gluing.lean`: the
+/-- [definition] A tower read at one chart as a generic gluing passage: the
 candidates are the faces actually available at that chart, the realizers are the continuing objects,
 and realization is materialization. Local admissibility at a single chart is total — an actual face
 is locally admissible by construction — so the whole content sits in the obstruction population. -/
@@ -814,7 +815,7 @@ theorem shiftTower_adjacent_not_surjective (n : ℕ) :
   have hx' : shiftFaceNat (n + 1) x + (n + 1 - n) = 0 := hx
   omega
 
-/-- [proved-derived; formal-checked] The obstruction population of `Millennium/Gluing.lean` is
+/-- [proved-derived; formal-checked] The generic gluing obstruction population is
 inhabited at every chart of the shift tower. -/
 theorem shiftTower_obstruction_nonempty (i : ℕ) :
     Nonempty (shiftTower.gluingPassage i).Obstruction :=

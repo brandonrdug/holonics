@@ -331,6 +331,12 @@ hidden through the whole admitted generator family.
 module [`Millennium/Separation.lean`](../formal/elementary-holonics/ElementaryHolonics/Millennium/Separation.lean)
 imports that owner and keeps its distinct algebraic, polynomial, and receiver-separation results.
 
+[definition] The generic `GluingPassage` obstruction carrier is owned by
+[`Foundation/GluingPassage.lean`](../formal/elementary-holonics/ElementaryHolonics/Foundation/GluingPassage.lean).
+`Foundation/ContinuingTower` imports it directly; `Millennium/Gluing` retains additive passages
+and its research-specific obstruction and pairing results. Declaration names remain in
+`Soma.Holonics.Millennium` until the later namespace migration.
+
 [definition] Loss belongs to the same framework. `Foundation/ComparisonLoss` reads an existing
 addressed comparison cell through a declared gauge, with both comparands and the signed
 difference retained. General entropy and probability receivers now live in

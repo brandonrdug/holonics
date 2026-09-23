@@ -1,86 +1,23 @@
 import Mathlib.Algebra.Order.Field.Rat
 import Mathlib.GroupTheory.QuotientGroup.Basic
+import ElementaryHolonics.Foundation.GluingPassage
 
 /-!
-# The gluing passage — the shape every open placement question shares
+# Additive gluing passages and research pairings
 
-A **gluing passage** is the situation in which local data is available, a population of
-*realizers* is available, and the question is whether every locally admissible candidate is
-*carried* by a realizer.  This file factors that shape out once so that the named lines in
-`Millennium/Lines.lean` are configurations of one structure rather than six unrelated
-statements.
+The generic `GluingPassage` carrier is owned by `Foundation/GluingPassage.lean`. This file keeps
+the additive specialization, its obstruction-group results, and the research pairing.
 
 The vocabulary is composed rather than eponymous, per the naming discipline: a name should let
 its mechanism be read off it and rebuilt from it by a reader who holds no shared history.  The
 classical label is carried as an aside on each declaration and never as the name.
 
-Every `theorem` in this file is discharged.  Nothing here is assumed.
+Every `theorem` in this file is discharged. Nothing here is assumed.
 -/
 
 namespace Soma.Holonics.Millennium
 
 universe u v
-
-/-! ## 1. The passage itself -/
-
-/-- A **gluing passage**: local admissibility, a realizer population, and the realization map
-that carries a realizer to the candidate it pays for.
-
-The single axiom is that realization lands inside local admissibility — *a realized candidate
-is always locally admissible*.  The content of every open question of this shape is the
-converse, which is not assumed here and cannot be. -/
-structure GluingPassage where
-  /-- What may be asked for. -/
-  Candidate : Type u
-  /-- What can be built. -/
-  Realizer : Type v
-  /-- Building it. -/
-  realize : Realizer → Candidate
-  /-- What the local receivers can already see. -/
-  LocallyAdmissible : Candidate → Prop
-  /-- Realization pays: what is built is locally admissible. -/
-  realized_is_admissible : ∀ r : Realizer, LocallyAdmissible (realize r)
-
-namespace GluingPassage
-
-variable (P : GluingPassage.{u, v})
-
-/-- A candidate is **carried** when some realizer realizes it. -/
-def Carried (c : P.Candidate) : Prop := ∃ r : P.Realizer, P.realize r = c
-
-/-- Realization pays, restated on candidates.  This direction is free. -/
-theorem carried_is_admissible {c : P.Candidate} (h : P.Carried c) :
-    P.LocallyAdmissible c := by
-  obtain ⟨r, rfl⟩ := h
-  exact P.realized_is_admissible r
-
-/-- The **obstruction population**: locally admissible candidates that nothing carries.
-This is the object every open line in this family is missing a handle on. -/
-def Obstruction : Type u := { c : P.Candidate // P.LocallyAdmissible c ∧ ¬ P.Carried c }
-
-/-- The passage **glues** when local admissibility already forces a realizer. -/
-def Glues : Prop := ∀ c : P.Candidate, P.LocallyAdmissible c → P.Carried c
-
-/-- **Gluing is exactly the emptiness of the obstruction population.**
-
-This is the sentence the six named lines share.  It is trivial as mathematics and it is the
-point: it says the content of each line is *a population*, so the useful question is never
-"does it glue" but "what inhabits the obstruction, and what separates one inhabitant from
-another". -/
-theorem glues_iff_obstruction_isEmpty : P.Glues ↔ IsEmpty P.Obstruction := by
-  constructor
-  · intro h
-    exact ⟨fun x => x.2.2 (h x.1 x.2.1)⟩
-  · intro h c hc
-    by_contra hnc
-    exact h.false ⟨c, hc, hnc⟩
-
-/-- A witness against gluing is an inhabitant of the obstruction, and conversely.  Stated so a
-counterexample search has a type to return into. -/
-theorem not_glues_iff_obstruction_nonempty : ¬ P.Glues ↔ Nonempty P.Obstruction := by
-  rw [glues_iff_obstruction_isEmpty, not_isEmpty_iff]
-
-end GluingPassage
 
 /-! ## 2. When the candidates add, the obstruction is a group
 
