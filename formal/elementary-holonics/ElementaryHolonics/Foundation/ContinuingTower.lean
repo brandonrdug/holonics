@@ -3,7 +3,7 @@ import ElementaryHolonics.Foundation.Receiver
 import ElementaryHolonics.Foundation.SectionResidual
 import ElementaryHolonics.Foundation.ReceiverHistoryCompression
 import ElementaryHolonics.Foundation.GluingPassage
-import ElementaryHolonics.Millennium.HolonicDirectedPassage
+import ElementaryHolonics.Foundation.SuccessorWitnessSystem
 
 /-!
 # The continuing tower and the non-invertible transition that carries its residual
@@ -31,7 +31,7 @@ it realizes; the correspondence is bidirectional and is the deliverable.
 
 [established-bounded; source-inspected] This is **not** a parallel family.
 
-* `Millennium/HolonicDirectedPassage.lean:260-306`'s `SuccessorWitnessSystem` owns the *existence*
+* `Foundation/SuccessorWitnessSystem.lean`'s `SuccessorWitnessSystem` owns the *existence*
   law: inhabited base plus surjective adjacent restriction constructs a coherent history through
   all depths. A `Tower` over `ℕ` restricts along every `i ≤ j`, not only `n ≤ n + 1`; the two are
   joined by `Tower.compatible_of_adjacent` (adjacent compatibility already implies compatibility at
@@ -44,7 +44,7 @@ it realizes; the correspondence is bidirectional and is the deliverable.
   `ObservationFibre`. `Tower.obstruction_nonempty_iff` is therefore the tower's obstruction read
   through the existing owner, and `shiftTower_not_glues` is discharged by
   `GluingPassage.not_glues_iff_obstruction_nonempty`.
-* `Millennium/HolonicDirectedPassage.lean:311-330`'s `boolFlipCoherent_isEmpty` owns the *loop*
+* `Foundation/SuccessorWitnessSystem.lean`'s `boolFlipCoherent_isEmpty` owns the *loop*
   obstruction. `Tower.restrict_self_eq_id` shows a tower cannot carry it: `restrict_refl` forces
   every one-chart restriction to be the identity, and `restrict_roundTrip` forces every index loop
   to be coherent. `boolFlipSelfLoop_isEmpty` therefore *cites* that owner rather than building a
@@ -130,8 +130,8 @@ namespace Soma.Holonics.Foundation.ContinuingTower
 
 open Soma.Holonics
 open Soma.Holonics.Millennium
-open Soma.Holonics.Millennium.Chronology
 open Soma.Holonics.Millennium.HolonicDirectedPassage
+open Soma.Holonics.Millennium.Chronology
 open Soma.Holonics.Millennium.LineageCompression
 
 universe u v w
@@ -286,7 +286,7 @@ theorem compatible_of_adjacent (T : Tower.{0, v} ℕ) (w : ∀ n, T.Face n)
 
 /-- [proved-derived; formal-checked] An inhabited base and surjective adjacent restrictions give a
 tower over `ℕ` a compatible section. The construction is
-`Millennium/HolonicDirectedPassage.lean`'s `SuccessorWitnessSystem.nonempty_coherentSection`; only
+`Foundation/SuccessorWitnessSystem.lean`'s `SuccessorWitnessSystem.nonempty_coherentSection`; only
 the gap-filling is new. -/
 theorem nonempty_compatibleSection_of_surjectiveAdjacent (T : Tower.{0, v} ℕ)
     (hbase : Nonempty (T.Face 0))
@@ -830,7 +830,7 @@ theorem shiftTower_not_glues (i : ℕ) : ¬ (shiftTower.gluingPassage i).Glues :
 /-! ### The loop obstruction stays with its existing owner -/
 
 /-- [counterexample; formal-checked] The fixed-point population of the smallest nonidentity
-self-transport is empty. This is `Millennium/HolonicDirectedPassage.lean:326-330`'s
+self-transport is empty. This is `Foundation/SuccessorWitnessSystem.lean`'s
 `boolFlipCoherent_isEmpty`, cited rather than rebuilt; `Tower.restrict_self_eq_id` shows no tower
 can carry that self-transport in the first place. -/
 theorem boolFlipSelfLoop_isEmpty : IsEmpty { w : Bool // boolFlip w = w } :=

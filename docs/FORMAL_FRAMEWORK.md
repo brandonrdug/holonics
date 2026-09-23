@@ -48,6 +48,13 @@ the proper-frame/axis Rust tests separate from the checked Lean bracket/translat
 It also reconnects the existing landmark, normalized-mode, inference and future-receiver
 compression owners; none is newly founded by this specialization.
 
+[proved-derived; formal-checked] [`Foundation/SuccessorWitnessSystem.lean`](../formal/elementary-holonics/ElementaryHolonics/Foundation/SuccessorWitnessSystem.lean) owns the generic
+sequential passage from an inhabited base and surjective adjacent restrictions to one compatible
+section. `Foundation/ContinuingTower` joins that law to all-gap tower compatibility. The associated
+Boolean flip loop witness is generic Foundation material; addressed-current composition and
+null-current limit laws remain in `Millennium/HolonicDirectedPassage`. `Transport/WorldTube`
+retains that research import because it consumes `AddressedPassage`.
+
 [proved-derived; formal-checked] `Framework.Dynamics` imports
 [`Transport/HelicalPairInteraction`](../formal/elementary-holonics/ElementaryHolonics/Transport/HelicalPairInteraction.lean),
 the formal statement of the [helical pair interaction unit](HOLON.md#the-helical-pair-interaction-unit).
