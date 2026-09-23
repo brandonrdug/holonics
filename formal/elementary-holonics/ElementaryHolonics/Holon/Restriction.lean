@@ -18,7 +18,9 @@ along a projection gives the passive coholon, `gyrator_projection_witness`); a s
 Kron/Schur elimination of a network's interior is an exact restriction: interior-balanced states
 have boundary bonds on the graph of `Λ_DN` with the full power preserved, and every boundary value
 extends (`kron_exact`, composing `Objects/Membrane`); witness the series path
-(`series_path_restriction`).
+(`series_path_restriction`). The pointwise square is the operator defect read at a state
+(`squareDefect_mulVec_eq_zero_iff`), and every reading either descends through a restriction or
+exhibits a merged pair it separates (`Descent`, `descent_total`).
 -/
 
 noncomputable section
@@ -192,7 +194,44 @@ theorem diagonal_square (a b : ℚ) :
     squareDefect !![1, 0] !![a, 0; 0, b] !![a] = 0 := by
   ext i j; fin_cases i; fin_cases j <;> simp [squareDefect]
 
+omit [DecidableEq ι] [DecidableEq κ] in
+/-- [proved-derived; formal-checked] **The pointwise square is the operator defect read at a
+state**: the two routes `π (A_fine x)` and `A_coarse (π x)` agree exactly when the defect vanishes
+at `x`. The Rust tube's per-face `SquareDefect` is this reading of `squareDefect`. -/
+theorem squareDefect_mulVec_eq_zero_iff (π : Matrix κ ι 𝕜) (Af : Matrix ι ι 𝕜)
+    (Ac : Matrix κ κ 𝕜) (x : ι → 𝕜) :
+    squareDefect π Af Ac *ᵥ x = 0 ↔ π *ᵥ (Af *ᵥ x) = Ac *ᵥ (π *ᵥ x) := by
+  rw [squareDefect, sub_mulVec, mulVec_mulVec, mulVec_mulVec, sub_eq_zero]
+
 end Square
+
+/-! ## 2b. Descent: a reading factors through a restriction, or a merged pair is separated -/
+
+section Descent
+
+universe u v w
+
+/-- [definition] **Descent of a reading through a restriction** `π`: either the reading factors
+through the image of `π` (`witness`, carrying the induced coarse reading), or a pair `π` merges is
+separated by it (`defect`). -/
+inductive Descent {X : Type u} {T : Type v} {V : Type w} (π : X → T) (ρ : X → V) : Prop
+  | witness (ρbar : Set.range π → V) (factors : ∀ x, ρ x = ρbar ⟨π x, x, rfl⟩)
+  | defect (x y : X) (merged : π x = π y) (separated : ρ x ≠ ρ y)
+
+/-- [proved-derived; formal-checked] **Descent is total**: every reading either factors through a
+restriction or exhibits a merged pair it separates. The factoring half is
+`Foundation/Standing.lean::standingLaw_exists_iff_future_factors` read at one reading. -/
+theorem descent_total {X : Type u} {T : Type v} {V : Type w} (π : X → T) (ρ : X → V) :
+    Descent π ρ := by
+  classical
+  by_cases h : ∃ x y, π x = π y ∧ ρ x ≠ ρ y
+  · obtain ⟨x, y, hm, hs⟩ := h
+    exact .defect x y hm hs
+  · push Not at h
+    refine .witness (fun t => ρ t.2.choose) fun x => ?_
+    exact (h _ _ (⟨π x, x, rfl⟩ : Set.range π).2.choose_spec).symm
+
+end Descent
 
 /-! ## 3. Kron/Schur elimination is an exact restriction with reading `Λ_DN` -/
 

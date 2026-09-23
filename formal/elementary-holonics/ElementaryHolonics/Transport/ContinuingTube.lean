@@ -119,7 +119,9 @@ staircases the repository owns: `BoundaryScalePassage` supplies none and is a mi
 
 ## Rust counterpart
 
-[definition] The paired executable owner is `crates/holonic-engine/src/continuing_tube.rs`:
+[definition] The paired executable owners are `crates/holonic-core/src/restriction/tube.rs` (the
+carrier law, re-exported at `crates/holonic-engine/src/continuing_tube.rs`) and that engine file
+(its receiver layers):
 `StationedTower`, `check_commuting_square` returning `SquareVerdict::Commutes | ::Defect` with its
 witness, `wormhole_receipt`, `check_circuit_holonomy`, and `LossySwapMigration`, tested on the
 `p`-adic tower, on `grain_tower.rs`'s measured non-commuting square, and on a closed circuit with
@@ -155,7 +157,7 @@ transporting after restricting. It is `Foundation/ContinuingTower.lean::Migratio
 the index map the identity, and `toMigration`/`ofStationaryMigration` prove the two are the same
 data.
 
-Rust counterpart: `crates/holonic-engine/src/continuing_tube.rs::StationedTower::transport`, whose
+Rust counterpart: `crates/holonic-core/src/restriction/tube.rs::StationedTower::transport`, whose
 square is checked by `check_commuting_square`. -/
 structure ChartwiseMigration {Index : Type u} [Preorder Index] (S T : Tower.{u, v} Index) where
   /-- The component at one chart. -/
@@ -268,7 +270,7 @@ ladder and its `restrict` is the coarsening of that section. `transport` is the 
 passage. `Tube.square` is the one law that joins them, and it is
 `ChartwiseMigration.naturality`.
 
-Rust counterpart: `crates/holonic-engine/src/continuing_tube.rs::StationedTower`. -/
+Rust counterpart: `crates/holonic-core/src/restriction/tube.rs::StationedTower`. -/
 structure Tube.{us, ui, uf} (Station : Type us) [Preorder Station] (Index : Type ui)
     [Preorder Index] where
   /-- The transverse section at one station. -/
@@ -384,7 +386,7 @@ its cost are the separate obligations of `ResidualMigration` and
 `Foundation/PresentationCost.lean`, and `PresentationCost.swapMigration_route_isEmpty` records that
 for a wormhole the refinement-route cost has nothing to measure.
 
-Rust counterpart: `crates/holonic-engine/src/continuing_tube.rs::wormhole_receipt`. -/
+Rust counterpart: `crates/holonic-core/src/restriction/tube.rs::wormhole_receipt`. -/
 structure Wormhole {Station : Type uS} [Preorder Station] {Index : Type u} [Preorder Index]
     (tube : Tube.{uS, u, v} Station Index) (source target : Station) where
   /-- The passage itself. -/

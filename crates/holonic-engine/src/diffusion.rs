@@ -39,6 +39,9 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+use holonic_core::holon::HolonError;
+use holonic_core::restriction::KronReduction;
+
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::{CurrentBranchId, CurrentNodeId};
 
@@ -555,20 +558,22 @@ fn compile_diffusion_transfer(
         operator[target][source] -= &coupling;
     }
 
-    let boundary_boundary = matrix_section(&operator, &boundary_ordinals, &boundary_ordinals);
     let boundary_interior = matrix_section(&operator, &boundary_ordinals, &interior_ordinals);
     let interior_boundary = matrix_section(&operator, &interior_ordinals, &boundary_ordinals);
     let interior_interior = matrix_section(&operator, &interior_ordinals, &interior_ordinals);
-    let interior_inverse = invert_exact(interior_interior.clone())?;
-    let schur_correction = if interior_ordinals.is_empty() {
-        vec![vec![Rat::zero(); boundary_ordinals.len()]; boundary_ordinals.len()]
-    } else {
-        matrix_multiply(
-            &matrix_multiply(&boundary_interior, &interior_inverse)?,
-            &interior_boundary,
-        )?
-    };
-    let schur_boundary_operator = matrix_subtract(&boundary_boundary, &schur_correction)?;
+    // The Schur elimination is the Holon core's Kron reduction of the implicit operator `M + τL`
+    // with the non-boundary nodes as interior (`Holon/Restriction.lean::kron_exact`, plan phase
+    // 6): `L_II⁻¹` and `Λ_DN = L_BB − L_BI L_II⁻¹ L_IB` are read off it, not formed a second time.
+    let kron = KronReduction::new(&carrier(&operator, extent)?, &interior_ordinals)
+        .map_err(DiffusionError::from_kron)?;
+    // `with_boundary` orders the boundary by node, as `node_order` is, so the core's ascending
+    // complement is the declared boundary order. A disagreement would permute `Λ_DN`'s rows; it is
+    // refused rather than repaired.
+    if kron.boundary() != boundary_ordinals.as_slice() {
+        return Err(DiffusionError::TransferCertificateFailure);
+    }
+    let interior_inverse = kron.interior_inverse().to_rows();
+    let schur_boundary_operator = kron.dirichlet_to_neumann().to_rows();
     let boundary_inverse = invert_exact(schur_boundary_operator.clone())?;
     let interior_inverse_residual = matrix_subtract(
         &matrix_multiply(&interior_inverse, &interior_interior)?,
@@ -675,6 +680,18 @@ fn matrix_section(matrix: &[Vec<Rat>], rows: &[usize], columns: &[usize]) -> Vec
                 .collect()
         })
         .collect()
+}
+
+impl DiffusionError {
+    /// A Kron refusal in this law's vocabulary: a singular interior block is `SingularLaw`, a
+    /// carrier refusal keeps its own mapping, and a shape refusal is a malformed operator.
+    fn from_kron(error: HolonError) -> Self {
+        match error {
+            HolonError::Singular { .. } => DiffusionError::SingularLaw,
+            HolonError::Linear(error) => error.into(),
+            _ => DiffusionError::MalformedOperator,
+        }
+    }
 }
 
 /// Every shape refusal the shared carrier raises, named in this law's own vocabulary.
@@ -1062,20 +1079,64 @@ mod tests {
         assert_eq!(law.transfer_cache_entries(), 1);
         assert_eq!(first.transfer.certificate.boundary, vec![left, right]);
         assert_eq!(first.transfer.certificate.interior, vec![middle]);
-        assert!(first
-            .transfer
-            .certificate
-            .interior_inverse_residual
-            .iter()
-            .flatten()
-            .all(Zero::is_zero));
-        assert!(first
-            .transfer
-            .certificate
-            .boundary_inverse_residual
-            .iter()
-            .flatten()
-            .all(Zero::is_zero));
+        assert!(
+            first
+                .transfer
+                .certificate
+                .interior_inverse_residual
+                .iter()
+                .flatten()
+                .all(Zero::is_zero)
+        );
+        assert!(
+            first
+                .transfer
+                .certificate
+                .boundary_inverse_residual
+                .iter()
+                .flatten()
+                .all(Zero::is_zero)
+        );
+
+        // Phase 6: the certified Schur boundary operator is the core Kron reduction's `Λ_DN`. It
+        // equals the elimination formed independently here from the certificate's own operator,
+        // the exact value `[[12/7, −1/7], [−1/7, 24/7]]`, and the reduction is exact at the
+        // harmonic extension of a boundary value (`Holon/Restriction.lean::kron_exact`).
+        let certificate = &first.transfer.certificate;
+        let ordinal_boundary = [0usize, 2];
+        let ordinal_interior = [1usize];
+        let l_bb = matrix_section(&certificate.operator, &ordinal_boundary, &ordinal_boundary);
+        let l_bi = matrix_section(&certificate.operator, &ordinal_boundary, &ordinal_interior);
+        let l_ib = matrix_section(&certificate.operator, &ordinal_interior, &ordinal_boundary);
+        let l_ii = matrix_section(&certificate.operator, &ordinal_interior, &ordinal_interior);
+        let independent = matrix_subtract(
+            &l_bb,
+            &matrix_multiply(
+                &matrix_multiply(&l_bi, &invert_exact(l_ii).unwrap()).unwrap(),
+                &l_ib,
+            )
+            .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(certificate.schur_boundary_operator, independent);
+        assert_eq!(
+            certificate.schur_boundary_operator,
+            vec![
+                vec![integer(12) / integer(7), integer(-1) / integer(7)],
+                vec![integer(-1) / integer(7), integer(24) / integer(7)],
+            ]
+        );
+        let kron = KronReduction::new(&carrier(&certificate.operator, 3).unwrap(), &[1]).unwrap();
+        assert_eq!(
+            kron.dirichlet_to_neumann().to_rows(),
+            certificate.schur_boundary_operator
+        );
+        assert_eq!(
+            kron.interior_inverse().to_rows(),
+            certificate.interior_inverse
+        );
+        let extended = kron.extend(&[integer(3), integer(-2)]).unwrap();
+        assert!(kron.is_exact_at(&extended).unwrap());
 
         let right_hand = first
             .transfer

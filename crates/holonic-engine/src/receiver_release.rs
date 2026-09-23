@@ -1499,6 +1499,94 @@ pub fn release_coarser(
     Ok(None)
 }
 
+/// The quotient a finer reading makes of an enumerated family: member `k` transports its face and
+/// retains itself. It is the core restriction's [`Transition`](crate::continuing_tower::Transition)
+/// over which [`CoarseningTower::descent`] asks each step to factor; the residual is the member,
+/// which is exactly what a later finer receiver reopens.
+struct FaceQuotient {
+    faces: Vec<ExactFace>,
+}
+
+impl crate::continuing_tower::Transition for FaceQuotient {
+    type Source = usize;
+    type Target = Option<ExactFace>;
+    type Residual = usize;
+
+    fn apply(&self, member: &usize) -> Option<ExactFace> {
+        self.faces.get(*member).cloned()
+    }
+
+    fn residual(&self, member: &usize) -> usize {
+        *member
+    }
+
+    fn reopen(&self, _face: &Option<ExactFace>, member: &usize) -> usize {
+        *member
+    }
+}
+
+/// One step of a coarsening tower read as the core restriction's factor descent: the step's
+/// reading factors through the reading below it (the witness carries the induced map on its
+/// faces), or the pairs it separates that the finer reading identified.
+pub type CoarseningDescent =
+    holonic_core::restriction::FactorDescent<Option<ExactFace>, usize, ExactFace>;
+
+impl CoarseningTower {
+    /// **The tower read as core descents**, one per step up to and including the first step that
+    /// does not factor — the step at which [`release_coarser`] refuses with
+    /// [`WidthRefusal::CoarserDoesNotFactor`], whose `(left, right)` is that descent's first
+    /// break (`Foundation/ReceiverRelease.lean::coarser_receiver_factors`,
+    /// `Foundation/Standing.lean::standingLaw_exists_iff_future_factors`).
+    pub fn descent(
+        &self,
+        fine: &dyn Reading,
+        family: &CompatibleFamily,
+    ) -> Result<Vec<CoarseningDescent>, WidthRefusal> {
+        let Some(members) = family.members() else {
+            return Err(WidthRefusal::DeclaredReadingNeedsEnumeratedFamily {
+                receiver: fine.name().to_owned(),
+            });
+        };
+        if self.steps.len() > TOWER_STEP_CEILING {
+            return Err(WidthRefusal::TowerStepCeiling {
+                requested: self.steps.len(),
+                ceiling: TOWER_STEP_CEILING,
+            });
+        }
+        let indices: Vec<usize> = (0..members.len()).collect();
+        let mut previous = members
+            .iter()
+            .map(|member| fine.read(member))
+            .collect::<Result<Vec<_>, _>>()?;
+        let mut descents = Vec::with_capacity(self.steps.len());
+        for step in &self.steps {
+            let coarse = members
+                .iter()
+                .map(|member| step.reading.read(member))
+                .collect::<Result<Vec<_>, _>>()?;
+            let quotient = FaceQuotient { faces: previous };
+            let descent = holonic_core::restriction::factor_descent(
+                &quotient,
+                |member: &usize| coarse[*member].clone(),
+                &indices,
+            )
+            // The family ceiling equals the descent ceiling; this refusal is unreachable through
+            // an enumerated family and is reported in the family's own vocabulary.
+            .map_err(|_| WidthRefusal::FamilyCeiling {
+                declared: members.len(),
+                ceiling: FAMILY_CEILING,
+            })?;
+            let broke = !descent.descends();
+            descents.push(descent);
+            if broke {
+                break;
+            }
+            previous = coarse;
+        }
+        Ok(descents)
+    }
+}
+
 /// A declared factor map on an exact rational reading. A *coarser* receiver is this map composed
 /// with a finer one; whether it is also *narrower* depends on whether the map is non-expansive,
 /// which [`FactoredReading::verify_non_expansive`] checks rather than assumes.

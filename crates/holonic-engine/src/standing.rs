@@ -134,6 +134,8 @@ use relational_geometry::Rat;
 use serde::Serialize;
 use thiserror::Error;
 
+use holonic_core::restriction::{FactorDescent, LinearRestriction, factor_descent_over};
+
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::receiver_release::{
     CompatibleFamily, DiameterNorm, ExactFace, Reading, WidthRefusal, width_enumerated,
@@ -695,60 +697,9 @@ pub fn sufficiency(
     generators: &GeneratorFamily,
     observations: &[FutureObservation],
 ) -> Result<SufficiencyVerdict, StandingRefusal> {
-    if standing.source_extent() != population.extent() {
-        return Err(StandingRefusal::ExtentMismatch {
-            declared: standing.source_extent(),
-            found: population.extent(),
-        });
-    }
-    if generators.extent() != population.extent() {
-        return Err(StandingRefusal::ExtentMismatch {
-            declared: generators.extent(),
-            found: population.extent(),
-        });
-    }
-    if observations.len() > OBSERVATION_CEILING {
-        return Err(StandingRefusal::ObservationCeiling {
-            declared: observations.len(),
-            ceiling: OBSERVATION_CEILING,
-        });
-    }
+    check_sufficiency_declaration(standing, population, generators, observations)?;
     let members = population.members();
     let count = members.len();
-    let pair_count = count
-        .checked_mul(count.saturating_sub(1))
-        .ok_or(StandingRefusal::PairCountOverflows { members: count })?
-        / 2;
-    let work = pair_count
-        .checked_mul(observations.len().max(1))
-        .ok_or(StandingRefusal::CheckWorkCeiling {
-            pairs: pair_count,
-            observations: observations.len(),
-            ceiling: CHECK_WORK_CEILING,
-        })?;
-    if work > CHECK_WORK_CEILING {
-        return Err(StandingRefusal::CheckWorkCeiling {
-            pairs: pair_count,
-            observations: observations.len(),
-            ceiling: CHECK_WORK_CEILING,
-        });
-    }
-    for observation in observations {
-        for letter in observation.word() {
-            if *letter >= generators.count() {
-                return Err(StandingRefusal::GeneratorAbsent {
-                    index: *letter,
-                    carried: generators.count(),
-                });
-            }
-        }
-        if observation.reading().source_extent() != population.extent() {
-            return Err(StandingRefusal::ExtentMismatch {
-                declared: observation.reading().source_extent(),
-                found: population.extent(),
-            });
-        }
-    }
 
     let retained = members
         .iter()
@@ -785,6 +736,118 @@ pub fn sufficiency(
     Ok(SufficiencyVerdict::Sufficient {
         pairs: equal_pairs,
         observations: observations.len(),
+    })
+}
+
+/// The declared-size and extent checks [`sufficiency`] asks before its first reading, shared with
+/// [`sufficiency_descent`] so the two readings of one factoring refuse identically.
+fn check_sufficiency_declaration(
+    standing: &StandingLaw,
+    population: &SourcePopulation,
+    generators: &GeneratorFamily,
+    observations: &[FutureObservation],
+) -> Result<(), StandingRefusal> {
+    if standing.source_extent() != population.extent() {
+        return Err(StandingRefusal::ExtentMismatch {
+            declared: standing.source_extent(),
+            found: population.extent(),
+        });
+    }
+    if generators.extent() != population.extent() {
+        return Err(StandingRefusal::ExtentMismatch {
+            declared: generators.extent(),
+            found: population.extent(),
+        });
+    }
+    if observations.len() > OBSERVATION_CEILING {
+        return Err(StandingRefusal::ObservationCeiling {
+            declared: observations.len(),
+            ceiling: OBSERVATION_CEILING,
+        });
+    }
+    let members = population.members();
+    let count = members.len();
+    let pair_count = count
+        .checked_mul(count.saturating_sub(1))
+        .ok_or(StandingRefusal::PairCountOverflows { members: count })?
+        / 2;
+    let work = pair_count.checked_mul(observations.len().max(1)).ok_or(
+        StandingRefusal::CheckWorkCeiling {
+            pairs: pair_count,
+            observations: observations.len(),
+            ceiling: CHECK_WORK_CEILING,
+        },
+    )?;
+    if work > CHECK_WORK_CEILING {
+        return Err(StandingRefusal::CheckWorkCeiling {
+            pairs: pair_count,
+            observations: observations.len(),
+            ceiling: CHECK_WORK_CEILING,
+        });
+    }
+    for observation in observations {
+        for letter in observation.word() {
+            if *letter >= generators.count() {
+                return Err(StandingRefusal::GeneratorAbsent {
+                    index: *letter,
+                    carried: generators.count(),
+                });
+            }
+        }
+        if observation.reading().source_extent() != population.extent() {
+            return Err(StandingRefusal::ExtentMismatch {
+                declared: observation.reading().source_extent(),
+                found: population.extent(),
+            });
+        }
+    }
+    Ok(())
+}
+
+impl StandingLaw {
+    /// **The standing as a core restriction**: `S` transports the retained residue and retains the
+    /// kernel component `x − σ S x` (`holonic_core::restriction::LinearRestriction`), which, with
+    /// the standing, reopens the source exactly. Nothing requires `S` to be injective.
+    pub fn restriction(&self) -> Result<LinearRestriction, StandingRefusal> {
+        Ok(LinearRestriction::new(self.retain.clone())?)
+    }
+}
+
+/// The sufficiency check read as the core restriction's factor descent: the reading of one member
+/// is its face under every declared observation, in declaration order.
+pub type SufficiencyDescent = FactorDescent<Vec<Rat>, Vec<Rat>, Vec<Vec<Rat>>>;
+
+/// **Sufficiency as descent** (`Foundation/Standing.lean::standingLaw_exists_iff_future_factors`):
+/// the admitted future factors through the standing — a witness carrying the induced reading on
+/// the retained residues — or the pairs of members with equal standing that some observation
+/// separates, with the kernel residuals that still separate them. [`sufficiency`]'s
+/// `NotSufficient { left, right, .. }` is this descent's first break and its `Sufficient { pairs }`
+/// is the witness's merged-pair count.
+pub fn sufficiency_descent(
+    standing: &StandingLaw,
+    population: &SourcePopulation,
+    generators: &GeneratorFamily,
+    observations: &[FutureObservation],
+) -> Result<SufficiencyDescent, StandingRefusal> {
+    check_sufficiency_declaration(standing, population, generators, observations)?;
+    let members = population.members();
+    let mut readings = Vec::with_capacity(members.len());
+    for member in members {
+        let mut faces = Vec::with_capacity(observations.len());
+        for observation in observations {
+            let advanced = generators.transport_word(observation.word(), member)?;
+            faces.push(observation.reading().face(&advanced)?);
+        }
+        readings.push(faces);
+    }
+    let restriction = standing.restriction()?;
+    // The population ceiling is below the descent ceiling, so this refusal is unreachable through
+    // a declared population; it is reported in the population's vocabulary.
+    factor_descent_over(&restriction, members, &readings).map_err(|_| {
+        StandingRefusal::PopulationCeiling {
+            declared: members.len(),
+            ceiling: POPULATION_CEILING,
+        }
     })
 }
 
@@ -1703,6 +1766,9 @@ pub enum StandingRefusal {
     /// The exact linear algebra refused.
     #[error(transparent)]
     Linear(#[from] ExactLinearError),
+    /// The core restriction refused the standing's retention map.
+    #[error(transparent)]
+    Restriction(#[from] holonic_core::holon::HolonError),
 }
 
 impl PartialEq for StandingRefusal {

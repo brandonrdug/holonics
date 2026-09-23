@@ -473,6 +473,136 @@ fn release_coarser_refuses_a_tower_that_does_not_factor() {
     ));
 }
 
+/// Phase 6: a coarsening tower is the core restriction's factor descent. The step that refuses in
+/// `release_coarser` is the first descent that breaks, at the same two members; a step that
+/// factors is a witness.
+#[test]
+fn the_coarsening_tower_is_the_core_factor_descent() {
+    let fibre =
+        CompatibleFamily::enumerated("doubling|fibre", vec![vec![ratio(1, 8)], vec![ratio(1, 4)]])
+            .expect("a family");
+    let timing = TimeOfEvent {
+        receiver: "time-of-event".to_owned(),
+        horizon: 3,
+        threshold: Rat::one(),
+    };
+    let event = EventByHorizon {
+        receiver: "event-by-3".to_owned(),
+        horizon: 3,
+        threshold: Rat::one(),
+    };
+    let lawful = CoarseningTower {
+        lineage: "doubling|timing-tower".to_owned(),
+        steps: vec![CoarseningStep {
+            reading: Box::new(EventByHorizon {
+                receiver: "event-by-3".to_owned(),
+                horizon: 3,
+                threshold: Rat::one(),
+            }),
+        }],
+    };
+    let descents = lawful
+        .descent(&timing, &fibre)
+        .expect("the descent is taken");
+    assert_eq!(descents.len(), 1);
+    assert!(descents[0].descends());
+    assert!(
+        release_coarser(
+            &timing,
+            &lawful,
+            &fibre,
+            &ratio(1, 2),
+            DiameterNorm::Supremum
+        )
+        .expect("the search returns")
+        .is_some()
+    );
+
+    let not_a_tower = CoarseningTower {
+        lineage: "doubling|not-a-tower".to_owned(),
+        steps: vec![CoarseningStep {
+            reading: Box::new(TimeOfEvent {
+                receiver: "time-of-event".to_owned(),
+                horizon: 3,
+                threshold: Rat::one(),
+            }),
+        }],
+    };
+    let descents = not_a_tower
+        .descent(&event, &fibre)
+        .expect("the descent is taken");
+    let breaks = descents
+        .last()
+        .and_then(|descent| descent.defect())
+        .expect("the timing step does not factor through the event flag");
+    let refusal = release_coarser(
+        &event,
+        &not_a_tower,
+        &fibre,
+        &integer(10),
+        DiameterNorm::Supremum,
+    )
+    .expect_err("the same step is refused");
+    let WidthRefusal::CoarserDoesNotFactor { left, right, .. } = refusal else {
+        panic!("the refusal is the factoring refusal");
+    };
+    assert_eq!(breaks.first().pair(), (left, right));
+    assert_eq!(descents.len(), 1);
+}
+
+/// Phase 6: a factor map is the induced coarse reading of a descent. A `FactoredReading` descends
+/// through its finer reading (`Foundation/ReceiverRelease.lean::coarser_receiver_factors`), and the
+/// witness's induced map `ρ̄` on the finer faces is the declared `FactorMap` applied entrywise.
+#[test]
+fn a_factor_map_is_the_induced_reading_of_a_descent() {
+    let family = CompatibleFamily::enumerated(
+        "fibre",
+        vec![
+            vec![integer(0)],
+            vec![integer(3)],
+            vec![integer(9)],
+            vec![integer(3)],
+        ],
+    )
+    .expect("a family");
+    let members = family.members().expect("enumerated");
+    let fine = Coordinate {
+        receiver: "x".to_owned(),
+        at: 0,
+    };
+    let clamp = Clamp { cap: integer(4) };
+    let coarse = FactoredReading {
+        receiver: "clamped-x".to_owned(),
+        fine: &fine,
+        factor: &clamp,
+    };
+    let quotient = super::FaceQuotient {
+        faces: members
+            .iter()
+            .map(|m| fine.read(m).expect("a face"))
+            .collect(),
+    };
+    let indices: Vec<usize> = (0..members.len()).collect();
+    let descent = holonic_core::restriction::factor_descent(
+        &quotient,
+        |k: &usize| coarse.read(&members[*k]).expect("a face"),
+        &indices,
+    )
+    .expect("a small family");
+    let witness = descent
+        .witness()
+        .expect("a factored reading descends by construction");
+    assert_eq!(witness.merged_pairs(), 1);
+    assert_eq!(witness.factored().len(), 3);
+    for (face, induced) in witness.factored() {
+        let Some(ExactFace::Vector(values)) = face else {
+            panic!("the coordinate reading is a vector face");
+        };
+        let mapped: Vec<Rat> = values.iter().map(|v| clamp.apply(v)).collect();
+        assert_eq!(induced, &ExactFace::Vector(mapped));
+    }
+}
+
 // ---------------------------------------------------------------------------------------------
 // the exact enclosure and the exact h-step map
 // ---------------------------------------------------------------------------------------------

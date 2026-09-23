@@ -134,6 +134,29 @@ dilation turns, whose curvature face equals the hinge world's cycle-return displ
 a general `PGL(2,ℚ)` turn. Owed: a matrix-valued core connection (projective turns, affine cell
 transports and higher sheaf stalks), for which the scalar determinant line is the present reading.
 
+### Phase 6 disposition: restriction as one owner
+
+[established-bounded; source-inspected, implemented-exact] `continuing_tower` moved whole to
+`holonic_core::restriction::tower` (it depended on no engine owner). `continuing_tube`'s carrier law
+(`StationedTower`, `check_commuting_square`, `SquareVerdict`, `SquareDefect`, circuit holonomy,
+wormhole receipt, `ConstantTube`/`FlipTube`/`LossySwapMigration`) moved to
+`holonic_core::restriction::tube`; the engine file keeps the grain and presentation tubes and the
+horizon/profile/route layers, because they read a tube through `receiver_release`'s `Horizon`,
+width and `ExactFace` and `relation_ladder::Rung` (phase 7 territory). Both engine paths re-export
+every moved item. The two square defects are one object: the tube's per-face
+`SquareDefect::route_difference` is `restriction::SquareDefect::at` at the source face
+(`LinearTube`; Lean `squareDefect_mulVec_eq_zero_iff`). `restriction::Descent { Witness, Defect }`
+(Lean `Holon/Restriction.lean::{Descent, descent_total}`) is built on `Transition::residual` through
+`square_descent`, `tower_square_descent` and `factor_descent`; its engine instances, each tested
+equal to the existing reading, are `SquareVerdict::descent` on the grain tube (with `GrainTower`'s
+restriction residual), `CoarseningTower::descent` (first break = `CoarserDoesNotFactor`; a
+`FactorMap` is a witness's induced reading), `standing::sufficiency_descent` (through
+`StandingLaw::restriction`, a rank-tolerant `LinearRestriction`) and
+`receiver_exact_compression::one_shot_descent` (breaks = collapsed pairs). The engine's only
+Schur/Dirichlet-to-Neumann owner, `diffusion::compile_diffusion_transfer`, now reads `L_II⁻¹` and
+`Λ_DN` off `KronReduction`; `causal_reflection.rs` is Kramers–Kronig (dispersive/absorptive
+reflection), not an interior elimination, and has no Kron reading.
+
 Constraints: rest/wire compatibility for `SavedCoupledBody`, `NativeIncidentModelRest`,
 `CoupledConstitutiveRest`, the complex schema string and custom deserializers; interaction types stay
 `Serialize`-only so no wire mints an unchecked object; no device layout change during consolidation;

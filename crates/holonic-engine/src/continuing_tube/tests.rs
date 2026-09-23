@@ -12,7 +12,8 @@ use relational_geometry::Rat;
 
 use super::*;
 use crate::continuing_tower::{
-    HalvingMigration, ResidueTower, ReversePassageReceipt, SwapMigration, check_reverse_passage,
+    HalvingMigration, ResidualMigration, ResidueTower, ReversePassageReceipt, SwapMigration,
+    TwoChartTower, TwoCharts, check_reverse_passage,
 };
 use crate::grain_tower::GrainPair;
 use crate::physical_constraint_complex::ContactClass;
@@ -201,6 +202,62 @@ fn a_declared_aperture_above_the_ceiling_is_refused_before_any_loop() {
             ceiling: DECLARED_CHART_CEILING,
         }
     );
+}
+
+/// Phase 6: the grain tube's square is the core restriction's descent. Its verdict read as a
+/// `Descent` breaks, and the core tower descent through `GrainTower`'s own restriction residual
+/// (`Foundation/ContinuingTower.lean::Tower.restrictTransition`) returns the same source and the
+/// same two routes; the retained residual reopens the selected fine face, so the defect is not a
+/// loss (`Transport/ContinuingTube.lean::grainSquare_defect_is_not_a_loss`).
+#[test]
+fn the_grain_tube_square_is_the_core_restriction_descent() {
+    use crate::continuing_tower::TowerRestrictTransition;
+    use holonic_core::restriction::{Descent, tower_square_descent};
+    let tube = grain_reading_tube();
+    let atom_face = tube.complete().atom_face().clone();
+    let verdict = check_commuting_square(
+        &tube,
+        &GrainStation::Complete,
+        &GrainStation::Selected,
+        &[Grain::Residue, Grain::Atom],
+        &[(Grain::Atom, atom_face.clone())],
+    )
+    .expect("the two stations are ordered and both carry a section");
+    let Descent::Defect(defect) = verdict.descent() else {
+        panic!("the grain square does not descend");
+    };
+    let core = tower_square_descent(
+        tube.complete(),
+        &Grain::Residue,
+        &Grain::Atom,
+        |face| Ok(tube.select(Grain::Atom, face)),
+        |face| Ok(tube.select(Grain::Residue, face)),
+        std::slice::from_ref(&atom_face),
+    )
+    .expect("the grain restriction and its residual are defined on the atom face");
+    let breaks = core
+        .defect()
+        .expect("the core descent breaks where the tube square does");
+    let first = breaks.first();
+    assert_eq!(first.source(), defect.source_face());
+    assert_eq!(
+        first.fine_then_restricted(),
+        defect.transported_then_restricted()
+    );
+    assert_eq!(
+        first.restricted_then_coarse(),
+        defect.restricted_then_transported()
+    );
+    let reopened = tube
+        .complete()
+        .restriction_reopen(
+            &Grain::Residue,
+            &Grain::Atom,
+            first.fine_then_restricted(),
+            first.fine_residual(),
+        )
+        .expect("the retained residual reopens the selected fine face");
+    assert_eq!(reopened, tube.select(Grain::Atom, &atom_face));
 }
 
 #[test]

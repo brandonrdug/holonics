@@ -436,6 +436,55 @@ pub fn compress(system: &dyn ObservedSystem) -> ReceiverExactCompression {
     }
 }
 
+/// The one-shot quotient as a core restriction: an item transports its one-shot block and retains
+/// itself — the item is exactly what a later receiver reopens inside its block.
+struct OneShotQuotient {
+    index: BlockIndex,
+}
+
+impl holonic_core::restriction::tower::Transition for OneShotQuotient {
+    type Source = ItemId;
+    type Target = Option<usize>;
+    type Residual = ItemId;
+
+    fn apply(&self, item: &ItemId) -> Option<usize> {
+        self.index.block_of(*item)
+    }
+
+    fn residual(&self, item: &ItemId) -> ItemId {
+        *item
+    }
+
+    fn reopen(&self, _block: &Option<usize>, item: &ItemId) -> ItemId {
+        *item
+    }
+}
+
+/// Receiver-exact compression read as the core restriction's factor descent: the future conduct
+/// (the Nerode block) factors through the one-shot quotient, or it does not.
+pub type OneShotDescent =
+    holonic_core::restriction::FactorDescent<Option<usize>, ItemId, Option<usize>>;
+
+/// **The one-shot quotient as a descent** (H.0016 with its successor clause;
+/// `Foundation/Standing.lean::standingLaw_exists_iff_future_factors`). The witness is an exact
+/// one-shot quotient; a defect's breaks are, pair for pair and in the items' declared order, the
+/// pairs [`compress`] returns as [`CollapsedPair`]s on a closed population — the population
+/// [`separated_pair_population`] counts. Refused above the core descent ceiling, where the pairwise
+/// scan is not taken; [`separated_pair_population`] counts it from block sizes instead.
+pub fn one_shot_descent(
+    system: &dyn ObservedSystem,
+) -> Result<OneShotDescent, holonic_core::restriction::DescentRefusal> {
+    let reading = refine(system);
+    let items = system.items();
+    let conduct = reading.conduct.index();
+    let conduct_blocks: Vec<Option<usize>> =
+        items.iter().map(|item| conduct.block_of(*item)).collect();
+    let quotient = OneShotQuotient {
+        index: reading.one_shot.index(),
+    };
+    holonic_core::restriction::factor_descent_over(&quotient, &items, &conduct_blocks)
+}
+
 /// Enact the same stable receiver/history quotient through the resident card's material-free
 /// `(current class, exact key)` law.
 ///
@@ -1285,6 +1334,44 @@ mod tests {
             );
             assert_eq!(bounded.len(), bound);
             assert_eq!(bounded.as_slice(), &compression.collapsed[..bound]);
+        }
+    }
+
+    /// Phase 6: the one-shot quotient is the core restriction's factor descent. It descends
+    /// exactly when the compression is exact, and its breaks are the collapsed pairs.
+    #[test]
+    fn the_one_shot_quotient_is_the_core_factor_descent() {
+        for n in 2..=12u64 {
+            for moduli in [vec![2u64], vec![3], vec![2, 3]] {
+                let system = CyclicCounter { n, moduli };
+                let compression = compress(&system);
+                let descent = one_shot_descent(&system).expect("a small population");
+                assert_eq!(descent.descends(), compression.is_exact());
+                let items = system.items();
+                let broken: BTreeSet<(ItemId, ItemId)> = descent
+                    .defect()
+                    .map(|breaks| {
+                        breaks
+                            .breaks()
+                            .iter()
+                            .map(|piece| {
+                                let (left, right) = piece.pair();
+                                (items[left], items[right])
+                            })
+                            .collect()
+                    })
+                    .unwrap_or_default();
+                let collapsed: BTreeSet<(ItemId, ItemId)> = compression
+                    .collapsed
+                    .iter()
+                    .map(|pair| (pair.left.min(pair.right), pair.left.max(pair.right)))
+                    .collect();
+                assert_eq!(broken, collapsed);
+                assert_eq!(
+                    broken.len() as u128,
+                    separated_pair_population(&compression.one_shot, &compression.conduct)
+                );
+            }
         }
     }
 

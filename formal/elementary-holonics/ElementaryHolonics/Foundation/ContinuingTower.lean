@@ -18,7 +18,8 @@ transport.
 
 ## Rust counterpart
 
-[definition] The paired executable owner is `crates/holonic-engine/src/continuing_tower.rs`. Its
+[definition] The paired executable owner is `crates/holonic-core/src/restriction/tower.rs` (the Holon
+core's restriction facet; `crates/holonic-engine/src/continuing_tower.rs` re-exports it). Its
 types carry the same names — `Tower`, `CompatibleSection`, `ObservationFibre`, `GluingResult`,
 `MaterializedFace`, `ComputableTower`, `Transition` — over exact arithmetic
 (`relational_geometry::Rat`, `num_bigint::BigInt`), with `restrict_refl` and `restrict_trans`
@@ -144,7 +145,7 @@ actually presented at index `i`; `restrict` is the only transport, and it is dir
 coarser. `restrict_refl` and `restrict_trans` are the two laws — no face is the object, and the
 object is exactly this family plus these laws.
 
-Rust counterpart: `crates/holonic-engine/src/continuing_tower.rs::Tower`. -/
+Rust counterpart: `crates/holonic-core/src/restriction/tower.rs::Tower`. -/
 structure Tower (Index : Type u) [Preorder Index] where
   /-- The face actually presented at one index. -/
   Face : Index → Type v
@@ -402,7 +403,7 @@ Outside the image of `apply`, `reopen` returns whatever the constructor supplies
 pairs `(apply x, residual x)` carry the law, in the same sense as
 `Foundation/Receiver.lean`'s `ReceiverTransformer` domain.
 
-Rust counterpart: `crates/holonic-engine/src/continuing_tower.rs::Transition`. -/
+Rust counterpart: `crates/holonic-core/src/restriction/tower.rs::Transition`. -/
 structure Transition (Source : Type u) (Target : Type v) where
   /-- The part of the source the transition does not transport. -/
   Residual : Type w
@@ -929,7 +930,7 @@ theorem theOrderFaceDoesNotDetermineTheModule :
   cosets of `ker (PadicInt.toZModPow (n+1))` inside the coset of `ker (PadicInt.toZModPow n)`.
   The count is `p ^ k` on the nose — an equality of `Nat.card`, not an asymptotic statement.
 
-Rust counterpart: `crates/holonic-engine/src/continuing_tower.rs::{FibreSplitting,
+Rust counterpart: `crates/holonic-core/src/restriction/tower.rs::{FibreSplitting,
 ResidueTower::split_fibre, ResidueTower::coset_count, ResidueTower::coset_count_bits}`.
 -/
 
@@ -1198,7 +1199,7 @@ history actually needs and the direction in which a saved object can be carried 
 Naturality is the whole content and is stated and proved below. Migrations compose, composition is
 associative, and the identity migration is a two-sided unit; all three hold by `rfl`.
 
-Rust counterpart: `crates/holonic-engine/src/continuing_tower.rs::{Migration, ResidualMigration,
+Rust counterpart: `crates/holonic-core/src/restriction/tower.rs::{Migration, ResidualMigration,
 check_migration_naturality, carry_section, ComposedMigration, IdentityMigration, HalvingMigration}`.
 -/
 

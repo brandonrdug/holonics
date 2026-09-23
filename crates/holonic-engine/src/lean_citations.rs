@@ -235,6 +235,13 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             "continuing_tube.rs",
             "Transport/ContinuingTube.lean",
         ),
+        // The tube's carrier law and the whole tower moved to the Holon core's restriction facet
+        // (plan phase 6); their tables are read where they now live.
+        (
+            include_str!("../../holonic-core/src/restriction/tube.rs"),
+            "holonic-core/src/restriction/tube.rs",
+            "Transport/ContinuingTube.lean",
+        ),
         (
             include_str!("artifact_release.rs"),
             "artifact_release.rs",
@@ -281,8 +288,13 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             "Foundation/RelationLadder.lean",
         ),
         (
-            include_str!("continuing_tower.rs"),
-            "continuing_tower.rs",
+            include_str!("../../holonic-core/src/restriction.rs"),
+            "holonic-core/src/restriction.rs",
+            "Holon/Restriction.lean",
+        ),
+        (
+            include_str!("../../holonic-core/src/restriction/tower.rs"),
+            "holonic-core/src/restriction/tower.rs",
             "Foundation/ContinuingTower.lean",
         ),
         (

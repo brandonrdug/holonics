@@ -123,6 +123,61 @@ fn a_quotient_is_a_standing_exactly_when_the_future_factors_through_it() {
     }
 }
 
+/// Phase 6: the sufficiency check is the core restriction's factor descent through the standing.
+/// A sufficient standing is a witness with the same merged-pair count; an insufficient one breaks
+/// at the same first pair, and the kernel residuals it retains separate the two members and, with
+/// the standing, reopen each exactly.
+#[test]
+fn sufficiency_is_the_core_factor_descent_through_the_standing() {
+    use crate::continuing_tower::Transition;
+    let generators = medium_generators();
+    let population = SourcePopulation::declared(
+        "three-presents",
+        vec![
+            state(&[(2, 1), (1, 1)]),
+            state(&[(4, 1), (1, 1)]),
+            state(&[(4, 1), (3, 1)]),
+        ],
+    )
+    .expect("a declared population");
+    let standing =
+        StandingLaw::declared("medium-standing", matrix(&[&[(0, 1), (1, 1)]])).expect("a standing");
+    let medium = vec![
+        FutureObservation::declared(vec![], medium_reading()).expect("an observation"),
+        FutureObservation::declared(vec![0, 1], medium_reading()).expect("an observation"),
+    ];
+    let verdict = sufficiency(&standing, &population, &generators, &medium).expect("runs");
+    let descent = sufficiency_descent(&standing, &population, &generators, &medium).expect("runs");
+    let SufficiencyVerdict::Sufficient { pairs, .. } = verdict else {
+        panic!("the medium standing is sufficient for the medium receiver");
+    };
+    assert_eq!(
+        descent.witness().expect("it descends").merged_pairs(),
+        pairs
+    );
+
+    let state_future =
+        vec![FutureObservation::declared(vec![1], state_reading()).expect("an observation")];
+    let verdict = sufficiency(&standing, &population, &generators, &state_future).expect("runs");
+    let descent =
+        sufficiency_descent(&standing, &population, &generators, &state_future).expect("runs");
+    let SufficiencyVerdict::NotSufficient { left, right, .. } = verdict else {
+        panic!("the state receiver refutes the medium standing");
+    };
+    let first = descent.defect().expect("it does not descend").first();
+    assert_eq!(first.pair(), (left, right));
+    let restriction = standing
+        .restriction()
+        .expect("the standing is a restriction");
+    let (left_residual, right_residual) = first.residuals();
+    assert_ne!(left_residual, right_residual);
+    for (member, residual) in [(left, left_residual), (right, right_residual)] {
+        let source = population.members()[member].clone();
+        let retained = standing.retained(&source).expect("an exact standing");
+        assert_eq!(restriction.reopen(&retained, residual), source);
+    }
+}
+
 /// **Lean: `two_histories_leave_one_standing`.** One doubling of the state and two reach distinct
 /// presents carrying the same standing, so the passage history is not recoverable from standing
 /// and none is owed.
