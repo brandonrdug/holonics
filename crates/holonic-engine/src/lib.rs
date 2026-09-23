@@ -55,9 +55,6 @@
 //! A display codec or a Vulkan executor may consume these receipts.  Neither
 //! is permitted to redefine their mathematics.
 
-/// Receiver R2: a bank of causal resonators consuming the same co-present mode population the
-/// colour receiver consumes, so colour and timbre factor through one current and one lineage.
-pub mod acoustic_receiver;
 mod addressed_current;
 pub use addressed_current::*;
 pub mod algebraic;

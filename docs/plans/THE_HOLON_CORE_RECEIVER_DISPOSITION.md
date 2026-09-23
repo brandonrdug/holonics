@@ -61,7 +61,7 @@ extents; no kernel, launch or returned value changed (device tests
 | `ReceiverExchange` | struct | `holonic-core/src/law/receiver.rs` | active receiver Holon | an active receiver's own balance and delivered power (this phase) (source-inspected) |
 | `ReceiverPower` | enum | `holonic-core/src/law/receiver.rs` | active receiver Holon | the declared power term of an active receiver (this phase) (source-inspected) |
 | `ReceiverWidth` | struct | `holonic-core/src/law/receiver.rs` | receiver face (codec) | the diameter face over a fibre; moved to the core this phase (source-inspected) |
-| `JointReceiverReading` | struct | `holonic-engine/src/acoustic_receiver.rs` | receiver face (codec) | a readout/face value (codec projection) of a receiver (name-inferred) |
+| `JointReceiverReading` | struct | historical Rust mirror `holonic-engine/src/acoustic_receiver.rs` (retired R1) | receiver face (codec) | historical readout/face value (codec projection); the checked acoustic law remains in `Foundation/AcousticReceiver.lean` |
 | `AlgebraicReceiver` | struct | `holonic-engine/src/algebraic.rs` | passive coholon | a declared reading (name-inferred): a passive coholon unless it returns a current |
 | `AlgebraicReceiverReceipt` | struct | `holonic-engine/src/algebraic.rs` | receiver face (codec) | a readout/face value (codec projection) of a receiver (name-inferred) |
 | `ExactZetaReceiverMeasure` | struct | `holonic-engine/src/arithmetic_fiber.rs` | receiver face (codec) | a readout/face value (codec projection) of a receiver (name-inferred) |

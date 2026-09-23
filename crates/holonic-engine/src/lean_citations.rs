@@ -221,11 +221,6 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             "Foundation/ReceiverAtlas.lean",
         ),
         (
-            include_str!("acoustic_receiver.rs"),
-            "acoustic_receiver.rs",
-            "Foundation/AcousticReceiver.lean",
-        ),
-        (
             include_str!("topological_receiver.rs"),
             "topological_receiver.rs",
             "Foundation/TopologicalReceiver.lean",

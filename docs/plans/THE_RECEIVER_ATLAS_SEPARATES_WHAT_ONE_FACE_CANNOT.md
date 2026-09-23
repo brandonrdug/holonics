@@ -194,12 +194,16 @@ signature on the same symmetric operator.
 `the_certified_chord_reads_the_same_m5_presentation` is that measurement.
 
 [definition] **R2 — Acoustic receiver sharing one modal population. Returned.** A bank of causal
-resonators `r_b' = (-gamma_b + i Omega_b) r_b + sum_m kappa_bm A_m(t)` consuming the same co-present
-mode population the existing colour receiver consumes, so that colour and timbre factor through one
-current and one lineage rather than through two authored mappings. The owners are
-[`acoustic_receiver.rs`](../../crates/holonic-engine/src/acoustic_receiver.rs) and
+resonators `r_b' = (-gamma_b + i Omega_b) r_b + sum_m kappa_bm A_m(t)` consumes the same co-present
+mode population the colour receiver consumes, so colour and timbre factor through one current and
+one lineage. The checked mathematical owner is
 [`Foundation/AcousticReceiver.lean`](../../formal/elementary-holonics/ElementaryHolonics/Foundation/AcousticReceiver.lean),
-built on R1's `causal_chord.rs` and on the colour receiver's own `dimensional_wave.rs`.
+built on the causal-chord and colour-receiver contracts. The standalone
+`holonic-engine::acoustic_receiver` Rust mirror and its PCM/WAV exporter were retired under R1
+(issue #65) because no current Rust caller or example consumed them. Its method correspondence and
+resource ceilings below document that historical implementation. The separate native Athena
+acoustic charts under `holonic-life::native_intelligence::membrane_acoustic` are a different law and
+remain in the R2 life-lineage audit.
 
 [established-bounded; source-inspected] **What the colour receiver actually is, and where it
 lives.** The plan named it only by its law; it is
@@ -212,14 +216,22 @@ is the colour law: the three exact nonnegative quadratic phase responses
 `(|Re A|², |Im A|², |Re A + Im A|²)` accumulated across the co-present modes after that
 superposition, plus the neutral support response, and only then the saturating aperture
 `P_j/(aperture + ΣP)`. The integer quantization is a **third** step further downstream still, in
-`examples/arithmetic_dimensional_receiver.rs`, after the doctrine has run. R2 consumes *that type*
-and calls *that doctrine*; it founds no second population and restates no colour law. The plan's
-phrase "and only then quantizes" therefore covers two distinct nonlinearities in the existing
-receiver, the saturating aperture and the integer readout, and the acoustic receiver respects both
-orderings: superposition in the population, the bank exactly linear over it, the one-dimensional
-pressure projection last, and the integer export face last of all.
+`examples/arithmetic_dimensional_receiver.rs`, after the doctrine has run. The former R2 Rust
+mirror consumed *that type* and called *that doctrine*; it founded no second population and
+restated no colour law. The plan's phrase "and only then quantizes" therefore covers two
+distinct nonlinearities in the existing colour receiver, the saturating aperture and the
+integer readout, and the retired acoustic mirror respected both
+orderings: superposition in the population, the bank linear over it, the one-dimensional pressure
+projection last, and integer readout last. The retired standalone mirror's PCM/WAV exporter was an
+exterior readout; it was not the separate native Athena acoustic chart.
 
-[proved-derived; formal-checked; implemented-exact] **The exact discrete law is the Cayley map, not
+[historical Rust implementation; current checked Lean law] The exact resonator bank,
+its resource ceilings, PCM/WAV export and measurements below describe the standalone
+`holonic-engine` mirror before its R1 retirement. They are scoped evidence, not current Rust
+APIs or an alternate owner of the Lean law. The separate native Athena acoustic chart has
+its own owner and scope.
+
+[proved-derived; formal-checked; historical Rust mirror] **The exact discrete law is the Cayley map, not
 an approximated exponential.** `exp(lambda t)` is not rational, so it is not the law. The declared
 law is `z_b = (2 + h lambda_b)/(2 - h lambda_b)` with input gain `g_b = h/(2 - h lambda_b)` at a
 declared rational step `h`, a **Gaussian rational** carried by `ExactComplexWaveCurrent` — the same
@@ -238,7 +250,7 @@ adds only which declared mode the excitation names and which band's factor the p
 `charpoly_realBlock` proves that factor is exactly `X² + 2 gamma X + (gamma² + Omega²)`, which is
 what keeps a component's pole exact even when the `Omega` that produced it was read off an interval.
 
-[proved-derived; formal-checked; implemented-exact] **The ordering is law, with both
+[proved-derived; formal-checked; historical Rust mirror] **The ordering is law, with both
 counterexamples exhibited.** Superposition holds exactly through the whole bank from rest, at every
 step, in the state and in the pressure (`run_add`, `superposition_holds_through_the_bank`), and the
 pressure projection is itself linear (`pressure_add`) — so the projection is *not* where the ordering
@@ -257,7 +269,7 @@ decreasing wherever `gamma_b > 0` (`energy_advance_le`, `energy_advance_lt`), an
 against its transpose — and `inertia.rs:375` reads its signature, negative on each dissipating band
 and null on each conservative one, in exact agreement with `‖z_b‖ < 1` and `‖z_b‖ = 1`.
 
-[proved-derived; formal-checked; implemented-exact] **One lineage, and neither receiver refines the
+[proved-derived; formal-checked; historical Rust mirror] **One lineage, and neither receiver refines the
 other.** `joint_reading` takes one `ExactReceiverPhasePopulation` and returns both readings. Equal
 colour does not imply equal timbre: exchanging which of two co-present modes carries which quadrature
 leaves the colour triple *identical*, because the colour law accumulates its quadratic response
@@ -276,7 +288,7 @@ beside the rate and the constructor *checks* that the declared rate really is th
 midpoint. The plan's standing caution is stated in both owners and built into no gate: a bank with
 positive decay settles, and that says nothing about whether what it settled onto is true.
 
-[established-bounded; measured] **Applied to a real object.** Driven by R3's exact grade-zero Hodge
+[established-bounded; measured; historical Rust mirror] **Applied to a real object.** Driven by R3's exact grade-zero Hodge
 spectrum of the authenticated M5 RBX1 window (24 residues, 8 Å aperture, unit metric, free boundary),
 with the four lowest positive eigenvalues as bands, `gamma = 1/10` and step `h = 1/8` declared, and
 one declared unit current per mode, the exact bank state after eight steps **separates all three
@@ -291,32 +303,32 @@ under `.local/artifacts/`, in integers, with its exact rational quantization res
 half a step — and its length is a measured property of exactness rather than a choice: the state
 gains one Cayley denominator's bit length per step and the pressure carries the product over bands,
 so sixty-four samples return in seconds where two hundred and fifty-six take minutes. The exact
-state is the object; the face is the thing that gets shortened. That measurement is now a **bound**
+state is the object; the face is the thing that gets shortened. That measurement was then a **bound**
 and not only a caution — see `STEP_WORK_CEILING` below.
 
-[proved-derived; implemented-exact] **Five defects an authoritative review found in the returned
-owners, repaired, each with a regression test that separates the repair from its absence.**
+[historical; proved-derived; implemented-exact at the recorded tree] **Five defects an authoritative review found in the returned
+mirror, repaired, each with a regression test that separates the repair from its absence.**
 
 - *Band attribution was aliasing.* `audible_components` attributed each component to the **first**
   band whose `characteristic_factor()` equalled the component's `pole_factor`. That factor is
   `X^2 + 2 gamma X + (gamma^2 + Omega^2)` and sees `Omega` only through `Omega^2`, so two distinctly
   named bands with mirror-signed rates carried the identical factor and both components were handed
-  the first band's name. The attribution is now **structural**: the excitation column names the mode,
+  the first band's name. The repaired attribution was **structural**: the excitation column names the mode,
   the declared coupling names which blocks that mode drives at a nonzero `kappa`, and
-  `AudibleComponent::originating_bands` returns exactly those blocks whose factor is the component's
-  pole factor. `band` and the new `band_index` are `Some` exactly when that set is a single block;
+  `AudibleComponent::originating_bands` returned exactly those blocks whose factor is the component's
+  pole factor. `band` and the then-new `band_index` were `Some` exactly when that set is a single block;
   when one column drives two bands sharing `gamma` and `Omega^2` the reduced denominator carries the
-  factor once, the pole is genuinely pooled, and the fields say `None` rather than picking one.
+  factor once, the pole is genuinely pooled, and the fields recorded `None` rather than picking one.
   `mirror_bands_are_attributed_by_block_and_not_by_polynomial_equality` builds the mirror pair,
   attributes each component to its own block, and then executes the superseded rule to exhibit that
   it returns the wrong name.
 - *The step ceiling did not bound the work.* `STEP_CEILING = 2^16` bounds the **retained trace** and
   nothing else, while the exact state gains a whole Cayley coefficient's bit length at every step, so
   the arithmetic is quadratic in the length and a declaration far inside that ceiling could run for
-  hours. `ResonatorBank::step_bit_length` now projects the per-step growth from the declared step's
-  own Cayley coefficients, `projected_run_work` forms `steps x projected state bit length` under
-  checked arithmetic, and both `run` and `run_held` refuse above the new `STEP_WORK_CEILING` of
-  `2^25` bit-steps by the new `AcousticRefusal::RunWorkAboveCeiling`, **before** the loop.
+  hours. `ResonatorBank::step_bit_length` projected the per-step growth from the declared step's
+  own Cayley coefficients, `projected_run_work` formed `steps x projected state bit length` under
+  checked arithmetic, and both `run` and `run_held` refused above the then-new `STEP_WORK_CEILING` of
+  `2^25` bit-steps by the then-new `AcousticRefusal::RunWorkAboveCeiling`, **before** the loop.
   The measured basis is stated in the constant's doc and held to it by assertion: the worked
   two-band bank's widest Cayley coefficient is seventeen bits, its thousand-and-twenty-four-step run
   takes about five seconds and is admitted, and its two-thousand-and-forty-eight-step run takes
@@ -325,22 +337,22 @@ owners, repaired, each with a regression test that separates the repair from its
   `a_run_under_the_step_ceiling_is_refused_by_the_projected_work`.
 - *The export face's ceiling was bypassable.* `PressureExportFace` had fully public fields, so a
   caller could assemble one with an arbitrarily large `samples` vector and hand it to `wav_bytes`,
-  going around the `SAMPLE_CEILING` refusal `export_pcm16` performs. The fields are now private with
-  accessors; the type derives `Serialize` and not `Deserialize`, has no `Default`, no second
-  constructor and no mutator, so `export_pcm16` is the only way a face comes into existence and the
+  going around the `SAMPLE_CEILING` refusal `export_pcm16` performs. The fields were made private with
+  accessors; the type derived `Serialize` and not `Deserialize`, had no `Default`, no second
+  constructor and no mutator, so `export_pcm16` was the only way a face could come into existence and the
   guarantee is a compile-level one rather than a checked one.
   `a_face_above_the_sample_ceiling_cannot_be_produced`.
 - *One refusal named the wrong defect.* `wav_bytes` reported a sample-rate multiplication overflow as
-  `ZeroSampleRate`, which it plainly is not; it has its own
+  `ZeroSampleRate`, which it plainly was not; it gained its own
   `AcousticRefusal::SampleRateOverflowsByteRate` with an accurate message.
   `a_sample_rate_that_overflows_the_byte_rate_refuses_by_its_own_name`.
 - *A Lean witness was weaker than its docstring.* `metamerBank` was documented as "both modes
   coupled" while its body was definitionally `workedBank`, with mode `1` uncoupled. It now couples
   both modes at `kappa = (1, 2)` and `metamer_sounds_different` is proved over that richer bank,
   with the supporting `bandGain_metamerBank_ne_zero`. Every theorem in the file depends on
-  `propext`, `Classical.choice` and `Quot.sound` and on nothing else. The Rust module header
-  additionally carries a machine-readable correspondence table naming all forty-four declarations of
-  the Lean owner against what carries each one here, so a stale citation is a checkable fact.
+  `propext`, `Classical.choice` and `Quot.sound` and on nothing else. The retired Rust module header
+  carried a machine-readable correspondence table naming all forty-four declarations of
+  the Lean owner against its then-current implementation, making a stale citation checkable at that revision.
 
 [established-bounded; measured] **A finding the plan did not anticipate, about R3 rather than R2.**
 R3's default isolation returns intervals certified to *separate* the eigenvalues, not intervals

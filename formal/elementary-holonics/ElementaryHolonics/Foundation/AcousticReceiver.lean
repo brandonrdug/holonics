@@ -10,16 +10,18 @@ import ElementaryHolonics.Foundation.CausalChord
 /-!
 # The acoustic receiver: a resonator bank on the colour receiver's own mode population
 
-[definition] This owner states the law the Rust module
-`crates/holonic-engine/src/acoustic_receiver.rs` implements. It is receiver **R2** of
+[definition] This is the checked mathematical owner of receiver **R2**. A standalone Rust mirror
+at `crates/holonic-engine/src/acoustic_receiver.rs` implemented this law and was retired in R1
+(issue #65) because no current Rust caller or example consumed it. The correspondence below is
+historical evidence, not a live code dependency. R2 is recorded in
 `docs/plans/THE_RECEIVER_ATLAS_SEPARATES_WHAT_ONE_FACE_CANNOT.md`:
 
 ```text
 r_b' = (−γ_b + i Ω_b) r_b + Σ_m κ_bm A_m(t)
 ```
 
-driven by **the same co-present mode population the existing colour receiver consumes**. In the
-Rust owner that population is `dimensional_wave.rs`'s `ExactReceiverPhasePopulation`, whose
+driven by **the same co-present mode population the existing colour receiver consumes**. The
+historical Rust mirror used `dimensional_wave.rs`'s `ExactReceiverPhasePopulation`, whose
 `coherent_modes` map already sums same-mode currents *before* any quadratic response is formed;
 here it is the function `A : Fin M → ℂ`. Colour and timbre are then two maps out of one type and
 not two authored mappings.
@@ -29,7 +31,7 @@ Five things are stated, in this order.
 1. **The exact discrete law.** The continuous resonator's response `exp(λ t)` is not rational, so
    nothing here discretizes it by approximation. `cayley h λ = (2 + hλ)/(2 − hλ)` is the
    Cayley/bilinear map at a *declared* step `h > 0`; `gain h λ = h/(2 − hλ)`. Both are Gaussian
-   rational when `h`, `γ_b`, `Ω_b` are rational, which is why the Rust state is exact.
+   rational when `h`, `γ_b`, `Ω_b` are rational, which allowed the former Rust state to be exact.
    `cayley_den_ne_zero` makes the law **total** on the whole closed left half plane.
    `normSq_cayley_lt_one` proves the stability preservation the plan demands — open left half
    plane ↦ open unit disc — and `normSq_cayley_eq_one` proves the marginal case is marginal
@@ -66,14 +68,15 @@ Five things are stated, in this order.
 colour are guidance receivers and never truth oracles. `energy_advance_lt` says a bank with
 positive decay settles; it does not say what it settled onto is true. A construction may reach an
 acoustically stable equilibrium under an incomplete receiver while remaining false. Nothing below
-is an acceptance condition and the Rust owner builds no gate from it.
+is an acceptance condition; the historical mirror built no gate from it.
 
-[definition] The step, decays, rates and couplings are carried here as reals and in Rust as
-declared rationals with sources. ℚ ⊆ ℝ, so every theorem below applies to the executed object; the
-reverse does not hold, and the Rust owner's exactness comes from its own arithmetic, not from
-these statements.
+[definition] The step, decays, rates and couplings are carried here as reals. The retired Rust
+mirror carried declared rational instances with sources; ℚ ⊆ ℝ, so every theorem below applies to
+those executed instances. The reverse does not hold, and the mirror's exactness came from its own
+arithmetic, not from these statements.
 
-Rust owner: `crates/holonic-engine/src/acoustic_receiver.rs`
+Historical Rust correspondence (retired R1, issue #65):
+`crates/holonic-engine/src/acoustic_receiver.rs`
 (`Bank` ↔ `ResonatorBank`; `cayley`/`gain` ↔ `ResonatorBank::transition`/`ResonatorBank::gain`;
 `Bank.advance`/`Bank.run` ↔ `ResonatorBank::advance`/`ResonatorBank::run`; `run_causal` ↔
 `the_state_after_n_steps_ignores_every_later_input`; `run_add` ↔
@@ -89,8 +92,8 @@ Rust owner: `crates/holonic-engine/src/acoustic_receiver.rs`
 `metamers_sound_different`; `unison_looks_different` ↔ `unisons_look_different`;
 `population_change_moves_both` ↔ `a_change_of_population_moves_both_receivers`).
 Colour is **not** restated here as a second law: `colour` below is the pre-aperture half of
-`dimensional_wave.rs`'s `ExactReceiverPrimaryDoctrine::transduce`, which the Rust owner calls
-rather than reimplements.
+`dimensional_wave.rs`'s `ExactReceiverPrimaryDoctrine::transduce`, which the historical mirror
+called rather than reimplemented.
 -/
 
 noncomputable section
@@ -115,8 +118,8 @@ theorem pole_im (g o : ℝ) : (pole g o).im = o := rfl
 
 /-- [definition] **The declared exact discrete law.** The continuous response `exp(λ t)` is not
 rational, so it is not the law: the law is the Cayley/bilinear image of `λ` at the declared step
-`h`. For rational `h`, `γ`, `Ω` this is a Gaussian rational, which is why the executed state is
-exact. -/
+`h`. For rational `h`, `γ`, `Ω` this is a Gaussian rational; the former Rust mirror used that
+representation to keep its executed state exact. -/
 def cayley (h : ℝ) (lam : ℂ) : ℂ := (2 + (h : ℂ) * lam) / (2 - (h : ℂ) * lam)
 
 /-- [definition] The matching input gain of the same discretization. -/
@@ -168,7 +171,7 @@ section Block
 open Matrix Polynomial
 
 /-- [definition] The realification over the reals of the one-pole generator `λ = −γ + iΩ`, which is
-the `2 × 2` diagonal block the Rust owner assembles into R1's `Linearization`. The bank's state
+the `2 × 2` diagonal block the historical Rust mirror assembled into R1's `Linearization`. The bank's state
 operator is the block diagonal of these, exactly as `causal_chord::resolvent_probe` realifies a
 Gaussian-rational probe point. -/
 def realBlock (g o : ℝ) : Matrix (Fin 2) (Fin 2) ℂ := !![(-g : ℂ), (-o : ℂ); (o : ℂ), (-g : ℂ)]
@@ -176,7 +179,7 @@ def realBlock (g o : ℝ) : Matrix (Fin 2) (Fin 2) ℂ := !![(-g : ℂ), (-o : �
 /-- [proved-derived; formal-checked] **Each band names its pole by an exact factor.** The block's
 characteristic polynomial is `X² + 2γX + (γ² + Ω²)`, whose roots are `−γ ± iΩ`. The audible
 component's pole is therefore this exact rational factor and never a measured frequency — which is
-what lets the Rust owner return `Ω` read off an isolating interval as a *declared readout* while
+what let the historical Rust mirror return `Ω` read off an isolating interval as a *declared readout* while
 the pole itself stays exact. -/
 theorem trace_realBlock (g o : ℝ) : (realBlock g o).trace = -(((2 * g : ℝ)) : ℂ) := by
   simp only [realBlock, Matrix.trace_fin_two_of]
@@ -214,10 +217,10 @@ section Bank
 variable {B M : ℕ}
 
 /-- [definition] **A declared bank of causal resonators.** No validation is carried in the
-structure: the Rust owner's `ResonatorBank::declared` refuses a non-positive step, a negative
+structure: the former `ResonatorBank::declared` refused a non-positive step, a negative
 decay, a mismatched shape and an unsourced rate by name, and every theorem below states the
-hypothesis it actually uses. That is the deliberate division of labour — the executable owner
-validates, the formal owner states. -/
+hypothesis it actually uses. In that historical realization, the executable constructor
+validated carrying values while this formal owner stated the law. -/
 structure Bank (B M : ℕ) where
   /-- The declared step `h`. -/
   step : ℝ
@@ -244,8 +247,8 @@ def transition (K : Bank B M) (b : Fin B) : ℂ := cayley K.step (K.bandPole b)
 def bandGain (K : Bank B M) (b : Fin B) : ℂ := gain K.step (K.bandPole b)
 
 /-- [definition] **The excitation: `Σ_m κ_bm A_m`.** The population is consumed *as one current*;
-a mode the bank does not couple to contributes exactly zero and is reported by the Rust owner
-rather than dropped. -/
+a mode the bank does not couple to contributes exactly zero and was reported by the historical
+mirror rather than dropped. -/
 def drive [Fintype (Fin M)] (K : Bank B M) (A : Fin M → ℂ) (b : Fin B) : ℂ :=
   ∑ m, (K.kappa b m : ℂ) * A m
 

@@ -145,7 +145,11 @@ The third eight add four **keep** (`graph_receiver`, `dimensional_receiver`,
 uncopied prime-square/affine-orbit law; `returned_conduct` still has a `life` runtime caller),
 and two proposed **retire** (`acoustic_receiver`, `artifact_release`). An independent review
 confirmed no external Rust caller/example and a checked Lean counterpart for each.
-`acoustic_receiver` is ready for a coordinated R1 source, re-export, citation and guide cut.
+The acoustic mirror cut has removed the standalone Rust module/tests and citation/export in
+the isolated R1 #65 worktree, marked its Lean correspondence historical, and retained the
+checked Lean owner and dated measurements. Focused engine-lib and cached Lean-owner checks
+passed; the all-target caller gate remains to be run on the rebased cut. The separate native
+Athena acoustic chart is not this module.
 `artifact_release` also has Rust-only `EnclosedFamily` representation and work-ceiling policy:
 classify these as implementation-specific retirement or preserve a distinct law in a guide/
 #62 before removing it. Both cuts still need focused Rust/Lean checks after the edit.
