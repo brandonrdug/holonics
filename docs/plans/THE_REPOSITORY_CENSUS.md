@@ -200,6 +200,9 @@ Two test-only ranked/sparse felt-surface wrappers also retired; their opposed-ar
 ranked/sparse parity witnesses now run against `SparseOwnState` and `GrowingRankedOwn` in the live
 body/membrane owners. The surviving 56 membrane tests and locked workspace gate passed; live
 `SparseStandingSurface` and `live_current` remain untouched.
+The redundant `soma-membrane::CausalMembrane` re-export also retired; `AgenticLanguageEcology`
+now names the existing `holonic-structure` trait owner directly. The 17 focused agentic-language
+tests and locked workspace target check passed without moving the live membrane runtime.
 The [workspace caller map](census/R2_WORKSPACE_EDGE.md) places the
 live variant-workspace operation at the workbench boundary and names its v1 persisted readers;
 those readers cannot become compatibility paths in the new library. Both are migration
