@@ -1,21 +1,42 @@
+//! **The coupled continuation of the normal wave Holon** (plan phases 9 and 12b).
+//!
+//! [definition] The same wave owner continues through a neighborhood of conditional member laws.
+//! Its state is the contemporary anchored family (a point of the Holon); its constitution is the
+//! neighborhood (member materials and the shared condition), which only deposition changes. Its
+//! fixed normal bank remains available for its own one-cut returns; it is not advanced as a
+//! hidden alternative current.
+//!
+//! [definition; agent-inferred] **Retention (phase 12b, one cut).** A pending coupled prediction
+//! retains only its producing operands: the source family it was read from, the admitted member
+//! law with its source chart, and its epoch (the address). A comparison, an empirical
+//! observation or a return reads that retained source through the *contemporary* member law and
+//! condition and returns its residual there; a return then deposits the `θ`-face operands of
+//! the source family into the contemporary constitution and moves the contemporary family one
+//! passage through the updated law. No ordered relation word is kept between a prediction and
+//! its return, and no earlier face is carried through the intervening maps
+//! (`Foundation/Standing.lean::standingLaw_exists_iff_future_factors`; the retention audit
+//! `research/records/2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md`).
 use super::*;
 pub(super) mod rest;
 mod comparison;
-mod continuation;
 mod dependent;
 mod observation;
 pub use observation::NormalCoupledObservation;
-pub use dependent::{ConstitutiveComparisonSection, ConstitutiveSourceFrame, ResidentCoupledConstitutive, CoupledConstitutiveRefusal, ConstitutiveSourceRefusal, CoupledConstitutiveRest};
-pub use continuation::{NormalCoupledContinuation, NormalContinuationPullback, NormalContinuationJoin};
+pub use dependent::{
+    ConstitutiveComparisonSection, ConstitutiveContinuationSection, ConstitutiveSourceRefusal,
+    CoupledConstitutiveRefusal, CoupledConstitutiveRest, ResidentCoupledConstitutive,
+};
 use comparison::CoupledProducingCut;
-pub use comparison::{CoupledConstitutiveFamily, CoupledConstitutiveAlternative, CompiledCoupledJoint, CoupledJointEvaluation, NormalCoupledComparison};
+pub use comparison::{
+    CompiledCoupledJoint, CoupledConstitutiveAlternative, CoupledConstitutiveFamily,
+    CoupledJointEvaluation, NormalCoupledComparison,
+};
 use crate::native_ecology::constitutive_fibre::{
     GeneratorNeighborhoodStep, ResidentGeneratorNeighborhood, ResidentSourcePairs,
     ResidentWaveRelation, WaveSourceReceiver,
 };
 
-/// The same wave owner continuing through a conditional family. Its fixed normal bank remains
-/// available for its old comparisons; it is not advanced as a hidden alternative current.
+/// The coupled continuation state of the normal wave Holon (see the module header).
 pub struct NormalWaveCoupled<'c> {
     neighborhood: ResidentGeneratorNeighborhood<'c>,
     current: Rc<NormalWaveFamily<'c>>,
@@ -27,9 +48,8 @@ pub struct NormalWaveCoupled<'c> {
     next_contact: u64,
     active_member: Option<usize>,
     bindings: BTreeMap<u64, Rc<CoupledBinding<'c>>>,
-    pending: BTreeMap<u64,Rc<CoupledProducingCut<'c>>>,
-    // One shared ordered word, rooted at the oldest still-pending producing source.
-    transport: BTreeMap<u64, Vec<Rc<ResidentWaveRelation<'c>>>>,
+    /// Pending predictions by epoch: each retains its producing operands only.
+    pending: BTreeMap<u64, Rc<CoupledProducingCut<'c>>>,
 }
 struct CoupledBinding<'c> {
     member: usize,
@@ -118,6 +138,32 @@ impl<'a, 'c> NormalCoupledStep<'a, 'c> {
     }
 }
 
+/// Read each actual member/receiver cut once for this prospective word. Repeated use shares
+/// immutable derived maps; it does not clone a continuing ecology or store observed events.
+pub(super) fn prospective_maps<'c>(
+    word: &[(usize, WaveSourceReceiver)],
+    mut read: impl FnMut(
+        usize,
+        WaveSourceReceiver,
+    ) -> Result<ResidentWaveRelation<'c>, ConstitutiveFibreError>,
+) -> Result<Vec<Rc<ResidentWaveRelation<'c>>>, ConstitutiveFibreError> {
+    if word.is_empty() {
+        return Err(ConstitutiveFibreError::Shape);
+    }
+    let mut retained: BTreeMap<(usize, bool), Rc<ResidentWaveRelation<'c>>> = BTreeMap::new();
+    word.iter()
+        .map(|&(member, chart)| {
+            let key = (member, matches!(chart, WaveSourceReceiver::UnitRealSum));
+            if let Some(map) = retained.get(&key) {
+                return Ok(Rc::clone(map));
+            }
+            let map = Rc::new(read(member, chart)?);
+            retained.insert(key, Rc::clone(&map));
+            Ok(map)
+        })
+        .collect()
+}
+
 impl<'c> ResidentNormalWave<'c> {
     pub fn with_neighborhood(
         self,
@@ -148,7 +194,6 @@ impl<'c> ResidentNormalWave<'c> {
                     active_member: None,
                     bindings: BTreeMap::new(),
                     pending: BTreeMap::new(),
-                    transport: BTreeMap::new(),
                 };
                 Ok(self.with_continuation(mode))
             }
@@ -156,19 +201,30 @@ impl<'c> ResidentNormalWave<'c> {
     }
 }
 impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
-    /// Receive an actual condition without advancing the held wave. Its original
-    /// map remains retained, and later contact reads the new condition.
-    pub fn receive_condition(&mut self,incoming:ResidentConstitutiveCurrent<'_, 'c>)
-        ->Result<(),ConstitutiveFibreError>{
-        let next=self.continuation.neighborhood_base.checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
+    /// Receive an actual condition without advancing the held wave. Later contacts, comparisons
+    /// and returns read the new condition; pending predictions keep only their source operands.
+    pub fn receive_condition(
+        &mut self,
+        incoming: ResidentConstitutiveCurrent<'_, 'c>,
+    ) -> Result<(), ConstitutiveFibreError> {
+        let next = self
+            .continuation
+            .neighborhood_base
+            .checked_add(1)
+            .ok_or(ConstitutiveFibreError::Shape)?;
         self.continuation.neighborhood.receive_condition(incoming)?;
-        self.continuation.neighborhood_base=next;self.continuation.bindings.clear();Ok(())
+        self.continuation.neighborhood_base = next;
+        self.continuation.bindings.clear();
+        Ok(())
     }
     pub fn epoch(&self) -> u64 {
         self.continuation.epoch
     }
     pub fn current(&self) -> &NormalWaveFamily<'c> {
         &self.continuation.current
+    }
+    pub(super) fn current_shared(&self) -> Rc<NormalWaveFamily<'c>> {
+        Rc::clone(&self.continuation.current)
     }
     pub fn neighborhood(&self) -> &ResidentGeneratorNeighborhood<'c> {
         &self.continuation.neighborhood
@@ -188,11 +244,46 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         self.pull_back_pending(id, observed)
     }
     /// Native projected action; the face retains this complete source family.
-    pub fn read_basis_face(&self,chart:&NormalWaveBasisChart<'c>)->Result<NormalFamilyBasisFace<'c>,ConstitutiveFibreError>{
-        chart.read_family(Rc::clone(&self.continuation.current),self.epoch())
+    pub fn read_basis_face(
+        &self,
+        chart: &NormalWaveBasisChart<'c>,
+    ) -> Result<NormalFamilyBasisFace<'c>, ConstitutiveFibreError> {
+        chart.read_family(Rc::clone(&self.continuation.current), self.epoch())
     }
     pub fn normal_source_epoch(&self) -> u64 {
         self.epoch
+    }
+    /// Prospective compound conduct through the current learned members and condition.
+    /// No actual contact, epoch, current, pending handle or material is published here.
+    pub fn read_prospective_word(
+        &self,
+        word: &[(usize, WaveSourceReceiver)],
+    ) -> Result<NormalWaveFamilyReceiver<'_, 'c>, ConstitutiveFibreError> {
+        self.current().check_prospective_shape(word.len())?;
+        let maps = prospective_maps(word, |member, chart| {
+            self.neighborhood().read_wave_relation_in_chart(
+                member,
+                self.normal_material().roots(),
+                chart,
+                None,
+            )
+        })?;
+        self.current().read_prospective(maps)
+    }
+    /// The unpublished passage of the contemporary family through one member law at the
+    /// contemporary cut. No contact is admitted and nothing is published.
+    pub fn read_member_passage(
+        &self,
+        member: usize,
+        chart: WaveSourceReceiver,
+    ) -> Result<NormalWaveFamily<'c>, ConstitutiveFibreError> {
+        let relation = self.neighborhood().read_wave_relation_in_chart(
+            member,
+            self.material.roots(),
+            chart,
+            None,
+        )?;
+        self.current().read_through(Rc::new(relation))
     }
     /// Admission is a declared interaction, not automatic contact between every co-present law.
     pub fn admit_contact(
@@ -230,6 +321,25 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
             id,
             binding,
         })
+    }
+    /// Admit one contact for one motion. A refused motion withdraws the admission, so the
+    /// owner (including its rest) is unchanged by the refusal.
+    pub(super) fn with_admitted<R>(
+        &mut self,
+        member: usize,
+        chart: WaveSourceReceiver,
+        act: impl FnOnce(&mut Self, &NormalCoupledContact<'c>) -> Result<R, ConstitutiveFibreError>,
+    ) -> Result<R, ConstitutiveFibreError> {
+        let next_contact = self.continuation.next_contact;
+        let contact = self.admit_contact_in_chart(member, chart)?;
+        match act(self, &contact) {
+            Ok(value) => Ok(value),
+            Err(error) => {
+                self.continuation.bindings.remove(&contact.id);
+                self.continuation.next_contact = next_contact;
+                Err(error)
+            }
+        }
     }
     pub fn contact(&self, id: u64) -> Result<NormalCoupledContact<'c>, ConstitutiveFibreError> {
         let binding = self
@@ -385,10 +495,8 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
             .ok_or(ConstitutiveFibreError::Shape)?;
         let mut successor = Rc::clone(&contact.binding.source);
         let mut predictions = Vec::new();
-        let mut factors = Vec::new();
-        let retain_factors = !self.continuation.pending.is_empty();
         for row in 0..pairs.source().rows() {
-            let (next, prediction, map) = (|| {
+            let (next, prediction) = (|| {
                 let passage_readings = contact.binding.relation.read_source_passage(
                     self.neighborhood().action(contact.member())?,
                     pairs.source().row(row)?,
@@ -397,11 +505,9 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
                 let mut prediction = passage_readings.prediction;
                 prediction.qualify_field_source(row);
                 let prediction = Rc::new(prediction);
-                let map = Rc::new(map);
                 Ok::<_, ConstitutiveFibreError>((
-                    successor.read_through_at(Rc::clone(&map), passage)?,
+                    successor.read_through_at(Rc::new(map), passage)?,
                     prediction,
-                    map,
                 ))
             })()
             .map_err(|source| ConstitutiveFibreError::SourcePassage {
@@ -410,13 +516,12 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
             })?;
             successor = Rc::new(next);
             predictions.push(prediction);
-            if retain_factors { factors.push(map); }
             progress(row + 1);
         }
         self.continuation
             .neighborhood
             .publish_wave_read(contact.binding.neighborhood_epoch);
-        let mut step = self.publish_coupled_factors(contact, next, successor, factors);
+        let mut step = self.publish_coupled(contact, next, successor);
         step.source = Some(pairs);
         step.predictions = predictions;
         Ok(step)
@@ -431,14 +536,22 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         observed: ResidentConstitutiveCurrent<'_, 'c>,
     ) -> Result<NormalCoupledStep<'a, 'c>, ConstitutiveFibreError> {
         self.check_contact(contact)?;
-        let next = self.epoch().checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
-        if !self.neighborhood().can_publish_wave_read(contact.binding.neighborhood_epoch) {
+        let next = self
+            .epoch()
+            .checked_add(1)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        if !self
+            .neighborhood()
+            .can_publish_wave_read(contact.binding.neighborhood_epoch)
+        {
             return Err(ConstitutiveFibreError::ForeignOccurrence);
         }
         let relation = contact.binding.relation.read_observed_next(observed)?;
         let successor = Rc::new(contact.binding.source.read_through(Rc::new(relation))?);
         // This checked total map preserves the admitted anchor domain of the predecessor.
-        self.continuation.neighborhood.publish_wave_read(contact.binding.neighborhood_epoch);
+        self.continuation
+            .neighborhood
+            .publish_wave_read(contact.binding.neighborhood_epoch);
         Ok(self.publish_coupled(contact, next, successor))
     }
     pub fn advance_contact<'a>(
@@ -498,6 +611,16 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
                 received.obstruction
             )));
         }
+        self.develop_contact_source(contact, next, source, observed_difference)
+    }
+    /// Develop a point source pair at the contemporary material and condition cut.
+    fn develop_contact_source<'i>(
+        &mut self,
+        contact: &NormalCoupledContact<'c>,
+        next: u64,
+        source: ResidentConstitutiveCurrent<'i, 'c>,
+        observed_difference: ResidentConstitutiveCurrent<'i, 'c>,
+    ) -> Result<NormalCoupledStep<'i, 'c>, ConstitutiveFibreError> {
         let prepared = self.continuation.neighborhood.prepare_consequence(
             contact.member(),
             source,
@@ -529,24 +652,11 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         next: u64,
         successor: Rc<NormalWaveFamily<'c>>,
     ) -> NormalCoupledStep<'a, 'c> {
-        let factors = vec![successor.last_relation_shared().expect("completed coupled passage")];
-        self.publish_coupled_factors(contact, next, successor, factors)
-    }
-    fn publish_coupled_factors<'a>(
-        &mut self,
-        contact: &NormalCoupledContact<'c>,
-        next: u64,
-        successor: Rc<NormalWaveFamily<'c>>,
-        factors: Vec<Rc<ResidentWaveRelation<'c>>>,
-    ) -> NormalCoupledStep<'a, 'c> {
         let predecessor_epoch = self.continuation.epoch;
-        if !self.continuation.pending.is_empty() {
-            self.continuation.transport.insert(next, factors);
-        }
         self.continuation.epoch = next;
         self.continuation.active_member = Some(contact.member());
         self.continuation.current = Rc::clone(&successor);
-        self.continuation.current_neighborhood_epoch=self.continuation.neighborhood.epoch();
+        self.continuation.current_neighborhood_epoch = self.continuation.neighborhood.epoch();
         // Admissions name one source occurrence. External receipts retain their old source,
         // but no admission can silently act again at a different continuation.
         self.continuation.bindings.clear();
@@ -569,4 +679,4 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
 mod tests;
 
 #[cfg(test)]
-mod continuation_tests;
+mod return_tests;

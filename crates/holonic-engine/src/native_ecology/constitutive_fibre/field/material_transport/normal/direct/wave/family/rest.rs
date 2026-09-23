@@ -46,6 +46,10 @@ impl NormalWaveFamilyRest {
     pub fn passages(&self) -> u64 {
         self.passages
     }
+    /// Whether two family charts share their producing fibre and anchor (states of one wave).
+    pub(crate) fn same_origin(&self, other: &Self) -> bool {
+        self.origin == other.origin && self.anchor == other.anchor
+    }
     pub fn validate(&self) -> Result<(), ConstitutiveFibreError> {
         let n = self.origin.material().roots();
         let a = n.checked_mul(4).ok_or(ConstitutiveFibreError::Shape)?;

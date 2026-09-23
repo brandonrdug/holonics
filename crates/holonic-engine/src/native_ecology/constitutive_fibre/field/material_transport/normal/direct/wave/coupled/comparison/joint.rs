@@ -1,5 +1,6 @@
-//! Device compilation of a real pending comparison, with its actual source/condition/material
-//! cuts retained. Relation row witnesses are existential coefficients, not learned map weights.
+//! Device compilation of a real pending comparison read at the contemporary cut: its source
+//! family, the contemporary condition and the contemporary member material. Relation row
+//! witnesses are existential coefficients, not learned map weights.
 use super::*;
 use crate::resident_section::{ResidentBilinearMap, ResidentBilinearReturn};
 
@@ -123,20 +124,14 @@ impl<'a, 'j, 'c> CoupledJointEvaluation<'a, 'j, 'c> {
     }
 }
 impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
-    /// Compile at the contemporary member-material cut while retaining the ORIGINAL producing
-    /// condition and source. This is read-only; pending consumption still requires incorporation.
+    /// Compile a comparison read at the contemporary cut (its source family, the contemporary
+    /// condition and member material). A comparison read at an earlier cut refuses: a delayed
+    /// compilation re-reads it. This is read-only; pending consumption requires a return.
     pub fn compile_coupled_joint<'a>(
         &self,
         comparison: &'a NormalCoupledComparison<'c>,
     ) -> Result<CompiledCoupledJoint<'a, 'c>, ConstitutiveFibreError> {
-        let pending = self
-            .continuation
-            .pending
-            .get(&comparison.id)
-            .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
-        if !Rc::ptr_eq(pending, &comparison.cut) {
-            return Err(ConstitutiveFibreError::ForeignOccurrence);
-        }
+        self.is_contemporary(comparison)?;
         let material = self.neighborhood().generator(comparison.member())?;
         if !material.usable {
             return Err(ConstitutiveFibreError::Uncertain);

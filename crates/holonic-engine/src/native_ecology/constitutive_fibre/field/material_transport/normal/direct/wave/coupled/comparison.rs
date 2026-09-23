@@ -1,37 +1,57 @@
-//! An observed difference remains jointly parameterized with its actual producing family.
-//! This carrier is not a point source or a span of independently observed alternative rows.
+//! **A pending coupled prediction and its comparison, read at the contemporary cut.**
+//!
+//! [definition; agent-inferred] The retained quotient of a coupled prediction is its producing
+//! operands `(source family, member, source chart)` addressed by its epoch. A comparison reads
+//! the source family through the *contemporary* member law and condition — the produced family
+//! is that contemporary read, not the family produced at the prediction's epoch — and pairs its
+//! coefficient images with the observation. The comparison records the neighborhood cut it was
+//! read at; a consumer at a later cut refuses it (re-read it), so no comparison acts as a frozen
+//! producing cut. An observed difference remains jointly parameterized with its source family;
+//! it is not a point source or a span of independently observed alternative rows.
 use super::*;
-pub(super) mod joint;
 mod constitutive;
-pub(super) use constitutive::{ConstitutiveReturnOperands,EvaluatedProducingCut};
-pub use constitutive::{CoupledConstitutiveFamily, CoupledConstitutiveAlternative};
+pub(super) mod joint;
+pub(super) use constitutive::read_return_operands;
+pub use constitutive::{CoupledConstitutiveAlternative, CoupledConstitutiveFamily};
 pub use joint::{CompiledCoupledJoint, CoupledJointEvaluation};
 
+/// The producing operands a pending coupled prediction retains (see the module header).
 pub(super) struct CoupledProducingCut<'c> {
     pub(super) member: usize,
+    pub(super) chart: WaveSourceReceiver,
     pub(super) source: Rc<NormalWaveFamily<'c>>,
-    pub(super) produced: Rc<NormalWaveFamily<'c>>,
 }
+/// The comparison of an observation with a pending prediction, read at one neighborhood cut.
 pub struct NormalCoupledComparison<'c> {
     id: u64,
     cut: Rc<CoupledProducingCut<'c>>,
+    produced: Rc<NormalWaveFamily<'c>>,
+    read_at: u64,
     features: usize,
     coefficients: ResidentSection<'c>,
     observed: ResidentSection<'c>,
 }
 impl<'c> NormalCoupledComparison<'c> {
-    pub(super) fn into_observation(self)->ResidentSection<'c>{self.observed}
+    pub(super) fn cut(&self) -> &Rc<CoupledProducingCut<'c>> {
+        &self.cut
+    }
     pub fn prediction_id(&self) -> u64 {
         self.id
     }
     pub fn member(&self) -> usize {
         self.cut.member
     }
+    /// The retained source family (the producing operand).
     pub fn source(&self) -> &NormalWaveFamily<'c> {
         &self.cut.source
     }
+    /// The source family read through the member law at the comparison's cut.
     pub fn produced(&self) -> &NormalWaveFamily<'c> {
-        &self.cut.produced
+        &self.produced
+    }
+    /// The neighborhood cut this comparison was read at.
+    pub fn read_at(&self) -> u64 {
+        self.read_at
     }
     pub fn feature_components(&self) -> usize {
         self.features
@@ -40,8 +60,7 @@ impl<'c> NormalCoupledComparison<'c> {
         self.coefficients.rows()
     }
     pub fn relation(&self) -> &ResidentWaveRelation<'c> {
-        self.cut
-            .produced
+        self.produced
             .last_relation()
             .expect("producing conditional map")
     }
@@ -107,10 +126,9 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         let id = *id.borrow();
         self.coupled_producing_cut(id)?;
         self.continuation.pending.remove(&id);
-        self.prune_coupled_transport();
         Ok(())
     }
-    /// Advance through an admitted contact and retain the producing cut as a pending coupled
+    /// Advance through an admitted contact and retain the producing operands as a pending coupled
     /// prediction, addressed by the successor epoch.
     pub fn predict_contact<'a>(
         &mut self,
@@ -118,39 +136,119 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
     ) -> Result<(u64, NormalCoupledStep<'a, 'c>), ConstitutiveFibreError> {
         let step = self.advance_contact(contact)?;
         let id = step.successor_epoch;
-        // publish_coupled already appended this map when another return was pending. A first
-        // prediction starts the retained word here, at its actual producing source.
-        self.continuation.transport.entry(id).or_insert_with(|| {
-            vec![step.successor.last_relation_shared().expect("producing map")]
-        });
         self.continuation.pending.insert(
             id,
             Rc::new(CoupledProducingCut {
                 member: contact.member(),
+                chart: contact.relation().source_receiver(),
                 source: Rc::clone(&contact.binding.source),
-                produced: Rc::clone(&step.successor),
             }),
         );
         Ok((id, step))
     }
-    /// Prepare the complete paired source/observed-difference family at this producing cut.
-    /// Pending ownership and contemporary state remain unchanged until a later material return
-    /// is actually bound, or the caller explicitly releases the comparison.
+    /// The retained source read through the member law at the contemporary cut.
+    pub(super) fn read_contemporary_produced(
+        &self,
+        cut: &CoupledProducingCut<'c>,
+    ) -> Result<Rc<NormalWaveFamily<'c>>, ConstitutiveFibreError> {
+        let relation = self.neighborhood().read_wave_relation_in_chart(
+            cut.member,
+            self.material.roots(),
+            cut.chart,
+            None,
+        )?;
+        Ok(Rc::new(cut.source.read_through(Rc::new(relation))?))
+    }
+    /// Read the complete paired source/observed-difference family of a pending prediction at the
+    /// contemporary constitution. Pending ownership and the contemporary state are unchanged.
     pub fn compare_coupled_prediction(
         &self,
         id: impl std::borrow::Borrow<u64>,
         observed: ResidentConstitutiveCurrent<'_, 'c>,
     ) -> Result<NormalCoupledComparison<'c>, ConstitutiveFibreError> {
         let id = *id.borrow();
+        self.neighborhood().require_usable()?;
         let cut = Rc::clone(self.coupled_producing_cut(id)?);
-        NormalCoupledComparison::from_cut(id, cut, observed)
+        let produced = self.read_contemporary_produced(&cut)?;
+        NormalCoupledComparison::read(id, cut, produced, self.neighborhood().epoch(), observed)
+    }
+    /// Whether a comparison of this owner was read at the contemporary cut.
+    pub(super) fn is_contemporary(
+        &self,
+        comparison: &NormalCoupledComparison<'c>,
+    ) -> Result<(), ConstitutiveFibreError> {
+        let pending = self.coupled_producing_cut(comparison.id)?;
+        if !Rc::ptr_eq(pending, &comparison.cut) {
+            return Err(ConstitutiveFibreError::ForeignOccurrence);
+        }
+        if comparison.read_at != self.neighborhood().epoch() {
+            return Err(ConstitutiveFibreError::Rest(
+                "the comparison was read at an earlier cut; re-read it at the contemporary constitution"
+                    .into(),
+            ));
+        }
+        Ok(())
+    }
+    /// **The one-cut return** of a pending prediction: read its comparison at the contemporary
+    /// constitution, evaluate the source family's `θ`-face operands `(x(θ), η(θ))` — at the
+    /// declared `parameters`, or at the source family's own receiver — and publish them as one
+    /// constitutive passage (condition contact, member formation and predictive deposit) that
+    /// moves the contemporary family through the updated law. Refusal leaves the owner unchanged.
+    pub fn return_coupled_prediction(
+        &mut self,
+        id: u64,
+        observed: ResidentConstitutiveCurrent<'_, 'c>,
+        parameters: Option<&ResidentSection<'c>>,
+    ) -> Result<(), ConstitutiveFibreError> {
+        let comparison = self.compare_coupled_prediction(id, observed)?;
+        self.publish_return(&comparison, parameters)
+    }
+    pub(super) fn publish_return(
+        &mut self,
+        comparison: &NormalCoupledComparison<'c>,
+        parameters: Option<&ResidentSection<'c>>,
+    ) -> Result<(), ConstitutiveFibreError> {
+        self.is_contemporary(comparison)?;
+        let receiver;
+        let parameters = match parameters {
+            Some(p) => p,
+            None => {
+                receiver = comparison
+                    .source()
+                    .receiver_coordinates()?
+                    .into_coordinates();
+                &receiver
+            }
+        };
+        let (source, difference, _) = read_return_operands(comparison, parameters)?;
+        let (member, chart) = (comparison.member(), comparison.cut.chart);
+        self.with_admitted(member, chart, |wave, contact| {
+            wave.check_contact(contact)?;
+            let next = wave
+                .epoch()
+                .checked_add(1)
+                .ok_or(ConstitutiveFibreError::Shape)?;
+            wave.develop_contact_source(
+                contact,
+                next,
+                ResidentConstitutiveCurrent::rational(&source)?,
+                ResidentConstitutiveCurrent::rational(&difference)?,
+            )
+            .map(|_| ())
+        })?;
+        self.continuation.pending.remove(&comparison.id);
+        Ok(())
     }
 }
 impl<'c> NormalCoupledComparison<'c> {
-    pub(super) fn from_cut(id:u64,cut:Rc<CoupledProducingCut<'c>>,observed:ResidentConstitutiveCurrent<'_, 'c>)
-        ->Result<Self,ConstitutiveFibreError>{
-        let relation = cut
-            .produced
+    fn read(
+        id: u64,
+        cut: Rc<CoupledProducingCut<'c>>,
+        produced: Rc<NormalWaveFamily<'c>>,
+        read_at: u64,
+        observed: ResidentConstitutiveCurrent<'_, 'c>,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        let relation = produced
             .last_relation()
             .ok_or(ConstitutiveFibreError::Shape)?;
         if relation.source_contact().is_some() || relation.observed_next().is_some() {
@@ -200,6 +298,8 @@ impl<'c> NormalCoupledComparison<'c> {
         Ok(NormalCoupledComparison {
             id,
             cut,
+            produced,
+            read_at,
             features,
             coefficients,
             observed: snapshot,
