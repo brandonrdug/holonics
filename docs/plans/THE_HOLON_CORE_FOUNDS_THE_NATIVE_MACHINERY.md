@@ -823,7 +823,7 @@ Engine consumer census: a module counts as consumed if some file outside it refe
     `holonic_complex` 1336, `physical` 942, `arithmetic_phase` 828.
   - Receivers and dimensions: `acoustic_receiver` 3086, `graph_receiver` 2547, `dimensional_receiver` 1828,
     `arithmetic_dimensional` 1275, `receiver_ecology` 740.
-  - Release, presentation and platform: `artifact_release` 4328, `returned_conduct` 1882, `bridge` 1581,
+  - Release, presentation and platform (historical R0 source sizes; `artifact_release` was retired in R1 #65): `artifact_release` 4328, `returned_conduct` 1882, `bridge` 1581,
     `model_surface` 887, `platform_x11` 384, `platform` 295, `live_presentation` 281, `display` 133.
   - Other: `cuda_relation` 1564, `implicit` 990, `phase_current` 850, `soulkiller_witness` 580, `conic` 527,
     `basin` 450, `atlas` 422, `mode` 334, `executor` 298, `parameter` 244, `resource` 203, `device` 166.

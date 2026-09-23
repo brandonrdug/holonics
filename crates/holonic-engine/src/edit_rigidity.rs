@@ -61,14 +61,15 @@
 //!
 //! # Which of T3's three relations this is
 //!
-//! [established-bounded] `artifact_release` (T3) proves "independent versus entangled" is three
-//! relations — commuting on the family, chartwise locality, constraint entanglement — and that
+//! [established-bounded] T3's retained formal owner `Transport/ArtifactRelease.lean` proves
+//! "independent versus entangled" is three relations — commuting on the family, chartwise locality,
+//! constraint entanglement — and that
 //! `dog → cat` against `is → why` is separated only by the third. **The linear notion here is the
 //! third, at first order, and neither of the other two.** It is not commuting: in a linear chart
 //! every pair of first-order edits commutes, because edit directions add, so commuting separates
 //! nothing here at all. It is not chartwise locality: a first-order direction has no read/write
 //! distinction at all, which is a property of the discrete `EditAction` and not of its
-//! differential. The discrete law is T3's; this is its first-order chart.
+//! differential. The discrete law remains in T3's formal owner; this is its first-order chart.
 //!
 //! # The scalar is one receiver of the edit, never its identity
 //!

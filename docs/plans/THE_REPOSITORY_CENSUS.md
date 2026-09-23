@@ -144,15 +144,13 @@ The third eight add four **keep** (`graph_receiver`, `dimensional_receiver`,
 `arithmetic_dimensional`, `receiver_ecology`), two **unresolved** (`arithmetic_phase` has an
 uncopied prime-square/affine-orbit law; `returned_conduct` still has a `life` runtime caller),
 and two proposed **retire** (`acoustic_receiver`, `artifact_release`). An independent review
-confirmed no external Rust caller/example and a checked Lean counterpart for each.
-The acoustic mirror cut has removed the standalone Rust module/tests and citation/export in
-the isolated R1 #65 worktree, marked its Lean correspondence historical, and retained the
-checked Lean owner and dated measurements. Focused engine-lib, cached Lean-owner, complete
-workspace all-target and Lean-citation checks passed on the rebased cut. The separate native
-Athena acoustic chart is not this module.
-`artifact_release` also has Rust-only `EnclosedFamily` representation and work-ceiling policy:
-classify these as implementation-specific retirement or preserve a distinct law in a guide/
-#62 before removing it. The artifact cut still needs focused Rust/Lean checks after its edit.
+confirmed no external Rust caller/example and a checked Lean counterpart for each. The acoustic
+mirror and the T3 artifact Rust mirror have both been retired in isolated R1 cuts (#65). The
+acoustic Cayley/receiver law and dated measurements remain with its checked Lean owner; the
+distinct native Athena acoustic chart remains live. The T3 product-family law and receiver
+release criterion now have checked Lean owners, while Rust work ceilings remain historical
+implementation evidence; the distinct live `edit_rigidity` chart remains. Focused engine,
+Lean-owner, workspace all-target and Lean-citation checks passed for both cuts.
 
 The [R2 owner audit](census/SOMA_R0.tsv) changes two earlier assumptions. `holonics-workspace`
 has a live workbench application caller, and `holonic-language`'s generic reflective
@@ -170,7 +168,8 @@ consumer or host words. The plan §0.4 now names those distinct edges.
 |---|---|---|
 | R1 | `crates/holonic-engine/src/platform_x11.rs`: `x11rb` implementation use is confined there and `lib.rs` gates its export behind default `desktop-x11`. **Type-level callers exist:** `examples/arithmetic_dimensional_receiver.rs` and `examples/desktop_receiver.rs` construct `X11Platform`. The governing plan §0.5 retires the feature, but the first static module-token scan missed these callers. | Decide each example's mathematical/saved-output disposition, then remove or rechart its X11 use in the same cut as the module, feature and dependency. Run targeted engine and all-target checks. The cut is not yet licensed by an absence-of-consumers claim. |
 | R1 | `generative_transport.rs` has one standalone prediction example; current source carries an exact `A(τ)=M+τ(S+K+R)` enrichment and prediction/grade-before-return law without an exact Lean counterpart. | Preserve that law in `HNN_FORMULA` or a named #62 proposition, verify its source/receiver scope, then retire the module and example together if no other caller remains. An isolated zero-token census is insufficient. |
-| R1 | `acoustic_receiver.rs` has no external Rust caller/example and maps its resonator/Cayley/causality/energy laws to checked `Foundation/AcousticReceiver.lean`; its WAV/export and ceilings are unconsumed boundary behavior. `artifact_release.rs` is similarly unconsumed and maps its release/tube laws to `Transport/ArtifactRelease.lean`, with a Rust-only coordinate-product representation and work ceilings. | Acoustic: retire Rust module/tests and public declaration, update `lean_citations`, architecture map, Lean comments and receiver guide; preserve the theorem and historical measurements. Artifact: first classify or preserve `EnclosedFamily` and ceiling policy, then make the same coordinated source/citation/guide cut including `edit_rigidity` comments/tests. Verify focused engine and Lean targets plus all-target callers. |
+| R1 complete (#65) | `acoustic_receiver.rs` had no external Rust caller/example and maps its resonator/Cayley/causality/energy laws to checked `Foundation/AcousticReceiver.lean`; its WAV/export and ceilings are historical boundary behavior. | Retired its Rust module/tests, root declaration and citation row; retained the formal law, dated measurements and distinct native Athena acoustic chart. Focused engine, Lean, all-target and citation gates passed. |
+| R1 complete (#65) | `artifact_release.rs` had no external Rust caller/example; its checked T3 mathematics, including the formerly Rust-only product enclosure specialization and numeric policy distinction, now resides in `Transport/ArtifactRelease.lean` and the T3 guide. | Retired the Rust module/tests, root export and `lean_citations` row. Focused engine, Lean, all-target and citation gates passed; the distinct live `edit_rigidity` chart remains. |
 | R3 | `Framework.Core` reaches five historically filed Millennium owners **transitively** through Standing/RelationLadder/ContinuingTower and CausalRelevance/JointReceiverDescent. The [declaration-level edge audit](census/LEAN_CORE_R3_EDGES.md) names each consumer and research remainder. `Objects.Ratio → HolonicGaugeCovariance → HolonicConnectionVariation` and `Holon.MomentStorage → HolonicQuadraticMomentCondensation → HolonicGranularBoundaryRadiation` are the other large ingress paths. | Extract only the declarations the foundation consumes, retain unique research theorems and update their source importers in the same cut. Focused Core, Ratio and MomentStorage builds pass before the edit; build the affected targets again afterward. |
 
 The candidate rows do not authorize the next cut before the remaining area dispositions and

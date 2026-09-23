@@ -6,8 +6,8 @@ import ElementaryHolonics.Transport.ContinuingTube
 # Release over an edited artifact family
 
 [definition] This file is the formal owner of item **T3** of
-`docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md`. Its executable
-counterpart is `crates/holonic-engine/src/artifact_release.rs`. It founds no second width, no
+`docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md`. Its former executable
+counterpart was retired in R1 after its laws were transferred here. It founds no second width, no
 second release law and no second circuit machinery: `Foundation/ReceiverRelease.lean` owns the
 width and the lawful returns, `Transport/ContinuingTube.lean` owns the two axes, the square and
 the circuit, and `Foundation/RelationLadder.lean` owns the rungs. What is new here is the

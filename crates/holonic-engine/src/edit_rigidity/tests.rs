@@ -77,14 +77,14 @@ fn placement_jacobian(
 
 /// **The six-slot role frame, on an embedding-placement chart.**
 ///
-/// [definition] T3's six-slot receiver is *discrete*: `ConstraintRule::RoleAgreement` is a decidable
+/// [definition] T3's formal six-slot receiver is *discrete*: role agreement is a decidable
 /// condition on integer token codes, and equality of token codes has no differential at all — a
 /// token chart admits no tangent direction, so the discrete law has no first-order chart of its
 /// own. The instance here is therefore built on an **embedding-placement chart**: the six slots are
 /// points of `ℚ²`, the kept faces are declared pairwise squared separations and one declared linear
 /// role-agreement form, and the edits are first-order displacements of a slot's placement. **The
-/// discrete law is T3's `artifact_release`; this is its first-order chart and nothing here claims
-/// the discrete constraint has a derivative.**
+/// discrete law is T3's formal owner in `Transport/ArtifactRelease.lean`; this is its first-order
+/// chart and nothing here claims the discrete constraint has a derivative.**
 fn six_slot_frame() -> (ExactConfiguration, RigidityJacobian, KeptReceiverJacobian) {
     let (configuration, placement) = placement_jacobian(
         "six-slot-role-frame",

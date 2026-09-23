@@ -64,10 +64,6 @@ pub mod arithmetic_dimensional;
 pub mod arithmetic_fiber;
 pub mod arithmetic_monodromy;
 pub mod arithmetic_phase;
-// T3 of `docs/plans/THE_TUBE_CARRIES_RELEASE_THROUGH_NECKS_FOLDS_AND_JUNCTIONS.md`: release
-// over an edited artifact family `F_{k+1} = T_g(F_k) ∩ C_k`, the draft-observe-revise cycle as
-// a declared circuit, and the typed disposition. Paired with `Transport/ArtifactRelease.lean`.
-pub mod artifact_release;
 pub mod atlas;
 pub mod atmospheric_inverse;
 // ATHENA -- the chart transition from a holonic atlas to a tensor container. The suffix-link tree

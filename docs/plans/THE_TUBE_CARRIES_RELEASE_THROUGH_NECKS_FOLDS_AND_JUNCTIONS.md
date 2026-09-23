@@ -306,27 +306,25 @@ halves; `e_t = a_t²` is then proved by induction rather than assumed; and the m
 split closes exactly over the rationals. A linear system plus a quadratic form does not by itself
 give an exact rational energy ledger.
 
-[established-bounded; formal-checked; implemented-exact] **T3 — Release over an edited artifact
-family. Returned.** Owners:
+[established-bounded; formal-checked] **T3 — Release over an edited artifact family. Returned.**
+The current owner is
 [`Transport/ArtifactRelease.lean`](../../formal/elementary-holonics/ElementaryHolonics/Transport/ArtifactRelease.lean)
-(namespace `Soma.Holonics.Transport.ArtifactRelease`) and
-[`artifact_release.rs`](../../crates/holonic-engine/src/artifact_release.rs) with
-`artifact_release/tests.rs`.
+(namespace `Soma.Holonics.Transport.ArtifactRelease`). Its former Rust implementation and local
+tests in `crates/holonic-engine/src/artifact_release.rs` were retired in R1 after source review
+found no external Rust caller or example. The Lean law and dated Rust verification evidence remain.
 
 **The edited family is literally a tube.** `regionTower` / `RegionTower` is the transverse ladder —
 the face at a region is the assignment on it and `restrict` **is** `π_B` — and `rotationTube` /
 `RevisionCircuit` is the longitudinal axis. `F_{k+1} = T_{g_k}(F_k) ∩ C_k` is `step` (single-valued)
 and `stepMulti` (a swing with sub-swings), with `stepMulti_singleton` identifying the first as the
 second's one-branch case. The visible draft is one member and never the state. **The section shrinks
-and widens:** `restriction_never_widens` is `receiver_release`'s `width_mono` at the constraint,
-cited; `width_is_not_monotone_along_edits` is the other half by instance — the name swing carries one
+and widens:** `restriction_never_widens` cites `receiver_release`'s `width_mono` at the constraint;
+`width_is_not_monotone_along_edits` is the other half by instance — the name swing carries one
 artifact to two admitted ones and the name region's width goes from `0` to `1`. Release is
-`ReceiverRelease.width` at a region (`releasable_iff_every_coordinate_width_is_zero`), and the
-executable `ArtifactFamily::region_width` **is** `width_enumerated` at a `RegionReading`. T5's
-two-axis `Horizon` is adopted for the transverse coordinate: `indexDistance` /
-`ArtifactFamily::index_distance` is a region's distance through the ladder, it is the `k` a horizon
-must declare, `region_width_at` computes the diameter with T5's own `width_over_readings`, and a
-horizon declaring another `k` is refused by name.
+`ReceiverRelease.width` at a region (`releasable_iff_every_coordinate_width_is_zero`). The retired
+Rust implementation computed that reading with `ArtifactFamily::region_width` / `width_enumerated`
+and adopted T5's two-axis `Horizon` for the transverse coordinate through `index_distance` and
+`region_width_at`; those API names and refusal behavior are historical implementation details.
 
 **The revision cycle is a declared circuit.** `the_rotation_tube_carries_no_holonomy` cites
 `tube_circuit_has_no_defect` at the rotation tube, so draft–observe–revise is a *declared*
@@ -344,7 +342,7 @@ moving an undeclared one. The typed disposition composes `ReleaseReturn` whole a
 function of the family and the receivers, and `no_candidate_carries_the_disposition` exhibits one
 artifact in two families whose dispositions differ, so no member of the candidate set carries it and
 no `NONE` competes under a normalization. The two media are typed differently with no coercion:
-`EditableDraft` revises any position, `IrrevocableUtterance` has no operation that changes its
+The formal `EditableDraft` revises any position; `IrrevocableUtterance` has no operation that changes its
 committed boundary, and `no_sequence_of_corrections_retracts` is *speech cannot retract, only
 correct* as a theorem. **Tori:** `windingCircuit` rotates two independent regions by the exact
 rational angles `1/3` and `1/4` of a turn inside `ZMod 12`; the two circuits commute, compose to the
@@ -352,37 +350,40 @@ joint one, and `(3, 0) ≠ (0, 0)` is a nontrivial winding whose visible face re
 the finite `Z/3 × Z/4` exactly. The entangled pair does **not** span a torus: the commutator of the
 position-0 rotation and the shear is exactly the translation `y ↦ y − 1`, a lawful declared circuit
 with nontrivial holonomy. That the artifact is *embedded on interlinked tori* is graded
-`interpretation`; what is proved is finite and exact. Each of the 46 audited Lean declarations
-depends only on `propext`, `Classical.choice` and `Quot.sound` — four on none — and none on
-`sorryAx`. The Rust owner is the executable equivalent with 82 tests, exact `u32` token codes,
-`BigInt` windings, `BigUint` cardinalities and `BigRational` widths, and no float anywhere.
+`interpretation`; what is proved is finite and exact. The original 46 audited Lean declarations
+depended only on `propext`, `Classical.choice` and `Quot.sound` — four on none — and none on
+`sorryAx`. The retired Rust implementation had 82 tests, exact `u32` token codes, `BigInt` windings,
+`BigUint` cardinalities and `BigRational` widths, with no floats; this records its historical scope,
+not a current Rust API.
 
 [proved-derived; formal-checked] **Independent coordinate specialization.** `ProductFamily A` is the
 finite product of the admitted finite coordinate sets `A_i`. Its cardinality is exactly
 `∏_i |A_i|`; a coordinatewise restriction by `C_i` is the product of `A_i ∩ C_i`, and the
 result is the empty family when any intersection is empty. For a nonempty product family, a
-region `B` is released exactly when each `A_i` for `i ∈ B` is a singleton. This is the law of the
-Rust `EnclosedFamily` owner, whose set-per-coordinate representation computes the same product
-without materializing its members. `product_family_cardinality`, `product_artifacts_cardinality`, `product_family_nonempty_iff`,
-`product_restriction_is_coordinate_intersection` and `product_restriction_empty_of_empty_factor`
-formalize its cardinality, existence and restriction returns; `productArtifact_injective` shows
-that mapping the product family into the existing `Artifact` type preserves that cardinality.
-`product_releasable_iff_T3_releasable`
-connects the product assignment family to the existing `Artifact`/`Releasable` receiver owner;
-`product_releasable_iff_singleton_coordinates` states that a nonempty product releases region `B`
-exactly when every factor on `B` is singleton. The Lean family is a mathematical finite-product
-extension: Rust currently refuses zero-position artifacts and empty admitted factors, so those
-cases have no executable `EnclosedFamily` result (although the formal restriction theorem returns
-an empty family when an intersection factor is empty).
+region `B` is released exactly when each `A_i` for `i ∈ B` is a singleton. This was the law of the
+retired Rust `EnclosedFamily` implementation. Its set-per-coordinate representation computed the
+same product without materializing its members. `product_family_cardinality`,
+`product_artifacts_cardinality`, `product_family_nonempty_iff`,
+`product_restriction_is_coordinate_intersection` and
+`product_restriction_empty_of_empty_factor` formalize cardinality, existence and restriction;
+`productArtifact_injective` shows that mapping into T3's `Artifact` type preserves cardinality.
+`product_releasable_iff_T3_releasable` connects this family to the existing
+`Artifact`/`Releasable` receiver owner. `product_releasable_iff_singleton_coordinates` proves
+that a nonempty product releases `B` exactly when each factor on `B` is singleton. Lean states
+the finite-product law also for empty-family cases: the former Rust implementation refused
+zero-position artifacts and empty admitted factors, so those cases had no executable
+`EnclosedFamily` result. The formal restriction theorem returns an empty family when an
+intersection factor is empty.
 
 This specialization assumes coordinate independence. A coupled constraint such as role agreement
 can cut out a non-product subset; retain its relation in an enumerated family or return a typed
-nonrepresentability/refusal. The existing Rust owner refuses such constraints rather than
-approximating them. Its `POSITION_CEILING = 1024`, `ALPHABET_CEILING = 2^16`, `FAMILY_CEILING = 4096`,
-`SWING_BRANCH_CEILING = 64`, `EDIT_WORD_CEILING = CIRCUIT_CEILING = 256`,
-`STEP_WORK_CEILING = 2^22`, `ROUTE_HISTORY_CEILING = 1024`,
-`CONSTRAINT_RULE_CEILING = 256` and `SUPPORT_PROBE_CEILING = 1024` bound this implementation's
-declared inputs and execution; these are numeric ceilings, not hypotheses of the finite product law.
+nonrepresentability/refusal. The retired Rust implementation refused such constraints rather
+than approximating them. Its numeric limits were `POSITION_CEILING = 1024`,
+`ALPHABET_CEILING = 2^16`, `FAMILY_CEILING = 4096`, `SWING_BRANCH_CEILING = 64`,
+`EDIT_WORD_CEILING = CIRCUIT_CEILING = 256`, `STEP_WORK_CEILING = 2^22`,
+`ROUTE_HISTORY_CEILING = 1024`, `CONSTRAINT_RULE_CEILING = 256` and
+`SUPPORT_PROBE_CEILING = 1024`. Those historical implementation ceilings are not hypotheses of
+the finite product law.
 
 [established-bounded] Four findings from building it, each changing the item as the paragraph above
 first stated it. **(1) Over a family, an edit supported off a released region cannot change its face

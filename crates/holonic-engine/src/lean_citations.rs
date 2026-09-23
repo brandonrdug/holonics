@@ -238,11 +238,6 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             "Transport/ContinuingTube.lean",
         ),
         (
-            include_str!("artifact_release.rs"),
-            "artifact_release.rs",
-            "Transport/ArtifactRelease.lean",
-        ),
-        (
             include_str!("edit_rigidity.rs"),
             "edit_rigidity.rs",
             "Transport/EditRigidity.lean",
