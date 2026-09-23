@@ -1,8 +1,6 @@
 use super::*;
 use crate::native::GeometricFieldSpec;
-use holonic_engine::{
-    ExactComplexWaveCurrent, native_ecology::constitutive_fibre::ResidentNormalEnclosureSection,
-};
+use holonic_engine::ExactComplexWaveCurrent;
 use num_rational::BigRational as Rat;
 use std::path::PathBuf;
 
@@ -63,11 +61,9 @@ fn incident_response_port_helper_preserves_legacy_and_rejects_overlap() {
     assert!(incident_response_slots(&fixed, &preparation, &(0..7).collect::<Vec<_>>()).is_err());
 }
 
-type SectionSnapshot = Vec<(Vec<ExactComplexWaveCurrent>, Rat)>;
-
 #[test]
-#[ignore = "requires CUDA; numerical solver selection persists with frozen pending words"]
-fn incident_solver_selection_survives_pending_rest_without_rebinding() {
+#[ignore = "requires CUDA; the numerical solver persists in rest and a pending comparison is read with the solver in force"]
+fn incident_solver_selection_survives_rest_and_reads_pending_at_the_contemporary_solver() {
     use crate::native::IncidentFieldSolver;
     let directory = tempfile::tempdir().unwrap();
     let path = directory.path().join("chebyshev.session");
@@ -85,6 +81,7 @@ fn incident_solver_selection_survives_pending_rest_without_rebinding() {
             .body
             .prepare_incident_field(anchor.view(), &vec![false; anchor.view().components() / 2])?;
         session.configure_incident_solver(IncidentFieldSolver::Chebyshev, 128)?;
+        // A prepared but unpublished word was produced with the former solver: refused.
         assert!(
             session
                 .body
@@ -94,11 +91,11 @@ fn incident_solver_selection_survives_pending_rest_without_rebinding() {
         let value = session.request(&request(true))?;
         let id = value["comparison"].as_u64().unwrap();
         let received = session.inspect_incident_comparison(id)?;
-        assert!(
-            session
-                .configure_incident_solver(IncidentFieldSolver::Richardson, 128)
-                .is_err()
-        );
+        // The pending comparison keeps no producing word, so it no longer pins the solver: it
+        // is read with the solver in force, and reads the same again at the same solver.
+        session.configure_incident_solver(IncidentFieldSolver::Richardson, 128)?;
+        session.inspect_incident_comparison(id)?;
+        session.configure_incident_solver(IncidentFieldSolver::Chebyshev, 128)?;
         assert_eq!(session.inspect_incident_comparison(id)?, received);
         session.checkpoint(&path, &HnaStreamState::default())?;
         Ok((id, received))
@@ -121,30 +118,24 @@ fn incident_solver_selection_survives_pending_rest_without_rebinding() {
         .unwrap();
 }
 
-fn snapshot(section: &ResidentNormalEnclosureSection<'_>) -> SectionSnapshot {
-    (0..section.rows())
-        .map(|row| {
-            let face = section.row(row).unwrap().inspect().unwrap();
-            (face.center, face.radius)
-        })
-        .collect()
-}
-
-fn pending_snapshot(
-    session: &NativeFieldSession<'_>,
-    id: u64,
-) -> (SectionSnapshot, SectionSnapshot, SectionSnapshot) {
-    let pending = session.incident.as_ref().unwrap().pending.get(&id).unwrap();
-    (
-        snapshot(&pending.encoded.rows),
-        snapshot(&pending.received.text_logits),
-        snapshot(&pending.received.support_logits),
-    )
+/// The keys of an observe that depend on the comparison's identity, its producing epoch or
+/// the apparatus, not on what was read and returned at the cut.
+fn at_the_cut(mut value: Value) -> Value {
+    let object = value.as_object_mut().unwrap();
+    for key in [
+        "comparison",
+        "producing_epoch",
+        "native_receipt",
+        "pending_before",
+    ] {
+        object.remove(key);
+    }
+    value
 }
 
 #[test]
-#[ignore = "requires CUDA; public incident session generation, delayed frozen receiver rest and reopen"]
-fn public_incident_session_reopens_frozen_receiver_after_intervening_update() {
+#[ignore = "requires CUDA; a delayed incident comparison is read at the contemporary constitution, equals an immediate one there, and survives rest"]
+fn public_incident_session_reads_a_delayed_comparison_at_the_contemporary_constitution() {
     let directory = tempfile::tempdir().unwrap();
     let path: PathBuf = directory.path().join("incident.session");
     let spec = spec();
@@ -184,9 +175,9 @@ fn public_incident_session_reopens_frozen_receiver_after_intervening_update() {
         Ok(())
     })
     .unwrap();
-    // Save after a real receiver/material update while the first producing
-    // comparison remains pending. Capture its frozen encoder/receiver faces.
-    let (saved, frozen_before_update) = with_field_session(&spec, |session| {
+    // Save after a real receiver/material update and a codec admission while the first
+    // comparison remains pending. Its reading follows the contemporary constitution.
+    let saved = with_field_session(&spec, |session| {
         let first = session
             .request(&FieldSectionRequest {
                 commit: true,
@@ -201,31 +192,31 @@ fn public_incident_session_reopens_frozen_receiver_after_intervening_update() {
         assert_eq!(first["local_complex"], 3);
         let first_id = first["comparison"].as_u64().unwrap();
         let second_id = second["comparison"].as_u64().unwrap();
-        let frozen_before_update = pending_snapshot(session, first_id);
-        let inspected_frozen = session.inspect_incident_comparison(first_id)?;
+        let before_update = session.inspect_incident_comparison(first_id)?;
         let material_before = session.inspect_incident_boundary_material()?;
         session.admit_incident_source_texts(&["λ".to_owned()])?;
-        let retro = session
+        let returned = session
             .observe(second_id, "λa", 3)
             .expect("second material return");
-        assert_eq!(retro["original_face_supports_target"], false);
-        assert_eq!(pending_snapshot(session, first_id), frozen_before_update);
-        assert_eq!(
-            session.inspect_incident_comparison(first_id)?,
-            inspected_frozen
-        );
+        assert_eq!(returned["comparison_cut"], "contemporary");
         assert_ne!(
             session.inspect_incident_boundary_material()?,
             material_before
         );
+        // The delayed comparison is read through the updated encoder, field and receiver.
+        let after_update = session.inspect_incident_comparison(first_id)?;
+        assert_ne!(after_update["text_logits"], before_update["text_logits"]);
+        assert_eq!(after_update["comparison_cut"], "contemporary");
+        // Reading is not a publication.
         let current = session.inspect_current()?;
-        session.inspect_incident_comparison(first_id)?;
-        session.inspect_incident_boundary_material()?;
+        let material = session.inspect_incident_boundary_material()?;
+        assert_eq!(session.inspect_incident_comparison(first_id)?, after_update);
         assert_eq!(session.inspect_current()?, current);
+        assert_eq!(session.inspect_incident_boundary_material()?, material);
         session
             .checkpoint(&path, &HnaStreamState::default())
             .expect("pending session checkpoint");
-        Ok(((first_id, current), frozen_before_update))
+        Ok((first_id, after_update))
     })
     .unwrap();
 
@@ -242,52 +233,73 @@ fn public_incident_session_reopens_frozen_receiver_after_intervening_update() {
         session.admit_incident_source_texts(&["λ".to_owned()])?;
         session.observe(second["comparison"].as_u64().unwrap(), "λa", 3)?;
         let returned = session.observe(first["comparison"].as_u64().unwrap(), "ba", 3)?;
-        Ok((returned, session.inspect_current()?))
+        Ok((
+            returned,
+            session.inspect_current()?,
+            session.inspect_incident_boundary_material()?,
+        ))
     })
     .unwrap();
 
     let resumed = NativeFieldSavedSession::open(&path)
         .unwrap()
         .with_session(|session, _| {
-            assert_eq!(pending_snapshot(session, saved.0), frozen_before_update);
+            assert_eq!(session.inspect_incident_comparison(saved.0)?, saved.1);
             let before_invalid = session.inspect_current()?;
-            let before_invalid_faces = pending_snapshot(session, saved.0);
             assert!(session.observe(saved.0, "abcab", 3).is_err());
             assert_eq!(session.inspect_current()?, before_invalid);
-            assert_eq!(pending_snapshot(session, saved.0), before_invalid_faces);
-            let later_cohort = session
-                .incident
-                .as_ref()
-                .unwrap()
-                .receiver
-                .text_cohort_rests()?;
+            assert_eq!(session.inspect_incident_comparison(saved.0)?, saved.1);
             let resumed = session.observe(saved.0, "ba", 3)?;
-            assert_eq!(
-                session
-                    .incident
-                    .as_ref()
-                    .unwrap()
-                    .receiver
-                    .text_cohort_rests()?,
-                later_cohort,
-                "an old comparison must not add observations to later receiver rows"
-            );
             assert_eq!(resumed["comparison"], saved.0);
             assert!(session.observe(saved.0, "ba", 3).is_err());
-            Ok((resumed, session.inspect_current()?))
+            Ok((
+                resumed,
+                session.inspect_current()?,
+                session.inspect_incident_boundary_material()?,
+            ))
         })
         .unwrap();
     assert!(
-        resumed.0["producing_cut"]["epoch"].as_u64().unwrap()
+        resumed.0["producing_epoch"].as_u64().unwrap()
             < resumed.0["current_cut_before"].as_u64().unwrap()
     );
-    let semantic_return = |mut value: Value| {
-        // Restart performs different transfers, but the producing and returned relations agree.
-        value.as_object_mut().unwrap().remove("native_receipt");
-        value
-    };
-    assert_eq!(semantic_return(resumed.0), semantic_return(uninterrupted.0));
+    assert_eq!(
+        resumed.0["read_cut"]["epoch"],
+        resumed.0["current_cut_before"]
+    );
+    // Restart performs different transfers, but the read and returned relations agree.
+    assert_eq!(at_the_cut(resumed.0.clone()), at_the_cut(uninterrupted.0));
     assert_eq!(resumed.1, uninterrupted.1);
+    assert_eq!(resumed.2, uninterrupted.2);
+
+    // The delayed return equals an immediate return made at the same constitution: at the saved
+    // cut, the same request retained afresh and observed at once reads and returns the same
+    // numbers, and leaves the same field, encoder and receiver.
+    let immediate = NativeFieldSavedSession::open(&path)
+        .unwrap()
+        .with_session(|session, _| {
+            let fresh = session.request(&request(true))?;
+            let fresh_id = fresh["comparison"].as_u64().unwrap();
+            assert_ne!(fresh_id, saved.0);
+            let mut reading = session.inspect_incident_comparison(fresh_id)?;
+            let mut delayed = saved.1.clone();
+            for value in [&mut reading, &mut delayed] {
+                let object = value.as_object_mut().unwrap();
+                object.remove("comparison");
+                object.remove("producing_epoch");
+            }
+            assert_eq!(reading, delayed, "one reading at one cut");
+            let returned = session.observe(fresh_id, "ba", 3)?;
+            Ok((
+                returned,
+                session.inspect_current()?,
+                session.inspect_incident_boundary_material()?,
+            ))
+        })
+        .unwrap();
+    assert_eq!(at_the_cut(immediate.0), at_the_cut(resumed.0));
+    assert_eq!(immediate.1, resumed.1);
+    assert_eq!(immediate.2, resumed.2);
 }
 
 #[test]
@@ -354,4 +366,103 @@ fn mathematical_product_and_code_share_the_field_native_ports() {
         Ok(())
     })
     .unwrap();
+}
+
+/// **A pre-12a incident session wire decodes and continues.** Its presentation carried a frozen
+/// encoder/receiver cut per pending comparison (`frozen_text`, `frozen_support`,
+/// `frozen_cohorts`, producing encoder columns) and its body the `\x01` frozen word. Both
+/// decode: the presentation's pending entry is checked against the retained request and
+/// dropped, the body's word becomes its boundary operand, and the comparison continues exactly
+/// as the live session's at the same cut.
+#[test]
+#[ignore = "requires CUDA; a pre-12a incident session wire with frozen receiver cuts decodes and continues"]
+fn a_pre_12a_incident_session_wire_decodes_and_continues() {
+    use super::super::incident_application::rest::IncidentPendingRest;
+    let directory = tempfile::tempdir().unwrap();
+    let path: PathBuf = directory.path().join("legacy.session");
+    let spec = spec();
+    let live = with_field_session(&spec, |session| {
+        let produced = session.request(&request(true))?;
+        let id = produced["comparison"].as_u64().unwrap();
+        let reading = session.inspect_incident_comparison(id)?;
+        // The retired wire, as a pre-12a build wrote it.
+        let incident = session.incident.as_ref().unwrap();
+        let retained = session.presentation.retained_shared[&id].clone();
+        let preparation = IncidentPreparation::from_request(&session.presentation.spec, &retained.request)?;
+        let symbols = preparation
+            .source_cells
+            .iter()
+            .map(|cell| cell.symbol_index)
+            .collect::<Vec<_>>();
+        let encoded = incident.encoder.encode(&symbols)?;
+        let bytes = |rest: holonic_engine::native_ecology::constitutive_fibre::NormalMaterialRest| {
+            let mut bytes = Vec::new();
+            rest.write(&mut bytes).unwrap();
+            bytes
+        };
+        let mut presentation = incident.rest()?;
+        presentation.pending = vec![IncidentPendingRest {
+            id,
+            encoded_symbols: symbols,
+            encoded_rows: encoded.rows.rest()?.canonical_bytes().map_err(invalid)?,
+            encoded_row_count: encoded.rows.rows(),
+            encoded_width: encoded.rows.components(),
+            grain_bits: encoded.rows.grain().0,
+            encoded_producing_material: incident
+                .encoder
+                .rest()?
+                .into_iter()
+                .map(bytes)
+                .collect(),
+            frozen_text: bytes(incident.receiver.text_rest()?),
+            frozen_support: bytes(incident.receiver.support_rest()?),
+            frozen_cohorts: incident.receiver.cohorts().to_vec(),
+            frozen_cohort_material: incident
+                .receiver
+                .text_cohort_rests()?
+                .into_iter()
+                .map(bytes)
+                .collect(),
+            preparation,
+        }];
+        let header = serde_json::to_vec(&FieldSessionHeader {
+            spec: session.presentation.spec.clone(),
+            state: HnaStreamState::default(),
+            pending_extents: BTreeMap::new(),
+            retained_shared: session.presentation.retained_shared.clone(),
+            issued_shared: session.presentation.issued_shared,
+            exposure: None,
+            incident: Some(presentation),
+            generator: None,
+        })?;
+        let body = session.body.legacy_frozen_incident_rest()?;
+        assert_eq!(&body[1..20], b"HNA-INCIDENT-FIELD\x01");
+        let mut wire = INCIDENT_MAGIC.to_vec();
+        for part in [&header, &body] {
+            wire.extend((part.len() as u64).to_le_bytes());
+            wire.extend(part.iter());
+        }
+        std::fs::write(&path, &wire)?;
+        let returned = session.observe(id, "ba", 3)?;
+        Ok((
+            id,
+            reading,
+            returned,
+            session.inspect_current()?,
+            session.inspect_incident_boundary_material()?,
+        ))
+    })
+    .unwrap();
+    let (id, reading, returned, current, material) = live;
+    NativeFieldSavedSession::open(&path)
+        .unwrap()
+        .with_session(|session, _| {
+            assert_eq!(session.inspect_incident_comparison(id)?, reading);
+            let again = session.observe(id, "ba", 3)?;
+            assert_eq!(at_the_cut(again), at_the_cut(returned.clone()));
+            assert_eq!(session.inspect_current()?, current);
+            assert_eq!(session.inspect_incident_boundary_material()?, material);
+            Ok(())
+        })
+        .unwrap();
 }

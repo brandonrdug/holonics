@@ -4,7 +4,7 @@ mod machine_episode;
 mod machine_receiving;
 mod machine_source;
 mod machine_source_contacts;
-use machine_episode::{GeneratorMomentComparison, GeneratorSourceMoment, RetainedComparison};
+use machine_episode::{GeneratorSourceMoment, RetainedComparison};
 #[allow(unused_imports)] // named by session consumers through the body's methods
 pub use machine_episode::{GeneratorMomentHolon, GeneratorSourceMomentMeta};
 pub use machine_source::GeneratorSourceBinding;
@@ -497,6 +497,9 @@ pub(crate) struct IncidentWord<'c> {
     /// Ordered-source Holon of a generator word (declaration and moment `m`); the anchor is
     /// `P((L^N q₀ + m) ⊕ b₀)` at the cut this word was evaluated at.
     source_moment: Option<GeneratorSourceMoment<'c>>,
+    /// The boundary a prepared word was supplied (`prepare_incident_field*`): the operand a
+    /// retained comparison of this word keeps. `None` for a passage or a received moment.
+    boundary: Option<Rc<ResidentNormalEnclosure<'c>>>,
     external_condition: Option<Rc<ResidentNormalEnclosureSection<'c>>>,
     machine: Option<Rc<crate::native::field_geometry::machine::CompiledGeneratorMachine>>,
     source: NativeFieldCurrentSource<'c>,
@@ -628,11 +631,10 @@ pub(crate) struct IncidentFieldModel<'c> {
     generations: u64,
     observations: u64,
     next_comparison: u64,
-    /// Legacy comparisons at their frozen producing cut.
-    pending: BTreeMap<u64, Rc<IncidentWord<'c>>>,
-    /// Generator comparisons: the source Holon's moment and condition, read at the
-    /// contemporary constitution when observed. Fixed in the passage length.
-    moments: BTreeMap<u64, Rc<GeneratorMomentComparison<'c>>>,
+    /// Outstanding comparisons: each keeps its producing operands only (a prepared boundary or a
+    /// passage's moment/condition with its declaration) and is read at the contemporary
+    /// constitution when observed. Fixed in the passage length; no producing cut is retained.
+    comparisons: BTreeMap<u64, Rc<RetainedComparison<'c>>>,
     /// Declared residual of the commits' rebases to their dyadic centres.
     rebase: IncidentRebaseResidual,
     /// Receipt of the power-neutral reaction deposits (empty under the legacy law).
@@ -870,8 +872,7 @@ impl<'c> IncidentFieldModel<'c> {
             generations: 0,
             observations: 0,
             next_comparison: 0,
-            pending: BTreeMap::new(),
-            moments: BTreeMap::new(),
+            comparisons: BTreeMap::new(),
             rebase: IncidentRebaseResidual::default(),
             reaction_record: ReactionDepositRecord::default(),
             reaction_certificates: std::cell::RefCell::new(Vec::new()),
@@ -927,7 +928,10 @@ impl<'c> IncidentFieldModel<'c> {
             })
             .collect()
     }
-    fn word(
+    /// The incident word of a prepared boundary at the contemporary field and material: the
+    /// anchor is `P(boundary ⊕ b₀(now))`. A fresh preparation and the contemporary read of a
+    /// retained boundary comparison are this one computation.
+    fn word_at(
         &mut self,
         prepared_boundary: ResidentNormalEnclosureView<'_, 'c>,
         held: &[bool],
@@ -967,6 +971,7 @@ impl<'c> IncidentFieldModel<'c> {
             self.evaluate(&source, &material, &anchor, &joint_held, &admitted, None)?;
         Ok(IncidentWord {
             source_moment: None,
+            boundary: Some(Rc::new(prepared_boundary.to_owned()?)),
             external_condition: None,
             machine: self.layout.machine.clone(),
             source,
@@ -999,26 +1004,19 @@ impl<'c> IncidentFieldModel<'c> {
         Some(self.observations)
     }
     pub(crate) fn pending(&self) -> usize {
-        self.pending.len() + self.moments.len()
+        self.comparisons.len()
     }
     pub(crate) fn pending_ids(&self) -> Vec<u64> {
-        let mut ids = self
-            .pending
-            .keys()
-            .chain(self.moments.keys())
-            .copied()
-            .collect::<Vec<_>>();
-        ids.sort_unstable();
-        ids
+        self.comparisons.keys().copied().collect()
     }
     fn is_pending(&self, id: u64) -> bool {
-        self.pending.contains_key(&id) || self.moments.contains_key(&id)
+        self.comparisons.contains_key(&id)
     }
     pub(crate) fn release(&mut self, id: u64) -> Result<(), NativeSessionError> {
-        if self.pending.remove(&id).is_none() && self.moments.remove(&id).is_none() {
-            return Err(invalid("unknown incident producing comparison"));
-        }
-        Ok(())
+        self.comparisons
+            .remove(&id)
+            .map(|_| ())
+            .ok_or_else(|| invalid("unknown incident producing comparison"))
     }
     pub(crate) fn inspect(&mut self) -> Result<Value, NativeSessionError> {
         let source = self.field.read_current_source()?;
@@ -1054,7 +1052,7 @@ impl<'c> IncidentFieldModel<'c> {
             .map(|s| vec![true; s.sources.len()])
             .collect();
         Ok(NativeIncidentGenerated {
-            word: Rc::new(self.word(boundary, held, admitted)?),
+            word: Rc::new(self.word_at(boundary, held, admitted)?),
             comparison: None,
         })
     }
@@ -1133,14 +1131,8 @@ impl<'c> IncidentFieldModel<'c> {
         }
         if let Some(retained) = retained {
             generated.comparison = Some(self.next_comparison);
-            match retained {
-                RetainedComparison::Word(word) => {
-                    self.pending.insert(self.next_comparison, word);
-                }
-                RetainedComparison::Moment(moment) => {
-                    self.moments.insert(self.next_comparison, moment);
-                }
-            }
+            self.comparisons
+                .insert(self.next_comparison, Rc::new(retained));
         }
         self.next_comparison = next_id;
         self.generations = generations;
@@ -1656,6 +1648,20 @@ impl<'c> IncidentFieldModel<'c> {
 
 #[cfg(test)]
 impl NativeCoupledBody<'_> {
+    /// Test fixture: this incident body written in the retired `\x01` frozen layout, as a
+    /// `SavedCoupledBody` wire (scope tag included).
+    pub(crate) fn legacy_frozen_incident_rest(&mut self) -> Result<Vec<u8>, NativeSessionError> {
+        let BodyState::Incident(model) = self.state_mut()? else {
+            return Err(invalid("legacy incident fixture requires its model chart"));
+        };
+        let mut bytes = vec![3];
+        NativeIncidentModelRest::write_legacy_frozen(model, &mut bytes)?;
+        Ok(bytes)
+    }
+}
+
+#[cfg(test)]
+impl NativeCoupledBody<'_> {
     /// Test diagnostic: zero the selected power-neutral reaction blocks (linear `W_s`, contrast
     /// coupling `W_c`, modulated slices) of every reaction material.
     pub(crate) fn zero_reaction_blocks(
@@ -1696,9 +1702,9 @@ impl NativeCoupledBody<'_> {
 }
 
 impl<'c> NativeCoupledBody<'c> {
-    /// Prepare the material return of a retained comparison. A legacy word returns through its
-    /// frozen producing cut; a generator comparison is read at the contemporary constitution
-    /// and must not have pooled directed contacts (use `prepare_generator_material_return`).
+    /// Prepare the material return of a retained comparison, read at the contemporary
+    /// constitution (its retained operands through the current field and material). A passage
+    /// that pooled directed contacts supplies them through `prepare_generator_material_return`.
     pub fn prepare_incident_material_return(
         &mut self,
         id: u64,
@@ -1708,15 +1714,12 @@ impl<'c> NativeCoupledBody<'c> {
         let BodyState::Incident(model) = self.state_mut()? else {
             return Err(invalid("incident return requires its model chart"));
         };
-        let word = match model.pending.get(&id) {
-            Some(word) => Rc::clone(word),
-            None => Rc::new(model.contemporary_comparison_word(id, None)?),
-        };
+        let word = Rc::new(model.contemporary_comparison_word(id, None)?);
         self.prepare_incident_material_return_at(id, &word, output_covector, step_bits, &[])
     }
 
-    /// The material return of comparison `id` pulled back through `word`, which is either its
-    /// frozen legacy word or its contemporary generator word.
+    /// The material return of comparison `id` pulled back through `word`, its word at the
+    /// contemporary constitution.
     fn prepare_incident_material_return_at(
         &mut self,
         id: u64,
@@ -1853,8 +1856,7 @@ impl<'c> NativeCoupledBody<'c> {
         *model.reaction_certificates.borrow_mut() = prepared.reaction_certificates;
         model.epoch = prepared.next_epoch;
         model.observations = prepared.observations;
-        model.pending.remove(&prepared.comparison);
-        model.moments.remove(&prepared.comparison);
+        model.comparisons.remove(&prepared.comparison);
         Ok(())
     }
     /// Found the declared incidence action D=B_U* with unit contact amplitudes. This creates
@@ -2065,8 +2067,10 @@ impl<'c> NativeCoupledBody<'c> {
             )),
         }
     }
-    /// Change only the numerical solve on a model with no outstanding producing comparisons.
-    /// Material and continuing q/b are retained. New checkpoints record the selected proposal.
+    /// Change only the numerical solve. Material and continuing q/b are retained, and new
+    /// checkpoints record the selected proposal. Outstanding comparisons keep no producing word,
+    /// so they are read with the solver in force when they return (the contemporary cut); only a
+    /// prepared but unpublished word is refused as stale by `publish_incident_field`.
     pub fn configure_incident_solver(
         &mut self,
         solver: IncidentFieldSolver,
@@ -2076,13 +2080,10 @@ impl<'c> NativeCoupledBody<'c> {
             return Err(invalid("incident solve resource aperture"));
         }
         match self.state_mut()? {
-            BodyState::Incident(model) if model.pending.is_empty() => {
+            BodyState::Incident(model) => {
                 model.spec.set_solver(solver, steps);
                 Ok(())
             }
-            BodyState::Incident(_) => Err(invalid(
-                "retain the producing solver until pending comparisons return",
-            )),
             _ => Err(invalid("incident solver requires its model chart")),
         }
     }
@@ -2097,26 +2098,6 @@ impl<'c> NativeCoupledBody<'c> {
                     .restrict(0..source.boundary_components())?)
             }
             _ => Err(invalid("incident current requires its model chart")),
-        }
-    }
-    pub fn incident_comparison(
-        &self,
-        id: u64,
-    ) -> Result<NativeIncidentGenerated<'c>, NativeSessionError> {
-        match self.state()? {
-            BodyState::Incident(model) if model.moments.contains_key(&id) => Err(invalid(
-                "a generator moment comparison keeps no producing word; read it with contemporary_incident_comparison",
-            )),
-            BodyState::Incident(model) => Ok(NativeIncidentGenerated {
-                word: Rc::clone(
-                    model
-                        .pending
-                        .get(&id)
-                        .ok_or_else(|| invalid("unknown incident comparison"))?,
-                ),
-                comparison: Some(id),
-            }),
-            _ => Err(invalid("incident comparison requires its model chart")),
         }
     }
     /// Restrict source-to-source participation and difference ports by the actual ordered
@@ -2180,7 +2161,7 @@ impl<'c> NativeCoupledBody<'c> {
             })
             .collect();
         Ok(NativeIncidentGenerated {
-            word: Rc::new(model.word(boundary, held, admitted)?),
+            word: Rc::new(model.word_at(boundary, held, admitted)?),
             comparison: None,
         })
     }

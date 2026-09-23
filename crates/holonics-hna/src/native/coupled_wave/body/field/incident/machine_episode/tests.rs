@@ -274,10 +274,7 @@ fn ordered_moment_preserves_order_and_returns_every_source_occurrence() {
     assert!(operands.condition.is_some());
     let generated = body.publish_incident_field(generated, false, true).unwrap();
     let id = generated.comparison_id().unwrap();
-    assert!(
-        body.incident_comparison(id).is_err(),
-        "no producing word is retained"
-    );
+    // No producing word is retained: the census holds no field cut, material view or iterate.
     let census = body.generator_comparison_census(id).unwrap();
     assert_eq!(census["solver_iterates"], 0);
     assert_eq!(census["material_views"], 0);
@@ -789,6 +786,7 @@ fn target_moment_accumulates_without_a_word_and_receives_through_the_same_phases
     let control = NativeIncidentGenerated {
         word: Rc::new(IncidentWord {
             source_moment: None,
+            boundary: None,
             external_condition: None,
             machine: produced.word.machine.clone(),
             source: produced.word.source.retained_clone(),
@@ -1458,4 +1456,80 @@ fn target_holon_is_one_word_at_the_contemporary_cut() {
         },
     );
     assert!(refused.is_err(), "a different alphabet is refused");
+}
+
+/// **The retired `\x02` source tape decodes to its moment.** A pre-moment build retained every
+/// occurrence's word and the encoded rows; the rows are the producing operands. The tape wire
+/// decodes, its rows are accumulated through the contemporary source maps into `m` and `c`, and
+/// the decoded comparison reads and returns exactly as the passage comparison of the same rows
+/// retained by this build (same cut, same contacts).
+#[test]
+#[ignore = "requires CUDA; a retired \\x02 source tape decodes to the moment comparison of its rows and returns identically"]
+fn a_retired_source_tape_decodes_to_the_moment_of_its_rows() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let (spec, binding) = setup();
+    let mut body =
+        NativeCoupledBody::found_generator_field(&surface, spec, ResidentGrain(48)).unwrap();
+    condition_material(&mut body);
+    let rows = encoded(&surface, false, 0);
+    let generated = body
+        .prepare_generator_episode(Rc::clone(&rows), binding.clone(), 0, contacts())
+        .unwrap();
+    let covector = generated.joint_output().to_owned().unwrap();
+    let generated = body.publish_incident_field(generated, false, true).unwrap();
+    let id = generated.comparison_id().unwrap();
+    drop(generated);
+    let native = model_bytes(&body);
+    assert_eq!(&native[..19], b"HNA-INCIDENT-FIELD\x05");
+    let mut tape = Vec::new();
+    {
+        let BodyState::Incident(model) = body.state_mut().unwrap() else {
+            panic!("machine")
+        };
+        NativeIncidentModelRest::write_legacy_tape(
+            model,
+            id,
+            &binding,
+            0,
+            &rows,
+            &contacts(),
+            &mut tape,
+        )
+        .unwrap();
+    }
+    assert_eq!(&tape[..19], b"HNA-INCIDENT-FIELD\x02");
+    let mut retained = restore(&surface, &native);
+    let mut decoded = restore(&surface, &tape);
+    assert_eq!(decoded.pending_ids().unwrap(), vec![id]);
+    assert_eq!(
+        decoded.generator_comparison_declaration(id).unwrap(),
+        retained.generator_comparison_declaration(id).unwrap(),
+        "the tape's per-edge relation becomes the passage's contact counts"
+    );
+    // The decoded body writes the operands, byte for byte the retained comparison's rest.
+    assert_eq!(model_bytes(&decoded), native);
+    fn read<'c>(
+        body: &mut NativeCoupledBody<'c>,
+        id: u64,
+        covector: &ResidentNormalEnclosure<'c>,
+    ) -> (
+        holonic_engine::native_ecology::constitutive_fibre::NativeFieldCurrentBall,
+        Vec<holonic_engine::native_ecology::constitutive_fibre::NativeFieldCurrentBall>,
+        Vec<u8>,
+    ) {
+        let word = body.contemporary_incident_comparison(id).unwrap();
+        let output = word.joint_output().inspect().unwrap();
+        let returned = body
+            .prepare_generator_material_return(&word, covector.view(), 4, &contacts())
+            .unwrap();
+        let rows = returned.source_covector().unwrap().inspect_rows().unwrap();
+        drop(word);
+        body.publish_incident_material_return(returned).unwrap();
+        (output, rows, model_bytes(body))
+    }
+    assert_eq!(
+        read(&mut decoded, id, &covector),
+        read(&mut retained, id, &covector)
+    );
 }

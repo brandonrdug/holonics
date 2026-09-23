@@ -227,15 +227,15 @@ fn generator_body_preserves_native_imaginary_modes_and_frozen_pair_contact() {
         source_before
     );
 
-    let restored = body.rest().unwrap().remount(&surface).unwrap();
-    let restored_output = restored.incident_comparison(comparison).unwrap();
+    let mut restored = body.rest().unwrap().remount(&surface).unwrap();
+    // The retained boundary read at the (unchanged) contemporary cut is the producing word.
+    let restored_output = restored.contemporary_incident_comparison(comparison).unwrap();
     assert_eq!(
         restored_output.joint_output().inspect().unwrap(),
         frozen_output
     );
     assert_eq!(restored.pending_coupled_predictions(), 1);
 
-    let mut restored = restored;
     let shifted_anchor = make_machine_anchor(&surface, grain, 1);
     let shifted = restored
         .prepare_incident_field(shifted_anchor.view(), &held)

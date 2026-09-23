@@ -143,7 +143,7 @@ fn incident_phi_uses_query_difference_and_distinct_phase_drive_at_zero_beta() {
         .iter()
         .map(|site| vec![true; site.sources.len()])
         .collect();
-    let word = model.word(anchor.view(), &held, admitted).unwrap();
+    let word = model.word_at(anchor.view(), &held, admitted).unwrap();
     assert_eq!(
         model
             .materials
@@ -237,7 +237,7 @@ fn incident_full_word_pullback_returns_anchor_and_all_stage_operands() {
         .iter()
         .map(|site| vec![true; site.sources.len()])
         .collect();
-    let word = model.word(anchor.view(), &held, admitted).unwrap();
+    let word = model.word_at(anchor.view(), &held, admitted).unwrap();
     let pull = model.pull_back(&word, word.output.view()).unwrap();
     assert_eq!(pull.contacts.len(), model.layout.steps);
     assert_eq!(pull.material.len(), model.materials.len());
@@ -271,7 +271,7 @@ fn incident_full_word_pullback_returns_anchor_and_all_stage_operands() {
         );
         outputs.push(
             model
-                .word(point.view(), &held, admitted.clone())
+                .word_at(point.view(), &held, admitted.clone())
                 .unwrap()
                 .output
                 .inspect()
@@ -317,8 +317,8 @@ fn incident_full_word_pullback_returns_anchor_and_all_stage_operands() {
 }
 
 #[test]
-#[ignore = "requires CUDA; preview pending incident word restores its frozen producing cut without changing the continuing current"]
-fn incident_pending_restores_frozen_word_and_preview_is_nonmutating() {
+#[ignore = "requires CUDA; a pending incident comparison rests as its boundary operand, reads its producing word at the unchanged cut, and preview is nonmutating"]
+fn incident_pending_restores_its_operands_and_preview_is_nonmutating() {
     let readout = ResidentReadout::new().unwrap();
     let surface = ResidentSurface::on(&readout).unwrap();
     let mut model = model(&surface);
@@ -347,13 +347,12 @@ fn incident_pending_restores_frozen_word_and_preview_is_nonmutating() {
             .unwrap(),
         before
     );
-    let restored = model.rest().unwrap().remount(&surface).unwrap();
+    let mut restored = model.rest().unwrap().remount(&surface).unwrap();
     assert_eq!(restored.pending(), 1);
+    let id = restored.pending_ids()[0];
     assert_eq!(
         restored
-            .pending
-            .values()
-            .next()
+            .contemporary_comparison_word(id, None)
             .unwrap()
             .output
             .inspect()
@@ -426,11 +425,12 @@ fn incident_quadrance_word_retains_complete_return_and_saved_chart() {
     );
     let generated = model.publish(prepared, false, true).unwrap();
     let before = generated.joint_output().inspect().unwrap();
-    let restored = model.rest().unwrap().remount(&surface).unwrap();
+    let mut restored = model.rest().unwrap().remount(&surface).unwrap();
     assert!(matches!(&restored.spec, IncidentModelSpec::Legacy(s)
         if s.participation == IncidentParticipationChart::QuadranceCurrent));
-    assert_eq!(restored.pending.len(), 1);
-    let word = Rc::clone(restored.pending.values().next().unwrap());
+    assert_eq!(restored.pending(), 1);
+    let id = restored.pending_ids()[0];
+    let word = restored.contemporary_comparison_word(id, None).unwrap();
     assert_eq!(word.output.inspect().unwrap(), before);
     let restored_back = restored.pull_back(&word, word.output.view()).unwrap();
     assert_eq!(
@@ -458,4 +458,115 @@ fn incident_model_wire_preserves_the_legacy_numeric_key_atlas() {
         serde_json::from_str::<IncidentModelSpec>(&encoded).unwrap(),
         IncidentModelSpec::Legacy(legacy)
     );
+}
+
+fn body_bytes(body: &NativeCoupledBody<'_>) -> Vec<u8> {
+    let mut bytes = Vec::new();
+    body.rest().unwrap().write(&mut bytes).unwrap();
+    bytes
+}
+
+fn restore<'c>(surface: &'c ResidentSurface<'c>, bytes: &[u8]) -> NativeCoupledBody<'c> {
+    crate::native::SavedCoupledBody::read(&mut &bytes[..], bytes.len() as u64)
+        .unwrap()
+        .remount(surface)
+        .unwrap()
+}
+
+/// The field, every reaction material and the returned anchor covector after one return.
+fn returned_state<'c>(
+    body: &mut NativeCoupledBody<'c>,
+    id: u64,
+    covector: &ResidentNormalEnclosure<'c>,
+) -> (Value, Value, Vec<Value>) {
+    let returned = body
+        .prepare_incident_material_return(id, covector.view(), 4)
+        .unwrap();
+    let anchor = serde_json::to_value(returned.anchor_covector().inspect().unwrap()).unwrap();
+    body.publish_incident_material_return(returned).unwrap();
+    let materials = (0..body.members())
+        .map(|member| body.inspect_predictive_material(member).unwrap())
+        .collect();
+    (anchor, body.inspect_current().unwrap(), materials)
+}
+
+/// **Retention law, legacy-slot chart.** A comparison retains only its prepared boundary,
+/// receiver mask, admitted contacts and producing epoch. After the constitution moves (a committed
+/// word and another comparison's material return), its delayed return is read at the
+/// contemporary cut and equals, number for number, the immediate return of a fresh comparison of
+/// the same boundary made at that cut; the same comparison written in the retired `\x01` frozen
+/// layout decodes to the same operands and continues to the same numbers.
+#[test]
+#[ignore = "requires CUDA; a delayed boundary comparison equals an immediate one at the same constitution, and an old \\x01 frozen rest decodes and continues"]
+fn delayed_boundary_comparison_equals_an_immediate_one_and_the_frozen_wire_decodes() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let grain = ResidentGrain(32);
+    let mut body = NativeCoupledBody::found_incident_field(&surface, spec(), grain).unwrap();
+    let components = body
+        .incident_current_boundary()
+        .unwrap()
+        .view()
+        .components();
+    let anchor = make_anchor(&surface, components, grain, 0);
+    let held = (0..components / 2).map(|i| i % 3 == 0).collect::<Vec<_>>();
+    let first = body.prepare_incident_field(anchor.view(), &held).unwrap();
+    let producing = first.joint_output().inspect().unwrap();
+    let covector = first.joint_output().to_owned().unwrap();
+    let first = body.publish_incident_field(first, false, true).unwrap();
+    let first_id = first.comparison_id().unwrap();
+    drop(first);
+    // The constitution moves: a committed word, and another comparison's material return.
+    let other = make_anchor(&surface, components, grain, 64);
+    let second = body.prepare_incident_field(other.view(), &held).unwrap();
+    let second = body.publish_incident_field(second, true, true).unwrap();
+    let second_id = second.comparison_id().unwrap();
+    let update = body
+        .prepare_incident_material_return(second_id, second.joint_output(), 4)
+        .unwrap();
+    drop(second);
+    body.publish_incident_material_return(update).unwrap();
+    let saved = body_bytes(&body);
+    // The delayed reading is one fresh word at the contemporary constitution.
+    let delayed_word = body.contemporary_incident_comparison(first_id).unwrap();
+    let fresh_word = body.prepare_incident_field(anchor.view(), &held).unwrap();
+    let delayed_output = delayed_word.joint_output().inspect().unwrap();
+    assert_eq!(delayed_output, fresh_word.joint_output().inspect().unwrap());
+    assert_ne!(delayed_output, producing, "the constitution moved in between");
+    drop((delayed_word, fresh_word));
+
+    let mut delayed = restore(&surface, &saved);
+    let delayed = returned_state(&mut delayed, first_id, &covector);
+
+    let mut immediate = restore(&surface, &saved);
+    let prepared = immediate
+        .prepare_incident_field(anchor.view(), &held)
+        .unwrap();
+    let fresh_id = immediate
+        .publish_incident_field(prepared, false, true)
+        .unwrap()
+        .comparison_id()
+        .unwrap();
+    assert_ne!(fresh_id, first_id);
+    let immediate = returned_state(&mut immediate, fresh_id, &covector);
+    assert_eq!(delayed.0, immediate.0, "the returned anchor covector");
+    assert_eq!(delayed.1, immediate.1, "the field after the return");
+    assert_eq!(delayed.2, immediate.2, "every reaction material after the return");
+
+    // The retired `\x01` layout: a frozen word per comparison. It decodes to the boundary.
+    let mut legacy = restore(&surface, &saved);
+    let mut wire = vec![3u8];
+    {
+        let BodyState::Incident(model) = legacy.state_mut().unwrap() else {
+            panic!("incident body");
+        };
+        NativeIncidentModelRest::write_legacy_frozen(model, &mut wire).unwrap();
+    }
+    assert_eq!(&wire[1..20], b"HNA-INCIDENT-FIELD\x01");
+    let mut decoded = restore(&surface, &wire);
+    assert_eq!(decoded.pending_ids().unwrap(), vec![first_id]);
+    // A decoded body writes its operands under the current tag.
+    assert_eq!(&body_bytes(&decoded)[1..20], b"HNA-INCIDENT-FIELD\x05");
+    let decoded = returned_state(&mut decoded, first_id, &covector);
+    assert_eq!(decoded, delayed, "the old wire continues to the same numbers");
 }

@@ -1,18 +1,18 @@
 //! Cold rest for the incident presentation boundary.
 //!
-//! Material maps are serialized through their existing binary NormalMaterialRest
-//! codec. Resident sections are explicit packets; no live receiver map is used to
-//! reconstruct a frozen producing comparison.
+//! Material maps are serialized through their existing binary NormalMaterialRest codec. An
+//! outstanding comparison is not part of this rest: its request is the session's
+//! `RetainedSharedSource` and its boundary operands are the body's; both are read at the
+//! contemporary constitution when it returns. A pre-12a wire carried a frozen encoder/receiver
+//! cut per comparison (`pending`: encoded rows, producing encoder material, `frozen_text`,
+//! `frozen_support`, `frozen_cohorts`); it still decodes, its source cells are checked against
+//! the retained request, and the frozen views are dropped.
 
 use super::boundary::BoundaryMaterial;
-use super::incident_encoder::{IncidentEncoded, IncidentEncoder};
+use super::incident_encoder::IncidentEncoder;
 use super::incident_receiver::{IncidentTextCohort, IncidentTextReceiver};
 use super::*;
-use crate::native::NativeIncidentGenerated;
-use holonic_engine::native_ecology::constitutive_fibre::{
-    NormalMaterialRest, ResidentNormalEnclosureSection,
-};
-use holonic_engine::resident_section::ResidentGrain;
+use holonic_engine::native_ecology::constitutive_fibre::NormalMaterialRest;
 use serde::{Deserialize, Serialize};
 use std::io::Cursor;
 
@@ -24,17 +24,9 @@ fn material_bytes(material: &NormalMaterialRest) -> Result<Vec<u8>> {
 fn read_material(bytes: &[u8]) -> Result<NormalMaterialRest> {
     NormalMaterialRest::read(&mut Cursor::new(bytes), bytes.len() as u64).map_err(invalid)
 }
-fn section_bytes(section: &ResidentNormalEnclosureSection<'_>) -> Result<Vec<u8>> {
-    section
-        .rest()
-        .map_err(invalid)?
-        .canonical_bytes()
-        .map_err(invalid)
-}
-fn read_section(bytes: &[u8]) -> Result<holonic_engine::resident_section::ResidentSectionRest> {
-    holonic_engine::resident_section::ResidentSectionRest::read(bytes).map_err(invalid)
-}
 
+/// A pre-12a pending incident comparison with its frozen producing cut. Decoded only: its
+/// preparation is checked against the retained request and every frozen view is dropped.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct IncidentPendingRest {
@@ -61,6 +53,8 @@ pub struct IncidentPresentationRest {
     pub receiver_support: Vec<u8>,
     pub receiver_cohorts: Vec<IncidentTextCohort>,
     pub receiver_cohort_material: Vec<Vec<u8>>,
+    /// Pre-12a frozen comparisons (decoded and dropped); never written.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub pending: Vec<IncidentPendingRest>,
     pub slot_rows: Vec<usize>,
     pub rows: usize,
@@ -79,45 +73,6 @@ impl<'c> IncidentPresentation<'c> {
             .iter()
             .map(material_bytes)
             .collect::<Result<Vec<_>>>()?;
-        let pending = self
-            .pending
-            .iter()
-            .map(|(&id, pending)| {
-                Ok(IncidentPendingRest {
-                    id,
-                    preparation: pending.preparation.clone(),
-                    encoded_symbols: pending.encoded.symbols.clone(),
-                    encoded_rows: section_bytes(&pending.encoded.rows)?,
-                    encoded_row_count: pending.encoded.rows.rows(),
-                    encoded_width: pending.encoded.rows.components(),
-                    grain_bits: pending.encoded.rows.grain().0,
-                    encoded_producing_material: pending
-                        .encoded
-                        .producing
-                        .iter()
-                        .map(|material| {
-                            material
-                                .rest()
-                                .map_err(invalid)
-                                .and_then(|rest| material_bytes(&rest))
-                        })
-                        .collect::<Result<Vec<_>>>()?,
-                    frozen_text: material_bytes(
-                        &self.receiver.producing_text_rest(&pending.received)?,
-                    )?,
-                    frozen_support: material_bytes(
-                        &self.receiver.producing_support_rest(&pending.received)?,
-                    )?,
-                    frozen_cohorts: pending.received.text_cohorts.clone(),
-                    frozen_cohort_material: self
-                        .receiver
-                        .producing_text_cohort_rests(&pending.received)?
-                        .iter()
-                        .map(material_bytes)
-                        .collect::<Result<Vec<_>>>()?,
-                })
-            })
-            .collect::<Result<Vec<_>>>()?;
         Ok(IncidentPresentationRest {
             encoder_material: encoder.iter().map(material_bytes).collect::<Result<_>>()?,
             encoder_identities: identities,
@@ -125,7 +80,7 @@ impl<'c> IncidentPresentation<'c> {
             receiver_support,
             receiver_cohorts: self.receiver.cohorts().to_vec(),
             receiver_cohort_material,
-            pending,
+            pending: Vec::new(),
             slot_rows: self.slot_rows.clone(),
             rows: self.rows,
             width: self.width,
@@ -135,11 +90,15 @@ impl<'c> IncidentPresentation<'c> {
 }
 
 impl IncidentPresentationRest {
+    /// Remount the presentation. Each decoded pre-12a pending entry must name an outstanding
+    /// body comparison whose retained request re-derives the same source cells; its frozen
+    /// encoder and receiver views are then dropped.
     pub(crate) fn remount<'c>(
         self,
         surface: &'c ResidentSurface<'c>,
         spec: &FieldSessionSpec,
         body: &NativeCoupledBody<'c>,
+        retained: &BTreeMap<u64, RetainedSharedSource>,
     ) -> Result<IncidentPresentation<'c>> {
         let (rows, width, grain, slot_rows) = body.incident_dimensions()?;
         if rows != self.rows || width != self.width || slot_rows != self.slot_rows {
@@ -191,22 +150,20 @@ impl IncidentPresentationRest {
                 .collect::<Result<Vec<_>>>()?,
             receiver_codec_version,
         )?;
-        let mut presentation = IncidentPresentation {
-            encoder,
-            receiver,
-            pending: BTreeMap::new(),
-            slot_rows,
-            rows,
-            width,
-            series: self.series,
-        };
-        for pending in self.pending {
-            pending.preparation.validate(spec)?;
-            if pending.encoded_row_count != pending.preparation.source_extent
-                || pending.encoded_width != width
-                || pending.grain_bits != grain.0
-                || pending.encoded_symbols
-                    != pending
+        let outstanding = body.pending_ids()?;
+        for legacy in self.pending {
+            legacy.preparation.validate(spec)?;
+            let request = &retained
+                .get(&legacy.id)
+                .ok_or_else(|| invalid("legacy incident comparison without its retained request"))?
+                .request;
+            if !outstanding.contains(&legacy.id)
+                || IncidentPreparation::from_request(spec, request)? != legacy.preparation
+                || legacy.encoded_row_count != legacy.preparation.source_extent
+                || legacy.encoded_width != width
+                || legacy.grain_bits != grain.0
+                || legacy.encoded_symbols
+                    != legacy
                         .preparation
                         .source_cells
                         .iter()
@@ -215,75 +172,14 @@ impl IncidentPresentationRest {
             {
                 return Err(invalid("incident pending source chart"));
             }
-            let generated: NativeIncidentGenerated<'c> = body.incident_comparison(pending.id)?;
-            let boundary_rows = generated.boundary()?.view().split_rows(rows, width)?;
-            let response_sites = super::incident_response_slots(
-                spec,
-                &pending.preparation,
-                &presentation.slot_rows,
-            )?;
-            let response = boundary_rows.gather_phase_rows(
-                &response_sites,
-                &vec![ExactWavePhaseTransport::identity(); response_sites.len()],
-                width,
-            )?;
-            let frozen_boundary = BoundaryMaterial::found(
-                surface,
-                spec.chart()?,
-                width / 2,
-                boundary_spec.response_aperture,
-                grain,
-                BoundaryMaterialSeed::new(boundary_spec.material_seed, grain.0),
-            )?;
-            let frozen_cohorts = pending.frozen_cohorts.clone();
-            let frozen_receiver = IncidentTextReceiver::remount_with_cohorts(
-                surface,
-                frozen_boundary,
-                read_material(&pending.frozen_text)?,
-                read_material(&pending.frozen_support)?,
-                frozen_cohorts.clone(),
-                pending
-                    .frozen_cohort_material
-                    .iter()
-                    .map(|bytes| read_material(bytes))
-                    .collect::<Result<Vec<_>>>()?,
-                frozen_cohorts
-                    .last()
-                    .map_or(0, |cohort| cohort.codec_version),
-            )?;
-            let received = frozen_receiver.forward(&response, SeriesAperture(self.series))?;
-            let rows_rest = read_section(&pending.encoded_rows)?;
-            let encoded_rows = ResidentNormalEnclosureSection::remount(
-                surface,
-                rows_rest,
-                pending.encoded_row_count,
-                pending.encoded_width,
-                ResidentGrain(pending.grain_bits),
-            )?;
-            let producing = pending
-                .encoded_producing_material
-                .iter()
-                .map(|bytes| {
-                    read_material(bytes)?
-                        .remount(surface)
-                        .map_err(invalid)
-                        .map(|material| material.retained_view())
-                })
-                .collect::<Result<Vec<_>>>()?;
-            let encoded = IncidentEncoded {
-                rows: encoded_rows,
-                symbols: pending.encoded_symbols,
-                producing,
-            };
-            presentation.pending.insert(
-                pending.id,
-                IncidentPending {
-                    preparation: pending.preparation,
-                    encoded,
-                    received,
-                },
-            );
         }
-        Ok(presentation)
+        Ok(IncidentPresentation {
+            encoder,
+            receiver,
+            slot_rows,
+            rows,
+            width,
+            series: self.series,
+        })
     }
 }

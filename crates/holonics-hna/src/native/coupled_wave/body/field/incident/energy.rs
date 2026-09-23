@@ -15,13 +15,14 @@
 //! `dissipated`, `port`, `reaction` (the skew interconnection's work, exactly `0` for exactly
 //! skew-Hermitian slices at every point of every ball, `Holon/Reaction.lean::skewReaction_workless`)
 //! and the solve's `discretization_defect`; the core balance's residual is computed and must be
-//! `0`. The participation is an exterior drive (an active receiver's delivered power, plan phase 7),
+//! `0`. The per-row balance is the chart's facet (`ResidentHolonChart::reaction_step_balance`,
+//! plan phase 12a), not a parallel reading of the certificate. The participation is an exterior drive (an active receiver's delivered power, plan phase 7),
 //! the projection onto the real-coded image is orthogonal (`≤ 0`), and `S_D` joins the contact
 //! dissipation and the source injection `b` in one reflection, which this host reading does not
 //! separate. Deposition work is `0`: a reaction deposit leaves the unit storage pairing unchanged
 //! (`ReactionDepositRecord::storage_epsilon`).
+use super::holon_chart::{ResidentHolonChart, RingReaction};
 use super::*;
-use holonic_core::law::EnergyBalance;
 use holonic_engine::ExactComplexWaveCurrent;
 use num_traits::{ToPrimitive, Zero};
 use relational_geometry::Rat;
@@ -73,116 +74,12 @@ fn energy(center: &[ExactComplexWaveCurrent]) -> Rat {
         .sum::<Rat>()
         * half()
 }
-type C = (Rat, Rat);
-fn cmul(a: &C, b: &C) -> C {
-    (&a.0 * &b.0 - &a.1 * &b.1, &a.0 * &b.1 + &a.1 * &b.0)
-}
-fn cadd(a: &C, b: &C) -> C {
-    (&a.0 + &b.0, &a.1 + &b.1)
-}
-/// `Re⟨x, v⟩ = Σ Re(conj(x_i) v_i)`.
-fn re_inner(x: &[C], v: &[C]) -> Rat {
-    x.iter()
-        .zip(v)
-        .map(|(a, b)| &a.0 * &b.0 + &a.1 * &b.1)
-        .sum()
-}
-fn apply(m: &[Vec<C>], v: &[C]) -> Vec<C> {
-    m.iter()
-        .map(|row| {
-            row.iter()
-                .zip(v)
-                .fold((Rat::zero(), Rat::zero()), |acc, (a, b)| {
-                    cadd(&acc, &cmul(a, b))
-                })
-        })
+/// The interleaved real chart `[re₀, im₀, re₁, im₁, …]` of a complex centre.
+fn realified(center: &[ExactComplexWaveCurrent]) -> Vec<Rat> {
+    center
+        .iter()
+        .flat_map(|z| [z.real.clone(), z.imaginary.clone()])
         .collect()
-}
-
-/// The exact reaction-stage balance of one row at the returned centres (see the module header):
-/// `(stored, dissipated, port, reaction, defect)` and the core balance.
-pub(crate) fn reaction_row_balance(
-    certificate: &holonic_engine::native_ecology::constitutive_fibre::PowerNeutralCertificate<'_>,
-    drive: &[ExactComplexWaveCurrent],
-    step: &[ExactComplexWaveCurrent],
-    contrast: &[Rat],
-) -> Result<EnergyBalance, NativeSessionError> {
-    let (n, k) = (certificate.n, certificate.k);
-    if drive.len() != n || step.len() != n || contrast.len() != k {
-        return Err(invalid("reaction balance extent"));
-    }
-    let unit = Rat::from_integer(num_bigint::BigInt::from(1) << certificate.grain);
-    let coefficient = |a: usize, j: usize| -> C {
-        let (re, im) = &certificate.coefficients[a][j];
-        (
-            Rat::from_integer(re.clone()) / &unit,
-            Rat::from_integer(im.clone()) / &unit,
-        )
-    };
-    let ws: Vec<Vec<C>> = (0..n)
-        .map(|a| (0..n).map(|b| coefficient(a, b)).collect())
-        .collect();
-    let j: Vec<Vec<C>> = (0..n)
-        .map(|a| {
-            (0..n)
-                .map(|b| {
-                    (0..k).fold((Rat::zero(), Rat::zero()), |acc, r| {
-                        let s = coefficient(a, n + k / 2 + r * n + b);
-                        (&acc.0 + &contrast[r] * &s.0, &acc.1 + &contrast[r] * &s.1)
-                    })
-                })
-                .collect()
-        })
-        .collect();
-    let wc: Vec<C> = (0..n)
-        .map(|a| {
-            (0..k / 2).fold((Rat::zero(), Rat::zero()), |acc, m| {
-                cadd(
-                    &acc,
-                    &cmul(
-                        &coefficient(a, n + m),
-                        &(contrast[2 * m].clone(), contrast[2 * m + 1].clone()),
-                    ),
-                )
-            })
-        })
-        .collect();
-    let p: Vec<C> = drive
-        .iter()
-        .map(|z| (z.real.clone(), z.imaginary.clone()))
-        .collect();
-    let y: Vec<C> = step
-        .iter()
-        .map(|z| (z.real.clone(), z.imaginary.clone()))
-        .collect();
-    let xbar: Vec<C> = p
-        .iter()
-        .zip(&y)
-        .map(|(a, b)| ((&a.0 + &b.0) * half(), (&a.1 + &b.1) * half()))
-        .collect();
-    // ρ = (I + K/2)p + W_c c − (I − K/2)y = p − y + K x̄ + W_c c.
-    let (wsx, jx) = (apply(&ws, &xbar), apply(&j, &xbar));
-    let rho: Vec<C> = (0..n)
-        .map(|a| {
-            (
-                &p[a].0 - &y[a].0 + &wsx[a].0 + &jx[a].0 + &wc[a].0,
-                &p[a].1 - &y[a].1 + &wsx[a].1 + &jx[a].1 + &wc[a].1,
-            )
-        })
-        .collect();
-    let stored = (re_inner(&y, &y) - re_inner(&p, &p)) * half();
-    let dissipated = -re_inner(&xbar, &wsx);
-    let port = re_inner(&xbar, &wc);
-    let reaction = re_inner(&xbar, &jx);
-    let defect = -re_inner(&xbar, &rho);
-    Ok(EnergyBalance::closed(
-        stored,
-        dissipated,
-        port,
-        reaction,
-        Rat::zero(),
-        defect,
-    ))
 }
 
 impl<'c> IncidentFieldModel<'c> {
@@ -251,8 +148,13 @@ impl<'c> IncidentFieldModel<'c> {
                                 .collect()
                         })
                         .unwrap_or_default();
-                    let row_balance =
-                        reaction_row_balance(&cayley.certificate, &p.center, &y.center, &c)?;
+                    // The ring Holon's step balance (the chart's advance facet), read at the
+                    // returned centres.
+                    let row_balance = ResidentHolonChart::reaction_step_balance(
+                        &RingReaction::certified(&cayley.certificate, &c),
+                        &realified(&p.center),
+                        &realified(&y.center),
+                    )?;
                     balance.reaction_balance_exact &= row_balance.is_exact();
                     balance.reaction += &row_balance.active;
                     dissipated += &row_balance.dissipated;

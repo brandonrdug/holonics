@@ -20,10 +20,12 @@ pub(super) struct IncidentEncoder<'c> {
     positions: BTreeMap<usize, usize>,
     seed: Option<BoundaryMaterialSeed>,
 }
+/// One source passage read through the encoder at the cut it was encoded: its rows `E(u_k)` and
+/// its codec identities. It is read within one cut (request, observe or inspection) and never
+/// retained; a later return encodes the identities again through the contemporary encoder.
 pub(super) struct IncidentEncoded<'c> {
     pub rows: ResidentNormalEnclosureSection<'c>,
     pub symbols: Vec<usize>,
-    pub producing: Vec<ResidentNormalMaterialView<'c>>,
 }
 pub(super) struct IncidentEncoderUpdate<'c> {
     columns: Vec<(usize, ResidentNormalMaterial<'c>)>,
@@ -157,11 +159,6 @@ impl<'c> IncidentEncoder<'c> {
         Ok(IncidentEncoded {
             rows,
             symbols: symbols.to_vec(),
-            producing: self
-                .columns
-                .iter()
-                .map(ResidentNormalMaterial::retained_view)
-                .collect(),
         })
     }
     /// The encoder table `|A| × 2d`: row `a` is `E(a)`, the current column of codec identity

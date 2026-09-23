@@ -1,12 +1,28 @@
-//! Persist outstanding comparisons. A legacy word keeps its producing cut (`\x01`); a
-//! generator comparison keeps only its source Holon — declaration, moment `m` and
-//! phase-weighted condition `c`, fixed in the passage length (`\x04`) — and is read at the
-//! contemporary constitution when observed. The retired `\x02` source tape and the retired
-//! `\x03` accumulated-anchor form (its anchor mixes the producing standing `U^N q₀` into `m`,
-//! so `m` cannot be recovered) are refused, not reinterpreted.
+//! Persist outstanding comparisons as their producing operands (`\x05`): a prepared boundary,
+//! or a passage's moment `m` and phase-weighted condition `c` (per-symbol sums for a symbol
+//! passage) with its declaration, fixed in the passage length. Every comparison is read at the
+//! contemporary constitution when observed, so no producing cut is written.
+//!
+//! Older wires still decode, converted to the same operands (plan phase 12a):
+//! - `\x01` (and the frozen entries of `\x04`): a legacy word at its producing cut
+//!   (field source, anchor, output, material views). The boundary part of its anchor is the
+//!   retained operand; the frozen source, output and material are read and dropped.
+//! - `\x02`: the retired per-occurrence source tape. Its encoded rows are the retained
+//!   operands; the moment and condition are accumulated through the body's source maps at
+//!   remount, and every per-occurrence word is dropped.
+//! - `\x04`: generator moments, unchanged.
+//!
+//! The retired `\x03` accumulated-anchor form (its anchor mixes the producing standing
+//! `U^N q₀` into `m`, so `m` cannot be recovered) is refused, not reinterpreted.
 use super::machine_episode::{ComparisonSource, SymbolSums};
 use super::*;
 use holonic_engine::native_ecology::constitutive_fibre::NormalMaterialRest;
+
+const OPERANDS: &[u8; 19] = b"HNA-INCIDENT-FIELD\x05";
+const LEGACY_WORDS: &[u8; 19] = b"HNA-INCIDENT-FIELD\x01";
+const LEGACY_TAPE: &[u8; 19] = b"HNA-INCIDENT-FIELD\x02";
+const RETIRED_ANCHORS: &[u8; 19] = b"HNA-INCIDENT-FIELD\x03";
+const LEGACY_MOMENTS: &[u8; 19] = b"HNA-INCIDENT-FIELD\x04";
 
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 struct Header {
@@ -25,10 +41,10 @@ struct Header {
 }
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 struct PendingHeader {
-    /// Retired `\x02` per-occurrence source tape. Decoded only to refuse it.
+    /// Retired `\x02` per-occurrence source tape (`LegacyEpisodeMeta`). Decoded to its operands.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     source_episode: Option<serde_json::Value>,
-    /// `\x04` generator comparison: binding, clock origin, passage length and contact counts.
+    /// A generator passage: binding, clock origin, passage length and contact counts.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     source_moment: Option<GeneratorSourceMomentMeta>,
     id: u64,
@@ -36,22 +52,35 @@ struct PendingHeader {
     held: Vec<bool>,
     admitted: Vec<Vec<bool>>,
 }
+
+/// The declaration of a retired `\x02` source tape: the passage and its per-edge relation.
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct LegacyEpisodeMeta {
+    binding: GeneratorSourceBinding,
+    start: u64,
+    rows: usize,
+    components: usize,
+    #[serde(default)]
+    contacts: Vec<GeneratorSourceContact>,
+}
+
 #[derive(Debug, PartialEq, Eq)]
 enum PendingRest {
-    /// A legacy word at its producing cut.
-    Frozen {
-        source: NativeFieldCurrentSourceRest,
-        anchor: ResidentSectionRest,
-        output: ResidentSectionRest,
-        material: Vec<NormalMaterialRest>,
-    },
-    /// A generator comparison: no material, field cut or output. An encoded-row passage
-    /// stores its moment `m` and condition `c`; a symbol passage (`alphabet` in the header)
-    /// stores its per-symbol sums `C` in `moment` and per-port sums `D` in `condition`.
+    /// A prepared boundary, as its caller supplied it.
+    Boundary(ResidentSectionRest),
+    /// A generator passage: an encoded-row passage stores its moment `m` and condition `c`; a
+    /// symbol passage (`alphabet` in the header) stores its per-symbol sums `C` in `moment` and
+    /// per-port sums `D` in `condition`.
     Moment {
         moment: ResidentSectionRest,
         condition: Option<ResidentSectionRest>,
     },
+    /// A legacy frozen word, decoded: only its anchor is kept, whose boundary part is the
+    /// retained operand (converted at remount). Its source, output and material were dropped.
+    Frozen { anchor: ResidentSectionRest },
+    /// A retired source tape, decoded: its encoded rows (converted to the moment at remount).
+    Tape { encoded: ResidentSectionRest },
 }
 #[derive(Debug, PartialEq, Eq)]
 pub struct NativeIncidentModelRest {
@@ -92,19 +121,24 @@ impl NativeIncidentModelRest {
     pub(crate) fn has_prediction(&self, id: u64) -> bool {
         self.header.pending.iter().any(|p| p.id == id)
     }
+    /// A body without outstanding comparisons keeps the original `\x01` bytes; outstanding
+    /// comparisons are written as operands under `\x05`. A decoded legacy entry is converted by
+    /// remounting the body; it is never written back in its retired form.
     pub(crate) fn write(&self, out: &mut impl Write) -> Result<(), NativeSessionError> {
-        out.write_all(
-            if self
-                .header
-                .pending
-                .iter()
-                .any(|p| p.source_moment.is_some())
-            {
-                b"HNA-INCIDENT-FIELD\x04"
-            } else {
-                b"HNA-INCIDENT-FIELD\x01"
-            },
-        )?;
+        if self
+            .pending
+            .iter()
+            .any(|p| matches!(p, PendingRest::Frozen { .. } | PendingRest::Tape { .. }))
+        {
+            return Err(invalid(
+                "a decoded legacy incident comparison converts to its operands at remount; remount the body before writing it",
+            ));
+        }
+        out.write_all(if self.pending.is_empty() {
+            LEGACY_WORDS
+        } else {
+            OPERANDS
+        })?;
         blob(out, &serde_json::to_vec(&self.header).map_err(invalid)?)?;
         let mut data = Vec::new();
         self.field.write(&mut data)?;
@@ -116,22 +150,8 @@ impl NativeIncidentModelRest {
         }
         for pending in &self.pending {
             match pending {
-                PendingRest::Frozen {
-                    source,
-                    anchor,
-                    output,
-                    material,
-                } => {
-                    let mut data = Vec::new();
-                    source.write(&mut data)?;
-                    blob(out, &data)?;
-                    blob(out, &anchor.canonical_bytes().map_err(invalid)?)?;
-                    blob(out, &output.canonical_bytes().map_err(invalid)?)?;
-                    for material in material {
-                        let mut data = Vec::new();
-                        material.write(&mut data)?;
-                        blob(out, &data)?;
-                    }
+                PendingRest::Boundary(boundary) => {
+                    blob(out, &boundary.canonical_bytes().map_err(invalid)?)?;
                 }
                 PendingRest::Moment { moment, condition } => {
                     blob(out, &moment.canonical_bytes().map_err(invalid)?)?;
@@ -139,6 +159,7 @@ impl NativeIncidentModelRest {
                         blob(out, &condition.canonical_bytes().map_err(invalid)?)?;
                     }
                 }
+                PendingRest::Frozen { .. } | PendingRest::Tape { .. } => unreachable!(),
             }
         }
         Ok(())
@@ -147,24 +168,26 @@ impl NativeIncidentModelRest {
         let mut input = input.take(octets);
         let mut magic = [0; 19];
         input.read_exact(&mut magic)?;
-        let moments = &magic == b"HNA-INCIDENT-FIELD\x04";
-        let tape = &magic == b"HNA-INCIDENT-FIELD\x02";
-        if &magic == b"HNA-INCIDENT-FIELD\x03" {
+        if &magic == RETIRED_ANCHORS {
             return Err(invalid(
                 "incident rest \\x03 retains generator comparisons as producing anchors U^N q0 + m; the moment is not separable from that standing, so the format is retired and not reinterpreted (observe or release its comparisons before saving)",
             ));
         }
-        if &magic != b"HNA-INCIDENT-FIELD\x01" && !moments && !tape {
-            return Err(invalid("incident model rest version"));
-        }
+        let (operands, tape, moments) = match &magic {
+            m if m == OPERANDS => (true, false, false),
+            m if m == LEGACY_WORDS => (false, false, false),
+            m if m == LEGACY_TAPE => (false, true, false),
+            m if m == LEGACY_MOMENTS => (false, false, true),
+            _ => return Err(invalid("incident model rest version")),
+        };
         let header: Header = serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
-        if tape || header.pending.iter().any(|p| p.source_episode.is_some()) {
-            return Err(invalid(
-                "incident rest \\x02 retains a per-occurrence generator source tape; that format is retired by the moment law and is not reinterpreted",
-            ));
-        }
-        if header.pending.iter().any(|p| p.source_moment.is_some()) != moments {
-            return Err(invalid("incident moment rest tag"));
+        let any_moment = header.pending.iter().any(|p| p.source_moment.is_some());
+        let any_episode = header.pending.iter().any(|p| p.source_episode.is_some());
+        if (any_episode && !tape)
+            || (tape && any_moment)
+            || (!operands && any_moment != moments)
+        {
+            return Err(invalid("incident rest tag and pending kinds"));
         }
         let layout = header.spec.compile()?;
         let data = read_blob(&mut input)?;
@@ -186,18 +209,25 @@ impl NativeIncidentModelRest {
                 pending.push(PendingRest::Moment { moment, condition });
                 continue;
             }
+            if operands {
+                pending.push(PendingRest::Boundary(
+                    ResidentSectionRest::read(&read_blob(&mut input)?).map_err(invalid)?,
+                ));
+                continue;
+            }
+            // A legacy frozen word (and, in `\x02`, its source tape): the producing cut is read,
+            // checked for its declared layout, and dropped.
             let data = read_blob(&mut input)?;
-            let source =
-                NativeFieldCurrentSourceRest::read(&mut data.as_slice(), data.len() as u64)?;
+            NativeFieldCurrentSourceRest::read(&mut data.as_slice(), data.len() as u64)?;
             let anchor = ResidentSectionRest::read(&read_blob(&mut input)?).map_err(invalid)?;
-            let output = ResidentSectionRest::read(&read_blob(&mut input)?).map_err(invalid)?;
-            let material = read_material(&mut input)?;
-            pending.push(PendingRest::Frozen {
-                source,
-                anchor,
-                output,
-                material,
-            });
+            ResidentSectionRest::read(&read_blob(&mut input)?).map_err(invalid)?;
+            read_material(&mut input)?;
+            if pending_header.source_episode.is_some() {
+                let encoded = ResidentSectionRest::read(&read_blob(&mut input)?).map_err(invalid)?;
+                pending.push(PendingRest::Tape { encoded });
+            } else {
+                pending.push(PendingRest::Frozen { anchor });
+            }
         }
         if input.limit() != 0 {
             return Err(invalid("trailing incident rest data"));
@@ -225,6 +255,8 @@ impl NativeIncidentModelRest {
         }
         let source = model.field.read_current_source()?;
         let grain = source.enclosure().grain();
+        let boundary = source.boundary_components();
+        let joint = boundary + source.internal_components();
         for (material, &features) in model.materials.iter().zip(&model.layout.material_features) {
             if material.source_complex() != features
                 || material.targets() != model.layout.width / 2
@@ -239,13 +271,13 @@ impl NativeIncidentModelRest {
         model.next_comparison = self.header.next_comparison;
         model.rebase = self.header.rebase.clone();
         model.reaction_record = self.header.reaction.clone();
+        let ports = model.layout.source_condition_ports;
         for (h, p) in self.header.pending.into_iter().zip(self.pending) {
             if h.id >= model.next_comparison || h.epoch > model.epoch || model.is_pending(h.id) {
                 return Err(invalid("incident pending chronology"));
             }
-            let word = match (h.source_moment, p) {
+            let comparison = match (h.source_moment, p) {
                 (Some(meta), PendingRest::Moment { moment, condition }) => {
-                    let ports = model.layout.source_condition_ports;
                     let source = match meta.alphabet {
                         None => ComparisonSource::Rows {
                             moment: Rc::new(ResidentNormalEnclosure::remount(
@@ -296,111 +328,81 @@ impl NativeIncidentModelRest {
                             })
                         }
                     };
-                    let comparison = model
-                        .remount_moment_comparison(meta, source, h.held, h.admitted, h.epoch)?;
-                    model.moments.insert(h.id, Rc::new(comparison));
-                    continue;
+                    model.remount_comparison(Some(meta), source, h.held, h.admitted, h.epoch)?
                 }
-                (
-                    None,
-                    PendingRest::Frozen {
-                        source,
-                        anchor,
-                        output,
-                        material,
-                    },
-                ) => {
-                    let source = model.field.remount_current_source(source)?;
-                    let grain = source.enclosure().grain();
-                    let anchor = Rc::new(ResidentNormalEnclosure::remount(surface, anchor, grain)?);
-                    if material.len() != model.layout.material_features.len()
-                        || material.iter().zip(&model.layout.material_features).any(
-                            |(m, &features)| {
-                                m.source_chart().complex_sources() != Some(features)
-                                    || m.targets() != model.layout.width / 2
-                                    || m.grain() != grain
-                            },
-                        )
-                    {
-                        return Err(invalid("pending incident material chart"));
+                (None, PendingRest::Boundary(rest)) => {
+                    let prepared = ResidentNormalEnclosure::remount(surface, rest, grain)?;
+                    model.remount_comparison(
+                        None,
+                        ComparisonSource::Boundary(Rc::new(prepared)),
+                        h.held,
+                        h.admitted,
+                        h.epoch,
+                    )?
+                }
+                (None, PendingRest::Frozen { anchor }) => {
+                    // The anchor is `P(boundary ⊕ b_pre)`; its boundary part is the operand.
+                    let anchor = ResidentNormalEnclosure::remount(surface, anchor, grain)?;
+                    if anchor.view().components() != joint {
+                        return Err(invalid("incident pending anchor chart"));
                     }
-                    let material = material
-                        .into_iter()
-                        .map(|m| m.remount(surface).map(|m| m.retained_view()))
-                        .collect::<Result<Vec<_>, _>>()?;
-                    if h.held.len() != anchor.view().components() / 2
-                        || h.held[source.boundary_components() / 2..]
-                            .iter()
-                            .any(|v| *v)
-                    {
-                        return Err(invalid("incident pending anchor mask"));
+                    let prepared = anchor.view().restrict(0..boundary)?;
+                    model.remount_comparison(
+                        None,
+                        ComparisonSource::Boundary(Rc::new(prepared)),
+                        h.held,
+                        h.admitted,
+                        h.epoch,
+                    )?
+                }
+                (None, PendingRest::Tape { encoded }) => {
+                    let meta: LegacyEpisodeMeta = serde_json::from_value(
+                        h.source_episode
+                            .ok_or_else(|| invalid("incident source tape declaration"))?,
+                    )
+                    .map_err(invalid)?;
+                    if h.held.iter().any(|v| *v) {
+                        return Err(invalid("incident source tape receiver mask"));
                     }
-                    let (steps, recomputed) =
-                        model.evaluate(&source, &material, &anchor, &h.held, &h.admitted, None)?;
-                    let recorded = ResidentNormalEnclosure::remount(surface, output, grain)?;
-                    if recomputed.inspect()? != recorded.inspect()? {
-                        return Err(invalid(
-                            "incident producing word does not reconstruct recorded endpoint",
-                        ));
-                    }
-                    IncidentWord {
-                        source_moment: None,
-                        external_condition: None,
-                        machine: model.layout.machine.clone(),
-                        source,
-                        material,
-                        anchor,
-                        held: h.held,
-                        admitted: h.admitted,
-                        steps,
-                        output: recomputed,
-                        epoch: h.epoch,
-                        solver: model.spec.solver(),
-                        solve_steps: model.spec.solve_steps(),
-                        enclosure_propagation: model.spec.enclosure_propagation(),
-                    }
+                    let encoded = ResidentNormalEnclosureSection::remount(
+                        surface,
+                        encoded,
+                        meta.rows,
+                        meta.components,
+                        grain,
+                    )?;
+                    model.comparison_from_tape(
+                        meta.binding,
+                        meta.start,
+                        &encoded,
+                        &meta.contacts,
+                        joint,
+                        h.admitted,
+                        h.epoch,
+                    )?
                 }
                 _ => return Err(invalid("incident pending rest kind")),
             };
-            model.pending.insert(h.id, Rc::new(word));
+            model.comparisons.insert(h.id, Rc::new(comparison));
         }
         Ok(model)
     }
 }
 impl IncidentFieldModel<'_> {
     pub(crate) fn rest(&self) -> Result<NativeIncidentModelRest, NativeSessionError> {
-        let mut ordered = Vec::with_capacity(self.pending());
-        for (&id, word) in &self.pending {
-            let header = PendingHeader {
+        let mut pending_headers = Vec::with_capacity(self.comparisons.len());
+        let mut pending = Vec::with_capacity(self.comparisons.len());
+        for (&id, comparison) in &self.comparisons {
+            pending_headers.push(PendingHeader {
                 source_episode: None,
-                source_moment: None,
-                id,
-                epoch: word.epoch,
-                held: word.held.clone(),
-                admitted: word.admitted.clone(),
-            };
-            let rest = PendingRest::Frozen {
-                source: word.source.rest()?,
-                anchor: word.anchor.rest()?,
-                output: word.output.rest()?,
-                material: word
-                    .material
-                    .iter()
-                    .map(|m| m.rest())
-                    .collect::<Result<Vec<_>, _>>()?,
-            };
-            ordered.push((header, rest));
-        }
-        for (&id, comparison) in &self.moments {
-            let header = PendingHeader {
-                source_episode: None,
-                source_moment: Some(comparison.meta().clone()),
+                source_moment: comparison.meta().cloned(),
                 id,
                 epoch: comparison.epoch(),
                 held: comparison.held().to_vec(),
                 admitted: comparison.admitted().to_vec(),
-            };
-            let rest = match comparison.source() {
+            });
+            pending.push(match comparison.source() {
+                ComparisonSource::Boundary(boundary) => PendingRest::Boundary(boundary.rest()?),
                 ComparisonSource::Rows { moment, condition } => PendingRest::Moment {
                     moment: moment.rest()?,
                     condition: condition.as_ref().map(|c| c.rest()).transpose()?,
@@ -409,11 +411,8 @@ impl IncidentFieldModel<'_> {
                     moment: sums.moment.rest()?,
                     condition: sums.ports.as_ref().map(|d| d.rest()).transpose()?,
                 },
-            };
-            ordered.push((header, rest));
+            });
         }
-        ordered.sort_by_key(|(header, _)| header.id);
-        let (pending_headers, pending): (Vec<_>, Vec<_>) = ordered.into_iter().unzip();
         let header = Header {
             spec: self.spec.clone(),
             epoch: self.epoch,
@@ -434,5 +433,94 @@ impl IncidentFieldModel<'_> {
                 .collect::<Result<Vec<_>, _>>()?,
             pending,
         })
+    }
+}
+
+#[cfg(test)]
+impl NativeIncidentModelRest {
+    /// Test fixture writer of the retired `\x01` layout: every boundary comparison is written as
+    /// the frozen word a pre-12a build wrote (field source, anchor, output, material views),
+    /// read from the model's contemporary cut. Only the layout matters for the decoder.
+    pub(crate) fn write_legacy_frozen(
+        model: &mut IncidentFieldModel<'_>,
+        out: &mut impl Write,
+    ) -> Result<(), NativeSessionError> {
+        let rest = model.rest()?;
+        if rest.header.pending.iter().any(|p| p.source_moment.is_some()) {
+            return Err(invalid("legacy frozen fixture holds boundary comparisons only"));
+        }
+        out.write_all(LEGACY_WORDS)?;
+        blob(out, &serde_json::to_vec(&rest.header).map_err(invalid)?)?;
+        let mut data = Vec::new();
+        rest.field.write(&mut data)?;
+        blob(out, &data)?;
+        for material in &rest.material {
+            let mut data = Vec::new();
+            material.write(&mut data)?;
+            blob(out, &data)?;
+        }
+        let ids = model.comparisons.keys().copied().collect::<Vec<_>>();
+        for id in ids {
+            let word = model.contemporary_comparison_word(id, None)?;
+            let mut data = Vec::new();
+            word.source.rest()?.write(&mut data)?;
+            blob(out, &data)?;
+            blob(out, &word.anchor.rest()?.canonical_bytes().map_err(invalid)?)?;
+            blob(out, &word.output.rest()?.canonical_bytes().map_err(invalid)?)?;
+            for material in &word.material {
+                let mut data = Vec::new();
+                material.rest()?.write(&mut data)?;
+                blob(out, &data)?;
+            }
+        }
+        Ok(())
+    }
+
+    /// Test fixture writer of the retired `\x02` source-tape layout for one encoded-row passage:
+    /// the episode declaration with its per-edge relation, the frozen word parts and the encoded
+    /// rows, as a pre-moment build wrote them.
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn write_legacy_tape(
+        model: &mut IncidentFieldModel<'_>,
+        id: u64,
+        binding: &GeneratorSourceBinding,
+        start: u64,
+        encoded: &ResidentNormalEnclosureSection<'_>,
+        contacts: &[GeneratorSourceContact],
+        out: &mut impl Write,
+    ) -> Result<(), NativeSessionError> {
+        let mut rest = model.rest()?;
+        if rest.header.pending.len() != 1 || rest.header.pending[0].id != id {
+            return Err(invalid("legacy tape fixture holds one passage comparison"));
+        }
+        let word = model.contemporary_comparison_word(id, None)?;
+        let pending = &mut rest.header.pending[0];
+        pending.source_moment = None;
+        pending.source_episode = Some(serde_json::json!({
+            "binding": binding, "start": start, "rows": encoded.rows(),
+            "components": encoded.components(), "contacts": contacts,
+        }));
+        out.write_all(LEGACY_TAPE)?;
+        blob(out, &serde_json::to_vec(&rest.header).map_err(invalid)?)?;
+        let mut data = Vec::new();
+        rest.field.write(&mut data)?;
+        blob(out, &data)?;
+        for material in &rest.material {
+            let mut data = Vec::new();
+            material.write(&mut data)?;
+            blob(out, &data)?;
+        }
+        let mut data = Vec::new();
+        word.source.rest()?.write(&mut data)?;
+        blob(out, &data)?;
+        blob(out, &word.anchor.rest()?.canonical_bytes().map_err(invalid)?)?;
+        blob(out, &word.output.rest()?.canonical_bytes().map_err(invalid)?)?;
+        for material in &word.material {
+            let mut data = Vec::new();
+            material.rest()?.write(&mut data)?;
+            blob(out, &data)?;
+        }
+        blob(out, &encoded.rest()?.canonical_bytes().map_err(invalid)?)?;
+        Ok(())
     }
 }

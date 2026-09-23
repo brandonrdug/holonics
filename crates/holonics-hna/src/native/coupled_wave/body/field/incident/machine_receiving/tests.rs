@@ -121,7 +121,14 @@ fn receiving_uses_generated_endpoint_and_returns_full_machine_boundary() {
     };
     let wire = serde_json::to_value(&binding).unwrap();
     assert_eq!(wire["kind"], "generator-phases");
-    let binding = serde_json::from_value(wire).unwrap();
+    let binding: GeneratorPhaseReceiverBinding = serde_json::from_value(wire).unwrap();
+    // The receive and pullback facets of the chart: the exact passive coholon of the same maps.
+    let reception = super::super::holon_chart::ResidentHolonChart::phase_reception(
+        generated.word.machine.as_ref().unwrap(),
+        &binding,
+        12,
+    )
+    .unwrap();
     let received = generated.receive_generator_phases(binding).unwrap();
     assert_eq!(received.output().rows(), 2);
     assert_eq!(received.output().components(), 12);
@@ -155,7 +162,38 @@ fn receiving_uses_generated_endpoint_and_returns_full_machine_boundary() {
         returned_im = returned_im.add(&action.linear.transpose().apply(&vector(&row.center, 1)));
     }
     assert_ne!(endpoint[0].center, endpoint[1].center);
+    let flat = |rows: &[holonic_engine::ExactComplexWaveCurrent]| {
+        rows.iter()
+            .flat_map(|z| [z.real.clone(), z.imaginary.clone()])
+            .collect::<Vec<_>>()
+    };
+    let complex = |values: &[Rat]| {
+        values
+            .chunks(2)
+            .map(|z| holonic_engine::ExactComplexWaveCurrent::new(z[0].clone(), z[1].clone()))
+            .collect::<Vec<_>>()
+    };
+    let read = reception.receive(&flat(&source.center)).unwrap();
+    assert!(read.power.is_zero(), "a passive coholon draws no power");
+    for (j, row) in endpoint.iter().enumerate() {
+        let action = signed_affine_power(&step, (j + 1) as i64).unwrap();
+        let exact = complex(&read.value[12 * j..12 * (j + 1)]);
+        assert_eq!(
+            exact,
+            native(&action.linear.apply(&qre), &action.linear.apply(&qim)),
+            "the chart's reading is the hand-rolled L re, L im"
+        );
+        assert!(row.contains(&exact), "exact reading in the device ball");
+    }
+    let covector = endpoint.iter().flat_map(|row| flat(&row.center)).collect::<Vec<_>>();
+    let pulled = reception.pull_back(&covector).unwrap();
     let returned = received.pull_back(received.output()).unwrap();
+    for (site, row) in returned.inspect_rows().unwrap().iter().enumerate() {
+        assert!(
+            row.contains(&complex(&pulled[12 * site..12 * (site + 1)])),
+            "exact pullback Cᵀ g in the device ball"
+        );
+    }
     assert_eq!(returned.rows(), 2);
     assert_eq!(returned.components(), 12);
     assert!(

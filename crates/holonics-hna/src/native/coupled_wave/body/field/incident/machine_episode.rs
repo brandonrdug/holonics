@@ -1,4 +1,5 @@
-//! Ordered source entering the fixed generator machine as phase-carried moments.
+//! Ordered source entering the fixed generator machine as phase-carried moments, and the one
+//! retained-comparison object of the incident body.
 //!
 //! Each occurrence advances every site by its declared finite action and injects its encoded
 //! increment, `q⁺ ← L q⁺ + I E(u_k)` (the current carried by the step's linear part; the
@@ -16,6 +17,14 @@
 //! contemporary constitution. Its adjoint returns the standing covector to that contemporary
 //! `q₀` and one covector per occurrence from the composite coefficients, so no intermediate
 //! state exists to retain.
+//!
+//! [definition] **One retained comparison** (plan phase 12a). Every outstanding comparison of the
+//! incident body — a prepared boundary (legacy-slot and direct machine words), an encoded-row
+//! passage or a symbol passage — is one [`RetainedComparison`]: its producing operands at the
+//! boundary port, the receiver restrictions (`held`, `admitted`) and the material cut id at which
+//! it was produced. It is read at the contemporary constitution (`contemporary_word`): the
+//! retention law (`Holon/Retention.lean::delayed_read_eq_immediate`). The frozen producing word
+//! (`\x01`) and the per-occurrence source tape (`\x02`) are decoded into it (`rest.rs`).
 use super::machine_source::{GeneratorSourceClockWitness, MachineSourceMaps};
 use super::machine_source_contacts::{
     GeneratorSourceContact, contact_counts, phase_weighted_source_condition, port_symbol_sums,
@@ -56,8 +65,11 @@ pub(crate) struct SymbolSums<'c> {
     pub(super) ports: Option<Rc<ResidentNormalEnclosureSection<'c>>>,
 }
 
-/// What a retained comparison keeps of its source Holon.
+/// What a retained comparison keeps of its source Holon at the boundary port.
 pub(crate) enum ComparisonSource<'c> {
+    /// A prepared boundary as its caller supplied it (`prepare_incident_field*`): the source
+    /// cells already entered at the boundary. The interior `b` is read at the contemporary field.
+    Boundary(Rc<ResidentNormalEnclosure<'c>>),
     /// An encoded-row passage: the moment `m` and condition `c` as produced.
     Rows {
         moment: Rc<ResidentNormalEnclosure<'c>>,
@@ -78,11 +90,21 @@ pub(crate) struct GeneratorSourceMoment<'c> {
     symbols: Option<SymbolSums<'c>>,
 }
 
-/// A retained generator comparison: the source Holon's moment and phase-weighted condition,
-/// fixed in the passage length. It holds no field cut, material view, anchor or output.
-pub(crate) struct GeneratorMomentComparison<'c> {
+/// The declaration of a retained ordered passage: its binding and the clock witnesses at which
+/// it was read.
+#[derive(Clone)]
+pub(crate) struct RetainedPassage {
     meta: GeneratorSourceMomentMeta,
     witnesses: Vec<GeneratorSourceClockWitness>,
+}
+
+/// [definition] **An outstanding comparison**: its producing operands (a prepared boundary, or a
+/// passage's moment/condition or symbol sums with their declaration), the receiver restrictions
+/// and the material cut id it was produced at — fixed in the passage length and holding no field
+/// cut, material view, anchor, solver iterate or output. It is read at the contemporary
+/// constitution when observed.
+pub(crate) struct RetainedComparison<'c> {
+    passage: Option<RetainedPassage>,
     source: ComparisonSource<'c>,
     held: Vec<bool>,
     admitted: Vec<Vec<bool>>,
@@ -90,9 +112,10 @@ pub(crate) struct GeneratorMomentComparison<'c> {
     epoch: u64,
 }
 
-impl<'c> GeneratorMomentComparison<'c> {
-    pub(super) fn meta(&self) -> &GeneratorSourceMomentMeta {
-        &self.meta
+impl<'c> RetainedComparison<'c> {
+    /// The passage declaration; `None` for a prepared boundary.
+    pub(super) fn meta(&self) -> Option<&GeneratorSourceMomentMeta> {
+        self.passage.as_ref().map(|p| &p.meta)
     }
     pub(super) fn source(&self) -> &ComparisonSource<'c> {
         &self.source
@@ -106,12 +129,9 @@ impl<'c> GeneratorMomentComparison<'c> {
     pub(super) fn epoch(&self) -> u64 {
         self.epoch
     }
-}
-
-/// A retained comparison of either kind.
-pub(super) enum RetainedComparison<'c> {
-    Word(Rc<IncidentWord<'c>>),
-    Moment(Rc<GeneratorMomentComparison<'c>>),
+    pub(super) fn is_passage(&self) -> bool {
+        self.passage.is_some()
+    }
 }
 
 /// A source passage accumulated through the machine's source maps without running the incident
@@ -256,6 +276,7 @@ impl<'c> IncidentFieldModel<'c> {
         let held = vec![false; accumulated.view().components() / 2];
         let word = IncidentWord {
             source_moment: None,
+            boundary: None,
             external_condition: None,
             machine: self.layout.machine.clone(),
             source,
@@ -330,6 +351,7 @@ impl<'c> IncidentFieldModel<'c> {
                 moment,
                 symbols: None,
             }),
+            boundary: None,
             external_condition: condition,
             machine: self.layout.machine.clone(),
             source: source.retained_clone(),
@@ -346,50 +368,86 @@ impl<'c> IncidentFieldModel<'c> {
         })
     }
 
-    /// The form a comparison retains. A moment word keeps its source Holon (`m`, `c`,
-    /// declaration) only; other words keep their recorded producing cut.
+    /// The form a comparison retains: its producing operands, never its producing cut. A
+    /// passage keeps its source Holon (`m`, `c` or the symbol sums, and the declaration); a
+    /// prepared word keeps the boundary its caller supplied.
     pub(super) fn retained_comparison(
         &self,
         word: &Rc<IncidentWord<'c>>,
     ) -> Result<RetainedComparison<'c>, NativeSessionError> {
-        let Some(moment) = &word.source_moment else {
-            return Ok(RetainedComparison::Word(Rc::clone(word)));
+        let (passage, source) = match &word.source_moment {
+            None => (
+                None,
+                ComparisonSource::Boundary(Rc::clone(word.boundary.as_ref().ok_or_else(
+                    || invalid("a received moment Holon is not a retainable comparison"),
+                )?)),
+            ),
+            Some(moment) => (
+                Some(RetainedPassage {
+                    meta: moment.meta.clone(),
+                    witnesses: moment.witnesses.clone(),
+                }),
+                match &moment.symbols {
+                    Some(sums) => ComparisonSource::Symbols(sums.clone()),
+                    None => ComparisonSource::Rows {
+                        moment: Rc::clone(&moment.moment),
+                        condition: word.external_condition.clone(),
+                    },
+                },
+            ),
         };
-        let source = match &moment.symbols {
-            Some(sums) => ComparisonSource::Symbols(sums.clone()),
-            None => ComparisonSource::Rows {
-                moment: Rc::clone(&moment.moment),
-                condition: word.external_condition.clone(),
-            },
-        };
-        Ok(RetainedComparison::Moment(Rc::new(
-            GeneratorMomentComparison {
-                meta: moment.meta.clone(),
-                witnesses: moment.witnesses.clone(),
-                source,
-                held: word.held.clone(),
-                admitted: word.admitted.clone(),
-                epoch: word.epoch,
-            },
-        )))
+        Ok(RetainedComparison {
+            passage,
+            source,
+            held: word.held.clone(),
+            admitted: word.admitted.clone(),
+            epoch: word.epoch,
+        })
     }
 
-    /// Rebuild a retained moment comparison from its rest operands.
-    pub(super) fn remount_moment_comparison(
+    /// Rebuild a retained comparison from its rest operands, validating its chart against this
+    /// body. A passage carries its declaration; a prepared boundary carries none.
+    pub(super) fn remount_comparison(
         &self,
-        meta: GeneratorSourceMomentMeta,
+        meta: Option<GeneratorSourceMomentMeta>,
         source: ComparisonSource<'c>,
         held: Vec<bool>,
         admitted: Vec<Vec<bool>>,
         epoch: u64,
-    ) -> Result<GeneratorMomentComparison<'c>, NativeSessionError> {
-        let witnesses = self.validate_source_meta(&meta)?;
+    ) -> Result<RetainedComparison<'c>, NativeSessionError> {
         let boundary = self
             .layout
             .sites
             .len()
             .checked_mul(self.layout.width)
-            .ok_or_else(|| invalid("generator moment boundary extent"))?;
+            .ok_or_else(|| invalid("retained comparison boundary extent"))?;
+        if admitted.len() != self.layout.sites.len()
+            || admitted
+                .iter()
+                .zip(&self.layout.sites)
+                .any(|(a, site)| a.len() != site.sources.len() || !a.iter().any(|v| *v))
+        {
+            return Err(invalid("retained comparison admitted contacts"));
+        }
+        let Some(meta) = meta else {
+            let ComparisonSource::Boundary(prepared) = &source else {
+                return Err(invalid("a passage comparison requires its declaration"));
+            };
+            if prepared.view().components() != boundary
+                || held.len() < boundary / 2
+                || held[boundary / 2..].iter().any(|v| *v)
+            {
+                return Err(invalid("retained boundary comparison chart"));
+            }
+            return Ok(RetainedComparison {
+                passage: None,
+                source,
+                held,
+                admitted,
+                epoch,
+            });
+        };
+        let witnesses = self.validate_source_meta(&meta)?;
         let ports = self.layout.source_condition_ports;
         let s = meta.binding.injection_sites.len();
         let chart = match (&source, meta.alphabet) {
@@ -416,17 +474,56 @@ impl<'c> IncidentFieldModel<'c> {
             }
             _ => false,
         };
-        if !chart || held.iter().any(|v| *v) || admitted.len() != self.layout.sites.len() {
+        if !chart || held.iter().any(|v| *v) {
             return Err(invalid("generator moment comparison chart"));
         }
-        Ok(GeneratorMomentComparison {
-            meta,
-            witnesses,
+        Ok(RetainedComparison {
+            passage: Some(RetainedPassage { meta, witnesses }),
             source,
             held,
             admitted,
             epoch,
         })
+    }
+
+    /// Convert a retired `\x02` source tape into its passage comparison: the tape's encoded rows
+    /// are the retained operands; `m` and `c` are accumulated through this body's source maps (the
+    /// contemporary law), and every per-occurrence word of the tape is dropped.
+    pub(super) fn comparison_from_tape(
+        &self,
+        binding: GeneratorSourceBinding,
+        start: u64,
+        encoded: &ResidentNormalEnclosureSection<'c>,
+        contacts: &[GeneratorSourceContact],
+        joint: usize,
+        admitted: Vec<Vec<bool>>,
+        epoch: u64,
+    ) -> Result<RetainedComparison<'c>, NativeSessionError> {
+        let meta = GeneratorSourceMomentMeta {
+            contact_counts: contact_counts(&binding.contact_kinds, contacts),
+            binding,
+            start,
+            rows: encoded.rows(),
+            components: encoded.components(),
+            alphabet: None,
+            present_symbols: Vec::new(),
+        };
+        if meta.rows == 0 {
+            return Err(invalid("generator source tape rows"));
+        }
+        self.validate_source_meta(&meta)?;
+        let maps = self.source_maps(&meta, encoded.grain())?;
+        let ports = source_ports(&meta.binding.contact_kinds, &meta.binding.offsets)?;
+        let condition =
+            phase_weighted_source_condition(&maps, encoded, &ports, contacts)?.map(Rc::new);
+        let moment = Rc::new(maps.moment(encoded)?);
+        self.remount_comparison(
+            Some(meta),
+            ComparisonSource::Rows { moment, condition },
+            vec![false; joint / 2],
+            admitted,
+            epoch,
+        )
     }
 
     /// Read a symbol passage's `m` and `c` through the table `E` (`|A| × 6S`).
@@ -513,6 +610,7 @@ impl<'c> IncidentFieldModel<'c> {
                 moment,
                 symbols: Some(sums),
             }),
+            boundary: None,
             external_condition: condition,
             machine: self.layout.machine.clone(),
             source: source.retained_clone(),
@@ -563,16 +661,42 @@ impl<'c> IncidentFieldModel<'c> {
         Ok(SymbolSums { moment, ports })
     }
 
-    /// The one incident word of a retained comparison at the contemporary constitution: the
-    /// anchor is re-read as `P((L^N q₀(now) + m) ⊕ b₀(now))` and the word is evaluated through
-    /// the contemporary field and material. A symbol passage re-reads `m` and `c` through the
-    /// supplied contemporary encoder table, so `q₀`, `M`, `E` are all read at one cut. Its
-    /// epoch is the contemporary material cut.
+    /// The one incident word of a retained comparison at the contemporary constitution. A
+    /// prepared boundary is read as `P(boundary ⊕ b₀(now))`, exactly as `prepare_incident_field`
+    /// reads a fresh boundary. A passage's anchor is re-read as `P((L^N q₀(now) + m) ⊕ b₀(now))`
+    /// and a symbol passage re-reads `m` and `c` through the supplied contemporary encoder table,
+    /// so `q₀`, `M`, `E` are all read at one cut. The word is evaluated through the contemporary
+    /// field and material; its epoch is the contemporary material cut.
     pub(super) fn contemporary_word(
         &mut self,
-        comparison: &GeneratorMomentComparison<'c>,
+        comparison: &RetainedComparison<'c>,
         table: Option<&ResidentNormalEnclosureSection<'c>>,
     ) -> Result<IncidentWord<'c>, NativeSessionError> {
+        let passage = match (&comparison.passage, &comparison.source) {
+            (None, ComparisonSource::Boundary(boundary)) => {
+                if table.is_some() {
+                    return Err(invalid(
+                        "a prepared-boundary comparison has no symbol sums to read a table through",
+                    ));
+                }
+                let width = boundary.view().components() / 2;
+                if comparison.held.len() < width {
+                    return Err(invalid(
+                        "contemporary field differs from the comparison chart",
+                    ));
+                }
+                let boundary = Rc::clone(boundary);
+                return self.word_at(
+                    boundary.view(),
+                    &comparison.held[..width],
+                    comparison.admitted.clone(),
+                );
+            }
+            (Some(passage), ComparisonSource::Rows { .. } | ComparisonSource::Symbols(_)) => {
+                passage.clone()
+            }
+            _ => return Err(invalid("retained comparison source/declaration kind")),
+        };
         let source = self.field.read_current_source()?;
         let joint = source.boundary_components() + source.internal_components();
         if comparison.held.len() != joint / 2 {
@@ -586,14 +710,14 @@ impl<'c> IncidentFieldModel<'c> {
             .map(ResidentNormalMaterial::retained_view)
             .collect::<Vec<_>>();
         let grain = source.enclosure().grain();
-        let maps = self.source_maps(comparison.meta(), grain)?;
+        let maps = self.source_maps(&passage.meta, grain)?;
         let (moment, condition, symbols) = match (&comparison.source, table) {
             (ComparisonSource::Rows { moment, condition }, None) => {
                 (Rc::clone(moment), condition.clone(), None)
             }
             (ComparisonSource::Symbols(sums), Some(table)) => {
                 let (moment, condition) =
-                    self.read_symbol_sums(&maps, &comparison.meta, sums, table)?;
+                    self.read_symbol_sums(&maps, &passage.meta, sums, table)?;
                 (moment, condition, Some(sums.clone()))
             }
             (ComparisonSource::Symbols(_), None) => {
@@ -601,10 +725,13 @@ impl<'c> IncidentFieldModel<'c> {
                     "a symbol comparison is read through the contemporary encoder table: use contemporary_symbol_comparison",
                 ));
             }
-            (ComparisonSource::Rows { .. }, Some(_)) => {
+            (ComparisonSource::Rows { .. } | ComparisonSource::Boundary(_), Some(_)) => {
                 return Err(invalid(
                     "an encoded-row comparison has no symbol sums to read a table through",
                 ));
+            }
+            (ComparisonSource::Boundary(_), None) => {
+                return Err(invalid("retained comparison source/declaration kind"));
             }
         };
         let anchor = self.moment_anchor(&maps, &source, &moment)?;
@@ -618,11 +745,12 @@ impl<'c> IncidentFieldModel<'c> {
         )?;
         Ok(IncidentWord {
             source_moment: Some(GeneratorSourceMoment {
-                meta: comparison.meta.clone(),
-                witnesses: comparison.witnesses.clone(),
+                meta: passage.meta,
+                witnesses: passage.witnesses,
                 moment,
                 symbols,
             }),
+            boundary: None,
             external_condition: condition,
             machine: self.layout.machine.clone(),
             source,
@@ -645,11 +773,43 @@ impl<'c> IncidentFieldModel<'c> {
         table: Option<&ResidentNormalEnclosureSection<'c>>,
     ) -> Result<IncidentWord<'c>, NativeSessionError> {
         let comparison = Rc::clone(
-            self.moments
+            self.comparisons
                 .get(&id)
-                .ok_or_else(|| invalid("unknown generator moment comparison"))?,
+                .ok_or_else(|| invalid("unknown incident comparison"))?,
         );
         self.contemporary_word(&comparison, table)
+    }
+
+    /// A retained prepared-boundary comparison read at one contemporary cut through a boundary
+    /// its source owner supplies again (for example re-encoded through its contemporary encoder
+    /// and the current boundary). The receiver restrictions are the retained ones; `held` must
+    /// equal them.
+    pub(super) fn contemporary_boundary_word(
+        &mut self,
+        id: u64,
+        boundary: ResidentNormalEnclosureView<'_, 'c>,
+        held: &[bool],
+    ) -> Result<IncidentWord<'c>, NativeSessionError> {
+        let comparison = Rc::clone(
+            self.comparisons
+                .get(&id)
+                .ok_or_else(|| invalid("unknown incident comparison"))?,
+        );
+        let ComparisonSource::Boundary(retained) = &comparison.source else {
+            return Err(invalid(
+                "a passage comparison is re-read from its moment, not a supplied boundary",
+            ));
+        };
+        let width = retained.view().components() / 2;
+        if boundary.components() != retained.view().components()
+            || held.len() != width
+            || comparison.held[..width] != *held
+        {
+            return Err(invalid(
+                "supplied boundary differs from the retained comparison chart",
+            ));
+        }
+        self.word_at(boundary, held, comparison.admitted.clone())
     }
 
     #[cfg_attr(not(test), allow(dead_code))]
@@ -856,10 +1016,10 @@ impl<'c> NativeCoupledBody<'c> {
             return Err(invalid("target Holon requires its incident body"));
         };
         let meta = model
-            .moments
+            .comparisons
             .get(&id)
+            .and_then(|c| c.meta())
             .ok_or_else(|| invalid("unknown generator moment comparison"))?
-            .meta()
             .clone();
         if meta.alphabet != Some(table.rows()) {
             return Err(invalid(
@@ -898,9 +1058,11 @@ impl<'c> NativeCoupledBody<'c> {
         holon.receive_moment_phases(binding)
     }
 
-    /// A retained generator comparison read at the contemporary constitution: one incident
-    /// word on `P((L^N q₀(now) + m) ⊕ b₀(now); c)` through the current field and material.
-    /// Receive, compare and pull back this word to stay at one cut.
+    /// A retained comparison read at the contemporary constitution: one incident word through
+    /// the current field and material, on `P(boundary ⊕ b₀(now))` for a prepared boundary and on
+    /// `P((L^N q₀(now) + m) ⊕ b₀(now); c)` for an encoded-row passage. Receive, compare and pull
+    /// back this word to stay at one cut. A delayed comparison read here equals an immediate one
+    /// produced from the same operands at this constitution, number for number.
     pub fn contemporary_incident_comparison(
         &mut self,
         id: u64,
@@ -1008,10 +1170,10 @@ impl<'c> NativeCoupledBody<'c> {
     ) -> Result<GeneratorSourceMomentMeta, NativeSessionError> {
         match self.state()? {
             BodyState::Incident(model) => Ok(model
-                .moments
+                .comparisons
                 .get(&id)
+                .and_then(|c| c.meta())
                 .ok_or_else(|| invalid("unknown generator moment comparison"))?
-                .meta()
                 .clone()),
             _ => Err(invalid("incident comparison requires its model chart")),
         }
@@ -1019,9 +1181,32 @@ impl<'c> NativeCoupledBody<'c> {
 
     /// Prepare the material return of a generator comparison at the cut of `contemporary`
     /// (from `contemporary_incident_comparison`/`contemporary_output`), with the passage's
-    /// declared per-edge contact relation. The cut must still be current: same material epoch
-    /// and the same field current.
+    /// declared per-edge contact relation. The same one-cut return as
+    /// [`Self::prepare_contemporary_material_return`] for a passage comparison.
     pub fn prepare_generator_material_return(
+        &mut self,
+        contemporary: &NativeIncidentGenerated<'c>,
+        output_covector: ResidentNormalEnclosureView<'_, 'c>,
+        step_bits: u32,
+        contacts: &[GeneratorSourceContact],
+    ) -> Result<NativeIncidentMaterialReturn<'c>, NativeSessionError> {
+        if contemporary.word.source_moment.is_none() {
+            return Err(invalid("unknown generator moment comparison"));
+        }
+        self.prepare_contemporary_material_return(
+            contemporary,
+            output_covector,
+            step_bits,
+            contacts,
+        )
+    }
+
+    /// Prepare the material return of any retained comparison at the cut of `contemporary` (a
+    /// word read at the contemporary constitution: `contemporary_incident_comparison`,
+    /// `contemporary_symbol_comparison` or `contemporary_incident_comparison_at`). The cut must
+    /// still be current: same material epoch and the same field current. A passage supplies its
+    /// declared per-edge contact relation; a prepared boundary supplies none.
+    pub fn prepare_contemporary_material_return(
         &mut self,
         contemporary: &NativeIncidentGenerated<'c>,
         output_covector: ResidentNormalEnclosureView<'_, 'c>,
@@ -1030,13 +1215,16 @@ impl<'c> NativeCoupledBody<'c> {
     ) -> Result<NativeIncidentMaterialReturn<'c>, NativeSessionError> {
         let id = contemporary
             .comparison
-            .ok_or_else(|| invalid("contemporary generator word has no comparison"))?;
+            .ok_or_else(|| invalid("contemporary word has no comparison"))?;
         {
             let BodyState::Incident(model) = self.state_mut()? else {
                 return Err(invalid("incident return requires its model chart"));
             };
-            if !model.moments.contains_key(&id) || contemporary.word.source_moment.is_none() {
-                return Err(invalid("unknown generator moment comparison"));
+            let kind_agrees = model.comparisons.get(&id).is_some_and(|comparison| {
+                comparison.is_passage() == contemporary.word.source_moment.is_some()
+            });
+            if !kind_agrees {
+                return Err(invalid("unknown incident comparison"));
             }
             let current = model.field.read_current_source()?;
             if contemporary.word.epoch != model.epoch
@@ -1045,7 +1233,7 @@ impl<'c> NativeCoupledBody<'c> {
                     != contemporary.word.source.enclosure().inspect()?
             {
                 return Err(invalid(
-                    "generator comparison was read at an earlier cut; read it again at the contemporary constitution",
+                    "the comparison was read at an earlier cut; read it again at the contemporary constitution",
                 ));
             }
         }
@@ -1056,6 +1244,25 @@ impl<'c> NativeCoupledBody<'c> {
             step_bits,
             contacts,
         )
+    }
+
+    /// A retained prepared-boundary comparison read at one contemporary cut through a boundary
+    /// its source owner supplies again (the session re-encodes its source cells through the
+    /// contemporary encoder onto the current boundary). The retained `admitted` restriction
+    /// applies; `held` must equal the retained receiver mask.
+    pub fn contemporary_incident_comparison_at(
+        &mut self,
+        id: u64,
+        boundary: ResidentNormalEnclosureView<'_, 'c>,
+        held: &[bool],
+    ) -> Result<NativeIncidentGenerated<'c>, NativeSessionError> {
+        let BodyState::Incident(model) = self.state_mut()? else {
+            return Err(invalid("incident comparison requires its model chart"));
+        };
+        Ok(NativeIncidentGenerated {
+            word: Rc::new(model.contemporary_boundary_word(id, boundary, held)?),
+            comparison: Some(id),
+        })
     }
 }
 
@@ -1125,11 +1332,12 @@ impl<'c> NativeIncidentGenerated<'c> {
     }
 }
 
-impl<'c> GeneratorMomentComparison<'c> {
+impl<'c> RetainedComparison<'c> {
     #[cfg_attr(not(test), allow(dead_code))]
     /// Resident sections and canonical rest octets this retained comparison holds.
     pub(crate) fn retained_operand_census(&self) -> Result<Value, NativeSessionError> {
         let (first, second) = match &self.source {
+            ComparisonSource::Boundary(boundary) => (boundary.rest()?, None),
             ComparisonSource::Rows { moment, condition } => (
                 moment.rest()?,
                 condition.as_ref().map(|c| c.rest()).transpose()?,
@@ -1145,22 +1353,26 @@ impl<'c> GeneratorMomentComparison<'c> {
             octets += second.canonical_bytes().map_err(invalid)?.len();
             sections += 1;
         }
+        let (rows, alphabet) = match self.meta() {
+            Some(meta) => (Some(meta.rows), meta.alphabet),
+            None => (None, None),
+        };
         Ok(json!({"sections": sections, "octets": octets,
             "solver_iterates": 0, "material_views": 0, "field_cuts": 0,
-            "source_rows": self.meta.rows, "alphabet": self.meta.alphabet}))
+            "source_rows": rows, "alphabet": alphabet}))
     }
 }
 
 impl<'c> NativeCoupledBody<'c> {
     #[cfg_attr(not(test), allow(dead_code))]
-    /// Census of a retained generator comparison: resident sections, rest octets and the
-    /// producing-cut objects it holds (always zero solver iterates, material views, field cuts).
+    /// Census of a retained comparison: resident sections, rest octets and the producing-cut
+    /// objects it holds (always zero solver iterates, material views, field cuts).
     pub(crate) fn generator_comparison_census(&self, id: u64) -> Result<Value, NativeSessionError> {
         match self.state()? {
             BodyState::Incident(model) => model
-                .moments
+                .comparisons
                 .get(&id)
-                .ok_or_else(|| invalid("unknown generator moment comparison"))?
+                .ok_or_else(|| invalid("unknown incident comparison"))?
                 .retained_operand_census(),
             _ => Err(invalid("incident comparison requires its model chart")),
         }

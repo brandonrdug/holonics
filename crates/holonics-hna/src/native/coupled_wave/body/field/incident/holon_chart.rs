@@ -20,9 +20,22 @@
 //! stage's law, `y − p = K(c) x̄ + W_c c` (`Holon/Law.lean::advance_law`,
 //! `Holon/Cayley.lean::midpoint_reaction_balance`); [`ResidentHolonChart::reaction_holon`] is that
 //! Holon, and the chart-square test checks that its exact advance lies in the ball the device word
-//! returned. Scope: the square is stated and tested for the reaction stage; the participation drive
-//! (an exterior receiver), the `S_D` reflection and the held relaxation are not yet charted here.
-#![allow(dead_code)] // consumed by its conformance square; `NativeCoupledBody` delegation is owed
+//! returned.
+//!
+//! [definition] **Delegation (plan phase 12a).** The incident body's host-side law goes through
+//! this chart's core facets wherever it computes the same thing:
+//!
+//! | Body operation | Core facet | Where |
+//! |---|---|---|
+//! | the committed word's reaction balance (`energy.rs`) | the ring Holon's step balance `EnergyBalance` | [`ResidentHolonChart::reaction_step_balance`]; equal to `HolonLaw::advance`'s balance on an exact step |
+//! | interaction of rings and pair contacts | `Holon::interconnect` of the ring Holons with the contact junction at their storage taps | [`ResidentHolonChart::holon`] |
+//! | reception through ordered phase ports | the passive coholon `C x` (`law::receiver::PassiveCoholon`) | [`ResidentHolonChart::phase_reception`]; `receive_generator_phases` mounts its maps |
+//! | the receiver's covector return | the port-map pullback `Cᵀ g` (`restriction::PortMap::pull_effort`) | [`PhaseReception::pull_back`] |
+//!
+//! The device word itself (participation, Cayley stage, projection, `S_D`, relaxation) stays the
+//! resident realization; the chart owes "exact reference ∈ returned ball", tested per facet.
+#![allow(dead_code)] // the device word is the realization; the exact facets serve its squares
+use super::machine_receiving::receiving_current_map;
 use super::*;
 use crate::native::field_geometry::machine::CompiledGeneratorMachine;
 use holonic_core::dirac::DiracStructure;
@@ -30,10 +43,12 @@ use holonic_core::element::ResistiveRelation;
 use holonic_core::exact_linear::ExactRatMatrix;
 use holonic_core::holon::{Holon, PortCounts, PortHolon};
 use holonic_core::inertia::SymmetricForm;
-use holonic_core::law::{ReferenceHolon, Scheme};
+use holonic_core::law::receiver::PassiveCoholon;
+use holonic_core::law::{EnergyBalance, PassiveReading, ReferenceHolon, Scheme};
+use holonic_core::restriction::PortMap;
 use holonic_engine::native_ecology::constitutive_fibre::PowerNeutralCertificate;
 use num_traits::{One, Zero};
-use relational_geometry::Rat;
+use relational_geometry::{AffineMap3, Rat};
 
 /// One arc's contact in the resident chart.
 #[derive(Clone, Debug)]
@@ -78,8 +93,70 @@ impl<'a> RingReaction<'a> {
     }
 }
 
+/// One ring's reaction on the interleaved real chart (`[re₀, im₀, re₁, im₁, …]`): the realified
+/// linear self-relation `W_s`, the modulated slices `J(c) = Σ_r c_r A_r` and the contrast input
+/// `B = realify W_c` on the `k` real contrast coordinates.
+struct RingParts {
+    self_relation: ExactRatMatrix,
+    modulation: ExactRatMatrix,
+    input: ExactRatMatrix,
+}
+
+/// The ordered phase reception of a machine: for every aperture row and port, the receiving
+/// site and its current map `L^j` (the linear part of the site's action power; a current is a
+/// tangent). `receive_generator_phases` mounts exactly these maps on the device.
+#[derive(Clone, Debug)]
+pub struct PhaseReception {
+    sites: usize,
+    width: usize,
+    pub source_indices: Vec<usize>,
+    pub maps: Vec<AffineMap3>,
+}
+
 fn rat_err(e: impl ToString) -> NativeSessionError {
     invalid(e.to_string())
+}
+
+impl PhaseReception {
+    /// The exact reader `C : (sites·12) → (rows·12)` on the resident rings: row block `r` reads
+    /// its site's original coordinates `re = (x₀, x₂, x₄)`, `im = (x₁, x₃, x₅)` (resident real
+    /// index `2i` for original coordinate `i`) and returns `L re`, `L im` on the real faces.
+    pub fn reader(&self) -> Result<ExactRatMatrix, NativeSessionError> {
+        let columns = self.sites * self.width;
+        let mut rows = vec![vec![Rat::zero(); columns]; self.maps.len() * self.width];
+        for (block, (site, map)) in self.source_indices.iter().zip(&self.maps).enumerate() {
+            let linear = &map.linear;
+            for part in 0..2 {
+                for a in 0..3 {
+                    for b in 0..3 {
+                        let value = linear.rows[a][b].clone();
+                        if !value.is_zero() {
+                            rows[block * self.width + 2 * (2 * a + part)]
+                                [site * self.width + 2 * (2 * b + part)] = value;
+                        }
+                    }
+                }
+            }
+        }
+        ExactRatMatrix::shaped(self.maps.len() * self.width, columns, rows).map_err(rat_err)
+    }
+
+    /// **receive**: the passive coholon on the rings' storage effort. With the unit storage
+    /// pairing the effort is the current `x` itself, so the reading is `C x` at zero power
+    /// (`Holon/Law.lean::passive_reading`).
+    pub fn receive(&self, current: &[Rat]) -> Result<PassiveReading, NativeSessionError> {
+        PassiveCoholon::new("generator-phases", self.reader()?)
+            .read(current)
+            .map_err(rat_err)
+    }
+
+    /// **pullback**: a covector on the received rows returns to the rings by `Cᵀ`
+    /// (`Holon/Law.lean::pullback_law`).
+    pub fn pull_back(&self, covector: &[Rat]) -> Result<Vec<Rat>, NativeSessionError> {
+        PortMap::new(self.reader()?)
+            .pull_effort(covector)
+            .map_err(rat_err)
+    }
 }
 
 impl ResidentHolonChart {
@@ -140,16 +217,10 @@ impl ResidentHolonChart {
         &self.contacts
     }
 
-    /// `(Ω, R, B)` of one ring's reaction on the interleaved real chart: `Ω = realify(skew W_s +
-    /// J(c))` (real skew), `R = −realify(herm W_s)` (PSD by the certificate) and `B = realify W_c`
-    /// on the `k` real contrast coordinates.
-    fn ring_blocks(
-        &self,
-        reaction: &RingReaction<'_>,
-    ) -> Result<(ExactRatMatrix, ExactRatMatrix, ExactRatMatrix), NativeSessionError> {
+    /// The ring's realified reaction parts (see [`RingParts`]).
+    fn ring_parts(reaction: &RingReaction<'_>) -> Result<RingParts, NativeSessionError> {
         let (n, k) = (reaction.n, reaction.k);
-        if 2 * n != self.width
-            || reaction.contrast.len() != k
+        if reaction.contrast.len() != k
             || reaction.coefficients.len() != n
             || reaction
                 .coefficients
@@ -166,9 +237,8 @@ impl ResidentHolonChart {
                 Rat::from_integer(im.clone()) / &unit,
             )
         };
-        // K = W_s + J(c) as complex entries.
-        let k_entry = |a: usize, b: usize| -> (Rat, Rat) {
-            let (mut re, mut im) = coefficient(a, b);
+        let modulated = |a: usize, b: usize| -> (Rat, Rat) {
+            let (mut re, mut im) = (Rat::zero(), Rat::zero());
             for (r, c) in reaction.contrast.iter().enumerate() {
                 let (sr, si) = coefficient(a, n + k / 2 + r * n + b);
                 re += c * sr;
@@ -189,13 +259,6 @@ impl ResidentHolonChart {
             }
             ExactRatMatrix::shaped(2 * n, 2 * columns, rows).map_err(rat_err)
         };
-        let kr = realify(&k_entry, n)?;
-        let half = Rat::new(1.into(), 2.into());
-        let kt = kr.transpose().map_err(rat_err)?;
-        // Ω = (K − Kᵀ)/2, R = −(K + Kᵀ)/2 in the realified chart (the slices are exactly skew,
-        // so the symmetric part is that of W_s).
-        let omega = kr.subtract(&kt).map_err(rat_err)?.scaled(&half);
-        let resistance = kr.add(&kt).map_err(rat_err)?.scaled(&(-half));
         // B maps real contrast coordinate c_(2m) ↦ W_c[:,m], c_(2m+1) ↦ i W_c[:,m].
         let mut b_rows = vec![vec![Rat::zero(); k]; 2 * n];
         for a in 0..n {
@@ -207,10 +270,75 @@ impl ResidentHolonChart {
                 b_rows[2 * a + 1][2 * m + 1] = x;
             }
         }
-        Ok((
-            omega,
-            resistance,
-            ExactRatMatrix::shaped(2 * n, k, b_rows).map_err(rat_err)?,
+        Ok(RingParts {
+            self_relation: realify(&coefficient, n)?,
+            modulation: realify(&modulated, n)?,
+            input: ExactRatMatrix::shaped(2 * n, k, b_rows).map_err(rat_err)?,
+        })
+    }
+
+    /// `(Ω, R, B)` of one ring's reaction on the interleaved real chart: `Ω = realify(skew W_s +
+    /// J(c))` (real skew), `R = −realify(herm W_s)` (PSD by the certificate) and `B = realify W_c`
+    /// on the `k` real contrast coordinates.
+    fn ring_blocks(
+        &self,
+        reaction: &RingReaction<'_>,
+    ) -> Result<(ExactRatMatrix, ExactRatMatrix, ExactRatMatrix), NativeSessionError> {
+        if 2 * reaction.n != self.width {
+            return Err(invalid("ring reaction extent"));
+        }
+        let parts = Self::ring_parts(reaction)?;
+        let kr = parts
+            .self_relation
+            .add(&parts.modulation)
+            .map_err(rat_err)?;
+        let half = Rat::new(1.into(), 2.into());
+        let kt = kr.transpose().map_err(rat_err)?;
+        // Ω = (K − Kᵀ)/2, R = −(K + Kᵀ)/2 in the realified chart (the slices are exactly skew,
+        // so the symmetric part is that of W_s).
+        let omega = kr.subtract(&kt).map_err(rat_err)?.scaled(&half);
+        let resistance = kr.add(&kt).map_err(rat_err)?.scaled(&(-half));
+        Ok((omega, resistance, parts.input))
+    }
+
+    /// **The ring's step balance** (the advance facet read on a supplied step): the core
+    /// `EnergyBalance` of one reaction step `p ↦ y` on the interleaved real chart, with
+    /// `x̄ = (p + y)/2` and the step's residual `ρ = p − y + (W_s + J(c)) x̄ + B c`:
+    /// `½|y|² − ½|p|² = −⟨x̄, R x̄⟩ + ⟨x̄, B c⟩ + ⟨x̄, J(c) x̄⟩ − ⟨x̄, ρ⟩`, returned as
+    /// `dissipated = −⟨x̄, W_s x̄⟩`, `port = ⟨x̄, B c⟩`, `active = ⟨x̄, J(c) x̄⟩` (exactly `0` for
+    /// exactly skew slices) and `discretization_defect = −⟨x̄, ρ⟩`; the residual is computed and is
+    /// `0`. On the exact implicit-midpoint step (`ρ = 0`) it is the balance
+    /// [`Self::reaction_holon`]'s `HolonLaw::advance` returns.
+    pub fn reaction_step_balance(
+        reaction: &RingReaction<'_>,
+        drive: &[Rat],
+        step: &[Rat],
+    ) -> Result<EnergyBalance, NativeSessionError> {
+        let parts = Self::ring_parts(reaction)?;
+        let width = 2 * reaction.n;
+        if drive.len() != width || step.len() != width {
+            return Err(invalid("reaction balance extent"));
+        }
+        let half = Rat::new(1.into(), 2.into());
+        let dot = |a: &[Rat], b: &[Rat]| -> Rat { a.iter().zip(b).map(|(x, y)| x * y).sum() };
+        let xbar = drive
+            .iter()
+            .zip(step)
+            .map(|(p, y)| (p + y) * &half)
+            .collect::<Vec<_>>();
+        let ws = parts.self_relation.apply(&xbar).map_err(rat_err)?;
+        let j = parts.modulation.apply(&xbar).map_err(rat_err)?;
+        let bc = parts.input.apply(reaction.contrast).map_err(rat_err)?;
+        let rho = (0..width)
+            .map(|i| &drive[i] - &step[i] + &ws[i] + &j[i] + &bc[i])
+            .collect::<Vec<_>>();
+        Ok(EnergyBalance::closed(
+            (dot(step, step) - dot(drive, drive)) * &half,
+            -dot(&xbar, &ws),
+            dot(&xbar, &bc),
+            dot(&xbar, &j),
+            Rat::zero(),
+            -dot(&xbar, &rho),
         ))
     }
 
@@ -220,7 +348,42 @@ impl ResidentHolonChart {
         &self,
         reaction: &RingReaction<'_>,
     ) -> Result<ReferenceHolon, NativeSessionError> {
+        ReferenceHolon::new(self.ring_holon(reaction, false)?, Rat::one(), Scheme::Midpoint)
+            .map_err(rat_err)
+    }
+
+    /// One ring as a Holon: the medium `f_S = −Ω e_S − e_R − B e_P` with its reaction
+    /// resistance, unit storage and contrast ports; with `taps`, its storage effort is also
+    /// exposed on `width` further external ports (`f_T = e_S`, `f_S ∋ −e_T`), where pair
+    /// contacts join it.
+    fn ring_holon(
+        &self,
+        reaction: &RingReaction<'_>,
+        taps: bool,
+    ) -> Result<Holon, NativeSessionError> {
         let (omega, resistance, input) = self.ring_blocks(reaction)?;
+        let input = if taps {
+            let k = input.columns();
+            let rows = (0..self.width)
+                .map(|row| {
+                    let mut entries = (0..k)
+                        .map(|m| input.get(row, m).map(Clone::clone))
+                        .collect::<Result<Vec<_>, _>>()?;
+                    entries.extend((0..self.width).map(|column| {
+                        if column == row {
+                            Rat::one()
+                        } else {
+                            Rat::zero()
+                        }
+                    }));
+                    Ok(entries)
+                })
+                .collect::<Result<Vec<_>, holonic_core::exact_linear::ExactLinearError>>()
+                .map_err(rat_err)?;
+            ExactRatMatrix::shaped(self.width, k + self.width, rows).map_err(rat_err)?
+        } else {
+            input
+        };
         let port = PortHolon::medium(
             &omega,
             &resistance,
@@ -229,63 +392,33 @@ impl ResidentHolonChart {
             false,
         )
         .map_err(rat_err)?;
-        ReferenceHolon::new(
-            Holon::new(port).map_err(rat_err)?,
-            Rat::one(),
-            Scheme::Midpoint,
-        )
-        .map_err(rat_err)
+        Holon::new(port).map_err(rat_err)
     }
 
-    /// **The machine Holon**: every ring's storage and reaction, every arc's contact, the rings'
-    /// contrast ports, on one skew interconnection (see the module header), with the sites'
-    /// generators attached.
-    pub fn holon(&self, reactions: &[RingReaction<'_>]) -> Result<Holon, NativeSessionError> {
-        if reactions.len() != self.sites {
-            return Err(invalid("one reaction per ring"));
-        }
-        let w = self.width;
-        let sigma = self.sites * w;
-        let blocks = reactions
-            .iter()
-            .map(|r| self.ring_blocks(r))
-            .collect::<Result<Vec<_>, _>>()?;
-        let mu: usize = blocks.iter().map(|b| b.2.columns()).sum();
-        let rho = sigma + 3 * self.contacts.len();
-        let total = sigma + rho + mu;
-        let mut s = vec![vec![Rat::zero(); total]; total];
-        let mut port_at = sigma + rho;
+    /// The pair contacts as one junction Holon: resistive ports the three slip coordinates of
+    /// every arc (`w D`), external ports the rings' storage taps, related by the transformer
+    /// `f_R = −G f_P`, `e_P = Gᵀ e_R` with `G` the stacked slips — power neutral:
+    /// `⟨e_R, f_R⟩ + ⟨e_P, f_P⟩ = −⟨e_R, G f_P⟩ + ⟨Gᵀ e_R, f_P⟩ = 0`.
+    fn contact_junction(&self) -> Result<Holon, NativeSessionError> {
+        let sigma = self.sites * self.width;
+        let rho = 3 * self.contacts.len();
+        let ports = rho + sigma;
+        let mut flow = vec![vec![Rat::zero(); ports]; ports];
+        let mut effort = vec![vec![Rat::zero(); ports]; ports];
         let mut resistance = vec![vec![Rat::zero(); rho]; rho];
-        for (site, (omega, r, b)) in blocks.iter().enumerate() {
-            let o = site * w;
-            for i in 0..w {
-                for j in 0..w {
-                    s[o + i][o + j] = -omega.get(i, j).map_err(rat_err)?.clone();
-                    resistance[o + i][o + j] = r.get(i, j).map_err(rat_err)?.clone();
-                }
-                // Reaction resistive incidence G = I on its own ring.
-                s[o + i][sigma + o + i] = -Rat::one();
-                s[sigma + o + i][o + i] = Rat::one();
-                for m in 0..b.columns() {
-                    let v = b.get(i, m).map_err(rat_err)?;
-                    s[o + i][port_at + m] = -v.clone();
-                    s[port_at + m][o + i] = v.clone();
-                }
-            }
-            port_at += b.columns();
-        }
         for (index, contact) in self.contacts.iter().enumerate() {
-            let at = sigma + sigma + 3 * index;
             for row in 0..3 {
+                let r = 3 * index + row;
+                flow[r][r] = Rat::one();
                 for column in 0..sigma {
                     let g = contact.slip.get(row, column).map_err(rat_err)?;
                     if !g.is_zero() {
-                        s[column][at + row] = -g.clone();
-                        s[at + row][column] = g.clone();
+                        flow[r][rho + column] = g.clone();
+                        effort[rho + column][r] = -g.clone();
                     }
                 }
                 for column in 0..3 {
-                    resistance[sigma + 3 * index + row][sigma + 3 * index + column] = contact
+                    resistance[r][3 * index + column] = contact
                         .resistance
                         .resistance()
                         .get(row, column)
@@ -294,25 +427,127 @@ impl ResidentHolonChart {
                 }
             }
         }
-        let structure = ExactRatMatrix::shaped(total, total, s).map_err(rat_err)?;
+        for column in 0..sigma {
+            effort[rho + column][rho + column] = Rat::one();
+        }
+        let dirac = DiracStructure::kernel_form(
+            &ExactRatMatrix::shaped(ports, ports, flow).map_err(rat_err)?,
+            &ExactRatMatrix::shaped(ports, ports, effort).map_err(rat_err)?,
+        )
+        .map_err(rat_err)?;
         let port = PortHolon::new(
-            DiracStructure::skew_graph(&structure).map_err(rat_err)?,
+            dirac,
             PortCounts {
-                storage: sigma,
+                storage: 0,
                 resistive: rho,
-                external: mu,
+                external: sigma,
                 active: 0,
             },
-            SymmetricForm::from_diagonal(vec![Rat::one(); sigma]),
+            SymmetricForm::from_diagonal(Vec::new()),
             ResistiveRelation::new(ExactRatMatrix::shaped(rho, rho, resistance).map_err(rat_err)?)
                 .map_err(rat_err)?,
         )
         .map_err(rat_err)?;
-        let mut holon = Holon::new(port).map_err(rat_err)?;
+        Holon::new(port).map_err(rat_err)
+    }
+
+    /// **The machine Holon** (the interact facet): every ring's reaction Holon, joined by
+    /// `Holon::interconnect` — the rings side by side, then the contact junction at their storage
+    /// taps — with the sites' generators attached. Its ports are the rings' storage, the rings'
+    /// reaction resistances then the arcs' contacts, and the rings' contrast ports, in site
+    /// order: the skew interconnection of the module header.
+    pub fn holon(&self, reactions: &[RingReaction<'_>]) -> Result<Holon, NativeSessionError> {
+        if reactions.len() != self.sites {
+            return Err(invalid("one reaction per ring"));
+        }
+        let mut rings: Option<Holon> = None;
+        let mut taps = Vec::with_capacity(self.sites * self.width);
+        let mut external = 0;
+        for reaction in reactions {
+            let ring = self.ring_holon(reaction, true)?;
+            let contrast = reaction.k;
+            taps.extend((0..self.width).map(|j| external + contrast + j));
+            external += contrast + self.width;
+            rings = Some(match rings {
+                None => ring,
+                Some(joined) => joined.interconnect(&ring, &[]).map_err(rat_err)?,
+            });
+        }
+        let rings = rings.ok_or_else(|| invalid("machine without rings"))?;
+        let joined = taps
+            .into_iter()
+            .enumerate()
+            .map(|(tap, port)| (port, tap))
+            .collect::<Vec<_>>();
+        let mut holon = rings
+            .interconnect(&self.contact_junction()?, &joined)
+            .map_err(rat_err)?;
         for generator in &self.generators {
             holon = holon.with_generator(generator.clone());
         }
         Ok(holon)
+    }
+
+    /// **The phase reception** of a binding (the receive facet): the receiving site and current
+    /// map `L^j` of every aperture row and port, validated against the machine. The device
+    /// reception mounts exactly these maps; [`PhaseReception::receive`] and
+    /// [`PhaseReception::pull_back`] are its exact passive coholon and pullback.
+    pub fn phase_reception(
+        machine: &CompiledGeneratorMachine,
+        binding: &GeneratorPhaseReceiverBinding,
+        width: usize,
+    ) -> Result<PhaseReception, NativeSessionError> {
+        let row_count = binding
+            .aperture
+            .checked_mul(binding.ports.len())
+            .ok_or_else(|| invalid("generator phase receiving row extent"))?;
+        if row_count > u32::MAX as usize
+            || binding.ports.len().checked_mul(12).is_none()
+            || binding.ports.len().checked_mul(12).unwrap_or(usize::MAX) > u32::MAX as usize
+        {
+            return Err(invalid("generator phase receiving extent"));
+        }
+        let last_j = i64::try_from(binding.aperture - 1).map_err(invalid)?;
+        for port in &binding.ports {
+            let site = machine
+                .sites()
+                .iter()
+                .find(|site| site.id() == port.site_id)
+                .ok_or_else(|| invalid("generator phase port site identity"))?;
+            if !site.is_receiver() {
+                return Err(invalid("generator phase port is not a receiver site"));
+            }
+            site.phase_origin_exponent()
+                .checked_add(port.origin_exponent)
+                .and_then(|value| port.step_exponent.checked_mul(last_j)?.checked_add(value))
+                .ok_or_else(|| invalid("generator phase exponent overflow"))?;
+        }
+        let mut source_indices = Vec::with_capacity(row_count);
+        let mut maps = Vec::with_capacity(row_count);
+        for j in 0..binding.aperture {
+            let j = i64::try_from(j).map_err(invalid)?;
+            for port in &binding.ports {
+                let index = machine
+                    .sites()
+                    .iter()
+                    .position(|candidate| candidate.id() == port.site_id)
+                    .ok_or_else(|| invalid("generator phase source site index"))?;
+                let site = &machine.sites()[index];
+                let exponent = site
+                    .phase_origin_exponent()
+                    .checked_add(port.origin_exponent)
+                    .and_then(|value| port.step_exponent.checked_mul(j)?.checked_add(value))
+                    .ok_or_else(|| invalid("generator phase exponent overflow"))?;
+                maps.push(receiving_current_map(site, exponent)?);
+                source_indices.push(index);
+            }
+        }
+        Ok(PhaseReception {
+            sites: machine.sites().len(),
+            width,
+            source_indices,
+            maps,
+        })
     }
 }
 
@@ -402,6 +637,277 @@ mod tests {
         assert!(advance.balance.discretization_defect.is_zero());
         assert!(advance.balance.dissipated > Rat::zero());
         assert!(advance.balance.active.is_zero());
+    }
+
+    /// The former hand-assembled machine structure (before `holon` joined its rings and
+    /// contacts by `Holon::interconnect`), kept as the independent reference of the equality.
+    fn hand_assembled_holon(chart: &ResidentHolonChart, reactions: &[RingReaction<'_>]) -> Holon {
+        let w = chart.width;
+        let sigma = chart.sites * w;
+        let blocks = reactions
+            .iter()
+            .map(|r| chart.ring_blocks(r).unwrap())
+            .collect::<Vec<_>>();
+        let mu: usize = blocks.iter().map(|b| b.2.columns()).sum();
+        let rho = sigma + 3 * chart.contacts.len();
+        let total = sigma + rho + mu;
+        let mut s = vec![vec![Rat::zero(); total]; total];
+        let mut port_at = sigma + rho;
+        let mut resistance = vec![vec![Rat::zero(); rho]; rho];
+        for (site, (omega, r, b)) in blocks.iter().enumerate() {
+            let o = site * w;
+            for i in 0..w {
+                for j in 0..w {
+                    s[o + i][o + j] = -omega.get(i, j).unwrap().clone();
+                    resistance[o + i][o + j] = r.get(i, j).unwrap().clone();
+                }
+                s[o + i][sigma + o + i] = -Rat::one();
+                s[sigma + o + i][o + i] = Rat::one();
+                for m in 0..b.columns() {
+                    let v = b.get(i, m).unwrap();
+                    s[o + i][port_at + m] = -v.clone();
+                    s[port_at + m][o + i] = v.clone();
+                }
+            }
+            port_at += b.columns();
+        }
+        for (index, contact) in chart.contacts.iter().enumerate() {
+            let at = sigma + sigma + 3 * index;
+            for row in 0..3 {
+                for column in 0..sigma {
+                    let g = contact.slip.get(row, column).unwrap();
+                    if !g.is_zero() {
+                        s[column][at + row] = -g.clone();
+                        s[at + row][column] = g.clone();
+                    }
+                }
+                for column in 0..3 {
+                    resistance[sigma + 3 * index + row][sigma + 3 * index + column] = contact
+                        .resistance
+                        .resistance()
+                        .get(row, column)
+                        .unwrap()
+                        .clone();
+                }
+            }
+        }
+        let structure = ExactRatMatrix::shaped(total, total, s).unwrap();
+        let port = PortHolon::new(
+            DiracStructure::skew_graph(&structure).unwrap(),
+            PortCounts {
+                storage: sigma,
+                resistive: rho,
+                external: mu,
+                active: 0,
+            },
+            SymmetricForm::from_diagonal(vec![Rat::one(); sigma]),
+            ResistiveRelation::new(ExactRatMatrix::shaped(rho, rho, resistance).unwrap()).unwrap(),
+        )
+        .unwrap();
+        Holon::new(port).unwrap()
+    }
+
+    /// **interact through the core facet.** The machine Holon joined by `Holon::interconnect`
+    /// (rings side by side, then the contact junction at their storage taps) is the former
+    /// hand-assembled skew structure: the same Dirac subspace, storage and resistance, and the
+    /// same exact advance from the same state and contrasts.
+    #[test]
+    fn the_machine_holon_is_the_interconnection_of_its_rings_and_contacts() {
+        let machine = spec().machine.compile().unwrap();
+        let chart = ResidentHolonChart::compile(&machine, 12).unwrap();
+        let (n, k, grain) = (6, 12, 8);
+        let w = coefficients(n, k, grain);
+        let contrasts: Vec<Vec<Rat>> = (0..2)
+            .map(|s| {
+                (0..k)
+                    .map(|i| Rat::new(((i * 5 + 3 * s) as i64 - 17).into(), 32.into()))
+                    .collect()
+            })
+            .collect();
+        let reactions: Vec<RingReaction> = contrasts
+            .iter()
+            .map(|c| RingReaction {
+                n,
+                k,
+                grain,
+                coefficients: &w,
+                contrast: c,
+            })
+            .collect();
+        let joined = chart.holon(&reactions).unwrap();
+        let reference = hand_assembled_holon(&chart, &reactions);
+        assert_eq!(joined.port_holon().counts(), reference.port_holon().counts());
+        assert!(
+            joined
+                .port_holon()
+                .dirac()
+                .same_subspace(reference.port_holon().dirac())
+        );
+        assert_eq!(joined.port_holon().storage(), reference.port_holon().storage());
+        assert_eq!(
+            joined.port_holon().resistance(),
+            reference.port_holon().resistance()
+        );
+        assert_eq!(joined.generators().len(), chart.sites());
+        let x: Vec<Rat> = (0..24).map(|i| r((i * 7 % 13) as i64 - 6)).collect();
+        let input = contrasts.concat();
+        let advance = |holon: Holon| {
+            ReferenceHolon::new(holon, r(1), Scheme::Midpoint)
+                .unwrap()
+                .advance(&HolonState::new(x.clone()), &input)
+                .unwrap()
+        };
+        let (a, b) = (advance(joined), advance(reference));
+        assert_eq!(a.state, b.state);
+        assert_eq!(a.balance, b.balance);
+        assert!(a.balance.is_exact());
+    }
+
+    /// The certificate's complex reading of one reaction row (the former `energy.rs` formula),
+    /// kept as the independent reference: `(stored, dissipated, port, reaction, defect)`.
+    fn complex_row_balance(
+        reaction: &RingReaction<'_>,
+        drive: &[Rat],
+        step: &[Rat],
+    ) -> [Rat; 5] {
+        type C = (Rat, Rat);
+        let (n, k) = (reaction.n, reaction.k);
+        let unit = Rat::from_integer(num_bigint::BigInt::from(1) << reaction.grain);
+        let coefficient = |a: usize, j: usize| -> C {
+            let (re, im) = &reaction.coefficients[a][j];
+            (
+                Rat::from_integer(re.clone()) / &unit,
+                Rat::from_integer(im.clone()) / &unit,
+            )
+        };
+        let mul = |a: &C, b: &C| (&a.0 * &b.0 - &a.1 * &b.1, &a.0 * &b.1 + &a.1 * &b.0);
+        let complex = |v: &[Rat]| {
+            v.chunks(2)
+                .map(|z| (z[0].clone(), z[1].clone()))
+                .collect::<Vec<C>>()
+        };
+        let re_inner =
+            |x: &[C], v: &[C]| -> Rat { x.iter().zip(v).map(|(a, b)| &a.0 * &b.0 + &a.1 * &b.1).sum() };
+        let (p, y) = (complex(drive), complex(step));
+        let half = Rat::new(1.into(), 2.into());
+        let xbar: Vec<C> = p
+            .iter()
+            .zip(&y)
+            .map(|(a, b)| ((&a.0 + &b.0) * &half, (&a.1 + &b.1) * &half))
+            .collect();
+        let apply = |m: &dyn Fn(usize, usize) -> C, v: &[C]| -> Vec<C> {
+            (0..n)
+                .map(|a| {
+                    (0..n).fold((Rat::zero(), Rat::zero()), |acc, b| {
+                        let t = mul(&m(a, b), &v[b]);
+                        (&acc.0 + &t.0, &acc.1 + &t.1)
+                    })
+                })
+                .collect()
+        };
+        let ws = apply(&|a, b| coefficient(a, b), &xbar);
+        let j = apply(
+            &|a, b| {
+                (0..k).fold((Rat::zero(), Rat::zero()), |acc, r| {
+                    let s = coefficient(a, n + k / 2 + r * n + b);
+                    (
+                        &acc.0 + &reaction.contrast[r] * &s.0,
+                        &acc.1 + &reaction.contrast[r] * &s.1,
+                    )
+                })
+            },
+            &xbar,
+        );
+        let wc: Vec<C> = (0..n)
+            .map(|a| {
+                (0..k / 2).fold((Rat::zero(), Rat::zero()), |acc, m| {
+                    let t = mul(
+                        &coefficient(a, n + m),
+                        &(
+                            reaction.contrast[2 * m].clone(),
+                            reaction.contrast[2 * m + 1].clone(),
+                        ),
+                    );
+                    (&acc.0 + &t.0, &acc.1 + &t.1)
+                })
+            })
+            .collect();
+        let rho: Vec<C> = (0..n)
+            .map(|a| {
+                (
+                    &p[a].0 - &y[a].0 + &ws[a].0 + &j[a].0 + &wc[a].0,
+                    &p[a].1 - &y[a].1 + &ws[a].1 + &j[a].1 + &wc[a].1,
+                )
+            })
+            .collect();
+        [
+            (re_inner(&y, &y) - re_inner(&p, &p)) * &half,
+            -re_inner(&xbar, &ws),
+            re_inner(&xbar, &wc),
+            re_inner(&xbar, &j),
+            -re_inner(&xbar, &rho),
+        ]
+    }
+
+    /// **advance through the core facet.** The committed word's per-row reaction balance is the
+    /// ring Holon's step balance: on the exact implicit-midpoint step it equals, term by term, the
+    /// balance `HolonLaw::advance` returns (zero defect, zero active power); on a perturbed step
+    /// (a returned centre off the exact solve) it equals the certificate's complex reading the
+    /// energy receipt used before, including the solve defect, with an exactly zero residual.
+    #[test]
+    fn the_step_balance_is_the_ring_holons_advance_balance() {
+        let machine = spec().machine.compile().unwrap();
+        let chart = ResidentHolonChart::compile(&machine, 12).unwrap();
+        let (n, grain) = (6, 8);
+        for k in [0, 12] {
+            let w = coefficients(n, k, grain);
+            let c: Vec<Rat> = (0..k)
+                .map(|i| Rat::new(((i * 3) as i64 - 10).into(), 16.into()))
+                .collect();
+            let reaction = RingReaction {
+                n,
+                k,
+                grain,
+                coefficients: &w,
+                contrast: &c,
+            };
+            let p: Vec<Rat> = (0..12).map(|i| Rat::new(((i * 5 % 11) as i64 - 5).into(), 4.into())).collect();
+            let advance = chart
+                .reaction_holon(&reaction)
+                .unwrap()
+                .advance(&HolonState::new(p.clone()), &c)
+                .unwrap();
+            let exact = ResidentHolonChart::reaction_step_balance(
+                &reaction,
+                &p,
+                &advance.state.configuration,
+            )
+            .unwrap();
+            assert_eq!(exact, advance.balance, "k = {k}");
+            assert!(exact.is_exact() && exact.discretization_defect.is_zero());
+            assert!(exact.active.is_zero());
+            let off: Vec<Rat> = advance
+                .state
+                .configuration
+                .iter()
+                .enumerate()
+                .map(|(i, v)| v + Rat::new(((i % 3) as i64 - 1).into(), 1024.into()))
+                .collect();
+            let perturbed = ResidentHolonChart::reaction_step_balance(&reaction, &p, &off).unwrap();
+            assert!(perturbed.is_exact());
+            assert!(!perturbed.discretization_defect.is_zero());
+            assert_eq!(
+                [
+                    perturbed.stored_change.clone(),
+                    perturbed.dissipated.clone(),
+                    perturbed.port.clone(),
+                    perturbed.active.clone(),
+                    perturbed.discretization_defect.clone(),
+                ],
+                complex_row_balance(&reaction, &p, &off),
+                "k = {k}"
+            );
+        }
     }
 
     fn rational_rows<'c>(
@@ -641,9 +1147,9 @@ mod tests {
             .zip(&plus.inspect().unwrap().center)
             .map(|(a, b)| b.subtract(a))
             .collect();
-        let frozen = body.incident_comparison(comparison).unwrap();
+        let contemporary = body.contemporary_incident_comparison(comparison).unwrap();
         let returned = body
-            .prepare_incident_material_return(comparison, frozen.joint_output(), 4)
+            .prepare_incident_material_return(comparison, contemporary.joint_output(), 4)
             .unwrap();
         let forward = pair(&output.center, &delta_out);
         let adjoint = pair(

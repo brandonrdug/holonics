@@ -18,9 +18,11 @@ use holonic_engine::{
 };
 use std::rc::Rc;
 
-/// The immutable producing operands for one text/support receiving aperture.
+/// One text/support receiving aperture read at one cut: the material views it read, its
+/// features, logits and normalized faces. The compare and the pullback of that cut read the same
+/// views; nothing here outlives the cut (a later return reads the contemporary receiver again).
 pub struct IncidentTextForward<'c> {
-    /// Frozen producing material cuts used by delayed pullback and rest snapshots.
+    /// The material views this reading was taken at (the cut's receiver).
     pub text_material:
         holonic_engine::native_ecology::constitutive_fibre::ResidentNormalMaterialView<'c>,
     pub support_material:
@@ -28,7 +30,6 @@ pub struct IncidentTextForward<'c> {
     pub text_materials:
         Vec<Rc<holonic_engine::native_ecology::constitutive_fibre::ResidentNormalMaterialView<'c>>>,
     pub text_cohorts: Vec<IncidentTextCohort>,
-    pub retro_provenance: Option<IncidentRetroProvenance>,
     pub text_features: ResidentNormalEnclosureSection<'c>,
     pub text_logits: ResidentNormalEnclosureSection<'c>,
     pub text_face: holonic_engine::native_ecology::constitutive_fibre::NativeNormalizedSection<'c>,
@@ -36,17 +37,6 @@ pub struct IncidentTextForward<'c> {
     pub support_logits: ResidentNormalEnclosureSection<'c>,
     pub support_face:
         holonic_engine::native_ecology::constitutive_fibre::NativeNormalizedSection<'c>,
-}
-
-/// An extended frozen producing decoder. The original forward remains untouched; only the new
-/// cohort logits/faces are added at its saved feature packet.
-pub struct IncidentTextExtendedForward<'c> {
-    pub text_materials:
-        Vec<Rc<holonic_engine::native_ecology::constitutive_fibre::ResidentNormalMaterialView<'c>>>,
-    pub text_cohorts: Vec<IncidentTextCohort>,
-    pub retro_provenance: IncidentRetroProvenance,
-    pub text_logits: ResidentNormalEnclosureSection<'c>,
-    pub text_face: holonic_engine::native_ecology::constitutive_fibre::NativeNormalizedSection<'c>,
 }
 
 /// Both contemporary material successors are returned together for one atomic publication.
@@ -73,15 +63,7 @@ pub struct IncidentTextCohortSuccessor<'c> {
     pub material: ResidentNormalMaterial<'c>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-pub struct IncidentRetroProvenance {
-    pub old_codec_version: u64,
-    pub new_codec_version: u64,
-    pub old_class_count: usize,
-    pub new_class_count: usize,
-}
-
-/// Delayed receiver operands and the staged successor maps.
+/// The receiver return of one cut: its covectors and the staged successor maps.
 pub struct IncidentTextReturn<'c> {
     pub text_covector: Option<ResidentNormalEnclosureSection<'c>>,
     /// Covector returned through R_text into the producing E_in source rows, when a source
@@ -415,7 +397,6 @@ impl<'c> IncidentTextReceiver<'c> {
             support_material: self.support.retained_view(),
             text_materials,
             text_cohorts,
-            retro_provenance: None,
             text_features,
             text_logits,
             text_face,
@@ -423,153 +404,6 @@ impl<'c> IncidentTextReceiver<'c> {
             support_logits,
             support_face,
         })
-    }
-
-    pub fn extend_producing_receiver(
-        &self,
-        old: &IncidentTextForward<'c>,
-        additions: &[&IncidentTextCohortSuccessor<'c>],
-        terms: SeriesAperture,
-    ) -> Result<IncidentTextExtendedForward<'c>> {
-        if additions.is_empty() {
-            return Err(invalid("retro decoder cohort additions"));
-        }
-        let old_classes = old
-            .text_cohorts
-            .iter()
-            .map(|c| c.class_count)
-            .sum::<usize>();
-        let mut text_sections = Vec::with_capacity(additions.len());
-        let mut materials = old.text_materials.clone();
-        let mut cohorts = old.text_cohorts.clone();
-        let mut expected_start = old_classes;
-        for addition in additions {
-            if addition.cohort.class_start != expected_start || addition.cohort.class_count == 0 {
-                return Err(invalid("retro decoder cohort order"));
-            }
-            let view = Rc::new(addition.material.retained_view());
-            text_sections.push(
-                view.read_applied_enclosed_section(&old.text_features)
-                    .map_err(invalid)?,
-            );
-            materials.push(view);
-            cohorts.push(addition.cohort.clone());
-            expected_start += addition.cohort.class_count;
-        }
-        let text_logits = join_cohort_sections_refs(&old.text_logits, &text_sections)?;
-        let text_face = text_logits
-            .normalized_participation(
-                expected_start,
-                terms,
-                NativeNormalizedFaceMeasure::ExponentialPotential,
-            )
-            .map_err(invalid)?;
-        Ok(IncidentTextExtendedForward {
-            text_materials: materials,
-            text_cohorts: cohorts,
-            retro_provenance: IncidentRetroProvenance {
-                old_codec_version: old
-                    .text_cohorts
-                    .last()
-                    .map_or(0, |cohort| cohort.codec_version),
-                new_codec_version: additions
-                    .last()
-                    .map_or(0, |addition| addition.cohort.codec_version),
-                old_class_count: old_classes,
-                new_class_count: expected_start,
-            },
-            text_logits,
-            text_face,
-        })
-    }
-
-    /// A new receiving chart on the saved field result. Old classes use their producing maps;
-    /// later classes use their founding E-derived priors, even if contemporary R has learned.
-    pub fn retro_forward(
-        &self,
-        old: &IncidentTextForward<'c>,
-        terms: SeriesAperture,
-    ) -> Result<IncidentTextForward<'c>> {
-        let old_count = old.text_cohorts.len();
-        if old_count >= self.cohorts.len() || self.cohorts[..old_count] != old.text_cohorts {
-            return Err(invalid(
-                "retro receiver requires an extended compatible codec",
-            ));
-        }
-        let classes = self.cohorts.iter().map(|c| c.class_count).sum();
-        let maps = self
-            .boundary
-            .spec()
-            .material_seed
-            .initial_maps(classes, self.boundary.spec().local_complex)?;
-        let additions = self.cohorts[old_count..]
-            .iter()
-            .map(|cohort| {
-                let rows = maps.decoder
-                    [cohort.class_start..cohort.class_start + cohort.class_count]
-                    .to_vec();
-                let material = ResidentNormalMaterial::found_features_with_prior(
-                    self.surface,
-                    self.boundary.spec().local_complex + 1,
-                    cohort.class_count,
-                    self.boundary.spec().grain,
-                    NativeNormalPrior::from_coefficients(rows)?,
-                )?;
-                Ok(IncidentTextCohortSuccessor {
-                    cohort: cohort.clone(),
-                    material,
-                })
-            })
-            .collect::<Result<Vec<_>>>()?;
-        let extended =
-            self.extend_producing_receiver(old, &additions.iter().collect::<Vec<_>>(), terms)?;
-        let text_features = gather_prefix(&old.text_features, old.text_features.rows())?;
-        let support_features = gather_prefix(&old.support_features, 1)?;
-        let support_logits = gather_prefix(&old.support_logits, 1)?;
-        let support_face = support_logits.normalized_participation(
-            self.boundary.spec().output_aperture + 1,
-            terms,
-            NativeNormalizedFaceMeasure::ExponentialPotential,
-        )?;
-        Ok(IncidentTextForward {
-            text_material: old.text_material.clone(),
-            support_material: old.support_material.clone(),
-            text_materials: extended.text_materials,
-            text_cohorts: extended.text_cohorts,
-            retro_provenance: Some(extended.retro_provenance),
-            text_features,
-            text_logits: extended.text_logits,
-            text_face: extended.text_face,
-            support_features,
-            support_logits,
-            support_face,
-        })
-    }
-
-    pub fn producing_text_rest(
-        &self,
-        forward: &IncidentTextForward<'c>,
-    ) -> Result<NormalMaterialRest> {
-        forward.text_material.rest().map_err(invalid)
-    }
-
-    pub fn producing_support_rest(
-        &self,
-        forward: &IncidentTextForward<'c>,
-    ) -> Result<NormalMaterialRest> {
-        forward.support_material.rest().map_err(invalid)
-    }
-
-    pub fn producing_text_cohort_rests(
-        &self,
-        forward: &IncidentTextForward<'c>,
-    ) -> Result<Vec<NormalMaterialRest>> {
-        forward
-            .text_materials
-            .iter()
-            .skip(1)
-            .map(|material| material.rest().map_err(invalid))
-            .collect()
     }
 
     /// Read nominal selections from resident real-potential logits. The normalized
@@ -1034,32 +868,6 @@ fn join_cohort_sections<'c>(
     for row in 0..first.rows() {
         let mut joined = sections[0].row(row)?.to_owned().map_err(invalid)?;
         for section in &sections[1..] {
-            let next = section.row(row)?.to_owned().map_err(invalid)?;
-            joined = joined.view().join(next.view()).map_err(invalid)?;
-        }
-        rows.push(joined.view().as_section().map_err(invalid)?);
-    }
-    let refs = rows.iter().collect::<Vec<_>>();
-    ResidentNormalEnclosureSection::concatenate_rows(&refs).map_err(invalid)
-}
-
-fn join_cohort_sections_refs<'c>(
-    first: &ResidentNormalEnclosureSection<'c>,
-    additions: &[ResidentNormalEnclosureSection<'c>],
-) -> Result<ResidentNormalEnclosureSection<'c>> {
-    if additions
-        .iter()
-        .any(|section| section.rows() != first.rows() || section.grain() != first.grain())
-    {
-        return Err(invalid("decoder cohort section chart"));
-    }
-    if additions.is_empty() {
-        return ResidentNormalEnclosureSection::concatenate_rows(&[first]).map_err(invalid);
-    }
-    let mut rows = Vec::with_capacity(first.rows());
-    for row in 0..first.rows() {
-        let mut joined = first.row(row)?.to_owned().map_err(invalid)?;
-        for section in additions {
             let next = section.row(row)?.to_owned().map_err(invalid)?;
             joined = joined.view().join(next.view()).map_err(invalid)?;
         }

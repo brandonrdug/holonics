@@ -16,19 +16,38 @@ mod rest;
 mod tests;
 pub(super) use rest::IncidentPresentationRest;
 
-pub(super) struct IncidentPending<'c> {
-    preparation: IncidentPreparation,
-    encoded: IncidentEncoded<'c>,
-    received: IncidentTextForward<'c>,
-}
+/// The incident chart's presentation boundary: its encoder, text receiver and fixed slots. An
+/// outstanding comparison is the session's `RetainedSharedSource` (the request that re-derives
+/// its source cells) beside the body's retained boundary operands; both are read at the
+/// contemporary constitution when the comparison returns, so this presentation keeps no
+/// per-comparison producing state.
 pub(super) struct IncidentPresentation<'c> {
     encoder: IncidentEncoder<'c>,
     receiver: IncidentTextReceiver<'c>,
-    pub(super) pending: BTreeMap<u64, IncidentPending<'c>>,
     slot_rows: Vec<usize>,
     rows: usize,
     width: usize,
     series: u32,
+}
+
+/// One incident source at the contemporary cut: its cells encoded through the current encoder
+/// and held on their source sites of the current boundary, with the fixed response sites. A
+/// request prepares its word from it; an observe or inspection re-reads a retained comparison
+/// from it, so production and return are one computation.
+struct IncidentBoundaryCut<'c> {
+    encoded: IncidentEncoded<'c>,
+    anchor: holonic_engine::native_ecology::constitutive_fibre::ResidentNormalEnclosure<'c>,
+    held: Vec<bool>,
+    source_sites: Vec<usize>,
+    response_sites: Vec<usize>,
+    contacts: Vec<(usize, usize)>,
+}
+
+/// The receiving face of one incident word: its fixed response rows and the text/support
+/// receiver read at the contemporary receiver material.
+struct IncidentReading<'c> {
+    response: ResidentNormalEnclosureSection<'c>,
+    received: IncidentTextForward<'c>,
 }
 fn phases(n: usize) -> Vec<ExactWavePhaseTransport> {
     vec![ExactWavePhaseTransport::identity(); n]
@@ -122,24 +141,120 @@ impl<'c> NativeFieldSession<'c> {
         }))
     }
 
-    /// Read the frozen receiving operands of an outstanding incident comparison. These are
-    /// the produced features/potentials/faces, not a recomputation with contemporary material.
-    pub fn inspect_incident_comparison(&self, id: u64) -> Result<Value> {
-        let pending = self
-            .incident
-            .as_ref()
-            .and_then(|incident| incident.pending.get(&id))
+    /// Read an outstanding incident comparison at the contemporary constitution: its source
+    /// cells encoded through the current encoder onto the current boundary, its word through the
+    /// current field and material, and its text/support faces through the current receiver. This
+    /// is the reading an immediate comparison of the same request would give at this cut; it
+    /// changes after an intervening update, and nothing is committed, deposited or published.
+    pub fn inspect_incident_comparison(&mut self, id: u64) -> Result<Value> {
+        let retained = self
+            .presentation
+            .retained_shared
+            .get(&id)
+            .cloned()
+            .filter(|_| self.incident.is_some())
             .ok_or_else(|| invalid("missing incident comparison"))?;
-        let forward = &pending.received;
+        let preparation = IncidentPreparation::from_request(&self.presentation.spec, &retained.request)?;
+        let cut = self.incident_boundary(&preparation)?;
+        if cut.held != retained.held {
+            return Err(invalid("incident retained receiver chart differs"));
+        }
+        let word = self
+            .body
+            .contemporary_incident_comparison_at(id, cut.anchor.view(), &cut.held)?;
+        let reading = self.incident_reading(&word, &cut)?;
+        let forward = &reading.received;
         Ok(json!({
             "comparison": id,
-            "encoded_source": section_face_receipt(&pending.encoded.rows)?,
+            "comparison_cut": "contemporary",
+            "producing_epoch": retained.producing_epoch,
+            "read_epoch": word.producing_epoch(),
+            "encoded_source": section_face_receipt(&cut.encoded.rows)?,
             "text_features": section_face_receipt(&forward.text_features)?,
             "text_logits": section_face_receipt(&forward.text_logits)?,
             "text_normalized": section_face_receipt(forward.text_face.participation())?,
             "support_logits": section_face_receipt(&forward.support_logits)?,
             "support_normalized": section_face_receipt(forward.support_face.participation())?,
         }))
+    }
+
+    /// The incident source of `preparation` at the contemporary cut (see `IncidentBoundaryCut`).
+    fn incident_boundary(
+        &mut self,
+        preparation: &IncidentPreparation,
+    ) -> Result<IncidentBoundaryCut<'c>> {
+        let incident = self
+            .incident
+            .as_ref()
+            .ok_or_else(|| invalid("incident session state"))?;
+        let response_sites =
+            incident_response_slots(&self.presentation.spec, preparation, &incident.slot_rows)?;
+        let symbols = preparation
+            .source_cells
+            .iter()
+            .map(|s| s.symbol_index)
+            .collect::<Vec<_>>();
+        let encoded = incident.encoder.encode(&symbols)?;
+        let source_sites = incident.slot_rows[..preparation.source_extent].to_vec();
+        let source = encoded.rows.scatter_phase_adjoint(
+            &source_sites,
+            &phases(source_sites.len()),
+            incident.rows,
+        )?;
+        let (rows, width) = (incident.rows, incident.width);
+        let current = self
+            .body
+            .incident_current_boundary()?
+            .view()
+            .split_rows(rows, width)?;
+        let mut held = vec![false; rows * (width / 2)];
+        for &site in &source_sites {
+            held[site * (width / 2)..(site + 1) * (width / 2)].fill(true);
+        }
+        let anchor = current
+            .held_refinement(&source, &held, 0)?
+            .pack_components(rows)?
+            .row(0)?
+            .to_owned()?;
+        let contacts = preparation
+            .contacts
+            .iter()
+            .map(|c| (source_sites[c.from_cell], source_sites[c.to_cell]))
+            .collect::<Vec<_>>();
+        Ok(IncidentBoundaryCut {
+            encoded,
+            anchor,
+            held,
+            source_sites,
+            response_sites,
+            contacts,
+        })
+    }
+
+    /// The response rows of `word` on the fixed response sites and their faces at the current
+    /// receiver material.
+    fn incident_reading(
+        &self,
+        word: &crate::native::NativeIncidentGenerated<'c>,
+        cut: &IncidentBoundaryCut<'c>,
+    ) -> Result<IncidentReading<'c>> {
+        let incident = self
+            .incident
+            .as_ref()
+            .ok_or_else(|| invalid("incident session state"))?;
+        let boundary = word
+            .boundary()?
+            .view()
+            .split_rows(incident.rows, incident.width)?;
+        let response = boundary.gather_phase_rows(
+            &cut.response_sites,
+            &phases(cut.response_sites.len()),
+            incident.width,
+        )?;
+        let received = incident
+            .receiver
+            .forward(&response, SeriesAperture(incident.series))?;
+        Ok(IncidentReading { response, received })
     }
 
     pub(super) fn found_incident(
@@ -216,7 +331,6 @@ impl<'c> NativeFieldSession<'c> {
             incident: Some(IncidentPresentation {
                 encoder,
                 receiver,
-                pending: BTreeMap::new(),
                 slot_rows,
                 rows,
                 width,
@@ -236,74 +350,37 @@ impl<'c> NativeFieldSession<'c> {
     pub(super) fn incident_request(&mut self, request: &FieldSectionRequest) -> Result<Value> {
         let start = Instant::now();
         let preparation = IncidentPreparation::from_request(&self.presentation.spec, request)?;
-        let incident = self
-            .incident
-            .as_mut()
-            .ok_or_else(|| invalid("incident session state"))?;
         let aperture = self
             .presentation
             .spec
             .incident
             .as_ref()
-            .unwrap()
+            .ok_or_else(|| invalid("incident material declaration"))?
             .response_aperture;
         if preparation.response_aperture != aperture {
+            let slots = self
+                .incident
+                .as_ref()
+                .ok_or_else(|| invalid("incident session state"))?
+                .slot_rows
+                .len();
             return Err(invalid(format!(
                 "complete incident source and response require {}+{} sites; declared slots={}, response aperture={}",
-                preparation.source_extent,
-                preparation.response_aperture,
-                incident.slot_rows.len(),
-                aperture
+                preparation.source_extent, preparation.response_aperture, slots, aperture
             )));
         }
-        let response_sites =
-            incident_response_slots(&self.presentation.spec, &preparation, &incident.slot_rows)?;
-        let symbols = preparation
-            .source_cells
-            .iter()
-            .map(|s| s.symbol_index)
-            .collect::<Vec<_>>();
-        let encoded = incident.encoder.encode(&symbols)?;
-        let source_sites = &incident.slot_rows[..preparation.source_extent];
-        let source = encoded.rows.scatter_phase_adjoint(
-            source_sites,
-            &phases(source_sites.len()),
-            incident.rows,
-        )?;
-        let current = self
-            .body
-            .incident_current_boundary()?
-            .view()
-            .split_rows(incident.rows, incident.width)?;
-        let mut held = vec![false; incident.rows * (incident.width / 2)];
-        for &site in source_sites {
-            held[site * (incident.width / 2)..(site + 1) * (incident.width / 2)].fill(true);
-        }
-        let anchor = current
-            .held_refinement(&source, &held, 0)?
-            .pack_components(incident.rows)?
-            .row(0)?
-            .to_owned()?;
-        let contacts = preparation
-            .contacts
-            .iter()
-            .map(|c| (source_sites[c.from_cell], source_sites[c.to_cell]))
-            .collect::<Vec<_>>();
+        let cut = self.incident_boundary(&preparation)?;
         let generated = self.body.prepare_incident_field_restricted(
-            anchor.view(),
-            &held,
-            source_sites,
-            &contacts,
+            cut.anchor.view(),
+            &cut.held,
+            &cut.source_sites,
+            &cut.contacts,
         )?;
-        let boundary = generated
-            .boundary()?
-            .view()
-            .split_rows(incident.rows, incident.width)?;
-        let response =
-            boundary.gather_phase_rows(&response_sites, &phases(aperture), incident.width)?;
-        let received = incident
-            .receiver
-            .forward(&response, SeriesAperture(incident.series))?;
+        let IncidentReading { response, received } = self.incident_reading(&generated, &cut)?;
+        let incident = self
+            .incident
+            .as_ref()
+            .ok_or_else(|| invalid("incident session state"))?;
         let selections = incident.receiver.select_text_receipts(&received)?;
         let selected = selections.iter().map(|s| s.selected).collect::<Vec<_>>();
         let support_selection = incident.receiver.select_support_receipt(&received)?;
@@ -329,34 +406,31 @@ impl<'c> NativeFieldSession<'c> {
         let support_face_receipt = section_face_receipt(received.support_face.participation())?;
         let receiver_material_cuts = incident.receiver.material_observations();
         let encoder_material_cuts = incident.encoder.material_observations();
-        let producing_encoder_cuts = encoded
-            .producing
-            .iter()
-            .map(|material| material.observations())
-            .collect::<Vec<_>>();
         let producing_receiver_cuts = json!({
             "text": received.text_material.observations(),
             "support": received.support_material.observations(),
             "text_cohorts": received.text_materials.iter().map(|material| material.observations()).collect::<Vec<_>>(),
         });
+        let codec_revision = incident.receiver.codec_version();
+        let (rows, width) = (incident.rows, incident.width);
         let pending_before = self.body.pending_ids()?;
         let current_cut_before = self.body.epoch();
         let mut value = json!({"schema":"org.holonics.hna.field-section.v1","scope":"incident-field-joint","source_chart":"incident-field",
-            "codec":"unicode-scalars","codec_symbols":self.presentation.spec.symbols,"codec_revision":incident.receiver.codec_version(),
+            "codec":"unicode-scalars","codec_symbols":self.presentation.spec.symbols,"codec_revision":codec_revision,
             "text":text,"symbols":selected[..support].iter().map(|&i|&self.presentation.spec.symbols[i]).collect::<Vec<_>>(),
             "support":support,"response_aperture":aperture,"output_symbols":preparation.request_extent+aperture,
             "selections":selections,"support_selection":support_selection,"selection_chart":"real-receiver-potentials",
             "response_section":response_section,"receiver_faces":{"support_logits":support_logits_receipt,"support_normalized":support_face_receipt},
             "uncertainty":{"text_logits_radius":text_logits_receipt,"text_normalized_radius":text_face_receipt},
-            "source_bindings":source_sites,"receiver_bindings":response_sites,
-            "material_cuts":{"encoder":encoder_material_cuts,"receiver":receiver_material_cuts,"producing_encoder":producing_encoder_cuts,"producing_receiver":producing_receiver_cuts},
+            "source_bindings":cut.source_sites,"receiver_bindings":cut.response_sites,
+            "material_cuts":{"encoder":encoder_material_cuts,"receiver":receiver_material_cuts,"producing_encoder":encoder_material_cuts,"producing_receiver":producing_receiver_cuts},
             "producing_cut":{"epoch":generated.producing_epoch(),"field_cut":generated.producing_field_cut(),"material_observations":generated.producing_material_observations()},
             "operator_bounds":generated.operator_bounds()?,
             "solver":self.presentation.spec.incident.as_ref().map(|o| json!({"method":o.solver,"steps":o.solve_steps})),
             "current_cut_before":current_cut_before,"pending_before":pending_before,
             "material_update":false,
-            "source_cells":preparation.source_extent,"context_cells":preparation.context_extent,"source_contacts":contacts.len(),
-            "field_sites":incident.rows,"local_complex":incident.width/2,"producing_epoch":generated.producing_epoch(),
+            "source_cells":preparation.source_extent,"context_cells":preparation.context_extent,"source_contacts":cut.contacts.len(),
+            "field_sites":rows,"local_complex":width/2,"producing_epoch":generated.producing_epoch(),
             "native_receipt":{"device":self.surface.device_name(),"kernel_sha256":self.surface.ptx_sha256(),"census_before_publication":self.surface.census()},
             "generation_us":start.elapsed().as_micros(),"committed":request.commit});
         let generated = self.body.publish_incident_field(
@@ -367,19 +441,14 @@ impl<'c> NativeFieldSession<'c> {
         value["current_cut_after"] = json!(self.body.epoch());
         value["native_receipt"]["census_after_publication"] = json!(self.surface.census());
         if let Some(id) = generated.comparison_id() {
-            incident.pending.insert(
-                id,
-                IncidentPending {
-                    preparation: preparation.clone(),
-                    encoded,
-                    received,
-                },
-            );
+            // The comparison keeps its request (which re-derives its source cells) and its
+            // receiver mask; the body keeps its boundary operands. Both are read again at the
+            // contemporary constitution when it returns.
             self.presentation.retained_shared.insert(
                 id,
                 RetainedSharedSource {
                     request: request.clone(),
-                    held,
+                    held: cut.held,
                     output_symbols: preparation.request_extent + aperture,
                     producing_epoch: generated.producing_epoch(),
                     exposure_pairing: None,
@@ -389,6 +458,13 @@ impl<'c> NativeFieldSession<'c> {
         }
         Ok(value)
     }
+
+    /// Observe a retained incident comparison at one contemporary cut: its source cells are
+    /// encoded through the current encoder onto the current boundary, its word is read through
+    /// the current field and material, its faces through the current receiver, and the ratio's
+    /// covector returns through those same operands to the receiver, the field and the encoder.
+    /// A delayed observe therefore equals an immediate observe of the same request made at the
+    /// same constitution, number for number (`delayed_incident_observe_equals_an_immediate_one`).
     pub(super) fn incident_observe(
         &mut self,
         id: u64,
@@ -396,14 +472,14 @@ impl<'c> NativeFieldSession<'c> {
         step_bits: u32,
     ) -> Result<Value> {
         let started = Instant::now();
-        let incident = self
-            .incident
-            .as_mut()
-            .ok_or_else(|| invalid("incident session state"))?;
-        let pending = incident
-            .pending
+        let retained = self
+            .presentation
+            .retained_shared
             .get(&id)
+            .cloned()
+            .filter(|_| self.incident.is_some())
             .ok_or_else(|| invalid("unknown incident boundary comparison"))?;
+        let preparation = IncidentPreparation::from_request(&self.presentation.spec, &retained.request)?;
         let target = self
             .presentation
             .spec
@@ -411,72 +487,62 @@ impl<'c> NativeFieldSession<'c> {
             .into_iter()
             .map(|s| s.0 as usize)
             .collect::<Vec<_>>();
-        let source_classes = pending
-            .preparation
+        let source_classes = preparation
             .source_cells
             .iter()
             .map(|c| c.symbol_index)
             .collect::<Vec<_>>();
-        let old_classes = pending
-            .received
-            .text_cohorts
-            .iter()
-            .map(|c| c.class_count)
-            .sum::<usize>();
-        let retro = if target.iter().any(|&i| i >= old_classes) {
-            Some(
-                incident
-                    .receiver
-                    .retro_forward(&pending.received, SeriesAperture(incident.series))?,
-            )
-        } else {
-            None
-        };
-        let comparison = retro.as_ref().unwrap_or(&pending.received);
+        let cut = self.incident_boundary(&preparation)?;
+        if cut.held != retained.held {
+            return Err(invalid("incident retained receiver chart differs"));
+        }
+        let word = self
+            .body
+            .contemporary_incident_comparison_at(id, cut.anchor.view(), &cut.held)?;
+        let IncidentReading { received, .. } = self.incident_reading(&word, &cut)?;
+        let incident = self
+            .incident
+            .as_mut()
+            .ok_or_else(|| invalid("incident session state"))?;
         let returned = incident
             .receiver
             .compare_with_codec(
-                comparison,
+                &received,
                 &target,
                 target.len(),
-                &pending.encoded.rows,
+                &cut.encoded.rows,
                 &source_classes,
                 SeriesAperture(incident.series),
                 step_bits,
             )
             .map_err(|error| invalid(format!("incident receiver comparison: {error}")))?;
         let receiver_returned = Instant::now();
-        let response_sites = incident_response_slots(
-            &self.presentation.spec,
-            &pending.preparation,
-            &incident.slot_rows,
-        )?;
         let response_covector = returned
             .boundary_covector
-            .split_components(pending.preparation.response_aperture)?;
+            .split_components(preparation.response_aperture)?;
         let boundary = response_covector
             .scatter_phase_adjoint(
-                &response_sites,
-                &phases(response_sites.len()),
+                &cut.response_sites,
+                &phases(cut.response_sites.len()),
                 incident.rows,
             )?
             .pack_components(incident.rows)?;
-        let generated = self.body.incident_comparison(id)?;
-        let full =
-            boundary.gather_phase_rows(&[0], &phases(1), generated.joint_output().components())?;
+        let full = boundary.gather_phase_rows(&[0], &phases(1), word.joint_output().components())?;
         let field = self
             .body
-            .prepare_incident_material_return(id, full.row(0)?, step_bits)
+            .prepare_contemporary_material_return(&word, full.row(0)?, step_bits, &[])
             .map_err(|error| invalid(format!("incident field material return: {error}")))?;
         let field_returned = Instant::now();
-        let source_sites = &incident.slot_rows[..pending.preparation.source_extent];
         let anchor = field
             .anchor_covector()
-            .restrict(0..generated.boundary_components())?
+            .restrict(0..word.boundary_components())?
             .view()
             .split_rows(incident.rows, incident.width)?;
-        let source_covector =
-            anchor.gather_phase_rows(source_sites, &phases(source_sites.len()), incident.width)?;
+        let source_covector = anchor.gather_phase_rows(
+            &cut.source_sites,
+            &phases(cut.source_sites.len()),
+            incident.width,
+        )?;
         let source_covector = source_covector.sum_same_shape(
             returned
                 .source_covector
@@ -485,7 +551,7 @@ impl<'c> NativeFieldSession<'c> {
         )?;
         let encoder = incident
             .encoder
-            .prepare_return(&pending.encoded, &source_covector, step_bits)
+            .prepare_return(&cut.encoded, &source_covector, step_bits)
             .map_err(|error| invalid(format!("incident encoder return: {error}")))?;
         let encoder_returned = Instant::now();
         let boundary_return_receipt = section_face_receipt(&returned.boundary_covector)?;
@@ -496,41 +562,30 @@ impl<'c> NativeFieldSession<'c> {
             .transpose()?;
         let encoder_cuts_before = incident.encoder.material_observations();
         let receiver_cuts_before = incident.receiver.material_observations();
-        let producing_encoder_cuts = pending
-            .encoded
-            .producing
-            .iter()
-            .map(|material| material.observations())
-            .collect::<Vec<_>>();
-        let producing_receiver_cuts = json!({
-            "text": comparison.text_material.observations(),
-            "support": comparison.support_material.observations(),
-            "text_cohorts": comparison.text_materials.iter().map(|material| material.observations()).collect::<Vec<_>>(),
-        });
         let current_cut_before = self.body.epoch();
         let pending_before = self.body.pending_ids()?;
-        let value = json!({"scope":"incident-field-observation","comparison":id,"producing_epoch":generated.producing_epoch(),
+        let mut value = json!({"scope":"incident-field-observation","comparison":id,"producing_epoch":retained.producing_epoch,
+            "comparison_cut":"contemporary",
             "observed_response_symbols":target.len(),"material_deposited":true,"whole_joint_return":true,
-            "retro_receiver":comparison.retro_provenance,"original_face_supports_target":retro.is_none(),
             "return_receipts":{"boundary_covector":boundary_return_receipt,"text_covector":text_return_receipt},
-            "producing_cut":{"epoch":generated.producing_epoch(),"field_cut":generated.producing_field_cut(),"material_observations":generated.producing_material_observations()},
-            "operator_bounds":generated.operator_bounds()?,
+            "read_cut":{"epoch":word.producing_epoch(),"field_cut":word.producing_field_cut(),"material_observations":word.producing_material_observations()},
+            "operator_bounds":word.operator_bounds()?,
             "current_cut_before":current_cut_before,"pending_before":pending_before,
             "native_receipt":{"device":self.surface.device_name(),"kernel_sha256":self.surface.ptx_sha256(),"census_before_publication":self.surface.census()},
             "material_cuts_before":{"encoder":encoder_cuts_before,"receiver":receiver_cuts_before}});
-        let mut value = value;
         value["native_receipt"]["stage_us"] = json!({
             "receiver_return": receiver_returned.duration_since(started).as_micros(),
             "field_return": field_returned.duration_since(receiver_returned).as_micros(),
             "encoder_return": encoder_returned.duration_since(field_returned).as_micros(),
             "receipt": encoder_returned.elapsed().as_micros(),
         });
-        value["producing_material_cuts"] =
-            json!({"encoder":producing_encoder_cuts,"receiver":producing_receiver_cuts});
         self.body.publish_incident_material_return(field)?;
+        let incident = self
+            .incident
+            .as_mut()
+            .ok_or_else(|| invalid("incident session state"))?;
         incident.encoder.publish(encoder);
         incident.receiver.publish(returned.successor);
-        incident.pending.remove(&id);
         self.presentation.retained_shared.remove(&id);
         value["current_cut_after"] = json!(self.body.epoch());
         value["native_receipt"]["census_after_publication"] = json!(self.surface.census());

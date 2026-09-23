@@ -247,56 +247,11 @@ impl<'c> NativeIncidentGenerated<'c> {
             .split_rows(site_count, width)
             .map_err(invalid)?;
         let source = Rc::new(source);
-        let row_count = binding
-            .aperture
-            .checked_mul(binding.ports.len())
-            .ok_or_else(|| invalid("generator phase receiving row extent"))?;
-        if row_count > u32::MAX as usize
-            || binding.ports.len().checked_mul(12).is_none()
-            || binding.ports.len().checked_mul(12).unwrap_or(usize::MAX) > u32::MAX as usize
-        {
-            return Err(invalid("generator phase receiving extent"));
-        }
-        let last_j = i64::try_from(binding.aperture - 1).map_err(invalid)?;
-        for port in &binding.ports {
-            let site = machine
-                .sites()
-                .iter()
-                .find(|site| site.id() == port.site_id)
-                .ok_or_else(|| invalid("generator phase port site identity"))?;
-            if !site.is_receiver() {
-                return Err(invalid("generator phase port is not a receiver site"));
-            }
-            site.phase_origin_exponent()
-                .checked_add(port.origin_exponent)
-                .and_then(|value| port.step_exponent.checked_mul(last_j)?.checked_add(value))
-                .ok_or_else(|| invalid("generator phase exponent overflow"))?;
-        }
-        let mut source_indices = Vec::with_capacity(row_count);
-        let mut maps = Vec::with_capacity(row_count);
-        for j in 0..binding.aperture {
-            let j = i64::try_from(j).map_err(invalid)?;
-            for port in &binding.ports {
-                let site = machine
-                    .sites()
-                    .iter()
-                    .find(|site| site.id() == port.site_id)
-                    .ok_or_else(|| invalid("generator phase port site identity"))?;
-                let exponent = site
-                    .phase_origin_exponent()
-                    .checked_add(port.origin_exponent)
-                    .and_then(|value| port.step_exponent.checked_mul(j)?.checked_add(value))
-                    .ok_or_else(|| invalid("generator phase exponent overflow"))?;
-                let map = receiving_current_map(site, exponent)?;
-                let index = machine
-                    .sites()
-                    .iter()
-                    .position(|candidate| candidate.id() == site.id())
-                    .ok_or_else(|| invalid("generator phase source site index"))?;
-                source_indices.push(index);
-                maps.push(map);
-            }
-        }
+        // The reception's maps are the chart's receive facet: the same maps are its exact
+        // passive coholon `C x` and pullback `Cᵀ g` (`ResidentHolonChart::phase_reception`).
+        let reception =
+            super::holon_chart::ResidentHolonChart::phase_reception(machine, &binding, width)?;
+        let (source_indices, maps) = (reception.source_indices, reception.maps);
         let coefficients = ResidentNormalEnclosureSection::affine_coefficients(
             source.surface(),
             &maps,

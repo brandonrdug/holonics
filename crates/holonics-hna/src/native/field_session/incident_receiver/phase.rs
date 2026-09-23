@@ -114,7 +114,6 @@ impl<'c> GeneratorTextReceiver<'c> {
             support_material: self.inner.support.retained_view(),
             text_materials,
             text_cohorts,
-            retro_provenance: None,
             text_features,
             text_logits,
             text_face,

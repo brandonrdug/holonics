@@ -43,12 +43,15 @@ enum BodyState<'c> {
     /// Legacy constituted field (tensor/joint/shared/geometric text charts, native-source
     /// session): storage = joint field current, skew interconnection = the operative reflection,
     /// active element = the neighborhood's bilinear reaction, source port = boundary + condition.
-    /// Its occurrence clock is fixed at attach; its pending comparisons are frozen producing cuts.
+    /// Its occurrence clock is fixed at attach; a pending comparison keeps its producing operands
+    /// (input, condition, held mask) and is read at the contemporary field and material.
     Field(FieldModel<'c>),
     /// Incident field and fixed generator machine (HNN): complex = declared site incidence,
     /// storage = joint q/b, skew = the declared contact action `D = B_U*`, active = the reaction
     /// material under its declared law, source port = the phase-carried moment `m` and condition
-    /// `c`, generators = the compiled machine. Source-only: no occurrence clock.
+    /// `c`, generators = the compiled machine. Source-only: no occurrence clock. A pending
+    /// comparison keeps its producing operands (a prepared boundary or a passage's moment) and
+    /// is read at the contemporary constitution; its host law is `ResidentHolonChart`.
     Incident(IncidentFieldModel<'c>),
     /// Projected affine wave (`NativeCoupledWaveSession`): storage = the (previous, current)
     /// wave pair, active = the normal material, source ports = admitted member contacts.

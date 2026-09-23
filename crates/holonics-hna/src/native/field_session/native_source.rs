@@ -288,7 +288,9 @@ impl<'c> NativeFieldSession<'c, NativeFieldSources<'c>> {
             .map(|_| ())
             .ok_or_else(|| invalid("unknown native preparation"))
     }
-    /// Ordinary observed output uses the body's retained producing D/M and complete adjoint.
+    /// Ordinary observed output: the body re-reads the retained comparison's operands through the
+    /// contemporary field `D` and reaction material `M` and returns the complete adjoint at that
+    /// cut (the retention law; no producing D/M cut is kept).
     pub fn observe_native_output(
         &mut self,
         comparison: u64,
@@ -314,8 +316,9 @@ struct NativeSourceHeader {
     next: u64,
     pending: BTreeMap<u64, NativePreparationRest>,
 }
-/// Durable native source presentation and the existing field body, including required interior
-/// and pending producing D/M. It contains no text alphabet or replay archive of formed examples.
+/// Durable native source presentation and the existing field body, including its required
+/// interior and the producing operands of its pending comparisons (never a producing D/M cut).
+/// It contains no text alphabet or replay archive of formed examples.
 pub struct NativeSourceSavedSession {
     header: NativeSourceHeader,
     body: SavedCoupledBody,

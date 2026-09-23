@@ -1139,12 +1139,11 @@ impl<'c> NativeFieldSession<'c> {
             generator.readings.forget(source);
             return Ok(json!({"released":source,"anatomy":self.inspect()}));
         }
-        if let Some(incident) = &mut self.incident {
-            if !incident.pending.contains_key(&source) {
+        if self.incident.is_some() {
+            if !self.presentation.retained_shared.contains_key(&source) {
                 return Err(invalid("unknown incident comparison"));
             }
             self.body.release(source)?;
-            incident.pending.remove(&source);
             self.presentation.retained_shared.remove(&source);
             return Ok(json!({"released":source,"anatomy":self.inspect()}));
         }
@@ -1596,7 +1595,7 @@ impl NativeFieldSavedSession {
         let body = self.body.remount(&surface)?;
         let incident = self
             .incident
-            .map(|i| i.remount(&surface, &self.spec, &body))
+            .map(|i| i.remount(&surface, &self.spec, &body, &self.retained_shared))
             .transpose()?;
         let generator = self
             .generator
