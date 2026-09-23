@@ -427,6 +427,74 @@ parametrizations give the same transported cross-entropy/material return when th
 commutes, or an explicit defect when it does not. These checks do not assert that the present
 Lean interfaces already solve coupled Einstein-fluid evolution.
 
+### 3.7 Class and method cut for the main library
+
+This is the proposed **type boundary** for consolidation, not a claim that these types already
+exist at these paths. Keep a Holon law apart from a point on it. A receiver is a role played by
+another Holon at a port; a receipt is the face returned by their actual interaction. The
+source, receiver and clock belong to the method arguments/return, not to a global scalar.
+
+```rust
+// Shape of the API; concrete generic parameters and ownership follow the consuming call.
+Holon { complex, ports, dirac, elements, generators, restrictions }
+HolonState { configuration, clock_states }           // no event tape
+ReceiverRole { holon, state, port, frame, clock, aperture }
+Holarchy { whole, constituent_generator, incidence, gluing, restrictions }
+Receipt { source, receiver, locus, frame, clock, grain, face, unresolved }
+Ratio<Left,Right> { left, right, comparison_transport, log_branch }
+InteractionReturn { source_next, receiver_next, face, receipt,
+                    boundary_currents, power_balance, unresolved }
+```
+
+`Holon::interconnect` must join the **complete** complex, named ports, material/pumps,
+generators and restrictions or return a typed gluing/clock defect. The current
+`holonic_core::Holon::interconnect` joins only the scoped port body/active law/generators;
+it refuses pumps and omits the joined complex, named ports and restrictions. The existing
+`HolonLaw::advance`/`ReferenceHolon` already return a state, bond and exact energy balance;
+retain them as the host reference. The existing `HolonLaw::receive` is a passive linear
+coholon reading. Add a joint `receive`/`interact`
+operation that advances both participants at one declared contact and returns their states,
+face, power and unresolved fibre; keep the passive reader as its zero-storage specialization.
+`Ratio::between` consumes compatible receipts after transporting frames/clocks and never
+replaces either participating Holon. `Receipt` is indexed by source, receiver, locus, frame,
+clock and grain. `Holarchy::view(receiver, grain, clock)` derives a partition and its count
+only when the receiver certifies one.
+
+| Main-library instance (one Holon law) | State/material fields and methods | Current owner to migrate; Lean counterpart |
+|---|---|---|
+| `physics::fluid` | `FluidState`: extensive mass, momentum, total/internal energy and optional internal modes on oriented cells. `FluidMaterial`: equation of state, pressure/incompressibility constraint, stress, heat/entropy transport. `face_flux` returns mass/momentum/energy currents plus traction on one oriented face; `advance` joins those face returns with sources, pressure solve, viscous-to-heat return and a residual. Pair slip is an optional interface contact, not the bulk law. | `holonic-engine::diffusion`, contact/field material where applicable; Lean `NavierStokesLambCurrentCell`, `FluidReceiverClosure`, `PortEnergyHeat`, fluid guide. A general native fluid solver is owed. |
+| `physics::wave` | `WaveState` carries complex amplitude/phase on a declared field section; `WaveMaterial` supplies propagation/dispersion, storage, damping/source and boundary relation. `propagate` returns transported section, energy/port flux and defect; `interfere` composes coherent sections before an amplitude/intensity receiver reads them. | Lean `PhaseCarrier`, `ScatteringWaveHeat` and wave/Maxwell owners; native coupled-wave sections are computational charts, not a general physical wave solver. |
+| `physics::spacetime` | `SpacetimeRealization`: metric, connection/curvature, Einstein tensor, coupling/Λ and a **source map** from a constituted fluid/thermal state to `T`. `einstein_residual` and `conservation_return` check the coupled relation; `observer_current(receiver_worldline)` contracts the full `T` in that receiver's tetrad and returns flux plus deformation work. This adapter never inserts an arbitrary arc ratio as κ. | Lean `NavierStokesCurvedTransport.EinsteinFluidDynamics`, `HolonicCurvedArcEinstein`, `ObserverBoundaryCurrent`, `ReceiverStressEnergy`; no native coupled Einstein solver yet. |
+| `physics::thermal` | `ThermalState`: internal energy, temperature/inverse-temperature, heat flux, entropy density/current and relaxation state with units. `exchange` returns boundary heat, stored-energy change and constitutive work; `entropy_production` returns a sign-certified local current under the stated material law; `diffuse` returns a timestep and exact/certified discretization defect. | Rust `DiffusionReceipt::energy_balance`; Lean `PortEnergyHeat`, `TwoCellEntropyTransport`, `HolonicEntropyActionInduction`. The latter two do not by themselves identify physical heat. |
+| `physics::information` | `InformationCoupling` binds an actual ensemble, energy levels/Gibbs reference, temperature and a reached material port to the **full** ratio covector. `apply` returns effort, work, altered material/receiver state and energy/entropy receipts. It may use the Gibbs free-energy/KL identity; raw cross-entropy or a code-length face cannot be passed as a force. | Lean `InformationDifference.thermal_crossEntropy_identity`, `freeEnergy_difference_eq_thermalScale_mul_kl`, `InformationReceiver.PhysicalCrossEntropyOccurrence`; native HNN `incident_receiver/phase::compare` and measurement reader supply the comparison, not yet this physical port. |
+| `geometry::clock` / `holon::generator` | `ClockAxis`/`ClockTransport` retain address, unit, phase+winding, rate map and the source/receiver/thermal axes. `transport_rate` composes declared maps; `join_axes` checks a commuting square or returns its defect. No extra physical timelike dimension is inferred from a parameter axis. | Rust core `generator::Clock` and interaction `Clock`; Lean `PhaseCarry`, `SituatedInformationRate`, `HolonicCausalFluxTime`, four-axis entropy-current owners. The time/entropy chain crossing remains open. |
+
+These are physical **specializations of `Holon`**, not optional fields added to every Holon or
+new primitive ontologies. `FluidState` and `SpacetimeRealization` remain distinct: a stress
+section enters Einstein's equation only through an explicit source map with units and observer
+transport. `InformationCoupling` produces physical effect only through its material port; the
+same ratio may be read by an HNN loss receiver without acting as heat or gravity. The
+thermodynamic and spacetime returns share the original interface/current and their complete
+first-law balance.
+
+The Lean package mirrors the method contracts, not every Rust struct: `Holonics.Holon` owns
+law/state/active receiver and complete interconnection; `Holonics.Ratio` and `Receipt` own the
+comparative reading; `Holonics.Holarchy` owns receiver/grain decomposition; and
+`Holonics.Physics.{Fluid,Wave,Spacetime,Thermal,Information}` imports those owners. Move a generic
+checked operator from `Millennium/` or `Physics/` when its hypotheses and target interface
+are retained; keep source-specific NS, ξ and gravity claims in `HolonicsResearch`. Pair each
+native `face_flux`, `observer_current`, `entropy_production` and `apply` return with its Lean
+statement or a named #62 obligation. A diagram/notation renderer reads this typed operator
+graph: ket = presented Holon, bra = active receiving role, bracket = receipt face, arrow =
+frame/clock transport, loop = declared circuit. It never stores a second topology.
+
+After R0 and retirement, migrate in dependency order: (1) complete Holon port/complex/clock
+joining and active receiver return; (2) ratio/receipt/Holarchy consumers; (3) finite fluid,
+wave and thermal cell returns on the polygon/cube controls; (4) stress-energy source map and
+moving-observer return; (5) information-to-material port across independent clocks; (6) HNN
+and CUDA consumers of the same contracts. Each step carries the actual current caller,
+wire compatibility and source-qualified verification; no package rename substitutes for it.
+
 ## 4. Order of work
 
 1. **R0 census (first, nothing retired before it).** Record the exact HEAD, dirty files,
@@ -452,7 +520,9 @@ Lean interfaces already solve coupled Einstein-fluid evolution.
 5. **Layout moves (§3):** sever dependency cycles, establish backend-neutral HNN and CPU-only
    main-library checks, then move/rename packages in mechanical commits. Move Lean paths and roots
    separately from declaration-namespace edits. Keep the old `hna` and wire identifiers as
-   described in §3.1 while their live consumers are migrated.
+   described in §3.1 while their live consumers are migrated. Use §3.7's class/method cut as
+   the migration and verification order: physics and receivers are main-library instances,
+   while device crates implement their declared operations.
 6. **Documents (§3.3)** and the GitHub issue reset (§5).
 7. **Update CLAUDE.md and AGENTS.md** owner tables, `CONSTRUCTION_STATE.md`, the roadmap,
    `docs/REPOSITORY.md`, root README and mathematical/operator owner links to the verified new
