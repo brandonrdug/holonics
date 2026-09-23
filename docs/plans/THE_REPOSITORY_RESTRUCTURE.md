@@ -40,16 +40,20 @@ Each is backed by a measurement at `d3b8b509`.
    reference are then built method by method (campaign K2 in §4). Neither blocks the restructure.
    `holonics-apple` implements the same port later.
 4. **Crate count: `holonics` and `holonics-cuda` now, `holonics-apple` later.** `holonic-words` is
-   kept as a separate `no_std` crate only if a Rust device kernel consumes it. Today only
-   `accelerators/cuda-kernel` (Rust compiled for nvptx) does, but its PTX is embedded by
-   `holonic-mount` library/tests/gates, loaded by engine `section_layout_adoption` tests and
-   used by `holonic-life`'s Soma CUDA lineage. Its launch owners (`SOMA_PTX`,
-   `register_launch`, `live_event_launch`) cannot be retired by removing `life` alone. The
-   HNN uses the 83 C++ kernels in `holonic-engine/kernels/`.
-   After R2 resolves the Soma lineage **and** the surviving mount/engine PTX and host callers,
-   the word rings (`ExactRing`, `CheckedIntegers`, `ModularWords`) can fold into
-   `holonics::ratio`, since residue arithmetic is ratio arithmetic. Host/device parity
-   then stays what it is for the `.cu` kernels: device tests against the host arithmetic.
+   a temporary host crate (it currently uses `std`): `holonic-core::PrimeChart` consumes
+   `ModularWords`, while the Rust NVPTX `accelerators/cuda-kernel` depends directly on
+   `soma-abi`, **not** on `holonic-words`. Both host words and the device kernel use
+   `soma-abi::section_layout_cuda` arithmetic for parity. The kernel's committed PTX is
+   embedded at compile time by `holonic-mount` library/tests/gates, loaded from those bytes by
+   engine `section_layout_adoption` tests, and used by `holonic-life`'s Soma CUDA lineage; it is
+   not a separate runtime file dependency. Its launch owners (`SOMA_PTX`, `register_launch`,
+   `live_event_launch`) cannot be retired by removing `life` alone. The HNN uses the 83 C++
+   kernels in `holonic-engine/kernels/`, generated through the engine's NVCC build script.
+   After R2 resolves the Soma lineage and the surviving host and PTX callers, the word rings
+   (`ExactRing`, `CheckedIntegers`, `ModularWords`) can fold into `holonics::ratio`, since residue
+   arithmetic is ratio arithmetic. If a Rust device kernel still needs shared `no_std` source,
+   retain only that small arithmetic carrier until the backend cut can consume it directly.
+   Host/device parity for the `.cu` kernels remains tested against host arithmetic.
    `accelerators/rust-gpu` (Vulkan, already ruled out for production) retires.
 5. **Minimal features.** Each feature combination compiles its own copy of the crate. On
    September 23 the engine had 39 incremental directories (150 GB). Main `holonics` has no

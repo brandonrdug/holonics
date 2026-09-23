@@ -153,9 +153,12 @@ classify these as implementation-specific retirement or preserve a distinct law 
 The [R2 owner audit](census/SOMA_R0.tsv) changes two earlier assumptions. `holonics-workspace`
 has a live workbench application caller, and `holonic-language`'s generic reflective
 continuation law lacks a clearly equivalent Lean owner; move that law before retiring its
-Rust crate. `accelerators/cuda-kernel`'s PTX is embedded by `holonic-mount` library/tests/gates
-and loaded by an engine section-layout test as well as by `life`; removing `life` alone cannot
-retire the Rust device kernel or `holonic-words`. The plan §0.4 now names those consumers.
+Rust crate. The [device and exact-word audit](census/R2_DEVICE_WORDS.md) establishes that
+`holonic-core::PrimeChart` consumes `holonic-words`, while the Rust NVPTX kernel consumes
+`soma-abi` directly; the latter owns the shared `no_std` arithmetic. The Soma PTX is embedded at
+compile time by `holonic-mount` library/tests/gates and loaded as bytes by the engine's
+section-layout test and `life` callers. Removing `life` alone cannot retire the kernel, mount
+consumer or host words. The plan §0.4 now names those distinct edges.
 
 ## First source-backed cuts to verify
 
