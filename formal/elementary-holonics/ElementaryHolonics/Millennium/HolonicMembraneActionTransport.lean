@@ -1,4 +1,5 @@
 import ElementaryHolonics.Foundation.MeasuredDifferenceReceiver
+import ElementaryHolonics.Foundation.FiniteCrossEntropyReceiver
 import ElementaryHolonics.Physics.CoupledIncidence
 import ElementaryHolonics.Millennium.HolonicEntropyActionInduction
 import ElementaryHolonics.Millennium.SituatedReturnedDifference
@@ -18,12 +19,11 @@ when both the potential transport and the constitutive map commute.  The existin
 Complex-Parametron theorem then supplies the contact-local mixing law: incidence and the complete
 two-index constitutive form must be reoriented together.
 
-The final section defines conventional finite cross-entropy only after a normalized reference
-population and a strictly positive normalized receiver section have been declared.  It is one real
-receiver face, with a complete reconstruction fibre.  A concrete three-member population proves
-that equal cross-entropy does not identify receiver sections, and a separating successor cannot
-factor through that scalar.  No theorem identifies this receiver with microscopic probability,
-uses it to select membrane support, or deposits it as morphology.
+The finite cross-entropy chart and action-indexed receiver fibre are the generic
+`Foundation/FiniteCrossEntropyReceiver` owner. This source-specific module supplies a concrete
+three-member population that proves equal cross-entropy does not identify receiver sections and a
+separating successor cannot factor through that scalar. No theorem identifies this receiver with
+microscopic probability, uses it to select membrane support, or deposits it as morphology.
 -/
 
 noncomputable section
@@ -149,67 +149,6 @@ theorem localMembraneMixing_zero_of_couplingRow_zero
   apply Finset.sum_eq_zero
   intro first hfirst
   rw [rowZero first, zero_mul]
-
-/-! ## Cross-entropy is a declared receiver face -/
-
-/-- Conventional finite cross-entropy.  Positivity and normalization belong to the receiver
-chart below; this raw expression is kept separate so its exact quotient can be inspected. -/
-def finiteCrossEntropy {Index : Type*} [Fintype Index]
-    (reference emitted : Index → ℝ) : ℝ :=
-  -∑ index, reference index * Real.log (emitted index)
-
-/-- A probability receiver chart for one action population.  The action itself remains arbitrary;
-only its emitted receiver section is assigned normalized positive coordinates. -/
-structure FiniteCrossEntropyReceiver (Action Index : Type*) [Fintype Index] where
-  reference : Index → ℝ
-  emitted : Action → Index → ℝ
-  reference_nonnegative : ∀ index, 0 ≤ reference index
-  reference_normalized : ∑ index, reference index = 1
-  emitted_positive : ∀ action index, 0 < emitted action index
-  emitted_normalized : ∀ action, ∑ index, emitted action index = 1
-
-namespace FiniteCrossEntropyReceiver
-
-variable {Action Index : Type*} [Fintype Index]
-
-/-- The scalar face returned after the complete action has entered the probability chart. -/
-def face (receiver : FiniteCrossEntropyReceiver Action Index) (action : Action) : ℝ :=
-  finiteCrossEntropy receiver.reference (receiver.emitted action)
-
-/-- The complete population of actions one scalar cross-entropy reading cannot distinguish. -/
-def preimageFibre (receiver : FiniteCrossEntropyReceiver Action Index) (reading : ℝ) :
-    Set Action :=
-  {action | receiver.face action = reading}
-
-@[simp] theorem mem_preimageFibre_iff
-    (receiver : FiniteCrossEntropyReceiver Action Index) (reading : ℝ) (action : Action) :
-    action ∈ receiver.preimageFibre reading ↔ receiver.face action = reading := Iff.rfl
-
-/-- Equal cross-entropy puts two actions in one receiver fibre; it does not identify them. -/
-theorem same_fibre_of_equal_face
-    (receiver : FiniteCrossEntropyReceiver Action Index) {left right : Action}
-    (equalFace : receiver.face left = receiver.face right) :
-    left ∈ receiver.preimageFibre (receiver.face left) ∧
-      right ∈ receiver.preimageFibre (receiver.face left) := by
-  exact ⟨rfl, equalFace.symm⟩
-
-/-- If a later receiver separates two equal-cross-entropy actions, that successor cannot factor
-through the scalar cross-entropy face. -/
-theorem no_successor_factor_of_equal_face
-    {Successor : Type*}
-    (receiver : FiniteCrossEntropyReceiver Action Index)
-    (successor : Action → Successor) {left right : Action}
-    (equalFace : receiver.face left = receiver.face right)
-    (separated : successor left ≠ successor right) :
-    ¬ ∃ factor : ℝ → Successor, ∀ action, successor action = factor (receiver.face action) := by
-  rintro ⟨factor, factors⟩
-  apply separated
-  calc
-    successor left = factor (receiver.face left) := factors left
-    _ = factor (receiver.face right) := congrArg factor equalFace
-    _ = successor right := (factors right).symm
-
-end FiniteCrossEntropyReceiver
 
 /-! ## A concrete nontrivial cross-entropy fibre -/
 

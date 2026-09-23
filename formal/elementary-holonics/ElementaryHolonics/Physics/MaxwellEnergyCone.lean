@@ -1,4 +1,3 @@
-import ElementaryHolonics.Millennium.HolonicMaxwellPropagation
 import Mathlib
 
 /-!

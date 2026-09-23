@@ -1,5 +1,5 @@
 import ElementaryHolonics.Foundation.InformationReceiver
-import ElementaryHolonics.Millennium.HolonicMembraneActionTransport
+import ElementaryHolonics.Foundation.FiniteCrossEntropyReceiver
 import Mathlib.Data.Complex.Basic
 
 /-!
@@ -194,18 +194,12 @@ theorem no_current_factor_of_equal_crossEntropy
     _ = factor (receiver.face right) := congrArg factor equalFace
     _ = current right := (factors right).symm
 
-theorem membrane_tail_scalar_does_not_determine_action :
-    ¬ ∃ factor : ℝ → Bool, ∀ action,
-      action = factor (tailCrossEntropyReceiver.face action) :=
-  tailCrossEntropyReceiver_no_identitySuccessorFactor
-
 section Audit
 
 #print axioms crossEntropy_self_eq_entropy
 #print axioms crossEntropy_excess_eq_kl
 #print axioms halfSection_crossEntropy_ne_zero
 #print axioms no_current_factor_of_equal_crossEntropy
-#print axioms membrane_tail_scalar_does_not_determine_action
 #print axioms thermal_crossEntropy_identity
 #print axioms freeEnergy_difference_eq_thermalScale_mul_kl
 #print axioms liftedCrossEntropy_real

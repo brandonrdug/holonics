@@ -390,6 +390,14 @@ Refine that root by **operator**, coupled to the Rust calls above:
 | `Holonics.Physics` (instances) | Fluid, wave, spacetime and thermal laws specialize Holon incidence, transport and element relations. Keep mass/momentum/energy and stress traction, pressure constraint/Hodge projection, complex-bilinear and conducting-fluid signs, heat/entropy flux and relaxation, phase superposition, propagation and boundary energy. Join `EinsteinFluidDynamics` and `ObserverBoundaryCurrent` under their stated field/Bianchi/metric hypotheses; preserve the abstract-versus-physical realization boundary. Use the finite checked owners and name continuum/discretization obligations. |
 | `Holonics.HNN` | Formal specializations of the same Holon operators: coupled field, source moments, complete variation, deposition return and complex-parametron storage/pump/lock chart. It imports the object owners; the physical parametron is not a foundation import. |
 
+`Framework/Physics.lean` is currently an import-only subject facade, not a declaration owner.
+Curate its target `Holonics.Physics` by the finite constitutive and receiver laws actually owned by
+its imports; keep source-specific Einstein/cosmology/Maxwell instances in `HolonicsResearch` and
+place HNN specializations under `Holonics.HNN`. The source map and two small Physics import cuts
+are recorded in [`LEAN_CORE_R3_EDGES.md`](census/LEAN_CORE_R3_EDGES.md#physics-facade-curation-audit).
+Those cuts remove direct edges but do not by themselves make the full Physics closure research-free;
+each remaining generic/source-specific mixed owner needs its declaration-level boundary audited.
+
 The September 23 Millennium work supplies concrete tests of this placement. `Computation/CertifiedWindingRoute`
 has receiver-count additivity over zero-free shared cuts and a compatible shrinking route;
 `Computation/IntersectionNavigation` returns an affine solution fibre or unreachable

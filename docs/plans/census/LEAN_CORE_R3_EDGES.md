@@ -144,3 +144,93 @@ measures `Framework.Dynamics` at 89 modules / 28,662 lines, down from 156 / 44,8
 closure. The full `ElementaryHolonics` umbrella remains 1,385 modules / 484,936 lines and
 retains every RH result. The Framework still reaches 282 Millennium modules through other
 facets; this curation alone does not establish the final two-root dependency boundary.
+## Physics facade curation audit
+
+`Framework/Physics.lean` is an import-only subject facade: it defines no physics operator or
+theorem. Its direct core candidates include `PhaseCarrier`, `CoupledIncidence`, `PortEnergyHeat`,
+`PartitionedHodgeEnergy`, `ReleasedMotion`, `ScatteringWaveHeat`, `PhaseContactPassage`,
+`ReactionCurrent`, `MechanicalReceiver`, `ReflectedBoundaryMemory`, `AccumulatedNormalResponse`,
+`TwoCellEntropyTransport`, and the generic `MaxwellEnergyCone` and `InformationDifference` owners.
+`ConstitutiveWorldTube` also contains a reusable physical chart, but still depends on
+`HolonicDifferenceCalculus`, `HolonicDirectedPassage`, `Gluing` and `Polarisation`; extract those
+generic transport declarations before treating its closure as core.
+
+Several direct physics modules currently carry source-specific dependencies and should be divided
+by declaration before their public-root placement is fixed: `CompactifiedModeTransport` reaches
+`HolonicTorusKnots`; `TemporalHodgeResidue` reaches the Hodge Green/decomposition family;
+`CompositeMassEnergy`, `ReceiverStressEnergy` and `ObserverBoundaryCurrent` reach the
+`HolonicMassShellFace` family; `FluidReceiverClosure` and `ConductiveFluidReflection` reach the
+Navier–Stokes finite Galerkin and vorticity families; `FourTorusParametronCurrent` reaches the
+four-torus realization; and `DirectionalPolarization` / `FermionicModeReceiver` reach
+computation-specific crystal/occupation owners. Their generic finite laws are `Holonics.Physics`
+candidates; their named physical instances and research theorems belong in `HolonicsResearch`.
+The computation aggregators `HolonicQuantumTransport` and `HolonicEvolutionKinds` are HNN
+specializations for the future `Holonics.HNN` root. Do not move their aggregate imports to Physics
+as a substitute for moving the consuming declarations.
+
+The original six direct Millennium imports were `HolonicMembraneActionTransport`,
+`HolonicCurvedArcEinstein`, `HolonicTypedOriginDimensions`, `HolonicCosmologicalInference`,
+`HolonicFourForceSectorCarrier`, and `HolonicMaxwellPropagation`. The membrane module was imported
+by `InformationDifference` for the concrete theorem `membrane_tail_scalar_does_not_determine_action`
+and the generic finite cross-entropy receiver family. `finiteCrossEntropy` and
+`FiniteCrossEntropyReceiver` (face, fibre, and equal-face factor theorem) now live in
+[`Foundation/FiniteCrossEntropyReceiver.lean`](../../../formal/elementary-holonics/ElementaryHolonics/Foundation/FiniteCrossEntropyReceiver.lean),
+preserving declaration names and their historical namespace. The concrete membrane-tail theorem
+is now in the research owner
+[`HolonicMembraneActionInformationDifference.lean`](../../../formal/elementary-holonics/ElementaryHolonics/Millennium/HolonicMembraneActionInformationDifference.lean)
+with the same declaration namespace and proof. `Physics/InformationDifference` now owns the finite
+receiver-relative information, free-energy and lifted-phase laws over `Foundation.InformationReceiver`
+and the extracted generic receiver. The old membrane owner remains imported by the broad
+`ElementaryHolonics.lean` umbrella and by the new theorem owner.
+
+The `HolonicMaxwellPropagation` import in `Physics/MaxwellEnergyCone` was unused: every theorem in
+the cone file is an algebraic `Fin 3` identity over its local `Field`, and no declaration from
+MaxwellPropagation occurs in the file. That dependency and the facade's direct re-export are
+removed. The propagation construction remains in the broad umbrella and in its
+`Millennium.HolonicDiscreteMaxwellOperator` consumer. The Einstein/curved-arc, typed-origin,
+cosmological and four-force imports remain direct research entries of the current facade pending
+the curated-root migration; their source files and standalone consumers remain intact.
+
+After the source cuts, the static source-import closure of `Framework.Physics` falls from 476
+modules / 170,559 lines (279 Millennium, 64 RH) to 475 / 169,920 (277 Millennium, 64 RH). This
+small net change reflects overlapping paths to the research modules. `Physics.InformationDifference`
+falls from 129 / 47,269 to 3 / 538 lines; `Objects.Ratio` falls from 136 / 49,827 to 16 / 4,340;
+and `Framework.Objects` falls from 208 / 81,459 to 110 / 41,755. These are source-import counts,
+not Lake artifact measurements. The full `Framework.Physics` research closure still needs
+declaration-level curation; dropping imports alone must not be reported as a research-free Holonics
+root.
+
+For a stacked-source projection, overlaying the two Lean files changed by
+`codex/restructure-r3-dynamics-curation` onto this Physics worktree gives `Framework.Physics` 408
+modules / 153,769 lines (274 Millennium, zero RH) and full `Framework` 474 / 172,792 (280
+Millennium, zero RH). This is an in-memory source-import projection before Git rebase and combined
+Lake verification; recount after integration. The legacy `ElementaryHolonics` umbrella remains a
+broad source/research closure.
+
+Direct importers after the cut: `HolonicMembraneActionTransport` remains in
+`ElementaryHolonics.lean` and `HolonicMembraneActionInformationDifference`;
+`HolonicMaxwellPropagation` remains in `ElementaryHolonics.lean` and
+`HolonicDiscreteMaxwellOperator`. `HolonicCurvedArcEinstein` is imported by the old umbrella and
+`Framework.Physics`; `HolonicTypedOriginDimensions` by the umbrella, `HolonicCosmologicalInference`,
+`HolonicDiscreteMaxwellOperator`, and `HolonicFieldTheoryPassage`; `HolonicCosmologicalInference`
+by `Framework.Physics`; and `HolonicFourForceSectorCarrier` by the umbrella,
+`HolonicConnectionCurvature`, and `HolonicEntropyActionInduction`. The computation aggregators
+retain their `HolonicQuantumTransport`, `HolonicSimulationCertificate`, `AngleExcess`, and
+`DirectionalPolarization` consumers. A source-specific declaration is not removed merely because
+the main root no longer re-exports its research owner.
+
+| Direct Framework import | Other source importers / consuming owners | Target disposition |
+|---|---|---|
+| `Millennium.HolonicCurvedArcEinstein` | broad `ElementaryHolonics.lean`; it itself imports `HolonicComposition` and `NavierStokesCurvedTransport` | research instance; preserve in `HolonicsResearch` |
+| `Millennium.HolonicTypedOriginDimensions` | broad umbrella; `HolonicCosmologicalInference`, `HolonicDiscreteMaxwellOperator`, `HolonicFieldTheoryPassage` | mixed: the two-origin `OriginDim` and symmetrization are generic candidates; Einstein/cosmological/tensor-area instances stay source-specific until separately cut |
+| `Millennium.HolonicCosmologicalInference` | `HolonicTypedOriginDimensions` | research parameter-receiver instance; preserve in `HolonicsResearch` |
+| `Millennium.HolonicFourForceSectorCarrier` | broad umbrella; `HolonicConnectionCurvature`, `HolonicEntropyActionInduction` | research carrier until its generic oriented-cell/connection declarations have an independent owner |
+| `Computation.HolonicQuantumTransport` | no other direct importer; it aggregates nine computation owners including Fermi/HNN modules | HNN specialization root, not Physics re-export |
+| `Computation.HolonicPolarizedCrystalTransport` | `Computation.HolonicQuantumTransport`, `Millennium.AngleExcess`, `Physics.DirectionalPolarization` | retain current physical/computation consumers; decide Physics vs HNN after the boundary chart is separated |
+| `Computation.HolonicEvolutionKinds` | `Computation.HolonicQuantumTransport`, `Computation.HolonicSimulationCertificate` | HNN/computation specialization; preserve in its consuming root |
+
+The remaining direct Physics owners whose own imports cross into research are recorded above by
+path and family; importantly, their counts overlap and must not be summed as unique removals. In
+the post-cut source graph the full Physics facade still reaches 277 Millennium and 64 RH modules.
+The target root must split those mixed declarations, not blindly remove the Physics modules or
+re-export all their source dependencies.
