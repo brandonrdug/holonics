@@ -612,13 +612,26 @@ coupled tests that read the retired anchors now read the step's prediction, and
 `source_rest_rejects_changed_returned_normal` now sees the changed returned normal refused at decode
 by the contact law (it was refused at remount by the anchored prediction).
 
+**Continuation verification, September 23, on `codex/consolidation-phase-11` from `de6a5300`.**
+Lean built `ElementaryHolonics.Holon.AffineContact` and
+`ElementaryHolonics.Framework.HolonObject`; the contact theorems report only the standard
+`propext`, `Classical.choice` and `Quot.sound` axioms. Rust host test
+`the_relation_fibre_is_the_translate_of_its_vertical_fibre` passed. GPU tests
+`every_resident_reading_is_the_fibre_of_the_one_relation`,
+`oblique_family_preserves_tangent_and_returns_normal_current`,
+`affine_origin_and_direction_scale_are_not_selected_as_actual_cause`,
+`legacy_anchored_source_map_decodes_into_the_same_map` and
+`source_rest_rejects_changed_returned_normal` passed serially. The public HNA caller test
+`field_interiors_form_and_feed_the_coupled_prediction` also passed. Full
+`material_transport::normal` and HNA consumer suites remain to run.
+
 **Not done, with reasons.** (1) The frozen producing material in `FieldReactionEnclosure` and the
 coupled continuation's retained transport word are phase-12 retention debt (hna field session). (2)
 `ConditionImageReading`/`ConstitutiveImageReading` could be one reading with renamed fields; their
 field names are public API of hna `mathematical`, so they stay two faces of one decoder. (3)
 `NormalWaveRelationRest` keeps its name (wire and public API) although the relation is not the normal
-law. (4) The contact law is checked on the host and on retained wave words; a device receipt of the
-balance (a sixth block) would change the reaction layout and is not added.
+law. (4) The contact law is checked by Lean and by the resident reaction reading; a device receipt
+of the balance (a sixth block) would change the reaction layout and is not added.
 
 ### Phase 15 disposition: the extracted operator is one Holon
 
@@ -856,22 +869,25 @@ advance (no energy balance is declared for the event laws); the kept standings w
 occurrence set (`arithmetic_phase`, `local_star`, `physical`, `simplicial`, `algebraic`,
 `holonic_complex`, `sheaf_diffusion`) and the one `HolonRest` codec named in the programme table.
 
-## Handoff, September 23: phases 11, 12a and 12b are paused mid-packet
+## Handoff, September 23: phases 11, 12a and 12b were paused mid-packet
 
 [established-bounded; source-inspected] Landed on `main`: phases 9 (`5c4bb58a`), 10 (`4dff57c8`),
-13 (`5b7c89ab`), 15 (`7e204283`) and 16 (`009e8363`). Three phases were stopped mid-work when the disk filled.
-Their unverified states are committed on local branches (not pushed), each in its own worktree:
+13 (`5b7c89ab`), 15 (`7e204283`) and 16 (`009e8363`). Phases 11, 12a and 12b were stopped
+mid-work when the disk filled. The original WIP branches remain preserved locally; phase 11 has
+since been transplanted to an isolated continuation branch:
 
 | Phase | Branch (worktree) | Base | Last step reached | Remaining |
 |---|---|---|---|---|
-| 11 resident constitutive views | `wip/consolidation-phase-11` (`.local/p11-wt`) | `5b7c89ab` | resident relation (`resident/relation.rs`), condition-contact reaction split, disposition section written; about to write `Holon/AffineContact.lean` (file present, unchecked) | finish Lean + import; equality tests; caller migration; host + device suites (`constitutive_fibre::resident`, `material_transport::normal`, hna consumers) |
+| 11 resident constitutive views | Original `wip/consolidation-phase-11` (`.local/p11-wt`) remains untouched; continued on `codex/consolidation-phase-11` (`.local/p11-continuation`) | `5b7c89ab` WIP transplanted onto `de6a5300` | Lean AffineContact and HolonObject import built; host relation equality, resident relation/contact GPU checks and one HNA field caller passed | run full `material_transport::normal` and HNA consumer suites; close phase #68 with final receipt |
 | 12a field body and session | `wip/consolidation-phase-12a` (`.local/p12a-wt`) | `5b7c89ab` | incident body/session edits for the joint `\x01` frozen-cut retirement, machine episode, `ResidentHolonChart`; about to add chart equality tests | packets 1–6 of the brief: contemporary-read tests (delayed = immediate at the same constitution), `\x01` decode test, `FieldProducingSection`, ladder consolidation, disposition, CLAUDE.md stale statements, suites, exposure sample (counts and bits only) |
 | 12b coupled continuation and field internals | `wip/consolidation-phase-12b` (`.local/p12b-wt`) | `7e204283` | coupled continuation retirement in progress: `continuation.rs` deleted, dependent/comparison/rest rewritten; writing coupled wave rest v12 with legacy v9/v10 decode (likely does not compile yet) | finish v12 rest; hna `coupled_wave.rs` session contract restated; contemporary-read tests; behaviour measurement; `NormalWaveHolon` reception/actuation chart; then packet 2 (junction, material_transport/{complete,contextual,moment,support}, archive, current_history_source, contextual_lift, rest) |
 
 Overlaps to resolve when joining: 11 and 12a both edit hna `field_session.rs` and
 `field_session/native_source.rs`; 11 and 12b both edit `normal/direct/wave/coupled.rs` and
 `coupled/comparison/constitutive.rs` (11's edits there are compile fixes; 12b's rewrite governs). Rebase each
-onto current `main`, verify in an isolated worktree with a single shared target directory, then commit.
+onto the reduced restructure tree, verify in an isolated worktree with a single shared target
+directory, then commit. Phase 11 is already transplanted on the continuation branch above; do not
+rebase or modify its original WIP branch.
 
 Still open after these: phase 14 (cultivated body, including the repeated apparatus fields phase 13 left);
 phase 16's remainder (event laws as a core `HolonLaw` advance with energy balance, the seven unconverted
