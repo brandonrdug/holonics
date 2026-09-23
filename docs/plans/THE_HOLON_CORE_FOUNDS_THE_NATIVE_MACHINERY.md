@@ -196,6 +196,64 @@ power declarations of the remaining name-inferred active receivers (`IncidentTex
 `GeneratorTextReceiver`, `NormalWaveFamilyReceiver`), and a consumer that feeds a participation's
 enclosed delivered power into the resident field's balance (phase 8's chart).
 
+### Phase 8b disposition: body states and retained history
+
+[established-bounded; source-inspected] `NativeCoupledBody`
+(`crates/holonics-hna/src/native/coupled_wave/body.rs`) has four `BodyState`s. Every one has a
+live public caller, so none is retired; each is a chart of the core `Holon` whose
+`HolonState.configuration` is the resident current and `HolonState.commit` the body `epoch`.
+
+| State | Entered through | Live callers | Test-only callers | Core `Holon` chart | Retained history |
+|---|---|---|---|---|---|
+| `Field` (`body/field.rs::FieldModel`) | `from_field`, `from_field_with_reaction_port`; rest tag 2 | `NativeFieldSession` charts `TensorCondition`, `JointRegions`, `SharedRegions`, `GeometricRegions` (`field_session.rs::found`) and `from_native_field` (`native_source.rs`); workbench `holonics hna field-session`; examples `athena_field`, `helical_field_generator`, `athena_exposure_field` (shared regions), `athena_geometric_spec`; drivers `research/experiments/athena_field/{geometric,pattern,session}` (`shared` keeps only its recorded run), `native_performance_benchmark/quality.py` | `field_session/{native_source,geometric}/tests.rs`, `coupled_wave/tests/boundary.rs` | storage = joint field current (`K` = field nodes); skew = operative reflection `D`; active = neighborhood bilinear reaction (normal material); source ports = boundary input + condition | occurrence clock fixed at the two foundation occurrences; pending comparisons are frozen producing sections (`FieldProducingSection`: source cut, reaction enclosure, input, output) |
+| `Incident` (`body/field/incident.rs::IncidentFieldModel`) | `found_incident_field` (chart `IncidentField`), `found_generator_field` (chart `GeneratorMachine`); rest tag 3 | `field_session/{incident_application,generator_application}.rs`; workbench `field-session`; examples `athena_exposure_field`, `athena_geometric_spec`, `support/generator_machine.rs`; drivers `quality.py` (`incident-field`), `athena_field/geometric/run.py` | `incident_tests.rs`, `incident/*/tests.rs`, `incident_application_tests.rs` | complex = declared site incidence (CSR + transpose); storage = joint `q/b`; skew = declared contact action `D = B_U*`; active = reaction material under `ReactionLaw` (power-neutral: `core::reaction` projections); source port = moment `m` and condition `c` through `I`; generators = compiled machine sites; receivers = the phase-7 normalized/phase active receivers | source-only field, no occurrence clock; generator comparisons are the moment quotient (`\x04`); legacy-slot comparisons are frozen words (`\x01`) |
+| `Affine` (`ResidentNormalWave<NormalWaveCoupled>`) | `from_wave`; rest tag 0 | `NativeCoupledWaveSession` (`coupled_wave.rs`); workbench `holonics hna coupled-wave-session`; `HnaStream::pump_coupled_wave` | `coupled_wave/tests{,/boundary}.rs` | storage = (previous, current) wave pair; active = normal material; source ports = admitted member contacts per `WaveSourceReceiver` | pending coupled predictions keep their `relation_cut` (engine owner) |
+| `Constitutive` (`ResidentCoupledConstitutive`) | only `Affine::incorporate` and rest tag 1 | the same coupled-wave session after its first incorporation | `coupled_wave/tests.rs` | the source-dependent generator continuation of the same Holon (its parameter generator is the active relation) | retained ordered generating word for prospective reads (engine owner) |
+
+`from_incident_field` (`incident.rs`) has no caller in the workspace, examples, applications or
+drivers; it is proposed for retirement with the incident owner (phase 8a's file).
+
+[established-bounded; source-inspected, measured] **Occurrence history.**
+`NativeConstitutiveField.history` grows only in `advance_with` (the constitutive `advance*`
+passage). A source-only field refuses that passage ("source-only field has no legacy
+constitutive advance") and its rest refuses history ("source-only field has legacy history").
+Every incident and generator-machine body founds `found_incident_source_only`
+(`incident.rs::found_incident_field`, `incident/machine.rs`), so **no live HNN path adds
+occurrences**. The legacy constituted-field session founds exactly two occurrences
+(`field_session.rs::found`: entering, then through) and, once attached, `FieldModel` exposes no
+advance: generation commits reflections and the reaction material, so the count stays fixed.
+The occurrence archive (`FieldArchive`: `enable_history_archive`, `archive_history_before`,
+`remount_with_history_archive`) is enabled only by engine unit tests. Retirement landed: both
+archive entries now refuse a source-only field before creating a file, and the field doc marks
+`history`/`archive` as the legacy occurrence clock. Tests:
+`field/rest/tests.rs::source_only_field_refuses_occurrences_at_runtime_and_at_rest` (runtime
+refusal, empty rest, remount, archive refusal, grafted legacy occurrence refused) and
+`body/field.rs::compatibility_tests::attached_field_occurrence_clock_is_fixed_through_generation_return_and_rest`
+(the delivered `athena_field/one-pass` wire decodes with two occurrences, two generate/return
+cycles and a rest/remount with one pending comparison keep two). Engine drivers
+(`native_material_mode`, `native_internal_mode`, `native_conditioned_phase`) and the hna
+measurement examples (`native_neighborhood`, `native_generator`) still grow the clock by their
+own `advance_status` loops; the linear-emission, anchor, internal-current and context readers
+consume it, so it is not removed.
+
+[established-bounded; source-inspected] **Frozen incident cuts are not retired.** The `\x01`
+pending word (`IncidentWord` with its material views, anchor, solve steps and output) is produced
+only by the legacy-slot `IncidentField` chart and consumed by a public contract:
+`field_session/incident_application.rs` freezes its own text/support/cohort receiver beside it
+(`incident_application/rest.rs`: `frozen_text`, `frozen_support`, `frozen_cohorts`),
+`inspect_incident_comparison` promises "the produced features … not a recomputation with
+contemporary material", and
+`incident_application_tests.rs::public_incident_session_reopens_frozen_receiver_after_intervening_update`
+asserts the frozen faces survive an intervening update and a rest/reopen. Replacing the body word
+alone with a contemporary reading would split that pair. The retirement is one joint packet over
+the body (`incident.rs::publish`/`word`, `incident/machine_episode.rs::retained_comparison`,
+`incident/rest.rs`: retain `(boundary, held, admitted, epoch)` and rebuild the word at the
+contemporary field/material on return, as `contemporary_comparison_word` does for moments; write
+a new tag and keep reading `\x01`) and the session receiver (read at contemporary material, with
+the test's contract restated). The legacy constituted field's `FieldProducingSection` is the same
+object class, consumed by the text charts' observe; it is recorded here and not retired. Owed:
+that joint packet, and the `ResidentHolonChart` delegation, which remains unimplemented.
+
 Constraints: rest/wire compatibility for `SavedCoupledBody`, `NativeIncidentModelRest`,
 `CoupledConstitutiveRest`, the complex schema string and custom deserializers; interaction types stay
 `Serialize`-only so no wire mints an unchecked object; no device layout change during consolidation;

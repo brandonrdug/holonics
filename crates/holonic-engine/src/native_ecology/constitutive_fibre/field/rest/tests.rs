@@ -216,3 +216,74 @@ fn joint_image_rest_matches_outgoing_and_rejects_corruption_without_history() {
     image.intervals[end-2]=(-1,-1);image.intervals[end-1]=(-1,-1);
     assert!(rest.validate().unwrap_err().to_string().contains("joint image extent/radius"));
 }
+
+/// Phase 8b retention bound. A source-only field — the owner every incident and generator-machine
+/// body founds (`found_incident_source_only`) — has no occurrence clock: the legacy advance is
+/// refused at runtime, its rest carries no history, and a legacy occurrence grafted onto its wire
+/// is refused by validation rather than mounted.
+#[test]
+#[ignore = "requires CUDA; a source-only field refuses occurrences at runtime and at rest"]
+fn source_only_field_refuses_occurrences_at_runtime_and_at_rest() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let mut field =
+        NativeConstitutiveField::found_incident_source_only(&surface, seed(), ResidentGrain(48))
+            .unwrap();
+    let refused = field.advance_resident(&mut NativeFieldOccurrence::entering(vec![phase(1)]));
+    assert!(
+        matches!(&refused, Err(ConstitutiveFibreError::Rest(m)) if m.contains("no legacy constitutive advance"))
+    );
+    assert_eq!(field.occurrence_count(), 0);
+    let rest = field.rest(&[], &[]).unwrap();
+    assert_eq!(rest.occurrences(), 0);
+    let mut bytes = Vec::new();
+    rest.write(&mut bytes).unwrap();
+    let decoded = NativeFieldRest::read(&mut &bytes[..], bytes.len() as u64).unwrap();
+    let (mut resumed, sources, anchors) =
+        NativeConstitutiveField::remount(&surface, decoded).unwrap();
+    assert_eq!(resumed.occurrence_count(), 0);
+    assert!(sources.is_empty() && anchors.is_empty());
+    // No occurrence archive is created for it, live or at remount; the refusal precedes the file.
+    let placement = std::env::temp_dir().join(format!(
+        "holonics-source-only-history-{}-{}",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+    ));
+    assert!(resumed.enable_history_archive(&placement).is_err());
+    assert!(!resumed.has_history_archive());
+    let decoded = NativeFieldRest::read(&mut &bytes[..], bytes.len() as u64).unwrap();
+    assert!(
+        NativeConstitutiveField::remount_with_history_archive(&surface, decoded, &placement)
+            .is_err()
+    );
+    assert!(!placement.exists());
+
+    let mut legacy =
+        NativeConstitutiveField::found_with_enclosed_junction(&surface, seed(), ResidentGrain(48))
+            .unwrap();
+    legacy
+        .advance_resident(&mut NativeFieldOccurrence::entering(vec![phase(1)]))
+        .unwrap();
+    let NativeFieldRest {
+        header: legacy_header,
+        history: legacy_history,
+        ..
+    } = legacy.rest(&[], &[]).unwrap();
+    let mut grafted = NativeFieldRest::read(&mut &bytes[..], bytes.len() as u64).unwrap();
+    grafted
+        .header
+        .history
+        .extend(legacy_header.history.into_iter().take(1));
+    grafted.history.extend(legacy_history.into_iter().take(1));
+    grafted.initial_junction = None;
+    assert!(
+        grafted
+            .validate()
+            .unwrap_err()
+            .to_string()
+            .contains("source-only field has legacy history")
+    );
+}

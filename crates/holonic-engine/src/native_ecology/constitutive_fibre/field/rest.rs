@@ -1367,6 +1367,11 @@ impl<'chart> NativeConstitutiveField<'chart> {
         Error,
     > {
         rest.validate()?;
+        if rest.header.source_only {
+            return Err(invalid(
+                "a source-only field has no occurrence history to place",
+            ));
+        }
         let archive = FieldArchive::create(path.as_ref())?;
         Self::remount_placed(surface, rest, Some(archive))
     }

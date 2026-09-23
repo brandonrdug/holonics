@@ -337,7 +337,14 @@ pub struct NativeConstitutiveField<'chart> {
     recharts: Vec<NativeRechartReceipt>,
     incidence_changes: Vec<NativeIncidenceChange>,
     owner: Rc<()>,
+    /// Legacy occurrence clock (plan phase 8b). Grows only through the constitutive `advance*`
+    /// passage, which a source-only field refuses; its rest refuses history too. Every incident
+    /// and generator-machine body founds source-only, so the HNN keeps this empty. The legacy
+    /// constituted-field session founds two occurrences and, once attached, has no advance.
+    /// Engine drivers and the linear-emission/anchor/internal-current readers still consume it.
     history: Vec<HeldField<'chart>>,
+    /// Legacy exterior placement of `history`; only engine unit tests enable it. New sessions
+    /// never create one.
     archive: Option<FieldArchive>,
     pending: Option<HeldField<'chart>>,
     junction: Option<PairedJunction<'chart>>,

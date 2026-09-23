@@ -267,7 +267,15 @@ impl<'chart> HeldField<'chart> {
 impl<'chart> NativeConstitutiveField<'chart> {
     /// Start a fresh append-only exterior chart owned by this continuing field. No placement
     /// changes yet. Existing files refuse; an archive is not an independent native model.
+    ///
+    /// Legacy (plan phase 8b): an occurrence archive places the legacy occurrence clock. A
+    /// source-only field has no occurrences, so it is refused an archive; no session creates one.
     pub fn enable_history_archive(&mut self, path: impl AsRef<Path>) -> Result<(), Error> {
+        if self.relation.source_only() {
+            return Err(error(
+                "a source-only field has no occurrence history to place",
+            ));
+        }
         if !self.relation.usable || self.pending.is_some() {
             return Err(Error::Uncertain);
         }

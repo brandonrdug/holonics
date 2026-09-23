@@ -944,4 +944,89 @@ mod compatibility_tests {
         let mut body = rest.remount(&surface).unwrap();
         assert_eq!(body.inspect_current().unwrap(), expected["model_state"]);
     }
+
+    fn point<'c>(surface: &'c ResidentSurface<'c>, v: &[i64]) -> ResidentSection<'c> {
+        surface
+            .mount_section_rest(
+                &ResidentSectionRest::found(
+                    1,
+                    v.len(),
+                    ResidentGrain(0),
+                    64,
+                    v.iter().map(|x| (*x, *x)).collect(),
+                )
+                .unwrap(),
+            )
+            .unwrap()
+    }
+    fn occurrences(body: &NativeCoupledBody<'_>) -> usize {
+        match body.state.as_ref() {
+            Some(BodyState::Field(model)) => model.field.occurrence_count(),
+            _ => panic!("constituted field body"),
+        }
+    }
+
+    /// Phase 8b retention bound on the legacy constituted field. Its occurrence clock is the two
+    /// foundation occurrences; generation and observation continue through reflection commits
+    /// and the reaction material, so an attached field adds no occurrence, and rest keeps the same
+    /// count. The delivered one-pass wire (`athena_field/one-pass`) is the old checkpoint read.
+    #[test]
+    #[ignore = "requires CUDA; an attached field adds no occurrence through generation, return and rest"]
+    fn attached_field_occurrence_clock_is_fixed_through_generation_return_and_rest() {
+        let bytes = include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../research/experiments/athena_field/one-pass/athena-field.rest"
+        ));
+        let rest = SavedCoupledBody::read(&mut bytes.as_slice(), bytes.len() as u64).unwrap();
+        let readout = ResidentReadout::new().unwrap();
+        let surface = ResidentSurface::on(&readout).unwrap();
+        let mut body = rest.remount(&surface).unwrap();
+        let founded = occurrences(&body);
+        assert_eq!(founded, 2);
+        let input = |[a, b]: [i64; 2]| [a, b, -b, a, a + b, b - a];
+        for h in [[1, 0], [0, 1]] {
+            let x = input(h);
+            let t = [-x[1], x[0], -x[3], x[2], -x[5], x[4]];
+            let (x, c, t) = (
+                point(&surface, &x),
+                point(&surface, &h),
+                point(&surface, &t),
+            );
+            let generated = body
+                .generate_field(
+                    ResidentConstitutiveCurrent::integers(&x).unwrap().into(),
+                    ResidentConstitutiveCurrent::integers(&c).unwrap(),
+                    true,
+                )
+                .unwrap();
+            let id = generated.comparison_id().unwrap();
+            body.observe_field(
+                id,
+                ResidentConstitutiveCurrent::integers(&t).unwrap().into(),
+                3,
+            )
+            .unwrap();
+            assert_eq!(occurrences(&body), founded);
+        }
+        let (x, c) = (point(&surface, &input([2, 0])), point(&surface, &[2, 0]));
+        let pending = body
+            .generate_field(
+                ResidentConstitutiveCurrent::integers(&x).unwrap().into(),
+                ResidentConstitutiveCurrent::integers(&c).unwrap(),
+                true,
+            )
+            .unwrap()
+            .comparison_id()
+            .unwrap();
+        assert_eq!(occurrences(&body), founded);
+        let mut saved = Vec::new();
+        body.rest().unwrap().write(&mut saved).unwrap();
+        drop(body);
+        let resumed = SavedCoupledBody::read(&mut saved.as_slice(), saved.len() as u64)
+            .unwrap()
+            .remount(&surface)
+            .unwrap();
+        assert_eq!(occurrences(&resumed), founded);
+        assert_eq!(resumed.pending_ids().unwrap(), vec![pending]);
+    }
 }
