@@ -1,7 +1,8 @@
 # The repository restructure: organize around the elementary objects, retire the rest
 
-**Status:** plan, September 23. Written by Claude (Opus 5.5) from a whole-repository review; GPT-6 (Codex)
-iterates on it and executes it. **Governs** the [consolidation programme](THE_HOLON_CORE_FOUNDS_THE_NATIVE_MACHINERY.md#consolidation-programme-phases-916)
+**Status:** active design, September 23. Claude's whole-repository review supplied the retirement
+census and paused-phase handoff; Codex's Rust/Lean dependency review and Brandon's 2–4-crate
+direction refine the target below. **Governs** the [consolidation programme](THE_HOLON_CORE_FOUNDS_THE_NATIVE_MACHINERY.md#consolidation-programme-phases-916)
 and its [overgrowth census](THE_HOLON_CORE_FOUNDS_THE_NATIVE_MACHINERY.md#overgrowth-census-and-retirement-programme-september-23):
 retirement comes first, then consolidation of what remains, then the crate and Lean layout below.
 
@@ -30,7 +31,8 @@ object, retention as a quotient, loss as a log-ratio, equation extraction) was a
 representation, usually with a compatibility alias and a legacy decoder. The result, measured at
 `c9012f17`:
 
-- **Rust.** 16 crates. `holonic-engine` is 548k lines of source (plus 111k in 178 examples) in one crate.
+- **Rust.** 16 library members and three application packages are declared in the current root
+  workspace. `holonic-engine` is 548k lines of source (plus 111k in 178 examples) in one crate.
   `holonic-life` is 314k. By last commit, five crates have not moved since September 4 or earlier
   (`holonic-language` Aug 7; `holonic-body`, `holonic-membrane`, `holonic-surface`,
   `holonic-circulation-abi` Sep 4) and four only as collateral of other work (`holonics-workspace` Sep 8,
@@ -49,6 +51,11 @@ representation, usually with a compatibility alias and a legacy decoder. The res
   `docs/` has 39 guides and 16 plans.
 - **Issues.** 45 open GitHub issues. None tracks the consolidation phases; several track the dropped
   protein work; most have not been updated since September 19–22. Campaign commits stopped citing issues.
+
+These are the `c9012f17` snapshot, not a current deletion verdict. In particular, the current
+`holonic-life` source is about 161k lines; the 314k above includes its then-current examples.
+Recompute counts and dependency edges at R0. A low reference count does not prove that a theorem,
+public API, saved wire or application boundary is disposable.
 
 ## 2. What is essential: the restructure is organized around these
 
@@ -104,87 +111,173 @@ kernels), the hardware cover and section partition, the device quadratic moment.
 
 ### 2.5 Research mathematics as instances
 
-Millennium (NS/Euler, Hodge, BSD, RH, P vs NP, Yang–Mills), Iwasawa, `Λ_DN`, Einstein: kept where a
-Framework owner, a live campaign or a cited record uses them, as instances of the objects above
-(winding ledgers, local factors, Farey, trace sequences, heat flow). A theorem is kept once, beside the
-object it instantiates.
+Millennium (NS/Euler, Hodge, BSD, RH, P vs NP, Yang–Mills), Iwasawa, `Λ_DN`, Einstein: keep a
+distinct theorem, derivation or open attempted construction when its hypotheses and conclusion
+remain meaningful, including a standalone mathematical consumer. Connect reusable laws to the
+elementary object they instantiate (winding ledgers, local factors, Farey, trace sequences,
+heat flow); retire duplicate wrappers and failed names, not a subject because HNN does not
+import it. A theorem is kept once, beside the object it instantiates.
 
 ## 3. Target layout
 
-[project-postulate; agent-inferred] Names say what a thing is; package name = directory name; no
-acronyms, lineage names (`soma`, `life`, `body`, `membrane`, `surface`, `mount`, `hna`) or product names
-in crate names. Codex refines this after the census (§4), which may merge further.
+[project-postulate; agent-inferred] Names say what a thing is; package name = directory name.
+Use **HNN** only for the established neural machinery; do not name new packages after lineage
+(`soma`, `life`, `hna`), vague roles (`body`, `membrane`, `surface`, `mount`) or a product.
+R0 may refine module placement, while the four-library ceiling and dependency direction guide
+the cut.
 
-### 3.1 Rust crates
+### 3.1 Rust: four maintained libraries, one dependency direction
 
-| Target crate | Contains | From |
+The 2–4 ceiling is for maintained Rust library packages. The target is four, including the
+public `holonics` package. The workbench becomes a binary target of the public package; the
+derivation atlas and plate are folded into an owning package's examples/tools or retired after
+their R0 consumer check. Conversation-data remains a data preparation application. Do not create
+an empty Apple package on this Linux branch.
+
+| Target package | Owns | Existing sources to sort at R0 |
 |---|---|---|
-| `holonic-core` | the Holon object and facets; exact algebra; exact machine words | `holonic-core`, `holonic-words` (fold in), exact parts of `holonic-structure` |
-| `holonic-geometry` | exact frames, screws, pairs, winding/carry/address, cell holonomy | `relational-geometry` (rename) |
-| `holonic-device` | CUDA driver boundary, word layouts, enclosure kernels, hardware cover, section partition, resident section, device moment | `holonic-mount`, `holonic-abi`, engine `cuda_refine`, `resident_section`, `kernels/`, `hardware_cover`, `section_partition` |
-| `holonic-machine` | the HNN field: constitution, generator machine, incident body, reaction, deposition, receivers, session, rest | engine `native_ecology/constitutive_fibre/**`, `holonic_interaction`, `holonic_chain`, `standing`, `receiver_release`, `exponentiated_ratio`; `holonics-hna` `native/**`; the live parts of `holonic-life` |
-| `holonic-extraction` | foreign graph intake and the extracted operator | engine `holonic_intelligence`, `soulkiller`, `foreign_*`, low-precision weights |
-| `holonics` | the public facade re-exporting the above | `holonics` |
-| applications | `holonics-workbench` (CLI), `conversation-data` | keep; `derivation-atlas`, `holon-plate`: census |
+| `holonic-core` | The Holon law and ports, elementary objects, exact algebra, exact word rings, geometry (frames, screws, winding, contacts, holonomy) and source-neutral receiver/restriction laws. No CUDA, HNN session or product dependency. | `holonic-core`, `relational-geometry`, `holonic-words`, live `holonic-structure` and source-neutral engine owners. |
+| `holonics-hnn` | Backend-neutral HNN: constituted field, helical pair interaction, generator machine, standing/deposition, ratio comparison, phase-carried source moments, receivers, session, rest and complete adjoint. Equation extraction lives here while its operative consumer is the machine. | `holonics-hna`, live `holonic-engine`/`holonic-life` machine owners, `holonic_intelligence`, `soulkiller`, `foreign_*`. |
+| `holonics-device` | Device realization and host/device exchange: CUDA driver, launch/section layouts, exact enclosure kernels, receipts, hardware cover and resident sections. `cuda` is the implemented backend; an Apple backend may join later behind the same declared machine operation, on Brandon's separate branch. Share laws only when both backends implement the same contract. | `holonic-mount`, device ABI/layout owners, engine `cuda_refine`, `resident_section`, `kernels/`, `hardware_cover`, `section_partition`. |
+| `holonics` | Main public crate and stable entry point. It exposes the core unconditionally and the HNN/device interfaces through explicit features and re-exports; it owns the CLI binary target but no second copy of a mathematical law. | Current `holonics` facade and live workbench. |
 
-Retire or fold after the census: `holonic-body`, `holonic-membrane`, `holonic-surface`,
-`holonic-circulation-abi`, `holonics-workspace`, `holonic-language`, `holonic-structure`, the remainder of
-`holonic-life` and `holonic-engine` (event laws, receivers and mathematics with no consumer), and
-`accelerators/` (`rust-gpu`, `cuda-smoke`, `cuda-kernel`) unless the device crate uses them. The 26
-event-law modules either become instances inside the owner of the object they instantiate or are deleted
-(most have no consumer; phase 16 unified their scaffolding before this was known).
+The dependency graph is `holonic-core → holonics-hnn → holonics-device → holonics` (the public
+crate also depends directly on core and HNN); arrows mean *may be used by*. The HNN defines the
+backend operation and a host/reference executor; the device package implements it. Neither the
+core nor HNN imports a CUDA symbol, type or linker dependency. The public package selects CUDA
+explicitly rather than making it the default on non-CUDA hosts. This cut must be demonstrated
+by `cargo metadata` and a CPU-only build before files move. The present graph does **not** have
+this property: engine imports `mount`, HNA imports engine and life, and `holonic-words` reaches
+the legacy `soma-abi`/`body` chain. Detach those edges before merging or renaming packages.
+The intended public feature policy is a CPU-capable default (`hnn` with its reference executor)
+and opt-in `cuda`; the later Apple feature is platform-scoped. `holonics::hna` can remain a
+public compatibility path through the facade while its implemented owner becomes
+`holonics-hnn`. Feature names and re-export scope are checked against workbench callers and
+saved artifacts before the old `native` feature is retired.
 
-### 3.2 Lean
+Within that graph, core owns the one `Holon` declaration and its `complex`, `port`, `element`,
+`generator`, `restriction`, `pair`, `parametron`, `deposition`, `ratio` and `receipt` laws, with
+exact geometry/algebra as their implementations. HNN owns compositions of those operations:
+the pair-contact graph, constituted field, source moments, participating receiver, deposition
+return and session. Its backend boundary accepts the same typed Holon/material/current and
+returns the same receiving section and covector/receipt in the reference and CUDA paths. The
+device package owns CUDA allocation, placement, kernels and checked transfer; it cannot invent
+a different loss or material update. The public crate chooses an implementation and presents
+stable paths. The concrete Rust trait signatures follow the surviving HNN consuming call at R0;
+do not design a generic backend trait before that call and its adjoint are inspected.
 
-Move `formal/elementary-holonics` to a top-level `lean/` (one Lake package), with two libraries:
+HNN warrants its own package because its field/session implementation and change rate are
+substantial, while source-neutral Holon mathematics must compile and be used without it. The
+public `holonics::hna` and other established Rust paths receive an audited migration map; keep
+only compatibility re-exports needed by live callers during the move. Wire/schema identifiers
+and usable saved artifacts retain their existing contracts unless a named migration changes
+them. A final path removal is not inferred merely from a package rename. Extraction is an HNN
+module at this boundary, not a fifth package; if it proves independently reusable, revisit the
+boundary with actual consumers instead of anticipating one.
 
-- `Holonics`: the foundation: `Holon/`, `Objects/`, `Geometry/`, `Transport/`, `Foundation/`, `Physics/`,
-  and the `Framework` entry points renamed as the library's sections (Core, Geometry, Dynamics,
-  Information, Physics, Computation). Only the `Framework` closure (188k lines) plus files a live
-  consumer cites.
-- `HolonicsResearch`: Millennium and RH, depending on `Holonics`; kept per §2.5, the rest deleted.
+Retire or fold after R0: `holonic-body`, `holonic-membrane`, `holonic-surface`,
+`holonic-circulation-abi`, `holonics-workspace`, `holonic-language`, `holonic-structure`, the
+remainder of `holonic-life` and `holonic-engine`, and unused `accelerators/` targets. An event-law
+module with a distinct theorem or live consumer moves to its object owner; one with neither is
+retired. A package count is an outcome of those owner decisions, not a reason to suppress a law.
 
-Update `tools/lean_check.sh`, the engine `lean_citations` test, `lakefile`, CLAUDE.md and AGENTS.md
-paths in the same commit. The namespace `Soma.Holonics.*` in current files becomes `Holonics.*`.
+### 3.2 Lean: one Lake package, two import closures
+
+Move the current package to top-level `lean/` in a separate mechanical phase. Its maintained
+libraries are `Holonics` (the public elementary-object and Framework closure) and
+`HolonicsResearch` (research instances with their own theorems and live mathematical consumers,
+depending on `Holonics`). `Holonics` must not import `HolonicsResearch`. A standalone mathematical
+theorem is a consumer in its own right; absence from the HNN build is not a deletion reason.
+The present `ElementaryHolonics.lean` umbrella imports almost all of Millennium and RH; replace
+it with curated roots rather than renaming that umbrella and calling it the foundation.
+
+Generate the import closures before classifying files. Keep `Holon/`, `Objects/` and the
+Framework's actual transitive owners together; sort `Geometry/`, `Transport/`, `Foundation/`,
+`Physics/`, `Computation/`, `Algorithm/`, `Mathematics/`, `Millennium/` and `RH/` by dependency and
+consuming theorem, not by folder name. Preserve the current `Soma.Holonics.*` declaration namespace
+through the path move. Rename it to `Holonics.*` only in a later mechanical phase with all imports,
+citations and proof clients updated and both library targets building.
+If a current Millennium/RH module supplies a law imported by the core (for example Farey
+addresses), move that law into the `Holonics` object owner and let `HolonicsResearch` import it;
+never make the foundation depend on a research umbrella or copy the theorem in both roots.
+
+Update Lake roots and executables, `tools/lean_check.sh`, CI, Rust Lean-citation tests, source
+comments, docs/verification receipts, AGENTS.md and CLAUDE.md in the move. A link/import census
+must catch every remaining `formal/elementary-holonics` and `ElementaryHolonics` reference.
 
 ### 3.3 Documents
 
-- Top level: `README.md` gives the map in one screen: crates, `lean/`, `docs/`, `research/`,
-  applications.
+- Top level: `README.md` gives the current map and target in one screen during migration, then
+  the final map: public crate, HNN, device, Lean, docs, research and applications.
 - `docs/`: the guides (`THE_MACHINE`, `ELEMENTARY_OBJECTS`, `HOLON`, `HNN_FORMULA`, notation, winding,
   helical geometry, development) and `plans/` (roadmap, this plan, the consolidation plan). Guides whose
   subject is retired are deleted; their live definitions move into `ELEMENTARY_OBJECTS`.
-- `research/records/`: keep records a guide, plan, issue or Lean/Rust owner cites; fold superseded
-  records into their guide; delete the rest. `research/papers/rendered` and `experiments/`: census.
+- `research/records/`: keep records that carry a distinct derivation, measurement, failed attempt
+  or live provenance, including direct-message evidence, even when no current source imports them.
+  Fold genuinely duplicate summaries into their guide. `research/papers/rendered` and
+  `experiments/` need an artifact/source census; generated copies may be regenerated from kept
+  sources only when that regeneration has been checked.
 - `archive/`: delete from the tree (git history keeps it); CLAUDE.md/AGENTS.md cite revisions instead.
 - Laboratory: stays frozen outside this repository; cite it by revision; import nothing further.
 
+### 3.4 Operator contracts and acceptance
+
+The package boundary follows the operation, not the old module tree. Each moved operator has
+one owner and a short mapping in the census: supplied Holon/source and receiver; inferred
+unknown; forward law; paired variation or proof obligation; CPU reference; device realization
+if any; saved/wire face; consuming call. A move changes paths and dependency edges, not the law.
+The HNN field still owes both terms of `δT=Σ a δ(UΨ)+Σ δa UΨ`; deposition changes the
+constitution from covectors that reached the locus, and loss remains the logarithm of a typed
+Holon ratio with its winding. A CUDA kernel's sealed-word/radius distinction, complete
+`SLOT_WORDS` receipt, transfer completion and device placement remain device contracts, not
+properties silently supplied by a new crate name. Lean proves named laws at their scope and
+does not enter the runtime.
+
+Before retiring an old package, verify a source-neutral `holonic-core` build, a host/reference
+HNN build, CUDA owner tests on the available card, an all-target public/workbench check, the
+two Lean library targets and the changed source-to-Lean citation/link scan. Inspect a saved
+session through the new public path when one is named as retained. Record the specific commands
+and results in the census; a build of an intermediate move is not the completed boundary check.
+
 ## 4. Order of work
 
-1. **R0 census (first, nothing deleted before it).** One table per area (engine modules, life modules,
-   other crates, examples, Lean files outside `Framework`, research records, docs, issues) with columns:
-   path, lines, consumers (build-confirmed: delete the module on a branch and run
-   `cargo check --workspace --all-targets`; for Lean, the import closure), the elementary object it
-   serves (§2) or none, superseded by, disposition (**keep and own** / **fold into owner** / **delete**),
-   target (§3). Put the tables in `docs/plans/THE_REPOSITORY_CENSUS.md`. Brandon reviews the
-   **keep** column; everything else proceeds.
-2. **R1–R3 deletion passes** in the order engine/examples, life/soma crates, Lean research,
-   each with a workspace check, `lake build Holonics` (the Framework closure) and the surviving
-   suites. See the consolidation plan's census section.
+1. **R0 census (first, nothing retired before it).** Record the exact HEAD, dirty files,
+   worktrees/branches, build outputs and saved artifacts. Preserve the current uncommitted
+   Lean/research work and paused WIP branches. Produce `docs/plans/THE_REPOSITORY_CENSUS.md` with
+   one table per Rust owner/example, Lean import closure/standalone theorem, document/record and
+   issue: path, elementary object or application, direct and transitive consumers, public/wire
+   use, distinct result or superseding owner, disposition (**keep and own** / **fold** /
+   **retire**), target and verification. Static references are leads, not proof of liveness or
+   deadness. Verify proposed removal in grouped, reviewable cuts with all-target builds and
+   owner tests; use Lean import closures plus named theorem/citation consumers. Show the census
+   and concrete cuts to Brandon without making the inventory an indefinite approval gate.
+2. **R1–R3 retirement passes** in the order engine/examples, life/soma crates, Lean research.
+   For each cut, check the surviving workspace and actual consumers; for Lean, build both
+   maintained libraries and the relevant research target after it exists. Until the move, build
+   the existing `ElementaryHolonics.Framework` target and affected research modules. Keep
+   theorem/record evidence not captured by an import count. See the consolidation plan's census.
 3. **R4 compatibility debt:** remove aliases and legacy decoders not needed by a named saved artifact.
    Saved Athena coupled models from September 11 already fail to load; old sessions under
    `.local/campaign-2026-09-20` are superseded checkpoints.
 4. **Finish the paused consolidation** (phases 11, 12a, 12b on their WIP branches; phase 14) on what
    remains. Rebase them after R1–R3.
-5. **Layout moves (§3):** crate renames/splits and the Lean move. Moves are mechanical commits (no logic
-   changes) so the history stays readable.
+5. **Layout moves (§3):** sever dependency cycles, establish backend-neutral HNN and CPU-only
+   core checks, then move/rename packages in mechanical commits. Move Lean paths and roots
+   separately from declaration-namespace edits. Keep the old `hna` and wire identifiers as
+   described in §3.1 while their live consumers are migrated.
 6. **Documents (§3.3)** and the GitHub issue reset (§5).
-7. **Update CLAUDE.md and AGENTS.md** owner tables, `CONSTRUCTION_STATE.md`, the roadmap and
-   `docs/REPOSITORY.md` to the new layout.
+7. **Update CLAUDE.md and AGENTS.md** owner tables, `CONSTRUCTION_STATE.md`, the roadmap,
+   `docs/REPOSITORY.md`, root README and mathematical/operator owner links to the verified new
+   paths. During migration, operator guides label present paths and planned owners separately.
 
-Build hygiene during the work: one shared scratch target directory, `CARGO_PROFILE_DEV_DEBUG=line-tables-only`,
-delete a branch's target when it lands; `cargo clean` the main `target/` after the crate split (its
-150 GB of incremental state is for the old crate graph).
+Build hygiene starts now: use one shared scratch target directory and
+`CARGO_PROFILE_DEV_DEBUG=line-tables-only`; inspect each target/cache's owner before reclaiming
+generated output. Remove a WIP branch's target only after its source is integrated or otherwise
+preserved. The old engine graph's incremental output can be cleared after the split; do not use
+`git clean`, blanket worktree deletion or a broad restore against the dirty research tree.
+The current root `target/` measured **216 GiB** on September 23 (`du -sh target`); it is generated
+build output, not a source-retention obligation. R0 records which active checks still need it
+before a targeted or post-split `cargo clean` reclaims the space.
 
 ## 5. GitHub issues
 
@@ -193,8 +286,9 @@ delete a branch's target when it lands; `cargo clean` the main `target/` after t
   close or fold: the protein/structure issues (#11, #38, #44, #46, #51, #52, #53) after the biology
   pivot away; device issues (#12–#15, #50) fold into one device-realization issue after §3.1; Lean
   obligations fold into #62 and its successors.
-- **Track the restructure.** One issue per step in §4 (R0 census, R1–R3, R4, consolidation 11/12/14,
-  crate layout, Lean move, documents), each linked from this plan.
+- **Track the restructure.** Keep one parent issue and separately testable cuts where their
+  owner and return differ: census/retirement, paused consolidation, Rust dependency cut,
+  Lean-library move, and docs/consumer migration. Link them from this plan when created.
 - **Practice from now on.** Every campaign cites its issue in the plan and in commit messages
   (`Refs #n`/`Closes #n`); a closing comment gives the commit, the verification receipt and any
   remaining scope; labels follow §2's objects (`holon`, `generator`, `pair-contact`, `parametron`,
@@ -205,7 +299,7 @@ delete a branch's target when it lands; `cargo clean` the main `target/` after t
 
 - Landed consolidation: phases 9, 10, 13, 15, 16 (`5c4bb58a`, `4dff57c8`, `5b7c89ab`, `7e204283`, `009e8363`).
 - Paused, unverified: `wip/consolidation-phase-{11,12a,12b}` (worktrees `.local/p11-wt`, `.local/p12a-wt`,
-  `.local/p12b-wt`), described in the consolidation plan's handoff section.
+  `.local/p12b-wt`), described in the consolidation plan's handoff section. Phase 14 remains open.
 - Uncommitted in the main tree: RH, Millennium and Computation Lean files and September 22–23 records
   from recent mathematics work. These are ours; R0 commits or retires them.
 - Measured machine position (campaign 1): exposure sample 516 frames / 13 returns, no refusals; receiver-ring

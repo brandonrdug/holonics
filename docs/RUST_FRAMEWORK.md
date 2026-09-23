@@ -5,6 +5,12 @@ owners; it supplies no second event model, numeric system or learner. The packag
 used as a path dependency (`publish = false`). HNN application and wire names retain `hna` for
 compatibility.
 
+[project-postulate] This table records the **current** public paths. The
+[repository restructure](plans/THE_REPOSITORY_RESTRUCTURE.md#31-rust-four-maintained-libraries-one-dependency-direction)
+targets four maintained libraries: core Holon law/geometry, a backend-neutral HNN, device
+realization and this public entry. Existing `hna` API paths and wire identifiers are audited
+at their consuming calls during migration; target package names are not yet importable.
+
 [definition] The [HNN composition guide](HNN_COMPOSITION.md) describes the model's semantic
 assembly, with its [governing model formula](HNN_FORMULA.md). The dependency split below improves library
 access; it does not make distinct field/full-operator states interchangeable or complete the

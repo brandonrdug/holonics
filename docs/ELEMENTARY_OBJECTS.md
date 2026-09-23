@@ -48,6 +48,12 @@ chart. The Lean foundation is `ElementaryHolonics.Framework.HolonObject` (`Holon
 Generator,Restriction,Law,Conformance}`); the Rust core (`holonic-core`) mirrors it and every native owner
 implements it.
 
+[definition] Those Lean and Rust paths are the **current** owners. The
+[repository restructure](plans/THE_REPOSITORY_RESTRUCTURE.md) preserves this Holon law while
+moving its source-neutral Rust facets and geometry into `holonic-core` and curating the Lean
+`Holonics` import closure. An owner name or namespace move supplies no new theorem or native
+operator by itself.
+
 ## The objects
 
 Each object comes with its dual. A reading is always a pairing of the two, and orientation exists

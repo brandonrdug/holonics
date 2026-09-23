@@ -1,146 +1,75 @@
 # Holonics
 
-[The machine and its mathematics](docs/THE_MACHINE.md) · [Research reading routes](research/records/README.md) · [Repository guide](docs/REPOSITORY.md)
+Holonics is Brandon's mathematical, physical and computational research programme, grounded
+in the reality of difference. It develops a common language for how situated things interact,
+change and become observable. Its working ambition is a constructive theory that connects
+mathematics, physics, computation and living systems. Claims retain their hypotheses and
+evidence; open constructions remain open.
 
-[project-postulate] **Holonics is a theory of everything grounded in the reality of difference.**
-It develops a mathematical, physical and philosophical framework for how situated things exist,
-interact, change and become observable. Mathematics, computation, physics and living systems
-are interconnected subjects of the same investigation.
+The elementary object is a **Holon**: a law with incidence, ports, material relations,
+generators and scale restrictions. Holons join at ports; a receiving face reads a situated
+comparison. The [elementary objects](docs/ELEMENTARY_OBJECTS.md) and
+[the machine](docs/THE_MACHINE.md) define the laws. **HNN** is neural machinery made from those
+objects, **Athena** its first intended product, and **Eros** their collective formation and
+composition. The intended generally useful Athena assistant is still under construction.
 
-[project-postulate] **Difference is the only thing that is real.** A value comes from a
-measurement, and a measurement is always a difference gauged through a comparison of frames or
-receivers. The difference carries the participating things, their orientation, conditions and
-causal history; a number is one measured face of it. This concerns the organization of reality
-before anyone names the quantities or writes an equation.
+## Start here
 
-[project-postulate] **Theory of everything is the working ambition and standard of construction.**
-Holonics seeks a common account whose laws make mechanisms understandable and constructible
-across subjects and scales. Counting, algebra, geometry, calculus and physical theories are
-approached as expressions of constrained relations. Engineering enacts those relations;
-cartography makes their consequences navigable. Every result includes the further constructions
-it makes possible, and every returned failure supplies a distinction to investigate.
-
-## The perspective
-
-[project-postulate] A **holon** is a causally situated composite with its own internal relations
-and observable faces. Holons compose other holons. The framework treats information as physically
-realized interaction: general relativity, quantum states, waves and material dynamics are part of its subject,
-with their actual laws and conditions. The repository records the derivations, implementations,
-measurements and open relations through which this universal account is being constructed.
-
-[definition] A **face** is what a particular receiver can distinguish. It does not identify the
-entire object or its origin. `2 + 2` and `2²` share the numerical face `4`, while retaining different
-constructions. Comparing those results requires a common chart; it does not merge their causal
-histories. Likewise, a chord class can recur in different performances without making those
-performances one occurrence.
-
-[project-postulate] The framework's working commitments are:
-
-- **Causal origin.** Nothing enters as an unexplained, self-originating object. Composition retains
-  the actual passages and their orientation.
-- **Measurement is comparison.** A reading retains its comparands, reference, receiving chart and
-  conditions. Integers, magnitudes, probabilities and coordinates are measured faces of difference.
-- **Relevance and relativity.** Everything is oriented and participates in causal relations.
-  Relevance is how those relations condition possible consequence: contact, constraint, phase,
-  transport, persistence and attenuation. Comparing coordinate frames is one expression of it.
-- **No floats in native mathematical conduct.** Exact ratios, symbolic generators and certified
-  series retain the remainder of an expansion. A floating-point codeword may be an exterior face;
-  it cannot silently become the underlying holon or decide native conduct.
-- **Bit-purity.** Computational realizations operate through explicit bit encodings and exact
-  operations. A byte is a packet of bits; its file format does not determine semantic identity.
-- **Phase and composition.** Relative orientation, superposition and ordered transport survive
-  until a declared receiver takes a quotient.
-- **Preimage Fibres.** Limited observations constrain compatible causes and future behavior.
-  Learning need not recover a unique original algorithm or a perfectly reversible past.
-- **The relevance hypothesis.** A distinction matters through the difference it can make under
-  admitted interactions and receivers, including future ones. The
-  [derived principle](docs/canon/THE_RELEVANCE_HYPOTHESIS.md) characterizes lawful future agreement
-  and retains the differences that a later interaction can expose.
-- **Loss as comparison.** Mechanical mismatch, information discrepancy, action difference and
-  learning loss are receiver-relative measurements of situated comparisons. Their comparands,
-  orientation, baseline and units belong to the construction.
-
-## A toolkit that connects disciplines
-
-[project-postulate] **Exterior change and boundary reception belong together.** Stokes' pairing
-`⟨dω,c⟩ = ⟨ω,∂c⟩` and pullback naturality `d(f*ω) = f*(dω)` express local change, oriented
-composition and compatible change of chart. Their [framework presentation](docs/FORMAL_FRAMEWORK.md#exterior-change-boundary-reception-and-change-of-chart)
-connects smooth forms, discrete incidence, scale transport and retained boundary fibres.
-
-[definition] **Holonic Compression** changes the representation of a construction together with
-its decoder, retained distinctions and computational cost. A compact generator may describe an
-unbounded family of outputs; a finite unfolding carries its remainder. Recursive restriction and
-rebase supply the structure of **fractal packing**, while **integration by reflection** develops
-boundary responses and the interior consequences they determine. Leader growth and later return
-describe how conduct forms a path that subsequent interaction can reuse.
-
-[established-bounded; source-inspected] The repository also develops classical machine learning
-within this account. Softmax has a ratio/gauge interpretation and a weighted-Laplacian return;
-sigmoid is its binary restriction. Convolution, graph transport, attention and state-space
-recurrence have explicit mathematical charts. Exact normalization, nonlinear reactions, adjoints,
-boundary elimination and generator reuse have implementations at their documented scopes.
-The [mathematical synthesis](docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) connects these owners and
-the remaining integration work.
-
-[project-postulate] The research stance is ambitious, constructive and directed toward tight
-unification across scales. First-person perception and cognition motivate the engineering of
-faces, coupled currents, active boundaries and coarse representations. Mathematical and physical
-research develops the objects that the machine executes; a conjecture's endpoint is one use of
-those objects. Work from the framework's accumulated strength and pursue the strongest connected
-construction its laws support. Keep the exact content of
-proofs and measurements visible as the framework grows. The
-[philosophy of difference](docs/canon/THE_REALITY_OF_DIFFERENCE.md) connects this stance to its
-human origins and to everyday reasoning within the project.
-
-## Implementations in this repository
-
-[definition] The software is one realization of the framework:
-
-| Implementation | Role |
+| Need | Read |
 |---|---|
-| **Holonic Engine** | Exact carriers, causal relations, transport, reactions and device execution |
-| **HNN — Holonic Neural Network** | The neural architecture explored within Holonics |
-| **Eros** | The collective formative machine, and the union/composition enacted by its nested interactions |
-| **Athena** | First intended HNN product within Eros; its interactions also enact Eros |
-| **Hephaestus / automata** | Utility product label / HNN-based solver applications using its traversal constructions |
-| **Soulkiller** | Analysis and dismantling of supported inherited models into reusable native material |
+| The mathematical object and its operative equations | [The machine](docs/THE_MACHINE.md), [Holon](docs/HOLON.md), [HNN formula](docs/HNN_FORMULA.md) |
+| What is implemented and what remains open | [Construction state](CONSTRUCTION_STATE.md) |
+| Construction order and current restructuring | [Roadmap](docs/plans/THE_ROADMAP.md), [repository restructure](docs/plans/THE_REPOSITORY_RESTRUCTURE.md) |
+| Formal and native source owners | [Elementary objects](docs/ELEMENTARY_OBJECTS.md), [architecture map](docs/ARCHITECTURE_MAP.md) |
+| Research derivations and scoped results | [Research routes](research/records/README.md), [research entry](research/README.md) |
+| How Codex and Claude work in this tree | [AGENTS.md](AGENTS.md), [CLAUDE.md](CLAUDE.md), [development method](docs/DEVELOPMENT.md) |
 
-[open] **The intended useful, general Athena assistant remains unfinished.** The mathematical
-workshop already returns exact inferred relations and reusable native operator applications;
-the broader contextual language/code product remains under construction. Native execution,
-formation, persistence and model-dismantling results retain their stated evidence scopes.
+## The checkout today
 
-[project-postulate] This breadth is part of the working method. A result in arithmetic can
-supply a recurrence, a geometric receiver can expose a hidden mode, and a physical balance can
-clarify an information-cost boundary. Their concrete source maps make them reusable construction
-material. The [implementation method](docs/DEVELOPMENT.md#mathematical-implementation-and-continuation)
-keeps those relationships and the human objective present across sustained work and context handoffs.
+The root `Cargo.toml` currently declares **16 library packages and three application packages**.
+The restructuring work is in progress; these are the paths that exist now.
 
-[definition] Current prose uses **HNN**. Existing source identifiers and historical campaign
-labels may still contain `hna` or `HNA`; these remain references to those implementations and
-records. Lean provides separate mathematical verification and never runs inside cultivation or
-inference pipelines.
+| Path | Current role |
+|---|---|
+| `crates/holonic-core/`, `crates/relational-geometry/` | Holon facets, exact algebra and geometric source laws |
+| `crates/holonic-engine/`, `crates/holonics-hna/`, `crates/holonic-life/` | Native field, HNN sessions, equation extraction and inherited implementation layers |
+| `crates/holonic-mount/`, `crates/holonic-words/` | CUDA driver/launch boundary and exact word arithmetic |
+| `crates/holonics/` | Current public Rust entry point; its default `native` feature still reaches the device stack |
+| `formal/elementary-holonics/` | Current Lean/Lake project; `ElementaryHolonics.Framework` is the curated entry point |
+| `applications/`, `accelerators/` | CLI, data/tools and device-specific targets |
+| `docs/`, `research/` | Maintained contracts, plans, derivations, experiments and papers |
 
-## Read and explore
+[Repository organization](docs/REPOSITORY.md) maps the remaining directories and historical
+locations. Historical code and records retain their cited revisions; a source name does not
+by itself certify current use.
 
-- [Rust framework](docs/RUST_FRAMEWORK.md) — public mathematical carriers and implementation boundaries
-- [HNN composition](docs/HNN_COMPOSITION.md) — model assembly, local standing, interaction and commuting architecture charts
-- [Hephaestus Automata](docs/HEPHAESTUS_AUTOMATA.md) — tools, code generation, mathematical requests and reusable constructions
-- [The reality of difference](docs/canon/THE_REALITY_OF_DIFFERENCE.md) — ontology, philosophy, relevance and constructive reasoning
-- [The construction programme](docs/plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md) — formalization and use across mathematical and physical realizations
-- [Holonics in Lean](docs/FORMAL_FRAMEWORK.md) — situated objects, molecular conformation, tubes, physics and computation
-- [The mathematics tablet](docs/canon/THE_MATHEMATICS_TABLET.md) — foundations and subject tablets
-- [Mathematics and native conduct](docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) — synthesis across research and implementation
-- [Architecture](docs/ARCHITECTURE.md) — framework, implementations and responsibilities
-- [Formal mathematics](formal/README.md) and [research](research/README.md) — proofs, derivations, experiments and papers
-- [Holonics beacon](docs/BEACON.md) — useful ideas, source constructions and their relation to other work
-- [Owner map](docs/ARCHITECTURE_MAP.md) — navigation between mathematical and executable sources
-- [Construction state](CONSTRUCTION_STATE.md) and [roadmap](docs/plans/THE_ROADMAP.md) — present position and ordered work
-- [Epistemic grades](docs/canon/EPISTEMIC_GRADES.md) — how to read the scope of a claim
-- [Repository guide](docs/REPOSITORY.md) — libraries, applications, accelerators and historical material
+## The intended libraries
 
-## License
+The [restructure plan](docs/plans/THE_REPOSITORY_RESTRUCTURE.md) audits consumers and retires
+superseded layers before moving code. Its target is **four maintained Rust libraries**:
 
-[definition] Holonics is available under either the [MIT License](LICENSE-MIT) or the
-[Apache License, Version 2.0](LICENSE-APACHE), at your option, matching the workspace's existing
-license declaration. Material carrying separate third-party notices retains those terms.
+| Library | Responsibility |
+|---|---|
+| `holonic-core` | Source-neutral Holon laws, exact algebra and geometry |
+| `holonics-hnn` | Backend-neutral HNN, generator field, sessions and operative equation extraction |
+| `holonics-device` | CUDA realization of the declared operations; Apple implementation later on Brandon's separate branch |
+| `holonics` | Main public entry, including the workbench binary and audited compatibility paths |
+
+The dependency direction is core → HNN → device → public entry; core and HNN must build
+without CUDA. Lean will become one top-level `lean/` Lake package with a public `Holonics`
+library and a dependent `HolonicsResearch` library. Those names describe the **target**; the
+current paths in the table above remain authoritative until their moves are verified. Rust
+and Lean express the same elementary laws at their respective scopes; Lean verification does
+not run inside HNN cultivation or inference.
+
+## Working in this repository
+
+Use the owner and consuming call in [AGENTS.md](AGENTS.md) or [CLAUDE.md](CLAUDE.md), then read
+the relevant research route and source. A moved operator keeps its typed source and receiver,
+forward law, variation, saved face and actual consumer. The current tree contains paused
+consolidation branches and uncommitted mathematical work; the restructure census accounts for
+them before retirement. Native build and Lean check commands live in
+[DEVELOPMENT.md](docs/DEVELOPMENT.md) and [FORMAL_FRAMEWORK.md](docs/FORMAL_FRAMEWORK.md).
+
+Holonics is dual-licensed under [MIT](LICENSE-MIT) or
+[Apache-2.0](LICENSE-APACHE), at your option. Third-party material retains its own notices.

@@ -776,11 +776,11 @@ disk. Use one shared worker target directory, `CARGO_PROFILE_DEV_DEBUG=line-tabl
 build directory when it lands, and treat splitting the engine crate along the Holon facets as consolidation
 work.
 
-**Phase 17 (added): split `holonic-engine` along the Holon facets.** Measured September 23. The crate has
+**Phase 17 (target refined by the [repository restructure](THE_REPOSITORY_RESTRUCTURE.md#31-rust-four-maintained-libraries-one-dependency-direction)): cut the surviving `holonic-engine` by owner.** Measured September 23. The crate has
 548k lines. 202 top-level single-file modules hold 302k of them. The largest directories are `native_ecology`
 (79k), `cuda_refine` (38k), `resident_section` (21k), `holonic_intelligence` (20k) and the physical receivers
-(`physical_occurrence`, `physicochemical_receiver`, `physical_intake`, about 20k). Proposed crates, each
-depending on `holonic-core`:
+(`physical_occurrence`, `physicochemical_receiver`, `physical_intake`, about 20k). These are census
+areas, not a proposal for six new crates:
 - the event laws: the 26 `ExactEventLaw` modules and `world`, about 62k lines, CUDA-free;
 - equation extraction: `holonic_intelligence`, `soulkiller`, `foreign_*`;
 - the device layer: `cuda_refine`, `resident_section`, kernels, `hardware_cover`, `section_partition`;
@@ -788,8 +788,10 @@ depending on `holonic-core`:
 - the physical and chemical receivers;
 - the remaining CUDA-free mathematics.
 
-The engine keeps explicit re-exports at the old paths, as phase 3 did, so the public API and wires are
-unchanged. Run it after phases 11, 12 and 14 land, since those phases edit the same modules.
+The target is four maintained libraries total: `holonic-core`, `holonics-hnn`, `holonics-device`
+and the public `holonics`. Retained source-neutral mathematics goes to core, HNN/extraction to
+HNN, and CUDA realization to device. Public-path and wire handling follows the restructure's
+audited migration map. Run it after phases 11, 12 and 14 land, since those phases edit the same modules.
 Moving a module first requires a dependency census (`use crate::` edges) to find the acyclic cut. The
 census is the first step of the phase.
 
@@ -849,7 +851,8 @@ remains. Order:
 3. **Compatibility debt (R4).** Remove the `pub type` aliases and legacy wire decoders added in
    phases 9–16 unless a saved artifact we still use needs them, and name that artifact.
 4. **Consolidation phases 11, 12 and 14** continue on what remains (WIP branches above).
-5. **Crate split (phase 17)** runs on the reduced engine.
+5. **Crate cut (phase 17)** follows the four-library graph in the repository restructure, on the
+   reduced engine; the former six-way bullet list is a census, not a package proposal.
 6. **Documents and records (R5).** `research/` (290k) and `docs/` get the same census. Superseded
    records are deleted or folded into their guide, and the research routes are updated.
 

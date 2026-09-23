@@ -24,6 +24,11 @@ The [Lean guide](../formal/elementary-holonics/README.md) gives focused imports 
 The [mathematics/native synthesis](MATHEMATICS_AND_NATIVE_CONDUCT.md) connects these laws to
 current executable owners.
 
+[project-postulate] The [repository restructure](plans/THE_REPOSITORY_RESTRUCTURE.md#32-lean-one-lake-package-two-import-closures)
+targets one `lean/` Lake package with public `Holonics` and dependent `HolonicsResearch` libraries.
+This section's `ElementaryHolonics` imports are the **current** checked paths. The move first
+separates their import closures; declaration namespaces change in a later checked phase.
+
 [definition] [Mass–energy and causal transport](MASS_ENERGY_AND_CAUSAL_TRANSPORT.md) is the
 comprehensive synthesis of the recent source, optics, mode exclusion, periplus, Gamma/ζ,
 Hodge and predictive-release work. It starts from full energy–momentum and derives the

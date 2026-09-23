@@ -10,6 +10,25 @@ Read [THE_MACHINE](docs/THE_MACHINE.md) first. Then read the active brief in
 retaining already-read context at the same revision. The state names the consuming operation;
 the roadmap orders it. The machine, source guides and research supply the construction.
 
+## Repository restructure in progress
+
+[project-postulate] Brandon's September 23 intervention is governed by
+[THE_REPOSITORY_RESTRUCTURE](docs/plans/THE_REPOSITORY_RESTRUCTURE.md). The source paths in this
+guide are **current owners**, not claims that the target layout has landed. The target has four
+maintained Rust libraries: `holonic-core` (source-neutral Holon law, exact algebra and geometry),
+`holonics-hnn` (the backend-neutral HNN and its operative extraction), `holonics-device` (CUDA
+now; a separate Apple implementation later), and `holonics` (the public entry). Dependency
+direction is core → HNN → device → public entry. The HNN defines the backend operation and a
+host/reference executor; neither it nor core imports CUDA. Lean becomes one Lake package with
+`Holonics` and dependent `HolonicsResearch`; the current `ElementaryHolonics` paths and
+`Soma.Holonics` declaration namespace stay factual until their distinct migrations land.
+
+[definition] A moved operator retains its typed source and receiver, forward law, full variation,
+material/clock/frame hypotheses, wire face and actual consuming call. R0 accounts for the dirty
+research tree and paused worktrees before retirement. Low reference count alone does not retire
+a theorem, saved artifact or public path. Update the owner map and consumer together after the
+specific move is verified; do not write a target path as if it were already implemented.
+
 ## The elementary objects — the only design vocabulary
 
 [project-postulate] Brandon, September 22: design, worker briefs, formal work and code state

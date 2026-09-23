@@ -11,6 +11,24 @@ Read the machine, [CONSTRUCTION_STATE](CONSTRUCTION_STATE.md) and the complete
 Worker prompts name this guide and the specific machine/source material to read. Make that context
 explicit rather than relying on an assumption about which files a particular harness loaded.
 
+## Repository restructure in progress
+
+[project-postulate] Brandon's September 23 intervention follows
+[THE_REPOSITORY_RESTRUCTURE](docs/plans/THE_REPOSITORY_RESTRUCTURE.md). The owner paths below
+describe today's tree until a verified move lands. Four maintained Rust libraries are the target:
+`holonic-core` (source-neutral Holon law, exact algebra and geometry), `holonics-hnn`
+(backend-neutral HNN and operative extraction), `holonics-device` (CUDA now, with Brandon's
+Apple implementation later), and `holonics` (public entry). Their dependency direction is
+core → HNN → device → public entry; core and HNN compile without CUDA. Lean becomes one Lake
+package with `Holonics` and dependent `HolonicsResearch`. Moving its paths and changing the
+current `Soma.Holonics` declaration namespace are separate checked phases.
+
+[definition] Each moved operator retains its typed source and receiver, forward law, complete
+variation, material/clock/frame hypotheses, wire face and consuming call. Account for the
+uncommitted research and paused worktrees in R0 before retirement. A low reference count is
+not a verdict on a theorem, saved artifact or public API. Update owner tables and consuming
+calls after the actual move; do not present target names as existing code.
+
 ## The elementary objects — the only design vocabulary
 
 [project-postulate] Brandon, September 22: design, worker briefs, formal work and code state

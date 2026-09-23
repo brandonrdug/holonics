@@ -7,6 +7,12 @@ next edit and completion evidence. The [native specification](THE_ATHENA_ALPHA_C
 holds implementation contracts; [HNN_FORMULA](../HNN_FORMULA.md) defines the model and
 [the illustrated blueprint](../ATHENA_ENGINE_BLUEPRINT.md) locates its operators.
 
+[project-postulate] **September 23 repository intervention.** The
+[restructure plan](THE_REPOSITORY_RESTRUCTURE.md) temporarily orders the retirement census,
+paused consolidation and Rust/Lean library moves before the next generator-machine campaign.
+It refines package ownership without changing the machine's operator equations. Resume the
+consuming HNN operation below from its retained state after each owning seam is verified.
+
 [project-postulate] The September 14 instruction consolidates the complete implementation
 plan. HNN is the machinery; Athena is its first intended product: useful local conversation,
 mathematics, code/tool use and progressively broader modalities. Frontier-level usefulness

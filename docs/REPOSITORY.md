@@ -46,6 +46,15 @@ public HNN library is now `holonics-hna`, and `holonics` is the framework entry 
 Its [Rust API](RUST_FRAMEWORK.md) exposes the existing structural and geometric libraries
 without default features; the default native implementation retains its device dependencies.
 
+[project-postulate] The [September 23 restructure](plans/THE_REPOSITORY_RESTRUCTURE.md)
+supersedes this layout as a **target**, while this page maps the present checkout. It reduces
+the maintained Rust library graph to `holonic-core` → `holonics-hnn` → `holonics-device` →
+public `holonics`, with CUDA in the device package and a host/reference HNN path. A later Apple
+backend joins that device boundary on Brandon's separate branch. The Lean target is one top-level
+`lean/` Lake package with `Holonics` and dependent `HolonicsResearch`. Until verified moves land,
+`crates/` and `formal/` above are the correct source paths. The operator guides distinguish
+current owner from target owner throughout the migration.
+
 ## Relocation guide
 
 | Former location | Current location |
