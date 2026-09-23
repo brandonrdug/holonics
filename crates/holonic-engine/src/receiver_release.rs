@@ -184,10 +184,9 @@ impl fmt::Display for GeneratorSource {
 
 /// One generator of an exact zonotope: a column of exact rationals with the source it came from.
 ///
-/// Renamed from `Generator` (kept as an alias) so it does not collide with the core
-/// `holonic_core::generator::Generator` (transport, initial configuration, clock, phase lift); a
-/// zonotope column is a direction of an exact set, not a clocked transport. The serde name and
-/// shape are unchanged.
+/// A zonotope column is a direction of an exact set, not a clocked transport like
+/// `holonic_core::generator::Generator`. Its serde name and shape are `Generator` for existing
+/// current-format zonotope packets.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename = "Generator")]
 pub struct ZonotopeGenerator {
@@ -196,9 +195,6 @@ pub struct ZonotopeGenerator {
     /// The column itself, of the zonotope's dimension.
     pub column: Vec<Rat>,
 }
-
-/// The former name of [`ZonotopeGenerator`].
-pub type Generator = ZonotopeGenerator;
 
 /// **An exact zonotope** `{ c + G e : e ∈ [−1, 1]^k }` over `Q`.
 ///
