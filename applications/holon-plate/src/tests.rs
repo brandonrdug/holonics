@@ -16,7 +16,6 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use body::num::Cog;
 use holonic_engine::algebraic::{
     CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex,
 };
@@ -26,18 +25,12 @@ use holonic_engine::graded_complex_form::encode_native_bytes;
 use life::conditioned_rest::ConditionedRest;
 use life::holonic_training::{FaceAddress, SourceFace, TrainingEcology};
 use num_bigint::BigInt;
-use soma_abi::active::{ActionCurrent, RelationAtom};
-use soma_membrane::{
-    ContemporaryEvent, CurrentEvent, CurrentGeometry, LiveCurrentMachine, SparseStandingSurface,
-};
 
 use crate::census::Census;
-use crate::deed::DEED_HEAD_OCTETS;
 use crate::plate::{self, PlateRefusal, SchemaTag, HEAD_OCTETS, SEAL_OCTETS};
 use crate::registry::{deposit, inspect, redeposit, resume};
 use crate::schema::{present_and_require_change, LitBody, PlateSchema, ResumeRefusal};
 use crate::schemas::conditioned::{CONDITIONED_SCHEMA_VERSION, CONDITIONED_TAG};
-use crate::schemas::current::{CurrentDeed, CURRENT_SCHEMA_VERSION, CURRENT_TAG};
 use crate::schemas::rebase::{
     decode_euler, encode_euler, BoundaryTerm, RebaseBody, RebaseDeed, REBASE_SCHEMA_VERSION,
     REBASE_TAG,
@@ -104,63 +97,11 @@ fn conditioned_form() -> Vec<u8> {
         .expect("a conditioned rest form")
 }
 
-fn relation(value: i64) -> RelationAtom {
-    RelationAtom::new(Cog::lit(value)).expect("a live relation")
-}
-
-fn action() -> ActionCurrent {
-    ActionCurrent::new(Cog::lit(1)).expect("a resolving action")
-}
-
-/// A live current body with two settled lineages, each carried across three real events.
-fn current_form() -> Vec<u8> {
-    let first = relation(13);
-    let mut machine = LiveCurrentMachine::new(SparseStandingSurface::empty_rank(6).expect("rank"));
-    let lineages = [
-        machine
-            .attach(CurrentGeometry::Cell(first))
-            .expect("an ingress"),
-        machine
-            .attach(CurrentGeometry::Cell(first))
-            .expect("an ingress"),
-    ];
-    for value in [13i64, 29, 17] {
-        let currents = [
-            CurrentEvent::continuing(
-                lineages[0],
-                CurrentGeometry::Cell(relation(value)),
-                action(),
-            ),
-            CurrentEvent::continuing(
-                lineages[1],
-                CurrentGeometry::Cell(relation(value)),
-                action(),
-            ),
-        ];
-        machine
-            .receive(ContemporaryEvent::unrelated(&currents))
-            .expect("a contemporary event");
-    }
-    machine
-        .rest_image()
-        .expect("a receiving-edge rest")
-        .encode_native_bytes()
-        .expect("a current form")
-}
-
 fn training_deed() -> Vec<u8> {
     TrainingDeed {
         faces: vec![face("left", 9, "nine"), face("right", 9, "six")],
         parameters: parameters("beta"),
         consequence: b"fifty-four".to_vec(),
-    }
-    .encode()
-}
-
-fn current_deed() -> Vec<u8> {
-    CurrentDeed {
-        relation: 71,
-        action: 1,
     }
     .encode()
 }
@@ -322,10 +263,9 @@ fn joining_deed(name: &str, from: u64, to: u64) -> Vec<u8> {
     .encode()
 }
 
-fn bodies() -> [(SchemaTag, Vec<u8>, Vec<u8>); 3] {
+fn bodies() -> [(SchemaTag, Vec<u8>, Vec<u8>); 2] {
     [
         (TRAINING_TAG, training_form(), training_deed()),
-        (CURRENT_TAG, current_form(), current_deed()),
         (REBASE_TAG, rebase_form(&hollow_triangle()), rebase_deed()),
     ]
 }
@@ -353,7 +293,7 @@ fn deposit_resume_redeposit_is_byte_identical() {
 fn the_round_trip_passes_through_a_remount_and_not_a_copy() {
     // The deposited FORM is not the input octets moved across; it is what the mounted body
     // returned. If `deposit` ever copied instead of mounting, a form the codec would refuse would
-    // still seal. It refuses -- both schemas carry their own magic in their leading octets and
+    // still seal. It refuses -- all held schemas carry their own magic in their leading octets and
     // neither codec will open a form whose magic has moved.
     for (tag, form, _) in bodies() {
         let mut broken = form.clone();
@@ -605,7 +545,6 @@ fn an_unheld_schema_refuses_rather_than_guessing() {
         held,
         &[
             "HTEC/2".to_owned(),
-            "ERST/2".to_owned(),
             "RBIN/1".to_owned(),
             "CDER/1".to_owned()
         ]
@@ -633,10 +572,6 @@ fn an_unheld_schema_version_refuses_rather_than_reading_it_as_the_held_one() {
 
 #[test]
 fn the_held_versions_are_taken_from_the_codecs_they_hold() {
-    assert_eq!(
-        CURRENT_SCHEMA_VERSION,
-        soma_membrane::LIVE_CURRENT_REST_LAYOUT_VERSION
-    );
     // HTEC's codec writes b"HTEC\0\0\0\x02"; the schema version is that trailing octet.
     let form = training_form();
     assert_eq!(&form[0..8], b"HTEC\0\0\0\x02".as_slice());
@@ -796,39 +731,6 @@ fn the_named_census_fields_that_move_are_the_structural_ones() {
         "the deed must found new transduction fibers, not only advance a counter"
     );
 
-    // ERST: a contemporary event advances every settled lineage's receiving edge
-    let form = current_form();
-    let mut relit =
-        resume(&deposit(CURRENT_TAG, &form).expect("a deposit").plate).expect("a re-light");
-    let (before, after) =
-        present_and_require_change(relit.body.as_mut(), &current_deed()).expect("a deed");
-    let lineages = before.value("lineages").expect("lineages");
-    assert_eq!(
-        after.value("carrier_cursors").expect("cursors"),
-        before.value("carrier_cursors").expect("cursors") + lineages,
-        "one contemporary event must advance every settled lineage's receiving edge by one"
-    );
-    assert_eq!(
-        after.value("lineages"),
-        before.value("lineages"),
-        "continuing a lineage must not found one"
-    );
-    // THE CARRIER EXTENT MUST NOT MOVE, and this assertion earned its keep on 2026-08-15.
-    //
-    // A composing entry was wired into the live `Cell` branch that hour, which made the carrier
-    // mount a further row on this deed — `720 -> 1272` — and **this line is what refused it.** The
-    // wiring was wrong (an atom face routed into the word-grain climb) and was reverted; the
-    // assertion was briefly inverted to accommodate it and is restored.
-    //
-    // Its reason is unchanged: a depth-one carrier holds its extent and advances within it, which
-    // is exactly why an extent alone cannot witness that a body received anything. The structural
-    // fields above carry the witness.
-    assert_eq!(
-        after.value("carrier_words"),
-        before.value("carrier_words"),
-        "a depth-one carrier holds its extent and advances within it -- which is exactly why an \
-         extent alone cannot witness that a body received anything"
-    );
 }
 
 /// The control's own control. Without this, `the_resumed_body_accepts_a_further_deed_and_changes`
@@ -874,15 +776,15 @@ fn an_inert_body_that_changes_nothing_is_refused() {
 
 #[test]
 fn a_deed_addressed_to_another_schema_refuses() {
-    let form = current_form();
+    let form = rebase_form(&hollow_triangle());
     let mut relit =
-        resume(&deposit(CURRENT_TAG, &form).expect("a deposit").plate).expect("a re-light");
+        resume(&deposit(REBASE_TAG, &form).expect("a deposit").plate).expect("a re-light");
     let refusal = present_and_require_change(relit.body.as_mut(), &training_deed())
         .expect_err("a deed addressed elsewhere must refuse");
     let ResumeRefusal::DeedRefused { detail } = &refusal else {
         panic!("expected DeedRefused, got {refusal}");
     };
-    assert!(detail.contains("addressed to schema HTEC"), "{detail}");
+    assert!(detail.contains("addressed to schema RBIN"), "{detail}");
     assert!(detail.contains("not re-addressed by guessing"), "{detail}");
 }
 
@@ -893,46 +795,13 @@ fn the_deed_wires_round_trip_and_refuse_trailing_octets() {
         parameters: parameters("gamma"),
         consequence: b"nine".to_vec(),
     };
-    assert_eq!(TrainingDeed::decode(&deed.encode()).expect("a deed"), deed);
-
-    let deed = CurrentDeed {
-        relation: -63_245,
-        action: 1,
-    };
     let encoded = deed.encode();
-    assert_eq!(encoded.len(), DEED_HEAD_OCTETS + 16);
-    assert_eq!(CurrentDeed::decode(&encoded).expect("a deed"), deed);
+    assert_eq!(TrainingDeed::decode(&encoded).expect("a deed"), deed);
 
     let mut trailing = encoded.clone();
     trailing.push(0);
-    assert!(CurrentDeed::decode(&trailing).is_err());
-    assert!(CurrentDeed::decode(&encoded[..encoded.len() - 1]).is_err());
-}
-
-#[test]
-fn a_deed_the_body_refuses_leaves_the_body_where_it_was() {
-    let form = current_form();
-    let deposited = deposit(CURRENT_TAG, &form).expect("a deposit");
-    let mut relit = resume(&deposited.plate).expect("a re-light");
-    // zero is the absence of an event action, not an action; the abi refuses it
-    let refusal = present_and_require_change(
-        relit.body.as_mut(),
-        &CurrentDeed {
-            relation: 71,
-            action: 0,
-        }
-        .encode(),
-    )
-    .expect_err("a deed with no action current must refuse");
-    let ResumeRefusal::DeedRefused { detail } = &refusal else {
-        panic!("expected DeedRefused, got {refusal}");
-    };
-    assert!(detail.contains("absence of an event action"), "{detail}");
-    let again = redeposit(CURRENT_TAG, relit.body.as_ref()).expect("a re-deposit");
-    assert_eq!(
-        again.plate, deposited.plate,
-        "a refused deed must leave the body exactly where it was"
-    );
+    assert!(TrainingDeed::decode(&trailing).is_err());
+    assert!(TrainingDeed::decode(&encoded[..encoded.len() - 1]).is_err());
 }
 
 // ---------------------------------------------------------------------------------------------

@@ -21,7 +21,8 @@ use soma_membrane::{
 
 /// This driver's name at the plate mouth: `.local/artifacts/eros_inherited_law_ecology/<name>-<sha256>.form`.
 const FORM_DRIVER: &str = "eros_inherited_law_ecology";
-/// The live-current rest this driver seals. `ERST` is the schema `holon-plate` holds for it.
+/// The live-current rest this driver seals. `ERST` is its native rest-image tag; the matching
+/// `holon-plate` schema was retired in R2.
 const MACHINE_REST_FORM: &str = "machine-rest";
 /// The `ERST` half of the ecology checkpoint.
 const CHECKPOINT_MACHINE_FORM: &str = "checkpoint-machine";
@@ -1394,9 +1395,9 @@ fn encode_checkpoint(checkpoint: &EcologyCheckpoint) -> Result<Vec<u8>, String> 
     let machine = checkpoint.machine.encode_native_bytes().map_err(debug)?;
     let law = checkpoint.law.encode_native_bytes()?;
     // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The checkpoint hash below is
-    // untouched. The three constituent forms are deposited apart — the machine half is `ERST` and
-    // has a mouth; the law wire and the four organ wires are forms of codecs this file and the
-    // membrane own, which no held plate schema reads.
+    // untouched. The three constituent forms are deposited apart: the machine uses native `ERST`
+    // rest bytes, but its holon-plate reader was retired in R2. The law wire and four organ wires
+    // use codecs this file and the membrane own, which no held plate schema reads.
     let deposited = deposit_form_or_message(FORM_DRIVER, CHECKPOINT_MACHINE_FORM, &machine)?;
     eprintln!("form deposited: {}", deposited.path.display());
     let deposited = deposit_form_or_message(FORM_DRIVER, CHECKPOINT_LAW_FORM, &law)?;

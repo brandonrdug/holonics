@@ -1,12 +1,12 @@
 # R2 membrane owner and caller audit
 
-Read-only source audit, 2026-09-23. No Cargo builds or tests were run. The audit follows `.agents/bin/prior-art 'membrane|SparseStanding|LiveCurrentMachine|live current|standing storage'`; its results are navigation evidence, so dispositions below are grounded in the owners and callers listed here.
+Source-backed R2 owner map, 2026-09-23. The initial audit followed `.agents/bin/prior-art 'membrane|SparseStanding|LiveCurrentMachine|live current|standing storage'`; its results are navigation evidence, so dispositions below are grounded in the owners and callers listed here. The ERST plate removal is recorded below; this worktree ran no Cargo builds or tests.
 
 ## Decision
 
 `soma-membrane` cannot be retired in isolation: `holonic-life` has production, test, and CUDA consumers of its live receive machine and its state types. Move the live execution cluster into the substantive `holonics` library and update the life consumers as part of the move. The generic `CausalMembrane` trait already belongs to `holonic-structure::membrane` and should be imported from its owner until the `holonics` merge consolidates that owner. Do not copy generic standing/descent laws into the runtime cluster.
 
-`holon-plate` has one membrane-specific schema, ERST. Its purpose is to read/write a `.holon` plate whose form contains `LiveCurrentRestImage` bytes. Given the restructure rule against old save-format readers, retire ERST as a plate schema rather than preserving this reader in the new library. This disposition concerns the plate adapter; the runtime rest-image codec remains part of the moved live machine unless a separate, explicit construction decision retires it.
+`holon-plate`'s membrane-specific ERST schema has been removed with its deed adapter, registry/export entries, fixtures, and direct dependency. ERST `.holon` plates are no longer read by this application. This disposition concerns the plate adapter; `LiveCurrentRestImage` remains a runtime rest representation and is not changed by this cut.
 
 ## Live module and consumer matrix
 
@@ -29,13 +29,17 @@ The manifest edges are explicit: `crates/holonic-life/Cargo.toml:23` and `applic
 The ERST schema is specifically the plate adapter for membrane rest bytes, not a generic plate facility:
 
 * `applications/holon-plate/src/schemas/current.rs:1-20,22-27` documents the `ERST` form owner and binds to `LiveCurrentRestImage`, `LiveCurrentMachine`, and `ContemporaryEvent`.
-* `CurrentSchema::relight` at `current.rs:70-76` decodes/rest-mounts the form; `CurrentBody::form` at `:83-90` re-encodes it; `CurrentBody::census` at `:92-127` reads standing and lineage state; `CurrentBody::present` at `:129-160` decodes and applies a further event.
-* `CurrentDeed::{encode,decode}` at `current.rs:165-184` is ERST-specific deed wire.
-* Remove the ERST module/export in `schemas/mod.rs:9,25-28`, the `CURRENT_SCHEMA` registry entry in `registry.rs:19,23-29`, and the four-current-schema table/export in `lib.rs:135-139` as applicable. Keep generic `deposit`, `resume`, `inspect`, `seal`, `open`, census, and schema dispatch for the other schemas.
-* Remove ERST branches and fixtures in `examples/emit_form.rs` (documented command at `:2,6`; current imports and dispatch at `:35,45-50,59,63,173`) and the ERST-only plate round-trip tests/fixtures in `src/tests.rs` and `tests/plate_mouth.rs` (current imports at `src/tests.rs:30-40`, `plate_mouth.rs:58-70`; current form creator at `plate_mouth.rs:135-146`). Preserve tests that exercise the generic plate container through other schemas.
-* `schemas/rebase.rs` mentions ERST only as a comparison/example (`:98`), so update that prose when deleting the schema; it is not a runtime dependency.
+* The retired `schemas/current.rs` had owned `CurrentSchema::relight`, `CurrentBody::{form,census,present}`, and ERST-specific `CurrentDeed::{encode,decode}`. That file is deleted.
+* The `CURRENT_SCHEMA` registry entry and schema exports are removed. `holon-plate/Cargo.toml` no longer depends on `soma-membrane`; the unused direct `body` and `soma-abi` edges were removed with the adapter.
+* ERST example branches and ERST-only test fixtures are removed. Generic plate round-trip, content-address, census, deed-dispatch and CLI laws remain exercised through HTEC/CDER/RBIN.
+* The incidental comparison in `schemas/rebase.rs` was rewritten without naming ERST.
 
-This cut retires the ERST plate reader/deed workflow, not `LiveCurrentRestImage::{encode_native_bytes,from_native_bytes}` or its native rest image. Those are used by life rest/remount pathways (e.g. `holonic-life/src/synchronized_occurrence/ecology.rs:520`) and must travel with the machine unless their consumers are independently retired.
+The former plate-only carrier regression assertion now belongs with its runtime owner at
+`crates/holonic-membrane/src/live_current.rs::tests::continuing_cell_advances_two_depth_one_lineages_without_growing_their_carriers` (test begins at line 5342). It reproduces two rank-6 attached lineages, settles both through cell relations 13, 29, and 17, then continues both through relation 71. It asserts native carrier extent remains 720 words while each lineage cursor advances from 3 to 4. This preserves the August 15, 2026, 720-to-1272 regression witness at the live-current boundary instead of keeping a machine assertion in a plate adapter. Source inspection shows the test calls existing test helpers and public `LiveCurrentMachine` methods; this worktree did not compile it.
+
+The deleted `CurrentSchema` zero-action refusal is covered at its typed owner: `crates/holonic-abi/src/active.rs:1101-1102` asserts `ActionCurrent::new(Cog::ZERO) == None` and rejects the zero-word action representation. Since `ActionCurrent` is the input required by live-current events, no duplicate membrane test was added.
+
+This cut retires the ERST plate reader/deed workflow, not `LiveCurrentRestImage::{encode_native_bytes,from_native_bytes}` or its native rest image. Those remain used by life rest/remount pathways (e.g. `holonic-life/src/synchronized_occurrence/ecology.rs:520`) and travel with the machine when its owner moves.
 
 ## Why move into `holonics`
 
@@ -45,7 +49,7 @@ The restructure’s target is a substantive, backend-neutral main `holonics` lib
 
 ## Verification gates for implementation
 
-No gates were run for this read-only audit. On the eventual move/cut:
+No Cargo gates were run for this plate cut; the orchestrator is running shared-target R2 checks. On the eventual move/cut:
 
 1. `rg` finds no live workspace `soma-membrane` manifest or source references after the package is removed; confirm the remaining path list with Cargo metadata/workspace membership.
 2. Check `holonic-life` with all targets, including its CUDA-feature/device-independent compile paths as supported by the host; its CPU live-current, synchronized occurrence, causal language, and receiver/ecology tests must compile and pass.

@@ -5339,6 +5339,75 @@ mod tests {
     }
 
     #[test]
+    fn continuing_cell_advances_two_depth_one_lineages_without_growing_their_carriers() {
+        let opening = relation(13);
+        let mut machine =
+            LiveCurrentMachine::new(SparseStandingSurface::empty_rank(6).unwrap());
+        let lineages = [
+            machine.attach(CurrentGeometry::Cell(opening)).unwrap(),
+            machine.attach(CurrentGeometry::Cell(opening)).unwrap(),
+        ];
+
+        // Match the established ERST receiving path: settle both attached lineages through the
+        // same three contemporary cell events before measuring the further continuation.
+        for value in [13, 29, 17] {
+            let currents = [
+                CurrentEvent::continuing(
+                    lineages[0],
+                    CurrentGeometry::Cell(relation(value)),
+                    action(),
+                ),
+                CurrentEvent::continuing(
+                    lineages[1],
+                    CurrentGeometry::Cell(relation(value)),
+                    action(),
+                ),
+            ];
+            machine
+                .receive(ContemporaryEvent::unrelated(&currents))
+                .unwrap();
+        }
+
+        let carrier_extent = |machine: &LiveCurrentMachine| {
+            machine
+                .rest_image()
+                .unwrap()
+                .lineages()
+                .iter()
+                .map(|lineage| lineage.native_carrier_words().len())
+                .sum::<usize>()
+        };
+        let before_words = carrier_extent(&machine);
+        assert_eq!(before_words, 720);
+        assert_eq!(machine.lineage_cursor(lineages[0]), Some(3));
+        assert_eq!(machine.lineage_cursor(lineages[1]), Some(3));
+
+        let further = [
+            CurrentEvent::continuing(
+                lineages[0],
+                CurrentGeometry::Cell(relation(71)),
+                action(),
+            ),
+            CurrentEvent::continuing(
+                lineages[1],
+                CurrentGeometry::Cell(relation(71)),
+                action(),
+            ),
+        ];
+        machine
+            .receive(ContemporaryEvent::unrelated(&further))
+            .unwrap();
+
+        // Regression guard retained from the 2026-08-15 ERST plate test: a Cell continuation
+        // once grew the live carriers from 720 to 1272 words. The event advances the receiving
+        // edge; it must not mount a spurious carrier row.
+        assert_eq!(carrier_extent(&machine), before_words);
+        assert_eq!(machine.memory().live_lineages, 2);
+        assert_eq!(machine.lineage_cursor(lineages[0]), Some(4));
+        assert_eq!(machine.lineage_cursor(lineages[1]), Some(4));
+    }
+
+    #[test]
     fn dark_world_extent_does_not_become_retained_execution_extent() {
         let dark = [relation(0)];
         let mut machine = LiveCurrentMachine::new(SparseStandingSurface::empty_rank(0).unwrap());

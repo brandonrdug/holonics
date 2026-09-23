@@ -27,7 +27,8 @@ use soma_membrane::{
 /// This driver's name at the plate mouth: `.local/artifacts/eros_exact_algorithm_ecology/<name>-<sha256>.form`.
 const FORM_DRIVER: &str = "eros_exact_algorithm_ecology";
 /// The two live-current rests this driver seals: the source population's, and the final one after
-/// source-absent conduct. `ERST` reads both, and depositing them apart is what lets a second frame
+/// source-absent conduct. The native rest-image codec reads both; its holon-plate schema was
+/// retired in R2. Depositing them apart is what lets a second frame
 /// see that the two are different bodies rather than one form written twice.
 const SOURCE_REST_FORM: &str = "source-rest";
 const FINAL_REST_FORM: &str = "final-rest";

@@ -26,7 +26,8 @@ use soma_membrane::{
 
 /// This driver's name at the plate mouth: `.local/artifacts/eros_audio_inscription/<name>-<sha256>.form`.
 const FORM_DRIVER: &str = "eros_audio_inscription";
-/// The two live-current rests this driver seals, at its two named passages. `ERST` reads both.
+/// The two live-current rests this driver seals at its named passages. The native rest codec
+/// reads both.
 const SUCCESSOR_REST_FORM: &str = "successor-rest";
 const PREFLIGHT_REST_FORM: &str = "preflight-rest";
 
@@ -313,9 +314,10 @@ impl AudioWorld {
         let rest = self.machine.rest_image().map_err(debug)?;
         let successor_rest_octets = rest.encode_native_bytes().map_err(debug)?;
         // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The hash below is untouched
-        // and still reported; these are the same octets reaching the plate's mouth instead of being
-        // hashed and dropped. This runs at every acoustic event; the address is the content, so
-        // every distinct rest is deposited at its own address rather than overwriting the previous.
+        // and still reported; this helper retains the content-addressed form artifact.
+        // The former ERST plate reader was retired in R2. This runs at every acoustic event; the
+        // address is the content, so each distinct rest is deposited at its own address rather
+        // than overwriting the previous.
         let deposited =
             deposit_form_or_message(FORM_DRIVER, SUCCESSOR_REST_FORM, &successor_rest_octets)?;
         eprintln!("form deposited: {}", deposited.path.display());

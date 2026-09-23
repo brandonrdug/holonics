@@ -18,7 +18,6 @@ publish = false
 # UP into the plate, which nothing here does.
 [dependencies]
 sha2 = "0.10"
-soma-membrane = { path = "../../crates/holonic-membrane" }
 soma-abi = { path = "../../crates/holonic-abi" }
 body = { path = "../../crates/holonic-body" }
 life = { path = "../../crates/holonic-life" }

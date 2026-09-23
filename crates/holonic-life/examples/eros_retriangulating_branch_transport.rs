@@ -18,7 +18,8 @@ use soma_membrane::{
 
 /// This driver's name at the plate mouth: `.local/artifacts/eros_retriangulating_branch_transport/<name>-<sha256>.form`.
 const FORM_DRIVER: &str = "eros_retriangulating_branch_transport";
-/// The live-current rest this driver seals. `ERST` is the schema `holon-plate` holds for it.
+/// The live-current rest this driver seals. `ERST` is its native rest-image tag; the matching
+/// `holon-plate` schema was retired in R2.
 const MACHINE_REST_FORM: &str = "machine-rest";
 
 const SOURCE_SCHEMA: &str = "eros.retriangulating-branch-transport.source.v1";
@@ -1001,8 +1002,9 @@ fn seed_carrier(
     let rest = machine.rest_image().map_err(debug)?;
     let rest_octets = rest.encode_native_bytes().map_err(debug)?;
     // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The hash below is untouched and
-    // still reported; these are the same octets reaching `holon-plate deposit --from ERST:` instead
-    // of being hashed and dropped. This helper is called at every named ending; the address is the
+    // still reported; this helper retains the content-addressed form artifact. The former ERST
+    // plate reader was retired in R2. This helper handles every named ending; each address is
+    // the
     // content, so each distinct rest is deposited at its own address rather than overwriting the
     // previous.
     let deposited = deposit_form_or_message(FORM_DRIVER, MACHINE_REST_FORM, &rest_octets)?;

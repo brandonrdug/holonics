@@ -64,9 +64,10 @@
 //! # What this owner is not
 //!
 //! It is **not a codec**. It does not know what a form is, does not parse one, and holds no schema.
-//! The schema is named at the mouth on the far side (`holon-plate deposit --from ERST:…`), by a
-//! reader that holds it. A guess here about which body a file carries is precisely the failure the
-//! plate container exists to make impossible, so nothing here guesses.
+//! The former ERST plate schema was retired in R2. This helper only writes content-addressed form
+//! artifacts; it does not select a schema or claim that `holon-plate` can read every native rest
+//! wire. A guess here about which body a file carries is precisely the failure the plate container
+//! exists to make impossible, so nothing here guesses.
 //!
 //! It carries **no count, ratio, score or figure** that could be read as a competence number. What
 //! it returns is an address — a [`DepositedForm`] naming the path, the content address, and the

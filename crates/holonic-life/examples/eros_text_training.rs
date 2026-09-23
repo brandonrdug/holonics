@@ -24,7 +24,8 @@ use soma_membrane::{
 
 /// This driver's name at the plate mouth: `.local/artifacts/eros_text_training/<name>-<sha256>.form`.
 const FORM_DRIVER: &str = "eros_text_training";
-/// The live-current rest this driver seals. `ERST` is the schema `holon-plate` holds for it.
+/// The live-current rest this driver seals. `ERST` is its native rest-image tag; the matching
+/// `holon-plate` schema was retired in R2.
 const MACHINE_REST_FORM: &str = "machine-rest";
 const TRAINING_LINES: [&str; 4] = [
     "one red sheep runs.",
@@ -938,8 +939,8 @@ struct SealedRest {
 /// Seal one rest at the plate mouth and return both halves of its receipt.
 ///
 /// THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The hash is untouched and still
-/// reported; these are the same octets reaching `holon-plate deposit --from ERST:` instead of being
-/// hashed and dropped.
+/// reported; this helper retains the content-addressed form artifact. Its ERST plate reader was
+/// retired in R2.
 ///
 /// This helper is called once per checkpoint, once per probe, and **once per candidate inside the
 /// probe loop** -- 511 distinct rests in a full run. Under a fixed `machine-rest.form` the first

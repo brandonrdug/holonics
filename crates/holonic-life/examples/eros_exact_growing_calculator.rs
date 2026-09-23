@@ -21,7 +21,8 @@ use soma_membrane::{
 
 /// This driver's name at the plate mouth: `.local/artifacts/eros_exact_growing_calculator/<name>-<sha256>.form`.
 const FORM_DRIVER: &str = "eros_exact_growing_calculator";
-/// The `ERST` half of the calculator checkpoint. This one has a mouth today.
+/// The native ERST rest-image half of the calculator checkpoint. Its holon-plate schema was
+/// retired in R2.
 const CHECKPOINT_MACHINE_FORM: &str = "checkpoint-machine";
 /// The four relation-organ wires of the same checkpoint. Real codecs; no held plate schema.
 const GCD_STATE_FORM: &str = "checkpoint-gcd-state";
@@ -993,7 +994,8 @@ fn capability_name(stage: u32) -> &'static str {
 fn checkpoint_bytes(checkpoint: &CalculatorCheckpoint) -> Result<Vec<u8>, String> {
     let machine = checkpoint.machine.encode_native_bytes().map_err(debug)?;
     // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The checkpoint hash below is
-    // untouched. The machine half is a canonical `ERST` form and reaches the plate's mouth here;
+    // untouched. The machine half is a canonical `ERST` form saved as a content-addressed artifact.
+    // Its plate reader was retired in R2;
     // the four organ wires are deposited beside it under their own names rather than only inside a
     // concatenation, because a form no reader holds is still a form and the falsifier reports it.
     let deposited = deposit_form_or_message(FORM_DRIVER, CHECKPOINT_MACHINE_FORM, &machine)?;

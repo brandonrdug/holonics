@@ -16,14 +16,13 @@
 use crate::census::Census;
 use crate::plate::{self, PlateRefusal, ReadPlate, SchemaTag};
 use crate::schema::{PlateSchema, ResumeRefusal};
-use crate::schemas::{CONDITIONED_SCHEMA, CURRENT_SCHEMA, REBASE_SCHEMA, TRAINING_SCHEMA};
+use crate::schemas::{CONDITIONED_SCHEMA, REBASE_SCHEMA, TRAINING_SCHEMA};
 
 /// Every schema this reader holds. The set is fixed at compile time and enumerable at run time,
 /// which is what lets a refusal print what *is* held beside what was asked for.
 pub fn held_schemas() -> Vec<&'static dyn PlateSchema> {
     vec![
         &TRAINING_SCHEMA,
-        &CURRENT_SCHEMA,
         &REBASE_SCHEMA,
         &CONDITIONED_SCHEMA,
     ]

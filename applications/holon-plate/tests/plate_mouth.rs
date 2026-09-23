@@ -37,25 +37,22 @@
 //!
 //! # What the fixtures here are, exactly
 //!
-//! Two form species reach this mouth. `ERST` is produced below by the same three calls
-//! `eros_text_training.rs:930` makes (`rest_image` → `encode_native_bytes`), on this file's own
-//! material. `HTEC` is produced by the same call `eros_holonic_training_ecology.rs:144` makes
-//! (`TrainingEcology::encode_native_bytes`), also on this file's own material — **and that driver
+//! `HTEC` and `CDER` forms reach this mouth. `HTEC` is produced by the same call
+//! `eros_holonic_training_ecology.rs:144` makes (`TrainingEcology::encode_native_bytes`), on this
+//! file's own material — **and that driver
 //! cannot be run from this repository at all**: it takes a `SOURCE.json` that is not tracked here,
 //! so no real `HTEC` form exists on disk to test against. What is established below is that the
-//! mouth carries a form of each species through deposit, resume and a deed. What is **not**
-//! established is that either driver's own material produces a canonical form — only running the
-//! driver shows that, and `eros_text_training` is the one of the two that can be run.
+//! mouth carries both form species through deposit, resume and a deed. What is **not** established
+//! is that either driver's own material produces a canonical form — only running the driver shows
+//! that.
 
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, MutexGuard};
 
-use body::num::Cog;
 use holon_plate::registry::{deposit, resume};
 use holon_plate::schema::{present_and_require_change, ResumeRefusal};
 use holon_plate::schemas::conditioned::{ConditionedDeed, CONDITIONED_TAG};
-use holon_plate::schemas::current::{CurrentDeed, CURRENT_TAG};
 use holon_plate::schemas::training::{TrainingDeed, TRAINING_TAG};
 use holon_plate::SchemaTag;
 use holonic_engine::conditioned_derivation::{expose, ConditionedBody, DerivationQuery};
@@ -65,10 +62,6 @@ use life::form_mouth::{
     DepositedForm, FormMouthRefusal, DEPOSIT_ROOT,
 };
 use life::holonic_training::{FaceAddress, SourceFace, TrainingEcology};
-use soma_abi::active::{ActionCurrent, RelationAtom};
-use soma_membrane::{
-    ContemporaryEvent, CurrentEvent, CurrentGeometry, LiveCurrentMachine, SparseStandingSurface,
-};
 
 // ---------------------------------------------------------------------------------------------
 // the two form species that reach this mouth, produced by the calls the drivers make
@@ -116,6 +109,10 @@ fn parameters(receiver: &str) -> BTreeMap<String, String> {
 /// `eros_holonic_training_ecology.rs:144` makes. The material is this file's, not that driver's;
 /// see the module note.
 fn training_octets() -> Vec<u8> {
+    training_octets_from(b"fifty-six")
+}
+
+fn training_octets_from(consequence: &[u8]) -> Vec<u8> {
     let mut ecology = TrainingEcology::new(2, 8).expect("a training ecology");
     for ordinal in 0..4u64 {
         ecology
@@ -125,47 +122,11 @@ fn training_octets() -> Vec<u8> {
                     face("right", ordinal, "eight"),
                 ],
                 &parameters("alpha"),
-                b"fifty-six",
+                consequence,
             )
             .expect("a cultivation");
     }
     ecology.encode_native_bytes().expect("a training form")
-}
-
-/// An `ERST` form, through `machine.rest_image()?.encode_native_bytes()?` — the call nineteen of
-/// the wired drivers make, `eros_text_training.rs:931` among them.
-fn current_octets() -> Vec<u8> {
-    current_octets_from(&[13i64, 29, 17])
-}
-
-/// The same producer over declared material, so a second `ERST` form can be made that is genuinely
-/// a different form rather than a copy of the first.
-fn current_octets_from(relations: &[i64]) -> Vec<u8> {
-    let action = ActionCurrent::new(Cog::lit(1)).expect("a resolving action");
-    let relation = |value: i64| RelationAtom::new(Cog::lit(value)).expect("a live relation");
-    let mut machine = LiveCurrentMachine::new(SparseStandingSurface::empty_rank(6).expect("rank"));
-    let lineages = [
-        machine
-            .attach(CurrentGeometry::Cell(relation(13)))
-            .expect("an ingress"),
-        machine
-            .attach(CurrentGeometry::Cell(relation(13)))
-            .expect("an ingress"),
-    ];
-    for value in relations.iter().copied() {
-        let currents = [
-            CurrentEvent::continuing(lineages[0], CurrentGeometry::Cell(relation(value)), action),
-            CurrentEvent::continuing(lineages[1], CurrentGeometry::Cell(relation(value)), action),
-        ];
-        machine
-            .receive(ContemporaryEvent::unrelated(&currents))
-            .expect("a contemporary event");
-    }
-    machine
-        .rest_image()
-        .expect("a receiving-edge rest")
-        .encode_native_bytes()
-        .expect("a current form")
 }
 
 /// A `CDER` form, through `ConditionedRest::seal(&body)?.encode_native_bytes()?` — the two calls
@@ -224,14 +185,6 @@ fn training_deed() -> Vec<u8> {
     .encode()
 }
 
-fn current_deed() -> Vec<u8> {
-    CurrentDeed {
-        relation: 71,
-        action: 1,
-    }
-    .encode()
-}
-
 /// Every (site, schema, octets, deed) species this mouth carries today. The first field is the
 /// **site name** the form is sealed under, not a claim about which driver ran.
 fn wired() -> Vec<(&'static str, SchemaTag, Vec<u8>, Vec<u8>)> {
@@ -241,12 +194,6 @@ fn wired() -> Vec<(&'static str, SchemaTag, Vec<u8>, Vec<u8>)> {
             TRAINING_TAG,
             training_octets(),
             training_deed(),
-        ),
-        (
-            "machine-rest",
-            CURRENT_TAG,
-            current_octets(),
-            current_deed(),
         ),
         (
             "conditioned-rest",
@@ -302,9 +249,9 @@ fn a_driver_form_written_to_the_mouth_deposits_and_resumes() {
 /// frames and establish nothing, so at least one field must be provably nonzero — and it must be a
 /// field of the *body*, recomputed on the far side, not a field copied out of the plate.
 ///
-/// There is no `!census.is_empty()` assertion here any more. Both schemas build their census with a
-/// fixed `Census::found([...])` literal — seven names for `ERST`, five for `HTEC` — so a non-empty
-/// census is a theorem about the carrier and could not have come out otherwise. `CLAUDE.md` §8:
+/// There is no `!census.is_empty()` assertion here any more. Both schemas build their census with
+/// fixed `Census::found([...])` literals, so a non-empty census is a theorem about the carrier and
+/// could not have come out otherwise. `CLAUDE.md` §8:
 /// a receipt that could not have come out otherwise carries no evidence.
 #[test]
 fn the_resumed_census_is_not_all_zero() {
@@ -379,8 +326,6 @@ fn a_driver_form_under_the_wrong_held_tag_is_refused() {
     let _alone = alone();
     let (root, driver) = scratch("wrong-tag");
     let crossed = [
-        ("training-ecology-rest", CURRENT_TAG, training_octets()),
-        ("machine-rest", TRAINING_TAG, current_octets()),
         ("conditioned-rest", TRAINING_TAG, conditioned_octets()),
         ("training-ecology-rest", CONDITIONED_TAG, training_octets()),
     ];
@@ -406,13 +351,10 @@ fn a_driver_form_under_the_wrong_held_tag_is_refused() {
 fn an_unheld_tag_is_refused_by_name() {
     let _alone = alone();
     let unheld = SchemaTag::parse("ZZZZ").expect("four octets of [A-Z0-9]");
-    match deposit(unheld, &current_octets()) {
+    match deposit(unheld, &training_octets()) {
         Err(ResumeRefusal::SchemaUnheld { tag, held, .. }) => {
             assert_eq!(tag, unheld);
-            assert!(
-                held.iter().any(|name| name.starts_with("ERST/")),
-                "the refusal names what is held: {held:?}"
-            );
+            assert!(held.iter().any(|name| name.starts_with("HTEC/")), "{held:?}");
         }
         other => panic!("an unheld tag must refuse by name, got {other:?}"),
     }
@@ -423,16 +365,16 @@ fn an_unheld_tag_is_refused_by_name() {
 #[test]
 fn a_truncated_driver_form_does_not_deposit() {
     let _alone = alone();
-    let octets = current_octets();
+    let octets = training_octets();
     assert!(octets.len() > 16, "the fixture form is long enough to cut");
     let truncated = &octets[..octets.len() - 8];
     assert!(
-        deposit(CURRENT_TAG, truncated).is_err(),
+        deposit(TRAINING_TAG, truncated).is_err(),
         "a form cut short mounted anyway"
     );
     // and the control for that control: the uncut form does deposit, so the assertion above is
     // about the cut and not about the fixture
-    assert!(deposit(CURRENT_TAG, &octets).is_ok());
+    assert!(deposit(TRAINING_TAG, &octets).is_ok());
 }
 
 /// The mouth refuses a form of zero octets, and refuses before founding anything. A driver whose
@@ -441,12 +383,12 @@ fn a_truncated_driver_form_does_not_deposit() {
 fn the_mouth_refuses_an_empty_form() {
     let _alone = alone();
     let (root, driver) = scratch("empty");
-    let refusal = deposit_form_under(&root, &driver, "machine-rest", b"")
+    let refusal = deposit_form_under(&root, &driver, "training-ecology-rest", b"")
         .expect_err("zero octets are not a form");
     match refusal {
         FormMouthRefusal::FormEmpty { under, name } => {
             assert_eq!(under, root.join(&driver));
-            assert_eq!(name, "machine-rest");
+            assert_eq!(name, "training-ecology-rest");
         }
         other => panic!("the empty-form law must fire here, got {other:?}"),
     }
@@ -519,26 +461,21 @@ fn two_conditioned_rests_from_one_site_both_reach_the_far_side() {
 // the content address — the half of the mouth that decides whether a return survives
 
 /// Two different forms sealed at **one site** must both survive, at two addresses.
-///
-/// This is the loss the content address exists to close, driven through the whole seam rather than
-/// only through the mouth: `eros_text_training` seals a rest inside a per-candidate loop, its own
-/// receipt carried 511 distinct rest hashes, and a fixed `machine-rest.form` left one file behind.
-/// Both forms below must reach `deposit` and `resume` as two bodies.
 #[test]
 fn two_forms_from_one_site_both_reach_the_far_side() {
     let _alone = alone();
     let (root, driver) = scratch("two-forms");
-    let first = current_octets_from(&[13i64, 29, 17]);
-    let second = current_octets_from(&[13i64, 29, 17, 41]);
+    let first = training_octets_from(b"first consequence");
+    let second = training_octets_from(b"second consequence");
     assert_ne!(first, second, "the two fixtures must be two forms");
 
-    let earlier = at_the_mouth(&root, &driver, "machine-rest", &first);
-    let later = at_the_mouth(&root, &driver, "machine-rest", &second);
+    let earlier = at_the_mouth(&root, &driver, "training-ecology-rest", &first);
+    let later = at_the_mouth(&root, &driver, "training-ecology-rest", &second);
     assert_ne!(earlier.path, later.path);
 
     for deposited in [&earlier, &later] {
         let from_disk = std::fs::read(&deposited.path).expect("both forms are still on disk");
-        let plate = deposit(CURRENT_TAG, &from_disk).expect("a deposit");
+        let plate = deposit(TRAINING_TAG, &from_disk).expect("a deposit");
         let relit = resume(&plate.plate).expect("a resume");
         assert_eq!(
             relit.body.form().expect("the re-lit body's form"),
@@ -561,17 +498,18 @@ fn two_forms_from_one_site_both_reach_the_far_side() {
 
 /// The path a driver writes is the path the shell command names, and the address in it is the same
 /// string the driver reports as that form's hash. If this drifts, every documented
-/// `holon-plate deposit --from ERST:.local/artifacts/<driver>/<name>-<sha256>.form` stops resolving and
+/// The documented `holon-plate deposit --from HTEC:<form>` path stops resolving if this drifts;
 /// nothing else in the suite would notice.
 #[test]
 fn the_declared_path_is_the_one_the_shell_names() {
     let _alone = alone();
-    let octets = current_octets();
+    let octets = training_octets();
     let address = content_address(&octets);
     assert_eq!(
-        declared_path("eros_text_training", "machine-rest", &octets).expect("a path"),
+        declared_path("eros_holonic_training_ecology", "training-ecology-rest", &octets)
+            .expect("a path"),
         PathBuf::from(format!(
-            "{DEPOSIT_ROOT}/eros_text_training/machine-rest-{address}.form"
+            "{DEPOSIT_ROOT}/eros_holonic_training_ecology/training-ecology-rest-{address}.form"
         ))
     );
     assert_eq!(DEPOSIT_ROOT, ".local/artifacts");
@@ -612,13 +550,13 @@ fn the_production_entry_point_writes_under_output_and_the_form_resumes() {
     std::env::set_current_dir(&root).expect("enter the working directory");
 
     let htec_driver = format!("{driver}_htec");
-    let octets = current_octets();
-    let training = training_octets();
+    let octets = training_octets();
+    let training = training_octets_from(b"a second consequence");
     let observed = (|| -> Result<Observed, String> {
-        // the exact call 38 of the 39 driver sites make
-        let deposited = deposit_form_or_message(&driver, "machine-rest", &octets)?;
-        // and the exact call the 39th makes, with the other carrier, under its own driver name so
-        // the directory listing below is about one site
+        // the production entry point writes under its default root
+        let deposited = deposit_form_or_message(&driver, "training-ecology-rest", &octets)?;
+        // The direct-return API uses a second driver name, allowing the directory listing below
+        // to identify the production entry point's one output.
         let by_refusal = deposit_form(&htec_driver, "training-ecology-rest", &training)
             .map_err(|refusal| refusal.to_string())?;
 
@@ -630,10 +568,10 @@ fn the_production_entry_point_writes_under_output_and_the_form_resumes() {
             .collect();
         held.sort();
 
-        let plate = deposit(CURRENT_TAG, &from_disk).map_err(|refusal| refusal.to_string())?;
+        let plate = deposit(TRAINING_TAG, &from_disk).map_err(|refusal| refusal.to_string())?;
         let mut relit = resume(&plate.plate).map_err(|refusal| refusal.to_string())?;
         let resumed = relit.body.form()?;
-        let (before, after) = present_and_require_change(relit.body.as_mut(), &current_deed())
+        let (before, after) = present_and_require_change(relit.body.as_mut(), &training_deed())
             .map_err(|refusal| refusal.to_string())?;
         let moved = before
             .rows()
@@ -659,7 +597,7 @@ fn the_production_entry_point_writes_under_output_and_the_form_resumes() {
     assert_eq!(
         observed.message_carrier,
         PathBuf::from(format!(
-            ".local/artifacts/{driver}/machine-rest-{}.form",
+            ".local/artifacts/{driver}/training-ecology-rest-{}.form",
             content_address(&octets)
         ))
     );
@@ -677,7 +615,7 @@ fn the_production_entry_point_writes_under_output_and_the_form_resumes() {
     assert_eq!(
         observed.held,
         vec![std::ffi::OsString::from(format!(
-            "machine-rest-{}.form",
+            "training-ecology-rest-{}.form",
             content_address(&octets)
         ))]
     );

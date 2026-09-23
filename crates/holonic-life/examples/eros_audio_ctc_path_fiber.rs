@@ -30,7 +30,8 @@ use soma_membrane::{
 
 /// This driver's name at the plate mouth: `.local/artifacts/eros_audio_ctc_path_fiber/<name>-<sha256>.form`.
 const FORM_DRIVER: &str = "eros_audio_ctc_path_fiber";
-/// The live-current rest this driver seals. `ERST` is the schema `holon-plate` holds for it.
+/// The live-current rest this driver seals. `ERST` is its native rest-image tag; the matching
+/// `holon-plate` schema was retired in R2.
 const MACHINE_REST_FORM: &str = "machine-rest";
 
 const SOURCE_SCHEMA: &str = "eros.audio-ctc-path-fiber.source.v1";
@@ -593,8 +594,8 @@ fn run(source: &Source, source_bytes: usize, source_sha256: String) -> Result<Va
     let rest = machine.rest_image().map_err(debug)?;
     let rest_octets = rest.encode_native_bytes().map_err(debug)?;
     // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. This site reported only the
-    // octet COUNT and dropped the octets; the count below is unchanged and the octets now reach
-    // `holon-plate deposit --from ERST:`.
+    // octet COUNT and dropped the octets. The count below is unchanged, and the rest-image bytes
+    // remain in a content-addressed form artifact. The ERST plate reader was retired in R2.
     let deposited = deposit_form_or_message(FORM_DRIVER, MACHINE_REST_FORM, &rest_octets)?;
     eprintln!("form deposited: {}", deposited.path.display());
     let rest_bytes = rest_octets.len();

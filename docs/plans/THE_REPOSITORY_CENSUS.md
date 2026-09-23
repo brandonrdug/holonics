@@ -193,8 +193,9 @@ M4/M5 measured claims remain in dated research records; old SLEEP readers and fi
 carry forward under §0.2. Cargo pruned the lockfile to 182 packages after the earlier X11 cut;
 the workspace all-target and locked-lockfile checks passed. The live CUDA PTX path remains.
 The [membrane caller map](census/R2_MEMBRANE_EDGE.md) keeps the live receive/standing runtime
-with its `life` and CUDA consumers until the main-library move, while the old ERST plate reader
-is a separate R2 retirement. The [workspace caller map](census/R2_WORKSPACE_EDGE.md) places the
+with its `life` and CUDA consumers until the main-library move; the ERST plate reader and its
+deed adapter have now been retired, with the runtime rest-image codec retained. The
+[workspace caller map](census/R2_WORKSPACE_EDGE.md) places the
 live variant-workspace operation at the workbench boundary and names its v1 persisted readers;
 those readers cannot become compatibility paths in the new library. Both are migration
 obligations, not evidence that the crates are currently unconsumed.

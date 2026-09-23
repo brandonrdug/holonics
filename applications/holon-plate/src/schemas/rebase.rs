@@ -95,8 +95,8 @@
 //! The other five:
 //!
 //! - **`cells`** does move, by `+1`, on every accepted deed — and it moves by `+1` whichever of the
-//!   two things happened. It is the extent of the storage, the same species as `ERST`'s
-//!   `carrier_words`: it witnesses that the wire grew, which the form digest already witnesses. A
+//!   two things happened. It is the extent of the storage: it witnesses that the wire grew, which
+//!   the form digest already witnesses. A
 //!   census resting on it would be declaring the form's length in another spelling.
 //! - **`grades`** does not move at all unless the deed opens a grade above the standing top.
 //! - **`boundary_rank_total`** moves only in the first case. A deed founding a vertex, or any cell

@@ -623,8 +623,9 @@ existing suites (§0.9):
    `holonic-life`, and `accelerators/` per §0.4. The isolated Vulkan surface cut is complete;
    continue with the remaining consumers and decide `holonic-words` here. The
    [membrane owner audit](census/R2_MEMBRANE_EDGE.md) finds a live receive/standing runtime used by
-   `life` and CUDA: its source moves with callers into main `holonics` during the Rust cut, while
-   the obsolete ERST plate reader can retire in R2. The
+   `life` and CUDA: its source moves with callers into main `holonics` during the Rust cut. The
+   ERST `.holon` reader/deed adapter has been retired in R2 while retaining the runtime rest-image
+   codec. The
    [workspace owner audit](census/R2_WORKSPACE_EDGE.md) finds a live workbench application edge:
    disposition its old persisted readers under §0.2, then move retained application operations
    into workbench or retire the command after the `life`/HNN owners move. Neither live crate is a

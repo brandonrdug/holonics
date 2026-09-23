@@ -135,6 +135,5 @@ pub use registry::{
 };
 pub use schema::{present_and_require_change, LitBody, PlateSchema, ResumeRefusal};
 pub use schemas::{
-    CURRENT_SCHEMA_VERSION, CURRENT_TAG, REBASE_SCHEMA_VERSION, REBASE_TAG,
-    TRAINING_SCHEMA_VERSION, TRAINING_TAG,
+    REBASE_SCHEMA_VERSION, REBASE_TAG, TRAINING_SCHEMA_VERSION, TRAINING_TAG,
 };

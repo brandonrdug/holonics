@@ -10,7 +10,6 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 use std::sync::atomic::{AtomicU32, Ordering};
 
-use holon_plate::schemas::current::CurrentDeed;
 use holon_plate::schemas::rebase::{BoundaryTerm, RebaseDeed};
 use holon_plate::schemas::training::TrainingDeed;
 
@@ -221,7 +220,7 @@ fn the_binary_reports_an_unheld_schema_on_inspect_and_refuses_it_on_resume() {
     assert!(inspected.status.success(), "{}", stderr(&inspected));
     let report = stdout(&inspected);
     assert!(report.contains("NOT HELD by this reader"), "{report}");
-    assert!(report.contains("HTEC/2, ERST/2"), "{report}");
+    assert!(report.contains("HTEC/2, RBIN/1, CDER/1"), "{report}");
     assert!(report.contains("NO BODY WAS LIT"), "{report}");
 
     let refused = holon_plate(&["resume", "--plate", &text(&plate)]);
@@ -298,9 +297,11 @@ fn a_deed_addressed_to_another_schema_refuses_through_the_binary() {
     let deed = scratch.at("wrong.deed");
     fs::write(
         &deed,
-        CurrentDeed {
-            relation: 71,
-            action: 1,
+        RebaseDeed {
+            name: "wrong-schema".to_owned(),
+            grade: 0,
+            source_events: vec![1],
+            boundary: Vec::new(),
         }
         .encode(),
     )
@@ -319,7 +320,7 @@ fn a_deed_addressed_to_another_schema_refuses_through_the_binary() {
     let refused = holon_plate(&["resume", "--plate", &text(&plate), "--deed", &text(&deed)]);
     assert_eq!(refused.status.code(), Some(1));
     let message = stderr(&refused);
-    assert!(message.contains("addressed to schema ERST"), "{message}");
+    assert!(message.contains("addressed to schema RBIN"), "{message}");
 }
 
 /// The choreography, end to end and through two processes: a graded incidence is written by the
@@ -489,8 +490,8 @@ fn the_help_states_what_the_plate_does_not_claim() {
     assert!(helped.status.success());
     let report = stdout(&helped);
     assert!(report.contains("HTEC/2"), "{report}");
-    assert!(report.contains("ERST/2"), "{report}");
     assert!(report.contains("RBIN/1"), "{report}");
+    assert!(report.contains("CDER/1"), "{report}");
     assert!(report.contains("REFUSED, never guessed at"), "{report}");
     assert!(
         report.contains("is not comprehension"),

@@ -20,7 +20,8 @@ use soma_membrane::{
 
 /// This driver's name at the plate mouth: `.local/artifacts/eros_residual_chart_cultivation/<name>-<sha256>.form`.
 const FORM_DRIVER: &str = "eros_residual_chart_cultivation";
-/// The live-current rest this driver seals. `ERST` is the schema `holon-plate` holds for it.
+/// The live-current rest this driver seals. `ERST` is its native rest-image tag; the matching
+/// `holon-plate` schema was retired in R2.
 const MACHINE_REST_FORM: &str = "machine-rest";
 
 const SOURCE_SCHEMA: &str = "eros.residual-chart-cultivation.source.v1";
@@ -2050,8 +2051,9 @@ fn machine_read(machine: &LiveCurrentMachine) -> Result<Value, String> {
     let rest = machine.rest_image().map_err(debug)?;
     let rest_octets = rest.encode_native_bytes().map_err(debug)?;
     // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The hash below is untouched and
-    // still reported; these are the same octets reaching `holon-plate deposit --from ERST:` instead
-    // of being hashed and dropped. This helper reads several machines; the address is the content,
+    // still reported; this helper retains the content-addressed form artifact. The former ERST
+    // plate reader was retired in R2. This helper reads several machines; each rest receives its
+    // own content address,
     // so each distinct rest is deposited at its own address rather than overwriting the previous.
     let deposited = deposit_form_or_message(FORM_DRIVER, MACHINE_REST_FORM, &rest_octets)?;
     eprintln!("form deposited: {}", deposited.path.display());

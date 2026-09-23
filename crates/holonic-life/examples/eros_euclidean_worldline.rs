@@ -26,7 +26,8 @@ use soma_membrane::{
 
 /// This driver's name at the plate mouth: `.local/artifacts/eros_euclidean_worldline/<name>-<sha256>.form`.
 const FORM_DRIVER: &str = "eros_euclidean_worldline";
-/// The live-current rest this driver seals. `ERST` is the schema `holon-plate` holds for it.
+/// The live-current rest this driver seals. `ERST` is its native rest-image tag; the matching
+/// `holon-plate` schema was retired in R2.
 const MACHINE_REST_FORM: &str = "machine-rest";
 /// The `ERST` half of the world checkpoint, deposited apart from the concatenation the driver hashes.
 const CHECKPOINT_MACHINE_FORM: &str = "checkpoint-machine";
@@ -973,9 +974,9 @@ fn checkpoint_bytes(checkpoint: &WorldCheckpoint) -> Result<Vec<u8>, String> {
     let trajectory = checkpoint.trajectory.encode_native_bytes();
     // The checkpoint the driver hashes is the two wires concatenated, which is a form of no schema
     // any reader holds. Its two constituents are each a form of their own codec, so they are
-    // deposited apart: the machine half is `ERST` and has a mouth today; the organ half is the
-    // relation-organ wire and has none, which is a fact about the reader's held set rather than
-    // about these octets, and the falsifier reports it rather than the concatenation hiding it.
+    // deposited apart: the machine half has a native `ERST` rest image, and the organ half has its
+    // own relation-organ wire. Neither is a held holon-plate schema; the falsifier reports each
+    // form separately rather than allowing the concatenation to hide them.
     let deposited = deposit_form_or_message(FORM_DRIVER, CHECKPOINT_MACHINE_FORM, &machine)?;
     eprintln!("form deposited: {}", deposited.path.display());
     let deposited = deposit_form_or_message(FORM_DRIVER, CHECKPOINT_TRAJECTORY_FORM, &trajectory)?;
@@ -988,8 +989,8 @@ fn checkpoint_bytes(checkpoint: &WorldCheckpoint) -> Result<Vec<u8>, String> {
 fn rest_sha256(rest: &LiveCurrentRestImage) -> Result<String, String> {
     let octets = rest.encode_native_bytes().map_err(debug)?;
     // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The hash below is untouched and
-    // still reported; these are the same octets reaching `holon-plate deposit --from ERST:` instead
-    // of being hashed and dropped. The address is the content, so this helper -- called at many
+    // still reported; this helper retains the content-addressed form artifact. The former ERST
+    // plate reader was retired in R2. The address is the content, so this helper -- called at many
     // rests -- deposits every distinct form it sealed instead of overwriting all but the last, and
     // the file name it returns carries the same hash the receipt does.
     let deposited = deposit_form_or_message(FORM_DRIVER, MACHINE_REST_FORM, &octets)?;

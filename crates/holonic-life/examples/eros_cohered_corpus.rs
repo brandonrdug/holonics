@@ -23,7 +23,8 @@ use soma_membrane::{
 
 /// This driver's name at the plate mouth: `.local/artifacts/eros_cohered_corpus/<name>-<sha256>.form`.
 const FORM_DRIVER: &str = "eros_cohered_corpus";
-/// The live-current rest this driver seals. `ERST` is the schema `holon-plate` holds for it.
+/// The live-current rest this driver seals. `ERST` is its native rest-image tag; the matching
+/// `holon-plate` schema was retired in R2.
 const MACHINE_REST_FORM: &str = "machine-rest";
 const SOURCE_SCHEMA: &str = "eros.cohered-corpus.source.v1";
 const REPORT_SCHEMA: &str = "eros.cohered-corpus.report.v1";
@@ -1365,8 +1366,8 @@ fn deed_name(deed: FeltDeed) -> &'static str {
 fn rest_sha256(rest: &LiveCurrentRestImage) -> Result<String, String> {
     let octets = rest.encode_native_bytes().map_err(debug)?;
     // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The hash below is untouched and
-    // still reported; these are the same octets reaching `holon-plate deposit --from ERST:` instead
-    // of being hashed and dropped. The address is the content, so this helper -- called at many
+    // still reported; this helper retains the content-addressed form artifact. The former ERST
+    // plate reader was retired in R2. The address is the content, so this helper -- called at many
     // rests -- deposits every distinct form it sealed instead of overwriting all but the last, and
     // the file name it returns carries the same hash the receipt does.
     let deposited = deposit_form_or_message(FORM_DRIVER, MACHINE_REST_FORM, &octets)?;

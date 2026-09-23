@@ -56,7 +56,8 @@ use soma_membrane::{
 
 /// This driver's name at the plate mouth: `.local/artifacts/eros_relampago_atmospheric_current/<name>-<sha256>.form`.
 const FORM_DRIVER: &str = "eros_relampago_atmospheric_current";
-/// The live-current rest this driver seals. `ERST` is the schema `holon-plate` holds for it. This
+/// The live-current rest this driver seals. `ERST` is its native rest-image tag; the matching
+/// `holon-plate` schema was retired in R2. This
 /// driver already wrote these octets to a caller-supplied directory as `coupled-live-current.bin`;
 /// that write stays, and this one puts the same octets at the declared mouth path where a plate
 /// deposit finds them without being told where the driver's run directory was.

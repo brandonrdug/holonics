@@ -1,9 +1,7 @@
 //! `cargo run -p holon-plate --example emit_form -- HTEC out.form`
-//! `cargo run -p holon-plate --example emit_form -- ERST out.form`
 //! `cargo run -p holon-plate --example emit_form -- RBIN out.form`
 //! `cargo run -p holon-plate --example emit_form -- CDER out.form`
 //! `cargo run -p holon-plate --example emit_form -- HTEC-DEED out.deed`
-//! `cargo run -p holon-plate --example emit_form -- ERST-DEED out.deed`
 //! `cargo run -p holon-plate --example emit_form -- RBIN-DEED out.deed`
 //! `cargo run -p holon-plate --example emit_form -- CDER-DEED out.deed`
 //!
@@ -15,8 +13,9 @@
 //! twenty-odd sites and not one of them writes the form where a second process could pick it up.
 //! Until those drivers open their own mouths, this is where a form comes from.
 //!
-//! The bodies here are small and are grown by their own machines — four real cultivations, three
-//! real contemporary events. They are a **demonstration seed**, not evidence of anything: no
+//! The bodies here are small and are grown by their own machines — four real cultivations,
+//! three founded incidence cells, and two conditioned exposures. They are a **demonstration seed**,
+//! not evidence of anything: no
 //! capability claim rests on them and the census they carry is whatever those occurrences actually
 //! produced.
 //!
@@ -30,9 +29,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::PathBuf;
 
-use body::num::Cog;
 use holon_plate::schemas::conditioned::ConditionedDeed;
-use holon_plate::schemas::current::CurrentDeed;
 use holon_plate::schemas::rebase::{BoundaryTerm, RebaseDeed};
 use holon_plate::schemas::training::TrainingDeed;
 use holonic_engine::algebraic::{CausalChain, ComparativeMultiplicity, GradedCausalComplex};
@@ -41,13 +38,9 @@ use holonic_engine::conditioned_derivation::{expose, ConditionedBody};
 use holonic_engine::graded_complex_form::encode_native_bytes;
 use life::conditioned_rest::ConditionedRest;
 use life::holonic_training::{FaceAddress, SourceFace, TrainingEcology};
-use soma_abi::active::{ActionCurrent, RelationAtom};
-use soma_membrane::{
-    ContemporaryEvent, CurrentEvent, CurrentGeometry, LiveCurrentMachine, SparseStandingSurface,
-};
 
 const USAGE: &str =
-    "usage: emit_form (HTEC|ERST|RBIN|CDER|HTEC-DEED|ERST-DEED|RBIN-DEED|CDER-DEED) OUT";
+    "usage: emit_form (HTEC|RBIN|CDER|HTEC-DEED|RBIN-DEED|CDER-DEED) OUT";
 
 fn main() -> Result<(), String> {
     let mut arguments = std::env::args().skip(1);
@@ -56,11 +49,9 @@ fn main() -> Result<(), String> {
 
     let octets = match what.as_str() {
         "HTEC" => training_form()?,
-        "ERST" => current_form()?,
         "RBIN" => rebase_form()?,
         "CDER" => conditioned_form()?,
         "HTEC-DEED" => training_deed(),
-        "ERST-DEED" => current_deed(),
         "RBIN-DEED" => rebase_deed(),
         "CDER-DEED" => conditioned_deed(),
         other => return Err(format!("`{other}` is not a held schema\n{USAGE}")),
@@ -94,37 +85,6 @@ fn training_deed() -> Vec<u8> {
         consequence: b"fifty-four".to_vec(),
     }
     .encode()
-}
-
-fn current_form() -> Result<Vec<u8>, String> {
-    let relation = |value: i64| {
-        RelationAtom::new(Cog::lit(value)).ok_or_else(|| "a canonical relation".to_owned())
-    };
-    let action = ActionCurrent::new(Cog::lit(1)).ok_or_else(|| "a resolving action".to_owned())?;
-    let first = relation(13)?;
-    let mut machine = LiveCurrentMachine::new(SparseStandingSurface::empty_rank(6).map_err(debug)?);
-    let lineages = [
-        machine
-            .attach(CurrentGeometry::Cell(first))
-            .map_err(debug)?,
-        machine
-            .attach(CurrentGeometry::Cell(first))
-            .map_err(debug)?,
-    ];
-    for value in [13i64, 29, 17] {
-        let currents = [
-            CurrentEvent::continuing(lineages[0], CurrentGeometry::Cell(relation(value)?), action),
-            CurrentEvent::continuing(lineages[1], CurrentGeometry::Cell(relation(value)?), action),
-        ];
-        machine
-            .receive(ContemporaryEvent::unrelated(&currents))
-            .map_err(debug)?;
-    }
-    machine
-        .rest_image()
-        .map_err(debug)?
-        .encode_native_bytes()
-        .map_err(debug)
 }
 
 /// A conditioned derivation body over two declared artifacts, conditioned by exposure to two
@@ -165,14 +125,6 @@ fn conditioned_deed() -> Vec<u8> {
     ConditionedDeed {
         whole: "document:three".to_owned(),
         text: "a novel receiver family meets the exact carrier".to_owned(),
-    }
-    .encode()
-}
-
-fn current_deed() -> Vec<u8> {
-    CurrentDeed {
-        relation: 71,
-        action: 1,
     }
     .encode()
 }

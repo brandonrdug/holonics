@@ -3,7 +3,7 @@
 The on-disk deposit mouth. `.holon`, magic `HLON`.
 
 ```text
-  live body  ──▶  deposit  ──▶  plate.holon  ──▶  resume  ──▶  a FRESH current
+  live body  ──▶  deposit  ──▶  plate.holon  ──▶  resume  ──▶  a FRESH continuation
                     FORM         two digests      RE-LIGHT      (not the old one)
                                  + a census
 ```
@@ -27,7 +27,6 @@ A form to feed it:
 
 ```sh
 cargo run -p holon-plate --example emit_form -- HTEC training.form
-cargo run -p holon-plate --example emit_form -- ERST current.form
 cargo run -p holon-plate --example emit_form -- RBIN incidence.form
 ```
 
@@ -132,15 +131,13 @@ it to prove the refusal can fire.
 
 | tag | version | owner | further deed |
 |---|---|---|---|
-| `HTEC` | 1 | `crates/holonic-life/src/holonic_training.rs:443` | one cultivation occurrence |
-| `ERST` | 2 | `crates/holonic-membrane/src/live_current.rs:1241` | one contemporary event continuing every settled lineage |
+| `HTEC` | 2 | `crates/holonic-life/src/holonic_training.rs:443` | one cultivation occurrence |
 | `RBIN` | 1 | `crates/holonic-engine/src/graded_complex_form.rs` | one further cell, founded through the incidence's own founder |
 | `CDER` | 1 | `crates/holonic-life/src/conditioned_rest.rs` | one further whole of linguistic material |
 
 A plate naming anything else is **refused, never guessed at** — separately for an unheld tag and an
-unheld codec version, because a form at another version is another form. `ERST`'s version is read
-from `LIVE_CURRENT_REST_LAYOUT_VERSION` rather than copied, `RBIN`'s from
-`GRADED_COMPLEX_FORM_LAYOUT_VERSION`, and `CDER`'s from the trailing octet of
+unheld codec version, because a form at another version is another form. `RBIN`'s version is read
+from `GRADED_COMPLEX_FORM_LAYOUT_VERSION`, and `CDER`'s from the trailing octet of
 `CONDITIONED_REST_PREFIX`, so a codec that bumps its wire stops this reader by version instead of
 silently misreading.
 
@@ -169,10 +166,9 @@ Two things about that census are load-bearing and easy to get wrong:
   but by the same amount in both cases, so neither can say what the deed did. `grades`,
   `boundary_rank_total` and `torsion_factors` need not move at all.
 
-`ERST` is the sharpest illustration of the FORM/current line, because its own codec already draws
-it: `LiveCurrentMachine::rest_image` refuses to close over an **attached seed** — a lineage opened
-and not yet across its first event — with `UnsettledRest`. An open ingress is a current in flight,
-and a current in flight cannot be deposited. The codec refuses; the plate inherits the refusal.
+The plate no longer holds the ERST live-current rest schema. `LiveCurrentRestImage` remains a
+runtime rest representation owned by the live receive machine; it is not a schema in this plate
+reader. Existing ERST plates are not read by `holon-plate`.
 
 ## The seam that is still open
 
@@ -186,6 +182,6 @@ than evidence of anything.
 
 *A cost law is a law* (`CLAUDE.md` §8). Deposit is one mount, one re-take, one census, and two
 passes over the octets. Resume is the same. The container adds `96 + census_octets` to whatever the
-form codec produced — 248 octets over a 111-octet `HTEC` form, 312 over a 3,012-octet `ERST` form.
+form codec produced — the overhead depends on the selected schema's census size.
 Verification is O(plate) and mounting is whatever the schema's own codec costs; the plate adds no
 term to it.

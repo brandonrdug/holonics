@@ -19,7 +19,8 @@ use soma_membrane::{
 
 /// This driver's name at the plate mouth: `.local/artifacts/eros_self_emanated_law/<name>-<sha256>.form`.
 const FORM_DRIVER: &str = "eros_self_emanated_law";
-/// The live-current rest this driver seals. `ERST` is the schema `holon-plate` holds for it.
+/// The live-current rest this driver seals. `ERST` is its native rest-image tag; the matching
+/// `holon-plate` schema was retired in R2.
 const MACHINE_REST_FORM: &str = "machine-rest";
 const PRIMING_VALUES: [i64; 8] = [13, 29, 17, 31, -63_245, 47, 71, -89];
 const LAW_MAGIC: [u8; 4] = *b"ELAW";
@@ -1369,8 +1370,8 @@ fn machine_read(machine: &LiveCurrentMachine) -> Result<MachineRead, String> {
         .encode_native_bytes()
         .map_err(debug)?;
     // THE_ASSEMBLY.md step 5, loop (d): *the signal is the octets*. The hash below is untouched and
-    // still reported; these are the same octets reaching `holon-plate deposit --from ERST:` instead
-    // of being hashed and dropped. This site sits inside a helper the driver calls at every read.
+    // still reported; this helper retains the content-addressed form artifact. The former ERST
+    // plate reader was retired in R2. The driver calls this helper at every read.
     // The address is the content, so every distinct rest it seals is deposited at its own address
     // instead of all but the last being overwritten, and the file name carries the reported hash.
     let deposited = deposit_form_or_message(FORM_DRIVER, MACHINE_REST_FORM, &rest_octets)?;

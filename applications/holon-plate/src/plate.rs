@@ -35,7 +35,7 @@ const CENSUS_OCTETS_AT: usize = 16;
 const FORM_OCTETS_AT: usize = 24;
 
 /// Four octets of `[A-Z0-9]` naming a form codec. It is the codec's own magic where the codec has
-/// one: `HTEC` for the training ecology, `ERST` for the live current rest.
+/// one: `HTEC` for the training ecology or `RBIN` for a graded causal incidence.
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SchemaTag([u8; 4]);
 
