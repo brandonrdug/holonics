@@ -207,6 +207,13 @@ The [workspace caller map](census/R2_WORKSPACE_EDGE.md) places the
 live variant-workspace operation at the workbench boundary and names its v1 persisted readers;
 those readers cannot become compatibility paths in the new library. Both are migration
 obligations, not evidence that the crates are currently unconsumed.
+The [native-intelligence caller map](census/R2_LIFE_NATIVE_EDGE.md) identifies a first M1 law
+slice: `holonic-engine::diffusion::ExactDiffusionLaw` moves to main
+`holonics::physics::diffusion`, while Soma incidence/session adapters remain at the HNA boundary.
+Situated actual-successor inference belongs to core HNN and resident addressed-junction conduct
+to `holonics-cuda`; snapshot/artifact reader formats remain unresolved until their current
+producers and consumers are classified. No `life::native_intelligence` module moves merely
+because it is re-exported by that facade.
 
 ## First source-backed cuts to verify
 
