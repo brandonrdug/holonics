@@ -792,3 +792,67 @@ The engine keeps explicit re-exports at the old paths, as phase 3 did, so the pu
 unchanged. Run it after phases 11, 12 and 14 land, since those phases edit the same modules.
 Moving a module first requires a dependency census (`use crate::` edges) to find the acyclic cut. The
 census is the first step of the phase.
+
+## Overgrowth census and retirement programme (September 23)
+
+[established-bounded; measured] Brandon's ruling: we are the only workers, and consolidation includes
+deleting what is superseded, unconsumed or outdated. Git history is the archive. The tracked tree at
+`c9012f17` (lines of `.rs/.lean/.py/.md/.cu/.cuh`):
+
+| Owner | Lines |
+|---|---|
+| `holonic-engine/src` | 548,225 (196 top-level modules; 202 single-file modules hold 302k) |
+| `holonic-engine/examples` | 110,723 (178 examples) |
+| `holonic-life` src + examples | 161,327 + 154,732 |
+| other crates (`hna` 53k, `core` 36k, `body` 24k, `mount` 17k, `membrane` 16k, `relational-geometry` 21k, …) | about 200k |
+| Lean `ElementaryHolonics` | 485,811 in 1,387 files. The `Framework` closure is 188,222; the research umbrella adds 293,276 (Millennium 248,698, RH 20,703); 23 files (4,313 lines) are imported by nothing |
+| `research/` | 290,470 |
+| `docs/` | 39,095 |
+
+Engine consumer census: a module counts as consumed if some file outside it references
+`crate|super|holonic_engine::<module>`. Multi-line `use` lists and re-exports through `holonics` or
+`holonics-hna` can hide a consumer, so confirm each zero with a build before deleting.
+- **41 modules, 63,060 lines, have no referencing file:**
+  - Event laws: `observation_ecology` 4750, `prime_ecology` 4138, `local_star` 4020, `field_atlas` 3072,
+    `causal_state_grammar` 2562, `organizational_grammar` 2367, `divisor_reconstruction` 2283,
+    `receiver_phase_atlas` 1933, `generative_transport` 1908, `coupled_informant` 1834,
+    `wave_propagation` 1822, `atmospheric_inverse` 1730, `causal_traversal` 1660,
+    `holonic_complex` 1336, `physical` 942, `arithmetic_phase` 828.
+  - Receivers and dimensions: `acoustic_receiver` 3086, `graph_receiver` 2547, `dimensional_receiver` 1828,
+    `arithmetic_dimensional` 1275, `receiver_ecology` 740.
+  - Release, presentation and platform: `artifact_release` 4328, `returned_conduct` 1882, `bridge` 1581,
+    `model_surface` 887, `platform_x11` 384, `platform` 295, `live_presentation` 281, `display` 133.
+  - Other: `cuda_relation` 1564, `implicit` 990, `phase_current` 850, `soulkiller_witness` 580, `conic` 527,
+    `basin` 450, `atlas` 422, `mode` 334, `executor` 298, `parameter` 244, `resource` 203, `device` 166.
+- **40 more modules (79,601 lines) have only one or two referencing files.** The largest:
+  `physicochemical_receiver`, `design_selection`, `fold`, `evaluation_discipline`, `edit_rigidity`,
+  `identity_atlas`, `iwasawa_tower`, `presentation`, `standing`, `receiver`, `curvature_bridge`,
+  `derivation_curvature`, `cultivated_rest`, `returned_reading`, `causal_body`,
+  `conditioned_static_response`, `sheaf_diffusion`, `bit_causal`, `derivation_codec_intake`,
+  `inverse_transport`.
+  Their consumers are often a single example.
+
+[project-postulate] Phase 16 consolidated the scaffolding of event laws that nothing consumes. That was
+effort spent on overgrowth. From now on, each phase begins with retirement and consolidates only what
+remains. Order:
+
+1. **Retirement census (R0).** For every engine module, life module and example, and every Lean file
+   outside `Framework`, record its consumers (build-confirmed), its superseding owner if any, and one
+   disposition: *keep and own* (law, owner, consumer), *fold* (its law moves into the owner that
+   supersedes it), or *delete*. Lean research modules (Millennium, RH) are kept only where a
+   `Framework` owner, a live campaign or a cited record consumes them. Otherwise they are deleted or
+   folded into their owner.
+2. **Deletion passes (R1–R3).** R1: engine modules and examples with no consumer. R2: life modules and
+   examples tied to retired experiments. R3: Lean files outside every closure, then umbrella-only
+   research modules. Each pass needs a workspace check, the Lean `Framework` build and the suites of
+   the surviving owners. `lean_citations` and doc links are updated in the same commit.
+3. **Compatibility debt (R4).** Remove the `pub type` aliases and legacy wire decoders added in
+   phases 9–16 unless a saved artifact we still use needs them, and name that artifact.
+4. **Consolidation phases 11, 12 and 14** continue on what remains (WIP branches above).
+5. **Crate split (phase 17)** runs on the reduced engine.
+6. **Documents and records (R5).** `research/` (290k) and `docs/` get the same census. Superseded
+   records are deleted or folded into their guide, and the research routes are updated.
+
+The uncommitted `formal/.../RH`, `Millennium` and `Computation` files and the September 22–23 records
+in the working tree are active work in this tree and are ours. They are committed or retired inside R0.
+They are not left as "another agent's" files.

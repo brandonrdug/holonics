@@ -328,7 +328,7 @@ Read the matched record and its actual source/caller. The task identifies the kn
 inferred unknown, generating law, receiver and returned residual. Native HNN foundations remain
 prior to further inherited-model production; Soulkiller's admitted material retains its recorded
 scope. [Architecture](docs/ARCHITECTURE.md), [Soulkiller](docs/SOULKILLER.md), [Athena](docs/ATHENA.md)
-and [interoperability](docs/INTEROPERABILITY.md) define those interfaces. Keep existing API/wire names.
+and [interoperability](docs/INTEROPERABILITY.md) define those interfaces. Rename or retire API/wire names under the ownership rule below.
 
 [definition] "Soulkiller" is a name only (borrowed from a game); it determines no mathematics.
 Its subject is **equation extraction**: reading a foreign realization's operators and coefficients
@@ -380,9 +380,17 @@ machine/source material, exact paths, existing owners, equations, consumer and r
 [WORKER_BRIEF](docs/WORKER_BRIEF.md) has the concrete template. The primary inspects source and
 integrates returned changes; worker measurements are reusable receipts.
 
-[project-postulate] This is a shared checkout. Stage and format explicit owned paths; preserve
-other agents' and the user's work. A broad restore/reset/stash/clean is not a way to tidy another
-owner's diff. Constructors and remounts validate carrying values, checked extents precede work,
+[project-postulate] **Ownership and retirement** (Brandon, September 23). This repository is Brandon's
+personal research programme; Brandon, Claude and Codex are its only workers, and every file in the
+tree, committed or not, is ours to account for. Consolidation includes deletion: code, examples,
+Lean and documents that are superseded, unconsumed or outdated are removed, and git history is the
+archive. A compatibility alias or legacy wire decoder is kept only for a saved artifact we still
+use, and is named with that artifact; otherwise the old name and decoder go. "Keep all mathematics"
+means keep each law once, in its owner, with its consumer, not every representation of it.
+
+[project-postulate] Stage and format explicit paths; preserve
+in-progress work until it is accounted for. Retire by explicit deletion, never by a broad
+restore/reset/stash/clean. Constructors and remounts validate carrying values, checked extents precede work,
 and exact growth is handled by rebase/factor/representation change with its decoder and residual.
 Commit and push coherent verified work on the task's branch. If adding a co-author credit, use
 actual attribution rather than a hardcoded model name.

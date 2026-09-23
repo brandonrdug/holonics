@@ -370,7 +370,15 @@ brief and integrates their returns. [WORKER_BRIEF](docs/WORKER_BRIEF.md) supplie
 Worker measurements are receipts; judgements are inspected against source. Use fewer workers
 when the work does not split. Honour a request to work without agents.
 
-[project-postulate] This is a shared checkout. Preserve other work, stage explicit owned paths,
+[project-postulate] **Ownership and retirement** (Brandon, September 23). This repository is Brandon's
+personal research programme; Brandon, Claude and Codex are its only workers, and every file in the
+tree, committed or not, is ours to account for. Consolidation includes deletion: code, examples,
+Lean and documents that are superseded, unconsumed or outdated are removed, and git history is the
+archive. A compatibility alias or legacy wire decoder is kept only for a saved artifact we still
+use, and is named with that artifact; otherwise the old name and decoder go. "Keep all mathematics"
+means keep each law once, in its owner, with its consumer, not every representation of it.
+
+[project-postulate] Preserve in-progress work until it is accounted for, stage explicit paths,
 and format explicit files. Never use a broad restore/reset/stash/clean to remove changes you did
 not make. Constructors and remounts validate carrying values; checked dimensions precede their
 allocation/work. Rebase, factor or change an exact representation when it outgrows its carrier,
