@@ -12,6 +12,9 @@ import ElementaryHolonics.Computation.HolonicRecurrentEcology
 import ElementaryHolonics.Computation.HolonicNeuralMorphologyContinuation
 import ElementaryHolonics.Computation.HolonicOrientedSiteTransport
 import ElementaryHolonics.Computation.HolonicSimulationCertificate
+import ElementaryHolonics.Computation.ZeroNavigation
+import ElementaryHolonics.Computation.CertifiedWindingRoute
+import ElementaryHolonics.Computation.IntersectionNavigation
 
 /-!
 # Execution, recurrent ecologies, and classical architecture charts
