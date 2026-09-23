@@ -745,3 +745,50 @@ Owed: `ExactEventLaw` itself still returns the law's standing type rather than a
 advance (no energy balance is declared for the event laws); the kept standings without an
 occurrence set (`arithmetic_phase`, `local_star`, `physical`, `simplicial`, `algebraic`,
 `holonic_complex`, `sheaf_diffusion`) and the one `HolonRest` codec named in the programme table.
+
+## Handoff, September 23: phases 11, 12a and 12b are paused mid-packet
+
+[established-bounded; source-inspected] Landed on `main`: phases 9 (`5c4bb58a`), 10 (`4dff57c8`),
+13 (`5b7c89ab`), 15 (`7e204283`) and 16 (`009e8363`). Three phases were stopped mid-work when the disk filled.
+Their unverified states are committed on local branches (not pushed), each in its own worktree:
+
+| Phase | Branch (worktree) | Base | Last step reached | Remaining |
+|---|---|---|---|---|
+| 11 resident constitutive views | `wip/consolidation-phase-11` (`.local/p11-wt`) | `5b7c89ab` | resident relation (`resident/relation.rs`), condition-contact reaction split, disposition section written; about to write `Holon/AffineContact.lean` (file present, unchecked) | finish Lean + import; equality tests; caller migration; host + device suites (`constitutive_fibre::resident`, `material_transport::normal`, hna consumers) |
+| 12a field body and session | `wip/consolidation-phase-12a` (`.local/p12a-wt`) | `5b7c89ab` | incident body/session edits for the joint `\x01` frozen-cut retirement, machine episode, `ResidentHolonChart`; about to add chart equality tests | packets 1–6 of the brief: contemporary-read tests (delayed = immediate at the same constitution), `\x01` decode test, `FieldProducingSection`, ladder consolidation, disposition, CLAUDE.md stale statements, suites, exposure sample (counts and bits only) |
+| 12b coupled continuation and field internals | `wip/consolidation-phase-12b` (`.local/p12b-wt`) | `7e204283` | coupled continuation retirement in progress: `continuation.rs` deleted, dependent/comparison/rest rewritten; writing coupled wave rest v12 with legacy v9/v10 decode (likely does not compile yet) | finish v12 rest; hna `coupled_wave.rs` session contract restated; contemporary-read tests; behaviour measurement; `NormalWaveHolon` reception/actuation chart; then packet 2 (junction, material_transport/{complete,contextual,moment,support}, archive, current_history_source, contextual_lift, rest) |
+
+Overlaps to resolve when joining: 11 and 12a both edit hna `field_session.rs` and
+`field_session/native_source.rs`; 11 and 12b both edit `normal/direct/wave/coupled.rs` and
+`coupled/comparison/constitutive.rs` (11's edits there are compile fixes; 12b's rewrite governs). Rebase each
+onto current `main`, verify in an isolated worktree with a single shared target directory, then commit.
+
+Still open after these: phase 14 (cultivated body, including the repeated apparatus fields phase 13 left);
+phase 16's remainder (event laws as a core `HolonLaw` advance with energy balance, the seven unconverted
+standings, the single `HolonRest` codec, the `ObservationEcologyStanding` audit); phase 15's owed extraction
+(GELU/tanh constants, positional terminal boundary, host per-layer interaction table, core `HolonLaw` chart,
+one executor); phase 13's unmerged relational-current and pair-coefficient wrappers.
+
+Build hygiene: `holonic-engine` is one ~548k-line crate. Each feature set, profile and check/test/example
+mode builds its own ~1.8 GB rlib and ~6 GB incremental directory. On September 23, `target/debug` held 39 engine
+incremental directories (150 GB) and per-worker target directories had reached about 380 GB, which filled the
+disk. Use one shared worker target directory, `CARGO_PROFILE_DEV_DEBUG=line-tables-only`, delete a phase's
+build directory when it lands, and treat splitting the engine crate along the Holon facets as consolidation
+work.
+
+**Phase 17 (added): split `holonic-engine` along the Holon facets.** Measured September 23. The crate has
+548k lines. 202 top-level single-file modules hold 302k of them. The largest directories are `native_ecology`
+(79k), `cuda_refine` (38k), `resident_section` (21k), `holonic_intelligence` (20k) and the physical receivers
+(`physical_occurrence`, `physicochemical_receiver`, `physical_intake`, about 20k). Proposed crates, each
+depending on `holonic-core`:
+- the event laws: the 26 `ExactEventLaw` modules and `world`, about 62k lines, CUDA-free;
+- equation extraction: `holonic_intelligence`, `soulkiller`, `foreign_*`;
+- the device layer: `cuda_refine`, `resident_section`, kernels, `hardware_cover`, `section_partition`;
+- the constitutive field: `native_ecology`;
+- the physical and chemical receivers;
+- the remaining CUDA-free mathematics.
+
+The engine keeps explicit re-exports at the old paths, as phase 3 did, so the public API and wires are
+unchanged. Run it after phases 11, 12 and 14 land, since those phases edit the same modules.
+Moving a module first requires a dependency census (`use crate::` edges) to find the acyclic cut. The
+census is the first step of the phase.
