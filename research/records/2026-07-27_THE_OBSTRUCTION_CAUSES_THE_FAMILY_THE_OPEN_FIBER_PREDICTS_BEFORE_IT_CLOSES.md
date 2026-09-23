@@ -491,9 +491,22 @@ The bounded example does not:
 - form the \(\tau_3\) prediction; or
 - solve the later physical propagation.
 
-It lawfully supplies chronology, receiver identity, and the opaque world's
-caused responses. Complete operator returns remain inherited grading
-material and are distinguishable from production's prediction.
+It lawfully supplies chronology and the opaque world's caused responses.
+Complete operator returns remain inherited grading material and are
+distinguishable from production's prediction.
+
+**Receiver scope of the bounded Rust realization.** The events carry a
+`TransportLineageId`, but `GenerativeTransportLaw::enact` currently ignores
+that field for both complete-operator returns and scalar observations; its
+standing retains no receiver lineage. The four-node example supplies one
+constant lineage throughout. Thus the built result is one implicit, fixed
+receiver family in one chart, as assumed by its equations. It does not
+establish lineage validation or a law for joining observations from distinct
+receivers/frames. The formal kernel in
+`ElementaryHolonics.Transport.GenerativeTransport` states the exact
+time-affine operator identity and the general observation-kernel criterion;
+it leaves the receiver functional fixed and does not formalize the Rust
+lineage field or its adaptive query routine.
 
 ## 11. What is established
 
