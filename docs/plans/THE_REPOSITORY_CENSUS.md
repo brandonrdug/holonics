@@ -147,12 +147,12 @@ and two proposed **retire** (`acoustic_receiver`, `artifact_release`). An indepe
 confirmed no external Rust caller/example and a checked Lean counterpart for each.
 The acoustic mirror cut has removed the standalone Rust module/tests and citation/export in
 the isolated R1 #65 worktree, marked its Lean correspondence historical, and retained the
-checked Lean owner and dated measurements. Focused engine-lib and cached Lean-owner checks
-passed; the all-target caller gate remains to be run on the rebased cut. The separate native
+checked Lean owner and dated measurements. Focused engine-lib, cached Lean-owner, complete
+workspace all-target and Lean-citation checks passed on the rebased cut. The separate native
 Athena acoustic chart is not this module.
 `artifact_release` also has Rust-only `EnclosedFamily` representation and work-ceiling policy:
 classify these as implementation-specific retirement or preserve a distinct law in a guide/
-#62 before removing it. Both cuts still need focused Rust/Lean checks after the edit.
+#62 before removing it. The artifact cut still needs focused Rust/Lean checks after its edit.
 
 The [R2 owner audit](census/SOMA_R0.tsv) changes two earlier assumptions. `holonics-workspace`
 has a live workbench application caller, and `holonic-language`'s generic reflective
