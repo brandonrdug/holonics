@@ -9,7 +9,7 @@
 use crate::native::{
     FieldSessionSpec, FieldSourceChart, FieldTextCodec, GeneratorIncidentFieldSpec,
     GeneratorPhasePort, GeneratorPhaseReceiverBinding, GeneratorSessionOptions,
-    GeneratorSourceBinding, GeneratorSourceContactKind, IncidentFieldSolver,
+    GeneratorSourceBinding, GeneratorSourceContactKind, IncidentFieldSolver, ReactionLaw,
     field_geometry::machine::{
         ClockSpec, GeneratorMachineSpec, GeneratorPairArcSpec, GeneratorSiteSpec, MachineUnitsSpec,
         PhaseSpec,
@@ -197,6 +197,8 @@ pub fn generator_session_spec(
         solve_steps: 128,
         solver: IncidentFieldSolver::Richardson,
         enclosure_propagation: NativeEnclosurePropagation::JointBall,
+        // A newly founded generator body declares the power-neutral reaction law.
+        reaction_law: ReactionLaw::PowerNeutral,
     };
     let options = GeneratorSessionOptions {
         field,

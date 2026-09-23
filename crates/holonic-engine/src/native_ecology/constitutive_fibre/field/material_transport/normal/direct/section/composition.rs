@@ -299,6 +299,25 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
         &self,
         condition: &Self,
     ) -> Result<Self, ConstitutiveFibreError> {
+        self.bilinear_enclosed_features_in(condition, false)
+    }
+    /// The power-neutral reaction chart `s ⊕ c ⊕ (c_r s)_r`, one block per REAL coordinate `c_r`
+    /// of `c` (`Re c_j`, `Im c_j` interleaved): real-bilinear in `(Re c, Im c)` ⊗ `s`, so a
+    /// coefficient slice multiplying `c_r` can be held skew-Hermitian and the reaction
+    /// `J(c)s = Σ_r c_r A_r s` satisfies `Re⟨s, J(c)s⟩ = 0` for every admitted `c`. A
+    /// complex-bilinear `c ⊗ s` cannot: neutrality for `c` and `i c` forces each slice to zero.
+    /// Width `d + k + d·k` (real words); both input radii and the mixed term are carried.
+    pub fn realified_bilinear_enclosed_features(
+        &self,
+        condition: &Self,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        self.bilinear_enclosed_features_in(condition, true)
+    }
+    fn bilinear_enclosed_features_in(
+        &self,
+        condition: &Self,
+        realified: bool,
+    ) -> Result<Self, ConstitutiveFibreError> {
         if self.rows != condition.rows
             || self.grain != condition.grain
             || !std::ptr::eq(self.surface, condition.surface)
@@ -307,7 +326,11 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
         }
         let f = self
             .width
-            .checked_mul(condition.width / 2)
+            .checked_mul(if realified {
+                condition.width
+            } else {
+                condition.width / 2
+            })
             .and_then(|n| n.checked_add(self.width)?.checked_add(condition.width))
             .ok_or(ConstitutiveFibreError::Shape)?;
         let out = self.composition_output(self.rows, f)?;
@@ -318,6 +341,7 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
                 d: self.width,
                 k: condition.width,
                 grain: self.grain.0,
+                realified,
             },
             &[&out],
         )?;
@@ -328,6 +352,24 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
         &self,
         condition: &Self,
         covector: &Self,
+    ) -> Result<(Self, Self), ConstitutiveFibreError> {
+        self.bilinear_enclosed_pullback_in(condition, covector, false)
+    }
+    /// Real adjoint of [`Self::realified_bilinear_enclosed_features`]:
+    /// `g_s = g[s] + Σ_r c_r g[r]` and `g_c[r] = g[c][r] + Σ_i ⟨s_i, g[r,i]⟩` in the real pairing
+    /// of the interleaved chart.
+    pub fn realified_bilinear_enclosed_pullback(
+        &self,
+        condition: &Self,
+        covector: &Self,
+    ) -> Result<(Self, Self), ConstitutiveFibreError> {
+        self.bilinear_enclosed_pullback_in(condition, covector, true)
+    }
+    fn bilinear_enclosed_pullback_in(
+        &self,
+        condition: &Self,
+        covector: &Self,
+        realified: bool,
     ) -> Result<(Self, Self), ConstitutiveFibreError> {
         if self.rows != condition.rows
             || self.rows != covector.rows
@@ -348,6 +390,7 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
                 d: self.width,
                 k: condition.width,
                 grain: self.grain.0,
+                realified,
             },
             &[&a, &b],
         )?;

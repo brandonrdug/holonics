@@ -27,6 +27,8 @@ mod section;
 pub use section::{ResidentNormalEnclosureSection, ResidentNormalSectionReturn};
 mod section_basis;
 pub use section_basis::NormalSectionBasisFace;
+mod reaction_law;
+pub use reaction_law::NormalReactionProjection;
 
 /// Declared domain of the same normal-statistic operator. A feature chart is not silently
 /// padded or identified with the wave's three equally sized physical/current ports.

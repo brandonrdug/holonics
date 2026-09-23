@@ -124,6 +124,7 @@ pub(super) fn spec() -> GeneratorIncidentFieldSpec {
         solve_steps: 128,
         solver: IncidentFieldSolver::Richardson,
         enclosure_propagation: NativeEnclosurePropagation::ComponentIntervals,
+        reaction_law: ReactionLaw::Legacy,
     }
 }
 
@@ -336,4 +337,40 @@ fn generator_body_rejects_incompatible_material_owners_and_missing_self_support(
         body.prepare_incident_field_restricted(anchor.view(), &held, &[0], &[])
             .is_err()
     );
+}
+
+/// The reaction law is a declared wire field: absent on saved declarations (decoded as
+/// `Legacy`, so existing files keep their law and bytes), explicit when `PowerNeutral`; the
+/// power-neutral feature chart is `6 + 13c` against the legacy `6 + 7c`.
+#[test]
+fn reaction_law_wire_defaults_to_legacy_and_sets_the_realified_extent() {
+    let legacy = spec();
+    let wire = serde_json::to_value(&legacy).unwrap();
+    assert!(wire.get("reaction_law").is_none(), "legacy wire unchanged");
+    let decoded: IncidentModelSpec = serde_json::from_value(wire).unwrap();
+    assert_eq!(decoded, IncidentModelSpec::Generator(legacy.clone()));
+    let mut neutral = legacy.clone();
+    neutral.reaction_law = ReactionLaw::PowerNeutral;
+    let wire = serde_json::to_value(&neutral).unwrap();
+    assert_eq!(wire["reaction_law"], "power-neutral");
+    let decoded: IncidentModelSpec = serde_json::from_value(wire).unwrap();
+    assert_eq!(decoded, IncidentModelSpec::Generator(neutral.clone()));
+    let (old, new) = (
+        IncidentModelSpec::Generator(legacy.clone())
+            .compile()
+            .unwrap(),
+        IncidentModelSpec::Generator(neutral.clone())
+            .compile()
+            .unwrap(),
+    );
+    assert_eq!(new.reaction, ReactionLaw::PowerNeutral);
+    assert!(old.material_features.iter().any(|f| *f > 6));
+    for (a, b) in old.material_features.iter().zip(&new.material_features) {
+        assert_eq!((a - 6) % 7, 0);
+        assert_eq!(*b, 6 + 13 * ((a - 6) / 7));
+    }
+    // The legacy slot chart cannot declare the generator-only law.
+    let mut slot = serde_json::to_value(&neutral).unwrap();
+    slot.as_object_mut().unwrap().remove("machine");
+    assert!(serde_json::from_value::<IncidentModelSpec>(slot).is_err());
 }

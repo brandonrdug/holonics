@@ -53,5 +53,6 @@ pub mod generator;
 pub mod holon;
 pub mod law;
 pub mod port;
+pub mod reaction;
 pub mod restriction;
 pub mod scalar;

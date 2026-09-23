@@ -19,6 +19,9 @@ struct Header {
     /// Declared residual of committed-current rebases (absent before the first commit).
     #[serde(default, skip_serializing_if = "IncidentRebaseResidual::is_empty")]
     rebase: IncidentRebaseResidual,
+    /// Receipt of power-neutral reaction deposits (absent under the legacy law).
+    #[serde(default, skip_serializing_if = "ReactionDepositRecord::is_empty")]
+    reaction: ReactionDepositRecord,
 }
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 struct PendingHeader {
@@ -235,6 +238,7 @@ impl NativeIncidentModelRest {
         model.observations = self.header.observations;
         model.next_comparison = self.header.next_comparison;
         model.rebase = self.header.rebase.clone();
+        model.reaction_record = self.header.reaction.clone();
         for (h, p) in self.header.pending.into_iter().zip(self.pending) {
             if h.id >= model.next_comparison || h.epoch > model.epoch || model.is_pending(h.id) {
                 return Err(invalid("incident pending chronology"));
@@ -418,6 +422,7 @@ impl IncidentFieldModel<'_> {
             next_comparison: self.next_comparison,
             pending: pending_headers,
             rebase: self.rebase.clone(),
+            reaction: self.reaction_record.clone(),
         };
         Ok(NativeIncidentModelRest {
             header,

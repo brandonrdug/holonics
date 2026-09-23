@@ -28,6 +28,7 @@ pub use body::{
     NativeFieldAttachRefusal, NativeFieldFormation, NativeFieldGeneratedSection,
     NativeFieldModelRest, NativeFieldReactionPort, NativeGeneratorPhaseReception,
     NativeIncidentGenerated, NativeIncidentMaterialReturn, NativeIncidentModelRest,
+    ReactionDepositRecord, ReactionLaw,
 };
 
 const MAGIC: &[u8] = b"HNA-COUPLED-WAVE-SESSION\x01";

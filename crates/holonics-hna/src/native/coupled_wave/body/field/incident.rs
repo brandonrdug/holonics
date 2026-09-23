@@ -83,6 +83,105 @@ impl IncidentParticipationChart {
     }
 }
 
+/// [definition; agent-inferred] The declared law of the learned reaction `M Φ(s,c)`.
+/// `Legacy` reads the complex-bilinear `Φ = s ⊕ c ⊕ (c ⊗ s)` and deposits the normal-law solve
+/// as is. `PowerNeutral` reads `Φ = s ⊕ c ⊕ (c_r s)_r` over the real coordinates of `c` and, after
+/// every deposit, holds each modulated slice exactly skew-Hermitian (`Re⟨s, J(c)s⟩ = 0` for every
+/// admitted `c`) and the linear self-relation passive (its Hermitian part is the resistive
+/// element); the contrast coupling is kept under the declared skew return of the joint port
+/// relation (`ResidentNormalMaterial::project_power_neutral_reaction`). A complex-bilinear block
+/// cannot be power-neutral for all complex `c` (`Holon/Reaction.lean::
+/// bilinear_reaction_workless_iff_zero`). An absent field is `Legacy`, so saved wires keep their
+/// law; new generator declarations state `PowerNeutral`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum ReactionLaw {
+    #[default]
+    Legacy,
+    PowerNeutral,
+}
+impl ReactionLaw {
+    pub(crate) fn is_legacy(&self) -> bool {
+        *self == Self::Legacy
+    }
+    /// Complex feature count for `n` complex current coordinates and `c` complex contrast
+    /// coordinates.
+    pub(crate) fn features(self, n: usize, c: usize) -> Option<usize> {
+        let products = match self {
+            Self::Legacy => n.checked_mul(c)?,
+            Self::PowerNeutral => n.checked_mul(c)?.checked_mul(2)?,
+        };
+        n.checked_add(c)?.checked_add(products)
+    }
+}
+
+/// The fixed-size receipt of the power-neutral deposits: count, the latest projection and running
+/// sums/maxima of what the projections removed. A reading, never a gate. The deposit ledger of the
+/// Holon balance (`holonic_core::deposition::DepositLedger`) is recorded against the current's
+/// declared unit storage pairing, which a reaction deposit does not change: each such deposit has
+/// `ε = 0` exactly, so its product stays `1`.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ReactionDepositRecord {
+    pub deposits: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last:
+        Option<Vec<holonic_engine::native_ecology::constitutive_fibre::NormalReactionProjection>>,
+    /// `Σ` over deposits and owners of the removed slice Hermitian parts `‖·‖_F²`.
+    pub bilinear_removed_square_sum: relational_geometry::Rat,
+    /// `max` over deposits and owners of the linear removed rank.
+    pub linear_removed_rank_max: usize,
+    /// `Σ` of the linear removed traces.
+    pub linear_removed_trace_sum: relational_geometry::Rat,
+    /// `Σ ‖removed‖₁` over deposits and owners.
+    pub removed_l1_sum: relational_geometry::Rat,
+    /// Storage `ε` of each reaction deposit against the unit pairing (exactly zero) and the
+    /// ledger product `∏(1 + ε_k)`.
+    pub storage_epsilon: relational_geometry::Rat,
+    pub ledger_product: relational_geometry::Rat,
+}
+impl ReactionDepositRecord {
+    pub(crate) fn is_empty(&self) -> bool {
+        self.deposits == 0
+    }
+    fn record(
+        &mut self,
+        projections: Vec<
+            holonic_engine::native_ecology::constitutive_fibre::NormalReactionProjection,
+        >,
+    ) -> Result<(), NativeSessionError> {
+        use num_traits::One;
+        if self.deposits == 0 {
+            self.ledger_product = relational_geometry::Rat::one();
+        }
+        self.deposits = self
+            .deposits
+            .checked_add(1)
+            .ok_or_else(|| invalid("reaction deposit count"))?;
+        for p in &projections {
+            self.bilinear_removed_square_sum += &p.bilinear_removed_square;
+            self.linear_removed_rank_max = self.linear_removed_rank_max.max(p.linear_removed_rank);
+            self.linear_removed_trace_sum += &p.linear_removed_trace;
+            self.removed_l1_sum += &p.removed_l1;
+        }
+        // Unit storage pairing: Q_(k+1) = Q_k, certified with ε = 0.
+        let unit = holonic_core::inertia::SymmetricForm::from_diagonal(vec![
+            relational_geometry::Rat::one();
+            1
+        ]);
+        holonic_core::deposition::DepositLedger::certify_deposit(
+            &unit,
+            &unit,
+            &self.storage_epsilon,
+        )
+        .map_err(invalid)?;
+        self.ledger_product =
+            &self.ledger_product * (relational_geometry::Rat::one() + &self.storage_epsilon);
+        self.last = Some(projections);
+        Ok(())
+    }
+}
+
 /// A declared local chart and material ownership on the existing geometric field.
 /// Equal degree does not imply shared material: sharing is supplied explicitly by this chart.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -128,6 +227,7 @@ struct IncidentLayout {
     series: u32,
     steps: usize,
     relaxation_bits: u32,
+    reaction: ReactionLaw,
 }
 struct IncidentGroup {
     material: usize,
@@ -295,6 +395,7 @@ impl IncidentFieldSpec {
             width,
             source_condition_ports: 0,
             material_features: features,
+            reaction: ReactionLaw::Legacy,
             participation: self.participation,
             beta: Dyadic {
                 significand: geometry.beta_significand,
@@ -391,6 +492,8 @@ pub struct NativeIncidentGenerated<'c> {
     comparison: Option<u64>,
 }
 pub struct NativeIncidentMaterialReturn<'c> {
+    /// The reaction deposit receipt this return publishes (unchanged under the legacy law).
+    reaction: ReactionDepositRecord,
     contact_amplitude: Option<
         holonic_engine::native_ecology::constitutive_fibre::NativeDeclaredAmplitudeCommit<'c>,
     >,
@@ -409,6 +512,10 @@ pub struct NativeIncidentMaterialReturn<'c> {
     >,
 }
 impl<'c> NativeIncidentMaterialReturn<'c> {
+    /// The reaction deposit receipt, including this return's projections.
+    pub fn reaction_deposits(&self) -> &ReactionDepositRecord {
+        &self.reaction
+    }
     /// One relative-amplitude cotangent per pair arc, using the old producing field
     /// variation and the contemporary pair basis. Publication installs its positive proposal.
     pub fn contact_scale_covector(&self) -> Option<&ResidentNormalEnclosureSection<'c>> {
@@ -497,6 +604,8 @@ pub(crate) struct IncidentFieldModel<'c> {
     moments: BTreeMap<u64, Rc<GeneratorMomentComparison<'c>>>,
     /// Declared residual of the commits' rebases to their dyadic centres.
     rebase: IncidentRebaseResidual,
+    /// Receipt of the power-neutral reaction deposits (empty under the legacy law).
+    reaction_record: ReactionDepositRecord,
     /// Test control only: publish the whole solve enclosure, as before the rebase law.
     #[cfg(test)]
     rebase_off: bool,
@@ -724,6 +833,7 @@ impl<'c> IncidentFieldModel<'c> {
             pending: BTreeMap::new(),
             moments: BTreeMap::new(),
             rebase: IncidentRebaseResidual::default(),
+            reaction_record: ReactionDepositRecord::default(),
             #[cfg(test)]
             rebase_off: false,
         })
@@ -830,6 +940,7 @@ impl<'c> IncidentFieldModel<'c> {
             "operator":source.inspect_operator_bounds()?,
             "operative_storage":self.field.operative_return_storage(),
             "rebase_residual":&self.rebase,
+            "reaction_law":self.layout.reaction,"reaction_deposits":&self.reaction_record,
             "chart": if self.layout.machine.is_some() {"fixed-generator-machine"} else {"legacy-slot-field"},
             "contact_material": if self.layout.machine.is_some() {"positive-pair-amplitude-family"} else {"unconstrained-global-return"}}),
         )
@@ -1129,9 +1240,12 @@ impl<'c> IncidentFieldModel<'c> {
                     current_condition.as_ref(),
                     external_condition.as_ref(),
                 )?;
-                let features = match &condition {
-                    Some(c) => query.bilinear_enclosed_features(c)?,
-                    None => ResidentNormalEnclosureSection::concatenate_rows(&[&query])?,
+                let features = match (&condition, layout.reaction) {
+                    (Some(c), ReactionLaw::Legacy) => query.bilinear_enclosed_features(c)?,
+                    (Some(c), ReactionLaw::PowerNeutral) => {
+                        query.realified_bilinear_enclosed_features(c)?
+                    }
+                    (None, _) => ResidentNormalEnclosureSection::concatenate_rows(&[&query])?,
                 };
                 let reaction = material[group.material]
                     .read_applied_enclosed_section_with_enclosure(
@@ -1255,7 +1369,14 @@ impl<'c> IncidentFieldModel<'c> {
                 )?;
                 let (gq, gcondition) = match &stage.condition {
                     Some(c) => {
-                        let (q, c) = stage.query.bilinear_enclosed_pullback(c, &gf)?;
+                        let (q, c) = match layout.reaction {
+                            ReactionLaw::Legacy => {
+                                stage.query.bilinear_enclosed_pullback(c, &gf)?
+                            }
+                            ReactionLaw::PowerNeutral => {
+                                stage.query.realified_bilinear_enclosed_pullback(c, &gf)?
+                            }
+                        };
                         (q, Some(c))
                     }
                     None => (gf, None),
@@ -1373,6 +1494,47 @@ impl<'c> IncidentFieldModel<'c> {
     }
 }
 
+#[cfg(test)]
+impl NativeCoupledBody<'_> {
+    /// Test diagnostic: zero the selected power-neutral reaction blocks (linear `W_s`, contrast
+    /// coupling `W_c`, modulated slices) of every reaction material.
+    pub(crate) fn zero_reaction_blocks(
+        &mut self,
+        linear: bool,
+        coupling: bool,
+        slices: bool,
+    ) -> Result<(), NativeSessionError> {
+        let BodyState::Incident(model) = self.state_mut()? else {
+            return Err(invalid("reaction columns require the incident model chart"));
+        };
+        if model.layout.reaction != ReactionLaw::PowerNeutral {
+            return Err(invalid(
+                "block attribution declared for the power-neutral chart",
+            ));
+        }
+        let n = model.layout.width / 2;
+        for (material, &features) in model
+            .materials
+            .iter_mut()
+            .zip(&model.layout.material_features)
+        {
+            let c = (features - n) / (2 * n + 1);
+            let mut columns = Vec::new();
+            if linear {
+                columns.push(0..n);
+            }
+            if coupling {
+                columns.push(n..n + c);
+            }
+            if slices {
+                columns.push(n + c..features);
+            }
+            *material = material.with_coefficient_columns_zeroed(&columns)?;
+        }
+        Ok(())
+    }
+}
+
 impl<'c> NativeCoupledBody<'c> {
     /// Prepare the material return of a retained comparison. A legacy word returns through its
     /// frozen producing cut; a generator comparison is read at the contemporary constitution
@@ -1432,6 +1594,21 @@ impl<'c> NativeCoupledBody<'c> {
             )?;
             material.push(current.stage_covector_return(&features, &covectors, step_bits)?);
         }
+        // The power-neutral law: each normal-law solve is followed by its projections.
+        let mut reaction = model.reaction_record.clone();
+        if model.layout.reaction == ReactionLaw::PowerNeutral {
+            let n = model.layout.width / 2;
+            let mut projections = Vec::with_capacity(material.len());
+            for (staged, &features) in material.iter_mut().zip(&model.layout.material_features) {
+                // features = n + c + 2nc complex, so the real contrast count is k = 2c.
+                // With no contrast (c = 0) only the linear self-relation is projected.
+                let c = (features - n) / (2 * n + 1);
+                let (projected, receipt) = staged.project_power_neutral_reaction(n, 2 * c)?;
+                *staged = projected;
+                projections.push(receipt);
+            }
+            reaction.record(projections)?;
+        }
         let (contact, contact_amplitude) = if word.source.internal_components() == 0 {
             (None, None)
         } else {
@@ -1467,6 +1644,7 @@ impl<'c> NativeCoupledBody<'c> {
             }
         };
         Ok(NativeIncidentMaterialReturn {
+            reaction,
             contact_amplitude,
             source_covector: returned.source_covector,
             symbol_covector: returned.symbol_covector,
@@ -1508,6 +1686,7 @@ impl<'c> NativeCoupledBody<'c> {
                 .commit_declared_contact_amplitude_return(contact)?;
         }
         model.materials = prepared.material;
+        model.reaction_record = prepared.reaction;
         model.epoch = prepared.next_epoch;
         model.observations = prepared.observations;
         model.pending.remove(&prepared.comparison);

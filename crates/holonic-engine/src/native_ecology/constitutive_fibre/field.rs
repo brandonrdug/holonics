@@ -115,7 +115,7 @@ pub use material_transport::{
 use material_transport::{MaterialTransport, PendingMaterialTransport};
 pub use material_transport::{
     NativeAffineGeometry, NativeAffineGeometryAdjoint, NativeEnclosurePropagation,
-    NativeRealification, NativeRealificationAdjoint,
+    NativeRealification, NativeRealificationAdjoint, NormalReactionProjection,
 };
 pub use receiver::{
     NativeFieldDifferentialReading, NativeMaterialActuation, NativeMaterialPacketReading,

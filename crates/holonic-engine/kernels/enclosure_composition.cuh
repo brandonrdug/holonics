@@ -142,20 +142,30 @@ extern "C" __global__ void section_enclosure_refine_rows(
  y[d]=add_checked(ec_ceil(radius,normal_wide(divisor),status),round,status);
  ec_seal(out+stride*row,oh+stride*row,d,status);
 }
+// realified=0: Phi(s,c)=s (+) c (+) (c tensor s), complex-bilinear. realified=1: the power-neutral
+// chart s (+) c (+) (c_r s)_r with c_r each REAL coordinate of c (Re c_j, Im c_j in the interleaved
+// chart): real-bilinear in (Re c, Im c), so each slice multiplying c_r can be held skew-Hermitian.
+// The radius bound is the same: |c_r s| blocks stack to |c|_2|s|_2 <= |c|_1|s|_1.
 extern "C" __global__ void section_enclosure_bilinear_features(
  const int64_t *source,const int64_t *source_hi,const int64_t *condition,const int64_t *condition_hi,
- uint32_t rows,uint32_t d,uint32_t k,uint32_t grain,
+ uint32_t rows,uint32_t d,uint32_t k,uint32_t grain,uint32_t realified,
  int64_t *out,int64_t *oh,int64_t *flags,
  uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
  if(threadIdx.x)return;uint32_t row=blockIdx.x;if(row>=rows)return;
  uint32_t *status=ec_status(flags,row);if(upstream_refused(census,lineage,lineage_count,status))return;
- if(grain<1||grain>120||!d||!k||(d&1u)||(k&1u)){atomicOr(status,REFUSED_MALFORMED);return;}
+ if(grain<1||grain>120||!d||!k||(d&1u)||(k&1u)||realified>1u){atomicOr(status,REFUSED_MALFORMED);return;}
  const int64_t *sw=source+2u*((size_t)d+1u)*row,*cw=condition+2u*((size_t)k+1u)*row;
  if(!ec_ball(sw,source_hi+2u*((size_t)d+1u)*row,d,status)||!ec_ball(cw,condition_hi+2u*((size_t)k+1u)*row,k,status))return;
  const wide *s=(const wide*)sw,*c=(const wide*)cw;wide S=(wide)((uwide)1<<grain),round=0;
- const size_t f=(size_t)d+k+(size_t)d*(k/2u);int64_t *ow=out+2u*(f+1u)*row;wide *y=(wide*)ow;
+ const size_t f=(size_t)d+k+(realified?(size_t)d*k:(size_t)d*(k/2u));int64_t *ow=out+2u*(f+1u)*row;wide *y=(wide*)ow;
  for(uint32_t i=0;i<d;++i)y[i]=s[i];for(uint32_t j=0;j<k;++j)y[d+j]=c[j];
- for(uint32_t j=0;j<k;j+=2u)for(uint32_t i=0;i<d;i+=2u){
+ if(realified){
+  for(uint32_t r=0;r<k;++r)for(uint32_t i=0;i<d;++i){
+   size_t at=d+k+(size_t)r*d+i;bool rr=false;
+   y[at]=normal_grid(exact_divide_positive(normal_wide(s[i])*normal_wide(c[r]),normal_wide(S),&rr),0,false,status);
+   round=add_checked(round,(wide)rr,status);
+  }
+ }else for(uint32_t j=0;j<k;j+=2u)for(uint32_t i=0;i<d;i+=2u){
   size_t at=d+k+(size_t)(j/2u)*d+i;MomentInteger re,im;
   normal_product(re,im,normal_wide(s[i]),normal_wide(s[i+1u]),normal_wide(c[j]),normal_wide(c[j+1u]),false);
   bool rr=false,ri=false;y[at]=normal_grid(exact_divide_positive(re,normal_wide(S),&rr),0,false,status);
@@ -165,19 +175,35 @@ extern "C" __global__ void section_enclosure_bilinear_features(
  y[f]=add_checked(add_checked(add_checked(s[d],c[k],status),ec_ceil(radius,normal_wide(S),status),status),round,status);
  ec_seal(ow,oh+2u*(f+1u)*row,(uint32_t)f,status);
 }
+// Real transpose of the same chart. Complex-bilinear: g_s=g[s]+sum conj(c) g[c(x)s],
+// g_c=g[c]+sum conj(s) g[c(x)s]. Realified: g_s=g[s]+sum_r c_r g[r,s] (real scalars), and each
+// real coordinate g_c[r]=g[c][r]+sum_i <s_i,g[r,i]> in the real pairing of the interleaved chart.
 extern "C" __global__ void section_enclosure_bilinear_adjoint(
  const int64_t *source,const int64_t *source_hi,const int64_t *condition,const int64_t *condition_hi,
- const int64_t *covector,const int64_t *covector_hi,uint32_t rows,uint32_t d,uint32_t k,uint32_t grain,
+ const int64_t *covector,const int64_t *covector_hi,uint32_t rows,uint32_t d,uint32_t k,uint32_t grain,uint32_t realified,
  int64_t *source_out,int64_t *source_oh,int64_t *condition_out,int64_t *condition_oh,int64_t *flags,
  uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
  if(threadIdx.x)return;uint32_t row=blockIdx.x;if(row>=rows)return;
  uint32_t *status=ec_status(flags,row);if(upstream_refused(census,lineage,lineage_count,status))return;
- const size_t f=(size_t)d+k+(size_t)d*(k/2u);
+ if(realified>1u){atomicOr(status,REFUSED_MALFORMED);return;}
+ const size_t f=(size_t)d+k+(realified?(size_t)d*k:(size_t)d*(k/2u));
  const int64_t *sw=source+2u*((size_t)d+1u)*row,*cw=condition+2u*((size_t)k+1u)*row,*gw=covector+2u*(f+1u)*row;
  if(!ec_ball(sw,source_hi+2u*((size_t)d+1u)*row,d,status)||!ec_ball(cw,condition_hi+2u*((size_t)k+1u)*row,k,status)||!ec_ball(gw,covector_hi+2u*(f+1u)*row,(uint32_t)f,status))return;
  const wide *s=(const wide*)sw,*c=(const wide*)cw,*g=(const wide*)gw;wide S=(wide)((uwide)1<<grain);
  wide *ys=(wide*)(source_out+2u*((size_t)d+1u)*row),*yc=(wide*)(condition_out+2u*((size_t)k+1u)*row);
  wide sr=0,cr=0;
+ if(realified){
+  for(uint32_t i=0;i<d;++i){
+   MomentInteger v=normal_wide(g[i])*normal_wide(S);
+   for(uint32_t r=0;r<k;++r)v=v+normal_wide(g[d+k+(size_t)r*d+i])*normal_wide(c[r]);
+   bool rr=false;ys[i]=normal_grid(exact_divide_positive(v,normal_wide(S),&rr),0,false,status);sr=add_checked(sr,(wide)rr,status);
+  }
+  for(uint32_t r=0;r<k;++r){
+   MomentInteger v=normal_wide(g[d+r])*normal_wide(S);
+   for(uint32_t i=0;i<d;++i)v=v+normal_wide(g[d+k+(size_t)r*d+i])*normal_wide(s[i]);
+   bool rr=false;yc[r]=normal_grid(exact_divide_positive(v,normal_wide(S),&rr),0,false,status);cr=add_checked(cr,(wide)rr,status);
+  }
+ }else{
  for(uint32_t i=0;i<d;i+=2u){
   MomentInteger re=normal_wide(g[i])*normal_wide(S),im=normal_wide(g[i+1u])*normal_wide(S);
   for(uint32_t j=0;j<k;j+=2u){size_t at=d+k+(size_t)(j/2u)*d+i;
@@ -191,6 +217,7 @@ extern "C" __global__ void section_enclosure_bilinear_adjoint(
    normal_product(re,im,normal_wide(g[at]),normal_wide(g[at+1u]),normal_wide(s[i]),normal_wide(s[i+1u]),true);}
   bool rr=false,ri=false;yc[j]=normal_grid(exact_divide_positive(re,normal_wide(S),&rr),0,false,status);
   yc[j+1u]=normal_grid(exact_divide_positive(im,normal_wide(S),&ri),0,false,status);cr=add_checked(cr,(wide)rr+(wide)ri,status);
+ }
  }
  wide gn=ec_l1(g,(uint32_t)f,status),sn=ec_l1(s,d,status),cn=ec_l1(c,k,status);
  MomentInteger rs=(normal_wide(S)+normal_wide(cn))*normal_wide(g[f])+normal_wide(c[k])*normal_wide(gn)+normal_wide(c[k])*normal_wide(g[f]);

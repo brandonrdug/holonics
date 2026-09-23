@@ -26,12 +26,15 @@ pub(crate) enum EnclosureComposition<'a, 'c> {
         components: usize,
         step_bits: u32,
     },
+    /// `realified`: the power-neutral chart `s ⊕ c ⊕ (c_r s)_r` over each real coordinate
+    /// `c_r` of `c`, width `d + k + d·k`; otherwise the complex product, `d + k + d·k/2`.
     Features {
         source: &'a ResidentSection<'c>,
         condition: &'a ResidentSection<'c>,
         d: usize,
         k: usize,
         grain: u32,
+        realified: bool,
     },
     FeaturesAdjoint {
         source: &'a ResidentSection<'c>,
@@ -40,6 +43,7 @@ pub(crate) enum EnclosureComposition<'a, 'c> {
         d: usize,
         k: usize,
         grain: u32,
+        realified: bool,
     },
     NormalAdjoint {
         state: &'a ResidentSection<'c>,
@@ -188,9 +192,10 @@ impl<'c> ResidentSurface<'c> {
                 d,
                 k,
                 grain,
+                realified,
             } => {
                 let f = d
-                    .checked_mul(k / 2)
+                    .checked_mul(if realified { k } else { k / 2 })
                     .and_then(|n| n.checked_add(d)?.checked_add(k))
                     .ok_or_else(fail)?;
                 if outputs.len() != 1
@@ -209,7 +214,8 @@ impl<'c> ResidentSurface<'c> {
                     .u32(rows as u32)
                     .u32(d as u32)
                     .u32(k as u32)
-                    .u32(grain);
+                    .u32(grain)
+                    .u32(u32::from(realified));
                 "section_enclosure_bilinear_features"
             }
             EnclosureComposition::FeaturesAdjoint {
@@ -219,9 +225,10 @@ impl<'c> ResidentSurface<'c> {
                 d,
                 k,
                 grain,
+                realified,
             } => {
                 let f = d
-                    .checked_mul(k / 2)
+                    .checked_mul(if realified { k } else { k / 2 })
                     .and_then(|n| n.checked_add(d)?.checked_add(k))
                     .ok_or_else(fail)?;
                 if outputs.len() != 2
@@ -243,7 +250,8 @@ impl<'c> ResidentSurface<'c> {
                     .u32(rows as u32)
                     .u32(d as u32)
                     .u32(k as u32)
-                    .u32(grain);
+                    .u32(grain)
+                    .u32(u32::from(realified));
                 "section_enclosure_bilinear_adjoint"
             }
             EnclosureComposition::NormalAdjoint {

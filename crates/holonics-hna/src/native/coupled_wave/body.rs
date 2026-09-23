@@ -28,7 +28,7 @@ pub use field::incident::{
     GeneratorSourceBinding, GeneratorSourceContact, GeneratorSourceContactKind,
     IncidentFieldSolver, IncidentFieldSpec, IncidentParticipationChart,
     NativeGeneratorPhaseReception, NativeIncidentGenerated, NativeIncidentMaterialReturn,
-    NativeIncidentModelRest,
+    NativeIncidentModelRest, ReactionDepositRecord, ReactionLaw,
 };
 pub use field::{
     NativeFieldAttachRefusal, NativeFieldGeneratedSection, NativeFieldModelRest,

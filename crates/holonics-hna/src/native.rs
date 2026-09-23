@@ -40,7 +40,7 @@ pub use coupled_wave::{
     NativeFieldAttachRefusal, NativeFieldFormation, NativeFieldGeneratedSection,
     NativeFieldModelRest, NativeFieldReactionPort, NativeGeneratorPhaseReception,
     NativeIncidentGenerated, NativeIncidentMaterialReturn, NativeIncidentModelRest,
-    SavedCoupledBody,
+    ReactionDepositRecord, ReactionLaw, SavedCoupledBody,
 };
 pub use normal_wave::{
     NATIVE_WAVE_SEED_SCHEMA, NativeWaveAttachRefusal, NativeWaveSavedSession, NativeWaveSeedSpec,

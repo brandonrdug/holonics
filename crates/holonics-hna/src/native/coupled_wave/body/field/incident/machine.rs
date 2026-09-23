@@ -30,6 +30,9 @@ pub struct GeneratorIncidentFieldSpec {
     pub solver: IncidentFieldSolver,
     #[serde(default, skip_serializing_if = "is_component_intervals")]
     pub enclosure_propagation: NativeEnclosurePropagation,
+    /// Absent on saved wires: `Legacy`. New declarations state `PowerNeutral`.
+    #[serde(default, skip_serializing_if = "ReactionLaw::is_legacy")]
+    pub reaction_law: ReactionLaw,
 }
 
 fn is_zero(value: &usize) -> bool {
@@ -73,6 +76,8 @@ impl<'de> Deserialize<'de> for IncidentModelSpec {
             solver: IncidentFieldSolver,
             #[serde(default)]
             enclosure_propagation: NativeEnclosurePropagation,
+            #[serde(default)]
+            reaction_law: ReactionLaw,
         }
         let w = Wire::deserialize(deserializer)?;
         match (w.geometry, w.machine) {
@@ -85,7 +90,8 @@ impl<'de> Deserialize<'de> for IncidentModelSpec {
                     && w.refinement_steps.is_none()
                     && w.relaxation_bits.is_none()
                     && w.enclosure_propagation
-                        == NativeEnclosurePropagation::ComponentIntervals =>
+                        == NativeEnclosurePropagation::ComponentIntervals
+                    && w.reaction_law.is_legacy() =>
             {
                 Ok(Self::Legacy(IncidentFieldSpec {
                     geometry,
@@ -124,6 +130,7 @@ impl<'de> Deserialize<'de> for IncidentModelSpec {
                     solve_steps: w.solve_steps,
                     solver: w.solver,
                     enclosure_propagation: w.enclosure_propagation,
+                    reaction_law: w.reaction_law,
                 }))
             }
             _ => Err(serde::de::Error::custom(
@@ -236,9 +243,9 @@ impl GeneratorIncidentFieldSpec {
                 .checked_add(self.source_condition_ports)
                 .and_then(|n| n.checked_mul(6))
                 .ok_or_else(|| invalid("generator condition extent"))?;
-            let f = c
-                .checked_mul(7)
-                .and_then(|n| n.checked_add(6))
+            let f = self
+                .reaction_law
+                .features(6, c)
                 .filter(|n| *n <= u32::MAX as usize)
                 .ok_or_else(|| invalid("generator feature extent"))?;
             if features[site.material] != 0 && features[site.material] != f {
@@ -273,6 +280,7 @@ impl GeneratorIncidentFieldSpec {
             series: self.series_terms,
             steps: self.refinement_steps,
             relaxation_bits: self.relaxation_bits,
+            reaction: self.reaction_law,
         })
     }
 }

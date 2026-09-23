@@ -11,6 +11,8 @@ use holonic_engine::native_ecology::constitutive_fibre::BoundaryMaterialSeed;
 use holonic_engine::resident_section::SeriesAperture;
 use std::rc::Rc;
 mod codec;
+#[cfg(test)]
+mod deposition_probe;
 mod rest;
 #[cfg(test)]
 mod tests;
