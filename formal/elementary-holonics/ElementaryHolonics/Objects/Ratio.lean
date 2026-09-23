@@ -1,8 +1,8 @@
 import ElementaryHolonics.Physics.InformationDifference
 import ElementaryHolonics.Computation.HolonicAdjointNormalization
 import ElementaryHolonics.Geometry.CrossRatio
+import ElementaryHolonics.Objects.Ratio.GaugeCalculus
 import ElementaryHolonics.Millennium.Turn
-import ElementaryHolonics.Millennium.HolonicGaugeCovariance
 import ElementaryHolonics.Transport.JetStaircase
 import Mathlib.Analysis.Quaternion
 
@@ -13,7 +13,7 @@ import Mathlib.Analysis.Quaternion
 carried as the undivided pair (`Geometry/CrossRatio.RatioPresentation`). Its logarithm is a lift
 carried as data, with the winding as its branch (`Millennium/Turn`); its first order is the
 Maurer–Cartan form `R⁻¹dR`, which is the pure-gauge term of the gauge owner
-(`Millennium/HolonicGaugeCovariance`); its higher orders are the jet of the log ratio, read
+(`Objects/Ratio/GaugeCalculus`); its higher orders are the jet of the log ratio, read
 continuously by `iteratedDeriv` and on the tick lattice by `Transport/JetStaircase`.
 
 This module joins those owners; it founds no second softmax, cross-entropy or gauge.

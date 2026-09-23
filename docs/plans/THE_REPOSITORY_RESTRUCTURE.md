@@ -90,8 +90,15 @@ Each is backed by a measurement at `d3b8b509`.
     - `Framework.Core` reaches five small Millennium modules **transitively** through its
       Foundation imports; they are foundation objects filed by history: `Gluing`,
       `HolonicDirectedPassage`, `Receiver`, `ReceiverHistory`, `Separation`.
-    - `Objects/Ratio` imports `Millennium/HolonicGaugeCovariance` (128 lines). Its one import,
-      `HolonicConnectionVariation`, pulls 45k lines across 105 files.
+    - The former `Objects/Ratio → Millennium/HolonicGaugeCovariance →
+      HolonicConnectionVariation` edge pulled 45k lines across 105 files. Ratio-facing gauge and
+      connection calculus now has core owners at `Objects/Ratio/GaugeCalculus` and
+      `Geometry/ConnectionCalculus`; the research curvature-covariance theorem remains in
+      `Millennium/HolonicGaugeCovariance`, which imports its curvature owner directly. This source
+      cut removes that direct research import path. It does not by itself remove the overlapping
+      source closure: `Objects/Ratio` still reaches 47,269 lines through its separate
+      `Physics/InformationDifference` import in the current source graph. Measure the actual Lake
+      closure after all §0.10 cuts; do not credit this one edge with deleting those shared modules.
     - `Holon/MomentStorage` imports `Millennium/HolonicQuadraticMomentCondensation` (472 lines).
       Its import `HolonicGranularBoundaryRadiation` pulls 48k lines across 111 files.
     - `Framework.Physics` reaches 345 research files.

@@ -1,4 +1,5 @@
 import ElementaryHolonics.Millennium.HolonicFourForceSectorCarrier
+import ElementaryHolonics.Geometry.ConnectionCalculus
 import Mathlib.Analysis.Calculus.FDeriv.Symmetric
 import Mathlib.Analysis.Calculus.FDeriv.Mul
 import Mathlib.Analysis.Calculus.ContDiff.Basic
@@ -9,7 +10,8 @@ import Mathlib.Analysis.Calculus.ContDiff.Basic
 The tree carried curvature only as a returned holonomy defect on an addressed face
 (`HolonicComposition.routeComparisonReturn`, `HolonicFourForceSectorCarrier.returnedCurvature`)
 and, in Rust, as the abelian `F = da` with the commutator `a ∧ a` measured but never differentiated.
-This owner supplies the differential object.
+The generic chart, directional derivative, connection carrier and product rules now live in
+`Geometry/ConnectionCalculus`; this research owner supplies the curvature and its identities.
 
 A connection is one component `A_i : ℝⁿ → 𝔤` per coordinate direction, with `𝔤` any normed
 algebra over `ℝ` and the bracket the ring commutator `[X, Y] = X Y − Y X`.  Its curvature is
@@ -42,21 +44,8 @@ section Continuum
 
 variable {n : ℕ} {𝔤 : Type*} [NormedRing 𝔤] [NormedAlgebra ℝ 𝔤]
 
-/-- The base chart: `n` real coordinates. -/
-abbrev Base (n : ℕ) := Fin n → ℝ
-
-/-- The unit direction of one coordinate. -/
-def direction (i : Fin n) : Base n := Pi.single i 1
-
-/-- The differential along one coordinate direction. -/
-def differential (i : Fin n) (f : Base n → 𝔤) : Base n → 𝔤 :=
-  fun x => fderiv ℝ f x (direction i)
-
 /-- The ring commutator. -/
 def bracket (X Y : 𝔤) : 𝔤 := X * Y - Y * X
-
-/-- A connection: one `𝔤`-valued component per coordinate direction. -/
-abbrev Connection (n : ℕ) (𝔤 : Type*) := Fin n → Base n → 𝔤
 
 /-- **Curvature itself.**  `F_ij = ∂_i A_j − ∂_j A_i + [A_i, A_j]`. -/
 def curvature (A : Connection n 𝔤) (i j : Fin n) : Base n → 𝔤 :=
@@ -82,31 +71,6 @@ theorem curvature_eq_of_commute (A : Connection n 𝔤) (i j : Fin n) (x : Base 
 
 /-! ### Derivative lemmas -/
 
-theorem differential_eq_hasFDerivAt {f : Base n → 𝔤} {L : Base n →L[ℝ] 𝔤} {x : Base n}
-    (hf : HasFDerivAt f L x) (i : Fin n) : differential i f x = L (direction i) := by
-  simp [differential, hf.fderiv]
-
-theorem differentiableAt_of_contDiff {f : Base n → 𝔤} (hf : ContDiff ℝ 2 f) (x : Base n) :
-    DifferentiableAt ℝ f x :=
-  (hf.differentiable (by norm_num)).differentiableAt
-
-theorem differentiable_fderiv_of_contDiff {f : Base n → 𝔤} (hf : ContDiff ℝ 2 f) :
-    Differentiable ℝ (fderiv ℝ f) :=
-  (hf.fderiv_right (m := 1) (by norm_num)).differentiable one_ne_zero
-
-theorem hasFDerivAt_differential {f : Base n → 𝔤} (hf : ContDiff ℝ 2 f) (j : Fin n)
-    (x : Base n) :
-    HasFDerivAt (differential j f) ((fderiv ℝ (fderiv ℝ f) x).flip (direction j)) x := by
-  have h := ((differentiable_fderiv_of_contDiff hf) x).hasFDerivAt.clm_apply
-    (hasFDerivAt_const (direction j) x)
-  simp only [ContinuousLinearMap.comp_zero, zero_add] at h
-  exact h
-
-theorem differentiableAt_differential {f : Base n → 𝔤} (hf : ContDiff ℝ 2 f) (j : Fin n)
-    (x : Base n) : DifferentiableAt ℝ (differential j f) x :=
-  (hasFDerivAt_differential hf j x).differentiableAt
-
-/-- Second differentials of a `C²` section commute. -/
 theorem differential_differential_comm {f : Base n → 𝔤} (hf : ContDiff ℝ 2 f) (i j : Fin n)
     (x : Base n) :
     differential i (differential j f) x = differential j (differential i f) x := by
@@ -114,26 +78,6 @@ theorem differential_differential_comm {f : Base n → 𝔤} (hf : ContDiff ℝ 
     differential_eq_hasFDerivAt (hasFDerivAt_differential hf i x)]
   simp only [ContinuousLinearMap.flip_apply]
   exact (hf.contDiffAt.isSymmSndFDerivAt (by simp)) (direction i) (direction j)
-
-theorem differential_sub {f g : Base n → 𝔤} {x : Base n} (hf : DifferentiableAt ℝ f x)
-    (hg : DifferentiableAt ℝ g x) (i : Fin n) :
-    differential i (fun y => f y - g y) x = differential i f x - differential i g x := by
-  refine (differential_eq_hasFDerivAt (hf.hasFDerivAt.sub hg.hasFDerivAt) i).trans ?_
-  simp [differential]
-
-theorem differential_add {f g : Base n → 𝔤} {x : Base n} (hf : DifferentiableAt ℝ f x)
-    (hg : DifferentiableAt ℝ g x) (i : Fin n) :
-    differential i (fun y => f y + g y) x = differential i f x + differential i g x := by
-  refine (differential_eq_hasFDerivAt (hf.hasFDerivAt.add hg.hasFDerivAt) i).trans ?_
-  simp [differential]
-
-/-- The Leibniz law in the noncommutative algebra, hands retained. -/
-theorem differential_mul {f g : Base n → 𝔤} {x : Base n} (hf : DifferentiableAt ℝ f x)
-    (hg : DifferentiableAt ℝ g x) (i : Fin n) :
-    differential i (fun y => f y * g y) x = f x * differential i g x + differential i f x * g x := by
-  refine (differential_eq_hasFDerivAt (hf.hasFDerivAt.mul' hg.hasFDerivAt) i).trans ?_
-  simp [differential, smul_eq_mul, ContinuousLinearMap.smulRight_apply,
-    add_apply, smul_apply]
 
 theorem differential_bracket {f g : Base n → 𝔤} {x : Base n} (hf : DifferentiableAt ℝ f x)
     (hg : DifferentiableAt ℝ g x) (i : Fin n) :

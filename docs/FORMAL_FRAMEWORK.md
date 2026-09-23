@@ -939,3 +939,10 @@ the Holon ratio, logit covector as expected log-derivative, winding, jet), `Obje
 `Objects/RelativeCompleteness` (three clauses, linear criterion, globe/lattice/quench/Ricci/tube
 witnesses). Governing guide: [elementary objects](ELEMENTARY_OBJECTS.md). Open items are listed there
 and in #62.
+
+[definition] The ratio's gauge logarithmic derivative is supported by
+`Objects/Ratio/GaugeCalculus`; its chart, directional derivative and product rules are owned by
+`Geometry/ConnectionCalculus`. These core operators retain their historical declaration namespaces
+for now. Curvature variation, Ricci, gauge covariance of curvature and Yang–Mills applications
+remain in their research owners. `Objects/Ratio` therefore has no import edge through
+`Millennium/HolonicGaugeCovariance` into the connection-variation research closure.
