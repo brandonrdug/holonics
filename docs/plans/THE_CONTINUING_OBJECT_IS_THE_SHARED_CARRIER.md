@@ -549,10 +549,11 @@ genuinely **undefined** is the chart-index one — "refine to a common upper bou
 `indistinguishable_of_refinement`; the union construction that would make the atlas-level comparison
 total is **not** built, because nothing consumes it yet.
 
-[established-bounded; formal-checked; implemented-exact] **C7 — Bridges — is returned.** The paired
-owners are
-[`Foundation/Bridge.lean`](../../formal/elementary-holonics/ElementaryHolonics/Foundation/Bridge.lean)
-and [`bridge.rs`](../../crates/holonic-engine/src/bridge.rs), each citing the other by declaration.
+[established-bounded; formal-checked] **C7 — Bridges — is returned in Lean.** The canonical checked
+owner is
+[`Foundation/Bridge.lean`](../../formal/elementary-holonics/ElementaryHolonics/Foundation/Bridge.lean).
+Its unused Rust mirror was retired in R1 after a source audit found no production callers; the
+theorems, witnesses and `proteinEmbeddingProposal` boundary remain in Lean.
 The eight statuses are one inductive `BridgeStatus`, and `BridgeStatus.entails` is a genuine partial
 order — `entails_refl`, `entails_trans`, `entails_antisymm`, all decided over the finite carrier.
 `Bridge` carries `status`, `passage : Option Transition` (so a map arrives with the residual it does

@@ -69,11 +69,11 @@ extents; no kernel, launch or returned value changed (device tests
 | `ExactEulerReceiverStanding` | struct | `holonic-engine/src/arithmetic_monodromy.rs` | different object | an event/world/program chart of a receiver-named system (the occurrence Holon's event chart), not a port object (name-inferred) |
 | `PrimeAxisReceiver` | struct | `holonic-engine/src/arithmetic_phase.rs` | passive coholon | a declared reading (name-inferred): a passive coholon unless it returns a current |
 | `ReceiverFiber` | struct | `holonic-engine/src/atlas.rs` | receiver face (codec) | a readout/face value (codec projection) of a receiver (name-inferred) |
+| `ProposedBridge.supportingReceivers` | field | `Foundation/Bridge.lean` | receiver family supporting a proposed connection | paired receiver maps carried with the proposal; Rust mirror retired in R1 |
 | `AltitudeReceiverLandmark` | struct | `holonic-engine/src/atmospheric_inverse.rs` | receiver face (codec) | a readout/face value (codec projection) of a receiver (name-inferred) |
 | `AtmosphericReceiverBody` | struct | `holonic-engine/src/atmospheric_inverse.rs` | receiver face (codec) | a receiver-named value (name-inferred) |
 | `SpectralReceiverContact` | struct | `holonic-engine/src/atmospheric_inverse.rs` | receiver face (codec) | a readout/face value (codec projection) of a receiver (name-inferred) |
 | `SpectralReceiverOccurrence` | struct | `holonic-engine/src/atmospheric_inverse.rs` | receiver face (codec) | a readout/face value (codec projection) of a receiver (name-inferred) |
-| `SupportingReceiver` | struct | `holonic-engine/src/bridge.rs` | passive coholon | a declared reading (name-inferred): a passive coholon unless it returns a current |
 | `CausalBodyReceiverStanding` | struct | `holonic-engine/src/causal_body.rs` | different object | an event/world/program chart of a receiver-named system (the occurrence Holon's event chart), not a port object (name-inferred) |
 | `CausalProjectionReceiverReceipt` | struct | `holonic-engine/src/causal_body.rs` | receiver face (codec) | a readout/face value (codec projection) of a receiver (name-inferred) |
 | `CausalReceiverReturn` | struct | `holonic-engine/src/causal_body.rs` | receiver face (codec) | a readout/face value (codec projection) of a receiver (name-inferred) |

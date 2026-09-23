@@ -268,11 +268,6 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             "Foundation/PresentationCost.lean",
         ),
         (
-            include_str!("bridge.rs"),
-            "bridge.rs",
-            "Foundation/Bridge.lean",
-        ),
-        (
             include_str!("relation_ladder.rs"),
             "relation_ladder.rs",
             "Foundation/RelationLadder.lean",

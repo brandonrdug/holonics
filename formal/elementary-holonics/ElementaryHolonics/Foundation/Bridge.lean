@@ -30,11 +30,11 @@ ordering among them**. So `composeGrade` does not rank them: it reads each grade
 weaker one, refusing `counterexample` and `historical`, which are dispositions rather than support.
 The reading is declared here and named as a declared reading wherever it is used.
 
-## Rust counterpart
+## Executable mirror history
 
-[definition] The paired executable owner is `crates/holonic-engine/src/bridge.rs`, with the same
-names — `EpistemicGrade`, `SupportLevel`, `BridgeStatus`, `Bridge`, `ProposedBridge`,
-`BridgeComposition`, `Promotion` — and every theorem below mirrored as a test.
+[definition] This Lean file is the canonical checked owner. Its Rust mirror was retired in R1
+after source review found no production callers. The finite-law witnesses and the explicit
+`proteinEmbeddingProposal` boundary remain here.
 -/
 
 namespace Soma.Holonics.Foundation.Bridges
@@ -52,7 +52,7 @@ universe u w
 carries exactly one. `open` is a Lean keyword, so the grade the canon writes `open` is
 `openObligation` here.
 
-Rust counterpart: `crates/holonic-engine/src/bridge.rs::EpistemicGrade`. -/
+Historical Rust mirror, retired in R1. -/
 inductive EpistemicGrade
   /-- A declared term or construction. -/
   | definition
@@ -89,7 +89,7 @@ instance : Fintype EpistemicGrade where
 is a **declared reading** of the grade and not an ordering of the canon's grades, which declares
 none.
 
-Rust counterpart: `bridge.rs::SupportLevel`. -/
+Historical Rust mirror, retired in R1. -/
 inductive SupportLevel
   /-- The link supports nothing downstream. -/
   | unsupported
@@ -140,7 +140,7 @@ def EpistemicGrade.support : EpistemicGrade → Option SupportLevel
 /-- [definition] Compose two grades: the weaker support wins, ties on the same level are
 canonicalized to that level's representative, and a link with no support reading refuses.
 
-Rust counterpart: `bridge.rs::compose_grade`. -/
+Historical Rust mirror, retired in R1. -/
 def composeGrade (a b : EpistemicGrade) : Option EpistemicGrade :=
   match a.support, b.support with
   | some sa, some sb =>
@@ -187,7 +187,7 @@ theorem historical_does_not_compose (b : EpistemicGrade) :
 /-- [definition] The eight distinct statuses a connection claim can carry. They must not share one
 word: `docs/plans/THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md` C7.
 
-Rust counterpart: `crates/holonic-engine/src/bridge.rs::BridgeStatus`. -/
+Historical Rust mirror, retired in R1. -/
 inductive BridgeStatus
   /-- One aperture in which both occur. Owes no map and no equality. -/
   | coPresence
@@ -226,7 +226,7 @@ def BridgeStatus.entailed : BridgeStatus → List BridgeStatus
 
 /-- [definition] `a.entails b` when every claim of status `a` is also a claim of status `b`.
 
-Rust counterpart: `bridge.rs::BridgeStatus::entails`. -/
+Historical Rust mirror, retired in R1. -/
 def BridgeStatus.entails (a b : BridgeStatus) : Bool := a.entailed.contains b
 
 /-- [proved-derived; formal-checked] The order is reflexive. -/
@@ -346,7 +346,7 @@ theorem speculativeAnalogy_is_off_the_order :
 /-- [definition] The greatest common lower bound of two statuses, when there is one. A speculative
 analogy has no lower bound in common with anything else, so composing through it is refused.
 
-Rust counterpart: `bridge.rs::status_meet`. -/
+Historical Rust mirror, retired in R1. -/
 def statusMeet : BridgeStatus → BridgeStatus → Option BridgeStatus
   | .speculativeAnalogy, .speculativeAnalogy => some .speculativeAnalogy
   | .speculativeAnalogy, _ => none
@@ -392,7 +392,7 @@ The domain of a partially defined bridge is carried by its source *type*, exactl
 `Foundation/Receiver.lean`'s `ReceiverTransformer` carries `Set.range entering` — a bridge out of a
 restricted domain is a bridge out of that subtype.
 
-Rust counterpart: `crates/holonic-engine/src/bridge.rs::Bridge`. -/
+Historical Rust mirror, retired in R1. -/
 structure Bridge (A B : Type u) where
   /-- Which of the eight is claimed. -/
   status : BridgeStatus
@@ -410,7 +410,7 @@ structure Bridge (A B : Type u) where
 /-- [definition] The passage a composite carries: the two passages composed, with their residuals
 paired by `Transition.comp_residual`.
 
-Rust counterpart: `bridge.rs::composed_passage`. -/
+Historical Rust mirror, retired in R1. -/
 def composedPassage {A B C : Type u} (second : Bridge.{u, w} B C) (first : Bridge.{u, w} A B) :
     Option (Transition.{u, u, w} A C) :=
   first.passage.bind fun f => second.passage.map fun t => Transition.comp t f
@@ -427,7 +427,7 @@ theorem composedPassage_of_both {A B C : Type u} (second : Bridge.{u, w} B C)
 /-- [definition] The lawful returns of an attempted composition. A refusal is returned as content
 and never raised.
 
-Rust counterpart: `bridge.rs::BridgeComposition`. -/
+Historical Rust mirror, retired in R1. -/
 inductive BridgeComposition (A C : Type u)
   /-- The composite bridge. -/
   | composed (bridge : Bridge.{u, w} A C)
@@ -464,7 +464,7 @@ def composedBridge {A B C : Type u} (s : BridgeStatus) (g : EpistemicGrade)
 /-- [definition] **Composition of bridges takes the meet of status and grade, and composes
 residuals through `Transition`.**
 
-Rust counterpart: `bridge.rs::Bridge::compose`. -/
+Historical Rust mirror, retired in R1. -/
 def Bridge.comp {A B C : Type u} (second : Bridge.{u, w} B C) (first : Bridge.{u, w} A B) :
     BridgeComposition.{u, w} A C :=
   match statusMeet first.status second.status with
@@ -517,7 +517,7 @@ theorem composedBridge_refuses_missing_passage {A B C : Type u} (s : BridgeStatu
 in `docs/canon/EPISTEMIC_GRADES.md` "must carry explicit maps, limits, preserved diagram, first
 derivation target, and a falsifier that can fire"; those are exactly these fields.
 
-Rust counterpart: `crates/holonic-engine/src/bridge.rs::ProposedBridge`. -/
+Historical Rust mirror, retired in R1. -/
 structure ProposedBridge (A B : Type u) where
   /-- The candidate connection. -/
   candidate : Bridge.{u, w} A B
@@ -535,7 +535,7 @@ hypothesis is discharged, no counterexample is recorded, and a target at or abov
 already have its passage. A recorded counterexample blocks promotion **by type**: there is no
 inhabitant of this structure when `counterexamples` is nonempty.
 
-Rust counterpart: `bridge.rs::Promotion`. -/
+Historical Rust mirror, retired in R1. -/
 structure Promotion {A B : Type u} (P : ProposedBridge.{u, w} A B) (target : BridgeStatus) where
   /-- Every required hypothesis holds. -/
   discharged : ∀ h ∈ P.requiredHypotheses, h
@@ -712,7 +712,7 @@ The three required hypotheses are written out, not gestured at:
 
 The falsifier fires when two contacts with different faces share an embedding coordinate.
 
-Rust counterpart: `crates/holonic-engine/src/bridge.rs::protein_embedding_proposal`. -/
+Historical Rust mirror, retired in R1. -/
 def proteinEmbeddingProposal (contactFace : Contact → ℤ) (embeddingFace : Embedding → ℤ)
     (candidateMap : Contact → Embedding) : ProposedBridge.{0, 0} Contact Embedding where
   candidate :=

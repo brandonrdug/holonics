@@ -71,11 +71,6 @@ pub mod atmospheric_inverse;
 // and every emitted float carries the exact rational residual its rounding cost.
 pub mod basin;
 pub mod bit_causal;
-// C7 of `docs/plans/THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md`: `Bridge` and
-// `ProposedBridge` — eight distinct connection statuses with a genuine partial order, one
-// epistemic grade from the canon, and a composition taking the meet of both while composing
-// residuals through `Transition`. Paired with `Foundation/Bridge.lean`.
-pub mod bridge;
 pub mod category;
 pub mod causal;
 pub mod causal_body;
