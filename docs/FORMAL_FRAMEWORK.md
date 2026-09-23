@@ -162,6 +162,8 @@ refine it; an exact rebase carries it through every ordered history; explicit re
 can determine one future face while source causes stay plural. Whole-family tolerance transports
 through a declared Lipschitz receiver, and shrinking bounds force compatible readouts to converge.
 
+[definition; source-cut, formal-checked] `Foundation/Receiver.lean` extends the existing receiver owner with additive receiver-family laws: the collapsed kernel, joint reading, its application lemma, kernel equivalence, and difference-based indistinguishability. `Foundation/JointReceiverDescent` imports it directly. The source-specific chain placement and theta-complex identities remain in `Millennium/Receiver`; the five extracted declarations keep their current `Soma.Holonics.Millennium.Receiver` namespace until M2. The focused receiver closure passes at 3,139 Lake jobs, `Framework.Core` at 8,738, and top-level `ElementaryHolonics` at 10,105. The extracted declarations use standard axioms (`propext`, `Classical.choice`, `Quot.sound`); see the R3 edge audit and verification receipts.
+
 [proved-derived; formal-checked] The joint additive construction uses
 `N=intersection_i ker(read_i)` and `Q=X/N`. Preservation of N is exactly the receiver-transformer
 criterion for an additive generator. All declared readers and admitted generator words factor

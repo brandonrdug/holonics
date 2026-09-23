@@ -1,3 +1,4 @@
+import ElementaryHolonics.Foundation.Receiver
 import ElementaryHolonics.Millennium.Coupling
 import ElementaryHolonics.Millennium.Theta
 import ElementaryHolonics.Millennium.Triangle
@@ -23,38 +24,10 @@ namespace Soma.Holonics.Millennium.Receiver
 
 open Soma.Holonics.Millennium Soma.Holonics.Millennium.Coupling
 
-/-! ## 1. An additive receiver family and what it collapses -/
-
 universe u
 
-variable {ι X V : Type u} [AddCommGroup X] [AddCommGroup V] (read : ι → (X →+ V))
-
-/-- The **collapsed population**: what no reading in the family can see. -/
-def collapsedPopulation : AddSubgroup X := ⨅ i, (read i).ker
-
-/-- The family read all at once. -/
-def jointReading : X →+ (ι → V) where
-  toFun x := fun i => read i x
-  map_zero' := by funext i; simp
-  map_add' a b := by funext i; simp
-
-@[simp] theorem jointReading_apply (x : X) (i : ι) : jointReading read x i = read i x := rfl
-
-/-- **The collapsed population is the kernel of the family read all at once.** -/
-theorem theCollapsedIsTheJointKernel :
-    (jointReading read).ker = collapsedPopulation read := by
-  ext x
-  simp [collapsedPopulation, AddSubgroup.mem_iInf, AddMonoidHom.mem_ker, funext_iff]
-
-/-- **Two constructions are unseparated exactly when their difference is collapsed.**
-
-This is what makes the collapsed population a subgroup rather than a relation: with additive
-readings, indistinguishability is a coset condition. -/
-theorem unseparatedIffDifferenceCollapsed (a b : X) :
-    (∀ i, read i a = read i b) ↔ (b - a) ∈ collapsedPopulation read := by
-  simp only [collapsedPopulation, AddSubgroup.mem_iInf, AddMonoidHom.mem_ker, map_sub,
-    sub_eq_zero]
-  exact forall_congr' fun _ => eq_comm
+variable {ι X V : Type u} [AddCommGroup X] [AddCommGroup V]
+  (read : ι → (X →+ V))
 
 /-! ## 2. The placement -/
 

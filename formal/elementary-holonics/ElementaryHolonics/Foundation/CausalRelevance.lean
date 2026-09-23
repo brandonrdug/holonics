@@ -1,3 +1,4 @@
+import Mathlib.Algebra.Order.Field.Rat
 import ElementaryHolonics.Foundation.JointReceiverDescent
 import ElementaryHolonics.Foundation.CompleteReceiverHistory
 import ElementaryHolonics.Foundation.ReceiverFamily

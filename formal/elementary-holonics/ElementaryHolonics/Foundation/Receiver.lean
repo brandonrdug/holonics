@@ -1,11 +1,13 @@
+import Mathlib.Algebra.Group.Subgroup.Ker
 import Mathlib.Logic.Relation
 import Mathlib.Data.Set.Operations
 
 /-!
 # Receivers and receiver-exact compression
 
-This file formalizes only the elementary relational carrier.  It does not make
-receiver dependence into an axiom of ordinary mathematics.
+This file formalizes the elementary relational carrier. It does not make receiver
+dependence into an axiom of ordinary mathematics. It also owns the additive receiver-family
+kernel and joint-reading laws in their historical Millennium namespace until M2.
 -/
 
 namespace Soma.Holonics
@@ -187,3 +189,40 @@ structure ReceiverCondensation {X : Type u} {Entering : Type v} {Returned : Type
   sameReturned : transformer.transform left = transformer.transform right
 
 end Soma.Holonics
+
+namespace Soma.Holonics.Millennium.Receiver
+
+/-! ## 1. An additive receiver family and what it collapses -/
+
+universe u
+
+variable {ι X V : Type u} [AddCommGroup X] [AddCommGroup V] (read : ι → (X →+ V))
+
+/-- The **collapsed population**: what no reading in the family can see. -/
+def collapsedPopulation : AddSubgroup X := ⨅ i, (read i).ker
+
+/-- The family read all at once. -/
+def jointReading : X →+ (ι → V) where
+  toFun x := fun i => read i x
+  map_zero' := by funext i; simp
+  map_add' a b := by funext i; simp
+
+@[simp] theorem jointReading_apply (x : X) (i : ι) : jointReading read x i = read i x := rfl
+
+/-- **The collapsed population is the kernel of the family read all at once.** -/
+theorem theCollapsedIsTheJointKernel :
+    (jointReading read).ker = collapsedPopulation read := by
+  ext x
+  simp [collapsedPopulation, AddSubgroup.mem_iInf, AddMonoidHom.mem_ker, funext_iff]
+
+/-- **Two constructions are unseparated exactly when their difference is collapsed.**
+
+This is what makes the collapsed population a subgroup rather than a relation: with additive
+readings, indistinguishability is a coset condition. -/
+theorem unseparatedIffDifferenceCollapsed (a b : X) :
+    (∀ i, read i a = read i b) ↔ (b - a) ∈ collapsedPopulation read := by
+  simp only [collapsedPopulation, AddSubgroup.mem_iInf, AddMonoidHom.mem_ker, map_sub,
+    sub_eq_zero]
+  exact forall_congr' fun _ => eq_comm
+
+end Soma.Holonics.Millennium.Receiver

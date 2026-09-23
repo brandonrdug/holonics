@@ -1,5 +1,6 @@
+import Mathlib.GroupTheory.QuotientGroup.Basic
 import ElementaryHolonics.Foundation.ReceiverHistoryCompression
-import ElementaryHolonics.Millennium.Receiver
+import ElementaryHolonics.Foundation.Receiver
 
 /-!
 # Canonical joint receiver descent
