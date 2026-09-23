@@ -1,6 +1,6 @@
 # R2 membrane owner and caller audit
 
-Source-backed R2 owner map, 2026-09-23. The initial audit followed `.agents/bin/prior-art 'membrane|SparseStanding|LiveCurrentMachine|live current|standing storage'`; its matches are navigation evidence, so dispositions below rest on named owners and callers. The ERST plate cut passed its focused and workspace gates, recorded in `docs/VERIFICATION_RECEIPTS.tsv`. The later replay-wrapper cut moved sparse and ranked witnesses to live body/membrane owners; its own Cargo gates are recorded when run.
+Source-backed R2 owner map, 2026-09-23. The initial audit followed `.agents/bin/prior-art 'membrane|SparseStanding|LiveCurrentMachine|live current|standing storage'`; its matches are navigation evidence, so dispositions below rest on named owners and callers. The ERST plate cut passed its focused and workspace gates, recorded in `docs/VERIFICATION_RECEIPTS.tsv`. The later replay-wrapper cut moved sparse and ranked witnesses to live body/membrane owners; its focused body/membrane and locked workspace gates also passed.
 
 ## Decision
 
@@ -65,6 +65,8 @@ either winding arm nonzero stays occupied; release requires both resultant coord
 arms to be zero. A release can narrow only when occupancy and all live founders lie in the exact
 zero section of the narrower gauge. Sparse storage reserves at most the admitted deed count and
 stores/visits only the live prefix, rather than allocating the receiver's `axis × axis` chart.
+The existing body test `live_sparse_own_is_the_dense_register_without_the_axis_square` is the
+executable resource witness; the new direct tests cover occupancy, narrowing and ranked parity.
 The removed wrapper additionally checked `FeltEmission::hand_is_exact` and the admitted deed
 extent before calling body state; those checks leave state untouched on refusal. They are wrapper
 transaction boundaries (source: accepted emission stream; receiver: disposable replay chart), not

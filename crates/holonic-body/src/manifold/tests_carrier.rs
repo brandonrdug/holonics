@@ -328,38 +328,6 @@ fn sparse_own_state_retries_narrowing_after_the_off_section_founder_releases() {
     }
 }
 
-/// The sparse REGISTER reservation is bounded by admitted deeds and stores only live cells; the
-/// body transition iterates the live prefix, not every address in the receiver's axis-square.
-#[test]
-fn sparse_own_state_storage_tracks_deeds_not_the_axis_square() {
-    const DEEDS: usize = 96;
-    let mut cells = [SparseOwnCell::EMPTY; DEEDS];
-    let mut state = SparseOwnState::preflight(&mut cells[..]).unwrap();
-    for n in 0..DEEDS {
-        state
-            .deposit_term(
-                &mut cells[..],
-                (Cog::lit((n * 17 + 1) as i64), Cog::lit((n * 29 + 3) as i64)),
-                FeltTerm {
-                    chi: Chi {
-                        same: Cog::lit((n + 1) as i64),
-                        other: Cog::lit((n * 2 + 1) as i64),
-                    },
-                    winding: WindingQuantum::None,
-                },
-            )
-            .unwrap();
-    }
-    let live = state.cells(&cells[..]).unwrap();
-    assert_eq!(live.len() as u64, state.occupancy());
-    assert_eq!(
-        cells.len(),
-        DEEDS,
-        "reservation is the admitted deed extent"
-    );
-    assert!((state.axis() as usize).pow(2) > cells.len());
-}
-
 /// ★ THE CARRIER THICKENS (`FORMULA §XVIII`, ratified 2026-07-09): completions at depth k are
 /// arrivals at depth k+1 — on real material the carrier stands ABOVE the word grain (enclosures
 /// standing at depth ≥ 1), deterministically; each

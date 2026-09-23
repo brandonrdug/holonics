@@ -196,6 +196,10 @@ The [membrane caller map](census/R2_MEMBRANE_EDGE.md) keeps the live receive/sta
 with its `life` and CUDA consumers until the main-library move; the ERST plate reader and its
 deed adapter have now been retired, with the runtime rest-image codec retained. The direct
 live-current carrier test, complete plate suite and locked workspace target gate passed.
+Two test-only ranked/sparse felt-surface wrappers also retired; their opposed-arm, narrowing and
+ranked/sparse parity witnesses now run against `SparseOwnState` and `GrowingRankedOwn` in the live
+body/membrane owners. The surviving 56 membrane tests and locked workspace gate passed; live
+`SparseStandingSurface` and `live_current` remain untouched.
 The [workspace caller map](census/R2_WORKSPACE_EDGE.md) places the
 live variant-workspace operation at the workbench boundary and names its v1 persisted readers;
 those readers cannot become compatibility paths in the new library. Both are migration
