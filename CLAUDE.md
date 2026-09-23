@@ -15,13 +15,14 @@ explicit rather than relying on an assumption about which files a particular har
 
 [project-postulate] Brandon's September 23 intervention follows
 [THE_REPOSITORY_RESTRUCTURE](docs/plans/THE_REPOSITORY_RESTRUCTURE.md). The owner paths below
-describe today's tree until a verified move lands. Four maintained Rust libraries are the target:
-`holonic-core` (source-neutral Holon law, exact algebra and geometry), `holonics-hnn`
-(backend-neutral HNN and operative extraction), `holonics-device` (CUDA now, with Brandon's
-Apple implementation later), and `holonics` (public entry). Their dependency direction is
-core → HNN → device → public entry; core and HNN compile without CUDA. Lean becomes one Lake
-package with `Holonics` and dependent `HolonicsResearch`. Moving its paths and changing the
-current `Soma.Holonics` declaration namespace are separate checked phases.
+describe today's tree until a verified move lands. The substantive main `holonics` library
+will own the Holon, exact geometry, elementary operations and backend-neutral `hnn` module.
+`holonic-words` owns the small shared exact word/section ABI; `holonics-cuda` implements the
+device execution port, and Brandon's later `holonics-apple` package implements its Apple
+counterpart. Dependency direction is words → main → backends; main builds with a host/reference
+HNN and without CUDA. Lean becomes one Lake package with `Holonics` and dependent
+`HolonicsResearch`. Moving its paths and changing the current `Soma.Holonics` declaration
+namespace are separate checked phases.
 
 [definition] Each moved operator retains its typed source and receiver, forward law, complete
 variation, material/clock/frame hypotheses, wire face and consuming call. Account for the

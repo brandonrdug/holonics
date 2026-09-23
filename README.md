@@ -46,21 +46,23 @@ by itself certify current use.
 ## The intended libraries
 
 The [restructure plan](docs/plans/THE_REPOSITORY_RESTRUCTURE.md) audits consumers and retires
-superseded layers before moving code. Its target is **four maintained Rust libraries**:
+superseded layers before moving code. The **main `holonics` crate will own the actual Holon
+laws and HNN**, organized by elementary object rather than acting as a facade:
 
 | Library | Responsibility |
 |---|---|
-| `holonic-core` | Source-neutral Holon laws, exact algebra and geometry |
-| `holonics-hnn` | Backend-neutral HNN, generator field, sessions and operative equation extraction |
-| `holonics-device` | CUDA realization of the declared operations; Apple implementation later on Brandon's separate branch |
-| `holonics` | Main public entry, including the workbench binary and audited compatibility paths |
+| `holonic-words` | Small portable exact word and section ABI shared by host and device |
+| `holonics` | Holon/port law, exact geometry, pair, parametron, tube, deposition, ratio, receipt, equation extraction and an internal backend-neutral `hnn` module |
+| `holonics-cuda` | CUDA implementation of the HNN execution port |
+| `holonics-apple` (later) | Apple silicon implementation on Brandon's separate branch |
 
-The dependency direction is core → HNN → device → public entry; core and HNN must build
-without CUDA. Lean will become one top-level `lean/` Lake package with a public `Holonics`
-library and a dependent `HolonicsResearch` library. Those names describe the **target**; the
-current paths in the table above remain authoritative until their moves are verified. Rust
-and Lean express the same elementary laws at their respective scopes; Lean verification does
-not run inside HNN cultivation or inference.
+That is three maintained Rust libraries now and four after Apple. The main library builds and
+runs its host/reference HNN without CUDA; a caller supplies a device executor when needed.
+The current workbench remains an application package while its deployment boundary is
+inventoried. Lean will become one top-level `lean/` Lake package with a public `Holonics`
+library and dependent `HolonicsResearch` library. Those names describe the **target**; the
+current paths above remain authoritative until their moves are verified. Lean verifies laws at
+its own scope and does not run inside HNN cultivation or inference.
 
 ## Working in this repository
 

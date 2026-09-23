@@ -14,12 +14,12 @@ the roadmap orders it. The machine, source guides and research supply the constr
 
 [project-postulate] Brandon's September 23 intervention is governed by
 [THE_REPOSITORY_RESTRUCTURE](docs/plans/THE_REPOSITORY_RESTRUCTURE.md). The source paths in this
-guide are **current owners**, not claims that the target layout has landed. The target has four
-maintained Rust libraries: `holonic-core` (source-neutral Holon law, exact algebra and geometry),
-`holonics-hnn` (the backend-neutral HNN and its operative extraction), `holonics-device` (CUDA
-now; a separate Apple implementation later), and `holonics` (the public entry). Dependency
-direction is core → HNN → device → public entry. The HNN defines the backend operation and a
-host/reference executor; neither it nor core imports CUDA. Lean becomes one Lake package with
+guide are **current owners**, not claims that the target layout has landed. The substantive
+main `holonics` library will own the Holon, exact geometry, elementary operations and its
+backend-neutral `hnn` module. `holonic-words` owns the small shared exact word/section ABI;
+`holonics-cuda` implements the device execution port, and Brandon's later `holonics-apple`
+package implements its Apple counterpart. Dependency direction is words → main → backends;
+main builds with a host/reference HNN and without CUDA. Lean becomes one Lake package with
 `Holonics` and dependent `HolonicsResearch`; the current `ElementaryHolonics` paths and
 `Soma.Holonics` declaration namespace stay factual until their distinct migrations land.
 

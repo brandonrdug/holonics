@@ -50,7 +50,8 @@ implements it.
 
 [definition] Those Lean and Rust paths are the **current** owners. The
 [repository restructure](plans/THE_REPOSITORY_RESTRUCTURE.md) preserves this Holon law while
-moving its source-neutral Rust facets and geometry into `holonic-core` and curating the Lean
+moving its source-neutral Rust facets and geometry into the substantive main `holonics` library
+and curating the Lean
 `Holonics` import closure. An owner name or namespace move supplies no new theorem or native
 operator by itself.
 

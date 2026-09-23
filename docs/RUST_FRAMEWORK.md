@@ -6,10 +6,12 @@ used as a path dependency (`publish = false`). HNN application and wire names re
 compatibility.
 
 [project-postulate] This table records the **current** public paths. The
-[repository restructure](plans/THE_REPOSITORY_RESTRUCTURE.md#31-rust-four-maintained-libraries-one-dependency-direction)
-targets four maintained libraries: core Holon law/geometry, a backend-neutral HNN, device
-realization and this public entry. Existing `hna` API paths and wire identifiers are audited
-at their consuming calls during migration; target package names are not yet importable.
+[repository restructure](plans/THE_REPOSITORY_RESTRUCTURE.md#31-rust-the-main-holonics-library-owns-the-construction)
+turns this package into the substantive owner of the Holon law/geometry and an internal
+backend-neutral HNN. `holonic-words` supplies shared exact device words; `holonics-cuda` and
+later `holonics-apple` implement its execution port. Existing `hna` API paths and wire
+identifiers are audited at their consuming calls during migration; target package names are
+not yet importable.
 
 [definition] The [HNN composition guide](HNN_COMPOSITION.md) describes the model's semantic
 assembly, with its [governing model formula](HNN_FORMULA.md). The dependency split below improves library

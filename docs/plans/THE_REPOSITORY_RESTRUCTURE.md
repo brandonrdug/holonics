@@ -60,7 +60,8 @@ public API, saved wire or application boundary is disposable.
 ## 2. What is essential: the restructure is organized around these
 
 [definition] Everything kept must be one of these objects, a composition of them, their device
-realization, a boundary chart, or a measurement. The owner column is the target home; §3 gives the layout.
+realization, a boundary chart, or a measurement. The owner columns below name **current**
+sources; §3 gives the target layout.
 
 ### 2.1 The Holon and its facets (the core)
 
@@ -126,60 +127,85 @@ Use **HNN** only for the established neural machinery; do not name new packages 
 R0 may refine module placement, while the four-library ceiling and dependency direction guide
 the cut.
 
-### 3.1 Rust: four maintained libraries, one dependency direction
+### 3.1 Rust: the main `holonics` library owns the construction
 
-The 2–4 ceiling is for maintained Rust library packages. The target is four, including the
-public `holonics` package. The workbench becomes a binary target of the public package; the
-derivation atlas and plate are folded into an owning package's examples/tools or retired after
-their R0 consumer check. Conversation-data remains a data preparation application. Do not create
-an empty Apple package on this Linux branch.
+The main package must be a **substantive library**, not the present 52-line facade. It owns the
+Holon law, exact geometry and algebra, elementary operations and the backend-neutral HNN. A
+separate HNN package would force the foundational package to depend on its implementation to
+keep `holonics::hna`, closing the dependency cycle. Keep HNN as an internal module until an
+actual post-retirement build/profile result justifies a public-path migration.
 
-| Target package | Owns | Existing sources to sort at R0 |
+The target is three maintained libraries on this branch, four when Brandon adds Apple:
+
+| Package | Internal ownership | Existing sources to sort at R0 |
 |---|---|---|
-| `holonic-core` | The Holon law and ports, elementary objects, exact algebra, exact word rings, geometry (frames, screws, winding, contacts, holonomy) and source-neutral receiver/restriction laws. No CUDA, HNN session or product dependency. | `holonic-core`, `relational-geometry`, `holonic-words`, live `holonic-structure` and source-neutral engine owners. |
-| `holonics-hnn` | Backend-neutral HNN: constituted field, helical pair interaction, generator machine, standing/deposition, ratio comparison, phase-carried source moments, receivers, session, rest and complete adjoint. Equation extraction lives here while its operative consumer is the machine. | `holonics-hna`, live `holonic-engine`/`holonic-life` machine owners, `holonic_intelligence`, `soulkiller`, `foreign_*`. |
-| `holonics-device` | Device realization and host/device exchange: CUDA driver, launch/section layouts, exact enclosure kernels, receipts, hardware cover and resident sections. `cuda` is the implemented backend; an Apple backend may join later behind the same declared machine operation, on Brandon's separate branch. Share laws only when both backends implement the same contract. | `holonic-mount`, device ABI/layout owners, engine `cuda_refine`, `resident_section`, `kernels/`, `hardware_cover`, `section_partition`. |
-| `holonics` | Main public crate and stable entry point. It exposes the core unconditionally and the HNN/device interfaces through explicit features and re-exports; it owns the CLI binary target but no second copy of a mathematical law. | Current `holonics` facade and live workbench. |
+| `holonic-words` | Small portable exact word ring and packet/section ABI shared by host and device, with a `no_std` arithmetic kernel compiled from one source. It owns the layout and refusal words both sides must agree on. No driver or HNN dependency. | `holonic-words` plus the shared `soma-abi::section_layout_cuda` law and validated layout definitions. Its present dependency on `soma-abi`/`body` must be reversed or retired. |
+| `holonics` | Main library: the Holon and its facets, exact/geometry support, pair contact, parametron, tube/tower, deposition/retention, ratio/receipt, equation extraction as a Holon boundary, and an internal `hnn` module with a host/reference executor. No CUDA dependency. | `holonic-core`, `relational-geometry`, live `holonic-structure`, source-neutral and HNN parts of `holonic-engine`, `holonics-hna`, live `holonic-life`. |
+| `holonics-cuda` | CUDA implementation of declared Holonics/HNN operations: driver, allocation, launch/section layout, resident kernels, checked receipts and transfer completion. It depends on `holonics` and `holonic-words` and implements the HNN execution port; it does not redefine the material or loss law. | `holonic-mount`, device ABI owners, engine `cuda_refine`, `resident_section`, `kernels/`, `hardware_cover`, `section_partition`. |
+| `holonics-apple` (later) | Apple silicon implementation behind the same typed execution port, with its own kernels and placement. Create it only on Brandon's Mac branch after its actual implementation is ready. | No Linux-branch move. |
 
-The dependency graph is `holonic-core → holonics-hnn → holonics-device → holonics` (the public
-crate also depends directly on core and HNN); arrows mean *may be used by*. The HNN defines the
-backend operation and a host/reference executor; the device package implements it. Neither the
-core nor HNN imports a CUDA symbol, type or linker dependency. The public package selects CUDA
-explicitly rather than making it the default on non-CUDA hosts. This cut must be demonstrated
-by `cargo metadata` and a CPU-only build before files move. The present graph does **not** have
-this property: engine imports `mount`, HNA imports engine and life, and `holonic-words` reaches
-the legacy `soma-abi`/`body` chain. Detach those edges before merging or renaming packages.
-The intended public feature policy is a CPU-capable default (`hnn` with its reference executor)
-and opt-in `cuda`; the later Apple feature is platform-scoped. `holonics::hna` can remain a
-public compatibility path through the facade while its implemented owner becomes
-`holonics-hnn`. Feature names and re-export scope are checked against workbench callers and
-saved artifacts before the old `native` feature is retired.
+The dependency direction is `holonic-words → holonics → holonics-cuda` (and later
+`holonics-apple`); arrows mean *may be used by*. Applications select a backend and depend on
+`holonics` plus that backend. The current workbench remains an application package while R0
+checks its deployment boundary; the 2–4 ceiling above counts maintained reusable libraries,
+not a CLI's separate Cargo binary target. The main library's default build must work without
+a CUDA SDK, driver or linker symbol. HNN is a feature/module inside it, with an exact host
+reference. A CUDA caller passes `CudaExecutor` through the HNN execution port rather than
+making `holonics` import the CUDA package. `holonics::hna` can remain a compatibility module
+for the established API and wire names while its implementation is organized under `hnn`.
+Device-specific constructors migrate to the backend package where necessary; name each
+consumer and saved artifact before removing a path.
+Initially keep `hnn` in the main package's default features to preserve public HNN imports;
+`--no-default-features` is the lean source-neutral Holon build. No `cuda` feature on main may
+introduce an edge back to `holonics-cuda`; applications select that dependency explicitly.
 
-Within that graph, core owns the one `Holon` declaration and its `complex`, `port`, `element`,
-`generator`, `restriction`, `pair`, `parametron`, `deposition`, `ratio` and `receipt` laws, with
-exact geometry/algebra as their implementations. HNN owns compositions of those operations:
-the pair-contact graph, constituted field, source moments, participating receiver, deposition
-return and session. Its backend boundary accepts the same typed Holon/material/current and
-returns the same receiving section and covector/receipt in the reference and CUDA paths. The
-device package owns CUDA allocation, placement, kernels and checked transfer; it cannot invent
-a different loss or material update. The public crate chooses an implementation and presents
-stable paths. The concrete Rust trait signatures follow the surviving HNN consuming call at R0;
-do not design a generic backend trait before that call and its adjoint are inspected.
+The internal source tree is organized by the elementary objects and their actual compositions:
 
-HNN warrants its own package because its field/session implementation and change rate are
-substantial, while source-neutral Holon mathematics must compile and be used without it. The
-public `holonics::hna` and other established Rust paths receive an audited migration map; keep
-only compatibility re-exports needed by live callers during the move. Wire/schema identifiers
-and usable saved artifacts retain their existing contracts unless a named migration changes
-them. A final path removal is not inferred merely from a package rename. Extraction is an HNN
-module at this boundary, not a fifth package; if it proves independently reusable, revisit the
-boundary with actual consumers instead of anticipating one.
+```text
+crates/holonics/src/
+  lib.rs                 public typed entry; feature declarations and narrow re-exports
+  holon/                 one Holon law: complex, ports/Dirac, elements, generators, restriction
+  geometry/              exact frames, screw, phase carry, lock address, cell holonomy
+  pair/                  helical contact, slip, quadrance and material return
+  parametron/            LC storage, pump, sheets and locks (host law)
+  tube/                  longitudinal transfer, tower restrictions and gluing
+  deposition/            reached covectors, constitution change and retention quotient
+  ratio/                 typed comparison, log branch and jets
+  receipt/               per-region framed/clocked readings
+  exact/                 rational, algebraic and word-backed implementation carriers
+  extraction/            foreign equations as Holon element/generator relations
+  hnn/                   field, source moments, generator inference, receiver, adjoint, session
+```
 
-Retire or fold after R0: `holonic-body`, `holonic-membrane`, `holonic-surface`,
-`holonic-circulation-abi`, `holonics-workspace`, `holonic-language`, `holonic-structure`, the
-remainder of `holonic-life` and `holonic-engine`, and unused `accelerators/` targets. An event-law
-module with a distinct theorem or live consumer moves to its object owner; one with neither is
-retired. A package count is an outcome of those owner decisions, not a reason to suppress a law.
+`holon` is the one definition of the port object; `pair`, `parametron`, `tube`, `deposition`,
+`ratio` and `receipt` are its elementary laws and compositions, not duplicate root Holons.
+`exact` is supporting representation, not a competing ontology. `hnn` assembles those laws
+into the continuing field; it does not copy their definitions. Most submodules should be
+private until an actual caller needs a public contract. Application codecs (text, image,
+motor) remain boundary charts at their consumers. The current engine's blanket public modules
+and glob exports are not copied into this tree.
+
+The root exports only the central `Holon` type and deliberate qualified modules. A caller
+uses `holonics::pair`, `holonics::ratio` or `holonics::hnn`, not a flat engine-wide glob.
+Preserve `holonics::geometry`, `holonics::structure` and `holonics::hna` as audited forwarding
+paths while their real consumers migrate; each forwarding path has a removal decision tied
+to a named caller or saved wire. In Lean, the public `Holonics` root imports the corresponding
+object owners and a curated HNN specialization; `HolonicsResearch` imports that root. Exact
+module/file names are settled against the existing proof import graph, not invented by copying
+the Rust directory tree.
+
+The HNN execution port is defined at its surviving consuming call, including the forward
+field, complete geometry/feature pullback, material return, source order, receiving phase and
+receipt. The host/reference implementation and CUDA implementation must return the same typed
+relation at their stated precision. The present graph does **not** satisfy this cut: engine
+imports `mount`; HNA imports engine and life; `holonic-words` imports `soma-abi`. Sever those
+edges, preserve the shared arithmetic implementation, then move code. A module with a distinct
+mathematical consumer survives in its object owner; unconsumed legacy scaffolding retires.
+
+A separate `holonics-hnn` package is a measured fallback, not the default design. If the
+surviving HNN still makes main-library rebuilds untenable after retirement, record that cost and an API
+migration that keeps wire/schema identifiers and a named public entry; an HNN split must not
+turn `holonics` back into a facade or duplicate elementary laws.
 
 ### 3.2 Lean: one Lake package, two import closures
 
@@ -190,6 +216,10 @@ depending on `Holonics`). `Holonics` must not import `HolonicsResearch`. A stand
 theorem is a consumer in its own right; absence from the HNN build is not a deletion reason.
 The present `ElementaryHolonics.lean` umbrella imports almost all of Millennium and RH; replace
 it with curated roots rather than renaming that umbrella and calling it the foundation.
+The public root presents `Holon`, pair contact, parametron, tube/tower, deposition/retention,
+ratio/receipt and their geometry in the same object order as the Rust main library. HNN
+theorems are a dependent specialization **inside** `Holonics`; `HolonicsResearch` contains
+independent mathematical instances and cannot become an alternate foundation.
 
 Generate the import closures before classifying files. Keep `Holon/`, `Objects/` and the
 Framework's actual transitive owners together; sort `Geometry/`, `Transport/`, `Foundation/`,
@@ -233,8 +263,9 @@ Holon ratio with its winding. A CUDA kernel's sealed-word/radius distinction, co
 properties silently supplied by a new crate name. Lean proves named laws at their scope and
 does not enter the runtime.
 
-Before retiring an old package, verify a source-neutral `holonic-core` build, a host/reference
-HNN build, CUDA owner tests on the available card, an all-target public/workbench check, the
+Before retiring an old package, verify a source-neutral `holonics` build without its HNN
+feature, a host/reference HNN build, CUDA owner tests on the available card, an all-target
+public/workbench check, the
 two Lean library targets and the changed source-to-Lean citation/link scan. Inspect a saved
 session through the new public path when one is named as retained. Record the specific commands
 and results in the census; a build of an intermediate move is not the completed boundary check.
@@ -262,7 +293,7 @@ and results in the census; a build of an intermediate move is not the completed 
 4. **Finish the paused consolidation** (phases 11, 12a, 12b on their WIP branches; phase 14) on what
    remains. Rebase them after R1–R3.
 5. **Layout moves (§3):** sever dependency cycles, establish backend-neutral HNN and CPU-only
-   core checks, then move/rename packages in mechanical commits. Move Lean paths and roots
+   main-library checks, then move/rename packages in mechanical commits. Move Lean paths and roots
    separately from declaration-namespace edits. Keep the old `hna` and wire identifiers as
    described in §3.1 while their live consumers are migrated.
 6. **Documents (§3.3)** and the GitHub issue reset (§5).

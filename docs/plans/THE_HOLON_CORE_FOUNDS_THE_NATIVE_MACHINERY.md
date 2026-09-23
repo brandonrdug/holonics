@@ -776,7 +776,7 @@ disk. Use one shared worker target directory, `CARGO_PROFILE_DEV_DEBUG=line-tabl
 build directory when it lands, and treat splitting the engine crate along the Holon facets as consolidation
 work.
 
-**Phase 17 (target refined by the [repository restructure](THE_REPOSITORY_RESTRUCTURE.md#31-rust-four-maintained-libraries-one-dependency-direction)): cut the surviving `holonic-engine` by owner.** Measured September 23. The crate has
+**Phase 17 (target refined by the [repository restructure](THE_REPOSITORY_RESTRUCTURE.md#31-rust-the-main-holonics-library-owns-the-construction)): cut the surviving `holonic-engine` by owner.** Measured September 23. The crate has
 548k lines. 202 top-level single-file modules hold 302k of them. The largest directories are `native_ecology`
 (79k), `cuda_refine` (38k), `resident_section` (21k), `holonic_intelligence` (20k) and the physical receivers
 (`physical_occurrence`, `physicochemical_receiver`, `physical_intake`, about 20k). These are census
@@ -788,10 +788,11 @@ areas, not a proposal for six new crates:
 - the physical and chemical receivers;
 - the remaining CUDA-free mathematics.
 
-The target is four maintained libraries total: `holonic-core`, `holonics-hnn`, `holonics-device`
-and the public `holonics`. Retained source-neutral mathematics goes to core, HNN/extraction to
-HNN, and CUDA realization to device. Public-path and wire handling follows the restructure's
-audited migration map. Run it after phases 11, 12 and 14 land, since those phases edit the same modules.
+The target is a substantive main `holonics` library containing the Holon laws, geometry,
+extraction and internal HNN; `holonic-words` remains the small shared exact ABI;
+`holonics-cuda` owns CUDA realization, with `holonics-apple` later on Brandon's branch.
+Public-path and wire handling follows the restructure's audited migration map. Run it after
+phases 11, 12 and 14 land, since those phases edit the same modules.
 Moving a module first requires a dependency census (`use crate::` edges) to find the acyclic cut. The
 census is the first step of the phase.
 
@@ -851,7 +852,7 @@ remains. Order:
 3. **Compatibility debt (R4).** Remove the `pub type` aliases and legacy wire decoders added in
    phases 9–16 unless a saved artifact we still use needs them, and name that artifact.
 4. **Consolidation phases 11, 12 and 14** continue on what remains (WIP branches above).
-5. **Crate cut (phase 17)** follows the four-library graph in the repository restructure, on the
+5. **Crate cut (phase 17)** follows the main-library graph in the repository restructure, on the
    reduced engine; the former six-way bullet list is a census, not a package proposal.
 6. **Documents and records (R5).** `research/` (290k) and `docs/` get the same census. Superseded
    records are deleted or folded into their guide, and the research routes are updated.
