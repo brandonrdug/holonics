@@ -69,6 +69,12 @@ or L3–L6 receipts. Across 420 audited records: 358 keep, 56 fold only after ow
 six unresolved. Row 370's Athena admission interpretation was withdrawn by its own
 counterexample, but its measured source and apparatus receipts remain evidence; retain the
 record and transfer only that corrected interpretation.
+The [eighth cohort](census/RECORDS_EIGHTH_R0.tsv) (August 26–September 1) adds 58 **keep**,
+one **fold** candidate and one **unresolved**. Across 480 audited records: 416 keep, 57 fold
+only after owner transfer, seven unresolved. The fold is an architecture comparison whose Lean
+theorem owners stay; its exact theorem names and hypotheses must reach `HNN_FORMULA` before the
+narrative is retired. The unresolved intrinsic-profile proposal needs a field-by-field map to
+the finalized Holon, Receiver and Holarchy contracts.
 
 The document table records paths, line counts, live incoming source count and a conservative
 working disposition. Its scan recognizes Markdown links and explicit path strings in common
