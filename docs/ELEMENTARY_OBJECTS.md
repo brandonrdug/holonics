@@ -69,6 +69,24 @@ is verified. Each move updates this table in the same commit.
 The restructure's detailed contracts, types and acceptance tests are in
 [§3.1 and §3.7 of the plan](plans/THE_REPOSITORY_RESTRUCTURE.md#31-rust-the-main-holonics-library-owns-the-construction).
 
+[definition] **Use of a Holon's material across an event boundary.** These are admissibility
+conditions on a Holon's existing ports, element relations and admitted futures, not a separate
+parameter object. An occurrence may be copied only when the relation at that interface supplies a
+lawful diagonal; a cloneable carrier alone does not establish that law. What remains available is
+governed by the admitted future: a retained representation is lawful only when every admitted
+receiver reading factors through it (`Foundation/Standing.lean::StandingLaw`). A local event
+boundary releases the occurrences declared event-local, and a separately declared departure may
+remove one occurrence earlier. When an event-local occurrence also carries an explicit return
+obligation, departure is refused until it returns, and closing the boundary is refused while that
+obligation remains. A successful return consumes that occurrence; it does not create a retained
+event archive. These copy, retention and departure labels are a local policy
+chart, not a general standing law: the hypotheses are the declared interface, obligations and
+future receiver family. Absent them, do not infer copyability, safe departure or a need for
+persistence from the Rust carrier type. This records the reusable relation isolated by the
+[August 14 audit](../research/records/2026-08-14_THE_CENSUS_DECAYED_THE_CYCLE_IS_BUILT_AND_THE_OPEN_GRADE_IS_THE_NONIDENTICAL_NEIGHBOURHOOD.md#6-corrections-to-the-record-this-audit-produced).
+The retired `holonic-engine::parameter` module encoded this relation in a standalone
+`ParameterLifecycle` carrier; that carrier is not an elementary object.
+
 ## The objects
 
 Each object comes with its dual. A reading is always a pairing of the two, and orientation exists
