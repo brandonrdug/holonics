@@ -7,6 +7,7 @@ import ElementaryHolonics.Holon.Restriction
 import ElementaryHolonics.Holon.Law
 import ElementaryHolonics.Holon.Conformance
 import ElementaryHolonics.Holon.Deposition
+import ElementaryHolonics.Holon.Reaction
 
 /-!
 # The Holon object
@@ -15,8 +16,8 @@ import ElementaryHolonics.Holon.Deposition
 is its law and ports — complex and connection (`Holon.Complex`), ports and power (`Holon.Port`),
 Dirac interconnection (`Holon.Dirac`), element relations and balances (`Holon.Element`),
 generators and clock jumps (`Holon.Generator`), restrictions (`Holon.Restriction`), the five laws
-(`Holon.Law`), the existing owners as instances (`Holon.Conformance`) and deposition under
-learning (`Holon.Deposition`). Namespace
+(`Holon.Law`), the existing owners as instances (`Holon.Conformance`) deposition under
+learning (`Holon.Deposition`) and the workless reaction (`Holon.Reaction`). Namespace
 `Soma.Holonics.HolonCore`. No axioms are added.
 -/
 
@@ -127,4 +128,17 @@ open Soma.Holonics.HolonCore
 #print axioms projectPassiveCongruence_of_passive
 #print axioms certified_committed_energy_bound
 #print axioms congruence_vs_eigen_witness
+#print axioms re_sum_antiConj
+#print axioms re_herm_skew
+#print axioms eq_zero_of_herm_zero
+#print axioms bilinear_reaction_workless_iff_zero
+#print axioms skewReaction_skew
+#print axioms skewReaction_workless
+#print axioms realify_skew
+#print axioms reaction_balance
+#print axioms skewPart_skew
+#print axioms skewPart_of_skew
+#print axioms skewPart_idem
+#print axioms skewPart_orthogonal
+#print axioms runaway_witness
 end Audit
