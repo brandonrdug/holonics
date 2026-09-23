@@ -140,7 +140,7 @@ The target is three maintained libraries on this branch, four when Brandon adds 
 | Package | Internal ownership | Existing sources to sort at R0 |
 |---|---|---|
 | `holonic-words` | Small portable exact word ring and packet/section ABI shared by host and device, with a `no_std` arithmetic kernel compiled from one source. It owns the layout and refusal words both sides must agree on. No driver or HNN dependency. | `holonic-words` plus the shared `soma-abi::section_layout_cuda` law and validated layout definitions. Its present dependency on `soma-abi`/`body` must be reversed or retired. |
-| `holonics` | Main library: typed ratio/remainder/inversion and their jets; geometric frames, pair and tube/tower charts; the one Holon law with composition, reception, restriction and deposition operators; a proposed receiver-relative `Holarchy` construction; equation extraction as a Holon boundary; and internal HNN whose complex-parametron chart is a physical implementation. No CUDA dependency. | `holonic-core`, `relational-geometry`, live `holonic-structure`, source-neutral and HNN parts of `holonic-engine`, `holonics-hna`, live `holonic-life`. |
+| `holonics` | Main library: typed ratio/remainder/inversion and jets; geometric frames, exterior cells, pair and tube/tower charts; the one Holon law with active receiving, composition, restriction and deposition; a proposed receiver-relative `Holarchy`; fluid, wave, spacetime and thermal constitutive instances; equation extraction as a Holon boundary; and internal HNN whose complex-parametron chart is a physical implementation. No CUDA dependency. | `holonic-core`, `relational-geometry`, live `holonic-structure`, source-neutral and HNN parts of `holonic-engine`, `holonics-hna`, live `holonic-life`. |
 | `holonics-cuda` | CUDA implementation of declared Holonics/HNN operations: driver, allocation, launch/section layout, resident kernels, checked receipts and transfer completion. It depends on `holonics` and `holonic-words` and implements the HNN execution port; it does not redefine the material or loss law. | `holonic-mount`, device ABI owners, engine `cuda_refine`, `resident_section`, `kernels/`, `hardware_cover`, `section_partition`. |
 | `holonics-apple` (later) | Apple silicon implementation behind the same typed execution port, with its own kernels and placement. Create it only on Brandon's Mac branch after its actual implementation is ready. | No Linux-branch move. |
 
@@ -171,9 +171,11 @@ all Holons.
 crates/holonics/src/
   lib.rs                 Holon and deliberate qualified public operations
   ratio/                 presentations, division/remainder, residue, partial inverse, lift, jet
-  geometry/              complex/frame/connection, phase carry, screw pair, tube/tower charts
-  holon/                 law, ports/Dirac, elements, generators, restrictions, composition
+  geometry/              complex/exterior/metric, frame/connection, carry, pair and tube charts
+  holon/                 law, ports/Dirac, receiver, elements, generators, restrictions, joins
+  receipt/               framed, clocked fields of received faces over declared partitions
   holarchy/              proposed compound Holon, receiver/grain views and gluing
+  physics/               fluid, wave, spacetime, heat/entropy instances of Holon law
   extraction/            foreign equations as Holon element/generator relations
   hnn/                   field, source moments, receiver, adjoint, session, parametron instance
 ```
@@ -188,13 +190,14 @@ future operation needs them.
 
 | Planned operation | Law and return | Current foothold / missing join |
 |---|---|---|
-| `Ratio::present`, `compare`, `compose`, `invert` | Carry the typed numerator/denominator pair; compare by cross multiplication where valid. Inversion has an explicit nonunit/zero fibre, not an invented reciprocal. | Lean `Objects/{Ratio,RatioBlock}`; Rust `RatioFace` and scoped `RatioFamily`. A general typed owner is owed. |
+| `Ratio::present`, `compare`, `compose`, `invert` | Carry the typed numerator/denominator pair; compare two received faces only after their sources, frames, clocks and units are joined. Cross-multiply where valid. Inversion has an explicit nonunit/zero fibre, not an invented reciprocal. | Lean `Objects/{Ratio,RatioBlock}`; Rust `RatioFace` and scoped `RatioFamily`. A general typed owner is owed. |
 | `div_rem`, `residue`, `lift`, `jet` | `a=bq+r` with divisor, quotient and remainder retained; modulo is the selected residue face, winding/carry the lift. Logarithmic and higher jets retain domain and branch. | Lean `Geometry/PhaseCarry`, `Millennium/Farey`, `Objects/Ratio`; Rust `winding::{Odometer,LockAddress}`. These laws are present but dispersed. |
 | `Generator::evaluate_with_remainder` | A series, recurrence or analytic source returns its exact/certified value **and its own tail or truncation defect**. This is not Euclidean remainder, although both refuse to erase what the finite reading omits. | η atlas and `RH/LogDerivativeRemainder` have source-specific realizations; a shared source/receiver port is owed where HNN or mathematical navigation consumes it. |
 | `Geometry::transport`, `screw_pair`, `tube`, `restrict` | Carry frame, connection, incidence, phase and clock. A pair chart supplies two motions and their relative jet; a tube chart supplies longitudinal transfer and transverse restriction with an explicit gluing defect. | Rust `relational_geometry::screw`, `winding`, core `restriction::{tube,tower}`; Lean `PhaseCarry`, `PairResonance`, `ContinuingTube`, `ContinuingTower`. |
-| `Holon::interconnect`, `contact`, `continue`, `receive` | Interconnect at ports with internal-power cancellation; bind pair geometry to contact material; carry one Holon through a tube; a receiver is another joined Holon. Return the composite law, face and unresolved fibre where appropriate. | `Holon::interconnect` and `PortHolon::interconnect` exist. Full Rust joining of pumps, named ports, complexes and restrictions is still refused or omitted; Lean `Holon/{Dirac,Law}` proves scoped port joins. |
+| `Holon::interconnect`, `contact`, `continue`, `receive` | Interconnect at ports with internal-power cancellation; bind pair geometry to contact material; carry one Holon through a tube. `receive` joins a source and receiving Holon and returns both changed participants, a typed face and its local receipt; receiver state/material/frame/clock are operands. | `Holon::interconnect` and `PortHolon::interconnect` exist. Full Rust joining of pumps, named ports, complexes and restrictions is still refused or omitted; Lean `Holon/{Dirac,Law}` proves scoped port joins. `Transport/ChangingReceiver` owns the moving-receiver term. |
 | `Holon::restrict`, `depose`, `pullback` | Restrict across grain with a commuting square or typed defect; only arrived covectors change the constitution; the adjoint returns through the full producing operands. | Core restriction/deposition and HNN adjoints exist at distinct scopes; their unified consuming call is owed. |
 | `Holarchy::assemble`, `view`, `count`, `refine` | Assemble a witnessed plurality as one Holon where its join closes. `view(receiver,grain,clock)` returns situated constituent faces, interface flux and unresolved classes. `count` requires a finite discrete receiver partition; otherwise return a typed unresolved reading. | New proposed owner. Existing Holon composition, receiver atlas, tower and future-sufficient quotient provide its ingredients; no current Rust `Holarchy` type has this contract. |
+| `Holon::fluid_flux`, `stress_energy`, `observer_current`, `entropy_balance`; wave `propagate`, `interfere` | A physical specialization carries mass/momentum/energy, stress traction, heat/entropy currents and the actual constitutive and metric/clock law. A spacetime receiver contracts the whole stress-energy tensor; waves join coherent amplitudes before an intensity face is read. | Fluid guide, `EinsteinFluidDynamics`, `ObserverBoundaryCurrent`, `PortEnergyHeat`, finite `FluidReceiverClosure`, `NavierStokesLambCurrentCell`, phase/scattering owners. Pair slip and pumps are only declared specializations; a general native fluid/wave/Einstein realization remains owed. |
 
 The root exports the central `Holon` type and qualified operations, not a flat engine-wide
 glob. `holonics::geometry`, `holonics::structure` and `holonics::hna` stay as audited
@@ -214,6 +217,24 @@ with units, partition/overlap conditions and clock; they are not immutable field
 Holarchy. Under a certified finite disjoint refinement, counts have a stated relation; with
 overlap, changed receivers or non-finite fibres, that relation requires a correction or remains
 unresolved. The whole itself may receive, act, and compose with other Holarchies.
+
+**Reception is a Holon interaction; ratio is its comparative reading.** The receiving Holon
+has its own material, current, frame, clock and possible next state. At an admitted contact,
+`I_C(|H_S⟩,|H_R⟩)=(|H'_S⟩,|H'_R⟩,f_R)`; `f_R` is the face, not the receiver object.
+A `Receipt` carries the source and receiver identities, region/interface, transported frame,
+clock/tick, typed face and unresolved fibre. `Ratio::between` compares two such faces after
+their declared common transport, retaining both operands and any winding. A moving receiver
+contributes its own variation (`D_Rρ·X_R` in addition to `D_Sρ·X_S` and explicit clock change).
+This places `holon::receiver`, `ratio` and `receipt` on one API surface without reducing a
+receiver to a scalar ratio.
+
+The notation must be derived from these same typed objects: `|H⟩_F` presents a Holon in a
+frame; `⟨r|` is a participating receiving port; `⟨r|H⟩` is the returned face; `Ĝ_(F'←F)`
+transports the complete source/receiver axes; contraction joins an upper ket port to a lower
+bra port through the declared pairing. A diagram line is a port/current, a vertex its
+constitutive interaction, and a loop a declared circuit with holonomy/trace. Rendering the
+notation or diagram reads the operator graph; a glyph or projected crossing never creates
+an interaction that the incidence and constitution do not contain.
 
 The HNN execution port is defined at its surviving consuming call, including the forward
 field, complete geometry/feature pullback, material return, source order, receiving phase and
@@ -250,7 +271,9 @@ Refine that root by **operator**, coupled to the Rust calls above:
 | `Holonics.Ratio` | `Objects/{Ratio,RatioPhase,RatioBlock}` already prove undivided presentations, nonunit/zero lift fibres, logarithmic derivative, matrix/projective ratio and jets. Bring the general quotient/remainder/carry and partial-inversion interface from `Geometry/PhaseCarry` and the Euclidean/Farey laws into one import surface; keep source-specific analytic remainders with their source. |
 | `Holonics.Geometry` | Oriented complex, frame/connection, phase lift, screw pair, tube/tower charts. Reuse `Geometry/{PhaseCarry,PairResonance}`, `Transport/{HelicalPairInteraction,ContinuingTube}`, `Foundation/ContinuingTower` and Hodge/exterior owners. Keep geometric kinematics distinct from a Holon's material contact law. |
 | `Holonics.Holon` | Join the occurrence/interface/receiver operations in `Foundation/Holon` with the port/material/interconnection law in `Holon/{Port,Dirac,Element,Generator,Restriction,Law}`. Prove the full joined complex, pumps, clocks and restrictions under stated hypotheses; the current port theorem and native method have narrower scope. |
+| `Holonics.Holon.Receiver` and `Holonics.Receipt` | A receiver is a participating Holon, with its own state and clock. Reuse `Foundation/Receiver`, `Transport/ChangingReceiver`, `Objects/Pairing` and `Foundation/Holon.mapReceiver`; prove the joint received return and moving-receiver variation before deriving typed ratio/receipt readings. The receipt retains frame, interface and unresolved fibre. |
 | `Holonics.Holarchy` (proposed) | Define a Holon with a witnessed plural decomposition and receiver/grain-indexed views. Prove interconnection closure where supplied, internal-port cancellation, compatible refinement and conditional count laws; exhibit two receivers with different counts of the same continuing whole. Retain overlap/gluing defects and preimage fibres. |
+| `Holonics.Physics` (instances) | Fluid, wave, spacetime and thermal laws specialize Holon incidence, transport and element relations. Keep mass/momentum/energy and stress traction, pressure constraint/Hodge projection, complex-bilinear and conducting-fluid signs, heat/entropy flux and relaxation, phase superposition, propagation and boundary energy. Join `EinsteinFluidDynamics` and `ObserverBoundaryCurrent` under their stated field/Bianchi/metric hypotheses; preserve the abstract-versus-physical realization boundary. Use the finite checked owners and name continuum/discretization obligations. |
 | `Holonics.HNN` | Formal specializations of the same Holon operators: coupled field, source moments, complete variation, deposition return and complex-parametron storage/pump/lock chart. It imports the object owners; the physical parametron is not a foundation import. |
 
 The September 23 Millennium work supplies concrete tests of this placement. `Computation/CertifiedWindingRoute`
@@ -316,10 +339,93 @@ does not enter the runtime.
 
 Before retiring an old package, verify a source-neutral `holonics` build without its HNN
 feature, a host/reference HNN build, CUDA owner tests on the available card, an all-target
-public/workbench check, the
-two Lean library targets and the changed source-to-Lean citation/link scan. Inspect a saved
+public/workbench check, both Lean library targets and the changed source-to-Lean citation/link
+scan. Inspect a saved
 session through the new public path when one is named as retained. Record the specific commands
 and results in the census; a build of an intermediate move is not the completed boundary check.
+
+### 3.5 Physical and receiving battle tests
+
+The [fluid construction](../HOLONIC_FLUID_CONSTRUCTION.md) is the physics contract here. A pair
+slip `J` measures relative kinematics at an admitted interface, and a pump supplies active
+work; neither alone gives Euler advection, a pressure constraint, viscous stress, heat or a
+continuum limit. A local pair-contact picture can realize two-sided face exchange, but a
+universal reduction of every fluid interaction to toroidal/helical pairs is an open
+reconstruction claim. It would need a decoder preserving bulk mass/momentum/energy balances,
+stress/pressure, circulation, phase, unresolved modes and every admitted receiving face.
+
+| Test | Required returned operation | Current scope / gap |
+|---|---|---|
+| Reflect a square and a cube, then join adjacent cells | Oriented boundaries and `∂²=0`; transported normals, signed area/volume from orientation plus a declared metric; Stokes pairing; common edge/face flux cancels once with opposite hands. | `CellComplex`, `Geometry/ExteriorBoundary`, material-polygon and two-cell Lamb-current theorems give pieces. The generic embedding-to-exterior-measure and full Holon join remain to be connected. |
+| Interfere and propagate two waves | Combine complex amplitudes with connection/phase before the receiver reads intensity; `1+(-1)=0` must not become `|1|²+|-1|²=2`. Advance under a supplied wave operator, material, boundary condition and clock; return energy/flux and propagation defect. | Phase-carrier and finite scattering/heat owners are bounded examples. HNN wave sections do not by themselves establish a physical continuum wave solver. |
+| Split a control volume for Euler/NS | Per oriented face return mass flux `ρu·n`, momentum transport `ρu(u·n)` and traction `σn`; cell storage plus outward flux equals source. Supply `σ=-pI+2μ Def u+λ(div u)I`, incompressibility/pressure solve where admitted, and viscous work to internal heat. Rejoin faces and compare the full-volume return. | `NavierStokesLambCurrentCell` checks scoped cell balance/gluing; `FluidReceiverClosure` retains hidden feedback. A native source-conforming fluid solver and its continuum/discretization scope remain open. |
+| Complex fluid versus a real field's Fourier chart | For `U=a+ib`, retain `B(a,a)-B(b,b)` and both cross terms; distinguish that physical complex-bilinear law from conjugate Fourier coefficients of one real velocity and from MHD's different induction sign. | `Physics/ConductiveFluidReflection` and the fluid guide own the finite/sign distinction. An imaginary component is not a magnetic field by notation alone. |
+| Move the receiver and change grain | Return both participants and local receipts; a moving reading includes the receiver-rate term. A Holarchy's count can change with a certified receiver/grain partition while shared physical flux and conditional invariants continue correctly. Render bra/ket, transport arrows and loop diagrams from the same typed operator graph. | `Transport/ChangingReceiver` and receiver-holarchy laws are starting owners. The joint native receiving return and Holarchy operator are owed. |
+
+Passing finite topology and face tests licenses those stated operations, not a general fluid or
+wave simulation. A simulation return additionally names its source equation, constitutive
+law, boundary/initial conditions, time advance, numerical/exact remainder and measured
+receiver. Preserve unresolved stress or hidden modes rather than replacing them with a
+pairwise metaphor.
+
+### 3.6 Spacetime, heat and plural-clock information return
+
+The Einstein/fluid lift is an owner, not an analogy to append after the Newtonian tests.
+`Millennium/NavierStokesCurvedTransport.EinsteinFluidDynamics` supplies `g`, `G`, a constituted
+stress-energy `T`, covariant divergence, `G+Λg=κT`, contracted Bianchi and metric
+compatibility; for `κ≠0` it proves `∇·T=0`, then every declared receiver reads that return.
+`Physics/ObserverBoundaryCurrent` reads `j_U^μ=−T^{μν}U_ν` with divergence
+`−(∇·T)·U−T:∇U`; the observer's acceleration/deformation is therefore a physical term in
+the received energy current. `Physics/ReceiverStressEnergy` has finite observer/boosted
+stress readings. The metric, curvature and fluid-plus-thermal constitution must be constructed
+for a nontrivial native realization; the existing flat vacuum witness does not do that.
+`HolonicCurvedArcEinstein.nonzeroCoupling_is_not_universalArcRatio` also rules out promoting
+the depth-two arc/differential receiver ratio to a universal Einstein coupling.
+
+A complete thermal port carries internal energy, heat flux `q`, entropy current `s`,
+temperature/inverse-temperature and material relaxation beside mechanical stress. It returns
+the first-law storage/boundary/work balance and a separately proved entropy-production law
+`∂_τ s + div j_s = σ_s`, `σ_s≥0` under its constitutive hypotheses. Viscous/contact work
+can enter internal heat without creating or destroying total stress-energy. The finite
+`Physics/PortEnergyHeat` balance, exact Rust `DiffusionReceipt::energy_balance`,
+`Physics/TwoCellEntropyTransport` and oriented current in
+`Millennium/HolonicEntropyActionInduction` supply different pieces. The two-cell proof uses
+dimensionless masses and a stipulated flux; it does not yet identify physical heat or force.
+The heat cross-current in `Millennium/HolonicEntropyHeatCurrent` is an exterior current with
+a sourced heat equation, not automatically Gibbs entropy. A relativistic diffusion instance
+also states its relaxation/causality law rather than treating the parabolic limit as a
+finite-speed signal.
+
+Keep distinct addressed clock lines: source/generator phase, receiving proper time,
+fluid/world-tube time, thermal relaxation and observation ticks. Their rate ratios require
+unit and chart maps; a joint multi-parameter evolution needs compatible transport or a
+retained commutator/holonomy defect. The four-axis exterior current in
+`HolonicEntropyActionInduction` is a checked alternating two-current, not a proof of four
+physical timelike dimensions. The time/entropy chain crossing remains open in the tube
+contract. For a moving received probability population and reference, the cross-entropy
+rate includes **both** `ṗ` and `q̇` and the moving aperture's normalization and boundary
+flux: for `C(p,q)=−Σ p_i log q_i`, `dC/dλ=−Σ ṗ_i log q_i−Σ p_i q̇_i/q_i`
+along a declared common parameter `λ`. Each dot includes its source/receiver clock-rate map;
+moving support needs a one-sided/measure transport. Its local clock and support stratum belong
+to the receipt.
+
+Cross-entropy can have a **literal physical effect** when the compared population is an
+actual physical ensemble and its returned covector enters a declared material/port law.
+`Physics/InformationDifference` proves that for a canonical Gibbs reference on the same
+energy state space, `F(p)−F(q)=k_B T·KL(p||q)` after the thermal unit is supplied; it also
+proves equal scalar cross-entropy can conceal different later physical currents.
+`Foundation/InformationReceiver.PhysicalCrossEntropyOccurrence` retains the addressed
+crossing/current before its scalar projection. The implementation contract is to pull the
+full ratio covector back to a constituted effort, account for its work/heat in stress-energy
+and entropy production, and show the receiver's changed state. A bare cross-entropy number,
+or bits multiplied by a temperature without that source/constitutive map, is only a face.
+
+Three extra acceptance cases follow: (1) a moving/boosted observer reads the same transported
+stress-energy and its deformation term; (2) two thermal cells exchange heat with total-energy
+balance and source-qualified nonnegative entropy production; (3) two independent clock
+parametrizations give the same transported cross-entropy/material return when the clock square
+commutes, or an explicit defect when it does not. These checks do not assert that the present
+Lean interfaces already solve coupled Einstein-fluid evolution.
 
 ## 4. Order of work
 

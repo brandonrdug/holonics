@@ -58,6 +58,9 @@ laws and HNN**, organized by elementary object rather than acting as a facade:
 
 That is three maintained Rust libraries now and four after Apple. The main library builds and
 runs its host/reference HNN without CUDA; a caller supplies a device executor when needed.
+Its physical instances must carry fluid stress/pressure, wave propagation, spacetime
+stress-energy, heat/entropy currents and the active receiver law with their stated hypotheses;
+pair slip and pumps alone do not supply those equations.
 The current workbench remains an application package while its deployment boundary is
 inventoried. Lean will become one top-level `lean/` Lake package with a public `Holonics`
 library and dependent `HolonicsResearch` library. Those names describe the **target**; the

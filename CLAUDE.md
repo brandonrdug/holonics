@@ -26,6 +26,9 @@ namespace are separate checked phases.
 The proposed internal operator order is ratio/remainder/inversion, geometric transport,
 the Holon law and its pair/tube operations, receiver-relative Holarchy, then HNN;
 the complex parametron is an HNN physical chart, not a prerequisite of every Holon.
+The main library's fluid, wave, Einstein/stress-energy and thermal instances retain their
+constitutive equations, clocks, heat/entropy balances and participating receiver. Cross-entropy
+acts physically only through a stated material/port return; its scalar face is not that law.
 
 [definition] Each moved operator retains its typed source and receiver, forward law, complete
 variation, material/clock/frame hypotheses, wire face and consuming call. Account for the
