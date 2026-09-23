@@ -75,6 +75,10 @@ only after owner transfer, seven unresolved. The fold is an architecture compari
 theorem owners stay; its exact theorem names and hypotheses must reach `HNN_FORMULA` before the
 narrative is retired. The unresolved intrinsic-profile proposal needs a field-by-field map to
 the finalized Holon, Receiver and Holarchy contracts.
+The [ninth cohort](census/RECORDS_NINTH_R0.tsv) (September 1–3) adds 60 **keep**.
+Across 540 audited records: 476 keep, 57 fold only after owner transfer, seven unresolved.
+The cohort includes distinct shell/analysis proofs, HNA negative controls and staged releases;
+DB0 retains its unique de Bruijn source and owner map even though later records prove some steps.
 
 The document table records paths, line counts, live incoming source count and a conservative
 working disposition. Its scan recognizes Markdown links and explicit path strings in common
