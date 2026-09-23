@@ -33,7 +33,7 @@ of the categorical paper's current `main.typ`. `.opencode/` contains local sessi
 |---|---|---|
 | Rust owners, examples, applications and accelerators | [Rust R0](census/RUST_R0.tsv): 1,825 tracked Rust/CUDA source paths; [Soma/R2 owner audit](census/SOMA_R0.tsv) | Current static caller signals and historical cohorts are leads. Module references and in-repo callers must be checked through re-exports and target builds. |
 | Lean modules and foundation import closure | [Lean R0](census/LEAN_R0.tsv): 1,399 package modules plus three top-level roots | Import count cannot retire a distinct theorem or source-specific research result. Focused Core, Ratio and MomentStorage targets pass at the captured worktree. |
-| Documents, records and archive | [Docs R0](census/DOCS_R0.tsv), [Archive R0](census/ARCHIVE_R0.tsv), [archived plans](census/ARCHIVE_PLANS_R0.tsv), [small archive trees](census/ARCHIVE_SMALL_R0.tsv) | Static live inbound links only. An uncited record may be the sole statement of a result; an archive citation needs a revision replacement before removal. |
+| Documents, records and archive | [Docs R0](census/DOCS_R0.tsv), [Archive R0](census/ARCHIVE_R0.tsv), [archived plans](census/ARCHIVE_PLANS_R0.tsv), [small archive trees](census/ARCHIVE_SMALL_R0.tsv), [reference snapshots](census/ARCHIVE_REFERENCE_R0.tsv) | Static live inbound links only. An uncited record may be the sole statement of a result; an archive citation needs a revision replacement before removal. |
 | Issues | [Issue R0 table](census/ISSUES_R0.tsv): 76 issues (34 open, 42 closed) | Claude completed the issue reset at `925b94b8`; §5 of the restructure plan lists the object/retirement dispositions and #63–#76 tracking. Historical closed issues outside that map keep their issue-body context. |
 
 The first claim-level record audit is [RECORDS_EARLY_R0.tsv](census/RECORDS_EARLY_R0.tsv):
@@ -93,6 +93,13 @@ a tooling script used as source data, and unique measured/experiment receipts. N
 can be removed merely because they live under `archive/`. The first narrow fold candidate is
 `archive/tooling/README.md`: replace its one `tools/README.md` link with the current repository
 guide and an immutable revision coordinate, then retire only that README.
+The [reference-snapshot audit](census/ARCHIVE_REFERENCE_R0.tsv) covers 345 tracked files,
+26 inbound sources across 13 linked paths, and dynamic corpus readers missed by the link
+scan. Holobrochos and pureholonics source trees remain live fixtures; 132 engine-snapshot
+files lack a current byte match and remain unresolved. `archive/reference/README.md` is a
+narrow fold candidate only after its source map reaches `docs/REPOSITORY.md` and the two
+`THE_HOLOBROCHOS_SPINE.md` citations are replaced with current guide and immutable-source
+coordinates. Four ignored local transcript files were observed and left untouched.
 
 The first eight historical “zero-reference” engine modules were inspected at current source:
 `mode`, `observation_ecology`, `prime_ecology`, `local_star`, `field_atlas`,
