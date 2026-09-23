@@ -63,6 +63,12 @@ and three **fold** candidates: two superseded research schedules and one umbrell
 inference definition. Across 360 audited records: 298 keep, 56 fold only after
 owner transfer, six unresolved. The GeneralHalving theorem and distinct formal
 owners cited by those schedules remain in their Lean sources.
+The [seventh cohort](census/RECORDS_SEVENTH_R0.tsv) (August 23–26) adds 60 **keep**:
+the records retain distinct formal returns, admission stages, measured failures and corrections,
+or L3–L6 receipts. Across 420 audited records: 358 keep, 56 fold only after owner transfer,
+six unresolved. Row 370's Athena admission interpretation was withdrawn by its own
+counterexample, but its measured source and apparatus receipts remain evidence; retain the
+record and transfer only that corrected interpretation.
 
 The document table records paths, line counts, live incoming source count and a conservative
 working disposition. Its scan recognizes Markdown links and explicit path strings in common
