@@ -87,6 +87,15 @@ theorem sibling_gap (cell : Cell) :
   simp [rightChild, leftChild]
   ring
 
+/-- The two child faces return an exact total-width reading of their
+parent's generator. This is a constitutive scale identity, not a sampled
+or externally supplied bound. -/
+theorem sibling_total_width (cell : Cell) :
+    (leftChild cell).width + (rightChild cell).width =
+      (2 / 3 : ℚ) * cell.width := by
+  simp [leftChild, rightChild, Cell.width]
+  ring
+
 /-- Positive parent width makes the two child cells strictly separated. -/
 theorem siblings_separated {cell : Cell} (positive : cell.Positive) :
     (leftChild cell).upper < (rightChild cell).lower := by
@@ -164,6 +173,7 @@ section Audit
 
 #print axioms child_width
 #print axioms siblings_separated
+#print axioms sibling_total_width
 #print axioms descend_width
 #print axioms contains_descend
 #print axioms polarized_descendants_are_separated

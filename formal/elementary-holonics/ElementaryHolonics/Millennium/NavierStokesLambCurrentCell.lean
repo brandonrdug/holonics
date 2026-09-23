@@ -101,6 +101,30 @@ theorem openPeriodicSolutionOn_cellCurrent_balance
   exact smoothSolutionOn_cellCurrent_balance
     (solution.toClosedInterior hS hST).toSmoothSolutionOn ht0 htS i
 
+/-- Two local Lamb-current balances glue across one shared face.  The traces are taken from
+the same component of the actual advective/diffusive flux; the two cells use opposite outward
+orientations.  The local balances may be supplied by translated instances of
+`smoothSolutionOn_cellCurrent_balance`; smoothness is therefore the same open-slab hypothesis
+as that theorem, and no terminal trace is asserted. -/
+theorem smoothSolutionOn_twoCell_sharedFace_gluing
+    {T nu : ℝ} {initial : InitialVelocity} {force velocity : VelocityField}
+    {pressure : PressureField}
+    (_solution : SmoothSolutionOn T nu initial force velocity pressure)
+    {t : ℝ} (ht0 : 0 < t) (htT : t < T) (i : Fin 3)
+    (sharedTrace : InitialVelocity → ℝ)
+    (storageL storageR exteriorL exteriorR sourceL sourceR
+      outwardL outwardR : ℝ)
+    (htraceL : outwardL = sharedTrace (currentComponentFlux nu velocity t i))
+    (htraceR : outwardR = sharedTrace (currentComponentFlux nu velocity t i))
+    (hlocalL : storageL + exteriorL + outwardL = sourceL)
+    (hlocalR : storageR + exteriorR - outwardR = sourceR) :
+    storageL + storageR + exteriorL + exteriorR = sourceL + sourceR := by
+  have _hslab : 0 < t ∧ t < T := ⟨ht0, htT⟩
+  rw [htraceL] at hlocalL
+  rw [htraceR] at hlocalR
+  linarith
+
 #print axioms smoothSolutionOn_cellCurrent_hasDerivAt
 #print axioms openPeriodicSolutionOn_cellCurrent_balance
+#print axioms smoothSolutionOn_twoCell_sharedFace_gluing
 end Soma.Holonics.Millennium.NavierStokesLambCurrentCell

@@ -506,6 +506,21 @@ theorem finrank_harmonic_metric_free (C' : WeightedComplex p q r) (hd₀ : C'.d�
   rw [hexact, hcocycles] at h
   omega
 
+/-- [proved-derived; formal-checked] Harmonic representatives transport across a linear
+isomorphism whenever the two declared Laplacians are intertwined. This is the exact operator
+condition needed for naturality of the harmonic receiver; metric preservation and commutation
+with the differentials are useful sufficient data for establishing this condition, but are not
+silently inferred from a cochain map alone. -/
+theorem harmonic_transport_of_laplacian_intertwining
+    (C' : WeightedComplex p q r)
+    (e : (Fin q → ℚ) ≃ₗ[ℚ] (Fin q → ℚ))
+    (hintertwines : ∀ x, C'.laplacian *ᵥ e x = e (C.laplacian *ᵥ x))
+    (x : Fin q → ℚ) :
+    x ∈ C.harmonic ↔ e x ∈ C'.harmonic := by
+  change C.laplacian *ᵥ x = 0 ↔ C'.laplacian *ᵥ e x = 0
+  rw [hintertwines]
+  exact e.map_eq_zero_iff.symm
+
 end WeightedComplex
 
 /-! ## The unit metric is one declaration among others -/
@@ -530,6 +545,80 @@ theorem unitMetric_codiff₀ (d₀ : Matrix (Fin q) (Fin p) ℚ) (d₁ : Matrix 
     (dd : d₁ * d₀ = 0) : (unitMetric d₀ d₁ dd).codiff₀ = d₀ᵀ := by
   funext i j
   simp [unitMetric, WeightedComplex.codiff₀, Matrix.transpose_apply]
+
+/-! ## A finite warning: chain transport need not preserve harmonic representatives -/
+
+namespace ShearCounterexample
+
+/-- The two-term complex whose only nonzero differential sends `1` to `(1,0)`. -/
+def d₀ : Matrix (Fin 2) (Fin 1) ℚ := !![1; 0]
+
+def d₁ : Matrix (Fin 0) (Fin 2) ℚ := 0
+
+theorem dd : d₁ * d₀ = 0 := by
+  ext i j
+  fin_cases i
+
+def complex : WeightedComplex 1 2 0 := unitMetric d₀ d₁ dd
+
+/-- The shear fixes the exact axis and adds the second coordinate into the first. -/
+def shear (v : Fin 2 → ℚ) : Fin 2 → ℚ := ![v 0 + v 1, v 1]
+
+/-- The explicit inverse shear. -/
+def unshear (v : Fin 2 → ℚ) : Fin 2 → ℚ := ![v 0 - v 1, v 1]
+
+theorem unshear_shear (v : Fin 2 → ℚ) : unshear (shear v) = v := by
+  ext i
+  fin_cases i <;> simp [unshear, shear]
+
+theorem shear_unshear (v : Fin 2 → ℚ) : shear (unshear v) = v := by
+  ext i
+  fin_cases i <;> simp [unshear, shear]
+
+/-- The shear is a chain automorphism: it fixes the image of `d₀`; `d₁` has zero target. -/
+theorem shear_commutes_with_d₀ (x : Fin 1 → ℚ) :
+    shear (d₀ *ᵥ x) = d₀ *ᵥ x := by
+  ext i
+  fin_cases i <;> simp [shear, d₀, Matrix.mulVec, dotProduct]
+
+/-- The nonzero harmonic vector is sent to a vector outside the harmonic subspace, despite
+the chain automorphism above. -/
+theorem shear_moves_harmonic_outside :
+    (![0, 1] : Fin 2 → ℚ) ∈ complex.harmonic ∧
+      shear (![0, 1] : Fin 2 → ℚ) ∉ complex.harmonic := by
+  constructor
+  · rw [WeightedComplex.mem_harmonic_iff]
+    constructor
+    · have hcod : complex.codiff₀ = d₀ᵀ := by
+        simpa [complex] using unitMetric_codiff₀ d₀ d₁ dd
+      rw [hcod]
+      ext i
+      fin_cases i
+      norm_num [Matrix.mulVec, dotProduct, d₀]
+    · simp
+  · rw [WeightedComplex.mem_harmonic_iff]
+    intro h
+    have hcodiff := h.1
+    have hcod : complex.codiff₀ = d₀ᵀ := by
+      simpa [complex] using unitMetric_codiff₀ d₀ d₁ dd
+    rw [hcod] at hcodiff
+    have hs : shear (![0, 1] : Fin 2 → ℚ) = ![1, 1] := by
+      norm_num [shear]
+    rw [hs] at hcodiff
+    have hfirst : (d₀ᵀ *ᵥ ![1, 1]) 0 = 1 := by
+      norm_num [Matrix.mulVec, dotProduct, d₀]
+    have := congrArg (fun v : Fin 1 → ℚ => v 0) hcodiff
+    rw [hfirst] at this
+    norm_num at this
+
+/-- The two vectors differ by an exact cochain, so they define the same cohomology class. -/
+theorem shear_difference_is_exact :
+    shear (![0, 1] : Fin 2 → ℚ) - ![0, 1] ∈ complex.exactPart := by
+  refine ⟨![1], ?_⟩
+  ext i
+  fin_cases i <;> norm_num [shear, complex, unitMetric, d₀, Matrix.mulVec, dotProduct]
+
+end ShearCounterexample
 
 end Soma.Holonics.Foundation.HodgeReceiver
 
