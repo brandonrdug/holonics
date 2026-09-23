@@ -48,12 +48,26 @@ chart. The Lean foundation is `ElementaryHolonics.Framework.HolonObject` (`Holon
 Generator,Restriction,Law,Conformance}`); the Rust core (`holonic-core`) mirrors it and every native owner
 implements it.
 
-[definition] Those Lean and Rust paths are the **current** owners. The
-[repository restructure](plans/THE_REPOSITORY_RESTRUCTURE.md) preserves this Holon law while
-moving its source-neutral Rust facets and geometry into the substantive main `holonics` library
-and curating the Lean
-`Holonics` import closure. An owner name or namespace move supplies no new theorem or native
-operator by itself.
+<a id="operator-contract"></a>
+[definition] **Operator contract** (finalized September 23, [restructure §0](plans/THE_REPOSITORY_RESTRUCTURE.md#0-final-decisions)).
+Each object's operations and their owners are listed below. The *current* column is the
+checked code today. The *target* column is its home in the main `holonics` library and the
+Lean `Holonics` library after the restructure. A target name is not importable until its move
+is verified. Each move updates this table in the same commit.
+
+| Object | Operations | Current owners | Target |
+|---|---|---|---|
+| Ratio | `present`, `compare`, `compose`, `invert` (nonunit fibre), `div_rem`, `residue`, `lift`, `jet`, `log` with branch | Lean `Objects/{Ratio,RatioPhase,RatioBlock}`, `Foundation/TransportLift`, `Geometry/PhaseCarry`, `Millennium/Farey`; Rust `relational-geometry::winding::{Odometer,LockAddress}`, `holonic-words` rings, engine `exponentiated_ratio::RatioFamily`, `exact_contact::RatioFace` | `holonics::ratio`; `Holonics.Ratio` |
+| Complex, frame, clock, carry | `boundary`, `transport`, `transport_rate`, `join_axes` (commuting square or defect), phase lift | Lean `Holon/Complex`, `Geometry/*`; Rust `holonic-core::{complex,generator::Clock}`, `relational-geometry::{exact,model}` | `holonics::geometry`; `Holonics.Geometry` |
+| Pair and tube charts | `screw_pair` (two motions, relative jet), `tube` (longitudinal transfer), `restrict` (transverse, gluing unique/plural/obstructed) | Lean `Transport/{HelicalPairInteraction,ContinuingTube}`, `Geometry/PairResonance`, `Foundation/{ContinuingTower,IwasawaTower}`; Rust `relational-geometry::screw`, `holonic-core::restriction::{tube,tower}` | `holonics::geometry`; `Holonics.Geometry` |
+| Holon | `advance` (state, bond, energy balance), `interconnect -> Holarchy`, `contact` (pair geometry + contact material), `continue` (through a tube), `restrict`, `depose`, `pullback` | Lean `Holon/{Law,Port,Dirac,Element,Generator,Restriction,Deposition,Reaction,Cayley}`, `Foundation/{Holon,Standing}`; Rust `holonic-core::{holon,law,port,dirac,element,generator,restriction,deposition,reaction}`, engine `holonic_interaction`, `holonic_chain`, `standing` | `holonics::holon`; `Holonics.Holon` |
+| Receiver and receipt | `interact`/`receive -> InteractionReturn` (both participants' next states, face, receipt, boundary currents, power balance, unresolved fibre); `Ratio::between(receipts)` | Lean `Foundation/Receiver`, `Transport/ChangingReceiver`, `Objects/Pairing`; Rust `HolonLaw::receive` (passive coholon reading, the zero-storage specialization), `law/receiver.rs`, `PresentationCost`, `landauer`; guide [RECEIVER_HOLARCHY](RECEIVER_HOLARCHY.md) | `holonics::receiver`; `Holonics.Receiver` |
+| Holarchy | `whole`, `view(receiver, grain, clock)`, `count` (certified finite partition only), `refine` | none as one object; ingredients are `Holon::interconnect`, the receiver atlas, the tower and the future-sufficient quotient | `holonics::holarchy`; `Holonics.Holarchy` (construction K1) |
+| Physical instances | fluid `face_flux`/`advance`; wave `propagate`/`interfere`; thermal `exchange`/`diffuse`/`entropy_production`; spacetime `einstein_residual`/`observer_current`; information `apply` | Lean `Physics/*`, `Millennium/{NavierStokesLambCurrentCell,NavierStokesCurvedTransport}`; Rust `diffusion` | `holonics::physics`; `Holonics.Physics` (construction K3–K4) |
+| HNN | field law, source moments, adjoint, deposition return, execution port | engine `native_ecology/constitutive_fibre/field/**`, `holonics-hna` `native/**` (device-resident) | law and port in `holonics::hnn`; resident realization in `holonics-cuda::hnn`; `Holonics.HNN` |
+
+The restructure's detailed contracts, types and acceptance tests are in
+[§3.1 and §3.7 of the plan](plans/THE_REPOSITORY_RESTRUCTURE.md#31-rust-the-main-holonics-library-owns-the-construction).
 
 ## The objects
 
@@ -234,6 +248,18 @@ through deposition (Exner) and the carved constitution directs the flow. The cha
 
 ### 9. Ratio
 
+[definition] **A ratio is "one per two" before it is a number.** `1/2` means one per two, and in
+the same chart the float `0.5` names the same relation. The ratio keeps its two comparands, their
+units and its presentation. Its arithmetic includes the operations that reading `0.5` erases:
+- **Division with remainder** `a=bq+r` keeps divisor, quotient and remainder. Modulo is the
+  residue face, and winding/carry is the lift. `Millennium/Farey` and `Geometry/PhaseCarry` own
+  these today.
+- **Inversion** keeps its nonunit/zero fibre instead of inventing a reciprocal
+  (`Foundation/TransportLift`).
+- **Jets** are its rates of change: a ratio of differences is a derivative.
+
+Exactness is the default; nothing here is an approximation that destroys information.
+
 [definition] A **ratio** compares two Holons, two coholons or two transports and always has
 types/units: it says "this happens as it relates to that happening". It is carried as the undivided
 pair (`CrossRatio`), or as a lift fibre when the denominator is not a unit (`TransportLift`). Every
@@ -269,6 +295,37 @@ gravitational redshift does). Each region reports the distribution and variabili
 over its own ticks — as heart-rate variability reads a cardiac oscillator's tick intervals — joined
 to the flux measured along its interface. Owners: `PresentationCost` (Pareto frontier; energy and
 erasure axes owed), `landauer.rs` (erasure only), `SituatedInformationRate`, `hardware_cover`.
+
+[definition] **To receive is to measure and compare.** The receiver is a *role* played by a
+participating Holon at a port. It has its own material, current, frame, clock and next state.
+Reception is an interaction:
+`I_C(|H_S⟩,|H_R⟩)=(|H'_S⟩,|H'_R⟩,f_R)`
+It changes both participants and returns the face `f_R` with its receipt: source, receiver,
+locus, frame, clock, grain and unresolved fibre. Every returned value is received this way, and
+is dilated to what witnessed it. A moving receiver adds its own variation term
+(`D_Rρ·X_R` beside `D_Sρ·X_S`). `Ratio::between` compares two receipts only after their common
+transport, keeping both operands and the winding. The present `HolonLaw::receive` is the passive,
+zero-storage specialization of this operation.
+
+### 11. Holarchy
+
+[definition] A **Holarchy** is a Holon perceived as a compound of distinct Holons, always in a
+context (Brandon, September 23). It is what `Holon::interconnect` returns: the joined whole
+together with its retained constituents, incidence, gluing and restrictions. When the join does not
+close, `interconnect` returns a typed gluing defect. Its constituent family may be implicit or
+recursively generated, carried by a constituent generator.
+
+[definition] **A Holarchy's quantities belong to the receiver.** It has no fixed count, mass or
+category. `view(receiver, grain, clock)` returns the constituent faces, interface flux and
+unresolved classes that the receiver distinguishes at that grain. One grain counts continents,
+another islands, another molecules: a telescoping coarse-graining. `count` exists only when the
+receiver certifies a finite disjoint partition. Overlap, a changed receiver or a non-finite fibre
+needs a correction or stays unresolved. `refine` passes between grains through the tower's
+restrictions. A shared physical flux cancels once on every joined face, whatever the grain
+(`smoothSolutionOn_twoCell_sharedFace_gluing`). The whole can receive, act and compose with other
+Holarchies. Formal ingredients are `Foundation/{HodgeReceiver,IwasawaTower,FractalPacking}`: a
+count can be stable while its representative changes, and a quotient's cardinality depends on the
+restriction.
 
 ## Keys, locks and navigation
 

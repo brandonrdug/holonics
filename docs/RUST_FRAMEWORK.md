@@ -10,7 +10,7 @@ compatibility.
 turns this package into the substantive owner of the Holon law/geometry and the
 backend-neutral HNN law and port; `holonics-cuda` receives the resident HNN and later
 `holonics-apple` implements the same port. `hna` paths are replaced, not forwarded, when their
-callers move; wire decoders stay only for saved artifacts Brandon names. Target package names
+callers move; every old save-format reader goes. Target package names
 are not yet importable.
 
 [definition] The [HNN composition guide](HNN_COMPOSITION.md) describes the model's semantic

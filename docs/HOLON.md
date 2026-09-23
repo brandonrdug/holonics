@@ -350,6 +350,14 @@ every elementary carrier.
 | Scale and locality | Restriction/prolongation and boundary summaries relate grains and local clocks | world-tube, scale and constitutive transport |
 | Continuing computation | Executable state, factors and live comparisons suffice where their law closes | internal modes, normal moments, coupled body and rest |
 
+[definition] The operations these characteristics become are defined in the
+[operator contract](ELEMENTARY_OBJECTS.md#operator-contract), which gives each operation's current
+and target owner. That contract lists the ratio arithmetic (`div_rem`, `residue`, `invert` with
+its nonunit fibre, `lift`, `jet`), geometric transport and pair/tube charts, the Holon's
+`advance`/`interconnect -> Holarchy`/`contact`/`continue`/`restrict`/`depose`/`pullback`, joint
+reception returning both participants and a receipt, and the Holarchy's receiver-relative `view`
+and `count`. The table above names the formal and executable owners they come from.
+
 [definition] A gradient, metric, mass, distribution, tensor rank or reversible decoder is
 additional mathematical structure. Requiring every Holon to contain all of them confuses the
 general object with a physical chart. Conversely, calling a vector a Holon does not supply

@@ -36,8 +36,8 @@ variation, material/clock/frame hypotheses and consuming call. Account for the u
 research and paused worktrees in R0 before retirement. **Lean holds the mathematics; Rust holds
 what runs:** unconsumed Rust is deleted after any law it alone states moves to Lean or a guide;
 checked Lean theorems stay unless duplicate or wrappers. A move updates its in-repo callers in
-the same commit, with no forwarding modules or aliases; a legacy wire decoder stays only for a
-saved artifact Brandon names. The restructure moves existing behavior; new objects (Holarchy,
+the same commit, with no forwarding modules or aliases; every old save-format reader goes
+(an old save is a superseded prototype). The restructure moves existing behavior; new objects (Holarchy,
 active receive, physics instances, HNN host reference) are separate construction campaigns
 (plan §0, §4). Do not present target names as existing code.
 
@@ -45,7 +45,7 @@ active receive, physics instances, HNN host reference) are separate construction
 
 [project-postulate] Brandon, September 22: design, worker briefs, formal work and code state
 their operations **only** in the [elementary objects](docs/ELEMENTARY_OBJECTS.md), which own the
-definitions and existing Lean/Rust owners; `ElementaryHolonics.Framework.Objects` imports them
+definitions, the [operator contract](docs/ELEMENTARY_OBJECTS.md#operator-contract) (operations, current and target owners); `ElementaryHolonics.Framework.Objects` imports them
 and the proved joins in `Objects/{Pairing,Deposition,Ratio,Parametron,RelativeCompleteness}`. A text, image, acoustic, motor or arithmetic
 application is a boundary chart of them. A noun that is not one of them, or a composition of
 them, is a design defect. The picture: a continuing field of chains of **complex parametrons**
@@ -72,8 +72,9 @@ Rust core implement this object, and every native owner implements or charts it.
 | Tube (longitudinal clocked span) and tower (transverse restriction; gluing unique/plural/obstructed); world tube; `Λ_DN` eliminates an interior | holonomy only on declared circuits |
 | Relatively complete region (globe): a boundary that bounds the interior, interior coupled to the exterior (conserved charges count) but not determined by it, with persistent interior motion | completeness is only relative to a receiver family; the full theorem is owed (#62) |
 | Deposition: the only law changing a constitution, from covectors that actually reached that locus | retention is the future-sufficient quotient of the constitution (the constitution suffices but is not minimal), never a record of fluxes |
-| Ratio: typed comparison of two Holons/coholons/transports, carried as an undivided pair | `ℓ=log R` with winding branch; `R⁻¹dR`; its jet (velocity, acceleration, jerk, …); loss is `log Ĝ_(T←H)` |
-| Receipt: a field of readings over a partition, each region in its own frame and clock | no global scalar or global gradient; per-region variability over its own ticks, joined to interface flux |
+| Ratio: "one per two", a typed comparison of two Holons/coholons/transports carried as an undivided pair, with division-with-remainder, residue/modulo, inversion with its nonunit fibre, lift/carry and jets | `ℓ=log R` with winding branch; `R⁻¹dR`; its jet (velocity, acceleration, jerk, …); loss is `log Ĝ_(T←H)` |
+| Receiver and receipt: a receiver is a role of a participating Holon; reception `I_C(\|H_S⟩,\|H_R⟩)=(\|H'_S⟩,\|H'_R⟩,f_R)` changes both and returns a receipt, a field of readings over a partition, each region in its own frame and clock | no global scalar or global gradient; per-region variability over its own ticks, joined to interface flux |
+| Holarchy: what `interconnect` returns; the joined whole with its retained constituents, incidence, gluing and restrictions (or a typed gluing defect) | quantities belong to the receiver: `view(receiver, grain, clock)`; `count` only under a certified finite partition; one continuing whole, many receiver-relative counts |
 
 [definition] Retire these phrasings: "terrain" and bare "standing" for the constitution; "a
 current changes a later current's standing" as a definition of learning; a constitution
@@ -414,8 +415,8 @@ integrates returned changes; worker measurements are reusable receipts.
 personal research programme; Brandon, Claude and Codex are its only workers, and every file in the
 tree, committed or not, is ours to account for. Consolidation includes deletion: code, examples,
 Lean and documents that are superseded, unconsumed or outdated are removed, and git history is the
-archive. A compatibility alias or legacy wire decoder is kept only for a saved artifact we still
-use, and is named with that artifact; otherwise the old name and decoder go. "Keep all mathematics"
+archive. Old names, compatibility aliases and legacy save-format decoders go: an old save is a
+superseded prototype (Brandon, September 23). "Keep all mathematics"
 means keep each law once, in its owner, with its consumer, not every representation of it.
 
 [project-postulate] Stage and format explicit paths; preserve

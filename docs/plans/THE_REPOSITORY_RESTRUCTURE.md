@@ -27,9 +27,10 @@ Each is backed by a measurement at `d3b8b509`.
    history is the archive.
 2. **No forwarding modules, path aliases or feature-gated compatibility layers.** Every Rust
    caller is in this repository, so a move updates its callers in the same commit.
-   `holonics::hna`, `holonics::structure` and similar paths are not kept. Old wire decoders are
-   kept only for a saved artifact Brandon names in the census (candidates:
-   `.local/artifacts/{athena-alpha,hnp3,hnp4,ske4}`). With none named, R4 removes them all.
+   `holonics::hna`, `holonics::structure` and similar paths are not kept. **Every old
+   save-format reader goes** (Brandon, September 23): a saved artifact in an old format is a
+   superseded prototype, so no legacy decoder is kept. `.local/artifacts` and `.local/campaign-*`
+   stay on disk as private evidence, not as formats the code must read.
 3. **The HNN is device-resident today, so its move and its backend-neutral port are separate
    steps.** Of 219 `native_ecology` files, 106 launch kernels or hold resident sections. So do 35 of
    93 `holonics-hna` files. No host reference implementation of the HNN field exists, and the engine's
@@ -593,8 +594,11 @@ existing suites (§0.9):
 
    Each table's columns are: path, lines, elementary object or application, consumers
    (build-confirmed), superseding owner, disposition (**keep** / **fold** / **retire**, applying
-   §0.1), target (§3) and verification. Brandon reviews the **keep** column and names any saved
-   artifact whose wire must stay readable (§0.2). The census is not an indefinite approval gate.
+   §0.1), target (§3) and verification. **The census is Codex's working instrument, not a
+   review for Brandon** (September 23): he has already stated what is kept (§0, §2), so dispositions
+   follow those rules and proceed without a review step. A disposition that would delete one of
+   §2's objects or a checked non-duplicate theorem is a mistake in the census, not a question to
+   escalate.
 2. **R1: Rust with no consumer.** Retire engine modules and examples first; their laws move to
    Lean or a guide first, as §0.1 requires.
 3. **R2: the Soma/`life` lineage and unconsumed crates.** Covers `holonic-body`, `-membrane`,
@@ -603,8 +607,7 @@ existing suites (§0.9):
 4. **R3: the Lean foundation cut.** Cut the §0.10 edges, curate the `Holonics` root and retire
    duplicate or wrapper theorems. Build `ElementaryHolonics.Framework` and the affected research
    modules.
-5. **R4: compatibility debt.** Remove aliases and legacy decoders, keeping only those Brandon
-   named in R0.
+5. **R4: compatibility debt.** Remove every alias, forwarding path and legacy decoder (§0.2).
 6. **C: finish the paused consolidation.** Rebase phases 11, 12a and 12b (WIP branches) onto the
    reduced tree, then do phase 14.
 7. **M1: the Rust cut.**
@@ -618,9 +621,18 @@ existing suites (§0.9):
    - Clean the old `target/`.
 8. **M2: the Lean move.** Move paths to `lean/` (`Holonics` and `HolonicsResearch`) and build both
    targets. Rename `Soma.Holonics` to `Holonics` as a separate mechanical commit.
-9. **D: documents.** Revise the README in full, then the guides, the §5 issue reset,
-   `CONSTRUCTION_STATE.md`, the roadmap, `docs/REPOSITORY.md`, and the CLAUDE.md/AGENTS.md owner
-   tables, all to the verified paths.
+9. **D: documents (the restructure's closing acceptance).** All to the verified paths:
+   - **Operator contracts:** [ELEMENTARY_OBJECTS](../ELEMENTARY_OBJECTS.md) owner map (current →
+     verified), [HOLON](../HOLON.md) operator methods, [THE_MACHINE](../THE_MACHINE.md) and
+     [HNN_FORMULA](../HNN_FORMULA.md) owner columns, [RECEIVER_HOLARCHY](../RECEIVER_HOLARCHY.md),
+     [FORMAL_FRAMEWORK](../FORMAL_FRAMEWORK.md), [RUST_FRAMEWORK](../RUST_FRAMEWORK.md),
+     [ARCHITECTURE_MAP](../ARCHITECTURE_MAP.md), and the CLAUDE.md/AGENTS.md owner tables.
+   - Guides that name `holonics::hna` or retired owners (ATHENA, NATIVE_HNA, CONVERSATION_DATA,
+     HARDWARE_AND_MODALITY_BOUNDARIES, the workbench guide) are updated or deleted.
+   - `CONSTRUCTION_STATE.md`, the roadmap and `docs/REPOSITORY.md`.
+   - **Last: rewrite `README.md` in full** to describe the repository as it now stands: the
+     libraries and their operators, `lean/`, the HNN, the applications, docs and research. The
+     restructure is complete only when the README matches the tree.
 
 **Construction campaigns** run on the new layout, each with its own issue:
 
