@@ -272,6 +272,51 @@ Holon type. Its encoding theorem equates full and reduced generation when their 
 commute; its composition equivalence carries one latent population through two refinements.
 Neither binding requires a trajectory archive or independent output marginals.
 
+### Bounded exact transport-family inference
+
+[established-bounded; source-inspected] One finite, deterministic construction demonstrates how
+an exact returned operator can cause a richer declared family, leave some predictions open, and
+still determine others. Its inherited passive chart is
+`A₀(τ)=I+τL`, with symmetric passive graph-Laplacian `L`. At a positive rational interval, the
+returned complete operator belongs to that chart only if it is symmetric, has nonpositive
+off-diagonal entries, and every row sums to one. Production keeps the exact symmetry and
+unit-row residuals when that test fails. Asymmetry declares oriented skew-pair transport; a
+nonzero unit-row residual declares diagonal standing/reaction; a positive symmetric
+off-diagonal part declares active symmetric transport. These residuals are retained rather
+than collapsed to a scalar error.
+
+The declared enriched family is
+`A(τ)=M+τ(S+K+R)`: positive diagonal receiver capacity `M`, symmetric pair carrier `S` (whose
+positive and negative pair coefficients distinguish passive and active terms), oriented skew
+pair carrier `K`, and diagonal reaction `R`. A first complete operator fixes its off-diagonal
+pair terms but leaves the capacity/reaction split open on the diagonal. A receiver question is
+the exact functional `y=rᵀA(τ)φ` for a fixed source potential `φ`, receiver `r`, and frame. On a
+nonempty compatible parameter fiber, it is determined precisely when its variation vanishes
+on every unresolved kernel direction. If a question varies along one such direction, the two
+compatible models separated by that direction return different values, so an exact
+distinguishing observation exists.
+
+[established-bounded; source-inspected] The Rust realization sets `τ₂=τ₁+1`, scans the complete
+operator's canonical basis for the first still-undetermined query, admits only that contemporary
+query, and repeats until the declared family closes. It then predicts a complete operator at
+`τ₃=τ₂+1` before receiving that operator for an entrywise grade. Agreement yields a certificate;
+disagreement is retained as the exact operator residual and differing entries. The generated
+model also propagates a supplied right-hand side by exact rational solution of `A(τ)φ=b` and
+checks the returned equation residual. In the four-node instrument with one fixed receiver
+lineage, selected queries separate four diagonal capacity/reaction directions; its prediction
+at `τ=5` is held out from fitting and then used for grading. These are bounded results for this
+fixed time-affine grammar, not a theorem
+of general law discovery or optimal observation design.
+
+[proved-derived; formal-checked] `ElementaryHolonics.Transport.GenerativeTransport` proves the
+time-affine interval identity and the general kernel criteria for invariant and distinguishing
+linear predictions. It does not formalize the passive-operator residual test, the `M,S,K,R`
+carrier decomposition, Rust's basis scan, held-out operator grade, or propagation solver. Those
+remaining construction details and the four-receiver evidence are recorded in the bounded
+[July transport construction](../research/records/2026-07-27_THE_OBSTRUCTION_CAUSES_THE_FAMILY_THE_OPEN_FIBER_PREDICTS_BEFORE_IT_CLOSES.md).
+That record also qualifies the implementation's receiver scope: event lineage is not checked or
+retained, so its observations belong to one implicit fixed receiver family and chart.
+
 ### One object, its charts and its recursive geometry
 
 [definition] A computational Holon is the same situated field across its local, modal and
