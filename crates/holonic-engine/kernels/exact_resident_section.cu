@@ -1705,6 +1705,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 #include "normal_wave.cuh"
 #include "normal_applied_condition.cuh"
 #include "enclosure_composition.cuh"
+#include "enclosure_cayley.cuh"
 #include "enclosure_incident.cuh"
 #include "global_field_action.cuh"
 #include "field_factor_action.cuh"

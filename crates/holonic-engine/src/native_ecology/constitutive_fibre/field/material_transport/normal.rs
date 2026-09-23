@@ -958,7 +958,7 @@ pub use direct::{
     NormalCoupledPrediction, NormalCoupledProducingHandle, NormalCoupledReception,
     NormalCoupledSourceActuation, NormalCoupledStep, NormalFamilyBasisFace,
     NormalFamilyComparisonRow, NormalFamilyPullback, NormalFamilyReceiverReading,
-    NormalFamilySupport, NormalMaterialRest, NormalProducingHandle, NormalReactionProjection,
+    NormalFamilySupport, NormalMaterialRest, NormalProducingHandle, NormalReactionProjection, PowerNeutralCertificate,
     NormalRealizationRefinement, NormalReceiverCoordinates, NormalSectionBasisFace,
     NormalSourceActuation, NormalSourceChart, NormalWaveBasisChart, NormalWaveBasisFace,
     NormalWaveBasisReading, NormalWaveComparison, NormalWaveComparisonReading, NormalWaveCoupled,

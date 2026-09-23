@@ -13,7 +13,12 @@ mod machine_transport;
 pub use machine_receiving::{
     GeneratorPhasePort, GeneratorPhaseReceiverBinding, NativeGeneratorPhaseReception,
 };
+mod energy;
 mod rest;
+pub use energy::IncidentEnergyBalance;
+mod holon_chart;
+#[allow(unused_imports)] // the phase-8 chart; named by its conformance tests and future consumers
+pub use holon_chart::{ResidentHolonChart, RingReaction};
 pub use machine::GeneratorIncidentFieldSpec;
 use machine::{IncidentModelSpec, MachineGroupMaps};
 use machine_transport::{MachineParticipation, MachineValueTransport};
@@ -416,6 +421,24 @@ struct IncidentSiteStep<'c> {
     external_condition: Option<ResidentNormalEnclosureSection<'c>>,
     machine_difference: Option<MachineValueTransport<'c>>,
     features: ResidentNormalEnclosureSection<'c>,
+    /// The power-neutral law's implicit reaction stage; `None` under the legacy law.
+    cayley: Option<CayleyStage<'c>>,
+}
+/// [definition; agent-inferred] The Cayley (implicit-midpoint) reaction stage of one group.
+/// The reaction acts on the participation drive `p` as the modulated skew interconnection
+/// `J(c)` with the resistive part of `W_s` and the contrast port `W_c c`:
+/// `(I − K(c)/2) y = (I + K(c)/2) p + W_c c`, `K(c) = W_s + Σ_r c_r A_r`, and `y` (not
+/// `p + W Φ(q, c)`) is the site's incoming current. [agent-inferred] The drive, not the standing
+/// query, is what the step carries: then `|y|² − |p|² = −2⟨x̄, R x̄⟩ + 2 Re⟨x̄, W_c c⟩` exactly
+/// (`Holon/Cayley.lean::midpoint_reaction_balance`), gain exactly `1` on the drive whatever
+/// `|Δ|` (`Holon/Cayley.lean::cayley_isometry`), whereas carrying the query would leave
+/// `p − q` outside the isometry. The standing current still enters through the contrast `Δ`
+/// (which modulates `J`) and through participation. The explicit law's gain `1 + h²|J x|²/|x|²`
+/// (`Holon/Cayley.lean::explicit_step_growth`) is what this replaces.
+struct CayleyStage<'c> {
+    certificate: holonic_engine::native_ecology::constitutive_fibre::PowerNeutralCertificate<'c>,
+    step: ResidentNormalEnclosureSection<'c>,
+    midpoint: ResidentNormalEnclosureSection<'c>,
 }
 enum IncidentParticipationForward<'c> {
     Bilinear(NativePhaseParticipation<'c>),
@@ -465,6 +488,10 @@ impl<'c> IncidentParticipationForward<'c> {
 struct IncidentStep<'c> {
     sites: Vec<IncidentSiteStep<'c>>,
     input: ResidentNormalEnclosure<'c>,
+    /// The step's current before (`q`), the projected reflection `S_D(input)` and the relaxed
+    /// current after it: exterior readings of the energy balance, never operands of the return.
+    before: Rc<ResidentNormalEnclosure<'c>>,
+    reflected: ResidentNormalEnclosure<'c>,
 }
 pub(crate) struct IncidentWord<'c> {
     /// Ordered-source Holon of a generator word (declaration and moment `m`); the anchor is
@@ -494,6 +521,10 @@ pub struct NativeIncidentGenerated<'c> {
 pub struct NativeIncidentMaterialReturn<'c> {
     /// The reaction deposit receipt this return publishes (unchanged under the legacy law).
     reaction: ReactionDepositRecord,
+    /// The certificates of the projected cuts (power-neutral law), installed with them.
+    reaction_certificates: Vec<
+        Option<holonic_engine::native_ecology::constitutive_fibre::PowerNeutralCertificate<'c>>,
+    >,
     contact_amplitude: Option<
         holonic_engine::native_ecology::constitutive_fibre::NativeDeclaredAmplitudeCommit<'c>,
     >,
@@ -606,6 +637,15 @@ pub(crate) struct IncidentFieldModel<'c> {
     rebase: IncidentRebaseResidual,
     /// Receipt of the power-neutral reaction deposits (empty under the legacy law).
     reaction_record: ReactionDepositRecord,
+    /// Certificates of the power-neutral material cuts in force, bound to their resident states;
+    /// filled lazily (one detachment per cut) and installed by each deposit's projection.
+    reaction_certificates: std::cell::RefCell<
+        Vec<
+            Option<holonic_engine::native_ecology::constitutive_fibre::PowerNeutralCertificate<'c>>,
+        >,
+    >,
+    /// The exterior energy balance of the latest committed power-neutral word.
+    energy_balance: Option<IncidentEnergyBalance>,
     /// Test control only: publish the whole solve enclosure, as before the rebase law.
     #[cfg(test)]
     rebase_off: bool,
@@ -834,9 +874,58 @@ impl<'c> IncidentFieldModel<'c> {
             moments: BTreeMap::new(),
             rebase: IncidentRebaseResidual::default(),
             reaction_record: ReactionDepositRecord::default(),
+            reaction_certificates: std::cell::RefCell::new(Vec::new()),
+            energy_balance: None,
             #[cfg(test)]
             rebase_off: false,
         })
+    }
+    /// `(n, k)` of reaction material `member`: `n` complex current coordinates, `k` real contrast
+    /// coordinates (features `n + c + 2nc` complex, `k = 2c`).
+    fn reaction_extent(&self, member: usize) -> Result<(usize, usize), NativeSessionError> {
+        let n = self.layout.width / 2;
+        let features = *self
+            .layout
+            .material_features
+            .get(member)
+            .ok_or_else(|| invalid("reaction material owner"))?;
+        if n == 0 || features < n || (features - n) % (2 * n + 1) != 0 {
+            return Err(invalid("power-neutral reaction feature chart"));
+        }
+        Ok((n, 2 * ((features - n) / (2 * n + 1))))
+    }
+    /// The certificates of the supplied material cuts under the power-neutral law (`None` under
+    /// the legacy law). A cached certificate is reused only for the exact resident state it
+    /// certified; any other cut is certified by one explicit detachment.
+    fn reaction_certificates(
+        &self,
+        material: &[ResidentNormalMaterialView<'c>],
+    ) -> Result<
+        Vec<
+            Option<holonic_engine::native_ecology::constitutive_fibre::PowerNeutralCertificate<'c>>,
+        >,
+        NativeSessionError,
+    > {
+        if self.layout.reaction != ReactionLaw::PowerNeutral {
+            return Ok(vec![None; material.len()]);
+        }
+        let mut cache = self.reaction_certificates.borrow_mut();
+        if cache.len() != material.len() {
+            cache.resize(material.len(), None);
+        }
+        material
+            .iter()
+            .enumerate()
+            .map(|(member, view)| {
+                if let Some(certificate) = cache[member].as_ref().filter(|c| c.certifies(view)) {
+                    return Ok(Some(certificate.clone()));
+                }
+                let (n, k) = self.reaction_extent(member)?;
+                let certificate = view.certify_power_neutral_reaction(n, k)?;
+                cache[member] = Some(certificate.clone());
+                Ok(Some(certificate))
+            })
+            .collect()
     }
     fn word(
         &mut self,
@@ -941,6 +1030,7 @@ impl<'c> IncidentFieldModel<'c> {
             "operative_storage":self.field.operative_return_storage(),
             "rebase_residual":&self.rebase,
             "reaction_law":self.layout.reaction,"reaction_deposits":&self.reaction_record,
+            "energy_balance":&self.energy_balance,
             "chart": if self.layout.machine.is_some() {"fixed-generator-machine"} else {"legacy-slot-field"},
             "contact_material": if self.layout.machine.is_some() {"positive-pair-amplitude-family"} else {"unconstrained-global-return"}}),
         )
@@ -1031,8 +1121,15 @@ impl<'c> IncidentFieldModel<'c> {
             None
         };
         if let Some((staged, rebase)) = staged {
+            // The exterior balance is read from the committed word's balls before publication.
+            let balance = (self.layout.reaction == ReactionLaw::PowerNeutral)
+                .then(|| self.read_energy_balance(&generated.word))
+                .transpose()?;
             self.field.commit_joint_current(staged)?;
             self.rebase = rebase;
+            if balance.is_some() {
+                self.energy_balance = balance;
+            }
         }
         if let Some(retained) = retained {
             generated.comparison = Some(self.next_comparison);
@@ -1073,6 +1170,7 @@ impl<'c> IncidentFieldModel<'c> {
         external: Option<&ResidentNormalEnclosureSection<'c>>,
     ) -> Result<(Vec<IncidentStep<'c>>, ResidentNormalEnclosure<'c>), NativeSessionError> {
         let layout = &self.layout;
+        let certificates = self.reaction_certificates(material)?;
         let external_width = layout
             .width
             .checked_mul(layout.source_condition_ports)
@@ -1240,22 +1338,50 @@ impl<'c> IncidentFieldModel<'c> {
                     current_condition.as_ref(),
                     external_condition.as_ref(),
                 )?;
-                let features = match (&condition, layout.reaction) {
-                    (Some(c), ReactionLaw::Legacy) => query.bilinear_enclosed_features(c)?,
-                    (Some(c), ReactionLaw::PowerNeutral) => {
-                        query.realified_bilinear_enclosed_features(c)?
+                let (site_incoming, features, cayley) = match layout.reaction {
+                    ReactionLaw::Legacy => {
+                        let features = match &condition {
+                            Some(c) => query.bilinear_enclosed_features(c)?,
+                            None => ResidentNormalEnclosureSection::concatenate_rows(&[&query])?,
+                        };
+                        let reaction = material[group.material]
+                            .read_applied_enclosed_section_with_enclosure(
+                                &features,
+                                self.spec.enclosure_propagation(),
+                            )?;
+                        (phase.output().sum_same_shape(&reaction)?, features, None)
                     }
-                    (None, _) => ResidentNormalEnclosureSection::concatenate_rows(&[&query])?,
+                    ReactionLaw::PowerNeutral => {
+                        let certificate = certificates[group.material]
+                            .clone()
+                            .ok_or_else(|| invalid("power-neutral material certificate"))?;
+                        let (step, midpoint) = material[group.material].cayley_reaction_step(
+                            &certificate,
+                            phase.output(),
+                            condition.as_ref(),
+                        )?;
+                        // The material and contrast returns are read at the midpoint.
+                        let features = match &condition {
+                            Some(c) => midpoint.realified_bilinear_enclosed_features(c)?,
+                            None => ResidentNormalEnclosureSection::concatenate_rows(&[&midpoint])?,
+                        };
+                        let incoming = ResidentNormalEnclosureSection::concatenate_rows(&[&step])?;
+                        (
+                            incoming,
+                            features,
+                            Some(CayleyStage {
+                                certificate,
+                                step,
+                                midpoint,
+                            }),
+                        )
+                    }
                 };
-                let reaction = material[group.material]
-                    .read_applied_enclosed_section_with_enclosure(
-                        &features,
-                        self.spec.enclosure_propagation(),
-                    )?;
-                let scattered = phase
-                    .output()
-                    .sum_same_shape(&reaction)?
-                    .scatter_phase_adjoint(&group.receivers, &phases(rows), layout.sites.len())?;
+                let scattered = site_incoming.scatter_phase_adjoint(
+                    &group.receivers,
+                    &phases(rows),
+                    layout.sites.len(),
+                )?;
                 incoming = Some(match incoming {
                     Some(previous) => previous.sum_same_shape(&scattered)?,
                     None => scattered,
@@ -1268,6 +1394,7 @@ impl<'c> IncidentFieldModel<'c> {
                     external_condition,
                     machine_difference,
                     features,
+                    cayley,
                 });
             }
             let a = self
@@ -1291,12 +1418,23 @@ impl<'c> IncidentFieldModel<'c> {
                 self.spec
                     .solver()
                     .action(source, input.view(), self.spec.solve_steps())?;
-            current = self
+            let reflected = self
                 .project_machine(reflection.output().as_section()?)?
+                .row(0)?
+                .to_owned()?;
+            let before = Rc::new(current);
+            current = reflected
+                .view()
+                .as_section()?
                 .held_refinement(&anchor_section, held, layout.relaxation_bits)?
                 .row(0)?
                 .to_owned()?;
-            steps.push(IncidentStep { sites, input });
+            steps.push(IncidentStep {
+                sites,
+                input,
+                before,
+                reflected,
+            });
         }
         Ok((steps, current))
     }
@@ -1363,12 +1501,31 @@ impl<'c> IncidentFieldModel<'c> {
                 let group = &stage.group;
                 let rows = group.receivers.len();
                 let g = ga.gather_phase_rows(&group.receivers, &phases(rows), layout.width)?;
+                // The Cayley stage returns through `u = A⁻ᴴ g`: the material reads `(Φ(x̄,c), u)`,
+                // the contrast the feature pullback of `Wᴴu` at the midpoint, and the drive
+                // `(I + K/2)ᴴ u = 2u − g`; the standing query receives nothing from the reaction.
+                let cayley_return = match &stage.cayley {
+                    Some(cy) => Some(word.material[group.material].cayley_reaction_adjoint(
+                        &cy.certificate,
+                        stage.condition.as_ref(),
+                        &g,
+                    )?),
+                    None => None,
+                };
+                let gdrive = cayley_return.as_ref().map_or(&g, |(_, drive)| drive);
                 let gf = word.material[group.material].pull_back_enclosed_section_with_enclosure(
-                    &g,
+                    cayley_return.as_ref().map_or(&g, |(u, _)| u),
                     word.enclosure_propagation.clone(),
                 )?;
-                let (gq, gcondition) = match &stage.condition {
-                    Some(c) => {
+                let (gq, gcondition) = match (&stage.condition, &stage.cayley) {
+                    (Some(c), Some(cy)) => (
+                        zero(self.field.surface(), rows, layout.width, grain)?,
+                        Some(cy.midpoint.realified_bilinear_enclosed_pullback(c, &gf)?.1),
+                    ),
+                    (None, Some(_)) => {
+                        (zero(self.field.surface(), rows, layout.width, grain)?, None)
+                    }
+                    (Some(c), None) => {
                         let (q, c) = match layout.reaction {
                             ReactionLaw::Legacy => {
                                 stage.query.bilinear_enclosed_pullback(c, &gf)?
@@ -1379,7 +1536,7 @@ impl<'c> IncidentFieldModel<'c> {
                         };
                         (q, Some(c))
                     }
-                    None => (gf, None),
+                    (None, None) => (gf, None),
                 };
                 let current_width = group
                     .differences
@@ -1414,11 +1571,11 @@ impl<'c> IncidentFieldModel<'c> {
                 }
                 let mut query = match &stage.phase {
                     IncidentParticipationForward::Machine(p) => {
-                        previous = previous.sum_same_shape(&p.pull_back(&g)?)?;
+                        previous = previous.sum_same_shape(&p.pull_back(gdrive)?)?;
                         gq
                     }
                     _ => {
-                        let (phase_query, phase_neighbors) = stage.phase.pull_back(&g)?;
+                        let (phase_query, phase_neighbors) = stage.phase.pull_back(gdrive)?;
                         previous =
                             previous.sum_same_shape(&phase_neighbors.scatter_phase_adjoint(
                                 &group.sources,
@@ -1460,7 +1617,10 @@ impl<'c> IncidentFieldModel<'c> {
                 )?)?;
                 material[group.material].push((
                     ResidentNormalEnclosureSection::concatenate_rows(&[&stage.features])?,
-                    g,
+                    match cayley_return {
+                        Some((u, _)) => u,
+                        None => g,
+                    },
                 ));
             }
             let q = previous
@@ -1596,16 +1756,18 @@ impl<'c> NativeCoupledBody<'c> {
         }
         // The power-neutral law: each normal-law solve is followed by its projections.
         let mut reaction = model.reaction_record.clone();
+        let mut reaction_certificates = vec![None; material.len()];
         if model.layout.reaction == ReactionLaw::PowerNeutral {
-            let n = model.layout.width / 2;
             let mut projections = Vec::with_capacity(material.len());
-            for (staged, &features) in material.iter_mut().zip(&model.layout.material_features) {
+            for (member, staged) in material.iter_mut().enumerate() {
                 // features = n + c + 2nc complex, so the real contrast count is k = 2c.
                 // With no contrast (c = 0) only the linear self-relation is projected.
-                let c = (features - n) / (2 * n + 1);
-                let (projected, receipt) = staged.project_power_neutral_reaction(n, 2 * c)?;
+                let (n, k) = model.reaction_extent(member)?;
+                let (projected, receipt, certificate) =
+                    staged.project_power_neutral_reaction_certified(n, k)?;
                 *staged = projected;
                 projections.push(receipt);
+                reaction_certificates[member] = Some(certificate);
             }
             reaction.record(projections)?;
         }
@@ -1645,6 +1807,7 @@ impl<'c> NativeCoupledBody<'c> {
         };
         Ok(NativeIncidentMaterialReturn {
             reaction,
+            reaction_certificates,
             contact_amplitude,
             source_covector: returned.source_covector,
             symbol_covector: returned.symbol_covector,
@@ -1687,6 +1850,7 @@ impl<'c> NativeCoupledBody<'c> {
         }
         model.materials = prepared.material;
         model.reaction_record = prepared.reaction;
+        *model.reaction_certificates.borrow_mut() = prepared.reaction_certificates;
         model.epoch = prepared.next_epoch;
         model.observations = prepared.observations;
         model.pending.remove(&prepared.comparison);

@@ -71,6 +71,118 @@ pub struct NormalReactionProjection {
     pub normal_residual_after: Rat,
 }
 
+/// [definition] **The host certificate of a power-neutral reaction material cut**: every modulated
+/// slice `A_r` exactly skew-Hermitian and the linear self-relation `W_s` passive (`herm W_s ⪯ 0`
+/// by exact inertia of its realification), bound to the resident state it was read from (the
+/// same `Rc`). It is the premise of the Cayley step's certified radius: with it,
+/// `herm K(c) ⪯ 0` for every real contrast `c`, so `‖(I − K/2)⁻¹‖ ≤ 1` and the Cayley map is a
+/// contraction (`Holon/Cayley.lean::cayley_isometry` on the skew part,
+/// `Holon/Cayley.lean::midpoint_reaction_balance` with `R = −herm W_s`). The kernel re-checks
+/// slice skewness itself; passivity is read only from this certificate.
+#[derive(Clone)]
+pub struct PowerNeutralCertificate<'c> {
+    pub(crate) state: Rc<ResidentSection<'c>>,
+    /// Complex targets `n` (the row's current) and real contrast coordinates `k`.
+    pub n: usize,
+    pub k: usize,
+    /// Inertia of `sym(realify W_s)`: `positive == 0`.
+    pub linear_inertia: holonic_core::inertia::Inertia,
+    /// The exact executed coefficients (`n × F`, integers at `2^-grain`), for exterior readings
+    /// such as the incident energy balance. Never an operand of the resident step.
+    pub coefficients: Vec<Vec<GridComplex>>,
+    pub grain: u32,
+}
+impl std::fmt::Debug for PowerNeutralCertificate<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("PowerNeutralCertificate")
+            .field("n", &self.n)
+            .field("k", &self.k)
+            .field("linear_inertia", &self.linear_inertia)
+            .finish()
+    }
+}
+impl<'c> PowerNeutralCertificate<'c> {
+    /// Whether this certificate was read from exactly `view`'s resident state.
+    pub fn certifies(&self, view: &ResidentNormalMaterialView<'c>) -> bool {
+        Rc::ptr_eq(&self.state, &view.state)
+    }
+    fn from_words(
+        state: Rc<ResidentSection<'c>>,
+        numeric: &[i128],
+        n: usize,
+        k: usize,
+        grain: u32,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        let features = power_neutral_features(n, k)?;
+        let block = |columns: std::ops::Range<usize>| -> Vec<Vec<GridComplex>> {
+            (0..n)
+                .map(|t| {
+                    columns
+                        .clone()
+                        .map(|j| grid(numeric, t, j, features))
+                        .collect()
+                })
+                .collect()
+        };
+        for r in 0..k {
+            let start = n + k / 2 + r * n;
+            if !holonic_core::reaction::is_skew_hermitian(&block(start..start + n)) {
+                return Err(invalid("power-neutral slice is not exactly skew-Hermitian"));
+            }
+        }
+        let linear_inertia = holonic_core::inertia::inertia(
+            &holonic_core::scalar::symmetric_part(
+                &holonic_core::reaction::realify(&block(0..n)).map_err(invalid)?,
+            )
+            .map_err(invalid)?,
+        );
+        if linear_inertia.positive != 0 {
+            return Err(invalid("power-neutral linear self-relation is not passive"));
+        }
+        Ok(Self {
+            state,
+            n,
+            k,
+            linear_inertia,
+            coefficients: block(0..features),
+            grain,
+        })
+    }
+}
+
+fn power_neutral_features(n: usize, k: usize) -> Result<usize, ConstitutiveFibreError> {
+    n.checked_mul(k)
+        .and_then(|v| v.checked_add(n)?.checked_add(k / 2))
+        .filter(|_| n > 0 && k % 2 == 0)
+        .ok_or(ConstitutiveFibreError::Shape)
+}
+
+impl<'c> ResidentNormalMaterialView<'c> {
+    /// Certify this material cut for the Cayley reaction step (see [`PowerNeutralCertificate`]):
+    /// one explicit detachment of the resident state and an exact inertia. Refuses a cut whose
+    /// slices are not exactly skew-Hermitian or whose linear block is active.
+    pub fn certify_power_neutral_reaction(
+        &self,
+        n: usize,
+        k: usize,
+    ) -> Result<PowerNeutralCertificate<'c>, ConstitutiveFibreError> {
+        let features = power_neutral_features(n, k)?;
+        if self.targets != n
+            || self.source_chart
+                != (NormalSourceChart::Features {
+                    source_complex: features,
+                })
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let layout = self.source_chart.layout(self.targets)?;
+        let rest = self.surface.detach_section(&self.state, i64::BITS)?;
+        point_section(&rest, 1, layout.state_words)?;
+        let numeric = wides(&rest.intervals[..layout.matrix_words])?;
+        PowerNeutralCertificate::from_words(Rc::clone(&self.state), &numeric, n, k, self.grain.0)
+    }
+}
+
 fn grid(numeric: &[i128], row: usize, column: usize, features: usize) -> GridComplex {
     let at = 2 * (row * features + column);
     (BigInt::from(numeric[at]), BigInt::from(numeric[at + 1]))
@@ -84,6 +196,18 @@ impl<'c> ResidentNormalMaterial<'c> {
         source_complex: usize,
         condition_real: usize,
     ) -> Result<(Self, NormalReactionProjection), ConstitutiveFibreError> {
+        self.project_power_neutral_reaction_certified(source_complex, condition_real)
+            .map(|(material, receipt, _)| (material, receipt))
+    }
+
+    /// [`Self::project_power_neutral_reaction`] with the certificate of the projected cut, read
+    /// from the same exact words the projection wrote (no second detachment).
+    pub fn project_power_neutral_reaction_certified(
+        &self,
+        source_complex: usize,
+        condition_real: usize,
+    ) -> Result<(Self, NormalReactionProjection, PowerNeutralCertificate<'c>), ConstitutiveFibreError>
+    {
         let n = source_complex;
         let k = condition_real;
         let features = n
@@ -169,12 +293,14 @@ impl<'c> ResidentNormalMaterial<'c> {
             rest.intervals[2 * w] = (lo, lo);
             rest.intervals[2 * w + 1] = (hi, hi);
         }
-        let state = self.surface.mount_section_rest(&rest)?;
+        let state = Rc::new(self.surface.mount_section_rest(&rest)?);
+        let certificate =
+            PowerNeutralCertificate::from_words(Rc::clone(&state), &next, n, k, grain)?;
         let square = |v: BigInt| Rat::new(v, &unit * &unit);
         Ok((
             Self {
                 surface: self.surface,
-                state: Rc::new(state),
+                state,
                 source_chart: self.source_chart,
                 targets: self.targets,
                 grain: self.grain,
@@ -197,6 +323,7 @@ impl<'c> ResidentNormalMaterial<'c> {
                 normal_residual_before: at_grain(residual_before),
                 normal_residual_after: at_grain(residual_after),
             },
+            certificate,
         ))
     }
 
@@ -586,5 +713,273 @@ mod tests {
         assert!(second.bilinear_removed_square.is_zero());
         assert_eq!(second.linear_removed_rank, 0);
         assert_eq!(second.normal_residual_after, receipt.normal_residual_after);
+    }
+
+    /// Rows at `grain` with a declared nonzero radius (grain units).
+    fn balls<'c>(
+        surface: &'c ResidentSurface<'c>,
+        rows: &[Vec<i64>],
+        grain: ResidentGrain,
+        radius: i128,
+    ) -> ResidentNormalEnclosureSection<'c> {
+        let width = rows[0].len();
+        let scale = 1i128 << grain.0;
+        let values = rows
+            .iter()
+            .flat_map(|row| {
+                row.iter()
+                    .map(|v| i128::from(*v) * scale)
+                    .chain([radius])
+                    .flat_map(|word| [word as i64, (word >> 64) as i64])
+                    .map(|word| (word, word))
+                    .collect::<Vec<_>>()
+            })
+            .collect();
+        let section = surface
+            .mount_section_rest(
+                &ResidentSectionRest::found(
+                    rows.len(),
+                    2 * (width + 1),
+                    ResidentGrain(0),
+                    64,
+                    values,
+                )
+                .unwrap(),
+            )
+            .unwrap();
+        ResidentNormalEnclosureSection::from_resident(surface, section, rows.len(), width, grain)
+            .unwrap()
+    }
+
+    /// The exact Cayley step `(I − K/2) y = (I + K/2) p + W_c c` (and, with `adjoint`, the solve
+    /// `(I − K/2)ᴴ u = g`) over ℚ on the interleaved real chart, from the certificate's coefficients.
+    fn exact_cayley(
+        certificate: &PowerNeutralCertificate<'_>,
+        p: &[Rat],
+        c: &[Rat],
+        adjoint: bool,
+    ) -> Vec<Rat> {
+        let (n, k) = (certificate.n, certificate.k);
+        let unit = Rat::from_integer(BigInt::one() << certificate.grain);
+        let w = |a: usize, j: usize| {
+            let (x, y) = &certificate.coefficients[a][j];
+            (
+                Rat::from_integer(x.clone()) / &unit,
+                Rat::from_integer(y.clone()) / &unit,
+            )
+        };
+        let kc = |a: usize, b: usize| {
+            let (mut x, mut y) = w(a, b);
+            for r in 0..k {
+                let (sx, sy) = w(a, n + k / 2 + r * n + b);
+                x += &c[r] * sx;
+                y += &c[r] * sy;
+            }
+            (x, y)
+        };
+        let half = Rat::new(1.into(), 2.into());
+        // Real 2n × 2n of K (or Kᴴ).
+        let mut kr = vec![vec![Rat::zero(); 2 * n]; 2 * n];
+        for a in 0..n {
+            for b in 0..n {
+                let (x, y) = if adjoint {
+                    let (x, y) = kc(b, a);
+                    (x, -y)
+                } else {
+                    kc(a, b)
+                };
+                kr[2 * a][2 * b] = x.clone();
+                kr[2 * a][2 * b + 1] = -y.clone();
+                kr[2 * a + 1][2 * b] = y;
+                kr[2 * a + 1][2 * b + 1] = x;
+            }
+        }
+        let system: Vec<Vec<Rat>> = (0..2 * n)
+            .map(|i| {
+                (0..2 * n)
+                    .map(|j| {
+                        let id = if i == j { Rat::one() } else { Rat::zero() };
+                        id - &half * &kr[i][j]
+                    })
+                    .collect()
+            })
+            .collect();
+        let rhs: Vec<Rat> = if adjoint {
+            p.to_vec()
+        } else {
+            (0..2 * n)
+                .map(|i| {
+                    let mut v = p[i].clone();
+                    for j in 0..2 * n {
+                        v += &half * &kr[i][j] * &p[j];
+                    }
+                    // W_c c: complex column m multiplies c_(2m) + i c_(2m+1).
+                    let a = i / 2;
+                    for m in 0..k / 2 {
+                        let (x, y) = w(a, n + m);
+                        let (cr, ci) = (&c[2 * m], &c[2 * m + 1]);
+                        v += if i % 2 == 0 {
+                            &x * cr - &y * ci
+                        } else {
+                            &x * ci + &y * cr
+                        };
+                    }
+                    v
+                })
+                .collect()
+        };
+        let matrix =
+            holonic_core::exact_linear::ExactRatMatrix::shaped(2 * n, 2 * n, system).unwrap();
+        let (z, kernel) = matrix.preimage_fibre(&rhs).unwrap().unwrap();
+        assert!(kernel.is_empty());
+        z
+    }
+
+    fn inside(exact: &[Rat], ball: &NativeFieldCurrentBall) -> bool {
+        let centre = real(ball);
+        let square: Rat = exact
+            .iter()
+            .zip(&centre)
+            .map(|(a, b)| (a - b) * (a - b))
+            .sum();
+        square <= &ball.radius * &ball.radius
+    }
+
+    /// **The Cayley step's certified enclosure.** On a trained, projected power-neutral material
+    /// with large contrasts (so the explicit step would amplify by `1 + |Jx|²/|x|²`), the device
+    /// step and its adjoint contain the exact rational solutions at the ball centres and at
+    /// perturbed points inside the input balls; the step is contractive on the drive (`|y| ≤ |p|
+    /// + |W_c c|`, `Holon/Cayley.lean::cayley_isometry` with the resistive part); a certificate of
+    /// another material cut is refused.
+    #[test]
+    #[ignore = "requires CUDA; the Cayley reaction step and its adjoint contain the exact solution"]
+    fn the_cayley_step_and_adjoint_contain_the_exact_solution() {
+        let readout = ResidentReadout::new().unwrap();
+        let surface = ResidentSurface::on(&readout).unwrap();
+        let grain = ResidentGrain(20);
+        let (n, k) = (3usize, 4usize);
+        let features = n + k / 2 + n * k;
+        let mut seed = 29;
+        let material =
+            ResidentNormalMaterial::found_features(&surface, features, n, grain).unwrap();
+        let rows = 16;
+        let s_rows: Vec<Vec<i64>> = (0..rows)
+            .map(|_| (0..2 * n).map(|_| lcg(&mut seed, 4)).collect())
+            .collect();
+        let c_rows: Vec<Vec<i64>> = (0..rows)
+            .map(|_| (0..k).map(|_| lcg(&mut seed, 4)).collect())
+            .collect();
+        let t_rows: Vec<Vec<i64>> = (0..rows)
+            .map(|_| (0..2 * n).map(|_| lcg(&mut seed, 9)).collect())
+            .collect();
+        let phi = points(&surface, &s_rows, grain)
+            .realified_bilinear_enclosed_features(&points(&surface, &c_rows, grain))
+            .unwrap();
+        let material = material
+            .stage_receive_enclosed_section(&phi, &points(&surface, &t_rows, grain))
+            .unwrap();
+        let (projected, _, certificate) = material
+            .project_power_neutral_reaction_certified(n, k)
+            .unwrap();
+        let view = projected.retained_view();
+        // Large contrasts: |c| ~ 300, the regime in which the explicit step diverged.
+        let p_rows: Vec<Vec<i64>> = (0..4)
+            .map(|_| (0..2 * n).map(|_| lcg(&mut seed, 50)).collect())
+            .collect();
+        let c_rows: Vec<Vec<i64>> = (0..4)
+            .map(|_| (0..k).map(|_| lcg(&mut seed, 300)).collect())
+            .collect();
+        let g_rows: Vec<Vec<i64>> = (0..4)
+            .map(|_| (0..2 * n).map(|_| lcg(&mut seed, 20)).collect())
+            .collect();
+        let (rp, rc, rg) = (7i128, 5i128, 3i128);
+        let p = balls(&surface, &p_rows, grain, rp);
+        let c = balls(&surface, &c_rows, grain, rc);
+        let g = balls(&surface, &g_rows, grain, rg);
+        let (y, mid) = view
+            .cayley_reaction_step(&certificate, &p, Some(&c))
+            .unwrap();
+        let (u, gp) = view
+            .cayley_reaction_adjoint(&certificate, Some(&c), &g)
+            .unwrap();
+        let int = |v: i64| Rat::from_integer(v.into());
+        let unit = Rat::from_integer(BigInt::one() << grain.0);
+        for row in 0..4 {
+            let yb = y.row(row).unwrap().inspect().unwrap();
+            let mb = mid.row(row).unwrap().inspect().unwrap();
+            let ub = u.row(row).unwrap().inspect().unwrap();
+            let gpb = gp.row(row).unwrap().inspect().unwrap();
+            // Centres and one perturbed corner inside each input ball.
+            for corner in [0i64, 1] {
+                let shift = |r: i128, len: usize, i: usize| -> Rat {
+                    // Spread r/2 over the first coordinate and r/2 over the last: |δ|₂ ≤ r.
+                    if corner == 0 || (i != 0 && i != len - 1) {
+                        Rat::zero()
+                    } else {
+                        Rat::new(BigInt::from(r), BigInt::from(2)) / &unit
+                    }
+                };
+                let p0: Vec<Rat> = p_rows[row]
+                    .iter()
+                    .enumerate()
+                    .map(|(i, v)| int(*v) + shift(rp, 2 * n, i))
+                    .collect();
+                let c0: Vec<Rat> = c_rows[row]
+                    .iter()
+                    .enumerate()
+                    .map(|(i, v)| int(*v) - shift(rc, k, i))
+                    .collect();
+                let g0: Vec<Rat> = g_rows[row]
+                    .iter()
+                    .enumerate()
+                    .map(|(i, v)| int(*v) + shift(rg, 2 * n, i))
+                    .collect();
+                let y_exact = exact_cayley(&certificate, &p0, &c0, false);
+                assert!(
+                    inside(&y_exact, &yb),
+                    "row {row} corner {corner}: y outside"
+                );
+                let m_exact: Vec<Rat> = p0
+                    .iter()
+                    .zip(&y_exact)
+                    .map(|(a, b)| (a + b) / int(2))
+                    .collect();
+                assert!(inside(&m_exact, &mb), "row {row}: midpoint outside");
+                let u_exact = exact_cayley(&certificate, &g0, &c0, true);
+                assert!(inside(&u_exact, &ub), "row {row}: u outside");
+                let gp_exact: Vec<Rat> = u_exact
+                    .iter()
+                    .zip(&g0)
+                    .map(|(a, b)| int(2) * a - b)
+                    .collect();
+                assert!(inside(&gp_exact, &gpb), "row {row}: drive covector outside");
+                if corner == 0 {
+                    // Contraction on the drive: |y − A⁻¹W_c c| ≤ |p|, via |y| ≤ |p| + ‖A⁻¹W_c c‖.
+                    let zero_p = vec![Rat::zero(); 2 * n];
+                    let port = exact_cayley(&certificate, &zero_p, &c0, false);
+                    let free: Rat = y_exact
+                        .iter()
+                        .zip(&port)
+                        .map(|(a, b)| (a - b) * (a - b))
+                        .sum();
+                    let drive: Rat = p0.iter().map(|a| a * a).sum();
+                    assert!(
+                        free <= drive,
+                        "row {row}: the Cayley map is not contractive"
+                    );
+                }
+            }
+            // The certified radius stays small: a few grain units above the input radius.
+            assert!(yb.radius < int(1), "row {row}: radius {}", yb.radius);
+        }
+        // A certificate of another cut is refused.
+        let other = ResidentNormalMaterial::found_features(&surface, features, n, grain)
+            .unwrap()
+            .retained_view();
+        assert!(
+            other
+                .cayley_reaction_step(&certificate, &p, Some(&c))
+                .is_err()
+        );
     }
 }

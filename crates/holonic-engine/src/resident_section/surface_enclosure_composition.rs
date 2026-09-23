@@ -53,8 +53,42 @@ pub(crate) enum EnclosureComposition<'a, 'c> {
         grain: u32,
         joint: bool,
     },
+    /// The implicit-midpoint (Cayley) reaction step of the power-neutral law
+    /// (`kernels/enclosure_cayley.cuh`): outputs the step `y` and the midpoint `(p + y)/2`.
+    /// `condition` is absent exactly when `k = 0`. `certified` is the host's exact passivity
+    /// certificate of the linear self-relation; the kernel refuses without it.
+    CayleyReaction {
+        state: &'a ResidentSection<'c>,
+        drive: &'a ResidentSection<'c>,
+        condition: Option<&'a ResidentSection<'c>>,
+        n: usize,
+        k: usize,
+        grain: u32,
+        certified: bool,
+    },
+    /// Its adjoint: outputs `u = A⁻ᴴ g` and the drive covector `2u − g`.
+    CayleyAdjoint {
+        state: &'a ResidentSection<'c>,
+        condition: Option<&'a ResidentSection<'c>>,
+        covector: &'a ResidentSection<'c>,
+        n: usize,
+        k: usize,
+        grain: u32,
+        certified: bool,
+    },
 }
 impl<'c> ResidentSurface<'c> {
+    /// `(2n, state words)` of a power-neutral reaction material with `n` complex targets and `k`
+    /// real contrast coordinates (`F = n + k/2 + n·k` complex sources); `n ≤ 8` (the kernel's
+    /// per-row solve extent).
+    fn cayley_extent(&self, n: usize, k: usize) -> Option<(usize, usize)> {
+        if n == 0 || n > 8 || k % 2 != 0 || k >= u32::MAX as usize {
+            return None;
+        }
+        let f = n.checked_mul(k)?.checked_add(n)?.checked_add(k / 2)?;
+        let words = crate::native_ecology::constitutive_fibre::normal_feature_state_words(f, n)?;
+        Some((2 * n, words))
+    }
     pub(crate) fn record_enclosure_composition(
         &self,
         lane: &Lane<'_, 'c>,
@@ -286,6 +320,76 @@ impl<'c> ResidentSurface<'c> {
                     .u32(grain)
                     .u32(u32::from(joint));
                 "section_normal_enclosed_adjoint"
+            }
+            EnclosureComposition::CayleyReaction {
+                state,
+                drive,
+                condition,
+                n,
+                k,
+                grain,
+                certified,
+            } => {
+                let (d, words) = self.cayley_extent(n, k).ok_or_else(fail)?;
+                if outputs.len() != 2
+                    || !(1..=120).contains(&grain)
+                    || !self.operative_shape(state, 1, words)
+                    || !ball(drive, rows, d)
+                    || condition.is_some() != (k > 0)
+                    || condition.is_some_and(|c| !ball(c, rows, k))
+                    || !ball(out, rows, d)
+                    || !ball(outputs[1], rows, d)
+                {
+                    return Err(fail());
+                }
+                let c = condition.unwrap_or(drive);
+                p.ptr(state.lo.device_ptr())
+                    .ptr(state.hi.device_ptr())
+                    .ptr(drive.lo.device_ptr())
+                    .ptr(drive.hi.device_ptr())
+                    .ptr(c.lo.device_ptr())
+                    .ptr(c.hi.device_ptr())
+                    .u32(rows as u32)
+                    .u32(n as u32)
+                    .u32(k as u32)
+                    .u32(grain)
+                    .u32(u32::from(certified));
+                "section_enclosure_cayley_reaction"
+            }
+            EnclosureComposition::CayleyAdjoint {
+                state,
+                condition,
+                covector,
+                n,
+                k,
+                grain,
+                certified,
+            } => {
+                let (d, words) = self.cayley_extent(n, k).ok_or_else(fail)?;
+                if outputs.len() != 2
+                    || !(1..=120).contains(&grain)
+                    || !self.operative_shape(state, 1, words)
+                    || !ball(covector, rows, d)
+                    || condition.is_some() != (k > 0)
+                    || condition.is_some_and(|c| !ball(c, rows, k))
+                    || !ball(out, rows, d)
+                    || !ball(outputs[1], rows, d)
+                {
+                    return Err(fail());
+                }
+                let c = condition.unwrap_or(covector);
+                p.ptr(state.lo.device_ptr())
+                    .ptr(state.hi.device_ptr())
+                    .ptr(c.lo.device_ptr())
+                    .ptr(c.hi.device_ptr())
+                    .ptr(covector.lo.device_ptr())
+                    .ptr(covector.hi.device_ptr())
+                    .u32(rows as u32)
+                    .u32(n as u32)
+                    .u32(k as u32)
+                    .u32(grain)
+                    .u32(u32::from(certified));
+                "section_enclosure_cayley_adjoint"
             }
         };
         for output in outputs {

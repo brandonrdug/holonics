@@ -258,3 +258,28 @@ Constraints: rest/wire compatibility for `SavedCoupledBody`, `NativeIncidentMode
 `CoupledConstitutiveRest`, the complex schema string and custom deserializers; interaction types stay
 `Serialize`-only so no wire mints an unchecked object; no device layout change during consolidation;
 public names kept; the Lean citation scan extended to `holonic-core`.
+
+## Consolidation programme (phases 9–16)
+
+[established-bounded; source-inspected] September 22 sweep (6,001 public types; suffix counts Receipt
+268, Error 263, Reading 179, Refusal 136, Return 121, Rest/Wire 92, Fibre 74): the same growth pattern —
+one wrapper per operation around a single object, each with its own Step/Reading/Rest/Refusal/Handle/
+Prediction/Comparison ladder, often holding frozen producing cuts — recurs across the tree. Brandon's
+standing request is consolidation onto the Holon objects with all mathematics and functionality kept.
+
+| Phase | Cluster | Size | The one object | Retention debt |
+|---|---|---|---|---|
+| 9 | engine `material_transport/normal/**` and its hna consumers | 65 files, ~22k lines, ~70 types | normal-law constitution `W H = B` and its motion | producing handles, comparisons, continuations |
+| 10 | core `Descent::Defect{fibre, separator}`; the ~14 reconstruction/preimage fibres and 19 separators | across life, native_ecology, spool, soulkiller | restriction descent with retained fibre | none |
+| 11 | engine `constitutive_fibre/resident/**` views | 34 files, 9.5k lines | the constitutive relation (onto phase 9's object) | anchors retained in wave observation |
+| 12 | HNN field session: hna `field_session*`, `coupled_wave/**`; engine `junction/operative/**`, `material_transport/{complete,contextual,moment,support}`, `archive`, `current_history_source`, `contextual_lift`, `rest` | hna 27k, junction 16k, material 5k lines | the resident field Holon; `ResidentHolonChart` lands here | heavy: frozen producing sections, pending rests, frozen receivers, occurrence kernels |
+| 13 | device quadratic moment: `cuda_refine/membrane_*`, `factored_moment/`, `receiver_history_compression` staging | 25k + 2k + 6k lines | `Σ w f f*` storage on the device | occurrence-addressed staging |
+| 14 | cultivated body: `native_spool`, engine `native_ecology` stages (5 files have no external consumer), life `native_intelligence/**`, `production_aperture/**` | 5k + 8.5k + 53k + 5k lines | one body with deposition (core `deposition`) | predecessor rests, deposit lists, identity histories |
+| 15 | Soulkiller operator ecology (two parallel session ladders) | 19k lines, 223 types | one source-neutral operator Holon | retained previous-cycle emission |
+| 16 | event-law ladder (26 `ExactEventLaw` modules; 237 ladder types) and one `HolonRest` codec | 58k lines | the event chart of motion; one rest | `history`/`pending` in 8 modules |
+
+Kept distinct: phase-4 (c) objects; the content of each event law (only its scaffolding unifies);
+within-cycle adjoint checkpoints; the traversal frontier; retention-law-conformant rests
+(`condition_contact`, `preimage`); receiver-history compression frames (the quotient itself);
+`holonic-membrane`/`holonic-body` register carriage until the chart exists; `DepositLedger`; legacy wire
+decoders. Each phase: disposition table, equality tests, caller migration, deletion, full suites.

@@ -45,6 +45,8 @@ impl<'c> ResidentNormalEnclosureSection<'c> {
             EnclosureComposition::Features { .. } => "bilinear features",
             EnclosureComposition::FeaturesAdjoint { .. } => "bilinear input adjoints",
             EnclosureComposition::NormalAdjoint { .. } => "normal material adjoint",
+            EnclosureComposition::CayleyReaction { .. } => "Cayley reaction step",
+            EnclosureComposition::CayleyAdjoint { .. } => "Cayley reaction adjoint",
         };
         let flags =
             self.surface
@@ -448,6 +450,135 @@ impl<'c> ResidentNormalMaterialView<'c> {
             width,
             self.grain,
         )
+    }
+}
+impl<'c> ResidentNormalMaterialView<'c> {
+    fn cayley_shape(
+        &self,
+        certificate: &PowerNeutralCertificate<'c>,
+        rows: usize,
+        condition: Option<&ResidentNormalEnclosureSection<'c>>,
+    ) -> Result<(usize, usize), ConstitutiveFibreError> {
+        let (n, k) = (certificate.n, certificate.k);
+        if !certificate.certifies(self)
+            || self.targets != n
+            || condition.map_or(0, |c| c.width) != k
+            || condition.is_some_and(|c| {
+                c.rows != rows || c.grain != self.grain || !std::ptr::eq(c.surface, self.surface)
+            })
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        Ok((n, k))
+    }
+    /// **The Cayley (implicit-midpoint) reaction step** of the power-neutral law on each row:
+    /// `(I − K(c)/2) y = (I + K(c)/2) p + W_c c` with `K(c) = W_s + Σ_r c_r A_r`, and the midpoint
+    /// `(p + y)/2` on which the material and contrast returns are read. The centre is refined
+    /// against the exact residual and the radius is certified from the certificate's passivity
+    /// (`kernels/enclosure_cayley.cuh`; `Holon/Cayley.lean::device_containment` with gain `1`).
+    /// Returns `(y, midpoint)`.
+    pub fn cayley_reaction_step(
+        &self,
+        certificate: &PowerNeutralCertificate<'c>,
+        drive: &ResidentNormalEnclosureSection<'c>,
+        condition: Option<&ResidentNormalEnclosureSection<'c>>,
+    ) -> Result<
+        (
+            ResidentNormalEnclosureSection<'c>,
+            ResidentNormalEnclosureSection<'c>,
+        ),
+        ConstitutiveFibreError,
+    > {
+        let (n, k) = self.cayley_shape(certificate, drive.rows, condition)?;
+        if drive.width != 2 * n
+            || drive.grain != self.grain
+            || !std::ptr::eq(drive.surface, self.surface)
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let y = drive.composition_output(drive.rows, drive.width)?;
+        let mid = drive.composition_output(drive.rows, drive.width)?;
+        drive.enact_composition(
+            EnclosureComposition::CayleyReaction {
+                state: &self.state,
+                drive: &drive.section,
+                condition: condition.map(|c| &c.section),
+                n,
+                k,
+                grain: self.grain.0,
+                certified: true,
+            },
+            &[&y, &mid],
+        )?;
+        Ok((
+            ResidentNormalEnclosureSection::from_resident(
+                self.surface,
+                y,
+                drive.rows,
+                drive.width,
+                self.grain,
+            )?,
+            ResidentNormalEnclosureSection::from_resident(
+                self.surface,
+                mid,
+                drive.rows,
+                drive.width,
+                self.grain,
+            )?,
+        ))
+    }
+    /// The exact adjoint of [`Self::cayley_reaction_step`] at its producing contrast: `u = A⁻ᴴ g`
+    /// (the covector the material and contrast returns read through `Wᴴ`) and the drive covector
+    /// `(I + K/2)ᴴ u = 2u − g`. Returns `(u, drive covector)`.
+    pub fn cayley_reaction_adjoint(
+        &self,
+        certificate: &PowerNeutralCertificate<'c>,
+        condition: Option<&ResidentNormalEnclosureSection<'c>>,
+        covector: &ResidentNormalEnclosureSection<'c>,
+    ) -> Result<
+        (
+            ResidentNormalEnclosureSection<'c>,
+            ResidentNormalEnclosureSection<'c>,
+        ),
+        ConstitutiveFibreError,
+    > {
+        let (n, k) = self.cayley_shape(certificate, covector.rows, condition)?;
+        if covector.width != 2 * n
+            || covector.grain != self.grain
+            || !std::ptr::eq(covector.surface, self.surface)
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let u = covector.composition_output(covector.rows, covector.width)?;
+        let drive = covector.composition_output(covector.rows, covector.width)?;
+        covector.enact_composition(
+            EnclosureComposition::CayleyAdjoint {
+                state: &self.state,
+                condition: condition.map(|c| &c.section),
+                covector: &covector.section,
+                n,
+                k,
+                grain: self.grain.0,
+                certified: true,
+            },
+            &[&u, &drive],
+        )?;
+        Ok((
+            ResidentNormalEnclosureSection::from_resident(
+                self.surface,
+                u,
+                covector.rows,
+                covector.width,
+                self.grain,
+            )?,
+            ResidentNormalEnclosureSection::from_resident(
+                self.surface,
+                drive,
+                covector.rows,
+                covector.width,
+                self.grain,
+            )?,
+        ))
     }
 }
 impl<'c> ResidentNormalMaterial<'c> {

@@ -111,11 +111,30 @@ fn silent_probe_partial(path: &Path, commits: usize) -> Result<(Vec<f64>, Option
     NativeFieldSavedSession::open(path)?.with_session(|session, _| silent_commits(session, commits))
 }
 
+/// The same probe with each silent commit's energy balance.
+fn silent_probe_balanced(
+    path: &Path,
+    commits: usize,
+) -> Result<(Vec<f64>, Option<String>, Vec<Value>)> {
+    NativeFieldSavedSession::open(path)?
+        .with_session(|session, _| silent_commits_with_balance(session, commits))
+}
+
 /// Silent commits on an open session.
 fn silent_commits(
     session: &mut NativeFieldSession<'_>,
     commits: usize,
 ) -> Result<(Vec<f64>, Option<String>)> {
+    silent_commits_with_balance(session, commits).map(|(e, r, _)| (e, r))
+}
+
+/// Silent commits, also returning each committed word's exterior energy balance
+/// (`IncidentEnergyBalance`, power-neutral law; `null` under the legacy law).
+fn silent_commits_with_balance(
+    session: &mut NativeFieldSession<'_>,
+    commits: usize,
+) -> Result<(Vec<f64>, Option<String>, Vec<Value>)> {
+    let mut balances = Vec::new();
     {
         let options = session.presentation.spec.generator.clone().unwrap();
         let sites = options.field.machine.sites().len();
@@ -140,12 +159,13 @@ fn silent_commits(
                 )
                 .and_then(|generated| session.body.publish_incident_field(generated, true, false));
             if let Err(error) = step {
-                return Ok((energies, Some(error.to_string())));
+                return Ok((energies, Some(error.to_string()), balances));
             }
             session.generator.as_mut().unwrap().next_event += 1;
             energies.push(energy(session, sites));
+            balances.push(session.body.inspect_current()?["energy_balance"].clone());
         }
-        Ok((energies, None))
+        Ok((energies, None, balances))
     }
 }
 
@@ -471,16 +491,29 @@ fn power_neutral_silent_probe_after_learning() {
     .unwrap();
     let mut worst = 0.0f64;
     let mut probe_refusals = 0usize;
+    let mut reaction_nonzero = 0usize;
     for (cycle, path, deposits, w) in &checkpoints {
-        let (energies, probe_refused) = silent_probe_partial(path, commits).unwrap();
+        let (energies, probe_refused, balances) = silent_probe_balanced(path, commits).unwrap();
         let r = ratios(&energies);
         let max = r.iter().cloned().fold(f64::MIN, f64::max);
         worst = worst.max(max);
         probe_refusals += usize::from(probe_refused.is_some());
+        // The skew reaction's work is exactly zero in every committed word's balance.
+        reaction_nonzero += balances
+            .iter()
+            .filter(|b| {
+                let zero = |v: &Value| {
+                    serde_json::from_value::<relational_geometry::Rat>(v.clone())
+                        .is_ok_and(|r| num_traits::Zero::is_zero(&r))
+                };
+                !b.is_null() && !(zero(&b["reaction"]) && zero(&b["residual"]))
+            })
+            .count();
         eprintln!(
             "POWER-NEUTRAL-SYNTH {}",
             json!({"cycle":cycle,"law":law_of_spec(&spec),"energies":energies,"ratios":r,"max_ratio":max,
-                "probe_refused":probe_refused,"W":w,"reaction_deposits":deposits})
+                "probe_refused":probe_refused,"W":w,"reaction_deposits":deposits,
+                "energy_balance":balances.last()})
         );
         if std::env::var("DEPOSITION_KEEP").is_err() {
             let _ = std::fs::remove_file(path);
@@ -494,6 +527,10 @@ fn power_neutral_silent_probe_after_learning() {
     assert!(refused.is_none(), "learning refused: {refused:?}");
     if law_of_spec(&spec) == crate::native::ReactionLaw::PowerNeutral {
         assert_eq!(probe_refusals, 0, "a silent probe refused");
+        assert_eq!(
+            reaction_nonzero, 0,
+            "a committed balance with nonzero reaction work or residual"
+        );
         assert!(
             worst <= 1.0,
             "an active silent commit under the power-neutral law: {worst}"
