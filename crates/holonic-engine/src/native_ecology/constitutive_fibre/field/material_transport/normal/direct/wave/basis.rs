@@ -70,30 +70,6 @@ pub struct NormalWaveBasisFace<'c> {
     scores: ResidentSection<'c>,
     report: ResidentSection<'c>,
 }
-#[derive(Clone, Debug, Serialize, PartialEq, Eq)]
-pub struct NormalBasisSelection {
-    pub selected: usize,
-    pub selected_coordinate: usize,
-    pub centre_score: Rat,
-    pub centre_ties: usize,
-    pub score_radius: Rat,
-    /// Strict interval separation for this finite receiver; never source uniqueness.
-    pub robust: bool,
-}
-#[derive(Clone, Debug, Serialize, PartialEq, Eq)]
-pub struct NormalBasisScore {
-    pub centre: Rat,
-    pub lower: Rat,
-    pub upper: Rat,
-}
-#[derive(Debug, Serialize)]
-pub struct NormalWaveBasisReading {
-    pub epoch: Option<u64>,
-    pub transport: NormalWaveTransport,
-    pub coordinates: Vec<usize>,
-    pub selection: NormalBasisSelection,
-    pub scores: Vec<NormalBasisScore>,
-}
 impl<'c> NormalWaveBasisFace<'c> {
     pub fn source(&self) -> &NormalWaveCurrent<'c> {
         &self.current
@@ -103,6 +79,15 @@ impl<'c> NormalWaveBasisFace<'c> {
     }
     pub fn basis_coordinates(&self) -> &[usize] {
         &self.coordinates
+    }
+    /// The codec face is a passive reading of the current (`2n` real coordinates): it selects a
+    /// basis action and injects no current (power zero).
+    pub fn receiver_element(&self) -> holonic_core::law::receiver::ActiveReceiver {
+        holonic_core::law::receiver::ActiveReceiver::declared(
+            "normal wave basis face",
+            2 * self.coordinates.len(),
+            holonic_core::law::receiver::ReceiverPower::Reading,
+        )
     }
     /// Only the already-selected native face crosses here. The host never ranks scores.
     pub fn selection(&self) -> Result<NormalBasisSelection, ConstitutiveFibreError> {

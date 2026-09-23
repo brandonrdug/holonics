@@ -558,7 +558,7 @@ mod pending_tests {
         assert!(valid.starts_with(magic));let prefix=magic.len();assert_eq!(valid[prefix],9);
         let mut legacy=valid.clone();legacy[prefix]=7;
         assert!(NormalWaveRest::read(&mut legacy.as_slice(),legacy.len() as u64).is_err());
-        rest.coupled.as_mut().unwrap().pending.get_mut(&pred.handle.id()).unwrap().source=source;
+        rest.coupled.as_mut().unwrap().pending.get_mut(&pred.0).unwrap().source=source;
         let mut altered=Vec::new();rest.write(&mut altered).unwrap();
         let read=NormalWaveRest::read(&mut altered.as_slice(),altered.len() as u64).unwrap();
         match read.remount_coupled(&s, |_|{}) {

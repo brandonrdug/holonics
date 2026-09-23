@@ -1,45 +1,14 @@
 use super::*;
 
-pub struct NormalRealizationRefinement<'c> {
-    surface: &'c ResidentSurface<'c>,
-    before: Rc<ResidentSection<'c>>,
-    after: Rc<ResidentSection<'c>>,
-    source_chart: NormalSourceChart,
-    targets: usize,
-    pub before_grain: ResidentGrain,
-    pub after_grain: ResidentGrain,
-    pub observations: u64,
-    prior: Option<NativeNormalPrior>,
-}
-impl NormalRealizationRefinement<'_> {
-    pub fn inspect_before(&self) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
-        expose_data_energy(
-            decode_state_layout(
-                &self.surface.detach_section(&self.before, 64)?,
-                self.source_chart.layout(self.targets)?,
-                self.targets,
-                self.before_grain.0,
-            )?,
-            self.prior.as_ref(),
-        )
-    }
-    pub fn inspect_after(&self) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
-        expose_data_energy(
-            decode_state_layout(
-                &self.surface.detach_section(&self.after, 64)?,
-                self.source_chart.layout(self.targets)?,
-                self.targets,
-                self.after_grain.0,
-            )?,
-            self.prior.as_ref(),
-        )
-    }
-}
 impl<'c> ResidentNormalMaterial<'c> {
+    /// Refine the numerical realization to a finer grain. The exact moments (the constitution's
+    /// storage and source) are unchanged; only the applied coefficients' realization error
+    /// shrinks. Returns the predecessor constitution: a shared cut of the section it replaced
+    /// (its `inspect()` is the before-reading; `self.inspect()` the after-reading).
     pub fn refine_realization(
         &mut self,
         grain: ResidentGrain,
-    ) -> Result<NormalRealizationRefinement<'c>, ConstitutiveFibreError> {
+    ) -> Result<ResidentNormalMaterial<'c>, ConstitutiveFibreError> {
         if grain.0 <= self.grain.0 || grain.0 > 120 {
             return Err(ConstitutiveFibreError::Shape);
         }
@@ -72,20 +41,10 @@ impl<'c> ResidentNormalMaterial<'c> {
                 returned.obstruction
             )));
         }
-        let next = Rc::new(next);
-        let before = std::mem::replace(&mut self.state, Rc::clone(&next));
-        let before_grain = std::mem::replace(&mut self.grain, grain);
-        Ok(NormalRealizationRefinement {
-            surface: self.surface,
-            before,
-            after: next,
-            source_chart: self.source_chart,
-            targets: self.targets,
-            before_grain,
-            after_grain: grain,
-            observations: self.observations,
-            prior: self.prior.clone(),
-        })
+        let predecessor = self.clone();
+        self.state = Rc::new(next);
+        self.grain = grain;
+        Ok(predecessor)
     }
 }
 
@@ -124,7 +83,9 @@ mod tests {
         let reads = s.census().section_read_outs;
         let returned = material.refine_realization(ResidentGrain(32)).unwrap();
         assert_eq!(s.census().section_read_outs, reads);
-        let after = returned.inspect_after().unwrap();
+        let after = material.inspect().unwrap();
+        assert_eq!(returned.inspect().unwrap().source_normal, before.source_normal);
+        assert_eq!((returned.grain(), material.grain()), (ResidentGrain(16), ResidentGrain(32)));
         assert_eq!(before.source_normal, after.source_normal);
         assert_eq!(before.cross_source, after.cross_source);
         assert_eq!(before.source_normal_error, after.source_normal_error);

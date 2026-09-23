@@ -87,15 +87,15 @@ fn delayed_joint_separates_same_marginals_after_member_paths_diverge() {
     let pp = plus.predict_contact(&p1).unwrap();
     let mp = minus.predict_contact(&m1).unwrap();
     assert_eq!(
-        pp.step.source().rest().unwrap(),
-        mp.step.source().rest().unwrap()
+        pp.1.source().rest().unwrap(),
+        mp.1.source().rest().unwrap()
     );
     assert_eq!(
-        pp.step.successor().rest().unwrap(),
-        mp.step.successor().rest().unwrap()
+        pp.1.successor().rest().unwrap(),
+        mp.1.successor().rest().unwrap()
     );
-    let handle_p = pp.handle;
-    let handle_m = mp.handle;
+    let handle_p = pp.0;
+    let handle_m = mp.0;
 
     // Both worlds retain the same pending producing cut, then choose different successors.
     let p1 = plus.admit_contact(1).unwrap();
@@ -104,11 +104,11 @@ fn delayed_joint_separates_same_marginals_after_member_paths_diverge() {
     minus.advance_contact(&m2).unwrap();
     assert_eq!(
         plus.pending_coupled_prediction_ids().collect::<Vec<_>>(),
-        vec![handle_p.id()]
+        vec![handle_p]
     );
     assert_eq!(
         minus.pending_coupled_prediction_ids().collect::<Vec<_>>(),
-        vec![handle_m.id()]
+        vec![handle_m]
     );
 
     // The same contemporary observation closes both paths.  The final marginals agree, but
@@ -143,8 +143,8 @@ fn delayed_joint_separates_same_marginals_after_member_paths_diverge() {
         .remount_coupled(&s, |_| {})
         .unwrap();
     assert_eq!(restored.rest().unwrap(), saved);
-    assert!(restored.pending_coupled_continuation(&handle_p).is_err());
-    let restored_handle = restored.pending_coupled_prediction(handle_p.id()).unwrap();
+    assert!(restored.pending_coupled_continuation(handle_p + 99).is_err());
+    let restored_handle = restored.pending_coupled_prediction(handle_p).unwrap();
     assert_eq!(
         restored
             .pending_coupled_continuation(&restored_handle)
@@ -166,7 +166,7 @@ fn pending_continuation_retains_internal_factors_and_prunes_only_released_prefix
     let s = ResidentSurface::on(&ro).unwrap();
     let mut wave = world(&s);
     let contact = wave.admit_contact(1).unwrap();
-    let first = wave.predict_contact(&contact).unwrap().handle;
+    let first = wave.predict_contact(&contact).unwrap().0;
     let source = s
         .mount_section_rest(
             &ResidentSectionRest::found(
@@ -204,7 +204,7 @@ fn pending_continuation_retains_internal_factors_and_prunes_only_released_prefix
         vec![Some(0), Some(1), Some(2)]
     );
     let contact = wave.admit_contact(1).unwrap();
-    let second = wave.predict_contact(&contact).unwrap().handle;
+    let second = wave.predict_contact(&contact).unwrap().0;
     let saved = wave.rest().unwrap();
     let mut bytes = Vec::new();
     saved.write(&mut bytes).unwrap();
@@ -229,7 +229,7 @@ fn pending_continuation_retains_internal_factors_and_prunes_only_released_prefix
             .count(),
         1
     );
-    let h = restored.pending_coupled_prediction(first.id()).unwrap();
+    let h = restored.pending_coupled_prediction(first).unwrap();
     restored.release_coupled_prediction(&h).unwrap();
     assert_eq!(restored.rest().unwrap(), wave.rest().unwrap());
 }

@@ -50,7 +50,7 @@ fn declared_receiver_coordinates_retain_the_coordinate_kernel(){
     use crate::native_ecology::constitutive_fibre::ConstitutiveReading;
     let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
     let mut wave=world(&s,true);let contact=wave.admit_contact(0).unwrap();wave.advance_contact(&contact).unwrap();
-    let contact=wave.admit_contact(0).unwrap();let pending=wave.predict_contact(&contact).unwrap().handle;
+    let contact=wave.admit_contact(0).unwrap();let pending=wave.predict_contact(&contact).unwrap().0;
     let observation=point(&s,&[7,4]);let comparison=wave.compare_coupled_prediction(&pending,current(&observation)).unwrap();
     let expected=comparison.source().read_receiver().unwrap().inspect().unwrap();
     let reads=s.census().section_read_outs;
@@ -79,7 +79,7 @@ fn dependent_field_is_one_clock_and_all_ordered_factors(){
     let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
     let build=||{
         let mut wave=world(&s,true);let contact=wave.admit_contact(0).unwrap();wave.advance_contact(&contact).unwrap();
-        let contact=wave.admit_contact(0).unwrap();let h=wave.predict_contact(&contact).unwrap().handle;
+        let contact=wave.admit_contact(0).unwrap();let h=wave.predict_contact(&contact).unwrap().0;
         let observed=point(&s,&[7,4]);let comparison=wave.compare_coupled_prediction(&h,current(&observed)).unwrap();
         let coordinates=comparison.source().receiver_coordinates().unwrap().into_coordinates();
         wave.into_constitutive_continuation(comparison,coordinates).unwrap()
@@ -137,7 +137,7 @@ fn owned_constitutive_cycle_publishes_consumes_and_continues() {
     let s = ResidentSurface::on(&ro).unwrap();
     let mut wave = world(&s, false);
     let contact = wave.admit_contact(0).unwrap();
-    let handle = wave.predict_contact(&contact).unwrap().handle;
+    let handle = wave.predict_contact(&contact).unwrap().0;
     let observation = point(&s, &[4, 3]);
     let comparison = wave
         .compare_coupled_prediction(&handle, current(&observation))
@@ -154,8 +154,8 @@ fn owned_constitutive_cycle_publishes_consumes_and_continues() {
         .unwrap();
     assert_eq!(s.census().section_read_outs, reads);
     assert_eq!(model.epoch(), old_epoch + 1);
-    assert_eq!(model.consumed_prediction(), handle.id());
-    assert!(model.pending_prediction(handle.id()).is_err());
+    assert_eq!(model.consumed_prediction(), handle);
+    assert!(model.pending_prediction(handle).is_err());
     assert_eq!(model.pending_prediction_ids().count(), 0);
     assert_eq!(
         face(&mut model),
@@ -226,7 +226,7 @@ fn owned_constitutive_cycle_publishes_consumes_and_continues() {
         vec![r(43, 10), r(0, 1), r(63, 5), r(-4, 1)]
     );
     let after_second = remounted.rest().unwrap();
-    assert!(remounted.pending_prediction(handle.id()).is_err());
+    assert!(remounted.pending_prediction(handle).is_err());
     let bad = s
         .mount_exact_rational_packet(&[1, 0, 2, 0, 0, 0].map(|v| r(v, 1)))
         .unwrap();
@@ -268,20 +268,20 @@ fn owned_constitutive_cycle_keeps_unit_sum_receiver() {
     let contact = wave
         .admit_contact_in_chart(0, WaveSourceReceiver::UnitRealSum)
         .unwrap();
-    let handle = wave.predict_contact(&contact).unwrap().handle;
+    let handle = wave.predict_contact(&contact).unwrap().0;
     let comparison = wave
         .compare_coupled_prediction(&handle, current(&c))
         .unwrap();
     let next_contact=wave.admit_contact_in_chart(0,WaveSourceReceiver::UnitRealSum).unwrap();
-    let other_pending=wave.predict_contact(&next_contact).unwrap().handle;
+    let other_pending=wave.predict_contact(&next_contact).unwrap().0;
     let coords = [1, 0, 0, 0, 0, 0, 1, 0];
     let theta = source_parameters_at(&comparison, &coords, &coords);
     let receiver = s.mount_exact_rational_packet(&theta).unwrap();
     let mut model = wave
         .into_constitutive_continuation(comparison, receiver)
         .unwrap();
-    assert_eq!(model.pending_prediction_ids().collect::<Vec<_>>(),vec![other_pending.id()]);
-    assert!(model.pending_prediction(other_pending.id()).is_ok());
+    assert_eq!(model.pending_prediction_ids().collect::<Vec<_>>(),vec![other_pending]);
+    assert!(model.pending_prediction(other_pending).is_ok());
     let view = face(&mut model);
     assert_eq!(&view[0] + &view[2], r(1, 1));
     assert_eq!(&view[4] + &view[6], r(1, 1));
@@ -293,7 +293,7 @@ fn owned_constitutive_cycle_keeps_unit_sum_receiver() {
         .remount(&s)
         .unwrap();
     assert_eq!(face(&mut restored), view);
-    assert_eq!(restored.pending_prediction_ids().collect::<Vec<_>>(),vec![other_pending.id()]);
+    assert_eq!(restored.pending_prediction_ids().collect::<Vec<_>>(),vec![other_pending]);
 }
 #[test]
 #[ignore = "requires CUDA; publication retains the non-affine family beyond its explicitly declared receiver"]
@@ -304,7 +304,7 @@ fn owned_constitutive_cycle_retains_other_source_sections() {
     let contact = wave.admit_contact(0).unwrap();
     wave.advance_contact(&contact).unwrap();
     let contact = wave.admit_contact(0).unwrap();
-    let handle = wave.predict_contact(&contact).unwrap().handle;
+    let handle = wave.predict_contact(&contact).unwrap().0;
     let observation = point(&s, &[7, 4]);
     let comparison = wave
         .compare_coupled_prediction(&handle, current(&observation))
@@ -318,11 +318,11 @@ fn owned_constitutive_cycle_retains_other_source_sections() {
         Ok(_) => panic!("outside-anchor receiver was admitted"),
         Err(refusal) => refusal,
     };
-    assert_eq!(refusal.wave.rest().unwrap(), before);
+    assert_eq!(refusal.returned.0.rest().unwrap(), before);
     let receiver = s.mount_exact_rational_packet(&a).unwrap();
-    let mut model = refusal
-        .wave
-        .into_constitutive_continuation(refusal.comparison, receiver)
+    let (wave, comparison, _) = refusal.returned;
+    let mut model = wave
+        .into_constitutive_continuation(comparison, receiver)
         .unwrap();
     assert_eq!(
         model
@@ -368,7 +368,7 @@ fn owned_constitutive_cycle_retains_other_source_sections() {
 fn repeated_constitutive_returns_form_and_continue_the_same_generator() {
     let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
     let mut wave=world(&s,false);let contact=wave.admit_contact(0).unwrap();
-    let pending=wave.predict_contact(&contact).unwrap().handle;
+    let pending=wave.predict_contact(&contact).unwrap().0;
     let observed=point(&s,&[4,3]);let comparison=wave.compare_coupled_prediction(&pending,current(&observed)).unwrap();
     let parameters=comparison.source().receiver_coordinates().unwrap().into_coordinates();
     let mut model=wave.into_constitutive_continuation(comparison,parameters).unwrap();
@@ -400,7 +400,7 @@ fn repeated_constitutive_returns_form_and_continue_the_same_generator() {
 fn repeated_returns_keep_their_original_sources_when_received_out_of_order() {
     let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
     let mut wave=world(&s,false);let contact=wave.admit_contact(0).unwrap();
-    let pending=wave.predict_contact(&contact).unwrap().handle;
+    let pending=wave.predict_contact(&contact).unwrap().0;
     let observation=point(&s,&[4,3]);let comparison=wave.compare_coupled_prediction(&pending,current(&observation)).unwrap();
     let parameters=comparison.source().receiver_coordinates().unwrap().into_coordinates();
     let mut model=wave.into_constitutive_continuation(comparison,parameters).unwrap();
@@ -426,7 +426,7 @@ fn repeated_returns_keep_their_original_sources_when_received_out_of_order() {
 fn repeated_return_retains_distinct_source_face_sections() {
     let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
     let mut wave=world(&s,true);let contact=wave.admit_contact(0).unwrap();
-    let pending=wave.predict_contact(&contact).unwrap().handle;
+    let pending=wave.predict_contact(&contact).unwrap().0;
     let observation=point(&s,&[4,3]);let comparison=wave.compare_coupled_prediction(&pending,current(&observation)).unwrap();
     let parameters=comparison.source().receiver_coordinates().unwrap().into_coordinates();
     let mut model=wave.into_constitutive_continuation(comparison,parameters).unwrap();
@@ -455,7 +455,7 @@ fn repeated_return_retains_distinct_source_face_sections() {
 fn repeated_return_reader_keeps_v1_and_v2_source_programmes() {
     let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
     let mut wave=world(&s,false);let contact=wave.admit_contact(0).unwrap();
-    let pending=wave.predict_contact(&contact).unwrap().handle;
+    let pending=wave.predict_contact(&contact).unwrap().0;
     let observation=point(&s,&[4,3]);let comparison=wave.compare_coupled_prediction(&pending,current(&observation)).unwrap();
     let parameters=comparison.source().receiver_coordinates().unwrap().into_coordinates();
     let mut model=wave.into_constitutive_continuation(comparison,parameters).unwrap();
@@ -491,25 +491,25 @@ fn base_pending_returns_join_the_root_and_later_programme() {
     let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
     for root_later in [false,true] {
         let mut wave=world(&s,false);let contact=wave.admit_contact(0).unwrap();
-        let first=wave.predict_contact(&contact).unwrap().handle;
-        let contact=wave.admit_contact(0).unwrap();let second=wave.predict_contact(&contact).unwrap().handle;
-        let (root,remaining,observed,returned)=if root_later {(&second,&first,[5,4],[5,4])}else{(&first,&second,[4,3],[6,5])};
+        let first=wave.predict_contact(&contact).unwrap().0;
+        let contact=wave.admit_contact(0).unwrap();let second=wave.predict_contact(&contact).unwrap().0;
+        let (root,remaining,observed,returned)=if root_later {(&second,first,[5,4],[5,4])}else{(&first,second,[4,3],[6,5])};
         let comparison=wave.compare_coupled_prediction(root,current(&point(&s,&observed))).unwrap();
         let parameters=comparison.source().receiver_coordinates().unwrap().into_coordinates();
         let mut model=wave.into_constitutive_continuation(comparison,parameters).unwrap();
         assert_eq!(face(&mut model),vec![r(4,1),r(3,1),r(6,1),r(5,1)]);
         let local=model.predict_member(0,WaveSourceReceiver::Direct).unwrap();
         let reads=s.census().section_read_outs;
-        model.incorporate_prediction(remaining.id(),current(&point(&s,&returned))).unwrap();
+        model.incorporate_prediction(remaining,current(&point(&s,&returned))).unwrap();
         assert_eq!(s.census().section_read_outs,reads);
-        assert!(!model.has_prediction(remaining.id()));assert!(model.has_prediction(local));
-        assert!(model.pending_prediction(remaining.id()).is_err());
+        assert!(!model.has_prediction(remaining));assert!(model.has_prediction(local));
+        assert!(model.pending_prediction(remaining).is_err());
         assert_eq!(face(&mut model),vec![r(10,1),r(9,1),r(22,1),r(21,1)]);
         assert!(matches!(model.return_source_receivers().next().unwrap().1,ConstitutiveSourceFrame::Base{..}));
         let saved=model.rest().unwrap();let mut bytes=Vec::new();saved.write(&mut bytes).unwrap();
         let mut resumed=CoupledConstitutiveRest::read(&mut bytes.as_slice(),bytes.len() as u64).unwrap().remount(&s).unwrap();
         assert_eq!(resumed.rest().unwrap(),saved);
-        assert!(!resumed.has_prediction(remaining.id()));
+        assert!(!resumed.has_prediction(remaining));
         for value in [&mut model,&mut resumed] {
             value.incorporate_prediction(local,current(&point(&s,&[8,7]))).unwrap();
             assert_eq!(value.material_returns(),3);
@@ -526,14 +526,14 @@ fn base_pending_returns_join_the_root_and_later_programme() {
 fn base_return_keeps_the_root_constraint_after_later_maps_erase_its_source() {
     let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
     let mut wave=world(&s,true);let contact=wave.admit_contact(0).unwrap();
-    let first=wave.predict_contact(&contact).unwrap().handle;
-    let contact=wave.admit_contact(0).unwrap();let earlier=wave.predict_contact(&contact).unwrap().handle;
-    let contact=wave.admit_contact(0).unwrap();let root=wave.predict_contact(&contact).unwrap().handle;
+    let first=wave.predict_contact(&contact).unwrap().0;
+    let contact=wave.admit_contact(0).unwrap();let earlier=wave.predict_contact(&contact).unwrap().0;
+    let contact=wave.admit_contact(0).unwrap();let root=wave.predict_contact(&contact).unwrap().0;
     let comparison=wave.compare_coupled_prediction(&root,current(&point(&s,&[0,5]))).unwrap();
     let parameters=comparison.source().receiver_coordinates().unwrap().into_coordinates();
     let mut model=wave.into_constitutive_continuation(comparison,parameters).unwrap();
-    model.incorporate_prediction(earlier.id(),current(&point(&s,&[0,4]))).unwrap();
-    assert!(model.has_prediction(first.id()));assert!(!model.has_prediction(earlier.id()));
+    model.incorporate_prediction(earlier,current(&point(&s,&[0,4]))).unwrap();
+    assert!(model.has_prediction(first));assert!(!model.has_prediction(earlier));
     let root=s.copy_section_device(model.receiver()).unwrap();
     let packet=model.return_source_receivers().next().unwrap().2;
     let raw=s.detach_section(packet,64).unwrap();let mut changed=raw.intervals.clone();
@@ -555,7 +555,7 @@ fn base_return_keeps_the_root_constraint_after_later_maps_erase_its_source() {
 fn base_return_reader_migrates_v3_programme_return_frames() {
     let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
     let mut wave=world(&s,false);let contact=wave.admit_contact(0).unwrap();
-    let root=wave.predict_contact(&contact).unwrap().handle;
+    let root=wave.predict_contact(&contact).unwrap().0;
     let comparison=wave.compare_coupled_prediction(&root,current(&point(&s,&[4,3]))).unwrap();
     let parameters=comparison.source().receiver_coordinates().unwrap().into_coordinates();
     let mut model=wave.into_constitutive_continuation(comparison,parameters).unwrap();
@@ -585,13 +585,13 @@ fn base_return_retains_root_invisible_source_parameters() {
     let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
     let mut wave=world(&s,true);let contact=wave.admit_contact(0).unwrap();
     wave.predict_contact(&contact).unwrap();
-    let contact=wave.admit_contact(0).unwrap();let old=wave.predict_contact(&contact).unwrap().handle;
+    let contact=wave.admit_contact(0).unwrap();let old=wave.predict_contact(&contact).unwrap().0;
     let contact=wave.admit_contact(0).unwrap();wave.predict_contact(&contact).unwrap();
-    let contact=wave.admit_contact(0).unwrap();let root=wave.predict_contact(&contact).unwrap().handle;
+    let contact=wave.admit_contact(0).unwrap();let root=wave.predict_contact(&contact).unwrap().0;
     let comparison=wave.compare_coupled_prediction(&root,current(&point(&s,&[0,6]))).unwrap();
     let parameters=comparison.source().receiver_coordinates().unwrap().into_coordinates();
     let mut model=wave.into_constitutive_continuation(comparison,parameters).unwrap();
-    model.incorporate_prediction(old.id(),current(&point(&s,&[0,5]))).unwrap();
+    model.incorporate_prediction(old,current(&point(&s,&[0,5]))).unwrap();
     let root=s.copy_section_device(model.receiver()).unwrap();
     let original=s.copy_section_device(model.return_source_receivers().next().unwrap().2).unwrap();
     let raw=s.detach_section(&original,64).unwrap();let mut changed=raw.intervals.clone();
@@ -623,15 +623,15 @@ fn dependent_observation_keeps_parameter_material_and_separate_wave_clocks() {
     let ball=s.mount_section_rest(&ResidentSectionRest::found(1,values.len(),ResidentGrain(0),64,values).unwrap()).unwrap();
     let seed=ResidentNormalEnclosureView{surface:&s,section:&ball,offset:0,width:4,grain};
     let mut wave=ResidentNormalMaterial::found(&s,1,1,grain).unwrap().into_joint_difference_wave(seed).unwrap().with_neighborhood(local).unwrap();
-    let c=wave.admit_contact(1).unwrap();let original=wave.predict_contact(&c).unwrap().handle;
-    let c=wave.admit_contact(0).unwrap();let root=wave.predict_contact(&c).unwrap().handle;
+    let c=wave.admit_contact(1).unwrap();let original=wave.predict_contact(&c).unwrap().0;
+    let c=wave.admit_contact(0).unwrap();let root=wave.predict_contact(&c).unwrap().0;
     let y=point(&s,&[3,0]);let comparison=wave.compare_coupled_prediction(&root,current(&y)).unwrap();
     let coordinates=[2,1].map(|c|source_parameters_at(&comparison,&[1,0,c,0],&[c,0,c,0]));
     let parameters=coordinates.iter().map(|p|s.mount_exact_rational_packet(p).unwrap()).collect::<Vec<_>>();
     let receiver=s.mount_exact_rational_packet(&coordinates[0]).unwrap();
     let mut model=wave.into_constitutive_continuation(comparison,receiver).unwrap();
     for (index,y) in [[4,0],[5,0]].into_iter().enumerate(){
-        let id=if index==0 {original.id()}else{model.predict_member(1,WaveSourceReceiver::Direct).unwrap()};
+        let id=if index==0 {original}else{model.predict_member(1,WaveSourceReceiver::Direct).unwrap()};
         let before=parameters.iter().map(|p|{
             let value=ResidentCoupledConstitutive::evaluate_programme(&mut model.base,&model.comparison,
                 &model.operations.iter().collect::<Vec<_>>(),p,None).unwrap().0;
@@ -681,7 +681,7 @@ fn known_condition_input_is_the_following_standing_without_a_wave_tick(){
     let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();let h=point(&s,&[1,0]);
     let neighborhood=ResidentGeneratorNeighborhood::with_shared_condition(vec![law(&s,true)],current(&h),ConditionContactMetric::UnitAdmittanceRealification).unwrap();
     let mut wave=body(&s).with_neighborhood(neighborhood).unwrap();
-    let c=wave.admit_contact(0).unwrap();let pending=wave.predict_contact(&c).unwrap().handle;
+    let c=wave.admit_contact(0).unwrap();let pending=wave.predict_contact(&c).unwrap().0;
     let y=point(&s,&[0,0]);let comparison=wave.compare_coupled_prediction(&pending,current(&y)).unwrap();
     let receiver=comparison.source().receiver_coordinates().unwrap().into_coordinates();
     let mut model=wave.into_constitutive_continuation(comparison,receiver).unwrap();

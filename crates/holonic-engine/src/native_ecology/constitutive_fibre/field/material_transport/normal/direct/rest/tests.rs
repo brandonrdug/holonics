@@ -127,7 +127,7 @@ fn complex_source_energy_validation_retains_its_null_fibre() {
     let q = |v: i64| Rat::from_integer(v.into());
     let z = |r, i| ExactComplexWaveCurrent::new(q(r), q(i));
     // x=(1,i), y=1: G=xx*, B=yx*, C=1, with a nontrivial complex source kernel.
-    let mut v = NativeNormalMaterialState {
+    let mut v = NormalConstitution {
         material: NativeFieldMaterialTransportState {
             coefficients: vec![vec![z(0, 0); 2]],
             radius: q(0),

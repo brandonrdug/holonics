@@ -581,11 +581,3 @@ impl<'c> ResidentNormalMaterialView<'c> {
         ))
     }
 }
-impl<'c> ResidentNormalMaterial<'c> {
-    pub fn pull_back_enclosed_section(
-        &self,
-        covector: &ResidentNormalEnclosureSection<'c>,
-    ) -> Result<ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
-        self.retained_view().pull_back_enclosed_section(covector)
-    }
-}

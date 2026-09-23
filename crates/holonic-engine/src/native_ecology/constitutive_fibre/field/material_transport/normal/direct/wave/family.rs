@@ -1,21 +1,21 @@
 use super::*;
 mod basis;
 mod receiver;
-pub use basis::{FamilyBasisReading, FamilyBasisSelection, NormalFamilyBasisFace};
+pub use basis::{NormalFamilyBasisFace};
 mod rest;
 mod section;
 mod pullback;
 pub use pullback::NormalFamilyPullback;
-pub use section::{NormalReceiverCoordinates,NormalWaveFacePacket};
+pub use section::{NormalReceiverCoordinates, NormalWaveFacePacket};
 use crate::native_ecology::constitutive_fibre::{ResidentConstitutiveReturn, ResidentWaveRelation};
-pub use receiver::{NormalFamilyReceiverReading, NormalFamilySupport, NormalWaveFamilyReceiver};
+pub use receiver::{NormalWaveFamilyReceiver};
 pub use rest::NormalWaveFamilyRest;
 
 /// A constrained affine family, not a normal ball and not a point-current operand.
 /// The relation targets (lambda,anchor,p,c); lambda=1 and the anchor retains the producing
 /// joint ball. Conditional composition eliminates intermediate variables but keeps that bound.
 pub struct NormalWaveFamily<'c> {
-    origin: Rc<NormalWaveJointSource<'c>>,
+    origin: Rc<NormalWaveState<'c>>,
     relation: ResidentConstitutiveReturn<'c>,
     last_relation: Option<Rc<ResidentWaveRelation<'c>>>,
     affine_coverage: Option<ResidentSection<'c>>,
@@ -49,7 +49,7 @@ impl<'c> NormalWaveFamily<'c> {
         Ok(Self {origin:Rc::clone(&self.origin),relation,
             last_relation:self.last_relation.as_ref().map(Rc::clone),affine_coverage:None,passages:self.passages})
     }
-    pub fn origin(&self) -> &NormalWaveJointSource<'c> {
+    pub fn origin(&self) -> &NormalWaveState<'c> {
         &self.origin
     }
     pub fn anchor(&self) -> ResidentNormalEnclosureView<'_, 'c> {

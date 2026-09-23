@@ -555,10 +555,10 @@ fn generic_features_rest_roundtrip_and_refinement_preserve_geometry() {
     let mut restored = rest.remount(&s).unwrap();
     assert_eq!(restored.source_chart(), body.source_chart());
     assert_eq!(restored.inspect().unwrap().source_normal, state.source_normal);
-    let refinement = restored.refine_realization(ResidentGrain(24)).unwrap();
-    assert_eq!(refinement.inspect_before().unwrap().source_normal, state.source_normal);
-    assert_eq!(refinement.inspect_after().unwrap().source_normal, state.source_normal);
-    drop(refinement);
+    let predecessor = restored.refine_realization(ResidentGrain(24)).unwrap();
+    assert_eq!(predecessor.inspect().unwrap().source_normal, state.source_normal);
+    assert_eq!(restored.inspect().unwrap().source_normal, state.source_normal);
+    drop(predecessor);
     let initial=point(&s,&[1,0,0,0]);
     assert!(restored.into_difference_wave(current(&initial),current(&initial)).is_err());
 }

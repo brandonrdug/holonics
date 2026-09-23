@@ -40,7 +40,7 @@ pub(crate) use material_transport::normal::{
     report_words as normal_material_report_words, state_words as normal_material_state_words,
     workspace_words as normal_material_workspace_words,
 };
-pub use material_transport::{BoundaryMaterialMaps, BoundaryMaterialSeed, NativeNormalPrior};
+pub use material_transport::normal::api::*;
 mod receiver;
 mod rechart;
 mod relation_current;
@@ -78,46 +78,11 @@ pub use junction::{
     joint_material_contact,
 };
 use junction::{PairedJunction, PendingJunction};
-pub use material_transport::ResidentNormalEnclosureSection;
 pub use material_transport::{
-    CompiledCoupledJoint, ConstitutiveComparisonSection, ConstitutiveSourceFrame,
-    ConstitutiveSourceRefusal, CoupledConstitutiveAlternative, CoupledConstitutiveFamily,
-    CoupledConstitutiveRefusal, CoupledConstitutiveRest, CoupledJointEvaluation,
-    CoupledJointReading, FamilyBasisReading, FamilyBasisSelection,
-    NativeCompleteMaterialTransportReading, NativeCompleteMaterialTransportState,
-    NativeContextualMaterialReading, NativeFieldExactMaterialTransport,
-    NativeFieldMaterialTransportReading, NativeFieldMaterialTransportResidual,
-    NativeFieldMaterialTransportState, NativeMaterialModeComponent, NativeMaterialModeDifferential,
-    NativeMaterialModeReading, NativeMaterialModeReturn, NativeMaterialModeUnfolding,
-    NativeMaterialReportPacking, NativeMaterialReportPackingRest, NativeMaterialTarget,
-    NativeMaterialTransportSource, NativeMomentMaterialReading, NativeNormalMaterialObjective,
-    NativeNormalMaterialReading, NativeNormalMaterialState, NativeOperativeContextReading,
-    NativeVisibleSourceReading, NormalBasisScore, NormalBasisSelection, NormalContinuationJoin,
-    NormalContinuationPullback, NormalCoupledAttachRefusal, NormalCoupledComparison,
-    NormalCoupledContact, NormalCoupledContinuation, NormalCoupledObservation,
-    NormalCoupledPrediction, NormalCoupledProducingHandle, NormalCoupledReception,
-    NormalCoupledSourceActuation, NormalCoupledStep, NormalFamilyBasisFace,
-    NormalFamilyComparisonRow, NormalFamilyPullback, NormalFamilyReceiverReading,
-    NormalFamilySupport, NormalMaterialRest, NormalProducingHandle, NormalRealizationRefinement,
-    NormalReceiverCoordinates, NormalSectionBasisFace, NormalSourceActuation, NormalSourceChart,
-    NormalWaveBasisChart, NormalWaveBasisFace, NormalWaveBasisReading, NormalWaveComparison,
-    NormalWaveComparisonReading, NormalWaveCoupled, NormalWaveCurrent, NormalWaveDevelopment,
-    NormalWaveFacePacket, NormalWaveFamily, NormalWaveFamilyReceiver, NormalWaveFamilyRest,
-    NormalWaveFibre, NormalWaveJointSource, NormalWavePrediction, NormalWaveReading,
-    NormalWaveReception, NormalWaveReceptionReading, NormalWaveReference,
-    NormalWaveReferenceReading, NormalWaveRest, NormalWaveSeedKind, NormalWaveSeedRefusal,
-    NormalWaveSource, NormalWaveStep, NormalWaveTransport, NormalWaveTransportChange,
-    NormalWaveWord, ResidentCoupledConstitutive, ResidentHeldSection, ResidentHeldSectionRest,
-    ResidentNormalEnclosure, ResidentNormalEnclosureView, ResidentNormalInput,
-    ResidentNormalMaterial, ResidentNormalMaterialView, ResidentNormalReturn,
-    ResidentNormalSectionReturn, ResidentNormalWave,
+    NativeCompleteMaterialTransportReading, NativeCompleteMaterialTransportState, NativeContextualMaterialReading, NativeFieldExactMaterialTransport, NativeFieldMaterialTransportReading, NativeFieldMaterialTransportResidual, NativeFieldMaterialTransportState, NativeMaterialModeComponent, NativeMaterialModeDifferential, NativeMaterialModeReading, NativeMaterialModeReturn, NativeMaterialModeUnfolding, NativeMaterialReportPacking, NativeMaterialReportPackingRest, NativeMaterialTarget, NativeMaterialTransportSource, NativeMomentMaterialReading, NativeOperativeContextReading, NativeVisibleSourceReading,
 };
 use material_transport::{MaterialTransport, PendingMaterialTransport};
-pub use material_transport::{
-    NativeAffineGeometry, NativeAffineGeometryAdjoint, NativeEnclosurePropagation,
-    NativeRealification, NativeRealificationAdjoint, NormalReactionProjection,
-    PowerNeutralCertificate,
-};
+
 pub use receiver::{
     NativeFieldDifferentialReading, NativeMaterialActuation, NativeMaterialPacketReading,
     NativeMaterialPullbackMetric, NativeMaterialSourcePullback,

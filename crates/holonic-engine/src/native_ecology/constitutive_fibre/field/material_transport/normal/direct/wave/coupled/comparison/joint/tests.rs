@@ -163,7 +163,7 @@ fn pending_comparison_compiles_joint_equations_without_freeing_its_anchor() {
         let prediction = wave.predict_contact(&contact).unwrap();
         let observed = point(&s, &observed_values);
         let comparison = wave
-            .compare_coupled_prediction(&prediction.handle, current(&observed))
+            .compare_coupled_prediction(&prediction.0, current(&observed))
             .unwrap();
         let inside = parameters(
             &comparison,
@@ -212,7 +212,7 @@ fn delayed_joint_compilation_uses_current_material_and_the_original_producing_co
     let prediction = wave.predict_contact(&contact).unwrap();
     let v = point(&s, &[3, 2]);
     let cmp = wave
-        .compare_coupled_prediction(&prediction.handle, current(&v))
+        .compare_coupled_prediction(&prediction.0, current(&v))
         .unwrap();
     let old = wave.compile_coupled_joint(&cmp).unwrap();
     let old_cut = old.material_cut();
@@ -246,7 +246,7 @@ fn delayed_joint_compilation_uses_current_material_and_the_original_producing_co
         .remount_coupled(&s, |_| {})
         .unwrap();
     let handle = restored
-        .pending_coupled_prediction(prediction.handle.id())
+        .pending_coupled_prediction(prediction.0)
         .unwrap();
     let cmp2 = restored
         .compare_coupled_prediction(&handle, current(&v))
@@ -260,7 +260,7 @@ fn delayed_joint_compilation_uses_current_material_and_the_original_producing_co
         .unwrap();
     assert_eq!(actual, expected);
     assert!(restored.compile_coupled_joint(&cmp).is_err());
-    wave.release_coupled_prediction(&prediction.handle).unwrap();
+    wave.release_coupled_prediction(&prediction.0).unwrap();
     assert!(wave.compile_coupled_joint(&cmp).is_err());
 }
 
@@ -289,7 +289,7 @@ fn compiled_joint_retains_free_current_directions_inside_one_anchor() {
     let pred = wave.predict_contact(&next).unwrap();
     let observed = point(&s, &[7, 3]);
     let comparison = wave
-        .compare_coupled_prediction(&pred.handle, current(&observed))
+        .compare_coupled_prediction(&pred.0, current(&observed))
         .unwrap();
     let a = parameters_at(
         &comparison,
@@ -343,7 +343,7 @@ fn compiled_joint_keeps_rational_condition_and_observation_denominators() {
         .unwrap();
     let cmp = wave
         .compare_coupled_prediction(
-            &pred.handle,
+            &pred.0,
             ResidentConstitutiveCurrent::rational(&v).unwrap(),
         )
         .unwrap();

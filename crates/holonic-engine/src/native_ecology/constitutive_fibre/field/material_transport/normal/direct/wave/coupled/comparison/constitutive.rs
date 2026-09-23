@@ -69,10 +69,8 @@ impl<'w, 'j, 'c> CoupledConstitutiveFamily<'w, 'j, 'c> {
     pub fn continuation(
         &self,
     ) -> Result<NormalCoupledContinuation<'_, 'c>, ConstitutiveFibreError> {
-        let handle = self
-            .wave
-            .pending_coupled_prediction(self.comparison.prediction_id())?;
-        self.wave.pending_coupled_continuation(&handle)
+        self.wave
+            .pending_coupled_continuation(self.comparison.prediction_id())
     }
 
     /// Substitute a bound source coordinate. Neither producing-condition equality nor an old

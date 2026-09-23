@@ -818,41 +818,9 @@ impl<'c> ResidentNormalMaterial<'c> {
         Ok(staged)
     }
 
-    pub fn read_applied_section<'a>(
-        &self,
-        source: ResidentConstitutiveSection<'a, 'c>,
-    ) -> Result<ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
-        self.retained_view().read_applied_section(source)
-    }
 
-    pub fn read_applied_bilinear_section<'a>(
-        &self,
-        source: ResidentConstitutiveSection<'a, 'c>,
-        condition: ResidentConstitutiveSection<'a, 'c>,
-    ) -> Result<ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
-        self.retained_view()
-            .read_applied_bilinear_section(source, condition)
-    }
 
-    pub fn read_applied_bilinear_enclosed_section<'a>(
-        &self,
-        source: &ResidentNormalEnclosureSection<'c>,
-        condition: ResidentConstitutiveSection<'a, 'c>,
-        identity: bool,
-    ) -> Result<ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
-        self.retained_view()
-            .read_applied_bilinear_enclosed_section(source, condition, identity)
-    }
 
-    pub fn read_applied_bilinear_enclosed_pair(
-        &self,
-        source: &ResidentNormalEnclosureSection<'c>,
-        condition: &ResidentNormalEnclosureSection<'c>,
-        identity: bool,
-    ) -> Result<ResidentNormalEnclosureSection<'c>, ConstitutiveFibreError> {
-        self.retained_view()
-            .read_applied_bilinear_enclosed_pair(source, condition, identity)
-    }
 }
 
 /// The two complete response fields share actual immutable producing operator cuts. Input
@@ -912,7 +880,7 @@ impl<'a, 'c> ResidentNormalSectionReturn<'a, 'c> {
     }
     pub fn inspect_before_operator(
         &self,
-    ) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
+    ) -> Result<NormalConstitution, ConstitutiveFibreError> {
         expose_data_energy(
             decode_state_layout(
                 &self.surface.detach_section(&self.prior, i64::BITS)?,
@@ -925,7 +893,7 @@ impl<'a, 'c> ResidentNormalSectionReturn<'a, 'c> {
     }
     pub fn inspect_after_operator(
         &self,
-    ) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
+    ) -> Result<NormalConstitution, ConstitutiveFibreError> {
         expose_data_energy(
             decode_state_layout(
                 &self.surface.detach_section(&self.successor, i64::BITS)?,

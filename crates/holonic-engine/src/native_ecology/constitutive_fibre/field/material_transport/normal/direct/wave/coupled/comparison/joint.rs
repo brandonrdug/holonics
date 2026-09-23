@@ -13,13 +13,6 @@ pub struct CompiledCoupledJoint<'a, 'c> {
     parameters: usize,
     map: ResidentBilinearMap<'c>,
 }
-#[derive(Debug, Serialize, PartialEq, Eq)]
-pub struct CoupledJointReading {
-    pub relation_residual: Vec<Rat>,
-    pub producing_condition_residual: Vec<Rat>,
-    pub anchor_difference: Vec<Rat>,
-    pub within_anchor: bool,
-}
 pub struct CoupledJointEvaluation<'a, 'j, 'c> {
     compiled: &'a CompiledCoupledJoint<'j, 'c>,
     parameters: &'a ResidentSection<'c>,

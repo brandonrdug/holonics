@@ -117,27 +117,14 @@ impl<'a, 'c> ConstitutiveComparisonSection<'a, 'c> {
     }
 }
 
-/// Failed ownership transfer returns every supplied owner and packet recoverably.
-pub struct CoupledConstitutiveRefusal<'c> {
-    pub wave: ResidentNormalWave<'c, NormalWaveCoupled<'c>>,
-    pub comparison: NormalCoupledComparison<'c>,
-    pub receiver: ResidentSection<'c>,
-    pub reason: ConstitutiveFibreError,
-}
-impl std::fmt::Debug for CoupledConstitutiveRefusal<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.reason.fmt(f)
-    }
-}
-pub struct ConstitutiveSourceRefusal<'c> {
-    pub source: ResidentSection<'c>,
-    pub reason: ConstitutiveFibreError,
-}
-impl std::fmt::Debug for ConstitutiveSourceRefusal<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.reason.fmt(f)
-    }
-}
+/// Failed ownership transfer returns the wave, the comparison and the receiver.
+pub type CoupledConstitutiveRefusal<'c> = NormalRefusal<(
+    ResidentNormalWave<'c, NormalWaveCoupled<'c>>,
+    NormalCoupledComparison<'c>,
+    ResidentSection<'c>,
+)>;
+/// A refused source passage returns its packet.
+pub type ConstitutiveSourceRefusal<'c> = NormalRefusal<ResidentSection<'c>>;
 
 impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
     /// Publish the entire executable return family by ownership transfer. No theta-dependent
@@ -172,12 +159,7 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
                 pending: BTreeMap::new(),
                 released: std::collections::BTreeSet::new(),
             }),
-            Err(reason) => Err(CoupledConstitutiveRefusal {
-                wave: self,
-                comparison,
-                receiver,
-                reason,
-            }),
+            Err(reason) => Err(NormalRefusal::new((self, comparison, receiver), reason)),
         }
     }
 }
@@ -243,8 +225,7 @@ impl<'c> ResidentCoupledConstitutive<'c> {
         if let Some(cut) = self.pending.get(&id) {
             return Ok(cut.clone().into());
         }
-        let handle = self.base.pending_coupled_prediction(id)?;
-        let cut = self.base.coupled_producing_cut(&handle)?;
+        let cut = self.base.coupled_producing_cut(id)?;
         let chart = cut
             .produced
             .last_relation()
@@ -393,15 +374,20 @@ impl<'c> ResidentCoupledConstitutive<'c> {
             })
             .chain(self.pending.keys().copied())
     }
-    pub fn pending_prediction(
-        &self,
-        id: u64,
-    ) -> Result<NormalCoupledProducingHandle, ConstitutiveFibreError> {
-        if id == self.consumed_prediction() || self.released.contains(&id) || self.returned_base(id)
-        {
-            return Err(ConstitutiveFibreError::ForeignOccurrence);
+    /// Resolve a pending prediction of the base word still open in this continuation.
+    pub fn pending_prediction(&self, id: u64) -> Result<u64, ConstitutiveFibreError> {
+        if self.has_base_prediction(id) {
+            Ok(id)
+        } else {
+            Err(ConstitutiveFibreError::ForeignOccurrence)
         }
-        self.base.pending_coupled_prediction(id)
+    }
+    /// Whether `id` is a pending prediction of the base word still open in this continuation.
+    pub fn has_base_prediction(&self, id: u64) -> bool {
+        id != self.consumed_prediction()
+            && !self.released.contains(&id)
+            && !self.returned_base(id)
+            && self.base.has_pending_coupled_prediction(id)
     }
     fn evaluate_parts<'p, 'j>(
         base: &mut ResidentNormalWave<'c, NormalWaveCoupled<'c>>,
@@ -602,7 +588,7 @@ impl<'c> ResidentCoupledConstitutive<'c> {
     /// Observer of the fitted material at the same declared source section used by conduct.
     /// Other source assignments remain in the retained generator; this is not a global matrix.
     pub fn inspect_predictive_material(&mut self, member: usize)
-        -> Result<Option<(u64, NativeNormalMaterialState)>, ConstitutiveFibreError> {
+        -> Result<Option<(u64, NormalConstitution)>, ConstitutiveFibreError> {
         let value = Self::evaluate_parts(&mut self.base, &self.comparison, &self.operations, &self.receiver)?;
         value.predictive_for(member,Some(self.base.neighborhood().material(member)?))?
             .map(|v|Ok((v.material.observations(),v.material.inspect()?))).transpose()
@@ -890,10 +876,8 @@ impl<'c> ResidentCoupledConstitutive<'c> {
             },
             false,
         )
-        .map(|_|()).map_err(|(p, reason)| ConstitutiveSourceRefusal {
-            source: p.source.expect("packet operation"),
-            reason,
-        })
+        .map(|_| ())
+        .map_err(|(p, reason)| NormalRefusal::new(p.source.expect("packet operation"), reason))
     }
     pub fn actuate_source(
         &mut self,

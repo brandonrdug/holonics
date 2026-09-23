@@ -284,6 +284,85 @@ within-cycle adjoint checkpoints; the traversal frontier; retention-law-conforma
 `holonic-membrane`/`holonic-body` register carriage until the chart exists; `DepositLedger`; legacy wire
 decoders. Each phase: disposition table, equality tests, caller migration, deletion, full suites.
 
+### Phase 9 disposition: the normal constitution stack is one Holon
+
+[established-bounded; source-inspected, measured] Scope: `holonic-engine/src/native_ecology/
+constitutive_fibre/field/material_transport/normal/**` and its consumers (`holonics-hna`
+`coupled_wave/body.rs`, `normal_wave.rs`, examples `normal_wave`, `conversation_wave`,
+`conversation_coupled`). Before: 90 public structs/enums + 1 alias, 23,208 lines. After: 72
+public structs/enums + 9 compatibility aliases, 23,397 lines (the growth is the new equality and
+conformance tests and facet documentation). Every enclosing module now re-exports the single list
+`normal::api` instead of three hand-copied lists. No kernel, device layout or wire field of an
+existing format changed; one new wave rest version (v11) was added.
+
+**Facets.** *Constitution*: `NormalConstitution` (was `NativeNormalMaterialState`, `constitution.rs`)
+is the element relation `W H = B` with `storage_form()` (realified `H`), `element()` (core
+`ElementRelation::Storage`), `stored_energy()` and `deposition_work(successor)` (core
+`element::deposition_work`); `ResidentNormalMaterial` is its one device chart (a clone is the
+retained cut; `ResidentNormalMaterialView` is an alias and the duplicated view/material method
+set was merged); `NormalMaterialRest` its one rest. *Motion*: `NormalWaveHolon` implements core
+`HolonLaw`: the applied word `x⁺ = T x`, `T = [[0, I], [M_p − M_d, I + M_d + M_c]]`, is the
+implicit-midpoint step of the medium with Cayley generator `A = 2(T − I)(T + I)⁻¹` (skew part the
+interconnection, symmetric part the declared active relation); its advance equals `T x` exactly
+with a zero-residual balance, and the chart square test checks the exact advance lies in the
+device ball for three applied words. Every other wave motion returns the one receipt
+`NormalWavePassage` (kind: actuate, develop, receive, reference, pullback, transport) with one
+reading `NormalWavePassageReading`; the state is `NormalWaveState`. *Interconnection*:
+`NormalWaveHolon::interact` is core interconnection; every coupled motion returns one
+`NormalCoupledStep`. *Readings*: `readings.rs` holds every reading and codec face value; the
+family and basis receivers declare `receiver_element()` (passive readings; the phase-7 owed
+declaration for `NormalWaveFamilyReceiver`). *Refusal*: one `NormalRefusal<T> { returned, reason }`.
+
+**Retention (one cut).** A plain-wave prediction retains only its source joint `(p, c)`; the
+return (`pullback(id, v)`) reads the forward response, the fit and the updated response at the
+contemporary constitution and transport. `delayed_return_is_one_cut_equal_to_an_immediate_return`
+proves a delayed return equals the return at the same cut number for number and that its source
+response is `P φ` of the contemporary `P = B H⁻¹` (9/10 in the witness; the retired producing cut
+read 1). Pending sources rest as v11; v5/v6 rests carrying frozen producing cuts still decode, and a
+remount regenerates each source joint once and drops the cut
+(`legacy_frozen_cut_pending_rest_decodes_into_the_one_cut_wave`). Owner-capability handles are
+retired: pending returns are addressed by epoch in the plain and coupled waves.
+
+| Former type | Disposition |
+|---|---|
+| `NativeNormalMaterialState` | renamed `NormalConstitution` (alias kept) |
+| `ResidentNormalMaterialView` | alias of `ResidentNormalMaterial` (Clone); duplicate delegations deleted |
+| `NormalRealizationRefinement` | retired: `refine_realization` returns the predecessor constitution |
+| `NativeNormalMaterialObjective`, `NativeNormalMaterialReading`, `NativeNormalPrior`, `NormalMaterialRest`, `NormalSourceChart` | kept (constitution readings/rest/chart; readings moved to `readings.rs`) |
+| `NormalWaveJointSource`, `NormalWaveStep` | aliases of `NormalWaveState` (the Holon state) |
+| `NormalWaveSource` | retired: `read_source()` returns the lifted `ResidentNormalEnclosure` |
+| `NormalWaveWord` | alias of `()` (the plain wave has no continuation state) |
+| `NormalSourceActuation`, `NormalWaveDevelopment`, `NormalWaveReception`, `NormalWaveReference`, `NormalWaveComparison`, `NormalWaveTransportChange` | retired into `NormalWavePassage` |
+| `NormalWaveReceptionReading`, `NormalWaveReferenceReading`, `NormalWaveComparisonReading` | retired into `NormalWavePassageReading` |
+| `NormalProducingHandle`, `NormalWavePrediction` | retired: `predict() -> (id, state)`, `pullback(id, v)` (one cut) |
+| `NormalWaveReading`, `NormalWaveTransport`, `NormalWaveSeedKind`, `NormalWaveCurrent`, `NormalWaveFibre`, `NormalWaveRest`, `ResidentNormalWave` | kept (word reading, operator-family scope, seed chart, occurrence, generating fibre, the one rest, the device Holon) |
+| `NormalWaveSeedRefusal`, `NormalCoupledAttachRefusal`, `CoupledConstitutiveRefusal`, `ConstitutiveSourceRefusal` | aliases of `NormalRefusal<T>` |
+| `NormalCoupledReception`, `NormalCoupledSourceActuation` | retired into `NormalCoupledStep` |
+| `NormalCoupledProducingHandle`, `NormalCoupledPrediction` | retired: `predict_contact() -> (id, step)`, id-addressed compare/observe/release |
+| `NormalWaveCoupled`, `NormalCoupledContact`, `NormalCoupledStep`, `NormalCoupledComparison`, `NormalCoupledObservation`, `NormalFamilyComparisonRow` | kept (coupled continuation state, admitted contact, the one coupled receipt, the producing-family comparison and its empirical return) |
+| `NormalCoupledContinuation`, `NormalContinuationPullback`, `NormalContinuationJoin` | kept, **not retired** (see below) |
+| `ResidentCoupledConstitutive`, `CoupledConstitutiveRest`, `CoupledConstitutiveFamily`, `CoupledConstitutiveAlternative`, `ConstitutiveComparisonSection`, `ConstitutiveSourceFrame`, `CompiledCoupledJoint`, `CoupledJointEvaluation`, `CoupledJointReading` | kept: the dependent (θ-parameterized) continuation and its compiled joint (see below) |
+| `NormalWaveFamily`, `NormalWaveFamilyRest`, `NormalWaveFamilyReceiver`, `NormalFamilyReceiverReading`, `NormalFamilySupport`, `NormalFamilyPullback`, `NormalReceiverCoordinates`, `NormalWaveFacePacket` | kept: the anchored affine family (a restriction/descent object whose fibre is the affine relation) and its receiver faces |
+| `NormalWaveBasisChart`, `NormalWaveBasisFace`, `NormalWaveBasisReading`, `NormalBasisSelection`, `NormalBasisScore`, `NormalFamilyBasisFace`, `FamilyBasisSelection`, `FamilyBasisReading`, `NormalSectionBasisFace` | kept as codec receiver faces (values in `readings.rs`; faces declare their element) |
+| `ResidentNormalEnclosure{,View,Section}`, `ResidentNormalInput`, `ResidentNormalReturn`, `ResidentNormalSectionReturn`, `ResidentHeldSection{,Rest}`, `NativeAffineGeometry{,Adjoint}`, `NativeRealification{,Adjoint}`, `NativeEnclosurePropagation` | kept: the constitution's device storage and section charts (brief: device section types stay) |
+| `NormalReactionProjection`, `PowerNeutralCertificate`, `BoundaryMaterialSeed`, `BoundaryMaterialMaps` | kept (phase-8a reaction law; boundary codec seed) |
+| new: `NormalRefusal`, `NormalWavePassage`, `NormalPassageKind`, `NormalWavePassageReading`, `NormalWaveHolon`, `NormalWaveState` (renamed) | the consolidated facets |
+
+**Not retired, with evidence.** The coupled continuation still retains its transport word
+(`NormalWaveCoupled.transport`, rested as wave v9/v10 passages) and its pending producing
+families. The dependent continuation (`ResidentCoupledConstitutive::evaluate_with_base_faces`,
+`read_retained_word_pullback`) imposes a returned θ-face at the prediction's own epoch and carries it
+through every intervening map to the contemporary family; a one-cut return has no such join, so
+retiring the word changes what `incorporate` computes. In the live session returns are delayed as a rule:
+`NativeCoupledWaveSession::emit_symbol` re-enters `(previous, current)` through `actuate_field`
+immediately after every `predict_symbol` that follows an earlier emission, so a later
+`incorporate_symbol` crosses at least one passage. Retirement is one joint packet over the coupled rest, the dependent continuation and the
+session contract (tests `coupled_session_incorporates_observed_symbol_and_continues`,
+`coupled_session_returns_original_base_prediction_after_restart`), as phase 8b recorded for the
+incident `\x01` word. The θ-dependent programme re-evaluation of `ResidentCoupledConstitutive`
+(its ordered `operations`) is the same debt. Owed: that packet; a device chart of reception and
+actuation in `NormalWaveHolon` (the square covers the free applied word).
+
 ### Phase 10 disposition: the retained fibre and its separator
 
 [established-bounded; source-inspected, implemented-exact] `holonic_core::restriction::fibre` owns

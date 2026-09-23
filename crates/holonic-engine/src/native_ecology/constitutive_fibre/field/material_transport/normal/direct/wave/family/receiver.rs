@@ -2,42 +2,6 @@ use super::*;
 use crate::native_ecology::constitutive_fibre::ResidentConstitutiveImage;
 mod enclosure;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
-pub enum NormalFamilySupport {
-    Supported,
-    EmptyAffineRelation,
-    OutsideAnchorBall,
-}
-#[derive(Debug, Serialize)]
-pub struct NormalFamilyReceiverReading {
-    pub support: NormalFamilySupport,
-    /// The projection of the ball centre onto the affine anchor domain, when that domain exists.
-    pub nearest_anchor: Option<Vec<Rat>>,
-    /// A declared minimum-norm joint receiver at nearest_anchor, only for supported families.
-    pub projected_joint: Option<Vec<Rat>>,
-    pub anchor_difference: Option<Vec<Rat>>,
-    /// Nonzero coordinates of directions at fixed anchor. False does not imply a constant
-    /// coordinate over the full ball; those coordinates can still vary with the anchor.
-    pub anchor_independent_free: Vec<bool>,
-    /// Every frame has (lambda, anchor, p, c). The first lambda/anchor are reported above;
-    /// later copies remain in projected_joint so shared-frame constraints are not discarded.
-    pub state_width: usize,
-    pub state_count: usize,
-}
-impl NormalFamilyReceiverReading {
-    /// The p,c coordinates at one state in this SAME joint projection, not separately
-    /// projected marginal optima. The complete affine family remains on the native receiver.
-    pub fn projected_state(&self, state: usize) -> Option<&[Rat]> {
-        if state >= self.state_count {
-            return None;
-        }
-        let width = self.state_width.checked_sub(2)? / 2;
-        let start = state.checked_mul(self.state_width)?;
-        self.projected_joint
-            .as_ref()?
-            .get(start..start.checked_add(width)?)
-    }
-}
 pub struct NormalWaveFamilyReceiver<'a, 'c> {
     source: &'a NormalWaveFamily<'c>,
     image: Option<ResidentConstitutiveImage<'a, 'c>>,
@@ -72,6 +36,18 @@ impl<'a, 'c> NormalWaveFamilyReceiver<'a, 'c> {
     }
     pub fn source(&self) -> &NormalWaveFamily<'c> {
         self.source
+    }
+    /// [definition] Plan phase 7's owed declaration: the anchored family receiver is a
+    /// (nonlinear) passive reading — a joint minimum-norm projection of the family over its
+    /// nearest supported anchor — that returns a face and injects no current, so its power term
+    /// is zero (`Holon/Law.lean::coholon_reading_power`). It reads every coordinate of the
+    /// relation's target.
+    pub fn receiver_element(&self) -> holonic_core::law::receiver::ActiveReceiver {
+        holonic_core::law::receiver::ActiveReceiver::declared(
+            "normal wave family receiver",
+            self.target_width(),
+            holonic_core::law::receiver::ReceiverPower::Reading,
+        )
     }
     pub fn image(&self) -> Option<&ResidentConstitutiveImage<'a, 'c>> {
         self.image.as_ref()

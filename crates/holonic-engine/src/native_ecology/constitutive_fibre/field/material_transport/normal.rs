@@ -6,6 +6,8 @@ use num_traits::{Signed, ToPrimitive, Zero};
 use std::collections::BTreeMap;
 
 mod layout;
+mod constitution;
+mod readings;
 use layout::{MomentWire, NormalLayout, ReportBall, STATISTIC_SCALARS};
 
 pub(crate) fn state_words(n: usize, t: usize) -> Option<usize> {
@@ -463,260 +465,6 @@ fn validate_numerical_witness_layout(
     Ok(())
 }
 
-#[derive(Debug, Serialize)]
-pub struct NativeNormalMaterialReading {
-    pub forward: NativeFieldCurrentBall,
-    pub observed: NativeFieldCurrentBall,
-    pub contemporary_source_forward: Option<NativeFieldCurrentBall>,
-    pub returned_difference: Option<NativeFieldCurrentBall>,
-    pub chronological_current: Option<NativeFieldCurrentBall>,
-    pub contemporary_difference: Option<NativeFieldCurrentBall>,
-    pub source_current: Option<NativeFieldCurrentBall>,
-    pub coefficient_error: Rat,
-    pub normal_residual_upper: Rat,
-    pub coefficient_norm_upper: Rat,
-    pub source_normal_error_upper: Rat,
-    pub cross_source_error_upper: Rat,
-    pub increments: [Rat; 4],
-}
-#[derive(Clone, Debug, Serialize)]
-pub struct NativeNormalMaterialState {
-    pub material: NativeFieldMaterialTransportState,
-    pub source_normal: Vec<Vec<ExactComplexWaveCurrent>>,
-    pub cross_source: Vec<Vec<ExactComplexWaveCurrent>>,
-    pub source_normal_error: Rat,
-    pub cross_source_error: Rat,
-    pub target_energy: Rat,
-    pub target_energy_error: Rat,
-    pub normal_residual_upper: Rat,
-}
-
-/// Immutable nonzero coefficient prior for a normal chart.  `cross_source` is
-/// `B_0 = W_0 H_0` and `target_energy` is `C_0 = ||W_0||²`; the observed
-/// `target_energy` retained in a state remains Q_data.  Keeping this operand
-/// separate prevents a prior from being reported as an observation.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
-pub struct NativeNormalPrior {
-    pub cross_source: Vec<Vec<ExactComplexWaveCurrent>>,
-    pub target_energy: Rat,
-}
-
-impl NativeNormalPrior {
-    pub fn from_coefficients(
-        coefficients: Vec<Vec<ExactComplexWaveCurrent>>,
-    ) -> Result<Self, ConstitutiveFibreError> {
-        if coefficients.is_empty()
-            || coefficients
-                .iter()
-                .any(|row| row.len() != coefficients[0].len())
-        {
-            return Err(ConstitutiveFibreError::Shape);
-        }
-        let target_energy = coefficients
-            .iter()
-            .flatten()
-            .map(ExactComplexWaveCurrent::norm_square)
-            .sum();
-        Ok(Self {
-            cross_source: coefficients,
-            target_energy,
-        })
-    }
-
-    pub fn source_complex(&self) -> usize {
-        self.cross_source.first().map_or(0, Vec::len)
-    }
-    pub fn targets(&self) -> usize {
-        self.cross_source.len()
-    }
-}
-
-/// Cold objective comparison in the unit-prior source chart. This describes the observed
-/// geometry, not language quality or a unique source selected from the retained family.
-#[derive(Debug, Serialize)]
-pub struct NativeNormalMaterialObjective {
-    pub nominal_data_term: Rat,
-    pub prior_term: Rat,
-    pub nominal_regularized_objective: Rat,
-    pub normal_residual_squared: Rat,
-    /// H >= I implies 0 <= Phi(M) - min Phi <= ||M H - B||_F^2 / 2.
-    pub solve_gap_upper: Rat,
-    pub nominal_minimum: crate::ExactInterval,
-    /// Bounds at the stored numerical M over every admitted observed-source/target family.
-    pub family_data_term: crate::ExactInterval,
-    pub family_regularized_objective: crate::ExactInterval,
-    /// Minimum for each admitted source geometry, including its unit prior.
-    pub family_minimum: crate::ExactInterval,
-}
-
-impl NativeNormalMaterialState {
-    /// Evaluate the normal objective with a supplied immutable prior.  The resident
-    /// state carries total H/B, while its Q_data remains the observed/proxy-target
-    /// energy; this method forms B-B0 and adds C0 only for the objective.
-    pub fn objective_with_prior(
-        &self,
-        prior: &NativeNormalPrior,
-    ) -> Result<NativeNormalMaterialObjective, ConstitutiveFibreError> {
-        if prior.targets() != self.cross_source.len()
-            || prior.source_complex() != self.source_normal.len()
-        {
-            return Err(ConstitutiveFibreError::Shape);
-        }
-        let mut data = self.clone();
-        for (row, p) in data.cross_source.iter_mut().zip(&prior.cross_source) {
-            for (value, prior_value) in row.iter_mut().zip(p) {
-                *value = value.subtract(prior_value);
-            }
-        }
-        data.target_energy += &prior.target_energy;
-        data.objective()
-    }
-
-    /// Validate the prior's dimensions and the retained H-I/B-B0 split without
-    /// conflating its C0 with Q_data.  Source-family uncertainty remains separate.
-    pub fn validate_prior(&self, prior: &NativeNormalPrior) -> Result<(), ConstitutiveFibreError> {
-        if prior.targets() != self.cross_source.len()
-            || prior.source_complex() != self.source_normal.len()
-            || self
-                .source_normal
-                .iter()
-                .any(|row| row.len() != self.source_normal.len())
-        {
-            return Err(ConstitutiveFibreError::Shape);
-        }
-        // Validate the observed source geometry as H-I. A nonzero prior does
-        // not require a fresh chart after observations have accumulated.
-        for i in 0..self.source_normal.len() {
-            for j in 0..self.source_normal.len() {
-                if self.source_normal[i][j] != self.source_normal[j][i].conjugate() {
-                    return Err(ConstitutiveFibreError::Uncertain);
-                }
-            }
-            let observed_diagonal = &self.source_normal[i][i].real - Rat::one();
-            if observed_diagonal.is_negative() {
-                return Err(ConstitutiveFibreError::Uncertain);
-            }
-        }
-        Ok(())
-    }
-
-    /// Decode the signed numerical normal residual from its retained exact factors.
-    /// Source/target family uncertainty remains in the separate normal and cross-source bounds.
-    pub fn normal_residual(
-        &self,
-    ) -> Result<Vec<Vec<ExactComplexWaveCurrent>>, ConstitutiveFibreError> {
-        let m = self.source_normal.len();
-        if m == 0
-            || self.source_normal.iter().any(|r| r.len() != m)
-            || self.material.coefficients.len() != self.cross_source.len()
-            || self
-                .material
-                .coefficients
-                .iter()
-                .chain(&self.cross_source)
-                .any(|r| r.len() != m)
-        {
-            return Err(ConstitutiveFibreError::Shape);
-        }
-        Ok(self
-            .material
-            .coefficients
-            .iter()
-            .zip(&self.cross_source)
-            .map(|(row, b)| {
-                (0..m)
-                    .map(|j| {
-                        row.iter()
-                            .zip(&self.source_normal)
-                            .fold(ExactComplexWaveCurrent::zero(), |sum, (a, h)| {
-                                sum.add(&a.multiply(&h[j]))
-                            })
-                            .subtract(&b[j])
-                    })
-                    .collect()
-            })
-            .collect())
-    }
-
-    /// Observe a state returned by `inspect_normal_material_state`. Its exact accumulated
-    /// Gram and every admitted source Gram are at least I. No inverse, raw-source replay,
-    /// source-centre selection for learning, or native coefficient change occurs here.
-    pub fn objective(&self) -> Result<NativeNormalMaterialObjective, ConstitutiveFibreError> {
-        if [
-            &self.source_normal_error,
-            &self.cross_source_error,
-            &self.target_energy_error,
-        ]
-        .iter()
-        .any(|q| q.is_negative())
-        {
-            return Err(invalid("negative objective family bound"));
-        }
-        let residual = self.normal_residual()?;
-        let two = Rat::from_integer(2.into());
-        let mut norm_square = Rat::zero();
-        let mut norm_upper = Rat::zero();
-        let mut cross_norm_upper = Rat::zero();
-        let mut paired = Rat::zero();
-        let mut residual_square = Rat::zero();
-        for ((m, b), r) in self
-            .material
-            .coefficients
-            .iter()
-            .flatten()
-            .zip(self.cross_source.iter().flatten())
-            .zip(residual.iter().flatten())
-        {
-            norm_square += m.norm_square();
-            norm_upper += m.real.abs() + m.imaginary.abs();
-            cross_norm_upper += b.real.abs() + b.imaginary.abs();
-            // M H = B + R: avoids a second matrix multiplication for the objective.
-            paired += m.multiply(&r.subtract(b).conjugate()).real;
-            residual_square += r.norm_square();
-        }
-        let prior = &norm_square / &two;
-        let attained = (&self.target_energy + paired) / &two;
-        let data = &attained - &prior;
-        if data.is_negative() || attained.is_negative() {
-            return Err(invalid(
-                "objective incompatible with accumulated unit-prior geometry",
-            ));
-        }
-        let gap = &residual_square / &two;
-        let lower = (&attained - &gap).max(Rat::zero());
-        let family_error = (&norm_square * &self.source_normal_error
-            + &two * &norm_upper * &self.cross_source_error
-            + &self.target_energy_error)
-            / &two;
-        // Both minimizers have norm <= ||B_nominal||_F + EB. L1 is an exact upper bound.
-        let k = cross_norm_upper + &self.cross_source_error;
-        let minimum_error = (&k * &k * &self.source_normal_error
-            + &two * &k * &self.cross_source_error
-            + &self.target_energy_error)
-            / &two;
-        let around = |value: &Rat, error: &Rat| crate::ExactInterval {
-            lower: (value - error).max(Rat::zero()),
-            upper: value + error,
-        };
-        Ok(NativeNormalMaterialObjective {
-            family_data_term: around(&data, &family_error),
-            family_regularized_objective: around(&attained, &family_error),
-            family_minimum: crate::ExactInterval {
-                lower: (&lower - &minimum_error).max(Rat::zero()),
-                upper: &attained + &minimum_error,
-            },
-            nominal_minimum: crate::ExactInterval {
-                lower,
-                upper: attained.clone(),
-            },
-            nominal_data_term: data,
-            prior_term: prior,
-            nominal_regularized_objective: attained,
-            normal_residual_squared: residual_square,
-            solve_gap_upper: gap,
-        })
-    }
-}
 impl NativeConstitutiveField<'_> {
     pub fn inspect_normal_material_transport(
         &self,
@@ -745,7 +493,7 @@ impl NativeConstitutiveField<'_> {
     }
     pub fn inspect_normal_material_state(
         &self,
-    ) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
+    ) -> Result<NormalConstitution, ConstitutiveFibreError> {
         if !self.relation.usable || self.pending.is_some() {
             return Err(ConstitutiveFibreError::Uncertain);
         }
@@ -856,7 +604,7 @@ fn decode_state(
     n: usize,
     t: usize,
     g: u32,
-) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
+) -> Result<NormalConstitution, ConstitutiveFibreError> {
     decode_state_layout(
         state,
         NormalLayout::new(n, t).ok_or(ConstitutiveFibreError::Shape)?,
@@ -869,7 +617,7 @@ fn decode_state_layout(
     layout: NormalLayout,
     t: usize,
     g: u32,
-) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
+) -> Result<NormalConstitution, ConstitutiveFibreError> {
     point_section(state, 1, layout.state_words)?;
     let numeric = wides(&state.intervals[..layout.matrix_words])?;
     let unit = BigInt::one() << g;
@@ -900,7 +648,7 @@ fn decode_state_layout(
             })
             .collect()
     };
-    Ok(NativeNormalMaterialState {
+    Ok(NormalConstitution {
         material: NativeFieldMaterialTransportState {
             coefficients: numeric[..layout.cross_values]
                 .chunks_exact(2 * m)
@@ -934,9 +682,9 @@ fn decode_state_layout(
 /// use the augmented reference bound.  Exterior inspection exposes Q_data alone;
 /// the prior remains an explicit sibling operand.
 pub(super) fn expose_data_energy(
-    mut state: NativeNormalMaterialState,
+    mut state: NormalConstitution,
     prior: Option<&NativeNormalPrior>,
-) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
+) -> Result<NormalConstitution, ConstitutiveFibreError> {
     if let Some(prior) = prior {
         if state.target_energy < prior.target_energy {
             return Err(ConstitutiveFibreError::Uncertain);
@@ -947,33 +695,14 @@ pub(super) fn expose_data_energy(
 }
 
 mod direct;
-pub use direct::{
-    BoundaryMaterialMaps, BoundaryMaterialSeed, CompiledCoupledJoint,
-    ConstitutiveComparisonSection, ConstitutiveSourceFrame, ConstitutiveSourceRefusal,
-    CoupledConstitutiveAlternative, CoupledConstitutiveFamily, CoupledConstitutiveRefusal,
-    CoupledConstitutiveRest, CoupledJointEvaluation, CoupledJointReading, FamilyBasisReading,
-    FamilyBasisSelection, NormalBasisScore, NormalBasisSelection, NormalContinuationJoin,
-    NormalContinuationPullback, NormalCoupledAttachRefusal, NormalCoupledComparison,
-    NormalCoupledContact, NormalCoupledContinuation, NormalCoupledObservation,
-    NormalCoupledPrediction, NormalCoupledProducingHandle, NormalCoupledReception,
-    NormalCoupledSourceActuation, NormalCoupledStep, NormalFamilyBasisFace,
-    NormalFamilyComparisonRow, NormalFamilyPullback, NormalFamilyReceiverReading,
-    NormalFamilySupport, NormalMaterialRest, NormalProducingHandle, NormalReactionProjection, PowerNeutralCertificate,
-    NormalRealizationRefinement, NormalReceiverCoordinates, NormalSectionBasisFace,
-    NormalSourceActuation, NormalSourceChart, NormalWaveBasisChart, NormalWaveBasisFace,
-    NormalWaveBasisReading, NormalWaveComparison, NormalWaveComparisonReading, NormalWaveCoupled,
-    NormalWaveCurrent, NormalWaveDevelopment, NormalWaveFacePacket, NormalWaveFamily,
-    NormalWaveFamilyReceiver, NormalWaveFamilyRest, NormalWaveFibre, NormalWaveJointSource,
-    NormalWavePrediction, NormalWaveReading, NormalWaveReception, NormalWaveReceptionReading,
-    NormalWaveReference, NormalWaveReferenceReading, NormalWaveRest, NormalWaveSeedKind,
-    NormalWaveSeedRefusal, NormalWaveSource, NormalWaveStep, NormalWaveTransport,
-    NormalWaveTransportChange, NormalWaveWord, ResidentCoupledConstitutive, ResidentHeldSection,
-    ResidentHeldSectionRest, ResidentNormalEnclosure, ResidentNormalEnclosureSection,
-    ResidentNormalEnclosureView, ResidentNormalInput, ResidentNormalMaterial,
-    ResidentNormalMaterialView, ResidentNormalReturn, ResidentNormalSectionReturn,
-    ResidentNormalWave,
-};
-pub use direct::{
-    NativeAffineGeometry, NativeAffineGeometryAdjoint, NativeEnclosurePropagation,
-    NativeRealification, NativeRealificationAdjoint,
-};
+/// [definition] **The public surface of the normal Holon, listed once** (plan phase 9):
+/// constitution (element relation, device chart, rest, prior, objective), motion (the wave, its
+/// state, its one passage receipt and its core `HolonLaw`), readings and codec faces, the family
+/// receivers, the coupled continuation, the one refusal family and the device sections that
+/// are the constitution's storage. Every enclosing module re-exports this list, never a copy.
+pub mod api {
+    pub use super::readings::*;
+    pub use super::constitution::{NativeNormalMaterialState, NativeNormalPrior, NormalConstitution};
+    pub use super::direct::*;
+}
+pub use api::*;

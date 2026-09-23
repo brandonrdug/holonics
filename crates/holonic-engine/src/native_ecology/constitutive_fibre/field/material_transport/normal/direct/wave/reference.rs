@@ -1,52 +1,9 @@
 use super::*;
 
-/// A read-only normal-reference comparison from an actual held source. This has no current
-/// occurrence of its own and cannot publish a successor. Refusal of this receiver leaves the
-/// continuing applied transport untouched.
-pub struct NormalWaveReference<'c> {
-    source: Rc<ResidentSection<'c>>,
-    fibre: NormalWaveFibre<'c>,
-    next: ResidentSection<'c>,
-}
-#[derive(Debug, Serialize)]
-pub struct NormalWaveReferenceReading {
-    pub source_epoch: u64,
-    pub source_transport: NormalWaveTransport,
-    pub reference_next_joint: NativeFieldCurrentBall,
-}
-impl<'c> NormalWaveReference<'c> {
-    pub fn source(&self) -> ResidentNormalEnclosureView<'_, 'c> {
-        ResidentNormalEnclosureView {
-            surface: self.fibre.surface,
-            section: &self.source,
-            offset: 0,
-            width: 4 * self.fibre.roots,
-            grain: self.fibre.grain,
-        }
-    }
-    pub fn producing_fibre(&self) -> &NormalWaveFibre<'c> {
-        &self.fibre
-    }
-    pub fn inspect(&self) -> Result<NormalWaveReferenceReading, ConstitutiveFibreError> {
-        let reading = ResidentNormalEnclosureView {
-            surface: self.fibre.surface,
-            section: &self.next,
-            offset: 0,
-            width: 4 * self.fibre.roots,
-            grain: self.fibre.grain,
-        }
-        .inspect()?;
-        Ok(NormalWaveReferenceReading {
-            source_epoch: self.fibre.epoch,
-            source_transport: self.fibre.transport,
-            reference_next_joint: reading,
-        })
-    }
-}
 impl<'c> ResidentNormalWave<'c> {
     /// Read one ideal-normal-family continuation from the complete contemporary source. This
     /// separate receiver pays the M/P comparison, without turning it into the next applied input.
-    pub fn reference_next(&self) -> Result<NormalWaveReference<'c>, ConstitutiveFibreError> {
+    pub fn reference_next<'a>(&self) -> Result<NormalWavePassage<'a, 'c>, ConstitutiveFibreError> {
         let s = self.material.surface;
         let n = self.material.roots();
         let d = 2 * n;
@@ -96,10 +53,11 @@ impl<'c> ResidentNormalWave<'c> {
                 result.obstruction
             )));
         }
-        Ok(NormalWaveReference {
-            source: Rc::clone(&self.joint),
-            fibre: self.fibre(),
-            next: joint,
-        })
+        // A pure receiver: the predecessor and successor are the same unchanged point.
+        let mut passage =
+            NormalWavePassage::new(NormalPassageKind::Reference, self.fibre(), self.fibre());
+        passage.source_joint = Some(Rc::clone(&self.joint));
+        passage.produced_joint = Some(Rc::new(joint));
+        Ok(passage)
     }
 }

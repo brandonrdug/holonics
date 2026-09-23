@@ -310,10 +310,9 @@ impl CoupledConstitutiveRest {
         } = self;
         let base_epoch = base_rest.epoch();
         let base = base_rest.remount_coupled(s, |_| {})?;
-        let handle = base.pending_coupled_prediction(header.prediction)?;
         let observation = s.mount_section_rest(&observation_rest)?;
         let comparison = base.compare_coupled_prediction(
-            &handle,
+            header.prediction,
             ResidentConstitutiveCurrent::rational(&observation)?,
         )?;
         let receiver = s.mount_section_rest(&receiver_rest)?;

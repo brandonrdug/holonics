@@ -296,7 +296,7 @@ impl ResidentNormalMaterial<'_> {
 /// G=H-I must be a source Gram, B must annihilate its null space, and C must pay the
 /// minimal compatible target energy. Real charts avoid a redundant realification.
 fn validate_geometry(
-    value: &NativeNormalMaterialState,
+    value: &NormalConstitution,
     observations: u64,
 ) -> Result<(), ConstitutiveFibreError> {
     use crate::inertia::{SymmetricForm, positive_source_energy};

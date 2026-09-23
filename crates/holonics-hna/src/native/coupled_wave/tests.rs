@@ -829,3 +829,27 @@ fn coupled_session_returns_original_base_prediction_after_restart() {
         before["text"], result["emitted"]["text"]
     );
 }
+
+/// Fixture writer for the workbench smoke (`holonics hna coupled-wave-session <dir>`): writes the
+/// specimen session's affine body as `model.wave` and its alphabet as `exterior-chart.json` into
+/// `HOLONICS_COUPLED_MODEL_DIR`. Does nothing without that variable.
+#[test]
+#[ignore = "requires CUDA; writes a coupled-wave model directory for the workbench smoke"]
+fn write_coupled_wave_model_directory_fixture() {
+    let Some(dir) = std::env::var_os("HOLONICS_COUPLED_MODEL_DIR") else {
+        return;
+    };
+    let dir = std::path::PathBuf::from(dir);
+    std::fs::create_dir_all(&dir).unwrap();
+    let ro = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&ro).unwrap();
+    let session = session(&s);
+    let mut bytes = Vec::new();
+    session.wave.affine_wave().unwrap().rest().unwrap().write(&mut bytes).unwrap();
+    std::fs::write(dir.join("model.wave"), bytes).unwrap();
+    std::fs::write(
+        dir.join("exterior-chart.json"),
+        serde_json::to_vec(session.chart.alphabet()).unwrap(),
+    )
+    .unwrap();
+}

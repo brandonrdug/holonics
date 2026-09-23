@@ -1,14 +1,5 @@
 use super::*;
 
-/// Actual section operands and producing material cuts accompany the development return.
-/// The body retains the changed material and current seed, not these source sections.
-pub struct NormalWaveDevelopment<'a, 'c> {
-    pub comparison: ResidentNormalSectionReturn<'a, 'c>,
-    pub predecessor_fibre: NormalWaveFibre<'c>,
-    pub successor_fibre: NormalWaveFibre<'c>,
-    pub rebased_joint_enclosure: bool,
-}
-
 pub(super) struct JointSeed<'c> {
     pub(super) power: ResidentSection<'c>,
     pub(super) metadata: ResidentSection<'c>,
@@ -22,8 +13,8 @@ impl<'c> ResidentNormalMaterial<'c> {
         ->Result<ResidentNormalWave<'c>,NormalWaveSeedRefusal<'c>> {
         let valid=matches!(self.source_chart,NormalSourceChart::Wave{roots} if roots==self.targets && joint.components()==4*roots)
             &&joint.grain()==self.grain&&std::ptr::eq(self.surface,joint.surface);
-        if !valid {return Err(NormalWaveSeedRefusal{material:self,reason:ConstitutiveFibreError::Shape});}
-        let owned=match joint.to_owned(){Ok(v)=>v,Err(reason)=>return Err(NormalWaveSeedRefusal{material:self,reason})};
+        if !valid {return Err(NormalRefusal::new(self,ConstitutiveFibreError::Shape));}
+        let owned=match joint.to_owned(){Ok(v)=>v,Err(reason)=>return Err(NormalRefusal::new(self,reason))};
         self.into_joint_wave(Rc::new(owned.section),0)
     }
     pub(super) fn prepare_joint_seed(
@@ -85,7 +76,7 @@ impl<'c> ResidentNormalMaterial<'c> {
                 previous,
                 current,
             }) => Ok(ResidentNormalWave {
-                continuation: NormalWaveWord,
+                continuation: (),
                 transport: NormalWaveTransport::NormalReference,
                 owner: Rc::new(()),
                 pending: BTreeMap::new(),
@@ -102,10 +93,7 @@ impl<'c> ResidentNormalMaterial<'c> {
                 steps: 0,
                 seed_epochs: [epoch.checked_sub(1), Some(epoch)],
             }),
-            Err(reason) => Err(NormalWaveSeedRefusal {
-                material: self,
-                reason,
-            }),
+            Err(reason) => Err(NormalRefusal::new(self, reason)),
         }
     }
 }
@@ -117,7 +105,7 @@ impl<'c> ResidentNormalWave<'c> {
         &mut self,
         source: ResidentConstitutiveSection<'a, 'c>,
         observed: ResidentConstitutiveSection<'a, 'c>,
-    ) -> Result<NormalWaveDevelopment<'a, 'c>, ConstitutiveFibreError> {
+    ) -> Result<NormalWavePassage<'a, 'c>, ConstitutiveFibreError> {
         let comparison = self.material.prepare_section(source, observed)?;
         let staged = if self.steps > 0 {
             Some(self.material.prepare_joint_seed(&self.joint, self.epoch)?)
@@ -141,11 +129,10 @@ impl<'c> ResidentNormalWave<'c> {
             self.seed_epochs = [self.previous.at(), self.current.at()];
         }
         self.material.publish_section(&comparison);
-        Ok(NormalWaveDevelopment {
-            comparison,
-            predecessor_fibre,
-            successor_fibre: self.fibre(),
-            rebased_joint_enclosure,
-        })
+        let mut passage =
+            NormalWavePassage::new(NormalPassageKind::Develop, predecessor_fibre, self.fibre());
+        passage.comparison = Some(comparison);
+        passage.rebased_joint_enclosure = rebased_joint_enclosure;
+        Ok(passage)
     }
 }

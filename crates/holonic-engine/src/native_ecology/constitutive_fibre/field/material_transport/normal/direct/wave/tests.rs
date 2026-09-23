@@ -52,8 +52,8 @@ fn source_action_separates_arrangement_at_fixed_material() {
     assert_eq!(s.census().section_read_outs, reads);
     assert_eq!(a.material.rest().unwrap(), before);
     assert_eq!(b.material.rest().unwrap(), before);
-    let x = aa.after().inspect().unwrap();
-    let y = bb.after().inspect().unwrap();
+    let x = aa.after().unwrap().inspect().unwrap();
+    let y = bb.after().unwrap().inspect().unwrap();
     contains(
         &x,
         &[
@@ -137,7 +137,7 @@ fn source_union_does_not_erase_an_arriving_current() {
     let received = body
         .actuate_section(ResidentConstitutiveSection::integers(&field).unwrap())
         .unwrap();
-    let reading = received.after().inspect().unwrap();
+    let reading = received.after().unwrap().inspect().unwrap();
     contains(&reading, &[wave(1, 0, 1), wave(1, 0, 1)]);
     assert_eq!(reading.radius, Rat::zero());
     assert_eq!(body.material.observations(), 0);
@@ -196,7 +196,7 @@ fn source_annihilator_is_exact_and_material_relative() {
         .actuate_section(ResidentConstitutiveSection::integers(&single).unwrap())
         .unwrap();
     assert_eq!(
-        reflected.after().inspect().unwrap().center[3].real,
+        reflected.after().unwrap().inspect().unwrap().center[3].real,
         Rat::new(1.into(), BigInt::one() << u64::BITS)
     );
     let mut body = material
@@ -205,7 +205,7 @@ fn source_annihilator_is_exact_and_material_relative() {
     let stimulus = make(&[2, 2, 2]);
     let input = ResidentConstitutiveSection::integers(&stimulus).unwrap();
     let returned = body.actuate_section(input).unwrap();
-    let reading = returned.after().inspect().unwrap();
+    let reading = returned.after().unwrap().inspect().unwrap();
     contains(
         &reading,
         &[
@@ -227,7 +227,7 @@ fn source_annihilator_is_exact_and_material_relative() {
     body.develop_section(new_fields.source(), new_fields.observed())
         .unwrap();
     let returned = body.actuate_section(input).unwrap();
-    let reading = returned.after().inspect().unwrap();
+    let reading = returned.after().unwrap().inspect().unwrap();
     let blind = [
         wave(1, 0, 1),
         wave(0, 0, 1),
@@ -297,7 +297,7 @@ fn source_action_retains_rational_bounds_and_atomic_refusal() {
     let returned = body
         .actuate_section(ResidentConstitutiveSection::rationals(&source).unwrap())
         .unwrap();
-    let ball = returned.after().inspect().unwrap();
+    let ball = returned.after().unwrap().inspect().unwrap();
     contains(
         &ball,
         &expected
@@ -464,10 +464,10 @@ fn refused_seed_and_wave_step_preserve_their_owners() {
         .into_difference_wave(current(&p), current(&bad))
         .err()
         .unwrap();
-    assert_eq!(refused.material.state_wire().unwrap(), before);
+    assert_eq!(refused.returned.state_wire().unwrap(), before);
     let c = point(&s, &[1, 0]);
     let mut generator = refused
-        .material
+        .returned
         .into_difference_wave(current(&p), current(&c))
         .unwrap();
     // A declared corrupted cache is a test-only fault injection; a production caller cannot
@@ -538,28 +538,28 @@ fn reception_changes_the_next_generator_without_archiving_its_past() {
     assert_eq!(s.census().section_read_outs, before.section_read_outs);
     assert_eq!(s.census().ingress_octets, before.ingress_octets);
     assert!(body.previous().same_occurrence(&joining));
-    assert!(received.previous().same_occurrence(&joining));
+    assert!(received.source_state().unwrap().current().same_occurrence(&joining));
     assert_eq!(body.steps(), 0);
     assert_eq!(body.epoch(), 2);
-    assert_eq!(received.current().at(), Some(2));
+    assert_eq!(received.current().unwrap().at(), Some(2));
     assert_eq!(received.predecessor_fibre().material_observations, 3);
     assert_eq!(received.successor_fibre().material_observations, 4);
     assert!(received.successor_fibre().initial().is_none());
     let reading = received.inspect().unwrap();
-    contains(&reading.source_joint, &[wave(1, 0, 1), wave(1, 0, 2)]);
+    contains(reading.source_joint.as_ref().unwrap(), &[wave(1, 0, 1), wave(1, 0, 2)]);
     contains(
-        reading.comparison.source_current.as_ref().unwrap(),
+        reading.comparison.as_ref().unwrap().source_current.as_ref().unwrap(),
         &[wave(-1, 0, 2), wave(1, 0, 2), wave(1, 0, 1)],
     );
-    contains(&reading.comparison.observed, &[wave(3, 0, 2)]);
-    assert!(reading.comparison.observed.radius > Rat::zero());
+    contains(&reading.comparison.as_ref().unwrap().observed, &[wave(3, 0, 2)]);
+    assert!(reading.comparison.as_ref().unwrap().observed.radius > Rat::zero());
     let old = received.predecessor_fibre().inspect_material().unwrap();
     let new = received.successor_fibre().inspect_material().unwrap();
     assert_ne!(old.cross_source, new.cross_source);
     // H=2I+xx*, B=(0,-1,0)+(3/2)x*: its exact response has coefficients
     // (-1/4,-1/4,1/2), so the next current is 2-5/8=11/8.
     let next = body.advance().unwrap();
-    assert!(next.previous().same_occurrence(&received.current()));
+    assert!(next.previous().same_occurrence(received.current().unwrap()));
     contains(&next.current().view().inspect().unwrap(), &[wave(11, 0, 8)]);
     assert_eq!(next.current().at(), Some(3));
     // Saved evidence refers to immutable producing material, even after further development.

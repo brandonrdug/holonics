@@ -124,13 +124,11 @@ fn applied_transport_retains_reference_without_reinjecting_it() {
     assert_eq!(applied.rest().unwrap(), before);
     assert!(applied.current().same_occurrence(&source));
     let comparison = reference.inspect().unwrap();
-    assert_eq!(comparison.source_transport, NormalWaveTransport::Applied);
+    assert_eq!(comparison.producing_transport, NormalWaveTransport::Applied);
+    let next = comparison.produced_joint.unwrap();
     let result = applied.advance().unwrap().inspect().unwrap();
-    assert_eq!(
-        result.joint_current.center,
-        comparison.reference_next_joint.center
-    );
-    assert!(result.joint_current.radius < comparison.reference_next_joint.radius);
+    assert_eq!(result.joint_current.center, next.center);
+    assert!(result.joint_current.radius < next.radius);
     assert!(applied.fibre().inspect_material().unwrap().material.radius > Rat::zero());
 }
 
@@ -140,48 +138,42 @@ fn transport_change_keeps_the_held_family_and_mixed_pending_scopes() {
     let readout = ResidentReadout::new().unwrap();
     let s = ResidentSurface::on(&readout).unwrap();
     let mut body = witness(&s);
-    let old = body.predict().unwrap();
+    let (old, _) = body.predict().unwrap();
     let held = body.current().snapshot();
     let before = serde_json::to_value(held.view().inspect().unwrap()).unwrap();
     let epoch = body.epoch();
     let change = body.set_transport(NormalWaveTransport::Applied).unwrap();
     assert_eq!(
-        change.predecessor.transport,
+        change.predecessor_fibre.transport,
         NormalWaveTransport::NormalReference
     );
-    assert_eq!(change.successor.transport, NormalWaveTransport::Applied);
+    assert_eq!(change.successor_fibre.transport, NormalWaveTransport::Applied);
     assert!(body.current().same_occurrence(&held));
     assert_eq!(body.epoch(), epoch);
     assert_eq!(
         serde_json::to_value(body.current().view().inspect().unwrap()).unwrap(),
         before
     );
-    let newer = body.predict().unwrap();
+    let (newer, _) = body.predict().unwrap();
     let mut bytes = Vec::new();
     body.rest().unwrap().write(&mut bytes).unwrap();
-    assert_eq!(bytes[b"HOLONIC-NORMAL-WAVE".len()], 6);
+    // One-cut pending sources: wave rest v11 (the transport header, then source joints).
+    assert_eq!(bytes[b"HOLONIC-NORMAL-WAVE".len()], 11);
     let rest = NormalWaveRest::read(&mut bytes.as_slice(), bytes.len() as u64).unwrap();
     assert_eq!(rest.transport(), NormalWaveTransport::Applied);
     assert_eq!(rest.pending_count(), 2);
     let mut restored = rest.remount(&s, |_| {}).unwrap();
     let target = point(&s, &[3, 0]);
-    for (id, scope) in [
-        (old.handle.id(), NormalWaveTransport::NormalReference),
-        (newer.handle.id(), NormalWaveTransport::Applied),
-    ] {
-        let a = body.pending_prediction(id).unwrap();
-        let b = restored.pending_prediction(id).unwrap();
-        let x = body
-            .receive_prediction(&a, current(&target))
-            .unwrap()
-            .inspect()
-            .unwrap();
+    // One cut: both returns read the contemporary (Applied) transport, whatever transport
+    // was in force when each prediction was made.
+    for id in [old, newer] {
+        let x = body.pullback(id, current(&target)).unwrap().inspect().unwrap();
         let y = restored
-            .receive_prediction(&b, current(&target))
+            .pullback(id, current(&target))
             .unwrap()
             .inspect()
             .unwrap();
-        assert_eq!(x.producing_transport, scope);
+        assert_eq!(x.producing_transport, NormalWaveTransport::Applied);
         assert_eq!(x.successor_transport, NormalWaveTransport::Applied);
         assert_eq!(
             serde_json::to_value(x).unwrap(),
@@ -217,24 +209,24 @@ fn applied_source_and_return_preserve_material_and_pay_rounding() {
         .actuate_section(section)
         .unwrap()
         .after()
+        .unwrap()
         .inspect()
         .unwrap();
     let r = reference
         .actuate_section(section)
         .unwrap()
         .after()
+        .unwrap()
         .inspect()
         .unwrap();
     assert_eq!(a.center, r.center);
     assert!(a.radius <= r.radius);
     assert_eq!(applied.material.rest().unwrap(), material);
-    let pa = applied.predict().unwrap();
-    let pr = reference.predict().unwrap();
+    let (pa, _) = applied.predict().unwrap();
+    let (pr, _) = reference.predict().unwrap();
     let y = point(&s, &[3, 0]);
-    applied.receive_prediction(&pa.handle, current(&y)).unwrap();
-    reference
-        .receive_prediction(&pr.handle, current(&y))
-        .unwrap();
+    applied.pullback(pa, current(&y)).unwrap();
+    reference.pullback(pr, current(&y)).unwrap();
     let aa = applied.material.inspect().unwrap();
     let rr = reference.material.inspect().unwrap();
     assert_eq!(aa.material.coefficients, rr.material.coefficients);

@@ -41,8 +41,9 @@ fn main() -> Result<()> {
             let surface = ResidentSurface::on(&readout)?;
             let mut material = rest.remount(&surface)?;
             let returned = material.refine_realization(ResidentGrain(grain.parse::<u32>()?))?;
-            let before = returned.inspect_before()?;
-            let after = returned.inspect_after()?;
+            // The refinement returns the predecessor constitution (the section it replaced).
+            let before = returned.inspect()?;
+            let after = material.inspect()?;
             if before.source_normal != after.source_normal
                 || before.cross_source != after.cross_source
                 || before.source_normal_error != after.source_normal_error
@@ -56,8 +57,8 @@ fn main() -> Result<()> {
             publish_new(output, |file| rest.write(file).map_err(io::Error::other))?;
             println!(
                 "{}",
-                serde_json::json!({"mode":"refine","before_grain":returned.before_grain.0,
-                "after_grain":returned.after_grain.0,"observations":returned.observations,
+                serde_json::json!({"mode":"refine","before_grain":returned.grain().0,
+                "after_grain":material.grain().0,"observations":material.observations(),
                 "source_geometry_unchanged":true,"coefficient_error_before":before.material.radius.to_string(),
                 "coefficient_error_after":after.material.radius.to_string()})
             );

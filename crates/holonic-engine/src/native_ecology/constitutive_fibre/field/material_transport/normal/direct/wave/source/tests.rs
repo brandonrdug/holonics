@@ -28,13 +28,9 @@ fn step_and_joint_source_share_one_canonical_current_receipt() {
         serde_json::to_value(saved.inspect().unwrap()).unwrap(),
         before
     );
-    assert!(
-        saved
-            .read_source()
-            .unwrap()
-            .current()
-            .same_occurrence(step.current())
-    );
+    // The lift is a reading of the saved point; the point keeps its occurrences.
+    saved.read_source().unwrap();
+    assert!(saved.current().same_occurrence(step.current()));
 }
 
 #[test]
@@ -49,20 +45,21 @@ fn source_lift_keeps_joint_occurrences_and_correlated_plane() {
         .into_applied_difference_wave(current(&p), current(&c))
         .unwrap();
     let reads = s.census().section_read_outs;
-    let source = body.read_source().unwrap();
+    let state = body.joint_source();
+    let source = state.read_source().unwrap();
     assert_eq!(s.census().section_read_outs, reads);
-    assert!(source.previous().same_occurrence(body.previous()));
-    assert!(source.current().same_occurrence(body.current()));
-    let seen = source.enclosure().inspect().unwrap();
+    assert!(state.previous().same_occurrence(body.previous()));
+    assert!(state.current().same_occurrence(body.current()));
+    let seen = source.inspect().unwrap();
     assert_eq!(
         seen.center,
         vec![wave(3, -2, 1), wave(5, -1, 1), wave(2, 1, 1)]
     );
     assert_eq!(seen.radius, Rat::zero());
     body.advance().unwrap();
-    assert!(source.current().same_occurrence(body.previous()));
-    assert_eq!(source.fibre().epoch, 0);
-    assert_eq!(source.enclosure().inspect().unwrap().center, seen.center);
+    assert!(state.current().same_occurrence(body.previous()));
+    assert_eq!(state.fibre().epoch, 0);
+    assert_eq!(source.inspect().unwrap().center, seen.center);
 }
 
 #[test]
@@ -74,10 +71,11 @@ fn bounded_source_lift_retains_radius_and_no_material_change() {
     body.advance().unwrap();
     let before = body.rest().unwrap();
     let reads = s.census().section_read_outs;
-    let source = body.read_source().unwrap();
+    let state = body.joint_source();
+    let source = state.read_source().unwrap();
     assert_eq!(s.census().section_read_outs, reads);
-    let joint = source.joint().inspect().unwrap();
-    let lifted = source.enclosure().inspect().unwrap();
+    let joint = state.joint().inspect().unwrap();
+    let lifted = source.inspect().unwrap();
     assert!(joint.radius > Rat::zero());
     assert_eq!(lifted.radius, &joint.radius + &joint.radius);
     assert_eq!(lifted.center[0], joint.center[1].subtract(&joint.center[0]));

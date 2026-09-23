@@ -6,7 +6,7 @@ use crate::{
     resident_section::SeriesAperture,
 };
 
-impl<'c> NormalWaveReception<'c> {
+impl<'a, 'c> NormalWavePassage<'a, 'c> {
     pub fn normalized_return(
         &self,
         group_width: usize,
@@ -15,6 +15,14 @@ impl<'c> NormalWaveReception<'c> {
         NativeNormalizedMaterialReturn<'c, u64, NormalWaveTransport, &Self>,
         ConstitutiveFibreError,
     > {
+        let (Some(source_joint), Some(current), Some(report)) =
+            (&self.source_joint, &self.current, &self.report)
+        else {
+            return Err(ConstitutiveFibreError::Shape);
+        };
+        if self.kind != NormalPassageKind::Receive {
+            return Err(ConstitutiveFibreError::Shape);
+        }
         let fibre = self.predecessor_fibre();
         let n = fibre.roots;
         if group_width == 0 || n % group_width != 0 || terms.0 == 0 || terms.0 == u32::MAX {
@@ -39,11 +47,11 @@ impl<'c> NormalWaveReception<'c> {
             let lane = passage.open(0, &[])?;
             s.record_normalized_sum_receiver(
                 &lane,
-                self.source_joint().section,
+                source_joint,
                 2 * n,
-                &self.report,
+                report,
                 layout.ball_at(ReportBall::ContemporarySource),
-                &self.current.inner.section,
+                &current.inner.section,
                 n,
                 group_width,
                 fibre.grain.0,

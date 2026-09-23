@@ -8,7 +8,7 @@ pub use rest::NormalMaterialRest;
 mod boundary;
 pub use boundary::{BoundaryMaterialMaps, BoundaryMaterialSeed};
 mod refine;
-pub use refine::NormalRealizationRefinement;
+
 
 #[cfg(test)]
 mod conditional_tests;
@@ -29,6 +29,32 @@ mod section_basis;
 pub use section_basis::NormalSectionBasisFace;
 mod reaction_law;
 pub use reaction_law::{NormalReactionProjection, PowerNeutralCertificate};
+
+/// [definition] **The one refusal of the normal Holon** (plan phase 9). A move-owned operation
+/// that fails returns every owner it took (`returned`) with the reason; nothing is lost and no
+/// partial state is published. The former per-operation refusals are this type at their
+/// owners: `NormalWaveSeedRefusal` (the constitution), `NormalCoupledAttachRefusal` (the wave and
+/// neighborhood), `CoupledConstitutiveRefusal` (wave, comparison, receiver) and
+/// `ConstitutiveSourceRefusal` (the source packet).
+pub struct NormalRefusal<T> {
+    pub returned: T,
+    pub reason: ConstitutiveFibreError,
+}
+impl<T> NormalRefusal<T> {
+    pub fn new(returned: T, reason: ConstitutiveFibreError) -> Self {
+        Self { returned, reason }
+    }
+}
+impl<T> std::fmt::Debug for NormalRefusal<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.reason.fmt(f)
+    }
+}
+impl<T> From<NormalRefusal<T>> for ConstitutiveFibreError {
+    fn from(refusal: NormalRefusal<T>) -> Self {
+        refusal.reason
+    }
+}
 
 /// Declared domain of the same normal-statistic operator. A feature chart is not silently
 /// padded or identified with the wave's three equally sized physical/current ports.
@@ -61,42 +87,18 @@ impl NormalSourceChart {
     }
 }
 mod wave;
-pub use wave::{
-    CompiledCoupledJoint, ConstitutiveComparisonSection, ConstitutiveSourceFrame,
-    ConstitutiveSourceRefusal, CoupledConstitutiveAlternative, CoupledConstitutiveFamily,
-    CoupledConstitutiveRefusal, CoupledConstitutiveRest, CoupledJointEvaluation,
-    CoupledJointReading, FamilyBasisReading, FamilyBasisSelection, NormalBasisScore,
-    NormalBasisSelection, NormalContinuationJoin, NormalContinuationPullback,
-    NormalCoupledAttachRefusal, NormalCoupledComparison, NormalCoupledContact,
-    NormalCoupledContinuation, NormalCoupledObservation, NormalCoupledPrediction,
-    NormalCoupledProducingHandle, NormalCoupledReception, NormalCoupledSourceActuation,
-    NormalCoupledStep, NormalFamilyBasisFace, NormalFamilyComparisonRow, NormalFamilyPullback,
-    NormalFamilyReceiverReading, NormalFamilySupport, NormalProducingHandle,
-    NormalReceiverCoordinates, NormalSourceActuation, NormalWaveBasisChart, NormalWaveBasisFace,
-    NormalWaveBasisReading, NormalWaveComparison, NormalWaveComparisonReading, NormalWaveCoupled,
-    NormalWaveCurrent, NormalWaveDevelopment, NormalWaveFacePacket, NormalWaveFamily,
-    NormalWaveFamilyReceiver, NormalWaveFamilyRest, NormalWaveFibre, NormalWaveJointSource,
-    NormalWavePrediction, NormalWaveReading, NormalWaveReception, NormalWaveReceptionReading,
-    NormalWaveReference, NormalWaveReferenceReading, NormalWaveRest, NormalWaveSeedKind,
-    NormalWaveSeedRefusal, NormalWaveSource, NormalWaveStep, NormalWaveTransport,
-    NormalWaveTransportChange, NormalWaveWord, ResidentCoupledConstitutive, ResidentNormalWave,
-};
+pub use wave::*;
 
-pub struct ResidentNormalMaterial<'c> {
-    surface: &'c ResidentSurface<'c>,
-    state: Rc<ResidentSection<'c>>,
-    source_chart: NormalSourceChart,
-    targets: usize,
-    grain: ResidentGrain,
-    observations: u64,
-    pub(crate) prior: Option<NativeNormalPrior>,
-}
-
-/// Immutable resident state retained by a source-qualified forecast.  This deliberately keeps
-/// the mounted section and its declared chart metadata; numerical detachment belongs to an
-/// explicit observer and is never part of the native forecast path.
+/// [definition] **The normal constitution on its resident chart** (plan phase 9): the element
+/// relation `W H = B` of the normal law — accumulated source Gram `H` (storage), cross moment `B`,
+/// target energy `C`, optional immutable prior `(B₀, C₀)` and the applied dyadic coefficients `W`
+/// with their certified normal-reference defect — mounted as one device section. Its exact host
+/// reading is [`NormalConstitution`]. A clone shares the immutable device section: it is the
+/// retained cut ("view") of a forecast or delayed receiver, and a mutation (`receive`, a
+/// refinement) replaces the owner's section without touching any other clone. There is no
+/// separate view type (`ResidentNormalMaterialView` is this type).
 #[derive(Clone)]
-pub struct ResidentNormalMaterialView<'c> {
+pub struct ResidentNormalMaterial<'c> {
     pub(crate) surface: &'c ResidentSurface<'c>,
     pub(crate) state: Rc<ResidentSection<'c>>,
     pub(crate) source_chart: NormalSourceChart,
@@ -106,59 +108,10 @@ pub struct ResidentNormalMaterialView<'c> {
     pub(crate) prior: Option<NativeNormalPrior>,
 }
 
-impl<'c> ResidentNormalMaterialView<'c> {
-    pub fn observations(&self) -> u64 {
-        self.observations
-    }
-    pub fn prior(&self) -> Option<&NativeNormalPrior> {
-        self.prior.as_ref()
-    }
-    pub fn rest(&self) -> Result<NormalMaterialRest, ConstitutiveFibreError> {
-        ResidentNormalMaterial {
-            surface: self.surface,
-            state: Rc::clone(&self.state),
-            source_chart: self.source_chart,
-            targets: self.targets,
-            grain: self.grain,
-            observations: self.observations,
-            prior: self.prior.clone(),
-        }
-        .rest()
-    }
-    /// Evaluate the retained immutable coefficient state at this producing cut. No mutable
-    /// learner is exposed by this view, and no numerical state is detached to the host.
-    pub fn read<'a>(
-        &self,
-        source: impl Into<ResidentNormalInput<'a, 'c>>,
-    ) -> Result<ResidentNormalReturn<'a, 'c>, ConstitutiveFibreError> {
-        let retained = ResidentNormalMaterial {
-            surface: self.surface,
-            state: Rc::clone(&self.state),
-            source_chart: self.source_chart,
-            targets: self.targets,
-            grain: self.grain,
-            observations: self.observations,
-            prior: self.prior.clone(),
-        };
-        retained.read(source)
-    }
-    /// The stored coefficient map is the executed law; its normal-reference defect remains
-    /// available through this immutable material witness.
-    pub fn read_applied<'a>(
-        &self,
-        source: impl Into<ResidentNormalInput<'a, 'c>>,
-    ) -> Result<ResidentNormalReturn<'a, 'c>, ConstitutiveFibreError> {
-        let retained = ResidentNormalMaterial {
-            surface: self.surface,
-            state: Rc::clone(&self.state),
-            source_chart: self.source_chart,
-            targets: self.targets,
-            grain: self.grain,
-            observations: self.observations,
-            prior: self.prior.clone(),
-        };
-        retained.read_applied(source)
-    }
+/// Compatibility name: the retained immutable cut is the constitution itself (a shared clone).
+pub type ResidentNormalMaterialView<'c> = ResidentNormalMaterial<'c>;
+
+impl<'c> ResidentNormalMaterial<'c> {
     /// Execute M[s,h,h⊗s] at fixed exact h, retaining the actual affine source restriction.
     /// Only A(h), not the independent condition coefficients, transports source uncertainty.
     pub fn read_applied_bilinear(
@@ -337,17 +290,6 @@ impl<'c> ResidentNormalMaterialView<'c> {
             grain: self.grain,
         })
     }
-    pub fn inspect(&self) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
-        expose_data_energy(
-            decode_state_layout(
-                &self.surface.detach_section(&self.state, i64::BITS)?,
-                self.source_chart.layout(self.targets)?,
-                self.targets,
-                self.grain.0,
-            )?,
-            self.prior.as_ref(),
-        )
-    }
 }
 
 /// A receiver result with its actual borrowed operands. Forward/return currents are complete
@@ -402,15 +344,7 @@ impl<'c> ResidentNormalMaterial<'c> {
     /// receiver.  The view keeps the device section and does not detach its
     /// numerical state to the host.
     pub fn retained_view(&self) -> ResidentNormalMaterialView<'c> {
-        ResidentNormalMaterialView {
-            surface: self.surface,
-            state: Rc::clone(&self.state),
-            source_chart: self.source_chart,
-            targets: self.targets,
-            grain: self.grain,
-            observations: self.observations,
-            prior: self.prior.clone(),
-        }
+        self.clone()
     }
     /// Found the existing unit-prior normal law. `roots` declares three equal complex port
     /// blocks (outgoing, held, target/reference), and targets declares the output chart.
@@ -520,7 +454,7 @@ impl<'c> ResidentNormalMaterial<'c> {
     pub fn grain(&self) -> ResidentGrain {
         self.grain
     }
-    pub fn inspect(&self) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
+    pub fn inspect(&self) -> Result<NormalConstitution, ConstitutiveFibreError> {
         expose_data_energy(
             decode_state_layout(
                 &self.surface.detach_section(&self.state, i64::BITS)?,

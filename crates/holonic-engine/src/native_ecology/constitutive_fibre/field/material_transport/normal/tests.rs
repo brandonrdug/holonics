@@ -28,7 +28,7 @@ fn normal_objective_separates_fit_prior_solve_and_source_family() {
     let wave = |r, i, d| ExactComplexWaveCurrent::new(q(r, d), q(i, d));
     // Two distinct target vectors at the same scalar source. The exact optimum cannot fit
     // both. Start at the optimum, then retain a deliberately complex, nonzero solve residual.
-    let mut state = NativeNormalMaterialState {
+    let mut state = NormalConstitution {
         material: NativeFieldMaterialTransportState {
             coefficients: vec![vec![wave(1, 0, 3)], vec![wave(1, 0, 3)]],
             radius: Rat::zero(),

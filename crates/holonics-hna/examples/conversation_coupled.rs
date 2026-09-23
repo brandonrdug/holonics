@@ -208,7 +208,7 @@ fn actuate(model: &str, take: &str, output: &str, receiver: WaveSourceReceiver) 
                         progress.next_part = next_part;
                         let after = surface.census();
                         fields.push(serde_json::json!({"sequence":frame.sequence,"part":part.ordinal,"scalars":symbols.len(),
-                            "source_passages":action.source().source().rows(),"predecessor_epoch":action.predecessor_epoch,"successor_epoch":action.successor_epoch,
+                            "source_passages":action.source_pairs().map_or(0, |p| p.source().rows()),"predecessor_epoch":action.predecessor_epoch,"successor_epoch":action.successor_epoch,
                             "milliseconds":clock.elapsed().as_millis(),"numerical_readouts":after.section_read_outs-before.section_read_outs,"ingress_octets":after.ingress_octets-before.ingress_octets}));
                         let observer = Instant::now();
                         let predictions = action

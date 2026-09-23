@@ -1,160 +1,70 @@
+//! **One-cut pullback of a pending prediction** (plan phase 9, retention law).
+//!
+//! [definition] A prediction retains only its **source**: the joint `(p, c)` the predicting word
+//! read. Nothing of its producing constitution is kept — no material section, operator-family
+//! transport or generating fibre. When the observation `v` returns, the kernel forms
+//! `φ = (c − p, c, p)` and `η = v − c` from that retained joint and reads the forward response,
+//! the fit and the updated response all at the **contemporary** constitution (its material
+//! and transport), so a delayed return is the return an immediate one would be at the same cut.
+//! Retention is then a future-sufficient quotient (the constitution plus the pending sources),
+//! not an archive of producing cuts (`Foundation/Standing.lean`; the generator path's
+//! `generator_delayed_observe_is_one_cut_equal_to_an_immediate_observe`). An immediate return
+//! — no intervening material or transport change — reads the same numbers as the former
+//! producing-cut comparison, whose producing and contemporary material coincide.
 use super::*;
 
-/// One active producing cut, shared immutably until its comparison is returned or released.
-/// This is not another continuing wave and contains no archive of source observations.
-pub(super) struct ProducingCut<'c> {
-    pub(super) joint: Rc<ResidentSection<'c>>,
-    pub(super) fibre: NormalWaveFibre<'c>,
-}
-
-/// A capability for one prediction of this continuing owner. Its serial address alone is not
-/// authority: the private owner identity and retained producing cut must still agree.
-pub struct NormalProducingHandle {
-    owner: Rc<()>,
-    id: u64,
-}
-impl NormalProducingHandle {
-    pub fn id(&self) -> u64 {
-        self.id
-    }
-}
-
-pub struct NormalWavePrediction<'c> {
-    pub step: NormalWaveStep<'c>,
-    pub handle: NormalProducingHandle,
-}
-
-/// The observed point and its producing joint remain the operands of the comparison. The
-/// complete contemporary current is unchanged by this material-only return. Numerical moment
-/// envelopes may enlarge the shared source family; the finer generating cut remains available.
-pub struct NormalWaveComparison<'a, 'c> {
-    prediction_id: u64,
-    source: Rc<ProducingCut<'c>>,
-    observed: ResidentConstitutiveCurrent<'a, 'c>,
-    report: ResidentSection<'c>,
-    pub predecessor_fibre: NormalWaveFibre<'c>,
-    pub successor_fibre: NormalWaveFibre<'c>,
-}
-
-#[derive(Debug, Serialize)]
-pub struct NormalWaveComparisonReading {
-    pub prediction_id: u64,
-    pub producing_epoch: u64,
-    pub producing_transport: NormalWaveTransport,
-    pub successor_transport: NormalWaveTransport,
-    pub source_joint: NativeFieldCurrentBall,
-    pub comparison: NativeNormalMaterialReading,
-}
-impl<'a, 'c> NormalWaveComparison<'a, 'c> {
-    pub fn observed(&self) -> ResidentConstitutiveCurrent<'_, 'c> {
-        self.observed
-    }
-    pub fn producing_fibre(&self) -> &NormalWaveFibre<'c> {
-        &self.source.fibre
-    }
-    pub fn source_joint(&self) -> ResidentNormalEnclosureView<'_, 'c> {
-        let f = &self.source.fibre;
-        ResidentNormalEnclosureView {
-            surface: f.surface,
-            section: &self.source.joint,
-            offset: 0,
-            width: 4 * f.roots,
-            grain: f.grain,
-        }
-    }
-    pub fn inspect(&self) -> Result<NormalWaveComparisonReading, ConstitutiveFibreError> {
-        let f = &self.source.fibre;
-        Ok(NormalWaveComparisonReading {
-            prediction_id: self.prediction_id,
-            producing_epoch: f.epoch,
-            producing_transport: f.transport,
-            successor_transport: self.successor_fibre.transport,
-            source_joint: self.source_joint().inspect()?,
-            comparison: decode_report(
-                &f.surface.detach_section(&self.report, i64::BITS)?,
-                f.roots,
-                f.roots,
-                f.grain.0,
-                true,
-            )?,
-        })
-    }
-}
 impl<'c> ResidentNormalWave<'c> {
-    /// Expose a prediction and retain its actual preceding joint/material cut. Ordinary
-    /// `advance` remains available without opening an addressed comparison obligation.
-    pub fn predict(&mut self) -> Result<NormalWavePrediction<'c>, ConstitutiveFibreError> {
-        let source = Rc::new(ProducingCut {
-            joint: Rc::clone(&self.joint),
-            fibre: self.fibre(),
-        });
+    /// Advance one word and retain its source joint as a pending prediction, addressed by the
+    /// successor epoch. Ordinary `advance` opens no comparison obligation.
+    pub fn predict(&mut self) -> Result<(u64, NormalWaveState<'c>), ConstitutiveFibreError> {
+        let source = Rc::clone(&self.joint);
         let step = self.advance()?;
         let id = self.epoch;
         self.pending.insert(id, source);
-        Ok(NormalWavePrediction {
-            step,
-            handle: NormalProducingHandle {
-                owner: Rc::clone(&self.owner),
-                id,
-            },
-        })
+        Ok((id, step))
     }
-
+    /// The one-cut pullback (see the module header).
+    pub fn pullback<'a>(
+        &mut self,
+        id: u64,
+        observed: ResidentConstitutiveCurrent<'a, 'c>,
+    ) -> Result<NormalWavePassage<'a, 'c>, ConstitutiveFibreError> {
+        self.pull_back_pending(id, observed)
+    }
 }
-impl<'c,C> ResidentNormalWave<'c,C> {
+impl<'c, C> ResidentNormalWave<'c, C> {
     pub fn pending_predictions(&self) -> usize {
         self.pending.len()
     }
-
-    /// Resolve an address already present in this owner's active comparison population,
-    /// including after a validated remount. Application source association is retained outside
-    /// this native address; an arbitrary message id does not produce a comparison here.
-    pub fn pending_prediction(
-        &self,
-        id: u64,
-    ) -> Result<NormalProducingHandle, ConstitutiveFibreError> {
-        if !self.pending.contains_key(&id) {
-            return Err(ConstitutiveFibreError::ForeignOccurrence);
-        }
-        Ok(NormalProducingHandle {
-            owner: Rc::clone(&self.owner),
-            id,
-        })
+    pub fn pending_prediction_ids(&self) -> impl Iterator<Item = u64> + '_ {
+        self.pending.keys().copied()
     }
-
-    fn producing_cut(
-        &self,
-        handle: &NormalProducingHandle,
-    ) -> Result<&Rc<ProducingCut<'c>>, ConstitutiveFibreError> {
-        if !Rc::ptr_eq(&self.owner, &handle.owner) {
-            return Err(ConstitutiveFibreError::ForeignOccurrence);
-        }
+    /// Whether `id` is an address of this owner's pending population, including after a
+    /// validated remount. An arbitrary message id does not produce a comparison here.
+    pub fn has_pending_prediction(&self, id: u64) -> bool {
+        self.pending.contains_key(&id)
+    }
+    /// Release a comparison the caller no longer admits as a future return. No coordinates or
+    /// material change.
+    pub fn release_prediction(&mut self, id: u64) -> Result<(), ConstitutiveFibreError> {
         self.pending
-            .get(&handle.id)
+            .remove(&id)
+            .map(|_| ())
             .ok_or(ConstitutiveFibreError::ForeignOccurrence)
     }
 
-    /// Release a comparison that the caller no longer admits as a future return. Existing
-    /// external handles then refuse; no coordinates or material are changed by release.
-    pub fn release_prediction(
+    /// The one-cut pullback: the retained source joint read at the contemporary constitution;
+    /// the increment joins that same constitution. The contemporary current is unchanged.
+    pub(super) fn pull_back_pending<'a>(
         &mut self,
-        handle: &NormalProducingHandle,
-    ) -> Result<(), ConstitutiveFibreError> {
-        self.producing_cut(handle)?;
-        self.pending.remove(&handle.id);
-        Ok(())
-    }
-
-    /// Develop at a retained producing joint while preserving the actual contemporary pair.
-    /// The existing correlated reception kernel forms φ=(c_s-p_s,c_s,p_s), η=v-c_s on device.
-    /// Its forward reading uses producing material; the increment joins contemporary material.
-    /// No enclosed centre enters a point-current port and no earlier material is restored.
-    pub(super) fn receive_normal_prediction<'a>(
-        &mut self,
-        handle: &NormalProducingHandle,
+        id: u64,
         observed: ResidentConstitutiveCurrent<'a, 'c>,
-    ) -> Result<NormalWaveComparison<'a, 'c>, ConstitutiveFibreError> {
-        let source = Rc::clone(self.producing_cut(handle)?);
+    ) -> Result<NormalWavePassage<'a, 'c>, ConstitutiveFibreError> {
+        let source = Rc::clone(
+            self.pending
+                .get(&id)
+                .ok_or(ConstitutiveFibreError::ForeignOccurrence)?,
+        );
         let count = self
             .material
             .observations
@@ -173,19 +83,21 @@ impl<'c,C> ResidentNormalWave<'c,C> {
         let report = fresh(layout.report_words)?;
         let work = fresh(layout.workspace_words)?;
         let input = fresh(4 * (layout.source_components + 1))?;
+        let reference = self.transport.is_reference();
         let mut passage = s.begin_passage(&[vec![]])?;
         {
             let lane = passage.open(0, &[])?;
+            // One cut: the producing and contemporary material and transport are the same.
             s.record_normal_wave_comparison(
                 &lane,
                 &self.material.state,
-                &source.fibre.material,
-                &source.joint,
+                &self.material.state,
+                &source,
                 observed,
                 n,
                 self.material.grain.0,
-                source.fibre.transport.is_reference(),
-                self.transport.is_reference(),
+                reference,
+                reference,
                 &next,
                 &report,
                 &work,
@@ -195,7 +107,10 @@ impl<'c,C> ResidentNormalWave<'c,C> {
         passage.close(0, &report, i64::BITS)?;
         let returned = passage.finish()?.launch()?;
         if !returned.obstruction.is_empty() {
-            let stage = s.read_out(&report).ok().and_then(|words| words.first().map(|w| w.1));
+            let stage = s
+                .read_out(&report)
+                .ok()
+                .and_then(|words| words.first().map(|w| w.1));
             let stage = match stage {
                 Some(1) => "joint source/target moments",
                 Some(2) => "producing response",
@@ -206,12 +121,14 @@ impl<'c,C> ResidentNormalWave<'c,C> {
                 _ => "unavailable stage",
             };
             return Err(ConstitutiveFibreError::Arithmetic(format!(
-                "producing wave comparison ({stage}): {:?}", returned.obstruction
+                "one-cut wave pullback ({stage}): {:?}",
+                returned.obstruction
             )));
         }
         // Every fallible operation precedes this publication. Retain both contemporary current
         // occurrence handles while rebasing the word onto their actual joint enclosure.
         let predecessor_fibre = self.normal_bank_fibre();
+        let rebased = staged.is_some();
         if let Some(super::develop::JointSeed {
             power, metadata, ..
         }) = staged
@@ -226,19 +143,17 @@ impl<'c,C> ResidentNormalWave<'c,C> {
         }
         self.material.state = Rc::new(next);
         self.material.observations = count;
-        self.pending.remove(&handle.id);
-        Ok(NormalWaveComparison {
-            prediction_id: handle.id,
-            source,
-            observed,
-            report,
+        self.pending.remove(&id);
+        let mut returned = NormalWavePassage::new(
+            NormalPassageKind::Pullback,
             predecessor_fibre,
-            successor_fibre: self.normal_bank_fibre(),
-        })
+            self.normal_bank_fibre(),
+        );
+        returned.prediction = Some(id);
+        returned.rebased_joint_enclosure = rebased;
+        returned.source_joint = Some(source);
+        returned.observed = Some(observed);
+        returned.report = Some(report);
+        Ok(returned)
     }
-}
-
-impl<'c> ResidentNormalWave<'c>{
-    pub fn receive_prediction<'a>(&mut self,handle:&NormalProducingHandle,observed:ResidentConstitutiveCurrent<'a,'c>)
-        ->Result<NormalWaveComparison<'a,'c>,ConstitutiveFibreError>{self.receive_normal_prediction(handle,observed)}
 }

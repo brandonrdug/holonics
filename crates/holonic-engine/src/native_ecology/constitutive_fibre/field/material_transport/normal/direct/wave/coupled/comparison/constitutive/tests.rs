@@ -45,7 +45,7 @@ fn dependent_constitutive_return_preserves_source_condition_correlation() {
     let prediction = wave.predict_contact(&next).unwrap();
     let observed = point(&s, &[7, 4]);
     let cmp = wave
-        .compare_coupled_prediction(&prediction.handle, current(&observed))
+        .compare_coupled_prediction(&prediction.0, current(&observed))
         .unwrap();
     let anchor = [1, 0, 2, 1];
     let assignments = [
@@ -118,7 +118,7 @@ fn dependent_constitutive_return_preserves_source_condition_correlation() {
     }
     assert_eq!(wave.rest().unwrap(), before);
     assert_eq!(wave.pending_coupled_predictions(), 1);
-    wave.release_coupled_prediction(&prediction.handle).unwrap();
+    wave.release_coupled_prediction(&prediction.0).unwrap();
     assert!(wave.read_coupled_constitutive_family(&cmp).is_err());
 }
 
@@ -127,7 +127,7 @@ fn dependent_constitutive_return_preserves_source_condition_correlation() {
 fn dependent_constitutive_return_joins_actual_current_before_new_material_acts(){
     let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
     let mut wave=body(&s).with_neighborhood(neighborhood(&s,law(&s,false))).unwrap();
-    let contact=wave.admit_contact(0).unwrap();let pending=wave.predict_contact(&contact).unwrap().handle;
+    let contact=wave.admit_contact(0).unwrap();let pending=wave.predict_contact(&contact).unwrap().0;
     let observation=point(&s,&[4,3]);
     let comparison=wave.compare_coupled_prediction(&pending,current(&observation)).unwrap();
     let next=point(&s,&[10,0]);let contact=wave.admit_contact(0).unwrap();
@@ -166,7 +166,7 @@ fn dependent_constitutive_return_retains_condition_obstruction_and_material_exte
     let prediction = wave.predict_contact(&contact).unwrap();
     let observed = point(&s, &[9, 7]);
     let cmp = wave
-        .compare_coupled_prediction(&prediction.handle, current(&observed))
+        .compare_coupled_prediction(&prediction.0, current(&observed))
         .unwrap();
     let values = source_parameters_at(&cmp, &[1, 0, 2, 1], &[1, 0, 2, 1]);
     let packet = s.mount_exact_rational_packet(&values).unwrap();

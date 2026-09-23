@@ -2,23 +2,6 @@
 //! retained; its receiver witness is not converted to a point-current learning operand.
 use super::super::*;
 
-#[derive(Clone, Debug, Serialize, PartialEq, Eq)]
-pub struct FamilyBasisSelection {
-    pub selected: usize,
-    pub selected_coordinate: usize,
-    pub projected_score: Rat,
-    pub projected_ties: usize,
-}
-#[derive(Debug, Serialize)]
-pub struct FamilyBasisReading {
-    pub epoch: u64,
-    pub selection: FamilyBasisSelection,
-    pub coordinates: Vec<usize>,
-    pub projected_scores: Vec<Rat>,
-    /// These flags witness unbounded variation at fixed anchor. False does not establish
-    /// constancy over the anchor ball, or a robust winning symbol for the whole family.
-    pub anchor_independent_free: Vec<bool>,
-}
 pub struct NormalFamilyBasisFace<'c, Origin = (Rc<NormalWaveFamily<'c>>, ResidentSection<'c>)> {
     origin: Origin,
     surface: &'c ResidentSurface<'c>,

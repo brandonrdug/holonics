@@ -4,26 +4,24 @@
 use super::*;
 use std::collections::BTreeMap;
 mod coupled;
-pub use coupled::{NormalWaveCoupled,NormalCoupledAttachRefusal,NormalCoupledContact,NormalCoupledStep,NormalCoupledReception, NormalCoupledSourceActuation, NormalCoupledProducingHandle, NormalCoupledPrediction, NormalCoupledComparison, NormalCoupledObservation, ConstitutiveComparisonSection, ConstitutiveSourceFrame, ResidentCoupledConstitutive, CoupledConstitutiveRefusal, ConstitutiveSourceRefusal, CoupledConstitutiveRest, NormalCoupledContinuation, NormalContinuationPullback, NormalContinuationJoin, CoupledConstitutiveFamily, CoupledConstitutiveAlternative, CompiledCoupledJoint, CoupledJointEvaluation, CoupledJointReading, NormalFamilyComparisonRow};
+pub use coupled::{NormalWaveCoupled, NormalCoupledAttachRefusal, NormalCoupledContact, NormalCoupledStep, NormalCoupledComparison, NormalCoupledObservation, ConstitutiveComparisonSection, ConstitutiveSourceFrame, ResidentCoupledConstitutive, CoupledConstitutiveRefusal, ConstitutiveSourceRefusal, CoupledConstitutiveRest, NormalCoupledContinuation, NormalContinuationPullback, NormalContinuationJoin, CoupledConstitutiveFamily, CoupledConstitutiveAlternative, CompiledCoupledJoint, CoupledJointEvaluation};
 mod actuate;
-pub use actuate::NormalSourceActuation;
 mod develop;
-pub use develop::NormalWaveDevelopment;
 mod receive;
-pub use receive::{NormalWaveReception, NormalWaveReceptionReading};
 mod rest;
 pub use rest::NormalWaveRest;
 mod family;
-pub use family::{NormalReceiverCoordinates,NormalWaveFacePacket, NormalFamilyPullback, NormalWaveFamily,NormalWaveFamilyRest, NormalFamilyBasisFace, FamilyBasisSelection, FamilyBasisReading,NormalFamilySupport,NormalFamilyReceiverReading,NormalWaveFamilyReceiver};
+pub use family::{NormalReceiverCoordinates, NormalWaveFacePacket, NormalFamilyPullback, NormalWaveFamily, NormalWaveFamilyRest, NormalFamilyBasisFace, NormalWaveFamilyReceiver};
 mod source;
-pub use source::{NormalWaveSource,NormalWaveJointSource};
+pub use source::{NormalWaveJointSource, NormalWaveState};
 mod basis;
-pub use basis::{NormalWaveBasisChart, NormalWaveBasisFace, NormalWaveBasisReading, NormalBasisSelection, NormalBasisScore};
+pub use basis::{NormalWaveBasisChart, NormalWaveBasisFace};
 mod reference;
-pub use reference::{NormalWaveReference, NormalWaveReferenceReading};
 mod comparison;
-use comparison::ProducingCut;
-pub use comparison::{NormalProducingHandle, NormalWavePrediction, NormalWaveComparison, NormalWaveComparisonReading};
+mod passage;
+pub use passage::{NormalWavePassage};
+mod holon;
+pub use holon::NormalWaveHolon;
 
 /// Which operator family the transported enclosure describes. Applied uses the actual stored
 /// dyadic M, retaining source uncertainty and numerical realization error. NormalReference also
@@ -37,11 +35,6 @@ pub enum NormalWaveTransport {
 }
 impl NormalWaveTransport {
     fn is_reference(self) -> bool { self == Self::NormalReference }
-}
-
-pub struct NormalWaveTransportChange<'c> {
-    pub predecessor: NormalWaveFibre<'c>,
-    pub successor: NormalWaveFibre<'c>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
@@ -152,7 +145,7 @@ impl<'c> NormalWaveFibre<'c> {
             }
         })
     }
-    pub fn inspect_material(&self) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
+    pub fn inspect_material(&self) -> Result<NormalConstitution, ConstitutiveFibreError> {
         decode_state(
             &self.surface.detach_section(&self.material, i64::BITS)?,
             self.roots,
@@ -162,36 +155,22 @@ impl<'c> NormalWaveFibre<'c> {
     }
 }
 
-#[derive(Debug, Serialize)]
-pub struct NormalWaveReading {
-    pub transport: NormalWaveTransport,
-    pub steps: u64,
-    pub maximum_computed_power_norm: Rat,
-    pub uniform_power_equation_defect: Rat,
-    pub operator_word_error: Rat,
-    pub joint_current: NativeFieldCurrentBall,
-}
 /// Compatibility name for the single immutable source receipt.
-pub type NormalWaveStep<'c> = NormalWaveJointSource<'c>;
+pub type NormalWaveStep<'c> = NormalWaveState<'c>;
 
-pub struct NormalWaveSeedRefusal<'c> {
-    pub material: ResidentNormalMaterial<'c>,
-    pub reason: ConstitutiveFibreError,
-}
-impl std::fmt::Debug for NormalWaveSeedRefusal<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.reason.fmt(f)
-    }
-}
+/// Refusal of a seed: the constitution is returned.
+pub type NormalWaveSeedRefusal<'c> = NormalRefusal<ResidentNormalMaterial<'c>>;
 
-/// Fixed-normal-word continuation. Coupling transfers the same owner into a family continuation.
-pub struct NormalWaveWord;
+/// Fixed-normal-word continuation (the plain wave carries no continuation state). Coupling
+/// transfers the same owner into a family continuation.
+pub type NormalWaveWord = ();
 
 pub struct ResidentNormalWave<'c, C = NormalWaveWord> {
     continuation: C,
     transport: NormalWaveTransport,
     owner: Rc<()>,
-    pending: BTreeMap<u64, Rc<ProducingCut<'c>>>,
+    /// Pending predictions: the source joint of each (the one-cut retention; see `comparison`).
+    pending: BTreeMap<u64, Rc<ResidentSection<'c>>>,
     material: ResidentNormalMaterial<'c>,
     seed: Rc<ResidentSection<'c>>,
     seed_bound: Rc<ResidentSection<'c>>,
@@ -248,7 +227,7 @@ impl<'c> ResidentNormalMaterial<'c> {
             }) => {
                 let seed_bound = Rc::new(seed_bound);
                 Ok(ResidentNormalWave {
-                    continuation: NormalWaveWord,
+                    continuation: (),
                     transport: NormalWaveTransport::NormalReference,
                     owner: Rc::new(()),
                     pending: BTreeMap::new(),
@@ -266,10 +245,7 @@ impl<'c> ResidentNormalMaterial<'c> {
                     seed_epochs: [None, Some(0)],
                 })
             }
-            Err(reason) => Err(NormalWaveSeedRefusal {
-                material: self,
-                reason,
-            }),
+            Err(reason) => Err(NormalRefusal::new(self, reason)),
         }
     }
 }
@@ -360,10 +336,10 @@ impl<'c> ResidentNormalWave<'c> {
 
     /// Change the future operator-family receiver, never reinterpret or narrow the held joint.
     /// Rebase at this cut so a reference word is not silently re-read as an applied word.
-    pub fn set_transport(
+    pub fn set_transport<'a>(
         &mut self,
         transport: NormalWaveTransport,
-    ) -> Result<NormalWaveTransportChange<'c>, ConstitutiveFibreError> {
+    ) -> Result<NormalWavePassage<'a, 'c>, ConstitutiveFibreError> {
         let predecessor = self.fibre();
         if self.transport != transport {
             let staged = self.material.prepare_joint_seed(&self.joint,self.epoch)?;
@@ -376,7 +352,7 @@ impl<'c> ResidentNormalWave<'c> {
             self.seed_epochs = [self.previous.at(),self.current.at()];
             self.transport = transport;
         }
-        Ok(NormalWaveTransportChange { predecessor, successor:self.fibre() })
+        Ok(NormalWavePassage::new(NormalPassageKind::Transport, predecessor, self.fibre()))
     }
 
     pub fn epoch(&self) -> u64 {

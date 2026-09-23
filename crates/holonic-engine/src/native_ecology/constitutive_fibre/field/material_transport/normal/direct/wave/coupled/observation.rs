@@ -104,13 +104,14 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
     /// law and condition are unchanged; later contact reads the returned M.
     pub fn observe_coupled_prediction<'a>(
         &mut self,
-        h: &NormalCoupledProducingHandle,
+        id: impl std::borrow::Borrow<u64>,
         observed: impl Into<ResidentNormalInput<'a, 'c>>,
     ) -> Result<NormalCoupledObservation<'c>, ConstitutiveFibreError>
     where
         'c: 'a,
     {
-        let cut = Rc::clone(self.coupled_producing_cut(h)?);
+        let id = *id.borrow();
+        let cut = Rc::clone(self.coupled_producing_cut(id)?);
         let material = self
             .neighborhood()
             .material(cut.member)?
@@ -125,13 +126,13 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
             .checked_add(1)
             .ok_or(ConstitutiveFibreError::Shape)?;
         let (receipt, next) =
-            NormalCoupledObservation::prepare(h.id(), Rc::clone(&cut), observed.into(), material)?;
+            NormalCoupledObservation::prepare(id, Rc::clone(&cut), observed.into(), material)?;
         self.continuation
             .neighborhood
             .publish_predictive(cut.member, epoch, next);
         self.continuation.neighborhood_base = base;
         self.continuation.bindings.clear();
-        self.continuation.pending.remove(&h.id());
+        self.continuation.pending.remove(&id);
         self.prune_coupled_transport();
         Ok(receipt)
     }

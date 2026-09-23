@@ -90,37 +90,33 @@ fn addressed_return_uses_producing_cut_witness() {
     let surface = ResidentSurface::on(&readout).unwrap();
     let mut body = witness(&surface);
     let reads_before_predict = surface.census().section_read_outs;
-    let prediction = body.predict().unwrap();
+    let (id, step) = body.predict().unwrap();
     assert_eq!(surface.census().section_read_outs, reads_before_predict);
-    contains(
-        &prediction.step.current().view().inspect().unwrap(),
-        &[wave(2, 0, 1)],
-    );
+    contains(&step.current().view().inspect().unwrap(), &[wave(2, 0, 1)]);
     let held = body.current().snapshot();
     let previous = body.previous().snapshot();
-    let handle = prediction.handle;
     assert_eq!(body.pending_predictions(), 1);
     let observed = rational(&surface, &[3, 0], 1);
     let reads = surface.census().section_read_outs;
-    let comparison = body
-        .receive_prediction(&handle, rational_current(&observed))
-        .unwrap();
+    let comparison = body.pullback(id, rational_current(&observed)).unwrap();
     assert_eq!(surface.census().section_read_outs, reads);
     assert!(body.current().same_occurrence(&held));
     assert!(body.previous().same_occurrence(&previous));
     let reading = comparison.inspect().unwrap();
-    assert_eq!(reading.prediction_id, handle.id());
+    assert_eq!(reading.prediction_id, Some(id));
     assert_eq!(reading.producing_epoch, 0);
     contains(
         &reading
             .comparison
+            .as_ref()
+            .unwrap()
             .contemporary_source_forward
             .as_ref()
             .unwrap(),
         &[wave(1, 0, 1)],
     );
-    contains(&reading.comparison.forward, &[wave(7, 0, 5)]);
-    assert!(reading.comparison.source_current.is_some());
+    contains(&reading.comparison.as_ref().unwrap().forward, &[wave(7, 0, 5)]);
+    assert!(reading.comparison.as_ref().unwrap().source_current.is_some());
     assert_eq!(body.pending_predictions(), 0);
     contains(
         &body.advance().unwrap().current().view().inspect().unwrap(),
@@ -143,20 +139,17 @@ fn addressed_return_uses_producing_cut_witness() {
 
 #[test]
 #[ignore = "requires CUDA; stale addressed handles refuse atomically"]
-fn producing_handles_are_single_use_and_body_local() {
+fn pending_addresses_are_single_use_and_body_local() {
     let readout = ResidentReadout::new().unwrap();
     let surface = ResidentSurface::on(&readout).unwrap();
     let mut left = witness(&surface);
     let mut right = witness(&surface);
-    let left_prediction = left.predict().unwrap();
-    let right_prediction = right.predict().unwrap();
+    let (left_id, _) = left.predict().unwrap();
+    let (right_id, _) = right.predict().unwrap();
     let observed = point(&surface, &[3, 0]);
     let right_rest = right.rest().unwrap();
-    assert!(
-        right
-            .receive_prediction(&left_prediction.handle, current(&observed))
-            .is_err()
-    );
+    // An address that is not pending in this owner refuses without change.
+    assert!(right.pullback(right_id + 7, current(&observed)).is_err());
     assert_eq!(right.pending_predictions(), 1);
     assert_eq!(right.rest().unwrap(), right_rest);
     let malformed = surface
@@ -166,56 +159,87 @@ fn producing_handles_are_single_use_and_body_local() {
         )
         .unwrap();
     let before = left.rest().unwrap();
-    assert!(
-        left.receive_prediction(&left_prediction.handle, current(&malformed))
-            .is_err()
-    );
+    assert!(left.pullback(left_id, current(&malformed)).is_err());
     assert_eq!(left.rest().unwrap(), before);
-    let _ = left
-        .receive_prediction(&left_prediction.handle, current(&observed))
-        .unwrap();
-    assert!(
-        left.receive_prediction(&left_prediction.handle, current(&observed))
-            .is_err()
-    );
-    assert_eq!(right_prediction.handle.id(), 1);
+    let _ = left.pullback(left_id, current(&observed)).unwrap();
+    assert!(left.pullback(left_id, current(&observed)).is_err());
+    assert_eq!(right_id, 1);
     assert_eq!(right.pending_predictions(), 1);
 }
 
+/// The one-cut law: a delayed return reads its retained source joint at the contemporary
+/// constitution. It equals the return made at that same cut — the same development first, then
+/// the same prediction from the same source joint — number for number, and its forward reading
+/// contains the exact normal-reference response `c + P φ`, `P = B H⁻¹` of the contemporary
+/// constitution (not of the producing one).
 #[test]
-#[ignore = "requires CUDA; delayed returns compose with contemporary material"]
-fn delayed_return_survives_intervening_development() {
+#[ignore = "requires CUDA; a delayed return is one-cut equal to an immediate return"]
+fn delayed_return_is_one_cut_equal_to_an_immediate_return() {
     let readout = ResidentReadout::new().unwrap();
     let surface = ResidentSurface::on(&readout).unwrap();
-    let mut body = witness(&surface);
-    let prediction = body.predict().unwrap();
     let intervening = point(&surface, &[0, 0, 1, 0, 0, 0]);
     let intervening_target = point(&surface, &[0, 0]);
-    body.develop_section(
-        ResidentConstitutiveSection::integers(&intervening).unwrap(),
-        ResidentConstitutiveSection::integers(&intervening_target).unwrap(),
-    )
-    .unwrap();
-    let before = body.fibre().material_observations;
+    let source = ResidentConstitutiveSection::integers(&intervening).unwrap();
+    let target = ResidentConstitutiveSection::integers(&intervening_target).unwrap();
     let observed = point(&surface, &[3, 0]);
-    let comparison = body
-        .receive_prediction(&prediction.handle, current(&observed))
+    // Delayed: predict, an intervening development, then the return.
+    let mut delayed = witness(&surface);
+    let (id, _) = delayed.predict().unwrap();
+    delayed.develop_section(source, target).unwrap();
+    let before = delayed.fibre().material_observations;
+    let contemporary = delayed.material.inspect().unwrap();
+    let returned = delayed.pullback(id, current(&observed)).unwrap();
+    assert_eq!(delayed.fibre().material_observations, before + 1);
+    let late = returned.inspect().unwrap();
+    assert_eq!(late.prediction_id, Some(id));
+    // Immediate at the same cut: the same development, then the prediction and its return.
+    let mut immediate = witness(&surface);
+    immediate.develop_section(source, target).unwrap();
+    let (at, _) = immediate.predict().unwrap();
+    assert_eq!(at, id);
+    let now = immediate
+        .pullback(at, current(&observed))
+        .unwrap()
+        .inspect()
         .unwrap();
     assert_eq!(
-        comparison.inspect().unwrap().prediction_id,
-        prediction.handle.id()
+        serde_json::to_value(&late.comparison).unwrap(),
+        serde_json::to_value(&now.comparison).unwrap()
     );
-    assert_eq!(body.fibre().material_observations, before + 1);
-    let reading = comparison.inspect().unwrap();
+    assert_eq!(
+        serde_json::to_value(delayed.material.inspect().unwrap()).unwrap(),
+        serde_json::to_value(immediate.material.inspect().unwrap()).unwrap()
+    );
+    // Exact reference response at the contemporary constitution: P H = B (real 3×3 here).
+    let h = contemporary
+        .source_normal
+        .iter()
+        .map(|row| row.iter().map(|z| z.real.clone()).collect::<Vec<_>>())
+        .collect::<Vec<_>>();
+    let b = contemporary.cross_source[0]
+        .iter()
+        .map(|z| z.real.clone())
+        .collect::<Vec<_>>();
+    assert!(contemporary.source_normal.iter().flatten().all(|z| z.imaginary.is_zero()));
+    let ht = crate::exact_linear::ExactRatMatrix::new(h).unwrap().transpose().unwrap();
+    let p = ht.inverse().unwrap().apply(&b).unwrap();
+    // Source joint (p, c) = (0, 1): φ = (c − p, c, p) = (1, 1, 0). The source response the
+    // return reads (`contemporary_source_forward`, in the difference chart `η = v − c`) is `P φ`
+    // of the contemporary constitution; the producing constitution would have read 1 here.
+    let response = &p[0] + &p[1];
+    assert_eq!(response, Rat::new(9.into(), 10.into()));
     contains(
-        reading
-            .comparison
+        late.comparison
+            .as_ref()
+            .unwrap()
             .contemporary_source_forward
             .as_ref()
             .unwrap(),
-        &[wave(1, 0, 1)],
+        &[ExactComplexWaveCurrent::new(response, Rat::zero())],
     );
-    contains(&reading.comparison.forward, &[wave(21, 0, 16)]);
+    // The updated response after the fit is the same as before the one-cut change (the fit
+    // always joined the contemporary constitution).
+    contains(&late.comparison.as_ref().unwrap().forward, &[wave(21, 0, 16)]);
 }
 
 #[test]
@@ -224,25 +248,18 @@ fn pending_prediction_rest_retains_the_next_return() {
     let readout = ResidentReadout::new().unwrap();
     let surface = ResidentSurface::on(&readout).unwrap();
     let mut body = witness(&surface);
-    let prediction = body.predict().unwrap();
+    let (id, _) = body.predict().unwrap();
     let rest = body.rest().unwrap();
     let mut bytes = Vec::new();
     rest.write(&mut bytes).unwrap();
     let loaded = NormalWaveRest::read(&mut bytes.as_slice(), bytes.len() as u64).unwrap();
     assert_eq!(loaded.pending_count(), 1);
     let mut remounted = loaded.remount(&surface, |_| {}).unwrap();
-    let handle = remounted
-        .pending_prediction(prediction.handle.id())
-        .unwrap();
-    assert_eq!(handle.id(), prediction.handle.id());
+    assert!(remounted.has_pending_prediction(id));
     let observed = point(&surface, &[3, 0]);
-    let a = body
-        .receive_prediction(&prediction.handle, current(&observed))
-        .unwrap()
-        .inspect()
-        .unwrap();
+    let a = body.pullback(id, current(&observed)).unwrap().inspect().unwrap();
     let b = remounted
-        .receive_prediction(&handle, current(&observed))
+        .pullback(id, current(&observed))
         .unwrap()
         .inspect()
         .unwrap();
@@ -271,14 +288,12 @@ fn enclosed_producing_joint_is_not_a_point_target() {
         .into_difference_wave(current(&zero), current(&one))
         .unwrap();
     body.advance().unwrap();
-    let p = body.predict().unwrap();
+    let (id, _) = body.predict().unwrap();
     let observed = point(&s, &[3, 0]);
     let reads = s.census().section_read_outs;
-    let returned = body
-        .receive_prediction(&p.handle, current(&observed))
-        .unwrap();
+    let returned = body.pullback(id, current(&observed)).unwrap();
     assert_eq!(s.census().section_read_outs, reads);
-    assert!(returned.source_joint().inspect().unwrap().radius > Rat::zero());
+    assert!(returned.source_joint().unwrap().inspect().unwrap().radius > Rat::zero());
     let state = body.material.inspect().unwrap();
     assert!(state.source_normal_error > Rat::zero());
     assert!(state.target_energy_error > Rat::zero());
@@ -302,10 +317,9 @@ fn producing_comparison_transports_a_unit_phase() {
     let mut body = material
         .into_difference_wave(current(&p), current(&c))
         .unwrap();
-    let prediction = body.predict().unwrap();
+    let (id, _) = body.predict().unwrap();
     let observed = point(&s, &[0, 3]);
-    body.receive_prediction(&prediction.handle, current(&observed))
-        .unwrap();
+    body.pullback(id, current(&observed)).unwrap();
     contains(
         &body.advance().unwrap().current().view().inspect().unwrap(),
         &[wave(0, 41, 10)],
@@ -336,10 +350,10 @@ fn pending_comparison_survives_process_exit() {
                 .remount(&s, |_| {})
                 .unwrap()
         };
-        let handle = body.pending_prediction(1).unwrap();
+        assert!(body.has_pending_prediction(1));
         let observed = point(&s, &[3, 0]);
         let comparison = body
-            .receive_prediction(&handle, current(&observed))
+            .pullback(1, current(&observed))
             .unwrap()
             .inspect()
             .unwrap();

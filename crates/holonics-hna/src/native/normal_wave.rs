@@ -205,7 +205,7 @@ impl<'c> NativeWaveSession<'c> {
             .ok_or_else(|| invalid("emission ordinal overflow"))?;
         if matches!(self.cursor, Cursor::Ready) {
             let prediction = if retain {
-                Some(self.wave.predict()?.handle.id())
+                Some(self.wave.predict()?.0)
             } else {
                 self.wave.advance()?;
                 None
@@ -307,11 +307,9 @@ impl<'c> NativeWaveSession<'c> {
             ));
         }
         let source = self.chart.mount(self.surface, &symbols)?;
-        let handle = self.wave.pending_prediction(prediction)?;
-        let result = self.wave.receive_prediction(
-            &handle,
-            ResidentConstitutiveSection::integers(&source)?.row(0)?,
-        )?;
+        let result = self
+            .wave
+            .pullback(prediction, ResidentConstitutiveSection::integers(&source)?.row(0)?)?;
         Ok(json!({"prediction":prediction,"epoch":self.wave.epoch(),
             "observations":result.successor_fibre.material_observations}))
     }

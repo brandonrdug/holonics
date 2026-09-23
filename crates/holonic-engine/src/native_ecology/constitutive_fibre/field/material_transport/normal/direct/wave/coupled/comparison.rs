@@ -5,32 +5,12 @@ pub(super) mod joint;
 mod constitutive;
 pub(super) use constitutive::{ConstitutiveReturnOperands,EvaluatedProducingCut};
 pub use constitutive::{CoupledConstitutiveFamily, CoupledConstitutiveAlternative};
-pub use joint::{CompiledCoupledJoint, CoupledJointEvaluation, CoupledJointReading};
+pub use joint::{CompiledCoupledJoint, CoupledJointEvaluation};
 
 pub(super) struct CoupledProducingCut<'c> {
     pub(super) member: usize,
     pub(super) source: Rc<NormalWaveFamily<'c>>,
     pub(super) produced: Rc<NormalWaveFamily<'c>>,
-}
-pub struct NormalCoupledProducingHandle {
-    owner: Rc<()>,
-    id: u64,
-}
-impl NormalCoupledProducingHandle {
-    pub fn id(&self) -> u64 {
-        self.id
-    }
-}
-pub struct NormalCoupledPrediction<'c> {
-    pub step: NormalCoupledStep<'c>,
-    pub handle: NormalCoupledProducingHandle,
-}
-#[derive(Debug, Serialize, PartialEq, Eq)]
-pub struct NormalFamilyComparisonRow {
-    /// None is the affine origin; Some(i) is the original source's i-th generator coefficient.
-    pub source_direction: Option<usize>,
-    pub features: Vec<Rat>,
-    pub observed_difference: Vec<Rat>,
 }
 pub struct NormalCoupledComparison<'c> {
     id: u64,
@@ -102,43 +82,40 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
     pub fn pending_coupled_prediction_ids(&self) -> impl Iterator<Item = u64> + '_ {
         self.continuation.pending.keys().copied()
     }
-    pub fn pending_coupled_prediction(
-        &self,
-        id: u64,
-    ) -> Result<NormalCoupledProducingHandle, ConstitutiveFibreError> {
-        if !self.continuation.pending.contains_key(&id) {
-            return Err(ConstitutiveFibreError::ForeignOccurrence);
-        }
-        Ok(NormalCoupledProducingHandle {
-            owner: Rc::clone(&self.owner),
-            id,
-        })
+    /// Whether `id` is a pending coupled prediction of this owner (including after a remount).
+    pub fn has_pending_coupled_prediction(&self, id: u64) -> bool {
+        self.continuation.pending.contains_key(&id)
+    }
+    /// Resolve an address in this owner's pending coupled population (including after a
+    /// validated remount); an arbitrary id refuses.
+    pub fn pending_coupled_prediction(&self, id: u64) -> Result<u64, ConstitutiveFibreError> {
+        self.coupled_producing_cut(id).map(|_| id)
     }
     pub(super) fn coupled_producing_cut(
         &self,
-        h: &NormalCoupledProducingHandle,
+        id: impl std::borrow::Borrow<u64>,
     ) -> Result<&Rc<CoupledProducingCut<'c>>, ConstitutiveFibreError> {
-        if !Rc::ptr_eq(&self.owner, &h.owner) {
-            return Err(ConstitutiveFibreError::ForeignOccurrence);
-        }
         self.continuation
             .pending
-            .get(&h.id)
+            .get(id.borrow())
             .ok_or(ConstitutiveFibreError::ForeignOccurrence)
     }
     pub fn release_coupled_prediction(
         &mut self,
-        h: &NormalCoupledProducingHandle,
+        id: impl std::borrow::Borrow<u64>,
     ) -> Result<(), ConstitutiveFibreError> {
-        self.coupled_producing_cut(h)?;
-        self.continuation.pending.remove(&h.id);
+        let id = *id.borrow();
+        self.coupled_producing_cut(id)?;
+        self.continuation.pending.remove(&id);
         self.prune_coupled_transport();
         Ok(())
     }
-    pub fn predict_contact(
+    /// Advance through an admitted contact and retain the producing cut as a pending coupled
+    /// prediction, addressed by the successor epoch.
+    pub fn predict_contact<'a>(
         &mut self,
         contact: &NormalCoupledContact<'c>,
-    ) -> Result<NormalCoupledPrediction<'c>, ConstitutiveFibreError> {
+    ) -> Result<(u64, NormalCoupledStep<'a, 'c>), ConstitutiveFibreError> {
         let step = self.advance_contact(contact)?;
         let id = step.successor_epoch;
         // publish_coupled already appended this map when another return was pending. A first
@@ -154,24 +131,19 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
                 produced: Rc::clone(&step.successor),
             }),
         );
-        Ok(NormalCoupledPrediction {
-            step,
-            handle: NormalCoupledProducingHandle {
-                owner: Rc::clone(&self.owner),
-                id,
-            },
-        })
+        Ok((id, step))
     }
     /// Prepare the complete paired source/observed-difference family at this producing cut.
     /// Pending ownership and contemporary state remain unchanged until a later material return
     /// is actually bound, or the caller explicitly releases the comparison.
     pub fn compare_coupled_prediction(
         &self,
-        h: &NormalCoupledProducingHandle,
+        id: impl std::borrow::Borrow<u64>,
         observed: ResidentConstitutiveCurrent<'_, 'c>,
     ) -> Result<NormalCoupledComparison<'c>, ConstitutiveFibreError> {
-        let cut = Rc::clone(self.coupled_producing_cut(h)?);
-        NormalCoupledComparison::from_cut(h.id,cut,observed)
+        let id = *id.borrow();
+        let cut = Rc::clone(self.coupled_producing_cut(id)?);
+        NormalCoupledComparison::from_cut(id, cut, observed)
     }
 }
 impl<'c> NormalCoupledComparison<'c> {

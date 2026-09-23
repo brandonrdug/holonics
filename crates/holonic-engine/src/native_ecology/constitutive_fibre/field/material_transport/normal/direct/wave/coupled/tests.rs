@@ -80,7 +80,7 @@ fn affine_signature(reading: ConstitutiveReading) -> (Vec<Rat>, Vec<Vec<Rat>>) {
     }
     (point, basis.into_iter().flatten().collect())
 }
-fn compare_source_images(step: &NormalCoupledStep<'_>) {
+fn compare_source_images(step: &NormalCoupledStep<'_, '_>) {
     let generic = step
         .applied_relation()
         .read_image(step.source().affine_relation())
@@ -135,8 +135,8 @@ fn coupled_source_return_changes_condition_and_joint_atomically() {
         .receive_contact_source(&contact, current(&x), current(&eta))
         .unwrap();
     assert_eq!(s.census().section_read_outs, reads);
-    assert_eq!(returned.step.successor_epoch, 1);
-    assert!(std::ptr::eq(wave.current(), returned.step.successor()));
+    assert_eq!(returned.successor_epoch, 1);
+    assert!(std::ptr::eq(wave.current(), returned.successor()));
     assert_eq!(face(wave.current()), vec![r(2), r(1), r(4), r(3)]);
     assert_ne!(wave.neighborhood().rest().unwrap(), before);
     assert_eq!(wave.material.rest().unwrap(), bank);
@@ -259,9 +259,7 @@ fn coupled_rest_crosses_process_exit_with_pending_normal_and_conditional_returns
             .unwrap();
         let epoch = wave.epoch();
         let family = Rc::clone(&wave.continuation.current);
-        let normal = wave.pending_prediction(normal_id).unwrap();
-        wave.receive_prediction(&normal, current(&observed))
-            .unwrap();
+        wave.pullback(normal_id, current(&observed)).unwrap();
         assert_eq!(wave.epoch(), epoch);
         assert!(Rc::ptr_eq(&family, &wave.continuation.current));
         let h = wave.admit_contact(0).unwrap();
@@ -294,7 +292,7 @@ fn coupled_rest_crosses_process_exit_with_pending_normal_and_conditional_returns
         let ro = ResidentReadout::new().unwrap();
         let s = ResidentSurface::on(&ro).unwrap();
         let mut base = body(&s);
-        let normal = base.predict().unwrap().handle;
+        let (normal, _) = base.predict().unwrap();
         let h = point(&s, &[1, 0]);
         let neighborhood = ResidentGeneratorNeighborhood::with_shared_condition(
             vec![law(&s, false)],
@@ -305,8 +303,8 @@ fn coupled_rest_crosses_process_exit_with_pending_normal_and_conditional_returns
         let mut wave = base.with_neighborhood(neighborhood).unwrap();
         let c = wave.admit_contact(0).unwrap();
         let before = wire(&wave);
-        follow(&s, &mut wave, c.id(), normal.id());
-        (before, wire(&wave), c.id(), normal.id())
+        follow(&s, &mut wave, c.id(), normal);
+        (before, wire(&wave), c.id(), normal)
     };
     let dir = std::env::temp_dir().join(format!("holonics-coupled-process-{}", std::process::id()));
     std::fs::create_dir(&dir).unwrap();
@@ -394,10 +392,9 @@ fn coupled_reception_forms_material_before_admitting_the_new_current() {
     assert_eq!(wave.material.rest().unwrap(), bank);
     assert!(
         !returned
-            .step
             .contact
             .relation()
-            .same_producing_cut(returned.step.applied_relation())
+            .same_producing_cut(returned.applied_relation())
     );
     let saved = wire(&wave);
     let restored = NormalWaveRest::read(&mut saved.as_slice(), saved.len() as u64)
@@ -721,8 +718,8 @@ fn coupled_source_field_has_one_public_successor_and_exact_internal_composition(
     let reads = s.census().section_read_outs;
     let action = word.actuate_contact_section(&h, section).unwrap();
     assert_eq!(s.census().section_read_outs, reads);
-    assert_eq!(action.source().source().rows(), 3);
-    assert_eq!(action.last_source_contact().source_row(), Some(2));
+    assert_eq!(action.source_pairs().unwrap().source().rows(), 3);
+    assert_eq!(action.last_source_contact().unwrap().source_row(), Some(2));
     assert_eq!(word.epoch(), 1);
     assert_eq!(word.current().passages(), 1);
     assert_eq!(word.neighborhood().epoch(), 1);
@@ -948,7 +945,7 @@ fn pending_word_pullback_retains_internal_factors_and_joined_boundaries() {
     let s=ResidentSurface::on(&ro).unwrap();
     let mut wave=coupled(&s);
     let contact=wave.admit_contact(0).unwrap();
-    let pending=wave.predict_contact(&contact).unwrap().handle;
+    let pending=wave.predict_contact(&contact).unwrap().0;
     let contact=wave.admit_contact(0).unwrap();
     let packet=s.mount_section_rest(&ResidentSectionRest::found(3,2,ResidentGrain(0),64,
         [1,0,2,0,1,0].into_iter().map(|v|(v,v)).collect()).unwrap()).unwrap();

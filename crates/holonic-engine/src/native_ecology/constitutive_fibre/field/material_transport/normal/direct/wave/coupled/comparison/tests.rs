@@ -103,7 +103,7 @@ fn coupled_producing_comparison_survives_intervening_condition_and_material() {
     let before = wave.rest().unwrap();
     let reads = s.census().section_read_outs;
     let paired = wave
-        .compare_coupled_prediction(&prediction.handle, current(&v))
+        .compare_coupled_prediction(&prediction.0, current(&v))
         .unwrap();
     assert_eq!(s.census().section_read_outs, reads);
     assert_eq!(wave.rest().unwrap(), before);
@@ -114,7 +114,7 @@ fn coupled_producing_comparison_survives_intervening_condition_and_material() {
     wave.receive_contact_source(&contact, current(&source), current(&response))
         .unwrap();
     let again = wave
-        .compare_coupled_prediction(&prediction.handle, current(&v))
+        .compare_coupled_prediction(&prediction.0, current(&v))
         .unwrap();
     assert_eq!(
         s.detach_section(paired.coefficients(), 64).unwrap(),
@@ -124,16 +124,18 @@ fn coupled_producing_comparison_survives_intervening_condition_and_material() {
     let saved = wave.rest().unwrap();
     let mut bytes = Vec::new();
     saved.write(&mut bytes).unwrap();
-    assert!(saved.has_coupled_prediction(prediction.handle.id()));
+    assert!(saved.has_coupled_prediction(prediction.0));
     let mut restored = NormalWaveRest::read(&mut bytes.as_slice(), bytes.len() as u64)
         .unwrap()
         .remount_coupled(&s, |_| {})
         .unwrap();
+    // Pending comparisons are addressed by their epoch: the address resolves in the remounted
+    // owner (the former owner-capability handle is retired); a foreign id refuses.
     assert!(restored
-        .compare_coupled_prediction(&prediction.handle, current(&v))
+        .compare_coupled_prediction(prediction.0 + 99, current(&v))
         .is_err());
     let h = restored
-        .pending_coupled_prediction(prediction.handle.id())
+        .pending_coupled_prediction(prediction.0)
         .unwrap();
     let next = restored
         .compare_coupled_prediction(&h, current(&v))
@@ -175,7 +177,7 @@ fn coupled_producing_comparison_unit_lift_is_exact() {
     let v = point(&s, &[1, 0, 2, 0, 3]);
     let packet = wave
         .compare_coupled_prediction(
-            &pred.handle,
+            &pred.0,
             ResidentConstitutiveCurrent::rational(&v).unwrap(),
         )
         .unwrap();
@@ -200,7 +202,7 @@ fn coupled_producing_comparison_unit_lift_is_exact() {
     let bad = point(&s, &[1, 0, 1, 0]);
     let before = wave.rest().unwrap();
     assert!(wave
-        .compare_coupled_prediction(&pred.handle, current(&bad))
+        .compare_coupled_prediction(&pred.0, current(&bad))
         .is_err());
     assert_eq!(wave.rest().unwrap(), before);
 }

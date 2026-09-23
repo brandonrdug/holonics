@@ -1,64 +1,14 @@
 use super::*;
 mod normalized;
 
-/// Both x=(c-p,c,p) and y=v-c come from the retained joint pair and actual received point.
-/// The numerical moment envelopes overapproximate that shared family, not independent causes.
-pub struct NormalWaveReception<'c> {
-    source: NormalWaveJointSource<'c>,
-    current: NormalWaveCurrent<'c>,
-    successor_fibre: NormalWaveFibre<'c>,
-    report: ResidentSection<'c>,
-}
-#[derive(Debug, Serialize)]
-pub struct NormalWaveReceptionReading {
-    pub transport: NormalWaveTransport,
-    pub epoch: u64,
-    pub source_joint: NativeFieldCurrentBall,
-    pub comparison: NativeNormalMaterialReading,
-}
-impl<'c> NormalWaveReception<'c> {
-    pub fn source(&self) -> &NormalWaveJointSource<'c> {
-        &self.source
-    }
-    pub fn previous(&self) -> &NormalWaveCurrent<'c> {
-        self.source.current()
-    }
-    pub fn current(&self) -> &NormalWaveCurrent<'c> {
-        &self.current
-    }
-    pub fn predecessor_fibre(&self) -> &NormalWaveFibre<'c> {
-        self.source.fibre()
-    }
-    pub fn successor_fibre(&self) -> &NormalWaveFibre<'c> {
-        &self.successor_fibre
-    }
-    pub fn source_joint(&self) -> ResidentNormalEnclosureView<'_, 'c> {
-        self.source.joint()
-    }
-    pub fn inspect(&self) -> Result<NormalWaveReceptionReading, ConstitutiveFibreError> {
-        let fibre = &self.successor_fibre;
-        Ok(NormalWaveReceptionReading {
-            transport: fibre.transport,
-            epoch: fibre.epoch,
-            source_joint: self.source_joint().inspect()?,
-            comparison: decode_report(
-                &fibre.surface.detach_section(&self.report, i64::BITS)?,
-                fibre.roots,
-                fibre.roots,
-                fibre.grain.0,
-                true,
-            )?,
-        })
-    }
-}
 impl<'c> ResidentNormalWave<'c> {
     /// Receive an actual next current in this generator's receiver chart. Publish the changed
     /// material and (c,v) together, preserving c's occurrence. Rebase to its full enclosure:
     /// this bounds the preceding family; it does not assert an exact future quotient.
-    pub fn receive(
+    pub fn receive<'a>(
         &mut self,
         observed: ResidentConstitutiveCurrent<'_, 'c>,
-    ) -> Result<NormalWaveReception<'c>, ConstitutiveFibreError> {
+    ) -> Result<NormalWavePassage<'a, 'c>, ConstitutiveFibreError> {
         let epoch = self
             .epoch
             .checked_add(1)
@@ -129,11 +79,15 @@ impl<'c> ResidentNormalWave<'c> {
         self.epoch = epoch;
         self.seed_kind = NormalWaveSeedKind::ReceivedCurrent;
         self.seed_epochs = [self.previous.at(), self.current.at()];
-        Ok(NormalWaveReception {
-            source,
-            current: self.current.snapshot(),
-            successor_fibre: self.fibre(),
-            report,
-        })
+        let mut passage = NormalWavePassage::new(
+            NormalPassageKind::Receive,
+            source.fibre().snapshot(),
+            self.fibre(),
+        );
+        passage.source_joint = Some(Rc::clone(&source.joint));
+        passage.source_state = Some(source);
+        passage.current = Some(self.current.snapshot());
+        passage.report = Some(report);
+        Ok(passage)
     }
 }

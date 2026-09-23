@@ -142,8 +142,8 @@ fn main() -> Result<()> {
                     // These are three explicitly joined cuts. The correction is addressed to
                     // the prediction, rather than pretending the last generated c is its source.
                     let actuation = body.actuate_section(input)?;
-                    let prediction = body.predict()?;
-                    let comparison = match body.receive_prediction(&prediction.handle, observed.row(0)?) {
+                    let (prediction_id, prediction) = body.predict()?;
+                    let comparison = match body.pullback(prediction_id, observed.row(0)?) {
                         Ok(returned) => returned,
                         Err(error) => {
                             // Preserve the complete committed state and unresolved address. This
@@ -154,9 +154,9 @@ fn main() -> Result<()> {
                             json(output.join("failed-comparison.json"), &serde_json::json!({
                                 "schema":"holonics.failed-producing-comparison.v1",
                                 "sequence":frame.sequence,"part":part.ordinal,
-                                "prediction_id":prediction.handle.id(),
+                                "prediction_id":prediction_id,
                                 "observed_symbol":text.chars().last(),
-                                "error":error.to_string(),"prediction":prediction.step.inspect()?,
+                                "error":error.to_string(),"prediction":prediction.inspect()?,
                                 "material":body.fibre().inspect_material()?,
                                 "completed_fields":fields}))?;
                             return Err(error.into());
@@ -169,7 +169,7 @@ fn main() -> Result<()> {
                         "comparison_chart":"same-part observed tail after prefix actuation",
                         "actuated_rows":source_symbols.len(),"observed_row":symbols.len()-1,
                         "source_epoch":actuation.successor_fibre().epoch,
-                        "prediction_id":prediction.handle.id(),"prediction":prediction.step.inspect()?,
+                        "prediction_id":prediction_id,"prediction":prediction.inspect()?,
                         "returned_comparison":comparison.inspect()?,
                         "observations":comparison.successor_fibre.material_observations,
                         "current_epoch":body.epoch(),"seconds":seconds,
@@ -177,7 +177,7 @@ fn main() -> Result<()> {
                         "numerical_readouts_during_comparison":after.section_read_outs-before.section_read_outs,
                         "ingress_octets_during_comparison":after.ingress_octets-before.ingress_octets}));
                     eprintln!("source {} part {}: producing comparison {}, {:.3}s",
-                        frame.sequence, part.ordinal, prediction.handle.id(), seconds);
+                        frame.sequence, part.ordinal, prediction_id, seconds);
                     continue;
                 }
                 if actuating {
@@ -187,7 +187,7 @@ fn main() -> Result<()> {
                     let returned = body.actuate_section(input)?;
                     let seconds = clock.elapsed().as_secs_f64();
                     let after = surface.census();
-                    let joint = returned.after().inspect()?;
+                    let joint = returned.after().ok_or("actuation joint")?.inspect()?;
                     fields.push(serde_json::json!({"sequence":frame.sequence,"part":part.ordinal,
                         "source_scalars":symbols.len(),"source_octets":text.len(),"source_contacts":symbols.len()-1,
                         "observations":returned.successor_fibre().material_observations,"current_epoch":body.epoch(),
@@ -216,7 +216,7 @@ fn main() -> Result<()> {
                 let after = surface.census();
                 let record = serde_json::json!({"sequence":frame.sequence,"part":part.ordinal,
                     "source_scalars":symbols.len(),"source_octets":text.len(),
-                    "comparisons":returned.comparison.rows(),"observations":returned.successor_fibre.material_observations,
+                    "comparisons":returned.comparison().expect("development comparison").rows(),"observations":returned.successor_fibre.material_observations,
                     "rebased_joint_enclosure":returned.rebased_joint_enclosure,"current_epoch":body.epoch(),
                     "seconds":seconds,"native_deeds":after.deed_launches-before.deed_launches,
                     "numerical_readouts_during_development":after.section_read_outs-before.section_read_outs,
@@ -225,7 +225,7 @@ fn main() -> Result<()> {
                     "source {} part {}: {} comparisons, {:.3}s",
                     frame.sequence,
                     part.ordinal,
-                    returned.comparison.rows(),
+                    returned.comparison().expect("development comparison").rows(),
                     seconds
                 );
                 fields.push(record);

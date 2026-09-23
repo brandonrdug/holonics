@@ -5,7 +5,7 @@
 use super::super::NativeSessionError;
 use holonic_engine::{
     native_ecology::constitutive_fibre::{
-        ConstitutiveSourceRefusal, CoupledConstitutiveRest, NormalCoupledContact,
+        CoupledConstitutiveRest, NormalCoupledContact,
         NormalCoupledObservation, NormalFamilyBasisFace, NormalWaveBasisChart, NormalWaveCoupled,
         NormalWaveRest, ResidentConstitutiveCurrent, ResidentConstitutiveSection,
         ResidentCoupledConstitutive, ResidentNormalInput, ResidentNormalWave, WaveSourceReceiver,
@@ -276,7 +276,7 @@ impl<'c> NativeCoupledBody<'c> {
                     None => wave.admit_contact_in_chart(member, chart)?,
                 };
                 if retain {
-                    Ok(Some(wave.predict_contact(&contact)?.handle.id()))
+                    Ok(Some(wave.predict_contact(&contact)?.0))
                 } else {
                     wave.advance_contact(&contact)?;
                     Ok(None)
@@ -319,7 +319,7 @@ impl<'c> NativeCoupledBody<'c> {
 
             BodyState::Constitutive(body) => body
                 .actuate_field(member, chart, source, rational)
-                .map_err(|e: ConstitutiveSourceRefusal<'c>| e.reason.into()),
+                .map_err(|e| e.reason.into()),
             BodyState::Affine(wave) => {
                 let contact = Self::affine_contact(wave, member, chart)?;
                 let section = if rational {
@@ -350,7 +350,7 @@ impl<'c> NativeCoupledBody<'c> {
 
             BodyState::Constitutive(body) => body
                 .receive_next_current(member, chart, source, rational)
-                .map_err(|e: ConstitutiveSourceRefusal<'c>| e.reason.into()),
+                .map_err(|e| e.reason.into()),
             BodyState::Affine(wave) => {
                 let contact = Self::affine_contact(wave, member, chart)?;
                 let observed = if rational {
@@ -510,8 +510,7 @@ impl<'c> NativeCoupledBody<'c> {
             }
 
             BodyState::Affine(wave) => {
-                let handle = wave.pending_coupled_prediction(id)?;
-                let comparison = wave.compare_coupled_prediction(&handle, observed)?;
+                let comparison = wave.compare_coupled_prediction(id, observed)?;
                 describe(&comparison, false)
             }
             BodyState::Constitutive(body) => {
@@ -534,8 +533,7 @@ impl<'c> NativeCoupledBody<'c> {
             }
 
             BodyState::Affine(wave) => {
-                let handle = wave.pending_coupled_prediction(id)?;
-                let comparison = wave.compare_coupled_prediction(&handle, observed)?;
+                let comparison = wave.compare_coupled_prediction(id, observed)?;
                 let coordinates = comparison
                     .source()
                     .receiver_coordinates()?
@@ -568,7 +566,8 @@ impl<'c> NativeCoupledBody<'c> {
                 )
             }
             Err(refusal) => {
-                self.state = Some(BodyState::Affine(refusal.wave));
+                let (wave, _, _) = refusal.returned;
+                self.state = Some(BodyState::Affine(wave));
                 Err(refusal.reason.into())
             }
         }
@@ -593,8 +592,7 @@ impl<'c> NativeCoupledBody<'c> {
             }
 
             BodyState::Affine(wave) => {
-                let handle = wave.pending_coupled_prediction(id)?;
-                Ok(wave.observe_coupled_prediction(&handle, observed)?)
+                Ok(wave.observe_coupled_prediction(id, observed)?)
             }
             BodyState::Constitutive(body) => Ok(body.observe_prediction(id, observed)?),
         }
@@ -605,7 +603,7 @@ impl<'c> NativeCoupledBody<'c> {
             BodyState::Incident(field) => field.release(id),
 
             BodyState::Affine(wave) => {
-                Ok(wave.release_coupled_prediction(&wave.pending_coupled_prediction(id)?)?)
+                Ok(wave.release_coupled_prediction(id)?)
             }
             BodyState::Constitutive(body) => Ok(body.release_prediction(id)?),
         }

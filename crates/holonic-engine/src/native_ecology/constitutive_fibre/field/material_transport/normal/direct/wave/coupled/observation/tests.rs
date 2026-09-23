@@ -61,7 +61,7 @@ fn observation_changes_normal_geometry_and_preserves_the_historical_current() {
     let y = point(&s, &[7, 4]);
     let reads = s.census().section_read_outs;
     let receipt = wave
-        .observe_coupled_prediction(&predicted.handle, current(&y))
+        .observe_coupled_prediction(&predicted.0, current(&y))
         .unwrap();
     assert_eq!(s.census().section_read_outs, reads);
     assert_eq!(wave.epoch(), epoch);
@@ -141,7 +141,7 @@ fn delayed_observations_use_their_own_sources_across_material_rest() {
     let second = wave.predict_contact(&c).unwrap();
     let y = point(&s, &[9, -3]);
     let receipt = wave
-        .observe_coupled_prediction(&second.handle, current(&y))
+        .observe_coupled_prediction(&second.0, current(&y))
         .unwrap();
     assert_eq!(
         receipt.source().inspect().unwrap().center,
@@ -154,7 +154,7 @@ fn delayed_observations_use_their_own_sources_across_material_rest() {
     assert_eq!(wave.pending_coupled_predictions(), 1);
     let mut resumed = restored(&s, &wave);
     let y = point(&s, &[7, 4]);
-    let id = first.handle.id();
+    let id = first.0;
     for body in [&mut wave, &mut resumed] {
         let epoch = body.epoch();
         let h = body.pending_coupled_prediction(id).unwrap();
@@ -206,7 +206,7 @@ fn observation_features_use_the_original_condition() {
     );
     let y = point(&s, &[7, 4]);
     let receipt = wave
-        .observe_coupled_prediction(&predicted.handle, current(&y))
+        .observe_coupled_prediction(&predicted.0, current(&y))
         .unwrap();
     let state = wave
         .neighborhood()

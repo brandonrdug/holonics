@@ -76,13 +76,14 @@ impl<'a, 'c> NormalCoupledContinuation<'a, 'c> {
 impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
     pub fn pending_coupled_continuation<'a>(
         &'a self,
-        handle: &NormalCoupledProducingHandle,
+        id: impl std::borrow::Borrow<u64>,
     ) -> Result<NormalCoupledContinuation<'a, 'c>, ConstitutiveFibreError> {
-        let cut = self.coupled_producing_cut(handle)?;
+        let id = *id.borrow();
+        let cut = self.coupled_producing_cut(id)?;
         Ok(NormalCoupledContinuation {
             cut,
             current: self.current(),
-            from: handle.id(),
+            from: id,
             through: self.epoch(),
             word: &self.continuation.transport,
         })

@@ -1,42 +1,6 @@
 use super::develop::JointSeed;
 use super::*;
 
-/// A source word of learned joined passages acting on the actual held joint current.
-/// Source sections are borrowed evidence. Material is shared immutable producing standing.
-pub struct NormalSourceActuation<'a, 'c> {
-    source: ResidentConstitutiveSection<'a, 'c>,
-    predecessor_fibre: NormalWaveFibre<'c>,
-    successor_fibre: NormalWaveFibre<'c>,
-    before: Rc<ResidentSection<'c>>,
-    after: Rc<ResidentSection<'c>>,
-}
-impl<'a, 'c> NormalSourceActuation<'a, 'c> {
-    pub fn predecessor_fibre(&self) -> &NormalWaveFibre<'c> {
-        &self.predecessor_fibre
-    }
-    pub fn successor_fibre(&self) -> &NormalWaveFibre<'c> {
-        &self.successor_fibre
-    }
-
-    pub fn source(&self) -> ResidentConstitutiveSection<'a, 'c> {
-        self.source
-    }
-    fn view<'r>(&'r self, section: &'r ResidentSection<'c>) -> ResidentNormalEnclosureView<'r, 'c> {
-        ResidentNormalEnclosureView {
-            surface: self.successor_fibre.surface,
-            section,
-            offset: 0,
-            width: 4 * self.successor_fibre.roots,
-            grain: self.successor_fibre.grain,
-        }
-    }
-    pub fn before(&self) -> ResidentNormalEnclosureView<'_, 'c> {
-        self.view(&self.before)
-    }
-    pub fn after(&self) -> ResidentNormalEnclosureView<'_, 'c> {
-        self.view(&self.after)
-    }
-}
 impl<'c> ResidentNormalWave<'c> {
     /// Act on held reference/current standing using the passive-contact law of each source
     /// pair and its learned joined arrival. This updates both current components under one
@@ -44,7 +8,7 @@ impl<'c> ResidentNormalWave<'c> {
     pub fn actuate_section<'a>(
         &mut self,
         source: ResidentConstitutiveSection<'a, 'c>,
-    ) -> Result<NormalSourceActuation<'a, 'c>, ConstitutiveFibreError> {
+    ) -> Result<NormalWavePassage<'a, 'c>, ConstitutiveFibreError> {
         let n = self.material.roots();
         if source.rows() < 2 || source.components() != 2 * n {
             return Err(ConstitutiveFibreError::Shape);
@@ -111,12 +75,11 @@ impl<'c> ResidentNormalWave<'c> {
         self.current = current;
         self.epoch = epoch;
         self.steps = 0;
-        Ok(NormalSourceActuation {
-            source,
-            predecessor_fibre,
-            successor_fibre: self.fibre(),
-            before,
-            after: Rc::clone(&self.joint),
-        })
+        let mut passage =
+            NormalWavePassage::new(NormalPassageKind::Actuate, predecessor_fibre, self.fibre());
+        passage.section = Some(source);
+        passage.source_joint = Some(before);
+        passage.produced_joint = Some(Rc::clone(&self.joint));
+        Ok(passage)
     }
 }

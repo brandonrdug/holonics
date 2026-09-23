@@ -1,20 +1,19 @@
 use super::*;
-/// The actual joint source and its generating fibre. Its lifetime does not depend on whether
-/// a particular outward image bound fits a receiver's carrier.
-pub struct NormalWaveJointSource<'c> {
-    previous: NormalWaveCurrent<'c>,
-    current: NormalWaveCurrent<'c>,
-    fibre: NormalWaveFibre<'c>,
-    joint: Rc<ResidentSection<'c>>,
-    metadata: Rc<ResidentSection<'c>>,
+/// [definition] **A point on the normal wave Holon** (plan phase 9; core `HolonState`): the
+/// previous and current occurrences, their joint enclosure `(p, c)` and the generating fibre
+/// (constitution, seed and word) that produced it. Its lifetime does not depend on whether a
+/// particular outward image bound fits a receiver's carrier. `NormalWaveStep` and
+/// `NormalWaveJointSource` are this type.
+pub struct NormalWaveState<'c> {
+    pub(super) previous: NormalWaveCurrent<'c>,
+    pub(super) current: NormalWaveCurrent<'c>,
+    pub(super) fibre: NormalWaveFibre<'c>,
+    pub(super) joint: Rc<ResidentSection<'c>>,
+    pub(super) metadata: Rc<ResidentSection<'c>>,
 }
-/// The source φ(p,c)=(c−p,c,p) observed through its outward ball. The retained joint
-/// precedes this receiver; failure of this bound need not stop another family operation.
-pub struct NormalWaveSource<'c> {
-    origin: NormalWaveJointSource<'c>,
-    source: ResidentSection<'c>,
-}
-impl<'c> NormalWaveJointSource<'c> {
+/// Compatibility name of [`NormalWaveState`].
+pub type NormalWaveJointSource<'c> = NormalWaveState<'c>;
+impl<'c> NormalWaveState<'c> {
     /// Share this immutable producing source; the continuing generator is not cloned.
     pub fn snapshot(&self) -> Self {
         Self {
@@ -70,7 +69,10 @@ impl<'c> NormalWaveJointSource<'c> {
             grain: self.fibre.grain,
         }
     }
-    pub fn read_source(&self) -> Result<NormalWaveSource<'c>, ConstitutiveFibreError> {
+    /// The lifted source `φ(p,c) = (c−p, c, p)` of this point, observed through its outward
+    /// ball (`6n` real components). The retained joint precedes this receiver; failure of this
+    /// bound need not stop another family operation.
+    pub fn read_source(&self) -> Result<ResidentNormalEnclosure<'c>, ConstitutiveFibreError> {
         let s = self.fibre.surface;
         let width = self
             .fibre
@@ -92,38 +94,17 @@ impl<'c> NormalWaveJointSource<'c> {
                 returned.obstruction
             )));
         }
-        Ok(NormalWaveSource {
-            origin: self.snapshot(),
-            source,
+        Ok(ResidentNormalEnclosure {
+            surface: s,
+            section: source,
+            width: 6 * self.fibre.roots,
+            grain: self.fibre.grain,
         })
     }
 }
-impl<'c> NormalWaveSource<'c> {
-    pub fn previous(&self) -> &NormalWaveCurrent<'c> {
-        self.origin.previous()
-    }
-    pub fn current(&self) -> &NormalWaveCurrent<'c> {
-        self.origin.current()
-    }
-    pub fn fibre(&self) -> &NormalWaveFibre<'c> {
-        self.origin.fibre()
-    }
-    pub fn joint(&self) -> ResidentNormalEnclosureView<'_, 'c> {
-        self.origin.joint()
-    }
-    pub fn enclosure(&self) -> ResidentNormalEnclosureView<'_, 'c> {
-        ResidentNormalEnclosureView {
-            surface: self.origin.fibre.surface,
-            section: &self.source,
-            offset: 0,
-            width: 6 * self.origin.fibre.roots,
-            grain: self.origin.fibre.grain,
-        }
-    }
-}
 impl<'c> ResidentNormalWave<'c> {
-    pub fn joint_source(&self) -> NormalWaveJointSource<'c> {
-        NormalWaveJointSource {
+    pub fn joint_source(&self) -> NormalWaveState<'c> {
+        NormalWaveState {
             previous: self.previous.snapshot(),
             current: self.current.snapshot(),
             fibre: self.fibre(),
@@ -131,7 +112,7 @@ impl<'c> ResidentNormalWave<'c> {
             metadata: Rc::clone(&self.metadata),
         }
     }
-    pub fn read_source(&self) -> Result<NormalWaveSource<'c>, ConstitutiveFibreError> {
+    pub fn read_source(&self) -> Result<ResidentNormalEnclosure<'c>, ConstitutiveFibreError> {
         self.joint_source().read_source()
     }
 }
