@@ -784,7 +784,8 @@ fn a_deed_addressed_to_another_schema_refuses() {
     let ResumeRefusal::DeedRefused { detail } = &refusal else {
         panic!("expected DeedRefused, got {refusal}");
     };
-    assert!(detail.contains("addressed to schema RBIN"), "{detail}");
+    assert!(detail.contains("addressed to schema HTEC"), "{detail}");
+    assert!(detail.contains("re-lit body is RBIN"), "{detail}");
     assert!(detail.contains("not re-addressed by guessing"), "{detail}");
 }
 

@@ -550,7 +550,6 @@ dependencies = [
  "num-bigint",
  "sha2 0.10.9",
  "soma-abi",
- "soma-membrane",
 ]
 
 [[package]]

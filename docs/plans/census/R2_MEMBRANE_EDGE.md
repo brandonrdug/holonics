@@ -1,6 +1,6 @@
 # R2 membrane owner and caller audit
 
-Source-backed R2 owner map, 2026-09-23. The initial audit followed `.agents/bin/prior-art 'membrane|SparseStanding|LiveCurrentMachine|live current|standing storage'`; its results are navigation evidence, so dispositions below are grounded in the owners and callers listed here. The ERST plate removal is recorded below; this worktree ran no Cargo builds or tests.
+Source-backed R2 owner map, 2026-09-23. The initial audit followed `.agents/bin/prior-art 'membrane|SparseStanding|LiveCurrentMachine|live current|standing storage'`; its results are navigation evidence, so dispositions below are grounded in the owners and callers listed here. The ERST plate removal is recorded below; the later ERST Cargo gates are recorded below and in docs/VERIFICATION_RECEIPTS.tsv.
 
 ## Decision
 
@@ -35,9 +35,9 @@ The ERST schema is specifically the plate adapter for membrane rest bytes, not a
 * The incidental comparison in `schemas/rebase.rs` was rewritten without naming ERST.
 
 The former plate-only carrier regression assertion now belongs with its runtime owner at
-`crates/holonic-membrane/src/live_current.rs::tests::continuing_cell_advances_two_depth_one_lineages_without_growing_their_carriers` (test begins at line 5342). It reproduces two rank-6 attached lineages, settles both through cell relations 13, 29, and 17, then continues both through relation 71. It asserts native carrier extent remains 720 words while each lineage cursor advances from 3 to 4. This preserves the August 15, 2026, 720-to-1272 regression witness at the live-current boundary instead of keeping a machine assertion in a plate adapter. Source inspection shows the test calls existing test helpers and public `LiveCurrentMachine` methods; this worktree did not compile it.
+`crates/holonic-membrane/src/live_current.rs::tests::continuing_cell_advances_two_depth_one_lineages_without_growing_their_carriers` (test begins at line 5342). It reproduces two rank-6 attached lineages, settles both through cell relations 13, 29, and 17, then continues both through relation 71. It asserts native carrier extent remains 720 words while each lineage cursor advances from 3 to 4. This preserves the August 15, 2026, 720-to-1272 regression witness at the live-current boundary instead of keeping a machine assertion in a plate adapter. Source inspection shows the test calls existing test helpers and public `LiveCurrentMachine` methods; the focused live-current test passed after the cut.
 
-The deleted `CurrentSchema` zero-action refusal is covered at its typed owner: `crates/holonic-abi/src/active.rs:1101-1102` asserts `ActionCurrent::new(Cog::ZERO) == None` and rejects the zero-word action representation. Since `ActionCurrent` is the input required by live-current events, no duplicate membrane test was added.
+The deleted `CurrentSchema` zero-action refusal is covered at its typed owner: `crates/holonic-abi/src/active.rs:1101-1102` asserts `ActionCurrent::new(Cog::ZERO) == None` and rejects the zero-word action representation. The focused ABI test passed; no duplicate membrane test was added.
 
 This cut retires the ERST plate reader/deed workflow, not `LiveCurrentRestImage::{encode_native_bytes,from_native_bytes}` or its native rest image. Those remain used by life rest/remount pathways (e.g. `holonic-life/src/synchronized_occurrence/ecology.rs:520`) and travel with the machine when its owner moves.
 
@@ -49,7 +49,7 @@ The restructure’s target is a substantive, backend-neutral main `holonics` lib
 
 ## Verification gates for implementation
 
-No Cargo gates were run for this plate cut; the orchestrator is running shared-target R2 checks. On the eventual move/cut:
+For the ERST plate cut, the focused live-current and zero-action tests, the complete `holon-plate` suite (32 library, nine CLI, 12 plate-mouth tests), and the locked workspace all-target check passed. On the eventual membrane runtime move:
 
 1. `rg` finds no live workspace `soma-membrane` manifest or source references after the package is removed; confirm the remaining path list with Cargo metadata/workspace membership.
 2. Check `holonic-life` with all targets, including its CUDA-feature/device-independent compile paths as supported by the host; its CPU live-current, synchronized occurrence, causal language, and receiver/ecology tests must compile and pass.
