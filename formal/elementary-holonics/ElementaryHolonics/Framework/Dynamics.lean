@@ -20,16 +20,6 @@ import ElementaryHolonics.Transport.CellHolonomy
 import ElementaryHolonics.Mathematics.AffineOrbitDivisor
 import ElementaryHolonics.Mathematics.AnalyticNavigation
 import ElementaryHolonics.Mathematics.AnalyticReceiving
-import ElementaryHolonics.RH.FiniteZeroCurrent
-import ElementaryHolonics.RH.ZeroNavigationReflection
-import ElementaryHolonics.RH.CofinalXiContoursConstructed
-import ElementaryHolonics.RH.WeilApertureNoGo
-import ElementaryHolonics.RH.PrimeAutocorrelationObstruction
-import ElementaryHolonics.RH.ThetaHankelPositive
-import ElementaryHolonics.RH.PositiveLaplaceOffLineControl
-import ElementaryHolonics.RH.PrimePhasePartition
-import ElementaryHolonics.RH.PrimeApertureCorrelation
-import ElementaryHolonics.RH.ArchimedeanModeSign
 import ElementaryHolonics.Millennium.HolonicDifferenceCalculus
 import ElementaryHolonics.Millennium.HolonicDirectedPassage
 import ElementaryHolonics.Millennium.HolonicClockedPantographicSwing
@@ -39,8 +29,9 @@ import ElementaryHolonics.Physics.ConstitutiveModulation
 /-!
 # Clocked passage, returned differences, and constitutive dynamics
 
-[definition] A subject entry point into existing owners. This module adds no axioms or
-replacement structures. Each imported result keeps its exact hypotheses and receiver scope.
+[definition] A subject entry point into the reusable clocked-dynamics owners. This module adds
+no axioms or replacement structures. Independent RH dynamics instances are imported by the
+research umbrella `ElementaryHolonics`, with their exact hypotheses and receiver scope retained.
 See `formal/elementary-holonics/README.md` and `docs/FORMAL_FRAMEWORK.md` for the reading path.
 Historical declaration namespaces remain stable even where implementation owners were factored.
 -/

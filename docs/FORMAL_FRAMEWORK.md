@@ -946,3 +946,9 @@ and in #62.
 for now. Curvature variation, Ricci, gauge covariance of curvature and Yang–Mills applications
 remain in their research owners. `Objects/Ratio` therefore has no import edge through
 `Millennium/HolonicGaugeCovariance` into the connection-variation research closure.
+
+`Framework.Dynamics` now presents the transport and clocked dynamics operators without directly
+importing RH instances. The ten formerly direct RH imports are in the complete
+`ElementaryHolonics` research umbrella, which still contains their theorems. This is one import
+curation step toward distinct `Holonics` and `HolonicsResearch` roots; the Framework still reaches
+other research sources through independent owners.

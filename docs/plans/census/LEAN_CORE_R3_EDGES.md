@@ -132,3 +132,15 @@ module (1,226); the full `ElementaryHolonics` root passed (10,106). A source-imp
 measured the `MomentStorage` closure dropping from 137 modules / 49,263 lines to seven modules /
 1,527 lines, and `ScrewGeometry` from 132 / 48,000 to two / 264. The full Framework closure
 drops only from 543 / 190,674 to 541 / 189,682 because separate imports still reach research.
+
+## Dynamics subject-entry curation
+
+`Framework/Dynamics.lean` imported ten RH modules solely to aggregate their independent
+research results; it declares no theorem that consumes them. Its only source importers are
+`Framework/Physics.lean` and `Framework.lean`. The ten imports moved to the complete
+`ElementaryHolonics.lean` research umbrella. A source-import traversal on this stacked cut
+measures `Framework.Dynamics` at 89 modules / 28,662 lines, down from 156 / 44,813;
+`Framework` at 475 / 173,431, down from 542 / 189,582, with no RH source module in either
+closure. The full `ElementaryHolonics` umbrella remains 1,385 modules / 484,936 lines and
+retains every RH result. The Framework still reaches 282 Millennium modules through other
+facets; this curation alone does not establish the final two-root dependency boundary.
