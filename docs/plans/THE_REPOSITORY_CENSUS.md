@@ -163,14 +163,20 @@ implementation policy. The prototype and inline test are retired; this does not 
 whole-face implementation or a missing Lean theorem.
 
 The [R2 owner audit](census/SOMA_R0.tsv) changes two earlier assumptions. `holonics-workspace`
-has a live workbench application caller, and `holonic-language`'s generic reflective
-continuation law lacks a clearly equivalent Lean owner; move that law before retiring its
-Rust crate. The [device and exact-word audit](census/R2_DEVICE_WORDS.md) establishes that
+has a live workbench application caller. `holonic-language`'s source-neutral reflection and
+continuation law now has checked `Transport/ReflectiveContinuation.lean`; its Rust crate remains
+live through `holonic-life` and needs the caller disposition before retirement. The
+[device and exact-word audit](census/R2_DEVICE_WORDS.md) establishes that
 `holonic-core::PrimeChart` consumes `holonic-words`, while the Rust NVPTX kernel consumes
 `soma-abi` directly; the latter owns the shared `no_std` arithmetic. The Soma PTX is embedded at
 compile time by `holonic-mount` library/tests/gates and loaded as bytes by the engine's
 section-layout test and `life` callers. Removing `life` alone cannot retire the kernel, mount
 consumer or host words. The plan §0.4 now names those distinct edges.
+The unconsumed wgpu `holonic-surface` crate and its orphan rust-gpu SPIR-V source, builder and
+artifact have been retired in R2 after a source/manifest scan found no external caller. The
+M4/M5 measured claims remain in dated research records; old SLEEP readers and fixtures do not
+carry forward under §0.2. Cargo pruned the lockfile to 182 packages after the earlier X11 cut;
+the workspace all-target and locked-lockfile checks passed. The live CUDA PTX path remains.
 
 ## First source-backed cuts to verify
 
