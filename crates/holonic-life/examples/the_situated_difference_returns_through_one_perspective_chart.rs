@@ -179,13 +179,10 @@ fn input(
             right: returned.address.occurrence,
             joining_native: candidate.emitting_native,
         },
-        occurrence_fibres: vec![NativeCollapsedFibre {
-            native: candidate.emitting_native,
-            occurrences: BTreeSet::from([
-                candidate.address.occurrence,
-                returned.address.occurrence,
-            ]),
-        }],
+        occurrence_fibres: vec![NativeCollapsedFibre::new(
+            candidate.emitting_native,
+            BTreeSet::from([candidate.address.occurrence, returned.address.occurrence]),
+        )],
         candidate,
         returned,
         source_transport,

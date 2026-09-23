@@ -306,7 +306,7 @@ impl NativeEcologyRest {
             ordered_word: word,
             receiver,
             observation,
-            reconstruction_fibre: section.reconstruction_fibre().occurrences.clone(),
+            reconstruction_fibre: section.reconstruction_fibre().members.clone(),
             successor_sections: Vec::new(),
             open_exterior,
         })
@@ -476,7 +476,7 @@ impl NativeEcologyRest {
                             ordered_word: thread.chronology.clone(),
                             receiver,
                             observation,
-                            reconstruction_fibre: fibre.occurrences.clone(),
+                            reconstruction_fibre: fibre.members.clone(),
                             successor_sections: successors
                                 .get(&occurrence.occurrence)
                                 .cloned()

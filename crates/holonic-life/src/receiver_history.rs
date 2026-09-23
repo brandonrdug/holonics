@@ -127,7 +127,7 @@ impl ReceiverHistoryCongruence {
             .native
             .reconstruction_fibres
             .iter()
-            .flat_map(|fibre| fibre.sources.iter().copied())
+            .flat_map(|fibre| fibre.members.iter().copied())
             .collect::<Vec<_>>();
         if sources.len() != self.sections.len() {
             return Err(

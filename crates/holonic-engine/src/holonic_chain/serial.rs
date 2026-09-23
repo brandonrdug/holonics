@@ -375,11 +375,11 @@ pub struct LinkContactJacobian {
 
 /// An ambient affine preimage intersected with the retained joint limits. The linear
 /// fibre may be nonempty while that constrained intersection is empty; `admits` checks
-/// a candidate against both the endpoint equation and every limit.
+/// a candidate against both the endpoint equation and every limit. The ambient fibre is the
+/// core [`AffineFibre`](holonic_core::restriction::AffineFibre) (plan phase 10).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PrismaticEndpointFibre {
-    particular: Vec<Rat>,
-    kernel: Vec<Vec<Rat>>,
+    fibre: holonic_core::restriction::AffineFibre,
     limits: Vec<Option<JointLimit>>,
     source: ExactRatMatrix,
     target: Vec<Rat>,
@@ -387,11 +387,16 @@ pub struct PrismaticEndpointFibre {
 
 impl PrismaticEndpointFibre {
     pub fn particular(&self) -> &[Rat] {
-        &self.particular
+        &self.fibre.particular
     }
 
     pub fn kernel(&self) -> &[Vec<Rat>] {
-        &self.kernel
+        &self.fibre.radical
+    }
+
+    /// The ambient affine preimage, before the joint limits.
+    pub fn affine_fibre(&self) -> &holonic_core::restriction::AffineFibre {
+        &self.fibre
     }
 
     pub fn limits(&self) -> &[Option<JointLimit>] {
@@ -714,15 +719,14 @@ impl SerialChain {
             target_translation.y,
             target_translation.z,
         ];
-        let Some((particular, kernel)) = matrix
-            .preimage_fibre(&target_vector)
+        let Some(fibre) = matrix
+            .affine_fibre(&target_vector)
             .map_err(|error| SerialError::Linear(error.to_string()))?
         else {
             return Ok(PrismaticEndpointInference::Empty);
         };
         Ok(PrismaticEndpointInference::Fibre(PrismaticEndpointFibre {
-            particular,
-            kernel,
+            fibre,
             limits: self
                 .joints
                 .iter()

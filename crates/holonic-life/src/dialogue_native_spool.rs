@@ -210,14 +210,16 @@ pub fn found_addressed_dialogue_native_spool(
     generator_steps.sort_by_key(|step| step.from);
     let fibres = states
         .iter()
-        .map(|native| NativeCollapsedFibre {
-            native: *native,
-            occurrences: threads
-                .iter()
-                .flat_map(|thread| &thread.occurrences)
-                .filter(|occurrence| occurrence.emitting_native == *native)
-                .map(|occurrence| occurrence.occurrence)
-                .collect(),
+        .map(|native| {
+            NativeCollapsedFibre::new(
+                *native,
+                threads
+                    .iter()
+                    .flat_map(|thread| &thread.occurrences)
+                    .filter(|occurrence| occurrence.emitting_native == *native)
+                    .map(|occurrence| occurrence.occurrence)
+                    .collect(),
+            )
         })
         .collect::<Vec<_>>();
     let spool = NativeSpool {
@@ -416,7 +418,7 @@ mod tests {
             scaffold.spools[0]
                 .reconstruction_fibres
                 .iter()
-                .map(|fibre| fibre.occurrences.len())
+                .map(|fibre| fibre.members.len())
                 .sum::<usize>(),
             2
         );

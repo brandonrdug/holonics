@@ -209,7 +209,7 @@ fn factor_action_from_product(
     if native
         .reconstruction_fibres
         .iter()
-        .any(|fibre| factor_sources.get(&fibre.native).copied() != Some(&fibre.sources))
+        .any(|fibre| factor_sources.get(&fibre.native).copied() != Some(&fibre.members))
     {
         return Err(GranularCultivationError::Exterior(
             "the L1 action and affine reconstruction fibres do not commute".to_owned(),

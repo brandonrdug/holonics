@@ -342,7 +342,7 @@ impl ReceiverHistoryRealizationPassage {
                     .decode(fibre.native, *receiver)
                     .map_err(|error| RealizationPassageRefusal::NativeRest(error.to_string()))?;
                 every_declared_image_decodes &=
-                    image.observation == rested && image.reconstruction_fibre == fibre.sources;
+                    image.observation == rested && image.reconstruction_fibre == fibre.members;
             }
         }
         if !every_declared_image_decodes {
@@ -399,7 +399,7 @@ impl ReceiverHistoryRealizationPassage {
             fibre_members_checked: history
                 .reconstruction_fibres
                 .iter()
-                .map(|fibre| fibre.sources.len() as u64)
+                .map(|fibre| fibre.members.len() as u64)
                 .sum(),
             receiver_images_checked: history.receiver_factors.len() as u64,
             source_generator_edges_checked,

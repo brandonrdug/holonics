@@ -63,6 +63,20 @@ pub struct DerivationSeparator {
     pub shortest_receiver_occurrence: String,
 }
 
+impl DerivationSeparator {
+    /// The core [`Separation`](holonic_core::restriction::Separation) (plan phase 10): two events
+    /// the native state merges, witnessed by that state and the shortest receiver occurrence, with
+    /// their two branches.
+    pub fn separation(&self) -> holonic_core::restriction::Separation<u64, (u32, String), u64> {
+        holonic_core::restriction::Separation::new(
+            self.left_event,
+            self.right_event,
+            (self.native_state, self.shortest_receiver_occurrence.clone()),
+            (self.left_branch, self.right_branch),
+        )
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct RequestedReceiverFactor {
     pub terminal_event: u64,
@@ -403,6 +417,23 @@ pub enum DerivationRecurrenceError {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Phase 10: the derivation separator is the core separation of two merged events.
+    #[test]
+    fn the_derivation_separator_reads_as_a_core_separation() {
+        let separator = DerivationSeparator {
+            native_state: 4,
+            left_event: 10,
+            right_event: 11,
+            left_branch: 0,
+            right_branch: 1,
+            shortest_receiver_occurrence: "receiver/4".to_owned(),
+        };
+        let separation = separator.separation();
+        assert_eq!(separation.pair(), (10, 11));
+        assert_eq!(separation.witness(), &(4, "receiver/4".to_owned()));
+        assert_eq!(separation.readings(), &(0, 1));
+    }
 
     #[test]
     fn source_detached_rest_refuses_an_authored_state_outside_its_material_extent() {

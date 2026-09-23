@@ -316,7 +316,9 @@ fn run() -> Result<(), String> {
     )?;
     let sum_product = separator_between(&after_reading, "infix-sum", "infix-product")?;
     let reversed = separator_between(&after_reading, "difference", "reverse-difference")?;
-    if sum_product.interventions != ["raise-left"] || reversed.interventions != ["raise-left"] {
+    if sum_product.distinguishing_word != ["raise-left"]
+        || reversed.distinguishing_word != ["raise-left"]
+    {
         return Err("an unseen same-value control lost its shortest intervention".to_owned());
     }
     let attributable_after = targeted_reading
@@ -409,8 +411,8 @@ fn run() -> Result<(), String> {
         after: after_profile,
         value_receiver_ablated_blocks: value_ablated.root_conduct_blocks,
         same_operation_cross_codec_fiber: sum_fiber.clone(),
-        same_value_different_law_separator: sum_product.interventions.clone(),
-        reversed_port_separator: reversed.interventions.clone(),
+        same_value_different_law_separator: sum_product.distinguishing_word.clone(),
+        reversed_port_separator: reversed.distinguishing_word.clone(),
         targeted_ablation: "infix-sum".to_owned(),
         target_became_open,
         unrelated_sections_bit_identical,
@@ -888,10 +890,10 @@ fn separator_receipt(separator: &SectionSeparator) -> SeparatorReceipt {
     SeparatorReceipt {
         left: separator.left.clone(),
         right: separator.right.clone(),
-        interventions: separator.interventions.clone(),
-        receiver: separator.receiver.clone(),
-        left_observation: separator.left_observation.clone(),
-        right_observation: separator.right_observation.clone(),
+        interventions: separator.distinguishing_word.clone(),
+        receiver: separator.receiver().cloned().flatten(),
+        left_observation: separator.left_observation().cloned().flatten(),
+        right_observation: separator.right_observation().cloned().flatten(),
         separated_by_terminus: separator.separated_by_terminus,
     }
 }

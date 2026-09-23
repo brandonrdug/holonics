@@ -344,10 +344,10 @@ impl<Standing: MembraneStanding> StagedMembraneCultivation<Standing> {
             candidate,
             returned,
             carrying_occurrence,
-            occurrence_fibres: vec![NativeCollapsedFibre {
-                native: carrying_occurrence.joining_native,
-                occurrences: fibre,
-            }],
+            occurrence_fibres: vec![NativeCollapsedFibre::new(
+                carrying_occurrence.joining_native,
+                fibre,
+            )],
             source_transport: identity.clone(),
             rebased_transport: identity.clone(),
             source_chart: identity.clone(),

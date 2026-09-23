@@ -201,23 +201,17 @@ impl BlockIndex {
     }
 }
 
-/// One pair the one-shot reading merged and later conduct separates.
+/// One pair the one-shot reading merged and later conduct separates: the core
+/// [`ShortestSeparator`](holonic_core::restriction::ShortestSeparator) over items, input words,
+/// receivers and observations (plan phase 10; same fields and wire). The shortest word is never
+/// empty here by construction — an empty word is the one-shot reading, which held these together;
+/// `separated_by_terminus` marks a word that separates because one continues and the other does
+/// not.
 ///
 /// This is the artifact, not a count. `CLAUDE.md` §9: a returned obstruction must itself be
 /// returned and inspected.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct CollapsedPair {
-    pub left: ItemId,
-    pub right: ItemId,
-    /// The shortest input word after which some receiver sees a difference. Empty is impossible
-    /// here by construction — an empty word is the one-shot reading, which held these together.
-    pub distinguishing_word: Vec<InputId>,
-    /// The receiver that finally sees it, and what the two returned.
-    pub witness: Option<(ReceiverId, Observation, Observation)>,
-    /// True when the word separates them because one continues and the other does not, rather than
-    /// because a receiver returned different observations. A terminus is a distinction.
-    pub separated_by_terminus: bool,
-}
+pub type CollapsedPair =
+    holonic_core::restriction::ShortestSeparator<ItemId, InputId, ReceiverId, Observation>;
 
 /// What a compression returns.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -1352,7 +1346,7 @@ mod tests {
                     .defect()
                     .map(|breaks| {
                         breaks
-                            .breaks()
+                            .separators()
                             .iter()
                             .map(|piece| {
                                 let (left, right) = piece.pair();
@@ -1371,6 +1365,67 @@ mod tests {
                     broken.len() as u128,
                     separated_pair_population(&compression.one_shot, &compression.conduct)
                 );
+                // Phase 10: the defect retains every fibre the one-shot quotient merges — the
+                // one-shot blocks of two or more items — beside the separators.
+                if let Some(defect) = descent.defect() {
+                    let retained: BTreeSet<BTreeSet<ItemId>> = defect
+                        .fibres()
+                        .iter()
+                        .map(|fibre| fibre.members.iter().map(|at| items[*at]).collect())
+                        .collect();
+                    let merged: BTreeSet<BTreeSet<ItemId>> = compression
+                        .one_shot
+                        .blocks
+                        .iter()
+                        .filter(|block| block.len() > 1)
+                        .cloned()
+                        .collect();
+                    assert_eq!(retained, merged);
+                    for pair in &compression.collapsed {
+                        let separation = pair.separation();
+                        assert_eq!(separation.pair(), (pair.left, pair.right));
+                        assert_eq!(separation.witness().0, pair.distinguishing_word);
+                        if !pair.separated_by_terminus {
+                            let (left, right) = separation.readings();
+                            assert_ne!(left, right);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// Phase 10: the collapsed pair is the core `ShortestSeparator`, and its wire is the struct it
+    /// replaced, field for field.
+    #[test]
+    fn the_collapsed_pair_keeps_its_wire_as_the_core_separator() {
+        #[derive(Serialize, Deserialize, PartialEq, Debug)]
+        struct OldCollapsedPair {
+            left: ItemId,
+            right: ItemId,
+            distinguishing_word: Vec<InputId>,
+            witness: Option<(ReceiverId, Observation, Observation)>,
+            separated_by_terminus: bool,
+        }
+        for n in 2..=12u64 {
+            let system = CyclicCounter {
+                n,
+                moduli: vec![2, 3],
+            };
+            for pair in compress(&system).collapsed {
+                let old = OldCollapsedPair {
+                    left: pair.left,
+                    right: pair.right,
+                    distinguishing_word: pair.distinguishing_word.clone(),
+                    witness: pair.witness,
+                    separated_by_terminus: pair.separated_by_terminus,
+                };
+                let wire = serde_json::to_string(&pair).expect("serializes");
+                assert_eq!(wire, serde_json::to_string(&old).expect("serializes"));
+                let back: CollapsedPair = serde_json::from_str(&wire).expect("remounts");
+                assert_eq!(back, pair);
+                let old_back: OldCollapsedPair = serde_json::from_str(&wire).expect("remounts");
+                assert_eq!(old_back, old);
             }
         }
     }

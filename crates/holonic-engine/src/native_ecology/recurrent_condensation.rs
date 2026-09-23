@@ -71,12 +71,13 @@ pub struct CondensedFibreMember {
     pub terminal_potential_sha256: Option<String>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct CondensedFibre {
-    pub native: u32,
-    pub members: Vec<CondensedFibreMember>,
-}
+holonic_core::fibre_field_names!(pub CondensedFibreNames = "CondensedFibre", "native", "members", deny);
+
+/// The occurrences one condensed native state merges: the core
+/// [`PreimageFibre`](holonic_core::restriction::PreimageFibre) under its `native`/`members` wire
+/// (plan phase 10).
+pub type CondensedFibre =
+    holonic_core::restriction::PreimageFibre<u32, Vec<CondensedFibreMember>, CondensedFibreNames>;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -87,6 +88,25 @@ pub struct CondensedSeparator {
     pub left_potential_sha256: String,
     pub right_potential_sha256: String,
     pub shortest_history: Vec<u32>,
+}
+
+impl CondensedSeparator {
+    /// The core [`Separation`](holonic_core::restriction::Separation) (plan phase 10): two
+    /// occurrences the condensed native merges, witnessed by that native and the shortest history,
+    /// with their two terminal potentials.
+    pub fn separation(
+        &self,
+    ) -> holonic_core::restriction::Separation<String, (u32, Vec<u32>), String> {
+        holonic_core::restriction::Separation::new(
+            self.left_occurrence.clone(),
+            self.right_occurrence.clone(),
+            (self.native, self.shortest_history.clone()),
+            (
+                self.left_potential_sha256.clone(),
+                self.right_potential_sha256.clone(),
+            ),
+        )
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -176,7 +196,7 @@ impl CondensedRecurrentRest {
         let mut fibres = Vec::with_capacity(passage.fibres.len());
         for fibre in &passage.fibres {
             let members = fibre
-                .source_sections
+                .members
                 .iter()
                 .map(|occurrence| {
                     let section = passage
@@ -192,11 +212,10 @@ impl CondensedRecurrentRest {
                     })
                 })
                 .collect::<Result<Vec<_>, _>>()?;
-            fibres.push(CondensedFibre {
-                native: u32::try_from(fibre.native.0)
-                    .map_err(|_| RecurrentCondensationRefusal::Fibre)?,
+            fibres.push(CondensedFibre::new(
+                u32::try_from(fibre.native.0).map_err(|_| RecurrentCondensationRefusal::Fibre)?,
                 members,
-            });
+            ));
         }
         let separators = passage
             .reopenings
@@ -530,16 +549,16 @@ mod tests {
             fibres: CondensedFibres {
                 schema: CONDENSED_FIBRES_SCHEMA.to_owned(),
                 fibres: vec![
-                    CondensedFibre {
-                        native: 0,
-                        members: vec![CondensedFibreMember {
+                    CondensedFibre::new(
+                        0,
+                        vec![CondensedFibreMember {
                             occurrence: digest('0'),
                             terminal_potential_sha256: None,
                         }],
-                    },
-                    CondensedFibre {
-                        native: 1,
-                        members: vec![
+                    ),
+                    CondensedFibre::new(
+                        1,
+                        vec![
                             CondensedFibreMember {
                                 occurrence: digest('1'),
                                 terminal_potential_sha256: Some(digest('c')),
@@ -549,10 +568,10 @@ mod tests {
                                 terminal_potential_sha256: Some(digest('d')),
                             },
                         ],
-                    },
-                    CondensedFibre {
-                        native: 2,
-                        members: vec![
+                    ),
+                    CondensedFibre::new(
+                        2,
+                        vec![
                             CondensedFibreMember {
                                 occurrence: digest('2'),
                                 terminal_potential_sha256: Some(digest('e')),
@@ -562,7 +581,7 @@ mod tests {
                                 terminal_potential_sha256: Some(digest('f')),
                             },
                         ],
-                    },
+                    ),
                 ],
                 separators: vec![
                     CondensedSeparator {

@@ -17,7 +17,9 @@
 //! fine motion exactly (a failed square is holonomy, not loss:
 //! `Transport/ContinuingTube.lean::grainSquare_defect_is_not_a_loss`); a factor break keeps the
 //! two sources `π` merges, the residuals that still separate them
-//! (`Foundation/ContinuingTower.lean::Transition.residual_separates`) and the two readings. The
+//! (`Foundation/ContinuingTower.lean::Transition.residual_separates`) and the two readings, and
+//! the factor defect retains every fibre `π` merges beside those separators
+//! ([`crate::restriction::fibre::FibreDefect`]). The
 //! matrix defect `π A_fine − A_coarse π` of [`crate::restriction::SquareDefect`]
 //! (`Holon/Restriction.lean::squareDefect`) is the operator of which every square break is one
 //! column reading; the equality is tested on [`crate::restriction::LinearRestriction`].
@@ -39,6 +41,7 @@
 
 use std::fmt::Debug;
 
+use super::fibre::{FibreDefect, PreimageFibre, Separation};
 use super::tower::{
     TowerFaceOutcome, TowerOutcome, TowerRefusal, TowerRestrictTransition, Transition,
 };
@@ -313,58 +316,18 @@ impl<T, V> FactorWitness<T, V> {
     }
 }
 
-/// Two sources `π` merges that the reading separates, with the residuals that still separate them.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct FactorBreak<R, V> {
-    left: usize,
-    right: usize,
-    residuals: (R, R),
-    readings: (V, V),
-}
+/// Two sources `π` merges that the reading separates, with the residuals that still separate them:
+/// the core [`Separation`] at source positions, witnessed by the two residuals
+/// (`Holon/Restriction.lean::Descent.defect`).
+pub type FactorBreak<R, V> = Separation<usize, (R, R), V>;
 
-impl<R, V> FactorBreak<R, V> {
-    /// The two sources' positions, `left < right`.
-    pub fn pair(&self) -> (usize, usize) {
-        (self.left, self.right)
-    }
-
-    /// `(π.residual(x_left), π.residual(x_right))`, which differ.
-    pub fn residuals(&self) -> &(R, R) {
-        &self.residuals
-    }
-
-    /// `(ρ x_left, ρ x_right)`, which differ.
-    pub fn readings(&self) -> &(V, V) {
-        &self.readings
-    }
-}
-
-/// Every break of a factoring over a declared population.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct FactorBreaks<R, V> {
-    breaks: Vec<FactorBreak<R, V>>,
-    merged_pairs: usize,
-}
-
-impl<R, V> FactorBreaks<R, V> {
-    /// The breaks in lexicographic pair order; never empty.
-    pub fn breaks(&self) -> &[FactorBreak<R, V>] {
-        &self.breaks
-    }
-
-    /// The first break in lexicographic pair order.
-    pub fn first(&self) -> &FactorBreak<R, V> {
-        &self.breaks[0]
-    }
-
-    /// How many declared pairs `π` merges.
-    pub fn merged_pairs(&self) -> usize {
-        self.merged_pairs
-    }
-}
+/// Every break of a factoring over a declared population, with every fibre `π` merges: the core
+/// [`FibreDefect`] over source positions. Separators are in lexicographic pair order; the fibres
+/// (each with at least two members) are in first-occurrence order.
+pub type FactorBreaks<T, R, V> = FibreDefect<PreimageFibre<T, Vec<usize>>, FactorBreak<R, V>>;
 
 /// The factor descent's return.
-pub type FactorDescent<T, R, V> = Descent<FactorWitness<T, V>, FactorBreaks<R, V>>;
+pub type FactorDescent<T, R, V> = Descent<FactorWitness<T, V>, FactorBreaks<T, R, V>>;
 
 /// [definition] **Does the reading factor through the restriction?** For every declared pair
 /// `π x = π y`, `ρ x = ρ y` (`Foundation/Standing.lean::standingLaw_exists_iff_future_factors`).
@@ -411,23 +374,31 @@ where
             }
             merged_pairs += 1;
             if readings[left] != readings[right] {
-                breaks.push(FactorBreak {
+                breaks.push(Separation::new(
                     left,
                     right,
-                    residuals: (
+                    (
                         restriction.residual(&sources[left]),
                         restriction.residual(&sources[right]),
                     ),
-                    readings: (readings[left].clone(), readings[right].clone()),
-                });
+                    (readings[left].clone(), readings[right].clone()),
+                ));
             }
         }
     }
     if !breaks.is_empty() {
-        return Ok(Descent::Defect(FactorBreaks {
-            breaks,
-            merged_pairs,
-        }));
+        // The defect retains every fibre `π` merges, first-occurrence order.
+        let mut fibres: Vec<PreimageFibre<P::Target, Vec<usize>>> = Vec::new();
+        for (index, image) in images.into_iter().enumerate() {
+            match fibres.iter_mut().find(|fibre| fibre.native == image) {
+                Some(fibre) => fibre.members.push(index),
+                None => fibres.push(PreimageFibre::new(image, vec![index])),
+            }
+        }
+        fibres.retain(|fibre| fibre.members.len() > 1);
+        let defect = FibreDefect::new(fibres, breaks);
+        debug_assert_eq!(defect.merged_pairs(), merged_pairs);
+        return Ok(Descent::Defect(defect));
     }
     let mut factored: Vec<(P::Target, V)> = Vec::new();
     for (image, value) in images.into_iter().zip(readings) {

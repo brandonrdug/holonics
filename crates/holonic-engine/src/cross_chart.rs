@@ -804,6 +804,21 @@ pub struct ReopeningSeparator {
     pub word_length: usize,
 }
 
+impl ReopeningSeparator {
+    /// The core [`Separation`](holonic_core::restriction::Separation) (plan phase 10): the merged
+    /// pair, witnessed by the shared image and the separating coordinate, with the two readings.
+    pub fn separation(
+        &self,
+    ) -> holonic_core::restriction::Separation<Vec<Rat>, (Vec<Rat>, usize), Rat> {
+        holonic_core::restriction::Separation::new(
+            self.left.clone(),
+            self.right.clone(),
+            (self.identified_image.clone(), self.separating_coordinate),
+            (self.left_reading.clone(), self.right_reading.clone()),
+        )
+    }
+}
+
 /// The shortest reopening separator for a declared quotient, or `None` when it collapses nothing.
 pub fn shortest_reopening_separator(
     phi: &ExactRatMatrix,
@@ -1165,6 +1180,29 @@ mod tests {
                 .all(num_traits::Zero::is_zero)
         );
         assert_ne!(separator.left_reading, separator.right_reading);
+        // Phase 10: the same pair is the core factor descent's defect through the quotient, read
+        // at the separating coordinate — one fibre {left, right} and one equal separator.
+        let restriction = holonic_core::restriction::LinearRestriction::new(quotient.clone())
+            .expect("restriction");
+        let coordinate = separator.separating_coordinate;
+        let descent = holonic_core::restriction::factor_descent(
+            &restriction,
+            |x: &Vec<Rat>| x[coordinate].clone(),
+            &[separator.left.clone(), separator.right.clone()],
+        )
+        .expect("a small population");
+        let defect = descent.defect().expect("the coordinate does not factor");
+        assert_eq!(defect.fibres().len(), 1);
+        assert_eq!(defect.fibres()[0].native, separator.identified_image);
+        assert_eq!(defect.fibres()[0].members, vec![0, 1]);
+        let core = defect.first().expect("one separator");
+        let reading = separator.separation();
+        assert_eq!(core.readings(), reading.readings());
+        assert_eq!(
+            (reading.left(), reading.right()),
+            (&separator.left, &separator.right)
+        );
+        assert_eq!(reading.witness().1, coordinate);
         let rebase = ExactRatMatrix::identity(3).expect("identity");
         assert!(
             shortest_reopening_separator(&rebase)

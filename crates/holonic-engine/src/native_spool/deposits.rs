@@ -125,40 +125,32 @@ pub struct NativeExactReconstructionFibre {
 }
 
 impl NativeExactReconstructionFibre {
+    /// The retained `particular + span(radical)` as the core
+    /// [`AffineFibre`](holonic_core::restriction::AffineFibre) (plan phase 10).
+    pub fn affine_fibre(&self) -> holonic_core::restriction::AffineFibre {
+        holonic_core::restriction::AffineFibre::new(self.particular.clone(), self.radical.clone())
+    }
+
     pub fn validate(&self) -> Result<(), NativeSpoolRefusal> {
         let domain_dimension = self.return_operator.columns();
         let codomain_dimension = self.return_operator.rows();
-        let zero = Rat::from_integer(0.into());
-        let mut radical = BTreeSet::new();
         let returned = self
             .return_operator
             .apply(&self.terminal_covector)
             .map_err(|_| NativeSpoolRefusal::ExactReconstructionFibre(self.address.clone()))?;
-        let particular_return = self
-            .return_operator
-            .apply(&self.particular)
-            .map_err(|_| NativeSpoolRefusal::ExactReconstructionFibre(self.address.clone()))?;
-        let radical_is_malformed = self.radical.iter().any(|direction| {
-            if direction.len() != domain_dimension
-                || direction.iter().all(|coordinate| coordinate == &zero)
-                || !radical.insert(direction)
-            {
-                return true;
-            }
-            match self.return_operator.apply(direction) {
-                Ok(image) => image.iter().any(|coordinate| coordinate != &zero),
-                Err(_) => true,
-            }
-        });
+        // `particular + span(radical)` is the affine preimage of the returned covector: the core
+        // fibre law (dimensions, `A p = y`, nonzero distinct radical directions in `ker A`).
+        let fibre_is_preimage = self
+            .affine_fibre()
+            .check_preimage(&self.return_operator, &self.returned_covector)
+            .is_ok();
         if self.address.is_empty()
             || self.thread.is_empty()
             || domain_dimension == 0
             || codomain_dimension == 0
-            || self.particular.len() != domain_dimension
             || self.terminal_covector.len() != domain_dimension
-            || self.returned_covector.len() != codomain_dimension
             || returned != self.returned_covector
-            || particular_return != self.returned_covector
+            || !fibre_is_preimage
             || self.k3_native_support.is_empty()
             || self.dependent_receiver_fibre.is_empty()
             || self.occurrences.is_empty()
@@ -168,7 +160,6 @@ impl NativeExactReconstructionFibre {
                 .k3_native_support
                 .contains(&self.carrying_pullback.joining_native)
             || self.open_exterior.iter().any(String::is_empty)
-            || radical_is_malformed
             || self
                 .obstruction
                 .as_ref()

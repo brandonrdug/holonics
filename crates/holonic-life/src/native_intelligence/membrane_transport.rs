@@ -705,7 +705,7 @@ impl<Standing: MembraneStanding> NativeCausalMembrane<Standing> {
                 .into_iter()
                 .map(|factor| (factor, BigUint::from(magnitude)))
                 .collect::<Vec<_>>();
-            let population = u64::try_from(admitted.reconstruction_fibre.occurrences.len())
+            let population = u64::try_from(admitted.reconstruction_fibre.members.len())
                 .map_err(|_| MembraneInteriorError::CapacityOverflow)?;
             if population == 0 {
                 return Err(MembraneInteriorError::MalformedStanding(format!(
@@ -717,7 +717,7 @@ impl<Standing: MembraneStanding> NativeCausalMembrane<Standing> {
             entry.1.push(address.clone());
             entry
                 .2
-                .extend(admitted.reconstruction_fibre.occurrences.iter().copied());
+                .extend(admitted.reconstruction_fibre.members.iter().copied());
         }
         if condensed.is_empty() {
             return Err(MembraneInteriorError::MalformedStanding(format!(
@@ -1251,7 +1251,7 @@ fn native_section_matches(rest: &impl MembraneStanding, native: &NativeConducted
         && response == Some(&native.constitutive_response)
         && observation.is_some_and(|consequence| consequence.observation == native.observation)
         && native.ordered_word == admitted.thread.chronology
-        && native.reconstruction_fibre == admitted.reconstruction_fibre.occurrences
+        && native.reconstruction_fibre == admitted.reconstruction_fibre.members
 }
 
 struct NativeContactView<'a> {
@@ -1298,8 +1298,7 @@ fn native_contact_view<'a>(
         .iter()
         .find(|cell| cell.native == occurrence.emitting_native)?;
     let reconstruction_fibre = spool.reconstruction_fibres.iter().find(|fibre| {
-        fibre.native == occurrence.emitting_native
-            && fibre.occurrences.contains(&occurrence.occurrence)
+        fibre.native == occurrence.emitting_native && fibre.members.contains(&occurrence.occurrence)
     })?;
     Some(NativeContactView {
         spool,

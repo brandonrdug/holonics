@@ -126,6 +126,19 @@ pub struct HistorySeparator {
     pub right: i64,
 }
 
+impl HistorySeparator {
+    /// The core [`Separation`](holonic_core::restriction::Separation) (plan phase 10): two
+    /// histories, the target coordinate that separates them, and the two coefficients.
+    pub fn separation(&self) -> holonic_core::restriction::Separation<usize, usize, i64> {
+        holonic_core::restriction::Separation::new(
+            self.left_history,
+            self.right_history,
+            self.target_coordinate,
+            (self.left, self.right),
+        )
+    }
+}
+
 /// One receiver-equivalence class of addressed coefficient occurrences. Equal carrier columns
 /// do not identify their source occurrences; every member remains in this reconstruction fibre.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -147,6 +160,22 @@ pub struct ForeignCoefficientWordSeparator {
     pub coordinate: usize,
     pub left: i64,
     pub right: i64,
+}
+
+impl ForeignCoefficientWordSeparator {
+    /// The core [`Separation`](holonic_core::restriction::Separation) (plan phase 10): two
+    /// histories, the section (index and address) and coordinate that separate them, and the two
+    /// coefficients.
+    pub fn separation(
+        &self,
+    ) -> holonic_core::restriction::Separation<usize, (usize, String, usize), i64> {
+        holonic_core::restriction::Separation::new(
+            self.left_history,
+            self.right_history,
+            (self.section, self.section_address.clone(), self.coordinate),
+            (self.left, self.right),
+        )
+    }
 }
 
 /// Exact quotient of addressed history occurrences by the complete captured foreign carrier

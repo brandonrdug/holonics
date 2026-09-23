@@ -356,14 +356,16 @@ pub fn found_lean_lattice(
         .collect();
     let reconstruction_fibres = referring
         .iter()
-        .map(|to| NativeCollapsedFibre {
-            native: state_of[to],
-            occurrences: references
-                .iter()
-                .enumerate()
-                .filter(|(_, (_, target))| target == to)
-                .map(|(at, _)| EventId(at as u64))
-                .collect(),
+        .map(|to| {
+            NativeCollapsedFibre::new(
+                state_of[to],
+                references
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, (_, target))| target == to)
+                    .map(|(at, _)| EventId(at as u64))
+                    .collect(),
+            )
         })
         .collect();
     let spool = NativeSpool {

@@ -44,7 +44,7 @@ impl SourceNeutralReceiverHistoryConstitution {
             .collect::<BTreeMap<_, _>>();
         let mut native_value = BTreeMap::new();
         for fibre in &self.compression.reconstruction_fibres {
-            let mut sources = fibre.sources.iter().copied();
+            let mut sources = fibre.members.iter().copied();
             let first = sources.next().ok_or_else(|| {
                 SourceNeutralEcologyError::Body(
                     "the returned-current quotient exposed an empty fibre".to_owned(),

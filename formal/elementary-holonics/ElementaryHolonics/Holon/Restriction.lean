@@ -20,7 +20,9 @@ have boundary bonds on the graph of `Λ_DN` with the full power preserved, and e
 extends (`kron_exact`, composing `Objects/Membrane`); witness the series path
 (`series_path_restriction`). The pointwise square is the operator defect read at a state
 (`squareDefect_mulVec_eq_zero_iff`), and every reading either descends through a restriction or
-exhibits a merged pair it separates (`Descent`, `descent_total`).
+exhibits a merged pair it separates (`Descent`, `descent_total`); that pair, in its fibre, refutes
+every coarse reading (`descent_defect_refutes_factoring`), and a retained affine fibre lies in the
+preimage (`affineFibre_mem`).
 -/
 
 noncomputable section
@@ -231,7 +233,36 @@ theorem descent_total {X : Type u} {T : Type v} {V : Type w} (π : X → T) (ρ 
     refine .witness (fun t => ρ t.2.choose) fun x => ?_
     exact (h _ _ (⟨π x, x, rfl⟩ : Set.range π).2.choose_spec).symm
 
+/-- [proved-derived; formal-checked] **A defect retains its fibre and its separator, and refutes
+every coarse reading.** A merged pair `π x = π y` lies in one fibre `π ⁻¹' {π x}`; when the
+reading separates it, no coarse reading `ρ̄` has `ρ = ρ̄ ∘ π`. The Rust `FibreDefect` keeps exactly
+these two things (the fibre and the separated pair). -/
+theorem descent_defect_refutes_factoring {X : Type u} {T : Type v} {V : Type w} (π : X → T)
+    (ρ : X → V) {x y : X} (merged : π x = π y) (separated : ρ x ≠ ρ y) :
+    x ∈ π ⁻¹' {π x} ∧ y ∈ π ⁻¹' {π x} ∧ ¬ ∃ ρbar : T → V, ∀ z, ρ z = ρbar (π z) := by
+  refine ⟨rfl, merged.symm, ?_⟩
+  rintro ⟨ρbar, h⟩
+  exact separated (by rw [h x, h y, merged])
+
 end Descent
+
+/-! ## 2c. The affine fibre of a linear restriction -/
+
+section AffineFibre
+
+variable {𝕜 : Type*} [Field 𝕜] {ι κ ρ : Type*} [Fintype ι] [Fintype ρ]
+
+/-- [proved-derived; formal-checked] **The affine fibre is in the preimage.** If
+`A · particular = y` and every radical direction lies in `ker A`, every point
+`particular + Σ cᵢ rᵢ` reaches `y`: the retained `particular + span(radical)` is inside `A⁻¹(y)`,
+so no representative has to be chosen (Rust `restriction::fibre::AffineFibre`). -/
+theorem affineFibre_mem (A : Matrix κ ι 𝕜) (particular : ι → 𝕜) (radical : ρ → ι → 𝕜)
+    (y : κ → 𝕜) (hp : A *ᵥ particular = y) (hr : ∀ i, A *ᵥ radical i = 0) (c : ρ → 𝕜) :
+    A *ᵥ (particular + ∑ i, c i • radical i) = y := by
+  rw [mulVec_add, mulVec_sum, hp]
+  simp [mulVec_smul, hr]
+
+end AffineFibre
 
 /-! ## 3. Kron/Schur elimination is an exact restriction with reading `Λ_DN` -/
 

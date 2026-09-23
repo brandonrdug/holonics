@@ -221,7 +221,7 @@ fn variable_grain(
             .fibres
             .iter()
             .filter(|fibre| fibre.native == future.to)
-            .flat_map(|fibre| fibre.occurrences.iter().copied())
+            .flat_map(|fibre| fibre.members.iter().copied())
             .collect::<BTreeSet<_>>();
         if occurrences.is_empty() {
             return Err(RepeatedInferenceError::Grain);
@@ -281,7 +281,7 @@ mod tests {
             .iter_mut()
             .find(|fibre| fibre.native == NativeStateId(0))
             .expect("the emitted native state carries a fibre")
-            .occurrences
+            .members
             .insert(EventId(3));
         body.validate().expect("the branching declared body is valid");
         body

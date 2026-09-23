@@ -131,7 +131,7 @@ fn derive_native_section(
         ordered_word: admitted.thread.chronology.clone(),
         receiver,
         observation,
-        reconstruction_fibre: admitted.reconstruction_fibre.occurrences.clone(),
+        reconstruction_fibre: admitted.reconstruction_fibre.members.clone(),
         successor_sections,
         open_exterior,
     })

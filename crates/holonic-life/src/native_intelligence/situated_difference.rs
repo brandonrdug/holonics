@@ -20,14 +20,14 @@ use super::types::NativeConductedSection;
 
 pub const SITUATED_DIFFERENCE_SCHEMA: &str = "soma-life.situated-difference-section.v1";
 
-/// One affine reconstruction fibre of a linear return.  `particular + span(kernel)` is retained
-/// instead of choosing the particular point as if it were an inverse.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct AffineReconstructionFibre {
-    pub particular: Vec<Rat>,
-    pub kernel: Vec<Vec<Rat>>,
-}
+holonic_core::fibre_field_names!(pub AffineReconstructionFibreNames = "AffineReconstructionFibre", "particular", "kernel", deny);
+
+/// One affine reconstruction fibre of a linear return: the core
+/// [`AffineFibre`](holonic_core::restriction::AffineFibre) under its `particular`/`kernel` wire
+/// (plan phase 10). `particular + span(kernel)` is retained instead of choosing the particular
+/// point as if it were an inverse.
+pub type AffineReconstructionFibre =
+    holonic_core::restriction::AffineFibre<AffineReconstructionFibreNames>;
 
 /// One forward differential and the receiver constitutive forms which determine its adjoint.
 /// Metrics are mandatory: a bare transpose is not silently promoted to the causal return.
@@ -367,8 +367,8 @@ fn validate_native_pair(input: &SituatedDifferenceInput) -> Result<(), SituatedD
         ));
     }
     let carries_both = input.occurrence_fibres.iter().any(|fibre| {
-        fibre.occurrences.contains(&candidate.address.occurrence)
-            && fibre.occurrences.contains(&returned.address.occurrence)
+        fibre.members.contains(&candidate.address.occurrence)
+            && fibre.members.contains(&returned.address.occurrence)
     });
     if !carries_both {
         return Err(SituatedDifferenceError::Malformed(
@@ -498,17 +498,14 @@ fn build_causal_adjoint(
         let returned = step.adjoint.apply(&current).map_err(linear_error)?;
         let fibre = step
             .adjoint
-            .preimage_fibre(&returned)
+            .affine_fibre(&returned)
             .map_err(linear_error)?
             .ok_or_else(|| SituatedDifferenceError::Adjoint("missing adjoint fibre".to_owned()))?;
         returned_sections.push(ReturnedCovectorSection {
             step: step.name.clone(),
             entering_covector: current,
             returned_covector: returned.clone(),
-            reconstruction_fibre: AffineReconstructionFibre {
-                particular: fibre.0,
-                kernel: fibre.1,
-            },
+            reconstruction_fibre: fibre,
             obstruction: step
                 .adjoint
                 .preimage_obstruction(&returned)
@@ -518,7 +515,7 @@ fn build_causal_adjoint(
     }
     let returned_source_covector = current;
     let whole_fibre = composite_adjoint
-        .preimage_fibre(&returned_source_covector)
+        .affine_fibre(&returned_source_covector)
         .map_err(linear_error)?
         .ok_or_else(|| SituatedDifferenceError::Adjoint("missing composite fibre".to_owned()))?;
     Ok(CausalAdjointWord {
@@ -528,10 +525,7 @@ fn build_causal_adjoint(
             composite_forward.rebase_receipt().map_err(linear_error)?,
         ),
         radical: composite_adjoint.kernel_basis().map_err(linear_error)?,
-        reconstruction_fibre: AffineReconstructionFibre {
-            particular: whole_fibre.0,
-            kernel: whole_fibre.1,
-        },
+        reconstruction_fibre: whole_fibre,
         obstruction: composite_adjoint
             .preimage_obstruction(&returned_source_covector)
             .map_err(linear_error)?,
@@ -782,10 +776,10 @@ mod tests {
                 right: EventId(2),
                 joining_native: NativeStateId(11),
             },
-            occurrence_fibres: vec![NativeCollapsedFibre {
-                native: NativeStateId(11),
-                occurrences: BTreeSet::from([EventId(1), EventId(2)]),
-            }],
+            occurrence_fibres: vec![NativeCollapsedFibre::new(
+                NativeStateId(11),
+                BTreeSet::from([EventId(1), EventId(2)]),
+            )],
             source_transport,
             rebased_transport,
             source_chart,
@@ -918,6 +912,74 @@ mod tests {
         ));
         assert!(word.obstruction.is_none());
         assert!(!word.reconstruction_fibre.particular.is_empty());
+    }
+
+    /// Phase 10: the affine reconstruction fibre is the core `AffineFibre` — its wire is the
+    /// struct it replaced, and every returned fibre is the preimage of its returned covector.
+    #[test]
+    fn the_affine_reconstruction_fibre_is_the_core_affine_preimage_on_its_old_wire() {
+        #[derive(Debug, PartialEq, Serialize, Deserialize)]
+        #[serde(deny_unknown_fields)]
+        struct AffineReconstructionFibreOld {
+            particular: Vec<Rat>,
+            kernel: Vec<Vec<Rat>>,
+        }
+        let section = SituatedDifferenceSection::found(lawful_input()).unwrap();
+        let rectangular = CausalAdjointWord::found(
+            vec![CausalAdjointStepInput {
+                name: "rectangular".to_owned(),
+                forward: matrix(&[&[(1, 1), (0, 1), (1, 1)], &[(0, 1), (1, 1), (1, 1)]]),
+                domain_metric: ExactRatMatrix::identity(3).unwrap(),
+                codomain_metric: ExactRatMatrix::identity(2).unwrap(),
+            }],
+            vec![q(2, 1), q(3, 1)],
+        )
+        .unwrap();
+        for word in [&section.causal_adjoint, &rectangular] {
+            let mut fibres = vec![(
+                &word.reconstruction_fibre,
+                &word.composite_adjoint,
+                &word.returned_source_covector,
+            )];
+            for (returned, step) in word.returned_sections.iter().zip(word.steps.iter().rev()) {
+                fibres.push((
+                    &returned.reconstruction_fibre,
+                    &step.adjoint,
+                    &returned.returned_covector,
+                ));
+            }
+            for (fibre, adjoint, returned) in fibres {
+                fibre.check_preimage(adjoint, returned).unwrap();
+                let old = AffineReconstructionFibreOld {
+                    particular: fibre.particular.clone(),
+                    kernel: fibre.radical.clone(),
+                };
+                let wire = serde_json::to_string(fibre).unwrap();
+                assert_eq!(wire, serde_json::to_string(&old).unwrap());
+                assert_eq!(
+                    &serde_json::from_str::<AffineReconstructionFibre>(&wire).unwrap(),
+                    fibre
+                );
+                assert_eq!(
+                    serde_json::from_str::<AffineReconstructionFibreOld>(&wire).unwrap(),
+                    old
+                );
+                assert_eq!(
+                    format!("{fibre:?}"),
+                    format!("{old:?}").replacen(
+                        "AffineReconstructionFibreOld",
+                        "AffineReconstructionFibre",
+                        1
+                    )
+                );
+            }
+        }
+        // The 3×2 adjoint has full column rank: its fibre is one point, radical empty.
+        assert_eq!(rectangular.reconstruction_fibre.dimension(), 0);
+        assert_eq!(
+            rectangular.reconstruction_fibre.radical,
+            rectangular.radical
+        );
     }
 
     #[test]

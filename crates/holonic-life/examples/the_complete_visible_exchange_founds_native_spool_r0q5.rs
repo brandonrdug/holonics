@@ -310,7 +310,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         reconstruction_occurrence_population: spool
             .reconstruction_fibres
             .iter()
-            .map(|fibre| fibre.occurrences.len())
+            .map(|fibre| fibre.members.len())
             .sum(),
         source_text_retained_in_native_wire: false,
         provider_or_speaker_routes_native_transport: false,

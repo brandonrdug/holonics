@@ -91,7 +91,7 @@ impl LongHorizonRetainedBoundary {
         let fibres = compression
             .reconstruction_fibres
             .iter()
-            .map(|fibre| (fibre.native, fibre.sources.iter().copied().collect()))
+            .map(|fibre| (fibre.native, fibre.members.iter().copied().collect()))
             .collect::<Vec<_>>();
         let richer_reopenings = richer_reopenings(&fibres, &source_members, &interiors)?;
         let recurrences = derive_recurrences(&native_states, &generator_table)?;

@@ -669,10 +669,10 @@ fn source_neutral_situated_difference_from_world_return(
             right: returned_event,
             joining_native: template_occurrence.emitting_native,
         },
-        occurrence_fibres: vec![NativeCollapsedFibre {
-            native: template_occurrence.emitting_native,
-            occurrences: BTreeSet::from([candidate_event, returned_event]),
-        }],
+        occurrence_fibres: vec![NativeCollapsedFibre::new(
+            template_occurrence.emitting_native,
+            BTreeSet::from([candidate_event, returned_event]),
+        )],
         source_transport: identity.clone(),
         rebased_transport: identity.clone(),
         source_chart: identity.clone(),

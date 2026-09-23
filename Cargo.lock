@@ -1164,6 +1164,7 @@ name = "life"
 version = "0.0.0"
 dependencies = [
  "body",
+ "holonic-core",
  "holonic-engine",
  "holonic-language",
  "holonic-structure",

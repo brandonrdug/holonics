@@ -27,6 +27,8 @@
 //! | `kron_exact`, `boundaryBond` | [`KronReduction`] |
 //! | `squareDefect_mulVec_eq_zero_iff` | `tube::SquareDefect::route_difference`, [`LinearTube`], [`square_descent`], [`tower_square_descent`] |
 //! | `Descent`, `descent_total` | [`Descent`], [`factor_descent`], [`factor_descent_over`] |
+//! | `Descent.defect`, `descent_defect_refutes_factoring` | [`FibreDefect`], [`Separation`], [`PreimageFibre`], [`ShortestSeparator`] |
+//! | `affineFibre_mem` | [`AffineFibre`] |
 //!
 //! [definition] **Restriction is one owner** (plan phase 6). The transverse axis — towers, gluing,
 //! the non-invertible [`tower::Transition`] with its residual, migrations — is [`tower`]
@@ -41,8 +43,16 @@
 //! `continuing_tube::SquareVerdict::descent` on the grain tube, `standing::sufficiency_descent`,
 //! `receiver_exact_compression::one_shot_descent`), and the engine's Schur boundary transfer
 //! (`diffusion::compile_diffusion_transfer`) is a [`KronReduction`] reading.
+//!
+//! [definition] **A defect retains its fibre and its separator** (plan phase 10). A factor defect
+//! is a [`FibreDefect`]: every fibre `π` merges ([`PreimageFibre`]) and every separated merged pair
+//! ([`Separation`], the Lean `Descent.defect`). The tree's reconstruction and preimage fibres are
+//! instances — a class fibre is a [`PreimageFibre`] under its wire's [`FieldNames`], a linear
+//! preimage an [`AffineFibre`], a receiver-exact collapsed pair a [`ShortestSeparator`] — and the
+//! remaining wire records read into them ([`fibre`]).
 
 pub mod descent;
+pub mod fibre;
 pub mod linear;
 pub mod tower;
 pub mod tube;
@@ -51,6 +61,10 @@ pub use descent::{
     DESCENT_SOURCE_CEILING, Descent, DescentRefusal, FactorBreak, FactorBreaks, FactorDescent,
     FactorWitness, SquareBreak, SquareBreaks, SquareDescent, SquareWitness, TowerDescentRefusal,
     factor_descent, factor_descent_over, square_descent, tower_square_descent,
+};
+pub use fibre::{
+    AffineFibre, AffineFibreDefect, FibreDefect, FieldNames, PreimageFibre, Separation,
+    ShortestSeparator,
 };
 pub use linear::{LinearChart, LinearRestriction, LinearStation, LinearTower, LinearTube};
 
@@ -488,8 +502,18 @@ mod tests {
         let first = |x: &Vec<Rat>| x[0].clone();
         let broken = factor_descent(&restriction, first, &sources).unwrap();
         let breaks = broken.defect().expect("x₀ alone does not factor");
-        assert_eq!(breaks.first().pair(), (0, 1));
-        let (left, right) = breaks.first().residuals();
+        let first_break = breaks.first().expect("a defect has a separator");
+        assert_eq!(first_break.pair(), (0, 1));
+        // The defect retains the fibre: (1,0,0), (0,1,0) and (3,-2,7) all restrict to (1, 2);
+        // (0,0,1) sits alone. Its merged-pair count is the witness count of the factoring above.
+        assert_eq!(breaks.fibres().len(), 1);
+        assert_eq!(
+            breaks.fibre_of(0).map(|f| f.members.clone()),
+            Some(vec![0, 1, 3])
+        );
+        assert_eq!(breaks.merged_pairs(), 3);
+        assert!(breaks.fibre_of(2).is_none());
+        let (left, right) = first_break.residuals();
         assert_ne!(left, right);
         assert_eq!(
             restriction.separating_residuals(&sources[0], &sources[1]),

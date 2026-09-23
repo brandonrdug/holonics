@@ -381,16 +381,16 @@ mod tests {
             fibres: CondensedFibres {
                 schema: CONDENSED_FIBRES_SCHEMA.to_owned(),
                 fibres: vec![
-                    CondensedFibre {
-                        native: 0,
-                        members: vec![CondensedFibreMember {
+                    CondensedFibre::new(
+                        0,
+                        vec![CondensedFibreMember {
                             occurrence: digest(1),
                             terminal_potential_sha256: None,
                         }],
-                    },
-                    CondensedFibre {
-                        native: 1,
-                        members: vec![
+                    ),
+                    CondensedFibre::new(
+                        1,
+                        vec![
                             CondensedFibreMember {
                                 occurrence: digest(2),
                                 terminal_potential_sha256: Some(digest(20)),
@@ -400,10 +400,10 @@ mod tests {
                                 terminal_potential_sha256: Some(digest(21)),
                             },
                         ],
-                    },
-                    CondensedFibre {
-                        native: 2,
-                        members: vec![
+                    ),
+                    CondensedFibre::new(
+                        2,
+                        vec![
                             CondensedFibreMember {
                                 occurrence: digest(4),
                                 terminal_potential_sha256: Some(digest(22)),
@@ -413,7 +413,7 @@ mod tests {
                                 terminal_potential_sha256: Some(digest(23)),
                             },
                         ],
-                    },
+                    ),
                 ],
                 separators: vec![
                     CondensedSeparator {

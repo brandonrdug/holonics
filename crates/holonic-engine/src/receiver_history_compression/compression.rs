@@ -402,14 +402,14 @@ impl ReceiverHistoryCompression {
         let mut fibre_union = BTreeSet::new();
         for fibre in &self.reconstruction_fibres {
             if !native_set.contains(&fibre.native)
-                || fibre.sources.is_empty()
+                || fibre.members.is_empty()
                 || fibre_by_native
-                    .insert(fibre.native, &fibre.sources)
+                    .insert(fibre.native, &fibre.members)
                     .is_some()
             {
                 return Err(ReceiverHistoryRefusal::EmptyFibre(fibre.native));
             }
-            for source in &fibre.sources {
+            for source in &fibre.members {
                 if !source_set.contains(source)
                     || !fibre_union.insert(*source)
                     || encoded.get(source) != Some(&fibre.native)
@@ -586,10 +586,7 @@ impl ReceiverHistoryCompression {
                     native,
                 });
             }
-            reconstruction_fibres.push(ReconstructionFibre {
-                native,
-                sources: sources.clone(),
-            });
+            reconstruction_fibres.push(ReconstructionFibre::new(native, sources.clone()));
         }
         for source in &source_population {
             if !encoded.contains_key(source) {
@@ -607,7 +604,7 @@ impl ReceiverHistoryCompression {
         let mut receiver_factor_reads = 0u64;
         for fibre in &reconstruction_fibres {
             for receiver in &receivers {
-                let mut readings = fibre.sources.iter().map(|source| {
+                let mut readings = fibre.members.iter().map(|source| {
                     receiver_factor_reads += 1;
                     system.observation(*source, *receiver)
                 });
@@ -659,7 +656,7 @@ impl ReceiverHistoryCompression {
             let mut native = Vec::with_capacity(native_population.len());
             for fibre in &reconstruction_fibres {
                 let targets = fibre
-                    .sources
+                    .members
                     .iter()
                     .filter_map(|member| source_map.get(member))
                     .filter_map(|target| encoded.get(target))
@@ -745,7 +742,7 @@ impl ReceiverHistoryCompression {
             .reconstruction_fibres
             .iter()
             .find(|fibre| fibre.native == native)
-            .map(|fibre| fibre.sources.clone())
+            .map(|fibre| fibre.members.clone())
             .ok_or(ReceiverHistoryRefusal::UnknownNative(native))?;
         Ok(DecodedReceiverImage {
             native,
@@ -880,13 +877,13 @@ impl PartialReceiverHistoryCompression {
         let mut fibre_union = BTreeSet::new();
         let mut fibre_natives = BTreeSet::new();
         for fibre in &self.reconstruction_fibres {
-            if fibre.sources.is_empty()
+            if fibre.members.is_empty()
                 || !native_set.contains(&fibre.native)
                 || !fibre_natives.insert(fibre.native)
             {
                 return Err(ReceiverHistoryRefusal::EmptyFibre(fibre.native));
             }
-            for source in &fibre.sources {
+            for source in &fibre.members {
                 if !source_set.contains(source)
                     || !fibre_union.insert(*source)
                     || encoded.get(source) != Some(&fibre.native)
@@ -1053,10 +1050,7 @@ impl PartialReceiverHistoryCompression {
                     native,
                 });
             }
-            reconstruction_fibres.push(ReconstructionFibre {
-                native,
-                sources: sources.clone(),
-            });
+            reconstruction_fibres.push(ReconstructionFibre::new(native, sources.clone()));
         }
         if source_population
             .iter()
@@ -1075,7 +1069,7 @@ impl PartialReceiverHistoryCompression {
         let mut receiver_factor_reads = 0u64;
         for fibre in &reconstruction_fibres {
             for receiver in &receivers {
-                let mut readings = fibre.sources.iter().map(|source| {
+                let mut readings = fibre.members.iter().map(|source| {
                     receiver_factor_reads += 1;
                     system.observation(*source, *receiver)
                 });
@@ -1129,17 +1123,17 @@ impl PartialReceiverHistoryCompression {
             let mut terminating_natives = BTreeSet::new();
             for fibre in &reconstruction_fibres {
                 let continuing = fibre
-                    .sources
+                    .members
                     .iter()
                     .filter_map(|member| source_map.get(member))
                     .map(|target| encoded[target])
                     .collect::<BTreeSet<_>>();
                 let terminating = fibre
-                    .sources
+                    .members
                     .iter()
                     .filter(|member| terminating_sources.contains(member))
                     .count();
-                if terminating == fibre.sources.len() {
+                if terminating == fibre.members.len() {
                     terminating_natives.insert(fibre.native);
                 } else if terminating == 0 && continuing.len() == 1 {
                     native_transport_entries += 1;

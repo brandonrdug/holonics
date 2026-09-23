@@ -1047,7 +1047,7 @@ impl ResidentMembraneInteriorWord {
             let native = *native_coordinates
                 .get(&fibre.native)
                 .ok_or(CudaRefineError::ReceiverHistoryCompressionMismatch)?;
-            for source in &fibre.sources {
+            for source in &fibre.members {
                 let at = *source_coordinates
                     .get(source)
                     .ok_or(CudaRefineError::ReceiverHistoryCompressionMismatch)?

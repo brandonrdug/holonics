@@ -150,7 +150,8 @@ fn main() -> Result<(), String> {
         .ok_or_else(|| "same-value sum/product returned no separator".to_owned())?;
     let reversed_separator = separator_between(&reading, "difference", "reverse-difference")
         .ok_or_else(|| "reversing a noncommuting port returned no separator".to_owned())?;
-    if same_value_separator.interventions.len() != 1 || reversed_separator.interventions.len() != 1
+    if same_value_separator.distinguishing_word.len() != 1
+        || reversed_separator.distinguishing_word.len() != 1
     {
         return Err(
             "a declared one-step control did not return a shortest one-step separator".to_owned(),
@@ -220,10 +221,10 @@ fn main() -> Result<(), String> {
         .map(|separator| SeparatorReceipt {
             left: separator.left.clone(),
             right: separator.right.clone(),
-            interventions: separator.interventions.clone(),
-            receiver: separator.receiver.clone(),
-            left_observation: separator.left_observation.clone(),
-            right_observation: separator.right_observation.clone(),
+            interventions: separator.distinguishing_word.clone(),
+            receiver: separator.receiver().cloned().flatten(),
+            left_observation: separator.left_observation().cloned().flatten(),
+            right_observation: separator.right_observation().cloned().flatten(),
             separated_by_terminus: separator.separated_by_terminus,
         })
         .collect();
@@ -258,8 +259,8 @@ fn main() -> Result<(), String> {
             cpu_semantic_replay: false,
         },
         same_operation_cross_codec_fiber: cross_codec,
-        same_value_different_law_separated: same_value_separator.interventions.clone(),
-        reversed_port_separated: reversed_separator.interventions.clone(),
+        same_value_different_law_separated: same_value_separator.distinguishing_word.clone(),
+        reversed_port_separated: reversed_separator.distinguishing_word.clone(),
         all_contact_faces_retained,
         receiver_ablation_only_coarsened,
         surface_renaming_preserved_shape,

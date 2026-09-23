@@ -425,10 +425,7 @@ fn dismantle_reachable_section(
     }
     let reconstruction_fibres = fibres
         .into_iter()
-        .map(|(native, occurrences)| NativeCollapsedFibre {
-            native,
-            occurrences,
-        })
+        .map(|(native, occurrences)| NativeCollapsedFibre::new(native, occurrences))
         .collect::<Vec<_>>();
     let event_nodes = event_nodes.into_iter().collect::<Vec<_>>();
     let mut mutual_constitutive_responses = Vec::new();

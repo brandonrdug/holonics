@@ -303,7 +303,7 @@ impl CompressedSituatedDifference {
         let event_fibre = self
             .occurrence_fibres
             .iter()
-            .flat_map(|fibre| fibre.occurrences.iter().copied())
+            .flat_map(|fibre| fibre.members.iter().copied())
             .collect::<BTreeSet<_>>();
         let candidate = readdress_section(
             &branch.candidate,
@@ -534,7 +534,7 @@ impl ExchangeSituatedProduct {
         let mut native_covers = Vec::with_capacity(material.native.native_population.len());
         for fibre in &material.native.reconstruction_fibres {
             let members = fibre
-                .sources
+                .members
                 .iter()
                 .map(|source| returned_by_source[source].clone())
                 .collect::<Vec<_>>();
@@ -584,7 +584,7 @@ impl ExchangeSituatedProduct {
                         branch,
                         &branches[branch],
                         &material.native,
-                        &fibre.sources,
+                        &fibre.members,
                     )?,
                     returned_native,
                     situated: CompressedSituatedDifference::from_full(&full),
@@ -621,7 +621,7 @@ impl ExchangeSituatedProduct {
             }
             native_covers.push(NativeStateExchangeCover {
                 native: fibre.native,
-                source_reconstruction_fibre: fibre.sources.clone(),
+                source_reconstruction_fibre: fibre.members.clone(),
                 locals,
                 cover,
             });

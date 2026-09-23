@@ -367,8 +367,12 @@ pub mod founded_receiver;
 // nothing.
 #[cfg(test)]
 mod lean_citations;
+// Plan phase 10: the engine's reconstruction fibres and separators, read against the core
+// restriction fibre they became, wire for wire. Test-only.
 pub mod lean_development;
 pub mod live_presentation;
+#[cfg(test)]
+mod restriction_fibre_instances;
 // The material loop and its circulation -- Kelvin's theorem as a carried loop rather than a fixed
 // covector. Reached explicitly: `MaterialLoop` and `circulation` say nothing at the crate root
 // about which field they belong to.

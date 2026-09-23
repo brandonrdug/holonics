@@ -43,13 +43,17 @@ pub struct QuotientAssignment {
     pub native: NativeStateId,
 }
 
-/// One complete source fibre of `q`.  This is what an exterior decoder must retain instead of
-/// silently choosing a source occurrence.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ReconstructionFibre {
-    pub native: NativeStateId,
-    pub sources: BTreeSet<ItemId>,
-}
+holonic_core::fibre_field_names!(pub ReconstructionFibreNames = "ReconstructionFibre", "native", "sources", allow);
+
+/// One complete source fibre `q⁻¹(native)`: the core
+/// [`PreimageFibre`](holonic_core::restriction::PreimageFibre) under its `native`/`sources` wire
+/// (plan phase 10). This is what an exterior decoder must retain instead of silently choosing a
+/// source occurrence.
+pub type ReconstructionFibre = holonic_core::restriction::PreimageFibre<
+    NativeStateId,
+    BTreeSet<ItemId>,
+    ReconstructionFibreNames,
+>;
 
 /// One entry of a source generator `T_i`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]

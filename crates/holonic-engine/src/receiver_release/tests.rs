@@ -546,7 +546,10 @@ fn the_coarsening_tower_is_the_core_factor_descent() {
     let WidthRefusal::CoarserDoesNotFactor { left, right, .. } = refusal else {
         panic!("the refusal is the factoring refusal");
     };
-    assert_eq!(breaks.first().pair(), (left, right));
+    assert_eq!(
+        breaks.first().expect("a defect has a separator").pair(),
+        (left, right)
+    );
     assert_eq!(descents.len(), 1);
 }
 

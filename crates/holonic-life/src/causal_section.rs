@@ -131,16 +131,12 @@ pub struct SectionReconstructionFiber {
     pub outside_declared_population_open: bool,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct SectionSeparator {
-    pub left: String,
-    pub right: String,
-    pub interventions: Vec<String>,
-    pub receiver: Option<String>,
-    pub left_observation: Option<String>,
-    pub right_observation: Option<String>,
-    pub separated_by_terminus: bool,
-}
+/// A collapsed pair read through the section's naming chart: the core
+/// [`ShortestSeparator`](holonic_core::restriction::ShortestSeparator) over presentation names,
+/// intervention names, and receiver/observation names that stay optional where the chart does
+/// not name them (plan phase 10). `distinguishing_word` is the shortest intervention sequence.
+pub type SectionSeparator =
+    holonic_core::restriction::ShortestSeparator<String, String, Option<String>, Option<String>>;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SectionWork {
@@ -452,27 +448,21 @@ impl CausalSectionEcology {
             .filter_map(|pair| {
                 let left = root_names.get(&pair.left)?.clone();
                 let right = root_names.get(&pair.right)?.clone();
-                let (receiver, left_observation, right_observation) = pair
-                    .witness
-                    .map(|(receiver, left, right)| {
+                Some(SectionSeparator {
+                    left,
+                    right,
+                    distinguishing_word: pair
+                        .distinguishing_word
+                        .iter()
+                        .filter_map(|input| self.input_names.get(input.0 as usize).cloned())
+                        .collect(),
+                    witness: pair.witness.map(|(receiver, left, right)| {
                         (
                             self.receiver_names.get(receiver.0 as usize).cloned(),
                             self.observation_names.get(left.0 as usize).cloned(),
                             self.observation_names.get(right.0 as usize).cloned(),
                         )
-                    })
-                    .unwrap_or((None, None, None));
-                Some(SectionSeparator {
-                    left,
-                    right,
-                    interventions: pair
-                        .distinguishing_word
-                        .iter()
-                        .filter_map(|input| self.input_names.get(input.0 as usize).cloned())
-                        .collect(),
-                    receiver,
-                    left_observation,
-                    right_observation,
+                    }),
                     separated_by_terminus: pair.separated_by_terminus,
                 })
             })

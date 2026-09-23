@@ -104,7 +104,7 @@ impl<'a> NativeAddressedSection<'a> {
             && self.spool.reconstruction_fibres.iter().any(|candidate| {
                 std::ptr::eq(candidate, self.reconstruction_fibre)
                     && candidate.native == self.occurrence.emitting_native
-                    && candidate.occurrences.contains(&self.occurrence.occurrence)
+                    && candidate.members.contains(&self.occurrence.occurrence)
             });
         if !valid {
             return Err(NativeSpoolRefusal::AddressedSection(
@@ -293,7 +293,7 @@ impl NativeTransportScaffold {
             .iter()
             .find(|fibre| {
                 fibre.native == occurrence.emitting_native
-                    && fibre.occurrences.contains(&occurrence.occurrence)
+                    && fibre.members.contains(&occurrence.occurrence)
             })
             .ok_or(NativeSpoolRefusal::AddressedSection(occurrence.occurrence))?;
         let section = NativeAddressedSection {
@@ -659,24 +659,20 @@ impl NativeTransportScaffold {
         let mut retained_fibres = Vec::new();
         for (position, mut fibre) in spool.reconstruction_fibres.drain(..).enumerate() {
             let withdrawn = fibre
-                .occurrences
+                .members
                 .intersection(&removed_events)
                 .copied()
                 .collect::<BTreeSet<_>>();
-            fibre.occurrences = fibre
-                .occurrences
-                .difference(&removed_events)
-                .copied()
-                .collect();
+            fibre.members = fibre.members.difference(&removed_events).copied().collect();
             if !withdrawn.is_empty() {
                 fibre_deltas.push(NativeWithdrawalFibreDelta {
                     position,
                     native: fibre.native,
                     occurrences: withdrawn,
-                    fibre_departed: fibre.occurrences.is_empty(),
+                    fibre_departed: fibre.members.is_empty(),
                 });
             }
-            if !fibre.occurrences.is_empty() {
+            if !fibre.members.is_empty() {
                 retained_fibres.push(fibre);
             }
         }
@@ -779,10 +775,7 @@ impl NativeTransportScaffold {
                 }
                 spool.reconstruction_fibres.insert(
                     delta.position,
-                    NativeCollapsedFibre {
-                        native: delta.native,
-                        occurrences: delta.occurrences,
-                    },
+                    NativeCollapsedFibre::new(delta.native, delta.occurrences),
                 );
             } else {
                 let fibre = spool
@@ -790,7 +783,7 @@ impl NativeTransportScaffold {
                     .iter_mut()
                     .find(|fibre| fibre.native == delta.native)
                     .ok_or(NativeSpoolRefusal::Restoration)?;
-                fibre.occurrences.extend(delta.occurrences);
+                fibre.members.extend(delta.occurrences);
             }
         }
         spool.native_population = spool

@@ -120,8 +120,8 @@ fn consequence_history_founds_the_class_and_not_the_codec_or_contact_face() {
         .root_conduct_blocks
         .contains(&BTreeSet::from(["infix-product".to_owned()])));
     assert!(reading.shortest_separators.iter().all(|separator| {
-        separator.interventions.len() == 1
-            && separator.receiver.as_deref() == Some("value")
+        separator.distinguishing_word.len() == 1
+            && separator.receiver().cloned().flatten().as_deref() == Some("value")
             && !separator.separated_by_terminus
     }));
     assert_eq!(reading.reconstruction_fibers.len(), 2);
@@ -188,4 +188,39 @@ fn the_resident_quotient_returns_the_cpu_admission_reading_exactly() {
         card.launches() > 0,
         "the admission cannot pass without a launch"
     );
+}
+
+/// Phase 10: a section separator is the compression's collapsed pair (the core
+/// `ShortestSeparator`) read through the section's naming chart, pair for pair.
+#[test]
+fn the_section_separator_is_the_collapsed_pair_read_through_names() {
+    let ecology = ecology("");
+    let reading = ecology.read_on_cpu_for_admission().unwrap();
+    let roots = ecology
+        .sections
+        .iter()
+        .enumerate()
+        .map(|(at, section)| (ecology.root_item(at), section.identity.clone()))
+        .collect::<BTreeMap<_, _>>();
+    let expected = reading
+        .compression
+        .collapsed
+        .iter()
+        .filter(|pair| roots.contains_key(&pair.left) && roots.contains_key(&pair.right))
+        .map(|pair| {
+            pair.clone().map(
+                |item| roots[&item].clone(),
+                |input| ecology.input_names[input.0 as usize].clone(),
+                |receiver| ecology.receiver_names.get(receiver.0 as usize).cloned(),
+                |observation| {
+                    ecology
+                        .observation_names
+                        .get(observation.0 as usize)
+                        .cloned()
+                },
+            )
+        })
+        .collect::<Vec<_>>();
+    assert!(!expected.is_empty());
+    assert_eq!(reading.shortest_separators, expected);
 }

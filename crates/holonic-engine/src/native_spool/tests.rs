@@ -509,7 +509,7 @@ fn native_addressed_section_borrows_the_exact_occurrence_carrier() {
     assert_eq!(section.emitting_parametron().native, NativeStateId(1));
     assert_eq!(section.ordered_generator_word(), &[InputId(7)]);
     assert_eq!(
-        section.reconstruction_fibre().occurrences,
+        section.reconstruction_fibre().members,
         BTreeSet::from([EventId(1)])
     );
 }

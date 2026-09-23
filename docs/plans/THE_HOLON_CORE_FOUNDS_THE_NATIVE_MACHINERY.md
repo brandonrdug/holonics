@@ -283,3 +283,65 @@ within-cycle adjoint checkpoints; the traversal frontier; retention-law-conforma
 (`condition_contact`, `preimage`); receiver-history compression frames (the quotient itself);
 `holonic-membrane`/`holonic-body` register carriage until the chart exists; `DepositLedger`; legacy wire
 decoders. Each phase: disposition table, equality tests, caller migration, deletion, full suites.
+
+### Phase 10 disposition: the retained fibre and its separator
+
+[established-bounded; source-inspected, implemented-exact] `holonic_core::restriction::fibre` owns
+what a failed descent retains: `PreimageFibre<T, C, N>` (a class fibre `π⁻¹(t)`, Lean
+`Foundation/Holon.lean::Holon.PreimageFibre`), `AffineFibre<N>` (`particular + span(radical)`,
+checked by `check_preimage`; Lean `Holon/Restriction.lean::affineFibre_mem`), `Separation<M, W, V>`
+(the Lean `Descent.defect x y merged separated`), `ShortestSeparator<M, I, R, O>` (a separation
+witnessed by a shortest word and receiver, `Foundation/CausalRelevance.lean::futureHistory_quotientNe_returns_separator`)
+and `FibreDefect<F, S>` (every retained fibre beside every separator; Lean
+`Holon/Restriction.lean::descent_defect_refutes_factoring`). The factor descent's defect is now
+`FibreDefect<PreimageFibre<T, Vec<usize>>, Separation<usize, (R, R), V>>` (`FactorBreaks`,
+`FactorBreak` are aliases; the merged-pair count is `Σ C(|fibre|, 2)` over the retained fibres).
+`Descent<W, D>` keeps its generic defect: square breaks retain a route difference and a fine
+residual (holonomy), which is not a merged pair. A `FieldNames` marker (`fibre_field_names!`) keeps
+each instance's wire — struct name, field names, unknown-field policy and `Debug` text — so an
+alias serializes byte-for-byte as the struct it replaced. Before/after: 9 per-operation structs
+deleted (`CollapsedPair`, observable `ReconstructionFibre`, `NativeCollapsedFibre`, `BoundaryFibre`,
+`CondensedFibre`, `AffineReconstructionFibre`, `SectionSeparator`, core `FactorBreak`,
+`FactorBreaks`), 5 core types added; 9 aliases; `*Fibre|*Fiber` structs/enums 78 → 75,
+`*Separator` 20 → 20 (one deleted, `ShortestSeparator` added).
+
+| Type (owner) | Disposition | Reading / reason |
+|---|---|---|
+| `FactorBreak`, `FactorBreaks` (core `restriction::descent`) | alias of `Separation`, `FibreDefect` | the defect now also retains every merged fibre |
+| `CollapsedPair` (engine `receiver_exact_compression`) | alias `ShortestSeparator<ItemId, InputId, ReceiverId, Observation>` | same fields and serde name; wire test against the old derive |
+| `ReconstructionFibre` (engine `receiver_history_compression::observable`) | alias `PreimageFibre<NativeStateId, BTreeSet<ItemId>, _>` (`native`/`sources`, unknown fields allowed) | field `.sources` → `.members` |
+| `NativeCollapsedFibre` (engine `native_spool`) | alias `PreimageFibre<NativeStateId, BTreeSet<EventId>, _>` (`native`/`occurrences`, deny) | `.occurrences` → `.members` |
+| `BoundaryFibre` (engine `native_ecology::recurrent`) | alias `PreimageFibre<NativeStateId, Vec<String>, _>` | `.source_sections` → `.members` |
+| `CondensedFibre` (engine `native_ecology::recurrent_condensation`) | alias `PreimageFibre<u32, Vec<CondensedFibreMember>, _>` | same field names |
+| `AffineReconstructionFibre` (life `situated_difference`) | alias `AffineFibre<_>` (`particular`/`kernel`) | `.kernel` → `.radical`; built by `ExactRatMatrix::affine_fibre` |
+| `SectionSeparator` (life `causal_section`) | alias `ShortestSeparator<String, String, Option<String>, Option<String>>` | the collapsed pair read through the naming chart (`ShortestSeparator::map`); `interventions` → `distinguishing_word`, receiver/observations via accessors; no wire |
+| `PrismaticEndpointFibre` (engine `holonic_chain::serial`) | holds an `AffineFibre` | adds joint limits and the source equation |
+| `NativeExactReconstructionFibre` (engine `native_spool`) | `affine_fibre()`; `validate` delegates the fibre law to `AffineFibre::check_preimage` | wire keeps causal lineage, obstruction and support |
+| `ExactLocalReconstructionFibre` (life `membrane_interior`) | `affine_fibre()`; construction checks through `check_preimage` | wire keeps the functional, partner and hidden difference |
+| `NativeShortestSeparator` (engine `native_spool`) | `shortest_separator()` | wire has a flat, always-present witness |
+| `CondensedSeparator`, `ReopeningSeparator`, `HistorySeparator`, `ForeignCoefficientWordSeparator`, `FactorSupportSeparator` (engine), `DerivationSeparator` (life) | `separation()` | wire records with their own field sets; `ReopeningSeparator` is tested equal to the core factor descent through its quotient |
+| `ReconstructionFibre` (engine `cultivated_rest::schema`) | wire record | candidate list with an omitted-remainder digest (a rest codec, not a quotient class) |
+| `ReconstructionFibre` (engine `native_ecology::continuation`) | distinct | one-entry predecessor/successor reopening receipt: `Transition::reopen`, not a preimage class |
+| `BoundaryReconstructionFibre`, `NativeReceiverFibre` (engine `heterogeneous_fusion`, `inference_membrane`) | wire records | image is the tuple `(address, family, state, boundary)`; five-field wire (owed: `preimage_fibre()` reading) |
+| `NativeFactorReconstructionFibre` (life `native_factor_deposit`) | distinct | kernel beside cokernel annihilator (`open_exterior`), not a preimage of a target |
+| `SectionReconstructionFiber` (life `causal_section`) | kept | carries the exterior-openness flag and no image; owed: `PreimageFibre<usize, BTreeSet<String>>` once the flag moves to the reading |
+| `ReconstructionFiber` (life `reconstruction_fiber`), `MoveSpeciesFiber` (engine) | kept | pass returns holding a focus, a population and the compression; their separators are `CollapsedPair`s |
+| `LowPrecisionPreimageFibre` (engine `holonic_intelligence::weight`) | distinct | a quantizer transition's residual reopening (`source = value + residual`), or an open law |
+| `NativeDepositFibreDelta` (engine `native_spool::deposits`) | distinct | a move-owned increment to a fibre (deliberately not `Clone`) |
+| `ObservationFibre` (core `restriction::tower`) | kept | already the core preimage fibre of the restrict-to-chart receiver, with its sections |
+| `NullFibre`, `ExactAffineVersionFiber`, `ExactPhaseFiber`, `OpenFieldRayFiber`, `JointBilinearFibre`, `ResidentJointBilinearFibre`, `ExactCausalKernelFiber` | distinct | kernel bases, reduced-row affine systems with lineage, implicit bilinear fibres, resident evaluators |
+| `RoundingFibre`, `PathwiseFibre`, `SummedFibre` (engine `cross_chart`) | distinct | interval preimages of rounding (endpoint membership by ties-to-even) |
+| `PluralFibre`, `CrossPresentationFibre`, `DesignSeparator`, `PairwiseSeparator`, `ContactSeparator` | distinct | complete member populations and complete contact comparisons (all separating contacts, never one witness) |
+| `relation_ladder::Separator<F>`, `receiver_atlas::Separator<Z>`, `ObservableMomentReceiverSeparator`, `ConfigurationSeparator`, `MaterialShortestSeparator`, `ShortestHistorySeparator`, life `NativeShortestSeparator`, `ForeignShortestSeparator` | distinct | a separating witness and readings whose pair is held by the caller, a linear separating covector, or a quotient refutation without a pair |
+| arithmetic, analytic, ray, receiver-direction, language, source and example fibres (`PrimeContinuationFiber`, `QuadraticPrimeFiber`, `QuinticGaloisFiber`, `ExactRefractionFiber`, `QuadricRayFiber`, `TorusRayFiber`, `FaceFiber`, `ReceiverDirectionFiber`, `ReceiverFiber`, `RelationalParseFiber`, `CoTestimonyFiber`, `RasterComponentFiber`, `StateFibre`, …) | distinct | fibre bundles, root sets, projective directions and plural parses: another meaning of "fibre" |
+| `ResidentConstitutiveFibre`, `NormalWaveFibre` | distinct | resident constitutive relations (phases 9/11) |
+
+Equality evidence: `holonic-core` `restriction::fibre` tests (named wire, positional/duplicate/
+missing/unknown-field policy, `Debug`, affine preimage and its refusals), the factor-descent test
+now asserting the retained fibre; engine `restriction_fibre_instances` (the four class fibres
+against their old derives, including the spool fixture; the native and condensed separators),
+`receiver_exact_compression` (defect fibres = one-shot blocks of two or more items; `CollapsedPair`
+wire against the old derive), `cross_chart` (the reopening separator equals the core descent);
+life `situated_difference` (every returned fibre is the preimage of its covector and keeps the old
+wire), `causal_section` (each section separator is the collapsed pair mapped through the naming
+chart), `membrane_interior`, `recurrence`.

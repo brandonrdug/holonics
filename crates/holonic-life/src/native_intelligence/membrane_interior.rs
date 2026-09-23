@@ -104,6 +104,15 @@ pub struct ExactLocalReconstructionFibre {
     pub no_global_origin_was_introduced: bool,
 }
 
+impl ExactLocalReconstructionFibre {
+    /// The retained `particular + span(radical)` as the core
+    /// [`AffineFibre`](holonic_core::restriction::AffineFibre): the preimage of
+    /// `returned_overlap` under `receiver_functional` (plan phase 10).
+    pub fn affine_fibre(&self) -> holonic_core::restriction::AffineFibre {
+        holonic_core::restriction::AffineFibre::new(self.particular.clone(), self.radical.clone())
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct FoundedInteriorContact {
@@ -1312,11 +1321,17 @@ fn reconstruction_fibre(
         radical.push(direction);
     }
     let functional_on_hidden_difference = dot(&functional, &hidden)?;
+    // `particular + span(radical)` is the affine preimage of the overlap under the receiver
+    // functional: the core fibre law (plan phase 10).
+    let receiver = ExactRatMatrix::new(vec![functional.clone()])
+        .map_err(|_| MembraneInteriorError::ReconstructionFibre)?;
+    let fibre_is_preimage = holonic_core::restriction::AffineFibre::<
+        holonic_core::restriction::fibre::ParticularRadical,
+    >::new(particular.clone(), radical.clone())
+    .check_preimage(&receiver, std::slice::from_ref(overlap))
+    .is_ok();
     if functional_on_hidden_difference != rat(0)
-        || radical
-            .iter()
-            .any(|direction| dot(&functional, direction).ok() != Some(rat(0)))
-        || dot(&functional, &particular)? != *overlap
+        || !fibre_is_preimage
         || dot(&functional, &partner)? != *overlap
     {
         return Err(MembraneInteriorError::ReconstructionFibre);
@@ -1366,4 +1381,36 @@ fn display_algebraic(error: impl std::fmt::Display) -> MembraneInteriorError {
 
 fn display_sheaf(error: impl std::fmt::Display) -> MembraneInteriorError {
     MembraneInteriorError::Sheaf(error.to_string())
+}
+
+#[cfg(test)]
+mod reconstruction_fibre_tests {
+    use super::*;
+
+    /// Phase 10: the local reconstruction fibre is the core affine preimage of the returned
+    /// overlap under the capacity-weighted receiver functional, and it keeps the hidden partner
+    /// difference in the functional's kernel.
+    #[test]
+    fn the_local_reconstruction_fibre_is_the_core_affine_preimage() {
+        let left = BTreeMap::from([(1, rat(2)), (3, rat(-1))]);
+        let right = BTreeMap::from([(1, rat(1)), (2, rat(5)), (3, rat(1))]);
+        let capacities = BTreeMap::from([(1, 3), (2, 7), (3, 2)]);
+        // ⟨capacity · left, right⟩ = 3·2·1 + 7·0·5 + 2·(−1)·1 = 4.
+        let overlap = rat(4);
+        let fibre = reconstruction_fibre(&left, &right, &capacities, &overlap).unwrap();
+        let receiver = ExactRatMatrix::new(vec![fibre.receiver_functional.clone()]).unwrap();
+        let core = fibre.affine_fibre();
+        core.check_preimage(&receiver, &[overlap.clone()]).unwrap();
+        assert_eq!(core.dimension(), fibre.coordinate_factors.len() - 1);
+        // The presented partner lies in the fibre: particular + hidden difference.
+        let partner = fibre
+            .particular
+            .iter()
+            .zip(&fibre.hidden_difference)
+            .map(|(visible, hidden)| visible + hidden)
+            .collect::<Vec<_>>();
+        assert_eq!(partner, fibre.presented_partner_section);
+        assert_eq!(receiver.apply(&partner).unwrap(), vec![overlap]);
+        assert_eq!(fibre.functional_on_hidden_difference, rat(0));
+    }
 }

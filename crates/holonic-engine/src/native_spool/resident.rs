@@ -248,7 +248,7 @@ impl ReceiverInsufficiency {
             schema: RECEIVER_INSUFFICIENCY_SCHEMA.to_owned(),
             at_occurrence: section.occurrence.occurrence,
             native: section.occurrence.emitting_native,
-            retained_fibre: section.reconstruction_fibre.occurrences.clone(),
+            retained_fibre: section.reconstruction_fibre.members.clone(),
             cause,
             open_exterior,
         };

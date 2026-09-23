@@ -582,7 +582,7 @@ pub(crate) fn stage_thread_deposit(
             .enumerate()
             .find(|(_, fibre)| fibre.native == delta.native)
         {
-            fibre.occurrences.extend(delta.occurrences.iter().copied());
+            fibre.members.extend(delta.occurrences.iter().copied());
             fibre_receipts.push(NativeDepositFibreReceipt {
                 position,
                 native: delta.native,
@@ -591,10 +591,10 @@ pub(crate) fn stage_thread_deposit(
             });
         } else {
             let position = spool.reconstruction_fibres.len();
-            spool.reconstruction_fibres.push(NativeCollapsedFibre {
-                native: delta.native,
-                occurrences: delta.occurrences.clone(),
-            });
+            spool.reconstruction_fibres.push(NativeCollapsedFibre::new(
+                delta.native,
+                delta.occurrences.clone(),
+            ));
             fibre_receipts.push(NativeDepositFibreReceipt {
                 position,
                 native: delta.native,
@@ -825,7 +825,7 @@ pub(crate) fn stage_native_deposit_batch(
                 .enumerate()
                 .find(|(_, fibre)| fibre.native == delta.native)
             {
-                fibre.occurrences.extend(delta.occurrences.iter().copied());
+                fibre.members.extend(delta.occurrences.iter().copied());
                 placement.fibre_receipts.push(NativeDepositFibreReceipt {
                     position,
                     native: delta.native,
@@ -834,10 +834,10 @@ pub(crate) fn stage_native_deposit_batch(
                 });
             } else {
                 let position = spool.reconstruction_fibres.len();
-                spool.reconstruction_fibres.push(NativeCollapsedFibre {
-                    native: delta.native,
-                    occurrences: delta.occurrences.clone(),
-                });
+                spool.reconstruction_fibres.push(NativeCollapsedFibre::new(
+                    delta.native,
+                    delta.occurrences.clone(),
+                ));
                 placement.fibre_receipts.push(NativeDepositFibreReceipt {
                     position,
                     native: delta.native,
@@ -930,21 +930,21 @@ pub(crate) fn withdraw_native_deposit_batch(
                 return Err(NativeSpoolRefusal::ThreadDepositBatchReceipt);
             };
             if fibre.native != fibre_receipt.native
-                || !fibre_receipt.occurrences.is_subset(&fibre.occurrences)
+                || !fibre_receipt.occurrences.is_subset(&fibre.members)
             {
                 return Err(NativeSpoolRefusal::ThreadDepositBatchReceipt);
             }
-            fibre.occurrences = fibre
-                .occurrences
+            fibre.members = fibre
+                .members
                 .difference(&fibre_receipt.occurrences)
                 .copied()
                 .collect();
             if fibre_receipt.fibre_was_founded {
-                if !fibre.occurrences.is_empty() {
+                if !fibre.members.is_empty() {
                     return Err(NativeSpoolRefusal::ThreadDepositBatchReceipt);
                 }
                 spool.reconstruction_fibres.remove(fibre_receipt.position);
-            } else if fibre.occurrences.is_empty() {
+            } else if fibre.members.is_empty() {
                 return Err(NativeSpoolRefusal::ThreadDepositBatchReceipt);
             }
         }

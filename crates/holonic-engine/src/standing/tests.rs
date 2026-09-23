@@ -164,7 +164,11 @@ fn sufficiency_is_the_core_factor_descent_through_the_standing() {
     let SufficiencyVerdict::NotSufficient { left, right, .. } = verdict else {
         panic!("the state receiver refutes the medium standing");
     };
-    let first = descent.defect().expect("it does not descend").first();
+    let first = descent
+        .defect()
+        .expect("it does not descend")
+        .first()
+        .expect("a defect has a separator");
     assert_eq!(first.pair(), (left, right));
     let restriction = standing
         .restriction()

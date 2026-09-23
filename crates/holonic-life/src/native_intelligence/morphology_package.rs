@@ -587,7 +587,7 @@ fn anatomy_projection(
             .spools
             .iter()
             .flat_map(|spool| &spool.reconstruction_fibres)
-            .map(|fibre| fibre.occurrences.len())
+            .map(|fibre| fibre.members.len())
             .sum(),
         shortest_separator_population: hot
             .native()
@@ -786,7 +786,7 @@ mod tests {
             .iter_mut()
             .find(|fibre| fibre.native == NativeStateId(0))
             .expect("the emitted native state carries a fibre")
-            .occurrences
+            .members
             .insert(EventId(3));
         let returned = holonic_engine::soulkiller::SoulkillerDismantlingReturn {
             native: body,

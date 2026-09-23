@@ -619,10 +619,12 @@ fn actual_receiver_history_decides_shared_and_separated_cases() {
     separated_reading.shortest_separators = vec![crate::causal_section::SectionSeparator {
         left: left.to_owned(),
         right: right.to_owned(),
-        interventions: vec!["advance".to_owned()],
-        receiver: Some("exact-value".to_owned()),
-        left_observation: Some("0".to_owned()),
-        right_observation: Some("1".to_owned()),
+        distinguishing_word: vec!["advance".to_owned()],
+        witness: Some((
+            Some("exact-value".to_owned()),
+            Some("0".to_owned()),
+            Some("1".to_owned()),
+        )),
         separated_by_terminus: false,
     }];
     let separated = ReceiverHistoryReturn::found("separated-history", separated_reading).unwrap();

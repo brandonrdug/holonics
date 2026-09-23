@@ -64,6 +64,21 @@ pub struct FactorSupportSeparator {
     pub outside_observation: Observation,
 }
 
+impl FactorSupportSeparator {
+    /// The core [`Separation`](holonic_core::restriction::Separation) (plan phase 10): the pair the
+    /// poorer quotient merges, the receiver that reopens it, and what the two returned.
+    pub fn separation(
+        &self,
+    ) -> holonic_core::restriction::Separation<ItemId, ReceiverId, Observation> {
+        holonic_core::restriction::Separation::new(
+            self.inside,
+            self.outside,
+            self.receiver,
+            (self.inside_observation, self.outside_observation),
+        )
+    }
+}
+
 /// One realization after its support has descended to the refined native action.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DescendedFactorSupport {
@@ -384,8 +399,8 @@ impl ReceiverRestrictedFactorDescent {
                 return Err(ReceiverRestrictedFactorRefusal::InvalidSupport);
             }
             for fibre in &self.quotient.reconstruction_fibres {
-                let intersects = !fibre.sources.is_disjoint(&factor.founding_sources);
-                let contained = fibre.sources.is_subset(&factor.founding_sources);
+                let intersects = !fibre.members.is_disjoint(&factor.founding_sources);
+                let contained = fibre.members.is_subset(&factor.founding_sources);
                 if intersects != contained
                     || contained != factor.native_support.contains(&fibre.native)
                 {
@@ -414,7 +429,7 @@ impl ReceiverRestrictedFactorDescent {
             .reconstruction_fibres
             .iter()
             .find(|fibre| fibre.native == native)
-            .map(|fibre| fibre.sources.clone())
+            .map(|fibre| fibre.members.clone())
             .expect("validated quotient retains every native fibre");
         let realization_addresses = self
             .factors
@@ -572,7 +587,7 @@ impl NativeAnatomyDescentReturn {
         let mut exterior_classes = Vec::with_capacity(quotient.native_population.len());
         for fibre in &quotient.reconstruction_fibres {
             let members = fibre
-                .sources
+                .members
                 .iter()
                 .map(|source| {
                     system
@@ -594,7 +609,7 @@ impl NativeAnatomyDescentReturn {
             }
             let mut predecessor_classes = BTreeSet::new();
             let mut successor_classes = BTreeSet::new();
-            for source in &fibre.sources {
+            for source in &fibre.members {
                 let item = *source;
                 if let Some(predecessor) = system.predecessor.get(&item) {
                     predecessor_classes.insert(native_by_item[predecessor]);
@@ -1137,7 +1152,7 @@ impl<'a> SupportRefinementSystem<'a> {
                 let native_support = quotient
                     .reconstruction_fibres
                     .iter()
-                    .filter(|fibre| fibre.sources.is_subset(&factor.founding_sources))
+                    .filter(|fibre| fibre.members.is_subset(&factor.founding_sources))
                     .map(|fibre| fibre.native)
                     .collect::<BTreeSet<_>>();
                 let inside = *factor

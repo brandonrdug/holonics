@@ -346,7 +346,7 @@ impl NativeCirculationSession {
             }
             let occurrences = fibres
                 .iter()
-                .flat_map(|fibre| fibre.occurrences.iter().copied())
+                .flat_map(|fibre| fibre.members.iter().copied())
                 .collect::<BTreeSet<_>>();
             if occurrences.is_empty() {
                 return Err(NativeSessionError::Boundary);
@@ -538,7 +538,7 @@ mod tests {
             let complete = future
                 .fibres
                 .iter()
-                .flat_map(|fibre| fibre.occurrences.iter().copied())
+                .flat_map(|fibre| fibre.members.iter().copied())
                 .collect::<BTreeSet<_>>();
             assert_eq!(grain.occurrences, complete);
         }

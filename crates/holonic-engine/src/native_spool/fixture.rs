@@ -201,14 +201,8 @@ pub fn spool() -> NativeSpool {
         ],
         mutual_constitutive_responses: Vec::new(),
         reconstruction_fibres: vec![
-            NativeCollapsedFibre {
-                native: NativeStateId(0),
-                occurrences: BTreeSet::from([EventId(2)]),
-            },
-            NativeCollapsedFibre {
-                native: NativeStateId(1),
-                occurrences: BTreeSet::from([EventId(1)]),
-            },
+            NativeCollapsedFibre::new(NativeStateId(0), BTreeSet::from([EventId(2)])),
+            NativeCollapsedFibre::new(NativeStateId(1), BTreeSet::from([EventId(1)])),
         ],
         shortest_separators: Vec::new(),
         interchanges: Vec::new(),
@@ -307,18 +301,9 @@ pub fn detached_spool() -> NativeSpool {
             .collect(),
         mutual_constitutive_responses: Vec::new(),
         reconstruction_fibres: vec![
-            NativeCollapsedFibre {
-                native: NativeStateId(1),
-                occurrences: BTreeSet::from([EventId(1)]),
-            },
-            NativeCollapsedFibre {
-                native: NativeStateId(3),
-                occurrences: BTreeSet::from([EventId(3)]),
-            },
-            NativeCollapsedFibre {
-                native: NativeStateId(4),
-                occurrences: BTreeSet::from([EventId(2)]),
-            },
+            NativeCollapsedFibre::new(NativeStateId(1), BTreeSet::from([EventId(1)])),
+            NativeCollapsedFibre::new(NativeStateId(3), BTreeSet::from([EventId(3)])),
+            NativeCollapsedFibre::new(NativeStateId(4), BTreeSet::from([EventId(2)])),
         ],
         shortest_separators: Vec::new(),
         interchanges: Vec::new(),

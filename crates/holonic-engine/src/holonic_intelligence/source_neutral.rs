@@ -211,14 +211,8 @@ pub fn direct_source_neutral_rest() -> Result<NativeTransportScaffold, NativeSpo
             storage: Rat::from_integer(BigInt::from(1)),
         }],
         reconstruction_fibres: vec![
-            NativeCollapsedFibre {
-                native: NativeStateId(0),
-                occurrences: BTreeSet::from([second]),
-            },
-            NativeCollapsedFibre {
-                native: NativeStateId(1),
-                occurrences: BTreeSet::from([first]),
-            },
+            NativeCollapsedFibre::new(NativeStateId(0), BTreeSet::from([second])),
+            NativeCollapsedFibre::new(NativeStateId(1), BTreeSet::from([first])),
         ],
         shortest_separators: Vec::new(),
         interchanges: Vec::new(),

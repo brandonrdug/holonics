@@ -713,11 +713,7 @@ fn cultivated_consequence(
         .map_err(|error| ScaffoldCultivationError::Ecology(error.to_string()))?;
     let conducted = cut.conducted_section();
     let emitted = cut.emitted_occurrence().clone();
-    let reconstruction_fibre = cut
-        .active_section()
-        .reconstruction_fibre()
-        .occurrences
-        .clone();
+    let reconstruction_fibre = cut.active_section().reconstruction_fibre().members.clone();
     let native_start = conducted.native_start.clone();
     let native_end = conducted.native_end.clone();
     let observations = conducted.observations.clone();

@@ -72,12 +72,13 @@ pub struct RetainedContinuationSection {
     pub open_exterior: Vec<String>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct BoundaryFibre {
-    pub native: NativeStateId,
-    pub source_sections: Vec<String>,
-}
+holonic_core::fibre_field_names!(pub BoundaryFibreNames = "BoundaryFibre", "native", "source_sections", deny);
+
+/// The source sections one native boundary merges: the core
+/// [`PreimageFibre`](holonic_core::restriction::PreimageFibre) under its `native`/`source_sections`
+/// wire (plan phase 10).
+pub type BoundaryFibre =
+    holonic_core::restriction::PreimageFibre<NativeStateId, Vec<String>, BoundaryFibreNames>;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -406,18 +407,20 @@ impl RetainedContinuationPassage {
 
         let fibres = native_population
             .iter()
-            .map(|native| BoundaryFibre {
-                native: *native,
-                source_sections: sections
-                    .iter()
-                    .filter(|section| section.native_boundary == *native)
-                    .map(|section| section.occurrence.clone())
-                    .collect(),
+            .map(|native| {
+                BoundaryFibre::new(
+                    *native,
+                    sections
+                        .iter()
+                        .filter(|section| section.native_boundary == *native)
+                        .map(|section| section.occurrence.clone())
+                        .collect(),
+                )
             })
             .collect::<Vec<_>>();
         let mut reopenings = Vec::new();
         for fibre in &fibres {
-            if fibre.source_sections.len() < 2 {
+            if fibre.members.len() < 2 {
                 continue;
             }
             let readings = sections
@@ -532,7 +535,7 @@ impl RetainedContinuationPassage {
         let fibre_population = self
             .fibres
             .iter()
-            .flat_map(|fibre| fibre.source_sections.iter().map(String::as_str))
+            .flat_map(|fibre| fibre.members.iter().map(String::as_str))
             .collect::<Vec<_>>();
         if section_population.len() != self.sections.len()
             || fibre_population.len() != self.sections.len()

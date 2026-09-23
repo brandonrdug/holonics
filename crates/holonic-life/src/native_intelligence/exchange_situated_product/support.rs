@@ -74,10 +74,10 @@ pub(super) fn situated_local(
         ));
     }
     let overlap_metric = ExactRatMatrix::new(vec![vec![overlap_metric_value]]).map_err(linear)?;
-    let occurrence_fibre = NativeCollapsedFibre {
-        native: branch.pullback.joining_native,
-        occurrences: returned_native.event_reconstruction_fibre.clone(),
-    };
+    let occurrence_fibre = NativeCollapsedFibre::new(
+        branch.pullback.joining_native,
+        returned_native.event_reconstruction_fibre.clone(),
+    );
     let candidate = readdress_section(
         &branch.candidate,
         returned_native.candidate_event,

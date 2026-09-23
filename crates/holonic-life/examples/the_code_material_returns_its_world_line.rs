@@ -916,10 +916,10 @@ fn profile(
             .map(|separator| SeparatorProfile {
                 left: separator.left.clone(),
                 right: separator.right.clone(),
-                interventions: separator.interventions.clone(),
-                receiver: separator.receiver.clone(),
-                left_observation: separator.left_observation.clone(),
-                right_observation: separator.right_observation.clone(),
+                interventions: separator.distinguishing_word.clone(),
+                receiver: separator.receiver().cloned().flatten(),
+                left_observation: separator.left_observation().cloned().flatten(),
+                right_observation: separator.right_observation().cloned().flatten(),
                 separated_by_terminus: separator.separated_by_terminus,
             })
             .collect(),

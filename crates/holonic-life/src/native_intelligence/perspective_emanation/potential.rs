@@ -345,7 +345,7 @@ fn section_to_owned<Standing: MaterialFactorizationStanding>(
         ordered_word: section.ordered_generator_word().to_vec(),
         receiver: consequence.receiver,
         observation: consequence.observation,
-        reconstruction_fibre: section.reconstruction_fibre().occurrences.clone(),
+        reconstruction_fibre: section.reconstruction_fibre().members.clone(),
         successor_sections: successors,
         open_exterior: thread.open_exterior.clone(),
     })

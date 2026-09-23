@@ -691,10 +691,7 @@ fn returned_difference(
             right: returned_event,
             joining_native: occurrence.emitting_native,
         },
-        occurrence_fibres: vec![NativeCollapsedFibre {
-            native: occurrence.emitting_native,
-            occurrences: fibre,
-        }],
+        occurrence_fibres: vec![NativeCollapsedFibre::new(occurrence.emitting_native, fibre)],
         source_transport: ExactRatMatrix::identity(4).map_err(display)?,
         rebased_transport: ExactRatMatrix::identity(4).map_err(display)?,
         source_chart: ExactRatMatrix::identity(4).map_err(display)?,

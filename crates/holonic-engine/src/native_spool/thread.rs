@@ -499,12 +499,16 @@ pub struct NativeGeneratorDescent {
     pub open_domain: BTreeSet<NativeStateId>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct NativeCollapsedFibre {
-    pub native: NativeStateId,
-    pub occurrences: BTreeSet<EventId>,
-}
+holonic_core::fibre_field_names!(pub NativeCollapsedFibreNames = "NativeCollapsedFibre", "native", "occurrences", deny);
+
+/// The occurrences one native state merges: the core
+/// [`PreimageFibre`](holonic_core::restriction::PreimageFibre) under its `native`/`occurrences`
+/// wire (plan phase 10).
+pub type NativeCollapsedFibre = holonic_core::restriction::PreimageFibre<
+    NativeStateId,
+    BTreeSet<EventId>,
+    NativeCollapsedFibreNames,
+>;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -515,6 +519,23 @@ pub struct NativeShortestSeparator {
     pub receiver: ReceiverId,
     pub left_observation: Observation,
     pub right_observation: Observation,
+}
+
+impl NativeShortestSeparator {
+    /// The core [`ShortestSeparator`](holonic_core::restriction::ShortestSeparator) this wire
+    /// carries: a present receiver witness, never a terminus (plan phase 10).
+    pub fn shortest_separator(
+        &self,
+    ) -> holonic_core::restriction::ShortestSeparator<EventId, InputId, ReceiverId, Observation>
+    {
+        holonic_core::restriction::ShortestSeparator {
+            left: self.left,
+            right: self.right,
+            distinguishing_word: self.word.clone(),
+            witness: Some((self.receiver, self.left_observation, self.right_observation)),
+            separated_by_terminus: false,
+        }
+    }
 }
 
 /// The complete consequence of one ordering used by an interchange receipt.
@@ -702,10 +723,10 @@ impl NativeSpool {
         let mut fibre_occurrences = BTreeSet::new();
         let mut fibre_by_occurrence = BTreeMap::new();
         for fibre in &self.reconstruction_fibres {
-            if fibre.occurrences.is_empty() || !self.native_population.contains(&fibre.native) {
+            if fibre.members.is_empty() || !self.native_population.contains(&fibre.native) {
                 return Err(NativeSpoolRefusal::SpoolFibre(self.address.clone()));
             }
-            for occurrence in &fibre.occurrences {
+            for occurrence in &fibre.members {
                 if occurrence_to_emitting.get(occurrence) != Some(&fibre.native)
                     || !fibre_occurrences.insert(*occurrence)
                 {

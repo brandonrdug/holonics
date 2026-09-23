@@ -144,7 +144,7 @@ impl ReceiverHistoryRelation {
         let admitted_interventions = reading
             .shortest_separators
             .iter()
-            .flat_map(|separator| separator.interventions.iter().cloned())
+            .flat_map(|separator| separator.distinguishing_word.iter().cloned())
             .collect::<BTreeSet<_>>();
         let evidence = BTreeSet::from([reading_occurrence.clone()]);
         if let Some(block) = reading
@@ -172,8 +172,8 @@ impl ReceiverHistoryRelation {
                 admitted_interventions,
                 shared_block: None,
                 shortest_separator: Some((
-                    separator.interventions.clone(),
-                    separator.receiver.clone(),
+                    separator.distinguishing_word.clone(),
+                    separator.receiver().cloned().flatten(),
                     separator.separated_by_terminus,
                 )),
                 open_fibre: None,

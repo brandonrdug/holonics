@@ -169,7 +169,7 @@ impl ResidentSourceNeutralEcology {
             .compression
             .reconstruction_fibres
             .iter()
-            .all(|fibre| fibre.sources.len() == 1)
+            .all(|fibre| fibre.members.len() == 1)
             && self
                 .receiver_history
                 .compression

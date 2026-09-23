@@ -491,10 +491,10 @@ mod tests {
                     observation: Observation(5),
                 }],
                 mutual_constitutive_responses: Vec::new(),
-                reconstruction_fibres: vec![NativeCollapsedFibre {
+                reconstruction_fibres: vec![NativeCollapsedFibre::new(
                     native,
-                    occurrences: BTreeSet::from([event]),
-                }],
+                    BTreeSet::from([event]),
+                )],
                 shortest_separators: Vec::new(),
                 interchanges: Vec::new(),
                 open_exterior: Vec::new(),
