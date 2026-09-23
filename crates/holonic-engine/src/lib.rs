@@ -162,7 +162,6 @@ pub mod cuda_refine;
 #[cfg(target_os = "linux")]
 pub mod cuda_relation;
 pub mod derivation_atlas;
-pub mod device;
 pub mod diffusion;
 mod digest;
 pub use digest::is_sha256_digest;
@@ -635,7 +634,6 @@ pub use cuda_aperture::*;
 pub use cuda_refine::*;
 #[cfg(target_os = "linux")]
 pub use cuda_relation::*;
-pub use device::*;
 pub use diffusion::*;
 pub use dimensional_receiver::*;
 pub use dimensional_wave::*;

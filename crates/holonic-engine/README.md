@@ -606,9 +606,9 @@ worker population and restores canonical logical order. Continuous
 cross-receiver arrangement pairs and terminal cell classification both use
 this executor; serial and multicore outputs are identical.
 
-`ExactDeviceExecutor` is the low-level device ABI. `admit_device` compares a
-candidate backend against the exact CPU authority and refuses it on any
-cardinality or value difference. `CudaApertureExecutor` is the concrete native
+The retired `ExactDeviceExecutor` was a generic three-task parity experiment;
+no resident operation consumed it. Its admission criterion is recorded in the
+hardware boundary guide. `CudaApertureExecutor` is the concrete native
 CUDA receiver path. It compiles its integer kernel from source, carries
 segments as finite homogeneous integer endpoints through a signed-magnitude
 128-bit host/card coefficient seam, and selects exact signed `i128`, 192-bit,

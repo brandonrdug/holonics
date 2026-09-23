@@ -289,15 +289,20 @@ host/native surface whose exact owners can compile without `libcuda`. The repair
 same native operation and return an explicit unsupported-device obstruction when no admitted
 backend is present.
 
-[established-bounded; source-inspected] `DeviceBackend` and `ExactDeviceExecutor` in
-[`device.rs`](../crates/holonic-engine/src/device.rs) provide a small exact parity vocabulary,
-but only `CpuExactDevice` implements it. The native resident lifecycle does not currently use
-this trait; `NativeTransportScaffold` constructs `CudaRefineExecutor` directly at
+[historical Rust mirror; source-inspected] The removed `device.rs` declared a small parity ABI
+for three unrelated exact tasks; only its CPU oracle implemented the trait, and no native
+resident operation consumed it. Its reusable admission criterion is: run a declared corpus
+through the exact CPU authority and candidate backend, require the same number of results in the
+same order with equal exact values, and issue a receipt identifying the candidate and task count.
+Equality of these task results did not establish parity for the resident HNN operation.
+`NativeTransportScaffold` constructs `CudaRefineExecutor` directly at
 [`scaffold.rs`](../crates/holonic-engine/src/native_spool/scaffold.rs).
 
-[open; source-inspected] Implementing `ExactDeviceExecutor` for another device would not by itself
-port native HNN. The native mount, resident carrier, operation scheduling, multiword arithmetic,
-and successor commit still need one coherent backend owner.
+[open; source-inspected] Implementing the historical three-task parity trait for another device
+would not by itself port native HNN. The native mount, resident carrier, operation scheduling,
+multiword arithmetic, and successor commit still need one coherent backend owner. Any future
+backend admission must compare the consuming operation's complete declared result and receipt on
+its declared corpus; the generic criterion above is necessary and not sufficient evidence.
 
 ## MLX as an architectural comparison
 
