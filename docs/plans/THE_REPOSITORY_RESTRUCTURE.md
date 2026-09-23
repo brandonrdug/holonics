@@ -87,9 +87,10 @@ Each is backed by a measurement at `d3b8b509`.
 10. **The Lean foundation is cut at a few measured edges.** The R0 `Framework` closure
     (188k lines) contains 292 Millennium files (119k lines) and 52 RH files (13k lines). They enter
     through few edges:
-    - `Framework.Core` reaches five small Millennium modules **transitively** through its
-      Foundation imports; they are foundation objects filed by history: `Gluing`,
-      `HolonicDirectedPassage`, `Receiver`, `ReceiverHistory`, `Separation`.
+    - At R0, `Framework.Core` reached five small Millennium modules **transitively** through
+      Foundation imports: `Gluing`, `HolonicDirectedPassage`, `Receiver`, `ReceiverHistory`, and
+      `Separation`. Their generic declarations have moved to Foundation owners; the measured
+      current Core source closure has no Millennium or RH import path.
     - The former `Objects/Ratio → Millennium/HolonicGaugeCovariance →
       HolonicConnectionVariation` edge pulled 45k lines across 105 files. Ratio-facing gauge and
       connection calculus now has core owners at `Objects/Ratio/GaugeCalculus` and
@@ -99,8 +100,12 @@ Each is backed by a measurement at `d3b8b509`.
       source closure: `Objects/Ratio` still reaches 47,269 lines through its separate
       `Physics/InformationDifference` import in the current source graph. Measure the actual Lake
       closure after all §0.10 cuts; do not credit this one edge with deleting those shared modules.
-    - `Holon/MomentStorage` imports `Millennium/HolonicQuadraticMomentCondensation` (472 lines).
-      Its import `HolonicGranularBoundaryRadiation` pulls 48k lines across 111 files.
+    - At R0, `Holon/MomentStorage` imported `Millennium/HolonicQuadraticMomentCondensation`,
+      whose `HolonicGranularBoundaryRadiation` import pulled 48k lines across 111 files. The
+      generic quadratic moment and receiver contraction now live in `Holon/QuadraticMoment`;
+      `MomentStorage` and `ScrewGeometry` import that owner directly. Distinct research
+      condensation theorems remain in the Millennium file. Other Framework imports still reach
+      research, so this local cut does not establish a research-free Framework.
     - `Framework.Physics` reaches 345 research files.
 
     Moving the declarations these edges actually use into `Holonics` owners removes most of the
