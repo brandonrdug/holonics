@@ -2153,18 +2153,6 @@ mod tests {
     // -----------------------------------------------------------------------------------------
     // grown material
 
-    /// Not a fixture: a circuit the machine grew, read on a cyclic receiver.
-    ///
-    /// The entries are conduction counted by displacement class, so they are whatever the growth put
-    /// there — and the test asserts they are beyond `{0,1}` so the law is visibly not a property of
-    /// the adjacency fixture.
-    ///
-    /// All three schedules are grown because the net identifier is a *schedule coordinate*, so the
-    /// charts genuinely differ. The claim under test is the one that survives that: the character
-    /// route and the elimination return one split on every chart. The schedule dependence is
-    /// **measured here rather than asserted away**, because an invariant is only visible across two
-    /// frames and a suite that never varied the frame could not tell the two apart.
-    #[test]
     // -----------------------------------------------------------------------------------------
     // the depth the material states
 
