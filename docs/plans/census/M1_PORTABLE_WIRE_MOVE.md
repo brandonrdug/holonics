@@ -19,21 +19,26 @@ and `presentation`.
 The moved source modules carry their inline unit tests. The two package-level REGISTER tests and
 the cooperative CONTACT extent test moved from `soma-abi/src/tests.rs` to `holonics-portable`'s
 `wire::tests`. `soma-abi`'s `current`, `holon`, and `presentation` modules and their tests are kept
-unchanged. No kernel source behavior, committed PTX artifact, entry signature or serialized
-identifier is intentionally changed; PTX regeneration and parity checks remain pending coordinated
-verification.
+unchanged. No kernel source behavior, entry signature or serialized identifier is intentionally
+changed. The pinned PTX regeneration and parity checks below establish the bounded result of
+that source move.
 
 ## Verification status
 
-No builds or device runs were performed in this cut. Required focused gates are:
-
-- `cargo test --locked -j 2 -p holonics-portable` and `cargo test --locked -j 2 -p soma-abi`;
-- `cargo check --locked -j 2 -p holonics-cuda -p life -p holonic-engine -p holonics-hna -p holon-plate --all-targets`;
-- rebuild the detached kernel using `accelerators/cuda-kernel/build-ptx.sh` on the pinned nightly,
-  verify all exported entry names/parameter signatures and normalized instruction bodies against
-  the committed PTX, accounting only for the established stable source-path remap;
-- run the existing `mount-register-gate` and `mount-register-remount-gate` on the admitted CUDA
-  device, and the applicable event/link gates for the live-current schemas.
-
-The moved `register` and `contact` tests check their word extents and register symbols on the
-portable host. Device gates are still needed to establish host/card parity.
+- `cargo check --locked -j2 --workspace --all-targets`: passed, including the dependent HNN,
+  life, engine, CUDA, and application targets.
+- `cargo test --locked -j2 -p holonics-portable -p soma-abi`: 168 portable tests passed with
+  2 ignored; 4 remaining ABI tests passed. The moved `register` and `contact` tests check
+  their word extents and register symbols on the portable host.
+- `accelerators/cuda-kernel/build-ptx.sh` on pinned `nightly-2026-05-22`: passed;
+  `ptxas -arch=sm_89` assembled the regenerated artifact. The prior PTX SHA-256 was
+  `c42c65c86a687b8f7baf1ed7d215ca982a7e13b21cf882190219c00fd1726d3a`; the new
+  artifact is `dd68dd2daf076c7e38130118ff12ff50df9d4e7d9422aadfb36e42ba2394b154`.
+  All 37 exported entry names and parameter-type sequences match. Each exported entry body
+  matches after normalizing Rust-mangled internal symbols, LLVM symbol suffixes, and anonymous
+  symbol hashes; the complete PTX differs because moved module names and function ordering
+  change internal symbols. This comparison does not assert identical helper-function names.
+- Under `.local/gpu.lock` on the RTX 4080 SUPER, `mount-link-gate`, `mount-scope-gate`,
+  `mount-register-gate`, and `mount-register-remount-gate` all passed against the regenerated
+  artifact. The link, scope, and register gates report exact card/reference results; the
+  remount gate reports exact fresh-context continuation.
