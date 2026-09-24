@@ -780,15 +780,26 @@ roots in §0.11.
    tests, per-check receipt logging and `mount-*` gate binaries.
 2. **R4: compatibility debt.** Remove the positional/old-length rest decoders and the serde
    defaults for absent legacy fields (§0.2).
-3. **M1: the Rust cut.**
-   - Move the source-neutral engine into `holonics` and the resident HNN (`native_ecology`,
-     `resident_section`, `embedding_fiber`, `cuda_refine`, the kernels and `build.rs`) into
-     `holonics-cuda::hnn`, following §0.3's dependency seam.
-   - Retire at item level on the way: anything the moved owners do not use stays behind and is
-     deleted with `holonic-engine`.
-   - Retire the `holonics-hna` name: its field sessions and stream go to `holonics::hnn` (law) and
-     `holonics-cuda::hnn` (resident). Check the non-field sessions (native, wave, coupled-wave,
-     mathematical) against the field, and retire the superseded ones.
+3. **M1: merge and prune (the Rust cut).** Measured on main at `307baad2`:
+   - 8 engine modules touch CUDA directly: `native_ecology`, `front_passage`, `resident_section`,
+     `cuda_refine`, `embedding_fiber`, `streamed_standing`, `cuda_aperture`, `cuda_relation`;
+     together 149k lines.
+   - 97 more modules (348k lines in all) reach one of those.
+   - Only 31 modules (37k lines) are source-neutral.
+
+   Untangling a backend-neutral seam module by module (§0.3's draft) would take weeks. Instead:
+   1. Move the 31 source-neutral modules into `holonics`, at their operator homes.
+   2. Merge the rest of `holonic-engine`, and `holonics-hna`, into `holonics-cuda`, with no
+      behaviour change: engine modules become crate modules, and the HNN crate becomes
+      `holonics_cuda::hnn`. This removes the engine→CUDA cycle and the `holonics-hna` name at
+      once. The workbench depends on `holonics` and `holonics-cuda`.
+   3. Prune at item level with the compiler. Make every module `pub(crate)` except the public
+      HNN session/stream API that the workbench and the kept Athena examples use. Delete what
+      `dead_code` reports, and repeat until it reports nothing. Tests of deleted items go with
+      them.
+   4. Afterwards, K2 extracts the backend-neutral HNN law into `holonics::hnn`, method by method.
+
+   The result is two libraries (`holonics`, `holonics-cuda`) and the workbench.
 4. **C: phase 14** (the cultivated body) on the moved tree.
 5. **R3 remainder and M2 (Lean).** Remove the duplicate and wrapper theorems the audit found, cut
    the Physics research ingress, then move to `lean/` as `Holonics` + `HolonicsResearch`.
