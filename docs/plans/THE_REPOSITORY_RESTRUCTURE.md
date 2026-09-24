@@ -31,14 +31,55 @@ Each is backed by a measurement at `d3b8b509`.
    save-format reader goes** (Brandon, September 23): a saved artifact in an old format is a
    superseded prototype, so no legacy decoder is kept. `.local/artifacts` and `.local/campaign-*`
    stay on disk as private evidence, not as formats the code must read.
-3. **The HNN is device-resident today, so its move and its backend-neutral port are separate
-   steps.** Of 219 `native_ecology` files, 106 launch kernels or hold resident sections. So do 35 of
-   93 `holonics-hna` files. No host reference implementation of the HNN field exists, and the engine's
-   `build.rs` runs `nvcc`. The resident HNN therefore moves **as it is** into `holonics-cuda::hnn`.
-   Main `holonics::hnn` owns the backend-neutral part: the field law, source moments, adjoint
-   contracts, the execution-port trait and, over time, a host reference. The port and host
-   reference are then built method by method (campaign K2 in §4). Neither blocks the restructure.
-   `holonics-apple` implements the same port later.
+3. **The HNN is device-resident today; extract its smallest backend-neutral seam before moving
+   its resident implementation.** Of 219 `native_ecology` files, 106 launch kernels or hold resident
+   sections. So do 35 of 93 `holonics-hna` files. No host reference implementation of the HNN field
+   exists, and `holonic-engine/build.rs` runs `nvcc`. The intended resident HNN still moves
+   behavior-for-behavior into `holonics-cuda::hnn`. The measured package graph sets a prerequisite:
+   `holonic-engine` depends on both `holonics` and `holonics-cuda`, while `holonics-cuda` currently
+   depends on `holonics` and `holonics-portable`. Moving engine-owned code into CUDA before removing
+   the engine-to-CUDA edge would create the Cargo cycle
+   `holonic-engine -> holonics-cuda -> holonic-engine`. Its current consumers add a second
+   constraint: `holonic-life` depends on both engine and CUDA, and `holonics-hna` depends on engine
+   and life. Retarget those callers as part of the owner move; they do not authorize a reverse
+   dependency from the backend into engine.
+
+   The resident closure is larger than `resident_section.rs`: its nested `resident_section/**`
+   modules call CUDA and import `holonic-engine::cuda_aperture::DerivedLaunch` and
+   `embedding_fiber::{MountedReadout, ResidentReadout}`; the constitutive field at
+   `native_ecology/constitutive_fibre/field.rs` and its `field/**` operators consume those sections
+   and engine-owned current, wave, circulation and material owners; `embedding_fiber` itself owns
+   CUDA-resident reads. The CUDA kernels under `holonic-engine/kernels/` are compiled by the engine's
+   `build.rs`. HNA session consumers live in `holonics-hna/src/native/**`, and some device lineage
+   consumers live in `holonic-life`. These owners must move or be retargeted with their consuming
+   call; moving only the section module cannot invert the dependency.
+
+   The first M1 packet is a backend-neutral boundary in `holonics::hnn` for the resident field's
+   input section, returned section/receipt, and typed refusal, using the already shared
+   `holonics-portable::wire` layout where host and device need identical words. Main owns the
+   backend-neutral values, ordering and receipt meaning; it owns no CUDA handle, allocation,
+   launch, stream, or device buffer. CUDA owns the resident allocation and converts to/from the
+   shared words. The first implementation packet is: define this boundary in `holonics::hnn`, move
+   the existing section-rest/receipt value owner to it, and retarget the current resident field
+   call and its tests to consume/return that value. Keep the device section and its behavior in its
+   existing owner for this packet. Do not add a crate, forwarding module, compatibility alias, or
+   speculative public trait signature. This extraction is only the dependency-inversion seam: it
+   does not claim a host reference or full method-by-method conformance.
+
+   The section/receipt seam is necessary but not sufficient to move the field. Before the resident
+   closure can compile in CUDA, M1 also moves or recasts the engine-owned current, wave, material
+   and readout value owners it imports as main-library mathematical values or typed boundary
+   operands. `DerivedLaunch` describes device admissions and belongs with the CUDA section/launch
+   owner. The engine's other CUDA callers must likewise move to CUDA or call through a main-owned
+   boundary, until no engine-to-CUDA edge remains. Keep device buffers, kernels, launch and
+   completion in CUDA; do not pull them into main to satisfy an import.
+
+   After these dependency cuts, M1 moves the resident closure with its current behavior, kernels
+   and `build.rs` into `holonics-cuda::hnn`, updates HNA/life callers, and removes every
+   `holonic-engine -> holonics-cuda` dependency edge. Campaign K2 in §4 later develops the complete
+   backend-neutral field law, source moments, adjoint contracts, execution-port methods, host
+   reference, and method-by-method relation to the resident CUDA return. `holonics-apple`
+   implements that port later.
 4. **Crate count: three maintained Linux libraries, Apple later.** At the R0 source census, the
    detached Rust NVPTX kernel compiled shared `no_std` laws from both `body` and `soma-abi`, including
    carriage, manifold, medium, number, register, active-current and section-layout operators.
@@ -382,11 +423,13 @@ an interaction that the incidence and constitution do not contain.
 The HNN execution port is defined at its surviving consuming call, including the forward
 field, complete geometry/feature pullback, material return, source order, receiving phase and
 receipt. The host/reference implementation and CUDA implementation must return the same typed
-relation at their stated precision. The apparatus package now has its target owner; the resident HNN cut remains: engine imports
-`holonics-cuda` and runs `nvcc`; resident field owners remain in engine/HNA/life; exact rings belong
-to `holonics::ratio::ring`; and the HNN field has no host reference (§0.3). M1 moves the resident HNN into
-`holonics-cuda` with its current behavior. K2 then extracts the port and host reference one
-method at a time, each against the CUDA return. A module with a distinct
+relation at their stated precision. The apparatus package now has its target owner. The resident
+HNN cut remains: `holonic-engine` imports `holonics-cuda` and runs `nvcc`; resident field owners
+remain in engine/HNA/life; exact rings belong to `holonics::ratio::ring`; and the HNN field has no
+host reference (§0.3). M1 first establishes the backend-neutral section/receipt seam in
+`holonics::hnn`, then moves the resident dependency closure into `holonics-cuda` with current
+behavior while removing the engine-to-CUDA edge. K2 later develops the complete execution port and
+host reference one method at a time against the CUDA return. A module with a distinct
 mathematical consumer survives in its object owner; unconsumed legacy scaffolding retires.
 
 A separate `holonics-hnn` package is a measured fallback, not the default design. If the
@@ -729,14 +772,28 @@ existing suites (§0.9):
    records its current operand-rest cut; the [Phase 12b return](census/C_PHASE12B_INTEGRATION.md)
    records coupled v7/v12 and published-continuation rest. Both name remaining C acceptance.
 7. **M1: the Rust cut.**
-   - Create `holonics-cuda` and move the driver, sections, kernels and the resident HNN into it as
-     they are (§0.3).
+   - Establish the minimal backend-neutral HNN section/receipt boundary in `holonics::hnn`, with
+     the shared packet words owned by `holonics-portable::wire`; make the current consuming field
+     call use that boundary. This is the dependency-inversion prerequisite in §0.3, not K2's host
+     reference or full execution-port conformance.
+   - Extract the field's engine-owned current, wave, material and readout values to main or make
+     them explicit typed boundary operands; move `DerivedLaunch` to the CUDA section/launch owner;
+     and move or recast every remaining engine CUDA caller until the engine-to-CUDA edge is gone.
+     Then move the CUDA resident closure—driver-facing resident sections, `embedding_fiber`, field
+     operators, CUDA kernels and their `build.rs`—into `holonics-cuda::hnn` with behavior and wire
+     unchanged. Move/update HNA and life callers with their owners. Never add a CUDA-to-engine edge
+     to bridge the move.
    - Merge `holonic-core`, `relational-geometry`, live `holonic-structure`, the source-neutral
      engine, the live membrane receive/standing runtime and extraction into substantive
      `holonics`. Move backend-specific membrane execution with the resident CUDA HNN.
    - Update every caller in the same commits (§0.2).
-   - Verify: `holonics` builds without CUDA, `holonics-cuda` owner tests pass on the card, and
-     the workbench/all-target check passes.
+   - Verify the seam packet with `holonics` all-target compilation and its focused section/receipt
+     owner tests, plus the current field consumer tests. For the resident move, run the locked
+     workspace all-target check, regenerate/validate the relocated CUDA PTX from the moved kernels
+     and its exported entry ABI, then run focused section/field and native-rest tests plus
+     `mount-link-gate`, `mount-register-gate`, `mount-register-remount-gate` and `mount-scope-gate`
+     on the card under the GPU lock. Also verify `holonics` builds without CUDA and the workbench
+     check passes. Record each command and receipt in the M1 census.
    - Clean the old `target/`.
 
    **M1 dependency and core owner cuts:** `holonics` no longer depends on HNA, engine or life,
