@@ -368,81 +368,20 @@ fn mathematical_product_and_code_share_the_field_native_ports() {
     .unwrap();
 }
 
-/// **A pre-12a incident session wire decodes and continues.** Its presentation carried a frozen
-/// encoder/receiver cut per pending comparison (`frozen_text`, `frozen_support`,
-/// `frozen_cohorts`, producing encoder columns) and its body the `\x01` frozen word. Both
-/// decode: the presentation's pending entry is checked against the retained request and
-/// dropped, the body's word becomes its boundary operand, and the comparison continues exactly
-/// as the live session's at the same cut.
+/// A current incident session saves pending operands and returns them after remount.
 #[test]
-#[ignore = "requires CUDA; a pre-12a incident session wire with frozen receiver cuts decodes and continues"]
-fn a_pre_12a_incident_session_wire_decodes_and_continues() {
-    use super::super::incident_application::rest::IncidentPendingRest;
+#[ignore = "requires CUDA; current incident pending rest roundtrips and continues"]
+fn current_incident_session_pending_operands_roundtrip_and_continue() {
     let directory = tempfile::tempdir().unwrap();
-    let path: PathBuf = directory.path().join("legacy.session");
+    let path: PathBuf = directory.path().join("current.session");
     let spec = spec();
     let live = with_field_session(&spec, |session| {
         let produced = session.request(&request(true))?;
         let id = produced["comparison"].as_u64().unwrap();
         let reading = session.inspect_incident_comparison(id)?;
-        // The retired wire, as a pre-12a build wrote it.
-        let incident = session.incident.as_ref().unwrap();
-        let retained = session.presentation.retained_shared[&id].clone();
-        let preparation = IncidentPreparation::from_request(&session.presentation.spec, &retained.request)?;
-        let symbols = preparation
-            .source_cells
-            .iter()
-            .map(|cell| cell.symbol_index)
-            .collect::<Vec<_>>();
-        let encoded = incident.encoder.encode(&symbols)?;
-        let bytes = |rest: holonic_engine::native_ecology::constitutive_fibre::NormalMaterialRest| {
-            let mut bytes = Vec::new();
-            rest.write(&mut bytes).unwrap();
-            bytes
-        };
-        let mut presentation = incident.rest()?;
-        presentation.pending = vec![IncidentPendingRest {
-            id,
-            encoded_symbols: symbols,
-            encoded_rows: encoded.rows.rest()?.canonical_bytes().map_err(invalid)?,
-            encoded_row_count: encoded.rows.rows(),
-            encoded_width: encoded.rows.components(),
-            grain_bits: encoded.rows.grain().0,
-            encoded_producing_material: incident
-                .encoder
-                .rest()?
-                .into_iter()
-                .map(bytes)
-                .collect(),
-            frozen_text: bytes(incident.receiver.text_rest()?),
-            frozen_support: bytes(incident.receiver.support_rest()?),
-            frozen_cohorts: incident.receiver.cohorts().to_vec(),
-            frozen_cohort_material: incident
-                .receiver
-                .text_cohort_rests()?
-                .into_iter()
-                .map(bytes)
-                .collect(),
-            preparation,
-        }];
-        let header = serde_json::to_vec(&FieldSessionHeader {
-            spec: session.presentation.spec.clone(),
-            state: HnaStreamState::default(),
-            pending_extents: BTreeMap::new(),
-            retained_shared: session.presentation.retained_shared.clone(),
-            issued_shared: session.presentation.issued_shared,
-            exposure: None,
-            incident: Some(presentation),
-            generator: None,
-        })?;
-        let body = session.body.legacy_frozen_incident_rest()?;
-        assert_eq!(&body[1..20], b"HNA-INCIDENT-FIELD\x01");
-        let mut wire = INCIDENT_MAGIC.to_vec();
-        for part in [&header, &body] {
-            wire.extend((part.len() as u64).to_le_bytes());
-            wire.extend(part.iter());
-        }
-        std::fs::write(&path, &wire)?;
+        session.checkpoint(&path, &HnaStreamState::default())?;
+        let wire = std::fs::read(&path)?;
+        assert!(wire.starts_with(INCIDENT_MAGIC));
         let returned = session.observe(id, "ba", 3)?;
         Ok((
             id,

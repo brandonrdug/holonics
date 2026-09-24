@@ -486,46 +486,6 @@ impl<'c> IncidentFieldModel<'c> {
         })
     }
 
-    /// Convert a retired `\x02` source tape into its passage comparison: the tape's encoded rows
-    /// are the retained operands; `m` and `c` are accumulated through this body's source maps (the
-    /// contemporary law), and every per-occurrence word of the tape is dropped.
-    pub(super) fn comparison_from_tape(
-        &self,
-        binding: GeneratorSourceBinding,
-        start: u64,
-        encoded: &ResidentNormalEnclosureSection<'c>,
-        contacts: &[GeneratorSourceContact],
-        joint: usize,
-        admitted: Vec<Vec<bool>>,
-        epoch: u64,
-    ) -> Result<RetainedComparison<'c>, NativeSessionError> {
-        let meta = GeneratorSourceMomentMeta {
-            contact_counts: contact_counts(&binding.contact_kinds, contacts),
-            binding,
-            start,
-            rows: encoded.rows(),
-            components: encoded.components(),
-            alphabet: None,
-            present_symbols: Vec::new(),
-        };
-        if meta.rows == 0 {
-            return Err(invalid("generator source tape rows"));
-        }
-        self.validate_source_meta(&meta)?;
-        let maps = self.source_maps(&meta, encoded.grain())?;
-        let ports = source_ports(&meta.binding.contact_kinds, &meta.binding.offsets)?;
-        let condition =
-            phase_weighted_source_condition(&maps, encoded, &ports, contacts)?.map(Rc::new);
-        let moment = Rc::new(maps.moment(encoded)?);
-        self.remount_comparison(
-            Some(meta),
-            ComparisonSource::Rows { moment, condition },
-            vec![false; joint / 2],
-            admitted,
-            epoch,
-        )
-    }
-
     /// Read a symbol passage's `m` and `c` through the table `E` (`|A| × 6S`).
     fn read_symbol_sums(
         &self,

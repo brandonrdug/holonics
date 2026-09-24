@@ -1648,20 +1648,6 @@ impl<'c> IncidentFieldModel<'c> {
 
 #[cfg(test)]
 impl NativeCoupledBody<'_> {
-    /// Test fixture: this incident body written in the retired `\x01` frozen layout, as a
-    /// `SavedCoupledBody` wire (scope tag included).
-    pub(crate) fn legacy_frozen_incident_rest(&mut self) -> Result<Vec<u8>, NativeSessionError> {
-        let BodyState::Incident(model) = self.state_mut()? else {
-            return Err(invalid("legacy incident fixture requires its model chart"));
-        };
-        let mut bytes = vec![3];
-        NativeIncidentModelRest::write_legacy_frozen(model, &mut bytes)?;
-        Ok(bytes)
-    }
-}
-
-#[cfg(test)]
-impl NativeCoupledBody<'_> {
     /// Test diagnostic: zero the selected power-neutral reaction blocks (linear `W_s`, contrast
     /// coupling `W_c`, modulated slices) of every reaction material.
     pub(crate) fn zero_reaction_blocks(

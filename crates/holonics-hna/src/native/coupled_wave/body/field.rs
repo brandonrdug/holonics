@@ -5,11 +5,10 @@ mod geometric;
 pub mod incident;
 mod section;
 use holonic_engine::native_ecology::constitutive_fibre::{
-    ConstitutiveSourceChart, FieldReactionEnclosure, FieldReactionEnclosureRest,
-    GeneratorNeighborhoodRest, NativeConstitutiveField, NativeFieldCurrentSource,
-    NativeFieldCurrentSourceRest, NativeFieldRest, ResidentConstitutiveCurrent,
-    ResidentContextualSection, ResidentGeneratorNeighborhood, ResidentHeldSection,
-    ResidentHeldSectionRest, ResidentNormalEnclosure, ResidentNormalEnclosureView,
+    ConstitutiveSourceChart, FieldReactionEnclosure, GeneratorNeighborhoodRest,
+    NativeConstitutiveField, NativeFieldCurrentSource, NativeFieldRest,
+    ResidentConstitutiveCurrent, ResidentContextualSection, ResidentGeneratorNeighborhood,
+    ResidentHeldSection, ResidentNormalEnclosure, ResidentNormalEnclosureView,
 };
 use holonic_engine::resident_section::{ResidentGrain, ResidentSectionRest};
 use serde::{Deserialize, Serialize};
@@ -525,7 +524,7 @@ impl<'c> FieldModel<'c> {
             .pending
             .iter()
             .map(|(id, p)| {
-                Ok(FieldPendingRest::Operands {
+                Ok(FieldPendingRest {
                     id: *id,
                     epoch: p.epoch,
                     input: p.input.rest()?,
@@ -552,34 +551,15 @@ impl<'c> FieldModel<'c> {
     }
 }
 
-/// One outstanding comparison at rest. Written as its producing operands (extension `4`); a
-/// pre-12a frozen producing section (extensions `2`/`3`) still decodes and is converted to the
-/// same operands at remount, dropping its frozen field source, reaction material and output.
+/// One current-format outstanding comparison at rest. Extension `4` stores only its producing
+/// operands; extensions `2` and `3` stored a frozen producing cut and are superseded formats.
 #[derive(Debug, PartialEq, Eq)]
-enum FieldPendingRest {
-    Operands {
-        id: u64,
-        epoch: u64,
-        input: ResidentSectionRest,
-        condition: ResidentSectionRest,
-        held: Option<Vec<bool>>,
-    },
-    Frozen {
-        id: u64,
-        epoch: u64,
-        source: NativeFieldCurrentSourceRest,
-        reaction: FieldReactionEnclosureRest,
-        input: ResidentSectionRest,
-        output: ResidentSectionRest,
-        receiver: Option<ResidentHeldSectionRest>,
-    },
-}
-impl FieldPendingRest {
-    fn id(&self) -> u64 {
-        match self {
-            Self::Operands { id, .. } | Self::Frozen { id, .. } => *id,
-        }
-    }
+struct FieldPendingRest {
+    id: u64,
+    epoch: u64,
+    input: ResidentSectionRest,
+    condition: ResidentSectionRest,
+    held: Option<Vec<bool>>,
 }
 
 /// Native field, reaction and outstanding producing comparisons using their existing cold
@@ -603,7 +583,7 @@ fn field_blob(out: &mut impl Write, bytes: &[u8]) -> Result<(), NativeSessionErr
 }
 impl NativeFieldModelRest {
     pub(super) fn has_prediction(&self, id: u64) -> bool {
-        self.pending.iter().any(|p| p.id() == id)
+        self.pending.iter().any(|p| p.id == id)
     }
     pub(super) fn roots(&self) -> usize {
         self.field.nodes()
@@ -615,15 +595,6 @@ impl NativeFieldModelRest {
         self.epoch
     }
     pub(super) fn write(&self, out: &mut impl Write) -> Result<(), NativeSessionError> {
-        if self
-            .pending
-            .iter()
-            .any(|p| matches!(p, FieldPendingRest::Frozen { .. }))
-        {
-            return Err(invalid(
-                "a decoded frozen field comparison converts to its operands at remount; remount the body before writing it",
-            ));
-        }
         for value in [
             self.member as u64,
             self.epoch,
@@ -652,21 +623,11 @@ impl NativeFieldModelRest {
             ])?;
             out.write_all(&(self.pending.len() as u64).to_le_bytes())?;
             for pending in &self.pending {
-                let FieldPendingRest::Operands {
-                    id,
-                    epoch,
-                    input,
-                    condition,
-                    held,
-                } = pending
-                else {
-                    unreachable!("frozen entries are refused above")
-                };
-                out.write_all(&id.to_le_bytes())?;
-                out.write_all(&epoch.to_le_bytes())?;
-                field_blob(out, &input.canonical_bytes().map_err(invalid)?)?;
-                field_blob(out, &condition.canonical_bytes().map_err(invalid)?)?;
-                let mask = held
+                out.write_all(&pending.id.to_le_bytes())?;
+                out.write_all(&pending.epoch.to_le_bytes())?;
+                field_blob(out, &pending.input.canonical_bytes().map_err(invalid)?)?;
+                field_blob(out, &pending.condition.canonical_bytes().map_err(invalid)?)?;
+                let mask = pending.held
                     .as_ref()
                     .map(|mask| mask.iter().map(|v| u8::from(*v)).collect::<Vec<_>>())
                     .unwrap_or_default();
@@ -705,7 +666,7 @@ impl NativeFieldModelRest {
             input.read_exact(&mut mode)?;
             match mode[0] {
                 1 if input.limit() == 0 => NativeFieldReactionPort::IncomingBoundary,
-                version @ (2..=4) => {
+                4 => {
                     input.read_exact(&mut mode)?;
                     let port = match mode[0] {
                         0 => NativeFieldReactionPort::ContinuingBoundary,
@@ -723,13 +684,8 @@ impl NativeFieldModelRest {
                         if id >= next_comparison || producing_epoch > epoch || !seen.insert(id) {
                             return Err(invalid("pending field identity/epoch"));
                         }
-                        let parts = match version {
-                            2 => 4,
-                            3 => 5,
-                            _ => 3,
-                        };
                         let mut blobs = Vec::new();
-                        for _ in 0..parts {
+                        for _ in 0..3 {
                             let count = number(&mut input)?;
                             if count > input.limit() {
                                 return Err(invalid("truncated pending field"));
@@ -742,45 +698,19 @@ impl NativeFieldModelRest {
                             input.read_exact(&mut bytes)?;
                             blobs.push(bytes);
                         }
-                        pending.push(if version == 4 {
-                            let held = if blobs[2].is_empty() {
-                                None
-                            } else if blobs[2].iter().all(|b| *b <= 1) {
-                                Some(blobs[2].iter().map(|b| *b == 1).collect())
-                            } else {
-                                return Err(invalid("pending field receiver mask"));
-                            };
-                            FieldPendingRest::Operands {
-                                id,
-                                epoch: producing_epoch,
-                                input: ResidentSectionRest::read(&blobs[0]).map_err(invalid)?,
-                                condition: ResidentSectionRest::read(&blobs[1])
-                                    .map_err(invalid)?,
-                                held,
-                            }
+                        let held = if blobs[2].is_empty() {
+                            None
+                        } else if blobs[2].iter().all(|b| *b <= 1) {
+                            Some(blobs[2].iter().map(|b| *b == 1).collect())
                         } else {
-                            FieldPendingRest::Frozen {
-                                id,
-                                epoch: producing_epoch,
-                                source: NativeFieldCurrentSourceRest::read(
-                                    &mut blobs[0].as_slice(),
-                                    blobs[0].len() as u64,
-                                )?,
-                                reaction: FieldReactionEnclosureRest::read(
-                                    &mut blobs[1].as_slice(),
-                                    blobs[1].len() as u64,
-                                )?,
-                                input: ResidentSectionRest::read(&blobs[2]).map_err(invalid)?,
-                                output: ResidentSectionRest::read(&blobs[3]).map_err(invalid)?,
-                                receiver: if version == 3 && !blobs[4].is_empty() {
-                                    Some(ResidentHeldSectionRest::read(
-                                        &mut blobs[4].as_slice(),
-                                        blobs[4].len() as u64,
-                                    )?)
-                                } else {
-                                    None
-                                },
-                            }
+                            return Err(invalid("pending field receiver mask"));
+                        };
+                        pending.push(FieldPendingRest {
+                            id,
+                            epoch: producing_epoch,
+                            input: ResidentSectionRest::read(&blobs[0]).map_err(invalid)?,
+                            condition: ResidentSectionRest::read(&blobs[1]).map_err(invalid)?,
+                            held,
                         });
                     }
                     if input.limit() != 0 {
@@ -817,65 +747,13 @@ impl NativeFieldModelRest {
         model.targets = self.targets;
         let grain = model.field.read_current_source()?.enclosure().grain();
         for p in self.pending {
-            let (id, comparison) = match p {
-                FieldPendingRest::Operands {
-                    id,
-                    epoch,
-                    input,
-                    condition,
-                    held,
-                } => {
-                    let input = ResidentNormalEnclosure::remount(surface, input, grain)?;
-                    let condition = surface.mount_section_rest(&condition).map_err(invalid)?;
-                    (
-                        id,
-                        FieldComparison {
-                            input,
-                            condition,
-                            held,
-                            epoch,
-                        },
-                    )
-                }
-                FieldPendingRest::Frozen {
-                    id,
-                    epoch,
-                    reaction,
-                    receiver,
-                    ..
-                } => {
-                    // The frozen reaction forecast still holds the producing operands: its
-                    // producing condition, and on the incoming port its source is the supplied
-                    // input. A continuing-port input is the receiver's given section. The frozen
-                    // field source, reaction material and output are dropped.
-                    let reaction = model.reaction.remount_field_reaction(model.member, reaction)?;
-                    let receiver = receiver
-                        .map(|r| ResidentHeldSection::remount(surface, r))
-                        .transpose()?;
-                    let input = match (model.reaction_port, &receiver) {
-                        (NativeFieldReactionPort::IncomingBoundary, _) => {
-                            reaction.source_view().to_owned()?
-                        }
-                        (NativeFieldReactionPort::ContinuingBoundary, Some(receiver)) => {
-                            receiver.given().to_owned()?
-                        }
-                        (NativeFieldReactionPort::ContinuingBoundary, None) => {
-                            return Err(invalid(
-                                "a frozen continuing-port field comparison without a receiver did not record its supplied input; observe or release it with the build that wrote it",
-                            ));
-                        }
-                    };
-                    let condition = reaction.producing_condition()?.to_owned(surface)?;
-                    (
-                        id,
-                        FieldComparison {
-                            input,
-                            condition,
-                            held: receiver.map(|r| r.held().to_vec()),
-                            epoch,
-                        },
-                    )
-                }
+            let input = ResidentNormalEnclosure::remount(surface, p.input, grain)?;
+            let condition = surface.mount_section_rest(&p.condition).map_err(invalid)?;
+            let comparison = FieldComparison {
+                input,
+                condition,
+                held: p.held,
+                epoch: p.epoch,
             };
             if comparison.input.view().components() != model.width
                 || comparison
@@ -885,7 +763,7 @@ impl NativeFieldModelRest {
             {
                 return Err(invalid("pending field operand chart"));
             }
-            model.pending.insert(id, comparison);
+            model.pending.insert(p.id, comparison);
         }
         Ok(model)
     }
@@ -1119,24 +997,146 @@ impl<'c> NativeCoupledBody<'c> {
 mod compatibility_tests {
     use super::*;
     use holonic_engine::embedding_fiber::ResidentReadout;
+    use holonic_engine::native_ecology::constitutive_fibre::{
+        ConditionContactMetric, NativeFieldOccurrence, NativeJunctionSeed, NativePhaseCurrent,
+        ResidentConstitutiveFibre, ResidentNormalMaterial,
+    };
+
+    fn current_field_body<'c>(surface: &'c ResidentSurface<'c>) -> NativeCoupledBody<'c> {
+        let nodes = 2;
+        let context = 2;
+        let source_complex = 3 * nodes;
+        let features = source_complex * context + source_complex + context;
+        let grain = ResidentGrain(32);
+        let seed = NativeJunctionSeed {
+            incoming_admittance: 1,
+            held_admittance: 1,
+            incoming_transport: NativePhaseCurrent::unit(),
+            initial_held: NativePhaseCurrent::zero(),
+        };
+        let mut field = NativeConstitutiveField::found_with_enclosed_junction(
+            surface,
+            vec![seed; nodes],
+            grain,
+        )
+        .unwrap();
+        let first = field
+            .advance_resident(&mut NativeFieldOccurrence::entering(vec![
+                NativePhaseCurrent::unit();
+                nodes
+            ]))
+            .unwrap();
+        field
+            .advance_resident(&mut NativeFieldOccurrence::through(
+                first.source,
+                vec![NativePhaseCurrent::new(0, 1, 1).unwrap(); nodes],
+            ))
+            .unwrap();
+        let initial = surface
+            .mount_section_rest(
+                &ResidentSectionRest::found(
+                    1,
+                    2 * context,
+                    ResidentGrain(0),
+                    64,
+                    vec![(0, 0); 2 * context],
+                )
+                .unwrap(),
+            )
+            .unwrap();
+        let law = ResidentConstitutiveFibre::found_bilinear_contact(
+            surface,
+            source_complex,
+            context,
+            source_complex,
+        )
+        .unwrap();
+        let material = ResidentNormalMaterial::found_features(
+            surface,
+            features,
+            source_complex,
+            grain,
+        )
+        .unwrap();
+        let mut reaction = ResidentGeneratorNeighborhood::with_shared_condition(
+            vec![law],
+            ResidentConstitutiveCurrent::integers(&initial).unwrap(),
+            ConditionContactMetric::UnitAdmittanceRealification,
+        )
+        .unwrap();
+        reaction.attach_normal_prediction(0, material).map_err(|r| r.reason).unwrap();
+        NativeCoupledBody::from_field_with_reaction_port(
+            field,
+            reaction,
+            0,
+            NativeFieldReactionPort::IncomingBoundary,
+        )
+        .map_err(|r| r.reason)
+        .unwrap()
+    }
+
+    fn field_model_rest(body: &NativeCoupledBody<'_>) -> Vec<u8> {
+        let BodyState::Field(model) = body.state.as_ref().expect("initialized body") else {
+            panic!("constituted field body")
+        };
+        let mut bytes = Vec::new();
+        model.rest().unwrap().write(&mut bytes).unwrap();
+        bytes
+    }
+
+    fn field_extension_offset(bytes: &[u8]) -> usize {
+        let mut at = 5 * 8;
+        for _ in 0..2 {
+            let length = u64::from_le_bytes(bytes[at..at + 8].try_into().unwrap()) as usize;
+            at += 8 + length;
+        }
+        at
+    }
 
     #[test]
-    #[ignore = "requires CUDA; reopens the previously delivered field model wire"]
-    fn original_one_pass_field_model_remains_readable() {
-        let bytes = include_bytes!(concat!(
-            env!("CARGO_MANIFEST_DIR"),
-            "/../../research/experiments/athena_field/one-pass/athena-field.rest"
-        ));
-        let expected: Value = serde_json::from_str(include_str!(concat!(
-            env!("CARGO_MANIFEST_DIR"),
-            "/../../research/experiments/athena_field/one-pass/return.json"
-        )))
-        .unwrap();
-        let rest = SavedCoupledBody::read(&mut bytes.as_slice(), bytes.len() as u64).unwrap();
+    #[ignore = "requires CUDA; current field rest roundtrips empty and pending operand state"]
+    fn current_field_rest_roundtrips_empty_and_pending_operand_state() {
         let readout = ResidentReadout::new().unwrap();
         let surface = ResidentSurface::on(&readout).unwrap();
-        let mut body = rest.remount(&surface).unwrap();
-        assert_eq!(body.inspect_current().unwrap(), expected["model_state"]);
+        let mut body = current_field_body(&surface);
+        let expected = body.inspect_current().unwrap();
+        let empty_rest = field_model_rest(&body);
+        assert_eq!(empty_rest[field_extension_offset(&empty_rest)], 1);
+        let empty = saved(&body);
+        let mut reopened = reopen(&surface, &empty);
+        assert_eq!(reopened.inspect_current().unwrap(), expected);
+
+        let (width, condition_width, _, _) = body.field_dimensions().unwrap();
+        let mut input_values = vec![0; width];
+        input_values[0] = 1;
+        let mut condition_values = vec![0; condition_width];
+        condition_values[0] = 1;
+        let input = point(&surface, &input_values);
+        let condition = point(&surface, &condition_values);
+        let pending = body
+            .generate_field(
+                ResidentConstitutiveCurrent::integers(&input).unwrap().into(),
+                ResidentConstitutiveCurrent::integers(&condition).unwrap(),
+                true,
+            )
+            .unwrap()
+            .comparison_id()
+            .unwrap();
+        let operand_rest = field_model_rest(&body);
+        let extension = field_extension_offset(&operand_rest);
+        assert_eq!(operand_rest[extension], 4);
+        for retired in [2, 3] {
+            let mut old_cut = operand_rest.clone();
+            old_cut[extension] = retired;
+            assert!(NativeFieldModelRest::read(
+                &mut old_cut.as_slice(),
+                old_cut.len() as u64,
+            )
+            .is_err());
+        }
+        let pending_rest = saved(&body);
+        let reopened = reopen(&surface, &pending_rest);
+        assert_eq!(reopened.pending_ids().unwrap(), vec![pending]);
     }
 
     fn point<'c>(surface: &'c ResidentSurface<'c>, v: &[i64]) -> ResidentSection<'c> {
@@ -1160,21 +1160,16 @@ mod compatibility_tests {
         }
     }
 
-    /// Phase 8b retention bound on the legacy constituted field. Its occurrence clock is the two
+    /// Phase 8b retention bound on the constituted field. Its occurrence clock is the two
     /// foundation occurrences; generation and observation continue through reflection commits
-    /// and the reaction material, so an attached field adds no occurrence, and rest keeps the same
-    /// count. The delivered one-pass wire (`athena_field/one-pass`) is the old checkpoint read.
+    /// and the reaction material, so an attached field adds no occurrence, and current operand
+    /// rest keeps the same count.
     #[test]
     #[ignore = "requires CUDA; an attached field adds no occurrence through generation, return and rest"]
     fn attached_field_occurrence_clock_is_fixed_through_generation_return_and_rest() {
-        let bytes = include_bytes!(concat!(
-            env!("CARGO_MANIFEST_DIR"),
-            "/../../research/experiments/athena_field/one-pass/athena-field.rest"
-        ));
-        let rest = SavedCoupledBody::read(&mut bytes.as_slice(), bytes.len() as u64).unwrap();
         let readout = ResidentReadout::new().unwrap();
         let surface = ResidentSurface::on(&readout).unwrap();
-        let mut body = rest.remount(&surface).unwrap();
+        let mut body = current_field_body(&surface);
         let founded = occurrences(&body);
         assert_eq!(founded, 2);
         let input = |[a, b]: [i64; 2]| [a, b, -b, a, a + b, b - a];
@@ -1267,21 +1262,25 @@ mod compatibility_tests {
     #[test]
     #[ignore = "requires CUDA; a delayed field return equals an immediate return of the same operands at the same constitution"]
     fn delayed_field_return_equals_an_immediate_return_at_the_same_constitution() {
-        let bytes = include_bytes!(concat!(
-            env!("CARGO_MANIFEST_DIR"),
-            "/../../research/experiments/athena_field/one-pass/athena-field.rest"
-        ));
         let readout = ResidentReadout::new().unwrap();
         let surface = ResidentSurface::on(&readout).unwrap();
-        let mut body = reopen(&surface, bytes);
+        let mut body = current_field_body(&surface);
         fn generate<'c>(
             surface: &'c ResidentSurface<'c>,
             body: &mut NativeCoupledBody<'c>,
             [a, b]: [i64; 2],
         ) -> u64 {
+            let (width, condition_width, _, _) = body.field_dimensions().unwrap();
+            let pattern = [a, b, -b, a, a + b, b - a];
+            let input = (0..width)
+                .map(|index| pattern[index % pattern.len()])
+                .collect::<Vec<_>>();
+            let condition = (0..condition_width)
+                .map(|index| [a, b][index % 2])
+                .collect::<Vec<_>>();
             let (x, c) = (
-                point(surface, &[a, b, -b, a, a + b, b - a]),
-                point(surface, &[a, b]),
+                point(surface, &input),
+                point(surface, &condition),
             );
             body.generate_field(
                 ResidentConstitutiveCurrent::integers(&x).unwrap().into(),
@@ -1295,7 +1294,12 @@ mod compatibility_tests {
         let delayed = generate(&surface, &mut body, [1, 0]);
         // The constitution moves: another comparison is produced and returned.
         let other = generate(&surface, &mut body, [0, 1]);
-        let t = point(&surface, &[-1, 0, 0, 1, -1, 1]);
+        let (width, _, _, _) = body.field_dimensions().unwrap();
+        let target_pattern = [-1, 0, 0, 1, -1, 1];
+        let target_values = (0..width)
+            .map(|index| target_pattern[index % target_pattern.len()])
+            .collect::<Vec<_>>();
+        let t = point(&surface, &target_values);
         body.observe_field(
             other,
             ResidentConstitutiveCurrent::integers(&t).unwrap().into(),
@@ -1304,63 +1308,15 @@ mod compatibility_tests {
         .unwrap();
         let immediate = generate(&surface, &mut body, [1, 0]);
         let cut = saved(&body);
-        let target = [0, 1, -1, 0, -1, -1];
+        let final_pattern = [0, 1, -1, 0, -1, -1];
+        let target = (0..width)
+            .map(|index| final_pattern[index % final_pattern.len()])
+            .collect::<Vec<_>>();
         let delayed = returned(&surface, &cut, delayed, &target);
         let immediate = returned(&surface, &cut, immediate, &target);
         assert_eq!(delayed.0, immediate.0, "returned evidence at the one cut");
         assert_eq!(delayed.1, immediate.1, "the field after the return");
         assert_eq!(delayed.2, immediate.2, "the reaction material after the return");
-    }
-
-    /// The body bytes of a delivered field-session wire (`HNA-FIELD-SESSION\x01`/`\x02`).
-    fn session_body(wire: &[u8]) -> Vec<u8> {
-        assert!(wire.starts_with(b"HNA-FIELD-SESSION"));
-        let mut at = 18;
-        let header = u64::from_le_bytes(wire[at..at + 8].try_into().unwrap()) as usize;
-        at += 8 + header;
-        let body = u64::from_le_bytes(wire[at..at + 8].try_into().unwrap()) as usize;
-        at += 8;
-        wire[at..at + body].to_vec()
-    }
-
-    /// **Pre-12a frozen field comparisons decode.** The delivered pending sessions hold one
-    /// frozen producing section each (extension `2`, and `3` with its held receiver). They
-    /// decode to their producing operands — the frozen reaction's supplied input and producing
-    /// condition, and the receiver's mask — and continue: a return of the decoded comparison
-    /// equals the return of a fresh comparison of the same operands at the same cut.
-    #[test]
-    #[ignore = "requires CUDA; delivered pre-12a pending field sessions decode to operands and continue"]
-    fn delivered_frozen_field_comparisons_decode_to_operands_and_continue() {
-        let wires: [&[u8]; 2] = [
-            include_bytes!(concat!(
-                env!("CARGO_MANIFEST_DIR"),
-                "/../../research/experiments/athena_field/session/initial/pending.session"
-            )),
-            include_bytes!(concat!(
-                env!("CARGO_MANIFEST_DIR"),
-                "/../../research/experiments/athena_field/pattern/run/pending.session"
-            )),
-        ];
-        let readout = ResidentReadout::new().unwrap();
-        let surface = ResidentSurface::on(&readout).unwrap();
-        for (version, wire) in wires.into_iter().enumerate() {
-            let legacy = session_body(wire);
-            let mut body = reopen(&surface, &legacy);
-            let pending = body.pending_ids().unwrap();
-            assert_eq!(pending.len(), 1, "wire {version}");
-            let decoded = pending[0];
-            let (width, _, _, port) = body.field_dimensions().unwrap();
-            assert_eq!(port, NativeFieldReactionPort::IncomingBoundary);
-            // Written again, the comparison is its operands.
-            let rewritten = saved(&body);
-            assert!(rewritten.len() < legacy.len(), "the frozen cut is dropped");
-            let fresh = body.regenerate_field_comparison(decoded).unwrap();
-            let cut = saved(&body);
-            let target = (0..width as i64).map(|i| i % 3 - 1).collect::<Vec<_>>();
-            let old = returned(&surface, &cut, decoded, &target);
-            let new = returned(&surface, &cut, fresh, &target);
-            assert_eq!(old, new, "wire {version}: the decoded comparison continues");
-        }
     }
 
 }

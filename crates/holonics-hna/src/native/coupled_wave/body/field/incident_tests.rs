@@ -494,11 +494,10 @@ fn returned_state<'c>(
 /// receiver mask, admitted contacts and producing epoch. After the constitution moves (a committed
 /// word and another comparison's material return), its delayed return is read at the
 /// contemporary cut and equals, number for number, the immediate return of a fresh comparison of
-/// the same boundary made at that cut; the same comparison written in the retired `\x01` frozen
-/// layout decodes to the same operands and continues to the same numbers.
+/// the same boundary made at that cut.
 #[test]
-#[ignore = "requires CUDA; a delayed boundary comparison equals an immediate one at the same constitution, and an old \\x01 frozen rest decodes and continues"]
-fn delayed_boundary_comparison_equals_an_immediate_one_and_the_frozen_wire_decodes() {
+#[ignore = "requires CUDA; a delayed boundary comparison equals an immediate one at the same constitution"]
+fn delayed_boundary_comparison_equals_an_immediate_one_at_the_contemporary_cut() {
     let readout = ResidentReadout::new().unwrap();
     let surface = ResidentSurface::on(&readout).unwrap();
     let grain = ResidentGrain(32);
@@ -553,20 +552,5 @@ fn delayed_boundary_comparison_equals_an_immediate_one_and_the_frozen_wire_decod
     assert_eq!(delayed.1, immediate.1, "the field after the return");
     assert_eq!(delayed.2, immediate.2, "every reaction material after the return");
 
-    // The retired `\x01` layout: a frozen word per comparison. It decodes to the boundary.
-    let mut legacy = restore(&surface, &saved);
-    let mut wire = vec![3u8];
-    {
-        let BodyState::Incident(model) = legacy.state_mut().unwrap() else {
-            panic!("incident body");
-        };
-        NativeIncidentModelRest::write_legacy_frozen(model, &mut wire).unwrap();
-    }
-    assert_eq!(&wire[1..20], b"HNA-INCIDENT-FIELD\x01");
-    let mut decoded = restore(&surface, &wire);
-    assert_eq!(decoded.pending_ids().unwrap(), vec![first_id]);
-    // A decoded body writes its operands under the current tag.
-    assert_eq!(&body_bytes(&decoded)[1..20], b"HNA-INCIDENT-FIELD\x05");
-    let decoded = returned_state(&mut decoded, first_id, &covector);
-    assert_eq!(decoded, delayed, "the old wire continues to the same numbers");
+
 }

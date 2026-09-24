@@ -1,15 +1,16 @@
 # Phase 12a integration map
 
-Source-linked integration plan for the paused HNN field/session packet. Phase 11 is present on draft
-PR #108, rebased onto the current facade; it is not merged. This note records source and wire
-boundaries; phase 12a remains unrebased and unbuilt.
+Source-linked integration and verification map for the HNN field/session packet. Phase 11 is
+present on draft PR #108; it is not merged. The Phase 12a source cut is on
+`codex/c-phase12a-current-cut`, stacked on #108. This note records its source and wire boundaries
+and the measured gates below; further C-phase work remains.
 
 ## Branches and overlaps
 
 | Work | Current source state |
 |---|---|
 | Phase 11 | Draft PR #108, branch tip `3587c382` on facade `3b2acef7`; not merged. Source commits `a6c0c95d`/`53e085eb` retired relation-rest v3/v1. Tests at `a6c0c95d`: engine normal 172/172, resident relation 2/2, contact 10/10; wave rest 6/6. The full HNA lib run at `a6c0c95d` was interrupted at `deposition_split_synthetic_long_control` (115 passed before interruption, 1 active, 100 not reached; no suite result). The later `53e085eb` host wave-rest gate passed 4 with two CUDA tests ignored. Exact command receipts are in `.local/p11-continuation/docs/VERIFICATION_RECEIPTS.tsv`. |
-| Phase 12a | `wip/consolidation-phase-12a`, `.local/p12a-wt`, WIP `0ee4ea6d`, based on `5b7c89ab`; 20 HNA files change. |
+| Phase 12a | Original WIP `0ee4ea6d` remains untouched at `.local/p12a-wt`; the source transplant and current-format cut are on `codex/c-phase12a-current-cut`, based on #108. |
 | M1 facade base | `codex/restructure-m1-facade`, current tip `3b2acef7`. The facade cut does not touch phase-12a source paths. |
 
 The path intersection from the shared `5b7c89ab` base between phase 11 and phase 12a is exactly:
@@ -21,9 +22,8 @@ The path intersection from the shared `5b7c89ab` base between phase 11 and phase
 
 Phase 12a and the M1 facade have **zero changed-path overlap** from their shared `5b7c89ab`
 base. Phase 11 draft #108 is already a descendant of facade tip `3b2acef7`; its earlier plan-file
-overlap was integrated in that rebase, so no p11-to-facade rebase remains. Rebase phase 12a onto
-tip `3587c382` when dispatching its source integration. Resolve the two HNA files by preserving both
-disjoint hunks. The original phase-12a WIP branch stays intact as the source record.
+overlap was integrated in that rebase. The Phase 12a transplant is now based on tip `3587c382`;
+the two HNA files retain both disjoint sets of changes. The original WIP branch stays intact.
 
 ## Keep the phase-11 law distinct
 
@@ -106,3 +106,23 @@ read-only branches.
   reads, current-format rest and chart equality. Broader HNA, workbench/all-target and remaining
   GPU acceptance gates are still owed; schedule them separately when resource-appropriate rather
   than treating this map as an automatic full-suite run.
+
+## Implemented source cut and measured gates
+
+The current cut retains field comparison operands and reconstructs each comparison through the
+contemporary field source and reaction material. Field rest writes no pending extension or the
+current `1`/`4` forms; readers for frozen extensions `2`/`3` and their migration test are gone.
+Incident rest writes `\x01` only with no pending comparison and `\x05` for pending boundary or
+moment operands. The read-only frozen word, source tape, old moment and accumulated-anchor tags,
+their test fixture writers and the tape-conversion helper are removed. The presentation no longer
+reads frozen per-comparison encoder/receiver cuts; the retained shared request remains in the
+session. The outer session reader accepts its writer-selected `\x03`/`\x04`/`\x05` forms and
+refuses read-only `\x01`/`\x02` forms. No public HNA identifier or current schema name changed.
+
+The focused HNA test binary compiled and thirteen selected tests passed: two host old-tag
+refusals; three current field/passage/session rest roundtrips; four delayed or solver-return
+checks; two host Holon interconnection/balance equalities; and the device reaction-ball and
+word-adjoint checks. `cargo check -p holonics-hna --all-targets` passed, covering examples and
+test callers of the removed helpers. Exact commands and logs are in the verification TSV. This
+is a focused source-cut return; the Phase 12a handoff's remaining ladder/disposition/exposure
+work and later C/M1/M2 acceptance stay open.

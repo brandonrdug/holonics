@@ -1458,14 +1458,11 @@ fn target_holon_is_one_word_at_the_contemporary_cut() {
     assert!(refused.is_err(), "a different alphabet is refused");
 }
 
-/// **The retired `\x02` source tape decodes to its moment.** A pre-moment build retained every
-/// occurrence's word and the encoded rows; the rows are the producing operands. The tape wire
-/// decodes, its rows are accumulated through the contemporary source maps into `m` and `c`, and
-/// the decoded comparison reads and returns exactly as the passage comparison of the same rows
-/// retained by this build (same cut, same contacts).
+/// A current `\x05` passage rest carries moment and phase-weighted condition operands.
+/// Remount reads the same pending declaration and returns through the contemporary machine.
 #[test]
-#[ignore = "requires CUDA; a retired \\x02 source tape decodes to the moment comparison of its rows and returns identically"]
-fn a_retired_source_tape_decodes_to_the_moment_of_its_rows() {
+#[ignore = "requires CUDA; current passage moment rest remounts and returns identically"]
+fn current_passage_moment_rest_roundtrips_and_returns() {
     let readout = ResidentReadout::new().unwrap();
     let surface = ResidentSurface::on(&readout).unwrap();
     let (spec, binding) = setup();
@@ -1474,41 +1471,20 @@ fn a_retired_source_tape_decodes_to_the_moment_of_its_rows() {
     condition_material(&mut body);
     let rows = encoded(&surface, false, 0);
     let generated = body
-        .prepare_generator_episode(Rc::clone(&rows), binding.clone(), 0, contacts())
+        .prepare_generator_episode(Rc::clone(&rows), binding, 0, contacts())
         .unwrap();
     let covector = generated.joint_output().to_owned().unwrap();
     let generated = body.publish_incident_field(generated, false, true).unwrap();
     let id = generated.comparison_id().unwrap();
     drop(generated);
-    let native = model_bytes(&body);
-    assert_eq!(&native[..19], b"HNA-INCIDENT-FIELD\x05");
-    let mut tape = Vec::new();
-    {
-        let BodyState::Incident(model) = body.state_mut().unwrap() else {
-            panic!("machine")
-        };
-        NativeIncidentModelRest::write_legacy_tape(
-            model,
-            id,
-            &binding,
-            0,
-            &rows,
-            &contacts(),
-            &mut tape,
-        )
-        .unwrap();
-    }
-    assert_eq!(&tape[..19], b"HNA-INCIDENT-FIELD\x02");
-    let mut retained = restore(&surface, &native);
-    let mut decoded = restore(&surface, &tape);
-    assert_eq!(decoded.pending_ids().unwrap(), vec![id]);
+    let wire = model_bytes(&body);
+    assert_eq!(&wire[..19], b"HNA-INCIDENT-FIELD\x05");
+    let mut reopened = restore(&surface, &wire);
+    assert_eq!(reopened.pending_ids().unwrap(), vec![id]);
     assert_eq!(
-        decoded.generator_comparison_declaration(id).unwrap(),
-        retained.generator_comparison_declaration(id).unwrap(),
-        "the tape's per-edge relation becomes the passage's contact counts"
+        reopened.generator_comparison_declaration(id).unwrap(),
+        body.generator_comparison_declaration(id).unwrap(),
     );
-    // The decoded body writes the operands, byte for byte the retained comparison's rest.
-    assert_eq!(model_bytes(&decoded), native);
     fn read<'c>(
         body: &mut NativeCoupledBody<'c>,
         id: u64,
@@ -1528,8 +1504,5 @@ fn a_retired_source_tape_decodes_to_the_moment_of_its_rows() {
         body.publish_incident_material_return(returned).unwrap();
         (output, rows, model_bytes(body))
     }
-    assert_eq!(
-        read(&mut decoded, id, &covector),
-        read(&mut retained, id, &covector)
-    );
+    assert_eq!(read(&mut reopened, id, &covector), read(&mut body, id, &covector));
 }

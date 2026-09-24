@@ -1356,10 +1356,7 @@ impl<'c> NativeFieldSession<'c> {
         Ok(publish_new(path, |out| out.write_all(&bytes))?)
     }
 }
-const MAGIC: &[u8] = b"HNA-FIELD-SESSION\x01";
-const REGIONS_MAGIC: &[u8] = b"HNA-FIELD-SESSION\x02";
-/// Version 3 adds the retained shared-source comparisons and the exposure cursor. Versions 1
-/// and 2 stay readable: their tuple headers simply carry neither.
+/// Current source-chart session rest; incident and generator charts select their own tags.
 const SOURCE_MAGIC: &[u8] = b"HNA-FIELD-SESSION\x03";
 const INCIDENT_MAGIC: &[u8] = b"HNA-FIELD-SESSION\x04";
 const GENERATOR_MAGIC: &[u8] = b"HNA-FIELD-SESSION\x05";
@@ -1425,13 +1422,11 @@ impl NativeFieldSavedSession {
     }
     fn read(input: &mut impl Read, octets: u64) -> Result<Self> {
         let mut input = input.take(octets);
-        let mut magic = vec![0; MAGIC.len()];
+        let mut magic = vec![0; SOURCE_MAGIC.len()];
         input.read_exact(&mut magic)?;
         let incident_wire = magic == INCIDENT_MAGIC;
         let generator_wire = magic == GENERATOR_MAGIC;
-        let sources = magic == SOURCE_MAGIC || incident_wire || generator_wire;
-        let regions = magic == REGIONS_MAGIC;
-        if magic != MAGIC && !regions && !sources {
+        if magic != SOURCE_MAGIC && !incident_wire && !generator_wire {
             return Err(invalid("unsupported field-session rest"));
         }
         fn blob(input: &mut std::io::Take<impl Read>) -> Result<Vec<u8>> {
@@ -1449,28 +1444,7 @@ impl NativeFieldSavedSession {
             input.read_exact(&mut bytes)?;
             Ok(bytes)
         }
-        let header = blob(&mut input)?;
-        let header: FieldSessionHeader = if sources {
-            serde_json::from_slice(&header)?
-        } else {
-            let (spec, state, pending_extents) = if regions {
-                serde_json::from_slice(&header)?
-            } else {
-                let (spec, state): (FieldSessionSpec, HnaStreamState) =
-                    serde_json::from_slice(&header)?;
-                (spec, state, BTreeMap::new())
-            };
-            FieldSessionHeader {
-                spec,
-                state,
-                pending_extents,
-                retained_shared: BTreeMap::new(),
-                issued_shared: 0,
-                exposure: None,
-                incident: None,
-                generator: None,
-            }
-        };
+        let header: FieldSessionHeader = serde_json::from_slice(&blob(&mut input)?)?;
         let FieldSessionHeader {
             spec,
             state,
@@ -1595,7 +1569,7 @@ impl NativeFieldSavedSession {
         let body = self.body.remount(&surface)?;
         let incident = self
             .incident
-            .map(|i| i.remount(&surface, &self.spec, &body, &self.retained_shared))
+            .map(|i| i.remount(&surface, &self.spec, &body))
             .transpose()?;
         let generator = self
             .generator
@@ -1670,6 +1644,16 @@ pub fn with_field_session<T>(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn retired_outer_field_session_tags_are_refused() {
+        for version in [1u8, 2] {
+            let mut bytes = b"HNA-FIELD-SESSION".to_vec();
+            bytes.push(version);
+            assert!(NativeFieldSavedSession::read(&mut bytes.as_slice(), bytes.len() as u64)
+                .is_err());
+        }
+    }
+
     #[test]
     #[ignore = "requires CUDA; actual outstanding field comparison resumes with its producing D/M"]
     fn field_session_reopens_old_producing_material_and_returns_once() {

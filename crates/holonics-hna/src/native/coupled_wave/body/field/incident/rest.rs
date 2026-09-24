@@ -3,26 +3,14 @@
 //! passage) with its declaration, fixed in the passage length. Every comparison is read at the
 //! contemporary constitution when observed, so no producing cut is written.
 //!
-//! Older wires still decode, converted to the same operands (plan phase 12a):
-//! - `\x01` (and the frozen entries of `\x04`): a legacy word at its producing cut
-//!   (field source, anchor, output, material views). The boundary part of its anchor is the
-//!   retained operand; the frozen source, output and material are read and dropped.
-//! - `\x02`: the retired per-occurrence source tape. Its encoded rows are the retained
-//!   operands; the moment and condition are accumulated through the body's source maps at
-//!   remount, and every per-occurrence word is dropped.
-//! - `\x04`: generator moments, unchanged.
-//!
-//! The retired `\x03` accumulated-anchor form (its anchor mixes the producing standing
-//! `U^N q₀` into `m`, so `m` cannot be recovered) is refused, not reinterpreted.
+//! The current writer uses `\x01` only for an empty pending set and `\x05` for pending
+//! operands. Previous frozen-word, source-tape and accumulated-anchor layouts are not read.
 use super::machine_episode::{ComparisonSource, SymbolSums};
 use super::*;
 use holonic_engine::native_ecology::constitutive_fibre::NormalMaterialRest;
 
 const OPERANDS: &[u8; 19] = b"HNA-INCIDENT-FIELD\x05";
-const LEGACY_WORDS: &[u8; 19] = b"HNA-INCIDENT-FIELD\x01";
-const LEGACY_TAPE: &[u8; 19] = b"HNA-INCIDENT-FIELD\x02";
-const RETIRED_ANCHORS: &[u8; 19] = b"HNA-INCIDENT-FIELD\x03";
-const LEGACY_MOMENTS: &[u8; 19] = b"HNA-INCIDENT-FIELD\x04";
+const EMPTY_PENDING: &[u8; 19] = b"HNA-INCIDENT-FIELD\x01";
 
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 struct Header {
@@ -41,9 +29,6 @@ struct Header {
 }
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 struct PendingHeader {
-    /// Retired `\x02` per-occurrence source tape (`LegacyEpisodeMeta`). Decoded to its operands.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    source_episode: Option<serde_json::Value>,
     /// A generator passage: binding, clock origin, passage length and contact counts.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     source_moment: Option<GeneratorSourceMomentMeta>,
@@ -51,18 +36,6 @@ struct PendingHeader {
     epoch: u64,
     held: Vec<bool>,
     admitted: Vec<Vec<bool>>,
-}
-
-/// The declaration of a retired `\x02` source tape: the passage and its per-edge relation.
-#[derive(Debug, Deserialize)]
-#[serde(deny_unknown_fields)]
-struct LegacyEpisodeMeta {
-    binding: GeneratorSourceBinding,
-    start: u64,
-    rows: usize,
-    components: usize,
-    #[serde(default)]
-    contacts: Vec<GeneratorSourceContact>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -76,11 +49,6 @@ enum PendingRest {
         moment: ResidentSectionRest,
         condition: Option<ResidentSectionRest>,
     },
-    /// A legacy frozen word, decoded: only its anchor is kept, whose boundary part is the
-    /// retained operand (converted at remount). Its source, output and material were dropped.
-    Frozen { anchor: ResidentSectionRest },
-    /// A retired source tape, decoded: its encoded rows (converted to the moment at remount).
-    Tape { encoded: ResidentSectionRest },
 }
 #[derive(Debug, PartialEq, Eq)]
 pub struct NativeIncidentModelRest {
@@ -121,21 +89,10 @@ impl NativeIncidentModelRest {
     pub(crate) fn has_prediction(&self, id: u64) -> bool {
         self.header.pending.iter().any(|p| p.id == id)
     }
-    /// A body without outstanding comparisons keeps the original `\x01` bytes; outstanding
-    /// comparisons are written as operands under `\x05`. A decoded legacy entry is converted by
-    /// remounting the body; it is never written back in its retired form.
+    /// The active empty-pending `\x01` form remains; pending operands are written under `\x05`.
     pub(crate) fn write(&self, out: &mut impl Write) -> Result<(), NativeSessionError> {
-        if self
-            .pending
-            .iter()
-            .any(|p| matches!(p, PendingRest::Frozen { .. } | PendingRest::Tape { .. }))
-        {
-            return Err(invalid(
-                "a decoded legacy incident comparison converts to its operands at remount; remount the body before writing it",
-            ));
-        }
         out.write_all(if self.pending.is_empty() {
-            LEGACY_WORDS
+            EMPTY_PENDING
         } else {
             OPERANDS
         })?;
@@ -159,7 +116,6 @@ impl NativeIncidentModelRest {
                         blob(out, &condition.canonical_bytes().map_err(invalid)?)?;
                     }
                 }
-                PendingRest::Frozen { .. } | PendingRest::Tape { .. } => unreachable!(),
             }
         }
         Ok(())
@@ -168,26 +124,21 @@ impl NativeIncidentModelRest {
         let mut input = input.take(octets);
         let mut magic = [0; 19];
         input.read_exact(&mut magic)?;
-        if &magic == RETIRED_ANCHORS {
-            return Err(invalid(
-                "incident rest \\x03 retains generator comparisons as producing anchors U^N q0 + m; the moment is not separable from that standing, so the format is retired and not reinterpreted (observe or release its comparisons before saving)",
-            ));
+        let operands = &magic == OPERANDS;
+        let empty = &magic == EMPTY_PENDING;
+        if !operands && !empty {
+            return Err(invalid("incident model rest version"));
         }
-        let (operands, tape, moments) = match &magic {
-            m if m == OPERANDS => (true, false, false),
-            m if m == LEGACY_WORDS => (false, false, false),
-            m if m == LEGACY_TAPE => (false, true, false),
-            m if m == LEGACY_MOMENTS => (false, false, true),
-            _ => return Err(invalid("incident model rest version")),
-        };
         let header: Header = serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
         let any_moment = header.pending.iter().any(|p| p.source_moment.is_some());
-        let any_episode = header.pending.iter().any(|p| p.source_episode.is_some());
-        if (any_episode && !tape)
-            || (tape && any_moment)
-            || (!operands && any_moment != moments)
-        {
-            return Err(invalid("incident rest tag and pending kinds"));
+        if empty && !header.pending.is_empty() {
+            return Err(invalid("incident pending comparisons require operand rest \\x05"));
+        }
+        if operands && header.pending.is_empty() {
+            return Err(invalid("empty incident rest requires current empty tag \\x01"));
+        }
+        if !operands && any_moment {
+            return Err(invalid("incident pending moment requires operand rest \\x05"));
         }
         let layout = header.spec.compile()?;
         let data = read_blob(&mut input)?;
@@ -209,25 +160,9 @@ impl NativeIncidentModelRest {
                 pending.push(PendingRest::Moment { moment, condition });
                 continue;
             }
-            if operands {
-                pending.push(PendingRest::Boundary(
-                    ResidentSectionRest::read(&read_blob(&mut input)?).map_err(invalid)?,
-                ));
-                continue;
-            }
-            // A legacy frozen word (and, in `\x02`, its source tape): the producing cut is read,
-            // checked for its declared layout, and dropped.
-            let data = read_blob(&mut input)?;
-            NativeFieldCurrentSourceRest::read(&mut data.as_slice(), data.len() as u64)?;
-            let anchor = ResidentSectionRest::read(&read_blob(&mut input)?).map_err(invalid)?;
-            ResidentSectionRest::read(&read_blob(&mut input)?).map_err(invalid)?;
-            read_material(&mut input)?;
-            if pending_header.source_episode.is_some() {
-                let encoded = ResidentSectionRest::read(&read_blob(&mut input)?).map_err(invalid)?;
-                pending.push(PendingRest::Tape { encoded });
-            } else {
-                pending.push(PendingRest::Frozen { anchor });
-            }
+            pending.push(PendingRest::Boundary(
+                ResidentSectionRest::read(&read_blob(&mut input)?).map_err(invalid)?,
+            ));
         }
         if input.limit() != 0 {
             return Err(invalid("trailing incident rest data"));
@@ -255,8 +190,6 @@ impl NativeIncidentModelRest {
         }
         let source = model.field.read_current_source()?;
         let grain = source.enclosure().grain();
-        let boundary = source.boundary_components();
-        let joint = boundary + source.internal_components();
         for (material, &features) in model.materials.iter().zip(&model.layout.material_features) {
             if material.source_complex() != features
                 || material.targets() != model.layout.width / 2
@@ -340,47 +273,6 @@ impl NativeIncidentModelRest {
                         h.epoch,
                     )?
                 }
-                (None, PendingRest::Frozen { anchor }) => {
-                    // The anchor is `P(boundary ⊕ b_pre)`; its boundary part is the operand.
-                    let anchor = ResidentNormalEnclosure::remount(surface, anchor, grain)?;
-                    if anchor.view().components() != joint {
-                        return Err(invalid("incident pending anchor chart"));
-                    }
-                    let prepared = anchor.view().restrict(0..boundary)?;
-                    model.remount_comparison(
-                        None,
-                        ComparisonSource::Boundary(Rc::new(prepared)),
-                        h.held,
-                        h.admitted,
-                        h.epoch,
-                    )?
-                }
-                (None, PendingRest::Tape { encoded }) => {
-                    let meta: LegacyEpisodeMeta = serde_json::from_value(
-                        h.source_episode
-                            .ok_or_else(|| invalid("incident source tape declaration"))?,
-                    )
-                    .map_err(invalid)?;
-                    if h.held.iter().any(|v| *v) {
-                        return Err(invalid("incident source tape receiver mask"));
-                    }
-                    let encoded = ResidentNormalEnclosureSection::remount(
-                        surface,
-                        encoded,
-                        meta.rows,
-                        meta.components,
-                        grain,
-                    )?;
-                    model.comparison_from_tape(
-                        meta.binding,
-                        meta.start,
-                        &encoded,
-                        &meta.contacts,
-                        joint,
-                        h.admitted,
-                        h.epoch,
-                    )?
-                }
                 _ => return Err(invalid("incident pending rest kind")),
             };
             model.comparisons.insert(h.id, Rc::new(comparison));
@@ -394,7 +286,6 @@ impl IncidentFieldModel<'_> {
         let mut pending = Vec::with_capacity(self.comparisons.len());
         for (&id, comparison) in &self.comparisons {
             pending_headers.push(PendingHeader {
-                source_episode: None,
                 source_moment: comparison.meta().cloned(),
                 id,
                 epoch: comparison.epoch(),
@@ -437,90 +328,16 @@ impl IncidentFieldModel<'_> {
 }
 
 #[cfg(test)]
-impl NativeIncidentModelRest {
-    /// Test fixture writer of the retired `\x01` layout: every boundary comparison is written as
-    /// the frozen word a pre-12a build wrote (field source, anchor, output, material views),
-    /// read from the model's contemporary cut. Only the layout matters for the decoder.
-    pub(crate) fn write_legacy_frozen(
-        model: &mut IncidentFieldModel<'_>,
-        out: &mut impl Write,
-    ) -> Result<(), NativeSessionError> {
-        let rest = model.rest()?;
-        if rest.header.pending.iter().any(|p| p.source_moment.is_some()) {
-            return Err(invalid("legacy frozen fixture holds boundary comparisons only"));
-        }
-        out.write_all(LEGACY_WORDS)?;
-        blob(out, &serde_json::to_vec(&rest.header).map_err(invalid)?)?;
-        let mut data = Vec::new();
-        rest.field.write(&mut data)?;
-        blob(out, &data)?;
-        for material in &rest.material {
-            let mut data = Vec::new();
-            material.write(&mut data)?;
-            blob(out, &data)?;
-        }
-        let ids = model.comparisons.keys().copied().collect::<Vec<_>>();
-        for id in ids {
-            let word = model.contemporary_comparison_word(id, None)?;
-            let mut data = Vec::new();
-            word.source.rest()?.write(&mut data)?;
-            blob(out, &data)?;
-            blob(out, &word.anchor.rest()?.canonical_bytes().map_err(invalid)?)?;
-            blob(out, &word.output.rest()?.canonical_bytes().map_err(invalid)?)?;
-            for material in &word.material {
-                let mut data = Vec::new();
-                material.rest()?.write(&mut data)?;
-                blob(out, &data)?;
-            }
-        }
-        Ok(())
-    }
+mod format_tests {
+    use super::*;
 
-    /// Test fixture writer of the retired `\x02` source-tape layout for one encoded-row passage:
-    /// the episode declaration with its per-edge relation, the frozen word parts and the encoded
-    /// rows, as a pre-moment build wrote them.
-    #[allow(clippy::too_many_arguments)]
-    pub(crate) fn write_legacy_tape(
-        model: &mut IncidentFieldModel<'_>,
-        id: u64,
-        binding: &GeneratorSourceBinding,
-        start: u64,
-        encoded: &ResidentNormalEnclosureSection<'_>,
-        contacts: &[GeneratorSourceContact],
-        out: &mut impl Write,
-    ) -> Result<(), NativeSessionError> {
-        let mut rest = model.rest()?;
-        if rest.header.pending.len() != 1 || rest.header.pending[0].id != id {
-            return Err(invalid("legacy tape fixture holds one passage comparison"));
+    #[test]
+    fn retired_incident_pending_tags_are_refused() {
+        for version in [2u8, 3, 4] {
+            let mut bytes = b"HNA-INCIDENT-FIELD".to_vec();
+            bytes.push(version);
+            assert!(NativeIncidentModelRest::read(&mut bytes.as_slice(), bytes.len() as u64)
+                .is_err());
         }
-        let word = model.contemporary_comparison_word(id, None)?;
-        let pending = &mut rest.header.pending[0];
-        pending.source_moment = None;
-        pending.source_episode = Some(serde_json::json!({
-            "binding": binding, "start": start, "rows": encoded.rows(),
-            "components": encoded.components(), "contacts": contacts,
-        }));
-        out.write_all(LEGACY_TAPE)?;
-        blob(out, &serde_json::to_vec(&rest.header).map_err(invalid)?)?;
-        let mut data = Vec::new();
-        rest.field.write(&mut data)?;
-        blob(out, &data)?;
-        for material in &rest.material {
-            let mut data = Vec::new();
-            material.write(&mut data)?;
-            blob(out, &data)?;
-        }
-        let mut data = Vec::new();
-        word.source.rest()?.write(&mut data)?;
-        blob(out, &data)?;
-        blob(out, &word.anchor.rest()?.canonical_bytes().map_err(invalid)?)?;
-        blob(out, &word.output.rest()?.canonical_bytes().map_err(invalid)?)?;
-        for material in &word.material {
-            let mut data = Vec::new();
-            material.rest()?.write(&mut data)?;
-            blob(out, &data)?;
-        }
-        blob(out, &encoded.rest()?.canonical_bytes().map_err(invalid)?)?;
-        Ok(())
     }
 }
