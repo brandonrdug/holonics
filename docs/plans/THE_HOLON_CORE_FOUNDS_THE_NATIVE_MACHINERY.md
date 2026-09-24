@@ -882,15 +882,13 @@ since been transplanted to an isolated continuation branch:
 | Phase | Branch (worktree) | Base | Last step reached | Remaining |
 |---|---|---|---|---|
 | 11 resident constitutive views | Original `wip/consolidation-phase-11` (`.local/p11-wt`) remains untouched; continued on `codex/consolidation-phase-11` (`.local/p11-continuation`) | `5b7c89ab` WIP transplanted onto `de6a5300`; pre-v1 source `a6c0c95d`; current source `53e085eb` | Lean AffineContact/HolonObject import built; engine normal 172/172; resident relation/contact/rest 2/10/6; post-v1 host rest 4 passed, 2 CUDA ignored; HNA full suite interrupted by user resource stop | post-v1 GPU v5 remount and focused HNA remount consumers remain unverified; retain HNA interruption receipt and close #68 only after its remaining acceptance scope is resolved |
-| 12a field body and session | `wip/consolidation-phase-12a` (`.local/p12a-wt`) | `5b7c89ab` | incident body/session edits for the joint `\x01` frozen-cut retirement, machine episode, `ResidentHolonChart`; about to add chart equality tests | packets 1–6 of the brief: contemporary-read tests (delayed = immediate at the same constitution), `\x01` decode test, `FieldProducingSection`, ladder consolidation, disposition, CLAUDE.md stale statements, suites, exposure sample (counts and bits only) |
-| 12b coupled continuation and field internals | `wip/consolidation-phase-12b` (`.local/p12b-wt`) | `7e204283` | coupled continuation retirement in progress: `continuation.rs` deleted, dependent/comparison/rest rewritten; writing coupled wave rest v12 with legacy v9/v10 decode (likely does not compile yet) | finish v12 rest; hna `coupled_wave.rs` session contract restated; contemporary-read tests; behaviour measurement; `NormalWaveHolon` reception/actuation chart; then packet 2 (junction, material_transport/{complete,contextual,moment,support}, archive, current_history_source, contextual_lift, rest) |
+| 12a field body and session | Original `wip/consolidation-phase-12a` untouched; current source cut on `codex/c-phase12a-current-cut` (draft #110) | Stacked on Phase 11 | Contemporary field/incident operand rest; old frozen/tape and read-only session tags retired; thirteen focused HNA tests and HNA all-targets passed | Remaining ladder/disposition/exposure work and final C acceptance are named in [the Phase 12a map](census/C_PHASE12A_INTEGRATION.md). |
+| 12b coupled continuation and field internals | Original `wip/consolidation-phase-12b` untouched; current return cut on `codex/consolidation-phase-12b` (draft #111) | Stacked on Phase 12a | Current coupled v7/v12 and published v7 rests; read-only coupled v8–v10 and dependent v1–v6 programme readers retired; six focused engine tests and HNA all-targets passed | The second junction/material-transport/contextual-lift packet, HNA session contract, behavior measurement and `NormalWaveHolon` reception/actuation chart remain; see [the Phase 12b return](census/C_PHASE12B_INTEGRATION.md). |
 
-Overlaps to resolve when joining: 11 and 12a both edit hna `field_session.rs` and
-`field_session/native_source.rs`; 11 and 12b both edit `normal/direct/wave/coupled.rs` and
-`coupled/comparison/constitutive.rs` (11's edits there are compile fixes; 12b's rewrite governs). Rebase each
-onto the reduced restructure tree, verify in an isolated worktree with a single shared target
-directory, then commit. Phase 11 is already transplanted on the continuation branch above; do not
-rebase or modify its original WIP branch.
+The Phase 11/12a overlap in HNA `field_session.rs` and `native_source.rs`, and the Phase 11/12b
+overlap in engine `coupled.rs` and `comparison/constitutive.rs`, are resolved in the draft stack.
+The original WIP branches remain untouched. Each current cut has its focused source/consumer
+receipts; the remaining packets and final integration gates are listed above.
 
 Still open after these: phase 14 (cultivated body, including the repeated apparatus fields phase 13 left);
 phase 16's remainder (event laws as a core `HolonLaw` advance with energy balance, the seven unconverted
