@@ -311,11 +311,6 @@ fn paired_owners() -> Vec<(&'static str, &'static str, &'static str)> {
             "Foundation/PhysicochemicalReceiver.lean",
         ),
         (
-            include_str!("standing.rs"),
-            "standing.rs",
-            "Foundation/Standing.lean",
-        ),
-        (
             include_str!("design_selection.rs"),
             "design_selection.rs",
             "Foundation/DesignSelection.lean",

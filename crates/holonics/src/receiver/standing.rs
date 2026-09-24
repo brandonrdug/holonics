@@ -28,7 +28,7 @@
 //! | `compatibleFibre`, `compatibleFibre_antitone` | [`ApertureChain::compatible`] and `the_compatible_fibre_is_antitone_in_the_step` |
 //! | `the_fibre_is_never_a_singleton_and_a_later_step_separates` | [`ApertureChain::first_separating_step`] and `what_one_step_cannot_separate_a_later_step_can` |
 //! | `Extinct` | [`extinction`] and [`ExtinctionVerdict`] |
-//! | `extinct_iff_release_width_inside_tolerance` | [`extinction`] computes every width through `receiver_release::width_enumerated` on the two-point family and decides with `ReceiverWidth::releasable_at` |
+//! | `extinct_iff_release_width_inside_tolerance` | [`extinction`] computes every width through `width_over_readings` on the two-point family and decides with `ReceiverWidth::releasable_at` |
 //! | `extinct_mono_tolerance`, `extinct_mono_receivers` | `extinction_is_monotone_in_the_tolerance`, `extinction_is_monotone_in_the_receiver_family` |
 //! | `fossilStep`, `fossilState` | [`GeneratorFamily`] built from the damped state matrix, in `the_fossil_instance_has_exact_numbers` |
 //! | `the_wave_is_extinct_at_horizon_three` | `the_wave_chart_is_extinct_at_horizon_three` |
@@ -54,10 +54,9 @@
 //! Extinct_{R,G,ε}(x | 0) :⟺ ∀ ρ ∈ R, ∀ w ∈ G*, d(ρ(T_w x), ρ(T_w 0)) ≤ ε
 //! ```
 //!
-//! and that is exactly `receiver_release`'s width inside tolerance on the two-point family
+//! and that is exactly the core receiver law's width inside tolerance on the two-point family
 //! `{T_w x, T_w 0}`. [`extinction`] computes it that way: it builds
-//! [`crate::receiver_release::CompatibleFamily::enumerated`] with those two members, takes
-//! [`crate::receiver_release::width_enumerated`] in the sup norm and decides with
+//! [`width_over_readings`] over those two members in the sup norm and decides with
 //! [`holonics::law::receiver::ReceiverWidth::releasable_at`]. No second diameter is founded here.
 //!
 //! # Why `Extinct` is a verdict and not a search that ran out
@@ -90,7 +89,7 @@
 //!
 //! # Where this sits on the relation ladder
 //!
-//! [definition] Item **T1** of the same plan, `crate::relation_ladder` and
+//! [definition] Item **T1** of the same plan, the relation-ladder owner and
 //! `Foundation/RelationLadder.lean`, places identity, continuation, isomorphism, receiver
 //! equality, equal potential and tolerance on one typed scale. This owner is stated against the
 //! same underlying owners, and the Lean file restates its results there:
@@ -128,21 +127,21 @@
 //! [`ContractionCertificate`] is not trusted on construction either — [`extinction`] calls
 //! [`ContractionCertificate::verify`] against the actual generators before it decides anything.
 
+use holonics::geometry::Rat;
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
-use holonics::geometry::Rat;
 use serde::Serialize;
 use thiserror::Error;
 
 use holonics::law::receiver::PassiveCoholon;
 use holonics::restriction::{FactorDescent, LinearRestriction, factor_descent_over};
 
+use crate::law::receiver::{ExactFace, width_over_readings};
 use holonics::exact_linear::{ExactLinearError, ExactRatMatrix};
 use holonics::law::receiver::DiameterNorm;
 use holonics::law::receiver::ExactFace;
 use holonics::law::receiver::Reading;
 use holonics::law::receiver::WidthRefusal;
-use crate::receiver_release::{CompatibleFamily, width_enumerated};
 
 /// The ceiling on a declared carrier extent.
 ///
@@ -608,7 +607,7 @@ impl ReceiverReading {
     /// **This reading as the core passive coholon** (plan phase 7, `Holon/Law.lean::passive_reading`):
     /// the same name and reader; the coholon reads the state as the effort under the unit storage
     /// chart, so [`Self::face`] and the coholon's value are equal entry for entry, at zero power.
-    /// This type is `receiver_release::LinearReading` with validated extents.
+    /// This type is the validated core linear receiver reading with declared extents.
     pub fn passive_coholon(&self) -> PassiveCoholon {
         PassiveCoholon::new(self.receiver.clone(), self.matrix.clone())
     }
@@ -1146,13 +1145,11 @@ impl ApertureChain {
         Ok(source
             .iter()
             .enumerate()
-            .map(|(index, value)| {
-                if index < step {
-                    value.clone()
-                } else {
-                    zero()
-                }
-            })
+            .map(
+                |(index, value)| {
+                    if index < step { value.clone() } else { zero() }
+                },
+            )
             .collect())
     }
 
@@ -1415,8 +1412,8 @@ pub enum ExtinctionVerdict {
 /// **Effective extinction of a perturbation against a reference.**
 ///
 /// [implemented-exact] Lean: `Extinct` and `extinct_iff_release_width_inside_tolerance`. Every
-/// width is taken by [`crate::receiver_release::width_enumerated`] over the two-point family
-/// `{T_w x, T_w z}` in the sup norm, and the decision is
+/// width is taken by [`width_over_readings`] over the two-point family
+/// `{T_w x, T_w z}` through the core [`width_over_readings`] law in the sup norm, and the decision is
 /// [`holonics::law::receiver::ReceiverWidth::releasable_at`]. This module computes no diameter of
 /// its own.
 ///
@@ -1512,14 +1509,15 @@ pub fn extinction(
 
     // The enumeration route. It can only refute, and it returns the first witness it finds.
     let words = generators.words_within(horizon)?;
-    let search_work = words
-        .len()
-        .checked_mul(receivers.len())
-        .ok_or(StandingRefusal::SearchWorkCeiling {
-            words: words.len(),
-            receivers: receivers.len(),
-            ceiling: SEARCH_WORK_CEILING,
-        })?;
+    let search_work =
+        words
+            .len()
+            .checked_mul(receivers.len())
+            .ok_or(StandingRefusal::SearchWorkCeiling {
+                words: words.len(),
+                receivers: receivers.len(),
+                ceiling: SEARCH_WORK_CEILING,
+            })?;
     if search_work > SEARCH_WORK_CEILING {
         return Err(StandingRefusal::SearchWorkCeiling {
             words: words.len(),
@@ -1533,14 +1531,16 @@ pub fn extinction(
         let advanced_perturbation = generators.transport_word(word, perturbation)?;
         let advanced_reference = generators.transport_word(word, reference)?;
         for reading in receivers {
-            let family = CompatibleFamily::enumerated(
-                format!("{}|{{x,0}}", generators.lineage()),
-                vec![
-                    advanced_perturbation.clone(),
-                    advanced_reference.clone(),
-                ],
+            let faces = [
+                reading.read(&advanced_perturbation)?,
+                reading.read(&advanced_reference)?,
+            ];
+            let width = width_over_readings(
+                reading.receiver(),
+                &format!("{}|{{x,0}}", generators.lineage()),
+                &faces,
+                DiameterNorm::Supremum,
             )?;
-            let width = width_enumerated(reading, &family, DiameterNorm::Supremum)?;
             if !width.releasable_at(tolerance) {
                 return Ok(ExtinctionVerdict::Separated {
                     receiver: reading.receiver().to_owned(),
@@ -1773,7 +1773,7 @@ pub enum StandingRefusal {
         /// The column outside the chart.
         column: usize,
     },
-    /// The release owner refused.
+    /// The receiver-width law refused.
     #[error(transparent)]
     Width(#[from] WidthRefusal),
     /// The exact linear algebra refused.
@@ -1791,5 +1791,5 @@ impl PartialEq for StandingRefusal {
 }
 
 #[cfg(test)]
-#[path = "standing/tests.rs"]
+#[path = "standing_tests.rs"]
 mod tests;

@@ -324,7 +324,7 @@ extents; no kernel, launch or returned value changed (device tests
 | `ReceiverRestrictedFactorDescent` | struct | `holonic-engine/src/soulkiller/receiver_restricted_transport.rs` | receiver face (codec) | a receiver-named value (name-inferred) |
 | `ReceiverRestrictedFactorRefusal` | enum | `holonic-engine/src/soulkiller/receiver_restricted_transport.rs` | different object | a refusal/status (name-inferred) |
 | `SuccessorSupportReceiverClass` | struct | `holonic-engine/src/soulkiller/receiver_restricted_transport.rs` | different object | retention/compression algebra or relation over receiver functionals (retained standing, not a port object) (name-inferred) |
-| `ReceiverReading` | struct | `holonic-engine/src/standing.rs` | passive coholon | the passive coholon with validated extents (`passive_coholon`, tested equal); the same object as `receiver_release::LinearReading`, kept because that type has public fields (source-inspected) |
+| `ReceiverReading` | struct | `holonics/src/receiver/standing.rs` | passive coholon | the passive coholon with validated extents (`passive_coholon`, tested equal); the same object as `receiver_release::LinearReading`, kept because that type has public fields (source-inspected) |
 | `ReceiverAxis` | enum | `holonic-engine/src/token_invariance.rs` | receiver face (codec) | a receiver chart/aperture geometry (where a face is read), not a port object (name-inferred) |
 | `ReceiverFamily` | struct | `holonic-engine/src/token_invariance.rs` | different object | three unrelated objects (prime family, monomial family, axis bitset) (source-inspected) |
 | `ReceiverFaceCarry` | enum | `holonic-engine/src/tube.rs` | receiver face (codec) | a readout/face value (codec projection) of a receiver (name-inferred) |

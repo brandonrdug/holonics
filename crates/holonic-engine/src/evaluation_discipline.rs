@@ -95,7 +95,7 @@ use crate::physical_occurrence::{
     DecidedClass, ExteriorDeclaration, OccurrenceId, PassageRefusal, PluralFibre,
 };
 use holonics::law::receiver::Rung;
-use crate::standing::TimedFace;
+use holonics::receiver::standing::TimedFace;
 use crate::topological_receiver::{ValueOrder, compare_values};
 
 // -------------------------------------------------------------------------------------------
@@ -1655,7 +1655,7 @@ impl Calibration {
 
 /// **One exact reading carried at a declared time.**
 ///
-/// [definition] The time is carried by [`crate::standing::TimedFace`], that owner's own object, so
+/// [definition] The time is carried by [`holonics::receiver::standing::TimedFace`], that owner's own object, so
 /// there is one owner of "a face at a time" and this module founds no second one. The reading's two
 /// exact rational endpoints are the face; a point interval is a decided reading and a wide one
 /// stays plural.
@@ -1715,7 +1715,7 @@ impl TimedReading {
         &self.receiver
     }
 
-    /// The timed face, which is `standing.rs`'s own object.
+    /// The timed face, owned by the main receiver standing object.
     pub const fn face(&self) -> &TimedFace {
         &self.face
     }
@@ -1728,7 +1728,7 @@ impl TimedReading {
 /// [`ExternalComparison::prediction`] returns it unchanged. What the return produces is a *new
 /// relation between two occurrences*, stated on a [`Rung`] of
 /// [`crate::relation_ladder`] and carrying its own time index. Cited law:
-/// `standing.rs::the_available_face_changes_while_the_source_does_not` — the available face changes
+/// `Foundation/Standing.lean::the_available_face_changes_while_the_source_does_not` — the available face changes
 /// while the source does not.
 ///
 /// `Deserialize` is not derived and every field is private.

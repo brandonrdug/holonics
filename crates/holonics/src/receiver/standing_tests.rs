@@ -9,8 +9,8 @@
 
 use super::*;
 
+use crate::law::receiver::{ExactFace, width_over_readings};
 use holonics::law::receiver::DiameterNorm;
-use crate::receiver_release::{CompatibleFamily, width_enumerated};
 
 fn rat(numerator: i64, denominator: i64) -> Rat {
     Rat::new(BigInt::from(numerator), BigInt::from(denominator))
@@ -62,8 +62,7 @@ fn medium_generators() -> GeneratorFamily {
 
 /// The receiver that reads the medium and nothing else.
 fn medium_reading() -> ReceiverReading {
-    ReceiverReading::declared("medium", matrix(&[&[(0, 1), (1, 1)]]))
-        .expect("a declared reading")
+    ReceiverReading::declared("medium", matrix(&[&[(0, 1), (1, 1)]])).expect("a declared reading")
 }
 
 /// The receiver that reads the occurrence's own state and nothing else.
@@ -92,8 +91,8 @@ fn a_quotient_is_a_standing_exactly_when_the_future_factors_through_it() {
         FutureObservation::declared(vec![1], medium_reading()).expect("an observation"),
         FutureObservation::declared(vec![0, 1, 0], medium_reading()).expect("an observation"),
     ];
-    let verdict = sufficiency(&standing, &population, &generators, &observations)
-        .expect("the check runs");
+    let verdict =
+        sufficiency(&standing, &population, &generators, &observations).expect("the check runs");
     assert_eq!(
         verdict,
         SufficiencyVerdict::Sufficient {
@@ -196,7 +195,10 @@ fn two_histories_leave_one_standing() {
     let two_steps = generators
         .transport_word(&[0, 0], &origin)
         .expect("two admitted passages");
-    assert_ne!(one_step, two_steps, "the two presents are distinct occurrences");
+    assert_ne!(
+        one_step, two_steps,
+        "the two presents are distinct occurrences"
+    );
     assert_eq!(one_step, state(&[(2, 1), (1, 1)]));
     assert_eq!(two_steps, state(&[(4, 1), (1, 1)]));
 
@@ -233,8 +235,8 @@ fn one_present_face_two_standings_separated_later() {
     );
 
     // The proposed standing is the present face. One admitted successor refutes it.
-    let proposed = StandingLaw::declared("present-face", matrix(&[&[(1, 1), (0, 1)]]))
-        .expect("a standing");
+    let proposed =
+        StandingLaw::declared("present-face", matrix(&[&[(1, 1), (0, 1)]])).expect("a standing");
     let observations = vec![
         FutureObservation::declared(vec![], state_reading()).expect("an observation"),
         FutureObservation::declared(vec![0], state_reading()).expect("an observation"),
@@ -355,8 +357,12 @@ fn one_original_two_standings_two_reconstructions() {
 
     let law = song_memory(9);
     let context = state(&[(7, 1)]);
-    let first = law.remember(&after_one, &context).expect("a reconstruction");
-    let second = law.remember(&after_two, &context).expect("a reconstruction");
+    let first = law
+        .remember(&after_one, &context)
+        .expect("a reconstruction");
+    let second = law
+        .remember(&after_two, &context)
+        .expect("a reconstruction");
     assert_ne!(
         first.value(),
         second.value(),
@@ -687,7 +693,11 @@ fn the_wave_chart_is_extinct_at_horizon_three() {
             ref factor,
         } => {
             assert_eq!(tolerance, &rat(1, 8));
-            assert_eq!(bound, &rat(1, 8), "the gain is 1 and the chart separation is 1/8");
+            assert_eq!(
+                bound,
+                &rat(1, 8),
+                "the gain is 1 and the chart separation is 1/8"
+            );
             assert_eq!(chart, &vec![0usize, 1]);
             assert_eq!(factor, &rat(1, 2));
         }
@@ -733,21 +743,22 @@ fn the_medium_separates_what_the_wave_chart_declared_extinct() {
 }
 
 /// **Lean: `extinct_iff_release_width_inside_tolerance`.** The width the verdict carries is
-/// `receiver_release`'s own width over the two-point family `{T_w x, T_w 0}`, not a second
+/// the core receiver law's width over the two-point family `{T_w x, T_w 0}`, not a second
 /// diameter.
 #[test]
 fn the_extinction_width_is_the_release_owners_width() {
-    let family = CompatibleFamily::enumerated(
+    let reading = medium_inscription_reading();
+    let faces = [
+        ExactFace::Vector(reading.face(&fossil_state(3)).expect("first face")),
+        ExactFace::Vector(reading.face(&fossil_rest()).expect("second face")),
+    ];
+    let width = width_over_readings(
+        reading.receiver(),
         "the fossil against its rest",
-        vec![fossil_state(3), fossil_rest()],
-    )
-    .expect("a two-point family");
-    let width = width_enumerated(
-        &medium_inscription_reading(),
-        &family,
+        &faces,
         DiameterNorm::Supremum,
     )
-    .expect("the release owner's width");
+    .expect("the receiver law's width");
     assert_eq!(width.diameter(), &rat(21, 64));
     assert!(!width.releasable_at(&rat(1, 8)));
     assert!(width.releasable_at(&rat(1, 2)));
@@ -850,10 +861,16 @@ fn a_search_without_a_certificate_returns_not_decided_rather_than_extinct() {
             ref reason,
         } => {
             assert_eq!(horizon, 3);
-            assert_eq!(words, 4, "one generator and a horizon of 3 names four words");
+            assert_eq!(
+                words, 4,
+                "one generator and a horizon of 3 names four words"
+            );
             assert_eq!(receiver, "medium");
             assert!(widest > &rat(21, 64));
-            assert!(reason.contains("no contraction certificate"), "reason: {reason}");
+            assert!(
+                reason.contains("no contraction certificate"),
+                "reason: {reason}"
+            );
         }
         other => panic!("the search must return NotDecidedWithinBound, got {other:?}"),
     }
@@ -1012,7 +1029,10 @@ fn a_generator_that_is_not_square_is_refused() {
     let refusal = GeneratorFamily::declared(
         "not a transport",
         vec!["oblong".to_owned()],
-        vec![matrix(&[&[(1, 1), (0, 1), (0, 1)], &[(0, 1), (1, 1), (0, 1)]])],
+        vec![matrix(&[
+            &[(1, 1), (0, 1), (0, 1)],
+            &[(0, 1), (1, 1), (0, 1)],
+        ])],
     )
     .expect_err("a non-square generator is refused");
     assert!(
@@ -1195,11 +1215,9 @@ fn an_extent_mismatch_between_a_standing_and_its_population_is_refused() {
 
 #[test]
 fn a_population_with_ragged_members_is_refused() {
-    let refusal = SourcePopulation::declared(
-        "ragged",
-        vec![state(&[(1, 1), (1, 1)]), state(&[(1, 1)])],
-    )
-    .expect_err("members of different extents are refused");
+    let refusal =
+        SourcePopulation::declared("ragged", vec![state(&[(1, 1), (1, 1)]), state(&[(1, 1)])])
+            .expect_err("members of different extents are refused");
     assert!(
         matches!(refusal, StandingRefusal::ExtentMismatch { .. }),
         "got {refusal:?}"

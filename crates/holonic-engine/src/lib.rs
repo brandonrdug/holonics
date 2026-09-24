@@ -548,7 +548,6 @@ pub mod spine_cut;
 // as a generator `m_t = D_t(S_t, c_t)`, the receiver that keeps changing after its source
 // stops, and effective extinction read as `receiver_release`'s width inside tolerance on the
 // two-point family. Paired with `Foundation/Standing.lean`.
-pub mod standing;
 pub mod statement_composition;
 pub mod statement_grammar;
 pub mod structure_group;

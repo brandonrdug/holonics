@@ -233,7 +233,7 @@ This can certify an invariant subcarrier of a larger ambient type.
 Returned.** Owners:
 [`Foundation/Standing.lean`](../../formal/elementary-holonics/ElementaryHolonics/Foundation/Standing.lean)
 (namespace `Soma.Holonics.Foundation.Standing`) and
-[`standing.rs`](../../crates/holonic-engine/src/standing.rs) with `standing/tests.rs`.
+[`standing.rs`](../../crates/holonics/src/receiver/standing.rs) with `standing_tests.rs`.
 
 **Standing is the retained residue of passages, and it may be any quotient sufficient for the
 admitted future.** `standingLaw_exists_iff_future_factors` proves that as an equivalence, which is the clause
